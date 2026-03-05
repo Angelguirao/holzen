@@ -16,6 +16,7 @@ export function useHolzen() {
   const [error, setError] = useState<string | null>(null);
   const [newReflection, setNewReflection] = useState(false);
   const [profileLoaded, setProfileLoaded] = useState(false);
+  const [hasOnboarded, setHasOnboarded] = useState(true);
 
   // Load profile from DB
   useEffect(() => {
@@ -23,7 +24,7 @@ export function useHolzen() {
     const load = async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('threshold, last_message, last_context, last_trigger_at, email_notifications')
+        .select('threshold, last_message, last_context, last_trigger_at, email_notifications, has_onboarded')
         .eq('user_id', user.id)
         .single();
 
@@ -32,6 +33,7 @@ export function useHolzen() {
         setMessage(data.last_message);
         setContext(data.last_context);
         setEmailNotificationsState(data.email_notifications ?? true);
+        setHasOnboarded(data.has_onboarded ?? false);
       }
       setProfileLoaded(true);
     };
@@ -53,6 +55,16 @@ export function useHolzen() {
     await supabase
       .from('profiles')
       .update({ email_notifications: val })
+      .eq('user_id', user.id);
+  }, [user]);
+
+  const completeOnboarding = useCallback(async (selectedThreshold: number) => {
+    setHasOnboarded(true);
+    setThresholdState(selectedThreshold);
+    if (!user) return;
+    await supabase
+      .from('profiles')
+      .update({ has_onboarded: true, threshold: selectedThreshold })
       .eq('user_id', user.id);
   }, [user]);
 
@@ -151,5 +163,7 @@ export function useHolzen() {
     newReflection,
     clearNewReflection: () => setNewReflection(false),
     dismissMessage,
+    hasOnboarded,
+    completeOnboarding,
   };
 }
