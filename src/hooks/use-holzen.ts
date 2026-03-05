@@ -89,14 +89,16 @@ export function useHolzen() {
         setMessage(msg);
         setContext(ctx);
         setNewReflection(true);
-        await supabase
-          .from('profiles')
-          .update({
+
+        // Save to history and update profile
+        await Promise.all([
+          supabase.from('reflections').insert({ user_id: user.id, message: msg, context: ctx }),
+          supabase.from('profiles').update({
             last_message: msg,
             last_context: ctx,
             last_trigger_at: new Date().toISOString(),
-          })
-          .eq('user_id', user.id);
+          }).eq('user_id', user.id),
+        ]);
       }
     } catch (e: any) {
       setError(e.message || 'Failed to generate message');
