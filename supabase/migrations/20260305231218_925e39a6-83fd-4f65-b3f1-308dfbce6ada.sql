@@ -1,0 +1,1 @@
+UPDATE profiles SET has_onboarded = false WHERE user_id = '46ed87a8-ec15-42ac-b99a-1b252f540675';
