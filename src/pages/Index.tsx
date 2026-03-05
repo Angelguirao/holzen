@@ -12,11 +12,14 @@ import { Label } from '@/components/ui/label';
 import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
+import { useTheme } from 'next-themes';
+import { Moon, Sun } from 'lucide-react';
 
 const Index = () => {
   const { user, signOut } = useAuth();
   const { subscribed, loading: subLoading, checkoutLoading, startCheckout, openPortal, refresh } = useSubscription();
   const [searchParams] = useSearchParams();
+  const { theme, setTheme } = useTheme();
 
   // Refresh subscription after checkout redirect
   useEffect(() => {
@@ -59,14 +62,23 @@ const Index = () => {
           <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">
             Holzen
           </h1>
-          {user && (
+          <div className="flex items-center gap-3">
             <button
-              onClick={signOut}
-              className="text-xs font-mono text-muted-foreground underline"
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="text-muted-foreground hover:text-foreground transition-colors"
+              aria-label="Toggle dark mode"
             >
-              Sign out
+              {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
-          )}
+            {user && (
+              <button
+                onClick={signOut}
+                className="text-xs font-mono text-muted-foreground underline"
+              >
+                Sign out
+              </button>
+            )}
+          </div>
         </div>
 
         {/* BTC Status */}
