@@ -70,15 +70,14 @@ Rules:
 async function sendNotificationEmail(
   email: string,
   reflection: string,
-  context: string,
-  apiKey: string
+  context: string
 ): Promise<boolean> {
-  // Use Lovable AI to generate a simple email body, then send via the AI gateway's email capability
-  // For now, we'll use a simple approach: generate the email content and send via Resend-like approach
-  // Since we don't have a dedicated email service, we'll use the AI gateway to format and
-  // leverage the built-in notification system
+  const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+  if (!RESEND_API_KEY) {
+    console.error("[EMAIL] RESEND_API_KEY not configured");
+    return false;
+  }
 
-  // Use a simple HTML email template
   const html = `
     <!DOCTYPE html>
     <html>
@@ -94,14 +93,31 @@ async function sendNotificationEmail(
   `;
 
   try {
-    // Send email using Supabase's built-in auth.admin methods won't work for custom emails
-    // We'll need to store the notification and let the user know in-app
-    // For a proper email solution, we'd need Resend or similar
-    console.log(`[EMAIL] Would send to ${email}: ${reflection.slice(0, 50)}...`);
-    console.log(`[EMAIL] HTML prepared, length: ${html.length}`);
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: "Holzen <onboarding@resend.dev>",
+        to: [email],
+        subject: "Holzen — A moment to pause",
+        html,
+      }),
+    });
+
+    if (!res.ok) {
+      const errText = await res.text();
+      console.error(`[EMAIL] Resend error [${res.status}]: ${errText}`);
+      return false;
+    }
+
+    await res.json();
+    console.log(`[EMAIL] Sent to ${email}`);
     return true;
   } catch (e) {
-    console.error("Email send error:", e);
+    console.error("[EMAIL] Send error:", e);
     return false;
   }
 }
@@ -180,7 +196,7 @@ serve(async (req) => {
         const { data: userData } = await supabase.auth.admin.getUserById(profile.user_id);
         const email = userData?.user?.email;
         if (email) {
-          await sendNotificationEmail(email, reflection, ctx, LOVABLE_API_KEY);
+          await sendNotificationEmail(email, reflection, ctx);
         }
       }
 
