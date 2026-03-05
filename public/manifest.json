@@ -1,0 +1,16 @@
+{
+  "name": "Holzen",
+  "short_name": "Holzen",
+  "description": "Pause before you act. Bitcoin volatility reflections.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f5f2ec",
+  "theme_color": "#f5f2ec",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64",
+      "type": "image/x-icon"
+    }
+  ]
+}
