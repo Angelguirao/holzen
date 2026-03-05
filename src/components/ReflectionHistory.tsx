@@ -50,9 +50,12 @@ export function ReflectionHistory() {
       </button>
 
       {expanded && (
-        <div className="space-y-6">
+        <div className="space-y-3">
           {reflections.map((r) => (
-            <div key={r.id} className="space-y-2">
+            <div
+              key={r.id}
+              className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2"
+            >
               <div className="flex items-start justify-between gap-2">
                 <p className="text-xs font-mono text-muted-foreground">
                   {format(new Date(r.created_at), 'MMM d, yyyy · h:mm a')}
@@ -60,7 +63,7 @@ export function ReflectionHistory() {
                 </p>
                 <button
                   onClick={() => deleteReflection(r.id)}
-                  className="shrink-0 text-muted-foreground/50 hover:text-foreground transition-colors"
+                  className="shrink-0 text-muted-foreground/40 hover:text-foreground transition-colors"
                   aria-label="Delete reflection"
                 >
                   <X className="h-3 w-3" />
