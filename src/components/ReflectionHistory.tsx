@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { format } from 'date-fns';
+import { X } from 'lucide-react';
 
 interface Reflection {
   id: string;
@@ -32,6 +33,11 @@ export function ReflectionHistory() {
     load();
   }, [user]);
 
+  const deleteReflection = useCallback(async (id: string) => {
+    await supabase.from('reflections').delete().eq('id', id);
+    setReflections((prev) => prev.filter((r) => r.id !== id));
+  }, []);
+
   if (loading || reflections.length === 0) return null;
 
   return (
@@ -47,10 +53,19 @@ export function ReflectionHistory() {
         <div className="space-y-6">
           {reflections.map((r) => (
             <div key={r.id} className="space-y-2">
-              <p className="text-xs font-mono text-muted-foreground">
-                {format(new Date(r.created_at), 'MMM d, yyyy · h:mm a')}
-                {r.context && ` — ${r.context}`}
-              </p>
+              <div className="flex items-start justify-between gap-2">
+                <p className="text-xs font-mono text-muted-foreground">
+                  {format(new Date(r.created_at), 'MMM d, yyyy · h:mm a')}
+                  {r.context && ` — ${r.context}`}
+                </p>
+                <button
+                  onClick={() => deleteReflection(r.id)}
+                  className="shrink-0 text-muted-foreground/50 hover:text-foreground transition-colors"
+                  aria-label="Delete reflection"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
               <p className="text-sm leading-relaxed">{r.message}</p>
             </div>
           ))}
