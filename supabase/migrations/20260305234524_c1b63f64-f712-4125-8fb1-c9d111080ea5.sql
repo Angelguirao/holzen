@@ -1,0 +1,1 @@
+DELETE FROM push_subscriptions WHERE user_id = '46ed87a8-ec15-42ac-b99a-1b252f540675';
