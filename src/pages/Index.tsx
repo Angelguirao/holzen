@@ -5,6 +5,7 @@ import { BtcStatus } from '@/components/BtcStatus';
 import { ThresholdSetting } from '@/components/ThresholdSetting';
 import { ReflectionMessage } from '@/components/ReflectionMessage';
 import { ReflectionHistory } from '@/components/ReflectionHistory';
+import { Onboarding } from '@/components/Onboarding';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -41,6 +42,8 @@ const Index = () => {
     newReflection,
     clearNewReflection,
     dismissMessage,
+    hasOnboarded,
+    completeOnboarding,
   } = useHolzen();
 
   // Show toast when a new reflection is generated
@@ -53,6 +56,10 @@ const Index = () => {
       clearNewReflection();
     }
   }, [newReflection, message, clearNewReflection]);
+
+  if (!hasOnboarded) {
+    return <Onboarding onComplete={completeOnboarding} />;
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
