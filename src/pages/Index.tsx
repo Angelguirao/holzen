@@ -6,6 +6,7 @@ import { ThresholdSetting } from '@/components/ThresholdSetting';
 import { ReflectionMessage } from '@/components/ReflectionMessage';
 import { ReflectionHistory } from '@/components/ReflectionHistory';
 import { Onboarding } from '@/components/Onboarding';
+import { useInstallPrompt } from '@/hooks/use-install-prompt';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -21,6 +22,7 @@ const Index = () => {
   const { subscribed, loading: subLoading, checkoutLoading, startCheckout, openPortal, refresh } = useSubscription();
   const [searchParams] = useSearchParams();
   const { theme, setTheme } = useTheme();
+  const { canInstall, install } = useInstallPrompt();
 
   // Refresh subscription after checkout redirect
   useEffect(() => {
@@ -161,6 +163,17 @@ const Index = () => {
         <Separator />
 
         {/* Footer */}
+        {canInstall && (
+          <>
+            <button
+              onClick={install}
+              className="text-xs font-mono text-muted-foreground underline"
+            >
+              Install app
+            </button>
+            <Separator />
+          </>
+        )}
         <p className="text-xs text-muted-foreground leading-relaxed">
           When volatility crosses your threshold, you receive one message encouraging pause. Nothing more.
         </p>
