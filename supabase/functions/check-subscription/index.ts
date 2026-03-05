@@ -50,18 +50,17 @@ serve(async (req) => {
     let subscriptionEnd = null;
     if (hasActive) {
       const sub = subscriptions.data[0];
-      console.log("Subscription keys:", Object.keys(sub).join(", "));
-      const raw = sub.current_period_end ?? (sub as any).ended_at ?? (sub as any).billing_cycle_anchor;
+      // In newer Stripe API versions, current_period_end moved to the subscription item level
+      const itemEnd = sub.items?.data?.[0]?.current_period_end;
+      const raw = itemEnd ?? (sub as any).current_period_end ?? sub.billing_cycle_anchor;
       try {
         if (typeof raw === "number") {
-          // Unix timestamp in seconds
           subscriptionEnd = new Date(raw * 1000).toISOString();
         } else if (typeof raw === "string") {
-          // Already an ISO string or date string
           subscriptionEnd = new Date(raw).toISOString();
         }
       } catch (e) {
-        console.log("Could not parse current_period_end:", raw, e);
+        console.log("Could not parse subscription end date:", raw, e);
       }
     }
 
