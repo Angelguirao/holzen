@@ -6,13 +6,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 
+type AuthView = 'sign-in' | 'sign-up' | 'forgot-password';
+
 const Auth = () => {
-  const [isSignUp, setIsSignUp] = useState(false);
+  const [view, setView] = useState<AuthView>('sign-in');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [confirmSent, setConfirmSent] = useState(false);
+  const [resetSent, setResetSent] = useState(false);
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -20,7 +23,7 @@ const Auth = () => {
     setLoading(true);
 
     try {
-      if (isSignUp) {
+      if (view === 'sign-up') {
         const { error } = await supabase.auth.signUp({
           email,
           password,
@@ -32,6 +35,24 @@ const Auth = () => {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
       }
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setLoading(true);
+
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/auth?type=recovery`,
+      });
+      if (error) throw error;
+      setResetSent(true);
     } catch (e: any) {
       setError(e.message);
     } finally {
@@ -64,13 +85,72 @@ const Auth = () => {
     );
   }
 
+  if (resetSent) {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6">
+        <div className="w-full max-w-sm space-y-6">
+          <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">Holzen</h1>
+          <p className="text-sm">Check your email for a password reset link.</p>
+          <button
+            onClick={() => { setResetSent(false); setView('sign-in'); }}
+            className="text-xs font-mono text-muted-foreground underline"
+          >
+            Back to sign in
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (view === 'forgot-password') {
+    return (
+      <div className="min-h-screen flex items-center justify-center p-6">
+        <div className="w-full max-w-sm space-y-8">
+          <div className="space-y-2">
+            <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">Holzen</h1>
+            <p className="text-sm text-muted-foreground">Reset your password</p>
+          </div>
+
+          <form onSubmit={handleForgotPassword} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="email" className="text-xs font-mono">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="font-mono text-sm"
+              />
+            </div>
+
+            {error && (
+              <p className="text-xs text-destructive font-mono">{error}</p>
+            )}
+
+            <Button type="submit" className="w-full font-mono text-xs" disabled={loading}>
+              Send reset link
+            </Button>
+          </form>
+
+          <button
+            onClick={() => { setView('sign-in'); setError(null); }}
+            className="text-xs font-mono text-muted-foreground underline w-full text-center"
+          >
+            Back to sign in
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
       <div className="w-full max-w-sm space-y-8">
         <div className="space-y-2">
           <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">Holzen</h1>
           <p className="text-sm text-muted-foreground">
-            {isSignUp ? 'Create an account' : 'Sign in to continue'}
+            {view === 'sign-up' ? 'Create an account' : 'Sign in to continue'}
           </p>
         </div>
 
@@ -101,7 +181,18 @@ const Auth = () => {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-xs font-mono">Password</Label>
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password" className="text-xs font-mono">Password</Label>
+              {view === 'sign-in' && (
+                <button
+                  type="button"
+                  onClick={() => { setView('forgot-password'); setError(null); }}
+                  className="text-xs font-mono text-muted-foreground underline"
+                >
+                  Forgot password?
+                </button>
+              )}
+            </div>
             <Input
               id="password"
               type="password"
@@ -118,15 +209,15 @@ const Auth = () => {
           )}
 
           <Button type="submit" className="w-full font-mono text-xs" disabled={loading}>
-            {isSignUp ? 'Create account' : 'Sign in'}
+            {view === 'sign-up' ? 'Create account' : 'Sign in'}
           </Button>
         </form>
 
         <button
-          onClick={() => { setIsSignUp(!isSignUp); setError(null); }}
+          onClick={() => { setView(view === 'sign-up' ? 'sign-in' : 'sign-up'); setError(null); }}
           className="text-xs font-mono text-muted-foreground underline w-full text-center"
         >
-          {isSignUp ? 'Already have an account' : 'Create an account'}
+          {view === 'sign-up' ? 'Already have an account' : 'Create an account'}
         </button>
       </div>
     </div>
