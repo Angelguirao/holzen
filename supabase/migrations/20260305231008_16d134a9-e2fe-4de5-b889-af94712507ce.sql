@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN has_onboarded boolean NOT NULL DEFAULT false;
