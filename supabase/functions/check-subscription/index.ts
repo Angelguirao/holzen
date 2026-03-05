@@ -48,11 +48,19 @@ serve(async (req) => {
 
     const hasActive = subscriptions.data.length > 0;
     let subscriptionEnd = null;
-    if (hasActive && subscriptions.data[0].current_period_end) {
+    if (hasActive) {
+      const raw = subscriptions.data[0].current_period_end;
+      console.log("current_period_end raw value:", JSON.stringify(raw), "type:", typeof raw);
       try {
-        subscriptionEnd = new Date(subscriptions.data[0].current_period_end * 1000).toISOString();
-      } catch {
-        console.log("Could not parse current_period_end:", subscriptions.data[0].current_period_end);
+        if (typeof raw === "number") {
+          // Unix timestamp in seconds
+          subscriptionEnd = new Date(raw * 1000).toISOString();
+        } else if (typeof raw === "string") {
+          // Already an ISO string or date string
+          subscriptionEnd = new Date(raw).toISOString();
+        }
+      } catch (e) {
+        console.log("Could not parse current_period_end:", raw, e);
       }
     }
 
