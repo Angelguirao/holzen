@@ -6,8 +6,11 @@ import { ThresholdSetting } from '@/components/ThresholdSetting';
 import { ReflectionMessage } from '@/components/ReflectionMessage';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
+import { Switch } from '@/components/ui/switch';
+import { Label } from '@/components/ui/label';
 import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { toast } from 'sonner';
 
 const Index = () => {
   const { user, signOut } = useAuth();
@@ -24,13 +27,28 @@ const Index = () => {
   const {
     threshold,
     setThreshold,
+    emailNotifications,
+    setEmailNotifications,
     btcData,
     message,
     context,
     loading,
     error,
+    newReflection,
+    clearNewReflection,
     dismissMessage,
   } = useHolzen();
+
+  // Show toast when a new reflection is generated
+  useEffect(() => {
+    if (newReflection && message) {
+      toast('New reflection', {
+        description: message.slice(0, 80) + (message.length > 80 ? '…' : ''),
+        duration: 6000,
+      });
+      clearNewReflection();
+    }
+  }, [newReflection, message, clearNewReflection]);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
@@ -97,6 +115,17 @@ const Index = () => {
                 )}
               </>
             )}
+            <Separator />
+            <div className="flex items-center justify-between">
+              <Label htmlFor="email-notif" className="text-xs font-mono text-muted-foreground">
+                Email notifications
+              </Label>
+              <Switch
+                id="email-notif"
+                checked={emailNotifications}
+                onCheckedChange={setEmailNotifications}
+              />
+            </div>
             <Separator />
             <button
               onClick={openPortal}

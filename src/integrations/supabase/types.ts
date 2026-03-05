@@ -17,6 +17,7 @@ export type Database = {
       profiles: {
         Row: {
           created_at: string
+          email_notifications: boolean
           id: string
           last_context: string | null
           last_message: string | null
@@ -27,6 +28,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          email_notifications?: boolean
           id?: string
           last_context?: string | null
           last_message?: string | null
@@ -37,6 +39,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          email_notifications?: boolean
           id?: string
           last_context?: string | null
           last_message?: string | null

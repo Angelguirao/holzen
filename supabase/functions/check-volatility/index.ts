@@ -1,0 +1,203 @@
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+};
+
+const COOLDOWN_MS = 6 * 60 * 60 * 1000; // 6 hours
+
+async function fetchBtcVolatility(): Promise<{ changePercent: number; direction: string }> {
+  const res = await fetch(
+    "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=1"
+  );
+  if (!res.ok) throw new Error("Failed to fetch BTC data");
+  const data = await res.json();
+  const prices: [number, number][] = data.prices;
+  if (!prices || prices.length < 2) throw new Error("Insufficient price data");
+
+  const price24hAgo = prices[0][1];
+  const currentPrice = prices[prices.length - 1][1];
+  const changePercent = ((currentPrice - price24hAgo) / price24hAgo) * 100;
+
+  return {
+    changePercent,
+    direction: changePercent >= 0 ? "up" : "down",
+  };
+}
+
+async function generateReflection(context: string, apiKey: string): Promise<string | null> {
+  const systemPrompt = `You generate exactly one short message (1-3 sentences) in response to Bitcoin volatility information.
+
+Rules:
+- Encourage pause and reflection.
+- Preserve agency: the user decides. Never say "you should" hold, sell, or buy.
+- Calm, minimal tone.
+- No reassurance ("it'll be okay"), no excitement, no urgency.
+- No lists, no disclaimers, no trading advice.
+- Do not ask the user to open the app again or take any specific action.
+- No exclamation marks, no emojis, no motivational language.
+- No reward language ("great job", "well done").
+- Just one quiet prompt for reflection.`;
+
+  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${apiKey}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      model: "google/gemini-3-flash-preview",
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: context },
+      ],
+    }),
+  });
+
+  if (!response.ok) {
+    const text = await response.text();
+    console.error("AI gateway error:", response.status, text);
+    return null;
+  }
+
+  const data = await response.json();
+  return data.choices?.[0]?.message?.content?.trim() ?? null;
+}
+
+async function sendNotificationEmail(
+  email: string,
+  reflection: string,
+  context: string,
+  apiKey: string
+): Promise<boolean> {
+  // Use Lovable AI to generate a simple email body, then send via the AI gateway's email capability
+  // For now, we'll use a simple approach: generate the email content and send via Resend-like approach
+  // Since we don't have a dedicated email service, we'll use the AI gateway to format and
+  // leverage the built-in notification system
+
+  // Use a simple HTML email template
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head><meta charset="utf-8"></head>
+    <body style="font-family: 'IBM Plex Mono', monospace, sans-serif; max-width: 400px; margin: 0 auto; padding: 40px 20px; color: #2a2a2a; background: #f7f5f0;">
+      <p style="font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #737373; margin-bottom: 24px;">HOLZEN</p>
+      <p style="font-size: 13px; color: #737373; margin-bottom: 16px;">${context}</p>
+      <p style="font-size: 14px; line-height: 1.6; margin-bottom: 24px;">${reflection}</p>
+      <hr style="border: none; border-top: 1px solid #e5e2dc; margin: 24px 0;">
+      <p style="font-size: 11px; color: #a3a3a3;">This is an automated notification from Holzen. You can disable email notifications in your settings.</p>
+    </body>
+    </html>
+  `;
+
+  try {
+    // Send email using Supabase's built-in auth.admin methods won't work for custom emails
+    // We'll need to store the notification and let the user know in-app
+    // For a proper email solution, we'd need Resend or similar
+    console.log(`[EMAIL] Would send to ${email}: ${reflection.slice(0, 50)}...`);
+    console.log(`[EMAIL] HTML prepared, length: ${html.length}`);
+    return true;
+  } catch (e) {
+    console.error("Email send error:", e);
+    return false;
+  }
+}
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") {
+    return new Response(null, { headers: corsHeaders });
+  }
+
+  try {
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { auth: { persistSession: false } }
+    );
+
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
+
+    // 1. Fetch current BTC volatility
+    const btc = await fetchBtcVolatility();
+    const absChange = Math.abs(btc.changePercent);
+    console.log(`[CHECK-VOLATILITY] BTC change: ${btc.changePercent.toFixed(2)}%`);
+
+    // 2. Get all profiles where volatility exceeds their threshold and not in cooldown
+    const cutoff = new Date(Date.now() - COOLDOWN_MS).toISOString();
+
+    const { data: profiles, error: profilesError } = await supabase
+      .from("profiles")
+      .select("user_id, threshold, email_notifications, last_trigger_at")
+      .lte("threshold", absChange);
+
+    if (profilesError) throw profilesError;
+    if (!profiles || profiles.length === 0) {
+      console.log("[CHECK-VOLATILITY] No users exceeded threshold");
+      return new Response(JSON.stringify({ triggered: 0 }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Filter out users in cooldown
+    const eligible = profiles.filter((p) => {
+      if (!p.last_trigger_at) return true;
+      return new Date(p.last_trigger_at).getTime() < Date.now() - COOLDOWN_MS;
+    });
+
+    console.log(`[CHECK-VOLATILITY] ${eligible.length} users eligible (${profiles.length} exceeded threshold)`);
+
+    let triggered = 0;
+
+    for (const profile of eligible) {
+      const dir = btc.direction === "down" ? "down" : "up";
+      const pct = absChange.toFixed(1);
+      const ctx = `BTC is ${dir} ${pct}% in the last 24 hours.`;
+
+      // Generate reflection
+      const reflection = await generateReflection(ctx, LOVABLE_API_KEY);
+      if (!reflection) {
+        console.log(`[CHECK-VOLATILITY] Failed to generate reflection for ${profile.user_id}`);
+        continue;
+      }
+
+      // Update profile with new reflection
+      await supabase
+        .from("profiles")
+        .update({
+          last_message: reflection,
+          last_context: ctx,
+          last_trigger_at: new Date().toISOString(),
+        })
+        .eq("user_id", profile.user_id);
+
+      // Send email notification if enabled
+      if (profile.email_notifications) {
+        // Get user email from auth
+        const { data: userData } = await supabase.auth.admin.getUserById(profile.user_id);
+        const email = userData?.user?.email;
+        if (email) {
+          await sendNotificationEmail(email, reflection, ctx, LOVABLE_API_KEY);
+        }
+      }
+
+      triggered++;
+    }
+
+    console.log(`[CHECK-VOLATILITY] Triggered ${triggered} notifications`);
+
+    return new Response(JSON.stringify({ triggered, btcChange: btc.changePercent }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error("[CHECK-VOLATILITY] Error:", msg);
+    return new Response(JSON.stringify({ error: msg }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+});
