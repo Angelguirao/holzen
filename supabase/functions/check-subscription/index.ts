@@ -48,8 +48,12 @@ serve(async (req) => {
 
     const hasActive = subscriptions.data.length > 0;
     let subscriptionEnd = null;
-    if (hasActive) {
-      subscriptionEnd = new Date(subscriptions.data[0].current_period_end * 1000).toISOString();
+    if (hasActive && subscriptions.data[0].current_period_end) {
+      try {
+        subscriptionEnd = new Date(subscriptions.data[0].current_period_end * 1000).toISOString();
+      } catch {
+        console.log("Could not parse current_period_end:", subscriptions.data[0].current_period_end);
+      }
     }
 
     return new Response(JSON.stringify({
