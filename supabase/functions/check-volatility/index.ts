@@ -180,6 +180,11 @@ serve(async (req) => {
         continue;
       }
 
+      // Save to reflection history
+      await supabase
+        .from("reflections")
+        .insert({ user_id: profile.user_id, message: reflection, context: ctx });
+
       // Update profile with new reflection
       await supabase
         .from("profiles")
