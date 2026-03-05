@@ -1,0 +1,4 @@
+project_id = "edgbwdecaoottowliimu"
+
+[functions.holzen-reflect]
+verify_jwt = false
