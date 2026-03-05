@@ -7,6 +7,7 @@ import { ReflectionMessage } from '@/components/ReflectionMessage';
 import { ReflectionHistory } from '@/components/ReflectionHistory';
 import { Onboarding } from '@/components/Onboarding';
 import { useInstallPrompt } from '@/hooks/use-install-prompt';
+import { usePushNotifications } from '@/hooks/use-push-notifications';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -23,6 +24,7 @@ const Index = () => {
   const [searchParams] = useSearchParams();
   const { theme, setTheme } = useTheme();
   const { canInstall, install } = useInstallPrompt();
+  const { isSupported: pushSupported, isSubscribed: pushSubscribed, loading: pushLoading, subscribe: pushSubscribe, unsubscribe: pushUnsubscribe } = usePushNotifications();
 
   // Refresh subscription after checkout redirect
   useEffect(() => {
@@ -148,6 +150,22 @@ const Index = () => {
                 onCheckedChange={setEmailNotifications}
               />
             </div>
+            {pushSupported && (
+              <>
+                <Separator />
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="push-notif" className="text-xs font-mono text-muted-foreground">
+                    Push notifications
+                  </Label>
+                  <Switch
+                    id="push-notif"
+                    checked={pushSubscribed}
+                    disabled={pushLoading}
+                    onCheckedChange={(checked) => checked ? pushSubscribe() : pushUnsubscribe()}
+                  />
+                </div>
+              </>
+            )}
             <Separator />
             <button
               onClick={openPortal}
