@@ -8,11 +8,13 @@ const COOLDOWN_MS = 6 * 60 * 60 * 1000; // 6 hours
 export function useHolzen() {
   const { user } = useAuth();
   const [threshold, setThresholdState] = useState(5);
+  const [emailNotifications, setEmailNotificationsState] = useState(true);
   const [btcData, setBtcData] = useState<BtcPriceData | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [context, setContext] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [newReflection, setNewReflection] = useState(false);
   const [profileLoaded, setProfileLoaded] = useState(false);
 
   // Load profile from DB
@@ -21,7 +23,7 @@ export function useHolzen() {
     const load = async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('threshold, last_message, last_context, last_trigger_at')
+        .select('threshold, last_message, last_context, last_trigger_at, email_notifications')
         .eq('user_id', user.id)
         .single();
 
@@ -29,6 +31,7 @@ export function useHolzen() {
         setThresholdState(data.threshold);
         setMessage(data.last_message);
         setContext(data.last_context);
+        setEmailNotificationsState(data.email_notifications ?? true);
       }
       setProfileLoaded(true);
     };
@@ -41,6 +44,15 @@ export function useHolzen() {
     await supabase
       .from('profiles')
       .update({ threshold: val })
+      .eq('user_id', user.id);
+  }, [user]);
+
+  const setEmailNotifications = useCallback(async (val: boolean) => {
+    setEmailNotificationsState(val);
+    if (!user) return;
+    await supabase
+      .from('profiles')
+      .update({ email_notifications: val })
       .eq('user_id', user.id);
   }, [user]);
 
@@ -76,6 +88,7 @@ export function useHolzen() {
       if (msg) {
         setMessage(msg);
         setContext(ctx);
+        setNewReflection(true);
         await supabase
           .from('profiles')
           .update({
@@ -126,11 +139,15 @@ export function useHolzen() {
   return {
     threshold,
     setThreshold,
+    emailNotifications,
+    setEmailNotifications,
     btcData,
     message,
     context,
     loading,
     error,
+    newReflection,
+    clearNewReflection: () => setNewReflection(false),
     dismissMessage,
   };
 }
