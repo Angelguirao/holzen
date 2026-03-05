@@ -4,6 +4,7 @@ import { useSubscription } from '@/hooks/use-subscription';
 import { BtcStatus } from '@/components/BtcStatus';
 import { ThresholdSetting } from '@/components/ThresholdSetting';
 import { ReflectionMessage } from '@/components/ReflectionMessage';
+import { ReflectionHistory } from '@/components/ReflectionHistory';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Switch } from '@/components/ui/switch';
@@ -133,6 +134,8 @@ const Index = () => {
             >
               Manage subscription
             </button>
+            <Separator />
+            <ReflectionHistory />
           </>
         )}
 

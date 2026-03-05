@@ -50,6 +50,30 @@ export type Database = {
         }
         Relationships: []
       }
+      reflections: {
+        Row: {
+          context: string | null
+          created_at: string
+          id: string
+          message: string
+          user_id: string
+        }
+        Insert: {
+          context?: string | null
+          created_at?: string
+          id?: string
+          message: string
+          user_id: string
+        }
+        Update: {
+          context?: string | null
+          created_at?: string
+          id?: string
+          message?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
