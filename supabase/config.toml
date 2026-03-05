@@ -14,3 +14,6 @@ verify_jwt = false
 
 [functions.check-volatility]
 verify_jwt = false
+
+[functions.register-push]
+verify_jwt = false

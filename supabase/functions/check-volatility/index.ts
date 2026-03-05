@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import webpush from "npm:web-push@3.6.7";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -202,6 +203,59 @@ serve(async (req) => {
         const email = userData?.user?.email;
         if (email) {
           await sendNotificationEmail(email, reflection, ctx);
+        }
+      }
+
+      // Send push notifications
+      const { data: pushSubs } = await supabase
+        .from("push_subscriptions")
+        .select("endpoint, p256dh, auth")
+        .eq("user_id", profile.user_id);
+
+      if (pushSubs && pushSubs.length > 0) {
+        const vapidPublicKey = Deno.env.get("VAPID_PUBLIC_KEY");
+        const vapidPrivateKeyJwk = Deno.env.get("VAPID_PRIVATE_KEY");
+
+        if (vapidPublicKey && vapidPrivateKeyJwk) {
+          try {
+            const privateKeyData = JSON.parse(vapidPrivateKeyJwk);
+            // Extract the raw private key 'd' parameter
+            const privateKeyBase64Url = privateKeyData.d;
+
+            webpush.setVapidDetails(
+              "mailto:noreply@holzen.app",
+              vapidPublicKey,
+              privateKeyBase64Url
+            );
+
+            const payload = JSON.stringify({
+              title: "Holzen",
+              body: reflection.slice(0, 120),
+            });
+
+            for (const sub of pushSubs) {
+              try {
+                await webpush.sendNotification(
+                  {
+                    endpoint: sub.endpoint,
+                    keys: { p256dh: sub.p256dh, auth: sub.auth },
+                  },
+                  payload
+                );
+              } catch (pushErr: any) {
+                console.error(`[PUSH] Failed for ${sub.endpoint}:`, pushErr.message);
+                // Remove invalid subscriptions (410 Gone or 404)
+                if (pushErr.statusCode === 410 || pushErr.statusCode === 404) {
+                  await supabase
+                    .from("push_subscriptions")
+                    .delete()
+                    .eq("endpoint", sub.endpoint);
+                }
+              }
+            }
+          } catch (vapidErr) {
+            console.error("[PUSH] VAPID setup error:", vapidErr);
+          }
         }
       }
 
