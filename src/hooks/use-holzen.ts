@@ -1,40 +1,63 @@
 import { useState, useEffect, useCallback } from 'react';
 import { fetchBtcData, type BtcPriceData } from '@/lib/btc';
-import { supabase } from '@/lib/supabase';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/use-auth';
 
-const STORAGE_KEY_THRESHOLD = 'holzen_threshold';
-const STORAGE_KEY_COOLDOWN = 'holzen_last_trigger';
-const STORAGE_KEY_MESSAGE = 'holzen_last_message';
-const STORAGE_KEY_CONTEXT = 'holzen_last_context';
 const COOLDOWN_MS = 6 * 60 * 60 * 1000; // 6 hours
 
 export function useHolzen() {
-  const [threshold, setThresholdState] = useState(() => {
-    const stored = localStorage.getItem(STORAGE_KEY_THRESHOLD);
-    return stored ? parseFloat(stored) : 5;
-  });
+  const { user } = useAuth();
+  const [threshold, setThresholdState] = useState(5);
   const [btcData, setBtcData] = useState<BtcPriceData | null>(null);
-  const [message, setMessage] = useState<string | null>(() =>
-    localStorage.getItem(STORAGE_KEY_MESSAGE)
-  );
-  const [context, setContext] = useState<string | null>(() =>
-    localStorage.getItem(STORAGE_KEY_CONTEXT)
-  );
+  const [message, setMessage] = useState<string | null>(null);
+  const [context, setContext] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [profileLoaded, setProfileLoaded] = useState(false);
 
-  const setThreshold = useCallback((val: number) => {
+  // Load profile from DB
+  useEffect(() => {
+    if (!user) return;
+    const load = async () => {
+      const { data } = await supabase
+        .from('profiles')
+        .select('threshold, last_message, last_context, last_trigger_at')
+        .eq('user_id', user.id)
+        .single();
+
+      if (data) {
+        setThresholdState(data.threshold);
+        setMessage(data.last_message);
+        setContext(data.last_context);
+      }
+      setProfileLoaded(true);
+    };
+    load();
+  }, [user]);
+
+  const setThreshold = useCallback(async (val: number) => {
     setThresholdState(val);
-    localStorage.setItem(STORAGE_KEY_THRESHOLD, val.toString());
-  }, []);
+    if (!user) return;
+    await supabase
+      .from('profiles')
+      .update({ threshold: val })
+      .eq('user_id', user.id);
+  }, [user]);
 
-  const isInCooldown = useCallback(() => {
-    const last = localStorage.getItem(STORAGE_KEY_COOLDOWN);
-    if (!last) return false;
-    return Date.now() - parseInt(last) < COOLDOWN_MS;
-  }, []);
+  const isInCooldown = useCallback(async () => {
+    if (!user) return true;
+    const { data } = await supabase
+      .from('profiles')
+      .select('last_trigger_at')
+      .eq('user_id', user.id)
+      .single();
+
+    if (!data?.last_trigger_at) return false;
+    return Date.now() - new Date(data.last_trigger_at).getTime() < COOLDOWN_MS;
+  }, [user]);
 
   const generateMessage = useCallback(async (data: BtcPriceData) => {
+    if (!user) return;
     const dir = data.direction === 'down' ? 'down' : 'up';
     const pct = Math.abs(data.changePercent).toFixed(1);
     const ctx = `BTC is ${dir} ${pct}% in the last 24 hours.`;
@@ -53,43 +76,52 @@ export function useHolzen() {
       if (msg) {
         setMessage(msg);
         setContext(ctx);
-        localStorage.setItem(STORAGE_KEY_MESSAGE, msg);
-        localStorage.setItem(STORAGE_KEY_CONTEXT, ctx);
-        localStorage.setItem(STORAGE_KEY_COOLDOWN, Date.now().toString());
+        await supabase
+          .from('profiles')
+          .update({
+            last_message: msg,
+            last_context: ctx,
+            last_trigger_at: new Date().toISOString(),
+          })
+          .eq('user_id', user.id);
       }
     } catch (e: any) {
       setError(e.message || 'Failed to generate message');
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [user]);
 
   const checkAndTrigger = useCallback(async () => {
     try {
       const data = await fetchBtcData();
       setBtcData(data);
 
-      if (Math.abs(data.changePercent) >= threshold && !isInCooldown()) {
+      if (user && Math.abs(data.changePercent) >= threshold && !(await isInCooldown())) {
         await generateMessage(data);
       }
     } catch (e: any) {
       setError(e.message || 'Failed to fetch BTC data');
     }
-  }, [threshold, isInCooldown, generateMessage]);
+  }, [user, threshold, isInCooldown, generateMessage]);
 
-  const dismissMessage = useCallback(() => {
+  const dismissMessage = useCallback(async () => {
     setMessage(null);
     setContext(null);
-    localStorage.removeItem(STORAGE_KEY_MESSAGE);
-    localStorage.removeItem(STORAGE_KEY_CONTEXT);
-  }, []);
+    if (!user) return;
+    await supabase
+      .from('profiles')
+      .update({ last_message: null, last_context: null })
+      .eq('user_id', user.id);
+  }, [user]);
 
-  // Initial fetch and periodic check every 5 minutes
+  // Fetch BTC data on load and periodically
   useEffect(() => {
+    if (!profileLoaded) return;
     checkAndTrigger();
     const interval = setInterval(checkAndTrigger, 5 * 60 * 1000);
     return () => clearInterval(interval);
-  }, [checkAndTrigger]);
+  }, [checkAndTrigger, profileLoaded]);
 
   return {
     threshold,

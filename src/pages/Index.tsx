@@ -1,10 +1,12 @@
 import { useHolzen } from '@/hooks/use-holzen';
+import { useAuth } from '@/hooks/use-auth';
 import { BtcStatus } from '@/components/BtcStatus';
 import { ThresholdSetting } from '@/components/ThresholdSetting';
 import { ReflectionMessage } from '@/components/ReflectionMessage';
 import { Separator } from '@/components/ui/separator';
 
 const Index = () => {
+  const { user, signOut } = useAuth();
   const {
     threshold,
     setThreshold,
@@ -20,10 +22,18 @@ const Index = () => {
     <div className="min-h-screen flex items-center justify-center p-6">
       <div className="w-full max-w-sm space-y-10">
         {/* Header */}
-        <div className="space-y-1">
+        <div className="flex items-center justify-between">
           <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">
             Holzen
           </h1>
+          {user && (
+            <button
+              onClick={signOut}
+              className="text-xs font-mono text-muted-foreground underline"
+            >
+              Sign out
+            </button>
+          )}
         </div>
 
         {/* BTC Status */}
