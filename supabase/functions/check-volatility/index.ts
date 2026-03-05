@@ -218,14 +218,31 @@ serve(async (req) => {
 
         if (vapidPublicKey && vapidPrivateKeyJwk) {
           try {
-            const privateKeyData = JSON.parse(vapidPrivateKeyJwk);
-            // Extract the raw private key 'd' parameter
-            const privateKeyBase64Url = privateKeyData.d;
+            // VAPID_PRIVATE_KEY may be PKCS8 base64, JWK JSON, or raw base64url
+            let privateKey = vapidPrivateKeyJwk;
+            try {
+              const parsed = JSON.parse(vapidPrivateKeyJwk);
+              privateKey = parsed.d || vapidPrivateKeyJwk;
+            } catch {
+              // Not JSON - check if it's PKCS8 (starts with MIG)
+              if (vapidPrivateKeyJwk.startsWith("MIG")) {
+                // PKCS8 EC key: decode and extract last 32 bytes (the raw private key)
+                const binaryStr = atob(vapidPrivateKeyJwk);
+                const bytes = new Uint8Array(binaryStr.length);
+                for (let i = 0; i < binaryStr.length; i++) bytes[i] = binaryStr.charCodeAt(i);
+                // Raw 32-byte key is at the end of PKCS8 structure
+                const rawKey = bytes.slice(-32);
+                // Convert to base64url
+                let b64 = btoa(String.fromCharCode(...rawKey));
+                b64 = b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+                privateKey = b64;
+              }
+            }
 
             webpush.setVapidDetails(
               "mailto:noreply@holzen.app",
               vapidPublicKey,
-              privateKeyBase64Url
+              privateKey
             );
 
             const payload = JSON.stringify({
@@ -243,7 +260,7 @@ serve(async (req) => {
                   payload
                 );
               } catch (pushErr: any) {
-                console.error(`[PUSH] Failed for ${sub.endpoint}:`, pushErr.message);
+                console.error(`[PUSH] Failed for ${sub.endpoint}:`, pushErr.message, "statusCode:", pushErr.statusCode, "body:", pushErr.body);
                 // Remove invalid subscriptions (410 Gone or 404)
                 if (pushErr.statusCode === 410 || pushErr.statusCode === 404) {
                   await supabase
