@@ -49,8 +49,9 @@ serve(async (req) => {
     const hasActive = subscriptions.data.length > 0;
     let subscriptionEnd = null;
     if (hasActive) {
-      const raw = subscriptions.data[0].current_period_end;
-      console.log("current_period_end raw value:", JSON.stringify(raw), "type:", typeof raw);
+      const sub = subscriptions.data[0];
+      console.log("Subscription keys:", Object.keys(sub).join(", "));
+      const raw = sub.current_period_end ?? (sub as any).ended_at ?? (sub as any).billing_cycle_anchor;
       try {
         if (typeof raw === "number") {
           // Unix timestamp in seconds
