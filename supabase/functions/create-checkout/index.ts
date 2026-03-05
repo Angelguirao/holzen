@@ -44,6 +44,7 @@ serve(async (req) => {
       customer_email: customerId ? undefined : user.email,
       line_items: [{ price: PRICE_ID, quantity: 1 }],
       mode: "subscription",
+      allow_promotion_codes: true,
       success_url: `${origin}/?subscribed=true`,
       cancel_url: `${origin}/`,
     });
