@@ -23,6 +23,9 @@ const Home = () => {
     btcData,
     message,
     context,
+    companions,
+    companionPrefs,
+    severity,
     loading,
     error,
     newReflection,
@@ -89,6 +92,9 @@ const Home = () => {
               message={message}
               context={context}
               onDismiss={dismissMessage}
+              companions={companions}
+              companionPrefs={companionPrefs}
+              severity={severity}
             />
           ) : (
             <>

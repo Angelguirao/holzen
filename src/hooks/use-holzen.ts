@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { fetchBtcData, type BtcPriceData } from '@/lib/btc';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
+import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
 
 const COOLDOWN_MS = 6 * 60 * 60 * 1000; // 6 hours
 
@@ -12,6 +13,8 @@ export function useHolzen() {
   const [btcData, setBtcData] = useState<BtcPriceData | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [context, setContext] = useState<string | null>(null);
+  const [companions, setCompanions] = useState<CompanionData>({ haiku: null, learningTitle: null, learningBody: null });
+  const [companionPrefs, setCompanionPrefsState] = useState<CompanionPrefs>({ breathing: true, haiku: true, learning: true });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [newReflection, setNewReflection] = useState(false);
@@ -24,7 +27,7 @@ export function useHolzen() {
     const load = async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('threshold, last_message, last_context, last_trigger_at, email_notifications, has_onboarded')
+        .select('threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_learning')
         .eq('user_id', user.id)
         .single();
 
@@ -34,6 +37,30 @@ export function useHolzen() {
         setContext(data.last_context);
         setEmailNotificationsState(data.email_notifications ?? true);
         setHasOnboarded(data.has_onboarded ?? false);
+        setCompanionPrefsState({
+          breathing: (data as any).companion_breathing ?? true,
+          haiku: (data as any).companion_haiku ?? true,
+          learning: (data as any).companion_learning ?? true,
+        });
+
+        // Load companion data from latest reflection if there's an active message
+        if (data.last_message) {
+          const { data: latestReflection } = await supabase
+            .from('reflections')
+            .select('haiku, learning_title, learning_body')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(1)
+            .single();
+
+          if (latestReflection) {
+            setCompanions({
+              haiku: (latestReflection as any).haiku ?? null,
+              learningTitle: (latestReflection as any).learning_title ?? null,
+              learningBody: (latestReflection as any).learning_body ?? null,
+            });
+          }
+        }
       }
       setProfileLoaded(true);
     };
@@ -55,6 +82,16 @@ export function useHolzen() {
     await supabase
       .from('profiles')
       .update({ email_notifications: val })
+      .eq('user_id', user.id);
+  }, [user]);
+
+  const setCompanionPref = useCallback(async (key: keyof CompanionPrefs, val: boolean) => {
+    setCompanionPrefsState((prev) => ({ ...prev, [key]: val }));
+    if (!user) return;
+    const dbKey = `companion_${key}` as string;
+    await supabase
+      .from('profiles')
+      .update({ [dbKey]: val } as any)
       .eq('user_id', user.id);
   }, [user]);
 
@@ -102,9 +139,23 @@ export function useHolzen() {
         setContext(ctx);
         setNewReflection(true);
 
+        const companionData: CompanionData = {
+          haiku: fnData?.haiku ?? null,
+          learningTitle: fnData?.learning_title ?? null,
+          learningBody: fnData?.learning_body ?? null,
+        };
+        setCompanions(companionData);
+
         // Save to history and update profile
         await Promise.all([
-          supabase.from('reflections').insert({ user_id: user.id, message: msg, context: ctx }),
+          supabase.from('reflections').insert({
+            user_id: user.id,
+            message: msg,
+            context: ctx,
+            haiku: companionData.haiku,
+            learning_title: companionData.learningTitle,
+            learning_body: companionData.learningBody,
+          } as any),
           supabase.from('profiles').update({
             last_message: msg,
             last_context: ctx,
@@ -145,12 +196,20 @@ export function useHolzen() {
   const dismissMessage = useCallback(async () => {
     setMessage(null);
     setContext(null);
+    setCompanions({ haiku: null, learningTitle: null, learningBody: null });
     if (!user) return;
     await supabase
       .from('profiles')
       .update({ last_message: null, last_context: null })
       .eq('user_id', user.id);
   }, [user]);
+
+  // Compute severity from btcData
+  const severity: 'mild' | 'moderate' | 'high' = btcData
+    ? Math.abs(btcData.changePercent) >= 10 ? 'high'
+      : Math.abs(btcData.changePercent) >= 5 ? 'moderate'
+      : 'mild'
+    : 'mild';
 
   // Fetch BTC data on load and periodically
   useEffect(() => {
@@ -165,9 +224,13 @@ export function useHolzen() {
     setThreshold,
     emailNotifications,
     setEmailNotifications,
+    companionPrefs,
+    setCompanionPref,
     btcData,
     message,
     context,
+    companions,
+    severity,
     loading,
     error,
     newReflection,
