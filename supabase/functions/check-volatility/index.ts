@@ -195,7 +195,11 @@ serve(async (req) => {
     for (const profile of eligible) {
       const dir = btc.direction === "down" ? "down" : "up";
       const pct = absChange.toFixed(1);
-      const ctx = `BTC is ${dir} ${pct}% in the last 24 hours.`;
+      let ctx = `BTC is ${dir} ${pct}% in the last 24 hours.`;
+      if (absCumChange >= ((profile as any).cumulative_threshold ?? 15)) {
+        const cumDir = btc.cumulativeDirection === "down" ? "down" : "up";
+        ctx += ` Over 7 days, it's ${cumDir} ${absCumChange.toFixed(1)}%.`;
+      }
 
       // Generate reflection
       const reflection = await generateReflection(ctx, LOVABLE_API_KEY);
