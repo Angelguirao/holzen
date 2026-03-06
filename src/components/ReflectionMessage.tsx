@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import { ShareReflection } from './ShareReflection';
 
 interface Props {
   message: string;
@@ -14,7 +15,10 @@ export function ReflectionMessage({ message, context, onDismiss }: Props) {
       )}
       <p className="text-lg leading-relaxed">{message}</p>
       <div className="flex items-center justify-between">
-        <span className="text-xs text-muted-foreground font-mono">From Holzen</span>
+        <div className="flex items-center gap-1">
+          <span className="text-xs text-muted-foreground font-mono">From Holzen</span>
+          <ShareReflection message={message} context={context} />
+        </div>
         <Button
           variant="ghost"
           size="sm"
