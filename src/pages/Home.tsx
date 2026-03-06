@@ -29,6 +29,7 @@ const Home = () => {
     companions,
     companionPrefs,
     severity,
+    lastReflectionId,
     loading,
     error,
     newReflection,
@@ -39,6 +40,20 @@ const Home = () => {
     manualTrigger,
     manualCooldownRemaining,
   } = useHolzen();
+
+  const [showOutcome, setShowOutcome] = useState(false);
+  const [outcomeReflectionId, setOutcomeReflectionId] = useState<string | null>(null);
+
+  const handleDismiss = () => {
+    setOutcomeReflectionId(lastReflectionId);
+    dismissMessage();
+    setShowOutcome(true);
+  };
+
+  const handleOutcomeComplete = () => {
+    setShowOutcome(false);
+    setOutcomeReflectionId(null);
+  };
 
   useEffect(() => {
     if (newReflection && message) {
