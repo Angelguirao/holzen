@@ -239,6 +239,8 @@ const Landing = () => {
 
             {/* Legal */}
             <div className="flex items-center gap-3 text-xs text-muted-foreground">
+              <Link to="/about" className="hover:text-foreground transition-colors">About</Link>
+              <span>·</span>
               <Link to="/terms" className="hover:text-foreground transition-colors">Terms</Link>
               <span>·</span>
               <Link to="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
