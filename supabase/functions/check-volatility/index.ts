@@ -21,21 +21,33 @@ async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise
   throw new Error("Failed to fetch BTC data after retries");
 }
 
-async function fetchBtcVolatility(): Promise<{ changePercent: number; direction: string }> {
-  const res = await fetchWithRetry(
-    "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=1"
-  );
-  const data = await res.json();
-  const prices: [number, number][] = data.prices;
-  if (!prices || prices.length < 2) throw new Error("Insufficient price data");
+async function fetchBtcVolatility(): Promise<{ changePercent: number; direction: string; cumulativeChangePercent: number; cumulativeDirection: string }> {
+  const [res1d, res7d] = await Promise.all([
+    fetchWithRetry("https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=1"),
+    fetchWithRetry("https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=7"),
+  ]);
 
-  const price24hAgo = prices[0][1];
-  const currentPrice = prices[prices.length - 1][1];
+  const data1d = await res1d.json();
+  const prices1d: [number, number][] = data1d.prices;
+  if (!prices1d || prices1d.length < 2) throw new Error("Insufficient price data");
+
+  const price24hAgo = prices1d[0][1];
+  const currentPrice = prices1d[prices1d.length - 1][1];
   const changePercent = ((currentPrice - price24hAgo) / price24hAgo) * 100;
+
+  const data7d = await res7d.json();
+  const prices7d: [number, number][] = data7d.prices;
+  let cumulativeChangePercent = 0;
+  if (prices7d && prices7d.length >= 2) {
+    const price7dAgo = prices7d[0][1];
+    cumulativeChangePercent = ((currentPrice - price7dAgo) / price7dAgo) * 100;
+  }
 
   return {
     changePercent,
     direction: changePercent >= 0 ? "up" : "down",
+    cumulativeChangePercent,
+    cumulativeDirection: cumulativeChangePercent >= 0 ? "up" : "down",
   };
 }
 
@@ -151,15 +163,13 @@ serve(async (req) => {
     // 1. Fetch current BTC volatility
     const btc = await fetchBtcVolatility();
     const absChange = Math.abs(btc.changePercent);
-    console.log(`[CHECK-VOLATILITY] BTC change: ${btc.changePercent.toFixed(2)}%`);
+    const absCumChange = Math.abs(btc.cumulativeChangePercent);
+    console.log(`[CHECK-VOLATILITY] BTC 24h: ${btc.changePercent.toFixed(2)}%, 7d: ${btc.cumulativeChangePercent.toFixed(2)}%`);
 
-    // 2. Get all profiles where volatility exceeds their threshold and not in cooldown
-    const cutoff = new Date(Date.now() - COOLDOWN_MS).toISOString();
-
+    // 2. Get all profiles - we need to check both thresholds
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
-      .select("user_id, threshold, email_notifications, last_trigger_at")
-      .lte("threshold", absChange);
+      .select("user_id, threshold, cumulative_threshold, email_notifications, last_trigger_at");
 
     if (profilesError) throw profilesError;
     if (!profiles || profiles.length === 0) {
@@ -169,20 +179,27 @@ serve(async (req) => {
       });
     }
 
-    // Filter out users in cooldown
+    // Filter: must exceed at least one threshold AND not in cooldown
     const eligible = profiles.filter((p) => {
+      const dailyTriggered = absChange >= (p.threshold ?? 5);
+      const cumulativeTriggered = absCumChange >= ((p as any).cumulative_threshold ?? 15);
+      if (!dailyTriggered && !cumulativeTriggered) return false;
       if (!p.last_trigger_at) return true;
       return new Date(p.last_trigger_at).getTime() < Date.now() - COOLDOWN_MS;
     });
 
-    console.log(`[CHECK-VOLATILITY] ${eligible.length} users eligible (${profiles.length} exceeded threshold)`);
+    console.log(`[CHECK-VOLATILITY] ${eligible.length} users eligible (${profiles.length} total)`);
 
     let triggered = 0;
 
     for (const profile of eligible) {
       const dir = btc.direction === "down" ? "down" : "up";
       const pct = absChange.toFixed(1);
-      const ctx = `BTC is ${dir} ${pct}% in the last 24 hours.`;
+      let ctx = `BTC is ${dir} ${pct}% in the last 24 hours.`;
+      if (absCumChange >= ((profile as any).cumulative_threshold ?? 15)) {
+        const cumDir = btc.cumulativeDirection === "down" ? "down" : "up";
+        ctx += ` Over 7 days, it's ${cumDir} ${absCumChange.toFixed(1)}%.`;
+      }
 
       // Generate reflection
       const reflection = await generateReflection(ctx, LOVABLE_API_KEY);
