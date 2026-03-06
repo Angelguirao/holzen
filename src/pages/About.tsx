@@ -71,7 +71,7 @@ const About = () => {
               This is true for experienced investors and beginners alike. The difference is that beginners often don't yet recognise the pattern: the urge to sell when prices fall, the urge to buy when prices surge. Both feel rational in the moment. Neither usually is.
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              We believe that small, well-timed interventions — a pause, a reflection, a moment of awareness — can meaningfully improve decision-making during these critical windows. Not advice. Not signals. Just enough friction to let your reflective mind catch up.
+              Holzen applies this research directly. When volatility crosses your threshold — daily or across a rolling 7-day window — you're met with a breathing exercise, a mood check, an AI reflection, and companion content (a haiku, a historical insight) designed to slow you down. Afterward, you tag your emotions, journal your thoughts, and record what you did. Over time, your personal insights panel reveals how your composure evolves — turning reactive moments into data you can learn from.
             </p>
             <p className="text-[10px] text-muted-foreground/70 leading-relaxed italic">
               Kahneman, D. (2011). <em>Thinking, Fast and Slow</em>. · Barber, B. & Odean, T. (2000). "Trading Is Hazardous to Your Wealth." <em>The Journal of Finance</em>, 55(2). · Thaler, R. (2015). <em>Misbehaving: The Making of Behavioral Economics</em>.
