@@ -31,7 +31,7 @@ const APP_VERSION = '1.1.0';
 
 const Settings = () => {
   const { user, signOut } = useAuth();
-  const { threshold, setThreshold, emailNotifications, setEmailNotifications } = useHolzen();
+  const { threshold, setThreshold, emailNotifications, setEmailNotifications, companionPrefs, setCompanionPref } = useHolzen();
   const { subscribed, loading: subLoading, checkoutLoading, startCheckout, openPortal, trialRemaining } = useSubscription();
   const { theme, setTheme } = useTheme();
   const { canInstall, install } = useInstallPrompt();
@@ -100,6 +100,46 @@ const Settings = () => {
 
       {/* Threshold */}
       <ThresholdSetting threshold={threshold} onSet={setThreshold} />
+
+      <Separator />
+
+      {/* Companions */}
+      <div className="space-y-4">
+        <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Companions</p>
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          Optional additions shown below each reflection.
+        </p>
+        <div className="flex items-center justify-between">
+          <Label htmlFor="comp-breathing" className="text-xs font-mono text-muted-foreground">
+            Breathing exercise
+          </Label>
+          <Switch
+            id="comp-breathing"
+            checked={companionPrefs.breathing}
+            onCheckedChange={(v) => setCompanionPref('breathing', v)}
+          />
+        </div>
+        <div className="flex items-center justify-between">
+          <Label htmlFor="comp-haiku" className="text-xs font-mono text-muted-foreground">
+            Haiku
+          </Label>
+          <Switch
+            id="comp-haiku"
+            checked={companionPrefs.haiku}
+            onCheckedChange={(v) => setCompanionPref('haiku', v)}
+          />
+        </div>
+        <div className="flex items-center justify-between">
+          <Label htmlFor="comp-learning" className="text-xs font-mono text-muted-foreground">
+            Historical insight
+          </Label>
+          <Switch
+            id="comp-learning"
+            checked={companionPrefs.learning}
+            onCheckedChange={(v) => setCompanionPref('learning', v)}
+          />
+        </div>
+      </div>
 
       <Separator />
 

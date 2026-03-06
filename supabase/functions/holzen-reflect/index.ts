@@ -25,18 +25,26 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const systemPrompt = `You generate exactly one short message (1-3 sentences) in response to Bitcoin volatility information.
+    const systemPrompt = `You generate a reflection with optional companions in response to Bitcoin volatility.
 
-Rules:
-- Encourage pause and reflection.
-- Preserve agency: the user decides. Never say "you should" hold, sell, or buy.
-- Calm, minimal tone.
-- No reassurance ("it'll be okay"), no excitement, no urgency.
-- No lists, no disclaimers, no trading advice.
-- Do not ask the user to open the app again or take any specific action.
-- No exclamation marks, no emojis, no motivational language.
-- No reward language ("great job", "well done").
-- Just one quiet prompt for reflection.`;
+You MUST respond by calling the "generate_reflection" function. Do not respond with plain text.
+
+Reflection rules:
+- Exactly 1-3 sentences. Calm, minimal tone.
+- Encourage pause and reflection. Preserve agency: never say "you should".
+- No reassurance, excitement, urgency, trading advice, lists, disclaimers.
+- No exclamation marks, emojis, motivational language, reward language.
+- Just one quiet prompt for reflection.
+
+Haiku rules:
+- Exactly 3 lines separated by newlines.
+- Traditional 5-7-5 syllable structure.
+- Captures the essence of the moment. Calm, contemplative.
+- No trading advice or price predictions.
+
+Learning input rules:
+- Title: a short, factual headline (5-10 words).
+- Body: 1-2 sentences about a historical Bitcoin event, market pattern, or behavioral finance insight relevant to the current context. Factual, educational, no advice.`;
 
     const response = await fetch(
       "https://ai.gateway.lovable.dev/v1/chat/completions",
@@ -52,6 +60,39 @@ Rules:
             { role: "system", content: systemPrompt },
             { role: "user", content: context },
           ],
+          tools: [
+            {
+              type: "function",
+              function: {
+                name: "generate_reflection",
+                description: "Generate a reflection message with optional haiku and learning companions.",
+                parameters: {
+                  type: "object",
+                  properties: {
+                    message: {
+                      type: "string",
+                      description: "The core reflection message (1-3 sentences).",
+                    },
+                    haiku: {
+                      type: "string",
+                      description: "A haiku (3 lines, 5-7-5 syllables) about this moment. Lines separated by newlines.",
+                    },
+                    learning_title: {
+                      type: "string",
+                      description: "Short factual headline for a historical/educational insight.",
+                    },
+                    learning_body: {
+                      type: "string",
+                      description: "1-2 sentences of factual, educational context about Bitcoin history or behavioral finance.",
+                    },
+                  },
+                  required: ["message", "haiku", "learning_title", "learning_body"],
+                  additionalProperties: false,
+                },
+              },
+            },
+          ],
+          tool_choice: { type: "function", function: { name: "generate_reflection" } },
         }),
       }
     );
@@ -75,9 +116,24 @@ Rules:
     }
 
     const data = await response.json();
-    const message = data.choices?.[0]?.message?.content?.trim();
 
-    return new Response(JSON.stringify({ message }), {
+    // Extract from tool call
+    const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
+    if (toolCall?.function?.arguments) {
+      const args = JSON.parse(toolCall.function.arguments);
+      return new Response(JSON.stringify({
+        message: args.message,
+        haiku: args.haiku || null,
+        learning_title: args.learning_title || null,
+        learning_body: args.learning_body || null,
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Fallback to plain content if tool call didn't work
+    const message = data.choices?.[0]?.message?.content?.trim();
+    return new Response(JSON.stringify({ message, haiku: null, learning_title: null, learning_body: null }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
