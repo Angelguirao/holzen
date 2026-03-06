@@ -21,7 +21,7 @@ export function ReflectionMessage({ message, context, onDismiss, companions, com
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1">
           <span className="text-xs text-muted-foreground font-mono">From Holzen</span>
-          <ShareReflection message={message} context={context} />
+          <ShareReflection message={message} context={context} haiku={companions?.haiku} />
         </div>
         <Button
           variant="ghost"
