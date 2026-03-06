@@ -192,13 +192,18 @@ export function useHolzen() {
       const data = await fetchBtcData();
       setBtcData(data);
 
-      if (user && Math.abs(data.changePercent) >= threshold && !(await isInCooldown())) {
-        await generateMessage(data);
+      if (user && !(await isInCooldown())) {
+        const dailyTriggered = Math.abs(data.changePercent) >= threshold;
+        const cumulativeTriggered = data.cumulativeChangePercent !== undefined && Math.abs(data.cumulativeChangePercent) >= cumulativeThreshold;
+
+        if (dailyTriggered || cumulativeTriggered) {
+          await generateMessage(data);
+        }
       }
     } catch (e: any) {
       setError(e.message || 'Failed to fetch BTC data');
     }
-  }, [user, threshold, isInCooldown, generateMessage]);
+  }, [user, threshold, cumulativeThreshold, isInCooldown, generateMessage]);
 
   const [lastManualAt, setLastManualAt] = useState<number | null>(null);
 
