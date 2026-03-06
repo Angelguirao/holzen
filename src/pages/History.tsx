@@ -135,7 +135,6 @@ const History = () => {
             ))}
           </div>
         )}
-        </div>
 
         {reflections.length > 3 && (
           <div className="relative">
