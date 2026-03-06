@@ -218,24 +218,38 @@ serve(async (req) => {
 
         if (vapidPublicKey && vapidPrivateKeyJwk) {
           try {
-            // VAPID_PRIVATE_KEY may be PKCS8 base64, JWK JSON, or raw base64url
             let privateKey = vapidPrivateKeyJwk;
+            console.log(`[PUSH] VAPID private key length: ${vapidPrivateKeyJwk.length}, starts: "${vapidPrivateKeyJwk.substring(0, 8)}"`);
+            
             try {
               const parsed = JSON.parse(vapidPrivateKeyJwk);
               privateKey = parsed.d || vapidPrivateKeyJwk;
             } catch {
-              // Not JSON - check if it's PKCS8 (starts with MIG)
-              if (vapidPrivateKeyJwk.startsWith("MIG")) {
-                // PKCS8 EC key: decode and extract last 32 bytes (the raw private key)
-                const binaryStr = atob(vapidPrivateKeyJwk);
-                const bytes = new Uint8Array(binaryStr.length);
-                for (let i = 0; i < binaryStr.length; i++) bytes[i] = binaryStr.charCodeAt(i);
-                // Raw 32-byte key is at the end of PKCS8 structure
-                const rawKey = bytes.slice(-32);
-                // Convert to base64url
-                let b64 = btoa(String.fromCharCode(...rawKey));
-                b64 = b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
-                privateKey = b64;
+              if (vapidPrivateKeyJwk.length > 44) {
+                // PKCS8 EC P-256 key - extract raw 32-byte private key using Web Crypto
+                let stdBase64 = vapidPrivateKeyJwk.replace(/-/g, "+").replace(/_/g, "/");
+                while (stdBase64.length % 4) stdBase64 += "=";
+                try {
+                  const binaryStr = atob(stdBase64);
+                  const pkcs8Bytes = new Uint8Array(binaryStr.length);
+                  for (let i = 0; i < binaryStr.length; i++) pkcs8Bytes[i] = binaryStr.charCodeAt(i);
+                  
+                  // Import as CryptoKey then export as JWK to get the raw 'd' value
+                  const cryptoKey = await crypto.subtle.importKey(
+                    "pkcs8",
+                    pkcs8Bytes.buffer,
+                    { name: "ECDSA", namedCurve: "P-256" },
+                    true,
+                    ["sign"]
+                  );
+                  const jwk = await crypto.subtle.exportKey("jwk", cryptoKey);
+                  if (jwk.d) {
+                    privateKey = jwk.d;
+                    console.log(`[PUSH] Extracted raw key from PKCS8 via Web Crypto, length: ${privateKey.length}`);
+                  }
+                } catch (decodeErr) {
+                  console.error("[PUSH] Failed to extract key from PKCS8:", decodeErr);
+                }
               }
             }
 
