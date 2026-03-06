@@ -36,7 +36,7 @@ function PublicOnlyRoute({ children }: { children: React.ReactNode }) {
 
 const App = () => (
   <ErrorBoundary>
-    <ThemeProvider attribute="class" defaultTheme="light" enableSystem={false}>
+    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <QueryClientProvider client={queryClient}>
         <TooltipProvider>
           <Sonner />

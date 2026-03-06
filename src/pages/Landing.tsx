@@ -30,10 +30,16 @@ const Landing = () => {
     <div className="min-h-screen flex items-start justify-center px-6 py-16">
       <div className="w-full max-w-sm space-y-12">
         {/* Header */}
-        <motion.div {...m()}>
+        <motion.div {...m()} className="flex items-center justify-between">
           <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">
             Holzen
           </h1>
+          <button
+            onClick={() => navigate('/auth')}
+            className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Sign in
+          </button>
         </motion.div>
 
         {/* Hero */}
@@ -110,18 +116,23 @@ const Landing = () => {
         <motion.div {...m()}>
           <div className="rounded-lg border border-border bg-card p-5 space-y-4">
             <div className="space-y-1">
-              <p className="text-lg font-mono text-foreground">$3<span className="text-sm text-muted-foreground">/month</span></p>
-              <p className="text-xs text-muted-foreground">
-                AI reflections via push, email, or in-app. Cancel anytime.
+              <p className="text-lg font-mono text-foreground">Free to start</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Your first 3 reflections are free — no card required. Then $3/month for unlimited AI reflections via push, email, or in-app. Cancel anytime.
               </p>
             </div>
-            <Button
-              onClick={() => navigate('/auth')}
-              className="w-full font-mono text-xs group"
-            >
-              Get started
-              <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-            </Button>
+            <div className="space-y-2">
+              <Button
+                onClick={() => navigate('/auth')}
+                className="w-full font-mono text-xs group"
+              >
+                Get started free
+                <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+              </Button>
+              <p className="text-[10px] text-muted-foreground text-center">
+                How much is one moment of clarity worth?
+              </p>
+            </div>
           </div>
         </motion.div>
 
