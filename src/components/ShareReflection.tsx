@@ -190,7 +190,7 @@ export const ShareReflection = forwardRef<HTMLButtonElement, Props>(
         }
       } catch (e: any) {
         if (e.name !== 'AbortError') {
-          toast({ description: 'Could not share image', variant: 'destructive' });
+          toast.error('Could not share image');
         }
       }
     }, [message, context, haiku, toast]);
