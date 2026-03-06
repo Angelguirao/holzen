@@ -186,7 +186,7 @@ export const ShareReflection = forwardRef<HTMLButtonElement, Props>(
           a.download = 'holzen-reflection.png';
           a.click();
           URL.revokeObjectURL(url);
-          toast({ description: 'Image downloaded' });
+          toast('Image downloaded');
         }
       } catch (e: any) {
         if (e.name !== 'AbortError') {
