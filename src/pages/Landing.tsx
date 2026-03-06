@@ -1,6 +1,7 @@
 import { useNavigate, Link } from 'react-router-dom';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -62,6 +63,49 @@ const Landing = () => {
         >
           Get started
         </Button>
+
+        <Separator />
+
+        {/* FAQ */}
+        <div className="space-y-4">
+          <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
+            Questions
+          </p>
+          <Accordion type="single" collapsible className="w-full">
+            <AccordionItem value="what" className="border-border">
+              <AccordionTrigger className="text-sm text-foreground hover:no-underline py-3">
+                What exactly does Holzen do?
+              </AccordionTrigger>
+              <AccordionContent className="text-xs text-muted-foreground leading-relaxed">
+                Holzen monitors Bitcoin's 24-hour price movement. When volatility crosses your chosen threshold, it sends you a single AI-generated reflection designed to encourage pause — not action. Then it goes quiet for six hours.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="advice" className="border-border">
+              <AccordionTrigger className="text-sm text-foreground hover:no-underline py-3">
+                Will it tell me what to buy or sell?
+              </AccordionTrigger>
+              <AccordionContent className="text-xs text-muted-foreground leading-relaxed">
+                Never. Holzen is not a trading tool or financial advisor. Reflections are intentionally neutral — they exist only to create a moment of awareness before you act on impulse.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="data" className="border-border">
+              <AccordionTrigger className="text-sm text-foreground hover:no-underline py-3">
+                What data do you collect?
+              </AccordionTrigger>
+              <AccordionContent className="text-xs text-muted-foreground leading-relaxed">
+                Only what's needed to run the service: your email, your volatility threshold, and push tokens if enabled. We don't track, profile, or sell your data. See our <Link to="/privacy" className="underline hover:text-foreground transition-colors">privacy policy</Link> for details.
+              </AccordionContent>
+            </AccordionItem>
+            <AccordionItem value="cancel" className="border-border">
+              <AccordionTrigger className="text-sm text-foreground hover:no-underline py-3">
+                Can I cancel anytime?
+              </AccordionTrigger>
+              <AccordionContent className="text-xs text-muted-foreground leading-relaxed">
+                Yes. Cancel through the app whenever you like — you keep access until the end of your billing period. No contracts, no commitments.
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        </div>
 
         <Separator />
 
