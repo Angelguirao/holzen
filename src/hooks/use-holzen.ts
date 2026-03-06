@@ -30,12 +30,13 @@ export function useHolzen() {
     const load = async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_learning')
+        .select('threshold, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_learning')
         .eq('user_id', user.id)
         .single();
 
       if (data) {
         setThresholdState(data.threshold);
+        setCumulativeThresholdState((data as any).cumulative_threshold ?? 15);
         setMessage(data.last_message);
         setContext(data.last_context);
         setEmailNotificationsState(data.email_notifications ?? true);
