@@ -14,7 +14,7 @@ import { useTheme } from 'next-themes';
 import { Moon, Sun } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -38,6 +38,11 @@ const Settings = () => {
   const { isSupported: pushSupported, isSubscribed: pushSubscribed, loading: pushLoading, subscribe: pushSubscribe, unsubscribe: pushUnsubscribe } = usePushNotifications();
   const [deleting, setDeleting] = useState(false);
   const [exporting, setExporting] = useState(false);
+
+  useEffect(() => {
+    document.title = 'Holzen — Settings';
+    return () => { document.title = 'Holzen — Pause before you act'; };
+  }, []);
 
   const exportData = async () => {
     if (!user) return;

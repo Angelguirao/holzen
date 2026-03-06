@@ -4,10 +4,12 @@ import { BtcStatus } from '@/components/BtcStatus';
 import { ReflectionMessage } from '@/components/ReflectionMessage';
 import { Onboarding } from '@/components/Onboarding';
 import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
+import { AlertCircle, Loader2 } from 'lucide-react';
 
 const Home = () => {
   const { subscribed, loading: subLoading, trialRemaining, checkoutLoading, startCheckout, refresh } = useSubscription();
@@ -46,6 +48,11 @@ const Home = () => {
     }
   }, [newReflection, message, clearNewReflection]);
 
+  useEffect(() => {
+    document.title = 'Holzen — Home';
+    return () => { document.title = 'Holzen — Pause before you act'; };
+  }, []);
+
   if (!hasOnboarded) {
     return <Onboarding onComplete={completeOnboarding} />;
   }
@@ -77,7 +84,10 @@ const Home = () => {
           </Button>
         </div>
       ) : subLoading ? (
-        <p className="text-xs font-mono text-muted-foreground">Loading</p>
+        <div className="space-y-3">
+          <Skeleton className="h-4 w-48" />
+          <Skeleton className="h-4 w-32" />
+        </div>
       ) : (
         <>
           {/* Trial badge */}
@@ -99,9 +109,28 @@ const Home = () => {
           ) : (
             <>
               {loading ? (
-                <p className="text-xs font-mono text-muted-foreground">
-                  Generating reflection
-                </p>
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    <p className="text-xs font-mono">Generating reflection</p>
+                  </div>
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-3/4" />
+                  <Skeleton className="h-4 w-1/2" />
+                </div>
+              ) : error && !btcData ? (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <AlertCircle className="h-3.5 w-3.5" />
+                    <p className="text-xs font-mono">Something went wrong</p>
+                  </div>
+                  <button
+                    onClick={manualTrigger}
+                    className="text-xs font-mono text-muted-foreground underline"
+                  >
+                    Try again
+                  </button>
+                </div>
               ) : (
                 <button
                   onClick={manualTrigger}

@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Eye, EyeOff } from 'lucide-react';
+import { Eye, EyeOff, WifiOff } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 import type { BtcPriceData } from '@/lib/btc';
 
 interface Props {
@@ -18,17 +19,28 @@ export function BtcStatus({ data, error }: Props) {
 
   if (error) {
     return (
-      <p className="text-xs font-mono text-muted-foreground">
-        Unable to fetch price data
-      </p>
+      <div className="space-y-2">
+        <div className="flex items-center gap-2 text-muted-foreground">
+          <WifiOff className="h-3.5 w-3.5" />
+          <p className="text-xs font-mono">Unable to fetch price data</p>
+        </div>
+        <p className="text-[10px] font-mono text-muted-foreground/60">
+          Check your connection and try again
+        </p>
+      </div>
     );
   }
 
   if (!data) {
     return (
-      <p className="text-xs font-mono text-muted-foreground">
-        Loading price data
-      </p>
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-3 w-16" />
+          <Skeleton className="h-3.5 w-3.5 rounded-full" />
+        </div>
+        <Skeleton className="h-7 w-32" />
+        <Skeleton className="h-4 w-24" />
+      </div>
     );
   }
 
