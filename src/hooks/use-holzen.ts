@@ -10,6 +10,7 @@ const MANUAL_COOLDOWN_MS = 15 * 60 * 1000; // 15 minutes for on-demand
 export function useHolzen() {
   const { user } = useAuth();
   const [threshold, setThresholdState] = useState(5);
+  const [cumulativeThreshold, setCumulativeThresholdState] = useState(15);
   const [emailNotifications, setEmailNotificationsState] = useState(true);
   const [btcData, setBtcData] = useState<BtcPriceData | null>(null);
   const [message, setMessage] = useState<string | null>(null);
