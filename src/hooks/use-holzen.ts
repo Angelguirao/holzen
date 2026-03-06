@@ -42,9 +42,9 @@ export function useHolzen() {
         setEmailNotificationsState(data.email_notifications ?? true);
         setHasOnboarded(data.has_onboarded ?? false);
         setCompanionPrefsState({
-          breathing: (data as any).companion_breathing ?? true,
-          haiku: (data as any).companion_haiku ?? true,
-          learning: (data as any).companion_learning ?? true,
+          breathing: data.companion_breathing ?? true,
+          haiku: data.companion_haiku ?? true,
+          learning: data.companion_learning ?? true,
         });
 
         // Load companion data from latest reflection if there's an active message
