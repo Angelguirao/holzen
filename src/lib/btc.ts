@@ -5,11 +5,21 @@ export interface BtcPriceData {
   direction: 'up' | 'down';
 }
 
+async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise<Response> {
+  for (let i = 0; i < retries; i++) {
+    const res = await fetch(url);
+    if (res.ok) return res;
+    console.warn(`BTC fetch attempt ${i + 1} failed (${res.status}), ${i < retries - 1 ? 'retrying...' : 'giving up'}`);
+    await res.text();
+    if (i < retries - 1) await new Promise((r) => setTimeout(r, delayMs * (i + 1)));
+  }
+  throw new Error('Failed to fetch BTC data after retries');
+}
+
 export async function fetchBtcData(): Promise<BtcPriceData> {
-  const res = await fetch(
+  const res = await fetchWithRetry(
     'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=1'
   );
-  if (!res.ok) throw new Error('Failed to fetch BTC data');
   const data = await res.json();
   const prices: [number, number][] = data.prices;
   if (!prices || prices.length < 2) throw new Error('Insufficient price data');
