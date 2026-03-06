@@ -21,21 +21,33 @@ async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise
   throw new Error("Failed to fetch BTC data after retries");
 }
 
-async function fetchBtcVolatility(): Promise<{ changePercent: number; direction: string }> {
-  const res = await fetchWithRetry(
-    "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=1"
-  );
-  const data = await res.json();
-  const prices: [number, number][] = data.prices;
-  if (!prices || prices.length < 2) throw new Error("Insufficient price data");
+async function fetchBtcVolatility(): Promise<{ changePercent: number; direction: string; cumulativeChangePercent: number; cumulativeDirection: string }> {
+  const [res1d, res7d] = await Promise.all([
+    fetchWithRetry("https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=1"),
+    fetchWithRetry("https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=7"),
+  ]);
 
-  const price24hAgo = prices[0][1];
-  const currentPrice = prices[prices.length - 1][1];
+  const data1d = await res1d.json();
+  const prices1d: [number, number][] = data1d.prices;
+  if (!prices1d || prices1d.length < 2) throw new Error("Insufficient price data");
+
+  const price24hAgo = prices1d[0][1];
+  const currentPrice = prices1d[prices1d.length - 1][1];
   const changePercent = ((currentPrice - price24hAgo) / price24hAgo) * 100;
+
+  const data7d = await res7d.json();
+  const prices7d: [number, number][] = data7d.prices;
+  let cumulativeChangePercent = 0;
+  if (prices7d && prices7d.length >= 2) {
+    const price7dAgo = prices7d[0][1];
+    cumulativeChangePercent = ((currentPrice - price7dAgo) / price7dAgo) * 100;
+  }
 
   return {
     changePercent,
     direction: changePercent >= 0 ? "up" : "down",
+    cumulativeChangePercent,
+    cumulativeDirection: cumulativeChangePercent >= 0 ? "up" : "down",
   };
 }
 
