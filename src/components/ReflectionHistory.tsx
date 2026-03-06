@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { format } from 'date-fns';
 import { X } from 'lucide-react';
+import { ShareReflection } from './ShareReflection';
 
 interface Reflection {
   id: string;
@@ -61,13 +62,16 @@ export function ReflectionHistory() {
                   {format(new Date(r.created_at), 'MMM d, yyyy · h:mm a')}
                   {r.context && ` — ${r.context}`}
                 </p>
-                <button
-                  onClick={() => deleteReflection(r.id)}
-                  className="shrink-0 text-muted-foreground/40 hover:text-foreground transition-colors"
-                  aria-label="Delete reflection"
-                >
-                  <X className="h-3 w-3" />
-                </button>
+                <div className="flex items-center gap-1 shrink-0">
+                  <ShareReflection message={r.message} context={r.context} />
+                  <button
+                    onClick={() => deleteReflection(r.id)}
+                    className="shrink-0 text-muted-foreground/40 hover:text-foreground transition-colors p-1"
+                    aria-label="Delete reflection"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
               </div>
               <p className="text-sm leading-relaxed">{r.message}</p>
             </div>
