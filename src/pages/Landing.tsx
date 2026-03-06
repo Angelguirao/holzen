@@ -164,6 +164,7 @@ const Landing = () => {
                 <AccordionContent className="text-xs text-muted-foreground leading-relaxed">
                   Yes. Decades of behavioral finance research — from Kahneman's Nobel-winning work on cognitive biases to Barber &amp; Odean's studies showing that frequent traders underperform by 6.5% annually — demonstrate that emotional, impulsive decisions under volatility are among the most costly mistakes investors make. Holzen applies a simple, evidence-based idea: a brief pause before action leads to better decisions.
                 </AccordionContent>
+              </AccordionItem>
               <AccordionItem value="advice" className="border-border">
                 <AccordionTrigger className="text-sm text-foreground hover:no-underline py-3">
                   Will it tell me what to buy or sell?
