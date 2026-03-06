@@ -18,6 +18,8 @@ import Privacy from "./pages/Privacy";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 import About from "./pages/About";
+import Blog from "./pages/Blog";
+import BlogPost from "./pages/BlogPost";
 
 const queryClient = new QueryClient();
 
