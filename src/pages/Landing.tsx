@@ -3,7 +3,7 @@ import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Shield, Clock, BellOff, ArrowRight } from 'lucide-react';
+import { Shield, Clock, BellOff, ArrowRight, Twitter } from 'lucide-react';
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 14 },
