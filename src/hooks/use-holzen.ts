@@ -119,7 +119,7 @@ export function useHolzen() {
     return Date.now() - new Date(data.last_trigger_at).getTime() < COOLDOWN_MS;
   }, [user]);
 
-  const generateMessage = useCallback(async (data: BtcPriceData) => {
+  const generateMessage = useCallback(async (data: BtcPriceData, mood?: string) => {
     if (!user) return;
     const dir = data.direction === 'down' ? 'down' : 'up';
     const pct = Math.abs(data.changePercent).toFixed(1);
@@ -156,6 +156,7 @@ export function useHolzen() {
           haiku: companionData.haiku,
           learning_title: companionData.learningTitle,
           learning_body: companionData.learningBody,
+          ...(mood ? { mood } : {}),
         } as any).select('id').single();
 
         if (insertedReflection) {
@@ -196,7 +197,7 @@ export function useHolzen() {
     return Math.max(0, MANUAL_COOLDOWN_MS - elapsed);
   }, [lastManualAt]);
 
-  const manualTrigger = useCallback(async () => {
+  const manualTrigger = useCallback(async (mood?: string) => {
     const remaining = manualCooldownRemaining();
     if (remaining > 0) return;
 
@@ -204,7 +205,7 @@ export function useHolzen() {
     try {
       const data = btcData || await fetchBtcData();
       if (!btcData) setBtcData(data);
-      await generateMessage(data);
+      await generateMessage(data, mood);
     } catch (e: any) {
       setError(e.message || 'Failed to trigger reflection');
     }

@@ -1,0 +1,1 @@
+ALTER TABLE public.reflections ADD COLUMN mood text DEFAULT NULL;
