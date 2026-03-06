@@ -10,11 +10,21 @@ const corsHeaders = {
 
 const COOLDOWN_MS = 6 * 60 * 60 * 1000; // 6 hours
 
+async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise<Response> {
+  for (let i = 0; i < retries; i++) {
+    const res = await fetch(url);
+    if (res.ok) return res;
+    console.warn(`[CHECK-VOLATILITY] Fetch attempt ${i + 1} failed (${res.status}), ${i < retries - 1 ? "retrying..." : "giving up"}`);
+    await res.text(); // consume body
+    if (i < retries - 1) await new Promise((r) => setTimeout(r, delayMs * (i + 1)));
+  }
+  throw new Error("Failed to fetch BTC data after retries");
+}
+
 async function fetchBtcVolatility(): Promise<{ changePercent: number; direction: string }> {
-  const res = await fetch(
+  const res = await fetchWithRetry(
     "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=1"
   );
-  if (!res.ok) throw new Error("Failed to fetch BTC data");
   const data = await res.json();
   const prices: [number, number][] = data.prices;
   if (!prices || prices.length < 2) throw new Error("Insufficient price data");
