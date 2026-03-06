@@ -16,6 +16,9 @@ export type Database = {
     Tables: {
       profiles: {
         Row: {
+          companion_breathing: boolean
+          companion_haiku: boolean
+          companion_learning: boolean
           created_at: string
           email_notifications: boolean
           has_onboarded: boolean
@@ -31,6 +34,9 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          companion_breathing?: boolean
+          companion_haiku?: boolean
+          companion_learning?: boolean
           created_at?: string
           email_notifications?: boolean
           has_onboarded?: boolean
@@ -46,6 +52,9 @@ export type Database = {
           user_id: string
         }
         Update: {
+          companion_breathing?: boolean
+          companion_haiku?: boolean
+          companion_learning?: boolean
           created_at?: string
           email_notifications?: boolean
           has_onboarded?: boolean
@@ -138,24 +147,33 @@ export type Database = {
         Row: {
           context: string | null
           created_at: string
+          haiku: string | null
           id: string
           is_favorite: boolean
+          learning_body: string | null
+          learning_title: string | null
           message: string
           user_id: string
         }
         Insert: {
           context?: string | null
           created_at?: string
+          haiku?: string | null
           id?: string
           is_favorite?: boolean
+          learning_body?: string | null
+          learning_title?: string | null
           message: string
           user_id: string
         }
         Update: {
           context?: string | null
           created_at?: string
+          haiku?: string | null
           id?: string
           is_favorite?: boolean
+          learning_body?: string | null
+          learning_title?: string | null
           message?: string
           user_id?: string
         }
