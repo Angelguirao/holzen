@@ -15,3 +15,5 @@ project_id = "edgbwdecaoottowliimu"
     verify_jwt = false
   [functions.register-push]
     verify_jwt = false
+  [functions.delete-account]
+    verify_jwt = false
