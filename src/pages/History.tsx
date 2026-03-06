@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import { X, Star, Search } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ShareReflection } from '@/components/ShareReflection';
+import { ReflectionNote } from '@/components/ReflectionNote';
 import { HaikuDisplay } from '@/components/HaikuDisplay';
 import { LearningInput } from '@/components/LearningInput';
 
