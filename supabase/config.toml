@@ -1,19 +1,17 @@
 project_id = "edgbwdecaoottowliimu"
 
-[functions.holzen-reflect]
-verify_jwt = false
-
-[functions.check-subscription]
-verify_jwt = false
-
-[functions.create-checkout]
-verify_jwt = false
-
-[functions.customer-portal]
-verify_jwt = false
-
-[functions.check-volatility]
-verify_jwt = false
-
-[functions.register-push]
-verify_jwt = false
+[functions]
+  [functions.auth-email-hook]
+    verify_jwt = false
+  [functions.check-subscription]
+    verify_jwt = false
+  [functions.check-volatility]
+    verify_jwt = false
+  [functions.create-checkout]
+    verify_jwt = false
+  [functions.customer-portal]
+    verify_jwt = false
+  [functions.holzen-reflect]
+    verify_jwt = false
+  [functions.register-push]
+    verify_jwt = false
