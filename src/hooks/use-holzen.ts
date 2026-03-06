@@ -59,9 +59,9 @@ export function useHolzen() {
 
           if (latestReflection) {
             setCompanions({
-              haiku: (latestReflection as any).haiku ?? null,
-              learningTitle: (latestReflection as any).learning_title ?? null,
-              learningBody: (latestReflection as any).learning_body ?? null,
+              haiku: latestReflection.haiku ?? null,
+              learningTitle: latestReflection.learning_title ?? null,
+              learningBody: latestReflection.learning_body ?? null,
             });
           }
         }
