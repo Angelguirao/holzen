@@ -216,6 +216,7 @@ export type Database = {
           mood: string | null
           note: string | null
           outcome: string | null
+          tags: string[] | null
           user_id: string
         }
         Insert: {
@@ -230,6 +231,7 @@ export type Database = {
           mood?: string | null
           note?: string | null
           outcome?: string | null
+          tags?: string[] | null
           user_id: string
         }
         Update: {
@@ -244,6 +246,7 @@ export type Database = {
           mood?: string | null
           note?: string | null
           outcome?: string | null
+          tags?: string[] | null
           user_id?: string
         }
         Relationships: []
