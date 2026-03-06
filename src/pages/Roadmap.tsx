@@ -91,48 +91,34 @@ const Roadmap = () => {
             ))}
           </div>
         ) : (
-          <div className="space-y-8">
-            {sortedStatuses.map((status) => (
-              <div key={status} className="space-y-3">
-                <span className={`inline-block text-[10px] font-mono tracking-wider uppercase px-2 py-0.5 rounded ${statusColors[status] || 'bg-muted text-muted-foreground'}`}>
-                  {statusLabels[status] || status}
-                </span>
-                {grouped[status]
-                  .sort((a, b) => b.vote_count - a.vote_count)
-                  .map((item) => {
-                    const voted = votes.has(item.id);
-                    return (
-                      <div
-                        key={item.id}
-                        className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 flex gap-3 items-start"
-                      >
-                        {status !== 'shipped' && (
-                          <button
-                            onClick={() => toggleVote(item.id)}
-                            disabled={!user}
-                            className={`shrink-0 flex flex-col items-center gap-0.5 pt-0.5 transition-colors ${
-                              voted ? 'text-primary' : 'text-muted-foreground/40 hover:text-foreground'
-                            } ${!user ? 'opacity-40 cursor-not-allowed' : ''}`}
-                            aria-label={voted ? 'Remove vote' : 'Upvote'}
-                          >
-                            <ChevronUp className={`h-3.5 w-3.5 ${voted ? 'text-primary' : ''}`} />
-                            <span className="text-[10px] font-mono">{item.vote_count}</span>
-                          </button>
-                        )}
-                        <div className="space-y-0.5 min-w-0">
-                          <p className="text-sm font-medium leading-snug">{item.title}</p>
-                          {item.description && (
-                            <p className="text-xs text-muted-foreground leading-relaxed">{item.description}</p>
-                          )}
-                        </div>
-                        {status === 'shipped' && (
-                          <span className="shrink-0 text-[10px] font-mono text-muted-foreground/50 ml-auto">✓</span>
-                        )}
-                      </div>
-                    );
-                  })}
-              </div>
-            ))}
+          <div className="space-y-3">
+            {sorted.map((item) => {
+              const voted = votes.has(item.id);
+              return (
+                <div
+                  key={item.id}
+                  className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 flex gap-3 items-start"
+                >
+                  <button
+                    onClick={() => toggleVote(item.id)}
+                    disabled={!user}
+                    className={`shrink-0 flex flex-col items-center gap-0.5 pt-0.5 transition-colors ${
+                      voted ? 'text-primary' : 'text-muted-foreground/40 hover:text-foreground'
+                    } ${!user ? 'opacity-40 cursor-not-allowed' : ''}`}
+                    aria-label={voted ? 'Remove vote' : 'Upvote'}
+                  >
+                    <ChevronUp className={`h-3.5 w-3.5 ${voted ? 'text-primary' : ''}`} />
+                    <span className="text-[10px] font-mono">{item.vote_count}</span>
+                  </button>
+                  <div className="space-y-0.5 min-w-0">
+                    <p className="text-sm font-medium leading-snug">{item.title}</p>
+                    {item.description && (
+                      <p className="text-xs text-muted-foreground leading-relaxed">{item.description}</p>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
