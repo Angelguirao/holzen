@@ -74,7 +74,7 @@ const History = () => {
     if (search.trim()) {
       const q = search.toLowerCase();
       result = result.filter(
-        (r) => r.message.toLowerCase().includes(q) || r.context?.toLowerCase().includes(q) || r.note?.toLowerCase().includes(q)
+        (r) => r.message.toLowerCase().includes(q) || r.context?.toLowerCase().includes(q) || r.note?.toLowerCase().includes(q) || r.tags?.some((t) => t.toLowerCase().includes(q))
       );
     }
     return result;
