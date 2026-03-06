@@ -190,6 +190,7 @@ export type Database = {
           learning_title: string | null
           message: string
           mood: string | null
+          note: string | null
           outcome: string | null
           user_id: string
         }
@@ -203,6 +204,7 @@ export type Database = {
           learning_title?: string | null
           message: string
           mood?: string | null
+          note?: string | null
           outcome?: string | null
           user_id: string
         }
@@ -216,6 +218,7 @@ export type Database = {
           learning_title?: string | null
           message?: string
           mood?: string | null
+          note?: string | null
           outcome?: string | null
           user_id?: string
         }
