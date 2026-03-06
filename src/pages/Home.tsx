@@ -99,6 +99,9 @@ const Home = () => {
       {/* BTC Status */}
       <BtcStatus data={btcData} error={error} />
 
+      {/* 7-day chart */}
+      <BtcChart />
+
       <Separator />
 
       {/* Subscription / trial gate */}
