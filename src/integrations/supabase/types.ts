@@ -189,6 +189,7 @@ export type Database = {
           learning_body: string | null
           learning_title: string | null
           message: string
+          outcome: string | null
           user_id: string
         }
         Insert: {
@@ -200,6 +201,7 @@ export type Database = {
           learning_body?: string | null
           learning_title?: string | null
           message: string
+          outcome?: string | null
           user_id: string
         }
         Update: {
@@ -211,6 +213,7 @@ export type Database = {
           learning_body?: string | null
           learning_title?: string | null
           message?: string
+          outcome?: string | null
           user_id?: string
         }
         Relationships: []

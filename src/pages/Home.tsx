@@ -2,6 +2,7 @@ import { useHolzen } from '@/hooks/use-holzen';
 import { useSubscription } from '@/hooks/use-subscription';
 import { BtcStatus } from '@/components/BtcStatus';
 import { ReflectionMessage } from '@/components/ReflectionMessage';
+import { OutcomePrompt } from '@/components/OutcomePrompt';
 import { Onboarding } from '@/components/Onboarding';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -28,6 +29,7 @@ const Home = () => {
     companions,
     companionPrefs,
     severity,
+    lastReflectionId,
     loading,
     error,
     newReflection,
@@ -38,6 +40,20 @@ const Home = () => {
     manualTrigger,
     manualCooldownRemaining,
   } = useHolzen();
+
+  const [showOutcome, setShowOutcome] = useState(false);
+  const [outcomeReflectionId, setOutcomeReflectionId] = useState<string | null>(null);
+
+  const handleDismiss = () => {
+    setOutcomeReflectionId(lastReflectionId);
+    dismissMessage();
+    setShowOutcome(true);
+  };
+
+  const handleOutcomeComplete = () => {
+    setShowOutcome(false);
+    setOutcomeReflectionId(null);
+  };
 
   useEffect(() => {
     if (newReflection && message) {
@@ -102,10 +118,15 @@ const Home = () => {
             <ReflectionMessage
               message={message}
               context={context}
-              onDismiss={dismissMessage}
+              onDismiss={handleDismiss}
               companions={companions}
               companionPrefs={companionPrefs}
               severity={severity}
+            />
+          ) : showOutcome && outcomeReflectionId ? (
+            <OutcomePrompt
+              reflectionId={outcomeReflectionId}
+              onComplete={handleOutcomeComplete}
             />
           ) : (
             <>
