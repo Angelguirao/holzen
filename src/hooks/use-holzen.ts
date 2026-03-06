@@ -119,7 +119,7 @@ export function useHolzen() {
     return Date.now() - new Date(data.last_trigger_at).getTime() < COOLDOWN_MS;
   }, [user]);
 
-  const generateMessage = useCallback(async (data: BtcPriceData) => {
+  const generateMessage = useCallback(async (data: BtcPriceData, mood?: string) => {
     if (!user) return;
     const dir = data.direction === 'down' ? 'down' : 'up';
     const pct = Math.abs(data.changePercent).toFixed(1);
