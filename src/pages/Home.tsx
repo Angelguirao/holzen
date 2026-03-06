@@ -6,10 +6,10 @@ import { Onboarding } from '@/components/Onboarding';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import { AlertCircle, Loader2 } from 'lucide-react';
+import { AlertCircle, Loader2, Pause } from 'lucide-react';
 
 const Home = () => {
   const { subscribed, loading: subLoading, trialRemaining, checkoutLoading, startCheckout, refresh } = useSubscription();
@@ -36,6 +36,7 @@ const Home = () => {
     hasOnboarded,
     completeOnboarding,
     manualTrigger,
+    manualCooldownRemaining,
   } = useHolzen();
 
   useEffect(() => {
@@ -132,12 +133,11 @@ const Home = () => {
                   </button>
                 </div>
               ) : (
-                <button
-                  onClick={manualTrigger}
-                  className="text-xs font-mono text-muted-foreground underline"
-                >
-                  Generate reflection now
-                </button>
+                <NeedAMomentButton
+                  onTrigger={manualTrigger}
+                  cooldownRemaining={manualCooldownRemaining}
+                  loading={loading}
+                />
               )}
             </>
           )}
@@ -152,5 +152,48 @@ const Home = () => {
     </div>
   );
 };
+
+function NeedAMomentButton({
+  onTrigger,
+  cooldownRemaining,
+  loading,
+}: {
+  onTrigger: () => void;
+  cooldownRemaining: () => number;
+  loading: boolean;
+}) {
+  const [remaining, setRemaining] = useState(cooldownRemaining());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRemaining(cooldownRemaining());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [cooldownRemaining]);
+
+  const inCooldown = remaining > 0;
+  const minutes = Math.ceil(remaining / 60000);
+
+  return (
+    <div className="space-y-3">
+      <Button
+        onClick={onTrigger}
+        disabled={inCooldown || loading}
+        variant="outline"
+        className="w-full font-mono text-xs gap-2"
+      >
+        <Pause className="h-3.5 w-3.5" />
+        {loading ? 'Generating...' : inCooldown
+          ? `Available in ${minutes} min`
+          : 'I need a moment'}
+      </Button>
+      <p className="text-[10px] text-muted-foreground text-center leading-relaxed">
+        {inCooldown
+          ? 'Take this time to breathe. The next reflection will be here when you need it.'
+          : 'Request a reflection anytime — no threshold required.'}
+      </p>
+    </div>
+  );
+}
 
 export default Home;
