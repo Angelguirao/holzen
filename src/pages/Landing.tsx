@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 
@@ -69,6 +69,14 @@ const Landing = () => {
         <p className="text-xs text-muted-foreground leading-relaxed">
           Holzen is not a trading tool. It won't tell you what to do. It exists to create a small space between impulse and decision.
         </p>
+
+        <div className="flex items-center gap-3 text-xs text-muted-foreground">
+          <Link to="/terms" className="hover:text-foreground transition-colors">Terms</Link>
+          <span>·</span>
+          <Link to="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
+          <span>·</span>
+          <a href="mailto:hello@holzen.app" className="hover:text-foreground transition-colors">Contact</a>
+        </div>
       </div>
     </div>
   );
