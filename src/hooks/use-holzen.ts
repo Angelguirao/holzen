@@ -5,6 +5,7 @@ import { useAuth } from '@/hooks/use-auth';
 import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
 
 const COOLDOWN_MS = 6 * 60 * 60 * 1000; // 6 hours
+const MANUAL_COOLDOWN_MS = 15 * 60 * 1000; // 15 minutes for on-demand
 
 export function useHolzen() {
   const { user } = useAuth();
@@ -183,7 +184,19 @@ export function useHolzen() {
     }
   }, [user, threshold, isInCooldown, generateMessage]);
 
+  const [lastManualAt, setLastManualAt] = useState<number | null>(null);
+
+  const manualCooldownRemaining = useCallback(() => {
+    if (!lastManualAt) return 0;
+    const elapsed = Date.now() - lastManualAt;
+    return Math.max(0, MANUAL_COOLDOWN_MS - elapsed);
+  }, [lastManualAt]);
+
   const manualTrigger = useCallback(async () => {
+    const remaining = manualCooldownRemaining();
+    if (remaining > 0) return;
+
+    setLastManualAt(Date.now());
     try {
       const data = btcData || await fetchBtcData();
       if (!btcData) setBtcData(data);
@@ -191,7 +204,7 @@ export function useHolzen() {
     } catch (e: any) {
       setError(e.message || 'Failed to trigger reflection');
     }
-  }, [btcData, generateMessage]);
+  }, [btcData, generateMessage, manualCooldownRemaining]);
 
   const dismissMessage = useCallback(async () => {
     setMessage(null);
@@ -239,5 +252,6 @@ export function useHolzen() {
     hasOnboarded,
     completeOnboarding,
     manualTrigger,
+    manualCooldownRemaining,
   };
 }
