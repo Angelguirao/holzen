@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { Copy, Check, Gift, Star, Crown } from 'lucide-react';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 import { Progress } from '@/components/ui/progress';
 
 interface GrantedReward {
@@ -19,7 +19,7 @@ const MILESTONES = [
 
 export function ReferralSection() {
   const { user } = useAuth();
-  const { toast } = useToast();
+  
   const [referralCode, setReferralCode] = useState<string | null>(null);
   const [referralCount, setReferralCount] = useState(0);
   const [grantedRewards, setGrantedRewards] = useState<GrantedReward[]>([]);
@@ -64,9 +64,9 @@ export function ReferralSection() {
     const link = `${window.location.origin}/welcome?ref=${referralCode}`;
     await navigator.clipboard.writeText(link);
     setCopied(true);
-    toast({ description: 'Referral link copied' });
+    toast('Referral link copied');
     setTimeout(() => setCopied(false), 2000);
-  }, [referralCode, toast]);
+  }, [referralCode]);
 
   if (!referralCode) return null;
 

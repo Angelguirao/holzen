@@ -7,7 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useToast } from '@/hooks/use-toast';
+import { toast } from 'sonner';
 
 interface Props {
   message: string;
@@ -159,15 +159,15 @@ function generateShareImage(
 
 export const ShareReflection = forwardRef<HTMLButtonElement, Props>(
   function ShareReflection({ message, context, haiku }, ref) {
-    const { toast } = useToast();
+    
 
     const copyText = useCallback(async () => {
       const text = context
         ? `${context}\n\n${message}\n\n— Holzen`
         : `${message}\n\n— Holzen`;
       await navigator.clipboard.writeText(text);
-      toast({ description: 'Copied to clipboard' });
-    }, [message, context, toast]);
+      toast('Copied to clipboard');
+    }, [message, context]);
 
     const shareImage = useCallback(async () => {
       try {
@@ -186,14 +186,14 @@ export const ShareReflection = forwardRef<HTMLButtonElement, Props>(
           a.download = 'holzen-reflection.png';
           a.click();
           URL.revokeObjectURL(url);
-          toast({ description: 'Image downloaded' });
+          toast('Image downloaded');
         }
       } catch (e: any) {
         if (e.name !== 'AbortError') {
-          toast({ description: 'Could not share image', variant: 'destructive' });
+          toast.error('Could not share image');
         }
       }
-    }, [message, context, haiku, toast]);
+    }, [message, context, haiku]);
 
     const shareText = useCallback(async () => {
       const text = context
