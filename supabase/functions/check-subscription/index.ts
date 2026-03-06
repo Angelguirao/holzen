@@ -29,7 +29,30 @@ serve(async (req) => {
     const { data: claimsData, error: claimsError } = await supabaseClient.auth.getClaims(token);
     if (claimsError || !claimsData?.claims) throw new Error("Unauthorized");
     const email = claimsData.claims.email as string;
+    const userId = claimsData.claims.sub as string;
     if (!email) throw new Error("No email in token");
+
+    // Check for lifetime access first
+    const serviceClient = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { auth: { persistSession: false } }
+    );
+    const { data: profile } = await serviceClient
+      .from('profiles')
+      .select('lifetime_access')
+      .eq('user_id', userId)
+      .single();
+
+    if (profile?.lifetime_access) {
+      return new Response(JSON.stringify({
+        subscribed: true,
+        lifetime: true,
+        subscription_end: null,
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
     const customers = await stripe.customers.list({ email, limit: 1 });
@@ -50,7 +73,6 @@ serve(async (req) => {
     let subscriptionEnd = null;
     if (hasActive) {
       const sub = subscriptions.data[0];
-      // In newer Stripe API versions, current_period_end moved to the subscription item level
       const itemEnd = sub.items?.data?.[0]?.current_period_end;
       const raw = itemEnd ?? (sub as any).current_period_end ?? sub.billing_cycle_anchor;
       try {
@@ -66,6 +88,7 @@ serve(async (req) => {
 
     return new Response(JSON.stringify({
       subscribed: hasActive,
+      lifetime: false,
       subscription_end: subscriptionEnd,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

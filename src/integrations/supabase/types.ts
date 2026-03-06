@@ -23,6 +23,7 @@ export type Database = {
           last_context: string | null
           last_message: string | null
           last_trigger_at: string | null
+          lifetime_access: boolean
           referral_code: string
           referred_by: string | null
           threshold: number
@@ -37,6 +38,7 @@ export type Database = {
           last_context?: string | null
           last_message?: string | null
           last_trigger_at?: string | null
+          lifetime_access?: boolean
           referral_code?: string
           referred_by?: string | null
           threshold?: number
@@ -51,6 +53,7 @@ export type Database = {
           last_context?: string | null
           last_message?: string | null
           last_trigger_at?: string | null
+          lifetime_access?: boolean
           referral_code?: string
           referred_by?: string | null
           threshold?: number
@@ -82,6 +85,30 @@ export type Database = {
           endpoint?: string
           id?: string
           p256dh?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      referral_rewards: {
+        Row: {
+          granted_at: string
+          id: string
+          milestone: number
+          reward_type: string
+          user_id: string
+        }
+        Insert: {
+          granted_at?: string
+          id?: string
+          milestone: number
+          reward_type: string
+          user_id: string
+        }
+        Update: {
+          granted_at?: string
+          id?: string
+          milestone?: number
+          reward_type?: string
           user_id?: string
         }
         Relationships: []
