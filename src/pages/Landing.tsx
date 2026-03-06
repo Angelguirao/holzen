@@ -54,14 +54,20 @@ const Landing = () => {
           </div>
         </motion.div>
 
-        {/* Emotional hook — the "why" */}
+        {/* The science — the "why" */}
         <motion.div {...m(0.15)}>
           <div className="space-y-3 border-l-2 border-primary/30 pl-4">
             <p className="text-sm text-foreground leading-relaxed">
-              Most regretted trades happen in the first five minutes.
+              Impulsive decisions under volatility consistently lead to worse outcomes.
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              A 10% drop triggers panic. A 15% surge triggers greed. Both feel urgent. Neither requires immediate action. Holzen exists to protect the space between impulse and decision.
+              Behavioral finance research shows that emotional reactions — panic selling during drops, euphoric buying during surges — are among the most reliable predictors of poor returns. Nobel laureate Daniel Kahneman's work on fast vs. slow thinking explains why: under stress, your instinctive mind takes over before your reflective mind has a chance to weigh in.
+            </p>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Holzen creates that missing pause — a small intervention between impulse and decision.
+            </p>
+            <p className="text-[10px] text-muted-foreground/70 leading-relaxed italic">
+              Kahneman, D. (2011). <em>Thinking, Fast and Slow</em>. Farrar, Straus and Giroux. · Barber, B. & Odean, T. (2000). "Trading Is Hazardous to Your Wealth." <em>The Journal of Finance</em>, 55(2).
             </p>
           </div>
         </motion.div>
@@ -149,6 +155,14 @@ const Landing = () => {
                 </AccordionTrigger>
                 <AccordionContent className="text-xs text-muted-foreground leading-relaxed">
                   Holzen monitors Bitcoin's 24-hour price movement. When volatility crosses your chosen threshold, it sends you a single AI-generated reflection designed to encourage pause — not action. Then it goes quiet for six hours.
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="science" className="border-border">
+                <AccordionTrigger className="text-sm text-foreground hover:no-underline py-3">
+                  Is there science behind this?
+                </AccordionTrigger>
+                <AccordionContent className="text-xs text-muted-foreground leading-relaxed">
+                  Yes. Decades of behavioral finance research — from Kahneman's Nobel-winning work on cognitive biases to Barber &amp; Odean's studies showing that frequent traders underperform by 6.5% annually — demonstrate that emotional, impulsive decisions under volatility are among the most costly mistakes investors make. Holzen applies a simple, evidence-based idea: a brief pause before action leads to better decisions.
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value="advice" className="border-border">
