@@ -166,8 +166,8 @@ export const ShareReflection = forwardRef<HTMLButtonElement, Props>(
         ? `${context}\n\n${message}\n\n— Holzen`
         : `${message}\n\n— Holzen`;
       await navigator.clipboard.writeText(text);
-      toast({ description: 'Copied to clipboard' });
-    }, [message, context, toast]);
+      toast('Copied to clipboard');
+    }, [message, context]);
 
     const shareImage = useCallback(async () => {
       try {
