@@ -259,6 +259,35 @@ const Settings = () => {
         </>
       )}
 
+      {/* Change password */}
+      <div className="space-y-3">
+        <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Password</p>
+        <Input
+          type="password"
+          placeholder="New password"
+          value={newPassword}
+          onChange={(e) => setNewPassword(e.target.value)}
+          className="text-xs font-mono"
+        />
+        <Input
+          type="password"
+          placeholder="Confirm new password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          className="text-xs font-mono"
+        />
+        <Button
+          onClick={changePassword}
+          disabled={changingPassword || !newPassword}
+          size="sm"
+          className="w-full font-mono text-xs"
+        >
+          {changingPassword ? 'Updating…' : 'Update password'}
+        </Button>
+      </div>
+
+      <Separator />
+
       {/* Data */}
       <div className="space-y-3">
         <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Data</p>
