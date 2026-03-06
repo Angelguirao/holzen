@@ -2,6 +2,7 @@ import { forwardRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { ShareReflection } from './ShareReflection';
 import { ReflectionNote } from './ReflectionNote';
+import { ReflectionTags } from './ReflectionTags';
 import { CompanionSection, type CompanionData, type CompanionPrefs } from './CompanionSection';
 
 interface Props {
