@@ -1,10 +1,9 @@
 import { useEffect } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
-import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Shield, Clock, BellOff } from 'lucide-react';
+import { Shield, Clock, BellOff, ArrowRight } from 'lucide-react';
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 14 },
@@ -12,13 +11,6 @@ const fade = (delay = 0) => ({
   viewport: { once: true, margin: '-40px' },
   transition: { duration: 0.6, delay, ease: [0.25, 0.1, 0.25, 1] },
 });
-
-const stagger = {
-  initial: { opacity: 0, y: 14 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: '-40px' },
-  transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] },
-};
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -32,20 +24,20 @@ const Landing = () => {
     }
   }, [searchParams]);
 
-  const motionProps = (delay = 0) => (prefersReduced ? {} : fade(delay));
+  const m = (delay = 0) => (prefersReduced ? {} : fade(delay));
 
   return (
-    <div className="min-h-screen flex items-start justify-center px-6 py-12">
-      <div className="w-full max-w-sm space-y-10">
+    <div className="min-h-screen flex items-start justify-center px-6 py-16">
+      <div className="w-full max-w-sm space-y-12">
         {/* Header */}
-        <motion.div {...motionProps()}>
+        <motion.div {...m()}>
           <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">
             Holzen
           </h1>
         </motion.div>
 
         {/* Hero */}
-        <motion.div {...motionProps(0.1)}>
+        <motion.div {...m(0.1)}>
           <div className="space-y-4">
             <p className="text-xl leading-relaxed text-foreground">
               When Bitcoin moves, pause before you do.
@@ -56,61 +48,40 @@ const Landing = () => {
           </div>
         </motion.div>
 
-        <motion.div {...motionProps(0.15)}>
-          <Separator />
-        </motion.div>
-
-        {/* Social proof stats */}
-        <motion.div {...motionProps(0.2)}>
-          <div className="grid grid-cols-3 gap-4 text-center">
-            {[
-              { value: '2,400+', label: 'Pauses taken' },
-              { value: '6h', label: 'Quiet between' },
-              { value: '0', label: 'Trades suggested' },
-            ].map((stat, i) => (
-              <motion.div
-                key={stat.label}
-                className="space-y-1"
-                {...(prefersReduced ? {} : {
-                  initial: { opacity: 0, scale: 0.95 },
-                  whileInView: { opacity: 1, scale: 1 },
-                  viewport: { once: true },
-                  transition: { duration: 0.5, delay: 0.25 + i * 0.08 },
-                })}
-              >
-                <p className="text-lg font-mono text-foreground">{stat.value}</p>
-                <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground">{stat.label}</p>
-              </motion.div>
-            ))}
+        {/* Emotional hook — the "why" */}
+        <motion.div {...m(0.15)}>
+          <div className="space-y-3 border-l-2 border-primary/30 pl-4">
+            <p className="text-sm text-foreground leading-relaxed">
+              Most regretted trades happen in the first five minutes.
+            </p>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              A 10% drop triggers panic. A 15% surge triggers greed. Both feel urgent. Neither requires immediate action. Holzen exists to protect the space between impulse and decision.
+            </p>
           </div>
         </motion.div>
 
-        <motion.div {...motionProps(0.2)}>
-          <Separator />
-        </motion.div>
-
         {/* How it works */}
-        <div className="space-y-4">
+        <div className="space-y-5">
           <motion.p
             className="text-xs font-mono tracking-widest uppercase text-muted-foreground"
-            {...motionProps()}
+            {...m()}
           >
             How it works
           </motion.p>
           <div className="space-y-4">
             {[
               {
-                icon: <Clock className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />,
+                icon: <Clock className="h-4 w-4 text-primary shrink-0 mt-0.5" />,
                 title: 'Set your threshold',
                 desc: 'Choose the percentage of 24h volatility that matters to you.',
               },
               {
-                icon: <Shield className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />,
+                icon: <Shield className="h-4 w-4 text-primary shrink-0 mt-0.5" />,
                 title: 'Receive a reflection',
                 desc: 'When volatility crosses your line, an AI-generated message encourages pause — never action.',
               },
               {
-                icon: <BellOff className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />,
+                icon: <BellOff className="h-4 w-4 text-primary shrink-0 mt-0.5" />,
                 title: 'Nothing more',
                 desc: 'No charts, no alerts, no trading signals. One message, then silence for six hours.',
               },
@@ -135,76 +106,27 @@ const Landing = () => {
           </div>
         </div>
 
-        <motion.div {...motionProps()}>
-          <Separator />
-        </motion.div>
-
-        {/* Testimonial */}
-        <motion.div {...motionProps()}>
-          <div className="space-y-4">
-            <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
-              From the community
-            </p>
-            <div className="space-y-5">
-              {[
-                {
-                  quote: '"I used to check charts every hour. Now I just wait for the reflection and decide if I need to act at all."',
-                  author: '— M., long-term holder',
-                },
-                {
-                  quote: '"It\'s not about ignoring the market. It\'s about not letting the market control you."',
-                  author: '— R., DCA investor',
-                },
-              ].map((t, i) => (
-                <motion.blockquote
-                  key={i}
-                  className="border-l-2 border-border pl-4 space-y-2"
-                  {...(prefersReduced ? {} : {
-                    initial: { opacity: 0, x: -6 },
-                    whileInView: { opacity: 1, x: 0 },
-                    viewport: { once: true },
-                    transition: { duration: 0.6, delay: i * 0.12 },
-                  })}
-                >
-                  <p className="text-sm text-muted-foreground leading-relaxed italic">
-                    {t.quote}
-                  </p>
-                  <p className="text-xs font-mono text-muted-foreground/70">{t.author}</p>
-                </motion.blockquote>
-              ))}
+        {/* Pricing + CTA */}
+        <motion.div {...m()}>
+          <div className="rounded-lg border border-border bg-card p-5 space-y-4">
+            <div className="space-y-1">
+              <p className="text-lg font-mono text-foreground">$3<span className="text-sm text-muted-foreground">/month</span></p>
+              <p className="text-xs text-muted-foreground">
+                AI reflections via push, email, or in-app. Cancel anytime.
+              </p>
             </div>
+            <Button
+              onClick={() => navigate('/auth')}
+              className="w-full font-mono text-xs group"
+            >
+              Get started
+              <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+            </Button>
           </div>
-        </motion.div>
-
-        <motion.div {...motionProps()}>
-          <Separator />
-        </motion.div>
-
-        {/* Pricing */}
-        <motion.div {...motionProps()}>
-          <div className="space-y-2">
-            <p className="text-sm text-foreground">$3/month</p>
-            <p className="text-xs text-muted-foreground">
-              AI reflections via push, email, or in-app. Cancel anytime.
-            </p>
-          </div>
-        </motion.div>
-
-        <motion.div {...motionProps(0.05)}>
-          <Button
-            onClick={() => navigate('/auth')}
-            className="w-full font-mono text-xs"
-          >
-            Get started
-          </Button>
-        </motion.div>
-
-        <motion.div {...motionProps()}>
-          <Separator />
         </motion.div>
 
         {/* FAQ */}
-        <motion.div {...motionProps()}>
+        <motion.div {...m()}>
           <div className="space-y-4">
             <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
               Questions
@@ -246,24 +168,19 @@ const Landing = () => {
           </div>
         </motion.div>
 
-        <motion.div {...motionProps()}>
-          <Separator />
-        </motion.div>
-
         {/* Footer */}
-        <motion.div {...motionProps()}>
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            Holzen is not a trading tool. It won't tell you what to do. It exists to create a small space between impulse and decision.
-          </p>
-        </motion.div>
-
-        <motion.div {...motionProps(0.05)}>
-          <div className="flex items-center gap-3 text-xs text-muted-foreground">
-            <Link to="/terms" className="hover:text-foreground transition-colors">Terms</Link>
-            <span>·</span>
-            <Link to="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
-            <span>·</span>
-            <a href="mailto:hello@holzen.app" className="hover:text-foreground transition-colors">Contact</a>
+        <motion.div {...m()}>
+          <div className="space-y-4">
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Holzen is not a trading tool. It won't tell you what to do. It exists to create a small space between impulse and decision.
+            </p>
+            <div className="flex items-center gap-3 text-xs text-muted-foreground">
+              <Link to="/terms" className="hover:text-foreground transition-colors">Terms</Link>
+              <span>·</span>
+              <Link to="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
+              <span>·</span>
+              <a href="mailto:hello@holzen.app" className="hover:text-foreground transition-colors">Contact</a>
+            </div>
           </div>
         </motion.div>
       </div>
