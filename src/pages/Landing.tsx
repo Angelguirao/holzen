@@ -243,6 +243,8 @@ const Landing = () => {
               <span>·</span>
               <Link to="/blog" className="hover:text-foreground transition-colors">Blog</Link>
               <span>·</span>
+              <Link to="/roadmap" className="hover:text-foreground transition-colors">Roadmap</Link>
+              <span>·</span>
               <Link to="/terms" className="hover:text-foreground transition-colors">Terms</Link>
               <span>·</span>
               <Link to="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
