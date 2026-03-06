@@ -104,7 +104,7 @@ export function useHolzen() {
     const dbKey = `companion_${key}` as string;
     await supabase
       .from('profiles')
-      .update({ [dbKey]: val } as any)
+      .update({ [dbKey]: val } as Record<string, boolean>)
       .eq('user_id', user.id);
   }, [user]);
 
