@@ -85,7 +85,7 @@ export function useHolzen() {
     if (!user) return;
     await supabase
       .from('profiles')
-      .update({ cumulative_threshold: val } as any)
+      .update({ cumulative_threshold: val })
       .eq('user_id', user.id);
   }, [user]);
 
