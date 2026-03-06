@@ -1,8 +1,9 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { format } from 'date-fns';
-import { X, Star } from 'lucide-react';
+import { X, Star, Search } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { ShareReflection } from '@/components/ShareReflection';
 import { HaikuDisplay } from '@/components/HaikuDisplay';
 import { LearningInput } from '@/components/LearningInput';
@@ -23,6 +24,12 @@ const History = () => {
   const [reflections, setReflections] = useState<Reflection[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'favorites'>('all');
+  const [search, setSearch] = useState('');
+
+  useEffect(() => {
+    document.title = 'Holzen — History';
+    return () => { document.title = 'Holzen — Pause before you act'; };
+  }, []);
 
   useEffect(() => {
     if (!user) return;
@@ -32,7 +39,7 @@ const History = () => {
         .select('id, message, context, created_at, is_favorite, haiku, learning_title, learning_body')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
-        .limit(50);
+        .limit(100);
 
       setReflections((data as unknown as Reflection[]) ?? []);
       setLoading(false);
@@ -55,7 +62,16 @@ const History = () => {
     setReflections((prev) => prev.filter((r) => r.id !== id));
   }, []);
 
-  const filtered = filter === 'favorites' ? reflections.filter((r) => r.is_favorite) : reflections;
+  const filtered = useMemo(() => {
+    let result = filter === 'favorites' ? reflections.filter((r) => r.is_favorite) : reflections;
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      result = result.filter(
+        (r) => r.message.toLowerCase().includes(q) || r.context?.toLowerCase().includes(q)
+      );
+    }
+    return result;
+  }, [reflections, filter, search]);
 
   return (
     <div className="space-y-6">
@@ -68,28 +84,57 @@ const History = () => {
         </p>
       </div>
 
-      {/* Filter */}
-      <div className="flex gap-3">
-        <button
-          onClick={() => setFilter('all')}
-          className={`text-xs font-mono transition-colors ${filter === 'all' ? 'text-foreground' : 'text-muted-foreground'}`}
-        >
-          All
-        </button>
-        <button
-          onClick={() => setFilter('favorites')}
-          className={`text-xs font-mono transition-colors ${filter === 'favorites' ? 'text-foreground' : 'text-muted-foreground'}`}
-        >
-          Favorites
-        </button>
+      {/* Filter & Search */}
+      <div className="space-y-3">
+        <div className="flex gap-3">
+          <button
+            onClick={() => setFilter('all')}
+            className={`text-xs font-mono transition-colors ${filter === 'all' ? 'text-foreground' : 'text-muted-foreground'}`}
+          >
+            All
+          </button>
+          <button
+            onClick={() => setFilter('favorites')}
+            className={`text-xs font-mono transition-colors ${filter === 'favorites' ? 'text-foreground' : 'text-muted-foreground'}`}
+          >
+            Favorites
+          </button>
+        </div>
+
+        {reflections.length > 3 && (
+          <div className="relative">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground/50" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search reflections…"
+              className="w-full rounded-md border border-border/60 bg-muted/30 pl-8 pr-3 py-2 text-xs font-mono text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-ring"
+            />
+          </div>
+        )}
       </div>
 
       {loading ? (
-        <p className="text-xs font-mono text-muted-foreground">Loading</p>
+        <div className="space-y-3">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2">
+              <Skeleton className="h-3 w-40" />
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-2/3" />
+            </div>
+          ))}
+        </div>
       ) : filtered.length === 0 ? (
-        <p className="text-xs text-muted-foreground">
-          {filter === 'favorites' ? 'No favorites yet. Star reflections you want to keep.' : "No reflections yet. They'll appear here when volatility crosses your threshold."}
-        </p>
+        <div className="py-8 text-center space-y-2">
+          <p className="text-xs text-muted-foreground">
+            {search
+              ? 'No reflections match your search.'
+              : filter === 'favorites'
+                ? 'No favorites yet. Star reflections you want to keep.'
+                : "No reflections yet. They'll appear here when volatility crosses your threshold."}
+          </p>
+        </div>
       ) : (
         <div className="space-y-3">
           {filtered.map((r) => (
