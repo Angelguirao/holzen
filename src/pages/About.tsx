@@ -110,7 +110,7 @@ const About = () => {
               Holzen is a micropreneur project — small by design.
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              We don't have investors, a growth team, or a roadmap optimised for scale. We have a simple product that does one thing well, a clear price, and users who value what we build. That's the model.
+              We don't have investors, a growth team, or a roadmap optimised for scale. We have a focused product, a <Link to="/roadmap" className="underline hover:text-foreground transition-colors">public roadmap</Link> shaped by user votes, a clear price, and users who value what we build. That's the model.
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
               We believe the best software is often built by small teams — or even individuals — who care deeply about the problem they're solving. No engagement metrics, no dark patterns, no pressure to grow at all costs. Just a useful tool that earns its place by being genuinely helpful.
