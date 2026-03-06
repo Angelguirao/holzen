@@ -33,9 +33,8 @@ export function usePushNotifications() {
       );
       if (keyError || !keyData?.publicKey) throw new Error("Failed to get VAPID key");
 
-      // Register push service worker
-      const reg = await navigator.serviceWorker.register("/push-sw.js");
-      await navigator.serviceWorker.ready;
+      // Use the main PWA service worker (already registered by vite-plugin-pwa)
+      const reg = await navigator.serviceWorker.ready;
 
       // Subscribe to push
       const subscription = await reg.pushManager.subscribe({
