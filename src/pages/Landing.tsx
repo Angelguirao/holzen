@@ -35,7 +35,7 @@ const Landing = () => {
   const motionProps = (delay = 0) => (prefersReduced ? {} : fade(delay));
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6">
+    <div className="min-h-screen flex items-start justify-center px-6 py-12">
       <div className="w-full max-w-sm space-y-10">
         {/* Header */}
         <motion.div {...motionProps()}>
