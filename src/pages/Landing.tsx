@@ -54,14 +54,20 @@ const Landing = () => {
           </div>
         </motion.div>
 
-        {/* Emotional hook — the "why" */}
+        {/* The science — the "why" */}
         <motion.div {...m(0.15)}>
           <div className="space-y-3 border-l-2 border-primary/30 pl-4">
             <p className="text-sm text-foreground leading-relaxed">
-              Most regretted trades happen in the first five minutes.
+              Impulsive decisions under volatility consistently lead to worse outcomes.
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              A 10% drop triggers panic. A 15% surge triggers greed. Both feel urgent. Neither requires immediate action. Holzen exists to protect the space between impulse and decision.
+              Behavioral finance research shows that emotional reactions — panic selling during drops, euphoric buying during surges — are among the most reliable predictors of poor returns. Nobel laureate Daniel Kahneman's work on fast vs. slow thinking explains why: under stress, your instinctive mind takes over before your reflective mind has a chance to weigh in.
+            </p>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Holzen creates that missing pause — a small intervention between impulse and decision.
+            </p>
+            <p className="text-[10px] text-muted-foreground/70 leading-relaxed italic">
+              Kahneman, D. (2011). <em>Thinking, Fast and Slow</em>. Farrar, Straus and Giroux. · Barber, B. & Odean, T. (2000). "Trading Is Hazardous to Your Wealth." <em>The Journal of Finance</em>, 55(2).
             </p>
           </div>
         </motion.div>
