@@ -77,7 +77,7 @@ const Roadmap = () => {
     <div className="min-h-screen bg-background">
       <div className="max-w-lg mx-auto px-6 py-12 space-y-8">
         <div className="space-y-4">
-          <Link to="/welcome" className="inline-flex items-center gap-1 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors">
+          <Link to={user ? '/settings' : '/welcome'} className="inline-flex items-center gap-1 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="h-3 w-3" />
             Back
           </Link>
