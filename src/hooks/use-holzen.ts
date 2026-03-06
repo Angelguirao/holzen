@@ -184,7 +184,19 @@ export function useHolzen() {
     }
   }, [user, threshold, isInCooldown, generateMessage]);
 
+  const [lastManualAt, setLastManualAt] = useState<number | null>(null);
+
+  const manualCooldownRemaining = useCallback(() => {
+    if (!lastManualAt) return 0;
+    const elapsed = Date.now() - lastManualAt;
+    return Math.max(0, MANUAL_COOLDOWN_MS - elapsed);
+  }, [lastManualAt]);
+
   const manualTrigger = useCallback(async () => {
+    const remaining = manualCooldownRemaining();
+    if (remaining > 0) return;
+
+    setLastManualAt(Date.now());
     try {
       const data = btcData || await fetchBtcData();
       if (!btcData) setBtcData(data);
@@ -192,7 +204,7 @@ export function useHolzen() {
     } catch (e: any) {
       setError(e.message || 'Failed to trigger reflection');
     }
-  }, [btcData, generateMessage]);
+  }, [btcData, generateMessage, manualCooldownRemaining]);
 
   const dismissMessage = useCallback(async () => {
     setMessage(null);
