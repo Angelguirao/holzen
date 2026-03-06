@@ -1,13 +1,17 @@
 import { Button } from '@/components/ui/button';
 import { ShareReflection } from './ShareReflection';
+import { CompanionSection, type CompanionData, type CompanionPrefs } from './CompanionSection';
 
 interface Props {
   message: string;
   context: string | null;
   onDismiss: () => void;
+  companions?: CompanionData;
+  companionPrefs?: CompanionPrefs;
+  severity?: 'mild' | 'moderate' | 'high';
 }
 
-export function ReflectionMessage({ message, context, onDismiss }: Props) {
+export function ReflectionMessage({ message, context, onDismiss, companions, companionPrefs, severity }: Props) {
   return (
     <div className="space-y-6">
       {context && (
@@ -28,6 +32,14 @@ export function ReflectionMessage({ message, context, onDismiss }: Props) {
           Dismiss
         </Button>
       </div>
+
+      {companions && companionPrefs && (
+        <CompanionSection
+          companions={companions}
+          prefs={companionPrefs}
+          severity={severity}
+        />
+      )}
     </div>
   );
 }
