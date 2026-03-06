@@ -175,7 +175,7 @@ export function useHolzen() {
         }).select('id').single();
 
         if (insertedReflection) {
-          setLastReflectionId((insertedReflection as any).id);
+          setLastReflectionId(insertedReflection.id);
         }
 
         await supabase.from('profiles').update({
