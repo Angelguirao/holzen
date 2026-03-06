@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 import {
   AlertDialog,
   AlertDialogContent,
@@ -8,36 +9,32 @@ import {
   AlertDialogFooter,
   AlertDialogAction,
 } from '@/components/ui/alert-dialog';
+import { Skeleton } from '@/components/ui/skeleton';
 
-const CHANGELOG = [
-  {
-    version: '1.1.0',
-    date: 'March 2026',
-    changes: [
-      'New 3-tab layout: Home, History, Settings',
-      'Favorite reflections with star bookmark',
-      'Export your data as JSON',
-      'Delete account option',
-      '3 free reflections before subscribing',
-      'In-app changelog',
-    ],
-  },
-  {
-    version: '1.0.0',
-    date: 'February 2026',
-    changes: [
-      'AI-generated reflections on BTC volatility',
-      'Adjustable volatility threshold',
-      'Email and push notifications',
-      'Reflection history with sharing',
-      'Referral program with rewards',
-      'Dark mode support',
-    ],
-  },
-];
+interface ChangelogEntry {
+  id: string;
+  version: string;
+  date: string;
+  changes: string[];
+}
 
 export function Changelog() {
   const [open, setOpen] = useState(false);
+  const [entries, setEntries] = useState<ChangelogEntry[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!open) return;
+    setLoading(true);
+    supabase
+      .from('changelog_entries' as any)
+      .select('id, version, date, changes')
+      .order('created_at', { ascending: false })
+      .then(({ data }) => {
+        setEntries((data as unknown as ChangelogEntry[]) ?? []);
+        setLoading(false);
+      });
+  }, [open]);
 
   return (
     <>
@@ -55,23 +52,35 @@ export function Changelog() {
             <AlertDialogDescription className="sr-only">Version history</AlertDialogDescription>
           </AlertDialogHeader>
 
-          <div className="space-y-6">
-            {CHANGELOG.map((entry) => (
-              <div key={entry.version} className="space-y-2">
-                <div className="flex items-baseline gap-2">
-                  <span className="text-xs font-mono font-medium">v{entry.version}</span>
-                  <span className="text-[10px] font-mono text-muted-foreground">{entry.date}</span>
+          {loading ? (
+            <div className="space-y-4">
+              {[1, 2].map((i) => (
+                <div key={i} className="space-y-2">
+                  <Skeleton className="h-3 w-24" />
+                  <Skeleton className="h-3 w-full" />
+                  <Skeleton className="h-3 w-3/4" />
                 </div>
-                <ul className="space-y-1">
-                  {entry.changes.map((change, i) => (
-                    <li key={i} className="text-xs text-muted-foreground leading-relaxed">
-                      · {change}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {entries.map((entry) => (
+                <div key={entry.id} className="space-y-2">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-xs font-mono font-medium">v{entry.version}</span>
+                    <span className="text-[10px] font-mono text-muted-foreground">{entry.date}</span>
+                  </div>
+                  <ul className="space-y-1">
+                    {entry.changes.map((change, i) => (
+                      <li key={i} className="text-xs text-muted-foreground leading-relaxed">
+                        · {change}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
+            </div>
+          )}
 
           <AlertDialogFooter>
             <AlertDialogAction className="font-mono text-xs">Close</AlertDialogAction>
