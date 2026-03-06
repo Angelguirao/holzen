@@ -240,13 +240,33 @@ const History = () => {
                         <Star className={`h-3 w-3 ${r.is_favorite ? 'fill-current' : ''}`} />
                       </button>
                       <ShareReflection message={r.message} context={r.context} haiku={r.haiku} />
-                      <button
-                        onClick={() => deleteReflection(r.id)}
-                        className="shrink-0 text-muted-foreground/40 hover:text-foreground transition-colors p-1"
-                        aria-label="Delete reflection"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <button
+                            className="shrink-0 text-muted-foreground/40 hover:text-foreground transition-colors p-1"
+                            aria-label="Delete reflection"
+                          >
+                            <X className="h-3 w-3" />
+                          </button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle className="font-mono text-sm">Delete reflection</AlertDialogTitle>
+                            <AlertDialogDescription className="text-xs">
+                              This will permanently delete this reflection. This action cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel className="font-mono text-xs">Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => deleteReflection(r.id)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 font-mono text-xs"
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
                     </div>
                   </div>
                   <p className="text-sm leading-relaxed">{r.message}</p>
