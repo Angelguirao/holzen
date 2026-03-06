@@ -19,9 +19,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
       setUser(session?.user ?? null);
       setLoading(false);
+
+      // Record referral on first sign-in
+      if (_event === 'SIGNED_IN' && session?.user) {
+        const refCode = localStorage.getItem('holzen_ref');
+        if (refCode) {
+          localStorage.removeItem('holzen_ref');
+          supabase.functions.invoke('record-referral', {
+            body: { referral_code: refCode },
+          });
+        }
+      }
     });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
