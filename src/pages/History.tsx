@@ -72,7 +72,7 @@ const History = () => {
     const reflection = reflections.find((r) => r.id === id);
     if (!reflection) return;
     const newVal = !reflection.is_favorite;
-    await supabase.from('reflections').update({ is_favorite: newVal } as any).eq('id', id);
+    await supabase.from('reflections').update({ is_favorite: newVal }).eq('id', id);
     setReflections((prev) =>
       prev.map((r) => (r.id === id ? { ...r, is_favorite: newVal } : r))
     );
