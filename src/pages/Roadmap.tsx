@@ -28,7 +28,7 @@ const Roadmap = () => {
   useEffect(() => {
     const load = async () => {
       const { data } = await supabase
-        .from('roadmap_items' as any)
+        .from('roadmap_items')
         .select('id, title, description, status, vote_count')
         .order('vote_count', { ascending: false });
 
@@ -36,10 +36,10 @@ const Roadmap = () => {
 
       if (user) {
         const { data: userVotes } = await supabase
-          .from('roadmap_votes' as any)
+          .from('roadmap_votes')
           .select('item_id')
           .eq('user_id', user.id);
-        setVotes(new Set((userVotes as any[])?.map((v: any) => v.item_id) ?? []));
+        setVotes(new Set(userVotes?.map((v) => v.item_id) ?? []));
       }
 
       setLoading(false);
