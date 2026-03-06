@@ -80,6 +80,15 @@ export function useHolzen() {
       .eq('user_id', user.id);
   }, [user]);
 
+  const setCumulativeThreshold = useCallback(async (val: number) => {
+    setCumulativeThresholdState(val);
+    if (!user) return;
+    await supabase
+      .from('profiles')
+      .update({ cumulative_threshold: val } as any)
+      .eq('user_id', user.id);
+  }, [user]);
+
   const setEmailNotifications = useCallback(async (val: boolean) => {
     setEmailNotificationsState(val);
     if (!user) return;
