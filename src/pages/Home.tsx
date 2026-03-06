@@ -145,6 +145,8 @@ const Home = () => {
               reflectionId={outcomeReflectionId}
               onComplete={handleOutcomeComplete}
             />
+          ) : showMoodCheck ? (
+            <MoodCheck onSelect={handleMoodSelected} onSkip={handleMoodSkipped} />
           ) : (
             <>
               {loading ? (
@@ -164,7 +166,7 @@ const Home = () => {
                     <p className="text-xs font-mono">Something went wrong</p>
                   </div>
                   <button
-                    onClick={manualTrigger}
+                    onClick={() => manualTrigger()}
                     className="text-xs font-mono text-muted-foreground underline"
                   >
                     Try again
@@ -172,7 +174,7 @@ const Home = () => {
                 </div>
               ) : (
                 <NeedAMomentButton
-                  onTrigger={manualTrigger}
+                  onTrigger={handleNeedAMoment}
                   cooldownRemaining={manualCooldownRemaining}
                   loading={loading}
                 />
