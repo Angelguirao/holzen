@@ -63,15 +63,7 @@ const Roadmap = () => {
     }
   }, [user, votes]);
 
-  // Group by status
-  const grouped = items.reduce<Record<string, RoadmapItem[]>>((acc, item) => {
-    const key = item.status;
-    if (!acc[key]) acc[key] = [];
-    acc[key].push(item);
-    return acc;
-  }, {});
-
-  const sortedStatuses = Object.keys(grouped).sort((a, b) => (statusOrder[a] ?? 99) - (statusOrder[b] ?? 99));
+  const sorted = [...items].sort((a, b) => b.vote_count - a.vote_count);
 
   return (
     <div className="min-h-screen bg-background">
