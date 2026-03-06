@@ -3,7 +3,7 @@ import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Shield, Clock, BellOff, ArrowRight } from 'lucide-react';
+import { Shield, Clock, BellOff, ArrowRight, Twitter } from 'lucide-react';
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 14 },
@@ -195,16 +195,53 @@ const Landing = () => {
 
         {/* Footer */}
         <motion.div {...m()}>
-          <div className="space-y-4">
+          <div className="space-y-5">
             <p className="text-xs text-muted-foreground leading-relaxed">
               Holzen is not a trading tool. It won't tell you what to do. It exists to create a small space between impulse and decision.
             </p>
+
+            {/* Social */}
+            <div className="flex items-center gap-4">
+              <a
+                href="https://x.com/holzenapp"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Follow on X"
+              >
+                <Twitter className="h-4 w-4" />
+              </a>
+              <a
+                href="https://njump.me/holzen"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Follow on Nostr"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15.5v-3.07c-1.42-.17-2.7-.8-3.64-1.74l1.42-1.42A4.47 4.47 0 0012 12.5c1.38 0 2.63-.56 3.54-1.46l1.42 1.42A6.47 6.47 0 0113 14.43V17.5h-2z" />
+                </svg>
+              </a>
+            </div>
+
+            {/* Contact */}
+            <div className="space-y-1">
+              <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground/70">
+                Contact
+              </p>
+              <a
+                href="mailto:hello@holzen.app"
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+              >
+                hello@holzen.app
+              </a>
+            </div>
+
+            {/* Legal */}
             <div className="flex items-center gap-3 text-xs text-muted-foreground">
               <Link to="/terms" className="hover:text-foreground transition-colors">Terms</Link>
               <span>·</span>
               <Link to="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
-              <span>·</span>
-              <a href="mailto:hello@holzen.app" className="hover:text-foreground transition-colors">Contact</a>
             </div>
           </div>
         </motion.div>
