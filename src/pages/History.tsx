@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import { X, Star, Search } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ShareReflection } from '@/components/ShareReflection';
+import { ReflectionNote } from '@/components/ReflectionNote';
 import { HaikuDisplay } from '@/components/HaikuDisplay';
 import { LearningInput } from '@/components/LearningInput';
 
@@ -17,6 +18,7 @@ interface Reflection {
   haiku: string | null;
   learning_title: string | null;
   learning_body: string | null;
+  note: string | null;
 }
 
 const History = () => {
@@ -36,7 +38,7 @@ const History = () => {
     const load = async () => {
       const { data } = await supabase
         .from('reflections')
-        .select('id, message, context, created_at, is_favorite, haiku, learning_title, learning_body')
+        .select('id, message, context, created_at, is_favorite, haiku, learning_title, learning_body, note')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(100);
@@ -67,7 +69,7 @@ const History = () => {
     if (search.trim()) {
       const q = search.toLowerCase();
       result = result.filter(
-        (r) => r.message.toLowerCase().includes(q) || r.context?.toLowerCase().includes(q)
+        (r) => r.message.toLowerCase().includes(q) || r.context?.toLowerCase().includes(q) || r.note?.toLowerCase().includes(q)
       );
     }
     return result;
@@ -166,6 +168,7 @@ const History = () => {
                 </div>
               </div>
               <p className="text-sm leading-relaxed">{r.message}</p>
+              <ReflectionNote reflectionId={r.id} initialNote={r.note} />
               {(r.haiku || r.learning_title) && (
                 <div className="space-y-2 pt-2 border-t border-border/30">
                   {r.haiku && <HaikuDisplay haiku={r.haiku} />}

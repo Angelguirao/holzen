@@ -1,6 +1,7 @@
 import { forwardRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { ShareReflection } from './ShareReflection';
+import { ReflectionNote } from './ReflectionNote';
 import { CompanionSection, type CompanionData, type CompanionPrefs } from './CompanionSection';
 
 interface Props {
@@ -10,9 +11,10 @@ interface Props {
   companions?: CompanionData;
   companionPrefs?: CompanionPrefs;
   severity?: 'mild' | 'moderate' | 'high';
+  reflectionId?: string | null;
 }
 
-export const ReflectionMessage = forwardRef<HTMLDivElement, Props>(function ReflectionMessage({ message, context, onDismiss, companions, companionPrefs, severity }, ref) {
+export const ReflectionMessage = forwardRef<HTMLDivElement, Props>(function ReflectionMessage({ message, context, onDismiss, companions, companionPrefs, severity, reflectionId }, ref) {
   return (
     <div ref={ref} className="space-y-6">
       {context && (
@@ -33,6 +35,8 @@ export const ReflectionMessage = forwardRef<HTMLDivElement, Props>(function Refl
           Dismiss
         </Button>
       </div>
+
+      {reflectionId && <ReflectionNote reflectionId={reflectionId} initialNote={null} />}
 
       {companions && companionPrefs && (
         <CompanionSection

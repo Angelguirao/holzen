@@ -139,7 +139,9 @@ const Home = () => {
               companions={companions}
               companionPrefs={companionPrefs}
               severity={severity}
+              reflectionId={lastReflectionId}
             />
+
           ) : showOutcome && outcomeReflectionId ? (
             <OutcomePrompt
               reflectionId={outcomeReflectionId}
