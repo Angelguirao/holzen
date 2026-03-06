@@ -133,12 +133,11 @@ const Home = () => {
                   </button>
                 </div>
               ) : (
-                <button
-                  onClick={manualTrigger}
-                  className="text-xs font-mono text-muted-foreground underline"
-                >
-                  Generate reflection now
-                </button>
+                <NeedAMomentButton
+                  onTrigger={manualTrigger}
+                  cooldownRemaining={manualCooldownRemaining}
+                  loading={loading}
+                />
               )}
             </>
           )}
