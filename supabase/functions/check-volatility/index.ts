@@ -219,8 +219,7 @@ serve(async (req) => {
         if (vapidPublicKey && vapidPrivateKeyJwk) {
           try {
             let privateKey = vapidPrivateKeyJwk;
-            console.log(`[PUSH] VAPID private key length: ${vapidPrivateKeyJwk.length}, starts: "${vapidPrivateKeyJwk.substring(0, 8)}"`);
-            
+
             try {
               const parsed = JSON.parse(vapidPrivateKeyJwk);
               privateKey = parsed.d || vapidPrivateKeyJwk;
@@ -245,7 +244,6 @@ serve(async (req) => {
                   const jwk = await crypto.subtle.exportKey("jwk", cryptoKey);
                   if (jwk.d) {
                     privateKey = jwk.d;
-                    console.log(`[PUSH] Extracted raw key from PKCS8 via Web Crypto, length: ${privateKey.length}`);
                   }
                 } catch (decodeErr) {
                   console.error("[PUSH] Failed to extract key from PKCS8:", decodeErr);
