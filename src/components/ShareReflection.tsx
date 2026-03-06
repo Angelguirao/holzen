@@ -159,7 +159,7 @@ function generateShareImage(
 
 export const ShareReflection = forwardRef<HTMLButtonElement, Props>(
   function ShareReflection({ message, context, haiku }, ref) {
-    const { toast } = useToast();
+    
 
     const copyText = useCallback(async () => {
       const text = context
