@@ -1,0 +1,158 @@
+import { useEffect, useState, useCallback } from 'react';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/use-auth';
+import { Link } from 'react-router-dom';
+import { ArrowLeft, ChevronUp } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
+
+interface RoadmapItem {
+  id: string;
+  title: string;
+  description: string | null;
+  status: string;
+  vote_count: number;
+}
+
+const statusOrder: Record<string, number> = { 'in-progress': 0, planned: 1, shipped: 2 };
+const statusLabels: Record<string, string> = { planned: 'Planned', 'in-progress': 'In Progress', shipped: 'Shipped' };
+const statusColors: Record<string, string> = {
+  planned: 'bg-muted text-muted-foreground',
+  'in-progress': 'bg-primary/10 text-primary',
+  shipped: 'bg-accent text-accent-foreground',
+};
+
+const Roadmap = () => {
+  const { user } = useAuth();
+  const [items, setItems] = useState<RoadmapItem[]>([]);
+  const [votes, setVotes] = useState<Set<string>>(new Set());
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    document.title = 'Holzen — Roadmap';
+    return () => { document.title = 'Holzen — Pause before you act'; };
+  }, []);
+
+  useEffect(() => {
+    const load = async () => {
+      const { data } = await supabase
+        .from('roadmap_items' as any)
+        .select('id, title, description, status, vote_count')
+        .order('vote_count', { ascending: false });
+
+      setItems((data as unknown as RoadmapItem[]) ?? []);
+
+      if (user) {
+        const { data: userVotes } = await supabase
+          .from('roadmap_votes' as any)
+          .select('item_id')
+          .eq('user_id', user.id);
+        setVotes(new Set((userVotes as any[])?.map((v: any) => v.item_id) ?? []));
+      }
+
+      setLoading(false);
+    };
+    load();
+  }, [user]);
+
+  const toggleVote = useCallback(async (itemId: string) => {
+    if (!user) return;
+    const hasVoted = votes.has(itemId);
+
+    if (hasVoted) {
+      await supabase.from('roadmap_votes' as any).delete().eq('user_id', user.id).eq('item_id', itemId);
+      // Decrement vote_count manually in UI
+      setItems((prev) => prev.map((i) => i.id === itemId ? { ...i, vote_count: Math.max(0, i.vote_count - 1) } : i));
+      setVotes((prev) => { const next = new Set(prev); next.delete(itemId); return next; });
+    } else {
+      await supabase.from('roadmap_votes' as any).insert({ user_id: user.id, item_id: itemId } as any);
+      setItems((prev) => prev.map((i) => i.id === itemId ? { ...i, vote_count: i.vote_count + 1 } : i));
+      setVotes((prev) => new Set(prev).add(itemId));
+    }
+  }, [user, votes]);
+
+  // Group by status
+  const grouped = items.reduce<Record<string, RoadmapItem[]>>((acc, item) => {
+    const key = item.status;
+    if (!acc[key]) acc[key] = [];
+    acc[key].push(item);
+    return acc;
+  }, {});
+
+  const sortedStatuses = Object.keys(grouped).sort((a, b) => (statusOrder[a] ?? 99) - (statusOrder[b] ?? 99));
+
+  return (
+    <div className="min-h-screen bg-background">
+      <div className="max-w-lg mx-auto px-6 py-12 space-y-8">
+        <div className="space-y-4">
+          <Link to="/welcome" className="inline-flex items-center gap-1 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors">
+            <ArrowLeft className="h-3 w-3" />
+            Back
+          </Link>
+          <div className="space-y-1">
+            <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">Roadmap</h1>
+            <p className="text-xs text-muted-foreground">
+              Vote on what we build next. {!user && 'Sign in to vote.'}
+            </p>
+          </div>
+        </div>
+
+        {loading ? (
+          <div className="space-y-3">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2">
+                <Skeleton className="h-3 w-32" />
+                <Skeleton className="h-3 w-full" />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="space-y-8">
+            {sortedStatuses.map((status) => (
+              <div key={status} className="space-y-3">
+                <span className={`inline-block text-[10px] font-mono tracking-wider uppercase px-2 py-0.5 rounded ${statusColors[status] || 'bg-muted text-muted-foreground'}`}>
+                  {statusLabels[status] || status}
+                </span>
+                {grouped[status]
+                  .sort((a, b) => b.vote_count - a.vote_count)
+                  .map((item) => {
+                    const voted = votes.has(item.id);
+                    return (
+                      <div
+                        key={item.id}
+                        className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 flex gap-3 items-start"
+                      >
+                        {status !== 'shipped' && (
+                          <button
+                            onClick={() => toggleVote(item.id)}
+                            disabled={!user}
+                            className={`shrink-0 flex flex-col items-center gap-0.5 pt-0.5 transition-colors ${
+                              voted ? 'text-primary' : 'text-muted-foreground/40 hover:text-foreground'
+                            } ${!user ? 'opacity-40 cursor-not-allowed' : ''}`}
+                            aria-label={voted ? 'Remove vote' : 'Upvote'}
+                          >
+                            <ChevronUp className={`h-3.5 w-3.5 ${voted ? 'text-primary' : ''}`} />
+                            <span className="text-[10px] font-mono">{item.vote_count}</span>
+                          </button>
+                        )}
+                        <div className="space-y-0.5 min-w-0">
+                          <p className="text-sm font-medium leading-snug">{item.title}</p>
+                          {item.description && (
+                            <p className="text-xs text-muted-foreground leading-relaxed">{item.description}</p>
+                          )}
+                        </div>
+                        {status === 'shipped' && (
+                          <span className="shrink-0 text-[10px] font-mono text-muted-foreground/50 ml-auto">✓</span>
+                        )}
+                      </div>
+                    );
+                  })}
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default Roadmap;
