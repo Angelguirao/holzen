@@ -110,7 +110,7 @@ const History = () => {
                   >
                     <Star className={`h-3 w-3 ${r.is_favorite ? 'fill-current' : ''}`} />
                   </button>
-                  <ShareReflection message={r.message} context={r.context} />
+                  <ShareReflection message={r.message} context={r.context} haiku={r.haiku} />
                   <button
                     onClick={() => deleteReflection(r.id)}
                     className="shrink-0 text-muted-foreground/40 hover:text-foreground transition-colors p-1"
