@@ -49,6 +49,9 @@ const About = () => {
             <p className="text-xs text-muted-foreground leading-relaxed">
               But access is only half the equation. What these platforms don't provide is the emotional infrastructure to handle what comes next: the volatility, the uncertainty, the constant temptation to act when doing nothing would serve you better.
             </p>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              That's the gap Holzen fills — not with more data or faster alerts, but with a practice of self-awareness: breathing exercises, AI-generated reflections, mood tracking, journaling, emotional tagging, and personal insights that reveal your patterns over time.
+            </p>
           </div>
         </motion.div>
 
