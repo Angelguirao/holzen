@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { Home, BookOpen, Settings } from 'lucide-react';
+import { Home, Clock, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const tabs = [
