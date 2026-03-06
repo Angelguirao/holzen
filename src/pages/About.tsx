@@ -95,7 +95,7 @@ const About = () => {
               We believe Bitcoin represents the most asymmetric bet in the history of financial markets. But capturing that asymmetry requires one thing above all else: the ability to hold through volatility. And that's where most people fail — not because the thesis is wrong, but because the emotional cost of conviction is brutally high.
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Holzen exists to help people hold. Not blindly, not recklessly — but with awareness. We don't tell you what to do. We help you pause long enough to remember why you started.
+              Holzen exists to help people hold — with awareness. We don't tell you what to do. We help you pause long enough to notice your impulse, name it, and choose deliberately. Your reflection library, mood patterns, and outcome tracking become a mirror: proof that you can sit with discomfort and come out the other side with your conviction intact.
             </p>
           </div>
         </motion.div>
