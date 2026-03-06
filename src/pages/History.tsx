@@ -30,12 +30,13 @@ const History = () => {
   const { user } = useAuth();
   const [reflections, setReflections] = useState<Reflection[]>([]);
   const [loading, setLoading] = useState(true);
+  const [tab, setTab] = useState<'library' | 'insights'>('library');
   const [filter, setFilter] = useState<'all' | 'favorites'>('all');
   const [tagFilter, setTagFilter] = useState<string | null>(null);
   const [search, setSearch] = useState('');
 
   useEffect(() => {
-    document.title = 'Holzen — History';
+    document.title = 'Holzen — Library';
     return () => { document.title = 'Holzen — Pause before you act'; };
   }, []);
 
@@ -92,133 +93,162 @@ const History = () => {
 
   return (
     <div className="space-y-6">
-      <div className="space-y-1">
-        <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">
-          Past reflections
-        </h1>
+      {/* Header with tabs */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-6">
+          <button
+            onClick={() => setTab('library')}
+            className={`text-sm font-mono tracking-widest uppercase transition-colors ${
+              tab === 'library' ? 'text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
+            }`}
+          >
+            Library
+          </button>
+          <button
+            onClick={() => setTab('insights')}
+            className={`text-sm font-mono tracking-widest uppercase transition-colors ${
+              tab === 'insights' ? 'text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
+            }`}
+          >
+            Insights
+          </button>
+        </div>
         <p className="text-xs text-muted-foreground">
           {reflections.length} reflection{reflections.length !== 1 ? 's' : ''} total
         </p>
       </div>
 
-      {/* Filter & Search */}
-      <div className="space-y-3">
-        <div className="flex gap-3">
-          <button
-            onClick={() => setFilter('all')}
-            className={`text-xs font-mono transition-colors ${filter === 'all' ? 'text-foreground' : 'text-muted-foreground'}`}
-          >
-            All
-          </button>
-          <button
-            onClick={() => setFilter('favorites')}
-            className={`text-xs font-mono transition-colors ${filter === 'favorites' ? 'text-foreground' : 'text-muted-foreground'}`}
-          >
-            Favorites
-          </button>
-        </div>
-
-        {allTags.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            {allTags.map((tag) => (
-              <button
-                key={tag}
-                onClick={() => setTagFilter(tagFilter === tag ? null : tag)}
-                className={`text-[10px] font-mono px-1.5 py-0.5 rounded transition-colors ${
-                  tagFilter === tag
-                    ? 'bg-primary/10 text-primary'
-                    : 'border border-border/60 text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                {tag}
-              </button>
-            ))}
+      {tab === 'insights' ? (
+        /* Insights Tab */
+        loading ? (
+          <div className="space-y-3">
+            <Skeleton className="h-40 w-full rounded-md" />
           </div>
-        )}
-
-        {reflections.length > 3 && (
-          <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground/50" />
-            <input
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search reflections…"
-              className="w-full rounded-md border border-border/60 bg-muted/30 pl-8 pr-3 py-2 text-xs font-mono text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-ring"
-            />
-          </div>
-        )}
-      </div>
-
-      {/* Insights */}
-      {!loading && reflections.length > 0 && (
-        <InsightsPanel reflections={reflections} />
-      )}
-
-      {loading ? (
-        <div className="space-y-3">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2">
-              <Skeleton className="h-3 w-40" />
-              <Skeleton className="h-4 w-full" />
-              <Skeleton className="h-4 w-2/3" />
-            </div>
-          ))}
-        </div>
-      ) : filtered.length === 0 ? (
-        <div className="py-8 text-center space-y-2">
-          <p className="text-xs text-muted-foreground">
-            {search
-              ? 'No reflections match your search.'
-              : filter === 'favorites'
-                ? 'No favorites yet. Star reflections you want to keep.'
-                : "No reflections yet. They'll appear here when volatility crosses your threshold."}
+        ) : reflections.length === 0 ? (
+          <p className="text-xs text-muted-foreground py-8 text-center">
+            No reflections yet. Insights will appear after your first reflection.
           </p>
-        </div>
+        ) : (
+          <InsightsPanel reflections={reflections} />
+        )
       ) : (
-        <div className="space-y-3">
-          {filtered.map((r) => (
-            <div
-              key={r.id}
-              className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2"
-            >
-              <div className="flex items-start justify-between gap-2">
-                <p className="text-xs font-mono text-muted-foreground">
-                  {format(new Date(r.created_at), 'MMM d, yyyy · h:mm a')}
-                  {r.context && ` — ${r.context}`}
-                </p>
-                <div className="flex items-center gap-1 shrink-0">
+        /* Library Tab */
+        <>
+          {/* Filter & Search */}
+          <div className="space-y-3">
+            <div className="flex gap-3">
+              <button
+                onClick={() => setFilter('all')}
+                className={`text-xs font-mono transition-colors ${filter === 'all' ? 'text-foreground' : 'text-muted-foreground'}`}
+              >
+                All
+              </button>
+              <button
+                onClick={() => setFilter('favorites')}
+                className={`text-xs font-mono transition-colors ${filter === 'favorites' ? 'text-foreground' : 'text-muted-foreground'}`}
+              >
+                Favorites
+              </button>
+            </div>
+
+            {allTags.length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {allTags.map((tag) => (
                   <button
-                    onClick={() => toggleFavorite(r.id)}
-                    className={`p-1 transition-colors ${r.is_favorite ? 'text-foreground' : 'text-muted-foreground/40 hover:text-foreground'}`}
-                    aria-label={r.is_favorite ? 'Remove from favorites' : 'Add to favorites'}
+                    key={tag}
+                    onClick={() => setTagFilter(tagFilter === tag ? null : tag)}
+                    className={`text-[10px] font-mono px-1.5 py-0.5 rounded transition-colors ${
+                      tagFilter === tag
+                        ? 'bg-primary/10 text-primary'
+                        : 'border border-border/60 text-muted-foreground hover:text-foreground'
+                    }`}
                   >
-                    <Star className={`h-3 w-3 ${r.is_favorite ? 'fill-current' : ''}`} />
+                    {tag}
                   </button>
-                  <ShareReflection message={r.message} context={r.context} haiku={r.haiku} />
-                  <button
-                    onClick={() => deleteReflection(r.id)}
-                    className="shrink-0 text-muted-foreground/40 hover:text-foreground transition-colors p-1"
-                    aria-label="Delete reflection"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </div>
+                ))}
               </div>
-              <p className="text-sm leading-relaxed">{r.message}</p>
-              <ReflectionNote reflectionId={r.id} initialNote={r.note} />
-              <ReflectionTags reflectionId={r.id} initialTags={r.tags ?? []} />
-              {(r.haiku || r.learning_title) && (
-                <div className="space-y-2 pt-2 border-t border-border/30">
-                  {r.haiku && <HaikuDisplay haiku={r.haiku} />}
-                  {r.learning_title && r.learning_body && (
-                    <LearningInput title={r.learning_title} body={r.learning_body} />
+            )}
+
+            {reflections.length > 3 && (
+              <div className="relative">
+                <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground/50" />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Search reflections…"
+                  className="w-full rounded-md border border-border/60 bg-muted/30 pl-8 pr-3 py-2 text-xs font-mono text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-ring"
+                />
+              </div>
+            )}
+          </div>
+
+          {loading ? (
+            <div className="space-y-3">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2">
+                  <Skeleton className="h-3 w-40" />
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-2/3" />
+                </div>
+              ))}
+            </div>
+          ) : filtered.length === 0 ? (
+            <div className="py-8 text-center space-y-2">
+              <p className="text-xs text-muted-foreground">
+                {search
+                  ? 'No reflections match your search.'
+                  : filter === 'favorites'
+                    ? 'No favorites yet. Star reflections you want to keep.'
+                    : "No reflections yet. They'll appear here when volatility crosses your threshold."}
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {filtered.map((r) => (
+                <div
+                  key={r.id}
+                  className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-xs font-mono text-muted-foreground">
+                      {format(new Date(r.created_at), 'MMM d, yyyy · h:mm a')}
+                      {r.context && ` — ${r.context}`}
+                    </p>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        onClick={() => toggleFavorite(r.id)}
+                        className={`p-1 transition-colors ${r.is_favorite ? 'text-foreground' : 'text-muted-foreground/40 hover:text-foreground'}`}
+                        aria-label={r.is_favorite ? 'Remove from favorites' : 'Add to favorites'}
+                      >
+                        <Star className={`h-3 w-3 ${r.is_favorite ? 'fill-current' : ''}`} />
+                      </button>
+                      <ShareReflection message={r.message} context={r.context} haiku={r.haiku} />
+                      <button
+                        onClick={() => deleteReflection(r.id)}
+                        className="shrink-0 text-muted-foreground/40 hover:text-foreground transition-colors p-1"
+                        aria-label="Delete reflection"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  </div>
+                  <p className="text-sm leading-relaxed">{r.message}</p>
+                  <ReflectionNote reflectionId={r.id} initialNote={r.note} />
+                  <ReflectionTags reflectionId={r.id} initialTags={r.tags ?? []} />
+                  {(r.haiku || r.learning_title) && (
+                    <div className="space-y-2 pt-2 border-t border-border/30">
+                      {r.haiku && <HaikuDisplay haiku={r.haiku} />}
+                      {r.learning_title && r.learning_body && (
+                        <LearningInput title={r.learning_title} body={r.learning_body} />
+                      )}
+                    </div>
                   )}
                 </div>
-              )}
+              ))}
             </div>
-          ))}
-        </div>
+          )}
+        </>
       )}
     </div>
   );
