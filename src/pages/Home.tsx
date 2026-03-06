@@ -6,10 +6,10 @@ import { Onboarding } from '@/components/Onboarding';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import { AlertCircle, Loader2 } from 'lucide-react';
+import { AlertCircle, Loader2, Pause } from 'lucide-react';
 
 const Home = () => {
   const { subscribed, loading: subLoading, trialRemaining, checkoutLoading, startCheckout, refresh } = useSubscription();
