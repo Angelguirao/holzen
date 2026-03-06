@@ -6,6 +6,7 @@ import { X, Star, Search } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ShareReflection } from '@/components/ShareReflection';
 import { ReflectionNote } from '@/components/ReflectionNote';
+import { InsightsPanel } from '@/components/InsightsPanel';
 import { HaikuDisplay } from '@/components/HaikuDisplay';
 import { LearningInput } from '@/components/LearningInput';
 
@@ -19,6 +20,8 @@ interface Reflection {
   learning_title: string | null;
   learning_body: string | null;
   note: string | null;
+  mood: string | null;
+  outcome: string | null;
 }
 
 const History = () => {
