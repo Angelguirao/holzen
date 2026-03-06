@@ -8,6 +8,7 @@ import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Landing from "./pages/Landing";
+import Terms from "./pages/Terms";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
@@ -40,6 +41,7 @@ const App = () => (
               <Route path="/welcome" element={<PublicOnlyRoute><Landing /></PublicOnlyRoute>} />
               <Route path="/auth" element={<PublicOnlyRoute><Auth /></PublicOnlyRoute>} />
               <Route path="/reset-password" element={<ResetPassword />} />
+              <Route path="/terms" element={<Terms />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </AuthProvider>
