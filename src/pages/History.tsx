@@ -43,7 +43,7 @@ const History = () => {
     const load = async () => {
       const { data } = await supabase
         .from('reflections')
-        .select('id, message, context, created_at, is_favorite, haiku, learning_title, learning_body, note, mood, outcome')
+        .select('id, message, context, created_at, is_favorite, haiku, learning_title, learning_body, note, mood, outcome, tags')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(100);
