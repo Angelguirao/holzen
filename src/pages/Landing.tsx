@@ -30,10 +30,16 @@ const Landing = () => {
     <div className="min-h-screen flex items-start justify-center px-6 py-16">
       <div className="w-full max-w-sm space-y-12">
         {/* Header */}
-        <motion.div {...m()}>
+        <motion.div {...m()} className="flex items-center justify-between">
           <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">
             Holzen
           </h1>
+          <button
+            onClick={() => navigate('/auth')}
+            className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
+          >
+            Sign in
+          </button>
         </motion.div>
 
         {/* Hero */}
