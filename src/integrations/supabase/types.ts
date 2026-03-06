@@ -23,6 +23,8 @@ export type Database = {
           last_context: string | null
           last_message: string | null
           last_trigger_at: string | null
+          referral_code: string
+          referred_by: string | null
           threshold: number
           updated_at: string
           user_id: string
@@ -35,6 +37,8 @@ export type Database = {
           last_context?: string | null
           last_message?: string | null
           last_trigger_at?: string | null
+          referral_code?: string
+          referred_by?: string | null
           threshold?: number
           updated_at?: string
           user_id: string
@@ -47,6 +51,8 @@ export type Database = {
           last_context?: string | null
           last_message?: string | null
           last_trigger_at?: string | null
+          referral_code?: string
+          referred_by?: string | null
           threshold?: number
           updated_at?: string
           user_id?: string
@@ -77,6 +83,27 @@ export type Database = {
           id?: string
           p256dh?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      referrals: {
+        Row: {
+          created_at: string
+          id: string
+          referred_user_id: string
+          referrer_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          referred_user_id: string
+          referrer_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          referred_user_id?: string
+          referrer_id?: string
         }
         Relationships: []
       }

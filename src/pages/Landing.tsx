@@ -1,4 +1,5 @@
-import { useNavigate, Link } from 'react-router-dom';
+import { useEffect } from 'react';
+import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { Separator } from '@/components/ui/separator';
 import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -23,6 +24,15 @@ const Section = ({ children, delay = 0 }: { children: React.ReactNode; delay?: n
 
 const Landing = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // Capture referral code
+  useEffect(() => {
+    const ref = searchParams.get('ref');
+    if (ref) {
+      localStorage.setItem('holzen_ref', ref);
+    }
+  }, [searchParams]);
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
