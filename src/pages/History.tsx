@@ -120,6 +120,11 @@ const History = () => {
         )}
       </div>
 
+      {/* Insights */}
+      {!loading && reflections.length > 0 && (
+        <InsightsPanel reflections={reflections} />
+      )}
+
       {loading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
