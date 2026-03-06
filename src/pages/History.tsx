@@ -118,6 +118,25 @@ const History = () => {
           </button>
         </div>
 
+        {allTags.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {allTags.map((tag) => (
+              <button
+                key={tag}
+                onClick={() => setTagFilter(tagFilter === tag ? null : tag)}
+                className={`text-[10px] font-mono px-1.5 py-0.5 rounded transition-colors ${
+                  tagFilter === tag
+                    ? 'bg-primary/10 text-primary'
+                    : 'border border-border/60 text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
+        )}
+        </div>
+
         {reflections.length > 3 && (
           <div className="relative">
             <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground/50" />
