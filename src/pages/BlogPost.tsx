@@ -1,0 +1,125 @@
+import { Link, useParams } from 'react-router-dom';
+import { motion, useReducedMotion } from 'framer-motion';
+import { ArrowLeft } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { supabase } from '@/integrations/supabase/client';
+import { format } from 'date-fns';
+import { useEffect } from 'react';
+
+const fade = (delay = 0) => ({
+  initial: { opacity: 0, y: 14 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true, margin: '-40px' },
+  transition: { duration: 0.6, delay, ease: [0.25, 0.1, 0.25, 1] },
+});
+
+const BlogPost = () => {
+  const { slug } = useParams<{ slug: string }>();
+  const prefersReduced = useReducedMotion();
+  const m = (delay = 0) => (prefersReduced ? {} : fade(delay));
+
+  const { data: post, isLoading, error } = useQuery({
+    queryKey: ['blog-post', slug],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('blog_posts')
+        .select('*')
+        .eq('slug', slug!)
+        .eq('published', true)
+        .maybeSingle();
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!slug,
+  });
+
+  // Update page title
+  useEffect(() => {
+    if (post?.title) {
+      document.title = `${post.title} — Holzen`;
+    }
+    return () => {
+      document.title = 'Holzen — Pause before you act';
+    };
+  }, [post?.title]);
+
+  return (
+    <div className="min-h-screen flex items-start justify-center px-6 py-16">
+      <div className="w-full max-w-sm space-y-10">
+        {/* Nav */}
+        <motion.div {...m()}>
+          <Link
+            to="/blog"
+            className="inline-flex items-center gap-1.5 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <ArrowLeft className="h-3.5 w-3.5" />
+            Blog
+          </Link>
+        </motion.div>
+
+        {isLoading ? (
+          <div className="space-y-4 animate-pulse">
+            <div className="h-3 w-24 bg-muted rounded" />
+            <div className="h-6 w-3/4 bg-muted rounded" />
+            <div className="space-y-2 pt-4">
+              <div className="h-3 w-full bg-muted rounded" />
+              <div className="h-3 w-full bg-muted rounded" />
+              <div className="h-3 w-2/3 bg-muted rounded" />
+            </div>
+          </div>
+        ) : error || !post ? (
+          <motion.div {...m(0.1)}>
+            <div className="space-y-3 py-8">
+              <p className="text-sm text-foreground">Post not found.</p>
+              <Link
+                to="/blog"
+                className="text-xs text-muted-foreground hover:text-foreground transition-colors underline"
+              >
+                Back to blog
+              </Link>
+            </div>
+          </motion.div>
+        ) : (
+          <>
+            {/* Header */}
+            <motion.div {...m(0.05)} className="space-y-3">
+              {post.published_at && (
+                <p className="text-[10px] font-mono text-muted-foreground/70 tracking-wider uppercase">
+                  {format(new Date(post.published_at), 'MMMM d, yyyy')}
+                </p>
+              )}
+              <h1 className="text-xl text-foreground leading-relaxed">
+                {post.title}
+              </h1>
+              {post.excerpt && (
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {post.excerpt}
+                </p>
+              )}
+            </motion.div>
+
+            {/* Body */}
+            <motion.div {...m(0.1)}>
+              <div className="prose-holzen text-xs text-muted-foreground leading-relaxed space-y-4 whitespace-pre-line">
+                {post.body}
+              </div>
+            </motion.div>
+          </>
+        )}
+
+        {/* Footer */}
+        <motion.div {...m()}>
+          <div className="flex items-center gap-3 text-xs text-muted-foreground pt-4 border-t border-border">
+            <Link to="/welcome" className="hover:text-foreground transition-colors">Home</Link>
+            <span>·</span>
+            <Link to="/blog" className="hover:text-foreground transition-colors">Blog</Link>
+            <span>·</span>
+            <Link to="/about" className="hover:text-foreground transition-colors">About</Link>
+          </div>
+        </motion.div>
+      </div>
+    </div>
+  );
+};
+
+export default BlogPost;
