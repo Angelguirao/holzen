@@ -18,6 +18,7 @@ interface Reflection {
   haiku: string | null;
   learning_title: string | null;
   learning_body: string | null;
+  note: string | null;
 }
 
 const History = () => {
