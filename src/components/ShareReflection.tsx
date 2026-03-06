@@ -193,7 +193,7 @@ export const ShareReflection = forwardRef<HTMLButtonElement, Props>(
           toast.error('Could not share image');
         }
       }
-    }, [message, context, haiku, toast]);
+    }, [message, context, haiku]);
 
     const shareText = useCallback(async () => {
       const text = context
