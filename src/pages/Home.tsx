@@ -153,4 +153,47 @@ const Home = () => {
   );
 };
 
+function NeedAMomentButton({
+  onTrigger,
+  cooldownRemaining,
+  loading,
+}: {
+  onTrigger: () => void;
+  cooldownRemaining: () => number;
+  loading: boolean;
+}) {
+  const [remaining, setRemaining] = useState(cooldownRemaining());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRemaining(cooldownRemaining());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [cooldownRemaining]);
+
+  const inCooldown = remaining > 0;
+  const minutes = Math.ceil(remaining / 60000);
+
+  return (
+    <div className="space-y-3">
+      <Button
+        onClick={onTrigger}
+        disabled={inCooldown || loading}
+        variant="outline"
+        className="w-full font-mono text-xs gap-2"
+      >
+        <Pause className="h-3.5 w-3.5" />
+        {loading ? 'Generating...' : inCooldown
+          ? `Available in ${minutes} min`
+          : 'I need a moment'}
+      </Button>
+      <p className="text-[10px] text-muted-foreground text-center leading-relaxed">
+        {inCooldown
+          ? 'Take this time to breathe. The next reflection will be here when you need it.'
+          : 'Request a reflection anytime — no threshold required.'}
+      </p>
+    </div>
+  );
+}
+
 export default Home;
