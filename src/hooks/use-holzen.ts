@@ -19,6 +19,7 @@ export function useHolzen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [newReflection, setNewReflection] = useState(false);
+  const [lastReflectionId, setLastReflectionId] = useState<string | null>(null);
   const [profileLoaded, setProfileLoaded] = useState(false);
   const [hasOnboarded, setHasOnboarded] = useState(true);
 
