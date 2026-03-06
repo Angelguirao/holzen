@@ -20,6 +20,7 @@ import NotFound from "./pages/NotFound";
 import About from "./pages/About";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
+import Roadmap from "./pages/Roadmap";
 
 const queryClient = new QueryClient();
 
@@ -60,6 +61,7 @@ const App = () => (
                 <Route path="/about" element={<About />} />
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/blog/:slug" element={<BlogPost />} />
+                <Route path="/roadmap" element={<Roadmap />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </AuthProvider>
