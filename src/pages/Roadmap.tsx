@@ -52,12 +52,11 @@ const Roadmap = () => {
     const hasVoted = votes.has(itemId);
 
     if (hasVoted) {
-      await supabase.from('roadmap_votes' as any).delete().eq('user_id', user.id).eq('item_id', itemId);
-      // Decrement vote_count manually in UI
+      await supabase.from('roadmap_votes').delete().eq('user_id', user.id).eq('item_id', itemId);
       setItems((prev) => prev.map((i) => i.id === itemId ? { ...i, vote_count: Math.max(0, i.vote_count - 1) } : i));
       setVotes((prev) => { const next = new Set(prev); next.delete(itemId); return next; });
     } else {
-      await supabase.from('roadmap_votes' as any).insert({ user_id: user.id, item_id: itemId } as any);
+      await supabase.from('roadmap_votes').insert({ user_id: user.id, item_id: itemId });
       setItems((prev) => prev.map((i) => i.id === itemId ? { ...i, vote_count: i.vote_count + 1 } : i));
       setVotes((prev) => new Set(prev).add(itemId));
     }

@@ -48,7 +48,7 @@ export function ReferralSection() {
 
       // Load granted rewards
       const { data: rewards } = await supabase
-        .from('referral_rewards' as any)
+        .from('referral_rewards')
         .select('milestone, reward_type, granted_at')
         .eq('user_id', user.id);
 
