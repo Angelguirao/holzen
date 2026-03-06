@@ -3,6 +3,7 @@ import { useHolzen } from '@/hooks/use-holzen';
 import { useSubscription } from '@/hooks/use-subscription';
 import { useInstallPrompt } from '@/hooks/use-install-prompt';
 import { usePushNotifications } from '@/hooks/use-push-notifications';
+import { ThresholdSetting } from '@/components/ThresholdSetting';
 import { ReferralSection } from '@/components/ReferralSection';
 import { Changelog } from '@/components/Changelog';
 import { Separator } from '@/components/ui/separator';
@@ -30,7 +31,7 @@ const APP_VERSION = '1.1.0';
 
 const Settings = () => {
   const { user, signOut } = useAuth();
-  const { emailNotifications, setEmailNotifications } = useHolzen();
+  const { threshold, setThreshold, emailNotifications, setEmailNotifications } = useHolzen();
   const { subscribed, loading: subLoading, checkoutLoading, startCheckout, openPortal, trialRemaining } = useSubscription();
   const { theme, setTheme } = useTheme();
   const { canInstall, install } = useInstallPrompt();
@@ -96,6 +97,11 @@ const Settings = () => {
           {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
         </button>
       </div>
+
+      {/* Threshold */}
+      <ThresholdSetting threshold={threshold} onSet={setThreshold} />
+
+      <Separator />
 
       {/* Notifications */}
       <div className="space-y-4">
