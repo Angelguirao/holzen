@@ -3,7 +3,7 @@ import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Shield, Clock, BellOff, ArrowRight, Twitter } from 'lucide-react';
+import { ArrowRight, Twitter, Wind, Feather, BookOpen, TrendingDown, Brain, Tag, BarChart3, MessageCircle } from 'lucide-react';
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 14 },
@@ -28,7 +28,7 @@ const Landing = () => {
 
   return (
     <div className="min-h-screen flex items-start justify-center px-6 py-16">
-      <div className="w-full max-w-sm space-y-12">
+      <div className="w-full max-w-sm space-y-14">
         {/* Header */}
         <motion.div {...m()} className="flex items-center justify-between">
           <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">
@@ -44,79 +44,118 @@ const Landing = () => {
 
         {/* Hero */}
         <motion.div {...m(0.1)}>
-          <div className="space-y-4">
+          <div className="space-y-5">
             <p className="text-xl leading-relaxed text-foreground">
-              When Bitcoin moves, pause before you do.
+              Understand how you respond to volatility — and grow calmer over time.
             </p>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Holzen watches volatility so you don't have to. When the market crosses your threshold, you receive one quiet reflection — not advice, not urgency — just a moment to consider your intentions.
+              Holzen isn't a trading tool. It's a self-awareness practice. When Bitcoin moves, you get a moment to pause, reflect, and notice your patterns — before you act on impulse.
             </p>
           </div>
         </motion.div>
 
-        {/* The science — the "why" */}
-        <motion.div {...m(0.15)}>
-          <div className="space-y-3 border-l-2 border-primary/30 pl-4">
-            <p className="text-sm text-foreground leading-relaxed">
-              Impulsive decisions under volatility consistently lead to worse outcomes.
-            </p>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Behavioral finance research shows that emotional reactions — panic selling during drops, euphoric buying during surges — are among the most reliable predictors of poor returns. Nobel laureate Daniel Kahneman's work on fast vs. slow thinking explains why: under stress, your instinctive mind takes over before your reflective mind has a chance to weigh in.
-            </p>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Holzen creates that missing pause — a small intervention between impulse and decision.
-            </p>
-            <p className="text-[10px] text-muted-foreground/70 leading-relaxed italic">
-              Kahneman, D. (2011). <em>Thinking, Fast and Slow</em>. Farrar, Straus and Giroux. · Barber, B. & Odean, T. (2000). "Trading Is Hazardous to Your Wealth." <em>The Journal of Finance</em>, 55(2).
-            </p>
-          </div>
-        </motion.div>
-
-        {/* How it works */}
+        {/* The loop */}
         <div className="space-y-5">
           <motion.p
             className="text-xs font-mono tracking-widest uppercase text-muted-foreground"
             {...m()}
           >
-            How it works
+            The reflection loop
           </motion.p>
           <div className="space-y-4">
             {[
               {
-                icon: <Clock className="h-4 w-4 text-primary shrink-0 mt-0.5" />,
-                title: 'Set your threshold',
-                desc: 'Choose the percentage of 24h volatility that matters to you.',
+                step: '01',
+                title: 'The market moves',
+                desc: 'Holzen watches daily and 7-day cumulative volatility against your personal thresholds. Or request a reflection anytime you need one.',
               },
               {
-                icon: <Shield className="h-4 w-4 text-primary shrink-0 mt-0.5" />,
-                title: 'Receive a reflection',
-                desc: 'When volatility crosses your line, an AI-generated message encourages pause — never action.',
+                step: '02',
+                title: 'You pause',
+                desc: 'A breathing exercise grounds you. A quick mood check captures how you feel right now — anxious, neutral, or calm.',
               },
               {
-                icon: <BellOff className="h-4 w-4 text-primary shrink-0 mt-0.5" />,
-                title: 'Nothing more',
-                desc: 'No charts, no alerts, no trading signals. One message, then silence for six hours.',
+                step: '03',
+                title: 'You reflect',
+                desc: 'An AI-generated reflection encourages awareness, not action. Accompanied by a haiku and a historical insight for perspective.',
+              },
+              {
+                step: '04',
+                title: 'You track',
+                desc: 'Tag your emotions. Journal a note. Record what you did — held, sold, bought, or nothing. Over time, patterns emerge.',
               },
             ].map((step, i) => (
               <motion.div
-                key={step.title}
-                className="flex gap-3"
+                key={step.step}
+                className="flex gap-4"
                 {...(prefersReduced ? {} : {
                   initial: { opacity: 0, x: -10 },
                   whileInView: { opacity: 1, x: 0 },
                   viewport: { once: true },
-                  transition: { duration: 0.5, delay: i * 0.1 },
+                  transition: { duration: 0.5, delay: i * 0.08 },
                 })}
               >
-                {step.icon}
+                <span className="text-[10px] font-mono text-muted-foreground/40 pt-1 shrink-0">{step.step}</span>
                 <div className="space-y-1">
                   <p className="text-sm text-foreground">{step.title}</p>
-                  <p className="text-xs text-muted-foreground">{step.desc}</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{step.desc}</p>
                 </div>
               </motion.div>
             ))}
           </div>
         </div>
+
+        {/* Features */}
+        <div className="space-y-5">
+          <motion.p
+            className="text-xs font-mono tracking-widest uppercase text-muted-foreground"
+            {...m()}
+          >
+            What you get
+          </motion.p>
+          <div className="grid grid-cols-2 gap-3">
+            {[
+              { icon: <Wind className="h-3.5 w-3.5" />, label: 'Breathing exercise', desc: 'Calm before the message' },
+              { icon: <Feather className="h-3.5 w-3.5" />, label: 'Haiku companion', desc: '5-7-5 stillness' },
+              { icon: <BookOpen className="h-3.5 w-3.5" />, label: 'Historical insight', desc: 'Context from past events' },
+              { icon: <TrendingDown className="h-3.5 w-3.5" />, label: '7-day detection', desc: 'Catches slow-burn drops' },
+              { icon: <Brain className="h-3.5 w-3.5" />, label: 'Mood tracking', desc: 'See emotional patterns' },
+              { icon: <Tag className="h-3.5 w-3.5" />, label: 'Reflection tags', desc: 'Fear, greed, FOMO, clarity' },
+              { icon: <BarChart3 className="h-3.5 w-3.5" />, label: 'Insights & trends', desc: 'Your composure over time' },
+              { icon: <MessageCircle className="h-3.5 w-3.5" />, label: 'Journal notes', desc: 'Your words, your growth' },
+            ].map((f, i) => (
+              <motion.div
+                key={f.label}
+                className="rounded-md border border-border/60 bg-muted/30 p-3 space-y-1.5"
+                {...(prefersReduced ? {} : {
+                  initial: { opacity: 0, y: 8 },
+                  whileInView: { opacity: 1, y: 0 },
+                  viewport: { once: true },
+                  transition: { duration: 0.4, delay: i * 0.05 },
+                })}
+              >
+                <div className="text-muted-foreground">{f.icon}</div>
+                <p className="text-xs text-foreground leading-snug">{f.label}</p>
+                <p className="text-[10px] text-muted-foreground leading-relaxed">{f.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        {/* The science */}
+        <motion.div {...m()}>
+          <div className="space-y-3 border-l-2 border-primary/30 pl-4">
+            <p className="text-sm text-foreground leading-relaxed">
+              Impulsive decisions under volatility consistently lead to worse outcomes.
+            </p>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Behavioral finance research shows that emotional reactions — panic selling during drops, euphoric buying during surges — are among the most reliable predictors of poor returns. A brief pause before action leads to better decisions.
+            </p>
+            <p className="text-[10px] text-muted-foreground/70 leading-relaxed italic">
+              Kahneman, D. (2011). <em>Thinking, Fast and Slow</em>. · Barber, B. & Odean, T. (2000). "Trading Is Hazardous to Your Wealth." <em>The Journal of Finance</em>.
+            </p>
+          </div>
+        </motion.div>
 
         {/* Pricing + CTA */}
         <motion.div {...m()}>
@@ -124,7 +163,7 @@ const Landing = () => {
             <div className="space-y-1">
               <p className="text-lg font-mono text-foreground">Free to start</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Your first 3 reflections are free — no card required. Then $3/month for unlimited AI reflections via push, email, or in-app. Cancel anytime.
+                Your first 3 reflections are free — no card required. Then $3/month for unlimited reflections, companions, mood tracking, and insights. Cancel anytime.
               </p>
             </div>
             <div className="space-y-2">
@@ -154,15 +193,7 @@ const Landing = () => {
                   What exactly does Holzen do?
                 </AccordionTrigger>
                 <AccordionContent className="text-xs text-muted-foreground leading-relaxed">
-                  Holzen monitors Bitcoin's 24-hour price movement. When volatility crosses your chosen threshold, it sends you a single AI-generated reflection designed to encourage pause — not action. Then it goes quiet for six hours.
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="science" className="border-border">
-                <AccordionTrigger className="text-sm text-foreground hover:no-underline py-3">
-                  Is there science behind this?
-                </AccordionTrigger>
-                <AccordionContent className="text-xs text-muted-foreground leading-relaxed">
-                  Yes. Decades of behavioral finance research — from Kahneman's Nobel-winning work on cognitive biases to Barber &amp; Odean's studies showing that frequent traders underperform by 6.5% annually — demonstrate that emotional, impulsive decisions under volatility are among the most costly mistakes investors make. Holzen applies a simple, evidence-based idea: a brief pause before action leads to better decisions.
+                  Holzen monitors Bitcoin volatility across two windows — 24-hour and 7-day cumulative. When movement crosses your thresholds, it offers an AI-generated reflection, a breathing exercise, a haiku, and a historical insight. You can also request reflections on demand. Over time, you track your moods, tag your emotions, journal notes, and see how your composure evolves.
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value="advice" className="border-border">
@@ -173,12 +204,28 @@ const Landing = () => {
                   Never. Holzen is not a trading tool or financial advisor. Reflections are intentionally neutral — they exist only to create a moment of awareness before you act on impulse.
                 </AccordionContent>
               </AccordionItem>
+              <AccordionItem value="tracking" className="border-border">
+                <AccordionTrigger className="text-sm text-foreground hover:no-underline py-3">
+                  How does mood and outcome tracking work?
+                </AccordionTrigger>
+                <AccordionContent className="text-xs text-muted-foreground leading-relaxed">
+                  Before each reflection, you do a quick 1-tap mood check (anxious, neutral, calm). After dismissing a reflection, you record what you did — held, sold, bought, or nothing. Your insights panel shows these patterns over time, helping you see how your emotional responses and decisions evolve.
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="cumulative" className="border-border">
+                <AccordionTrigger className="text-sm text-foreground hover:no-underline py-3">
+                  What is cumulative volatility detection?
+                </AccordionTrigger>
+                <AccordionContent className="text-xs text-muted-foreground leading-relaxed">
+                  Beyond daily swings, Holzen tracks the rolling 7-day price movement. A slow-burn 12% drop over a week might never trigger a 5% daily threshold — but it matters. You set both thresholds independently.
+                </AccordionContent>
+              </AccordionItem>
               <AccordionItem value="data" className="border-border">
                 <AccordionTrigger className="text-sm text-foreground hover:no-underline py-3">
                   What data do you collect?
                 </AccordionTrigger>
                 <AccordionContent className="text-xs text-muted-foreground leading-relaxed">
-                  Only what's needed to run the service: your email, your volatility threshold, and push tokens if enabled. We don't track, profile, or sell your data. See our <Link to="/privacy" className="underline hover:text-foreground transition-colors">privacy policy</Link> for details.
+                  Only what's needed: your email, thresholds, reflections, mood entries, and push tokens if enabled. You can export all your data anytime or delete your account entirely. See our <Link to="/privacy" className="underline hover:text-foreground transition-colors">privacy policy</Link>.
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value="cancel" className="border-border">
@@ -197,7 +244,7 @@ const Landing = () => {
         <motion.div {...m()}>
           <div className="space-y-5">
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Holzen is not a trading tool. It won't tell you what to do. It exists to create a small space between impulse and decision.
+              Holzen is not a trading tool. It won't tell you what to do. It exists to help you understand yourself — one volatile moment at a time.
             </p>
 
             {/* Social */}
