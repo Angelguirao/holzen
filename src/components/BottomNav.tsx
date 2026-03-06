@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 
 const tabs = [
   { to: '/', icon: Home, label: 'Home' },
-  { to: '/history', icon: BookOpen, label: 'Library' },
+  { to: '/history', icon: BookOpen, label: 'History' },
   { to: '/settings', icon: Settings, label: 'Settings' },
 ];
 
