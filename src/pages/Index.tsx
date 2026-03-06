@@ -48,6 +48,7 @@ const Index = () => {
     dismissMessage,
     hasOnboarded,
     completeOnboarding,
+    manualTrigger,
   } = useHolzen();
 
   // Show toast when a new reflection is generated
@@ -132,10 +133,17 @@ const Index = () => {
             ) : (
               <>
                 <ThresholdSetting threshold={threshold} onSet={setThreshold} />
-                {loading && (
+                {loading ? (
                   <p className="text-xs font-mono text-muted-foreground">
                     Generating reflection
                   </p>
+                ) : (
+                  <button
+                    onClick={manualTrigger}
+                    className="text-xs font-mono text-muted-foreground underline"
+                  >
+                    Generate reflection now
+                  </button>
                 )}
               </>
             )}

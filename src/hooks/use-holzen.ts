@@ -132,6 +132,16 @@ export function useHolzen() {
     }
   }, [user, threshold, isInCooldown, generateMessage]);
 
+  const manualTrigger = useCallback(async () => {
+    try {
+      const data = btcData || await fetchBtcData();
+      if (!btcData) setBtcData(data);
+      await generateMessage(data);
+    } catch (e: any) {
+      setError(e.message || 'Failed to trigger reflection');
+    }
+  }, [btcData, generateMessage]);
+
   const dismissMessage = useCallback(async () => {
     setMessage(null);
     setContext(null);
@@ -165,5 +175,6 @@ export function useHolzen() {
     dismissMessage,
     hasOnboarded,
     completeOnboarding,
+    manualTrigger,
   };
 }
