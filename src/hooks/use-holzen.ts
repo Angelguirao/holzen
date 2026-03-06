@@ -36,15 +36,15 @@ export function useHolzen() {
 
       if (data) {
         setThresholdState(data.threshold);
-        setCumulativeThresholdState((data as any).cumulative_threshold ?? 15);
+        setCumulativeThresholdState(data.cumulative_threshold ?? 15);
         setMessage(data.last_message);
         setContext(data.last_context);
         setEmailNotificationsState(data.email_notifications ?? true);
         setHasOnboarded(data.has_onboarded ?? false);
         setCompanionPrefsState({
-          breathing: (data as any).companion_breathing ?? true,
-          haiku: (data as any).companion_haiku ?? true,
-          learning: (data as any).companion_learning ?? true,
+          breathing: data.companion_breathing ?? true,
+          haiku: data.companion_haiku ?? true,
+          learning: data.companion_learning ?? true,
         });
 
         // Load companion data from latest reflection if there's an active message
@@ -59,9 +59,9 @@ export function useHolzen() {
 
           if (latestReflection) {
             setCompanions({
-              haiku: (latestReflection as any).haiku ?? null,
-              learningTitle: (latestReflection as any).learning_title ?? null,
-              learningBody: (latestReflection as any).learning_body ?? null,
+              haiku: latestReflection.haiku ?? null,
+              learningTitle: latestReflection.learning_title ?? null,
+              learningBody: latestReflection.learning_body ?? null,
             });
           }
         }
@@ -85,7 +85,7 @@ export function useHolzen() {
     if (!user) return;
     await supabase
       .from('profiles')
-      .update({ cumulative_threshold: val } as any)
+      .update({ cumulative_threshold: val })
       .eq('user_id', user.id);
   }, [user]);
 
@@ -104,7 +104,7 @@ export function useHolzen() {
     const dbKey = `companion_${key}` as string;
     await supabase
       .from('profiles')
-      .update({ [dbKey]: val } as any)
+      .update({ [dbKey]: val } as Record<string, boolean>)
       .eq('user_id', user.id);
   }, [user]);
 
@@ -172,10 +172,10 @@ export function useHolzen() {
           learning_title: companionData.learningTitle,
           learning_body: companionData.learningBody,
           ...(mood ? { mood } : {}),
-        } as any).select('id').single();
+        }).select('id').single();
 
         if (insertedReflection) {
-          setLastReflectionId((insertedReflection as any).id);
+          setLastReflectionId(insertedReflection.id);
         }
 
         await supabase.from('profiles').update({

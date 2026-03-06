@@ -22,7 +22,7 @@ export function OutcomePrompt({ reflectionId, onComplete }: Props) {
     setSaving(true);
     await supabase
       .from('reflections')
-      .update({ outcome } as any)
+      .update({ outcome })
       .eq('id', reflectionId);
     onComplete();
   };
