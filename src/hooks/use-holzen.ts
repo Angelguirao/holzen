@@ -134,7 +134,11 @@ export function useHolzen() {
     if (!user) return;
     const dir = data.direction === 'down' ? 'down' : 'up';
     const pct = Math.abs(data.changePercent).toFixed(1);
-    const ctx = `BTC is ${dir} ${pct}% in the last 24 hours.`;
+    let ctx = `BTC is ${dir} ${pct}% in the last 24 hours.`;
+    if (data.cumulativeChangePercent !== undefined && Math.abs(data.cumulativeChangePercent) >= cumulativeThreshold) {
+      const cumDir = data.cumulativeDirection === 'down' ? 'down' : 'up';
+      ctx += ` Over 7 days, it's ${cumDir} ${Math.abs(data.cumulativeChangePercent).toFixed(1)}%.`;
+    }
 
     setLoading(true);
     setError(null);
