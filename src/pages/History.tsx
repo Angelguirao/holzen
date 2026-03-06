@@ -23,6 +23,7 @@ interface Reflection {
   note: string | null;
   mood: string | null;
   outcome: string | null;
+  tags: string[];
 }
 
 const History = () => {
