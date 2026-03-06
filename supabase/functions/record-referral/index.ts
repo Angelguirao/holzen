@@ -13,6 +13,61 @@ const MILESTONES = [
   { count: 5, reward: 'lifetime', trialDays: 0 },
 ];
 
+const REWARD_LABELS: Record<string, string> = {
+  '1_week_free': '1 week free',
+  '1_month_free': '1 month free',
+  'lifetime': 'lifetime access',
+};
+
+async function sendRewardEmail(email: string, rewardType: string, referralCount: number) {
+  const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+  if (!RESEND_API_KEY) {
+    logStep('RESEND_API_KEY not set, skipping reward email');
+    return;
+  }
+
+  const rewardLabel = REWARD_LABELS[rewardType] || rewardType;
+
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${RESEND_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: "Holzen <onboarding@resend.dev>",
+        to: [email],
+        subject: `Holzen — You earned ${rewardLabel}`,
+        html: `
+          <div style="font-family: monospace; max-width: 400px; margin: 0 auto; padding: 32px 16px;">
+            <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: #888;">Holzen</p>
+            <h2 style="font-size: 16px; margin: 24px 0 12px;">You've earned a reward</h2>
+            <p style="font-size: 14px; color: #444; line-height: 1.6;">
+              ${referralCount} ${referralCount === 1 ? 'person has' : 'people have'} joined Holzen through your referral link.
+            </p>
+            <p style="font-size: 14px; color: #444; line-height: 1.6;">
+              <strong>Your reward:</strong> ${rewardLabel}${rewardType === 'lifetime' ? ' — no more subscription needed.' : ' has been credited to your account.'}
+            </p>
+            <p style="font-size: 12px; color: #999; margin-top: 32px;">
+              Thank you for sharing a moment of pause.
+            </p>
+          </div>
+        `,
+      }),
+    });
+
+    if (!res.ok) {
+      const errText = await res.text();
+      logStep('Email send error', { status: res.status, error: errText });
+    } else {
+      logStep('Reward email sent', { email, rewardType });
+    }
+  } catch (e) {
+    logStep('Email send exception', { error: e.message });
+  }
+}
+
 const logStep = (step: string, details?: any) => {
   const d = details ? ` - ${JSON.stringify(details)}` : '';
   console.log(`[RECORD-REFERRAL] ${step}${d}`);
@@ -23,7 +78,8 @@ async function grantReward(
   stripe: any,
   referrerId: string,
   referrerEmail: string,
-  milestone: typeof MILESTONES[number]
+  milestone: typeof MILESTONES[number],
+  referralCount: number
 ) {
   // Check if already granted
   const { data: existing } = await supabase
@@ -94,6 +150,9 @@ async function grantReward(
   });
 
   logStep('Reward granted', { milestone: milestone.count, reward: milestone.reward });
+
+  // Send email notification
+  await sendRewardEmail(referrerEmail, milestone.reward, referralCount);
 }
 
 serve(async (req) => {
@@ -195,7 +254,7 @@ serve(async (req) => {
         // Check each milestone
         for (const milestone of MILESTONES) {
           if (referralCount >= milestone.count) {
-            await grantReward(supabase, stripe, referrer.user_id, referrerEmail, milestone);
+            await grantReward(supabase, stripe, referrer.user_id, referrerEmail, milestone, referralCount);
           }
         }
       } else {
