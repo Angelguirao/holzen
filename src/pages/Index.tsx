@@ -6,6 +6,7 @@ import { ThresholdSetting } from '@/components/ThresholdSetting';
 import { ReflectionMessage } from '@/components/ReflectionMessage';
 import { ReflectionHistory } from '@/components/ReflectionHistory';
 import { Onboarding } from '@/components/Onboarding';
+import { ReferralSection } from '@/components/ReferralSection';
 import { useInstallPrompt } from '@/hooks/use-install-prompt';
 import { usePushNotifications } from '@/hooks/use-push-notifications';
 import { Separator } from '@/components/ui/separator';
@@ -183,6 +184,8 @@ const Index = () => {
             </button>
             <Separator />
             <ReflectionHistory />
+            <Separator />
+            <ReferralSection />
           </>
         )}
 
