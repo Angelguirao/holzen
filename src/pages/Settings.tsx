@@ -39,6 +39,32 @@ const Settings = () => {
   const { isSupported: pushSupported, isSubscribed: pushSubscribed, loading: pushLoading, subscribe: pushSubscribe, unsubscribe: pushUnsubscribe } = usePushNotifications();
   const [deleting, setDeleting] = useState(false);
   const [exporting, setExporting] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [changingPassword, setChangingPassword] = useState(false);
+
+  const changePassword = useCallback(async () => {
+    if (newPassword.length < 6) {
+      toast('Password must be at least 6 characters');
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      toast('Passwords do not match');
+      return;
+    }
+    setChangingPassword(true);
+    try {
+      const { error } = await supabase.auth.updateUser({ password: newPassword });
+      if (error) throw error;
+      toast('Password updated');
+      setNewPassword('');
+      setConfirmPassword('');
+    } catch {
+      toast('Failed to update password');
+    } finally {
+      setChangingPassword(false);
+    }
+  }, [newPassword, confirmPassword]);
 
   useEffect(() => {
     document.title = 'Holzen — Settings';
