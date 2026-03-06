@@ -203,7 +203,7 @@ const Settings = () => {
         )}
         <button
           onClick={signOut}
-          className="text-xs font-mono text-muted-foreground underline"
+          className="block text-xs font-mono text-muted-foreground underline"
         >
           Sign out
         </button>
