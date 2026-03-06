@@ -197,7 +197,7 @@ export function useHolzen() {
     return Math.max(0, MANUAL_COOLDOWN_MS - elapsed);
   }, [lastManualAt]);
 
-  const manualTrigger = useCallback(async () => {
+  const manualTrigger = useCallback(async (mood?: string) => {
     const remaining = manualCooldownRemaining();
     if (remaining > 0) return;
 
@@ -205,7 +205,7 @@ export function useHolzen() {
     try {
       const data = btcData || await fetchBtcData();
       if (!btcData) setBtcData(data);
-      await generateMessage(data);
+      await generateMessage(data, mood);
     } catch (e: any) {
       setError(e.message || 'Failed to trigger reflection');
     }
