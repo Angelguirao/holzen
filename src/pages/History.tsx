@@ -6,6 +6,7 @@ import { X, Star, Search } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ShareReflection } from '@/components/ShareReflection';
 import { ReflectionNote } from '@/components/ReflectionNote';
+import { InsightsPanel } from '@/components/InsightsPanel';
 import { HaikuDisplay } from '@/components/HaikuDisplay';
 import { LearningInput } from '@/components/LearningInput';
 
@@ -19,6 +20,8 @@ interface Reflection {
   learning_title: string | null;
   learning_body: string | null;
   note: string | null;
+  mood: string | null;
+  outcome: string | null;
 }
 
 const History = () => {
@@ -38,7 +41,7 @@ const History = () => {
     const load = async () => {
       const { data } = await supabase
         .from('reflections')
-        .select('id, message, context, created_at, is_favorite, haiku, learning_title, learning_body, note')
+        .select('id, message, context, created_at, is_favorite, haiku, learning_title, learning_body, note, mood, outcome')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(100);
@@ -116,6 +119,11 @@ const History = () => {
           </div>
         )}
       </div>
+
+      {/* Insights */}
+      {!loading && reflections.length > 0 && (
+        <InsightsPanel reflections={reflections} />
+      )}
 
       {loading ? (
         <div className="space-y-3">
