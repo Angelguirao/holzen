@@ -1,7 +1,6 @@
 import { useHolzen } from '@/hooks/use-holzen';
 import { useSubscription } from '@/hooks/use-subscription';
 import { BtcStatus } from '@/components/BtcStatus';
-import { ThresholdSetting } from '@/components/ThresholdSetting';
 import { ReflectionMessage } from '@/components/ReflectionMessage';
 import { Onboarding } from '@/components/Onboarding';
 import { Separator } from '@/components/ui/separator';
@@ -21,8 +20,6 @@ const Home = () => {
   }, [searchParams, refresh]);
 
   const {
-    threshold,
-    setThreshold,
     btcData,
     message,
     context,
@@ -61,24 +58,20 @@ const Home = () => {
 
       {/* Subscription / trial gate */}
       {!subLoading && !hasAccess ? (
-        <div className="space-y-4">
-          <ThresholdSetting threshold={threshold} onSet={setThreshold} />
-          <Separator />
-          <div className="space-y-3">
-            <p className="text-sm text-muted-foreground">
-              You've used all 3 free reflections. Subscribe to continue.
-            </p>
-            <p className="text-xs font-mono text-muted-foreground">
-              $3 per month. Cancel anytime.
-            </p>
-            <Button
-              onClick={startCheckout}
-              disabled={checkoutLoading}
-              className="w-full font-mono text-xs"
-            >
-              {checkoutLoading ? 'Opening checkout' : 'Subscribe'}
-            </Button>
-          </div>
+        <div className="space-y-3">
+          <p className="text-sm text-muted-foreground">
+            You've used all 3 free reflections. Subscribe to continue.
+          </p>
+          <p className="text-xs font-mono text-muted-foreground">
+            $3 per month. Cancel anytime.
+          </p>
+          <Button
+            onClick={startCheckout}
+            disabled={checkoutLoading}
+            className="w-full font-mono text-xs"
+          >
+            {checkoutLoading ? 'Opening checkout' : 'Subscribe'}
+          </Button>
         </div>
       ) : subLoading ? (
         <p className="text-xs font-mono text-muted-foreground">Loading</p>
@@ -99,7 +92,6 @@ const Home = () => {
             />
           ) : (
             <>
-              <ThresholdSetting threshold={threshold} onSet={setThreshold} />
               {loading ? (
                 <p className="text-xs font-mono text-muted-foreground">
                   Generating reflection
