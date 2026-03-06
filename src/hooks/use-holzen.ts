@@ -256,6 +256,8 @@ export function useHolzen() {
   return {
     threshold,
     setThreshold,
+    cumulativeThreshold,
+    setCumulativeThreshold,
     emailNotifications,
     setEmailNotifications,
     companionPrefs,

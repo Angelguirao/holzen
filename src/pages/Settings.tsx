@@ -131,7 +131,7 @@ const Settings = () => {
       </div>
 
       {/* Threshold */}
-      <ThresholdSetting threshold={threshold} onSet={setThreshold} />
+      <ThresholdSetting threshold={threshold} onSet={setThreshold} cumulativeThreshold={cumulativeThreshold} onSetCumulative={setCumulativeThreshold} />
 
       <Separator />
 
