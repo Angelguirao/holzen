@@ -38,6 +38,7 @@ export const ReflectionMessage = forwardRef<HTMLDivElement, Props>(function Refl
       </div>
 
       {reflectionId && <ReflectionNote reflectionId={reflectionId} initialNote={null} />}
+      {reflectionId && <ReflectionTags reflectionId={reflectionId} initialTags={[]} />}
 
       {companions && companionPrefs && (
         <CompanionSection
