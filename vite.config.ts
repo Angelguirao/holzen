@@ -17,22 +17,14 @@ export default defineConfig(({ mode }) => ({
     react(),
     mode === "development" && componentTagger(),
     VitePWA({
+      strategies: "injectManifest",
+      srcDir: "src",
+      filename: "sw.ts",
       registerType: "autoUpdate",
       includeAssets: ["icon-512.png"],
-      manifest: false, // we use our own public/manifest.json
-      workbox: {
+      manifest: false,
+      injectManifest: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
-        navigateFallbackDenylist: [/^\/~oauth/],
-        runtimeCaching: [
-          {
-            urlPattern: /^https:\/\/api\.coingecko\.com\//,
-            handler: "NetworkFirst",
-            options: {
-              cacheName: "btc-data",
-              expiration: { maxEntries: 5, maxAgeSeconds: 300 },
-            },
-          },
-        ],
       },
     }),
   ].filter(Boolean),
