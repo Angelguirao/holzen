@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
+import Landing from "./pages/Landing";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
@@ -15,11 +16,11 @@ const queryClient = new QueryClient();
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   if (loading) return null;
-  if (!user) return <Navigate to="/auth" replace />;
+  if (!user) return <Navigate to="/welcome" replace />;
   return <>{children}</>;
 }
 
-function AuthRoute({ children }: { children: React.ReactNode }) {
+function PublicOnlyRoute({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   if (loading) return null;
   if (user) return <Navigate to="/" replace />;
@@ -36,7 +37,8 @@ const App = () => (
           <AuthProvider>
             <Routes>
               <Route path="/" element={<ProtectedRoute><Index /></ProtectedRoute>} />
-              <Route path="/auth" element={<AuthRoute><Auth /></AuthRoute>} />
+              <Route path="/welcome" element={<PublicOnlyRoute><Landing /></PublicOnlyRoute>} />
+              <Route path="/auth" element={<PublicOnlyRoute><Auth /></PublicOnlyRoute>} />
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
