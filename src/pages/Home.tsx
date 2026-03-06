@@ -36,6 +36,7 @@ const Home = () => {
     hasOnboarded,
     completeOnboarding,
     manualTrigger,
+    manualCooldownRemaining,
   } = useHolzen();
 
   useEffect(() => {
