@@ -7,6 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ShareReflection } from '@/components/ShareReflection';
 import { ReflectionNote } from '@/components/ReflectionNote';
 import { InsightsPanel } from '@/components/InsightsPanel';
+import { ReflectionTags } from '@/components/ReflectionTags';
 import { HaikuDisplay } from '@/components/HaikuDisplay';
 import { LearningInput } from '@/components/LearningInput';
 
@@ -22,6 +23,7 @@ interface Reflection {
   note: string | null;
   mood: string | null;
   outcome: string | null;
+  tags: string[];
 }
 
 const History = () => {
@@ -29,6 +31,7 @@ const History = () => {
   const [reflections, setReflections] = useState<Reflection[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'favorites'>('all');
+  const [tagFilter, setTagFilter] = useState<string | null>(null);
   const [search, setSearch] = useState('');
 
   useEffect(() => {
@@ -41,7 +44,7 @@ const History = () => {
     const load = async () => {
       const { data } = await supabase
         .from('reflections')
-        .select('id, message, context, created_at, is_favorite, haiku, learning_title, learning_body, note, mood, outcome')
+        .select('id, message, context, created_at, is_favorite, haiku, learning_title, learning_body, note, mood, outcome, tags')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(100);
@@ -67,16 +70,25 @@ const History = () => {
     setReflections((prev) => prev.filter((r) => r.id !== id));
   }, []);
 
+  const allTags = useMemo(() => {
+    const set = new Set<string>();
+    reflections.forEach((r) => r.tags?.forEach((t) => set.add(t)));
+    return Array.from(set).sort();
+  }, [reflections]);
+
   const filtered = useMemo(() => {
     let result = filter === 'favorites' ? reflections.filter((r) => r.is_favorite) : reflections;
+    if (tagFilter) {
+      result = result.filter((r) => r.tags?.includes(tagFilter));
+    }
     if (search.trim()) {
       const q = search.toLowerCase();
       result = result.filter(
-        (r) => r.message.toLowerCase().includes(q) || r.context?.toLowerCase().includes(q) || r.note?.toLowerCase().includes(q)
+        (r) => r.message.toLowerCase().includes(q) || r.context?.toLowerCase().includes(q) || r.note?.toLowerCase().includes(q) || r.tags?.some((t) => t.toLowerCase().includes(q))
       );
     }
     return result;
-  }, [reflections, filter, search]);
+  }, [reflections, filter, tagFilter, search]);
 
   return (
     <div className="space-y-6">
@@ -105,6 +117,24 @@ const History = () => {
             Favorites
           </button>
         </div>
+
+        {allTags.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {allTags.map((tag) => (
+              <button
+                key={tag}
+                onClick={() => setTagFilter(tagFilter === tag ? null : tag)}
+                className={`text-[10px] font-mono px-1.5 py-0.5 rounded transition-colors ${
+                  tagFilter === tag
+                    ? 'bg-primary/10 text-primary'
+                    : 'border border-border/60 text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {tag}
+              </button>
+            ))}
+          </div>
+        )}
 
         {reflections.length > 3 && (
           <div className="relative">
@@ -177,6 +207,7 @@ const History = () => {
               </div>
               <p className="text-sm leading-relaxed">{r.message}</p>
               <ReflectionNote reflectionId={r.id} initialNote={r.note} />
+              <ReflectionTags reflectionId={r.id} initialTags={r.tags ?? []} />
               {(r.haiku || r.learning_title) && (
                 <div className="space-y-2 pt-2 border-t border-border/30">
                   {r.haiku && <HaikuDisplay haiku={r.haiku} />}
