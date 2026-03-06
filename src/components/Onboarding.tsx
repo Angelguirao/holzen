@@ -1,10 +1,20 @@
 import { useState, useCallback } from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
+import { HaikuDisplay } from '@/components/HaikuDisplay';
+import { LearningInput } from '@/components/LearningInput';
 
 interface Props {
   onComplete: (threshold: number) => void;
 }
+
+const sampleReflection = {
+  context: 'BTC is down 7.2% in the last 24 hours.',
+  message: 'A sharp move invites reaction. This is a moment to observe the impulse before following it.',
+  haiku: 'Numbers fall like rain\nThe urge to act rises fast\nBreathe before you move',
+  learningTitle: 'Panic Selling and Recovery',
+  learningBody: 'After Bitcoin\'s 30% drop in May 2021, it recovered within three months. Historically, sharp declines have often preceded periods of consolidation rather than further collapse.',
+};
 
 const steps = [
   {
@@ -22,9 +32,14 @@ export function Onboarding({ onComplete }: Props) {
   const [threshold, setThreshold] = useState(5);
   const [transitioning, setTransitioning] = useState(false);
   const [direction, setDirection] = useState<'forward' | 'back'>('forward');
+  const [breathingDemo, setBreathingDemo] = useState(false);
+  const [haikuExpanded, setHaikuExpanded] = useState(false);
+  const [learningExpanded, setLearningExpanded] = useState(false);
 
-  const totalSteps = steps.length + 1;
-  const isLastStep = step === steps.length;
+  // Steps: 0-1 text, 2 companion preview, 3 threshold
+  const totalSteps = steps.length + 2;
+  const isPreviewStep = step === steps.length;
+  const isThresholdStep = step === steps.length + 1;
 
   const goTo = useCallback((next: number) => {
     setDirection(next > step ? 'forward' : 'back');
@@ -32,6 +47,12 @@ export function Onboarding({ onComplete }: Props) {
     setTimeout(() => {
       setStep(next);
       setTransitioning(false);
+      // Reset companion states when entering/leaving preview
+      if (next !== steps.length) {
+        setBreathingDemo(false);
+        setHaikuExpanded(false);
+        setLearningExpanded(false);
+      }
     }, 250);
   }, [step]);
 
@@ -43,11 +64,31 @@ export function Onboarding({ onComplete }: Props) {
       : 'translateY(0)',
   };
 
+  const renderNav = (showBack: boolean, onNext: () => void, nextLabel = 'Continue') => (
+    <div className="flex items-center gap-4 mt-10">
+      {showBack && (
+        <button
+          onClick={() => goTo(step - 1)}
+          className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
+        >
+          ← Back
+        </button>
+      )}
+      <button
+        onClick={onNext}
+        className="text-xs font-mono text-muted-foreground underline hover:text-foreground transition-colors"
+      >
+        {nextLabel}
+      </button>
+    </div>
+  );
+
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
       <div className="w-full max-w-sm space-y-12">
         <div style={transitionStyle}>
-          {!isLastStep ? (
+          {/* Text steps */}
+          {step < steps.length && (
             <>
               <div className="space-y-6">
                 <p className="text-sm font-mono tracking-widest uppercase text-muted-foreground">
@@ -57,24 +98,99 @@ export function Onboarding({ onComplete }: Props) {
                   {steps[step].body}
                 </p>
               </div>
-              <div className="flex items-center gap-4 mt-10">
-                {step > 0 && (
-                  <button
-                    onClick={() => goTo(step - 1)}
-                    className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
-                  >
-                    ← Back
-                  </button>
-                )}
-                <button
-                  onClick={() => goTo(step + 1)}
-                  className="text-xs font-mono text-muted-foreground underline hover:text-foreground transition-colors"
-                >
-                  Continue
-                </button>
-              </div>
+              {renderNav(step > 0, () => goTo(step + 1))}
             </>
-          ) : (
+          )}
+
+          {/* Companion preview step */}
+          {isPreviewStep && (
+            <>
+              <div className="space-y-6">
+                <p className="text-sm font-mono tracking-widest uppercase text-muted-foreground">
+                  Your companions
+                </p>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Each reflection comes with optional companions — tools to help you pause. Try them.
+                </p>
+
+                {/* Sample reflection */}
+                <div className="rounded-md border border-border/60 bg-muted/20 px-4 py-4 space-y-4">
+                  <p className="text-[10px] font-mono text-muted-foreground/60">
+                    {sampleReflection.context}
+                  </p>
+                  <p className="text-sm leading-relaxed">
+                    {sampleReflection.message}
+                  </p>
+
+                  {/* Companion prompts */}
+                  <div className="space-y-3 pt-3 border-t border-border/30">
+                    <p className="text-[10px] font-mono text-muted-foreground/50 uppercase tracking-wider">
+                      Pause with this
+                    </p>
+
+                    {/* Breathing demo */}
+                    {breathingDemo ? (
+                      <div className="animate-fade-in flex flex-col items-center gap-2 py-3">
+                        <div
+                          className="rounded-full bg-foreground/10 animate-[pulse_4s_cubic-bezier(0.4,0,0.6,1)_infinite]"
+                          style={{ width: 48, height: 48 }}
+                        />
+                        <p className="text-[10px] font-mono text-muted-foreground">
+                          Inhale… hold… exhale…
+                        </p>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setBreathingDemo(true)}
+                        className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        Breathe with this →
+                      </button>
+                    )}
+
+                    {/* Haiku demo */}
+                    {haikuExpanded ? (
+                      <div className="animate-fade-in">
+                        <HaikuDisplay haiku={sampleReflection.haiku} />
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setHaikuExpanded(true)}
+                        className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        Read as haiku →
+                      </button>
+                    )}
+
+                    {/* Learning demo */}
+                    {learningExpanded ? (
+                      <div className="animate-fade-in">
+                        <LearningInput
+                          title={sampleReflection.learningTitle}
+                          body={sampleReflection.learningBody}
+                        />
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => setLearningExpanded(true)}
+                        className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        Learn from history →
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                <p className="text-xs text-muted-foreground/60">
+                  You can enable or disable companions anytime in Settings.
+                </p>
+              </div>
+              {renderNav(true, () => goTo(step + 1))}
+            </>
+          )}
+
+          {/* Threshold step */}
+          {isThresholdStep && (
             <>
               <div className="space-y-6">
                 <p className="text-sm font-mono tracking-widest uppercase text-muted-foreground">
