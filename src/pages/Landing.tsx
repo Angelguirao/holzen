@@ -157,6 +157,13 @@ const Landing = () => {
                   Holzen monitors Bitcoin's 24-hour price movement. When volatility crosses your chosen threshold, it sends you a single AI-generated reflection designed to encourage pause — not action. Then it goes quiet for six hours.
                 </AccordionContent>
               </AccordionItem>
+              <AccordionItem value="science" className="border-border">
+                <AccordionTrigger className="text-sm text-foreground hover:no-underline py-3">
+                  Is there science behind this?
+                </AccordionTrigger>
+                <AccordionContent className="text-xs text-muted-foreground leading-relaxed">
+                  Yes. Decades of behavioral finance research — from Kahneman's Nobel-winning work on cognitive biases to Barber &amp; Odean's studies showing that frequent traders underperform by 6.5% annually — demonstrate that emotional, impulsive decisions under volatility are among the most costly mistakes investors make. Holzen applies a simple, evidence-based idea: a brief pause before action leads to better decisions.
+                </AccordionContent>
               <AccordionItem value="advice" className="border-border">
                 <AccordionTrigger className="text-sm text-foreground hover:no-underline py-3">
                   Will it tell me what to buy or sell?
