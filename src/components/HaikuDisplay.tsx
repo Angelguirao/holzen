@@ -3,7 +3,7 @@ interface Props {
 }
 
 export function HaikuDisplay({ haiku }: Props) {
-  const lines = haiku.split('\n').filter(Boolean);
+  const lines = haiku.split(/\\n|\n/).map(l => l.trim()).filter(Boolean);
 
   return (
     <div className="py-3 space-y-1">
