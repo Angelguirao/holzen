@@ -13,13 +13,6 @@ interface RoadmapItem {
   vote_count: number;
 }
 
-const statusOrder: Record<string, number> = { 'in-progress': 0, planned: 1, shipped: 2 };
-const statusLabels: Record<string, string> = { planned: 'Planned', 'in-progress': 'In Progress', shipped: 'Shipped' };
-const statusColors: Record<string, string> = {
-  planned: 'bg-muted text-muted-foreground',
-  'in-progress': 'bg-primary/10 text-primary',
-  shipped: 'bg-accent text-accent-foreground',
-};
 
 const Roadmap = () => {
   const { user } = useAuth();
