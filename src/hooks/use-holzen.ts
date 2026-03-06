@@ -245,6 +245,7 @@ export function useHolzen() {
     context,
     companions,
     severity,
+    lastReflectionId,
     loading,
     error,
     newReflection,
