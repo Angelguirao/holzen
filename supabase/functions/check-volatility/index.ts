@@ -163,15 +163,13 @@ serve(async (req) => {
     // 1. Fetch current BTC volatility
     const btc = await fetchBtcVolatility();
     const absChange = Math.abs(btc.changePercent);
-    console.log(`[CHECK-VOLATILITY] BTC change: ${btc.changePercent.toFixed(2)}%`);
+    const absCumChange = Math.abs(btc.cumulativeChangePercent);
+    console.log(`[CHECK-VOLATILITY] BTC 24h: ${btc.changePercent.toFixed(2)}%, 7d: ${btc.cumulativeChangePercent.toFixed(2)}%`);
 
-    // 2. Get all profiles where volatility exceeds their threshold and not in cooldown
-    const cutoff = new Date(Date.now() - COOLDOWN_MS).toISOString();
-
+    // 2. Get all profiles - we need to check both thresholds
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
-      .select("user_id, threshold, email_notifications, last_trigger_at")
-      .lte("threshold", absChange);
+      .select("user_id, threshold, cumulative_threshold, email_notifications, last_trigger_at");
 
     if (profilesError) throw profilesError;
     if (!profiles || profiles.length === 0) {
