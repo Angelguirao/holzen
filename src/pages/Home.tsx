@@ -1,6 +1,7 @@
 import { useHolzen } from '@/hooks/use-holzen';
 import { useSubscription } from '@/hooks/use-subscription';
 import { BtcStatus } from '@/components/BtcStatus';
+import { BtcChart } from '@/components/BtcChart';
 import { ReflectionMessage } from '@/components/ReflectionMessage';
 import { OutcomePrompt } from '@/components/OutcomePrompt';
 import { MoodCheck, type MoodValue } from '@/components/MoodCheck';
@@ -97,6 +98,9 @@ const Home = () => {
     <div className="space-y-10">
       {/* BTC Status */}
       <BtcStatus data={btcData} error={error} />
+
+      {/* 7-day chart */}
+      <BtcChart />
 
       <Separator />
 
