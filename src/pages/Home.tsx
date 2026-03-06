@@ -3,6 +3,7 @@ import { useSubscription } from '@/hooks/use-subscription';
 import { BtcStatus } from '@/components/BtcStatus';
 import { ReflectionMessage } from '@/components/ReflectionMessage';
 import { OutcomePrompt } from '@/components/OutcomePrompt';
+import { MoodCheck, type MoodValue } from '@/components/MoodCheck';
 import { Onboarding } from '@/components/Onboarding';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -43,6 +44,22 @@ const Home = () => {
 
   const [showOutcome, setShowOutcome] = useState(false);
   const [outcomeReflectionId, setOutcomeReflectionId] = useState<string | null>(null);
+  const [showMoodCheck, setShowMoodCheck] = useState(false);
+
+  const handleNeedAMoment = () => {
+    if (manualCooldownRemaining() > 0) return;
+    setShowMoodCheck(true);
+  };
+
+  const handleMoodSelected = (mood: MoodValue) => {
+    setShowMoodCheck(false);
+    manualTrigger(mood);
+  };
+
+  const handleMoodSkipped = () => {
+    setShowMoodCheck(false);
+    manualTrigger();
+  };
 
   const handleDismiss = () => {
     setOutcomeReflectionId(lastReflectionId);
@@ -128,6 +145,8 @@ const Home = () => {
               reflectionId={outcomeReflectionId}
               onComplete={handleOutcomeComplete}
             />
+          ) : showMoodCheck ? (
+            <MoodCheck onSelect={handleMoodSelected} onSkip={handleMoodSkipped} />
           ) : (
             <>
               {loading ? (
@@ -147,7 +166,7 @@ const Home = () => {
                     <p className="text-xs font-mono">Something went wrong</p>
                   </div>
                   <button
-                    onClick={manualTrigger}
+                    onClick={() => manualTrigger()}
                     className="text-xs font-mono text-muted-foreground underline"
                   >
                     Try again
@@ -155,7 +174,7 @@ const Home = () => {
                 </div>
               ) : (
                 <NeedAMomentButton
-                  onTrigger={manualTrigger}
+                  onTrigger={handleNeedAMoment}
                   cooldownRemaining={manualCooldownRemaining}
                   loading={loading}
                 />
