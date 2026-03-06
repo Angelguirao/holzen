@@ -31,6 +31,7 @@ const History = () => {
   const [reflections, setReflections] = useState<Reflection[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<'all' | 'favorites'>('all');
+  const [tagFilter, setTagFilter] = useState<string | null>(null);
   const [search, setSearch] = useState('');
 
   useEffect(() => {
