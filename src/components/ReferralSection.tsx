@@ -19,7 +19,7 @@ const MILESTONES = [
 
 export function ReferralSection() {
   const { user } = useAuth();
-  const { toast } = useToast();
+  
   const [referralCode, setReferralCode] = useState<string | null>(null);
   const [referralCount, setReferralCount] = useState(0);
   const [grantedRewards, setGrantedRewards] = useState<GrantedReward[]>([]);
