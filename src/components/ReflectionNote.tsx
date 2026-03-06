@@ -17,7 +17,7 @@ export function ReflectionNote({ reflectionId, initialNote }: Props) {
     setSaved(true);
     await supabase
       .from('reflections')
-      .update({ note: note.trim() || null } as any)
+      .update({ note: note.trim() || null })
       .eq('id', reflectionId);
     setTimeout(() => setSaved(false), 1500);
   }, [reflectionId, note]);

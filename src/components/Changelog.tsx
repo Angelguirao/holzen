@@ -27,7 +27,7 @@ export function Changelog() {
     if (!open) return;
     setLoading(true);
     supabase
-      .from('changelog_entries' as any)
+      .from('changelog_entries')
       .select('id, version, date, changes')
       .order('created_at', { ascending: false })
       .then(({ data }) => {
