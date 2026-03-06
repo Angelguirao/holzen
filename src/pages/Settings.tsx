@@ -32,7 +32,7 @@ const APP_VERSION = '1.1.0';
 
 const Settings = () => {
   const { user, signOut } = useAuth();
-  const { threshold, setThreshold, emailNotifications, setEmailNotifications, companionPrefs, setCompanionPref } = useHolzen();
+  const { threshold, setThreshold, cumulativeThreshold, setCumulativeThreshold, emailNotifications, setEmailNotifications, companionPrefs, setCompanionPref } = useHolzen();
   const { subscribed, loading: subLoading, checkoutLoading, startCheckout, openPortal, trialRemaining } = useSubscription();
   const { theme, setTheme } = useTheme();
   const { canInstall, install } = useInstallPrompt();
@@ -131,7 +131,7 @@ const Settings = () => {
       </div>
 
       {/* Threshold */}
-      <ThresholdSetting threshold={threshold} onSet={setThreshold} />
+      <ThresholdSetting threshold={threshold} onSet={setThreshold} cumulativeThreshold={cumulativeThreshold} onSetCumulative={setCumulativeThreshold} />
 
       <Separator />
 

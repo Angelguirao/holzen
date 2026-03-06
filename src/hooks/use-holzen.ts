@@ -10,6 +10,7 @@ const MANUAL_COOLDOWN_MS = 15 * 60 * 1000; // 15 minutes for on-demand
 export function useHolzen() {
   const { user } = useAuth();
   const [threshold, setThresholdState] = useState(5);
+  const [cumulativeThreshold, setCumulativeThresholdState] = useState(15);
   const [emailNotifications, setEmailNotificationsState] = useState(true);
   const [btcData, setBtcData] = useState<BtcPriceData | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -29,12 +30,13 @@ export function useHolzen() {
     const load = async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_learning')
+        .select('threshold, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_learning')
         .eq('user_id', user.id)
         .single();
 
       if (data) {
         setThresholdState(data.threshold);
+        setCumulativeThresholdState((data as any).cumulative_threshold ?? 15);
         setMessage(data.last_message);
         setContext(data.last_context);
         setEmailNotificationsState(data.email_notifications ?? true);
@@ -75,6 +77,15 @@ export function useHolzen() {
     await supabase
       .from('profiles')
       .update({ threshold: val })
+      .eq('user_id', user.id);
+  }, [user]);
+
+  const setCumulativeThreshold = useCallback(async (val: number) => {
+    setCumulativeThresholdState(val);
+    if (!user) return;
+    await supabase
+      .from('profiles')
+      .update({ cumulative_threshold: val } as any)
       .eq('user_id', user.id);
   }, [user]);
 
@@ -123,7 +134,11 @@ export function useHolzen() {
     if (!user) return;
     const dir = data.direction === 'down' ? 'down' : 'up';
     const pct = Math.abs(data.changePercent).toFixed(1);
-    const ctx = `BTC is ${dir} ${pct}% in the last 24 hours.`;
+    let ctx = `BTC is ${dir} ${pct}% in the last 24 hours.`;
+    if (data.cumulativeChangePercent !== undefined && Math.abs(data.cumulativeChangePercent) >= cumulativeThreshold) {
+      const cumDir = data.cumulativeDirection === 'down' ? 'down' : 'up';
+      ctx += ` Over 7 days, it's ${cumDir} ${Math.abs(data.cumulativeChangePercent).toFixed(1)}%.`;
+    }
 
     setLoading(true);
     setError(null);
@@ -181,13 +196,18 @@ export function useHolzen() {
       const data = await fetchBtcData();
       setBtcData(data);
 
-      if (user && Math.abs(data.changePercent) >= threshold && !(await isInCooldown())) {
-        await generateMessage(data);
+      if (user && !(await isInCooldown())) {
+        const dailyTriggered = Math.abs(data.changePercent) >= threshold;
+        const cumulativeTriggered = data.cumulativeChangePercent !== undefined && Math.abs(data.cumulativeChangePercent) >= cumulativeThreshold;
+
+        if (dailyTriggered || cumulativeTriggered) {
+          await generateMessage(data);
+        }
       }
     } catch (e: any) {
       setError(e.message || 'Failed to fetch BTC data');
     }
-  }, [user, threshold, isInCooldown, generateMessage]);
+  }, [user, threshold, cumulativeThreshold, isInCooldown, generateMessage]);
 
   const [lastManualAt, setLastManualAt] = useState<number | null>(null);
 
@@ -240,6 +260,8 @@ export function useHolzen() {
   return {
     threshold,
     setThreshold,
+    cumulativeThreshold,
+    setCumulativeThreshold,
     emailNotifications,
     setEmailNotifications,
     companionPrefs,
