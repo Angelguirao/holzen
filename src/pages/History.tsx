@@ -79,8 +79,12 @@ const History = () => {
   }, [reflections]);
 
   const deleteReflection = useCallback(async (id: string) => {
-    await supabase.from('reflections').delete().eq('id', id);
-    setReflections((prev) => prev.filter((r) => r.id !== id));
+    try {
+      await supabase.from('reflections').delete().eq('id', id);
+      setReflections((prev) => prev.filter((r) => r.id !== id));
+    } catch {
+      toast('Failed to delete reflection');
+    }
   }, []);
 
   const allTags = useMemo(() => {
