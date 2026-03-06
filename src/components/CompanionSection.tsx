@@ -44,7 +44,9 @@ export function CompanionSection({ companions, prefs, severity = 'mild' }: Props
       {hasHaiku && (
         <div>
           {expandedHaiku ? (
-            <HaikuDisplay haiku={companions.haiku!} />
+            <div className="animate-fade-in">
+              <HaikuDisplay haiku={companions.haiku!} />
+            </div>
           ) : (
             <button
               onClick={() => setExpandedHaiku(true)}
@@ -59,7 +61,9 @@ export function CompanionSection({ companions, prefs, severity = 'mild' }: Props
       {hasLearning && (
         <div>
           {expandedLearning ? (
-            <LearningInput title={companions.learningTitle!} body={companions.learningBody!} />
+            <div className="animate-fade-in">
+              <LearningInput title={companions.learningTitle!} body={companions.learningBody!} />
+            </div>
           ) : (
             <button
               onClick={() => setExpandedLearning(true)}
