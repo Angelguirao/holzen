@@ -156,6 +156,7 @@ export function useHolzen() {
           haiku: companionData.haiku,
           learning_title: companionData.learningTitle,
           learning_body: companionData.learningBody,
+          ...(mood ? { mood } : {}),
         } as any).select('id').single();
 
         if (insertedReflection) {
