@@ -70,8 +70,17 @@ const History = () => {
     setReflections((prev) => prev.filter((r) => r.id !== id));
   }, []);
 
+  const allTags = useMemo(() => {
+    const set = new Set<string>();
+    reflections.forEach((r) => r.tags?.forEach((t) => set.add(t)));
+    return Array.from(set).sort();
+  }, [reflections]);
+
   const filtered = useMemo(() => {
     let result = filter === 'favorites' ? reflections.filter((r) => r.is_favorite) : reflections;
+    if (tagFilter) {
+      result = result.filter((r) => r.tags?.includes(tagFilter));
+    }
     if (search.trim()) {
       const q = search.toLowerCase();
       result = result.filter(
@@ -79,7 +88,7 @@ const History = () => {
       );
     }
     return result;
-  }, [reflections, filter, search]);
+  }, [reflections, filter, tagFilter, search]);
 
   return (
     <div className="space-y-6">
