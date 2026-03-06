@@ -252,5 +252,6 @@ export function useHolzen() {
     hasOnboarded,
     completeOnboarding,
     manualTrigger,
+    manualCooldownRemaining,
   };
 }
