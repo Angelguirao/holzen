@@ -20,7 +20,7 @@ export function ReflectionTags({ reflectionId, initialTags }: Props) {
     setTags(newTags);
     await supabase
       .from('reflections')
-      .update({ tags: newTags } as any)
+      .update({ tags: newTags })
       .eq('id', reflectionId);
   }, [reflectionId, tags]);
 
