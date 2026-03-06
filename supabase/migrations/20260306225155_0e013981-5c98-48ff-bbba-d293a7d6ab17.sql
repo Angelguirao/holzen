@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN cumulative_threshold numeric NOT NULL DEFAULT 15;

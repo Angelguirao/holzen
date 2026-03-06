@@ -80,6 +80,7 @@ export type Database = {
           companion_haiku: boolean
           companion_learning: boolean
           created_at: string
+          cumulative_threshold: number
           email_notifications: boolean
           has_onboarded: boolean
           id: string
@@ -98,6 +99,7 @@ export type Database = {
           companion_haiku?: boolean
           companion_learning?: boolean
           created_at?: string
+          cumulative_threshold?: number
           email_notifications?: boolean
           has_onboarded?: boolean
           id?: string
@@ -116,6 +118,7 @@ export type Database = {
           companion_haiku?: boolean
           companion_learning?: boolean
           created_at?: string
+          cumulative_threshold?: number
           email_notifications?: boolean
           has_onboarded?: boolean
           id?: string
