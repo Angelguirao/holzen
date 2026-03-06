@@ -1,3 +1,4 @@
+import { forwardRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { ShareReflection } from './ShareReflection';
 import { CompanionSection, type CompanionData, type CompanionPrefs } from './CompanionSection';
@@ -11,9 +12,9 @@ interface Props {
   severity?: 'mild' | 'moderate' | 'high';
 }
 
-export function ReflectionMessage({ message, context, onDismiss, companions, companionPrefs, severity }: Props) {
+export const ReflectionMessage = forwardRef<HTMLDivElement, Props>(function ReflectionMessage({ message, context, onDismiss, companions, companionPrefs, severity }, ref) {
   return (
-    <div className="space-y-6">
+    <div ref={ref} className="space-y-6">
       {context && (
         <p className="text-xs font-mono text-muted-foreground">{context}</p>
       )}
@@ -42,4 +43,4 @@ export function ReflectionMessage({ message, context, onDismiss, companions, com
       )}
     </div>
   );
-}
+});
