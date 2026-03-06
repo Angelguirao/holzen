@@ -168,6 +168,7 @@ const History = () => {
                 </div>
               </div>
               <p className="text-sm leading-relaxed">{r.message}</p>
+              <ReflectionNote reflectionId={r.id} initialNote={r.note} />
               {(r.haiku || r.learning_title) && (
                 <div className="space-y-2 pt-2 border-t border-border/30">
                   {r.haiku && <HaikuDisplay haiku={r.haiku} />}
