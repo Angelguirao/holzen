@@ -19,6 +19,7 @@ export function useHolzen() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [newReflection, setNewReflection] = useState(false);
+  const [lastReflectionId, setLastReflectionId] = useState<string | null>(null);
   const [profileLoaded, setProfileLoaded] = useState(false);
   const [hasOnboarded, setHasOnboarded] = useState(true);
 
@@ -148,21 +149,24 @@ export function useHolzen() {
         setCompanions(companionData);
 
         // Save to history and update profile
-        await Promise.all([
-          supabase.from('reflections').insert({
-            user_id: user.id,
-            message: msg,
-            context: ctx,
-            haiku: companionData.haiku,
-            learning_title: companionData.learningTitle,
-            learning_body: companionData.learningBody,
-          } as any),
-          supabase.from('profiles').update({
-            last_message: msg,
-            last_context: ctx,
-            last_trigger_at: new Date().toISOString(),
-          }).eq('user_id', user.id),
-        ]);
+        const { data: insertedReflection } = await supabase.from('reflections').insert({
+          user_id: user.id,
+          message: msg,
+          context: ctx,
+          haiku: companionData.haiku,
+          learning_title: companionData.learningTitle,
+          learning_body: companionData.learningBody,
+        } as any).select('id').single();
+
+        if (insertedReflection) {
+          setLastReflectionId((insertedReflection as any).id);
+        }
+
+        await supabase.from('profiles').update({
+          last_message: msg,
+          last_context: ctx,
+          last_trigger_at: new Date().toISOString(),
+        }).eq('user_id', user.id);
       }
     } catch (e: any) {
       setError(e.message || 'Failed to generate message');
@@ -244,6 +248,7 @@ export function useHolzen() {
     context,
     companions,
     severity,
+    lastReflectionId,
     loading,
     error,
     newReflection,
