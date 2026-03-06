@@ -139,6 +139,7 @@ export type Database = {
           context: string | null
           created_at: string
           id: string
+          is_favorite: boolean
           message: string
           user_id: string
         }
@@ -146,6 +147,7 @@ export type Database = {
           context?: string | null
           created_at?: string
           id?: string
+          is_favorite?: boolean
           message: string
           user_id: string
         }
@@ -153,6 +155,7 @@ export type Database = {
           context?: string | null
           created_at?: string
           id?: string
+          is_favorite?: boolean
           message?: string
           user_id?: string
         }
