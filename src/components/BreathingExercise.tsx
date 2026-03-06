@@ -49,7 +49,7 @@ export function BreathingExercise({ severity = 'mild' }: Props) {
   const progress = seconds / durations[phase];
   const scale = phase === 'inhale' ? 0.6 + progress * 0.4 : phase === 'hold' ? 1 : 1 - progress * 0.4;
 
-  const pulseClass = severity === 'high' ? 'animate-pulse' : '';
+  const pulseClass = severity === 'high' ? 'animate-[pulse_3s_cubic-bezier(0.4,0,0.6,1)_infinite]' : '';
 
   if (!active) {
     return (
