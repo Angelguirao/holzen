@@ -50,6 +50,30 @@ export type Database = {
         }
         Relationships: []
       }
+      changelog_entries: {
+        Row: {
+          changes: string[]
+          created_at: string
+          date: string
+          id: string
+          version: string
+        }
+        Insert: {
+          changes?: string[]
+          created_at?: string
+          date: string
+          id?: string
+          version: string
+        }
+        Update: {
+          changes?: string[]
+          created_at?: string
+          date?: string
+          id?: string
+          version?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           companion_breathing: boolean
@@ -223,6 +247,62 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      roadmap_items: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          status: string
+          title: string
+          vote_count: number
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          status?: string
+          title: string
+          vote_count?: number
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          status?: string
+          title?: string
+          vote_count?: number
+        }
+        Relationships: []
+      }
+      roadmap_votes: {
+        Row: {
+          created_at: string
+          id: string
+          item_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          item_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          item_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "roadmap_votes_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "roadmap_items"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
