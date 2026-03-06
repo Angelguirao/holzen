@@ -49,6 +49,9 @@ const About = () => {
             <p className="text-xs text-muted-foreground leading-relaxed">
               But access is only half the equation. What these platforms don't provide is the emotional infrastructure to handle what comes next: the volatility, the uncertainty, the constant temptation to act when doing nothing would serve you better.
             </p>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              That's the gap Holzen fills — not with more data or faster alerts, but with a practice of self-awareness: breathing exercises, AI-generated reflections, mood tracking, journaling, emotional tagging, and personal insights that reveal your patterns over time.
+            </p>
           </div>
         </motion.div>
 
@@ -68,7 +71,7 @@ const About = () => {
               This is true for experienced investors and beginners alike. The difference is that beginners often don't yet recognise the pattern: the urge to sell when prices fall, the urge to buy when prices surge. Both feel rational in the moment. Neither usually is.
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              We believe that small, well-timed interventions — a pause, a reflection, a moment of awareness — can meaningfully improve decision-making during these critical windows. Not advice. Not signals. Just enough friction to let your reflective mind catch up.
+              Holzen applies this research directly. When volatility crosses your threshold — daily or across a rolling 7-day window — you're met with a breathing exercise, a mood check, an AI reflection, and companion content (a haiku, a historical insight) designed to slow you down. Afterward, you tag your emotions, journal your thoughts, and record what you did. Over time, your personal insights panel reveals how your composure evolves — turning reactive moments into data you can learn from.
             </p>
             <p className="text-[10px] text-muted-foreground/70 leading-relaxed italic">
               Kahneman, D. (2011). <em>Thinking, Fast and Slow</em>. · Barber, B. & Odean, T. (2000). "Trading Is Hazardous to Your Wealth." <em>The Journal of Finance</em>, 55(2). · Thaler, R. (2015). <em>Misbehaving: The Making of Behavioral Economics</em>.
@@ -92,7 +95,7 @@ const About = () => {
               We believe Bitcoin represents the most asymmetric bet in the history of financial markets. But capturing that asymmetry requires one thing above all else: the ability to hold through volatility. And that's where most people fail — not because the thesis is wrong, but because the emotional cost of conviction is brutally high.
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Holzen exists to help people hold. Not blindly, not recklessly — but with awareness. We don't tell you what to do. We help you pause long enough to remember why you started.
+              Holzen exists to help people hold — with awareness. We don't tell you what to do. We help you pause long enough to notice your impulse, name it, and choose deliberately. Your reflection library, mood patterns, and outcome tracking become a mirror: proof that you can sit with discomfort and come out the other side with your conviction intact.
             </p>
           </div>
         </motion.div>
@@ -107,7 +110,7 @@ const About = () => {
               Holzen is a micropreneur project — small by design.
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              We don't have investors, a growth team, or a roadmap optimised for scale. We have a simple product that does one thing well, a clear price, and users who value what we build. That's the model.
+              We don't have investors, a growth team, or a roadmap optimised for scale. We have a focused product, a <Link to="/roadmap" className="underline hover:text-foreground transition-colors">public roadmap</Link> shaped by user votes, a clear price, and users who value what we build. That's the model.
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
               We believe the best software is often built by small teams — or even individuals — who care deeply about the problem they're solving. No engagement metrics, no dark patterns, no pressure to grow at all costs. Just a useful tool that earns its place by being genuinely helpful.
