@@ -5,6 +5,12 @@ import { Copy, Check, Gift, Star, Crown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { Progress } from '@/components/ui/progress';
 
+interface GrantedReward {
+  milestone: number;
+  reward_type: string;
+  granted_at: string;
+}
+
 const MILESTONES = [
   { count: 1, icon: Gift, label: '1 referral', reward: '1 week free added' },
   { count: 3, icon: Star, label: '3 referrals', reward: '1 month free added' },
@@ -16,6 +22,7 @@ export function ReferralSection() {
   const { toast } = useToast();
   const [referralCode, setReferralCode] = useState<string | null>(null);
   const [referralCount, setReferralCount] = useState(0);
+  const [grantedRewards, setGrantedRewards] = useState<GrantedReward[]>([]);
   const [copied, setCopied] = useState(false);
   const [expanded, setExpanded] = useState(false);
 
@@ -38,6 +45,16 @@ export function ReferralSection() {
         .eq('referrer_id', user.id);
 
       setReferralCount(count ?? 0);
+
+      // Load granted rewards
+      const { data: rewards } = await supabase
+        .from('referral_rewards' as any)
+        .select('milestone, reward_type, granted_at')
+        .eq('user_id', user.id);
+
+      if (rewards) {
+        setGrantedRewards(rewards as unknown as GrantedReward[]);
+      }
     };
     load();
   }, [user]);
@@ -102,6 +119,7 @@ export function ReferralSection() {
               {MILESTONES.map((milestone) => {
                 const Icon = milestone.icon;
                 const reached = referralCount >= milestone.count;
+                const granted = grantedRewards.some(r => r.milestone === milestone.count);
                 return (
                   <div
                     key={milestone.count}
@@ -111,7 +129,11 @@ export function ReferralSection() {
                   >
                     <Icon className={`h-3 w-3 shrink-0 ${reached ? 'text-foreground' : ''}`} />
                     <span className="flex-1">{milestone.reward}</span>
-                    {reached && <Check className="h-3 w-3 shrink-0" />}
+                    {granted ? (
+                      <span className="text-[10px] text-foreground/70">Earned ✓</span>
+                    ) : reached ? (
+                      <Check className="h-3 w-3 shrink-0" />
+                    ) : null}
                   </div>
                 );
               })}
