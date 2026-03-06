@@ -3,6 +3,8 @@ export interface BtcPriceData {
   price24hAgo: number;
   changePercent: number;
   direction: 'up' | 'down';
+  cumulativeChangePercent?: number;
+  cumulativeDirection?: 'up' | 'down';
 }
 
 async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise<Response> {
