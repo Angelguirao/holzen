@@ -111,7 +111,7 @@ async function sendNotificationEmail(
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        from: "Holzen <onboarding@resend.dev>",
+        from: "Holzen <notify@holzen.app>",
         to: [email],
         subject: "Holzen — A moment to pause",
         html,
