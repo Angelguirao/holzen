@@ -179,13 +179,16 @@ serve(async (req) => {
       });
     }
 
-    // Filter out users in cooldown
+    // Filter: must exceed at least one threshold AND not in cooldown
     const eligible = profiles.filter((p) => {
+      const dailyTriggered = absChange >= (p.threshold ?? 5);
+      const cumulativeTriggered = absCumChange >= ((p as any).cumulative_threshold ?? 15);
+      if (!dailyTriggered && !cumulativeTriggered) return false;
       if (!p.last_trigger_at) return true;
       return new Date(p.last_trigger_at).getTime() < Date.now() - COOLDOWN_MS;
     });
 
-    console.log(`[CHECK-VOLATILITY] ${eligible.length} users eligible (${profiles.length} exceeded threshold)`);
+    console.log(`[CHECK-VOLATILITY] ${eligible.length} users eligible (${profiles.length} total)`);
 
     let triggered = 0;
 
