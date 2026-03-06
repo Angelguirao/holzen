@@ -118,10 +118,15 @@ const Home = () => {
             <ReflectionMessage
               message={message}
               context={context}
-              onDismiss={dismissMessage}
+              onDismiss={handleDismiss}
               companions={companions}
               companionPrefs={companionPrefs}
               severity={severity}
+            />
+          ) : showOutcome && outcomeReflectionId ? (
+            <OutcomePrompt
+              reflectionId={outcomeReflectionId}
+              onComplete={handleOutcomeComplete}
             />
           ) : (
             <>
