@@ -346,7 +346,10 @@ const Settings = () => {
 
       {/* Changelog & Version */}
       <div className="space-y-3">
-        <Changelog />
+        <div className="flex items-center gap-3">
+          <Changelog />
+          <a href="/roadmap" target="_blank" rel="noopener noreferrer" className="text-xs font-mono text-muted-foreground underline">Roadmap</a>
+        </div>
         <p className="text-[10px] font-mono text-muted-foreground/50">
           Holzen v{APP_VERSION}
         </p>
