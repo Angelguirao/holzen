@@ -14,7 +14,7 @@ interface Props {
   reflectionId?: string | null;
 }
 
-export const ReflectionMessage = forwardRef<HTMLDivElement, Props>(function ReflectionMessage({ message, context, onDismiss, companions, companionPrefs, severity }, ref) {
+export const ReflectionMessage = forwardRef<HTMLDivElement, Props>(function ReflectionMessage({ message, context, onDismiss, companions, companionPrefs, severity, reflectionId }, ref) {
   return (
     <div ref={ref} className="space-y-6">
       {context && (
