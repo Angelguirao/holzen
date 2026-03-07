@@ -6,6 +6,7 @@ import { Mail, Lock, Clock, Trash2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ReflectionStats } from '@/components/ReflectionStats';
 import { InsightsPanel } from '@/components/InsightsPanel';
+import { AIInsightsPanel } from '@/components/AIInsightsPanel';
 import { MoodTrends } from '@/components/MoodTrends';
 import { BadgesPanel } from '@/components/BadgesPanel';
 import { ReferralSection } from '@/components/ReferralSection';
