@@ -149,6 +149,7 @@ const History = () => {
         ) : (
           <div className="space-y-5">
             <ReflectionStats reflections={reflections} />
+            <MoodTrends reflections={reflections} />
             <InsightsPanel reflections={reflections} />
           </div>
         )
