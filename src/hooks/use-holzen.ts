@@ -4,7 +4,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
 
-const COOLDOWN_MS = 6 * 60 * 60 * 1000; // 6 hours
 const MANUAL_COOLDOWN_MS = 15 * 60 * 1000; // 15 minutes for on-demand
 
 export function useHolzen() {
@@ -13,6 +12,7 @@ export function useHolzen() {
   const [cumulativeThreshold, setCumulativeThresholdState] = useState(15);
   const [emailNotifications, setEmailNotificationsState] = useState(true);
   const [reflectionTone, setReflectionToneState] = useState('stoic');
+  const [cooldownHours, setCooldownHoursState] = useState(6);
   const [btcData, setBtcData] = useState<BtcPriceData | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [context, setContext] = useState<string | null>(null);
@@ -31,7 +31,7 @@ export function useHolzen() {
     const load = async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('threshold, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_learning, reflection_tone')
+        .select('threshold, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_learning, reflection_tone, cooldown_hours')
         .eq('user_id', user.id)
         .single();
 
@@ -42,6 +42,7 @@ export function useHolzen() {
         setContext(data.last_context);
         setEmailNotificationsState(data.email_notifications ?? true);
         setReflectionToneState((data as any).reflection_tone ?? 'stoic');
+        setCooldownHoursState((data as any).cooldown_hours ?? 6);
         setHasOnboarded(data.has_onboarded ?? false);
         setCompanionPrefsState({
           breathing: data.companion_breathing ?? true,
@@ -138,8 +139,9 @@ export function useHolzen() {
       .single();
 
     if (!data?.last_trigger_at) return false;
-    return Date.now() - new Date(data.last_trigger_at).getTime() < COOLDOWN_MS;
-  }, [user]);
+    const cooldownMs = cooldownHours * 60 * 60 * 1000;
+    return Date.now() - new Date(data.last_trigger_at).getTime() < cooldownMs;
+  }, [user, cooldownHours]);
 
   const generateMessage = useCallback(async (data: BtcPriceData, mood?: string) => {
     if (!user) return;
@@ -271,6 +273,15 @@ export function useHolzen() {
     return () => clearInterval(interval);
   }, [checkAndTrigger, profileLoaded]);
 
+  const setCooldownHours = useCallback(async (val: number) => {
+    setCooldownHoursState(val);
+    if (!user) return;
+    await supabase
+      .from('profiles')
+      .update({ cooldown_hours: val } as any)
+      .eq('user_id', user.id);
+  }, [user]);
+
   return {
     threshold,
     setThreshold,
@@ -280,6 +291,8 @@ export function useHolzen() {
     setEmailNotifications,
     reflectionTone,
     setReflectionTone,
+    cooldownHours,
+    setCooldownHours,
     companionPrefs,
     setCompanionPref,
     btcData,

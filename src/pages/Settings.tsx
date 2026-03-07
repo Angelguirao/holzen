@@ -32,7 +32,7 @@ const APP_VERSION = '1.2.0';
 
 const Settings = () => {
   const { user, signOut } = useAuth();
-  const { threshold, setThreshold, cumulativeThreshold, setCumulativeThreshold, emailNotifications, setEmailNotifications, companionPrefs, setCompanionPref, reflectionTone, setReflectionTone } = useHolzen();
+  const { threshold, setThreshold, cumulativeThreshold, setCumulativeThreshold, emailNotifications, setEmailNotifications, companionPrefs, setCompanionPref, reflectionTone, setReflectionTone, cooldownHours, setCooldownHours } = useHolzen();
   const { subscribed, loading: subLoading, checkoutLoading, startCheckout, openPortal, trialRemaining } = useSubscription();
   const { theme, setTheme } = useTheme();
   const { canInstall, install } = useInstallPrompt();
@@ -132,6 +132,31 @@ const Settings = () => {
 
       {/* Threshold */}
       <ThresholdSetting threshold={threshold} onSet={setThreshold} cumulativeThreshold={cumulativeThreshold} onSetCumulative={setCumulativeThreshold} />
+
+      <Separator />
+
+      {/* Cooldown */}
+      <div className="space-y-4">
+        <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Cooldown</p>
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          Minimum time between automatic reflections.
+        </p>
+        <div className="grid grid-cols-4 gap-2">
+          {([1, 6, 12, 24] as const).map((h) => (
+            <button
+              key={h}
+              onClick={() => setCooldownHours(h)}
+              className={`rounded-md border px-3 py-2 text-center transition-colors ${
+                cooldownHours === h
+                  ? 'border-primary bg-primary/5 text-foreground'
+                  : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <p className="text-xs font-mono">{h}h</p>
+            </button>
+          ))}
+        </div>
+      </div>
 
       <Separator />
 

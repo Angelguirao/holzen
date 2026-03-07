@@ -8,7 +8,7 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const COOLDOWN_MS = 6 * 60 * 60 * 1000; // 6 hours
+const DEFAULT_COOLDOWN_MS = 6 * 60 * 60 * 1000; // 6 hours fallback
 
 async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise<Response> {
   for (let i = 0; i < retries; i++) {
@@ -169,7 +169,7 @@ serve(async (req) => {
     // 2. Get all profiles - we need to check both thresholds
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
-      .select("user_id, threshold, cumulative_threshold, email_notifications, last_trigger_at");
+      .select("user_id, threshold, cumulative_threshold, email_notifications, last_trigger_at, cooldown_hours");
 
     if (profilesError) throw profilesError;
     if (!profiles || profiles.length === 0) {
@@ -185,7 +185,8 @@ serve(async (req) => {
       const cumulativeTriggered = absCumChange >= ((p as any).cumulative_threshold ?? 15);
       if (!dailyTriggered && !cumulativeTriggered) return false;
       if (!p.last_trigger_at) return true;
-      return new Date(p.last_trigger_at).getTime() < Date.now() - COOLDOWN_MS;
+      const cooldownMs = ((p as any).cooldown_hours ?? 6) * 60 * 60 * 1000;
+      return new Date(p.last_trigger_at).getTime() < Date.now() - cooldownMs;
     });
 
     console.log(`[CHECK-VOLATILITY] ${eligible.length} users eligible (${profiles.length} total)`);
