@@ -18,22 +18,69 @@ async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise
 }
 
 function shouldSendDigest(frequency: string, now: Date): boolean {
-  const dayOfWeek = now.getUTCDay(); // 0=Sun
+  const dayOfWeek = now.getUTCDay();
   const dayOfMonth = now.getUTCDate();
 
   switch (frequency) {
     case "daily":
       return true;
     case "weekly":
-      return dayOfWeek === 0; // Sunday
+      return dayOfWeek === 0;
     case "biweekly":
-      return dayOfWeek === 0 && (Math.ceil(dayOfMonth / 7) % 2 === 1); // 1st & 3rd Sundays
+      return dayOfWeek === 0 && (Math.ceil(dayOfMonth / 7) % 2 === 1);
     case "monthly":
       return dayOfMonth === 1;
     case "off":
       return false;
     default:
-      return dayOfWeek === 0; // fallback to weekly
+      return dayOfWeek === 0;
+  }
+}
+
+async function generateAIInsight(
+  reflectionCount: number,
+  topMood: string | undefined,
+  steadyCount: number,
+  weekDir: string,
+  absWeekChange: string,
+  LOVABLE_API_KEY: string
+): Promise<string | null> {
+  if (reflectionCount === 0) return null;
+
+  try {
+    const prompt = `You are Holzen, a mindful Bitcoin reflection app. Generate ONE short behavioral observation (1-2 sentences max) based on this user's week:
+- BTC moved ${weekDir} ${absWeekChange}% this week
+- They reflected ${reflectionCount} time(s)
+- Most common mood: ${topMood || "unknown"}
+- Stayed steady (held/did nothing): ${steadyCount} time(s)
+
+Be observational, not prescriptive. No advice, no exclamation marks. Calm and grounded. Examples:
+- "You noticed the dip but didn't flinch. That pattern is strengthening."
+- "Three reflections during a quiet week — you're building awareness beyond volatility."
+- "Anxiety appeared twice this week, both during drops. The pattern is worth noticing."`;
+
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash-lite",
+        messages: [{ role: "user", content: prompt }],
+      }),
+    });
+
+    if (!response.ok) {
+      console.error(`[DIGEST] AI insight error: ${response.status}`);
+      return null;
+    }
+
+    const data = await response.json();
+    return data.choices?.[0]?.message?.content?.trim() || null;
+  } catch (e) {
+    console.error("[DIGEST] AI insight failed:", e);
+    return null;
   }
 }
 
@@ -51,6 +98,8 @@ serve(async (req) => {
 
     const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
     if (!RESEND_API_KEY) throw new Error("RESEND_API_KEY not configured");
+
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
     // 1. Fetch 7-day BTC data
     const res7d = await fetchWithRetry(
@@ -91,13 +140,12 @@ serve(async (req) => {
     const eligible = (profiles ?? []).filter(
       (p) => p.email_notifications && shouldSendDigest(p.digest_frequency ?? "weekly", now)
     );
-    console.log(`[WEEKLY-DIGEST] ${eligible.length} users eligible`);
+    console.log(`[DIGEST] ${eligible.length} users eligible`);
 
     let sent = 0;
     const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
     for (const profile of eligible) {
-      // Get user's reflections this week
       const { data: reflections } = await supabase
         .from("reflections")
         .select("message, mood, outcome, created_at")
@@ -107,7 +155,6 @@ serve(async (req) => {
 
       const reflectionCount = reflections?.length ?? 0;
 
-      // Mood summary
       const moods: Record<string, number> = {};
       const outcomes: Record<string, number> = {};
       for (const r of reflections ?? []) {
@@ -120,13 +167,20 @@ serve(async (req) => {
       const nothingCount = outcomes["nothing"] ?? 0;
       const steadyCount = heldCount + nothingCount;
 
-      // Build the email
       const { data: userData } = await supabase.auth.admin.getUserById(profile.user_id);
       const email = userData?.user?.email;
       if (!email) continue;
 
       const thresholdUp = profile.threshold ?? 5;
       const thresholdDn = profile.threshold_down ?? 5;
+
+      // Generate AI insight
+      let aiInsight: string | null = null;
+      if (LOVABLE_API_KEY && reflectionCount > 0) {
+        aiInsight = await generateAIInsight(
+          reflectionCount, topMood, steadyCount, weekDir, absWeekChange, LOVABLE_API_KEY
+        );
+      }
 
       const reflectionsList =
         reflectionCount === 0
@@ -140,6 +194,10 @@ serve(async (req) => {
                   : ""
               }
             </p>`;
+
+      const aiInsightHtml = aiInsight
+        ? `<p style="font-size: 13px; color: #2a2a2a; line-height: 1.6; font-style: italic; border-left: 2px solid #d4d0c8; padding-left: 12px; margin: 16px 0;">${aiInsight}</p>`
+        : "";
 
       const html = `
 <!DOCTYPE html>
@@ -178,6 +236,8 @@ serve(async (req) => {
 
   ${reflectionsList}
 
+  ${aiInsightHtml}
+
   <hr style="border: none; border-top: 1px solid #e5e2dc; margin: 24px 0;">
 
   <p style="font-size: 13px; color: #737373; line-height: 1.6;">
@@ -206,23 +266,23 @@ serve(async (req) => {
 
         if (!res.ok) {
           const errText = await res.text();
-          console.error(`[WEEKLY-DIGEST] Resend error [${res.status}]: ${errText}`);
+          console.error(`[DIGEST] Resend error [${res.status}]: ${errText}`);
           continue;
         }
         await res.json();
         sent++;
       } catch (e) {
-        console.error(`[WEEKLY-DIGEST] Send error for ${email}:`, e);
+        console.error(`[DIGEST] Send error for ${email}:`, e);
       }
     }
 
-    console.log(`[WEEKLY-DIGEST] Sent ${sent} digest emails`);
+    console.log(`[DIGEST] Sent ${sent} digest emails`);
     return new Response(JSON.stringify({ sent }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    console.error("[WEEKLY-DIGEST] Error:", msg);
+    console.error("[DIGEST] Error:", msg);
     return new Response(JSON.stringify({ error: msg }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

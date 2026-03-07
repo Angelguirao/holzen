@@ -13,13 +13,21 @@ const TONE_INSTRUCTIONS: Record<string, string> = {
   blunt: "Write in a direct, blunt tone. No fluff. Say it plainly in as few words as possible.",
 };
 
+const STYLE_INSTRUCTIONS: Record<string, string> = {
+  standard: "Write a reflection in 1-3 sentences.",
+  "one-liner": "Write EXACTLY one sentence. Concise and impactful.",
+  question: "Respond with EXACTLY one thought-provoking question. No statements.",
+  metaphor: "Use a single vivid metaphor to frame the moment. 1-2 sentences max.",
+  koan: "Write a short zen koan or paradox related to the moment. 1-2 sentences.",
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { context, tone, customPrompt } = await req.json();
+    const { context, tone, customPrompt, style } = await req.json();
     if (!context) {
       return new Response(JSON.stringify({ error: "Missing context" }), {
         status: 400,
@@ -33,6 +41,7 @@ serve(async (req) => {
     }
 
     const toneInstruction = TONE_INSTRUCTIONS[tone] || TONE_INSTRUCTIONS.stoic;
+    const styleInstruction = STYLE_INSTRUCTIONS[style] || STYLE_INSTRUCTIONS.standard;
 
     const systemPrompt = `You generate a reflection with optional companions in response to Bitcoin volatility.
 
@@ -49,7 +58,8 @@ The context may include a Fear & Greed Index score (0-100). Use this to subtly a
 Do NOT name the index or its score directly. Weave the sentiment naturally into the reflection.
 
 Reflection rules:
-- Exactly 1-3 sentences. ${tone === 'blunt' ? '1 sentence preferred.' : ''}
+- Style: ${styleInstruction}
+- ${tone === 'blunt' ? '1 sentence preferred.' : ''}
 - Encourage pause and reflection. Preserve agency: never say "you should".
 - No reassurance, excitement, urgency, trading advice, lists, disclaimers.
 - No exclamation marks, emojis, motivational language, reward language.

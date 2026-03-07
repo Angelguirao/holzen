@@ -18,6 +18,9 @@ export function useHolzen() {
   const [cooldownHours, setCooldownHoursState] = useState(6);
   const [digestFrequency, setDigestFrequencyState] = useState('weekly');
   const [customPrompt, setCustomPromptState] = useState<string | null>(null);
+  const [reflectionStyle, setReflectionStyleState] = useState('standard');
+  const [quietHoursStart, setQuietHoursStartState] = useState<number | null>(null);
+  const [quietHoursEnd, setQuietHoursEndState] = useState<number | null>(null);
   const [btcData, setBtcData] = useState<BtcPriceData | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [context, setContext] = useState<string | null>(null);
@@ -36,7 +39,7 @@ export function useHolzen() {
     const load = async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('threshold, threshold_down, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_learning, reflection_tone, cooldown_hours, last_trigger_at, silent_mode, streak_freeze_dates, digest_frequency, custom_prompt')
+        .select('threshold, threshold_down, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_learning, reflection_tone, cooldown_hours, last_trigger_at, silent_mode, streak_freeze_dates, digest_frequency, custom_prompt, reflection_style, quiet_hours_start, quiet_hours_end')
         .eq('user_id', user.id)
         .single();
 
@@ -54,6 +57,9 @@ export function useHolzen() {
         setSilentModeState((data as any).silent_mode ?? false);
         setDigestFrequencyState((data as any).digest_frequency ?? 'weekly');
         setCustomPromptState((data as any).custom_prompt ?? null);
+        setReflectionStyleState((data as any).reflection_style ?? 'standard');
+        setQuietHoursStartState((data as any).quiet_hours_start ?? null);
+        setQuietHoursEndState((data as any).quiet_hours_end ?? null);
         setHasOnboarded(data.has_onboarded ?? false);
         setCompanionPrefsState({
           breathing: data.companion_breathing ?? true,
@@ -245,7 +251,7 @@ export function useHolzen() {
 
     try {
       const { data: fnData, error: fnError } = await supabase.functions.invoke('holzen-reflect', {
-        body: { context: ctx, tone: reflectionTone, customPrompt: customPrompt || undefined },
+        body: { context: ctx, tone: reflectionTone, customPrompt: customPrompt || undefined, style: reflectionStyle },
       });
 
       if (fnError) throw fnError;
@@ -291,14 +297,24 @@ export function useHolzen() {
     } finally {
       setLoading(false);
     }
-  }, [user, reflectionTone, silentMode, cumulativeThreshold, customPrompt]);
+  }, [user, reflectionTone, reflectionStyle, silentMode, cumulativeThreshold, customPrompt]);
+
+  const isInQuietHours = useCallback(() => {
+    if (quietHoursStart === null || quietHoursEnd === null) return false;
+    const nowHour = new Date().getHours();
+    if (quietHoursStart <= quietHoursEnd) {
+      return nowHour >= quietHoursStart && nowHour < quietHoursEnd;
+    }
+    // Wraps midnight (e.g., 22-7)
+    return nowHour >= quietHoursStart || nowHour < quietHoursEnd;
+  }, [quietHoursStart, quietHoursEnd]);
 
   const checkAndTrigger = useCallback(async () => {
     try {
       const data = await fetchBtcData();
       setBtcData(data);
 
-      if (user && !(await isInCooldown())) {
+      if (user && !(await isInCooldown()) && !isInQuietHours()) {
         const effectiveThreshold = data.changePercent < 0 ? thresholdDown : threshold;
         const dailyTriggered = Math.abs(data.changePercent) >= effectiveThreshold;
         const cumulativeTriggered = data.cumulativeChangePercent !== undefined && Math.abs(data.cumulativeChangePercent) >= cumulativeThreshold;
@@ -310,7 +326,7 @@ export function useHolzen() {
     } catch (e: any) {
       setError(e.message || 'Failed to fetch BTC data');
     }
-  }, [user, threshold, thresholdDown, cumulativeThreshold, isInCooldown, generateMessage]);
+  }, [user, threshold, thresholdDown, cumulativeThreshold, isInCooldown, isInQuietHours, generateMessage]);
 
   const [lastTriggerAt, setLastTriggerAt] = useState<string | null>(null);
   const [lastManualAt, setLastManualAt] = useState<number | null>(() => {
@@ -406,6 +422,20 @@ export function useHolzen() {
       setCustomPromptState(val);
       if (!user) return;
       await supabase.from('profiles').update({ custom_prompt: val } as any).eq('user_id', user.id);
+    },
+    reflectionStyle,
+    setReflectionStyle: async (val: string) => {
+      setReflectionStyleState(val);
+      if (!user) return;
+      await supabase.from('profiles').update({ reflection_style: val } as any).eq('user_id', user.id);
+    },
+    quietHoursStart,
+    quietHoursEnd,
+    setQuietHours: async (start: number | null, end: number | null) => {
+      setQuietHoursStartState(start);
+      setQuietHoursEndState(end);
+      if (!user) return;
+      await supabase.from('profiles').update({ quiet_hours_start: start, quiet_hours_end: end } as any).eq('user_id', user.id);
     },
     companionPrefs,
     setCompanionPref,
