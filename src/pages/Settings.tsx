@@ -43,6 +43,26 @@ const Settings = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [changingPassword, setChangingPassword] = useState(false);
   const [zenMode, setZenMode] = useState(() => localStorage.getItem('holzen_zen_mode') === 'true');
+  const [latestVersion, setLatestVersion] = useState<string | null>(null);
+  const [hasNewVersion, setHasNewVersion] = useState(false);
+
+  // Load latest version from changelog
+  useEffect(() => {
+    supabase
+      .from('changelog_entries')
+      .select('version')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single()
+      .then(({ data }) => {
+        if (data) {
+          const v = data.version;
+          setLatestVersion(v);
+          const lastSeen = localStorage.getItem(LAST_SEEN_VERSION_KEY);
+          setHasNewVersion(lastSeen !== v);
+        }
+      });
+  }, []);
 
   const changePassword = useCallback(async () => {
     if (newPassword.length < 6) {
