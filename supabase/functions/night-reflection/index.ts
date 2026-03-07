@@ -63,7 +63,7 @@ serve(async (req) => {
     // 2. Get all users with timezone
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
-      .select("user_id, reflection_tone, timezone");
+      .select("user_id, reflection_tone, timezone, night_reflection_hour");
 
     if (profilesError) throw profilesError;
     if (!profiles || profiles.length === 0) {
