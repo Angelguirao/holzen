@@ -32,7 +32,7 @@ const LAST_SEEN_VERSION_KEY = 'holzen_last_seen_version';
 
 const Settings = () => {
   const { user, signOut } = useAuth();
-  const { threshold, setThreshold, thresholdDown, setThresholdDown, cumulativeThreshold, setCumulativeThreshold, emailNotifications, setEmailNotifications, companionPrefs, setCompanionPref, reflectionTone, setReflectionTone, reflectionStyle, setReflectionStyle, silentMode, setSilentMode, cooldownHours, setCooldownHours, digestFrequency, setDigestFrequency, customPrompt, setCustomPrompt, quietHoursStart, quietHoursEnd, setQuietHours, streakFreezeDates, useStreakFreeze, profileLoaded } = useHolzen();
+  const { threshold, setThreshold, thresholdDown, setThresholdDown, cumulativeThreshold, setCumulativeThreshold, emailNotifications, setEmailNotifications, companionPrefs, setCompanionPref, reflectionTone, setReflectionTone, reflectionStyle, setReflectionStyle, silentMode, setSilentMode, cooldownHours, setCooldownHours, digestFrequency, setDigestFrequency, customPrompt, setCustomPrompt, quietHoursStart, quietHoursEnd, setQuietHours, streakFreezeDates, useStreakFreeze, firstName, setFirstName, profileLoaded } = useHolzen();
   const { subscribed, loading: subLoading, checkoutLoading, startCheckout, openPortal, trialRemaining } = useSubscription();
   const { theme, setTheme } = useTheme();
   const { canInstall, install } = useInstallPrompt();
@@ -150,6 +150,23 @@ const Settings = () => {
           {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
         </button>
       </div>
+
+      {/* Name */}
+      <div className="space-y-3">
+        <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Name</p>
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          Optional. Shown as a quiet greeting on home.
+        </p>
+        <Input
+          value={firstName ?? ''}
+          onChange={(e) => setFirstName(e.target.value || null)}
+          placeholder="Your first name"
+          maxLength={30}
+          className="text-xs font-mono"
+        />
+      </div>
+
+      <Separator />
 
       {/* Threshold */}
       {profileLoaded ? (

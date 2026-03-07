@@ -44,6 +44,7 @@ export const ReflectionMessage = forwardRef<HTMLDivElement, Props>(function Refl
           companions={companions}
           prefs={companionPrefs}
           severity={severity}
+          reflectionId={reflectionId}
         />
       )}
     </div>
