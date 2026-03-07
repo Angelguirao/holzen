@@ -45,6 +45,8 @@ const Home = () => {
     completeOnboarding,
     manualTrigger,
     manualCooldownRemaining,
+    autoCooldownRemaining,
+    cooldownHours,
   } = useHolzen();
 
   const [showOutcome, setShowOutcome] = useState(false);
