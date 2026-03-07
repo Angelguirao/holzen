@@ -326,7 +326,7 @@ export function useHolzen() {
     } catch (e: any) {
       setError(e.message || 'Failed to fetch BTC data');
     }
-  }, [user, threshold, thresholdDown, cumulativeThreshold, isInCooldown, generateMessage]);
+  }, [user, threshold, thresholdDown, cumulativeThreshold, isInCooldown, isInQuietHours, generateMessage]);
 
   const [lastTriggerAt, setLastTriggerAt] = useState<string | null>(null);
   const [lastManualAt, setLastManualAt] = useState<number | null>(() => {
