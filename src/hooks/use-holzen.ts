@@ -21,6 +21,7 @@ export function useHolzen() {
   const [reflectionStyle, setReflectionStyleState] = useState('standard');
   const [quietHoursStart, setQuietHoursStartState] = useState<number | null>(null);
   const [quietHoursEnd, setQuietHoursEndState] = useState<number | null>(null);
+  const [firstName, setFirstNameState] = useState<string | null>(null);
   const [btcData, setBtcData] = useState<BtcPriceData | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [context, setContext] = useState<string | null>(null);
@@ -39,7 +40,7 @@ export function useHolzen() {
     const load = async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('threshold, threshold_down, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_learning, reflection_tone, cooldown_hours, last_trigger_at, silent_mode, streak_freeze_dates, digest_frequency, custom_prompt, reflection_style, quiet_hours_start, quiet_hours_end')
+        .select('threshold, threshold_down, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_learning, reflection_tone, cooldown_hours, last_trigger_at, silent_mode, streak_freeze_dates, digest_frequency, custom_prompt, reflection_style, quiet_hours_start, quiet_hours_end, first_name')
         .eq('user_id', user.id)
         .single();
 
@@ -60,6 +61,7 @@ export function useHolzen() {
         setReflectionStyleState((data as any).reflection_style ?? 'standard');
         setQuietHoursStartState((data as any).quiet_hours_start ?? null);
         setQuietHoursEndState((data as any).quiet_hours_end ?? null);
+        setFirstNameState((data as any).first_name ?? null);
         setHasOnboarded(data.has_onboarded ?? false);
         setCompanionPrefsState({
           breathing: data.companion_breathing ?? true,
@@ -436,6 +438,12 @@ export function useHolzen() {
       setQuietHoursEndState(end);
       if (!user) return;
       await supabase.from('profiles').update({ quiet_hours_start: start, quiet_hours_end: end } as any).eq('user_id', user.id);
+    },
+    firstName,
+    setFirstName: async (val: string | null) => {
+      setFirstNameState(val);
+      if (!user) return;
+      await supabase.from('profiles').update({ first_name: val } as any).eq('user_id', user.id);
     },
     companionPrefs,
     setCompanionPref,
