@@ -297,7 +297,9 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
                   >
                     <p className="text-sm font-mono text-foreground">Sealed.</p>
                     <p className="text-[10px] font-mono text-muted-foreground/50 max-w-[200px] leading-relaxed">
-                      {deliverDuring === 'ath'
+                      {mode === 'calm'
+                        ? 'This letter waits for the storm.'
+                        : deliverDuring === 'ath'
                         ? 'This letter waits for confidence.'
                         : 'This letter waits for doubt.'}
                     </p>
