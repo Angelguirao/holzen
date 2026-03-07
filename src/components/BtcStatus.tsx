@@ -6,16 +6,12 @@ import type { BtcPriceData } from '@/lib/btc';
 interface Props {
   data: BtcPriceData | null;
   error: string | null;
+  hidden: boolean;
+  onToggleHidden: () => void;
 }
 
-export function BtcStatus({ data, error }: Props) {
-  const [hidden, setHidden] = useState(() => localStorage.getItem('holzen_hide_price') === 'true');
-
-  const toggle = () => {
-    const next = !hidden;
-    setHidden(next);
-    localStorage.setItem('holzen_hide_price', String(next));
-  };
+export function BtcStatus({ data, error, hidden, onToggleHidden }: Props) {
+  const toggle = onToggleHidden;
 
   if (error) {
     return (
