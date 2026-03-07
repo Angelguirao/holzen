@@ -164,6 +164,7 @@ export type Database = {
           referral_code: string
           referred_by: string | null
           reflection_tone: string
+          silent_mode: boolean
           threshold: number
           updated_at: string
           user_id: string
@@ -185,6 +186,7 @@ export type Database = {
           referral_code?: string
           referred_by?: string | null
           reflection_tone?: string
+          silent_mode?: boolean
           threshold?: number
           updated_at?: string
           user_id: string
@@ -206,6 +208,7 @@ export type Database = {
           referral_code?: string
           referred_by?: string | null
           reflection_tone?: string
+          silent_mode?: boolean
           threshold?: number
           updated_at?: string
           user_id?: string

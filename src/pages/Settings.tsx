@@ -32,7 +32,7 @@ const APP_VERSION = '1.2.0';
 
 const Settings = () => {
   const { user, signOut } = useAuth();
-  const { threshold, setThreshold, cumulativeThreshold, setCumulativeThreshold, emailNotifications, setEmailNotifications, companionPrefs, setCompanionPref, reflectionTone, setReflectionTone, cooldownHours, setCooldownHours, profileLoaded } = useHolzen();
+  const { threshold, setThreshold, cumulativeThreshold, setCumulativeThreshold, emailNotifications, setEmailNotifications, companionPrefs, setCompanionPref, reflectionTone, setReflectionTone, silentMode, setSilentMode, cooldownHours, setCooldownHours, profileLoaded } = useHolzen();
   const { subscribed, loading: subLoading, checkoutLoading, startCheckout, openPortal, trialRemaining } = useSubscription();
   const { theme, setTheme } = useTheme();
   const { canInstall, install } = useInstallPrompt();
@@ -202,6 +202,26 @@ const Settings = () => {
             id="comp-learning"
             checked={companionPrefs.learning}
             onCheckedChange={(v) => setCompanionPref('learning', v)}
+          />
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* Silent Mode */}
+      <div className="space-y-4">
+        <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Silent mode</p>
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          Just "BTC moved." — no reflection text. Maximum trust in yourself.
+        </p>
+        <div className="flex items-center justify-between">
+          <Label htmlFor="silent-mode" className="text-xs font-mono text-muted-foreground">
+            Enable silent mode
+          </Label>
+          <Switch
+            id="silent-mode"
+            checked={silentMode}
+            onCheckedChange={setSilentMode}
           />
         </div>
       </div>
