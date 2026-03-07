@@ -12,6 +12,7 @@ export function useHolzen() {
   const [threshold, setThresholdState] = useState(5);
   const [cumulativeThreshold, setCumulativeThresholdState] = useState(15);
   const [emailNotifications, setEmailNotificationsState] = useState(true);
+  const [reflectionTone, setReflectionToneState] = useState('stoic');
   const [btcData, setBtcData] = useState<BtcPriceData | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [context, setContext] = useState<string | null>(null);
@@ -30,7 +31,7 @@ export function useHolzen() {
     const load = async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('threshold, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_learning')
+        .select('threshold, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_learning, reflection_tone')
         .eq('user_id', user.id)
         .single();
 
@@ -40,6 +41,7 @@ export function useHolzen() {
         setMessage(data.last_message);
         setContext(data.last_context);
         setEmailNotificationsState(data.email_notifications ?? true);
+        setReflectionToneState((data as any).reflection_tone ?? 'stoic');
         setHasOnboarded(data.has_onboarded ?? false);
         setCompanionPrefsState({
           breathing: data.companion_breathing ?? true,
@@ -98,6 +100,15 @@ export function useHolzen() {
       .eq('user_id', user.id);
   }, [user]);
 
+  const setReflectionTone = useCallback(async (val: string) => {
+    setReflectionToneState(val);
+    if (!user) return;
+    await supabase
+      .from('profiles')
+      .update({ reflection_tone: val } as any)
+      .eq('user_id', user.id);
+  }, [user]);
+
   const setCompanionPref = useCallback(async (key: keyof CompanionPrefs, val: boolean) => {
     setCompanionPrefsState((prev) => ({ ...prev, [key]: val }));
     if (!user) return;
@@ -145,7 +156,7 @@ export function useHolzen() {
 
     try {
       const { data: fnData, error: fnError } = await supabase.functions.invoke('holzen-reflect', {
-        body: { context: ctx },
+        body: { context: ctx, tone: reflectionTone },
       });
 
       if (fnError) throw fnError;
@@ -189,7 +200,7 @@ export function useHolzen() {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, reflectionTone]);
 
   const checkAndTrigger = useCallback(async () => {
     try {
@@ -264,6 +275,8 @@ export function useHolzen() {
     setCumulativeThreshold,
     emailNotifications,
     setEmailNotifications,
+    reflectionTone,
+    setReflectionTone,
     companionPrefs,
     setCompanionPref,
     btcData,
