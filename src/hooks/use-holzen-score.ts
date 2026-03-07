@@ -54,7 +54,7 @@ export interface HolzenScoreData {
   trend: 'improving' | 'declining' | 'stable';
 }
 
-export function useHolzenScore(reflections: Reflection[]): HolzenScoreData | null {
+export function useHolzenScore(reflections: Reflection[], freezeDates: string[] = []): HolzenScoreData | null {
   return useMemo(() => {
     if (reflections.length < 3) return null;
 
