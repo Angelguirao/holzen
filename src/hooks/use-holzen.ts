@@ -139,8 +139,9 @@ export function useHolzen() {
       .single();
 
     if (!data?.last_trigger_at) return false;
-    return Date.now() - new Date(data.last_trigger_at).getTime() < COOLDOWN_MS;
-  }, [user]);
+    const cooldownMs = cooldownHours * 60 * 60 * 1000;
+    return Date.now() - new Date(data.last_trigger_at).getTime() < cooldownMs;
+  }, [user, cooldownHours]);
 
   const generateMessage = useCallback(async (data: BtcPriceData, mood?: string) => {
     if (!user) return;
