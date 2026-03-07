@@ -31,6 +31,8 @@ interface Reflection {
   haiku: string | null;
   learning_title: string | null;
   learning_body: string | null;
+  learning_citation: string | null;
+  learning_url: string | null;
   note: string | null;
   mood: string | null;
   outcome: string | null;
@@ -56,7 +58,7 @@ const History = () => {
     const loadReflections = async () => {
       const { data } = await supabase
         .from('reflections')
-        .select('id, message, context, created_at, is_favorite, haiku, learning_title, learning_body, note, mood, outcome, tags')
+        .select('id, message, context, created_at, is_favorite, haiku, learning_title, learning_body, learning_citation, learning_url, note, mood, outcome, tags')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(1000);
@@ -293,11 +295,20 @@ const History = () => {
               <p className="text-sm leading-relaxed">{r.message}</p>
               <ReflectionNote reflectionId={r.id} initialNote={r.note} />
               <ReflectionTags reflectionId={r.id} initialTags={r.tags ?? []} />
-              {(r.haiku || r.learning_title) && (
+               {(r.haiku || r.learning_title) && (
                 <div className="space-y-2 pt-2 border-t border-border/30">
                   {r.haiku && <HaikuDisplay haiku={r.haiku} />}
                   {r.learning_title && r.learning_body && (
-                    <LearningInput title={r.learning_title} body={r.learning_body} />
+                    <LearningInput
+                      title={r.learning_title}
+                      body={r.learning_body}
+                      nudge={r.learning_citation ? {
+                        title: r.learning_title,
+                        body: r.learning_body,
+                        citation: r.learning_citation,
+                        url: r.learning_url ?? '',
+                      } : undefined}
+                    />
                   )}
                 </div>
               )}

@@ -108,7 +108,21 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
         if (fnError || !data || data.error) {
           setNudgeError(true);
         } else {
-          setNudge(data as NudgeData);
+          const nudgeData = data as NudgeData;
+          setNudge(nudgeData);
+          // Persist nudge to DB
+          if (reflectionId) {
+            supabase
+              .from('reflections')
+              .update({
+                learning_title: nudgeData.title,
+                learning_body: nudgeData.body,
+                learning_citation: nudgeData.citation,
+                learning_url: nudgeData.url,
+              } as any)
+              .eq('id', reflectionId)
+              .then(() => {});
+          }
         }
         setNudgeLoading(false);
       });
