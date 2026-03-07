@@ -108,7 +108,7 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
           onToggle={() => setExpandedBreathing((v) => !v)}
           completed={completion.breathing}
         >
-          <BreathingExercise severity={severity} onComplete={() => markCompleted('breathing')} />
+          <BreathingExercise severity={severity} onComplete={() => markCompleted('breathing')} autoOpen />
         </CollapsibleCompanion>
       )}
 
