@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from '@/components/ui/button';
@@ -6,7 +6,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Mail, Send } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
 interface Letter {
   id: string;
@@ -35,6 +35,71 @@ const WRITING_PROMPTS = {
   ],
 };
 
+// Wax seal SVG component
+function WaxSeal({ size = 48, breaking = false, className = '' }: { size?: number; breaking?: boolean; className?: string }) {
+  return (
+    <div className={`relative ${className}`} style={{ width: size, height: size }}>
+      {/* Outer ring */}
+      <motion.div
+        className="absolute inset-0 rounded-full border-2 border-primary/40"
+        style={{ background: 'radial-gradient(circle at 35% 35%, hsl(var(--primary) / 0.25), hsl(var(--primary) / 0.1))' }}
+        animate={breaking ? { scale: [1, 1.15, 0.95, 1.05], opacity: [1, 0.8, 1, 0.6] } : {}}
+        transition={{ duration: 1.2, ease: 'easeOut' }}
+      />
+      {/* Inner emboss */}
+      <motion.div
+        className="absolute rounded-full border border-primary/30"
+        style={{
+          top: '20%', left: '20%', right: '20%', bottom: '20%',
+          background: 'radial-gradient(circle at 40% 40%, hsl(var(--primary) / 0.35), hsl(var(--primary) / 0.15))',
+        }}
+        animate={breaking ? { rotate: [0, 15, -10, 5], scale: [1, 0.9, 1.1, 1] } : {}}
+        transition={{ duration: 1, ease: 'easeOut', delay: 0.2 }}
+      />
+      {/* Center dot */}
+      <div
+        className="absolute rounded-full bg-primary/20"
+        style={{ top: '38%', left: '38%', right: '38%', bottom: '38%' }}
+      />
+      {/* Drip details */}
+      <div
+        className="absolute rounded-full bg-primary/15"
+        style={{ width: '12%', height: '18%', bottom: '-6%', left: '30%', borderRadius: '0 0 50% 50%' }}
+      />
+      <div
+        className="absolute rounded-full bg-primary/10"
+        style={{ width: '10%', height: '14%', bottom: '-4%', right: '25%', borderRadius: '0 0 50% 50%' }}
+      />
+    </div>
+  );
+}
+
+// Crack lines for broken seal
+function SealCracks() {
+  return (
+    <svg className="absolute inset-0 w-full h-full" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <motion.path
+        d="M24 8 L26 20 L32 24 L26 26 L24 38"
+        stroke="hsl(var(--background))"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        initial={{ pathLength: 0, opacity: 0 }}
+        animate={{ pathLength: 1, opacity: 0.6 }}
+        transition={{ duration: 0.8, delay: 0.4 }}
+      />
+      <motion.path
+        d="M12 20 L20 22 L24 24 L28 22 L36 18"
+        stroke="hsl(var(--background))"
+        strokeWidth="1"
+        strokeLinecap="round"
+        initial={{ pathLength: 0, opacity: 0 }}
+        animate={{ pathLength: 1, opacity: 0.4 }}
+        transition={{ duration: 0.6, delay: 0.7 }}
+      />
+    </svg>
+  );
+}
+
 interface Props {
   currentPrice: number | null;
   changePercent: number | null;
@@ -42,12 +107,13 @@ interface Props {
 
 export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
   const { user } = useAuth();
+  const prefersReducedMotion = useReducedMotion();
   const [letters, setLetters] = useState<Letter[]>([]);
   const [pendingLetters, setPendingLetters] = useState<Letter[]>([]);
   const [deliveredLetters, setDeliveredLetters] = useState<Letter[]>([]);
   const [body, setBody] = useState('');
   const [sending, setSending] = useState(false);
-  const [justSealed, setJustSealed] = useState(false);
+  const [sealPhase, setSealPhase] = useState<'idle' | 'sealing' | 'sealed'>('idle');
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -76,11 +142,13 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
   const deliverDuring = isCrash ? 'ath' : 'crash';
 
   const prompts = isCrash ? WRITING_PROMPTS.crash : WRITING_PROMPTS.ath;
-  const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)];
+  // Stable prompt per render cycle
+  const randomPrompt = useMemo(() => prompts[Math.floor(Math.random() * prompts.length)], [isCrash]);
 
   const handleSend = async () => {
     if (!body.trim() || !currentPrice || !canWrite) return;
     setSending(true);
+    setSealPhase('sealing');
 
     try {
       const { data, error } = await supabase
@@ -98,11 +166,20 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
       if (error) throw error;
 
       const newLetter = data as unknown as Letter;
-      setLetters((prev) => [newLetter, ...prev]);
-      setPendingLetters((prev) => [newLetter, ...prev]);
-      setBody('');
-      setJustSealed(true);
-      setTimeout(() => setJustSealed(false), 3000);
+
+      // Phase: sealing → sealed
+      setTimeout(() => {
+        setSealPhase('sealed');
+        setLetters((prev) => [newLetter, ...prev]);
+        setPendingLetters((prev) => [newLetter, ...prev]);
+        setBody('');
+
+        // Dismiss after showing sealed state
+        setTimeout(() => {
+          setSealPhase('idle');
+        }, 2200);
+      }, 1200);
+
       toast('Letter sealed', {
         description: deliverDuring === 'ath'
           ? 'Sealed in fear · Opens when confidence returns'
@@ -110,6 +187,7 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
       });
     } catch {
       toast('Failed to save letter');
+      setSealPhase('idle');
     } finally {
       setSending(false);
     }
@@ -125,9 +203,15 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
     return 'Sealed in euphoria · Opens when doubt arrives';
   };
 
+  const getTimeCopy = (l: Letter) => {
+    const days = Math.round((Date.now() - new Date(l.written_at).getTime()) / (1000 * 60 * 60 * 24));
+    if (days === 0) return 'Sealed today';
+    if (days === 1) return 'Sealed yesterday';
+    return `Sealed ${days} days ago`;
+  };
+
   const getDaysElapsed = (from: string, to: string) => {
-    const days = Math.round((new Date(to).getTime() - new Date(from).getTime()) / (1000 * 60 * 60 * 24));
-    return days;
+    return Math.round((new Date(to).getTime() - new Date(from).getTime()) / (1000 * 60 * 60 * 24));
   };
 
   const getPriceDelta = (writePrice: number, deliveryPrice: number) => {
@@ -137,33 +221,72 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
 
   return (
     <div className="space-y-4">
-      {/* Seal animation overlay */}
+      {/* Seal ceremony overlay */}
       <AnimatePresence>
-        {justSealed && (
+        {sealPhase !== 'idle' && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.9 }}
-            transition={{ duration: 0.5, ease: 'easeOut' }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-background/90"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.4 }}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-background/95 backdrop-blur-sm"
           >
-            <div className="flex flex-col items-center gap-4">
-              <motion.div
-                initial={{ scale: 0, rotate: -180 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ delay: 0.2, duration: 0.6, ease: 'easeOut' }}
-                className="w-16 h-16 rounded-full bg-primary/20 border-2 border-primary/40 flex items-center justify-center"
-              >
-                <div className="w-8 h-8 rounded-full bg-primary/30" />
-              </motion.div>
-              <motion.p
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.6 }}
-                className="text-sm font-mono text-foreground"
-              >
-                Sealed.
-              </motion.p>
+            <div className="flex flex-col items-center gap-6">
+              {sealPhase === 'sealing' ? (
+                <>
+                  {/* Folding letter animation */}
+                  <motion.div
+                    initial={{ scaleY: 1, opacity: 1 }}
+                    animate={{ scaleY: 0.1, opacity: 0.5 }}
+                    transition={{ duration: 0.8, ease: 'easeInOut' }}
+                    className="w-32 h-20 rounded-sm border border-border/60 bg-muted/40 flex items-center justify-center overflow-hidden origin-bottom"
+                  >
+                    <p className="text-[8px] font-mono text-muted-foreground/30 truncate px-3">
+                      {body.slice(0, 40)}
+                    </p>
+                  </motion.div>
+                  {/* Wax dropping */}
+                  <motion.div
+                    initial={{ scale: 0, y: -20 }}
+                    animate={{ scale: 1, y: 0 }}
+                    transition={{ delay: 0.5, duration: 0.5, ease: 'easeOut' }}
+                  >
+                    <WaxSeal size={56} />
+                  </motion.div>
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.8 }}
+                    className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-widest"
+                  >
+                    Sealing…
+                  </motion.p>
+                </>
+              ) : (
+                <>
+                  {/* Sealed state */}
+                  <motion.div
+                    initial={prefersReducedMotion ? {} : { scale: 1.2, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ duration: 0.5, ease: 'easeOut' }}
+                  >
+                    <WaxSeal size={64} />
+                  </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3, duration: 0.4 }}
+                    className="text-center space-y-2"
+                  >
+                    <p className="text-sm font-mono text-foreground">Sealed.</p>
+                    <p className="text-[10px] font-mono text-muted-foreground/50 max-w-[200px] leading-relaxed">
+                      {deliverDuring === 'ath'
+                        ? 'This letter waits for confidence.'
+                        : 'This letter waits for doubt.'}
+                    </p>
+                  </motion.div>
+                </>
+              )}
             </div>
           </motion.div>
         )}
@@ -171,7 +294,11 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
 
       {/* Write section */}
       {canWrite ? (
-        <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3">
+        <motion.div
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3"
+        >
           <div className="flex items-center gap-2 text-muted-foreground">
             <Mail className="h-3 w-3" />
             <p className="text-[10px] font-mono tracking-widest uppercase">
@@ -202,23 +329,32 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
               {sending ? 'Sealing…' : 'Seal letter'}
             </Button>
           </div>
-        </div>
+        </motion.div>
       ) : pendingLetters.length > 0 ? (
         /* Sealed letters — completely opaque, no peeking */
-        <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-3">
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <div className="w-3 h-3 rounded-full bg-primary/30 border border-primary/40" />
+        <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-4">
+          <div className="flex items-center gap-2.5 text-muted-foreground">
+            <WaxSeal size={20} />
             <p className="text-[10px] font-mono tracking-widest uppercase">Sealed letters</p>
           </div>
           <p className="text-xs text-muted-foreground leading-relaxed">
             {pendingLetters.length} letter{pendingLetters.length !== 1 ? 's' : ''} sealed and waiting.
           </p>
-          {pendingLetters.map((l) => (
-            <div key={l.id} className="flex items-start gap-2 text-[10px] font-mono text-muted-foreground/50">
-              <div className="w-2 h-2 rounded-full bg-primary/20 border border-primary/30 shrink-0 mt-0.5" />
-              <span className="italic">{getStatusCopy(l)}</span>
-            </div>
-          ))}
+          <div className="space-y-2.5">
+            {pendingLetters.map((l) => (
+              <div key={l.id} className="flex items-center gap-3 rounded-sm border border-border/40 bg-background/30 px-3 py-2.5">
+                <WaxSeal size={16} />
+                <div className="min-w-0 space-y-0.5">
+                  <p className="text-[10px] font-mono text-muted-foreground/60 italic">
+                    {getStatusCopy(l)}
+                  </p>
+                  <p className="text-[9px] font-mono text-muted-foreground/30">
+                    {getTimeCopy(l)} · BTC at {fmtPrice(l.btc_price_at_write)}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       ) : (
         <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2">
@@ -232,7 +368,7 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
         </div>
       )}
 
-      {/* Delivered letters — with emotional context */}
+      {/* Delivered letters — wax seal break + emotional context */}
       {deliveredLetters.length > 0 && (
         <div className="space-y-3">
           {deliveredLetters.map((l) => {
@@ -244,36 +380,71 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
             return (
               <motion.div
                 key={l.id}
-                initial={{ opacity: 0, y: 4 }}
+                initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="rounded-md border border-primary/20 bg-primary/5 px-4 py-4 space-y-3"
+                transition={{ duration: 0.5 }}
+                className="rounded-md border border-primary/20 bg-primary/5 px-4 py-4 space-y-4"
               >
-                {/* Wax seal break indicator */}
-                <div className="flex items-center gap-2">
-                  <div className="w-3 h-3 rounded-full bg-primary/30 border border-primary/50 relative">
-                    <div className="absolute inset-0 rounded-full bg-primary/10 animate-ping" style={{ animationDuration: '3s', animationIterationCount: '1' }} />
+                {/* Broken wax seal */}
+                <div className="flex items-center gap-3">
+                  <div className="relative">
+                    <WaxSeal size={24} breaking />
+                    <SealCracks />
                   </div>
-                  <p className="text-[10px] font-mono text-primary uppercase tracking-wider">
-                    Delivered
-                  </p>
+                  <div>
+                    <p className="text-[10px] font-mono text-primary uppercase tracking-wider">
+                      Opened
+                    </p>
+                    {l.delivered_at && (
+                      <p className="text-[9px] font-mono text-muted-foreground/40">
+                        {format(new Date(l.delivered_at), 'MMM d, yyyy')}
+                      </p>
+                    )}
+                  </div>
                 </div>
 
-                <p className="text-sm leading-relaxed">{l.body}</p>
+                {/* Letter body */}
+                <p className="text-sm leading-relaxed pl-1">{l.body}</p>
 
                 {/* Emotional journey context */}
-                <div className="space-y-1 pt-1 border-t border-primary/10">
-                  <p className="text-[10px] font-mono text-muted-foreground/50">
-                    Written {format(new Date(l.written_at), 'MMM d, yyyy')} during{' '}
-                    {l.written_during === 'crash' ? 'a drop' : 'a surge'} · BTC at {fmtPrice(l.btc_price_at_write)}
-                  </p>
-                  {l.delivered_at && (
-                    <p className="text-[10px] font-mono text-muted-foreground/50">
-                      Opened {format(new Date(l.delivered_at), 'MMM d, yyyy')}
-                      {days !== null && ` · ${days} day${days !== 1 ? 's' : ''} later`}
-                      {l.btc_price_at_delivery && ` · BTC at ${fmtPrice(l.btc_price_at_delivery)}`}
-                      {priceDelta && ` (${priceDelta})`}
-                    </p>
-                  )}
+                <div className="space-y-2 pt-2 border-t border-primary/10">
+                  <div className="grid grid-cols-2 gap-2">
+                    <div className="space-y-0.5">
+                      <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider">Written</p>
+                      <p className="text-[10px] font-mono text-muted-foreground/60">
+                        {format(new Date(l.written_at), 'MMM d, yyyy')}
+                      </p>
+                      <p className="text-[10px] font-mono text-muted-foreground/50">
+                        During {l.written_during === 'crash' ? 'a drop' : 'a surge'}
+                      </p>
+                      <p className="text-[10px] font-mono text-muted-foreground/40">
+                        BTC {fmtPrice(l.btc_price_at_write)}
+                      </p>
+                    </div>
+                    {l.delivered_at && (
+                      <div className="space-y-0.5">
+                        <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider">Opened</p>
+                        <p className="text-[10px] font-mono text-muted-foreground/60">
+                          {format(new Date(l.delivered_at), 'MMM d, yyyy')}
+                        </p>
+                        {days !== null && (
+                          <p className="text-[10px] font-mono text-muted-foreground/50">
+                            {days} day{days !== 1 ? 's' : ''} later
+                          </p>
+                        )}
+                        {l.btc_price_at_delivery && (
+                          <p className="text-[10px] font-mono text-muted-foreground/40">
+                            BTC {fmtPrice(l.btc_price_at_delivery)}
+                            {priceDelta && (
+                              <span className={priceDelta.startsWith('+') ? 'text-primary/60' : 'text-destructive/60'}>
+                                {' '}{priceDelta}
+                              </span>
+                            )}
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
                 </div>
               </motion.div>
             );
