@@ -2,27 +2,33 @@ import { useMemo } from 'react';
 import { differenceInCalendarDays, parseISO } from 'date-fns';
 
 interface Props {
-  reflections: { created_at: string }[];
+  reflections: { created_at: string; outcome: string | null }[];
 }
 
 export function ReflectionStats({ reflections }: Props) {
   const { total, currentStreak, longestStreak } = useMemo(() => {
     if (reflections.length === 0) return { total: 0, currentStreak: 0, longestStreak: 0 };
 
-    // Get unique days (sorted newest first)
+    // Count total reflections with outcomes
+    const withOutcome = reflections.filter(r => r.outcome != null && r.outcome !== '');
+    const totalOutcomes = withOutcome.length;
+
+    if (totalOutcomes === 0) return { total: reflections.length, currentStreak: 0, longestStreak: 0 };
+
+    // Get unique days with outcomes (sorted newest first)
     const days = new Set<string>();
-    for (const r of reflections) {
+    for (const r of withOutcome) {
       days.add(parseISO(r.created_at).toISOString().slice(0, 10));
     }
-    const sorted = Array.from(days).sort().reverse(); // newest first
+    const sorted = Array.from(days).sort().reverse();
 
     // Current streak: count consecutive days from today/yesterday
     const today = new Date().toISOString().slice(0, 10);
     let current = 0;
     const startDay = sorted[0];
-    const daysSinceLastReflection = differenceInCalendarDays(new Date(today), new Date(startDay));
+    const daysSinceLastOutcome = differenceInCalendarDays(new Date(today), new Date(startDay));
 
-    if (daysSinceLastReflection <= 1) {
+    if (daysSinceLastOutcome <= 1) {
       current = 1;
       for (let i = 1; i < sorted.length; i++) {
         const diff = differenceInCalendarDays(new Date(sorted[i - 1]), new Date(sorted[i]));
@@ -51,9 +57,9 @@ export function ReflectionStats({ reflections }: Props) {
 
   return (
     <div className="grid grid-cols-3 gap-3">
-      <StatCard label="Total" value={total} />
-      <StatCard label="Streak" value={currentStreak} suffix="d" />
-      <StatCard label="Best" value={longestStreak} suffix="d" />
+      <StatCard label="Reflections" value={total} />
+      <StatCard label="Outcome streak" value={currentStreak} suffix="d" />
+      <StatCard label="Best streak" value={longestStreak} suffix="d" />
     </div>
   );
 }
