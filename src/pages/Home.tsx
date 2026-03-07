@@ -340,6 +340,14 @@ const Home = () => {
         </>
       )}
 
+      {/* Letter to Future Self */}
+      {hasAccess && btcData && (
+        <LetterToFutureSelf
+          currentPrice={btcData.price}
+          changePercent={btcData.change24h}
+        />
+      )}
+
       <Separator />
 
       <p className="text-xs text-muted-foreground leading-relaxed">
