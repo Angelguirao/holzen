@@ -321,8 +321,10 @@ export type Database = {
           id: string
           is_favorite: boolean
           learning_body: string | null
+          learning_citation: string | null
           learning_read: boolean
           learning_title: string | null
+          learning_url: string | null
           message: string
           mood: string | null
           note: string | null
@@ -339,8 +341,10 @@ export type Database = {
           id?: string
           is_favorite?: boolean
           learning_body?: string | null
+          learning_citation?: string | null
           learning_read?: boolean
           learning_title?: string | null
+          learning_url?: string | null
           message: string
           mood?: string | null
           note?: string | null
@@ -357,8 +361,10 @@ export type Database = {
           id?: string
           is_favorite?: boolean
           learning_body?: string | null
+          learning_citation?: string | null
           learning_read?: boolean
           learning_title?: string | null
+          learning_url?: string | null
           message?: string
           mood?: string | null
           note?: string | null
