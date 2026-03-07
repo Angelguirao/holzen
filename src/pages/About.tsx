@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
+import { PageMeta } from '@/components/PageMeta';
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 14 },
