@@ -21,10 +21,7 @@ const Roadmap = () => {
   const [votes, setVotes] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    document.title = 'Holzen — Roadmap';
-    return () => { document.title = 'Holzen — Pause before you act'; };
-  }, []);
+  // Remove manual document.title — PageMeta handles it
 
   useEffect(() => {
     const load = async () => {
