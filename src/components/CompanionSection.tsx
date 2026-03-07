@@ -141,6 +141,7 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
             title={companions.learningTitle ?? ''}
             body={companions.learningBody ?? ''}
             context={context}
+            reflectionId={reflectionId}
             useGroundNudge
           />
         </CollapsibleCompanion>
