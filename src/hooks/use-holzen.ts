@@ -12,6 +12,7 @@ export function useHolzen() {
   const [cumulativeThreshold, setCumulativeThresholdState] = useState(15);
   const [emailNotifications, setEmailNotificationsState] = useState(true);
   const [reflectionTone, setReflectionToneState] = useState('stoic');
+  const [silentMode, setSilentModeState] = useState(false);
   const [cooldownHours, setCooldownHoursState] = useState(6);
   const [btcData, setBtcData] = useState<BtcPriceData | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -31,7 +32,7 @@ export function useHolzen() {
     const load = async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('threshold, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_learning, reflection_tone, cooldown_hours, last_trigger_at')
+        .select('threshold, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_learning, reflection_tone, cooldown_hours, last_trigger_at, silent_mode')
         .eq('user_id', user.id)
         .single();
 
@@ -44,6 +45,7 @@ export function useHolzen() {
         setEmailNotificationsState(data.email_notifications ?? true);
         setReflectionToneState((data as any).reflection_tone ?? 'stoic');
         setCooldownHoursState((data as any).cooldown_hours ?? 6);
+        setSilentModeState((data as any).silent_mode ?? false);
         setHasOnboarded(data.has_onboarded ?? false);
         setCompanionPrefsState({
           breathing: data.companion_breathing ?? true,
@@ -112,6 +114,15 @@ export function useHolzen() {
       .eq('user_id', user.id);
   }, [user]);
 
+  const setSilentMode = useCallback(async (val: boolean) => {
+    setSilentModeState(val);
+    if (!user) return;
+    await supabase
+      .from('profiles')
+      .update({ silent_mode: val } as any)
+      .eq('user_id', user.id);
+  }, [user]);
+
   const setCompanionPref = useCallback(async (key: keyof CompanionPrefs, val: boolean) => {
     setCompanionPrefsState((prev) => ({ ...prev, [key]: val }));
     if (!user) return;
@@ -156,6 +167,33 @@ export function useHolzen() {
     }
     if (data.fearGreed) {
       ctx += ` Market sentiment: ${data.fearGreed.label} (${data.fearGreed.value}/100).`;
+    }
+
+    // Silent mode: skip AI, just show context
+    if (silentMode) {
+      const silentMsg = 'BTC moved.';
+      setMessage(silentMsg);
+      setContext(ctx);
+      setCompanions({ haiku: null, learningTitle: null, learningBody: null });
+      setNewReflection(true);
+
+      const { data: insertedReflection } = await supabase.from('reflections').insert({
+        user_id: user.id,
+        message: silentMsg,
+        context: ctx,
+        ...(mood ? { mood } : {}),
+      }).select('id').single();
+
+      if (insertedReflection) setLastReflectionId(insertedReflection.id);
+
+      await supabase.from('profiles').update({
+        last_message: silentMsg,
+        last_context: ctx,
+        last_trigger_at: new Date().toISOString(),
+      }).eq('user_id', user.id);
+
+      setLastTriggerAt(new Date().toISOString());
+      return;
     }
 
     setLoading(true);
@@ -209,7 +247,7 @@ export function useHolzen() {
     } finally {
       setLoading(false);
     }
-  }, [user, reflectionTone]);
+  }, [user, reflectionTone, silentMode, cumulativeThreshold]);
 
   const checkAndTrigger = useCallback(async () => {
     try {
@@ -308,6 +346,8 @@ export function useHolzen() {
     setEmailNotifications,
     reflectionTone,
     setReflectionTone,
+    silentMode,
+    setSilentMode,
     cooldownHours,
     setCooldownHours,
     companionPrefs,

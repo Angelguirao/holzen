@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN silent_mode boolean NOT NULL DEFAULT false;
