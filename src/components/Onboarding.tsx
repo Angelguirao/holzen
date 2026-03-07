@@ -1,35 +1,35 @@
 import { useState, useCallback, forwardRef } from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { HaikuDisplay } from '@/components/HaikuDisplay';
 import { LearningInput } from '@/components/LearningInput';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
+interface OnboardingResult {
+  threshold: number;
+  firstName: string | null;
+  timezone: string;
+}
+
 interface Props {
-  onComplete: (threshold: number) => void;
+  onComplete: (result: OnboardingResult) => void;
 }
 
 const sampleReflection = {
-  context: 'BTC is down 7.2% in the last 24 hours.',
+  context: 'BTC is down 7.2% in the last 24 hours. Market sentiment: Extreme Fear (18/100).',
   message: 'A sharp move invites reaction. This is a moment to observe the impulse before following it.',
   haiku: 'Numbers fall like rain\nThe urge to act rises fast\nBreathe before you move',
   learningTitle: 'Panic Selling and Recovery',
   learningBody: 'After Bitcoin\'s 30% drop in May 2021, it recovered within three months. Historically, sharp declines have often preceded periods of consolidation rather than further collapse.',
 };
 
-const steps = [
-  {
-    heading: 'Holzen',
-    body: 'The market moves. You feel the pull to act. This app exists for the space between impulse and decision.',
-  },
-  {
-    heading: 'Not advice',
-    body: 'No signals. No predictions. Just a mirror — so you can see yourself clearly before you move.',
-  },
-];
+const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 export function Onboarding({ onComplete }: Props) {
   const [step, setStep] = useState(0);
+  const [firstName, setFirstName] = useState('');
+  const [timezone] = useState(detectedTimezone);
   const [threshold, setThreshold] = useState(5);
   const [direction, setDirection] = useState(1);
   const [breathingDemo, setBreathingDemo] = useState(false);
@@ -37,13 +37,14 @@ export function Onboarding({ onComplete }: Props) {
   const [learningExpanded, setLearningExpanded] = useState(false);
   const prefersReduced = useReducedMotion();
 
-  const totalSteps = steps.length + 2; // text steps + companions + threshold
-  const isPreviewStep = step === steps.length;
-  const isThresholdStep = step === steps.length + 1;
+  // 3 steps: Welcome + Name, Companions Preview, Threshold
+  const totalSteps = 3;
+  const isPreviewStep = step === 1;
+  const isThresholdStep = step === 2;
 
   const goTo = useCallback((next: number) => {
     setDirection(next > step ? 1 : -1);
-    if (next !== steps.length) {
+    if (next !== 1) {
       setBreathingDemo(false);
       setHaikuExpanded(false);
       setLearningExpanded(false);
@@ -82,32 +83,46 @@ export function Onboarding({ onComplete }: Props) {
               exit="exit"
               transition={transition}
             >
-              {/* Text steps */}
-              {step < steps.length && (
+              {/* Step 1: Welcome + Name + Timezone */}
+              {step === 0 && (
                 <div className="space-y-8">
                   <motion.p
                     className="text-xs font-mono tracking-[0.25em] uppercase text-muted-foreground"
                     {...stagger(0.1)}
                   >
-                    {steps[step].heading}
+                    Holzen
                   </motion.p>
                   <motion.p
                     className="text-xl leading-relaxed text-foreground"
                     {...stagger(0.2)}
                   >
-                    {steps[step].body}
+                    The market moves. You feel the pull to act. This app exists for the space between impulse and decision.
                   </motion.p>
+                  <motion.div className="space-y-4" {...stagger(0.3)}>
+                    <div className="space-y-2">
+                      <p className="text-xs font-mono text-muted-foreground">What should we call you?</p>
+                      <Input
+                        value={firstName}
+                        onChange={(e) => setFirstName(e.target.value)}
+                        placeholder="First name (optional)"
+                        maxLength={30}
+                        className="text-xs font-mono"
+                        autoFocus
+                      />
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <p className="text-[10px] font-mono text-muted-foreground/50">
+                        Timezone: {timezone.replace(/_/g, ' ')}
+                      </p>
+                    </div>
+                  </motion.div>
                   <motion.div {...stagger(0.4)}>
-                    <Nav
-                      showBack={step > 0}
-                      onBack={() => goTo(step - 1)}
-                      onNext={() => goTo(step + 1)}
-                    />
+                    <Nav showBack={false} onNext={() => goTo(1)} />
                   </motion.div>
                 </div>
               )}
 
-              {/* Companion preview */}
+              {/* Step 2: Companion preview */}
               {isPreviewStep && (
                 <div className="space-y-6">
                   <motion.p
@@ -226,12 +241,12 @@ export function Onboarding({ onComplete }: Props) {
                   </motion.p>
 
                   <motion.div {...stagger(0.4)}>
-                    <Nav showBack onBack={() => goTo(step - 1)} onNext={() => goTo(step + 1)} />
+                    <Nav showBack onBack={() => goTo(0)} onNext={() => goTo(2)} />
                   </motion.div>
                 </div>
               )}
 
-              {/* Threshold step */}
+              {/* Step 3: Threshold */}
               {isThresholdStep && (
                 <div className="space-y-8">
                   <motion.p
@@ -263,13 +278,17 @@ export function Onboarding({ onComplete }: Props) {
 
                   <motion.div className="flex items-center gap-4" {...stagger(0.35)}>
                     <button
-                      onClick={() => goTo(step - 1)}
+                      onClick={() => goTo(1)}
                       className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
                     >
                       ← Back
                     </button>
                     <Button
-                      onClick={() => onComplete(threshold)}
+                      onClick={() => onComplete({
+                        threshold,
+                        firstName: firstName.trim() || null,
+                        timezone,
+                      })}
                       variant="outline"
                       size="sm"
                       className="font-mono text-xs"
