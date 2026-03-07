@@ -8,6 +8,8 @@ import {
   Tooltip,
   ResponsiveContainer,
   Cell,
+  Line,
+  ComposedChart,
 } from 'recharts';
 
 interface Props {
