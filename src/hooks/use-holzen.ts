@@ -401,6 +401,12 @@ export function useHolzen() {
     setCooldownHours,
     digestFrequency,
     setDigestFrequency,
+    customPrompt,
+    setCustomPrompt: async (val: string | null) => {
+      setCustomPromptState(val);
+      if (!user) return;
+      await supabase.from('profiles').update({ custom_prompt: val } as any).eq('user_id', user.id);
+    },
     companionPrefs,
     setCompanionPref,
     btcData,
