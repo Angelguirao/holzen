@@ -17,6 +17,7 @@ export function useHolzen() {
   const [silentMode, setSilentModeState] = useState(false);
   const [cooldownHours, setCooldownHoursState] = useState(6);
   const [digestFrequency, setDigestFrequencyState] = useState('weekly');
+  const [customPrompt, setCustomPromptState] = useState<string | null>(null);
   const [btcData, setBtcData] = useState<BtcPriceData | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [context, setContext] = useState<string | null>(null);
@@ -35,7 +36,7 @@ export function useHolzen() {
     const load = async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('threshold, threshold_down, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_learning, reflection_tone, cooldown_hours, last_trigger_at, silent_mode, streak_freeze_dates, digest_frequency')
+        .select('threshold, threshold_down, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_learning, reflection_tone, cooldown_hours, last_trigger_at, silent_mode, streak_freeze_dates, digest_frequency, custom_prompt')
         .eq('user_id', user.id)
         .single();
 
@@ -52,6 +53,7 @@ export function useHolzen() {
         setCooldownHoursState((data as any).cooldown_hours ?? 6);
         setSilentModeState((data as any).silent_mode ?? false);
         setDigestFrequencyState((data as any).digest_frequency ?? 'weekly');
+        setCustomPromptState((data as any).custom_prompt ?? null);
         setHasOnboarded(data.has_onboarded ?? false);
         setCompanionPrefsState({
           breathing: data.companion_breathing ?? true,
@@ -243,7 +245,7 @@ export function useHolzen() {
 
     try {
       const { data: fnData, error: fnError } = await supabase.functions.invoke('holzen-reflect', {
-        body: { context: ctx, tone: reflectionTone },
+        body: { context: ctx, tone: reflectionTone, customPrompt: customPrompt || undefined },
       });
 
       if (fnError) throw fnError;
@@ -289,7 +291,7 @@ export function useHolzen() {
     } finally {
       setLoading(false);
     }
-  }, [user, reflectionTone, silentMode, cumulativeThreshold]);
+  }, [user, reflectionTone, silentMode, cumulativeThreshold, customPrompt]);
 
   const checkAndTrigger = useCallback(async () => {
     try {
@@ -399,6 +401,12 @@ export function useHolzen() {
     setCooldownHours,
     digestFrequency,
     setDigestFrequency,
+    customPrompt,
+    setCustomPrompt: async (val: string | null) => {
+      setCustomPromptState(val);
+      if (!user) return;
+      await supabase.from('profiles').update({ custom_prompt: val } as any).eq('user_id', user.id);
+    },
     companionPrefs,
     setCompanionPref,
     btcData,
