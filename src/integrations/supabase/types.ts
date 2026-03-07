@@ -74,6 +74,45 @@ export type Database = {
         }
         Relationships: []
       }
+      future_letters: {
+        Row: {
+          body: string
+          btc_price_at_delivery: number | null
+          btc_price_at_write: number
+          deliver_during: string
+          delivered: boolean
+          delivered_at: string | null
+          id: string
+          user_id: string
+          written_at: string
+          written_during: string
+        }
+        Insert: {
+          body: string
+          btc_price_at_delivery?: number | null
+          btc_price_at_write: number
+          deliver_during: string
+          delivered?: boolean
+          delivered_at?: string | null
+          id?: string
+          user_id: string
+          written_at?: string
+          written_during: string
+        }
+        Update: {
+          body?: string
+          btc_price_at_delivery?: number | null
+          btc_price_at_write?: number
+          deliver_during?: string
+          delivered?: boolean
+          delivered_at?: string | null
+          id?: string
+          user_id?: string
+          written_at?: string
+          written_during?: string
+        }
+        Relationships: []
+      }
       night_reflections: {
         Row: {
           btc_change_percent: number
