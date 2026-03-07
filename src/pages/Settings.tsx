@@ -42,6 +42,7 @@ const Settings = () => {
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [changingPassword, setChangingPassword] = useState(false);
+  const [zenMode, setZenMode] = useState(() => localStorage.getItem('holzen_zen_mode') === 'true');
 
   const changePassword = useCallback(async () => {
     if (newPassword.length < 6) {
@@ -222,6 +223,29 @@ const Settings = () => {
             id="silent-mode"
             checked={silentMode}
             onCheckedChange={setSilentMode}
+          />
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* Zen Mode */}
+      <div className="space-y-4">
+        <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Zen mode</p>
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          Strips the home screen to just the reflection and breathing exercise. No charts, no stats, no noise.
+        </p>
+        <div className="flex items-center justify-between">
+          <Label htmlFor="zen-mode" className="text-xs font-mono text-muted-foreground">
+            Enable zen mode
+          </Label>
+          <Switch
+            id="zen-mode"
+            checked={zenMode}
+            onCheckedChange={(v) => {
+              setZenMode(v);
+              localStorage.setItem('holzen_zen_mode', String(v));
+            }}
           />
         </div>
       </div>
