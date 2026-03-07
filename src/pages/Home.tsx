@@ -52,6 +52,15 @@ const Home = () => {
   const [showOutcome, setShowOutcome] = useState(false);
   const [outcomeReflectionId, setOutcomeReflectionId] = useState<string | null>(null);
   const [showMoodCheck, setShowMoodCheck] = useState(false);
+  const [priceHidden, setPriceHidden] = useState(() => localStorage.getItem('holzen_hide_price') === 'true');
+
+  const togglePriceHidden = useCallback(() => {
+    setPriceHidden(prev => {
+      const next = !prev;
+      localStorage.setItem('holzen_hide_price', String(next));
+      return next;
+    });
+  }, []);
 
   const handleNeedAMoment = () => {
     if (manualCooldownRemaining() > 0) return;
