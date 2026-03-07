@@ -20,12 +20,16 @@ const OUTCOME_SCORES: Record<string, number> = {
   sold: 20,
 };
 
-function computeCurrentStreak(reflections: Reflection[]): number {
+function computeCurrentStreak(reflections: Reflection[], freezeDates: string[] = []): number {
   if (reflections.length === 0) return 0;
 
   const days = new Set<string>();
   for (const r of reflections) {
     days.add(parseISO(r.created_at).toISOString().slice(0, 10));
+  }
+  // Add freeze dates as "valid" days
+  for (const d of freezeDates) {
+    days.add(d);
   }
   const sorted = Array.from(days).sort().reverse();
 
