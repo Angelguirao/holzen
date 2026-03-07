@@ -47,6 +47,8 @@ const Home = () => {
     manualCooldownRemaining,
     autoCooldownRemaining,
     cooldownHours,
+    streakFreezeDates,
+    useStreakFreeze,
   } = useHolzen();
 
   const [showOutcome, setShowOutcome] = useState(false);
