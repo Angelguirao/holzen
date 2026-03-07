@@ -8,6 +8,20 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+function getUserLocalHour(timezone: string): number {
+  try {
+    const now = new Date();
+    const formatter = new Intl.DateTimeFormat("en-US", {
+      hour: "numeric",
+      hour12: false,
+      timeZone: timezone,
+    });
+    return parseInt(formatter.format(now), 10);
+  } catch {
+    return -1; // invalid timezone
+  }
+}
+
 async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise<Response> {
   for (let i = 0; i < retries; i++) {
     const res = await fetch(url);
@@ -46,10 +60,10 @@ serve(async (req) => {
 
     console.log(`[NIGHT-REFLECTION] BTC 24h: ${changePercent.toFixed(2)}%`);
 
-    // 2. Get all users
+    // 2. Get all users with timezone
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
-      .select("user_id, reflection_tone");
+      .select("user_id, reflection_tone, timezone");
 
     if (profilesError) throw profilesError;
     if (!profiles || profiles.length === 0) {
@@ -61,7 +75,12 @@ serve(async (req) => {
     let sent = 0;
 
     for (const profile of profiles) {
-      // Check if user had any reflections today
+      // Timezone-aware: only send if user's local time is 9 PM (21:00)
+      const tz = (profile as any).timezone || "UTC";
+      const localHour = getUserLocalHour(tz);
+      if (localHour !== 21) continue;
+
+      // Check if user had any reflections today (in their timezone)
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const { count } = await supabase
