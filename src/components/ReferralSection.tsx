@@ -17,7 +17,7 @@ const MILESTONES = [
   { count: 5, icon: Crown, label: '5 referrals', reward: 'Lifetime access unlocked' },
 ];
 
-export function ReferralSection() {
+export function ReferralSection({ defaultExpanded = false }: { defaultExpanded?: boolean }) {
   const { user } = useAuth();
   
   const [referralCode, setReferralCode] = useState<string | null>(null);
