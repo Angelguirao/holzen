@@ -3,7 +3,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { ReflectionStats } from './ReflectionStats';
 
-export function HomeStreaks() {
+interface Props {
+  streakFreezeDates: string[];
+  onUseFreeze: () => Promise<void>;
+}
+
+export function HomeStreaks({ streakFreezeDates, onUseFreeze }: Props) {
   const { user } = useAuth();
   const [reflections, setReflections] = useState<{ created_at: string; outcome: string | null }[]>([]);
   const [loaded, setLoaded] = useState(false);
@@ -23,5 +28,11 @@ export function HomeStreaks() {
 
   if (!loaded || reflections.length === 0) return null;
 
-  return <ReflectionStats reflections={reflections} />;
+  return (
+    <ReflectionStats
+      reflections={reflections}
+      streakFreezeDates={streakFreezeDates}
+      onUseFreeze={onUseFreeze}
+    />
+  );
 }

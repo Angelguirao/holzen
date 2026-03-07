@@ -1,28 +1,37 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { differenceInCalendarDays, parseISO } from 'date-fns';
+import { Shield } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
 
 interface Props {
   reflections: { created_at: string; outcome: string | null }[];
+  streakFreezeDates?: string[];
+  onUseFreeze?: () => Promise<void>;
 }
 
-export function ReflectionStats({ reflections }: Props) {
-  const { total, currentStreak, longestStreak } = useMemo(() => {
-    if (reflections.length === 0) return { total: 0, currentStreak: 0, longestStreak: 0 };
+export function ReflectionStats({ reflections, streakFreezeDates = [], onUseFreeze }: Props) {
+  const [freezing, setFreezing] = useState(false);
 
-    // Count total reflections with outcomes
+  const { total, currentStreak, longestStreak, streakAtRisk, canFreeze } = useMemo(() => {
+    if (reflections.length === 0) return { total: 0, currentStreak: 0, longestStreak: 0, streakAtRisk: false, canFreeze: false };
+
     const withOutcome = reflections.filter(r => r.outcome != null && r.outcome !== '');
     const totalOutcomes = withOutcome.length;
 
-    if (totalOutcomes === 0) return { total: reflections.length, currentStreak: 0, longestStreak: 0 };
+    if (totalOutcomes === 0) return { total: reflections.length, currentStreak: 0, longestStreak: 0, streakAtRisk: false, canFreeze: false };
 
-    // Get unique days with outcomes (sorted newest first)
+    // Get unique days with outcomes + freeze dates
     const days = new Set<string>();
     for (const r of withOutcome) {
       days.add(parseISO(r.created_at).toISOString().slice(0, 10));
     }
+    const realDays = new Set(days);
+    for (const d of streakFreezeDates) {
+      days.add(d);
+    }
     const sorted = Array.from(days).sort().reverse();
 
-    // Current streak: count consecutive days from today/yesterday
     const today = new Date().toISOString().slice(0, 10);
     let current = 0;
     const startDay = sorted[0];
@@ -50,16 +59,56 @@ export function ReflectionStats({ reflections }: Props) {
       }
     }
 
-    return { total: reflections.length, currentStreak: current, longestStreak: longest };
-  }, [reflections]);
+    // Streak at risk: user had a streak ≥2, no reflection today, and last real reflection was yesterday
+    const hasReflectionToday = realDays.has(today);
+    const hasFreezeToday = streakFreezeDates.includes(today);
+    const atRisk = current >= 2 && !hasReflectionToday && !hasFreezeToday;
+
+    // Can freeze: no freeze used in last 7 days
+    const recentFreezes = streakFreezeDates.filter((d) => {
+      const diff = Math.abs(Date.now() - new Date(d).getTime());
+      return diff < 7 * 24 * 60 * 60 * 1000;
+    });
+    const freezeAvailable = recentFreezes.length < 1;
+
+    return { total: reflections.length, currentStreak: current, longestStreak: longest, streakAtRisk: atRisk, canFreeze: freezeAvailable };
+  }, [reflections, streakFreezeDates]);
+
+  const handleFreeze = async () => {
+    if (!onUseFreeze) return;
+    setFreezing(true);
+    try {
+      await onUseFreeze();
+      toast('Streak freeze activated for today');
+    } catch {
+      toast('Failed to activate freeze');
+    } finally {
+      setFreezing(false);
+    }
+  };
 
   if (total === 0) return null;
 
   return (
-    <div className="grid grid-cols-3 gap-3">
-      <StatCard label="Reflections" value={total} />
-      <StatCard label="Outcome streak" value={currentStreak} suffix="d" />
-      <StatCard label="Best streak" value={longestStreak} suffix="d" />
+    <div className="space-y-3">
+      <div className="grid grid-cols-3 gap-3">
+        <StatCard label="Reflections" value={total} />
+        <StatCard label="Outcome streak" value={currentStreak} suffix="d" />
+        <StatCard label="Best streak" value={longestStreak} suffix="d" />
+      </div>
+
+      {streakAtRisk && canFreeze && onUseFreeze && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleFreeze}
+          disabled={freezing}
+          className="w-full font-mono text-xs gap-2 border-primary/30 text-primary hover:bg-primary/5"
+        >
+          <Shield className="h-3.5 w-3.5" />
+          {freezing ? 'Activating…' : 'Use streak freeze — protect your streak today'}
+        </Button>
+      )}
     </div>
   );
 }
