@@ -114,6 +114,15 @@ export function useHolzen() {
       .eq('user_id', user.id);
   }, [user]);
 
+  const setSilentMode = useCallback(async (val: boolean) => {
+    setSilentModeState(val);
+    if (!user) return;
+    await supabase
+      .from('profiles')
+      .update({ silent_mode: val } as any)
+      .eq('user_id', user.id);
+  }, [user]);
+
   const setCompanionPref = useCallback(async (key: keyof CompanionPrefs, val: boolean) => {
     setCompanionPrefsState((prev) => ({ ...prev, [key]: val }));
     if (!user) return;
