@@ -419,21 +419,42 @@ const Settings = () => {
 
       <Separator />
 
-      {/* Night Reflection Hour */}
+      {/* Night Reflection */}
       <div className="space-y-4">
         <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Night reflection</p>
         <p className="text-xs text-muted-foreground leading-relaxed">
-          When to receive your nightly summary (in your local time).
+          A nightly summary of your day's BTC movement and whether you reflected.
         </p>
-        <select
-          value={nightReflectionHour}
-          onChange={(e) => setNightReflectionHour(Number(e.target.value))}
-          className="w-full text-xs font-mono px-2 py-1.5 rounded-md border border-border/60 bg-background text-foreground"
-        >
-          {Array.from({ length: 24 }, (_, i) => (
-            <option key={i} value={i}>{String(i).padStart(2, '0')}:00</option>
-          ))}
-        </select>
+        <div className="flex items-center justify-between">
+          <Label htmlFor="night-reflection-enabled" className="text-xs font-mono text-muted-foreground">
+            Enable night reflection
+          </Label>
+          <Switch
+            id="night-reflection-enabled"
+            checked={nightReflectionHour !== null}
+            onCheckedChange={(v) => {
+              if (v) {
+                setNightReflectionHour(21);
+              } else {
+                setNightReflectionHour(null);
+              }
+            }}
+          />
+        </div>
+        {nightReflectionHour !== null && (
+          <div className="space-y-1.5">
+            <p className="text-[10px] font-mono text-muted-foreground/60">Delivery time (local)</p>
+            <select
+              value={nightReflectionHour}
+              onChange={(e) => setNightReflectionHour(Number(e.target.value))}
+              className="w-full text-xs font-mono px-2 py-1.5 rounded-md border border-border/60 bg-background text-foreground"
+            >
+              {Array.from({ length: 24 }, (_, i) => (
+                <option key={i} value={i}>{String(i).padStart(2, '0')}:00</option>
+              ))}
+            </select>
+          </div>
+        )}
       </div>
 
       <Separator />
