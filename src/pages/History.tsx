@@ -241,7 +241,20 @@ const History = () => {
               <div className="flex items-start justify-between gap-2">
                 <p className="text-xs font-mono text-muted-foreground">
                   {format(new Date(r.created_at), 'MMM d, yyyy · h:mm a')}
-                  {r.context && ` — ${r.context}`}
+                  {r.context && (
+                    <TooltipProvider delayDuration={200}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button className="inline-flex ml-1.5 align-middle text-muted-foreground/40 hover:text-muted-foreground transition-colors">
+                            <Info className="h-3 w-3" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" className="max-w-[280px] text-[10px] font-mono leading-relaxed">
+                          {r.context}
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
                 </p>
                 <div className="flex items-center gap-1 shrink-0">
                   <button
