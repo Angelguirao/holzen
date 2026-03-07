@@ -112,10 +112,10 @@ const Home = () => {
   return (
     <div className="space-y-10">
       {/* BTC Status */}
-      <BtcStatus data={btcData} error={error} />
+      <BtcStatus data={btcData} error={error} hidden={priceHidden} onToggleHidden={togglePriceHidden} />
 
       {/* 7-day chart */}
-      <BtcChart />
+      <BtcChart hidden={priceHidden} />
 
       {/* Streaks & Stats */}
       <HomeStreaks />
