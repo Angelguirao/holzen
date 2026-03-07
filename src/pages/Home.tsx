@@ -136,6 +136,11 @@ const Home = () => {
     return <Onboarding onComplete={completeOnboarding} />;
   }
 
+  const unpinReflection = useCallback(() => {
+    localStorage.removeItem('holzen_pinned_reflection');
+    setPinnedReflection(null);
+  }, []);
+
   const hasAccess = subscribed || (trialRemaining !== undefined && trialRemaining > 0);
 
   if (zenMode) {
