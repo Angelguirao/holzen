@@ -16,6 +16,11 @@ const About = () => {
 
   return (
     <div className="min-h-screen flex items-start justify-center px-6 py-16">
+      <PageMeta
+        title="About Holzen — Why we built a self-awareness tool for Bitcoin holders"
+        description="Holzen applies behavioral finance research to help Bitcoin holders pause before acting on impulse. Built by a husband-and-wife team, small by design."
+        path="/about"
+      />
       <div className="w-full max-w-sm space-y-14">
         {/* Nav */}
         <motion.div {...m()}>
