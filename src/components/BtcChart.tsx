@@ -8,10 +8,13 @@ interface ChartPoint {
   price: number;
 }
 
-export function BtcChart() {
+interface Props {
+  hidden?: boolean;
+}
+
+export function BtcChart({ hidden = false }: Props) {
   const [data, setData] = useState<ChartPoint[] | null>(null);
   const [error, setError] = useState(false);
-  const [hidden] = useState(() => localStorage.getItem('holzen_hide_price') === 'true');
 
   useEffect(() => {
     let cancelled = false;
