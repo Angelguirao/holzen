@@ -5,14 +5,14 @@ import { ReflectionStats } from './ReflectionStats';
 
 export function HomeStreaks() {
   const { user } = useAuth();
-  const [reflections, setReflections] = useState<{ created_at: string }[]>([]);
+  const [reflections, setReflections] = useState<{ created_at: string; outcome: string | null }[]>([]);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     if (!user) return;
     supabase
       .from('reflections')
-      .select('created_at')
+      .select('created_at, outcome')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
       .then(({ data }) => {
