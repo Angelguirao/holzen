@@ -200,7 +200,7 @@ export function useHolzen() {
     } finally {
       setLoading(false);
     }
-  }, [user]);
+  }, [user, reflectionTone]);
 
   const checkAndTrigger = useCallback(async () => {
     try {
