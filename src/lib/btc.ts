@@ -1,3 +1,8 @@
+export interface FearGreedData {
+  value: number;
+  label: string; // e.g. "Extreme Fear", "Fear", "Neutral", "Greed", "Extreme Greed"
+}
+
 export interface BtcPriceData {
   currentPrice: number;
   price24hAgo: number;
@@ -5,6 +10,7 @@ export interface BtcPriceData {
   direction: 'up' | 'down';
   cumulativeChangePercent?: number;
   cumulativeDirection?: 'up' | 'down';
+  fearGreed?: FearGreedData;
 }
 
 async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise<Response> {
@@ -18,11 +24,28 @@ async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise
   throw new Error('Failed to fetch BTC data after retries');
 }
 
+async function fetchFearGreed(): Promise<FearGreedData | undefined> {
+  try {
+    const res = await fetch('https://api.alternative.me/fng/?limit=1');
+    if (!res.ok) return undefined;
+    const data = await res.json();
+    const entry = data?.data?.[0];
+    if (!entry) return undefined;
+    return {
+      value: parseInt(entry.value, 10),
+      label: entry.value_classification,
+    };
+  } catch {
+    return undefined;
+  }
+}
+
 export async function fetchBtcData(): Promise<BtcPriceData> {
-  // Fetch both 1-day and 7-day data in parallel
-  const [res1d, res7d] = await Promise.all([
+  // Fetch price data and fear/greed in parallel
+  const [res1d, res7d, fearGreed] = await Promise.all([
     fetchWithRetry('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=1'),
     fetchWithRetry('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=7'),
+    fetchFearGreed(),
   ]);
 
   const data1d = await res1d.json();
@@ -45,7 +68,7 @@ export async function fetchBtcData(): Promise<BtcPriceData> {
       cumulativeDirection = cumulativeChangePercent >= 0 ? 'up' : 'down';
     }
   } catch {
-    // 7-day data is optional, don't fail
+    // 7-day data is optional
   }
 
   return {
@@ -55,5 +78,6 @@ export async function fetchBtcData(): Promise<BtcPriceData> {
     direction: changePercent >= 0 ? 'up' : 'down',
     cumulativeChangePercent,
     cumulativeDirection,
+    fearGreed,
   };
 }

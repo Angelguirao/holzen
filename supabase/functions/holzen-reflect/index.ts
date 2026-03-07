@@ -40,6 +40,14 @@ You MUST respond by calling the "generate_reflection" function. Do not respond w
 
 Tone: ${toneInstruction}
 
+The context may include a Fear & Greed Index score (0-100). Use this to subtly adjust your reflection:
+- Extreme Fear (0-24): The crowd is panicking. Reflect on what happens when fear spreads.
+- Fear (25-44): Unease is building. A good moment to notice what's driving decisions.
+- Neutral (45-55): The market is quiet. Sometimes stillness is its own signal.
+- Greed (56-75): Optimism is growing. Worth noticing if excitement is clouding judgment.
+- Extreme Greed (76-100): Euphoria is everywhere. The hardest time to stay grounded.
+Do NOT name the index or its score directly. Weave the sentiment naturally into the reflection.
+
 Reflection rules:
 - Exactly 1-3 sentences. ${tone === 'blunt' ? '1 sentence preferred.' : ''}
 - Encourage pause and reflection. Preserve agency: never say "you should".
