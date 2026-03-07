@@ -48,10 +48,11 @@ function getSuggestedPattern(severity: 'mild' | 'moderate' | 'high'): number {
 interface Props {
   severity?: 'mild' | 'moderate' | 'high';
   onComplete?: () => void;
+  onClose?: () => void;
   autoOpen?: boolean;
 }
 
-export function BreathingExercise({ severity = 'mild', onComplete, autoOpen = false }: Props) {
+export function BreathingExercise({ severity = 'mild', onComplete, onClose, autoOpen = false }: Props) {
   const [overlayOpen, setOverlayOpen] = useState(autoOpen);
   const [patternIndex, setPatternIndex] = useState(() => getSuggestedPattern(severity));
   const [active, setActive] = useState(false);
