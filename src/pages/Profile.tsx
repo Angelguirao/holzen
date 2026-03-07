@@ -215,6 +215,7 @@ function StatsContent({ reflections }: { reflections: Reflection[] }) {
     <div className="space-y-5">
       <ReflectionStats reflections={reflections} />
       {scoreData && <HolzenScoreDetail scoreData={scoreData} />}
+      <MoodPriceChart reflections={reflections} />
       <MoodTrends reflections={reflections} />
       <InsightsPanel reflections={reflections} />
     </div>
