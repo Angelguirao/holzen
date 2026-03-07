@@ -273,6 +273,15 @@ export function useHolzen() {
     return () => clearInterval(interval);
   }, [checkAndTrigger, profileLoaded]);
 
+  const setCooldownHours = useCallback(async (val: number) => {
+    setCooldownHoursState(val);
+    if (!user) return;
+    await supabase
+      .from('profiles')
+      .update({ cooldown_hours: val } as any)
+      .eq('user_id', user.id);
+  }, [user]);
+
   return {
     threshold,
     setThreshold,
@@ -282,6 +291,8 @@ export function useHolzen() {
     setEmailNotifications,
     reflectionTone,
     setReflectionTone,
+    cooldownHours,
+    setCooldownHours,
     companionPrefs,
     setCompanionPref,
     btcData,
