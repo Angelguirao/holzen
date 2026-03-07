@@ -120,12 +120,33 @@ export function ReflectionStats({ reflections, streakFreezeDates = [], onUseFree
       )}
 
       {onUseFreeze && (
-        <div className="flex items-center gap-2 text-[10px] font-mono text-muted-foreground/60">
-          <Snowflake className="h-3 w-3" />
-          {canFreeze ? (
-            <span>1 streak freeze available · resets weekly</span>
-          ) : (
-            <span>Next freeze {nextFreezeAvailable}</span>
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 text-[10px] font-mono text-muted-foreground/60">
+            <Snowflake className="h-3 w-3" />
+            {canFreeze ? (
+              <span>1 streak freeze available · resets weekly</span>
+            ) : (
+              <span>Next freeze {nextFreezeAvailable}</span>
+            )}
+          </div>
+
+          {streakFreezeDates.length > 0 && (
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <span className="text-[10px] font-mono text-muted-foreground/40">Used:</span>
+              {[...streakFreezeDates].sort().reverse().slice(0, 5).map((d) => (
+                <span
+                  key={d}
+                  className="text-[10px] font-mono text-muted-foreground/50 bg-muted/50 px-1.5 py-0.5 rounded"
+                >
+                  {new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                </span>
+              ))}
+              {streakFreezeDates.length > 5 && (
+                <span className="text-[10px] font-mono text-muted-foreground/30">
+                  +{streakFreezeDates.length - 5} more
+                </span>
+              )}
+            </div>
           )}
         </div>
       )}

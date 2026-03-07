@@ -11,6 +11,7 @@ import { BadgesPanel } from '@/components/BadgesPanel';
 import { ReferralSection } from '@/components/ReferralSection';
 import { MoodPriceChart } from '@/components/MoodPriceChart';
 import { MoodTrendChart } from '@/components/MoodTrendChart';
+import { MoodPriceScatter } from '@/components/MoodPriceScatter';
 import { ShareStats } from '@/components/ShareStats';
 import { useHolzenScore } from '@/hooks/use-holzen-score';
 import { HolzenScoreCard } from '@/components/HolzenScoreCard';
@@ -237,6 +238,7 @@ function StatsContent({ reflections }: { reflections: Reflection[] }) {
       {scoreData && <HolzenScoreDetail scoreData={scoreData} />}
       <MoodTrendChart reflections={reflections} />
       <MoodPriceChart reflections={reflections} />
+      <MoodPriceScatter reflections={reflections} />
       <MoodTrends reflections={reflections} />
       <InsightsPanel reflections={reflections} />
     </div>
