@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 
@@ -12,6 +12,10 @@ interface Props {
 export function ThresholdSetting({ threshold, onSet, cumulativeThreshold, onSetCumulative }: Props) {
   const [value, setValue] = useState(threshold);
   const [cumValue, setCumValue] = useState(cumulativeThreshold);
+
+  // Sync local state when props update (e.g. after DB load)
+  useEffect(() => { setValue(threshold); }, [threshold]);
+  useEffect(() => { setCumValue(cumulativeThreshold); }, [cumulativeThreshold]);
 
   return (
     <div className="space-y-8">
