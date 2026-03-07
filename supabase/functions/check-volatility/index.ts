@@ -51,19 +51,53 @@ async function fetchBtcVolatility(): Promise<{ changePercent: number; direction:
   };
 }
 
-async function generateReflection(context: string, apiKey: string): Promise<string | null> {
-  const systemPrompt = `You generate exactly one short message (1-3 sentences) in response to Bitcoin volatility information.
+interface ReflectionResult {
+  message: string;
+  haiku: string | null;
+  learning_title: string | null;
+  learning_body: string | null;
+}
 
-Rules:
-- Encourage pause and reflection.
-- Preserve agency: the user decides. Never say "you should" hold, sell, or buy.
-- Calm, minimal tone.
-- No reassurance ("it'll be okay"), no excitement, no urgency.
-- No lists, no disclaimers, no trading advice.
-- Do not ask the user to open the app again or take any specific action.
-- No exclamation marks, no emojis, no motivational language.
-- No reward language ("great job", "well done").
-- Just one quiet prompt for reflection.`;
+async function generateReflection(context: string, apiKey: string, tone = "stoic"): Promise<ReflectionResult | null> {
+  const TONE_INSTRUCTIONS: Record<string, string> = {
+    stoic: "Write in a calm, stoic tone. Brief and grounded. Like Marcus Aurelius observing the market.",
+    zen: "Write in a gentle zen tone. Spacious, almost meditative. Use natural metaphors.",
+    poetic: "Write in a poetic, literary tone. Evocative and beautiful. Use imagery and rhythm.",
+    blunt: "Write in a direct, blunt tone. No fluff. Say it plainly in as few words as possible.",
+  };
+
+  const toneInstruction = TONE_INSTRUCTIONS[tone] || TONE_INSTRUCTIONS.stoic;
+
+  const systemPrompt = `You generate a reflection with optional companions in response to Bitcoin volatility.
+
+You MUST respond by calling the "generate_reflection" function. Do not respond with plain text.
+
+Tone: ${toneInstruction}
+
+The context may include a Fear & Greed Index score (0-100). Use this to subtly adjust your reflection:
+- Extreme Fear (0-24): The crowd is panicking. Reflect on what happens when fear spreads.
+- Fear (25-44): Unease is building. A good moment to notice what's driving decisions.
+- Neutral (45-55): The market is quiet. Sometimes stillness is its own signal.
+- Greed (56-75): Optimism is growing. Worth noticing if excitement is clouding judgment.
+- Extreme Greed (76-100): Euphoria is everywhere. The hardest time to stay grounded.
+Do NOT name the index or its score directly. Weave the sentiment naturally into the reflection.
+
+Reflection rules:
+- Exactly 1-3 sentences. ${tone === 'blunt' ? '1 sentence preferred.' : ''}
+- Encourage pause and reflection. Preserve agency: never say "you should".
+- No reassurance, excitement, urgency, trading advice, lists, disclaimers.
+- No exclamation marks, emojis, motivational language, reward language.
+- Just one quiet prompt for reflection.
+
+Haiku rules:
+- Exactly 3 lines separated by newlines.
+- Traditional 5-7-5 syllable structure.
+- Captures the essence of the moment. Match the chosen tone.
+- No trading advice or price predictions.
+
+Learning input rules:
+- Title: a short, factual headline (5-10 words).
+- Body: 1-2 sentences about a historical Bitcoin event, market pattern, or behavioral finance insight relevant to the current context. Factual, educational, no advice.`;
 
   const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
@@ -77,6 +111,27 @@ Rules:
         { role: "system", content: systemPrompt },
         { role: "user", content: context },
       ],
+      tools: [
+        {
+          type: "function",
+          function: {
+            name: "generate_reflection",
+            description: "Generate a reflection message with optional haiku and learning companions.",
+            parameters: {
+              type: "object",
+              properties: {
+                message: { type: "string", description: "The core reflection message (1-3 sentences)." },
+                haiku: { type: "string", description: "A haiku (3 lines, 5-7-5 syllables). Lines separated by newlines." },
+                learning_title: { type: "string", description: "Short factual headline for a historical/educational insight." },
+                learning_body: { type: "string", description: "1-2 sentences of factual, educational context." },
+              },
+              required: ["message", "haiku", "learning_title", "learning_body"],
+              additionalProperties: false,
+            },
+          },
+        },
+      ],
+      tool_choice: { type: "function", function: { name: "generate_reflection" } },
     }),
   });
 
@@ -87,7 +142,22 @@ Rules:
   }
 
   const data = await response.json();
-  return data.choices?.[0]?.message?.content?.trim() ?? null;
+
+  const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
+  if (toolCall?.function?.arguments) {
+    const args = JSON.parse(toolCall.function.arguments);
+    return {
+      message: args.message,
+      haiku: args.haiku || null,
+      learning_title: args.learning_title || null,
+      learning_body: args.learning_body || null,
+    };
+  }
+
+  // Fallback to plain content
+  const message = data.choices?.[0]?.message?.content?.trim();
+  if (!message) return null;
+  return { message, haiku: null, learning_title: null, learning_body: null };
 }
 
 async function sendNotificationEmail(
@@ -169,7 +239,7 @@ serve(async (req) => {
     // 2. Get all profiles - we need to check both thresholds
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
-      .select("user_id, threshold, cumulative_threshold, email_notifications, last_trigger_at, cooldown_hours");
+      .select("user_id, threshold, cumulative_threshold, email_notifications, last_trigger_at, cooldown_hours, reflection_tone, companion_haiku, companion_learning");
 
     if (profilesError) throw profilesError;
     if (!profiles || profiles.length === 0) {
@@ -202,23 +272,36 @@ serve(async (req) => {
         ctx += ` Over 7 days, it's ${cumDir} ${absCumChange.toFixed(1)}%.`;
       }
 
-      // Generate reflection
-      const reflection = await generateReflection(ctx, LOVABLE_API_KEY);
-      if (!reflection) {
+      // Generate reflection with companions
+      const tone = (profile as any).reflection_tone || "stoic";
+      const result = await generateReflection(ctx, LOVABLE_API_KEY, tone);
+      if (!result) {
         console.log(`[CHECK-VOLATILITY] Failed to generate reflection for ${profile.user_id}`);
         continue;
       }
 
+      // Respect user companion preferences
+      const haiku = (profile as any).companion_haiku ? result.haiku : null;
+      const learningTitle = (profile as any).companion_learning ? result.learning_title : null;
+      const learningBody = (profile as any).companion_learning ? result.learning_body : null;
+
       // Save to reflection history
       await supabase
         .from("reflections")
-        .insert({ user_id: profile.user_id, message: reflection, context: ctx });
+        .insert({
+          user_id: profile.user_id,
+          message: result.message,
+          context: ctx,
+          haiku,
+          learning_title: learningTitle,
+          learning_body: learningBody,
+        });
 
       // Update profile with new reflection
       await supabase
         .from("profiles")
         .update({
-          last_message: reflection,
+          last_message: result.message,
           last_context: ctx,
           last_trigger_at: new Date().toISOString(),
         })
@@ -230,7 +313,7 @@ serve(async (req) => {
         const { data: userData } = await supabase.auth.admin.getUserById(profile.user_id);
         const email = userData?.user?.email;
         if (email) {
-          await sendNotificationEmail(email, reflection, ctx);
+          await sendNotificationEmail(email, result.message, ctx);
         }
       }
 
@@ -287,7 +370,7 @@ serve(async (req) => {
 
             const payload = JSON.stringify({
               title: "Holzen",
-              body: reflection.slice(0, 120),
+              body: result.message.slice(0, 120),
             });
 
             for (const sub of pushSubs) {
