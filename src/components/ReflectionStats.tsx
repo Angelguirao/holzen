@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
 import { differenceInCalendarDays, parseISO } from 'date-fns';
-import { Shield } from 'lucide-react';
+import { Shield, Snowflake } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { formatDistanceToNow } from 'date-fns';
 
 interface Props {
   reflections: { created_at: string; outcome: string | null }[];
@@ -13,13 +14,13 @@ interface Props {
 export function ReflectionStats({ reflections, streakFreezeDates = [], onUseFreeze }: Props) {
   const [freezing, setFreezing] = useState(false);
 
-  const { total, currentStreak, longestStreak, streakAtRisk, canFreeze } = useMemo(() => {
-    if (reflections.length === 0) return { total: 0, currentStreak: 0, longestStreak: 0, streakAtRisk: false, canFreeze: false };
+  const { total, currentStreak, longestStreak, streakAtRisk, canFreeze, nextFreezeAvailable } = useMemo(() => {
+    if (reflections.length === 0) return { total: 0, currentStreak: 0, longestStreak: 0, streakAtRisk: false, canFreeze: false, nextFreezeAvailable: null };
 
     const withOutcome = reflections.filter(r => r.outcome != null && r.outcome !== '');
     const totalOutcomes = withOutcome.length;
 
-    if (totalOutcomes === 0) return { total: reflections.length, currentStreak: 0, longestStreak: 0, streakAtRisk: false, canFreeze: false };
+    if (totalOutcomes === 0) return { total: reflections.length, currentStreak: 0, longestStreak: 0, streakAtRisk: false, canFreeze: false, nextFreezeAvailable: null };
 
     // Get unique days with outcomes + freeze dates
     const days = new Set<string>();
@@ -71,7 +72,15 @@ export function ReflectionStats({ reflections, streakFreezeDates = [], onUseFree
     });
     const freezeAvailable = recentFreezes.length < 1;
 
-    return { total: reflections.length, currentStreak: current, longestStreak: longest, streakAtRisk: atRisk, canFreeze: freezeAvailable };
+    // Next freeze available date
+    let nextFreezeAvailable: string | null = null;
+    if (!freezeAvailable && recentFreezes.length > 0) {
+      const latestFreeze = recentFreezes.sort().reverse()[0];
+      const nextDate = new Date(new Date(latestFreeze).getTime() + 7 * 24 * 60 * 60 * 1000);
+      nextFreezeAvailable = formatDistanceToNow(nextDate, { addSuffix: true });
+    }
+
+    return { total: reflections.length, currentStreak: current, longestStreak: longest, streakAtRisk: atRisk, canFreeze: freezeAvailable, nextFreezeAvailable };
   }, [reflections, streakFreezeDates]);
 
   const handleFreeze = async () => {
@@ -108,6 +117,17 @@ export function ReflectionStats({ reflections, streakFreezeDates = [], onUseFree
           <Shield className="h-3.5 w-3.5" />
           {freezing ? 'Activating…' : 'Use streak freeze — protect your streak today'}
         </Button>
+      )}
+
+      {onUseFreeze && (
+        <div className="flex items-center gap-2 text-[10px] font-mono text-muted-foreground/60">
+          <Snowflake className="h-3 w-3" />
+          {canFreeze ? (
+            <span>1 streak freeze available · resets weekly</span>
+          ) : (
+            <span>Next freeze {nextFreezeAvailable}</span>
+          )}
+        </div>
       )}
     </div>
   );
