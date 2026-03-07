@@ -100,6 +100,15 @@ export function useHolzen() {
       .eq('user_id', user.id);
   }, [user]);
 
+  const setReflectionTone = useCallback(async (val: string) => {
+    setReflectionToneState(val);
+    if (!user) return;
+    await supabase
+      .from('profiles')
+      .update({ reflection_tone: val } as any)
+      .eq('user_id', user.id);
+  }, [user]);
+
   const setCompanionPref = useCallback(async (key: keyof CompanionPrefs, val: boolean) => {
     setCompanionPrefsState((prev) => ({ ...prev, [key]: val }));
     if (!user) return;
