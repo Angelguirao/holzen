@@ -155,12 +155,12 @@ const History = () => {
       <div className="space-y-4">
         <div className="flex items-center gap-6">
           <button
-            onClick={() => setTab('library')}
+            onClick={() => setTab('reflections')}
             className={`text-sm font-mono tracking-widest uppercase transition-colors ${
-              tab === 'library' ? 'text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
+              tab === 'reflections' ? 'text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
             }`}
           >
-            Library
+            Reflections
           </button>
           <button
             onClick={() => setTab('letters')}
