@@ -90,6 +90,7 @@ export type Database = {
           lifetime_access: boolean
           referral_code: string
           referred_by: string | null
+          reflection_tone: string
           threshold: number
           updated_at: string
           user_id: string
@@ -109,6 +110,7 @@ export type Database = {
           lifetime_access?: boolean
           referral_code?: string
           referred_by?: string | null
+          reflection_tone?: string
           threshold?: number
           updated_at?: string
           user_id: string
@@ -128,6 +130,7 @@ export type Database = {
           lifetime_access?: boolean
           referral_code?: string
           referred_by?: string | null
+          reflection_tone?: string
           threshold?: number
           updated_at?: string
           user_id?: string

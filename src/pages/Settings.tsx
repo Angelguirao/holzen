@@ -32,7 +32,7 @@ const APP_VERSION = '1.2.0';
 
 const Settings = () => {
   const { user, signOut } = useAuth();
-  const { threshold, setThreshold, cumulativeThreshold, setCumulativeThreshold, emailNotifications, setEmailNotifications, companionPrefs, setCompanionPref } = useHolzen();
+  const { threshold, setThreshold, cumulativeThreshold, setCumulativeThreshold, emailNotifications, setEmailNotifications, companionPrefs, setCompanionPref, reflectionTone, setReflectionTone } = useHolzen();
   const { subscribed, loading: subLoading, checkoutLoading, startCheckout, openPortal, trialRemaining } = useSubscription();
   const { theme, setTheme } = useTheme();
   const { canInstall, install } = useInstallPrompt();
@@ -175,7 +175,36 @@ const Settings = () => {
 
       <Separator />
 
-      {/* Notifications */}
+      {/* Reflection Tone */}
+      <div className="space-y-4">
+        <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Reflection tone</p>
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          Choose the voice of your reflections.
+        </p>
+        <div className="grid grid-cols-2 gap-2">
+          {([
+            { value: 'stoic', label: 'Stoic', desc: 'Grounded, like Marcus Aurelius' },
+            { value: 'zen', label: 'Zen', desc: 'Spacious, meditative' },
+            { value: 'poetic', label: 'Poetic', desc: 'Evocative, literary' },
+            { value: 'blunt', label: 'Blunt', desc: 'Direct, no fluff' },
+          ] as const).map((t) => (
+            <button
+              key={t.value}
+              onClick={() => setReflectionTone(t.value)}
+              className={`rounded-md border px-3 py-2.5 text-left transition-colors ${
+                reflectionTone === t.value
+                  ? 'border-primary bg-primary/5 text-foreground'
+                  : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <p className="text-xs font-mono font-medium">{t.label}</p>
+              <p className="text-[10px] text-muted-foreground mt-0.5">{t.desc}</p>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <Separator />
       <div className="space-y-4">
         <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Notifications</p>
         <div className="flex items-center justify-between">
