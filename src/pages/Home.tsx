@@ -372,7 +372,7 @@ function NeedAMomentButton({
         className="w-full font-mono text-xs gap-2"
       >
         <Pause className="h-3.5 w-3.5" />
-        {loading ? 'Generating...' : inCooldown
+        {loading ? 'Generating…' : inCooldown
           ? `Manual reflection in ${minutes} min`
           : 'I need a moment'}
       </Button>
