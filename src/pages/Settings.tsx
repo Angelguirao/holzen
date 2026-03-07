@@ -283,6 +283,37 @@ const Settings = () => {
 
       <Separator />
 
+      {/* Reflection Style */}
+      <div className="space-y-4">
+        <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Reflection style</p>
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          Choose how your reflections are structured.
+        </p>
+        <div className="grid grid-cols-2 gap-2">
+          {([
+            { value: 'standard', label: 'Standard', desc: '1-3 sentence reflection' },
+            { value: 'one-liner', label: 'One-liner', desc: 'Single impactful sentence' },
+            { value: 'question', label: 'Question', desc: 'One thought-provoking question' },
+            { value: 'metaphor', label: 'Metaphor', desc: 'A vivid image for the moment' },
+            { value: 'koan', label: 'Koan', desc: 'A zen paradox to sit with' },
+          ] as const).map((s) => (
+            <button
+              key={s.value}
+              onClick={() => setReflectionStyle(s.value)}
+              className={`rounded-md border px-3 py-2.5 text-left transition-colors ${
+                reflectionStyle === s.value
+                  ? 'border-primary bg-primary/5 text-foreground'
+                  : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <p className="text-xs font-mono font-medium">{s.label}</p>
+              <p className="text-[10px] text-muted-foreground mt-0.5">{s.desc}</p>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <Separator />
       {/* Custom Prompt */}
       <div className="space-y-4">
         <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Custom prompt</p>
