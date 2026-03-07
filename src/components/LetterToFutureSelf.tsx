@@ -120,14 +120,26 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
   const [sending, setSending] = useState(false);
   const [sealPhase, setSealPhase] = useState<'idle' | 'sealing' | 'sealed'>('idle');
   const [loaded, setLoaded] = useState(false);
+  const [mode, setMode] = useState<'storm' | 'calm'>('storm');
 
   const isCrash = changePercent !== null && changePercent <= -LETTER_THRESHOLD;
   const isATH = changePercent !== null && changePercent >= LETTER_THRESHOLD;
-  const canWrite = isCrash || isATH;
-  const writtenDuring = isCrash ? 'crash' : 'ath';
-  const deliverDuring = isCrash ? 'ath' : 'crash';
-  const prompts = isCrash ? WRITING_PROMPTS.crash : WRITING_PROMPTS.ath;
-  const randomPrompt = useMemo(() => prompts[Math.floor(Math.random() * prompts.length)], [isCrash]);
+  const isVolatile = isCrash || isATH;
+  const isCalm = !isVolatile;
+
+  // Storm mode: write during volatility, deliver during opposite
+  // Calm mode: write during calm, deliver during next volatility (crash or ath)
+  const canWriteStorm = isVolatile;
+  const canWriteCalm = isCalm && currentPrice !== null;
+  const canWrite = mode === 'storm' ? canWriteStorm : canWriteCalm;
+
+  const writtenDuring = mode === 'calm' ? 'calm' : (isCrash ? 'crash' : 'ath');
+  const deliverDuring = mode === 'calm' ? 'crash' : (isCrash ? 'ath' : 'crash');
+
+  const prompts = mode === 'calm'
+    ? WRITING_PROMPTS.calm
+    : (isCrash ? WRITING_PROMPTS.crash : WRITING_PROMPTS.ath);
+  const randomPrompt = useMemo(() => prompts[Math.floor(Math.random() * prompts.length)], [isCrash, mode]);
 
   useEffect(() => {
     if (!user) return;
