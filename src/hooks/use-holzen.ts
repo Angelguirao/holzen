@@ -16,6 +16,7 @@ export function useHolzen() {
   const [reflectionTone, setReflectionToneState] = useState('stoic');
   const [silentMode, setSilentModeState] = useState(false);
   const [cooldownHours, setCooldownHoursState] = useState(6);
+  const [digestFrequency, setDigestFrequencyState] = useState('weekly');
   const [btcData, setBtcData] = useState<BtcPriceData | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [context, setContext] = useState<string | null>(null);
@@ -34,7 +35,7 @@ export function useHolzen() {
     const load = async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('threshold, threshold_down, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_learning, reflection_tone, cooldown_hours, last_trigger_at, silent_mode, streak_freeze_dates')
+        .select('threshold, threshold_down, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_learning, reflection_tone, cooldown_hours, last_trigger_at, silent_mode, streak_freeze_dates, digest_frequency')
         .eq('user_id', user.id)
         .single();
 
@@ -50,6 +51,7 @@ export function useHolzen() {
         setReflectionToneState((data as any).reflection_tone ?? 'stoic');
         setCooldownHoursState((data as any).cooldown_hours ?? 6);
         setSilentModeState((data as any).silent_mode ?? false);
+        setDigestFrequencyState((data as any).digest_frequency ?? 'weekly');
         setHasOnboarded(data.has_onboarded ?? false);
         setCompanionPrefsState({
           breathing: data.companion_breathing ?? true,
@@ -151,6 +153,15 @@ export function useHolzen() {
     await supabase
       .from('profiles')
       .update({ silent_mode: val } as any)
+      .eq('user_id', user.id);
+  }, [user]);
+
+  const setDigestFrequency = useCallback(async (val: string) => {
+    setDigestFrequencyState(val);
+    if (!user) return;
+    await supabase
+      .from('profiles')
+      .update({ digest_frequency: val } as any)
       .eq('user_id', user.id);
   }, [user]);
 
@@ -386,6 +397,8 @@ export function useHolzen() {
     setSilentMode,
     cooldownHours,
     setCooldownHours,
+    digestFrequency,
+    setDigestFrequency,
     companionPrefs,
     setCompanionPref,
     btcData,

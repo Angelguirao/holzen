@@ -154,6 +154,7 @@ export type Database = {
           cooldown_hours: number
           created_at: string
           cumulative_threshold: number
+          digest_frequency: string
           email_notifications: boolean
           has_onboarded: boolean
           id: string
@@ -178,6 +179,7 @@ export type Database = {
           cooldown_hours?: number
           created_at?: string
           cumulative_threshold?: number
+          digest_frequency?: string
           email_notifications?: boolean
           has_onboarded?: boolean
           id?: string
@@ -202,6 +204,7 @@ export type Database = {
           cooldown_hours?: number
           created_at?: string
           cumulative_threshold?: number
+          digest_frequency?: string
           email_notifications?: boolean
           has_onboarded?: boolean
           id?: string
