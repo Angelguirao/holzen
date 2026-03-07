@@ -115,6 +115,12 @@ const Home = () => {
       {/* Night Reflection */}
       <NightReflectionCard />
 
+      {/* Letter to Future Self */}
+      <LetterToFutureSelf
+        currentPrice={btcData?.currentPrice ?? null}
+        changePercent={btcData?.changePercent ?? null}
+      />
+
       <Separator />
 
       {/* Subscription / trial gate */}
