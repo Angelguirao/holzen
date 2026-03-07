@@ -207,30 +207,18 @@ const Home = () => {
     );
   }
 
+  const unpinReflection = useCallback(() => {
+    localStorage.removeItem('holzen_pinned_reflection');
+    setPinnedReflection(null);
+  }, []);
+
   return (
     <div className="space-y-10">
       {/* BTC Status */}
       <BtcStatus data={btcData} error={error} hidden={priceHidden} onToggleHidden={togglePriceHidden} />
 
-      {/* 7-day chart */}
-      <BtcChart hidden={priceHidden} />
-
-      {/* Streaks & Stats */}
-      <HomeStreaks streakFreezeDates={streakFreezeDates} onUseFreeze={useStreakFreeze} />
-
-      {/* Holzen Score */}
-      <HolzenScoreCard />
-
       {/* Night Reflection */}
       <NightReflectionCard />
-
-      {/* Letter to Future Self */}
-      <LetterToFutureSelf
-        currentPrice={btcData?.currentPrice ?? null}
-        changePercent={btcData?.changePercent ?? null}
-      />
-
-      <Separator />
 
       {/* Auto-trigger cooldown countdown */}
       <AutoCooldownIndicator
@@ -245,14 +233,14 @@ const Home = () => {
             You've used all 3 free reflections. Subscribe to continue.
           </p>
           <p className="text-xs font-mono text-muted-foreground">
-            $3 per month. Cancel anytime.
+            $3 per month · Cancel anytime
           </p>
           <Button
             onClick={startCheckout}
             disabled={checkoutLoading}
             className="w-full font-mono text-xs"
           >
-            {checkoutLoading ? 'Opening checkout' : 'Subscribe'}
+            {checkoutLoading ? 'Opening checkout…' : 'Subscribe'}
           </Button>
         </div>
       ) : subLoading ? (
@@ -293,7 +281,7 @@ const Home = () => {
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Loader2 className="h-3 w-3 animate-spin" />
-                    <p className="text-xs font-mono">Generating reflection</p>
+                    <p className="text-xs font-mono">Generating reflection…</p>
                   </div>
                   <Skeleton className="h-4 w-full" />
                   <Skeleton className="h-4 w-3/4" />
@@ -313,11 +301,31 @@ const Home = () => {
                   </button>
                 </div>
               ) : (
-                <NeedAMomentButton
-                  onTrigger={handleNeedAMoment}
-                  cooldownRemaining={manualCooldownRemaining}
-                  loading={loading}
-                />
+                <div className="space-y-6">
+                  {/* Pinned reflection */}
+                  {pinnedReflection && (
+                    <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-1.5 text-muted-foreground">
+                          <Pin className="h-2.5 w-2.5" />
+                          <span className="text-[10px] font-mono uppercase tracking-wider">Pinned</span>
+                        </div>
+                        <button
+                          onClick={unpinReflection}
+                          className="text-[10px] font-mono text-muted-foreground/50 hover:text-foreground transition-colors"
+                        >
+                          Unpin
+                        </button>
+                      </div>
+                      <p className="text-sm leading-relaxed">{pinnedReflection.message}</p>
+                    </div>
+                  )}
+                  <NeedAMomentButton
+                    onTrigger={handleNeedAMoment}
+                    cooldownRemaining={manualCooldownRemaining}
+                    loading={loading}
+                  />
+                </div>
               )}
             </>
           )}
@@ -327,7 +335,7 @@ const Home = () => {
       <Separator />
 
       <p className="text-xs text-muted-foreground leading-relaxed">
-        When volatility crosses your threshold, you receive one message encouraging pause. Nothing more.
+        When volatility crosses your threshold, you'll receive one quiet prompt to pause. Nothing more.
       </p>
     </div>
   );
