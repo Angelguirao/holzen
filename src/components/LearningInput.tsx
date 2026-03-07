@@ -16,8 +16,10 @@ interface Props {
 }
 
 export function LearningInput({ title, body, nudge, nudgeLoading = false, nudgeError = false }: Props) {
-  const displayTitle = nudge?.title ?? (nudgeError ? title : '');
-  const displayBody = nudge?.body ?? (nudgeError ? body : '');
+  // If nudge data exists, use it. If nudge failed or no nudge system involved (History), fall back to static content.
+  const hasNudgeSystem = nudge !== undefined || nudgeLoading || nudgeError;
+  const displayTitle = nudge?.title ?? (!hasNudgeSystem || nudgeError ? title : '');
+  const displayBody = nudge?.body ?? (!hasNudgeSystem || nudgeError ? body : '');
 
   if (nudgeLoading) {
     return (
