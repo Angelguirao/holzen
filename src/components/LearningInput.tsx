@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { Loader2, ExternalLink } from 'lucide-react';
 
@@ -13,16 +13,22 @@ interface Props {
   title: string;
   body: string;
   context?: string | null;
+  reflectionId?: string | null;
   useGroundNudge?: boolean;
 }
 
-export function LearningInput({ title, body, context, useGroundNudge = true }: Props) {
+export function LearningInput({ title, body, context, reflectionId, useGroundNudge = true }: Props) {
   const [nudge, setNudge] = useState<NudgeData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(false);
+  const fetchedForRef = useRef<string | null>(null);
 
   useEffect(() => {
     if (!useGroundNudge) return;
+    // Only fetch once per reflection
+    const key = reflectionId ?? context ?? '';
+    if (fetchedForRef.current === key) return;
+    fetchedForRef.current = key;
 
     let cancelled = false;
     setLoading(true);
@@ -41,7 +47,7 @@ export function LearningInput({ title, body, context, useGroundNudge = true }: P
       });
 
     return () => { cancelled = true; };
-  }, [useGroundNudge, context]);
+  }, [useGroundNudge, context, reflectionId]);
 
   // Fallback to passed-in content if AI fails
   const displayTitle = nudge?.title ?? (error ? title : '');
