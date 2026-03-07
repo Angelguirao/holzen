@@ -59,7 +59,7 @@ const History = () => {
   const [letters, setLetters] = useState<Letter[]>([]);
   const [loading, setLoading] = useState(true);
   const [lettersLoading, setLettersLoading] = useState(true);
-  const [tab, setTab] = useState<'library' | 'letters' | 'insights'>('library');
+  const [tab, setTab] = useState<'reflections' | 'letters' | 'insights'>('reflections');
   const [filter, setFilter] = useState<'all' | 'favorites'>('all');
   const [tagFilter, setTagFilter] = useState<string | null>(null);
   const [search, setSearch] = useState('');
