@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, forwardRef } from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 
@@ -9,7 +9,7 @@ interface Props {
   onSetCumulative: (val: number) => void;
 }
 
-export function ThresholdSetting({ threshold, onSet, cumulativeThreshold, onSetCumulative }: Props) {
+export const ThresholdSetting = forwardRef<HTMLDivElement, Props>(function ThresholdSetting({ threshold, onSet, cumulativeThreshold, onSetCumulative }, ref) {
   const [value, setValue] = useState(threshold);
   const [cumValue, setCumValue] = useState(cumulativeThreshold);
 
@@ -18,7 +18,7 @@ export function ThresholdSetting({ threshold, onSet, cumulativeThreshold, onSetC
   useEffect(() => { setCumValue(cumulativeThreshold); }, [cumulativeThreshold]);
 
   return (
-    <div className="space-y-8">
+    <div ref={ref} className="space-y-8">
       {/* Daily threshold */}
       <div className="space-y-4">
         <div className="space-y-2">
@@ -88,4 +88,4 @@ export function ThresholdSetting({ threshold, onSet, cumulativeThreshold, onSetC
       </div>
     </div>
   );
-}
+});
