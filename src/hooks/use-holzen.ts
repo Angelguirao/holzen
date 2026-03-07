@@ -200,6 +200,8 @@ export function useHolzen() {
           last_context: ctx,
           last_trigger_at: new Date().toISOString(),
         }).eq('user_id', user.id);
+
+        setLastTriggerAt(new Date().toISOString());
       }
     } catch (e: any) {
       setError(e.message || 'Failed to generate message');
