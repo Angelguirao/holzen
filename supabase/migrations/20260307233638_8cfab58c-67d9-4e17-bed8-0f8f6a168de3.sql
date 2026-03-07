@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN night_reflection_hour integer NOT NULL DEFAULT 21;

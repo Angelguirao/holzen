@@ -63,7 +63,7 @@ serve(async (req) => {
     // 2. Get all users with timezone
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
-      .select("user_id, reflection_tone, timezone");
+      .select("user_id, reflection_tone, timezone, night_reflection_hour");
 
     if (profilesError) throw profilesError;
     if (!profiles || profiles.length === 0) {
@@ -78,7 +78,8 @@ serve(async (req) => {
       // Timezone-aware: only send if user's local time is 9 PM (21:00)
       const tz = (profile as any).timezone || "UTC";
       const localHour = getUserLocalHour(tz);
-      if (localHour !== 21) continue;
+      const targetHour = (profile as any).night_reflection_hour ?? 21;
+      if (localHour !== targetHour) continue;
 
       // Check if user had any reflections today (in their timezone)
       const today = new Date();
