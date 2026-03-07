@@ -9,6 +9,7 @@ import { InsightsPanel } from '@/components/InsightsPanel';
 import { MoodTrends } from '@/components/MoodTrends';
 import { BadgesPanel } from '@/components/BadgesPanel';
 import { ReferralSection } from '@/components/ReferralSection';
+import { MoodPriceChart } from '@/components/MoodPriceChart';
 import { useHolzenScore } from '@/hooks/use-holzen-score';
 import { HolzenScoreCard } from '@/components/HolzenScoreCard';
 import { toast } from 'sonner';
