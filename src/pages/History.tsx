@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { format, subDays, isAfter } from 'date-fns';
-import { X, Star, Search } from 'lucide-react';
+import { X, Star, Search, Pin } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ShareReflection } from '@/components/ShareReflection';
 import { ReflectionNote } from '@/components/ReflectionNote';
@@ -75,6 +75,17 @@ const History = () => {
       prev.map((r) => (r.id === id ? { ...r, is_favorite: newVal } : r))
     );
   }, [reflections]);
+
+  const pinReflection = useCallback((id: string) => {
+    const current = localStorage.getItem('holzen_pinned_reflection');
+    if (current === id) {
+      localStorage.removeItem('holzen_pinned_reflection');
+      toast('Reflection unpinned');
+    } else {
+      localStorage.setItem('holzen_pinned_reflection', id);
+      toast('Reflection pinned to Home');
+    }
+  }, []);
 
   const deleteReflection = useCallback(async (id: string) => {
     try {
@@ -230,6 +241,18 @@ const History = () => {
                   {r.context && ` — ${r.context}`}
                 </p>
                 <div className="flex items-center gap-1 shrink-0">
+                  <button
+                    onClick={() => pinReflection(r.id)}
+                    className={`p-1 transition-colors ${
+                      localStorage.getItem('holzen_pinned_reflection') === r.id
+                        ? 'text-primary'
+                        : 'text-muted-foreground/40 hover:text-foreground'
+                    }`}
+                    aria-label="Pin to Home"
+                    title="Pin to Home"
+                  >
+                    <Pin className={`h-3 w-3 ${localStorage.getItem('holzen_pinned_reflection') === r.id ? 'fill-current' : ''}`} />
+                  </button>
                   <button
                     onClick={() => toggleFavorite(r.id)}
                     className={`p-1 transition-colors ${r.is_favorite ? 'text-foreground' : 'text-muted-foreground/40 hover:text-foreground'}`}
