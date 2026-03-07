@@ -108,6 +108,9 @@ const Home = () => {
       {/* Streaks & Stats */}
       <HomeStreaks />
 
+      {/* Holzen Score */}
+      <HolzenScoreCard />
+
       {/* Night Reflection */}
       <NightReflectionCard />
 
