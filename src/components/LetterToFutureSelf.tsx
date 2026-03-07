@@ -33,6 +33,11 @@ const WRITING_PROMPTS = {
     "What would your grounded self tell your panicking self?",
     "Write what this moment has taught you.",
   ],
+  calm: [
+    "What would you tell yourself when the market panics?",
+    "What's true right now that fear will make you forget?",
+    "Write advice for the version of you that wants to sell everything.",
+  ],
 };
 
 // Wax seal SVG component
@@ -115,14 +120,22 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
   const [sending, setSending] = useState(false);
   const [sealPhase, setSealPhase] = useState<'idle' | 'sealing' | 'sealed'>('idle');
   const [loaded, setLoaded] = useState(false);
-
   const isCrash = changePercent !== null && changePercent <= -LETTER_THRESHOLD;
   const isATH = changePercent !== null && changePercent >= LETTER_THRESHOLD;
-  const canWrite = isCrash || isATH;
-  const writtenDuring = isCrash ? 'crash' : 'ath';
-  const deliverDuring = isCrash ? 'ath' : 'crash';
-  const prompts = isCrash ? WRITING_PROMPTS.crash : WRITING_PROMPTS.ath;
-  const randomPrompt = useMemo(() => prompts[Math.floor(Math.random() * prompts.length)], [isCrash]);
+  const isVolatile = isCrash || isATH;
+  const isCalm = !isVolatile;
+
+  // Auto-select mode based on market state
+  const effectiveMode = isVolatile ? 'storm' : 'calm';
+  const canWrite = isVolatile || (isCalm && currentPrice !== null);
+
+  const writtenDuring = effectiveMode === 'calm' ? 'calm' : (isCrash ? 'crash' : 'ath');
+  const deliverDuring = effectiveMode === 'calm' ? 'crash' : (isCrash ? 'ath' : 'crash');
+
+  const prompts = effectiveMode === 'calm'
+    ? WRITING_PROMPTS.calm
+    : (isCrash ? WRITING_PROMPTS.crash : WRITING_PROMPTS.ath);
+  const randomPrompt = useMemo(() => prompts[Math.floor(Math.random() * prompts.length)], [isCrash, effectiveMode]);
 
   useEffect(() => {
     if (!user) return;
@@ -178,7 +191,9 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
       }, 1200);
 
       toast('Letter sealed', {
-        description: deliverDuring === 'ath'
+        description: effectiveMode === 'calm'
+          ? 'Sealed in calm · Opens when the storm hits'
+          : deliverDuring === 'ath'
           ? 'Sealed in fear · Opens when confidence returns'
           : 'Sealed in euphoria · Opens when doubt arrives',
       });
@@ -194,6 +209,9 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
     p.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
 
   const getStatusCopy = (l: Letter) => {
+    if (l.written_during === 'calm') {
+      return 'Sealed in calm · Opens when the storm hits';
+    }
     if (l.written_during === 'crash') {
       return 'Sealed in fear · Opens when confidence returns';
     }
@@ -277,7 +295,9 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
                   >
                     <p className="text-sm font-mono text-foreground">Sealed.</p>
                     <p className="text-[10px] font-mono text-muted-foreground/50 max-w-[200px] leading-relaxed">
-                      {deliverDuring === 'ath'
+                      {effectiveMode === 'calm'
+                        ? 'This letter waits for the storm.'
+                        : deliverDuring === 'ath'
                         ? 'This letter waits for confidence.'
                         : 'This letter waits for doubt.'}
                     </p>
@@ -296,14 +316,18 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
           animate={{ opacity: 1, y: 0 }}
           className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3"
         >
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Mail className="h-3 w-3" />
-            <p className="text-[10px] font-mono tracking-widest uppercase">
-              Letter to future self
-            </p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Mail className="h-3 w-3" />
+              <p className="text-[10px] font-mono tracking-widest uppercase">
+                {effectiveMode === 'calm' ? 'Calm letter' : 'Storm letter'}
+              </p>
+            </div>
           </div>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            {isCrash
+            {effectiveMode === 'calm'
+              ? "The market is quiet. Write to your future self — this letter will arrive when volatility strikes."
+              : isCrash
               ? "The market is falling. Write something to yourself — you'll receive it during the next surge."
               : "The market is surging. Write something to yourself — you'll receive it during the next drop."}
           </p>
