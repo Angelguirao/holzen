@@ -13,6 +13,7 @@ import { ReflectionStats } from '@/components/ReflectionStats';
 import { ReflectionTags } from '@/components/ReflectionTags';
 import { HaikuDisplay } from '@/components/HaikuDisplay';
 import { LearningInput } from '@/components/LearningInput';
+import { BadgesPanel } from '@/components/BadgesPanel';
 import { toast } from 'sonner';
 import {
   AlertDialog,
