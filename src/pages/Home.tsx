@@ -257,7 +257,7 @@ function NeedAMomentButton({
       >
         <Pause className="h-3.5 w-3.5" />
         {loading ? 'Generating...' : inCooldown
-          ? `Available in ${minutes} min`
+          ? `Manual reflection in ${minutes} min`
           : 'I need a moment'}
       </Button>
       <p className="text-[10px] text-muted-foreground text-center leading-relaxed">
