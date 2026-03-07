@@ -41,6 +41,7 @@ export function useHolzen() {
         setMessage(data.last_message);
         setContext(data.last_context);
         setEmailNotificationsState(data.email_notifications ?? true);
+        setReflectionToneState((data as any).reflection_tone ?? 'stoic');
         setHasOnboarded(data.has_onboarded ?? false);
         setCompanionPrefsState({
           breathing: data.companion_breathing ?? true,
