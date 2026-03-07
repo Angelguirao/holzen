@@ -349,7 +349,7 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
             </Button>
           </div>
         </motion.div>
-      ) : isCalm && !canWriteCalm ? (
+      ) : pendingLetters.length > 0 ? (
         /* Sealed letters — completely opaque, no peeking */
         <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-4">
           <div className="flex items-center gap-2.5 text-muted-foreground">
