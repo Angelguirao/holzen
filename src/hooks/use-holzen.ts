@@ -230,7 +230,10 @@ export function useHolzen() {
   }, [user, threshold, cumulativeThreshold, isInCooldown, generateMessage]);
 
   const [lastTriggerAt, setLastTriggerAt] = useState<string | null>(null);
-  const [lastManualAt, setLastManualAt] = useState<number | null>(null);
+  const [lastManualAt, setLastManualAt] = useState<number | null>(() => {
+    const stored = localStorage.getItem('holzen_last_manual_at');
+    return stored ? Number(stored) : null;
+  });
 
   const manualCooldownRemaining = useCallback(() => {
     if (!lastManualAt) return 0;
