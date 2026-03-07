@@ -37,7 +37,7 @@ export const Changelog = forwardRef<HTMLDivElement, object>(function Changelog(_
   }, [open]);
 
   return (
-    <>
+    <div ref={ref}>
       <button
         onClick={() => setOpen(true)}
         className="text-xs font-mono text-muted-foreground underline"
