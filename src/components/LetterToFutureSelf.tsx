@@ -318,14 +318,30 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
           animate={{ opacity: 1, y: 0 }}
           className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3"
         >
-          <div className="flex items-center gap-2 text-muted-foreground">
-            <Mail className="h-3 w-3" />
-            <p className="text-[10px] font-mono tracking-widest uppercase">
-              Letter to future self
-            </p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Mail className="h-3 w-3" />
+              <p className="text-[10px] font-mono tracking-widest uppercase">
+                {mode === 'calm' ? 'Calm letter' : 'Storm letter'}
+              </p>
+            </div>
+            {isCalm && (
+              <div className="flex rounded bg-muted/50 p-0.5">
+                <button
+                  onClick={() => setMode('calm')}
+                  className={`text-[10px] font-mono px-2 py-0.5 rounded transition-colors ${
+                    mode === 'calm' ? 'bg-primary/20 text-primary' : 'text-muted-foreground/50 hover:text-muted-foreground'
+                  }`}
+                >
+                  Calm
+                </button>
+              </div>
+            )}
           </div>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            {isCrash
+            {mode === 'calm'
+              ? "The market is quiet. Write to your future self — this letter will arrive when volatility strikes."
+              : isCrash
               ? "The market is falling. Write something to yourself — you'll receive it during the next surge."
               : "The market is surging. Write something to yourself — you'll receive it during the next drop."}
           </p>
@@ -349,7 +365,7 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
             </Button>
           </div>
         </motion.div>
-      ) : pendingLetters.length > 0 ? (
+      ) : isCalm && !canWriteCalm ? (
         /* Sealed letters — completely opaque, no peeking */
         <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-4">
           <div className="flex items-center gap-2.5 text-muted-foreground">
