@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { format } from 'date-fns';
-import { X, Star, Search } from 'lucide-react';
+import { X, Star, Search, Mail, Lock, Clock, Trash2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ShareReflection } from '@/components/ShareReflection';
 import { ReflectionNote } from '@/components/ReflectionNote';
@@ -41,11 +41,25 @@ interface Reflection {
   tags: string[];
 }
 
+interface Letter {
+  id: string;
+  body: string;
+  written_during: string;
+  deliver_during: string;
+  btc_price_at_write: number;
+  written_at: string;
+  delivered: boolean;
+  delivered_at: string | null;
+  btc_price_at_delivery: number | null;
+}
+
 const History = () => {
   const { user } = useAuth();
   const [reflections, setReflections] = useState<Reflection[]>([]);
+  const [letters, setLetters] = useState<Letter[]>([]);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<'library' | 'insights'>('library');
+  const [lettersLoading, setLettersLoading] = useState(true);
+  const [tab, setTab] = useState<'library' | 'letters' | 'insights'>('library');
   const [filter, setFilter] = useState<'all' | 'favorites'>('all');
   const [tagFilter, setTagFilter] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -57,18 +71,27 @@ const History = () => {
 
   useEffect(() => {
     if (!user) return;
-    const load = async () => {
+    const loadReflections = async () => {
       const { data } = await supabase
         .from('reflections')
         .select('id, message, context, created_at, is_favorite, haiku, learning_title, learning_body, note, mood, outcome, tags')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(100);
-
       setReflections((data as unknown as Reflection[]) ?? []);
       setLoading(false);
     };
-    load();
+    const loadLetters = async () => {
+      const { data } = await supabase
+        .from('future_letters')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('written_at', { ascending: false });
+      setLetters((data as unknown as Letter[]) ?? []);
+      setLettersLoading(false);
+    };
+    loadReflections();
+    loadLetters();
   }, [user]);
 
   const toggleFavorite = useCallback(async (id: string) => {
@@ -87,6 +110,16 @@ const History = () => {
       setReflections((prev) => prev.filter((r) => r.id !== id));
     } catch {
       toast('Failed to delete reflection');
+    }
+  }, []);
+
+  const deleteLetter = useCallback(async (id: string) => {
+    try {
+      await supabase.from('future_letters').delete().eq('id', id);
+      setLetters((prev) => prev.filter((l) => l.id !== id));
+      toast('Letter deleted');
+    } catch {
+      toast('Failed to delete letter');
     }
   }, []);
 
@@ -110,6 +143,12 @@ const History = () => {
     return result;
   }, [reflections, filter, tagFilter, search]);
 
+  const pendingLetters = useMemo(() => letters.filter((l) => !l.delivered), [letters]);
+  const deliveredLetters = useMemo(() => letters.filter((l) => l.delivered), [letters]);
+
+  const fmtPrice = (p: number) =>
+    p.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+
   return (
     <div className="space-y-6">
       {/* Header with tabs */}
@@ -124,6 +163,19 @@ const History = () => {
             Library
           </button>
           <button
+            onClick={() => setTab('letters')}
+            className={`text-sm font-mono tracking-widest uppercase transition-colors ${
+              tab === 'letters' ? 'text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
+            }`}
+          >
+            Letters
+            {pendingLetters.length > 0 && (
+              <span className="ml-1.5 text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">
+                {pendingLetters.length}
+              </span>
+            )}
+          </button>
+          <button
             onClick={() => setTab('insights')}
             className={`text-sm font-mono tracking-widest uppercase transition-colors ${
               tab === 'insights' ? 'text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
@@ -133,11 +185,139 @@ const History = () => {
           </button>
         </div>
         <p className="text-xs text-muted-foreground">
-          {reflections.length} reflection{reflections.length !== 1 ? 's' : ''} total
+          {tab === 'letters'
+            ? `${letters.length} letter${letters.length !== 1 ? 's' : ''} total`
+            : `${reflections.length} reflection${reflections.length !== 1 ? 's' : ''} total`}
         </p>
       </div>
 
-      {tab === 'insights' ? (
+      {tab === 'letters' ? (
+        /* Letters Tab */
+        lettersLoading ? (
+          <div className="space-y-3">
+            <Skeleton className="h-20 w-full rounded-md" />
+            <Skeleton className="h-20 w-full rounded-md" />
+          </div>
+        ) : letters.length === 0 ? (
+          <div className="py-8 text-center space-y-2">
+            <Mail className="h-5 w-5 mx-auto text-muted-foreground/40" />
+            <p className="text-xs text-muted-foreground">
+              No letters yet. Write one during a ±5% market swing from the home page.
+            </p>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {/* Sealed / Pending */}
+            {pendingLetters.length > 0 && (
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Lock className="h-3 w-3" />
+                  <p className="text-[10px] font-mono tracking-widest uppercase">
+                    Sealed ({pendingLetters.length})
+                  </p>
+                </div>
+                {pendingLetters.map((l) => (
+                  <div key={l.id} className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-2 text-[10px] font-mono text-muted-foreground">
+                        <Clock className="h-2.5 w-2.5" />
+                        <span>
+                          Written {format(new Date(l.written_at), 'MMM d, yyyy')} during{' '}
+                          {l.written_during === 'crash' ? 'a drop' : 'a surge'} at{' '}
+                          {fmtPrice(l.btc_price_at_write)}
+                        </span>
+                      </div>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <button className="shrink-0 text-muted-foreground/40 hover:text-foreground transition-colors p-1" aria-label="Delete letter">
+                            <Trash2 className="h-3 w-3" />
+                          </button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle className="font-mono text-sm">Delete sealed letter</AlertDialogTitle>
+                            <AlertDialogDescription className="text-xs">
+                              This will permanently delete this letter. It will never be delivered. This cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel className="font-mono text-xs">Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => deleteLetter(l.id)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 font-mono text-xs"
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                    <p className="text-xs text-muted-foreground/50">
+                      Delivers during next {l.deliver_during === 'ath' ? 'surge' : 'drop'}
+                    </p>
+                    <p className="text-sm leading-relaxed blur-sm hover:blur-none transition-all duration-300 cursor-pointer select-none" title="Hover to peek">
+                      {l.body}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Delivered */}
+            {deliveredLetters.length > 0 && (
+              <div className="space-y-3">
+                <div className="flex items-center gap-2 text-muted-foreground">
+                  <Mail className="h-3 w-3" />
+                  <p className="text-[10px] font-mono tracking-widest uppercase">
+                    Delivered ({deliveredLetters.length})
+                  </p>
+                </div>
+                {deliveredLetters.map((l) => (
+                  <div key={l.id} className="rounded-md border border-primary/20 bg-primary/5 px-4 py-3 space-y-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <Mail className="h-3 w-3 text-primary" />
+                        <p className="text-[10px] font-mono text-primary uppercase tracking-wider">
+                          Delivered {l.delivered_at ? format(new Date(l.delivered_at), 'MMM d, yyyy') : ''}
+                        </p>
+                      </div>
+                      <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                          <button className="shrink-0 text-muted-foreground/40 hover:text-foreground transition-colors p-1" aria-label="Delete letter">
+                            <Trash2 className="h-3 w-3" />
+                          </button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                          <AlertDialogHeader>
+                            <AlertDialogTitle className="font-mono text-sm">Delete delivered letter</AlertDialogTitle>
+                            <AlertDialogDescription className="text-xs">
+                              This will permanently delete this letter. This cannot be undone.
+                            </AlertDialogDescription>
+                          </AlertDialogHeader>
+                          <AlertDialogFooter>
+                            <AlertDialogCancel className="font-mono text-xs">Cancel</AlertDialogCancel>
+                            <AlertDialogAction
+                              onClick={() => deleteLetter(l.id)}
+                              className="bg-destructive text-destructive-foreground hover:bg-destructive/90 font-mono text-xs"
+                            >
+                              Delete
+                            </AlertDialogAction>
+                          </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </div>
+                    <p className="text-sm leading-relaxed">{l.body}</p>
+                    <p className="text-[10px] font-mono text-muted-foreground/50">
+                      Written {format(new Date(l.written_at), 'MMM d, yyyy')} at {fmtPrice(l.btc_price_at_write)}
+                      {l.btc_price_at_delivery && ` · Delivered at ${fmtPrice(l.btc_price_at_delivery)}`}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )
+      ) : tab === 'insights' ? (
         /* Insights Tab */
         loading ? (
           <div className="space-y-3">
