@@ -107,6 +107,9 @@ const Home = () => {
       {/* Streaks & Stats */}
       <HomeStreaks />
 
+      {/* Night Reflection */}
+      <NightReflectionCard />
+
       <Separator />
 
       {/* Subscription / trial gate */}
