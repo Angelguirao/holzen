@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/button';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import { AlertCircle, Loader2, Pause } from 'lucide-react';
+import { AlertCircle, Loader2, Pause, Timer } from 'lucide-react';
 
 const Home = () => {
   const { subscribed, loading: subLoading, trialRemaining, checkoutLoading, startCheckout, refresh } = useSubscription();
