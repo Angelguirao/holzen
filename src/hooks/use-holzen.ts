@@ -21,6 +21,7 @@ export function useHolzen() {
   const [reflectionStyle, setReflectionStyleState] = useState('standard');
   const [quietHoursStart, setQuietHoursStartState] = useState<number | null>(null);
   const [quietHoursEnd, setQuietHoursEndState] = useState<number | null>(null);
+  const [firstName, setFirstNameState] = useState<string | null>(null);
   const [btcData, setBtcData] = useState<BtcPriceData | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [context, setContext] = useState<string | null>(null);
