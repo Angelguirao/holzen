@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { Separator } from '@/components/ui/separator';
+import { PageMeta } from '@/components/PageMeta';
 
 const Terms = () => {
   const navigate = useNavigate();
