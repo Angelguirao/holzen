@@ -230,7 +230,10 @@ export function useHolzen() {
   }, [user, threshold, cumulativeThreshold, isInCooldown, generateMessage]);
 
   const [lastTriggerAt, setLastTriggerAt] = useState<string | null>(null);
-  const [lastManualAt, setLastManualAt] = useState<number | null>(null);
+  const [lastManualAt, setLastManualAt] = useState<number | null>(() => {
+    const stored = localStorage.getItem('holzen_last_manual_at');
+    return stored ? Number(stored) : null;
+  });
 
   const manualCooldownRemaining = useCallback(() => {
     if (!lastManualAt) return 0;
@@ -249,7 +252,9 @@ export function useHolzen() {
     const remaining = manualCooldownRemaining();
     if (remaining > 0) return;
 
-    setLastManualAt(Date.now());
+    const now = Date.now();
+    setLastManualAt(now);
+    localStorage.setItem('holzen_last_manual_at', String(now));
     try {
       const data = btcData || await fetchBtcData();
       if (!btcData) setBtcData(data);
