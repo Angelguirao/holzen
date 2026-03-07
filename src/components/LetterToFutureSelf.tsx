@@ -22,6 +22,7 @@ interface Letter {
 interface Props {
   currentPrice: number | null;
   changePercent: number | null;
+  threshold?: number;
 }
 
 export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
