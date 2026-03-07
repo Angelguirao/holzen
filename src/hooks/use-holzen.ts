@@ -447,6 +447,12 @@ export function useHolzen() {
       if (!user) return;
       await supabase.from('profiles').update({ quiet_hours_start: start, quiet_hours_end: end } as any).eq('user_id', user.id);
     },
+    nightReflectionHour,
+    setNightReflectionHour: async (val: number) => {
+      setNightReflectionHourState(val);
+      if (!user) return;
+      await supabase.from('profiles').update({ night_reflection_hour: val } as any).eq('user_id', user.id);
+    },
     firstName,
     setFirstName: async (val: string | null) => {
       setFirstNameState(val);
