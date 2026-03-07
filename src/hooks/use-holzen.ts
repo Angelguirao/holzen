@@ -346,6 +346,8 @@ export function useHolzen() {
     setEmailNotifications,
     reflectionTone,
     setReflectionTone,
+    silentMode,
+    setSilentMode,
     cooldownHours,
     setCooldownHours,
     companionPrefs,
