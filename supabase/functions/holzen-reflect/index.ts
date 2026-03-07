@@ -19,7 +19,7 @@ serve(async (req) => {
   }
 
   try {
-    const { context, tone } = await req.json();
+    const { context, tone, customPrompt } = await req.json();
     if (!context) {
       return new Response(JSON.stringify({ error: "Missing context" }), {
         status: 400,
