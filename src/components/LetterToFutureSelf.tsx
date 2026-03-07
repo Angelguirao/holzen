@@ -211,6 +211,9 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
     p.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
 
   const getStatusCopy = (l: Letter) => {
+    if (l.written_during === 'calm') {
+      return 'Sealed in calm · Opens when the storm hits';
+    }
     if (l.written_during === 'crash') {
       return 'Sealed in fear · Opens when confidence returns';
     }
