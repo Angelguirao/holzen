@@ -343,8 +343,8 @@ const Home = () => {
       {/* Letter to Future Self */}
       {hasAccess && btcData && (
         <LetterToFutureSelf
-          currentPrice={btcData.price}
-          changePercent={btcData.change24h}
+          currentPrice={btcData.currentPrice}
+          changePercent={btcData.changePercent}
         />
       )}
 
