@@ -41,6 +41,7 @@ serve(async (req) => {
     }
 
     const toneInstruction = TONE_INSTRUCTIONS[tone] || TONE_INSTRUCTIONS.stoic;
+    const styleInstruction = STYLE_INSTRUCTIONS[style] || STYLE_INSTRUCTIONS.standard;
 
     const systemPrompt = `You generate a reflection with optional companions in response to Bitcoin volatility.
 
