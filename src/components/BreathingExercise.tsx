@@ -104,6 +104,7 @@ export function BreathingExercise({ severity = 'mild', onComplete }: Props) {
             if (nextCycle >= totalCycles) {
               setActive(false);
               setCompleted(true);
+              onComplete?.();
               return 0;
             }
             setCycle(nextCycle);
