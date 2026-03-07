@@ -53,7 +53,7 @@ Reflection rules:
 - Encourage pause and reflection. Preserve agency: never say "you should".
 - No reassurance, excitement, urgency, trading advice, lists, disclaimers.
 - No exclamation marks, emojis, motivational language, reward language.
-- Just one quiet prompt for reflection.
+- Just one quiet prompt for reflection.${customPrompt ? `\n\nUser's personal reflection guidance: "${customPrompt}"` : ''}
 
 Haiku rules:
 - Exactly 3 lines separated by newlines.
