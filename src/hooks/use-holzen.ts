@@ -150,6 +150,9 @@ export function useHolzen() {
       const cumDir = data.cumulativeDirection === 'down' ? 'down' : 'up';
       ctx += ` Over 7 days, it's ${cumDir} ${Math.abs(data.cumulativeChangePercent).toFixed(1)}%.`;
     }
+    if (data.fearGreed) {
+      ctx += ` Market sentiment: ${data.fearGreed.label} (${data.fearGreed.value}/100).`;
+    }
 
     setLoading(true);
     setError(null);
