@@ -174,6 +174,7 @@ export type Database = {
           streak_freeze_dates: string[]
           threshold: number
           threshold_down: number
+          timezone: string | null
           updated_at: string
           user_id: string
         }
@@ -204,6 +205,7 @@ export type Database = {
           streak_freeze_dates?: string[]
           threshold?: number
           threshold_down?: number
+          timezone?: string | null
           updated_at?: string
           user_id: string
         }
@@ -234,6 +236,7 @@ export type Database = {
           streak_freeze_dates?: string[]
           threshold?: number
           threshold_down?: number
+          timezone?: string | null
           updated_at?: string
           user_id?: string
         }
