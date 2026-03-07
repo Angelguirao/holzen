@@ -293,4 +293,58 @@ const History = () => {
   );
 };
 
+function InsightsWithScore({ reflections }: { reflections: { created_at: string; mood: string | null; outcome: string | null; message: string; context: string | null; is_favorite: boolean; haiku: string | null; learning_title: string | null; learning_body: string | null; note: string | null; tags: string[]; id: string }[] }) {
+  const scoreData = useHolzenScore(reflections);
+
+  return (
+    <div className="space-y-5">
+      <ReflectionStats reflections={reflections} />
+      {scoreData && <HolzenScoreDetail scoreData={scoreData} />}
+      <MoodTrends reflections={reflections} />
+      <InsightsPanel reflections={reflections} />
+    </div>
+  );
+}
+
+function HolzenScoreDetail({ scoreData }: { scoreData: import('@/hooks/use-holzen-score').HolzenScoreData }) {
+  const circumference = 2 * Math.PI * 36;
+  const offset = circumference - (scoreData.score / 100) * circumference;
+
+  return (
+    <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3">
+      <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">Holzen Score</p>
+      <div className="flex items-center gap-5">
+        <div className="relative shrink-0">
+          <svg width="88" height="88" viewBox="0 0 88 88">
+            <circle cx="44" cy="44" r="36" fill="none" stroke="hsl(var(--border))" strokeWidth="4" opacity="0.3" />
+            <circle cx="44" cy="44" r="36" fill="none" stroke="hsl(var(--primary))" strokeWidth="4" strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={offset} transform="rotate(-90 44 44)" className="transition-all duration-1000 ease-out" />
+          </svg>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="text-xl font-mono font-medium">{scoreData.score}</span>
+          </div>
+        </div>
+        <div className="space-y-2 flex-1 min-w-0">
+          <ScoreBarInline label="Mood" value={scoreData.moodScore} />
+          <ScoreBarInline label="Actions" value={scoreData.outcomeScore} />
+          <ScoreBarInline label="Streak" value={scoreData.streakScore} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ScoreBarInline({ label, value }: { label: string; value: number }) {
+  return (
+    <div className="space-y-0.5">
+      <div className="flex justify-between text-[10px] font-mono text-muted-foreground">
+        <span>{label}</span>
+        <span>{value}</span>
+      </div>
+      <div className="h-1 rounded-full bg-muted/50 overflow-hidden">
+        <div className="h-full rounded-full bg-primary/60 transition-all duration-700 ease-out" style={{ width: `${value}%` }} />
+      </div>
+    </div>
+  );
+}
+
 export default History;
