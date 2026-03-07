@@ -33,15 +33,9 @@ const BlogPost = () => {
     enabled: !!slug,
   });
 
-  // Update page title
-  useEffect(() => {
-    if (post?.title) {
-      document.title = `${post.title} — Holzen`;
-    }
-    return () => {
-      document.title = 'Holzen — Pause before you act';
-    };
-  }, [post?.title]);
+  const postTitle = post?.title ? `${post.title} — Holzen Blog` : 'Holzen Blog';
+  const postDesc = post?.excerpt || 'Read this article on the Holzen blog.';
+  const postPath = slug ? `/blog/${slug}` : '/blog';
 
   return (
     <div className="min-h-screen flex items-start justify-center px-6 py-16">
