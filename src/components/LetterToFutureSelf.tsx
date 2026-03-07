@@ -165,7 +165,7 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
             <p className="text-[10px] font-mono tracking-widest uppercase">Letter to future self</p>
           </div>
           <p className="text-xs text-muted-foreground/60 leading-relaxed">
-            When BTC moves ±{threshold}% or more, you can write a letter to your future self. It will be sealed and delivered when the market flips.
+            When BTC moves ±{LETTER_THRESHOLD}% or more, you can write a letter to your future self. It will be sealed and delivered when the market flips.
           </p>
         </div>
       )}
