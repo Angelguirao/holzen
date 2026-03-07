@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
+import { PageMeta } from '@/components/PageMeta';
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 14 },
