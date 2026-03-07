@@ -32,7 +32,7 @@ const APP_VERSION = '1.2.0';
 
 const Settings = () => {
   const { user, signOut } = useAuth();
-  const { threshold, setThreshold, cumulativeThreshold, setCumulativeThreshold, emailNotifications, setEmailNotifications, companionPrefs, setCompanionPref, reflectionTone, setReflectionTone, cooldownHours, setCooldownHours } = useHolzen();
+  const { threshold, setThreshold, cumulativeThreshold, setCumulativeThreshold, emailNotifications, setEmailNotifications, companionPrefs, setCompanionPref, reflectionTone, setReflectionTone, cooldownHours, setCooldownHours, profileLoaded } = useHolzen();
   const { subscribed, loading: subLoading, checkoutLoading, startCheckout, openPortal, trialRemaining } = useSubscription();
   const { theme, setTheme } = useTheme();
   const { canInstall, install } = useInstallPrompt();
