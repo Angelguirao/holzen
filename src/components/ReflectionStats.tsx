@@ -72,7 +72,15 @@ export function ReflectionStats({ reflections, streakFreezeDates = [], onUseFree
     });
     const freezeAvailable = recentFreezes.length < 1;
 
-    return { total: reflections.length, currentStreak: current, longestStreak: longest, streakAtRisk: atRisk, canFreeze: freezeAvailable };
+    // Next freeze available date
+    let nextFreezeAvailable: string | null = null;
+    if (!freezeAvailable && recentFreezes.length > 0) {
+      const latestFreeze = recentFreezes.sort().reverse()[0];
+      const nextDate = new Date(new Date(latestFreeze).getTime() + 7 * 24 * 60 * 60 * 1000);
+      nextFreezeAvailable = formatDistanceToNow(nextDate, { addSuffix: true });
+    }
+
+    return { total: reflections.length, currentStreak: current, longestStreak: longest, streakAtRisk: atRisk, canFreeze: freezeAvailable, nextFreezeAvailable };
   }, [reflections, streakFreezeDates]);
 
   const handleFreeze = async () => {
