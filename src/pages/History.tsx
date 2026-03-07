@@ -65,7 +65,7 @@ const History = () => {
   const [search, setSearch] = useState('');
 
   useEffect(() => {
-    document.title = 'Holzen — Library';
+    document.title = 'Holzen — Reflections';
     return () => { document.title = 'Holzen — Pause before you act'; };
   }, []);
 
