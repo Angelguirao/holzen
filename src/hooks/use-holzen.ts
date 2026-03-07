@@ -237,6 +237,13 @@ export function useHolzen() {
     return Math.max(0, MANUAL_COOLDOWN_MS - elapsed);
   }, [lastManualAt]);
 
+  const autoCooldownRemaining = useCallback(() => {
+    if (!lastTriggerAt) return 0;
+    const cooldownMs = cooldownHours * 60 * 60 * 1000;
+    const elapsed = Date.now() - new Date(lastTriggerAt).getTime();
+    return Math.max(0, cooldownMs - elapsed);
+  }, [lastTriggerAt, cooldownHours]);
+
   const manualTrigger = useCallback(async (mood?: string) => {
     const remaining = manualCooldownRemaining();
     if (remaining > 0) return;
