@@ -120,7 +120,7 @@ const Home = () => {
       <BtcChart hidden={priceHidden} />
 
       {/* Streaks & Stats */}
-      <HomeStreaks />
+      <HomeStreaks streakFreezeDates={streakFreezeDates} onUseFreeze={useStreakFreeze} />
 
       {/* Holzen Score */}
       <HolzenScoreCard />
