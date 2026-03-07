@@ -239,7 +239,7 @@ serve(async (req) => {
     // 2. Get all profiles - we need to check both thresholds
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
-      .select("user_id, threshold, cumulative_threshold, email_notifications, last_trigger_at, cooldown_hours");
+      .select("user_id, threshold, cumulative_threshold, email_notifications, last_trigger_at, cooldown_hours, reflection_tone, companion_haiku, companion_learning");
 
     if (profilesError) throw profilesError;
     if (!profiles || profiles.length === 0) {
