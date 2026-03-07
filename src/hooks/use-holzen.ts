@@ -38,6 +38,7 @@ export function useHolzen() {
       if (data) {
         setThresholdState(data.threshold);
         setCumulativeThresholdState(data.cumulative_threshold ?? 15);
+        setLastTriggerAt((data as any).last_trigger_at ?? null);
         setMessage(data.last_message);
         setContext(data.last_context);
         setEmailNotificationsState(data.email_notifications ?? true);
