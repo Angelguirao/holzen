@@ -52,6 +52,14 @@ export function BtcStatus({ data, error }: Props) {
     maximumFractionDigits: 0,
   });
 
+  const fearGreedColor = data.fearGreed
+    ? data.fearGreed.value <= 25 ? 'text-destructive'
+      : data.fearGreed.value <= 45 ? 'text-orange-500'
+      : data.fearGreed.value <= 55 ? 'text-muted-foreground'
+      : data.fearGreed.value <= 75 ? 'text-chart-2'
+      : 'text-primary'
+    : '';
+
   return (
     <div className="space-y-1">
       <div className="flex items-center justify-between">
@@ -72,9 +80,16 @@ export function BtcStatus({ data, error }: Props) {
       ) : (
         <>
           <p className="text-2xl font-mono tracking-tight">{price}</p>
-          <p className="text-sm font-mono text-muted-foreground">
-            {dir}{pct}% in 24h
-          </p>
+          <div className="flex items-center gap-3">
+            <p className="text-sm font-mono text-muted-foreground">
+              {dir}{pct}% in 24h
+            </p>
+            {data.fearGreed && (
+              <p className={`text-[10px] font-mono ${fearGreedColor}`}>
+                {data.fearGreed.value} · {data.fearGreed.label}
+              </p>
+            )}
+          </div>
         </>
       )}
     </div>
