@@ -13,6 +13,7 @@ import { ReflectionStats } from '@/components/ReflectionStats';
 import { ReflectionTags } from '@/components/ReflectionTags';
 import { HaikuDisplay } from '@/components/HaikuDisplay';
 import { LearningInput } from '@/components/LearningInput';
+import { BadgesPanel } from '@/components/BadgesPanel';
 import { toast } from 'sonner';
 import {
   AlertDialog,
@@ -59,7 +60,7 @@ const History = () => {
   const [letters, setLetters] = useState<Letter[]>([]);
   const [loading, setLoading] = useState(true);
   const [lettersLoading, setLettersLoading] = useState(true);
-  const [tab, setTab] = useState<'reflections' | 'letters' | 'insights'>('reflections');
+  const [tab, setTab] = useState<'reflections' | 'letters' | 'insights' | 'badges'>('reflections');
   const [filter, setFilter] = useState<'all' | 'favorites'>('all');
   const [tagFilter, setTagFilter] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -183,11 +184,21 @@ const History = () => {
           >
             Insights
           </button>
+          <button
+            onClick={() => setTab('badges')}
+            className={`text-sm font-mono tracking-widest uppercase transition-colors ${
+              tab === 'badges' ? 'text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
+            }`}
+          >
+            Badges
+          </button>
         </div>
         <p className="text-xs text-muted-foreground">
           {tab === 'letters'
             ? `${letters.length} letter${letters.length !== 1 ? 's' : ''} total`
-            : `${reflections.length} reflection${reflections.length !== 1 ? 's' : ''} total`}
+            : tab === 'badges'
+              ? 'Visual milestones for your practice'
+              : `${reflections.length} reflection${reflections.length !== 1 ? 's' : ''} total`}
         </p>
       </div>
 
@@ -329,6 +340,15 @@ const History = () => {
           </p>
         ) : (
           <InsightsWithScore reflections={reflections} />
+        )
+      ) : tab === 'badges' ? (
+        /* Badges Tab */
+        loading ? (
+          <div className="space-y-3">
+            <Skeleton className="h-40 w-full rounded-md" />
+          </div>
+        ) : (
+          <BadgesPanel reflections={reflections} />
         )
       ) : (
         /* Library Tab */
