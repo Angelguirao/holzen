@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN reflection_tone text NOT NULL DEFAULT 'stoic';
