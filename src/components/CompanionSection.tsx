@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { BreathingExercise } from './BreathingExercise';
 import { HaikuDisplay } from './HaikuDisplay';
 import { LearningInput } from './LearningInput';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Check } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 export interface CompanionData {
   haiku: string | null;
@@ -16,21 +17,30 @@ export interface CompanionPrefs {
   learning: boolean;
 }
 
+interface CompletionState {
+  breathing: boolean;
+  haiku: boolean;
+  learning: boolean;
+}
+
 interface Props {
   companions: CompanionData;
   prefs: CompanionPrefs;
   severity?: 'mild' | 'moderate' | 'high';
+  reflectionId?: string | null;
 }
 
 function CollapsibleCompanion({
   label,
   expanded,
   onToggle,
+  completed,
   children,
 }: {
   label: string;
   expanded: boolean;
   onToggle: () => void;
+  completed?: boolean;
   children: React.ReactNode;
 }) {
   return (
@@ -39,10 +49,14 @@ function CollapsibleCompanion({
         onClick={onToggle}
         className="flex items-center gap-1.5 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors w-full text-left"
       >
-        <ChevronDown
-          className={`h-3 w-3 shrink-0 transition-transform duration-200 ${expanded ? 'rotate-0' : '-rotate-90'}`}
-        />
-        {label}
+        {completed ? (
+          <Check className="h-3 w-3 shrink-0 text-primary" />
+        ) : (
+          <ChevronDown
+            className={`h-3 w-3 shrink-0 transition-transform duration-200 ${expanded ? 'rotate-0' : '-rotate-90'}`}
+          />
+        )}
+        <span className={completed ? 'text-muted-foreground/50' : ''}>{label}</span>
       </button>
       {expanded && (
         <div className="animate-fade-in mt-2 ml-4.5">
@@ -53,10 +67,27 @@ function CollapsibleCompanion({
   );
 }
 
-export function CompanionSection({ companions, prefs, severity = 'mild' }: Props) {
+export function CompanionSection({ companions, prefs, severity = 'mild', reflectionId }: Props) {
   const [expandedBreathing, setExpandedBreathing] = useState(false);
   const [expandedHaiku, setExpandedHaiku] = useState(false);
   const [expandedLearning, setExpandedLearning] = useState(false);
+  const [completion, setCompletion] = useState<CompletionState>({
+    breathing: false,
+    haiku: false,
+    learning: false,
+  });
+
+  const markCompleted = useCallback(async (key: keyof CompletionState) => {
+    if (completion[key]) return;
+    setCompletion((prev) => ({ ...prev, [key]: true }));
+    if (reflectionId) {
+      const dbKey = key === 'breathing' ? 'breathing_completed' : key === 'haiku' ? 'haiku_read' : 'learning_read';
+      await supabase
+        .from('reflections')
+        .update({ [dbKey]: true } as any)
+        .eq('id', reflectionId);
+    }
+  }, [reflectionId, completion]);
 
   const hasBreathing = prefs.breathing;
   const hasHaiku = prefs.haiku && companions.haiku;
@@ -75,8 +106,9 @@ export function CompanionSection({ companions, prefs, severity = 'mild' }: Props
           label="Breathe with this"
           expanded={expandedBreathing}
           onToggle={() => setExpandedBreathing((v) => !v)}
+          completed={completion.breathing}
         >
-          <BreathingExercise severity={severity} />
+          <BreathingExercise severity={severity} onComplete={() => markCompleted('breathing')} />
         </CollapsibleCompanion>
       )}
 
@@ -84,7 +116,11 @@ export function CompanionSection({ companions, prefs, severity = 'mild' }: Props
         <CollapsibleCompanion
           label="Read as haiku"
           expanded={expandedHaiku}
-          onToggle={() => setExpandedHaiku((v) => !v)}
+          onToggle={() => {
+            setExpandedHaiku((v) => !v);
+            if (!completion.haiku) markCompleted('haiku');
+          }}
+          completed={completion.haiku}
         >
           <HaikuDisplay haiku={companions.haiku!} />
         </CollapsibleCompanion>
@@ -94,7 +130,11 @@ export function CompanionSection({ companions, prefs, severity = 'mild' }: Props
         <CollapsibleCompanion
           label="Learn from history"
           expanded={expandedLearning}
-          onToggle={() => setExpandedLearning((v) => !v)}
+          onToggle={() => {
+            setExpandedLearning((v) => !v);
+            if (!completion.learning) markCompleted('learning');
+          }}
+          completed={completion.learning}
         >
           <LearningInput title={companions.learningTitle!} body={companions.learningBody!} />
         </CollapsibleCompanion>
