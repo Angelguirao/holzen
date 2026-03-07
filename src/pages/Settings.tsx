@@ -32,7 +32,7 @@ const APP_VERSION = '1.2.0';
 
 const Settings = () => {
   const { user, signOut } = useAuth();
-  const { threshold, setThreshold, cumulativeThreshold, setCumulativeThreshold, emailNotifications, setEmailNotifications, companionPrefs, setCompanionPref, reflectionTone, setReflectionTone, silentMode, setSilentMode, cooldownHours, setCooldownHours, profileLoaded } = useHolzen();
+  const { threshold, setThreshold, thresholdDown, setThresholdDown, cumulativeThreshold, setCumulativeThreshold, emailNotifications, setEmailNotifications, companionPrefs, setCompanionPref, reflectionTone, setReflectionTone, silentMode, setSilentMode, cooldownHours, setCooldownHours, streakFreezeDates, useStreakFreeze, profileLoaded } = useHolzen();
   const { subscribed, loading: subLoading, checkoutLoading, startCheckout, openPortal, trialRemaining } = useSubscription();
   const { theme, setTheme } = useTheme();
   const { canInstall, install } = useInstallPrompt();
@@ -132,7 +132,7 @@ const Settings = () => {
 
       {/* Threshold */}
       {profileLoaded ? (
-        <ThresholdSetting threshold={threshold} onSet={setThreshold} cumulativeThreshold={cumulativeThreshold} onSetCumulative={setCumulativeThreshold} />
+        <ThresholdSetting thresholdUp={threshold} onSetUp={setThreshold} thresholdDown={thresholdDown} onSetDown={setThresholdDown} cumulativeThreshold={cumulativeThreshold} onSetCumulative={setCumulativeThreshold} />
       ) : (
         <div className="space-y-4 animate-pulse">
           <div className="h-4 w-40 bg-muted rounded" />

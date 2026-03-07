@@ -20,12 +20,16 @@ const OUTCOME_SCORES: Record<string, number> = {
   sold: 20,
 };
 
-function computeCurrentStreak(reflections: Reflection[]): number {
+function computeCurrentStreak(reflections: Reflection[], freezeDates: string[] = []): number {
   if (reflections.length === 0) return 0;
 
   const days = new Set<string>();
   for (const r of reflections) {
     days.add(parseISO(r.created_at).toISOString().slice(0, 10));
+  }
+  // Add freeze dates as "valid" days
+  for (const d of freezeDates) {
+    days.add(d);
   }
   const sorted = Array.from(days).sort().reverse();
 
@@ -50,7 +54,7 @@ export interface HolzenScoreData {
   trend: 'improving' | 'declining' | 'stable';
 }
 
-export function useHolzenScore(reflections: Reflection[]): HolzenScoreData | null {
+export function useHolzenScore(reflections: Reflection[], freezeDates: string[] = []): HolzenScoreData | null {
   return useMemo(() => {
     if (reflections.length < 3) return null;
 
@@ -72,7 +76,7 @@ export function useHolzenScore(reflections: Reflection[]): HolzenScoreData | nul
         : 50;
 
     // Streak score (25%) — capped at 14 days
-    const streak = computeCurrentStreak(reflections);
+    const streak = computeCurrentStreak(reflections, freezeDates);
     const streakPct = Math.min(streak / 14, 1) * 100;
 
     const score = Math.round(moodAvg * 0.4 + outcomeAvg * 0.35 + streakPct * 0.25);
@@ -102,5 +106,5 @@ export function useHolzenScore(reflections: Reflection[]): HolzenScoreData | nul
       streakScore: Math.round(streakPct),
       trend,
     };
-  }, [reflections]);
+  }, [reflections, freezeDates]);
 }
