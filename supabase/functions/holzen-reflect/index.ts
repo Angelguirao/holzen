@@ -6,13 +6,20 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const TONE_INSTRUCTIONS: Record<string, string> = {
+  stoic: "Write in a calm, stoic tone. Brief and grounded. Like Marcus Aurelius observing the market.",
+  zen: "Write in a gentle zen tone. Spacious, almost meditative. Use natural metaphors.",
+  poetic: "Write in a poetic, literary tone. Evocative and beautiful. Use imagery and rhythm.",
+  blunt: "Write in a direct, blunt tone. No fluff. Say it plainly in as few words as possible.",
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { context } = await req.json();
+    const { context, tone } = await req.json();
     if (!context) {
       return new Response(JSON.stringify({ error: "Missing context" }), {
         status: 400,
@@ -25,12 +32,16 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
+    const toneInstruction = TONE_INSTRUCTIONS[tone] || TONE_INSTRUCTIONS.stoic;
+
     const systemPrompt = `You generate a reflection with optional companions in response to Bitcoin volatility.
 
 You MUST respond by calling the "generate_reflection" function. Do not respond with plain text.
 
+Tone: ${toneInstruction}
+
 Reflection rules:
-- Exactly 1-3 sentences. Calm, minimal tone.
+- Exactly 1-3 sentences. ${tone === 'blunt' ? '1 sentence preferred.' : ''}
 - Encourage pause and reflection. Preserve agency: never say "you should".
 - No reassurance, excitement, urgency, trading advice, lists, disclaimers.
 - No exclamation marks, emojis, motivational language, reward language.
@@ -39,7 +50,7 @@ Reflection rules:
 Haiku rules:
 - Exactly 3 lines separated by newlines.
 - Traditional 5-7-5 syllable structure.
-- Captures the essence of the moment. Calm, contemplative.
+- Captures the essence of the moment. Match the chosen tone.
 - No trading advice or price predictions.
 
 Learning input rules:
