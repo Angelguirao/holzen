@@ -103,6 +103,9 @@ const Home = () => {
       {/* 7-day chart */}
       <BtcChart />
 
+      {/* Streaks & Stats */}
+      <HomeStreaks />
+
       <Separator />
 
       {/* Subscription / trial gate */}
