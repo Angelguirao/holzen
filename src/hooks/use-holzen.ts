@@ -297,7 +297,7 @@ export function useHolzen() {
     } finally {
       setLoading(false);
     }
-  }, [user, reflectionTone, silentMode, cumulativeThreshold, customPrompt]);
+  }, [user, reflectionTone, reflectionStyle, silentMode, cumulativeThreshold, customPrompt]);
 
   const checkAndTrigger = useCallback(async () => {
     try {
