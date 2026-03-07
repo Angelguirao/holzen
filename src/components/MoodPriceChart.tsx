@@ -33,6 +33,29 @@ function extractChange(context: string | null): number | null {
   return match[1].toLowerCase() === 'down' ? -val : val;
 }
 
+function linearRegression(points: { x: number; y: number }[]) {
+  const n = points.length;
+  if (n < 2) return null;
+  const sumX = points.reduce((s, p) => s + p.x, 0);
+  const sumY = points.reduce((s, p) => s + p.y, 0);
+  const sumXY = points.reduce((s, p) => s + p.x * p.y, 0);
+  const sumX2 = points.reduce((s, p) => s + p.x * p.x, 0);
+  const sumY2 = points.reduce((s, p) => s + p.y * p.y, 0);
+
+  const denom = n * sumX2 - sumX * sumX;
+  if (denom === 0) return null;
+
+  const slope = (n * sumXY - sumX * sumY) / denom;
+  const intercept = (sumY - slope * sumX) / n;
+
+  // Pearson r
+  const rNum = n * sumXY - sumX * sumY;
+  const rDen = Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
+  const r = rDen === 0 ? 0 : rNum / rDen;
+
+  return { slope, intercept, r };
+}
+
 export function MoodPriceChart({ reflections }: Props) {
   const data = useMemo(() => {
     return reflections
@@ -44,6 +67,22 @@ export function MoodPriceChart({ reflections }: Props) {
       })
       .filter(Boolean) as { change: number; mood: number; moodLabel: string }[];
   }, [reflections]);
+
+  const regression = useMemo(() => {
+    if (data.length < 3) return null;
+    return linearRegression(data.map((d) => ({ x: d.change, y: d.mood })));
+  }, [data]);
+
+  const trendLine = useMemo(() => {
+    if (!regression || data.length < 3) return [];
+    const changes = data.map((d) => d.change);
+    const minX = Math.min(...changes);
+    const maxX = Math.max(...changes);
+    return [
+      { change: minX, trend: regression.slope * minX + regression.intercept },
+      { change: maxX, trend: regression.slope * maxX + regression.intercept },
+    ];
+  }, [regression, data]);
 
   // Compute averages per mood for the summary
   const moodAvgs = useMemo(() => {
@@ -63,15 +102,29 @@ export function MoodPriceChart({ reflections }: Props) {
 
   if (data.length < 3) return null;
 
+  const rLabel = regression
+    ? `r = ${regression.r >= 0 ? '+' : ''}${regression.r.toFixed(2)}`
+    : null;
+  const rStrength = regression
+    ? Math.abs(regression.r) < 0.3 ? 'weak' : Math.abs(regression.r) < 0.6 ? 'moderate' : 'strong'
+    : null;
+
   return (
     <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3">
-      <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
-        Mood × Price Change
-      </p>
+      <div className="flex items-center justify-between">
+        <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
+          Mood × Price Change
+        </p>
+        {rLabel && (
+          <span className="text-[10px] font-mono text-muted-foreground/70 bg-muted/50 px-2 py-0.5 rounded">
+            {rLabel} · {rStrength}
+          </span>
+        )}
+      </div>
 
       <div className="h-44">
         <ResponsiveContainer width="100%" height="100%">
-          <ScatterChart margin={{ top: 8, right: 8, bottom: 0, left: -16 }}>
+          <ComposedChart margin={{ top: 8, right: 8, bottom: 0, left: -16 }} data={trendLine}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
             <XAxis
               dataKey="change"
@@ -81,6 +134,8 @@ export function MoodPriceChart({ reflections }: Props) {
               tick={{ fontSize: 9, fontFamily: 'monospace', fill: 'hsl(var(--muted-foreground))' }}
               axisLine={false}
               tickLine={false}
+              domain={['dataMin', 'dataMax']}
+              allowDuplicatedCategory={false}
             />
             <YAxis
               dataKey="mood"
@@ -101,13 +156,23 @@ export function MoodPriceChart({ reflections }: Props) {
                 fontSize: '11px',
                 fontFamily: 'monospace',
               }}
-              formatter={(_v: number, name: string, props: { payload: { change: number; moodLabel: string } }) => {
-                if (name === 'mood') return [props.payload.moodLabel, 'Mood'];
+              formatter={(_v: number, name: string, props: { payload: { change: number; moodLabel?: string } }) => {
+                if (name === 'mood') return [props.payload.moodLabel ?? '', 'Mood'];
+                if (name === 'trend') return [`${props.payload.change > 0 ? '+' : ''}${props.payload.change.toFixed(1)}%`, 'Trend'];
                 return [`${props.payload.change > 0 ? '+' : ''}${props.payload.change.toFixed(1)}%`, '24h Change'];
               }}
               labelFormatter={() => ''}
             />
-            <Scatter data={data} fill="hsl(var(--primary))">
+            <Line
+              dataKey="trend"
+              stroke="hsl(var(--primary))"
+              strokeWidth={1.5}
+              strokeDasharray="6 3"
+              dot={false}
+              strokeOpacity={0.5}
+              isAnimationActive={false}
+            />
+            <Scatter data={data} dataKey="mood" fill="hsl(var(--primary))">
               {data.map((entry, i) => (
                 <Cell
                   key={i}
@@ -117,7 +182,7 @@ export function MoodPriceChart({ reflections }: Props) {
                 />
               ))}
             </Scatter>
-          </ScatterChart>
+          </ComposedChart>
         </ResponsiveContainer>
       </div>
 
