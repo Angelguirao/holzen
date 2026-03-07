@@ -156,6 +156,15 @@ export function useHolzen() {
       .eq('user_id', user.id);
   }, [user]);
 
+  const setDigestFrequency = useCallback(async (val: string) => {
+    setDigestFrequencyState(val);
+    if (!user) return;
+    await supabase
+      .from('profiles')
+      .update({ digest_frequency: val } as any)
+      .eq('user_id', user.id);
+  }, [user]);
+
   const setCompanionPref = useCallback(async (key: keyof CompanionPrefs, val: boolean) => {
     setCompanionPrefsState((prev) => ({ ...prev, [key]: val }));
     if (!user) return;
