@@ -62,6 +62,7 @@ export function useHolzen() {
             .single();
 
           if (latestReflection) {
+            setLastReflectionId(latestReflection.id);
             setCompanions({
               haiku: latestReflection.haiku ?? null,
               learningTitle: latestReflection.learning_title ?? null,
