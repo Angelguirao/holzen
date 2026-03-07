@@ -23,3 +23,11 @@ project_id = "edgbwdecaoottowliimu"
     verify_jwt = false
   [functions.deliver-letters]
     verify_jwt = false
+  [functions.ground-nudge]
+    verify_jwt = false
+  [functions.personalized-nudge]
+    verify_jwt = false
+  [functions.monthly-report]
+    verify_jwt = false
+  [functions.record-referral]
+    verify_jwt = false
