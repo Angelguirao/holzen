@@ -1,5 +1,3 @@
-import { useState, useEffect, useRef } from 'react';
-import { supabase } from '@/integrations/supabase/client';
 import { Loader2, ExternalLink } from 'lucide-react';
 
 interface NudgeData {
@@ -12,48 +10,16 @@ interface NudgeData {
 interface Props {
   title: string;
   body: string;
-  context?: string | null;
-  reflectionId?: string | null;
-  useGroundNudge?: boolean;
+  nudge?: NudgeData | null;
+  nudgeLoading?: boolean;
+  nudgeError?: boolean;
 }
 
-export function LearningInput({ title, body, context, reflectionId, useGroundNudge = true }: Props) {
-  const [nudge, setNudge] = useState<NudgeData | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(false);
-  const fetchedForRef = useRef<string | null>(null);
+export function LearningInput({ title, body, nudge, nudgeLoading = false, nudgeError = false }: Props) {
+  const displayTitle = nudge?.title ?? (nudgeError ? title : '');
+  const displayBody = nudge?.body ?? (nudgeError ? body : '');
 
-  useEffect(() => {
-    if (!useGroundNudge) return;
-    // Only fetch once per reflection
-    const key = reflectionId ?? context ?? '';
-    if (fetchedForRef.current === key) return;
-    fetchedForRef.current = key;
-
-    let cancelled = false;
-    setLoading(true);
-    setError(false);
-
-    supabase.functions
-      .invoke('ground-nudge', { body: { context: context ?? '' } })
-      .then(({ data, error: fnError }) => {
-        if (cancelled) return;
-        if (fnError || !data || data.error) {
-          setError(true);
-        } else {
-          setNudge(data as NudgeData);
-        }
-        setLoading(false);
-      });
-
-    return () => { cancelled = true; };
-  }, [useGroundNudge, context, reflectionId]);
-
-  // Fallback to passed-in content if AI fails
-  const displayTitle = nudge?.title ?? (error ? title : '');
-  const displayBody = nudge?.body ?? (error ? body : '');
-
-  if (loading) {
+  if (nudgeLoading) {
     return (
       <div className="py-3 flex items-center gap-2 text-muted-foreground">
         <Loader2 className="h-3 w-3 animate-spin" />
@@ -86,7 +52,7 @@ export function LearningInput({ title, body, context, reflectionId, useGroundNud
           )}
         </div>
       )}
-      {error && !nudge && (
+      {nudgeError && !nudge && (
         <p className="text-[9px] font-mono text-muted-foreground/30 pt-1">
           Behavioral science · Research-grounded
         </p>
