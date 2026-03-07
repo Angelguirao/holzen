@@ -91,6 +91,15 @@ export function useHolzen() {
       .eq('user_id', user.id);
   }, [user]);
 
+  const setThresholdDown = useCallback(async (val: number) => {
+    setThresholdDownState(val);
+    if (!user) return;
+    await supabase
+      .from('profiles')
+      .update({ threshold_down: val } as any)
+      .eq('user_id', user.id);
+  }, [user]);
+
   const setCumulativeThreshold = useCallback(async (val: number) => {
     setCumulativeThresholdState(val);
     if (!user) return;
@@ -99,6 +108,24 @@ export function useHolzen() {
       .update({ cumulative_threshold: val })
       .eq('user_id', user.id);
   }, [user]);
+
+  const useStreakFreeze = useCallback(async () => {
+    if (!user) return;
+    const today = new Date().toISOString().slice(0, 10);
+    if (streakFreezeDates.includes(today)) return; // already used today
+    // Limit: max 1 freeze per 7 days
+    const recent = streakFreezeDates.filter((d) => {
+      const diff = Math.abs(Date.now() - new Date(d).getTime());
+      return diff < 7 * 24 * 60 * 60 * 1000;
+    });
+    if (recent.length >= 1) return;
+    const updated = [...streakFreezeDates, today];
+    setStreakFreezeDatesState(updated);
+    await supabase
+      .from('profiles')
+      .update({ streak_freeze_dates: updated } as any)
+      .eq('user_id', user.id);
+  }, [user, streakFreezeDates]);
 
   const setEmailNotifications = useCallback(async (val: boolean) => {
     setEmailNotificationsState(val);
