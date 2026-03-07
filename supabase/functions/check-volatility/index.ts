@@ -313,7 +313,7 @@ serve(async (req) => {
         const { data: userData } = await supabase.auth.admin.getUserById(profile.user_id);
         const email = userData?.user?.email;
         if (email) {
-          await sendNotificationEmail(email, reflection, ctx);
+          await sendNotificationEmail(email, result.message, ctx);
         }
       }
 
