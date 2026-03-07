@@ -275,6 +275,8 @@ export function useHolzen() {
     setCumulativeThreshold,
     emailNotifications,
     setEmailNotifications,
+    reflectionTone,
+    setReflectionTone,
     companionPrefs,
     setCompanionPref,
     btcData,
