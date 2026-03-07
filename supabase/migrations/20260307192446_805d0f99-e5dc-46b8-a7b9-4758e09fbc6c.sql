@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN digest_frequency text NOT NULL DEFAULT 'weekly';
