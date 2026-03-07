@@ -39,6 +39,7 @@ const BlogPost = () => {
 
   return (
     <div className="min-h-screen flex items-start justify-center px-6 py-16">
+      <PageMeta title={postTitle} description={postDesc} path={postPath} />
       <div className="w-full max-w-sm space-y-10">
         {/* Nav */}
         <motion.div {...m()}>

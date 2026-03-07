@@ -32,6 +32,11 @@ const Blog = () => {
 
   return (
     <div className="min-h-screen flex items-start justify-center px-6 py-16">
+      <PageMeta
+        title="Holzen Blog — Bitcoin psychology, behavioral finance & self-awareness"
+        description="Articles on Bitcoin conviction, behavioral finance, and the art of pausing before you act. From the team behind Holzen."
+        path="/blog"
+      />
       <div className="w-full max-w-sm space-y-10">
         {/* Nav */}
         <motion.div {...m()} className="flex items-center justify-between">
