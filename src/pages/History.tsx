@@ -341,6 +341,15 @@ const History = () => {
         ) : (
           <InsightsWithScore reflections={reflections} />
         )
+      ) : tab === 'badges' ? (
+        /* Badges Tab */
+        loading ? (
+          <div className="space-y-3">
+            <Skeleton className="h-40 w-full rounded-md" />
+          </div>
+        ) : (
+          <BadgesPanel reflections={reflections} />
+        )
       ) : (
         /* Library Tab */
         <>
