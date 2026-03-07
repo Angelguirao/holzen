@@ -323,7 +323,7 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
             </div>
           </div>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            {mode === 'calm'
+            {effectiveMode === 'calm'
               ? "The market is quiet. Write to your future self — this letter will arrive when volatility strikes."
               : isCrash
               ? "The market is falling. Write something to yourself — you'll receive it during the next surge."
