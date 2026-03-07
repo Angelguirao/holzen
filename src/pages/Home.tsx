@@ -119,6 +119,7 @@ const Home = () => {
       <LetterToFutureSelf
         currentPrice={btcData?.currentPrice ?? null}
         changePercent={btcData?.changePercent ?? null}
+        threshold={threshold}
       />
 
       <Separator />
