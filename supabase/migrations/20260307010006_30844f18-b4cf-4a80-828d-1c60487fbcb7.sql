@@ -1,0 +1,1 @@
+CREATE POLICY "Users can delete their own letters" ON public.future_letters FOR DELETE USING (auth.uid() = user_id);
