@@ -18,7 +18,7 @@ export const ThresholdSetting = forwardRef<HTMLDivElement, Props>(function Thres
   useEffect(() => { setCumValue(cumulativeThreshold); }, [cumulativeThreshold]);
 
   return (
-    <div className="space-y-8">
+    <div ref={ref} className="space-y-8">
       {/* Daily threshold */}
       <div className="space-y-4">
         <div className="space-y-2">
