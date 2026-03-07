@@ -33,6 +33,11 @@ const WRITING_PROMPTS = {
     "What would your grounded self tell your panicking self?",
     "Write what this moment has taught you.",
   ],
+  calm: [
+    "What would you tell yourself when the market panics?",
+    "What's true right now that fear will make you forget?",
+    "Write advice for the version of you that wants to sell everything.",
+  ],
 };
 
 // Wax seal SVG component
