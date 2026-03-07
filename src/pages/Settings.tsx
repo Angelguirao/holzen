@@ -32,7 +32,7 @@ const APP_VERSION = '1.2.0';
 
 const Settings = () => {
   const { user, signOut } = useAuth();
-  const { threshold, setThreshold, thresholdDown, setThresholdDown, cumulativeThreshold, setCumulativeThreshold, emailNotifications, setEmailNotifications, companionPrefs, setCompanionPref, reflectionTone, setReflectionTone, silentMode, setSilentMode, cooldownHours, setCooldownHours, streakFreezeDates, useStreakFreeze, profileLoaded } = useHolzen();
+  const { threshold, setThreshold, thresholdDown, setThresholdDown, cumulativeThreshold, setCumulativeThreshold, emailNotifications, setEmailNotifications, companionPrefs, setCompanionPref, reflectionTone, setReflectionTone, silentMode, setSilentMode, cooldownHours, setCooldownHours, digestFrequency, setDigestFrequency, streakFreezeDates, useStreakFreeze, profileLoaded } = useHolzen();
   const { subscribed, loading: subLoading, checkoutLoading, startCheckout, openPortal, trialRemaining } = useSubscription();
   const { theme, setTheme } = useTheme();
   const { canInstall, install } = useInstallPrompt();
@@ -276,6 +276,53 @@ const Settings = () => {
             >
               <p className="text-xs font-mono font-medium">{t.label}</p>
               <p className="text-[10px] text-muted-foreground mt-0.5">{t.desc}</p>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <Separator />
+
+      {/* Digest Frequency */}
+      <div className="space-y-4">
+        <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Digest frequency</p>
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          How often you receive your reflection digest email.
+        </p>
+        <div className="grid grid-cols-3 gap-2">
+          {([
+            { value: 'daily', label: 'Daily' },
+            { value: 'weekly', label: 'Weekly' },
+            { value: 'biweekly', label: 'Biweekly' },
+          ] as const).map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => setDigestFrequency(opt.value)}
+              className={`rounded-md border px-3 py-2 text-center transition-colors ${
+                digestFrequency === opt.value
+                  ? 'border-primary bg-primary/5 text-foreground'
+                  : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <p className="text-xs font-mono">{opt.label}</p>
+            </button>
+          ))}
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          {([
+            { value: 'monthly', label: 'Monthly' },
+            { value: 'off', label: 'Off' },
+          ] as const).map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => setDigestFrequency(opt.value)}
+              className={`rounded-md border px-3 py-2 text-center transition-colors ${
+                digestFrequency === opt.value
+                  ? 'border-primary bg-primary/5 text-foreground'
+                  : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <p className="text-xs font-mono">{opt.label}</p>
             </button>
           ))}
         </div>

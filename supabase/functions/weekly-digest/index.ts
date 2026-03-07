@@ -17,6 +17,26 @@ async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise
   throw new Error("Failed to fetch after retries");
 }
 
+function shouldSendDigest(frequency: string, now: Date): boolean {
+  const dayOfWeek = now.getUTCDay(); // 0=Sun
+  const dayOfMonth = now.getUTCDate();
+
+  switch (frequency) {
+    case "daily":
+      return true;
+    case "weekly":
+      return dayOfWeek === 0; // Sunday
+    case "biweekly":
+      return dayOfWeek === 0 && (Math.ceil(dayOfMonth / 7) % 2 === 1); // 1st & 3rd Sundays
+    case "monthly":
+      return dayOfMonth === 1;
+    case "off":
+      return false;
+    default:
+      return dayOfWeek === 0; // fallback to weekly
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -63,11 +83,14 @@ serve(async (req) => {
     // 2. Get all users with email notifications enabled
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
-      .select("user_id, email_notifications");
+      .select("user_id, email_notifications, digest_frequency, threshold, threshold_down");
 
     if (profilesError) throw profilesError;
 
-    const eligible = (profiles ?? []).filter((p) => p.email_notifications);
+    const now = new Date();
+    const eligible = (profiles ?? []).filter(
+      (p) => p.email_notifications && shouldSendDigest(p.digest_frequency ?? "weekly", now)
+    );
     console.log(`[WEEKLY-DIGEST] ${eligible.length} users eligible`);
 
     let sent = 0;
@@ -102,6 +125,9 @@ serve(async (req) => {
       const email = userData?.user?.email;
       if (!email) continue;
 
+      const thresholdUp = profile.threshold ?? 5;
+      const thresholdDn = profile.threshold_down ?? 5;
+
       const reflectionsList =
         reflectionCount === 0
           ? `<p style="font-size: 13px; color: #737373; line-height: 1.6;">No reflections this week. Sometimes the best move is no move at all.</p>`
@@ -120,7 +146,7 @@ serve(async (req) => {
 <html>
 <head><meta charset="utf-8"></head>
 <body style="font-family: 'IBM Plex Mono', monospace, sans-serif; max-width: 440px; margin: 0 auto; padding: 40px 20px; color: #2a2a2a; background: #f7f5f0;">
-  <p style="font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #737373; margin-bottom: 32px;">HOLZEN · WEEKLY DIGEST</p>
+  <p style="font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #737373; margin-bottom: 32px;">HOLZEN · DIGEST</p>
 
   <p style="font-size: 14px; line-height: 1.6; margin-bottom: 24px;">
     This week, BTC moved <strong>${weekDir} ${absWeekChange}%</strong>.
@@ -143,6 +169,13 @@ serve(async (req) => {
 
   <hr style="border: none; border-top: 1px solid #e5e2dc; margin: 24px 0;">
 
+  <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
+    <tr>
+      <td style="padding: 8px 0; font-size: 12px; color: #737373; border-bottom: 1px solid #e5e2dc;">Your triggers</td>
+      <td style="padding: 8px 0; font-size: 12px; color: #2a2a2a; text-align: right; border-bottom: 1px solid #e5e2dc;">↑ ${thresholdUp}% / ↓ ${thresholdDn}%</td>
+    </tr>
+  </table>
+
   ${reflectionsList}
 
   <hr style="border: none; border-top: 1px solid #e5e2dc; margin: 24px 0;">
@@ -152,7 +185,7 @@ serve(async (req) => {
   </p>
 
   <hr style="border: none; border-top: 1px solid #e5e2dc; margin: 24px 0;">
-  <p style="font-size: 11px; color: #a3a3a3;">Sunday digest from Holzen. Disable in settings.</p>
+  <p style="font-size: 11px; color: #a3a3a3;">Digest from Holzen. Change frequency in settings.</p>
 </body>
 </html>`;
 
