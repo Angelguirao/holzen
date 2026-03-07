@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import {
   LineChart,
   Line,
@@ -15,36 +15,44 @@ interface Props {
   reflections: { created_at: string; mood: string | null }[];
 }
 
+type Granularity = 'daily' | 'weekly';
+
 const MOOD_VAL: Record<string, number> = { anxious: 1, neutral: 2, calm: 3 };
 const MOOD_LABELS: Record<number, string> = { 1: 'Anxious', 2: 'Neutral', 3: 'Calm' };
 
+function buildData(reflections: Props['reflections'], granularity: Granularity) {
+  const buckets = new Map<string, { total: number; count: number }>();
+
+  for (const r of reflections) {
+    if (!r.mood || MOOD_VAL[r.mood] === undefined) continue;
+    const date = parseISO(r.created_at);
+    const key =
+      granularity === 'daily'
+        ? date.toISOString().slice(0, 10)
+        : startOfWeek(date, { weekStartsOn: 1 }).toISOString().slice(0, 10);
+    const entry = buckets.get(key) || { total: 0, count: 0 };
+    entry.total += MOOD_VAL[r.mood];
+    entry.count += 1;
+    buckets.set(key, entry);
+  }
+
+  return Array.from(buckets.entries())
+    .map(([key, { total, count }]) => ({
+      key,
+      label: format(new Date(key), granularity === 'daily' ? 'MMM d' : 'MMM d'),
+      avg: total / count,
+      count,
+    }))
+    .sort((a, b) => a.key.localeCompare(b.key));
+}
+
 export function MoodTrendChart({ reflections }: Props) {
-  const data = useMemo(() => {
-    const weeks = new Map<string, { total: number; count: number }>();
+  const [granularity, setGranularity] = useState<Granularity>('weekly');
 
-    for (const r of reflections) {
-      if (!r.mood || MOOD_VAL[r.mood] === undefined) continue;
-      const weekStart = startOfWeek(parseISO(r.created_at), { weekStartsOn: 1 });
-      const key = weekStart.toISOString().slice(0, 10);
-      const entry = weeks.get(key) || { total: 0, count: 0 };
-      entry.total += MOOD_VAL[r.mood];
-      entry.count += 1;
-      weeks.set(key, entry);
-    }
-
-    return Array.from(weeks.entries())
-      .map(([week, { total, count }]) => ({
-        week,
-        label: format(new Date(week), 'MMM d'),
-        avg: total / count,
-        count,
-      }))
-      .sort((a, b) => a.week.localeCompare(b.week));
-  }, [reflections]);
+  const data = useMemo(() => buildData(reflections, granularity), [reflections, granularity]);
 
   if (data.length < 1) return null;
 
-  // Overall trend direction
   const first = data[0].avg;
   const last = data[data.length - 1].avg;
   const diff = last - first;
@@ -56,15 +64,34 @@ export function MoodTrendChart({ reflections }: Props) {
         ? 'text-destructive'
         : 'text-muted-foreground';
 
+  const periodLabel = granularity === 'daily' ? 'day' : 'week';
+
   return (
     <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3">
       <div className="flex items-center justify-between">
         <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
-          Weekly Mood Trend
+          Mood Trend
         </p>
-        <span className={`text-[10px] font-mono px-2 py-0.5 rounded bg-muted/50 ${trendColor}`}>
-          {trendLabel}
-        </span>
+        <div className="flex items-center gap-2">
+          <div className="flex rounded bg-muted/50 p-0.5">
+            {(['daily', 'weekly'] as const).map((g) => (
+              <button
+                key={g}
+                onClick={() => setGranularity(g)}
+                className={`text-[10px] font-mono px-2 py-0.5 rounded transition-colors ${
+                  granularity === g
+                    ? 'bg-primary/20 text-primary'
+                    : 'text-muted-foreground/50 hover:text-muted-foreground'
+                }`}
+              >
+                {g === 'daily' ? 'D' : 'W'}
+              </button>
+            ))}
+          </div>
+          <span className={`text-[10px] font-mono px-2 py-0.5 rounded bg-muted/50 ${trendColor}`}>
+            {trendLabel}
+          </span>
+        </div>
       </div>
 
       <div className="h-40">
@@ -98,7 +125,9 @@ export function MoodTrendChart({ reflections }: Props) {
                 const closest = value < 1.5 ? 'Anxious' : value < 2.5 ? 'Neutral' : 'Calm';
                 return [`${value.toFixed(2)} (${closest})`, 'Avg Mood'];
               }}
-              labelFormatter={(label: string) => `Week of ${label}`}
+              labelFormatter={(label: string) =>
+                granularity === 'daily' ? label : `Week of ${label}`
+              }
             />
             <Line
               type="monotone"
@@ -113,7 +142,7 @@ export function MoodTrendChart({ reflections }: Props) {
       </div>
 
       <p className="text-[10px] text-muted-foreground/40 leading-relaxed">
-        Average mood per week across {data.reduce((s, d) => s + d.count, 0)} reflections
+        Average mood per {periodLabel} across {data.reduce((s, d) => s + d.count, 0)} reflections
       </p>
     </div>
   );
