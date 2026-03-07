@@ -115,16 +115,12 @@ const Home = () => {
   const hasAccess = subscribed || (trialRemaining !== undefined && trialRemaining > 0);
 
   if (zenMode) {
-    const shouldReduce = prefersReducedMotion;
-    const zenVariants = shouldReduce
+    const zenTransition = { duration: 0.8, ease: "easeOut" as const };
+    const zenVariants = prefersReducedMotion
       ? { hidden: { opacity: 1 }, visible: { opacity: 1 } }
       : {
           hidden: { opacity: 0, y: 12 },
-          visible: {
-            opacity: 1,
-            y: 0,
-            transition: { duration: 0.8, ease: [0.25, 0.1, 0.25, 1] },
-          },
+          visible: { opacity: 1, y: 0, transition: zenTransition },
         };
 
     return (
