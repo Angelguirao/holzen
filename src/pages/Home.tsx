@@ -3,6 +3,7 @@ import { useSubscription } from '@/hooks/use-subscription';
 import { BtcStatus } from '@/components/BtcStatus';
 import { BtcChart } from '@/components/BtcChart';
 import { HomeStreaks } from '@/components/HomeStreaks';
+import { NightReflectionCard } from '@/components/NightReflectionCard';
 import { ReflectionMessage } from '@/components/ReflectionMessage';
 import { OutcomePrompt } from '@/components/OutcomePrompt';
 import { MoodCheck, type MoodValue } from '@/components/MoodCheck';
