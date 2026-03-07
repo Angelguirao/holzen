@@ -86,7 +86,7 @@ export function MoodPriceScatter({ reflections }: Props) {
             <XAxis
               type="number"
               dataKey="x"
-              domain={[-xPad, xPad]}
+              domain={[-xMax, xMax]}
               tick={{ fontSize: 9, fontFamily: 'monospace', fill: 'hsl(var(--muted-foreground))' }}
               axisLine={false}
               tickLine={false}
