@@ -40,7 +40,6 @@ export function MoodPriceChart({ reflections }: Props) {
       points.push({ mood: ref.mood, change });
     }
 
-    // Averages per mood
     const groups: Record<string, { total: number; count: number }> = {};
     for (const p of points) {
       const g = groups[p.mood] || { total: 0, count: 0 };
@@ -56,9 +55,8 @@ export function MoodPriceChart({ reflections }: Props) {
       count: groups[m]?.count ?? 0,
     })).filter((m) => m.avg !== null) as { mood: string; label: string; avg: number; count: number }[];
 
-    const maxAbsAvg = Math.max(...moodAvgs.map((m) => Math.abs(m.avg)), 1);
+    const maxAbsAvg = Math.max(...moodAvgs.map((m) => Math.abs(m.avg)), 0.5);
 
-    // Correlation
     const r = pearsonR(points.map((p) => ({ x: p.change, y: MOOD_VALUES[p.mood] })));
     const rStrength = r !== null
       ? Math.abs(r) < 0.3 ? 'weak' : Math.abs(r) < 0.6 ? 'moderate' : 'strong'
@@ -82,54 +80,46 @@ export function MoodPriceChart({ reflections }: Props) {
         )}
       </div>
 
-      <div className="space-y-3">
+      <div className="space-y-4">
         {moodAvgs.map((m) => {
           const isNeg = m.avg < 0;
-          const barWidth = (Math.abs(m.avg) / maxAbsAvg) * 50; // 50% max width per side
+          const barWidthPercent = (Math.abs(m.avg) / maxAbsAvg) * 100;
+          const formattedAvg = `${isNeg ? '' : '+'}${m.avg.toFixed(1)}%`;
 
           return (
-            <div key={m.mood} className="space-y-1">
+            <div key={m.mood} className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-mono text-muted-foreground">{m.label}</span>
-                <span className="text-[10px] font-mono text-muted-foreground/50">{m.count} entries</span>
+                <span className="text-xs font-mono text-muted-foreground">{m.label}</span>
+                <span className="text-[10px] font-mono text-muted-foreground/50">
+                  {m.count} entr{m.count === 1 ? 'y' : 'ies'}
+                </span>
               </div>
-              <div className="relative h-5 w-full flex items-center">
-                {/* Center line */}
-                <div className="absolute left-1/2 top-0 bottom-0 w-px bg-border/60" />
-
-                {/* Bar */}
-                <div
-                  className="absolute h-4 rounded-sm transition-all duration-500"
+              <div className="flex items-center gap-3">
+                <div className="flex-1 h-6 bg-muted/40 rounded-sm overflow-hidden relative">
+                  <div
+                    className="absolute top-0 left-0 h-full rounded-sm transition-all duration-700 ease-out"
+                    style={{
+                      width: `${Math.max(barWidthPercent, 4)}%`,
+                      backgroundColor: isNeg
+                        ? 'hsl(var(--destructive) / 0.5)'
+                        : 'hsl(var(--primary) / 0.5)',
+                    }}
+                  />
+                </div>
+                <span
+                  className="text-xs font-mono font-medium w-14 text-right shrink-0"
                   style={{
-                    width: `${barWidth}%`,
-                    ...(isNeg
-                      ? { right: '50%', backgroundColor: 'hsl(var(--destructive) / 0.6)' }
-                      : { left: '50%', backgroundColor: 'hsl(var(--primary) / 0.6)' }),
-                  }}
-                />
-
-                {/* Value label */}
-                <div
-                  className="absolute text-[10px] font-mono"
-                  style={{
-                    ...(isNeg
-                      ? { right: `calc(50% + ${barWidth}% + 6px)`, color: 'hsl(var(--destructive))' }
-                      : { left: `calc(50% + ${barWidth}% + 6px)`, color: 'hsl(var(--primary))' }),
+                    color: isNeg
+                      ? 'hsl(var(--destructive))'
+                      : 'hsl(var(--primary))',
                   }}
                 >
-                  {isNeg ? '' : '+'}{m.avg.toFixed(1)}%
-                </div>
+                  {formattedAvg}
+                </span>
               </div>
             </div>
           );
         })}
-      </div>
-
-      {/* Axis labels */}
-      <div className="flex items-center justify-between">
-        <span className="text-[8px] font-mono text-muted-foreground/40">← drops</span>
-        <span className="text-[8px] font-mono text-muted-foreground/40">0%</span>
-        <span className="text-[8px] font-mono text-muted-foreground/40">surges →</span>
       </div>
 
       <p className="text-[10px] text-muted-foreground/40 leading-relaxed">
