@@ -184,6 +184,14 @@ const History = () => {
           >
             Insights
           </button>
+          <button
+            onClick={() => setTab('badges')}
+            className={`text-sm font-mono tracking-widest uppercase transition-colors ${
+              tab === 'badges' ? 'text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
+            }`}
+          >
+            Badges
+          </button>
         </div>
         <p className="text-xs text-muted-foreground">
           {tab === 'letters'
