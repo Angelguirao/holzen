@@ -312,9 +312,9 @@ function LetterCard({ letter: l, onDelete, fmtPrice, type }: {
           <div className="flex items-center gap-2 text-[10px] font-mono text-muted-foreground">
             <Clock className="h-2.5 w-2.5" />
             <span>
-              Written {format(new Date(l.written_at), 'MMM d, yyyy')} during{' '}
-              {l.written_during === 'crash' ? 'a drop' : 'a surge'} at{' '}
-              {fmtPrice(l.btc_price_at_write)}
+              Written {format(new Date(l.written_at), 'MMM d, yyyy')}{' '}
+              {l.written_during === 'calm' ? 'during calm markets' : l.written_during === 'crash' ? 'during a drop' : 'during a surge'}{' '}
+              at {fmtPrice(l.btc_price_at_write)}
             </span>
           </div>
         )}
