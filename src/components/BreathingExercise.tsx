@@ -52,7 +52,7 @@ interface Props {
 }
 
 export function BreathingExercise({ severity = 'mild', onComplete, autoOpen = false }: Props) {
-  const [overlayOpen, setOverlayOpen] = useState(false);
+  const [overlayOpen, setOverlayOpen] = useState(autoOpen);
   const [patternIndex, setPatternIndex] = useState(() => getSuggestedPattern(severity));
   const [active, setActive] = useState(false);
   const [phaseIndex, setPhaseIndex] = useState(0);
