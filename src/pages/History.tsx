@@ -31,6 +31,8 @@ interface Reflection {
   haiku: string | null;
   learning_title: string | null;
   learning_body: string | null;
+  learning_citation: string | null;
+  learning_url: string | null;
   note: string | null;
   mood: string | null;
   outcome: string | null;
