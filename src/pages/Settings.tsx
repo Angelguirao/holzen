@@ -208,6 +208,26 @@ const Settings = () => {
 
       <Separator />
 
+      {/* Silent Mode */}
+      <div className="space-y-4">
+        <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Silent mode</p>
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          Just "BTC moved." — no reflection text. Maximum trust in yourself.
+        </p>
+        <div className="flex items-center justify-between">
+          <Label htmlFor="silent-mode" className="text-xs font-mono text-muted-foreground">
+            Enable silent mode
+          </Label>
+          <Switch
+            id="silent-mode"
+            checked={silentMode}
+            onCheckedChange={setSilentMode}
+          />
+        </div>
+      </div>
+
+      <Separator />
+
       {/* Reflection Tone */}
       <div className="space-y-4">
         <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Reflection tone</p>
