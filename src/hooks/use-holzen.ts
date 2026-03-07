@@ -321,6 +321,8 @@ export function useHolzen() {
     completeOnboarding,
     manualTrigger,
     manualCooldownRemaining,
+    autoCooldownRemaining,
+    cooldownHours,
     profileLoaded,
   };
 }
