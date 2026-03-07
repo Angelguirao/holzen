@@ -40,7 +40,9 @@ export function useHolzen() {
 
       if (data) {
         setThresholdState(data.threshold);
+        setThresholdDownState((data as any).threshold_down ?? data.threshold);
         setCumulativeThresholdState(data.cumulative_threshold ?? 15);
+        setStreakFreezeDatesState((data as any).streak_freeze_dates ?? []);
         setLastTriggerAt((data as any).last_trigger_at ?? null);
         setMessage(data.last_message);
         setContext(data.last_context);
