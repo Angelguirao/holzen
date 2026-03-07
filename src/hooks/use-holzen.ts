@@ -55,13 +55,14 @@ export function useHolzen() {
         if (data.last_message) {
           const { data: latestReflection } = await supabase
             .from('reflections')
-            .select('haiku, learning_title, learning_body')
+            .select('id, haiku, learning_title, learning_body')
             .eq('user_id', user.id)
             .order('created_at', { ascending: false })
             .limit(1)
             .single();
 
           if (latestReflection) {
+            setLastReflectionId(latestReflection.id);
             setCompanions({
               haiku: latestReflection.haiku ?? null,
               learningTitle: latestReflection.learning_title ?? null,
