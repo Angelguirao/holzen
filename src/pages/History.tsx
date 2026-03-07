@@ -7,6 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ShareReflection } from '@/components/ShareReflection';
 import { ReflectionNote } from '@/components/ReflectionNote';
 import { InsightsPanel } from '@/components/InsightsPanel';
+import { ReflectionStats } from '@/components/ReflectionStats';
 import { ReflectionTags } from '@/components/ReflectionTags';
 import { HaikuDisplay } from '@/components/HaikuDisplay';
 import { LearningInput } from '@/components/LearningInput';
@@ -145,7 +146,10 @@ const History = () => {
             No reflections yet. Insights will appear after your first reflection.
           </p>
         ) : (
-          <InsightsPanel reflections={reflections} />
+          <div className="space-y-5">
+            <ReflectionStats reflections={reflections} />
+            <InsightsPanel reflections={reflections} />
+          </div>
         )
       ) : (
         /* Library Tab */
