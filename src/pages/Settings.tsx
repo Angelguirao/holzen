@@ -626,12 +626,29 @@ const Settings = () => {
       {/* Changelog & Version */}
       <div className="space-y-3">
         <div className="flex items-center gap-3">
-          <Changelog />
+          <button
+            onClick={() => {
+              if (latestVersion) {
+                localStorage.setItem(LAST_SEEN_VERSION_KEY, latestVersion);
+                setHasNewVersion(false);
+              }
+            }}
+            className="contents"
+          >
+            <Changelog />
+          </button>
+          {hasNewVersion && (
+            <span className="text-[10px] font-mono bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">
+              New
+            </span>
+          )}
           <a href="/roadmap" target="_blank" rel="noopener noreferrer" className="text-xs font-mono text-muted-foreground underline">Roadmap</a>
         </div>
-        <p className="text-[10px] font-mono text-muted-foreground/50">
-          Holzen v{APP_VERSION}
-        </p>
+        {latestVersion && (
+          <p className="text-[10px] font-mono text-muted-foreground/50">
+            Holzen v{latestVersion}
+          </p>
+        )}
       </div>
     </div>
   );
