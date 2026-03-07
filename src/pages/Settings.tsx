@@ -132,7 +132,7 @@ const Settings = () => {
 
       {/* Threshold */}
       {profileLoaded ? (
-        <ThresholdSetting threshold={threshold} onSet={setThreshold} cumulativeThreshold={cumulativeThreshold} onSetCumulative={setCumulativeThreshold} />
+        <ThresholdSetting thresholdUp={threshold} onSetUp={setThreshold} thresholdDown={thresholdDown} onSetDown={setThresholdDown} cumulativeThreshold={cumulativeThreshold} onSetCumulative={setCumulativeThreshold} />
       ) : (
         <div className="space-y-4 animate-pulse">
           <div className="h-4 w-40 bg-muted rounded" />
