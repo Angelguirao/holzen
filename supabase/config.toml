@@ -17,3 +17,5 @@ project_id = "edgbwdecaoottowliimu"
     verify_jwt = false
   [functions.delete-account]
     verify_jwt = false
+  [functions.night-reflection]
+    verify_jwt = false
