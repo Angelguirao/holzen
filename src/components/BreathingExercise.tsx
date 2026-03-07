@@ -88,8 +88,9 @@ export function BreathingExercise({ severity = 'mild', onComplete, onClose, auto
 
   const closeOverlay = useCallback(() => {
     setOverlayOpen(false);
+    if (!completed) onClose?.();
     reset();
-  }, [reset]);
+  }, [reset, completed, onClose]);
 
   // Timer
   useEffect(() => {
