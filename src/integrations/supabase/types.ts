@@ -163,8 +163,11 @@ export type Database = {
           last_message: string | null
           last_trigger_at: string | null
           lifetime_access: boolean
+          quiet_hours_end: number | null
+          quiet_hours_start: number | null
           referral_code: string
           referred_by: string | null
+          reflection_style: string
           reflection_tone: string
           silent_mode: boolean
           streak_freeze_dates: string[]
@@ -189,8 +192,11 @@ export type Database = {
           last_message?: string | null
           last_trigger_at?: string | null
           lifetime_access?: boolean
+          quiet_hours_end?: number | null
+          quiet_hours_start?: number | null
           referral_code?: string
           referred_by?: string | null
+          reflection_style?: string
           reflection_tone?: string
           silent_mode?: boolean
           streak_freeze_dates?: string[]
@@ -215,8 +221,11 @@ export type Database = {
           last_message?: string | null
           last_trigger_at?: string | null
           lifetime_access?: boolean
+          quiet_hours_end?: number | null
+          quiet_hours_start?: number | null
           referral_code?: string
           referred_by?: string | null
+          reflection_style?: string
           reflection_tone?: string
           silent_mode?: boolean
           streak_freeze_dates?: string[]
