@@ -31,7 +31,7 @@ export function useHolzen() {
     const load = async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('threshold, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_learning, reflection_tone, cooldown_hours')
+        .select('threshold, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_learning, reflection_tone, cooldown_hours, last_trigger_at')
         .eq('user_id', user.id)
         .single();
 
