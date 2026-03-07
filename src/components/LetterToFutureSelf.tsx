@@ -116,6 +116,14 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
   const [sealPhase, setSealPhase] = useState<'idle' | 'sealing' | 'sealed'>('idle');
   const [loaded, setLoaded] = useState(false);
 
+  const isCrash = changePercent !== null && changePercent <= -LETTER_THRESHOLD;
+  const isATH = changePercent !== null && changePercent >= LETTER_THRESHOLD;
+  const canWrite = isCrash || isATH;
+  const writtenDuring = isCrash ? 'crash' : 'ath';
+  const deliverDuring = isCrash ? 'ath' : 'crash';
+  const prompts = isCrash ? WRITING_PROMPTS.crash : WRITING_PROMPTS.ath;
+  const randomPrompt = useMemo(() => prompts[Math.floor(Math.random() * prompts.length)], [isCrash]);
+
   useEffect(() => {
     if (!user) return;
     supabase
@@ -133,17 +141,6 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
   }, [user]);
 
   if (!loaded || !user) return null;
-
-  const isCrash = changePercent !== null && changePercent <= -LETTER_THRESHOLD;
-  const isATH = changePercent !== null && changePercent >= LETTER_THRESHOLD;
-  const canWrite = isCrash || isATH;
-
-  const writtenDuring = isCrash ? 'crash' : 'ath';
-  const deliverDuring = isCrash ? 'ath' : 'crash';
-
-  const prompts = isCrash ? WRITING_PROMPTS.crash : WRITING_PROMPTS.ath;
-  // Stable prompt per render cycle
-  const randomPrompt = useMemo(() => prompts[Math.floor(Math.random() * prompts.length)], [isCrash]);
 
   const handleSend = async () => {
     if (!body.trim() || !currentPrice || !canWrite) return;
