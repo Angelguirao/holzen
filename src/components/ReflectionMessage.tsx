@@ -24,7 +24,6 @@ export const ReflectionMessage = forwardRef<HTMLDivElement, Props>(function Refl
       <p className="text-lg leading-relaxed">{message}</p>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1">
-          <span className="text-xs text-muted-foreground font-mono">From Holzen</span>
           <ShareReflection message={message} context={context} haiku={companions?.haiku} />
         </div>
         <Button

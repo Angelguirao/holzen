@@ -28,7 +28,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 
-const APP_VERSION = '1.2.0';
+const LAST_SEEN_VERSION_KEY = 'holzen_last_seen_version';
 
 const Settings = () => {
   const { user, signOut } = useAuth();
@@ -43,6 +43,26 @@ const Settings = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [changingPassword, setChangingPassword] = useState(false);
   const [zenMode, setZenMode] = useState(() => localStorage.getItem('holzen_zen_mode') === 'true');
+  const [latestVersion, setLatestVersion] = useState<string | null>(null);
+  const [hasNewVersion, setHasNewVersion] = useState(false);
+
+  // Load latest version from changelog
+  useEffect(() => {
+    supabase
+      .from('changelog_entries')
+      .select('version')
+      .order('created_at', { ascending: false })
+      .limit(1)
+      .single()
+      .then(({ data }) => {
+        if (data) {
+          const v = data.version;
+          setLatestVersion(v);
+          const lastSeen = localStorage.getItem(LAST_SEEN_VERSION_KEY);
+          setHasNewVersion(lastSeen !== v);
+        }
+      });
+  }, []);
 
   const changePassword = useCallback(async () => {
     if (newPassword.length < 6) {
@@ -492,7 +512,7 @@ const Settings = () => {
               className="w-full font-mono text-xs"
               size="sm"
             >
-              {checkoutLoading ? 'Opening checkout' : 'Subscribe'}
+              {checkoutLoading ? 'Opening checkout…' : 'Subscribe'}
             </Button>
           </div>
         )}
@@ -606,12 +626,29 @@ const Settings = () => {
       {/* Changelog & Version */}
       <div className="space-y-3">
         <div className="flex items-center gap-3">
-          <Changelog />
+          <button
+            onClick={() => {
+              if (latestVersion) {
+                localStorage.setItem(LAST_SEEN_VERSION_KEY, latestVersion);
+                setHasNewVersion(false);
+              }
+            }}
+            className="contents"
+          >
+            <Changelog />
+          </button>
+          {hasNewVersion && (
+            <span className="text-[10px] font-mono bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">
+              New
+            </span>
+          )}
           <a href="/roadmap" target="_blank" rel="noopener noreferrer" className="text-xs font-mono text-muted-foreground underline">Roadmap</a>
         </div>
-        <p className="text-[10px] font-mono text-muted-foreground/50">
-          Holzen v{APP_VERSION}
-        </p>
+        {latestVersion && (
+          <p className="text-[10px] font-mono text-muted-foreground/50">
+            Holzen v{latestVersion}
+          </p>
+        )}
       </div>
     </div>
   );
