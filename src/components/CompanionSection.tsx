@@ -85,6 +85,25 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
     learning: false,
   });
 
+  // Load persisted completion state from DB
+  useEffect(() => {
+    if (!reflectionId) return;
+    supabase
+      .from('reflections')
+      .select('breathing_completed, haiku_read, learning_read')
+      .eq('id', reflectionId)
+      .single()
+      .then(({ data }) => {
+        if (data) {
+          setCompletion({
+            breathing: (data as any).breathing_completed ?? false,
+            haiku: (data as any).haiku_read ?? false,
+            learning: (data as any).learning_read ?? false,
+          });
+        }
+      });
+  }, [reflectionId]);
+
   // Lift nudge state here so it survives expand/collapse cycles
   const [nudge, setNudge] = useState<NudgeData | null>(null);
   const [nudgeLoading, setNudgeLoading] = useState(false);
