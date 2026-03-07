@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ALTER COLUMN night_reflection_hour DROP NOT NULL, ALTER COLUMN night_reflection_hour SET DEFAULT 21;
