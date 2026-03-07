@@ -59,13 +59,13 @@ const History = () => {
   const [letters, setLetters] = useState<Letter[]>([]);
   const [loading, setLoading] = useState(true);
   const [lettersLoading, setLettersLoading] = useState(true);
-  const [tab, setTab] = useState<'library' | 'letters' | 'insights'>('library');
+  const [tab, setTab] = useState<'reflections' | 'letters' | 'insights'>('reflections');
   const [filter, setFilter] = useState<'all' | 'favorites'>('all');
   const [tagFilter, setTagFilter] = useState<string | null>(null);
   const [search, setSearch] = useState('');
 
   useEffect(() => {
-    document.title = 'Holzen — Library';
+    document.title = 'Holzen — Reflections';
     return () => { document.title = 'Holzen — Pause before you act'; };
   }, []);
 
@@ -155,12 +155,12 @@ const History = () => {
       <div className="space-y-4">
         <div className="flex items-center gap-6">
           <button
-            onClick={() => setTab('library')}
+            onClick={() => setTab('reflections')}
             className={`text-sm font-mono tracking-widest uppercase transition-colors ${
-              tab === 'library' ? 'text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
+              tab === 'reflections' ? 'text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
             }`}
           >
-            Library
+            Reflections
           </button>
           <button
             onClick={() => setTab('letters')}
