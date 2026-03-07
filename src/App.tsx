@@ -10,6 +10,7 @@ import AuthLoading from "./components/AuthLoading";
 import { AppLayout } from "./components/AppLayout";
 import Home from "./pages/Home";
 import History from "./pages/History";
+import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import Auth from "./pages/Auth";
 import Landing from "./pages/Landing";
@@ -51,6 +52,7 @@ const App = () => (
                 <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
                   <Route path="/" element={<Home />} />
                   <Route path="/history" element={<History />} />
+                  <Route path="/profile" element={<Profile />} />
                   <Route path="/settings" element={<Settings />} />
                 </Route>
                 <Route path="/welcome" element={<PublicOnlyRoute><Landing /></PublicOnlyRoute>} />
