@@ -157,6 +157,7 @@ export type Database = {
           custom_prompt: string | null
           digest_frequency: string
           email_notifications: boolean
+          first_name: string | null
           has_onboarded: boolean
           id: string
           last_context: string | null
@@ -186,6 +187,7 @@ export type Database = {
           custom_prompt?: string | null
           digest_frequency?: string
           email_notifications?: boolean
+          first_name?: string | null
           has_onboarded?: boolean
           id?: string
           last_context?: string | null
@@ -215,6 +217,7 @@ export type Database = {
           custom_prompt?: string | null
           digest_frequency?: string
           email_notifications?: boolean
+          first_name?: string | null
           has_onboarded?: boolean
           id?: string
           last_context?: string | null

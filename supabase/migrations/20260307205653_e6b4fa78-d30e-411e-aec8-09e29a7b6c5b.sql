@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN first_name text DEFAULT null;
