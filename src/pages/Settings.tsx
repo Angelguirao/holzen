@@ -135,6 +135,31 @@ const Settings = () => {
 
       <Separator />
 
+      {/* Cooldown */}
+      <div className="space-y-4">
+        <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Cooldown</p>
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          Minimum time between automatic reflections.
+        </p>
+        <div className="grid grid-cols-4 gap-2">
+          {([1, 6, 12, 24] as const).map((h) => (
+            <button
+              key={h}
+              onClick={() => setCooldownHours(h)}
+              className={`rounded-md border px-3 py-2 text-center transition-colors ${
+                cooldownHours === h
+                  ? 'border-primary bg-primary/5 text-foreground'
+                  : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <p className="text-xs font-mono">{h}h</p>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <Separator />
+
       {/* Companions */}
       <div className="space-y-4">
         <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Companions</p>
