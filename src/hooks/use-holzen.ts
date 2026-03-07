@@ -4,7 +4,6 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
 
-const COOLDOWN_MS = 6 * 60 * 60 * 1000; // 6 hours
 const MANUAL_COOLDOWN_MS = 15 * 60 * 1000; // 15 minutes for on-demand
 
 export function useHolzen() {
