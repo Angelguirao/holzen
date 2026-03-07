@@ -242,6 +242,18 @@ const History = () => {
                 </p>
                 <div className="flex items-center gap-1 shrink-0">
                   <button
+                    onClick={() => pinReflection(r.id)}
+                    className={`p-1 transition-colors ${
+                      localStorage.getItem('holzen_pinned_reflection') === r.id
+                        ? 'text-primary'
+                        : 'text-muted-foreground/40 hover:text-foreground'
+                    }`}
+                    aria-label="Pin to Home"
+                    title="Pin to Home"
+                  >
+                    <Pin className={`h-3 w-3 ${localStorage.getItem('holzen_pinned_reflection') === r.id ? 'fill-current' : ''}`} />
+                  </button>
+                  <button
                     onClick={() => toggleFavorite(r.id)}
                     className={`p-1 transition-colors ${r.is_favorite ? 'text-foreground' : 'text-muted-foreground/40 hover:text-foreground'}`}
                     aria-label={r.is_favorite ? 'Remove from favorites' : 'Add to favorites'}
