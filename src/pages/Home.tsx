@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/button';
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import { AlertCircle, Loader2, Pause } from 'lucide-react';
+import { AlertCircle, Loader2, Pause, Timer } from 'lucide-react';
 
 const Home = () => {
   const { subscribed, loading: subLoading, trialRemaining, checkoutLoading, startCheckout, refresh } = useSubscription();
@@ -45,6 +45,8 @@ const Home = () => {
     completeOnboarding,
     manualTrigger,
     manualCooldownRemaining,
+    autoCooldownRemaining,
+    cooldownHours,
   } = useHolzen();
 
   const [showOutcome, setShowOutcome] = useState(false);
@@ -122,6 +124,12 @@ const Home = () => {
       />
 
       <Separator />
+
+      {/* Auto-trigger cooldown countdown */}
+      <AutoCooldownIndicator
+        cooldownRemaining={autoCooldownRemaining}
+        cooldownHours={cooldownHours}
+      />
 
       {/* Subscription / trial gate */}
       {!subLoading && !hasAccess ? (
@@ -257,6 +265,56 @@ function NeedAMomentButton({
           ? 'Take this time to breathe. The next reflection will be here when you need it.'
           : 'Request a reflection anytime — no threshold required.'}
       </p>
+    </div>
+  );
+}
+
+function AutoCooldownIndicator({
+  cooldownRemaining,
+  cooldownHours,
+}: {
+  cooldownRemaining: () => number;
+  cooldownHours: number;
+}) {
+  const [remaining, setRemaining] = useState(cooldownRemaining());
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRemaining(cooldownRemaining());
+    }, 1000);
+    return () => clearInterval(interval);
+  }, [cooldownRemaining]);
+
+  if (remaining <= 0) return null;
+
+  const totalMs = cooldownHours * 60 * 60 * 1000;
+  const progress = ((totalMs - remaining) / totalMs) * 100;
+  const hours = Math.floor(remaining / 3600000);
+  const minutes = Math.floor((remaining % 3600000) / 60000);
+
+  const timeLabel = hours > 0
+    ? `${hours}h ${minutes}m`
+    : `${minutes}m`;
+
+  return (
+    <div className="flex items-center gap-3 py-2">
+      <Timer className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+      <div className="flex-1 space-y-1.5">
+        <div className="flex items-center justify-between">
+          <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">
+            Next auto-reflection in {timeLabel}
+          </p>
+          <p className="text-[10px] font-mono text-muted-foreground">
+            {Math.round(progress)}%
+          </p>
+        </div>
+        <div className="h-0.5 w-full bg-muted rounded-full overflow-hidden">
+          <div
+            className="h-full bg-muted-foreground/40 rounded-full transition-all duration-1000"
+            style={{ width: `${progress}%` }}
+          />
+        </div>
+      </div>
     </div>
   );
 }

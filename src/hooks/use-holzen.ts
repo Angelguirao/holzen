@@ -31,13 +31,14 @@ export function useHolzen() {
     const load = async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('threshold, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_learning, reflection_tone, cooldown_hours')
+        .select('threshold, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_learning, reflection_tone, cooldown_hours, last_trigger_at')
         .eq('user_id', user.id)
         .single();
 
       if (data) {
         setThresholdState(data.threshold);
         setCumulativeThresholdState(data.cumulative_threshold ?? 15);
+        setLastTriggerAt((data as any).last_trigger_at ?? null);
         setMessage(data.last_message);
         setContext(data.last_context);
         setEmailNotificationsState(data.email_notifications ?? true);
@@ -199,6 +200,8 @@ export function useHolzen() {
           last_context: ctx,
           last_trigger_at: new Date().toISOString(),
         }).eq('user_id', user.id);
+
+        setLastTriggerAt(new Date().toISOString());
       }
     } catch (e: any) {
       setError(e.message || 'Failed to generate message');
@@ -225,6 +228,7 @@ export function useHolzen() {
     }
   }, [user, threshold, cumulativeThreshold, isInCooldown, generateMessage]);
 
+  const [lastTriggerAt, setLastTriggerAt] = useState<string | null>(null);
   const [lastManualAt, setLastManualAt] = useState<number | null>(null);
 
   const manualCooldownRemaining = useCallback(() => {
@@ -232,6 +236,13 @@ export function useHolzen() {
     const elapsed = Date.now() - lastManualAt;
     return Math.max(0, MANUAL_COOLDOWN_MS - elapsed);
   }, [lastManualAt]);
+
+  const autoCooldownRemaining = useCallback(() => {
+    if (!lastTriggerAt) return 0;
+    const cooldownMs = cooldownHours * 60 * 60 * 1000;
+    const elapsed = Date.now() - new Date(lastTriggerAt).getTime();
+    return Math.max(0, cooldownMs - elapsed);
+  }, [lastTriggerAt, cooldownHours]);
 
   const manualTrigger = useCallback(async (mood?: string) => {
     const remaining = manualCooldownRemaining();
@@ -310,6 +321,7 @@ export function useHolzen() {
     completeOnboarding,
     manualTrigger,
     manualCooldownRemaining,
+    autoCooldownRemaining,
     profileLoaded,
   };
 }
