@@ -156,6 +156,15 @@ const Profile = () => {
         ) : (
           <StatsContent reflections={reflections} />
         )
+      ) : tab === 'insights' ? (
+        loading ? (
+          <div className="space-y-3">
+            <Skeleton className="h-20 w-full rounded-md" />
+            <Skeleton className="h-20 w-full rounded-md" />
+          </div>
+        ) : (
+          <AIInsightsPanel reflectionCount={reflections.length} />
+        )
       ) : tab === 'badges' ? (
         loading ? (
           <div className="space-y-3">
