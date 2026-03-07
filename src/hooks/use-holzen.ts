@@ -310,5 +310,6 @@ export function useHolzen() {
     completeOnboarding,
     manualTrigger,
     manualCooldownRemaining,
+    profileLoaded,
   };
 }
