@@ -317,6 +317,39 @@ export type Database = {
         }
         Relationships: []
       }
+      reflection_insights: {
+        Row: {
+          created_at: string
+          generated_at: string
+          id: string
+          insights: Json
+          period_end: string | null
+          period_start: string | null
+          reflection_count: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          generated_at?: string
+          id?: string
+          insights?: Json
+          period_end?: string | null
+          period_start?: string | null
+          reflection_count?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          generated_at?: string
+          id?: string
+          insights?: Json
+          period_end?: string | null
+          period_start?: string | null
+          reflection_count?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       reflections: {
         Row: {
           breathing_completed: boolean
