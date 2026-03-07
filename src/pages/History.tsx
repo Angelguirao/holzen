@@ -8,6 +8,7 @@ import { ShareReflection } from '@/components/ShareReflection';
 import { ReflectionNote } from '@/components/ReflectionNote';
 import { InsightsPanel } from '@/components/InsightsPanel';
 import { MoodTrends } from '@/components/MoodTrends';
+import { useHolzenScore } from '@/hooks/use-holzen-score';
 import { ReflectionStats } from '@/components/ReflectionStats';
 import { ReflectionTags } from '@/components/ReflectionTags';
 import { HaikuDisplay } from '@/components/HaikuDisplay';
