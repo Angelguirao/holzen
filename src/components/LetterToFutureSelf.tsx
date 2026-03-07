@@ -53,8 +53,8 @@ export function LetterToFutureSelf({ currentPrice, changePercent, threshold = 5 
   if (!loaded || !user) return null;
 
   // Determine current market condition
-  const isCrash = changePercent !== null && changePercent <= -5;
-  const isATH = changePercent !== null && changePercent >= 5;
+  const isCrash = changePercent !== null && changePercent <= -threshold;
+  const isATH = changePercent !== null && changePercent >= threshold;
   const canWrite = isCrash || isATH;
 
   const writtenDuring = isCrash ? 'crash' : 'ath';
