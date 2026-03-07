@@ -286,7 +286,8 @@ export function useHolzen() {
       setBtcData(data);
 
       if (user && !(await isInCooldown())) {
-        const dailyTriggered = Math.abs(data.changePercent) >= threshold;
+        const effectiveThreshold = data.changePercent < 0 ? thresholdDown : threshold;
+        const dailyTriggered = Math.abs(data.changePercent) >= effectiveThreshold;
         const cumulativeTriggered = data.cumulativeChangePercent !== undefined && Math.abs(data.cumulativeChangePercent) >= cumulativeThreshold;
 
         if (dailyTriggered || cumulativeTriggered) {
