@@ -185,13 +185,19 @@ export function useHolzen() {
       .eq('user_id', user.id);
   }, [user]);
 
-  const completeOnboarding = useCallback(async (selectedThreshold: number) => {
+  const completeOnboarding = useCallback(async (result: { threshold: number; firstName: string | null; timezone: string }) => {
     setHasOnboarded(true);
-    setThresholdState(selectedThreshold);
+    setThresholdState(result.threshold);
+    if (result.firstName) setFirstNameState(result.firstName);
     if (!user) return;
     await supabase
       .from('profiles')
-      .update({ has_onboarded: true, threshold: selectedThreshold })
+      .update({
+        has_onboarded: true,
+        threshold: result.threshold,
+        first_name: result.firstName,
+        timezone: result.timezone,
+      } as any)
       .eq('user_id', user.id);
   }, [user]);
 
