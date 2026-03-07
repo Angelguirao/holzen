@@ -53,6 +53,7 @@ export function useHolzen() {
         setCooldownHoursState((data as any).cooldown_hours ?? 6);
         setSilentModeState((data as any).silent_mode ?? false);
         setDigestFrequencyState((data as any).digest_frequency ?? 'weekly');
+        setCustomPromptState((data as any).custom_prompt ?? null);
         setHasOnboarded(data.has_onboarded ?? false);
         setCompanionPrefsState({
           breathing: data.companion_breathing ?? true,
