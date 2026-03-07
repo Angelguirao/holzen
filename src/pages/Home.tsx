@@ -56,6 +56,7 @@ const Home = () => {
     manualCooldownRemaining,
     autoCooldownRemaining,
     cooldownHours,
+    firstName,
   } = useHolzen();
 
   const [showOutcome, setShowOutcome] = useState(false);
