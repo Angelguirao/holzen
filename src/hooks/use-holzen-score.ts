@@ -76,7 +76,7 @@ export function useHolzenScore(reflections: Reflection[], freezeDates: string[] 
         : 50;
 
     // Streak score (25%) — capped at 14 days
-    const streak = computeCurrentStreak(reflections);
+    const streak = computeCurrentStreak(reflections, freezeDates);
     const streakPct = Math.min(streak / 14, 1) * 100;
 
     const score = Math.round(moodAvg * 0.4 + outcomeAvg * 0.35 + streakPct * 0.25);
