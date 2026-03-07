@@ -14,8 +14,8 @@ interface Props {
 export function ReflectionStats({ reflections, streakFreezeDates = [], onUseFreeze }: Props) {
   const [freezing, setFreezing] = useState(false);
 
-  const { total, currentStreak, longestStreak, streakAtRisk, canFreeze } = useMemo(() => {
-    if (reflections.length === 0) return { total: 0, currentStreak: 0, longestStreak: 0, streakAtRisk: false, canFreeze: false };
+  const { total, currentStreak, longestStreak, streakAtRisk, canFreeze, nextFreezeAvailable } = useMemo(() => {
+    if (reflections.length === 0) return { total: 0, currentStreak: 0, longestStreak: 0, streakAtRisk: false, canFreeze: false, nextFreezeAvailable: null };
 
     const withOutcome = reflections.filter(r => r.outcome != null && r.outcome !== '');
     const totalOutcomes = withOutcome.length;
