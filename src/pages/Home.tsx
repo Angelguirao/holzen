@@ -125,6 +125,12 @@ const Home = () => {
 
       <Separator />
 
+      {/* Auto-trigger cooldown countdown */}
+      <AutoCooldownIndicator
+        cooldownRemaining={autoCooldownRemaining}
+        cooldownHours={cooldownHours}
+      />
+
       {/* Subscription / trial gate */}
       {!subLoading && !hasAccess ? (
         <div className="space-y-3">
