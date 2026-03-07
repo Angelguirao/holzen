@@ -423,6 +423,20 @@ export function useHolzen() {
       if (!user) return;
       await supabase.from('profiles').update({ custom_prompt: val } as any).eq('user_id', user.id);
     },
+    reflectionStyle,
+    setReflectionStyle: async (val: string) => {
+      setReflectionStyleState(val);
+      if (!user) return;
+      await supabase.from('profiles').update({ reflection_style: val } as any).eq('user_id', user.id);
+    },
+    quietHoursStart,
+    quietHoursEnd,
+    setQuietHours: async (start: number | null, end: number | null) => {
+      setQuietHoursStartState(start);
+      setQuietHoursEndState(end);
+      if (!user) return;
+      await supabase.from('profiles').update({ quiet_hours_start: start, quiet_hours_end: end } as any).eq('user_id', user.id);
+    },
     companionPrefs,
     setCompanionPref,
     btcData,
