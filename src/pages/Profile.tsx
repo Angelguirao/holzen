@@ -238,6 +238,7 @@ function StatsContent({ reflections }: { reflections: Reflection[] }) {
       {scoreData && <HolzenScoreDetail scoreData={scoreData} />}
       <MoodTrendChart reflections={reflections} />
       <MoodPriceChart reflections={reflections} />
+      <MoodPriceScatter reflections={reflections} />
       <MoodTrends reflections={reflections} />
       <InsightsPanel reflections={reflections} />
     </div>
