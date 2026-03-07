@@ -11,6 +11,7 @@ const MOOD_TEXT_COLORS: Record<string, string> = {
   neutral: 'hsl(var(--muted-foreground))',
   calm: 'hsl(var(--primary))',
 };
+interface Props {
   reflections: { context: string | null; mood: string | null }[];
 }
 
