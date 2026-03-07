@@ -30,7 +30,6 @@ const Home = () => {
 
   const {
     btcData,
-    threshold,
     message,
     context,
     companions,
