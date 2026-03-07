@@ -282,6 +282,53 @@ const Settings = () => {
       </div>
 
       <Separator />
+
+      {/* Digest Frequency */}
+      <div className="space-y-4">
+        <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Digest frequency</p>
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          How often you receive your reflection digest email.
+        </p>
+        <div className="grid grid-cols-3 gap-2">
+          {([
+            { value: 'daily', label: 'Daily' },
+            { value: 'weekly', label: 'Weekly' },
+            { value: 'biweekly', label: 'Biweekly' },
+          ] as const).map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => setDigestFrequency(opt.value)}
+              className={`rounded-md border px-3 py-2 text-center transition-colors ${
+                digestFrequency === opt.value
+                  ? 'border-primary bg-primary/5 text-foreground'
+                  : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <p className="text-xs font-mono">{opt.label}</p>
+            </button>
+          ))}
+        </div>
+        <div className="grid grid-cols-2 gap-2">
+          {([
+            { value: 'monthly', label: 'Monthly' },
+            { value: 'off', label: 'Off' },
+          ] as const).map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => setDigestFrequency(opt.value)}
+              className={`rounded-md border px-3 py-2 text-center transition-colors ${
+                digestFrequency === opt.value
+                  ? 'border-primary bg-primary/5 text-foreground'
+                  : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              <p className="text-xs font-mono">{opt.label}</p>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <Separator />
       <div className="space-y-4">
         <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Notifications</p>
         <div className="flex items-center justify-between">
