@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/use-auth';
 import { Hand, TrendingDown, TrendingUp, Minus, Check, Flame } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -17,8 +18,22 @@ interface Props {
 }
 
 export function OutcomePrompt({ reflectionId, onComplete }: Props) {
+  const { user } = useAuth();
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [pendingCount, setPendingCount] = useState(0);
+
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from('reflections')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .is('outcome', null)
+      .then(({ count }) => {
+        setPendingCount(count ?? 0);
+      });
+  }, [user]);
 
   const handleSelect = async (outcome: string) => {
     setSaving(true);
@@ -69,7 +84,15 @@ export function OutcomePrompt({ reflectionId, onComplete }: Props) {
           >
             <div className="space-y-1">
               <p className="text-sm font-mono text-muted-foreground">What did you do?</p>
-              <p className="text-[10px] font-mono text-muted-foreground/50">Logging an outcome builds your streak.</p>
+              {pendingCount >= 3 ? (
+                <p className="text-[10px] font-mono text-muted-foreground/50">
+                  You have {pendingCount} reflections without an outcome. Logging builds your streak.
+                </p>
+              ) : (
+                <p className="text-[10px] font-mono text-muted-foreground/50">
+                  Logging an outcome builds your streak.
+                </p>
+              )}
             </div>
             <div className="grid grid-cols-4 gap-2">
               {outcomes.map(({ value, label, icon: Icon }) => (
