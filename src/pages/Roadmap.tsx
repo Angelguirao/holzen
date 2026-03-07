@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ChevronUp } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { PageMeta } from '@/components/PageMeta';
 
 interface RoadmapItem {
   id: string;
@@ -20,10 +21,7 @@ const Roadmap = () => {
   const [votes, setVotes] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    document.title = 'Holzen — Roadmap';
-    return () => { document.title = 'Holzen — Pause before you act'; };
-  }, []);
+  // Remove manual document.title — PageMeta handles it
 
   useEffect(() => {
     const load = async () => {
@@ -66,6 +64,7 @@ const Roadmap = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <PageMeta title="Holzen Roadmap — Vote on what we build next" description="See what's planned for Holzen and vote on features you want most. Public roadmap shaped by the community." path="/roadmap" />
       <div className="max-w-lg mx-auto px-6 py-12 space-y-8">
         <div className="space-y-4">
           <Link to={user ? '/settings' : '/welcome'} className="inline-flex items-center gap-1 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors">

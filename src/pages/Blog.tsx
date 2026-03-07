@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
+import { PageMeta } from '@/components/PageMeta';
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 14 },
@@ -31,6 +32,11 @@ const Blog = () => {
 
   return (
     <div className="min-h-screen flex items-start justify-center px-6 py-16">
+      <PageMeta
+        title="Holzen Blog — Bitcoin psychology, behavioral finance & self-awareness"
+        description="Articles on Bitcoin conviction, behavioral finance, and the art of pausing before you act. From the team behind Holzen."
+        path="/blog"
+      />
       <div className="w-full max-w-sm space-y-10">
         {/* Nav */}
         <motion.div {...m()} className="flex items-center justify-between">

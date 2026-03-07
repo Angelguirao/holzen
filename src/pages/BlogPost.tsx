@@ -4,7 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
-import { useEffect } from 'react';
+import { PageMeta } from '@/components/PageMeta';
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 14 },
@@ -33,18 +33,13 @@ const BlogPost = () => {
     enabled: !!slug,
   });
 
-  // Update page title
-  useEffect(() => {
-    if (post?.title) {
-      document.title = `${post.title} — Holzen`;
-    }
-    return () => {
-      document.title = 'Holzen — Pause before you act';
-    };
-  }, [post?.title]);
+  const postTitle = post?.title ? `${post.title} — Holzen Blog` : 'Holzen Blog';
+  const postDesc = post?.excerpt || 'Read this article on the Holzen blog.';
+  const postPath = slug ? `/blog/${slug}` : '/blog';
 
   return (
     <div className="min-h-screen flex items-start justify-center px-6 py-16">
+      <PageMeta title={postTitle} description={postDesc} path={postPath} />
       <div className="w-full max-w-sm space-y-10">
         {/* Nav */}
         <motion.div {...m()}>

@@ -1,11 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 import { Separator } from '@/components/ui/separator';
+import { PageMeta } from '@/components/PageMeta';
 
 const Privacy = () => {
   const navigate = useNavigate();
 
   return (
     <div className="min-h-screen flex justify-center p-6 py-16">
+      <PageMeta title="Privacy Policy — Holzen" description="How Holzen handles your data. We collect only what's needed and you can export or delete everything anytime." path="/privacy" />
       <div className="w-full max-w-lg space-y-10">
         <div className="space-y-4">
           <button
