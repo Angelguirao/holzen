@@ -20,7 +20,7 @@ export function ReflectionStats({ reflections, streakFreezeDates = [], onUseFree
     const withOutcome = reflections.filter(r => r.outcome != null && r.outcome !== '');
     const totalOutcomes = withOutcome.length;
 
-    if (totalOutcomes === 0) return { total: reflections.length, currentStreak: 0, longestStreak: 0, streakAtRisk: false, canFreeze: false };
+    if (totalOutcomes === 0) return { total: reflections.length, currentStreak: 0, longestStreak: 0, streakAtRisk: false, canFreeze: false, nextFreezeAvailable: null };
 
     // Get unique days with outcomes + freeze dates
     const days = new Set<string>();
