@@ -58,7 +58,8 @@ The context may include a Fear & Greed Index score (0-100). Use this to subtly a
 Do NOT name the index or its score directly. Weave the sentiment naturally into the reflection.
 
 Reflection rules:
-- Exactly 1-3 sentences. ${tone === 'blunt' ? '1 sentence preferred.' : ''}
+- Style: ${styleInstruction}
+- ${tone === 'blunt' ? '1 sentence preferred.' : ''}
 - Encourage pause and reflection. Preserve agency: never say "you should".
 - No reassurance, excitement, urgency, trading advice, lists, disclaimers.
 - No exclamation marks, emojis, motivational language, reward language.
