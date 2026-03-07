@@ -51,6 +51,7 @@ export function useHolzen() {
         setReflectionToneState((data as any).reflection_tone ?? 'stoic');
         setCooldownHoursState((data as any).cooldown_hours ?? 6);
         setSilentModeState((data as any).silent_mode ?? false);
+        setDigestFrequencyState((data as any).digest_frequency ?? 'weekly');
         setHasOnboarded(data.has_onboarded ?? false);
         setCompanionPrefsState({
           breathing: data.companion_breathing ?? true,
