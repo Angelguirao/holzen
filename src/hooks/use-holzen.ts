@@ -9,7 +9,9 @@ const MANUAL_COOLDOWN_MS = 15 * 60 * 1000; // 15 minutes for on-demand
 export function useHolzen() {
   const { user } = useAuth();
   const [threshold, setThresholdState] = useState(5);
+  const [thresholdDown, setThresholdDownState] = useState(5);
   const [cumulativeThreshold, setCumulativeThresholdState] = useState(15);
+  const [streakFreezeDates, setStreakFreezeDatesState] = useState<string[]>([]);
   const [emailNotifications, setEmailNotificationsState] = useState(true);
   const [reflectionTone, setReflectionToneState] = useState('stoic');
   const [silentMode, setSilentModeState] = useState(false);
@@ -38,7 +40,9 @@ export function useHolzen() {
 
       if (data) {
         setThresholdState(data.threshold);
+        setThresholdDownState((data as any).threshold_down ?? data.threshold);
         setCumulativeThresholdState(data.cumulative_threshold ?? 15);
+        setStreakFreezeDatesState((data as any).streak_freeze_dates ?? []);
         setLastTriggerAt((data as any).last_trigger_at ?? null);
         setMessage(data.last_message);
         setContext(data.last_context);
@@ -87,6 +91,15 @@ export function useHolzen() {
       .eq('user_id', user.id);
   }, [user]);
 
+  const setThresholdDown = useCallback(async (val: number) => {
+    setThresholdDownState(val);
+    if (!user) return;
+    await supabase
+      .from('profiles')
+      .update({ threshold_down: val } as any)
+      .eq('user_id', user.id);
+  }, [user]);
+
   const setCumulativeThreshold = useCallback(async (val: number) => {
     setCumulativeThresholdState(val);
     if (!user) return;
@@ -95,6 +108,24 @@ export function useHolzen() {
       .update({ cumulative_threshold: val })
       .eq('user_id', user.id);
   }, [user]);
+
+  const useStreakFreeze = useCallback(async () => {
+    if (!user) return;
+    const today = new Date().toISOString().slice(0, 10);
+    if (streakFreezeDates.includes(today)) return; // already used today
+    // Limit: max 1 freeze per 7 days
+    const recent = streakFreezeDates.filter((d) => {
+      const diff = Math.abs(Date.now() - new Date(d).getTime());
+      return diff < 7 * 24 * 60 * 60 * 1000;
+    });
+    if (recent.length >= 1) return;
+    const updated = [...streakFreezeDates, today];
+    setStreakFreezeDatesState(updated);
+    await supabase
+      .from('profiles')
+      .update({ streak_freeze_dates: updated } as any)
+      .eq('user_id', user.id);
+  }, [user, streakFreezeDates]);
 
   const setEmailNotifications = useCallback(async (val: boolean) => {
     setEmailNotificationsState(val);
@@ -255,7 +286,8 @@ export function useHolzen() {
       setBtcData(data);
 
       if (user && !(await isInCooldown())) {
-        const dailyTriggered = Math.abs(data.changePercent) >= threshold;
+        const effectiveThreshold = data.changePercent < 0 ? thresholdDown : threshold;
+        const dailyTriggered = Math.abs(data.changePercent) >= effectiveThreshold;
         const cumulativeTriggered = data.cumulativeChangePercent !== undefined && Math.abs(data.cumulativeChangePercent) >= cumulativeThreshold;
 
         if (dailyTriggered || cumulativeTriggered) {
@@ -265,7 +297,7 @@ export function useHolzen() {
     } catch (e: any) {
       setError(e.message || 'Failed to fetch BTC data');
     }
-  }, [user, threshold, cumulativeThreshold, isInCooldown, generateMessage]);
+  }, [user, threshold, thresholdDown, cumulativeThreshold, isInCooldown, generateMessage]);
 
   const [lastTriggerAt, setLastTriggerAt] = useState<string | null>(null);
   const [lastManualAt, setLastManualAt] = useState<number | null>(() => {
@@ -340,8 +372,12 @@ export function useHolzen() {
   return {
     threshold,
     setThreshold,
+    thresholdDown,
+    setThresholdDown,
     cumulativeThreshold,
     setCumulativeThreshold,
+    streakFreezeDates,
+    useStreakFreeze,
     emailNotifications,
     setEmailNotifications,
     reflectionTone,
