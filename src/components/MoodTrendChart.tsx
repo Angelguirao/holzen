@@ -42,7 +42,7 @@ export function MoodTrendChart({ reflections }: Props) {
       .sort((a, b) => a.week.localeCompare(b.week));
   }, [reflections]);
 
-  if (data.length < 2) return null;
+  if (data.length < 1) return null;
 
   // Overall trend direction
   const first = data[0].avg;
