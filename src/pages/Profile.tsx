@@ -356,7 +356,7 @@ function LetterCard({ letter: l, onDelete, fmtPrice, type }: {
           <p className="text-xs text-muted-foreground/50">
             Delivers during next {l.deliver_during === 'ath' ? 'surge' : 'drop'}
           </p>
-          <p className="text-sm leading-relaxed blur-sm hover:blur-none transition-all duration-300 cursor-pointer select-none" title="Hover to peek">
+          <p className="text-sm leading-relaxed blur-[8px] select-none pointer-events-none">
             {l.body}
           </p>
         </>
