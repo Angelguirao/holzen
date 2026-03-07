@@ -272,23 +272,36 @@ serve(async (req) => {
         ctx += ` Over 7 days, it's ${cumDir} ${absCumChange.toFixed(1)}%.`;
       }
 
-      // Generate reflection
-      const reflection = await generateReflection(ctx, LOVABLE_API_KEY);
-      if (!reflection) {
+      // Generate reflection with companions
+      const tone = (profile as any).reflection_tone || "stoic";
+      const result = await generateReflection(ctx, LOVABLE_API_KEY, tone);
+      if (!result) {
         console.log(`[CHECK-VOLATILITY] Failed to generate reflection for ${profile.user_id}`);
         continue;
       }
 
+      // Respect user companion preferences
+      const haiku = (profile as any).companion_haiku ? result.haiku : null;
+      const learningTitle = (profile as any).companion_learning ? result.learning_title : null;
+      const learningBody = (profile as any).companion_learning ? result.learning_body : null;
+
       // Save to reflection history
       await supabase
         .from("reflections")
-        .insert({ user_id: profile.user_id, message: reflection, context: ctx });
+        .insert({
+          user_id: profile.user_id,
+          message: result.message,
+          context: ctx,
+          haiku,
+          learning_title: learningTitle,
+          learning_body: learningBody,
+        });
 
       // Update profile with new reflection
       await supabase
         .from("profiles")
         .update({
-          last_message: reflection,
+          last_message: result.message,
           last_context: ctx,
           last_trigger_at: new Date().toISOString(),
         })
