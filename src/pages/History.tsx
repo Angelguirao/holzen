@@ -146,7 +146,10 @@ const History = () => {
             No reflections yet. Insights will appear after your first reflection.
           </p>
         ) : (
-          <InsightsPanel reflections={reflections} />
+          <div className="space-y-5">
+            <ReflectionStats reflections={reflections} />
+            <InsightsPanel reflections={reflections} />
+          </div>
         )
       ) : (
         /* Library Tab */
