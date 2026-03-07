@@ -1,5 +1,5 @@
-import { useState } from 'react';
 import { Eye, EyeOff, WifiOff } from 'lucide-react';
+import { BtcChart } from '@/components/BtcChart';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { BtcPriceData } from '@/lib/btc';
 
