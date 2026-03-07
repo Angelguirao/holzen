@@ -22,6 +22,7 @@ export function useHolzen() {
   const [quietHoursStart, setQuietHoursStartState] = useState<number | null>(null);
   const [quietHoursEnd, setQuietHoursEndState] = useState<number | null>(null);
   const [firstName, setFirstNameState] = useState<string | null>(null);
+  const [nightReflectionHour, setNightReflectionHourState] = useState(21);
   const [btcData, setBtcData] = useState<BtcPriceData | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [context, setContext] = useState<string | null>(null);
