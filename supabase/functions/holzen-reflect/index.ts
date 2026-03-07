@@ -13,6 +13,14 @@ const TONE_INSTRUCTIONS: Record<string, string> = {
   blunt: "Write in a direct, blunt tone. No fluff. Say it plainly in as few words as possible.",
 };
 
+const STYLE_INSTRUCTIONS: Record<string, string> = {
+  standard: "Write a reflection in 1-3 sentences.",
+  "one-liner": "Write EXACTLY one sentence. Concise and impactful.",
+  question: "Respond with EXACTLY one thought-provoking question. No statements.",
+  metaphor: "Use a single vivid metaphor to frame the moment. 1-2 sentences max.",
+  koan: "Write a short zen koan or paradox related to the moment. 1-2 sentences.",
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
