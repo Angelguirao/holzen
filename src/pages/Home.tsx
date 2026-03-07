@@ -55,6 +55,7 @@ const Home = () => {
   const [outcomeReflectionId, setOutcomeReflectionId] = useState<string | null>(null);
   const [showMoodCheck, setShowMoodCheck] = useState(false);
   const [priceHidden, setPriceHidden] = useState(() => localStorage.getItem('holzen_hide_price') === 'true');
+  const [zenMode] = useState(() => localStorage.getItem('holzen_zen_mode') === 'true');
 
   const togglePriceHidden = useCallback(() => {
     setPriceHidden(prev => {
@@ -110,6 +111,53 @@ const Home = () => {
   }
 
   const hasAccess = subscribed || (trialRemaining !== undefined && trialRemaining > 0);
+
+  if (zenMode) {
+    return (
+      <div className="space-y-10 min-h-[60vh] flex flex-col justify-center">
+        {message ? (
+          <ReflectionMessage
+            message={message}
+            context={context}
+            onDismiss={handleDismiss}
+            companions={companions}
+            companionPrefs={{ breathing: companionPrefs.breathing, haiku: false, learning: false }}
+            severity={severity}
+            reflectionId={lastReflectionId}
+          />
+        ) : showOutcome && outcomeReflectionId ? (
+          <OutcomePrompt
+            reflectionId={outcomeReflectionId}
+            onComplete={handleOutcomeComplete}
+          />
+        ) : showMoodCheck ? (
+          <MoodCheck onSelect={handleMoodSelected} onSkip={handleMoodSkipped} />
+        ) : loading ? (
+          <div className="space-y-4">
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Loader2 className="h-3 w-3 animate-spin" />
+              <p className="text-xs font-mono">Generating reflection</p>
+            </div>
+            <Skeleton className="h-4 w-full" />
+            <Skeleton className="h-4 w-3/4" />
+          </div>
+        ) : (
+          <div className="space-y-6 text-center">
+            <p className="text-sm text-muted-foreground font-mono leading-relaxed">
+              No active reflection.
+            </p>
+            {hasAccess && (
+              <NeedAMomentButton
+                onTrigger={handleNeedAMoment}
+                cooldownRemaining={manualCooldownRemaining}
+                loading={loading}
+              />
+            )}
+          </div>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-10">
