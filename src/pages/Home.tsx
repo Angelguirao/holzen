@@ -17,7 +17,17 @@ import { toast } from 'sonner';
 import { AlertCircle, Loader2, Pause, Pin, Timer } from 'lucide-react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
+interface PinnedReflection {
+  id: string;
+  message: string;
+  context: string | null;
+  haiku: string | null;
+  learning_title: string | null;
+  learning_body: string | null;
+}
+
 const Home = () => {
+  const { user } = useAuth();
   const { subscribed, loading: subLoading, trialRemaining, checkoutLoading, startCheckout, refresh } = useSubscription();
   const [searchParams] = useSearchParams();
 
@@ -46,8 +56,6 @@ const Home = () => {
     manualCooldownRemaining,
     autoCooldownRemaining,
     cooldownHours,
-    streakFreezeDates,
-    useStreakFreeze,
   } = useHolzen();
 
   const [showOutcome, setShowOutcome] = useState(false);
@@ -55,7 +63,25 @@ const Home = () => {
   const [showMoodCheck, setShowMoodCheck] = useState(false);
   const [priceHidden, setPriceHidden] = useState(() => localStorage.getItem('holzen_hide_price') === 'true');
   const [zenMode] = useState(() => localStorage.getItem('holzen_zen_mode') === 'true');
+  const [pinnedReflection, setPinnedReflection] = useState<PinnedReflection | null>(null);
   const prefersReducedMotion = useReducedMotion();
+
+  // Load pinned reflection
+  useEffect(() => {
+    if (!user) return;
+    const pinnedId = localStorage.getItem('holzen_pinned_reflection');
+    if (!pinnedId) return;
+    supabase
+      .from('reflections')
+      .select('id, message, context, haiku, learning_title, learning_body')
+      .eq('id', pinnedId)
+      .eq('user_id', user.id)
+      .single()
+      .then(({ data }) => {
+        if (data) setPinnedReflection(data as unknown as PinnedReflection);
+        else localStorage.removeItem('holzen_pinned_reflection');
+      });
+  }, [user]);
 
   const togglePriceHidden = useCallback(() => {
     setPriceHidden(prev => {
