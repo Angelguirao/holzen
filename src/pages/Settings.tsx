@@ -28,7 +28,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 
-const APP_VERSION = '1.2.0';
+const LAST_SEEN_VERSION_KEY = 'holzen_last_seen_version';
 
 const Settings = () => {
   const { user, signOut } = useAuth();
