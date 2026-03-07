@@ -283,6 +283,27 @@ const Settings = () => {
 
       <Separator />
 
+      {/* Custom Prompt */}
+      <div className="space-y-4">
+        <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Custom prompt</p>
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          Add personal guidance the AI will weave into every reflection. e.g. "remind me why I hold long-term" or "focus on what I can control".
+        </p>
+        <textarea
+          value={customPrompt ?? ''}
+          onChange={(e) => setCustomPrompt(e.target.value || null)}
+          placeholder="Your personal reflection guidance…"
+          maxLength={200}
+          rows={3}
+          className="w-full text-xs font-mono px-3 py-2 rounded-md border border-border/60 bg-background text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/40 transition-colors resize-none"
+        />
+        <p className="text-[10px] font-mono text-muted-foreground/50 text-right">
+          {(customPrompt?.length ?? 0)}/200
+        </p>
+      </div>
+
+      <Separator />
+
       {/* Digest Frequency */}
       <div className="space-y-4">
         <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Digest frequency</p>
