@@ -17,14 +17,14 @@ const MILESTONES = [
   { count: 5, icon: Crown, label: '5 referrals', reward: 'Lifetime access unlocked' },
 ];
 
-export function ReferralSection() {
+export function ReferralSection({ defaultExpanded = false }: { defaultExpanded?: boolean }) {
   const { user } = useAuth();
   
   const [referralCode, setReferralCode] = useState<string | null>(null);
   const [referralCount, setReferralCount] = useState(0);
   const [grantedRewards, setGrantedRewards] = useState<GrantedReward[]>([]);
   const [copied, setCopied] = useState(false);
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(defaultExpanded);
 
   useEffect(() => {
     if (!user) return;
