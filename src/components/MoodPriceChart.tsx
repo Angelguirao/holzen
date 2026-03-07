@@ -43,8 +43,6 @@ export function MoodPriceChart({ reflections }: Props) {
       .filter(Boolean) as { change: number; mood: number; moodLabel: string }[];
   }, [reflections]);
 
-  if (data.length < 3) return null;
-
   // Compute averages per mood for the summary
   const moodAvgs = useMemo(() => {
     const groups: Record<string, { total: number; count: number }> = {};
@@ -60,6 +58,8 @@ export function MoodPriceChart({ reflections }: Props) {
       count,
     }));
   }, [data]);
+
+  if (data.length < 3) return null;
 
   return (
     <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3">
