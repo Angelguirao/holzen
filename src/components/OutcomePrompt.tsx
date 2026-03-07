@@ -29,7 +29,10 @@ export function OutcomePrompt({ reflectionId, onComplete }: Props) {
 
   return (
     <div className="space-y-4">
-      <p className="text-sm font-mono text-muted-foreground">What did you do?</p>
+      <div className="space-y-1">
+        <p className="text-sm font-mono text-muted-foreground">What did you do?</p>
+        <p className="text-[10px] font-mono text-muted-foreground/50">Logging an outcome builds your streak.</p>
+      </div>
       <div className="grid grid-cols-4 gap-2">
         {outcomes.map(({ value, label, icon: Icon }) => (
           <Button
