@@ -25,7 +25,7 @@ interface Props {
   threshold?: number;
 }
 
-export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
+export function LetterToFutureSelf({ currentPrice, changePercent, threshold = 5 }: Props) {
   const { user } = useAuth();
   const [letters, setLetters] = useState<Letter[]>([]);
   const [pendingLetters, setPendingLetters] = useState<Letter[]>([]);
