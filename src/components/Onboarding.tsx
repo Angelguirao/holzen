@@ -310,14 +310,16 @@ export function Onboarding({ onComplete }: Props) {
   );
 }
 
-function Nav({ showBack, onBack, onNext, nextLabel = 'Continue' }: {
+import { forwardRef } from 'react';
+
+const Nav = forwardRef<HTMLDivElement, {
   showBack: boolean;
   onBack?: () => void;
   onNext: () => void;
   nextLabel?: string;
-}) {
+}>(function Nav({ showBack, onBack, onNext, nextLabel = 'Continue' }, ref) {
   return (
-    <div className="flex items-center gap-4 pt-2">
+    <div ref={ref} className="flex items-center gap-4 pt-2">
       {showBack && (
         <button
           onClick={onBack}
@@ -334,4 +336,4 @@ function Nav({ showBack, onBack, onNext, nextLabel = 'Continue' }: {
       </button>
     </div>
   );
-}
+});
