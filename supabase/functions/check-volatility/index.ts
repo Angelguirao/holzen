@@ -239,7 +239,7 @@ serve(async (req) => {
     // 2. Get all profiles - we need to check both thresholds
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
-      .select("user_id, threshold, cumulative_threshold, email_notifications, last_trigger_at, cooldown_hours, reflection_tone, companion_haiku, companion_learning");
+      .select("user_id, threshold, cumulative_threshold, email_notifications, last_trigger_at, cooldown_hours, reflection_tone, companion_haiku, companion_learning, quiet_hours_start, quiet_hours_end, timezone");
 
     if (profilesError) throw profilesError;
     if (!profiles || profiles.length === 0) {
@@ -249,11 +249,31 @@ serve(async (req) => {
       });
     }
 
-    // Filter: must exceed at least one threshold AND not in cooldown
+    // Helper: get user's local hour
+    function getUserLocalHour(timezone: string): number {
+      try {
+        const formatter = new Intl.DateTimeFormat("en-US", { hour: "numeric", hour12: false, timeZone: timezone });
+        return parseInt(formatter.format(new Date()), 10);
+      } catch { return new Date().getUTCHours(); }
+    }
+
+    // Helper: check if user is in quiet hours (timezone-aware)
+    function isInQuietHours(p: any): boolean {
+      const start = p.quiet_hours_start;
+      const end = p.quiet_hours_end;
+      if (start == null || end == null) return false;
+      const tz = p.timezone || "UTC";
+      const localHour = getUserLocalHour(tz);
+      if (start <= end) return localHour >= start && localHour < end;
+      return localHour >= start || localHour < end; // wraps midnight
+    }
+
+    // Filter: must exceed at least one threshold AND not in cooldown AND not in quiet hours
     const eligible = profiles.filter((p) => {
       const dailyTriggered = absChange >= (p.threshold ?? 5);
       const cumulativeTriggered = absCumChange >= ((p as any).cumulative_threshold ?? 15);
       if (!dailyTriggered && !cumulativeTriggered) return false;
+      if (isInQuietHours(p)) return false;
       if (!p.last_trigger_at) return true;
       const cooldownMs = ((p as any).cooldown_hours ?? 6) * 60 * 60 * 1000;
       return new Date(p.last_trigger_at).getTime() < Date.now() - cooldownMs;

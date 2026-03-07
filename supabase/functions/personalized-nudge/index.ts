@@ -37,14 +37,33 @@ serve(async (req) => {
       });
     }
 
-    // 2. Get users with email notifications enabled
+    // 2. Get users with email notifications enabled (with timezone)
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
-      .select("user_id, email_notifications");
+      .select("user_id, email_notifications, quiet_hours_start, quiet_hours_end, timezone");
 
     if (profilesError) throw profilesError;
 
-    const eligible = (profiles ?? []).filter((p) => p.email_notifications);
+    // Helper: get user's local hour
+    function getUserLocalHour(timezone: string): number {
+      try {
+        const formatter = new Intl.DateTimeFormat("en-US", { hour: "numeric", hour12: false, timeZone: timezone });
+        return parseInt(formatter.format(new Date()), 10);
+      } catch { return new Date().getUTCHours(); }
+    }
+
+    // Helper: check quiet hours
+    function isInQuietHours(p: any): boolean {
+      const start = p.quiet_hours_start;
+      const end = p.quiet_hours_end;
+      if (start == null || end == null) return false;
+      const tz = p.timezone || "UTC";
+      const localHour = getUserLocalHour(tz);
+      if (start <= end) return localHour >= start && localHour < end;
+      return localHour >= start || localHour < end;
+    }
+
+    const eligible = (profiles ?? []).filter((p) => p.email_notifications && !isInQuietHours(p));
     const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
     let nudged = 0;
 
