@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
 import { differenceInCalendarDays, parseISO } from 'date-fns';
-import { Shield } from 'lucide-react';
+import { Shield, Snowflake } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { formatDistanceToNow } from 'date-fns';
 
 interface Props {
   reflections: { created_at: string; outcome: string | null }[];
