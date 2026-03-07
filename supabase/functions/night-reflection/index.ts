@@ -78,7 +78,9 @@ serve(async (req) => {
       // Timezone-aware: only send if user's local time is 9 PM (21:00)
       const tz = (profile as any).timezone || "UTC";
       const localHour = getUserLocalHour(tz);
-      const targetHour = (profile as any).night_reflection_hour ?? 21;
+      const targetHour = (profile as any).night_reflection_hour;
+      // null means disabled
+      if (targetHour === null || targetHour === undefined) continue;
       if (localHour !== targetHour) continue;
 
       // Check if user had any reflections today (in their timezone)
