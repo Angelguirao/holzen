@@ -1,6 +1,16 @@
 import { useMemo } from 'react';
 
-interface Props {
+const MOOD_BAR_COLORS: Record<string, string> = {
+  anxious: 'hsl(var(--destructive) / 0.5)',
+  neutral: 'hsl(var(--muted-foreground) / 0.35)',
+  calm: 'hsl(var(--primary) / 0.5)',
+};
+
+const MOOD_TEXT_COLORS: Record<string, string> = {
+  anxious: 'hsl(var(--destructive))',
+  neutral: 'hsl(var(--muted-foreground))',
+  calm: 'hsl(var(--primary))',
+};
   reflections: { context: string | null; mood: string | null }[];
 }
 
