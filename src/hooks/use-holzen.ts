@@ -372,8 +372,12 @@ export function useHolzen() {
   return {
     threshold,
     setThreshold,
+    thresholdDown,
+    setThresholdDown,
     cumulativeThreshold,
     setCumulativeThreshold,
+    streakFreezeDates,
+    useStreakFreeze,
     emailNotifications,
     setEmailNotifications,
     reflectionTone,
