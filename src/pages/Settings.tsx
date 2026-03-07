@@ -151,6 +151,23 @@ const Settings = () => {
         </button>
       </div>
 
+      {/* Name */}
+      <div className="space-y-3">
+        <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Name</p>
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          Optional. Shown as a quiet greeting on home.
+        </p>
+        <Input
+          value={firstName ?? ''}
+          onChange={(e) => setFirstName(e.target.value || null)}
+          placeholder="Your first name"
+          maxLength={30}
+          className="text-xs font-mono"
+        />
+      </div>
+
+      <Separator />
+
       {/* Threshold */}
       {profileLoaded ? (
         <ThresholdSetting thresholdUp={threshold} onSetUp={setThreshold} thresholdDown={thresholdDown} onSetDown={setThresholdDown} cumulativeThreshold={cumulativeThreshold} onSetCumulative={setCumulativeThreshold} />
