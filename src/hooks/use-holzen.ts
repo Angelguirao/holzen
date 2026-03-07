@@ -397,6 +397,8 @@ export function useHolzen() {
     setSilentMode,
     cooldownHours,
     setCooldownHours,
+    digestFrequency,
+    setDigestFrequency,
     companionPrefs,
     setCompanionPref,
     btcData,
