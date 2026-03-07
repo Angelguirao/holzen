@@ -2,13 +2,14 @@ import { useEffect, useState, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { format, subDays, isAfter } from 'date-fns';
-import { X, Star, Search, Pin } from 'lucide-react';
+import { X, Star, Search, Pin, Info } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ShareReflection } from '@/components/ShareReflection';
 import { ReflectionNote } from '@/components/ReflectionNote';
 import { ReflectionTags } from '@/components/ReflectionTags';
 import { HaikuDisplay } from '@/components/HaikuDisplay';
 import { LearningInput } from '@/components/LearningInput';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { toast } from 'sonner';
 import {
   AlertDialog,
