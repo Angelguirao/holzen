@@ -17,6 +17,7 @@ export function useHolzen() {
   const [silentMode, setSilentModeState] = useState(false);
   const [cooldownHours, setCooldownHoursState] = useState(6);
   const [digestFrequency, setDigestFrequencyState] = useState('weekly');
+  const [customPrompt, setCustomPromptState] = useState<string | null>(null);
   const [btcData, setBtcData] = useState<BtcPriceData | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [context, setContext] = useState<string | null>(null);
