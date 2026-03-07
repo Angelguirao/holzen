@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ChevronUp } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { PageMeta } from '@/components/PageMeta';
 
 interface RoadmapItem {
   id: string;
