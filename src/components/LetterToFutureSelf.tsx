@@ -191,7 +191,9 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
       }, 1200);
 
       toast('Letter sealed', {
-        description: deliverDuring === 'ath'
+        description: effectiveMode === 'calm'
+          ? 'Sealed in calm · Opens when the storm hits'
+          : deliverDuring === 'ath'
           ? 'Sealed in fear · Opens when confidence returns'
           : 'Sealed in euphoria · Opens when doubt arrives',
       });
