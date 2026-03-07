@@ -17,6 +17,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
 import { AlertCircle, Loader2, Pause, Timer } from 'lucide-react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
 const Home = () => {
   const { subscribed, loading: subLoading, trialRemaining, checkoutLoading, startCheckout, refresh } = useSubscription();
@@ -56,6 +57,7 @@ const Home = () => {
   const [showMoodCheck, setShowMoodCheck] = useState(false);
   const [priceHidden, setPriceHidden] = useState(() => localStorage.getItem('holzen_hide_price') === 'true');
   const [zenMode] = useState(() => localStorage.getItem('holzen_zen_mode') === 'true');
+  const prefersReducedMotion = useReducedMotion();
 
   const togglePriceHidden = useCallback(() => {
     setPriceHidden(prev => {
@@ -113,48 +115,70 @@ const Home = () => {
   const hasAccess = subscribed || (trialRemaining !== undefined && trialRemaining > 0);
 
   if (zenMode) {
+    const zenTransition = { duration: 0.8, ease: "easeOut" as const };
+    const zenVariants = prefersReducedMotion
+      ? { hidden: { opacity: 1 }, visible: { opacity: 1 } }
+      : {
+          hidden: { opacity: 0, y: 12 },
+          visible: { opacity: 1, y: 0, transition: zenTransition },
+        };
+
     return (
-      <div className="space-y-10 min-h-[60vh] flex flex-col justify-center">
-        {message ? (
-          <ReflectionMessage
-            message={message}
-            context={context}
-            onDismiss={handleDismiss}
-            companions={companions}
-            companionPrefs={{ breathing: companionPrefs.breathing, haiku: false, learning: false }}
-            severity={severity}
-            reflectionId={lastReflectionId}
-          />
-        ) : showOutcome && outcomeReflectionId ? (
-          <OutcomePrompt
-            reflectionId={outcomeReflectionId}
-            onComplete={handleOutcomeComplete}
-          />
-        ) : showMoodCheck ? (
-          <MoodCheck onSelect={handleMoodSelected} onSkip={handleMoodSkipped} />
-        ) : loading ? (
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 text-muted-foreground">
-              <Loader2 className="h-3 w-3 animate-spin" />
-              <p className="text-xs font-mono">Generating reflection</p>
-            </div>
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-3/4" />
-          </div>
-        ) : (
-          <div className="space-y-6 text-center">
-            <p className="text-sm text-muted-foreground font-mono leading-relaxed">
-              No active reflection.
-            </p>
-            {hasAccess && (
-              <NeedAMomentButton
-                onTrigger={handleNeedAMoment}
-                cooldownRemaining={manualCooldownRemaining}
-                loading={loading}
+      <div className="min-h-[60vh] flex flex-col justify-center">
+        <AnimatePresence mode="wait">
+          {message ? (
+            <motion.div
+              key="zen-reflection"
+              variants={zenVariants}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+            >
+              <ReflectionMessage
+                message={message}
+                context={context}
+                onDismiss={handleDismiss}
+                companions={companions}
+                companionPrefs={{ breathing: companionPrefs.breathing, haiku: false, learning: false }}
+                severity={severity}
+                reflectionId={lastReflectionId}
               />
-            )}
-          </div>
-        )}
+            </motion.div>
+          ) : showOutcome && outcomeReflectionId ? (
+            <motion.div key="zen-outcome" variants={zenVariants} initial="hidden" animate="visible" exit="hidden">
+              <OutcomePrompt
+                reflectionId={outcomeReflectionId}
+                onComplete={handleOutcomeComplete}
+              />
+            </motion.div>
+          ) : showMoodCheck ? (
+            <motion.div key="zen-mood" variants={zenVariants} initial="hidden" animate="visible" exit="hidden">
+              <MoodCheck onSelect={handleMoodSelected} onSkip={handleMoodSkipped} />
+            </motion.div>
+          ) : loading ? (
+            <motion.div key="zen-loading" variants={zenVariants} initial="hidden" animate="visible" exit="hidden" className="space-y-4">
+              <div className="flex items-center gap-2 text-muted-foreground">
+                <Loader2 className="h-3 w-3 animate-spin" />
+                <p className="text-xs font-mono">Generating reflection</p>
+              </div>
+              <Skeleton className="h-4 w-full" />
+              <Skeleton className="h-4 w-3/4" />
+            </motion.div>
+          ) : (
+            <motion.div key="zen-empty" variants={zenVariants} initial="hidden" animate="visible" exit="hidden" className="space-y-6 text-center">
+              <p className="text-sm text-muted-foreground font-mono leading-relaxed">
+                No active reflection.
+              </p>
+              {hasAccess && (
+                <NeedAMomentButton
+                  onTrigger={handleNeedAMoment}
+                  cooldownRemaining={manualCooldownRemaining}
+                  loading={loading}
+                />
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     );
   }
