@@ -21,3 +21,5 @@ project_id = "edgbwdecaoottowliimu"
     verify_jwt = false
   [functions.weekly-digest]
     verify_jwt = false
+  [functions.deliver-letters]
+    verify_jwt = false
