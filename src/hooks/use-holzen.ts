@@ -299,12 +299,22 @@ export function useHolzen() {
     }
   }, [user, reflectionTone, reflectionStyle, silentMode, cumulativeThreshold, customPrompt]);
 
+  const isInQuietHours = useCallback(() => {
+    if (quietHoursStart === null || quietHoursEnd === null) return false;
+    const nowHour = new Date().getHours();
+    if (quietHoursStart <= quietHoursEnd) {
+      return nowHour >= quietHoursStart && nowHour < quietHoursEnd;
+    }
+    // Wraps midnight (e.g., 22-7)
+    return nowHour >= quietHoursStart || nowHour < quietHoursEnd;
+  }, [quietHoursStart, quietHoursEnd]);
+
   const checkAndTrigger = useCallback(async () => {
     try {
       const data = await fetchBtcData();
       setBtcData(data);
 
-      if (user && !(await isInCooldown())) {
+      if (user && !(await isInCooldown()) && !isInQuietHours()) {
         const effectiveThreshold = data.changePercent < 0 ? thresholdDown : threshold;
         const dailyTriggered = Math.abs(data.changePercent) >= effectiveThreshold;
         const cumulativeTriggered = data.cumulativeChangePercent !== undefined && Math.abs(data.cumulativeChangePercent) >= cumulativeThreshold;
