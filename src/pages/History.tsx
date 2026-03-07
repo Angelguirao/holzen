@@ -196,7 +196,9 @@ const History = () => {
         <p className="text-xs text-muted-foreground">
           {tab === 'letters'
             ? `${letters.length} letter${letters.length !== 1 ? 's' : ''} total`
-            : `${reflections.length} reflection${reflections.length !== 1 ? 's' : ''} total`}
+            : tab === 'badges'
+              ? 'Visual milestones for your practice'
+              : `${reflections.length} reflection${reflections.length !== 1 ? 's' : ''} total`}
         </p>
       </div>
 
