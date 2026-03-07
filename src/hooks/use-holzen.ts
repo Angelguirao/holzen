@@ -245,7 +245,7 @@ export function useHolzen() {
 
     try {
       const { data: fnData, error: fnError } = await supabase.functions.invoke('holzen-reflect', {
-        body: { context: ctx, tone: reflectionTone },
+        body: { context: ctx, tone: reflectionTone, customPrompt: customPrompt || undefined },
       });
 
       if (fnError) throw fnError;
