@@ -112,6 +112,7 @@ export type Database = {
           companion_breathing: boolean
           companion_haiku: boolean
           companion_learning: boolean
+          cooldown_hours: number
           created_at: string
           cumulative_threshold: number
           email_notifications: boolean
@@ -132,6 +133,7 @@ export type Database = {
           companion_breathing?: boolean
           companion_haiku?: boolean
           companion_learning?: boolean
+          cooldown_hours?: number
           created_at?: string
           cumulative_threshold?: number
           email_notifications?: boolean
@@ -152,6 +154,7 @@ export type Database = {
           companion_breathing?: boolean
           companion_haiku?: boolean
           companion_learning?: boolean
+          cooldown_hours?: number
           created_at?: string
           cumulative_threshold?: number
           email_notifications?: boolean

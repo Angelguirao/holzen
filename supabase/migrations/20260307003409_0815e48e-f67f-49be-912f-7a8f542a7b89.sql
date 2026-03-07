@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN cooldown_hours integer NOT NULL DEFAULT 6;
