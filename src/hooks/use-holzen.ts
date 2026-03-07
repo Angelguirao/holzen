@@ -225,6 +225,7 @@ export function useHolzen() {
     }
   }, [user, threshold, cumulativeThreshold, isInCooldown, generateMessage]);
 
+  const [lastTriggerAt, setLastTriggerAt] = useState<string | null>(null);
   const [lastManualAt, setLastManualAt] = useState<number | null>(null);
 
   const manualCooldownRemaining = useCallback(() => {
