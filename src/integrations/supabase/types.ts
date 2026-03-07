@@ -74,6 +74,39 @@ export type Database = {
         }
         Relationships: []
       }
+      night_reflections: {
+        Row: {
+          btc_change_percent: number
+          btc_direction: string
+          created_at: string
+          dismissed: boolean
+          had_reflection: boolean
+          id: string
+          message: string
+          user_id: string
+        }
+        Insert: {
+          btc_change_percent: number
+          btc_direction: string
+          created_at?: string
+          dismissed?: boolean
+          had_reflection?: boolean
+          id?: string
+          message: string
+          user_id: string
+        }
+        Update: {
+          btc_change_percent?: number
+          btc_direction?: string
+          created_at?: string
+          dismissed?: boolean
+          had_reflection?: boolean
+          id?: string
+          message?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           companion_breathing: boolean
