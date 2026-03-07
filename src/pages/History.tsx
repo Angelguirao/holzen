@@ -148,11 +148,7 @@ const History = () => {
             No reflections yet. Insights will appear after your first reflection.
           </p>
         ) : (
-          <div className="space-y-5">
-            <ReflectionStats reflections={reflections} />
-            <MoodTrends reflections={reflections} />
-            <InsightsPanel reflections={reflections} />
-          </div>
+          <InsightsWithScore reflections={reflections} />
         )
       ) : (
         /* Library Tab */
