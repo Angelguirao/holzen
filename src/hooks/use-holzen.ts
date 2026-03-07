@@ -12,6 +12,7 @@ export function useHolzen() {
   const [threshold, setThresholdState] = useState(5);
   const [cumulativeThreshold, setCumulativeThresholdState] = useState(15);
   const [emailNotifications, setEmailNotificationsState] = useState(true);
+  const [reflectionTone, setReflectionToneState] = useState('stoic');
   const [btcData, setBtcData] = useState<BtcPriceData | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [context, setContext] = useState<string | null>(null);
