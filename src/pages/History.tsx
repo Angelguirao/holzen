@@ -76,6 +76,17 @@ const History = () => {
     );
   }, [reflections]);
 
+  const pinReflection = useCallback((id: string) => {
+    const current = localStorage.getItem('holzen_pinned_reflection');
+    if (current === id) {
+      localStorage.removeItem('holzen_pinned_reflection');
+      toast('Reflection unpinned');
+    } else {
+      localStorage.setItem('holzen_pinned_reflection', id);
+      toast('Reflection pinned to Home');
+    }
+  }, []);
+
   const deleteReflection = useCallback(async (id: string) => {
     try {
       await supabase.from('reflections').delete().eq('id', id);
