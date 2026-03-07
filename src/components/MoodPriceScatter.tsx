@@ -49,22 +49,18 @@ export function MoodPriceScatter({ reflections }: Props) {
     return pts;
   }, [reflections]);
 
-  if (points.length < 5) return null;
-
-  const xMin = Math.min(...points.map((p) => p.x));
-  const xMax = Math.max(...points.map((p) => p.x));
-  const xPad = Math.max(Math.abs(xMin), Math.abs(xMax), 2) * 1.15;
-
   // Cluster summary
   const clusters = useMemo(() => {
     const neg = points.filter((p) => p.x < 0);
     const pos = points.filter((p) => p.x > 0);
     const avgMood = (pts: typeof points) =>
       pts.length ? pts.reduce((s, p) => s + p.y, 0) / pts.length : 0;
-    const negAvg = avgMood(neg);
-    const posAvg = avgMood(pos);
-    return { neg: neg.length, pos: pos.length, negAvg, posAvg };
+    return { neg: neg.length, pos: pos.length, negAvg: avgMood(neg), posAvg: avgMood(pos) };
   }, [points]);
+
+  if (points.length < 5) return null;
+
+  const xMax = Math.max(...points.map((p) => Math.abs(p.x)), 2) * 1.15;
 
   const insightParts: string[] = [];
   if (clusters.neg >= 3 && clusters.pos >= 3) {
