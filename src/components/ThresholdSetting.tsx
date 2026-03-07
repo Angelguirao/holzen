@@ -1,35 +1,45 @@
 import { useState, useEffect, forwardRef } from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
+import { ArrowUp, ArrowDown } from 'lucide-react';
 
 interface Props {
-  threshold: number;
-  onSet: (val: number) => void;
+  thresholdUp: number;
+  onSetUp: (val: number) => void;
+  thresholdDown: number;
+  onSetDown: (val: number) => void;
   cumulativeThreshold: number;
   onSetCumulative: (val: number) => void;
 }
 
-export const ThresholdSetting = forwardRef<HTMLDivElement, Props>(function ThresholdSetting({ threshold, onSet, cumulativeThreshold, onSetCumulative }, ref) {
-  const [value, setValue] = useState(threshold);
-  const [cumValue, setCumValue] = useState(cumulativeThreshold);
+export const ThresholdSetting = forwardRef<HTMLDivElement, Props>(function ThresholdSetting(
+  { thresholdUp, onSetUp, thresholdDown, onSetDown, cumulativeThreshold, onSetCumulative },
+  ref
+) {
+  const [upVal, setUpVal] = useState(thresholdUp);
+  const [downVal, setDownVal] = useState(thresholdDown);
+  const [cumVal, setCumVal] = useState(cumulativeThreshold);
 
-  // Sync local state when props update (e.g. after DB load)
-  useEffect(() => { setValue(threshold); }, [threshold]);
-  useEffect(() => { setCumValue(cumulativeThreshold); }, [cumulativeThreshold]);
+  useEffect(() => { setUpVal(thresholdUp); }, [thresholdUp]);
+  useEffect(() => { setDownVal(thresholdDown); }, [thresholdDown]);
+  useEffect(() => { setCumVal(cumulativeThreshold); }, [cumulativeThreshold]);
 
   return (
     <div ref={ref} className="space-y-8">
-      {/* Daily threshold */}
+      {/* Daily threshold — UP */}
       <div className="space-y-4">
         <div className="space-y-2">
-          <p className="text-sm text-muted-foreground font-mono">Daily volatility threshold</p>
-          <p className="text-3xl font-mono tracking-tight">{value.toFixed(1)}%</p>
-          <p className="text-sm text-muted-foreground">in 24 hours</p>
+          <div className="flex items-center gap-2">
+            <ArrowUp className="h-3.5 w-3.5 text-emerald-500" />
+            <p className="text-sm text-muted-foreground font-mono">Price rises threshold</p>
+          </div>
+          <p className="text-3xl font-mono tracking-tight">{upVal.toFixed(1)}%</p>
+          <p className="text-sm text-muted-foreground">trigger when BTC rises this much in 24h</p>
         </div>
 
         <Slider
-          value={[value]}
-          onValueChange={([v]) => setValue(v)}
+          value={[upVal]}
+          onValueChange={([v]) => setUpVal(v)}
           min={1}
           max={20}
           step={0.5}
@@ -40,13 +50,50 @@ export const ThresholdSetting = forwardRef<HTMLDivElement, Props>(function Thres
           <Button
             variant="outline"
             size="sm"
-            onClick={() => { setValue(5); onSet(5); }}
+            onClick={() => { setUpVal(5); onSetUp(5); }}
             className="font-mono text-xs"
           >
-            Reset to default
+            Reset
           </Button>
-          {value !== threshold && (
-            <Button size="sm" onClick={() => onSet(value)} className="font-mono text-xs">
+          {upVal !== thresholdUp && (
+            <Button size="sm" onClick={() => onSetUp(upVal)} className="font-mono text-xs">
+              Confirm
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* Daily threshold — DOWN */}
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <ArrowDown className="h-3.5 w-3.5 text-red-500" />
+            <p className="text-sm text-muted-foreground font-mono">Price drops threshold</p>
+          </div>
+          <p className="text-3xl font-mono tracking-tight">{downVal.toFixed(1)}%</p>
+          <p className="text-sm text-muted-foreground">trigger when BTC drops this much in 24h</p>
+        </div>
+
+        <Slider
+          value={[downVal]}
+          onValueChange={([v]) => setDownVal(v)}
+          min={1}
+          max={20}
+          step={0.5}
+          className="w-full"
+        />
+
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => { setDownVal(5); onSetDown(5); }}
+            className="font-mono text-xs"
+          >
+            Reset
+          </Button>
+          {downVal !== thresholdDown && (
+            <Button size="sm" onClick={() => onSetDown(downVal)} className="font-mono text-xs">
               Confirm
             </Button>
           )}
@@ -57,13 +104,13 @@ export const ThresholdSetting = forwardRef<HTMLDivElement, Props>(function Thres
       <div className="space-y-4">
         <div className="space-y-2">
           <p className="text-sm text-muted-foreground font-mono">7-day cumulative threshold</p>
-          <p className="text-3xl font-mono tracking-tight">{cumValue.toFixed(1)}%</p>
+          <p className="text-3xl font-mono tracking-tight">{cumVal.toFixed(1)}%</p>
           <p className="text-sm text-muted-foreground">rolling 7-day window</p>
         </div>
 
         <Slider
-          value={[cumValue]}
-          onValueChange={([v]) => setCumValue(v)}
+          value={[cumVal]}
+          onValueChange={([v]) => setCumVal(v)}
           min={3}
           max={40}
           step={1}
@@ -74,13 +121,13 @@ export const ThresholdSetting = forwardRef<HTMLDivElement, Props>(function Thres
           <Button
             variant="outline"
             size="sm"
-            onClick={() => { setCumValue(15); onSetCumulative(15); }}
+            onClick={() => { setCumVal(15); onSetCumulative(15); }}
             className="font-mono text-xs"
           >
-            Reset to default
+            Reset
           </Button>
-          {cumValue !== cumulativeThreshold && (
-            <Button size="sm" onClick={() => onSetCumulative(cumValue)} className="font-mono text-xs">
+          {cumVal !== cumulativeThreshold && (
+            <Button size="sm" onClick={() => onSetCumulative(cumVal)} className="font-mono text-xs">
               Confirm
             </Button>
           )}
