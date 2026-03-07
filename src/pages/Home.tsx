@@ -302,7 +302,7 @@ function AutoCooldownIndicator({
       <div className="flex-1 space-y-1.5">
         <div className="flex items-center justify-between">
           <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">
-            Resting · {timeLabel}
+            Next auto-check · {timeLabel}
           </p>
           <p className="text-[10px] font-mono text-muted-foreground">
             {Math.round(progress)}%
