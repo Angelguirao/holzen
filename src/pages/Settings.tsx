@@ -381,6 +381,60 @@ const Settings = () => {
       </div>
 
       <Separator />
+
+      {/* Quiet Hours */}
+      <div className="space-y-4">
+        <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Quiet hours</p>
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          No automatic reflections during these hours. Manual reflections still work.
+        </p>
+        <div className="flex items-center justify-between">
+          <Label htmlFor="quiet-enabled" className="text-xs font-mono text-muted-foreground">
+            Enable quiet hours
+          </Label>
+          <Switch
+            id="quiet-enabled"
+            checked={quietHoursStart !== null}
+            onCheckedChange={(v) => {
+              if (v) {
+                setQuietHours(22, 7);
+              } else {
+                setQuietHours(null, null);
+              }
+            }}
+          />
+        </div>
+        {quietHoursStart !== null && quietHoursEnd !== null && (
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <p className="text-[10px] font-mono text-muted-foreground/60">From</p>
+              <select
+                value={quietHoursStart}
+                onChange={(e) => setQuietHours(Number(e.target.value), quietHoursEnd)}
+                className="w-full text-xs font-mono px-2 py-1.5 rounded-md border border-border/60 bg-background text-foreground"
+              >
+                {Array.from({ length: 24 }, (_, i) => (
+                  <option key={i} value={i}>{String(i).padStart(2, '0')}:00</option>
+                ))}
+              </select>
+            </div>
+            <div className="space-y-1.5">
+              <p className="text-[10px] font-mono text-muted-foreground/60">Until</p>
+              <select
+                value={quietHoursEnd}
+                onChange={(e) => setQuietHours(quietHoursStart, Number(e.target.value))}
+                className="w-full text-xs font-mono px-2 py-1.5 rounded-md border border-border/60 bg-background text-foreground"
+              >
+                {Array.from({ length: 24 }, (_, i) => (
+                  <option key={i} value={i}>{String(i).padStart(2, '0')}:00</option>
+                ))}
+              </select>
+            </div>
+          </div>
+        )}
+      </div>
+
+      <Separator />
       <div className="space-y-4">
         <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Notifications</p>
         <div className="flex items-center justify-between">
