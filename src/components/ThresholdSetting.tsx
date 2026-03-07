@@ -67,7 +67,7 @@ export const ThresholdSetting = forwardRef<HTMLDivElement, Props>(function Thres
       <div className="space-y-4">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <ArrowDown className="h-3.5 w-3.5 text-red-500" />
+            <ArrowDown className="h-3.5 w-3.5 text-destructive" />
             <p className="text-sm text-muted-foreground font-mono">Price drops threshold</p>
           </div>
           <p className="text-3xl font-mono tracking-tight">{downVal.toFixed(1)}%</p>

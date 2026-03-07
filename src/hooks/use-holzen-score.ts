@@ -106,5 +106,5 @@ export function useHolzenScore(reflections: Reflection[], freezeDates: string[] 
       streakScore: Math.round(streakPct),
       trend,
     };
-  }, [reflections]);
+  }, [reflections, freezeDates]);
 }
