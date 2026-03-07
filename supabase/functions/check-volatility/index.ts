@@ -8,7 +8,7 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const COOLDOWN_MS = 6 * 60 * 60 * 1000; // 6 hours
+const DEFAULT_COOLDOWN_MS = 6 * 60 * 60 * 1000; // 6 hours fallback
 
 async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise<Response> {
   for (let i = 0; i < retries; i++) {
