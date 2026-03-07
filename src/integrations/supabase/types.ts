@@ -165,7 +165,9 @@ export type Database = {
           referred_by: string | null
           reflection_tone: string
           silent_mode: boolean
+          streak_freeze_dates: string[]
           threshold: number
+          threshold_down: number
           updated_at: string
           user_id: string
         }
@@ -187,7 +189,9 @@ export type Database = {
           referred_by?: string | null
           reflection_tone?: string
           silent_mode?: boolean
+          streak_freeze_dates?: string[]
           threshold?: number
+          threshold_down?: number
           updated_at?: string
           user_id: string
         }
@@ -209,7 +213,9 @@ export type Database = {
           referred_by?: string | null
           reflection_tone?: string
           silent_mode?: boolean
+          streak_freeze_dates?: string[]
           threshold?: number
+          threshold_down?: number
           updated_at?: string
           user_id?: string
         }
