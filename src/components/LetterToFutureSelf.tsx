@@ -120,18 +120,14 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
   const [sending, setSending] = useState(false);
   const [sealPhase, setSealPhase] = useState<'idle' | 'sealing' | 'sealed'>('idle');
   const [loaded, setLoaded] = useState(false);
-  const [mode, setMode] = useState<'storm' | 'calm'>('storm');
-
   const isCrash = changePercent !== null && changePercent <= -LETTER_THRESHOLD;
   const isATH = changePercent !== null && changePercent >= LETTER_THRESHOLD;
   const isVolatile = isCrash || isATH;
   const isCalm = !isVolatile;
 
-  // Storm mode: write during volatility, deliver during opposite
-  // Calm mode: write during calm, deliver during next volatility (crash or ath)
-  const canWriteStorm = isVolatile;
-  const canWriteCalm = isCalm && currentPrice !== null;
-  const canWrite = mode === 'storm' ? canWriteStorm : canWriteCalm;
+  // Auto-select mode based on market state
+  const effectiveMode = isVolatile ? 'storm' : 'calm';
+  const canWrite = isVolatile || (isCalm && currentPrice !== null);
 
   const writtenDuring = mode === 'calm' ? 'calm' : (isCrash ? 'crash' : 'ath');
   const deliverDuring = mode === 'calm' ? 'crash' : (isCrash ? 'ath' : 'crash');
