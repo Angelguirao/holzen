@@ -88,4 +88,4 @@ export const ThresholdSetting = forwardRef<HTMLDivElement, Props>(function Thres
       </div>
     </div>
   );
-}
+});

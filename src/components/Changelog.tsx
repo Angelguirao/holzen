@@ -87,6 +87,6 @@ export const Changelog = forwardRef<HTMLDivElement, object>(function Changelog(_
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </>
+    </div>
   );
-}
+});
