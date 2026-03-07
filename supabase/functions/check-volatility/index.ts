@@ -185,7 +185,8 @@ serve(async (req) => {
       const cumulativeTriggered = absCumChange >= ((p as any).cumulative_threshold ?? 15);
       if (!dailyTriggered && !cumulativeTriggered) return false;
       if (!p.last_trigger_at) return true;
-      return new Date(p.last_trigger_at).getTime() < Date.now() - COOLDOWN_MS;
+      const cooldownMs = ((p as any).cooldown_hours ?? 6) * 60 * 60 * 1000;
+      return new Date(p.last_trigger_at).getTime() < Date.now() - cooldownMs;
     });
 
     console.log(`[CHECK-VOLATILITY] ${eligible.length} users eligible (${profiles.length} total)`);
