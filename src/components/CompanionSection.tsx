@@ -28,6 +28,7 @@ interface Props {
   prefs: CompanionPrefs;
   severity?: 'mild' | 'moderate' | 'high';
   reflectionId?: string | null;
+  context?: string | null;
 }
 
 function CollapsibleCompanion({
@@ -67,7 +68,7 @@ function CollapsibleCompanion({
   );
 }
 
-export function CompanionSection({ companions, prefs, severity = 'mild', reflectionId }: Props) {
+export function CompanionSection({ companions, prefs, severity = 'mild', reflectionId, context }: Props) {
   const [expandedBreathing, setExpandedBreathing] = useState(false);
   const [expandedHaiku, setExpandedHaiku] = useState(false);
   const [expandedLearning, setExpandedLearning] = useState(false);
@@ -91,7 +92,7 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
 
   const hasBreathing = prefs.breathing;
   const hasHaiku = prefs.haiku && companions.haiku;
-  const hasLearning = prefs.learning && companions.learningTitle && companions.learningBody;
+  const hasLearning = prefs.learning; // Ground nudges always available
 
   if (!hasBreathing && !hasHaiku && !hasLearning) return null;
 
@@ -128,7 +129,7 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
 
       {hasLearning && (
         <CollapsibleCompanion
-          label="Learn from history"
+          label="Ground yourself"
           expanded={expandedLearning}
           onToggle={() => {
             setExpandedLearning((v) => !v);
@@ -136,7 +137,12 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
           }}
           completed={completion.learning}
         >
-          <LearningInput title={companions.learningTitle!} body={companions.learningBody!} />
+          <LearningInput
+            title={companions.learningTitle ?? ''}
+            body={companions.learningBody ?? ''}
+            context={context}
+            useGroundNudge
+          />
         </CollapsibleCompanion>
       )}
     </div>
