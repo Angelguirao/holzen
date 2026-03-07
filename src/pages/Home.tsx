@@ -47,6 +47,8 @@ const Home = () => {
     manualCooldownRemaining,
     autoCooldownRemaining,
     cooldownHours,
+    streakFreezeDates,
+    useStreakFreeze,
   } = useHolzen();
 
   const [showOutcome, setShowOutcome] = useState(false);
@@ -118,7 +120,7 @@ const Home = () => {
       <BtcChart hidden={priceHidden} />
 
       {/* Streaks & Stats */}
-      <HomeStreaks />
+      <HomeStreaks streakFreezeDates={streakFreezeDates} onUseFreeze={useStreakFreeze} />
 
       {/* Holzen Score */}
       <HolzenScoreCard />
