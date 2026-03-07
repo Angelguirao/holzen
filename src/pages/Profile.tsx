@@ -312,9 +312,9 @@ function LetterCard({ letter: l, onDelete, fmtPrice, type }: {
           <div className="flex items-center gap-2 text-[10px] font-mono text-muted-foreground">
             <Clock className="h-2.5 w-2.5" />
             <span>
-              Written {format(new Date(l.written_at), 'MMM d, yyyy')} during{' '}
-              {l.written_during === 'crash' ? 'a drop' : 'a surge'} at{' '}
-              {fmtPrice(l.btc_price_at_write)}
+              Written {format(new Date(l.written_at), 'MMM d, yyyy')}{' '}
+              {l.written_during === 'calm' ? 'during calm markets' : l.written_during === 'crash' ? 'during a drop' : 'during a surge'}{' '}
+              at {fmtPrice(l.btc_price_at_write)}
             </span>
           </div>
         )}
@@ -356,7 +356,7 @@ function LetterCard({ letter: l, onDelete, fmtPrice, type }: {
           <p className="text-xs text-muted-foreground/50">
             Delivers during next {l.deliver_during === 'ath' ? 'surge' : 'drop'}
           </p>
-          <p className="text-sm leading-relaxed blur-sm hover:blur-none transition-all duration-300 cursor-pointer select-none" title="Hover to peek">
+          <p className="text-sm leading-relaxed blur-[8px] select-none pointer-events-none">
             {l.body}
           </p>
         </>
