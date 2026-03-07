@@ -207,10 +207,6 @@ const Home = () => {
     );
   }
 
-  const unpinReflection = useCallback(() => {
-    localStorage.removeItem('holzen_pinned_reflection');
-    setPinnedReflection(null);
-  }, []);
 
   return (
     <div className="space-y-10">
