@@ -512,7 +512,7 @@ const Settings = () => {
               className="w-full font-mono text-xs"
               size="sm"
             >
-              {checkoutLoading ? 'Opening checkout' : 'Subscribe'}
+              {checkoutLoading ? 'Opening checkout…' : 'Subscribe'}
             </Button>
           </div>
         )}
