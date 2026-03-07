@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { BreathingExercise } from './BreathingExercise';
 import { HaikuDisplay } from './HaikuDisplay';
 import { LearningInput } from './LearningInput';
@@ -21,6 +21,13 @@ interface CompletionState {
   breathing: boolean;
   haiku: boolean;
   learning: boolean;
+}
+
+interface NudgeData {
+  title: string;
+  body: string;
+  citation: string;
+  url: string;
 }
 
 interface Props {
@@ -78,6 +85,37 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
     learning: false,
   });
 
+  // Lift nudge state here so it survives expand/collapse cycles
+  const [nudge, setNudge] = useState<NudgeData | null>(null);
+  const [nudgeLoading, setNudgeLoading] = useState(false);
+  const [nudgeError, setNudgeError] = useState(false);
+  const nudgeFetchedRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!prefs.learning) return;
+    const key = reflectionId ?? context ?? '';
+    if (nudgeFetchedRef.current === key) return;
+    nudgeFetchedRef.current = key;
+
+    let cancelled = false;
+    setNudgeLoading(true);
+    setNudgeError(false);
+
+    supabase.functions
+      .invoke('ground-nudge', { body: { context: context ?? '' } })
+      .then(({ data, error: fnError }) => {
+        if (cancelled) return;
+        if (fnError || !data || data.error) {
+          setNudgeError(true);
+        } else {
+          setNudge(data as NudgeData);
+        }
+        setNudgeLoading(false);
+      });
+
+    return () => { cancelled = true; };
+  }, [prefs.learning, reflectionId, context]);
+
   const markCompleted = useCallback(async (key: keyof CompletionState) => {
     if (completion[key]) return;
     setCompletion((prev) => ({ ...prev, [key]: true }));
@@ -92,7 +130,7 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
 
   const hasBreathing = prefs.breathing;
   const hasHaiku = prefs.haiku && companions.haiku;
-  const hasLearning = prefs.learning; // Ground nudges always available
+  const hasLearning = prefs.learning;
 
   if (!hasBreathing && !hasHaiku && !hasLearning) return null;
 
@@ -140,9 +178,9 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
           <LearningInput
             title={companions.learningTitle ?? ''}
             body={companions.learningBody ?? ''}
-            context={context}
-            reflectionId={reflectionId}
-            useGroundNudge
+            nudge={nudge}
+            nudgeLoading={nudgeLoading}
+            nudgeError={nudgeError}
           />
         </CollapsibleCompanion>
       )}
