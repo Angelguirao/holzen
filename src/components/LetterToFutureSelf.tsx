@@ -22,9 +22,10 @@ interface Letter {
 interface Props {
   currentPrice: number | null;
   changePercent: number | null;
+  threshold?: number;
 }
 
-export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
+export function LetterToFutureSelf({ currentPrice, changePercent, threshold = 5 }: Props) {
   const { user } = useAuth();
   const [letters, setLetters] = useState<Letter[]>([]);
   const [pendingLetters, setPendingLetters] = useState<Letter[]>([]);
@@ -52,8 +53,8 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
   if (!loaded || !user) return null;
 
   // Determine current market condition
-  const isCrash = changePercent !== null && changePercent <= -5;
-  const isATH = changePercent !== null && changePercent >= 5;
+  const isCrash = changePercent !== null && changePercent <= -threshold;
+  const isATH = changePercent !== null && changePercent >= threshold;
   const canWrite = isCrash || isATH;
 
   const writtenDuring = isCrash ? 'crash' : 'ath';
@@ -156,7 +157,17 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
             </div>
           ))}
         </div>
-      ) : null}
+      ) : (
+        <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2">
+          <div className="flex items-center gap-2 text-muted-foreground">
+            <Mail className="h-3 w-3" />
+            <p className="text-[10px] font-mono tracking-widest uppercase">Letter to future self</p>
+          </div>
+          <p className="text-xs text-muted-foreground/60 leading-relaxed">
+            When BTC moves ±{threshold}% or more, you can write a letter to your future self. It will be sealed and delivered when the market flips.
+          </p>
+        </div>
+      )}
 
       {/* Delivered letters */}
       {deliveredLetters.length > 0 && (
