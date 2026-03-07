@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, Twitter, Wind, Feather, BookOpen, TrendingDown, Brain, Tag, BarChart3, MessageCircle } from 'lucide-react';
+import { PageMeta } from '@/components/PageMeta';
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 14 },
