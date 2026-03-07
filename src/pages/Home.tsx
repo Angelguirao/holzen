@@ -1,11 +1,7 @@
 import { useHolzen } from '@/hooks/use-holzen';
 import { useSubscription } from '@/hooks/use-subscription';
 import { BtcStatus } from '@/components/BtcStatus';
-import { BtcChart } from '@/components/BtcChart';
-import { HomeStreaks } from '@/components/HomeStreaks';
 import { NightReflectionCard } from '@/components/NightReflectionCard';
-import { HolzenScoreCard } from '@/components/HolzenScoreCard';
-import { LetterToFutureSelf } from '@/components/LetterToFutureSelf';
 import { ReflectionMessage } from '@/components/ReflectionMessage';
 import { OutcomePrompt } from '@/components/OutcomePrompt';
 import { MoodCheck, type MoodValue } from '@/components/MoodCheck';
@@ -15,8 +11,10 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/use-auth';
 import { toast } from 'sonner';
-import { AlertCircle, Loader2, Pause, Timer } from 'lucide-react';
+import { AlertCircle, Loader2, Pause, Pin, Timer } from 'lucide-react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
 const Home = () => {
