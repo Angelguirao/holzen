@@ -2,13 +2,14 @@ import { useEffect, useState, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { format, subDays, isAfter } from 'date-fns';
-import { X, Star, Search, Pin } from 'lucide-react';
+import { X, Star, Search, Pin, Info } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ShareReflection } from '@/components/ShareReflection';
 import { ReflectionNote } from '@/components/ReflectionNote';
 import { ReflectionTags } from '@/components/ReflectionTags';
 import { HaikuDisplay } from '@/components/HaikuDisplay';
 import { LearningInput } from '@/components/LearningInput';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { toast } from 'sonner';
 import {
   AlertDialog,
@@ -240,7 +241,20 @@ const History = () => {
               <div className="flex items-start justify-between gap-2">
                 <p className="text-xs font-mono text-muted-foreground">
                   {format(new Date(r.created_at), 'MMM d, yyyy · h:mm a')}
-                  {r.context && ` — ${r.context}`}
+                  {r.context && (
+                    <TooltipProvider delayDuration={200}>
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button className="inline-flex ml-1.5 align-middle text-muted-foreground/40 hover:text-muted-foreground transition-colors">
+                            <Info className="h-3 w-3" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom" className="max-w-[280px] text-[10px] font-mono leading-relaxed">
+                          {r.context}
+                        </TooltipContent>
+                      </Tooltip>
+                    </TooltipProvider>
+                  )}
                 </p>
                 <div className="flex items-center gap-1 shrink-0">
                   <button

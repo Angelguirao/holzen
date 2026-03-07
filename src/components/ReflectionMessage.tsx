@@ -18,9 +18,6 @@ interface Props {
 export const ReflectionMessage = forwardRef<HTMLDivElement, Props>(function ReflectionMessage({ message, context, onDismiss, companions, companionPrefs, severity, reflectionId }, ref) {
   return (
     <div ref={ref} className="space-y-6">
-      {context && (
-        <p className="text-xs font-mono text-muted-foreground">{context}</p>
-      )}
       <p className="text-lg leading-relaxed">{message}</p>
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1">
