@@ -169,6 +169,33 @@ export function useHolzen() {
       ctx += ` Market sentiment: ${data.fearGreed.label} (${data.fearGreed.value}/100).`;
     }
 
+    // Silent mode: skip AI, just show context
+    if (silentMode) {
+      const silentMsg = 'BTC moved.';
+      setMessage(silentMsg);
+      setContext(ctx);
+      setCompanions({ haiku: null, learningTitle: null, learningBody: null });
+      setNewReflection(true);
+
+      const { data: insertedReflection } = await supabase.from('reflections').insert({
+        user_id: user.id,
+        message: silentMsg,
+        context: ctx,
+        ...(mood ? { mood } : {}),
+      }).select('id').single();
+
+      if (insertedReflection) setLastReflectionId(insertedReflection.id);
+
+      await supabase.from('profiles').update({
+        last_message: silentMsg,
+        last_context: ctx,
+        last_trigger_at: new Date().toISOString(),
+      }).eq('user_id', user.id);
+
+      setLastTriggerAt(new Date().toISOString());
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
