@@ -216,6 +216,11 @@ const Home = () => {
 
   return (
     <div className="space-y-10">
+      {/* Subtle greeting */}
+      {firstName && (
+        <p className="text-sm font-mono text-muted-foreground/60">{firstName}.</p>
+      )}
+
       {/* BTC Status */}
       <BtcStatus data={btcData} error={error} hidden={priceHidden} onToggleHidden={togglePriceHidden} />
 
