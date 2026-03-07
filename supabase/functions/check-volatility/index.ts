@@ -370,7 +370,7 @@ serve(async (req) => {
 
             const payload = JSON.stringify({
               title: "Holzen",
-              body: reflection.slice(0, 120),
+              body: result.message.slice(0, 120),
             });
 
             for (const sub of pushSubs) {
