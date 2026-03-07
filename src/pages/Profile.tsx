@@ -201,7 +201,7 @@ const Profile = () => {
           </div>
         )
       ) : (
-        <ReferralSection />
+        <ReferralSection defaultExpanded />
       )}
     </div>
   );

@@ -24,7 +24,7 @@ export function ReferralSection({ defaultExpanded = false }: { defaultExpanded?:
   const [referralCount, setReferralCount] = useState(0);
   const [grantedRewards, setGrantedRewards] = useState<GrantedReward[]>([]);
   const [copied, setCopied] = useState(false);
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(defaultExpanded);
 
   useEffect(() => {
     if (!user) return;
