@@ -213,8 +213,26 @@ const Profile = () => {
 function StatsContent({ reflections }: { reflections: Reflection[] }) {
   const scoreData = useHolzenScore(reflections);
 
+  const moodCounts = useMemo(() => {
+    const counts = { anxious: 0, neutral: 0, calm: 0 };
+    for (const r of reflections) {
+      if (r.mood && r.mood in counts) counts[r.mood as keyof typeof counts]++;
+    }
+    return counts;
+  }, [reflections]);
+
   return (
     <div className="space-y-5">
+      <div className="flex items-center justify-between">
+        <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
+          Overview
+        </p>
+        <ShareStats
+          reflectionCount={reflections.length}
+          scoreData={scoreData}
+          moodCounts={moodCounts}
+        />
+      </div>
       <ReflectionStats reflections={reflections} />
       {scoreData && <HolzenScoreDetail scoreData={scoreData} />}
       <MoodTrendChart reflections={reflections} />
