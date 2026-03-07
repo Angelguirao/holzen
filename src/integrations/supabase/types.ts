@@ -313,12 +313,15 @@ export type Database = {
       }
       reflections: {
         Row: {
+          breathing_completed: boolean
           context: string | null
           created_at: string
           haiku: string | null
+          haiku_read: boolean
           id: string
           is_favorite: boolean
           learning_body: string | null
+          learning_read: boolean
           learning_title: string | null
           message: string
           mood: string | null
@@ -328,12 +331,15 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          breathing_completed?: boolean
           context?: string | null
           created_at?: string
           haiku?: string | null
+          haiku_read?: boolean
           id?: string
           is_favorite?: boolean
           learning_body?: string | null
+          learning_read?: boolean
           learning_title?: string | null
           message: string
           mood?: string | null
@@ -343,12 +349,15 @@ export type Database = {
           user_id: string
         }
         Update: {
+          breathing_completed?: boolean
           context?: string | null
           created_at?: string
           haiku?: string | null
+          haiku_read?: boolean
           id?: string
           is_favorite?: boolean
           learning_body?: string | null
+          learning_read?: boolean
           learning_title?: string | null
           message?: string
           mood?: string | null
