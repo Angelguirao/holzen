@@ -28,6 +28,7 @@ interface Props {
   prefs: CompanionPrefs;
   severity?: 'mild' | 'moderate' | 'high';
   reflectionId?: string | null;
+  context?: string | null;
 }
 
 function CollapsibleCompanion({
