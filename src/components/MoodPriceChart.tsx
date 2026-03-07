@@ -1,5 +1,16 @@
 import { useMemo } from 'react';
 
+const MOOD_BAR_COLORS: Record<string, string> = {
+  anxious: 'hsl(var(--destructive) / 0.5)',
+  neutral: 'hsl(var(--muted-foreground) / 0.35)',
+  calm: 'hsl(var(--primary) / 0.5)',
+};
+
+const MOOD_TEXT_COLORS: Record<string, string> = {
+  anxious: 'hsl(var(--destructive))',
+  neutral: 'hsl(var(--muted-foreground))',
+  calm: 'hsl(var(--primary))',
+};
 interface Props {
   reflections: { context: string | null; mood: string | null }[];
 }
@@ -100,18 +111,14 @@ export function MoodPriceChart({ reflections }: Props) {
                     className="absolute top-0 left-0 h-full rounded-sm transition-all duration-700 ease-out"
                     style={{
                       width: `${Math.max(barWidthPercent, 4)}%`,
-                      backgroundColor: isNeg
-                        ? 'hsl(var(--destructive) / 0.5)'
-                        : 'hsl(var(--primary) / 0.5)',
+                      backgroundColor: MOOD_BAR_COLORS[m.mood] ?? 'hsl(var(--muted-foreground) / 0.3)',
                     }}
                   />
                 </div>
                 <span
                   className="text-xs font-mono font-medium w-14 text-right shrink-0"
                   style={{
-                    color: isNeg
-                      ? 'hsl(var(--destructive))'
-                      : 'hsl(var(--primary))',
+                    color: MOOD_TEXT_COLORS[m.mood] ?? 'hsl(var(--muted-foreground))',
                   }}
                 >
                   {formattedAvg}
