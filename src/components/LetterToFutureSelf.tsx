@@ -129,13 +129,13 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
   const effectiveMode = isVolatile ? 'storm' : 'calm';
   const canWrite = isVolatile || (isCalm && currentPrice !== null);
 
-  const writtenDuring = mode === 'calm' ? 'calm' : (isCrash ? 'crash' : 'ath');
-  const deliverDuring = mode === 'calm' ? 'crash' : (isCrash ? 'ath' : 'crash');
+  const writtenDuring = effectiveMode === 'calm' ? 'calm' : (isCrash ? 'crash' : 'ath');
+  const deliverDuring = effectiveMode === 'calm' ? 'crash' : (isCrash ? 'ath' : 'crash');
 
-  const prompts = mode === 'calm'
+  const prompts = effectiveMode === 'calm'
     ? WRITING_PROMPTS.calm
     : (isCrash ? WRITING_PROMPTS.crash : WRITING_PROMPTS.ath);
-  const randomPrompt = useMemo(() => prompts[Math.floor(Math.random() * prompts.length)], [isCrash, mode]);
+  const randomPrompt = useMemo(() => prompts[Math.floor(Math.random() * prompts.length)], [isCrash, effectiveMode]);
 
   useEffect(() => {
     if (!user) return;
