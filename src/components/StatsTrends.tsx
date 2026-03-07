@@ -107,7 +107,7 @@ interface Props {
 export function StatsTrends({ reflections }: Props) {
   const data = useMemo(() => buildWeeklyData(reflections), [reflections]);
 
-  if (data.length < 2) return null;
+  if (data.length < 1) return null;
 
   const firstScore = data[0].score;
   const lastScore = data[data.length - 1].score;
