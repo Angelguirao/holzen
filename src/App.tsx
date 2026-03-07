@@ -52,6 +52,7 @@ const App = () => (
                 <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
                   <Route path="/" element={<Home />} />
                   <Route path="/history" element={<History />} />
+                  <Route path="/profile" element={<Profile />} />
                   <Route path="/settings" element={<Settings />} />
                 </Route>
                 <Route path="/welcome" element={<PublicOnlyRoute><Landing /></PublicOnlyRoute>} />
