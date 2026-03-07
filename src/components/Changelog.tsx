@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, forwardRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import {
   AlertDialog,
@@ -18,7 +18,7 @@ interface ChangelogEntry {
   changes: string[];
 }
 
-export function Changelog() {
+export const Changelog = forwardRef<HTMLDivElement, object>(function Changelog(_props, ref) {
   const [open, setOpen] = useState(false);
   const [entries, setEntries] = useState<ChangelogEntry[]>([]);
   const [loading, setLoading] = useState(false);
