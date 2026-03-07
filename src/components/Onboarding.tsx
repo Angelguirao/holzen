@@ -310,8 +310,6 @@ export function Onboarding({ onComplete }: Props) {
   );
 }
 
-import { forwardRef } from 'react';
-
 const Nav = forwardRef<HTMLDivElement, {
   showBack: boolean;
   onBack?: () => void;
