@@ -92,8 +92,8 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
   const nudgeFetchedRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!prefs.learning) return;
-    const key = reflectionId ?? context ?? '';
+    if (!prefs.learning || !reflectionId) return;
+    const key = reflectionId;
     if (nudgeFetchedRef.current === key) return;
     nudgeFetchedRef.current = key;
 
@@ -101,30 +101,49 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
     setNudgeLoading(true);
     setNudgeError(false);
 
-    supabase.functions
-      .invoke('ground-nudge', { body: { context: context ?? '' } })
-      .then(({ data, error: fnError }) => {
+    // First check if nudge already exists in DB
+    supabase
+      .from('reflections')
+      .select('learning_title, learning_body, learning_citation, learning_url')
+      .eq('id', reflectionId)
+      .single()
+      .then(({ data: row }) => {
         if (cancelled) return;
-        if (fnError || !data || data.error) {
-          setNudgeError(true);
-        } else {
-          const nudgeData = data as NudgeData;
-          setNudge(nudgeData);
-          // Persist nudge to DB
-          if (reflectionId) {
-            supabase
-              .from('reflections')
-              .update({
-                learning_title: nudgeData.title,
-                learning_body: nudgeData.body,
-                learning_citation: nudgeData.citation,
-                learning_url: nudgeData.url,
-              } as any)
-              .eq('id', reflectionId)
-              .then(() => {});
-          }
+        if (row?.learning_citation) {
+          // Already persisted — use it
+          setNudge({
+            title: row.learning_title ?? '',
+            body: row.learning_body ?? '',
+            citation: row.learning_citation,
+            url: row.learning_url ?? '',
+          });
+          setNudgeLoading(false);
+          return;
         }
-        setNudgeLoading(false);
+
+        // Not yet generated — fetch from AI
+        supabase.functions
+          .invoke('ground-nudge', { body: { context: context ?? '' } })
+          .then(({ data, error: fnError }) => {
+            if (cancelled) return;
+            if (fnError || !data || data.error) {
+              setNudgeError(true);
+            } else {
+              const nudgeData = data as NudgeData;
+              setNudge(nudgeData);
+              supabase
+                .from('reflections')
+                .update({
+                  learning_title: nudgeData.title,
+                  learning_body: nudgeData.body,
+                  learning_citation: nudgeData.citation,
+                  learning_url: nudgeData.url,
+                } as any)
+                .eq('id', reflectionId)
+                .then(() => {});
+            }
+            setNudgeLoading(false);
+          });
       });
 
     return () => { cancelled = true; };
