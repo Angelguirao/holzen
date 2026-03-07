@@ -118,6 +118,17 @@ export function ReflectionStats({ reflections, streakFreezeDates = [], onUseFree
           {freezing ? 'Activating…' : 'Use streak freeze — protect your streak today'}
         </Button>
       )}
+
+      {onUseFreeze && (
+        <div className="flex items-center gap-2 text-[10px] font-mono text-muted-foreground/60">
+          <Snowflake className="h-3 w-3" />
+          {canFreeze ? (
+            <span>1 streak freeze available · resets weekly</span>
+          ) : (
+            <span>Next freeze {nextFreezeAvailable}</span>
+          )}
+        </div>
+      )}
     </div>
   );
 }
