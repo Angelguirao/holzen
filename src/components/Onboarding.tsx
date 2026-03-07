@@ -51,6 +51,8 @@ export function Onboarding({ onComplete }: Props) {
     setStep(next);
   }, [step]);
 
+  const ease: [number, number, number, number] = [0.22, 1, 0.36, 1];
+
   const variants = prefersReduced
     ? { enter: {}, center: {}, exit: {} }
     : {
@@ -61,10 +63,10 @@ export function Onboarding({ onComplete }: Props) {
 
   const transition = prefersReduced
     ? { duration: 0 }
-    : { duration: 0.5, ease: [0.22, 1, 0.36, 1] };
+    : { duration: 0.5, ease };
 
   const stagger = (delay: number) =>
-    prefersReduced ? {} : { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 }, transition: { delay, duration: 0.4, ease: [0.22, 1, 0.36, 1] } };
+    prefersReduced ? {} : { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 }, transition: { delay, duration: 0.4, ease } };
 
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
