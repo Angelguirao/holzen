@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, forwardRef } from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import { HaikuDisplay } from '@/components/HaikuDisplay';
@@ -310,14 +310,14 @@ export function Onboarding({ onComplete }: Props) {
   );
 }
 
-function Nav({ showBack, onBack, onNext, nextLabel = 'Continue' }: {
+const Nav = forwardRef<HTMLDivElement, {
   showBack: boolean;
   onBack?: () => void;
   onNext: () => void;
   nextLabel?: string;
-}) {
+}>(function Nav({ showBack, onBack, onNext, nextLabel = 'Continue' }, ref) {
   return (
-    <div className="flex items-center gap-4 pt-2">
+    <div ref={ref} className="flex items-center gap-4 pt-2">
       {showBack && (
         <button
           onClick={onBack}
@@ -334,4 +334,4 @@ function Nav({ showBack, onBack, onNext, nextLabel = 'Continue' }: {
       </button>
     </div>
   );
-}
+});
