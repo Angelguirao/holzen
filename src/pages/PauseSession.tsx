@@ -58,6 +58,19 @@ export default function PauseSession() {
   const [phase, setPhase] = useState<'session' | 'outcome' | 'done'>('session');
   const [decision, setDecision] = useState<string | null>(null);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [moodDone, setMoodDone] = useState(false);
+
+  const handleMoodSelect = useCallback(async (mood: MoodValue) => {
+    hapticFeedback('light');
+    setMoodDone(true);
+    if (reflectionId) {
+      await supabase.from('reflections').update({ mood }).eq('id', reflectionId);
+    }
+  }, [reflectionId]);
+
+  const handleMoodSkip = useCallback(() => {
+    setMoodDone(true);
+  }, []);
 
   const toggleFavorite = useCallback(async () => {
     if (!reflectionId) return;
