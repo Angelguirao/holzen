@@ -8,7 +8,8 @@ import {
   XAxis,
   YAxis,
   Tooltip as RechartsTooltip,
-  ReferenceDot,
+  Scatter,
+  ComposedChart,
 } from 'recharts';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format, subDays, isAfter } from 'date-fns';
