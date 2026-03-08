@@ -95,7 +95,8 @@ export function VolatilityTimeline() {
   useEffect(() => {
     setPriceLoading(true);
     const days = Math.max(effectiveDays, 7);
-    fetch(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=${days}`)
+    const cur = currency.toLowerCase();
+    fetch(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=${cur}&days=${days}`)
       .then((r) => r.json())
       .then((data) => {
         const prices: [number, number][] = data.prices ?? [];
@@ -103,7 +104,7 @@ export function VolatilityTimeline() {
         setPriceLoading(false);
       })
       .catch(() => setPriceLoading(false));
-  }, [effectiveDays]);
+  }, [effectiveDays, currency]);
 
   // Build chart data with reflections mapped to nearest price point
   const { chartData, reflectionPoints } = useMemo(() => {
