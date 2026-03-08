@@ -66,22 +66,23 @@ const Settings = () => {
 
   const changePassword = useCallback(async () => {
     if (newPassword.length < 6) {
-      toast('Password must be at least 6 characters');
+      toast.error('Too short', { description: 'Password must be at least 6 characters.' });
       return;
     }
     if (newPassword !== confirmPassword) {
-      toast('Passwords do not match');
+      toast.error('Passwords don\'t match', { description: 'Please make sure both fields are identical.' });
       return;
     }
     setChangingPassword(true);
     try {
       const { error } = await supabase.auth.updateUser({ password: newPassword });
       if (error) throw error;
-      toast('Password updated');
+      toast.success('Password updated', { description: 'Your new password is now active.' });
       setNewPassword('');
       setConfirmPassword('');
-    } catch {
-      toast('Failed to update password');
+    } catch (e: any) {
+      const msg = e?.message || 'Something went wrong';
+      toast.error('Failed to update password', { description: msg });
     } finally {
       setChangingPassword(false);
     }
