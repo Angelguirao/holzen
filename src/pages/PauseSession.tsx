@@ -54,7 +54,6 @@ export default function PauseSession() {
   const companionPrefs: CompanionPrefs = state.companionPrefs ?? { breathing: true, haiku: true, learning: true, signal: true, zoomOut: true, history: true };
   const severity: 'mild' | 'moderate' | 'high' = state.severity ?? 'mild';
 
-  const [showRitual, setShowRitual] = useState(false);
   const [phase, setPhase] = useState<'session' | 'outcome' | 'done'>('session');
   const [decision, setDecision] = useState<string | null>(null);
 
