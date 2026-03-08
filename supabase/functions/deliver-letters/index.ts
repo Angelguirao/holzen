@@ -30,7 +30,7 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
-    // 1. Fetch current BTC price and 24h change
+    // 1. Fetch current BTC price and 24h change (USD for threshold check)
     const res = await fetchWithRetry(
       "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=1"
     );
@@ -39,8 +39,8 @@ serve(async (req) => {
     if (!prices || prices.length < 2) throw new Error("Insufficient price data");
 
     const price24hAgo = prices[0][1];
-    const currentPrice = prices[prices.length - 1][1];
-    const changePercent = ((currentPrice - price24hAgo) / price24hAgo) * 100;
+    const currentPriceUsd = prices[prices.length - 1][1];
+    const changePercent = ((currentPriceUsd - price24hAgo) / price24hAgo) * 100;
 
     // Determine current market condition
     const isCrash = changePercent <= -5;
