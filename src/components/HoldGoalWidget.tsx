@@ -76,8 +76,9 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
     }
 
     if (type === 'price') {
-      if (val < MIN_PRICE) return 'Minimum $1';
-      if (val > MAX_PRICE) return `Maximum $${MAX_PRICE.toLocaleString()}`;
+      const sym = SUPPORTED_CURRENCIES.find(c => c.code === currency)?.symbol ?? currency;
+      if (val < MIN_PRICE) return `Minimum ${sym}1`;
+      if (val > MAX_PRICE) return `Maximum ${sym}${MAX_PRICE.toLocaleString()}`;
       if (currentPrice && val <= currentPrice) return 'Target should be above current price';
     }
 
