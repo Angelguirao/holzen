@@ -1,4 +1,5 @@
-import { Pin, PinOff, Trash2, ExternalLink, Tag, Eye, EyeOff, Archive, FolderPlus } from 'lucide-react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { Pin, PinOff, Trash2, ExternalLink, Tag, X, Eye, EyeOff, Archive, FolderPlus } from 'lucide-react';
 import type { LibraryItem, Collection } from '@/hooks/use-library';
 import { useTranslation } from 'react-i18next';
 import { AddToCollectionButton } from './AddToCollectionButton';
