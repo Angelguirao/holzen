@@ -26,10 +26,17 @@ export class ErrorBoundary extends Component<Props, State> {
     this.setState({ hasError: false });
   };
 
+  handleGoHome = () => {
+    this.setState({ hasError: false }, () => {
+      window.history.pushState({}, '', '/');
+      window.dispatchEvent(new PopStateEvent('popstate'));
+    });
+  };
+
   render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen flex items-center justify-center p-6">
+        <div className="min-h-screen flex items-center justify-center p-6 bg-background">
           <div className="w-full max-w-xs space-y-6 text-center">
             <p className="text-sm font-mono tracking-widest uppercase text-muted-foreground">
               Holzen
@@ -45,7 +52,7 @@ export class ErrorBoundary extends Component<Props, State> {
                 Try again
               </button>
               <button
-                onClick={() => { window.location.href = '/'; }}
+                onClick={this.handleGoHome}
                 className="block mx-auto text-xs font-mono text-muted-foreground underline"
               >
                 Go home
