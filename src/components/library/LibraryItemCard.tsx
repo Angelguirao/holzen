@@ -1,4 +1,5 @@
-import { Pin, PinOff, Trash2, ExternalLink, Tag, Eye, EyeOff, Archive, FolderPlus } from 'lucide-react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { Pin, PinOff, Trash2, ExternalLink, Tag, X, Eye, EyeOff, Archive, FolderPlus } from 'lucide-react';
 import type { LibraryItem, Collection } from '@/hooks/use-library';
 import { useTranslation } from 'react-i18next';
 import { AddToCollectionButton } from './AddToCollectionButton';
@@ -23,6 +24,7 @@ interface Props {
   onTogglePin: (id: string) => void;
   onDelete: (id: string) => void;
   onStatusChange: (id: string, status: 'unread' | 'read' | 'archived') => void;
+  onUpdateTags?: (id: string, tags: string[]) => void;
   collections?: Collection[];
   itemCollections?: Collection[];
   onAddToCollection?: (collectionId: string, itemId: string) => Promise<any>;
@@ -30,11 +32,40 @@ interface Props {
 }
 
 export function LibraryItemCard({
-  item, onTogglePin, onDelete, onStatusChange,
+  item, onTogglePin, onDelete, onStatusChange, onUpdateTags,
   collections, itemCollections, onAddToCollection, onRemoveFromCollection,
 }: Props) {
   const { t } = useTranslation();
   const isUnread = item.status === 'unread';
+  const [editingTags, setEditingTags] = useState(false);
+  const [tagInput, setTagInput] = useState('');
+  const tagInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (editingTags) tagInputRef.current?.focus();
+  }, [editingTags]);
+
+  const addTag = useCallback((tag: string) => {
+    const trimmed = tag.trim().toLowerCase();
+    if (!trimmed || item.tags.includes(trimmed) || !onUpdateTags) return;
+    onUpdateTags(item.id, [...item.tags, trimmed]);
+    setTagInput('');
+  }, [item.id, item.tags, onUpdateTags]);
+
+  const removeTag = useCallback((tag: string) => {
+    if (!onUpdateTags) return;
+    onUpdateTags(item.id, item.tags.filter((t) => t !== tag));
+  }, [item.id, item.tags, onUpdateTags]);
+
+  const handleTagKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (tagInput.trim()) addTag(tagInput);
+    } else if (e.key === 'Escape') {
+      setEditingTags(false);
+      setTagInput('');
+    }
+  };
 
   return (
     <div className="group rounded-md border border-border/40 bg-card/50 px-3 py-2.5 space-y-1.5 transition-colors hover:bg-card/80">
@@ -129,11 +160,44 @@ export function LibraryItemCard({
           </span>
         ))}
         {item.tags.length > 0 && item.tags.map((tag) => (
-          <span key={tag} className="inline-flex items-center gap-0.5 text-[9px] font-mono px-1 py-0.5 rounded bg-primary/5 text-primary/70">
-            <Tag className="h-2 w-2" />{tag}
-          </span>
+          editingTags ? (
+            <button
+              key={tag}
+              onClick={() => removeTag(tag)}
+              className="inline-flex items-center gap-0.5 text-[9px] font-mono px-1 py-0.5 rounded bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+            >
+              <Tag className="h-2 w-2" />{tag}
+              <X className="h-2 w-2 text-primary/50 ml-0.5" />
+            </button>
+          ) : (
+            <span key={tag} className="inline-flex items-center gap-0.5 text-[9px] font-mono px-1 py-0.5 rounded bg-primary/5 text-primary/70">
+              <Tag className="h-2 w-2" />{tag}
+            </span>
+          )
         ))}
+        {onUpdateTags && (
+          <button
+            onClick={() => setEditingTags(!editingTags)}
+            className="inline-flex items-center gap-0.5 text-[9px] font-mono text-muted-foreground/40 hover:text-muted-foreground transition-colors"
+          >
+            <Tag className="h-2.5 w-2.5" />
+            {item.tags.length === 0 && !editingTags ? 'tag' : editingTags ? 'done' : '+'}
+          </button>
+        )}
       </div>
+
+      {editingTags && (
+        <div className="px-3 pb-2">
+          <input
+            ref={tagInputRef}
+            value={tagInput}
+            onChange={(e) => setTagInput(e.target.value)}
+            onKeyDown={handleTagKeyDown}
+            placeholder="Type a tag + Enter…"
+            className="w-full text-[10px] font-mono px-2 py-1 rounded border border-border/60 bg-background text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/40 transition-colors"
+          />
+        </div>
+      )}
     </div>
   );
 }
