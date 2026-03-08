@@ -136,7 +136,7 @@ function CollectionChip({
   );
 }
 
-export function LibraryItems({ library }: Props) {
+export function LibraryItems({ library, favoritesOnly = false }: Props) {
   const { t } = useTranslation();
   const {
     items, collections, collectionItems, loading,
