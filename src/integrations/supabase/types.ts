@@ -536,6 +536,23 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      find_similar_reflection: {
+        Args: {
+          _min_age_days?: number
+          _reflection_id: string
+          _user_id: string
+        }
+        Returns: {
+          context: string
+          created_at: string
+          id: string
+          message: string
+          mood: string
+          note: string
+          outcome: string
+          tags: string[]
+        }[]
+      }
       get_holzen_number: { Args: never; Returns: Json }
     }
     Enums: {
