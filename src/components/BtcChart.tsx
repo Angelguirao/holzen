@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TrendingDown, TrendingUp } from 'lucide-react';
 import { formatBtcPrice } from '@/lib/btc';
+import { ErrorRetry } from '@/components/ErrorRetry';
 
 interface ChartPoint {
   timestamp: number;
