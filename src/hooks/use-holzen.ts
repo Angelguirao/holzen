@@ -563,6 +563,12 @@ export function useHolzen() {
       if (!user) return;
       await supabase.from('profiles').update({ hold_goal_currency: val }).eq('user_id', user.id);
     },
+    language,
+    setLanguage: async (val: string) => {
+      setLanguageState(val);
+      if (!user) return;
+      await supabase.from('profiles').update({ language: val } as any).eq('user_id', user.id);
+    },
     companionPrefs,
     setCompanionPref,
     btcData,
