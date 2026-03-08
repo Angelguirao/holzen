@@ -16,6 +16,7 @@ import { MoodPriceChart } from '@/components/MoodPriceChart';
 import { MoodTrendChart } from '@/components/MoodTrendChart';
 import { MoodPriceScatter } from '@/components/MoodPriceScatter';
 import { RitualStatsCard } from '@/components/RitualStatsCard';
+import { VolatilityTimeline } from '@/components/VolatilityTimeline';
 import { StatsTrends } from '@/components/StatsTrends';
 import { ShareStats } from '@/components/ShareStats';
 import { useHolzenScore } from '@/hooks/use-holzen-score';
@@ -69,7 +70,7 @@ const Profile = () => {
   const [letters, setLetters] = useState<Letter[]>([]);
   const [loading, setLoading] = useState(true);
   const [lettersLoading, setLettersLoading] = useState(true);
-  const [tab, setTab] = useState<'stats' | 'insights' | 'badges' | 'letters' | 'referrals'>('stats');
+  const [tab, setTab] = useState<'stats' | 'timeline' | 'insights' | 'badges' | 'letters' | 'referrals'>('stats');
 
   useEffect(() => {
     document.title = 'Holzen — Profile';
@@ -119,6 +120,7 @@ const Profile = () => {
 
   const tabs = [
     { id: 'stats' as const, label: 'Stats' },
+    { id: 'timeline' as const, label: 'Timeline' },
     { id: 'insights' as const, label: 'Insights' },
     { id: 'badges' as const, label: 'Badges' },
     { id: 'letters' as const, label: 'Letters', count: pendingLetters.length },
@@ -162,6 +164,8 @@ const Profile = () => {
         ) : (
           <StatsContent reflections={reflections} />
         )
+      ) : tab === 'timeline' ? (
+        <VolatilityTimeline />
       ) : tab === 'insights' ? (
         loading ? (
           <div className="space-y-3">
