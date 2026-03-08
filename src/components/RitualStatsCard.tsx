@@ -216,11 +216,14 @@ export function RitualStatsCard() {
   );
 }
 
-function StatItem({ label, value }: { label: string; value: string }) {
-  return (
-    <div className="text-center">
+import { forwardRef } from 'react';
+
+const StatItem = forwardRef<HTMLDivElement, { label: string; value: string }>(
+  ({ label, value }, ref) => (
+    <div ref={ref} className="text-center">
       <p className="text-sm font-mono">{value}</p>
       <p className="text-[9px] font-mono text-muted-foreground/50">{label}</p>
     </div>
-  );
-}
+  )
+);
+StatItem.displayName = 'StatItem';
