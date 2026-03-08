@@ -61,10 +61,12 @@ const Home = () => {
     autoCooldownRemaining,
     cooldownHours,
     firstName,
+    ritualTemplate,
   } = useHolzen();
 
   const [showOutcome, setShowOutcome] = useState(false);
   const [showVoid, setShowVoid] = useState(false);
+  const [showRitual, setShowRitual] = useState(false);
   const [outcomeReflectionId, setOutcomeReflectionId] = useState<string | null>(null);
   const [showMoodCheck, setShowMoodCheck] = useState(false);
   const [priceHidden, setPriceHidden] = useState(() => localStorage.getItem('holzen_hide_price') === 'true');
