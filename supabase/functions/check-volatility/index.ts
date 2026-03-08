@@ -318,7 +318,8 @@ serve(async (req) => {
 
       // Generate reflection with companions
       const tone = (profile as any).reflection_tone || "stoic";
-      const result = await generateReflection(ctx, LOVABLE_API_KEY, tone);
+      const userLang = (profile as any).language || "en";
+      const result = await generateReflection(ctx, LOVABLE_API_KEY, tone, userLang);
       if (!result) {
         console.log(`[CHECK-VOLATILITY] Failed to generate reflection for ${profile.user_id}`);
         continue;
