@@ -2,6 +2,8 @@ import { useState, useEffect, useMemo, forwardRef } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
+import { useHolzen } from '@/hooks/use-holzen';
+import { formatBtcPrice } from '@/lib/btc';
 import { differenceInDays } from 'date-fns';
 import {
   ResponsiveContainer,
@@ -51,6 +53,7 @@ const PERIOD_DAYS: Record<Period, number | null> = {
 
 export function VolatilityTimeline() {
   const { user } = useAuth();
+  const { currency } = useHolzen();
   const [period, setPeriod] = useState<Period>('30d');
   const [priceData, setPriceData] = useState<[number, number][]>([]);
   const [reflections, setReflections] = useState<Reflection[]>([]);
@@ -92,7 +95,8 @@ export function VolatilityTimeline() {
   useEffect(() => {
     setPriceLoading(true);
     const days = Math.max(effectiveDays, 7);
-    fetch(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=${days}`)
+    const cur = currency.toLowerCase();
+    fetch(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=${cur}&days=${days}`)
       .then((r) => r.json())
       .then((data) => {
         const prices: [number, number][] = data.prices ?? [];
@@ -100,7 +104,7 @@ export function VolatilityTimeline() {
         setPriceLoading(false);
       })
       .catch(() => setPriceLoading(false));
-  }, [effectiveDays]);
+  }, [effectiveDays, currency]);
 
   // Build chart data with reflections mapped to nearest price point
   const { chartData, reflectionPoints } = useMemo(() => {
@@ -242,11 +246,11 @@ export function VolatilityTimeline() {
               tick={{ fontSize: 9, fill: 'hsl(var(--muted-foreground))' }}
               tickLine={false}
               axisLine={false}
-              tickFormatter={(v: number) => `$${(v / 1000).toFixed(0)}k`}
+              tickFormatter={(v: number) => formatBtcPrice(v, currency).replace(/\.00$/, '')}
               width={45}
             />
             <RechartsTooltip
-              content={<ChartTooltip />}
+              content={<ChartTooltip currency={currency} />}
               cursor={{ stroke: 'hsl(var(--primary))', strokeWidth: 1, strokeDasharray: '3 3' }}
             />
             <Area
@@ -340,7 +344,7 @@ function LegendItem({ color, label }: { color: string; label: string }) {
   );
 }
 
-const ChartTooltip = forwardRef<HTMLDivElement, any>(({ active, payload }, ref) => {
+const ChartTooltip = forwardRef<HTMLDivElement, any>(({ active, payload, currency }, ref) => {
   if (!active || !payload?.[0]) return null;
   const data = payload[0].payload as PricePoint;
   const decisionLabels: Record<string, string> = {
@@ -351,7 +355,7 @@ const ChartTooltip = forwardRef<HTMLDivElement, any>(({ active, payload }, ref) 
     <div ref={ref} className="rounded-md border border-border/60 bg-background px-3 py-2 shadow-md max-w-[220px]">
       <p className="text-[10px] font-mono text-muted-foreground">{data.date}</p>
       <p className="text-xs font-mono font-medium">
-        ${data.price.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+        {formatBtcPrice(data.price, currency)}
       </p>
       {data.reflection && (
         <div className="mt-1.5 pt-1.5 border-t border-border/40 space-y-1">
@@ -382,6 +386,7 @@ ChartTooltip.displayName = 'ChartTooltip';
 
 const ReflectionMarkerCard = forwardRef<HTMLDivElement, { point: PricePoint }>(({ point }, ref) => {
   const [expanded, setExpanded] = useState(false);
+  const { currency } = useHolzen();
   const refl = point.reflection!;
   const ritual = point.ritual;
 
@@ -413,7 +418,7 @@ const ReflectionMarkerCard = forwardRef<HTMLDivElement, { point: PricePoint }>((
             <span className="text-[9px] font-mono text-muted-foreground/60">{changeStr}</span>
           )}
           <span className="text-[9px] font-mono text-muted-foreground/60">
-            ${point.price.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+            {formatBtcPrice(point.price, currency)}
           </span>
         </div>
       </div>

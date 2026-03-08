@@ -1,6 +1,8 @@
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
+import { useHolzen } from '@/hooks/use-holzen';
+import { formatBtcPrice } from '@/lib/btc';
 import { format } from 'date-fns';
 import { Mail, Lock, Clock, Trash2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -119,8 +121,8 @@ const Profile = () => {
   const pendingLetters = useMemo(() => letters.filter((l) => !l.delivered), [letters]);
   const deliveredLetters = useMemo(() => letters.filter((l) => l.delivered), [letters]);
 
-  const fmtPrice = (p: number) =>
-    p.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+  const { currency } = useHolzen();
+  const fmtPrice = (p: number) => formatBtcPrice(p, currency);
 
   const tabs = [
     { id: 'stats' as const, label: 'Stats' },

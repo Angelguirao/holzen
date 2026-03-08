@@ -1,6 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
+import { useHolzen } from '@/hooks/use-holzen';
+import { formatBtcPrice } from '@/lib/btc';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { Mail, Send } from 'lucide-react';
@@ -205,8 +207,8 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
     }
   };
 
-  const fmtPrice = (p: number) =>
-    p.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+  const { currency } = useHolzen();
+  const fmtPrice = (p: number) => formatBtcPrice(p, currency);
 
   const getStatusCopy = (l: Letter) => {
     if (l.written_during === 'calm') {
