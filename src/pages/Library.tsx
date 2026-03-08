@@ -41,7 +41,7 @@ export default function Library() {
   if (loading) {
     return (
       <div className="space-y-4 pb-24">
-        <PageMeta title={t('library.pageTitle')} />
+        <PageMeta title={t('library.pageTitle')} description={t('library.pageDescription')} />
         <Skeleton className="h-6 w-32" />
         <Skeleton className="h-8 w-full" />
         <Skeleton className="h-20 w-full" />
