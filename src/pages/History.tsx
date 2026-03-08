@@ -53,7 +53,7 @@ const History = () => {
   const { user } = useAuth();
   const [reflections, setReflections] = useState<Reflection[]>([]);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<'recent' | 'library'>('recent');
+  const [tab, setTab] = useState<'recent' | 'library' | 'timeline'>('recent');
   const [filter, setFilter] = useState<'all' | 'favorites'>('all');
   const [tagFilter, setTagFilter] = useState<string | null>(null);
   const [search, setSearch] = useState('');
