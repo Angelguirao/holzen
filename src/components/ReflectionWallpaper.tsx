@@ -114,6 +114,7 @@ function compositeWallpaper(
 }
 
 export function ReflectionWallpaper({ message, mood, context, haiku, variant = 'icon' }: Props) {
+  const { t } = useTranslation();
   const [generating, setGenerating] = useState(false);
   const [compositeUrl, setCompositeUrl] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
