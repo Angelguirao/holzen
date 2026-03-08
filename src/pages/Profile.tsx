@@ -207,7 +207,7 @@ const Profile = () => {
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Lock className="h-3 w-3" />
                   <p className="text-[10px] font-mono tracking-widest uppercase">
-                    Sealed ({pendingLetters.length})
+                    {t('profile.sealed')} ({pendingLetters.length})
                   </p>
                 </div>
                 {pendingLetters.map((l) => (
