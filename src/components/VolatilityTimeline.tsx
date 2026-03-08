@@ -329,15 +329,41 @@ function LegendItem({ color, label }: { color: string; label: string }) {
   );
 }
 
-function PriceTooltip({ active, payload }: any) {
+function ChartTooltip({ active, payload }: any) {
   if (!active || !payload?.[0]) return null;
   const data = payload[0].payload as PricePoint;
+  const decisionLabels: Record<string, string> = {
+    held: 'Hold', sold: 'Sell', bought: 'Buy', nothing: 'Nothing',
+  };
+
   return (
-    <div className="rounded-md border border-border/60 bg-background px-3 py-2 shadow-sm">
+    <div className="rounded-md border border-border/60 bg-background px-3 py-2 shadow-md max-w-[220px]">
       <p className="text-[10px] font-mono text-muted-foreground">{data.date}</p>
-      <p className="text-xs font-mono">
+      <p className="text-xs font-mono font-medium">
         ${data.price.toLocaleString('en-US', { maximumFractionDigits: 0 })}
       </p>
+      {data.reflection && (
+        <div className="mt-1.5 pt-1.5 border-t border-border/40 space-y-1">
+          <p className="text-[10px] leading-relaxed line-clamp-2">{data.reflection.message}</p>
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {data.reflection.mood && (
+              <span className="text-[8px] font-mono px-1 py-0.5 rounded bg-muted/40 text-muted-foreground">
+                {data.reflection.mood}
+              </span>
+            )}
+            {data.reflection.outcome && (
+              <span className="text-[8px] font-mono px-1 py-0.5 rounded bg-muted/40 text-muted-foreground">
+                {decisionLabels[data.reflection.outcome] || data.reflection.outcome}
+              </span>
+            )}
+            {data.ritual && (
+              <span className="text-[8px] font-mono px-1 py-0.5 rounded bg-primary/10 text-primary/70">
+                ritual
+              </span>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
