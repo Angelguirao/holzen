@@ -953,5 +953,133 @@
     "haiku": "Numbers fall like rain\nThe urge to act rises fast\nBreathe before you move",
     "learningTitle": "Panic Selling and Recovery",
     "learningBody": "After Bitcoin's 30% drop in May 2021, it recovered within three months. Historically, sharp declines have often preceded periods of consolidation rather than further collapse."
+  },
+  "periodComparison": {
+    "title": "Period Comparison",
+    "thisWeek": "This week",
+    "lastWeek": "Last week",
+    "reflections": "Reflections",
+    "holdRate": "Hold rate",
+    "composure": "Composure",
+    "companionUse": "Companion use",
+    "noDataPrevious": "No data for {{period}} — comparisons will appear next {{next}}.",
+    "week": "week",
+    "month": "month"
+  },
+  "streakTimeline": {
+    "title": "Last 28 Days",
+    "daysToMilestone": "{{days}}d to {{milestone}}-day milestone",
+    "beforeSignup": "before signup",
+    "streakDays": "{{days}}d streak",
+    "milestoneDays": "{{days}}d milestone",
+    "status": {
+      "outcome": "outcome logged",
+      "reflection": "reflected",
+      "freeze": "streak freeze",
+      "empty": "no activity"
+    },
+    "legend": {
+      "outcomeLogged": "outcome logged",
+      "reflectedNoOutcome": "reflected (no outcome)",
+      "streakFreeze": "streak freeze",
+      "noActivity": "no activity"
+    }
+  },
+  "statsTrends": {
+    "weeklyTrends": "Weekly Trends",
+    "emptyMessage": "Reflect across 3+ different weeks to unlock score, mood, and hold-rate trend charts.",
+    "scoreOverTime": "Score Over Time",
+    "stable": "stable",
+    "score": "Score",
+    "weeklyComposureScore": "Weekly composure score across {{count}} reflections",
+    "moodDistribution": "Mood Distribution",
+    "composed": "Composed",
+    "mixed": "Mixed",
+    "reactive": "Reactive",
+    "holdRate": "Hold Rate",
+    "holdRateDescription": "% of weeks where you held or did nothing after reflecting"
+  },
+  "volatilityTimeline": {
+    "title": "Volatility Timeline",
+    "all": "All",
+    "unableToLoad": "Unable to load price data. Try again later.",
+    "legendCalm": "Calm",
+    "legendAnxious": "Anxious",
+    "legendNeutral": "Neutral",
+    "reflections": "Reflections ({{count}})",
+    "context": "Context",
+    "outcome": "Outcome",
+    "ritual": "Ritual",
+    "decision": "Decision"
+  },
+  "ritualStats": {
+    "title": "Ritual Stats",
+    "completed": "Completed",
+    "avgDuration": "Avg Duration",
+    "mostUsed": "Most Used",
+    "decisionBreakdown": "Decision breakdown",
+    "bestTemplateInsight": "Your {{template}} ritual has the highest hold rate at {{rate}}%",
+    "avgSuffix": "avg {{seconds}}s",
+    "templateEffectiveness": "Template effectiveness",
+    "held": "held",
+    "templates": {
+      "quick": "Quick",
+      "standard": "Standard",
+      "deep": "Deep"
+    }
+  },
+  "reflectionNote": {
+    "addNote": "Add a note",
+    "editNote": "Edit note",
+    "placeholder": "How did this make you feel?",
+    "save": "Save",
+    "saved": "Saved"
+  },
+  "reflectionTags": {
+    "addTags": "Add tags",
+    "typeTag": "Type a tag…",
+    "pressEnterToCreate": "Press Enter to create \"{{tag}}\""
+  },
+  "reflectionComparison": {
+    "similarMoment": "Similar moment · {{time}} ago",
+    "then": "Then",
+    "now": "Now",
+    "insightCalmer": "You were calmer this time facing similar conditions.",
+    "insightHeldSteady": "You held steady this time — last time you acted on impulse.",
+    "insightConsistent": "Consistent composure — you held steady both times.",
+    "insightSimilar": "Similar emotional response — your patterns are consistent."
+  },
+  "moodCharts": {
+    "reactive": "Reactive",
+    "neutral": "Neutral",
+    "composed": "Composed",
+    "mixed": "Mixed",
+    "moodOverTime": "Mood over time",
+    "moodOverTimeEmpty": "Log moods across 3+ different weeks to see your composure trend.",
+    "avgComposure": "Avg composure",
+    "weeklyAverageMoodChecks": "Weekly average of your pre-reflection mood checks",
+    "moodTrend": "Mood Trend",
+    "moodTrendEmpty": "Log moods across 3+ different weeks to see a meaningful trend line.",
+    "stable": "stable",
+    "improving": "improving",
+    "declining": "declining",
+    "day": "day",
+    "week": "week",
+    "weekOf": "Week of",
+    "averageMoodPer": "Average mood per {{period}} across {{count}} reflections",
+    "moodPriceScatter": "Mood × Price Scatter",
+    "moodPriceScatterEmpty": "Need 8+ reflections with mood & price data to reveal emotional patterns.",
+    "mood": "Mood",
+    "reflections": "Reflections",
+    "scatterInsightDifferent": "You tend to feel {{negLabel}} during drops and {{posLabel}} during surges.",
+    "scatterInsightSame": "You tend to feel {{label}} regardless of direction.",
+    "scatterFooter": "Each dot is one reflection · {{count}} data points",
+    "moodPriceChange": "Mood × Price Change",
+    "moodPriceChangeEmpty": "Log 3+ reflections with mood to compare how you feel vs. market moves.",
+    "entries": "{{count}} entries",
+    "avgBtcChange": "Average BTC 24h change when each mood was logged",
+    "weak": "weak",
+    "moderate": "moderate",
+    "strong": "strong"
   }
 }
