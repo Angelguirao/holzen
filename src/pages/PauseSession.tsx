@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
-import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { X, Sparkles, ArrowDown, Check } from 'lucide-react';
+import { motion, useReducedMotion } from 'framer-motion';
+import { X, ArrowDown, Check } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { hapticFeedback } from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
@@ -12,7 +12,6 @@ import { ReflectionTags } from '@/components/ReflectionTags';
 import { ShareReflection } from '@/components/ShareReflection';
 import { ReflectionWallpaper } from '@/components/ReflectionWallpaper';
 import { SaveToLibraryButton } from '@/components/library/SaveToLibraryButton';
-import { HolzenRitual, type RitualTemplate } from '@/components/HolzenRitual';
 import { OutcomePrompt } from '@/components/OutcomePrompt';
 
 const DECISIONS = [
@@ -55,7 +54,6 @@ export default function PauseSession() {
   const companionPrefs: CompanionPrefs = state.companionPrefs ?? { breathing: true, haiku: true, learning: true, signal: true, zoomOut: true, history: true };
   const severity: 'mild' | 'moderate' | 'high' = state.severity ?? 'mild';
 
-  const [showRitual, setShowRitual] = useState(false);
   const [phase, setPhase] = useState<'session' | 'outcome' | 'done'>('session');
   const [decision, setDecision] = useState<string | null>(null);
 
@@ -71,16 +69,6 @@ export default function PauseSession() {
     setPhase('outcome');
   }, [dismissMessage]);
 
-  const handleRitualDecision = useCallback((d: string) => {
-    setDecision(d);
-    setShowRitual(false);
-    dismissMessage();
-    setPhase('outcome');
-  }, [dismissMessage]);
-
-  const handleRitualClose = useCallback(() => {
-    setShowRitual(false);
-  }, []);
 
   const handleOutcomeComplete = useCallback(() => {
     setPhase('done');
@@ -99,19 +87,16 @@ export default function PauseSession() {
   }
 
   return (
-    <>
-      <AnimatePresence>
-        {!showRitual && (
-          <motion.div
-            className="fixed inset-0 z-50 overflow-y-auto"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.6 }}
-            style={{
-              background: 'linear-gradient(160deg, hsl(var(--background)) 0%, hsl(var(--muted)) 50%, hsl(var(--background)) 100%)',
-            }}
-          >
+    <motion.div
+      className="fixed inset-0 z-50 overflow-y-auto"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.6 }}
+      style={{
+        background: 'linear-gradient(160deg, hsl(var(--background)) 0%, hsl(var(--muted)) 50%, hsl(var(--background)) 100%)',
+      }}
+    >
             {/* Ambient orbs */}
             <motion.div
               className="fixed top-1/4 left-1/3 w-[300px] h-[300px] rounded-full pointer-events-none"
@@ -240,23 +225,6 @@ export default function PauseSession() {
                     />
                   </RevealSection>
 
-                  {/* Ritual option */}
-                  <RevealSection>
-                    <div className="flex flex-col items-center gap-4">
-                      <button
-                        onClick={() => { hapticFeedback('light'); setShowRitual(true); }}
-                        className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-lg border border-primary/15 bg-primary/5 hover:bg-primary/10 transition-all duration-500"
-                      >
-                        <Sparkles className="h-3.5 w-3.5 text-primary/40" />
-                        <span className="text-[11px] font-mono text-primary/50 tracking-[0.12em] uppercase">
-                          {t('pause.startRitual')}
-                        </span>
-                      </button>
-                      <p className="text-[10px] font-mono text-muted-foreground/25 text-center">
-                        {t('pause.orDecideNow')}
-                      </p>
-                    </div>
-                  </RevealSection>
 
                   {/* Decision */}
                   <RevealSection>
@@ -331,18 +299,5 @@ export default function PauseSession() {
               )}
             </div>
           </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Ritual overlay */}
-      <HolzenRitual
-        open={showRitual}
-        onClose={handleRitualClose}
-        template={(ritualTemplate || 'standard') as RitualTemplate}
-        reflectionMessage={message}
-        reflectionId={reflectionId}
-        onDecision={handleRitualDecision}
-      />
-    </>
   );
 }
