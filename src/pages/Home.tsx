@@ -286,6 +286,18 @@ const Home = () => {
           </HomeWidget>
         );
 
+      case 'hold-goal':
+        return (
+          <HomeWidget
+            id="hold-goal"
+            title={WIDGET_TITLES['hold-goal']}
+            collapsed={collapsed['hold-goal']}
+            onToggleCollapse={() => toggleCollapsed('hold-goal')}
+          >
+            <HoldGoalWidget currentPrice={btcData?.currentPrice} />
+          </HomeWidget>
+        );
+
       case 'reflection':
         return (
           <HomeWidget
