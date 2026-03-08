@@ -69,16 +69,6 @@ export default function PauseSession() {
     setPhase('outcome');
   }, [dismissMessage]);
 
-  const handleRitualDecision = useCallback((d: string) => {
-    setDecision(d);
-    setShowRitual(false);
-    dismissMessage();
-    setPhase('outcome');
-  }, [dismissMessage]);
-
-  const handleRitualClose = useCallback(() => {
-    setShowRitual(false);
-  }, []);
 
   const handleOutcomeComplete = useCallback(() => {
     setPhase('done');
