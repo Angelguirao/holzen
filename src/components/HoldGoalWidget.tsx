@@ -192,7 +192,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
                   : 'text-muted-foreground/50 hover:text-muted-foreground'
               }`}
             >
-              {t === 'time' ? <Calendar className="h-2.5 w-2.5" /> : t === 'price' ? <DollarSign className="h-2.5 w-2.5" /> : <Infinity className="h-2.5 w-2.5" />}
+              {t === 'time' ? <Calendar className="h-2.5 w-2.5" /> : t === 'price' ? <Coins className="h-2.5 w-2.5" /> : <Infinity className="h-2.5 w-2.5" />}
               {t === 'time' ? 'Time' : t === 'price' ? 'Price' : 'Forever'}
             </button>
           ))}
