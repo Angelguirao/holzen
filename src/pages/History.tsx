@@ -553,12 +553,12 @@ const History = () => {
         <div className="py-8 text-center space-y-2">
           <p className="text-xs text-muted-foreground">
             {tab === 'recent'
-              ? 'No reflections in the last 7 days.'
+              ? t('history.noReflectionsRecent')
               : search
-                ? 'No reflections match your search.'
+                ? t('history.noReflectionsSearch')
                 : filter === 'favorites'
-                  ? 'No favorites yet. Star reflections you want to keep.'
-                  : "No reflections yet. They'll appear here when volatility crosses your threshold."}
+                  ? t('history.noFavorites')
+                  : t('history.noReflectionsYet')}
           </p>
         </div>
       ) : (
