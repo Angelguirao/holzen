@@ -207,8 +207,8 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
     }
   };
 
-  const fmtPrice = (p: number) =>
-    p.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+  const { currency } = useHolzen();
+  const fmtPrice = (p: number) => formatBtcPrice(p, currency);
 
   const getStatusCopy = (l: Letter) => {
     if (l.written_during === 'calm') {
