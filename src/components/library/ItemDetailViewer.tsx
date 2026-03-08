@@ -52,7 +52,7 @@ function CompanionCard({ item, onSelect }: { item: LibraryItem; onSelect?: (item
         <span className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{sourceLabel}</span>
         {item.is_favorite && <Heart className="h-2.5 w-2.5 text-destructive fill-current" />}
       </div>
-      {item.title && item.title !== 'Reflection' && (
+      {item.title && item.title !== 'Reflection' && typeof item.title === 'string' && (
         <p className="text-xs font-medium text-foreground leading-snug">{item.title}</p>
       )}
       {item.source_type === 'haiku' && bodyText && (
