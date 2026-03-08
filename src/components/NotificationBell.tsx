@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 type NotificationItem = {
   id: string;
-  type: 'badge' | 'night_reflection' | 'letter' | 'insight';
+  type: 'badge' | 'night_reflection' | 'letter' | 'insight' | 'reflection' | 'ritual';
   title: string;
   subtitle: string;
   timestamp: string;
@@ -104,21 +104,45 @@ export function NotificationBell() {
         }
       }
 
-      const { data: insights } = await supabase
-        .from('reflection_insights')
-        .select('id, generated_at, reflection_count')
+      // Fetch recent reflections (system-triggered)
+      const { data: reflections } = await supabase
+        .from('reflections')
+        .select('id, message, created_at')
         .eq('user_id', user!.id)
-        .order('generated_at', { ascending: false })
-        .limit(3);
+        .order('created_at', { ascending: false })
+        .limit(5);
 
-      if (insights) {
-        for (const i of insights) {
+      if (reflections) {
+        for (const r of reflections) {
           items.push({
-            id: `insight-${i.id}`,
-            type: 'insight',
-            title: 'AI insights ready',
-            subtitle: `Based on ${i.reflection_count} reflections`,
-            timestamp: i.generated_at,
+            id: `reflection-${r.id}`,
+            type: 'reflection',
+            title: 'Reflection triggered',
+            subtitle: r.message.slice(0, 60) + (r.message.length > 60 ? '…' : ''),
+            timestamp: r.created_at,
+          });
+        }
+      }
+
+      // Fetch recent ritual completions
+      const { data: rituals } = await supabase
+        .from('ritual_completions')
+        .select('id, decision, created_at')
+        .eq('user_id', user!.id)
+        .order('created_at', { ascending: false })
+        .limit(5);
+
+      if (rituals) {
+        const decisionLabels: Record<string, string> = {
+          held: 'hold', sold: 'sell', bought: 'buy', nothing: 'do nothing',
+        };
+        for (const r of rituals) {
+          items.push({
+            id: `ritual-${r.id}`,
+            type: 'ritual',
+            title: 'Ritual completed',
+            subtitle: `Decision: ${decisionLabels[r.decision] || r.decision}`,
+            timestamp: r.created_at,
           });
         }
       }
@@ -184,6 +208,8 @@ export function NotificationBell() {
     night_reflection: '🌙',
     letter: '✉️',
     insight: '✨',
+    reflection: '📝',
+    ritual: '🔮',
   };
 
   return (
