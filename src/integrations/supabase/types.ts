@@ -169,6 +169,7 @@ export type Database = {
           hold_goal_target_price: number | null
           hold_goal_type: string | null
           id: string
+          language: string
           last_context: string | null
           last_message: string | null
           last_trigger_at: string | null
@@ -214,6 +215,7 @@ export type Database = {
           hold_goal_target_price?: number | null
           hold_goal_type?: string | null
           id?: string
+          language?: string
           last_context?: string | null
           last_message?: string | null
           last_trigger_at?: string | null
@@ -259,6 +261,7 @@ export type Database = {
           hold_goal_target_price?: number | null
           hold_goal_type?: string | null
           id?: string
+          language?: string
           last_context?: string | null
           last_message?: string | null
           last_trigger_at?: string | null
