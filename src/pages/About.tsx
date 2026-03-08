@@ -130,19 +130,19 @@ const About = () => {
         <motion.div {...m(0.1)}>
           <div className="space-y-4">
             <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
-              BTC Reserve
+              {t('about.btcReserve')}
             </p>
             <p className="text-sm text-foreground leading-relaxed">
-              We hold what we help others hold.
+              {t('about.reserveBody1')}
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Holzen maintains a Bitcoin reserve as a long-term store of value — not as speculation, but as a statement of conviction. We believe a product that helps people hold should itself hold.
+              {t('about.reserveBody2')}
             </p>
             <Link
               to="/reserve"
               className="inline-flex items-center gap-1.5 text-xs font-mono text-primary hover:text-primary/80 transition-colors"
             >
-              Read our full reserve strategy →
+              {t('about.readReserveStrategy')}
             </Link>
           </div>
         </motion.div>
