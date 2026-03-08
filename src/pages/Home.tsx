@@ -589,7 +589,7 @@ const Home = () => {
       <TestimonialRequest reflectionCount={reflectionCount} />
 
       <p className="text-xs text-muted-foreground leading-relaxed">
-        When Bitcoin moves, we'll help you pause before you act.
+        {t('home.whenBtcMoves')}
       </p>
     </div>
   );
