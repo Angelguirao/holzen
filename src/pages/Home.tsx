@@ -10,6 +10,7 @@ import { ReflectionMessage } from '@/components/ReflectionMessage';
 import { OutcomePrompt } from '@/components/OutcomePrompt';
 import { HolzenNumber } from '@/components/HolzenNumber';
 import { MoodCheck, type MoodValue } from '@/components/MoodCheck';
+import { ReflectionComparison } from '@/components/ReflectionComparison';
 import { Onboarding } from '@/components/Onboarding';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
@@ -332,6 +333,7 @@ const Home = () => {
                           Start ritual before deciding
                         </span>
                       </button>
+                      {lastReflectionId && <ReflectionComparison reflectionId={lastReflectionId} />}
                     </div>
                   ) : showOutcome && outcomeReflectionId ? (
                     <OutcomePrompt reflectionId={outcomeReflectionId} onComplete={handleOutcomeComplete} />

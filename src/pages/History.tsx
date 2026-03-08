@@ -7,6 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ShareReflection } from '@/components/ShareReflection';
 import { ReflectionNote } from '@/components/ReflectionNote';
 import { ReflectionTags } from '@/components/ReflectionTags';
+import { ReflectionComparison } from '@/components/ReflectionComparison';
 import { HaikuDisplay } from '@/components/HaikuDisplay';
 import { LearningInput } from '@/components/LearningInput';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -326,6 +327,7 @@ const History = () => {
                   )}
                 </div>
               )}
+              <ReflectionComparison reflectionId={r.id} />
             </div>
           ))}
         </div>
