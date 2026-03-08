@@ -226,7 +226,7 @@ const Profile = () => {
   );
 };
 
-function StatsContent({ reflections }: { reflections: Reflection[] }) {
+function StatsContent({ reflections, memberSince }: { reflections: Reflection[]; memberSince?: string }) {
   const scoreData = useHolzenScore(reflections);
 
   const moodCounts = useMemo(() => {
