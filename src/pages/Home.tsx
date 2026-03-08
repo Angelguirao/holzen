@@ -60,6 +60,14 @@ interface PinnedReflection {
 
 const Home = () => {
   const { t } = useTranslation();
+  const WIDGET_TITLES: Record<WidgetId, string> = {
+    'btc-status': t('home.widget.market'),
+    'hold-goal': t('home.widget.goal'),
+    'reflection': t('home.widget.reflection'),
+    'night': t('home.widget.evening'),
+    'letter': t('home.widget.letter'),
+    'actions': t('home.widget.practice'),
+  };
   const { user } = useAuth();
   const navigate = useNavigate();
   const { subscribed, loading: subLoading, trialRemaining, checkoutLoading, startCheckout, refresh } = useSubscription();
