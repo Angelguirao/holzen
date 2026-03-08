@@ -339,7 +339,14 @@ export function useHolzen() {
         setLastTriggerAt(new Date().toISOString());
       }
     } catch (e: any) {
-      setError(e.message || 'Failed to generate message');
+      const raw = e?.message || '';
+      if (raw.includes('fetch') || raw.includes('network') || raw.includes('Failed to fetch')) {
+        setError('Could not reach the reflection service. Check your connection.');
+      } else if (raw.includes('rate') || raw.includes('limit') || raw.includes('429')) {
+        setError('Too many requests — please wait a moment and try again.');
+      } else {
+        setError('AI reflection unavailable right now. Try again shortly.');
+      }
     } finally {
       setLoading(false);
     }
