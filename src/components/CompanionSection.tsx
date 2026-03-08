@@ -377,7 +377,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
                 .update({ zoom_out_data: data } as any)
                 .eq('id', reflectionId)
                 .then(() => {});
-            }
+              autoSaveToLibrary({ title: 'Zoom Out', body: typeof data === 'object' ? JSON.stringify(data) : String(data), sourceType: 'zoom_out' });
             setZoomOutLoading(false);
           });
       });
