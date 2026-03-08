@@ -34,6 +34,8 @@ const outcomeLabels: Record<string, string> = {
 };
 
 export function ZoomOutDisplay({ data, loading, error }: Props) {
+  const { currency } = useHolzen();
+  const fmtPrice = (n: number) => formatBtcPrice(n, currency);
   if (loading) {
     return (
       <div className="space-y-3">
