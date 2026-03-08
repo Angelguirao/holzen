@@ -193,9 +193,16 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
                 <span className="ml-2 text-primary/50">Refresh recommended</span>
               )}
             </p>
-            <p className="text-[9px] font-mono text-muted-foreground/30">
-              {row.reflection_count} reflections
-            </p>
+            <div className="flex items-center gap-2">
+              {row.language && row.language !== language && (
+                <span className="text-[8px] font-mono px-1.5 py-0.5 rounded bg-muted/60 text-muted-foreground/60 uppercase">
+                  {LANG_LABELS[row.language] || row.language}
+                </span>
+              )}
+              <p className="text-[9px] font-mono text-muted-foreground/30">
+                {row.reflection_count} reflections
+              </p>
+            </div>
           </div>
 
           {row.insights.map((insight, i) => {
