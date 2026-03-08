@@ -13,6 +13,7 @@ export interface LibraryItem {
   reflection_id: string | null;
   tags: string[];
   pinned: boolean;
+  is_favorite: boolean;
   status: 'unread' | 'read' | 'archived';
   created_at: string;
 }
