@@ -625,7 +625,7 @@ const History = () => {
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel className="font-mono text-xs">Cancel</AlertDialogCancel>
+                        <AlertDialogCancel className="font-mono text-xs">{t('common.cancel')}</AlertDialogCancel>
                         <AlertDialogAction
                           onClick={() => deleteReflection(r.id)}
                           className="bg-destructive text-destructive-foreground hover:bg-destructive/90 font-mono text-xs"
