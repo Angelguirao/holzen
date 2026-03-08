@@ -179,7 +179,23 @@ export function BadgesPanel({ reflections }: BadgesPanelProps) {
   // Next badge to earn
   const nextBadge = badges.find((b) => !b.earned && b.progress > 0);
 
+  // Badge sync for celebration
+  const earnedBadgeIds = useMemo(() => badges.filter((b) => b.earned).map((b) => b.id), [badges]);
+  const badgeMeta = useMemo(() => {
+    const meta: Record<string, { label: string; description: string; color: string }> = {};
+    for (const b of badges) {
+      if (b.earned) meta[b.id] = { label: b.label, description: b.description, color: b.color };
+    }
+    return meta;
+  }, [badges]);
+
+  const { newBadges, dismissCelebration } = useBadgeSync(earnedBadgeIds, badgeMeta);
+
   return (
+    <>
+      {newBadges.length > 0 && (
+        <BadgeCelebration badges={newBadges} onDismiss={dismissCelebration} />
+      )}
     <div className="space-y-6">
       {/* Summary */}
       <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-3">
