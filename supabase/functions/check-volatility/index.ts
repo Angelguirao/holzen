@@ -10,6 +10,14 @@ const corsHeaders = {
 
 const DEFAULT_COOLDOWN_MS = 6 * 60 * 60 * 1000; // 6 hours fallback
 
+async function validateUrl(url: string, fallbackQuery: string): Promise<string> {
+  try {
+    const res = await fetch(url, { method: 'HEAD', redirect: 'follow' });
+    if (res.ok || res.status === 405 || res.status === 403) return url;
+  } catch { /* broken */ }
+  return `https://www.google.com/search?q=${encodeURIComponent(fallbackQuery)}`;
+}
+
 async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise<Response> {
   for (let i = 0; i < retries; i++) {
     const res = await fetch(url);
@@ -56,6 +64,8 @@ interface ReflectionResult {
   haiku: string | null;
   learning_title: string | null;
   learning_body: string | null;
+  learning_citation: string | null;
+  learning_url: string | null;
 }
 
 async function generateReflection(context: string, apiKey: string, tone = "stoic"): Promise<ReflectionResult | null> {
@@ -97,7 +107,9 @@ Haiku rules:
 
 Learning input rules:
 - Title: a short, factual headline (5-10 words).
-- Body: 1-2 sentences about a historical Bitcoin event, market pattern, or behavioral finance insight relevant to the current context. Factual, educational, no advice.`;
+- Body: 1-2 sentences about a historical Bitcoin event, market pattern, or behavioral finance insight relevant to the current context. Factual, educational, no advice.
+- Citation: formatted source reference (e.g. "CoinDesk, 2020" or "Kahneman & Tversky, 1979")
+- URL: a real, working URL to a reputable source documenting the event or research referenced.`;
 
   const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
@@ -124,8 +136,10 @@ Learning input rules:
                 haiku: { type: "string", description: "A haiku (3 lines, 5-7-5 syllables). Lines separated by newlines." },
                 learning_title: { type: "string", description: "Short factual headline for a historical/educational insight." },
                 learning_body: { type: "string", description: "1-2 sentences of factual, educational context." },
+                learning_citation: { type: "string", description: "Formatted source reference (e.g. 'CoinDesk, 2020')." },
+                learning_url: { type: "string", description: "URL to a reputable source for the referenced event or research." },
               },
-              required: ["message", "haiku", "learning_title", "learning_body"],
+              required: ["message", "haiku", "learning_title", "learning_body", "learning_citation", "learning_url"],
               additionalProperties: false,
             },
           },
@@ -146,18 +160,24 @@ Learning input rules:
   const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
   if (toolCall?.function?.arguments) {
     const args = JSON.parse(toolCall.function.arguments);
+    let learningUrl = args.learning_url || null;
+    if (learningUrl && args.learning_title) {
+      learningUrl = await validateUrl(learningUrl, `${args.learning_title} ${args.learning_citation || ''}`);
+    }
     return {
       message: args.message,
       haiku: args.haiku || null,
       learning_title: args.learning_title || null,
       learning_body: args.learning_body || null,
+      learning_citation: args.learning_citation || null,
+      learning_url: learningUrl,
     };
   }
 
   // Fallback to plain content
   const message = data.choices?.[0]?.message?.content?.trim();
   if (!message) return null;
-  return { message, haiku: null, learning_title: null, learning_body: null };
+  return { message, haiku: null, learning_title: null, learning_body: null, learning_citation: null, learning_url: null };
 }
 
 async function sendNotificationEmail(
@@ -304,6 +324,8 @@ serve(async (req) => {
       const haiku = (profile as any).companion_haiku ? result.haiku : null;
       const learningTitle = (profile as any).companion_learning ? result.learning_title : null;
       const learningBody = (profile as any).companion_learning ? result.learning_body : null;
+      const learningCitation = (profile as any).companion_learning ? result.learning_citation : null;
+      const learningUrl = (profile as any).companion_learning ? result.learning_url : null;
 
       // Save to reflection history
       await supabase
@@ -315,6 +337,8 @@ serve(async (req) => {
           haiku,
           learning_title: learningTitle,
           learning_body: learningBody,
+          learning_citation: learningCitation,
+          learning_url: learningUrl,
         });
 
       // Update profile with new reflection
