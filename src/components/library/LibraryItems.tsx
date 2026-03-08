@@ -196,6 +196,10 @@ export function LibraryItems({ library, favoritesOnly = false }: Props) {
     toast.success(t('library.collectionDeleted'));
   };
 
+  const handleUpdateTags = async (id: string, tags: string[]) => {
+    await updateItem(id, { tags } as any);
+  };
+
   const renderCard = (item: typeof items[0]) => (
     <LibraryItemCard
       key={item.id}
@@ -203,6 +207,7 @@ export function LibraryItems({ library, favoritesOnly = false }: Props) {
       onTogglePin={togglePin}
       onDelete={deleteItem}
       onStatusChange={handleStatusChange}
+      onUpdateTags={handleUpdateTags}
       collections={collections}
       itemCollections={getItemCollections(item.id)}
       onAddToCollection={addToCollection}
