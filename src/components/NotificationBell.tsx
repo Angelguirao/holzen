@@ -14,7 +14,7 @@ const SwipeableNotification = forwardRef<HTMLDivElement, {
   n: NotificationItem;
   iconMap: Record<NotificationItem['type'], string>;
   onDismiss: (id: string) => void;
-  onAction: (path: string) => void;
+  onAction: (path: string, state?: Record<string, any>) => void;
 }>(function SwipeableNotification({
   n,
   iconMap,
