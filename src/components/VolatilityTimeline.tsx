@@ -53,6 +53,7 @@ const PERIOD_DAYS: Record<Period, number | null> = {
 
 export function VolatilityTimeline() {
   const { user } = useAuth();
+  const { currency } = useHolzen();
   const [period, setPeriod] = useState<Period>('30d');
   const [priceData, setPriceData] = useState<[number, number][]>([]);
   const [reflections, setReflections] = useState<Reflection[]>([]);
