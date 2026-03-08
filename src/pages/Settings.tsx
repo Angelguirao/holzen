@@ -234,7 +234,7 @@ const Settings = () => {
         </div>
         <div className="flex items-center justify-between">
           <Label htmlFor="comp-learning" className="text-xs font-mono text-muted-foreground">
-            Historical insight
+            Learning nudge
           </Label>
           <Switch
             id="comp-learning"
