@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { PageMeta } from '@/components/PageMeta';
 import { LandingTestimonials } from '@/components/LandingTestimonials';
+import { LandingLanguageSwitcher } from '@/components/LandingLanguageSwitcher';
 
 function Section({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   const ref = useRef(null);
