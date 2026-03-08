@@ -280,6 +280,8 @@ const History = () => {
     if (!reflection) return;
     const newVal = !reflection.is_favorite;
     await supabase.from('reflections').update({ is_favorite: newVal }).eq('id', id);
+    // Also sync to library_items linked to this reflection
+    await supabase.from('library_items').update({ is_favorite: newVal }).eq('reflection_id', id).eq('source_type', 'reflection');
     setReflections((prev) =>
       prev.map((r) => (r.id === id ? { ...r, is_favorite: newVal } : r))
     );
