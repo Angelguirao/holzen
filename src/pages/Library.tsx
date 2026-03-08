@@ -58,6 +58,11 @@ export default function Library() {
       {tab === 'activity' && <HistoryContent />}
       {tab === 'items' && <LibraryItems library={library} />}
       {tab === 'collections' && <LibraryCollections library={library} />}
+      {tab === 'graph' && (
+        <Suspense fallback={<div className="flex items-center justify-center h-[400px]"><p className="text-xs font-mono text-muted-foreground/40 animate-pulse">Loading graph…</p></div>}>
+          <GraphView />
+        </Suspense>
+      )}
     </div>
   );
 }
