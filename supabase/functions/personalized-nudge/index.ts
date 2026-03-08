@@ -40,7 +40,7 @@ serve(async (req) => {
     // 2. Get users with email notifications enabled (with timezone)
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
-      .select("user_id, email_notifications, quiet_hours_start, quiet_hours_end, timezone");
+      .select("user_id, email_notifications, quiet_hours_start, quiet_hours_end, timezone, language");
 
     if (profilesError) throw profilesError;
 
