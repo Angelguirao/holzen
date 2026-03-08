@@ -124,6 +124,7 @@ export function HolzenRitual({ open, onClose, template, reflectionMessage, refle
     setCompleted(false);
     setJournalText('');
     setDecision('');
+    setShowMantra(false);
     startTimeRef.current = Date.now();
     onClose();
   }, [onClose]);
