@@ -440,6 +440,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
                 .eq('id', reflectionId)
                 .then(() => {});
               autoSaveToLibrary({ title: (data as HistoricalInsightData).title, body: (data as HistoricalInsightData).btcInsight, sourceType: 'history_insight' });
+            }
             setHistoryLoading(false);
           });
       });
