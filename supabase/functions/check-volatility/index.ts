@@ -160,11 +160,17 @@ Learning input rules:
   const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
   if (toolCall?.function?.arguments) {
     const args = JSON.parse(toolCall.function.arguments);
+    let learningUrl = args.learning_url || null;
+    if (learningUrl && args.learning_title) {
+      learningUrl = await validateUrl(learningUrl, `${args.learning_title} ${args.learning_citation || ''}`);
+    }
     return {
       message: args.message,
       haiku: args.haiku || null,
       learning_title: args.learning_title || null,
       learning_body: args.learning_body || null,
+      learning_citation: args.learning_citation || null,
+      learning_url: learningUrl,
     };
   }
 
