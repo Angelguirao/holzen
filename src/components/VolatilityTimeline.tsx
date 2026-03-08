@@ -60,10 +60,9 @@ export function VolatilityTimeline() {
   const memberSince = user?.created_at ? new Date(user.created_at) : null;
   const daysSinceSignup = memberSince ? differenceInDays(new Date(), memberSince) : 365;
 
-  // Clamp requested period to days since signup
+  // Use the requested period directly — don't clamp to signup date
   const effectiveDays = useMemo(() => {
-    const requested = PERIOD_DAYS[period] ?? daysSinceSignup;
-    return Math.min(requested, Math.max(daysSinceSignup, 1));
+    return PERIOD_DAYS[period] ?? Math.max(daysSinceSignup, 30);
   }, [period, daysSinceSignup]);
 
   // Fetch reflections + rituals once
@@ -91,20 +90,16 @@ export function VolatilityTimeline() {
   // Fetch price data capped to signup date
   useEffect(() => {
     setPriceLoading(true);
-    const days = Math.max(effectiveDays, 1);
+    const days = Math.max(effectiveDays, 7);
     fetch(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=${days}`)
       .then((r) => r.json())
       .then((data) => {
-        let prices: [number, number][] = data.prices ?? [];
-        if (memberSince) {
-          const signupTs = memberSince.getTime();
-          prices = prices.filter(([ts]) => ts >= signupTs);
-        }
+        const prices: [number, number][] = data.prices ?? [];
         setPriceData(prices);
         setPriceLoading(false);
       })
       .catch(() => setPriceLoading(false));
-  }, [effectiveDays, memberSince]);
+  }, [effectiveDays]);
 
   // Build chart data with reflections mapped to nearest price point
   const { chartData, reflectionPoints } = useMemo(() => {
