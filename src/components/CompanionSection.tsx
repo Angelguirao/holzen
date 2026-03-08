@@ -551,6 +551,8 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             if (!completion.haiku) markCompleted('haiku');
           }}
           completed={completion.haiku}
+          isFavorite={favorites['haiku']}
+          onToggleFavorite={() => toggleCompanionFavorite('haiku')}
         >
           <HaikuDisplay haiku={companions.haiku!} />
         </CollapsibleCompanion>
@@ -565,6 +567,8 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             if (!completion.learning) markCompleted('learning');
           }}
           completed={completion.learning}
+          isFavorite={favorites['learning']}
+          onToggleFavorite={() => toggleCompanionFavorite('learning')}
         >
           <LearningInput
             title={companions.learningTitle ?? ''}
@@ -573,7 +577,6 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             nudgeLoading={nudgeLoading}
             nudgeError={nudgeError}
           />
-          
         </CollapsibleCompanion>
       )}
 
@@ -586,13 +589,14 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             if (!completion.signal) markCompleted('signal');
           }}
           completed={completion.signal}
+          isFavorite={favorites['signal']}
+          onToggleFavorite={() => toggleCompanionFavorite('signal')}
         >
           <SignalDisplay
             signal={signal}
             loading={signalLoading}
             error={signalError}
           />
-          
         </CollapsibleCompanion>
       )}
 
@@ -605,13 +609,14 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             if (!completion.zoomOut) markCompleted('zoomOut');
           }}
           completed={completion.zoomOut}
+          isFavorite={favorites['zoom_out']}
+          onToggleFavorite={() => toggleCompanionFavorite('zoom_out')}
         >
           <ZoomOutDisplay
             data={zoomOut}
             loading={zoomOutLoading}
             error={zoomOutError}
           />
-          
         </CollapsibleCompanion>
       )}
 
@@ -624,13 +629,14 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             if (!completion.history) markCompleted('history');
           }}
           completed={completion.history}
+          isFavorite={favorites['history_insight']}
+          onToggleFavorite={() => toggleCompanionFavorite('history_insight')}
         >
           <HistoricalInsightDisplay
             data={historyInsight}
             loading={historyLoading}
             error={historyError}
           />
-          
         </CollapsibleCompanion>
       )}
     </div>
