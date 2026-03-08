@@ -170,11 +170,11 @@ const Landing = () => {
                 onClick={() => navigate('/auth')}
                 className="w-full font-mono text-xs group"
               >
-                Get started free
+                {t('landing.getStartedFree')}
                 <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
               </Button>
               <p className="text-[10px] text-muted-foreground text-center">
-                How much is one moment of clarity worth?
+                {t('landing.clarityWorth')}
               </p>
             </div>
           </div>
