@@ -1,0 +1,2 @@
+DELETE FROM roadmap_votes WHERE item_id IN ('a2aae1f8-319d-4d40-8a17-bdff1f86a92b', '3ccf3757-feed-4cca-9420-6e1dd4181193', 'c7635554-75e1-4090-a925-0376c3821b2a', '3603ef91-4656-42e8-bad6-370ca126d433');
+DELETE FROM roadmap_items WHERE id IN ('a2aae1f8-319d-4d40-8a17-bdff1f86a92b', '3ccf3757-feed-4cca-9420-6e1dd4181193', 'c7635554-75e1-4090-a925-0376c3821b2a', '3603ef91-4656-42e8-bad6-370ca126d433');
