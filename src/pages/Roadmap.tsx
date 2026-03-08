@@ -19,6 +19,7 @@ interface RoadmapItem {
 }
 
 const Roadmap = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [items, setItems] = useState<RoadmapItem[]>([]);
   const [votes, setVotes] = useState<Set<string>>(new Set());
