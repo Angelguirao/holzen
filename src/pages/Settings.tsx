@@ -249,13 +249,11 @@ const Settings = () => {
                   { code: 'USD', label: 'USD', desc: 'US Dollar ($)' },
                   { code: 'EUR', label: 'EUR', desc: 'Euro (€)' },
                   { code: 'GBP', label: 'GBP', desc: 'British Pound (£)' },
-                  { code: 'JPY', label: 'JPY', desc: 'Japanese Yen (¥)' },
                   { code: 'CHF', label: 'CHF', desc: 'Swiss Franc' },
                   { code: 'CAD', label: 'CAD', desc: 'Canadian Dollar (C$)' },
                   { code: 'AUD', label: 'AUD', desc: 'Australian Dollar (A$)' },
                   { code: 'BRL', label: 'BRL', desc: 'Brazilian Real (R$)' },
-                  { code: 'INR', label: 'INR', desc: 'Indian Rupee (₹)' },
-                  { code: 'KRW', label: 'KRW', desc: 'South Korean Won (₩)' },
+                  { code: 'TRY', label: 'TRY', desc: 'Turkish Lira (₺)' },
                 ] as const).map((c) => (
                   <button
                     key={c.code}
