@@ -78,7 +78,7 @@ const Profile = () => {
     const loadReflections = async () => {
       const { data } = await supabase
         .from('reflections')
-        .select('id, message, context, created_at, is_favorite, haiku, learning_title, learning_body, note, mood, outcome, tags')
+        .select('id, message, context, created_at, is_favorite, haiku, learning_title, learning_body, note, mood, outcome, tags, breathing_completed, haiku_read, learning_read')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(1000);
