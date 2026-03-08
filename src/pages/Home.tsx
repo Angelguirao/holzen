@@ -354,12 +354,25 @@ const Home = () => {
                           <Skeleton className="h-4 w-1/2" />
                         </div>
                       ) : error && !btcData ? (
-                        <div className="space-y-2">
-                          <div className="flex items-center gap-2 text-muted-foreground">
+                        <div className="rounded-md border border-destructive/20 bg-destructive/5 px-4 py-3 space-y-2">
+                          <div className="flex items-center gap-2 text-destructive/80">
                             <AlertCircle className="h-3.5 w-3.5" />
-                            <p className="text-xs font-mono">Something went wrong</p>
+                            <p className="text-xs font-mono">
+                              {error.includes('fetch') || error.includes('network') || error.includes('Failed to fetch')
+                                ? 'Could not reach price data'
+                                : error.includes('generate') || error.includes('reflect')
+                                ? 'AI reflection unavailable right now'
+                                : 'Something went wrong'}
+                            </p>
                           </div>
-                          <button onClick={() => manualTrigger()} className="text-xs font-mono text-muted-foreground underline">
+                          <p className="text-[10px] font-mono text-muted-foreground/60 leading-relaxed">
+                            {error.includes('fetch') || error.includes('network') || error.includes('Failed to fetch')
+                              ? 'Check your internet connection. Price data comes from CoinGecko and may be temporarily unavailable.'
+                              : error.includes('generate') || error.includes('reflect')
+                              ? 'The AI service is temporarily unavailable. Your settings and data are safe — try again in a moment.'
+                              : 'An unexpected error occurred. Your data is safe.'}
+                          </p>
+                          <button onClick={() => manualTrigger()} className="text-xs font-mono text-primary underline">
                             Try again
                           </button>
                         </div>
