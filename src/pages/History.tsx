@@ -630,7 +630,7 @@ const History = () => {
                           onClick={() => deleteReflection(r.id)}
                           className="bg-destructive text-destructive-foreground hover:bg-destructive/90 font-mono text-xs"
                         >
-                          Delete
+                          {t('common.delete')}
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
