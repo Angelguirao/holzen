@@ -644,9 +644,9 @@ const History = () => {
                     <div className="flex items-center gap-1 shrink-0">
                       <button
                         onClick={() => toggleFavorite(r.id)}
-                        className={`p-1 transition-colors ${r.is_favorite ? 'text-foreground' : 'text-muted-foreground/40 hover:text-foreground'}`}
+                        className={`p-1 transition-colors ${r.is_favorite ? 'text-destructive' : 'text-muted-foreground/40 hover:text-destructive'}`}
                       >
-                        <Star className={`h-3 w-3 ${r.is_favorite ? 'fill-current' : ''}`} />
+                        <Heart className={`h-3 w-3 ${r.is_favorite ? 'fill-current' : ''}`} />
                       </button>
                     </div>
                   </div>
