@@ -124,7 +124,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
       hold_goal_start: startDate.toISOString(),
       hold_goal_target_months: months,
       hold_goal_target_price: goalType === 'price' ? val : null,
-      hold_goal_currency: 'USD',
+      hold_goal_currency: currency,
     };
 
     await supabase.from('profiles').update(updates).eq('user_id', user.id);
@@ -133,7 +133,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
       start: updates.hold_goal_start,
       targetMonths: updates.hold_goal_target_months,
       targetPrice: updates.hold_goal_target_price,
-      currency: 'USD',
+      currency,
     });
     setSetting(false);
     setInputValue('');
