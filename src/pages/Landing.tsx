@@ -10,7 +10,6 @@ import {
   Zap, Moon, ChevronDown, Timer, Eye, Sparkles,
 } from 'lucide-react';
 import { PageMeta } from '@/components/PageMeta';
-import { HolzenNumber } from '@/components/HolzenNumber';
 import { LandingTestimonials } from '@/components/LandingTestimonials';
 
 function Section({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
@@ -161,7 +160,6 @@ const Landing = () => {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.6 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-3"
           >
             <Button
               onClick={() => navigate('/auth')}
@@ -171,9 +169,6 @@ const Landing = () => {
               {t('landing.getStartedFree')}
               <ArrowRight className="h-3.5 w-3.5 ml-2 transition-transform group-hover:translate-x-0.5" />
             </Button>
-            <p className="text-[10px] font-mono text-muted-foreground/50">
-              {t('landing.clarityWorth')}
-            </p>
           </motion.div>
         </div>
 
@@ -188,12 +183,8 @@ const Landing = () => {
         </motion.div>
       </div>
 
-      {/* ─── HOLZEN NUMBER ─── */}
-      <div className="max-w-lg mx-auto px-6 py-16">
-        <Section>
-          <HolzenNumber />
-        </Section>
-      </div>
+
+
 
       {/* ─── THE LOOP ─── */}
       <div className="max-w-lg mx-auto px-6 py-16">
