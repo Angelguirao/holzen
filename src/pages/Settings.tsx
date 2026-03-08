@@ -1029,6 +1029,6 @@ function ChangeEmailSection() {
       </p>
     </div>
   );
-});
+}
 
 export default Settings;
