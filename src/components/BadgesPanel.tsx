@@ -13,6 +13,7 @@ interface Reflection {
   breathing_completed?: boolean;
   haiku_read?: boolean;
   learning_read?: boolean;
+  signal_source?: string | null;
 }
 
 interface Badge {
