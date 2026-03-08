@@ -74,7 +74,7 @@ export function ZoomOutDisplay({ data, loading, error }: Props) {
                     {entry.yearsAgo}y ago
                   </span>
                   <span className="text-xs font-mono text-muted-foreground tabular-nums">
-                    {formatPrice(entry.price)}
+                    {fmtPrice(entry.price)}
                   </span>
                   <span className={`text-[10px] font-mono tabular-nums flex items-center gap-0.5 ${isUp ? 'text-primary/70' : 'text-destructive/70'}`}>
                     {isUp ? <TrendingUp className="h-2.5 w-2.5" /> : <TrendingDown className="h-2.5 w-2.5" />}
