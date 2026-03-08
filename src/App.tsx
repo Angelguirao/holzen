@@ -67,6 +67,7 @@ const App = () => (
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/blog/:slug" element={<BlogPost />} />
                 <Route path="/roadmap" element={<Roadmap />} />
+                <Route path="/reserve" element={<Reserve />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </AuthProvider>
