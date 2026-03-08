@@ -580,7 +580,8 @@
     "create": "Create",
     "addToCollection": "Add to collection",
     "addedToCollection": "Added to collection",
-    "emptyCollection": "No items in this collection yet."
+    "emptyCollection": "No items in this collection yet.",
+    "allCollections": "All"
   },
   "pause": {
     "youPaused": "You paused. That's the hardest part.",
