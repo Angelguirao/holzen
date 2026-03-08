@@ -24,47 +24,14 @@ function shouldShow(reflectionCount: number): boolean {
   return true;
 }
 
-const T: Record<string, Record<string, string>> = {
-  en: {
-    title: 'Enjoying Holzen?',
-    subtitle: 'Share a short quote about your experience — it may appear on our landing page.',
-    placeholder: 'e.g. "Holzen helped me stop panic-selling during dips."',
-    send: 'Submit',
-    thanks: 'Thank you! Your testimonial is under review.',
-    nameLabel: 'Display name',
-  },
-  es: {
-    title: '¿Disfrutas Holzen?',
-    subtitle: 'Comparte una breve frase sobre tu experiencia — podría aparecer en nuestra página de inicio.',
-    placeholder: 'ej. "Holzen me ayudó a dejar de vender en pánico durante las caídas."',
-    send: 'Enviar',
-    thanks: '¡Gracias! Tu testimonio está en revisión.',
-    nameLabel: 'Nombre visible',
-  },
-  pt: {
-    title: 'Curtindo o Holzen?',
-    subtitle: 'Compartilhe uma frase curta sobre sua experiência — ela pode aparecer na nossa página inicial.',
-    placeholder: 'ex. "Holzen me ajudou a parar de vender em pânico durante as quedas."',
-    send: 'Enviar',
-    thanks: 'Obrigado! Seu depoimento está em análise.',
-    nameLabel: 'Nome visível',
-  },
-  de: {
-    title: 'Gefällt dir Holzen?',
-    subtitle: 'Teile ein kurzes Zitat über deine Erfahrung — es könnte auf unserer Startseite erscheinen.',
-    placeholder: 'z.B. „Holzen hat mir geholfen, nicht mehr in Panik zu verkaufen."',
-    send: 'Absenden',
-    thanks: 'Danke! Dein Testimonial wird geprüft.',
-    nameLabel: 'Anzeigename',
-  },
-  fr: {
-    title: 'Tu aimes Holzen ?',
-    subtitle: 'Partage une courte phrase sur ton expérience — elle pourrait apparaître sur notre page d\'accueil.',
-    placeholder: 'ex. « Holzen m\'a aidé à arrêter de vendre en panique. »',
-    send: 'Envoyer',
-    thanks: 'Merci ! Ton témoignage est en cours de révision.',
-    nameLabel: 'Nom affiché',
-  },
+// Static English UI — language setting only affects AI-generated content
+const t = {
+  title: 'Enjoying Holzen?',
+  subtitle: 'Share a short quote about your experience — it may appear on our landing page.',
+  placeholder: 'e.g. "Holzen helped me stop panic-selling during dips."',
+  send: 'Submit',
+  thanks: 'Thank you! Your testimonial is under review.',
+  nameLabel: 'Display name',
 };
 
 interface Props {
@@ -73,13 +40,11 @@ interface Props {
 
 export function TestimonialRequest({ reflectionCount }: Props) {
   const { user } = useAuth();
-  const { firstName, language } = useHolzen();
+  const { firstName } = useHolzen();
   const [visible, setVisible] = useState(false);
   const [quote, setQuote] = useState('');
   const [displayName, setDisplayName] = useState('');
   const [submitting, setSubmitting] = useState(false);
-
-  const t = T[language] || T.en;
 
   useEffect(() => {
     setVisible(shouldShow(reflectionCount));
