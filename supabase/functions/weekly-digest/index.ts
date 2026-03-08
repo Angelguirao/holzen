@@ -89,7 +89,8 @@ async function generateAIInsight(
   steadyCount: number,
   weekDir: string,
   absWeekChange: string,
-  LOVABLE_API_KEY: string
+  LOVABLE_API_KEY: string,
+  language?: string
 ): Promise<string | null> {
   if (reflectionCount === 0) return null;
 
