@@ -8,6 +8,7 @@ import { HistoricalInsightDisplay } from './HistoricalInsightDisplay';
 import { ChevronDown, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { hapticFeedback } from '@/lib/haptics';
+import { useHolzen } from '@/hooks/use-holzen';
 
 export interface CompanionData {
   haiku: string | null;
@@ -94,6 +95,7 @@ function CollapsibleCompanion({
 }
 
 export function CompanionSection({ companions, prefs, severity = 'mild', reflectionId, context, reflectionMessage }: Props) {
+  const { language } = useHolzen();
   const [expandedBreathing, setExpandedBreathing] = useState(false);
   const [expandedHaiku, setExpandedHaiku] = useState(false);
   const [expandedLearning, setExpandedLearning] = useState(false);
@@ -166,7 +168,7 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
         }
 
         supabase.functions
-          .invoke('ground-nudge', { body: { context: context ?? '' } })
+          .invoke('ground-nudge', { body: { context: context ?? '', language } })
           .then(({ data, error: fnError }) => {
             if (cancelled) return;
             if (fnError || !data || data.error) {
@@ -227,7 +229,7 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
         }
 
         supabase.functions
-          .invoke('signal-companion', { body: { context: context ?? '' } })
+          .invoke('signal-companion', { body: { context: context ?? '', language } })
           .then(({ data, error: fnError }) => {
             if (cancelled) return;
             if (fnError || !data || data.error) {
@@ -343,7 +345,7 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
         }
 
         supabase.functions
-          .invoke('historical-insight', { body: { context: context ?? '' } })
+          .invoke('historical-insight', { body: { context: context ?? '', language } })
           .then(({ data, error: fnError }) => {
             if (cancelled) return;
             if (fnError || !data || data.error) {

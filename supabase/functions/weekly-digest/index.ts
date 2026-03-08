@@ -89,11 +89,17 @@ async function generateAIInsight(
   steadyCount: number,
   weekDir: string,
   absWeekChange: string,
-  LOVABLE_API_KEY: string
+  LOVABLE_API_KEY: string,
+  language?: string
 ): Promise<string | null> {
   if (reflectionCount === 0) return null;
 
   try {
+    const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", ja: "Japanese", de: "German" };
+    const langCode = language || "en";
+    const langName = LANG_NAMES[langCode] || "English";
+    const langInstruction = langCode !== "en" ? `\nWrite in ${langName}.` : "";
+
     const prompt = `You are Holzen, a mindful Bitcoin reflection app. Generate ONE short behavioral observation (1-2 sentences max) based on this user's week:
 - BTC moved ${weekDir} ${absWeekChange}% this week
 - They reflected ${reflectionCount} time(s)
@@ -103,7 +109,7 @@ async function generateAIInsight(
 Be observational, not prescriptive. No advice, no exclamation marks. Calm and grounded. Examples:
 - "You noticed the dip but didn't flinch. That pattern is strengthening."
 - "Three reflections during a quiet week — you're building awareness beyond volatility."
-- "Anxiety appeared twice this week, both during drops. The pattern is worth noticing."`;
+- "Anxiety appeared twice this week, both during drops. The pattern is worth noticing."${langInstruction}`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -150,7 +156,7 @@ serve(async (req) => {
     // Get all users with email notifications enabled
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
-      .select("user_id, email_notifications, digest_frequency, threshold, threshold_down, hold_goal_currency");
+      .select("user_id, email_notifications, digest_frequency, threshold, threshold_down, hold_goal_currency, language");
 
     if (profilesError) throw profilesError;
 
@@ -202,7 +208,7 @@ serve(async (req) => {
       let aiInsight: string | null = null;
       if (LOVABLE_API_KEY && reflectionCount > 0) {
         aiInsight = await generateAIInsight(
-          reflectionCount, topMood, steadyCount, weekDir, absWeekChange, LOVABLE_API_KEY
+          reflectionCount, topMood, steadyCount, weekDir, absWeekChange, LOVABLE_API_KEY, (profile as any).language
         );
       }
 

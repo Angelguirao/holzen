@@ -29,6 +29,7 @@ export function useHolzen() {
   const [motivations, setMotivationsState] = useState<string[]>([]);
   const [mantra, setMantraState] = useState<string | null>(null);
   const [currency, setCurrencyState] = useState<string>('USD');
+  const [language, setLanguageState] = useState<string>('en');
   const [btcData, setBtcData] = useState<BtcPriceData | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [context, setContext] = useState<string | null>(null);
@@ -47,7 +48,7 @@ export function useHolzen() {
     const load = async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('threshold, threshold_down, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_learning, companion_signal, companion_zoom_out, companion_history, reflection_tone, cooldown_hours, last_trigger_at, silent_mode, streak_freeze_dates, digest_frequency, custom_prompt, reflection_style, quiet_hours_start, quiet_hours_end, first_name, night_reflection_hour, ai_insights_enabled, ritual_template, notify_badges, motivations, mantra, hold_goal_currency')
+        .select('threshold, threshold_down, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_learning, companion_signal, companion_zoom_out, companion_history, reflection_tone, cooldown_hours, last_trigger_at, silent_mode, streak_freeze_dates, digest_frequency, custom_prompt, reflection_style, quiet_hours_start, quiet_hours_end, first_name, night_reflection_hour, ai_insights_enabled, ritual_template, notify_badges, motivations, mantra, hold_goal_currency, language')
         .eq('user_id', user.id)
         .single();
 
@@ -76,6 +77,7 @@ export function useHolzen() {
         setMotivationsState((data as any).motivations ?? []);
         setMantraState((data as any).mantra ?? null);
         setCurrencyState((data as any).hold_goal_currency ?? 'USD');
+        setLanguageState((data as any).language ?? 'en');
         setHasOnboarded(data.has_onboarded ?? false);
         setCompanionPrefsState({
           breathing: data.companion_breathing ?? true,
@@ -308,6 +310,7 @@ export function useHolzen() {
           motivations: motivations.length > 0 ? motivations : undefined,
           mantra: mantra || undefined,
           currency,
+          language,
         },
       });
 
@@ -559,6 +562,12 @@ export function useHolzen() {
       setBtcData(null); // clear cached data so it refetches in new currency
       if (!user) return;
       await supabase.from('profiles').update({ hold_goal_currency: val }).eq('user_id', user.id);
+    },
+    language,
+    setLanguage: async (val: string) => {
+      setLanguageState(val);
+      if (!user) return;
+      await supabase.from('profiles').update({ language: val } as any).eq('user_id', user.id);
     },
     companionPrefs,
     setCompanionPref,

@@ -32,9 +32,14 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const { context } = await req.json();
+    const { context, language } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+
+    const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", ja: "Japanese", de: "German" };
+    const langCode = language || "en";
+    const langName = LANG_NAMES[langCode] || "English";
+    const langInstruction = langCode !== "en" ? `\n\nLANGUAGE: Write the title, body, and analogy in ${langName}. Keep source URLs as-is.` : "";
 
     const systemPrompt = `You are a financial historian specializing in Bitcoin and broader market history. Given the current market context, provide ONE historical insight that helps a Bitcoin holder see today's moment through the lens of history.
 
@@ -55,7 +60,7 @@ VARIETY IS CRITICAL. Rotate through different eras and asset classes:
 - Commodities: Oil negative prices (2020), Silver Thursday (1980), Tulip mania
 - Macro: Weimar hyperinflation, Bretton Woods collapse, Asian financial crisis 1997
 
-The analogy should feel surprising and illuminating, not obvious.`;
+The analogy should feel surprising and illuminating, not obvious.${langInstruction}`;
 
     const response = await fetch(
       "https://ai.gateway.lovable.dev/v1/chat/completions",
