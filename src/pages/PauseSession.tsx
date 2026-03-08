@@ -67,11 +67,11 @@ export default function PauseSession() {
 
   const fadeIn = prefersReducedMotion
     ? { initial: { opacity: 1 }, animate: { opacity: 1 } }
-    : { initial: { opacity: 0, y: 16 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.8, ease: 'easeOut' } };
+    : { initial: { opacity: 0, y: 16 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.8, ease: 'easeOut' as const } };
 
   const slowFade = prefersReducedMotion
     ? { initial: { opacity: 1 }, animate: { opacity: 1 } }
-    : { initial: { opacity: 0 }, animate: { opacity: 1 }, transition: { duration: 1.2, ease: 'easeOut' } };
+    : { initial: { opacity: 0 }, animate: { opacity: 1 }, transition: { duration: 1.2, ease: 'easeOut' as const } };
 
   return (
     <>
