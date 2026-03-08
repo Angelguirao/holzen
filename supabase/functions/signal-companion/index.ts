@@ -123,6 +123,7 @@ Rules:
     }
 
     const signal = JSON.parse(toolCall.function.arguments);
+    signal.url = await validateUrl(signal.url, `${signal.source} ${signal.title}`);
 
     return new Response(JSON.stringify(signal), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

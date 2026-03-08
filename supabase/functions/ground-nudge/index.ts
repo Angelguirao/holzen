@@ -124,6 +124,7 @@ Topics to draw from based on context:
     if (!toolCall) throw new Error("No tool call in response");
 
     const nudge = JSON.parse(toolCall.function.arguments);
+    nudge.url = await validateUrl(nudge.url, nudge.citation);
 
     return new Response(JSON.stringify(nudge), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
