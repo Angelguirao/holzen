@@ -56,6 +56,7 @@ const History = () => {
   const [tab, setTab] = useState<'recent' | 'library' | 'timeline'>('recent');
   const [filter, setFilter] = useState<'all' | 'favorites'>('all');
   const [tagFilter, setTagFilter] = useState<string | null>(null);
+  const [moodFilter, setMoodFilter] = useState<string | null>(null);
   const [search, setSearch] = useState('');
 
   useEffect(() => {
@@ -121,10 +122,15 @@ const History = () => {
     return Array.from(set).sort();
   }, [reflections]);
 
+  const moods = ['fomo', 'excited', 'greedy', 'anxious', 'calm', 'detached', 'uncertain', 'fearful'] as const;
+
   const filtered = useMemo(() => {
     let result = filter === 'favorites' ? reflections.filter((r) => r.is_favorite) : reflections;
     if (tagFilter) {
       result = result.filter((r) => r.tags?.includes(tagFilter));
+    }
+    if (moodFilter) {
+      result = result.filter((r) => r.mood === moodFilter);
     }
     if (search.trim()) {
       const q = search.toLowerCase();
@@ -133,7 +139,7 @@ const History = () => {
       );
     }
     return result;
-  }, [reflections, filter, tagFilter, search]);
+  }, [reflections, filter, tagFilter, moodFilter, search]);
 
   const displayedReflections = tab === 'recent' ? recentReflections : filtered;
 
@@ -211,6 +217,22 @@ const History = () => {
               ))}
             </div>
           )}
+
+          <div className="flex flex-wrap gap-1">
+            {moods.map((m) => (
+              <button
+                key={m}
+                onClick={() => setMoodFilter(moodFilter === m ? null : m)}
+                className={`text-[10px] font-mono px-1.5 py-0.5 rounded capitalize transition-colors ${
+                  moodFilter === m
+                    ? 'bg-primary/10 text-primary'
+                    : 'border border-border/60 text-muted-foreground hover:text-foreground'
+                }`}
+              >
+                {m}
+              </button>
+            ))}
+          </div>
 
           {reflections.length > 3 && (
             <div className="relative">
