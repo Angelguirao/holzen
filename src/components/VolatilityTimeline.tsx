@@ -60,10 +60,9 @@ export function VolatilityTimeline() {
   const memberSince = user?.created_at ? new Date(user.created_at) : null;
   const daysSinceSignup = memberSince ? differenceInDays(new Date(), memberSince) : 365;
 
-  // Clamp requested period to days since signup
+  // Use the requested period directly — don't clamp to signup date
   const effectiveDays = useMemo(() => {
-    const requested = PERIOD_DAYS[period] ?? daysSinceSignup;
-    return Math.min(requested, Math.max(daysSinceSignup, 1));
+    return PERIOD_DAYS[period] ?? Math.max(daysSinceSignup, 30);
   }, [period, daysSinceSignup]);
 
   // Fetch reflections + rituals once
