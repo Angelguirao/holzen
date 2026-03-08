@@ -238,8 +238,29 @@ const Settings = () => {
               </p>
             </div>
 
-            {/* Currency */}
+            {/* 1 BTC = 1 BTC mode */}
             <div className="space-y-3">
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">1 BTC = 1 BTC</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Strip away fiat noise. No prices, no percentages, no red or green. Just Bitcoin.
+              </p>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="btc-mode" className="text-xs text-muted-foreground cursor-pointer">
+                  Enable conviction mode
+                </Label>
+                <Switch
+                  id="btc-mode"
+                  checked={btcMode}
+                  onCheckedChange={(val) => {
+                    setBtcMode(val);
+                    localStorage.setItem('holzen_btc_mode', String(val));
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Currency */}
+            <div className={`space-y-3 transition-opacity ${btcMode ? 'opacity-30 pointer-events-none' : ''}`}>
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">Display currency</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
                 Choose how BTC prices are displayed throughout the app.
