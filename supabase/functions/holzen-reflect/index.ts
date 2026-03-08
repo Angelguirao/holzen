@@ -104,6 +104,10 @@ serve(async (req) => {
     }
 
     const currencyCode = currency || "USD";
+    const langCode = language || "en";
+    const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", ja: "Japanese", de: "German" };
+    const langName = LANG_NAMES[langCode] || "English";
+    const langInstruction = langCode !== "en" ? `\n\nLANGUAGE: You MUST write ALL output (reflection, haiku, learning title, learning body) in ${langName}. Do not use English.` : "";
     const systemPrompt = `You generate a reflection with optional companions in response to Bitcoin volatility.
 
 You MUST respond by calling the "generate_reflection" function. Do not respond with plain text.
