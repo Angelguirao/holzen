@@ -13,6 +13,7 @@ import { MoodCheck, type MoodValue } from '@/components/MoodCheck';
 import { ReflectionComparison } from '@/components/ReflectionComparison';
 import { Onboarding } from '@/components/Onboarding';
 import { HoldGoalWidget } from '@/components/HoldGoalWidget';
+import { MyWhyWidget } from '@/components/MyWhyWidget';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { HomeWidget, useWidgetLayout } from '@/components/HomeWidget';
