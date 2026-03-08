@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN notify_badges boolean NOT NULL DEFAULT true;

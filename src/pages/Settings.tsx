@@ -37,7 +37,7 @@ const LAST_SEEN_VERSION_KEY = 'holzen_last_seen_version';
 
 const Settings = () => {
   const { user, signOut } = useAuth();
-  const { threshold, setThreshold, thresholdDown, setThresholdDown, cumulativeThreshold, setCumulativeThreshold, emailNotifications, setEmailNotifications, companionPrefs, setCompanionPref, reflectionTone, setReflectionTone, reflectionStyle, setReflectionStyle, silentMode, setSilentMode, cooldownHours, setCooldownHours, digestFrequency, setDigestFrequency, customPrompt, setCustomPrompt, quietHoursStart, quietHoursEnd, setQuietHours, streakFreezeDates, useStreakFreeze, firstName, setFirstName, nightReflectionHour, setNightReflectionHour, aiInsightsEnabled, setAiInsightsEnabled, ritualTemplate, setRitualTemplate, profileLoaded } = useHolzen();
+  const { threshold, setThreshold, thresholdDown, setThresholdDown, cumulativeThreshold, setCumulativeThreshold, emailNotifications, setEmailNotifications, companionPrefs, setCompanionPref, reflectionTone, setReflectionTone, reflectionStyle, setReflectionStyle, silentMode, setSilentMode, cooldownHours, setCooldownHours, digestFrequency, setDigestFrequency, customPrompt, setCustomPrompt, quietHoursStart, quietHoursEnd, setQuietHours, streakFreezeDates, useStreakFreeze, firstName, setFirstName, nightReflectionHour, setNightReflectionHour, aiInsightsEnabled, setAiInsightsEnabled, ritualTemplate, setRitualTemplate, notifyBadges, setNotifyBadges, profileLoaded } = useHolzen();
   const { subscribed, loading: subLoading, checkoutLoading, startCheckout, openPortal, trialRemaining } = useSubscription();
   const { theme, setTheme } = useTheme();
   const { canInstall, install } = useInstallPrompt();
@@ -547,6 +547,20 @@ const Settings = () => {
                   </div>
                 </div>
               )}
+            </div>
+
+            {/* Badge notifications */}
+            <div className="space-y-3">
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">Badge notifications</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Get notified when you unlock new milestone badges.
+              </p>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="notify-badges" className="text-xs font-mono text-muted-foreground">
+                  Enable badge notifications
+                </Label>
+                <Switch id="notify-badges" checked={notifyBadges} onCheckedChange={setNotifyBadges} />
+              </div>
             </div>
 
             {/* AI Insights */}
