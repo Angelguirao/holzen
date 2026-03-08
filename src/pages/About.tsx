@@ -46,19 +46,19 @@ const About = () => {
         <motion.div {...m(0.1)}>
           <div className="space-y-4">
             <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
-              The opportunity & the problem
+              {t('about.opportunityProblem')}
             </p>
             <p className="text-sm text-foreground leading-relaxed">
-              The democratisation of investing is one of the most important financial shifts of our time.
+              {t('about.opportunityBody1')}
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Platforms like Robinhood, Trade Republic, and countless others have opened markets that were once reserved for professionals. Anyone can now invest in stocks, ETFs, commodities — and Bitcoin. This is a genuinely good thing.
+              {t('about.opportunityBody2')}
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              But access is only half the equation. What these platforms don't provide is the emotional infrastructure to handle what comes next: the volatility, the uncertainty, the constant temptation to act when doing nothing would serve you better.
+              {t('about.opportunityBody3')}
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              That's the gap Holzen fills — not with more data or faster alerts, but with a practice of self-awareness: breathing exercises, AI-generated reflections, mood tracking, journaling, emotional tagging, and personal insights that reveal your patterns over time.
+              {t('about.opportunityBody4')}
             </p>
           </div>
         </motion.div>
