@@ -10,7 +10,6 @@ import {
   Zap, Moon, ChevronDown, Timer, Eye, Sparkles,
 } from 'lucide-react';
 import { PageMeta } from '@/components/PageMeta';
-import { HolzenNumber } from '@/components/HolzenNumber';
 import { LandingTestimonials } from '@/components/LandingTestimonials';
 
 function Section({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
