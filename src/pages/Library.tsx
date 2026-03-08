@@ -1,14 +1,11 @@
-import { useState, useMemo, lazy, Suspense } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLibrary } from '@/hooks/use-library';
 import { PageMeta } from '@/components/PageMeta';
-import { List, Share2, Star, Search, Tag, FolderOpen, Filter, X } from 'lucide-react';
+import { Star, Search, Tag, FolderOpen, Filter, X } from 'lucide-react';
 import { LibraryItems } from '@/components/library/LibraryItems';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import { useIsMobile } from '@/hooks/use-mobile';
-
-const GraphView = lazy(() => import('@/components/library/GraphView'));
 
 const SOURCE_FILTERS: { key: string; label: string }[] = [
   { key: 'reflection', label: 'Reflection' },
