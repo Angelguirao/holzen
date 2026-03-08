@@ -549,6 +549,20 @@ const Settings = () => {
               )}
             </div>
 
+            {/* Badge notifications */}
+            <div className="space-y-3">
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">Badge notifications</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Get notified when you unlock new milestone badges.
+              </p>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="notify-badges" className="text-xs font-mono text-muted-foreground">
+                  Enable badge notifications
+                </Label>
+                <Switch id="notify-badges" checked={notifyBadges} onCheckedChange={setNotifyBadges} />
+              </div>
+            </div>
+
             {/* AI Insights */}
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">AI Insights</p>
