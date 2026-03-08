@@ -453,7 +453,7 @@ const History = () => {
                             dateTo ? "text-foreground" : "text-muted-foreground/50"
                           )}>
                             <CalendarIcon className="h-3 w-3" />
-                            {dateTo ? format(dateTo, 'MMM d, yyyy') : 'To'}
+                            {dateTo ? format(dateTo, 'MMM d, yyyy') : t('common.until')}
                           </button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
