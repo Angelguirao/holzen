@@ -2,6 +2,7 @@
   "nav": {
     "home": "Accueil",
     "history": "Historique",
+    "library": "Bibliothèque",
     "profile": "Profil",
     "settings": "Paramètres"
   },
@@ -195,8 +196,8 @@
     "enableConvictionMode": "Activer le mode conviction",
     "displayCurrency": "Devise d'affichage",
     "displayCurrencyDesc": "Choisissez comment les prix BTC sont affichés dans l'app.",
-    "reflectionLanguage": "Langue de réflexion",
-    "reflectionLanguageDesc": "Choisissez la langue pour les réflexions, haïkus et analyses générés par IA.",
+    "reflectionLanguage": "Langue",
+    "reflectionLanguageDesc": "Choisissez la langue pour toute l'application, y compris les réflexions, haïkus et analyses générés par IA.",
     "cooldown": "Refroidissement",
     "cooldownDesc": "Temps minimum entre les réflexions automatiques.",
     "tone": "Ton",

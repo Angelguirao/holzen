@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useHolzen } from '@/hooks/use-holzen';
@@ -42,18 +43,21 @@ const WRITING_PROMPTS = {
   ],
 };
 
+interface Props {
+  currentPrice: number | null;
+  changePercent: number | null;
+}
+
 // Wax seal SVG component
 function WaxSeal({ size = 48, breaking = false, className = '' }: { size?: number; breaking?: boolean; className?: string }) {
   return (
     <div className={`relative ${className}`} style={{ width: size, height: size }}>
-      {/* Outer ring */}
       <motion.div
         className="absolute inset-0 rounded-full border-2 border-primary/40"
         style={{ background: 'radial-gradient(circle at 35% 35%, hsl(var(--primary) / 0.25), hsl(var(--primary) / 0.1))' }}
         animate={breaking ? { scale: [1, 1.15, 0.95, 1.05], opacity: [1, 0.8, 1, 0.6] } : {}}
         transition={{ duration: 1.2, ease: 'easeOut' }}
       />
-      {/* Inner emboss */}
       <motion.div
         className="absolute rounded-full border border-primary/30"
         style={{
@@ -63,12 +67,10 @@ function WaxSeal({ size = 48, breaking = false, className = '' }: { size?: numbe
         animate={breaking ? { rotate: [0, 15, -10, 5], scale: [1, 0.9, 1.1, 1] } : {}}
         transition={{ duration: 1, ease: 'easeOut', delay: 0.2 }}
       />
-      {/* Center dot */}
       <div
         className="absolute rounded-full bg-primary/20"
         style={{ top: '38%', left: '38%', right: '38%', bottom: '38%' }}
       />
-      {/* Drip details */}
       <div
         className="absolute rounded-full bg-primary/15"
         style={{ width: '12%', height: '18%', bottom: '-6%', left: '30%', borderRadius: '0 0 50% 50%' }}
@@ -81,7 +83,6 @@ function WaxSeal({ size = 48, breaking = false, className = '' }: { size?: numbe
   );
 }
 
-// Crack lines for broken seal
 function SealCracks() {
   return (
     <svg className="absolute inset-0 w-full h-full" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -107,12 +108,8 @@ function SealCracks() {
   );
 }
 
-interface Props {
-  currentPrice: number | null;
-  changePercent: number | null;
-}
-
 export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { currency } = useHolzen();
   const prefersReducedMotion = useReducedMotion();
@@ -128,7 +125,6 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
   const isVolatile = isCrash || isSurge;
   const isCalm = !isVolatile;
 
-  // Auto-select mode based on market state
   const effectiveMode = isVolatile ? 'storm' : 'calm';
   const canWrite = isVolatile || (isCalm && currentPrice !== null);
 
@@ -180,28 +176,26 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
 
       const newLetter = data as unknown as Letter;
 
-      // Phase: sealing → sealed
       setTimeout(() => {
         setSealPhase('sealed');
         setLetters((prev) => [newLetter, ...prev]);
         setPendingLetters((prev) => [newLetter, ...prev]);
         setBody('');
 
-        // Dismiss after showing sealed state
         setTimeout(() => {
           setSealPhase('idle');
         }, 2200);
       }, 1200);
 
-      toast('Letter sealed', {
+      toast(t('letter.letterSealed'), {
         description: effectiveMode === 'calm'
-          ? 'Sealed in calm · Opens when the storm hits'
-           : deliverDuring === 'surge'
-          ? 'Sealed in fear · Opens when confidence returns'
-          : 'Sealed in euphoria · Opens when doubt arrives',
+          ? t('letter.sealedInCalm')
+          : deliverDuring === 'surge'
+          ? t('letter.sealedInFear')
+          : t('letter.sealedInEuphoria'),
       });
     } catch {
-      toast.error('Letter not saved', { description: 'Something went wrong. Your words are not lost — try sealing again.' });
+      toast.error(t('letter.letterNotSaved'), { description: t('letter.letterNotSavedDesc') });
       setSealPhase('idle');
     } finally {
       setSending(false);
@@ -211,20 +205,16 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
   const fmtPrice = (p: number) => formatBtcPrice(p, currency);
 
   const getStatusCopy = (l: Letter) => {
-    if (l.written_during === 'calm') {
-      return 'Sealed in calm · Opens when the storm hits';
-    }
-    if (l.written_during === 'crash') {
-      return 'Sealed in fear · Opens when confidence returns';
-    }
-    return 'Sealed in euphoria · Opens when doubt arrives';
+    if (l.written_during === 'calm') return t('letter.sealedInCalm');
+    if (l.written_during === 'crash') return t('letter.sealedInFear');
+    return t('letter.sealedInEuphoria');
   };
 
   const getTimeCopy = (l: Letter) => {
     const days = Math.round((Date.now() - new Date(l.written_at).getTime()) / (1000 * 60 * 60 * 24));
-    if (days === 0) return 'Sealed today';
-    if (days === 1) return 'Sealed yesterday';
-    return `Sealed ${days} days ago`;
+    if (days === 0) return t('letter.sealedToday');
+    if (days === 1) return t('letter.sealedYesterday');
+    return t('letter.sealedDaysAgo', { count: days });
   };
 
   const getDaysElapsed = (from: string, to: string) => {
@@ -234,6 +224,12 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
   const getPriceDelta = (writePrice: number, deliveryPrice: number) => {
     const delta = ((deliveryPrice - writePrice) / writePrice) * 100;
     return delta > 0 ? `+${delta.toFixed(1)}%` : `${delta.toFixed(1)}%`;
+  };
+
+  const getWrittenDuringLabel = (during: string) => {
+    if (during === 'crash') return t('letter.duringDrop');
+    if (during === 'calm') return t('letter.duringCalm');
+    return t('letter.duringSurge');
   };
 
   return (
@@ -251,7 +247,6 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
             <div className="flex flex-col items-center gap-6">
               {sealPhase === 'sealing' ? (
                 <>
-                  {/* Folding letter animation */}
                   <motion.div
                     initial={{ scaleY: 1, opacity: 1 }}
                     animate={{ scaleY: 0.1, opacity: 0.5 }}
@@ -262,7 +257,6 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
                       {body.slice(0, 40)}
                     </p>
                   </motion.div>
-                  {/* Wax dropping */}
                   <motion.div
                     initial={{ scale: 0, y: -20 }}
                     animate={{ scale: 1, y: 0 }}
@@ -276,12 +270,11 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
                     transition={{ delay: 0.8 }}
                     className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-widest"
                   >
-                    Sealing…
+                    {t('letter.sealing')}
                   </motion.p>
                 </>
               ) : (
                 <>
-                  {/* Sealed state */}
                   <motion.div
                     initial={prefersReducedMotion ? {} : { scale: 1.2, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
@@ -295,13 +288,13 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
                     transition={{ delay: 0.3, duration: 0.4 }}
                     className="text-center space-y-2"
                   >
-                    <p className="text-sm font-mono text-foreground">Sealed.</p>
+                    <p className="text-sm font-mono text-foreground">{t('letter.sealed')}</p>
                     <p className="text-[10px] font-mono text-muted-foreground/50 max-w-[200px] leading-relaxed">
                       {effectiveMode === 'calm'
-                        ? 'This letter waits for the storm.'
+                        ? t('letter.waitsForStorm')
                         : deliverDuring === 'surge'
-                        ? 'This letter waits for confidence.'
-                        : 'This letter waits for doubt.'}
+                          ? t('letter.waitsForConfidence')
+                          : t('letter.waitsForDoubt')}
                     </p>
                   </motion.div>
                 </>
@@ -322,16 +315,16 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
             <div className="flex items-center gap-2 text-muted-foreground">
               <Mail className="h-3 w-3" />
               <p className="text-[10px] font-mono tracking-widest uppercase">
-                {effectiveMode === 'calm' ? 'Calm letter' : 'Storm letter'}
+                {effectiveMode === 'calm' ? t('letter.calmTitle') : t('letter.stormTitle')}
               </p>
             </div>
           </div>
           <p className="text-xs text-muted-foreground leading-relaxed">
             {effectiveMode === 'calm'
-              ? "The market is quiet. Write to your future self — this letter will arrive when volatility strikes."
+              ? t('letter.calmDesc')
               : isCrash
-              ? "The market is falling. Write something to yourself — you'll receive it during the next surge."
-              : "The market is surging. Write something to yourself — you'll receive it during the next drop."}
+                ? t('letter.crashDesc')
+                : t('letter.surgeDesc')}
           </p>
           <Textarea
             value={body}
@@ -349,19 +342,18 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
               className="font-mono text-xs gap-1.5"
             >
               <Send className="h-3 w-3" />
-              {sending ? 'Sealing…' : 'Seal letter'}
+              {sending ? t('letter.sealing') : t('letter.seal')}
             </Button>
           </div>
         </motion.div>
       ) : pendingLetters.length > 0 ? (
-        /* Sealed letters — completely opaque, no peeking */
         <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-4">
           <div className="flex items-center gap-2.5 text-muted-foreground">
             <WaxSeal size={20} />
-            <p className="text-[10px] font-mono tracking-widest uppercase">Sealed letters</p>
+            <p className="text-[10px] font-mono tracking-widest uppercase">{t('letter.sealedLetters')}</p>
           </div>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            {pendingLetters.length} letter{pendingLetters.length !== 1 ? 's' : ''} sealed and waiting.
+            {t('letter.lettersSealedWaiting', { count: pendingLetters.length })}
           </p>
           <div className="space-y-2.5">
             {pendingLetters.map((l) => (
@@ -383,15 +375,15 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
         <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2">
           <div className="flex items-center gap-2 text-muted-foreground">
             <Mail className="h-3 w-3" />
-            <p className="text-[10px] font-mono tracking-widest uppercase">Letter to future self</p>
+            <p className="text-[10px] font-mono tracking-widest uppercase">{t('letter.letterToFutureSelf')}</p>
           </div>
           <p className="text-xs text-muted-foreground/60 leading-relaxed">
-            When BTC moves ±{LETTER_THRESHOLD}% or more, you can write a letter to your future self. It will be sealed and delivered when the market flips.
+            {t('letter.letterThresholdDesc', { threshold: LETTER_THRESHOLD })}
           </p>
         </div>
       )}
 
-      {/* Delivered letters — wax seal break + emotional context */}
+      {/* Delivered letters */}
       {deliveredLetters.length > 0 && (
         <div className="space-y-3">
           {deliveredLetters.map((l) => {
@@ -408,7 +400,6 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
                 transition={{ duration: 0.5 }}
                 className="rounded-md border border-primary/20 bg-primary/5 px-4 py-4 space-y-4"
               >
-                {/* Broken wax seal */}
                 <div className="flex items-center gap-3">
                   <div className="relative">
                     <WaxSeal size={24} breaking />
@@ -416,7 +407,7 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
                   </div>
                   <div>
                     <p className="text-[10px] font-mono text-primary uppercase tracking-wider">
-                      Opened
+                      {t('letter.opened')}
                     </p>
                     {l.delivered_at && (
                       <p className="text-[9px] font-mono text-muted-foreground/40">
@@ -426,19 +417,17 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
                   </div>
                 </div>
 
-                {/* Letter body */}
                 <p className="text-sm leading-relaxed pl-1">{l.body}</p>
 
-                {/* Emotional journey context */}
                 <div className="space-y-2 pt-2 border-t border-primary/10">
                   <div className="grid grid-cols-2 gap-2">
                     <div className="space-y-0.5">
-                      <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider">Written</p>
+                      <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider">{t('letter.written')}</p>
                       <p className="text-[10px] font-mono text-muted-foreground/60">
                         {format(new Date(l.written_at), 'MMM d, yyyy')}
                       </p>
                       <p className="text-[10px] font-mono text-muted-foreground/50">
-                        {l.written_during === 'crash' ? 'During a drop' : l.written_during === 'calm' ? 'During calm markets' : 'During a surge'}
+                        {getWrittenDuringLabel(l.written_during)}
                       </p>
                       <p className="text-[10px] font-mono text-muted-foreground/40">
                         BTC {fmtPrice(l.btc_price_at_write)}
@@ -446,13 +435,13 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
                     </div>
                     {l.delivered_at && (
                       <div className="space-y-0.5">
-                        <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider">Opened</p>
+                        <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider">{t('letter.opened')}</p>
                         <p className="text-[10px] font-mono text-muted-foreground/60">
                           {format(new Date(l.delivered_at), 'MMM d, yyyy')}
                         </p>
                         {days !== null && (
                           <p className="text-[10px] font-mono text-muted-foreground/50">
-                            {days} day{days !== 1 ? 's' : ''} later
+                            {t('letter.daysLater', { count: days })}
                           </p>
                         )}
                         {l.btc_price_at_delivery && (
