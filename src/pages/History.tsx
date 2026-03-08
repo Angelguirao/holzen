@@ -158,12 +158,22 @@ const History = () => {
           >
             Library
           </button>
+          <button
+            onClick={() => setTab('timeline')}
+            className={`text-sm font-mono tracking-widest uppercase transition-colors ${
+              tab === 'timeline' ? 'text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
+            }`}
+          >
+            Timeline
+          </button>
         </div>
-        <p className="text-xs text-muted-foreground">
-          {tab === 'recent'
-            ? `${recentReflections.length} reflection${recentReflections.length !== 1 ? 's' : ''} in the last 7 days`
-            : `${reflections.length} reflection${reflections.length !== 1 ? 's' : ''} total`}
-        </p>
+        {tab !== 'timeline' && (
+          <p className="text-xs text-muted-foreground">
+            {tab === 'recent'
+              ? `${recentReflections.length} reflection${recentReflections.length !== 1 ? 's' : ''} in the last 7 days`
+              : `${reflections.length} reflection${reflections.length !== 1 ? 's' : ''} total`}
+          </p>
+        )}
       </div>
 
       {/* Library filters (only for library tab) */}
