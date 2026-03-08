@@ -91,19 +91,19 @@ const About = () => {
         <motion.div {...m(0.1)}>
           <div className="space-y-4">
             <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
-              Why Bitcoin
+              {t('about.whyBitcoin')}
             </p>
             <p className="text-sm text-foreground leading-relaxed">
-              Holding Bitcoin is especially hard — and we think that's exactly why it's worth doing.
+              {t('about.bitcoinBody1')}
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Bitcoin behaves like a volatile tech stock in the short term, but we believe it is something fundamentally different: the best savings technology ever invented. A decentralised, scarce, programmable monetary network with no counterparty risk. The monetisation of a new store of value is a generational event — perhaps a millennium event.
+              {t('about.bitcoinBody2')}
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              We believe Bitcoin represents the most asymmetric bet in the history of financial markets. But capturing that asymmetry requires one thing above all else: the ability to hold through volatility. And that's where most people fail — not because the thesis is wrong, but because the emotional cost of conviction is brutally high.
+              {t('about.bitcoinBody3')}
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Holzen exists to help people hold — with awareness. We don't tell you what to do. We help you pause long enough to notice your impulse, name it, and choose deliberately. Your reflection library, mood patterns, and outcome tracking become a mirror: proof that you can sit with discomfort and come out the other side with your conviction intact.
+              {t('about.bitcoinBody4')}
             </p>
           </div>
         </motion.div>
