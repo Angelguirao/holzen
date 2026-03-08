@@ -264,7 +264,7 @@ const Landing = () => {
         <div className="max-w-lg mx-auto px-6 py-16">
           <Section>
             <SectionLabel>{t('landing.whatYouGet')}</SectionLabel>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               {FEATURES.map((f, i) => (
                 <motion.div
                   key={f.label}
