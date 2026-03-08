@@ -625,8 +625,6 @@ const History = () => {
             activities={calendarActivities}
             selectedDate={calendarDate}
             onSelectDate={setCalendarDate}
-            activeFilters={calendarFilters}
-            onToggleFilter={toggleCalendarFilter}
           />
           {/* Show reflections for selected day */}
           {calendarDate && displayedReflections.length > 0 && (
