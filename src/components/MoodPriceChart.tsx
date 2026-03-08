@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { ChartEmptyState } from './ChartEmptyState';
 
 const MOOD_BAR_COLORS: Record<string, string> = {
   anxious: 'hsl(var(--destructive) / 0.5)',
@@ -76,7 +77,17 @@ export function MoodPriceChart({ reflections }: Props) {
     return { moodAvgs, r, rStrength, maxAbsAvg };
   }, [reflections]);
 
-  if (moodAvgs.length < 2) return null;
+  if (moodAvgs.length < 2) {
+    const withBoth = reflections.filter((r) => r.mood && r.context).length;
+    return (
+      <ChartEmptyState
+        title="Mood × Price Change"
+        message="Log 3+ reflections with mood to compare how you feel vs. market moves."
+        current={withBoth}
+        needed={3}
+      />
+    );
+  }
 
   return (
     <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-4">
