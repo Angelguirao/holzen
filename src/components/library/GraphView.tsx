@@ -3,20 +3,21 @@ import {
   ReactFlow,
   useNodesState,
   useEdgesState,
-  MiniMap,
   Controls,
   Background,
   BackgroundVariant,
-  useReactFlow,
   type Node,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useLibrary } from '@/hooks/use-library';
+import type { LibraryItem } from '@/hooks/use-library';
 import { useGraphData, type GraphNodeData } from '@/hooks/use-graph-data';
 import { nodeTypes } from './graph/GraphNodes';
+import { ItemDetailViewer } from './ItemDetailViewer';
 import { useTranslation } from 'react-i18next';
+import { forceLayout } from '@/lib/force-layout';
 
 interface Reflection {
   id: string;
@@ -28,30 +29,17 @@ interface Reflection {
   is_favorite: boolean;
 }
 
-// Simple force layout since @xyflow doesn't include one
-function applySimpleLayout(nodes: Node<GraphNodeData>[]): Node<GraphNodeData>[] {
-  const byType: Record<string, Node<GraphNodeData>[]> = {};
-  nodes.forEach((n) => {
-    const t = n.data.nodeType;
-    if (!byType[t]) byType[t] = [];
-    byType[t].push(n);
-  });
-
-  const rows = ['mood', 'tag', 'collection', 'reflection', 'library_item'];
-  let y = 0;
-
-  return nodes.map((node) => {
-    const type = node.data.nodeType;
-    const rowIdx = rows.indexOf(type);
-    const group = byType[type] || [];
-    const idx = group.indexOf(node);
-    const cols = group.length;
-    const spacing = type === 'reflection' || type === 'library_item' ? 200 : 160;
-    const rowY = rowIdx * 180;
-    const x = (idx - (cols - 1) / 2) * spacing;
-
-    return { ...node, position: { x, y: rowY } };
-  });
+function applyForceLayout(nodes: Node<GraphNodeData>[], edges: { source: string; target: string }[]): Node<GraphNodeData>[] {
+  if (nodes.length === 0) return nodes;
+  const positions = forceLayout(
+    nodes.map((n) => ({ id: n.id, group: n.data.nodeType })),
+    edges,
+    { iterations: 150 },
+  );
+  return nodes.map((n) => ({
+    ...n,
+    position: positions.get(n.id) ?? n.position,
+  }));
 }
 
 export default function GraphView() {
@@ -60,6 +48,9 @@ export default function GraphView() {
   const library = useLibrary();
   const [reflections, setReflections] = useState<Reflection[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // Item viewer state
+  const [selectedItem, setSelectedItem] = useState<LibraryItem | null>(null);
 
   useEffect(() => {
     if (!user) return;
@@ -82,15 +73,42 @@ export default function GraphView() {
     library.collectionItems,
   );
 
-  const laidOutNodes = useMemo(() => applySimpleLayout(rawNodes), [rawNodes]);
+  // Inject click handlers into node data
+  const nodesWithHandlers = useMemo(() => {
+    return rawNodes.map((node) => {
+      const data = { ...node.data };
+      const entityId = data.entityId;
+
+      if (data.nodeType === 'library_item' && entityId) {
+        data.onClick = () => {
+          const item = library.items.find((i) => i.id === entityId);
+          if (item) setSelectedItem(item);
+        };
+      } else if (data.nodeType === 'reflection' && entityId) {
+        data.onClick = () => {
+          // Find the library item that represents this reflection
+          const item = library.items.find((i) => i.reflection_id === entityId && i.source_type === 'reflection');
+          if (item) setSelectedItem(item);
+        };
+      }
+      // Tags, moods, collections — no detail viewer yet, could be added later
+
+      return { ...node, data };
+    });
+  }, [rawNodes, library.items]);
+
+  const laidOutNodes = useMemo(
+    () => applyForceLayout(nodesWithHandlers, rawEdges),
+    [nodesWithHandlers, rawEdges],
+  );
 
   const [nodes, setNodes, onNodesChange] = useNodesState(laidOutNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(rawEdges);
 
   useEffect(() => {
-    setNodes(applySimpleLayout(rawNodes));
+    setNodes(applyForceLayout(nodesWithHandlers, rawEdges));
     setEdges(rawEdges);
-  }, [rawNodes, rawEdges, setNodes, setEdges]);
+  }, [nodesWithHandlers, rawEdges, setNodes, setEdges]);
 
   const [filter, setFilter] = useState<string[]>(['reflection', 'tag', 'mood', 'library_item', 'collection']);
 
@@ -109,6 +127,14 @@ export default function GraphView() {
       prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type],
     );
   };
+
+  // Linked items for viewer
+  const selectedLinkedItems = useMemo(() => {
+    if (!selectedItem?.reflection_id || selectedItem.source_type !== 'reflection') return undefined;
+    return library.items.filter(
+      (i) => i.reflection_id === selectedItem.reflection_id && i.id !== selectedItem.id,
+    );
+  }, [selectedItem, library.items]);
 
   if (loading || library.loading) {
     return (
@@ -129,11 +155,11 @@ export default function GraphView() {
   }
 
   const FILTERS = [
-    { key: 'reflection', label: '● Reflections', emoji: '' },
-    { key: 'tag', label: '● Tags', emoji: '' },
-    { key: 'mood', label: '● Moods', emoji: '' },
-    { key: 'library_item', label: '■ Items', emoji: '' },
-    { key: 'collection', label: '📂 Collections', emoji: '' },
+    { key: 'reflection', label: '● Reflections' },
+    { key: 'tag', label: '● Tags' },
+    { key: 'mood', label: '● Moods' },
+    { key: 'library_item', label: '■ Items' },
+    { key: 'collection', label: '📂 Collections' },
   ];
 
   return (
@@ -168,29 +194,32 @@ export default function GraphView() {
           nodeTypes={nodeTypes}
           fitView
           fitViewOptions={{ padding: 0.3 }}
-          minZoom={0.2}
-          maxZoom={2}
+          minZoom={0.15}
+          maxZoom={2.5}
           proOptions={{ hideAttribution: true }}
+          defaultEdgeOptions={{
+            animated: false,
+            style: { strokeWidth: 1 },
+          }}
         >
           <Background variant={BackgroundVariant.Dots} gap={20} size={1} className="!bg-background" />
           <Controls
             showInteractive={false}
             className="!bg-card !border-border/40 !shadow-sm [&>button]:!bg-card [&>button]:!border-border/40 [&>button]:!text-foreground [&>button:hover]:!bg-accent"
           />
-          <MiniMap
-            nodeColor={(node) => {
-              const t = (node.data as GraphNodeData)?.nodeType;
-              if (t === 'mood') return 'hsl(var(--chart-4))';
-              if (t === 'tag') return 'hsl(var(--primary))';
-              if (t === 'collection') return 'hsl(var(--secondary))';
-              if (t === 'library_item') return 'hsl(var(--accent))';
-              return 'hsl(var(--foreground))';
-            }}
-            className="!bg-card !border-border/40"
-            maskColor="hsl(var(--background) / 0.8)"
-          />
         </ReactFlow>
       </div>
+
+      {/* Item detail viewer */}
+      <ItemDetailViewer
+        item={selectedItem}
+        linkedItems={selectedLinkedItems}
+        allItems={library.items}
+        open={!!selectedItem}
+        onClose={() => setSelectedItem(null)}
+        onToggleFavorite={library.toggleFavorite}
+        onSelectItem={setSelectedItem}
+      />
     </div>
   );
 }
