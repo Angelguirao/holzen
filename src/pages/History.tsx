@@ -6,6 +6,7 @@ import { X, Star, Search, Pin, Info } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ShareReflection } from '@/components/ShareReflection';
 import { ReflectionNote } from '@/components/ReflectionNote';
+import { ReflectionWallpaper } from '@/components/ReflectionWallpaper';
 import { ReflectionTags } from '@/components/ReflectionTags';
 import { ReflectionComparison } from '@/components/ReflectionComparison';
 import { HaikuDisplay } from '@/components/HaikuDisplay';
@@ -278,6 +279,7 @@ const History = () => {
                     <Star className={`h-3 w-3 ${r.is_favorite ? 'fill-current' : ''}`} />
                   </button>
                   <ShareReflection message={r.message} context={r.context} haiku={r.haiku} />
+                  <ReflectionWallpaper message={r.message} mood={r.mood} context={r.context} />
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <button
