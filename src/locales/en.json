@@ -375,6 +375,15 @@
       "iveReflected": "I've reflected"
     }
   },
+  "companions": {
+    "pause": "Pause with this",
+    "breathe": "Breathe with this →",
+    "haiku": "Read as haiku →",
+    "ground": "Ground yourself →",
+    "signal": "Read the signal →",
+    "zoomOut": "Zoom out →",
+    "lookBack": "Look back →"
+  },
   "landing": {
     "hero": "Pause before you act on Bitcoin volatility.",
     "heroDesc": "Holzen is a self-awareness practice for Bitcoin holders. When volatility hits, you get a moment to breathe, reflect, and notice your patterns — before impulse takes over.",
