@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -9,7 +10,7 @@ const corsHeaders = {
 async function validateUrl(url: string, fallbackQuery: string): Promise<string> {
   try {
     const res = await fetch(url, { method: 'HEAD', redirect: 'follow' });
-    if (res.ok || res.status === 405 || res.status === 403) return url; // 405/403 = exists but blocks HEAD
+    if (res.ok || res.status === 405 || res.status === 403) return url;
   } catch { /* broken */ }
   return `https://www.google.com/search?q=${encodeURIComponent(fallbackQuery)}`;
 }
@@ -20,10 +21,19 @@ serve(async (req) => {
   }
 
   try {
-    const { context, language } = await req.json();
+    const { context, language, sources } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+
+    // Build source list for the prompt
+    let sourceInstruction = "";
+    if (sources && Array.isArray(sources) && sources.length > 0) {
+      const sourceList = sources.map((s: { name: string; type: string; url?: string }) =>
+        `- ${s.name} (${s.type}${s.url ? `, ${s.url}` : ''})`
+      ).join("\n");
+      sourceInstruction = `\n\nPRIORITY SOURCES — The user has selected these as their preferred signal sources. You MUST draw from this list when possible. If the current market context is especially relevant to one of these sources, prioritize it. Only go outside this list if none are contextually relevant:\n${sourceList}\n`;
+    }
 
     const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
     const langCode = language || "en";
@@ -33,7 +43,7 @@ serve(async (req) => {
     const systemPrompt = `${langInstruction}You are a Bitcoin signal curator for a mindfulness app called Holzen. Your job is to surface ONE real, high-signal piece of Bitcoin analysis or insight that is contextually relevant to the current market conditions.
 
 You MUST call the "return_signal" function with your response. Do not respond with plain text.
-
+${sourceInstruction}
 Rules:
 - Reference REAL sources from the Bitcoin ecosystem — articles, blog posts, research papers, podcast episodes, YouTube videos, books, newsletter posts, tweets/threads, data dashboards, conference talks, or any other credible format
 - VARIETY IS CRITICAL: Vary both the source AND the format. Don't always link articles — mix in podcast episodes, video essays, book excerpts, tweetstorms, academic papers, newsletter issues, etc. Draw from the full breadth of Bitcoin analysis — on-chain analysts, macro researchers, mining experts, protocol developers, historians, authors, podcasters, and more. Surprise the reader with lesser-known but credible voices.
