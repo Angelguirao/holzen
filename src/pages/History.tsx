@@ -244,6 +244,16 @@ const History = () => {
       setCalendarActivities(activities);
     };
     loadActivities();
+  }, [user]);
+
+  const toggleCalendarFilter = useCallback((type: ActivityType) => {
+    setCalendarFilters((prev) => {
+      const next = new Set(prev);
+      if (next.has(type)) next.delete(type);
+      else next.add(type);
+      return next;
+    });
+  }, []);
 
   const loadMore = useCallback(async () => {
     if (!user || loadingMore || !hasMore) return;
