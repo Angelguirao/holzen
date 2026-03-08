@@ -100,7 +100,7 @@ export function TestimonialRequest({ reflectionCount }: Props) {
           <Textarea
             value={quote}
             onChange={(e) => setQuote(e.target.value)}
-            placeholder={t.placeholder}
+            placeholder={t('testimonial.placeholder')}
             className="text-xs min-h-[60px] resize-none"
             maxLength={280}
           />
