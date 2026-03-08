@@ -1,4 +1,5 @@
 import { useAuth } from '@/hooks/use-auth';
+import { SourceManagement } from '@/components/SourceManagement';
 import { isHapticEnabled, setHapticEnabled } from '@/lib/haptics';
 import { useHolzen } from '@/hooks/use-holzen';
 import { useSubscription } from '@/hooks/use-subscription';
@@ -546,22 +547,29 @@ const Settings = () => {
           <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
             {t('settings.companions')}
           </AccordionTrigger>
-          <AccordionContent className="space-y-3 pb-4">
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              {t('settings.companionsDesc')}
-            </p>
-            {(['breathing', 'haiku', 'learning', 'signal', 'zoomOut', 'history'] as const).map((comp) => (
-              <div key={comp} className="flex items-center justify-between">
-                <Label htmlFor={`comp-${comp}`} className="text-xs font-mono text-muted-foreground">
-                  {t(`settings.companionLabels.${comp}`)}
-                </Label>
-                <Switch
-                  id={`comp-${comp}`}
-                  checked={companionPrefs[comp]}
-                  onCheckedChange={(v) => setCompanionPref(comp, v)}
-                />
-              </div>
-            ))}
+          <AccordionContent className="space-y-6 pb-4">
+            <div className="space-y-3">
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {t('settings.companionsDesc')}
+              </p>
+              {(['breathing', 'haiku', 'learning', 'signal', 'zoomOut', 'history'] as const).map((comp) => (
+                <div key={comp} className="flex items-center justify-between">
+                  <Label htmlFor={`comp-${comp}`} className="text-xs font-mono text-muted-foreground">
+                    {t(`settings.companionLabels.${comp}`)}
+                  </Label>
+                  <Switch
+                    id={`comp-${comp}`}
+                    checked={companionPrefs[comp]}
+                    onCheckedChange={(v) => setCompanionPref(comp, v)}
+                  />
+                </div>
+              ))}
+            </div>
+
+            {/* Signal Sources */}
+            <div className="border-t border-border/30 pt-4">
+              <SourceManagement />
+            </div>
           </AccordionContent>
         </AccordionItem>
 
