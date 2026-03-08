@@ -208,12 +208,7 @@ Generate 3-5 behavioral insights based on real patterns in this data.`;
 
       if (!insights || !Array.isArray(insights)) continue;
 
-      // Delete old insights for this user, then insert new
-      await supabase
-        .from("reflection_insights")
-        .delete()
-        .eq("user_id", userId);
-
+      // Insert new insights (keep old ones)
       await supabase.from("reflection_insights").insert({
         user_id: userId,
         insights,
