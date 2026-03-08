@@ -21,6 +21,7 @@ interface Props {
   item: LibraryItem;
   onTogglePin: (id: string) => void;
   onDelete: (id: string) => void;
+  onStatusChange: (id: string, status: 'unread' | 'read' | 'archived') => void;
 }
 
 export function LibraryItemCard({ item, onTogglePin, onDelete }: Props) {
