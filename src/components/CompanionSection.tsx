@@ -5,7 +5,6 @@ import { LearningInput } from './LearningInput';
 import { SignalDisplay } from './SignalDisplay';
 import { ZoomOutDisplay } from './ZoomOutDisplay';
 import { HistoricalInsightDisplay } from './HistoricalInsightDisplay';
-import { SaveToLibraryButton } from './library/SaveToLibraryButton';
 import { ChevronDown, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { hapticFeedback } from '@/lib/haptics';
@@ -97,6 +96,31 @@ function CollapsibleCompanion({
 
 export const CompanionSection = forwardRef<HTMLDivElement, Props>(function CompanionSection({ companions, prefs, severity = 'mild', reflectionId, context, reflectionMessage }, ref) {
   const { language } = useHolzen();
+
+  // Helper: auto-save companion to library (dedup by reflection_id + source_type)
+  const autoSaveToLibrary = useCallback(async (params: { title: string; body: string; sourceType: string; sourceUrl?: string }) => {
+    if (!reflectionId) return;
+    const { data: authData } = await supabase.auth.getUser();
+    const userId = authData?.user?.id;
+    if (!userId) return;
+    const { data: existing } = await supabase
+      .from('library_items')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('reflection_id', reflectionId)
+      .eq('source_type', params.sourceType)
+      .limit(1);
+    if (existing && existing.length > 0) return;
+    await supabase.from('library_items').insert({
+      user_id: userId,
+      type: 'bookmark',
+      title: params.title,
+      body: params.body,
+      source_type: params.sourceType,
+      source_url: params.sourceUrl || null,
+      reflection_id: reflectionId,
+    });
+  }, [reflectionId]);
 
   // Static English labels — language setting only affects AI-generated content
   const t = { pause: 'Pause with this', breathe: 'Breathe with this', haiku: 'Read as haiku', ground: 'Ground yourself', signal: 'Read the signal', zoomOut: 'Zoom out', lookBack: 'Look back' };
@@ -212,6 +236,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
                 } as any)
                 .eq('id', reflectionId)
                 .then(() => {});
+              autoSaveToLibrary({ title: nudgeData.title, body: nudgeData.body, sourceType: 'learning', sourceUrl: nudgeData.url });
             }
             setNudgeLoading(false);
           });
@@ -301,6 +326,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
                 } as any)
                 .eq('id', reflectionId)
                 .then(() => {});
+              autoSaveToLibrary({ title: signalData.title, body: signalData.body, sourceType: 'signal', sourceUrl: signalData.url });
             }
             setSignalLoading(false);
           });
@@ -353,6 +379,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
                 .update({ zoom_out_data: data } as any)
                 .eq('id', reflectionId)
                 .then(() => {});
+              autoSaveToLibrary({ title: 'Zoom Out', body: typeof data === 'object' ? JSON.stringify(data) : String(data), sourceType: 'zoom_out' });
             }
             setZoomOutLoading(false);
           });
@@ -412,6 +439,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
                 .update({ history_insight_data: data } as any)
                 .eq('id', reflectionId)
                 .then(() => {});
+              autoSaveToLibrary({ title: (data as HistoricalInsightData).title, body: (data as HistoricalInsightData).btcInsight, sourceType: 'history_insight' });
             }
             setHistoryLoading(false);
           });
@@ -480,7 +508,6 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           completed={completion.haiku}
         >
           <HaikuDisplay haiku={companions.haiku!} />
-          <div className="mt-1.5"><SaveToLibraryButton title="Haiku" body={companions.haiku!} sourceType="haiku" reflectionId={reflectionId ?? undefined} /></div>
         </CollapsibleCompanion>
       )}
 
@@ -501,7 +528,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             nudgeLoading={nudgeLoading}
             nudgeError={nudgeError}
           />
-          {nudge && <div className="mt-1.5"><SaveToLibraryButton title={nudge.title} body={nudge.body} sourceType="learning" sourceUrl={nudge.url} reflectionId={reflectionId ?? undefined} /></div>}
+          
         </CollapsibleCompanion>
       )}
 
@@ -520,7 +547,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             loading={signalLoading}
             error={signalError}
           />
-          {signal && <div className="mt-1.5"><SaveToLibraryButton title={signal.title} body={signal.body} sourceType="signal" sourceUrl={signal.url} reflectionId={reflectionId ?? undefined} /></div>}
+          
         </CollapsibleCompanion>
       )}
 
@@ -539,7 +566,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             loading={zoomOutLoading}
             error={zoomOutError}
           />
-          {zoomOut && <div className="mt-1.5"><SaveToLibraryButton title="Zoom Out" body={typeof zoomOut === 'object' ? JSON.stringify(zoomOut) : String(zoomOut)} sourceType="zoom_out" reflectionId={reflectionId ?? undefined} /></div>}
+          
         </CollapsibleCompanion>
       )}
 
@@ -558,7 +585,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             loading={historyLoading}
             error={historyError}
           />
-          {historyInsight && <div className="mt-1.5"><SaveToLibraryButton title={historyInsight.title} body={historyInsight.btcInsight} sourceType="history_insight" reflectionId={reflectionId ?? undefined} /></div>}
+          
         </CollapsibleCompanion>
       )}
     </div>

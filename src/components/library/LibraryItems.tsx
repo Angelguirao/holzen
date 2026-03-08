@@ -1,6 +1,6 @@
+import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LibraryItemCard } from './LibraryItemCard';
-import { toast } from 'sonner';
 import type { useLibrary } from '@/hooks/use-library';
 import type { LibraryItem } from '@/hooks/use-library';
 
@@ -12,7 +12,7 @@ interface Props {
 export function LibraryItems({ library, filtered }: Props) {
   const { t } = useTranslation();
   const {
-    collections, updateItem, deleteItem, togglePin,
+    items, collections, updateItem, deleteItem, togglePin,
     addToCollection, removeFromCollection, getItemCollections,
   } = library;
 
@@ -23,6 +23,19 @@ export function LibraryItems({ library, filtered }: Props) {
   const handleUpdateTags = async (id: string, tags: string[]) => {
     await updateItem(id, { tags } as any);
   };
+
+  // Build a map of reflection_id → linked companion items
+  const linkedMap = useMemo(() => {
+    const map = new Map<string, LibraryItem[]>();
+    items.forEach((i) => {
+      if (i.reflection_id && i.source_type !== 'reflection') {
+        const arr = map.get(i.reflection_id) ?? [];
+        arr.push(i);
+        map.set(i.reflection_id, arr);
+      }
+    });
+    return map;
+  }, [items]);
 
   const pinnedItems = filtered.filter((i) => i.pinned);
   const unpinnedItems = filtered.filter((i) => !i.pinned);
@@ -35,6 +48,7 @@ export function LibraryItems({ library, filtered }: Props) {
       onDelete={deleteItem}
       onStatusChange={handleStatusChange}
       onUpdateTags={handleUpdateTags}
+      linkedItems={item.source_type === 'reflection' && item.reflection_id ? linkedMap.get(item.reflection_id) : undefined}
       collections={collections}
       itemCollections={getItemCollections(item.id)}
       onAddToCollection={addToCollection}
