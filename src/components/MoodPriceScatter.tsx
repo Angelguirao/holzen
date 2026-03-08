@@ -41,7 +41,7 @@ function extractChange(context: string | null): number | null {
   return match[1].toLowerCase() === 'down' ? -val : val;
 }
 
-export function MoodPriceScatter({ reflections }: Props) {
+export const MoodPriceScatter = forwardRef<HTMLDivElement, Props>(function MoodPriceScatter({ reflections }, ref) {
   const points = useMemo(() => {
     const pts: { x: number; y: number; mood: string; date: string }[] = [];
     for (const r of reflections) {
