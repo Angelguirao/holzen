@@ -381,6 +381,21 @@
     "getStartedForFree": "Empieza gratis",
     "noCreditCard": "Sin tarjeta de crédito",
     "reflectionLoop": "El ciclo de reflexión",
+    "reaction": {
+      "label": "Sin Holzen",
+      "01title": "El mercado cae",
+      "02title": "El pánico se apodera",
+      "03title": "Vendes por impulso",
+      "04title": "Te arrepientes después"
+    },
+    "reflection": {
+      "label": "Con Holzen",
+      "01title": "El mercado cae",
+      "02title": "Respiras",
+      "03title": "Reflexionas",
+      "04title": "Decides deliberadamente",
+      "05title": "Creces con el tiempo"
+    },
     "steps": {
       "01title": "El mercado se mueve",
       "01desc": "Holzen monitorea la volatilidad diaria y acumulada de 7 días contra tus umbrales personales. O solicita una reflexión cuando quieras.",
