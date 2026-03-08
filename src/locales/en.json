@@ -581,7 +581,12 @@
     "addToCollection": "Add to collection",
     "addedToCollection": "Added to collection",
     "emptyCollection": "No items in this collection yet.",
-    "allCollections": "All"
+    "allCollections": "All",
+    "renameCollection": "Rename",
+    "deleteCollection": "Delete",
+    "deleteCollectionConfirm": "Delete this collection? Items inside won't be removed.",
+    "collectionRenamed": "Collection renamed",
+    "collectionDeleted": "Collection deleted"
   },
   "pause": {
     "youPaused": "You paused. That's the hardest part.",
