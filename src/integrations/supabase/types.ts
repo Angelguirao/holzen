@@ -173,6 +173,8 @@ export type Database = {
           last_message: string | null
           last_trigger_at: string | null
           lifetime_access: boolean
+          mantra: string | null
+          motivations: string[] | null
           night_reflection_hour: number | null
           notify_badges: boolean
           quiet_hours_end: number | null
@@ -216,6 +218,8 @@ export type Database = {
           last_message?: string | null
           last_trigger_at?: string | null
           lifetime_access?: boolean
+          mantra?: string | null
+          motivations?: string[] | null
           night_reflection_hour?: number | null
           notify_badges?: boolean
           quiet_hours_end?: number | null
@@ -259,6 +263,8 @@ export type Database = {
           last_message?: string | null
           last_trigger_at?: string | null
           lifetime_access?: boolean
+          mantra?: string | null
+          motivations?: string[] | null
           night_reflection_hour?: number | null
           notify_badges?: boolean
           quiet_hours_end?: number | null

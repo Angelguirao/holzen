@@ -26,6 +26,8 @@ export function useHolzen() {
   const [ritualTemplate, setRitualTemplateState] = useState<string>('standard');
   const [nightReflectionHour, setNightReflectionHourState] = useState<number | null>(21);
   const [notifyBadges, setNotifyBadgesState] = useState(true);
+  const [motivations, setMotivationsState] = useState<string[]>([]);
+  const [mantra, setMantraState] = useState<string | null>(null);
   const [btcData, setBtcData] = useState<BtcPriceData | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [context, setContext] = useState<string | null>(null);
@@ -44,7 +46,7 @@ export function useHolzen() {
     const load = async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('threshold, threshold_down, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_learning, companion_signal, companion_zoom_out, companion_history, reflection_tone, cooldown_hours, last_trigger_at, silent_mode, streak_freeze_dates, digest_frequency, custom_prompt, reflection_style, quiet_hours_start, quiet_hours_end, first_name, night_reflection_hour, ai_insights_enabled, ritual_template, notify_badges')
+        .select('threshold, threshold_down, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_learning, companion_signal, companion_zoom_out, companion_history, reflection_tone, cooldown_hours, last_trigger_at, silent_mode, streak_freeze_dates, digest_frequency, custom_prompt, reflection_style, quiet_hours_start, quiet_hours_end, first_name, night_reflection_hour, ai_insights_enabled, ritual_template, notify_badges, motivations, mantra')
         .eq('user_id', user.id)
         .single();
 
@@ -70,6 +72,8 @@ export function useHolzen() {
         setAiInsightsEnabledState((data as any).ai_insights_enabled ?? true);
         setRitualTemplateState((data as any).ritual_template ?? 'standard');
         setNotifyBadgesState((data as any).notify_badges ?? true);
+        setMotivationsState((data as any).motivations ?? []);
+        setMantraState((data as any).mantra ?? null);
         setHasOnboarded(data.has_onboarded ?? false);
         setCompanionPrefsState({
           breathing: data.companion_breathing ?? true,
@@ -299,6 +303,8 @@ export function useHolzen() {
           style: reflectionStyle,
           moodHistory,
           severity: Math.abs(data.changePercent),
+          motivations: motivations.length > 0 ? motivations : undefined,
+          mantra: mantra || undefined,
         },
       });
 
@@ -531,6 +537,18 @@ export function useHolzen() {
       setNotifyBadgesState(val);
       if (!user) return;
       await supabase.from('profiles').update({ notify_badges: val } as any).eq('user_id', user.id);
+    },
+    motivations,
+    setMotivations: async (val: string[]) => {
+      setMotivationsState(val);
+      if (!user) return;
+      await supabase.from('profiles').update({ motivations: val } as any).eq('user_id', user.id);
+    },
+    mantra,
+    setMantra: async (val: string | null) => {
+      setMantraState(val);
+      if (!user) return;
+      await supabase.from('profiles').update({ mantra: val } as any).eq('user_id', user.id);
     },
     companionPrefs,
     setCompanionPref,

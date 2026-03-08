@@ -37,7 +37,7 @@ const LAST_SEEN_VERSION_KEY = 'holzen_last_seen_version';
 
 const Settings = () => {
   const { user, signOut } = useAuth();
-  const { threshold, setThreshold, thresholdDown, setThresholdDown, cumulativeThreshold, setCumulativeThreshold, emailNotifications, setEmailNotifications, companionPrefs, setCompanionPref, reflectionTone, setReflectionTone, reflectionStyle, setReflectionStyle, silentMode, setSilentMode, cooldownHours, setCooldownHours, digestFrequency, setDigestFrequency, customPrompt, setCustomPrompt, quietHoursStart, quietHoursEnd, setQuietHours, streakFreezeDates, useStreakFreeze, firstName, setFirstName, nightReflectionHour, setNightReflectionHour, aiInsightsEnabled, setAiInsightsEnabled, ritualTemplate, setRitualTemplate, notifyBadges, setNotifyBadges, profileLoaded } = useHolzen();
+  const { threshold, setThreshold, thresholdDown, setThresholdDown, cumulativeThreshold, setCumulativeThreshold, emailNotifications, setEmailNotifications, companionPrefs, setCompanionPref, reflectionTone, setReflectionTone, reflectionStyle, setReflectionStyle, silentMode, setSilentMode, cooldownHours, setCooldownHours, digestFrequency, setDigestFrequency, customPrompt, setCustomPrompt, quietHoursStart, quietHoursEnd, setQuietHours, streakFreezeDates, useStreakFreeze, firstName, setFirstName, nightReflectionHour, setNightReflectionHour, aiInsightsEnabled, setAiInsightsEnabled, ritualTemplate, setRitualTemplate, notifyBadges, setNotifyBadges, motivations, setMotivations, mantra, setMantra, profileLoaded } = useHolzen();
   const { subscribed, loading: subLoading, checkoutLoading, startCheckout, openPortal, trialRemaining } = useSubscription();
   const { theme, setTheme } = useTheme();
   const { canInstall, install } = useInstallPrompt();
@@ -163,17 +163,80 @@ const Settings = () => {
           <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
             You
           </AccordionTrigger>
-          <AccordionContent className="space-y-3 pb-4">
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Optional. Shown as a quiet greeting on home.
-            </p>
-            <Input
-              value={firstName ?? ''}
-              onChange={(e) => setFirstName(e.target.value || null)}
-              placeholder="Your first name"
-              maxLength={30}
-              className="text-xs font-mono"
-            />
+          <AccordionContent className="space-y-5 pb-4">
+            <div className="space-y-3">
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">First name</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Optional. Shown as a quiet greeting on home.
+              </p>
+              <Input
+                value={firstName ?? ''}
+                onChange={(e) => setFirstName(e.target.value || null)}
+                placeholder="Your first name"
+                maxLength={30}
+                className="text-xs font-mono"
+              />
+            </div>
+
+            {/* My Why — Motivations */}
+            <div className="space-y-3">
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">My Why</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Why do you hold? Select what resonates. This anchors your reflections and appears as a mantra during rituals.
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                {([
+                  { value: 'freedom', label: 'Financial freedom', desc: 'Building independence' },
+                  { value: 'family', label: 'Family security', desc: 'Protecting what matters' },
+                  { value: 'generational', label: 'Generational wealth', desc: 'Beyond your lifetime' },
+                  { value: 'discipline', label: 'Learning discipline', desc: 'Mastering patience' },
+                  { value: 'conviction', label: 'Philosophical conviction', desc: 'Believing in the protocol' },
+                  { value: 'sovereignty', label: 'Self-sovereignty', desc: 'Being your own bank' },
+                  { value: 'inflation', label: 'Inflation hedge', desc: 'Preserving purchasing power' },
+                  { value: 'curiosity', label: 'Curiosity', desc: 'Learning about money' },
+                ] as const).map((m) => {
+                  const selected = motivations.includes(m.value);
+                  return (
+                    <button
+                      key={m.value}
+                      onClick={() => {
+                        const next = selected
+                          ? motivations.filter((v) => v !== m.value)
+                          : [...motivations, m.value];
+                        setMotivations(next);
+                      }}
+                      className={`rounded-md border px-3 py-2.5 text-left transition-colors ${
+                        selected
+                          ? 'border-primary bg-primary/5 text-foreground'
+                          : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      <p className="text-xs font-mono font-medium">{m.label}</p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5">{m.desc}</p>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Mantra */}
+            <div className="space-y-3">
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">Personal mantra</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Optional. Your own words — shown during rituals and woven into AI reflections.
+              </p>
+              <textarea
+                value={mantra ?? ''}
+                onChange={(e) => setMantra(e.target.value || null)}
+                placeholder="e.g. I hold because time is on my side…"
+                maxLength={200}
+                rows={2}
+                className="w-full text-xs font-mono px-3 py-2 rounded-md border border-border/60 bg-background text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/40 transition-colors resize-none"
+              />
+              <p className="text-[10px] font-mono text-muted-foreground/50 text-right">
+                {(mantra?.length ?? 0)}/200
+              </p>
+            </div>
           </AccordionContent>
         </AccordionItem>
 

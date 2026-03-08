@@ -1,10 +1,11 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Wind, Eye, PenLine, Target, Check, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { hapticFeedback } from '@/lib/haptics';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
+import { useHolzen } from '@/hooks/use-holzen';
 import { RitualBreathing, RitualReflect, RitualJournal, RitualDecide } from './ritual';
 
 export type RitualTemplate = 'quick' | 'standard' | 'deep';
@@ -45,6 +46,7 @@ interface HolzenRitualProps {
 
 export function HolzenRitual({ open, onClose, template, reflectionMessage, reflectionId, onDecision }: HolzenRitualProps) {
   const { user } = useAuth();
+  const { mantra, motivations } = useHolzen();
   const steps = TEMPLATES[template]
     .map((id) => ALL_STEPS.find((s) => s.id === id)!)
     .filter(Boolean);
@@ -53,7 +55,19 @@ export function HolzenRitual({ open, onClose, template, reflectionMessage, refle
   const [completed, setCompleted] = useState(false);
   const [journalText, setJournalText] = useState('');
   const [decision, setDecision] = useState('');
+  const [showMantra, setShowMantra] = useState(false);
   const startTimeRef = useRef<number>(Date.now());
+
+  const hasMantra = !!(mantra || motivations.length > 0);
+
+  // Show mantra briefly before the first step
+  useEffect(() => {
+    if (open && hasMantra && currentStep === 0 && !completed) {
+      setShowMantra(true);
+      const timer = setTimeout(() => setShowMantra(false), 3500);
+      return () => clearTimeout(timer);
+    }
+  }, [open, hasMantra, currentStep, completed]);
 
   const step = steps[currentStep];
 
@@ -110,6 +124,7 @@ export function HolzenRitual({ open, onClose, template, reflectionMessage, refle
     setCompleted(false);
     setJournalText('');
     setDecision('');
+    setShowMantra(false);
     startTimeRef.current = Date.now();
     onClose();
   }, [onClose]);
@@ -171,6 +186,31 @@ export function HolzenRitual({ open, onClose, template, reflectionMessage, refle
               </div>
             )}
 
+            {/* Mantra overlay */}
+            <AnimatePresence>
+              {showMantra && (
+                <motion.div
+                  key="mantra"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 1 }}
+                  className="flex flex-col items-center gap-4 py-12 text-center"
+                >
+                  {mantra && (
+                    <p className="text-sm font-mono text-foreground/70 italic leading-relaxed max-w-xs">
+                      "{mantra}"
+                    </p>
+                  )}
+                  {!mantra && motivations.length > 0 && (
+                    <p className="text-xs font-mono text-muted-foreground/60 tracking-wider uppercase">
+                      Remember why you hold
+                    </p>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             {/* Step content */}
             <AnimatePresence mode="wait">
               {completed ? (
@@ -195,7 +235,7 @@ export function HolzenRitual({ open, onClose, template, reflectionMessage, refle
                     Return
                   </Button>
                 </motion.div>
-              ) : (
+              ) : !showMantra ? (
                 <motion.div
                   key={step.id}
                   initial={{ opacity: 0, x: 20 }}
@@ -208,7 +248,7 @@ export function HolzenRitual({ open, onClose, template, reflectionMessage, refle
                   {step.id === 'journal' && <RitualJournal onComplete={(t) => { setJournalText(t); advance(); }} />}
                   {step.id === 'decide' && <RitualDecide onComplete={handleDecision} />}
                 </motion.div>
-              )}
+              ) : null}
             </AnimatePresence>
           </div>
         </motion.div>

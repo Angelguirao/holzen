@@ -27,7 +27,7 @@ serve(async (req) => {
   }
 
   try {
-    const { context, tone, customPrompt, style, moodHistory, severity } = await req.json();
+    const { context, tone, customPrompt, style, moodHistory, severity, motivations, mantra } = await req.json();
     if (!context) {
       return new Response(JSON.stringify({ error: "Missing context" }), {
         status: 400,
@@ -111,7 +111,7 @@ Reflection rules:
 - Encourage pause and reflection. Preserve agency: never say "you should".
 - No reassurance, excitement, urgency, trading advice, lists, disclaimers.
 - No exclamation marks, emojis, motivational language, reward language.
-- Just one quiet prompt for reflection.${customPrompt ? `\n\nUser's personal reflection guidance: "${customPrompt}"` : ''}
+- Just one quiet prompt for reflection.${customPrompt ? `\n\nUser's personal reflection guidance: "${customPrompt}"` : ''}${motivations && motivations.length > 0 ? `\n\nThe user's core motivations for holding: ${motivations.join(', ')}. Subtly weave this context into the reflection when relevant — don't lecture about it.` : ''}${mantra ? `\n\nThe user's personal mantra: "${mantra}". You may gently echo its spirit when it fits the moment.` : ''}
 
 Haiku rules:
 - Exactly 3 lines separated by newlines.
