@@ -241,6 +241,9 @@ const Home = () => {
       {/* BTC Status */}
       <BtcStatus data={btcData} error={error} hidden={priceHidden} onToggleHidden={togglePriceHidden} />
 
+      {/* The Holzen Number */}
+      <HolzenNumber variant="compact" />
+
       {/* Ritual cooldown awareness */}
       <RitualCooldownBanner />
 
