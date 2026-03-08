@@ -94,7 +94,7 @@ function CollapsibleCompanion({
   );
 }
 
-export function CompanionSection({ companions, prefs, severity = 'mild', reflectionId, context, reflectionMessage }: Props) {
+export const CompanionSection = forwardRef<HTMLDivElement, Props>(function CompanionSection({ companions, prefs, severity = 'mild', reflectionId, context, reflectionMessage }, ref) {
   const { language } = useHolzen();
 
   // Static English labels — language setting only affects AI-generated content
