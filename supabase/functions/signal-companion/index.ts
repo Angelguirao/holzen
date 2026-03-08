@@ -1,19 +1,10 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.49.1";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
-
-async function validateUrl(url: string, fallbackQuery: string): Promise<string> {
-  try {
-    const res = await fetch(url, { method: 'HEAD', redirect: 'follow' });
-    if (res.ok || res.status === 405 || res.status === 403) return url;
-  } catch { /* broken */ }
-  return `https://www.google.com/search?q=${encodeURIComponent(fallbackQuery)}`;
-}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -23,122 +14,160 @@ serve(async (req) => {
   try {
     const { context, language, sources } = await req.json();
 
+    const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
+    if (!PERPLEXITY_API_KEY) throw new Error("PERPLEXITY_API_KEY is not configured");
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    // Build source list for the prompt
-    let sourceInstruction = "";
+    // Build domain filter from user's active sources (only if they have customized)
+    const domainFilter: string[] = [];
     if (sources && Array.isArray(sources) && sources.length > 0) {
-      const sourceList = sources.map((s: { name: string; type: string; url?: string }) =>
-        `- ${s.name} (${s.type}${s.url ? `, ${s.url}` : ''})`
-      ).join("\n");
-      sourceInstruction = `\n\nPRIORITY SOURCES — The user has selected these as their preferred signal sources. You MUST draw from this list when possible. If the current market context is especially relevant to one of these sources, prioritize it. Only go outside this list if none are contextually relevant:\n${sourceList}\n`;
+      for (const s of sources) {
+        if (s.url) {
+          try {
+            const domain = new URL(s.url).hostname.replace(/^www\./, '');
+            domainFilter.push(domain);
+          } catch { /* skip invalid URLs */ }
+        }
+      }
     }
 
     const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
     const langCode = language || "en";
     const langName = LANG_NAMES[langCode] || "English";
-    const langInstruction = langCode !== "en" ? `CRITICAL LANGUAGE REQUIREMENT: You MUST write the title and body in ${langName}. Do NOT use English for title or body. Source name and URL should remain as-is.\n\n` : "";
 
-    const systemPrompt = `${langInstruction}You are a Bitcoin signal curator for a mindfulness app called Holzen. Your job is to surface ONE real, high-signal piece of Bitcoin analysis or insight that is contextually relevant to the current market conditions.
+    // Step 1: Perplexity search for real, grounded Bitcoin analysis
+    const searchQuery = context
+      ? `Current Bitcoin market analysis: ${context}. Find one high-signal insight from a reputable Bitcoin analyst, researcher, or data source.`
+      : "Latest high-signal Bitcoin market analysis or insight from reputable analysts or researchers.";
 
-You MUST call the "return_signal" function with your response. Do not respond with plain text.
-${sourceInstruction}
-Rules:
-- Reference REAL sources from the Bitcoin ecosystem — articles, blog posts, research papers, podcast episodes, YouTube videos, books, newsletter posts, tweets/threads, data dashboards, conference talks, or any other credible format
-- VARIETY IS CRITICAL: Vary both the source AND the format. Don't always link articles — mix in podcast episodes, video essays, book excerpts, tweetstorms, academic papers, newsletter issues, etc. Draw from the full breadth of Bitcoin analysis — on-chain analysts, macro researchers, mining experts, protocol developers, historians, authors, podcasters, and more. Surprise the reader with lesser-known but credible voices.
-- The insight should be FACTUAL — a real concept, framework, or historical pattern, not made-up content
-- Match it to the current market context (if fees are high, talk about fee markets; if there's a crash, reference historical recoveries; if sentiment is extreme, reference behavioral patterns)
-- Keep the body to 2-3 sentences max
-- Include a real, working URL to a relevant source (blog post, article, or data dashboard)
-- Tone: calm, educational, grounding. No hype, no advice, no predictions.
-- Prioritize timeless insights over breaking news`;
-
-    const userPrompt = context
-      ? `Current market context: ${context}\n\nFind one relevant, real Bitcoin insight for this moment.`
-      : "Find one relevant, real Bitcoin insight for the current moment.";
-
-    const response = await fetch(
-      "https://ai.gateway.lovable.dev/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
+    const perplexityBody: any = {
+      model: "sonar",
+      messages: [
+        {
+          role: "system",
+          content: "You are a Bitcoin market research assistant. Find one specific, high-signal piece of Bitcoin analysis or insight that is relevant to the current market conditions. Focus on real analysts, real data, and real sources. Provide factual, grounded information — no hype, no predictions.",
         },
-        body: JSON.stringify({
-          model: "google/gemini-3-flash-preview",
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userPrompt },
-          ],
-          tools: [
-            {
-              type: "function",
-              function: {
-                name: "return_signal",
-                description: langCode !== "en" ? `Return a curated Bitcoin signal/insight. Title and body MUST be in ${langName}.` : "Return a curated Bitcoin signal/insight.",
-                parameters: {
-                  type: "object",
-                  properties: {
-                    title: {
-                      type: "string",
-                      description: langCode !== "en" ? `Short headline (5-12 words). MUST be in ${langName}. Factual, not clickbait.` : "Short headline (5-12 words). Factual, not clickbait.",
-                    },
-                    body: {
-                      type: "string",
-                      description: langCode !== "en" ? `2-3 sentence insight in ${langName}. Reference real data, analysts, or historical patterns.` : "2-3 sentence insight. Reference real data, analysts, or historical patterns.",
-                    },
-                    source: {
-                      type: "string",
-                      description: "Name of the source (e.g., 'Lyn Alden', 'mempool.space', 'Glassnode')",
-                    },
-                    url: {
-                      type: "string",
-                      description: "A real, working URL to the source material.",
-                    },
-                  },
-                  required: ["title", "body", "source", "url"],
-                  additionalProperties: false,
-                },
-              },
-            },
-          ],
-          tool_choice: {
-            type: "function",
-            function: { name: "return_signal" },
-          },
-        }),
-      }
-    );
+        { role: "user", content: searchQuery },
+      ],
+      search_recency_filter: "week",
+    };
 
-    if (!response.ok) {
-      if (response.status === 429) {
+    // Apply domain filter only if user has active sources with URLs
+    if (domainFilter.length > 0) {
+      perplexityBody.search_domain_filter = domainFilter.slice(0, 5); // Perplexity limit
+    }
+
+    const searchResponse = await fetch("https://api.perplexity.ai/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${PERPLEXITY_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(perplexityBody),
+    });
+
+    if (!searchResponse.ok) {
+      const errText = await searchResponse.text();
+      console.error("Perplexity error:", searchResponse.status, errText);
+      if (searchResponse.status === 429) {
         return new Response(
           JSON.stringify({ error: "Rate limited. Try again later." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      if (response.status === 402) {
+      throw new Error("Perplexity search failed");
+    }
+
+    const searchData = await searchResponse.json();
+    const searchContent = searchData.choices?.[0]?.message?.content || "";
+    const citations: string[] = searchData.citations || [];
+
+    // Step 2: Use Lovable AI to structure the grounded result into a clean signal
+    const langInstruction = langCode !== "en" ? `CRITICAL: Write title and body in ${langName}. Source name and URL remain as-is.\n\n` : "";
+
+    const structureResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash-lite",
+        messages: [
+          {
+            role: "system",
+            content: `${langInstruction}You are a signal curator for a Bitcoin mindfulness app. Given grounded search results with real citations, extract ONE clean signal. You MUST call the "return_signal" function.
+
+Rules:
+- Use ONLY facts from the provided search results — do not invent anything
+- Title: short headline (5-12 words), factual, not clickbait
+- Body: 2-3 sentences max, calm and educational tone
+- Source: name the actual source (analyst, publication, or data provider)
+- URL: use one of the provided citation URLs. Pick the most relevant one.
+- No hype, no advice, no predictions`,
+          },
+          {
+            role: "user",
+            content: `Search results:\n${searchContent}\n\nAvailable citation URLs:\n${citations.map((c: string, i: number) => `[${i + 1}] ${c}`).join("\n")}\n\nExtract one clean signal from these results.`,
+          },
+        ],
+        tools: [
+          {
+            type: "function",
+            function: {
+              name: "return_signal",
+              description: "Return a curated Bitcoin signal/insight.",
+              parameters: {
+                type: "object",
+                properties: {
+                  title: { type: "string", description: "Short headline (5-12 words)." },
+                  body: { type: "string", description: "2-3 sentence insight." },
+                  source: { type: "string", description: "Name of the source." },
+                  url: { type: "string", description: "A real URL from the citations." },
+                },
+                required: ["title", "body", "source", "url"],
+                additionalProperties: false,
+              },
+            },
+          },
+        ],
+        tool_choice: { type: "function", function: { name: "return_signal" } },
+      }),
+    });
+
+    if (!structureResponse.ok) {
+      if (structureResponse.status === 429) {
+        return new Response(
+          JSON.stringify({ error: "Rate limited. Try again later." }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      if (structureResponse.status === 402) {
         return new Response(
           JSON.stringify({ error: "AI usage limit reached." }),
           { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      const text = await response.text();
-      console.error("Signal AI error:", response.status, text);
-      throw new Error("AI gateway error");
+      const text = await structureResponse.text();
+      console.error("AI structure error:", structureResponse.status, text);
+      throw new Error("AI structuring failed");
     }
 
-    const data = await response.json();
-    const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
+    const structureData = await structureResponse.json();
+    const toolCall = structureData.choices?.[0]?.message?.tool_calls?.[0];
 
     if (!toolCall?.function?.arguments) {
       throw new Error("No signal returned from AI");
     }
 
     const signal = JSON.parse(toolCall.function.arguments);
-    signal.url = await validateUrl(signal.url, `${signal.source} ${signal.title}`);
+
+    // Ensure URL is from citations if possible
+    if (citations.length > 0 && !citations.includes(signal.url)) {
+      signal.url = citations[0];
+    }
 
     return new Response(JSON.stringify(signal), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
