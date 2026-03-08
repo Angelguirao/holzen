@@ -110,7 +110,7 @@ const Landing = () => {
             className="text-xs font-mono tracking-widest uppercase text-muted-foreground"
             {...m()}
           >
-            What you get
+            {t('landing.whatYouGet')}
           </motion.p>
           <div className="grid grid-cols-2 gap-3">
             {[
