@@ -106,7 +106,7 @@ export default function Library() {
           )}
           <div className="space-y-1.5">
             {unpinnedItems.map((item) => (
-              <LibraryItemCard key={item.id} item={item} onTogglePin={togglePin} onDelete={deleteItem} />
+              <LibraryItemCard key={item.id} item={item} onTogglePin={togglePin} onDelete={deleteItem} onStatusChange={handleStatusChange} />
             ))}
           </div>
           {filtered.length === 0 && (
