@@ -337,6 +337,7 @@ const Nav = forwardRef<HTMLDivElement, {
   onNext: () => void;
   nextLabel?: string;
 }>(function Nav({ showBack, onBack, onNext, nextLabel = 'Continue' }, ref) {
+  const { t } = useTranslation();
   return (
     <div ref={ref} className="flex items-center gap-4 pt-2">
       {showBack && (
@@ -344,7 +345,7 @@ const Nav = forwardRef<HTMLDivElement, {
           onClick={onBack}
           className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
         >
-          ← {t('common.back') ?? 'Back'}
+          ← {t('common.back')}
         </button>
       )}
       <button
