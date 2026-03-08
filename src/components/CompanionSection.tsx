@@ -21,6 +21,7 @@ export interface CompanionPrefs {
   learning: boolean;
   signal: boolean;
   zoomOut: boolean;
+  history: boolean;
 }
 
 interface CompletionState {
@@ -29,6 +30,7 @@ interface CompletionState {
   learning: boolean;
   signal: boolean;
   zoomOut: boolean;
+  history: boolean;
 }
 
 interface NudgeData {
