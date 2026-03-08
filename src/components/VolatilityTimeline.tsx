@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
+import { differenceInDays } from 'date-fns';
 import {
   ResponsiveContainer,
   AreaChart,
@@ -56,6 +57,15 @@ export function VolatilityTimeline() {
   const [loading, setLoading] = useState(true);
   const [priceLoading, setPriceLoading] = useState(true);
 
+  const memberSince = user?.created_at ? new Date(user.created_at) : null;
+  const daysSinceSignup = memberSince ? differenceInDays(new Date(), memberSince) : 365;
+
+  // Clamp requested period to days since signup
+  const effectiveDays = useMemo(() => {
+    const requested = PERIOD_DAYS[period] ?? daysSinceSignup;
+    return Math.min(requested, Math.max(daysSinceSignup, 1));
+  }, [period, daysSinceSignup]);
+
   // Fetch reflections + rituals once
   useEffect(() => {
     if (!user) return;
@@ -78,18 +88,23 @@ export function VolatilityTimeline() {
     })();
   }, [user]);
 
-  // Fetch price data based on period
+  // Fetch price data capped to signup date
   useEffect(() => {
     setPriceLoading(true);
-    const days = PERIOD_DAYS[period] ?? 365;
+    const days = Math.max(effectiveDays, 1);
     fetch(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=${days}`)
       .then((r) => r.json())
       .then((data) => {
-        setPriceData(data.prices ?? []);
+        let prices: [number, number][] = data.prices ?? [];
+        if (memberSince) {
+          const signupTs = memberSince.getTime();
+          prices = prices.filter(([ts]) => ts >= signupTs);
+        }
+        setPriceData(prices);
         setPriceLoading(false);
       })
       .catch(() => setPriceLoading(false));
-  }, [period]);
+  }, [effectiveDays, memberSince]);
 
   // Build chart data with reflections mapped to nearest price point
   const { chartData, reflectionPoints } = useMemo(() => {
