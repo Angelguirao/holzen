@@ -96,7 +96,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
     if (goalType === 'forever') {
       const updates = {
         hold_goal_type: 'forever',
-        hold_goal_start: new Date().toISOString(),
+        hold_goal_start: startDate.toISOString(),
         hold_goal_target_months: null,
         hold_goal_target_price: null,
         hold_goal_currency: 'USD',
