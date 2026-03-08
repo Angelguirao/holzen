@@ -368,11 +368,12 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
     if (completion[key]) return;
     setCompletion((prev) => ({ ...prev, [key]: true }));
     hapticFeedback('light');
-    if (reflectionId && key !== 'signal') {
+    if (reflectionId) {
       const dbKeyMap: Record<string, string> = {
         breathing: 'breathing_completed',
         haiku: 'haiku_read',
         learning: 'learning_read',
+        signal: 'signal_read',
         zoomOut: 'zoom_out_read',
         history: 'history_read',
       };
