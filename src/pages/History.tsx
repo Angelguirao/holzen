@@ -392,13 +392,13 @@ const History = () => {
                     onClick={() => setFilter('all')}
                     className={`text-xs font-mono transition-colors ${filter === 'all' ? 'text-foreground' : 'text-muted-foreground'}`}
                   >
-                    All
+                    {t('history.all')}
                   </button>
                   <button
                     onClick={() => setFilter('favorites')}
                     className={`text-xs font-mono transition-colors ${filter === 'favorites' ? 'text-foreground' : 'text-muted-foreground'}`}
                   >
-                    Favorites
+                    {t('history.favorites')}
                   </button>
                 </div>
                 <div className="flex-1" />
