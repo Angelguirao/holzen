@@ -6,6 +6,7 @@ import { Mail, Lock, Clock, Trash2 } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ReflectionStats } from '@/components/ReflectionStats';
 import { InsightsPanel } from '@/components/InsightsPanel';
+import { DecisionQualityCard } from '@/components/DecisionQualityCard';
 import { AIInsightsPanel } from '@/components/AIInsightsPanel';
 import { MoodTrends } from '@/components/MoodTrends';
 import { BadgesPanel } from '@/components/BadgesPanel';
@@ -43,6 +44,9 @@ interface Reflection {
   mood: string | null;
   outcome: string | null;
   tags: string[];
+  breathing_completed: boolean;
+  haiku_read: boolean;
+  learning_read: boolean;
 }
 
 interface Letter {
@@ -75,7 +79,7 @@ const Profile = () => {
     const loadReflections = async () => {
       const { data } = await supabase
         .from('reflections')
-        .select('id, message, context, created_at, is_favorite, haiku, learning_title, learning_body, note, mood, outcome, tags')
+        .select('id, message, context, created_at, is_favorite, haiku, learning_title, learning_body, note, mood, outcome, tags, breathing_completed, haiku_read, learning_read')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(1000);
@@ -248,6 +252,7 @@ function StatsContent({ reflections }: { reflections: Reflection[] }) {
       </div>
       <ReflectionStats reflections={reflections} />
       {scoreData && <HolzenScoreDetail scoreData={scoreData} />}
+      <DecisionQualityCard reflections={reflections} />
       <StatsTrends reflections={reflections} />
       <MoodTrendChart reflections={reflections} />
       <MoodPriceChart reflections={reflections} />
