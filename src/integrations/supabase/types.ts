@@ -244,6 +244,7 @@ export type Database = {
           body: string | null
           created_at: string
           id: string
+          is_favorite: boolean
           pinned: boolean
           reflection_id: string | null
           source_type: string | null
@@ -258,6 +259,7 @@ export type Database = {
           body?: string | null
           created_at?: string
           id?: string
+          is_favorite?: boolean
           pinned?: boolean
           reflection_id?: string | null
           source_type?: string | null
@@ -272,6 +274,7 @@ export type Database = {
           body?: string | null
           created_at?: string
           id?: string
+          is_favorite?: boolean
           pinned?: boolean
           reflection_id?: string | null
           source_type?: string | null
