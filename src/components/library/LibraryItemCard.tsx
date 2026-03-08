@@ -201,6 +201,21 @@ export function LibraryItemCard({
           />
         </div>
       )}
+
+      {/* Linked companions */}
+      {linkedItems && linkedItems.length > 0 && (
+        <div className="px-3 pb-2 flex items-center gap-1.5 flex-wrap">
+          <Link2 className="h-2.5 w-2.5 text-muted-foreground/30" />
+          {linkedItems.map((li) => (
+            <span
+              key={li.id}
+              className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground/60"
+            >
+              {SOURCE_LABELS[li.source_type ?? ''] ?? li.source_type}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
