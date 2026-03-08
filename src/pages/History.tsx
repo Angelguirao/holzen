@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { format, subDays, isAfter } from 'date-fns';
 import { X, Star, Search, Pin, Info, TrendingUp, TrendingDown, Clock, History as HistoryIcon, ExternalLink, ArrowRight } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { VolatilityTimeline } from '@/components/VolatilityTimeline';
 import { ShareReflection } from '@/components/ShareReflection';
 import { ReflectionNote } from '@/components/ReflectionNote';
 import { ReflectionWallpaper } from '@/components/ReflectionWallpaper';
@@ -52,7 +53,7 @@ const History = () => {
   const { user } = useAuth();
   const [reflections, setReflections] = useState<Reflection[]>([]);
   const [loading, setLoading] = useState(true);
-  const [tab, setTab] = useState<'recent' | 'library'>('recent');
+  const [tab, setTab] = useState<'recent' | 'library' | 'timeline'>('recent');
   const [filter, setFilter] = useState<'all' | 'favorites'>('all');
   const [tagFilter, setTagFilter] = useState<string | null>(null);
   const [search, setSearch] = useState('');
@@ -157,12 +158,22 @@ const History = () => {
           >
             Library
           </button>
+          <button
+            onClick={() => setTab('timeline')}
+            className={`text-sm font-mono tracking-widest uppercase transition-colors ${
+              tab === 'timeline' ? 'text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
+            }`}
+          >
+            Timeline
+          </button>
         </div>
-        <p className="text-xs text-muted-foreground">
-          {tab === 'recent'
-            ? `${recentReflections.length} reflection${recentReflections.length !== 1 ? 's' : ''} in the last 7 days`
-            : `${reflections.length} reflection${reflections.length !== 1 ? 's' : ''} total`}
-        </p>
+        {tab !== 'timeline' && (
+          <p className="text-xs text-muted-foreground">
+            {tab === 'recent'
+              ? `${recentReflections.length} reflection${recentReflections.length !== 1 ? 's' : ''} in the last 7 days`
+              : `${reflections.length} reflection${reflections.length !== 1 ? 's' : ''} total`}
+          </p>
+        )}
       </div>
 
       {/* Library filters (only for library tab) */}
@@ -216,8 +227,10 @@ const History = () => {
         </div>
       )}
 
-      {/* Reflections list */}
-      {loading ? (
+      {/* Timeline tab */}
+      {tab === 'timeline' ? (
+        <VolatilityTimeline />
+      ) : loading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
             <div key={i} className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2">
