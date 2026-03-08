@@ -561,6 +561,7 @@
     "graphEmpty": "No data yet. Complete reflections and save items to build your graph.",
     "searchPlaceholder": "Search items…",
     "tabAll": "All",
+    "tabFavorites": "Favorites",
     "tabBookmarks": "Saved",
     "tabNotes": "Notes",
     "newNote": "New note",
