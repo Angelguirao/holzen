@@ -23,6 +23,7 @@ export function LibraryItems({ library }: Props) {
     items, collections, collectionItems, loading,
     addItem, updateItem, deleteItem, togglePin,
     addToCollection, removeFromCollection, getItemCollections,
+    addCollection,
   } = library;
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
