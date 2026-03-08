@@ -65,6 +65,7 @@ export function useHolzen() {
         setQuietHoursEndState((data as any).quiet_hours_end ?? null);
         setFirstNameState((data as any).first_name ?? null);
         setNightReflectionHourState((data as any).night_reflection_hour ?? 21);
+        setAiInsightsEnabledState((data as any).ai_insights_enabled ?? true);
         setHasOnboarded(data.has_onboarded ?? false);
         setCompanionPrefsState({
           breathing: data.companion_breathing ?? true,
