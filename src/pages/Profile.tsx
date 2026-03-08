@@ -164,6 +164,8 @@ const Profile = () => {
         ) : (
           <StatsContent reflections={reflections} />
         )
+      ) : tab === 'timeline' ? (
+        <VolatilityTimeline />
       ) : tab === 'insights' ? (
         loading ? (
           <div className="space-y-3">
