@@ -78,6 +78,10 @@ async function generateReflection(context: string, apiKey: string, tone = "stoic
 
   const toneInstruction = TONE_INSTRUCTIONS[tone] || TONE_INSTRUCTIONS.stoic;
 
+  const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
+  const langName = LANG_NAMES[language] || "English";
+  const langInstruction = language !== "en" ? `\n\nLANGUAGE: You MUST write ALL output (reflection message, haiku, learning title, learning body) in ${langName}. Do not use English.` : "";
+
   const systemPrompt = `You generate a reflection with optional companions in response to Bitcoin volatility.
 
 You MUST respond by calling the "generate_reflection" function. Do not respond with plain text.
