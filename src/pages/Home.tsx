@@ -407,18 +407,18 @@ const Home = () => {
                             <AlertCircle className="h-3.5 w-3.5" />
                             <p className="text-xs font-mono">
                               {error.includes('fetch') || error.includes('network') || error.includes('Failed to fetch')
-                                ? 'Could not reach price data'
+                                ? t('home.errors.couldNotReachPrice')
                                 : error.includes('generate') || error.includes('reflect')
-                                ? 'AI reflection unavailable right now'
-                                : 'Something went wrong'}
+                                ? t('home.errors.aiUnavailable')
+                                : t('home.errors.somethingWentWrong')}
                             </p>
                           </div>
                           <p className="text-[10px] font-mono text-muted-foreground/60 leading-relaxed">
                             {error.includes('fetch') || error.includes('network') || error.includes('Failed to fetch')
-                              ? 'Check your internet connection. Price data comes from CoinGecko and may be temporarily unavailable.'
+                              ? t('home.errors.checkConnection')
                               : error.includes('generate') || error.includes('reflect')
-                              ? 'The AI service is temporarily unavailable. Your settings and data are safe — try again in a moment.'
-                              : 'An unexpected error occurred. Your data is safe.'}
+                              ? t('home.errors.aiTemporarilyUnavailable')
+                              : t('home.errors.unexpectedError')}
                           </p>
                           <button onClick={() => manualTrigger()} className="text-xs font-mono text-primary underline">
                             Try again
