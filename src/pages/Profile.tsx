@@ -220,7 +220,7 @@ const Profile = () => {
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Mail className="h-3 w-3" />
                   <p className="text-[10px] font-mono tracking-widest uppercase">
-                    Delivered ({deliveredLetters.length})
+                    {t('profile.delivered')} ({deliveredLetters.length})
                   </p>
                 </div>
                 {deliveredLetters.map((l) => (
