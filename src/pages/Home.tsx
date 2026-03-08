@@ -562,6 +562,9 @@ const Home = () => {
       />
       <TheVoid open={showVoid} onClose={() => setShowVoid(false)} />
 
+      {/* Testimonial request */}
+      <TestimonialRequest reflectionCount={reflectionCount} />
+
       <p className="text-xs text-muted-foreground leading-relaxed">
         When Bitcoin moves, we'll help you pause before you act.
       </p>
