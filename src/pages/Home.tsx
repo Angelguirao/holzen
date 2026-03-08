@@ -508,7 +508,7 @@ const Home = () => {
               >
                 <Waves className="h-3 w-3 text-muted-foreground/40" />
                 <span className="text-[10px] font-mono text-muted-foreground/40 tracking-[0.2em] uppercase">
-                  Ambient mode
+                  {t('home.ambientMode')}
                 </span>
               </button>
             </div>
