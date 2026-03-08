@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, forwardRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { format, formatDistanceToNow } from 'date-fns';
@@ -55,7 +55,7 @@ const outcomeLabels: Record<string, string> = {
   nothing: 'Did nothing',
 };
 
-export function ReflectionComparison({ reflectionId, minAgeDays = 30 }: ReflectionComparisonProps) {
+export const ReflectionComparison = forwardRef<HTMLDivElement, ReflectionComparisonProps>(function ReflectionComparison({ reflectionId, minAgeDays = 30 }, ref) {
   const { user } = useAuth();
   const [current, setCurrent] = useState<ComparisonReflection | null>(null);
   const [past, setPast] = useState<ComparisonReflection | null>(null);
@@ -152,7 +152,8 @@ export function ReflectionComparison({ reflectionId, minAgeDays = 30 }: Reflecti
       <GrowthInsight current={current} past={past} />
     </motion.div>
   );
-}
+});
+ReflectionComparison.displayName = 'ReflectionComparison';
 
 function ComparisonCard({
   label,
