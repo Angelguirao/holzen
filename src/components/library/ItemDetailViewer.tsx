@@ -69,7 +69,9 @@ function CompanionCard({ item, onSelect }: { item: LibraryItem; onSelect?: (item
             <p className="text-[11px] text-muted-foreground/70 italic line-clamp-2">"{zoomOutData.echo.message}"</p>
           )}
           {zoomOutData.deepTime && (
-            <p className="text-[11px] text-muted-foreground/70 line-clamp-2">{zoomOutData.deepTime}</p>
+            <p className="text-[11px] text-muted-foreground/70 line-clamp-2">
+              {typeof zoomOutData.deepTime === 'string' ? zoomOutData.deepTime : zoomOutData.deepTime.title}
+            </p>
           )}
         </div>
       )}
@@ -195,7 +197,14 @@ export function ItemDetailViewer({ item, linkedItems, allItems, open, onClose, o
                   {zoomOutData.deepTime && (
                     <div className="space-y-1">
                       <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Deep Time</p>
-                      <p className="text-xs text-muted-foreground leading-relaxed">{zoomOutData.deepTime}</p>
+                      {typeof zoomOutData.deepTime === 'string' ? (
+                        <p className="text-xs text-muted-foreground leading-relaxed">{zoomOutData.deepTime}</p>
+                      ) : (
+                        <>
+                          <p className="text-[10px] font-mono text-foreground/70 uppercase tracking-wide leading-snug">{zoomOutData.deepTime.title}</p>
+                          <p className="text-xs text-muted-foreground leading-relaxed">{zoomOutData.deepTime.body}</p>
+                        </>
+                      )}
                     </div>
                   )}
                 </div>
