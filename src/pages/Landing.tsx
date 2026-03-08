@@ -194,6 +194,11 @@ const Landing = () => {
           </div>
         </motion.div>
 
+        {/* Testimonials */}
+        <motion.div {...m()}>
+          <LandingTestimonials />
+        </motion.div>
+
         {/* FAQ */}
         <motion.div {...m()}>
           <div className="space-y-4">
