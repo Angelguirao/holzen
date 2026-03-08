@@ -401,7 +401,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
               {reached ? '🎉 Target reached!' : `${formatBtcPrice(diff, currency)} to go`}
             </span>
             <span className="text-[10px] font-mono text-muted-foreground/50">
-              Target: ${target.toLocaleString()}
+              Target: {formatBtcPrice(target, currency)}
             </span>
           </div>
           <div className="h-1.5 w-full rounded-full bg-muted/50 overflow-hidden">
