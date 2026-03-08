@@ -641,9 +641,6 @@ function NeedAMomentButtonInner({ onTrigger, inCooldown, loading, minutes }: { o
           : t('home.requestAnytime')}
       </p>
     </>
-  );
-    </div>
-  );
 }
 
 function AutoCooldownIndicator({
