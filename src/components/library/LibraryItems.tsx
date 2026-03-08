@@ -1,6 +1,7 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LibraryItemCard } from './LibraryItemCard';
+import { ItemDetailViewer } from './ItemDetailViewer';
 import type { useLibrary } from '@/hooks/use-library';
 import type { LibraryItem } from '@/hooks/use-library';
 
@@ -15,6 +16,8 @@ export function LibraryItems({ library, filtered }: Props) {
     items, collections, updateItem, deleteItem, togglePin, toggleFavorite,
     addToCollection, removeFromCollection, getItemCollections,
   } = library;
+
+  const [selectedItem, setSelectedItem] = useState<LibraryItem | null>(null);
 
   const handleStatusChange = async (id: string, status: 'unread' | 'read' | 'archived') => {
     await updateItem(id, { status } as any);
@@ -37,6 +40,21 @@ export function LibraryItems({ library, filtered }: Props) {
     return map;
   }, [items]);
 
+  // Keep selectedItem in sync with items state (e.g. after favorite toggle)
+  const currentSelectedItem = useMemo(() => {
+    if (!selectedItem) return null;
+    return items.find((i) => i.id === selectedItem.id) ?? selectedItem;
+  }, [selectedItem, items]);
+
+  const selectedLinkedItems = useMemo(() => {
+    if (!currentSelectedItem?.reflection_id || currentSelectedItem.source_type !== 'reflection') return undefined;
+    return linkedMap.get(currentSelectedItem.reflection_id);
+  }, [currentSelectedItem, linkedMap]);
+
+  const handleSelectFromViewer = useCallback((item: LibraryItem) => {
+    setSelectedItem(item);
+  }, []);
+
   const pinnedItems = filtered.filter((i) => i.pinned);
   const unpinnedItems = filtered.filter((i) => !i.pinned);
 
@@ -54,25 +72,38 @@ export function LibraryItems({ library, filtered }: Props) {
       itemCollections={getItemCollections(item.id)}
       onAddToCollection={addToCollection}
       onRemoveFromCollection={removeFromCollection}
+      onClick={() => setSelectedItem(item)}
     />
   );
 
   return (
-    <div className="space-y-1.5">
-      {pinnedItems.length > 0 && (
-        <div className="space-y-1.5">
-          <p className="text-[10px] font-mono text-muted-foreground/50 uppercase tracking-wider">{t('common.pinned')}</p>
-          {pinnedItems.map(renderCard)}
-        </div>
-      )}
+    <>
+      <div className="space-y-1.5">
+        {pinnedItems.length > 0 && (
+          <div className="space-y-1.5">
+            <p className="text-[10px] font-mono text-muted-foreground/50 uppercase tracking-wider">{t('common.pinned')}</p>
+            {pinnedItems.map(renderCard)}
+          </div>
+        )}
 
-      {unpinnedItems.map(renderCard)}
+        {unpinnedItems.map(renderCard)}
 
-      {filtered.length === 0 && (
-        <p className="text-xs text-muted-foreground/40 text-center py-8 font-mono">
-          {t('library.emptyState')}
-        </p>
-      )}
-    </div>
+        {filtered.length === 0 && (
+          <p className="text-xs text-muted-foreground/40 text-center py-8 font-mono">
+            {t('library.emptyState')}
+          </p>
+        )}
+      </div>
+
+      <ItemDetailViewer
+        item={currentSelectedItem}
+        linkedItems={selectedLinkedItems}
+        allItems={items}
+        open={!!selectedItem}
+        onClose={() => setSelectedItem(null)}
+        onToggleFavorite={toggleFavorite}
+        onSelectItem={handleSelectFromViewer}
+      />
+    </>
   );
 }
