@@ -383,12 +383,12 @@ const ChartTooltip = forwardRef<HTMLDivElement, any>(({ active, payload }, ref) 
   );
 });
 
-function ReflectionMarkerCard({ point }: { point: PricePoint }) {
-  const ref = point.reflection!;
+const ReflectionMarkerCard = forwardRef<HTMLDivElement, { point: PricePoint }>(({ point }, ref) => {
+  const refl = point.reflection!;
   const ritual = point.ritual;
 
   // Parse BTC change from context
-  const changeMatch = ref.context?.match(/(up|down)\s+([\d.]+)%/);
+  const changeMatch = refl.context?.match(/(up|down)\s+([\d.]+)%/);
   const changeStr = changeMatch ? `${changeMatch[1] === 'down' ? '↓' : '↑'} ${changeMatch[2]}%` : null;
 
   const decisionLabels: Record<string, string> = {
@@ -396,15 +396,15 @@ function ReflectionMarkerCard({ point }: { point: PricePoint }) {
   };
 
   return (
-    <div className="rounded-md border border-border/40 bg-muted/20 px-3 py-2.5 space-y-1.5">
+    <div ref={ref} className="rounded-md border border-border/40 bg-muted/20 px-3 py-2.5 space-y-1.5">
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-1.5">
           <div
             className="h-2 w-2 rounded-full shrink-0"
-            style={{ backgroundColor: getMoodColor(ref.mood) }}
+            style={{ backgroundColor: getMoodColor(refl.mood) }}
           />
           <span className="text-[9px] font-mono text-muted-foreground">
-            {format(new Date(ref.created_at), 'MMM d, HH:mm')}
+            {format(new Date(refl.created_at), 'MMM d, HH:mm')}
           </span>
         </div>
         <div className="flex items-center gap-2">
@@ -416,16 +416,16 @@ function ReflectionMarkerCard({ point }: { point: PricePoint }) {
           </span>
         </div>
       </div>
-      <p className="text-xs leading-relaxed line-clamp-2">{ref.message}</p>
+      <p className="text-xs leading-relaxed line-clamp-2">{refl.message}</p>
       <div className="flex items-center gap-2 flex-wrap">
-        {ref.mood && (
+        {refl.mood && (
           <span className="text-[9px] font-mono text-muted-foreground/50 bg-muted/30 px-1.5 py-0.5 rounded">
-            {ref.mood}
+            {refl.mood}
           </span>
         )}
-        {ref.outcome && (
+        {refl.outcome && (
           <span className="text-[9px] font-mono text-muted-foreground/50 bg-muted/30 px-1.5 py-0.5 rounded">
-            {decisionLabels[ref.outcome] || ref.outcome}
+            {decisionLabels[refl.outcome] || refl.outcome}
           </span>
         )}
         {ritual && (
@@ -436,4 +436,4 @@ function ReflectionMarkerCard({ point }: { point: PricePoint }) {
       </div>
     </div>
   );
-}
+});
