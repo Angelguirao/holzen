@@ -170,7 +170,7 @@ const Home = () => {
                 context={context}
                 onDismiss={handleDismiss}
                 companions={companions}
-                companionPrefs={{ breathing: companionPrefs.breathing, haiku: false, learning: false }}
+                companionPrefs={{ breathing: companionPrefs.breathing, haiku: false, learning: false, signal: false }}
                 severity={severity}
                 reflectionId={lastReflectionId}
               />
