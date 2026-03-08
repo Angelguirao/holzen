@@ -100,9 +100,10 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
     );
   }
 
-  const insights = data?.insights ?? [];
-  const isStale = data
-    ? Date.now() - new Date(data.generated_at).getTime() > 7 * 24 * 60 * 60 * 1000
+  const latest = allData[0] ?? null;
+  const insights = latest?.insights ?? [];
+  const isStale = latest
+    ? Date.now() - new Date(latest.generated_at).getTime() > 7 * 24 * 60 * 60 * 1000
     : true;
 
   return (
@@ -124,12 +125,12 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
           ) : (
             <RefreshCw className="h-3 w-3" />
           )}
-          {generating ? 'Analyzing…' : data ? 'Refresh' : 'Generate'}
+          {generating ? 'Analyzing…' : latest ? 'Refresh' : 'Generate'}
         </Button>
       </div>
 
       {/* No insights yet */}
-      {insights.length === 0 && !generating && (
+      {allData.length === 0 && !generating && (
         <div className="py-6 text-center space-y-3">
           <Brain className="h-5 w-5 mx-auto text-muted-foreground/40" />
           <p className="text-xs text-muted-foreground">
@@ -139,7 +140,7 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
       )}
 
       {/* Generating state */}
-      {generating && insights.length === 0 && (
+      {generating && allData.length === 0 && (
         <div className="py-6 text-center space-y-3">
           <Loader2 className="h-5 w-5 mx-auto text-muted-foreground animate-spin" />
           <p className="text-xs font-mono text-muted-foreground">
@@ -148,47 +149,45 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
         </div>
       )}
 
-      {/* Insight cards */}
-      {insights.length > 0 && (
-        <>
-          <div className="space-y-2.5">
-            {insights.map((insight, i) => {
-              const Icon = CATEGORY_ICONS[insight.category] || Brain;
-              const style = SENTIMENT_STYLES[insight.sentiment] || SENTIMENT_STYLES.neutral;
+      {/* All insight sets, newest first */}
+      {allData.map((row, rowIdx) => (
+        <div key={row.id} className="space-y-2.5">
+          {/* Date header for each generation */}
+          <div className="flex items-center justify-between pt-1">
+            <p className="text-[9px] font-mono text-muted-foreground/50">
+              {format(new Date(row.generated_at), 'MMM d, yyyy · h:mm a')}
+              {rowIdx === 0 && isStale && (
+                <span className="ml-2 text-primary/50">Refresh recommended</span>
+              )}
+            </p>
+            <p className="text-[9px] font-mono text-muted-foreground/30">
+              {row.reflection_count} reflections
+            </p>
+          </div>
 
-              return (
-                <div
-                  key={i}
-                  className={`rounded-md border px-4 py-3 space-y-1.5 ${style}`}
-                >
-                  <div className="flex items-center gap-2">
-                    <Icon className="h-3 w-3 text-muted-foreground shrink-0" />
-                    <p className="text-xs font-mono font-medium text-foreground/80">
-                      {insight.title}
-                    </p>
-                  </div>
-                  <p className="text-xs text-muted-foreground leading-relaxed pl-5">
-                    {insight.body}
+          {row.insights.map((insight, i) => {
+            const Icon = CATEGORY_ICONS[insight.category] || Brain;
+            const style = SENTIMENT_STYLES[insight.sentiment] || SENTIMENT_STYLES.neutral;
+
+            return (
+              <div
+                key={`${row.id}-${i}`}
+                className={`rounded-md border px-4 py-3 space-y-1.5 ${style}`}
+              >
+                <div className="flex items-center gap-2">
+                  <Icon className="h-3 w-3 text-muted-foreground shrink-0" />
+                  <p className="text-xs font-mono font-medium text-foreground/80">
+                    {insight.title}
                   </p>
                 </div>
-              );
-            })}
-          </div>
-
-          {/* Meta */}
-          <div className="flex items-center justify-between text-[9px] font-mono text-muted-foreground/40 pt-1">
-            <span>
-              Based on {data?.reflection_count} reflections
-              {data?.period_start && data?.period_end && (
-                <> · {format(new Date(data.period_start), 'MMM d')} – {format(new Date(data.period_end), 'MMM d, yyyy')}</>
-              )}
-            </span>
-            {isStale && (
-              <span className="text-primary/50">Refresh recommended</span>
-            )}
-          </div>
-        </>
-      )}
+                <p className="text-xs text-muted-foreground leading-relaxed pl-5">
+                  {insight.body}
+                </p>
+              </div>
+            );
+          })}
+        </div>
+      ))}
     </div>
   );
 }
