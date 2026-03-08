@@ -29,7 +29,7 @@ export function useHolzen() {
   const [message, setMessage] = useState<string | null>(null);
   const [context, setContext] = useState<string | null>(null);
   const [companions, setCompanions] = useState<CompanionData>({ haiku: null, learningTitle: null, learningBody: null });
-  const [companionPrefs, setCompanionPrefsState] = useState<CompanionPrefs>({ breathing: true, haiku: true, learning: true, signal: true });
+  const [companionPrefs, setCompanionPrefsState] = useState<CompanionPrefs>({ breathing: true, haiku: true, learning: true, signal: true, zoomOut: true });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [newReflection, setNewReflection] = useState(false);
