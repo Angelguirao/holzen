@@ -726,10 +726,10 @@ const History = () => {
                   </button>
                   <button
                     onClick={() => toggleFavorite(r.id)}
-                    className={`p-1 transition-colors ${r.is_favorite ? 'text-foreground' : 'text-muted-foreground/40 hover:text-foreground'}`}
+                    className={`p-1 transition-colors ${r.is_favorite ? 'text-destructive' : 'text-muted-foreground/40 hover:text-destructive'}`}
                     aria-label={r.is_favorite ? 'Remove from favorites' : 'Add to favorites'}
                   >
-                    <Star className={`h-3 w-3 ${r.is_favorite ? 'fill-current' : ''}`} />
+                    <Heart className={`h-3 w-3 ${r.is_favorite ? 'fill-current' : ''}`} />
                   </button>
                   <ShareReflection message={r.message} context={r.context} haiku={r.haiku} />
                   <ReflectionWallpaper message={r.message} mood={r.mood} context={r.context} haiku={r.haiku} />
