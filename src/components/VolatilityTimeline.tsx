@@ -246,7 +246,7 @@ export function VolatilityTimeline() {
               tick={{ fontSize: 9, fill: 'hsl(var(--muted-foreground))' }}
               tickLine={false}
               axisLine={false}
-              tickFormatter={(v: number) => `$${(v / 1000).toFixed(0)}k`}
+              tickFormatter={(v: number) => formatBtcPrice(v, currency).replace(/\.00$/, '')}
               width={45}
             />
             <RechartsTooltip
