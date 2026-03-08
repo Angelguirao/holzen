@@ -6,6 +6,7 @@ import { List, Share2, Star, Search, Tag, FolderOpen, Filter, X } from 'lucide-r
 import { LibraryItems } from '@/components/library/LibraryItems';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const GraphView = lazy(() => import('@/components/library/GraphView'));
 
