@@ -12,7 +12,6 @@ import { ReflectionTags } from '@/components/ReflectionTags';
 import { ShareReflection } from '@/components/ShareReflection';
 import { ReflectionWallpaper } from '@/components/ReflectionWallpaper';
 import { SaveToLibraryButton } from '@/components/library/SaveToLibraryButton';
-import { HolzenRitual, type RitualTemplate } from '@/components/HolzenRitual';
 import { OutcomePrompt } from '@/components/OutcomePrompt';
 
 const DECISIONS = [
