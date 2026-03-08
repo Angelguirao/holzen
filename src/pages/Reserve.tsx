@@ -11,12 +11,13 @@ const fade = (delay = 0) => ({
   transition: { duration: 0.6, delay, ease: [0.25, 0.1, 0.25, 1] },
 });
 
-// Treasury data — update periodically
+// Treasury data — update when first BTC is acquired
 const TREASURY = {
-  totalBtc: 0.25,
-  averageCost: 62_400,
-  lastUpdated: '2026-03-01',
-  percentOfTreasury: 85,
+  totalBtc: 0,
+  averageCost: 0,
+  lastUpdated: '2026-03-08',
+  percentOfTreasury: 0,
+  hasStarted: false,
 };
 
 function useBtcPrice() {
