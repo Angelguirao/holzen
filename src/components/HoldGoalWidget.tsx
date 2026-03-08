@@ -2,8 +2,8 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useHolzen } from '@/hooks/use-holzen';
-import { formatBtcPrice } from '@/lib/btc';
-import { Target, Calendar, DollarSign, Infinity, X, Check, CalendarIcon } from 'lucide-react';
+import { formatBtcPrice, SUPPORTED_CURRENCIES } from '@/lib/btc';
+import { Target, Calendar, Coins, Infinity, X, Check, CalendarIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { differenceInDays, format } from 'date-fns';
@@ -76,8 +76,9 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
     }
 
     if (type === 'price') {
-      if (val < MIN_PRICE) return 'Minimum $1';
-      if (val > MAX_PRICE) return `Maximum $${MAX_PRICE.toLocaleString()}`;
+      const sym = SUPPORTED_CURRENCIES.find(c => c.code === currency)?.symbol ?? currency;
+      if (val < MIN_PRICE) return `Minimum ${sym}1`;
+      if (val > MAX_PRICE) return `Maximum ${sym}${MAX_PRICE.toLocaleString()}`;
       if (currentPrice && val <= currentPrice) return 'Target should be above current price';
     }
 
@@ -191,7 +192,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
                   : 'text-muted-foreground/50 hover:text-muted-foreground'
               }`}
             >
-              {t === 'time' ? <Calendar className="h-2.5 w-2.5" /> : t === 'price' ? <DollarSign className="h-2.5 w-2.5" /> : <Infinity className="h-2.5 w-2.5" />}
+              {t === 'time' ? <Calendar className="h-2.5 w-2.5" /> : t === 'price' ? <Coins className="h-2.5 w-2.5" /> : <Infinity className="h-2.5 w-2.5" />}
               {t === 'time' ? 'Time' : t === 'price' ? 'Price' : 'Forever'}
             </button>
           ))}
