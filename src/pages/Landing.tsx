@@ -61,6 +61,11 @@ const Landing = () => {
           </div>
         </motion.div>
 
+        {/* The Holzen Number */}
+        <motion.div {...m(0.15)}>
+          <HolzenNumber />
+        </motion.div>
+
         {/* The loop */}
         <div className="space-y-5">
           <motion.p
