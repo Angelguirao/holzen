@@ -129,10 +129,10 @@ const Settings = () => {
     try {
       const { error } = await supabase.functions.invoke('delete-account');
       if (error) throw error;
-      toast('Account deleted');
+      toast.success('Account deleted');
       await signOut();
     } catch {
-      toast('Failed to delete account');
+      toast.error('Failed to delete account', { description: 'Please try again or contact support.' });
       setDeleting(false);
     }
   };
