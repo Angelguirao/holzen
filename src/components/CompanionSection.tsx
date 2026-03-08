@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, forwardRef } from 'react';
 import { BreathingExercise } from './BreathingExercise';
 import { HaikuDisplay } from './HaikuDisplay';
 import { LearningInput } from './LearningInput';
@@ -94,7 +94,7 @@ function CollapsibleCompanion({
   );
 }
 
-export function CompanionSection({ companions, prefs, severity = 'mild', reflectionId, context, reflectionMessage }: Props) {
+export const CompanionSection = forwardRef<HTMLDivElement, Props>(function CompanionSection({ companions, prefs, severity = 'mild', reflectionId, context, reflectionMessage }, ref) {
   const { language } = useHolzen();
 
   // Static English labels — language setting only affects AI-generated content
@@ -402,7 +402,7 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
   if (!hasBreathing && !hasHaiku && !hasLearning && !hasSignal && !hasZoomOut && !hasHistory) return null;
 
   return (
-    <div className="space-y-3 pt-2 border-t border-border/40">
+    <div ref={ref} className="space-y-3 pt-2 border-t border-border/40">
       <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">
         {t.pause}
       </p>
@@ -507,4 +507,4 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
       )}
     </div>
   );
-}
+});
