@@ -1,10 +1,12 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Pin, PinOff, Trash2, ExternalLink, Tag, X, Eye, EyeOff, Archive, FolderPlus } from 'lucide-react';
+import { Pin, PinOff, Trash2, ExternalLink, Tag, X, Eye, EyeOff, Archive, FolderPlus, Link2 } from 'lucide-react';
 import type { LibraryItem, Collection } from '@/hooks/use-library';
 import { useTranslation } from 'react-i18next';
 import { AddToCollectionButton } from './AddToCollectionButton';
 
 const SOURCE_LABELS: Record<string, string> = {
+  reflection: 'Reflection',
+  reflection_note: 'Note',
   signal: 'Signal',
   learning: 'Learning',
   haiku: 'Haiku',
@@ -25,6 +27,7 @@ interface Props {
   onDelete: (id: string) => void;
   onStatusChange: (id: string, status: 'unread' | 'read' | 'archived') => void;
   onUpdateTags?: (id: string, tags: string[]) => void;
+  linkedItems?: LibraryItem[];
   collections?: Collection[];
   itemCollections?: Collection[];
   onAddToCollection?: (collectionId: string, itemId: string) => Promise<any>;
@@ -32,7 +35,7 @@ interface Props {
 }
 
 export function LibraryItemCard({
-  item, onTogglePin, onDelete, onStatusChange, onUpdateTags,
+  item, onTogglePin, onDelete, onStatusChange, onUpdateTags, linkedItems,
   collections, itemCollections, onAddToCollection, onRemoveFromCollection,
 }: Props) {
   const { t } = useTranslation();
@@ -196,6 +199,21 @@ export function LibraryItemCard({
             placeholder="Type a tag + Enter…"
             className="w-full text-[10px] font-mono px-2 py-1 rounded border border-border/60 bg-background text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/40 transition-colors"
           />
+        </div>
+      )}
+
+      {/* Linked companions */}
+      {linkedItems && linkedItems.length > 0 && (
+        <div className="px-3 pb-2 flex items-center gap-1.5 flex-wrap">
+          <Link2 className="h-2.5 w-2.5 text-muted-foreground/30" />
+          {linkedItems.map((li) => (
+            <span
+              key={li.id}
+              className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground/60"
+            >
+              {SOURCE_LABELS[li.source_type ?? ''] ?? li.source_type}
+            </span>
+          ))}
         </div>
       )}
     </div>
