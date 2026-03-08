@@ -1,3 +1,4 @@
+import { useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
@@ -5,6 +6,9 @@ import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { PageMeta } from '@/components/PageMeta';
+import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
+
+const PAGE_SIZE = 20;
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 14 },
@@ -13,22 +17,57 @@ const fade = (delay = 0) => ({
   transition: { duration: 0.6, delay, ease: [0.25, 0.1, 0.25, 1] },
 });
 
+interface BlogPost {
+  id: string;
+  slug: string;
+  title: string;
+  excerpt: string | null;
+  published_at: string | null;
+}
+
 const Blog = () => {
   const prefersReduced = useReducedMotion();
   const m = (delay = 0) => (prefersReduced ? {} : fade(delay));
+  const [posts, setPosts] = useState<BlogPost[]>([]);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
 
-  const { data: posts, isLoading } = useQuery({
-    queryKey: ['blog-posts'],
+  const { isLoading } = useQuery({
+    queryKey: ['blog-posts-initial'],
     queryFn: async () => {
       const { data, error } = await supabase
         .from('blog_posts')
         .select('id, slug, title, excerpt, published_at')
         .eq('published', true)
-        .order('published_at', { ascending: false });
+        .order('published_at', { ascending: false })
+        .limit(PAGE_SIZE);
       if (error) throw error;
-      return data;
+      const rows = (data ?? []) as BlogPost[];
+      setPosts(rows);
+      setHasMore(rows.length === PAGE_SIZE);
+      return rows;
     },
   });
+
+  const loadMore = useCallback(async () => {
+    if (loadingMore || !hasMore) return;
+    setLoadingMore(true);
+    const last = posts[posts.length - 1];
+    if (!last?.published_at) { setLoadingMore(false); return; }
+    const { data } = await supabase
+      .from('blog_posts')
+      .select('id, slug, title, excerpt, published_at')
+      .eq('published', true)
+      .order('published_at', { ascending: false })
+      .lt('published_at', last.published_at)
+      .limit(PAGE_SIZE);
+    const rows = (data ?? []) as BlogPost[];
+    setPosts((prev) => [...prev, ...rows]);
+    setHasMore(rows.length === PAGE_SIZE);
+    setLoadingMore(false);
+  }, [loadingMore, hasMore, posts]);
+
+  const sentinelRef = useInfiniteScroll({ hasMore, loading: loadingMore, onLoadMore: loadMore });
 
   return (
     <div className="min-h-screen flex items-start justify-center px-6 py-16">
@@ -91,6 +130,10 @@ const Blog = () => {
                 </Link>
               </motion.div>
             ))}
+            <div ref={sentinelRef} className="h-1" />
+            {loadingMore && (
+              <p className="text-[10px] font-mono text-muted-foreground animate-pulse text-center">Loading more…</p>
+            )}
           </div>
         ) : (
           <motion.div {...m(0.1)}>
