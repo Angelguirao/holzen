@@ -1,6 +1,14 @@
 export interface FearGreedData {
   value: number;
-  label: string; // e.g. "Extreme Fear", "Fear", "Neutral", "Greed", "Extreme Greed"
+  label: string;
+}
+
+export interface OnChainData {
+  mempoolSize?: number; // number of unconfirmed txs
+  fastestFee?: number; // sat/vB
+  medianFee?: number;
+  hashrate?: string; // human-readable
+  blockHeight?: number;
 }
 
 export interface BtcPriceData {
@@ -11,6 +19,7 @@ export interface BtcPriceData {
   cumulativeChangePercent?: number;
   cumulativeDirection?: 'up' | 'down';
   fearGreed?: FearGreedData;
+  onChain?: OnChainData;
 }
 
 async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise<Response> {
