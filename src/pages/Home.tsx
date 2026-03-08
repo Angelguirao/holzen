@@ -124,6 +124,7 @@ const Home = () => {
 
   useEffect(() => {
     if (newReflection && message) {
+      playNotificationTone();
       toast('New reflection', {
         description: message.slice(0, 80) + (message.length > 80 ? '…' : ''),
         duration: 6000,
@@ -131,6 +132,11 @@ const Home = () => {
       clearNewReflection();
     }
   }, [newReflection, message, clearNewReflection]);
+
+  // Pre-cache the notification tone
+  useEffect(() => {
+    prefetchNotificationTone();
+  }, []);
 
   useEffect(() => {
     document.title = 'Holzen — Home';
