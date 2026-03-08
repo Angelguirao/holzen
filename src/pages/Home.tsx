@@ -8,6 +8,7 @@ import { BtcStatus } from '@/components/BtcStatus';
 import { NightReflectionCard } from '@/components/NightReflectionCard';
 import { ReflectionMessage } from '@/components/ReflectionMessage';
 import { OutcomePrompt } from '@/components/OutcomePrompt';
+import { HolzenNumber } from '@/components/HolzenNumber';
 import { MoodCheck, type MoodValue } from '@/components/MoodCheck';
 import { Onboarding } from '@/components/Onboarding';
 import { Separator } from '@/components/ui/separator';
