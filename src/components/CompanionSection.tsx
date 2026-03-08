@@ -611,7 +611,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
 
       {hasZoomOut && (
         <CollapsibleCompanion
-          label={t.zoomOut}
+          label={labels.zoomOut}
           expanded={expandedZoomOut}
           onToggle={() => {
             setExpandedZoomOut((v) => !v);
