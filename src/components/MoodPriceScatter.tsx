@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, forwardRef } from 'react';
 import { ChartEmptyState } from './ChartEmptyState';
 import {
   ScatterChart,
