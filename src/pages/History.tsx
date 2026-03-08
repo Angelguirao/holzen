@@ -526,7 +526,7 @@ const History = () => {
                       onClick={clearAllFilters}
                       className="text-[10px] font-mono text-muted-foreground hover:text-foreground transition-colors underline underline-offset-2"
                     >
-                      Clear all filters
+                      {t('history.clearAllFilters')}
                     </button>
                   )}
                 </div>
