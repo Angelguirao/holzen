@@ -443,7 +443,7 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
 
       {hasLearning && (
         <CollapsibleCompanion
-          label="Ground yourself"
+          label={t.ground}
           expanded={expandedLearning}
           onToggle={() => {
             setExpandedLearning((v) => !v);
