@@ -36,7 +36,7 @@ interface Props {
 }
 
 export function LibraryItemCard({
-  item, onTogglePin, onDelete, onStatusChange, onUpdateTags, linkedItems,
+  item, onTogglePin, onToggleFavorite, onDelete, onStatusChange, onUpdateTags, linkedItems,
   collections, itemCollections, onAddToCollection, onRemoveFromCollection,
 }: Props) {
   const { t } = useTranslation();
