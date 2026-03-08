@@ -151,48 +151,110 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate }: Prop
         })}
       </div>
 
-      {/* Selected day detail */}
-      {selectedDate && (
-        <div className="space-y-2 pt-2 border-t border-border/30">
-          <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">
-            {format(selectedDate, 'EEEE, MMMM d, yyyy')}
-          </p>
-          {(activityMap.get(format(selectedDate, 'yyyy-MM-dd')) || []).length === 0 ? (
-            <p className="text-xs text-muted-foreground/40 italic">No activity.</p>
-          ) : (
-            <div className="space-y-1">
-              {(activityMap.get(format(selectedDate, 'yyyy-MM-dd')) || []).map((a) => (
-                <div key={a.id} className="flex items-center gap-2 text-xs">
-                  {a.type === 'reflection' && (
-                    <>
-                      <span className={cn('h-2 w-2 rounded-full', MOOD_COLORS[a.mood || ''] || 'bg-foreground/30')} />
-                      <span className="text-muted-foreground capitalize">{a.mood || 'reflection'}</span>
-                    </>
-                  )}
-                  {a.type === 'ritual' && (
-                    <>
-                      <Sparkles className="h-2.5 w-2.5 text-primary/60" />
-                      <span className="text-muted-foreground">{a.label || 'Ritual'}</span>
-                    </>
-                  )}
-                  {a.type === 'letter' && (
-                    <>
-                      <Scroll className="h-2.5 w-2.5 text-amber-500/60" />
-                      <span className="text-muted-foreground">{a.label || 'Letter'}</span>
-                    </>
-                  )}
-                  {a.type === 'badge' && (
-                    <>
-                      <Award className="h-2.5 w-2.5 text-yellow-500/60" />
-                      <span className="text-muted-foreground capitalize">{a.label?.replace(/-/g, ' ') || 'Badge'}</span>
-                    </>
-                  )}
-                </div>
-              ))}
+      {/* Selected day summary */}
+      {selectedDate && (() => {
+        const dayItems = activityMap.get(format(selectedDate, 'yyyy-MM-dd')) || [];
+        if (dayItems.length === 0) {
+          return (
+            <div className="pt-2 border-t border-border/30">
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">
+                {format(selectedDate, 'EEEE, MMMM d, yyyy')}
+              </p>
+              <p className="text-xs text-muted-foreground/40 italic mt-1">No activity.</p>
             </div>
-          )}
-        </div>
-      )}
+          );
+        }
+
+        const reflections = dayItems.filter((a) => a.type === 'reflection');
+        const ritualsList = dayItems.filter((a) => a.type === 'ritual');
+        const lettersList = dayItems.filter((a) => a.type === 'letter');
+        const badgesList = dayItems.filter((a) => a.type === 'badge');
+
+        // Mood breakdown
+        const moodCounts: Record<string, number> = {};
+        reflections.forEach((r) => {
+          const m = r.mood || 'neutral';
+          moodCounts[m] = (moodCounts[m] || 0) + 1;
+        });
+        const totalMoods = reflections.length;
+        const sortedMoods = Object.entries(moodCounts).sort((a, b) => b[1] - a[1]);
+
+        return (
+          <div className="space-y-3 pt-3 border-t border-border/30">
+            <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">
+              {format(selectedDate, 'EEEE, MMMM d, yyyy')}
+            </p>
+
+            {/* Activity counts */}
+            <div className="flex items-center gap-3">
+              {reflections.length > 0 && (
+                <span className="text-[10px] font-mono text-muted-foreground">
+                  {reflections.length} reflection{reflections.length !== 1 ? 's' : ''}
+                </span>
+              )}
+              {ritualsList.length > 0 && (
+                <span className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
+                  <Sparkles className="h-2.5 w-2.5 text-primary/60" />
+                  {ritualsList.length} ritual{ritualsList.length !== 1 ? 's' : ''}
+                </span>
+              )}
+              {lettersList.length > 0 && (
+                <span className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
+                  <Scroll className="h-2.5 w-2.5 text-amber-500/60" />
+                  {lettersList.length} letter{lettersList.length !== 1 ? 's' : ''}
+                </span>
+              )}
+              {badgesList.length > 0 && (
+                <span className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
+                  <Award className="h-2.5 w-2.5 text-yellow-500/60" />
+                  {badgesList.length} badge{badgesList.length !== 1 ? 's' : ''}
+                </span>
+              )}
+            </div>
+
+            {/* Mood breakdown bar */}
+            {totalMoods > 0 && (
+              <div className="space-y-1.5">
+                <div className="flex h-2 rounded-full overflow-hidden">
+                  {sortedMoods.map(([mood, count]) => (
+                    <div
+                      key={mood}
+                      className={cn('h-full', MOOD_COLORS[mood] || 'bg-foreground/20')}
+                      style={{ width: `${(count / totalMoods) * 100}%` }}
+                    />
+                  ))}
+                </div>
+                <div className="flex flex-wrap gap-x-3 gap-y-0.5">
+                  {sortedMoods.map(([mood, count]) => (
+                    <span key={mood} className="flex items-center gap-1 text-[9px] font-mono text-muted-foreground/60">
+                      <span className={cn('h-[5px] w-[5px] rounded-full', MOOD_COLORS[mood] || 'bg-foreground/20')} />
+                      {mood} ({count})
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Notable events: rituals and badges (not every reflection) */}
+            {(ritualsList.length > 0 || badgesList.length > 0) && (
+              <div className="space-y-1">
+                {ritualsList.map((r) => (
+                  <div key={r.id} className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Sparkles className="h-2.5 w-2.5 text-primary/60 shrink-0" />
+                    <span>{r.label || 'Ritual'}</span>
+                  </div>
+                ))}
+                {badgesList.map((b) => (
+                  <div key={b.id} className="flex items-center gap-2 text-xs text-muted-foreground">
+                    <Award className="h-2.5 w-2.5 text-yellow-500/60 shrink-0" />
+                    <span className="capitalize">{b.label?.replace(/-/g, ' ') || 'Badge'}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })()}
     </div>
   );
 }
