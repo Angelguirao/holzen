@@ -6,22 +6,31 @@ import { hapticFeedback } from '@/lib/haptics';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useHolzen } from '@/hooks/use-holzen';
+import { useTranslation } from 'react-i18next';
 import { RitualBreathing, RitualReflect, RitualJournal, RitualDecide } from './ritual';
 
 export type RitualTemplate = 'quick' | 'standard' | 'deep';
 
 export interface RitualStep {
   id: 'breathe' | 'reflect' | 'journal' | 'decide';
-  label: string;
+  labelKey: string;
   icon: typeof Wind;
 }
 
 const ALL_STEPS: RitualStep[] = [
-  { id: 'breathe', label: 'Breathe', icon: Wind },
-  { id: 'reflect', label: 'Reflect', icon: Eye },
-  { id: 'journal', label: 'Journal', icon: PenLine },
-  { id: 'decide', label: 'Decide', icon: Target },
+  { id: 'breathe', labelKey: 'breathing.phases.inhale', icon: Wind },
+  { id: 'reflect', labelKey: 'ritual.reflect.iveReflected', icon: Eye },
+  { id: 'journal', labelKey: 'ritualJournal.writeItOut', icon: PenLine },
+  { id: 'decide', labelKey: 'ritual.decide.prompt', icon: Target },
 ];
+
+// Step labels for the progress display
+const STEP_LABEL_KEYS: Record<string, string> = {
+  breathe: 'ritualBreathing.exhale',
+  reflect: 'settings.companionLabels.zoomOut',
+  journal: 'ritualJournal.writeItOut',
+  decide: 'ritual.decide.hold',
+};
 
 const TEMPLATES: Record<RitualTemplate, string[]> = {
   quick: ['breathe', 'decide'],
@@ -29,10 +38,10 @@ const TEMPLATES: Record<RitualTemplate, string[]> = {
   deep: ['breathe', 'reflect', 'journal', 'decide'],
 };
 
-export const TEMPLATE_LABELS: Record<RitualTemplate, { label: string; description: string }> = {
-  quick: { label: 'Quick', description: 'Breathe → Decide' },
-  standard: { label: 'Standard', description: 'Breathe → Reflect → Decide' },
-  deep: { label: 'Deep', description: 'Breathe → Reflect → Journal → Decide' },
+export const TEMPLATE_LABELS: Record<RitualTemplate, { labelKey: string; descKey: string }> = {
+  quick: { labelKey: 'settings.ritualTemplates.quick', descKey: 'settings.ritualTemplates.quickDesc' },
+  standard: { labelKey: 'settings.ritualTemplates.standard', descKey: 'settings.ritualTemplates.standardDesc' },
+  deep: { labelKey: 'settings.ritualTemplates.deep', descKey: 'settings.ritualTemplates.deepDesc' },
 };
 
 interface HolzenRitualProps {
@@ -45,6 +54,7 @@ interface HolzenRitualProps {
 }
 
 export function HolzenRitual({ open, onClose, template, reflectionMessage, reflectionId, onDecision }: HolzenRitualProps) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { mantra, motivations } = useHolzen();
   const steps = TEMPLATES[template]
@@ -60,7 +70,6 @@ export function HolzenRitual({ open, onClose, template, reflectionMessage, refle
 
   const hasMantra = !!(mantra || motivations.length > 0);
 
-  // Show mantra briefly before the first step
   useEffect(() => {
     if (open && hasMantra && currentStep === 0 && !completed) {
       setShowMantra(true);
@@ -81,7 +90,6 @@ export function HolzenRitual({ open, onClose, template, reflectionMessage, refle
   }, [currentStep, steps.length]);
 
   const skipStep = useCallback(() => {
-    // Can't skip the final decide step
     if (step.id === 'decide') return;
     hapticFeedback('light');
     advance();
@@ -91,7 +99,6 @@ export function HolzenRitual({ open, onClose, template, reflectionMessage, refle
     if (!user) return;
     const durationSeconds = Math.round((Date.now() - startTimeRef.current) / 1000);
 
-    // Save to ritual_completions
     await supabase.from('ritual_completions' as any).insert({
       user_id: user.id,
       reflection_id: reflectionId || null,
@@ -101,7 +108,6 @@ export function HolzenRitual({ open, onClose, template, reflectionMessage, refle
       duration_seconds: durationSeconds,
     });
 
-    // Save journal text to the reflection's note field if linked
     if (reflectionId && journal) {
       await supabase
         .from('reflections')
@@ -128,6 +134,14 @@ export function HolzenRitual({ open, onClose, template, reflectionMessage, refle
     startTimeRef.current = Date.now();
     onClose();
   }, [onClose]);
+
+  // Simple step label for progress
+  const stepLabels: Record<string, string> = {
+    breathe: t('breathing.phases.inhale'),
+    reflect: t('ritual.reflect.iveReflected'),
+    journal: t('ritualJournal.writeItOut'),
+    decide: t('ritual.decide.hold'),
+  };
 
   return (
     <AnimatePresence>
@@ -173,14 +187,14 @@ export function HolzenRitual({ open, onClose, template, reflectionMessage, refle
             {!completed && (
               <div className="flex items-center justify-center gap-3 mb-2">
                 <p className="text-[10px] font-mono text-muted-foreground/50 uppercase tracking-[0.2em] text-center">
-                  {step.label} · {currentStep + 1}/{steps.length}
+                  {stepLabels[step.id] || step.id} · {currentStep + 1}/{steps.length}
                 </p>
                 {step.id !== 'decide' && (
                   <button
                     onClick={skipStep}
                     className="flex items-center gap-0.5 text-[10px] font-mono text-muted-foreground/30 hover:text-muted-foreground/60 transition-colors"
                   >
-                    Skip <ChevronRight className="h-2.5 w-2.5" />
+                    {t('ritualFlow.skip')} <ChevronRight className="h-2.5 w-2.5" />
                   </button>
                 )}
               </div>
@@ -204,7 +218,7 @@ export function HolzenRitual({ open, onClose, template, reflectionMessage, refle
                   )}
                   {!mantra && motivations.length > 0 && (
                     <p className="text-xs font-mono text-muted-foreground/60 tracking-wider uppercase">
-                      Remember why you hold
+                      {t('ritualFlow.rememberWhy')}
                     </p>
                   )}
                 </motion.div>
@@ -224,15 +238,15 @@ export function HolzenRitual({ open, onClose, template, reflectionMessage, refle
                     <Check className="h-5 w-5 text-primary" />
                   </div>
                   <div className="text-center space-y-2">
-                    <p className="text-sm font-mono">Ritual complete</p>
+                    <p className="text-sm font-mono">{t('ritualFlow.ritualComplete')}</p>
                     {decision && (
                       <p className="text-xs text-muted-foreground">
-                        Decision: <span className="text-foreground">{decision}</span>
+                        {t('ritualFlow.decision')}: <span className="text-foreground">{decision}</span>
                       </p>
                     )}
                   </div>
                   <Button variant="outline" size="sm" onClick={handleClose} className="font-mono text-xs">
-                    Return
+                    {t('ritualFlow.return')}
                   </Button>
                 </motion.div>
               ) : !showMantra ? (
@@ -245,7 +259,7 @@ export function HolzenRitual({ open, onClose, template, reflectionMessage, refle
                 >
                   {step.id === 'breathe' && <RitualBreathing onComplete={advance} />}
                   {step.id === 'reflect' && <RitualReflect message={reflectionMessage} onComplete={advance} />}
-                  {step.id === 'journal' && <RitualJournal onComplete={(t) => { setJournalText(t); advance(); }} />}
+                  {step.id === 'journal' && <RitualJournal onComplete={(txt) => { setJournalText(txt); advance(); }} />}
                   {step.id === 'decide' && <RitualDecide onComplete={handleDecision} />}
                 </motion.div>
               ) : null}

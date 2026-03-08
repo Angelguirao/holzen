@@ -17,14 +17,6 @@ interface Props {
   onComplete: (result: OnboardingResult) => void;
 }
 
-const sampleReflection = {
-  context: 'BTC is down 7.2% in the last 24 hours. Market sentiment: Extreme Fear (18/100).',
-  message: 'A sharp move invites reaction. This is a moment to observe the impulse before following it.',
-  haiku: 'Numbers fall like rain\nThe urge to act rises fast\nBreathe before you move',
-  learningTitle: 'Panic Selling and Recovery',
-  learningBody: 'After Bitcoin\'s 30% drop in May 2021, it recovered within three months. Historically, sharp declines have often preceded periods of consolidation rather than further collapse.',
-};
-
 const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 export function Onboarding({ onComplete }: Props) {
@@ -39,7 +31,6 @@ export function Onboarding({ onComplete }: Props) {
   const [learningExpanded, setLearningExpanded] = useState(false);
   const prefersReduced = useReducedMotion();
 
-  // 3 steps: Welcome + Name, Companions Preview, Threshold
   const totalSteps = 3;
   const isPreviewStep = step === 1;
   const isThresholdStep = step === 2;
@@ -145,10 +136,10 @@ export function Onboarding({ onComplete }: Props) {
                     {...stagger(0.25)}
                   >
                     <p className="text-[10px] font-mono text-muted-foreground/60">
-                      {sampleReflection.context}
+                      {t('onboardingSample.context')}
                     </p>
                     <p className="text-sm leading-relaxed">
-                      {sampleReflection.message}
+                      {t('onboardingSample.message')}
                     </p>
 
                     <div className="space-y-3 pt-3 border-t border-border/30">
@@ -196,7 +187,7 @@ export function Onboarding({ onComplete }: Props) {
                             animate={{ opacity: 1, height: 'auto' }}
                             transition={{ duration: 0.3 }}
                           >
-                            <HaikuDisplay haiku={sampleReflection.haiku} />
+                            <HaikuDisplay haiku={t('onboardingSample.haiku')} />
                           </motion.div>
                         ) : (
                           <motion.button
@@ -220,8 +211,8 @@ export function Onboarding({ onComplete }: Props) {
                             transition={{ duration: 0.3 }}
                           >
                             <LearningInput
-                              title={sampleReflection.learningTitle}
-                              body={sampleReflection.learningBody}
+                              title={t('onboardingSample.learningTitle')}
+                              body={t('onboardingSample.learningBody')}
                             />
                           </motion.div>
                         ) : (
