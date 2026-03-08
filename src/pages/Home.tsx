@@ -37,7 +37,7 @@ import {
   verticalListSortingStrategy,
   arrayMove,
 } from '@dnd-kit/sortable';
-import { restrictToVerticalAxis, restrictToParentElement } from '@dnd-kit/modifiers';
+import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 
 // Widget IDs
 const WIDGET_IDS = ['btc-status', 'reflection', 'night', 'letter', 'actions'] as const;
