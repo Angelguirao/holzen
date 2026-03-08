@@ -6,6 +6,14 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+async function validateUrl(url: string, fallbackQuery: string): Promise<string> {
+  try {
+    const res = await fetch(url, { method: 'HEAD', redirect: 'follow' });
+    if (res.ok || res.status === 405 || res.status === 403) return url; // 405/403 = exists but blocks HEAD
+  } catch { /* broken */ }
+  return `https://www.google.com/search?q=${encodeURIComponent(fallbackQuery)}`;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
