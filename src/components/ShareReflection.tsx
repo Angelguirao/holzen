@@ -1,10 +1,11 @@
 import { useCallback, forwardRef } from 'react';
-import { Share2, Copy, Image } from 'lucide-react';
+import { Share2, Copy, Image, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { toast } from 'sonner';
@@ -13,6 +14,12 @@ interface Props {
   message: string;
   context?: string | null;
   haiku?: string | null;
+}
+
+function buildShareText(message: string, context?: string | null): string {
+  return context
+    ? `${context}\n\n${message}\n\n— Holzen\nholzen.lovable.app`
+    : `${message}\n\n— Holzen\nholzen.lovable.app`;
 }
 
 function wrapText(
@@ -159,12 +166,9 @@ function generateShareImage(
 
 export const ShareReflection = forwardRef<HTMLButtonElement, Props>(
   function ShareReflection({ message, context, haiku }, ref) {
-    
 
     const copyText = useCallback(async () => {
-      const text = context
-        ? `${context}\n\n${message}\n\n— Holzen`
-        : `${message}\n\n— Holzen`;
+      const text = buildShareText(message, context);
       await navigator.clipboard.writeText(text);
       toast('Copied to clipboard');
     }, [message, context]);
@@ -195,21 +199,23 @@ export const ShareReflection = forwardRef<HTMLButtonElement, Props>(
       }
     }, [message, context, haiku]);
 
-    const shareText = useCallback(async () => {
-      const text = context
-        ? `${context}\n\n${message}\n\n— Holzen`
-        : `${message}\n\n— Holzen`;
+    const shareToX = useCallback(() => {
+      const text = buildShareText(message, context);
+      const url = `https://x.com/intent/tweet?text=${encodeURIComponent(text)}`;
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }, [message, context]);
 
-      if (navigator.share) {
-        try {
-          await navigator.share({ text });
-        } catch (e: any) {
-          if (e.name !== 'AbortError') await copyText();
-        }
-      } else {
-        await copyText();
-      }
-    }, [message, context, copyText]);
+    const shareToWhatsApp = useCallback(() => {
+      const text = buildShareText(message, context);
+      const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }, [message, context]);
+
+    const shareToTelegram = useCallback(() => {
+      const text = buildShareText(message, context);
+      const url = `https://t.me/share/url?url=${encodeURIComponent('https://holzen.lovable.app')}&text=${encodeURIComponent(text)}`;
+      window.open(url, '_blank', 'noopener,noreferrer');
+    }, [message, context]);
 
     return (
       <DropdownMenu>
@@ -229,13 +235,22 @@ export const ShareReflection = forwardRef<HTMLButtonElement, Props>(
             <Copy className="h-3 w-3" />
             Copy text
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={shareText} className="text-xs gap-2">
-            <Share2 className="h-3 w-3" />
-            Share text
-          </DropdownMenuItem>
           <DropdownMenuItem onClick={shareImage} className="text-xs gap-2">
             <Image className="h-3 w-3" />
             Share as image
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onClick={shareToX} className="text-xs gap-2">
+            <ExternalLink className="h-3 w-3" />
+            Post on X
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={shareToWhatsApp} className="text-xs gap-2">
+            <ExternalLink className="h-3 w-3" />
+            WhatsApp
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={shareToTelegram} className="text-xs gap-2">
+            <ExternalLink className="h-3 w-3" />
+            Telegram
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
