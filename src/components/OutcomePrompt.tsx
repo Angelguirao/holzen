@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { Hand, TrendingDown, TrendingUp, Minus, Check, Flame } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { hapticFeedback } from '@/lib/haptics';
 
 const outcomes = [
   { value: 'held', label: 'Held', icon: Hand },
