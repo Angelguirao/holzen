@@ -533,6 +533,20 @@ const Settings = () => {
               </div>
             </div>
 
+            {/* Haptic Feedback */}
+            <div className="space-y-3">
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">Haptic feedback</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Vibration feedback on interactions (mobile only).
+              </p>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="haptic-toggle" className="text-xs font-mono text-muted-foreground">
+                  Enable haptics
+                </Label>
+                <Switch id="haptic-toggle" checked={hapticEnabled} onCheckedChange={(val) => { setHapticEnabledState(val); setHapticEnabled(val); }} />
+              </div>
+            </div>
+
             {/* Zen Mode */}
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">Zen mode</p>
