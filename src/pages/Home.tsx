@@ -279,7 +279,7 @@ const Home = () => {
             <motion.div key="zen-loading" variants={zenVariants} initial="hidden" animate="visible" exit="hidden" className="space-y-4">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Loader2 className="h-3 w-3 animate-spin" />
-                <p className="text-xs font-mono">Generating reflection</p>
+                <p className="text-xs font-mono">Generating reflection…</p>
               </div>
               <Skeleton className="h-4 w-full" />
               <Skeleton className="h-4 w-3/4" />
