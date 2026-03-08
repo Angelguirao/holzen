@@ -278,15 +278,26 @@ const Home = () => {
           )}
 
           {message ? (
-            <ReflectionMessage
-              message={message}
-              context={context}
-              onDismiss={handleDismiss}
-              companions={companions}
-              companionPrefs={companionPrefs}
-              severity={severity}
-              reflectionId={lastReflectionId}
-            />
+            <div className="space-y-4">
+              <ReflectionMessage
+                message={message}
+                context={context}
+                onDismiss={handleDismiss}
+                companions={companions}
+                companionPrefs={companionPrefs}
+                severity={severity}
+                reflectionId={lastReflectionId}
+              />
+              <button
+                onClick={() => setShowRitual(true)}
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-md border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors"
+              >
+                <Sparkles className="h-3 w-3 text-primary/60" />
+                <span className="text-[10px] font-mono text-primary/60 tracking-[0.15em] uppercase">
+                  Start ritual before deciding
+                </span>
+              </button>
+            </div>
 
           ) : showOutcome && outcomeReflectionId ? (
             <OutcomePrompt
