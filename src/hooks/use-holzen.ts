@@ -376,7 +376,13 @@ export function useHolzen() {
     return nowHour >= quietHoursStart || nowHour < quietHoursEnd;
   }, [quietHoursStart, quietHoursEnd]);
 
+  const checkingRef = useRef(false);
+
   const checkAndTrigger = useCallback(async () => {
+    // Prevent concurrent checks that could fire duplicate reflections
+    if (checkingRef.current) return;
+    checkingRef.current = true;
+
     try {
       const data = await fetchBtcData(currency);
       setBtcData(data);
@@ -397,6 +403,8 @@ export function useHolzen() {
       } else {
         setError('Could not check market data. Will retry automatically.');
       }
+    } finally {
+      checkingRef.current = false;
     }
   }, [user, threshold, thresholdDown, cumulativeThreshold, isInCooldown, isInQuietHours, generateMessage, currency]);
 
