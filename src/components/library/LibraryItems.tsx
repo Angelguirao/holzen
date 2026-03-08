@@ -12,7 +12,7 @@ interface Props {
 export function LibraryItems({ library, filtered }: Props) {
   const { t } = useTranslation();
   const {
-    items, collections, updateItem, deleteItem, togglePin,
+    items, collections, updateItem, deleteItem, togglePin, toggleFavorite,
     addToCollection, removeFromCollection, getItemCollections,
   } = library;
 
