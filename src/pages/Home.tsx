@@ -397,6 +397,15 @@ const Home = () => {
             Enter the void
           </span>
         </button>
+        <button
+          onClick={() => navigate('/ambient')}
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-border/30 bg-muted/10 hover:bg-muted/20 transition-colors duration-500"
+        >
+          <Waves className="h-3 w-3 text-muted-foreground/40" />
+          <span className="text-[10px] font-mono text-muted-foreground/40 tracking-[0.2em] uppercase">
+            Ambient mode
+          </span>
+        </button>
       </div>
       <HolzenRitual
         open={showRitual}
