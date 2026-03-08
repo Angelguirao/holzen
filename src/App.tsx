@@ -9,7 +9,7 @@ import { OfflineBanner } from "./components/OfflineBanner";
 import AuthLoading from "./components/AuthLoading";
 import { AppLayout } from "./components/AppLayout";
 import Home from "./pages/Home";
-import History from "./pages/History";
+import Library from "./pages/Library";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import Auth from "./pages/Auth";
