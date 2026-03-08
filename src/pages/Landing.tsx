@@ -75,7 +75,7 @@ const Landing = () => {
             className="text-xs font-mono tracking-widest uppercase text-muted-foreground"
             {...m()}
           >
-            The reflection loop
+            {t('landing.reflectionLoop')}
           </motion.p>
           <div className="space-y-4">
             {[
