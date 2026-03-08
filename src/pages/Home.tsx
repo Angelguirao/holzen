@@ -333,6 +333,7 @@ const Home = () => {
                           Start ritual before deciding
                         </span>
                       </button>
+                      {lastReflectionId && <ReflectionComparison reflectionId={lastReflectionId} />}
                     </div>
                   ) : showOutcome && outcomeReflectionId ? (
                     <OutcomePrompt reflectionId={outcomeReflectionId} onComplete={handleOutcomeComplete} />
