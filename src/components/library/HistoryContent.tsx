@@ -797,4 +797,4 @@ const HistoryContent = () => {
   );
 };
 
-export default History;
+export default HistoryContent;
