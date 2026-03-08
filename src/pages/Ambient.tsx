@@ -72,7 +72,7 @@ export default function Ambient() {
   // Fetch BTC data on mount and every 60s
   const loadData = useCallback(async () => {
     try {
-      const data = await fetchBtcData();
+      const data = await fetchBtcData(); // Ambient uses USD always
       setBtcData(data);
       setLevel(getVolatilityLevel(data.changePercent));
     } catch {
