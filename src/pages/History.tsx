@@ -666,7 +666,7 @@ const History = () => {
           <div ref={sentinelRef} className="h-1" />
           {loadingMore && (
             <div className="py-4 text-center">
-              <p className="text-[10px] font-mono text-muted-foreground animate-pulse">Loading more…</p>
+              <p className="text-[10px] font-mono text-muted-foreground animate-pulse">{t('common.loadingMore')}</p>
             </div>
           )}
         </div>
