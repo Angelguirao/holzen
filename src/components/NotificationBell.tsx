@@ -115,7 +115,7 @@ const SwipeableNotification = forwardRef<HTMLDivElement, {
       </div>
     </motion.div>
   );
-}
+});
 
 type NotificationItem = {
   id: string;
