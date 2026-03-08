@@ -118,20 +118,22 @@ export function LibraryItems({ library }: Props) {
       </div>
 
       {/* Collection filter chips */}
-      {collections.length > 0 && (
+      <div className="space-y-2">
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
           <FolderOpen className="h-3 w-3 text-muted-foreground/30 flex-shrink-0" />
-          <button
-            onClick={() => setCollectionFilter(null)}
-            className={cn(
-              'text-[9px] font-mono px-2 py-0.5 rounded-full border transition-colors whitespace-nowrap flex-shrink-0',
-              !collectionFilter
-                ? 'border-foreground/20 bg-foreground/5 text-foreground'
-                : 'border-border/30 text-muted-foreground/40 hover:text-muted-foreground/60'
-            )}
-          >
-            {t('library.allCollections')}
-          </button>
+          {collections.length > 0 && (
+            <button
+              onClick={() => setCollectionFilter(null)}
+              className={cn(
+                'text-[9px] font-mono px-2 py-0.5 rounded-full border transition-colors whitespace-nowrap flex-shrink-0',
+                !collectionFilter
+                  ? 'border-foreground/20 bg-foreground/5 text-foreground'
+                  : 'border-border/30 text-muted-foreground/40 hover:text-muted-foreground/60'
+              )}
+            >
+              {t('library.allCollections')}
+            </button>
+          )}
           {collections.map((col) => {
             const count = collectionItems.filter((ci) => ci.collection_id === col.id).length;
             return (
@@ -151,8 +153,24 @@ export function LibraryItems({ library }: Props) {
               </button>
             );
           })}
+          <button
+            onClick={() => setShowNewCollection(true)}
+            className="text-[9px] font-mono px-1.5 py-0.5 rounded-full border border-dashed border-border/30 text-muted-foreground/40 hover:text-muted-foreground/60 hover:border-border/50 transition-colors flex-shrink-0 flex items-center gap-0.5"
+          >
+            <Plus className="h-2.5 w-2.5" />
+            {t('library.newCollection')}
+          </button>
         </div>
-      )}
+
+        {showNewCollection && (
+          <NewCollectionForm
+            onSave={async (name, description, icon) => {
+              await addCollection({ name, description, icon });
+              setShowNewCollection(false);
+            }}
+          />
+        )}
+      </div>
 
       <NewNoteForm onSave={handleNewNote} />
 
