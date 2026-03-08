@@ -519,6 +519,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             loading={signalLoading}
             error={signalError}
           />
+          {signal && <div className="mt-1.5"><SaveToLibraryButton title={signal.title} body={signal.body} sourceType="signal" sourceUrl={signal.url} reflectionId={reflectionId ?? undefined} /></div>}
         </CollapsibleCompanion>
       )}
 
