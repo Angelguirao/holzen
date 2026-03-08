@@ -159,7 +159,7 @@ const Profile = () => {
             No reflections yet. Stats will appear after your first reflection.
           </p>
         ) : (
-          <StatsContent reflections={reflections} />
+          <StatsContent reflections={reflections} memberSince={user?.created_at} />
         )
       ) : tab === 'insights' ? (
         loading ? (
