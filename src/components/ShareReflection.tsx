@@ -1,4 +1,5 @@
 import { useCallback, forwardRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Share2, Copy, Image, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -166,12 +167,13 @@ function generateShareImage(
 
 export const ShareReflection = forwardRef<HTMLButtonElement, Props>(
   function ShareReflection({ message, context, haiku }, ref) {
+    const { t } = useTranslation();
 
     const copyText = useCallback(async () => {
       const text = buildShareText(message, context);
       await navigator.clipboard.writeText(text);
-      toast('Copied to clipboard');
-    }, [message, context]);
+      toast(t('share.copied'));
+    }, [message, context, t]);
 
     const shareImage = useCallback(async () => {
       try {
@@ -190,14 +192,14 @@ export const ShareReflection = forwardRef<HTMLButtonElement, Props>(
           a.download = 'holzen-reflection.png';
           a.click();
           URL.revokeObjectURL(url);
-          toast('Image downloaded');
+          toast(t('share.imageDownloaded'));
         }
       } catch (e: any) {
         if (e.name !== 'AbortError') {
-          toast.error('Could not share image');
+          toast.error(t('share.couldNotShareImage'));
         }
       }
-    }, [message, context, haiku]);
+    }, [message, context, haiku, t]);
 
     const shareToX = useCallback(() => {
       const text = buildShareText(message, context);
@@ -227,30 +229,30 @@ export const ShareReflection = forwardRef<HTMLButtonElement, Props>(
             className="text-xs font-mono text-muted-foreground gap-1.5"
           >
             <Share2 className="h-3 w-3" />
-            Share
+            {t('share.share')}
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-44">
           <DropdownMenuItem onClick={copyText} className="text-xs gap-2">
             <Copy className="h-3 w-3" />
-            Copy text
+            {t('share.copyText')}
           </DropdownMenuItem>
           <DropdownMenuItem onClick={shareImage} className="text-xs gap-2">
             <Image className="h-3 w-3" />
-            Share as image
+            {t('share.shareAsImage')}
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={shareToX} className="text-xs gap-2">
             <ExternalLink className="h-3 w-3" />
-            Post on X
+            {t('share.postOnX')}
           </DropdownMenuItem>
           <DropdownMenuItem onClick={shareToWhatsApp} className="text-xs gap-2">
             <ExternalLink className="h-3 w-3" />
-            WhatsApp
+            {t('share.whatsApp')}
           </DropdownMenuItem>
           <DropdownMenuItem onClick={shareToTelegram} className="text-xs gap-2">
             <ExternalLink className="h-3 w-3" />
-            Telegram
+            {t('share.telegram')}
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
