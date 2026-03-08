@@ -4,6 +4,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { format, subDays, isAfter } from 'date-fns';
 import { X, Star, Search, Pin, Info, TrendingUp, TrendingDown, Clock, History as HistoryIcon, ExternalLink, ArrowRight } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { VolatilityTimeline } from '@/components/VolatilityTimeline';
 import { ShareReflection } from '@/components/ShareReflection';
 import { ReflectionNote } from '@/components/ReflectionNote';
 import { ReflectionWallpaper } from '@/components/ReflectionWallpaper';
