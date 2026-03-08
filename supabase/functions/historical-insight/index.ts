@@ -6,14 +6,6 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-async function validateUrl(url: string, fallbackQuery: string): Promise<string> {
-  try {
-    const res = await fetch(url, { method: 'HEAD', redirect: 'follow' });
-    if (res.ok || res.status === 405 || res.status === 403) return url;
-  } catch { /* broken */ }
-  return `https://www.google.com/search?q=${encodeURIComponent(fallbackQuery)}`;
-}
-
 serve(async (req) => {
   if (req.method === "OPTIONS")
     return new Response(null, { headers: corsHeaders });
@@ -33,128 +25,139 @@ serve(async (req) => {
     }
 
     const { context, language } = await req.json();
+
+    const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
+    if (!PERPLEXITY_API_KEY) throw new Error("PERPLEXITY_API_KEY is not configured");
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
     const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
     const langCode = language || "en";
     const langName = LANG_NAMES[langCode] || "English";
-    const langInstruction = langCode !== "en" ? `CRITICAL LANGUAGE REQUIREMENT: You MUST write the title, body, and analogy in ${langName}. Keep source URLs as-is.\n\n` : "";
 
-    const systemPrompt = `${langInstruction}You are a financial historian specializing in Bitcoin and broader market history. Given the current market context, provide ONE historical insight that helps a Bitcoin holder see today's moment through the lens of history.
+    const marketContext = context || "Bitcoin market movement";
 
-Your insight MUST:
-1. Reference a REAL, specific historical event — primarily from Bitcoin's history, but ALSO draw analogies from other assets (gold, equities, tech stocks, commodities, real estate, bonds, emerging market currencies)
-2. Include specific dates, prices, and percentage moves where possible
-3. Draw a clear parallel or analogy between the historical event and the current context
-4. Be factually accurate — use real events, real numbers, real dates
-5. Be concise — 2-3 sentences for the main insight, 1-2 sentences for the cross-asset analogy
-6. End with a grounding observation, not hype
-7. Include a source URL — link to a reputable article, Wikipedia page, or data source that documents the historical event referenced
+    // Step 1: Perplexity search for historical parallels (open web, no domain filter)
+    const searchQuery = `Historical financial event parallel to current Bitcoin market: ${marketContext}. Find a specific historical event from Bitcoin history, gold markets, tech stocks, or other asset classes that mirrors the current conditions. Include specific dates, prices, and percentage moves.`;
 
-VARIETY IS CRITICAL. Rotate through different eras and asset classes:
-- Bitcoin: Mt. Gox crash (2014), China ban cycles, COVID crash (March 2020), 2017 bull run, 2018 bear, 2021 ATH & correction, halving cycles, exchange collapses (FTX)
-- Gold: 1970s bull run, 1980 crash from $850 to $250, 2011 peak & 4-year bear, Nixon shock, Gold Reserve Act 1934
-- Equities: Dot-com bubble & recovery, 1987 Black Monday, 2008 financial crisis, Nifty Fifty collapse, Japanese bubble 1989, South Sea Bubble
-- Tech stocks: Amazon -94% (2000-2001), Apple near-bankruptcy (1997), Netflix -77% (2022)
-- Commodities: Oil negative prices (2020), Silver Thursday (1980), Tulip mania
-- Macro: Weimar hyperinflation, Bretton Woods collapse, Asian financial crisis 1997
-
-The analogy should feel surprising and illuminating, not obvious.`;
-
-    const response = await fetch(
-      "https://ai.gateway.lovable.dev/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "google/gemini-3-flash-preview",
-          messages: [
-            { role: "system", content: systemPrompt },
-            {
-              role: "user",
-              content: `Current market context: ${context || "Bitcoin market movement"}. Provide one historical insight with a cross-asset analogy.`,
-            },
-          ],
-          tools: [
-            {
-              type: "function",
-              function: {
-                name: "return_historical_insight",
-                description: "Return a historical insight with cross-asset analogy and source",
-                parameters: {
-                  type: "object",
-                  properties: {
-                    title: {
-                      type: "string",
-                      description: "Short evocative title (e.g. 'The 2018 winter lasted 84 days at this level')",
-                    },
-                    btcInsight: {
-                      type: "string",
-                      description: "2-3 sentences about a specific Bitcoin historical event with real dates and numbers, drawing a parallel to now",
-                    },
-                    analogy: {
-                      type: "string",
-                      description: "1-2 sentences drawing a parallel from another asset class (gold, stocks, commodities, etc.) with specific historical data",
-                    },
-                    assetClass: {
-                      type: "string",
-                      description: "The other asset class referenced in the analogy (e.g. 'Gold', 'Tech stocks', 'Oil', 'S&P 500')",
-                    },
-                    period: {
-                      type: "string",
-                      description: "The historical period referenced (e.g. '2014', 'March 2020', '1987')",
-                    },
-                    source: {
-                      type: "string",
-                      description: "Name of the source documenting the event (e.g. 'Wikipedia', 'CoinDesk', 'Federal Reserve History')",
-                    },
-                    url: {
-                      type: "string",
-                      description: "URL to a reputable source documenting the historical event (Wikipedia, news archive, data source)",
-                    },
-                  },
-                  required: ["title", "btcInsight", "analogy", "assetClass", "period", "source", "url"],
-                  additionalProperties: false,
-                },
-              },
-            },
-          ],
-          tool_choice: {
-            type: "function",
-            function: { name: "return_historical_insight" },
+    const searchResponse = await fetch("https://api.perplexity.ai/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${PERPLEXITY_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "sonar",
+        messages: [
+          {
+            role: "system",
+            content: "You are a financial historian. Search for specific historical events from Bitcoin, gold, equities, tech stocks, commodities, or macro economics that parallel current market conditions. Always include specific dates, prices, percentage moves, and factual data. Draw from diverse eras: Bitcoin crashes, gold's 1980 peak, dot-com bubble, 2008 crisis, tech stock collapses, oil price shocks, etc.",
           },
-        }),
-      }
-    );
+          { role: "user", content: searchQuery },
+        ],
+      }),
+    });
 
-    if (!response.ok) {
-      if (response.status === 429) {
+    if (!searchResponse.ok) {
+      const errText = await searchResponse.text();
+      console.error("Perplexity error:", searchResponse.status, errText);
+      if (searchResponse.status === 429) {
         return new Response(
           JSON.stringify({ error: "Rate limited, please try again later." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      if (response.status === 402) {
+      throw new Error("Perplexity search failed");
+    }
+
+    const searchData = await searchResponse.json();
+    const searchContent = searchData.choices?.[0]?.message?.content || "";
+    const citations: string[] = searchData.citations || [];
+
+    // Step 2: Lovable AI structures the grounded result
+    const langInstruction = langCode !== "en" ? `CRITICAL: Write title, btcInsight, and analogy in ${langName}. Keep source URLs as-is.\n\n` : "";
+
+    const structureResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash-lite",
+        messages: [
+          {
+            role: "system",
+            content: `${langInstruction}You are a financial historian for a Bitcoin mindfulness app. Given grounded search results with citations, extract ONE historical insight with a cross-asset analogy. Call the "return_historical_insight" function.
+
+Rules:
+- Use ONLY facts from the provided search results
+- Include specific dates, prices, and percentage moves
+- Draw a clear parallel between a historical event and the current context
+- End with a grounding observation, not hype
+- URL: use one of the provided citation URLs`,
+          },
+          {
+            role: "user",
+            content: `Market context: ${marketContext}\n\nSearch results:\n${searchContent}\n\nAvailable citation URLs:\n${citations.map((c: string, i: number) => `[${i + 1}] ${c}`).join("\n")}\n\nExtract one historical insight with cross-asset analogy.`,
+          },
+        ],
+        tools: [
+          {
+            type: "function",
+            function: {
+              name: "return_historical_insight",
+              description: "Return a historical insight with cross-asset analogy and source",
+              parameters: {
+                type: "object",
+                properties: {
+                  title: { type: "string", description: "Short evocative title." },
+                  btcInsight: { type: "string", description: "2-3 sentences about a specific historical event with real dates/numbers." },
+                  analogy: { type: "string", description: "1-2 sentences drawing a parallel from another asset class." },
+                  assetClass: { type: "string", description: "The other asset class (e.g. 'Gold', 'Tech stocks')." },
+                  period: { type: "string", description: "Historical period (e.g. '2014', 'March 2020')." },
+                  source: { type: "string", description: "Name of the source." },
+                  url: { type: "string", description: "URL from the citations." },
+                },
+                required: ["title", "btcInsight", "analogy", "assetClass", "period", "source", "url"],
+                additionalProperties: false,
+              },
+            },
+          },
+        ],
+        tool_choice: { type: "function", function: { name: "return_historical_insight" } },
+      }),
+    });
+
+    if (!structureResponse.ok) {
+      if (structureResponse.status === 429) {
+        return new Response(
+          JSON.stringify({ error: "Rate limited, please try again later." }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      if (structureResponse.status === 402) {
         return new Response(
           JSON.stringify({ error: "AI credits exhausted." }),
           { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      const t = await response.text();
-      console.error("AI error:", response.status, t);
-      throw new Error("AI gateway error");
+      const t = await structureResponse.text();
+      console.error("AI structure error:", structureResponse.status, t);
+      throw new Error("AI structuring failed");
     }
 
-    const data = await response.json();
-    const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
+    const structureData = await structureResponse.json();
+    const toolCall = structureData.choices?.[0]?.message?.tool_calls?.[0];
     if (!toolCall) throw new Error("No tool call in response");
 
     const insight = JSON.parse(toolCall.function.arguments);
-    insight.url = await validateUrl(insight.url, `${insight.title} ${insight.assetClass} ${insight.period}`);
+
+    // Ensure URL is from citations
+    if (citations.length > 0 && !citations.includes(insight.url)) {
+      insight.url = citations[0];
+    }
 
     return new Response(JSON.stringify(insight), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

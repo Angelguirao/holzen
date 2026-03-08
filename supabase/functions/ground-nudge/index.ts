@@ -6,14 +6,6 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-async function validateUrl(url: string, fallbackQuery: string): Promise<string> {
-  try {
-    const res = await fetch(url, { method: 'HEAD', redirect: 'follow' });
-    if (res.ok || res.status === 405 || res.status === 403) return url;
-  } catch { /* broken */ }
-  return `https://scholar.google.com/scholar?q=${encodeURIComponent(fallbackQuery)}`;
-}
-
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -33,116 +25,158 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const { context, language } = await req.json();
+    const { context, language, sources } = await req.json();
+
+    const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
+    if (!PERPLEXITY_API_KEY) throw new Error("PERPLEXITY_API_KEY is not configured");
+
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
     const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
     const langCode = language || "en";
     const langName = LANG_NAMES[langCode] || "English";
-    const langInstruction = langCode !== "en" ? `CRITICAL LANGUAGE REQUIREMENT: You MUST write the title and body in ${langName}. Keep citation names and URLs in their original form.\n\n` : "";
 
-    const systemPrompt = `${langInstruction}You are a behavioral finance researcher. Given the current market context, generate ONE grounding nudge for a Bitcoin holder who might be about to make an impulsive decision.
-
-Your nudge MUST:
-1. Reference a REAL, specific study, paper, or finding from behavioral science, behavioral economics, or finance
-2. VARIETY IS CRITICAL: Draw from the full breadth of behavioral science research — not just the most famous names. Include lesser-known but credible researchers, recent papers, cross-disciplinary findings (neuroscience, psychology, sociology), and diverse academic traditions. Surprise the reader.
-3. Include the actual researcher names and year (e.g., "Kahneman & Tversky, 1979")
-4. Include a citation URL — use the actual DOI link, Google Scholar link, or a reputable source URL for the research
-5. Be grounded in fact, not motivational fluff
-6. Be concise — 2-3 sentences max for the body
-
-Topics to draw from based on context:
-- During crashes/fear: loss aversion, panic selling data, recovery statistics, hot-state decision making, recency bias
-- During surges/greed: disposition effect, overconfidence, FOMO neuroscience, herding behavior, narrative fallacy
-- General: anchoring, sunk cost, status quo bias, regret aversion, emotional regulation timing`;
-
-    const response = await fetch(
-      "https://ai.gateway.lovable.dev/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "google/gemini-3-flash-preview",
-          messages: [
-            { role: "system", content: systemPrompt },
-            {
-              role: "user",
-              content: `Market context: ${context || "Bitcoin market, general conditions"}. Generate one grounding nudge.`,
-            },
-          ],
-          tools: [
-            {
-              type: "function",
-              function: {
-                name: "return_nudge",
-                description:
-                  "Return a single behavioral science grounding nudge with a citation.",
-                parameters: {
-                  type: "object",
-                  properties: {
-                    title: {
-                      type: "string",
-                      description:
-                        "Short title summarizing the bias or finding (e.g. 'Loss aversion amplifies drops 2×')",
-                    },
-                    body: {
-                      type: "string",
-                      description:
-                        "2-3 sentence explanation referencing the specific study, researchers, and year.",
-                    },
-                    citation: {
-                      type: "string",
-                      description:
-                        "Formatted citation like 'Kahneman & Tversky (1979), Prospect Theory'",
-                    },
-                    url: {
-                      type: "string",
-                      description:
-                        "URL to the research paper, DOI, or reputable source (Google Scholar, SSRN, NBER, etc.)",
-                    },
-                  },
-                  required: ["title", "body", "citation", "url"],
-                  additionalProperties: false,
-                },
-              },
-            },
-          ],
-          tool_choice: {
-            type: "function",
-            function: { name: "return_nudge" },
-          },
-        }),
+    // Build domain filter from user's active learning sources
+    const domainFilter: string[] = [];
+    if (sources && Array.isArray(sources) && sources.length > 0) {
+      for (const s of sources) {
+        if (s.url) {
+          try {
+            const domain = new URL(s.url).hostname.replace(/^www\./, '');
+            domainFilter.push(domain);
+          } catch { /* skip */ }
+        }
       }
-    );
+    }
 
-    if (!response.ok) {
-      if (response.status === 429) {
+    // Step 1: Perplexity search for behavioral finance research
+    const marketContext = context || "Bitcoin market volatility";
+    const searchQuery = `Behavioral finance research relevant to: ${marketContext}. Find a specific study, paper, or finding from behavioral economics, psychology, or neuroscience about investor decision-making during market volatility. Include researcher names and year of publication.`;
+
+    const perplexityBody: any = {
+      model: "sonar",
+      messages: [
+        {
+          role: "system",
+          content: "You are a behavioral finance research assistant. Search for real academic research, published papers, and credible findings about investor psychology and decision-making biases. Focus on loss aversion, panic selling, FOMO, herding behavior, disposition effect, anchoring, and emotional regulation. Always include specific researcher names, publication years, and factual findings.",
+        },
+        { role: "user", content: searchQuery },
+      ],
+      search_mode: "academic",
+    };
+
+    if (domainFilter.length > 0) {
+      perplexityBody.search_domain_filter = domainFilter.slice(0, 5);
+    }
+
+    const searchResponse = await fetch("https://api.perplexity.ai/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${PERPLEXITY_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(perplexityBody),
+    });
+
+    if (!searchResponse.ok) {
+      const errText = await searchResponse.text();
+      console.error("Perplexity error:", searchResponse.status, errText);
+      if (searchResponse.status === 429) {
         return new Response(
           JSON.stringify({ error: "Rate limited, please try again later." }),
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      if (response.status === 402) {
+      throw new Error("Perplexity search failed");
+    }
+
+    const searchData = await searchResponse.json();
+    const searchContent = searchData.choices?.[0]?.message?.content || "";
+    const citations: string[] = searchData.citations || [];
+
+    // Step 2: Lovable AI structures the grounded result
+    const langInstruction = langCode !== "en" ? `CRITICAL: Write title and body in ${langName}. Keep citation names and URLs as-is.\n\n` : "";
+
+    const structureResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash-lite",
+        messages: [
+          {
+            role: "system",
+            content: `${langInstruction}You are a behavioral science curator for a Bitcoin mindfulness app. Given grounded research results with citations, extract ONE grounding nudge. Call the "return_nudge" function.
+
+Rules:
+- Use ONLY facts from the provided search results
+- Reference specific researchers and years
+- Title: short summary of the bias or finding
+- Body: 2-3 sentences explaining the research and how it relates to the market context
+- Citation: formatted like "Kahneman & Tversky (1979), Prospect Theory"
+- URL: use one of the provided citation URLs
+- Tone: calm, grounding, no advice`,
+          },
+          {
+            role: "user",
+            content: `Market context: ${marketContext}\n\nSearch results:\n${searchContent}\n\nAvailable citation URLs:\n${citations.map((c: string, i: number) => `[${i + 1}] ${c}`).join("\n")}\n\nExtract one grounding nudge.`,
+          },
+        ],
+        tools: [
+          {
+            type: "function",
+            function: {
+              name: "return_nudge",
+              description: "Return a behavioral science grounding nudge with citation.",
+              parameters: {
+                type: "object",
+                properties: {
+                  title: { type: "string", description: "Short title summarizing the bias or finding." },
+                  body: { type: "string", description: "2-3 sentence explanation referencing the study." },
+                  citation: { type: "string", description: "Formatted citation like 'Kahneman & Tversky (1979), Prospect Theory'." },
+                  url: { type: "string", description: "URL from the citations." },
+                },
+                required: ["title", "body", "citation", "url"],
+                additionalProperties: false,
+              },
+            },
+          },
+        ],
+        tool_choice: { type: "function", function: { name: "return_nudge" } },
+      }),
+    });
+
+    if (!structureResponse.ok) {
+      if (structureResponse.status === 429) {
+        return new Response(
+          JSON.stringify({ error: "Rate limited, please try again later." }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      if (structureResponse.status === 402) {
         return new Response(
           JSON.stringify({ error: "AI credits exhausted." }),
           { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      const t = await response.text();
-      console.error("AI gateway error:", response.status, t);
-      throw new Error("AI gateway error");
+      const t = await structureResponse.text();
+      console.error("AI structure error:", structureResponse.status, t);
+      throw new Error("AI structuring failed");
     }
 
-    const data = await response.json();
-    const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
+    const structureData = await structureResponse.json();
+    const toolCall = structureData.choices?.[0]?.message?.tool_calls?.[0];
     if (!toolCall) throw new Error("No tool call in response");
 
     const nudge = JSON.parse(toolCall.function.arguments);
-    nudge.url = await validateUrl(nudge.url, nudge.citation);
+
+    // Ensure URL is from citations
+    if (citations.length > 0 && !citations.includes(nudge.url)) {
+      nudge.url = citations[0];
+    }
 
     return new Response(JSON.stringify(nudge), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
