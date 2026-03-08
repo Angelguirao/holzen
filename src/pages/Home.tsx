@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { usePullToRefresh } from '@/hooks/use-pull-to-refresh';
 import { useHolzen } from '@/hooks/use-holzen';
 import { TestimonialRequest } from '@/components/TestimonialRequest';
@@ -48,15 +49,6 @@ import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 const WIDGET_IDS = ['btc-status', 'hold-goal', 'reflection', 'night', 'letter', 'actions'] as const;
 type WidgetId = typeof WIDGET_IDS[number];
 
-const WIDGET_TITLES: Record<WidgetId, string> = {
-  'btc-status': 'Market',
-  'hold-goal': 'Goal',
-  'reflection': 'Reflection',
-  'night': 'Evening',
-  'letter': 'Letter',
-  'actions': 'Practice',
-};
-
 interface PinnedReflection {
   id: string;
   message: string;
@@ -67,6 +59,15 @@ interface PinnedReflection {
 }
 
 const Home = () => {
+  const { t } = useTranslation();
+  const WIDGET_TITLES: Record<WidgetId, string> = {
+    'btc-status': t('home.widget.market'),
+    'hold-goal': t('home.widget.goal'),
+    'reflection': t('home.widget.reflection'),
+    'night': t('home.widget.evening'),
+    'letter': t('home.widget.letter'),
+    'actions': t('home.widget.practice'),
+  };
   const { user } = useAuth();
   const navigate = useNavigate();
   const { subscribed, loading: subLoading, trialRemaining, checkoutLoading, startCheckout, refresh } = useSubscription();
@@ -278,14 +279,14 @@ const Home = () => {
             <motion.div key="zen-loading" variants={zenVariants} initial="hidden" animate="visible" exit="hidden" className="space-y-4">
               <div className="flex items-center gap-2 text-muted-foreground">
                 <Loader2 className="h-3 w-3 animate-spin" />
-                <p className="text-xs font-mono">Generating reflection</p>
+                <p className="text-xs font-mono">Generating reflection…</p>
               </div>
               <Skeleton className="h-4 w-full" />
               <Skeleton className="h-4 w-3/4" />
             </motion.div>
           ) : (
             <motion.div key="zen-empty" variants={zenVariants} initial="hidden" animate="visible" exit="hidden" className="space-y-6 text-center">
-              <p className="text-sm text-muted-foreground font-mono leading-relaxed">No active reflection.</p>
+              <p className="text-sm text-muted-foreground font-mono leading-relaxed">{t('home.noActiveReflection')}</p>
               {hasAccess && (
                 <NeedAMomentButton onTrigger={handleNeedAMoment} cooldownRemaining={manualCooldownRemaining} loading={loading} />
               )}
@@ -343,13 +344,14 @@ const Home = () => {
               {!subLoading && !hasAccess ? (
                 <div className="space-y-3">
                   <p className="text-sm text-muted-foreground">
-                    You've used all 3 free reflections. Subscribe to continue.
+                    {t('home.subscription.usedAllFree')}
                   </p>
                   <p className="text-xs font-mono text-muted-foreground">
-                    $3 per month · Cancel anytime
+                    {t('home.subscription.pricePerMonth')}
                   </p>
                   <Button onClick={startCheckout} disabled={checkoutLoading} className="w-full font-mono text-xs">
-                    {checkoutLoading ? 'Opening checkout…' : 'Subscribe'}
+                    {checkoutLoading ? t('home.subscription.openingCheckout') : t('common.subscribe')}
+                  </Button>
                   </Button>
                 </div>
               ) : subLoading ? (
@@ -361,7 +363,7 @@ const Home = () => {
                 <>
                   {!subscribed && trialRemaining !== undefined && trialRemaining > 0 && (
                     <p className="text-xs font-mono text-muted-foreground">
-                      {trialRemaining} free reflection{trialRemaining !== 1 ? 's' : ''} remaining
+                      {t('home.subscription.freeRemaining', { count: trialRemaining })}
                     </p>
                   )}
 
@@ -378,7 +380,7 @@ const Home = () => {
                       >
                         <Sparkles className="h-3 w-3 text-primary/60" />
                         <span className="text-[10px] font-mono text-primary/60 tracking-[0.15em] uppercase">
-                          Start ritual before deciding
+                          {t('home.startRitualBeforeDeciding')}
                         </span>
                       </button>
                       {lastReflectionId && <ReflectionComparison reflectionId={lastReflectionId} />}
@@ -393,7 +395,7 @@ const Home = () => {
                         <div className="space-y-4">
                           <div className="flex items-center gap-2 text-muted-foreground">
                             <Loader2 className="h-3 w-3 animate-spin" />
-                            <p className="text-xs font-mono">Generating reflection…</p>
+                            <p className="text-xs font-mono">{t('home.generatingReflection')}</p>
                           </div>
                           <Skeleton className="h-4 w-full" />
                           <Skeleton className="h-4 w-3/4" />
@@ -405,21 +407,20 @@ const Home = () => {
                             <AlertCircle className="h-3.5 w-3.5" />
                             <p className="text-xs font-mono">
                               {error.includes('fetch') || error.includes('network') || error.includes('Failed to fetch')
-                                ? 'Could not reach price data'
+                                ? t('home.errors.couldNotReachPrice')
                                 : error.includes('generate') || error.includes('reflect')
-                                ? 'AI reflection unavailable right now'
-                                : 'Something went wrong'}
+                                ? t('home.errors.aiUnavailable')
+                                : t('home.errors.somethingWentWrong')}
                             </p>
                           </div>
                           <p className="text-[10px] font-mono text-muted-foreground/60 leading-relaxed">
                             {error.includes('fetch') || error.includes('network') || error.includes('Failed to fetch')
-                              ? 'Check your internet connection. Price data comes from CoinGecko and may be temporarily unavailable.'
+                              ? t('home.errors.checkConnection')
                               : error.includes('generate') || error.includes('reflect')
-                              ? 'The AI service is temporarily unavailable. Your settings and data are safe — try again in a moment.'
-                              : 'An unexpected error occurred. Your data is safe.'}
+                              ? t('home.errors.aiTemporarilyUnavailable')
+                              : t('home.errors.unexpectedError')}
                           </p>
-                          <button onClick={() => manualTrigger()} className="text-xs font-mono text-primary underline">
-                            Try again
+                          <button onClick={() => manualTrigger()} className="text-xs font-mono text-primary underline">{t('common.tryAgain')}</button>
                           </button>
                         </div>
                       ) : (
@@ -429,10 +430,9 @@ const Home = () => {
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-1.5 text-muted-foreground">
                                   <Pin className="h-2.5 w-2.5" />
-                                  <span className="text-[10px] font-mono uppercase tracking-wider">Pinned</span>
-                                </div>
-                                <button onClick={unpinReflection} className="text-[10px] font-mono text-muted-foreground/50 hover:text-foreground transition-colors">
-                                  Unpin
+                                <span className="text-[10px] font-mono uppercase tracking-wider">{t('common.pinned')}</span>
+                              </div>
+                              <button onClick={unpinReflection} className="text-[10px] font-mono text-muted-foreground/50 hover:text-foreground transition-colors">{t('common.unpin')}</button>
                                 </button>
                               </div>
                               <p className="text-sm leading-relaxed">{pinnedReflection.message}</p>
@@ -490,7 +490,7 @@ const Home = () => {
               >
                 <Sparkles className="h-3 w-3 text-primary/40" />
                 <span className="text-[10px] font-mono text-primary/40 tracking-[0.2em] uppercase">
-                  Start a ritual
+                  {t('home.startARitual')}
                 </span>
               </button>
               <button
@@ -499,7 +499,7 @@ const Home = () => {
               >
                 <Circle className="h-3 w-3 text-muted-foreground/40" />
                 <span className="text-[10px] font-mono text-muted-foreground/40 tracking-[0.2em] uppercase">
-                  Enter the void
+                  {t('home.enterTheVoid')}
                 </span>
               </button>
               <button
@@ -508,7 +508,7 @@ const Home = () => {
               >
                 <Waves className="h-3 w-3 text-muted-foreground/40" />
                 <span className="text-[10px] font-mono text-muted-foreground/40 tracking-[0.2em] uppercase">
-                  Ambient mode
+                  {t('home.ambientMode')}
                 </span>
               </button>
             </div>
@@ -551,7 +551,7 @@ const Home = () => {
             aria-label="Reset widget layout"
           >
             <RotateCcw className="h-2.5 w-2.5" />
-            Reset
+            {t('common.reset')}
           </button>
         )}
       </div>
@@ -589,7 +589,7 @@ const Home = () => {
       <TestimonialRequest reflectionCount={reflectionCount} />
 
       <p className="text-xs text-muted-foreground leading-relaxed">
-        When Bitcoin moves, we'll help you pause before you act.
+        {t('home.whenBtcMoves')}
       </p>
     </div>
   );
