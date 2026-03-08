@@ -16,12 +16,20 @@ interface Props {
   reflections: { context: string | null; mood: string | null; created_at: string }[];
 }
 
-const MOOD_VAL: Record<string, number> = { anxious: 1, neutral: 2, calm: 3 };
-const MOOD_LABELS: Record<number, string> = { 1: 'Anxious', 2: 'Neutral', 3: 'Calm' };
+const MOOD_VAL: Record<string, number> = {
+  fomo: 1, greedy: 1.5, anxious: 2, fearful: 2, excited: 2.5,
+  uncertain: 3, detached: 4, calm: 5,
+};
+const MOOD_LABELS: Record<number, string> = { 1: 'Reactive', 3: 'Neutral', 5: 'Composed' };
 
 const MOOD_COLORS: Record<string, string> = {
-  anxious: 'hsl(var(--destructive))',
-  neutral: 'hsl(var(--muted-foreground))',
+  fomo: 'hsl(var(--destructive))',
+  greedy: 'hsl(var(--destructive) / 0.8)',
+  anxious: 'hsl(var(--destructive) / 0.6)',
+  fearful: 'hsl(var(--destructive) / 0.5)',
+  excited: 'hsl(var(--accent-foreground))',
+  uncertain: 'hsl(var(--muted-foreground))',
+  detached: 'hsl(var(--muted-foreground) / 0.7)',
   calm: 'hsl(var(--primary))',
 };
 
