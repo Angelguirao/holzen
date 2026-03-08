@@ -981,7 +981,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
       </Accordion>
     </div>
   );
-};
+});
 
 function ChangeEmailSection() {
   const { t } = useTranslation();
