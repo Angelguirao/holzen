@@ -551,7 +551,7 @@ const Home = () => {
             aria-label="Reset widget layout"
           >
             <RotateCcw className="h-2.5 w-2.5" />
-            Reset
+            {t('common.reset')}
           </button>
         )}
       </div>
