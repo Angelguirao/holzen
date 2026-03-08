@@ -127,10 +127,10 @@ const Profile = () => {
   const fmtPrice = (p: number) => formatBtcPrice(p, currency);
 
   const tabs = [
-    { id: 'stats' as const, label: 'Stats' },
-    { id: 'insights' as const, label: 'Insights' },
-    { id: 'badges' as const, label: 'Badges' },
-    { id: 'letters' as const, label: 'Letters', count: pendingLetters.length },
+    { id: 'stats' as const, label: t('profile.stats') },
+    { id: 'insights' as const, label: t('profile.insights') },
+    { id: 'badges' as const, label: t('profile.badges') },
+    { id: 'letters' as const, label: t('profile.letters'), count: pendingLetters.length },
   ];
 
   return (
