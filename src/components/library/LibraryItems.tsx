@@ -13,6 +13,7 @@ import type { Collection } from '@/hooks/use-library';
 
 interface Props {
   library: ReturnType<typeof useLibrary>;
+  favoritesOnly?: boolean;
 }
 
 const TYPE_FILTERS = [
@@ -135,7 +136,7 @@ function CollectionChip({
   );
 }
 
-export function LibraryItems({ library }: Props) {
+export function LibraryItems({ library, favoritesOnly = false }: Props) {
   const { t } = useTranslation();
   const {
     items, collections, collectionItems, loading,
@@ -151,6 +152,7 @@ export function LibraryItems({ library }: Props) {
   const filtered = useMemo(() => {
     let result = items;
     if (!search.trim()) result = result.filter((i) => i.status !== 'archived');
+    if (favoritesOnly) result = result.filter((i) => i.pinned);
     if (typeFilter === 'bookmarks') result = result.filter((i) => i.type === 'bookmark');
     if (typeFilter === 'notes') result = result.filter((i) => i.type === 'note');
     if (collectionFilter) {
@@ -170,7 +172,7 @@ export function LibraryItems({ library }: Props) {
       );
     }
     return result;
-  }, [items, typeFilter, collectionFilter, collectionItems, search]);
+  }, [items, typeFilter, collectionFilter, collectionItems, search, favoritesOnly]);
 
   const pinnedItems = filtered.filter((i) => i.pinned);
   const unpinnedItems = filtered.filter((i) => !i.pinned);
