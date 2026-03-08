@@ -327,6 +327,7 @@ const History = () => {
                   )}
                 </div>
               )}
+              <ReflectionComparison reflectionId={r.id} />
             </div>
           ))}
         </div>
