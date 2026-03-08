@@ -436,7 +436,7 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
                         {format(new Date(l.written_at), 'MMM d, yyyy')}
                       </p>
                       <p className="text-[10px] font-mono text-muted-foreground/50">
-                        During {l.written_during === 'crash' ? 'a drop' : 'a surge'}
+                        {l.written_during === 'crash' ? 'During a drop' : l.written_during === 'calm' ? 'During calm markets' : 'During a surge'}
                       </p>
                       <p className="text-[10px] font-mono text-muted-foreground/40">
                         BTC {fmtPrice(l.btc_price_at_write)}
