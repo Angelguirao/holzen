@@ -59,7 +59,7 @@ export function ReflectionNote({ reflectionId, initialNote }: Props) {
         className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground/50 hover:text-muted-foreground transition-colors"
       >
         <Pencil className="h-2.5 w-2.5" />
-        Add a note
+        {t('reflectionNote.addNote')}
       </button>
     );
   }

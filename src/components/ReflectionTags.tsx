@@ -124,7 +124,7 @@ export function ReflectionTags({ reflectionId, initialTags }: Props) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Type a tag…"
+            placeholder={t('reflectionTags.typeTag')}
             className="w-full text-[11px] font-mono px-2 py-1.5 rounded border border-border/60 bg-background text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/40 transition-colors"
           />
           {suggestions.length > 0 && (
