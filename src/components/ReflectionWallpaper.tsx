@@ -225,6 +225,12 @@ export function ReflectionWallpaper({ message, mood, context, haiku, variant = '
                     Regenerate
                   </button>
                 </div>
+                <button
+                  onClick={() => setOpen(false)}
+                  className="w-full py-2.5 rounded-md border border-border text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Done
+                </button>
               </>
             ) : null}
 
