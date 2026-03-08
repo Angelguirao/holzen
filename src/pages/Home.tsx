@@ -18,6 +18,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { toast } from 'sonner';
 import { AlertCircle, Loader2, Pause, Pin, Timer, Circle } from 'lucide-react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { playNotificationTone, prefetchNotificationTone } from '@/lib/notification-tone';
 
 interface PinnedReflection {
   id: string;
@@ -123,6 +124,7 @@ const Home = () => {
 
   useEffect(() => {
     if (newReflection && message) {
+      playNotificationTone();
       toast('New reflection', {
         description: message.slice(0, 80) + (message.length > 80 ? '…' : ''),
         duration: 6000,
@@ -130,6 +132,11 @@ const Home = () => {
       clearNewReflection();
     }
   }, [newReflection, message, clearNewReflection]);
+
+  // Pre-cache the notification tone
+  useEffect(() => {
+    prefetchNotificationTone();
+  }, []);
 
   useEffect(() => {
     document.title = 'Holzen — Home';
