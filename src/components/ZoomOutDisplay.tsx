@@ -88,7 +88,7 @@ export function ZoomOutDisplay({ data, loading, error }: Props) {
                 Now
               </span>
               <span className="text-xs font-mono text-foreground font-medium tabular-nums">
-                {formatPrice(currentPrice)}
+                {fmtPrice(currentPrice)}
               </span>
               <span className="text-[10px] font-mono text-muted-foreground/40">—</span>
             </div>
