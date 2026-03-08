@@ -157,7 +157,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
       .select('learning_title, learning_body, learning_citation, learning_url')
       .eq('id', reflectionId)
       .single()
-      .then(({ data: row }) => {
+      .then(async ({ data: row }) => {
         if (cancelled) return;
         if (row?.learning_citation) {
           setNudge({
@@ -170,8 +170,30 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           return;
         }
 
+        // Fetch learning sources for ground-nudge
+        let learningSources: { name: string; type: string; url?: string }[] = [];
+        try {
+          const { data: authData } = await supabase.auth.getUser();
+          const userId = authData?.user?.id;
+          if (userId) {
+            const [{ data: catalog }, { data: userPrefs }] = await Promise.all([
+              supabase.from('signal_sources').select('id, name, type, url, category').eq('category', 'learning'),
+              supabase.from('user_signal_preferences').select('source_id, custom_name, custom_url, custom_type, active, category').eq('user_id', userId).eq('category', 'learning'),
+            ]);
+            const prefsMap = new Map((userPrefs ?? []).map((p: any) => [p.source_id, p]));
+            const catalogActive = (catalog ?? []).filter((s: any) => {
+              const pref = prefsMap.get(s.id);
+              return pref ? pref.active : true;
+            }).map((s: any) => ({ name: s.name, type: s.type, url: s.url }));
+            const customActive = (userPrefs ?? [])
+              .filter((p: any) => !p.source_id && p.custom_name && p.active)
+              .map((p: any) => ({ name: p.custom_name, type: p.custom_type || 'blog', url: p.custom_url }));
+            learningSources = [...catalogActive, ...customActive];
+          }
+        } catch { /* non-critical */ }
+
         supabase.functions
-          .invoke('ground-nudge', { body: { context: context ?? '', language } })
+          .invoke('ground-nudge', { body: { context: context ?? '', language, sources: learningSources.length > 0 ? learningSources : undefined } })
           .then(({ data, error: fnError }) => {
             if (cancelled) return;
             if (fnError || !data || data.error) {
@@ -231,24 +253,21 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           return;
         }
 
-        // Fetch user's active signal sources to pass to the edge function
+        // Fetch user's active signal sources (category=signal) to pass to the edge function
         let activeSources: { name: string; type: string; url?: string }[] = [];
         try {
           const { data: authData } = await supabase.auth.getUser();
           const userId = authData?.user?.id;
           if (userId) {
-            // Get all catalog sources and user prefs
             const [{ data: catalog }, { data: userPrefs }] = await Promise.all([
-              supabase.from('signal_sources').select('id, name, type, url'),
-              supabase.from('user_signal_preferences').select('source_id, custom_name, custom_url, custom_type, active').eq('user_id', userId),
+              supabase.from('signal_sources').select('id, name, type, url, category').eq('category', 'signal'),
+              supabase.from('user_signal_preferences').select('source_id, custom_name, custom_url, custom_type, active, category').eq('user_id', userId).eq('category', 'signal'),
             ]);
             const prefsMap = new Map((userPrefs ?? []).map((p: any) => [p.source_id, p]));
-            // Catalog sources: active if no pref or pref.active=true
             const catalogActive = (catalog ?? []).filter((s: any) => {
               const pref = prefsMap.get(s.id);
               return pref ? pref.active : true;
             }).map((s: any) => ({ name: s.name, type: s.type, url: s.url }));
-            // Custom sources
             const customActive = (userPrefs ?? [])
               .filter((p: any) => !p.source_id && p.custom_name && p.active)
               .map((p: any) => ({ name: p.custom_name, type: p.custom_type || 'blog', url: p.custom_url }));

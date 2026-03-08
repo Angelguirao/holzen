@@ -514,8 +514,11 @@
     "closingAttribution": "— Holzen"
   },
   "sources": {
-    "title": "Signal Sources",
-    "description": "Choose which Bitcoin sources inform your signal companion. Active sources are prioritized when generating insights.",
+    "title": "Sources",
+    "signalTab": "Signal",
+    "learningTab": "Learning",
+    "signalDescription": "Sources for Read the Signal — market analysis, analysts, news.",
+    "learningDescription": "Sources for Ground Yourself — research papers, books, behavioral science.",
     "activeCount": "{{active}} of {{total}} active",
     "types": {
       "analyst": "Analysts",
@@ -523,7 +526,8 @@
       "newsletter": "Newsletters",
       "blog": "Blogs",
       "dashboard": "Dashboards",
-      "youtube": "YouTube"
+      "youtube": "YouTube",
+      "book": "Books"
     },
     "custom": "Custom sources",
     "addCustom": "Add custom source",
