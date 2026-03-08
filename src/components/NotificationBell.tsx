@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import { Bell } from 'lucide-react';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import { Bell, X, CheckCheck } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { formatDistanceToNow } from 'date-fns';
@@ -14,13 +14,30 @@ type NotificationItem = {
 };
 
 const LAST_READ_KEY = 'holzen_notifications_read_at';
+const DISMISSED_KEY = 'holzen_notifications_dismissed';
+
+function getDismissedIds(): Set<string> {
+  try {
+    const raw = localStorage.getItem(DISMISSED_KEY);
+    return raw ? new Set(JSON.parse(raw)) : new Set();
+  } catch {
+    return new Set();
+  }
+}
+
+function saveDismissedIds(ids: Set<string>) {
+  localStorage.setItem(DISMISSED_KEY, JSON.stringify([...ids]));
+}
 
 export function NotificationBell() {
   const { user } = useAuth();
-  const [notifications, setNotifications] = useState<NotificationItem[]>([]);
+  const [allNotifications, setAllNotifications] = useState<NotificationItem[]>([]);
+  const [dismissed, setDismissed] = useState<Set<string>>(getDismissedIds);
   const [open, setOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
+
+  const visibleNotifications = allNotifications.filter(n => !dismissed.has(n.id));
 
   useEffect(() => {
     if (!user) return;
@@ -28,7 +45,6 @@ export function NotificationBell() {
     async function fetchNotifications() {
       const items: NotificationItem[] = [];
 
-      // Fetch recent badges
       const { data: badges } = await supabase
         .from('user_badges')
         .select('id, badge_id, earned_at')
@@ -48,7 +64,6 @@ export function NotificationBell() {
         }
       }
 
-      // Fetch recent night reflections
       const { data: nights } = await supabase
         .from('night_reflections')
         .select('id, message, created_at')
@@ -68,7 +83,6 @@ export function NotificationBell() {
         }
       }
 
-      // Fetch delivered letters
       const { data: letters } = await supabase
         .from('future_letters')
         .select('id, delivered_at')
@@ -90,7 +104,6 @@ export function NotificationBell() {
         }
       }
 
-      // Fetch recent AI insights
       const { data: insights } = await supabase
         .from('reflection_insights')
         .select('id, generated_at, reflection_count')
@@ -110,23 +123,24 @@ export function NotificationBell() {
         }
       }
 
-      // Sort by timestamp descending
       items.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-
-      setNotifications(items.slice(0, 20));
-
-      // Calculate unread
-      const lastRead = localStorage.getItem(LAST_READ_KEY);
-      if (lastRead) {
-        const readTime = new Date(lastRead).getTime();
-        setUnreadCount(items.filter(i => new Date(i.timestamp).getTime() > readTime).length);
-      } else {
-        setUnreadCount(items.length);
-      }
+      setAllNotifications(items.slice(0, 20));
     }
 
     fetchNotifications();
   }, [user]);
+
+  // Recalculate unread when notifications or dismissed change
+  useEffect(() => {
+    const visible = allNotifications.filter(n => !dismissed.has(n.id));
+    const lastRead = localStorage.getItem(LAST_READ_KEY);
+    if (lastRead) {
+      const readTime = new Date(lastRead).getTime();
+      setUnreadCount(visible.filter(i => new Date(i.timestamp).getTime() > readTime).length);
+    } else {
+      setUnreadCount(visible.length);
+    }
+  }, [allNotifications, dismissed]);
 
   // Close on outside click
   useEffect(() => {
@@ -146,6 +160,24 @@ export function NotificationBell() {
       setUnreadCount(0);
     }
   }
+
+  const dismissOne = useCallback((id: string) => {
+    setDismissed(prev => {
+      const next = new Set(prev);
+      next.add(id);
+      saveDismissedIds(next);
+      return next;
+    });
+  }, []);
+
+  const dismissAll = useCallback(() => {
+    setDismissed(prev => {
+      const next = new Set(prev);
+      for (const n of allNotifications) next.add(n.id);
+      saveDismissedIds(next);
+      return next;
+    });
+  }, [allNotifications]);
 
   const iconMap: Record<NotificationItem['type'], string> = {
     badge: '🏅',
@@ -178,36 +210,61 @@ export function NotificationBell() {
             transition={{ duration: 0.15 }}
             className="absolute right-0 top-full mt-2 w-72 max-h-80 overflow-y-auto rounded-md border border-border bg-popover shadow-lg z-50"
           >
-            <div className="px-3 py-2 border-b border-border">
+            <div className="px-3 py-2 border-b border-border flex items-center justify-between">
               <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
                 Notifications
               </p>
+              {visibleNotifications.length > 0 && (
+                <button
+                  onClick={dismissAll}
+                  className="flex items-center gap-1 text-[9px] font-mono text-muted-foreground hover:text-foreground transition-colors"
+                  title="Dismiss all"
+                >
+                  <CheckCheck className="h-3 w-3" />
+                  Clear all
+                </button>
+              )}
             </div>
 
-            {notifications.length === 0 ? (
+            {visibleNotifications.length === 0 ? (
               <div className="px-3 py-6 text-center">
-                <p className="text-xs text-muted-foreground">Nothing yet</p>
+                <p className="text-xs text-muted-foreground">All caught up</p>
               </div>
             ) : (
               <div className="divide-y divide-border">
-                {notifications.map(n => (
-                  <div key={n.id} className="px-3 py-2.5 hover:bg-accent/50 transition-colors">
-                    <div className="flex items-start gap-2">
-                      <span className="text-sm mt-0.5">{iconMap[n.type]}</span>
-                      <div className="min-w-0 flex-1">
-                        <p className="text-[11px] font-medium text-foreground leading-tight">
-                          {n.title}
-                        </p>
-                        <p className="text-[10px] text-muted-foreground leading-snug mt-0.5 truncate">
-                          {n.subtitle}
-                        </p>
-                        <p className="text-[9px] text-muted-foreground/60 font-mono mt-1">
-                          {formatDistanceToNow(new Date(n.timestamp), { addSuffix: true })}
-                        </p>
+                <AnimatePresence initial={false}>
+                  {visibleNotifications.map(n => (
+                    <motion.div
+                      key={n.id}
+                      layout
+                      exit={{ opacity: 0, height: 0, paddingTop: 0, paddingBottom: 0 }}
+                      transition={{ duration: 0.2 }}
+                      className="px-3 py-2.5 hover:bg-accent/50 transition-colors group"
+                    >
+                      <div className="flex items-start gap-2">
+                        <span className="text-sm mt-0.5">{iconMap[n.type]}</span>
+                        <div className="min-w-0 flex-1">
+                          <p className="text-[11px] font-medium text-foreground leading-tight">
+                            {n.title}
+                          </p>
+                          <p className="text-[10px] text-muted-foreground leading-snug mt-0.5 truncate">
+                            {n.subtitle}
+                          </p>
+                          <p className="text-[9px] text-muted-foreground/60 font-mono mt-1">
+                            {formatDistanceToNow(new Date(n.timestamp), { addSuffix: true })}
+                          </p>
+                        </div>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); dismissOne(n.id); }}
+                          className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-accent transition-all shrink-0 mt-0.5"
+                          aria-label="Dismiss notification"
+                        >
+                          <X className="h-3 w-3 text-muted-foreground" />
+                        </button>
                       </div>
-                    </div>
-                  </div>
-                ))}
+                    </motion.div>
+                  ))}
+                </AnimatePresence>
               </div>
             )}
           </motion.div>
