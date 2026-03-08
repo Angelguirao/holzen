@@ -33,11 +33,12 @@ interface Props {
   itemCollections?: Collection[];
   onAddToCollection?: (collectionId: string, itemId: string) => Promise<any>;
   onRemoveFromCollection?: (collectionId: string, itemId: string) => Promise<void>;
+  onClick?: () => void;
 }
 
 export function LibraryItemCard({
   item, onTogglePin, onToggleFavorite, onDelete, onStatusChange, onUpdateTags, linkedItems,
-  collections, itemCollections, onAddToCollection, onRemoveFromCollection,
+  collections, itemCollections, onAddToCollection, onRemoveFromCollection, onClick,
 }: Props) {
   const { t } = useTranslation();
   const isUnread = item.status === 'unread';
@@ -72,7 +73,14 @@ export function LibraryItemCard({
   };
 
   return (
-    <div className="group rounded-md border border-border/40 bg-card/50 px-3 py-2.5 space-y-1.5 transition-colors hover:bg-card/80">
+    <div
+      className="group rounded-md border border-border/40 bg-card/50 px-3 py-2.5 space-y-1.5 transition-colors hover:bg-card/80 cursor-pointer"
+      onClick={(e) => {
+        // Don't open viewer when clicking buttons/inputs
+        if ((e.target as HTMLElement).closest('button, input, a')) return;
+        onClick?.();
+      }}
+    >
       <div className="flex items-start gap-2">
         <span className="text-sm shrink-0 mt-0.5">{TYPE_LABELS[item.type] ?? '📄'}</span>
         <div className="flex-1 min-w-0">
