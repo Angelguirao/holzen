@@ -333,7 +333,7 @@ const History = () => {
               tab === 'recent' ? 'text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
             }`}
           >
-            Recent
+            {t('history.recent')}
           </button>
           <button
             onClick={() => setTab('library')}
@@ -341,7 +341,7 @@ const History = () => {
               tab === 'library' ? 'text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
             }`}
           >
-            Library
+            {t('history.library')}
           </button>
           <button
             onClick={() => setTab('timeline')}
@@ -349,7 +349,7 @@ const History = () => {
               tab === 'timeline' ? 'text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
             }`}
           >
-            Timeline
+            {t('history.timeline')}
           </button>
         </div>
          {tab !== 'timeline' && (
