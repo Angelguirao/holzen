@@ -513,15 +513,20 @@
     "closingQuote": "Die Praxis ist dieselbe, ob du 0,001 BTC oder 10.000 hältst. Sitze mit der Volatilität. Bemerke den Impuls. Wähle bewusst.",
     "closingAttribution": "— Holzen"
   },
-  "notFound": {
-    "title": "404",
-    "message": "Hoppla! Seite nicht gefunden",
-    "returnHome": "Zur Startseite"
+  "sources": {
+    "title": "Signal-Quellen",
+    "description": "Wähle, welche Bitcoin-Quellen deinen Signal-Begleiter informieren. Aktive Quellen werden bei der Erstellung von Insights priorisiert.",
+    "activeCount": "{{active}} von {{total}} aktiv",
+    "types": { "analyst": "Analysten", "podcast": "Podcasts", "newsletter": "Newsletter", "blog": "Blogs", "dashboard": "Dashboards", "youtube": "YouTube" },
+    "custom": "Eigene Quellen",
+    "addCustom": "Eigene Quelle hinzufügen",
+    "customNamePlaceholder": "Name der Quelle",
+    "customUrlPlaceholder": "URL (optional)",
+    "add": "Hinzufügen",
+    "addFailed": "Quelle konnte nicht hinzugefügt werden",
+    "sourceAdded": "Quelle hinzugefügt"
   },
-  "terms": {
-    "title": "Nutzungsbedingungen"
-  },
-  "privacy": {
-    "title": "Datenschutzerklärung"
-  }
+  "notFound": { "title": "404", "message": "Hoppla! Seite nicht gefunden", "returnHome": "Zur Startseite" },
+  "terms": { "title": "Nutzungsbedingungen" },
+  "privacy": { "title": "Datenschutzerklärung" }
 }

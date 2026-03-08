@@ -513,15 +513,20 @@
     "closingQuote": "La pratique est la même que vous déteniez 0,001 BTC ou 10 000. Asseyez-vous avec la volatilité. Remarquez l'impulsion. Choisissez délibérément.",
     "closingAttribution": "— Holzen"
   },
-  "notFound": {
-    "title": "404",
-    "message": "Oups ! Page non trouvée",
-    "returnHome": "Retour à l'accueil"
+  "sources": {
+    "title": "Sources de signal",
+    "description": "Choisissez quelles sources Bitcoin alimentent votre compagnon de signal. Les sources actives sont prioritaires lors de la génération d'insights.",
+    "activeCount": "{{active}} sur {{total}} actives",
+    "types": { "analyst": "Analystes", "podcast": "Podcasts", "newsletter": "Newsletters", "blog": "Blogs", "dashboard": "Tableaux de bord", "youtube": "YouTube" },
+    "custom": "Sources personnalisées",
+    "addCustom": "Ajouter une source personnalisée",
+    "customNamePlaceholder": "Nom de la source",
+    "customUrlPlaceholder": "URL (optionnel)",
+    "add": "Ajouter",
+    "addFailed": "Échec de l'ajout de la source",
+    "sourceAdded": "Source ajoutée"
   },
-  "terms": {
-    "title": "Conditions d'utilisation"
-  },
-  "privacy": {
-    "title": "Politique de confidentialité"
-  }
+  "notFound": { "title": "404", "message": "Oups ! Page non trouvée", "returnHome": "Retour à l'accueil" },
+  "terms": { "title": "Conditions d'utilisation" },
+  "privacy": { "title": "Politique de confidentialité" }
 }

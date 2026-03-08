@@ -513,15 +513,20 @@
     "closingQuote": "Pratik, 0,001 BTC veya 10.000 tutmanız fark etmeksizin aynıdır. Volatiliteyle oturun. Dürtüyü fark edin. Bilinçli seçim yapın.",
     "closingAttribution": "— Holzen"
   },
-  "notFound": {
-    "title": "404",
-    "message": "Hay aksi! Sayfa bulunamadı",
-    "returnHome": "Ana Sayfaya dön"
+  "sources": {
+    "title": "Sinyal Kaynakları",
+    "description": "Sinyal arkadaşınızı hangi Bitcoin kaynaklarının bilgilendireceğini seçin. Aktif kaynaklar içgörü oluşturulurken önceliklendirilir.",
+    "activeCount": "{{total}} kaynaktan {{active}} aktif",
+    "types": { "analyst": "Analistler", "podcast": "Podcastler", "newsletter": "Bültenler", "blog": "Bloglar", "dashboard": "Panolar", "youtube": "YouTube" },
+    "custom": "Özel kaynaklar",
+    "addCustom": "Özel kaynak ekle",
+    "customNamePlaceholder": "Kaynak adı",
+    "customUrlPlaceholder": "URL (isteğe bağlı)",
+    "add": "Ekle",
+    "addFailed": "Kaynak eklenemedi",
+    "sourceAdded": "Kaynak eklendi"
   },
-  "terms": {
-    "title": "Hizmet Şartları"
-  },
-  "privacy": {
-    "title": "Gizlilik Politikası"
-  }
+  "notFound": { "title": "404", "message": "Hay aksi! Sayfa bulunamadı", "returnHome": "Ana Sayfaya dön" },
+  "terms": { "title": "Hizmet Şartları" },
+  "privacy": { "title": "Gizlilik Politikası" }
 }
