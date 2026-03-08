@@ -8,7 +8,8 @@ import {
   XAxis,
   YAxis,
   Tooltip as RechartsTooltip,
-  ReferenceDot,
+  Scatter,
+  ComposedChart,
 } from 'recharts';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format, subDays, isAfter } from 'date-fns';
@@ -36,6 +37,7 @@ interface PricePoint {
   date: string;
   reflection?: Reflection;
   ritual?: RitualCompletion;
+  reflectionPrice?: number;
 }
 
 const PERIOD_DAYS: Record<Period, number | null> = {
@@ -127,28 +129,35 @@ export function VolatilityTimeline() {
       });
     }
 
-    // Map reflections to nearest price points
+    // Inject reflections into the chart data at nearest price points
     const refPoints: PricePoint[] = [];
     for (const ref of filteredRefs) {
       const refTime = new Date(ref.created_at).getTime();
-      // Find nearest price point
-      let nearest = sampled[0];
-      let minDiff = Math.abs(refTime - nearest.timestamp);
-      for (const p of sampled) {
-        const diff = Math.abs(refTime - p.timestamp);
+      let nearestIdx = 0;
+      let minDiff = Math.abs(refTime - sampled[0].timestamp);
+      for (let i = 1; i < sampled.length; i++) {
+        const diff = Math.abs(refTime - sampled[i].timestamp);
         if (diff < minDiff) {
           minDiff = diff;
-          nearest = p;
+          nearestIdx = i;
         }
       }
-      refPoints.push({
-        ...nearest,
+      // Tag the sampled point with reflection data
+      const point: PricePoint = {
+        ...sampled[nearestIdx],
         timestamp: refTime,
-        price: nearest.price,
-        date: format(new Date(refTime), 'MMM d, HH:mm'),
         reflection: ref,
         ritual: ritualMap.get(ref.id),
-      });
+        reflectionPrice: sampled[nearestIdx].price,
+      };
+      refPoints.push(point);
+      // Also mark the sampled data so dots render on the line
+      sampled[nearestIdx] = {
+        ...sampled[nearestIdx],
+        reflection: ref,
+        ritual: ritualMap.get(ref.id),
+        reflectionPrice: sampled[nearestIdx].price,
+      };
     }
 
     return { chartData: sampled, reflectionPoints: refPoints };
@@ -202,7 +211,7 @@ export function VolatilityTimeline() {
       {/* Chart */}
       <div className="rounded-md border border-border/60 bg-muted/20 p-3">
         <ResponsiveContainer width="100%" height={220}>
-          <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+          <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="priceGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.2} />
@@ -217,6 +226,7 @@ export function VolatilityTimeline() {
               interval="preserveStartEnd"
             />
             <YAxis
+              dataKey="price"
               domain={[minPrice * 0.98, maxPrice * 1.02]}
               tick={{ fontSize: 9, fill: 'hsl(var(--muted-foreground))' }}
               tickLine={false}
@@ -225,7 +235,7 @@ export function VolatilityTimeline() {
               width={45}
             />
             <RechartsTooltip
-              content={<PriceTooltip />}
+              content={<ChartTooltip />}
               cursor={{ stroke: 'hsl(var(--primary))', strokeWidth: 1, strokeDasharray: '3 3' }}
             />
             <Area
@@ -237,20 +247,44 @@ export function VolatilityTimeline() {
               dot={false}
               activeDot={false}
             />
-            {/* Reflection markers */}
-            {reflectionPoints.map((rp) => (
-              <ReferenceDot
-                key={rp.reflection!.id}
-                x={rp.date}
-                y={rp.price}
-                r={4}
-                fill={getMoodColor(rp.reflection!.mood)}
-                stroke="hsl(var(--background))"
-                strokeWidth={1.5}
-                isFront
-              />
-            ))}
-          </AreaChart>
+            <Scatter
+              dataKey="reflectionPrice"
+              fill="hsl(var(--primary))"
+              shape={(props: any) => {
+                const point = props.payload as PricePoint;
+                if (!point.reflection) return null;
+                const color = getMoodColor(point.reflection.mood);
+                return (
+                  <g>
+                    {/* Glow ring */}
+                    <circle
+                      cx={props.cx}
+                      cy={props.cy}
+                      r={10}
+                      fill={color}
+                      fillOpacity={0.15}
+                    />
+                    {/* Outer ring */}
+                    <circle
+                      cx={props.cx}
+                      cy={props.cy}
+                      r={6}
+                      fill="hsl(var(--background))"
+                      stroke={color}
+                      strokeWidth={2}
+                    />
+                    {/* Inner dot */}
+                    <circle
+                      cx={props.cx}
+                      cy={props.cy}
+                      r={3}
+                      fill={color}
+                    />
+                  </g>
+                );
+              }}
+            />
+          </ComposedChart>
         </ResponsiveContainer>
 
         {/* Legend */}
@@ -295,15 +329,41 @@ function LegendItem({ color, label }: { color: string; label: string }) {
   );
 }
 
-function PriceTooltip({ active, payload }: any) {
+function ChartTooltip({ active, payload }: any) {
   if (!active || !payload?.[0]) return null;
   const data = payload[0].payload as PricePoint;
+  const decisionLabels: Record<string, string> = {
+    held: 'Hold', sold: 'Sell', bought: 'Buy', nothing: 'Nothing',
+  };
+
   return (
-    <div className="rounded-md border border-border/60 bg-background px-3 py-2 shadow-sm">
+    <div className="rounded-md border border-border/60 bg-background px-3 py-2 shadow-md max-w-[220px]">
       <p className="text-[10px] font-mono text-muted-foreground">{data.date}</p>
-      <p className="text-xs font-mono">
+      <p className="text-xs font-mono font-medium">
         ${data.price.toLocaleString('en-US', { maximumFractionDigits: 0 })}
       </p>
+      {data.reflection && (
+        <div className="mt-1.5 pt-1.5 border-t border-border/40 space-y-1">
+          <p className="text-[10px] leading-relaxed line-clamp-2">{data.reflection.message}</p>
+          <div className="flex items-center gap-1.5 flex-wrap">
+            {data.reflection.mood && (
+              <span className="text-[8px] font-mono px-1 py-0.5 rounded bg-muted/40 text-muted-foreground">
+                {data.reflection.mood}
+              </span>
+            )}
+            {data.reflection.outcome && (
+              <span className="text-[8px] font-mono px-1 py-0.5 rounded bg-muted/40 text-muted-foreground">
+                {decisionLabels[data.reflection.outcome] || data.reflection.outcome}
+              </span>
+            )}
+            {data.ritual && (
+              <span className="text-[8px] font-mono px-1 py-0.5 rounded bg-primary/10 text-primary/70">
+                ritual
+              </span>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
