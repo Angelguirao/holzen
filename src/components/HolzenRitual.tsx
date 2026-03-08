@@ -1,9 +1,11 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Wind, Eye, PenLine, Target, ChevronRight, Check } from 'lucide-react';
+import { X, Wind, Eye, PenLine, Target, Check, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
 import { hapticFeedback } from '@/lib/haptics';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/use-auth';
+import { RitualBreathing, RitualReflect, RitualJournal, RitualDecide } from './ritual';
 
 export type RitualTemplate = 'quick' | 'standard' | 'deep';
 
@@ -32,162 +34,17 @@ export const TEMPLATE_LABELS: Record<RitualTemplate, { label: string; descriptio
   deep: { label: 'Deep', description: 'Breathe → Reflect → Journal → Decide' },
 };
 
-const outcomes = [
-  { value: 'held', label: 'Hold' },
-  { value: 'sold', label: 'Sell' },
-  { value: 'bought', label: 'Buy' },
-  { value: 'nothing', label: 'Nothing' },
-] as const;
-
-// Minimal inline breathing for the ritual (self-contained, no overlay)
-function RitualBreathing({ onComplete }: { onComplete: () => void }) {
-  const [phase, setPhase] = useState<'inhale' | 'hold' | 'exhale'>('inhale');
-  const [cycle, setCycle] = useState(0);
-  const [started, setStarted] = useState(false);
-  const totalCycles = 3;
-
-  const runCycle = useCallback(() => {
-    setPhase('inhale');
-    setTimeout(() => {
-      setPhase('hold');
-      setTimeout(() => {
-        setPhase('exhale');
-        setTimeout(() => {
-          setCycle((prev) => {
-            const next = prev + 1;
-            if (next >= totalCycles) {
-              hapticFeedback('success');
-              onComplete();
-              return next;
-            }
-            // Recurse for next cycle
-            runCycle();
-            return next;
-          });
-        }, 4000);
-      }, 4000);
-    }, 4000);
-  }, [onComplete]);
-
-  const handleStart = () => {
-    setStarted(true);
-    hapticFeedback('light');
-    runCycle();
-  };
-
-  if (!started) {
-    return (
-      <div className="flex flex-col items-center gap-6 py-8">
-        <div className="h-16 w-16 rounded-full border border-border/40 flex items-center justify-center">
-          <Wind className="h-6 w-6 text-muted-foreground/60" />
-        </div>
-        <p className="text-xs text-muted-foreground text-center">
-          3 cycles of box breathing. 4 seconds each phase.
-        </p>
-        <Button variant="outline" size="sm" onClick={handleStart} className="font-mono text-xs">
-          Begin breathing
-        </Button>
-      </div>
-    );
-  }
-
-  const phaseLabel = phase === 'inhale' ? 'Inhale' : phase === 'hold' ? 'Hold' : 'Exhale';
-  const scale = phase === 'inhale' ? 1.3 : phase === 'exhale' ? 0.8 : 1.1;
-
-  return (
-    <div className="flex flex-col items-center gap-4 py-8">
-      <motion.div
-        className="h-20 w-20 rounded-full border-2 border-primary/30 flex items-center justify-center"
-        animate={{ scale }}
-        transition={{ duration: 4, ease: 'easeInOut' }}
-      >
-        <span className="text-sm font-mono text-primary/70">{phaseLabel}</span>
-      </motion.div>
-      <p className="text-[10px] font-mono text-muted-foreground/50">
-        {cycle + 1} / {totalCycles}
-      </p>
-    </div>
-  );
-}
-
-function RitualReflect({ message, onComplete }: { message?: string; onComplete: () => void }) {
-  return (
-    <div className="flex flex-col items-center gap-6 py-8">
-      <Eye className="h-6 w-6 text-muted-foreground/40" />
-      {message ? (
-        <p className="text-sm leading-relaxed text-center max-w-sm">{message}</p>
-      ) : (
-        <p className="text-sm text-muted-foreground leading-relaxed text-center max-w-sm italic">
-          Sit with the moment. Notice your impulses without acting on them. What is the market making you feel?
-        </p>
-      )}
-      <Button variant="outline" size="sm" onClick={() => { hapticFeedback('light'); onComplete(); }} className="font-mono text-xs">
-        I've reflected
-      </Button>
-    </div>
-  );
-}
-
-function RitualJournal({ onComplete }: { onComplete: (text: string) => void }) {
-  const [text, setText] = useState('');
-
-  return (
-    <div className="flex flex-col gap-4 py-6">
-      <div className="flex items-center gap-2 text-muted-foreground/60">
-        <PenLine className="h-4 w-4" />
-        <p className="text-xs font-mono">Write it out before you act</p>
-      </div>
-      <Textarea
-        value={text}
-        onChange={(e) => setText(e.target.value)}
-        placeholder="What's driving this impulse? What would future-you think?"
-        className="min-h-[100px] text-sm resize-none bg-muted/20 border-border/40"
-      />
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={() => { hapticFeedback('light'); onComplete(text); }}
-        className="font-mono text-xs self-end"
-      >
-        Done writing
-      </Button>
-    </div>
-  );
-}
-
-function RitualDecide({ onComplete }: { onComplete: (decision: string) => void }) {
-  return (
-    <div className="flex flex-col items-center gap-6 py-8">
-      <Target className="h-6 w-6 text-muted-foreground/40" />
-      <p className="text-xs text-muted-foreground text-center">
-        You've paused. You've reflected. Now decide intentionally.
-      </p>
-      <div className="grid grid-cols-2 gap-2 w-full max-w-xs">
-        {outcomes.map((o) => (
-          <Button
-            key={o.value}
-            variant="outline"
-            size="sm"
-            onClick={() => { hapticFeedback('medium'); onComplete(o.value); }}
-            className="font-mono text-xs"
-          >
-            {o.label}
-          </Button>
-        ))}
-      </div>
-    </div>
-  );
-}
-
 interface HolzenRitualProps {
   open: boolean;
   onClose: () => void;
   template: RitualTemplate;
   reflectionMessage?: string;
+  reflectionId?: string | null;
   onDecision?: (decision: string, journal?: string) => void;
 }
 
-export function HolzenRitual({ open, onClose, template, reflectionMessage, onDecision }: HolzenRitualProps) {
+export function HolzenRitual({ open, onClose, template, reflectionMessage, reflectionId, onDecision }: HolzenRitualProps) {
+  const { user } = useAuth();
   const steps = TEMPLATES[template]
     .map((id) => ALL_STEPS.find((s) => s.id === id)!)
     .filter(Boolean);
@@ -196,6 +53,7 @@ export function HolzenRitual({ open, onClose, template, reflectionMessage, onDec
   const [completed, setCompleted] = useState(false);
   const [journalText, setJournalText] = useState('');
   const [decision, setDecision] = useState('');
+  const startTimeRef = useRef<number>(Date.now());
 
   const step = steps[currentStep];
 
@@ -208,18 +66,51 @@ export function HolzenRitual({ open, onClose, template, reflectionMessage, onDec
     }
   }, [currentStep, steps.length]);
 
+  const skipStep = useCallback(() => {
+    // Can't skip the final decide step
+    if (step.id === 'decide') return;
+    hapticFeedback('light');
+    advance();
+  }, [step, advance]);
+
+  const persistCompletion = useCallback(async (d: string, journal: string) => {
+    if (!user) return;
+    const durationSeconds = Math.round((Date.now() - startTimeRef.current) / 1000);
+
+    // Save to ritual_completions
+    await supabase.from('ritual_completions' as any).insert({
+      user_id: user.id,
+      reflection_id: reflectionId || null,
+      template,
+      decision: d,
+      journal_text: journal || null,
+      duration_seconds: durationSeconds,
+    });
+
+    // Save journal text to the reflection's note field if linked
+    if (reflectionId && journal) {
+      await supabase
+        .from('reflections')
+        .update({ note: journal })
+        .eq('id', reflectionId)
+        .eq('user_id', user.id);
+    }
+  }, [user, reflectionId, template]);
+
   const handleDecision = useCallback((d: string) => {
     setDecision(d);
     onDecision?.(d, journalText);
+    persistCompletion(d, journalText);
     setCompleted(true);
     hapticFeedback('success');
-  }, [onDecision, journalText]);
+  }, [onDecision, journalText, persistCompletion]);
 
   const handleClose = useCallback(() => {
     setCurrentStep(0);
     setCompleted(false);
     setJournalText('');
     setDecision('');
+    startTimeRef.current = Date.now();
     onClose();
   }, [onClose]);
 
@@ -263,11 +154,21 @@ export function HolzenRitual({ open, onClose, template, reflectionMessage, onDec
               ))}
             </div>
 
-            {/* Step label */}
+            {/* Step label + skip */}
             {!completed && (
-              <p className="text-[10px] font-mono text-muted-foreground/50 uppercase tracking-[0.2em] text-center mb-2">
-                {step.label} · {currentStep + 1}/{steps.length}
-              </p>
+              <div className="flex items-center justify-center gap-3 mb-2">
+                <p className="text-[10px] font-mono text-muted-foreground/50 uppercase tracking-[0.2em] text-center">
+                  {step.label} · {currentStep + 1}/{steps.length}
+                </p>
+                {step.id !== 'decide' && (
+                  <button
+                    onClick={skipStep}
+                    className="flex items-center gap-0.5 text-[10px] font-mono text-muted-foreground/30 hover:text-muted-foreground/60 transition-colors"
+                  >
+                    Skip <ChevronRight className="h-2.5 w-2.5" />
+                  </button>
+                )}
+              </div>
             )}
 
             {/* Step content */}

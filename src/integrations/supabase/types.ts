@@ -434,6 +434,47 @@ export type Database = {
         }
         Relationships: []
       }
+      ritual_completions: {
+        Row: {
+          created_at: string
+          decision: string
+          duration_seconds: number | null
+          id: string
+          journal_text: string | null
+          reflection_id: string | null
+          template: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          decision: string
+          duration_seconds?: number | null
+          id?: string
+          journal_text?: string | null
+          reflection_id?: string | null
+          template?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          decision?: string
+          duration_seconds?: number | null
+          id?: string
+          journal_text?: string | null
+          reflection_id?: string | null
+          template?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ritual_completions_reflection_id_fkey"
+            columns: ["reflection_id"]
+            isOneToOne: false
+            referencedRelation: "reflections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       roadmap_items: {
         Row: {
           created_at: string

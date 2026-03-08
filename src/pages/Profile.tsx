@@ -15,6 +15,7 @@ import { ReferralSection } from '@/components/ReferralSection';
 import { MoodPriceChart } from '@/components/MoodPriceChart';
 import { MoodTrendChart } from '@/components/MoodTrendChart';
 import { MoodPriceScatter } from '@/components/MoodPriceScatter';
+import { RitualStatsCard } from '@/components/RitualStatsCard';
 import { StatsTrends } from '@/components/StatsTrends';
 import { ShareStats } from '@/components/ShareStats';
 import { useHolzenScore } from '@/hooks/use-holzen-score';
@@ -254,6 +255,7 @@ function StatsContent({ reflections }: { reflections: Reflection[] }) {
       <ReflectionStats reflections={reflections} />
       <StreakTimeline reflections={reflections} />
       {scoreData && <HolzenScoreDetail scoreData={scoreData} />}
+      <RitualStatsCard />
       <DecisionQualityCard reflections={reflections} />
       <StatsTrends reflections={reflections} />
       <MoodTrendChart reflections={reflections} />
