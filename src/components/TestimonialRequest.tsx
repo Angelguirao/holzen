@@ -1,0 +1,165 @@
+import { useState, useEffect } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { MessageCircle, X, Send } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Textarea } from '@/components/ui/textarea';
+import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/use-auth';
+import { useHolzen } from '@/hooks/use-holzen';
+import { toast } from 'sonner';
+
+const DISMISS_KEY = 'holzen_testimonial_dismissed';
+const SUBMITTED_KEY = 'holzen_testimonial_submitted';
+
+// Show after 10+ reflections, not dismissed, not already submitted
+function shouldShow(reflectionCount: number): boolean {
+  if (reflectionCount < 10) return false;
+  if (localStorage.getItem(SUBMITTED_KEY)) return false;
+  const dismissed = localStorage.getItem(DISMISS_KEY);
+  if (dismissed) {
+    const dismissedAt = new Date(dismissed).getTime();
+    const weekAgo = Date.now() - 7 * 24 * 60 * 60 * 1000;
+    if (dismissedAt > weekAgo) return false;
+  }
+  return true;
+}
+
+const T: Record<string, Record<string, string>> = {
+  en: {
+    title: 'Enjoying Holzen?',
+    subtitle: 'Share a short quote about your experience — it may appear on our landing page.',
+    placeholder: 'e.g. "Holzen helped me stop panic-selling during dips."',
+    send: 'Submit',
+    thanks: 'Thank you! Your testimonial is under review.',
+    nameLabel: 'Display name',
+  },
+  es: {
+    title: '¿Disfrutas Holzen?',
+    subtitle: 'Comparte una breve frase sobre tu experiencia — podría aparecer en nuestra página de inicio.',
+    placeholder: 'ej. "Holzen me ayudó a dejar de vender en pánico durante las caídas."',
+    send: 'Enviar',
+    thanks: '¡Gracias! Tu testimonio está en revisión.',
+    nameLabel: 'Nombre visible',
+  },
+  pt: {
+    title: 'Curtindo o Holzen?',
+    subtitle: 'Compartilhe uma frase curta sobre sua experiência — ela pode aparecer na nossa página inicial.',
+    placeholder: 'ex. "Holzen me ajudou a parar de vender em pânico durante as quedas."',
+    send: 'Enviar',
+    thanks: 'Obrigado! Seu depoimento está em análise.',
+    nameLabel: 'Nome visível',
+  },
+  de: {
+    title: 'Gefällt dir Holzen?',
+    subtitle: 'Teile ein kurzes Zitat über deine Erfahrung — es könnte auf unserer Startseite erscheinen.',
+    placeholder: 'z.B. „Holzen hat mir geholfen, nicht mehr in Panik zu verkaufen."',
+    send: 'Absenden',
+    thanks: 'Danke! Dein Testimonial wird geprüft.',
+    nameLabel: 'Anzeigename',
+  },
+  fr: {
+    title: 'Tu aimes Holzen ?',
+    subtitle: 'Partage une courte phrase sur ton expérience — elle pourrait apparaître sur notre page d\'accueil.',
+    placeholder: 'ex. « Holzen m\'a aidé à arrêter de vendre en panique. »',
+    send: 'Envoyer',
+    thanks: 'Merci ! Ton témoignage est en cours de révision.',
+    nameLabel: 'Nom affiché',
+  },
+};
+
+interface Props {
+  reflectionCount: number;
+}
+
+export function TestimonialRequest({ reflectionCount }: Props) {
+  const { user } = useAuth();
+  const { firstName, language } = useHolzen();
+  const [visible, setVisible] = useState(false);
+  const [quote, setQuote] = useState('');
+  const [displayName, setDisplayName] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  const t = T[language] || T.en;
+
+  useEffect(() => {
+    setVisible(shouldShow(reflectionCount));
+  }, [reflectionCount]);
+
+  useEffect(() => {
+    if (firstName) setDisplayName(firstName);
+  }, [firstName]);
+
+  const dismiss = () => {
+    localStorage.setItem(DISMISS_KEY, new Date().toISOString());
+    setVisible(false);
+  };
+
+  const submit = async () => {
+    if (!user || !quote.trim() || !displayName.trim()) return;
+    setSubmitting(true);
+    const { error } = await supabase.from('testimonials').insert({
+      user_id: user.id,
+      display_name: displayName.trim(),
+      quote: quote.trim(),
+    } as any);
+    setSubmitting(false);
+    if (error) {
+      toast.error('Failed to submit');
+    } else {
+      localStorage.setItem(SUBMITTED_KEY, 'true');
+      toast.success(t.thanks);
+      setVisible(false);
+    }
+  };
+
+  return (
+    <AnimatePresence>
+      {visible && (
+        <motion.div
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -8 }}
+          className="rounded-lg border border-border bg-card p-4 space-y-3"
+        >
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <MessageCircle className="h-4 w-4 text-primary shrink-0" />
+              <p className="text-sm text-foreground font-medium">{t.title}</p>
+            </div>
+            <button onClick={dismiss} className="text-muted-foreground hover:text-foreground transition-colors">
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed">{t.subtitle}</p>
+          <input
+            type="text"
+            value={displayName}
+            onChange={(e) => setDisplayName(e.target.value)}
+            placeholder={t.nameLabel}
+            className="w-full text-xs rounded-md border border-border bg-background px-3 py-2 text-foreground placeholder:text-muted-foreground/50"
+            maxLength={50}
+          />
+          <Textarea
+            value={quote}
+            onChange={(e) => setQuote(e.target.value)}
+            placeholder={t.placeholder}
+            className="text-xs min-h-[60px] resize-none"
+            maxLength={280}
+          />
+          <div className="flex items-center justify-between">
+            <span className="text-[10px] text-muted-foreground">{quote.length}/280</span>
+            <Button
+              size="sm"
+              onClick={submit}
+              disabled={submitting || !quote.trim() || !displayName.trim()}
+              className="text-xs font-mono gap-1.5"
+            >
+              <Send className="h-3 w-3" />
+              {t.send}
+            </Button>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}

@@ -1,4 +1,5 @@
 import { useHolzen } from '@/hooks/use-holzen';
+import { TestimonialRequest } from '@/components/TestimonialRequest';
 import { LetterToFutureSelf } from '@/components/LetterToFutureSelf';
 import { TheVoid } from '@/components/TheVoid';
 import { HolzenRitual, type RitualTemplate } from '@/components/HolzenRitual';
@@ -112,6 +113,7 @@ const Home = () => {
   const [zenMode] = useState(() => localStorage.getItem('holzen_zen_mode') === 'true');
   const [pinnedReflection, setPinnedReflection] = useState<PinnedReflection | null>(null);
   const prefersReducedMotion = useReducedMotion();
+  const [reflectionCount, setReflectionCount] = useState(0);
 
   // Widget layout
   const defaultOrder = useMemo(() => [...WIDGET_IDS], []);
@@ -151,6 +153,13 @@ const Home = () => {
         if (data) setPinnedReflection(data as unknown as PinnedReflection);
         else localStorage.removeItem('holzen_pinned_reflection');
       });
+  }, [user]);
+
+  // Fetch reflection count for testimonial prompt
+  useEffect(() => {
+    if (!user) return;
+    supabase.from('reflections').select('id', { count: 'exact', head: true }).eq('user_id', user.id)
+      .then(({ count }) => { if (count != null) setReflectionCount(count); });
   }, [user]);
 
   const togglePriceHidden = useCallback(() => {
@@ -552,6 +561,9 @@ const Home = () => {
         reflectionId={lastReflectionId}
       />
       <TheVoid open={showVoid} onClose={() => setShowVoid(false)} />
+
+      {/* Testimonial request */}
+      <TestimonialRequest reflectionCount={reflectionCount} />
 
       <p className="text-xs text-muted-foreground leading-relaxed">
         When Bitcoin moves, we'll help you pause before you act.
