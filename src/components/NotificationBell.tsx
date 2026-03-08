@@ -10,17 +10,17 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 const SWIPE_THRESHOLD = 80;
 
-function SwipeableNotification({
-  n,
-  iconMap,
-  onDismiss,
-  onAction,
-}: {
+const SwipeableNotification = forwardRef<HTMLDivElement, {
   n: NotificationItem;
   iconMap: Record<NotificationItem['type'], string>;
   onDismiss: (id: string) => void;
   onAction: (path: string) => void;
-}) {
+}>(function SwipeableNotification({
+  n,
+  iconMap,
+  onDismiss,
+  onAction,
+}, _ref) {
   const startX = useRef(0);
   const currentX = useRef(0);
   const swiping = useRef(false);
