@@ -365,6 +365,7 @@ export type Database = {
           generated_at: string
           id: string
           insights: Json
+          language: string
           period_end: string | null
           period_start: string | null
           reflection_count: number
@@ -375,6 +376,7 @@ export type Database = {
           generated_at?: string
           id?: string
           insights?: Json
+          language?: string
           period_end?: string | null
           period_start?: string | null
           reflection_count?: number
@@ -385,6 +387,7 @@ export type Database = {
           generated_at?: string
           id?: string
           insights?: Json
+          language?: string
           period_end?: string | null
           period_start?: string | null
           reflection_count?: number
