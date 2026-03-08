@@ -283,7 +283,7 @@ export function Onboarding({ onComplete }: Props) {
                       onClick={() => goTo(1)}
                       className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
                     >
-                      ← Back
+                    ← {t('common.back')}
                     </button>
                     <Button
                       onClick={() => onComplete({
