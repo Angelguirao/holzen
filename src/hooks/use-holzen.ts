@@ -353,16 +353,29 @@ export function useHolzen() {
 
         if (insertedReflection) {
           setLastReflectionId(insertedReflection.id);
-          // Auto-save reflection to library
-          await supabase.from('library_items').insert({
-            user_id: user.id,
-            type: 'bookmark',
-            title: 'Reflection',
-            body: msg,
-            source_type: 'reflection',
-            reflection_id: insertedReflection.id,
-            tags: ['reflection'],
-          });
+          // Auto-save reflection + haiku to library
+          const libraryInserts: any[] = [
+            {
+              user_id: user.id,
+              type: 'bookmark',
+              title: 'Reflection',
+              body: msg,
+              source_type: 'reflection',
+              reflection_id: insertedReflection.id,
+              tags: ['reflection'],
+            },
+          ];
+          if (companionData.haiku) {
+            libraryInserts.push({
+              user_id: user.id,
+              type: 'bookmark',
+              title: 'Haiku',
+              body: companionData.haiku,
+              source_type: 'haiku',
+              reflection_id: insertedReflection.id,
+            });
+          }
+          await supabase.from('library_items').insert(libraryInserts);
         }
 
         await supabase.from('profiles').update({
