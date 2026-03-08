@@ -79,26 +79,10 @@ const Landing = () => {
           </motion.p>
           <div className="space-y-4">
             {[
-              {
-                step: '01',
-                title: 'The market moves',
-                desc: 'Holzen watches daily and 7-day cumulative volatility against your personal thresholds. Or request a reflection anytime you need one.',
-              },
-              {
-                step: '02',
-                title: 'You pause',
-                desc: 'A breathing exercise grounds you. A quick mood check captures how you feel right now — anxious, neutral, or calm.',
-              },
-              {
-                step: '03',
-                title: 'You reflect',
-                desc: 'An AI-generated reflection encourages awareness, not action. Accompanied by a haiku and a historical insight for perspective.',
-              },
-              {
-                step: '04',
-                title: 'You track',
-                desc: 'Tag your emotions. Journal a note. Record what you did — held, sold, bought, or nothing. Over time, patterns emerge.',
-              },
+              { step: '01', title: t('landing.steps.01title'), desc: t('landing.steps.01desc') },
+              { step: '02', title: t('landing.steps.02title'), desc: t('landing.steps.02desc') },
+              { step: '03', title: t('landing.steps.03title'), desc: t('landing.steps.03desc') },
+              { step: '04', title: t('landing.steps.04title'), desc: t('landing.steps.04desc') },
             ].map((step, i) => (
               <motion.div
                 key={step.step}
