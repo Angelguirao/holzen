@@ -35,3 +35,5 @@ project_id = "edgbwdecaoottowliimu"
     verify_jwt = false
   [functions.zoom-out-companion]
     verify_jwt = false
+  [functions.historical-insight]
+    verify_jwt = false

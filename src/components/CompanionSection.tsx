@@ -428,6 +428,24 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
           />
         </CollapsibleCompanion>
       )}
+
+      {hasHistory && (
+        <CollapsibleCompanion
+          label="Historical insight"
+          expanded={expandedHistory}
+          onToggle={() => {
+            setExpandedHistory((v) => !v);
+            if (!completion.history) markCompleted('history');
+          }}
+          completed={completion.history}
+        >
+          <HistoricalInsightDisplay
+            data={historyInsight}
+            loading={historyLoading}
+            error={historyError}
+          />
+        </CollapsibleCompanion>
+      )}
     </div>
   );
 }
