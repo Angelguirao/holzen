@@ -344,7 +344,7 @@ function LegendItem({ color, label }: { color: string; label: string }) {
   );
 }
 
-function ChartTooltip({ active, payload }: any) {
+const ChartTooltip = forwardRef<HTMLDivElement, any>(({ active, payload }, ref) => {
   if (!active || !payload?.[0]) return null;
   const data = payload[0].payload as PricePoint;
   const decisionLabels: Record<string, string> = {
@@ -352,7 +352,7 @@ function ChartTooltip({ active, payload }: any) {
   };
 
   return (
-    <div className="rounded-md border border-border/60 bg-background px-3 py-2 shadow-md max-w-[220px]">
+    <div ref={ref} className="rounded-md border border-border/60 bg-background px-3 py-2 shadow-md max-w-[220px]">
       <p className="text-[10px] font-mono text-muted-foreground">{data.date}</p>
       <p className="text-xs font-mono font-medium">
         ${data.price.toLocaleString('en-US', { maximumFractionDigits: 0 })}
@@ -381,7 +381,7 @@ function ChartTooltip({ active, payload }: any) {
       )}
     </div>
   );
-}
+});
 
 function ReflectionMarkerCard({ point }: { point: PricePoint }) {
   const ref = point.reflection!;
