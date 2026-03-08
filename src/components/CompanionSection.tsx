@@ -97,6 +97,31 @@ function CollapsibleCompanion({
 export const CompanionSection = forwardRef<HTMLDivElement, Props>(function CompanionSection({ companions, prefs, severity = 'mild', reflectionId, context, reflectionMessage }, ref) {
   const { language } = useHolzen();
 
+  // Helper: auto-save companion to library (dedup by reflection_id + source_type)
+  const autoSaveToLibrary = useCallback(async (params: { title: string; body: string; sourceType: string; sourceUrl?: string }) => {
+    if (!reflectionId) return;
+    const { data: authData } = await supabase.auth.getUser();
+    const userId = authData?.user?.id;
+    if (!userId) return;
+    const { data: existing } = await supabase
+      .from('library_items')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('reflection_id', reflectionId)
+      .eq('source_type', params.sourceType)
+      .limit(1);
+    if (existing && existing.length > 0) return;
+    await supabase.from('library_items').insert({
+      user_id: userId,
+      type: 'bookmark',
+      title: params.title,
+      body: params.body,
+      source_type: params.sourceType,
+      source_url: params.sourceUrl || null,
+      reflection_id: reflectionId,
+    });
+  }, [reflectionId]);
+
   // Static English labels — language setting only affects AI-generated content
   const t = { pause: 'Pause with this', breathe: 'Breathe with this', haiku: 'Read as haiku', ground: 'Ground yourself', signal: 'Read the signal', zoomOut: 'Zoom out', lookBack: 'Look back' };
   const [expandedBreathing, setExpandedBreathing] = useState(false);
