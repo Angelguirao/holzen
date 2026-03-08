@@ -18,6 +18,8 @@ export interface GraphNodeData extends Record<string, unknown> {
   sublabel?: string;
   count?: number;
   emoji?: string;
+  onClick?: () => void;
+  entityId?: string; // original reflection/library_item id
 }
 
 const MOOD_EMOJIS: Record<string, string> = {
