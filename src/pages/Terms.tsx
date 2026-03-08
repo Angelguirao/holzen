@@ -93,9 +93,30 @@ const Terms = () => {
         </section>
 
         <section className="space-y-3">
-          <h2 className="text-sm font-medium text-foreground">11. Contact</h2>
+          <h2 className="text-sm font-medium text-foreground">11. Business Entity</h2>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            For questions about these terms, reach out via the support channels provided within the app.
+            Holzen is operated by [Your Company Name], a company registered in [Country/State], registration number [Registration Number]. Registered address: [Street Address, City, Postal Code, Country].
+          </p>
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="text-sm font-medium text-foreground">12. Invoices & Billing</h2>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Invoices for your subscription are generated automatically and sent to the email address associated with your account. You can view and download past invoices through the Stripe customer portal accessible from your Settings page. Invoices include the business details listed in Section 11.
+          </p>
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="text-sm font-medium text-foreground">13. Governing Law</h2>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            These Terms shall be governed by and construed in accordance with the laws of [Country/State]. Any disputes arising under these terms shall be subject to the exclusive jurisdiction of the courts of [City, Country].
+          </p>
+        </section>
+
+        <section className="space-y-3">
+          <h2 className="text-sm font-medium text-foreground">14. Contact</h2>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            For questions about these terms, reach out via the support channels provided within the app or email [contact@yourdomain.com].
           </p>
         </section>
 
