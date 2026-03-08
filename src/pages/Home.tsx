@@ -1,3 +1,4 @@
+import { usePullToRefresh } from '@/hooks/use-pull-to-refresh';
 import { useHolzen } from '@/hooks/use-holzen';
 import { TestimonialRequest } from '@/components/TestimonialRequest';
 import { LetterToFutureSelf } from '@/components/LetterToFutureSelf';
@@ -23,7 +24,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { toast } from 'sonner';
-import { AlertCircle, Loader2, Pause, Pin, Timer, Circle, Sparkles, Waves, RotateCcw } from 'lucide-react';
+import { AlertCircle, Loader2, Pause, Pin, Timer, Circle, Sparkles, Waves, RotateCcw, RefreshCw } from 'lucide-react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { playNotificationTone, prefetchNotificationTone } from '@/lib/notification-tone';
 import {
@@ -228,6 +229,14 @@ const Home = () => {
     localStorage.removeItem('holzen_pinned_reflection');
     setPinnedReflection(null);
   }, []);
+
+  const handlePullRefresh = useCallback(async () => {
+    window.location.reload();
+  }, []);
+
+  const { pullDistance, refreshing: pullRefreshing, handlers: pullHandlers } = usePullToRefresh({
+    onRefresh: handlePullRefresh,
+  });
 
   if (!hasOnboarded) {
     return <Onboarding onComplete={completeOnboarding} />;
@@ -515,7 +524,21 @@ const Home = () => {
   const hasCollapsed = Object.values(collapsed).some(Boolean);
 
   return (
-    <div className="space-y-4">
+    <div {...pullHandlers} className="space-y-4">
+      {/* Pull-to-refresh indicator */}
+      {(pullDistance > 0 || pullRefreshing) && (
+        <div
+          className="flex items-center justify-center transition-all overflow-hidden"
+          style={{ height: pullRefreshing ? 32 : pullDistance * 0.4 }}
+        >
+          <RefreshCw
+            className={`h-4 w-4 text-muted-foreground/50 transition-transform ${
+              pullRefreshing ? 'animate-spin' : ''
+            }`}
+            style={{ transform: pullRefreshing ? undefined : `rotate(${pullDistance * 3}deg)` }}
+          />
+        </div>
+      )}
       {/* Greeting + reset */}
       <div className="flex items-center justify-between">
         {firstName ? (
