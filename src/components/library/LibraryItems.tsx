@@ -4,6 +4,7 @@ import { Search, FolderOpen, Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { LibraryItemCard } from './LibraryItemCard';
 import { NewNoteForm } from './NewNoteForm';
+import { NewCollectionForm } from './NewCollectionForm';
 import { cn } from '@/lib/utils';
 import type { useLibrary } from '@/hooks/use-library';
 
