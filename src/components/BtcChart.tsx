@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TrendingDown, TrendingUp } from 'lucide-react';
+import { formatBtcPrice } from '@/lib/btc';
 
 interface ChartPoint {
   timestamp: number;
@@ -10,24 +11,27 @@ interface ChartPoint {
 
 interface Props {
   hidden?: boolean;
+  currency?: string;
 }
 
-export function BtcChart({ hidden = false }: Props) {
+export function BtcChart({ hidden = false, currency = 'USD' }: Props) {
   const [data, setData] = useState<ChartPoint[] | null>(null);
   const [error, setError] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
+    setData(null);
+    setError(false);
     const load = async () => {
       try {
+        const cur = currency.toLowerCase();
         const res = await fetch(
-          'https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=7'
+          `https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=${cur}&days=7`
         );
         if (!res.ok) throw new Error();
         const json = await res.json();
         const prices: [number, number][] = json.prices;
         if (!cancelled && prices?.length >= 2) {
-          // Sample ~48 points to keep chart clean
           const step = Math.max(1, Math.floor(prices.length / 48));
           const sampled = prices
             .filter((_, i) => i % step === 0 || i === prices.length - 1)
@@ -40,7 +44,7 @@ export function BtcChart({ hidden = false }: Props) {
     };
     load();
     return () => { cancelled = true; };
-  }, []);
+  }, [currency]);
 
   if (hidden) return null;
   if (error) return null;
@@ -64,8 +68,7 @@ export function BtcChart({ hidden = false }: Props) {
     return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
   };
 
-  const formatPrice = (p: number) =>
-    p.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+  const formatPrice = (p: number) => formatBtcPrice(p, currency);
 
   return (
     <div className="space-y-2">
