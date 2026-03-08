@@ -34,9 +34,11 @@ serve(async (req) => {
       // Cron: generate for all users, respecting quiet hours & timezone
       const { data: profiles } = await supabase
         .from("profiles")
-        .select("user_id, quiet_hours_start, quiet_hours_end, timezone");
+        .select("user_id, quiet_hours_start, quiet_hours_end, timezone, ai_insights_enabled");
 
       const eligibleProfiles = (profiles ?? []).filter((p: any) => {
+        // Skip users who disabled AI insights
+        if (p.ai_insights_enabled === false) return false;
         if (p.quiet_hours_start == null || p.quiet_hours_end == null) return true;
         const tz = p.timezone || "UTC";
         let nowHour: number;

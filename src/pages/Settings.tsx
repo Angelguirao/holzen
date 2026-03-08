@@ -532,6 +532,8 @@ const Settings = () => {
       </div>
 
       <Separator />
+      <div className="space-y-4">
+        <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Notifications</p>
         <div className="flex items-center justify-between">
           <Label htmlFor="email-notif" className="text-xs font-mono text-muted-foreground">
             Email notifications
