@@ -155,6 +155,13 @@ const Home = () => {
       });
   }, [user]);
 
+  // Fetch reflection count for testimonial prompt
+  useEffect(() => {
+    if (!user) return;
+    supabase.from('reflections').select('id', { count: 'exact', head: true }).eq('user_id', user.id)
+      .then(({ count }) => { if (count != null) setReflectionCount(count); });
+  }, [user]);
+
   const togglePriceHidden = useCallback(() => {
     setPriceHidden(prev => {
       const next = !prev;
