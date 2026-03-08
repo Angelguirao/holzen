@@ -1,0 +1,2 @@
+ALTER TABLE public.reflections ADD COLUMN IF NOT EXISTS zoom_out_read boolean NOT NULL DEFAULT false;
+ALTER TABLE public.reflections ADD COLUMN IF NOT EXISTS history_read boolean NOT NULL DEFAULT false;
