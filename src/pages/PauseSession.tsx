@@ -215,7 +215,6 @@ export default function PauseSession() {
                         <ReflectionWallpaper message={message} mood={null} context={context} haiku={companions?.haiku} variant="button" />
                         <SaveToLibraryButton title="Reflection" body={message} sourceType="reflection" reflectionId={reflectionId ?? undefined} tags={context ? ['reflection'] : []} />
                       </div>
-                      </div>
                     </div>
                   </RevealSection>
 
