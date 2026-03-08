@@ -228,23 +228,6 @@ export default function PauseSession() {
                     />
                   </RevealSection>
 
-                  {/* Ritual option */}
-                  <RevealSection>
-                    <div className="flex flex-col items-center gap-4">
-                      <button
-                        onClick={() => { hapticFeedback('light'); setShowRitual(true); }}
-                        className="w-full flex items-center justify-center gap-2.5 py-3.5 rounded-lg border border-primary/15 bg-primary/5 hover:bg-primary/10 transition-all duration-500"
-                      >
-                        <Sparkles className="h-3.5 w-3.5 text-primary/40" />
-                        <span className="text-[11px] font-mono text-primary/50 tracking-[0.12em] uppercase">
-                          {t('pause.startRitual')}
-                        </span>
-                      </button>
-                      <p className="text-[10px] font-mono text-muted-foreground/25 text-center">
-                        {t('pause.orDecideNow')}
-                      </p>
-                    </div>
-                  </RevealSection>
 
                   {/* Decision */}
                   <RevealSection>
