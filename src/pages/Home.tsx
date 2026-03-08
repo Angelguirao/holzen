@@ -391,6 +391,7 @@ const Home = () => {
         );
 
       case 'night':
+        if (!nightReflection) return null;
         return (
           <HomeWidget
             id="night"
@@ -398,7 +399,7 @@ const Home = () => {
             collapsed={collapsed['night']}
             onToggleCollapse={() => toggleCollapsed('night')}
           >
-            <NightReflectionCard />
+            <NightReflectionCard reflection={nightReflection} onDismiss={dismissNight} />
           </HomeWidget>
         );
 
