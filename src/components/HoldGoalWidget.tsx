@@ -11,6 +11,17 @@ import { toast } from 'sonner';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar as CalendarPicker } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 type GoalType = 'time' | 'price' | 'forever';
 type TimeUnit = 'months' | 'years';
@@ -308,9 +319,23 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
               Hold Forever
             </p>
           </div>
-          <button onClick={clearGoal} className="text-[10px] font-mono text-muted-foreground/30 hover:text-foreground transition-colors">
-            Clear
-          </button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <button className="text-[10px] font-mono text-muted-foreground/30 hover:text-foreground transition-colors">
+                Clear
+              </button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle className="font-mono text-sm">Clear hold goal</AlertDialogTitle>
+                <AlertDialogDescription className="text-xs">This will remove your current hold goal. You can set a new one anytime.</AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel className="font-mono text-xs">Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={clearGoal} className="bg-destructive text-destructive-foreground hover:bg-destructive/90 font-mono text-xs">Clear</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
         <div className="space-y-1">
           <span className="text-xs font-mono text-foreground/80">
@@ -346,9 +371,23 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
               Hold Goal
             </p>
           </div>
-          <button onClick={clearGoal} className="text-[10px] font-mono text-muted-foreground/30 hover:text-foreground transition-colors">
-            Clear
-          </button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <button className="text-[10px] font-mono text-muted-foreground/30 hover:text-foreground transition-colors">
+                Clear
+              </button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle className="font-mono text-sm">Clear hold goal</AlertDialogTitle>
+                <AlertDialogDescription className="text-xs">This will remove your current hold goal. You can set a new one anytime.</AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel className="font-mono text-xs">Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={clearGoal} className="bg-destructive text-destructive-foreground hover:bg-destructive/90 font-mono text-xs">Clear</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
 
         <div className="space-y-1.5">
@@ -391,9 +430,23 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
               Hold Goal
             </p>
           </div>
-          <button onClick={clearGoal} className="text-[10px] font-mono text-muted-foreground/30 hover:text-foreground transition-colors">
-            Clear
-          </button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <button className="text-[10px] font-mono text-muted-foreground/30 hover:text-foreground transition-colors">
+                Clear
+              </button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle className="font-mono text-sm">Clear hold goal</AlertDialogTitle>
+                <AlertDialogDescription className="text-xs">This will remove your current hold goal. You can set a new one anytime.</AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel className="font-mono text-xs">Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={clearGoal} className="bg-destructive text-destructive-foreground hover:bg-destructive/90 font-mono text-xs">Clear</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
 
         <div className="space-y-1.5">

@@ -934,12 +934,27 @@ const Settings = () => {
             )}
 
             {/* Sign out */}
-            <button
-              onClick={signOut}
-              className="block text-xs font-mono text-muted-foreground underline"
-            >
-              Sign out
-            </button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <button className="block text-xs font-mono text-muted-foreground underline">
+                  Sign out
+                </button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="font-mono text-sm">Sign out</AlertDialogTitle>
+                  <AlertDialogDescription className="text-xs">
+                    Are you sure you want to sign out?
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel className="font-mono text-xs">Cancel</AlertDialogCancel>
+                  <AlertDialogAction onClick={signOut} className="font-mono text-xs">
+                    Sign out
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
 
             {/* Delete */}
             <AlertDialog>
