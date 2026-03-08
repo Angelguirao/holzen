@@ -48,7 +48,7 @@ const Landing = () => {
             onClick={() => navigate('/auth')}
             className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
           >
-            Sign in
+            {t('common.signIn')}
           </button>
         </motion.div>
 
