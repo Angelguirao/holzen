@@ -34,6 +34,9 @@ interface Props {
 function CompanionCard({ item, onSelect }: { item: LibraryItem; onSelect?: (item: LibraryItem) => void }) {
   const sourceLabel = SOURCE_LABELS[item.source_type ?? ''] ?? item.source_type ?? 'Item';
 
+  // Safely get string body (some items may have object bodies)
+  const bodyText = typeof item.body === 'string' ? item.body : item.body ? JSON.stringify(item.body) : null;
+
   // Try to parse zoom_out JSON for richer display
   const zoomOutData = useMemo(() => {
     if (item.source_type !== 'zoom_out' || !item.body) return null;
