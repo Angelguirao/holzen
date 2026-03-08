@@ -540,7 +540,7 @@ const Home = () => {
       <TheVoid open={showVoid} onClose={() => setShowVoid(false)} />
 
       <p className="text-xs text-muted-foreground leading-relaxed">
-        When volatility crosses your threshold, you'll receive one quiet prompt to pause. Nothing more.
+        When Bitcoin moves, we'll help you pause before you act.
       </p>
     </div>
   );
