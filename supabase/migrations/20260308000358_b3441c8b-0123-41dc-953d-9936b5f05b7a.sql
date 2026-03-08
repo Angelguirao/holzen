@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN ai_insights_enabled boolean NOT NULL DEFAULT true;
