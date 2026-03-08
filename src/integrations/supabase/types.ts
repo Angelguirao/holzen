@@ -163,6 +163,11 @@ export type Database = {
           email_notifications: boolean
           first_name: string | null
           has_onboarded: boolean
+          hold_goal_currency: string | null
+          hold_goal_start: string | null
+          hold_goal_target_months: number | null
+          hold_goal_target_price: number | null
+          hold_goal_type: string | null
           id: string
           last_context: string | null
           last_message: string | null
@@ -200,6 +205,11 @@ export type Database = {
           email_notifications?: boolean
           first_name?: string | null
           has_onboarded?: boolean
+          hold_goal_currency?: string | null
+          hold_goal_start?: string | null
+          hold_goal_target_months?: number | null
+          hold_goal_target_price?: number | null
+          hold_goal_type?: string | null
           id?: string
           last_context?: string | null
           last_message?: string | null
@@ -237,6 +247,11 @@ export type Database = {
           email_notifications?: boolean
           first_name?: string | null
           has_onboarded?: boolean
+          hold_goal_currency?: string | null
+          hold_goal_start?: string | null
+          hold_goal_target_months?: number | null
+          hold_goal_target_price?: number | null
+          hold_goal_type?: string | null
           id?: string
           last_context?: string | null
           last_message?: string | null
