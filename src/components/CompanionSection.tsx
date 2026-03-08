@@ -499,7 +499,7 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
 
       {hasHistory && (
         <CollapsibleCompanion
-          label="Look back"
+          label={t.lookBack}
           expanded={expandedHistory}
           onToggle={() => {
             setExpandedHistory((v) => !v);
