@@ -80,9 +80,9 @@ async function generateReflection(context: string, apiKey: string, tone = "stoic
 
   const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
   const langName = LANG_NAMES[language] || "English";
-  const langInstruction = language !== "en" ? `\n\nLANGUAGE: You MUST write ALL output (reflection message, haiku, learning title, learning body) in ${langName}. Do not use English.` : "";
+  const langInstruction = language !== "en" ? `CRITICAL LANGUAGE REQUIREMENT: You MUST write ALL output (reflection message, haiku, learning title, learning body) in ${langName}. Do not use English for any generated text.\n\n` : "";
 
-  const systemPrompt = `You generate a reflection with optional companions in response to Bitcoin volatility.
+  const systemPrompt = `${langInstruction}You generate a reflection with optional companions in response to Bitcoin volatility.
 
 You MUST respond by calling the "generate_reflection" function. Do not respond with plain text.
 
@@ -113,7 +113,7 @@ Learning input rules:
 - Title: a short, factual headline (5-10 words).
 - Body: 1-2 sentences about a historical Bitcoin event, market pattern, or behavioral finance insight relevant to the current context. Factual, educational, no advice.
 - Citation: formatted source reference (e.g. "CoinDesk, 2020" or "Kahneman & Tversky, 1979")
-- URL: a real, working URL to a reputable source documenting the event or research referenced.${langInstruction}`;
+- URL: a real, working URL to a reputable source documenting the event or research referenced.`;
 
   const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",

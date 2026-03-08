@@ -39,9 +39,9 @@ serve(async (req) => {
     const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
     const langCode = language || "en";
     const langName = LANG_NAMES[langCode] || "English";
-    const langInstruction = langCode !== "en" ? `\n\nLANGUAGE: Write the title, body, and analogy in ${langName}. Keep source URLs as-is.` : "";
+    const langInstruction = langCode !== "en" ? `CRITICAL LANGUAGE REQUIREMENT: You MUST write the title, body, and analogy in ${langName}. Keep source URLs as-is.\n\n` : "";
 
-    const systemPrompt = `You are a financial historian specializing in Bitcoin and broader market history. Given the current market context, provide ONE historical insight that helps a Bitcoin holder see today's moment through the lens of history.
+    const systemPrompt = `${langInstruction}You are a financial historian specializing in Bitcoin and broader market history. Given the current market context, provide ONE historical insight that helps a Bitcoin holder see today's moment through the lens of history.
 
 Your insight MUST:
 1. Reference a REAL, specific historical event — primarily from Bitcoin's history, but ALSO draw analogies from other assets (gold, equities, tech stocks, commodities, real estate, bonds, emerging market currencies)
@@ -60,7 +60,7 @@ VARIETY IS CRITICAL. Rotate through different eras and asset classes:
 - Commodities: Oil negative prices (2020), Silver Thursday (1980), Tulip mania
 - Macro: Weimar hyperinflation, Bretton Woods collapse, Asian financial crisis 1997
 
-The analogy should feel surprising and illuminating, not obvious.${langInstruction}`;
+The analogy should feel surprising and illuminating, not obvious.`;
 
     const response = await fetch(
       "https://ai.gateway.lovable.dev/v1/chat/completions",
