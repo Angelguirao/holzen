@@ -5,6 +5,7 @@ import { RefreshCw, TrendingUp, Clock, Brain, Sparkles, Target, Loader2 } from '
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
+import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 
 interface Insight {
   category: 'timing' | 'mood' | 'behavior' | 'engagement' | 'growth';
@@ -21,6 +22,8 @@ interface InsightsRow {
   period_start: string | null;
   period_end: string | null;
 }
+
+const PAGE_SIZE = 10;
 
 const CATEGORY_ICONS: Record<string, typeof TrendingUp> = {
   timing: Clock,
@@ -45,6 +48,8 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
   const [allData, setAllData] = useState<InsightsRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   const loadInsights = useCallback(async () => {
     if (!user) return;
@@ -53,15 +58,37 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
       .select('*')
       .eq('user_id', user.id)
       .order('generated_at', { ascending: false })
-      .limit(20);
+      .limit(PAGE_SIZE);
 
-    setAllData((rows as unknown as InsightsRow[]) ?? []);
+    const parsed = (rows as unknown as InsightsRow[]) ?? [];
+    setAllData(parsed);
+    setHasMore(parsed.length === PAGE_SIZE);
     setLoading(false);
   }, [user]);
 
   useEffect(() => {
     loadInsights();
   }, [loadInsights]);
+
+  const loadMore = useCallback(async () => {
+    if (!user || loadingMore || !hasMore) return;
+    setLoadingMore(true);
+    const last = allData[allData.length - 1];
+    if (!last) { setLoadingMore(false); return; }
+    const { data: rows } = await supabase
+      .from('reflection_insights')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('generated_at', { ascending: false })
+      .lt('generated_at', last.generated_at)
+      .limit(PAGE_SIZE);
+    const parsed = (rows as unknown as InsightsRow[]) ?? [];
+    setAllData((prev) => [...prev, ...parsed]);
+    setHasMore(parsed.length === PAGE_SIZE);
+    setLoadingMore(false);
+  }, [user, loadingMore, hasMore, allData]);
+
+  const sentinelRef = useInfiniteScroll({ hasMore, loading: loadingMore, onLoadMore: loadMore });
 
   const generateInsights = useCallback(async () => {
     if (!user) return;
@@ -101,7 +128,6 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
   }
 
   const latest = allData[0] ?? null;
-  const insights = latest?.insights ?? [];
   const isStale = latest
     ? Date.now() - new Date(latest.generated_at).getTime() > 7 * 24 * 60 * 60 * 1000
     : true;
@@ -188,6 +214,12 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
           })}
         </div>
       ))}
+
+      {/* Infinite scroll sentinel */}
+      <div ref={sentinelRef} className="h-1" />
+      {loadingMore && (
+        <p className="text-[10px] font-mono text-muted-foreground animate-pulse text-center">Loading more…</p>
+      )}
     </div>
   );
 }

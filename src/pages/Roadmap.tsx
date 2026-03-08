@@ -5,6 +5,9 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, ChevronUp } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { PageMeta } from '@/components/PageMeta';
+import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
+
+const PAGE_SIZE = 30;
 
 interface RoadmapItem {
   id: string;
@@ -14,23 +17,25 @@ interface RoadmapItem {
   vote_count: number;
 }
 
-
 const Roadmap = () => {
   const { user } = useAuth();
   const [items, setItems] = useState<RoadmapItem[]>([]);
   const [votes, setVotes] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
-
-  // Remove manual document.title — PageMeta handles it
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
 
   useEffect(() => {
     const load = async () => {
       const { data } = await supabase
         .from('roadmap_items')
         .select('id, title, description, status, vote_count')
-        .order('vote_count', { ascending: false });
+        .order('vote_count', { ascending: false })
+        .limit(PAGE_SIZE);
 
-      setItems((data as unknown as RoadmapItem[]) ?? []);
+      const rows = (data as unknown as RoadmapItem[]) ?? [];
+      setItems(rows);
+      setHasMore(rows.length === PAGE_SIZE);
 
       if (user) {
         const { data: userVotes } = await supabase
@@ -44,6 +49,22 @@ const Roadmap = () => {
     };
     load();
   }, [user]);
+
+  const loadMore = useCallback(async () => {
+    if (loadingMore || !hasMore) return;
+    setLoadingMore(true);
+    const { data } = await supabase
+      .from('roadmap_items')
+      .select('id, title, description, status, vote_count')
+      .order('vote_count', { ascending: false })
+      .range(items.length, items.length + PAGE_SIZE - 1);
+    const rows = (data as unknown as RoadmapItem[]) ?? [];
+    setItems((prev) => [...prev, ...rows]);
+    setHasMore(rows.length === PAGE_SIZE);
+    setLoadingMore(false);
+  }, [loadingMore, hasMore, items.length]);
+
+  const sentinelRef = useInfiniteScroll({ hasMore, loading: loadingMore, onLoadMore: loadMore });
 
   const toggleVote = useCallback(async (itemId: string) => {
     if (!user) return;
@@ -117,6 +138,10 @@ const Roadmap = () => {
                 </div>
               );
             })}
+            <div ref={sentinelRef} className="h-1" />
+            {loadingMore && (
+              <p className="text-[10px] font-mono text-muted-foreground animate-pulse text-center py-2">Loading more…</p>
+            )}
           </div>
         )}
       </div>
