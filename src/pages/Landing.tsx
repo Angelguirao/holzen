@@ -174,14 +174,16 @@ const Landing = () => {
         </div>
 
         {/* Scroll hint */}
-        <motion.div
-          className="absolute bottom-8"
+        <motion.button
+          className="absolute bottom-8 cursor-pointer"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 2, duration: 1 }}
+          onClick={() => document.getElementById('reflection-loop')?.scrollIntoView({ behavior: 'smooth' })}
+          aria-label="Scroll to content"
         >
           <ChevronDown className="h-4 w-4 text-muted-foreground/30 animate-bounce" />
-        </motion.div>
+        </motion.button>
       </div>
 
       {/* ─── THE LOOP ─── */}
