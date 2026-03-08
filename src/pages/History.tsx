@@ -355,8 +355,8 @@ const History = () => {
          {tab !== 'timeline' && (
           <p className="text-xs text-muted-foreground">
             {tab === 'recent'
-              ? `${filteredRecent.length} reflection${filteredRecent.length !== 1 ? 's' : ''} in the last 7 days`
-              : `${filtered.length} of ${reflections.length} reflection${reflections.length !== 1 ? 's' : ''}`}
+              ? t('history.reflectionsInLast7Days', { count: filteredRecent.length })
+              : t('history.reflectionsOf', { filtered: filtered.length, total: reflections.length, count: reflections.length })}
           </p>
         )}
       </div>
