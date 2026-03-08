@@ -176,7 +176,7 @@ serve(async (req) => {
           body: JSON.stringify({
             from: "Holzen <notify@holzen.app>",
             to: [email],
-            subject: `BTC is ${direction} ${pct}% — take a moment`,
+            subject: copy.subject(direction, pct),
             html,
           }),
         });
