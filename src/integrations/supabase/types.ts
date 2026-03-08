@@ -148,6 +148,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          ai_insights_enabled: boolean
           companion_breathing: boolean
           companion_haiku: boolean
           companion_learning: boolean
@@ -180,6 +181,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          ai_insights_enabled?: boolean
           companion_breathing?: boolean
           companion_haiku?: boolean
           companion_learning?: boolean
@@ -212,6 +214,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          ai_insights_enabled?: boolean
           companion_breathing?: boolean
           companion_haiku?: boolean
           companion_learning?: boolean
