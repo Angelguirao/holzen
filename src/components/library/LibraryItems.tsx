@@ -172,7 +172,7 @@ export function LibraryItems({ library, favoritesOnly = false }: Props) {
       );
     }
     return result;
-  }, [items, typeFilter, collectionFilter, collectionItems, search]);
+  }, [items, typeFilter, collectionFilter, collectionItems, search, favoritesOnly]);
 
   const pinnedItems = filtered.filter((i) => i.pinned);
   const unpinnedItems = filtered.filter((i) => !i.pinned);
