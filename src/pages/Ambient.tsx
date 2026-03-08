@@ -205,7 +205,7 @@ export default function Ambient() {
         className="absolute bottom-12 text-[9px] font-mono tracking-[0.2em] uppercase"
         style={{ color: textColors[level], opacity: 0.3 }}
       >
-        Breathe with the circle
+        {t('ambient.breathe')}
       </p>
     </div>
   );

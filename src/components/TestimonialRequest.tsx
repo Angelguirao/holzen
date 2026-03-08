@@ -25,15 +25,6 @@ function shouldShow(reflectionCount: number): boolean {
   return true;
 }
 
-// Static English UI — language setting only affects AI-generated content
-const t = {
-  title: 'Enjoying Holzen?',
-  subtitle: 'Share a short quote about your experience — it may appear on our landing page.',
-  placeholder: 'e.g. "Holzen helped me stop panic-selling during dips."',
-  send: 'Submit',
-  thanks: 'Thank you! Your testimonial is under review.',
-  nameLabel: 'Display name',
-};
 
 interface Props {
   reflectionCount: number;
