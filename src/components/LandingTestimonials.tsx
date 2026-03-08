@@ -11,6 +11,7 @@ interface Testimonial {
 }
 
 export function LandingTestimonials() {
+  const { t } = useTranslation();
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
 
   useEffect(() => {
