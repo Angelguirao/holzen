@@ -52,7 +52,7 @@ export default function Library() {
 
   return (
     <div className="space-y-5 pb-24">
-      <PageMeta title={t('library.pageTitle')} />
+      <PageMeta title={t('library.pageTitle')} description={t('library.pageDescription')} />
 
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
