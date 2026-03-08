@@ -269,7 +269,18 @@ export function useHolzen() {
         ...(mood ? { mood } : {}),
       }).select('id').single();
 
-      if (insertedReflection) setLastReflectionId(insertedReflection.id);
+      if (insertedReflection) {
+        setLastReflectionId(insertedReflection.id);
+        await supabase.from('library_items').insert({
+          user_id: user.id,
+          type: 'bookmark',
+          title: 'Reflection',
+          body: silentMsg,
+          source_type: 'reflection',
+          reflection_id: insertedReflection.id,
+          tags: ['reflection'],
+        });
+      }
 
       await supabase.from('profiles').update({
         last_message: silentMsg,
@@ -342,6 +353,16 @@ export function useHolzen() {
 
         if (insertedReflection) {
           setLastReflectionId(insertedReflection.id);
+          // Auto-save reflection to library
+          await supabase.from('library_items').insert({
+            user_id: user.id,
+            type: 'bookmark',
+            title: 'Reflection',
+            body: msg,
+            source_type: 'reflection',
+            reflection_id: insertedReflection.id,
+            tags: ['reflection'],
+          });
         }
 
         await supabase.from('profiles').update({
