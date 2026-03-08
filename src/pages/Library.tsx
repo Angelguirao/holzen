@@ -100,7 +100,7 @@ export default function Library() {
             <div className="space-y-1.5">
               <p className="text-[10px] font-mono text-muted-foreground/50 uppercase tracking-wider">{t('common.pinned')}</p>
               {pinnedItems.map((item) => (
-                <LibraryItemCard key={item.id} item={item} onTogglePin={togglePin} onDelete={deleteItem} />
+                <LibraryItemCard key={item.id} item={item} onTogglePin={togglePin} onDelete={deleteItem} onStatusChange={handleStatusChange} />
               ))}
             </div>
           )}
