@@ -528,7 +528,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             nudgeLoading={nudgeLoading}
             nudgeError={nudgeError}
           />
-          {nudge && <div className="mt-1.5"><SaveToLibraryButton title={nudge.title} body={nudge.body} sourceType="learning" sourceUrl={nudge.url} reflectionId={reflectionId ?? undefined} /></div>}
+          
         </CollapsibleCompanion>
       )}
 
