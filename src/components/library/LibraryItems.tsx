@@ -29,6 +29,7 @@ export function LibraryItems({ library }: Props) {
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
   const [collectionFilter, setCollectionFilter] = useState<string | null>(null);
+  const [showNewCollection, setShowNewCollection] = useState(false);
 
   const filtered = useMemo(() => {
     let result = items;
