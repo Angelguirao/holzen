@@ -186,9 +186,6 @@ const Landing = () => {
         </motion.div>
       </div>
 
-
-
-
       {/* ─── THE LOOP ─── */}
       <div className="max-w-lg mx-auto px-6 py-16">
         <Section>
