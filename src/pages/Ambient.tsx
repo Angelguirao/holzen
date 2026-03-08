@@ -126,8 +126,8 @@ export default function Ambient() {
           transition: {
             duration: BREATH_DURATION,
             repeat: Infinity,
-            ease: 'easeInOut',
-            delay: 0.3,
+          ease: 'easeInOut' as const,
+          delay: 0.3,
           },
         },
       };
