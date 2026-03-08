@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useEffect, useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
@@ -18,6 +19,7 @@ interface RoadmapItem {
 }
 
 const Roadmap = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [items, setItems] = useState<RoadmapItem[]>([]);
   const [votes, setVotes] = useState<Set<string>>(new Set());
@@ -90,12 +92,12 @@ const Roadmap = () => {
         <div className="space-y-4">
           <Link to={user ? '/settings' : '/welcome'} className="inline-flex items-center gap-1 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="h-3 w-3" />
-            Back
+            {t('common.back')}
           </Link>
           <div className="space-y-1">
-            <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">Roadmap</h1>
+            <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">{t('roadmap.title')}</h1>
             <p className="text-xs text-muted-foreground">
-              Vote on what we build next. {!user && 'Sign in to vote.'}
+              {t('roadmap.voteOnNext')} {!user && t('roadmap.signInToVote')}
             </p>
           </div>
         </div>
@@ -140,7 +142,7 @@ const Roadmap = () => {
             })}
             <div ref={sentinelRef} className="h-1" />
             {loadingMore && (
-              <p className="text-[10px] font-mono text-muted-foreground animate-pulse text-center py-2">Loading more…</p>
+              <p className="text-[10px] font-mono text-muted-foreground animate-pulse text-center py-2">{t('common.loadingMore')}</p>
             )}
           </div>
         )}

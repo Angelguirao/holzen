@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useEffect } from 'react';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
@@ -16,6 +17,7 @@ const fade = (delay = 0) => ({
 });
 
 const Landing = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const prefersReduced = useReducedMotion();
@@ -46,7 +48,7 @@ const Landing = () => {
             onClick={() => navigate('/auth')}
             className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
           >
-            Sign in
+            {t('common.signIn')}
           </button>
         </motion.div>
 
@@ -54,10 +56,10 @@ const Landing = () => {
         <motion.div {...m(0.1)}>
           <div className="space-y-5">
             <p className="text-xl leading-relaxed text-foreground">
-              Understand how you respond to volatility — and grow calmer over time.
+              {t('landing.hero')}
             </p>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Holzen isn't a trading tool. It's a self-awareness practice. When Bitcoin moves, you get a moment to pause, reflect, and notice your patterns — before you act on impulse.
+              {t('landing.heroDesc')}
             </p>
           </div>
         </motion.div>
@@ -73,30 +75,14 @@ const Landing = () => {
             className="text-xs font-mono tracking-widest uppercase text-muted-foreground"
             {...m()}
           >
-            The reflection loop
+            {t('landing.reflectionLoop')}
           </motion.p>
           <div className="space-y-4">
             {[
-              {
-                step: '01',
-                title: 'The market moves',
-                desc: 'Holzen watches daily and 7-day cumulative volatility against your personal thresholds. Or request a reflection anytime you need one.',
-              },
-              {
-                step: '02',
-                title: 'You pause',
-                desc: 'A breathing exercise grounds you. A quick mood check captures how you feel right now — anxious, neutral, or calm.',
-              },
-              {
-                step: '03',
-                title: 'You reflect',
-                desc: 'An AI-generated reflection encourages awareness, not action. Accompanied by a haiku and a historical insight for perspective.',
-              },
-              {
-                step: '04',
-                title: 'You track',
-                desc: 'Tag your emotions. Journal a note. Record what you did — held, sold, bought, or nothing. Over time, patterns emerge.',
-              },
+              { step: '01', title: t('landing.steps.01title'), desc: t('landing.steps.01desc') },
+              { step: '02', title: t('landing.steps.02title'), desc: t('landing.steps.02desc') },
+              { step: '03', title: t('landing.steps.03title'), desc: t('landing.steps.03desc') },
+              { step: '04', title: t('landing.steps.04title'), desc: t('landing.steps.04desc') },
             ].map((step, i) => (
               <motion.div
                 key={step.step}
@@ -124,18 +110,18 @@ const Landing = () => {
             className="text-xs font-mono tracking-widest uppercase text-muted-foreground"
             {...m()}
           >
-            What you get
+            {t('landing.whatYouGet')}
           </motion.p>
           <div className="grid grid-cols-2 gap-3">
             {[
-              { icon: <Wind className="h-3.5 w-3.5" />, label: 'Breathing exercise', desc: 'Calm before the message' },
-              { icon: <Feather className="h-3.5 w-3.5" />, label: 'Haiku companion', desc: '5-7-5 stillness' },
-              { icon: <BookOpen className="h-3.5 w-3.5" />, label: 'Historical insight', desc: 'Context from past events' },
-              { icon: <TrendingDown className="h-3.5 w-3.5" />, label: '7-day detection', desc: 'Catches slow-burn drops' },
-              { icon: <Brain className="h-3.5 w-3.5" />, label: 'Mood tracking', desc: 'See emotional patterns' },
-              { icon: <Tag className="h-3.5 w-3.5" />, label: 'Reflection tags', desc: 'Fear, greed, FOMO, clarity' },
-              { icon: <BarChart3 className="h-3.5 w-3.5" />, label: 'Insights & trends', desc: 'Your composure over time' },
-              { icon: <MessageCircle className="h-3.5 w-3.5" />, label: 'Journal notes', desc: 'Your words, your growth' },
+              { icon: <Wind className="h-3.5 w-3.5" />, label: t('landing.features.breathing'), desc: t('landing.features.breathingDesc') },
+              { icon: <Feather className="h-3.5 w-3.5" />, label: t('landing.features.haiku'), desc: t('landing.features.haikuDesc') },
+              { icon: <BookOpen className="h-3.5 w-3.5" />, label: t('landing.features.historical'), desc: t('landing.features.historicalDesc') },
+              { icon: <TrendingDown className="h-3.5 w-3.5" />, label: t('landing.features.detection'), desc: t('landing.features.detectionDesc') },
+              { icon: <Brain className="h-3.5 w-3.5" />, label: t('landing.features.mood'), desc: t('landing.features.moodDesc') },
+              { icon: <Tag className="h-3.5 w-3.5" />, label: t('landing.features.tags'), desc: t('landing.features.tagsDesc') },
+              { icon: <BarChart3 className="h-3.5 w-3.5" />, label: t('landing.features.insights'), desc: t('landing.features.insightsDesc') },
+              { icon: <MessageCircle className="h-3.5 w-3.5" />, label: t('landing.features.journal'), desc: t('landing.features.journalDesc') },
             ].map((f, i) => (
               <motion.div
                 key={f.label}
@@ -159,10 +145,10 @@ const Landing = () => {
         <motion.div {...m()}>
           <div className="space-y-3 border-l-2 border-primary/30 pl-4">
             <p className="text-sm text-foreground leading-relaxed">
-              Impulsive decisions under volatility consistently lead to worse outcomes.
+              {t('landing.scienceQuote')}
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Behavioral finance research shows that emotional reactions — panic selling during drops, euphoric buying during surges — are among the most reliable predictors of poor returns. A brief pause before action leads to better decisions.
+              {t('landing.scienceDesc')}
             </p>
             <p className="text-[10px] text-muted-foreground/70 leading-relaxed italic">
               Kahneman, D. (2011). <em>Thinking, Fast and Slow</em>. · Barber, B. & Odean, T. (2000). "Trading Is Hazardous to Your Wealth." <em>The Journal of Finance</em>.
@@ -174,9 +160,9 @@ const Landing = () => {
         <motion.div {...m()}>
           <div className="rounded-lg border border-border bg-card p-5 space-y-4">
             <div className="space-y-1">
-              <p className="text-lg font-mono text-foreground">Free to start</p>
+              <p className="text-lg font-mono text-foreground">{t('landing.freeToStart')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Your first 3 reflections are free — no card required. Then $3/month for unlimited reflections, companions, mood tracking, and insights. Cancel anytime.
+                {t('landing.pricingDesc')}
               </p>
             </div>
             <div className="space-y-2">
@@ -184,11 +170,11 @@ const Landing = () => {
                 onClick={() => navigate('/auth')}
                 className="w-full font-mono text-xs group"
               >
-                Get started free
+                {t('landing.getStartedFree')}
                 <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
               </Button>
               <p className="text-[10px] text-muted-foreground text-center">
-                How much is one moment of clarity worth?
+                {t('landing.clarityWorth')}
               </p>
             </div>
           </div>
@@ -203,7 +189,7 @@ const Landing = () => {
         <motion.div {...m()}>
           <div className="space-y-4">
             <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
-              Questions
+              {t('landing.questions')}
             </p>
             <Accordion type="single" collapsible className="w-full">
               <AccordionItem value="what" className="border-border">
@@ -262,7 +248,7 @@ const Landing = () => {
         <motion.div {...m()}>
           <div className="space-y-5">
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Holzen is not a trading tool. It won't tell you what to do. It exists to help you understand yourself — one volatile moment at a time.
+              {t('landing.footer')}
             </p>
 
             {/* Social */}

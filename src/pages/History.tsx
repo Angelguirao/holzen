@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { supabase } from '@/integrations/supabase/client';
@@ -171,6 +172,7 @@ function HistoryCompanions({ label, r }: { label: string; r: Reflection }) {
 }
 
 const History = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { currency } = useHolzen();
   const [reflections, setReflections] = useState<Reflection[]>([]);
@@ -331,7 +333,7 @@ const History = () => {
               tab === 'recent' ? 'text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
             }`}
           >
-            Recent
+            {t('history.recent')}
           </button>
           <button
             onClick={() => setTab('library')}
@@ -339,7 +341,7 @@ const History = () => {
               tab === 'library' ? 'text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
             }`}
           >
-            Library
+            {t('history.library')}
           </button>
           <button
             onClick={() => setTab('timeline')}
@@ -347,14 +349,14 @@ const History = () => {
               tab === 'timeline' ? 'text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
             }`}
           >
-            Timeline
+            {t('history.timeline')}
           </button>
         </div>
          {tab !== 'timeline' && (
           <p className="text-xs text-muted-foreground">
             {tab === 'recent'
-              ? `${filteredRecent.length} reflection${filteredRecent.length !== 1 ? 's' : ''} in the last 7 days`
-              : `${filtered.length} of ${reflections.length} reflection${reflections.length !== 1 ? 's' : ''}`}
+              ? t('history.reflectionsInLast7Days', { count: filteredRecent.length })
+              : t('history.reflectionsOf', { filtered: filtered.length, total: reflections.length, count: reflections.length })}
           </p>
         )}
       </div>
@@ -370,7 +372,7 @@ const History = () => {
                 type="text"
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                placeholder="Search reflections…"
+                placeholder={t('history.searchReflections')}
                 className="w-full rounded-md border border-border/60 bg-muted/30 pl-8 pr-8 py-2 text-xs font-mono text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-ring"
               />
               {search && (
@@ -390,13 +392,13 @@ const History = () => {
                     onClick={() => setFilter('all')}
                     className={`text-xs font-mono transition-colors ${filter === 'all' ? 'text-foreground' : 'text-muted-foreground'}`}
                   >
-                    All
+                    {t('history.all')}
                   </button>
                   <button
                     onClick={() => setFilter('favorites')}
                     className={`text-xs font-mono transition-colors ${filter === 'favorites' ? 'text-foreground' : 'text-muted-foreground'}`}
                   >
-                    Favorites
+                    {t('history.favorites')}
                   </button>
                 </div>
                 <div className="flex-1" />
@@ -407,7 +409,7 @@ const History = () => {
                   }`}
                 >
                   <Filter className="h-3 w-3" />
-                  Filters
+                  {t('history.filters')}
                   {hasActiveFilters && (
                     <span className="h-3.5 w-3.5 rounded-full bg-primary text-primary-foreground text-[8px] flex items-center justify-center">
                       {[tagFilter, moodFilter, dateFrom, dateTo, filter === 'favorites'].filter(Boolean).length}
@@ -420,7 +422,7 @@ const History = () => {
                 <div className="space-y-3 rounded-md border border-border/60 bg-muted/20 p-3">
                   {/* Date range */}
                   <div className="space-y-1.5">
-                    <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Date range</p>
+                    <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">{t('history.dateRange')}</p>
                     <div className="flex items-center gap-2">
                       <Popover>
                         <PopoverTrigger asChild>
@@ -429,7 +431,7 @@ const History = () => {
                             dateFrom ? "text-foreground" : "text-muted-foreground/50"
                           )}>
                             <CalendarIcon className="h-3 w-3" />
-                            {dateFrom ? format(dateFrom, 'MMM d, yyyy') : 'From'}
+                            {dateFrom ? format(dateFrom, 'MMM d, yyyy') : t('common.from')}
                           </button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
@@ -451,7 +453,7 @@ const History = () => {
                             dateTo ? "text-foreground" : "text-muted-foreground/50"
                           )}>
                             <CalendarIcon className="h-3 w-3" />
-                            {dateTo ? format(dateTo, 'MMM d, yyyy') : 'To'}
+                            {dateTo ? format(dateTo, 'MMM d, yyyy') : t('common.until')}
                           </button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
@@ -478,7 +480,7 @@ const History = () => {
 
                   {/* Mood filter */}
                   <div className="space-y-1.5">
-                    <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Mood</p>
+                    <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">{t('history.mood')}</p>
                     <div className="flex flex-wrap gap-1">
                       {moods.map((m) => (
                         <button
@@ -499,7 +501,7 @@ const History = () => {
                   {/* Tag filter */}
                   {allTags.length > 0 && (
                     <div className="space-y-1.5">
-                      <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Tags</p>
+                      <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">{t('history.tags')}</p>
                       <div className="flex flex-wrap gap-1">
                         {allTags.map((tag) => (
                           <button
@@ -524,7 +526,7 @@ const History = () => {
                       onClick={clearAllFilters}
                       className="text-[10px] font-mono text-muted-foreground hover:text-foreground transition-colors underline underline-offset-2"
                     >
-                      Clear all filters
+                      {t('history.clearAllFilters')}
                     </button>
                   )}
                 </div>
@@ -551,12 +553,12 @@ const History = () => {
         <div className="py-8 text-center space-y-2">
           <p className="text-xs text-muted-foreground">
             {tab === 'recent'
-              ? 'No reflections in the last 7 days.'
+              ? t('history.noReflectionsRecent')
               : search
-                ? 'No reflections match your search.'
+                ? t('history.noReflectionsSearch')
                 : filter === 'favorites'
-                  ? 'No favorites yet. Star reflections you want to keep.'
-                  : "No reflections yet. They'll appear here when volatility crosses your threshold."}
+                  ? t('history.noFavorites')
+                  : t('history.noReflectionsYet')}
           </p>
         </div>
       ) : (
@@ -617,18 +619,18 @@ const History = () => {
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle className="font-mono text-sm">Delete reflection</AlertDialogTitle>
+                        <AlertDialogTitle className="font-mono text-sm">{t('history.deleteReflection')}</AlertDialogTitle>
                         <AlertDialogDescription className="text-xs">
-                          This will permanently delete this reflection. This action cannot be undone.
+                          {t('history.deleteReflectionDesc')}
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
-                        <AlertDialogCancel className="font-mono text-xs">Cancel</AlertDialogCancel>
+                        <AlertDialogCancel className="font-mono text-xs">{t('common.cancel')}</AlertDialogCancel>
                         <AlertDialogAction
                           onClick={() => deleteReflection(r.id)}
                           className="bg-destructive text-destructive-foreground hover:bg-destructive/90 font-mono text-xs"
                         >
-                          Delete
+                          {t('common.delete')}
                         </AlertDialogAction>
                       </AlertDialogFooter>
                     </AlertDialogContent>
@@ -651,7 +653,7 @@ const History = () => {
 
                 return (
                   <HistoryCompanions
-                    label={`${companionItems.length} companion${companionItems.length !== 1 ? 's' : ''}`}
+                    label={`${companionItems.length} ${companionItems.length !== 1 ? t('history.companions_other', { count: companionItems.length }) : t('history.companions', { count: 1 })}`}
                     r={r}
                   />
                 );
@@ -664,7 +666,7 @@ const History = () => {
           <div ref={sentinelRef} className="h-1" />
           {loadingMore && (
             <div className="py-4 text-center">
-              <p className="text-[10px] font-mono text-muted-foreground animate-pulse">Loading more…</p>
+              <p className="text-[10px] font-mono text-muted-foreground animate-pulse">{t('common.loadingMore')}</p>
             </div>
           )}
         </div>
