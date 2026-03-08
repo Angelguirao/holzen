@@ -34,6 +34,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
   const [timeUnit, setTimeUnit] = useState<TimeUnit>('months');
   const [inputValue, setInputValue] = useState('');
   const [validationError, setValidationError] = useState<string | null>(null);
+  const [startDate, setStartDate] = useState<Date>(new Date());
 
   const loadGoal = useCallback(async () => {
     if (!user) return;
