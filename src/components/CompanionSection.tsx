@@ -50,6 +50,7 @@ interface Props {
   severity?: 'mild' | 'moderate' | 'high';
   reflectionId?: string | null;
   context?: string | null;
+  reflectionMessage?: string | null;
 }
 
 function CollapsibleCompanion({
