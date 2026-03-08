@@ -428,10 +428,9 @@ const Home = () => {
                               <div className="flex items-center justify-between">
                                 <div className="flex items-center gap-1.5 text-muted-foreground">
                                   <Pin className="h-2.5 w-2.5" />
-                                <span className="text-[10px] font-mono uppercase tracking-wider">{t('common.pinned')}</span>
+                                 <span className="text-[10px] font-mono uppercase tracking-wider">{t('common.pinned')}</span>
                               </div>
                               <button onClick={unpinReflection} className="text-[10px] font-mono text-muted-foreground/50 hover:text-foreground transition-colors">{t('common.unpin')}</button>
-                                </button>
                               </div>
                               <p className="text-sm leading-relaxed">{pinnedReflection.message}</p>
                             </div>
