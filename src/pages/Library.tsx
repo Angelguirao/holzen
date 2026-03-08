@@ -293,11 +293,7 @@ export default function Library() {
           {/* Item list */}
           <LibraryItems library={library} filtered={filtered} />
         </div>
-      ) : (
-        <Suspense fallback={<div className="flex items-center justify-center h-[400px]"><p className="text-xs font-mono text-muted-foreground/40 animate-pulse">Loading graph…</p></div>}>
-          <GraphView />
-        </Suspense>
-      )}
+      </div>
     </div>
   );
 }
