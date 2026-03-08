@@ -5,7 +5,7 @@ import { HolzenRitual, type RitualTemplate } from '@/components/HolzenRitual';
 import { RitualCooldownBanner } from '@/components/RitualCooldownBanner';
 import { useSubscription } from '@/hooks/use-subscription';
 import { BtcStatus } from '@/components/BtcStatus';
-import { NightReflectionCard } from '@/components/NightReflectionCard';
+import { NightReflectionCard, useNightReflection } from '@/components/NightReflectionCard';
 import { ReflectionMessage } from '@/components/ReflectionMessage';
 import { OutcomePrompt } from '@/components/OutcomePrompt';
 import { HolzenNumber } from '@/components/HolzenNumber';
