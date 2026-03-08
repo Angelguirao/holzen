@@ -102,6 +102,12 @@ export function useLibrary() {
     await updateItem(id, { pinned: !item.pinned });
   }, [items, updateItem]);
 
+  const toggleFavorite = useCallback(async (id: string) => {
+    const item = items.find((i) => i.id === id);
+    if (!item) return;
+    await updateItem(id, { is_favorite: !item.is_favorite });
+  }, [items, updateItem]);
+
   // Collections CRUD
   const addCollection = useCallback(async (col: Partial<Collection>) => {
     if (!user) return null;
