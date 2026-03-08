@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { ChartEmptyState } from './ChartEmptyState';
 
 const MOOD_BAR_COLORS: Record<string, string> = {
   anxious: 'hsl(var(--destructive) / 0.5)',
