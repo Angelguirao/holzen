@@ -483,7 +483,7 @@ const Home = () => {
         sensors={sensors}
         collisionDetection={closestCenter}
         onDragEnd={handleDragEnd}
-        modifiers={[restrictToVerticalAxis, restrictToParentElement]}
+        modifiers={[restrictToVerticalAxis]}
       >
         <SortableContext items={order} strategy={verticalListSortingStrategy}>
           <div className="space-y-3">
