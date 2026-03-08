@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback, useMemo } from 'react';
+import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { format, subDays, isAfter } from 'date-fns';
