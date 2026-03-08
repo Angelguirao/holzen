@@ -585,7 +585,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             loading={historyLoading}
             error={historyError}
           />
-          {historyInsight && <div className="mt-1.5"><SaveToLibraryButton title={historyInsight.title} body={historyInsight.btcInsight} sourceType="history_insight" reflectionId={reflectionId ?? undefined} /></div>}
+          
         </CollapsibleCompanion>
       )}
     </div>
