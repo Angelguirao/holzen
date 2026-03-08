@@ -6,6 +6,7 @@ import { X, Star, Search, Pin, Info } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ShareReflection } from '@/components/ShareReflection';
 import { ReflectionNote } from '@/components/ReflectionNote';
+import { ReflectionWallpaper } from '@/components/ReflectionWallpaper';
 import { ReflectionTags } from '@/components/ReflectionTags';
 import { ReflectionComparison } from '@/components/ReflectionComparison';
 import { HaikuDisplay } from '@/components/HaikuDisplay';
