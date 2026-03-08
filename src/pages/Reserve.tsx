@@ -3,6 +3,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft, Bitcoin } from 'lucide-react';
 import { PageMeta } from '@/components/PageMeta';
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 14 },
@@ -11,7 +12,6 @@ const fade = (delay = 0) => ({
   transition: { duration: 0.6, delay, ease: [0.25, 0.1, 0.25, 1] },
 });
 
-// Treasury data — update when first BTC is acquired
 const TREASURY = {
   totalBtc: 0,
   averageCost: 0,
@@ -32,6 +32,7 @@ function useBtcPrice() {
 }
 
 const Reserve = () => {
+  const { t } = useTranslation();
   const prefersReduced = useReducedMotion();
   const m = (delay = 0) => (prefersReduced ? {} : fade(delay));
   const btcPrice = useBtcPrice();
@@ -52,146 +53,81 @@ const Reserve = () => {
         path="/reserve"
       />
       <div className="w-full max-w-sm space-y-14">
-        {/* Nav */}
         <motion.div {...m()}>
-          <Link
-            to="/welcome"
-            className="inline-flex items-center gap-1.5 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
-          >
+          <Link to="/welcome" className="inline-flex items-center gap-1.5 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="h-3.5 w-3.5" />
-            Back
+            {t('common.back')}
           </Link>
         </motion.div>
 
-        {/* Title */}
         <motion.div {...m(0.05)} className="space-y-3">
           <div className="flex items-center gap-2.5">
             <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
               <Bitcoin className="h-4 w-4 text-primary" />
             </div>
-            <h1 className="text-xl text-foreground leading-relaxed">
-              BTC Reserve Strategy
-            </h1>
+            <h1 className="text-xl text-foreground leading-relaxed">{t('reserve.title')}</h1>
           </div>
-          <p className="text-sm text-muted-foreground leading-relaxed">
-            We hold what we help others hold.
-          </p>
+          <p className="text-sm text-muted-foreground leading-relaxed">{t('reserve.subtitle')}</p>
         </motion.div>
 
-        {/* Philosophy */}
         <motion.div {...m(0.1)}>
           <div className="space-y-4">
-            <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
-              Why we hold
-            </p>
-            <p className="text-sm text-foreground leading-relaxed">
-              A product that helps people hold Bitcoin should itself hold Bitcoin. Anything else would be a contradiction.
-            </p>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Holzen maintains a Bitcoin reserve — not as a financial strategy, but as a statement of conviction. We believe Bitcoin is the best savings technology ever created. We believe in multi-decade time horizons. We believe the hardest part of holding is the emotional cost, and that cost is worth paying.
-            </p>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Our reserve is denominated in Bitcoin, not dollars. We don't measure success by fiat returns. We measure it by the discipline of not selling — the same discipline we ask of our users every day.
-            </p>
+            <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">{t('reserve.whyWeHold')}</p>
+            <p className="text-sm text-foreground leading-relaxed">{t('reserve.whyWeHoldBody1')}</p>
+            <p className="text-xs text-muted-foreground leading-relaxed">{t('reserve.whyWeHoldBody2')}</p>
+            <p className="text-xs text-muted-foreground leading-relaxed">{t('reserve.whyWeHoldBody3')}</p>
           </div>
         </motion.div>
 
-        {/* Strategy */}
         <motion.div {...m(0.1)}>
           <div className="space-y-4">
-            <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
-              Our strategy
-            </p>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              We allocate a significant portion of company treasury to Bitcoin. We acquire through dollar-cost averaging and opportunistic buys during periods of elevated fear. We do not trade. We do not hedge. We do not lend.
-            </p>
+            <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">{t('reserve.ourStrategy')}</p>
+            <p className="text-xs text-muted-foreground leading-relaxed">{t('reserve.strategyBody')}</p>
             <div className="space-y-2">
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <span className="h-1.5 w-1.5 rounded-full bg-primary/60" />
-                Self-custody only — no third-party risk
-              </div>
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <span className="h-1.5 w-1.5 rounded-full bg-primary/60" />
-                No selling — indefinite time horizon
-              </div>
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <span className="h-1.5 w-1.5 rounded-full bg-primary/60" />
-                DCA + conviction buys during fear
-              </div>
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <span className="h-1.5 w-1.5 rounded-full bg-primary/60" />
-                Transparent reporting, updated periodically
-              </div>
+              {(['strategyBullet1', 'strategyBullet2', 'strategyBullet3', 'strategyBullet4'] as const).map((key) => (
+                <div key={key} className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary/60" />
+                  {t(`reserve.${key}`)}
+                </div>
+              ))}
             </div>
           </div>
         </motion.div>
 
-        {/* Treasury tracker */}
         <motion.div {...m(0.1)}>
           <div className="space-y-4">
-            <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
-              Treasury
-            </p>
+            <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">{t('reserve.treasury')}</p>
             <div className="border border-border/60 rounded-lg p-5 space-y-4 bg-muted/10">
               {TREASURY.hasStarted ? (
                 <>
-                  {/* BTC held */}
                   <div className="flex items-baseline justify-between">
-                    <p className="text-[10px] font-mono text-muted-foreground/70 uppercase tracking-wider">
-                      Total BTC held
-                    </p>
-                    <p className="text-lg font-mono text-foreground">
-                      {TREASURY.totalBtc.toFixed(8).replace(/0+$/, '').replace(/\.$/, '')} ₿
-                    </p>
+                    <p className="text-[10px] font-mono text-muted-foreground/70 uppercase tracking-wider">{t('reserve.totalBtcHeld')}</p>
+                    <p className="text-lg font-mono text-foreground">{TREASURY.totalBtc.toFixed(8).replace(/0+$/, '').replace(/\.$/, '')} ₿</p>
                   </div>
-
                   <div className="h-px bg-border/40" />
-
-                  {/* Average cost */}
                   <div className="flex items-baseline justify-between">
-                    <p className="text-[10px] font-mono text-muted-foreground/70 uppercase tracking-wider">
-                      Avg. cost basis
-                    </p>
-                    <p className="text-sm font-mono text-muted-foreground">
-                      {formatUsd(TREASURY.averageCost)}
-                    </p>
+                    <p className="text-[10px] font-mono text-muted-foreground/70 uppercase tracking-wider">{t('reserve.avgCostBasis')}</p>
+                    <p className="text-sm font-mono text-muted-foreground">{formatUsd(TREASURY.averageCost)}</p>
                   </div>
-
-                  {/* Current value */}
                   {currentValue !== null && (
                     <>
                       <div className="flex items-baseline justify-between">
-                        <p className="text-[10px] font-mono text-muted-foreground/70 uppercase tracking-wider">
-                          Current value
-                        </p>
-                        <p className="text-sm font-mono text-foreground">
-                          {formatUsd(currentValue)}
-                        </p>
+                        <p className="text-[10px] font-mono text-muted-foreground/70 uppercase tracking-wider">{t('reserve.currentValue')}</p>
+                        <p className="text-sm font-mono text-foreground">{formatUsd(currentValue)}</p>
                       </div>
-
                       <div className="flex items-baseline justify-between">
-                        <p className="text-[10px] font-mono text-muted-foreground/70 uppercase tracking-wider">
-                          Unrealised P&L
-                        </p>
+                        <p className="text-[10px] font-mono text-muted-foreground/70 uppercase tracking-wider">{t('reserve.unrealisedPnl')}</p>
                         <p className={`text-sm font-mono ${unrealisedPnl !== null && unrealisedPnl >= 0 ? 'text-primary' : 'text-destructive'}`}>
                           {unrealisedPnl !== null ? `${unrealisedPnl >= 0 ? '+' : ''}${unrealisedPnl.toFixed(1)}%` : '—'}
                         </p>
                       </div>
                     </>
                   )}
-
                   <div className="h-px bg-border/40" />
-
-                  {/* Treasury allocation */}
                   <div className="flex items-baseline justify-between">
-                    <p className="text-[10px] font-mono text-muted-foreground/70 uppercase tracking-wider">
-                      % of treasury
-                    </p>
-                    <p className="text-sm font-mono text-foreground">
-                      {TREASURY.percentOfTreasury}%
-                    </p>
+                    <p className="text-[10px] font-mono text-muted-foreground/70 uppercase tracking-wider">{t('reserve.percentOfTreasury')}</p>
+                    <p className="text-sm font-mono text-foreground">{TREASURY.percentOfTreasury}%</p>
                   </div>
-
                   <p className="text-[10px] font-mono text-muted-foreground/40 text-right">
                     Updated {new Date(TREASURY.lastUpdated).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
                   </p>
@@ -199,54 +135,39 @@ const Reserve = () => {
               ) : (
                 <div className="text-center py-3 space-y-2">
                   <p className="text-sm font-mono text-foreground">0 ₿</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    Our reserve hasn't started yet. When it does, the numbers will appear here — transparent from the first sat.
-                  </p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{t('reserve.reserveNotStarted')}</p>
                 </div>
               )}
             </div>
           </div>
         </motion.div>
 
-        {/* Inspiration */}
         <motion.div {...m(0.1)}>
           <div className="space-y-4">
-            <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
-              Standing on conviction
-            </p>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Our approach is inspired by companies like MicroStrategy, who demonstrated that a corporate Bitcoin reserve isn't speculative — it's a statement about the future of money. We operate at a different scale, but with the same philosophical commitment: Bitcoin is not an asset to trade. It's an asset to hold.
-            </p>
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              Every sat in our treasury represents the same conviction we ask our users to practice. We don't just build tools for holders — we are holders.
-            </p>
+            <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">{t('reserve.standingOnConviction')}</p>
+            <p className="text-xs text-muted-foreground leading-relaxed">{t('reserve.convictionBody1')}</p>
+            <p className="text-xs text-muted-foreground leading-relaxed">{t('reserve.convictionBody2')}</p>
           </div>
         </motion.div>
 
-        {/* Closing */}
         <motion.div {...m(0.1)}>
           <div className="border-t border-border/40 pt-6 space-y-3">
-            <p className="text-xs text-muted-foreground leading-relaxed italic">
-              "The practice is the same whether you hold 0.001 BTC or 10,000. Sit with the volatility. Notice the impulse. Choose deliberately."
-            </p>
-            <p className="text-[10px] font-mono text-muted-foreground/50">
-              — Holzen
-            </p>
+            <p className="text-xs text-muted-foreground leading-relaxed italic">"{t('reserve.closingQuote')}"</p>
+            <p className="text-[10px] font-mono text-muted-foreground/50">{t('reserve.closingAttribution')}</p>
           </div>
         </motion.div>
 
-        {/* Footer */}
         <motion.div {...m()}>
           <div className="flex items-center gap-3 text-xs text-muted-foreground pt-4 border-t border-border">
-            <Link to="/welcome" className="hover:text-foreground transition-colors">Home</Link>
+            <Link to="/welcome" className="hover:text-foreground transition-colors">{t('about.home')}</Link>
             <span>·</span>
-            <Link to="/about" className="hover:text-foreground transition-colors">About</Link>
+            <Link to="/about" className="hover:text-foreground transition-colors">{t('landing.about')}</Link>
             <span>·</span>
-            <Link to="/terms" className="hover:text-foreground transition-colors">Terms</Link>
+            <Link to="/terms" className="hover:text-foreground transition-colors">{t('landing.terms')}</Link>
             <span>·</span>
-            <Link to="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
+            <Link to="/privacy" className="hover:text-foreground transition-colors">{t('landing.privacy')}</Link>
             <span>·</span>
-            <a href="mailto:hello@holzen.app" className="hover:text-foreground transition-colors">Contact</a>
+            <a href="mailto:hello@holzen.app" className="hover:text-foreground transition-colors">{t('about.contact')}</a>
           </div>
         </motion.div>
       </div>

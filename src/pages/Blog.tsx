@@ -7,6 +7,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { format } from 'date-fns';
 import { PageMeta } from '@/components/PageMeta';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
+import { useTranslation } from 'react-i18next';
 
 const PAGE_SIZE = 20;
 
@@ -26,6 +27,7 @@ interface BlogPost {
 }
 
 const Blog = () => {
+  const { t } = useTranslation();
   const prefersReduced = useReducedMotion();
   const m = (delay = 0) => (prefersReduced ? {} : fade(delay));
   const [posts, setPosts] = useState<BlogPost[]>([]);
@@ -77,21 +79,14 @@ const Blog = () => {
         path="/blog"
       />
       <div className="w-full max-w-sm space-y-10">
-        {/* Nav */}
         <motion.div {...m()} className="flex items-center justify-between">
-          <Link
-            to="/welcome"
-            className="inline-flex items-center gap-1.5 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
-          >
+          <Link to="/welcome" className="inline-flex items-center gap-1.5 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="h-3.5 w-3.5" />
-            Back
+            {t('common.back')}
           </Link>
-          <span className="text-sm font-mono tracking-widest uppercase text-muted-foreground">
-            Blog
-          </span>
+          <span className="text-sm font-mono tracking-widest uppercase text-muted-foreground">{t('blog.title')}</span>
         </motion.div>
 
-        {/* Posts */}
         {isLoading ? (
           <div className="space-y-6">
             {[1, 2, 3].map((i) => (
@@ -106,25 +101,16 @@ const Blog = () => {
           <div className="space-y-8">
             {posts.map((post, i) => (
               <motion.div key={post.id} {...m(i * 0.05)}>
-                <Link
-                  to={`/blog/${post.slug}`}
-                  className="block group space-y-2"
-                >
+                <Link to={`/blog/${post.slug}`} className="block group space-y-2">
                   {post.published_at && (
                     <p className="text-[10px] font-mono text-muted-foreground/70 tracking-wider uppercase">
                       {format(new Date(post.published_at), 'MMM d, yyyy')}
                     </p>
                   )}
-                  <p className="text-sm text-foreground group-hover:text-primary transition-colors leading-relaxed">
-                    {post.title}
-                  </p>
-                  {post.excerpt && (
-                    <p className="text-xs text-muted-foreground leading-relaxed">
-                      {post.excerpt}
-                    </p>
-                  )}
+                  <p className="text-sm text-foreground group-hover:text-primary transition-colors leading-relaxed">{post.title}</p>
+                  {post.excerpt && <p className="text-xs text-muted-foreground leading-relaxed">{post.excerpt}</p>}
                   <span className="inline-flex items-center gap-1 text-[10px] font-mono text-muted-foreground group-hover:text-foreground transition-colors">
-                    Read
+                    {t('blog.read')}
                     <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
                   </span>
                 </Link>
@@ -132,30 +118,27 @@ const Blog = () => {
             ))}
             <div ref={sentinelRef} className="h-1" />
             {loadingMore && (
-              <p className="text-[10px] font-mono text-muted-foreground animate-pulse text-center">Loading more…</p>
+              <p className="text-[10px] font-mono text-muted-foreground animate-pulse text-center">{t('common.loadingMore')}</p>
             )}
           </div>
         ) : (
           <motion.div {...m(0.1)}>
             <div className="space-y-3 py-8">
-              <p className="text-sm text-foreground">Nothing here yet.</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                We're working on our first posts about behavioral finance, Bitcoin conviction, and the art of doing nothing. Check back soon.
-              </p>
+              <p className="text-sm text-foreground">{t('blog.nothingYet')}</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">{t('blog.nothingDesc')}</p>
             </div>
           </motion.div>
         )}
 
-        {/* Footer */}
         <motion.div {...m()}>
           <div className="flex items-center gap-3 text-xs text-muted-foreground pt-4 border-t border-border">
-            <Link to="/welcome" className="hover:text-foreground transition-colors">Home</Link>
+            <Link to="/welcome" className="hover:text-foreground transition-colors">{t('blog.home')}</Link>
             <span>·</span>
-            <Link to="/about" className="hover:text-foreground transition-colors">About</Link>
+            <Link to="/about" className="hover:text-foreground transition-colors">{t('blog.about')}</Link>
             <span>·</span>
-            <Link to="/terms" className="hover:text-foreground transition-colors">Terms</Link>
+            <Link to="/terms" className="hover:text-foreground transition-colors">{t('blog.terms')}</Link>
             <span>·</span>
-            <Link to="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
+            <Link to="/privacy" className="hover:text-foreground transition-colors">{t('blog.privacy')}</Link>
           </div>
         </motion.div>
       </div>
