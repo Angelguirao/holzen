@@ -2,6 +2,8 @@ import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
+import { useHolzen } from '@/hooks/use-holzen';
+import { formatBtcPrice } from '@/lib/btc';
 import { format, subDays, isAfter } from 'date-fns';
 import { X, Star, Search, Pin, Info, TrendingUp, TrendingDown, Clock, History as HistoryIcon, ExternalLink, ArrowRight, ChevronDown } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -55,6 +57,7 @@ const FIELDS = 'id, message, context, created_at, is_favorite, haiku, learning_t
 
 function HistoryCompanions({ label, r }: { label: string; r: Reflection }) {
   const [open, setOpen] = useState(false);
+  const { currency } = useHolzen();
 
   return (
     <div className="pt-2 border-t border-border/30">
@@ -113,7 +116,7 @@ function HistoryCompanions({ label, r }: { label: string; r: Reflection }) {
                     return (
                       <div key={entry.yearsAgo} className="flex items-center justify-between gap-2">
                         <span className="text-[10px] font-mono text-muted-foreground/60 w-14 shrink-0">{entry.yearsAgo}y ago</span>
-                        <span className="text-xs font-mono text-muted-foreground tabular-nums">${entry.price.toLocaleString()}</span>
+                        <span className="text-xs font-mono text-muted-foreground tabular-nums">{formatBtcPrice(entry.price, currency)}</span>
                         <span className={`text-[10px] font-mono tabular-nums ${isUp ? 'text-primary/70' : 'text-destructive/70'}`}>
                           {isUp ? '+' : ''}{changePct.toFixed(0)}%
                         </span>
@@ -166,6 +169,7 @@ function HistoryCompanions({ label, r }: { label: string; r: Reflection }) {
 
 const History = () => {
   const { user } = useAuth();
+  const { currency } = useHolzen();
   const [reflections, setReflections] = useState<Reflection[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);

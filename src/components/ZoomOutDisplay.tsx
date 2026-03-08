@@ -1,6 +1,8 @@
 import { Skeleton } from '@/components/ui/skeleton';
 import { TrendingUp, TrendingDown, Clock } from 'lucide-react';
 import { format } from 'date-fns';
+import { useHolzen } from '@/hooks/use-holzen';
+import { formatBtcPrice } from '@/lib/btc';
 
 interface OnThisDayEntry {
   yearsAgo: number;
@@ -25,15 +27,15 @@ interface Props {
   error: boolean;
 }
 
-function formatPrice(n: number): string {
-  return `$${n.toLocaleString()}`;
-}
+// formatPrice is now handled by formatBtcPrice from btc.ts
 
 const outcomeLabels: Record<string, string> = {
   held: 'Held', hold: 'Held', sold: 'Sold', bought: 'Bought', nothing: 'Did nothing',
 };
 
 export function ZoomOutDisplay({ data, loading, error }: Props) {
+  const { currency } = useHolzen();
+  const fmtPrice = (n: number) => formatBtcPrice(n, currency);
   if (loading) {
     return (
       <div className="space-y-3">
@@ -72,7 +74,7 @@ export function ZoomOutDisplay({ data, loading, error }: Props) {
                     {entry.yearsAgo}y ago
                   </span>
                   <span className="text-xs font-mono text-muted-foreground tabular-nums">
-                    {formatPrice(entry.price)}
+                    {fmtPrice(entry.price)}
                   </span>
                   <span className={`text-[10px] font-mono tabular-nums flex items-center gap-0.5 ${isUp ? 'text-primary/70' : 'text-destructive/70'}`}>
                     {isUp ? <TrendingUp className="h-2.5 w-2.5" /> : <TrendingDown className="h-2.5 w-2.5" />}
@@ -86,7 +88,7 @@ export function ZoomOutDisplay({ data, loading, error }: Props) {
                 Now
               </span>
               <span className="text-xs font-mono text-foreground font-medium tabular-nums">
-                {formatPrice(currentPrice)}
+                {fmtPrice(currentPrice)}
               </span>
               <span className="text-[10px] font-mono text-muted-foreground/40">—</span>
             </div>

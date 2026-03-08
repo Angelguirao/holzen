@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
+import { useHolzen } from '@/hooks/use-holzen';
+import { formatBtcPrice } from '@/lib/btc';
 import { Target, Calendar, DollarSign, Infinity, X, Check, CalendarIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -26,6 +28,7 @@ const MAX_PRICE = 100_000_000; // $100M
 const MIN_PRICE = 1;
 
 export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
+  const { currency } = useHolzen();
   const { user } = useAuth();
   const [goal, setGoal] = useState<HoldGoal | null>(null);
   const [loading, setLoading] = useState(true);
@@ -99,10 +102,10 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
         hold_goal_start: startDate.toISOString(),
         hold_goal_target_months: null,
         hold_goal_target_price: null,
-        hold_goal_currency: 'USD',
+        hold_goal_currency: currency,
       };
       await supabase.from('profiles').update(updates).eq('user_id', user.id);
-      setGoal({ type: 'forever', start: updates.hold_goal_start, currency: 'USD' });
+      setGoal({ type: 'forever', start: updates.hold_goal_start, currency });
       setSetting(false);
       setInputValue('');
       toast('Hold forever. Conviction locked in.');
@@ -121,7 +124,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
       hold_goal_start: startDate.toISOString(),
       hold_goal_target_months: months,
       hold_goal_target_price: goalType === 'price' ? val : null,
-      hold_goal_currency: 'USD',
+      hold_goal_currency: currency,
     };
 
     await supabase.from('profiles').update(updates).eq('user_id', user.id);
@@ -130,7 +133,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
       start: updates.hold_goal_start,
       targetMonths: updates.hold_goal_target_months,
       targetPrice: updates.hold_goal_target_price,
-      currency: 'USD',
+      currency,
     });
     setSetting(false);
     setInputValue('');
@@ -395,10 +398,10 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
             <span className="text-xs font-mono text-foreground/80">
-              {reached ? '🎉 Target reached!' : `$${diff.toLocaleString()} to go`}
+              {reached ? '🎉 Target reached!' : `${formatBtcPrice(diff, currency)} to go`}
             </span>
             <span className="text-[10px] font-mono text-muted-foreground/50">
-              Target: ${target.toLocaleString()}
+              Target: {formatBtcPrice(target, currency)}
             </span>
           </div>
           <div className="h-1.5 w-full rounded-full bg-muted/50 overflow-hidden">
@@ -408,7 +411,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
             />
           </div>
           <p className="text-[9px] font-mono text-muted-foreground/40">
-            Started {format(start, 'MMM d, yyyy')} · {differenceInDays(new Date(), start)} day{differenceInDays(new Date(), start) !== 1 ? 's' : ''} held · Current: ${price.toLocaleString()}
+            Started {format(start, 'MMM d, yyyy')} · {differenceInDays(new Date(), start)} day{differenceInDays(new Date(), start) !== 1 ? 's' : ''} held · Current: {formatBtcPrice(price, currency)}
           </p>
         </div>
       </div>
