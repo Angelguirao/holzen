@@ -7,6 +7,114 @@ import { formatDistanceToNow } from 'date-fns';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Skeleton } from '@/components/ui/skeleton';
 
+const SWIPE_THRESHOLD = 80;
+
+function SwipeableNotification({
+  n,
+  iconMap,
+  onDismiss,
+  onAction,
+}: {
+  n: NotificationItem;
+  iconMap: Record<NotificationItem['type'], string>;
+  onDismiss: (id: string) => void;
+  onAction: (path: string) => void;
+}) {
+  const startX = useRef(0);
+  const currentX = useRef(0);
+  const swiping = useRef(false);
+  const elRef = useRef<HTMLDivElement>(null);
+
+  const handleTouchStart = useCallback((e: React.TouchEvent) => {
+    startX.current = e.touches[0].clientX;
+    currentX.current = 0;
+    swiping.current = true;
+  }, []);
+
+  const handleTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!swiping.current || !elRef.current) return;
+    const delta = e.touches[0].clientX - startX.current;
+    // Only allow swiping left (negative)
+    currentX.current = Math.min(0, delta);
+    elRef.current.style.transform = `translateX(${currentX.current}px)`;
+    elRef.current.style.opacity = `${1 - Math.abs(currentX.current) / 200}`;
+  }, []);
+
+  const handleTouchEnd = useCallback(() => {
+    swiping.current = false;
+    if (!elRef.current) return;
+    if (Math.abs(currentX.current) >= SWIPE_THRESHOLD) {
+      // Animate out then dismiss
+      elRef.current.style.transition = 'transform 0.2s, opacity 0.2s';
+      elRef.current.style.transform = 'translateX(-100%)';
+      elRef.current.style.opacity = '0';
+      setTimeout(() => onDismiss(n.id), 200);
+    } else {
+      // Snap back
+      elRef.current.style.transition = 'transform 0.2s, opacity 0.2s';
+      elRef.current.style.transform = 'translateX(0)';
+      elRef.current.style.opacity = '1';
+      setTimeout(() => {
+        if (elRef.current) elRef.current.style.transition = '';
+      }, 200);
+    }
+  }, [n.id, onDismiss]);
+
+  return (
+    <motion.div
+      layout
+      exit={{ opacity: 0, height: 0, paddingTop: 0, paddingBottom: 0 }}
+      transition={{ duration: 0.2 }}
+      className="relative overflow-hidden"
+    >
+      {/* Red background revealed on swipe */}
+      <div className="absolute inset-0 flex items-center justify-end pr-3 bg-destructive/20">
+        <X className="h-3.5 w-3.5 text-destructive" />
+      </div>
+      <div
+        ref={elRef}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+        className="relative px-3 py-2.5 bg-popover hover:bg-accent/50 transition-colors group"
+      >
+        <div className="flex items-start gap-2">
+          <span className="text-sm mt-0.5">{iconMap[n.type]}</span>
+          <div className="min-w-0 flex-1">
+            <p className="text-[11px] font-medium text-foreground leading-tight">
+              {n.title}
+            </p>
+            <p className="text-[10px] text-muted-foreground leading-snug mt-0.5 truncate">
+              {n.subtitle}
+            </p>
+            <div className="flex items-center gap-2 mt-1">
+              <p className="text-[9px] text-muted-foreground/60 font-mono">
+                {formatDistanceToNow(new Date(n.timestamp), { addSuffix: true })}
+              </p>
+              {n.action && (
+                <button
+                  onClick={() => onAction(n.action!.path)}
+                  className="flex items-center gap-0.5 text-[9px] font-mono text-primary/70 hover:text-primary transition-colors"
+                >
+                  {n.action.label}
+                  <ArrowRight className="h-2.5 w-2.5" />
+                </button>
+              )}
+            </div>
+          </div>
+          <button
+            onClick={(e) => { e.stopPropagation(); onDismiss(n.id); }}
+            className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-accent transition-all shrink-0 mt-0.5"
+            aria-label="Dismiss notification"
+          >
+            <X className="h-3 w-3 text-muted-foreground" />
+          </button>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 type NotificationItem = {
   id: string;
   type: 'badge' | 'night_reflection' | 'letter' | 'insight' | 'reflection' | 'ritual';
