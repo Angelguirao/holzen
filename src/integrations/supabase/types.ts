@@ -608,6 +608,7 @@ export type Database = {
       }
       signal_sources: {
         Row: {
+          category: string
           created_at: string
           description: string | null
           id: string
@@ -616,6 +617,7 @@ export type Database = {
           url: string | null
         }
         Insert: {
+          category?: string
           created_at?: string
           description?: string | null
           id?: string
@@ -624,6 +626,7 @@ export type Database = {
           url?: string | null
         }
         Update: {
+          category?: string
           created_at?: string
           description?: string | null
           id?: string
@@ -687,6 +690,7 @@ export type Database = {
       user_signal_preferences: {
         Row: {
           active: boolean
+          category: string
           created_at: string
           custom_name: string | null
           custom_type: string | null
@@ -697,6 +701,7 @@ export type Database = {
         }
         Insert: {
           active?: boolean
+          category?: string
           created_at?: string
           custom_name?: string | null
           custom_type?: string | null
@@ -707,6 +712,7 @@ export type Database = {
         }
         Update: {
           active?: boolean
+          category?: string
           created_at?: string
           custom_name?: string | null
           custom_type?: string | null
