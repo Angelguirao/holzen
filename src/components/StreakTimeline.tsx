@@ -71,7 +71,7 @@ export function StreakTimeline({ reflections, streakFreezeDates = [], memberSinc
       .map(([date, status]) => ({ date, status }));
 
     return { days, currentStreak: current, longestStreak: longest, nextMilestone };
-  }, [reflections, streakFreezeDates]);
+  }, [reflections, streakFreezeDates, memberSince]);
 
   if (reflections.length === 0) return null;
 
