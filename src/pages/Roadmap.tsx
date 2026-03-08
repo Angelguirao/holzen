@@ -142,7 +142,7 @@ const Roadmap = () => {
             })}
             <div ref={sentinelRef} className="h-1" />
             {loadingMore && (
-              <p className="text-[10px] font-mono text-muted-foreground animate-pulse text-center py-2">Loading more…</p>
+              <p className="text-[10px] font-mono text-muted-foreground animate-pulse text-center py-2">{t('common.loadingMore')}</p>
             )}
           </div>
         )}
