@@ -119,7 +119,7 @@ export function Onboarding({ onComplete }: Props) {
                     </div>
                   </motion.div>
                   <motion.div {...stagger(0.4)}>
-                    <Nav showBack={false} onNext={() => goTo(1)} />
+                    <Nav showBack={false} onNext={() => goTo(1)} nextLabel={t('common.continue')} />
                   </motion.div>
                 </div>
               )}
