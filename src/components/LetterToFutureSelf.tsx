@@ -297,7 +297,7 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
                     <p className="text-[10px] font-mono text-muted-foreground/50 max-w-[200px] leading-relaxed">
                       {effectiveMode === 'calm'
                         ? 'This letter waits for the storm.'
-                        : deliverDuring === 'ath'
+                        : deliverDuring === 'surge'
                         ? 'This letter waits for confidence.'
                         : 'This letter waits for doubt.'}
                     </p>
