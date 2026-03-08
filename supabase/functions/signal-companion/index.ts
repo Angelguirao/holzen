@@ -42,7 +42,7 @@ Rules:
 - Keep the body to 2-3 sentences max
 - Include a real, working URL to a relevant source (blog post, article, or data dashboard)
 - Tone: calm, educational, grounding. No hype, no advice, no predictions.
-- Prioritize timeless insights over breaking news`;
+- Prioritize timeless insights over breaking news${langInstruction}`;
 
     const userPrompt = context
       ? `Current market context: ${context}\n\nFind one relevant, real Bitcoin insight for this moment.`

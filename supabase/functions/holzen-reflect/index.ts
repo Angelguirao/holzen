@@ -112,7 +112,7 @@ serve(async (req) => {
 
 You MUST respond by calling the "generate_reflection" function. Do not respond with plain text.
 
-Tone: ${baseTone}
+Tone: ${baseTone}${langInstruction}
 ${adaptiveContext}
 
 CURRENCY: The user views BTC prices in ${currencyCode}. When mentioning any price or monetary value, format it in ${currencyCode} (e.g. use the appropriate currency symbol). Never use USD unless the user's currency IS USD.
