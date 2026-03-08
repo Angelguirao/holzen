@@ -12,7 +12,7 @@ import { PageMeta } from '@/components/PageMeta';
 
 export default function Library() {
   const { t } = useTranslation();
-  const { items, collections, loading, addItem, deleteItem, togglePin, deleteCollection } = useLibrary();
+  const { items, collections, loading, addItem, updateItem, deleteItem, togglePin, deleteCollection } = useLibrary();
   const [search, setSearch] = useState('');
   const [tab, setTab] = useState('all');
 
