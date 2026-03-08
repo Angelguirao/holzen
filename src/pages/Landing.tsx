@@ -145,10 +145,10 @@ const Landing = () => {
         <motion.div {...m()}>
           <div className="space-y-3 border-l-2 border-primary/30 pl-4">
             <p className="text-sm text-foreground leading-relaxed">
-              Impulsive decisions under volatility consistently lead to worse outcomes.
+              {t('landing.scienceQuote')}
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Behavioral finance research shows that emotional reactions — panic selling during drops, euphoric buying during surges — are among the most reliable predictors of poor returns. A brief pause before action leads to better decisions.
+              {t('landing.scienceDesc')}
             </p>
             <p className="text-[10px] text-muted-foreground/70 leading-relaxed italic">
               Kahneman, D. (2011). <em>Thinking, Fast and Slow</em>. · Barber, B. & Odean, T. (2000). "Trading Is Hazardous to Your Wealth." <em>The Journal of Finance</em>.
