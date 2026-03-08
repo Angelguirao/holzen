@@ -403,6 +403,22 @@
       "04title": "Du protokollierst",
       "04desc": "Markiere deine Emotionen. Schreibe eine Notiz. Halte fest, was du getan hast — gehalten, verkauft, gekauft oder nichts. Mit der Zeit zeigen sich Muster."
     },
+    "companionsTitle": "Sechs Begleiter",
+    "companionsDesc": "Jede Reflexion kommt mit Begleitern, die dich verlangsamen und Perspektive bieten. Speichere jeden in deiner Bibliothek mit einem Tipp.",
+    "companions": {
+      "breathing": "Atemübung",
+      "breathingDesc": "Geführte Ruhe vor dem Lesen",
+      "haiku": "Haiku",
+      "haikuDesc": "5-7-5 Stille, jedes Mal einzigartig",
+      "signal": "Signal lesen",
+      "signalDesc": "KI-gestützte Intelligenz aus deinen kuratierten Quellen",
+      "learning": "Erde dich",
+      "learningDesc": "Verhaltensfinanz-Forschung im Kontext",
+      "zoomOut": "Perspektive",
+      "zoomOutDesc": "BTC-Preise von vor 1–5 Jahren, deine vergangenen Reflexionen & Tiefzeit-Perspektive",
+      "history": "Historisches Echo",
+      "historyDesc": "Finanzgeschichtliche Parallelen & Vergleiche zwischen Anlageklassen via Recherche"
+    },
     "whatYouGet": "Was du bekommst",
     "features": {
       "breathing": "Atemübung",
