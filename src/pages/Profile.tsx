@@ -316,9 +316,9 @@ function HolzenScoreDetail({ scoreData }: { scoreData: import('@/hooks/use-holze
           </div>
         </div>
         <div className="space-y-2 flex-1 min-w-0">
-          <ScoreBarInline label="Mood" value={scoreData.moodScore} />
-          <ScoreBarInline label="Actions" value={scoreData.outcomeScore} />
-          <ScoreBarInline label="Streak" value={scoreData.streakScore} />
+          <ScoreBarInline label={t('profile.moodLabel')} value={scoreData.moodScore} />
+          <ScoreBarInline label={t('profile.actionsLabel')} value={scoreData.outcomeScore} />
+          <ScoreBarInline label={t('profile.streakLabel')} value={scoreData.streakScore} />
         </div>
       </div>
     </div>
