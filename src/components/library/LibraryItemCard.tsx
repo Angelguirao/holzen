@@ -89,7 +89,7 @@ export function LibraryItemCard({
           )}
           {item.body && (
             <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-3 mt-0.5">
-              {item.body}
+              {typeof item.body === 'string' ? item.body : JSON.stringify(item.body)}
             </p>
           )}
         </div>
