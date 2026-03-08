@@ -17,24 +17,13 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const sources = [
-      'Lyn Alden', 'Nic Carter', 'Willy Woo', 'mempool.space', 'Glassnode',
-      'ARK Invest', 'Plan B', 'Bitcoin Magazine', 'River Financial',
-      'Jameson Lopp', 'Adam Back', 'Vijay Boyapati', 'Saifedean Ammous',
-      'Unchained Capital', 'NYDIG', 'Blockware Solutions', 'Look Into Bitcoin',
-      'Clark Moody Dashboard', 'Woobull Charts', 'Coin Metrics',
-    ];
-    // Pick 3 random sources to suggest for this request
-    const shuffled = sources.sort(() => Math.random() - 0.5);
-    const suggested = shuffled.slice(0, 3);
-
     const systemPrompt = `You are a Bitcoin signal curator for a mindfulness app called Holzen. Your job is to surface ONE real, high-signal piece of Bitcoin analysis or insight that is contextually relevant to the current market conditions.
 
 You MUST call the "return_signal" function with your response. Do not respond with plain text.
 
 Rules:
-- For THIS request, you MUST use one of these sources: ${suggested.join(', ')}. Do NOT use any other source.
-- Reference REAL analysts, publications, or concepts from the Bitcoin ecosystem
+- Reference REAL analysts, publications, data dashboards, or research from the Bitcoin ecosystem
+- VARIETY IS CRITICAL: Each response must use a DIFFERENT source. Draw from the full breadth of Bitcoin analysis — on-chain analysts, macro researchers, mining experts, protocol developers, academic papers, data platforms, newsletters, podcasts, etc. Surprise the reader with lesser-known but credible voices, not just the most popular names.
 - The insight should be FACTUAL — a real concept, framework, or historical pattern, not made-up content
 - Match it to the current market context (if fees are high, talk about fee markets; if there's a crash, reference historical recoveries; if sentiment is extreme, reference behavioral patterns)
 - Keep the body to 2-3 sentences max
