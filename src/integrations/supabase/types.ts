@@ -582,6 +582,33 @@ export type Database = {
           },
         ]
       }
+      testimonials: {
+        Row: {
+          approved: boolean
+          created_at: string
+          display_name: string
+          id: string
+          quote: string
+          user_id: string
+        }
+        Insert: {
+          approved?: boolean
+          created_at?: string
+          display_name: string
+          id?: string
+          quote: string
+          user_id: string
+        }
+        Update: {
+          approved?: boolean
+          created_at?: string
+          display_name?: string
+          id?: string
+          quote?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       user_badges: {
         Row: {
           badge_id: string
