@@ -305,15 +305,6 @@ export default function PauseSession() {
         )}
       </AnimatePresence>
 
-      {/* Ritual overlay */}
-      <HolzenRitual
-        open={showRitual}
-        onClose={handleRitualClose}
-        template={(ritualTemplate || 'standard') as RitualTemplate}
-        reflectionMessage={message}
-        reflectionId={reflectionId}
-        onDecision={handleRitualDecision}
-      />
     </>
   );
 }
