@@ -18,8 +18,11 @@ interface Props {
 
 type Granularity = 'daily' | 'weekly';
 
-const MOOD_VAL: Record<string, number> = { anxious: 1, neutral: 2, calm: 3 };
-const MOOD_LABELS: Record<number, string> = { 1: 'Anxious', 2: 'Neutral', 3: 'Calm' };
+const MOOD_VAL: Record<string, number> = {
+  fomo: 1, greedy: 1.5, anxious: 2, fearful: 2, excited: 2.5,
+  uncertain: 3, detached: 4, calm: 5,
+};
+const MOOD_LABELS: Record<number, string> = { 1: 'Reactive', 3: 'Neutral', 5: 'Composed' };
 
 function buildData(reflections: Props['reflections'], granularity: Granularity) {
   const buckets = new Map<string, { total: number; count: number }>();
@@ -116,14 +119,14 @@ export function MoodTrendChart({ reflections }: Props) {
               tickLine={false}
             />
             <YAxis
-              domain={[0.5, 3.5]}
-              ticks={[1, 2, 3]}
+              domain={[0.5, 5.5]}
+              ticks={[1, 3, 5]}
               tickFormatter={(v: number) => MOOD_LABELS[v] ?? ''}
               tick={{ fontSize: 9, fontFamily: 'monospace', fill: 'hsl(var(--muted-foreground))' }}
               axisLine={false}
               tickLine={false}
             />
-            <ReferenceLine y={2} stroke="hsl(var(--border))" strokeDasharray="3 3" opacity={0.4} />
+            <ReferenceLine y={3} stroke="hsl(var(--border))" strokeDasharray="3 3" opacity={0.4} />
             <Tooltip
               contentStyle={{
                 background: 'hsl(var(--muted))',
@@ -133,8 +136,8 @@ export function MoodTrendChart({ reflections }: Props) {
                 fontFamily: 'monospace',
               }}
               formatter={(value: number) => {
-                const closest = value < 1.5 ? 'Anxious' : value < 2.5 ? 'Neutral' : 'Calm';
-                return [`${value.toFixed(2)} (${closest})`, 'Avg Mood'];
+                const label = value < 2 ? 'Reactive' : value < 3.5 ? 'Mixed' : 'Composed';
+                return [`${value.toFixed(2)} (${label})`, 'Avg Composure'];
               }}
               labelFormatter={(label: string) =>
                 granularity === 'daily' ? label : `Week of ${label}`
