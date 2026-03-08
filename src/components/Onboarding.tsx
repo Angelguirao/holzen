@@ -106,7 +106,7 @@ export function Onboarding({ onComplete }: Props) {
                       <Input
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
-                        placeholder="First name (optional)"
+                        placeholder={t('onboarding.firstNameOptional')}
                         maxLength={30}
                         className="text-xs font-mono"
                         autoFocus
