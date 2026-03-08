@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { MessageCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -10,6 +11,7 @@ interface Testimonial {
 }
 
 export function LandingTestimonials() {
+  const { t } = useTranslation();
   const [testimonials, setTestimonials] = useState<Testimonial[]>([]);
 
   useEffect(() => {
@@ -29,7 +31,7 @@ export function LandingTestimonials() {
   return (
     <div className="space-y-5">
       <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
-        What users say
+        {t('landing.whatUsersSay')}
       </p>
       <div className="space-y-3">
         {testimonials.map((t, i) => (
