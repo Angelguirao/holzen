@@ -205,16 +205,16 @@ export function StatsTrends({ reflections }: Props) {
                 contentStyle={tooltipStyle}
                 formatter={(v: number, name: string) => [`${Math.round(v * 100)}%`, name]}
               />
-              <Area type="monotone" dataKey="calm" stackId="1" stroke="hsl(var(--primary))" fill="hsl(var(--primary) / 0.3)" />
-              <Area type="monotone" dataKey="neutral" stackId="1" stroke="hsl(var(--muted-foreground))" fill="hsl(var(--muted-foreground) / 0.2)" />
-              <Area type="monotone" dataKey="anxious" stackId="1" stroke="hsl(var(--destructive))" fill="hsl(var(--destructive) / 0.2)" />
+              <Area type="monotone" dataKey="composed" stackId="1" stroke="hsl(var(--primary))" fill="hsl(var(--primary) / 0.3)" />
+              <Area type="monotone" dataKey="mixed" stackId="1" stroke="hsl(var(--muted-foreground))" fill="hsl(var(--muted-foreground) / 0.2)" />
+              <Area type="monotone" dataKey="reactive" stackId="1" stroke="hsl(var(--destructive))" fill="hsl(var(--destructive) / 0.2)" />
             </AreaChart>
           </ResponsiveContainer>
         </div>
         <div className="flex items-center gap-4 text-[10px] font-mono text-muted-foreground/50">
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-primary/60" />Calm</span>
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-muted-foreground/40" />Neutral</span>
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-destructive/40" />Anxious</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-primary/60" />Composed</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-muted-foreground/40" />Mixed</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-destructive/40" />Reactive</span>
         </div>
       </div>
 

@@ -82,8 +82,9 @@ export function MoodPriceScatter({ reflections }: Props) {
 
   const insightParts: string[] = [];
   if (clusters.neg >= 3 && clusters.pos >= 3) {
-    const negLabel = clusters.negAvg < 1.5 ? 'anxious' : clusters.negAvg < 2.5 ? 'neutral' : 'calm';
-    const posLabel = clusters.posAvg < 1.5 ? 'anxious' : clusters.posAvg < 2.5 ? 'neutral' : 'calm';
+    const toLabel = (avg: number) => avg < 2 ? 'reactive' : avg < 3.5 ? 'mixed' : 'composed';
+    const negLabel = toLabel(clusters.negAvg);
+    const posLabel = toLabel(clusters.posAvg);
     if (negLabel !== posLabel) {
       insightParts.push(`You tend to feel ${negLabel} during drops and ${posLabel} during surges.`);
     } else {
