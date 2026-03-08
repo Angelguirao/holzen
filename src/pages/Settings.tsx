@@ -99,29 +99,100 @@ const Settings = () => {
     return () => { document.title = 'Holzen — Pause before you act'; };
   }, []);
 
-  const exportData = async () => {
+  const exportData = async (format: 'json' | 'csv' = 'json') => {
     if (!user) return;
     setExporting(true);
     try {
-      const [{ data: profile }, { data: reflections }] = await Promise.all([
+      const [{ data: profile }, { data: reflections }, { data: rituals }] = await Promise.all([
         supabase.from('profiles').select('*').eq('user_id', user.id).single(),
         supabase.from('reflections').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
+        supabase.from('ritual_completions').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
       ]);
 
-      const exportPayload = {
-        exported_at: new Date().toISOString(),
-        profile: profile ? { threshold: profile.threshold, email_notifications: profile.email_notifications, created_at: profile.created_at } : null,
-        reflections: reflections?.map((r) => ({ message: r.message, context: r.context, created_at: r.created_at })) ?? [],
-      };
+      const dateStr = new Date().toISOString().slice(0, 10);
 
-      const blob = new Blob([JSON.stringify(exportPayload, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `holzen-export-${new Date().toISOString().slice(0, 10)}.json`;
-      a.click();
-      URL.revokeObjectURL(url);
-      toast.success('Data exported', { description: `${reflections?.length ?? 0} reflections downloaded.` });
+      if (format === 'csv') {
+        // Reflections CSV
+        const refHeaders = ['created_at', 'message', 'context', 'mood', 'outcome', 'note', 'tags', 'haiku', 'is_favorite'];
+        const refRows = (reflections ?? []).map((r: any) =>
+          refHeaders.map(h => {
+            const val = h === 'tags' ? (r[h] ?? []).join('; ') : (r[h] ?? '');
+            return `"${String(val).replace(/"/g, '""')}"`;
+          }).join(',')
+        );
+        const refCsv = [refHeaders.join(','), ...refRows].join('\n');
+
+        // Rituals CSV
+        const ritHeaders = ['created_at', 'decision', 'template', 'journal_text', 'duration_seconds'];
+        const ritRows = (rituals ?? []).map((r: any) =>
+          ritHeaders.map(h => {
+            const val = r[h] ?? '';
+            return `"${String(val).replace(/"/g, '""')}"`;
+          }).join(',')
+        );
+        const ritCsv = [ritHeaders.join(','), ...ritRows].join('\n');
+
+        // Download reflections CSV
+        const refBlob = new Blob([refCsv], { type: 'text/csv' });
+        const refUrl = URL.createObjectURL(refBlob);
+        const a1 = document.createElement('a');
+        a1.href = refUrl; a1.download = `holzen-reflections-${dateStr}.csv`; a1.click();
+        URL.revokeObjectURL(refUrl);
+
+        // Download rituals CSV if any
+        if (rituals && rituals.length > 0) {
+          const ritBlob = new Blob([ritCsv], { type: 'text/csv' });
+          const ritUrl = URL.createObjectURL(ritBlob);
+          const a2 = document.createElement('a');
+          a2.href = ritUrl; a2.download = `holzen-rituals-${dateStr}.csv`; a2.click();
+          URL.revokeObjectURL(ritUrl);
+        }
+
+        toast.success('CSV exported', { description: `${reflections?.length ?? 0} reflections + ${rituals?.length ?? 0} rituals.` });
+      } else {
+        const exportPayload = {
+          exported_at: new Date().toISOString(),
+          profile: profile ? {
+            threshold: profile.threshold,
+            threshold_down: profile.threshold_down,
+            cooldown_hours: profile.cooldown_hours,
+            reflection_tone: profile.reflection_tone,
+            reflection_style: profile.reflection_style,
+            language: profile.language,
+            email_notifications: profile.email_notifications,
+            created_at: profile.created_at,
+          } : null,
+          reflections: (reflections ?? []).map((r: any) => ({
+            message: r.message,
+            context: r.context,
+            mood: r.mood,
+            outcome: r.outcome,
+            note: r.note,
+            tags: r.tags,
+            haiku: r.haiku,
+            is_favorite: r.is_favorite,
+            learning_title: r.learning_title,
+            learning_body: r.learning_body,
+            signal_title: r.signal_title,
+            signal_body: r.signal_body,
+            created_at: r.created_at,
+          })),
+          rituals: (rituals ?? []).map((r: any) => ({
+            decision: r.decision,
+            template: r.template,
+            journal_text: r.journal_text,
+            duration_seconds: r.duration_seconds,
+            created_at: r.created_at,
+          })),
+        };
+
+        const blob = new Blob([JSON.stringify(exportPayload, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url; a.download = `holzen-export-${dateStr}.json`; a.click();
+        URL.revokeObjectURL(url);
+        toast.success('Data exported', { description: `${reflections?.length ?? 0} reflections + ${rituals?.length ?? 0} rituals.` });
+      }
     } catch {
       toast.error('Export failed', { description: 'Could not export your data. Please try again.' });
     } finally {
