@@ -76,6 +76,8 @@ const Landing = () => {
     { icon: <Globe />, label: t('landing.features.multilanguage'), desc: t('landing.features.multilanguageDesc') },
     { icon: <Award />, label: t('landing.features.badges'), desc: t('landing.features.badgesDesc') },
     { icon: <Shield />, label: t('landing.features.privacy'), desc: t('landing.features.privacyDesc') },
+    { icon: <Moon />, label: t('landing.features.mindfulSpaces'), desc: t('landing.features.mindfulSpacesDesc') },
+    { icon: <Globe />, label: t('landing.features.builtForLife'), desc: t('landing.features.builtForLifeDesc') },
   ];
 
   const FAQ = [
