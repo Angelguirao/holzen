@@ -152,7 +152,8 @@ export const ReflectionComparison = forwardRef<HTMLDivElement, ReflectionCompari
       <GrowthInsight current={current} past={past} />
     </motion.div>
   );
-}
+});
+ReflectionComparison.displayName = 'ReflectionComparison';
 
 function ComparisonCard({
   label,
