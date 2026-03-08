@@ -298,6 +298,7 @@ function StatsContent({ reflections, memberSince }: { reflections: Reflection[];
 }
 
 function HolzenScoreDetail({ scoreData }: { scoreData: import('@/hooks/use-holzen-score').HolzenScoreData }) {
+  const { t } = useTranslation();
   const circumference = 2 * Math.PI * 36;
   const offset = circumference - (scoreData.score / 100) * circumference;
 
