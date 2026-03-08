@@ -630,13 +630,34 @@ const History = () => {
           />
           {/* Show reflections for selected day */}
           {calendarDate && displayedReflections.length > 0 && (
-            <div className="space-y-1.5 pt-2">
-              <p className="text-[10px] font-mono text-muted-foreground/50 uppercase tracking-wider">
-                {displayedReflections.length} reflection{displayedReflections.length !== 1 ? 's' : ''}
-              </p>
+            <div className="space-y-3">
+              {displayedReflections.map((r) => (
+                <div
+                  key={r.id}
+                  className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-xs font-mono text-muted-foreground">
+                      {format(new Date(r.created_at), 'h:mm a')}
+                      {r.mood && <span className="ml-1.5 capitalize text-muted-foreground/60">· {r.mood}</span>}
+                    </p>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        onClick={() => toggleFavorite(r.id)}
+                        className={`p-1 transition-colors ${r.is_favorite ? 'text-foreground' : 'text-muted-foreground/40 hover:text-foreground'}`}
+                      >
+                        <Star className={`h-3 w-3 ${r.is_favorite ? 'fill-current' : ''}`} />
+                      </button>
+                    </div>
+                  </div>
+                  <p className="text-sm leading-relaxed">{r.message}</p>
+                  {r.outcome && (
+                    <p className="text-[10px] font-mono text-muted-foreground/50 capitalize">→ {r.outcome}</p>
+                  )}
+                </div>
+              ))}
             </div>
           )}
-          {calendarDate && displayedReflections.length === 0 && (
             <div className="py-4 text-center">
               <p className="text-xs text-muted-foreground/50 italic">No reflections on this day.</p>
             </div>
