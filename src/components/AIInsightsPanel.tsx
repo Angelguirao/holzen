@@ -27,6 +27,10 @@ interface InsightsRow {
 
 const PAGE_SIZE = 10;
 
+const LANG_LABELS: Record<string, string> = {
+  en: 'EN', es: 'ES', pt: 'PT', de: 'DE', nl: 'NL', fr: 'FR', tr: 'TR',
+};
+
 const CATEGORY_ICONS: Record<string, typeof TrendingUp> = {
   timing: Clock,
   mood: Sparkles,
