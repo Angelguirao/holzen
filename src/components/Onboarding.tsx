@@ -28,6 +28,7 @@ const sampleReflection = {
 const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 export function Onboarding({ onComplete }: Props) {
+  const { t } = useTranslation();
   const [step, setStep] = useState(0);
   const [firstName, setFirstName] = useState('');
   const [timezone] = useState(detectedTimezone);
