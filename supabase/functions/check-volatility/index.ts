@@ -136,6 +136,8 @@ Learning input rules:
                 haiku: { type: "string", description: "A haiku (3 lines, 5-7-5 syllables). Lines separated by newlines." },
                 learning_title: { type: "string", description: "Short factual headline for a historical/educational insight." },
                 learning_body: { type: "string", description: "1-2 sentences of factual, educational context." },
+                learning_citation: { type: "string", description: "Formatted source reference (e.g. 'CoinDesk, 2020')." },
+                learning_url: { type: "string", description: "URL to a reputable source for the referenced event or research." },
               },
               required: ["message", "haiku", "learning_title", "learning_body"],
               additionalProperties: false,
