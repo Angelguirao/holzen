@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN ritual_template text NOT NULL DEFAULT 'standard';
