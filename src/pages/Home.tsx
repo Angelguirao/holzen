@@ -41,11 +41,12 @@ import {
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 
 // Widget IDs
-const WIDGET_IDS = ['btc-status', 'reflection', 'night', 'letter', 'actions'] as const;
+const WIDGET_IDS = ['btc-status', 'hold-goal', 'reflection', 'night', 'letter', 'actions'] as const;
 type WidgetId = typeof WIDGET_IDS[number];
 
 const WIDGET_TITLES: Record<WidgetId, string> = {
   'btc-status': 'Market',
+  'hold-goal': 'Goal',
   'reflection': 'Reflection',
   'night': 'Evening',
   'letter': 'Letter',
