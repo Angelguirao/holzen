@@ -41,7 +41,17 @@ export function MoodTrends({ reflections }: Props) {
     }));
   }, [reflections]);
 
-  if (!data || data.length < 2) return null;
+  if (!data || data.length < 2) {
+    const moodCount = reflections.filter((r) => r.mood && MOOD_MAP[r.mood] !== undefined).length;
+    return (
+      <ChartEmptyState
+        title="Mood over time"
+        message="Log a few more reflections with mood to see your weekly trend."
+        current={moodCount}
+        needed={4}
+      />
+    );
+  }
 
   return (
     <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3">

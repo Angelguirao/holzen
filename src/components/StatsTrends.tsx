@@ -107,7 +107,16 @@ interface Props {
 export function StatsTrends({ reflections }: Props) {
   const data = useMemo(() => buildWeeklyData(reflections), [reflections]);
 
-  if (data.length < 1) return null;
+  if (data.length < 1) {
+    return (
+      <ChartEmptyState
+        title="Weekly Trends"
+        message="Complete 3+ reflections across different weeks to see score, mood, and hold-rate trends."
+        current={reflections.length}
+        needed={3}
+      />
+    );
+  }
 
   const firstScore = data[0].score;
   const lastScore = data[data.length - 1].score;
