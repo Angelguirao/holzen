@@ -146,13 +146,18 @@ serve(async (req) => {
       let aiInsight = "";
       if (LOVABLE_API_KEY && reflectionCount > 0) {
         try {
+          const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", ja: "Japanese", de: "German" };
+          const langCode = (profile as any).language || "en";
+          const langName = LANG_NAMES[langCode] || "English";
+          const langInstruction = langCode !== "en" ? `\nWrite in ${langName}.` : "";
+
           const prompt = `You are Holzen. Write ONE short behavioral observation (1-2 sentences) for a monthly report:
 - BTC moved ${monthDir} ${absMonthChange}% last month
 - User reflected ${reflectionCount} times
 - Top mood: ${topMood?.[0] || "unknown"} (${topMood?.[1] || 0} times)
 - Held steady: ${steadyCount}, bought: ${boughtCount}, sold: ${soldCount}
 - Top tags: ${topTags.map(([t, c]) => `${t}(${c})`).join(", ") || "none"}
-Be observational, calm. No advice, no exclamation marks.`;
+Be observational, calm. No advice, no exclamation marks.${langInstruction}`;
 
           const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
             method: "POST",
