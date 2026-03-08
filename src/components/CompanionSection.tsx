@@ -229,7 +229,7 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
         }
 
         supabase.functions
-          .invoke('signal-companion', { body: { context: context ?? '' } })
+          .invoke('signal-companion', { body: { context: context ?? '', language } })
           .then(({ data, error: fnError }) => {
             if (cancelled) return;
             if (fnError || !data || data.error) {
