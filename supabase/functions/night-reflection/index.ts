@@ -32,6 +32,32 @@ async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise
   throw new Error("Failed to fetch BTC data after retries");
 }
 
+// Cache BTC data per currency to avoid redundant API calls
+const btcCache = new Map<string, { changePercent: number; direction: string; absChange: string }>();
+
+async function fetchBtc1dData(currency: string) {
+  const cached = btcCache.get(currency);
+  if (cached) return cached;
+
+  const cur = currency.toLowerCase();
+  const res = await fetchWithRetry(
+    `https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=${cur}&days=1`
+  );
+  const data = await res.json();
+  const prices: [number, number][] = data.prices;
+  if (!prices || prices.length < 2) throw new Error("Insufficient price data");
+
+  const price24hAgo = prices[0][1];
+  const currentPrice = prices[prices.length - 1][1];
+  const changePercent = ((currentPrice - price24hAgo) / price24hAgo) * 100;
+  const direction = changePercent >= 0 ? "up" : "down";
+  const absChange = Math.abs(changePercent).toFixed(1);
+
+  const result = { changePercent, direction, absChange };
+  btcCache.set(currency, result);
+  return result;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -44,26 +70,14 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
-    // 1. Fetch today's BTC movement
-    const res = await fetchWithRetry(
-      "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=1"
-    );
-    const data = await res.json();
-    const prices: [number, number][] = data.prices;
-    if (!prices || prices.length < 2) throw new Error("Insufficient price data");
+    // Fetch USD data first for logging
+    const usdData = await fetchBtc1dData("USD");
+    console.log(`[NIGHT-REFLECTION] BTC 24h: ${usdData.changePercent.toFixed(2)}%`);
 
-    const price24hAgo = prices[0][1];
-    const currentPrice = prices[prices.length - 1][1];
-    const changePercent = ((currentPrice - price24hAgo) / price24hAgo) * 100;
-    const direction = changePercent >= 0 ? "up" : "down";
-    const absChange = Math.abs(changePercent).toFixed(1);
-
-    console.log(`[NIGHT-REFLECTION] BTC 24h: ${changePercent.toFixed(2)}%`);
-
-    // 2. Get all users with timezone
+    // Get all users with timezone
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
-      .select("user_id, reflection_tone, timezone, night_reflection_hour");
+      .select("user_id, reflection_tone, timezone, night_reflection_hour, hold_goal_currency");
 
     if (profilesError) throw profilesError;
     if (!profiles || profiles.length === 0) {
@@ -75,13 +89,15 @@ serve(async (req) => {
     let sent = 0;
 
     for (const profile of profiles) {
-      // Timezone-aware: only send if user's local time is 9 PM (21:00)
       const tz = (profile as any).timezone || "UTC";
       const localHour = getUserLocalHour(tz);
       const targetHour = (profile as any).night_reflection_hour;
-      // null means disabled
       if (targetHour === null || targetHour === undefined) continue;
       if (localHour !== targetHour) continue;
+
+      // Use the user's currency for percentage (same across currencies, but we use their preference for consistency)
+      const currency = (profile as any).hold_goal_currency || "USD";
+      const btc = await fetchBtc1dData(currency);
 
       // Check if user had any reflections today (in their timezone)
       const today = new Date();
@@ -97,17 +113,17 @@ serve(async (req) => {
       // Build the night message
       let message: string;
       if (hadReflection) {
-        message = `Today BTC moved ${absChange}%. You paused, reflected, and continued. That's the practice.`;
+        message = `Today BTC moved ${btc.absChange}%. You paused, reflected, and continued. That's the practice.`;
       } else {
-        message = `Today BTC moved ${absChange}%. You didn't react. That's worth noticing.`;
+        message = `Today BTC moved ${btc.absChange}%. You didn't react. That's worth noticing.`;
       }
 
       // Store the night reflection
       await supabase.from("night_reflections").insert({
         user_id: profile.user_id,
         message,
-        btc_change_percent: changePercent,
-        btc_direction: direction,
+        btc_change_percent: btc.changePercent,
+        btc_direction: btc.direction,
         had_reflection: hadReflection,
       });
 
