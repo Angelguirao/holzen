@@ -182,6 +182,9 @@ const History = () => {
   const [tagFilter, setTagFilter] = useState<string | null>(null);
   const [moodFilter, setMoodFilter] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
+  const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
+  const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     document.title = 'Holzen — History';
