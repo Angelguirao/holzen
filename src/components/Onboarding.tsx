@@ -274,7 +274,7 @@ export function Onboarding({ onComplete }: Props) {
                       className="w-full"
                     />
                     <p className="text-[10px] text-muted-foreground/60 mt-3">
-                      You can change this later.
+                      {t('onboarding.changeThresholdLater')}
                     </p>
                   </motion.div>
 
