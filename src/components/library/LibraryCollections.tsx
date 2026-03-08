@@ -14,7 +14,7 @@ export function LibraryCollections({ library }: Props) {
   const {
     items, collections, addCollection, deleteCollection, updateItem,
     getCollectionItemIds, getCollectionItemCount, removeFromCollection,
-    togglePin, deleteItem,
+    togglePin, toggleFavorite, deleteItem,
   } = library;
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
