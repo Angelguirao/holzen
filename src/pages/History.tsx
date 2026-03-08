@@ -168,6 +168,7 @@ function HistoryCompanions({ label, r }: { label: string; r: Reflection }) {
 
 const History = () => {
   const { user } = useAuth();
+  const { currency } = useHolzen();
   const [reflections, setReflections] = useState<Reflection[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
