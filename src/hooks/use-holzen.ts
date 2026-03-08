@@ -538,6 +538,18 @@ export function useHolzen() {
       if (!user) return;
       await supabase.from('profiles').update({ notify_badges: val } as any).eq('user_id', user.id);
     },
+    motivations,
+    setMotivations: async (val: string[]) => {
+      setMotivationsState(val);
+      if (!user) return;
+      await supabase.from('profiles').update({ motivations: val } as any).eq('user_id', user.id);
+    },
+    mantra,
+    setMantra: async (val: string | null) => {
+      setMantraState(val);
+      if (!user) return;
+      await supabase.from('profiles').update({ mantra: val } as any).eq('user_id', user.id);
+    },
     companionPrefs,
     setCompanionPref,
     btcData,
