@@ -88,7 +88,7 @@ export function TestimonialRequest({ reflectionCount }: Props) {
               <X className="h-3.5 w-3.5" />
             </button>
           </div>
-          <p className="text-xs text-muted-foreground leading-relaxed">{t.subtitle}</p>
+          <p className="text-xs text-muted-foreground leading-relaxed">{t('testimonial.subtitle')}</p>
           <input
             type="text"
             value={displayName}
