@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
@@ -64,6 +65,7 @@ const textColors: Record<VolatilityLevel, string> = {
 const BREATH_DURATION = 8; // seconds per full cycle
 
 export default function Ambient() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const prefersReducedMotion = useReducedMotion();
   const [btcData, setBtcData] = useState<BtcPriceData | null>(null);
@@ -133,9 +135,9 @@ export default function Ambient() {
       };
 
   const labelMap: Record<VolatilityLevel, string> = {
-    calm: 'Markets are quiet',
-    moderate: 'Some movement',
-    intense: 'High volatility',
+    calm: t('ambient.calm'),
+    moderate: t('ambient.moderate'),
+    intense: t('ambient.intense'),
   };
 
   return (
@@ -205,7 +207,7 @@ export default function Ambient() {
         className="absolute bottom-12 text-[9px] font-mono tracking-[0.2em] uppercase"
         style={{ color: textColors[level], opacity: 0.3 }}
       >
-        Breathe with the circle
+        {t('ambient.breathe')}
       </p>
     </div>
   );

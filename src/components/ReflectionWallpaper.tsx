@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Sparkles, Download, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
@@ -113,6 +114,7 @@ function compositeWallpaper(
 }
 
 export function ReflectionWallpaper({ message, mood, context, haiku, variant = 'icon' }: Props) {
+  const { t } = useTranslation();
   const [generating, setGenerating] = useState(false);
   const [compositeUrl, setCompositeUrl] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
@@ -194,7 +196,7 @@ export function ReflectionWallpaper({ message, mood, context, haiku, variant = '
               <div className="flex flex-col items-center justify-center py-16 gap-3">
                 <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                 <p className="text-xs text-muted-foreground font-mono">
-                  Generating your wallpaper…
+                  {t('wallpaper.generating')}
                 </p>
               </div>
             ) : compositeUrl ? (
@@ -235,7 +237,7 @@ export function ReflectionWallpaper({ message, mood, context, haiku, variant = '
             ) : null}
 
             <p className="text-[10px] text-muted-foreground/60 font-mono text-center">
-              Carry your composure with you
+              {t('wallpaper.carry')}
             </p>
           </div>
         </DialogContent>

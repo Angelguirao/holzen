@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { Tag, X } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
@@ -10,6 +11,7 @@ interface Props {
 
 export function ReflectionTags({ reflectionId, initialTags }: Props) {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [tags, setTags] = useState<string[]>(initialTags);
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState('');
@@ -111,7 +113,7 @@ export function ReflectionTags({ reflectionId, initialTags }: Props) {
           className="inline-flex items-center gap-0.5 text-[10px] font-mono text-muted-foreground/50 hover:text-muted-foreground transition-colors"
         >
           <Tag className="h-2.5 w-2.5" />
-          {tags.length === 0 ? 'Add tags' : '+'}
+          {tags.length === 0 ? t('reflectionTags.addTags') : '+'}
         </button>
       </div>
 
@@ -122,7 +124,7 @@ export function ReflectionTags({ reflectionId, initialTags }: Props) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Type a tag…"
+            placeholder={t('reflectionTags.typeTag')}
             className="w-full text-[11px] font-mono px-2 py-1.5 rounded border border-border/60 bg-background text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/40 transition-colors"
           />
           {suggestions.length > 0 && (
