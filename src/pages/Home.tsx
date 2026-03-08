@@ -1,5 +1,6 @@
 import { useHolzen } from '@/hooks/use-holzen';
 import { LetterToFutureSelf } from '@/components/LetterToFutureSelf';
+import { TheVoid } from '@/components/TheVoid';
 import { useSubscription } from '@/hooks/use-subscription';
 import { BtcStatus } from '@/components/BtcStatus';
 import { NightReflectionCard } from '@/components/NightReflectionCard';
