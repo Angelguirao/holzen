@@ -634,6 +634,9 @@ const Settings = () => {
               <p className="text-xs font-mono text-muted-foreground truncate">{user.email}</p>
             )}
 
+            {/* Change Email */}
+            <ChangeEmailSection />
+
             {/* Password */}
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">Password</p>
