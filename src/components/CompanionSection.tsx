@@ -114,7 +114,7 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
     if (!reflectionId) return;
     supabase
       .from('reflections')
-      .select('breathing_completed, haiku_read, learning_read')
+      .select('breathing_completed, haiku_read, learning_read, zoom_out_read, history_read')
       .eq('id', reflectionId)
       .single()
       .then(({ data }) => {
@@ -124,8 +124,8 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
             haiku: (data as any).haiku_read ?? false,
             learning: (data as any).learning_read ?? false,
             signal: false,
-            zoomOut: false,
-            history: false,
+            zoomOut: (data as any).zoom_out_read ?? false,
+            history: (data as any).history_read ?? false,
           });
         }
       });
