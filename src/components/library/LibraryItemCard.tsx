@@ -43,6 +43,20 @@ export function LibraryItemCard({ item, onTogglePin, onDelete, onStatusChange }:
         </div>
         <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
           <button
+            onClick={() => onStatusChange(item.id, isUnread ? 'read' : 'unread')}
+            className="p-1 text-muted-foreground/50 hover:text-foreground transition-colors"
+            aria-label={isUnread ? 'Mark read' : 'Mark unread'}
+          >
+            {isUnread ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
+          </button>
+          <button
+            onClick={() => onStatusChange(item.id, 'archived')}
+            className="p-1 text-muted-foreground/50 hover:text-foreground transition-colors"
+            aria-label="Archive"
+          >
+            <Archive className="h-3 w-3" />
+          </button>
+          <button
             onClick={() => onTogglePin(item.id)}
             className="p-1 text-muted-foreground/50 hover:text-foreground transition-colors"
             aria-label={item.pinned ? t('common.unpin') : t('common.pinned')}
