@@ -17,6 +17,7 @@ import { MoodPriceScatter } from '@/components/MoodPriceScatter';
 import { RitualStatsCard } from '@/components/RitualStatsCard';
 
 import { StatsTrends } from '@/components/StatsTrends';
+import { PeriodComparison } from '@/components/PeriodComparison';
 import { ShareStats } from '@/components/ShareStats';
 import { useHolzenScore } from '@/hooks/use-holzen-score';
 import { HolzenScoreCard } from '@/components/HolzenScoreCard';
@@ -256,6 +257,7 @@ function StatsContent({ reflections, memberSince }: { reflections: Reflection[];
       </div>
       <ReflectionStats reflections={reflections} />
       {scoreData && <HolzenScoreDetail scoreData={scoreData} />}
+      <PeriodComparison reflections={reflections} />
       <StreakTimeline reflections={reflections} memberSince={memberSince} />
       <InsightsPanel reflections={reflections} />
       <DecisionQualityCard reflections={reflections} />
