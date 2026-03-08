@@ -5,7 +5,7 @@ import { HolzenRitual, type RitualTemplate } from '@/components/HolzenRitual';
 import { RitualCooldownBanner } from '@/components/RitualCooldownBanner';
 import { useSubscription } from '@/hooks/use-subscription';
 import { BtcStatus } from '@/components/BtcStatus';
-import { NightReflectionCard } from '@/components/NightReflectionCard';
+import { NightReflectionCard, useNightReflection } from '@/components/NightReflectionCard';
 import { ReflectionMessage } from '@/components/ReflectionMessage';
 import { OutcomePrompt } from '@/components/OutcomePrompt';
 import { HolzenNumber } from '@/components/HolzenNumber';
@@ -95,6 +95,8 @@ const Home = () => {
     firstName,
     ritualTemplate,
   } = useHolzen();
+
+  const { reflection: nightReflection, dismiss: dismissNight } = useNightReflection();
 
   const [showOutcome, setShowOutcome] = useState(false);
   const [showVoid, setShowVoid] = useState(false);
@@ -389,6 +391,7 @@ const Home = () => {
         );
 
       case 'night':
+        if (!nightReflection) return null;
         return (
           <HomeWidget
             id="night"
@@ -396,7 +399,7 @@ const Home = () => {
             collapsed={collapsed['night']}
             onToggleCollapse={() => toggleCollapsed('night')}
           >
-            <NightReflectionCard />
+            <NightReflectionCard reflection={nightReflection} onDismiss={dismissNight} />
           </HomeWidget>
         );
 
