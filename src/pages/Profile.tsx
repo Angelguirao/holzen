@@ -70,7 +70,7 @@ const Profile = () => {
   const [letters, setLetters] = useState<Letter[]>([]);
   const [loading, setLoading] = useState(true);
   const [lettersLoading, setLettersLoading] = useState(true);
-  const [tab, setTab] = useState<'stats' | 'insights' | 'badges' | 'letters' | 'referrals'>('stats');
+  const [tab, setTab] = useState<'stats' | 'timeline' | 'insights' | 'badges' | 'letters' | 'referrals'>('stats');
 
   useEffect(() => {
     document.title = 'Holzen — Profile';
