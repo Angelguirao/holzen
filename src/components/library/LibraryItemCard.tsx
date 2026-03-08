@@ -32,11 +32,40 @@ interface Props {
 }
 
 export function LibraryItemCard({
-  item, onTogglePin, onDelete, onStatusChange,
+  item, onTogglePin, onDelete, onStatusChange, onUpdateTags,
   collections, itemCollections, onAddToCollection, onRemoveFromCollection,
 }: Props) {
   const { t } = useTranslation();
   const isUnread = item.status === 'unread';
+  const [editingTags, setEditingTags] = useState(false);
+  const [tagInput, setTagInput] = useState('');
+  const tagInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (editingTags) tagInputRef.current?.focus();
+  }, [editingTags]);
+
+  const addTag = useCallback((tag: string) => {
+    const trimmed = tag.trim().toLowerCase();
+    if (!trimmed || item.tags.includes(trimmed) || !onUpdateTags) return;
+    onUpdateTags(item.id, [...item.tags, trimmed]);
+    setTagInput('');
+  }, [item.id, item.tags, onUpdateTags]);
+
+  const removeTag = useCallback((tag: string) => {
+    if (!onUpdateTags) return;
+    onUpdateTags(item.id, item.tags.filter((t) => t !== tag));
+  }, [item.id, item.tags, onUpdateTags]);
+
+  const handleTagKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (tagInput.trim()) addTag(tagInput);
+    } else if (e.key === 'Escape') {
+      setEditingTags(false);
+      setTagInput('');
+    }
+  };
 
   return (
     <div className="group rounded-md border border-border/40 bg-card/50 px-3 py-2.5 space-y-1.5 transition-colors hover:bg-card/80">
