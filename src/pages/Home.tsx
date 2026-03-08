@@ -420,7 +420,6 @@ const Home = () => {
                               : t('home.errors.unexpectedError')}
                           </p>
                           <button onClick={() => manualTrigger()} className="text-xs font-mono text-primary underline">{t('common.tryAgain')}</button>
-                          </button>
                         </div>
                       ) : (
                         <div className="space-y-6">
