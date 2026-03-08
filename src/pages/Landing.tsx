@@ -181,11 +181,27 @@ const Landing = () => {
         </motion.button>
       </div>
 
-      {/* ─── REACTION vs REFLECTION ─── */}
+      {/* ─── APPROACH 1: Side-by-side ─── */}
       <div id="reflection-loop" className="max-w-lg mx-auto px-6 py-16">
         <Section>
-          <SectionLabel>{t('landing.reflectionLoop')}</SectionLabel>
-          <LandingComparison />
+          <SectionLabel>{'① ' + t('landing.reflectionLoop') + ' — Side-by-side'}</SectionLabel>
+          <LandingComparison variant="side-by-side" />
+        </Section>
+      </div>
+
+      {/* ─── APPROACH 2: Card flip ─── */}
+      <div className="max-w-lg mx-auto px-6 pb-16">
+        <Section>
+          <SectionLabel>{'② ' + t('landing.reflectionLoop') + ' — Card flip'}</SectionLabel>
+          <LandingComparison variant="card-flip" />
+        </Section>
+      </div>
+
+      {/* ─── APPROACH 3: Stacked contrast ─── */}
+      <div className="max-w-lg mx-auto px-6 pb-16">
+        <Section>
+          <SectionLabel>{'③ ' + t('landing.reflectionLoop') + ' — Stacked'}</SectionLabel>
+          <LandingComparison variant="stacked" />
         </Section>
       </div>
 
