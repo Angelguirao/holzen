@@ -74,6 +74,7 @@ export function useHolzen() {
           haiku: data.companion_haiku ?? true,
           learning: data.companion_learning ?? true,
           signal: (data as any).companion_signal ?? true,
+          zoomOut: (data as any).companion_zoom_out ?? true,
         });
 
         // Load companion data from latest reflection if there's an active message
