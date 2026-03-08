@@ -118,7 +118,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
 
     const updates: Record<string, any> = {
       hold_goal_type: goalType,
-      hold_goal_start: new Date().toISOString(),
+      hold_goal_start: startDate.toISOString(),
       hold_goal_target_months: months,
       hold_goal_target_price: goalType === 'price' ? val : null,
       hold_goal_currency: 'USD',
