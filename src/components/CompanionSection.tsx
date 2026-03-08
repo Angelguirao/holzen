@@ -19,6 +19,7 @@ export interface CompanionPrefs {
   haiku: boolean;
   learning: boolean;
   signal: boolean;
+  zoomOut: boolean;
 }
 
 interface CompletionState {
@@ -26,6 +27,7 @@ interface CompletionState {
   haiku: boolean;
   learning: boolean;
   signal: boolean;
+  zoomOut: boolean;
 }
 
 interface NudgeData {
