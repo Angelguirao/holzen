@@ -124,6 +124,27 @@ const About = () => {
           </div>
         </motion.div>
 
+        {/* Section: BTC Reserve */}
+        <motion.div {...m(0.1)}>
+          <div className="space-y-4">
+            <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
+              BTC Reserve
+            </p>
+            <p className="text-sm text-foreground leading-relaxed">
+              We hold what we help others hold.
+            </p>
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              Holzen maintains a Bitcoin reserve as a long-term store of value — not as speculation, but as a statement of conviction. We believe a product that helps people hold should itself hold.
+            </p>
+            <Link
+              to="/reserve"
+              className="inline-flex items-center gap-1.5 text-xs font-mono text-primary hover:text-primary/80 transition-colors"
+            >
+              Read our full reserve strategy →
+            </Link>
+          </div>
+        </motion.div>
+
         {/* Section: About us */}
         <motion.div {...m(0.1)}>
           <div className="space-y-4">
