@@ -190,7 +190,7 @@ export function BadgesPanel({ reflections, notifyBadges = true }: BadgesPanelPro
     return meta;
   }, [badges]);
 
-  const { newBadges, dismissCelebration } = useBadgeSync(earnedBadgeIds, badgeMeta);
+  const { newBadges, dismissCelebration } = useBadgeSync(earnedBadgeIds, badgeMeta, notifyBadges);
 
   return (
     <>
