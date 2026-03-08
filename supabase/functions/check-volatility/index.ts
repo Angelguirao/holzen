@@ -56,6 +56,8 @@ interface ReflectionResult {
   haiku: string | null;
   learning_title: string | null;
   learning_body: string | null;
+  learning_citation: string | null;
+  learning_url: string | null;
 }
 
 async function generateReflection(context: string, apiKey: string, tone = "stoic"): Promise<ReflectionResult | null> {
