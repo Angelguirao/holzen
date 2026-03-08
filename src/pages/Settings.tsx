@@ -889,13 +889,22 @@ const Settings = () => {
             {/* Data export */}
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">Data</p>
-              <button
-                onClick={exportData}
-                disabled={exporting}
-                className="text-xs font-mono text-muted-foreground underline"
-              >
-                {exporting ? 'Exporting…' : 'Export my data'}
-              </button>
+              <div className="flex gap-4">
+                <button
+                  onClick={() => exportData('json')}
+                  disabled={exporting}
+                  className="text-xs font-mono text-muted-foreground underline"
+                >
+                  {exporting ? 'Exporting…' : 'Export as JSON'}
+                </button>
+                <button
+                  onClick={() => exportData('csv')}
+                  disabled={exporting}
+                  className="text-xs font-mono text-muted-foreground underline"
+                >
+                  {exporting ? 'Exporting…' : 'Export as CSV'}
+                </button>
+              </div>
             </div>
 
             {/* Install */}
