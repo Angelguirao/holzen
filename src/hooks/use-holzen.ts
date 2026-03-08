@@ -307,6 +307,7 @@ export function useHolzen() {
           severity: Math.abs(data.changePercent),
           motivations: motivations.length > 0 ? motivations : undefined,
           mantra: mantra || undefined,
+          currency,
         },
       });
 
