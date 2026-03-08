@@ -653,7 +653,7 @@ const History = () => {
 
                 return (
                   <HistoryCompanions
-                    label={`${companionItems.length} companion${companionItems.length !== 1 ? 's' : ''}`}
+                    label={`${companionItems.length} ${companionItems.length !== 1 ? t('history.companions_other', { count: companionItems.length }) : t('history.companions', { count: 1 })}`}
                     r={r}
                   />
                 );
