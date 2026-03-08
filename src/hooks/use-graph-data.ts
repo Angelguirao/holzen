@@ -143,6 +143,7 @@ export function useGraphData(
           label: li.title || li.body?.slice(0, 40) || 'Untitled',
           nodeType: 'library_item',
           sublabel: li.type,
+          entityId: li.id,
         },
       });
 
