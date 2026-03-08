@@ -40,7 +40,7 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const { context, tone, customPrompt, style, moodHistory, severity, motivations, mantra, currency } = await req.json();
+    const { context, tone, customPrompt, style, moodHistory, severity, motivations, mantra, currency, language } = await req.json();
     if (!context) {
       return new Response(JSON.stringify({ error: "Missing context" }), {
         status: 400,
