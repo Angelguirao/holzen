@@ -113,7 +113,7 @@ Learning input rules:
 - Title: a short, factual headline (5-10 words).
 - Body: 1-2 sentences about a historical Bitcoin event, market pattern, or behavioral finance insight relevant to the current context. Factual, educational, no advice.
 - Citation: formatted source reference (e.g. "CoinDesk, 2020" or "Kahneman & Tversky, 1979")
-- URL: a real, working URL to a reputable source documenting the event or research referenced.${langInstruction}`;
+- URL: a real, working URL to a reputable source documenting the event or research referenced.`;
 
   const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
