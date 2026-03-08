@@ -352,7 +352,6 @@ const Home = () => {
                   <Button onClick={startCheckout} disabled={checkoutLoading} className="w-full font-mono text-xs">
                     {checkoutLoading ? t('home.subscription.openingCheckout') : t('common.subscribe')}
                   </Button>
-                  </Button>
                 </div>
               ) : subLoading ? (
                 <div className="space-y-3">
