@@ -24,6 +24,7 @@ interface Props {
   onTogglePin: (id: string) => void;
   onDelete: (id: string) => void;
   onStatusChange: (id: string, status: 'unread' | 'read' | 'archived') => void;
+  onUpdateTags?: (id: string, tags: string[]) => void;
   collections?: Collection[];
   itemCollections?: Collection[];
   onAddToCollection?: (collectionId: string, itemId: string) => Promise<any>;
