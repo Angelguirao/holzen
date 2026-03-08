@@ -46,14 +46,14 @@ export function MoodTrends({ reflections }: Props) {
     }));
   }, [reflections]);
 
-  if (!data || data.length < 2) {
+  if (!data || data.length < 3) {
     const moodCount = reflections.filter((r) => r.mood && MOOD_MAP[r.mood] !== undefined).length;
     return (
       <ChartEmptyState
         title="Mood over time"
-        message="Log a few more reflections with mood to see your weekly trend."
-        current={moodCount}
-        needed={4}
+        message="Log moods across 3+ different weeks to see your composure trend."
+        current={data?.length ?? 0}
+        needed={3}
       />
     );
   }
