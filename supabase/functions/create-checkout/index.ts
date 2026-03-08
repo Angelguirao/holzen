@@ -47,6 +47,9 @@ serve(async (req) => {
       allow_promotion_codes: true,
       success_url: `${origin}/?subscribed=true`,
       cancel_url: `${origin}/`,
+      subscription_data: {
+        description: "Holzen — Bitcoin self-awareness companion",
+      },
     });
 
     return new Response(JSON.stringify({ url: session.url }), {
