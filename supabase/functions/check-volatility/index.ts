@@ -139,7 +139,7 @@ Learning input rules:
                 learning_citation: { type: "string", description: "Formatted source reference (e.g. 'CoinDesk, 2020')." },
                 learning_url: { type: "string", description: "URL to a reputable source for the referenced event or research." },
               },
-              required: ["message", "haiku", "learning_title", "learning_body"],
+              required: ["message", "haiku", "learning_title", "learning_body", "learning_citation", "learning_url"],
               additionalProperties: false,
             },
           },
