@@ -19,7 +19,11 @@ interface Reflection {
   outcome: string | null;
 }
 
-const MOOD_SCORES: Record<string, number> = { calm: 100, neutral: 60, anxious: 20 };
+// Composure scale: higher = more composed
+const MOOD_SCORES: Record<string, number> = {
+  fomo: 10, greedy: 15, anxious: 20, fearful: 25,
+  excited: 40, uncertain: 50, detached: 75, calm: 100,
+};
 const OUTCOME_SCORES: Record<string, number> = { held: 100, nothing: 100, bought: 50, sold: 20 };
 
 interface WeekBucket {
@@ -29,16 +33,16 @@ interface WeekBucket {
   moodAvg: number;
   outcomeAvg: number;
   holdRate: number;
-  anxious: number;
-  neutral: number;
-  calm: number;
+  reactive: number;
+  mixed: number;
+  composed: number;
   count: number;
 }
 
 function buildWeeklyData(reflections: Reflection[]): WeekBucket[] {
   const buckets = new Map<string, {
     moods: number[]; outcomes: number[];
-    anxious: number; neutral: number; calm: number;
+    reactive: number; mixed: number; composed: number;
     held: number; totalOutcomes: number; count: number;
   }>();
 
@@ -47,17 +51,18 @@ function buildWeeklyData(reflections: Reflection[]): WeekBucket[] {
     const key = startOfWeek(date, { weekStartsOn: 1 }).toISOString().slice(0, 10);
     const entry = buckets.get(key) || {
       moods: [], outcomes: [],
-      anxious: 0, neutral: 0, calm: 0,
+      reactive: 0, mixed: 0, composed: 0,
       held: 0, totalOutcomes: 0, count: 0,
     };
 
     entry.count++;
 
     if (r.mood && MOOD_SCORES[r.mood] !== undefined) {
-      entry.moods.push(MOOD_SCORES[r.mood]);
-      if (r.mood === 'anxious') entry.anxious++;
-      else if (r.mood === 'neutral') entry.neutral++;
-      else if (r.mood === 'calm') entry.calm++;
+      const score = MOOD_SCORES[r.mood];
+      entry.moods.push(score);
+      if (score <= 30) entry.reactive++;
+      else if (score <= 60) entry.mixed++;
+      else entry.composed++;
     }
 
     if (r.outcome && OUTCOME_SCORES[r.outcome] !== undefined) {
@@ -73,8 +78,8 @@ function buildWeeklyData(reflections: Reflection[]): WeekBucket[] {
     .map(([key, b]) => {
       const moodAvg = b.moods.length > 0 ? b.moods.reduce((a, c) => a + c, 0) / b.moods.length : 60;
       const outcomeAvg = b.outcomes.length > 0 ? b.outcomes.reduce((a, c) => a + c, 0) / b.outcomes.length : 50;
-      const score = Math.round(moodAvg * 0.4 + outcomeAvg * 0.35 + 50 * 0.25); // simplified streak component
-      const totalMoods = b.anxious + b.neutral + b.calm;
+      const score = Math.round(moodAvg * 0.4 + outcomeAvg * 0.35 + 50 * 0.25);
+      const totalMoods = b.reactive + b.mixed + b.composed;
       const holdRate = b.totalOutcomes > 0 ? Math.round((b.held / b.totalOutcomes) * 100) : 0;
 
       return {
@@ -84,9 +89,9 @@ function buildWeeklyData(reflections: Reflection[]): WeekBucket[] {
         moodAvg: Math.round(moodAvg),
         outcomeAvg: Math.round(outcomeAvg),
         holdRate,
-        anxious: totalMoods > 0 ? Math.round((b.anxious / totalMoods) * 100) : 0,
-        neutral: totalMoods > 0 ? Math.round((b.neutral / totalMoods) * 100) : 0,
-        calm: totalMoods > 0 ? Math.round((b.calm / totalMoods) * 100) : 0,
+        reactive: totalMoods > 0 ? Math.round((b.reactive / totalMoods) * 100) : 0,
+        mixed: totalMoods > 0 ? Math.round((b.mixed / totalMoods) * 100) : 0,
+        composed: totalMoods > 0 ? Math.round((b.composed / totalMoods) * 100) : 0,
         count: b.count,
       };
     })
