@@ -1,5 +1,6 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/use-auth';
 import { Pencil, Check } from 'lucide-react';
 
 interface Props {
@@ -8,19 +9,46 @@ interface Props {
 }
 
 export function ReflectionNote({ reflectionId, initialNote }: Props) {
+  const { user } = useAuth();
   const [note, setNote] = useState(initialNote ?? '');
   const [editing, setEditing] = useState(false);
   const [saved, setSaved] = useState(false);
+  const savedToLibraryRef = useRef(!!initialNote);
 
   const save = useCallback(async () => {
     setEditing(false);
     setSaved(true);
+    const trimmed = note.trim() || null;
     await supabase
       .from('reflections')
-      .update({ note: note.trim() || null })
+      .update({ note: trimmed })
       .eq('id', reflectionId);
+
+    // Auto-save new notes to library
+    if (trimmed && user && !savedToLibraryRef.current) {
+      savedToLibraryRef.current = true;
+      await supabase
+        .from('library_items')
+        .insert({
+          user_id: user.id,
+          type: 'note',
+          title: 'Session note',
+          body: trimmed,
+          source_type: 'reflection_note',
+          reflection_id: reflectionId,
+          tags: [],
+        } as any);
+    } else if (trimmed && savedToLibraryRef.current) {
+      // Update existing library item body
+      await supabase
+        .from('library_items')
+        .update({ body: trimmed } as any)
+        .eq('reflection_id', reflectionId)
+        .eq('source_type', 'reflection_note');
+    }
+
     setTimeout(() => setSaved(false), 1500);
-  }, [reflectionId, note]);
+  }, [reflectionId, note, user]);
 
   if (!editing && !note.trim()) {
     return (
