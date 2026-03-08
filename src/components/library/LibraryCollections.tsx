@@ -38,6 +38,7 @@ export function LibraryCollections({ library }: Props) {
         onDeleteCollection={deleteCollection}
         onRemoveItem={removeFromCollection}
         onTogglePin={togglePin}
+        onToggleFavorite={toggleFavorite}
         onDeleteItem={deleteItem}
         onStatusChange={handleStatusChange}
       />
