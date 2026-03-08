@@ -429,7 +429,7 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
 
       {hasHaiku && (
         <CollapsibleCompanion
-          label="Read as haiku"
+          label={t.haiku}
           expanded={expandedHaiku}
           onToggle={() => {
             setExpandedHaiku((v) => !v);
