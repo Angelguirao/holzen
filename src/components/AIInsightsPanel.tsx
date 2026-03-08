@@ -46,6 +46,7 @@ interface Props {
 
 export function AIInsightsPanel({ reflectionCount }: Props) {
   const { user } = useAuth();
+  const { language } = useHolzen();
   const [allData, setAllData] = useState<InsightsRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
