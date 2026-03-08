@@ -286,11 +286,45 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
       });
   }, [prefs.zoomOut, reflectionId, context, reflectionMessage]);
 
+  // Historical Insight companion state
+  interface HistoricalInsightData {
+    title: string;
+    btcInsight: string;
+    analogy: string;
+    assetClass: string;
+    period: string;
+  }
+  const [historyInsight, setHistoryInsight] = useState<HistoricalInsightData | null>(null);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyError, setHistoryError] = useState(false);
+  const historyFetchedRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!prefs.history || !reflectionId) return;
+    const key = reflectionId;
+    if (historyFetchedRef.current === key) return;
+    historyFetchedRef.current = key;
+
+    setHistoryLoading(true);
+    setHistoryError(false);
+
+    supabase.functions
+      .invoke('historical-insight', { body: { context: context ?? '' } })
+      .then(({ data, error: fnError }) => {
+        if (fnError || !data || data.error) {
+          setHistoryError(true);
+        } else {
+          setHistoryInsight(data as HistoricalInsightData);
+        }
+        setHistoryLoading(false);
+      });
+  }, [prefs.history, reflectionId, context]);
+
   const markCompleted = useCallback(async (key: keyof CompletionState) => {
     if (completion[key]) return;
     setCompletion((prev) => ({ ...prev, [key]: true }));
     hapticFeedback('light');
-    if (reflectionId && key !== 'signal' && key !== 'zoomOut') {
+    if (reflectionId && key !== 'signal' && key !== 'zoomOut' && key !== 'history') {
       const dbKey = key === 'breathing' ? 'breathing_completed' : key === 'haiku' ? 'haiku_read' : 'learning_read';
       await supabase
         .from('reflections')
@@ -304,8 +338,9 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
   const hasLearning = prefs.learning;
   const hasSignal = prefs.signal && !!reflectionId;
   const hasZoomOut = prefs.zoomOut && !!reflectionId;
+  const hasHistory = prefs.history && !!reflectionId;
 
-  if (!hasBreathing && !hasHaiku && !hasLearning && !hasSignal && !hasZoomOut) return null;
+  if (!hasBreathing && !hasHaiku && !hasLearning && !hasSignal && !hasZoomOut && !hasHistory) return null;
 
   return (
     <div className="space-y-3 pt-2 border-t border-border/40">
