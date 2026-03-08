@@ -1,6 +1,7 @@
 import { useHolzen } from '@/hooks/use-holzen';
 import { LetterToFutureSelf } from '@/components/LetterToFutureSelf';
 import { TheVoid } from '@/components/TheVoid';
+import { HolzenRitual, type RitualTemplate } from '@/components/HolzenRitual';
 import { useSubscription } from '@/hooks/use-subscription';
 import { BtcStatus } from '@/components/BtcStatus';
 import { NightReflectionCard } from '@/components/NightReflectionCard';
@@ -16,7 +17,7 @@ import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { toast } from 'sonner';
-import { AlertCircle, Loader2, Pause, Pin, Timer, Circle } from 'lucide-react';
+import { AlertCircle, Loader2, Pause, Pin, Timer, Circle, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { playNotificationTone, prefetchNotificationTone } from '@/lib/notification-tone';
 
@@ -60,10 +61,12 @@ const Home = () => {
     autoCooldownRemaining,
     cooldownHours,
     firstName,
+    ritualTemplate,
   } = useHolzen();
 
   const [showOutcome, setShowOutcome] = useState(false);
   const [showVoid, setShowVoid] = useState(false);
+  const [showRitual, setShowRitual] = useState(false);
   const [outcomeReflectionId, setOutcomeReflectionId] = useState<string | null>(null);
   const [showMoodCheck, setShowMoodCheck] = useState(false);
   const [priceHidden, setPriceHidden] = useState(() => localStorage.getItem('holzen_hide_price') === 'true');
@@ -275,15 +278,26 @@ const Home = () => {
           )}
 
           {message ? (
-            <ReflectionMessage
-              message={message}
-              context={context}
-              onDismiss={handleDismiss}
-              companions={companions}
-              companionPrefs={companionPrefs}
-              severity={severity}
-              reflectionId={lastReflectionId}
-            />
+            <div className="space-y-4">
+              <ReflectionMessage
+                message={message}
+                context={context}
+                onDismiss={handleDismiss}
+                companions={companions}
+                companionPrefs={companionPrefs}
+                severity={severity}
+                reflectionId={lastReflectionId}
+              />
+              <button
+                onClick={() => setShowRitual(true)}
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-md border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors"
+              >
+                <Sparkles className="h-3 w-3 text-primary/60" />
+                <span className="text-[10px] font-mono text-primary/60 tracking-[0.15em] uppercase">
+                  Start ritual before deciding
+                </span>
+              </button>
+            </div>
 
           ) : showOutcome && outcomeReflectionId ? (
             <OutcomePrompt
@@ -357,16 +371,33 @@ const Home = () => {
         />
       )}
 
-      {/* The Void */}
-      <button
-        onClick={() => setShowVoid(true)}
-        className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-border/30 bg-muted/10 hover:bg-muted/20 transition-colors duration-500"
-      >
-        <Circle className="h-3 w-3 text-muted-foreground/40" />
-        <span className="text-[10px] font-mono text-muted-foreground/40 tracking-[0.2em] uppercase">
-          Enter the void
-        </span>
-      </button>
+      {/* Ritual + Void */}
+      <div className="space-y-2">
+        <button
+          onClick={() => setShowRitual(true)}
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors duration-300"
+        >
+          <Sparkles className="h-3 w-3 text-primary/40" />
+          <span className="text-[10px] font-mono text-primary/40 tracking-[0.2em] uppercase">
+            Start a ritual
+          </span>
+        </button>
+        <button
+          onClick={() => setShowVoid(true)}
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-border/30 bg-muted/10 hover:bg-muted/20 transition-colors duration-500"
+        >
+          <Circle className="h-3 w-3 text-muted-foreground/40" />
+          <span className="text-[10px] font-mono text-muted-foreground/40 tracking-[0.2em] uppercase">
+            Enter the void
+          </span>
+        </button>
+      </div>
+      <HolzenRitual
+        open={showRitual}
+        onClose={() => setShowRitual(false)}
+        template={(ritualTemplate || 'standard') as RitualTemplate}
+        reflectionMessage={message ?? undefined}
+      />
       <TheVoid open={showVoid} onClose={() => setShowVoid(false)} />
 
       <Separator />

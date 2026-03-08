@@ -173,6 +173,7 @@ export type Database = {
           referred_by: string | null
           reflection_style: string
           reflection_tone: string
+          ritual_template: string
           silent_mode: boolean
           streak_freeze_dates: string[]
           threshold: number
@@ -207,6 +208,7 @@ export type Database = {
           referred_by?: string | null
           reflection_style?: string
           reflection_tone?: string
+          ritual_template?: string
           silent_mode?: boolean
           streak_freeze_dates?: string[]
           threshold?: number
@@ -241,6 +243,7 @@ export type Database = {
           referred_by?: string | null
           reflection_style?: string
           reflection_tone?: string
+          ritual_template?: string
           silent_mode?: boolean
           streak_freeze_dates?: string[]
           threshold?: number
