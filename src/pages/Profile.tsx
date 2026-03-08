@@ -165,7 +165,7 @@ const Profile = () => {
           </div>
         ) : reflections.length === 0 ? (
           <p className="text-xs text-muted-foreground py-8 text-center">
-            No reflections yet. Stats will appear after your first reflection.
+            {t('profile.noReflectionsYet')}
           </p>
         ) : (
           <StatsContent reflections={reflections} memberSince={user?.created_at} />
