@@ -128,28 +128,35 @@ export function VolatilityTimeline() {
       });
     }
 
-    // Map reflections to nearest price points
+    // Inject reflections into the chart data at nearest price points
     const refPoints: PricePoint[] = [];
     for (const ref of filteredRefs) {
       const refTime = new Date(ref.created_at).getTime();
-      // Find nearest price point
-      let nearest = sampled[0];
-      let minDiff = Math.abs(refTime - nearest.timestamp);
-      for (const p of sampled) {
-        const diff = Math.abs(refTime - p.timestamp);
+      let nearestIdx = 0;
+      let minDiff = Math.abs(refTime - sampled[0].timestamp);
+      for (let i = 1; i < sampled.length; i++) {
+        const diff = Math.abs(refTime - sampled[i].timestamp);
         if (diff < minDiff) {
           minDiff = diff;
-          nearest = p;
+          nearestIdx = i;
         }
       }
-      refPoints.push({
-        ...nearest,
+      // Tag the sampled point with reflection data
+      const point: PricePoint = {
+        ...sampled[nearestIdx],
         timestamp: refTime,
-        price: nearest.price,
-        date: format(new Date(refTime), 'MMM d, HH:mm'),
         reflection: ref,
         ritual: ritualMap.get(ref.id),
-      });
+        reflectionPrice: sampled[nearestIdx].price,
+      };
+      refPoints.push(point);
+      // Also mark the sampled data so dots render on the line
+      sampled[nearestIdx] = {
+        ...sampled[nearestIdx],
+        reflection: ref,
+        ritual: ritualMap.get(ref.id),
+        reflectionPrice: sampled[nearestIdx].price,
+      };
     }
 
     return { chartData: sampled, reflectionPoints: refPoints };
