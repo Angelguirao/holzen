@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useCallback } from 'react';
-import { Pin, PinOff, Trash2, ExternalLink, Tag, X, Eye, EyeOff, Archive, FolderPlus, Link2 } from 'lucide-react';
+import { Pin, PinOff, Trash2, ExternalLink, Tag, X, Eye, EyeOff, Archive, FolderPlus, Link2, Heart } from 'lucide-react';
 import type { LibraryItem, Collection } from '@/hooks/use-library';
 import { useTranslation } from 'react-i18next';
 import { AddToCollectionButton } from './AddToCollectionButton';
@@ -24,6 +24,7 @@ const TYPE_LABELS: Record<string, string> = {
 interface Props {
   item: LibraryItem;
   onTogglePin: (id: string) => void;
+  onToggleFavorite: (id: string) => void;
   onDelete: (id: string) => void;
   onStatusChange: (id: string, status: 'unread' | 'read' | 'archived') => void;
   onUpdateTags?: (id: string, tags: string[]) => void;
@@ -35,7 +36,7 @@ interface Props {
 }
 
 export function LibraryItemCard({
-  item, onTogglePin, onDelete, onStatusChange, onUpdateTags, linkedItems,
+  item, onTogglePin, onToggleFavorite, onDelete, onStatusChange, onUpdateTags, linkedItems,
   collections, itemCollections, onAddToCollection, onRemoveFromCollection,
 }: Props) {
   const { t } = useTranslation();
@@ -84,7 +85,15 @@ export function LibraryItemCard({
             </p>
           )}
         </div>
-        <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+        <div className="flex items-center gap-0.5 shrink-0">
+          <button
+            onClick={() => onToggleFavorite(item.id)}
+            className={`p-1 transition-colors ${item.is_favorite ? 'text-destructive' : 'text-muted-foreground/50 hover:text-destructive'}`}
+            aria-label={item.is_favorite ? 'Remove from favorites' : 'Add to favorites'}
+          >
+            <Heart className={`h-3 w-3 ${item.is_favorite ? 'fill-current' : ''}`} />
+          </button>
+          <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
           <button
             onClick={() => onStatusChange(item.id, isUnread ? 'read' : 'unread')}
             className="p-1 text-muted-foreground/50 hover:text-foreground transition-colors"
@@ -122,6 +131,7 @@ export function LibraryItemCard({
           >
             <Trash2 className="h-3 w-3" />
           </button>
+          </div>
         </div>
       </div>
 

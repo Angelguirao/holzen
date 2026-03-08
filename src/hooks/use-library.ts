@@ -13,6 +13,7 @@ export interface LibraryItem {
   reflection_id: string | null;
   tags: string[];
   pinned: boolean;
+  is_favorite: boolean;
   status: 'unread' | 'read' | 'archived';
   created_at: string;
 }
@@ -101,6 +102,12 @@ export function useLibrary() {
     await updateItem(id, { pinned: !item.pinned });
   }, [items, updateItem]);
 
+  const toggleFavorite = useCallback(async (id: string) => {
+    const item = items.find((i) => i.id === id);
+    if (!item) return;
+    await updateItem(id, { is_favorite: !item.is_favorite });
+  }, [items, updateItem]);
+
   // Collections CRUD
   const addCollection = useCallback(async (col: Partial<Collection>) => {
     if (!user) return null;
@@ -171,7 +178,7 @@ export function useLibrary() {
 
   return {
     items, collections, collectionItems, loading,
-    addItem, updateItem, deleteItem, togglePin,
+    addItem, updateItem, deleteItem, togglePin, toggleFavorite,
     addCollection, updateCollection, deleteCollection,
     addToCollection, removeFromCollection,
     getCollectionItemIds, getCollectionItemCount, getItemCollections,

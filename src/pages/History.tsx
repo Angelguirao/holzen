@@ -6,7 +6,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useHolzen } from '@/hooks/use-holzen';
 import { formatBtcPrice } from '@/lib/btc';
 import { format, subDays, isAfter, isBefore, startOfDay, endOfDay, isSameDay } from 'date-fns';
-import { X, Star, Search, Pin, Info, TrendingUp, TrendingDown, Clock, History as HistoryIcon, ExternalLink, ArrowRight, ChevronDown, CalendarIcon, Filter, List, LayoutGrid } from 'lucide-react';
+import { X, Star, Search, Pin, Info, TrendingUp, TrendingDown, Clock, History as HistoryIcon, ExternalLink, ArrowRight, ChevronDown, CalendarIcon, Filter, List, LayoutGrid, Heart } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { VolatilityTimeline } from '@/components/VolatilityTimeline';
 import { ShareReflection } from '@/components/ShareReflection';
@@ -280,6 +280,8 @@ const History = () => {
     if (!reflection) return;
     const newVal = !reflection.is_favorite;
     await supabase.from('reflections').update({ is_favorite: newVal }).eq('id', id);
+    // Also sync to library_items linked to this reflection
+    await supabase.from('library_items').update({ is_favorite: newVal }).eq('reflection_id', id).eq('source_type', 'reflection');
     setReflections((prev) =>
       prev.map((r) => (r.id === id ? { ...r, is_favorite: newVal } : r))
     );
@@ -642,9 +644,9 @@ const History = () => {
                     <div className="flex items-center gap-1 shrink-0">
                       <button
                         onClick={() => toggleFavorite(r.id)}
-                        className={`p-1 transition-colors ${r.is_favorite ? 'text-foreground' : 'text-muted-foreground/40 hover:text-foreground'}`}
+                        className={`p-1 transition-colors ${r.is_favorite ? 'text-destructive' : 'text-muted-foreground/40 hover:text-destructive'}`}
                       >
-                        <Star className={`h-3 w-3 ${r.is_favorite ? 'fill-current' : ''}`} />
+                        <Heart className={`h-3 w-3 ${r.is_favorite ? 'fill-current' : ''}`} />
                       </button>
                     </div>
                   </div>
@@ -724,10 +726,10 @@ const History = () => {
                   </button>
                   <button
                     onClick={() => toggleFavorite(r.id)}
-                    className={`p-1 transition-colors ${r.is_favorite ? 'text-foreground' : 'text-muted-foreground/40 hover:text-foreground'}`}
+                    className={`p-1 transition-colors ${r.is_favorite ? 'text-destructive' : 'text-muted-foreground/40 hover:text-destructive'}`}
                     aria-label={r.is_favorite ? 'Remove from favorites' : 'Add to favorites'}
                   >
-                    <Star className={`h-3 w-3 ${r.is_favorite ? 'fill-current' : ''}`} />
+                    <Heart className={`h-3 w-3 ${r.is_favorite ? 'fill-current' : ''}`} />
                   </button>
                   <ShareReflection message={r.message} context={r.context} haiku={r.haiku} />
                   <ReflectionWallpaper message={r.message} mood={r.mood} context={r.context} haiku={r.haiku} />

@@ -1,9 +1,10 @@
 import { useState, useCallback, useRef } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { X, ArrowDown, Check } from 'lucide-react';
+import { X, ArrowDown, Check, Heart } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { hapticFeedback } from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
+import { supabase } from '@/integrations/supabase/client';
 import { useHolzen } from '@/hooks/use-holzen';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 import { CompanionSection, type CompanionData, type CompanionPrefs } from '@/components/CompanionSection';
@@ -55,6 +56,16 @@ export default function PauseSession() {
 
   const [phase, setPhase] = useState<'session' | 'outcome' | 'done'>('session');
   const [decision, setDecision] = useState<string | null>(null);
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  const toggleFavorite = useCallback(async () => {
+    if (!reflectionId) return;
+    const newVal = !isFavorite;
+    setIsFavorite(newVal);
+    hapticFeedback('light');
+    await supabase.from('reflections').update({ is_favorite: newVal }).eq('id', reflectionId);
+    await supabase.from('library_items').update({ is_favorite: newVal }).eq('reflection_id', reflectionId).eq('source_type', 'reflection');
+  }, [reflectionId, isFavorite]);
 
   const handleReturn = useCallback(() => {
     navigate(-1);
@@ -195,6 +206,13 @@ export default function PauseSession() {
                       )}
                       <p className="text-lg leading-relaxed text-foreground/90">{message}</p>
                       <div className="flex items-center gap-1">
+                        <button
+                          onClick={toggleFavorite}
+                          className={`p-1.5 transition-colors ${isFavorite ? 'text-destructive' : 'text-muted-foreground/40 hover:text-destructive'}`}
+                          aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+                        >
+                          <Heart className={`h-4 w-4 ${isFavorite ? 'fill-current' : ''}`} />
+                        </button>
                         <ShareReflection message={message} context={context} haiku={companions?.haiku} />
                         <ReflectionWallpaper message={message} mood={null} context={context} haiku={companions?.haiku} variant="button" />
                       </div>
