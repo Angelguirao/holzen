@@ -490,7 +490,7 @@ const Home = () => {
               >
                 <Sparkles className="h-3 w-3 text-primary/40" />
                 <span className="text-[10px] font-mono text-primary/40 tracking-[0.2em] uppercase">
-                  Start a ritual
+                  {t('home.startARitual')}
                 </span>
               </button>
               <button
