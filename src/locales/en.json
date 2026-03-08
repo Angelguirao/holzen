@@ -443,7 +443,7 @@
     "questions": "Questions",
     "faq": {
       "whatQuestion": "What exactly does Holzen do?",
-      "whatAnswer": "Holzen monitors Bitcoin volatility across two windows — 24-hour and 7-day cumulative. When movement crosses your thresholds, it generates an AI reflection accompanied by six companions: a breathing exercise, a haiku, a signal, a learning nudge, a zoom-out perspective, and a historical echo from your own past. You track your moods, tag emotions, journal notes, record decisions, and watch your composure evolve over time.",
+      "whatAnswer": "Holzen monitors Bitcoin volatility across two windows — 24-hour and 7-day cumulative. When movement crosses your thresholds, it generates an AI reflection accompanied by six companions: a breathing exercise, a haiku, a signal, a learning nudge, a zoom-out perspective, and a historical echo from your own past. You check in emotionally, tag your feelings, journal notes, record decisions, and watch your composure evolve over time.",
       "adviceQuestion": "Will it tell me what to buy or sell?",
       "adviceAnswer": "Never. Holzen is not a trading tool or financial advisor. Reflections are intentionally neutral — they exist only to create a moment of awareness before you act on impulse.",
       "companionsQuestion": "What are companions?",
