@@ -102,7 +102,7 @@ export function Onboarding({ onComplete }: Props) {
                   </motion.p>
                   <motion.div className="space-y-4" {...stagger(0.3)}>
                     <div className="space-y-2">
-                      <p className="text-xs font-mono text-muted-foreground">What should we call you?</p>
+                      <p className="text-xs font-mono text-muted-foreground">{t('onboarding.whatToCallYou')}</p>
                       <Input
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
