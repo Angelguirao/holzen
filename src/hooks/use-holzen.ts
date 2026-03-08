@@ -261,9 +261,30 @@ export function useHolzen() {
     setLoading(true);
     setError(null);
 
+    // Fetch recent mood history for adaptive tone
+    let moodHistory: { mood: string; outcome: string | null; created_at: string }[] = [];
+    try {
+      const { data: recentMoods } = await supabase
+        .from('reflections')
+        .select('mood, outcome, created_at')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(20);
+      moodHistory = (recentMoods ?? [])
+        .filter((r: any) => r.mood)
+        .map((r: any) => ({ mood: r.mood, outcome: r.outcome, created_at: r.created_at }));
+    } catch { /* non-critical */ }
+
     try {
       const { data: fnData, error: fnError } = await supabase.functions.invoke('holzen-reflect', {
-        body: { context: ctx, tone: reflectionTone, customPrompt: customPrompt || undefined, style: reflectionStyle },
+        body: {
+          context: ctx,
+          tone: reflectionTone,
+          customPrompt: customPrompt || undefined,
+          style: reflectionStyle,
+          moodHistory,
+          severity: Math.abs(data.changePercent),
+        },
       });
 
       if (fnError) throw fnError;
