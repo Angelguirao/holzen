@@ -90,7 +90,7 @@ function CollapsibleCompanion({
   );
 }
 
-export function CompanionSection({ companions, prefs, severity = 'mild', reflectionId, context }: Props) {
+export function CompanionSection({ companions, prefs, severity = 'mild', reflectionId, context, reflectionMessage }: Props) {
   const [expandedBreathing, setExpandedBreathing] = useState(false);
   const [expandedHaiku, setExpandedHaiku] = useState(false);
   const [expandedLearning, setExpandedLearning] = useState(false);
