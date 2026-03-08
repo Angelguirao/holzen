@@ -27,7 +27,7 @@ serve(async (req) => {
   }
 
   try {
-    const { context, tone, customPrompt, style } = await req.json();
+    const { context, tone, customPrompt, style, moodHistory, severity } = await req.json();
     if (!context) {
       return new Response(JSON.stringify({ error: "Missing context" }), {
         status: 400,
@@ -40,14 +40,62 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    const toneInstruction = TONE_INSTRUCTIONS[tone] || TONE_INSTRUCTIONS.stoic;
-    const styleInstruction = STYLE_INSTRUCTIONS[style] || STYLE_INSTRUCTIONS.standard;
+    // --- Adaptive tone logic ---
+    const baseTone = TONE_INSTRUCTIONS[tone] || TONE_INSTRUCTIONS.stoic;
+    const baseStyle = STYLE_INSTRUCTIONS[style] || STYLE_INSTRUCTIONS.standard;
+
+    let adaptiveContext = "";
+
+    // Analyze mood history for patterns
+    if (moodHistory && Array.isArray(moodHistory) && moodHistory.length > 0) {
+      const moods = moodHistory.map((m: any) => m.mood);
+      const anxiousCount = moods.filter((m: string) => m === "anxious").length;
+      const calmCount = moods.filter((m: string) => m === "calm").length;
+      const total = moods.length;
+      const anxiousRate = anxiousCount / total;
+      const calmRate = calmCount / total;
+
+      // Check recent streak (last 3)
+      const recentMoods = moods.slice(0, 3);
+      const recentAllAnxious = recentMoods.every((m: string) => m === "anxious");
+      const recentAllCalm = recentMoods.every((m: string) => m === "calm");
+
+      // Check outcomes
+      const outcomes = moodHistory.map((m: any) => m.outcome).filter(Boolean);
+      const soldCount = outcomes.filter((o: string) => o === "sold").length;
+      const soldRate = outcomes.length > 0 ? soldCount / outcomes.length : 0;
+
+      if (recentAllAnxious) {
+        adaptiveContext += "\nADAPTIVE CONTEXT: The user has been anxious in their last 3 reflections. Be extra gentle and grounding. Prioritize calm and spaciousness over challenge.";
+      } else if (anxiousRate > 0.5) {
+        adaptiveContext += "\nADAPTIVE CONTEXT: The user tends toward anxiety in their reflections. Lean toward warmth and reassurance without being patronizing.";
+      } else if (recentAllCalm) {
+        adaptiveContext += "\nADAPTIVE CONTEXT: The user has been consistently calm recently. You can be slightly more thought-provoking or philosophical — they can handle depth.";
+      } else if (calmRate > 0.6) {
+        adaptiveContext += "\nADAPTIVE CONTEXT: The user is generally composed. Offer reflections that reward their steadiness with deeper insight.";
+      }
+
+      if (soldRate > 0.4 && outcomes.length >= 3) {
+        adaptiveContext += "\nThe user has a pattern of selling during volatility. Gently invite pause without judgment.";
+      }
+    }
+
+    // Adjust for market severity
+    const sev = typeof severity === "number" ? severity : 0;
+    if (sev >= 15) {
+      adaptiveContext += "\nMARKET SEVERITY: Extreme move (15%+). This is a rare, high-stress moment. Be exceptionally calm and anchoring. Shorter is better.";
+    } else if (sev >= 10) {
+      adaptiveContext += "\nMARKET SEVERITY: Major move (10%+). Emotions are likely running high. Prioritize grounding over insight.";
+    } else if (sev >= 7) {
+      adaptiveContext += "\nMARKET SEVERITY: Significant move (7%+). Balance grounding with perspective.";
+    }
 
     const systemPrompt = `You generate a reflection with optional companions in response to Bitcoin volatility.
 
 You MUST respond by calling the "generate_reflection" function. Do not respond with plain text.
 
-Tone: ${toneInstruction}
+Tone: ${baseTone}
+${adaptiveContext}
 
 The context may include a Fear & Greed Index score (0-100). Use this to subtly adjust your reflection:
 - Extreme Fear (0-24): The crowd is panicking. Reflect on what happens when fear spreads.
@@ -58,7 +106,7 @@ The context may include a Fear & Greed Index score (0-100). Use this to subtly a
 Do NOT name the index or its score directly. Weave the sentiment naturally into the reflection.
 
 Reflection rules:
-- Style: ${styleInstruction}
+- Style: ${baseStyle}
 - ${tone === 'blunt' ? '1 sentence preferred.' : ''}
 - Encourage pause and reflection. Preserve agency: never say "you should".
 - No reassurance, excitement, urgency, trading advice, lists, disclaimers.
