@@ -292,5 +292,6 @@ export function BadgesPanel({ reflections }: BadgesPanelProps) {
         );
       })}
     </div>
+    </>
   );
 }
