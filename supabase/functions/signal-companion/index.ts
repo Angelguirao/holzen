@@ -30,8 +30,8 @@ serve(async (req) => {
 You MUST call the "return_signal" function with your response. Do not respond with plain text.
 
 Rules:
-- Reference REAL analysts, publications, data dashboards, or research from the Bitcoin ecosystem
-- VARIETY IS CRITICAL: Each response must use a DIFFERENT source. Draw from the full breadth of Bitcoin analysis — on-chain analysts, macro researchers, mining experts, protocol developers, academic papers, data platforms, newsletters, podcasts, etc. Surprise the reader with lesser-known but credible voices, not just the most popular names.
+- Reference REAL sources from the Bitcoin ecosystem — articles, blog posts, research papers, podcast episodes, YouTube videos, books, newsletter posts, tweets/threads, data dashboards, conference talks, or any other credible format
+- VARIETY IS CRITICAL: Vary both the source AND the format. Don't always link articles — mix in podcast episodes, video essays, book excerpts, tweetstorms, academic papers, newsletter issues, etc. Draw from the full breadth of Bitcoin analysis — on-chain analysts, macro researchers, mining experts, protocol developers, historians, authors, podcasters, and more. Surprise the reader with lesser-known but credible voices.
 - The insight should be FACTUAL — a real concept, framework, or historical pattern, not made-up content
 - Match it to the current market context (if fees are high, talk about fee markets; if there's a crash, reference historical recoveries; if sentiment is extreme, reference behavioral patterns)
 - Keep the body to 2-3 sentences max
