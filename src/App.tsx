@@ -23,6 +23,7 @@ import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import Roadmap from "./pages/Roadmap";
 import Ambient from "./pages/Ambient";
+import Reserve from "./pages/Reserve";
 
 const queryClient = new QueryClient();
 
@@ -66,6 +67,7 @@ const App = () => (
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/blog/:slug" element={<BlogPost />} />
                 <Route path="/roadmap" element={<Roadmap />} />
+                <Route path="/reserve" element={<Reserve />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </AuthProvider>
