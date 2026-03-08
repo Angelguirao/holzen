@@ -404,6 +404,22 @@
       "04title": "Você registra",
       "04desc": "Marque suas emoções. Escreva uma nota. Registre o que fez — segurou, vendeu, comprou ou nada. Com o tempo, padrões surgem."
     },
+    "companionsTitle": "Seis companheiros",
+    "companionsDesc": "Cada reflexão vem com companheiros projetados para te desacelerar e adicionar perspectiva. Salve qualquer um na sua Biblioteca com um toque.",
+    "companions": {
+      "breathing": "Exercício de respiração",
+      "breathingDesc": "Calma guiada antes de ler",
+      "haiku": "Haiku",
+      "haikuDesc": "Quietude 5-7-5, único a cada vez",
+      "signal": "Leia o Sinal",
+      "signalDesc": "Inteligência via IA das suas fontes curadas",
+      "learning": "Conecte-se",
+      "learningDesc": "Pesquisa de finanças comportamentais em contexto",
+      "zoomOut": "Perspectiva Ampla",
+      "zoomOutDesc": "Preços de BTC de 1–5 anos atrás, suas reflexões passadas e perspectiva profunda",
+      "history": "Eco Histórico",
+      "historyDesc": "Paralelos da história financeira e analogias entre classes de ativos via pesquisa"
+    },
     "whatYouGet": "O que você recebe",
     "features": {
       "breathing": "Exercício de respiração",

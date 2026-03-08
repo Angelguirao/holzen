@@ -403,6 +403,22 @@
       "04title": "Vous enregistrez",
       "04desc": "Taguez vos émotions. Écrivez une note. Enregistrez ce que vous avez fait — gardé, vendu, acheté ou rien. Avec le temps, des schémas émergent."
     },
+    "companionsTitle": "Six compagnons",
+    "companionsDesc": "Chaque réflexion est accompagnée de compagnons conçus pour vous ralentir et ajouter de la perspective. Enregistrez-en un dans votre Bibliothèque d'un geste.",
+    "companions": {
+      "breathing": "Exercice de respiration",
+      "breathingDesc": "Calme guidé avant la lecture",
+      "haiku": "Haïku",
+      "haikuDesc": "Silence 5-7-5, unique à chaque fois",
+      "signal": "Lire le Signal",
+      "signalDesc": "Intelligence IA à partir de vos sources sélectionnées",
+      "learning": "Ancrez-vous",
+      "learningDesc": "Recherche en finance comportementale en contexte",
+      "zoomOut": "Perspective",
+      "zoomOutDesc": "Prix BTC d'il y a 1–5 ans, vos réflexions passées & perspective profonde",
+      "history": "Écho Historique",
+      "historyDesc": "Parallèles de l'histoire financière & analogies entre classes d'actifs via la recherche"
+    },
     "whatYouGet": "Ce que vous obtenez",
     "features": {
       "breathing": "Exercice de respiration",
