@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { useEffect, useRef } from 'react';
+import { LandingComparison } from '@/components/LandingComparison';
 import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -50,13 +51,7 @@ const Landing = () => {
     if (ref) localStorage.setItem('holzen_ref', ref);
   }, [searchParams]);
 
-  const LOOP_STEPS = [
-    { num: '01', icon: <TrendingDown className="h-4 w-4" />, title: t('landing.steps.01title'), desc: t('landing.steps.01desc') },
-    { num: '02', icon: <Wind className="h-4 w-4" />, title: t('landing.steps.02title'), desc: t('landing.steps.02desc') },
-    { num: '03', icon: <Eye className="h-4 w-4" />, title: t('landing.steps.03title'), desc: t('landing.steps.03desc') },
-    { num: '04', icon: <Target className="h-4 w-4" />, title: t('landing.steps.04title'), desc: t('landing.steps.04desc') },
-    { num: '05', icon: <Sparkles className="h-4 w-4" />, title: t('landing.steps.05title'), desc: t('landing.steps.05desc') },
-  ];
+
 
   const COMPANIONS = [
     { icon: <Wind className="h-4 w-4" />, label: t('landing.companions.breathing'), desc: t('landing.companions.breathingDesc') },
@@ -186,35 +181,11 @@ const Landing = () => {
         </motion.button>
       </div>
 
-      {/* ─── THE LOOP ─── */}
+      {/* ─── REACTION vs REFLECTION ─── */}
       <div id="reflection-loop" className="max-w-lg mx-auto px-6 py-16">
         <Section>
           <SectionLabel>{t('landing.reflectionLoop')}</SectionLabel>
-          <div className="space-y-0">
-            {LOOP_STEPS.map((step, i) => (
-              <motion.div
-                key={step.num}
-                className="relative flex gap-5 pb-8 last:pb-0"
-                initial={prefersReduced ? {} : { opacity: 0, x: -12 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.5, delay: i * 0.1 }}
-              >
-                {/* Vertical line */}
-                {i < LOOP_STEPS.length - 1 && (
-                  <div className="absolute left-[15px] top-[36px] bottom-0 w-px bg-border/40" />
-                )}
-                {/* Icon circle */}
-                <div className="relative z-10 flex-shrink-0 w-8 h-8 rounded-full border border-border/60 bg-background flex items-center justify-center text-muted-foreground/60">
-                  {step.icon}
-                </div>
-                <div className="space-y-1 pt-1">
-                  <p className="text-sm font-medium text-foreground">{step.title}</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">{step.desc}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
+          <LandingComparison />
         </Section>
       </div>
 

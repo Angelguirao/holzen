@@ -379,6 +379,21 @@
     "hero": "Begrijp hoe je reageert op volatiliteit — en word rustiger met de tijd.",
     "heroDesc": "Holzen is geen trading-tool. Het is een zelfbewustzijnspraktijk. Wanneer Bitcoin beweegt, krijg je een moment om te pauzeren, reflecteren en je patronen op te merken — voordat je impulsief handelt.",
     "reflectionLoop": "De reflectiecyclus",
+    "reaction": {
+      "label": "Zonder Holzen",
+      "01title": "De markt daalt",
+      "02title": "Paniek slaat toe",
+      "03title": "Je verkoopt impulsief",
+      "04title": "Je hebt er later spijt van"
+    },
+    "reflection": {
+      "label": "Met Holzen",
+      "01title": "De markt daalt",
+      "02title": "Je ademt",
+      "03title": "Je reflecteert",
+      "04title": "Je beslist bewust",
+      "05title": "Je groeit met de tijd"
+    },
     "steps": {
       "01title": "De markt beweegt",
       "01desc": "Holzen bewaakt dagelijkse en 7-daagse cumulatieve volatiliteit ten opzichte van je persoonlijke drempels. Of vraag een reflectie aan wanneer je wilt.",
