@@ -6,6 +6,7 @@ import { List, Share2, Star, Search, Tag, FolderOpen, Filter, X } from 'lucide-r
 import { LibraryItems } from '@/components/library/LibraryItems';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const GraphView = lazy(() => import('@/components/library/GraphView'));
 
@@ -29,6 +30,7 @@ const STATUS_FILTERS: { key: string; label: string }[] = [
 export default function Library() {
   const { t } = useTranslation();
   const library = useLibrary();
+  const isMobile = useIsMobile();
   const [viewMode, setViewMode] = useState<'list' | 'graph'>('list');
   const [tab, setTab] = useState<'all' | 'favorites'>('all');
   const [search, setSearch] = useState('');
@@ -121,31 +123,33 @@ export default function Library() {
           {t('library.tabFavorites')}
         </button>
 
-        <div className="ml-auto flex items-center gap-1 rounded-md border border-border/40 p-0.5">
-          <button
-            onClick={() => setViewMode('list')}
-            className={cn(
-              'p-1 rounded transition-colors',
-              viewMode === 'list' ? 'bg-muted text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
-            )}
-            aria-label="List view"
-          >
-            <List className="h-3.5 w-3.5" />
-          </button>
-          <button
-            onClick={() => setViewMode('graph')}
-            className={cn(
-              'p-1 rounded transition-colors',
-              viewMode === 'graph' ? 'bg-muted text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
-            )}
-            aria-label="Graph view"
-          >
-            <Share2 className="h-3.5 w-3.5" />
-          </button>
-        </div>
+        {!isMobile && (
+          <div className="ml-auto flex items-center gap-1 rounded-md border border-border/40 p-0.5">
+            <button
+              onClick={() => setViewMode('list')}
+              className={cn(
+                'p-1 rounded transition-colors',
+                viewMode === 'list' ? 'bg-muted text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
+              )}
+              aria-label="List view"
+            >
+              <List className="h-3.5 w-3.5" />
+            </button>
+            <button
+              onClick={() => setViewMode('graph')}
+              className={cn(
+                'p-1 rounded transition-colors',
+                viewMode === 'graph' ? 'bg-muted text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
+              )}
+              aria-label="Graph view"
+            >
+              <Share2 className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        )}
       </div>
 
-      {viewMode === 'list' ? (
+      {viewMode === 'list' || isMobile ? (
         <div className="space-y-3">
           {/* Search + filter toggle */}
           <div className="flex items-center gap-2">
