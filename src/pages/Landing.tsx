@@ -5,6 +5,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, Twitter, Wind, Feather, BookOpen, TrendingDown, Brain, Tag, BarChart3, MessageCircle } from 'lucide-react';
 import { PageMeta } from '@/components/PageMeta';
+import { HolzenNumber } from '@/components/HolzenNumber';
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 14 },
