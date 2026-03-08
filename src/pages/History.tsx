@@ -501,7 +501,7 @@ const History = () => {
                   {/* Tag filter */}
                   {allTags.length > 0 && (
                     <div className="space-y-1.5">
-                      <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Tags</p>
+                      <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">{t('history.tags')}</p>
                       <div className="flex flex-wrap gap-1">
                         {allTags.map((tag) => (
                           <button
