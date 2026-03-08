@@ -438,3 +438,4 @@ const ReflectionMarkerCard = forwardRef<HTMLDivElement, { point: PricePoint }>((
     </div>
   );
 });
+ReflectionMarkerCard.displayName = 'ReflectionMarkerCard';
