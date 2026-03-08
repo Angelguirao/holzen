@@ -125,6 +125,7 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
             learning: (data as any).learning_read ?? false,
             signal: false,
             zoomOut: false,
+            history: false,
           });
         }
       });
