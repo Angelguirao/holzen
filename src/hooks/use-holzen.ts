@@ -498,6 +498,12 @@ export function useHolzen() {
       if (!user) return;
       await supabase.from('profiles').update({ ai_insights_enabled: val } as any).eq('user_id', user.id);
     },
+    ritualTemplate,
+    setRitualTemplate: async (val: string) => {
+      setRitualTemplateState(val);
+      if (!user) return;
+      await supabase.from('profiles').update({ ritual_template: val } as any).eq('user_id', user.id);
+    },
     companionPrefs,
     setCompanionPref,
     btcData,
