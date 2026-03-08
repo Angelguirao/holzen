@@ -38,7 +38,7 @@ interface Props {
 
 export function LibraryItemCard({
   item, onTogglePin, onToggleFavorite, onDelete, onStatusChange, onUpdateTags, linkedItems,
-  collections, itemCollections, onAddToCollection, onRemoveFromCollection,
+  collections, itemCollections, onAddToCollection, onRemoveFromCollection, onClick,
 }: Props) {
   const { t } = useTranslation();
   const isUnread = item.status === 'unread';
