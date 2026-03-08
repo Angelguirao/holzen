@@ -74,6 +74,75 @@ export type Database = {
         }
         Relationships: []
       }
+      collection_items: {
+        Row: {
+          added_at: string
+          collection_id: string
+          id: string
+          library_item_id: string
+          position: number
+        }
+        Insert: {
+          added_at?: string
+          collection_id: string
+          id?: string
+          library_item_id: string
+          position?: number
+        }
+        Update: {
+          added_at?: string
+          collection_id?: string
+          id?: string
+          library_item_id?: string
+          position?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "collection_items_collection_id_fkey"
+            columns: ["collection_id"]
+            isOneToOne: false
+            referencedRelation: "collections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "collection_items_library_item_id_fkey"
+            columns: ["library_item_id"]
+            isOneToOne: false
+            referencedRelation: "library_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      collections: {
+        Row: {
+          color: string | null
+          created_at: string
+          description: string | null
+          icon: string | null
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          color?: string | null
+          created_at?: string
+          description?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       feedback: {
         Row: {
           category: string
@@ -136,6 +205,56 @@ export type Database = {
           written_during?: string
         }
         Relationships: []
+      }
+      library_items: {
+        Row: {
+          body: string | null
+          created_at: string
+          id: string
+          pinned: boolean
+          reflection_id: string | null
+          source_type: string | null
+          source_url: string | null
+          tags: string[]
+          title: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          pinned?: boolean
+          reflection_id?: string | null
+          source_type?: string | null
+          source_url?: string | null
+          tags?: string[]
+          title?: string | null
+          type?: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          id?: string
+          pinned?: boolean
+          reflection_id?: string | null
+          source_type?: string | null
+          source_url?: string | null
+          tags?: string[]
+          title?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "library_items_reflection_id_fkey"
+            columns: ["reflection_id"]
+            isOneToOne: false
+            referencedRelation: "reflections"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       night_reflections: {
         Row: {
@@ -754,6 +873,10 @@ export type Database = {
         }[]
       }
       get_holzen_number: { Args: never; Returns: Json }
+      owns_collection: {
+        Args: { _collection_id: string; _user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
