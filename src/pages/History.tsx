@@ -122,10 +122,15 @@ const History = () => {
     return Array.from(set).sort();
   }, [reflections]);
 
+  const moods = ['fomo', 'excited', 'greedy', 'anxious', 'calm', 'detached', 'uncertain', 'fearful'] as const;
+
   const filtered = useMemo(() => {
     let result = filter === 'favorites' ? reflections.filter((r) => r.is_favorite) : reflections;
     if (tagFilter) {
       result = result.filter((r) => r.tags?.includes(tagFilter));
+    }
+    if (moodFilter) {
+      result = result.filter((r) => r.mood === moodFilter);
     }
     if (search.trim()) {
       const q = search.toLowerCase();
@@ -134,7 +139,7 @@ const History = () => {
       );
     }
     return result;
-  }, [reflections, filter, tagFilter, search]);
+  }, [reflections, filter, tagFilter, moodFilter, search]);
 
   const displayedReflections = tab === 'recent' ? recentReflections : filtered;
 
