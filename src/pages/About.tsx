@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
@@ -11,6 +12,7 @@ const fade = (delay = 0) => ({
 });
 
 const About = () => {
+  const { t } = useTranslation();
   const prefersReduced = useReducedMotion();
   const m = (delay = 0) => (prefersReduced ? {} : fade(delay));
 
@@ -29,14 +31,14 @@ const About = () => {
             className="inline-flex items-center gap-1.5 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            Back
+            {t('common.back')}
           </Link>
         </motion.div>
 
         {/* Title */}
         <motion.div {...m(0.05)}>
           <h1 className="text-xl text-foreground leading-relaxed">
-            Why Holzen exists
+            {t('about.whyHolzenExists')}
           </h1>
         </motion.div>
 
@@ -44,19 +46,19 @@ const About = () => {
         <motion.div {...m(0.1)}>
           <div className="space-y-4">
             <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
-              The opportunity & the problem
+              {t('about.opportunityProblem')}
             </p>
             <p className="text-sm text-foreground leading-relaxed">
-              The democratisation of investing is one of the most important financial shifts of our time.
+              {t('about.opportunityBody1')}
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Platforms like Robinhood, Trade Republic, and countless others have opened markets that were once reserved for professionals. Anyone can now invest in stocks, ETFs, commodities — and Bitcoin. This is a genuinely good thing.
+              {t('about.opportunityBody2')}
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              But access is only half the equation. What these platforms don't provide is the emotional infrastructure to handle what comes next: the volatility, the uncertainty, the constant temptation to act when doing nothing would serve you better.
+              {t('about.opportunityBody3')}
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              That's the gap Holzen fills — not with more data or faster alerts, but with a practice of self-awareness: breathing exercises, AI-generated reflections, mood tracking, journaling, emotional tagging, and personal insights that reveal your patterns over time.
+              {t('about.opportunityBody4')}
             </p>
           </div>
         </motion.div>
@@ -65,22 +67,22 @@ const About = () => {
         <motion.div {...m(0.1)}>
           <div className="space-y-4">
             <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
-              What the research says
+              {t('about.whatResearchSays')}
             </p>
             <p className="text-sm text-foreground leading-relaxed">
-              Investing is hard. Controlling your emotions under volatility is harder.
+              {t('about.researchBody1')}
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Behavioral finance has spent decades documenting this. Daniel Kahneman's work on System 1 and System 2 thinking shows that under stress, our fast, instinctive mind hijacks decisions before our slower, reflective mind can intervene. Barber and Odean's research found that the most active individual traders underperform by 6.5% annually — not because they lack information, but because they act on emotion.
+              {t('about.researchBody2')}
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              This is true for experienced investors and beginners alike. The difference is that beginners often don't yet recognise the pattern: the urge to sell when prices fall, the urge to buy when prices surge. Both feel rational in the moment. Neither usually is.
+              {t('about.researchBody3')}
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Holzen applies this research directly. When volatility crosses your threshold — daily or across a rolling 7-day window — you're met with a breathing exercise, a mood check, an AI reflection, and companion content (a haiku, a historical insight) designed to slow you down. Afterward, you tag your emotions, journal your thoughts, and record what you did. Over time, your personal insights panel reveals how your composure evolves — turning reactive moments into data you can learn from.
+              {t('about.researchBody4')}
             </p>
             <p className="text-[10px] text-muted-foreground/70 leading-relaxed italic">
-              Kahneman, D. (2011). <em>Thinking, Fast and Slow</em>. · Barber, B. & Odean, T. (2000). "Trading Is Hazardous to Your Wealth." <em>The Journal of Finance</em>, 55(2). · Thaler, R. (2015). <em>Misbehaving: The Making of Behavioral Economics</em>.
+              {t('about.researchCitation')}
             </p>
           </div>
         </motion.div>
@@ -89,19 +91,19 @@ const About = () => {
         <motion.div {...m(0.1)}>
           <div className="space-y-4">
             <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
-              Why Bitcoin
+              {t('about.whyBitcoin')}
             </p>
             <p className="text-sm text-foreground leading-relaxed">
-              Holding Bitcoin is especially hard — and we think that's exactly why it's worth doing.
+              {t('about.bitcoinBody1')}
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Bitcoin behaves like a volatile tech stock in the short term, but we believe it is something fundamentally different: the best savings technology ever invented. A decentralised, scarce, programmable monetary network with no counterparty risk. The monetisation of a new store of value is a generational event — perhaps a millennium event.
+              {t('about.bitcoinBody2')}
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              We believe Bitcoin represents the most asymmetric bet in the history of financial markets. But capturing that asymmetry requires one thing above all else: the ability to hold through volatility. And that's where most people fail — not because the thesis is wrong, but because the emotional cost of conviction is brutally high.
+              {t('about.bitcoinBody3')}
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Holzen exists to help people hold — with awareness. We don't tell you what to do. We help you pause long enough to notice your impulse, name it, and choose deliberately. Your reflection library, mood patterns, and outcome tracking become a mirror: proof that you can sit with discomfort and come out the other side with your conviction intact.
+              {t('about.bitcoinBody4')}
             </p>
           </div>
         </motion.div>
@@ -110,16 +112,16 @@ const About = () => {
         <motion.div {...m(0.1)}>
           <div className="space-y-4">
             <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
-              Our philosophy
+              {t('about.ourPhilosophy')}
             </p>
             <p className="text-sm text-foreground leading-relaxed">
-              Holzen is a micropreneur project — small by design.
+              {t('about.philosophyBody1')}
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              We don't have investors, a growth team, or a roadmap optimised for scale. We have a focused product, a <Link to="/roadmap" className="underline hover:text-foreground transition-colors">public roadmap</Link> shaped by user votes, a clear price, and users who value what we build. That's the model.
+              {t('about.philosophyBody2')}
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              We believe the best software is often built by small teams — or even individuals — who care deeply about the problem they're solving. No engagement metrics, no dark patterns, no pressure to grow at all costs. Just a useful tool that earns its place by being genuinely helpful.
+              {t('about.philosophyBody3')}
             </p>
           </div>
         </motion.div>
@@ -128,19 +130,19 @@ const About = () => {
         <motion.div {...m(0.1)}>
           <div className="space-y-4">
             <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
-              BTC Reserve
+              {t('about.btcReserve')}
             </p>
             <p className="text-sm text-foreground leading-relaxed">
-              We hold what we help others hold.
+              {t('about.reserveBody1')}
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Holzen maintains a Bitcoin reserve as a long-term store of value — not as speculation, but as a statement of conviction. We believe a product that helps people hold should itself hold.
+              {t('about.reserveBody2')}
             </p>
             <Link
               to="/reserve"
               className="inline-flex items-center gap-1.5 text-xs font-mono text-primary hover:text-primary/80 transition-colors"
             >
-              Read our full reserve strategy →
+              {t('about.readReserveStrategy')}
             </Link>
           </div>
         </motion.div>
@@ -149,13 +151,13 @@ const About = () => {
         <motion.div {...m(0.1)}>
           <div className="space-y-4">
             <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
-              About us
+              {t('about.aboutUs')}
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Holzen is built by a husband-and-wife team. We're Bitcoin holders ourselves, and we built this tool because we needed it. The moments of highest volatility are the moments we're most tempted to act — and we've learned, sometimes the hard way, that pausing almost always leads to better decisions.
+              {t('about.aboutUsBody1')}
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              We hope Holzen can do the same for you.
+              {t('about.aboutUsBody2')}
             </p>
           </div>
         </motion.div>
@@ -163,13 +165,13 @@ const About = () => {
         {/* Footer */}
         <motion.div {...m()}>
           <div className="flex items-center gap-3 text-xs text-muted-foreground pt-4 border-t border-border">
-            <Link to="/welcome" className="hover:text-foreground transition-colors">Home</Link>
+            <Link to="/welcome" className="hover:text-foreground transition-colors">{t('about.home')}</Link>
             <span>·</span>
-            <Link to="/terms" className="hover:text-foreground transition-colors">Terms</Link>
+            <Link to="/terms" className="hover:text-foreground transition-colors">{t('about.terms')}</Link>
             <span>·</span>
-            <Link to="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
+            <Link to="/privacy" className="hover:text-foreground transition-colors">{t('about.privacy')}</Link>
             <span>·</span>
-            <a href="mailto:hello@holzen.app" className="hover:text-foreground transition-colors">Contact</a>
+            <a href="mailto:hello@holzen.app" className="hover:text-foreground transition-colors">{t('about.contact')}</a>
           </div>
         </motion.div>
       </div>
