@@ -45,6 +45,7 @@ export const ReflectionMessage = forwardRef<HTMLDivElement, Props>(function Refl
           severity={severity}
           reflectionId={reflectionId}
           context={context}
+          reflectionMessage={message}
         />
       )}
     </div>
