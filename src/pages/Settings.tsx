@@ -222,7 +222,7 @@ const Settings = () => {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">
-          Settings
+          {t('settings.title')}
         </h1>
         <button
           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
