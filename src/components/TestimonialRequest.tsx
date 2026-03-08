@@ -86,8 +86,8 @@ export function TestimonialRequest({ reflectionCount }: Props) {
   }, [reflectionCount]);
 
   useEffect(() => {
-    if (profile?.first_name) setDisplayName(profile.first_name);
-  }, [profile?.first_name]);
+    if (firstName) setDisplayName(firstName);
+  }, [firstName]);
 
   const dismiss = () => {
     localStorage.setItem(DISMISS_KEY, new Date().toISOString());
