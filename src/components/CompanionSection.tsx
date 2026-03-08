@@ -542,7 +542,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
 
       {hasBreathing && (
         <CollapsibleCompanion
-          label={t.breathe}
+          label={labels.breathe}
           expanded={expandedBreathing}
           onToggle={() => setExpandedBreathing((v) => !v)}
           completed={completion.breathing}
