@@ -259,7 +259,7 @@ const Landing = () => {
               {t('landing.scienceDesc')}
             </p>
             <p className="text-[10px] text-muted-foreground/50 leading-relaxed">
-              Kahneman, D. (2011). <em>Thinking, Fast and Slow</em>. · Barber, B. & Odean, T. (2000). "Trading Is Hazardous to Your Wealth."
+              <a href="https://en.wikipedia.org/wiki/Thinking,_Fast_and_Slow" target="_blank" rel="noopener noreferrer" className="underline hover:text-muted-foreground transition-colors">Kahneman, D. (2011). <em>Thinking, Fast and Slow</em></a>. · <a href="https://doi.org/10.1111/0022-1082.00226" target="_blank" rel="noopener noreferrer" className="underline hover:text-muted-foreground transition-colors">Barber, B. & Odean, T. (2000). "Trading Is Hazardous to Your Wealth."</a> · <a href="https://en.wikipedia.org/wiki/Misbehaving_(book)" target="_blank" rel="noopener noreferrer" className="underline hover:text-muted-foreground transition-colors">Thaler, R. (2015). <em>Misbehaving</em></a>.
             </p>
           </div>
         </Section>
