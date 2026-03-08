@@ -188,6 +188,8 @@ const Profile = () => {
         ) : (
           <BadgesPanel reflections={reflections} />
         )
+      ) : tab === 'activity' ? (
+        <HistoryContent />
       ) : (
         lettersLoading ? (
           <div className="space-y-3">
