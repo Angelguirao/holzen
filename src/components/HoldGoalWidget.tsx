@@ -313,7 +313,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
             {years > 0 ? `${years}y ${days}d` : `${elapsed} day${elapsed !== 1 ? 's' : ''}`} and counting
           </span>
           <p className="text-[9px] font-mono text-muted-foreground/40">
-            Since {format(start, 'MMM d, yyyy')} · No end date
+            Since {format(start, 'MMM d, yyyy')}{elapsed > 0 ? ` · ${elapsed} day${elapsed !== 1 ? 's' : ''} ago` : ''} · No end date
           </p>
         </div>
       </div>
