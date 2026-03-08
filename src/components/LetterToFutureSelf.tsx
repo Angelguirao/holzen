@@ -28,7 +28,7 @@ const WRITING_PROMPTS = {
     "What would your calm self say to your excited self?",
     "Write what you know to be true right now.",
   ],
-  ath: [
+  surge: [
     "What do you want to remember when fear takes over?",
     "What would your grounded self tell your panicking self?",
     "Write what this moment has taught you.",
