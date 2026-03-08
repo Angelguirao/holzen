@@ -118,7 +118,7 @@ export default function Library() {
 
         <TabsContent value="bookmarks" className="mt-3 space-y-1.5">
           {filtered.map((item) => (
-            <LibraryItemCard key={item.id} item={item} onTogglePin={togglePin} onDelete={deleteItem} />
+            <LibraryItemCard key={item.id} item={item} onTogglePin={togglePin} onDelete={deleteItem} onStatusChange={handleStatusChange} />
           ))}
           {filtered.length === 0 && (
             <p className="text-xs text-muted-foreground/40 text-center py-8 font-mono">
