@@ -208,7 +208,7 @@ serve(async (req) => {
       let aiInsight: string | null = null;
       if (LOVABLE_API_KEY && reflectionCount > 0) {
         aiInsight = await generateAIInsight(
-          reflectionCount, topMood, steadyCount, weekDir, absWeekChange, LOVABLE_API_KEY
+          reflectionCount, topMood, steadyCount, weekDir, absWeekChange, LOVABLE_API_KEY, (profile as any).language
         );
       }
 
