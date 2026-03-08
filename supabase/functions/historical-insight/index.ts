@@ -40,8 +40,6 @@ serve(async (req) => {
     const langCode = language || "en";
     const langName = LANG_NAMES[langCode] || "English";
     const langInstruction = langCode !== "en" ? `\n\nLANGUAGE: Write the title, body, and analogy in ${langName}. Keep source URLs as-is.` : "";
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
     const systemPrompt = `You are a financial historian specializing in Bitcoin and broader market history. Given the current market context, provide ONE historical insight that helps a Bitcoin holder see today's moment through the lens of history.
 
