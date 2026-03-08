@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS companion_zoom_out boolean NOT NULL DEFAULT true;
