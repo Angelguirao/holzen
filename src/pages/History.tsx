@@ -619,6 +619,36 @@ const History = () => {
       {/* Timeline tab */}
       {tab === 'timeline' ? (
         <VolatilityTimeline />
+      ) : tab === 'recent' && viewMode === 'calendar' ? (
+        <div className="space-y-4">
+          <HistoryCalendar
+            activities={calendarActivities}
+            selectedDate={calendarDate}
+            onSelectDate={setCalendarDate}
+            activeFilters={calendarFilters}
+            onToggleFilter={toggleCalendarFilter}
+          />
+          {/* Show reflections for selected day */}
+          {calendarDate && displayedReflections.length > 0 && (
+            <div className="space-y-1.5 pt-2">
+              <p className="text-[10px] font-mono text-muted-foreground/50 uppercase tracking-wider">
+                {displayedReflections.length} reflection{displayedReflections.length !== 1 ? 's' : ''}
+              </p>
+            </div>
+          )}
+          {calendarDate && displayedReflections.length === 0 && (
+            <div className="py-4 text-center">
+              <p className="text-xs text-muted-foreground/50 italic">No reflections on this day.</p>
+            </div>
+          )}
+          {calendarDate && displayedReflections.length > 0 && (
+            <div className="space-y-3">
+              {displayedReflections.map((r) => (
+                <ReflectionCard key={r.id} r={r} currency={currency} t={t} toggleFavorite={toggleFavorite} pinReflection={pinReflection} deleteReflection={deleteReflection} />
+              ))}
+            </div>
+          )}
+        </div>
       ) : loading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
