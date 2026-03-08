@@ -73,12 +73,12 @@ const Landing = () => {
     { icon: <Mail />, label: t('landing.features.letters'), desc: t('landing.features.lettersDesc') },
     { icon: <Sparkles />, label: t('landing.features.personalization'), desc: t('landing.features.personalizationDesc') },
     { icon: <BarChart3 />, label: t('landing.features.profileStats'), desc: t('landing.features.profileStatsDesc') },
-    { icon: <Globe />, label: t('landing.features.multilanguage'), desc: t('landing.features.multilanguageDesc') },
     { icon: <Award />, label: t('landing.features.badges'), desc: t('landing.features.badgesDesc') },
     { icon: <Shield />, label: t('landing.features.privacy'), desc: t('landing.features.privacyDesc') },
     { icon: <Moon />, label: t('landing.features.mindfulSpaces'), desc: t('landing.features.mindfulSpacesDesc') },
     { icon: <Globe />, label: t('landing.features.globalDefault'), desc: t('landing.features.globalDefaultDesc') },
     { icon: <MessageCircle />, label: t('landing.features.shareTrack'), desc: t('landing.features.shareTrackDesc') },
+    { icon: <BarChart3 />, label: t('landing.features.activityLog'), desc: t('landing.features.activityLogDesc') },
   ];
 
   const FAQ = [
