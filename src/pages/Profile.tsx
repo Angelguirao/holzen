@@ -9,7 +9,7 @@ import { InsightsPanel } from '@/components/InsightsPanel';
 import { DecisionQualityCard } from '@/components/DecisionQualityCard';
 import { StreakTimeline } from '@/components/StreakTimeline';
 import { AIInsightsPanel } from '@/components/AIInsightsPanel';
-import { MoodTrends } from '@/components/MoodTrends';
+
 import { BadgesPanel } from '@/components/BadgesPanel';
 import { ReferralSection } from '@/components/ReferralSection';
 import { MoodPriceChart } from '@/components/MoodPriceChart';
