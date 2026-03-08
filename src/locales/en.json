@@ -623,5 +623,51 @@
     "youChose": "You chose deliberately.",
     "return": "Return",
     "noReflection": "No active reflection. Go back to trigger one."
+  },
+  "reflectionNote": {
+    "addNote": "Add a note",
+    "placeholder": "Write a note…",
+    "saved": "Saved"
+  },
+  "reflectionTags": {
+    "addTags": "Add tags",
+    "typeTag": "Type a tag…"
+  },
+  "letter": {
+    "calmTitle": "Calm letter",
+    "stormTitle": "Storm letter",
+    "calmDesc": "The market is quiet. Write to your future self — this letter will arrive when volatility strikes.",
+    "crashDesc": "The market is falling. Write something to yourself — you'll receive it during the next surge.",
+    "surgeDesc": "The market is surging. Write something to yourself — you'll receive it during the next drop.",
+    "seal": "Seal letter",
+    "sealing": "Sealing…"
+  },
+  "testimonial": {
+    "title": "Enjoying Holzen?",
+    "subtitle": "Share a short quote about your experience — it may appear on our landing page.",
+    "placeholder": "e.g. \"Holzen helped me stop panic-selling during dips.\"",
+    "submit": "Submit",
+    "thanks": "Thank you! Your testimonial is under review.",
+    "nameLabel": "Display name",
+    "namePlaceholder": "How you'd like to appear",
+    "failed": "Failed to submit"
+  },
+  "wallpaper": {
+    "generating": "Generating your wallpaper…",
+    "carry": "Carry your composure with you"
+  },
+  "ambient": {
+    "calm": "Markets are quiet",
+    "moderate": "Some movement",
+    "intense": "High volatility",
+    "breathe": "Breathe with the circle"
+  },
+  "share": {
+    "share": "Share",
+    "copyText": "Copy text",
+    "copied": "Copied to clipboard",
+    "saveAsImage": "Save as image",
+    "shareOnX": "Share on X"
   }
+}
 }
