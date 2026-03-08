@@ -5,10 +5,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useHolzen } from '@/hooks/use-holzen';
 import { formatBtcPrice } from '@/lib/btc';
-import { format, subDays, isAfter, isBefore, startOfDay, endOfDay, isSameDay } from 'date-fns';
+import { format, isAfter, isBefore, startOfDay, endOfDay, isSameDay } from 'date-fns';
 import { X, Star, Search, Pin, Info, TrendingUp, TrendingDown, Clock, History as HistoryIcon, ExternalLink, ArrowRight, ChevronDown, CalendarIcon, Filter, List, LayoutGrid } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { VolatilityTimeline } from '@/components/VolatilityTimeline';
 import { ShareReflection } from '@/components/ShareReflection';
 import { ReflectionNote } from '@/components/ReflectionNote';
 import { ReflectionWallpaper } from '@/components/ReflectionWallpaper';
@@ -185,7 +184,6 @@ const HistoryContent = ({ viewMode: externalViewMode, onViewModeChange }: Histor
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const [tab, setTab] = useState<'recent' | 'library' | 'timeline'>('recent');
   const [internalViewMode, setInternalViewMode] = useState<'list' | 'calendar'>('list');
   const viewMode = externalViewMode ?? internalViewMode;
   const setViewMode = onViewModeChange ?? setInternalViewMode;
@@ -199,8 +197,6 @@ const HistoryContent = ({ viewMode: externalViewMode, onViewModeChange }: Histor
   const [calendarDate, setCalendarDate] = useState<Date | null>(null);
   const [calendarFilters, setCalendarFilters] = useState<Set<ActivityType>>(new Set(['reflection', 'ritual', 'letter', 'badge']));
   const [calendarActivities, setCalendarActivities] = useState<CalendarActivity[]>([]);
-
-  // No separate title — managed by parent Library page
 
   useEffect(() => {
     if (!user) return;
@@ -219,7 +215,7 @@ const HistoryContent = ({ viewMode: externalViewMode, onViewModeChange }: Histor
     loadReflections();
   }, [user]);
 
-  // Load calendar activities (all reflections + rituals + letters + badges)
+  // Load calendar activities
   useEffect(() => {
     if (!user) return;
     const loadActivities = async () => {
@@ -231,7 +227,6 @@ const HistoryContent = ({ viewMode: externalViewMode, onViewModeChange }: Histor
       ]);
 
       const activities: CalendarActivity[] = [];
-
       (allReflections ?? []).forEach((r: any) => {
         activities.push({ date: r.created_at, type: 'reflection', mood: r.mood, id: r.id });
       });
@@ -244,7 +239,6 @@ const HistoryContent = ({ viewMode: externalViewMode, onViewModeChange }: Histor
       (badges ?? []).forEach((b: any) => {
         activities.push({ date: b.earned_at, type: 'badge', id: b.id, label: b.badge_id });
       });
-
       setCalendarActivities(activities);
     };
     loadActivities();
@@ -309,13 +303,6 @@ const HistoryContent = ({ viewMode: externalViewMode, onViewModeChange }: Histor
     }
   }, []);
 
-  const sevenDaysAgo = useMemo(() => subDays(new Date(), 7), []);
-
-  const recentReflections = useMemo(
-    () => reflections.filter((r) => isAfter(new Date(r.created_at), sevenDaysAgo)),
-    [reflections, sevenDaysAgo]
-  );
-
   const allTags = useMemo(() => {
     const set = new Set<string>();
     reflections.forEach((r) => r.tags?.forEach((t) => set.add(t)));
@@ -326,49 +313,21 @@ const HistoryContent = ({ viewMode: externalViewMode, onViewModeChange }: Histor
 
   const filtered = useMemo(() => {
     let result = filter === 'favorites' ? reflections.filter((r) => r.is_favorite) : reflections;
-    if (tagFilter) {
-      result = result.filter((r) => r.tags?.includes(tagFilter));
-    }
-    if (moodFilter) {
-      result = result.filter((r) => r.mood === moodFilter);
-    }
-    if (dateFrom) {
-      result = result.filter((r) => isAfter(new Date(r.created_at), startOfDay(dateFrom)));
-    }
-    if (dateTo) {
-      result = result.filter((r) => isBefore(new Date(r.created_at), endOfDay(dateTo)));
-    }
+    if (tagFilter) result = result.filter((r) => r.tags?.includes(tagFilter));
+    if (moodFilter) result = result.filter((r) => r.mood === moodFilter);
+    if (dateFrom) result = result.filter((r) => isAfter(new Date(r.created_at), startOfDay(dateFrom)));
+    if (dateTo) result = result.filter((r) => isBefore(new Date(r.created_at), endOfDay(dateTo)));
     if (search.trim()) {
       const q = search.toLowerCase();
       result = result.filter(
         (r) => r.message.toLowerCase().includes(q) || r.context?.toLowerCase().includes(q) || r.note?.toLowerCase().includes(q) || r.tags?.some((t) => t.toLowerCase().includes(q))
       );
     }
-    return result;
-  }, [reflections, filter, tagFilter, moodFilter, dateFrom, dateTo, search]);
-
-  const filteredRecent = useMemo(() => {
-    let result = recentReflections;
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      result = result.filter(
-        (r) => r.message.toLowerCase().includes(q) || r.context?.toLowerCase().includes(q) || r.note?.toLowerCase().includes(q) || r.tags?.some((t) => t.toLowerCase().includes(q))
-      );
-    }
-    // If calendar view with a selected date, filter to that day
     if (viewMode === 'calendar' && calendarDate) {
-      result = reflections.filter((r) => isSameDay(new Date(r.created_at), calendarDate));
-      if (search.trim()) {
-        const q = search.toLowerCase();
-        result = result.filter(
-          (r) => r.message.toLowerCase().includes(q) || r.context?.toLowerCase().includes(q) || r.note?.toLowerCase().includes(q) || r.tags?.some((t) => t.toLowerCase().includes(q))
-        );
-      }
+      result = result.filter((r) => isSameDay(new Date(r.created_at), calendarDate));
     }
     return result;
-  }, [recentReflections, reflections, search, viewMode, calendarDate]);
-
-  const displayedReflections = tab === 'recent' ? filteredRecent : filtered;
+  }, [reflections, filter, tagFilter, moodFilter, dateFrom, dateTo, search, viewMode, calendarDate]);
 
   const hasActiveFilters = !!tagFilter || !!moodFilter || !!dateFrom || !!dateTo || filter === 'favorites';
 
@@ -382,248 +341,205 @@ const HistoryContent = ({ viewMode: externalViewMode, onViewModeChange }: Histor
   }, []);
 
   return (
-    <div className="space-y-6">
-      {/* Header with tabs */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-6">
+    <div className="space-y-4">
+      {/* Header row: count + view toggle */}
+      <div className="flex items-center justify-between">
+        <p className="text-xs text-muted-foreground font-mono">
+          {t('history.reflectionsOf', { filtered: filtered.length, total: reflections.length, count: reflections.length })}
+        </p>
+        <div className="flex items-center gap-1 rounded-md border border-border/40 p-0.5">
           <button
-            onClick={() => setTab('recent')}
-            className={`text-sm font-mono tracking-widest uppercase transition-colors ${
-              tab === 'recent' ? 'text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
-            }`}
+            onClick={() => { setViewMode('list'); setCalendarDate(null); }}
+            className={cn(
+              'p-1 rounded transition-colors',
+              viewMode === 'list' ? 'bg-muted text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
+            )}
+            aria-label="List view"
           >
-            {t('history.recent')}
+            <List className="h-3.5 w-3.5" />
           </button>
           <button
-            onClick={() => setTab('library')}
-            className={`text-sm font-mono tracking-widest uppercase transition-colors ${
-              tab === 'library' ? 'text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
-            }`}
+            onClick={() => setViewMode('calendar')}
+            className={cn(
+              'p-1 rounded transition-colors',
+              viewMode === 'calendar' ? 'bg-muted text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
+            )}
+            aria-label="Calendar view"
           >
-            {t('history.library')}
+            <LayoutGrid className="h-3.5 w-3.5" />
           </button>
-          <button
-            onClick={() => setTab('timeline')}
-            className={`text-sm font-mono tracking-widest uppercase transition-colors ${
-              tab === 'timeline' ? 'text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
-            }`}
-          >
-            {t('history.timeline')}
-          </button>
-          <div className="flex-1" />
-          {tab === 'recent' && (
-            <div className="flex items-center gap-1 rounded-md border border-border/40 p-0.5">
-              <button
-                onClick={() => { setViewMode('list'); setCalendarDate(null); }}
-                className={cn(
-                  'p-1 rounded transition-colors',
-                  viewMode === 'list' ? 'bg-muted text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
-                )}
-                aria-label="List view"
-              >
-                <List className="h-3.5 w-3.5" />
-              </button>
-              <button
-                onClick={() => setViewMode('calendar')}
-                className={cn(
-                  'p-1 rounded transition-colors',
-                  viewMode === 'calendar' ? 'bg-muted text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
-                )}
-                aria-label="Calendar view"
-              >
-                <LayoutGrid className="h-3.5 w-3.5" />
-              </button>
-            </div>
-          )}
         </div>
-         {tab !== 'timeline' && viewMode !== 'calendar' && (
-          <p className="text-xs text-muted-foreground">
-            {tab === 'recent'
-              ? t('history.reflectionsInLast7Days', { count: filteredRecent.length })
-              : t('history.reflectionsOf', { filtered: filtered.length, total: reflections.length, count: reflections.length })}
-          </p>
+      </div>
+
+      {/* Search + filters */}
+      <div className="space-y-3">
+        {reflections.length > 3 && (
+          <div className="relative">
+            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground/50" />
+            <input
+              type="text"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder={t('history.searchReflections')}
+              className="w-full rounded-md border border-border/60 bg-muted/30 pl-8 pr-8 py-2 text-xs font-mono text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-ring"
+            />
+            {search && (
+              <button onClick={() => setSearch('')} className="absolute right-2.5 top-1/2 -translate-y-1/2">
+                <X className="h-3 w-3 text-muted-foreground/50 hover:text-muted-foreground" />
+              </button>
+            )}
+          </div>
+        )}
+
+        <div className="flex items-center gap-3">
+          <div className="flex gap-3">
+            <button
+              onClick={() => setFilter('all')}
+              className={`text-xs font-mono transition-colors ${filter === 'all' ? 'text-foreground' : 'text-muted-foreground'}`}
+            >
+              {t('history.all')}
+            </button>
+            <button
+              onClick={() => setFilter('favorites')}
+              className={`text-xs font-mono transition-colors ${filter === 'favorites' ? 'text-foreground' : 'text-muted-foreground'}`}
+            >
+              {t('history.favorites')}
+            </button>
+          </div>
+          <div className="flex-1" />
+          <button
+            onClick={() => setShowFilters(!showFilters)}
+            className={`flex items-center gap-1.5 text-[10px] font-mono transition-colors ${
+              showFilters || hasActiveFilters ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
+            }`}
+          >
+            <Filter className="h-3 w-3" />
+            {t('history.filters')}
+            {hasActiveFilters && (
+              <span className="h-3.5 w-3.5 rounded-full bg-primary text-primary-foreground text-[8px] flex items-center justify-center">
+                {[tagFilter, moodFilter, dateFrom, dateTo, filter === 'favorites'].filter(Boolean).length}
+              </span>
+            )}
+          </button>
+        </div>
+
+        {showFilters && (
+          <div className="space-y-3 rounded-md border border-border/60 bg-muted/20 p-3">
+            {/* Date range */}
+            <div className="space-y-1.5">
+              <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">{t('history.dateRange')}</p>
+              <div className="flex items-center gap-2">
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button className={cn(
+                      "flex items-center gap-1.5 rounded-md border border-border/60 px-2 py-1.5 text-[10px] font-mono transition-colors",
+                      dateFrom ? "text-foreground" : "text-muted-foreground/50"
+                    )}>
+                      <CalendarIcon className="h-3 w-3" />
+                      {dateFrom ? format(dateFrom, 'MMM d, yyyy') : t('common.from')}
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={dateFrom}
+                      onSelect={setDateFrom}
+                      disabled={(date) => date > new Date() || (dateTo ? date > dateTo : false)}
+                      initialFocus
+                      className={cn("p-3 pointer-events-auto")}
+                    />
+                  </PopoverContent>
+                </Popover>
+                <span className="text-[10px] text-muted-foreground/40">→</span>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <button className={cn(
+                      "flex items-center gap-1.5 rounded-md border border-border/60 px-2 py-1.5 text-[10px] font-mono transition-colors",
+                      dateTo ? "text-foreground" : "text-muted-foreground/50"
+                    )}>
+                      <CalendarIcon className="h-3 w-3" />
+                      {dateTo ? format(dateTo, 'MMM d, yyyy') : t('common.until')}
+                    </button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <Calendar
+                      mode="single"
+                      selected={dateTo}
+                      onSelect={setDateTo}
+                      disabled={(date) => date > new Date() || (dateFrom ? date < dateFrom : false)}
+                      initialFocus
+                      className={cn("p-3 pointer-events-auto")}
+                    />
+                  </PopoverContent>
+                </Popover>
+                {(dateFrom || dateTo) && (
+                  <button
+                    onClick={() => { setDateFrom(undefined); setDateTo(undefined); }}
+                    className="text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                )}
+              </div>
+            </div>
+
+            {/* Mood filter */}
+            <div className="space-y-1.5">
+              <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">{t('history.mood')}</p>
+              <div className="flex flex-wrap gap-1">
+                {moods.map((m) => (
+                  <button
+                    key={m}
+                    onClick={() => setMoodFilter(moodFilter === m ? null : m)}
+                    className={`text-[10px] font-mono px-1.5 py-0.5 rounded capitalize transition-colors ${
+                      moodFilter === m
+                        ? 'bg-primary/10 text-primary'
+                        : 'border border-border/60 text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    {m}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Tag filter */}
+            {allTags.length > 0 && (
+              <div className="space-y-1.5">
+                <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">{t('history.tags')}</p>
+                <div className="flex flex-wrap gap-1">
+                  {allTags.map((tag) => (
+                    <button
+                      key={tag}
+                      onClick={() => setTagFilter(tagFilter === tag ? null : tag)}
+                      className={`text-[10px] font-mono px-1.5 py-0.5 rounded transition-colors ${
+                        tagFilter === tag
+                          ? 'bg-primary/10 text-primary'
+                          : 'border border-border/60 text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      {tag}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Clear all */}
+            {hasActiveFilters && (
+              <button
+                onClick={clearAllFilters}
+                className="text-[10px] font-mono text-muted-foreground hover:text-foreground transition-colors underline underline-offset-2"
+              >
+                {t('history.clearAllFilters')}
+              </button>
+            )}
+          </div>
         )}
       </div>
 
-      {/* Search & filters (available on recent + library) */}
-      {tab !== 'timeline' && (
-        <div className="space-y-3">
-          {/* Search bar */}
-          {reflections.length > 3 && (
-            <div className="relative">
-              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground/50" />
-              <input
-                type="text"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                placeholder={t('history.searchReflections')}
-                className="w-full rounded-md border border-border/60 bg-muted/30 pl-8 pr-8 py-2 text-xs font-mono text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-ring"
-              />
-              {search && (
-                <button onClick={() => setSearch('')} className="absolute right-2.5 top-1/2 -translate-y-1/2">
-                  <X className="h-3 w-3 text-muted-foreground/50 hover:text-muted-foreground" />
-                </button>
-              )}
-            </div>
-          )}
-
-          {/* Filter toggle + active filter badges */}
-          {tab === 'library' && (
-            <div className="space-y-3">
-              <div className="flex items-center gap-3">
-                <div className="flex gap-3">
-                  <button
-                    onClick={() => setFilter('all')}
-                    className={`text-xs font-mono transition-colors ${filter === 'all' ? 'text-foreground' : 'text-muted-foreground'}`}
-                  >
-                    {t('history.all')}
-                  </button>
-                  <button
-                    onClick={() => setFilter('favorites')}
-                    className={`text-xs font-mono transition-colors ${filter === 'favorites' ? 'text-foreground' : 'text-muted-foreground'}`}
-                  >
-                    {t('history.favorites')}
-                  </button>
-                </div>
-                <div className="flex-1" />
-                <button
-                  onClick={() => setShowFilters(!showFilters)}
-                  className={`flex items-center gap-1.5 text-[10px] font-mono transition-colors ${
-                    showFilters || hasActiveFilters ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  <Filter className="h-3 w-3" />
-                  {t('history.filters')}
-                  {hasActiveFilters && (
-                    <span className="h-3.5 w-3.5 rounded-full bg-primary text-primary-foreground text-[8px] flex items-center justify-center">
-                      {[tagFilter, moodFilter, dateFrom, dateTo, filter === 'favorites'].filter(Boolean).length}
-                    </span>
-                  )}
-                </button>
-              </div>
-
-              {showFilters && (
-                <div className="space-y-3 rounded-md border border-border/60 bg-muted/20 p-3">
-                  {/* Date range */}
-                  <div className="space-y-1.5">
-                    <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">{t('history.dateRange')}</p>
-                    <div className="flex items-center gap-2">
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <button className={cn(
-                            "flex items-center gap-1.5 rounded-md border border-border/60 px-2 py-1.5 text-[10px] font-mono transition-colors",
-                            dateFrom ? "text-foreground" : "text-muted-foreground/50"
-                          )}>
-                            <CalendarIcon className="h-3 w-3" />
-                            {dateFrom ? format(dateFrom, 'MMM d, yyyy') : t('common.from')}
-                          </button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={dateFrom}
-                            onSelect={setDateFrom}
-                            disabled={(date) => date > new Date() || (dateTo ? date > dateTo : false)}
-                            initialFocus
-                            className={cn("p-3 pointer-events-auto")}
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <span className="text-[10px] text-muted-foreground/40">→</span>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <button className={cn(
-                            "flex items-center gap-1.5 rounded-md border border-border/60 px-2 py-1.5 text-[10px] font-mono transition-colors",
-                            dateTo ? "text-foreground" : "text-muted-foreground/50"
-                          )}>
-                            <CalendarIcon className="h-3 w-3" />
-                            {dateTo ? format(dateTo, 'MMM d, yyyy') : t('common.until')}
-                          </button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={dateTo}
-                            onSelect={setDateTo}
-                            disabled={(date) => date > new Date() || (dateFrom ? date < dateFrom : false)}
-                            initialFocus
-                            className={cn("p-3 pointer-events-auto")}
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      {(dateFrom || dateTo) && (
-                        <button
-                          onClick={() => { setDateFrom(undefined); setDateTo(undefined); }}
-                          className="text-[10px] text-muted-foreground hover:text-foreground transition-colors"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* Mood filter */}
-                  <div className="space-y-1.5">
-                    <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">{t('history.mood')}</p>
-                    <div className="flex flex-wrap gap-1">
-                      {moods.map((m) => (
-                        <button
-                          key={m}
-                          onClick={() => setMoodFilter(moodFilter === m ? null : m)}
-                          className={`text-[10px] font-mono px-1.5 py-0.5 rounded capitalize transition-colors ${
-                            moodFilter === m
-                              ? 'bg-primary/10 text-primary'
-                              : 'border border-border/60 text-muted-foreground hover:text-foreground'
-                          }`}
-                        >
-                          {m}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Tag filter */}
-                  {allTags.length > 0 && (
-                    <div className="space-y-1.5">
-                      <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">{t('history.tags')}</p>
-                      <div className="flex flex-wrap gap-1">
-                        {allTags.map((tag) => (
-                          <button
-                            key={tag}
-                            onClick={() => setTagFilter(tagFilter === tag ? null : tag)}
-                            className={`text-[10px] font-mono px-1.5 py-0.5 rounded transition-colors ${
-                              tagFilter === tag
-                                ? 'bg-primary/10 text-primary'
-                                : 'border border-border/60 text-muted-foreground hover:text-foreground'
-                            }`}
-                          >
-                            {tag}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Clear all */}
-                  {hasActiveFilters && (
-                    <button
-                      onClick={clearAllFilters}
-                      className="text-[10px] font-mono text-muted-foreground hover:text-foreground transition-colors underline underline-offset-2"
-                    >
-                      {t('history.clearAllFilters')}
-                    </button>
-                  )}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* Timeline tab */}
-      {tab === 'timeline' ? (
-        <VolatilityTimeline />
-      ) : tab === 'recent' && viewMode === 'calendar' ? (
+      {/* Calendar view */}
+      {viewMode === 'calendar' ? (
         <div className="space-y-4">
           <HistoryCalendar
             activities={calendarActivities}
@@ -632,14 +548,10 @@ const HistoryContent = ({ viewMode: externalViewMode, onViewModeChange }: Histor
             activeFilters={calendarFilters}
             onToggleFilter={toggleCalendarFilter}
           />
-          {/* Show reflections for selected day */}
-          {calendarDate && displayedReflections.length > 0 && (
+          {calendarDate && filtered.length > 0 && (
             <div className="space-y-3">
-              {displayedReflections.map((r) => (
-                <div
-                  key={r.id}
-                  className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2"
-                >
+              {filtered.map((r) => (
+                <div key={r.id} className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2">
                   <div className="flex items-start justify-between gap-2">
                     <p className="text-xs font-mono text-muted-foreground">
                       {format(new Date(r.created_at), 'h:mm a')}
@@ -662,7 +574,7 @@ const HistoryContent = ({ viewMode: externalViewMode, onViewModeChange }: Histor
               ))}
             </div>
           )}
-          {calendarDate && displayedReflections.length === 0 && (
+          {calendarDate && filtered.length === 0 && (
             <div className="py-4 text-center">
               <p className="text-xs text-muted-foreground/50 italic">No reflections on this day.</p>
             </div>
@@ -678,25 +590,20 @@ const HistoryContent = ({ viewMode: externalViewMode, onViewModeChange }: Histor
             </div>
           ))}
         </div>
-      ) : displayedReflections.length === 0 ? (
+      ) : filtered.length === 0 ? (
         <div className="py-8 text-center space-y-2">
           <p className="text-xs text-muted-foreground">
-            {tab === 'recent'
-              ? t('history.noReflectionsRecent')
-              : search
-                ? t('history.noReflectionsSearch')
-                : filter === 'favorites'
-                  ? t('history.noFavorites')
-                  : t('history.noReflectionsYet')}
+            {search
+              ? t('history.noReflectionsSearch')
+              : filter === 'favorites'
+                ? t('history.noFavorites')
+                : t('history.noReflectionsYet')}
           </p>
         </div>
       ) : (
         <div className="space-y-3">
-          {displayedReflections.map((r) => (
-            <div
-              key={r.id}
-              className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2"
-            >
+          {filtered.map((r) => (
+            <div key={r.id} className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2">
               <div className="flex items-start justify-between gap-2">
                 <p className="text-xs font-mono text-muted-foreground">
                   {format(new Date(r.created_at), 'MMM d, yyyy · h:mm a')}

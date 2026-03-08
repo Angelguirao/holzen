@@ -14,7 +14,7 @@ const SwipeableNotification = forwardRef<HTMLDivElement, {
   n: NotificationItem;
   iconMap: Record<NotificationItem['type'], string>;
   onDismiss: (id: string) => void;
-  onAction: (path: string) => void;
+  onAction: (path: string, state?: Record<string, any>) => void;
 }>(function SwipeableNotification({
   n,
   iconMap,
@@ -95,7 +95,7 @@ const SwipeableNotification = forwardRef<HTMLDivElement, {
               </p>
               {n.action && (
                 <button
-                  onClick={() => onAction(n.action!.path)}
+                  onClick={() => onAction(n.action!.path, n.action!.state)}
                   className="flex items-center gap-0.5 text-[9px] font-mono text-primary/70 hover:text-primary transition-colors"
                 >
                   {n.action.label}
@@ -123,7 +123,7 @@ type NotificationItem = {
   title: string;
   subtitle: string;
   timestamp: string;
-  action?: { label: string; path: string };
+  action?: { label: string; path: string; state?: Record<string, any> };
 };
 
 const LAST_READ_KEY = 'holzen_notifications_read_at';
@@ -172,7 +172,7 @@ export function NotificationBell() {
         supabase.from('user_badges').select('id, badge_id, earned_at').eq('user_id', user!.id).order('earned_at', { ascending: false }).limit(10),
         supabase.from('night_reflections').select('id, message, created_at').eq('user_id', user!.id).order('created_at', { ascending: false }).limit(5),
         supabase.from('future_letters').select('id, delivered_at').eq('user_id', user!.id).eq('delivered', true).not('delivered_at', 'is', null).order('delivered_at', { ascending: false }).limit(5),
-        supabase.from('reflections').select('id, message, created_at').eq('user_id', user!.id).order('created_at', { ascending: false }).limit(5),
+        supabase.from('reflections').select('id, message, context, created_at, haiku, learning_title, learning_body').eq('user_id', user!.id).order('created_at', { ascending: false }).limit(5),
         supabase.from('ritual_completions').select('id, decision, created_at').eq('user_id', user!.id).order('created_at', { ascending: false }).limit(5),
         supabase.from('reflection_insights').select('id, generated_at, reflection_count').eq('user_id', user!.id).order('generated_at', { ascending: false }).limit(3),
       ]);
@@ -216,14 +216,29 @@ export function NotificationBell() {
       }
 
       if (reflections) {
-        for (const r of reflections) {
+        for (const r of reflections as any[]) {
           items.push({
             id: `reflection-${r.id}`,
             type: 'reflection',
             title: 'Reflection triggered',
             subtitle: r.message.slice(0, 60) + (r.message.length > 60 ? '…' : ''),
             timestamp: r.created_at,
-            action: { label: 'View in history', path: '/history' },
+            action: {
+              label: 'Pause with this',
+              path: '/pause',
+              state: {
+                reflectionMessage: r.message,
+                context: r.context,
+                reflectionId: r.id,
+                companions: {
+                  haiku: r.haiku ?? null,
+                  learningTitle: r.learning_title ?? null,
+                  learningBody: r.learning_body ?? null,
+                },
+                companionPrefs: { breathing: true, haiku: true, learning: true, signal: true, zoomOut: true, history: true },
+                severity: 'mild' as const,
+              },
+            },
           });
         }
       }
@@ -296,9 +311,9 @@ export function NotificationBell() {
     }
   }
 
-  const handleAction = useCallback((path: string) => {
+  const handleAction = useCallback((path: string, state?: Record<string, any>) => {
     setOpen(false);
-    navigate(path);
+    navigate(path, state ? { state } : undefined);
   }, [navigate]);
 
   const dismissOne = useCallback((id: string) => {
