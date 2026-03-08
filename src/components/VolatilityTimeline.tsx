@@ -90,20 +90,16 @@ export function VolatilityTimeline() {
   // Fetch price data capped to signup date
   useEffect(() => {
     setPriceLoading(true);
-    const days = Math.max(effectiveDays, 1);
+    const days = Math.max(effectiveDays, 7);
     fetch(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=${days}`)
       .then((r) => r.json())
       .then((data) => {
-        let prices: [number, number][] = data.prices ?? [];
-        if (memberSince) {
-          const signupTs = memberSince.getTime();
-          prices = prices.filter(([ts]) => ts >= signupTs);
-        }
+        const prices: [number, number][] = data.prices ?? [];
         setPriceData(prices);
         setPriceLoading(false);
       })
       .catch(() => setPriceLoading(false));
-  }, [effectiveDays, memberSince]);
+  }, [effectiveDays]);
 
   // Build chart data with reflections mapped to nearest price point
   const { chartData, reflectionPoints } = useMemo(() => {
