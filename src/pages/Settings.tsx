@@ -6,6 +6,7 @@ import { usePushNotifications } from '@/hooks/use-push-notifications';
 import { ThresholdSetting } from '@/components/ThresholdSetting';
 import { ReferralSection } from '@/components/ReferralSection';
 import { Changelog } from '@/components/Changelog';
+import { FeedbackForm } from '@/components/FeedbackForm';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -883,26 +884,29 @@ const Settings = () => {
               </span>
             )}
           </AccordionTrigger>
-          <AccordionContent className="space-y-3 pb-4">
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => {
-                  if (latestVersion) {
-                    localStorage.setItem(LAST_SEEN_VERSION_KEY, latestVersion);
-                    setHasNewVersion(false);
-                  }
-                }}
-                className="contents"
-              >
-                <Changelog />
-              </button>
-              <a href="/roadmap" target="_blank" rel="noopener noreferrer" className="text-xs font-mono text-muted-foreground underline">Roadmap</a>
+          <AccordionContent className="space-y-5 pb-4">
+            <FeedbackForm />
+            <div className="border-t border-border/30 pt-4 space-y-3">
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => {
+                    if (latestVersion) {
+                      localStorage.setItem(LAST_SEEN_VERSION_KEY, latestVersion);
+                      setHasNewVersion(false);
+                    }
+                  }}
+                  className="contents"
+                >
+                  <Changelog />
+                </button>
+                <a href="/roadmap" target="_blank" rel="noopener noreferrer" className="text-xs font-mono text-muted-foreground underline">Roadmap</a>
+              </div>
+              {latestVersion && (
+                <p className="text-[10px] font-mono text-muted-foreground/50">
+                  Holzen v{latestVersion}
+                </p>
+              )}
             </div>
-            {latestVersion && (
-              <p className="text-[10px] font-mono text-muted-foreground/50">
-                Holzen v{latestVersion}
-              </p>
-            )}
           </AccordionContent>
         </AccordionItem>
 
