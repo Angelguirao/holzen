@@ -56,10 +56,10 @@ const Landing = () => {
         <motion.div {...m(0.1)}>
           <div className="space-y-5">
             <p className="text-xl leading-relaxed text-foreground">
-              Understand how you respond to volatility — and grow calmer over time.
+              {t('landing.hero')}
             </p>
             <p className="text-sm text-muted-foreground leading-relaxed">
-              Holzen isn't a trading tool. It's a self-awareness practice. When Bitcoin moves, you get a moment to pause, reflect, and notice your patterns — before you act on impulse.
+              {t('landing.heroDesc')}
             </p>
           </div>
         </motion.div>
