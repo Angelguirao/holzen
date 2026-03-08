@@ -658,15 +658,9 @@ const History = () => {
               ))}
             </div>
           )}
+          {calendarDate && displayedReflections.length === 0 && (
             <div className="py-4 text-center">
               <p className="text-xs text-muted-foreground/50 italic">No reflections on this day.</p>
-            </div>
-          )}
-          {calendarDate && displayedReflections.length > 0 && (
-            <div className="space-y-3">
-              {displayedReflections.map((r) => (
-                <ReflectionCard key={r.id} r={r} currency={currency} t={t} toggleFavorite={toggleFavorite} pinReflection={pinReflection} deleteReflection={deleteReflection} />
-              ))}
             </div>
           )}
         </div>
