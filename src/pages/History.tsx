@@ -279,6 +279,7 @@ const History = () => {
                     <Star className={`h-3 w-3 ${r.is_favorite ? 'fill-current' : ''}`} />
                   </button>
                   <ShareReflection message={r.message} context={r.context} haiku={r.haiku} />
+                  <ReflectionWallpaper message={r.message} mood={r.mood} context={r.context} />
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <button
