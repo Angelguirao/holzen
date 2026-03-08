@@ -34,6 +34,10 @@ export default function Library() {
   const pinnedItems = filtered.filter((i) => i.pinned);
   const unpinnedItems = filtered.filter((i) => !i.pinned);
 
+  const handleStatusChange = async (id: string, status: 'unread' | 'read' | 'archived') => {
+    await updateItem(id, { status } as any);
+  };
+
   const handleNewNote = async (title: string, body: string, tags: string[]) => {
     await addItem({ type: 'note', title: title || null, body, tags });
   };
