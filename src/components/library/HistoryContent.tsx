@@ -172,7 +172,12 @@ function HistoryCompanions({ label, r }: { label: string; r: Reflection }) {
   );
 }
 
-const HistoryContent = () => {
+interface HistoryContentProps {
+  viewMode?: 'list' | 'calendar';
+  onViewModeChange?: (mode: 'list' | 'calendar') => void;
+}
+
+const HistoryContent = ({ viewMode: externalViewMode, onViewModeChange }: HistoryContentProps = {}) => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { currency } = useHolzen();
@@ -181,7 +186,9 @@ const HistoryContent = () => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [tab, setTab] = useState<'recent' | 'library' | 'timeline'>('recent');
-  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
+  const [internalViewMode, setInternalViewMode] = useState<'list' | 'calendar'>('list');
+  const viewMode = externalViewMode ?? internalViewMode;
+  const setViewMode = onViewModeChange ?? setInternalViewMode;
   const [filter, setFilter] = useState<'all' | 'favorites'>('all');
   const [tagFilter, setTagFilter] = useState<string | null>(null);
   const [moodFilter, setMoodFilter] = useState<string | null>(null);
