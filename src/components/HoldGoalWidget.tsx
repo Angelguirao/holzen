@@ -398,7 +398,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
             <span className="text-xs font-mono text-foreground/80">
-              {reached ? '🎉 Target reached!' : `$${diff.toLocaleString()} to go`}
+              {reached ? '🎉 Target reached!' : `${formatBtcPrice(diff, currency)} to go`}
             </span>
             <span className="text-[10px] font-mono text-muted-foreground/50">
               Target: ${target.toLocaleString()}
