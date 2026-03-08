@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { Home, Clock, BookOpen, User, Settings } from 'lucide-react';
+import { Home, BookOpen, User, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 
