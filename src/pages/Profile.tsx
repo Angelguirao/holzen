@@ -237,6 +237,8 @@ function StatsContent({ reflections, memberSince }: { reflections: Reflection[];
     return counts;
   }, [reflections]);
 
+  const hasEnoughForCharts = reflections.length >= 5;
+
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
@@ -255,10 +257,30 @@ function StatsContent({ reflections, memberSince }: { reflections: Reflection[];
       <InsightsPanel reflections={reflections} />
       <DecisionQualityCard reflections={reflections} />
       <RitualStatsCard />
-      <StatsTrends reflections={reflections} />
-      <MoodTrendChart reflections={reflections} />
-      <MoodPriceChart reflections={reflections} />
-      <MoodPriceScatter reflections={reflections} />
+
+      {hasEnoughForCharts ? (
+        <>
+          <StatsTrends reflections={reflections} />
+          <MoodTrendChart reflections={reflections} />
+          <MoodPriceChart reflections={reflections} />
+          <MoodPriceScatter reflections={reflections} />
+        </>
+      ) : (
+        <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-6 text-center space-y-2">
+          <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground/50">
+            Charts unlock soon
+          </p>
+          <p className="text-xs text-muted-foreground/60 leading-relaxed max-w-[240px] mx-auto">
+            Complete {5 - reflections.length} more reflection{5 - reflections.length !== 1 ? 's' : ''} to unlock trend charts, mood analysis, and scatter plots.
+          </p>
+          <div className="pt-1 space-y-1">
+            <div className="h-1 w-24 mx-auto rounded-full bg-muted/50 overflow-hidden">
+              <div className="h-full rounded-full bg-primary/30 transition-all" style={{ width: `${(reflections.length / 5) * 100}%` }} />
+            </div>
+            <p className="text-[9px] font-mono text-muted-foreground/40">{reflections.length} / 5</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
