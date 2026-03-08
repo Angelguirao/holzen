@@ -17,6 +17,7 @@ const fade = (delay = 0) => ({
 });
 
 const Landing = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const prefersReduced = useReducedMotion();
