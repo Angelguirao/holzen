@@ -87,19 +87,16 @@ export default function PauseSession() {
   }
 
   return (
-    <>
-      <AnimatePresence>
-        {!showRitual && (
-          <motion.div
-            className="fixed inset-0 z-50 overflow-y-auto"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.6 }}
-            style={{
-              background: 'linear-gradient(160deg, hsl(var(--background)) 0%, hsl(var(--muted)) 50%, hsl(var(--background)) 100%)',
-            }}
-          >
+    <motion.div
+      className="fixed inset-0 z-50 overflow-y-auto"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 0.6 }}
+      style={{
+        background: 'linear-gradient(160deg, hsl(var(--background)) 0%, hsl(var(--muted)) 50%, hsl(var(--background)) 100%)',
+      }}
+    >
             {/* Ambient orbs */}
             <motion.div
               className="fixed top-1/4 left-1/3 w-[300px] h-[300px] rounded-full pointer-events-none"
