@@ -17,6 +17,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useState, useEffect, useCallback } from 'react';
 import { Input } from '@/components/ui/input';
+import { useTranslation } from 'react-i18next';
 import {
   Accordion,
   AccordionContent,
@@ -38,6 +39,7 @@ import {
 const LAST_SEEN_VERSION_KEY = 'holzen_last_seen_version';
 
 const Settings = () => {
+  const { t } = useTranslation();
   const { user, signOut } = useAuth();
   const { threshold, setThreshold, thresholdDown, setThresholdDown, cumulativeThreshold, setCumulativeThreshold, emailNotifications, setEmailNotifications, companionPrefs, setCompanionPref, reflectionTone, setReflectionTone, reflectionStyle, setReflectionStyle, silentMode, setSilentMode, cooldownHours, setCooldownHours, digestFrequency, setDigestFrequency, customPrompt, setCustomPrompt, quietHoursStart, quietHoursEnd, setQuietHours, streakFreezeDates, useStreakFreeze, firstName, setFirstName, nightReflectionHour, setNightReflectionHour, aiInsightsEnabled, setAiInsightsEnabled, ritualTemplate, setRitualTemplate, notifyBadges, setNotifyBadges, motivations, setMotivations, mantra, setMantra, currency, setCurrency, language, setLanguage, profileLoaded } = useHolzen();
   const { subscribed, loading: subLoading, checkoutLoading, startCheckout, openPortal, trialRemaining } = useSubscription();
@@ -74,27 +76,27 @@ const Settings = () => {
 
   const changePassword = useCallback(async () => {
     if (newPassword.length < 6) {
-      toast.error('Too short', { description: 'Password must be at least 6 characters.' });
+      toast.error(t('auth.passwordTooShort'));
       return;
     }
     if (newPassword !== confirmPassword) {
-      toast.error('Passwords don\'t match', { description: 'Please make sure both fields are identical.' });
+      toast.error(t('auth.passwordsDoNotMatch'));
       return;
     }
     setChangingPassword(true);
     try {
       const { error } = await supabase.auth.updateUser({ password: newPassword });
       if (error) throw error;
-      toast.success('Password updated', { description: 'Your new password is now active.' });
+      toast.success(t('auth.passwordUpdated'));
       setNewPassword('');
       setConfirmPassword('');
     } catch (e: any) {
       const msg = e?.message || 'Something went wrong';
-      toast.error('Failed to update password', { description: msg });
+      toast.error(msg);
     } finally {
       setChangingPassword(false);
     }
-  }, [newPassword, confirmPassword]);
+  }, [newPassword, confirmPassword, t]);
 
   useEffect(() => {
     document.title = 'Holzen — Settings';
@@ -114,7 +116,6 @@ const Settings = () => {
       const dateStr = new Date().toISOString().slice(0, 10);
 
       if (format === 'csv') {
-        // Reflections CSV
         const refHeaders = ['created_at', 'message', 'context', 'mood', 'outcome', 'note', 'tags', 'haiku', 'is_favorite'];
         const refRows = (reflections ?? []).map((r: any) =>
           refHeaders.map(h => {
@@ -124,7 +125,6 @@ const Settings = () => {
         );
         const refCsv = [refHeaders.join(','), ...refRows].join('\n');
 
-        // Rituals CSV
         const ritHeaders = ['created_at', 'decision', 'template', 'journal_text', 'duration_seconds'];
         const ritRows = (rituals ?? []).map((r: any) =>
           ritHeaders.map(h => {
@@ -134,14 +134,12 @@ const Settings = () => {
         );
         const ritCsv = [ritHeaders.join(','), ...ritRows].join('\n');
 
-        // Download reflections CSV
         const refBlob = new Blob([refCsv], { type: 'text/csv' });
         const refUrl = URL.createObjectURL(refBlob);
         const a1 = document.createElement('a');
         a1.href = refUrl; a1.download = `holzen-reflections-${dateStr}.csv`; a1.click();
         URL.revokeObjectURL(refUrl);
 
-        // Download rituals CSV if any
         if (rituals && rituals.length > 0) {
           const ritBlob = new Blob([ritCsv], { type: 'text/csv' });
           const ritUrl = URL.createObjectURL(ritBlob);
@@ -165,26 +163,14 @@ const Settings = () => {
             created_at: profile.created_at,
           } : null,
           reflections: (reflections ?? []).map((r: any) => ({
-            message: r.message,
-            context: r.context,
-            mood: r.mood,
-            outcome: r.outcome,
-            note: r.note,
-            tags: r.tags,
-            haiku: r.haiku,
-            is_favorite: r.is_favorite,
-            learning_title: r.learning_title,
-            learning_body: r.learning_body,
-            signal_title: r.signal_title,
-            signal_body: r.signal_body,
-            created_at: r.created_at,
+            message: r.message, context: r.context, mood: r.mood, outcome: r.outcome,
+            note: r.note, tags: r.tags, haiku: r.haiku, is_favorite: r.is_favorite,
+            learning_title: r.learning_title, learning_body: r.learning_body,
+            signal_title: r.signal_title, signal_body: r.signal_body, created_at: r.created_at,
           })),
           rituals: (rituals ?? []).map((r: any) => ({
-            decision: r.decision,
-            template: r.template,
-            journal_text: r.journal_text,
-            duration_seconds: r.duration_seconds,
-            created_at: r.created_at,
+            decision: r.decision, template: r.template, journal_text: r.journal_text,
+            duration_seconds: r.duration_seconds, created_at: r.created_at,
           })),
         };
 
@@ -196,7 +182,7 @@ const Settings = () => {
         toast.success('Data exported', { description: `${reflections?.length ?? 0} reflections + ${rituals?.length ?? 0} rituals.` });
       }
     } catch {
-      toast.error('Export failed', { description: 'Could not export your data. Please try again.' });
+      toast.error('Export failed');
     } finally {
       setExporting(false);
     }
@@ -211,7 +197,7 @@ const Settings = () => {
       toast.success('Account deleted');
       await signOut();
     } catch {
-      toast.error('Failed to delete account', { description: 'Please try again or contact support.' });
+      toast.error('Failed to delete account');
       setDeleting(false);
     }
   };
@@ -220,7 +206,7 @@ const Settings = () => {
     <div className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">
-          Settings
+          {t('settings.title')}
         </h1>
         <button
           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
@@ -236,18 +222,18 @@ const Settings = () => {
         {/* 1. You */}
         <AccordionItem value="you" className="border border-border/40 rounded-md px-4">
           <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
-            You
+            {t('settings.you')}
           </AccordionTrigger>
           <AccordionContent className="space-y-5 pb-4">
             <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">First name</p>
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.firstName')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Optional. Shown as a quiet greeting on home.
+                {t('settings.firstNameDesc')}
               </p>
               <Input
                 value={firstName ?? ''}
                 onChange={(e) => setFirstName(e.target.value || null)}
-                placeholder="Your first name"
+                placeholder={t('settings.firstNamePlaceholder')}
                 maxLength={30}
                 className="text-xs font-mono"
               />
@@ -255,29 +241,20 @@ const Settings = () => {
 
             {/* My Why — Motivations */}
             <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">My Why</p>
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.myWhy')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Why do you hold? Select what resonates. This anchors your reflections and appears as a mantra during rituals.
+                {t('settings.myWhyDesc')}
               </p>
               <div className="grid grid-cols-2 gap-2">
-                {([
-                  { value: 'freedom', label: 'Financial freedom', desc: 'Building independence' },
-                  { value: 'family', label: 'Family security', desc: 'Protecting what matters' },
-                  { value: 'generational', label: 'Generational wealth', desc: 'Beyond your lifetime' },
-                  { value: 'discipline', label: 'Learning discipline', desc: 'Mastering patience' },
-                  { value: 'conviction', label: 'Philosophical conviction', desc: 'Believing in the protocol' },
-                  { value: 'sovereignty', label: 'Self-sovereignty', desc: 'Being your own bank' },
-                  { value: 'inflation', label: 'Inflation hedge', desc: 'Preserving purchasing power' },
-                  { value: 'curiosity', label: 'Curiosity', desc: 'Learning about money' },
-                ] as const).map((m) => {
-                  const selected = motivations.includes(m.value);
+                {(['freedom', 'family', 'generational', 'discipline', 'conviction', 'sovereignty', 'inflation', 'curiosity'] as const).map((value) => {
+                  const selected = motivations.includes(value);
                   return (
                     <button
-                      key={m.value}
+                      key={value}
                       onClick={() => {
                         const next = selected
-                          ? motivations.filter((v) => v !== m.value)
-                          : [...motivations, m.value];
+                          ? motivations.filter((v) => v !== value)
+                          : [...motivations, value];
                         setMotivations(next);
                       }}
                       className={`rounded-md border px-3 py-2.5 text-left transition-colors ${
@@ -286,8 +263,8 @@ const Settings = () => {
                           : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
                       }`}
                     >
-                      <p className="text-xs font-mono font-medium">{m.label}</p>
-                      <p className="text-[10px] text-muted-foreground mt-0.5">{m.desc}</p>
+                      <p className="text-xs font-mono font-medium">{t(`settings.motivations.${value}`)}</p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5">{t(`settings.motivations.${value}Desc`)}</p>
                     </button>
                   );
                 })}
@@ -296,14 +273,14 @@ const Settings = () => {
 
             {/* Mantra */}
             <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">Personal mantra</p>
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.personalMantra')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Optional. Your own words — shown during rituals and woven into AI reflections.
+                {t('settings.mantraDesc')}
               </p>
               <textarea
                 value={mantra ?? ''}
                 onChange={(e) => setMantra(e.target.value || null)}
-                placeholder="e.g. I hold because time is on my side…"
+                placeholder={t('settings.mantraPlaceholder')}
                 maxLength={200}
                 rows={2}
                 className="w-full text-xs font-mono px-3 py-2 rounded-md border border-border/60 bg-background text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/40 transition-colors resize-none"
@@ -315,13 +292,13 @@ const Settings = () => {
 
             {/* 1 BTC = 1 BTC mode */}
             <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">1 BTC = 1 BTC</p>
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.btcMode')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Strip away fiat noise. No prices, no percentages, no red or green. Just Bitcoin.
+                {t('settings.btcModeDesc')}
               </p>
               <div className="flex items-center justify-between">
                 <Label htmlFor="btc-mode" className="text-xs text-muted-foreground cursor-pointer">
-                  Enable conviction mode
+                  {t('settings.enableConvictionMode')}
                 </Label>
                 <Switch
                   id="btc-mode"
@@ -336,9 +313,9 @@ const Settings = () => {
 
             {/* Currency */}
             <div className={`space-y-3 transition-opacity ${btcMode ? 'opacity-30 pointer-events-none' : ''}`}>
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">Display currency</p>
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.displayCurrency')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Choose how BTC prices are displayed throughout the app.
+                {t('settings.displayCurrencyDesc')}
               </p>
               <div className="grid grid-cols-2 gap-2">
                 {([
@@ -369,9 +346,9 @@ const Settings = () => {
 
             {/* Language */}
             <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">Reflection language</p>
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.reflectionLanguage')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Choose the language for AI-generated reflections, haikus, and insights.
+                {t('settings.reflectionLanguageDesc')}
               </p>
               <div className="grid grid-cols-2 gap-2">
                 {([
@@ -404,10 +381,9 @@ const Settings = () => {
         {/* 2. Reflection */}
         <AccordionItem value="reflection" className="border border-border/40 rounded-md px-4">
           <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
-            Reflection
+            {t('settings.reflection')}
           </AccordionTrigger>
           <AccordionContent className="space-y-6 pb-4">
-            {/* Threshold */}
             {profileLoaded ? (
               <ThresholdSetting thresholdUp={threshold} onSetUp={setThreshold} thresholdDown={thresholdDown} onSetDown={setThresholdDown} cumulativeThreshold={cumulativeThreshold} onSetCumulative={setCumulativeThreshold} />
             ) : (
@@ -420,9 +396,9 @@ const Settings = () => {
 
             {/* Cooldown */}
             <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">Cooldown</p>
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.cooldown')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Minimum time between automatic reflections.
+                {t('settings.cooldownDesc')}
               </p>
               <div className="grid grid-cols-4 gap-2">
                 {([1, 6, 12, 24] as const).map((h) => (
@@ -443,28 +419,23 @@ const Settings = () => {
 
             {/* Tone */}
             <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">Tone</p>
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.tone')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Choose the voice of your reflections.
+                {t('settings.toneDesc')}
               </p>
               <div className="grid grid-cols-2 gap-2">
-                {([
-                  { value: 'stoic', label: 'Stoic', desc: 'Grounded, like Marcus Aurelius' },
-                  { value: 'zen', label: 'Zen', desc: 'Spacious, meditative' },
-                  { value: 'poetic', label: 'Poetic', desc: 'Evocative, literary' },
-                  { value: 'blunt', label: 'Blunt', desc: 'Direct, no fluff' },
-                ] as const).map((t) => (
+                {(['stoic', 'zen', 'poetic', 'blunt'] as const).map((value) => (
                   <button
-                    key={t.value}
-                    onClick={() => setReflectionTone(t.value)}
+                    key={value}
+                    onClick={() => setReflectionTone(value)}
                     className={`rounded-md border px-3 py-2.5 text-left transition-colors ${
-                      reflectionTone === t.value
+                      reflectionTone === value
                         ? 'border-primary bg-primary/5 text-foreground'
                         : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
                     }`}
                   >
-                    <p className="text-xs font-mono font-medium">{t.label}</p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">{t.desc}</p>
+                    <p className="text-xs font-mono font-medium">{t(`settings.tones.${value}`)}</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">{t(`settings.tones.${value}Desc`)}</p>
                   </button>
                 ))}
               </div>
@@ -472,17 +443,17 @@ const Settings = () => {
 
             {/* Style */}
             <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">Style</p>
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.style')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Choose how your reflections are structured.
+                {t('settings.styleDesc')}
               </p>
               <div className="grid grid-cols-2 gap-2">
                 {([
-                  { value: 'standard', label: 'Standard', desc: '1-3 sentence reflection' },
-                  { value: 'one-liner', label: 'One-liner', desc: 'Single impactful sentence' },
-                  { value: 'question', label: 'Question', desc: 'One thought-provoking question' },
-                  { value: 'metaphor', label: 'Metaphor', desc: 'A vivid image for the moment' },
-                  { value: 'koan', label: 'Koan', desc: 'A zen paradox to sit with' },
+                  { value: 'standard', key: 'standard' },
+                  { value: 'one-liner', key: 'oneLiner' },
+                  { value: 'question', key: 'question' },
+                  { value: 'metaphor', key: 'metaphor' },
+                  { value: 'koan', key: 'koan' },
                 ] as const).map((s) => (
                   <button
                     key={s.value}
@@ -493,8 +464,8 @@ const Settings = () => {
                         : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
                     }`}
                   >
-                    <p className="text-xs font-mono font-medium">{s.label}</p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">{s.desc}</p>
+                    <p className="text-xs font-mono font-medium">{t(`settings.styles.${s.key}`)}</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">{t(`settings.styles.${s.key}Desc`)}</p>
                   </button>
                 ))}
               </div>
@@ -502,14 +473,14 @@ const Settings = () => {
 
             {/* Custom Prompt */}
             <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">Custom prompt</p>
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.customPrompt')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Add personal guidance the AI will weave into every reflection.
+                {t('settings.customPromptDesc')}
               </p>
               <textarea
                 value={customPrompt ?? ''}
                 onChange={(e) => setCustomPrompt(e.target.value || null)}
-                placeholder="Your personal reflection guidance…"
+                placeholder={t('settings.customPromptPlaceholder')}
                 maxLength={200}
                 rows={3}
                 className="w-full text-xs font-mono px-3 py-2 rounded-md border border-border/60 bg-background text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/40 transition-colors resize-none"
@@ -521,13 +492,13 @@ const Settings = () => {
 
             {/* Silent Mode */}
             <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">Silent mode</p>
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.silentMode')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Just "BTC moved." — no reflection text.
+                {t('settings.silentModeDesc')}
               </p>
               <div className="flex items-center justify-between">
                 <Label htmlFor="silent-mode" className="text-xs font-mono text-muted-foreground">
-                  Enable silent mode
+                  {t('settings.enableSilentMode')}
                 </Label>
                 <Switch id="silent-mode" checked={silentMode} onCheckedChange={setSilentMode} />
               </div>
@@ -535,13 +506,13 @@ const Settings = () => {
 
             {/* Haptic Feedback */}
             <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">Haptic feedback</p>
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.hapticFeedback')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Vibration feedback on interactions (mobile only).
+                {t('settings.hapticDesc')}
               </p>
               <div className="flex items-center justify-between">
                 <Label htmlFor="haptic-toggle" className="text-xs font-mono text-muted-foreground">
-                  Enable haptics
+                  {t('settings.enableHaptics')}
                 </Label>
                 <Switch id="haptic-toggle" checked={hapticEnabled} onCheckedChange={(val) => { setHapticEnabledState(val); setHapticEnabled(val); }} />
               </div>
@@ -549,13 +520,13 @@ const Settings = () => {
 
             {/* Zen Mode */}
             <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">Zen mode</p>
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.zenMode')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Strips the home screen to just the reflection and breathing exercise.
+                {t('settings.zenModeDesc')}
               </p>
               <div className="flex items-center justify-between">
                 <Label htmlFor="zen-mode" className="text-xs font-mono text-muted-foreground">
-                  Enable zen mode
+                  {t('settings.enableZenMode')}
                 </Label>
                 <Switch
                   id="zen-mode"
@@ -573,28 +544,21 @@ const Settings = () => {
         {/* 3. Companions */}
         <AccordionItem value="companions" className="border border-border/40 rounded-md px-4">
           <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
-            Companions
+            {t('settings.companions')}
           </AccordionTrigger>
           <AccordionContent className="space-y-3 pb-4">
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Optional additions shown below each reflection.
+              {t('settings.companionsDesc')}
             </p>
-            {([
-              { id: 'breathing', label: 'Breathing exercise' },
-              { id: 'haiku', label: 'Haiku' },
-              { id: 'learning', label: 'Learning nudge' },
-              { id: 'signal', label: 'Signal' },
-              { id: 'zoomOut', label: 'Zoom out' },
-              { id: 'history', label: 'Historical insight' },
-            ] as const).map((comp) => (
-              <div key={comp.id} className="flex items-center justify-between">
-                <Label htmlFor={`comp-${comp.id}`} className="text-xs font-mono text-muted-foreground">
-                  {comp.label}
+            {(['breathing', 'haiku', 'learning', 'signal', 'zoomOut', 'history'] as const).map((comp) => (
+              <div key={comp} className="flex items-center justify-between">
+                <Label htmlFor={`comp-${comp}`} className="text-xs font-mono text-muted-foreground">
+                  {t(`settings.companionLabels.${comp}`)}
                 </Label>
                 <Switch
-                  id={`comp-${comp.id}`}
-                  checked={companionPrefs[comp.id]}
-                  onCheckedChange={(v) => setCompanionPref(comp.id, v)}
+                  id={`comp-${comp}`}
+                  checked={companionPrefs[comp]}
+                  onCheckedChange={(v) => setCompanionPref(comp, v)}
                 />
               </div>
             ))}
@@ -604,31 +568,27 @@ const Settings = () => {
         {/* 4. Ritual */}
         <AccordionItem value="ritual" className="border border-border/40 rounded-md px-4">
           <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
-            Ritual
+            {t('settings.ritual')}
           </AccordionTrigger>
           <AccordionContent className="space-y-3 pb-4">
             <p className="text-xs text-muted-foreground leading-relaxed">
-              A guided pre-decision sequence. Choose your preferred depth.
+              {t('settings.ritualDesc')}
             </p>
             <div className="space-y-2">
-              {([
-                { value: 'quick', label: 'Quick', desc: 'Breathe → Decide' },
-                { value: 'standard', label: 'Standard', desc: 'Breathe → Reflect → Decide' },
-                { value: 'deep', label: 'Deep', desc: 'Breathe → Reflect → Journal → Decide' },
-              ] as const).map((t) => (
+              {(['quick', 'standard', 'deep'] as const).map((value) => (
                 <button
-                  key={t.value}
-                  onClick={() => setRitualTemplate(t.value)}
+                  key={value}
+                  onClick={() => setRitualTemplate(value)}
                   className={`w-full text-left rounded-md border px-3 py-2.5 transition-colors ${
-                    ritualTemplate === t.value
+                    ritualTemplate === value
                       ? 'border-primary/40 bg-primary/5'
                       : 'border-border/40 bg-muted/10 hover:bg-muted/20'
                   }`}
                 >
-                  <p className={`text-xs font-mono ${ritualTemplate === t.value ? 'text-foreground' : 'text-muted-foreground'}`}>
-                    {t.label}
+                  <p className={`text-xs font-mono ${ritualTemplate === value ? 'text-foreground' : 'text-muted-foreground'}`}>
+                    {t(`settings.ritualTemplates.${value}`)}
                   </p>
-                  <p className="text-[10px] text-muted-foreground/60">{t.desc}</p>
+                  <p className="text-[10px] text-muted-foreground/60">{t(`settings.ritualTemplates.${value}Desc`)}</p>
                 </button>
               ))}
             </div>
@@ -638,21 +598,20 @@ const Settings = () => {
         {/* 5. Notifications & Schedule */}
         <AccordionItem value="notifications" className="border border-border/40 rounded-md px-4">
           <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
-            Notifications & Schedule
+            {t('settings.notificationsSchedule')}
           </AccordionTrigger>
           <AccordionContent className="space-y-6 pb-4">
-            {/* Email & Push */}
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <Label htmlFor="email-notif" className="text-xs font-mono text-muted-foreground">
-                  Email notifications
+                  {t('settings.emailNotifications')}
                 </Label>
                 <Switch id="email-notif" checked={emailNotifications} onCheckedChange={setEmailNotifications} />
               </div>
               {pushSupported && (
                 <div className="flex items-center justify-between">
                   <Label htmlFor="push-notif" className="text-xs font-mono text-muted-foreground">
-                    Push notifications
+                    {t('settings.pushNotifications')}
                   </Label>
                   <Switch
                     id="push-notif"
@@ -666,44 +625,37 @@ const Settings = () => {
 
             {/* Digest */}
             <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">Digest frequency</p>
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.digestFrequency')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                How often you receive your reflection digest email.
+                {t('settings.digestDesc')}
               </p>
               <div className="grid grid-cols-3 gap-2">
-                {([
-                  { value: 'daily', label: 'Daily' },
-                  { value: 'weekly', label: 'Weekly' },
-                  { value: 'biweekly', label: 'Biweekly' },
-                ] as const).map((opt) => (
+                {(['daily', 'weekly', 'biweekly'] as const).map((opt) => (
                   <button
-                    key={opt.value}
-                    onClick={() => setDigestFrequency(opt.value)}
+                    key={opt}
+                    onClick={() => setDigestFrequency(opt)}
                     className={`rounded-md border px-3 py-2 text-center transition-colors ${
-                      digestFrequency === opt.value
+                      digestFrequency === opt
                         ? 'border-primary bg-primary/5 text-foreground'
                         : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
                     }`}
                   >
-                    <p className="text-xs font-mono">{opt.label}</p>
+                    <p className="text-xs font-mono">{t(`settings.digestOptions.${opt}`)}</p>
                   </button>
                 ))}
               </div>
               <div className="grid grid-cols-2 gap-2">
-                {([
-                  { value: 'monthly', label: 'Monthly' },
-                  { value: 'off', label: 'Off' },
-                ] as const).map((opt) => (
+                {(['monthly', 'off'] as const).map((opt) => (
                   <button
-                    key={opt.value}
-                    onClick={() => setDigestFrequency(opt.value)}
+                    key={opt}
+                    onClick={() => setDigestFrequency(opt)}
                     className={`rounded-md border px-3 py-2 text-center transition-colors ${
-                      digestFrequency === opt.value
+                      digestFrequency === opt
                         ? 'border-primary bg-primary/5 text-foreground'
                         : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
                     }`}
                   >
-                    <p className="text-xs font-mono">{opt.label}</p>
+                    <p className="text-xs font-mono">{t(`settings.digestOptions.${opt}`)}</p>
                   </button>
                 ))}
               </div>
@@ -711,13 +663,13 @@ const Settings = () => {
 
             {/* Night Reflection */}
             <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">Night reflection</p>
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.nightReflection')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                A nightly summary of your day's BTC movement and whether you reflected.
+                {t('settings.nightReflectionDesc')}
               </p>
               <div className="flex items-center justify-between">
                 <Label htmlFor="night-reflection-enabled" className="text-xs font-mono text-muted-foreground">
-                  Enable night reflection
+                  {t('settings.enableNightReflection')}
                 </Label>
                 <Switch
                   id="night-reflection-enabled"
@@ -727,7 +679,7 @@ const Settings = () => {
               </div>
               {nightReflectionHour !== null && (
                 <div className="space-y-1.5">
-                  <p className="text-[10px] font-mono text-muted-foreground/60">Delivery time (local)</p>
+                  <p className="text-[10px] font-mono text-muted-foreground/60">{t('settings.deliveryTime')}</p>
                   <select
                     value={nightReflectionHour}
                     onChange={(e) => setNightReflectionHour(Number(e.target.value))}
@@ -743,13 +695,13 @@ const Settings = () => {
 
             {/* Quiet Hours */}
             <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">Quiet hours</p>
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.quietHours')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                No automatic reflections during these hours.
+                {t('settings.quietHoursDesc')}
               </p>
               <div className="flex items-center justify-between">
                 <Label htmlFor="quiet-enabled" className="text-xs font-mono text-muted-foreground">
-                  Enable quiet hours
+                  {t('settings.enableQuietHours')}
                 </Label>
                 <Switch
                   id="quiet-enabled"
@@ -760,7 +712,7 @@ const Settings = () => {
               {quietHoursStart !== null && quietHoursEnd !== null && (
                 <div className="grid grid-cols-2 gap-3">
                   <div className="space-y-1.5">
-                    <p className="text-[10px] font-mono text-muted-foreground/60">From</p>
+                    <p className="text-[10px] font-mono text-muted-foreground/60">{t('common.from')}</p>
                     <select
                       value={quietHoursStart}
                       onChange={(e) => setQuietHours(Number(e.target.value), quietHoursEnd)}
@@ -772,7 +724,7 @@ const Settings = () => {
                     </select>
                   </div>
                   <div className="space-y-1.5">
-                    <p className="text-[10px] font-mono text-muted-foreground/60">Until</p>
+                    <p className="text-[10px] font-mono text-muted-foreground/60">{t('common.until')}</p>
                     <select
                       value={quietHoursEnd}
                       onChange={(e) => setQuietHours(quietHoursStart, Number(e.target.value))}
@@ -789,13 +741,13 @@ const Settings = () => {
 
             {/* Badge notifications */}
             <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">Badge notifications</p>
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.badgeNotifications')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Get notified when you unlock new milestone badges.
+                {t('settings.badgeNotifDesc')}
               </p>
               <div className="flex items-center justify-between">
                 <Label htmlFor="notify-badges" className="text-xs font-mono text-muted-foreground">
-                  Enable badge notifications
+                  {t('settings.enableBadgeNotif')}
                 </Label>
                 <Switch id="notify-badges" checked={notifyBadges} onCheckedChange={setNotifyBadges} />
               </div>
@@ -803,13 +755,13 @@ const Settings = () => {
 
             {/* AI Insights */}
             <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">AI Insights</p>
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.aiInsights')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Weekly AI-generated pattern analysis across your reflections.
+                {t('settings.aiInsightsDesc')}
               </p>
               <div className="flex items-center justify-between">
                 <Label htmlFor="ai-insights" className="text-xs font-mono text-muted-foreground">
-                  Enable AI insights
+                  {t('settings.enableAiInsights')}
                 </Label>
                 <Switch id="ai-insights" checked={aiInsightsEnabled} onCheckedChange={setAiInsightsEnabled} />
               </div>
@@ -820,30 +772,29 @@ const Settings = () => {
         {/* 6. Subscription & Referrals */}
         <AccordionItem value="subscription" className="border border-border/40 rounded-md px-4">
           <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
-            Subscription & Referrals
+            {t('settings.subscriptionReferrals')}
           </AccordionTrigger>
           <AccordionContent className="space-y-6 pb-4">
-            {/* Subscription */}
             <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">Plan</p>
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.plan')}</p>
               {subLoading ? (
-                <p className="text-xs font-mono text-muted-foreground">Loading</p>
+                <p className="text-xs font-mono text-muted-foreground">{t('common.loading')}</p>
               ) : subscribed ? (
                 <button
                   onClick={openPortal}
                   className="text-xs font-mono text-muted-foreground underline"
                 >
-                  Manage subscription
+                  {t('settings.manageSubscription')}
                 </button>
               ) : (
                 <div className="space-y-2">
                   {trialRemaining !== undefined && trialRemaining > 0 && (
                     <p className="text-xs font-mono text-muted-foreground">
-                      {trialRemaining} free reflection{trialRemaining !== 1 ? 's' : ''} remaining
+                      {t('home.subscription.freeRemaining', { count: trialRemaining })}
                     </p>
                   )}
                   <p className="text-xs font-mono text-muted-foreground">
-                    $3/month · Cancel anytime
+                    {t('settings.pricePerMonth')}
                   </p>
                   <Button
                     onClick={startCheckout}
@@ -851,13 +802,12 @@ const Settings = () => {
                     className="w-full font-mono text-xs"
                     size="sm"
                   >
-                    {checkoutLoading ? 'Opening checkout…' : 'Subscribe'}
+                    {checkoutLoading ? t('settings.openingCheckout') : t('common.subscribe')}
                   </Button>
                 </div>
               )}
             </div>
 
-            {/* Referrals */}
             <ReferralSection />
           </AccordionContent>
         </AccordionItem>
@@ -865,29 +815,28 @@ const Settings = () => {
         {/* 7. Account */}
         <AccordionItem value="account" className="border border-border/40 rounded-md px-4">
           <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
-            Account
+            {t('settings.account')}
           </AccordionTrigger>
           <AccordionContent className="space-y-6 pb-4">
             {user && (
               <p className="text-xs font-mono text-muted-foreground truncate">{user.email}</p>
             )}
 
-            {/* Change Email */}
             <ChangeEmailSection />
 
             {/* Password */}
             <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">Password</p>
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.passwordLabel')}</p>
               <Input
                 type="password"
-                placeholder="New password"
+                placeholder={t('settings.newPasswordPlaceholder')}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 className="text-xs font-mono"
               />
               <Input
                 type="password"
-                placeholder="Confirm new password"
+                placeholder={t('settings.confirmPasswordPlaceholder')}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 className="text-xs font-mono"
@@ -898,27 +847,27 @@ const Settings = () => {
                 size="sm"
                 className="w-full font-mono text-xs"
               >
-                {changingPassword ? 'Updating…' : 'Update password'}
+                {changingPassword ? t('settings.updatingPassword') : t('settings.updatePassword')}
               </Button>
             </div>
 
             {/* Data export */}
             <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">Data</p>
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.data')}</p>
               <div className="flex gap-4">
                 <button
                   onClick={() => exportData('json')}
                   disabled={exporting}
                   className="text-xs font-mono text-muted-foreground underline"
                 >
-                  {exporting ? 'Exporting…' : 'Export as JSON'}
+                  {exporting ? t('settings.exporting') : t('settings.exportJson')}
                 </button>
                 <button
                   onClick={() => exportData('csv')}
                   disabled={exporting}
                   className="text-xs font-mono text-muted-foreground underline"
                 >
-                  {exporting ? 'Exporting…' : 'Export as CSV'}
+                  {exporting ? t('settings.exporting') : t('settings.exportCsv')}
                 </button>
               </div>
             </div>
@@ -929,7 +878,7 @@ const Settings = () => {
                 onClick={install}
                 className="text-xs font-mono text-muted-foreground underline"
               >
-                Install app
+                {t('settings.installApp')}
               </button>
             )}
 
@@ -937,20 +886,20 @@ const Settings = () => {
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <button className="block text-xs font-mono text-muted-foreground underline">
-                  Sign out
+                  {t('common.signOut')}
                 </button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle className="font-mono text-sm">Sign out</AlertDialogTitle>
+                  <AlertDialogTitle className="font-mono text-sm">{t('common.signOut')}</AlertDialogTitle>
                   <AlertDialogDescription className="text-xs">
-                    Are you sure you want to sign out?
+                    {t('settings.signOutConfirm')}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel className="font-mono text-xs">Cancel</AlertDialogCancel>
+                  <AlertDialogCancel className="font-mono text-xs">{t('common.cancel')}</AlertDialogCancel>
                   <AlertDialogAction onClick={signOut} className="font-mono text-xs">
-                    Sign out
+                    {t('common.signOut')}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
@@ -960,24 +909,24 @@ const Settings = () => {
             <AlertDialog>
               <AlertDialogTrigger asChild>
                 <button className="text-xs font-mono text-destructive underline">
-                  Delete account
+                  {t('settings.deleteAccount')}
                 </button>
               </AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle className="font-mono text-sm">Delete account</AlertDialogTitle>
+                  <AlertDialogTitle className="font-mono text-sm">{t('settings.deleteAccount')}</AlertDialogTitle>
                   <AlertDialogDescription className="text-xs">
-                    This will permanently delete your account, all reflections, and all data. This action cannot be undone.
+                    {t('settings.deleteAccountDesc')}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel className="font-mono text-xs">Cancel</AlertDialogCancel>
+                  <AlertDialogCancel className="font-mono text-xs">{t('common.cancel')}</AlertDialogCancel>
                   <AlertDialogAction
                     onClick={deleteAccount}
                     disabled={deleting}
                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90 font-mono text-xs"
                   >
-                    {deleting ? 'Deleting…' : 'Delete forever'}
+                    {deleting ? t('settings.deleting') : t('settings.deleteForever')}
                   </AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
@@ -988,10 +937,10 @@ const Settings = () => {
         {/* 8. About */}
         <AccordionItem value="about" className="border border-border/40 rounded-md px-4">
           <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
-            About
+            {t('settings.about')}
             {hasNewVersion && (
               <span className="ml-2 text-[10px] font-mono bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">
-                New
+                {t('common.new')}
               </span>
             )}
           </AccordionTrigger>
@@ -1010,7 +959,7 @@ const Settings = () => {
                 >
                   <Changelog />
                 </button>
-                <a href="/roadmap" target="_blank" rel="noopener noreferrer" className="text-xs font-mono text-muted-foreground underline">Roadmap</a>
+                <a href="/roadmap" target="_blank" rel="noopener noreferrer" className="text-xs font-mono text-muted-foreground underline">{t('settings.roadmap')}</a>
               </div>
               {latestVersion && (
                 <p className="text-[10px] font-mono text-muted-foreground/50">
@@ -1027,22 +976,23 @@ const Settings = () => {
 };
 
 function ChangeEmailSection() {
+  const { t } = useTranslation();
   const [newEmail, setNewEmail] = useState('');
   const [changing, setChanging] = useState(false);
 
   const changeEmail = useCallback(async () => {
     if (!newEmail || !newEmail.includes('@')) {
-      toast.error('Invalid email', { description: 'Please enter a valid email address.' });
+      toast.error('Invalid email');
       return;
     }
     setChanging(true);
     try {
       const { error } = await supabase.auth.updateUser({ email: newEmail });
       if (error) throw error;
-      toast.success('Confirmation sent', { description: 'Check both your old and new email to confirm the change.' });
+      toast.success('Confirmation sent');
       setNewEmail('');
     } catch (e: any) {
-      toast.error('Failed to update email', { description: e?.message || 'Something went wrong' });
+      toast.error(e?.message || 'Something went wrong');
     } finally {
       setChanging(false);
     }
@@ -1050,10 +1000,10 @@ function ChangeEmailSection() {
 
   return (
     <div className="space-y-3">
-      <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">Email</p>
+      <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.emailLabel')}</p>
       <Input
         type="email"
-        placeholder="New email address"
+        placeholder={t('settings.newEmailPlaceholder')}
         value={newEmail}
         onChange={(e) => setNewEmail(e.target.value)}
         className="text-xs font-mono"
@@ -1064,10 +1014,10 @@ function ChangeEmailSection() {
         size="sm"
         className="w-full font-mono text-xs"
       >
-        {changing ? 'Sending confirmation…' : 'Change email'}
+        {changing ? t('settings.sendingConfirmation') : t('settings.changeEmail')}
       </Button>
       <p className="text-[10px] text-muted-foreground/50 leading-relaxed">
-        You'll receive a confirmation link on both your current and new email.
+        {t('settings.emailConfirmNote')}
       </p>
     </div>
   );
