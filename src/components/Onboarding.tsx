@@ -239,7 +239,7 @@ export function Onboarding({ onComplete }: Props) {
                   </motion.div>
 
                   <motion.p className="text-[10px] text-muted-foreground/60" {...stagger(0.35)}>
-                    Toggle companions anytime in Settings.
+                    {t('onboarding.toggleCompanions')}
                   </motion.p>
 
                   <motion.div {...stagger(0.4)}>
