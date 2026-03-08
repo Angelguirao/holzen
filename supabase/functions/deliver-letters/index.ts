@@ -73,14 +73,47 @@ serve(async (req) => {
 
     let delivered = 0;
 
+    // Cache for per-currency price lookups
+    const priceCache = new Map<string, number>();
+
     for (const letter of letters) {
+      // Get user's currency preference for delivery price
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("hold_goal_currency")
+        .eq("user_id", letter.user_id)
+        .single();
+
+      const currency = (profile?.hold_goal_currency || "USD").toLowerCase();
+      let deliveryPrice: number;
+
+      if (currency === "usd") {
+        deliveryPrice = currentPriceUsd;
+      } else {
+        const cached = priceCache.get(currency);
+        if (cached) {
+          deliveryPrice = cached;
+        } else {
+          try {
+            const curRes = await fetchWithRetry(
+              `https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=${currency}`
+            );
+            const curData = await curRes.json();
+            deliveryPrice = curData?.bitcoin?.[currency] ?? currentPriceUsd;
+            priceCache.set(currency, deliveryPrice);
+          } catch {
+            deliveryPrice = currentPriceUsd;
+          }
+        }
+      }
+
       // Mark as delivered
       await supabase
         .from("future_letters")
         .update({
           delivered: true,
           delivered_at: new Date().toISOString(),
-          btc_price_at_delivery: currentPrice,
+          btc_price_at_delivery: deliveryPrice,
         })
         .eq("id", letter.id);
 
