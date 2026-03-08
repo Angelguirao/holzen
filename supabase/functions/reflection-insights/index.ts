@@ -108,6 +108,10 @@ serve(async (req) => {
         outcomes[r.outcome as keyof typeof outcomes] = (outcomes[r.outcome as keyof typeof outcomes] || 0) + 1;
       }
 
+      const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", ja: "Japanese", de: "German" };
+      const langName = LANG_NAMES[userLanguage] || "English";
+      const langInstruction = userLanguage !== "en" ? `\n\nLANGUAGE: Write all insight titles and bodies in ${langName}.` : "";
+
       const systemPrompt = `You are a behavioral pattern analyst for a Bitcoin mindfulness app called Holzen. Users reflect during BTC volatility to build emotional composure.
 
 Analyze the user's reflection data and identify 3-5 specific, actionable patterns. Each insight should be:
@@ -119,7 +123,7 @@ Analyze the user's reflection data and identify 3-5 specific, actionable pattern
 Examples of good insights:
 - "You reflect most on Mondays and Wednesdays — and your hold rate is 20% higher on those days."
 - "When you log 'anxious' mood, you sell 40% of the time. When you breathe first, that drops to 15%."
-- "Your calm mood percentage has increased from 30% to 55% over the last 30 reflections."`;
+- "Your calm mood percentage has increased from 30% to 55% over the last 30 reflections."${langInstruction}`;
 
       const userPrompt = `Here is the user's reflection data (${reflections.length} total reflections):
 
