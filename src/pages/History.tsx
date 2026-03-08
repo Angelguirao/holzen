@@ -350,11 +350,11 @@ const History = () => {
             Timeline
           </button>
         </div>
-        {tab !== 'timeline' && (
+         {tab !== 'timeline' && (
           <p className="text-xs text-muted-foreground">
             {tab === 'recent'
-              ? `${recentReflections.length} reflection${recentReflections.length !== 1 ? 's' : ''} in the last 7 days`
-              : `${reflections.length} reflection${reflections.length !== 1 ? 's' : ''} total`}
+              ? `${filteredRecent.length} reflection${filteredRecent.length !== 1 ? 's' : ''} in the last 7 days`
+              : `${filtered.length} of ${reflections.length} reflection${reflections.length !== 1 ? 's' : ''}`}
           </p>
         )}
       </div>
