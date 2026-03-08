@@ -1,3 +1,4 @@
+import { forwardRef } from 'react';
 import { BarChart3 } from 'lucide-react';
 
 interface Props {
@@ -7,9 +8,9 @@ interface Props {
   needed?: number;
 }
 
-export function ChartEmptyState({ title, message, current, needed }: Props) {
+export const ChartEmptyState = forwardRef<HTMLDivElement, Props>(function ChartEmptyState({ title, message, current, needed }, ref) {
   return (
-    <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-6 space-y-2 text-center">
+    <div ref={ref} className="rounded-md border border-border/60 bg-muted/30 px-4 py-6 space-y-2 text-center">
       <BarChart3 className="h-4 w-4 mx-auto text-muted-foreground/30" />
       <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground/50">
         {title}
@@ -32,4 +33,4 @@ export function ChartEmptyState({ title, message, current, needed }: Props) {
       )}
     </div>
   );
-}
+});
