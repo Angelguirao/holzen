@@ -197,7 +197,7 @@ const Profile = () => {
           <div className="py-8 text-center space-y-2">
             <Mail className="h-5 w-5 mx-auto text-muted-foreground/40" />
             <p className="text-xs text-muted-foreground">
-              No letters yet. Write one during a ±5% market swing from the home page.
+              {t('profile.noLettersYet')}
             </p>
           </div>
         ) : (
