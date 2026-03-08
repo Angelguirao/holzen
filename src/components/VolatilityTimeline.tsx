@@ -344,7 +344,7 @@ function LegendItem({ color, label }: { color: string; label: string }) {
   );
 }
 
-const ChartTooltip = forwardRef<HTMLDivElement, any>(({ active, payload }, ref) => {
+const ChartTooltip = forwardRef<HTMLDivElement, any>(({ active, payload, currency }, ref) => {
   if (!active || !payload?.[0]) return null;
   const data = payload[0].payload as PricePoint;
   const decisionLabels: Record<string, string> = {
