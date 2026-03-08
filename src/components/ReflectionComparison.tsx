@@ -55,7 +55,7 @@ const outcomeLabels: Record<string, string> = {
   nothing: 'Did nothing',
 };
 
-export function ReflectionComparison({ reflectionId, minAgeDays = 30 }: ReflectionComparisonProps) {
+export const ReflectionComparison = forwardRef<HTMLDivElement, ReflectionComparisonProps>(function ReflectionComparison({ reflectionId, minAgeDays = 30 }, ref) {
   const { user } = useAuth();
   const [current, setCurrent] = useState<ComparisonReflection | null>(null);
   const [past, setPast] = useState<ComparisonReflection | null>(null);
