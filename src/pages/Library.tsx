@@ -293,7 +293,6 @@ export default function Library() {
           {/* Item list */}
           <LibraryItems library={library} filtered={filtered} />
         </div>
-      </div>
     </div>
   );
 }
