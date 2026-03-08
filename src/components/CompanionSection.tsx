@@ -418,7 +418,7 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
 
       {hasBreathing && (
         <CollapsibleCompanion
-          label="Breathe with this"
+          label={t.breathe}
           expanded={expandedBreathing}
           onToggle={() => setExpandedBreathing((v) => !v)}
           completed={completion.breathing}
