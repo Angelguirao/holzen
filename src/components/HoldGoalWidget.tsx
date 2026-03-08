@@ -28,6 +28,7 @@ const MAX_PRICE = 100_000_000; // $100M
 const MIN_PRICE = 1;
 
 export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
+  const { currency } = useHolzen();
   const { user } = useAuth();
   const [goal, setGoal] = useState<HoldGoal | null>(null);
   const [loading, setLoading] = useState(true);
