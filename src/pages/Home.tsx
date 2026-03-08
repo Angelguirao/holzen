@@ -96,6 +96,8 @@ const Home = () => {
     ritualTemplate,
   } = useHolzen();
 
+  const { reflection: nightReflection, dismiss: dismissNight } = useNightReflection();
+
   const [showOutcome, setShowOutcome] = useState(false);
   const [showVoid, setShowVoid] = useState(false);
   const [showRitual, setShowRitual] = useState(false);
