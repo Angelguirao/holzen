@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 const GraphView = lazy(() => import('@/components/library/GraphView'));
 
 const SOURCE_FILTERS: { key: string; label: string }[] = [
+  { key: 'reflection', label: 'Reflection' },
   { key: 'signal', label: 'Signal' },
   { key: 'learning', label: 'Learning' },
   { key: 'haiku', label: 'Haiku' },
