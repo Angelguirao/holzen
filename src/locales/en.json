@@ -553,10 +553,10 @@
     "title": "Library",
     "pageTitle": "Library — Holzen",
     "pageDescription": "Your activity, bookmarks, notes, and collections",
-    "tabActivity": "Activity",
     "tabItems": "Items",
-    "tabCollections": "Collections",
-    "tabGraph": "Graph",
+    "tabArchive": "Archive",
+    "viewList": "List",
+    "viewGraph": "Graph",
     "graphEmpty": "No data yet. Complete reflections and save items to build your graph.",
     "searchPlaceholder": "Search items…",
     "tabAll": "All",
@@ -581,5 +581,13 @@
     "addToCollection": "Add to collection",
     "addedToCollection": "Added to collection",
     "emptyCollection": "No items in this collection yet."
+  },
+  "pause": {
+    "youPaused": "You paused. That's the hardest part.",
+    "startRitual": "Start a ritual",
+    "skipToDecision": "Skip to decision",
+    "whatWillYouDo": "What will you do?",
+    "youChose": "You chose deliberately.",
+    "return": "Return"
   }
 }
