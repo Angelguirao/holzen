@@ -208,7 +208,6 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
     }
   };
 
-  const { currency } = useHolzen();
   const fmtPrice = (p: number) => formatBtcPrice(p, currency);
 
   const getStatusCopy = (l: Letter) => {
