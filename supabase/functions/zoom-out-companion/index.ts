@@ -125,14 +125,14 @@ serve(async (req) => {
         const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
         const langCode = language || "en";
         const langName = LANG_NAMES[langCode] || "English";
-        const langInstruction = langCode !== "en" ? `\n\nLANGUAGE: Write title and body in ${langName}.` : "";
+        const langInstruction = langCode !== "en" ? `CRITICAL LANGUAGE REQUIREMENT: You MUST write title and body in ${langName}.\n\n` : "";
 
         const priceContext = currentPrice ? `Current BTC price: $${currentPrice.toLocaleString()}.` : "";
         const historyContext = onThisDay.length > 0
           ? `BTC prices on this day: ${onThisDay.map(e => `${e.yearsAgo}y ago: $${e.price.toLocaleString()}`).join(", ")}.`
           : "";
 
-        const systemPrompt = `You generate ONE deep-time perspective for a Bitcoin mindfulness app. Your job is to zoom way out — beyond markets, beyond decades — into civilizational, planetary, or epochal timescales.
+        const systemPrompt = `${langInstruction}You generate ONE deep-time perspective for a Bitcoin mindfulness app. Your job is to zoom way out — beyond markets, beyond decades — into civilizational, planetary, or epochal timescales.
 
 Think like the Long Now Foundation. Think in centuries and millennia. Put today's price movement in the context of:
 - Human civilization's relationship with money (shells, gold, paper, digital)
@@ -146,7 +146,7 @@ Rules:
 - Body: 1-2 sentences. Poetic but factual. Should make the reader feel the smallness of today's price move against deep time.
 - No trading advice, no price predictions, no exclamation marks.
 - Vary the theme: sometimes civilizational, sometimes planetary, sometimes about the nature of patience itself.
-- Ground in real facts and numbers when possible.${langInstruction}
+- Ground in real facts and numbers when possible.
 
 You MUST respond by calling the "generate_deep_time" function.`;
 
