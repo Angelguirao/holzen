@@ -369,6 +369,24 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
           />
         </CollapsibleCompanion>
       )}
+
+      {hasZoomOut && (
+        <CollapsibleCompanion
+          label="Zoom out"
+          expanded={expandedZoomOut}
+          onToggle={() => {
+            setExpandedZoomOut((v) => !v);
+            if (!completion.zoomOut) markCompleted('zoomOut');
+          }}
+          completed={completion.zoomOut}
+        >
+          <ZoomOutDisplay
+            data={zoomOut}
+            loading={zoomOutLoading}
+            error={zoomOutError}
+          />
+        </CollapsibleCompanion>
+      )}
     </div>
   );
 }
