@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN companion_signal boolean NOT NULL DEFAULT true;

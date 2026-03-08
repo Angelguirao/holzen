@@ -242,6 +242,16 @@ const Settings = () => {
             onCheckedChange={(v) => setCompanionPref('learning', v)}
           />
         </div>
+        <div className="flex items-center justify-between">
+          <Label htmlFor="comp-signal" className="text-xs font-mono text-muted-foreground">
+            Signal
+          </Label>
+          <Switch
+            id="comp-signal"
+            checked={companionPrefs.signal}
+            onCheckedChange={(v) => setCompanionPref('signal', v)}
+          />
+        </div>
       </div>
 
       <Separator />
