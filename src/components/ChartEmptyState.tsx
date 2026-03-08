@@ -33,4 +33,4 @@ export const ChartEmptyState = forwardRef<HTMLDivElement, Props>(function ChartE
       )}
     </div>
   );
-}
+});
