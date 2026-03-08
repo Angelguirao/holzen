@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { fetchBtcData, type BtcPriceData } from '@/lib/btc';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
@@ -376,7 +376,13 @@ export function useHolzen() {
     return nowHour >= quietHoursStart || nowHour < quietHoursEnd;
   }, [quietHoursStart, quietHoursEnd]);
 
+  const checkingRef = useRef(false);
+
   const checkAndTrigger = useCallback(async () => {
+    // Prevent concurrent checks that could fire duplicate reflections
+    if (checkingRef.current) return;
+    checkingRef.current = true;
+
     try {
       const data = await fetchBtcData(currency);
       setBtcData(data);
@@ -397,6 +403,8 @@ export function useHolzen() {
       } else {
         setError('Could not check market data. Will retry automatically.');
       }
+    } finally {
+      checkingRef.current = false;
     }
   }, [user, threshold, thresholdDown, cumulativeThreshold, isInCooldown, isInQuietHours, generateMessage, currency]);
 
