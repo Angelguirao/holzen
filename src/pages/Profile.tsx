@@ -345,6 +345,7 @@ function LetterCard({ letter: l, onDelete, fmtPrice, type }: {
   fmtPrice: (p: number) => string;
   type: 'sealed' | 'delivered';
 }) {
+  const { t } = useTranslation();
   const isDelivered = type === 'delivered';
 
   return (
