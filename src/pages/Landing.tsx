@@ -100,7 +100,7 @@ const Landing = () => {
       />
 
       {/* ─── HERO ─── */}
-      <div className="relative min-h-[90vh] flex flex-col items-center justify-center px-6 overflow-hidden">
+      <div className="relative min-h-[70vh] flex flex-col items-center justify-center px-6 overflow-hidden">
         {/* Ambient background */}
         <div className="absolute inset-0 pointer-events-none">
           <motion.div
@@ -166,9 +166,12 @@ const Landing = () => {
               size="lg"
               className="font-mono text-xs tracking-wider group px-8"
             >
-              {t('landing.getStartedFree')}
+              {t('landing.getStartedForFree')}
               <ArrowRight className="h-3.5 w-3.5 ml-2 transition-transform group-hover:translate-x-0.5" />
             </Button>
+            <p className="text-[11px] text-muted-foreground/50 mt-3 font-mono">
+              {t('landing.noCreditCard')}
+            </p>
           </motion.div>
         </div>
 
@@ -182,9 +185,6 @@ const Landing = () => {
           <ChevronDown className="h-4 w-4 text-muted-foreground/30 animate-bounce" />
         </motion.div>
       </div>
-
-
-
 
       {/* ─── THE LOOP ─── */}
       <div className="max-w-lg mx-auto px-6 py-16">
@@ -259,7 +259,7 @@ const Landing = () => {
               {t('landing.scienceDesc')}
             </p>
             <p className="text-[10px] text-muted-foreground/50 leading-relaxed">
-              Kahneman, D. (2011). <em>Thinking, Fast and Slow</em>. · Barber, B. & Odean, T. (2000). "Trading Is Hazardous to Your Wealth."
+              <a href="https://en.wikipedia.org/wiki/Thinking,_Fast_and_Slow" target="_blank" rel="noopener noreferrer" className="underline hover:text-muted-foreground transition-colors">Kahneman, D. (2011). <em>Thinking, Fast and Slow</em></a>. · <a href="https://doi.org/10.1111/0022-1082.00226" target="_blank" rel="noopener noreferrer" className="underline hover:text-muted-foreground transition-colors">Barber, B. & Odean, T. (2000). "Trading Is Hazardous to Your Wealth."</a> · <a href="https://en.wikipedia.org/wiki/Misbehaving_(book)" target="_blank" rel="noopener noreferrer" className="underline hover:text-muted-foreground transition-colors">Thaler, R. (2015). <em>Misbehaving</em></a>.
             </p>
           </div>
         </Section>
@@ -305,7 +305,7 @@ const Landing = () => {
               size="lg"
               className="font-mono text-xs tracking-wider group px-10"
             >
-              {t('landing.getStartedFree')}
+              {t('landing.getStartedForFree')}
               <ArrowRight className="h-3.5 w-3.5 ml-2 transition-transform group-hover:translate-x-0.5" />
             </Button>
           </div>
