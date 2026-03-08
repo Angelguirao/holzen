@@ -59,14 +59,14 @@ export function HomeWidget({
       className={`rounded-lg border border-border/50 bg-card/50 transition-shadow ${isDragging ? 'shadow-lg' : ''}`}
     >
       {/* Header */}
-      <div className="flex items-center gap-1.5 px-3 py-2">
-        {/* Drag handle */}
+      <div className="flex items-center gap-2 px-3 py-2.5">
+        {/* Drag handle — large touch target */}
         <button
           {...listeners}
-          className="touch-none cursor-grab active:cursor-grabbing p-0.5 -ml-0.5 text-muted-foreground/30 hover:text-muted-foreground/60 transition-colors"
+          className="touch-none cursor-grab active:cursor-grabbing p-1.5 -ml-1.5 rounded-md text-muted-foreground/40 hover:text-muted-foreground/70 hover:bg-muted/50 active:bg-muted transition-colors"
           aria-label={`Drag to reorder ${title}`}
         >
-          <GripVertical className="h-3.5 w-3.5" />
+          <GripVertical className="h-4 w-4" />
         </button>
 
         {/* Title */}
