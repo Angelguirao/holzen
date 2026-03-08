@@ -11,6 +11,7 @@ import { ReflectionNote } from '@/components/ReflectionNote';
 import { ReflectionTags } from '@/components/ReflectionTags';
 import { ShareReflection } from '@/components/ShareReflection';
 import { ReflectionWallpaper } from '@/components/ReflectionWallpaper';
+import { SaveToLibraryButton } from '@/components/library/SaveToLibraryButton';
 import { HolzenRitual, type RitualTemplate } from '@/components/HolzenRitual';
 import { OutcomePrompt } from '@/components/OutcomePrompt';
 
@@ -212,6 +213,7 @@ export default function PauseSession() {
                       <div className="flex items-center gap-1">
                         <ShareReflection message={message} context={context} haiku={companions?.haiku} />
                         <ReflectionWallpaper message={message} mood={null} context={context} haiku={companions?.haiku} variant="button" />
+                        <SaveToLibraryButton title="Reflection" body={message} sourceType="reflection" reflectionId={reflectionId ?? undefined} tags={context ? ['reflection'] : []} />
                       </div>
                     </div>
                   </RevealSection>
