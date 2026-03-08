@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { X, ArrowDown, Check } from 'lucide-react';
+import { X, ArrowDown, Check, Heart } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { hapticFeedback } from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
