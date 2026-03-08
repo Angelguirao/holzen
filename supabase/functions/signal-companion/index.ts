@@ -25,6 +25,11 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
+    const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", ja: "Japanese", de: "German" };
+    const langCode = language || "en";
+    const langName = LANG_NAMES[langCode] || "English";
+    const langInstruction = langCode !== "en" ? `\n\nLANGUAGE: Write the title and body in ${langName}. Source name and URL should remain as-is.` : "";
+
     const systemPrompt = `You are a Bitcoin signal curator for a mindfulness app called Holzen. Your job is to surface ONE real, high-signal piece of Bitcoin analysis or insight that is contextually relevant to the current market conditions.
 
 You MUST call the "return_signal" function with your response. Do not respond with plain text.
