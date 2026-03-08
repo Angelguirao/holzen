@@ -406,8 +406,33 @@ const History = () => {
           >
             {t('history.timeline')}
           </button>
+          <div className="flex-1" />
+          {tab === 'recent' && (
+            <div className="flex items-center gap-1 rounded-md border border-border/40 p-0.5">
+              <button
+                onClick={() => { setViewMode('list'); setCalendarDate(null); }}
+                className={cn(
+                  'p-1 rounded transition-colors',
+                  viewMode === 'list' ? 'bg-muted text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
+                )}
+                aria-label="List view"
+              >
+                <List className="h-3.5 w-3.5" />
+              </button>
+              <button
+                onClick={() => setViewMode('calendar')}
+                className={cn(
+                  'p-1 rounded transition-colors',
+                  viewMode === 'calendar' ? 'bg-muted text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
+                )}
+                aria-label="Calendar view"
+              >
+                <LayoutGrid className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          )}
         </div>
-         {tab !== 'timeline' && (
+         {tab !== 'timeline' && viewMode !== 'calendar' && (
           <p className="text-xs text-muted-foreground">
             {tab === 'recent'
               ? t('history.reflectionsInLast7Days', { count: filteredRecent.length })
