@@ -31,15 +31,19 @@ export function useBadgeSync(computedBadgeIds: string[], badgeMeta: Record<strin
           fresh.map((badge_id) => ({ user_id: user.id, badge_id }))
         );
 
-        // Build celebration data
-        setNewBadges(
-          fresh.map((id) => ({
-            id,
-            label: badgeMeta[id]?.label ?? id,
-            description: badgeMeta[id]?.description ?? '',
-            color: badgeMeta[id]?.color ?? 'hsl(var(--primary))',
-          }))
-        );
+        const newBadgeData = fresh.map((id) => ({
+          id,
+          label: badgeMeta[id]?.label ?? id,
+          description: badgeMeta[id]?.description ?? '',
+          color: badgeMeta[id]?.color ?? 'hsl(var(--primary))',
+        }));
+
+        setNewBadges(newBadgeData);
+
+        // Send push notification (fire and forget)
+        supabase.functions.invoke('badge-notify', {
+          body: { badges: newBadgeData },
+        }).catch(() => {});
       }
 
       setSynced(true);
