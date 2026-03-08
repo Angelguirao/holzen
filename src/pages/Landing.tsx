@@ -114,14 +114,14 @@ const Landing = () => {
           </motion.p>
           <div className="grid grid-cols-2 gap-3">
             {[
-              { icon: <Wind className="h-3.5 w-3.5" />, label: 'Breathing exercise', desc: 'Calm before the message' },
-              { icon: <Feather className="h-3.5 w-3.5" />, label: 'Haiku companion', desc: '5-7-5 stillness' },
-              { icon: <BookOpen className="h-3.5 w-3.5" />, label: 'Historical insight', desc: 'Context from past events' },
-              { icon: <TrendingDown className="h-3.5 w-3.5" />, label: '7-day detection', desc: 'Catches slow-burn drops' },
-              { icon: <Brain className="h-3.5 w-3.5" />, label: 'Mood tracking', desc: 'See emotional patterns' },
-              { icon: <Tag className="h-3.5 w-3.5" />, label: 'Reflection tags', desc: 'Fear, greed, FOMO, clarity' },
-              { icon: <BarChart3 className="h-3.5 w-3.5" />, label: 'Insights & trends', desc: 'Your composure over time' },
-              { icon: <MessageCircle className="h-3.5 w-3.5" />, label: 'Journal notes', desc: 'Your words, your growth' },
+              { icon: <Wind className="h-3.5 w-3.5" />, label: t('landing.features.breathing'), desc: t('landing.features.breathingDesc') },
+              { icon: <Feather className="h-3.5 w-3.5" />, label: t('landing.features.haiku'), desc: t('landing.features.haikuDesc') },
+              { icon: <BookOpen className="h-3.5 w-3.5" />, label: t('landing.features.historical'), desc: t('landing.features.historicalDesc') },
+              { icon: <TrendingDown className="h-3.5 w-3.5" />, label: t('landing.features.detection'), desc: t('landing.features.detectionDesc') },
+              { icon: <Brain className="h-3.5 w-3.5" />, label: t('landing.features.mood'), desc: t('landing.features.moodDesc') },
+              { icon: <Tag className="h-3.5 w-3.5" />, label: t('landing.features.tags'), desc: t('landing.features.tagsDesc') },
+              { icon: <BarChart3 className="h-3.5 w-3.5" />, label: t('landing.features.insights'), desc: t('landing.features.insightsDesc') },
+              { icon: <MessageCircle className="h-3.5 w-3.5" />, label: t('landing.features.journal'), desc: t('landing.features.journalDesc') },
             ].map((f, i) => (
               <motion.div
                 key={f.label}
