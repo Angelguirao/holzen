@@ -262,6 +262,7 @@ function StatsContent({ reflections, memberSince }: { reflections: Reflection[];
       <StreakTimeline reflections={reflections} memberSince={memberSince} />
       <InsightsPanel reflections={reflections} />
       <DecisionQualityCard reflections={reflections} />
+      <VolatilityToleranceCard reflections={reflections} />
       <RitualStatsCard />
 
       {hasEnoughForCharts ? (
