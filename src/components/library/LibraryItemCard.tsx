@@ -5,6 +5,8 @@ import { useTranslation } from 'react-i18next';
 import { AddToCollectionButton } from './AddToCollectionButton';
 
 const SOURCE_LABELS: Record<string, string> = {
+  reflection: 'Reflection',
+  reflection_note: 'Note',
   signal: 'Signal',
   learning: 'Learning',
   haiku: 'Haiku',
