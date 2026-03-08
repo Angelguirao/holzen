@@ -28,6 +28,25 @@ export function SaveToLibraryButton({ title, body, sourceType, sourceUrl, reflec
   const [highlightIdx, setHighlightIdx] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
 
+  // Check if already saved on mount
+  useEffect(() => {
+    if (!user) { setChecking(false); return; }
+    const check = async () => {
+      let query = supabase
+        .from('library_items')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('source_type', sourceType);
+      if (reflectionId) query = query.eq('reflection_id', reflectionId);
+      else if (body) query = query.eq('body', body);
+      else if (title) query = query.eq('title', title);
+      const { data } = await query.limit(1);
+      if (data && data.length > 0) setSaved(true);
+      setChecking(false);
+    };
+    check();
+  }, [user, sourceType, reflectionId, body, title]);
+
   // Fetch user's existing tags when tag picker opens
   useEffect(() => {
     if (!showTags || !user) return;
