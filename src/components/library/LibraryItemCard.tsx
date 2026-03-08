@@ -24,9 +24,9 @@ interface Props {
   onStatusChange: (id: string, status: 'unread' | 'read' | 'archived') => void;
 }
 
-export function LibraryItemCard({ item, onTogglePin, onDelete }: Props) {
+export function LibraryItemCard({ item, onTogglePin, onDelete, onStatusChange }: Props) {
   const { t } = useTranslation();
-
+  const isUnread = item.status === 'unread';
   return (
     <div className="group rounded-md border border-border/40 bg-card/50 px-3 py-2.5 space-y-1.5 transition-colors hover:bg-card/80">
       <div className="flex items-start gap-2">
