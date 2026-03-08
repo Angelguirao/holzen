@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Bell, X, CheckCheck } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Bell, X, CheckCheck, ArrowRight } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { formatDistanceToNow } from 'date-fns';
 import { AnimatePresence, motion } from 'framer-motion';
+import { Skeleton } from '@/components/ui/skeleton';
 
 type NotificationItem = {
   id: string;
@@ -11,6 +13,7 @@ type NotificationItem = {
   title: string;
   subtitle: string;
   timestamp: string;
+  action?: { label: string; path: string };
 };
 
 const LAST_READ_KEY = 'holzen_notifications_read_at';
@@ -31,9 +34,11 @@ function saveDismissedIds(ids: Set<string>) {
 
 export function NotificationBell() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [allNotifications, setAllNotifications] = useState<NotificationItem[]>([]);
   const [dismissed, setDismissed] = useState<Set<string>>(getDismissedIds);
   const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -43,14 +48,24 @@ export function NotificationBell() {
     if (!user) return;
 
     async function fetchNotifications() {
+      setLoading(true);
       const items: NotificationItem[] = [];
 
-      const { data: badges } = await supabase
-        .from('user_badges')
-        .select('id, badge_id, earned_at')
-        .eq('user_id', user!.id)
-        .order('earned_at', { ascending: false })
-        .limit(10);
+      const [
+        { data: badges },
+        { data: nights },
+        { data: letters },
+        { data: reflections },
+        { data: rituals },
+        { data: insights },
+      ] = await Promise.all([
+        supabase.from('user_badges').select('id, badge_id, earned_at').eq('user_id', user!.id).order('earned_at', { ascending: false }).limit(10),
+        supabase.from('night_reflections').select('id, message, created_at').eq('user_id', user!.id).order('created_at', { ascending: false }).limit(5),
+        supabase.from('future_letters').select('id, delivered_at').eq('user_id', user!.id).eq('delivered', true).not('delivered_at', 'is', null).order('delivered_at', { ascending: false }).limit(5),
+        supabase.from('reflections').select('id, message, created_at').eq('user_id', user!.id).order('created_at', { ascending: false }).limit(5),
+        supabase.from('ritual_completions').select('id, decision, created_at').eq('user_id', user!.id).order('created_at', { ascending: false }).limit(5),
+        supabase.from('reflection_insights').select('id, generated_at, reflection_count').eq('user_id', user!.id).order('generated_at', { ascending: false }).limit(3),
+      ]);
 
       if (badges) {
         for (const b of badges) {
@@ -60,16 +75,10 @@ export function NotificationBell() {
             title: 'Badge earned',
             subtitle: b.badge_id.replace(/_/g, ' '),
             timestamp: b.earned_at,
+            action: { label: 'View badges', path: '/profile' },
           });
         }
       }
-
-      const { data: nights } = await supabase
-        .from('night_reflections')
-        .select('id, message, created_at')
-        .eq('user_id', user!.id)
-        .order('created_at', { ascending: false })
-        .limit(5);
 
       if (nights) {
         for (const n of nights) {
@@ -83,15 +92,6 @@ export function NotificationBell() {
         }
       }
 
-      const { data: letters } = await supabase
-        .from('future_letters')
-        .select('id, delivered_at')
-        .eq('user_id', user!.id)
-        .eq('delivered', true)
-        .not('delivered_at', 'is', null)
-        .order('delivered_at', { ascending: false })
-        .limit(5);
-
       if (letters) {
         for (const l of letters) {
           items.push({
@@ -100,17 +100,10 @@ export function NotificationBell() {
             title: 'Letter delivered',
             subtitle: 'A letter from your past self arrived',
             timestamp: l.delivered_at!,
+            action: { label: 'Read letter', path: '/profile' },
           });
         }
       }
-
-      // Fetch recent reflections (system-triggered)
-      const { data: reflections } = await supabase
-        .from('reflections')
-        .select('id, message, created_at')
-        .eq('user_id', user!.id)
-        .order('created_at', { ascending: false })
-        .limit(5);
 
       if (reflections) {
         for (const r of reflections) {
@@ -120,17 +113,10 @@ export function NotificationBell() {
             title: 'Reflection triggered',
             subtitle: r.message.slice(0, 60) + (r.message.length > 60 ? '…' : ''),
             timestamp: r.created_at,
+            action: { label: 'View in history', path: '/history' },
           });
         }
       }
-
-      // Fetch recent ritual completions
-      const { data: rituals } = await supabase
-        .from('ritual_completions')
-        .select('id, decision, created_at')
-        .eq('user_id', user!.id)
-        .order('created_at', { ascending: false })
-        .limit(5);
 
       if (rituals) {
         const decisionLabels: Record<string, string> = {
@@ -143,12 +129,27 @@ export function NotificationBell() {
             title: 'Ritual completed',
             subtitle: `Decision: ${decisionLabels[r.decision] || r.decision}`,
             timestamp: r.created_at,
+            action: { label: 'View history', path: '/history' },
+          });
+        }
+      }
+
+      if (insights) {
+        for (const i of insights) {
+          items.push({
+            id: `insight-${i.id}`,
+            type: 'insight',
+            title: 'AI insights ready',
+            subtitle: `Based on ${i.reflection_count} reflections`,
+            timestamp: i.generated_at,
+            action: { label: 'View insights', path: '/profile' },
           });
         }
       }
 
       items.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
       setAllNotifications(items.slice(0, 20));
+      setLoading(false);
     }
 
     fetchNotifications();
@@ -184,6 +185,11 @@ export function NotificationBell() {
       setUnreadCount(0);
     }
   }
+
+  const handleAction = useCallback((path: string) => {
+    setOpen(false);
+    navigate(path);
+  }, [navigate]);
 
   const dismissOne = useCallback((id: string) => {
     setDismissed(prev => {
@@ -252,7 +258,20 @@ export function NotificationBell() {
               )}
             </div>
 
-            {visibleNotifications.length === 0 ? (
+            {loading ? (
+              <div className="px-3 py-3 space-y-3">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="flex items-start gap-2">
+                    <Skeleton className="h-4 w-4 rounded-full shrink-0 mt-0.5" />
+                    <div className="flex-1 space-y-1.5">
+                      <Skeleton className="h-3 w-24" />
+                      <Skeleton className="h-2.5 w-full" />
+                      <Skeleton className="h-2 w-16" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : visibleNotifications.length === 0 ? (
               <div className="px-3 py-6 text-center">
                 <p className="text-xs text-muted-foreground">All caught up</p>
               </div>
@@ -276,9 +295,20 @@ export function NotificationBell() {
                           <p className="text-[10px] text-muted-foreground leading-snug mt-0.5 truncate">
                             {n.subtitle}
                           </p>
-                          <p className="text-[9px] text-muted-foreground/60 font-mono mt-1">
-                            {formatDistanceToNow(new Date(n.timestamp), { addSuffix: true })}
-                          </p>
+                          <div className="flex items-center gap-2 mt-1">
+                            <p className="text-[9px] text-muted-foreground/60 font-mono">
+                              {formatDistanceToNow(new Date(n.timestamp), { addSuffix: true })}
+                            </p>
+                            {n.action && (
+                              <button
+                                onClick={() => handleAction(n.action!.path)}
+                                className="flex items-center gap-0.5 text-[9px] font-mono text-primary/70 hover:text-primary transition-colors"
+                              >
+                                {n.action.label}
+                                <ArrowRight className="h-2.5 w-2.5" />
+                              </button>
+                            )}
+                          </div>
                         </div>
                         <button
                           onClick={(e) => { e.stopPropagation(); dismissOne(n.id); }}
