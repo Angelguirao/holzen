@@ -431,7 +431,7 @@ const History = () => {
                             dateFrom ? "text-foreground" : "text-muted-foreground/50"
                           )}>
                             <CalendarIcon className="h-3 w-3" />
-                            {dateFrom ? format(dateFrom, 'MMM d, yyyy') : 'From'}
+                            {dateFrom ? format(dateFrom, 'MMM d, yyyy') : t('common.from')}
                           </button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
