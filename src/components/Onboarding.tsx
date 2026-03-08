@@ -114,7 +114,7 @@ export function Onboarding({ onComplete }: Props) {
                     </div>
                     <div className="flex items-center gap-2">
                       <p className="text-[10px] font-mono text-muted-foreground/50">
-                        Timezone: {timezone.replace(/_/g, ' ')}
+                        {t('onboarding.timezone', { tz: timezone.replace(/_/g, ' ') })}
                       </p>
                     </div>
                   </motion.div>
