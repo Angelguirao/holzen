@@ -31,3 +31,5 @@ project_id = "edgbwdecaoottowliimu"
     verify_jwt = false
   [functions.record-referral]
     verify_jwt = false
+  [functions.generate-wallpaper]
+    verify_jwt = false
