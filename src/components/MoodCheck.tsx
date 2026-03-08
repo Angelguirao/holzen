@@ -21,7 +21,10 @@ const moodGroups = [
   },
 ] as const;
 
-const allMoods = moodGroups.flatMap((g) => g.moods);
+const allMoods = [
+  ...moodGroups[0].moods,
+  ...moodGroups[1].moods,
+] as const;
 
 export type MoodValue = (typeof allMoods)[number]['value'];
 
