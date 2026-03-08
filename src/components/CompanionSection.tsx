@@ -8,6 +8,7 @@ import { HistoricalInsightDisplay } from './HistoricalInsightDisplay';
 import { ChevronDown, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { hapticFeedback } from '@/lib/haptics';
+import { useHolzen } from '@/hooks/use-holzen';
 
 export interface CompanionData {
   haiku: string | null;
