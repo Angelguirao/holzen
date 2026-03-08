@@ -126,7 +126,7 @@ export function MoodTrendChart({ reflections }: Props) {
               axisLine={false}
               tickLine={false}
             />
-            <ReferenceLine y={2} stroke="hsl(var(--border))" strokeDasharray="3 3" opacity={0.4} />
+            <ReferenceLine y={3} stroke="hsl(var(--border))" strokeDasharray="3 3" opacity={0.4} />
             <Tooltip
               contentStyle={{
                 background: 'hsl(var(--muted))',
