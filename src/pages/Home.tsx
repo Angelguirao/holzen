@@ -371,16 +371,33 @@ const Home = () => {
         />
       )}
 
-      {/* The Void */}
-      <button
-        onClick={() => setShowVoid(true)}
-        className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-border/30 bg-muted/10 hover:bg-muted/20 transition-colors duration-500"
-      >
-        <Circle className="h-3 w-3 text-muted-foreground/40" />
-        <span className="text-[10px] font-mono text-muted-foreground/40 tracking-[0.2em] uppercase">
-          Enter the void
-        </span>
-      </button>
+      {/* Ritual + Void */}
+      <div className="space-y-2">
+        <button
+          onClick={() => setShowRitual(true)}
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors duration-300"
+        >
+          <Sparkles className="h-3 w-3 text-primary/40" />
+          <span className="text-[10px] font-mono text-primary/40 tracking-[0.2em] uppercase">
+            Start a ritual
+          </span>
+        </button>
+        <button
+          onClick={() => setShowVoid(true)}
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-border/30 bg-muted/10 hover:bg-muted/20 transition-colors duration-500"
+        >
+          <Circle className="h-3 w-3 text-muted-foreground/40" />
+          <span className="text-[10px] font-mono text-muted-foreground/40 tracking-[0.2em] uppercase">
+            Enter the void
+          </span>
+        </button>
+      </div>
+      <HolzenRitual
+        open={showRitual}
+        onClose={() => setShowRitual(false)}
+        template={(ritualTemplate || 'standard') as RitualTemplate}
+        reflectionMessage={message ?? undefined}
+      />
       <TheVoid open={showVoid} onClose={() => setShowVoid(false)} />
 
       <Separator />
