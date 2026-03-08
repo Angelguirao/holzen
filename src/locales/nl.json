@@ -404,6 +404,22 @@
       "04title": "Je legt vast",
       "04desc": "Tag je emoties. Schrijf een notitie. Leg vast wat je deed — gehouden, verkocht, gekocht of niets. Na verloop van tijd ontstaan patronen."
     },
+    "companionsTitle": "Zes begeleiders",
+    "companionsDesc": "Elke reflectie komt met begeleiders die je vertragen en perspectief bieden. Sla er eentje op in je Bibliotheek met een tik.",
+    "companions": {
+      "breathing": "Ademhalingsoefening",
+      "breathingDesc": "Begeleide kalmte voor het lezen",
+      "haiku": "Haiku",
+      "haikuDesc": "5-7-5 stilte, elke keer uniek",
+      "signal": "Lees het Signaal",
+      "signalDesc": "AI-aangedreven intelligentie uit je gecureerde bronnen",
+      "learning": "Aard jezelf",
+      "learningDesc": "Gedragsfinanciën-onderzoek in context",
+      "zoomOut": "Perspectief",
+      "zoomOutDesc": "BTC-prijzen van 1–5 jaar geleden, je eerdere reflecties & dieptijd-perspectief",
+      "history": "Historisch Echo",
+      "historyDesc": "Financiële geschiedenisparallellen & vergelijkingen tussen activaklassen via onderzoek"
+    },
     "whatYouGet": "Wat je krijgt",
     "features": {
       "breathing": "Ademhalingsoefening",
