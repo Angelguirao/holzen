@@ -131,7 +131,7 @@ export default function Library() {
           <NewNoteForm onSave={handleNewNote} />
           <div className="space-y-1.5">
             {filtered.map((item) => (
-              <LibraryItemCard key={item.id} item={item} onTogglePin={togglePin} onDelete={deleteItem} />
+              <LibraryItemCard key={item.id} item={item} onTogglePin={togglePin} onDelete={deleteItem} onStatusChange={handleStatusChange} />
             ))}
           </div>
           {filtered.length === 0 && (
