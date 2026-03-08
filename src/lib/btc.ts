@@ -1,6 +1,14 @@
 export interface FearGreedData {
   value: number;
-  label: string; // e.g. "Extreme Fear", "Fear", "Neutral", "Greed", "Extreme Greed"
+  label: string;
+}
+
+export interface OnChainData {
+  mempoolSize?: number; // number of unconfirmed txs
+  fastestFee?: number; // sat/vB
+  medianFee?: number;
+  hashrate?: string; // human-readable
+  blockHeight?: number;
 }
 
 export interface BtcPriceData {
@@ -11,6 +19,7 @@ export interface BtcPriceData {
   cumulativeChangePercent?: number;
   cumulativeDirection?: 'up' | 'down';
   fearGreed?: FearGreedData;
+  onChain?: OnChainData;
 }
 
 async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise<Response> {
@@ -40,12 +49,38 @@ async function fetchFearGreed(): Promise<FearGreedData | undefined> {
   }
 }
 
+async function fetchOnChainData(): Promise<OnChainData | undefined> {
+  try {
+    const [mempoolRes, feesRes, hashrateRes, tipRes] = await Promise.all([
+      fetch('https://mempool.space/api/mempool').then((r) => (r.ok ? r.json() : null)).catch(() => null),
+      fetch('https://mempool.space/api/v1/fees/recommended').then((r) => (r.ok ? r.json() : null)).catch(() => null),
+      fetch('https://mempool.space/api/v1/mining/hashrate/1d').then((r) => (r.ok ? r.json() : null)).catch(() => null),
+      fetch('https://mempool.space/api/blocks/tip/height').then((r) => (r.ok ? r.text() : null)).catch(() => null),
+    ]);
+
+    const result: OnChainData = {};
+    if (mempoolRes) result.mempoolSize = mempoolRes.count;
+    if (feesRes) {
+      result.fastestFee = feesRes.fastestFee;
+      result.medianFee = feesRes.halfHourFee;
+    }
+    if (hashrateRes?.currentHashrate) {
+      const eh = hashrateRes.currentHashrate / 1e18;
+      result.hashrate = `${eh.toFixed(1)} EH/s`;
+    }
+    if (tipRes) result.blockHeight = parseInt(tipRes, 10);
+    return result;
+  } catch {
+    return undefined;
+  }
+}
+
 export async function fetchBtcData(): Promise<BtcPriceData> {
-  // Fetch price data and fear/greed in parallel
-  const [res1d, res7d, fearGreed] = await Promise.all([
+  const [res1d, res7d, fearGreed, onChain] = await Promise.all([
     fetchWithRetry('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=1'),
     fetchWithRetry('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=7'),
     fetchFearGreed(),
+    fetchOnChainData(),
   ]);
 
   const data1d = await res1d.json();
@@ -79,5 +114,6 @@ export async function fetchBtcData(): Promise<BtcPriceData> {
     cumulativeChangePercent,
     cumulativeDirection,
     fearGreed,
+    onChain,
   };
 }
