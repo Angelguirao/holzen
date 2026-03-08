@@ -149,7 +149,7 @@ export default function Library() {
         )}
       </div>
 
-      {viewMode === 'list' ? (
+      {viewMode === 'list' || isMobile ? (
         <div className="space-y-3">
           {/* Search + filter toggle */}
           <div className="flex items-center gap-2">
