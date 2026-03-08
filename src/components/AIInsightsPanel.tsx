@@ -22,6 +22,7 @@ interface InsightsRow {
   generated_at: string;
   period_start: string | null;
   period_end: string | null;
+  language?: string;
 }
 
 const PAGE_SIZE = 10;
