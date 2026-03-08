@@ -380,6 +380,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
                 .eq('id', reflectionId)
                 .then(() => {});
               autoSaveToLibrary({ title: 'Zoom Out', body: typeof data === 'object' ? JSON.stringify(data) : String(data), sourceType: 'zoom_out' });
+            }
             setZoomOutLoading(false);
           });
       });
