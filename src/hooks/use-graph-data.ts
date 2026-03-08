@@ -18,6 +18,8 @@ export interface GraphNodeData extends Record<string, unknown> {
   sublabel?: string;
   count?: number;
   emoji?: string;
+  onClick?: () => void;
+  entityId?: string; // original reflection/library_item id
 }
 
 const MOOD_EMOJIS: Record<string, string> = {
@@ -106,6 +108,7 @@ export function useGraphData(
           label: r.message.slice(0, 60) + (r.message.length > 60 ? '…' : ''),
           nodeType: 'reflection',
           sublabel: r.context || undefined,
+          entityId: r.id,
         },
       });
 
@@ -140,6 +143,7 @@ export function useGraphData(
           label: li.title || li.body?.slice(0, 40) || 'Untitled',
           nodeType: 'library_item',
           sublabel: li.type,
+          entityId: li.id,
         },
       });
 
