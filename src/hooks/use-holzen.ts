@@ -417,7 +417,12 @@ export function useHolzen() {
       if (!btcData) setBtcData(data);
       await generateMessage(data, mood);
     } catch (e: any) {
-      setError(e.message || 'Failed to trigger reflection');
+      const raw = e?.message || '';
+      if (raw.includes('fetch') || raw.includes('Failed to fetch')) {
+        setError('Could not connect. Check your internet and try again.');
+      } else {
+        setError('Reflection could not be generated right now. Try again in a moment.');
+      }
     }
   }, [btcData, generateMessage, manualCooldownRemaining]);
 
