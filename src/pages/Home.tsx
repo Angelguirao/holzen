@@ -420,8 +420,7 @@ const Home = () => {
                               ? t('home.errors.aiTemporarilyUnavailable')
                               : t('home.errors.unexpectedError')}
                           </p>
-                          <button onClick={() => manualTrigger()} className="text-xs font-mono text-primary underline">
-                            Try again
+                          <button onClick={() => manualTrigger()} className="text-xs font-mono text-primary underline">{t('common.tryAgain')}</button>
                           </button>
                         </div>
                       ) : (
