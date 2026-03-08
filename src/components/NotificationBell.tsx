@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 
 type NotificationItem = {
   id: string;
-  type: 'badge' | 'night_reflection' | 'letter' | 'insight';
+  type: 'badge' | 'night_reflection' | 'letter' | 'insight' | 'reflection' | 'ritual';
   title: string;
   subtitle: string;
   timestamp: string;
