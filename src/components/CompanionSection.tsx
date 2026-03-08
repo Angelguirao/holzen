@@ -118,7 +118,8 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
             breathing: (data as any).breathing_completed ?? false,
             haiku: (data as any).haiku_read ?? false,
             learning: (data as any).learning_read ?? false,
-            signal: false, // Signal is ephemeral, not persisted
+            signal: false,
+            zoomOut: false,
           });
         }
       });
