@@ -161,6 +161,14 @@ const Home = () => {
     });
   }, []);
 
+  const toggleBtcMode = useCallback(() => {
+    setBtcMode(prev => {
+      const next = !prev;
+      localStorage.setItem('holzen_btc_mode', String(next));
+      return next;
+    });
+  }, []);
+
   const handleNeedAMoment = () => {
     if (manualCooldownRemaining() > 0) return;
     setShowMoodCheck(true);
