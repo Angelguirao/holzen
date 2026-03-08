@@ -31,7 +31,7 @@ export function LandingTestimonials() {
   return (
     <div className="space-y-5">
       <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
-        What users say
+        {t('landing.whatUsersSay')}
       </p>
       <div className="space-y-3">
         {testimonials.map((t, i) => (
