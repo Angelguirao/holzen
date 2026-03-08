@@ -85,7 +85,15 @@ export function LibraryItemCard({
             </p>
           )}
         </div>
-        <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+        <div className="flex items-center gap-0.5 shrink-0">
+          <button
+            onClick={() => onToggleFavorite(item.id)}
+            className={`p-1 transition-colors ${item.is_favorite ? 'text-destructive' : 'text-muted-foreground/50 hover:text-destructive'}`}
+            aria-label={item.is_favorite ? 'Remove from favorites' : 'Add to favorites'}
+          >
+            <Heart className={`h-3 w-3 ${item.is_favorite ? 'fill-current' : ''}`} />
+          </button>
+          <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
           <button
             onClick={() => onStatusChange(item.id, isUnread ? 'read' : 'unread')}
             className="p-1 text-muted-foreground/50 hover:text-foreground transition-colors"
