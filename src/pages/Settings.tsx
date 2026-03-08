@@ -1,4 +1,5 @@
 import { useAuth } from '@/hooks/use-auth';
+import { isHapticEnabled, setHapticEnabled } from '@/lib/haptics';
 import { useHolzen } from '@/hooks/use-holzen';
 import { useSubscription } from '@/hooks/use-subscription';
 import { useInstallPrompt } from '@/hooks/use-install-prompt';
@@ -49,6 +50,7 @@ const Settings = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [changingPassword, setChangingPassword] = useState(false);
   const [zenMode, setZenMode] = useState(() => localStorage.getItem('holzen_zen_mode') === 'true');
+  const [hapticEnabled, setHapticEnabledState] = useState(isHapticEnabled);
   const [btcMode, setBtcMode] = useState(() => localStorage.getItem('holzen_btc_mode') === 'true');
   const [latestVersion, setLatestVersion] = useState<string | null>(null);
   const [hasNewVersion, setHasNewVersion] = useState(false);
@@ -528,6 +530,20 @@ const Settings = () => {
                   Enable silent mode
                 </Label>
                 <Switch id="silent-mode" checked={silentMode} onCheckedChange={setSilentMode} />
+              </div>
+            </div>
+
+            {/* Haptic Feedback */}
+            <div className="space-y-3">
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">Haptic feedback</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Vibration feedback on interactions (mobile only).
+              </p>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="haptic-toggle" className="text-xs font-mono text-muted-foreground">
+                  Enable haptics
+                </Label>
+                <Switch id="haptic-toggle" checked={hapticEnabled} onCheckedChange={(val) => { setHapticEnabledState(val); setHapticEnabled(val); }} />
               </div>
             </div>
 
