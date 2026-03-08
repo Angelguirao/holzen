@@ -65,6 +65,7 @@ const textColors: Record<VolatilityLevel, string> = {
 const BREATH_DURATION = 8; // seconds per full cycle
 
 export default function Ambient() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const prefersReducedMotion = useReducedMotion();
   const [btcData, setBtcData] = useState<BtcPriceData | null>(null);
