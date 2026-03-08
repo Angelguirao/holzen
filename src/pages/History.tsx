@@ -227,8 +227,10 @@ const History = () => {
         </div>
       )}
 
-      {/* Reflections list */}
-      {loading ? (
+      {/* Timeline tab */}
+      {tab === 'timeline' ? (
+        <VolatilityTimeline />
+      ) : loading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
             <div key={i} className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2">
