@@ -1,11 +1,9 @@
 import { useState, useMemo, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Search, FolderOpen, Plus, Pencil, Trash2 } from 'lucide-react';
+import { Search, FolderOpen, Tag, Pencil, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { LibraryItemCard } from './LibraryItemCard';
-import { NewNoteForm } from './NewNoteForm';
-import { NewCollectionForm } from './NewCollectionForm';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
 import type { useLibrary } from '@/hooks/use-library';
@@ -13,14 +11,18 @@ import type { Collection } from '@/hooks/use-library';
 
 interface Props {
   library: ReturnType<typeof useLibrary>;
-  favoritesOnly?: boolean;
 }
 
-const TYPE_FILTERS = [
-  { key: 'all', labelKey: 'library.tabAll' },
-  { key: 'bookmarks', labelKey: 'library.tabBookmarks' },
-  { key: 'notes', labelKey: 'library.tabNotes' },
-] as const;
+const SOURCE_FILTERS: { key: string; label: string }[] = [
+  { key: 'all', label: 'All' },
+  { key: 'signal', label: 'Signal' },
+  { key: 'learning', label: 'Learning' },
+  { key: 'haiku', label: 'Haiku' },
+  { key: 'zoom_out', label: 'Zoom Out' },
+  { key: 'history_insight', label: 'History' },
+  { key: 'reflection_note', label: 'Note' },
+  { key: 'external', label: 'External' },
+];
 
 function CollectionChip({
   col,
@@ -44,7 +46,6 @@ function CollectionChip({
   const [newName, setNewName] = useState(col.name);
   const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const didLongPress = useRef(false);
-  const inputRef = useRef<HTMLInputElement>(null);
 
   const startLongPress = useCallback(() => {
     didLongPress.current = false;
@@ -72,21 +73,18 @@ function CollectionChip({
 
   if (renaming) {
     return (
-      <div className="flex items-center gap-1 flex-shrink-0">
-        <input
-          ref={inputRef}
-          value={newName}
-          onChange={(e) => setNewName(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter') handleRenameSubmit();
-            if (e.key === 'Escape') { setRenaming(false); setMenuOpen(false); }
-          }}
-          onBlur={handleRenameSubmit}
-          autoFocus
-          maxLength={80}
-          className="text-[9px] font-mono px-2 py-0.5 rounded-full border border-foreground/20 bg-foreground/5 text-foreground w-24 focus:outline-none focus:ring-1 focus:ring-ring/30"
-        />
-      </div>
+      <input
+        value={newName}
+        onChange={(e) => setNewName(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') handleRenameSubmit();
+          if (e.key === 'Escape') { setRenaming(false); setMenuOpen(false); }
+        }}
+        onBlur={handleRenameSubmit}
+        autoFocus
+        maxLength={80}
+        className="text-[9px] font-mono px-2 py-0.5 rounded-full border border-foreground/20 bg-foreground/5 text-foreground w-24 focus:outline-none focus:ring-1 focus:ring-ring/30"
+      />
     );
   }
 
@@ -136,25 +134,41 @@ function CollectionChip({
   );
 }
 
-export function LibraryItems({ library, favoritesOnly = false }: Props) {
+export function LibraryItems({ library }: Props) {
   const { t } = useTranslation();
   const {
     items, collections, collectionItems, loading,
-    addItem, updateItem, deleteItem, togglePin,
+    updateItem, deleteItem, togglePin,
     addToCollection, removeFromCollection, getItemCollections,
-    addCollection, updateCollection, deleteCollection,
+    updateCollection, deleteCollection,
   } = library;
   const [search, setSearch] = useState('');
-  const [typeFilter, setTypeFilter] = useState('all');
+  const [sourceFilter, setSourceFilter] = useState('all');
+  const [tagFilter, setTagFilter] = useState<string | null>(null);
   const [collectionFilter, setCollectionFilter] = useState<string | null>(null);
-  const [showNewCollection, setShowNewCollection] = useState(false);
+
+  // Collect all unique tags across items
+  const allTags = useMemo(() => {
+    const set = new Set<string>();
+    items.forEach((i) => i.tags?.forEach((t) => set.add(t)));
+    return Array.from(set).sort();
+  }, [items]);
+
+  // Only show source types that actually exist in items
+  const availableSources = useMemo(() => {
+    const existing = new Set(items.map((i) => i.source_type).filter(Boolean));
+    return SOURCE_FILTERS.filter((f) => f.key === 'all' || existing.has(f.key));
+  }, [items]);
 
   const filtered = useMemo(() => {
     let result = items;
+    // Hide archived unless searching
     if (!search.trim()) result = result.filter((i) => i.status !== 'archived');
-    if (favoritesOnly) result = result.filter((i) => i.pinned);
-    if (typeFilter === 'bookmarks') result = result.filter((i) => i.type === 'bookmark');
-    if (typeFilter === 'notes') result = result.filter((i) => i.type === 'note');
+    // Source type filter
+    if (sourceFilter !== 'all') result = result.filter((i) => i.source_type === sourceFilter);
+    // Tag filter
+    if (tagFilter) result = result.filter((i) => i.tags?.includes(tagFilter));
+    // Collection filter
     if (collectionFilter) {
       const itemIds = new Set(
         collectionItems
@@ -163,16 +177,17 @@ export function LibraryItems({ library, favoritesOnly = false }: Props) {
       );
       result = result.filter((i) => itemIds.has(i.id));
     }
+    // Search
     if (search.trim()) {
       const q = search.toLowerCase();
       result = result.filter((i) =>
         i.title?.toLowerCase().includes(q) ||
         i.body?.toLowerCase().includes(q) ||
-        i.tags.some((t) => t.includes(q))
+        i.tags?.some((t) => t.includes(q))
       );
     }
     return result;
-  }, [items, typeFilter, collectionFilter, collectionItems, search, favoritesOnly]);
+  }, [items, sourceFilter, tagFilter, collectionFilter, collectionItems, search]);
 
   const pinnedItems = filtered.filter((i) => i.pinned);
   const unpinnedItems = filtered.filter((i) => !i.pinned);
@@ -181,8 +196,8 @@ export function LibraryItems({ library, favoritesOnly = false }: Props) {
     await updateItem(id, { status } as any);
   };
 
-  const handleNewNote = async (title: string, body: string, tags: string[]) => {
-    await addItem({ type: 'note', title: title || null, body, tags });
+  const handleUpdateTags = async (id: string, tags: string[]) => {
+    await updateItem(id, { tags } as any);
   };
 
   const handleRenameCollection = async (id: string, name: string) => {
@@ -194,10 +209,6 @@ export function LibraryItems({ library, favoritesOnly = false }: Props) {
     if (collectionFilter === id) setCollectionFilter(null);
     await deleteCollection(id);
     toast.success(t('library.collectionDeleted'));
-  };
-
-  const handleUpdateTags = async (id: string, tags: string[]) => {
-    await updateItem(id, { tags } as any);
   };
 
   const renderCard = (item: typeof items[0]) => (
@@ -219,8 +230,11 @@ export function LibraryItems({ library, favoritesOnly = false }: Props) {
     ? collections.find((c) => c.id === collectionFilter)
     : null;
 
+  const hasActiveFilters = sourceFilter !== 'all' || tagFilter || collectionFilter;
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
+      {/* Search */}
       <div className="relative">
         <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/40" />
         <Input
@@ -231,45 +245,49 @@ export function LibraryItems({ library, favoritesOnly = false }: Props) {
         />
       </div>
 
-      {/* Type filters */}
-      <div className="flex items-center gap-2">
-        {TYPE_FILTERS.map(({ key, labelKey }) => (
+      {/* Source type filters */}
+      <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-hide">
+        {availableSources.map(({ key, label }) => (
           <button
             key={key}
-            onClick={() => setTypeFilter(key)}
+            onClick={() => setSourceFilter(sourceFilter === key && key !== 'all' ? 'all' : key)}
             className={cn(
-              'text-[10px] font-mono px-2 py-1 rounded transition-colors',
-              typeFilter === key
-                ? 'bg-primary/10 text-foreground'
-                : 'text-muted-foreground/50 hover:text-muted-foreground'
+              'text-[9px] font-mono px-2 py-0.5 rounded-full border transition-colors whitespace-nowrap flex-shrink-0',
+              sourceFilter === key
+                ? 'border-foreground/20 bg-foreground/5 text-foreground'
+                : 'border-border/30 text-muted-foreground/40 hover:text-muted-foreground/60'
             )}
           >
-            {t(labelKey)}
+            {label}
           </button>
         ))}
-        <div className="flex-1" />
-        <span className="text-[10px] font-mono text-muted-foreground/40">
-          {t('library.itemCount', { count: filtered.length })}
-        </span>
       </div>
 
-      {/* Collection filter chips */}
-      <div className="space-y-2">
-        <div className="flex items-center gap-1.5 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
-          <FolderOpen className="h-3 w-3 text-muted-foreground/30 flex-shrink-0" />
-          {collections.length > 0 && (
+      {/* Tag filters */}
+      {allTags.length > 0 && (
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-hide">
+          <Tag className="h-3 w-3 text-muted-foreground/30 flex-shrink-0" />
+          {allTags.map((tag) => (
             <button
-              onClick={() => setCollectionFilter(null)}
+              key={tag}
+              onClick={() => setTagFilter(tagFilter === tag ? null : tag)}
               className={cn(
                 'text-[9px] font-mono px-2 py-0.5 rounded-full border transition-colors whitespace-nowrap flex-shrink-0',
-                !collectionFilter
-                  ? 'border-foreground/20 bg-foreground/5 text-foreground'
+                tagFilter === tag
+                  ? 'border-primary/30 bg-primary/10 text-primary'
                   : 'border-border/30 text-muted-foreground/40 hover:text-muted-foreground/60'
               )}
             >
-              {t('library.allCollections')}
+              {tag}
             </button>
-          )}
+          ))}
+        </div>
+      )}
+
+      {/* Collection filters */}
+      {collections.length > 0 && (
+        <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 scrollbar-hide">
+          <FolderOpen className="h-3 w-3 text-muted-foreground/30 flex-shrink-0" />
           {collections.map((col) => {
             const count = collectionItems.filter((ci) => ci.collection_id === col.id).length;
             return (
@@ -285,27 +303,25 @@ export function LibraryItems({ library, favoritesOnly = false }: Props) {
               />
             );
           })}
-          <button
-            onClick={() => setShowNewCollection(true)}
-            className="text-[9px] font-mono px-1.5 py-0.5 rounded-full border border-dashed border-border/30 text-muted-foreground/40 hover:text-muted-foreground/60 hover:border-border/50 transition-colors flex-shrink-0 flex items-center gap-0.5"
-          >
-            <Plus className="h-2.5 w-2.5" />
-            {t('library.newCollection')}
-          </button>
         </div>
+      )}
 
-        {showNewCollection && (
-          <NewCollectionForm
-            onSave={async (name, description, icon) => {
-              await addCollection({ name, description, icon });
-              setShowNewCollection(false);
-            }}
-          />
+      {/* Active filter indicator + count */}
+      <div className="flex items-center justify-between">
+        {hasActiveFilters && (
+          <button
+            onClick={() => { setSourceFilter('all'); setTagFilter(null); setCollectionFilter(null); }}
+            className="text-[9px] font-mono text-muted-foreground/50 hover:text-muted-foreground transition-colors"
+          >
+            Clear filters ×
+          </button>
         )}
+        <span className="text-[9px] font-mono text-muted-foreground/30 ml-auto">
+          {filtered.length} {filtered.length === 1 ? 'item' : 'items'}
+        </span>
       </div>
 
-      <NewNoteForm onSave={handleNewNote} />
-
+      {/* Items */}
       {pinnedItems.length > 0 && (
         <div className="space-y-1.5">
           <p className="text-[10px] font-mono text-muted-foreground/50 uppercase tracking-wider">{t('common.pinned')}</p>
