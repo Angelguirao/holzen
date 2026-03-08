@@ -67,22 +67,22 @@ const About = () => {
         <motion.div {...m(0.1)}>
           <div className="space-y-4">
             <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
-              What the research says
+              {t('about.whatResearchSays')}
             </p>
             <p className="text-sm text-foreground leading-relaxed">
-              Investing is hard. Controlling your emotions under volatility is harder.
+              {t('about.researchBody1')}
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Behavioral finance has spent decades documenting this. Daniel Kahneman's work on System 1 and System 2 thinking shows that under stress, our fast, instinctive mind hijacks decisions before our slower, reflective mind can intervene. Barber and Odean's research found that the most active individual traders underperform by 6.5% annually — not because they lack information, but because they act on emotion.
+              {t('about.researchBody2')}
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              This is true for experienced investors and beginners alike. The difference is that beginners often don't yet recognise the pattern: the urge to sell when prices fall, the urge to buy when prices surge. Both feel rational in the moment. Neither usually is.
+              {t('about.researchBody3')}
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Holzen applies this research directly. When volatility crosses your threshold — daily or across a rolling 7-day window — you're met with a breathing exercise, a mood check, an AI reflection, and companion content (a haiku, a historical insight) designed to slow you down. Afterward, you tag your emotions, journal your thoughts, and record what you did. Over time, your personal insights panel reveals how your composure evolves — turning reactive moments into data you can learn from.
+              {t('about.researchBody4')}
             </p>
             <p className="text-[10px] text-muted-foreground/70 leading-relaxed italic">
-              Kahneman, D. (2011). <em>Thinking, Fast and Slow</em>. · Barber, B. & Odean, T. (2000). "Trading Is Hazardous to Your Wealth." <em>The Journal of Finance</em>, 55(2). · Thaler, R. (2015). <em>Misbehaving: The Making of Behavioral Economics</em>.
+              {t('about.researchCitation')}
             </p>
           </div>
         </motion.div>
