@@ -34,6 +34,9 @@ interface Props {
 function CompanionCard({ item, onSelect }: { item: LibraryItem; onSelect?: (item: LibraryItem) => void }) {
   const sourceLabel = SOURCE_LABELS[item.source_type ?? ''] ?? item.source_type ?? 'Item';
 
+  // Safely get string body (some items may have object bodies)
+  const bodyText = typeof item.body === 'string' ? item.body : item.body ? JSON.stringify(item.body) : null;
+
   // Try to parse zoom_out JSON for richer display
   const zoomOutData = useMemo(() => {
     if (item.source_type !== 'zoom_out' || !item.body) return null;
@@ -49,11 +52,11 @@ function CompanionCard({ item, onSelect }: { item: LibraryItem; onSelect?: (item
         <span className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{sourceLabel}</span>
         {item.is_favorite && <Heart className="h-2.5 w-2.5 text-destructive fill-current" />}
       </div>
-      {item.title && item.title !== 'Reflection' && (
+      {item.title && item.title !== 'Reflection' && typeof item.title === 'string' && (
         <p className="text-xs font-medium text-foreground leading-snug">{item.title}</p>
       )}
-      {item.source_type === 'haiku' && item.body && (
-        <p className="text-xs text-foreground/80 leading-relaxed whitespace-pre-line italic">{item.body}</p>
+      {item.source_type === 'haiku' && bodyText && (
+        <p className="text-xs text-foreground/80 leading-relaxed whitespace-pre-line italic">{bodyText}</p>
       )}
       {item.source_type === 'zoom_out' && zoomOutData && (
         <div className="space-y-1">
@@ -70,12 +73,12 @@ function CompanionCard({ item, onSelect }: { item: LibraryItem; onSelect?: (item
           )}
         </div>
       )}
-      {item.source_type === 'history_insight' && item.body && (
-        <p className="text-[11px] text-muted-foreground/70 leading-relaxed line-clamp-3">{item.body}</p>
+      {item.source_type === 'history_insight' && bodyText && (
+        <p className="text-[11px] text-muted-foreground/70 leading-relaxed line-clamp-3">{bodyText}</p>
       )}
       {item.source_type === 'signal' && (
         <div className="space-y-1">
-          {item.body && <p className="text-[11px] text-muted-foreground/70 leading-relaxed line-clamp-3">{item.body}</p>}
+          {bodyText && <p className="text-[11px] text-muted-foreground/70 leading-relaxed line-clamp-3">{bodyText}</p>}
           {item.source_url && (
             <span className="inline-flex items-center gap-0.5 text-[9px] font-mono text-primary/60">
               <ExternalLink className="h-2 w-2" /> source
@@ -85,7 +88,7 @@ function CompanionCard({ item, onSelect }: { item: LibraryItem; onSelect?: (item
       )}
       {item.source_type === 'learning' && (
         <div className="space-y-1">
-          {item.body && <p className="text-[11px] text-muted-foreground/70 leading-relaxed line-clamp-3">{item.body}</p>}
+          {bodyText && <p className="text-[11px] text-muted-foreground/70 leading-relaxed line-clamp-3">{bodyText}</p>}
           {item.source_url && (
             <span className="inline-flex items-center gap-0.5 text-[9px] font-mono text-primary/60">
               <ExternalLink className="h-2 w-2" /> source
@@ -94,8 +97,8 @@ function CompanionCard({ item, onSelect }: { item: LibraryItem; onSelect?: (item
         </div>
       )}
       {/* Fallback for other types */}
-      {!['haiku', 'zoom_out', 'history_insight', 'signal', 'learning', 'reflection'].includes(item.source_type ?? '') && item.body && (
-        <p className="text-[11px] text-muted-foreground/70 leading-relaxed line-clamp-3">{item.body}</p>
+      {!['haiku', 'zoom_out', 'history_insight', 'signal', 'learning', 'reflection'].includes(item.source_type ?? '') && bodyText && (
+        <p className="text-[11px] text-muted-foreground/70 leading-relaxed line-clamp-3">{bodyText}</p>
       )}
     </button>
   );
@@ -155,44 +158,54 @@ export function ItemDetailViewer({ item, linkedItems, allItems, open, onClose, o
           </div>
 
           {/* Title */}
-          {item.title && !(isReflection && item.title === 'Reflection') && (
+          {item.title && typeof item.title === 'string' && !(isReflection && item.title === 'Reflection') && (
             <p className="text-sm font-medium text-foreground leading-snug">{item.title}</p>
           )}
 
           {/* Body — full content */}
-          {item.source_type === 'haiku' && item.body ? (
-            <div className="py-4 px-2">
-              <p className="text-base text-foreground/80 leading-loose whitespace-pre-line italic text-center">{item.body}</p>
-            </div>
-          ) : item.source_type === 'zoom_out' && zoomOutData ? (
-            <div className="space-y-3">
-              {zoomOutData.onThisDay?.length > 0 && (
-                <div className="space-y-1.5">
-                  <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">On this day</p>
-                  {[...zoomOutData.onThisDay].reverse().map((entry: any) => (
-                    <div key={entry.yearsAgo} className="flex items-center justify-between gap-2 text-xs font-mono">
-                      <span className="text-muted-foreground/60 w-14 shrink-0">{entry.yearsAgo}y ago</span>
-                      <span className="text-muted-foreground tabular-nums">${entry.price?.toLocaleString()}</span>
+          {(() => {
+            const bodyStr = typeof item.body === 'string' ? item.body : item.body ? JSON.stringify(item.body) : null;
+            if (item.source_type === 'haiku' && bodyStr) {
+              return (
+                <div className="py-4 px-2">
+                  <p className="text-base text-foreground/80 leading-loose whitespace-pre-line italic text-center">{bodyStr}</p>
+                </div>
+              );
+            }
+            if (item.source_type === 'zoom_out' && zoomOutData) {
+              return (
+                <div className="space-y-3">
+                  {zoomOutData.onThisDay?.length > 0 && (
+                    <div className="space-y-1.5">
+                      <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">On this day</p>
+                      {[...zoomOutData.onThisDay].reverse().map((entry: any) => (
+                        <div key={entry.yearsAgo} className="flex items-center justify-between gap-2 text-xs font-mono">
+                          <span className="text-muted-foreground/60 w-14 shrink-0">{entry.yearsAgo}y ago</span>
+                          <span className="text-muted-foreground tabular-nums">${entry.price?.toLocaleString()}</span>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  )}
+                  {zoomOutData.echo?.message && (
+                    <div className="space-y-1 border-l-2 border-border/40 pl-3">
+                      <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Echo</p>
+                      <p className="text-xs text-muted-foreground leading-relaxed italic">"{zoomOutData.echo.message}"</p>
+                    </div>
+                  )}
+                  {zoomOutData.deepTime && (
+                    <div className="space-y-1">
+                      <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Deep Time</p>
+                      <p className="text-xs text-muted-foreground leading-relaxed">{zoomOutData.deepTime}</p>
+                    </div>
+                  )}
                 </div>
-              )}
-              {zoomOutData.echo?.message && (
-                <div className="space-y-1 border-l-2 border-border/40 pl-3">
-                  <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Echo</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed italic">"{zoomOutData.echo.message}"</p>
-                </div>
-              )}
-              {zoomOutData.deepTime && (
-                <div className="space-y-1">
-                  <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Deep Time</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">{zoomOutData.deepTime}</p>
-                </div>
-              )}
-            </div>
-          ) : item.body ? (
-            <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">{item.body}</p>
-          ) : null}
+              );
+            }
+            if (bodyStr) {
+              return <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">{bodyStr}</p>;
+            }
+            return null;
+          })()}
 
           {/* Source URL */}
           {item.source_url && (

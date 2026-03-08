@@ -5,7 +5,7 @@ import { LearningInput } from './LearningInput';
 import { SignalDisplay } from './SignalDisplay';
 import { ZoomOutDisplay } from './ZoomOutDisplay';
 import { HistoricalInsightDisplay } from './HistoricalInsightDisplay';
-import { ChevronDown, Check } from 'lucide-react';
+import { ChevronDown, Check, Heart } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { hapticFeedback } from '@/lib/haptics';
 import { useHolzen } from '@/hooks/use-holzen';
@@ -62,29 +62,44 @@ function CollapsibleCompanion({
   expanded,
   onToggle,
   completed,
+  isFavorite,
+  onToggleFavorite,
   children,
 }: {
   label: string;
   expanded: boolean;
   onToggle: () => void;
   completed?: boolean;
+  isFavorite?: boolean;
+  onToggleFavorite?: () => void;
   children: React.ReactNode;
 }) {
   return (
     <div>
-      <button
-        onClick={onToggle}
-        className="flex items-center gap-1.5 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors w-full text-left"
-      >
-        {completed ? (
-          <Check className="h-3 w-3 shrink-0 text-primary" />
-        ) : (
-          <ChevronDown
-            className={`h-3 w-3 shrink-0 transition-transform duration-200 ${expanded ? 'rotate-0' : '-rotate-90'}`}
-          />
+      <div className="flex items-center gap-1">
+        <button
+          onClick={onToggle}
+          className="flex items-center gap-1.5 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors flex-1 text-left"
+        >
+          {completed ? (
+            <Check className="h-3 w-3 shrink-0 text-primary" />
+          ) : (
+            <ChevronDown
+              className={`h-3 w-3 shrink-0 transition-transform duration-200 ${expanded ? 'rotate-0' : '-rotate-90'}`}
+            />
+          )}
+          <span className={completed ? 'text-muted-foreground/50' : ''}>{label}</span>
+        </button>
+        {onToggleFavorite && (
+          <button
+            onClick={onToggleFavorite}
+            className={`p-1 transition-colors ${isFavorite ? 'text-destructive' : 'text-muted-foreground/30 hover:text-destructive'}`}
+            aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+          >
+            <Heart className={`h-3 w-3 ${isFavorite ? 'fill-current' : ''}`} />
+          </button>
         )}
-        <span className={completed ? 'text-muted-foreground/50' : ''}>{label}</span>
-      </button>
+      </div>
       {expanded && (
         <div className="animate-fade-in mt-2 ml-4.5">
           {children}
@@ -96,6 +111,36 @@ function CollapsibleCompanion({
 
 export const CompanionSection = forwardRef<HTMLDivElement, Props>(function CompanionSection({ companions, prefs, severity = 'mild', reflectionId, context, reflectionMessage }, ref) {
   const { language } = useHolzen();
+
+  // Track favorite state per source_type from library_items
+  const [favorites, setFavorites] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    if (!reflectionId) return;
+    supabase
+      .from('library_items')
+      .select('source_type, is_favorite')
+      .eq('reflection_id', reflectionId)
+      .then(({ data }) => {
+        if (!data) return;
+        const favs: Record<string, boolean> = {};
+        data.forEach((row: any) => {
+          if (row.source_type) favs[row.source_type] = row.is_favorite ?? false;
+        });
+        setFavorites(favs);
+      });
+  }, [reflectionId]);
+
+  const toggleCompanionFavorite = useCallback(async (sourceType: string) => {
+    if (!reflectionId) return;
+    const newVal = !favorites[sourceType];
+    setFavorites((prev) => ({ ...prev, [sourceType]: newVal }));
+    await supabase
+      .from('library_items')
+      .update({ is_favorite: newVal })
+      .eq('reflection_id', reflectionId)
+      .eq('source_type', sourceType);
+  }, [reflectionId, favorites]);
 
   // Helper: auto-save companion to library (dedup by reflection_id + source_type)
   const autoSaveToLibrary = useCallback(async (params: { title: string; body: string; sourceType: string; sourceUrl?: string }) => {
@@ -506,6 +551,8 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             if (!completion.haiku) markCompleted('haiku');
           }}
           completed={completion.haiku}
+          isFavorite={favorites['haiku']}
+          onToggleFavorite={() => toggleCompanionFavorite('haiku')}
         >
           <HaikuDisplay haiku={companions.haiku!} />
         </CollapsibleCompanion>
@@ -520,6 +567,8 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             if (!completion.learning) markCompleted('learning');
           }}
           completed={completion.learning}
+          isFavorite={favorites['learning']}
+          onToggleFavorite={() => toggleCompanionFavorite('learning')}
         >
           <LearningInput
             title={companions.learningTitle ?? ''}
@@ -528,7 +577,6 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             nudgeLoading={nudgeLoading}
             nudgeError={nudgeError}
           />
-          
         </CollapsibleCompanion>
       )}
 
@@ -541,13 +589,14 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             if (!completion.signal) markCompleted('signal');
           }}
           completed={completion.signal}
+          isFavorite={favorites['signal']}
+          onToggleFavorite={() => toggleCompanionFavorite('signal')}
         >
           <SignalDisplay
             signal={signal}
             loading={signalLoading}
             error={signalError}
           />
-          
         </CollapsibleCompanion>
       )}
 
@@ -560,13 +609,14 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             if (!completion.zoomOut) markCompleted('zoomOut');
           }}
           completed={completion.zoomOut}
+          isFavorite={favorites['zoom_out']}
+          onToggleFavorite={() => toggleCompanionFavorite('zoom_out')}
         >
           <ZoomOutDisplay
             data={zoomOut}
             loading={zoomOutLoading}
             error={zoomOutError}
           />
-          
         </CollapsibleCompanion>
       )}
 
@@ -579,13 +629,14 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             if (!completion.history) markCompleted('history');
           }}
           completed={completion.history}
+          isFavorite={favorites['history_insight']}
+          onToggleFavorite={() => toggleCompanionFavorite('history_insight')}
         >
           <HistoricalInsightDisplay
             data={historyInsight}
             loading={historyLoading}
             error={historyError}
           />
-          
         </CollapsibleCompanion>
       )}
     </div>
