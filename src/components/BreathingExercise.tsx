@@ -1,48 +1,53 @@
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 type Pattern = {
-  name: string;
-  description: string;
-  phases: { label: string; duration: number }[];
+  nameKey: string;
+  descKey: string;
+  phases: { labelKey: string; duration: number }[];
 };
 
 const PATTERNS: Pattern[] = [
   {
-    name: 'Box',
-    description: '4-4-4-4 · Grounding',
+    nameKey: 'breathing.patterns.box',
+    descKey: 'breathing.patterns.boxDesc',
     phases: [
-      { label: 'Inhale', duration: 4 },
-      { label: 'Hold', duration: 4 },
-      { label: 'Exhale', duration: 4 },
-      { label: 'Hold', duration: 4 },
+      { labelKey: 'breathing.phases.inhale', duration: 4 },
+      { labelKey: 'breathing.phases.hold', duration: 4 },
+      { labelKey: 'breathing.phases.exhale', duration: 4 },
+      { labelKey: 'breathing.phases.hold', duration: 4 },
     ],
   },
   {
-    name: 'Calming',
-    description: '4-7-8 · Deep calm',
+    nameKey: 'breathing.patterns.calming',
+    descKey: 'breathing.patterns.calmingDesc',
     phases: [
-      { label: 'Inhale', duration: 4 },
-      { label: 'Hold', duration: 7 },
-      { label: 'Exhale', duration: 8 },
+      { labelKey: 'breathing.phases.inhale', duration: 4 },
+      { labelKey: 'breathing.phases.hold', duration: 7 },
+      { labelKey: 'breathing.phases.exhale', duration: 8 },
     ],
   },
   {
-    name: 'Sigh',
-    description: 'Physiological sigh',
+    nameKey: 'breathing.patterns.sigh',
+    descKey: 'breathing.patterns.sighDesc',
     phases: [
-      { label: 'Inhale', duration: 3 },
-      { label: 'Sip', duration: 1 },
-      { label: 'Exhale', duration: 6 },
+      { labelKey: 'breathing.phases.inhale', duration: 3 },
+      { labelKey: 'breathing.phases.sip', duration: 1 },
+      { labelKey: 'breathing.phases.exhale', duration: 6 },
     ],
   },
 ];
 
+// For scale logic we still need to know the semantic phase type
+const EXPAND_KEYS = ['breathing.phases.inhale', 'breathing.phases.sip'];
+const CONTRACT_KEYS = ['breathing.phases.exhale'];
+
 function getSuggestedPattern(severity: 'mild' | 'moderate' | 'high'): number {
-  if (severity === 'high') return 1; // Calming 4-7-8
-  if (severity === 'moderate') return 0; // Box
-  return 0; // Box
+  if (severity === 'high') return 1;
+  if (severity === 'moderate') return 0;
+  return 0;
 }
 
 interface Props {
@@ -53,6 +58,7 @@ interface Props {
 }
 
 export function BreathingExercise({ severity = 'mild', onComplete, onClose, autoOpen = false }: Props) {
+  const { t } = useTranslation();
   const [overlayOpen, setOverlayOpen] = useState(autoOpen);
   const [patternIndex, setPatternIndex] = useState(() => getSuggestedPattern(severity));
   const [active, setActive] = useState(false);
@@ -99,10 +105,8 @@ export function BreathingExercise({ severity = 'mild', onComplete, onClose, auto
       setElapsed((prev) => {
         const next = prev + 1;
         if (next >= currentPhase.duration) {
-          // Move to next phase
           const nextPhaseIndex = phaseIndex + 1;
           if (nextPhaseIndex >= pattern.phases.length) {
-            // End of cycle
             const nextCycle = cycle + 1;
             if (nextCycle >= totalCycles) {
               setActive(false);
@@ -123,13 +127,11 @@ export function BreathingExercise({ severity = 'mild', onComplete, onClose, auto
     return () => clearInterval(timer);
   }, [active, completed, phaseIndex, cycle, currentPhase.duration, pattern.phases.length]);
 
-  // Ring scale/progress
   const progress = currentPhase.duration > 0 ? elapsed / currentPhase.duration : 0;
-  const isExpand = currentPhase.label === 'Inhale' || currentPhase.label === 'Sip';
-  const isContract = currentPhase.label === 'Exhale';
+  const isExpand = EXPAND_KEYS.includes(currentPhase.labelKey);
+  const isContract = CONTRACT_KEYS.includes(currentPhase.labelKey);
   const scale = isExpand ? 0.5 + progress * 0.5 : isContract ? 1 - progress * 0.5 : 1;
 
-  // Severity-based color
   const ringColor = severity === 'high'
     ? 'hsl(var(--destructive) / 0.2)'
     : severity === 'moderate'
@@ -142,14 +144,13 @@ export function BreathingExercise({ severity = 'mild', onComplete, onClose, auto
     ? 'hsl(var(--primary) / 0.4)'
     : 'hsl(var(--muted-foreground) / 0.25)';
 
-  // Inline trigger button
   if (!overlayOpen) {
     return (
       <button
         onClick={openOverlay}
         className={`text-xs font-mono text-muted-foreground hover:text-foreground transition-colors ${pulseClass}`}
       >
-        Breathe with this →
+        {t('breathing.trigger')}
       </button>
     );
   }
@@ -164,16 +165,14 @@ export function BreathingExercise({ severity = 'mild', onComplete, onClose, auto
           transition={{ duration: 0.4 }}
           className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background"
         >
-          {/* Close button */}
           <button
             onClick={closeOverlay}
             className="absolute top-6 right-6 text-muted-foreground/40 hover:text-foreground transition-colors"
-            aria-label="Close"
+            aria-label={t('common.done')}
           >
             <X className="h-5 w-5" />
           </button>
 
-          {/* Completed state */}
           {completed ? (
             <motion.div
               initial={{ opacity: 0, y: 8 }}
@@ -185,19 +184,18 @@ export function BreathingExercise({ severity = 'mild', onComplete, onClose, auto
                 className="w-20 h-20 rounded-full border-2 transition-colors duration-500"
                 style={{ borderColor: ringBorder, backgroundColor: ringColor }}
               />
-              <p className="text-sm font-mono text-foreground">Settled.</p>
+              <p className="text-sm font-mono text-foreground">{t('breathing.settled')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed max-w-[240px]">
-                You gave yourself a moment. That's enough.
+                {t('breathing.settledDesc')}
               </p>
               <button
                 onClick={closeOverlay}
                 className="text-xs font-mono text-muted-foreground underline hover:text-foreground transition-colors mt-4"
               >
-                Return
+                {t('breathing.return')}
               </button>
             </motion.div>
           ) : !active ? (
-            /* Pattern selection */
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
@@ -205,12 +203,12 @@ export function BreathingExercise({ severity = 'mild', onComplete, onClose, auto
               className="flex flex-col items-center gap-8 px-6 max-w-sm"
             >
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-widest">
-                Choose a pattern
+                {t('breathing.choosePattern')}
               </p>
               <div className="space-y-2 w-full">
                 {PATTERNS.map((p, i) => (
                   <button
-                    key={p.name}
+                    key={p.nameKey}
                     onClick={() => setPatternIndex(i)}
                     className={`w-full rounded-md border px-4 py-3 text-left transition-colors ${
                       patternIndex === i
@@ -218,32 +216,30 @@ export function BreathingExercise({ severity = 'mild', onComplete, onClose, auto
                         : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
                     }`}
                   >
-                    <p className="text-xs font-mono font-medium">{p.name}</p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">{p.description}</p>
+                    <p className="text-xs font-mono font-medium">{t(p.nameKey)}</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">{t(p.descKey)}</p>
                   </button>
                 ))}
               </div>
               {severity !== 'mild' && patternIndex === getSuggestedPattern(severity) && (
                 <p className="text-[10px] text-muted-foreground/50 font-mono">
-                  Suggested for current volatility
+                  {t('breathing.suggestedForVolatility')}
                 </p>
               )}
               <button
                 onClick={startExercise}
                 className="text-xs font-mono text-foreground underline hover:text-muted-foreground transition-colors"
               >
-                Begin
+                {t('breathing.begin')}
               </button>
             </motion.div>
           ) : (
-            /* Active breathing */
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6 }}
               className="flex flex-col items-center gap-8"
             >
-              {/* Ring */}
               <motion.div
                 className="rounded-full border-2"
                 style={{
@@ -255,30 +251,22 @@ export function BreathingExercise({ severity = 'mild', onComplete, onClose, auto
                 animate={{ scale }}
                 transition={{ duration: 1, ease: 'easeInOut' }}
               />
-
-              {/* Phase label */}
               <motion.p
                 key={`${phaseIndex}-${cycle}`}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 className="text-sm font-mono text-muted-foreground capitalize"
               >
-                {currentPhase.label}
+                {t(currentPhase.labelKey)}
               </motion.p>
-
-              {/* Countdown */}
               <p className="text-[10px] font-mono text-muted-foreground/50">
                 {currentPhase.duration - elapsed}
               </p>
-
-              {/* Cycle progress */}
               <p className="text-[10px] font-mono text-muted-foreground/40">
                 {cycle + 1} / {totalCycles}
               </p>
-
-              {/* Pattern name */}
               <p className="text-[10px] font-mono text-muted-foreground/30">
-                {pattern.name}
+                {t(pattern.nameKey)}
               </p>
             </motion.div>
           )}
