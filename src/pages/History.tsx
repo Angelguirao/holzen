@@ -164,7 +164,7 @@ function HistoryCompanions({ label, r }: { label: string; r: Reflection }) {
   );
 }
 
-
+const History = () => {
   const { user } = useAuth();
   const [reflections, setReflections] = useState<Reflection[]>([]);
   const [loading, setLoading] = useState(true);
