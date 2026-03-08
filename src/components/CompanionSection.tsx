@@ -243,6 +243,7 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
   const markCompleted = useCallback(async (key: keyof CompletionState) => {
     if (completion[key]) return;
     setCompletion((prev) => ({ ...prev, [key]: true }));
+    hapticFeedback('light');
     if (reflectionId && key !== 'signal') {
       const dbKey = key === 'breathing' ? 'breathing_completed' : key === 'haiku' ? 'haiku_read' : 'learning_read';
       await supabase
