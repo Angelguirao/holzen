@@ -3,6 +3,7 @@ import { BreathingExercise } from './BreathingExercise';
 import { HaikuDisplay } from './HaikuDisplay';
 import { LearningInput } from './LearningInput';
 import { SignalDisplay } from './SignalDisplay';
+import { ZoomOutDisplay } from './ZoomOutDisplay';
 import { ChevronDown, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { hapticFeedback } from '@/lib/haptics';
@@ -18,6 +19,7 @@ export interface CompanionPrefs {
   haiku: boolean;
   learning: boolean;
   signal: boolean;
+  zoomOut: boolean;
 }
 
 interface CompletionState {
@@ -25,6 +27,7 @@ interface CompletionState {
   haiku: boolean;
   learning: boolean;
   signal: boolean;
+  zoomOut: boolean;
 }
 
 interface NudgeData {
@@ -47,6 +50,7 @@ interface Props {
   severity?: 'mild' | 'moderate' | 'high';
   reflectionId?: string | null;
   context?: string | null;
+  reflectionMessage?: string | null;
 }
 
 function CollapsibleCompanion({
@@ -86,16 +90,18 @@ function CollapsibleCompanion({
   );
 }
 
-export function CompanionSection({ companions, prefs, severity = 'mild', reflectionId, context }: Props) {
+export function CompanionSection({ companions, prefs, severity = 'mild', reflectionId, context, reflectionMessage }: Props) {
   const [expandedBreathing, setExpandedBreathing] = useState(false);
   const [expandedHaiku, setExpandedHaiku] = useState(false);
   const [expandedLearning, setExpandedLearning] = useState(false);
   const [expandedSignal, setExpandedSignal] = useState(false);
+  const [expandedZoomOut, setExpandedZoomOut] = useState(false);
   const [completion, setCompletion] = useState<CompletionState>({
     breathing: false,
     haiku: false,
     learning: false,
     signal: false,
+    zoomOut: false,
   });
 
   // Load persisted completion state from DB
@@ -112,7 +118,8 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
             breathing: (data as any).breathing_completed ?? false,
             haiku: (data as any).haiku_read ?? false,
             learning: (data as any).learning_read ?? false,
-            signal: false, // Signal is ephemeral, not persisted
+            signal: false,
+            zoomOut: false,
           });
         }
       });
@@ -240,11 +247,44 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
     return () => { cancelled = true; };
   }, [reflectionId, context]);
 
+  // Zoom Out companion state
+  interface ZoomOutData {
+    perspective: string;
+    echo: string;
+    macro: string;
+    prices: { current: number | null; oneYear: number | null; fourYears: number | null; tenYears: number | null };
+  }
+  const [zoomOut, setZoomOut] = useState<ZoomOutData | null>(null);
+  const [zoomOutLoading, setZoomOutLoading] = useState(false);
+  const [zoomOutError, setZoomOutError] = useState(false);
+  const zoomOutFetchedRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!prefs.zoomOut || !reflectionId) return;
+    const key = reflectionId;
+    if (zoomOutFetchedRef.current === key) return;
+    zoomOutFetchedRef.current = key;
+
+    setZoomOutLoading(true);
+    setZoomOutError(false);
+
+    supabase.functions
+      .invoke('zoom-out-companion', { body: { context: context ?? '', reflectionMessage: reflectionMessage ?? '' } })
+      .then(({ data, error: fnError }) => {
+        if (fnError || !data || data.error) {
+          setZoomOutError(true);
+        } else {
+          setZoomOut(data as ZoomOutData);
+        }
+        setZoomOutLoading(false);
+      });
+  }, [prefs.zoomOut, reflectionId, context, reflectionMessage]);
+
   const markCompleted = useCallback(async (key: keyof CompletionState) => {
     if (completion[key]) return;
     setCompletion((prev) => ({ ...prev, [key]: true }));
     hapticFeedback('light');
-    if (reflectionId && key !== 'signal') {
+    if (reflectionId && key !== 'signal' && key !== 'zoomOut') {
       const dbKey = key === 'breathing' ? 'breathing_completed' : key === 'haiku' ? 'haiku_read' : 'learning_read';
       await supabase
         .from('reflections')
@@ -257,8 +297,9 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
   const hasHaiku = prefs.haiku && companions.haiku;
   const hasLearning = prefs.learning;
   const hasSignal = prefs.signal && !!reflectionId;
+  const hasZoomOut = prefs.zoomOut && !!reflectionId;
 
-  if (!hasBreathing && !hasHaiku && !hasLearning && !hasSignal) return null;
+  if (!hasBreathing && !hasHaiku && !hasLearning && !hasSignal && !hasZoomOut) return null;
 
   return (
     <div className="space-y-3 pt-2 border-t border-border/40">
@@ -325,6 +366,24 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
             signal={signal}
             loading={signalLoading}
             error={signalError}
+          />
+        </CollapsibleCompanion>
+      )}
+
+      {hasZoomOut && (
+        <CollapsibleCompanion
+          label="Zoom out"
+          expanded={expandedZoomOut}
+          onToggle={() => {
+            setExpandedZoomOut((v) => !v);
+            if (!completion.zoomOut) markCompleted('zoomOut');
+          }}
+          completed={completion.zoomOut}
+        >
+          <ZoomOutDisplay
+            data={zoomOut}
+            loading={zoomOutLoading}
+            error={zoomOutError}
           />
         </CollapsibleCompanion>
       )}
