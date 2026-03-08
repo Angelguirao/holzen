@@ -131,7 +131,7 @@ export function Onboarding({ onComplete }: Props) {
                     className="text-xs font-mono tracking-[0.25em] uppercase text-muted-foreground"
                     {...stagger(0.1)}
                   >
-                    Your companions
+                    {t('onboarding.yourCompanions')}
                   </motion.p>
                   <motion.p
                     className="text-sm text-muted-foreground leading-relaxed"
