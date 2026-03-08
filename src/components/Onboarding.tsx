@@ -98,7 +98,7 @@ export function Onboarding({ onComplete }: Props) {
                     className="text-xl leading-relaxed text-foreground"
                     {...stagger(0.2)}
                   >
-                    The market moves. You feel the pull to act. This app exists for the space between impulse and decision.
+                    {t('onboarding.heroText')}
                   </motion.p>
                   <motion.div className="space-y-4" {...stagger(0.3)}>
                     <div className="space-y-2">
