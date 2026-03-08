@@ -206,6 +206,13 @@ export default function PauseSession() {
                       )}
                       <p className="text-lg leading-relaxed text-foreground/90">{message}</p>
                       <div className="flex items-center gap-1">
+                        <button
+                          onClick={toggleFavorite}
+                          className={`p-1.5 transition-colors ${isFavorite ? 'text-destructive' : 'text-muted-foreground/40 hover:text-destructive'}`}
+                          aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+                        >
+                          <Heart className={`h-4 w-4 ${isFavorite ? 'fill-current' : ''}`} />
+                        </button>
                         <ShareReflection message={message} context={context} haiku={companions?.haiku} />
                         <ReflectionWallpaper message={message} mood={null} context={context} haiku={companions?.haiku} variant="button" />
                       </div>
