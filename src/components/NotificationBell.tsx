@@ -172,7 +172,7 @@ export function NotificationBell() {
         supabase.from('user_badges').select('id, badge_id, earned_at').eq('user_id', user!.id).order('earned_at', { ascending: false }).limit(10),
         supabase.from('night_reflections').select('id, message, created_at').eq('user_id', user!.id).order('created_at', { ascending: false }).limit(5),
         supabase.from('future_letters').select('id, delivered_at').eq('user_id', user!.id).eq('delivered', true).not('delivered_at', 'is', null).order('delivered_at', { ascending: false }).limit(5),
-        supabase.from('reflections').select('id, message, created_at').eq('user_id', user!.id).order('created_at', { ascending: false }).limit(5),
+        supabase.from('reflections').select('id, message, context, created_at, haiku, learning_title, learning_body').eq('user_id', user!.id).order('created_at', { ascending: false }).limit(5),
         supabase.from('ritual_completions').select('id, decision, created_at').eq('user_id', user!.id).order('created_at', { ascending: false }).limit(5),
         supabase.from('reflection_insights').select('id, generated_at, reflection_count').eq('user_id', user!.id).order('generated_at', { ascending: false }).limit(3),
       ]);
