@@ -163,25 +163,25 @@ Learning input rules:
               type: "function",
               function: {
                 name: "generate_reflection",
-                description: "Generate a reflection message with optional haiku and learning companions.",
+                description: langCode !== "en" ? `Generate a reflection. ALL fields MUST be written in ${langName}.` : "Generate a reflection message with optional haiku and learning companions.",
                 parameters: {
                   type: "object",
                   properties: {
                     message: {
                       type: "string",
-                      description: "The core reflection message (1-3 sentences).",
+                      description: langCode !== "en" ? `The core reflection message (1-3 sentences). MUST be in ${langName}.` : "The core reflection message (1-3 sentences).",
                     },
                     haiku: {
                       type: "string",
-                      description: "A haiku (3 lines, 5-7-5 syllables) about this moment. Lines separated by newlines.",
+                      description: langCode !== "en" ? `A haiku (3 lines, 5-7-5 syllables). MUST be in ${langName}. Lines separated by newlines.` : "A haiku (3 lines, 5-7-5 syllables) about this moment. Lines separated by newlines.",
                     },
                     learning_title: {
                       type: "string",
-                      description: "Short factual headline for a historical/educational insight.",
+                      description: langCode !== "en" ? `Short factual headline (5-10 words). MUST be in ${langName}.` : "Short factual headline for a historical/educational insight.",
                     },
                     learning_body: {
                       type: "string",
-                      description: "1-2 sentences of factual, educational context about Bitcoin history or behavioral finance.",
+                      description: langCode !== "en" ? `1-2 sentences of factual educational context. MUST be in ${langName}.` : "1-2 sentences of factual, educational context about Bitcoin history or behavioral finance.",
                     },
                   },
                   required: ["message", "haiku", "learning_title", "learning_body"],
