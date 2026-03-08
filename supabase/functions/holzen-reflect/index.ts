@@ -40,7 +40,7 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const { context, tone, customPrompt, style, moodHistory, severity, motivations, mantra } = await req.json();
+    const { context, tone, customPrompt, style, moodHistory, severity, motivations, mantra, currency } = await req.json();
     if (!context) {
       return new Response(JSON.stringify({ error: "Missing context" }), {
         status: 400,
@@ -103,12 +103,15 @@ serve(async (req) => {
       adaptiveContext += "\nMARKET SEVERITY: Significant move (7%+). Balance grounding with perspective.";
     }
 
+    const currencyCode = currency || "USD";
     const systemPrompt = `You generate a reflection with optional companions in response to Bitcoin volatility.
 
 You MUST respond by calling the "generate_reflection" function. Do not respond with plain text.
 
 Tone: ${baseTone}
 ${adaptiveContext}
+
+CURRENCY: The user views BTC prices in ${currencyCode}. When mentioning any price or monetary value, format it in ${currencyCode} (e.g. use the appropriate currency symbol). Never use USD unless the user's currency IS USD.
 
 The context may include a Fear & Greed Index score (0-100). Use this to subtly adjust your reflection:
 - Extreme Fear (0-24): The crowd is panicking. Reflect on what happens when fear spreads.
