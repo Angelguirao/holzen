@@ -379,6 +379,21 @@
     "hero": "Entenda como você responde à volatilidade — e fique mais calmo com o tempo.",
     "heroDesc": "Holzen não é uma ferramenta de trading. É uma prática de autoconhecimento. Quando o Bitcoin se move, você tem um momento para pausar, refletir e notar seus padrões — antes de agir por impulso.",
     "reflectionLoop": "O ciclo de reflexão",
+    "reaction": {
+      "label": "Sem Holzen",
+      "01title": "O mercado cai",
+      "02title": "O pânico toma conta",
+      "03title": "Você vende por impulso",
+      "04title": "Você se arrepende depois"
+    },
+    "reflection": {
+      "label": "Com Holzen",
+      "01title": "O mercado cai",
+      "02title": "Você respira",
+      "03title": "Você reflete",
+      "04title": "Você decide com intenção",
+      "05title": "Você evolui com o tempo"
+    },
     "steps": {
       "01title": "O mercado se move",
       "01desc": "Holzen monitora a volatilidade diária e acumulada de 7 dias contra seus limites pessoais. Ou solicite uma reflexão quando precisar.",

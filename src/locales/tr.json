@@ -379,6 +379,21 @@
     "hero": "Volatiliteye nasıl tepki verdiğinizi anlayın — ve zamanla daha sakin olun.",
     "heroDesc": "Holzen bir ticaret aracı değildir. Bir öz-farkındalık pratiğidir. Bitcoin hareket ettiğinde, dürtüsel davranmadan önce durmak, düşünmek ve kalıplarınızı fark etmek için bir an elde edersiniz.",
     "reflectionLoop": "Düşünce döngüsü",
+    "reaction": {
+      "label": "Holzen Olmadan",
+      "01title": "Piyasa düşer",
+      "02title": "Panik başlar",
+      "03title": "Dürtüsel satarsınız",
+      "04title": "Sonra pişman olursunuz"
+    },
+    "reflection": {
+      "label": "Holzen ile",
+      "01title": "Piyasa düşer",
+      "02title": "Nefes alırsınız",
+      "03title": "Düşünürsünüz",
+      "04title": "Bilinçli karar verirsiniz",
+      "05title": "Zamanla büyürsünüz"
+    },
     "steps": {
       "01title": "Piyasa hareket eder",
       "01desc": "Holzen günlük ve 7 günlük kümülatif volatiliteyi kişisel eşiklerinize göre izler. Veya istediğiniz zaman bir düşünce talep edin.",

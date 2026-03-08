@@ -390,6 +390,21 @@
     "getStartedForFree": "Get started for free",
     "noCreditCard": "No credit card required",
     "reflectionLoop": "The reflection loop",
+    "reaction": {
+      "label": "Without Holzen",
+      "01title": "The market drops",
+      "02title": "Panic sets in",
+      "03title": "You sell impulsively",
+      "04title": "You regret it later"
+    },
+    "reflection": {
+      "label": "With Holzen",
+      "01title": "The market drops",
+      "02title": "You breathe",
+      "03title": "You reflect",
+      "04title": "You decide deliberately",
+      "05title": "You grow over time"
+    },
     "steps": {
       "01title": "The market moves",
       "01desc": "Holzen monitors daily and 7-day cumulative volatility against your personal thresholds. Or request a reflection anytime.",
