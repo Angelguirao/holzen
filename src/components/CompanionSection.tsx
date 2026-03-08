@@ -538,6 +538,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             loading={zoomOutLoading}
             error={zoomOutError}
           />
+          {zoomOut && <div className="mt-1.5"><SaveToLibraryButton title="Zoom Out" body={typeof zoomOut === 'object' ? JSON.stringify(zoomOut) : String(zoomOut)} sourceType="zoom_out" reflectionId={reflectionId ?? undefined} /></div>}
         </CollapsibleCompanion>
       )}
 
