@@ -591,7 +591,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
 
       {hasSignal && (
         <CollapsibleCompanion
-          label={t.signal}
+          label={labels.signal}
           expanded={expandedSignal}
           onToggle={() => {
             setExpandedSignal((v) => !v);
