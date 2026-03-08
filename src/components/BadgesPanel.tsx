@@ -2,6 +2,8 @@ import { useMemo } from 'react';
 import { differenceInCalendarDays, parseISO } from 'date-fns';
 import { Flame, MessageSquare, Shield, Zap, Eye, Heart, Award, Target, Wind, BookOpen, Feather, Radio, Telescope, Landmark } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { BadgeCelebration } from './BadgeCelebration';
+import { useBadgeSync } from '@/hooks/use-badge-sync';
 
 interface Reflection {
   id: string;
