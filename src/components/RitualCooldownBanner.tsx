@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
-import { Check, Sparkles } from 'lucide-react';
+import { Check } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export function RitualCooldownBanner() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [lastRitual, setLastRitual] = useState<{ decision: string; created_at: string } | null>(null);
 
@@ -23,15 +25,12 @@ export function RitualCooldownBanner() {
 
   if (!lastRitual) return null;
 
-  // Show banner for 2 hours after ritual completion
   const elapsed = Date.now() - new Date(lastRitual.created_at).getTime();
   const TWO_HOURS = 2 * 60 * 60 * 1000;
   if (elapsed > TWO_HOURS) return null;
 
-  const decisionLabels: Record<string, string> = {
-    held: 'hold', sold: 'sell', bought: 'buy', nothing: 'do nothing',
-  };
-  const label = decisionLabels[lastRitual.decision] || lastRitual.decision;
+  const decisionKey = `cooldownBanner.decisions.${lastRitual.decision}`;
+  const label = t(decisionKey, lastRitual.decision);
 
   return (
     <div className="flex items-center gap-2.5 rounded-md border border-primary/15 bg-primary/5 px-3 py-2.5">
@@ -39,7 +38,7 @@ export function RitualCooldownBanner() {
         <Check className="h-2.5 w-2.5 text-primary" />
       </div>
       <p className="text-[10px] font-mono text-primary/60 leading-relaxed">
-        You decided to <span className="text-primary/90 font-medium">{label}</span> — sit with it.
+        {t('cooldownBanner.youDecidedTo', { decision: label }).replace(/<\/?strong>/g, '')}
       </p>
     </div>
   );
