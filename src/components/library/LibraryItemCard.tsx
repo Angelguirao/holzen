@@ -1,4 +1,4 @@
-import { Pin, PinOff, Trash2, ExternalLink, Tag } from 'lucide-react';
+import { Pin, PinOff, Trash2, ExternalLink, Tag, Eye, EyeOff, Archive } from 'lucide-react';
 import type { LibraryItem } from '@/hooks/use-library';
 import { useTranslation } from 'react-i18next';
 
@@ -21,11 +21,12 @@ interface Props {
   item: LibraryItem;
   onTogglePin: (id: string) => void;
   onDelete: (id: string) => void;
+  onStatusChange: (id: string, status: 'unread' | 'read' | 'archived') => void;
 }
 
-export function LibraryItemCard({ item, onTogglePin, onDelete }: Props) {
+export function LibraryItemCard({ item, onTogglePin, onDelete, onStatusChange }: Props) {
   const { t } = useTranslation();
-
+  const isUnread = item.status === 'unread';
   return (
     <div className="group rounded-md border border-border/40 bg-card/50 px-3 py-2.5 space-y-1.5 transition-colors hover:bg-card/80">
       <div className="flex items-start gap-2">
@@ -41,6 +42,20 @@ export function LibraryItemCard({ item, onTogglePin, onDelete }: Props) {
           )}
         </div>
         <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+          <button
+            onClick={() => onStatusChange(item.id, isUnread ? 'read' : 'unread')}
+            className="p-1 text-muted-foreground/50 hover:text-foreground transition-colors"
+            aria-label={isUnread ? 'Mark read' : 'Mark unread'}
+          >
+            {isUnread ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
+          </button>
+          <button
+            onClick={() => onStatusChange(item.id, 'archived')}
+            className="p-1 text-muted-foreground/50 hover:text-foreground transition-colors"
+            aria-label="Archive"
+          >
+            <Archive className="h-3 w-3" />
+          </button>
           <button
             onClick={() => onTogglePin(item.id)}
             className="p-1 text-muted-foreground/50 hover:text-foreground transition-colors"
@@ -59,6 +74,16 @@ export function LibraryItemCard({ item, onTogglePin, onDelete }: Props) {
       </div>
 
       <div className="flex items-center gap-1.5 flex-wrap">
+        {isUnread && (
+          <span className="text-[9px] font-mono px-1 py-0.5 rounded bg-primary/15 text-primary">
+            unread
+          </span>
+        )}
+        {item.status === 'archived' && (
+          <span className="text-[9px] font-mono px-1 py-0.5 rounded bg-muted text-muted-foreground/50">
+            archived
+          </span>
+        )}
         {item.pinned && (
           <span className="text-[9px] font-mono px-1 py-0.5 rounded bg-primary/10 text-primary">
             pinned

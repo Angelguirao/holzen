@@ -12,12 +12,14 @@ import { PageMeta } from '@/components/PageMeta';
 
 export default function Library() {
   const { t } = useTranslation();
-  const { items, collections, loading, addItem, deleteItem, togglePin, deleteCollection } = useLibrary();
+  const { items, collections, loading, addItem, updateItem, deleteItem, togglePin, deleteCollection } = useLibrary();
   const [search, setSearch] = useState('');
   const [tab, setTab] = useState('all');
 
   const filtered = useMemo(() => {
     let result = items;
+    // Hide archived unless searching
+    if (!search.trim()) result = result.filter((i) => i.status !== 'archived');
     if (tab === 'bookmarks') result = result.filter((i) => i.type === 'bookmark');
     if (tab === 'notes') result = result.filter((i) => i.type === 'note');
     if (search.trim()) {
@@ -33,6 +35,10 @@ export default function Library() {
 
   const pinnedItems = filtered.filter((i) => i.pinned);
   const unpinnedItems = filtered.filter((i) => !i.pinned);
+
+  const handleStatusChange = async (id: string, status: 'unread' | 'read' | 'archived') => {
+    await updateItem(id, { status } as any);
+  };
 
   const handleNewNote = async (title: string, body: string, tags: string[]) => {
     await addItem({ type: 'note', title: title || null, body, tags });
@@ -96,13 +102,13 @@ export default function Library() {
             <div className="space-y-1.5">
               <p className="text-[10px] font-mono text-muted-foreground/50 uppercase tracking-wider">{t('common.pinned')}</p>
               {pinnedItems.map((item) => (
-                <LibraryItemCard key={item.id} item={item} onTogglePin={togglePin} onDelete={deleteItem} />
+                <LibraryItemCard key={item.id} item={item} onTogglePin={togglePin} onDelete={deleteItem} onStatusChange={handleStatusChange} />
               ))}
             </div>
           )}
           <div className="space-y-1.5">
             {unpinnedItems.map((item) => (
-              <LibraryItemCard key={item.id} item={item} onTogglePin={togglePin} onDelete={deleteItem} />
+              <LibraryItemCard key={item.id} item={item} onTogglePin={togglePin} onDelete={deleteItem} onStatusChange={handleStatusChange} />
             ))}
           </div>
           {filtered.length === 0 && (
@@ -114,7 +120,7 @@ export default function Library() {
 
         <TabsContent value="bookmarks" className="mt-3 space-y-1.5">
           {filtered.map((item) => (
-            <LibraryItemCard key={item.id} item={item} onTogglePin={togglePin} onDelete={deleteItem} />
+            <LibraryItemCard key={item.id} item={item} onTogglePin={togglePin} onDelete={deleteItem} onStatusChange={handleStatusChange} />
           ))}
           {filtered.length === 0 && (
             <p className="text-xs text-muted-foreground/40 text-center py-8 font-mono">
@@ -127,7 +133,7 @@ export default function Library() {
           <NewNoteForm onSave={handleNewNote} />
           <div className="space-y-1.5">
             {filtered.map((item) => (
-              <LibraryItemCard key={item.id} item={item} onTogglePin={togglePin} onDelete={deleteItem} />
+              <LibraryItemCard key={item.id} item={item} onTogglePin={togglePin} onDelete={deleteItem} onStatusChange={handleStatusChange} />
             ))}
           </div>
           {filtered.length === 0 && (
