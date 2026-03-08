@@ -108,6 +108,7 @@ export function useGraphData(
           label: r.message.slice(0, 60) + (r.message.length > 60 ? '…' : ''),
           nodeType: 'reflection',
           sublabel: r.context || undefined,
+          entityId: r.id,
         },
       });
 
