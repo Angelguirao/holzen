@@ -13,6 +13,7 @@ import type { Collection } from '@/hooks/use-library';
 
 interface Props {
   library: ReturnType<typeof useLibrary>;
+  favoritesOnly?: boolean;
 }
 
 const TYPE_FILTERS = [
