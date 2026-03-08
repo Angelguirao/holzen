@@ -23,7 +23,7 @@ export function FeedbackForm() {
     // Queue if offline
     if (!navigator.onLine) {
       enqueueAction('feedback', { category, message: message.trim() });
-      toast('Saved offline', { description: 'Your feedback will be sent when you're back online.' });
+      toast('Saved offline', { description: "Your feedback will be sent when you're back online." });
       setMessage('');
       return;
     }
