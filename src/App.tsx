@@ -9,7 +9,7 @@ import { OfflineBanner } from "./components/OfflineBanner";
 import AuthLoading from "./components/AuthLoading";
 import { AppLayout } from "./components/AppLayout";
 import Home from "./pages/Home";
-import History from "./pages/History";
+import Library from "./pages/Library";
 import Profile from "./pages/Profile";
 import Settings from "./pages/Settings";
 import Auth from "./pages/Auth";
@@ -24,7 +24,6 @@ import BlogPost from "./pages/BlogPost";
 import Roadmap from "./pages/Roadmap";
 import Ambient from "./pages/Ambient";
 import Reserve from "./pages/Reserve";
-import Library from "./pages/Library";
 
 const queryClient = new QueryClient();
 
@@ -54,8 +53,8 @@ const App = () => (
               <Routes>
                 <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
                   <Route path="/" element={<Home />} />
-                  <Route path="/history" element={<History />} />
                   <Route path="/library" element={<Library />} />
+                  <Route path="/history" element={<Navigate to="/library" replace />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/ambient" element={<Ambient />} />
