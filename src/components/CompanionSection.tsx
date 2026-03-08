@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, forwardRef } from 'react';
 import { BreathingExercise } from './BreathingExercise';
 import { HaikuDisplay } from './HaikuDisplay';
 import { LearningInput } from './LearningInput';
