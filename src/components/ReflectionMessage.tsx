@@ -5,6 +5,7 @@ import { ReflectionNote } from './ReflectionNote';
 import { ReflectionTags } from './ReflectionTags';
 import { ReflectionWallpaper } from './ReflectionWallpaper';
 import { CompanionSection, type CompanionData, type CompanionPrefs } from './CompanionSection';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   message: string;
@@ -17,6 +18,8 @@ interface Props {
 }
 
 export const ReflectionMessage = forwardRef<HTMLDivElement, Props>(function ReflectionMessage({ message, context, onDismiss, companions, companionPrefs, severity, reflectionId }, ref) {
+  const { t } = useTranslation();
+
   return (
     <div ref={ref} className="space-y-6">
       <p className="text-lg leading-relaxed">{message}</p>
@@ -31,7 +34,7 @@ export const ReflectionMessage = forwardRef<HTMLDivElement, Props>(function Refl
           onClick={onDismiss}
           className="text-xs font-mono text-muted-foreground"
         >
-          Done
+          {t('common.done')}
         </Button>
       </div>
 
