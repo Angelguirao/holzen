@@ -62,10 +62,10 @@ export function TestimonialRequest({ reflectionCount }: Props) {
     } as any);
     setSubmitting(false);
     if (error) {
-      toast.error('Failed to submit');
+      toast.error(t('testimonial.failed'));
     } else {
       localStorage.setItem(SUBMITTED_KEY, 'true');
-      toast.success(t.thanks);
+      toast.success(t('testimonial.thanks'));
       setVisible(false);
     }
   };
