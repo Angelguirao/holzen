@@ -261,7 +261,7 @@ export function Onboarding({ onComplete }: Props) {
                     className="text-sm text-muted-foreground leading-relaxed"
                     {...stagger(0.15)}
                   >
-                    How much does BTC need to move in 24 hours before you hear from us?
+                    {t('onboarding.thresholdQuestion')}
                   </motion.p>
                   <motion.div {...stagger(0.25)}>
                     <p className="text-4xl font-mono tracking-tight mb-6">{threshold.toFixed(1)}%</p>
