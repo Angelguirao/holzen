@@ -56,6 +56,7 @@ const History = () => {
   const [tab, setTab] = useState<'recent' | 'library' | 'timeline'>('recent');
   const [filter, setFilter] = useState<'all' | 'favorites'>('all');
   const [tagFilter, setTagFilter] = useState<string | null>(null);
+  const [moodFilter, setMoodFilter] = useState<string | null>(null);
   const [search, setSearch] = useState('');
 
   useEffect(() => {
