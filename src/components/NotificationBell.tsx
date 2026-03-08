@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Bell, X, CheckCheck, ArrowRight } from 'lucide-react';
+import { hapticFeedback } from '@/lib/haptics';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { formatDistanceToNow } from 'date-fns';
@@ -45,6 +46,7 @@ function SwipeableNotification({
     if (!elRef.current) return;
     if (Math.abs(currentX.current) >= SWIPE_THRESHOLD) {
       // Animate out then dismiss
+      hapticFeedback('medium');
       elRef.current.style.transition = 'transform 0.2s, opacity 0.2s';
       elRef.current.style.transform = 'translateX(-100%)';
       elRef.current.style.opacity = '0';
