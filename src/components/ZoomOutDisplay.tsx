@@ -27,9 +27,7 @@ interface Props {
   error: boolean;
 }
 
-function formatPrice(n: number): string {
-  return `$${n.toLocaleString()}`;
-}
+// formatPrice is now handled by formatBtcPrice from btc.ts
 
 const outcomeLabels: Record<string, string> = {
   held: 'Held', hold: 'Held', sold: 'Sold', bought: 'Bought', nothing: 'Did nothing',

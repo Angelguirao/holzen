@@ -386,6 +386,7 @@ ChartTooltip.displayName = 'ChartTooltip';
 
 const ReflectionMarkerCard = forwardRef<HTMLDivElement, { point: PricePoint }>(({ point }, ref) => {
   const [expanded, setExpanded] = useState(false);
+  const { currency } = useHolzen();
   const refl = point.reflection!;
   const ritual = point.ritual;
 
@@ -417,7 +418,7 @@ const ReflectionMarkerCard = forwardRef<HTMLDivElement, { point: PricePoint }>((
             <span className="text-[9px] font-mono text-muted-foreground/60">{changeStr}</span>
           )}
           <span className="text-[9px] font-mono text-muted-foreground/60">
-            ${point.price.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+            {formatBtcPrice(point.price, currency)}
           </span>
         </div>
       </div>

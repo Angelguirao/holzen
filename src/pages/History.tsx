@@ -115,7 +115,7 @@ function HistoryCompanions({ label, r }: { label: string; r: Reflection }) {
                     return (
                       <div key={entry.yearsAgo} className="flex items-center justify-between gap-2">
                         <span className="text-[10px] font-mono text-muted-foreground/60 w-14 shrink-0">{entry.yearsAgo}y ago</span>
-                        <span className="text-xs font-mono text-muted-foreground tabular-nums">${entry.price.toLocaleString()}</span>
+                        <span className="text-xs font-mono text-muted-foreground tabular-nums">{formatBtcPrice(entry.price, currency)}</span>
                         <span className={`text-[10px] font-mono tabular-nums ${isUp ? 'text-primary/70' : 'text-destructive/70'}`}>
                           {isUp ? '+' : ''}{changePct.toFixed(0)}%
                         </span>
