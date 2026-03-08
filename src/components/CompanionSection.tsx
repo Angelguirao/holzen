@@ -631,7 +631,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
 
       {hasHistory && (
         <CollapsibleCompanion
-          label={t.lookBack}
+          label={labels.lookBack}
           expanded={expandedHistory}
           onToggle={() => {
             setExpandedHistory((v) => !v);
