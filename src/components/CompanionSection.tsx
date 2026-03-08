@@ -569,7 +569,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
 
       {hasLearning && (
         <CollapsibleCompanion
-          label={t.ground}
+          label={labels.ground}
           expanded={expandedLearning}
           onToggle={() => {
             setExpandedLearning((v) => !v);
