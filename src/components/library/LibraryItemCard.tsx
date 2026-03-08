@@ -1,6 +1,7 @@
-import { Pin, PinOff, Trash2, ExternalLink, Tag, Eye, EyeOff, Archive } from 'lucide-react';
-import type { LibraryItem } from '@/hooks/use-library';
+import { Pin, PinOff, Trash2, ExternalLink, Tag, Eye, EyeOff, Archive, FolderPlus } from 'lucide-react';
+import type { LibraryItem, Collection } from '@/hooks/use-library';
 import { useTranslation } from 'react-i18next';
+import { AddToCollectionButton } from './AddToCollectionButton';
 
 const SOURCE_LABELS: Record<string, string> = {
   signal: 'Signal',
@@ -22,11 +23,19 @@ interface Props {
   onTogglePin: (id: string) => void;
   onDelete: (id: string) => void;
   onStatusChange: (id: string, status: 'unread' | 'read' | 'archived') => void;
+  collections?: Collection[];
+  itemCollections?: Collection[];
+  onAddToCollection?: (collectionId: string, itemId: string) => Promise<any>;
+  onRemoveFromCollection?: (collectionId: string, itemId: string) => Promise<void>;
 }
 
-export function LibraryItemCard({ item, onTogglePin, onDelete, onStatusChange }: Props) {
+export function LibraryItemCard({
+  item, onTogglePin, onDelete, onStatusChange,
+  collections, itemCollections, onAddToCollection, onRemoveFromCollection,
+}: Props) {
   const { t } = useTranslation();
   const isUnread = item.status === 'unread';
+
   return (
     <div className="group rounded-md border border-border/40 bg-card/50 px-3 py-2.5 space-y-1.5 transition-colors hover:bg-card/80">
       <div className="flex items-start gap-2">
@@ -56,6 +65,15 @@ export function LibraryItemCard({ item, onTogglePin, onDelete, onStatusChange }:
           >
             <Archive className="h-3 w-3" />
           </button>
+          {collections && itemCollections && onAddToCollection && onRemoveFromCollection && (
+            <AddToCollectionButton
+              itemId={item.id}
+              collections={collections}
+              itemCollections={itemCollections}
+              onAdd={onAddToCollection}
+              onRemove={onRemoveFromCollection}
+            />
+          )}
           <button
             onClick={() => onTogglePin(item.id)}
             className="p-1 text-muted-foreground/50 hover:text-foreground transition-colors"
@@ -105,6 +123,11 @@ export function LibraryItemCard({ item, onTogglePin, onDelete, onStatusChange }:
             link
           </a>
         )}
+        {itemCollections && itemCollections.length > 0 && itemCollections.map((col) => (
+          <span key={col.id} className="text-[9px] font-mono px-1 py-0.5 rounded bg-accent/50 text-accent-foreground/70">
+            {col.icon ?? '📂'} {col.name}
+          </span>
+        ))}
         {item.tags.length > 0 && item.tags.map((tag) => (
           <span key={tag} className="inline-flex items-center gap-0.5 text-[9px] font-mono px-1 py-0.5 rounded bg-primary/5 text-primary/70">
             <Tag className="h-2 w-2" />{tag}
