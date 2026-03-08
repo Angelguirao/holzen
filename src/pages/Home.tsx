@@ -368,21 +368,39 @@ const Home = () => {
 
                   {message ? (
                     <div className="space-y-4">
-                      <ReflectionMessage
-                        message={message} context={context} onDismiss={handleDismiss}
-                        companions={companions} companionPrefs={companionPrefs}
-                        severity={severity} reflectionId={lastReflectionId}
-                      />
+                      {/* First-line teaser */}
+                      <p className="text-sm leading-relaxed text-foreground/80">
+                        {message.split(/[.!?]\s/)[0]}{message.split(/[.!?]\s/).length > 1 ? '…' : ''}
+                      </p>
+                      {context && (
+                        <p className="text-[10px] font-mono text-muted-foreground/40 uppercase tracking-wider">
+                          {context.slice(0, 60)}{context.length > 60 ? '…' : ''}
+                        </p>
+                      )}
                       <button
-                        onClick={() => navigate('/pause', { state: { reflectionMessage: message, reflectionId: lastReflectionId } })}
-                        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-md border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors"
+                        onClick={() => navigate('/pause', {
+                          state: {
+                            reflectionMessage: message,
+                            context,
+                            reflectionId: lastReflectionId,
+                            companions,
+                            companionPrefs,
+                            severity,
+                          },
+                        })}
+                        className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors"
                       >
                         <Sparkles className="h-3 w-3 text-primary/60" />
                         <span className="text-[10px] font-mono text-primary/60 tracking-[0.15em] uppercase">
                           {t('onboarding.pauseWithThis')}
                         </span>
                       </button>
-                      {lastReflectionId && <ReflectionComparison reflectionId={lastReflectionId} />}
+                      <button
+                        onClick={handleDismiss}
+                        className="w-full text-center text-[10px] font-mono text-muted-foreground/30 hover:text-muted-foreground/50 transition-colors"
+                      >
+                        {t('common.done')}
+                      </button>
                     </div>
                   ) : showOutcome && outcomeReflectionId ? (
                     <OutcomePrompt reflectionId={outcomeReflectionId} onComplete={handleOutcomeComplete} />
