@@ -93,7 +93,7 @@ export function TestimonialRequest({ reflectionCount }: Props) {
             type="text"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
-            placeholder={t.nameLabel}
+            placeholder={t('testimonial.nameLabel')}
             className="w-full text-xs rounded-md border border-border bg-background px-3 py-2 text-foreground placeholder:text-muted-foreground/50"
             maxLength={50}
           />
