@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { Sparkles, Download, Loader2, X } from 'lucide-react';
+import { Sparkles, Download, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import {
@@ -13,16 +13,114 @@ interface Props {
   message: string;
   mood?: string | null;
   context?: string | null;
+  haiku?: string | null;
+  variant?: 'icon' | 'button';
 }
 
-export function ReflectionWallpaper({ message, mood, context }: Props) {
+function wrapText(
+  ctx: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  maxWidth: number,
+  lineHeight: number
+): number {
+  const words = text.split(' ');
+  let line = '';
+  let currentY = y;
+  for (const word of words) {
+    const testLine = line + (line ? ' ' : '') + word;
+    if (ctx.measureText(testLine).width > maxWidth && line) {
+      ctx.fillText(line, x, currentY);
+      line = word;
+      currentY += lineHeight;
+    } else {
+      line = testLine;
+    }
+  }
+  ctx.fillText(line, x, currentY);
+  return currentY;
+}
+
+function compositeWallpaper(
+  imageUrl: string,
+  message: string,
+  haiku?: string | null
+): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'anonymous';
+    img.onload = () => {
+      // Phone wallpaper dimensions
+      const W = 1080;
+      const H = 1920;
+      const canvas = document.createElement('canvas');
+      canvas.width = W;
+      canvas.height = H;
+      const ctx = canvas.getContext('2d')!;
+
+      // Draw AI image covering the canvas
+      const scale = Math.max(W / img.width, H / img.height);
+      const sw = img.width * scale;
+      const sh = img.height * scale;
+      ctx.drawImage(img, (W - sw) / 2, (H - sh) / 2, sw, sh);
+
+      // Dark gradient overlay at bottom for text readability
+      const grad = ctx.createLinearGradient(0, H * 0.45, 0, H);
+      grad.addColorStop(0, 'rgba(0,0,0,0)');
+      grad.addColorStop(0.4, 'rgba(0,0,0,0.3)');
+      grad.addColorStop(1, 'rgba(0,0,0,0.75)');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, H * 0.45, W, H * 0.55);
+
+      const pad = 72;
+      const maxWidth = W - pad * 2;
+
+      // Reflection text
+      ctx.textBaseline = 'top';
+      ctx.fillStyle = 'rgba(255,255,255,0.95)';
+      ctx.font = '500 36px "Inter", system-ui, sans-serif';
+      let y = H * 0.62;
+      y = wrapText(ctx, `"${message}"`, pad, y, maxWidth, 50);
+      y += 40;
+
+      // Haiku
+      if (haiku) {
+        const lines = haiku.split(/\\n|\n/).map(l => l.trim()).filter(Boolean);
+        ctx.font = 'italic 26px "IBM Plex Mono", monospace';
+        ctx.fillStyle = 'rgba(255,255,255,0.6)';
+        for (const line of lines) {
+          ctx.fillText(line, pad, y);
+          y += 36;
+        }
+        y += 16;
+      }
+
+      // Branding
+      ctx.font = '600 18px "IBM Plex Mono", monospace';
+      ctx.fillStyle = 'rgba(255,255,255,0.35)';
+      ctx.fillText('HOLZEN', pad, H - pad);
+
+      const tagline = 'PAUSE BEFORE YOU ACT';
+      const tw = ctx.measureText(tagline).width;
+      ctx.fillText(tagline, W - pad - tw, H - pad);
+
+      resolve(canvas.toDataURL('image/png'));
+    };
+    img.onerror = () => reject(new Error('Failed to load generated image'));
+    img.src = imageUrl;
+  });
+}
+
+export function ReflectionWallpaper({ message, mood, context, haiku, variant = 'icon' }: Props) {
   const [generating, setGenerating] = useState(false);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [compositeUrl, setCompositeUrl] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
 
   const generate = useCallback(async () => {
     setGenerating(true);
     setOpen(true);
+    setCompositeUrl(null);
     try {
       const { data, error } = await supabase.functions.invoke('generate-wallpaper', {
         body: { message, mood, context },
@@ -31,39 +129,57 @@ export function ReflectionWallpaper({ message, mood, context }: Props) {
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
 
-      setImageUrl(data.image);
+      // Composite text over the AI image
+      const finalUrl = await compositeWallpaper(data.image, message, haiku);
+      setCompositeUrl(finalUrl);
     } catch (e: any) {
       toast.error(e.message || 'Failed to generate wallpaper');
       setOpen(false);
     } finally {
       setGenerating(false);
     }
-  }, [message, mood, context]);
+  }, [message, mood, context, haiku]);
 
   const download = useCallback(() => {
-    if (!imageUrl) return;
+    if (!compositeUrl) return;
     const a = document.createElement('a');
-    a.href = imageUrl;
+    a.href = compositeUrl;
     a.download = 'holzen-wallpaper.png';
     a.click();
     toast('Wallpaper downloaded');
-  }, [imageUrl]);
+  }, [compositeUrl]);
 
   return (
     <>
-      <button
-        onClick={generate}
-        disabled={generating}
-        className="inline-flex items-center gap-1 text-[10px] font-mono text-muted-foreground/60 hover:text-foreground transition-colors disabled:opacity-50"
-        title="Generate wallpaper from this reflection"
-      >
-        {generating ? (
-          <Loader2 className="h-3 w-3 animate-spin" />
-        ) : (
-          <Sparkles className="h-3 w-3" />
-        )}
-        Wallpaper
-      </button>
+      {variant === 'button' ? (
+        <button
+          onClick={generate}
+          disabled={generating}
+          className="inline-flex items-center gap-1.5 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
+          title="Generate wallpaper"
+        >
+          {generating ? (
+            <Loader2 className="h-3 w-3 animate-spin" />
+          ) : (
+            <Sparkles className="h-3 w-3" />
+          )}
+          Wallpaper
+        </button>
+      ) : (
+        <button
+          onClick={generate}
+          disabled={generating}
+          className="inline-flex items-center gap-1 text-[10px] font-mono text-muted-foreground/60 hover:text-foreground transition-colors disabled:opacity-50"
+          title="Generate wallpaper from this reflection"
+        >
+          {generating ? (
+            <Loader2 className="h-3 w-3 animate-spin" />
+          ) : (
+            <Sparkles className="h-3 w-3" />
+          )}
+          Wallpaper
+        </button>
+      )}
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent className="max-w-sm p-0 overflow-hidden bg-card border-border">
@@ -81,11 +197,11 @@ export function ReflectionWallpaper({ message, mood, context }: Props) {
                   Generating your wallpaper…
                 </p>
               </div>
-            ) : imageUrl ? (
+            ) : compositeUrl ? (
               <>
                 <div className="relative rounded-lg overflow-hidden border border-border/60 aspect-[9/16] bg-muted/30">
                   <img
-                    src={imageUrl}
+                    src={compositeUrl}
                     alt="Reflection wallpaper"
                     className="w-full h-full object-cover"
                   />
@@ -100,7 +216,7 @@ export function ReflectionWallpaper({ message, mood, context }: Props) {
                   </button>
                   <button
                     onClick={() => {
-                      setImageUrl(null);
+                      setCompositeUrl(null);
                       generate();
                     }}
                     className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-md border border-border text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"

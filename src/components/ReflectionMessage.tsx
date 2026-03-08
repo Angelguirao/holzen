@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { ShareReflection } from './ShareReflection';
 import { ReflectionNote } from './ReflectionNote';
 import { ReflectionTags } from './ReflectionTags';
+import { ReflectionWallpaper } from './ReflectionWallpaper';
 import { CompanionSection, type CompanionData, type CompanionPrefs } from './CompanionSection';
 
 interface Props {
@@ -22,6 +23,7 @@ export const ReflectionMessage = forwardRef<HTMLDivElement, Props>(function Refl
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1">
           <ShareReflection message={message} context={context} haiku={companions?.haiku} />
+          <ReflectionWallpaper message={message} mood={null} context={context} haiku={companions?.haiku} variant="button" />
         </div>
         <Button
           variant="ghost"
