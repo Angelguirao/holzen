@@ -14,13 +14,15 @@ export function StreakTimeline({ reflections, streakFreezeDates = [], memberSinc
     const today = new Date();
     const dayCount = 28; // show last 28 days
     const memberStart = memberSince ? new Date(memberSince).toISOString().slice(0, 10) : null;
-    const dayMap = new Map<string, 'outcome' | 'reflection' | 'freeze' | 'empty'>();
+    const dayMap = new Map<string, 'outcome' | 'reflection' | 'freeze' | 'empty' | 'pre'>();
 
     for (let i = 0; i < dayCount; i++) {
       const d = subDays(today, i).toISOString().slice(0, 10);
-      // Don't show days before user registered
-      if (memberStart && d < memberStart) continue;
-      dayMap.set(d, streakFreezeDates.includes(d) ? 'freeze' : 'empty');
+      if (memberStart && d < memberStart) {
+        dayMap.set(d, 'pre');
+      } else {
+        dayMap.set(d, streakFreezeDates.includes(d) ? 'freeze' : 'empty');
+      }
     }
 
     for (const r of reflections) {
