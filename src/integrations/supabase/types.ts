@@ -606,6 +606,33 @@ export type Database = {
           },
         ]
       }
+      signal_sources: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          name: string
+          type: string
+          url: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name: string
+          type?: string
+          url?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          name?: string
+          type?: string
+          url?: string | null
+        }
+        Relationships: []
+      }
       testimonials: {
         Row: {
           approved: boolean
@@ -656,6 +683,47 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      user_signal_preferences: {
+        Row: {
+          active: boolean
+          created_at: string
+          custom_name: string | null
+          custom_type: string | null
+          custom_url: string | null
+          id: string
+          source_id: string | null
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          custom_name?: string | null
+          custom_type?: string | null
+          custom_url?: string | null
+          id?: string
+          source_id?: string | null
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          custom_name?: string | null
+          custom_type?: string | null
+          custom_url?: string | null
+          id?: string
+          source_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_signal_preferences_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "signal_sources"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {
