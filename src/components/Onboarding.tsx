@@ -137,7 +137,7 @@ export function Onboarding({ onComplete }: Props) {
                     className="text-sm text-muted-foreground leading-relaxed"
                     {...stagger(0.15)}
                   >
-                    Each reflection comes with tools to help you pause. Try them.
+                    {t('onboarding.companionIntro')}
                   </motion.p>
 
                   <motion.div
