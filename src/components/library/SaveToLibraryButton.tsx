@@ -28,7 +28,6 @@ export function SaveToLibraryButton({ title, body, sourceType, sourceUrl, reflec
   const [highlightIdx, setHighlightIdx] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Check if already saved on mount
   useEffect(() => {
     if (!user) { setChecking(false); return; }
     const check = async () => {
@@ -47,7 +46,6 @@ export function SaveToLibraryButton({ title, body, sourceType, sourceUrl, reflec
     check();
   }, [user, sourceType, reflectionId, body, title]);
 
-  // Fetch user's existing tags when tag picker opens
   useEffect(() => {
     if (!showTags || !user) return;
     const fetch = async () => {
@@ -126,15 +124,14 @@ export function SaveToLibraryButton({ title, body, sourceType, sourceUrl, reflec
       <button
         onClick={handleClick}
         className="inline-flex items-center gap-0.5 text-[10px] font-mono text-muted-foreground/50 hover:text-foreground transition-colors"
-        aria-label="Save to library"
+        aria-label={t('libraryCard.saveToLibrary')}
       >
         {saved ? <Check className="h-2.5 w-2.5 text-primary" /> : <Bookmark className="h-2.5 w-2.5" />}
-        {saved ? 'Saved' : 'Save'}
+        {saved ? t('libraryCard.saved') : t('libraryCard.save')}
       </button>
 
       {showTags && !saved && (
         <div className="space-y-2 rounded-md border border-border/60 bg-background p-2.5">
-          {/* Selected tags */}
           {tags.length > 0 && (
             <div className="flex items-center gap-1 flex-wrap">
               {tags.map((tag) => (
@@ -150,7 +147,6 @@ export function SaveToLibraryButton({ title, body, sourceType, sourceUrl, reflec
             </div>
           )}
 
-          {/* Tag input */}
           <div className="flex items-center gap-1.5">
             <Tag className="h-3 w-3 text-muted-foreground/40 shrink-0" />
             <input
@@ -158,12 +154,11 @@ export function SaveToLibraryButton({ title, body, sourceType, sourceUrl, reflec
               value={input}
               onChange={(e) => { setInput(e.target.value); setHighlightIdx(-1); }}
               onKeyDown={handleKeyDown}
-              placeholder="Add tags…"
+              placeholder={t('libraryCard.addTagsPlaceholder')}
               className="flex-1 text-[11px] font-mono bg-transparent text-foreground placeholder:text-muted-foreground/40 focus:outline-none"
             />
           </div>
 
-          {/* Suggestions */}
           {suggestions.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {suggestions.map((tag, idx) => (
@@ -184,23 +179,22 @@ export function SaveToLibraryButton({ title, body, sourceType, sourceUrl, reflec
 
           {input.trim() && !allUserTags.includes(input.trim().toLowerCase()) && (
             <p className="text-[9px] font-mono text-muted-foreground/40">
-              Enter to create "{input.trim()}"
+              {t('libraryCard.enterToCreate', { tag: input.trim() })}
             </p>
           )}
 
-          {/* Actions */}
           <div className="flex items-center gap-2 pt-1">
             <button
               onClick={handleSave}
               className="text-[10px] font-mono px-2.5 py-1 rounded bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
             >
-              Save to Library
+              {t('libraryCard.saveToLibrary')}
             </button>
             <button
               onClick={() => setShowTags(false)}
               className="text-[10px] font-mono text-muted-foreground/50 hover:text-muted-foreground transition-colors"
             >
-              Cancel
+              {t('common.cancel')}
             </button>
           </div>
         </div>

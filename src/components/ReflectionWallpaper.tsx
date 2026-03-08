@@ -52,7 +52,6 @@ function compositeWallpaper(
     const img = new Image();
     img.crossOrigin = 'anonymous';
     img.onload = () => {
-      // Phone wallpaper dimensions
       const W = 1080;
       const H = 1920;
       const canvas = document.createElement('canvas');
@@ -60,13 +59,11 @@ function compositeWallpaper(
       canvas.height = H;
       const ctx = canvas.getContext('2d')!;
 
-      // Draw AI image covering the canvas
       const scale = Math.max(W / img.width, H / img.height);
       const sw = img.width * scale;
       const sh = img.height * scale;
       ctx.drawImage(img, (W - sw) / 2, (H - sh) / 2, sw, sh);
 
-      // Dark gradient overlay at bottom for text readability
       const grad = ctx.createLinearGradient(0, H * 0.45, 0, H);
       grad.addColorStop(0, 'rgba(0,0,0,0)');
       grad.addColorStop(0.4, 'rgba(0,0,0,0.3)');
@@ -77,7 +74,6 @@ function compositeWallpaper(
       const pad = 72;
       const maxWidth = W - pad * 2;
 
-      // Reflection text
       ctx.textBaseline = 'top';
       ctx.fillStyle = 'rgba(255,255,255,0.95)';
       ctx.font = '500 36px "Inter", system-ui, sans-serif';
@@ -85,7 +81,6 @@ function compositeWallpaper(
       y = wrapText(ctx, `"${message}"`, pad, y, maxWidth, 50);
       y += 40;
 
-      // Haiku
       if (haiku) {
         const lines = haiku.split(/\\n|\n/).map(l => l.trim()).filter(Boolean);
         ctx.font = 'italic 26px "IBM Plex Mono", monospace';
@@ -97,7 +92,6 @@ function compositeWallpaper(
         y += 16;
       }
 
-      // Branding
       ctx.font = '600 18px "IBM Plex Mono", monospace';
       ctx.fillStyle = 'rgba(255,255,255,0.35)';
       ctx.fillText('HOLZEN', pad, H - pad);
@@ -131,16 +125,15 @@ export function ReflectionWallpaper({ message, mood, context, haiku, variant = '
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
 
-      // Composite text over the AI image
       const finalUrl = await compositeWallpaper(data.image, message, haiku);
       setCompositeUrl(finalUrl);
     } catch (e: any) {
-      toast.error(e.message || 'Failed to generate wallpaper');
+      toast.error(e.message || t('wallpaper.failedToGenerate'));
       setOpen(false);
     } finally {
       setGenerating(false);
     }
-  }, [message, mood, context, haiku]);
+  }, [message, mood, context, haiku, t]);
 
   const download = useCallback(() => {
     if (!compositeUrl) return;
@@ -148,8 +141,8 @@ export function ReflectionWallpaper({ message, mood, context, haiku, variant = '
     a.href = compositeUrl;
     a.download = 'holzen-wallpaper.png';
     a.click();
-    toast('Wallpaper downloaded');
-  }, [compositeUrl]);
+    toast(t('wallpaper.downloaded'));
+  }, [compositeUrl, t]);
 
   return (
     <>
@@ -158,28 +151,28 @@ export function ReflectionWallpaper({ message, mood, context, haiku, variant = '
           onClick={generate}
           disabled={generating}
           className="inline-flex items-center gap-1.5 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors disabled:opacity-50"
-          title="Generate wallpaper"
+          title={t('wallpaper.generateTitle')}
         >
           {generating ? (
             <Loader2 className="h-3 w-3 animate-spin" />
           ) : (
             <Sparkles className="h-3 w-3" />
           )}
-          Wallpaper
+          {t('wallpaper.wallpaper')}
         </button>
       ) : (
         <button
           onClick={generate}
           disabled={generating}
           className="inline-flex items-center gap-1 text-[10px] font-mono text-muted-foreground/60 hover:text-foreground transition-colors disabled:opacity-50"
-          title="Generate wallpaper from this reflection"
+          title={t('wallpaper.generateFromReflection')}
         >
           {generating ? (
             <Loader2 className="h-3 w-3 animate-spin" />
           ) : (
             <Sparkles className="h-3 w-3" />
           )}
-          Wallpaper
+          {t('wallpaper.wallpaper')}
         </button>
       )}
 
@@ -187,7 +180,7 @@ export function ReflectionWallpaper({ message, mood, context, haiku, variant = '
         <DialogContent className="max-w-sm p-0 overflow-y-auto max-h-[90vh] bg-card border-border [&>button]:z-10 [&>button]:bg-background/80 [&>button]:backdrop-blur-sm [&>button]:rounded-full [&>button]:p-1 [&>button]:right-3 [&>button]:top-3 [&>button]:sticky">
           <DialogHeader className="p-4 pb-0">
             <DialogTitle className="text-sm font-mono tracking-wider">
-              Reflection Wallpaper
+              {t('wallpaper.reflectionWallpaper')}
             </DialogTitle>
           </DialogHeader>
 
@@ -204,7 +197,7 @@ export function ReflectionWallpaper({ message, mood, context, haiku, variant = '
                 <div className="relative rounded-lg overflow-hidden border border-border/60 aspect-[9/16] bg-muted/30">
                   <img
                     src={compositeUrl}
-                    alt="Reflection wallpaper"
+                    alt={t('wallpaper.reflectionWallpaper')}
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -214,7 +207,7 @@ export function ReflectionWallpaper({ message, mood, context, haiku, variant = '
                     className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-md bg-primary text-primary-foreground text-xs font-mono transition-colors hover:bg-primary/90"
                   >
                     <Download className="h-3.5 w-3.5" />
-                    Download
+                    {t('wallpaper.download')}
                   </button>
                   <button
                     onClick={() => {
@@ -224,14 +217,14 @@ export function ReflectionWallpaper({ message, mood, context, haiku, variant = '
                     className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-md border border-border text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
                   >
                     <Sparkles className="h-3.5 w-3.5" />
-                    Regenerate
+                    {t('wallpaper.regenerate')}
                   </button>
                 </div>
                 <button
                   onClick={() => setOpen(false)}
                   className="w-full py-2.5 rounded-md border border-border text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
                 >
-                  Done
+                  {t('common.done')}
                 </button>
               </>
             ) : null}
