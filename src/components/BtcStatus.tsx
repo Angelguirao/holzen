@@ -1,16 +1,17 @@
 import { Eye, EyeOff, WifiOff } from 'lucide-react';
 import { BtcChart } from '@/components/BtcChart';
 import { Skeleton } from '@/components/ui/skeleton';
-import type { BtcPriceData } from '@/lib/btc';
+import { formatBtcPrice, type BtcPriceData } from '@/lib/btc';
 
 interface Props {
   data: BtcPriceData | null;
   error: string | null;
   hidden: boolean;
   onToggleHidden: () => void;
+  currency?: string;
 }
 
-export function BtcStatus({ data, error, hidden, onToggleHidden }: Props) {
+export function BtcStatus({ data, error, hidden, onToggleHidden, currency = 'USD' }: Props) {
   const toggle = onToggleHidden;
 
   if (error) {
@@ -40,13 +41,10 @@ export function BtcStatus({ data, error, hidden, onToggleHidden }: Props) {
     );
   }
 
+  const cur = data.currency || currency;
   const dir = data.direction === 'down' ? '−' : '+';
   const pct = Math.abs(data.changePercent).toFixed(1);
-  const price = data.currentPrice.toLocaleString('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    maximumFractionDigits: 0,
-  });
+  const price = formatBtcPrice(data.currentPrice, cur);
 
   const fearGreedColor = data.fearGreed
     ? data.fearGreed.value <= 25 ? 'text-destructive'
@@ -60,7 +58,7 @@ export function BtcStatus({ data, error, hidden, onToggleHidden }: Props) {
     <div className="space-y-3">
       <div className="space-y-1">
         <div className="flex items-center justify-between">
-          <p className="text-xs font-mono text-muted-foreground">BTC / USD</p>
+          <p className="text-xs font-mono text-muted-foreground">BTC / {cur}</p>
           <button
             onClick={toggle}
             className="text-muted-foreground hover:text-foreground transition-colors"
@@ -90,7 +88,7 @@ export function BtcStatus({ data, error, hidden, onToggleHidden }: Props) {
           </>
         )}
       </div>
-      <BtcChart hidden={hidden} />
+      <BtcChart hidden={hidden} currency={cur} />
     </div>
   );
 }
