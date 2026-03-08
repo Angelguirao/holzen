@@ -168,7 +168,7 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
         }
 
         supabase.functions
-          .invoke('ground-nudge', { body: { context: context ?? '' } })
+          .invoke('ground-nudge', { body: { context: context ?? '', language } })
           .then(({ data, error: fnError }) => {
             if (cancelled) return;
             if (fnError || !data || data.error) {
