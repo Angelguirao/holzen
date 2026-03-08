@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
@@ -11,6 +12,7 @@ const fade = (delay = 0) => ({
 });
 
 const About = () => {
+  const { t } = useTranslation();
   const prefersReduced = useReducedMotion();
   const m = (delay = 0) => (prefersReduced ? {} : fade(delay));
 
