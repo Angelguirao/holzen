@@ -100,14 +100,14 @@ export function ZoomOutDisplay({ data, loading, error }: Props) {
 
       {/* Deep Time — civilizational / planetary perspective */}
       {deepTime && (
-        <div className="space-y-1.5">
+        <div className="rounded-lg border border-primary/10 bg-primary/[0.03] px-4 py-3.5 space-y-2">
           <div className="flex items-center gap-1.5">
-            <Globe className="h-3 w-3 text-muted-foreground/50" />
-            <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">
+            <Globe className="h-3 w-3 text-primary/40" />
+            <p className="text-[9px] font-mono text-primary/50 uppercase tracking-wider">
               Deep time
             </p>
           </div>
-          <p className="text-[10px] font-mono text-muted-foreground/70 uppercase tracking-wide">
+          <p className="text-[10px] font-mono text-foreground/70 uppercase tracking-wide leading-snug">
             {deepTime.title}
           </p>
           <p className="text-xs text-muted-foreground leading-relaxed">
