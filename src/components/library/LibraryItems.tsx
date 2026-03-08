@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Search, BookOpen, Bookmark, StickyNote } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { LibraryItemCard } from './LibraryItemCard';
 import { NewNoteForm } from './NewNoteForm';
@@ -18,7 +18,11 @@ const TYPE_FILTERS = [
 
 export function LibraryItems({ library }: Props) {
   const { t } = useTranslation();
-  const { items, loading, addItem, updateItem, deleteItem, togglePin } = library;
+  const {
+    items, collections, loading,
+    addItem, updateItem, deleteItem, togglePin,
+    addToCollection, removeFromCollection, getItemCollections,
+  } = library;
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
 
@@ -49,9 +53,22 @@ export function LibraryItems({ library }: Props) {
     await addItem({ type: 'note', title: title || null, body, tags });
   };
 
+  const renderCard = (item: typeof items[0]) => (
+    <LibraryItemCard
+      key={item.id}
+      item={item}
+      onTogglePin={togglePin}
+      onDelete={deleteItem}
+      onStatusChange={handleStatusChange}
+      collections={collections}
+      itemCollections={getItemCollections(item.id)}
+      onAddToCollection={addToCollection}
+      onRemoveFromCollection={removeFromCollection}
+    />
+  );
+
   return (
     <div className="space-y-4">
-      {/* Search */}
       <div className="relative">
         <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/40" />
         <Input
@@ -62,7 +79,6 @@ export function LibraryItems({ library }: Props) {
         />
       </div>
 
-      {/* Type filter chips */}
       <div className="flex items-center gap-2">
         {TYPE_FILTERS.map(({ key, labelKey }) => (
           <button
@@ -83,24 +99,17 @@ export function LibraryItems({ library }: Props) {
         </span>
       </div>
 
-      {/* New note */}
       <NewNoteForm onSave={handleNewNote} />
 
-      {/* Pinned */}
       {pinnedItems.length > 0 && (
         <div className="space-y-1.5">
           <p className="text-[10px] font-mono text-muted-foreground/50 uppercase tracking-wider">{t('common.pinned')}</p>
-          {pinnedItems.map((item) => (
-            <LibraryItemCard key={item.id} item={item} onTogglePin={togglePin} onDelete={deleteItem} onStatusChange={handleStatusChange} />
-          ))}
+          {pinnedItems.map(renderCard)}
         </div>
       )}
 
-      {/* Items */}
       <div className="space-y-1.5">
-        {unpinnedItems.map((item) => (
-          <LibraryItemCard key={item.id} item={item} onTogglePin={togglePin} onDelete={deleteItem} onStatusChange={handleStatusChange} />
-        ))}
+        {unpinnedItems.map(renderCard)}
       </div>
 
       {filtered.length === 0 && (
