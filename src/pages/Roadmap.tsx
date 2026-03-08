@@ -92,12 +92,12 @@ const Roadmap = () => {
         <div className="space-y-4">
           <Link to={user ? '/settings' : '/welcome'} className="inline-flex items-center gap-1 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors">
             <ArrowLeft className="h-3 w-3" />
-            Back
+            {t('common.back')}
           </Link>
           <div className="space-y-1">
-            <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">Roadmap</h1>
+            <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">{t('roadmap.title')}</h1>
             <p className="text-xs text-muted-foreground">
-              Vote on what we build next. {!user && 'Sign in to vote.'}
+              {t('roadmap.voteOnNext')} {!user && t('roadmap.signInToVote')}
             </p>
           </div>
         </div>
