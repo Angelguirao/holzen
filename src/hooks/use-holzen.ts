@@ -374,7 +374,7 @@ export function useHolzen() {
 
   const checkAndTrigger = useCallback(async () => {
     try {
-      const data = await fetchBtcData();
+      const data = await fetchBtcData(currency);
       setBtcData(data);
 
       if (user && !(await isInCooldown()) && !isInQuietHours()) {
