@@ -208,6 +208,8 @@ export function NotificationBell() {
     night_reflection: '🌙',
     letter: '✉️',
     insight: '✨',
+    reflection: '📝',
+    ritual: '🔮',
   };
 
   return (
