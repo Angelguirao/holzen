@@ -463,7 +463,7 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
 
       {hasSignal && (
         <CollapsibleCompanion
-          label="Read the signal"
+          label={t.signal}
           expanded={expandedSignal}
           onToggle={() => {
             setExpandedSignal((v) => !v);
