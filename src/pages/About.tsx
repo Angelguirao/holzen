@@ -31,7 +31,7 @@ const About = () => {
             className="inline-flex items-center gap-1.5 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
           >
             <ArrowLeft className="h-3.5 w-3.5" />
-            Back
+            {t('common.back')}
           </Link>
         </motion.div>
 
