@@ -15,8 +15,12 @@ interface Props {
   reflections: { created_at: string; mood: string | null }[];
 }
 
-const MOOD_MAP: Record<string, number> = { anxious: 1, neutral: 2, calm: 3 };
-const MOOD_LABELS: Record<number, string> = { 1: 'Anxious', 2: 'Neutral', 3: 'Calm' };
+// Map moods to a 1-5 composure scale (1 = most reactive, 5 = most composed)
+const MOOD_MAP: Record<string, number> = {
+  fomo: 1, greedy: 1.5, anxious: 2, fearful: 2, excited: 2.5,
+  uncertain: 3, detached: 4, calm: 5,
+};
+const MOOD_LABELS: Record<number, string> = { 1: 'Reactive', 3: 'Neutral', 5: 'Composed' };
 
 export function MoodTrends({ reflections }: Props) {
   const data = useMemo(() => {
