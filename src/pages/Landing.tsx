@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { PageMeta } from '@/components/PageMeta';
 import { LandingTestimonials } from '@/components/LandingTestimonials';
+import { LandingLanguageSwitcher } from '@/components/LandingLanguageSwitcher';
 
 function Section({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   const ref = useRef(null);
@@ -119,12 +120,15 @@ const Landing = () => {
           transition={{ duration: 0.5 }}
         >
           <h1 className="text-xs font-mono tracking-[0.25em] uppercase text-foreground/80">Holzen</h1>
-          <button
-            onClick={() => navigate('/auth')}
-            className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
-          >
-            {t('common.signIn')}
-          </button>
+          <div className="flex items-center gap-4">
+            <LandingLanguageSwitcher />
+            <button
+              onClick={() => navigate('/auth')}
+              className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {t('common.signIn')}
+            </button>
+          </div>
         </motion.nav>
 
         {/* Hero content */}
@@ -170,18 +174,20 @@ const Landing = () => {
         </div>
 
         {/* Scroll hint */}
-        <motion.div
-          className="absolute bottom-8"
+        <motion.button
+          className="absolute bottom-8 cursor-pointer"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 2, duration: 1 }}
+          onClick={() => document.getElementById('reflection-loop')?.scrollIntoView({ behavior: 'smooth' })}
+          aria-label="Scroll to content"
         >
           <ChevronDown className="h-4 w-4 text-muted-foreground/30 animate-bounce" />
-        </motion.div>
+        </motion.button>
       </div>
 
       {/* ─── THE LOOP ─── */}
-      <div className="max-w-lg mx-auto px-6 py-16">
+      <div id="reflection-loop" className="max-w-lg mx-auto px-6 py-16">
         <Section>
           <SectionLabel>{t('landing.reflectionLoop')}</SectionLabel>
           <div className="space-y-0">
