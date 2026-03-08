@@ -49,15 +49,6 @@ import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 const WIDGET_IDS = ['btc-status', 'hold-goal', 'reflection', 'night', 'letter', 'actions'] as const;
 type WidgetId = typeof WIDGET_IDS[number];
 
-const WIDGET_TITLES: Record<WidgetId, string> = {
-  'btc-status': 'Market',
-  'hold-goal': 'Goal',
-  'reflection': 'Reflection',
-  'night': 'Evening',
-  'letter': 'Letter',
-  'actions': 'Practice',
-};
-
 interface PinnedReflection {
   id: string;
   message: string;
@@ -68,6 +59,7 @@ interface PinnedReflection {
 }
 
 const Home = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const { subscribed, loading: subLoading, trialRemaining, checkoutLoading, startCheckout, refresh } = useSubscription();
