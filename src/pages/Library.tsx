@@ -1,14 +1,11 @@
-import { useState, useMemo, lazy, Suspense } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLibrary } from '@/hooks/use-library';
 import { PageMeta } from '@/components/PageMeta';
-import { List, Share2, Star, Search, Tag, FolderOpen, Filter, X } from 'lucide-react';
+import { Star, Search, Tag, FolderOpen, Filter, X } from 'lucide-react';
 import { LibraryItems } from '@/components/library/LibraryItems';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import { useIsMobile } from '@/hooks/use-mobile';
-
-const GraphView = lazy(() => import('@/components/library/GraphView'));
 
 const SOURCE_FILTERS: { key: string; label: string }[] = [
   { key: 'reflection', label: 'Reflection' },
@@ -30,8 +27,6 @@ const STATUS_FILTERS: { key: string; label: string }[] = [
 export default function Library() {
   const { t } = useTranslation();
   const library = useLibrary();
-  const isMobile = useIsMobile();
-  const [viewMode, setViewMode] = useState<'list' | 'graph'>('list');
   const [tab, setTab] = useState<'all' | 'favorites'>('all');
   const [search, setSearch] = useState('');
   const [sourceFilter, setSourceFilter] = useState<string | null>(null);
@@ -123,34 +118,9 @@ export default function Library() {
           {t('library.tabFavorites')}
         </button>
 
-        {!isMobile && (
-          <div className="ml-auto flex items-center gap-1 rounded-md border border-border/40 p-0.5">
-            <button
-              onClick={() => setViewMode('list')}
-              className={cn(
-                'p-1 rounded transition-colors',
-                viewMode === 'list' ? 'bg-muted text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
-              )}
-              aria-label="List view"
-            >
-              <List className="h-3.5 w-3.5" />
-            </button>
-            <button
-              onClick={() => setViewMode('graph')}
-              className={cn(
-                'p-1 rounded transition-colors',
-                viewMode === 'graph' ? 'bg-muted text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
-              )}
-              aria-label="Graph view"
-            >
-              <Share2 className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        )}
       </div>
 
-      {viewMode === 'list' || isMobile ? (
-        <div className="space-y-3">
+      <div className="space-y-3">
           {/* Search + filter toggle */}
           <div className="flex items-center gap-2">
             <div className="relative flex-1">
@@ -322,11 +292,6 @@ export default function Library() {
           {/* Item list */}
           <LibraryItems library={library} filtered={filtered} />
         </div>
-      ) : (
-        <Suspense fallback={<div className="flex items-center justify-center h-[400px]"><p className="text-xs font-mono text-muted-foreground/40 animate-pulse">Loading graph…</p></div>}>
-          <GraphView />
-        </Suspense>
-      )}
     </div>
   );
 }
