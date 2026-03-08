@@ -99,8 +99,10 @@ export function BadgesPanel({ reflections }: BadgesPanelProps) {
     const haikuCount = reflections.filter((r) => r.haiku_read).length;
     const groundCount = reflections.filter((r) => r.learning_read).length;
     const signalCount = reflections.filter((r) => !!r.signal_source).length;
-    const allFourCount = reflections.filter(
-      (r) => r.breathing_completed && r.haiku_read && r.learning_read && !!r.signal_source
+    const zoomOutCount = reflections.filter((r) => r.zoom_out_read).length;
+    const historyCount = reflections.filter((r) => r.history_read).length;
+    const allSixCount = reflections.filter(
+      (r) => r.breathing_completed && r.haiku_read && r.learning_read && !!r.signal_source && r.zoom_out_read && r.history_read
     ).length;
 
     const makeBadge = (
@@ -142,7 +144,7 @@ export function BadgesPanel({ reflections }: BadgesPanelProps) {
       makeBadge('held-10', 'Diamond Hands', 'Held steady 10 times', Target, 'composure', 'hsl(170, 40%, 42%)', heldCount, 10, 'holds'),
       makeBadge('held-50', 'Iron Will', 'Held steady 50 times', Target, 'composure', 'hsl(180, 45%, 38%)', heldCount, 50, 'holds'),
 
-      // Companion engagement badges (NEW)
+      // Companion engagement badges
       makeBadge('breathe-5', 'First Breaths', 'Completed breathing 5 times', Wind, 'companions', 'hsl(190, 50%, 50%)', breathingCount, 5, 'sessions'),
       makeBadge('breathe-25', 'Breath Master', 'Completed breathing 25 times', Wind, 'companions', 'hsl(195, 55%, 45%)', breathingCount, 25, 'sessions'),
       makeBadge('breathe-100', 'Zen Lungs', 'Completed breathing 100 times', Wind, 'companions', 'hsl(200, 60%, 40%)', breathingCount, 100, 'sessions'),
@@ -152,8 +154,12 @@ export function BadgesPanel({ reflections }: BadgesPanelProps) {
       makeBadge('learn-50', 'Scholar of Calm', 'Used Ground Yourself 50 times', BookOpen, 'companions', 'hsl(50, 55%, 43%)', groundCount, 50, 'sessions'),
       makeBadge('signal-10', 'Signal Reader', 'Read 10 signals', Radio, 'companions', 'hsl(30, 50%, 48%)', signalCount, 10, 'signals'),
       makeBadge('signal-50', 'Deep Listener', 'Read 50 signals', Radio, 'companions', 'hsl(35, 55%, 43%)', signalCount, 50, 'signals'),
-      makeBadge('all-4-5', 'Full Practice', 'Used all 4 companions in 5 reflections', Award, 'companions', 'hsl(310, 45%, 48%)', allFourCount, 5, 'full sessions'),
-      makeBadge('all-4-25', 'Complete Discipline', 'Used all 4 companions in 25 reflections', Award, 'companions', 'hsl(315, 50%, 43%)', allFourCount, 25, 'full sessions'),
+      makeBadge('zoom-5', 'Long View', 'Used Zoom Out 5 times', Telescope, 'companions', 'hsl(240, 45%, 50%)', zoomOutCount, 5, 'sessions'),
+      makeBadge('zoom-25', 'Macro Thinker', 'Used Zoom Out 25 times', Telescope, 'companions', 'hsl(245, 50%, 45%)', zoomOutCount, 25, 'sessions'),
+      makeBadge('history-5', 'History Student', 'Read 5 historical insights', Landmark, 'companions', 'hsl(60, 40%, 48%)', historyCount, 5, 'insights'),
+      makeBadge('history-25', 'Cycle Sage', 'Read 25 historical insights', Landmark, 'companions', 'hsl(65, 45%, 43%)', historyCount, 25, 'insights'),
+      makeBadge('all-6-5', 'Full Practice', 'Used all 6 companions in 5 reflections', Award, 'companions', 'hsl(310, 45%, 48%)', allSixCount, 5, 'full sessions'),
+      makeBadge('all-6-25', 'Complete Discipline', 'Used all 6 companions in 25 reflections', Award, 'companions', 'hsl(315, 50%, 43%)', allSixCount, 25, 'full sessions'),
 
       // Engagement badges
       makeBadge('fav-5', 'Curator', '5 favorited reflections', Heart, 'engagement', 'hsl(340, 50%, 50%)', favCount, 5, 'favorites'),
