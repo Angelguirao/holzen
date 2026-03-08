@@ -146,7 +146,7 @@ serve(async (req) => {
       let aiInsight = "";
       if (LOVABLE_API_KEY && reflectionCount > 0) {
         try {
-          const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", ja: "Japanese", de: "German" };
+          const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
           const langCode = (profile as any).language || "en";
           const langName = LANG_NAMES[langCode] || "English";
           const langInstruction = langCode !== "en" ? `\nWrite in ${langName}.` : "";

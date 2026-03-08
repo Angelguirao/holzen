@@ -108,7 +108,7 @@ serve(async (req) => {
         outcomes[r.outcome as keyof typeof outcomes] = (outcomes[r.outcome as keyof typeof outcomes] || 0) + 1;
       }
 
-      const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", ja: "Japanese", de: "German" };
+      const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
       const langName = LANG_NAMES[userLanguage] || "English";
       const langInstruction = userLanguage !== "en" ? `\n\nLANGUAGE: Write all insight titles and bodies in ${langName}.` : "";
 
