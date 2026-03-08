@@ -194,16 +194,46 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
     setSignalLoading(true);
     setSignalError(false);
 
-    supabase.functions
-      .invoke('signal-companion', { body: { context: context ?? '' } })
-      .then(({ data, error: fnError }) => {
+    supabase
+      .from('reflections')
+      .select('signal_title, signal_body, signal_source, signal_url')
+      .eq('id', reflectionId)
+      .single()
+      .then(({ data: row }) => {
         if (cancelled) return;
-        if (fnError || !data || data.error) {
-          setSignalError(true);
-        } else {
-          setSignal(data as SignalData);
+        if (row?.signal_source) {
+          setSignal({
+            title: row.signal_title ?? '',
+            body: row.signal_body ?? '',
+            source: row.signal_source,
+            url: row.signal_url ?? '',
+          });
+          setSignalLoading(false);
+          return;
         }
-        setSignalLoading(false);
+
+        supabase.functions
+          .invoke('signal-companion', { body: { context: context ?? '' } })
+          .then(({ data, error: fnError }) => {
+            if (cancelled) return;
+            if (fnError || !data || data.error) {
+              setSignalError(true);
+            } else {
+              const signalData = data as SignalData;
+              setSignal(signalData);
+              supabase
+                .from('reflections')
+                .update({
+                  signal_title: signalData.title,
+                  signal_body: signalData.body,
+                  signal_source: signalData.source,
+                  signal_url: signalData.url,
+                } as any)
+                .eq('id', reflectionId)
+                .then(() => {});
+            }
+            setSignalLoading(false);
+          });
       });
 
     return () => { cancelled = true; };
