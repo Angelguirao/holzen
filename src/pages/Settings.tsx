@@ -284,8 +284,10 @@ const Settings = () => {
                   { code: 'en', label: 'English', desc: 'Default' },
                   { code: 'es', label: 'Español', desc: 'Spanish' },
                   { code: 'pt', label: 'Português', desc: 'Portuguese' },
-                  { code: 'ja', label: '日本語', desc: 'Japanese' },
                   { code: 'de', label: 'Deutsch', desc: 'German' },
+                  { code: 'nl', label: 'Nederlands', desc: 'Dutch' },
+                  { code: 'fr', label: 'Français', desc: 'French' },
+                  { code: 'tr', label: 'Türkçe', desc: 'Turkish' },
                 ] as const).map((l) => (
                   <button
                     key={l.code}
