@@ -1,4 +1,5 @@
 import { useAuth } from '@/hooks/use-auth';
+import { useTranslation } from 'react-i18next';
 import { isHapticEnabled, setHapticEnabled } from '@/lib/haptics';
 import { useHolzen } from '@/hooks/use-holzen';
 import { useSubscription } from '@/hooks/use-subscription';
