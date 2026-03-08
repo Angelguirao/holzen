@@ -113,7 +113,7 @@ export function TestimonialRequest({ reflectionCount }: Props) {
               className="text-xs font-mono gap-1.5"
             >
               <Send className="h-3 w-3" />
-              {t.send}
+              {t('testimonial.submit')}
             </Button>
           </div>
         </motion.div>
