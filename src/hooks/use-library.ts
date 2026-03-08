@@ -178,7 +178,7 @@ export function useLibrary() {
 
   return {
     items, collections, collectionItems, loading,
-    addItem, updateItem, deleteItem, togglePin,
+    addItem, updateItem, deleteItem, togglePin, toggleFavorite,
     addCollection, updateCollection, deleteCollection,
     addToCollection, removeFromCollection,
     getCollectionItemIds, getCollectionItemCount, getItemCollections,
