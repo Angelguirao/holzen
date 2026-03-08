@@ -92,7 +92,7 @@ export function Onboarding({ onComplete }: Props) {
                     className="text-xs font-mono tracking-[0.25em] uppercase text-muted-foreground"
                     {...stagger(0.1)}
                   >
-                    Holzen
+                    {t('common.holzen')}
                   </motion.p>
                   <motion.p
                     className="text-xl leading-relaxed text-foreground"
