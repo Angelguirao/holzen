@@ -114,7 +114,7 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
     if (!reflectionId) return;
     supabase
       .from('reflections')
-      .select('breathing_completed, haiku_read, learning_read, zoom_out_read, history_read')
+      .select('breathing_completed, haiku_read, learning_read, signal_read, zoom_out_read, history_read')
       .eq('id', reflectionId)
       .single()
       .then(({ data }) => {
@@ -123,7 +123,7 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
             breathing: (data as any).breathing_completed ?? false,
             haiku: (data as any).haiku_read ?? false,
             learning: (data as any).learning_read ?? false,
-            signal: false,
+            signal: (data as any).signal_read ?? false,
             zoomOut: (data as any).zoom_out_read ?? false,
             history: (data as any).history_read ?? false,
           });
@@ -368,11 +368,12 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
     if (completion[key]) return;
     setCompletion((prev) => ({ ...prev, [key]: true }));
     hapticFeedback('light');
-    if (reflectionId && key !== 'signal') {
+    if (reflectionId) {
       const dbKeyMap: Record<string, string> = {
         breathing: 'breathing_completed',
         haiku: 'haiku_read',
         learning: 'learning_read',
+        signal: 'signal_read',
         zoomOut: 'zoom_out_read',
         history: 'history_read',
       };
