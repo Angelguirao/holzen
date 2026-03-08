@@ -272,6 +272,36 @@ const Settings = () => {
                 ))}
               </div>
             </div>
+
+            {/* Language */}
+            <div className="space-y-3">
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">Reflection language</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Choose the language for AI-generated reflections, haikus, and insights.
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                {([
+                  { code: 'en', label: 'English', desc: 'Default' },
+                  { code: 'es', label: 'Español', desc: 'Spanish' },
+                  { code: 'pt', label: 'Português', desc: 'Portuguese' },
+                  { code: 'ja', label: '日本語', desc: 'Japanese' },
+                  { code: 'de', label: 'Deutsch', desc: 'German' },
+                ] as const).map((l) => (
+                  <button
+                    key={l.code}
+                    onClick={() => setLanguage(l.code)}
+                    className={`rounded-md border px-3 py-2.5 text-left transition-colors ${
+                      language === l.code
+                        ? 'border-primary bg-primary/5 text-foreground'
+                        : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    <p className="text-xs font-mono font-medium">{l.label}</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">{l.desc}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
           </AccordionContent>
         </AccordionItem>
 
