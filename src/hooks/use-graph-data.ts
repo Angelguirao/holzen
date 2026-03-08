@@ -12,7 +12,7 @@ interface Reflection {
   is_favorite: boolean;
 }
 
-export interface GraphNodeData {
+export interface GraphNodeData extends Record<string, unknown> {
   label: string;
   nodeType: 'reflection' | 'tag' | 'mood' | 'library_item' | 'collection';
   sublabel?: string;
