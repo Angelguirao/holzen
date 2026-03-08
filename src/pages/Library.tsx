@@ -28,7 +28,6 @@ export default function Library() {
   const { t } = useTranslation();
   const library = useLibrary();
   const [tab, setTab] = useState<'all' | 'favorites'>('all');
-  const [tab, setTab] = useState<'all' | 'favorites'>('all');
   const [search, setSearch] = useState('');
   const [sourceFilter, setSourceFilter] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string | null>(null);
