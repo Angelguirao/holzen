@@ -158,10 +158,10 @@ const Settings = () => {
 
       <Accordion type="multiple" defaultValue={['profile', 'reflection']} className="space-y-1">
 
-        {/* 1. Profile */}
-        <AccordionItem value="profile" className="border border-border/40 rounded-md px-4">
+        {/* 1. You */}
+        <AccordionItem value="you" className="border border-border/40 rounded-md px-4">
           <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
-            Profile
+            You
           </AccordionTrigger>
           <AccordionContent className="space-y-3 pb-4">
             <p className="text-xs text-muted-foreground leading-relaxed">
