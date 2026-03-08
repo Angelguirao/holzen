@@ -11,6 +11,7 @@ interface Props {
 
 export function ReflectionNote({ reflectionId, initialNote }: Props) {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [note, setNote] = useState(initialNote ?? '');
   const [editing, setEditing] = useState(false);
   const [saved, setSaved] = useState(false);
