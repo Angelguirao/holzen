@@ -49,10 +49,15 @@ interface Reflection {
   tags: string[];
 }
 
+const PAGE_SIZE = 30;
+const FIELDS = 'id, message, context, created_at, is_favorite, haiku, learning_title, learning_body, learning_citation, learning_url, signal_title, signal_body, signal_source, signal_url, zoom_out_data, history_insight_data, note, mood, outcome, tags';
+
 const History = () => {
   const { user } = useAuth();
   const [reflections, setReflections] = useState<Reflection[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
   const [tab, setTab] = useState<'recent' | 'library' | 'timeline'>('recent');
   const [filter, setFilter] = useState<'all' | 'favorites'>('all');
   const [tagFilter, setTagFilter] = useState<string | null>(null);
@@ -69,15 +74,37 @@ const History = () => {
     const loadReflections = async () => {
       const { data } = await supabase
         .from('reflections')
-        .select('id, message, context, created_at, is_favorite, haiku, learning_title, learning_body, learning_citation, learning_url, signal_title, signal_body, signal_source, signal_url, zoom_out_data, history_insight_data, note, mood, outcome, tags')
+        .select(FIELDS)
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
-        .limit(1000);
-      setReflections((data as unknown as Reflection[]) ?? []);
+        .limit(PAGE_SIZE);
+      const rows = (data as unknown as Reflection[]) ?? [];
+      setReflections(rows);
+      setHasMore(rows.length === PAGE_SIZE);
       setLoading(false);
     };
     loadReflections();
   }, [user]);
+
+  const loadMore = useCallback(async () => {
+    if (!user || loadingMore || !hasMore) return;
+    setLoadingMore(true);
+    const last = reflections[reflections.length - 1];
+    if (!last) { setLoadingMore(false); return; }
+    const { data } = await supabase
+      .from('reflections')
+      .select(FIELDS)
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false })
+      .lt('created_at', last.created_at)
+      .limit(PAGE_SIZE);
+    const rows = (data as unknown as Reflection[]) ?? [];
+    setReflections((prev) => [...prev, ...rows]);
+    setHasMore(rows.length === PAGE_SIZE);
+    setLoadingMore(false);
+  }, [user, loadingMore, hasMore, reflections]);
+
+  const sentinelRef = useInfiniteScroll({ hasMore, loading: loadingMore, onLoadMore: loadMore });
 
   const toggleFavorite = useCallback(async (id: string) => {
     const reflection = reflections.find((r) => r.id === id);
