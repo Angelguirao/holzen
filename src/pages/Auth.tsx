@@ -5,10 +5,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
+import { useTranslation } from 'react-i18next';
 
 type AuthView = 'sign-in' | 'sign-up' | 'forgot-password';
 
 const Auth = () => {
+  const { t } = useTranslation();
   const [view, setView] = useState<AuthView>('sign-in');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -21,14 +23,9 @@ const Auth = () => {
     e.preventDefault();
     setError(null);
     setLoading(true);
-
     try {
       if (view === 'sign-up') {
-        const { error } = await supabase.auth.signUp({
-          email,
-          password,
-          options: { emailRedirectTo: window.location.origin },
-        });
+        const { error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin } });
         if (error) throw error;
         setConfirmSent(true);
       } else {
@@ -46,11 +43,8 @@ const Auth = () => {
     e.preventDefault();
     setError(null);
     setLoading(true);
-
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${window.location.origin}/reset-password`,
-      });
+      const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/reset-password` });
       if (error) throw error;
       setResetSent(true);
     } catch (e: any) {
@@ -62,9 +56,7 @@ const Auth = () => {
 
   const handleGoogle = async () => {
     setError(null);
-    const { error } = await lovable.auth.signInWithOAuth('google', {
-      redirect_uri: window.location.origin,
-    });
+    const { error } = await lovable.auth.signInWithOAuth('google', { redirect_uri: window.location.origin });
     if (error) setError(error.message);
   };
 
@@ -72,14 +64,9 @@ const Auth = () => {
     return (
       <div className="min-h-screen flex items-center justify-center p-6">
         <div className="w-full max-w-sm space-y-6">
-          <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">Holzen</h1>
-          <p className="text-sm">Check your email to confirm your account.</p>
-          <button
-            onClick={() => setConfirmSent(false)}
-            className="text-xs font-mono text-muted-foreground underline"
-          >
-            Back
-          </button>
+          <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">{t('common.holzen')}</h1>
+          <p className="text-sm">{t('auth.checkEmailConfirm')}</p>
+          <button onClick={() => setConfirmSent(false)} className="text-xs font-mono text-muted-foreground underline">{t('common.back')}</button>
         </div>
       </div>
     );
@@ -89,14 +76,9 @@ const Auth = () => {
     return (
       <div className="min-h-screen flex items-center justify-center p-6">
         <div className="w-full max-w-sm space-y-6">
-          <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">Holzen</h1>
-          <p className="text-sm">Check your email for a password reset link.</p>
-          <button
-            onClick={() => { setResetSent(false); setView('sign-in'); }}
-            className="text-xs font-mono text-muted-foreground underline"
-          >
-            Back to sign in
-          </button>
+          <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">{t('common.holzen')}</h1>
+          <p className="text-sm">{t('auth.checkEmailReset')}</p>
+          <button onClick={() => { setResetSent(false); setView('sign-in'); }} className="text-xs font-mono text-muted-foreground underline">{t('auth.backToSignIn')}</button>
         </div>
       </div>
     );
@@ -107,38 +89,18 @@ const Auth = () => {
       <div className="min-h-screen flex items-center justify-center p-6">
         <div className="w-full max-w-sm space-y-8">
           <div className="space-y-2">
-            <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">Holzen</h1>
-            <p className="text-sm text-muted-foreground">Reset your password</p>
+            <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">{t('common.holzen')}</h1>
+            <p className="text-sm text-muted-foreground">{t('auth.resetYourPassword')}</p>
           </div>
-
           <form onSubmit={handleForgotPassword} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-xs font-mono">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                className="font-mono text-sm"
-              />
+              <Label htmlFor="email" className="text-xs font-mono">{t('auth.email')}</Label>
+              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="font-mono text-sm" />
             </div>
-
-            {error && (
-              <p className="text-xs text-destructive font-mono">{error}</p>
-            )}
-
-            <Button type="submit" className="w-full font-mono text-xs" disabled={loading}>
-              Send reset link
-            </Button>
+            {error && <p className="text-xs text-destructive font-mono">{error}</p>}
+            <Button type="submit" className="w-full font-mono text-xs" disabled={loading}>{t('auth.sendResetLink')}</Button>
           </form>
-
-          <button
-            onClick={() => { setView('sign-in'); setError(null); }}
-            className="text-xs font-mono text-muted-foreground underline w-full text-center"
-          >
-            Back to sign in
-          </button>
+          <button onClick={() => { setView('sign-in'); setError(null); }} className="text-xs font-mono text-muted-foreground underline w-full text-center">{t('auth.backToSignIn')}</button>
         </div>
       </div>
     );
@@ -148,76 +110,46 @@ const Auth = () => {
     <div className="min-h-screen flex items-center justify-center p-6">
       <div className="w-full max-w-sm space-y-8">
         <div className="space-y-2">
-          <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">Holzen</h1>
+          <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">{t('common.holzen')}</h1>
           <p className="text-sm text-muted-foreground">
-            {view === 'sign-up' ? 'Create an account' : 'Sign in to continue'}
+            {view === 'sign-up' ? t('auth.createAnAccount') : t('auth.signInToContinue')}
           </p>
         </div>
 
-        <Button
-          variant="outline"
-          className="w-full font-mono text-xs"
-          onClick={handleGoogle}
-        >
-          Continue with Google
+        <Button variant="outline" className="w-full font-mono text-xs" onClick={handleGoogle}>
+          {t('auth.continueWithGoogle')}
         </Button>
 
         <div className="flex items-center gap-3">
           <Separator className="flex-1" />
-          <span className="text-xs text-muted-foreground font-mono">or</span>
+          <span className="text-xs text-muted-foreground font-mono">{t('auth.or')}</span>
           <Separator className="flex-1" />
         </div>
 
         <form onSubmit={handleEmailAuth} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-xs font-mono">Email</Label>
-            <Input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="font-mono text-sm"
-            />
+            <Label htmlFor="email" className="text-xs font-mono">{t('auth.email')}</Label>
+            <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="font-mono text-sm" />
           </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="password" className="text-xs font-mono">Password</Label>
+              <Label htmlFor="password" className="text-xs font-mono">{t('auth.password')}</Label>
               {view === 'sign-in' && (
-                <button
-                  type="button"
-                  onClick={() => { setView('forgot-password'); setError(null); }}
-                  className="text-xs font-mono text-muted-foreground underline"
-                >
-                  Forgot password?
+                <button type="button" onClick={() => { setView('forgot-password'); setError(null); }} className="text-xs font-mono text-muted-foreground underline">
+                  {t('auth.forgotPassword')}
                 </button>
               )}
             </div>
-            <Input
-              id="password"
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              minLength={6}
-              className="font-mono text-sm"
-            />
+            <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} className="font-mono text-sm" />
           </div>
-
-          {error && (
-            <p className="text-xs text-destructive font-mono">{error}</p>
-          )}
-
+          {error && <p className="text-xs text-destructive font-mono">{error}</p>}
           <Button type="submit" className="w-full font-mono text-xs" disabled={loading}>
-            {view === 'sign-up' ? 'Create account' : 'Sign in'}
+            {view === 'sign-up' ? t('common.signUp') : t('common.signIn')}
           </Button>
         </form>
 
-        <button
-          onClick={() => { setView(view === 'sign-up' ? 'sign-in' : 'sign-up'); setError(null); }}
-          className="text-xs font-mono text-muted-foreground underline w-full text-center"
-        >
-          {view === 'sign-up' ? 'Already have an account' : 'Create an account'}
+        <button onClick={() => { setView(view === 'sign-up' ? 'sign-in' : 'sign-up'); setError(null); }} className="text-xs font-mono text-muted-foreground underline w-full text-center">
+          {view === 'sign-up' ? t('auth.alreadyHaveAccount') : t('auth.createAnAccount')}
         </button>
       </div>
     </div>
