@@ -66,22 +66,23 @@ const Settings = () => {
 
   const changePassword = useCallback(async () => {
     if (newPassword.length < 6) {
-      toast('Password must be at least 6 characters');
+      toast.error('Too short', { description: 'Password must be at least 6 characters.' });
       return;
     }
     if (newPassword !== confirmPassword) {
-      toast('Passwords do not match');
+      toast.error('Passwords don\'t match', { description: 'Please make sure both fields are identical.' });
       return;
     }
     setChangingPassword(true);
     try {
       const { error } = await supabase.auth.updateUser({ password: newPassword });
       if (error) throw error;
-      toast('Password updated');
+      toast.success('Password updated', { description: 'Your new password is now active.' });
       setNewPassword('');
       setConfirmPassword('');
-    } catch {
-      toast('Failed to update password');
+    } catch (e: any) {
+      const msg = e?.message || 'Something went wrong';
+      toast.error('Failed to update password', { description: msg });
     } finally {
       setChangingPassword(false);
     }
@@ -114,9 +115,9 @@ const Settings = () => {
       a.download = `holzen-export-${new Date().toISOString().slice(0, 10)}.json`;
       a.click();
       URL.revokeObjectURL(url);
-      toast('Data exported successfully');
+      toast.success('Data exported', { description: `${reflections?.length ?? 0} reflections downloaded.` });
     } catch {
-      toast('Failed to export data');
+      toast.error('Export failed', { description: 'Could not export your data. Please try again.' });
     } finally {
       setExporting(false);
     }
@@ -128,10 +129,10 @@ const Settings = () => {
     try {
       const { error } = await supabase.functions.invoke('delete-account');
       if (error) throw error;
-      toast('Account deleted');
+      toast.success('Account deleted');
       await signOut();
     } catch {
-      toast('Failed to delete account');
+      toast.error('Failed to delete account', { description: 'Please try again or contact support.' });
       setDeleting(false);
     }
   };

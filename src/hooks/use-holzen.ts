@@ -339,7 +339,14 @@ export function useHolzen() {
         setLastTriggerAt(new Date().toISOString());
       }
     } catch (e: any) {
-      setError(e.message || 'Failed to generate message');
+      const raw = e?.message || '';
+      if (raw.includes('fetch') || raw.includes('network') || raw.includes('Failed to fetch')) {
+        setError('Could not reach the reflection service. Check your connection.');
+      } else if (raw.includes('rate') || raw.includes('limit') || raw.includes('429')) {
+        setError('Too many requests — please wait a moment and try again.');
+      } else {
+        setError('AI reflection unavailable right now. Try again shortly.');
+      }
     } finally {
       setLoading(false);
     }
@@ -370,7 +377,12 @@ export function useHolzen() {
         }
       }
     } catch (e: any) {
-      setError(e.message || 'Failed to fetch BTC data');
+      const raw = e?.message || '';
+      if (raw.includes('fetch') || raw.includes('Failed to fetch')) {
+        setError('Price data unavailable. CoinGecko may be down — retrying shortly.');
+      } else {
+        setError('Could not check market data. Will retry automatically.');
+      }
     }
   }, [user, threshold, thresholdDown, cumulativeThreshold, isInCooldown, isInQuietHours, generateMessage]);
 
@@ -405,7 +417,12 @@ export function useHolzen() {
       if (!btcData) setBtcData(data);
       await generateMessage(data, mood);
     } catch (e: any) {
-      setError(e.message || 'Failed to trigger reflection');
+      const raw = e?.message || '';
+      if (raw.includes('fetch') || raw.includes('Failed to fetch')) {
+        setError('Could not connect. Check your internet and try again.');
+      } else {
+        setError('Reflection could not be generated right now. Try again in a moment.');
+      }
     }
   }, [btcData, generateMessage, manualCooldownRemaining]);
 

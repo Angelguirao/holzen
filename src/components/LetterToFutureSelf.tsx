@@ -198,7 +198,7 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
           : 'Sealed in euphoria · Opens when doubt arrives',
       });
     } catch {
-      toast('Failed to save letter');
+      toast.error('Letter not saved', { description: 'Something went wrong. Your words are not lost — try sealing again.' });
       setSealPhase('idle');
     } finally {
       setSending(false);
