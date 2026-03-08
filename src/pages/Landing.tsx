@@ -4,7 +4,11 @@ import { useNavigate, Link, useSearchParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { motion, useReducedMotion } from 'framer-motion';
-import { ArrowRight, Twitter, Wind, Feather, BookOpen, TrendingDown, Brain, Tag, BarChart3, MessageCircle } from 'lucide-react';
+import {
+  ArrowRight, Twitter, Wind, Feather, BookOpen, TrendingDown, Brain, Tag,
+  BarChart3, MessageCircle, Target, Heart, Mail, Globe, Shield, Award,
+  Zap, Library, Moon, Sparkles,
+} from 'lucide-react';
 import { PageMeta } from '@/components/PageMeta';
 import { HolzenNumber } from '@/components/HolzenNumber';
 import { LandingTestimonials } from '@/components/LandingTestimonials';
@@ -31,11 +35,35 @@ const Landing = () => {
 
   const m = (delay = 0) => (prefersReduced ? {} : fade(delay));
 
+  const COMPANIONS = [
+    { icon: <Wind className="h-3.5 w-3.5" />, label: t('landing.companions.breathing'), desc: t('landing.companions.breathingDesc') },
+    { icon: <Feather className="h-3.5 w-3.5" />, label: t('landing.companions.haiku'), desc: t('landing.companions.haikuDesc') },
+    { icon: <Zap className="h-3.5 w-3.5" />, label: t('landing.companions.signal'), desc: t('landing.companions.signalDesc') },
+    { icon: <BookOpen className="h-3.5 w-3.5" />, label: t('landing.companions.learning'), desc: t('landing.companions.learningDesc') },
+    { icon: <Globe className="h-3.5 w-3.5" />, label: t('landing.companions.zoomOut'), desc: t('landing.companions.zoomOutDesc') },
+    { icon: <BookOpen className="h-3.5 w-3.5" />, label: t('landing.companions.history'), desc: t('landing.companions.historyDesc') },
+  ];
+
+  const FEATURES = [
+    { icon: <TrendingDown className="h-3.5 w-3.5" />, label: t('landing.features.detection'), desc: t('landing.features.detectionDesc') },
+    { icon: <Brain className="h-3.5 w-3.5" />, label: t('landing.features.mood'), desc: t('landing.features.moodDesc') },
+    { icon: <Tag className="h-3.5 w-3.5" />, label: t('landing.features.tags'), desc: t('landing.features.tagsDesc') },
+    { icon: <MessageCircle className="h-3.5 w-3.5" />, label: t('landing.features.journal'), desc: t('landing.features.journalDesc') },
+    { icon: <Target className="h-3.5 w-3.5" />, label: t('landing.features.ritual'), desc: t('landing.features.ritualDesc') },
+    { icon: <BarChart3 className="h-3.5 w-3.5" />, label: t('landing.features.insights'), desc: t('landing.features.insightsDesc') },
+    { icon: <Mail className="h-3.5 w-3.5" />, label: t('landing.features.letters'), desc: t('landing.features.lettersDesc') },
+    { icon: <Heart className="h-3.5 w-3.5" />, label: t('landing.features.library'), desc: t('landing.features.libraryDesc') },
+    { icon: <Award className="h-3.5 w-3.5" />, label: t('landing.features.badges'), desc: t('landing.features.badgesDesc') },
+    { icon: <Moon className="h-3.5 w-3.5" />, label: t('landing.features.night'), desc: t('landing.features.nightDesc') },
+    { icon: <Globe className="h-3.5 w-3.5" />, label: t('landing.features.languages'), desc: t('landing.features.languagesDesc') },
+    { icon: <Shield className="h-3.5 w-3.5" />, label: t('landing.features.privacy'), desc: t('landing.features.privacyDesc') },
+  ];
+
   return (
     <div className="min-h-screen flex items-start justify-center px-6 py-16">
       <PageMeta
         title="Holzen — Pause before you act on Bitcoin volatility"
-        description="Holzen watches Bitcoin volatility and sends AI-generated reflections to help you pause before acting on impulse. Mood tracking, journaling, and behavioral insights — not trading advice."
+        description="Holzen watches Bitcoin volatility and sends AI-generated reflections to help you pause before acting on impulse. Mood tracking, journaling, rituals, and behavioral insights — not trading advice."
         path="/welcome"
       />
       <div className="w-full max-w-sm space-y-14">
@@ -83,6 +111,7 @@ const Landing = () => {
               { step: '02', title: t('landing.steps.02title'), desc: t('landing.steps.02desc') },
               { step: '03', title: t('landing.steps.03title'), desc: t('landing.steps.03desc') },
               { step: '04', title: t('landing.steps.04title'), desc: t('landing.steps.04desc') },
+              { step: '05', title: t('landing.steps.05title'), desc: t('landing.steps.05desc') },
             ].map((step, i) => (
               <motion.div
                 key={step.step}
@@ -104,7 +133,38 @@ const Landing = () => {
           </div>
         </div>
 
-        {/* Features */}
+        {/* Companions */}
+        <div className="space-y-5">
+          <motion.p
+            className="text-xs font-mono tracking-widest uppercase text-muted-foreground"
+            {...m()}
+          >
+            {t('landing.companionsTitle')}
+          </motion.p>
+          <motion.p className="text-sm text-muted-foreground leading-relaxed" {...m(0.05)}>
+            {t('landing.companionsDesc')}
+          </motion.p>
+          <div className="grid grid-cols-2 gap-3">
+            {COMPANIONS.map((c, i) => (
+              <motion.div
+                key={c.label}
+                className="rounded-md border border-border/60 bg-muted/30 p-3 space-y-1.5"
+                {...(prefersReduced ? {} : {
+                  initial: { opacity: 0, y: 8 },
+                  whileInView: { opacity: 1, y: 0 },
+                  viewport: { once: true },
+                  transition: { duration: 0.4, delay: i * 0.05 },
+                })}
+              >
+                <div className="text-muted-foreground">{c.icon}</div>
+                <p className="text-xs text-foreground leading-snug">{c.label}</p>
+                <p className="text-[10px] text-muted-foreground leading-relaxed">{c.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+
+        {/* Features grid */}
         <div className="space-y-5">
           <motion.p
             className="text-xs font-mono tracking-widest uppercase text-muted-foreground"
@@ -113,16 +173,7 @@ const Landing = () => {
             {t('landing.whatYouGet')}
           </motion.p>
           <div className="grid grid-cols-2 gap-3">
-            {[
-              { icon: <Wind className="h-3.5 w-3.5" />, label: t('landing.features.breathing'), desc: t('landing.features.breathingDesc') },
-              { icon: <Feather className="h-3.5 w-3.5" />, label: t('landing.features.haiku'), desc: t('landing.features.haikuDesc') },
-              { icon: <BookOpen className="h-3.5 w-3.5" />, label: t('landing.features.historical'), desc: t('landing.features.historicalDesc') },
-              { icon: <TrendingDown className="h-3.5 w-3.5" />, label: t('landing.features.detection'), desc: t('landing.features.detectionDesc') },
-              { icon: <Brain className="h-3.5 w-3.5" />, label: t('landing.features.mood'), desc: t('landing.features.moodDesc') },
-              { icon: <Tag className="h-3.5 w-3.5" />, label: t('landing.features.tags'), desc: t('landing.features.tagsDesc') },
-              { icon: <BarChart3 className="h-3.5 w-3.5" />, label: t('landing.features.insights'), desc: t('landing.features.insightsDesc') },
-              { icon: <MessageCircle className="h-3.5 w-3.5" />, label: t('landing.features.journal'), desc: t('landing.features.journalDesc') },
-            ].map((f, i) => (
+            {FEATURES.map((f, i) => (
               <motion.div
                 key={f.label}
                 className="rounded-md border border-border/60 bg-muted/30 p-3 space-y-1.5"
@@ -130,7 +181,7 @@ const Landing = () => {
                   initial: { opacity: 0, y: 8 },
                   whileInView: { opacity: 1, y: 0 },
                   viewport: { once: true },
-                  transition: { duration: 0.4, delay: i * 0.05 },
+                  transition: { duration: 0.4, delay: i * 0.04 },
                 })}
               >
                 <div className="text-muted-foreground">{f.icon}</div>
@@ -194,50 +245,61 @@ const Landing = () => {
             <Accordion type="single" collapsible className="w-full">
               <AccordionItem value="what" className="border-border">
                 <AccordionTrigger className="text-sm text-foreground hover:no-underline py-3">
-                  What exactly does Holzen do?
+                  {t('landing.faq.whatQuestion')}
                 </AccordionTrigger>
                 <AccordionContent className="text-xs text-muted-foreground leading-relaxed">
-                  Holzen monitors Bitcoin volatility across two windows — 24-hour and 7-day cumulative. When movement crosses your thresholds, it offers an AI-generated reflection, a breathing exercise, a haiku, and a historical insight. You can also request reflections on demand. Over time, you track your moods, tag your emotions, journal notes, and see how your composure evolves.
+                  {t('landing.faq.whatAnswer')}
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value="advice" className="border-border">
                 <AccordionTrigger className="text-sm text-foreground hover:no-underline py-3">
-                  Will it tell me what to buy or sell?
+                  {t('landing.faq.adviceQuestion')}
                 </AccordionTrigger>
                 <AccordionContent className="text-xs text-muted-foreground leading-relaxed">
-                  Never. Holzen is not a trading tool or financial advisor. Reflections are intentionally neutral — they exist only to create a moment of awareness before you act on impulse.
+                  {t('landing.faq.adviceAnswer')}
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="companions" className="border-border">
+                <AccordionTrigger className="text-sm text-foreground hover:no-underline py-3">
+                  {t('landing.faq.companionsQuestion')}
+                </AccordionTrigger>
+                <AccordionContent className="text-xs text-muted-foreground leading-relaxed">
+                  {t('landing.faq.companionsAnswer')}
+                </AccordionContent>
+              </AccordionItem>
+              <AccordionItem value="ritual" className="border-border">
+                <AccordionTrigger className="text-sm text-foreground hover:no-underline py-3">
+                  {t('landing.faq.ritualQuestion')}
+                </AccordionTrigger>
+                <AccordionContent className="text-xs text-muted-foreground leading-relaxed">
+                  {t('landing.faq.ritualAnswer')}
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value="tracking" className="border-border">
                 <AccordionTrigger className="text-sm text-foreground hover:no-underline py-3">
-                  How does mood and outcome tracking work?
+                  {t('landing.faq.trackingQuestion')}
                 </AccordionTrigger>
                 <AccordionContent className="text-xs text-muted-foreground leading-relaxed">
-                  Before each reflection, you do a quick 1-tap mood check (anxious, neutral, calm). After dismissing a reflection, you record what you did — held, sold, bought, or nothing. Your insights panel shows these patterns over time, helping you see how your emotional responses and decisions evolve.
-                </AccordionContent>
-              </AccordionItem>
-              <AccordionItem value="cumulative" className="border-border">
-                <AccordionTrigger className="text-sm text-foreground hover:no-underline py-3">
-                  What is cumulative volatility detection?
-                </AccordionTrigger>
-                <AccordionContent className="text-xs text-muted-foreground leading-relaxed">
-                  Beyond daily swings, Holzen tracks the rolling 7-day price movement. A slow-burn 12% drop over a week might never trigger a 5% daily threshold — but it matters. You set both thresholds independently.
+                  {t('landing.faq.trackingAnswer')}
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value="data" className="border-border">
                 <AccordionTrigger className="text-sm text-foreground hover:no-underline py-3">
-                  What data do you collect?
+                  {t('landing.faq.dataQuestion')}
                 </AccordionTrigger>
                 <AccordionContent className="text-xs text-muted-foreground leading-relaxed">
-                  Only what's needed: your email, thresholds, reflections, mood entries, and push tokens if enabled. You can export all your data anytime or delete your account entirely. See our <Link to="/privacy" className="underline hover:text-foreground transition-colors">privacy policy</Link>.
+                  {t('landing.faq.dataAnswer')}{' '}
+                  <Link to="/privacy" className="underline hover:text-foreground transition-colors">
+                    {t('landing.privacy')}
+                  </Link>.
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value="cancel" className="border-border">
                 <AccordionTrigger className="text-sm text-foreground hover:no-underline py-3">
-                  Can I cancel anytime?
+                  {t('landing.faq.cancelQuestion')}
                 </AccordionTrigger>
                 <AccordionContent className="text-xs text-muted-foreground leading-relaxed">
-                  Yes. Cancel through the app whenever you like — you keep access until the end of your billing period. No contracts, no commitments.
+                  {t('landing.faq.cancelAnswer')}
                 </AccordionContent>
               </AccordionItem>
             </Accordion>
@@ -278,7 +340,7 @@ const Landing = () => {
             {/* Contact */}
             <div className="space-y-1">
               <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground/70">
-                Contact
+                {t('landing.contact')}
               </p>
               <a
                 href="mailto:hello@holzen.app"
@@ -290,17 +352,17 @@ const Landing = () => {
 
             {/* Legal */}
             <div className="flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-              <Link to="/about" className="hover:text-foreground transition-colors">About</Link>
+              <Link to="/about" className="hover:text-foreground transition-colors">{t('landing.about')}</Link>
               <span>·</span>
-              <Link to="/reserve" className="hover:text-foreground transition-colors">BTC Reserve</Link>
+              <Link to="/reserve" className="hover:text-foreground transition-colors">{t('landing.btcReserve')}</Link>
               <span>·</span>
-              <Link to="/blog" className="hover:text-foreground transition-colors">Blog</Link>
+              <Link to="/blog" className="hover:text-foreground transition-colors">{t('landing.blog')}</Link>
               <span>·</span>
-              <Link to="/roadmap" className="hover:text-foreground transition-colors">Roadmap</Link>
+              <Link to="/roadmap" className="hover:text-foreground transition-colors">{t('landing.roadmap')}</Link>
               <span>·</span>
-              <Link to="/terms" className="hover:text-foreground transition-colors">Terms</Link>
+              <Link to="/terms" className="hover:text-foreground transition-colors">{t('landing.terms')}</Link>
               <span>·</span>
-              <Link to="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
+              <Link to="/privacy" className="hover:text-foreground transition-colors">{t('landing.privacy')}</Link>
             </div>
           </div>
         </motion.div>
