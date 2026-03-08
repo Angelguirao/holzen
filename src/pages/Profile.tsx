@@ -121,8 +121,8 @@ const Profile = () => {
   const pendingLetters = useMemo(() => letters.filter((l) => !l.delivered), [letters]);
   const deliveredLetters = useMemo(() => letters.filter((l) => l.delivered), [letters]);
 
-  const fmtPrice = (p: number) =>
-    p.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+  const { currency } = useHolzen();
+  const fmtPrice = (p: number) => formatBtcPrice(p, currency);
 
   const tabs = [
     { id: 'stats' as const, label: 'Stats' },

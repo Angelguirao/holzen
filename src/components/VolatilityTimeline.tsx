@@ -355,7 +355,7 @@ const ChartTooltip = forwardRef<HTMLDivElement, any>(({ active, payload }, ref) 
     <div ref={ref} className="rounded-md border border-border/60 bg-background px-3 py-2 shadow-md max-w-[220px]">
       <p className="text-[10px] font-mono text-muted-foreground">{data.date}</p>
       <p className="text-xs font-mono font-medium">
-        ${data.price.toLocaleString('en-US', { maximumFractionDigits: 0 })}
+        {formatBtcPrice(data.price, currency)}
       </p>
       {data.reflection && (
         <div className="mt-1.5 pt-1.5 border-t border-border/40 space-y-1">

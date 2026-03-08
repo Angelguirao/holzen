@@ -411,7 +411,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
             />
           </div>
           <p className="text-[9px] font-mono text-muted-foreground/40">
-            Started {format(start, 'MMM d, yyyy')} · {differenceInDays(new Date(), start)} day{differenceInDays(new Date(), start) !== 1 ? 's' : ''} held · Current: ${price.toLocaleString()}
+            Started {format(start, 'MMM d, yyyy')} · {differenceInDays(new Date(), start)} day{differenceInDays(new Date(), start) !== 1 ? 's' : ''} held · Current: {formatBtcPrice(price, currency)}
           </p>
         </div>
       </div>
