@@ -480,7 +480,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           completed={completion.haiku}
         >
           <HaikuDisplay haiku={companions.haiku!} />
-        </CollapsibleCompanion>
+          <div className="mt-1.5"><SaveToLibraryButton title="Haiku" body={companions.haiku!} sourceType="haiku" reflectionId={reflectionId ?? undefined} /></div>
       )}
 
       {hasLearning && (
