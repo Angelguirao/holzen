@@ -619,9 +619,9 @@ const History = () => {
                     </AlertDialogTrigger>
                     <AlertDialogContent>
                       <AlertDialogHeader>
-                        <AlertDialogTitle className="font-mono text-sm">Delete reflection</AlertDialogTitle>
+                        <AlertDialogTitle className="font-mono text-sm">{t('history.deleteReflection')}</AlertDialogTitle>
                         <AlertDialogDescription className="text-xs">
-                          This will permanently delete this reflection. This action cannot be undone.
+                          {t('history.deleteReflectionDesc')}
                         </AlertDialogDescription>
                       </AlertDialogHeader>
                       <AlertDialogFooter>
