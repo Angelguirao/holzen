@@ -84,9 +84,10 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 interface BadgesPanelProps {
   reflections: Reflection[];
+  notifyBadges?: boolean;
 }
 
-export function BadgesPanel({ reflections }: BadgesPanelProps) {
+export function BadgesPanel({ reflections, notifyBadges = true }: BadgesPanelProps) {
   const badges = useMemo(() => {
     const total = reflections.length;
     const longestStreak = computeLongestStreak(reflections);
