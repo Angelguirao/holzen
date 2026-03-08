@@ -20,7 +20,23 @@ export interface BtcPriceData {
   cumulativeDirection?: 'up' | 'down';
   fearGreed?: FearGreedData;
   onChain?: OnChainData;
+  currency: string;
 }
+
+export const SUPPORTED_CURRENCIES = [
+  { code: 'USD', symbol: '$', label: 'US Dollar' },
+  { code: 'EUR', symbol: '€', label: 'Euro' },
+  { code: 'GBP', symbol: '£', label: 'British Pound' },
+  { code: 'JPY', symbol: '¥', label: 'Japanese Yen' },
+  { code: 'CHF', symbol: 'CHF', label: 'Swiss Franc' },
+  { code: 'CAD', symbol: 'C$', label: 'Canadian Dollar' },
+  { code: 'AUD', symbol: 'A$', label: 'Australian Dollar' },
+  { code: 'BRL', symbol: 'R$', label: 'Brazilian Real' },
+  { code: 'INR', symbol: '₹', label: 'Indian Rupee' },
+  { code: 'KRW', symbol: '₩', label: 'South Korean Won' },
+] as const;
+
+export type SupportedCurrency = typeof SUPPORTED_CURRENCIES[number]['code'];
 
 async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise<Response> {
   for (let i = 0; i < retries; i++) {
@@ -75,10 +91,20 @@ async function fetchOnChainData(): Promise<OnChainData | undefined> {
   }
 }
 
-export async function fetchBtcData(): Promise<BtcPriceData> {
+export function formatBtcPrice(price: number, currency: string): string {
+  const fractionDigits = currency === 'JPY' || currency === 'KRW' ? 0 : 0;
+  return price.toLocaleString('en-US', {
+    style: 'currency',
+    currency,
+    maximumFractionDigits: fractionDigits,
+  });
+}
+
+export async function fetchBtcData(currency: string = 'USD'): Promise<BtcPriceData> {
+  const cur = currency.toLowerCase();
   const [res1d, res7d, fearGreed, onChain] = await Promise.all([
-    fetchWithRetry('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=1'),
-    fetchWithRetry('https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=7'),
+    fetchWithRetry(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=${cur}&days=1`),
+    fetchWithRetry(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=${cur}&days=7`),
     fetchFearGreed(),
     fetchOnChainData(),
   ]);
@@ -115,5 +141,6 @@ export async function fetchBtcData(): Promise<BtcPriceData> {
     cumulativeDirection,
     fearGreed,
     onChain,
+    currency: currency.toUpperCase(),
   };
 }

@@ -28,6 +28,7 @@ export function useHolzen() {
   const [notifyBadges, setNotifyBadgesState] = useState(true);
   const [motivations, setMotivationsState] = useState<string[]>([]);
   const [mantra, setMantraState] = useState<string | null>(null);
+  const [currency, setCurrencyState] = useState<string>('USD');
   const [btcData, setBtcData] = useState<BtcPriceData | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [context, setContext] = useState<string | null>(null);
@@ -46,7 +47,7 @@ export function useHolzen() {
     const load = async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('threshold, threshold_down, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_learning, companion_signal, companion_zoom_out, companion_history, reflection_tone, cooldown_hours, last_trigger_at, silent_mode, streak_freeze_dates, digest_frequency, custom_prompt, reflection_style, quiet_hours_start, quiet_hours_end, first_name, night_reflection_hour, ai_insights_enabled, ritual_template, notify_badges, motivations, mantra')
+        .select('threshold, threshold_down, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_learning, companion_signal, companion_zoom_out, companion_history, reflection_tone, cooldown_hours, last_trigger_at, silent_mode, streak_freeze_dates, digest_frequency, custom_prompt, reflection_style, quiet_hours_start, quiet_hours_end, first_name, night_reflection_hour, ai_insights_enabled, ritual_template, notify_badges, motivations, mantra, hold_goal_currency')
         .eq('user_id', user.id)
         .single();
 
@@ -74,6 +75,7 @@ export function useHolzen() {
         setNotifyBadgesState((data as any).notify_badges ?? true);
         setMotivationsState((data as any).motivations ?? []);
         setMantraState((data as any).mantra ?? null);
+        setCurrencyState((data as any).hold_goal_currency ?? 'USD');
         setHasOnboarded(data.has_onboarded ?? false);
         setCompanionPrefsState({
           breathing: data.companion_breathing ?? true,
@@ -372,7 +374,7 @@ export function useHolzen() {
 
   const checkAndTrigger = useCallback(async () => {
     try {
-      const data = await fetchBtcData();
+      const data = await fetchBtcData(currency);
       setBtcData(data);
 
       if (user && !(await isInCooldown()) && !isInQuietHours()) {
@@ -392,7 +394,7 @@ export function useHolzen() {
         setError('Could not check market data. Will retry automatically.');
       }
     }
-  }, [user, threshold, thresholdDown, cumulativeThreshold, isInCooldown, isInQuietHours, generateMessage]);
+  }, [user, threshold, thresholdDown, cumulativeThreshold, isInCooldown, isInQuietHours, generateMessage, currency]);
 
   const [lastTriggerAt, setLastTriggerAt] = useState<string | null>(null);
   const [lastManualAt, setLastManualAt] = useState<number | null>(() => {
@@ -421,7 +423,7 @@ export function useHolzen() {
     setLastManualAt(now);
     localStorage.setItem('holzen_last_manual_at', String(now));
     try {
-      const data = btcData || await fetchBtcData();
+      const data = btcData || await fetchBtcData(currency);
       if (!btcData) setBtcData(data);
       await generateMessage(data, mood);
     } catch (e: any) {
@@ -432,7 +434,7 @@ export function useHolzen() {
         setError('Reflection could not be generated right now. Try again in a moment.');
       }
     }
-  }, [btcData, generateMessage, manualCooldownRemaining]);
+  }, [btcData, generateMessage, manualCooldownRemaining, currency]);
 
   const dismissMessage = useCallback(async () => {
     setMessage(null);
@@ -549,6 +551,13 @@ export function useHolzen() {
       setMantraState(val);
       if (!user) return;
       await supabase.from('profiles').update({ mantra: val } as any).eq('user_id', user.id);
+    },
+    currency,
+    setCurrency: async (val: string) => {
+      setCurrencyState(val);
+      setBtcData(null); // clear cached data so it refetches in new currency
+      if (!user) return;
+      await supabase.from('profiles').update({ hold_goal_currency: val }).eq('user_id', user.id);
     },
     companionPrefs,
     setCompanionPref,

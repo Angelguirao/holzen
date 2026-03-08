@@ -37,7 +37,7 @@ const LAST_SEEN_VERSION_KEY = 'holzen_last_seen_version';
 
 const Settings = () => {
   const { user, signOut } = useAuth();
-  const { threshold, setThreshold, thresholdDown, setThresholdDown, cumulativeThreshold, setCumulativeThreshold, emailNotifications, setEmailNotifications, companionPrefs, setCompanionPref, reflectionTone, setReflectionTone, reflectionStyle, setReflectionStyle, silentMode, setSilentMode, cooldownHours, setCooldownHours, digestFrequency, setDigestFrequency, customPrompt, setCustomPrompt, quietHoursStart, quietHoursEnd, setQuietHours, streakFreezeDates, useStreakFreeze, firstName, setFirstName, nightReflectionHour, setNightReflectionHour, aiInsightsEnabled, setAiInsightsEnabled, ritualTemplate, setRitualTemplate, notifyBadges, setNotifyBadges, motivations, setMotivations, mantra, setMantra, profileLoaded } = useHolzen();
+  const { threshold, setThreshold, thresholdDown, setThresholdDown, cumulativeThreshold, setCumulativeThreshold, emailNotifications, setEmailNotifications, companionPrefs, setCompanionPref, reflectionTone, setReflectionTone, reflectionStyle, setReflectionStyle, silentMode, setSilentMode, cooldownHours, setCooldownHours, digestFrequency, setDigestFrequency, customPrompt, setCustomPrompt, quietHoursStart, quietHoursEnd, setQuietHours, streakFreezeDates, useStreakFreeze, firstName, setFirstName, nightReflectionHour, setNightReflectionHour, aiInsightsEnabled, setAiInsightsEnabled, ritualTemplate, setRitualTemplate, notifyBadges, setNotifyBadges, motivations, setMotivations, mantra, setMantra, currency, setCurrency, profileLoaded } = useHolzen();
   const { subscribed, loading: subLoading, checkoutLoading, startCheckout, openPortal, trialRemaining } = useSubscription();
   const { theme, setTheme } = useTheme();
   const { canInstall, install } = useInstallPrompt();
@@ -236,6 +236,41 @@ const Settings = () => {
               <p className="text-[10px] font-mono text-muted-foreground/50 text-right">
                 {(mantra?.length ?? 0)}/200
               </p>
+            </div>
+
+            {/* Currency */}
+            <div className="space-y-3">
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">Display currency</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                Choose how BTC prices are displayed throughout the app.
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                {([
+                  { code: 'USD', label: 'USD', desc: 'US Dollar ($)' },
+                  { code: 'EUR', label: 'EUR', desc: 'Euro (€)' },
+                  { code: 'GBP', label: 'GBP', desc: 'British Pound (£)' },
+                  { code: 'JPY', label: 'JPY', desc: 'Japanese Yen (¥)' },
+                  { code: 'CHF', label: 'CHF', desc: 'Swiss Franc' },
+                  { code: 'CAD', label: 'CAD', desc: 'Canadian Dollar (C$)' },
+                  { code: 'AUD', label: 'AUD', desc: 'Australian Dollar (A$)' },
+                  { code: 'BRL', label: 'BRL', desc: 'Brazilian Real (R$)' },
+                  { code: 'INR', label: 'INR', desc: 'Indian Rupee (₹)' },
+                  { code: 'KRW', label: 'KRW', desc: 'South Korean Won (₩)' },
+                ] as const).map((c) => (
+                  <button
+                    key={c.code}
+                    onClick={() => setCurrency(c.code)}
+                    className={`rounded-md border px-3 py-2.5 text-left transition-colors ${
+                      currency === c.code
+                        ? 'border-primary bg-primary/5 text-foreground'
+                        : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    <p className="text-xs font-mono font-medium">{c.label}</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">{c.desc}</p>
+                  </button>
+                ))}
+              </div>
             </div>
           </AccordionContent>
         </AccordionItem>
