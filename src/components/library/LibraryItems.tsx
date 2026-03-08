@@ -45,6 +45,7 @@ export function LibraryItems({ library, filtered }: Props) {
       key={item.id}
       item={item}
       onTogglePin={togglePin}
+      onToggleFavorite={toggleFavorite}
       onDelete={deleteItem}
       onStatusChange={handleStatusChange}
       onUpdateTags={handleUpdateTags}

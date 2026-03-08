@@ -60,6 +60,7 @@ export function CollectionDetail({
               <LibraryItemCard
                 item={item}
                 onTogglePin={onTogglePin}
+                onToggleFavorite={onTogglePin}
                 onDelete={onDeleteItem}
                 onStatusChange={onStatusChange}
               />
