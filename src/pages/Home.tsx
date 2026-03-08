@@ -524,7 +524,21 @@ const Home = () => {
   const hasCollapsed = Object.values(collapsed).some(Boolean);
 
   return (
-    <div className="space-y-4">
+    <div {...pullHandlers} className="space-y-4">
+      {/* Pull-to-refresh indicator */}
+      {(pullDistance > 0 || pullRefreshing) && (
+        <div
+          className="flex items-center justify-center transition-all overflow-hidden"
+          style={{ height: pullRefreshing ? 32 : pullDistance * 0.4 }}
+        >
+          <RefreshCw
+            className={`h-4 w-4 text-muted-foreground/50 transition-transform ${
+              pullRefreshing ? 'animate-spin' : ''
+            }`}
+            style={{ transform: pullRefreshing ? undefined : `rotate(${pullDistance * 3}deg)` }}
+          />
+        </div>
+      )}
       {/* Greeting + reset */}
       <div className="flex items-center justify-between">
         {firstName ? (
