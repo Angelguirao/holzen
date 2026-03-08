@@ -26,6 +26,8 @@ export function useHolzen() {
   const [ritualTemplate, setRitualTemplateState] = useState<string>('standard');
   const [nightReflectionHour, setNightReflectionHourState] = useState<number | null>(21);
   const [notifyBadges, setNotifyBadgesState] = useState(true);
+  const [motivations, setMotivationsState] = useState<string[]>([]);
+  const [mantra, setMantraState] = useState<string | null>(null);
   const [btcData, setBtcData] = useState<BtcPriceData | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [context, setContext] = useState<string | null>(null);
