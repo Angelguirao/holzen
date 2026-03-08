@@ -409,7 +409,7 @@ const History = () => {
                   }`}
                 >
                   <Filter className="h-3 w-3" />
-                  Filters
+                  {t('history.filters')}
                   {hasActiveFilters && (
                     <span className="h-3.5 w-3.5 rounded-full bg-primary text-primary-foreground text-[8px] flex items-center justify-center">
                       {[tagFilter, moodFilter, dateFrom, dateTo, filter === 'favorites'].filter(Boolean).length}
