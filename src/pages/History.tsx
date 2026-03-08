@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { supabase } from '@/integrations/supabase/client';
