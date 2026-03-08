@@ -120,12 +120,15 @@ const Landing = () => {
           transition={{ duration: 0.5 }}
         >
           <h1 className="text-xs font-mono tracking-[0.25em] uppercase text-foreground/80">Holzen</h1>
-          <button
-            onClick={() => navigate('/auth')}
-            className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
-          >
-            {t('common.signIn')}
-          </button>
+          <div className="flex items-center gap-4">
+            <LandingLanguageSwitcher />
+            <button
+              onClick={() => navigate('/auth')}
+              className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
+            >
+              {t('common.signIn')}
+            </button>
+          </div>
         </motion.nav>
 
         {/* Hero content */}
