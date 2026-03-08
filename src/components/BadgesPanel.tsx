@@ -14,6 +14,8 @@ interface Reflection {
   haiku_read?: boolean;
   learning_read?: boolean;
   signal_source?: string | null;
+  zoom_out_read?: boolean;
+  history_read?: boolean;
 }
 
 interface Badge {
