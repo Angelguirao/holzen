@@ -4,6 +4,7 @@ import { X, ArrowDown, Check, Heart } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { hapticFeedback } from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
+import { supabase } from '@/integrations/supabase/client';
 import { useHolzen } from '@/hooks/use-holzen';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 import { CompanionSection, type CompanionData, type CompanionPrefs } from '@/components/CompanionSection';
