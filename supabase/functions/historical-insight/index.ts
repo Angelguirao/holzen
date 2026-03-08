@@ -6,6 +6,14 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+async function validateUrl(url: string, fallbackQuery: string): Promise<string> {
+  try {
+    const res = await fetch(url, { method: 'HEAD', redirect: 'follow' });
+    if (res.ok || res.status === 405 || res.status === 403) return url;
+  } catch { /* broken */ }
+  return `https://www.google.com/search?q=${encodeURIComponent(fallbackQuery)}`;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS")
     return new Response(null, { headers: corsHeaders });
@@ -24,6 +32,7 @@ Your insight MUST:
 4. Be factually accurate — use real events, real numbers, real dates
 5. Be concise — 2-3 sentences for the main insight, 1-2 sentences for the cross-asset analogy
 6. End with a grounding observation, not hype
+7. Include a source URL — link to a reputable article, Wikipedia page, or data source that documents the historical event referenced
 
 VARIETY IS CRITICAL. Rotate through different eras and asset classes:
 - Bitcoin: Mt. Gox crash (2014), China ban cycles, COVID crash (March 2020), 2017 bull run, 2018 bear, 2021 ATH & correction, halving cycles, exchange collapses (FTX)
@@ -57,7 +66,7 @@ The analogy should feel surprising and illuminating, not obvious.`;
               type: "function",
               function: {
                 name: "return_historical_insight",
-                description: "Return a historical insight with cross-asset analogy",
+                description: "Return a historical insight with cross-asset analogy and source",
                 parameters: {
                   type: "object",
                   properties: {
@@ -81,8 +90,16 @@ The analogy should feel surprising and illuminating, not obvious.`;
                       type: "string",
                       description: "The historical period referenced (e.g. '2014', 'March 2020', '1987')",
                     },
+                    source: {
+                      type: "string",
+                      description: "Name of the source documenting the event (e.g. 'Wikipedia', 'CoinDesk', 'Federal Reserve History')",
+                    },
+                    url: {
+                      type: "string",
+                      description: "URL to a reputable source documenting the historical event (Wikipedia, news archive, data source)",
+                    },
                   },
-                  required: ["title", "btcInsight", "analogy", "assetClass", "period"],
+                  required: ["title", "btcInsight", "analogy", "assetClass", "period", "source", "url"],
                   additionalProperties: false,
                 },
               },
@@ -119,6 +136,7 @@ The analogy should feel surprising and illuminating, not obvious.`;
     if (!toolCall) throw new Error("No tool call in response");
 
     const insight = JSON.parse(toolCall.function.arguments);
+    insight.url = await validateUrl(insight.url, `${insight.title} ${insight.assetClass} ${insight.period}`);
 
     return new Response(JSON.stringify(insight), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
