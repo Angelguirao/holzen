@@ -11,6 +11,7 @@ interface Props {
 
 export function ReflectionTags({ reflectionId, initialTags }: Props) {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [tags, setTags] = useState<string[]>(initialTags);
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState('');
