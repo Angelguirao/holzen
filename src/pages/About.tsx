@@ -151,13 +151,13 @@ const About = () => {
         <motion.div {...m(0.1)}>
           <div className="space-y-4">
             <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
-              About us
+              {t('about.aboutUs')}
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Holzen is built by a husband-and-wife team. We're Bitcoin holders ourselves, and we built this tool because we needed it. The moments of highest volatility are the moments we're most tempted to act — and we've learned, sometimes the hard way, that pausing almost always leads to better decisions.
+              {t('about.aboutUsBody1')}
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              We hope Holzen can do the same for you.
+              {t('about.aboutUsBody2')}
             </p>
           </div>
         </motion.div>
