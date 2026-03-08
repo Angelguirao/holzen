@@ -281,6 +281,12 @@ const History = () => {
     if (moodFilter) {
       result = result.filter((r) => r.mood === moodFilter);
     }
+    if (dateFrom) {
+      result = result.filter((r) => isAfter(new Date(r.created_at), startOfDay(dateFrom)));
+    }
+    if (dateTo) {
+      result = result.filter((r) => isBefore(new Date(r.created_at), endOfDay(dateTo)));
+    }
     if (search.trim()) {
       const q = search.toLowerCase();
       result = result.filter(
@@ -288,9 +294,31 @@ const History = () => {
       );
     }
     return result;
-  }, [reflections, filter, tagFilter, moodFilter, search]);
+  }, [reflections, filter, tagFilter, moodFilter, dateFrom, dateTo, search]);
 
-  const displayedReflections = tab === 'recent' ? recentReflections : filtered;
+  const filteredRecent = useMemo(() => {
+    let result = recentReflections;
+    if (search.trim()) {
+      const q = search.toLowerCase();
+      result = result.filter(
+        (r) => r.message.toLowerCase().includes(q) || r.context?.toLowerCase().includes(q) || r.note?.toLowerCase().includes(q) || r.tags?.some((t) => t.toLowerCase().includes(q))
+      );
+    }
+    return result;
+  }, [recentReflections, search]);
+
+  const displayedReflections = tab === 'recent' ? filteredRecent : filtered;
+
+  const hasActiveFilters = !!tagFilter || !!moodFilter || !!dateFrom || !!dateTo || filter === 'favorites';
+
+  const clearAllFilters = useCallback(() => {
+    setFilter('all');
+    setTagFilter(null);
+    setMoodFilter(null);
+    setDateFrom(undefined);
+    setDateTo(undefined);
+    setSearch('');
+  }, []);
 
   return (
     <div className="space-y-6">
