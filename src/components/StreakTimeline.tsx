@@ -97,7 +97,7 @@ export function StreakTimeline({ reflections, streakFreezeDates = [], memberSinc
           return (
             <div
               key={date}
-              title={`${format(new Date(date), 'MMM d')} — ${status}`}
+              title={`${format(new Date(date), 'MMM d')} — ${status === 'pre' ? 'before signup' : status}`}
               className={`aspect-square rounded-sm transition-colors ${
                 status === 'outcome'
                   ? 'bg-primary'
@@ -105,7 +105,9 @@ export function StreakTimeline({ reflections, streakFreezeDates = [], memberSinc
                     ? 'bg-primary/30'
                     : status === 'freeze'
                       ? 'bg-blue-400/40'
-                      : 'bg-muted/50'
+                      : status === 'pre'
+                        ? 'bg-transparent border border-border/20'
+                        : 'bg-muted/50'
               } ${isToday ? 'ring-1 ring-foreground/20' : ''}`}
             />
           );
