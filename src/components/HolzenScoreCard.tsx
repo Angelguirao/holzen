@@ -3,8 +3,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useHolzenScore } from '@/hooks/use-holzen-score';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export function HolzenScoreCard() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const [reflections, setReflections] = useState<{ created_at: string; mood: string | null; outcome: string | null }[]>([]);
   const [loaded, setLoaded] = useState(false);
@@ -32,11 +34,8 @@ export function HolzenScoreCard() {
     scoreData.trend === 'declining' ? <TrendingDown className="h-3 w-3 text-destructive" /> :
     <Minus className="h-3 w-3 text-muted-foreground" />;
 
-  const trendLabel =
-    scoreData.trend === 'improving' ? 'Improving' :
-    scoreData.trend === 'declining' ? 'Declining' : 'Stable';
+  const trendLabel = t(`holzenScore.${scoreData.trend}`);
 
-  // Ring progress
   const circumference = 2 * Math.PI * 36;
   const offset = circumference - (scoreData.score / 100) * circumference;
 
@@ -44,7 +43,7 @@ export function HolzenScoreCard() {
     <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3">
       <div className="flex items-center justify-between">
         <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
-          Holzen Score
+          {t('holzenScore.title')}
         </p>
         <div className="flex items-center gap-1">
           {trendIcon}
@@ -53,25 +52,12 @@ export function HolzenScoreCard() {
       </div>
 
       <div className="flex items-center gap-5">
-        {/* Score ring */}
         <div className="relative shrink-0">
           <svg width="88" height="88" viewBox="0 0 88 88">
+            <circle cx="44" cy="44" r="36" fill="none" stroke="hsl(var(--border))" strokeWidth="4" opacity="0.3" />
             <circle
-              cx="44" cy="44" r="36"
-              fill="none"
-              stroke="hsl(var(--border))"
-              strokeWidth="4"
-              opacity="0.3"
-            />
-            <circle
-              cx="44" cy="44" r="36"
-              fill="none"
-              stroke="hsl(var(--primary))"
-              strokeWidth="4"
-              strokeLinecap="round"
-              strokeDasharray={circumference}
-              strokeDashoffset={offset}
-              transform="rotate(-90 44 44)"
+              cx="44" cy="44" r="36" fill="none" stroke="hsl(var(--primary))" strokeWidth="4" strokeLinecap="round"
+              strokeDasharray={circumference} strokeDashoffset={offset} transform="rotate(-90 44 44)"
               className="transition-all duration-1000 ease-out"
             />
           </svg>
@@ -80,16 +66,15 @@ export function HolzenScoreCard() {
           </div>
         </div>
 
-        {/* Breakdown */}
         <div className="space-y-2 flex-1 min-w-0">
-          <ScoreBar label="Mood" value={scoreData.moodScore} />
-          <ScoreBar label="Actions" value={scoreData.outcomeScore} />
-          <ScoreBar label="Streak" value={scoreData.streakScore} />
+          <ScoreBar label={t('holzenScore.mood')} value={scoreData.moodScore} />
+          <ScoreBar label={t('holzenScore.actions')} value={scoreData.outcomeScore} />
+          <ScoreBar label={t('holzenScore.streak')} value={scoreData.streakScore} />
         </div>
       </div>
 
       <p className="text-[10px] text-muted-foreground/40 leading-relaxed">
-        Based on your last 30 reflections. Higher is calmer.
+        {t('holzenScore.basedOn')}
       </p>
     </div>
   );

@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { Activity } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface Reflection {
   context: string | null;
@@ -26,7 +27,7 @@ function extractChange(context: string | null): number | null {
 }
 
 interface DropBucket {
-  label: string;
+  labelKey: string;
   min: number;
   max: number;
   composureAvg: number | null;
@@ -35,8 +36,9 @@ interface DropBucket {
 }
 
 export function VolatilityToleranceCard({ reflections }: Props) {
+  const { t } = useTranslation();
+
   const data = useMemo(() => {
-    // Only look at drops
     const drops = reflections
       .filter((r) => {
         const change = extractChange(r.context);
@@ -51,11 +53,10 @@ export function VolatilityToleranceCard({ reflections }: Props) {
 
     if (drops.length < 3) return null;
 
-    // Buckets: mild (0-3%), moderate (3-6%), heavy (6%+)
     const bucketDefs = [
-      { label: 'Mild dips', min: 0, max: 3 },
-      { label: 'Moderate drops', min: 3, max: 6 },
-      { label: 'Heavy drops', min: 6, max: 100 },
+      { labelKey: 'volatility.buckets.mild', min: 0, max: 3 },
+      { labelKey: 'volatility.buckets.moderate', min: 3, max: 6 },
+      { labelKey: 'volatility.buckets.heavy', min: 6, max: 100 },
     ];
 
     const buckets: DropBucket[] = bucketDefs.map((def) => {
@@ -73,8 +74,6 @@ export function VolatilityToleranceCard({ reflections }: Props) {
       };
     });
 
-    // Overall volatility tolerance score
-    // Weighted by severity: heavier drops matter more
     const weights = [1, 2, 3];
     let totalWeight = 0;
     let weightedScore = 0;
@@ -90,27 +89,33 @@ export function VolatilityToleranceCard({ reflections }: Props) {
 
     const overallScore = totalWeight > 0 ? Math.round(weightedScore / totalWeight) : null;
 
-    // Grade
-    let grade: string;
+    let gradeKey: string;
     let gradeColor: string;
     if (overallScore === null) {
-      grade = '—';
+      gradeKey = '';
       gradeColor = 'text-muted-foreground';
     } else if (overallScore >= 80) {
-      grade = 'Iron hands';
+      gradeKey = 'volatility.grades.ironHands';
       gradeColor = 'text-primary';
     } else if (overallScore >= 60) {
-      grade = 'Steady';
+      gradeKey = 'volatility.grades.steady';
       gradeColor = 'text-primary/70';
     } else if (overallScore >= 40) {
-      grade = 'Shaky';
+      gradeKey = 'volatility.grades.shaky';
       gradeColor = 'text-muted-foreground';
     } else {
-      grade = 'Paper hands';
+      gradeKey = 'volatility.grades.paperHands';
       gradeColor = 'text-destructive';
     }
 
-    return { buckets, overallScore, grade, gradeColor, totalDrops: drops.length };
+    let descKey: string;
+    if (overallScore === null) descKey = '';
+    else if (overallScore >= 80) descKey = 'volatility.descriptions.high';
+    else if (overallScore >= 60) descKey = 'volatility.descriptions.moderate';
+    else if (overallScore >= 40) descKey = 'volatility.descriptions.low';
+    else descKey = 'volatility.descriptions.veryLow';
+
+    return { buckets, overallScore, gradeKey, gradeColor, descKey, totalDrops: drops.length };
   }, [reflections]);
 
   if (!data) return null;
@@ -121,42 +126,36 @@ export function VolatilityToleranceCard({ reflections }: Props) {
         <div className="flex items-center gap-2">
           <Activity className="h-3.5 w-3.5 text-primary" />
           <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
-            Volatility Tolerance
+            {t('volatility.title')}
           </p>
         </div>
-        {data.overallScore !== null && (
+        {data.overallScore !== null && data.gradeKey && (
           <span className={`text-[10px] font-mono px-2 py-0.5 rounded bg-muted/50 ${data.gradeColor}`}>
-            {data.grade}
+            {t(data.gradeKey)}
           </span>
         )}
       </div>
 
-      {/* Score ring */}
       {data.overallScore !== null && (
         <div className="flex items-center gap-4">
           <ScoreRing score={data.overallScore} />
           <div className="space-y-1 flex-1 min-w-0">
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              {data.overallScore >= 80
-                ? 'You stay remarkably composed during drops — even heavy ones.'
-                : data.overallScore >= 60
-                  ? 'You handle most drops well, though bigger swings test your composure.'
-                  : data.overallScore >= 40
-                    ? 'Drops tend to rattle you. Breathing before acting could help.'
-                    : 'Drops hit hard emotionally. The ritual is your best defense.'}
-            </p>
+            {data.descKey && (
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {t(data.descKey)}
+              </p>
+            )}
             <p className="text-[10px] font-mono text-muted-foreground/40">
-              Based on {data.totalDrops} drop reflection{data.totalDrops !== 1 ? 's' : ''}
+              {t('volatility.basedOnDrops', { count: data.totalDrops })}
             </p>
           </div>
         </div>
       )}
 
-      {/* Severity breakdown */}
       <div className="space-y-2">
         {data.buckets.map((b) => (
           b.count > 0 && (
-            <BucketRow key={b.label} bucket={b} />
+            <BucketRow key={b.labelKey} bucket={b} />
           )
         ))}
       </div>
@@ -189,8 +188,10 @@ function ScoreRing({ score }: { score: number }) {
 }
 
 function BucketRow({ bucket }: { bucket: DropBucket }) {
+  const { t } = useTranslation();
+
   const composureLabel = bucket.composureAvg !== null
-    ? bucket.composureAvg < 30 ? 'Reactive' : bucket.composureAvg < 60 ? 'Mixed' : 'Composed'
+    ? bucket.composureAvg < 30 ? t('volatility.composure.reactive') : bucket.composureAvg < 60 ? t('volatility.composure.mixed') : t('volatility.composure.composed')
     : '—';
 
   const composureColor = bucket.composureAvg !== null
@@ -200,7 +201,7 @@ function BucketRow({ bucket }: { bucket: DropBucket }) {
   return (
     <div className="flex items-center justify-between text-[10px] font-mono">
       <span className="text-muted-foreground">
-        {bucket.label}{' '}
+        {t(bucket.labelKey)}{' '}
         <span className="text-muted-foreground/40">
           ({bucket.min}–{bucket.max >= 100 ? '∞' : bucket.max}%)
         </span>
@@ -209,7 +210,7 @@ function BucketRow({ bucket }: { bucket: DropBucket }) {
         <span className="text-muted-foreground/40">{bucket.count}×</span>
         <span className={composureColor}>{composureLabel}</span>
         {bucket.holdRate !== null && (
-          <span className="text-muted-foreground/50">{Math.round(bucket.holdRate * 100)}% held</span>
+          <span className="text-muted-foreground/50">{t('volatility.held', { percent: Math.round(bucket.holdRate * 100) })}</span>
         )}
       </div>
     </div>
