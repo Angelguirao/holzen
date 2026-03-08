@@ -57,7 +57,7 @@ Your nudge MUST:
 Topics to draw from based on context:
 - During crashes/fear: loss aversion, panic selling data, recovery statistics, hot-state decision making, recency bias
 - During surges/greed: disposition effect, overconfidence, FOMO neuroscience, herding behavior, narrative fallacy
-- General: anchoring, sunk cost, status quo bias, regret aversion, emotional regulation timing`;
+- General: anchoring, sunk cost, status quo bias, regret aversion, emotional regulation timing${langInstruction}`;
 
     const response = await fetch(
       "https://ai.gateway.lovable.dev/v1/chat/completions",
