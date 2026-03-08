@@ -80,8 +80,8 @@ export function MoodTrends({ reflections }: Props) {
               tickLine={false}
             />
             <YAxis
-              domain={[1, 3]}
-              ticks={[1, 2, 3]}
+              domain={[1, 5]}
+              ticks={[1, 3, 5]}
               tickFormatter={(v: number) => MOOD_LABELS[v] ?? ''}
               tick={{ fontSize: 9, fontFamily: 'monospace', fill: 'hsl(var(--muted-foreground))' }}
               axisLine={false}
