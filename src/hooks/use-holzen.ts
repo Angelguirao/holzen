@@ -434,7 +434,7 @@ export function useHolzen() {
         setError('Reflection could not be generated right now. Try again in a moment.');
       }
     }
-  }, [btcData, generateMessage, manualCooldownRemaining]);
+  }, [btcData, generateMessage, manualCooldownRemaining, currency]);
 
   const dismissMessage = useCallback(async () => {
     setMessage(null);
