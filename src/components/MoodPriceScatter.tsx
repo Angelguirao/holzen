@@ -123,7 +123,7 @@ export function MoodPriceScatter({ reflections }: Props) {
               name="Mood"
             />
             <ReferenceLine x={0} stroke="hsl(var(--border))" strokeDasharray="3 3" opacity={0.5} />
-            <ReferenceLine y={2} stroke="hsl(var(--border))" strokeDasharray="3 3" opacity={0.3} />
+            <ReferenceLine y={3} stroke="hsl(var(--border))" strokeDasharray="3 3" opacity={0.3} />
             <Tooltip
               cursor={false}
               contentStyle={{

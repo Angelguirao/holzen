@@ -135,7 +135,7 @@ export function MoodPriceChart({ reflections }: Props) {
                 <span
                   className="text-xs font-mono font-medium w-14 text-right shrink-0"
                   style={{
-                    color: MOOD_TEXT_COLORS[m.mood] ?? 'hsl(var(--muted-foreground))',
+                    color: MOOD_COLORS[m.mood]?.text ?? 'hsl(var(--muted-foreground))',
                   }}
                 >
                   {formattedAvg}
