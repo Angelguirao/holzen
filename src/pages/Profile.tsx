@@ -15,6 +15,7 @@ import { ReferralSection } from '@/components/ReferralSection';
 import { MoodPriceChart } from '@/components/MoodPriceChart';
 import { MoodTrendChart } from '@/components/MoodTrendChart';
 import { MoodPriceScatter } from '@/components/MoodPriceScatter';
+import { RitualStatsCard } from '@/components/RitualStatsCard';
 import { StatsTrends } from '@/components/StatsTrends';
 import { ShareStats } from '@/components/ShareStats';
 import { useHolzenScore } from '@/hooks/use-holzen-score';
