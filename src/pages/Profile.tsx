@@ -18,6 +18,7 @@ import { RitualStatsCard } from '@/components/RitualStatsCard';
 
 import { StatsTrends } from '@/components/StatsTrends';
 import { PeriodComparison } from '@/components/PeriodComparison';
+import { VolatilityToleranceCard } from '@/components/VolatilityToleranceCard';
 import { ShareStats } from '@/components/ShareStats';
 import { useHolzenScore } from '@/hooks/use-holzen-score';
 import { HolzenScoreCard } from '@/components/HolzenScoreCard';
@@ -261,6 +262,7 @@ function StatsContent({ reflections, memberSince }: { reflections: Reflection[];
       <StreakTimeline reflections={reflections} memberSince={memberSince} />
       <InsightsPanel reflections={reflections} />
       <DecisionQualityCard reflections={reflections} />
+      <VolatilityToleranceCard reflections={reflections} />
       <RitualStatsCard />
 
       {hasEnoughForCharts ? (
