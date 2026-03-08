@@ -37,9 +37,14 @@ function parsePercent(context: string | null): string | null {
 }
 
 const moodLabels: Record<string, string> = {
+  fomo: '🤯 FOMO',
+  excited: '🚀 Excited',
+  greedy: '🤑 Greedy',
   anxious: '😰 Anxious',
-  neutral: '😐 Neutral',
   calm: '😌 Calm',
+  detached: '🧊 Detached',
+  uncertain: '🤔 Uncertain',
+  fearful: '😨 Fearful',
 };
 
 const outcomeLabels: Record<string, string> = {
