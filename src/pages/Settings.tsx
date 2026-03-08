@@ -16,7 +16,7 @@ import { useTheme } from 'next-themes';
 import { Moon, Sun } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, forwardRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { useTranslation } from 'react-i18next';
 import {
@@ -39,7 +39,7 @@ import {
 
 const LAST_SEEN_VERSION_KEY = 'holzen_last_seen_version';
 
-const Settings = () => {
+const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
   const { t } = useTranslation();
   const { user, signOut } = useAuth();
   const { threshold, setThreshold, thresholdDown, setThresholdDown, cumulativeThreshold, setCumulativeThreshold, emailNotifications, setEmailNotifications, companionPrefs, setCompanionPref, reflectionTone, setReflectionTone, reflectionStyle, setReflectionStyle, silentMode, setSilentMode, cooldownHours, setCooldownHours, digestFrequency, setDigestFrequency, customPrompt, setCustomPrompt, quietHoursStart, quietHoursEnd, setQuietHours, streakFreezeDates, useStreakFreeze, firstName, setFirstName, nightReflectionHour, setNightReflectionHour, aiInsightsEnabled, setAiInsightsEnabled, ritualTemplate, setRitualTemplate, notifyBadges, setNotifyBadges, motivations, setMotivations, mantra, setMantra, currency, setCurrency, language, setLanguage, profileLoaded } = useHolzen();
@@ -204,7 +204,7 @@ const Settings = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div ref={ref} className="space-y-4">
       <div className="flex items-center justify-between">
         <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">
           {t('settings.title')}
@@ -981,7 +981,7 @@ const Settings = () => {
       </Accordion>
     </div>
   );
-};
+});
 
 function ChangeEmailSection() {
   const { t } = useTranslation();

@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, forwardRef } from 'react';
 import { ChartEmptyState } from './ChartEmptyState';
 import {
   ScatterChart,
@@ -41,7 +41,7 @@ function extractChange(context: string | null): number | null {
   return match[1].toLowerCase() === 'down' ? -val : val;
 }
 
-export function MoodPriceScatter({ reflections }: Props) {
+export const MoodPriceScatter = forwardRef<HTMLDivElement, Props>(function MoodPriceScatter({ reflections }, ref) {
   const points = useMemo(() => {
     const pts: { x: number; y: number; mood: string; date: string }[] = [];
     for (const r of reflections) {
@@ -93,7 +93,7 @@ export function MoodPriceScatter({ reflections }: Props) {
   }
 
   return (
-    <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3">
+    <div ref={ref} className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3">
       <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
         Mood × Price Scatter
       </p>
@@ -166,4 +166,4 @@ export function MoodPriceScatter({ reflections }: Props) {
       </p>
     </div>
   );
-}
+});
