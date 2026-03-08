@@ -402,7 +402,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
   if (!hasBreathing && !hasHaiku && !hasLearning && !hasSignal && !hasZoomOut && !hasHistory) return null;
 
   return (
-    <div className="space-y-3 pt-2 border-t border-border/40">
+    <div ref={ref} className="space-y-3 pt-2 border-t border-border/40">
       <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">
         {t.pause}
       </p>
@@ -507,4 +507,4 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
       )}
     </div>
   );
-}
+});
