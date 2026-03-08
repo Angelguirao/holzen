@@ -295,7 +295,10 @@ const Home = () => {
             collapsed={collapsed['hold-goal']}
             onToggleCollapse={() => toggleCollapsed('hold-goal')}
           >
-            <HoldGoalWidget currentPrice={btcData?.currentPrice} />
+            <div className="space-y-3">
+              <HoldGoalWidget currentPrice={btcData?.currentPrice} />
+              <MyWhyWidget />
+            </div>
           </HomeWidget>
         );
 
