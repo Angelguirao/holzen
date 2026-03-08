@@ -123,7 +123,7 @@ type NotificationItem = {
   title: string;
   subtitle: string;
   timestamp: string;
-  action?: { label: string; path: string };
+  action?: { label: string; path: string; state?: Record<string, any> };
 };
 
 const LAST_READ_KEY = 'holzen_notifications_read_at';
