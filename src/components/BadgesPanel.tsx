@@ -146,10 +146,12 @@ export function BadgesPanel({ reflections }: BadgesPanelProps) {
       makeBadge('breathe-100', 'Zen Lungs', 'Completed breathing 100 times', Wind, 'companions', 'hsl(200, 60%, 40%)', breathingCount, 100, 'sessions'),
       makeBadge('haiku-10', 'Poetry Reader', 'Read 10 haiku', Feather, 'companions', 'hsl(280, 40%, 50%)', haikuCount, 10, 'haiku'),
       makeBadge('haiku-50', 'Verse Devotee', 'Read 50 haiku', Feather, 'companions', 'hsl(285, 45%, 45%)', haikuCount, 50, 'haiku'),
-      makeBadge('learn-10', 'Knowledge Seeker', 'Read 10 learning cards', BookOpen, 'companions', 'hsl(45, 50%, 48%)', learningCount, 10, 'cards'),
-      makeBadge('learn-50', 'Scholar of Calm', 'Read 50 learning cards', BookOpen, 'companions', 'hsl(50, 55%, 43%)', learningCount, 50, 'cards'),
-      makeBadge('all-3-5', 'Full Practice', 'Used all 3 companions in 5 reflections', Award, 'companions', 'hsl(310, 45%, 48%)', allThreeCount, 5, 'full sessions'),
-      makeBadge('all-3-25', 'Complete Discipline', 'Used all 3 companions in 25 reflections', Award, 'companions', 'hsl(315, 50%, 43%)', allThreeCount, 25, 'full sessions'),
+      makeBadge('learn-10', 'Grounded Mind', 'Used Ground Yourself 10 times', BookOpen, 'companions', 'hsl(45, 50%, 48%)', groundCount, 10, 'sessions'),
+      makeBadge('learn-50', 'Scholar of Calm', 'Used Ground Yourself 50 times', BookOpen, 'companions', 'hsl(50, 55%, 43%)', groundCount, 50, 'sessions'),
+      makeBadge('signal-10', 'Signal Reader', 'Read 10 signals', Radio, 'companions', 'hsl(30, 50%, 48%)', signalCount, 10, 'signals'),
+      makeBadge('signal-50', 'Deep Listener', 'Read 50 signals', Radio, 'companions', 'hsl(35, 55%, 43%)', signalCount, 50, 'signals'),
+      makeBadge('all-4-5', 'Full Practice', 'Used all 4 companions in 5 reflections', Award, 'companions', 'hsl(310, 45%, 48%)', allFourCount, 5, 'full sessions'),
+      makeBadge('all-4-25', 'Complete Discipline', 'Used all 4 companions in 25 reflections', Award, 'companions', 'hsl(315, 50%, 43%)', allFourCount, 25, 'full sessions'),
 
       // Engagement badges
       makeBadge('fav-5', 'Curator', '5 favorited reflections', Heart, 'engagement', 'hsl(340, 50%, 50%)', favCount, 5, 'favorites'),
