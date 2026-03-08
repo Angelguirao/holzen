@@ -359,58 +359,10 @@ const History = () => {
         )}
       </div>
 
-      {/* Library filters (only for library tab) */}
-      {tab === 'library' && (
+      {/* Search & filters (available on recent + library) */}
+      {tab !== 'timeline' && (
         <div className="space-y-3">
-          <div className="flex gap-3">
-            <button
-              onClick={() => setFilter('all')}
-              className={`text-xs font-mono transition-colors ${filter === 'all' ? 'text-foreground' : 'text-muted-foreground'}`}
-            >
-              All
-            </button>
-            <button
-              onClick={() => setFilter('favorites')}
-              className={`text-xs font-mono transition-colors ${filter === 'favorites' ? 'text-foreground' : 'text-muted-foreground'}`}
-            >
-              Favorites
-            </button>
-          </div>
-
-          {allTags.length > 0 && (
-            <div className="flex flex-wrap gap-1">
-              {allTags.map((tag) => (
-                <button
-                  key={tag}
-                  onClick={() => setTagFilter(tagFilter === tag ? null : tag)}
-                  className={`text-[10px] font-mono px-1.5 py-0.5 rounded transition-colors ${
-                    tagFilter === tag
-                      ? 'bg-primary/10 text-primary'
-                      : 'border border-border/60 text-muted-foreground hover:text-foreground'
-                  }`}
-                >
-                  {tag}
-                </button>
-              ))}
-            </div>
-          )}
-
-          <div className="flex flex-wrap gap-1">
-            {moods.map((m) => (
-              <button
-                key={m}
-                onClick={() => setMoodFilter(moodFilter === m ? null : m)}
-                className={`text-[10px] font-mono px-1.5 py-0.5 rounded capitalize transition-colors ${
-                  moodFilter === m
-                    ? 'bg-primary/10 text-primary'
-                    : 'border border-border/60 text-muted-foreground hover:text-foreground'
-                }`}
-              >
-                {m}
-              </button>
-            ))}
-          </div>
-
+          {/* Search bar */}
           {reflections.length > 3 && (
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3 w-3 text-muted-foreground/50" />
@@ -419,8 +371,164 @@ const History = () => {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder="Search reflections…"
-                className="w-full rounded-md border border-border/60 bg-muted/30 pl-8 pr-3 py-2 text-xs font-mono text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-ring"
+                className="w-full rounded-md border border-border/60 bg-muted/30 pl-8 pr-8 py-2 text-xs font-mono text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-ring"
               />
+              {search && (
+                <button onClick={() => setSearch('')} className="absolute right-2.5 top-1/2 -translate-y-1/2">
+                  <X className="h-3 w-3 text-muted-foreground/50 hover:text-muted-foreground" />
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Filter toggle + active filter badges */}
+          {tab === 'library' && (
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setFilter('all')}
+                    className={`text-xs font-mono transition-colors ${filter === 'all' ? 'text-foreground' : 'text-muted-foreground'}`}
+                  >
+                    All
+                  </button>
+                  <button
+                    onClick={() => setFilter('favorites')}
+                    className={`text-xs font-mono transition-colors ${filter === 'favorites' ? 'text-foreground' : 'text-muted-foreground'}`}
+                  >
+                    Favorites
+                  </button>
+                </div>
+                <div className="flex-1" />
+                <button
+                  onClick={() => setShowFilters(!showFilters)}
+                  className={`flex items-center gap-1.5 text-[10px] font-mono transition-colors ${
+                    showFilters || hasActiveFilters ? 'text-primary' : 'text-muted-foreground hover:text-foreground'
+                  }`}
+                >
+                  <Filter className="h-3 w-3" />
+                  Filters
+                  {hasActiveFilters && (
+                    <span className="h-3.5 w-3.5 rounded-full bg-primary text-primary-foreground text-[8px] flex items-center justify-center">
+                      {[tagFilter, moodFilter, dateFrom, dateTo, filter === 'favorites'].filter(Boolean).length}
+                    </span>
+                  )}
+                </button>
+              </div>
+
+              {showFilters && (
+                <div className="space-y-3 rounded-md border border-border/60 bg-muted/20 p-3">
+                  {/* Date range */}
+                  <div className="space-y-1.5">
+                    <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Date range</p>
+                    <div className="flex items-center gap-2">
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <button className={cn(
+                            "flex items-center gap-1.5 rounded-md border border-border/60 px-2 py-1.5 text-[10px] font-mono transition-colors",
+                            dateFrom ? "text-foreground" : "text-muted-foreground/50"
+                          )}>
+                            <CalendarIcon className="h-3 w-3" />
+                            {dateFrom ? format(dateFrom, 'MMM d, yyyy') : 'From'}
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={dateFrom}
+                            onSelect={setDateFrom}
+                            disabled={(date) => date > new Date() || (dateTo ? date > dateTo : false)}
+                            initialFocus
+                            className={cn("p-3 pointer-events-auto")}
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <span className="text-[10px] text-muted-foreground/40">→</span>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <button className={cn(
+                            "flex items-center gap-1.5 rounded-md border border-border/60 px-2 py-1.5 text-[10px] font-mono transition-colors",
+                            dateTo ? "text-foreground" : "text-muted-foreground/50"
+                          )}>
+                            <CalendarIcon className="h-3 w-3" />
+                            {dateTo ? format(dateTo, 'MMM d, yyyy') : 'To'}
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={dateTo}
+                            onSelect={setDateTo}
+                            disabled={(date) => date > new Date() || (dateFrom ? date < dateFrom : false)}
+                            initialFocus
+                            className={cn("p-3 pointer-events-auto")}
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      {(dateFrom || dateTo) && (
+                        <button
+                          onClick={() => { setDateFrom(undefined); setDateTo(undefined); }}
+                          className="text-[10px] text-muted-foreground hover:text-foreground transition-colors"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Mood filter */}
+                  <div className="space-y-1.5">
+                    <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Mood</p>
+                    <div className="flex flex-wrap gap-1">
+                      {moods.map((m) => (
+                        <button
+                          key={m}
+                          onClick={() => setMoodFilter(moodFilter === m ? null : m)}
+                          className={`text-[10px] font-mono px-1.5 py-0.5 rounded capitalize transition-colors ${
+                            moodFilter === m
+                              ? 'bg-primary/10 text-primary'
+                              : 'border border-border/60 text-muted-foreground hover:text-foreground'
+                          }`}
+                        >
+                          {m}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Tag filter */}
+                  {allTags.length > 0 && (
+                    <div className="space-y-1.5">
+                      <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Tags</p>
+                      <div className="flex flex-wrap gap-1">
+                        {allTags.map((tag) => (
+                          <button
+                            key={tag}
+                            onClick={() => setTagFilter(tagFilter === tag ? null : tag)}
+                            className={`text-[10px] font-mono px-1.5 py-0.5 rounded transition-colors ${
+                              tagFilter === tag
+                                ? 'bg-primary/10 text-primary'
+                                : 'border border-border/60 text-muted-foreground hover:text-foreground'
+                            }`}
+                          >
+                            {tag}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Clear all */}
+                  {hasActiveFilters && (
+                    <button
+                      onClick={clearAllFilters}
+                      className="text-[10px] font-mono text-muted-foreground hover:text-foreground transition-colors underline underline-offset-2"
+                    >
+                      Clear all filters
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
           )}
         </div>
