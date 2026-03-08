@@ -20,7 +20,6 @@ export function ReflectionTags({ reflectionId, initialTags }: Props) {
   const [highlightIdx, setHighlightIdx] = useState(-1);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Fetch all tags the user has ever used (for autocomplete)
   useEffect(() => {
     if (!open || !user) return;
     const fetchTags = async () => {
@@ -35,10 +34,8 @@ export function ReflectionTags({ reflectionId, initialTags }: Props) {
     fetchTags();
   }, [open, user]);
 
-  // Update suggestions when input changes
   useEffect(() => {
     if (!input.trim()) {
-      // Show unused tags as suggestions when input is empty
       setSuggestions(allUserTags.filter((t) => !tags.includes(t)).slice(0, 8));
     } else {
       const q = input.toLowerCase();
@@ -146,7 +143,7 @@ export function ReflectionTags({ reflectionId, initialTags }: Props) {
           )}
           {input.trim() && !allUserTags.includes(input.trim().toLowerCase()) && (
             <p className="text-[10px] font-mono text-muted-foreground/50">
-              Press Enter to create "{input.trim()}"
+              {t('reflectionTags.pressEnterToCreate', { tag: input.trim() })}
             </p>
           )}
         </div>

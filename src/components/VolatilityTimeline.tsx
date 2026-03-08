@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, forwardRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { AnimatePresence, motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
@@ -53,6 +54,7 @@ const PERIOD_DAYS: Record<Period, number | null> = {
 
 export function VolatilityTimeline() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const { currency } = useHolzen();
   const [period, setPeriod] = useState<Period>('30d');
   const [priceData, setPriceData] = useState<[number, number][]>([]);
@@ -64,12 +66,10 @@ export function VolatilityTimeline() {
   const memberSince = user?.created_at ? new Date(user.created_at) : null;
   const daysSinceSignup = memberSince ? differenceInDays(new Date(), memberSince) : 365;
 
-  // Use the requested period directly — don't clamp to signup date
   const effectiveDays = useMemo(() => {
     return PERIOD_DAYS[period] ?? Math.max(daysSinceSignup, 30);
   }, [period, daysSinceSignup]);
 
-  // Fetch reflections + rituals once
   useEffect(() => {
     if (!user) return;
     (async () => {
@@ -91,7 +91,6 @@ export function VolatilityTimeline() {
     })();
   }, [user]);
 
-  // Fetch price data capped to signup date
   useEffect(() => {
     setPriceLoading(true);
     const days = Math.max(effectiveDays, 7);
@@ -106,24 +105,20 @@ export function VolatilityTimeline() {
       .catch(() => setPriceLoading(false));
   }, [effectiveDays, currency]);
 
-  // Build chart data with reflections mapped to nearest price point
   const { chartData, reflectionPoints } = useMemo(() => {
     if (!priceData.length) return { chartData: [], reflectionPoints: [] };
 
     const cutoff = PERIOD_DAYS[period] ? subDays(new Date(), PERIOD_DAYS[period]!) : null;
 
-    // Filter reflections by period
     const filteredRefs = cutoff
       ? reflections.filter((r) => isAfter(new Date(r.created_at), cutoff))
       : reflections;
 
-    // Build ritual lookup
     const ritualMap = new Map<string, RitualCompletion>();
     for (const r of rituals) {
       if (r.reflection_id) ritualMap.set(r.reflection_id, r);
     }
 
-    // Downsample price data for performance
     const maxPoints = 200;
     const step = Math.max(1, Math.floor(priceData.length / maxPoints));
     const sampled: PricePoint[] = [];
@@ -134,7 +129,6 @@ export function VolatilityTimeline() {
         date: format(new Date(priceData[i][0]), 'MMM d'),
       });
     }
-    // Always include last point
     const last = priceData[priceData.length - 1];
     if (sampled[sampled.length - 1]?.timestamp !== last[0]) {
       sampled.push({
@@ -144,7 +138,6 @@ export function VolatilityTimeline() {
       });
     }
 
-    // Inject reflections into the chart data at nearest price points
     const refPoints: PricePoint[] = [];
     for (const ref of filteredRefs) {
       const refTime = new Date(ref.created_at).getTime();
@@ -157,7 +150,6 @@ export function VolatilityTimeline() {
           nearestIdx = i;
         }
       }
-      // Tag the sampled point with reflection data
       const point: PricePoint = {
         ...sampled[nearestIdx],
         timestamp: refTime,
@@ -166,7 +158,6 @@ export function VolatilityTimeline() {
         reflectionPrice: sampled[nearestIdx].price,
       };
       refPoints.push(point);
-      // Also mark the sampled data so dots render on the line
       sampled[nearestIdx] = {
         ...sampled[nearestIdx],
         reflection: ref,
@@ -190,7 +181,7 @@ export function VolatilityTimeline() {
   if (!chartData.length) {
     return (
       <p className="text-xs text-muted-foreground py-6 text-center">
-        Unable to load price data. Try again later.
+        {t('volatilityTimeline.unableToLoad')}
       </p>
     );
   }
@@ -201,10 +192,9 @@ export function VolatilityTimeline() {
 
   return (
     <div className="space-y-4">
-      {/* Period selector */}
       <div className="flex items-center justify-between">
         <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
-          Volatility Timeline
+          {t('volatilityTimeline.title')}
         </p>
         <div className="flex gap-1">
           {(['7d', '30d', '90d', 'all'] as Period[]).map((p) => (
@@ -217,13 +207,12 @@ export function VolatilityTimeline() {
                   : 'text-muted-foreground/50 hover:text-muted-foreground'
               }`}
             >
-              {p === 'all' ? 'All' : p}
+              {p === 'all' ? t('volatilityTimeline.all') : p}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Chart */}
       <div className="rounded-md border border-border/60 bg-muted/20 p-3">
         <ResponsiveContainer width="100%" height={220}>
           <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
@@ -247,7 +236,6 @@ export function VolatilityTimeline() {
               tickLine={false}
               axisLine={false}
               tickFormatter={(v: number) => {
-                const sym = currency === 'JPY' || currency === 'KRW' ? '' : '';
                 if (v >= 1_000_000) return `${formatBtcPrice(v / 1_000_000, currency).replace(/,/g, '').replace(/\.00$/, '')}M`;
                 if (v >= 1_000) return `${formatBtcPrice(v / 1_000, currency).replace(/,/g, '').replace(/\.00$/, '')}K`;
                 return formatBtcPrice(v, currency).replace(/\.00$/, '');
@@ -255,7 +243,7 @@ export function VolatilityTimeline() {
               width={55}
             />
             <RechartsTooltip
-              content={<ChartTooltip currency={currency} />}
+              content={<ChartTooltip currency={currency} t={t} />}
               cursor={{ stroke: 'hsl(var(--primary))', strokeWidth: 1, strokeDasharray: '3 3' }}
             />
             <Area
@@ -276,30 +264,9 @@ export function VolatilityTimeline() {
                 const color = getMoodColor(point.reflection.mood);
                 return (
                   <g>
-                    {/* Glow ring */}
-                    <circle
-                      cx={props.cx}
-                      cy={props.cy}
-                      r={10}
-                      fill={color}
-                      fillOpacity={0.15}
-                    />
-                    {/* Outer ring */}
-                    <circle
-                      cx={props.cx}
-                      cy={props.cy}
-                      r={6}
-                      fill="hsl(var(--background))"
-                      stroke={color}
-                      strokeWidth={2}
-                    />
-                    {/* Inner dot */}
-                    <circle
-                      cx={props.cx}
-                      cy={props.cy}
-                      r={3}
-                      fill={color}
-                    />
+                    <circle cx={props.cx} cy={props.cy} r={10} fill={color} fillOpacity={0.15} />
+                    <circle cx={props.cx} cy={props.cy} r={6} fill="hsl(var(--background))" stroke={color} strokeWidth={2} />
+                    <circle cx={props.cx} cy={props.cy} r={3} fill={color} />
                   </g>
                 );
               }}
@@ -307,19 +274,17 @@ export function VolatilityTimeline() {
           </ComposedChart>
         </ResponsiveContainer>
 
-        {/* Legend */}
         <div className="flex items-center gap-4 mt-2 justify-center">
-          <LegendItem color="hsl(var(--primary))" label="Calm" />
-          <LegendItem color="hsl(var(--destructive))" label="Anxious" />
-          <LegendItem color="hsl(var(--muted-foreground))" label="Neutral" />
+          <LegendItem color="hsl(var(--primary))" label={t('volatilityTimeline.legendCalm')} />
+          <LegendItem color="hsl(var(--destructive))" label={t('volatilityTimeline.legendAnxious')} />
+          <LegendItem color="hsl(var(--muted-foreground))" label={t('volatilityTimeline.legendNeutral')} />
         </div>
       </div>
 
-      {/* Reflection list below chart */}
       {reflectionPoints.length > 0 && (
         <div className="space-y-2">
           <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
-            Reflections ({reflectionPoints.length})
+            {t('volatilityTimeline.reflections', { count: reflectionPoints.length })}
           </p>
           <div className="space-y-1.5 max-h-[300px] overflow-y-auto">
             {[...reflectionPoints].reverse().map((rp) => (
@@ -349,12 +314,9 @@ function LegendItem({ color, label }: { color: string; label: string }) {
   );
 }
 
-const ChartTooltip = forwardRef<HTMLDivElement, any>(({ active, payload, currency }, ref) => {
+const ChartTooltip = forwardRef<HTMLDivElement, any>(({ active, payload, currency, t }, ref) => {
   if (!active || !payload?.[0]) return null;
   const data = payload[0].payload as PricePoint;
-  const decisionLabels: Record<string, string> = {
-    held: 'Hold', sold: 'Sell', bought: 'Buy', nothing: 'Nothing',
-  };
 
   return (
     <div ref={ref} className="rounded-md border border-border/60 bg-background px-3 py-2 shadow-md max-w-[220px]">
@@ -368,17 +330,17 @@ const ChartTooltip = forwardRef<HTMLDivElement, any>(({ active, payload, currenc
           <div className="flex items-center gap-1.5 flex-wrap">
             {data.reflection.mood && (
               <span className="text-[8px] font-mono px-1 py-0.5 rounded bg-muted/40 text-muted-foreground">
-                {data.reflection.mood}
+                {t(`moodCheck.moods.${data.reflection.mood}`, data.reflection.mood)}
               </span>
             )}
             {data.reflection.outcome && (
               <span className="text-[8px] font-mono px-1 py-0.5 rounded bg-muted/40 text-muted-foreground">
-                {decisionLabels[data.reflection.outcome] || data.reflection.outcome}
+                {t(`outcome.${data.reflection.outcome}`, data.reflection.outcome)}
               </span>
             )}
             {data.ritual && (
               <span className="text-[8px] font-mono px-1 py-0.5 rounded bg-primary/10 text-primary/70">
-                ritual
+                {t('volatilityTimeline.ritual')}
               </span>
             )}
           </div>
@@ -392,15 +354,12 @@ ChartTooltip.displayName = 'ChartTooltip';
 const ReflectionMarkerCard = forwardRef<HTMLDivElement, { point: PricePoint }>(({ point }, ref) => {
   const [expanded, setExpanded] = useState(false);
   const { currency } = useHolzen();
+  const { t } = useTranslation();
   const refl = point.reflection!;
   const ritual = point.ritual;
 
   const changeMatch = refl.context?.match(/(up|down)\s+([\d.]+)%/);
   const changeStr = changeMatch ? `${changeMatch[1] === 'down' ? '↓' : '↑'} ${changeMatch[2]}%` : null;
-
-  const decisionLabels: Record<string, string> = {
-    held: 'Hold', sold: 'Sell', bought: 'Buy', nothing: 'Nothing',
-  };
 
   return (
     <div
@@ -441,21 +400,21 @@ const ReflectionMarkerCard = forwardRef<HTMLDivElement, { point: PricePoint }>((
             <div className="pt-2 mt-1 border-t border-border/30 space-y-2">
               {refl.context && (
                 <div className="space-y-0.5">
-                  <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider">Context</p>
+                  <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider">{t('volatilityTimeline.context')}</p>
                   <p className="text-[10px] text-muted-foreground leading-relaxed">{refl.context}</p>
                 </div>
               )}
               {refl.outcome && (
                 <div className="space-y-0.5">
-                  <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider">Outcome</p>
-                  <p className="text-[10px] text-muted-foreground">{decisionLabels[refl.outcome] || refl.outcome}</p>
+                  <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider">{t('volatilityTimeline.outcome')}</p>
+                  <p className="text-[10px] text-muted-foreground">{t(`outcome.${refl.outcome}`, refl.outcome)}</p>
                 </div>
               )}
               {ritual && (
                 <div className="space-y-0.5">
-                  <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider">Ritual</p>
+                  <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider">{t('volatilityTimeline.ritual')}</p>
                   <p className="text-[10px] text-muted-foreground">
-                    {ritual.template} · Decision: {decisionLabels[ritual.decision] || ritual.decision}
+                    {ritual.template} · {t('volatilityTimeline.decision')}: {t(`outcome.${ritual.decision}`, ritual.decision)}
                   </p>
                 </div>
               )}
@@ -467,17 +426,17 @@ const ReflectionMarkerCard = forwardRef<HTMLDivElement, { point: PricePoint }>((
       <div className="flex items-center gap-2 flex-wrap">
         {refl.mood && (
           <span className="text-[9px] font-mono text-muted-foreground/50 bg-muted/30 px-1.5 py-0.5 rounded">
-            {refl.mood}
+            {t(`moodCheck.moods.${refl.mood}`, refl.mood)}
           </span>
         )}
         {refl.outcome && !expanded && (
           <span className="text-[9px] font-mono text-muted-foreground/50 bg-muted/30 px-1.5 py-0.5 rounded">
-            {decisionLabels[refl.outcome] || refl.outcome}
+            {t(`outcome.${refl.outcome}`, refl.outcome)}
           </span>
         )}
         {ritual && !expanded && (
           <span className="text-[9px] font-mono text-primary/50 bg-primary/5 px-1.5 py-0.5 rounded">
-            Ritual: {ritual.template}
+            {t('volatilityTimeline.ritual')}: {ritual.template}
           </span>
         )}
       </div>
