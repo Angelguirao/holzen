@@ -251,7 +251,7 @@ function StatsContent({ reflections, memberSince }: { reflections: Reflection[];
       </div>
       <ReflectionStats reflections={reflections} />
       {scoreData && <HolzenScoreDetail scoreData={scoreData} />}
-      <StreakTimeline reflections={reflections} />
+      <StreakTimeline reflections={reflections} memberSince={memberSince} />
       <InsightsPanel reflections={reflections} />
       <DecisionQualityCard reflections={reflections} />
       <RitualStatsCard />
