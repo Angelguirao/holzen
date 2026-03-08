@@ -119,11 +119,9 @@ const Profile = () => {
 
   const tabs = [
     { id: 'stats' as const, label: 'Stats' },
-    { id: 'timeline' as const, label: 'Timeline' },
     { id: 'insights' as const, label: 'Insights' },
     { id: 'badges' as const, label: 'Badges' },
     { id: 'letters' as const, label: 'Letters', count: pendingLetters.length },
-    { id: 'referrals' as const, label: 'Referrals' },
   ];
 
   return (
