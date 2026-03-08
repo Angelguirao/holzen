@@ -102,10 +102,10 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
         hold_goal_start: startDate.toISOString(),
         hold_goal_target_months: null,
         hold_goal_target_price: null,
-        hold_goal_currency: 'USD',
+        hold_goal_currency: currency,
       };
       await supabase.from('profiles').update(updates).eq('user_id', user.id);
-      setGoal({ type: 'forever', start: updates.hold_goal_start, currency: 'USD' });
+      setGoal({ type: 'forever', start: updates.hold_goal_start, currency });
       setSetting(false);
       setInputValue('');
       toast('Hold forever. Conviction locked in.');
