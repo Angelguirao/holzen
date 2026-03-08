@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef, forwardRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BreathingExercise } from './BreathingExercise';
 import { HaikuDisplay } from './HaikuDisplay';
 import { LearningInput } from './LearningInput';
