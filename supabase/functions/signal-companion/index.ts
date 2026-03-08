@@ -67,17 +67,17 @@ Rules:
               type: "function",
               function: {
                 name: "return_signal",
-                description: "Return a curated Bitcoin signal/insight.",
+                description: langCode !== "en" ? `Return a curated Bitcoin signal/insight. Title and body MUST be in ${langName}.` : "Return a curated Bitcoin signal/insight.",
                 parameters: {
                   type: "object",
                   properties: {
                     title: {
                       type: "string",
-                      description: "Short headline (5-12 words). Factual, not clickbait.",
+                      description: langCode !== "en" ? `Short headline (5-12 words). MUST be in ${langName}. Factual, not clickbait.` : "Short headline (5-12 words). Factual, not clickbait.",
                     },
                     body: {
                       type: "string",
-                      description: "2-3 sentence insight. Reference real data, analysts, or historical patterns.",
+                      description: langCode !== "en" ? `2-3 sentence insight in ${langName}. Reference real data, analysts, or historical patterns.` : "2-3 sentence insight. Reference real data, analysts, or historical patterns.",
                     },
                     source: {
                       type: "string",
