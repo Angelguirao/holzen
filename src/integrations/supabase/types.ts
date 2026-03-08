@@ -248,6 +248,7 @@ export type Database = {
           reflection_id: string | null
           source_type: string | null
           source_url: string | null
+          status: string
           tags: string[]
           title: string | null
           type: string
@@ -261,6 +262,7 @@ export type Database = {
           reflection_id?: string | null
           source_type?: string | null
           source_url?: string | null
+          status?: string
           tags?: string[]
           title?: string | null
           type?: string
@@ -274,6 +276,7 @@ export type Database = {
           reflection_id?: string | null
           source_type?: string | null
           source_url?: string | null
+          status?: string
           tags?: string[]
           title?: string | null
           type?: string
