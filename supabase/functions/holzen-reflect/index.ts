@@ -107,7 +107,7 @@ serve(async (req) => {
     const langCode = language || "en";
     const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
     const langName = LANG_NAMES[langCode] || "English";
-    const langInstruction = langCode !== "en" ? `CRITICAL LANGUAGE REQUIREMENT: You MUST write ALL output (reflection, haiku, learning title, learning body) in ${langName}. Do not use English for any generated text.\n\n` : "";
+    const langInstruction = langCode !== "en" ? `CRITICAL LANGUAGE REQUIREMENT: You MUST write ALL output — reflection message, haiku, learning_title, and learning_body — in ${langName}. Every single field must be in ${langName}. Do NOT use English for any generated text. This is non-negotiable.\n\n` : "";
     const systemPrompt = `${langInstruction}You generate a reflection with optional companions in response to Bitcoin volatility.
 
 You MUST respond by calling the "generate_reflection" function. Do not respond with plain text.
@@ -163,25 +163,25 @@ Learning input rules:
               type: "function",
               function: {
                 name: "generate_reflection",
-                description: "Generate a reflection message with optional haiku and learning companions.",
+                description: langCode !== "en" ? `Generate a reflection. ALL fields MUST be written in ${langName}.` : "Generate a reflection message with optional haiku and learning companions.",
                 parameters: {
                   type: "object",
                   properties: {
                     message: {
                       type: "string",
-                      description: "The core reflection message (1-3 sentences).",
+                      description: langCode !== "en" ? `The core reflection message (1-3 sentences). MUST be in ${langName}.` : "The core reflection message (1-3 sentences).",
                     },
                     haiku: {
                       type: "string",
-                      description: "A haiku (3 lines, 5-7-5 syllables) about this moment. Lines separated by newlines.",
+                      description: langCode !== "en" ? `A haiku (3 lines, 5-7-5 syllables). MUST be in ${langName}. Lines separated by newlines.` : "A haiku (3 lines, 5-7-5 syllables) about this moment. Lines separated by newlines.",
                     },
                     learning_title: {
                       type: "string",
-                      description: "Short factual headline for a historical/educational insight.",
+                      description: langCode !== "en" ? `Short factual headline (5-10 words). MUST be in ${langName}.` : "Short factual headline for a historical/educational insight.",
                     },
                     learning_body: {
                       type: "string",
-                      description: "1-2 sentences of factual, educational context about Bitcoin history or behavioral finance.",
+                      description: langCode !== "en" ? `1-2 sentences of factual educational context. MUST be in ${langName}.` : "1-2 sentences of factual, educational context about Bitcoin history or behavioral finance.",
                     },
                   },
                   required: ["message", "haiku", "learning_title", "learning_body"],

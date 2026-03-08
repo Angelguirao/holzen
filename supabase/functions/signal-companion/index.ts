@@ -28,7 +28,7 @@ serve(async (req) => {
     const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
     const langCode = language || "en";
     const langName = LANG_NAMES[langCode] || "English";
-    const langInstruction = langCode !== "en" ? `CRITICAL LANGUAGE REQUIREMENT: You MUST write the title and body in ${langName}. Source name and URL should remain as-is.\n\n` : "";
+    const langInstruction = langCode !== "en" ? `CRITICAL LANGUAGE REQUIREMENT: You MUST write the title and body in ${langName}. Do NOT use English for title or body. Source name and URL should remain as-is.\n\n` : "";
 
     const systemPrompt = `${langInstruction}You are a Bitcoin signal curator for a mindfulness app called Holzen. Your job is to surface ONE real, high-signal piece of Bitcoin analysis or insight that is contextually relevant to the current market conditions.
 
@@ -67,17 +67,17 @@ Rules:
               type: "function",
               function: {
                 name: "return_signal",
-                description: "Return a curated Bitcoin signal/insight.",
+                description: langCode !== "en" ? `Return a curated Bitcoin signal/insight. Title and body MUST be in ${langName}.` : "Return a curated Bitcoin signal/insight.",
                 parameters: {
                   type: "object",
                   properties: {
                     title: {
                       type: "string",
-                      description: "Short headline (5-12 words). Factual, not clickbait.",
+                      description: langCode !== "en" ? `Short headline (5-12 words). MUST be in ${langName}. Factual, not clickbait.` : "Short headline (5-12 words). Factual, not clickbait.",
                     },
                     body: {
                       type: "string",
-                      description: "2-3 sentence insight. Reference real data, analysts, or historical patterns.",
+                      description: langCode !== "en" ? `2-3 sentence insight in ${langName}. Reference real data, analysts, or historical patterns.` : "2-3 sentence insight. Reference real data, analysts, or historical patterns.",
                     },
                     source: {
                       type: "string",
