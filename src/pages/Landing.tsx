@@ -187,7 +187,7 @@ const Landing = () => {
       </div>
 
       {/* ─── THE LOOP ─── */}
-      <div className="max-w-lg mx-auto px-6 py-16">
+      <div id="reflection-loop" className="max-w-lg mx-auto px-6 py-16">
         <Section>
           <SectionLabel>{t('landing.reflectionLoop')}</SectionLabel>
           <div className="space-y-0">
