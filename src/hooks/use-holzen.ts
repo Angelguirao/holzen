@@ -423,7 +423,7 @@ export function useHolzen() {
     setLastManualAt(now);
     localStorage.setItem('holzen_last_manual_at', String(now));
     try {
-      const data = btcData || await fetchBtcData();
+      const data = btcData || await fetchBtcData(currency);
       if (!btcData) setBtcData(data);
       await generateMessage(data, mood);
     } catch (e: any) {
