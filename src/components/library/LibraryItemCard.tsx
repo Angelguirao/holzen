@@ -1,4 +1,4 @@
-import { Pin, PinOff, Trash2, ExternalLink, Tag } from 'lucide-react';
+import { Pin, PinOff, Trash2, ExternalLink, Tag, Eye, EyeOff, Archive } from 'lucide-react';
 import type { LibraryItem } from '@/hooks/use-library';
 import { useTranslation } from 'react-i18next';
 
