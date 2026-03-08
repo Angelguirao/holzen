@@ -96,7 +96,7 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
     setGenerating(true);
     try {
       const { error } = await supabase.functions.invoke('reflection-insights', {
-        body: { user_id: user.id },
+        body: { user_id: user.id, language },
       });
       if (error) throw error;
       await loadInsights();
