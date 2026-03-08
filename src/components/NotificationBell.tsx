@@ -311,9 +311,9 @@ export function NotificationBell() {
     }
   }
 
-  const handleAction = useCallback((path: string) => {
+  const handleAction = useCallback((path: string, state?: Record<string, any>) => {
     setOpen(false);
-    navigate(path);
+    navigate(path, state ? { state } : undefined);
   }, [navigate]);
 
   const dismissOne = useCallback((id: string) => {
