@@ -761,4 +761,51 @@ const Settings = () => {
   );
 };
 
+function ChangeEmailSection() {
+  const [newEmail, setNewEmail] = useState('');
+  const [changing, setChanging] = useState(false);
+
+  const changeEmail = useCallback(async () => {
+    if (!newEmail || !newEmail.includes('@')) {
+      toast.error('Invalid email', { description: 'Please enter a valid email address.' });
+      return;
+    }
+    setChanging(true);
+    try {
+      const { error } = await supabase.auth.updateUser({ email: newEmail });
+      if (error) throw error;
+      toast.success('Confirmation sent', { description: 'Check both your old and new email to confirm the change.' });
+      setNewEmail('');
+    } catch (e: any) {
+      toast.error('Failed to update email', { description: e?.message || 'Something went wrong' });
+    } finally {
+      setChanging(false);
+    }
+  }, [newEmail]);
+
+  return (
+    <div className="space-y-3">
+      <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">Email</p>
+      <Input
+        type="email"
+        placeholder="New email address"
+        value={newEmail}
+        onChange={(e) => setNewEmail(e.target.value)}
+        className="text-xs font-mono"
+      />
+      <Button
+        onClick={changeEmail}
+        disabled={changing || !newEmail}
+        size="sm"
+        className="w-full font-mono text-xs"
+      >
+        {changing ? 'Sending confirmation…' : 'Change email'}
+      </Button>
+      <p className="text-[10px] text-muted-foreground/50 leading-relaxed">
+        You'll receive a confirmation link on both your current and new email.
+      </p>
+    </div>
+  );
+}
+
 export default Settings;
