@@ -5,6 +5,7 @@ import { LearningInput } from './LearningInput';
 import { SignalDisplay } from './SignalDisplay';
 import { ZoomOutDisplay } from './ZoomOutDisplay';
 import { HistoricalInsightDisplay } from './HistoricalInsightDisplay';
+import { SaveToLibraryButton } from './library/SaveToLibraryButton';
 import { ChevronDown, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { hapticFeedback } from '@/lib/haptics';
@@ -479,6 +480,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           completed={completion.haiku}
         >
           <HaikuDisplay haiku={companions.haiku!} />
+          <div className="mt-1.5"><SaveToLibraryButton title="Haiku" body={companions.haiku!} sourceType="haiku" reflectionId={reflectionId ?? undefined} /></div>
         </CollapsibleCompanion>
       )}
 
@@ -499,6 +501,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             nudgeLoading={nudgeLoading}
             nudgeError={nudgeError}
           />
+          {nudge && <div className="mt-1.5"><SaveToLibraryButton title={nudge.title} body={nudge.body} sourceType="learning" sourceUrl={nudge.url} reflectionId={reflectionId ?? undefined} /></div>}
         </CollapsibleCompanion>
       )}
 
@@ -517,6 +520,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             loading={signalLoading}
             error={signalError}
           />
+          {signal && <div className="mt-1.5"><SaveToLibraryButton title={signal.title} body={signal.body} sourceType="signal" sourceUrl={signal.url} reflectionId={reflectionId ?? undefined} /></div>}
         </CollapsibleCompanion>
       )}
 
@@ -535,6 +539,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             loading={zoomOutLoading}
             error={zoomOutError}
           />
+          {zoomOut && <div className="mt-1.5"><SaveToLibraryButton title="Zoom Out" body={typeof zoomOut === 'object' ? JSON.stringify(zoomOut) : String(zoomOut)} sourceType="zoom_out" reflectionId={reflectionId ?? undefined} /></div>}
         </CollapsibleCompanion>
       )}
 
@@ -553,6 +558,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             loading={historyLoading}
             error={historyError}
           />
+          {historyInsight && <div className="mt-1.5"><SaveToLibraryButton title={historyInsight.title} body={historyInsight.btcInsight} sourceType="history_insight" reflectionId={reflectionId ?? undefined} /></div>}
         </CollapsibleCompanion>
       )}
     </div>
