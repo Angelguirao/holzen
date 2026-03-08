@@ -159,7 +159,7 @@ const Profile = () => {
             No reflections yet. Stats will appear after your first reflection.
           </p>
         ) : (
-          <StatsContent reflections={reflections} />
+          <StatsContent reflections={reflections} memberSince={user?.created_at} />
         )
       ) : tab === 'insights' ? (
         loading ? (
@@ -226,7 +226,7 @@ const Profile = () => {
   );
 };
 
-function StatsContent({ reflections }: { reflections: Reflection[] }) {
+function StatsContent({ reflections, memberSince }: { reflections: Reflection[]; memberSince?: string }) {
   const scoreData = useHolzenScore(reflections);
 
   const moodCounts = useMemo(() => {
@@ -251,7 +251,7 @@ function StatsContent({ reflections }: { reflections: Reflection[] }) {
       </div>
       <ReflectionStats reflections={reflections} />
       {scoreData && <HolzenScoreDetail scoreData={scoreData} />}
-      <StreakTimeline reflections={reflections} />
+      <StreakTimeline reflections={reflections} memberSince={memberSince} />
       <InsightsPanel reflections={reflections} />
       <DecisionQualityCard reflections={reflections} />
       <RitualStatsCard />
