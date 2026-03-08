@@ -193,10 +193,7 @@ const HistoryContent = () => {
   const [calendarFilters, setCalendarFilters] = useState<Set<ActivityType>>(new Set(['reflection', 'ritual', 'letter', 'badge']));
   const [calendarActivities, setCalendarActivities] = useState<CalendarActivity[]>([]);
 
-  useEffect(() => {
-    document.title = 'Holzen — History';
-    return () => { document.title = 'Holzen — Pause before you act'; };
-  }, []);
+  // No separate title — managed by parent Library page
 
   useEffect(() => {
     if (!user) return;
