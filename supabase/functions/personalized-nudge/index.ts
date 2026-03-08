@@ -86,6 +86,61 @@ serve(async (req) => {
 
       const direction = (data?.bitcoin?.usd_24h_change ?? 0) >= 0 ? "up" : "down";
       const pct = change24h.toFixed(1);
+      const userLang = (profile as any).language || "en";
+
+      const NUDGE_COPY: Record<string, { subject: (d: string, p: string) => string; body: (d: string, p: string) => string; reminder: string; cta: string; footer: string }> = {
+        en: {
+          subject: (d, p) => `BTC is ${d} ${p}% — take a moment`,
+          body: (d, p) => `BTC is ${d} ${p}% today.`,
+          reminder: "You haven't reflected in a while. No pressure — just a gentle reminder that Holzen is here when you need a moment to pause.",
+          cta: "Open Holzen",
+          footer: "A gentle nudge from Holzen. Disable in settings.",
+        },
+        es: {
+          subject: (d, p) => `BTC ${d === "up" ? "subió" : "bajó"} ${p}% — tómate un momento`,
+          body: (d, p) => `BTC ${d === "up" ? "subió" : "bajó"} ${p}% hoy.`,
+          reminder: "No has reflexionado en un tiempo. Sin presión — solo un recordatorio de que Holzen está aquí cuando necesites un momento de pausa.",
+          cta: "Abrir Holzen",
+          footer: "Un recordatorio amable de Holzen. Desactívalo en ajustes.",
+        },
+        pt: {
+          subject: (d, p) => `BTC ${d === "up" ? "subiu" : "caiu"} ${p}% — faça uma pausa`,
+          body: (d, p) => `BTC ${d === "up" ? "subiu" : "caiu"} ${p}% hoje.`,
+          reminder: "Faz um tempo que você não refletiu. Sem pressão — só um lembrete de que o Holzen está aqui quando você precisar pausar.",
+          cta: "Abrir Holzen",
+          footer: "Um lembrete gentil do Holzen. Desative nas configurações.",
+        },
+        de: {
+          subject: (d, p) => `BTC ist ${d === "up" ? "gestiegen" : "gefallen"} um ${p}% — nimm dir einen Moment`,
+          body: (d, p) => `BTC ist heute um ${p}% ${d === "up" ? "gestiegen" : "gefallen"}.`,
+          reminder: "Du hast eine Weile nicht reflektiert. Kein Druck — nur eine sanfte Erinnerung, dass Holzen da ist, wenn du eine Pause brauchst.",
+          cta: "Holzen öffnen",
+          footer: "Eine sanfte Erinnerung von Holzen. In den Einstellungen deaktivieren.",
+        },
+        fr: {
+          subject: (d, p) => `BTC a ${d === "up" ? "monté" : "baissé"} de ${p}% — prends un moment`,
+          body: (d, p) => `BTC a ${d === "up" ? "monté" : "baissé"} de ${p}% aujourd'hui.`,
+          reminder: "Tu n'as pas réfléchi depuis un moment. Pas de pression — juste un rappel que Holzen est là quand tu as besoin d'une pause.",
+          cta: "Ouvrir Holzen",
+          footer: "Un rappel bienveillant de Holzen. Désactive dans les paramètres.",
+        },
+        nl: {
+          subject: (d, p) => `BTC is ${d === "up" ? "gestegen" : "gedaald"} met ${p}% — neem even een moment`,
+          body: (d, p) => `BTC is vandaag ${p}% ${d === "up" ? "gestegen" : "gedaald"}.`,
+          reminder: "Je hebt al een tijdje niet gereflecteerd. Geen druk — gewoon een herinnering dat Holzen er is als je een moment van rust nodig hebt.",
+          cta: "Holzen openen",
+          footer: "Een zachte herinnering van Holzen. Uitschakelen in instellingen.",
+        },
+        tr: {
+          subject: (d, p) => `BTC %${p} ${d === "up" ? "yükseldi" : "düştü"} — bir an dur`,
+          body: (d, p) => `BTC bugün %${p} ${d === "up" ? "yükseldi" : "düştü"}.`,
+          reminder: "Bir süredir düşünmedin. Baskı yok — sadece bir duraklamaya ihtiyaç duyduğunda Holzen'in burada olduğunu hatırlatmak istedik.",
+          cta: "Holzen'i Aç",
+          footer: "Holzen'den nazik bir hatırlatma. Ayarlardan devre dışı bırakabilirsin.",
+        },
+      };
+
+      const copy = NUDGE_COPY[userLang] || NUDGE_COPY.en;
 
       const html = `
 <!DOCTYPE html>
@@ -95,19 +150,19 @@ serve(async (req) => {
   <p style="font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #737373; margin-bottom: 32px;">HOLZEN</p>
 
   <p style="font-size: 14px; line-height: 1.8; margin-bottom: 24px;">
-    BTC is ${direction} ${pct}% today.
+    ${copy.body(direction, pct)}
   </p>
 
   <p style="font-size: 13px; color: #737373; line-height: 1.6; margin-bottom: 24px;">
-    You haven't reflected in a while. No pressure — just a gentle reminder that Holzen is here when you need a moment to pause.
+    ${copy.reminder}
   </p>
 
   <a href="https://holzen.lovable.app" style="display: inline-block; font-size: 12px; font-family: 'IBM Plex Mono', monospace; color: #2a2a2a; border: 1px solid #d4d0c8; padding: 8px 16px; text-decoration: none; border-radius: 4px;">
-    Open Holzen
+    ${copy.cta}
   </a>
 
   <hr style="border: none; border-top: 1px solid #e5e2dc; margin: 32px 0 16px;">
-  <p style="font-size: 11px; color: #a3a3a3;">A gentle nudge from Holzen. Disable in settings.</p>
+  <p style="font-size: 11px; color: #a3a3a3;">${copy.footer}</p>
 </body>
 </html>`;
 
