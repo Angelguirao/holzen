@@ -7,7 +7,7 @@ import type { NewBadge } from '@/components/BadgeCelebration';
  * Syncs computed badge IDs to user_badges table.
  * Returns any newly earned badges for celebration overlay.
  */
-export function useBadgeSync(computedBadgeIds: string[], badgeMeta: Record<string, { label: string; description: string; color: string }>) {
+export function useBadgeSync(computedBadgeIds: string[], badgeMeta: Record<string, { label: string; description: string; color: string }>, notifyEnabled = true) {
   const { user } = useAuth();
   const [newBadges, setNewBadges] = useState<NewBadge[]>([]);
   const [synced, setSynced] = useState(false);
