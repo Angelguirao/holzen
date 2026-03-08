@@ -131,6 +131,7 @@ const Profile = () => {
     { id: 'insights' as const, label: t('profile.insights') },
     { id: 'badges' as const, label: t('profile.badges') },
     { id: 'letters' as const, label: t('profile.letters'), count: pendingLetters.length },
+    { id: 'activity' as const, label: t('profile.activity') },
   ];
 
   return (
