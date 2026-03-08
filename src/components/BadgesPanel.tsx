@@ -95,9 +95,10 @@ export function BadgesPanel({ reflections }: BadgesPanelProps) {
     // Companion engagement counts
     const breathingCount = reflections.filter((r) => r.breathing_completed).length;
     const haikuCount = reflections.filter((r) => r.haiku_read).length;
-    const learningCount = reflections.filter((r) => r.learning_read).length;
-    const allThreeCount = reflections.filter(
-      (r) => r.breathing_completed && r.haiku_read && r.learning_read
+    const groundCount = reflections.filter((r) => r.learning_read).length;
+    const signalCount = reflections.filter((r) => !!r.signal_source).length;
+    const allFourCount = reflections.filter(
+      (r) => r.breathing_completed && r.haiku_read && r.learning_read && !!r.signal_source
     ).length;
 
     const makeBadge = (
