@@ -95,11 +95,13 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
   const [expandedHaiku, setExpandedHaiku] = useState(false);
   const [expandedLearning, setExpandedLearning] = useState(false);
   const [expandedSignal, setExpandedSignal] = useState(false);
+  const [expandedZoomOut, setExpandedZoomOut] = useState(false);
   const [completion, setCompletion] = useState<CompletionState>({
     breathing: false,
     haiku: false,
     learning: false,
     signal: false,
+    zoomOut: false,
   });
 
   // Load persisted completion state from DB
