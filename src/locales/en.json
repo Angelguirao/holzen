@@ -585,9 +585,10 @@
   "pause": {
     "youPaused": "You paused. That's the hardest part.",
     "startRitual": "Start a ritual",
-    "skipToDecision": "Skip to decision",
+    "orDecideNow": "or scroll down to decide without a ritual",
     "whatWillYouDo": "What will you do?",
     "youChose": "You chose deliberately.",
-    "return": "Return"
+    "return": "Return",
+    "noReflection": "No active reflection. Go back to trigger one."
   }
 }
