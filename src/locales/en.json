@@ -910,5 +910,48 @@
     "actions": "Actions",
     "streak": "Streak",
     "basedOn": "Based on your last 30 reflections. Higher is calmer."
+  },
+  "ritualFlow": {
+    "rememberWhy": "Remember why you hold",
+    "ritualComplete": "Ritual complete",
+    "decision": "Decision",
+    "return": "Return",
+    "skip": "Skip"
+  },
+  "ritualBreathing": {
+    "description": "3 cycles of box breathing. 4 seconds each phase.",
+    "beginBreathing": "Begin breathing",
+    "inhale": "Inhale",
+    "hold": "Hold",
+    "exhale": "Exhale"
+  },
+  "ritualJournal": {
+    "writeItOut": "Write it out before you act",
+    "placeholder": "What's driving this impulse? What would future-you think?",
+    "doneWriting": "Done writing"
+  },
+  "void": {
+    "begin": "Begin",
+    "youStayed": "You stayed",
+    "return": "Return"
+  },
+  "nightReflection": {
+    "title": "Night reflection"
+  },
+  "cooldownBanner": {
+    "youDecidedTo": "You decided to <strong>{{decision}}</strong> — sit with it.",
+    "decisions": {
+      "held": "hold",
+      "sold": "sell",
+      "bought": "buy",
+      "nothing": "do nothing"
+    }
+  },
+  "onboardingSample": {
+    "context": "BTC is down 7.2% in the last 24 hours. Market sentiment: Extreme Fear (18/100).",
+    "message": "A sharp move invites reaction. This is a moment to observe the impulse before following it.",
+    "haiku": "Numbers fall like rain\nThe urge to act rises fast\nBreathe before you move",
+    "learningTitle": "Panic Selling and Recovery",
+    "learningBody": "After Bitcoin's 30% drop in May 2021, it recovered within three months. Historically, sharp declines have often preceded periods of consolidation rather than further collapse."
   }
 }
