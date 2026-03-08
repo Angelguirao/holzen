@@ -236,6 +236,7 @@ const Profile = () => {
 };
 
 function StatsContent({ reflections, memberSince }: { reflections: Reflection[]; memberSince?: string }) {
+  const { t } = useTranslation();
   const scoreData = useHolzenScore(reflections);
 
   const moodCounts = useMemo(() => {
