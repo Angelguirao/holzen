@@ -310,6 +310,7 @@ export function useHolzen() {
           motivations: motivations.length > 0 ? motivations : undefined,
           mantra: mantra || undefined,
           currency,
+          language,
         },
       });
 
