@@ -55,6 +55,16 @@ export default function PauseSession() {
 
   const [phase, setPhase] = useState<'session' | 'outcome' | 'done'>('session');
   const [decision, setDecision] = useState<string | null>(null);
+  const [isFavorite, setIsFavorite] = useState(false);
+
+  const toggleFavorite = useCallback(async () => {
+    if (!reflectionId) return;
+    const newVal = !isFavorite;
+    setIsFavorite(newVal);
+    hapticFeedback('light');
+    await supabase.from('reflections').update({ is_favorite: newVal }).eq('id', reflectionId);
+    await supabase.from('library_items').update({ is_favorite: newVal }).eq('reflection_id', reflectionId).eq('source_type', 'reflection');
+  }, [reflectionId, isFavorite]);
 
   const handleReturn = useCallback(() => {
     navigate(-1);
