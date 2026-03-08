@@ -395,7 +395,7 @@ const Home = () => {
                         <div className="space-y-4">
                           <div className="flex items-center gap-2 text-muted-foreground">
                             <Loader2 className="h-3 w-3 animate-spin" />
-                            <p className="text-xs font-mono">Generating reflection…</p>
+                            <p className="text-xs font-mono">{t('home.generatingReflection')}</p>
                           </div>
                           <Skeleton className="h-4 w-full" />
                           <Skeleton className="h-4 w-3/4" />
