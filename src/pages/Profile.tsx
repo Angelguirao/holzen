@@ -304,7 +304,7 @@ function HolzenScoreDetail({ scoreData }: { scoreData: import('@/hooks/use-holze
 
   return (
     <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3">
-      <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">Holzen Score</p>
+      <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">{t('profile.holzenScore')}</p>
       <div className="flex items-center gap-5">
         <div className="relative shrink-0">
           <svg width="88" height="88" viewBox="0 0 88 88">
