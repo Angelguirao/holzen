@@ -30,6 +30,7 @@ const STATUS_FILTERS: { key: string; label: string }[] = [
 export default function Library() {
   const { t } = useTranslation();
   const library = useLibrary();
+  const isMobile = useIsMobile();
   const [viewMode, setViewMode] = useState<'list' | 'graph'>('list');
   const [tab, setTab] = useState<'all' | 'favorites'>('all');
   const [search, setSearch] = useState('');
