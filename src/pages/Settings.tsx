@@ -48,6 +48,7 @@ const Settings = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [changingPassword, setChangingPassword] = useState(false);
   const [zenMode, setZenMode] = useState(() => localStorage.getItem('holzen_zen_mode') === 'true');
+  const [btcMode, setBtcMode] = useState(() => localStorage.getItem('holzen_btc_mode') === 'true');
   const [latestVersion, setLatestVersion] = useState<string | null>(null);
   const [hasNewVersion, setHasNewVersion] = useState(false);
 
