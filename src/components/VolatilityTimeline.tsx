@@ -382,6 +382,7 @@ const ChartTooltip = forwardRef<HTMLDivElement, any>(({ active, payload }, ref) 
     </div>
   );
 });
+ChartTooltip.displayName = 'ChartTooltip';
 
 const ReflectionMarkerCard = forwardRef<HTMLDivElement, { point: PricePoint }>(({ point }, ref) => {
   const refl = point.reflection!;
