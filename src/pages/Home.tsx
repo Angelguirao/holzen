@@ -380,7 +380,7 @@ const Home = () => {
                       >
                         <Sparkles className="h-3 w-3 text-primary/60" />
                         <span className="text-[10px] font-mono text-primary/60 tracking-[0.15em] uppercase">
-                          Start ritual before deciding
+                          {t('home.startRitualBeforeDeciding')}
                         </span>
                       </button>
                       {lastReflectionId && <ReflectionComparison reflectionId={lastReflectionId} />}
