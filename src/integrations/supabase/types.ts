@@ -372,6 +372,7 @@ export type Database = {
           created_at: string
           haiku: string | null
           haiku_read: boolean
+          history_read: boolean
           id: string
           is_favorite: boolean
           learning_body: string | null
@@ -389,6 +390,7 @@ export type Database = {
           signal_url: string | null
           tags: string[] | null
           user_id: string
+          zoom_out_read: boolean
         }
         Insert: {
           breathing_completed?: boolean
@@ -396,6 +398,7 @@ export type Database = {
           created_at?: string
           haiku?: string | null
           haiku_read?: boolean
+          history_read?: boolean
           id?: string
           is_favorite?: boolean
           learning_body?: string | null
@@ -413,6 +416,7 @@ export type Database = {
           signal_url?: string | null
           tags?: string[] | null
           user_id: string
+          zoom_out_read?: boolean
         }
         Update: {
           breathing_completed?: boolean
@@ -420,6 +424,7 @@ export type Database = {
           created_at?: string
           haiku?: string | null
           haiku_read?: boolean
+          history_read?: boolean
           id?: string
           is_favorite?: boolean
           learning_body?: string | null
@@ -437,6 +442,7 @@ export type Database = {
           signal_url?: string | null
           tags?: string[] | null
           user_id?: string
+          zoom_out_read?: boolean
         }
         Relationships: []
       }

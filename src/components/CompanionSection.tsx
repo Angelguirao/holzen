@@ -114,7 +114,7 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
     if (!reflectionId) return;
     supabase
       .from('reflections')
-      .select('breathing_completed, haiku_read, learning_read')
+      .select('breathing_completed, haiku_read, learning_read, zoom_out_read, history_read')
       .eq('id', reflectionId)
       .single()
       .then(({ data }) => {
@@ -124,8 +124,8 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
             haiku: (data as any).haiku_read ?? false,
             learning: (data as any).learning_read ?? false,
             signal: false,
-            zoomOut: false,
-            history: false,
+            zoomOut: (data as any).zoom_out_read ?? false,
+            history: (data as any).history_read ?? false,
           });
         }
       });
@@ -324,12 +324,21 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
     if (completion[key]) return;
     setCompletion((prev) => ({ ...prev, [key]: true }));
     hapticFeedback('light');
-    if (reflectionId && key !== 'signal' && key !== 'zoomOut' && key !== 'history') {
-      const dbKey = key === 'breathing' ? 'breathing_completed' : key === 'haiku' ? 'haiku_read' : 'learning_read';
-      await supabase
-        .from('reflections')
-        .update({ [dbKey]: true } as any)
-        .eq('id', reflectionId);
+    if (reflectionId && key !== 'signal') {
+      const dbKeyMap: Record<string, string> = {
+        breathing: 'breathing_completed',
+        haiku: 'haiku_read',
+        learning: 'learning_read',
+        zoomOut: 'zoom_out_read',
+        history: 'history_read',
+      };
+      const dbKey = dbKeyMap[key];
+      if (dbKey) {
+        await supabase
+          .from('reflections')
+          .update({ [dbKey]: true } as any)
+          .eq('id', reflectionId);
+      }
     }
   }, [reflectionId, completion]);
 
