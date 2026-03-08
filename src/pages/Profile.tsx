@@ -237,9 +237,9 @@ function StatsContent({ reflections }: { reflections: Reflection[] }) {
   const scoreData = useHolzenScore(reflections);
 
   const moodCounts = useMemo(() => {
-    const counts = { anxious: 0, neutral: 0, calm: 0 };
+    const counts: Record<string, number> = {};
     for (const r of reflections) {
-      if (r.mood && r.mood in counts) counts[r.mood as keyof typeof counts]++;
+      if (r.mood) counts[r.mood] = (counts[r.mood] || 0) + 1;
     }
     return counts;
   }, [reflections]);
