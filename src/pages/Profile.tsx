@@ -43,6 +43,9 @@ interface Reflection {
   mood: string | null;
   outcome: string | null;
   tags: string[];
+  breathing_completed: boolean;
+  haiku_read: boolean;
+  learning_read: boolean;
 }
 
 interface Letter {
