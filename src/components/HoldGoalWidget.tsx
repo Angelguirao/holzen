@@ -313,7 +313,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
             {years > 0 ? `${years}y ${days}d` : `${elapsed} day${elapsed !== 1 ? 's' : ''}`} and counting
           </span>
           <p className="text-[9px] font-mono text-muted-foreground/40">
-            Since {format(start, 'MMM d, yyyy')} · No end date
+            Since {format(start, 'MMM d, yyyy')}{elapsed > 0 ? ` · ${elapsed} day${elapsed !== 1 ? 's' : ''} ago` : ''} · No end date
           </p>
         </div>
       </div>
@@ -363,7 +363,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
             />
           </div>
           <p className="text-[9px] font-mono text-muted-foreground/40">
-            Since {format(start, 'MMM d, yyyy')} · {elapsed} day{elapsed !== 1 ? 's' : ''} held
+            Started {format(start, 'MMM d, yyyy')} · {elapsed} day{elapsed !== 1 ? 's' : ''} held
           </p>
         </div>
       </div>
@@ -408,7 +408,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
             />
           </div>
           <p className="text-[9px] font-mono text-muted-foreground/40">
-            Since {format(start, 'MMM d, yyyy')} · Current: ${price.toLocaleString()}
+            Started {format(start, 'MMM d, yyyy')} · {differenceInDays(new Date(), start)} day{differenceInDays(new Date(), start) !== 1 ? 's' : ''} held · Current: ${price.toLocaleString()}
           </p>
         </div>
       </div>
