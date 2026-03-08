@@ -1,10 +1,11 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Wind, Eye, PenLine, Target, Check, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { hapticFeedback } from '@/lib/haptics';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
+import { useHolzen } from '@/hooks/use-holzen';
 import { RitualBreathing, RitualReflect, RitualJournal, RitualDecide } from './ritual';
 
 export type RitualTemplate = 'quick' | 'standard' | 'deep';
