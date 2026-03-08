@@ -1,12 +1,15 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Search, FolderOpen, Plus } from 'lucide-react';
+import { Search, FolderOpen, Plus, Pencil, Trash2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { LibraryItemCard } from './LibraryItemCard';
 import { NewNoteForm } from './NewNoteForm';
 import { NewCollectionForm } from './NewCollectionForm';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 import type { useLibrary } from '@/hooks/use-library';
+import type { Collection } from '@/hooks/use-library';
 
 interface Props {
   library: ReturnType<typeof useLibrary>;
@@ -18,13 +21,127 @@ const TYPE_FILTERS = [
   { key: 'notes', labelKey: 'library.tabNotes' },
 ] as const;
 
+function CollectionChip({
+  col,
+  count,
+  isActive,
+  onSelect,
+  onRename,
+  onDelete,
+  t,
+}: {
+  col: Collection;
+  count: number;
+  isActive: boolean;
+  onSelect: () => void;
+  onRename: (name: string) => void;
+  onDelete: () => void;
+  t: (k: string) => string;
+}) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [renaming, setRenaming] = useState(false);
+  const [newName, setNewName] = useState(col.name);
+  const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const didLongPress = useRef(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const startLongPress = useCallback(() => {
+    didLongPress.current = false;
+    longPressTimer.current = setTimeout(() => {
+      didLongPress.current = true;
+      setMenuOpen(true);
+    }, 500);
+  }, []);
+
+  const cancelLongPress = useCallback(() => {
+    if (longPressTimer.current) clearTimeout(longPressTimer.current);
+  }, []);
+
+  const handleClick = () => {
+    if (didLongPress.current) return;
+    onSelect();
+  };
+
+  const handleRenameSubmit = () => {
+    const trimmed = newName.trim();
+    if (trimmed && trimmed !== col.name) onRename(trimmed);
+    setRenaming(false);
+    setMenuOpen(false);
+  };
+
+  if (renaming) {
+    return (
+      <div className="flex items-center gap-1 flex-shrink-0">
+        <input
+          ref={inputRef}
+          value={newName}
+          onChange={(e) => setNewName(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') handleRenameSubmit();
+            if (e.key === 'Escape') { setRenaming(false); setMenuOpen(false); }
+          }}
+          onBlur={handleRenameSubmit}
+          autoFocus
+          maxLength={80}
+          className="text-[9px] font-mono px-2 py-0.5 rounded-full border border-foreground/20 bg-foreground/5 text-foreground w-24 focus:outline-none focus:ring-1 focus:ring-ring/30"
+        />
+      </div>
+    );
+  }
+
+  return (
+    <Popover open={menuOpen} onOpenChange={setMenuOpen}>
+      <PopoverTrigger asChild>
+        <button
+          onClick={handleClick}
+          onContextMenu={(e) => { e.preventDefault(); setMenuOpen(true); }}
+          onPointerDown={startLongPress}
+          onPointerUp={cancelLongPress}
+          onPointerLeave={cancelLongPress}
+          className={cn(
+            'text-[9px] font-mono px-2 py-0.5 rounded-full border transition-colors whitespace-nowrap flex-shrink-0 flex items-center gap-1',
+            isActive
+              ? 'border-foreground/20 bg-foreground/5 text-foreground'
+              : 'border-border/30 text-muted-foreground/40 hover:text-muted-foreground/60'
+          )}
+        >
+          {col.icon && <span className="text-[9px]">{col.icon}</span>}
+          {col.name}
+          <span className="text-muted-foreground/30">{count}</span>
+        </button>
+      </PopoverTrigger>
+      <PopoverContent align="start" className="w-36 p-1" sideOffset={6}>
+        <button
+          onClick={() => { setNewName(col.name); setRenaming(true); }}
+          className="flex items-center gap-2 w-full px-2 py-1.5 text-[10px] font-mono text-foreground/70 hover:bg-muted rounded transition-colors"
+        >
+          <Pencil className="h-3 w-3" />
+          {t('library.renameCollection')}
+        </button>
+        <button
+          onClick={() => {
+            if (window.confirm(t('library.deleteCollectionConfirm'))) {
+              onDelete();
+              setMenuOpen(false);
+            }
+          }}
+          className="flex items-center gap-2 w-full px-2 py-1.5 text-[10px] font-mono text-destructive/70 hover:bg-destructive/10 rounded transition-colors"
+        >
+          <Trash2 className="h-3 w-3" />
+          {t('library.deleteCollection')}
+        </button>
+      </PopoverContent>
+    </Popover>
+  );
+}
+
 export function LibraryItems({ library }: Props) {
   const { t } = useTranslation();
   const {
     items, collections, collectionItems, loading,
     addItem, updateItem, deleteItem, togglePin,
     addToCollection, removeFromCollection, getItemCollections,
-    addCollection,
+    addCollection, updateCollection, deleteCollection,
   } = library;
   const [search, setSearch] = useState('');
   const [typeFilter, setTypeFilter] = useState('all');
@@ -64,6 +181,17 @@ export function LibraryItems({ library }: Props) {
 
   const handleNewNote = async (title: string, body: string, tags: string[]) => {
     await addItem({ type: 'note', title: title || null, body, tags });
+  };
+
+  const handleRenameCollection = async (id: string, name: string) => {
+    await updateCollection(id, { name });
+    toast.success(t('library.collectionRenamed'));
+  };
+
+  const handleDeleteCollection = async (id: string) => {
+    if (collectionFilter === id) setCollectionFilter(null);
+    await deleteCollection(id);
+    toast.success(t('library.collectionDeleted'));
   };
 
   const renderCard = (item: typeof items[0]) => (
@@ -138,20 +266,16 @@ export function LibraryItems({ library }: Props) {
           {collections.map((col) => {
             const count = collectionItems.filter((ci) => ci.collection_id === col.id).length;
             return (
-              <button
+              <CollectionChip
                 key={col.id}
-                onClick={() => setCollectionFilter(collectionFilter === col.id ? null : col.id)}
-                className={cn(
-                  'text-[9px] font-mono px-2 py-0.5 rounded-full border transition-colors whitespace-nowrap flex-shrink-0 flex items-center gap-1',
-                  collectionFilter === col.id
-                    ? 'border-foreground/20 bg-foreground/5 text-foreground'
-                    : 'border-border/30 text-muted-foreground/40 hover:text-muted-foreground/60'
-                )}
-              >
-                {col.icon && <span className="text-[9px]">{col.icon}</span>}
-                {col.name}
-                <span className="text-muted-foreground/30">{count}</span>
-              </button>
+                col={col}
+                count={count}
+                isActive={collectionFilter === col.id}
+                onSelect={() => setCollectionFilter(collectionFilter === col.id ? null : col.id)}
+                onRename={(name) => handleRenameCollection(col.id, name)}
+                onDelete={() => handleDeleteCollection(col.id)}
+                t={t}
+              />
             );
           })}
           <button
