@@ -1,4 +1,5 @@
 import { Loader2, ExternalLink } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface NudgeData {
   title: string;
@@ -16,7 +17,7 @@ interface Props {
 }
 
 export function LearningInput({ title, body, nudge, nudgeLoading = false, nudgeError = false }: Props) {
-  // If nudge data exists, use it. If nudge failed or no nudge system involved (History), fall back to static content.
+  const { t } = useTranslation();
   const hasNudgeSystem = nudge !== undefined || nudgeLoading || nudgeError;
   const displayTitle = nudge?.title ?? (!hasNudgeSystem || nudgeError ? title : '');
   const displayBody = nudge?.body ?? (!hasNudgeSystem || nudgeError ? body : '');
@@ -25,7 +26,7 @@ export function LearningInput({ title, body, nudge, nudgeLoading = false, nudgeE
     return (
       <div className="py-3 flex items-center gap-2 text-muted-foreground">
         <Loader2 className="h-3 w-3 animate-spin" />
-        <span className="text-xs font-mono">Finding research…</span>
+        <span className="text-xs font-mono">{t('learning.findingResearch')}</span>
       </div>
     );
   }
@@ -47,7 +48,7 @@ export function LearningInput({ title, body, nudge, nudgeLoading = false, nudgeE
               target="_blank"
               rel="noopener noreferrer"
               className="text-primary/50 hover:text-primary transition-colors"
-              aria-label="View research"
+              aria-label={t('learning.viewResearch')}
             >
               <ExternalLink className="h-2.5 w-2.5" />
             </a>
@@ -56,7 +57,7 @@ export function LearningInput({ title, body, nudge, nudgeLoading = false, nudgeE
       )}
       {nudgeError && !nudge && (
         <p className="text-[9px] font-mono text-muted-foreground/30 pt-1">
-          Behavioral science · Research-grounded
+          {t('learning.researchGrounded')}
         </p>
       )}
     </div>

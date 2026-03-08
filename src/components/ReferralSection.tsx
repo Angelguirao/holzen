@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
+import { useTranslation } from 'react-i18next';
 import { Copy, Check, Gift, Star, Crown } from 'lucide-react';
 import { toast } from 'sonner';
 import { Progress } from '@/components/ui/progress';
@@ -11,15 +12,16 @@ interface GrantedReward {
   granted_at: string;
 }
 
-const MILESTONES = [
-  { count: 1, icon: Gift, label: '1 referral', reward: '1 week free added' },
-  { count: 3, icon: Star, label: '3 referrals', reward: '1 month free added' },
-  { count: 5, icon: Crown, label: '5 referrals', reward: 'Lifetime access unlocked' },
-];
-
 export function ReferralSection({ defaultExpanded = false }: { defaultExpanded?: boolean }) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   
+  const MILESTONES = [
+    { count: 1, icon: Gift, label: t('referral.milestone1'), reward: t('referral.reward1') },
+    { count: 3, icon: Star, label: t('referral.milestone3'), reward: t('referral.reward3') },
+    { count: 5, icon: Crown, label: t('referral.milestone5'), reward: t('referral.reward5') },
+  ];
+
   const [referralCode, setReferralCode] = useState<string | null>(null);
   const [referralCount, setReferralCount] = useState(0);
   const [grantedRewards, setGrantedRewards] = useState<GrantedReward[]>([]);
@@ -46,7 +48,6 @@ export function ReferralSection({ defaultExpanded = false }: { defaultExpanded?:
 
       setReferralCount(count ?? 0);
 
-      // Load granted rewards
       const { data: rewards } = await supabase
         .from('referral_rewards')
         .select('milestone, reward_type, granted_at')
@@ -64,9 +65,9 @@ export function ReferralSection({ defaultExpanded = false }: { defaultExpanded?:
     const link = `${window.location.origin}/welcome?ref=${referralCode}`;
     await navigator.clipboard.writeText(link);
     setCopied(true);
-    toast('Referral link copied');
+    toast(t('referral.linkCopied'));
     setTimeout(() => setCopied(false), 2000);
-  }, [referralCode]);
+  }, [referralCode, t]);
 
   if (!referralCode) return null;
 
@@ -80,13 +81,13 @@ export function ReferralSection({ defaultExpanded = false }: { defaultExpanded?:
         onClick={() => setExpanded(!expanded)}
         className="text-xs font-mono text-muted-foreground underline"
       >
-        {expanded ? 'Hide referral link' : 'Invite friends'}
+        {expanded ? t('referral.hideLink') : t('referral.inviteFriends')}
       </button>
 
       {expanded && (
         <div className="space-y-4 animate-fade-in">
           <p className="text-xs text-muted-foreground leading-relaxed">
-            Share Holzen with someone who could use a moment of pause.
+            {t('referral.shareDescription')}
           </p>
 
           <button
@@ -103,14 +104,13 @@ export function ReferralSection({ defaultExpanded = false }: { defaultExpanded?:
             )}
           </button>
 
-          {/* Reward milestones */}
           <div className="space-y-3 rounded-md border border-border bg-muted/20 p-3">
             <div className="flex items-center justify-between">
               <p className="text-xs font-mono text-muted-foreground">
-                {referralCount} / {maxCount} referrals
+                {referralCount} / {maxCount} {t('referral.referrals')}
               </p>
               {referralCount >= maxCount && (
-                <span className="text-xs font-mono text-foreground">All rewards earned ✦</span>
+                <span className="text-xs font-mono text-foreground">{t('referral.allEarned')} ✦</span>
               )}
             </div>
             <Progress value={progressPercent} className="h-1" />
@@ -130,7 +130,7 @@ export function ReferralSection({ defaultExpanded = false }: { defaultExpanded?:
                     <Icon className={`h-3 w-3 shrink-0 ${reached ? 'text-foreground' : ''}`} />
                     <span className="flex-1">{milestone.reward}</span>
                     {granted ? (
-                      <span className="text-[10px] text-foreground/70">Earned ✓</span>
+                      <span className="text-[10px] text-foreground/70">{t('referral.earned')} ✓</span>
                     ) : reached ? (
                       <Check className="h-3 w-3 shrink-0" />
                     ) : null}
@@ -141,7 +141,10 @@ export function ReferralSection({ defaultExpanded = false }: { defaultExpanded?:
 
             {referralCount < maxCount && (
               <p className="text-[10px] text-muted-foreground/60 leading-relaxed">
-                {nextMilestone.count - referralCount} more {nextMilestone.count - referralCount === 1 ? 'referral' : 'referrals'} until: {nextMilestone.reward}
+                {t('referral.moreUntil', {
+                  count: nextMilestone.count - referralCount,
+                  reward: nextMilestone.reward,
+                })}
               </p>
             )}
           </div>

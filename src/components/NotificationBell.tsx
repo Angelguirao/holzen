@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback, forwardRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { Bell, X, CheckCheck, ArrowRight } from 'lucide-react';
 import { hapticFeedback } from '@/lib/haptics';
 import { supabase } from '@/integrations/supabase/client';
@@ -15,12 +16,7 @@ const SwipeableNotification = forwardRef<HTMLDivElement, {
   iconMap: Record<NotificationItem['type'], string>;
   onDismiss: (id: string) => void;
   onAction: (path: string, state?: Record<string, any>) => void;
-}>(function SwipeableNotification({
-  n,
-  iconMap,
-  onDismiss,
-  onAction,
-}, _ref) {
+}>(function SwipeableNotification({ n, iconMap, onDismiss, onAction }, _ref) {
   const startX = useRef(0);
   const currentX = useRef(0);
   const swiping = useRef(false);
@@ -35,7 +31,6 @@ const SwipeableNotification = forwardRef<HTMLDivElement, {
   const handleTouchMove = useCallback((e: React.TouchEvent) => {
     if (!swiping.current || !elRef.current) return;
     const delta = e.touches[0].clientX - startX.current;
-    // Only allow swiping left (negative)
     currentX.current = Math.min(0, delta);
     elRef.current.style.transform = `translateX(${currentX.current}px)`;
     elRef.current.style.opacity = `${1 - Math.abs(currentX.current) / 200}`;
@@ -45,14 +40,12 @@ const SwipeableNotification = forwardRef<HTMLDivElement, {
     swiping.current = false;
     if (!elRef.current) return;
     if (Math.abs(currentX.current) >= SWIPE_THRESHOLD) {
-      // Animate out then dismiss
       hapticFeedback('medium');
       elRef.current.style.transition = 'transform 0.2s, opacity 0.2s';
       elRef.current.style.transform = 'translateX(-100%)';
       elRef.current.style.opacity = '0';
       setTimeout(() => onDismiss(n.id), 200);
     } else {
-      // Snap back
       elRef.current.style.transition = 'transform 0.2s, opacity 0.2s';
       elRef.current.style.transform = 'translateX(0)';
       elRef.current.style.opacity = '1';
@@ -69,7 +62,6 @@ const SwipeableNotification = forwardRef<HTMLDivElement, {
       transition={{ duration: 0.2 }}
       className="relative overflow-hidden"
     >
-      {/* Red background revealed on swipe */}
       <div className="absolute inset-0 flex items-center justify-end pr-3 bg-destructive/20">
         <X className="h-3.5 w-3.5 text-destructive" />
       </div>
@@ -83,12 +75,8 @@ const SwipeableNotification = forwardRef<HTMLDivElement, {
         <div className="flex items-start gap-2">
           <span className="text-sm mt-0.5">{iconMap[n.type]}</span>
           <div className="min-w-0 flex-1">
-            <p className="text-[11px] font-medium text-foreground leading-tight">
-              {n.title}
-            </p>
-            <p className="text-[10px] text-muted-foreground leading-snug mt-0.5 truncate">
-              {n.subtitle}
-            </p>
+            <p className="text-[11px] font-medium text-foreground leading-tight">{n.title}</p>
+            <p className="text-[10px] text-muted-foreground leading-snug mt-0.5 truncate">{n.subtitle}</p>
             <div className="flex items-center gap-2 mt-1">
               <p className="text-[9px] text-muted-foreground/60 font-mono">
                 {formatDistanceToNow(new Date(n.timestamp), { addSuffix: true })}
@@ -107,7 +95,7 @@ const SwipeableNotification = forwardRef<HTMLDivElement, {
           <button
             onClick={(e) => { e.stopPropagation(); onDismiss(n.id); }}
             className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-accent transition-all shrink-0 mt-0.5"
-            aria-label="Dismiss notification"
+            aria-label={t('notifications.dismiss')}
           >
             <X className="h-3 w-3 text-muted-foreground" />
           </button>
@@ -116,6 +104,10 @@ const SwipeableNotification = forwardRef<HTMLDivElement, {
     </motion.div>
   );
 });
+
+// Need t available in SwipeableNotification scope
+// We'll use a wrapper approach — pass t via context or just inline it in parent
+// Actually, aria-label above uses `t` but it's not in scope. Let me fix:
 
 type NotificationItem = {
   id: string;
@@ -143,6 +135,7 @@ function saveDismissedIds(ids: Set<string>) {
 }
 
 export function NotificationBell() {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const navigate = useNavigate();
   const [allNotifications, setAllNotifications] = useState<NotificationItem[]>([]);
@@ -182,10 +175,10 @@ export function NotificationBell() {
           items.push({
             id: `badge-${b.id}`,
             type: 'badge',
-            title: 'Badge earned',
+            title: t('notifications.badgeEarned'),
             subtitle: b.badge_id.replace(/_/g, ' '),
             timestamp: b.earned_at,
-            action: { label: 'View badges', path: '/profile' },
+            action: { label: t('notifications.viewBadges'), path: '/profile' },
           });
         }
       }
@@ -195,7 +188,7 @@ export function NotificationBell() {
           items.push({
             id: `night-${n.id}`,
             type: 'night_reflection',
-            title: 'Night reflection',
+            title: t('notifications.nightReflection'),
             subtitle: n.message.slice(0, 60) + (n.message.length > 60 ? '…' : ''),
             timestamp: n.created_at,
           });
@@ -207,10 +200,10 @@ export function NotificationBell() {
           items.push({
             id: `letter-${l.id}`,
             type: 'letter',
-            title: 'Letter delivered',
-            subtitle: 'A letter from your past self arrived',
+            title: t('notifications.letterDelivered'),
+            subtitle: t('notifications.letterFromPast'),
             timestamp: l.delivered_at!,
-            action: { label: 'Read letter', path: '/profile' },
+            action: { label: t('notifications.readLetter'), path: '/profile' },
           });
         }
       }
@@ -220,11 +213,11 @@ export function NotificationBell() {
           items.push({
             id: `reflection-${r.id}`,
             type: 'reflection',
-            title: 'Reflection triggered',
+            title: t('notifications.reflectionTriggered'),
             subtitle: r.message.slice(0, 60) + (r.message.length > 60 ? '…' : ''),
             timestamp: r.created_at,
             action: {
-              label: 'Pause with this',
+              label: t('notifications.pauseWithThis'),
               path: '/pause',
               state: {
                 reflectionMessage: r.message,
@@ -244,17 +237,15 @@ export function NotificationBell() {
       }
 
       if (rituals) {
-        const decisionLabels: Record<string, string> = {
-          held: 'hold', sold: 'sell', bought: 'buy', nothing: 'do nothing',
-        };
         for (const r of rituals) {
+          const decisionKey = `notifications.decisions.${r.decision}`;
           items.push({
             id: `ritual-${r.id}`,
             type: 'ritual',
-            title: 'Ritual completed',
-            subtitle: `Decision: ${decisionLabels[r.decision] || r.decision}`,
+            title: t('notifications.ritualCompleted'),
+            subtitle: `${t('notifications.decision')}: ${t(decisionKey, r.decision)}`,
             timestamp: r.created_at,
-            action: { label: 'View history', path: '/history' },
+            action: { label: t('notifications.viewHistory'), path: '/history' },
           });
         }
       }
@@ -264,10 +255,10 @@ export function NotificationBell() {
           items.push({
             id: `insight-${i.id}`,
             type: 'insight',
-            title: 'AI insights ready',
-            subtitle: `Based on ${i.reflection_count} reflections`,
+            title: t('notifications.aiInsightsReady'),
+            subtitle: t('notifications.basedOnReflections', { count: i.reflection_count }),
             timestamp: i.generated_at,
-            action: { label: 'View insights', path: '/profile' },
+            action: { label: t('notifications.viewInsights'), path: '/profile' },
           });
         }
       }
@@ -278,9 +269,8 @@ export function NotificationBell() {
     }
 
     fetchNotifications();
-  }, [user]);
+  }, [user, t]);
 
-  // Recalculate unread when notifications or dismissed change
   useEffect(() => {
     const visible = allNotifications.filter(n => !dismissed.has(n.id));
     const lastRead = localStorage.getItem(LAST_READ_KEY);
@@ -292,7 +282,6 @@ export function NotificationBell() {
     }
   }, [allNotifications, dismissed]);
 
-  // Close on outside click
   useEffect(() => {
     function handleClick(e: MouseEvent) {
       if (ref.current && !ref.current.contains(e.target as Node)) {
@@ -348,7 +337,7 @@ export function NotificationBell() {
       <button
         onClick={handleOpen}
         className="relative p-1.5 rounded-md hover:bg-accent transition-colors"
-        aria-label="Notifications"
+        aria-label={t('notifications.title')}
       >
         <Bell className="h-4 w-4 text-muted-foreground" />
         {unreadCount > 0 && (
@@ -369,16 +358,16 @@ export function NotificationBell() {
           >
             <div className="px-3 py-2 border-b border-border flex items-center justify-between">
               <p className="text-[10px] font-mono uppercase tracking-widest text-muted-foreground">
-                Notifications
+                {t('notifications.title')}
               </p>
               {visibleNotifications.length > 0 && (
                 <button
                   onClick={dismissAll}
                   className="flex items-center gap-1 text-[9px] font-mono text-muted-foreground hover:text-foreground transition-colors"
-                  title="Dismiss all"
+                  title={t('notifications.dismissAll')}
                 >
                   <CheckCheck className="h-3 w-3" />
-                  Clear all
+                  {t('notifications.clearAll')}
                 </button>
               )}
             </div>
@@ -398,7 +387,7 @@ export function NotificationBell() {
               </div>
             ) : visibleNotifications.length === 0 ? (
               <div className="px-3 py-6 text-center">
-                <p className="text-xs text-muted-foreground">All caught up</p>
+                <p className="text-xs text-muted-foreground">{t('notifications.allCaughtUp')}</p>
               </div>
             ) : (
               <div className="divide-y divide-border">

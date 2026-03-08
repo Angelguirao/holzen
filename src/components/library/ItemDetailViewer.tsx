@@ -1,19 +1,9 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { Heart, ExternalLink, Tag, Link2, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import type { LibraryItem } from '@/hooks/use-library';
-
-const SOURCE_LABELS: Record<string, string> = {
-  reflection: 'Reflection',
-  reflection_note: 'Note',
-  signal: 'Signal',
-  learning: 'Learning',
-  haiku: 'Haiku',
-  zoom_out: 'Zoom Out',
-  history_insight: 'History',
-  external: 'External',
-};
 
 const TYPE_EMOJIS: Record<string, string> = {
   bookmark: '🔖',
@@ -32,12 +22,11 @@ interface Props {
 }
 
 function CompanionCard({ item, onSelect }: { item: LibraryItem; onSelect?: (item: LibraryItem) => void }) {
-  const sourceLabel = SOURCE_LABELS[item.source_type ?? ''] ?? item.source_type ?? 'Item';
+  const { t } = useTranslation();
+  const sourceLabel = t(`librarySources.${item.source_type}`, item.source_type ?? 'Item');
 
-  // Safely get string body (some items may have object bodies)
   const bodyText = typeof item.body === 'string' ? item.body : item.body ? JSON.stringify(item.body) : null;
 
-  // Try to parse zoom_out JSON for richer display
   const zoomOutData = useMemo(() => {
     if (item.source_type !== 'zoom_out' || !item.body) return null;
     try { return JSON.parse(item.body); } catch { return null; }
@@ -62,7 +51,7 @@ function CompanionCard({ item, onSelect }: { item: LibraryItem; onSelect?: (item
         <div className="space-y-1">
           {zoomOutData.onThisDay?.length > 0 && (
             <p className="text-[10px] font-mono text-muted-foreground/50">
-              {zoomOutData.onThisDay.length} historical data points
+              {t('itemDetail.historicalDataPoints', { count: zoomOutData.onThisDay.length })}
             </p>
           )}
           {zoomOutData.echo?.message && (
@@ -83,7 +72,7 @@ function CompanionCard({ item, onSelect }: { item: LibraryItem; onSelect?: (item
           {bodyText && <p className="text-[11px] text-muted-foreground/70 leading-relaxed line-clamp-3">{bodyText}</p>}
           {item.source_url && (
             <span className="inline-flex items-center gap-0.5 text-[9px] font-mono text-primary/60">
-              <ExternalLink className="h-2 w-2" /> source
+              <ExternalLink className="h-2 w-2" /> {t('itemDetail.source')}
             </span>
           )}
         </div>
@@ -93,12 +82,11 @@ function CompanionCard({ item, onSelect }: { item: LibraryItem; onSelect?: (item
           {bodyText && <p className="text-[11px] text-muted-foreground/70 leading-relaxed line-clamp-3">{bodyText}</p>}
           {item.source_url && (
             <span className="inline-flex items-center gap-0.5 text-[9px] font-mono text-primary/60">
-              <ExternalLink className="h-2 w-2" /> source
+              <ExternalLink className="h-2 w-2" /> {t('itemDetail.source')}
             </span>
           )}
         </div>
       )}
-      {/* Fallback for other types */}
       {!['haiku', 'zoom_out', 'history_insight', 'signal', 'learning', 'reflection'].includes(item.source_type ?? '') && bodyText && (
         <p className="text-[11px] text-muted-foreground/70 leading-relaxed line-clamp-3">{bodyText}</p>
       )}
@@ -107,13 +95,13 @@ function CompanionCard({ item, onSelect }: { item: LibraryItem; onSelect?: (item
 }
 
 export function ItemDetailViewer({ item, linkedItems, allItems, open, onClose, onToggleFavorite, onSelectItem }: Props) {
-  // For non-reflection items, find siblings (other items with same reflection_id)
+  const { t } = useTranslation();
+
   const siblings = useMemo(() => {
     if (!item?.reflection_id || !allItems) return [];
     return allItems.filter((i) => i.reflection_id === item.reflection_id && i.id !== item.id);
   }, [item, allItems]);
 
-  // Parse zoom_out JSON
   const zoomOutData = useMemo(() => {
     if (item?.source_type !== 'zoom_out' || !item?.body) return null;
     try { return JSON.parse(item.body); } catch { return null; }
@@ -123,7 +111,7 @@ export function ItemDetailViewer({ item, linkedItems, allItems, open, onClose, o
 
   const companions = linkedItems && linkedItems.length > 0 ? linkedItems : siblings;
   const isReflection = item.source_type === 'reflection';
-  const sourceLabel = SOURCE_LABELS[item.source_type ?? ''] ?? item.source_type ?? 'Item';
+  const sourceLabel = t(`librarySources.${item.source_type}`, item.source_type ?? 'Item');
 
   return (
     <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
@@ -133,7 +121,7 @@ export function ItemDetailViewer({ item, linkedItems, allItems, open, onClose, o
             <div className="flex items-center gap-2">
               <span className="text-base">{TYPE_EMOJIS[item.type] ?? '📄'}</span>
               <SheetTitle className="text-sm font-mono">
-                {isReflection ? 'Reflection' : sourceLabel}
+                {isReflection ? t('librarySources.reflection') : sourceLabel}
               </SheetTitle>
             </div>
             <button
@@ -146,7 +134,6 @@ export function ItemDetailViewer({ item, linkedItems, allItems, open, onClose, o
         </SheetHeader>
 
         <div className="space-y-4 pb-6">
-          {/* Metadata */}
           <div className="flex items-center gap-1.5 flex-wrap">
             <span className="text-[9px] font-mono text-muted-foreground/50 flex items-center gap-1">
               <Clock className="h-2.5 w-2.5" />
@@ -159,12 +146,10 @@ export function ItemDetailViewer({ item, linkedItems, allItems, open, onClose, o
             )}
           </div>
 
-          {/* Title */}
           {item.title && typeof item.title === 'string' && !(isReflection && item.title === 'Reflection') && (
             <p className="text-sm font-medium text-foreground leading-snug">{item.title}</p>
           )}
 
-          {/* Body — full content */}
           {(() => {
             const bodyStr = typeof item.body === 'string' ? item.body : item.body ? JSON.stringify(item.body) : null;
             if (item.source_type === 'haiku' && bodyStr) {
@@ -179,10 +164,10 @@ export function ItemDetailViewer({ item, linkedItems, allItems, open, onClose, o
                 <div className="space-y-3">
                   {zoomOutData.onThisDay?.length > 0 && (
                     <div className="space-y-1.5">
-                      <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">On this day</p>
+                      <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">{t('itemDetail.onThisDay')}</p>
                       {[...zoomOutData.onThisDay].reverse().map((entry: any) => (
                         <div key={entry.yearsAgo} className="flex items-center justify-between gap-2 text-xs font-mono">
-                          <span className="text-muted-foreground/60 w-14 shrink-0">{entry.yearsAgo}y ago</span>
+                          <span className="text-muted-foreground/60 w-14 shrink-0">{t('itemDetail.yearsAgo', { count: entry.yearsAgo })}</span>
                           <span className="text-muted-foreground tabular-nums">${entry.price?.toLocaleString()}</span>
                         </div>
                       ))}
@@ -190,13 +175,13 @@ export function ItemDetailViewer({ item, linkedItems, allItems, open, onClose, o
                   )}
                   {zoomOutData.echo?.message && (
                     <div className="space-y-1 border-l-2 border-border/40 pl-3">
-                      <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Echo</p>
+                      <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">{t('itemDetail.echo')}</p>
                       <p className="text-xs text-muted-foreground leading-relaxed italic">"{zoomOutData.echo.message}"</p>
                     </div>
                   )}
                   {zoomOutData.deepTime && (
                     <div className="space-y-1">
-                      <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Deep Time</p>
+                      <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">{t('itemDetail.deepTime')}</p>
                       {typeof zoomOutData.deepTime === 'string' ? (
                         <p className="text-xs text-muted-foreground leading-relaxed">{zoomOutData.deepTime}</p>
                       ) : (
@@ -216,7 +201,6 @@ export function ItemDetailViewer({ item, linkedItems, allItems, open, onClose, o
             return null;
           })()}
 
-          {/* Source URL */}
           {item.source_url && (
             <a
               href={item.source_url}
@@ -225,11 +209,10 @@ export function ItemDetailViewer({ item, linkedItems, allItems, open, onClose, o
               className="inline-flex items-center gap-1 text-[10px] font-mono text-primary/70 hover:text-primary transition-colors"
             >
               <ExternalLink className="h-3 w-3" />
-              View source
+              {t('itemDetail.viewSource')}
             </a>
           )}
 
-          {/* Tags */}
           {item.tags.length > 0 && (
             <div className="flex items-center gap-1.5 flex-wrap">
               {item.tags.map((tag) => (
@@ -240,13 +223,12 @@ export function ItemDetailViewer({ item, linkedItems, allItems, open, onClose, o
             </div>
           )}
 
-          {/* Linked companions */}
           {companions.length > 0 && (
             <div className="space-y-2 pt-2 border-t border-border/40">
               <div className="flex items-center gap-1.5">
                 <Link2 className="h-3 w-3 text-muted-foreground/40" />
                 <p className="text-[10px] font-mono text-muted-foreground/50 uppercase tracking-wider">
-                  {isReflection ? 'Companions' : 'Related items'}
+                  {isReflection ? t('itemDetail.companions') : t('itemDetail.relatedItems')}
                 </p>
               </div>
               <div className="space-y-1.5">
