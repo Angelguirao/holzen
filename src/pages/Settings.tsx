@@ -252,6 +252,16 @@ const Settings = () => {
             onCheckedChange={(v) => setCompanionPref('signal', v)}
           />
         </div>
+        <div className="flex items-center justify-between">
+          <Label htmlFor="comp-zoomout" className="text-xs font-mono text-muted-foreground">
+            Zoom out
+          </Label>
+          <Switch
+            id="comp-zoomout"
+            checked={companionPrefs.zoomOut}
+            onCheckedChange={(v) => setCompanionPref('zoomOut', v)}
+          />
+        </div>
       </div>
 
       <Separator />
