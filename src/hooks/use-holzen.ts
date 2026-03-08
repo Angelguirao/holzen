@@ -25,6 +25,7 @@ export function useHolzen() {
   const [aiInsightsEnabled, setAiInsightsEnabledState] = useState(true);
   const [ritualTemplate, setRitualTemplateState] = useState<string>('standard');
   const [nightReflectionHour, setNightReflectionHourState] = useState<number | null>(21);
+  const [notifyBadges, setNotifyBadgesState] = useState(true);
   const [btcData, setBtcData] = useState<BtcPriceData | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [context, setContext] = useState<string | null>(null);
