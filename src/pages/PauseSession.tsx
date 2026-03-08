@@ -243,6 +243,13 @@ export default function PauseSession() {
                     </RevealSection>
                   )}
 
+                  {/* Mood check-in */}
+                  {!moodDone && (
+                    <RevealSection>
+                      <MoodCheck onSelect={handleMoodSelect} onSkip={handleMoodSkip} />
+                    </RevealSection>
+                  )}
+
                   {/* Companions */}
                   <RevealSection>
                     <CompanionSection
