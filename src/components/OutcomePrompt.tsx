@@ -38,11 +38,13 @@ export function OutcomePrompt({ reflectionId, onComplete }: Props) {
 
   const handleSelect = async (outcome: string) => {
     setSaving(true);
+    hapticFeedback('medium');
     await supabase
       .from('reflections')
       .update({ outcome })
       .eq('id', reflectionId);
     setSaved(true);
+    hapticFeedback('success');
     setTimeout(() => onComplete(), 1800);
   };
 
