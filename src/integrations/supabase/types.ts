@@ -151,6 +151,7 @@ export type Database = {
           ai_insights_enabled: boolean
           companion_breathing: boolean
           companion_haiku: boolean
+          companion_history: boolean
           companion_learning: boolean
           companion_signal: boolean
           companion_zoom_out: boolean
@@ -187,6 +188,7 @@ export type Database = {
           ai_insights_enabled?: boolean
           companion_breathing?: boolean
           companion_haiku?: boolean
+          companion_history?: boolean
           companion_learning?: boolean
           companion_signal?: boolean
           companion_zoom_out?: boolean
@@ -223,6 +225,7 @@ export type Database = {
           ai_insights_enabled?: boolean
           companion_breathing?: boolean
           companion_haiku?: boolean
+          companion_history?: boolean
           companion_learning?: boolean
           companion_signal?: boolean
           companion_zoom_out?: boolean

@@ -262,6 +262,16 @@ const Settings = () => {
             onCheckedChange={(v) => setCompanionPref('zoomOut', v)}
           />
         </div>
+        <div className="flex items-center justify-between">
+          <Label htmlFor="comp-history" className="text-xs font-mono text-muted-foreground">
+            Historical insight
+          </Label>
+          <Switch
+            id="comp-history"
+            checked={companionPrefs.history}
+            onCheckedChange={(v) => setCompanionPref('history', v)}
+          />
+        </div>
       </div>
 
       <Separator />

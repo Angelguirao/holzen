@@ -231,7 +231,7 @@ const Home = () => {
               <ReflectionMessage
                 message={message} context={context} onDismiss={handleDismiss}
                 companions={companions}
-                companionPrefs={{ breathing: companionPrefs.breathing, haiku: false, learning: false, signal: false, zoomOut: false }}
+                companionPrefs={{ breathing: companionPrefs.breathing, haiku: false, learning: false, signal: false, zoomOut: false, history: false }}
                 severity={severity} reflectionId={lastReflectionId}
               />
             </motion.div>
