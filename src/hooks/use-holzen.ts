@@ -393,6 +393,10 @@ export function useHolzen() {
         const cumulativeTriggered = data.cumulativeChangePercent !== undefined && Math.abs(data.cumulativeChangePercent) >= cumulativeThreshold;
 
         if (dailyTriggered || cumulativeTriggered) {
+          // Optimistically set cooldown BEFORE AI call to prevent duplicate triggers
+          const nowIso = new Date().toISOString();
+          await supabase.from('profiles').update({ last_trigger_at: nowIso }).eq('user_id', user.id);
+          setLastTriggerAt(nowIso);
           await generateMessage(data);
         }
       }
