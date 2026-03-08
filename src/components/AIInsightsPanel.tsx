@@ -112,7 +112,7 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
     } finally {
       setGenerating(false);
     }
-  }, [user, loadInsights]);
+  }, [user, language, loadInsights]);
 
   if (reflectionCount < 5) {
     return (
