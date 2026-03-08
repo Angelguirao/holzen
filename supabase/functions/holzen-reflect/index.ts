@@ -107,12 +107,12 @@ serve(async (req) => {
     const langCode = language || "en";
     const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
     const langName = LANG_NAMES[langCode] || "English";
-    const langInstruction = langCode !== "en" ? `\n\nLANGUAGE: You MUST write ALL output (reflection, haiku, learning title, learning body) in ${langName}. Do not use English.` : "";
-    const systemPrompt = `You generate a reflection with optional companions in response to Bitcoin volatility.
+    const langInstruction = langCode !== "en" ? `CRITICAL LANGUAGE REQUIREMENT: You MUST write ALL output (reflection, haiku, learning title, learning body) in ${langName}. Do not use English for any generated text.\n\n` : "";
+    const systemPrompt = `${langInstruction}You generate a reflection with optional companions in response to Bitcoin volatility.
 
 You MUST respond by calling the "generate_reflection" function. Do not respond with plain text.
 
-Tone: ${baseTone}${langInstruction}
+Tone: ${baseTone}
 ${adaptiveContext}
 
 CURRENCY: The user views BTC prices in ${currencyCode}. When mentioning any price or monetary value, format it in ${currencyCode} (e.g. use the appropriate currency symbol). Never use USD unless the user's currency IS USD.

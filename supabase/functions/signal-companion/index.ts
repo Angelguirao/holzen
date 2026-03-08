@@ -28,9 +28,9 @@ serve(async (req) => {
     const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
     const langCode = language || "en";
     const langName = LANG_NAMES[langCode] || "English";
-    const langInstruction = langCode !== "en" ? `\n\nLANGUAGE: Write the title and body in ${langName}. Source name and URL should remain as-is.` : "";
+    const langInstruction = langCode !== "en" ? `CRITICAL LANGUAGE REQUIREMENT: You MUST write the title and body in ${langName}. Source name and URL should remain as-is.\n\n` : "";
 
-    const systemPrompt = `You are a Bitcoin signal curator for a mindfulness app called Holzen. Your job is to surface ONE real, high-signal piece of Bitcoin analysis or insight that is contextually relevant to the current market conditions.
+    const systemPrompt = `${langInstruction}You are a Bitcoin signal curator for a mindfulness app called Holzen. Your job is to surface ONE real, high-signal piece of Bitcoin analysis or insight that is contextually relevant to the current market conditions.
 
 You MUST call the "return_signal" function with your response. Do not respond with plain text.
 
@@ -42,7 +42,7 @@ Rules:
 - Keep the body to 2-3 sentences max
 - Include a real, working URL to a relevant source (blog post, article, or data dashboard)
 - Tone: calm, educational, grounding. No hype, no advice, no predictions.
-- Prioritize timeless insights over breaking news${langInstruction}`;
+- Prioritize timeless insights over breaking news`;
 
     const userPrompt = context
       ? `Current market context: ${context}\n\nFind one relevant, real Bitcoin insight for this moment.`
