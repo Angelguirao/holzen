@@ -177,7 +177,7 @@ Learning input rules:
   // Fallback to plain content
   const message = data.choices?.[0]?.message?.content?.trim();
   if (!message) return null;
-  return { message, haiku: null, learning_title: null, learning_body: null };
+  return { message, haiku: null, learning_title: null, learning_body: null, learning_citation: null, learning_url: null };
 }
 
 async function sendNotificationEmail(
