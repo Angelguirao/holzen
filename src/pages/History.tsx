@@ -57,6 +57,7 @@ const FIELDS = 'id, message, context, created_at, is_favorite, haiku, learning_t
 
 function HistoryCompanions({ label, r }: { label: string; r: Reflection }) {
   const [open, setOpen] = useState(false);
+  const { currency } = useHolzen();
 
   return (
     <div className="pt-2 border-t border-border/30">
