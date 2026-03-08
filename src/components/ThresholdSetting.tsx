@@ -2,6 +2,7 @@ import { useState, useEffect, forwardRef } from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import { ArrowUp, ArrowDown } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   thresholdUp: number;
@@ -16,6 +17,7 @@ export const ThresholdSetting = forwardRef<HTMLDivElement, Props>(function Thres
   { thresholdUp, onSetUp, thresholdDown, onSetDown, cumulativeThreshold, onSetCumulative },
   ref
 ) {
+  const { t } = useTranslation();
   const [upVal, setUpVal] = useState(thresholdUp);
   const [downVal, setDownVal] = useState(thresholdDown);
   const [cumVal, setCumVal] = useState(cumulativeThreshold);
@@ -31,10 +33,10 @@ export const ThresholdSetting = forwardRef<HTMLDivElement, Props>(function Thres
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <ArrowUp className="h-3.5 w-3.5 text-primary" />
-            <p className="text-sm text-muted-foreground font-mono">Price rises threshold</p>
+            <p className="text-sm text-muted-foreground font-mono">{t('threshold.priceRises')}</p>
           </div>
           <p className="text-3xl font-mono tracking-tight">{upVal.toFixed(1)}%</p>
-          <p className="text-sm text-muted-foreground">trigger when BTC rises this much in 24h</p>
+          <p className="text-sm text-muted-foreground">{t('threshold.triggerRises')}</p>
         </div>
 
         <Slider
@@ -53,11 +55,11 @@ export const ThresholdSetting = forwardRef<HTMLDivElement, Props>(function Thres
             onClick={() => { setUpVal(5); onSetUp(5); }}
             className="font-mono text-xs"
           >
-            Reset
+            {t('common.reset')}
           </Button>
           {upVal !== thresholdUp && (
             <Button size="sm" onClick={() => onSetUp(upVal)} className="font-mono text-xs">
-              Confirm
+              {t('threshold.confirm')}
             </Button>
           )}
         </div>
@@ -68,10 +70,10 @@ export const ThresholdSetting = forwardRef<HTMLDivElement, Props>(function Thres
         <div className="space-y-2">
           <div className="flex items-center gap-2">
             <ArrowDown className="h-3.5 w-3.5 text-destructive" />
-            <p className="text-sm text-muted-foreground font-mono">Price drops threshold</p>
+            <p className="text-sm text-muted-foreground font-mono">{t('threshold.priceDrops')}</p>
           </div>
           <p className="text-3xl font-mono tracking-tight">{downVal.toFixed(1)}%</p>
-          <p className="text-sm text-muted-foreground">trigger when BTC drops this much in 24h</p>
+          <p className="text-sm text-muted-foreground">{t('threshold.triggerDrops')}</p>
         </div>
 
         <Slider
@@ -90,11 +92,11 @@ export const ThresholdSetting = forwardRef<HTMLDivElement, Props>(function Thres
             onClick={() => { setDownVal(5); onSetDown(5); }}
             className="font-mono text-xs"
           >
-            Reset
+            {t('common.reset')}
           </Button>
           {downVal !== thresholdDown && (
             <Button size="sm" onClick={() => onSetDown(downVal)} className="font-mono text-xs">
-              Confirm
+              {t('threshold.confirm')}
             </Button>
           )}
         </div>
@@ -103,9 +105,9 @@ export const ThresholdSetting = forwardRef<HTMLDivElement, Props>(function Thres
       {/* Cumulative threshold */}
       <div className="space-y-4">
         <div className="space-y-2">
-          <p className="text-sm text-muted-foreground font-mono">7-day cumulative threshold</p>
+          <p className="text-sm text-muted-foreground font-mono">{t('threshold.cumulative')}</p>
           <p className="text-3xl font-mono tracking-tight">{cumVal.toFixed(1)}%</p>
-          <p className="text-sm text-muted-foreground">rolling 7-day window</p>
+          <p className="text-sm text-muted-foreground">{t('threshold.rolling7day')}</p>
         </div>
 
         <Slider
@@ -124,11 +126,11 @@ export const ThresholdSetting = forwardRef<HTMLDivElement, Props>(function Thres
             onClick={() => { setCumVal(15); onSetCumulative(15); }}
             className="font-mono text-xs"
           >
-            Reset
+            {t('common.reset')}
           </Button>
           {cumVal !== cumulativeThreshold && (
             <Button size="sm" onClick={() => onSetCumulative(cumVal)} className="font-mono text-xs">
-              Confirm
+              {t('threshold.confirm')}
             </Button>
           )}
         </div>

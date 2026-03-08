@@ -2,6 +2,7 @@ import { Eye, EyeOff, WifiOff, Bitcoin } from 'lucide-react';
 import { BtcChart } from '@/components/BtcChart';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatBtcPrice, type BtcPriceData } from '@/lib/btc';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   data: BtcPriceData | null;
@@ -14,6 +15,7 @@ interface Props {
 }
 
 export function BtcStatus({ data, error, hidden, onToggleHidden, currency = 'USD', btcMode = false, onToggleBtcMode }: Props) {
+  const { t } = useTranslation();
   const toggle = onToggleHidden;
 
   if (error) {
@@ -21,10 +23,10 @@ export function BtcStatus({ data, error, hidden, onToggleHidden, currency = 'USD
       <div className="space-y-2">
         <div className="flex items-center gap-2 text-muted-foreground">
           <WifiOff className="h-3.5 w-3.5" />
-          <p className="text-xs font-mono">Unable to fetch price data</p>
+          <p className="text-xs font-mono">{t('btcStatus.unableToFetch')}</p>
         </div>
         <p className="text-[10px] font-mono text-muted-foreground/60">
-          Check your connection and try again
+          {t('btcStatus.checkConnection')}
         </p>
       </div>
     );
@@ -54,8 +56,8 @@ export function BtcStatus({ data, error, hidden, onToggleHidden, currency = 'USD
                 <button
                   onClick={onToggleBtcMode}
                   className="text-primary/60 hover:text-primary transition-colors"
-                  aria-label="Exit 1 BTC = 1 BTC mode"
-                  title="Exit 1 BTC = 1 BTC mode"
+                  aria-label={t('btcStatus.exitBtcMode')}
+                  title={t('btcStatus.exitBtcMode')}
                 >
                   <Bitcoin className="h-3.5 w-3.5" />
                 </button>
@@ -63,7 +65,7 @@ export function BtcStatus({ data, error, hidden, onToggleHidden, currency = 'USD
               <button
                 onClick={toggle}
                 className="text-muted-foreground hover:text-foreground transition-colors"
-                aria-label={hidden ? 'Show' : 'Hide'}
+                aria-label={hidden ? t('btcStatus.show') : t('btcStatus.hide')}
               >
                 {hidden ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
               </button>
@@ -78,12 +80,11 @@ export function BtcStatus({ data, error, hidden, onToggleHidden, currency = 'USD
             <>
               <p className="text-2xl font-mono tracking-tight text-foreground/80">1 BTC = 1 BTC</p>
               <p className="text-[10px] font-mono text-muted-foreground/40 leading-relaxed">
-                Price is noise. Value is constant.
+                {t('btcStatus.priceIsNoise')}
               </p>
             </>
           )}
         </div>
-        {/* No chart in BTC mode — no fiat reference */}
       </div>
     );
   }
@@ -111,7 +112,7 @@ export function BtcStatus({ data, error, hidden, onToggleHidden, currency = 'USD
               <button
                 onClick={onToggleBtcMode}
                 className="text-muted-foreground/40 hover:text-primary transition-colors"
-                aria-label="Enter 1 BTC = 1 BTC mode"
+                aria-label={t('btcStatus.enterBtcMode')}
                 title="1 BTC = 1 BTC"
               >
                 <Bitcoin className="h-3.5 w-3.5" />
@@ -120,7 +121,7 @@ export function BtcStatus({ data, error, hidden, onToggleHidden, currency = 'USD
             <button
               onClick={toggle}
               className="text-muted-foreground hover:text-foreground transition-colors"
-              aria-label={hidden ? 'Show price' : 'Hide price'}
+              aria-label={hidden ? t('btcStatus.showPrice') : t('btcStatus.hidePrice')}
             >
               {hidden ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
             </button>
@@ -136,7 +137,7 @@ export function BtcStatus({ data, error, hidden, onToggleHidden, currency = 'USD
             <p className="text-2xl font-mono tracking-tight">{price}</p>
             <div className="flex items-center gap-3">
               <p className="text-sm font-mono text-muted-foreground">
-                {dir}{pct}% in 24h
+                {dir}{pct}% {t('btcStatus.in24h')}
               </p>
               {data.fearGreed && (
                 <p className={`text-[10px] font-mono ${fearGreedColor}`}>

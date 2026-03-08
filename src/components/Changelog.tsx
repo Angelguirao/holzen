@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, forwardRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
+import { useTranslation } from 'react-i18next';
 import {
   AlertDialog,
   AlertDialogContent,
@@ -23,6 +24,7 @@ interface ChangelogEntry {
 }
 
 export const Changelog = forwardRef<HTMLDivElement, object>(function Changelog(_props, ref) {
+  const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [entries, setEntries] = useState<ChangelogEntry[]>([]);
   const [loading, setLoading] = useState(false);
@@ -70,14 +72,14 @@ export const Changelog = forwardRef<HTMLDivElement, object>(function Changelog(_
         onClick={() => setOpen(true)}
         className="text-xs font-mono text-muted-foreground underline"
       >
-        What's new
+        {t('changelog.whatsNew')}
       </button>
 
       <AlertDialog open={open} onOpenChange={setOpen}>
         <AlertDialogContent className="max-h-[80vh] overflow-y-auto">
           <AlertDialogHeader>
-            <AlertDialogTitle className="font-mono text-sm">Changelog</AlertDialogTitle>
-            <AlertDialogDescription className="sr-only">Version history</AlertDialogDescription>
+            <AlertDialogTitle className="font-mono text-sm">{t('changelog.title')}</AlertDialogTitle>
+            <AlertDialogDescription className="sr-only">{t('changelog.versionHistory')}</AlertDialogDescription>
           </AlertDialogHeader>
 
           {loading ? (
@@ -109,13 +111,13 @@ export const Changelog = forwardRef<HTMLDivElement, object>(function Changelog(_
               ))}
               <div ref={sentinelRef} className="h-1" />
               {loadingMore && (
-                <p className="text-[10px] font-mono text-muted-foreground animate-pulse text-center">Loading more…</p>
+                <p className="text-[10px] font-mono text-muted-foreground animate-pulse text-center">{t('common.loadingMore')}</p>
               )}
             </div>
           )}
 
           <AlertDialogFooter>
-            <AlertDialogAction className="font-mono text-xs">Close</AlertDialogAction>
+            <AlertDialogAction className="font-mono text-xs">{t('changelog.close')}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

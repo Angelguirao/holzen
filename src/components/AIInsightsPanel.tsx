@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useHolzen } from '@/hooks/use-holzen';
+import { useTranslation } from 'react-i18next';
 import { RefreshCw, TrendingUp, Clock, Brain, Sparkles, Target, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -50,6 +51,7 @@ interface Props {
 }
 
 export function AIInsightsPanel({ reflectionCount }: Props) {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { language } = useHolzen();
   const [allData, setAllData] = useState<InsightsRow[]>([]);
@@ -106,20 +108,20 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
       });
       if (error) throw error;
       await loadInsights();
-      toast('Insights generated');
+      toast(t('aiInsights.generated'));
     } catch {
-      toast('Failed to generate insights');
+      toast(t('aiInsights.failedToGenerate'));
     } finally {
       setGenerating(false);
     }
-  }, [user, language, loadInsights]);
+  }, [user, language, loadInsights, t]);
 
   if (reflectionCount < 5) {
     return (
       <div className="py-8 text-center space-y-2">
         <Brain className="h-5 w-5 mx-auto text-muted-foreground/40" />
         <p className="text-xs text-muted-foreground">
-          Need at least 5 reflections to generate insights. You have {reflectionCount}.
+          {t('aiInsights.needMinReflections', { count: reflectionCount })}
         </p>
       </div>
     );
@@ -141,10 +143,9 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
 
   return (
     <div className="space-y-4">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
-          AI Pattern Analysis
+          {t('aiInsights.title')}
         </p>
         <Button
           variant="ghost"
@@ -158,39 +159,35 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
           ) : (
             <RefreshCw className="h-3 w-3" />
           )}
-          {generating ? 'Analyzing…' : latest ? 'Refresh' : 'Generate'}
+          {generating ? t('aiInsights.analyzing') : latest ? t('aiInsights.refresh') : t('aiInsights.generate')}
         </Button>
       </div>
 
-      {/* No insights yet */}
       {allData.length === 0 && !generating && (
         <div className="py-6 text-center space-y-3">
           <Brain className="h-5 w-5 mx-auto text-muted-foreground/40" />
           <p className="text-xs text-muted-foreground">
-            No insights generated yet. Click "Generate" to analyze your reflection patterns.
+            {t('aiInsights.noInsightsYet')}
           </p>
         </div>
       )}
 
-      {/* Generating state */}
       {generating && allData.length === 0 && (
         <div className="py-6 text-center space-y-3">
           <Loader2 className="h-5 w-5 mx-auto text-muted-foreground animate-spin" />
           <p className="text-xs font-mono text-muted-foreground">
-            Analyzing {reflectionCount} reflections…
+            {t('aiInsights.analyzingCount', { count: reflectionCount })}
           </p>
         </div>
       )}
 
-      {/* All insight sets, newest first */}
       {allData.map((row, rowIdx) => (
         <div key={row.id} className="space-y-2.5">
-          {/* Date header for each generation */}
           <div className="flex items-center justify-between pt-1">
             <p className="text-[9px] font-mono text-muted-foreground/50">
               {format(new Date(row.generated_at), 'MMM d, yyyy · h:mm a')}
               {rowIdx === 0 && isStale && (
-                <span className="ml-2 text-primary/50">Refresh recommended</span>
+                <span className="ml-2 text-primary/50">{t('aiInsights.refreshRecommended')}</span>
               )}
             </p>
             <div className="flex items-center gap-2">
@@ -200,7 +197,7 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
                 </span>
               )}
               <p className="text-[9px] font-mono text-muted-foreground/30">
-                {row.reflection_count} reflections
+                {t('aiInsights.reflectionsCount', { count: row.reflection_count })}
               </p>
             </div>
           </div>
@@ -229,10 +226,9 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
         </div>
       ))}
 
-      {/* Infinite scroll sentinel */}
       <div ref={sentinelRef} className="h-1" />
       {loadingMore && (
-        <p className="text-[10px] font-mono text-muted-foreground animate-pulse text-center">Loading more…</p>
+        <p className="text-[10px] font-mono text-muted-foreground animate-pulse text-center">{t('common.loadingMore')}</p>
       )}
     </div>
   );

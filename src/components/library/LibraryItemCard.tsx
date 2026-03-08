@@ -4,23 +4,6 @@ import type { LibraryItem, Collection } from '@/hooks/use-library';
 import { useTranslation } from 'react-i18next';
 import { AddToCollectionButton } from './AddToCollectionButton';
 
-const SOURCE_LABELS: Record<string, string> = {
-  reflection: 'Reflection',
-  reflection_note: 'Note',
-  signal: 'Signal',
-  learning: 'Learning',
-  haiku: 'Haiku',
-  zoom_out: 'Zoom Out',
-  history_insight: 'History',
-  external: 'External',
-};
-
-const TYPE_LABELS: Record<string, string> = {
-  bookmark: '🔖',
-  note: '📝',
-  clipping: '✂️',
-};
-
 interface Props {
   item: LibraryItem;
   onTogglePin: (id: string) => void;
@@ -35,6 +18,12 @@ interface Props {
   onRemoveFromCollection?: (collectionId: string, itemId: string) => Promise<void>;
   onClick?: () => void;
 }
+
+const TYPE_LABELS: Record<string, string> = {
+  bookmark: '🔖',
+  note: '📝',
+  clipping: '✂️',
+};
 
 export function LibraryItemCard({
   item, onTogglePin, onToggleFavorite, onDelete, onStatusChange, onUpdateTags, linkedItems,
@@ -72,11 +61,12 @@ export function LibraryItemCard({
     }
   };
 
+  const sourceLabel = t(`librarySources.${item.source_type}`, item.source_type ?? '');
+
   return (
     <div
       className="group rounded-md border border-border/40 bg-card/50 px-3 py-2.5 space-y-1.5 transition-colors hover:bg-card/80 cursor-pointer"
       onClick={(e) => {
-        // Don't open viewer when clicking buttons/inputs
         if ((e.target as HTMLElement).closest('button, input, a')) return;
         onClick?.();
       }}
@@ -97,7 +87,7 @@ export function LibraryItemCard({
           <button
             onClick={() => onToggleFavorite(item.id)}
             className={`p-1 transition-colors ${item.is_favorite ? 'text-destructive' : 'text-muted-foreground/50 hover:text-destructive'}`}
-            aria-label={item.is_favorite ? 'Remove from favorites' : 'Add to favorites'}
+            aria-label={item.is_favorite ? t('libraryCard.removeFavorite') : t('libraryCard.addFavorite')}
           >
             <Heart className={`h-3 w-3 ${item.is_favorite ? 'fill-current' : ''}`} />
           </button>
@@ -105,14 +95,14 @@ export function LibraryItemCard({
           <button
             onClick={() => onStatusChange(item.id, isUnread ? 'read' : 'unread')}
             className="p-1 text-muted-foreground/50 hover:text-foreground transition-colors"
-            aria-label={isUnread ? 'Mark read' : 'Mark unread'}
+            aria-label={isUnread ? t('libraryCard.markRead') : t('libraryCard.markUnread')}
           >
             {isUnread ? <Eye className="h-3 w-3" /> : <EyeOff className="h-3 w-3" />}
           </button>
           <button
             onClick={() => onStatusChange(item.id, 'archived')}
             className="p-1 text-muted-foreground/50 hover:text-foreground transition-colors"
-            aria-label="Archive"
+            aria-label={t('libraryCard.archive')}
           >
             <Archive className="h-3 w-3" />
           </button>
@@ -146,22 +136,22 @@ export function LibraryItemCard({
       <div className="flex items-center gap-1.5 flex-wrap">
         {isUnread && (
           <span className="text-[9px] font-mono px-1 py-0.5 rounded bg-primary/15 text-primary">
-            unread
+            {t('libraryCard.unread')}
           </span>
         )}
         {item.status === 'archived' && (
           <span className="text-[9px] font-mono px-1 py-0.5 rounded bg-muted text-muted-foreground/50">
-            archived
+            {t('libraryCard.archived')}
           </span>
         )}
         {item.pinned && (
           <span className="text-[9px] font-mono px-1 py-0.5 rounded bg-primary/10 text-primary">
-            pinned
+            {t('common.pinned')}
           </span>
         )}
         {item.source_type && (
           <span className="text-[9px] font-mono px-1 py-0.5 rounded bg-muted text-muted-foreground">
-            {SOURCE_LABELS[item.source_type] ?? item.source_type}
+            {sourceLabel}
           </span>
         )}
         {item.source_url && (
@@ -172,7 +162,7 @@ export function LibraryItemCard({
             className="inline-flex items-center gap-0.5 text-[9px] font-mono text-muted-foreground/50 hover:text-foreground transition-colors"
           >
             <ExternalLink className="h-2.5 w-2.5" />
-            link
+            {t('libraryCard.link')}
           </a>
         )}
         {itemCollections && itemCollections.length > 0 && itemCollections.map((col) => (
@@ -202,7 +192,7 @@ export function LibraryItemCard({
             className="inline-flex items-center gap-0.5 text-[9px] font-mono text-muted-foreground/40 hover:text-muted-foreground transition-colors"
           >
             <Tag className="h-2.5 w-2.5" />
-            {item.tags.length === 0 && !editingTags ? 'tag' : editingTags ? 'done' : '+'}
+            {item.tags.length === 0 && !editingTags ? t('libraryCard.tag') : editingTags ? t('common.done') : '+'}
           </button>
         )}
       </div>
@@ -214,13 +204,12 @@ export function LibraryItemCard({
             value={tagInput}
             onChange={(e) => setTagInput(e.target.value)}
             onKeyDown={handleTagKeyDown}
-            placeholder="Type a tag + Enter…"
+            placeholder={t('libraryCard.tagPlaceholder')}
             className="w-full text-[10px] font-mono px-2 py-1 rounded border border-border/60 bg-background text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/40 transition-colors"
           />
         </div>
       )}
 
-      {/* Linked companions */}
       {linkedItems && linkedItems.length > 0 && (
         <div className="px-3 pb-2 flex items-center gap-1.5 flex-wrap">
           <Link2 className="h-2.5 w-2.5 text-muted-foreground/30" />
@@ -229,7 +218,7 @@ export function LibraryItemCard({
               key={li.id}
               className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground/60"
             >
-              {SOURCE_LABELS[li.source_type ?? ''] ?? li.source_type}
+              {t(`librarySources.${li.source_type}`, li.source_type ?? '')}
             </span>
           ))}
         </div>
