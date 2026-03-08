@@ -363,7 +363,7 @@ const Home = () => {
                 <>
                   {!subscribed && trialRemaining !== undefined && trialRemaining > 0 && (
                     <p className="text-xs font-mono text-muted-foreground">
-                      {trialRemaining} free reflection{trialRemaining !== 1 ? 's' : ''} remaining
+                      {t('home.subscription.freeRemaining', { count: trialRemaining })}
                     </p>
                   )}
 
