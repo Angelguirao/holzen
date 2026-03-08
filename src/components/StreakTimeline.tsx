@@ -115,18 +115,18 @@ export function StreakTimeline({ reflections, streakFreezeDates = [], memberSinc
       </div>
 
       {/* Legend */}
-      <div className="flex items-center gap-4 text-[9px] font-mono text-muted-foreground/50">
+      <div className="flex items-center flex-wrap gap-x-3 gap-y-1 text-[9px] font-mono text-muted-foreground/50">
         <span className="flex items-center gap-1">
-          <span className="h-2 w-2 rounded-sm bg-primary" /> outcome
+          <span className="h-2 w-2 rounded-sm bg-primary" /> outcome logged
         </span>
         <span className="flex items-center gap-1">
-          <span className="h-2 w-2 rounded-sm bg-primary/30" /> reflection
+          <span className="h-2 w-2 rounded-sm bg-primary/30" /> reflected (no outcome)
         </span>
         <span className="flex items-center gap-1">
-          <span className="h-2 w-2 rounded-sm bg-blue-400/40" /> freeze
+          <span className="h-2 w-2 rounded-sm bg-blue-400/40" /> streak freeze
         </span>
         <span className="flex items-center gap-1">
-          <span className="h-2 w-2 rounded-sm bg-muted/50" /> missed
+          <span className="h-2 w-2 rounded-sm bg-muted/50" /> no activity
         </span>
       </div>
 
