@@ -481,7 +481,7 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
 
       {hasZoomOut && (
         <CollapsibleCompanion
-          label="Zoom out"
+          label={t.zoomOut}
           expanded={expandedZoomOut}
           onToggle={() => {
             setExpandedZoomOut((v) => !v);
