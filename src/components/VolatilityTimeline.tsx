@@ -37,6 +37,7 @@ interface PricePoint {
   date: string;
   reflection?: Reflection;
   ritual?: RitualCompletion;
+  reflectionPrice?: number;
 }
 
 const PERIOD_DAYS: Record<Period, number | null> = {
