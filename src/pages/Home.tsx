@@ -230,6 +230,14 @@ const Home = () => {
     setPinnedReflection(null);
   }, []);
 
+  const handlePullRefresh = useCallback(async () => {
+    window.location.reload();
+  }, []);
+
+  const { pullDistance, refreshing: pullRefreshing, handlers: pullHandlers } = usePullToRefresh({
+    onRefresh: handlePullRefresh,
+  });
+
   if (!hasOnboarded) {
     return <Onboarding onComplete={completeOnboarding} />;
   }
