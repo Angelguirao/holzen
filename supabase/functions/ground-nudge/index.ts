@@ -37,7 +37,7 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", ja: "Japanese", de: "German" };
+    const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
     const langCode = language || "en";
     const langName = LANG_NAMES[langCode] || "English";
     const langInstruction = langCode !== "en" ? `\n\nLANGUAGE: Write the title and body in ${langName}. Keep citation names and URLs in their original form.` : "";
