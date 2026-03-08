@@ -134,7 +134,7 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
 
   const prompts = effectiveMode === 'calm'
     ? WRITING_PROMPTS.calm
-    : (isCrash ? WRITING_PROMPTS.crash : WRITING_PROMPTS.ath);
+    : (isCrash ? WRITING_PROMPTS.crash : WRITING_PROMPTS.surge);
   const randomPrompt = useMemo(() => prompts[Math.floor(Math.random() * prompts.length)], [isCrash, effectiveMode]);
 
   useEffect(() => {
