@@ -20,6 +20,7 @@ export function SaveToLibraryButton({ title, body, sourceType, sourceUrl, reflec
   const { user } = useAuth();
   const saveToLibrary = useSaveToLibrary();
   const [saved, setSaved] = useState(false);
+  const [checking, setChecking] = useState(true);
   const [showTags, setShowTags] = useState(false);
   const [tags, setTags] = useState<string[]>(initialTags ?? []);
   const [input, setInput] = useState('');
