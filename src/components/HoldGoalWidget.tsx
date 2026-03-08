@@ -363,7 +363,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
             />
           </div>
           <p className="text-[9px] font-mono text-muted-foreground/40">
-            Since {format(start, 'MMM d, yyyy')} · {elapsed} day{elapsed !== 1 ? 's' : ''} held
+            Started {format(start, 'MMM d, yyyy')} · {elapsed} day{elapsed !== 1 ? 's' : ''} held
           </p>
         </div>
       </div>
