@@ -11,7 +11,6 @@ import { ReflectionNote } from '@/components/ReflectionNote';
 import { ReflectionTags } from '@/components/ReflectionTags';
 import { ShareReflection } from '@/components/ShareReflection';
 import { ReflectionWallpaper } from '@/components/ReflectionWallpaper';
-import { SaveToLibraryButton } from '@/components/library/SaveToLibraryButton';
 import { OutcomePrompt } from '@/components/OutcomePrompt';
 
 const DECISIONS = [
