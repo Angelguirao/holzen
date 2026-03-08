@@ -31,11 +31,31 @@ serve(async (req) => {
     if (singleUserId) {
       userIds = [singleUserId];
     } else {
-      // Cron: generate for all users with 10+ reflections
+      // Cron: generate for all users, respecting quiet hours & timezone
       const { data: profiles } = await supabase
         .from("profiles")
-        .select("user_id");
-      userIds = (profiles ?? []).map((p: any) => p.user_id);
+        .select("user_id, quiet_hours_start, quiet_hours_end, timezone");
+
+      const eligibleProfiles = (profiles ?? []).filter((p: any) => {
+        if (p.quiet_hours_start == null || p.quiet_hours_end == null) return true;
+        const tz = p.timezone || "UTC";
+        let nowHour: number;
+        try {
+          nowHour = parseInt(
+            new Date().toLocaleString("en-US", { timeZone: tz, hour: "numeric", hour12: false })
+          );
+        } catch {
+          nowHour = new Date().getUTCHours();
+        }
+        const start = p.quiet_hours_start;
+        const end = p.quiet_hours_end;
+        if (start <= end) {
+          return !(nowHour >= start && nowHour < end);
+        }
+        // Wraps midnight (e.g., 22-7)
+        return !(nowHour >= start || nowHour < end);
+      });
+      userIds = eligibleProfiles.map((p: any) => p.user_id);
     }
 
     let generated = 0;
