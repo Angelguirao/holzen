@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, forwardRef } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { differenceInDays } from 'date-fns';
@@ -380,10 +381,10 @@ const ChartTooltip = forwardRef<HTMLDivElement, any>(({ active, payload }, ref) 
 ChartTooltip.displayName = 'ChartTooltip';
 
 const ReflectionMarkerCard = forwardRef<HTMLDivElement, { point: PricePoint }>(({ point }, ref) => {
+  const [expanded, setExpanded] = useState(false);
   const refl = point.reflection!;
   const ritual = point.ritual;
 
-  // Parse BTC change from context
   const changeMatch = refl.context?.match(/(up|down)\s+([\d.]+)%/);
   const changeStr = changeMatch ? `${changeMatch[1] === 'down' ? '↓' : '↑'} ${changeMatch[2]}%` : null;
 
@@ -392,7 +393,11 @@ const ReflectionMarkerCard = forwardRef<HTMLDivElement, { point: PricePoint }>((
   };
 
   return (
-    <div ref={ref} className="rounded-md border border-border/40 bg-muted/20 px-3 py-2.5 space-y-1.5">
+    <div
+      ref={ref}
+      onClick={() => setExpanded(!expanded)}
+      className="rounded-md border border-border/40 bg-muted/20 px-3 py-2.5 space-y-1.5 cursor-pointer transition-colors hover:bg-muted/30 active:bg-muted/40"
+    >
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-1.5">
           <div
@@ -412,19 +417,55 @@ const ReflectionMarkerCard = forwardRef<HTMLDivElement, { point: PricePoint }>((
           </span>
         </div>
       </div>
-      <p className="text-xs leading-relaxed line-clamp-2">{refl.message}</p>
+      <p className={`text-xs leading-relaxed ${expanded ? '' : 'line-clamp-2'}`}>{refl.message}</p>
+
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="overflow-hidden"
+          >
+            <div className="pt-2 mt-1 border-t border-border/30 space-y-2">
+              {refl.context && (
+                <div className="space-y-0.5">
+                  <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider">Context</p>
+                  <p className="text-[10px] text-muted-foreground leading-relaxed">{refl.context}</p>
+                </div>
+              )}
+              {refl.outcome && (
+                <div className="space-y-0.5">
+                  <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider">Outcome</p>
+                  <p className="text-[10px] text-muted-foreground">{decisionLabels[refl.outcome] || refl.outcome}</p>
+                </div>
+              )}
+              {ritual && (
+                <div className="space-y-0.5">
+                  <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider">Ritual</p>
+                  <p className="text-[10px] text-muted-foreground">
+                    {ritual.template} · Decision: {decisionLabels[ritual.decision] || ritual.decision}
+                  </p>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       <div className="flex items-center gap-2 flex-wrap">
         {refl.mood && (
           <span className="text-[9px] font-mono text-muted-foreground/50 bg-muted/30 px-1.5 py-0.5 rounded">
             {refl.mood}
           </span>
         )}
-        {refl.outcome && (
+        {refl.outcome && !expanded && (
           <span className="text-[9px] font-mono text-muted-foreground/50 bg-muted/30 px-1.5 py-0.5 rounded">
             {decisionLabels[refl.outcome] || refl.outcome}
           </span>
         )}
-        {ritual && (
+        {ritual && !expanded && (
           <span className="text-[9px] font-mono text-primary/50 bg-primary/5 px-1.5 py-0.5 rounded">
             Ritual: {ritual.template}
           </span>
