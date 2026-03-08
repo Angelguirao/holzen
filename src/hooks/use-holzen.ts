@@ -526,6 +526,12 @@ export function useHolzen() {
       if (!user) return;
       await supabase.from('profiles').update({ ritual_template: val } as any).eq('user_id', user.id);
     },
+    notifyBadges,
+    setNotifyBadges: async (val: boolean) => {
+      setNotifyBadgesState(val);
+      if (!user) return;
+      await supabase.from('profiles').update({ notify_badges: val } as any).eq('user_id', user.id);
+    },
     companionPrefs,
     setCompanionPref,
     btcData,
