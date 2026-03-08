@@ -114,8 +114,8 @@ export function MoodPriceScatter({ reflections }: Props) {
             <YAxis
               type="number"
               dataKey="y"
-              domain={[0.5, 3.5]}
-              ticks={[1, 2, 3]}
+              domain={[0.5, 5.5]}
+              ticks={[1, 3, 5]}
               tickFormatter={(v: number) => MOOD_LABELS[v] ?? ''}
               tick={{ fontSize: 9, fontFamily: 'monospace', fill: 'hsl(var(--muted-foreground))' }}
               axisLine={false}
