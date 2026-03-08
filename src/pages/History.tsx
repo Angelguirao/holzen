@@ -422,7 +422,7 @@ const History = () => {
                 <div className="space-y-3 rounded-md border border-border/60 bg-muted/20 p-3">
                   {/* Date range */}
                   <div className="space-y-1.5">
-                    <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Date range</p>
+                    <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">{t('history.dateRange')}</p>
                     <div className="flex items-center gap-2">
                       <Popover>
                         <PopoverTrigger asChild>
