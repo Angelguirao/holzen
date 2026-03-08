@@ -172,7 +172,7 @@ export function Onboarding({ onComplete }: Props) {
                               transition={{ duration: 12, repeat: Infinity, times: [0, 0.33, 0.66, 1], ease: 'easeInOut' }}
                             />
                             <p className="text-[10px] font-mono text-muted-foreground">
-                              Inhale… hold… exhale…
+                              {t('onboarding.inhaleHoldExhale')}
                             </p>
                           </motion.div>
                         ) : (
