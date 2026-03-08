@@ -1,6 +1,8 @@
 import { Skeleton } from '@/components/ui/skeleton';
 import { TrendingUp, TrendingDown, Clock } from 'lucide-react';
 import { format } from 'date-fns';
+import { useHolzen } from '@/hooks/use-holzen';
+import { formatBtcPrice } from '@/lib/btc';
 
 interface OnThisDayEntry {
   yearsAgo: number;
