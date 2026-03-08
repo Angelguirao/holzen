@@ -1,0 +1,1 @@
+DELETE FROM roadmap_items WHERE id = '58ea0dee-08f7-4b1e-80c2-aaf7603acb79';
