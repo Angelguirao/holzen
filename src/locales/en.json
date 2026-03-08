@@ -513,6 +513,26 @@
     "closingQuote": "The practice is the same whether you hold 0.001 BTC or 10,000. Sit with the volatility. Notice the impulse. Choose deliberately.",
     "closingAttribution": "— Holzen"
   },
+  "sources": {
+    "title": "Signal Sources",
+    "description": "Choose which Bitcoin sources inform your signal companion. Active sources are prioritized when generating insights.",
+    "activeCount": "{{active}} of {{total}} active",
+    "types": {
+      "analyst": "Analysts",
+      "podcast": "Podcasts",
+      "newsletter": "Newsletters",
+      "blog": "Blogs",
+      "dashboard": "Dashboards",
+      "youtube": "YouTube"
+    },
+    "custom": "Custom sources",
+    "addCustom": "Add custom source",
+    "customNamePlaceholder": "Source name",
+    "customUrlPlaceholder": "URL (optional)",
+    "add": "Add",
+    "addFailed": "Failed to add source",
+    "sourceAdded": "Source added"
+  },
   "notFound": {
     "title": "404",
     "message": "Oops! Page not found",
