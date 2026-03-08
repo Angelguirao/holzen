@@ -615,6 +615,15 @@ function NeedAMomentButton({
 
   return (
     <div className="space-y-3">
+      <NeedAMomentButtonInner onTrigger={onTrigger} inCooldown={inCooldown} loading={loading} minutes={minutes} />
+    </div>
+  );
+}
+
+function NeedAMomentButtonInner({ onTrigger, inCooldown, loading, minutes }: { onTrigger: () => void; inCooldown: boolean; loading: boolean; minutes: number }) {
+  const { t } = useTranslation();
+  return (
+    <>
       <Button
         onClick={onTrigger}
         disabled={inCooldown || loading}
@@ -622,15 +631,17 @@ function NeedAMomentButton({
         className="w-full font-mono text-xs gap-2"
       >
         <Pause className="h-3.5 w-3.5" />
-        {loading ? 'Generating…' : inCooldown
-          ? `Manual reflection in ${minutes} min`
-          : 'I need a moment'}
+        {loading ? t('home.generatingReflection') : inCooldown
+          ? t('home.manualReflectionIn', { minutes })
+          : t('home.needAMoment')}
       </Button>
       <p className="text-[10px] text-muted-foreground text-center leading-relaxed">
         {inCooldown
-          ? 'Take this time to breathe. The next reflection will be here when you need it.'
-          : 'Request a reflection anytime — no threshold required.'}
+          ? t('home.cooldownMessage')
+          : t('home.requestAnytime')}
       </p>
+    </>
+  );
     </div>
   );
 }
