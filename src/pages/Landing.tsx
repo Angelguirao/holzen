@@ -160,9 +160,9 @@ const Landing = () => {
         <motion.div {...m()}>
           <div className="rounded-lg border border-border bg-card p-5 space-y-4">
             <div className="space-y-1">
-              <p className="text-lg font-mono text-foreground">Free to start</p>
+              <p className="text-lg font-mono text-foreground">{t('landing.freeToStart')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
-                Your first 3 reflections are free — no card required. Then $3/month for unlimited reflections, companions, mood tracking, and insights. Cancel anytime.
+                {t('landing.pricingDesc')}
               </p>
             </div>
             <div className="space-y-2">
