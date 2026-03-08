@@ -166,4 +166,4 @@ export const MoodPriceScatter = forwardRef<HTMLDivElement, Props>(function MoodP
       </p>
     </div>
   );
-}
+});
