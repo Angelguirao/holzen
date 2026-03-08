@@ -8,9 +8,8 @@ interface Reflection {
 }
 
 const MOOD_SCORES: Record<string, number> = {
-  calm: 100,
-  neutral: 60,
-  anxious: 20,
+  fomo: 10, greedy: 15, anxious: 20, fearful: 25,
+  excited: 40, uncertain: 50, detached: 75, calm: 100,
 };
 
 const OUTCOME_SCORES: Record<string, number> = {
