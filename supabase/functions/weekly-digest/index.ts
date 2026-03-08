@@ -150,7 +150,7 @@ serve(async (req) => {
     // Get all users with email notifications enabled
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
-      .select("user_id, email_notifications, digest_frequency, threshold, threshold_down, hold_goal_currency");
+      .select("user_id, email_notifications, digest_frequency, threshold, threshold_down, hold_goal_currency, language");
 
     if (profilesError) throw profilesError;
 
