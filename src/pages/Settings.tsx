@@ -156,7 +156,7 @@ const Settings = () => {
         </button>
       </div>
 
-      <Accordion type="multiple" defaultValue={['profile', 'reflection']} className="space-y-1">
+      <Accordion type="multiple" defaultValue={['you', 'reflection']} className="space-y-1">
 
         {/* 1. You */}
         <AccordionItem value="you" className="border border-border/40 rounded-md px-4">
