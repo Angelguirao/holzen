@@ -418,7 +418,7 @@ const History = () => {
                           <div className="flex items-center gap-1.5">
                             <Clock className="h-3 w-3 text-muted-foreground/50" />
                             <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">
-                              Echo · {format(new Date(r.zoom_out_data.echo.created_at), 'MMM d, yyyy')}
+                              Echo{r.zoom_out_data.echo.created_at ? ` · ${format(new Date(r.zoom_out_data.echo.created_at), 'MMM d, yyyy')}` : ''}
                             </p>
                           </div>
                           <p className="text-xs text-muted-foreground leading-relaxed italic line-clamp-2">
