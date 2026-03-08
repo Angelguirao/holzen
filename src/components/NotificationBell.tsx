@@ -387,46 +387,13 @@ export function NotificationBell() {
               <div className="divide-y divide-border">
                 <AnimatePresence initial={false}>
                   {visibleNotifications.map(n => (
-                    <motion.div
+                    <SwipeableNotification
                       key={n.id}
-                      layout
-                      exit={{ opacity: 0, height: 0, paddingTop: 0, paddingBottom: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="px-3 py-2.5 hover:bg-accent/50 transition-colors group"
-                    >
-                      <div className="flex items-start gap-2">
-                        <span className="text-sm mt-0.5">{iconMap[n.type]}</span>
-                        <div className="min-w-0 flex-1">
-                          <p className="text-[11px] font-medium text-foreground leading-tight">
-                            {n.title}
-                          </p>
-                          <p className="text-[10px] text-muted-foreground leading-snug mt-0.5 truncate">
-                            {n.subtitle}
-                          </p>
-                          <div className="flex items-center gap-2 mt-1">
-                            <p className="text-[9px] text-muted-foreground/60 font-mono">
-                              {formatDistanceToNow(new Date(n.timestamp), { addSuffix: true })}
-                            </p>
-                            {n.action && (
-                              <button
-                                onClick={() => handleAction(n.action!.path)}
-                                className="flex items-center gap-0.5 text-[9px] font-mono text-primary/70 hover:text-primary transition-colors"
-                              >
-                                {n.action.label}
-                                <ArrowRight className="h-2.5 w-2.5" />
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                        <button
-                          onClick={(e) => { e.stopPropagation(); dismissOne(n.id); }}
-                          className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-accent transition-all shrink-0 mt-0.5"
-                          aria-label="Dismiss notification"
-                        >
-                          <X className="h-3 w-3 text-muted-foreground" />
-                        </button>
-                      </div>
-                    </motion.div>
+                      n={n}
+                      iconMap={iconMap}
+                      onDismiss={dismissOne}
+                      onAction={handleAction}
+                    />
                   ))}
                 </AnimatePresence>
               </div>
