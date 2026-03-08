@@ -5,14 +5,16 @@ import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { enqueueAction } from '@/lib/offline-queue';
+import { useTranslation } from 'react-i18next';
 
 const CATEGORIES = [
-  { value: 'bug', label: 'Bug', icon: Bug, desc: 'Something broken' },
-  { value: 'feature', label: 'Feature', icon: Lightbulb, desc: 'An idea' },
-  { value: 'question', label: 'Question', icon: HelpCircle, desc: 'Need help' },
+  { value: 'bug', labelKey: 'feedback.bug', icon: Bug, descKey: 'feedback.bugDesc' },
+  { value: 'feature', labelKey: 'feedback.feature', icon: Lightbulb, descKey: 'feedback.featureDesc' },
+  { value: 'question', labelKey: 'feedback.question', icon: HelpCircle, descKey: 'feedback.questionDesc' },
 ] as const;
 
 export function FeedbackForm() {
+  const { t } = useTranslation();
   const [category, setCategory] = useState<string>('question');
   const [message, setMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -20,10 +22,9 @@ export function FeedbackForm() {
   const submit = async () => {
     if (!message.trim()) return;
 
-    // Queue if offline
     if (!navigator.onLine) {
       enqueueAction('feedback', { category, message: message.trim() });
-      toast('Saved offline', { description: "Your feedback will be sent when you're back online." });
+      toast(t('feedback.savedOffline'), { description: t('feedback.savedOfflineDesc') });
       setMessage('');
       return;
     }
@@ -34,9 +35,9 @@ export function FeedbackForm() {
     });
     setSubmitting(false);
     if (error) {
-      toast.error('Failed to send', { description: 'Please try again later.' });
+      toast.error(t('feedback.failedToSend'), { description: t('feedback.tryAgainLater') });
     } else {
-      toast.success('Feedback sent', { description: 'Thank you! We\'ll get back to you.' });
+      toast.success(t('feedback.sent'), { description: t('feedback.sentDesc') });
       setMessage('');
     }
   };
@@ -44,10 +45,10 @@ export function FeedbackForm() {
   return (
     <div className="space-y-3">
       <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">
-        Get in touch
+        {t('feedback.getInTouch')}
       </p>
       <p className="text-xs text-muted-foreground leading-relaxed">
-        Report a bug, request a feature, or ask a question. We read every message.
+        {t('feedback.description')}
       </p>
 
       <div className="grid grid-cols-3 gap-2">
@@ -65,8 +66,8 @@ export function FeedbackForm() {
               }`}
             >
               <Icon className="h-3.5 w-3.5 mb-1" />
-              <p className="text-xs font-mono font-medium">{c.label}</p>
-              <p className="text-[10px] text-muted-foreground mt-0.5">{c.desc}</p>
+              <p className="text-xs font-mono font-medium">{t(c.labelKey)}</p>
+              <p className="text-[10px] text-muted-foreground mt-0.5">{t(c.descKey)}</p>
             </button>
           );
         })}
@@ -75,7 +76,7 @@ export function FeedbackForm() {
       <Textarea
         value={message}
         onChange={(e) => setMessage(e.target.value)}
-        placeholder="Tell us what's on your mind…"
+        placeholder={t('feedback.placeholder')}
         className="text-xs min-h-[80px] resize-none"
         maxLength={1000}
       />
@@ -89,7 +90,7 @@ export function FeedbackForm() {
           className="text-xs font-mono gap-1.5"
         >
           <Send className="h-3 w-3" />
-          {submitting ? 'Sending…' : 'Send'}
+          {submitting ? t('feedback.sending') : t('feedback.send')}
         </Button>
       </div>
     </div>

@@ -2,6 +2,7 @@ import { useState, useMemo, useCallback } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isSameDay, addMonths, subMonths, isToday } from 'date-fns';
 import { ChevronLeft, ChevronRight, Sparkles, Scroll, Award } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 const MOOD_COLORS: Record<string, string> = {
   fomo: 'bg-amber-400',
@@ -14,7 +15,6 @@ const MOOD_COLORS: Record<string, string> = {
   fearful: 'bg-rose-400',
 };
 
-// Day-level tint: maps dominant mood to a subtle background
 const DAY_TINT: Record<string, string> = {
   calm: 'bg-emerald-500/8',
   detached: 'bg-slate-500/8',
@@ -42,8 +42,6 @@ interface Props {
   onSelectDate: (date: Date | null) => void;
 }
 
-const WEEKDAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
-
 function getDominantMood(activities: CalendarActivity[]): string | null {
   const moods = activities.filter((a) => a.type === 'reflection' && a.mood).map((a) => a.mood!);
   if (moods.length === 0) return null;
@@ -53,7 +51,13 @@ function getDominantMood(activities: CalendarActivity[]): string | null {
 }
 
 export function HistoryCalendar({ activities, selectedDate, onSelectDate }: Props) {
+  const { t } = useTranslation();
   const [currentMonth, setCurrentMonth] = useState(new Date());
+
+  const WEEKDAYS = [
+    t('calendar.su'), t('calendar.mo'), t('calendar.tu'),
+    t('calendar.we'), t('calendar.th'), t('calendar.fr'), t('calendar.sa'),
+  ];
 
   const activityMap = useMemo(() => {
     const map = new Map<string, CalendarActivity[]>();
@@ -79,7 +83,6 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate }: Prop
 
   return (
     <div className="space-y-3">
-      {/* Month navigation */}
       <div className="flex items-center justify-between">
         <button onClick={goToPrev} className="p-1 text-muted-foreground hover:text-foreground transition-colors">
           <ChevronLeft className="h-4 w-4" />
@@ -92,7 +95,6 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate }: Prop
         </button>
       </div>
 
-      {/* Grid */}
       <div className="grid grid-cols-7 gap-0.5">
         {WEEKDAYS.map((d) => (
           <div key={d} className="text-center text-[9px] font-mono text-muted-foreground/40 uppercase py-1">
@@ -132,7 +134,6 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate }: Prop
                 {format(day, 'd')}
               </span>
 
-              {/* Intensity indicator: small bar */}
               {hasActivities && (
                 <div className="absolute bottom-[3px] flex items-center gap-[1px]">
                   {count <= 3 ? (
@@ -151,7 +152,6 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate }: Prop
         })}
       </div>
 
-      {/* Selected day summary */}
       {selectedDate && (() => {
         const dayItems = activityMap.get(format(selectedDate, 'yyyy-MM-dd')) || [];
         if (dayItems.length === 0) {
@@ -160,7 +160,7 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate }: Prop
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">
                 {format(selectedDate, 'EEEE, MMMM d, yyyy')}
               </p>
-              <p className="text-xs text-muted-foreground/40 italic mt-1">No activity.</p>
+              <p className="text-xs text-muted-foreground/40 italic mt-1">{t('calendar.noActivity')}</p>
             </div>
           );
         }
@@ -170,7 +170,6 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate }: Prop
         const lettersList = dayItems.filter((a) => a.type === 'letter');
         const badgesList = dayItems.filter((a) => a.type === 'badge');
 
-        // Mood breakdown
         const moodCounts: Record<string, number> = {};
         reflections.forEach((r) => {
           const m = r.mood || 'neutral';
@@ -185,34 +184,32 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate }: Prop
               {format(selectedDate, 'EEEE, MMMM d, yyyy')}
             </p>
 
-            {/* Activity counts */}
             <div className="flex items-center gap-3">
               {reflections.length > 0 && (
                 <span className="text-[10px] font-mono text-muted-foreground">
-                  {reflections.length} reflection{reflections.length !== 1 ? 's' : ''}
+                  {t('calendar.reflectionCount', { count: reflections.length })}
                 </span>
               )}
               {ritualsList.length > 0 && (
                 <span className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
                   <Sparkles className="h-2.5 w-2.5 text-primary/60" />
-                  {ritualsList.length} ritual{ritualsList.length !== 1 ? 's' : ''}
+                  {t('calendar.ritualCount', { count: ritualsList.length })}
                 </span>
               )}
               {lettersList.length > 0 && (
                 <span className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
                   <Scroll className="h-2.5 w-2.5 text-amber-500/60" />
-                  {lettersList.length} letter{lettersList.length !== 1 ? 's' : ''}
+                  {t('calendar.letterCount', { count: lettersList.length })}
                 </span>
               )}
               {badgesList.length > 0 && (
                 <span className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
                   <Award className="h-2.5 w-2.5 text-yellow-500/60" />
-                  {badgesList.length} badge{badgesList.length !== 1 ? 's' : ''}
+                  {t('calendar.badgeCount', { count: badgesList.length })}
                 </span>
               )}
             </div>
 
-            {/* Mood breakdown bar */}
             {totalMoods > 0 && (
               <div className="space-y-1.5">
                 <div className="flex h-2 rounded-full overflow-hidden">
@@ -228,26 +225,25 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate }: Prop
                   {sortedMoods.map(([mood, count]) => (
                     <span key={mood} className="flex items-center gap-1 text-[9px] font-mono text-muted-foreground/60">
                       <span className={cn('h-[5px] w-[5px] rounded-full', MOOD_COLORS[mood] || 'bg-foreground/20')} />
-                      {mood} ({count})
+                      {t(`moodCheck.moods.${mood}`, mood)} ({count})
                     </span>
                   ))}
                 </div>
               </div>
             )}
 
-            {/* Notable events: rituals and badges (not every reflection) */}
             {(ritualsList.length > 0 || badgesList.length > 0) && (
               <div className="space-y-1">
                 {ritualsList.map((r) => (
                   <div key={r.id} className="flex items-center gap-2 text-xs text-muted-foreground">
                     <Sparkles className="h-2.5 w-2.5 text-primary/60 shrink-0" />
-                    <span>{r.label || 'Ritual'}</span>
+                    <span>{r.label || t('calendar.ritual')}</span>
                   </div>
                 ))}
                 {badgesList.map((b) => (
                   <div key={b.id} className="flex items-center gap-2 text-xs text-muted-foreground">
                     <Award className="h-2.5 w-2.5 text-yellow-500/60 shrink-0" />
-                    <span className="capitalize">{b.label?.replace(/-/g, ' ') || 'Badge'}</span>
+                    <span className="capitalize">{b.label?.replace(/-/g, ' ') || t('calendar.badge')}</span>
                   </div>
                 ))}
               </div>
