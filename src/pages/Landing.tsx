@@ -100,7 +100,7 @@ const Landing = () => {
       />
 
       {/* ─── HERO ─── */}
-      <div className="relative min-h-[90vh] flex flex-col items-center justify-center px-6 overflow-hidden">
+      <div className="relative min-h-[70vh] flex flex-col items-center justify-center px-6 overflow-hidden">
         {/* Ambient background */}
         <div className="absolute inset-0 pointer-events-none">
           <motion.div
