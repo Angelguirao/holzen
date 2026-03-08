@@ -166,9 +166,12 @@ const Landing = () => {
               size="lg"
               className="font-mono text-xs tracking-wider group px-8"
             >
-              {t('landing.getStartedFree')}
+              {t('landing.getStartedForFree')}
               <ArrowRight className="h-3.5 w-3.5 ml-2 transition-transform group-hover:translate-x-0.5" />
             </Button>
+            <p className="text-[11px] text-muted-foreground/50 mt-3 font-mono">
+              {t('landing.noCreditCard')}
+            </p>
           </motion.div>
         </div>
 
