@@ -480,7 +480,7 @@ const History = () => {
 
                   {/* Mood filter */}
                   <div className="space-y-1.5">
-                    <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Mood</p>
+                    <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">{t('history.mood')}</p>
                     <div className="flex flex-wrap gap-1">
                       {moods.map((m) => (
                         <button
