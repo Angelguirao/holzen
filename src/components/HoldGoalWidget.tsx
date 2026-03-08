@@ -1,26 +1,36 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
-import { Target, Calendar, DollarSign, X, Check } from 'lucide-react';
+import { Target, Calendar, DollarSign, Infinity, X, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { differenceInDays, format } from 'date-fns';
+import { toast } from 'sonner';
+
+type GoalType = 'time' | 'price' | 'forever';
+type TimeUnit = 'months' | 'years';
 
 interface HoldGoal {
-  type: 'time' | 'price';
+  type: GoalType;
   start: string;
   targetMonths?: number;
   targetPrice?: number;
   currency: string;
 }
 
+const MAX_MONTHS = 1200; // 100 years
+const MAX_PRICE = 100_000_000; // $100M
+const MIN_PRICE = 1;
+
 export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
   const { user } = useAuth();
   const [goal, setGoal] = useState<HoldGoal | null>(null);
   const [loading, setLoading] = useState(true);
   const [setting, setSetting] = useState(false);
-  const [goalType, setGoalType] = useState<'time' | 'price'>('time');
+  const [goalType, setGoalType] = useState<GoalType>('time');
+  const [timeUnit, setTimeUnit] = useState<TimeUnit>('months');
   const [inputValue, setInputValue] = useState('');
+  const [validationError, setValidationError] = useState<string | null>(null);
 
   const loadGoal = useCallback(async () => {
     if (!user) return;
@@ -32,7 +42,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
 
     if (data?.hold_goal_type) {
       setGoal({
-        type: data.hold_goal_type as 'time' | 'price',
+        type: data.hold_goal_type as GoalType,
         start: data.hold_goal_start,
         targetMonths: data.hold_goal_target_months,
         targetPrice: data.hold_goal_target_price,
@@ -44,15 +54,68 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
 
   useEffect(() => { loadGoal(); }, [loadGoal]);
 
+  const validate = (type: GoalType, value: string, unit: TimeUnit): string | null => {
+    if (type === 'forever') return null;
+    if (!value.trim()) return 'Enter a value';
+    const val = parseFloat(value);
+    if (isNaN(val) || val <= 0) return 'Must be a positive number';
+
+    if (type === 'time') {
+      const months = unit === 'years' ? val * 12 : val;
+      if (months < 1) return 'Minimum 1 month';
+      if (months > MAX_MONTHS) return 'Maximum 100 years';
+      if (unit === 'months' && !Number.isInteger(val)) return 'Whole months only';
+      if (unit === 'years' && val % 0.5 !== 0 && !Number.isInteger(val)) return 'Use whole or half years';
+    }
+
+    if (type === 'price') {
+      if (val < MIN_PRICE) return 'Minimum $1';
+      if (val > MAX_PRICE) return `Maximum $${MAX_PRICE.toLocaleString()}`;
+      if (currentPrice && val <= currentPrice) return 'Target should be above current price';
+    }
+
+    return null;
+  };
+
+  const handleInputChange = (value: string) => {
+    setInputValue(value);
+    if (value) {
+      setValidationError(validate(goalType, value, timeUnit));
+    } else {
+      setValidationError(null);
+    }
+  };
+
   const saveGoal = async () => {
-    if (!user || !inputValue) return;
+    if (!user) return;
+
+    if (goalType === 'forever') {
+      const updates = {
+        hold_goal_type: 'forever',
+        hold_goal_start: new Date().toISOString(),
+        hold_goal_target_months: null,
+        hold_goal_target_price: null,
+        hold_goal_currency: 'USD',
+      };
+      await supabase.from('profiles').update(updates).eq('user_id', user.id);
+      setGoal({ type: 'forever', start: updates.hold_goal_start, currency: 'USD' });
+      setSetting(false);
+      setInputValue('');
+      toast('Hold forever. Conviction locked in.');
+      return;
+    }
+
+    if (!inputValue) return;
+    const error = validate(goalType, inputValue, timeUnit);
+    if (error) { setValidationError(error); return; }
+
     const val = parseFloat(inputValue);
-    if (isNaN(val) || val <= 0) return;
+    const months = goalType === 'time' ? (timeUnit === 'years' ? Math.round(val * 12) : Math.round(val)) : null;
 
     const updates: Record<string, any> = {
       hold_goal_type: goalType,
       hold_goal_start: new Date().toISOString(),
-      hold_goal_target_months: goalType === 'time' ? Math.round(val) : null,
+      hold_goal_target_months: months,
       hold_goal_target_price: goalType === 'price' ? val : null,
       hold_goal_currency: 'USD',
     };
@@ -67,6 +130,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
     });
     setSetting(false);
     setInputValue('');
+    setValidationError(null);
   };
 
   const clearGoal = async () => {
@@ -104,51 +168,125 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
           <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
             Set Your Goal
           </p>
-          <button onClick={() => setSetting(false)} className="text-muted-foreground/40 hover:text-foreground">
+          <button onClick={() => { setSetting(false); setValidationError(null); }} className="text-muted-foreground/40 hover:text-foreground">
             <X className="h-3 w-3" />
           </button>
         </div>
 
         <div className="flex rounded bg-muted/50 p-0.5">
-          {(['time', 'price'] as const).map((t) => (
+          {(['time', 'price', 'forever'] as const).map((t) => (
             <button
               key={t}
-              onClick={() => { setGoalType(t); setInputValue(''); }}
-              className={`flex-1 text-[10px] font-mono px-3 py-1.5 rounded transition-colors flex items-center justify-center gap-1.5 ${
+              onClick={() => { setGoalType(t); setInputValue(''); setValidationError(null); }}
+              className={`flex-1 text-[10px] font-mono px-2 py-1.5 rounded transition-colors flex items-center justify-center gap-1.5 ${
                 goalType === t
                   ? 'bg-primary/20 text-primary'
                   : 'text-muted-foreground/50 hover:text-muted-foreground'
               }`}
             >
-              {t === 'time' ? <Calendar className="h-2.5 w-2.5" /> : <DollarSign className="h-2.5 w-2.5" />}
-              {t === 'time' ? 'Time' : 'Price'}
+              {t === 'time' ? <Calendar className="h-2.5 w-2.5" /> : t === 'price' ? <DollarSign className="h-2.5 w-2.5" /> : <Infinity className="h-2.5 w-2.5" />}
+              {t === 'time' ? 'Time' : t === 'price' ? 'Price' : 'Forever'}
             </button>
           ))}
         </div>
 
-        <div className="flex items-center gap-2">
-          <Input
-            type="number"
-            value={inputValue}
-            onChange={(e) => setInputValue(e.target.value)}
-            placeholder={goalType === 'time' ? 'Months (e.g. 6)' : 'Target price (e.g. 150000)'}
-            className="text-xs font-mono h-8"
-          />
-          <Button size="sm" onClick={saveGoal} disabled={!inputValue} className="h-8 px-3">
-            <Check className="h-3 w-3" />
-          </Button>
-        </div>
+        {goalType === 'forever' ? (
+          <div className="space-y-3">
+            <p className="text-xs text-muted-foreground leading-relaxed">
+              No timeline. No target price. Just hold. The counter starts now and never ends.
+            </p>
+            <Button size="sm" onClick={saveGoal} className="w-full h-8 text-xs font-mono">
+              <Infinity className="h-3 w-3 mr-1.5" />
+              Commit to holding forever
+            </Button>
+          </div>
+        ) : (
+          <>
+            {goalType === 'time' && (
+              <div className="flex rounded bg-muted/50 p-0.5">
+                {(['months', 'years'] as const).map((u) => (
+                  <button
+                    key={u}
+                    onClick={() => { setTimeUnit(u); setInputValue(''); setValidationError(null); }}
+                    className={`flex-1 text-[10px] font-mono px-3 py-1 rounded transition-colors capitalize ${
+                      timeUnit === u
+                        ? 'bg-foreground/10 text-foreground'
+                        : 'text-muted-foreground/40 hover:text-muted-foreground'
+                    }`}
+                  >
+                    {u}
+                  </button>
+                ))}
+              </div>
+            )}
 
-        <p className="text-[10px] text-muted-foreground/40">
-          {goalType === 'time'
-            ? 'How many months do you commit to holding?'
-            : 'At what price would you consider your goal reached?'}
-        </p>
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2">
+                <Input
+                  type="number"
+                  value={inputValue}
+                  onChange={(e) => handleInputChange(e.target.value)}
+                  placeholder={
+                    goalType === 'time'
+                      ? timeUnit === 'months' ? 'e.g. 6' : 'e.g. 2'
+                      : 'e.g. 150000'
+                  }
+                  className={`text-xs font-mono h-8 ${validationError ? 'border-destructive/50' : ''}`}
+                  min={0}
+                />
+                <Button size="sm" onClick={saveGoal} disabled={!inputValue || !!validationError} className="h-8 px-3">
+                  <Check className="h-3 w-3" />
+                </Button>
+              </div>
+              {validationError && (
+                <p className="text-[10px] font-mono text-destructive">{validationError}</p>
+              )}
+            </div>
+
+            <p className="text-[10px] text-muted-foreground/40">
+              {goalType === 'time'
+                ? `How many ${timeUnit} do you commit to holding?`
+                : 'At what price would you consider your goal reached?'}
+            </p>
+          </>
+        )}
       </div>
     );
   }
 
-  // Active goal display
+  // Forever goal display
+  if (goal.type === 'forever') {
+    const start = new Date(goal.start);
+    const elapsed = differenceInDays(new Date(), start);
+    const years = Math.floor(elapsed / 365);
+    const days = elapsed % 365;
+
+    return (
+      <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2.5">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Infinity className="h-3 w-3 text-primary/60" />
+            <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
+              Hold Forever
+            </p>
+          </div>
+          <button onClick={clearGoal} className="text-[10px] font-mono text-muted-foreground/30 hover:text-foreground transition-colors">
+            Clear
+          </button>
+        </div>
+        <div className="space-y-1">
+          <span className="text-xs font-mono text-foreground/80">
+            {years > 0 ? `${years}y ${days}d` : `${elapsed} day${elapsed !== 1 ? 's' : ''}`} and counting
+          </span>
+          <p className="text-[9px] font-mono text-muted-foreground/40">
+            Since {format(start, 'MMM d, yyyy')} · No end date
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // Active time goal display
   if (goal.type === 'time' && goal.targetMonths) {
     const start = new Date(goal.start);
     const totalDays = goal.targetMonths * 30;
@@ -156,6 +294,10 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
     const progress = Math.min((elapsed / totalDays) * 100, 100);
     const remaining = Math.max(totalDays - elapsed, 0);
     const completed = remaining === 0;
+
+    const displayTarget = goal.targetMonths >= 12
+      ? `${(goal.targetMonths / 12).toFixed(goal.targetMonths % 12 === 0 ? 0 : 1)}y commitment`
+      : `${goal.targetMonths}mo commitment`;
 
     return (
       <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2.5">
@@ -177,7 +319,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
               {completed ? '🎉 Goal reached!' : `${remaining} day${remaining !== 1 ? 's' : ''} to go`}
             </span>
             <span className="text-[10px] font-mono text-muted-foreground/50">
-              {goal.targetMonths}mo commitment
+              {displayTarget}
             </span>
           </div>
           <div className="h-1.5 w-full rounded-full bg-muted/50 overflow-hidden">
