@@ -377,7 +377,12 @@ export function useHolzen() {
         }
       }
     } catch (e: any) {
-      setError(e.message || 'Failed to fetch BTC data');
+      const raw = e?.message || '';
+      if (raw.includes('fetch') || raw.includes('Failed to fetch')) {
+        setError('Price data unavailable. CoinGecko may be down — retrying shortly.');
+      } else {
+        setError('Could not check market data. Will retry automatically.');
+      }
     }
   }, [user, threshold, thresholdDown, cumulativeThreshold, isInCooldown, isInQuietHours, generateMessage]);
 
