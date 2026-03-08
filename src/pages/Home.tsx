@@ -97,6 +97,7 @@ const Home = () => {
     cooldownHours,
     firstName,
     ritualTemplate,
+    currency,
   } = useHolzen();
 
   const { reflection: nightReflection, dismiss: dismissNight } = useNightReflection();
