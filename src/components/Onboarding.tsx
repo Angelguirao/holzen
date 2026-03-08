@@ -231,7 +231,7 @@ export function Onboarding({ onComplete }: Props) {
                             className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
                             whileHover={prefersReduced ? {} : { x: 4 }}
                           >
-                            Learn from history →
+                            {t('onboarding.learnFromHistory')}
                           </motion.button>
                         )}
                       </AnimatePresence>
