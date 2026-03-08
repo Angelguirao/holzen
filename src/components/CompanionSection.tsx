@@ -157,7 +157,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
       .select('learning_title, learning_body, learning_citation, learning_url')
       .eq('id', reflectionId)
       .single()
-      .then(({ data: row }) => {
+      .then(async ({ data: row }) => {
         if (cancelled) return;
         if (row?.learning_citation) {
           setNudge({
