@@ -553,7 +553,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
 
       {hasHaiku && (
         <CollapsibleCompanion
-          label={t.haiku}
+          label={labels.haiku}
           expanded={expandedHaiku}
           onToggle={() => {
             setExpandedHaiku((v) => !v);
