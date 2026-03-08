@@ -6,8 +6,13 @@ import type { HolzenScoreData } from '@/hooks/use-holzen-score';
 interface Props {
   reflectionCount: number;
   scoreData: HolzenScoreData | null;
-  moodCounts: { anxious: number; neutral: number; calm: number };
+  moodCounts: Record<string, number>;
 }
+
+const MOOD_EMOJI: Record<string, string> = {
+  fomo: '🔥', excited: '⚡', greedy: '🤑', anxious: '😰',
+  calm: '🧘', detached: '😶', uncertain: '🤔', fearful: '😨',
+};
 
 function buildShareText({ reflectionCount, scoreData, moodCounts }: Props): string {
   const lines: string[] = ['My Holzen Stats 🧘‍♂️'];
@@ -19,13 +24,14 @@ function buildShareText({ reflectionCount, scoreData, moodCounts }: Props): stri
     lines.push(`  Mood ${scoreData.moodScore} · Actions ${scoreData.outcomeScore} · Streak ${scoreData.streakScore}`);
   }
 
-  const total = moodCounts.anxious + moodCounts.neutral + moodCounts.calm;
-  if (total > 0) {
+  const entries = Object.entries(moodCounts).filter(([, c]) => c > 0);
+  if (entries.length > 0) {
     lines.push('');
     lines.push('Mood breakdown:');
-    if (moodCounts.calm) lines.push(`  😌 Calm: ${moodCounts.calm}`);
-    if (moodCounts.neutral) lines.push(`  😐 Neutral: ${moodCounts.neutral}`);
-    if (moodCounts.anxious) lines.push(`  😰 Anxious: ${moodCounts.anxious}`);
+    for (const [mood, count] of entries.sort((a, b) => b[1] - a[1])) {
+      const emoji = MOOD_EMOJI[mood] || '•';
+      lines.push(`  ${emoji} ${mood}: ${count}`);
+    }
   }
 
   lines.push('');
