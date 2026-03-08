@@ -22,6 +22,7 @@ export function useHolzen() {
   const [quietHoursStart, setQuietHoursStartState] = useState<number | null>(null);
   const [quietHoursEnd, setQuietHoursEndState] = useState<number | null>(null);
   const [firstName, setFirstNameState] = useState<string | null>(null);
+  const [aiInsightsEnabled, setAiInsightsEnabledState] = useState(true);
   const [nightReflectionHour, setNightReflectionHourState] = useState<number | null>(21);
   const [btcData, setBtcData] = useState<BtcPriceData | null>(null);
   const [message, setMessage] = useState<string | null>(null);
@@ -64,6 +65,7 @@ export function useHolzen() {
         setQuietHoursEndState((data as any).quiet_hours_end ?? null);
         setFirstNameState((data as any).first_name ?? null);
         setNightReflectionHourState((data as any).night_reflection_hour ?? 21);
+        setAiInsightsEnabledState((data as any).ai_insights_enabled ?? true);
         setHasOnboarded(data.has_onboarded ?? false);
         setCompanionPrefsState({
           breathing: data.companion_breathing ?? true,
@@ -458,6 +460,12 @@ export function useHolzen() {
       setFirstNameState(val);
       if (!user) return;
       await supabase.from('profiles').update({ first_name: val } as any).eq('user_id', user.id);
+    },
+    aiInsightsEnabled,
+    setAiInsightsEnabled: async (val: boolean) => {
+      setAiInsightsEnabledState(val);
+      if (!user) return;
+      await supabase.from('profiles').update({ ai_insights_enabled: val } as any).eq('user_id', user.id);
     },
     companionPrefs,
     setCompanionPref,
