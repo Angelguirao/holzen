@@ -512,8 +512,26 @@ const Settings = () => {
       </div>
 
       <Separator />
+
+      {/* AI Insights */}
       <div className="space-y-4">
-        <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Notifications</p>
+        <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">AI Insights</p>
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          Weekly AI-generated pattern analysis across your reflections. Identifies behavioral trends, mood correlations, and growth over time.
+        </p>
+        <div className="flex items-center justify-between">
+          <Label htmlFor="ai-insights" className="text-xs font-mono text-muted-foreground">
+            Enable AI insights
+          </Label>
+          <Switch
+            id="ai-insights"
+            checked={aiInsightsEnabled}
+            onCheckedChange={setAiInsightsEnabled}
+          />
+        </div>
+      </div>
+
+      <Separator />
         <div className="flex items-center justify-between">
           <Label htmlFor="email-notif" className="text-xs font-mono text-muted-foreground">
             Email notifications
