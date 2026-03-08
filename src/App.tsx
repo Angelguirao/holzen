@@ -24,6 +24,7 @@ import BlogPost from "./pages/BlogPost";
 import Roadmap from "./pages/Roadmap";
 import Ambient from "./pages/Ambient";
 import Reserve from "./pages/Reserve";
+import PauseSession from "./pages/PauseSession";
 
 const queryClient = new QueryClient();
 
