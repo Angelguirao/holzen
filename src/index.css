@@ -90,3 +90,9 @@
     font-family: var(--font-body);
   }
 }
+
+/* Hide bottom nav and app chrome in ambient mode */
+body.ambient-active nav,
+body.ambient-active header {
+  display: none !important;
+}
