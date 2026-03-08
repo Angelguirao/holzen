@@ -430,9 +430,23 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
               Hold Goal
             </p>
           </div>
-          <button onClick={clearGoal} className="text-[10px] font-mono text-muted-foreground/30 hover:text-foreground transition-colors">
-            Clear
-          </button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <button className="text-[10px] font-mono text-muted-foreground/30 hover:text-foreground transition-colors">
+                Clear
+              </button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle className="font-mono text-sm">Clear hold goal</AlertDialogTitle>
+                <AlertDialogDescription className="text-xs">This will remove your current hold goal. You can set a new one anytime.</AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel className="font-mono text-xs">Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={clearGoal} className="bg-destructive text-destructive-foreground hover:bg-destructive/90 font-mono text-xs">Clear</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
 
         <div className="space-y-1.5">
