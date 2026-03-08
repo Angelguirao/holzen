@@ -54,8 +54,8 @@ const App = () => (
               <Routes>
                 <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
                   <Route path="/" element={<Home />} />
-                  <Route path="/history" element={<History />} />
                   <Route path="/library" element={<Library />} />
+                  <Route path="/history" element={<Navigate to="/library" replace />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/ambient" element={<Ambient />} />
