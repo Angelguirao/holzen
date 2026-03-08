@@ -255,6 +255,7 @@ function StatsContent({ reflections }: { reflections: Reflection[] }) {
       <ReflectionStats reflections={reflections} />
       <StreakTimeline reflections={reflections} />
       {scoreData && <HolzenScoreDetail scoreData={scoreData} />}
+      <RitualStatsCard />
       <DecisionQualityCard reflections={reflections} />
       <StatsTrends reflections={reflections} />
       <MoodTrendChart reflections={reflections} />
