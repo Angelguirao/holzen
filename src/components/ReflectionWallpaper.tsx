@@ -182,7 +182,7 @@ export function ReflectionWallpaper({ message, mood, context, haiku, variant = '
       )}
 
       <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="max-w-sm p-0 overflow-hidden bg-card border-border [&>button]:z-10 [&>button]:bg-background/80 [&>button]:rounded-full [&>button]:p-1 [&>button]:right-3 [&>button]:top-3">
+        <DialogContent className="max-w-sm p-0 overflow-y-auto max-h-[90vh] bg-card border-border [&>button]:z-10 [&>button]:bg-background/80 [&>button]:backdrop-blur-sm [&>button]:rounded-full [&>button]:p-1 [&>button]:right-3 [&>button]:top-3 [&>button]:sticky">
           <DialogHeader className="p-4 pb-0">
             <DialogTitle className="text-sm font-mono tracking-wider">
               Reflection Wallpaper
