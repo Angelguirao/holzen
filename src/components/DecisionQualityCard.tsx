@@ -1,5 +1,5 @@
-import { useMemo } from 'react';
-import { Shield, TrendingUp, TrendingDown, Minus } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { Shield, TrendingUp, TrendingDown, Minus, ChevronDown, Wind, BookOpen, Feather, Radio, Eye, History } from 'lucide-react';
 
 interface Reflection {
   mood: string | null;
@@ -7,6 +7,9 @@ interface Reflection {
   breathing_completed: boolean;
   haiku_read: boolean;
   learning_read: boolean;
+  signal_read?: boolean;
+  zoom_out_read?: boolean;
+  history_read?: boolean;
   created_at: string;
 }
 
@@ -14,27 +17,34 @@ interface Props {
   reflections: Reflection[];
 }
 
+interface CompanionStat {
+  label: string;
+  icon: typeof Wind;
+  used: number;
+  holdRate: number | null;
+}
+
 export function DecisionQualityCard({ reflections }: Props) {
+  const [showBreakdown, setShowBreakdown] = useState(false);
+
   const data = useMemo(() => {
     const withOutcome = reflections.filter((r) => r.outcome);
     if (withOutcome.length < 3) return null;
 
     const engaged = withOutcome.filter(
-      (r) => r.breathing_completed || r.haiku_read || r.learning_read
+      (r) => r.breathing_completed || r.haiku_read || r.learning_read || r.signal_read || r.zoom_out_read || r.history_read
     );
     const notEngaged = withOutcome.filter(
-      (r) => !r.breathing_completed && !r.haiku_read && !r.learning_read
+      (r) => !r.breathing_completed && !r.haiku_read && !r.learning_read && !r.signal_read && !r.zoom_out_read && !r.history_read
     );
 
     const holdRate = (arr: typeof withOutcome) => {
       if (arr.length === 0) return null;
-      return arr.filter((r) => r.outcome === 'held').length / arr.length;
+      return arr.filter((r) => r.outcome === 'held' || r.outcome === 'nothing').length / arr.length;
     };
 
     const engagedHoldRate = holdRate(engaged);
     const notEngagedHoldRate = holdRate(notEngaged);
-
-    // Overall decision quality: % of engaged reflections that led to holding
     const overallHoldRate = holdRate(withOutcome);
 
     // Trend: compare first half vs second half
@@ -51,9 +61,18 @@ export function DecisionQualityCard({ reflections }: Props) {
       else if (delta < -0.1) trend = 'declining';
     }
 
-    // Breathing impact specifically
-    const breathed = withOutcome.filter((r) => r.breathing_completed);
-    const breathedHoldRate = holdRate(breathed);
+    // Per-companion breakdown
+    const companions: CompanionStat[] = [
+      { label: 'Breathing', icon: Wind, used: withOutcome.filter((r) => r.breathing_completed).length, holdRate: holdRate(withOutcome.filter((r) => r.breathing_completed)) },
+      { label: 'Haiku', icon: Feather, used: withOutcome.filter((r) => r.haiku_read).length, holdRate: holdRate(withOutcome.filter((r) => r.haiku_read)) },
+      { label: 'Learning', icon: BookOpen, used: withOutcome.filter((r) => r.learning_read).length, holdRate: holdRate(withOutcome.filter((r) => r.learning_read)) },
+      { label: 'Signal', icon: Radio, used: withOutcome.filter((r) => r.signal_read).length, holdRate: holdRate(withOutcome.filter((r) => r.signal_read)) },
+      { label: 'Zoom Out', icon: Eye, used: withOutcome.filter((r) => r.zoom_out_read).length, holdRate: holdRate(withOutcome.filter((r) => r.zoom_out_read)) },
+      { label: 'History', icon: History, used: withOutcome.filter((r) => r.history_read).length, holdRate: holdRate(withOutcome.filter((r) => r.history_read)) },
+    ].filter((c) => c.used >= 2);
+
+    // Sort by hold rate descending (best companions first)
+    companions.sort((a, b) => (b.holdRate ?? 0) - (a.holdRate ?? 0));
 
     return {
       totalDecisions: withOutcome.length,
@@ -62,9 +81,8 @@ export function DecisionQualityCard({ reflections }: Props) {
       engagedHoldRate,
       notEngagedHoldRate,
       overallHoldRate,
-      breathedHoldRate,
-      breathedCount: breathed.length,
       trend,
+      companions,
       delta:
         engagedHoldRate !== null && notEngagedHoldRate !== null
           ? engagedHoldRate - notEngagedHoldRate
@@ -73,8 +91,6 @@ export function DecisionQualityCard({ reflections }: Props) {
   }, [reflections]);
 
   if (!data) return null;
-
-  const pct = (v: number | null) => (v !== null ? `${Math.round(v * 100)}%` : '—');
 
   const TrendIcon =
     data.trend === 'improving'
@@ -85,9 +101,9 @@ export function DecisionQualityCard({ reflections }: Props) {
 
   const trendColor =
     data.trend === 'improving'
-      ? 'text-green-500'
+      ? 'text-primary'
       : data.trend === 'declining'
-        ? 'text-orange-400'
+        ? 'text-destructive'
         : 'text-muted-foreground';
 
   return (
@@ -133,27 +149,37 @@ export function DecisionQualityCard({ reflections }: Props) {
         </p>
       )}
 
-      {/* Bars */}
+      {/* Summary bars */}
       <div className="space-y-2.5">
-        <QualityBar
-          label="With pause"
-          value={data.engagedHoldRate}
-          count={data.engagedCount}
-        />
-        <QualityBar
-          label="Without pause"
-          value={data.notEngagedHoldRate}
-          count={data.notEngagedCount}
-        />
-        {data.breathedCount >= 2 && (
-          <QualityBar
-            label="After breathing"
-            value={data.breathedHoldRate}
-            count={data.breathedCount}
-            accent
-          />
-        )}
+        <QualityBar label="With pause" value={data.engagedHoldRate} count={data.engagedCount} />
+        <QualityBar label="Without pause" value={data.notEngagedHoldRate} count={data.notEngagedCount} />
       </div>
+
+      {/* Per-companion breakdown */}
+      {data.companions.length >= 2 && (
+        <div className="space-y-2">
+          <button
+            onClick={() => setShowBreakdown(!showBreakdown)}
+            className="flex items-center gap-1.5 text-[10px] font-mono text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+          >
+            <ChevronDown className={`h-3 w-3 transition-transform ${showBreakdown ? 'rotate-180' : ''}`} />
+            Companion breakdown
+          </button>
+
+          {showBreakdown && (
+            <div className="space-y-2 pt-1 border-t border-border/30">
+              {data.companions.map((c) => (
+                <CompanionBar key={c.label} companion={c} baselineRate={data.notEngagedHoldRate} />
+              ))}
+              {data.companions.length > 0 && data.notEngagedHoldRate !== null && (
+                <p className="text-[9px] text-muted-foreground/40 font-mono pt-1">
+                  Compared to {Math.round(data.notEngagedHoldRate * 100)}% baseline (no companions)
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       <p className="text-[10px] text-muted-foreground/50 font-mono">
         Based on {data.totalDecisions} decisions with recorded outcomes
@@ -166,12 +192,10 @@ function QualityBar({
   label,
   value,
   count,
-  accent,
 }: {
   label: string;
   value: number | null;
   count: number;
-  accent?: boolean;
 }) {
   const width = value !== null ? Math.round(value * 100) : 0;
   return (
@@ -185,9 +209,41 @@ function QualityBar({
       </div>
       <div className="h-1.5 rounded-full bg-muted/50 overflow-hidden">
         <div
-          className={`h-full rounded-full transition-all duration-700 ease-out ${
-            accent ? 'bg-primary' : 'bg-primary/60'
-          }`}
+          className="h-full rounded-full bg-primary/60 transition-all duration-700 ease-out"
+          style={{ width: `${width}%` }}
+        />
+      </div>
+    </div>
+  );
+}
+
+function CompanionBar({ companion, baselineRate }: { companion: CompanionStat; baselineRate: number | null }) {
+  const Icon = companion.icon;
+  const width = companion.holdRate !== null ? Math.round(companion.holdRate * 100) : 0;
+  const delta = companion.holdRate !== null && baselineRate !== null
+    ? Math.round((companion.holdRate - baselineRate) * 100)
+    : null;
+
+  return (
+    <div className="space-y-0.5">
+      <div className="flex justify-between text-[10px] font-mono text-muted-foreground">
+        <span className="flex items-center gap-1.5">
+          <Icon className="h-2.5 w-2.5 text-muted-foreground/50" />
+          {companion.label}
+          <span className="text-muted-foreground/40">({companion.used})</span>
+        </span>
+        <span className="flex items-center gap-1.5">
+          {companion.holdRate !== null ? `${Math.round(companion.holdRate * 100)}%` : '—'}
+          {delta !== null && delta !== 0 && (
+            <span className={`text-[9px] ${delta > 0 ? 'text-primary' : 'text-destructive'}`}>
+              {delta > 0 ? '+' : ''}{delta}pp
+            </span>
+          )}
+        </span>
+      </div>
+      <div className="h-1 rounded-full bg-muted/50 overflow-hidden">
+        <div
+          className="h-full rounded-full bg-primary/40 transition-all duration-700 ease-out"
           style={{ width: `${width}%` }}
         />
       </div>
