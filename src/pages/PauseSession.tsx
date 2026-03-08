@@ -13,6 +13,7 @@ import { ReflectionTags } from '@/components/ReflectionTags';
 import { ShareReflection } from '@/components/ShareReflection';
 import { ReflectionWallpaper } from '@/components/ReflectionWallpaper';
 import { OutcomePrompt } from '@/components/OutcomePrompt';
+import { MoodCheck, type MoodValue } from '@/components/MoodCheck';
 
 const DECISIONS = [
   { value: 'held', key: 'hold', emoji: '🪨' },
@@ -57,6 +58,19 @@ export default function PauseSession() {
   const [phase, setPhase] = useState<'session' | 'outcome' | 'done'>('session');
   const [decision, setDecision] = useState<string | null>(null);
   const [isFavorite, setIsFavorite] = useState(false);
+  const [moodDone, setMoodDone] = useState(false);
+
+  const handleMoodSelect = useCallback(async (mood: MoodValue) => {
+    hapticFeedback('light');
+    setMoodDone(true);
+    if (reflectionId) {
+      await supabase.from('reflections').update({ mood }).eq('id', reflectionId);
+    }
+  }, [reflectionId]);
+
+  const handleMoodSkip = useCallback(() => {
+    setMoodDone(true);
+  }, []);
 
   const toggleFavorite = useCallback(async () => {
     if (!reflectionId) return;
@@ -226,6 +240,13 @@ export default function PauseSession() {
                         <ReflectionNote reflectionId={reflectionId} initialNote={null} />
                         <ReflectionTags reflectionId={reflectionId} initialTags={[]} />
                       </div>
+                    </RevealSection>
+                  )}
+
+                  {/* Mood check-in */}
+                  {!moodDone && (
+                    <RevealSection>
+                      <MoodCheck onSelect={handleMoodSelect} onSkip={handleMoodSkip} />
                     </RevealSection>
                   )}
 
