@@ -7,6 +7,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ReflectionStats } from '@/components/ReflectionStats';
 import { InsightsPanel } from '@/components/InsightsPanel';
 import { DecisionQualityCard } from '@/components/DecisionQualityCard';
+import { StreakTimeline } from '@/components/StreakTimeline';
 import { AIInsightsPanel } from '@/components/AIInsightsPanel';
 import { MoodTrends } from '@/components/MoodTrends';
 import { BadgesPanel } from '@/components/BadgesPanel';
@@ -251,6 +252,7 @@ function StatsContent({ reflections }: { reflections: Reflection[] }) {
         />
       </div>
       <ReflectionStats reflections={reflections} />
+      <StreakTimeline reflections={reflections} />
       {scoreData && <HolzenScoreDetail scoreData={scoreData} />}
       <DecisionQualityCard reflections={reflections} />
       <StatsTrends reflections={reflections} />
