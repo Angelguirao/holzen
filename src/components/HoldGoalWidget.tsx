@@ -172,7 +172,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
           <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
             Set Your Goal
           </p>
-          <button onClick={() => { setSetting(false); setValidationError(null); }} className="text-muted-foreground/40 hover:text-foreground">
+          <button onClick={() => { setSetting(false); setValidationError(null); setStartDate(new Date()); }} className="text-muted-foreground/40 hover:text-foreground">
             <X className="h-3 w-3" />
           </button>
         </div>
