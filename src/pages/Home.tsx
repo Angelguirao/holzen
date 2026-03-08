@@ -113,6 +113,7 @@ const Home = () => {
   const [zenMode] = useState(() => localStorage.getItem('holzen_zen_mode') === 'true');
   const [pinnedReflection, setPinnedReflection] = useState<PinnedReflection | null>(null);
   const prefersReducedMotion = useReducedMotion();
+  const [reflectionCount, setReflectionCount] = useState(0);
 
   // Widget layout
   const defaultOrder = useMemo(() => [...WIDGET_IDS], []);
