@@ -5,6 +5,7 @@ import { LearningInput } from './LearningInput';
 import { SignalDisplay } from './SignalDisplay';
 import { ChevronDown, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
+import { hapticFeedback } from '@/lib/haptics';
 
 export interface CompanionData {
   haiku: string | null;
