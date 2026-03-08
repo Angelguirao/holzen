@@ -344,7 +344,7 @@ const Nav = forwardRef<HTMLDivElement, {
           onClick={onBack}
           className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
         >
-          ← Back
+          ← {t('common.back') ?? 'Back'}
         </button>
       )}
       <button
