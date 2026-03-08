@@ -1,5 +1,6 @@
 import { useHolzen } from '@/hooks/use-holzen';
 import { LetterToFutureSelf } from '@/components/LetterToFutureSelf';
+import { TheVoid } from '@/components/TheVoid';
 import { useSubscription } from '@/hooks/use-subscription';
 import { BtcStatus } from '@/components/BtcStatus';
 import { NightReflectionCard } from '@/components/NightReflectionCard';
@@ -15,7 +16,7 @@ import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { toast } from 'sonner';
-import { AlertCircle, Loader2, Pause, Pin, Timer } from 'lucide-react';
+import { AlertCircle, Loader2, Pause, Pin, Timer, Circle } from 'lucide-react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
 interface PinnedReflection {
@@ -61,6 +62,7 @@ const Home = () => {
   } = useHolzen();
 
   const [showOutcome, setShowOutcome] = useState(false);
+  const [showVoid, setShowVoid] = useState(false);
   const [outcomeReflectionId, setOutcomeReflectionId] = useState<string | null>(null);
   const [showMoodCheck, setShowMoodCheck] = useState(false);
   const [priceHidden, setPriceHidden] = useState(() => localStorage.getItem('holzen_hide_price') === 'true');
@@ -347,6 +349,18 @@ const Home = () => {
           changePercent={btcData.changePercent}
         />
       )}
+
+      {/* The Void */}
+      <button
+        onClick={() => setShowVoid(true)}
+        className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-border/30 bg-muted/10 hover:bg-muted/20 transition-colors duration-500"
+      >
+        <Circle className="h-3 w-3 text-muted-foreground/40" />
+        <span className="text-[10px] font-mono text-muted-foreground/40 tracking-[0.2em] uppercase">
+          Enter the void
+        </span>
+      </button>
+      <TheVoid open={showVoid} onClose={() => setShowVoid(false)} />
 
       <Separator />
 
