@@ -37,9 +37,14 @@ function parsePercent(context: string | null): string | null {
 }
 
 const moodLabels: Record<string, string> = {
+  fomo: '🤯 FOMO',
+  excited: '🚀 Excited',
+  greedy: '🤑 Greedy',
   anxious: '😰 Anxious',
-  neutral: '😐 Neutral',
   calm: '😌 Calm',
+  detached: '🧊 Detached',
+  uncertain: '🤔 Uncertain',
+  fearful: '😨 Fearful',
 };
 
 const outcomeLabels: Record<string, string> = {
@@ -210,9 +215,13 @@ function ComparisonCard({
 }
 
 function GrowthInsight({ current, past }: { current: ComparisonReflection; past: ComparisonReflection }) {
-  const moodOrder = ['anxious', 'neutral', 'calm'];
-  const currentMoodIdx = current.mood ? moodOrder.indexOf(current.mood) : -1;
-  const pastMoodIdx = past.mood ? moodOrder.indexOf(past.mood) : -1;
+  // Composure scale: higher = more composed
+  const composureScale: Record<string, number> = {
+    fomo: 1, greedy: 1, anxious: 2, fearful: 2,
+    excited: 3, uncertain: 3, detached: 4, calm: 5,
+  };
+  const currentComposure = current.mood ? composureScale[current.mood] ?? -1 : -1;
+  const pastComposure = past.mood ? composureScale[past.mood] ?? -1 : -1;
 
   const holdOutcomes = ['held', 'hold', 'nothing'];
   const currentHeld = current.outcome ? holdOutcomes.includes(current.outcome) : false;
@@ -220,13 +229,13 @@ function GrowthInsight({ current, past }: { current: ComparisonReflection; past:
 
   let insight: string | null = null;
 
-  if (currentMoodIdx > pastMoodIdx && pastMoodIdx >= 0) {
+  if (currentComposure > pastComposure && pastComposure >= 0) {
     insight = 'You were calmer this time facing similar conditions.';
   } else if (currentHeld && !pastHeld) {
     insight = 'You held steady this time — last time you acted on impulse.';
   } else if (currentHeld && pastHeld) {
     insight = 'Consistent composure — you held steady both times.';
-  } else if (currentMoodIdx >= 0 && pastMoodIdx >= 0 && currentMoodIdx === pastMoodIdx) {
+  } else if (currentComposure >= 0 && pastComposure >= 0 && currentComposure === pastComposure) {
     insight = 'Similar emotional response — your patterns are consistent.';
   }
 

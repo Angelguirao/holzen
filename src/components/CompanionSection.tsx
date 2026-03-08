@@ -254,13 +254,7 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
   }, [reflectionId, context]);
 
   // Zoom Out companion state
-  interface ZoomOutData {
-    perspective: string;
-    echo: string;
-    macro: string;
-    prices: { current: number | null; oneYear: number | null; fourYears: number | null; tenYears: number | null };
-  }
-  const [zoomOut, setZoomOut] = useState<ZoomOutData | null>(null);
+  const [zoomOut, setZoomOut] = useState<import('./ZoomOutDisplay').ZoomOutData | null>(null);
   const [zoomOutLoading, setZoomOutLoading] = useState(false);
   const [zoomOutError, setZoomOutError] = useState(false);
   const zoomOutFetchedRef = useRef<string | null>(null);
@@ -271,19 +265,44 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
     if (zoomOutFetchedRef.current === key) return;
     zoomOutFetchedRef.current = key;
 
+    let cancelled = false;
     setZoomOutLoading(true);
     setZoomOutError(false);
 
-    supabase.functions
-      .invoke('zoom-out-companion', { body: { context: context ?? '', reflectionMessage: reflectionMessage ?? '' } })
-      .then(({ data, error: fnError }) => {
-        if (fnError || !data || data.error) {
-          setZoomOutError(true);
-        } else {
-          setZoomOut(data as ZoomOutData);
+    // Check if already persisted
+    supabase
+      .from('reflections')
+      .select('zoom_out_data')
+      .eq('id', reflectionId)
+      .single()
+      .then(({ data: row }) => {
+        if (cancelled) return;
+        if ((row as any)?.zoom_out_data) {
+          setZoomOut((row as any).zoom_out_data);
+          setZoomOutLoading(false);
+          return;
         }
-        setZoomOutLoading(false);
+
+        supabase.functions
+          .invoke('zoom-out-companion', { body: { context: context ?? '', reflectionMessage: reflectionMessage ?? '' } })
+          .then(({ data, error: fnError }) => {
+            if (cancelled) return;
+            if (fnError || !data || data.error) {
+              setZoomOutError(true);
+            } else {
+              setZoomOut(data as any);
+              // Persist
+              supabase
+                .from('reflections')
+                .update({ zoom_out_data: data } as any)
+                .eq('id', reflectionId)
+                .then(() => {});
+            }
+            setZoomOutLoading(false);
+          });
       });
+
+    return () => { cancelled = true; };
   }, [prefs.zoomOut, reflectionId, context, reflectionMessage]);
 
   // Historical Insight companion state
@@ -305,19 +324,44 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
     if (historyFetchedRef.current === key) return;
     historyFetchedRef.current = key;
 
+    let cancelled = false;
     setHistoryLoading(true);
     setHistoryError(false);
 
-    supabase.functions
-      .invoke('historical-insight', { body: { context: context ?? '' } })
-      .then(({ data, error: fnError }) => {
-        if (fnError || !data || data.error) {
-          setHistoryError(true);
-        } else {
-          setHistoryInsight(data as HistoricalInsightData);
+    // Check if already persisted
+    supabase
+      .from('reflections')
+      .select('history_insight_data')
+      .eq('id', reflectionId)
+      .single()
+      .then(({ data: row }) => {
+        if (cancelled) return;
+        if ((row as any)?.history_insight_data) {
+          setHistoryInsight((row as any).history_insight_data);
+          setHistoryLoading(false);
+          return;
         }
-        setHistoryLoading(false);
+
+        supabase.functions
+          .invoke('historical-insight', { body: { context: context ?? '' } })
+          .then(({ data, error: fnError }) => {
+            if (cancelled) return;
+            if (fnError || !data || data.error) {
+              setHistoryError(true);
+            } else {
+              setHistoryInsight(data as HistoricalInsightData);
+              // Persist
+              supabase
+                .from('reflections')
+                .update({ history_insight_data: data } as any)
+                .eq('id', reflectionId)
+                .then(() => {});
+            }
+            setHistoryLoading(false);
+          });
       });
+
+    return () => { cancelled = true; };
   }, [prefs.history, reflectionId, context]);
 
   const markCompleted = useCallback(async (key: keyof CompletionState) => {

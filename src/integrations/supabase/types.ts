@@ -387,6 +387,7 @@ export type Database = {
           created_at: string
           haiku: string | null
           haiku_read: boolean
+          history_insight_data: Json | null
           history_read: boolean
           id: string
           is_favorite: boolean
@@ -400,11 +401,13 @@ export type Database = {
           note: string | null
           outcome: string | null
           signal_body: string | null
+          signal_read: boolean
           signal_source: string | null
           signal_title: string | null
           signal_url: string | null
           tags: string[] | null
           user_id: string
+          zoom_out_data: Json | null
           zoom_out_read: boolean
         }
         Insert: {
@@ -413,6 +416,7 @@ export type Database = {
           created_at?: string
           haiku?: string | null
           haiku_read?: boolean
+          history_insight_data?: Json | null
           history_read?: boolean
           id?: string
           is_favorite?: boolean
@@ -426,11 +430,13 @@ export type Database = {
           note?: string | null
           outcome?: string | null
           signal_body?: string | null
+          signal_read?: boolean
           signal_source?: string | null
           signal_title?: string | null
           signal_url?: string | null
           tags?: string[] | null
           user_id: string
+          zoom_out_data?: Json | null
           zoom_out_read?: boolean
         }
         Update: {
@@ -439,6 +445,7 @@ export type Database = {
           created_at?: string
           haiku?: string | null
           haiku_read?: boolean
+          history_insight_data?: Json | null
           history_read?: boolean
           id?: string
           is_favorite?: boolean
@@ -452,11 +459,13 @@ export type Database = {
           note?: string | null
           outcome?: string | null
           signal_body?: string | null
+          signal_read?: boolean
           signal_source?: string | null
           signal_title?: string | null
           signal_url?: string | null
           tags?: string[] | null
           user_id?: string
+          zoom_out_data?: Json | null
           zoom_out_read?: boolean
         }
         Relationships: []
