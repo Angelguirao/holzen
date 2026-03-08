@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { hapticFeedback } from '@/lib/haptics';
+import { useTranslation } from 'react-i18next';
 
 const TOTAL_SECONDS = 60;
 
@@ -11,12 +12,12 @@ interface TheVoidProps {
 }
 
 export function TheVoid({ open, onClose }: TheVoidProps) {
+  const { t } = useTranslation();
   const [seconds, setSeconds] = useState(TOTAL_SECONDS);
   const [started, setStarted] = useState(false);
   const [completed, setCompleted] = useState(false);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Reset on open
   useEffect(() => {
     if (open) {
       setSeconds(TOTAL_SECONDS);
@@ -25,7 +26,6 @@ export function TheVoid({ open, onClose }: TheVoidProps) {
     }
   }, [open]);
 
-  // Timer logic
   useEffect(() => {
     if (!started || completed) return;
     intervalRef.current = setInterval(() => {
@@ -72,7 +72,6 @@ export function TheVoid({ open, onClose }: TheVoidProps) {
             background: 'radial-gradient(ellipse at center, hsl(30, 60%, 12%) 0%, hsl(25, 50%, 6%) 70%, hsl(20, 40%, 3%) 100%)',
           }}
         >
-          {/* Close button */}
           <button
             onClick={handleClose}
             className="absolute top-6 right-6 p-2 text-amber-200/20 hover:text-amber-200/50 transition-colors duration-500"
@@ -81,7 +80,6 @@ export function TheVoid({ open, onClose }: TheVoidProps) {
           </button>
 
           <div className="flex flex-col items-center gap-12">
-            {/* Warm glow */}
             <motion.div
               className="absolute rounded-full"
               style={{
@@ -109,7 +107,7 @@ export function TheVoid({ open, onClose }: TheVoidProps) {
                 transition={{ delay: 0.5, duration: 1 }}
                 className="relative z-10 text-amber-200/40 hover:text-amber-200/60 transition-colors duration-700 font-mono text-xs tracking-[0.3em] uppercase"
               >
-                Begin
+                {t('void.begin')}
               </motion.button>
             ) : completed ? (
               <motion.div
@@ -119,7 +117,7 @@ export function TheVoid({ open, onClose }: TheVoidProps) {
                 className="relative z-10 flex flex-col items-center gap-8"
               >
                 <p className="text-amber-200/30 font-mono text-xs tracking-[0.3em] uppercase">
-                  You stayed
+                  {t('void.youStayed')}
                 </p>
                 <motion.button
                   onClick={handleClose}
@@ -128,7 +126,7 @@ export function TheVoid({ open, onClose }: TheVoidProps) {
                   transition={{ delay: 2, duration: 1 }}
                   className="text-amber-200/20 hover:text-amber-200/40 transition-colors duration-700 font-mono text-[10px] tracking-[0.2em] uppercase"
                 >
-                  Return
+                  {t('void.return')}
                 </motion.button>
               </motion.div>
             ) : (
@@ -138,7 +136,6 @@ export function TheVoid({ open, onClose }: TheVoidProps) {
                 transition={{ duration: 1 }}
                 className="relative z-10 flex flex-col items-center gap-8"
               >
-                {/* Timer */}
                 <p
                   className="font-mono text-2xl tracking-[0.2em] tabular-nums"
                   style={{ color: `hsla(35, 60%, 70%, ${0.15 + progress * 0.25})` }}
@@ -146,23 +143,10 @@ export function TheVoid({ open, onClose }: TheVoidProps) {
                   {timeDisplay}
                 </p>
 
-                {/* Minimal progress ring */}
                 <svg width="120" height="120" className="absolute -z-10 opacity-20">
+                  <circle cx="60" cy="60" r="56" fill="none" stroke="hsla(35, 50%, 40%, 0.1)" strokeWidth="1" />
                   <circle
-                    cx="60"
-                    cy="60"
-                    r="56"
-                    fill="none"
-                    stroke="hsla(35, 50%, 40%, 0.1)"
-                    strokeWidth="1"
-                  />
-                  <circle
-                    cx="60"
-                    cy="60"
-                    r="56"
-                    fill="none"
-                    stroke="hsla(35, 60%, 55%, 0.3)"
-                    strokeWidth="1"
+                    cx="60" cy="60" r="56" fill="none" stroke="hsla(35, 60%, 55%, 0.3)" strokeWidth="1"
                     strokeLinecap="round"
                     strokeDasharray={`${2 * Math.PI * 56}`}
                     strokeDashoffset={`${2 * Math.PI * 56 * (1 - progress)}`}

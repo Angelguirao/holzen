@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { Moon, X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 interface NightReflection {
   id: string;
@@ -52,17 +53,19 @@ interface Props {
 }
 
 export function NightReflectionCard({ reflection, onDismiss }: Props) {
+  const { t } = useTranslation();
+
   return (
     <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2">
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2 text-muted-foreground">
           <Moon className="h-3 w-3" />
-          <p className="text-[10px] font-mono uppercase tracking-wider">Night reflection</p>
+          <p className="text-[10px] font-mono uppercase tracking-wider">{t('nightReflection.title')}</p>
         </div>
         <button
           onClick={onDismiss}
           className="shrink-0 text-muted-foreground/40 hover:text-foreground transition-colors p-0.5"
-          aria-label="Dismiss"
+          aria-label={t('common.done')}
         >
           <X className="h-3 w-3" />
         </button>
