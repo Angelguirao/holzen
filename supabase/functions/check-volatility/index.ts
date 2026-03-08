@@ -324,6 +324,8 @@ serve(async (req) => {
       const haiku = (profile as any).companion_haiku ? result.haiku : null;
       const learningTitle = (profile as any).companion_learning ? result.learning_title : null;
       const learningBody = (profile as any).companion_learning ? result.learning_body : null;
+      const learningCitation = (profile as any).companion_learning ? result.learning_citation : null;
+      const learningUrl = (profile as any).companion_learning ? result.learning_url : null;
 
       // Save to reflection history
       await supabase
@@ -335,6 +337,8 @@ serve(async (req) => {
           haiku,
           learning_title: learningTitle,
           learning_body: learningBody,
+          learning_citation: learningCitation,
+          learning_url: learningUrl,
         });
 
       // Update profile with new reflection
