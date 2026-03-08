@@ -6,6 +6,14 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+async function validateUrl(url: string, fallbackQuery: string): Promise<string> {
+  try {
+    const res = await fetch(url, { method: 'HEAD', redirect: 'follow' });
+    if (res.ok || res.status === 405 || res.status === 403) return url;
+  } catch { /* broken */ }
+  return `https://scholar.google.com/scholar?q=${encodeURIComponent(fallbackQuery)}`;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -116,6 +124,7 @@ Topics to draw from based on context:
     if (!toolCall) throw new Error("No tool call in response");
 
     const nudge = JSON.parse(toolCall.function.arguments);
+    nudge.url = await validateUrl(nudge.url, nudge.citation);
 
     return new Response(JSON.stringify(nudge), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
