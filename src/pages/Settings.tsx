@@ -256,7 +256,37 @@ const Settings = () => {
 
       <Separator />
 
-      {/* Silent Mode */}
+      {/* Ritual Template */}
+      <div className="space-y-4">
+        <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Ritual template</p>
+        <p className="text-xs text-muted-foreground leading-relaxed">
+          A guided pre-decision sequence. Choose your preferred depth.
+        </p>
+        <div className="space-y-2">
+          {([
+            { value: 'quick', label: 'Quick', desc: 'Breathe → Decide' },
+            { value: 'standard', label: 'Standard', desc: 'Breathe → Reflect → Decide' },
+            { value: 'deep', label: 'Deep', desc: 'Breathe → Reflect → Journal → Decide' },
+          ] as const).map((t) => (
+            <button
+              key={t.value}
+              onClick={() => setRitualTemplate(t.value)}
+              className={`w-full text-left rounded-md border px-3 py-2.5 transition-colors ${
+                ritualTemplate === t.value
+                  ? 'border-primary/40 bg-primary/5'
+                  : 'border-border/40 bg-muted/10 hover:bg-muted/20'
+              }`}
+            >
+              <p className={`text-xs font-mono ${ritualTemplate === t.value ? 'text-foreground' : 'text-muted-foreground'}`}>
+                {t.label}
+              </p>
+              <p className="text-[10px] text-muted-foreground/60">{t.desc}</p>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <Separator />
       <div className="space-y-4">
         <p className="text-xs font-mono text-muted-foreground uppercase tracking-wider">Silent mode</p>
         <p className="text-xs text-muted-foreground leading-relaxed">
