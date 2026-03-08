@@ -96,6 +96,18 @@ function CollapsibleCompanion({
 
 export function CompanionSection({ companions, prefs, severity = 'mild', reflectionId, context, reflectionMessage }: Props) {
   const { language } = useHolzen();
+
+  // Translated companion labels
+  const T: Record<string, Record<string, string>> = {
+    en: { pause: 'Pause with this', breathe: 'Breathe with this', haiku: 'Read as haiku', ground: 'Ground yourself', signal: 'Read the signal', zoomOut: 'Zoom out', lookBack: 'Look back' },
+    es: { pause: 'Pausa con esto', breathe: 'Respira con esto', haiku: 'Lee como haiku', ground: 'Ancla tu mente', signal: 'Lee la señal', zoomOut: 'Amplía la vista', lookBack: 'Mira atrás' },
+    pt: { pause: 'Pause com isso', breathe: 'Respire com isso', haiku: 'Leia como haiku', ground: 'Ancore-se', signal: 'Leia o sinal', zoomOut: 'Amplie a visão', lookBack: 'Olhe para trás' },
+    de: { pause: 'Halte inne', breathe: 'Atme damit', haiku: 'Lies als Haiku', ground: 'Erde dich', signal: 'Lies das Signal', zoomOut: 'Zoome raus', lookBack: 'Schau zurück' },
+    fr: { pause: 'Pause avec ceci', breathe: 'Respire avec ceci', haiku: 'Lis en haïku', ground: 'Ancre-toi', signal: 'Lis le signal', zoomOut: 'Prends du recul', lookBack: 'Regarde en arrière' },
+    nl: { pause: 'Pauzeer hiermee', breathe: 'Adem hiermee', haiku: 'Lees als haiku', ground: 'Aarde jezelf', signal: 'Lees het signaal', zoomOut: 'Zoom uit', lookBack: 'Kijk terug' },
+    tr: { pause: 'Bununla dur', breathe: 'Bununla nefes al', haiku: 'Haiku olarak oku', ground: 'Kendini topla', signal: 'Sinyali oku', zoomOut: 'Uzaklaş', lookBack: 'Geriye bak' },
+  };
+  const t = T[language] || T.en;
   const [expandedBreathing, setExpandedBreathing] = useState(false);
   const [expandedHaiku, setExpandedHaiku] = useState(false);
   const [expandedLearning, setExpandedLearning] = useState(false);
