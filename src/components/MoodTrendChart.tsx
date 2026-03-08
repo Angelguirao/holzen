@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { ChartEmptyState } from './ChartEmptyState';
 import {
   LineChart,
   Line,

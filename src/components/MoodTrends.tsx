@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { ChartEmptyState } from './ChartEmptyState';
 import { format, parseISO, startOfWeek } from 'date-fns';
 import {
   AreaChart,
