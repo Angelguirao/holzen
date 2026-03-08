@@ -250,7 +250,7 @@ export function VolatilityTimeline() {
               width={45}
             />
             <RechartsTooltip
-              content={<ChartTooltip />}
+              content={<ChartTooltip currency={currency} />}
               cursor={{ stroke: 'hsl(var(--primary))', strokeWidth: 1, strokeDasharray: '3 3' }}
             />
             <Area
