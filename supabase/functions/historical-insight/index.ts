@@ -60,7 +60,7 @@ VARIETY IS CRITICAL. Rotate through different eras and asset classes:
 - Commodities: Oil negative prices (2020), Silver Thursday (1980), Tulip mania
 - Macro: Weimar hyperinflation, Bretton Woods collapse, Asian financial crisis 1997
 
-The analogy should feel surprising and illuminating, not obvious.`;
+The analogy should feel surprising and illuminating, not obvious.${langInstruction}`;
 
     const response = await fetch(
       "https://ai.gateway.lovable.dev/v1/chat/completions",
