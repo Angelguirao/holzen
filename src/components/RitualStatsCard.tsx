@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, forwardRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { Sparkles, ChevronDown, Zap, Timer, Layers } from 'lucide-react';
@@ -11,15 +12,15 @@ interface RitualCompletion {
   created_at: string;
 }
 
-const TEMPLATE_META: Record<string, { label: string; icon: typeof Zap }> = {
-  quick: { label: 'Quick', icon: Zap },
-  standard: { label: 'Standard', icon: Timer },
-  deep: { label: 'Deep', icon: Layers },
+const TEMPLATE_META: Record<string, { labelKey: string; icon: typeof Zap }> = {
+  quick: { labelKey: 'ritualStats.templates.quick', icon: Zap },
+  standard: { labelKey: 'ritualStats.templates.standard', icon: Timer },
+  deep: { labelKey: 'ritualStats.templates.deep', icon: Layers },
 };
 
 interface TemplateStats {
   template: string;
-  label: string;
+  labelKey: string;
   count: number;
   holdRate: number | null;
   avgDuration: number | null;
@@ -28,6 +29,7 @@ interface TemplateStats {
 
 export function RitualStatsCard() {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [completions, setCompletions] = useState<RitualCompletion[]>([]);
   const [loading, setLoading] = useState(true);
   const [showBreakdown, setShowBreakdown] = useState(false);
@@ -68,7 +70,6 @@ export function RitualStatsCard() {
     const topTemplate = Object.entries(templateCounts).sort((a, b) => b[1] - a[1])[0];
     const avgDuration = durationCount > 0 ? Math.round(totalDuration / durationCount) : null;
 
-    // Per-template breakdown
     const byTemplate = new Map<string, RitualCompletion[]>();
     for (const c of completions) {
       const arr = byTemplate.get(c.template) || [];
@@ -90,7 +91,7 @@ export function RitualStatsCard() {
         const meta = TEMPLATE_META[template];
         return {
           template,
-          label: meta?.label ?? template,
+          labelKey: meta?.labelKey ?? template,
           count: items.length,
           holdRate,
           avgDuration: durCount > 0 ? Math.round(dur / durCount) : null,
@@ -99,7 +100,6 @@ export function RitualStatsCard() {
       })
       .sort((a, b) => (b.holdRate ?? 0) - (a.holdRate ?? 0));
 
-    // Best template (with at least 2 completions)
     const eligible = templateStats.filter((t) => t.count >= 2);
     const bestTemplate = eligible.length > 0 ? eligible[0] : null;
 
@@ -112,26 +112,21 @@ export function RitualStatsCard() {
 
   if (loading || !stats) return null;
 
-  const decisionLabels: Record<string, string> = {
-    held: 'Hold', sold: 'Sell', bought: 'Buy', nothing: 'Nothing',
-  };
-
   return (
     <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3">
       <div className="flex items-center gap-2">
         <Sparkles className="h-3 w-3 text-primary/60" />
-        <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">Ritual Stats</p>
+        <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">{t('ritualStats.title')}</p>
       </div>
 
       <div className="grid grid-cols-3 gap-3">
-        <StatItem label="Completed" value={String(stats.total)} />
-        <StatItem label="Avg Duration" value={stats.avgDuration ? `${stats.avgDuration}s` : '—'} />
-        <StatItem label="Most Used" value={stats.topTemplate?.[0] ?? '—'} />
+        <StatItem label={t('ritualStats.completed')} value={String(stats.total)} />
+        <StatItem label={t('ritualStats.avgDuration')} value={stats.avgDuration ? `${stats.avgDuration}s` : '—'} />
+        <StatItem label={t('ritualStats.mostUsed')} value={stats.topTemplate?.[0] ?? '—'} />
       </div>
 
-      {/* Decision distribution */}
       <div className="space-y-1.5">
-        <p className="text-[10px] font-mono text-muted-foreground/50">Decision breakdown</p>
+        <p className="text-[10px] font-mono text-muted-foreground/50">{t('ritualStats.decisionBreakdown')}</p>
         <div className="flex gap-1 h-2 rounded-full overflow-hidden bg-muted/50">
           {Object.entries(stats.decisionCounts).map(([key, count]) => (
             <div
@@ -143,31 +138,31 @@ export function RitualStatsCard() {
                 'bg-accent-foreground/40'
               }`}
               style={{ width: `${(count / stats.total) * 100}%` }}
-              title={`${decisionLabels[key] || key}: ${count}`}
+              title={`${t(`outcome.${key}`, key)}: ${count}`}
             />
           ))}
         </div>
         <div className="flex flex-wrap gap-x-3 gap-y-0.5">
           {Object.entries(stats.decisionCounts).map(([key, count]) => (
             <span key={key} className="text-[9px] font-mono text-muted-foreground/50">
-              {decisionLabels[key] || key} {count}
+              {t(`outcome.${key}`, key)} {count}
             </span>
           ))}
         </div>
       </div>
 
-      {/* Best template insight */}
       {bestTemplate && templateStats.length > 1 && (
         <p className="text-xs text-muted-foreground leading-relaxed">
-          Your <span className="font-mono font-medium text-primary">{bestTemplate.label}</span> ritual has the highest hold rate at{' '}
-          <span className="font-mono font-medium">{Math.round((bestTemplate.holdRate ?? 0) * 100)}%</span>
+          {t('ritualStats.bestTemplateInsight', {
+            template: t(bestTemplate.labelKey),
+            rate: Math.round((bestTemplate.holdRate ?? 0) * 100),
+          })}
           {bestTemplate.avgDuration && (
-            <span className="text-muted-foreground/50"> · avg {bestTemplate.avgDuration}s</span>
+            <span className="text-muted-foreground/50"> · {t('ritualStats.avgSuffix', { seconds: bestTemplate.avgDuration })}</span>
           )}
         </p>
       )}
 
-      {/* Per-template breakdown */}
       {templateStats.length > 1 && (
         <div className="space-y-2">
           <button
@@ -175,34 +170,34 @@ export function RitualStatsCard() {
             className="flex items-center gap-1.5 text-[10px] font-mono text-muted-foreground/60 hover:text-muted-foreground transition-colors"
           >
             <ChevronDown className={`h-3 w-3 transition-transform ${showBreakdown ? 'rotate-180' : ''}`} />
-            Template effectiveness
+            {t('ritualStats.templateEffectiveness')}
           </button>
 
           {showBreakdown && (
             <div className="space-y-2.5 pt-1 border-t border-border/30">
-              {templateStats.map((t) => {
-                const Icon = TEMPLATE_META[t.template]?.icon ?? Sparkles;
+              {templateStats.map((ts) => {
+                const Icon = TEMPLATE_META[ts.template]?.icon ?? Sparkles;
                 return (
-                  <div key={t.template} className="space-y-1">
+                  <div key={ts.template} className="space-y-1">
                     <div className="flex items-center justify-between text-[10px] font-mono">
                       <span className="flex items-center gap-1.5 text-muted-foreground">
                         <Icon className="h-2.5 w-2.5 text-muted-foreground/50" />
-                        {t.label}
-                        <span className="text-muted-foreground/40">({t.count})</span>
+                        {t(ts.labelKey)}
+                        <span className="text-muted-foreground/40">({ts.count})</span>
                       </span>
                       <span className="flex items-center gap-2">
-                        {t.avgDuration && (
-                          <span className="text-muted-foreground/40">{t.avgDuration}s avg</span>
+                        {ts.avgDuration && (
+                          <span className="text-muted-foreground/40">{ts.avgDuration}s avg</span>
                         )}
-                        <span className={t.holdRate !== null && t.holdRate >= 0.7 ? 'text-primary' : 'text-muted-foreground'}>
-                          {t.holdRate !== null ? `${Math.round(t.holdRate * 100)}% held` : '—'}
+                        <span className={ts.holdRate !== null && ts.holdRate >= 0.7 ? 'text-primary' : 'text-muted-foreground'}>
+                          {ts.holdRate !== null ? `${Math.round(ts.holdRate * 100)}% ${t('ritualStats.held')}` : '—'}
                         </span>
                       </span>
                     </div>
                     <div className="h-1 rounded-full bg-muted/50 overflow-hidden">
                       <div
                         className="h-full rounded-full bg-primary/50 transition-all duration-700 ease-out"
-                        style={{ width: `${(t.holdRate ?? 0) * 100}%` }}
+                        style={{ width: `${(ts.holdRate ?? 0) * 100}%` }}
                       />
                     </div>
                   </div>
@@ -215,8 +210,6 @@ export function RitualStatsCard() {
     </div>
   );
 }
-
-import { forwardRef } from 'react';
 
 const StatItem = forwardRef<HTMLDivElement, { label: string; value: string }>(
   ({ label, value }, ref) => (

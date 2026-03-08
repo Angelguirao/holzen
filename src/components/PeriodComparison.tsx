@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ArrowUpRight, ArrowDownRight, Minus, CalendarDays } from 'lucide-react';
 import {
   startOfWeek, endOfWeek, subWeeks, startOfMonth, endOfMonth, subMonths,
@@ -56,6 +57,7 @@ function computeStats(refs: Reflection[]): PeriodStats {
 type View = 'weekly' | 'monthly';
 
 export function PeriodComparison({ reflections }: Props) {
+  const { t } = useTranslation();
   const [view, setView] = useState<View>('weekly');
 
   const { current, previous, currentLabel, previousLabel } = useMemo(() => {
@@ -69,8 +71,8 @@ export function PeriodComparison({ reflections }: Props) {
       currentEnd = endOfWeek(now, { weekStartsOn: 1 });
       prevStart = startOfWeek(subWeeks(now, 1), { weekStartsOn: 1 });
       prevEnd = endOfWeek(subWeeks(now, 1), { weekStartsOn: 1 });
-      currentLabel = `This week`;
-      previousLabel = `Last week`;
+      currentLabel = t('periodComparison.thisWeek');
+      previousLabel = t('periodComparison.lastWeek');
     } else {
       currentStart = startOfMonth(now);
       currentEnd = endOfMonth(now);
@@ -95,14 +97,13 @@ export function PeriodComparison({ reflections }: Props) {
       currentLabel,
       previousLabel,
     };
-  }, [reflections, view]);
+  }, [reflections, view, t]);
 
-  // Need at least some data in both periods to be meaningful
   if (current.count === 0 && previous.count === 0) return null;
 
   const metrics = [
     {
-      label: 'Reflections',
+      label: t('periodComparison.reflections'),
       current: current.count,
       previous: previous.count,
       format: (v: number) => `${v}`,
@@ -110,7 +111,7 @@ export function PeriodComparison({ reflections }: Props) {
       deltaFormat: (d: number) => `${d > 0 ? '+' : ''}${d}`,
     },
     {
-      label: 'Hold rate',
+      label: t('periodComparison.holdRate'),
       current: current.holdRate,
       previous: previous.holdRate,
       format: (v: number) => `${Math.round(v * 100)}%`,
@@ -120,7 +121,7 @@ export function PeriodComparison({ reflections }: Props) {
       deltaFormat: (d: number) => `${d > 0 ? '+' : ''}${d}pp`,
     },
     {
-      label: 'Composure',
+      label: t('periodComparison.composure'),
       current: current.composure,
       previous: previous.composure,
       format: (v: number) => `${Math.round(v)}`,
@@ -130,7 +131,7 @@ export function PeriodComparison({ reflections }: Props) {
       deltaFormat: (d: number) => `${d > 0 ? '+' : ''}${d}`,
     },
     {
-      label: 'Companion use',
+      label: t('periodComparison.companionUse'),
       current: current.companionUsage,
       previous: previous.companionUsage,
       format: (v: number) => `${Math.round(v * 100)}%`,
@@ -147,7 +148,7 @@ export function PeriodComparison({ reflections }: Props) {
         <div className="flex items-center gap-2">
           <CalendarDays className="h-3.5 w-3.5 text-primary" />
           <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
-            Period Comparison
+            {t('periodComparison.title')}
           </p>
         </div>
         <div className="flex rounded bg-muted/50 p-0.5">
@@ -167,14 +168,12 @@ export function PeriodComparison({ reflections }: Props) {
         </div>
       </div>
 
-      {/* Period labels */}
       <div className="grid grid-cols-[1fr_auto_auto] gap-x-4 items-center">
         <div />
         <p className="text-[9px] font-mono text-muted-foreground/50 text-right">{previousLabel}</p>
         <p className="text-[9px] font-mono text-muted-foreground/80 text-right">{currentLabel}</p>
       </div>
 
-      {/* Metric rows */}
       <div className="space-y-3">
         {metrics.map((m) => (
           <MetricRow key={m.label} {...m} />
@@ -183,7 +182,10 @@ export function PeriodComparison({ reflections }: Props) {
 
       {previous.count === 0 && current.count > 0 && (
         <p className="text-[10px] text-muted-foreground/40 italic">
-          No data for {previousLabel.toLowerCase()} — comparisons will appear next {view === 'weekly' ? 'week' : 'month'}.
+          {t('periodComparison.noDataPrevious', {
+            period: previousLabel.toLowerCase(),
+            next: view === 'weekly' ? t('periodComparison.week') : t('periodComparison.month'),
+          })}
         </p>
       )}
     </div>
