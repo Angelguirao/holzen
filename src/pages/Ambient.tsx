@@ -133,9 +133,9 @@ export default function Ambient() {
       };
 
   const labelMap: Record<VolatilityLevel, string> = {
-    calm: 'Markets are quiet',
-    moderate: 'Some movement',
-    intense: 'High volatility',
+    calm: t('ambient.calm'),
+    moderate: t('ambient.moderate'),
+    intense: t('ambient.intense'),
   };
 
   return (
