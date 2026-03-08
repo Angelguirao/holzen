@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Search, FolderOpen } from 'lucide-react';
+import { Search, FolderOpen, Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { LibraryItemCard } from './LibraryItemCard';
 import { NewNoteForm } from './NewNoteForm';
