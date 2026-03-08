@@ -4,8 +4,10 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useTranslation } from 'react-i18next';
 
 const ResetPassword = () => {
+  const { t } = useTranslation();
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -15,11 +17,8 @@ const ResetPassword = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Listen for the PASSWORD_RECOVERY event from the auth URL hash
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === 'PASSWORD_RECOVERY') {
-        setReady(true);
-      }
+      if (event === 'PASSWORD_RECOVERY') setReady(true);
     });
     return () => subscription.unsubscribe();
   }, []);
@@ -27,16 +26,8 @@ const ResetPassword = () => {
   const handleReset = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
-
-    if (password !== confirmPassword) {
-      setError('Passwords do not match');
-      return;
-    }
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters');
-      return;
-    }
-
+    if (password !== confirmPassword) { setError(t('auth.passwordsDoNotMatch')); return; }
+    if (password.length < 6) { setError(t('auth.passwordTooShort')); return; }
     setLoading(true);
     try {
       const { error } = await supabase.auth.updateUser({ password });
@@ -54,8 +45,8 @@ const ResetPassword = () => {
     return (
       <div className="min-h-screen flex items-center justify-center p-6">
         <div className="w-full max-w-sm space-y-6">
-          <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">Holzen</h1>
-          <p className="text-sm">Password updated. Redirecting…</p>
+          <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">{t('common.holzen')}</h1>
+          <p className="text-sm">{t('auth.passwordUpdated')}</p>
         </div>
       </div>
     );
@@ -65,46 +56,21 @@ const ResetPassword = () => {
     <div className="min-h-screen flex items-center justify-center p-6">
       <div className="w-full max-w-sm space-y-8">
         <div className="space-y-2">
-          <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">Holzen</h1>
-          <p className="text-sm text-muted-foreground">
-            {ready ? 'Set your new password' : 'Verifying reset link…'}
-          </p>
+          <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">{t('common.holzen')}</h1>
+          <p className="text-sm text-muted-foreground">{ready ? t('auth.setNewPassword') : t('auth.verifyingResetLink')}</p>
         </div>
-
         {ready && (
           <form onSubmit={handleReset} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-xs font-mono">New password</Label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                minLength={6}
-                className="font-mono text-sm"
-              />
+              <Label htmlFor="password" className="text-xs font-mono">{t('auth.newPassword')}</Label>
+              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} className="font-mono text-sm" />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirm" className="text-xs font-mono">Confirm password</Label>
-              <Input
-                id="confirm"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                required
-                minLength={6}
-                className="font-mono text-sm"
-              />
+              <Label htmlFor="confirm" className="text-xs font-mono">{t('auth.confirmPassword')}</Label>
+              <Input id="confirm" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required minLength={6} className="font-mono text-sm" />
             </div>
-
-            {error && (
-              <p className="text-xs text-destructive font-mono">{error}</p>
-            )}
-
-            <Button type="submit" className="w-full font-mono text-xs" disabled={loading}>
-              Update password
-            </Button>
+            {error && <p className="text-xs text-destructive font-mono">{error}</p>}
+            <Button type="submit" className="w-full font-mono text-xs" disabled={loading}>{t('auth.updatePassword')}</Button>
           </form>
         )}
       </div>
