@@ -69,7 +69,9 @@ function CompanionCard({ item, onSelect }: { item: LibraryItem; onSelect?: (item
             <p className="text-[11px] text-muted-foreground/70 italic line-clamp-2">"{zoomOutData.echo.message}"</p>
           )}
           {zoomOutData.deepTime && (
-            <p className="text-[11px] text-muted-foreground/70 line-clamp-2">{zoomOutData.deepTime}</p>
+            <p className="text-[11px] text-muted-foreground/70 line-clamp-2">
+              {typeof zoomOutData.deepTime === 'string' ? zoomOutData.deepTime : zoomOutData.deepTime.title}
+            </p>
           )}
         </div>
       )}
