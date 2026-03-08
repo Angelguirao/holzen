@@ -194,7 +194,7 @@ export function ReflectionWallpaper({ message, mood, context, haiku, variant = '
               <div className="flex flex-col items-center justify-center py-16 gap-3">
                 <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
                 <p className="text-xs text-muted-foreground font-mono">
-                  Generating your wallpaper…
+                  {t('wallpaper.generating')}
                 </p>
               </div>
             ) : compositeUrl ? (
