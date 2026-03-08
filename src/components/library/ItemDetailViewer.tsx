@@ -55,8 +55,8 @@ function CompanionCard({ item, onSelect }: { item: LibraryItem; onSelect?: (item
       {item.title && item.title !== 'Reflection' && (
         <p className="text-xs font-medium text-foreground leading-snug">{item.title}</p>
       )}
-      {item.source_type === 'haiku' && item.body && (
-        <p className="text-xs text-foreground/80 leading-relaxed whitespace-pre-line italic">{item.body}</p>
+      {item.source_type === 'haiku' && bodyText && (
+        <p className="text-xs text-foreground/80 leading-relaxed whitespace-pre-line italic">{bodyText}</p>
       )}
       {item.source_type === 'zoom_out' && zoomOutData && (
         <div className="space-y-1">
@@ -73,12 +73,12 @@ function CompanionCard({ item, onSelect }: { item: LibraryItem; onSelect?: (item
           )}
         </div>
       )}
-      {item.source_type === 'history_insight' && item.body && (
-        <p className="text-[11px] text-muted-foreground/70 leading-relaxed line-clamp-3">{item.body}</p>
+      {item.source_type === 'history_insight' && bodyText && (
+        <p className="text-[11px] text-muted-foreground/70 leading-relaxed line-clamp-3">{bodyText}</p>
       )}
       {item.source_type === 'signal' && (
         <div className="space-y-1">
-          {item.body && <p className="text-[11px] text-muted-foreground/70 leading-relaxed line-clamp-3">{item.body}</p>}
+          {bodyText && <p className="text-[11px] text-muted-foreground/70 leading-relaxed line-clamp-3">{bodyText}</p>}
           {item.source_url && (
             <span className="inline-flex items-center gap-0.5 text-[9px] font-mono text-primary/60">
               <ExternalLink className="h-2 w-2" /> source
@@ -88,7 +88,7 @@ function CompanionCard({ item, onSelect }: { item: LibraryItem; onSelect?: (item
       )}
       {item.source_type === 'learning' && (
         <div className="space-y-1">
-          {item.body && <p className="text-[11px] text-muted-foreground/70 leading-relaxed line-clamp-3">{item.body}</p>}
+          {bodyText && <p className="text-[11px] text-muted-foreground/70 leading-relaxed line-clamp-3">{bodyText}</p>}
           {item.source_url && (
             <span className="inline-flex items-center gap-0.5 text-[9px] font-mono text-primary/60">
               <ExternalLink className="h-2 w-2" /> source
@@ -97,8 +97,8 @@ function CompanionCard({ item, onSelect }: { item: LibraryItem; onSelect?: (item
         </div>
       )}
       {/* Fallback for other types */}
-      {!['haiku', 'zoom_out', 'history_insight', 'signal', 'learning', 'reflection'].includes(item.source_type ?? '') && item.body && (
-        <p className="text-[11px] text-muted-foreground/70 leading-relaxed line-clamp-3">{item.body}</p>
+      {!['haiku', 'zoom_out', 'history_insight', 'signal', 'learning', 'reflection'].includes(item.source_type ?? '') && bodyText && (
+        <p className="text-[11px] text-muted-foreground/70 leading-relaxed line-clamp-3">{bodyText}</p>
       )}
     </button>
   );
