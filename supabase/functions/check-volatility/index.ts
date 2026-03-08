@@ -10,6 +10,14 @@ const corsHeaders = {
 
 const DEFAULT_COOLDOWN_MS = 6 * 60 * 60 * 1000; // 6 hours fallback
 
+async function validateUrl(url: string, fallbackQuery: string): Promise<string> {
+  try {
+    const res = await fetch(url, { method: 'HEAD', redirect: 'follow' });
+    if (res.ok || res.status === 405 || res.status === 403) return url;
+  } catch { /* broken */ }
+  return `https://www.google.com/search?q=${encodeURIComponent(fallbackQuery)}`;
+}
+
 async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise<Response> {
   for (let i = 0; i < retries; i++) {
     const res = await fetch(url);
