@@ -115,9 +115,9 @@ const Settings = () => {
       a.download = `holzen-export-${new Date().toISOString().slice(0, 10)}.json`;
       a.click();
       URL.revokeObjectURL(url);
-      toast('Data exported successfully');
+      toast.success('Data exported', { description: `${reflections?.length ?? 0} reflections downloaded.` });
     } catch {
-      toast('Failed to export data');
+      toast.error('Export failed', { description: 'Could not export your data. Please try again.' });
     } finally {
       setExporting(false);
     }
