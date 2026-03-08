@@ -110,13 +110,41 @@ serve(async (req) => {
 
       const hadReflection = (count ?? 0) > 0;
 
-      // Build the night message
-      let message: string;
-      if (hadReflection) {
-        message = `Today BTC moved ${btc.absChange}%. You paused, reflected, and continued. That's the practice.`;
-      } else {
-        message = `Today BTC moved ${btc.absChange}%. You didn't react. That's worth noticing.`;
-      }
+      // Build the night message (language-aware)
+      const userLang = (profile as any).language || "en";
+      const NIGHT_MESSAGES: Record<string, { reflected: (pct: string) => string; quiet: (pct: string) => string }> = {
+        en: {
+          reflected: (pct) => `Today BTC moved ${pct}%. You paused, reflected, and continued. That's the practice.`,
+          quiet: (pct) => `Today BTC moved ${pct}%. You didn't react. That's worth noticing.`,
+        },
+        es: {
+          reflected: (pct) => `Hoy BTC se movió ${pct}%. Pausaste, reflexionaste y continuaste. Esa es la práctica.`,
+          quiet: (pct) => `Hoy BTC se movió ${pct}%. No reaccionaste. Vale la pena notarlo.`,
+        },
+        pt: {
+          reflected: (pct) => `Hoje o BTC moveu ${pct}%. Você pausou, refletiu e continuou. Essa é a prática.`,
+          quiet: (pct) => `Hoje o BTC moveu ${pct}%. Você não reagiu. Vale a pena notar.`,
+        },
+        de: {
+          reflected: (pct) => `Heute bewegte sich BTC um ${pct}%. Du hast innegehalten, reflektiert und weitergemacht. Das ist die Praxis.`,
+          quiet: (pct) => `Heute bewegte sich BTC um ${pct}%. Du hast nicht reagiert. Das ist bemerkenswert.`,
+        },
+        fr: {
+          reflected: (pct) => `Aujourd'hui BTC a bougé de ${pct}%. Tu as fait une pause, réfléchi, et continué. C'est la pratique.`,
+          quiet: (pct) => `Aujourd'hui BTC a bougé de ${pct}%. Tu n'as pas réagi. Ça vaut la peine d'être remarqué.`,
+        },
+        nl: {
+          reflected: (pct) => `Vandaag bewoog BTC ${pct}%. Je pauzeerde, reflecteerde en ging verder. Dat is de praktijk.`,
+          quiet: (pct) => `Vandaag bewoog BTC ${pct}%. Je reageerde niet. Dat is het opmerken waard.`,
+        },
+        tr: {
+          reflected: (pct) => `Bugün BTC %${pct} hareket etti. Durdun, düşündün ve devam ettin. Pratik budur.`,
+          quiet: (pct) => `Bugün BTC %${pct} hareket etti. Tepki vermedin. Bu fark edilmeye değer.`,
+        },
+      };
+      const msgs = NIGHT_MESSAGES[userLang] || NIGHT_MESSAGES.en;
+      const pctStr = btc.absChange.toString();
+      const message = hadReflection ? msgs.reflected(pctStr) : msgs.quiet(pctStr);
 
       // Store the night reflection
       await supabase.from("night_reflections").insert({
