@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { differenceInCalendarDays, parseISO } from 'date-fns';
 import { Shield, Snowflake } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -12,6 +13,7 @@ interface Props {
 }
 
 export function ReflectionStats({ reflections, streakFreezeDates = [], onUseFreeze }: Props) {
+  const { t } = useTranslation();
   const [freezing, setFreezing] = useState(false);
 
   const { total, currentStreak, longestStreak, streakAtRisk, canFreeze, nextFreezeAvailable } = useMemo(() => {
@@ -22,7 +24,6 @@ export function ReflectionStats({ reflections, streakFreezeDates = [], onUseFree
 
     if (totalOutcomes === 0) return { total: reflections.length, currentStreak: 0, longestStreak: 0, streakAtRisk: false, canFreeze: false, nextFreezeAvailable: null };
 
-    // Get unique days with outcomes + freeze dates
     const days = new Set<string>();
     for (const r of withOutcome) {
       days.add(parseISO(r.created_at).toISOString().slice(0, 10));
@@ -47,7 +48,6 @@ export function ReflectionStats({ reflections, streakFreezeDates = [], onUseFree
       }
     }
 
-    // Longest streak
     let longest = 1;
     let streak = 1;
     for (let i = 1; i < sorted.length; i++) {
@@ -60,19 +60,16 @@ export function ReflectionStats({ reflections, streakFreezeDates = [], onUseFree
       }
     }
 
-    // Streak at risk: user had a streak ≥2, no reflection today, and last real reflection was yesterday
     const hasReflectionToday = realDays.has(today);
     const hasFreezeToday = streakFreezeDates.includes(today);
     const atRisk = current >= 2 && !hasReflectionToday && !hasFreezeToday;
 
-    // Can freeze: no freeze used in last 7 days
     const recentFreezes = streakFreezeDates.filter((d) => {
       const diff = Math.abs(Date.now() - new Date(d).getTime());
       return diff < 7 * 24 * 60 * 60 * 1000;
     });
     const freezeAvailable = recentFreezes.length < 1;
 
-    // Next freeze available date
     let nextFreezeAvailable: string | null = null;
     if (!freezeAvailable && recentFreezes.length > 0) {
       const latestFreeze = recentFreezes.sort().reverse()[0];
@@ -88,9 +85,9 @@ export function ReflectionStats({ reflections, streakFreezeDates = [], onUseFree
     setFreezing(true);
     try {
       await onUseFreeze();
-      toast('Streak freeze activated for today');
+      toast(t('stats.streakFreezeActivated'));
     } catch {
-      toast('Failed to activate freeze');
+      toast(t('stats.failedFreeze'));
     } finally {
       setFreezing(false);
     }
@@ -101,9 +98,9 @@ export function ReflectionStats({ reflections, streakFreezeDates = [], onUseFree
   return (
     <div className="space-y-3">
       <div className="grid grid-cols-3 gap-3">
-        <StatCard label="Reflections" value={total} />
-        <StatCard label="Outcome streak" value={currentStreak} suffix="d" />
-        <StatCard label="Best streak" value={longestStreak} suffix="d" />
+        <StatCard label={t('stats.reflections')} value={total} />
+        <StatCard label={t('stats.outcomeStreak')} value={currentStreak} suffix="d" />
+        <StatCard label={t('stats.bestStreak')} value={longestStreak} suffix="d" />
       </div>
 
       {streakAtRisk && canFreeze && onUseFreeze && (
@@ -115,7 +112,7 @@ export function ReflectionStats({ reflections, streakFreezeDates = [], onUseFree
           className="w-full font-mono text-xs gap-2 border-primary/30 text-primary hover:bg-primary/5"
         >
           <Shield className="h-3.5 w-3.5" />
-          {freezing ? 'Activating…' : 'Use streak freeze — protect your streak today'}
+          {freezing ? t('stats.activating') : t('stats.useStreakFreeze')}
         </Button>
       )}
 
@@ -124,26 +121,26 @@ export function ReflectionStats({ reflections, streakFreezeDates = [], onUseFree
           <div className="flex items-center gap-2 text-[10px] font-mono text-muted-foreground/60">
             <Snowflake className="h-3 w-3" />
             {canFreeze ? (
-              <span>1 streak freeze available · resets weekly</span>
+              <span>{t('stats.freezeAvailable')}</span>
             ) : (
-              <span>Next freeze {nextFreezeAvailable}</span>
+              <span>{t('stats.nextFreeze', { time: nextFreezeAvailable })}</span>
             )}
           </div>
 
           {streakFreezeDates.length > 0 && (
             <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="text-[10px] font-mono text-muted-foreground/40">Used:</span>
+              <span className="text-[10px] font-mono text-muted-foreground/40">{t('stats.used')}:</span>
               {[...streakFreezeDates].sort().reverse().slice(0, 5).map((d) => (
                 <span
                   key={d}
                   className="text-[10px] font-mono text-muted-foreground/50 bg-muted/50 px-1.5 py-0.5 rounded"
                 >
-                  {new Date(d).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  {new Date(d).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}
                 </span>
               ))}
               {streakFreezeDates.length > 5 && (
                 <span className="text-[10px] font-mono text-muted-foreground/30">
-                  +{streakFreezeDates.length - 5} more
+                  {t('stats.more', { count: streakFreezeDates.length - 5 })}
                 </span>
               )}
             </div>

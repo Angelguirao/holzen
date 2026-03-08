@@ -1,19 +1,10 @@
 import { useHolzen } from '@/hooks/use-holzen';
+import { useTranslation } from 'react-i18next';
 import { Heart } from 'lucide-react';
-
-const MOTIVATION_LABELS: Record<string, string> = {
-  freedom: 'Financial freedom',
-  family: 'Family security',
-  generational: 'Generational wealth',
-  discipline: 'Learning discipline',
-  conviction: 'Philosophical conviction',
-  sovereignty: 'Self-sovereignty',
-  inflation: 'Inflation hedge',
-  curiosity: 'Curiosity',
-};
 
 export function MyWhyWidget() {
   const { motivations, mantra } = useHolzen();
+  const { t } = useTranslation();
 
   if (!mantra && motivations.length === 0) return null;
 
@@ -22,7 +13,7 @@ export function MyWhyWidget() {
       <div className="flex items-center gap-1.5">
         <Heart className="h-2.5 w-2.5 text-primary/40" />
         <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground/50">
-          My Why
+          {t('myWhy.title')}
         </p>
       </div>
       {mantra && (
@@ -37,7 +28,7 @@ export function MyWhyWidget() {
               key={m}
               className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-primary/5 text-primary/60 border border-primary/10"
             >
-              {MOTIVATION_LABELS[m] || m}
+              {t(`settings.motivations.${m}`, m)}
             </span>
           ))}
         </div>
