@@ -112,16 +112,16 @@ const About = () => {
         <motion.div {...m(0.1)}>
           <div className="space-y-4">
             <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
-              Our philosophy
+              {t('about.ourPhilosophy')}
             </p>
             <p className="text-sm text-foreground leading-relaxed">
-              Holzen is a micropreneur project — small by design.
+              {t('about.philosophyBody1')}
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              We don't have investors, a growth team, or a roadmap optimised for scale. We have a focused product, a <Link to="/roadmap" className="underline hover:text-foreground transition-colors">public roadmap</Link> shaped by user votes, a clear price, and users who value what we build. That's the model.
+              {t('about.philosophyBody2')}
             </p>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              We believe the best software is often built by small teams — or even individuals — who care deeply about the problem they're solving. No engagement metrics, no dark patterns, no pressure to grow at all costs. Just a useful tool that earns its place by being genuinely helpful.
+              {t('about.philosophyBody3')}
             </p>
           </div>
         </motion.div>
