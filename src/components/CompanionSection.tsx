@@ -237,6 +237,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
                 .eq('id', reflectionId)
                 .then(() => {});
               autoSaveToLibrary({ title: nudgeData.title, body: nudgeData.body, sourceType: 'learning', sourceUrl: nudgeData.url });
+            }
             setNudgeLoading(false);
           });
       });
