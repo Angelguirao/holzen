@@ -1,0 +1,1 @@
+ALTER TABLE public.reflection_insights ADD COLUMN language text NOT NULL DEFAULT 'en';
