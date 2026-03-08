@@ -152,6 +152,7 @@ export function LibraryItems({ library, favoritesOnly = false }: Props) {
   const filtered = useMemo(() => {
     let result = items;
     if (!search.trim()) result = result.filter((i) => i.status !== 'archived');
+    if (favoritesOnly) result = result.filter((i) => i.pinned);
     if (typeFilter === 'bookmarks') result = result.filter((i) => i.type === 'bookmark');
     if (typeFilter === 'notes') result = result.filter((i) => i.type === 'note');
     if (collectionFilter) {
