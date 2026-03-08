@@ -253,7 +253,7 @@ function StatsContent({ reflections, memberSince }: { reflections: Reflection[];
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
-          Overview
+          {t('profile.overview')}
         </p>
         <ShareStats
           reflectionCount={reflections.length}
