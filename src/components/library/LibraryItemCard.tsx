@@ -27,6 +27,7 @@ interface Props {
   onDelete: (id: string) => void;
   onStatusChange: (id: string, status: 'unread' | 'read' | 'archived') => void;
   onUpdateTags?: (id: string, tags: string[]) => void;
+  linkedItems?: LibraryItem[];
   collections?: Collection[];
   itemCollections?: Collection[];
   onAddToCollection?: (collectionId: string, itemId: string) => Promise<any>;
