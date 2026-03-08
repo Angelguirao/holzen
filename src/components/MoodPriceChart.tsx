@@ -1,24 +1,30 @@
 import { useMemo } from 'react';
 import { ChartEmptyState } from './ChartEmptyState';
 
-const MOOD_BAR_COLORS: Record<string, string> = {
-  anxious: 'hsl(var(--destructive) / 0.5)',
-  neutral: 'hsl(var(--muted-foreground) / 0.35)',
-  calm: 'hsl(var(--primary) / 0.5)',
+const MOOD_COLORS: Record<string, { bar: string; text: string }> = {
+  fomo: { bar: 'hsl(var(--destructive) / 0.5)', text: 'hsl(var(--destructive))' },
+  greedy: { bar: 'hsl(var(--destructive) / 0.4)', text: 'hsl(var(--destructive))' },
+  anxious: { bar: 'hsl(var(--destructive) / 0.35)', text: 'hsl(var(--destructive) / 0.8)' },
+  fearful: { bar: 'hsl(var(--destructive) / 0.3)', text: 'hsl(var(--destructive) / 0.7)' },
+  excited: { bar: 'hsl(var(--accent) / 0.4)', text: 'hsl(var(--accent-foreground))' },
+  uncertain: { bar: 'hsl(var(--muted-foreground) / 0.3)', text: 'hsl(var(--muted-foreground))' },
+  detached: { bar: 'hsl(var(--muted-foreground) / 0.25)', text: 'hsl(var(--muted-foreground) / 0.8)' },
+  calm: { bar: 'hsl(var(--primary) / 0.5)', text: 'hsl(var(--primary))' },
 };
 
-const MOOD_TEXT_COLORS: Record<string, string> = {
-  anxious: 'hsl(var(--destructive))',
-  neutral: 'hsl(var(--muted-foreground))',
-  calm: 'hsl(var(--primary))',
-};
 interface Props {
   reflections: { context: string | null; mood: string | null }[];
 }
 
-const MOODS = ['anxious', 'neutral', 'calm'] as const;
-const MOOD_LABELS: Record<string, string> = { anxious: 'Anxious', neutral: 'Neutral', calm: 'Calm' };
-const MOOD_VALUES: Record<string, number> = { anxious: 1, neutral: 2, calm: 3 };
+const MOODS = ['fomo', 'excited', 'greedy', 'anxious', 'calm', 'detached', 'uncertain', 'fearful'] as const;
+const MOOD_LABELS: Record<string, string> = {
+  fomo: 'FOMO', excited: 'Excited', greedy: 'Greedy', anxious: 'Anxious',
+  calm: 'Calm', detached: 'Detached', uncertain: 'Uncertain', fearful: 'Fearful',
+};
+const MOOD_VALUES: Record<string, number> = {
+  fomo: 1, greedy: 1.5, anxious: 2, fearful: 2, excited: 2.5,
+  uncertain: 3, detached: 4, calm: 5,
+};
 
 function extractChange(context: string | null): number | null {
   if (!context) return null;
