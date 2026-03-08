@@ -324,12 +324,21 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
     if (completion[key]) return;
     setCompletion((prev) => ({ ...prev, [key]: true }));
     hapticFeedback('light');
-    if (reflectionId && key !== 'signal' && key !== 'zoomOut' && key !== 'history') {
-      const dbKey = key === 'breathing' ? 'breathing_completed' : key === 'haiku' ? 'haiku_read' : 'learning_read';
-      await supabase
-        .from('reflections')
-        .update({ [dbKey]: true } as any)
-        .eq('id', reflectionId);
+    if (reflectionId && key !== 'signal') {
+      const dbKeyMap: Record<string, string> = {
+        breathing: 'breathing_completed',
+        haiku: 'haiku_read',
+        learning: 'learning_read',
+        zoomOut: 'zoom_out_read',
+        history: 'history_read',
+      };
+      const dbKey = dbKeyMap[key];
+      if (dbKey) {
+        await supabase
+          .from('reflections')
+          .update({ [dbKey]: true } as any)
+          .eq('id', reflectionId);
+      }
     }
   }, [reflectionId, completion]);
 
