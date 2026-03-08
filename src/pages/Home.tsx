@@ -482,7 +482,7 @@ const Home = () => {
           >
             <div className="space-y-2">
               <button
-                onClick={() => setShowRitual(true)}
+                onClick={() => navigate('/pause')}
                 className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors duration-300"
               >
                 <Sparkles className="h-3 w-3 text-primary/40" />
