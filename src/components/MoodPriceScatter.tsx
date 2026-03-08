@@ -67,13 +67,13 @@ export function MoodPriceScatter({ reflections }: Props) {
     return { neg: neg.length, pos: pos.length, negAvg: avgMood(neg), posAvg: avgMood(pos) };
   }, [points]);
 
-  if (points.length < 5) {
+  if (points.length < 8) {
     return (
       <ChartEmptyState
         title="Mood × Price Scatter"
-        message="Need 5+ reflections with mood & price data to map your emotional patterns."
+        message="Need 8+ reflections with mood & price data to reveal emotional patterns."
         current={points.length}
-        needed={5}
+        needed={8}
       />
     );
   }
