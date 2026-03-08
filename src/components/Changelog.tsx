@@ -1,4 +1,4 @@
-import { useState, useEffect, forwardRef } from 'react';
+import { useState, useEffect, useCallback, forwardRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import {
   AlertDialog,
@@ -10,31 +10,59 @@ import {
   AlertDialogAction,
 } from '@/components/ui/alert-dialog';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
+
+const PAGE_SIZE = 15;
 
 interface ChangelogEntry {
   id: string;
   version: string;
   date: string;
   changes: string[];
+  created_at: string;
 }
 
 export const Changelog = forwardRef<HTMLDivElement, object>(function Changelog(_props, ref) {
   const [open, setOpen] = useState(false);
   const [entries, setEntries] = useState<ChangelogEntry[]>([]);
   const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
 
   useEffect(() => {
     if (!open) return;
     setLoading(true);
     supabase
       .from('changelog_entries')
-      .select('id, version, date, changes')
+      .select('id, version, date, changes, created_at')
       .order('created_at', { ascending: false })
+      .limit(PAGE_SIZE)
       .then(({ data }) => {
-        setEntries((data as unknown as ChangelogEntry[]) ?? []);
+        const rows = (data as unknown as ChangelogEntry[]) ?? [];
+        setEntries(rows);
+        setHasMore(rows.length === PAGE_SIZE);
         setLoading(false);
       });
   }, [open]);
+
+  const loadMore = useCallback(async () => {
+    if (loadingMore || !hasMore) return;
+    setLoadingMore(true);
+    const last = entries[entries.length - 1];
+    if (!last) { setLoadingMore(false); return; }
+    const { data } = await supabase
+      .from('changelog_entries')
+      .select('id, version, date, changes, created_at')
+      .order('created_at', { ascending: false })
+      .lt('created_at', last.created_at)
+      .limit(PAGE_SIZE);
+    const rows = (data as unknown as ChangelogEntry[]) ?? [];
+    setEntries((prev) => [...prev, ...rows]);
+    setHasMore(rows.length === PAGE_SIZE);
+    setLoadingMore(false);
+  }, [loadingMore, hasMore, entries]);
+
+  const sentinelRef = useInfiniteScroll({ hasMore, loading: loadingMore, onLoadMore: loadMore });
 
   return (
     <div ref={ref}>
@@ -79,6 +107,10 @@ export const Changelog = forwardRef<HTMLDivElement, object>(function Changelog(_
                   </ul>
                 </div>
               ))}
+              <div ref={sentinelRef} className="h-1" />
+              {loadingMore && (
+                <p className="text-[10px] font-mono text-muted-foreground animate-pulse text-center">Loading more…</p>
+              )}
             </div>
           )}
 
