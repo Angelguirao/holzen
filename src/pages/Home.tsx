@@ -18,8 +18,9 @@ import { useSearchParams } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { toast } from 'sonner';
-import { AlertCircle, Loader2, Pause, Pin, Timer, Circle, Sparkles } from 'lucide-react';
+import { AlertCircle, Loader2, Pause, Pin, Timer, Circle, Sparkles, Waves } from 'lucide-react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { playNotificationTone, prefetchNotificationTone } from '@/lib/notification-tone';
 
 interface PinnedReflection {
@@ -33,6 +34,7 @@ interface PinnedReflection {
 
 const Home = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { subscribed, loading: subLoading, trialRemaining, checkoutLoading, startCheckout, refresh } = useSubscription();
   const [searchParams] = useSearchParams();
 
@@ -393,6 +395,15 @@ const Home = () => {
           <Circle className="h-3 w-3 text-muted-foreground/40" />
           <span className="text-[10px] font-mono text-muted-foreground/40 tracking-[0.2em] uppercase">
             Enter the void
+          </span>
+        </button>
+        <button
+          onClick={() => navigate('/ambient')}
+          className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-border/30 bg-muted/10 hover:bg-muted/20 transition-colors duration-500"
+        >
+          <Waves className="h-3 w-3 text-muted-foreground/40" />
+          <span className="text-[10px] font-mono text-muted-foreground/40 tracking-[0.2em] uppercase">
+            Ambient mode
           </span>
         </button>
       </div>
