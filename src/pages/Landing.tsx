@@ -51,13 +51,7 @@ const Landing = () => {
     if (ref) localStorage.setItem('holzen_ref', ref);
   }, [searchParams]);
 
-  const LOOP_STEPS = [
-    { num: '01', icon: <TrendingDown className="h-4 w-4" />, title: t('landing.steps.01title'), desc: t('landing.steps.01desc') },
-    { num: '02', icon: <Wind className="h-4 w-4" />, title: t('landing.steps.02title'), desc: t('landing.steps.02desc') },
-    { num: '03', icon: <Eye className="h-4 w-4" />, title: t('landing.steps.03title'), desc: t('landing.steps.03desc') },
-    { num: '04', icon: <Target className="h-4 w-4" />, title: t('landing.steps.04title'), desc: t('landing.steps.04desc') },
-    { num: '05', icon: <Sparkles className="h-4 w-4" />, title: t('landing.steps.05title'), desc: t('landing.steps.05desc') },
-  ];
+
 
   const COMPANIONS = [
     { icon: <Wind className="h-4 w-4" />, label: t('landing.companions.breathing'), desc: t('landing.companions.breathingDesc') },
