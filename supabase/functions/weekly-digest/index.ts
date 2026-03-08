@@ -37,6 +37,52 @@ function shouldSendDigest(frequency: string, now: Date): boolean {
   }
 }
 
+function fmtPrice(p: number, currency: string): string {
+  const fractionDigits = currency === "JPY" || currency === "KRW" ? 0 : 0;
+  return p.toLocaleString("en-US", { style: "currency", currency, maximumFractionDigits: fractionDigits });
+}
+
+interface BtcWeekData {
+  weekChange: number;
+  weekHigh: number;
+  weekLow: number;
+  currentPrice: number;
+}
+
+const btcCache = new Map<string, BtcWeekData>();
+
+async function fetchBtcWeekData(currency: string): Promise<BtcWeekData> {
+  const cached = btcCache.get(currency);
+  if (cached) return cached;
+
+  const cur = currency.toLowerCase();
+  const res7d = await fetchWithRetry(
+    `https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=${cur}&days=7`
+  );
+  const data7d = await res7d.json();
+  const prices: [number, number][] = data7d.prices;
+
+  let weekChange = 0;
+  let weekHigh = 0;
+  let weekLow = Infinity;
+  let currentPrice = 0;
+
+  if (prices && prices.length >= 2) {
+    const startPrice = prices[0][1];
+    currentPrice = prices[prices.length - 1][1];
+    weekChange = ((currentPrice - startPrice) / startPrice) * 100;
+
+    for (const [, p] of prices) {
+      if (p > weekHigh) weekHigh = p;
+      if (p < weekLow) weekLow = p;
+    }
+  }
+
+  const result = { weekChange, weekHigh, weekLow, currentPrice };
+  btcCache.set(currency, result);
+  return result;
+}
+
 async function generateAIInsight(
   reflectionCount: number,
   topMood: string | undefined,
@@ -101,38 +147,10 @@ serve(async (req) => {
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
-    // 1. Fetch 7-day BTC data
-    const res7d = await fetchWithRetry(
-      "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=7"
-    );
-    const data7d = await res7d.json();
-    const prices: [number, number][] = data7d.prices;
-
-    let weekChange = 0;
-    let weekHigh = 0;
-    let weekLow = Infinity;
-    let currentPrice = 0;
-
-    if (prices && prices.length >= 2) {
-      const startPrice = prices[0][1];
-      currentPrice = prices[prices.length - 1][1];
-      weekChange = ((currentPrice - startPrice) / startPrice) * 100;
-
-      for (const [, p] of prices) {
-        if (p > weekHigh) weekHigh = p;
-        if (p < weekLow) weekLow = p;
-      }
-    }
-
-    const weekDir = weekChange >= 0 ? "up" : "down";
-    const absWeekChange = Math.abs(weekChange).toFixed(1);
-    const fmtPrice = (p: number) =>
-      p.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
-
-    // 2. Get all users with email notifications enabled
+    // Get all users with email notifications enabled
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
-      .select("user_id, email_notifications, digest_frequency, threshold, threshold_down");
+      .select("user_id, email_notifications, digest_frequency, threshold, threshold_down, hold_goal_currency");
 
     if (profilesError) throw profilesError;
 
@@ -146,6 +164,12 @@ serve(async (req) => {
     const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
     for (const profile of eligible) {
+      const currency = (profile as any).hold_goal_currency || "USD";
+      const btc = await fetchBtcWeekData(currency);
+
+      const weekDir = btc.weekChange >= 0 ? "up" : "down";
+      const absWeekChange = Math.abs(btc.weekChange).toFixed(1);
+
       const { data: reflections } = await supabase
         .from("reflections")
         .select("message, mood, outcome, created_at")
@@ -213,15 +237,15 @@ serve(async (req) => {
   <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
     <tr>
       <td style="padding: 8px 0; font-size: 12px; color: #737373; border-bottom: 1px solid #e5e2dc;">Current</td>
-      <td style="padding: 8px 0; font-size: 12px; color: #2a2a2a; text-align: right; border-bottom: 1px solid #e5e2dc;">${fmtPrice(currentPrice)}</td>
+      <td style="padding: 8px 0; font-size: 12px; color: #2a2a2a; text-align: right; border-bottom: 1px solid #e5e2dc;">${fmtPrice(btc.currentPrice, currency)}</td>
     </tr>
     <tr>
       <td style="padding: 8px 0; font-size: 12px; color: #737373; border-bottom: 1px solid #e5e2dc;">Week high</td>
-      <td style="padding: 8px 0; font-size: 12px; color: #2a2a2a; text-align: right; border-bottom: 1px solid #e5e2dc;">${fmtPrice(weekHigh)}</td>
+      <td style="padding: 8px 0; font-size: 12px; color: #2a2a2a; text-align: right; border-bottom: 1px solid #e5e2dc;">${fmtPrice(btc.weekHigh, currency)}</td>
     </tr>
     <tr>
       <td style="padding: 8px 0; font-size: 12px; color: #737373;">Week low</td>
-      <td style="padding: 8px 0; font-size: 12px; color: #2a2a2a; text-align: right;">${fmtPrice(weekLow)}</td>
+      <td style="padding: 8px 0; font-size: 12px; color: #2a2a2a; text-align: right;">${fmtPrice(btc.weekLow, currency)}</td>
     </tr>
   </table>
 
