@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
+import { useHolzen } from '@/hooks/use-holzen';
 import { RefreshCw, TrendingUp, Clock, Brain, Sparkles, Target, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
@@ -45,6 +46,7 @@ interface Props {
 
 export function AIInsightsPanel({ reflectionCount }: Props) {
   const { user } = useAuth();
+  const { language } = useHolzen();
   const [allData, setAllData] = useState<InsightsRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
@@ -95,7 +97,7 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
     setGenerating(true);
     try {
       const { error } = await supabase.functions.invoke('reflection-insights', {
-        body: { user_id: user.id },
+        body: { user_id: user.id, language },
       });
       if (error) throw error;
       await loadInsights();

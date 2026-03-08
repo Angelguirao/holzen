@@ -20,10 +20,15 @@ serve(async (req) => {
   }
 
   try {
-    const { context } = await req.json();
+    const { context, language } = await req.json();
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+
+    const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", ja: "Japanese", de: "German" };
+    const langCode = language || "en";
+    const langName = LANG_NAMES[langCode] || "English";
+    const langInstruction = langCode !== "en" ? `\n\nLANGUAGE: Write the title and body in ${langName}. Source name and URL should remain as-is.` : "";
 
     const systemPrompt = `You are a Bitcoin signal curator for a mindfulness app called Holzen. Your job is to surface ONE real, high-signal piece of Bitcoin analysis or insight that is contextually relevant to the current market conditions.
 
@@ -37,7 +42,7 @@ Rules:
 - Keep the body to 2-3 sentences max
 - Include a real, working URL to a relevant source (blog post, article, or data dashboard)
 - Tone: calm, educational, grounding. No hype, no advice, no predictions.
-- Prioritize timeless insights over breaking news`;
+- Prioritize timeless insights over breaking news${langInstruction}`;
 
     const userPrompt = context
       ? `Current market context: ${context}\n\nFind one relevant, real Bitcoin insight for this moment.`

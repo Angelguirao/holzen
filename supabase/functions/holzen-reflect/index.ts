@@ -40,7 +40,7 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const { context, tone, customPrompt, style, moodHistory, severity, motivations, mantra, currency } = await req.json();
+    const { context, tone, customPrompt, style, moodHistory, severity, motivations, mantra, currency, language } = await req.json();
     if (!context) {
       return new Response(JSON.stringify({ error: "Missing context" }), {
         status: 400,
@@ -104,11 +104,15 @@ serve(async (req) => {
     }
 
     const currencyCode = currency || "USD";
+    const langCode = language || "en";
+    const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", ja: "Japanese", de: "German" };
+    const langName = LANG_NAMES[langCode] || "English";
+    const langInstruction = langCode !== "en" ? `\n\nLANGUAGE: You MUST write ALL output (reflection, haiku, learning title, learning body) in ${langName}. Do not use English.` : "";
     const systemPrompt = `You generate a reflection with optional companions in response to Bitcoin volatility.
 
 You MUST respond by calling the "generate_reflection" function. Do not respond with plain text.
 
-Tone: ${baseTone}
+Tone: ${baseTone}${langInstruction}
 ${adaptiveContext}
 
 CURRENCY: The user views BTC prices in ${currencyCode}. When mentioning any price or monetary value, format it in ${currencyCode} (e.g. use the appropriate currency symbol). Never use USD unless the user's currency IS USD.

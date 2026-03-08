@@ -33,9 +33,14 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const { context } = await req.json();
+    const { context, language } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+
+    const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", ja: "Japanese", de: "German" };
+    const langCode = language || "en";
+    const langName = LANG_NAMES[langCode] || "English";
+    const langInstruction = langCode !== "en" ? `\n\nLANGUAGE: Write the title and body in ${langName}. Keep citation names and URLs in their original form.` : "";
 
     const systemPrompt = `You are a behavioral finance researcher. Given the current market context, generate ONE grounding nudge for a Bitcoin holder who might be about to make an impulsive decision.
 
@@ -50,7 +55,7 @@ Your nudge MUST:
 Topics to draw from based on context:
 - During crashes/fear: loss aversion, panic selling data, recovery statistics, hot-state decision making, recency bias
 - During surges/greed: disposition effect, overconfidence, FOMO neuroscience, herding behavior, narrative fallacy
-- General: anchoring, sunk cost, status quo bias, regret aversion, emotional regulation timing`;
+- General: anchoring, sunk cost, status quo bias, regret aversion, emotional regulation timing${langInstruction}`;
 
     const response = await fetch(
       "https://ai.gateway.lovable.dev/v1/chat/completions",
