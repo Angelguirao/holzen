@@ -238,6 +238,9 @@ const Home = () => {
       {/* BTC Status */}
       <BtcStatus data={btcData} error={error} hidden={priceHidden} onToggleHidden={togglePriceHidden} />
 
+      {/* Ritual cooldown awareness */}
+      <RitualCooldownBanner />
+
       {/* Night Reflection */}
       <NightReflectionCard />
 
