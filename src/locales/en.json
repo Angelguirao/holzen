@@ -378,6 +378,8 @@
   "landing": {
     "hero": "Pause before you act on Bitcoin volatility.",
     "heroDesc": "Holzen is a self-awareness practice for Bitcoin holders. When volatility hits, you get a moment to breathe, reflect, and notice your patterns — before impulse takes over.",
+    "getStartedForFree": "Get started for free",
+    "noCreditCard": "No credit card required",
     "reflectionLoop": "The reflection loop",
     "steps": {
       "01title": "The market moves",
@@ -385,9 +387,9 @@
       "02title": "You pause",
       "02desc": "A breathing exercise grounds you. An emotional check-in captures how you feel — from FOMO and greed to calm and detachment.",
       "03title": "You reflect",
-      "03desc": "An AI-generated reflection encourages awareness, not action. Six companions offer context: a haiku, a signal, a learning nudge, a zoom-out perspective, and a historical echo.",
+      "03desc": "An AI-generated reflection encourages awareness, not action. Six companions offer context: a haiku, a signal, a grounding nudge, a zoom-out perspective, and a historical echo.",
       "04title": "You decide",
-      "04desc": "Choose deliberately: hold, sell, buy, or do nothing. Run a pre-decision ritual — quick, standard, or deep — to ground yourself before committing.",
+      "04desc": "Choose deliberately: hold, sell, buy, or do nothing. Run a pre-decision ritual — breathe, reflect, journal, then decide — to ground yourself before committing.",
       "05title": "You grow",
       "05desc": "Tag emotions. Journal notes. Track outcomes. Over time, your Library, insights, and streaks reveal how your composure evolves."
     },
@@ -398,14 +400,14 @@
       "breathingDesc": "Guided calm before you read",
       "haiku": "Haiku",
       "haikuDesc": "5-7-5 stillness, unique each time",
-      "signal": "Signal",
-      "signalDesc": "Curated intelligence from 29+ sources",
-      "learning": "Learning nudge",
-      "learningDesc": "Bitcoin knowledge in context",
+      "signal": "Read the Signal",
+      "signalDesc": "AI-powered intelligence from your curated sources via Perplexity",
+      "learning": "Ground Yourself",
+      "learningDesc": "Behavioral finance research in context",
       "zoomOut": "Zoom Out",
-      "zoomOutDesc": "BTC prices years ago + deep-time perspective",
+      "zoomOutDesc": "Historical BTC prices, past echoes & deep-time perspective",
       "history": "Historical echo",
-      "historyDesc": "Your own past reflection in a similar moment"
+      "historyDesc": "Your past reflections, BTC prices years ago & civilizational context"
     },
     "whatYouGet": "Everything you get",
     "features": {
