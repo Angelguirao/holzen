@@ -451,7 +451,7 @@
       "ritualQuestion": "What are pre-decision rituals?",
       "ritualAnswer": "Rituals are guided sequences you run before making a decision. Choose Quick (breathe → decide), Standard (breathe → reflect → decide), or Deep (breathe → reflect → journal → decide). They help you slow down and commit to a deliberate choice rather than an impulsive one.",
       "trackingQuestion": "How does mood and outcome tracking work?",
-      "trackingAnswer": "Before each reflection, you do a quick 1-tap mood check across 8 emotional states. After reflecting, you record what you did — held, sold, bought, or nothing. Your insights panel shows these patterns over time, including decision quality scores, mood trends, and period comparisons.",
+      "trackingAnswer": "During each pause session, you do an emotional check-in across 8 states — from FOMO and greed to calm and detachment. After reflecting, you record what you did: held, sold, bought, or nothing. Your insights panel shows patterns over time, including decision quality scores, mood trends, and period comparisons.",
       "dataQuestion": "What data do you collect?",
       "dataAnswer": "Only what's needed: your email, thresholds, reflections, mood entries, and push tokens if enabled. You can export all your data anytime or delete your account entirely. See our",
       "cancelQuestion": "Can I cancel anytime?",
