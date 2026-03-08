@@ -248,7 +248,7 @@ const Landing = () => {
         <motion.div {...m()}>
           <div className="space-y-5">
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Holzen is not a trading tool. It won't tell you what to do. It exists to help you understand yourself — one volatile moment at a time.
+              {t('landing.footer')}
             </p>
 
             {/* Social */}
