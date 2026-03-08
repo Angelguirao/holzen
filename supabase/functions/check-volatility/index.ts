@@ -68,7 +68,7 @@ interface ReflectionResult {
   learning_url: string | null;
 }
 
-async function generateReflection(context: string, apiKey: string, tone = "stoic"): Promise<ReflectionResult | null> {
+async function generateReflection(context: string, apiKey: string, tone = "stoic", language = "en"): Promise<ReflectionResult | null> {
   const TONE_INSTRUCTIONS: Record<string, string> = {
     stoic: "Write in a calm, stoic tone. Brief and grounded. Like Marcus Aurelius observing the market.",
     zen: "Write in a gentle zen tone. Spacious, almost meditative. Use natural metaphors.",
@@ -77,6 +77,10 @@ async function generateReflection(context: string, apiKey: string, tone = "stoic
   };
 
   const toneInstruction = TONE_INSTRUCTIONS[tone] || TONE_INSTRUCTIONS.stoic;
+
+  const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
+  const langName = LANG_NAMES[language] || "English";
+  const langInstruction = language !== "en" ? `\n\nLANGUAGE: You MUST write ALL output (reflection message, haiku, learning title, learning body) in ${langName}. Do not use English.` : "";
 
   const systemPrompt = `You generate a reflection with optional companions in response to Bitcoin volatility.
 
@@ -109,7 +113,7 @@ Learning input rules:
 - Title: a short, factual headline (5-10 words).
 - Body: 1-2 sentences about a historical Bitcoin event, market pattern, or behavioral finance insight relevant to the current context. Factual, educational, no advice.
 - Citation: formatted source reference (e.g. "CoinDesk, 2020" or "Kahneman & Tversky, 1979")
-- URL: a real, working URL to a reputable source documenting the event or research referenced.`;
+- URL: a real, working URL to a reputable source documenting the event or research referenced.${langInstruction}`;
 
   const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
     method: "POST",
@@ -259,7 +263,7 @@ serve(async (req) => {
     // 2. Get all profiles - we need to check both thresholds
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
-      .select("user_id, threshold, cumulative_threshold, email_notifications, last_trigger_at, cooldown_hours, reflection_tone, companion_haiku, companion_learning, quiet_hours_start, quiet_hours_end, timezone");
+      .select("user_id, threshold, cumulative_threshold, email_notifications, last_trigger_at, cooldown_hours, reflection_tone, companion_haiku, companion_learning, quiet_hours_start, quiet_hours_end, timezone, language");
 
     if (profilesError) throw profilesError;
     if (!profiles || profiles.length === 0) {
@@ -314,7 +318,8 @@ serve(async (req) => {
 
       // Generate reflection with companions
       const tone = (profile as any).reflection_tone || "stoic";
-      const result = await generateReflection(ctx, LOVABLE_API_KEY, tone);
+      const userLang = (profile as any).language || "en";
+      const result = await generateReflection(ctx, LOVABLE_API_KEY, tone, userLang);
       if (!result) {
         console.log(`[CHECK-VOLATILITY] Failed to generate reflection for ${profile.user_id}`);
         continue;
