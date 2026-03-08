@@ -113,7 +113,7 @@ export function ReflectionTags({ reflectionId, initialTags }: Props) {
           className="inline-flex items-center gap-0.5 text-[10px] font-mono text-muted-foreground/50 hover:text-muted-foreground transition-colors"
         >
           <Tag className="h-2.5 w-2.5" />
-          {tags.length === 0 ? 'Add tags' : '+'}
+          {tags.length === 0 ? t('reflectionTags.addTags') : '+'}
         </button>
       </div>
 
