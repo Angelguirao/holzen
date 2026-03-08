@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState, useCallback, forwardRef } from 'react';
 import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
@@ -27,6 +28,7 @@ const sampleReflection = {
 const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
 export function Onboarding({ onComplete }: Props) {
+  const { t } = useTranslation();
   const [step, setStep] = useState(0);
   const [firstName, setFirstName] = useState('');
   const [timezone] = useState(detectedTimezone);
@@ -90,21 +92,21 @@ export function Onboarding({ onComplete }: Props) {
                     className="text-xs font-mono tracking-[0.25em] uppercase text-muted-foreground"
                     {...stagger(0.1)}
                   >
-                    Holzen
+                    {t('common.holzen')}
                   </motion.p>
                   <motion.p
                     className="text-xl leading-relaxed text-foreground"
                     {...stagger(0.2)}
                   >
-                    The market moves. You feel the pull to act. This app exists for the space between impulse and decision.
+                    {t('onboarding.heroText')}
                   </motion.p>
                   <motion.div className="space-y-4" {...stagger(0.3)}>
                     <div className="space-y-2">
-                      <p className="text-xs font-mono text-muted-foreground">What should we call you?</p>
+                      <p className="text-xs font-mono text-muted-foreground">{t('onboarding.whatToCallYou')}</p>
                       <Input
                         value={firstName}
                         onChange={(e) => setFirstName(e.target.value)}
-                        placeholder="First name (optional)"
+                        placeholder={t('onboarding.firstNameOptional')}
                         maxLength={30}
                         className="text-xs font-mono"
                         autoFocus
@@ -112,12 +114,12 @@ export function Onboarding({ onComplete }: Props) {
                     </div>
                     <div className="flex items-center gap-2">
                       <p className="text-[10px] font-mono text-muted-foreground/50">
-                        Timezone: {timezone.replace(/_/g, ' ')}
+                        {t('onboarding.timezone', { tz: timezone.replace(/_/g, ' ') })}
                       </p>
                     </div>
                   </motion.div>
                   <motion.div {...stagger(0.4)}>
-                    <Nav showBack={false} onNext={() => goTo(1)} />
+                    <Nav showBack={false} onNext={() => goTo(1)} nextLabel={t('common.continue')} />
                   </motion.div>
                 </div>
               )}
@@ -129,13 +131,13 @@ export function Onboarding({ onComplete }: Props) {
                     className="text-xs font-mono tracking-[0.25em] uppercase text-muted-foreground"
                     {...stagger(0.1)}
                   >
-                    Your companions
+                    {t('onboarding.yourCompanions')}
                   </motion.p>
                   <motion.p
                     className="text-sm text-muted-foreground leading-relaxed"
                     {...stagger(0.15)}
                   >
-                    Each reflection comes with tools to help you pause. Try them.
+                    {t('onboarding.companionIntro')}
                   </motion.p>
 
                   <motion.div
@@ -151,7 +153,7 @@ export function Onboarding({ onComplete }: Props) {
 
                     <div className="space-y-3 pt-3 border-t border-border/30">
                       <p className="text-[10px] font-mono text-muted-foreground/50 uppercase tracking-wider">
-                        Pause with this
+                        {t('onboarding.pauseWithThis')}
                       </p>
 
                       {/* Breathing */}
@@ -170,7 +172,7 @@ export function Onboarding({ onComplete }: Props) {
                               transition={{ duration: 12, repeat: Infinity, times: [0, 0.33, 0.66, 1], ease: 'easeInOut' }}
                             />
                             <p className="text-[10px] font-mono text-muted-foreground">
-                              Inhale… hold… exhale…
+                              {t('onboarding.inhaleHoldExhale')}
                             </p>
                           </motion.div>
                         ) : (
@@ -180,7 +182,7 @@ export function Onboarding({ onComplete }: Props) {
                             className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
                             whileHover={prefersReduced ? {} : { x: 4 }}
                           >
-                            Breathe with this →
+                            {t('onboarding.breatheWithThis')}
                           </motion.button>
                         )}
                       </AnimatePresence>
@@ -203,7 +205,7 @@ export function Onboarding({ onComplete }: Props) {
                             className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
                             whileHover={prefersReduced ? {} : { x: 4 }}
                           >
-                            Read as haiku →
+                            {t('onboarding.readAsHaiku')}
                           </motion.button>
                         )}
                       </AnimatePresence>
@@ -229,7 +231,7 @@ export function Onboarding({ onComplete }: Props) {
                             className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
                             whileHover={prefersReduced ? {} : { x: 4 }}
                           >
-                            Learn from history →
+                            {t('onboarding.learnFromHistory')}
                           </motion.button>
                         )}
                       </AnimatePresence>
@@ -237,11 +239,11 @@ export function Onboarding({ onComplete }: Props) {
                   </motion.div>
 
                   <motion.p className="text-[10px] text-muted-foreground/60" {...stagger(0.35)}>
-                    Toggle companions anytime in Settings.
+                    {t('onboarding.toggleCompanions')}
                   </motion.p>
 
                   <motion.div {...stagger(0.4)}>
-                    <Nav showBack onBack={() => goTo(0)} onNext={() => goTo(2)} />
+                    <Nav showBack onBack={() => goTo(0)} onNext={() => goTo(2)} nextLabel={t('common.continue')} />
                   </motion.div>
                 </div>
               )}
@@ -253,13 +255,13 @@ export function Onboarding({ onComplete }: Props) {
                     className="text-xs font-mono tracking-[0.25em] uppercase text-muted-foreground"
                     {...stagger(0.1)}
                   >
-                    Your threshold
+                    {t('onboarding.yourThreshold')}
                   </motion.p>
                   <motion.p
                     className="text-sm text-muted-foreground leading-relaxed"
                     {...stagger(0.15)}
                   >
-                    How much does BTC need to move in 24 hours before you hear from us?
+                    {t('onboarding.thresholdQuestion')}
                   </motion.p>
                   <motion.div {...stagger(0.25)}>
                     <p className="text-4xl font-mono tracking-tight mb-6">{threshold.toFixed(1)}%</p>
@@ -272,7 +274,7 @@ export function Onboarding({ onComplete }: Props) {
                       className="w-full"
                     />
                     <p className="text-[10px] text-muted-foreground/60 mt-3">
-                      You can change this later.
+                      {t('onboarding.changeThresholdLater')}
                     </p>
                   </motion.div>
 
@@ -281,7 +283,7 @@ export function Onboarding({ onComplete }: Props) {
                       onClick={() => goTo(1)}
                       className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
                     >
-                      ← Back
+                    ← {t('common.back')}
                     </button>
                     <Button
                       onClick={() => onComplete({
@@ -293,7 +295,7 @@ export function Onboarding({ onComplete }: Props) {
                       size="sm"
                       className="font-mono text-xs"
                     >
-                      Begin
+                      {t('common.begin')}
                     </Button>
                   </motion.div>
                 </div>
@@ -335,6 +337,7 @@ const Nav = forwardRef<HTMLDivElement, {
   onNext: () => void;
   nextLabel?: string;
 }>(function Nav({ showBack, onBack, onNext, nextLabel = 'Continue' }, ref) {
+  const { t } = useTranslation();
   return (
     <div ref={ref} className="flex items-center gap-4 pt-2">
       {showBack && (
@@ -342,7 +345,7 @@ const Nav = forwardRef<HTMLDivElement, {
           onClick={onBack}
           className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
         >
-          ← Back
+          ← {t('common.back')}
         </button>
       )}
       <button

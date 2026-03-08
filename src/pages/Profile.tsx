@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useEffect, useState, useMemo, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
@@ -72,6 +73,7 @@ interface Letter {
 
 const Profile = () => {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [reflections, setReflections] = useState<Reflection[]>([]);
   const [letters, setLetters] = useState<Letter[]>([]);
   const [loading, setLoading] = useState(true);
@@ -125,10 +127,10 @@ const Profile = () => {
   const fmtPrice = (p: number) => formatBtcPrice(p, currency);
 
   const tabs = [
-    { id: 'stats' as const, label: 'Stats' },
-    { id: 'insights' as const, label: 'Insights' },
-    { id: 'badges' as const, label: 'Badges' },
-    { id: 'letters' as const, label: 'Letters', count: pendingLetters.length },
+    { id: 'stats' as const, label: t('profile.stats') },
+    { id: 'insights' as const, label: t('profile.insights') },
+    { id: 'badges' as const, label: t('profile.badges') },
+    { id: 'letters' as const, label: t('profile.letters'), count: pendingLetters.length },
   ];
 
   return (
@@ -163,7 +165,7 @@ const Profile = () => {
           </div>
         ) : reflections.length === 0 ? (
           <p className="text-xs text-muted-foreground py-8 text-center">
-            No reflections yet. Stats will appear after your first reflection.
+            {t('profile.noReflectionsYet')}
           </p>
         ) : (
           <StatsContent reflections={reflections} memberSince={user?.created_at} />
@@ -195,7 +197,7 @@ const Profile = () => {
           <div className="py-8 text-center space-y-2">
             <Mail className="h-5 w-5 mx-auto text-muted-foreground/40" />
             <p className="text-xs text-muted-foreground">
-              No letters yet. Write one during a ±5% market swing from the home page.
+              {t('profile.noLettersYet')}
             </p>
           </div>
         ) : (
@@ -205,7 +207,7 @@ const Profile = () => {
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Lock className="h-3 w-3" />
                   <p className="text-[10px] font-mono tracking-widest uppercase">
-                    Sealed ({pendingLetters.length})
+                    {t('profile.sealed')} ({pendingLetters.length})
                   </p>
                 </div>
                 {pendingLetters.map((l) => (
@@ -218,7 +220,7 @@ const Profile = () => {
                 <div className="flex items-center gap-2 text-muted-foreground">
                   <Mail className="h-3 w-3" />
                   <p className="text-[10px] font-mono tracking-widest uppercase">
-                    Delivered ({deliveredLetters.length})
+                    {t('profile.delivered')} ({deliveredLetters.length})
                   </p>
                 </div>
                 {deliveredLetters.map((l) => (
@@ -234,6 +236,7 @@ const Profile = () => {
 };
 
 function StatsContent({ reflections, memberSince }: { reflections: Reflection[]; memberSince?: string }) {
+  const { t } = useTranslation();
   const scoreData = useHolzenScore(reflections);
 
   const moodCounts = useMemo(() => {
@@ -250,7 +253,7 @@ function StatsContent({ reflections, memberSince }: { reflections: Reflection[];
     <div className="space-y-5">
       <div className="flex items-center justify-between">
         <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
-          Overview
+          {t('profile.overview')}
         </p>
         <ShareStats
           reflectionCount={reflections.length}
@@ -277,10 +280,10 @@ function StatsContent({ reflections, memberSince }: { reflections: Reflection[];
       ) : (
         <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-6 text-center space-y-2">
           <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground/50">
-            Charts unlock soon
+            {t('profile.chartsUnlockSoon')}
           </p>
           <p className="text-xs text-muted-foreground/60 leading-relaxed max-w-[240px] mx-auto">
-            Complete {5 - reflections.length} more reflection{5 - reflections.length !== 1 ? 's' : ''} to unlock trend charts, mood analysis, and scatter plots.
+            {t('profile.completeMoreReflections', { count: 5 - reflections.length })}
           </p>
           <div className="pt-1 space-y-1">
             <div className="h-1 w-24 mx-auto rounded-full bg-muted/50 overflow-hidden">
@@ -295,12 +298,13 @@ function StatsContent({ reflections, memberSince }: { reflections: Reflection[];
 }
 
 function HolzenScoreDetail({ scoreData }: { scoreData: import('@/hooks/use-holzen-score').HolzenScoreData }) {
+  const { t } = useTranslation();
   const circumference = 2 * Math.PI * 36;
   const offset = circumference - (scoreData.score / 100) * circumference;
 
   return (
     <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3">
-      <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">Holzen Score</p>
+      <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">{t('profile.holzenScore')}</p>
       <div className="flex items-center gap-5">
         <div className="relative shrink-0">
           <svg width="88" height="88" viewBox="0 0 88 88">
@@ -312,9 +316,9 @@ function HolzenScoreDetail({ scoreData }: { scoreData: import('@/hooks/use-holze
           </div>
         </div>
         <div className="space-y-2 flex-1 min-w-0">
-          <ScoreBarInline label="Mood" value={scoreData.moodScore} />
-          <ScoreBarInline label="Actions" value={scoreData.outcomeScore} />
-          <ScoreBarInline label="Streak" value={scoreData.streakScore} />
+          <ScoreBarInline label={t('profile.moodLabel')} value={scoreData.moodScore} />
+          <ScoreBarInline label={t('profile.actionsLabel')} value={scoreData.outcomeScore} />
+          <ScoreBarInline label={t('profile.streakLabel')} value={scoreData.streakScore} />
         </div>
       </div>
     </div>
@@ -341,6 +345,7 @@ function LetterCard({ letter: l, onDelete, fmtPrice, type }: {
   fmtPrice: (p: number) => string;
   type: 'sealed' | 'delivered';
 }) {
+  const { t } = useTranslation();
   const isDelivered = type === 'delivered';
 
   return (
