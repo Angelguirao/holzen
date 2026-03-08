@@ -1,11 +1,14 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
-import { Target, Calendar, DollarSign, Infinity, X, Check } from 'lucide-react';
+import { Target, Calendar, DollarSign, Infinity, X, Check, CalendarIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { differenceInDays, format } from 'date-fns';
 import { toast } from 'sonner';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar as CalendarPicker } from '@/components/ui/calendar';
+import { cn } from '@/lib/utils';
 
 type GoalType = 'time' | 'price' | 'forever';
 type TimeUnit = 'months' | 'years';
@@ -31,6 +34,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
   const [timeUnit, setTimeUnit] = useState<TimeUnit>('months');
   const [inputValue, setInputValue] = useState('');
   const [validationError, setValidationError] = useState<string | null>(null);
+  const [startDate, setStartDate] = useState<Date>(new Date());
 
   const loadGoal = useCallback(async () => {
     if (!user) return;
@@ -92,7 +96,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
     if (goalType === 'forever') {
       const updates = {
         hold_goal_type: 'forever',
-        hold_goal_start: new Date().toISOString(),
+        hold_goal_start: startDate.toISOString(),
         hold_goal_target_months: null,
         hold_goal_target_price: null,
         hold_goal_currency: 'USD',
@@ -114,7 +118,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
 
     const updates: Record<string, any> = {
       hold_goal_type: goalType,
-      hold_goal_start: new Date().toISOString(),
+      hold_goal_start: startDate.toISOString(),
       hold_goal_target_months: months,
       hold_goal_target_price: goalType === 'price' ? val : null,
       hold_goal_currency: 'USD',
@@ -168,7 +172,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
           <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
             Set Your Goal
           </p>
-          <button onClick={() => { setSetting(false); setValidationError(null); }} className="text-muted-foreground/40 hover:text-foreground">
+          <button onClick={() => { setSetting(false); setValidationError(null); setStartDate(new Date()); }} className="text-muted-foreground/40 hover:text-foreground">
             <X className="h-3 w-3" />
           </button>
         </div>
@@ -190,10 +194,40 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
           ))}
         </div>
 
+        {/* Start date picker */}
+        <div className="flex items-center gap-2">
+          <p className="text-[10px] font-mono text-muted-foreground/60 whitespace-nowrap">Start from</p>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className={cn(
+                  "h-7 flex-1 justify-start text-left text-[10px] font-mono",
+                  startDate.toDateString() === new Date().toDateString() && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="h-2.5 w-2.5 mr-1.5" />
+                {startDate.toDateString() === new Date().toDateString() ? 'Today' : format(startDate, 'MMM d, yyyy')}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <CalendarPicker
+                mode="single"
+                selected={startDate}
+                onSelect={(d) => d && setStartDate(d)}
+                disabled={(date) => date > new Date()}
+                initialFocus
+                className={cn("p-3 pointer-events-auto")}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+
         {goalType === 'forever' ? (
           <div className="space-y-3">
             <p className="text-xs text-muted-foreground leading-relaxed">
-              No timeline. No target price. Just hold. The counter starts now and never ends.
+              No timeline. No target price. Just hold. The counter starts {startDate.toDateString() === new Date().toDateString() ? 'now' : `from ${format(startDate, 'MMM d, yyyy')}`} and never ends.
             </p>
             <Button size="sm" onClick={saveGoal} className="w-full h-8 text-xs font-mono">
               <Infinity className="h-3 w-3 mr-1.5" />
