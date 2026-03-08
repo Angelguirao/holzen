@@ -51,7 +51,17 @@ export function MoodTrendChart({ reflections }: Props) {
 
   const data = useMemo(() => buildData(reflections, granularity), [reflections, granularity]);
 
-  if (data.length < 1) return null;
+  if (data.length < 1) {
+    const moodCount = reflections.filter((r) => r.mood && MOOD_VAL[r.mood] !== undefined).length;
+    return (
+      <ChartEmptyState
+        title="Mood Trend"
+        message="Complete 2+ reflections with mood checks to see your trend."
+        current={moodCount}
+        needed={2}
+      />
+    );
+  }
 
   const first = data[0].avg;
   const last = data[data.length - 1].avg;
