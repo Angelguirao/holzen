@@ -11,18 +11,45 @@ import { OutcomePrompt } from '@/components/OutcomePrompt';
 import { HolzenNumber } from '@/components/HolzenNumber';
 import { MoodCheck, type MoodValue } from '@/components/MoodCheck';
 import { Onboarding } from '@/components/Onboarding';
-import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
-import { useCallback, useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
+import { HomeWidget, useWidgetLayout } from '@/components/HomeWidget';
+import { useCallback, useEffect, useState, useMemo } from 'react';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { toast } from 'sonner';
-import { AlertCircle, Loader2, Pause, Pin, Timer, Circle, Sparkles, Waves } from 'lucide-react';
+import { AlertCircle, Loader2, Pause, Pin, Timer, Circle, Sparkles, Waves, RotateCcw } from 'lucide-react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
 import { playNotificationTone, prefetchNotificationTone } from '@/lib/notification-tone';
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  TouchSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from '@dnd-kit/core';
+import {
+  SortableContext,
+  verticalListSortingStrategy,
+  arrayMove,
+} from '@dnd-kit/sortable';
+import { restrictToVerticalAxis, restrictToParentElement } from '@dnd-kit/modifiers';
+
+// Widget IDs
+const WIDGET_IDS = ['btc-status', 'reflection', 'night', 'letter', 'actions'] as const;
+type WidgetId = typeof WIDGET_IDS[number];
+
+const WIDGET_TITLES: Record<WidgetId, string> = {
+  'btc-status': 'Market',
+  'reflection': 'Reflection',
+  'night': 'Evening',
+  'letter': 'Letter',
+  'actions': 'Practice',
+};
 
 interface PinnedReflection {
   id: string;
@@ -77,6 +104,29 @@ const Home = () => {
   const [zenMode] = useState(() => localStorage.getItem('holzen_zen_mode') === 'true');
   const [pinnedReflection, setPinnedReflection] = useState<PinnedReflection | null>(null);
   const prefersReducedMotion = useReducedMotion();
+
+  // Widget layout
+  const defaultOrder = useMemo(() => [...WIDGET_IDS], []);
+  const { order, collapsed, reorder, toggleCollapsed, resetLayout } = useWidgetLayout(defaultOrder);
+
+  // DnD sensors with activation constraints to prevent accidental drags
+  const sensors = useSensors(
+    useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+    useSensor(TouchSensor, { activationConstraint: { delay: 200, tolerance: 5 } }),
+    useSensor(KeyboardSensor),
+  );
+
+  const handleDragEnd = useCallback(
+    (event: DragEndEvent) => {
+      const { active, over } = event;
+      if (over && active.id !== over.id) {
+        const oldIndex = order.indexOf(active.id as string);
+        const newIndex = order.indexOf(over.id as string);
+        reorder(arrayMove(order, oldIndex, newIndex));
+      }
+    },
+    [order, reorder],
+  );
 
   // Load pinned reflection
   useEffect(() => {
@@ -140,7 +190,6 @@ const Home = () => {
     }
   }, [newReflection, message, clearNewReflection]);
 
-  // Pre-cache the notification tone
   useEffect(() => {
     prefetchNotificationTone();
   }, []);
@@ -149,6 +198,7 @@ const Home = () => {
     document.title = 'Holzen — Home';
     return () => { document.title = 'Holzen — Pause before you act'; };
   }, []);
+
   const unpinReflection = useCallback(() => {
     localStorage.removeItem('holzen_pinned_reflection');
     setPinnedReflection(null);
@@ -158,9 +208,9 @@ const Home = () => {
     return <Onboarding onComplete={completeOnboarding} />;
   }
 
-
   const hasAccess = subscribed || (trialRemaining !== undefined && trialRemaining > 0);
 
+  // Zen mode — unchanged
   if (zenMode) {
     const zenTransition = { duration: 0.8, ease: "easeOut" as const };
     const zenVariants = prefersReducedMotion
@@ -174,29 +224,17 @@ const Home = () => {
       <div className="min-h-[60vh] flex flex-col justify-center">
         <AnimatePresence mode="wait">
           {message ? (
-            <motion.div
-              key="zen-reflection"
-              variants={zenVariants}
-              initial="hidden"
-              animate="visible"
-              exit="hidden"
-            >
+            <motion.div key="zen-reflection" variants={zenVariants} initial="hidden" animate="visible" exit="hidden">
               <ReflectionMessage
-                message={message}
-                context={context}
-                onDismiss={handleDismiss}
+                message={message} context={context} onDismiss={handleDismiss}
                 companions={companions}
                 companionPrefs={{ breathing: companionPrefs.breathing, haiku: false, learning: false, signal: false }}
-                severity={severity}
-                reflectionId={lastReflectionId}
+                severity={severity} reflectionId={lastReflectionId}
               />
             </motion.div>
           ) : showOutcome && outcomeReflectionId ? (
             <motion.div key="zen-outcome" variants={zenVariants} initial="hidden" animate="visible" exit="hidden">
-              <OutcomePrompt
-                reflectionId={outcomeReflectionId}
-                onComplete={handleOutcomeComplete}
-              />
+              <OutcomePrompt reflectionId={outcomeReflectionId} onComplete={handleOutcomeComplete} />
             </motion.div>
           ) : showMoodCheck ? (
             <motion.div key="zen-mood" variants={zenVariants} initial="hidden" animate="visible" exit="hidden">
@@ -213,15 +251,9 @@ const Home = () => {
             </motion.div>
           ) : (
             <motion.div key="zen-empty" variants={zenVariants} initial="hidden" animate="visible" exit="hidden" className="space-y-6 text-center">
-              <p className="text-sm text-muted-foreground font-mono leading-relaxed">
-                No active reflection.
-              </p>
+              <p className="text-sm text-muted-foreground font-mono leading-relaxed">No active reflection.</p>
               {hasAccess && (
-                <NeedAMomentButton
-                  onTrigger={handleNeedAMoment}
-                  cooldownRemaining={manualCooldownRemaining}
-                  loading={loading}
-                />
+                <NeedAMomentButton onTrigger={handleNeedAMoment} cooldownRemaining={manualCooldownRemaining} loading={loading} />
               )}
             </motion.div>
           )}
@@ -230,187 +262,242 @@ const Home = () => {
     );
   }
 
-
-  return (
-    <div className="space-y-10">
-      {/* Subtle greeting */}
-      {firstName && (
-        <p className="text-sm font-mono text-muted-foreground/60">{firstName}.</p>
-      )}
-
-      {/* BTC Status */}
-      <BtcStatus data={btcData} error={error} hidden={priceHidden} onToggleHidden={togglePriceHidden} />
-
-      {/* The Holzen Number */}
-      <HolzenNumber variant="compact" />
-
-      {/* Ritual cooldown awareness */}
-      <RitualCooldownBanner />
-
-      {/* Night Reflection */}
-      <NightReflectionCard />
-
-      {/* Auto-trigger cooldown countdown */}
-      <AutoCooldownIndicator
-        cooldownRemaining={autoCooldownRemaining}
-        cooldownHours={cooldownHours}
-      />
-
-      {/* Subscription / trial gate */}
-      {!subLoading && !hasAccess ? (
-        <div className="space-y-3">
-          <p className="text-sm text-muted-foreground">
-            You've used all 3 free reflections. Subscribe to continue.
-          </p>
-          <p className="text-xs font-mono text-muted-foreground">
-            $3 per month · Cancel anytime
-          </p>
-          <Button
-            onClick={startCheckout}
-            disabled={checkoutLoading}
-            className="w-full font-mono text-xs"
+  // --- Widget content renderers ---
+  const renderWidget = (widgetId: string) => {
+    switch (widgetId as WidgetId) {
+      case 'btc-status':
+        return (
+          <HomeWidget
+            id="btc-status"
+            title={WIDGET_TITLES['btc-status']}
+            collapsed={collapsed['btc-status']}
+            onToggleCollapse={() => toggleCollapsed('btc-status')}
           >
-            {checkoutLoading ? 'Opening checkout…' : 'Subscribe'}
-          </Button>
-        </div>
-      ) : subLoading ? (
-        <div className="space-y-3">
-          <Skeleton className="h-4 w-48" />
-          <Skeleton className="h-4 w-32" />
-        </div>
-      ) : (
-        <>
-          {/* Trial badge */}
-          {!subscribed && trialRemaining !== undefined && trialRemaining > 0 && (
-            <p className="text-xs font-mono text-muted-foreground">
-              {trialRemaining} free reflection{trialRemaining !== 1 ? 's' : ''} remaining
-            </p>
-          )}
-
-          {message ? (
             <div className="space-y-4">
-              <ReflectionMessage
-                message={message}
-                context={context}
-                onDismiss={handleDismiss}
-                companions={companions}
-                companionPrefs={companionPrefs}
-                severity={severity}
-                reflectionId={lastReflectionId}
-              />
+              <BtcStatus data={btcData} error={error} hidden={priceHidden} onToggleHidden={togglePriceHidden} />
+              <HolzenNumber variant="compact" />
+              <AutoCooldownIndicator cooldownRemaining={autoCooldownRemaining} cooldownHours={cooldownHours} />
+            </div>
+          </HomeWidget>
+        );
+
+      case 'reflection':
+        return (
+          <HomeWidget
+            id="reflection"
+            title={WIDGET_TITLES['reflection']}
+            alwaysOpen
+          >
+            <div className="space-y-4">
+              <RitualCooldownBanner />
+
+              {!subLoading && !hasAccess ? (
+                <div className="space-y-3">
+                  <p className="text-sm text-muted-foreground">
+                    You've used all 3 free reflections. Subscribe to continue.
+                  </p>
+                  <p className="text-xs font-mono text-muted-foreground">
+                    $3 per month · Cancel anytime
+                  </p>
+                  <Button onClick={startCheckout} disabled={checkoutLoading} className="w-full font-mono text-xs">
+                    {checkoutLoading ? 'Opening checkout…' : 'Subscribe'}
+                  </Button>
+                </div>
+              ) : subLoading ? (
+                <div className="space-y-3">
+                  <Skeleton className="h-4 w-48" />
+                  <Skeleton className="h-4 w-32" />
+                </div>
+              ) : (
+                <>
+                  {!subscribed && trialRemaining !== undefined && trialRemaining > 0 && (
+                    <p className="text-xs font-mono text-muted-foreground">
+                      {trialRemaining} free reflection{trialRemaining !== 1 ? 's' : ''} remaining
+                    </p>
+                  )}
+
+                  {message ? (
+                    <div className="space-y-4">
+                      <ReflectionMessage
+                        message={message} context={context} onDismiss={handleDismiss}
+                        companions={companions} companionPrefs={companionPrefs}
+                        severity={severity} reflectionId={lastReflectionId}
+                      />
+                      <button
+                        onClick={() => setShowRitual(true)}
+                        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-md border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors"
+                      >
+                        <Sparkles className="h-3 w-3 text-primary/60" />
+                        <span className="text-[10px] font-mono text-primary/60 tracking-[0.15em] uppercase">
+                          Start ritual before deciding
+                        </span>
+                      </button>
+                    </div>
+                  ) : showOutcome && outcomeReflectionId ? (
+                    <OutcomePrompt reflectionId={outcomeReflectionId} onComplete={handleOutcomeComplete} />
+                  ) : showMoodCheck ? (
+                    <MoodCheck onSelect={handleMoodSelected} onSkip={handleMoodSkipped} />
+                  ) : (
+                    <>
+                      {loading ? (
+                        <div className="space-y-4">
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <Loader2 className="h-3 w-3 animate-spin" />
+                            <p className="text-xs font-mono">Generating reflection…</p>
+                          </div>
+                          <Skeleton className="h-4 w-full" />
+                          <Skeleton className="h-4 w-3/4" />
+                          <Skeleton className="h-4 w-1/2" />
+                        </div>
+                      ) : error && !btcData ? (
+                        <div className="space-y-2">
+                          <div className="flex items-center gap-2 text-muted-foreground">
+                            <AlertCircle className="h-3.5 w-3.5" />
+                            <p className="text-xs font-mono">Something went wrong</p>
+                          </div>
+                          <button onClick={() => manualTrigger()} className="text-xs font-mono text-muted-foreground underline">
+                            Try again
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="space-y-6">
+                          {pinnedReflection && (
+                            <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2">
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-1.5 text-muted-foreground">
+                                  <Pin className="h-2.5 w-2.5" />
+                                  <span className="text-[10px] font-mono uppercase tracking-wider">Pinned</span>
+                                </div>
+                                <button onClick={unpinReflection} className="text-[10px] font-mono text-muted-foreground/50 hover:text-foreground transition-colors">
+                                  Unpin
+                                </button>
+                              </div>
+                              <p className="text-sm leading-relaxed">{pinnedReflection.message}</p>
+                            </div>
+                          )}
+                          <NeedAMomentButton onTrigger={handleNeedAMoment} cooldownRemaining={manualCooldownRemaining} loading={loading} />
+                        </div>
+                      )}
+                    </>
+                  )}
+                </>
+              )}
+            </div>
+          </HomeWidget>
+        );
+
+      case 'night':
+        return (
+          <HomeWidget
+            id="night"
+            title={WIDGET_TITLES['night']}
+            collapsed={collapsed['night']}
+            onToggleCollapse={() => toggleCollapsed('night')}
+          >
+            <NightReflectionCard />
+          </HomeWidget>
+        );
+
+      case 'letter':
+        if (!hasAccess || !btcData) return null;
+        return (
+          <HomeWidget
+            id="letter"
+            title={WIDGET_TITLES['letter']}
+            collapsed={collapsed['letter']}
+            onToggleCollapse={() => toggleCollapsed('letter')}
+          >
+            <LetterToFutureSelf currentPrice={btcData.currentPrice} changePercent={btcData.changePercent} />
+          </HomeWidget>
+        );
+
+      case 'actions':
+        return (
+          <HomeWidget
+            id="actions"
+            title={WIDGET_TITLES['actions']}
+            collapsed={collapsed['actions']}
+            onToggleCollapse={() => toggleCollapsed('actions')}
+          >
+            <div className="space-y-2">
               <button
                 onClick={() => setShowRitual(true)}
-                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-md border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors"
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors duration-300"
               >
-                <Sparkles className="h-3 w-3 text-primary/60" />
-                <span className="text-[10px] font-mono text-primary/60 tracking-[0.15em] uppercase">
-                  Start ritual before deciding
+                <Sparkles className="h-3 w-3 text-primary/40" />
+                <span className="text-[10px] font-mono text-primary/40 tracking-[0.2em] uppercase">
+                  Start a ritual
+                </span>
+              </button>
+              <button
+                onClick={() => setShowVoid(true)}
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-border/30 bg-muted/10 hover:bg-muted/20 transition-colors duration-500"
+              >
+                <Circle className="h-3 w-3 text-muted-foreground/40" />
+                <span className="text-[10px] font-mono text-muted-foreground/40 tracking-[0.2em] uppercase">
+                  Enter the void
+                </span>
+              </button>
+              <button
+                onClick={() => navigate('/ambient')}
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-border/30 bg-muted/10 hover:bg-muted/20 transition-colors duration-500"
+              >
+                <Waves className="h-3 w-3 text-muted-foreground/40" />
+                <span className="text-[10px] font-mono text-muted-foreground/40 tracking-[0.2em] uppercase">
+                  Ambient mode
                 </span>
               </button>
             </div>
+          </HomeWidget>
+        );
 
-          ) : showOutcome && outcomeReflectionId ? (
-            <OutcomePrompt
-              reflectionId={outcomeReflectionId}
-              onComplete={handleOutcomeComplete}
-            />
-          ) : showMoodCheck ? (
-            <MoodCheck onSelect={handleMoodSelected} onSkip={handleMoodSkipped} />
-          ) : (
-            <>
-              {loading ? (
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <Loader2 className="h-3 w-3 animate-spin" />
-                    <p className="text-xs font-mono">Generating reflection…</p>
-                  </div>
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-3/4" />
-                  <Skeleton className="h-4 w-1/2" />
-                </div>
-              ) : error && !btcData ? (
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-muted-foreground">
-                    <AlertCircle className="h-3.5 w-3.5" />
-                    <p className="text-xs font-mono">Something went wrong</p>
-                  </div>
-                  <button
-                    onClick={() => manualTrigger()}
-                    className="text-xs font-mono text-muted-foreground underline"
-                  >
-                    Try again
-                  </button>
-                </div>
-              ) : (
-                <div className="space-y-6">
-                  {/* Pinned reflection */}
-                  {pinnedReflection && (
-                    <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1.5 text-muted-foreground">
-                          <Pin className="h-2.5 w-2.5" />
-                          <span className="text-[10px] font-mono uppercase tracking-wider">Pinned</span>
-                        </div>
-                        <button
-                          onClick={unpinReflection}
-                          className="text-[10px] font-mono text-muted-foreground/50 hover:text-foreground transition-colors"
-                        >
-                          Unpin
-                        </button>
-                      </div>
-                      <p className="text-sm leading-relaxed">{pinnedReflection.message}</p>
-                    </div>
-                  )}
-                  <NeedAMomentButton
-                    onTrigger={handleNeedAMoment}
-                    cooldownRemaining={manualCooldownRemaining}
-                    loading={loading}
-                  />
-                </div>
-              )}
-            </>
-          )}
-        </>
-      )}
+      default:
+        return null;
+    }
+  };
 
-      {/* Letter to Future Self */}
-      {hasAccess && btcData && (
-        <LetterToFutureSelf
-          currentPrice={btcData.currentPrice}
-          changePercent={btcData.changePercent}
-        />
-      )}
+  const isDefaultOrder = order.every((id, i) => id === defaultOrder[i]);
+  const hasCollapsed = Object.values(collapsed).some(Boolean);
 
-      {/* Ritual + Void */}
-      <div className="space-y-2">
-        <button
-          onClick={() => setShowRitual(true)}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors duration-300"
-        >
-          <Sparkles className="h-3 w-3 text-primary/40" />
-          <span className="text-[10px] font-mono text-primary/40 tracking-[0.2em] uppercase">
-            Start a ritual
-          </span>
-        </button>
-        <button
-          onClick={() => setShowVoid(true)}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-border/30 bg-muted/10 hover:bg-muted/20 transition-colors duration-500"
-        >
-          <Circle className="h-3 w-3 text-muted-foreground/40" />
-          <span className="text-[10px] font-mono text-muted-foreground/40 tracking-[0.2em] uppercase">
-            Enter the void
-          </span>
-        </button>
-        <button
-          onClick={() => navigate('/ambient')}
-          className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-border/30 bg-muted/10 hover:bg-muted/20 transition-colors duration-500"
-        >
-          <Waves className="h-3 w-3 text-muted-foreground/40" />
-          <span className="text-[10px] font-mono text-muted-foreground/40 tracking-[0.2em] uppercase">
-            Ambient mode
-          </span>
-        </button>
+  return (
+    <div className="space-y-4">
+      {/* Greeting + reset */}
+      <div className="flex items-center justify-between">
+        {firstName ? (
+          <p className="text-sm font-mono text-muted-foreground/60">{firstName}.</p>
+        ) : <div />}
+        {(!isDefaultOrder || hasCollapsed) && (
+          <button
+            onClick={resetLayout}
+            className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground/40 hover:text-muted-foreground transition-colors"
+            aria-label="Reset widget layout"
+          >
+            <RotateCcw className="h-2.5 w-2.5" />
+            Reset
+          </button>
+        )}
       </div>
+
+      {/* Draggable widgets */}
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+        modifiers={[restrictToVerticalAxis, restrictToParentElement]}
+      >
+        <SortableContext items={order} strategy={verticalListSortingStrategy}>
+          <div className="space-y-3">
+            {order.map((widgetId) => {
+              const content = renderWidget(widgetId);
+              // Don't render null widgets (e.g. letter when no access)
+              if (content === null) return null;
+              return <div key={widgetId}>{content}</div>;
+            })}
+          </div>
+        </SortableContext>
+      </DndContext>
+
+      {/* Modals (outside widget flow) */}
       <HolzenRitual
         open={showRitual}
         onClose={() => setShowRitual(false)}
@@ -419,8 +506,6 @@ const Home = () => {
         reflectionId={lastReflectionId}
       />
       <TheVoid open={showVoid} onClose={() => setShowVoid(false)} />
-
-      <Separator />
 
       <p className="text-xs text-muted-foreground leading-relaxed">
         When volatility crosses your threshold, you'll receive one quiet prompt to pause. Nothing more.
