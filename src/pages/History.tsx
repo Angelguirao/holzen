@@ -172,6 +172,7 @@ function HistoryCompanions({ label, r }: { label: string; r: Reflection }) {
 }
 
 const History = () => {
+  const { t } = useTranslation();
   const { user } = useAuth();
   const { currency } = useHolzen();
   const [reflections, setReflections] = useState<Reflection[]>([]);
