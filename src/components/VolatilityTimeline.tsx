@@ -211,7 +211,7 @@ export function VolatilityTimeline() {
       {/* Chart */}
       <div className="rounded-md border border-border/60 bg-muted/20 p-3">
         <ResponsiveContainer width="100%" height={220}>
-          <AreaChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
+          <ComposedChart data={chartData} margin={{ top: 10, right: 10, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="priceGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity={0.2} />
@@ -226,6 +226,7 @@ export function VolatilityTimeline() {
               interval="preserveStartEnd"
             />
             <YAxis
+              dataKey="price"
               domain={[minPrice * 0.98, maxPrice * 1.02]}
               tick={{ fontSize: 9, fill: 'hsl(var(--muted-foreground))' }}
               tickLine={false}
@@ -234,7 +235,7 @@ export function VolatilityTimeline() {
               width={45}
             />
             <RechartsTooltip
-              content={<PriceTooltip />}
+              content={<ChartTooltip />}
               cursor={{ stroke: 'hsl(var(--primary))', strokeWidth: 1, strokeDasharray: '3 3' }}
             />
             <Area
@@ -246,20 +247,44 @@ export function VolatilityTimeline() {
               dot={false}
               activeDot={false}
             />
-            {/* Reflection markers */}
-            {reflectionPoints.map((rp) => (
-              <ReferenceDot
-                key={rp.reflection!.id}
-                x={rp.date}
-                y={rp.price}
-                r={4}
-                fill={getMoodColor(rp.reflection!.mood)}
-                stroke="hsl(var(--background))"
-                strokeWidth={1.5}
-                isFront
-              />
-            ))}
-          </AreaChart>
+            <Scatter
+              dataKey="reflectionPrice"
+              fill="hsl(var(--primary))"
+              shape={(props: any) => {
+                const point = props.payload as PricePoint;
+                if (!point.reflection) return null;
+                const color = getMoodColor(point.reflection.mood);
+                return (
+                  <g>
+                    {/* Glow ring */}
+                    <circle
+                      cx={props.cx}
+                      cy={props.cy}
+                      r={10}
+                      fill={color}
+                      fillOpacity={0.15}
+                    />
+                    {/* Outer ring */}
+                    <circle
+                      cx={props.cx}
+                      cy={props.cy}
+                      r={6}
+                      fill="hsl(var(--background))"
+                      stroke={color}
+                      strokeWidth={2}
+                    />
+                    {/* Inner dot */}
+                    <circle
+                      cx={props.cx}
+                      cy={props.cy}
+                      r={3}
+                      fill={color}
+                    />
+                  </g>
+                );
+              }}
+            />
+          </ComposedChart>
         </ResponsiveContainer>
 
         {/* Legend */}
