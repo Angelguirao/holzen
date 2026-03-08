@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { differenceInCalendarDays, parseISO } from 'date-fns';
-import { Flame, MessageSquare, Shield, Zap, Eye, Heart, Award, Target, Wind, BookOpen, Feather, Radio } from 'lucide-react';
+import { Flame, MessageSquare, Shield, Zap, Eye, Heart, Award, Target, Wind, BookOpen, Feather, Radio, Telescope, Landmark } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface Reflection {
