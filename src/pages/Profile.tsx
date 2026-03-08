@@ -161,8 +161,6 @@ const Profile = () => {
         ) : (
           <StatsContent reflections={reflections} />
         )
-      ) : tab === 'timeline' ? (
-        <VolatilityTimeline />
       ) : tab === 'insights' ? (
         loading ? (
           <div className="space-y-3">
@@ -180,7 +178,7 @@ const Profile = () => {
         ) : (
           <BadgesPanel reflections={reflections} />
         )
-      ) : tab === 'letters' ? (
+      ) : (
         lettersLoading ? (
           <div className="space-y-3">
             <Skeleton className="h-20 w-full rounded-md" />
@@ -223,8 +221,6 @@ const Profile = () => {
             )}
           </div>
         )
-      ) : (
-        <ReferralSection defaultExpanded />
       )}
     </div>
   );
