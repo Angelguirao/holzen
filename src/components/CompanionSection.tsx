@@ -485,7 +485,7 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
 
       {hasHistory && (
         <CollapsibleCompanion
-          label="Historical insight"
+          label="Look back"
           expanded={expandedHistory}
           onToggle={() => {
             setExpandedHistory((v) => !v);
