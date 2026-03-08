@@ -18,6 +18,8 @@ export default function Library() {
 
   const filtered = useMemo(() => {
     let result = items;
+    // Hide archived unless searching
+    if (!search.trim()) result = result.filter((i) => i.status !== 'archived');
     if (tab === 'bookmarks') result = result.filter((i) => i.type === 'bookmark');
     if (tab === 'notes') result = result.filter((i) => i.type === 'note');
     if (search.trim()) {
