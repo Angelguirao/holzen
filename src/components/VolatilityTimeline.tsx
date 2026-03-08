@@ -2,7 +2,6 @@ import { useState, useEffect, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { differenceInDays } from 'date-fns';
-import { useAuth } from '@/hooks/use-auth';
 import {
   ResponsiveContainer,
   AreaChart,
