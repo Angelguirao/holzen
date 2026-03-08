@@ -1,8 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { AreaChart, Area, XAxis, YAxis, ResponsiveContainer, Tooltip } from 'recharts';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TrendingDown, TrendingUp } from 'lucide-react';
 import { formatBtcPrice } from '@/lib/btc';
+import { ErrorRetry } from '@/components/ErrorRetry';
 
 interface ChartPoint {
   timestamp: number;
@@ -17,37 +18,40 @@ interface Props {
 export function BtcChart({ hidden = false, currency = 'USD' }: Props) {
   const [data, setData] = useState<ChartPoint[] | null>(null);
   const [error, setError] = useState(false);
+  const [retryKey, setRetryKey] = useState(0);
 
-  useEffect(() => {
-    let cancelled = false;
+  const load = useCallback(async (signal?: AbortSignal) => {
     setData(null);
     setError(false);
-    const load = async () => {
-      try {
-        const cur = currency.toLowerCase();
-        const res = await fetch(
-          `https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=${cur}&days=7`
-        );
-        if (!res.ok) throw new Error();
-        const json = await res.json();
-        const prices: [number, number][] = json.prices;
-        if (!cancelled && prices?.length >= 2) {
-          const step = Math.max(1, Math.floor(prices.length / 48));
-          const sampled = prices
-            .filter((_, i) => i % step === 0 || i === prices.length - 1)
-            .map(([t, p]) => ({ timestamp: t, price: p }));
-          setData(sampled);
-        }
-      } catch {
-        if (!cancelled) setError(true);
+    try {
+      const cur = currency.toLowerCase();
+      const res = await fetch(
+        `https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=${cur}&days=7`,
+        { signal }
+      );
+      if (!res.ok) throw new Error();
+      const json = await res.json();
+      const prices: [number, number][] = json.prices;
+      if (prices?.length >= 2) {
+        const step = Math.max(1, Math.floor(prices.length / 48));
+        const sampled = prices
+          .filter((_, i) => i % step === 0 || i === prices.length - 1)
+          .map(([t, p]) => ({ timestamp: t, price: p }));
+        setData(sampled);
       }
-    };
-    load();
-    return () => { cancelled = true; };
+    } catch (e: any) {
+      if (e?.name !== 'AbortError') setError(true);
+    }
   }, [currency]);
 
+  useEffect(() => {
+    const ctrl = new AbortController();
+    load(ctrl.signal);
+    return () => ctrl.abort();
+  }, [load, retryKey]);
+
   if (hidden) return null;
-  if (error) return null;
+  if (error) return <ErrorRetry message="Could not load chart data" onRetry={() => setRetryKey(k => k + 1)} />;
 
   if (!data) {
     return (

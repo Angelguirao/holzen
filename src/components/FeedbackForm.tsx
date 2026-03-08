@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { enqueueAction } from '@/lib/offline-queue';
 
 const CATEGORIES = [
   { value: 'bug', label: 'Bug', icon: Bug, desc: 'Something broken' },
@@ -18,6 +19,15 @@ export function FeedbackForm() {
 
   const submit = async () => {
     if (!message.trim()) return;
+
+    // Queue if offline
+    if (!navigator.onLine) {
+      enqueueAction('feedback', { category, message: message.trim() });
+      toast('Saved offline', { description: "Your feedback will be sent when you're back online." });
+      setMessage('');
+      return;
+    }
+
     setSubmitting(true);
     const { error } = await supabase.functions.invoke('send-feedback', {
       body: { category, message: message.trim() },
