@@ -552,6 +552,13 @@ export function useHolzen() {
       if (!user) return;
       await supabase.from('profiles').update({ mantra: val } as any).eq('user_id', user.id);
     },
+    currency,
+    setCurrency: async (val: string) => {
+      setCurrencyState(val);
+      setBtcData(null); // clear cached data so it refetches in new currency
+      if (!user) return;
+      await supabase.from('profiles').update({ hold_goal_currency: val }).eq('user_id', user.id);
+    },
     companionPrefs,
     setCompanionPref,
     btcData,
