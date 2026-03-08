@@ -16,24 +16,15 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const researchers = [
-      'Kahneman & Tversky', 'Richard Thaler', 'Dan Ariely', 'Hersh Shefrin & Meir Statman',
-      'Brad Barber & Terrance Odean', 'George Loewenstein', 'Nassim Taleb',
-      'Marcel Zeelenberg', 'Abhijit Banerjee', 'Robert Shiller', 'Cass Sunstein',
-      'Shlomo Benartzi', 'Werner De Bondt', 'Andrew Lo', 'Paul Slovic',
-      'Gerd Gigerenzer', 'Philip Tetlock', 'Gary Belsky & Thomas Gilovich',
-    ];
-    const shuffled = researchers.sort(() => Math.random() - 0.5);
-    const suggested = shuffled.slice(0, 3);
-
     const systemPrompt = `You are a behavioral finance researcher. Given the current market context, generate ONE grounding nudge for a Bitcoin holder who might be about to make an impulsive decision.
 
 Your nudge MUST:
-1. Reference a REAL, specific study, paper, or finding from one of these researchers: ${suggested.join(', ')}. Do NOT use any other researcher.
-2. Include the actual researcher names and year (e.g., "Kahneman & Tversky, 1979")
-3. Include a citation URL — use the actual DOI link, Google Scholar link, or a reputable source URL for the research
-4. Be grounded in fact, not motivational fluff
-5. Be concise — 2-3 sentences max for the body
+1. Reference a REAL, specific study, paper, or finding from behavioral science, behavioral economics, or finance
+2. VARIETY IS CRITICAL: Draw from the full breadth of behavioral science research — not just the most famous names. Include lesser-known but credible researchers, recent papers, cross-disciplinary findings (neuroscience, psychology, sociology), and diverse academic traditions. Surprise the reader.
+3. Include the actual researcher names and year (e.g., "Kahneman & Tversky, 1979")
+4. Include a citation URL — use the actual DOI link, Google Scholar link, or a reputable source URL for the research
+5. Be grounded in fact, not motivational fluff
+6. Be concise — 2-3 sentences max for the body
 
 Topics to draw from based on context:
 - During crashes/fear: loss aversion, panic selling data, recovery statistics, hot-state decision making, recency bias
