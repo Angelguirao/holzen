@@ -163,39 +163,49 @@ export function ItemDetailViewer({ item, linkedItems, allItems, open, onClose, o
           )}
 
           {/* Body — full content */}
-          {item.source_type === 'haiku' && item.body ? (
-            <div className="py-4 px-2">
-              <p className="text-base text-foreground/80 leading-loose whitespace-pre-line italic text-center">{item.body}</p>
-            </div>
-          ) : item.source_type === 'zoom_out' && zoomOutData ? (
-            <div className="space-y-3">
-              {zoomOutData.onThisDay?.length > 0 && (
-                <div className="space-y-1.5">
-                  <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">On this day</p>
-                  {[...zoomOutData.onThisDay].reverse().map((entry: any) => (
-                    <div key={entry.yearsAgo} className="flex items-center justify-between gap-2 text-xs font-mono">
-                      <span className="text-muted-foreground/60 w-14 shrink-0">{entry.yearsAgo}y ago</span>
-                      <span className="text-muted-foreground tabular-nums">${entry.price?.toLocaleString()}</span>
+          {(() => {
+            const bodyStr = typeof item.body === 'string' ? item.body : item.body ? JSON.stringify(item.body) : null;
+            if (item.source_type === 'haiku' && bodyStr) {
+              return (
+                <div className="py-4 px-2">
+                  <p className="text-base text-foreground/80 leading-loose whitespace-pre-line italic text-center">{bodyStr}</p>
+                </div>
+              );
+            }
+            if (item.source_type === 'zoom_out' && zoomOutData) {
+              return (
+                <div className="space-y-3">
+                  {zoomOutData.onThisDay?.length > 0 && (
+                    <div className="space-y-1.5">
+                      <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">On this day</p>
+                      {[...zoomOutData.onThisDay].reverse().map((entry: any) => (
+                        <div key={entry.yearsAgo} className="flex items-center justify-between gap-2 text-xs font-mono">
+                          <span className="text-muted-foreground/60 w-14 shrink-0">{entry.yearsAgo}y ago</span>
+                          <span className="text-muted-foreground tabular-nums">${entry.price?.toLocaleString()}</span>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  )}
+                  {zoomOutData.echo?.message && (
+                    <div className="space-y-1 border-l-2 border-border/40 pl-3">
+                      <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Echo</p>
+                      <p className="text-xs text-muted-foreground leading-relaxed italic">"{zoomOutData.echo.message}"</p>
+                    </div>
+                  )}
+                  {zoomOutData.deepTime && (
+                    <div className="space-y-1">
+                      <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Deep Time</p>
+                      <p className="text-xs text-muted-foreground leading-relaxed">{zoomOutData.deepTime}</p>
+                    </div>
+                  )}
                 </div>
-              )}
-              {zoomOutData.echo?.message && (
-                <div className="space-y-1 border-l-2 border-border/40 pl-3">
-                  <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Echo</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed italic">"{zoomOutData.echo.message}"</p>
-                </div>
-              )}
-              {zoomOutData.deepTime && (
-                <div className="space-y-1">
-                  <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Deep Time</p>
-                  <p className="text-xs text-muted-foreground leading-relaxed">{zoomOutData.deepTime}</p>
-                </div>
-              )}
-            </div>
-          ) : item.body ? (
-            <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">{item.body}</p>
-          ) : null}
+              );
+            }
+            if (bodyStr) {
+              return <p className="text-sm text-foreground/80 leading-relaxed whitespace-pre-wrap">{bodyStr}</p>;
+            }
+            return null;
+          })()}
 
           {/* Source URL */}
           {item.source_url && (
