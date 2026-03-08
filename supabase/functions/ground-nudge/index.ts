@@ -41,8 +41,6 @@ serve(async (req) => {
     const langCode = language || "en";
     const langName = LANG_NAMES[langCode] || "English";
     const langInstruction = langCode !== "en" ? `\n\nLANGUAGE: Write the title and body in ${langName}. Keep citation names and URLs in their original form.` : "";
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
     const systemPrompt = `You are a behavioral finance researcher. Given the current market context, generate ONE grounding nudge for a Bitcoin holder who might be about to make an impulsive decision.
 
