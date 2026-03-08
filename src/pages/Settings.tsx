@@ -5,7 +5,6 @@ import { useInstallPrompt } from '@/hooks/use-install-prompt';
 import { usePushNotifications } from '@/hooks/use-push-notifications';
 import { ThresholdSetting } from '@/components/ThresholdSetting';
 import { ReferralSection } from '@/components/ReferralSection';
-import { ReferralSection } from '@/components/ReferralSection';
 import { Changelog } from '@/components/Changelog';
 import { Separator } from '@/components/ui/separator';
 import { Switch } from '@/components/ui/switch';
