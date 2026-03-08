@@ -404,6 +404,22 @@
       "04title": "Siz kaydedersiniz",
       "04desc": "Duygularınızı etiketleyin. Bir not yazın. Ne yaptığınızı kaydedin — tuttunuz, sattınız, aldınız veya hiçbir şey. Zamanla kalıplar ortaya çıkar."
     },
+    "companionsTitle": "Altı yol arkadaşı",
+    "companionsDesc": "Her düşünce, sizi yavaşlatmak ve bakış açısı katmak için tasarlanmış yol arkadaşlarıyla gelir. Herhangi birini bir dokunuşla Kütüphanenize kaydedin.",
+    "companions": {
+      "breathing": "Nefes egzersizi",
+      "breathingDesc": "Okumadan önce rehberli sakinlik",
+      "haiku": "Haiku",
+      "haikuDesc": "5-7-5 sessizlik, her seferinde benzersiz",
+      "signal": "Sinyali Oku",
+      "signalDesc": "Küratörlüğünüzü yaptığınız kaynaklardan yapay zeka destekli istihbarat",
+      "learning": "Kendini Topla",
+      "learningDesc": "Bağlamda davranışsal finans araştırması",
+      "zoomOut": "Perspektif",
+      "zoomOutDesc": "1–5 yıl önceki BTC fiyatları, geçmiş düşünceleriniz ve derin zaman perspektifi",
+      "history": "Tarihsel Yankı",
+      "historyDesc": "Finansal tarih paralelleri ve araştırma yoluyla varlık sınıfı analogileri"
+    },
     "whatYouGet": "Ne elde edersiniz",
     "features": {
       "breathing": "Nefes egzersizi",
