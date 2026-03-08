@@ -1,0 +1,1 @@
+ALTER TABLE public.reflections ADD COLUMN signal_title text, ADD COLUMN signal_body text, ADD COLUMN signal_source text, ADD COLUMN signal_url text;

@@ -374,6 +374,10 @@ export type Database = {
           mood: string | null
           note: string | null
           outcome: string | null
+          signal_body: string | null
+          signal_source: string | null
+          signal_title: string | null
+          signal_url: string | null
           tags: string[] | null
           user_id: string
         }
@@ -394,6 +398,10 @@ export type Database = {
           mood?: string | null
           note?: string | null
           outcome?: string | null
+          signal_body?: string | null
+          signal_source?: string | null
+          signal_title?: string | null
+          signal_url?: string | null
           tags?: string[] | null
           user_id: string
         }
@@ -414,6 +422,10 @@ export type Database = {
           mood?: string | null
           note?: string | null
           outcome?: string | null
+          signal_body?: string | null
+          signal_source?: string | null
+          signal_title?: string | null
+          signal_url?: string | null
           tags?: string[] | null
           user_id?: string
         }
