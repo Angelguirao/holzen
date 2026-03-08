@@ -280,10 +280,10 @@ function StatsContent({ reflections, memberSince }: { reflections: Reflection[];
       ) : (
         <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-6 text-center space-y-2">
           <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground/50">
-            Charts unlock soon
+            {t('profile.chartsUnlockSoon')}
           </p>
           <p className="text-xs text-muted-foreground/60 leading-relaxed max-w-[240px] mx-auto">
-            Complete {5 - reflections.length} more reflection{5 - reflections.length !== 1 ? 's' : ''} to unlock trend charts, mood analysis, and scatter plots.
+            {t('profile.completeMoreReflections', { count: 5 - reflections.length })}
           </p>
           <div className="pt-1 space-y-1">
             <div className="h-1 w-24 mx-auto rounded-full bg-muted/50 overflow-hidden">
