@@ -5,8 +5,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useHolzen } from '@/hooks/use-holzen';
 import { formatBtcPrice } from '@/lib/btc';
-import { format, subDays, isAfter, isBefore, startOfDay, endOfDay } from 'date-fns';
-import { X, Star, Search, Pin, Info, TrendingUp, TrendingDown, Clock, History as HistoryIcon, ExternalLink, ArrowRight, ChevronDown, CalendarIcon, Filter } from 'lucide-react';
+import { format, subDays, isAfter, isBefore, startOfDay, endOfDay, isSameDay } from 'date-fns';
+import { X, Star, Search, Pin, Info, TrendingUp, TrendingDown, Clock, History as HistoryIcon, ExternalLink, ArrowRight, ChevronDown, CalendarIcon, Filter, List, LayoutGrid } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { VolatilityTimeline } from '@/components/VolatilityTimeline';
 import { ShareReflection } from '@/components/ShareReflection';
@@ -16,6 +16,7 @@ import { ReflectionTags } from '@/components/ReflectionTags';
 import { ReflectionComparison } from '@/components/ReflectionComparison';
 import { HaikuDisplay } from '@/components/HaikuDisplay';
 import { LearningInput } from '@/components/LearningInput';
+import { HistoryCalendar, type CalendarActivity, type ActivityType } from '@/components/HistoryCalendar';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
@@ -180,6 +181,7 @@ const History = () => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [tab, setTab] = useState<'recent' | 'library' | 'timeline'>('recent');
+  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const [filter, setFilter] = useState<'all' | 'favorites'>('all');
   const [tagFilter, setTagFilter] = useState<string | null>(null);
   const [moodFilter, setMoodFilter] = useState<string | null>(null);
@@ -187,6 +189,9 @@ const History = () => {
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
   const [showFilters, setShowFilters] = useState(false);
+  const [calendarDate, setCalendarDate] = useState<Date | null>(null);
+  const [calendarFilters, setCalendarFilters] = useState<Set<ActivityType>>(new Set(['reflection', 'ritual', 'letter', 'badge']));
+  const [calendarActivities, setCalendarActivities] = useState<CalendarActivity[]>([]);
 
   useEffect(() => {
     document.title = 'Holzen — History';
@@ -209,6 +214,46 @@ const History = () => {
     };
     loadReflections();
   }, [user]);
+
+  // Load calendar activities (all reflections + rituals + letters + badges)
+  useEffect(() => {
+    if (!user) return;
+    const loadActivities = async () => {
+      const [{ data: allReflections }, { data: rituals }, { data: letters }, { data: badges }] = await Promise.all([
+        supabase.from('reflections').select('id, created_at, mood').eq('user_id', user.id).order('created_at', { ascending: false }),
+        supabase.from('ritual_completions').select('id, created_at, decision, template').eq('user_id', user.id).order('created_at', { ascending: false }),
+        supabase.from('future_letters').select('id, written_at, deliver_during').eq('user_id', user.id).order('written_at', { ascending: false }),
+        supabase.from('user_badges').select('id, earned_at, badge_id').eq('user_id', user.id).order('earned_at', { ascending: false }),
+      ]);
+
+      const activities: CalendarActivity[] = [];
+
+      (allReflections ?? []).forEach((r: any) => {
+        activities.push({ date: r.created_at, type: 'reflection', mood: r.mood, id: r.id });
+      });
+      (rituals ?? []).forEach((r: any) => {
+        activities.push({ date: r.created_at, type: 'ritual', id: r.id, label: `${r.template} · ${r.decision}` });
+      });
+      (letters ?? []).forEach((l: any) => {
+        activities.push({ date: l.written_at, type: 'letter', id: l.id, label: `Letter → ${l.deliver_during}` });
+      });
+      (badges ?? []).forEach((b: any) => {
+        activities.push({ date: b.earned_at, type: 'badge', id: b.id, label: b.badge_id });
+      });
+
+      setCalendarActivities(activities);
+    };
+    loadActivities();
+  }, [user]);
+
+  const toggleCalendarFilter = useCallback((type: ActivityType) => {
+    setCalendarFilters((prev) => {
+      const next = new Set(prev);
+      if (next.has(type)) next.delete(type);
+      else next.add(type);
+      return next;
+    });
+  }, []);
 
   const loadMore = useCallback(async () => {
     if (!user || loadingMore || !hasMore) return;
@@ -306,8 +351,18 @@ const History = () => {
         (r) => r.message.toLowerCase().includes(q) || r.context?.toLowerCase().includes(q) || r.note?.toLowerCase().includes(q) || r.tags?.some((t) => t.toLowerCase().includes(q))
       );
     }
+    // If calendar view with a selected date, filter to that day
+    if (viewMode === 'calendar' && calendarDate) {
+      result = reflections.filter((r) => isSameDay(new Date(r.created_at), calendarDate));
+      if (search.trim()) {
+        const q = search.toLowerCase();
+        result = result.filter(
+          (r) => r.message.toLowerCase().includes(q) || r.context?.toLowerCase().includes(q) || r.note?.toLowerCase().includes(q) || r.tags?.some((t) => t.toLowerCase().includes(q))
+        );
+      }
+    }
     return result;
-  }, [recentReflections, search]);
+  }, [recentReflections, reflections, search, viewMode, calendarDate]);
 
   const displayedReflections = tab === 'recent' ? filteredRecent : filtered;
 
@@ -351,8 +406,33 @@ const History = () => {
           >
             {t('history.timeline')}
           </button>
+          <div className="flex-1" />
+          {tab === 'recent' && (
+            <div className="flex items-center gap-1 rounded-md border border-border/40 p-0.5">
+              <button
+                onClick={() => { setViewMode('list'); setCalendarDate(null); }}
+                className={cn(
+                  'p-1 rounded transition-colors',
+                  viewMode === 'list' ? 'bg-muted text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
+                )}
+                aria-label="List view"
+              >
+                <List className="h-3.5 w-3.5" />
+              </button>
+              <button
+                onClick={() => setViewMode('calendar')}
+                className={cn(
+                  'p-1 rounded transition-colors',
+                  viewMode === 'calendar' ? 'bg-muted text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
+                )}
+                aria-label="Calendar view"
+              >
+                <LayoutGrid className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          )}
         </div>
-         {tab !== 'timeline' && (
+         {tab !== 'timeline' && viewMode !== 'calendar' && (
           <p className="text-xs text-muted-foreground">
             {tab === 'recent'
               ? t('history.reflectionsInLast7Days', { count: filteredRecent.length })
@@ -539,6 +619,51 @@ const History = () => {
       {/* Timeline tab */}
       {tab === 'timeline' ? (
         <VolatilityTimeline />
+      ) : tab === 'recent' && viewMode === 'calendar' ? (
+        <div className="space-y-4">
+          <HistoryCalendar
+            activities={calendarActivities}
+            selectedDate={calendarDate}
+            onSelectDate={setCalendarDate}
+            activeFilters={calendarFilters}
+            onToggleFilter={toggleCalendarFilter}
+          />
+          {/* Show reflections for selected day */}
+          {calendarDate && displayedReflections.length > 0 && (
+            <div className="space-y-3">
+              {displayedReflections.map((r) => (
+                <div
+                  key={r.id}
+                  className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2"
+                >
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="text-xs font-mono text-muted-foreground">
+                      {format(new Date(r.created_at), 'h:mm a')}
+                      {r.mood && <span className="ml-1.5 capitalize text-muted-foreground/60">· {r.mood}</span>}
+                    </p>
+                    <div className="flex items-center gap-1 shrink-0">
+                      <button
+                        onClick={() => toggleFavorite(r.id)}
+                        className={`p-1 transition-colors ${r.is_favorite ? 'text-foreground' : 'text-muted-foreground/40 hover:text-foreground'}`}
+                      >
+                        <Star className={`h-3 w-3 ${r.is_favorite ? 'fill-current' : ''}`} />
+                      </button>
+                    </div>
+                  </div>
+                  <p className="text-sm leading-relaxed">{r.message}</p>
+                  {r.outcome && (
+                    <p className="text-[10px] font-mono text-muted-foreground/50 capitalize">→ {r.outcome}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+          {calendarDate && displayedReflections.length === 0 && (
+            <div className="py-4 text-center">
+              <p className="text-xs text-muted-foreground/50 italic">No reflections on this day.</p>
+            </div>
+          )}
+        </div>
       ) : loading ? (
         <div className="space-y-3">
           {[1, 2, 3].map((i) => (
