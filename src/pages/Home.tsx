@@ -344,13 +344,14 @@ const Home = () => {
               {!subLoading && !hasAccess ? (
                 <div className="space-y-3">
                   <p className="text-sm text-muted-foreground">
-                    You've used all 3 free reflections. Subscribe to continue.
+                    {t('home.subscription.usedAllFree')}
                   </p>
                   <p className="text-xs font-mono text-muted-foreground">
-                    $3 per month · Cancel anytime
+                    {t('home.subscription.pricePerMonth')}
                   </p>
                   <Button onClick={startCheckout} disabled={checkoutLoading} className="w-full font-mono text-xs">
-                    {checkoutLoading ? 'Opening checkout…' : 'Subscribe'}
+                    {checkoutLoading ? t('home.subscription.openingCheckout') : t('common.subscribe')}
+                  </Button>
                   </Button>
                 </div>
               ) : subLoading ? (
