@@ -513,15 +513,20 @@
     "closingQuote": "De praktijk is hetzelfde of je 0,001 BTC of 10.000 hebt. Zit met de volatiliteit. Merk de impuls op. Kies bewust.",
     "closingAttribution": "— Holzen"
   },
-  "notFound": {
-    "title": "404",
-    "message": "Oeps! Pagina niet gevonden",
-    "returnHome": "Terug naar Home"
+  "sources": {
+    "title": "Signaalbronnen",
+    "description": "Kies welke Bitcoin-bronnen je signaalmetgezel informeren. Actieve bronnen krijgen prioriteit bij het genereren van inzichten.",
+    "activeCount": "{{active}} van {{total}} actief",
+    "types": { "analyst": "Analisten", "podcast": "Podcasts", "newsletter": "Nieuwsbrieven", "blog": "Blogs", "dashboard": "Dashboards", "youtube": "YouTube" },
+    "custom": "Eigen bronnen",
+    "addCustom": "Eigen bron toevoegen",
+    "customNamePlaceholder": "Naam van de bron",
+    "customUrlPlaceholder": "URL (optioneel)",
+    "add": "Toevoegen",
+    "addFailed": "Bron toevoegen mislukt",
+    "sourceAdded": "Bron toegevoegd"
   },
-  "terms": {
-    "title": "Servicevoorwaarden"
-  },
-  "privacy": {
-    "title": "Privacybeleid"
-  }
+  "notFound": { "title": "404", "message": "Oeps! Pagina niet gevonden", "returnHome": "Terug naar Home" },
+  "terms": { "title": "Servicevoorwaarden" },
+  "privacy": { "title": "Privacybeleid" }
 }
