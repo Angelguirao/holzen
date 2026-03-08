@@ -114,5 +114,6 @@ export async function fetchBtcData(): Promise<BtcPriceData> {
     cumulativeChangePercent,
     cumulativeDirection,
     fearGreed,
+    onChain,
   };
 }
