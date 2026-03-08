@@ -295,7 +295,7 @@ export function Onboarding({ onComplete }: Props) {
                       size="sm"
                       className="font-mono text-xs"
                     >
-                      Begin
+                      {t('common.begin')}
                     </Button>
                   </motion.div>
                 </div>
