@@ -2,6 +2,8 @@ import { useMemo } from 'react';
 import { differenceInCalendarDays, parseISO } from 'date-fns';
 import { Flame, MessageSquare, Shield, Zap, Eye, Heart, Award, Target, Wind, BookOpen, Feather, Radio, Telescope, Landmark } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { BadgeCelebration } from './BadgeCelebration';
+import { useBadgeSync } from '@/hooks/use-badge-sync';
 
 interface Reflection {
   id: string;
@@ -82,9 +84,10 @@ const CATEGORY_LABELS: Record<string, string> = {
 
 interface BadgesPanelProps {
   reflections: Reflection[];
+  notifyBadges?: boolean;
 }
 
-export function BadgesPanel({ reflections }: BadgesPanelProps) {
+export function BadgesPanel({ reflections, notifyBadges = true }: BadgesPanelProps) {
   const badges = useMemo(() => {
     const total = reflections.length;
     const longestStreak = computeLongestStreak(reflections);
@@ -177,7 +180,23 @@ export function BadgesPanel({ reflections }: BadgesPanelProps) {
   // Next badge to earn
   const nextBadge = badges.find((b) => !b.earned && b.progress > 0);
 
+  // Badge sync for celebration
+  const earnedBadgeIds = useMemo(() => badges.filter((b) => b.earned).map((b) => b.id), [badges]);
+  const badgeMeta = useMemo(() => {
+    const meta: Record<string, { label: string; description: string; color: string }> = {};
+    for (const b of badges) {
+      if (b.earned) meta[b.id] = { label: b.label, description: b.description, color: b.color };
+    }
+    return meta;
+  }, [badges]);
+
+  const { newBadges, dismissCelebration } = useBadgeSync(earnedBadgeIds, badgeMeta, notifyBadges);
+
   return (
+    <>
+      {newBadges.length > 0 && (
+        <BadgeCelebration badges={newBadges} onDismiss={dismissCelebration} />
+      )}
     <div className="space-y-6">
       {/* Summary */}
       <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-3">
@@ -274,5 +293,6 @@ export function BadgesPanel({ reflections }: BadgesPanelProps) {
         );
       })}
     </div>
+    </>
   );
 }

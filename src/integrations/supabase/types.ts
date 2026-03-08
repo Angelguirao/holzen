@@ -174,6 +174,7 @@ export type Database = {
           last_trigger_at: string | null
           lifetime_access: boolean
           night_reflection_hour: number | null
+          notify_badges: boolean
           quiet_hours_end: number | null
           quiet_hours_start: number | null
           referral_code: string
@@ -216,6 +217,7 @@ export type Database = {
           last_trigger_at?: string | null
           lifetime_access?: boolean
           night_reflection_hour?: number | null
+          notify_badges?: boolean
           quiet_hours_end?: number | null
           quiet_hours_start?: number | null
           referral_code?: string
@@ -258,6 +260,7 @@ export type Database = {
           last_trigger_at?: string | null
           lifetime_access?: boolean
           night_reflection_hour?: number | null
+          notify_badges?: boolean
           quiet_hours_end?: number | null
           quiet_hours_start?: number | null
           referral_code?: string
@@ -566,6 +569,30 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      user_badges: {
+        Row: {
+          badge_id: string
+          earned_at: string
+          id: string
+          notified: boolean
+          user_id: string
+        }
+        Insert: {
+          badge_id: string
+          earned_at?: string
+          id?: string
+          notified?: boolean
+          user_id: string
+        }
+        Update: {
+          badge_id?: string
+          earned_at?: string
+          id?: string
+          notified?: boolean
+          user_id?: string
+        }
+        Relationships: []
       }
     }
     Views: {
