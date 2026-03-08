@@ -17,6 +17,52 @@ async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise
   throw new Error("Failed to fetch after retries");
 }
 
+function fmtPrice(p: number, currency: string): string {
+  const fractionDigits = currency === "JPY" || currency === "KRW" ? 0 : 0;
+  return p.toLocaleString("en-US", { style: "currency", currency, maximumFractionDigits: fractionDigits });
+}
+
+interface BtcMonthData {
+  monthChange: number;
+  monthHigh: number;
+  monthLow: number;
+  currentPrice: number;
+}
+
+const btcCache = new Map<string, BtcMonthData>();
+
+async function fetchBtcMonthData(currency: string): Promise<BtcMonthData> {
+  const cached = btcCache.get(currency);
+  if (cached) return cached;
+
+  const cur = currency.toLowerCase();
+  const res30d = await fetchWithRetry(
+    `https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=${cur}&days=30`
+  );
+  const data30d = await res30d.json();
+  const prices: [number, number][] = data30d.prices;
+
+  let monthChange = 0;
+  let monthHigh = 0;
+  let monthLow = Infinity;
+  let currentPrice = 0;
+
+  if (prices && prices.length >= 2) {
+    const startPrice = prices[0][1];
+    currentPrice = prices[prices.length - 1][1];
+    monthChange = ((currentPrice - startPrice) / startPrice) * 100;
+
+    for (const [, p] of prices) {
+      if (p > monthHigh) monthHigh = p;
+      if (p < monthLow) monthLow = p;
+    }
+  }
+
+  const result = { monthChange, monthHigh, monthLow, currentPrice };
+  btcCache.set(currency, result);
+  return result;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -42,42 +88,14 @@ serve(async (req) => {
       });
     }
 
-    // 1. Fetch 30-day BTC data
-    const res30d = await fetchWithRetry(
-      "https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=30"
-    );
-    const data30d = await res30d.json();
-    const prices: [number, number][] = data30d.prices;
-
-    let monthChange = 0;
-    let monthHigh = 0;
-    let monthLow = Infinity;
-    let currentPrice = 0;
-
-    if (prices && prices.length >= 2) {
-      const startPrice = prices[0][1];
-      currentPrice = prices[prices.length - 1][1];
-      monthChange = ((currentPrice - startPrice) / startPrice) * 100;
-
-      for (const [, p] of prices) {
-        if (p > monthHigh) monthHigh = p;
-        if (p < monthLow) monthLow = p;
-      }
-    }
-
-    const monthDir = monthChange >= 0 ? "up" : "down";
-    const absMonthChange = Math.abs(monthChange).toFixed(1);
-    const fmtPrice = (p: number) =>
-      p.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 });
-
     const monthNames = ["January", "February", "March", "April", "May", "June",
       "July", "August", "September", "October", "November", "December"];
     const lastMonth = monthNames[(now.getUTCMonth() + 11) % 12];
 
-    // 2. Get all users with email notifications enabled
+    // Get all users with email notifications enabled
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
-      .select("user_id, email_notifications");
+      .select("user_id, email_notifications, hold_goal_currency");
 
     if (profilesError) throw profilesError;
 
@@ -88,6 +106,12 @@ serve(async (req) => {
     const monthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
     for (const profile of eligible) {
+      const currency = (profile as any).hold_goal_currency || "USD";
+      const btc = await fetchBtcMonthData(currency);
+
+      const monthDir = btc.monthChange >= 0 ? "up" : "down";
+      const absMonthChange = Math.abs(btc.monthChange).toFixed(1);
+
       const { data: reflections } = await supabase
         .from("reflections")
         .select("message, mood, outcome, tags, created_at")
@@ -178,15 +202,15 @@ Be observational, calm. No advice, no exclamation marks.`;
   <table style="width: 100%; border-collapse: collapse; margin-bottom: 24px;">
     <tr>
       <td style="padding: 8px 0; font-size: 12px; color: #737373; border-bottom: 1px solid #e5e2dc;">Current</td>
-      <td style="padding: 8px 0; font-size: 12px; color: #2a2a2a; text-align: right; border-bottom: 1px solid #e5e2dc;">${fmtPrice(currentPrice)}</td>
+      <td style="padding: 8px 0; font-size: 12px; color: #2a2a2a; text-align: right; border-bottom: 1px solid #e5e2dc;">${fmtPrice(btc.currentPrice, currency)}</td>
     </tr>
     <tr>
       <td style="padding: 8px 0; font-size: 12px; color: #737373; border-bottom: 1px solid #e5e2dc;">Month high</td>
-      <td style="padding: 8px 0; font-size: 12px; color: #2a2a2a; text-align: right; border-bottom: 1px solid #e5e2dc;">${fmtPrice(monthHigh)}</td>
+      <td style="padding: 8px 0; font-size: 12px; color: #2a2a2a; text-align: right; border-bottom: 1px solid #e5e2dc;">${fmtPrice(btc.monthHigh, currency)}</td>
     </tr>
     <tr>
       <td style="padding: 8px 0; font-size: 12px; color: #737373;">Month low</td>
-      <td style="padding: 8px 0; font-size: 12px; color: #2a2a2a; text-align: right;">${fmtPrice(monthLow)}</td>
+      <td style="padding: 8px 0; font-size: 12px; color: #2a2a2a; text-align: right;">${fmtPrice(btc.monthLow, currency)}</td>
     </tr>
   </table>
 
