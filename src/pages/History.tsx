@@ -181,6 +181,7 @@ const History = () => {
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [tab, setTab] = useState<'recent' | 'library' | 'timeline'>('recent');
+  const [viewMode, setViewMode] = useState<'list' | 'calendar'>('list');
   const [filter, setFilter] = useState<'all' | 'favorites'>('all');
   const [tagFilter, setTagFilter] = useState<string | null>(null);
   const [moodFilter, setMoodFilter] = useState<string | null>(null);
@@ -188,6 +189,9 @@ const History = () => {
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
   const [showFilters, setShowFilters] = useState(false);
+  const [calendarDate, setCalendarDate] = useState<Date | null>(null);
+  const [calendarFilters, setCalendarFilters] = useState<Set<ActivityType>>(new Set(['reflection', 'ritual', 'letter', 'badge']));
+  const [calendarActivities, setCalendarActivities] = useState<CalendarActivity[]>([]);
 
   useEffect(() => {
     document.title = 'Holzen — History';
