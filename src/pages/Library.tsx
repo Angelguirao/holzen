@@ -119,34 +119,9 @@ export default function Library() {
           {t('library.tabFavorites')}
         </button>
 
-        {!isMobile && (
-          <div className="ml-auto flex items-center gap-1 rounded-md border border-border/40 p-0.5">
-            <button
-              onClick={() => setViewMode('list')}
-              className={cn(
-                'p-1 rounded transition-colors',
-                viewMode === 'list' ? 'bg-muted text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
-              )}
-              aria-label="List view"
-            >
-              <List className="h-3.5 w-3.5" />
-            </button>
-            <button
-              onClick={() => setViewMode('graph')}
-              className={cn(
-                'p-1 rounded transition-colors',
-                viewMode === 'graph' ? 'bg-muted text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
-              )}
-              aria-label="Graph view"
-            >
-              <Share2 className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        )}
       </div>
 
-      {viewMode === 'list' || isMobile ? (
-        <div className="space-y-3">
+      <div className="space-y-3">
           {/* Search + filter toggle */}
           <div className="flex items-center gap-2">
             <div className="relative flex-1">
