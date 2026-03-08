@@ -4,18 +4,22 @@ import { differenceInCalendarDays, subDays, format } from 'date-fns';
 interface Props {
   reflections: { created_at: string; outcome: string | null }[];
   streakFreezeDates?: string[];
+  memberSince?: string | null;
 }
 
 const STREAK_MILESTONES = [3, 7, 14, 30, 60, 100];
 
-export function StreakTimeline({ reflections, streakFreezeDates = [] }: Props) {
+export function StreakTimeline({ reflections, streakFreezeDates = [], memberSince }: Props) {
   const { days, currentStreak, longestStreak, nextMilestone } = useMemo(() => {
     const today = new Date();
     const dayCount = 28; // show last 28 days
+    const memberStart = memberSince ? new Date(memberSince).toISOString().slice(0, 10) : null;
     const dayMap = new Map<string, 'outcome' | 'reflection' | 'freeze' | 'empty'>();
 
     for (let i = 0; i < dayCount; i++) {
       const d = subDays(today, i).toISOString().slice(0, 10);
+      // Don't show days before user registered
+      if (memberStart && d < memberStart) continue;
       dayMap.set(d, streakFreezeDates.includes(d) ? 'freeze' : 'empty');
     }
 
