@@ -257,16 +257,15 @@ function StatsContent({ reflections }: { reflections: Reflection[] }) {
         />
       </div>
       <ReflectionStats reflections={reflections} />
-      <StreakTimeline reflections={reflections} />
       {scoreData && <HolzenScoreDetail scoreData={scoreData} />}
-      <RitualStatsCard />
+      <StreakTimeline reflections={reflections} />
+      <InsightsPanel reflections={reflections} />
       <DecisionQualityCard reflections={reflections} />
+      <RitualStatsCard />
       <StatsTrends reflections={reflections} />
       <MoodTrendChart reflections={reflections} />
       <MoodPriceChart reflections={reflections} />
       <MoodPriceScatter reflections={reflections} />
-      <MoodTrends reflections={reflections} />
-      <InsightsPanel reflections={reflections} />
     </div>
   );
 }
