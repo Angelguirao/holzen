@@ -157,12 +157,26 @@ export default function PauseSession() {
                   >
                     {/* Breathing circle */}
                     <motion.div
-                      className="w-20 h-20 rounded-full border border-border/15"
+                      className="w-20 h-20 rounded-full border border-border/15 relative cursor-pointer"
                       style={{
                         background: 'radial-gradient(circle, hsl(var(--primary) / 0.06) 0%, transparent 70%)',
                       }}
-                      animate={prefersReducedMotion ? {} : { scale: [1, 1.12, 1] }}
-                      transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
+                      initial={prefersReducedMotion ? {} : { scale: 0, opacity: 0 }}
+                      animate={prefersReducedMotion ? {} : { scale: [1, 1.12, 1], opacity: 1 }}
+                      transition={{
+                        scale: { duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 0.6 },
+                        opacity: { duration: 1.2, ease: 'easeOut' },
+                      }}
+                      whileTap={{ scale: 0.92 }}
+                      onClick={(e) => {
+                        hapticFeedback('light');
+                        const circle = e.currentTarget;
+                        const ripple = document.createElement('span');
+                        ripple.className = 'absolute inset-0 rounded-full animate-ping';
+                        ripple.style.background = 'hsl(var(--primary) / 0.08)';
+                        circle.appendChild(ripple);
+                        setTimeout(() => ripple.remove(), 700);
+                      }}
                     />
                     <p className="text-xs font-mono text-muted-foreground/40 tracking-wider">
                       {t('pause.youPaused')}
