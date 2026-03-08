@@ -167,8 +167,16 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
     });
   }, [reflectionId]);
 
-  // Static English labels — language setting only affects AI-generated content
-  const t = { pause: 'Pause with this', breathe: 'Breathe with this', haiku: 'Read as haiku', ground: 'Ground yourself', signal: 'Read the signal', zoomOut: 'Zoom out', lookBack: 'Look back' };
+  const { t: i18nT } = useTranslation();
+  const labels = {
+    pause: i18nT('companions.pause'),
+    breathe: i18nT('companions.breathe'),
+    haiku: i18nT('companions.haiku'),
+    ground: i18nT('companions.ground'),
+    signal: i18nT('companions.signal'),
+    zoomOut: i18nT('companions.zoomOut'),
+    lookBack: i18nT('companions.lookBack'),
+  };
   const [expandedBreathing, setExpandedBreathing] = useState(false);
   const [expandedHaiku, setExpandedHaiku] = useState(false);
   const [expandedLearning, setExpandedLearning] = useState(false);
