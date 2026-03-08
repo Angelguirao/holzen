@@ -46,6 +46,7 @@ interface HolzenRitualProps {
 
 export function HolzenRitual({ open, onClose, template, reflectionMessage, reflectionId, onDecision }: HolzenRitualProps) {
   const { user } = useAuth();
+  const { mantra, motivations } = useHolzen();
   const steps = TEMPLATES[template]
     .map((id) => ALL_STEPS.find((s) => s.id === id)!)
     .filter(Boolean);
@@ -54,7 +55,19 @@ export function HolzenRitual({ open, onClose, template, reflectionMessage, refle
   const [completed, setCompleted] = useState(false);
   const [journalText, setJournalText] = useState('');
   const [decision, setDecision] = useState('');
+  const [showMantra, setShowMantra] = useState(false);
   const startTimeRef = useRef<number>(Date.now());
+
+  const hasMantra = !!(mantra || motivations.length > 0);
+
+  // Show mantra briefly before the first step
+  useEffect(() => {
+    if (open && hasMantra && currentStep === 0 && !completed) {
+      setShowMantra(true);
+      const timer = setTimeout(() => setShowMantra(false), 3500);
+      return () => clearTimeout(timer);
+    }
+  }, [open, hasMantra, currentStep, completed]);
 
   const step = steps[currentStep];
 
