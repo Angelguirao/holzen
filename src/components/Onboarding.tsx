@@ -153,7 +153,7 @@ export function Onboarding({ onComplete }: Props) {
 
                     <div className="space-y-3 pt-3 border-t border-border/30">
                       <p className="text-[10px] font-mono text-muted-foreground/50 uppercase tracking-wider">
-                        Pause with this
+                        {t('onboarding.pauseWithThis')}
                       </p>
 
                       {/* Breathing */}
