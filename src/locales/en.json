@@ -818,5 +818,97 @@
   },
   "myWhy": {
     "title": "My Why"
+  },
+  "breathing": {
+    "trigger": "Breathe with this →",
+    "choosePattern": "Choose a pattern",
+    "suggestedForVolatility": "Suggested for current volatility",
+    "begin": "Begin",
+    "settled": "Settled.",
+    "settledDesc": "You gave yourself a moment. That's enough.",
+    "return": "Return",
+    "patterns": {
+      "box": "Box",
+      "boxDesc": "4-4-4-4 · Grounding",
+      "calming": "Calming",
+      "calmingDesc": "4-7-8 · Deep calm",
+      "sigh": "Sigh",
+      "sighDesc": "Physiological sigh"
+    },
+    "phases": {
+      "inhale": "Inhale",
+      "hold": "Hold",
+      "exhale": "Exhale",
+      "sip": "Sip"
+    }
+  },
+  "volatility": {
+    "title": "Volatility Tolerance",
+    "grades": {
+      "ironHands": "Iron hands",
+      "steady": "Steady",
+      "shaky": "Shaky",
+      "paperHands": "Paper hands"
+    },
+    "descriptions": {
+      "high": "You stay remarkably composed during drops — even heavy ones.",
+      "moderate": "You handle most drops well, though bigger swings test your composure.",
+      "low": "Drops tend to rattle you. Breathing before acting could help.",
+      "veryLow": "Drops hit hard emotionally. The ritual is your best defense."
+    },
+    "basedOnDrops": "Based on {{count}} drop reflection",
+    "basedOnDrops_other": "Based on {{count}} drop reflections",
+    "buckets": {
+      "mild": "Mild dips",
+      "moderate": "Moderate drops",
+      "heavy": "Heavy drops"
+    },
+    "composure": {
+      "reactive": "Reactive",
+      "mixed": "Mixed",
+      "composed": "Composed"
+    },
+    "held": "{{percent}}% held"
+  },
+  "insightsPanel": {
+    "title": "Mood & Actions",
+    "howYouFelt": "How you felt before reflecting",
+    "whatYouDid": "What you did after",
+    "basedOn": "Based on {{count}} reflection",
+    "basedOn_other": "Based on {{count}} reflections"
+  },
+  "decisionQuality": {
+    "title": "Decision Quality",
+    "improving": "Improving",
+    "stable": "Stable",
+    "declining": "Declining",
+    "withPause": "With pause",
+    "withoutPause": "Without pause",
+    "companionBreakdown": "Companion breakdown",
+    "comparedToBaseline": "Compared to {{percent}}% baseline (no companions)",
+    "basedOnDecisions": "Based on {{count}} decisions with recorded outcomes",
+    "pauseHigher": "When you pause before acting, your hold rate is {{delta}}pp higher.",
+    "pauseSame": "Your hold rate is the same whether you pause or not — keep reflecting.",
+    "pauseSimilar": "Interesting — your hold rate is similar regardless of pausing. The practice may be helping in ways beyond outcomes.",
+    "keepReflecting": "Keep reflecting to see how pausing affects your decisions.",
+    "held": "{{percent}}% held",
+    "companionLabels": {
+      "breathing": "Breathing",
+      "haiku": "Haiku",
+      "learning": "Learning",
+      "signal": "Signal",
+      "zoomOut": "Zoom Out",
+      "history": "History"
+    }
+  },
+  "holzenScore": {
+    "title": "Holzen Score",
+    "improving": "Improving",
+    "declining": "Declining",
+    "stable": "Stable",
+    "mood": "Mood",
+    "actions": "Actions",
+    "streak": "Streak",
+    "basedOn": "Based on your last 30 reflections. Higher is calmer."
   }
 }

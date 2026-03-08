@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 
 interface ReflectionStats {
   mood: string | null;
@@ -9,15 +10,15 @@ interface Props {
   reflections: ReflectionStats[];
 }
 
-const MOOD_META: Record<string, { label: string; emoji: string; color: string; energy: 'high' | 'low' }> = {
-  fomo: { label: 'FOMO', emoji: '🔥', color: 'bg-destructive/70', energy: 'high' },
-  excited: { label: 'Excited', emoji: '⚡', color: 'bg-accent/50', energy: 'high' },
-  greedy: { label: 'Greedy', emoji: '🤑', color: 'bg-destructive/60', energy: 'high' },
-  anxious: { label: 'Anxious', emoji: '😰', color: 'bg-destructive/50', energy: 'high' },
-  calm: { label: 'Calm', emoji: '🧘', color: 'bg-primary/70', energy: 'low' },
-  detached: { label: 'Detached', emoji: '😶', color: 'bg-muted-foreground/40', energy: 'low' },
-  uncertain: { label: 'Uncertain', emoji: '🤔', color: 'bg-muted-foreground/50', energy: 'low' },
-  fearful: { label: 'Fearful', emoji: '😨', color: 'bg-destructive/40', energy: 'low' },
+const MOOD_META: Record<string, { emoji: string; color: string; energy: 'high' | 'low' }> = {
+  fomo: { emoji: '🔥', color: 'bg-destructive/70', energy: 'high' },
+  excited: { emoji: '⚡', color: 'bg-accent/50', energy: 'high' },
+  greedy: { emoji: '🤑', color: 'bg-destructive/60', energy: 'high' },
+  anxious: { emoji: '😰', color: 'bg-destructive/50', energy: 'high' },
+  calm: { emoji: '🧘', color: 'bg-primary/70', energy: 'low' },
+  detached: { emoji: '😶', color: 'bg-muted-foreground/40', energy: 'low' },
+  uncertain: { emoji: '🤔', color: 'bg-muted-foreground/50', energy: 'low' },
+  fearful: { emoji: '😨', color: 'bg-destructive/40', energy: 'low' },
 };
 
 const MOOD_ORDER = ['fomo', 'excited', 'greedy', 'anxious', 'calm', 'detached', 'uncertain', 'fearful'];
@@ -49,6 +50,8 @@ function Bar({ label, count, total, color }: { label: string; count: number; tot
 }
 
 export function InsightsPanel({ reflections }: Props) {
+  const { t } = useTranslation();
+
   const { moodCounts, outcomeCounts, totalMoods, totalOutcomes } = useMemo(() => {
     const moods: Record<string, number> = {};
     const outcomes: Record<string, number> = {};
@@ -67,18 +70,18 @@ export function InsightsPanel({ reflections }: Props) {
 
   return (
     <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-5">
-      <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">Mood & Actions</p>
+      <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">{t('insightsPanel.title')}</p>
 
       {totalMoods > 0 && (
         <div className="space-y-2">
-          <p className="text-xs font-mono text-muted-foreground/70">How you felt before reflecting</p>
+          <p className="text-xs font-mono text-muted-foreground/70">{t('insightsPanel.howYouFelt')}</p>
           {MOOD_ORDER.map((m) => {
             const meta = MOOD_META[m];
             if (!meta || !moodCounts[m]) return null;
             return (
               <Bar
                 key={m}
-                label={`${meta.emoji} ${meta.label}`}
+                label={`${meta.emoji} ${t(`moodCheck.moods.${m}`, m)}`}
                 count={moodCounts[m]}
                 total={totalMoods}
                 color={meta.color}
@@ -90,15 +93,15 @@ export function InsightsPanel({ reflections }: Props) {
 
       {totalOutcomes > 0 && (
         <div className="space-y-2">
-          <p className="text-xs font-mono text-muted-foreground/70">What you did after</p>
+          <p className="text-xs font-mono text-muted-foreground/70">{t('insightsPanel.whatYouDid')}</p>
           {(['held', 'nothing', 'bought', 'sold'] as const).map((o) => (
-            <Bar key={o} label={o} count={outcomeCounts[o] || 0} total={totalOutcomes} color={OUTCOME_COLORS[o]} />
+            <Bar key={o} label={t(`outcome.${o}`, o)} count={outcomeCounts[o] || 0} total={totalOutcomes} color={OUTCOME_COLORS[o]} />
           ))}
         </div>
       )}
 
       <p className="text-[10px] text-muted-foreground/40 leading-relaxed">
-        Based on {reflections.length} reflection{reflections.length !== 1 ? 's' : ''}
+        {t('insightsPanel.basedOn', { count: reflections.length })}
       </p>
     </div>
   );
