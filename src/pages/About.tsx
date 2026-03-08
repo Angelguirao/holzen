@@ -38,7 +38,7 @@ const About = () => {
         {/* Title */}
         <motion.div {...m(0.05)}>
           <h1 className="text-xl text-foreground leading-relaxed">
-            Why Holzen exists
+            {t('about.whyHolzenExists')}
           </h1>
         </motion.div>
 
