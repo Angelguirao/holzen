@@ -281,7 +281,7 @@ const Home = () => {
             onToggleCollapse={() => toggleCollapsed('btc-status')}
           >
             <div className="space-y-4">
-              <BtcStatus data={btcData} error={error} hidden={priceHidden} onToggleHidden={togglePriceHidden} />
+              <BtcStatus data={btcData} error={error} hidden={priceHidden} onToggleHidden={togglePriceHidden} currency={currency} />
               <HolzenNumber variant="compact" />
               <AutoCooldownIndicator cooldownRemaining={autoCooldownRemaining} cooldownHours={cooldownHours} />
             </div>
