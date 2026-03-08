@@ -16,6 +16,7 @@ export interface CompanionPrefs {
   breathing: boolean;
   haiku: boolean;
   learning: boolean;
+  signal: boolean;
 }
 
 interface CompletionState {
