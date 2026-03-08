@@ -153,6 +153,7 @@ export type Database = {
           companion_haiku: boolean
           companion_learning: boolean
           companion_signal: boolean
+          companion_zoom_out: boolean
           cooldown_hours: number
           created_at: string
           cumulative_threshold: number
@@ -188,6 +189,7 @@ export type Database = {
           companion_haiku?: boolean
           companion_learning?: boolean
           companion_signal?: boolean
+          companion_zoom_out?: boolean
           cooldown_hours?: number
           created_at?: string
           cumulative_threshold?: number
@@ -223,6 +225,7 @@ export type Database = {
           companion_haiku?: boolean
           companion_learning?: boolean
           companion_signal?: boolean
+          companion_zoom_out?: boolean
           cooldown_hours?: number
           created_at?: string
           cumulative_threshold?: number
