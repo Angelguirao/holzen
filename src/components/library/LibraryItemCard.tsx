@@ -33,6 +33,7 @@ interface Props {
   itemCollections?: Collection[];
   onAddToCollection?: (collectionId: string, itemId: string) => Promise<any>;
   onRemoveFromCollection?: (collectionId: string, itemId: string) => Promise<void>;
+  onClick?: () => void;
 }
 
 export function LibraryItemCard({
