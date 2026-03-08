@@ -121,7 +121,8 @@ Haiku rules:
 
 Learning input rules:
 - Title: a short, factual headline (5-10 words).
-- Body: 1-2 sentences about a historical Bitcoin event, market pattern, or behavioral finance insight relevant to the current context. Factual, educational, no advice.`;
+- Body: 1-2 sentences about a historical Bitcoin event, market pattern, or behavioral finance insight relevant to the current context. Factual, educational, no advice.
+- If on-chain data is provided in the context (mempool size, fees, hashrate, block height), USE IT to make the learning insight factually grounded. Reference actual current conditions rather than generic history.`;
 
     const response = await fetch(
       "https://ai.gateway.lovable.dev/v1/chat/completions",

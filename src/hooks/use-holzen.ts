@@ -230,6 +230,13 @@ export function useHolzen() {
     if (data.fearGreed) {
       ctx += ` Market sentiment: ${data.fearGreed.label} (${data.fearGreed.value}/100).`;
     }
+    if (data.onChain) {
+      const oc = data.onChain;
+      if (oc.mempoolSize) ctx += ` Mempool: ${oc.mempoolSize.toLocaleString()} unconfirmed txs.`;
+      if (oc.fastestFee) ctx += ` Fees: ${oc.fastestFee} sat/vB (fastest), ${oc.medianFee ?? '?'} sat/vB (medium).`;
+      if (oc.hashrate) ctx += ` Hashrate: ${oc.hashrate}.`;
+      if (oc.blockHeight) ctx += ` Block height: ${oc.blockHeight.toLocaleString()}.`;
+    }
 
     // Silent mode: skip AI, just show context
     if (silentMode) {
