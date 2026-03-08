@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { differenceInCalendarDays, subDays, format } from 'date-fns';
 
 interface Props {
@@ -10,9 +11,11 @@ interface Props {
 const STREAK_MILESTONES = [3, 7, 14, 30, 60, 100];
 
 export function StreakTimeline({ reflections, streakFreezeDates = [], memberSince }: Props) {
+  const { t } = useTranslation();
+
   const { days, currentStreak, longestStreak, nextMilestone } = useMemo(() => {
     const today = new Date();
-    const dayCount = 28; // show last 28 days
+    const dayCount = 28;
     const memberStart = memberSince ? new Date(memberSince).toISOString().slice(0, 10) : null;
     const dayMap = new Map<string, 'outcome' | 'reflection' | 'freeze' | 'empty' | 'pre'>();
 
@@ -32,7 +35,6 @@ export function StreakTimeline({ reflections, streakFreezeDates = [], memberSinc
       }
     }
 
-    // Compute current streak
     const allDays = new Set<string>();
     for (const r of reflections) {
       if (r.outcome) allDays.add(new Date(r.created_at).toISOString().slice(0, 10));
@@ -54,7 +56,6 @@ export function StreakTimeline({ reflections, streakFreezeDates = [], memberSinc
       }
     }
 
-    // Longest
     let longest = 0;
     if (sorted.length > 0) {
       let s = 1;
@@ -81,23 +82,22 @@ export function StreakTimeline({ reflections, streakFreezeDates = [], memberSinc
     <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3">
       <div className="flex items-center justify-between">
         <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
-          Last 28 Days
+          {t('streakTimeline.title')}
         </p>
         {nextMilestone && currentStreak > 0 && (
           <p className="text-[10px] font-mono text-muted-foreground/60">
-            {nextMilestone - currentStreak}d to {nextMilestone}-day milestone
+            {t('streakTimeline.daysToMilestone', { days: nextMilestone - currentStreak, milestone: nextMilestone })}
           </p>
         )}
       </div>
 
-      {/* Day grid */}
       <div className="grid grid-cols-7 gap-1">
         {days.map(({ date, status }) => {
           const isToday = date === new Date().toISOString().slice(0, 10);
           return (
             <div
               key={date}
-              title={`${format(new Date(date), 'MMM d')} — ${status === 'pre' ? 'before signup' : status}`}
+              title={`${format(new Date(date), 'MMM d')} — ${status === 'pre' ? t('streakTimeline.beforeSignup') : t(`streakTimeline.status.${status}`)}`}
               className={`aspect-square rounded-sm transition-colors ${
                 status === 'outcome'
                   ? 'bg-primary'
@@ -114,28 +114,26 @@ export function StreakTimeline({ reflections, streakFreezeDates = [], memberSinc
         })}
       </div>
 
-      {/* Legend */}
       <div className="flex items-center flex-wrap gap-x-3 gap-y-1 text-[9px] font-mono text-muted-foreground/50">
         <span className="flex items-center gap-1">
-          <span className="h-2 w-2 rounded-sm bg-primary" /> outcome logged
+          <span className="h-2 w-2 rounded-sm bg-primary" /> {t('streakTimeline.legend.outcomeLogged')}
         </span>
         <span className="flex items-center gap-1">
-          <span className="h-2 w-2 rounded-sm bg-primary/30" /> reflected (no outcome)
+          <span className="h-2 w-2 rounded-sm bg-primary/30" /> {t('streakTimeline.legend.reflectedNoOutcome')}
         </span>
         <span className="flex items-center gap-1">
-          <span className="h-2 w-2 rounded-sm bg-blue-400/40" /> streak freeze
+          <span className="h-2 w-2 rounded-sm bg-blue-400/40" /> {t('streakTimeline.legend.streakFreeze')}
         </span>
         <span className="flex items-center gap-1">
-          <span className="h-2 w-2 rounded-sm bg-muted/50" /> no activity
+          <span className="h-2 w-2 rounded-sm bg-muted/50" /> {t('streakTimeline.legend.noActivity')}
         </span>
       </div>
 
-      {/* Milestone progress */}
       {currentStreak > 0 && nextMilestone && (
         <div className="space-y-1">
           <div className="flex justify-between text-[10px] font-mono text-muted-foreground">
-            <span>{currentStreak}d streak</span>
-            <span>{nextMilestone}d milestone</span>
+            <span>{t('streakTimeline.streakDays', { days: currentStreak })}</span>
+            <span>{t('streakTimeline.milestoneDays', { days: nextMilestone })}</span>
           </div>
           <div className="h-1.5 rounded-full bg-muted/50 overflow-hidden">
             <div

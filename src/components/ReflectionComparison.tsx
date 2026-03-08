@@ -1,9 +1,10 @@
 import { useEffect, useState, forwardRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { format, formatDistanceToNow } from 'date-fns';
 import { motion, useReducedMotion } from 'framer-motion';
-import { GitCompareArrows, ArrowDown, ArrowUp, TrendingDown, TrendingUp } from 'lucide-react';
+import { GitCompareArrows, TrendingDown, TrendingUp } from 'lucide-react';
 
 interface ComparisonReflection {
   id: string;
@@ -17,9 +18,7 @@ interface ComparisonReflection {
 }
 
 interface ReflectionComparisonProps {
-  /** The current/recent reflection to compare from */
   reflectionId: string;
-  /** Minimum age in days for the comparison reflection (default 30) */
   minAgeDays?: number;
 }
 
@@ -36,27 +35,9 @@ function parsePercent(context: string | null): string | null {
   return match ? match[1] : null;
 }
 
-const moodLabels: Record<string, string> = {
-  fomo: '🤯 FOMO',
-  excited: '🚀 Excited',
-  greedy: '🤑 Greedy',
-  anxious: '😰 Anxious',
-  calm: '😌 Calm',
-  detached: '🧊 Detached',
-  uncertain: '🤔 Uncertain',
-  fearful: '😨 Fearful',
-};
-
-const outcomeLabels: Record<string, string> = {
-  held: 'Held',
-  hold: 'Held',
-  sold: 'Sold',
-  bought: 'Bought',
-  nothing: 'Did nothing',
-};
-
 export const ReflectionComparison = forwardRef<HTMLDivElement, ReflectionComparisonProps>(function ReflectionComparison({ reflectionId, minAgeDays = 30 }, ref) {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [current, setCurrent] = useState<ComparisonReflection | null>(null);
   const [past, setPast] = useState<ComparisonReflection | null>(null);
   const [loading, setLoading] = useState(true);
@@ -68,7 +49,6 @@ export const ReflectionComparison = forwardRef<HTMLDivElement, ReflectionCompari
     async function load() {
       setLoading(true);
       try {
-        // Fetch current reflection
         const { data: currentData } = await supabase
           .from('reflections')
           .select('id, message, context, mood, outcome, tags, created_at, note')
@@ -79,7 +59,6 @@ export const ReflectionComparison = forwardRef<HTMLDivElement, ReflectionCompari
         if (!currentData) return;
         setCurrent(currentData as ComparisonReflection);
 
-        // Find similar past reflection via RPC
         const { data: pastData } = await supabase.rpc('find_similar_reflection', {
           _user_id: user!.id,
           _reflection_id: reflectionId,
@@ -120,36 +99,32 @@ export const ReflectionComparison = forwardRef<HTMLDivElement, ReflectionCompari
       className="rounded-lg border border-border/50 bg-card/50 overflow-hidden"
       {...motionProps}
     >
-      {/* Header */}
       <div className="flex items-center gap-2 px-3 py-2.5 border-b border-border/30">
         <GitCompareArrows className="h-3.5 w-3.5 text-muted-foreground/50" />
         <span className="text-[10px] font-mono tracking-[0.15em] uppercase text-muted-foreground/50">
-          Similar moment · {timeDiff} ago
+          {t('reflectionComparison.similarMoment', { time: timeDiff })}
         </span>
       </div>
 
-      {/* Side-by-side */}
       <div className="grid grid-cols-2 divide-x divide-border/30">
-        {/* Past reflection */}
         <ComparisonCard
-          label="Then"
+          label={t('reflectionComparison.then')}
           reflection={past}
           direction={pastDir}
           percent={pastPct}
           muted
+          t={t}
         />
-
-        {/* Current reflection */}
         <ComparisonCard
-          label="Now"
+          label={t('reflectionComparison.now')}
           reflection={current}
           direction={currentDir}
           percent={currentPct}
+          t={t}
         />
       </div>
 
-      {/* Growth insight */}
-      <GrowthInsight current={current} past={past} />
+      <GrowthInsight current={current} past={past} t={t} />
     </motion.div>
   );
 });
@@ -161,19 +136,20 @@ function ComparisonCard({
   direction,
   percent,
   muted = false,
+  t,
 }: {
   label: string;
   reflection: ComparisonReflection;
   direction: 'up' | 'down' | null;
   percent: string | null;
   muted?: boolean;
+  t: (k: string, opts?: any) => string;
 }) {
   const DirIcon = direction === 'down' ? TrendingDown : TrendingUp;
   const textClass = muted ? 'text-muted-foreground/70' : 'text-foreground';
 
   return (
     <div className="p-3 space-y-2.5">
-      {/* Label + date */}
       <div className="space-y-0.5">
         <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-foreground/40">
           {label}
@@ -183,7 +159,6 @@ function ComparisonCard({
         </p>
       </div>
 
-      {/* BTC context */}
       {direction && percent && (
         <div className="flex items-center gap-1">
           <DirIcon className={`h-2.5 w-2.5 ${direction === 'down' ? 'text-destructive/60' : 'text-primary/60'}`} />
@@ -193,21 +168,19 @@ function ComparisonCard({
         </div>
       )}
 
-      {/* Message excerpt */}
       <p className={`text-xs leading-relaxed line-clamp-4 ${textClass}`}>
         {reflection.message}
       </p>
 
-      {/* Mood + Outcome badges */}
       <div className="flex flex-wrap gap-1">
         {reflection.mood && (
           <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground">
-            {moodLabels[reflection.mood] || reflection.mood}
+            {t(`moodCheck.moods.${reflection.mood}`, reflection.mood)}
           </span>
         )}
         {reflection.outcome && (
           <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground">
-            {outcomeLabels[reflection.outcome] || reflection.outcome}
+            {t(`outcome.${reflection.outcome}`, reflection.outcome)}
           </span>
         )}
       </div>
@@ -215,8 +188,7 @@ function ComparisonCard({
   );
 }
 
-function GrowthInsight({ current, past }: { current: ComparisonReflection; past: ComparisonReflection }) {
-  // Composure scale: higher = more composed
+function GrowthInsight({ current, past, t }: { current: ComparisonReflection; past: ComparisonReflection; t: (k: string) => string }) {
   const composureScale: Record<string, number> = {
     fomo: 1, greedy: 1, anxious: 2, fearful: 2,
     excited: 3, uncertain: 3, detached: 4, calm: 5,
@@ -228,24 +200,24 @@ function GrowthInsight({ current, past }: { current: ComparisonReflection; past:
   const currentHeld = current.outcome ? holdOutcomes.includes(current.outcome) : false;
   const pastHeld = past.outcome ? holdOutcomes.includes(past.outcome) : false;
 
-  let insight: string | null = null;
+  let insightKey: string | null = null;
 
   if (currentComposure > pastComposure && pastComposure >= 0) {
-    insight = 'You were calmer this time facing similar conditions.';
+    insightKey = 'reflectionComparison.insightCalmer';
   } else if (currentHeld && !pastHeld) {
-    insight = 'You held steady this time — last time you acted on impulse.';
+    insightKey = 'reflectionComparison.insightHeldSteady';
   } else if (currentHeld && pastHeld) {
-    insight = 'Consistent composure — you held steady both times.';
+    insightKey = 'reflectionComparison.insightConsistent';
   } else if (currentComposure >= 0 && pastComposure >= 0 && currentComposure === pastComposure) {
-    insight = 'Similar emotional response — your patterns are consistent.';
+    insightKey = 'reflectionComparison.insightSimilar';
   }
 
-  if (!insight) return null;
+  if (!insightKey) return null;
 
   return (
     <div className="px-3 py-2 border-t border-border/30 bg-muted/20">
       <p className="text-[10px] text-muted-foreground leading-relaxed italic">
-        {insight}
+        {t(insightKey)}
       </p>
     </div>
   );
