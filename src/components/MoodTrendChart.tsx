@@ -1,14 +1,8 @@
 import { useMemo, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChartEmptyState } from './ChartEmptyState';
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  ReferenceLine,
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine,
 } from 'recharts';
 import { format, startOfWeek, parseISO } from 'date-fns';
 
@@ -22,7 +16,6 @@ const MOOD_VAL: Record<string, number> = {
   fomo: 1, greedy: 1.5, anxious: 2, fearful: 2, excited: 2.5,
   uncertain: 3, detached: 4, calm: 5,
 };
-const MOOD_LABELS: Record<number, string> = { 1: 'Reactive', 3: 'Neutral', 5: 'Composed' };
 
 function buildData(reflections: Props['reflections'], granularity: Granularity) {
   const buckets = new Map<string, { total: number; count: number }>();
@@ -43,7 +36,7 @@ function buildData(reflections: Props['reflections'], granularity: Granularity) 
   return Array.from(buckets.entries())
     .map(([key, { total, count }]) => ({
       key,
-      label: format(new Date(key), granularity === 'daily' ? 'MMM d' : 'MMM d'),
+      label: format(new Date(key), 'MMM d'),
       avg: total / count,
       count,
     }))
@@ -51,16 +44,20 @@ function buildData(reflections: Props['reflections'], granularity: Granularity) 
 }
 
 export function MoodTrendChart({ reflections }: Props) {
+  const { t } = useTranslation();
   const [granularity, setGranularity] = useState<Granularity>('weekly');
+
+  const MOOD_LABELS: Record<number, string> = {
+    1: t('moodCharts.reactive'), 3: t('moodCharts.neutral'), 5: t('moodCharts.composed'),
+  };
 
   const data = useMemo(() => buildData(reflections, granularity), [reflections, granularity]);
 
   if (data.length < 3) {
-    const moodCount = reflections.filter((r) => r.mood && MOOD_VAL[r.mood] !== undefined).length;
     return (
       <ChartEmptyState
-        title="Mood Trend"
-        message="Log moods across 3+ different weeks to see a meaningful trend line."
+        title={t('moodCharts.moodTrend')}
+        message={t('moodCharts.moodTrendEmpty')}
         current={data.length}
         needed={3}
       />
@@ -70,21 +67,21 @@ export function MoodTrendChart({ reflections }: Props) {
   const first = data[0].avg;
   const last = data[data.length - 1].avg;
   const diff = last - first;
-  const trendLabel = Math.abs(diff) < 0.15 ? 'stable' : diff > 0 ? 'improving' : 'declining';
+  const trendLabel = Math.abs(diff) < 0.15 ? t('moodCharts.stable') : diff > 0 ? t('moodCharts.improving') : t('moodCharts.declining');
   const trendColor =
-    trendLabel === 'improving'
+    diff > 0.15
       ? 'text-primary'
-      : trendLabel === 'declining'
+      : diff < -0.15
         ? 'text-destructive'
         : 'text-muted-foreground';
 
-  const periodLabel = granularity === 'daily' ? 'day' : 'week';
+  const periodLabel = granularity === 'daily' ? t('moodCharts.day') : t('moodCharts.week');
 
   return (
     <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3">
       <div className="flex items-center justify-between">
         <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
-          Mood Trend
+          {t('moodCharts.moodTrend')}
         </p>
         <div className="flex items-center gap-2">
           <div className="flex rounded bg-muted/50 p-0.5">
@@ -112,51 +109,26 @@ export function MoodTrendChart({ reflections }: Props) {
         <ResponsiveContainer width="100%" height="100%">
           <LineChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: -16 }}>
             <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" opacity={0.3} />
-            <XAxis
-              dataKey="label"
-              tick={{ fontSize: 9, fontFamily: 'monospace', fill: 'hsl(var(--muted-foreground))' }}
-              axisLine={false}
-              tickLine={false}
-            />
-            <YAxis
-              domain={[0.5, 5.5]}
-              ticks={[1, 3, 5]}
-              tickFormatter={(v: number) => MOOD_LABELS[v] ?? ''}
-              tick={{ fontSize: 9, fontFamily: 'monospace', fill: 'hsl(var(--muted-foreground))' }}
-              axisLine={false}
-              tickLine={false}
-            />
+            <XAxis dataKey="label" tick={{ fontSize: 9, fontFamily: 'monospace', fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
+            <YAxis domain={[0.5, 5.5]} ticks={[1, 3, 5]} tickFormatter={(v: number) => MOOD_LABELS[v] ?? ''} tick={{ fontSize: 9, fontFamily: 'monospace', fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
             <ReferenceLine y={3} stroke="hsl(var(--border))" strokeDasharray="3 3" opacity={0.4} />
             <Tooltip
-              contentStyle={{
-                background: 'hsl(var(--muted))',
-                border: '1px solid hsl(var(--border))',
-                borderRadius: '6px',
-                fontSize: '11px',
-                fontFamily: 'monospace',
-              }}
+              contentStyle={{ background: 'hsl(var(--muted))', border: '1px solid hsl(var(--border))', borderRadius: '6px', fontSize: '11px', fontFamily: 'monospace' }}
               formatter={(value: number) => {
-                const label = value < 2 ? 'Reactive' : value < 3.5 ? 'Mixed' : 'Composed';
-                return [`${value.toFixed(2)} (${label})`, 'Avg Composure'];
+                const label = value < 2 ? t('moodCharts.reactive') : value < 3.5 ? t('moodCharts.mixed') : t('moodCharts.composed');
+                return [`${value.toFixed(2)} (${label})`, t('moodCharts.avgComposure')];
               }}
               labelFormatter={(label: string) =>
-                granularity === 'daily' ? label : `Week of ${label}`
+                granularity === 'daily' ? label : `${t('moodCharts.weekOf')} ${label}`
               }
             />
-            <Line
-              type="monotone"
-              dataKey="avg"
-              stroke="hsl(var(--primary))"
-              strokeWidth={2}
-              dot={{ r: 3, fill: 'hsl(var(--primary))', strokeWidth: 0 }}
-              activeDot={{ r: 5, fill: 'hsl(var(--primary))' }}
-            />
+            <Line type="monotone" dataKey="avg" stroke="hsl(var(--primary))" strokeWidth={2} dot={{ r: 3, fill: 'hsl(var(--primary))', strokeWidth: 0 }} activeDot={{ r: 5, fill: 'hsl(var(--primary))' }} />
           </LineChart>
         </ResponsiveContainer>
       </div>
 
       <p className="text-[10px] text-muted-foreground/40 leading-relaxed">
-        Average mood per {periodLabel} across {data.reduce((s, d) => s + d.count, 0)} reflections
+        {t('moodCharts.averageMoodPer', { period: periodLabel, count: data.reduce((s, d) => s + d.count, 0) })}
       </p>
     </div>
   );

@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChartEmptyState } from './ChartEmptyState';
 import {
   LineChart,
@@ -111,13 +112,14 @@ interface Props {
 }
 
 export function StatsTrends({ reflections }: Props) {
+  const { t } = useTranslation();
   const data = useMemo(() => buildWeeklyData(reflections), [reflections]);
 
   if (data.length < 3) {
     return (
       <ChartEmptyState
-        title="Weekly Trends"
-        message="Reflect across 3+ different weeks to unlock score, mood, and hold-rate trend charts."
+        title={t('statsTrends.weeklyTrends')}
+        message={t('statsTrends.emptyMessage')}
         current={data.length}
         needed={3}
       />
@@ -139,12 +141,12 @@ export function StatsTrends({ reflections }: Props) {
       <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3">
         <div className="flex items-center justify-between">
           <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
-            Score Over Time
+            {t('statsTrends.scoreOverTime')}
           </p>
           <span className={`text-[10px] font-mono px-2 py-0.5 rounded bg-muted/50 ${
             scoreDirection === 'up' ? 'text-primary' : scoreDirection === 'down' ? 'text-destructive' : 'text-muted-foreground'
           }`}>
-            {scoreDirection === 'up' ? `+${scoreDelta}` : scoreDirection === 'down' ? `${scoreDelta}` : 'stable'}
+            {scoreDirection === 'up' ? `+${scoreDelta}` : scoreDirection === 'down' ? `${scoreDelta}` : t('statsTrends.stable')}
           </span>
         </div>
         <div className="h-36">
@@ -163,7 +165,7 @@ export function StatsTrends({ reflections }: Props) {
                 axisLine={false}
                 tickLine={false}
               />
-              <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => [`${v}`, 'Score']} />
+              <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => [`${v}`, t('statsTrends.score')]} />
               <Line
                 type="monotone"
                 dataKey="score"
@@ -176,14 +178,14 @@ export function StatsTrends({ reflections }: Props) {
           </ResponsiveContainer>
         </div>
         <p className="text-[10px] text-muted-foreground/40">
-          Weekly composure score across {data.reduce((s, d) => s + d.count, 0)} reflections
+          {t('statsTrends.weeklyComposureScore', { count: data.reduce((s, d) => s + d.count, 0) })}
         </p>
       </div>
 
       {/* Mood distribution shift */}
       <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3">
         <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
-          Mood Distribution
+          {t('statsTrends.moodDistribution')}
         </p>
         <div className="h-36">
           <ResponsiveContainer width="100%" height="100%">
@@ -203,7 +205,7 @@ export function StatsTrends({ reflections }: Props) {
               />
               <Tooltip
                 contentStyle={tooltipStyle}
-                formatter={(v: number, name: string) => [`${Math.round(v * 100)}%`, name]}
+                formatter={(v: number, name: string) => [`${Math.round(v * 100)}%`, t(`statsTrends.${name}`)]}
               />
               <Area type="monotone" dataKey="composed" stackId="1" stroke="hsl(var(--primary))" fill="hsl(var(--primary) / 0.3)" />
               <Area type="monotone" dataKey="mixed" stackId="1" stroke="hsl(var(--muted-foreground))" fill="hsl(var(--muted-foreground) / 0.2)" />
@@ -212,9 +214,9 @@ export function StatsTrends({ reflections }: Props) {
           </ResponsiveContainer>
         </div>
         <div className="flex items-center gap-4 text-[10px] font-mono text-muted-foreground/50">
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-primary/60" />Composed</span>
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-muted-foreground/40" />Mixed</span>
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-destructive/40" />Reactive</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-primary/60" />{t('statsTrends.composed')}</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-muted-foreground/40" />{t('statsTrends.mixed')}</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-destructive/40" />{t('statsTrends.reactive')}</span>
         </div>
       </div>
 
@@ -222,7 +224,7 @@ export function StatsTrends({ reflections }: Props) {
       <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3">
         <div className="flex items-center justify-between">
           <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
-            Hold Rate
+            {t('statsTrends.holdRate')}
           </p>
           <span className={`text-[10px] font-mono px-2 py-0.5 rounded bg-muted/50 ${
             holdDelta > 5 ? 'text-primary' : holdDelta < -5 ? 'text-destructive' : 'text-muted-foreground'
@@ -247,7 +249,7 @@ export function StatsTrends({ reflections }: Props) {
                 axisLine={false}
                 tickLine={false}
               />
-              <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => [`${v}%`, 'Hold rate']} />
+              <Tooltip contentStyle={tooltipStyle} formatter={(v: number) => [`${v}%`, t('statsTrends.holdRate')]} />
               <Line
                 type="monotone"
                 dataKey="holdRate"
@@ -260,7 +262,7 @@ export function StatsTrends({ reflections }: Props) {
           </ResponsiveContainer>
         </div>
         <p className="text-[10px] text-muted-foreground/40">
-          % of weeks where you held or did nothing after reflecting
+          {t('statsTrends.holdRateDescription')}
         </p>
       </div>
     </div>

@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChartEmptyState } from './ChartEmptyState';
 
 const MOOD_COLORS: Record<string, { bar: string; text: string }> = {
@@ -17,10 +18,6 @@ interface Props {
 }
 
 const MOODS = ['fomo', 'excited', 'greedy', 'anxious', 'calm', 'detached', 'uncertain', 'fearful'] as const;
-const MOOD_LABELS: Record<string, string> = {
-  fomo: 'FOMO', excited: 'Excited', greedy: 'Greedy', anxious: 'Anxious',
-  calm: 'Calm', detached: 'Detached', uncertain: 'Uncertain', fearful: 'Fearful',
-};
 const MOOD_VALUES: Record<string, number> = {
   fomo: 1, greedy: 1.5, anxious: 2, fearful: 2, excited: 2.5,
   uncertain: 3, detached: 4, calm: 5,
@@ -48,6 +45,8 @@ function pearsonR(points: { x: number; y: number }[]): number | null {
 }
 
 export function MoodPriceChart({ reflections }: Props) {
+  const { t } = useTranslation();
+
   const { moodAvgs, r, rStrength, maxAbsAvg } = useMemo(() => {
     const points: { mood: string; change: number }[] = [];
 
@@ -68,27 +67,26 @@ export function MoodPriceChart({ reflections }: Props) {
 
     const moodAvgs = MOODS.map((m) => ({
       mood: m,
-      label: MOOD_LABELS[m],
       avg: groups[m] ? groups[m].total / groups[m].count : null,
       count: groups[m]?.count ?? 0,
-    })).filter((m) => m.avg !== null) as { mood: string; label: string; avg: number; count: number }[];
+    })).filter((m) => m.avg !== null) as { mood: string; avg: number; count: number }[];
 
     const maxAbsAvg = Math.max(...moodAvgs.map((m) => Math.abs(m.avg)), 0.5);
 
     const r = pearsonR(points.map((p) => ({ x: p.change, y: MOOD_VALUES[p.mood] })));
     const rStrength = r !== null
-      ? Math.abs(r) < 0.3 ? 'weak' : Math.abs(r) < 0.6 ? 'moderate' : 'strong'
+      ? Math.abs(r) < 0.3 ? t('moodCharts.weak') : Math.abs(r) < 0.6 ? t('moodCharts.moderate') : t('moodCharts.strong')
       : null;
 
     return { moodAvgs, r, rStrength, maxAbsAvg };
-  }, [reflections]);
+  }, [reflections, t]);
 
   if (moodAvgs.length < 2) {
     const withBoth = reflections.filter((r) => r.mood && r.context).length;
     return (
       <ChartEmptyState
-        title="Mood × Price Change"
-        message="Log 3+ reflections with mood to compare how you feel vs. market moves."
+        title={t('moodCharts.moodPriceChange')}
+        message={t('moodCharts.moodPriceChangeEmpty')}
         current={withBoth}
         needed={3}
       />
@@ -99,7 +97,7 @@ export function MoodPriceChart({ reflections }: Props) {
     <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-4">
       <div className="flex items-center justify-between">
         <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
-          Mood × Price Change
+          {t('moodCharts.moodPriceChange')}
         </p>
         {r !== null && (
           <span className="text-[10px] font-mono text-muted-foreground/70 bg-muted/50 px-2 py-0.5 rounded">
@@ -117,9 +115,9 @@ export function MoodPriceChart({ reflections }: Props) {
           return (
             <div key={m.mood} className="space-y-1.5">
               <div className="flex items-center justify-between">
-                <span className="text-xs font-mono text-muted-foreground">{m.label}</span>
+                <span className="text-xs font-mono text-muted-foreground">{t(`moodCheck.moods.${m.mood}`, m.mood)}</span>
                 <span className="text-[10px] font-mono text-muted-foreground/50">
-                  {m.count} entr{m.count === 1 ? 'y' : 'ies'}
+                  {t('moodCharts.entries', { count: m.count })}
                 </span>
               </div>
               <div className="flex items-center gap-3">
@@ -147,7 +145,7 @@ export function MoodPriceChart({ reflections }: Props) {
       </div>
 
       <p className="text-[10px] text-muted-foreground/40 leading-relaxed">
-        Average BTC 24h change when each mood was logged
+        {t('moodCharts.avgBtcChange')}
       </p>
     </div>
   );
