@@ -158,7 +158,7 @@ export function ItemDetailViewer({ item, linkedItems, allItems, open, onClose, o
           </div>
 
           {/* Title */}
-          {item.title && !(isReflection && item.title === 'Reflection') && (
+          {item.title && typeof item.title === 'string' && !(isReflection && item.title === 'Reflection') && (
             <p className="text-sm font-medium text-foreground leading-snug">{item.title}</p>
           )}
 
