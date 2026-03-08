@@ -128,7 +128,7 @@ export function MoodPriceChart({ reflections }: Props) {
                     className="absolute top-0 left-0 h-full rounded-sm transition-all duration-700 ease-out"
                     style={{
                       width: `${Math.max(barWidthPercent, 4)}%`,
-                      backgroundColor: MOOD_BAR_COLORS[m.mood] ?? 'hsl(var(--muted-foreground) / 0.3)',
+                      backgroundColor: MOOD_COLORS[m.mood]?.bar ?? 'hsl(var(--muted-foreground) / 0.3)',
                     }}
                   />
                 </div>
