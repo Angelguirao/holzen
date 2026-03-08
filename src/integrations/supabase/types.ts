@@ -206,6 +206,39 @@ export type Database = {
         }
         Relationships: []
       }
+      graph_edges: {
+        Row: {
+          created_at: string
+          id: string
+          label: string | null
+          source_id: string
+          source_type: string
+          target_id: string
+          target_type: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          label?: string | null
+          source_id: string
+          source_type: string
+          target_id: string
+          target_type: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          label?: string | null
+          source_id?: string
+          source_type?: string
+          target_id?: string
+          target_type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       library_items: {
         Row: {
           body: string | null
