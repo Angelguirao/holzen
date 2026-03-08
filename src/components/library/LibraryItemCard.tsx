@@ -74,6 +74,16 @@ export function LibraryItemCard({ item, onTogglePin, onDelete, onStatusChange }:
       </div>
 
       <div className="flex items-center gap-1.5 flex-wrap">
+        {isUnread && (
+          <span className="text-[9px] font-mono px-1 py-0.5 rounded bg-primary/15 text-primary">
+            unread
+          </span>
+        )}
+        {item.status === 'archived' && (
+          <span className="text-[9px] font-mono px-1 py-0.5 rounded bg-muted text-muted-foreground/50">
+            archived
+          </span>
+        )}
         {item.pinned && (
           <span className="text-[9px] font-mono px-1 py-0.5 rounded bg-primary/10 text-primary">
             pinned
