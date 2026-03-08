@@ -1,16 +1,22 @@
 import { Skeleton } from '@/components/ui/skeleton';
-import { TrendingUp, Clock, Compass } from 'lucide-react';
+import { TrendingUp, TrendingDown, Clock } from 'lucide-react';
+import { format } from 'date-fns';
 
-interface ZoomOutData {
-  perspective: string;
-  echo: string;
-  macro: string;
-  prices: {
-    current: number | null;
-    oneYear: number | null;
-    fourYears: number | null;
-    tenYears: number | null;
-  };
+interface OnThisDayEntry {
+  yearsAgo: number;
+  price: number;
+  date: string;
+}
+
+export interface ZoomOutData {
+  onThisDay: OnThisDayEntry[];
+  currentPrice: number | null;
+  echo: {
+    message: string;
+    created_at: string;
+    mood: string | null;
+    outcome: string | null;
+  } | null;
 }
 
 interface Props {
@@ -19,16 +25,13 @@ interface Props {
   error: boolean;
 }
 
-function formatPrice(n: number | null): string {
-  if (!n) return '—';
+function formatPrice(n: number): string {
   return `$${n.toLocaleString()}`;
 }
 
-function calcChange(current: number | null, past: number | null): string {
-  if (!current || !past) return '';
-  const pct = ((current - past) / past) * 100;
-  return `${pct >= 0 ? '+' : ''}${pct.toFixed(0)}%`;
-}
+const outcomeLabels: Record<string, string> = {
+  held: 'Held', hold: 'Held', sold: 'Sold', bought: 'Bought', nothing: 'Did nothing',
+};
 
 export function ZoomOutDisplay({ data, loading, error }: Props) {
   if (loading) {
@@ -49,65 +52,84 @@ export function ZoomOutDisplay({ data, loading, error }: Props) {
     );
   }
 
+  const { onThisDay, currentPrice, echo } = data;
+
   return (
     <div className="space-y-4">
-      {/* Price timeline */}
-      {data.prices.current && (data.prices.oneYear || data.prices.fourYears || data.prices.tenYears) && (
-        <div className="flex gap-3 overflow-x-auto pb-1">
-          {data.prices.tenYears && (
-            <div className="shrink-0 text-center">
-              <p className="text-[9px] font-mono text-muted-foreground/50 uppercase">10y ago</p>
-              <p className="text-xs font-mono text-muted-foreground">{formatPrice(data.prices.tenYears)}</p>
-              <p className="text-[9px] font-mono text-primary/70">{calcChange(data.prices.current, data.prices.tenYears)}</p>
+      {/* On this day - price timeline */}
+      {currentPrice && onThisDay.length > 0 && (
+        <div className="space-y-2">
+          <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">
+            BTC on this day
+          </p>
+          <div className="space-y-1.5">
+            {[...onThisDay].reverse().map((entry) => {
+              const changePct = ((currentPrice - entry.price) / entry.price) * 100;
+              const isUp = changePct >= 0;
+              return (
+                <div key={entry.yearsAgo} className="flex items-center justify-between gap-2">
+                  <span className="text-[10px] font-mono text-muted-foreground/60 w-16 shrink-0">
+                    {entry.yearsAgo}y ago
+                  </span>
+                  <span className="text-xs font-mono text-muted-foreground tabular-nums">
+                    {formatPrice(entry.price)}
+                  </span>
+                  <span className={`text-[10px] font-mono tabular-nums flex items-center gap-0.5 ${isUp ? 'text-primary/70' : 'text-destructive/70'}`}>
+                    {isUp ? <TrendingUp className="h-2.5 w-2.5" /> : <TrendingDown className="h-2.5 w-2.5" />}
+                    {isUp ? '+' : ''}{changePct.toFixed(0)}%
+                  </span>
+                </div>
+              );
+            })}
+            <div className="flex items-center justify-between gap-2 pt-1 border-t border-border/30">
+              <span className="text-[10px] font-mono text-muted-foreground/60 w-16 shrink-0">
+                Now
+              </span>
+              <span className="text-xs font-mono text-foreground font-medium tabular-nums">
+                {formatPrice(currentPrice)}
+              </span>
+              <span className="text-[10px] font-mono text-muted-foreground/40">—</span>
             </div>
-          )}
-          {data.prices.fourYears && (
-            <div className="shrink-0 text-center">
-              <p className="text-[9px] font-mono text-muted-foreground/50 uppercase">4y ago</p>
-              <p className="text-xs font-mono text-muted-foreground">{formatPrice(data.prices.fourYears)}</p>
-              <p className="text-[9px] font-mono text-primary/70">{calcChange(data.prices.current, data.prices.fourYears)}</p>
-            </div>
-          )}
-          {data.prices.oneYear && (
-            <div className="shrink-0 text-center">
-              <p className="text-[9px] font-mono text-muted-foreground/50 uppercase">1y ago</p>
-              <p className="text-xs font-mono text-muted-foreground">{formatPrice(data.prices.oneYear)}</p>
-              <p className="text-[9px] font-mono text-primary/70">{calcChange(data.prices.current, data.prices.oneYear)}</p>
-            </div>
-          )}
-          <div className="shrink-0 text-center">
-            <p className="text-[9px] font-mono text-muted-foreground/50 uppercase">Now</p>
-            <p className="text-xs font-mono text-foreground font-medium">{formatPrice(data.prices.current)}</p>
           </div>
         </div>
       )}
 
-      {/* Perspective */}
-      <div className="space-y-1.5">
-        <div className="flex items-center gap-1.5">
-          <TrendingUp className="h-3 w-3 text-muted-foreground/50" />
-          <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Perspective</p>
+      {/* Echo - real past reflection */}
+      {echo ? (
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-1.5">
+            <Clock className="h-3 w-3 text-muted-foreground/50" />
+            <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">
+              Echo · {format(new Date(echo.created_at), 'MMM d, yyyy')}
+            </p>
+          </div>
+          <p className="text-xs text-muted-foreground leading-relaxed italic line-clamp-3">
+            "{echo.message}"
+          </p>
+          <div className="flex gap-1.5">
+            {echo.mood && (
+              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground">
+                {echo.mood}
+              </span>
+            )}
+            {echo.outcome && (
+              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground">
+                {outcomeLabels[echo.outcome] || echo.outcome}
+              </span>
+            )}
+          </div>
         </div>
-        <p className="text-xs text-muted-foreground leading-relaxed">{data.perspective}</p>
-      </div>
-
-      {/* Echo */}
-      <div className="space-y-1.5">
-        <div className="flex items-center gap-1.5">
-          <Clock className="h-3 w-3 text-muted-foreground/50" />
-          <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Echo</p>
+      ) : (
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-1.5">
+            <Clock className="h-3 w-3 text-muted-foreground/50" />
+            <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Echo</p>
+          </div>
+          <p className="text-xs text-muted-foreground/50 leading-relaxed italic">
+            No past reflection to echo yet. Keep reflecting — your future self will thank you.
+          </p>
         </div>
-        <p className="text-xs text-muted-foreground leading-relaxed italic">{data.echo}</p>
-      </div>
-
-      {/* Macro */}
-      <div className="space-y-1.5">
-        <div className="flex items-center gap-1.5">
-          <Compass className="h-3 w-3 text-muted-foreground/50" />
-          <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Macro</p>
-        </div>
-        <p className="text-xs text-muted-foreground leading-relaxed">{data.macro}</p>
-      </div>
+      )}
     </div>
   );
 }
