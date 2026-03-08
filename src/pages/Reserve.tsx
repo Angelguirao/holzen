@@ -11,12 +11,13 @@ const fade = (delay = 0) => ({
   transition: { duration: 0.6, delay, ease: [0.25, 0.1, 0.25, 1] },
 });
 
-// Treasury data — update periodically
+// Treasury data — update when first BTC is acquired
 const TREASURY = {
-  totalBtc: 0.25,
-  averageCost: 62_400,
-  lastUpdated: '2026-03-01',
-  percentOfTreasury: 85,
+  totalBtc: 0,
+  averageCost: 0,
+  lastUpdated: '2026-03-08',
+  percentOfTreasury: 0,
+  hasStarted: false,
 };
 
 function useBtcPrice() {
@@ -132,66 +133,77 @@ const Reserve = () => {
               Treasury
             </p>
             <div className="border border-border/60 rounded-lg p-5 space-y-4 bg-muted/10">
-              {/* BTC held */}
-              <div className="flex items-baseline justify-between">
-                <p className="text-[10px] font-mono text-muted-foreground/70 uppercase tracking-wider">
-                  Total BTC held
-                </p>
-                <p className="text-lg font-mono text-foreground">
-                  {TREASURY.totalBtc.toFixed(8).replace(/0+$/, '').replace(/\.$/, '')} ₿
-                </p>
-              </div>
-
-              <div className="h-px bg-border/40" />
-
-              {/* Average cost */}
-              <div className="flex items-baseline justify-between">
-                <p className="text-[10px] font-mono text-muted-foreground/70 uppercase tracking-wider">
-                  Avg. cost basis
-                </p>
-                <p className="text-sm font-mono text-muted-foreground">
-                  {formatUsd(TREASURY.averageCost)}
-                </p>
-              </div>
-
-              {/* Current value */}
-              {currentValue !== null && (
+              {TREASURY.hasStarted ? (
                 <>
+                  {/* BTC held */}
                   <div className="flex items-baseline justify-between">
                     <p className="text-[10px] font-mono text-muted-foreground/70 uppercase tracking-wider">
-                      Current value
+                      Total BTC held
+                    </p>
+                    <p className="text-lg font-mono text-foreground">
+                      {TREASURY.totalBtc.toFixed(8).replace(/0+$/, '').replace(/\.$/, '')} ₿
+                    </p>
+                  </div>
+
+                  <div className="h-px bg-border/40" />
+
+                  {/* Average cost */}
+                  <div className="flex items-baseline justify-between">
+                    <p className="text-[10px] font-mono text-muted-foreground/70 uppercase tracking-wider">
+                      Avg. cost basis
+                    </p>
+                    <p className="text-sm font-mono text-muted-foreground">
+                      {formatUsd(TREASURY.averageCost)}
+                    </p>
+                  </div>
+
+                  {/* Current value */}
+                  {currentValue !== null && (
+                    <>
+                      <div className="flex items-baseline justify-between">
+                        <p className="text-[10px] font-mono text-muted-foreground/70 uppercase tracking-wider">
+                          Current value
+                        </p>
+                        <p className="text-sm font-mono text-foreground">
+                          {formatUsd(currentValue)}
+                        </p>
+                      </div>
+
+                      <div className="flex items-baseline justify-between">
+                        <p className="text-[10px] font-mono text-muted-foreground/70 uppercase tracking-wider">
+                          Unrealised P&L
+                        </p>
+                        <p className={`text-sm font-mono ${unrealisedPnl !== null && unrealisedPnl >= 0 ? 'text-primary' : 'text-destructive'}`}>
+                          {unrealisedPnl !== null ? `${unrealisedPnl >= 0 ? '+' : ''}${unrealisedPnl.toFixed(1)}%` : '—'}
+                        </p>
+                      </div>
+                    </>
+                  )}
+
+                  <div className="h-px bg-border/40" />
+
+                  {/* Treasury allocation */}
+                  <div className="flex items-baseline justify-between">
+                    <p className="text-[10px] font-mono text-muted-foreground/70 uppercase tracking-wider">
+                      % of treasury
                     </p>
                     <p className="text-sm font-mono text-foreground">
-                      {formatUsd(currentValue)}
+                      {TREASURY.percentOfTreasury}%
                     </p>
                   </div>
 
-                  <div className="flex items-baseline justify-between">
-                    <p className="text-[10px] font-mono text-muted-foreground/70 uppercase tracking-wider">
-                      Unrealised P&L
-                    </p>
-                    <p className={`text-sm font-mono ${unrealisedPnl !== null && unrealisedPnl >= 0 ? 'text-primary' : 'text-destructive'}`}>
-                      {unrealisedPnl !== null ? `${unrealisedPnl >= 0 ? '+' : ''}${unrealisedPnl.toFixed(1)}%` : '—'}
-                    </p>
-                  </div>
+                  <p className="text-[10px] font-mono text-muted-foreground/40 text-right">
+                    Updated {new Date(TREASURY.lastUpdated).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                  </p>
                 </>
+              ) : (
+                <div className="text-center py-3 space-y-2">
+                  <p className="text-sm font-mono text-foreground">0 ₿</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Our reserve hasn't started yet. When it does, the numbers will appear here — transparent from the first sat.
+                  </p>
+                </div>
               )}
-
-              <div className="h-px bg-border/40" />
-
-              {/* Treasury allocation */}
-              <div className="flex items-baseline justify-between">
-                <p className="text-[10px] font-mono text-muted-foreground/70 uppercase tracking-wider">
-                  % of treasury
-                </p>
-                <p className="text-sm font-mono text-foreground">
-                  {TREASURY.percentOfTreasury}%
-                </p>
-              </div>
-
-              <p className="text-[10px] font-mono text-muted-foreground/40 text-right">
-                Updated {new Date(TREASURY.lastUpdated).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-              </p>
             </div>
           </div>
         </motion.div>
