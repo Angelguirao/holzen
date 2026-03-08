@@ -136,8 +136,8 @@ export function MoodTrendChart({ reflections }: Props) {
                 fontFamily: 'monospace',
               }}
               formatter={(value: number) => {
-                const closest = value < 1.5 ? 'Anxious' : value < 2.5 ? 'Neutral' : 'Calm';
-                return [`${value.toFixed(2)} (${closest})`, 'Avg Mood'];
+                const label = value < 2 ? 'Reactive' : value < 3.5 ? 'Mixed' : 'Composed';
+                return [`${value.toFixed(2)} (${label})`, 'Avg Composure'];
               }}
               labelFormatter={(label: string) =>
                 granularity === 'daily' ? label : `Week of ${label}`
