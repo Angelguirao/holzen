@@ -224,7 +224,7 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
   const hasBreathing = prefs.breathing;
   const hasHaiku = prefs.haiku && companions.haiku;
   const hasLearning = prefs.learning;
-  const hasSignal = !!reflectionId; // Signal is always available when there's a reflection
+  const hasSignal = prefs.signal && !!reflectionId;
 
   if (!hasBreathing && !hasHaiku && !hasLearning && !hasSignal) return null;
 
