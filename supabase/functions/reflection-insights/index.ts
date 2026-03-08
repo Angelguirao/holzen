@@ -64,6 +64,13 @@ serve(async (req) => {
     let generated = 0;
 
     for (const userId of userIds) {
+      // Determine language for this user
+      let userLanguage = bodyLanguage || "en";
+      if (!bodyLanguage && !singleUserId) {
+        // Cron mode — look up from profile data we already fetched
+        const prof = (await supabase.from("profiles").select("language").eq("user_id", userId).single()).data;
+        userLanguage = (prof as any)?.language || "en";
+      }
       // Get all reflections for this user
       const { data: reflections, error: refError } = await supabase
         .from("reflections")
