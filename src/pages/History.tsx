@@ -3,7 +3,7 @@ import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { format, subDays, isAfter } from 'date-fns';
-import { X, Star, Search, Pin, Info, TrendingUp, TrendingDown, Clock, History as HistoryIcon, ExternalLink, ArrowRight } from 'lucide-react';
+import { X, Star, Search, Pin, Info, TrendingUp, TrendingDown, Clock, History as HistoryIcon, ExternalLink, ArrowRight, ChevronDown } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { VolatilityTimeline } from '@/components/VolatilityTimeline';
 import { ShareReflection } from '@/components/ShareReflection';
@@ -52,6 +52,117 @@ interface Reflection {
 
 const PAGE_SIZE = 30;
 const FIELDS = 'id, message, context, created_at, is_favorite, haiku, learning_title, learning_body, learning_citation, learning_url, signal_title, signal_body, signal_source, signal_url, zoom_out_data, history_insight_data, note, mood, outcome, tags';
+
+function HistoryCompanions({ label, r }: { label: string; r: Reflection }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="pt-2 border-t border-border/30">
+      <button
+        onClick={() => setOpen(!open)}
+        className="flex items-center gap-2 text-[10px] font-mono text-muted-foreground/50 hover:text-muted-foreground transition-colors w-full"
+      >
+        <ChevronDown className={`h-3 w-3 transition-transform ${open ? 'rotate-180' : ''}`} />
+        <span className="tracking-wider uppercase">{label}</span>
+      </button>
+
+      {open && (
+        <div className="space-y-3 pt-2.5">
+          {r.haiku && <HaikuDisplay haiku={r.haiku} />}
+
+          {r.learning_title && r.learning_body && (
+            <LearningInput
+              title={r.learning_title}
+              body={r.learning_body}
+              nudge={r.learning_citation ? {
+                title: r.learning_title,
+                body: r.learning_body,
+                citation: r.learning_citation,
+                url: r.learning_url ?? '',
+              } : undefined}
+            />
+          )}
+
+          {r.signal_source && (
+            <div className="space-y-1.5">
+              <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Signal</p>
+              {r.signal_title && <p className="text-xs font-medium leading-snug">{r.signal_title}</p>}
+              {r.signal_body && <p className="text-xs text-muted-foreground leading-relaxed">{r.signal_body}</p>}
+              {r.signal_url && (
+                <a
+                  href={r.signal_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 text-[10px] font-mono text-primary/70 hover:text-primary transition-colors"
+                >
+                  <ExternalLink className="h-2.5 w-2.5" />
+                  {r.signal_source}
+                </a>
+              )}
+            </div>
+          )}
+
+          {r.zoom_out_data && (
+            <div className="space-y-2">
+              <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Zoom out</p>
+              {r.zoom_out_data.onThisDay?.length > 0 && r.zoom_out_data.currentPrice && (
+                <div className="space-y-1">
+                  {[...r.zoom_out_data.onThisDay].reverse().map((entry: any) => {
+                    const changePct = ((r.zoom_out_data.currentPrice - entry.price) / entry.price) * 100;
+                    const isUp = changePct >= 0;
+                    return (
+                      <div key={entry.yearsAgo} className="flex items-center justify-between gap-2">
+                        <span className="text-[10px] font-mono text-muted-foreground/60 w-14 shrink-0">{entry.yearsAgo}y ago</span>
+                        <span className="text-xs font-mono text-muted-foreground tabular-nums">${entry.price.toLocaleString()}</span>
+                        <span className={`text-[10px] font-mono tabular-nums ${isUp ? 'text-primary/70' : 'text-destructive/70'}`}>
+                          {isUp ? '+' : ''}{changePct.toFixed(0)}%
+                        </span>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+              {r.zoom_out_data.echo && (
+                <div className="space-y-1">
+                  <div className="flex items-center gap-1.5">
+                    <Clock className="h-3 w-3 text-muted-foreground/50" />
+                    <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">
+                      Echo{r.zoom_out_data.echo.created_at ? ` · ${format(new Date(r.zoom_out_data.echo.created_at), 'MMM d, yyyy')}` : ''}
+                    </p>
+                  </div>
+                  <p className="text-xs text-muted-foreground leading-relaxed italic line-clamp-2">
+                    "{r.zoom_out_data.echo.message}"
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+
+          {r.history_insight_data && (
+            <div className="space-y-2">
+              <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Historical insight</p>
+              <p className="text-xs font-mono font-medium leading-relaxed">{r.history_insight_data.title}</p>
+              <div className="space-y-1">
+                <div className="flex items-center gap-1.5">
+                  <HistoryIcon className="h-3 w-3 text-muted-foreground/50 shrink-0" />
+                  <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Bitcoin · {r.history_insight_data.period}</p>
+                </div>
+                <p className="text-xs text-muted-foreground leading-relaxed">{r.history_insight_data.btcInsight}</p>
+              </div>
+              <div className="space-y-1 pl-3 border-l-2 border-border/40">
+                <div className="flex items-center gap-1.5">
+                  <ArrowRight className="h-2.5 w-2.5 text-muted-foreground/40 shrink-0" />
+                  <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider">{r.history_insight_data.assetClass} parallel</p>
+                </div>
+                <p className="text-xs text-muted-foreground/80 leading-relaxed italic">{r.history_insight_data.analogy}</p>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
 
 const History = () => {
   const { user } = useAuth();
@@ -382,104 +493,23 @@ const History = () => {
               <ReflectionNote reflectionId={r.id} initialNote={r.note} />
               <ReflectionTags reflectionId={r.id} initialTags={r.tags ?? []} />
 
-              {/* Companions section */}
-              {(r.haiku || r.learning_title || r.signal_source || r.zoom_out_data || r.history_insight_data) && (
-                <div className="space-y-3 pt-2 border-t border-border/30">
-                  {r.haiku && <HaikuDisplay haiku={r.haiku} />}
+              {/* Companions section — collapsible */}
+              {(() => {
+                const companionItems: string[] = [];
+                if (r.haiku) companionItems.push('Haiku');
+                if (r.learning_title) companionItems.push('Learning');
+                if (r.signal_source) companionItems.push('Signal');
+                if (r.zoom_out_data) companionItems.push('Zoom Out');
+                if (r.history_insight_data) companionItems.push('History');
+                if (companionItems.length === 0) return null;
 
-                  {r.learning_title && r.learning_body && (
-                    <LearningInput
-                      title={r.learning_title}
-                      body={r.learning_body}
-                      nudge={r.learning_citation ? {
-                        title: r.learning_title,
-                        body: r.learning_body,
-                        citation: r.learning_citation,
-                        url: r.learning_url ?? '',
-                      } : undefined}
-                    />
-                  )}
-
-                  {/* Signal */}
-                  {r.signal_source && (
-                    <div className="space-y-1.5">
-                      <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Signal</p>
-                      {r.signal_title && <p className="text-xs font-medium leading-snug">{r.signal_title}</p>}
-                      {r.signal_body && <p className="text-xs text-muted-foreground leading-relaxed">{r.signal_body}</p>}
-                      {r.signal_url && (
-                        <a
-                          href={r.signal_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 text-[10px] font-mono text-primary/70 hover:text-primary transition-colors"
-                        >
-                          <ExternalLink className="h-2.5 w-2.5" />
-                          {r.signal_source}
-                        </a>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Zoom Out */}
-                  {r.zoom_out_data && (
-                    <div className="space-y-2">
-                      <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Zoom out</p>
-                      {r.zoom_out_data.onThisDay?.length > 0 && r.zoom_out_data.currentPrice && (
-                        <div className="space-y-1">
-                          {[...r.zoom_out_data.onThisDay].reverse().map((entry: any) => {
-                            const changePct = ((r.zoom_out_data.currentPrice - entry.price) / entry.price) * 100;
-                            const isUp = changePct >= 0;
-                            return (
-                              <div key={entry.yearsAgo} className="flex items-center justify-between gap-2">
-                                <span className="text-[10px] font-mono text-muted-foreground/60 w-14 shrink-0">{entry.yearsAgo}y ago</span>
-                                <span className="text-xs font-mono text-muted-foreground tabular-nums">${entry.price.toLocaleString()}</span>
-                                <span className={`text-[10px] font-mono tabular-nums ${isUp ? 'text-primary/70' : 'text-destructive/70'}`}>
-                                  {isUp ? '+' : ''}{changePct.toFixed(0)}%
-                                </span>
-                              </div>
-                            );
-                          })}
-                        </div>
-                      )}
-                      {r.zoom_out_data.echo && (
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-1.5">
-                            <Clock className="h-3 w-3 text-muted-foreground/50" />
-                            <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">
-                              Echo{r.zoom_out_data.echo.created_at ? ` · ${format(new Date(r.zoom_out_data.echo.created_at), 'MMM d, yyyy')}` : ''}
-                            </p>
-                          </div>
-                          <p className="text-xs text-muted-foreground leading-relaxed italic line-clamp-2">
-                            "{r.zoom_out_data.echo.message}"
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Historical Insight */}
-                  {r.history_insight_data && (
-                    <div className="space-y-2">
-                      <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Historical insight</p>
-                      <p className="text-xs font-mono font-medium leading-relaxed">{r.history_insight_data.title}</p>
-                      <div className="space-y-1">
-                        <div className="flex items-center gap-1.5">
-                          <HistoryIcon className="h-3 w-3 text-muted-foreground/50 shrink-0" />
-                          <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Bitcoin · {r.history_insight_data.period}</p>
-                        </div>
-                        <p className="text-xs text-muted-foreground leading-relaxed">{r.history_insight_data.btcInsight}</p>
-                      </div>
-                      <div className="space-y-1 pl-3 border-l-2 border-border/40">
-                        <div className="flex items-center gap-1.5">
-                          <ArrowRight className="h-2.5 w-2.5 text-muted-foreground/40 shrink-0" />
-                          <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider">{r.history_insight_data.assetClass} parallel</p>
-                        </div>
-                        <p className="text-xs text-muted-foreground/80 leading-relaxed italic">{r.history_insight_data.analogy}</p>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
+                return (
+                  <HistoryCompanions
+                    label={`${companionItems.length} companion${companionItems.length !== 1 ? 's' : ''}`}
+                    r={r}
+                  />
+                );
+              })()}
 
               <ReflectionComparison reflectionId={r.id} />
             </div>
