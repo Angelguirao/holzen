@@ -189,7 +189,7 @@ const Landing = () => {
         <motion.div {...m()}>
           <div className="space-y-4">
             <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
-              Questions
+              {t('landing.questions')}
             </p>
             <Accordion type="single" collapsible className="w-full">
               <AccordionItem value="what" className="border-border">
