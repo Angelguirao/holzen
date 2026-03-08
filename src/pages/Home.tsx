@@ -586,8 +586,8 @@ function AutoCooldownIndicator({
   const minutes = Math.floor((remaining % 3600000) / 60000);
 
   const timeLabel = hours > 0
-    ? `${hours}h ${minutes}m`
-    : `${minutes}m`;
+    ? `${hours}h ${minutes}min`
+    : `${minutes}min`;
 
   return (
     <div className="flex items-center gap-3 py-2">
