@@ -25,6 +25,7 @@ serve(async (req) => {
     // Determine if this is a cron call (all users) or a single-user call
     const body = await req.json().catch(() => ({}));
     const singleUserId = body.user_id as string | undefined;
+    const bodyLanguage = body.language as string | undefined;
 
     let userIds: string[] = [];
 
