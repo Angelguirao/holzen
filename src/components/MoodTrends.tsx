@@ -95,7 +95,7 @@ export function MoodTrends({ reflections }: Props) {
                 fontSize: '11px',
                 fontFamily: 'monospace',
               }}
-              formatter={(value: number) => [MOOD_LABELS[Math.round(value)] ?? value.toFixed(1), 'Avg mood']}
+              formatter={(value: number) => [value < 2 ? 'Reactive' : value < 3.5 ? 'Mixed' : 'Composed', 'Avg composure']}
               labelStyle={{ fontSize: '10px', color: 'hsl(var(--muted-foreground))' }}
             />
             <Area
