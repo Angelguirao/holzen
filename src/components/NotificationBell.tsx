@@ -105,9 +105,6 @@ const SwipeableNotification = forwardRef<HTMLDivElement, {
   );
 });
 
-// Need t available in SwipeableNotification scope
-// We'll use a wrapper approach — pass t via context or just inline it in parent
-// Actually, aria-label above uses `t` but it's not in scope. Let me fix:
 
 type NotificationItem = {
   id: string;
