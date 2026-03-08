@@ -18,8 +18,11 @@ interface Props {
 
 type Granularity = 'daily' | 'weekly';
 
-const MOOD_VAL: Record<string, number> = { anxious: 1, neutral: 2, calm: 3 };
-const MOOD_LABELS: Record<number, string> = { 1: 'Anxious', 2: 'Neutral', 3: 'Calm' };
+const MOOD_VAL: Record<string, number> = {
+  fomo: 1, greedy: 1.5, anxious: 2, fearful: 2, excited: 2.5,
+  uncertain: 3, detached: 4, calm: 5,
+};
+const MOOD_LABELS: Record<number, string> = { 1: 'Reactive', 3: 'Neutral', 5: 'Composed' };
 
 function buildData(reflections: Props['reflections'], granularity: Granularity) {
   const buckets = new Map<string, { total: number; count: number }>();
