@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useHolzen } from '@/hooks/use-holzen';
@@ -34,11 +35,12 @@ interface HoldGoal {
   currency: string;
 }
 
-const MAX_MONTHS = 1200; // 100 years
-const MAX_PRICE = 100_000_000; // $100M
+const MAX_MONTHS = 1200;
+const MAX_PRICE = 100_000_000;
 const MIN_PRICE = 1;
 
 export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
+  const { t } = useTranslation();
   const { currency } = useHolzen();
   const { user } = useAuth();
   const [goal, setGoal] = useState<HoldGoal | null>(null);
@@ -120,7 +122,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
       setGoal({ type: 'forever', start: updates.hold_goal_start, currency });
       setSetting(false);
       setInputValue('');
-      toast('Hold forever. Conviction locked in.');
+      toast(t('holdGoal.goalSavedForever'));
       return;
     }
 
@@ -175,7 +177,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
         >
           <Target className="h-3 w-3 text-muted-foreground/40" />
           <span className="text-[10px] font-mono text-muted-foreground/50 tracking-[0.15em] uppercase">
-            Set a hold goal
+            {t('holdGoal.setAGoal')}
           </span>
         </button>
       );
@@ -185,7 +187,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
       <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3">
         <div className="flex items-center justify-between">
           <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
-            Set Your Goal
+            {t('holdGoal.setYourGoal')}
           </p>
           <button onClick={() => { setSetting(false); setValidationError(null); setStartDate(new Date()); }} className="text-muted-foreground/40 hover:text-foreground">
             <X className="h-3 w-3" />
@@ -193,25 +195,25 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
         </div>
 
         <div className="flex rounded bg-muted/50 p-0.5">
-          {(['time', 'price', 'forever'] as const).map((t) => (
+          {(['time', 'price', 'forever'] as const).map((tp) => (
             <button
-              key={t}
-              onClick={() => { setGoalType(t); setInputValue(''); setValidationError(null); }}
+              key={tp}
+              onClick={() => { setGoalType(tp); setInputValue(''); setValidationError(null); }}
               className={`flex-1 text-[10px] font-mono px-2 py-1.5 rounded transition-colors flex items-center justify-center gap-1.5 ${
-                goalType === t
+                goalType === tp
                   ? 'bg-primary/20 text-primary'
                   : 'text-muted-foreground/50 hover:text-muted-foreground'
               }`}
             >
-              {t === 'time' ? <Calendar className="h-2.5 w-2.5" /> : t === 'price' ? <Coins className="h-2.5 w-2.5" /> : <Infinity className="h-2.5 w-2.5" />}
-              {t === 'time' ? 'Time' : t === 'price' ? 'Price' : 'Forever'}
+              {tp === 'time' ? <Calendar className="h-2.5 w-2.5" /> : tp === 'price' ? <Coins className="h-2.5 w-2.5" /> : <Infinity className="h-2.5 w-2.5" />}
+              {tp === 'time' ? t('holdGoal.time') : tp === 'price' ? t('holdGoal.price') : t('holdGoal.forever')}
             </button>
           ))}
         </div>
 
         {/* Start date picker */}
         <div className="flex items-center gap-2">
-          <p className="text-[10px] font-mono text-muted-foreground/60 whitespace-nowrap">Start from</p>
+          <p className="text-[10px] font-mono text-muted-foreground/60 whitespace-nowrap">{t('holdGoal.startFrom')}</p>
           <Popover>
             <PopoverTrigger asChild>
               <Button
@@ -223,7 +225,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
                 )}
               >
                 <CalendarIcon className="h-2.5 w-2.5 mr-1.5" />
-                {startDate.toDateString() === new Date().toDateString() ? 'Today' : format(startDate, 'MMM d, yyyy')}
+                {startDate.toDateString() === new Date().toDateString() ? t('holdGoal.today') : format(startDate, 'MMM d, yyyy')}
               </Button>
             </PopoverTrigger>
             <PopoverContent className="w-auto p-0" align="start">
@@ -242,11 +244,14 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
         {goalType === 'forever' ? (
           <div className="space-y-3">
             <p className="text-xs text-muted-foreground leading-relaxed">
-              No timeline. No target price. Just hold. The counter starts {startDate.toDateString() === new Date().toDateString() ? 'now' : `from ${format(startDate, 'MMM d, yyyy')}`} and never ends.
+              {t('holdGoal.foreverDesc')}{' '}
+              {startDate.toDateString() === new Date().toDateString()
+                ? t('holdGoal.counterStartsNow')
+                : t('holdGoal.counterStartsFrom', { date: format(startDate, 'MMM d, yyyy') })}
             </p>
             <Button size="sm" onClick={saveGoal} className="w-full h-8 text-xs font-mono">
               <Infinity className="h-3 w-3 mr-1.5" />
-              Commit to holding forever
+              {t('holdGoal.commitForever')}
             </Button>
           </div>
         ) : (
@@ -263,7 +268,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
                         : 'text-muted-foreground/40 hover:text-muted-foreground'
                     }`}
                   >
-                    {u}
+                    {u === 'months' ? t('holdGoal.months') : t('holdGoal.years')}
                   </button>
                 ))}
               </div>
@@ -294,14 +299,35 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
 
             <p className="text-[10px] text-muted-foreground/40">
               {goalType === 'time'
-                ? `How many ${timeUnit} do you commit to holding?`
-                : 'At what price would you consider your goal reached?'}
+                ? t('holdGoal.howManyTime', { unit: timeUnit === 'months' ? t('holdGoal.months').toLowerCase() : t('holdGoal.years').toLowerCase() })
+                : t('holdGoal.atWhatPrice')}
             </p>
           </>
         )}
       </div>
     );
   }
+
+  // Clear goal dialog (shared)
+  const clearDialog = (
+    <AlertDialog>
+      <AlertDialogTrigger asChild>
+        <button className="text-[10px] font-mono text-muted-foreground/30 hover:text-foreground transition-colors">
+          {t('holdGoal.clear')}
+        </button>
+      </AlertDialogTrigger>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle className="font-mono text-sm">{t('holdGoal.clearTitle')}</AlertDialogTitle>
+          <AlertDialogDescription className="text-xs">{t('holdGoal.clearDesc')}</AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel className="font-mono text-xs">{t('common.cancel')}</AlertDialogCancel>
+          <AlertDialogAction onClick={clearGoal} className="bg-destructive text-destructive-foreground hover:bg-destructive/90 font-mono text-xs">{t('holdGoal.clear')}</AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
+  );
 
   // Forever goal display
   if (goal.type === 'forever') {
@@ -316,33 +342,17 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
           <div className="flex items-center gap-2">
             <Infinity className="h-3 w-3 text-primary/60" />
             <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
-              Hold Forever
+              {t('holdGoal.holdForever')}
             </p>
           </div>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <button className="text-[10px] font-mono text-muted-foreground/30 hover:text-foreground transition-colors">
-                Clear
-              </button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle className="font-mono text-sm">Clear hold goal</AlertDialogTitle>
-                <AlertDialogDescription className="text-xs">This will remove your current hold goal. You can set a new one anytime.</AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel className="font-mono text-xs">Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={clearGoal} className="bg-destructive text-destructive-foreground hover:bg-destructive/90 font-mono text-xs">Clear</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          {clearDialog}
         </div>
         <div className="space-y-1">
           <span className="text-xs font-mono text-foreground/80">
-            {years > 0 ? `${years}y ${days}d` : `${elapsed} day${elapsed !== 1 ? 's' : ''}`} and counting
+            {years > 0 ? `${years}y ${days}d` : `${elapsed} day${elapsed !== 1 ? 's' : ''}`} {t('holdGoal.andCounting')}
           </span>
           <p className="text-[9px] font-mono text-muted-foreground/40">
-            Since {format(start, 'MMM d, yyyy')}{elapsed > 0 ? ` · ${elapsed} day${elapsed !== 1 ? 's' : ''} ago` : ''} · No end date
+            {t('holdGoal.since', { date: format(start, 'MMM d, yyyy') })}{elapsed > 0 ? ` · ${t('holdGoal.daysHeld', { count: elapsed })}` : ''} · {t('holdGoal.noEndDate')}
           </p>
         </div>
       </div>
@@ -359,8 +369,8 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
     const completed = remaining === 0;
 
     const displayTarget = goal.targetMonths >= 12
-      ? `${(goal.targetMonths / 12).toFixed(goal.targetMonths % 12 === 0 ? 0 : 1)}y commitment`
-      : `${goal.targetMonths}mo commitment`;
+      ? `${(goal.targetMonths / 12).toFixed(goal.targetMonths % 12 === 0 ? 0 : 1)}y ${t('holdGoal.commitment')}`
+      : `${goal.targetMonths}mo ${t('holdGoal.commitment')}`;
 
     return (
       <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2.5">
@@ -368,32 +378,16 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
           <div className="flex items-center gap-2">
             <Target className="h-3 w-3 text-primary/60" />
             <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
-              Hold Goal
+              {t('holdGoal.title')}
             </p>
           </div>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <button className="text-[10px] font-mono text-muted-foreground/30 hover:text-foreground transition-colors">
-                Clear
-              </button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle className="font-mono text-sm">Clear hold goal</AlertDialogTitle>
-                <AlertDialogDescription className="text-xs">This will remove your current hold goal. You can set a new one anytime.</AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel className="font-mono text-xs">Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={clearGoal} className="bg-destructive text-destructive-foreground hover:bg-destructive/90 font-mono text-xs">Clear</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          {clearDialog}
         </div>
 
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
             <span className="text-xs font-mono text-foreground/80">
-              {completed ? '🎉 Goal reached!' : `${remaining} day${remaining !== 1 ? 's' : ''} to go`}
+              {completed ? t('holdGoal.goalReached') : t('holdGoal.daysToGo', { count: remaining })}
             </span>
             <span className="text-[10px] font-mono text-muted-foreground/50">
               {displayTarget}
@@ -406,7 +400,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
             />
           </div>
           <p className="text-[9px] font-mono text-muted-foreground/40">
-            Started {format(start, 'MMM d, yyyy')} · {elapsed} day{elapsed !== 1 ? 's' : ''} held
+            {t('holdGoal.started', { date: format(start, 'MMM d, yyyy') })} · {t('holdGoal.daysHeld', { count: elapsed })}
           </p>
         </div>
       </div>
@@ -427,35 +421,19 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
           <div className="flex items-center gap-2">
             <Target className="h-3 w-3 text-primary/60" />
             <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
-              Hold Goal
+              {t('holdGoal.title')}
             </p>
           </div>
-          <AlertDialog>
-            <AlertDialogTrigger asChild>
-              <button className="text-[10px] font-mono text-muted-foreground/30 hover:text-foreground transition-colors">
-                Clear
-              </button>
-            </AlertDialogTrigger>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle className="font-mono text-sm">Clear hold goal</AlertDialogTitle>
-                <AlertDialogDescription className="text-xs">This will remove your current hold goal. You can set a new one anytime.</AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel className="font-mono text-xs">Cancel</AlertDialogCancel>
-                <AlertDialogAction onClick={clearGoal} className="bg-destructive text-destructive-foreground hover:bg-destructive/90 font-mono text-xs">Clear</AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
+          {clearDialog}
         </div>
 
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
             <span className="text-xs font-mono text-foreground/80">
-              {reached ? '🎉 Target reached!' : `${formatBtcPrice(diff, currency)} to go`}
+              {reached ? t('holdGoal.targetReached') : `${formatBtcPrice(diff, currency)} ${t('holdGoal.toGo')}`}
             </span>
             <span className="text-[10px] font-mono text-muted-foreground/50">
-              Target: {formatBtcPrice(target, currency)}
+              {t('holdGoal.target')}: {formatBtcPrice(target, currency)}
             </span>
           </div>
           <div className="h-1.5 w-full rounded-full bg-muted/50 overflow-hidden">
@@ -465,7 +443,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
             />
           </div>
           <p className="text-[9px] font-mono text-muted-foreground/40">
-            Started {format(start, 'MMM d, yyyy')} · {differenceInDays(new Date(), start)} day{differenceInDays(new Date(), start) !== 1 ? 's' : ''} held · Current: {formatBtcPrice(price, currency)}
+            {t('holdGoal.started', { date: format(start, 'MMM d, yyyy') })} · {t('holdGoal.daysHeld', { count: differenceInDays(new Date(), start) })} · {t('holdGoal.current')}: {formatBtcPrice(price, currency)}
           </p>
         </div>
       </div>
