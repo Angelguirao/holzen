@@ -41,9 +41,11 @@ export function useBadgeSync(computedBadgeIds: string[], badgeMeta: Record<strin
         setNewBadges(newBadgeData);
 
         // Send push notification (fire and forget)
-        supabase.functions.invoke('badge-notify', {
-          body: { badges: newBadgeData },
-        }).catch(() => {});
+        if (notifyEnabled) {
+          supabase.functions.invoke('badge-notify', {
+            body: { badges: newBadgeData },
+          }).catch(() => {});
+        }
       }
 
       setSynced(true);
