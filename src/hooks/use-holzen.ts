@@ -186,7 +186,8 @@ export function useHolzen() {
   const setCompanionPref = useCallback(async (key: keyof CompanionPrefs, val: boolean) => {
     setCompanionPrefsState((prev) => ({ ...prev, [key]: val }));
     if (!user) return;
-    const dbKey = `companion_${key}` as string;
+    const snakeKey = key === 'zoomOut' ? 'zoom_out' : key;
+    const dbKey = `companion_${snakeKey}` as string;
     await supabase
       .from('profiles')
       .update({ [dbKey]: val } as Record<string, boolean>)
