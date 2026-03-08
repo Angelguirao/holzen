@@ -33,6 +33,7 @@ interface Props {
 export function TestimonialRequest({ reflectionCount }: Props) {
   const { user } = useAuth();
   const { firstName } = useHolzen();
+  const { t } = useTranslation();
   const [visible, setVisible] = useState(false);
   const [quote, setQuote] = useState('');
   const [displayName, setDisplayName] = useState('');
