@@ -1,5 +1,5 @@
 import { Skeleton } from '@/components/ui/skeleton';
-import { TrendingUp, TrendingDown, Clock } from 'lucide-react';
+import { TrendingUp, TrendingDown, Clock, Globe } from 'lucide-react';
 import { format } from 'date-fns';
 import { useHolzen } from '@/hooks/use-holzen';
 import { formatBtcPrice } from '@/lib/btc';
@@ -19,6 +19,10 @@ export interface ZoomOutData {
     mood: string | null;
     outcome: string | null;
   } | null;
+  deepTime: {
+    title: string;
+    body: string;
+  } | null;
 }
 
 interface Props {
@@ -26,8 +30,6 @@ interface Props {
   loading: boolean;
   error: boolean;
 }
-
-// formatPrice is now handled by formatBtcPrice from btc.ts
 
 const outcomeLabels: Record<string, string> = {
   held: 'Held', hold: 'Held', sold: 'Sold', bought: 'Bought', nothing: 'Did nothing',
@@ -54,7 +56,7 @@ export function ZoomOutDisplay({ data, loading, error }: Props) {
     );
   }
 
-  const { onThisDay, currentPrice, echo } = data;
+  const { onThisDay, currentPrice, echo, deepTime } = data;
 
   return (
     <div className="space-y-4">
@@ -93,6 +95,24 @@ export function ZoomOutDisplay({ data, loading, error }: Props) {
               <span className="text-[10px] font-mono text-muted-foreground/40">—</span>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Deep Time — civilizational / planetary perspective */}
+      {deepTime && (
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-1.5">
+            <Globe className="h-3 w-3 text-muted-foreground/50" />
+            <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">
+              Deep time
+            </p>
+          </div>
+          <p className="text-[10px] font-mono text-muted-foreground/70 uppercase tracking-wide">
+            {deepTime.title}
+          </p>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            {deepTime.body}
+          </p>
         </div>
       )}
 
