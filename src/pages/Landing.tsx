@@ -74,21 +74,15 @@ const Landing = () => {
     { icon: <Heart />, label: t('landing.features.library'), desc: t('landing.features.libraryDesc') },
     { icon: <Mail />, label: t('landing.features.letters'), desc: t('landing.features.lettersDesc') },
     { icon: <Award />, label: t('landing.features.badges'), desc: t('landing.features.badgesDesc') },
-    { icon: <Moon />, label: t('landing.features.night'), desc: t('landing.features.nightDesc') },
-    { icon: <Tag />, label: t('landing.features.tags'), desc: t('landing.features.tagsDesc') },
-    { icon: <MessageCircle />, label: t('landing.features.journal'), desc: t('landing.features.journalDesc') },
-    { icon: <Globe />, label: t('landing.features.languages'), desc: t('landing.features.languagesDesc') },
     { icon: <Shield />, label: t('landing.features.privacy'), desc: t('landing.features.privacyDesc') },
   ];
 
   const FAQ = [
-    { key: 'what', q: t('landing.faq.whatQuestion'), a: t('landing.faq.whatAnswer') },
+    { key: 'who', q: t('landing.faq.whoQuestion'), a: t('landing.faq.whoAnswer') },
     { key: 'advice', q: t('landing.faq.adviceQuestion'), a: t('landing.faq.adviceAnswer') },
-    { key: 'companions', q: t('landing.faq.companionsQuestion'), a: t('landing.faq.companionsAnswer') },
-    { key: 'ritual', q: t('landing.faq.ritualQuestion'), a: t('landing.faq.ritualAnswer') },
-    { key: 'tracking', q: t('landing.faq.trackingQuestion'), a: t('landing.faq.trackingAnswer') },
+    { key: 'free', q: t('landing.faq.freeQuestion'), a: t('landing.faq.freeAnswer') },
     { key: 'data', q: t('landing.faq.dataQuestion'), a: t('landing.faq.dataAnswer') },
-    { key: 'cancel', q: t('landing.faq.cancelQuestion'), a: t('landing.faq.cancelAnswer') },
+    { key: 'different', q: t('landing.faq.differentQuestion'), a: t('landing.faq.differentAnswer') },
   ];
 
   return (
@@ -270,7 +264,7 @@ const Landing = () => {
         <div className="max-w-lg mx-auto px-6 py-16">
           <Section>
             <SectionLabel>{t('landing.whatYouGet')}</SectionLabel>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            <div className="grid grid-cols-2 gap-3">
               {FEATURES.map((f, i) => (
                 <motion.div
                   key={f.label}
