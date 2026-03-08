@@ -15,8 +15,12 @@ interface Props {
   reflections: { created_at: string; mood: string | null }[];
 }
 
-const MOOD_MAP: Record<string, number> = { anxious: 1, neutral: 2, calm: 3 };
-const MOOD_LABELS: Record<number, string> = { 1: 'Anxious', 2: 'Neutral', 3: 'Calm' };
+// Map moods to a 1-5 composure scale (1 = most reactive, 5 = most composed)
+const MOOD_MAP: Record<string, number> = {
+  fomo: 1, greedy: 1.5, anxious: 2, fearful: 2, excited: 2.5,
+  uncertain: 3, detached: 4, calm: 5,
+};
+const MOOD_LABELS: Record<number, string> = { 1: 'Reactive', 3: 'Neutral', 5: 'Composed' };
 
 export function MoodTrends({ reflections }: Props) {
   const data = useMemo(() => {
@@ -76,8 +80,8 @@ export function MoodTrends({ reflections }: Props) {
               tickLine={false}
             />
             <YAxis
-              domain={[1, 3]}
-              ticks={[1, 2, 3]}
+              domain={[1, 5]}
+              ticks={[1, 3, 5]}
               tickFormatter={(v: number) => MOOD_LABELS[v] ?? ''}
               tick={{ fontSize: 9, fontFamily: 'monospace', fill: 'hsl(var(--muted-foreground))' }}
               axisLine={false}
@@ -91,7 +95,7 @@ export function MoodTrends({ reflections }: Props) {
                 fontSize: '11px',
                 fontFamily: 'monospace',
               }}
-              formatter={(value: number) => [MOOD_LABELS[Math.round(value)] ?? value.toFixed(1), 'Avg mood']}
+              formatter={(value: number) => [value < 2 ? 'Reactive' : value < 3.5 ? 'Mixed' : 'Composed', 'Avg composure']}
               labelStyle={{ fontSize: '10px', color: 'hsl(var(--muted-foreground))' }}
             />
             <Area
