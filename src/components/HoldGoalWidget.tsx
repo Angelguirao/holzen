@@ -194,10 +194,40 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
           ))}
         </div>
 
+        {/* Start date picker */}
+        <div className="flex items-center gap-2">
+          <p className="text-[10px] font-mono text-muted-foreground/60 whitespace-nowrap">Start from</p>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                size="sm"
+                className={cn(
+                  "h-7 flex-1 justify-start text-left text-[10px] font-mono",
+                  startDate.toDateString() === new Date().toDateString() && "text-muted-foreground"
+                )}
+              >
+                <CalendarIcon className="h-2.5 w-2.5 mr-1.5" />
+                {startDate.toDateString() === new Date().toDateString() ? 'Today' : format(startDate, 'MMM d, yyyy')}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-auto p-0" align="start">
+              <CalendarPicker
+                mode="single"
+                selected={startDate}
+                onSelect={(d) => d && setStartDate(d)}
+                disabled={(date) => date > new Date()}
+                initialFocus
+                className={cn("p-3 pointer-events-auto")}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+
         {goalType === 'forever' ? (
           <div className="space-y-3">
             <p className="text-xs text-muted-foreground leading-relaxed">
-              No timeline. No target price. Just hold. The counter starts now and never ends.
+              No timeline. No target price. Just hold. The counter starts {startDate.toDateString() === new Date().toDateString() ? 'now' : `from ${format(startDate, 'MMM d, yyyy')}`} and never ends.
             </p>
             <Button size="sm" onClick={saveGoal} className="w-full h-8 text-xs font-mono">
               <Infinity className="h-3 w-3 mr-1.5" />
