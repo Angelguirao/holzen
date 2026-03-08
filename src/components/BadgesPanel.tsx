@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 import { differenceInCalendarDays, parseISO } from 'date-fns';
-import { Flame, MessageSquare, Shield, Zap, Eye, Heart, Award, Target } from 'lucide-react';
+import { Flame, MessageSquare, Shield, Zap, Eye, Heart, Award, Target, Wind, BookOpen, Feather } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 interface Reflection {
@@ -10,6 +10,9 @@ interface Reflection {
   outcome: string | null;
   is_favorite: boolean;
   note: string | null;
+  breathing_completed?: boolean;
+  haiku_read?: boolean;
+  learning_read?: boolean;
 }
 
 interface Badge {
@@ -17,10 +20,10 @@ interface Badge {
   label: string;
   description: string;
   icon: typeof Flame;
-  category: 'streak' | 'volume' | 'composure' | 'engagement';
+  category: 'streak' | 'volume' | 'composure' | 'engagement' | 'companions';
   color: string;
   earned: boolean;
-  progress: number; // 0-1
+  progress: number;
   requirement: number;
   current: number;
   unit: string;
@@ -70,6 +73,7 @@ const CATEGORY_LABELS: Record<string, string> = {
   streak: 'Consistency',
   volume: 'Reflection Count',
   composure: 'Composure',
+  companions: 'Companion Engagement',
   engagement: 'Engagement',
 };
 
@@ -87,6 +91,14 @@ export function BadgesPanel({ reflections }: BadgesPanelProps) {
     const favCount = reflections.filter((r) => r.is_favorite).length;
     const noteCount = reflections.filter((r) => r.note).length;
 
+    // Companion engagement counts
+    const breathingCount = reflections.filter((r) => r.breathing_completed).length;
+    const haikuCount = reflections.filter((r) => r.haiku_read).length;
+    const learningCount = reflections.filter((r) => r.learning_read).length;
+    const allThreeCount = reflections.filter(
+      (r) => r.breathing_completed && r.haiku_read && r.learning_read
+    ).length;
+
     const makeBadge = (
       id: string,
       label: string,
@@ -98,24 +110,21 @@ export function BadgesPanel({ reflections }: BadgesPanelProps) {
       requirement: number,
       unit: string
     ): Badge => ({
-      id,
-      label,
-      description,
-      icon,
-      category,
-      color,
+      id, label, description, icon, category, color,
       earned: current >= requirement,
       progress: Math.min(current / requirement, 1),
-      requirement,
-      current,
-      unit,
+      requirement, current, unit,
     });
 
     return [
-      // Streak badges
+      // Streak badges (expanded milestones)
+      makeBadge('streak-3', 'Getting Started', '3-day reflection streak', Flame, 'streak', 'hsl(35, 65%, 60%)', longestStreak, 3, 'days'),
       makeBadge('streak-7', 'Week Watcher', '7-day reflection streak', Flame, 'streak', 'hsl(25, 70%, 55%)', longestStreak, 7, 'days'),
+      makeBadge('streak-14', 'Fortnight Focus', '14-day reflection streak', Flame, 'streak', 'hsl(20, 72%, 52%)', longestStreak, 14, 'days'),
       makeBadge('streak-30', 'Month Mind', '30-day reflection streak', Flame, 'streak', 'hsl(15, 75%, 50%)', longestStreak, 30, 'days'),
+      makeBadge('streak-60', 'Steady Hand', '60-day reflection streak', Flame, 'streak', 'hsl(10, 78%, 47%)', longestStreak, 60, 'days'),
       makeBadge('streak-100', 'Century Stoic', '100-day reflection streak', Flame, 'streak', 'hsl(5, 80%, 45%)', longestStreak, 100, 'days'),
+      makeBadge('streak-365', 'Year of Composure', '365-day reflection streak', Flame, 'streak', 'hsl(0, 85%, 42%)', longestStreak, 365, 'days'),
 
       // Volume badges
       makeBadge('reflect-10', 'First Steps', '10 reflections logged', MessageSquare, 'volume', 'hsl(200, 50%, 50%)', total, 10, 'reflections'),
@@ -129,34 +138,77 @@ export function BadgesPanel({ reflections }: BadgesPanelProps) {
       makeBadge('held-10', 'Diamond Hands', 'Held steady 10 times', Target, 'composure', 'hsl(170, 40%, 42%)', heldCount, 10, 'holds'),
       makeBadge('held-50', 'Iron Will', 'Held steady 50 times', Target, 'composure', 'hsl(180, 45%, 38%)', heldCount, 50, 'holds'),
 
+      // Companion engagement badges (NEW)
+      makeBadge('breathe-5', 'First Breaths', 'Completed breathing 5 times', Wind, 'companions', 'hsl(190, 50%, 50%)', breathingCount, 5, 'sessions'),
+      makeBadge('breathe-25', 'Breath Master', 'Completed breathing 25 times', Wind, 'companions', 'hsl(195, 55%, 45%)', breathingCount, 25, 'sessions'),
+      makeBadge('breathe-100', 'Zen Lungs', 'Completed breathing 100 times', Wind, 'companions', 'hsl(200, 60%, 40%)', breathingCount, 100, 'sessions'),
+      makeBadge('haiku-10', 'Poetry Reader', 'Read 10 haiku', Feather, 'companions', 'hsl(280, 40%, 50%)', haikuCount, 10, 'haiku'),
+      makeBadge('haiku-50', 'Verse Devotee', 'Read 50 haiku', Feather, 'companions', 'hsl(285, 45%, 45%)', haikuCount, 50, 'haiku'),
+      makeBadge('learn-10', 'Knowledge Seeker', 'Read 10 learning cards', BookOpen, 'companions', 'hsl(45, 50%, 48%)', learningCount, 10, 'cards'),
+      makeBadge('learn-50', 'Scholar of Calm', 'Read 50 learning cards', BookOpen, 'companions', 'hsl(50, 55%, 43%)', learningCount, 50, 'cards'),
+      makeBadge('all-3-5', 'Full Practice', 'Used all 3 companions in 5 reflections', Award, 'companions', 'hsl(310, 45%, 48%)', allThreeCount, 5, 'full sessions'),
+      makeBadge('all-3-25', 'Complete Discipline', 'Used all 3 companions in 25 reflections', Award, 'companions', 'hsl(315, 50%, 43%)', allThreeCount, 25, 'full sessions'),
+
       // Engagement badges
       makeBadge('fav-5', 'Curator', '5 favorited reflections', Heart, 'engagement', 'hsl(340, 50%, 50%)', favCount, 5, 'favorites'),
+      makeBadge('fav-25', 'Archivist', '25 favorited reflections', Heart, 'engagement', 'hsl(345, 55%, 45%)', favCount, 25, 'favorites'),
       makeBadge('notes-10', 'Journaler', '10 personal notes', Eye, 'engagement', 'hsl(270, 40%, 50%)', noteCount, 10, 'notes'),
+      makeBadge('notes-50', 'Deep Diarist', '50 personal notes', Eye, 'engagement', 'hsl(275, 45%, 45%)', noteCount, 50, 'notes'),
       makeBadge('active-streak', 'On Fire', 'Currently on a 7+ day streak', Zap, 'engagement', 'hsl(40, 70%, 50%)', currentStreak, 7, 'day streak'),
+      makeBadge('active-streak-30', 'Unstoppable', 'Currently on a 30+ day streak', Zap, 'engagement', 'hsl(35, 75%, 45%)', currentStreak, 30, 'day streak'),
     ];
   }, [reflections]);
 
   const earnedCount = badges.filter((b) => b.earned).length;
-  const categories = ['streak', 'volume', 'composure', 'engagement'] as const;
+  const categories = ['streak', 'volume', 'composure', 'companions', 'engagement'] as const;
+
+  // Next badge to earn
+  const nextBadge = badges.find((b) => !b.earned && b.progress > 0);
 
   return (
     <div className="space-y-6">
       {/* Summary */}
-      <div className="flex items-center gap-3">
-        <Award className="h-4 w-4 text-primary" />
-        <p className="text-xs font-mono text-muted-foreground">
-          <span className="text-foreground font-medium">{earnedCount}</span> / {badges.length} earned
-        </p>
+      <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Award className="h-4 w-4 text-primary" />
+            <p className="text-xs font-mono text-muted-foreground">
+              <span className="text-foreground font-medium">{earnedCount}</span> / {badges.length} earned
+            </p>
+          </div>
+          <div className="h-1.5 flex-1 max-w-[120px] ml-4 rounded-full bg-muted/50 overflow-hidden">
+            <motion.div
+              className="h-full rounded-full bg-primary/60"
+              initial={{ width: 0 }}
+              animate={{ width: `${(earnedCount / badges.length) * 100}%` }}
+              transition={{ duration: 0.8 }}
+            />
+          </div>
+        </div>
+        {nextBadge && (
+          <div className="flex items-center gap-2 text-[10px] font-mono text-muted-foreground/60">
+            <nextBadge.icon className="h-3 w-3" style={{ color: nextBadge.color }} />
+            <span>
+              Next: <span className="text-foreground/70">{nextBadge.label}</span> — {nextBadge.current}/{nextBadge.requirement} {nextBadge.unit}
+            </span>
+          </div>
+        )}
       </div>
 
       {/* Badge grid by category */}
       {categories.map((cat) => {
         const catBadges = badges.filter((b) => b.category === cat);
+        const catEarned = catBadges.filter((b) => b.earned).length;
         return (
           <div key={cat} className="space-y-2.5">
-            <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground/60">
-              {CATEGORY_LABELS[cat]}
-            </p>
+            <div className="flex items-center justify-between">
+              <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground/60">
+                {CATEGORY_LABELS[cat]}
+              </p>
+              <p className="text-[9px] font-mono text-muted-foreground/40">
+                {catEarned}/{catBadges.length}
+              </p>
+            </div>
             <div className="grid grid-cols-2 gap-2">
               {catBadges.map((badge, i) => (
                 <motion.div
@@ -170,7 +222,6 @@ export function BadgesPanel({ reflections }: BadgesPanelProps) {
                       : 'border-border/40 bg-muted/20 opacity-50'
                   }`}
                 >
-                  {/* Icon + label */}
                   <div className="flex items-center gap-2">
                     <badge.icon
                       className="h-3.5 w-3.5 shrink-0"
@@ -184,7 +235,6 @@ export function BadgesPanel({ reflections }: BadgesPanelProps) {
                     {badge.description}
                   </p>
 
-                  {/* Progress bar */}
                   {!badge.earned && (
                     <div className="space-y-1">
                       <div className="h-1 w-full rounded-full bg-border/40 overflow-hidden">
@@ -202,9 +252,8 @@ export function BadgesPanel({ reflections }: BadgesPanelProps) {
                     </div>
                   )}
 
-                  {/* Earned indicator */}
                   {badge.earned && (
-                    <p className="text-[9px] font-mono text-primary/70">Earned</p>
+                    <p className="text-[9px] font-mono text-primary/70">Earned ✓</p>
                   )}
                 </motion.div>
               ))}
