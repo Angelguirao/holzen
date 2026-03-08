@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { Pencil, Check } from 'lucide-react';
@@ -10,6 +11,7 @@ interface Props {
 
 export function ReflectionNote({ reflectionId, initialNote }: Props) {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [note, setNote] = useState(initialNote ?? '');
   const [editing, setEditing] = useState(false);
   const [saved, setSaved] = useState(false);
@@ -57,7 +59,7 @@ export function ReflectionNote({ reflectionId, initialNote }: Props) {
         className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground/50 hover:text-muted-foreground transition-colors"
       >
         <Pencil className="h-2.5 w-2.5" />
-        Add a note
+        {t('reflectionNote.addNote')}
       </button>
     );
   }

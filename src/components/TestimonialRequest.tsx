@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, X, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -24,15 +25,6 @@ function shouldShow(reflectionCount: number): boolean {
   return true;
 }
 
-// Static English UI — language setting only affects AI-generated content
-const t = {
-  title: 'Enjoying Holzen?',
-  subtitle: 'Share a short quote about your experience — it may appear on our landing page.',
-  placeholder: 'e.g. "Holzen helped me stop panic-selling during dips."',
-  send: 'Submit',
-  thanks: 'Thank you! Your testimonial is under review.',
-  nameLabel: 'Display name',
-};
 
 interface Props {
   reflectionCount: number;
@@ -41,6 +33,7 @@ interface Props {
 export function TestimonialRequest({ reflectionCount }: Props) {
   const { user } = useAuth();
   const { firstName } = useHolzen();
+  const { t } = useTranslation();
   const [visible, setVisible] = useState(false);
   const [quote, setQuote] = useState('');
   const [displayName, setDisplayName] = useState('');
@@ -69,10 +62,10 @@ export function TestimonialRequest({ reflectionCount }: Props) {
     } as any);
     setSubmitting(false);
     if (error) {
-      toast.error('Failed to submit');
+      toast.error(t('testimonial.failed'));
     } else {
       localStorage.setItem(SUBMITTED_KEY, 'true');
-      toast.success(t.thanks);
+      toast.success(t('testimonial.thanks'));
       setVisible(false);
     }
   };
@@ -89,25 +82,25 @@ export function TestimonialRequest({ reflectionCount }: Props) {
           <div className="flex items-start justify-between gap-2">
             <div className="flex items-center gap-2">
               <MessageCircle className="h-4 w-4 text-primary shrink-0" />
-              <p className="text-sm text-foreground font-medium">{t.title}</p>
+              <p className="text-sm text-foreground font-medium">{t('testimonial.title')}</p>
             </div>
             <button onClick={dismiss} className="text-muted-foreground hover:text-foreground transition-colors">
               <X className="h-3.5 w-3.5" />
             </button>
           </div>
-          <p className="text-xs text-muted-foreground leading-relaxed">{t.subtitle}</p>
+          <p className="text-xs text-muted-foreground leading-relaxed">{t('testimonial.subtitle')}</p>
           <input
             type="text"
             value={displayName}
             onChange={(e) => setDisplayName(e.target.value)}
-            placeholder={t.nameLabel}
+            placeholder={t('testimonial.nameLabel')}
             className="w-full text-xs rounded-md border border-border bg-background px-3 py-2 text-foreground placeholder:text-muted-foreground/50"
             maxLength={50}
           />
           <Textarea
             value={quote}
             onChange={(e) => setQuote(e.target.value)}
-            placeholder={t.placeholder}
+            placeholder={t('testimonial.placeholder')}
             className="text-xs min-h-[60px] resize-none"
             maxLength={280}
           />
@@ -120,7 +113,7 @@ export function TestimonialRequest({ reflectionCount }: Props) {
               className="text-xs font-mono gap-1.5"
             >
               <Send className="h-3 w-3" />
-              {t.send}
+              {t('testimonial.submit')}
             </Button>
           </div>
         </motion.div>

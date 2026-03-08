@@ -1,4 +1,5 @@
 import { useState, useCallback, useEffect, useRef, forwardRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { BreathingExercise } from './BreathingExercise';
 import { HaikuDisplay } from './HaikuDisplay';
 import { LearningInput } from './LearningInput';
@@ -167,8 +168,16 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
     });
   }, [reflectionId]);
 
-  // Static English labels — language setting only affects AI-generated content
-  const t = { pause: 'Pause with this', breathe: 'Breathe with this', haiku: 'Read as haiku', ground: 'Ground yourself', signal: 'Read the signal', zoomOut: 'Zoom out', lookBack: 'Look back' };
+  const { t: i18nT } = useTranslation();
+  const labels = {
+    pause: i18nT('companions.pause'),
+    breathe: i18nT('companions.breathe'),
+    haiku: i18nT('companions.haiku'),
+    ground: i18nT('companions.ground'),
+    signal: i18nT('companions.signal'),
+    zoomOut: i18nT('companions.zoomOut'),
+    lookBack: i18nT('companions.lookBack'),
+  };
   const [expandedBreathing, setExpandedBreathing] = useState(false);
   const [expandedHaiku, setExpandedHaiku] = useState(false);
   const [expandedLearning, setExpandedLearning] = useState(false);
@@ -528,12 +537,12 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
   return (
     <div ref={ref} className="space-y-3 pt-2 border-t border-border/40">
       <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">
-        {t.pause}
+        {labels.pause}
       </p>
 
       {hasBreathing && (
         <CollapsibleCompanion
-          label={t.breathe}
+          label={labels.breathe}
           expanded={expandedBreathing}
           onToggle={() => setExpandedBreathing((v) => !v)}
           completed={completion.breathing}
@@ -544,7 +553,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
 
       {hasHaiku && (
         <CollapsibleCompanion
-          label={t.haiku}
+          label={labels.haiku}
           expanded={expandedHaiku}
           onToggle={() => {
             setExpandedHaiku((v) => !v);
@@ -560,7 +569,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
 
       {hasLearning && (
         <CollapsibleCompanion
-          label={t.ground}
+          label={labels.ground}
           expanded={expandedLearning}
           onToggle={() => {
             setExpandedLearning((v) => !v);
@@ -582,7 +591,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
 
       {hasSignal && (
         <CollapsibleCompanion
-          label={t.signal}
+          label={labels.signal}
           expanded={expandedSignal}
           onToggle={() => {
             setExpandedSignal((v) => !v);
@@ -602,7 +611,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
 
       {hasZoomOut && (
         <CollapsibleCompanion
-          label={t.zoomOut}
+          label={labels.zoomOut}
           expanded={expandedZoomOut}
           onToggle={() => {
             setExpandedZoomOut((v) => !v);
@@ -622,7 +631,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
 
       {hasHistory && (
         <CollapsibleCompanion
-          label={t.lookBack}
+          label={labels.lookBack}
           expanded={expandedHistory}
           onToggle={() => {
             setExpandedHistory((v) => !v);
