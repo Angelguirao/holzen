@@ -228,6 +228,7 @@ Generate 3-5 behavioral insights based on real patterns in this data.`;
         period_start: reflections[reflections.length - 1].created_at,
         period_end: reflections[0].created_at,
         generated_at: new Date().toISOString(),
+        language: userLanguage,
       });
 
       generated++;
