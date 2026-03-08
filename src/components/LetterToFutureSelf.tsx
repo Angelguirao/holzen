@@ -28,7 +28,7 @@ const WRITING_PROMPTS = {
     "What would your calm self say to your excited self?",
     "Write what you know to be true right now.",
   ],
-  ath: [
+  surge: [
     "What do you want to remember when fear takes over?",
     "What would your grounded self tell your panicking self?",
     "Write what this moment has taught you.",
@@ -121,20 +121,20 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
   const [sealPhase, setSealPhase] = useState<'idle' | 'sealing' | 'sealed'>('idle');
   const [loaded, setLoaded] = useState(false);
   const isCrash = changePercent !== null && changePercent <= -LETTER_THRESHOLD;
-  const isATH = changePercent !== null && changePercent >= LETTER_THRESHOLD;
-  const isVolatile = isCrash || isATH;
+  const isSurge = changePercent !== null && changePercent >= LETTER_THRESHOLD;
+  const isVolatile = isCrash || isSurge;
   const isCalm = !isVolatile;
 
   // Auto-select mode based on market state
   const effectiveMode = isVolatile ? 'storm' : 'calm';
   const canWrite = isVolatile || (isCalm && currentPrice !== null);
 
-  const writtenDuring = effectiveMode === 'calm' ? 'calm' : (isCrash ? 'crash' : 'ath');
-  const deliverDuring = effectiveMode === 'calm' ? 'crash' : (isCrash ? 'ath' : 'crash');
+  const writtenDuring = effectiveMode === 'calm' ? 'calm' : (isCrash ? 'crash' : 'surge');
+  const deliverDuring = effectiveMode === 'calm' ? 'crash' : (isCrash ? 'surge' : 'crash');
 
   const prompts = effectiveMode === 'calm'
     ? WRITING_PROMPTS.calm
-    : (isCrash ? WRITING_PROMPTS.crash : WRITING_PROMPTS.ath);
+    : (isCrash ? WRITING_PROMPTS.crash : WRITING_PROMPTS.surge);
   const randomPrompt = useMemo(() => prompts[Math.floor(Math.random() * prompts.length)], [isCrash, effectiveMode]);
 
   useEffect(() => {
@@ -193,7 +193,7 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
       toast('Letter sealed', {
         description: effectiveMode === 'calm'
           ? 'Sealed in calm · Opens when the storm hits'
-          : deliverDuring === 'ath'
+           : deliverDuring === 'surge'
           ? 'Sealed in fear · Opens when confidence returns'
           : 'Sealed in euphoria · Opens when doubt arrives',
       });
@@ -297,7 +297,7 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
                     <p className="text-[10px] font-mono text-muted-foreground/50 max-w-[200px] leading-relaxed">
                       {effectiveMode === 'calm'
                         ? 'This letter waits for the storm.'
-                        : deliverDuring === 'ath'
+                        : deliverDuring === 'surge'
                         ? 'This letter waits for confidence.'
                         : 'This letter waits for doubt.'}
                     </p>

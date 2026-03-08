@@ -44,16 +44,16 @@ serve(async (req) => {
 
     // Determine current market condition
     const isCrash = changePercent <= -5;
-    const isATH = changePercent >= 5;
+    const isSurge = changePercent >= 5;
 
-    if (!isCrash && !isATH) {
+    if (!isCrash && !isSurge) {
       console.log(`[DELIVER-LETTERS] No extreme condition (${changePercent.toFixed(1)}%), skipping`);
       return new Response(JSON.stringify({ delivered: 0, condition: "neutral" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const currentCondition = isCrash ? "crash" : "ath";
+    const currentCondition = isCrash ? "crash" : "surge";
     console.log(`[DELIVER-LETTERS] Market condition: ${currentCondition} (${changePercent.toFixed(1)}%)`);
 
     // 2. Find letters waiting for this condition

@@ -378,7 +378,7 @@ function LetterCard({ letter: l, onDelete, fmtPrice, type }: {
       ) : (
         <>
           <p className="text-xs text-muted-foreground/50">
-            Delivers during next {l.deliver_during === 'ath' ? 'surge' : 'drop'}
+            Delivers during next {l.deliver_during === 'surge' ? 'surge' : 'drop'}
           </p>
           <p className="text-sm leading-relaxed blur-[8px] select-none pointer-events-none">
             {l.body}
