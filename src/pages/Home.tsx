@@ -374,12 +374,12 @@ const Home = () => {
                         severity={severity} reflectionId={lastReflectionId}
                       />
                       <button
-                        onClick={() => setShowRitual(true)}
+                        onClick={() => navigate('/pause', { state: { reflectionMessage: message, reflectionId: lastReflectionId } })}
                         className="w-full flex items-center justify-center gap-2 py-2.5 rounded-md border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors"
                       >
                         <Sparkles className="h-3 w-3 text-primary/60" />
                         <span className="text-[10px] font-mono text-primary/60 tracking-[0.15em] uppercase">
-                          {t('home.startRitualBeforeDeciding')}
+                          {t('onboarding.pauseWithThis')}
                         </span>
                       </button>
                       {lastReflectionId && <ReflectionComparison reflectionId={lastReflectionId} />}
