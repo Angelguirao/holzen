@@ -556,6 +556,8 @@
     "tabActivity": "Activity",
     "tabItems": "Items",
     "tabCollections": "Collections",
+    "tabGraph": "Graph",
+    "graphEmpty": "No data yet. Complete reflections and save items to build your graph.",
     "searchPlaceholder": "Search items…",
     "tabAll": "All",
     "tabBookmarks": "Saved",
