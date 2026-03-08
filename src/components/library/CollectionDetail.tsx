@@ -12,13 +12,14 @@ interface Props {
   onDeleteCollection: (id: string) => void;
   onRemoveItem: (collectionId: string, itemId: string) => Promise<void>;
   onTogglePin: (id: string) => void;
+  onToggleFavorite: (id: string) => void;
   onDeleteItem: (id: string) => void;
   onStatusChange: (id: string, status: 'unread' | 'read' | 'archived') => void;
 }
 
 export function CollectionDetail({
   collection, items, itemIds, onBack, onDeleteCollection, onRemoveItem,
-  onTogglePin, onDeleteItem, onStatusChange,
+  onTogglePin, onToggleFavorite, onDeleteItem, onStatusChange,
 }: Props) {
   const { t } = useTranslation();
 
