@@ -461,6 +461,12 @@ export function useHolzen() {
       if (!user) return;
       await supabase.from('profiles').update({ first_name: val } as any).eq('user_id', user.id);
     },
+    aiInsightsEnabled,
+    setAiInsightsEnabled: async (val: boolean) => {
+      setAiInsightsEnabledState(val);
+      if (!user) return;
+      await supabase.from('profiles').update({ ai_insights_enabled: val } as any).eq('user_id', user.id);
+    },
     companionPrefs,
     setCompanionPref,
     btcData,
