@@ -102,23 +102,23 @@ function CompanionCard({ item, onSelect }: { item: LibraryItem; onSelect?: (item
 }
 
 export function ItemDetailViewer({ item, linkedItems, allItems, open, onClose, onToggleFavorite, onSelectItem }: Props) {
-  if (!item) return null;
-
   // For non-reflection items, find siblings (other items with same reflection_id)
   const siblings = useMemo(() => {
-    if (!item.reflection_id || !allItems) return [];
+    if (!item?.reflection_id || !allItems) return [];
     return allItems.filter((i) => i.reflection_id === item.reflection_id && i.id !== item.id);
   }, [item, allItems]);
+
+  // Parse zoom_out JSON
+  const zoomOutData = useMemo(() => {
+    if (item?.source_type !== 'zoom_out' || !item?.body) return null;
+    try { return JSON.parse(item.body); } catch { return null; }
+  }, [item?.source_type, item?.body]);
+
+  if (!item) return null;
 
   const companions = linkedItems && linkedItems.length > 0 ? linkedItems : siblings;
   const isReflection = item.source_type === 'reflection';
   const sourceLabel = SOURCE_LABELS[item.source_type ?? ''] ?? item.source_type ?? 'Item';
-
-  // Parse zoom_out JSON
-  const zoomOutData = useMemo(() => {
-    if (item.source_type !== 'zoom_out' || !item.body) return null;
-    try { return JSON.parse(item.body); } catch { return null; }
-  }, [item.source_type, item.body]);
 
   return (
     <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
