@@ -1,7 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isSameDay, isSameMonth, addMonths, subMonths, isToday, startOfDay } from 'date-fns';
-import { ChevronLeft, ChevronRight, Circle, Sparkles, Scroll, Award, BookOpen } from 'lucide-react';
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isSameDay, addMonths, subMonths, isToday } from 'date-fns';
+import { ChevronLeft, ChevronRight, Sparkles, Scroll, Award } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const MOOD_COLORS: Record<string, string> = {
@@ -15,10 +14,22 @@ const MOOD_COLORS: Record<string, string> = {
   fearful: 'bg-rose-400',
 };
 
+// Day-level tint: maps dominant mood to a subtle background
+const DAY_TINT: Record<string, string> = {
+  calm: 'bg-emerald-500/8',
+  detached: 'bg-slate-500/8',
+  excited: 'bg-yellow-500/8',
+  fomo: 'bg-amber-500/10',
+  greedy: 'bg-orange-500/10',
+  anxious: 'bg-red-500/10',
+  fearful: 'bg-rose-500/10',
+  uncertain: 'bg-purple-500/8',
+};
+
 export type ActivityType = 'reflection' | 'ritual' | 'letter' | 'badge';
 
 export interface CalendarActivity {
-  date: string; // ISO date
+  date: string;
   type: ActivityType;
   mood?: string | null;
   id: string;
@@ -29,37 +40,30 @@ interface Props {
   activities: CalendarActivity[];
   selectedDate: Date | null;
   onSelectDate: (date: Date | null) => void;
-  activeFilters: Set<ActivityType>;
-  onToggleFilter: (type: ActivityType) => void;
 }
-
-const ACTIVITY_TYPES: { type: ActivityType; icon: React.ReactNode; label: string }[] = [
-  { type: 'reflection', icon: <Circle className="h-2.5 w-2.5" />, label: 'Reflections' },
-  { type: 'ritual', icon: <Sparkles className="h-2.5 w-2.5" />, label: 'Rituals' },
-  { type: 'letter', icon: <Scroll className="h-2.5 w-2.5" />, label: 'Letters' },
-  { type: 'badge', icon: <Award className="h-2.5 w-2.5" />, label: 'Badges' },
-];
 
 const WEEKDAYS = ['Su', 'Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa'];
 
-export function HistoryCalendar({ activities, selectedDate, onSelectDate, activeFilters, onToggleFilter }: Props) {
-  const { t } = useTranslation();
+function getDominantMood(activities: CalendarActivity[]): string | null {
+  const moods = activities.filter((a) => a.type === 'reflection' && a.mood).map((a) => a.mood!);
+  if (moods.length === 0) return null;
+  const counts: Record<string, number> = {};
+  for (const m of moods) counts[m] = (counts[m] || 0) + 1;
+  return Object.entries(counts).sort((a, b) => b[1] - a[1])[0][0];
+}
+
+export function HistoryCalendar({ activities, selectedDate, onSelectDate }: Props) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
 
-  const filteredActivities = useMemo(() => {
-    return activities.filter((a) => activeFilters.has(a.type));
-  }, [activities, activeFilters]);
-
-  // Group activities by day key
   const activityMap = useMemo(() => {
     const map = new Map<string, CalendarActivity[]>();
-    for (const a of filteredActivities) {
+    for (const a of activities) {
       const key = format(new Date(a.date), 'yyyy-MM-dd');
       if (!map.has(key)) map.set(key, []);
       map.get(key)!.push(a);
     }
     return map;
-  }, [filteredActivities]);
+  }, [activities]);
 
   const monthStart = startOfMonth(currentMonth);
   const monthEnd = endOfMonth(currentMonth);
@@ -74,26 +78,7 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate, active
   }, [onSelectDate]);
 
   return (
-    <div className="space-y-4">
-      {/* Activity type filters */}
-      <div className="flex flex-wrap gap-1.5">
-        {ACTIVITY_TYPES.map(({ type, icon, label }) => (
-          <button
-            key={type}
-            onClick={() => onToggleFilter(type)}
-            className={cn(
-              'flex items-center gap-1.5 text-[10px] font-mono px-2 py-1 rounded-full border transition-colors',
-              activeFilters.has(type)
-                ? 'border-primary/40 bg-primary/5 text-foreground'
-                : 'border-border/40 text-muted-foreground/50 hover:text-muted-foreground'
-            )}
-          >
-            {icon}
-            {label}
-          </button>
-        ))}
-      </div>
-
+    <div className="space-y-3">
       {/* Month navigation */}
       <div className="flex items-center justify-between">
         <button onClick={goToPrev} className="p-1 text-muted-foreground hover:text-foreground transition-colors">
@@ -107,49 +92,39 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate, active
         </button>
       </div>
 
-      {/* Weekday headers */}
-      <div className="grid grid-cols-7 gap-0">
+      {/* Grid */}
+      <div className="grid grid-cols-7 gap-0.5">
         {WEEKDAYS.map((d) => (
           <div key={d} className="text-center text-[9px] font-mono text-muted-foreground/40 uppercase py-1">
             {d}
           </div>
         ))}
 
-        {/* Empty cells for offset */}
         {Array.from({ length: startDayOfWeek }).map((_, i) => (
           <div key={`empty-${i}`} className="aspect-square" />
         ))}
 
-        {/* Day cells */}
         {days.map((day) => {
           const key = format(day, 'yyyy-MM-dd');
           const dayActivities = activityMap.get(key) || [];
           const isSelected = selectedDate && isSameDay(day, selectedDate);
           const isCurrentDay = isToday(day);
           const hasActivities = dayActivities.length > 0;
-
-          // Get unique moods for reflection dots
-          const reflectionMoods = dayActivities
-            .filter((a) => a.type === 'reflection' && a.mood)
-            .map((a) => a.mood!);
-          const hasRitual = dayActivities.some((a) => a.type === 'ritual');
-          const hasLetter = dayActivities.some((a) => a.type === 'letter');
-          const hasBadge = dayActivities.some((a) => a.type === 'badge');
-
-          // Dominant mood for background tint
-          const dominantMood = reflectionMoods[0];
+          const dominantMood = getDominantMood(dayActivities);
+          const tint = dominantMood ? DAY_TINT[dominantMood] : undefined;
+          const count = dayActivities.length;
 
           return (
             <button
               key={key}
               onClick={() => onSelectDate(isSelected ? null : day)}
               className={cn(
-                'aspect-square flex flex-col items-center justify-center gap-0.5 rounded-md text-xs font-mono transition-all relative',
+                'aspect-square flex flex-col items-center justify-center rounded-md text-xs font-mono transition-all relative',
                 isSelected
-                  ? 'bg-primary/10 ring-1 ring-primary/40 text-foreground'
+                  ? 'ring-1 ring-primary/50 bg-primary/10 text-foreground'
                   : hasActivities
-                    ? 'hover:bg-muted/40 text-foreground'
-                    : 'text-muted-foreground/30 hover:text-muted-foreground/50',
+                    ? cn('hover:bg-muted/40 text-foreground', tint)
+                    : 'text-muted-foreground/25',
                 isCurrentDay && !isSelected && 'ring-1 ring-border/60',
               )}
             >
@@ -157,21 +132,18 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate, active
                 {format(day, 'd')}
               </span>
 
-              {/* Activity dots */}
+              {/* Intensity indicator: small bar */}
               {hasActivities && (
-                <div className="flex items-center gap-[2px] absolute bottom-[3px]">
-                  {reflectionMoods.slice(0, 3).map((mood, i) => (
-                    <span
-                      key={`m-${i}`}
-                      className={cn('h-[4px] w-[4px] rounded-full', MOOD_COLORS[mood] || 'bg-foreground/30')}
+                <div className="absolute bottom-[3px] flex items-center gap-[1px]">
+                  {count <= 3 ? (
+                    Array.from({ length: count }).map((_, i) => (
+                      <span key={i} className={cn('h-[3px] w-[3px] rounded-full', dominantMood ? (MOOD_COLORS[dominantMood] || 'bg-foreground/30') : 'bg-foreground/20')} />
+                    ))
+                  ) : (
+                    <span className={cn('h-[3px] rounded-full', dominantMood ? (MOOD_COLORS[dominantMood] || 'bg-foreground/30') : 'bg-foreground/20')}
+                      style={{ width: `${Math.min(count * 2, 16)}px` }}
                     />
-                  ))}
-                  {reflectionMoods.length === 0 && dayActivities.some((a) => a.type === 'reflection') && (
-                    <span className="h-[4px] w-[4px] rounded-full bg-foreground/30" />
                   )}
-                  {hasRitual && <span className="h-[4px] w-[4px] rounded-full bg-primary/60" />}
-                  {hasLetter && <span className="h-[4px] w-[4px] rounded-full bg-amber-500/60" />}
-                  {hasBadge && <span className="h-[4px] w-[4px] rounded-full bg-yellow-500/60" />}
                 </div>
               )}
             </button>
@@ -179,42 +151,14 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate, active
         })}
       </div>
 
-      {/* Legend */}
-      <div className="flex flex-wrap gap-x-3 gap-y-1 pt-1">
-        <div className="flex items-center gap-1">
-          <span className="h-[5px] w-[5px] rounded-full bg-emerald-400" />
-          <span className="text-[8px] font-mono text-muted-foreground/40">calm</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <span className="h-[5px] w-[5px] rounded-full bg-red-400" />
-          <span className="text-[8px] font-mono text-muted-foreground/40">anxious</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <span className="h-[5px] w-[5px] rounded-full bg-amber-400" />
-          <span className="text-[8px] font-mono text-muted-foreground/40">fomo</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <span className="h-[5px] w-[5px] rounded-full bg-primary/60" />
-          <span className="text-[8px] font-mono text-muted-foreground/40">ritual</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <span className="h-[5px] w-[5px] rounded-full bg-amber-500/60" />
-          <span className="text-[8px] font-mono text-muted-foreground/40">letter</span>
-        </div>
-        <div className="flex items-center gap-1">
-          <span className="h-[5px] w-[5px] rounded-full bg-yellow-500/60" />
-          <span className="text-[8px] font-mono text-muted-foreground/40">badge</span>
-        </div>
-      </div>
-
-      {/* Selected day summary */}
+      {/* Selected day detail */}
       {selectedDate && (
-        <div className="space-y-1.5 pt-2 border-t border-border/30">
+        <div className="space-y-2 pt-2 border-t border-border/30">
           <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">
             {format(selectedDate, 'EEEE, MMMM d, yyyy')}
           </p>
           {(activityMap.get(format(selectedDate, 'yyyy-MM-dd')) || []).length === 0 ? (
-            <p className="text-xs text-muted-foreground/40 italic">No activity on this day.</p>
+            <p className="text-xs text-muted-foreground/40 italic">No activity.</p>
           ) : (
             <div className="space-y-1">
               {(activityMap.get(format(selectedDate, 'yyyy-MM-dd')) || []).map((a) => (
@@ -240,7 +184,7 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate, active
                   {a.type === 'badge' && (
                     <>
                       <Award className="h-2.5 w-2.5 text-yellow-500/60" />
-                      <span className="text-muted-foreground">{a.label || 'Badge'}</span>
+                      <span className="text-muted-foreground capitalize">{a.label?.replace(/-/g, ' ') || 'Badge'}</span>
                     </>
                   )}
                 </div>
