@@ -235,7 +235,7 @@ export function ReflectionWallpaper({ message, mood, context, haiku, variant = '
             ) : null}
 
             <p className="text-[10px] text-muted-foreground/60 font-mono text-center">
-              Carry your composure with you
+              {t('wallpaper.carry')}
             </p>
           </div>
         </DialogContent>
