@@ -9,7 +9,7 @@ import { InsightsPanel } from '@/components/InsightsPanel';
 import { DecisionQualityCard } from '@/components/DecisionQualityCard';
 import { StreakTimeline } from '@/components/StreakTimeline';
 import { AIInsightsPanel } from '@/components/AIInsightsPanel';
-import { MoodTrends } from '@/components/MoodTrends';
+
 import { BadgesPanel } from '@/components/BadgesPanel';
 import { ReferralSection } from '@/components/ReferralSection';
 import { MoodPriceChart } from '@/components/MoodPriceChart';
@@ -237,9 +237,9 @@ function StatsContent({ reflections }: { reflections: Reflection[] }) {
   const scoreData = useHolzenScore(reflections);
 
   const moodCounts = useMemo(() => {
-    const counts = { anxious: 0, neutral: 0, calm: 0 };
+    const counts: Record<string, number> = {};
     for (const r of reflections) {
-      if (r.mood && r.mood in counts) counts[r.mood as keyof typeof counts]++;
+      if (r.mood) counts[r.mood] = (counts[r.mood] || 0) + 1;
     }
     return counts;
   }, [reflections]);
@@ -257,16 +257,15 @@ function StatsContent({ reflections }: { reflections: Reflection[] }) {
         />
       </div>
       <ReflectionStats reflections={reflections} />
-      <StreakTimeline reflections={reflections} />
       {scoreData && <HolzenScoreDetail scoreData={scoreData} />}
-      <RitualStatsCard />
+      <StreakTimeline reflections={reflections} />
+      <InsightsPanel reflections={reflections} />
       <DecisionQualityCard reflections={reflections} />
+      <RitualStatsCard />
       <StatsTrends reflections={reflections} />
       <MoodTrendChart reflections={reflections} />
       <MoodPriceChart reflections={reflections} />
       <MoodPriceScatter reflections={reflections} />
-      <MoodTrends reflections={reflections} />
-      <InsightsPanel reflections={reflections} />
     </div>
   );
 }
