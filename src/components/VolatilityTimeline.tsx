@@ -246,8 +246,13 @@ export function VolatilityTimeline() {
               tick={{ fontSize: 9, fill: 'hsl(var(--muted-foreground))' }}
               tickLine={false}
               axisLine={false}
-              tickFormatter={(v: number) => formatBtcPrice(v, currency).replace(/\.00$/, '')}
-              width={45}
+              tickFormatter={(v: number) => {
+                const sym = currency === 'JPY' || currency === 'KRW' ? '' : '';
+                if (v >= 1_000_000) return `${formatBtcPrice(v / 1_000_000, currency).replace(/,/g, '').replace(/\.00$/, '')}M`;
+                if (v >= 1_000) return `${formatBtcPrice(v / 1_000, currency).replace(/,/g, '').replace(/\.00$/, '')}K`;
+                return formatBtcPrice(v, currency).replace(/\.00$/, '');
+              }}
+              width={55}
             />
             <RechartsTooltip
               content={<ChartTooltip currency={currency} />}
