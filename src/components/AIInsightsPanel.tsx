@@ -42,7 +42,7 @@ interface Props {
 
 export function AIInsightsPanel({ reflectionCount }: Props) {
   const { user } = useAuth();
-  const [data, setData] = useState<InsightsRow | null>(null);
+  const [allData, setAllData] = useState<InsightsRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
 
@@ -53,9 +53,9 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
       .select('*')
       .eq('user_id', user.id)
       .order('generated_at', { ascending: false })
-      .limit(1);
+      .limit(20);
 
-    setData((rows as unknown as InsightsRow[])?.[0] ?? null);
+    setAllData((rows as unknown as InsightsRow[]) ?? []);
     setLoading(false);
   }, [user]);
 
