@@ -5,12 +5,13 @@ import { useAuth } from '@/hooks/use-auth';
 import { Hand, TrendingDown, TrendingUp, Minus, Check, Flame } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { hapticFeedback } from '@/lib/haptics';
+import { useTranslation } from 'react-i18next';
 
 const outcomes = [
-  { value: 'held', label: 'Held', icon: Hand },
-  { value: 'sold', label: 'Sold', icon: TrendingDown },
-  { value: 'bought', label: 'Bought', icon: TrendingUp },
-  { value: 'nothing', label: 'Nothing', icon: Minus },
+  { value: 'held', key: 'held', icon: Hand },
+  { value: 'sold', key: 'sold', icon: TrendingDown },
+  { value: 'bought', key: 'bought', icon: TrendingUp },
+  { value: 'nothing', key: 'nothing', icon: Minus },
 ] as const;
 
 interface Props {
@@ -20,6 +21,7 @@ interface Props {
 
 export function OutcomePrompt({ reflectionId, onComplete }: Props) {
   const { user } = useAuth();
+  const { t } = useTranslation();
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [pendingCount, setPendingCount] = useState(0);
@@ -75,7 +77,7 @@ export function OutcomePrompt({ reflectionId, onComplete }: Props) {
               className="flex items-center gap-1.5"
             >
               <Flame className="h-3.5 w-3.5 text-primary" />
-              <p className="text-xs font-mono text-muted-foreground">Streak updated</p>
+              <p className="text-xs font-mono text-muted-foreground">{t('outcome.streakUpdated')}</p>
             </motion.div>
           </motion.div>
         ) : (
@@ -86,19 +88,19 @@ export function OutcomePrompt({ reflectionId, onComplete }: Props) {
             className="space-y-4"
           >
             <div className="space-y-1">
-              <p className="text-sm font-mono text-muted-foreground">What did you do?</p>
+              <p className="text-sm font-mono text-muted-foreground">{t('outcome.whatDidYouDo')}</p>
               {pendingCount >= 3 ? (
                 <p className="text-[10px] font-mono text-muted-foreground/50">
-                  You have {pendingCount} reflections without an outcome. Logging builds your streak.
+                  {t('outcome.pendingOutcomes', { count: pendingCount })}
                 </p>
               ) : (
                 <p className="text-[10px] font-mono text-muted-foreground/50">
-                  Logging an outcome builds your streak.
+                  {t('outcome.loggingBuildsStreak')}
                 </p>
               )}
             </div>
             <div className="grid grid-cols-4 gap-2">
-              {outcomes.map(({ value, label, icon: Icon }) => (
+              {outcomes.map(({ value, key, icon: Icon }) => (
                 <Button
                   key={value}
                   variant="outline"
@@ -108,7 +110,7 @@ export function OutcomePrompt({ reflectionId, onComplete }: Props) {
                   className="flex flex-col items-center gap-1 h-auto py-3 text-xs font-mono"
                 >
                   <Icon className="h-4 w-4" />
-                  {label}
+                  {t(`outcome.${key}`)}
                 </Button>
               ))}
             </div>
@@ -116,7 +118,7 @@ export function OutcomePrompt({ reflectionId, onComplete }: Props) {
               onClick={onComplete}
               className="text-[10px] font-mono text-muted-foreground/60 underline w-full text-center"
             >
-              Skip
+              {t('common.skip')}
             </button>
           </motion.div>
         )}

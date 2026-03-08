@@ -1,22 +1,23 @@
 import { Button } from '@/components/ui/button';
+import { useTranslation } from 'react-i18next';
 
 const moodGroups = [
   {
-    label: 'High energy',
+    key: 'highEnergy',
     moods: [
-      { value: 'fomo', label: 'FOMO', emoji: '🔥' },
-      { value: 'excited', label: 'Excited', emoji: '⚡' },
-      { value: 'greedy', label: 'Greedy', emoji: '🤑' },
-      { value: 'anxious', label: 'Anxious', emoji: '😰' },
+      { value: 'fomo', key: 'fomo', emoji: '🔥' },
+      { value: 'excited', key: 'excited', emoji: '⚡' },
+      { value: 'greedy', key: 'greedy', emoji: '🤑' },
+      { value: 'anxious', key: 'anxious', emoji: '😰' },
     ],
   },
   {
-    label: 'Low energy',
+    key: 'lowEnergy',
     moods: [
-      { value: 'calm', label: 'Calm', emoji: '🧘' },
-      { value: 'detached', label: 'Detached', emoji: '😶' },
-      { value: 'uncertain', label: 'Uncertain', emoji: '🤔' },
-      { value: 'fearful', label: 'Fearful', emoji: '😨' },
+      { value: 'calm', key: 'calm', emoji: '🧘' },
+      { value: 'detached', key: 'detached', emoji: '😶' },
+      { value: 'uncertain', key: 'uncertain', emoji: '🤔' },
+      { value: 'fearful', key: 'fearful', emoji: '😨' },
     ],
   },
 ] as const;
@@ -34,16 +35,18 @@ interface Props {
 }
 
 export function MoodCheck({ onSelect, onSkip }: Props) {
+  const { t } = useTranslation();
+
   return (
     <div className="space-y-4">
-      <p className="text-sm font-mono text-muted-foreground">How are you feeling right now?</p>
+      <p className="text-sm font-mono text-muted-foreground">{t('moodCheck.howAreYouFeeling')}</p>
       {moodGroups.map((group) => (
-        <div key={group.label} className="space-y-1.5">
+        <div key={group.key} className="space-y-1.5">
           <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground/50">
-            {group.label}
+            {t(`moodCheck.${group.key}`)}
           </p>
           <div className="grid grid-cols-4 gap-1.5">
-            {group.moods.map(({ value, label, emoji }) => (
+            {group.moods.map(({ value, key, emoji }) => (
               <Button
                 key={value}
                 variant="outline"
@@ -52,7 +55,7 @@ export function MoodCheck({ onSelect, onSkip }: Props) {
                 className="flex flex-col items-center gap-0.5 h-auto py-2.5 text-[10px] font-mono border-border/50 hover:border-primary/30 hover:bg-primary/5 transition-colors"
               >
                 <span className="text-sm">{emoji}</span>
-                {label}
+                {t(`moodCheck.moods.${key}`)}
               </Button>
             ))}
           </div>
@@ -62,7 +65,7 @@ export function MoodCheck({ onSelect, onSkip }: Props) {
         onClick={onSkip}
         className="text-[10px] font-mono text-muted-foreground/60 underline w-full text-center"
       >
-        Skip
+        {t('common.skip')}
       </button>
     </div>
   );
