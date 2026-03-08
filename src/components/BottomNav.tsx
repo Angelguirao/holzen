@@ -1,11 +1,12 @@
 import { NavLink } from 'react-router-dom';
-import { Home, Clock, User, Settings } from 'lucide-react';
+import { Home, Clock, BookOpen, User, Settings } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 
 const tabs = [
   { to: '/', icon: Home, key: 'home' },
   { to: '/history', icon: Clock, key: 'history' },
+  { to: '/library', icon: BookOpen, key: 'library' },
   { to: '/profile', icon: User, key: 'profile' },
   { to: '/settings', icon: Settings, key: 'settings' },
 ] as const;

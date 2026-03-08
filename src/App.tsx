@@ -55,6 +55,7 @@ const App = () => (
                 <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
                   <Route path="/" element={<Home />} />
                   <Route path="/history" element={<History />} />
+                  <Route path="/library" element={<Library />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/ambient" element={<Ambient />} />
