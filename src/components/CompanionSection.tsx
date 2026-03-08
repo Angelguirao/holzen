@@ -2,6 +2,7 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { BreathingExercise } from './BreathingExercise';
 import { HaikuDisplay } from './HaikuDisplay';
 import { LearningInput } from './LearningInput';
+import { SignalDisplay } from './SignalDisplay';
 import { ChevronDown, Check } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -21,12 +22,20 @@ interface CompletionState {
   breathing: boolean;
   haiku: boolean;
   learning: boolean;
+  signal: boolean;
 }
 
 interface NudgeData {
   title: string;
   body: string;
   citation: string;
+  url: string;
+}
+
+interface SignalData {
+  title: string;
+  body: string;
+  source: string;
   url: string;
 }
 
@@ -79,10 +88,12 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
   const [expandedBreathing, setExpandedBreathing] = useState(false);
   const [expandedHaiku, setExpandedHaiku] = useState(false);
   const [expandedLearning, setExpandedLearning] = useState(false);
+  const [expandedSignal, setExpandedSignal] = useState(false);
   const [completion, setCompletion] = useState<CompletionState>({
     breathing: false,
     haiku: false,
     learning: false,
+    signal: false,
   });
 
   // Load persisted completion state from DB
@@ -99,6 +110,7 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
             breathing: (data as any).breathing_completed ?? false,
             haiku: (data as any).haiku_read ?? false,
             learning: (data as any).learning_read ?? false,
+            signal: false, // Signal is ephemeral, not persisted
           });
         }
       });
@@ -120,7 +132,6 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
     setNudgeLoading(true);
     setNudgeError(false);
 
-    // First check if nudge already exists in DB
     supabase
       .from('reflections')
       .select('learning_title, learning_body, learning_citation, learning_url')
@@ -129,7 +140,6 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
       .then(({ data: row }) => {
         if (cancelled) return;
         if (row?.learning_citation) {
-          // Already persisted — use it
           setNudge({
             title: row.learning_title ?? '',
             body: row.learning_body ?? '',
@@ -140,7 +150,6 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
           return;
         }
 
-        // Not yet generated — fetch from AI
         supabase.functions
           .invoke('ground-nudge', { body: { context: context ?? '' } })
           .then(({ data, error: fnError }) => {
@@ -168,10 +177,41 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
     return () => { cancelled = true; };
   }, [prefs.learning, reflectionId, context]);
 
+  // Signal companion state
+  const [signal, setSignal] = useState<SignalData | null>(null);
+  const [signalLoading, setSignalLoading] = useState(false);
+  const [signalError, setSignalError] = useState(false);
+  const signalFetchedRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!reflectionId) return;
+    const key = reflectionId;
+    if (signalFetchedRef.current === key) return;
+    signalFetchedRef.current = key;
+
+    let cancelled = false;
+    setSignalLoading(true);
+    setSignalError(false);
+
+    supabase.functions
+      .invoke('signal-companion', { body: { context: context ?? '' } })
+      .then(({ data, error: fnError }) => {
+        if (cancelled) return;
+        if (fnError || !data || data.error) {
+          setSignalError(true);
+        } else {
+          setSignal(data as SignalData);
+        }
+        setSignalLoading(false);
+      });
+
+    return () => { cancelled = true; };
+  }, [reflectionId, context]);
+
   const markCompleted = useCallback(async (key: keyof CompletionState) => {
     if (completion[key]) return;
     setCompletion((prev) => ({ ...prev, [key]: true }));
-    if (reflectionId) {
+    if (reflectionId && key !== 'signal') {
       const dbKey = key === 'breathing' ? 'breathing_completed' : key === 'haiku' ? 'haiku_read' : 'learning_read';
       await supabase
         .from('reflections')
@@ -183,8 +223,9 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
   const hasBreathing = prefs.breathing;
   const hasHaiku = prefs.haiku && companions.haiku;
   const hasLearning = prefs.learning;
+  const hasSignal = !!reflectionId; // Signal is always available when there's a reflection
 
-  if (!hasBreathing && !hasHaiku && !hasLearning) return null;
+  if (!hasBreathing && !hasHaiku && !hasLearning && !hasSignal) return null;
 
   return (
     <div className="space-y-3 pt-2 border-t border-border/40">
@@ -233,6 +274,24 @@ export function CompanionSection({ companions, prefs, severity = 'mild', reflect
             nudge={nudge}
             nudgeLoading={nudgeLoading}
             nudgeError={nudgeError}
+          />
+        </CollapsibleCompanion>
+      )}
+
+      {hasSignal && (
+        <CollapsibleCompanion
+          label="Read the signal"
+          expanded={expandedSignal}
+          onToggle={() => {
+            setExpandedSignal((v) => !v);
+            if (!completion.signal) markCompleted('signal');
+          }}
+          completed={completion.signal}
+        >
+          <SignalDisplay
+            signal={signal}
+            loading={signalLoading}
+            error={signalError}
           />
         </CollapsibleCompanion>
       )}
