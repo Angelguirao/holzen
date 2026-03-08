@@ -72,6 +72,8 @@ export function useHolzen() {
         setAiInsightsEnabledState((data as any).ai_insights_enabled ?? true);
         setRitualTemplateState((data as any).ritual_template ?? 'standard');
         setNotifyBadgesState((data as any).notify_badges ?? true);
+        setMotivationsState((data as any).motivations ?? []);
+        setMantraState((data as any).mantra ?? null);
         setHasOnboarded(data.has_onboarded ?? false);
         setCompanionPrefsState({
           breathing: data.companion_breathing ?? true,
