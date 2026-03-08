@@ -31,7 +31,7 @@ export const ReflectionMessage = forwardRef<HTMLDivElement, Props>(function Refl
           onClick={onDismiss}
           className="text-xs font-mono text-muted-foreground"
         >
-          I've sat with this
+          Done
         </Button>
       </div>
 
