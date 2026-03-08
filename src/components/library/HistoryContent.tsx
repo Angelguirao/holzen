@@ -172,7 +172,7 @@ function HistoryCompanions({ label, r }: { label: string; r: Reflection }) {
   );
 }
 
-const History = () => {
+const HistoryContent = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { currency } = useHolzen();
