@@ -205,7 +205,7 @@ export function Onboarding({ onComplete }: Props) {
                             className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
                             whileHover={prefersReduced ? {} : { x: 4 }}
                           >
-                            Read as haiku →
+                            {t('onboarding.readAsHaiku')}
                           </motion.button>
                         )}
                       </AnimatePresence>
