@@ -327,6 +327,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
                 .eq('id', reflectionId)
                 .then(() => {});
               autoSaveToLibrary({ title: signalData.title, body: signalData.body, sourceType: 'signal', sourceUrl: signalData.url });
+            }
             setSignalLoading(false);
           });
       });
