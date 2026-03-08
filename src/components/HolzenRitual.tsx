@@ -186,6 +186,31 @@ export function HolzenRitual({ open, onClose, template, reflectionMessage, refle
               </div>
             )}
 
+            {/* Mantra overlay */}
+            <AnimatePresence>
+              {showMantra && (
+                <motion.div
+                  key="mantra"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 1 }}
+                  className="flex flex-col items-center gap-4 py-12 text-center"
+                >
+                  {mantra && (
+                    <p className="text-sm font-mono text-foreground/70 italic leading-relaxed max-w-xs">
+                      "{mantra}"
+                    </p>
+                  )}
+                  {!mantra && motivations.length > 0 && (
+                    <p className="text-xs font-mono text-muted-foreground/60 tracking-wider uppercase">
+                      Remember why you hold
+                    </p>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+
             {/* Step content */}
             <AnimatePresence mode="wait">
               {completed ? (
@@ -210,7 +235,7 @@ export function HolzenRitual({ open, onClose, template, reflectionMessage, refle
                     Return
                   </Button>
                 </motion.div>
-              ) : (
+              ) : !showMantra ? (
                 <motion.div
                   key={step.id}
                   initial={{ opacity: 0, x: 20 }}
@@ -223,7 +248,7 @@ export function HolzenRitual({ open, onClose, template, reflectionMessage, refle
                   {step.id === 'journal' && <RitualJournal onComplete={(t) => { setJournalText(t); advance(); }} />}
                   {step.id === 'decide' && <RitualDecide onComplete={handleDecision} />}
                 </motion.div>
-              )}
+              ) : null}
             </AnimatePresence>
           </div>
         </motion.div>
