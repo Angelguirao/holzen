@@ -68,7 +68,7 @@ interface ReflectionResult {
   learning_url: string | null;
 }
 
-async function generateReflection(context: string, apiKey: string, tone = "stoic"): Promise<ReflectionResult | null> {
+async function generateReflection(context: string, apiKey: string, tone = "stoic", language = "en"): Promise<ReflectionResult | null> {
   const TONE_INSTRUCTIONS: Record<string, string> = {
     stoic: "Write in a calm, stoic tone. Brief and grounded. Like Marcus Aurelius observing the market.",
     zen: "Write in a gentle zen tone. Spacious, almost meditative. Use natural metaphors.",
