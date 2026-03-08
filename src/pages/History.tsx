@@ -351,8 +351,18 @@ const History = () => {
         (r) => r.message.toLowerCase().includes(q) || r.context?.toLowerCase().includes(q) || r.note?.toLowerCase().includes(q) || r.tags?.some((t) => t.toLowerCase().includes(q))
       );
     }
+    // If calendar view with a selected date, filter to that day
+    if (viewMode === 'calendar' && calendarDate) {
+      result = reflections.filter((r) => isSameDay(new Date(r.created_at), calendarDate));
+      if (search.trim()) {
+        const q = search.toLowerCase();
+        result = result.filter(
+          (r) => r.message.toLowerCase().includes(q) || r.context?.toLowerCase().includes(q) || r.note?.toLowerCase().includes(q) || r.tags?.some((t) => t.toLowerCase().includes(q))
+        );
+      }
+    }
     return result;
-  }, [recentReflections, search]);
+  }, [recentReflections, reflections, search, viewMode, calendarDate]);
 
   const displayedReflections = tab === 'recent' ? filteredRecent : filtered;
 
