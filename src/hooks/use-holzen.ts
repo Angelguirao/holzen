@@ -394,7 +394,7 @@ export function useHolzen() {
         setError('Could not check market data. Will retry automatically.');
       }
     }
-  }, [user, threshold, thresholdDown, cumulativeThreshold, isInCooldown, isInQuietHours, generateMessage]);
+  }, [user, threshold, thresholdDown, cumulativeThreshold, isInCooldown, isInQuietHours, generateMessage, currency]);
 
   const [lastTriggerAt, setLastTriggerAt] = useState<string | null>(null);
   const [lastManualAt, setLastManualAt] = useState<number | null>(() => {
