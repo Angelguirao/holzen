@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { OfflineBanner } from "./components/OfflineBanner";
+import { CookieConsent } from "./components/CookieConsent";
 import AuthLoading from "./components/AuthLoading";
 import { AppLayout } from "./components/AppLayout";
 import Home from "./pages/Home";
