@@ -177,6 +177,7 @@ const History = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { currency } = useHolzen();
+  const { subscribed } = useSubscription();
   const [reflections, setReflections] = useState<Reflection[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
