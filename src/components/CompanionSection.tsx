@@ -554,19 +554,23 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
       )}
 
       {hasHaiku && (
-        <CollapsibleCompanion
-          label={labels.haiku}
-          expanded={expandedHaiku}
-          onToggle={() => {
-            setExpandedHaiku((v) => !v);
-            if (!completion.haiku) markCompleted('haiku');
-          }}
-          completed={completion.haiku}
-          isFavorite={favorites['haiku']}
-          onToggleFavorite={() => toggleCompanionFavorite('haiku')}
-        >
-          <HaikuDisplay haiku={companions.haiku!} />
-        </CollapsibleCompanion>
+        isPro ? (
+          <CollapsibleCompanion
+            label={labels.haiku}
+            expanded={expandedHaiku}
+            onToggle={() => {
+              setExpandedHaiku((v) => !v);
+              if (!completion.haiku) markCompleted('haiku');
+            }}
+            completed={completion.haiku}
+            isFavorite={favorites['haiku']}
+            onToggleFavorite={() => toggleCompanionFavorite('haiku')}
+          >
+            <HaikuDisplay haiku={companions.haiku!} />
+          </CollapsibleCompanion>
+        ) : (
+          <ProLockedCompanion label={labels.haiku} onUpgrade={() => requirePro('haiku')} />
+        )
       )}
 
       {hasLearning && (
