@@ -105,11 +105,8 @@ const Home = () => {
 
   const { reflection: nightReflection, dismiss: dismissNight } = useNightReflection();
 
-  const [showOutcome, setShowOutcome] = useState(false);
   const [showVoid, setShowVoid] = useState(false);
   const [showRitual, setShowRitual] = useState(false);
-  const [outcomeReflectionId, setOutcomeReflectionId] = useState<string | null>(null);
-  const [showMoodCheck, setShowMoodCheck] = useState(false);
   const [priceHidden, setPriceHidden] = useState(() => localStorage.getItem('holzen_hide_price') === 'true');
   const [btcMode, setBtcMode] = useState(() => localStorage.getItem('holzen_btc_mode') === 'true');
   const [zenMode] = useState(() => localStorage.getItem('holzen_zen_mode') === 'true');
