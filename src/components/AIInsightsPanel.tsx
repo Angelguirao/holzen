@@ -118,6 +118,14 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
     }
   }, [user, language, loadInsights, t]);
 
+  if (subLoading) {
+    return (
+      <div className="space-y-3">
+        <div className="h-20 w-full rounded-md bg-muted/30 animate-pulse" />
+      </div>
+    );
+  }
+
   if (!subscribed) {
     return (
       <div className="py-8 text-center space-y-2">
