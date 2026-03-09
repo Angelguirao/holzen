@@ -177,30 +177,13 @@ const Home = () => {
     });
   }, []);
 
-  const handleNeedAMoment = () => {
+  const handleNeedAPause = () => {
     if (manualCooldownRemaining() > 0) return;
-    setShowMoodCheck(true);
-  };
-
-  const handleMoodSelected = (mood: MoodValue) => {
-    setShowMoodCheck(false);
-    manualTrigger(mood);
-  };
-
-  const handleMoodSkipped = () => {
-    setShowMoodCheck(false);
     manualTrigger();
   };
 
   const handleDismiss = () => {
-    setOutcomeReflectionId(lastReflectionId);
     dismissMessage();
-    setShowOutcome(true);
-  };
-
-  const handleOutcomeComplete = () => {
-    setShowOutcome(false);
-    setOutcomeReflectionId(null);
   };
 
   useEffect(() => {
