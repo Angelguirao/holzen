@@ -76,8 +76,8 @@
       "practice": "Pratik"
     },
     "subscription": {
-      "usedAllFree": "3 ücretsiz düşüncenizi kullandınız. Devam etmek için abone olun.",
-      "pricePerMonth": "Ayda 3$ · İstediğiniz zaman iptal edin",
+      "usedAllFree": "{{freeReflections}} ücretsiz düşüncenizi kullandınız. Devam etmek için abone olun.",
+      "pricePerMonth": "Ayda ${{price}} · İstediğiniz zaman iptal edin",
       "openingCheckout": "Ödeme açılıyor…",
       "freeRemaining": "{{count}} ücretsiz düşünce kaldı",
       "freeRemaining_other": "{{count}} ücretsiz düşünce kaldı"
