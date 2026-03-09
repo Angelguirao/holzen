@@ -76,11 +76,12 @@
       "practice": "Pratik"
     },
     "subscription": {
-      "usedAllFree": "{{freeReflections}} ücretsiz düşüncenizi kullandınız. Devam etmek için abone olun.",
+      "monthlyLimitReached": "Bu ay {{freeReflectionsPerMonth}} ücretsiz düşüncenizi kullandınız. Sınırsız için Pro'ya geçin.",
+      "upgradeToPro": "Ayda ${{price}} · Sınırsız düşünce + AI yol arkadaşları · İstediğiniz zaman iptal",
       "pricePerMonth": "Ayda ${{price}} · İstediğiniz zaman iptal edin",
       "openingCheckout": "Ödeme açılıyor…",
-      "freeRemaining": "{{count}} ücretsiz düşünce kaldı",
-      "freeRemaining_other": "{{count}} ücretsiz düşünce kaldı"
+      "freeRemaining": "Bu ay {{count}} ücretsiz düşünce kaldı",
+      "freeRemaining_other": "Bu ay {{count}} ücretsiz düşünce kaldı"
     },
     "errors": {
       "couldNotReachPrice": "Fiyat verilerine ulaşılamadı",
