@@ -1,11 +1,10 @@
 import { useTranslation } from 'react-i18next';
-import { useState, useCallback, forwardRef } from 'react';
-import { Slider } from '@/components/ui/slider';
+import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { HaikuDisplay } from '@/components/HaikuDisplay';
-import { LearningInput } from '@/components/LearningInput';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
+import { OnboardingWelcome } from '@/components/onboarding/OnboardingWelcome';
+import { OnboardingCompanions } from '@/components/onboarding/OnboardingCompanions';
+import { OnboardingThreshold } from '@/components/onboarding/OnboardingThreshold';
 
 interface OnboardingResult {
   threshold: number;
@@ -18,6 +17,7 @@ interface Props {
 }
 
 const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+const TOTAL_STEPS = 3;
 
 export function Onboarding({ onComplete }: Props) {
   const { t } = useTranslation();
@@ -26,22 +26,10 @@ export function Onboarding({ onComplete }: Props) {
   const [timezone] = useState(detectedTimezone);
   const [threshold, setThreshold] = useState(5);
   const [direction, setDirection] = useState(1);
-  const [breathingDemo, setBreathingDemo] = useState(false);
-  const [haikuExpanded, setHaikuExpanded] = useState(false);
-  const [learningExpanded, setLearningExpanded] = useState(false);
   const prefersReduced = useReducedMotion();
-
-  const totalSteps = 3;
-  const isPreviewStep = step === 1;
-  const isThresholdStep = step === 2;
 
   const goTo = useCallback((next: number) => {
     setDirection(next > step ? 1 : -1);
-    if (next !== 1) {
-      setBreathingDemo(false);
-      setHaikuExpanded(false);
-      setLearningExpanded(false);
-    }
     setStep(next);
   }, [step]);
 
@@ -62,10 +50,12 @@ export function Onboarding({ onComplete }: Props) {
   const stagger = (delay: number) =>
     prefersReduced ? {} : { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 }, transition: { delay, duration: 0.4, ease } };
 
+  const canProceed = step === 0 ? true : true;
+
   return (
-    <div className="min-h-screen flex items-center justify-center p-6">
+    <div className="fixed inset-0 z-50 bg-background flex items-center justify-center p-6">
       <div className="w-full max-w-sm">
-        <div className="min-h-[420px] relative">
+        <div className="min-h-[440px] relative">
           <AnimatePresence mode="wait" custom={direction}>
             <motion.div
               key={step}
@@ -76,275 +66,88 @@ export function Onboarding({ onComplete }: Props) {
               exit="exit"
               transition={transition}
             >
-              {/* Step 1: Welcome + Name + Timezone */}
               {step === 0 && (
-                <div className="space-y-8">
-                  <motion.p
-                    className="text-xs font-mono tracking-[0.25em] uppercase text-muted-foreground"
-                    {...stagger(0.1)}
-                  >
-                    {t('common.holzen')}
-                  </motion.p>
-                  <motion.p
-                    className="text-xl leading-relaxed text-foreground"
-                    {...stagger(0.2)}
-                  >
-                    {t('onboarding.heroText')}
-                  </motion.p>
-                  <motion.div className="space-y-4" {...stagger(0.3)}>
-                    <div className="space-y-2">
-                      <p className="text-xs font-mono text-muted-foreground">{t('onboarding.whatToCallYou')}</p>
-                      <Input
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
-                        placeholder={t('onboarding.firstNameOptional')}
-                        maxLength={30}
-                        className="text-xs font-mono"
-                        autoFocus
-                      />
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <p className="text-[10px] font-mono text-muted-foreground/50">
-                        {t('onboarding.timezone', { tz: timezone.replace(/_/g, ' ') })}
-                      </p>
-                    </div>
-                  </motion.div>
-                  <motion.div {...stagger(0.4)}>
-                    <Nav showBack={false} onNext={() => goTo(1)} nextLabel={t('common.continue')} />
-                  </motion.div>
-                </div>
+                <OnboardingWelcome
+                  firstName={firstName}
+                  onFirstNameChange={setFirstName}
+                  timezone={timezone}
+                  stagger={stagger}
+                />
               )}
 
-              {/* Step 2: Companion preview */}
-              {isPreviewStep && (
-                <div className="space-y-6">
-                  <motion.p
-                    className="text-xs font-mono tracking-[0.25em] uppercase text-muted-foreground"
-                    {...stagger(0.1)}
-                  >
-                    {t('onboarding.yourCompanions')}
-                  </motion.p>
-                  <motion.p
-                    className="text-sm text-muted-foreground leading-relaxed"
-                    {...stagger(0.15)}
-                  >
-                    {t('onboarding.companionIntro')}
-                  </motion.p>
-
-                  <motion.div
-                    className="rounded-md border border-border/60 bg-muted/20 px-4 py-4 space-y-4"
-                    {...stagger(0.25)}
-                  >
-                    <p className="text-[10px] font-mono text-muted-foreground/60">
-                      {t('onboardingSample.context')}
-                    </p>
-                    <p className="text-sm leading-relaxed">
-                      {t('onboardingSample.message')}
-                    </p>
-
-                    <div className="space-y-3 pt-3 border-t border-border/30">
-                      <p className="text-[10px] font-mono text-muted-foreground/50 uppercase tracking-wider">
-                        {t('onboarding.pauseWithThis')}
-                      </p>
-
-                      {/* Breathing */}
-                      <AnimatePresence mode="wait">
-                        {breathingDemo ? (
-                          <motion.div
-                            key="breathing-active"
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            className="flex flex-col items-center gap-2 py-3"
-                          >
-                            <motion.div
-                              className="rounded-full bg-foreground/10"
-                              style={{ width: 48, height: 48 }}
-                              animate={{ scale: [0.6, 1, 1, 0.6] }}
-                              transition={{ duration: 12, repeat: Infinity, times: [0, 0.33, 0.66, 1], ease: 'easeInOut' }}
-                            />
-                            <p className="text-[10px] font-mono text-muted-foreground">
-                              {t('onboarding.inhaleHoldExhale')}
-                            </p>
-                          </motion.div>
-                        ) : (
-                          <motion.button
-                            key="breathing-prompt"
-                            onClick={() => setBreathingDemo(true)}
-                            className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
-                            whileHover={prefersReduced ? {} : { x: 4 }}
-                          >
-                            {t('onboarding.breatheWithThis')}
-                          </motion.button>
-                        )}
-                      </AnimatePresence>
-
-                      {/* Haiku */}
-                      <AnimatePresence mode="wait">
-                        {haikuExpanded ? (
-                          <motion.div
-                            key="haiku-expanded"
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            transition={{ duration: 0.3 }}
-                          >
-                            <HaikuDisplay haiku={t('onboardingSample.haiku')} />
-                          </motion.div>
-                        ) : (
-                          <motion.button
-                            key="haiku-prompt"
-                            onClick={() => setHaikuExpanded(true)}
-                            className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
-                            whileHover={prefersReduced ? {} : { x: 4 }}
-                          >
-                            {t('onboarding.readAsHaiku')}
-                          </motion.button>
-                        )}
-                      </AnimatePresence>
-
-                      {/* Learning */}
-                      <AnimatePresence mode="wait">
-                        {learningExpanded ? (
-                          <motion.div
-                            key="learning-expanded"
-                            initial={{ opacity: 0, height: 0 }}
-                            animate={{ opacity: 1, height: 'auto' }}
-                            transition={{ duration: 0.3 }}
-                          >
-                            <LearningInput
-                              title={t('onboardingSample.learningTitle')}
-                              body={t('onboardingSample.learningBody')}
-                            />
-                          </motion.div>
-                        ) : (
-                          <motion.button
-                            key="learning-prompt"
-                            onClick={() => setLearningExpanded(true)}
-                            className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
-                            whileHover={prefersReduced ? {} : { x: 4 }}
-                          >
-                            {t('onboarding.learnFromHistory')}
-                          </motion.button>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  </motion.div>
-
-                  <motion.p className="text-[10px] text-muted-foreground/60" {...stagger(0.35)}>
-                    {t('onboarding.toggleCompanions')}
-                  </motion.p>
-
-                  <motion.div {...stagger(0.4)}>
-                    <Nav showBack onBack={() => goTo(0)} onNext={() => goTo(2)} nextLabel={t('common.continue')} />
-                  </motion.div>
-                </div>
+              {step === 1 && (
+                <OnboardingCompanions stagger={stagger} />
               )}
 
-              {/* Step 3: Threshold */}
-              {isThresholdStep && (
-                <div className="space-y-8">
-                  <motion.p
-                    className="text-xs font-mono tracking-[0.25em] uppercase text-muted-foreground"
-                    {...stagger(0.1)}
-                  >
-                    {t('onboarding.yourThreshold')}
-                  </motion.p>
-                  <motion.p
-                    className="text-sm text-muted-foreground leading-relaxed"
-                    {...stagger(0.15)}
-                  >
-                    {t('onboarding.thresholdQuestion')}
-                  </motion.p>
-                  <motion.div {...stagger(0.25)}>
-                    <p className="text-4xl font-mono tracking-tight mb-6">{threshold.toFixed(1)}%</p>
-                    <Slider
-                      value={[threshold]}
-                      onValueChange={([v]) => setThreshold(v)}
-                      min={1}
-                      max={20}
-                      step={0.5}
-                      className="w-full"
-                    />
-                    <p className="text-[10px] text-muted-foreground/60 mt-3">
-                      {t('onboarding.changeThresholdLater')}
-                    </p>
-                  </motion.div>
-
-                  <motion.div className="flex items-center gap-4" {...stagger(0.35)}>
-                    <button
-                      onClick={() => goTo(1)}
-                      className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                    ← {t('common.back')}
-                    </button>
-                    <Button
-                      onClick={() => onComplete({
-                        threshold,
-                        firstName: firstName.trim() || null,
-                        timezone,
-                      })}
-                      variant="outline"
-                      size="sm"
-                      className="font-mono text-xs"
-                    >
-                      {t('common.begin')}
-                    </Button>
-                  </motion.div>
-                </div>
+              {step === 2 && (
+                <OnboardingThreshold
+                  threshold={threshold}
+                  onThresholdChange={setThreshold}
+                  stagger={stagger}
+                />
               )}
             </motion.div>
           </AnimatePresence>
         </div>
 
-        {/* Progress */}
+        {/* Navigation */}
         <motion.div
-          className="flex gap-2 items-center mt-12"
+          className="flex items-center justify-between mt-8"
           initial={prefersReduced ? {} : { opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.6 }}
+          transition={{ delay: 0.5 }}
         >
-          {[...Array(totalSteps)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="h-px bg-foreground"
-              animate={{
-                width: i === step ? '2rem' : '1rem',
-                opacity: i <= step ? 1 : 0.2,
-              }}
-              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            />
-          ))}
-          <span className="text-[10px] font-mono text-muted-foreground ml-2">
-            {step + 1}/{totalSteps}
-          </span>
+          <div className="flex items-center gap-2">
+            {[...Array(TOTAL_STEPS)].map((_, i) => (
+              <motion.div
+                key={i}
+                className="h-px bg-foreground"
+                animate={{
+                  width: i === step ? '1.5rem' : '0.75rem',
+                  opacity: i <= step ? 1 : 0.15,
+                }}
+                transition={{ duration: 0.4, ease }}
+              />
+            ))}
+            <span className="text-[10px] font-mono text-muted-foreground/40 ml-1.5">
+              {step + 1}/{TOTAL_STEPS}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-3">
+            {step > 0 && (
+              <button
+                onClick={() => goTo(step - 1)}
+                className="text-[10px] font-mono text-muted-foreground/50 hover:text-foreground transition-colors"
+              >
+                ← {t('common.back')}
+              </button>
+            )}
+
+            {step < TOTAL_STEPS - 1 ? (
+              <button
+                onClick={() => goTo(step + 1)}
+                className="text-[10px] font-mono text-muted-foreground underline underline-offset-4 hover:text-foreground transition-colors"
+              >
+                {t('common.continue')}
+              </button>
+            ) : (
+              <Button
+                onClick={() => onComplete({
+                  threshold,
+                  firstName: firstName.trim() || null,
+                  timezone,
+                })}
+                variant="outline"
+                size="sm"
+                className="font-mono text-xs h-7 px-4"
+              >
+                {t('common.begin')}
+              </Button>
+            )}
+          </div>
         </motion.div>
       </div>
     </div>
   );
 }
-
-const Nav = forwardRef<HTMLDivElement, {
-  showBack: boolean;
-  onBack?: () => void;
-  onNext: () => void;
-  nextLabel?: string;
-}>(function Nav({ showBack, onBack, onNext, nextLabel = 'Continue' }, ref) {
-  const { t } = useTranslation();
-  return (
-    <div ref={ref} className="flex items-center gap-4 pt-2">
-      {showBack && (
-        <button
-          onClick={onBack}
-          className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
-        >
-          ← {t('common.back')}
-        </button>
-      )}
-      <button
-        onClick={onNext}
-        className="text-xs font-mono text-muted-foreground underline hover:text-foreground transition-colors"
-      >
-        {nextLabel}
-      </button>
-    </div>
-  );
-});
