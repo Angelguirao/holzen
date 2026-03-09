@@ -1,7 +1,6 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { User } from '@supabase/supabase-js';
-import { trackOnce } from '@/lib/analytics';
 
 interface AuthContextType {
   user: User | null;
@@ -26,7 +25,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // Record referral on first sign-in
       if (_event === 'SIGNED_IN' && session?.user) {
-        trackOnce('signup');
         const refCode = localStorage.getItem('holzen_ref');
         if (refCode) {
           localStorage.removeItem('holzen_ref');
