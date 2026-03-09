@@ -98,7 +98,6 @@ const Home = () => {
     autoCooldownRemaining,
     cooldownHours,
     firstName,
-    ritualTemplate,
     currency,
   } = useHolzen();
 
