@@ -37,5 +37,5 @@ export function useProGate() {
     [subscribed, startCheckout, t],
   );
 
-  return { isPro, requirePro, startCheckout, checkoutLoading };
+  return { isPro, isPending: loading, requirePro, startCheckout, checkoutLoading };
 }
