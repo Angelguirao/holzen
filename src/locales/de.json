@@ -377,8 +377,8 @@
   "landing": {
     "hero": "Wenn Bitcoin sich bewegt, halte inne, bevor du handelst.",
     "heroDesc": "Holzen ist kein Trading-Tool. Es ist eine Praxis der Selbsterkenntnis. Wenn sich Bitcoin bewegt, bekommst du einen Moment zum Innehalten, Reflektieren und Beobachten deiner Muster — bevor du impulsiv handelst.",
-    "getStartedForFree": "Starte deine Praxis",
-    "noCreditCard": "Gratis-Plan verfügbar · Pro ab $5/Monat · keine Karte nötig",
+    "getStartedForFree": "Starte kostenlos",
+    "noCreditCard": "Dann ${{price}}/Monat · keine Karte · jederzeit kündbar",
     "reflectionLoop": "Der Reflexionszyklus",
     "reaction": {
       "label": "Ohne Holzen",
