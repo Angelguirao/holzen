@@ -26,6 +26,7 @@ export function Onboarding({ onComplete }: Props) {
   const [firstName, setFirstName] = useState('');
   const [timezone] = useState(detectedTimezone);
   const [threshold, setThreshold] = useState(5);
+  const [motivations, setMotivations] = useState<string[]>([]);
   const [direction, setDirection] = useState(1);
   const prefersReduced = useReducedMotion();
 
