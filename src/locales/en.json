@@ -1342,6 +1342,7 @@
   },
   "ritual": {
     "selectTemplate": "Choose your ritual",
+    "intro": "Rituals are guided step-by-step sequences that slow you down before making a financial decision. Breathe, reflect, journal, and then decide — so your choices come from clarity, not impulse.",
     "yourTemplates": "Your rituals",
     "buildYourOwn": "Build your own",
     "aiSuggest": "AI suggest",
