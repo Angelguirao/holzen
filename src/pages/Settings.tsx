@@ -43,7 +43,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
   const { t } = useTranslation();
   const { user, signOut } = useAuth();
   const { threshold, setThreshold, thresholdDown, setThresholdDown, cumulativeThreshold, setCumulativeThreshold, emailNotifications, setEmailNotifications, companionPrefs, setCompanionPref, reflectionTone, setReflectionTone, reflectionStyle, setReflectionStyle, silentMode, setSilentMode, cooldownHours, setCooldownHours, digestFrequency, setDigestFrequency, customPrompt, setCustomPrompt, quietHoursStart, quietHoursEnd, setQuietHours, streakFreezeDates, useStreakFreeze, firstName, setFirstName, nightReflectionHour, setNightReflectionHour, aiInsightsEnabled, setAiInsightsEnabled, ritualTemplate, setRitualTemplate, notifyBadges, setNotifyBadges, motivations, setMotivations, mantra, setMantra, currency, setCurrency, language, setLanguage, profileLoaded } = useHolzen();
-  const { subscribed, loading: subLoading, checkoutLoading, startCheckout, openPortal, trialRemaining } = useSubscription();
+  const { subscribed, loading: subLoading, checkoutLoading, startCheckout, openPortal, monthlyRemaining } = useSubscription();
   const { theme, setTheme } = useTheme();
   const { canInstall, install } = useInstallPrompt();
   const { isSupported: pushSupported, isSubscribed: pushSubscribed, loading: pushLoading, subscribe: pushSubscribe, unsubscribe: pushUnsubscribe } = usePushNotifications();
@@ -796,9 +796,14 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                 </button>
               ) : (
                 <div className="space-y-2">
-                  {trialRemaining !== undefined && trialRemaining > 0 && (
+                  {monthlyRemaining !== undefined && monthlyRemaining > 0 && (
                     <p className="text-xs font-mono text-muted-foreground">
-                      {t('home.subscription.freeRemaining', { count: trialRemaining })}
+                      {t('home.subscription.freeRemaining', { count: monthlyRemaining })}
+                    </p>
+                  )}
+                  {monthlyRemaining !== undefined && monthlyRemaining <= 0 && (
+                    <p className="text-xs font-mono text-muted-foreground">
+                      {t('home.subscription.monthlyLimitReached')}
                     </p>
                   )}
                   <p className="text-xs font-mono text-muted-foreground">
@@ -810,7 +815,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                     className="w-full font-mono text-xs"
                     size="sm"
                   >
-                    {checkoutLoading ? t('settings.openingCheckout') : t('common.subscribe')}
+                    {checkoutLoading ? t('settings.openingCheckout') : t('pro.upgradeCta')}
                   </Button>
                 </div>
               )}

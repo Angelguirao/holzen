@@ -3,14 +3,15 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { PRICING } from '@/lib/pricing';
 
-const FREE_TRIAL_COUNT = PRICING.freeReflections;
+const FREE_MONTHLY_LIMIT = PRICING.freeReflectionsPerMonth;
 
 export function useSubscription() {
   const { user } = useAuth();
   const [subscribed, setSubscribed] = useState(false);
   const [loading, setLoading] = useState(true);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
-  const [trialRemaining, setTrialRemaining] = useState<number | undefined>(undefined);
+  const [monthlyUsed, setMonthlyUsed] = useState(0);
+  const [monthlyRemaining, setMonthlyRemaining] = useState<number | undefined>(undefined);
 
   const checkSubscription = useCallback(async () => {
     if (!user) {
@@ -25,17 +26,21 @@ export function useSubscription() {
 
       if (data?.subscribed) {
         setSubscribed(true);
-        setTrialRemaining(undefined);
+        setMonthlyRemaining(undefined);
       } else {
         setSubscribed(false);
-        // Count reflections for trial
+        // Count reflections this month
+        const now = new Date();
+        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
         const { count } = await supabase
           .from('reflections')
           .select('*', { count: 'exact', head: true })
-          .eq('user_id', user.id);
+          .eq('user_id', user.id)
+          .gte('created_at', monthStart);
 
         const used = count ?? 0;
-        setTrialRemaining(Math.max(0, FREE_TRIAL_COUNT - used));
+        setMonthlyUsed(used);
+        setMonthlyRemaining(Math.max(0, FREE_MONTHLY_LIMIT - used));
       }
     } catch {
       setSubscribed(false);
@@ -77,5 +82,18 @@ export function useSubscription() {
     }
   }, []);
 
-  return { subscribed, loading, checkoutLoading, startCheckout, openPortal, refresh: checkSubscription, trialRemaining };
+  /** Whether the user can create a new reflection (subscribed OR has free reflections left) */
+  const canReflect = subscribed || (monthlyRemaining !== undefined && monthlyRemaining > 0);
+
+  return {
+    subscribed,
+    loading,
+    checkoutLoading,
+    startCheckout,
+    openPortal,
+    refresh: checkSubscription,
+    monthlyRemaining,
+    monthlyUsed,
+    canReflect,
+  };
 }
