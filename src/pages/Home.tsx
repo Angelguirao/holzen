@@ -24,6 +24,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { toast } from 'sonner';
 import { AlertCircle, Loader2, Pause, Pin, Timer, Sparkles, Waves, RotateCcw, RefreshCw, Lock } from 'lucide-react';
+import { PracticeWidget } from '@/components/PracticeWidget';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { playNotificationTone, prefetchNotificationTone } from '@/lib/notification-tone';
 import {
