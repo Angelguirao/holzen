@@ -6,6 +6,8 @@ import { hapticFeedback } from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useHolzen } from '@/hooks/use-holzen';
+import { useSubscription } from '@/hooks/use-subscription';
+import { toast } from 'sonner';
 import { useScrollReveal } from '@/hooks/use-scroll-reveal';
 import { CompanionSection, type CompanionData, type CompanionPrefs } from '@/components/CompanionSection';
 import { ReflectionNote } from '@/components/ReflectionNote';
