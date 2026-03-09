@@ -176,14 +176,16 @@ const Profile = () => {
           <StatsContent reflections={reflections} memberSince={user?.created_at} />
         )
       ) : tab === 'insights' ? (
-        loading ? (
-          <div className="space-y-3">
-            <Skeleton className="h-20 w-full rounded-md" />
-            <Skeleton className="h-20 w-full rounded-md" />
-          </div>
-        ) : (
-          <AIInsightsPanel reflectionCount={reflections.length} />
-        )
+        <ProLock>
+          {loading ? (
+            <div className="space-y-3">
+              <Skeleton className="h-20 w-full rounded-md" />
+              <Skeleton className="h-20 w-full rounded-md" />
+            </div>
+          ) : (
+            <AIInsightsPanel reflectionCount={reflections.length} />
+          )}
+        </ProLock>
       ) : tab === 'badges' ? (
         loading ? (
           <div className="space-y-3">
@@ -193,7 +195,9 @@ const Profile = () => {
           <BadgesPanel reflections={reflections} />
         )
       ) : tab === 'activity' ? (
-        <HistoryContent />
+        <ProLock>
+          <HistoryContent />
+        </ProLock>
       ) : (
         lettersLoading ? (
           <div className="space-y-3">
