@@ -1424,6 +1424,8 @@
     "checkinSaved": "Check-in logged",
     "journalPlaceholder": "Write freely…",
     "journalSaved": "Journal entry saved",
+    "generatingPrompt": "Crafting your prompt…",
+    "aiGenerated": "AI generated",
     "prompt1": "What pattern am I noticing in my reactions lately?",
     "prompt2": "What would I tell a friend feeling this way about their portfolio?",
     "prompt3": "What am I avoiding looking at right now?",

@@ -37,3 +37,5 @@ project_id = "edgbwdecaoottowliimu"
     verify_jwt = false
   [functions.historical-insight]
     verify_jwt = false
+  [functions.journal-prompt]
+    verify_jwt = false
