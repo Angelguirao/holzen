@@ -57,7 +57,7 @@
     "greeting": "{{name}}.",
     "noActiveReflection": "No active reflection.",
     "generatingReflection": "Generating reflection…",
-    "needAMoment": "I need a moment",
+    "needAMoment": "I need a pause",
     "manualReflectionIn": "Manual reflection in {{minutes}} min",
     "cooldownMessage": "Take this time to breathe. The next reflection will be here when you need it.",
     "requestAnytime": "Request a reflection anytime — no threshold required.",
