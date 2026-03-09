@@ -128,6 +128,13 @@ const Landing = () => {
           <div className="flex items-center gap-4">
             <LandingLanguageSwitcher />
             <button
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="text-muted-foreground hover:text-foreground transition-colors"
+              aria-label="Toggle dark mode"
+            >
+              {theme === 'dark' ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+            </button>
+            <button
               onClick={() => navigate('/auth')}
               className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
             >
