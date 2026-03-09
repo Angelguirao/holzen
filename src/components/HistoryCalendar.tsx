@@ -170,6 +170,7 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate }: Prop
         const ritualsList = dayItems.filter((a) => a.type === 'ritual');
         const lettersList = dayItems.filter((a) => a.type === 'letter');
         const badgesList = dayItems.filter((a) => a.type === 'badge');
+        const practiceList = dayItems.filter((a) => a.type === 'practice');
 
         const moodCounts: Record<string, number> = {};
         reflections.forEach((r) => {
