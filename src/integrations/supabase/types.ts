@@ -753,35 +753,48 @@ export type Database = {
       ritual_completions: {
         Row: {
           created_at: string
+          custom_template_id: string | null
           decision: string
           duration_seconds: number | null
           id: string
           journal_text: string | null
           reflection_id: string | null
+          steps_completed: Json | null
           template: string
           user_id: string
         }
         Insert: {
           created_at?: string
+          custom_template_id?: string | null
           decision: string
           duration_seconds?: number | null
           id?: string
           journal_text?: string | null
           reflection_id?: string | null
+          steps_completed?: Json | null
           template?: string
           user_id: string
         }
         Update: {
           created_at?: string
+          custom_template_id?: string | null
           decision?: string
           duration_seconds?: number | null
           id?: string
           journal_text?: string | null
           reflection_id?: string | null
+          steps_completed?: Json | null
           template?: string
           user_id?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "ritual_completions_custom_template_id_fkey"
+            columns: ["custom_template_id"]
+            isOneToOne: false
+            referencedRelation: "ritual_templates"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "ritual_completions_reflection_id_fkey"
             columns: ["reflection_id"]
@@ -790,6 +803,39 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      ritual_templates: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          is_preset: boolean
+          name: string
+          steps: Json
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_preset?: boolean
+          name: string
+          steps?: Json
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_preset?: boolean
+          name?: string
+          steps?: Json
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       roadmap_items: {
         Row: {
