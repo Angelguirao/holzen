@@ -2,7 +2,6 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { PRICING } from '@/lib/pricing';
-import { trackOnce, trackEvent } from '@/lib/analytics';
 
 const FREE_MONTHLY_LIMIT = PRICING.freeReflectionsPerMonth;
 
@@ -27,9 +26,6 @@ export function useSubscription() {
       });
       if (error) throw error;
 
-      if (data?.subscribed && !data?.cached) {
-        trackOnce('subscribed');
-      }
       if (data?.subscribed) {
         setSubscribed(true);
         setMonthlyRemaining(undefined);
@@ -48,9 +44,6 @@ export function useSubscription() {
         setMonthlyUsed(used);
         const remaining = Math.max(0, FREE_MONTHLY_LIMIT - used);
         setMonthlyRemaining(remaining);
-        if (remaining === 0 && used > 0) {
-          trackOnce('hit_free_limit');
-        }
       }
     } catch {
       setSubscribed(false);
