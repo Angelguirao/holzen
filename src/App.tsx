@@ -61,6 +61,7 @@ const App = () => (
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/ambient" element={<Ambient />} />
                   <Route path="/pause" element={<PauseSession />} />
+                  <Route path="/admin" element={<Admin />} />
                 </Route>
                 <Route path="/welcome" element={<PublicOnlyRoute><Landing /></PublicOnlyRoute>} />
                 <Route path="/auth" element={<PublicOnlyRoute><Auth /></PublicOnlyRoute>} />
