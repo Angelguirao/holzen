@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { fetchBtcData, type BtcPriceData } from '@/lib/btc';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
- } from '@/components/CompanionSection';
+import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
 
 const MANUAL_COOLDOWN_MS = 15 * 60 * 1000; // 15 minutes for on-demand
 
