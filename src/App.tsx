@@ -60,10 +60,11 @@ const App = () => (
                   <Route path="/history" element={<Navigate to="/library" replace />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/settings" element={<Settings />} />
-                  <Route path="/breathe" element={<Breathe />} />
-                  <Route path="/ambient" element={<Breathe />} />
-                  <Route path="/pause" element={<PauseSession />} />
                 </Route>
+                {/* Immersive full-screen experiences — no nav bar */}
+                <Route path="/pause" element={<ProtectedRoute><PauseSession /></ProtectedRoute>} />
+                <Route path="/breathe" element={<ProtectedRoute><Breathe /></ProtectedRoute>} />
+                <Route path="/ambient" element={<ProtectedRoute><Breathe /></ProtectedRoute>} />
                 <Route path="/welcome" element={<PublicOnlyRoute><Landing /></PublicOnlyRoute>} />
                 <Route path="/auth" element={<PublicOnlyRoute><Auth /></PublicOnlyRoute>} />
                 <Route path="/reset-password" element={<ResetPassword />} />
