@@ -44,7 +44,7 @@ export default function PauseSession() {
   const navigate = useNavigate();
   const location = useLocation();
   const prefersReducedMotion = useReducedMotion();
-  const { ritualTemplate, mantra, dismissMessage } = useHolzen();
+  const { mantra, dismissMessage } = useHolzen();
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // State passed from Home
