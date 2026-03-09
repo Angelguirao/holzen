@@ -447,10 +447,14 @@ export function useHolzen() {
   }, [user, threshold, thresholdDown, cumulativeThreshold, isInCooldown, isInQuietHours, generateMessage, currency]);
 
   const [lastTriggerAt, setLastTriggerAt] = useState<string | null>(null);
-  const [lastManualAt, setLastManualAt] = useState<number | null>(() => {
-    const stored = localStorage.getItem('holzen_last_manual_at');
-    return stored ? Number(stored) : null;
-  });
+  const manualCooldownKey = user ? `holzen_last_manual_at_${user.id}` : 'holzen_last_manual_at';
+  const [lastManualAt, setLastManualAt] = useState<number | null>(null);
+
+  // Sync manual cooldown from localStorage scoped to user
+  useEffect(() => {
+    const stored = localStorage.getItem(manualCooldownKey);
+    setLastManualAt(stored ? Number(stored) : null);
+  }, [manualCooldownKey]);
 
   const manualCooldownRemaining = useCallback(() => {
     if (!lastManualAt) return 0;
