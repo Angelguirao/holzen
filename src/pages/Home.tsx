@@ -3,7 +3,6 @@ import { usePullToRefresh } from '@/hooks/use-pull-to-refresh';
 import { useHolzen } from '@/hooks/use-holzen';
 import { TestimonialRequest } from '@/components/TestimonialRequest';
 import { LetterToFutureSelf } from '@/components/LetterToFutureSelf';
-import { TheVoid } from '@/components/TheVoid';
 import { ReflectionTriggerOverlay } from '@/components/ReflectionTriggerOverlay';
 import { HolzenRitual, type RitualTemplate } from '@/components/HolzenRitual';
 import { RitualCooldownBanner } from '@/components/RitualCooldownBanner';
