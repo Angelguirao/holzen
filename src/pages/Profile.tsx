@@ -125,8 +125,18 @@ const Profile = () => {
       setLetters((data as unknown as Letter[]) ?? []);
       setLettersLoading(false);
     };
+    const loadPractice = async () => {
+      const { data } = await supabase
+        .from('practice_entries')
+        .select('id, created_at, type, mood, intensity, duration_seconds')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(500);
+      setPracticeEntries((data as unknown as PracticeEntry[]) ?? []);
+    };
     loadReflections();
     loadLetters();
+    loadPractice();
   }, [user]);
 
   const deleteLetter = useCallback(async (id: string) => {
