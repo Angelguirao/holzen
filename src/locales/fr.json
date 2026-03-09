@@ -76,8 +76,8 @@
       "practice": "Pratique"
     },
     "subscription": {
-      "usedAllFree": "Vous avez utilisé vos 3 réflexions gratuites. Abonnez-vous pour continuer.",
-      "pricePerMonth": "3 $/mois · Annulez quand vous voulez",
+      "usedAllFree": "Vous avez utilisé vos {{freeReflections}} réflexions gratuites. Abonnez-vous pour continuer.",
+      "pricePerMonth": "{{price}} $/mois · Annulez quand vous voulez",
       "openingCheckout": "Ouverture du paiement…",
       "freeRemaining": "{{count}} réflexion gratuite restante",
       "freeRemaining_other": "{{count}} réflexions gratuites restantes"
