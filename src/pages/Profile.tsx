@@ -198,7 +198,7 @@ const Profile = () => {
             {t('profile.noReflectionsYet')}
           </p>
         ) : (
-          <StatsContent reflections={reflections} memberSince={user?.created_at} />
+          <StatsContent reflections={reflections} practiceEntries={practiceEntries} memberSince={user?.created_at} />
         )
       ) : tab === 'insights' ? (
         <ProLock>
