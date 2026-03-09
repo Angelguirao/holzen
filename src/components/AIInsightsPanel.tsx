@@ -118,6 +118,15 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
     }
   }, [user, language, loadInsights, t]);
 
+  if (!subscribed) {
+    return (
+      <div className="py-8 text-center space-y-2">
+        <Lock className="h-5 w-5 mx-auto text-muted-foreground/30" />
+        <p className="text-xs text-muted-foreground">{t('pro.upgradeDesc')}</p>
+      </div>
+    );
+  }
+
   if (reflectionCount < 5) {
     return (
       <div className="py-8 text-center space-y-2">
