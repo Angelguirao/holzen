@@ -254,6 +254,7 @@
       "history": "Historical insight"
     },
     "ritualDesc": "A guided pre-decision sequence. Choose your preferred depth.",
+    "ritualDescUpdated": "Rituals are customizable grounding sequences you run before making a decision. Choose from presets, build your own, or let AI suggest one — directly from the ritual screen.",
     "ritualTemplates": {
       "quick": "Quick",
       "quickDesc": "Breathe → Decide",

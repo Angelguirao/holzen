@@ -555,29 +555,9 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             {t('settings.ritual')}
           </AccordionTrigger>
           <AccordionContent className="space-y-3 pb-4">
-            <ProLock>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              {t('settings.ritualDesc')}
+              {t('settings.ritualDescUpdated')}
             </p>
-            <div className="space-y-2">
-              {(['quick', 'standard', 'deep'] as const).map((value) => (
-                <button
-                  key={value}
-                  onClick={() => setRitualTemplate(value)}
-                  className={`w-full text-left rounded-md border px-3 py-2.5 transition-colors ${
-                    ritualTemplate === value
-                      ? 'border-primary/40 bg-primary/5'
-                      : 'border-border/40 bg-muted/10 hover:bg-muted/20'
-                  }`}
-                >
-                  <p className={`text-xs font-mono ${ritualTemplate === value ? 'text-foreground' : 'text-muted-foreground'}`}>
-                    {t(`settings.ritualTemplates.${value}`)}
-                  </p>
-                  <p className="text-[10px] text-muted-foreground/60">{t(`settings.ritualTemplates.${value}Desc`)}</p>
-                </button>
-              ))}
-            </div>
-            </ProLock>
           </AccordionContent>
         </AccordionItem>
 
