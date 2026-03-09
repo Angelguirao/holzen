@@ -76,8 +76,8 @@
       "practice": "Práctica"
     },
     "subscription": {
-      "usedAllFree": "Has usado tus 3 reflexiones gratuitas. Suscríbete para continuar.",
-      "pricePerMonth": "$3 por mes · Cancela cuando quieras",
+      "usedAllFree": "Has usado tus {{freeReflections}} reflexiones gratuitas. Suscríbete para continuar.",
+      "pricePerMonth": "${{price}} por mes · Cancela cuando quieras",
       "openingCheckout": "Abriendo pago…",
       "freeRemaining": "{{count}} reflexión gratuita restante",
       "freeRemaining_other": "{{count}} reflexiones gratuitas restantes"
@@ -283,7 +283,7 @@
     "enableAiInsights": "Activar análisis IA",
     "plan": "Plan",
     "manageSubscription": "Gestionar suscripción",
-    "pricePerMonth": "$3/mes · Cancela cuando quieras",
+    "pricePerMonth": "${{price}}/mes · Cancela cuando quieras",
     "openingCheckout": "Abriendo pago…",
     "passwordLabel": "Contraseña",
     "newPasswordPlaceholder": "Nueva contraseña",
@@ -378,8 +378,8 @@
   "landing": {
     "hero": "Cuando Bitcoin se mueve, haz una pausa antes de actuar.",
     "heroDesc": "Holzen no es una herramienta de trading. Es una práctica de autoconocimiento. Cuando Bitcoin se mueve, tienes un momento para respirar, reflexionar y notar tus patrones — antes de que el impulso tome el control.",
-    "getStartedForFree": "Empieza tu práctica",
-    "noCreditCard": "Plan gratis disponible · Pro desde $5/mes · sin tarjeta",
+    "getStartedForFree": "Empieza gratis",
+    "noCreditCard": "Luego ${{price}}/mes · sin tarjeta · cancela cuando quieras",
     "reflectionLoop": "El ciclo de reflexión",
     "reaction": {
       "label": "Sin Holzen",
@@ -464,7 +464,7 @@
     "scienceQuote": "Las decisiones impulsivas bajo volatilidad consistentemente llevan a peores resultados.",
     "scienceDesc": "La investigación en finanzas conductuales muestra que las reacciones emocionales — vender en pánico durante caídas, comprar en euforia durante subidas — son de los predictores más confiables de malos rendimientos. Una breve pausa antes de actuar lleva a mejores decisiones.",
     "freeToStart": "Gratis para empezar",
-    "pricingDesc": "Tus primeras 3 reflexiones son gratis — sin tarjeta requerida. Luego $5/mes para reflexiones ilimitadas, herramientas, rituales, seguimiento de ánimo, biblioteca y análisis. Cancela cuando quieras.",
+    "pricingDesc": "Tus primeras {{freeReflections}} reflexiones son gratis — sin tarjeta requerida. Luego ${{price}}/mes para reflexiones ilimitadas, herramientas, rituales, seguimiento de ánimo, biblioteca y análisis. Cancela cuando quieras.",
     "questions": "Preguntas frecuentes",
     "faq": {
       "whoQuestion": "¿Para quién es Holzen?",
@@ -472,7 +472,7 @@
       "adviceQuestion": "¿Me dirá qué comprar o vender?",
       "adviceAnswer": "Nunca. Holzen no es una herramienta de trading ni un asesor financiero. Cada reflexión es intencionalmente neutral — diseñada para crear conciencia, no acción.",
       "freeQuestion": "¿Qué obtengo gratis?",
-      "freeAnswer": "Tus primeras 3 reflexiones son completamente gratis con todas las funciones incluidas — herramientas, seguimiento de ánimo, rituales, todo. Después, son $3/mes. Cancela cuando quieras, sin contratos.",
+      "freeAnswer": "Tus primeras {{freeReflections}} reflexiones son completamente gratis con todas las funciones incluidas — herramientas, seguimiento de ánimo, rituales, todo. Después, son ${{price}}/mes. Cancela cuando quieras, sin contratos.",
       "dataQuestion": "¿Qué pasa con mis datos?",
       "dataAnswer": "Solo almacenamos lo necesario: tu email, umbrales, reflexiones y registros de ánimo. Puedes exportar todo como JSON o CSV cuando quieras, o eliminar tu cuenta completamente con un toque. Consulta nuestra",
       "differentQuestion": "¿En qué se diferencia de una app de diario?",

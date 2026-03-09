@@ -76,8 +76,8 @@
       "practice": "Praxis"
     },
     "subscription": {
-      "usedAllFree": "Du hast alle 3 kostenlosen Reflexionen genutzt. Abonniere um fortzufahren.",
-      "pricePerMonth": "$3 pro Monat · Jederzeit kündbar",
+      "usedAllFree": "Du hast alle {{freeReflections}} kostenlosen Reflexionen genutzt. Abonniere um fortzufahren.",
+      "pricePerMonth": "${{price}} pro Monat · Jederzeit kündbar",
       "openingCheckout": "Zahlung wird geöffnet…",
       "freeRemaining": "{{count}} kostenlose Reflexion übrig",
       "freeRemaining_other": "{{count}} kostenlose Reflexionen übrig"
@@ -282,7 +282,7 @@
     "enableAiInsights": "KI-Analysen aktivieren",
     "plan": "Plan",
     "manageSubscription": "Abo verwalten",
-    "pricePerMonth": "$3/Monat · Jederzeit kündbar",
+    "pricePerMonth": "${{price}}/Monat · Jederzeit kündbar",
     "openingCheckout": "Zahlung wird geöffnet…",
     "passwordLabel": "Passwort",
     "newPasswordPlaceholder": "Neues Passwort",
@@ -377,8 +377,8 @@
   "landing": {
     "hero": "Wenn Bitcoin sich bewegt, halte inne, bevor du handelst.",
     "heroDesc": "Holzen ist kein Trading-Tool. Es ist eine Praxis der Selbsterkenntnis. Wenn sich Bitcoin bewegt, bekommst du einen Moment zum Innehalten, Reflektieren und Beobachten deiner Muster — bevor du impulsiv handelst.",
-    "getStartedForFree": "Starte deine Praxis",
-    "noCreditCard": "Gratis-Plan verfügbar · Pro ab $5/Monat · keine Karte nötig",
+    "getStartedForFree": "Starte kostenlos",
+    "noCreditCard": "Dann ${{price}}/Monat · keine Karte · jederzeit kündbar",
     "reflectionLoop": "Der Reflexionszyklus",
     "reaction": {
       "label": "Ohne Holzen",
@@ -461,7 +461,7 @@
     "scienceQuote": "Impulsive Entscheidungen bei Volatilität führen durchgehend zu schlechteren Ergebnissen.",
     "scienceDesc": "Forschung zur Verhaltensfinanzierung zeigt, dass emotionale Reaktionen — Panikverkäufe bei Rückgängen, euphorische Käufe bei Anstiegen — zu den zuverlässigsten Prädiktoren für schlechte Renditen gehören. Eine kurze Pause vor dem Handeln führt zu besseren Entscheidungen.",
     "freeToStart": "Kostenlos starten",
-    "pricingDesc": "Deine ersten 3 Reflexionen sind kostenlos — keine Karte erforderlich. Dann $5/Monat für unbegrenzte Reflexionen, Begleiter, Stimmungstracking und Analysen. Jederzeit kündbar.",
+    "pricingDesc": "Deine ersten {{freeReflections}} Reflexionen sind kostenlos — keine Karte erforderlich. Dann ${{price}}/Monat für unbegrenzte Reflexionen, Begleiter, Stimmungstracking und Analysen. Jederzeit kündbar.",
     "getStartedFree": "Kostenlos starten",
     "clarityWorth": "Was ist ein Moment der Klarheit wert?",
     "questions": "Fragen",

@@ -76,8 +76,8 @@
       "practice": "Praktijk"
     },
     "subscription": {
-      "usedAllFree": "Je hebt alle 3 gratis reflecties gebruikt. Abonneer om door te gaan.",
-      "pricePerMonth": "$3 per maand · Altijd opzegbaar",
+      "usedAllFree": "Je hebt alle {{freeReflections}} gratis reflecties gebruikt. Abonneer om door te gaan.",
+      "pricePerMonth": "${{price}} per maand · Altijd opzegbaar",
       "openingCheckout": "Betaling openen…",
       "freeRemaining": "{{count}} gratis reflectie over",
       "freeRemaining_other": "{{count}} gratis reflecties over"
@@ -283,7 +283,7 @@
     "enableAiInsights": "AI-inzichten inschakelen",
     "plan": "Plan",
     "manageSubscription": "Abonnement beheren",
-    "pricePerMonth": "$3/maand · Altijd opzegbaar",
+    "pricePerMonth": "${{price}}/maand · Altijd opzegbaar",
     "openingCheckout": "Betaling openen…",
     "passwordLabel": "Wachtwoord",
     "newPasswordPlaceholder": "Nieuw wachtwoord",
@@ -378,8 +378,8 @@
   "landing": {
     "hero": "Als Bitcoin beweegt, pauzeer voordat jij beweegt.",
     "heroDesc": "Holzen is geen trading-tool. Het is een zelfbewustzijnspraktijk. Wanneer Bitcoin beweegt, krijg je een moment om te pauzeren, reflecteren en je patronen op te merken — voordat je impulsief handelt.",
-    "getStartedForFree": "Begin je praktijk",
-    "noCreditCard": "Gratis plan beschikbaar · Pro vanaf $5/maand · geen kaart nodig",
+    "getStartedForFree": "Begin gratis",
+    "noCreditCard": "Daarna ${{price}}/maand · geen kaart · altijd opzegbaar",
     "reflectionLoop": "De reflectiecyclus",
     "reaction": {
       "label": "Zonder Holzen",
@@ -462,7 +462,7 @@
     "scienceQuote": "Impulsieve beslissingen bij volatiliteit leiden consequent tot slechtere resultaten.",
     "scienceDesc": "Onderzoek naar gedragsfinancien toont aan dat emotionele reacties — paniekverkoop bij dalingen, euforische aankopen bij stijgingen — tot de meest betrouwbare voorspellers van slechte rendementen behoren. Een korte pauze voor actie leidt tot betere beslissingen.",
     "freeToStart": "Gratis beginnen",
-    "pricingDesc": "Je eerste 3 reflecties zijn gratis — geen kaart vereist. Daarna $5/maand voor onbeperkte reflecties, begeleiders, stemmingstracking en inzichten. Altijd opzegbaar.",
+    "pricingDesc": "Je eerste {{freeReflections}} reflecties zijn gratis — geen kaart vereist. Daarna ${{price}}/maand voor onbeperkte reflecties, begeleiders, stemmingstracking en inzichten. Altijd opzegbaar.",
     "getStartedFree": "Gratis beginnen",
     "clarityWorth": "Hoeveel is één moment van helderheid waard?",
     "questions": "Vragen",
