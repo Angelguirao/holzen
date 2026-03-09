@@ -26,7 +26,7 @@ const DAY_TINT: Record<string, string> = {
   uncertain: 'bg-purple-500/8',
 };
 
-export type ActivityType = 'reflection' | 'ritual' | 'letter' | 'badge';
+export type ActivityType = 'reflection' | 'ritual' | 'letter' | 'badge' | 'practice';
 
 export interface CalendarActivity {
   date: string;
@@ -34,6 +34,7 @@ export interface CalendarActivity {
   mood?: string | null;
   id: string;
   label?: string;
+  practiceType?: string;
 }
 
 interface Props {
