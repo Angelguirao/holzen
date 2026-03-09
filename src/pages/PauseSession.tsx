@@ -80,6 +80,8 @@ export default function PauseSession() {
     setMoodDone(true);
   }, []);
 
+  const { subscribed } = useSubscription();
+
   const toggleFavorite = useCallback(async () => {
     if (!reflectionId) return;
     const newVal = !isFavorite;
@@ -87,7 +89,10 @@ export default function PauseSession() {
     hapticFeedback('light');
     await supabase.from('reflections').update({ is_favorite: newVal }).eq('id', reflectionId);
     await supabase.from('library_items').update({ is_favorite: newVal }).eq('reflection_id', reflectionId).eq('source_type', 'reflection');
-  }, [reflectionId, isFavorite]);
+    if (newVal && !subscribed) {
+      toast(t('pause.favoriteProHint'), { duration: 4000 });
+    }
+  }, [reflectionId, isFavorite, subscribed, t]);
 
   const handleReturn = useCallback(() => {
     if (window.history.length > 1) {
