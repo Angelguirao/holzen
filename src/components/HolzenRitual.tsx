@@ -152,7 +152,7 @@ export function HolzenRitual({
   }, [onClose]);
 
   const selectPreset = useCallback((preset: typeof PRESET_TEMPLATES[number]) => {
-    setSteps(preset.steps as StepData[]);
+    setSteps([...preset.steps] as StepData[]);
     setTemplateName(preset.id);
     setPhase('run');
     startTimeRef.current = Date.now();
