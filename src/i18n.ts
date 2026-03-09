@@ -1,5 +1,6 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
+import { PRICING } from './lib/pricing';
 import en from './locales/en.json';
 import es from './locales/es.json';
 import pt from './locales/pt.json';
@@ -20,7 +21,13 @@ i18n.use(initReactI18next).init({
   },
   lng: 'en',
   fallbackLng: 'en',
-  interpolation: { escapeValue: false },
+  interpolation: {
+    escapeValue: false,
+    defaultVariables: {
+      price: PRICING.monthlyPrice,
+      freeReflections: PRICING.freeReflections,
+    },
+  },
 });
 
 export default i18n;
