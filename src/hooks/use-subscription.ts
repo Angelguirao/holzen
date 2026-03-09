@@ -2,7 +2,11 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { PRICING } from '@/lib/pricing';
-r } = useAuth();
+
+const FREE_MONTHLY_LIMIT = PRICING.freeReflectionsPerMonth;
+
+export function useSubscription() {
+  const { user } = useAuth();
   const [subscribed, setSubscribed] = useState(false);
   const [loading, setLoading] = useState(true);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
@@ -22,12 +26,11 @@ r } = useAuth();
       });
       if (error) throw error;
 
-      if (data?.subscribed && !data?.cached) {
-        trackOnce('subscribed');
-      }
-      if (data?.subscriibed(true);
+      if (data?.subscribed) {
+        setSubscribed(true);
         setMonthlyRemaining(undefined);
-    bscribed(false);
+      } else {
+        setSubscribed(false);
         // Count reflections this month
         const now = new Date();
         const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
@@ -41,12 +44,11 @@ r } = useAuth();
         setMonthlyUsed(used);
         const remaining = Math.max(0, FREE_MONTHLY_LIMIT - used);
         setMonthlyRemaining(remaining);
-        if (remaining === 0 && used > 0) {
-          trackOnce('hit_free_limit');
-        }
       }
     } catch {
-      setSubscribed   setLoading(false);
+      setSubscribed(false);
+    } finally {
+      setLoading(false);
     }
   }, [user]);
 
