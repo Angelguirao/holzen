@@ -23,7 +23,7 @@ export function useHolzen() {
   const [quietHoursEnd, setQuietHoursEndState] = useState<number | null>(null);
   const [firstName, setFirstNameState] = useState<string | null>(null);
   const [aiInsightsEnabled, setAiInsightsEnabledState] = useState(true);
-  const [ritualTemplate, setRitualTemplateState] = useState<string>('standard');
+  
   const [nightReflectionHour, setNightReflectionHourState] = useState<number | null>(21);
   const [notifyBadges, setNotifyBadgesState] = useState(true);
   const [motivations, setMotivationsState] = useState<string[]>([]);
@@ -72,7 +72,7 @@ export function useHolzen() {
         setFirstNameState((data as any).first_name ?? null);
         setNightReflectionHourState((data as any).night_reflection_hour ?? 21);
         setAiInsightsEnabledState((data as any).ai_insights_enabled ?? true);
-        setRitualTemplateState((data as any).ritual_template ?? 'standard');
+        
         setNotifyBadgesState((data as any).notify_badges ?? true);
         setMotivationsState((data as any).motivations ?? []);
         setMantraState((data as any).mantra ?? null);
@@ -583,12 +583,6 @@ export function useHolzen() {
       setAiInsightsEnabledState(val);
       if (!user) return;
       await supabase.from('profiles').update({ ai_insights_enabled: val } as any).eq('user_id', user.id);
-    },
-    ritualTemplate,
-    setRitualTemplate: async (val: string) => {
-      setRitualTemplateState(val);
-      if (!user) return;
-      await supabase.from('profiles').update({ ritual_template: val } as any).eq('user_id', user.id);
     },
     notifyBadges,
     setNotifyBadges: async (val: boolean) => {
