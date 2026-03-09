@@ -381,5 +381,6 @@ export default function Breathe() {
         )}
       </AnimatePresence>
     </div>
+    </>
   );
 }
