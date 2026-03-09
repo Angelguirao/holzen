@@ -25,6 +25,7 @@ import Roadmap from "./pages/Roadmap";
 import Ambient from "./pages/Ambient";
 import Reserve from "./pages/Reserve";
 import PauseSession from "./pages/PauseSession";
+import Admin from "./pages/Admin";
 
 const queryClient = new QueryClient();
 
@@ -60,6 +61,7 @@ const App = () => (
                   <Route path="/settings" element={<Settings />} />
                   <Route path="/ambient" element={<Ambient />} />
                   <Route path="/pause" element={<PauseSession />} />
+                  <Route path="/admin" element={<Admin />} />
                 </Route>
                 <Route path="/welcome" element={<PublicOnlyRoute><Landing /></PublicOnlyRoute>} />
                 <Route path="/auth" element={<PublicOnlyRoute><Auth /></PublicOnlyRoute>} />
