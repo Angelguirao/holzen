@@ -28,27 +28,6 @@ const STATUS_FILTERS: { key: string; label: string }[] = [
 export default function Library() {
   const { t } = useTranslation();
   const { isPro, startCheckout, checkoutLoading } = useProGate();
-
-  if (!isPro) {
-    return (
-      <>
-        <PageMeta title="Library — Holzen" />
-        <div className="flex flex-col items-center justify-center min-h-[50vh] gap-4 text-center px-6">
-          <Lock className="h-6 w-6 text-muted-foreground/30" />
-          <h2 className="text-sm font-mono text-foreground">{t('pro.featureLocked')}</h2>
-          <p className="text-xs text-muted-foreground max-w-xs">{t('pro.upgradeDesc')}</p>
-          <button
-            onClick={startCheckout}
-            disabled={checkoutLoading}
-            className="text-xs font-mono text-primary hover:text-primary/80 underline transition-colors"
-          >
-            {t('pro.upgradeCta')}
-          </button>
-        </div>
-      </>
-    );
-  }
-
   const library = useLibrary();
   const [tab, setTab] = useState<'all' | 'favorites'>('all');
   const [search, setSearch] = useState('');
