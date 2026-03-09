@@ -725,4 +725,21 @@ function AutoCooldownIndicator({
   );
 }
 
+function ProLockedWidget({ onUpgrade, checkoutLoading }: { onUpgrade: () => void; checkoutLoading: boolean }) {
+  const { t } = useTranslation();
+  return (
+    <div className="flex flex-col items-center gap-2 py-4">
+      <Lock className="h-4 w-4 text-muted-foreground/30" />
+      <p className="text-[10px] font-mono text-muted-foreground/50">{t('pro.upgradeDesc')}</p>
+      <button
+        onClick={onUpgrade}
+        disabled={checkoutLoading}
+        className="text-[10px] font-mono text-primary/60 hover:text-primary transition-colors underline"
+      >
+        {t('pro.upgradeCta')}
+      </button>
+    </div>
+  );
+}
+
 export default Home;
