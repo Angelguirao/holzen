@@ -64,6 +64,7 @@
     "cooldownMessage": "Take this time to breathe. The next reflection will be here when you need it.",
     "requestAnytime": "Request a reflection anytime — no threshold required.",
     "startARitual": "Start a ritual",
+    "ritualHint": "Feeling reactive? Ground yourself first.",
     "ambientMode": "Ambient mode",
     "whenBtcMoves": "When Bitcoin moves, we'll help you pause before you act.",
     "nextAutoCheck": "Next auto-check · {{time}}",
