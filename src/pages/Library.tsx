@@ -55,7 +55,7 @@ export default function Library() {
   const filtered = useMemo(() => {
     let result = items;
     // Tab
-    if (tab === 'favorites') result = result.filter((i) => i.pinned);
+    if (tab === 'favorites') result = result.filter((i) => i.is_favorite);
     // Status filter (default: hide archived)
     if (statusFilter) {
       result = result.filter((i) => i.status === statusFilter);
