@@ -389,7 +389,8 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
               </div>
             </div>
 
-            {/* Tone */}
+            {/* Tone — Pro */}
+            <ProLock>
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.tone')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
@@ -412,8 +413,10 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                 ))}
               </div>
             </div>
+            </ProLock>
 
-            {/* Style */}
+            {/* Style — Pro */}
+            <ProLock>
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.style')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
@@ -442,8 +445,10 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                 ))}
               </div>
             </div>
+            </ProLock>
 
-            {/* Custom Prompt */}
+            {/* Custom Prompt — Pro */}
+            <ProLock>
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.customPrompt')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
@@ -461,6 +466,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                 {(customPrompt?.length ?? 0)}/200
               </p>
             </div>
+            </ProLock>
 
             {/* Silent Mode */}
             <div className="space-y-3">
