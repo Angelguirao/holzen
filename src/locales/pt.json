@@ -76,8 +76,8 @@
       "practice": "Prática"
     },
     "subscription": {
-      "usedAllFree": "Você usou suas 3 reflexões gratuitas. Assine para continuar.",
-      "pricePerMonth": "$3 por mês · Cancele quando quiser",
+      "usedAllFree": "Você usou suas {{freeReflections}} reflexões gratuitas. Assine para continuar.",
+      "pricePerMonth": "${{price}} por mês · Cancele quando quiser",
       "openingCheckout": "Abrindo pagamento…",
       "freeRemaining": "{{count}} reflexão gratuita restante",
       "freeRemaining_other": "{{count}} reflexões gratuitas restantes"
@@ -283,7 +283,7 @@
     "enableAiInsights": "Ativar análises IA",
     "plan": "Plano",
     "manageSubscription": "Gerenciar assinatura",
-    "pricePerMonth": "$3/mês · Cancele quando quiser",
+    "pricePerMonth": "${{price}}/mês · Cancele quando quiser",
     "openingCheckout": "Abrindo pagamento…",
     "passwordLabel": "Senha",
     "newPasswordPlaceholder": "Nova senha",
@@ -378,8 +378,8 @@
   "landing": {
     "hero": "Quando o Bitcoin se move, pause antes de agir.",
     "heroDesc": "Holzen não é uma ferramenta de trading. É uma prática de autoconhecimento. Quando o Bitcoin se move, você tem um momento para pausar, refletir e notar seus padrões — antes de agir por impulso.",
-    "getStartedForFree": "Comece sua prática",
-    "noCreditCard": "Plano grátis disponível · Pro a partir de $5/mês · sem cartão",
+    "getStartedForFree": "Comece grátis",
+    "noCreditCard": "Depois ${{price}}/mês · sem cartão · cancele quando quiser",
     "reflectionLoop": "O ciclo de reflexão",
     "reaction": {
       "label": "Sem Holzen",
@@ -462,7 +462,7 @@
     "scienceQuote": "Decisões impulsivas sob volatilidade consistentemente levam a piores resultados.",
     "scienceDesc": "Pesquisas de finanças comportamentais mostram que reações emocionais — venda em pânico durante quedas, compra eufórica durante altas — estão entre os preditores mais confiáveis de retornos ruins. Uma breve pausa antes da ação leva a melhores decisões.",
     "freeToStart": "Grátis para começar",
-    "pricingDesc": "Suas primeiras 3 reflexões são gratuitas — sem cartão necessário. Depois $5/mês para reflexões ilimitadas, companheiros, rastreamento de humor e análises. Cancele quando quiser.",
+    "pricingDesc": "Suas primeiras {{freeReflections}} reflexões são gratuitas — sem cartão necessário. Depois ${{price}}/mês para reflexões ilimitadas, companheiros, rastreamento de humor e análises. Cancele quando quiser.",
     "getStartedFree": "Comece grátis",
     "clarityWorth": "Quanto vale um momento de clareza?",
     "questions": "Perguntas",

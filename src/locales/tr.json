@@ -76,8 +76,8 @@
       "practice": "Pratik"
     },
     "subscription": {
-      "usedAllFree": "3 ücretsiz düşüncenizi kullandınız. Devam etmek için abone olun.",
-      "pricePerMonth": "Ayda 3$ · İstediğiniz zaman iptal edin",
+      "usedAllFree": "{{freeReflections}} ücretsiz düşüncenizi kullandınız. Devam etmek için abone olun.",
+      "pricePerMonth": "Ayda ${{price}} · İstediğiniz zaman iptal edin",
       "openingCheckout": "Ödeme açılıyor…",
       "freeRemaining": "{{count}} ücretsiz düşünce kaldı",
       "freeRemaining_other": "{{count}} ücretsiz düşünce kaldı"
@@ -283,7 +283,7 @@
     "enableAiInsights": "Yapay zeka analizlerini etkinleştir",
     "plan": "Plan",
     "manageSubscription": "Aboneliği yönet",
-    "pricePerMonth": "3$/ay · İstediğiniz zaman iptal edin",
+    "pricePerMonth": "${{price}}/ay · İstediğiniz zaman iptal edin",
     "openingCheckout": "Ödeme açılıyor…",
     "passwordLabel": "Şifre",
     "newPasswordPlaceholder": "Yeni şifre",
@@ -378,8 +378,8 @@
   "landing": {
     "hero": "Bitcoin hareket ettiğinde, sen hareket etmeden önce dur.",
     "heroDesc": "Holzen bir ticaret aracı değildir. Bir öz-farkındalık pratiğidir. Bitcoin hareket ettiğinde, dürtüsel davranmadan önce durmak, düşünmek ve kalıplarınızı fark etmek için bir an elde edersiniz.",
-    "getStartedForFree": "Pratiğine başla",
-    "noCreditCard": "Ücretsiz plan mevcut · Pro ayda $5'tan · kart gerekmez",
+    "getStartedForFree": "Ücretsiz başla",
+    "noCreditCard": "Sonra ayda ${{price}} · kart gerekmez · istediğiniz zaman iptal edin",
     "reflectionLoop": "Düşünce döngüsü",
     "reaction": {
       "label": "Holzen Olmadan",
@@ -462,7 +462,7 @@
     "scienceQuote": "Volatilite altında alınan dürtüsel kararlar tutarlı olarak daha kötü sonuçlara yol açar.",
     "scienceDesc": "Davranışsal finans araştırmaları, duygusal tepkilerin — düşüşlerde panik satışı, yükselişlerde coşkulu alımlar — kötü getirilerin en güvenilir öngörücüleri arasında olduğunu gösterir. Eylemden önce kısa bir duraklama daha iyi kararlara yol açar.",
     "freeToStart": "Başlamak ücretsiz",
-    "pricingDesc": "İlk 3 düşünceniz ücretsiz — kart gerekmez. Sonra sınırsız düşünce, yol arkadaşları, ruh hali takibi ve analizler için ayda 5$. İstediğiniz zaman iptal edin.",
+    "pricingDesc": "İlk {{freeReflections}} düşünceniz ücretsiz — kart gerekmez. Sonra sınırsız düşünce, yol arkadaşları, ruh hali takibi ve analizler için ayda ${{price}}. İstediğiniz zaman iptal edin.",
     "getStartedFree": "Ücretsiz başla",
     "clarityWorth": "Bir an berraklığın değeri ne kadar?",
     "questions": "Sorular",

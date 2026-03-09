@@ -76,8 +76,8 @@
       "practice": "Pratique"
     },
     "subscription": {
-      "usedAllFree": "Vous avez utilisé vos 3 réflexions gratuites. Abonnez-vous pour continuer.",
-      "pricePerMonth": "3 $/mois · Annulez quand vous voulez",
+      "usedAllFree": "Vous avez utilisé vos {{freeReflections}} réflexions gratuites. Abonnez-vous pour continuer.",
+      "pricePerMonth": "{{price}} $/mois · Annulez quand vous voulez",
       "openingCheckout": "Ouverture du paiement…",
       "freeRemaining": "{{count}} réflexion gratuite restante",
       "freeRemaining_other": "{{count}} réflexions gratuites restantes"
@@ -282,7 +282,7 @@
     "enableAiInsights": "Activer les analyses IA",
     "plan": "Plan",
     "manageSubscription": "Gérer l'abonnement",
-    "pricePerMonth": "3 $/mois · Annulez quand vous voulez",
+    "pricePerMonth": "{{price}} $/mois · Annulez quand vous voulez",
     "openingCheckout": "Ouverture du paiement…",
     "passwordLabel": "Mot de passe",
     "newPasswordPlaceholder": "Nouveau mot de passe",
@@ -377,8 +377,8 @@
   "landing": {
     "hero": "Quand le Bitcoin bouge, faites une pause avant d'agir.",
     "heroDesc": "Holzen n'est pas un outil de trading. C'est une pratique de conscience de soi. Quand le Bitcoin bouge, vous avez un moment pour faire une pause, réfléchir et observer vos schémas — avant d'agir impulsivement.",
-    "getStartedForFree": "Commencez votre pratique",
-    "noCreditCard": "Plan gratuit disponible · Pro dès 5$/mois · sans carte",
+    "getStartedForFree": "Commencez gratuitement",
+    "noCreditCard": "Ensuite {{price}} $/mois · sans carte · annulez quand vous voulez",
     "reflectionLoop": "Le cycle de réflexion",
     "reaction": {
       "label": "Sans Holzen",
@@ -461,7 +461,7 @@
     "scienceQuote": "Les décisions impulsives sous volatilité mènent systématiquement à de moins bons résultats.",
     "scienceDesc": "La recherche en finance comportementale montre que les réactions émotionnelles — vente panique lors des baisses, achats euphoriques lors des hausses — comptent parmi les prédicteurs les plus fiables de mauvais rendements. Une brève pause avant l'action mène à de meilleures décisions.",
     "freeToStart": "Gratuit pour commencer",
-    "pricingDesc": "Vos 3 premières réflexions sont gratuites — sans carte requise. Ensuite 5 $/mois pour des réflexions illimitées, compagnons, suivi d'humeur et analyses. Annulez quand vous voulez.",
+    "pricingDesc": "Vos {{freeReflections}} premières réflexions sont gratuites — sans carte requise. Ensuite {{price}} $/mois pour des réflexions illimitées, compagnons, suivi d'humeur et analyses. Annulez quand vous voulez.",
     "getStartedFree": "Commencer gratuitement",
     "clarityWorth": "Combien vaut un moment de clarté ?",
     "questions": "Questions",
