@@ -63,11 +63,18 @@ export default function Breathe() {
   const [mode, setMode] = useState<Mode>('ambient');
   const [btcData, setBtcData] = useState<BtcPriceData | null>(null);
   const [level, setLevel] = useState<VolatilityLevel>('calm');
+  const [curtainLifted, setCurtainLifted] = useState(false);
 
   // Void state
   const [voidSeconds, setVoidSeconds] = useState(VOID_SECONDS);
   const [voidStarted, setVoidStarted] = useState(false);
   const [voidCompleted, setVoidCompleted] = useState(false);
+
+  // Cinematic entrance
+  useEffect(() => {
+    const timer = setTimeout(() => setCurtainLifted(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Fetch BTC data
@@ -116,7 +123,11 @@ export default function Breathe() {
 
   const handleClose = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
-    navigate(-1);
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/', { replace: true });
+    }
   }, [navigate]);
 
   const startVoid = useCallback(() => {
@@ -148,10 +159,22 @@ export default function Breathe() {
   };
 
   return (
-    <div
-      className="fixed inset-0 z-[100] flex flex-col items-center justify-center select-none"
-      style={backgroundStyle}
-    >
+    <>
+      {/* Dark curtain entrance */}
+      <AnimatePresence>
+        {!curtainLifted && (
+          <motion.div
+            className="fixed inset-0 z-[200] bg-background"
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.8, ease: [0.22, 1, 0.36, 1] }}
+          />
+        )}
+      </AnimatePresence>
+
+      <div
+        className="fixed inset-0 z-[100] flex flex-col items-center justify-center select-none"
+        style={backgroundStyle}
+      >
       {/* Close */}
       <button
         onClick={handleClose}
@@ -358,5 +381,6 @@ export default function Breathe() {
         )}
       </AnimatePresence>
     </div>
+    </>
   );
 }
