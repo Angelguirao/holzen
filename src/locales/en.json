@@ -51,7 +51,8 @@
     "updatePassword": "Update password",
     "passwordUpdated": "Password updated. Redirecting…",
     "passwordsDoNotMatch": "Passwords do not match",
-    "passwordTooShort": "Password must be at least 6 characters"
+    "passwordTooShort": "Password must be at least 6 characters",
+    "agreeToTerms": "By signing up, you agree to our <terms>Terms</terms> and <privacy>Privacy Policy</privacy>."
   },
   "home": {
     "greeting": "{{name}}.",
