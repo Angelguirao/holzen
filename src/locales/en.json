@@ -138,6 +138,8 @@
     "moodLabel": "Mood",
     "actionsLabel": "Actions",
     "streakLabel": "Streak",
+    "practiceLabel": "Practice",
+    "practiceActivity": "Practice activity",
     "chartsUnlockSoon": "Charts unlock soon",
     "completeMoreReflections": "Complete {{count}} more reflection to unlock trend charts, mood analysis, and scatter plots.",
     "completeMoreReflections_other": "Complete {{count}} more reflections to unlock trend charts, mood analysis, and scatter plots.",
