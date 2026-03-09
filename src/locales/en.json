@@ -417,7 +417,7 @@
     "hero": "When Bitcoin moves, pause before you do.",
     "heroDesc": "Holzen is a self-awareness practice for Bitcoin holders. When volatility hits, you get a moment to breathe, reflect, and notice your patterns — before impulse takes over.",
     "getStartedForFree": "Start for free",
-    "noCreditCard": "Free forever · Pro from ${{price}}/mo · no credit card",
+    "noCreditCard": "Free forever · Pro ${{price}}/mo · no credit card",
     "reflectionLoop": "The reflection loop",
     "reaction": {
       "label": "Without Holzen",
