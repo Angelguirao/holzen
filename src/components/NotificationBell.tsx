@@ -255,7 +255,7 @@ export function NotificationBell() {
             title: t('notifications.aiInsightsReady'),
             subtitle: t('notifications.basedOnReflections', { count: i.reflection_count }),
             timestamp: i.generated_at,
-            action: { label: t('notifications.viewInsights'), path: '/profile' },
+            action: { label: t('notifications.viewInsights'), path: '/profile', state: { tab: 'insights' } },
           });
         }
       }
