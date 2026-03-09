@@ -75,6 +75,15 @@ interface Letter {
   btc_price_at_delivery: number | null;
 }
 
+interface PracticeEntry {
+  id: string;
+  created_at: string;
+  type: string;
+  mood: string | null;
+  intensity: number | null;
+  duration_seconds: number | null;
+}
+
 const Profile = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
@@ -83,6 +92,7 @@ const Profile = () => {
   const locationTab = (location.state as any)?.tab;
   const [reflections, setReflections] = useState<Reflection[]>([]);
   const [letters, setLetters] = useState<Letter[]>([]);
+  const [practiceEntries, setPracticeEntries] = useState<PracticeEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [lettersLoading, setLettersLoading] = useState(true);
   const [tab, setTab] = useState<'stats' | 'insights' | 'badges' | 'letters' | 'activity'>(
