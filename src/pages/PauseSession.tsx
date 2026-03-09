@@ -96,18 +96,17 @@ export default function PauseSession() {
     }
   }, [navigate]);
 
-  const handleDecide = useCallback((d: string) => {
+  const handleDecide = useCallback(async (d: string) => {
     hapticFeedback('medium');
     setDecision(d);
-    // Dismiss the reflection from Home state
     dismissMessage();
-    setPhase('outcome');
-  }, [dismissMessage]);
-
-
-  const handleOutcomeComplete = useCallback(() => {
+    // Save outcome directly to DB
+    if (reflectionId) {
+      await supabase.from('reflections').update({ outcome: d }).eq('id', reflectionId);
+    }
+    hapticFeedback('success');
     setPhase('done');
-  }, []);
+  }, [dismissMessage, reflectionId]);
 
   // If no message, redirect back
   if (!message && phase === 'session') {
