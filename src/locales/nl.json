@@ -76,8 +76,8 @@
       "practice": "Praktijk"
     },
     "subscription": {
-      "usedAllFree": "Je hebt alle 3 gratis reflecties gebruikt. Abonneer om door te gaan.",
-      "pricePerMonth": "$3 per maand · Altijd opzegbaar",
+      "usedAllFree": "Je hebt alle {{freeReflections}} gratis reflecties gebruikt. Abonneer om door te gaan.",
+      "pricePerMonth": "${{price}} per maand · Altijd opzegbaar",
       "openingCheckout": "Betaling openen…",
       "freeRemaining": "{{count}} gratis reflectie over",
       "freeRemaining_other": "{{count}} gratis reflecties over"
