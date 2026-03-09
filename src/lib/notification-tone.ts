@@ -1,68 +1,57 @@
 /**
  * Holzen notification tone.
- * Generates via ElevenLabs on first use, then caches in localStorage.
+ * Uses Web Audio API to generate a warm, bowl-like chime.
+ * No external API dependency.
  */
 
-const CACHE_KEY = 'holzen_notification_tone';
+let audioCtx: AudioContext | null = null;
 
-async function fetchTone(): Promise<string> {
-  const cached = localStorage.getItem(CACHE_KEY);
-  if (cached) return cached;
-
-  try {
-    const response = await fetch(
-      `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/generate-tone`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          apikey: import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-        },
-        body: JSON.stringify({
-          prompt: 'A warm, organic, calming notification chime. Like a soft wooden singing bowl being gently struck once, with a warm golden resonance that fades slowly. Not electronic, not a ping. Natural, grounding, meditative. Single tone, brief.',
-          duration: 2,
-        }),
-      }
-    );
-
-    if (!response.ok) return '';
-
-    const data = await response.json();
-    if (data.audio) {
-      localStorage.setItem(CACHE_KEY, data.audio);
-      return data.audio;
-    }
-  } catch (e) {
-    console.warn('Could not generate notification tone:', e);
+function getAudioContext(): AudioContext {
+  if (!audioCtx) {
+    audioCtx = new AudioContext();
   }
-  return '';
+  return audioCtx;
 }
-
-let audioInstance: HTMLAudioElement | null = null;
 
 export async function playNotificationTone() {
   try {
-    const base64 = await fetchTone();
-    if (!base64) return;
+    const ctx = getAudioContext();
+    if (ctx.state === 'suspended') await ctx.resume();
 
-    const audioUrl = `data:audio/mpeg;base64,${base64}`;
-    
-    if (audioInstance) {
-      audioInstance.pause();
-      audioInstance.currentTime = 0;
-    }
-    
-    audioInstance = new Audio(audioUrl);
-    audioInstance.volume = 0.4;
-    await audioInstance.play();
-  } catch (e) {
+    const now = ctx.currentTime;
+
+    // Fundamental tone (singing bowl ~528Hz)
+    const osc1 = ctx.createOscillator();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(528, now);
+
+    // Gentle harmonic
+    const osc2 = ctx.createOscillator();
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(1056, now); // octave above
+
+    // Gain envelopes
+    const gain1 = ctx.createGain();
+    gain1.gain.setValueAtTime(0, now);
+    gain1.gain.linearRampToValueAtTime(0.25, now + 0.02);
+    gain1.gain.exponentialRampToValueAtTime(0.001, now + 1.8);
+
+    const gain2 = ctx.createGain();
+    gain2.gain.setValueAtTime(0, now);
+    gain2.gain.linearRampToValueAtTime(0.08, now + 0.02);
+    gain2.gain.exponentialRampToValueAtTime(0.001, now + 1.2);
+
+    osc1.connect(gain1).connect(ctx.destination);
+    osc2.connect(gain2).connect(ctx.destination);
+
+    osc1.start(now);
+    osc2.start(now);
+    osc1.stop(now + 2);
+    osc2.stop(now + 1.5);
+  } catch {
     // Silently fail — autoplay may be blocked
-    console.warn('Could not play notification tone:', e);
   }
 }
 
-/** Pre-fetch the tone so it's cached for when needed */
-export function prefetchNotificationTone() {
-  fetchTone().catch(() => {});
-}
+/** No-op kept for API compatibility */
+export function prefetchNotificationTone() {}
