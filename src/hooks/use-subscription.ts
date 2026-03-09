@@ -2,9 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { PRICING } from '@/lib/pricing';
-
-
-const FREE_MONTHLY_LIMIT = PRICING.freeReflectionsPerMonth;
+onth;
 
 export function useSubscription() {
   const { user } = useAuth();
@@ -30,8 +28,7 @@ export function useSubscription() {
       if (data?.subscribed && !data?.cached) {
         trackOnce('subscribed');
       }
-      if (data?.subscribed) {
-        setSubscribed(true);
+      if (data?.subscriibed(true);
         setMonthlyRemaining(undefined);
       } else {
         setSubscribed(false);
