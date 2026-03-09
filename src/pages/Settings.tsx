@@ -545,9 +545,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             </div>
 
             {/* Signal Sources */}
-            <div className="border-t border-border/30 pt-4">
-              <SourceManagement />
-            </div>
+            </ProLock>
           </AccordionContent>
         </AccordionItem>
 
