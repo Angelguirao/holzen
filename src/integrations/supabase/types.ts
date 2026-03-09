@@ -369,6 +369,9 @@ export type Database = {
           ritual_template: string
           silent_mode: boolean
           streak_freeze_dates: string[]
+          subscription_checked_at: string | null
+          subscription_end: string | null
+          subscription_status: string
           threshold: number
           threshold_down: number
           timezone: string | null
@@ -415,6 +418,9 @@ export type Database = {
           ritual_template?: string
           silent_mode?: boolean
           streak_freeze_dates?: string[]
+          subscription_checked_at?: string | null
+          subscription_end?: string | null
+          subscription_status?: string
           threshold?: number
           threshold_down?: number
           timezone?: string | null
@@ -461,6 +467,9 @@ export type Database = {
           ritual_template?: string
           silent_mode?: boolean
           streak_freeze_dates?: string[]
+          subscription_checked_at?: string | null
+          subscription_end?: string | null
+          subscription_status?: string
           threshold?: number
           threshold_down?: number
           timezone?: string | null

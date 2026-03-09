@@ -7,19 +7,27 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader?.startsWith("Bearer ")) throw new Error("No authorization header");
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) throw new Error("No authorization header");
 
-    const supabaseClient = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_ANON_KEY") ?? "",
-      { global: { headers: { Authorization: authHeader } } }
-    );
+  const supabaseClient = createClient(
+    Deno.env.get("SUPABASE_URL") ?? "",
+    Deno.env.get("SUPABASE_ANON_KEY") ?? "",
+    { global: { headers: { Authorization: authHeader } } }
+  );
+
+  const serviceClient = createClient(
+    Deno.env.get("SUPABASE_URL") ?? "",
+    Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+    { auth: { persistSession: false } }
+  );
 
   try {
     const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
@@ -32,18 +40,14 @@ serve(async (req) => {
     const userId = claimsData.claims.sub as string;
     if (!email) throw new Error("No email in token");
 
-    // Check for lifetime access first
-    const serviceClient = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-      { auth: { persistSession: false } }
-    );
+    // Fetch cached subscription data from profiles
     const { data: profile } = await serviceClient
-      .from('profiles')
-      .select('lifetime_access')
-      .eq('user_id', userId)
+      .from("profiles")
+      .select("lifetime_access, subscription_status, subscription_end, subscription_checked_at")
+      .eq("user_id", userId)
       .single();
 
+    // Lifetime access — always return immediately
     if (profile?.lifetime_access) {
       return new Response(JSON.stringify({
         subscribed: true,
@@ -54,42 +58,76 @@ serve(async (req) => {
       });
     }
 
+    // Check if cache is still fresh (unless force=true in body)
+    let force = false;
+    try {
+      const body = await req.json();
+      force = body?.force === true;
+    } catch { /* no body is fine */ }
+
+    if (!force && profile?.subscription_checked_at) {
+      const checkedAt = new Date(profile.subscription_checked_at).getTime();
+      const now = Date.now();
+      if (now - checkedAt < CACHE_TTL_MS) {
+        // Return cached result
+        const cachedSubscribed = profile.subscription_status === "active";
+        return new Response(JSON.stringify({
+          subscribed: cachedSubscribed,
+          lifetime: false,
+          subscription_end: profile.subscription_end,
+          cached: true,
+        }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
+    // Cache is stale or missing — call Stripe
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
     const customers = await stripe.customers.list({ email, limit: 1 });
 
-    if (customers.data.length === 0) {
-      return new Response(JSON.stringify({ subscribed: false }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+    let hasActive = false;
+    let subscriptionEnd: string | null = null;
+
+    if (customers.data.length > 0) {
+      const subscriptions = await stripe.subscriptions.list({
+        customer: customers.data[0].id,
+        status: "active",
+        limit: 1,
       });
-    }
 
-    const subscriptions = await stripe.subscriptions.list({
-      customer: customers.data[0].id,
-      status: "active",
-      limit: 1,
-    });
-
-    const hasActive = subscriptions.data.length > 0;
-    let subscriptionEnd = null;
-    if (hasActive) {
-      const sub = subscriptions.data[0];
-      const itemEnd = sub.items?.data?.[0]?.current_period_end;
-      const raw = itemEnd ?? (sub as any).current_period_end ?? sub.billing_cycle_anchor;
-      try {
-        if (typeof raw === "number") {
-          subscriptionEnd = new Date(raw * 1000).toISOString();
-        } else if (typeof raw === "string") {
-          subscriptionEnd = new Date(raw).toISOString();
+      hasActive = subscriptions.data.length > 0;
+      if (hasActive) {
+        const sub = subscriptions.data[0];
+        const itemEnd = sub.items?.data?.[0]?.current_period_end;
+        const raw = itemEnd ?? (sub as any).current_period_end ?? sub.billing_cycle_anchor;
+        try {
+          if (typeof raw === "number") {
+            subscriptionEnd = new Date(raw * 1000).toISOString();
+          } else if (typeof raw === "string") {
+            subscriptionEnd = new Date(raw).toISOString();
+          }
+        } catch (e) {
+          console.log("Could not parse subscription end date:", raw, e);
         }
-      } catch (e) {
-        console.log("Could not parse subscription end date:", raw, e);
       }
     }
+
+    // Write result to cache
+    await serviceClient
+      .from("profiles")
+      .update({
+        subscription_status: hasActive ? "active" : "free",
+        subscription_end: subscriptionEnd,
+        subscription_checked_at: new Date().toISOString(),
+      })
+      .eq("user_id", userId);
 
     return new Response(JSON.stringify({
       subscribed: hasActive,
       lifetime: false,
       subscription_end: subscriptionEnd,
+      cached: false,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
