@@ -63,9 +63,7 @@
     "manualReflectionIn": "Manual reflection in {{minutes}} min",
     "cooldownMessage": "Take this time to breathe. The next reflection will be here when you need it.",
     "requestAnytime": "Request a reflection anytime — no threshold required.",
-    "startRitualBeforeDeciding": "Start ritual before deciding",
     "startARitual": "Start a ritual",
-    "enterTheVoid": "Enter the void",
     "ambientMode": "Ambient mode",
     "whenBtcMoves": "When Bitcoin moves, we'll help you pause before you act.",
     "nextAutoCheck": "Next auto-check · {{time}}",
@@ -253,16 +251,7 @@
       "zoomOut": "Zoom out",
       "history": "Historical insight"
     },
-    "ritualDesc": "A guided pre-decision sequence. Choose your preferred depth.",
     "ritualDescUpdated": "Rituals are customizable grounding sequences you run before making a decision. Choose from presets, build your own, or let AI suggest one — directly from the ritual screen.",
-    "ritualTemplates": {
-      "quick": "Quick",
-      "quickDesc": "Breathe → Decide",
-      "standard": "Standard",
-      "standardDesc": "Breathe → Reflect → Decide",
-      "deep": "Deep",
-      "deepDesc": "Breathe → Reflect → Journal → Decide"
-    },
     "emailNotifications": "Email notifications",
     "pushNotifications": "Push notifications",
     "digestFrequency": "Digest frequency",
