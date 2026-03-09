@@ -221,6 +221,9 @@ export function HolzenRitual({
                   <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground/50 text-center">
                     {t('ritual.selectTemplate')}
                   </p>
+                  <p className="text-[11px] text-muted-foreground/60 leading-relaxed text-center">
+                    {t('ritual.intro')}
+                  </p>
 
                   {/* Presets */}
                   <div className="space-y-2">
