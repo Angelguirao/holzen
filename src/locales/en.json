@@ -1087,6 +1087,11 @@
     "bestTemplateInsight": "Your {{template}} ritual has the highest hold rate at {{rate}}%",
     "avgSuffix": "avg {{seconds}}s",
     "templateEffectiveness": "Template effectiveness",
+    "stepEffectiveness": "Step-type effectiveness",
+    "topStepLabel": "Most effective step",
+    "stepInsight": "Rituals with {{step}} have a {{rateWith}}% hold rate vs {{rateWithout}}% without",
+    "withStep": "With",
+    "withoutStep": "Without",
     "held": "held",
     "templates": {
       "quick": "Quick",
