@@ -646,13 +646,6 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           <ProLockedCompanion label={labels.zoomOut} onUpgrade={() => requirePro('zoom_out')} />
         )
       )}
-          <ZoomOutDisplay
-            data={zoomOut}
-            loading={zoomOutLoading}
-            error={zoomOutError}
-          />
-        </CollapsibleCompanion>
-      )}
 
       {hasHistory && (
         isPro ? (
@@ -676,13 +669,6 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
         ) : (
           <ProLockedCompanion label={labels.lookBack} onUpgrade={() => requirePro('history')} />
         )
-      )}
-          <HistoricalInsightDisplay
-            data={historyInsight}
-            loading={historyLoading}
-            error={historyError}
-          />
-        </CollapsibleCompanion>
       )}
     </div>
   );
