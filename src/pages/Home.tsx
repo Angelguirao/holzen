@@ -571,7 +571,6 @@ const Home = () => {
       <HolzenRitual
         open={showRitual}
         onClose={() => setShowRitual(false)}
-        template={(ritualTemplate || 'standard') as RitualTemplate}
         reflectionMessage={message ?? undefined}
         reflectionId={lastReflectionId}
       />

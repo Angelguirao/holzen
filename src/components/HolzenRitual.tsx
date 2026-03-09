@@ -190,7 +190,7 @@ export function HolzenRitual({
     } catch {
       // Fallback to standard
       const std = PRESET_TEMPLATES.find((p) => p.id === 'standard')!;
-      setSteps(std.steps as StepData[]);
+      setSteps([...std.steps] as StepData[]);
       setTemplateName('standard');
       setPhase('run');
       startTimeRef.current = Date.now();
