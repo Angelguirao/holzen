@@ -378,8 +378,8 @@
   "landing": {
     "hero": "Bitcoin hareket ettiğinde, sen hareket etmeden önce dur.",
     "heroDesc": "Holzen bir ticaret aracı değildir. Bir öz-farkındalık pratiğidir. Bitcoin hareket ettiğinde, dürtüsel davranmadan önce durmak, düşünmek ve kalıplarınızı fark etmek için bir an elde edersiniz.",
-    "getStartedForFree": "Pratiğine başla",
-    "noCreditCard": "Ücretsiz plan mevcut · Pro ayda $5'tan · kart gerekmez",
+    "getStartedForFree": "Ücretsiz başla",
+    "noCreditCard": "Sonra ayda ${{price}} · kart gerekmez · istediğiniz zaman iptal edin",
     "reflectionLoop": "Düşünce döngüsü",
     "reaction": {
       "label": "Holzen Olmadan",
