@@ -3,13 +3,14 @@ import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { OnboardingWelcome } from '@/components/onboarding/OnboardingWelcome';
-import { OnboardingCompanions } from '@/components/onboarding/OnboardingCompanions';
+import { OnboardingWhy } from '@/components/onboarding/OnboardingWhy';
 import { OnboardingThreshold } from '@/components/onboarding/OnboardingThreshold';
 
 interface OnboardingResult {
   threshold: number;
   firstName: string | null;
   timezone: string;
+  motivations: string[];
 }
 
 interface Props {
