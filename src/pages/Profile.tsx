@@ -242,6 +242,7 @@ const Profile = () => {
             )}
           </div>
         )
+        </ProLock>
       )}
     </div>
   );
