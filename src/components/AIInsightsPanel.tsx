@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
+import { useSubscription } from '@/hooks/use-subscription';
 
 interface Insight {
   category: 'timing' | 'mood' | 'behavior' | 'engagement' | 'growth';
