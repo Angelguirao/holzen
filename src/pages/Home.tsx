@@ -3,7 +3,7 @@ import { usePullToRefresh } from '@/hooks/use-pull-to-refresh';
 import { useHolzen } from '@/hooks/use-holzen';
 import { TestimonialRequest } from '@/components/TestimonialRequest';
 import { LetterToFutureSelf } from '@/components/LetterToFutureSelf';
-import { TheVoid } from '@/components/TheVoid';
+import { ReflectionTriggerOverlay } from '@/components/ReflectionTriggerOverlay';
 import { HolzenRitual, type RitualTemplate } from '@/components/HolzenRitual';
 import { RitualCooldownBanner } from '@/components/RitualCooldownBanner';
 import { useSubscription } from '@/hooks/use-subscription';
@@ -23,7 +23,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { toast } from 'sonner';
-import { AlertCircle, Loader2, Pause, Pin, Timer, Circle, Sparkles, Waves, RotateCcw, RefreshCw, Lock } from 'lucide-react';
+import { AlertCircle, Loader2, Pause, Pin, Timer, Sparkles, Waves, RotateCcw, RefreshCw, Lock } from 'lucide-react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { playNotificationTone, prefetchNotificationTone } from '@/lib/notification-tone';
 import {
@@ -103,7 +103,7 @@ const Home = () => {
 
   const { reflection: nightReflection, dismiss: dismissNight } = useNightReflection();
 
-  const [showVoid, setShowVoid] = useState(false);
+  const [showTriggerOverlay, setShowTriggerOverlay] = useState(false);
   const [showRitual, setShowRitual] = useState(false);
   const [priceHidden, setPriceHidden] = useState(() => localStorage.getItem('holzen_hide_price') === 'true');
   const [btcMode, setBtcMode] = useState(() => localStorage.getItem('holzen_btc_mode') === 'true');
@@ -187,10 +187,7 @@ const Home = () => {
   useEffect(() => {
     if (newReflection && message) {
       playNotificationTone();
-      toast('New reflection', {
-        description: message.slice(0, 80) + (message.length > 80 ? '…' : ''),
-        duration: 6000,
-      });
+      setShowTriggerOverlay(true);
       clearNewReflection();
     }
   }, [newReflection, message, clearNewReflection]);
@@ -488,21 +485,12 @@ const Home = () => {
                 {!subscribed && <span className="text-[8px] font-mono text-primary/30 uppercase tracking-wider">PRO</span>}
               </button>
               <button
-                onClick={() => setShowVoid(true)}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-border/30 bg-muted/10 hover:bg-muted/20 transition-colors duration-500"
-              >
-                <Circle className="h-3 w-3 text-muted-foreground/40" />
-                <span className="text-[10px] font-mono text-muted-foreground/40 tracking-[0.2em] uppercase">
-                  {t('home.enterTheVoid')}
-                </span>
-              </button>
-              <button
-                onClick={() => navigate('/ambient')}
+                onClick={() => navigate('/breathe')}
                 className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-border/30 bg-muted/10 hover:bg-muted/20 transition-colors duration-500"
               >
                 <Waves className="h-3 w-3 text-muted-foreground/40" />
                 <span className="text-[10px] font-mono text-muted-foreground/40 tracking-[0.2em] uppercase">
-                  {t('home.ambientMode')}
+                  {t('nav.breathe')}
                 </span>
               </button>
             </div>
@@ -577,7 +565,18 @@ const Home = () => {
         reflectionMessage={message ?? undefined}
         reflectionId={lastReflectionId}
       />
-      <TheVoid open={showVoid} onClose={() => setShowVoid(false)} />
+
+      {/* Trigger overlay */}
+      <ReflectionTriggerOverlay
+        open={showTriggerOverlay}
+        context={context}
+        message={message ?? ''}
+        reflectionId={lastReflectionId}
+        companions={companions}
+        companionPrefs={companionPrefs}
+        severity={severity}
+        onDismiss={() => setShowTriggerOverlay(false)}
+      />
 
       {/* Testimonial request */}
       <TestimonialRequest reflectionCount={reflectionCount} />
