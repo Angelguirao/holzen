@@ -1284,8 +1284,10 @@
     "ritualCount": "{{count}} ritual(s)",
     "letterCount": "{{count}} letter(s)",
     "badgeCount": "{{count}} badge(s)",
+    "practiceCount": "{{count}} practice(s)",
     "ritual": "Ritual",
-    "badge": "Badge"
+    "badge": "Badge",
+    "practice": "Practice"
   },
   "librarySources": {
     "reflection": "Reflection",

@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isSameDay, addMonths, subMonths, isToday } from 'date-fns';
-import { ChevronLeft, ChevronRight, Sparkles, Scroll, Award } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Sparkles, Scroll, Award, Heart, PenLine, Scan, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 
@@ -26,7 +26,7 @@ const DAY_TINT: Record<string, string> = {
   uncertain: 'bg-purple-500/8',
 };
 
-export type ActivityType = 'reflection' | 'ritual' | 'letter' | 'badge';
+export type ActivityType = 'reflection' | 'ritual' | 'letter' | 'badge' | 'practice';
 
 export interface CalendarActivity {
   date: string;
@@ -34,6 +34,7 @@ export interface CalendarActivity {
   mood?: string | null;
   id: string;
   label?: string;
+  practiceType?: string;
 }
 
 interface Props {
@@ -169,6 +170,7 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate }: Prop
         const ritualsList = dayItems.filter((a) => a.type === 'ritual');
         const lettersList = dayItems.filter((a) => a.type === 'letter');
         const badgesList = dayItems.filter((a) => a.type === 'badge');
+        const practiceList = dayItems.filter((a) => a.type === 'practice');
 
         const moodCounts: Record<string, number> = {};
         reflections.forEach((r) => {
@@ -208,6 +210,12 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate }: Prop
                   {t('calendar.badgeCount', { count: badgesList.length })}
                 </span>
               )}
+              {practiceList.length > 0 && (
+                <span className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
+                  <Heart className="h-2.5 w-2.5 text-pink-500/60" />
+                  {t('calendar.practiceCount', { count: practiceList.length })}
+                </span>
+              )}
             </div>
 
             {totalMoods > 0 && (
@@ -232,7 +240,7 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate }: Prop
               </div>
             )}
 
-            {(ritualsList.length > 0 || badgesList.length > 0) && (
+            {(ritualsList.length > 0 || badgesList.length > 0 || practiceList.length > 0) && (
               <div className="space-y-1">
                 {ritualsList.map((r) => (
                   <div key={r.id} className="flex items-center gap-2 text-xs text-muted-foreground">
@@ -246,6 +254,15 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate }: Prop
                     <span className="capitalize">{b.label?.replace(/-/g, ' ') || t('calendar.badge')}</span>
                   </div>
                 ))}
+                {practiceList.map((p) => {
+                  const PIcon = p.practiceType === 'journal' ? PenLine : p.practiceType === 'bodyscan' ? Scan : p.practiceType === 'replay' ? RotateCcw : Heart;
+                  return (
+                    <div key={p.id} className="flex items-center gap-2 text-xs text-muted-foreground">
+                      <PIcon className="h-2.5 w-2.5 text-pink-500/60 shrink-0" />
+                      <span>{p.label || t('calendar.practice')}</span>
+                    </div>
+                  );
+                })}
               </div>
             )}
           </div>

@@ -16,18 +16,34 @@ const HistoryContent = () => {
   useEffect(() => {
     if (!user) return;
     const load = async () => {
-      const [{ data: refs }, { data: rits }, { data: lets }, { data: bads }] = await Promise.all([
+      const [{ data: refs }, { data: rits }, { data: lets }, { data: bads }, { data: pracs }] = await Promise.all([
         supabase.from('reflections').select('id, created_at, mood').eq('user_id', user.id),
         supabase.from('ritual_completions').select('id, created_at, decision, template').eq('user_id', user.id),
         supabase.from('future_letters').select('id, written_at, deliver_during').eq('user_id', user.id),
         supabase.from('user_badges').select('id, earned_at, badge_id').eq('user_id', user.id),
+        supabase.from('practice_entries').select('id, created_at, type, mood, prompt').eq('user_id', user.id),
       ]);
+
+      const PRACTICE_LABELS: Record<string, string> = {
+        checkin: 'Emotional check-in',
+        journal: 'Guided journal',
+        bodyscan: 'Body scan',
+        replay: 'Reflection replay',
+      };
 
       const items: CalendarActivity[] = [];
       (refs ?? []).forEach((r: any) => items.push({ date: r.created_at, type: 'reflection', mood: r.mood, id: r.id }));
       (rits ?? []).forEach((r: any) => items.push({ date: r.created_at, type: 'ritual', id: r.id, label: `${r.template} · ${r.decision}` }));
       (lets ?? []).forEach((l: any) => items.push({ date: l.written_at, type: 'letter', id: l.id, label: `Letter → ${l.deliver_during}` }));
       (bads ?? []).forEach((b: any) => items.push({ date: b.earned_at, type: 'badge', id: b.id, label: b.badge_id }));
+      (pracs ?? []).forEach((p: any) => items.push({
+        date: p.created_at,
+        type: 'practice',
+        id: p.id,
+        label: PRACTICE_LABELS[p.type] ?? p.type,
+        mood: p.mood,
+        practiceType: p.type,
+      }));
       setActivities(items);
       setLoading(false);
     };
