@@ -344,13 +344,13 @@ const Home = () => {
               {!subLoading && !hasAccess ? (
                 <div className="space-y-3">
                   <p className="text-sm text-muted-foreground">
-                    {t('home.subscription.usedAllFree')}
+                    {t('home.subscription.monthlyLimitReached')}
                   </p>
                   <p className="text-xs font-mono text-muted-foreground">
-                    {t('home.subscription.pricePerMonth')}
+                    {t('home.subscription.upgradeToPro')}
                   </p>
                   <Button onClick={startCheckout} disabled={checkoutLoading} className="w-full font-mono text-xs">
-                    {checkoutLoading ? t('home.subscription.openingCheckout') : t('common.subscribe')}
+                    {checkoutLoading ? t('home.subscription.openingCheckout') : t('pro.upgradeCta')}
                   </Button>
                 </div>
               ) : subLoading ? (
@@ -360,9 +360,9 @@ const Home = () => {
                 </div>
               ) : (
                 <>
-                  {!subscribed && trialRemaining !== undefined && trialRemaining > 0 && (
+                  {!subscribed && monthlyRemaining !== undefined && monthlyRemaining > 0 && (
                     <p className="text-xs font-mono text-muted-foreground">
-                      {t('home.subscription.freeRemaining', { count: trialRemaining })}
+                      {t('home.subscription.freeRemaining', { count: monthlyRemaining })}
                     </p>
                   )}
 
