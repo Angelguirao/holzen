@@ -76,11 +76,12 @@
       "practice": "Praktijk"
     },
     "subscription": {
-      "usedAllFree": "Je hebt alle {{freeReflections}} gratis reflecties gebruikt. Abonneer om door te gaan.",
+      "monthlyLimitReached": "Je hebt je {{freeReflectionsPerMonth}} gratis reflecties deze maand gebruikt. Upgrade naar Pro voor onbeperkt.",
+      "upgradeToPro": "${{price}}/maand · Onbeperkte reflecties + AI-begeleiders · Altijd opzegbaar",
       "pricePerMonth": "${{price}} per maand · Altijd opzegbaar",
       "openingCheckout": "Betaling openen…",
-      "freeRemaining": "{{count}} gratis reflectie over",
-      "freeRemaining_other": "{{count}} gratis reflecties over"
+      "freeRemaining": "{{count}} gratis reflectie over deze maand",
+      "freeRemaining_other": "{{count}} gratis reflecties over deze maand"
     },
     "errors": {
       "couldNotReachPrice": "Prijsgegevens niet bereikbaar",
