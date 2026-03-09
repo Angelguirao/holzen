@@ -421,7 +421,7 @@ const Home = () => {
                               <p className="text-sm leading-relaxed">{pinnedReflection.message}</p>
                             </div>
                           )}
-                          <NeedAMomentButton onTrigger={handleNeedAMoment} cooldownRemaining={manualCooldownRemaining} loading={loading} />
+                          <NeedAMomentButton onTrigger={handleNeedAPause} cooldownRemaining={manualCooldownRemaining} loading={loading} />
                         </div>
                       )}
                     </>
