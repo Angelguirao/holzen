@@ -46,7 +46,11 @@ export function useSubscription() {
 
         const used = count ?? 0;
         setMonthlyUsed(used);
-        setMonthlyRemaining(Math.max(0, FREE_MONTHLY_LIMIT - used));
+        const remaining = Math.max(0, FREE_MONTHLY_LIMIT - used);
+        setMonthlyRemaining(remaining);
+        if (remaining === 0 && used > 0) {
+          trackOnce('hit_free_limit');
+        }
       }
     } catch {
       setSubscribed(false);
