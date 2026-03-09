@@ -59,6 +59,13 @@ export default function PauseSession() {
   const [decision, setDecision] = useState<string | null>(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [moodDone, setMoodDone] = useState(false);
+  const [curtainLifted, setCurtainLifted] = useState(false);
+
+  // Cinematic entrance: dark curtain fades away after mount
+  useEffect(() => {
+    const timer = setTimeout(() => setCurtainLifted(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleMoodSelect = useCallback(async (mood: MoodValue) => {
     hapticFeedback('light');
