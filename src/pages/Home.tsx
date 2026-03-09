@@ -374,10 +374,6 @@ const Home = () => {
                         {t('common.done')}
                       </button>
                     </div>
-                  ) : showOutcome && outcomeReflectionId ? (
-                    <OutcomePrompt reflectionId={outcomeReflectionId} onComplete={handleOutcomeComplete} />
-                  ) : showMoodCheck ? (
-                    <MoodCheck onSelect={handleMoodSelected} onSkip={handleMoodSkipped} />
                   ) : (
                     <>
                       {loading ? (
