@@ -505,13 +505,21 @@ const Home = () => {
           >
             <div className="space-y-2">
               <button
-                onClick={() => setShowRitual(true)}
+                onClick={() => {
+                  if (!subscribed) {
+                    toast(t('pro.featureLocked'), { description: t('pro.upgradeDesc'), action: { label: t('pro.upgradeCta'), onClick: () => startCheckout() }, duration: 6000 });
+                    return;
+                  }
+                  setShowRitual(true);
+                }}
                 className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors duration-300"
               >
+                {!subscribed && <Lock className="h-3 w-3 text-primary/20" />}
                 <Sparkles className="h-3 w-3 text-primary/40" />
                 <span className="text-[10px] font-mono text-primary/40 tracking-[0.2em] uppercase">
                   {t('home.startARitual')}
                 </span>
+                {!subscribed && <span className="text-[8px] font-mono text-primary/30 uppercase tracking-wider">PRO</span>}
               </button>
               <button
                 onClick={() => setShowVoid(true)}
