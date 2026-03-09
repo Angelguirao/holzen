@@ -283,7 +283,7 @@
     "enableAiInsights": "Yapay zeka analizlerini etkinleştir",
     "plan": "Plan",
     "manageSubscription": "Aboneliği yönet",
-    "pricePerMonth": "3$/ay · İstediğiniz zaman iptal edin",
+    "pricePerMonth": "${{price}}/ay · İstediğiniz zaman iptal edin",
     "openingCheckout": "Ödeme açılıyor…",
     "passwordLabel": "Şifre",
     "newPasswordPlaceholder": "Yeni şifre",
