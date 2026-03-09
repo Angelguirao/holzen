@@ -1333,5 +1333,38 @@
   },
   "breathe": {
     "startTimer": "Start a 60s timer"
+  },
+  "practice": {
+    "title": "Practice",
+    "breatheLabel": "Breathe",
+    "checkinLabel": "Emotional check-in",
+    "journalLabel": "Guided journal",
+    "bodyscanLabel": "5-4-3-2-1 grounding",
+    "replayLabel": "Reflection replay",
+    "howAreYou": "How are you feeling right now?",
+    "howIntense": "How intense is it?",
+    "whatTriggered": "What triggered this feeling?",
+    "triggerPlaceholder": "Market news, a conversation, a thought…",
+    "checkinSaved": "Check-in logged",
+    "journalPlaceholder": "Write freely…",
+    "journalSaved": "Journal entry saved",
+    "prompt1": "What pattern am I noticing in my reactions lately?",
+    "prompt2": "What would I tell a friend feeling this way about their portfolio?",
+    "prompt3": "What am I avoiding looking at right now?",
+    "prompt4": "When I imagine the price in 4 years, what changes?",
+    "prompt5": "What would my calmest self do right now?",
+    "prompt6": "What did I learn from the last time I felt this way?",
+    "groundingIntro": "Notice 5 things you see, 4 you hear, 3 you feel, 2 you smell, 1 you taste. Tap to acknowledge each one.",
+    "sense_see": "{{count}} things you can see",
+    "sense_hear": "{{count}} things you can hear",
+    "sense_feel": "{{count}} things you can feel",
+    "sense_smell": "{{count}} things you can smell",
+    "sense_taste": "{{count}} thing you can taste",
+    "tapToAck": "Tap to acknowledge",
+    "grounded": "You are here",
+    "needMoreReflections": "You need at least a week of reflections before replaying. Keep going.",
+    "replayPrompt": "How has your perspective changed?",
+    "replayPlaceholder": "Looking back now, I notice…",
+    "replaySaved": "Replay saved"
   }
 }
