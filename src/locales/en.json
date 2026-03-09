@@ -1332,8 +1332,5 @@
   },
   "breathe": {
     "startTimer": "Start a 60s timer"
-  },
-  "onboarding": {
-    "demoComplete": "That's Holzen. We'll be here when the market moves."
   }
 }
