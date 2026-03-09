@@ -132,7 +132,7 @@ export default function Breathe() {
 
   const selectPractice = useCallback((id: PracticeMode) => {
     if (id !== 'breathe' && !subscribed) {
-      hapticFeedback('error');
+      hapticFeedback('warning');
       return;
     }
     if (id === 'breathe') {
