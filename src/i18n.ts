@@ -2,22 +2,13 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import { PRICING } from './lib/pricing';
 import en from './locales/en.json';
-import es from './locales/es.json';
-import pt from './locales/pt.json';
-import de from './locales/de.json';
-import nl from './locales/nl.json';
-import fr from './locales/fr.json';
-import tr from './locales/tr.json';
+
+// Other locales (es, pt, de, nl, fr, tr) are kept in /src/locales/ but disabled for now.
+// Re-enable by importing and adding to resources below.
 
 i18n.use(initReactI18next).init({
   resources: {
     en: { translation: en },
-    es: { translation: es },
-    pt: { translation: pt },
-    de: { translation: de },
-    nl: { translation: nl },
-    fr: { translation: fr },
-    tr: { translation: tr },
   },
   lng: 'en',
   fallbackLng: 'en',
