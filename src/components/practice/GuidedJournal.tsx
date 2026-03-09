@@ -80,11 +80,21 @@ export function GuidedJournal({ onComplete, textColor, ringColor }: Props) {
     if (!user || !body.trim()) return;
     setSaving(true);
     try {
+      // Save practice entry
       await supabase.from('practice_entries' as any).insert({
         user_id: user.id,
         type: 'journal',
         body: body.trim(),
         prompt,
+      });
+      // Also save to library as a note
+      await supabase.from('library_items').insert({
+        user_id: user.id,
+        type: 'note',
+        title: prompt.slice(0, 80),
+        body: body.trim(),
+        source_type: 'practice_journal',
+        tags: ['journal', 'practice'],
       });
       hapticFeedback('success');
       setDone(true);
