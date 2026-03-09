@@ -205,7 +205,7 @@ export function useHolzen() {
       .eq('user_id', user.id);
   }, [user]);
 
-  const completeOnboarding = useCallback(async (result: { threshold: number; firstName: string | null; timezone: string }) => {
+  const completeOnboarding = useCallback(async (result: { threshold: number; firstName: string | null; timezone: string; motivations: string[] }) => {
     setHasOnboarded(true);
     setThresholdState(result.threshold);
     if (result.firstName) setFirstNameState(result.firstName);
@@ -217,6 +217,7 @@ export function useHolzen() {
         threshold: result.threshold,
         first_name: result.firstName,
         timezone: result.timezone,
+        motivations: result.motivations.length > 0 ? result.motivations : null,
       } as any)
       .eq('user_id', user.id);
   }, [user]);

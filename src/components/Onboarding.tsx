@@ -147,6 +147,7 @@ export function Onboarding({ onComplete }: Props) {
                   threshold,
                   firstName: firstName.trim() || null,
                   timezone,
+                  motivations,
                 })}
                 variant="outline"
                 size="sm"
