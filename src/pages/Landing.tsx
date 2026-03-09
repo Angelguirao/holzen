@@ -8,8 +8,9 @@ import { motion, useReducedMotion, useInView } from 'framer-motion';
 import {
   ArrowRight, Twitter, Wind, Feather, BookOpen, TrendingDown, Brain, Tag,
   BarChart3, MessageCircle, Target, Heart, Mail, Globe, Shield, Award,
-  Zap, Moon, ChevronDown, Timer, Eye, Sparkles,
+  Zap, Moon, Sun, ChevronDown, Timer, Eye, Sparkles,
 } from 'lucide-react';
+import { useTheme } from 'next-themes';
 import { PageMeta } from '@/components/PageMeta';
 import { LandingTestimonials } from '@/components/LandingTestimonials';
 import { LandingLanguageSwitcher } from '@/components/LandingLanguageSwitcher';
@@ -45,6 +46,7 @@ const Landing = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const prefersReduced = useReducedMotion();
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     const ref = searchParams.get('ref');
@@ -125,6 +127,13 @@ const Landing = () => {
           <h1 className="text-xs font-mono tracking-[0.25em] uppercase text-foreground/80">Holzen</h1>
           <div className="flex items-center gap-4">
             <LandingLanguageSwitcher />
+            <button
+              onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+              className="text-muted-foreground hover:text-foreground transition-colors"
+              aria-label="Toggle dark mode"
+            >
+              {theme === 'dark' ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
+            </button>
             <button
               onClick={() => navigate('/auth')}
               className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
