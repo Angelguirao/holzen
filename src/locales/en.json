@@ -1349,13 +1349,21 @@
     "aiGenerating": "Crafting your ritual…",
     "steps": {
       "breathe": "Breathe",
+      "breatheDesc": "3 guided breathing cycles to calm your nervous system",
       "grounding": "Grounding",
+      "groundingDesc": "5-4-3-2-1 sensory exercise to anchor you in the present",
       "checkin": "Check-in",
+      "checkinDesc": "Name your current emotional state honestly",
       "reflect": "Reflect",
+      "reflectDesc": "Sit with a reflection message and notice what arises",
       "review": "Self-review",
+      "reviewDesc": "Look at your personal stats — hold rate, mood patterns",
       "journal": "Journal",
+      "journalDesc": "Free-form writing to process thoughts before deciding",
       "physical": "Physical action",
-      "decide": "Decide"
+      "physicalDesc": "Movement or physical activity to release tension",
+      "decide": "Decide",
+      "decideDesc": "Make your final choice: hold, buy, sell, or do nothing"
     },
     "categories": {
       "mindfulness": "Mindfulness",

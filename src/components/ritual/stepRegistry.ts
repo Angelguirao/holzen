@@ -4,6 +4,7 @@ import type { LucideIcon } from 'lucide-react';
 export interface RitualStepConfig {
   type: string;
   label: string;
+  descKey: string;
   icon: LucideIcon;
   category: 'mindfulness' | 'reflection' | 'journaling' | 'physical' | 'decision';
   /** Extra config for physical steps */
@@ -12,14 +13,14 @@ export interface RitualStepConfig {
 }
 
 export const STEP_REGISTRY: Record<string, Omit<RitualStepConfig, 'type'>> = {
-  breathe: { label: 'ritual.steps.breathe', icon: Wind, category: 'mindfulness' },
-  grounding: { label: 'ritual.steps.grounding', icon: Scan, category: 'mindfulness' },
-  checkin: { label: 'ritual.steps.checkin', icon: Heart, category: 'reflection' },
-  reflect: { label: 'ritual.steps.reflect', icon: Eye, category: 'reflection' },
-  review: { label: 'ritual.steps.review', icon: BarChart3, category: 'reflection' },
-  journal: { label: 'ritual.steps.journal', icon: PenLine, category: 'journaling' },
-  physical: { label: 'ritual.steps.physical', icon: Dumbbell, category: 'physical' },
-  decide: { label: 'ritual.steps.decide', icon: Target, category: 'decision' },
+  breathe: { label: 'ritual.steps.breathe', descKey: 'ritual.steps.breatheDesc', icon: Wind, category: 'mindfulness' },
+  grounding: { label: 'ritual.steps.grounding', descKey: 'ritual.steps.groundingDesc', icon: Scan, category: 'mindfulness' },
+  checkin: { label: 'ritual.steps.checkin', descKey: 'ritual.steps.checkinDesc', icon: Heart, category: 'reflection' },
+  reflect: { label: 'ritual.steps.reflect', descKey: 'ritual.steps.reflectDesc', icon: Eye, category: 'reflection' },
+  review: { label: 'ritual.steps.review', descKey: 'ritual.steps.reviewDesc', icon: BarChart3, category: 'reflection' },
+  journal: { label: 'ritual.steps.journal', descKey: 'ritual.steps.journalDesc', icon: PenLine, category: 'journaling' },
+  physical: { label: 'ritual.steps.physical', descKey: 'ritual.steps.physicalDesc', icon: Dumbbell, category: 'physical' },
+  decide: { label: 'ritual.steps.decide', descKey: 'ritual.steps.decideDesc', icon: Target, category: 'decision' },
 };
 
 export const STEP_CATEGORIES = [
