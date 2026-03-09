@@ -3,6 +3,7 @@ import { useSubscription } from './use-subscription';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import type { ProFeature } from '@/lib/pricing';
+import { trackEvent } from '@/lib/analytics';
 
 /**
  * Hook for gating Pro-only features.
@@ -22,11 +23,15 @@ export function useProGate() {
   const requirePro = useCallback(
     (_feature?: ProFeature): boolean => {
       if (subscribed) return true;
+      trackEvent('pro_feature_blocked', { feature: _feature }, { dedupKey: `blocked:${_feature}` });
       toast(t('pro.featureLocked'), {
         description: t('pro.upgradeDesc'),
         action: {
           label: t('pro.upgradeCta'),
-          onClick: () => startCheckout(),
+          onClick: () => {
+            trackEvent('upgrade_click', { source: _feature });
+            startCheckout();
+          },
         },
         duration: 6000,
       });
