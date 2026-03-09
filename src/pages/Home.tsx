@@ -478,7 +478,12 @@ const Home = () => {
         );
 
       case 'letter':
-        if (!hasAccess || !btcData) return null;
+        if (!btcData) return null;
+        if (!subscribed) return (
+          <HomeWidget id="letter" title={WIDGET_TITLES['letter']} collapsed={collapsed['letter']} onToggleCollapse={() => toggleCollapsed('letter')}>
+            <ProLockedWidget onUpgrade={startCheckout} checkoutLoading={checkoutLoading} />
+          </HomeWidget>
+        );
         return (
           <HomeWidget
             id="letter"
