@@ -173,7 +173,8 @@ export default function PauseSession() {
             {/* Close */}
             <button
               onClick={handleReturn}
-              className="fixed top-6 right-6 p-2 text-muted-foreground/30 hover:text-foreground/60 transition-colors duration-500 z-10"
+              className="fixed top-6 right-6 p-3 text-muted-foreground/30 hover:text-foreground/60 transition-colors duration-500 z-[60]"
+              aria-label="Close"
             >
               <X className="h-5 w-5" />
             </button>
