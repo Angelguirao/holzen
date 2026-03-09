@@ -159,10 +159,22 @@ export default function Breathe() {
   };
 
   return (
-    <div
-      className="fixed inset-0 z-[100] flex flex-col items-center justify-center select-none"
-      style={backgroundStyle}
-    >
+    <>
+      {/* Dark curtain entrance */}
+      <AnimatePresence>
+        {!curtainLifted && (
+          <motion.div
+            className="fixed inset-0 z-[200] bg-background"
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.8, ease: [0.22, 1, 0.36, 1] }}
+          />
+        )}
+      </AnimatePresence>
+
+      <div
+        className="fixed inset-0 z-[100] flex flex-col items-center justify-center select-none"
+        style={backgroundStyle}
+      >
       {/* Close */}
       <button
         onClick={handleClose}
