@@ -172,7 +172,7 @@ const Landing = () => {
             transition={{ duration: 0.6, delay: 0.6 }}
           >
             <Button
-              onClick={() => navigate('/auth')}
+              onClick={() => navigate('/auth?view=sign-up')}
               size="lg"
               className="font-mono text-xs tracking-wider group px-8"
             >
