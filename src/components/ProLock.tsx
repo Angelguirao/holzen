@@ -1,4 +1,4 @@
-import { Lock } from 'lucide-react';
+import { Lock, Sparkles } from 'lucide-react';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { useTranslation } from 'react-i18next';
 
@@ -10,7 +10,8 @@ interface Props {
 
 /**
  * Wraps a section that requires Pro.
- * Shows a locked overlay with upgrade prompt for free users.
+ * Shows children with a gradient fade + lock overlay so free users
+ * can glimpse what they're missing, but can't interact.
  */
 export function ProLock({ children, inline }: Props) {
   const { isPro, isPending, startCheckout, checkoutLoading } = useProGate();
@@ -32,19 +33,28 @@ export function ProLock({ children, inline }: Props) {
   }
 
   return (
-    <div className="relative">
-      <div className="opacity-20 pointer-events-none select-none blur-[1px]">
-        {children}
+    <div className="relative overflow-hidden rounded-md">
+      {/* Teaser peek — visible but non-interactive */}
+      <div className="pointer-events-none select-none" aria-hidden="true">
+        <div className="opacity-30 blur-[2px] max-h-[280px] overflow-hidden">
+          {children}
+        </div>
+        {/* Gradient fade to obscure bottom */}
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent" />
       </div>
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
-        <Lock className="h-4 w-4 text-muted-foreground/40" />
-        <p className="text-[10px] font-mono text-muted-foreground/50 uppercase tracking-wider">
-          {t('pro.badge')}
-        </p>
+
+      {/* Upgrade CTA overlay */}
+      <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+        <div className="flex items-center gap-2 bg-muted/60 backdrop-blur-sm border border-border/40 rounded-full px-4 py-2">
+          <Sparkles className="h-3.5 w-3.5 text-primary/70" />
+          <span className="text-[11px] font-mono text-muted-foreground uppercase tracking-wider">
+            {t('pro.badge')}
+          </span>
+        </div>
         <button
           onClick={() => startCheckout()}
           disabled={checkoutLoading}
-          className="text-[10px] font-mono text-primary/60 hover:text-primary underline underline-offset-2 transition-colors"
+          className="text-xs font-mono text-primary/80 hover:text-primary underline underline-offset-4 decoration-primary/30 hover:decoration-primary/60 transition-all"
         >
           {t('pro.upgradeCta')}
         </button>
