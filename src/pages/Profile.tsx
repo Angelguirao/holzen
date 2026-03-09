@@ -264,48 +264,39 @@ function StatsContent({ reflections, memberSince }: { reflections: Reflection[];
 
   return (
     <div className="space-y-5">
-      <div className="flex items-center justify-between">
-        <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
-          {t('profile.overview')}
-        </p>
-        <ShareStats
-          reflectionCount={reflections.length}
-          scoreData={scoreData}
-          moodCounts={moodCounts}
-        />
-      </div>
+      <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
+        {t('profile.overview')}
+      </p>
       <ReflectionStats reflections={reflections} />
-      {scoreData && <HolzenScoreDetail scoreData={scoreData} />}
-      <PeriodComparison reflections={reflections} />
       <StreakTimeline reflections={reflections} memberSince={memberSince} />
-      <InsightsPanel reflections={reflections} />
-      <DecisionQualityCard reflections={reflections} />
-      <VolatilityToleranceCard reflections={reflections} />
-      <RitualStatsCard />
 
-      {hasEnoughForCharts ? (
-        <>
-          <StatsTrends reflections={reflections} />
-          <MoodTrendChart reflections={reflections} />
-          <MoodPriceChart reflections={reflections} />
-          <MoodPriceScatter reflections={reflections} />
-        </>
-      ) : (
-        <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-6 text-center space-y-2">
-          <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground/50">
-            {t('profile.chartsUnlockSoon')}
-          </p>
-          <p className="text-xs text-muted-foreground/60 leading-relaxed max-w-[240px] mx-auto">
-            {t('profile.completeMoreReflections', { count: 5 - reflections.length })}
-          </p>
-          <div className="pt-1 space-y-1">
-            <div className="h-1 w-24 mx-auto rounded-full bg-muted/50 overflow-hidden">
-              <div className="h-full rounded-full bg-primary/30 transition-all" style={{ width: `${(reflections.length / 5) * 100}%` }} />
-            </div>
-            <p className="text-[9px] font-mono text-muted-foreground/40">{reflections.length} / 5</p>
+      {/* Pro-gated advanced stats */}
+      <ProLock>
+        <div className="space-y-5">
+          <div className="flex items-center justify-end">
+            <ShareStats
+              reflectionCount={reflections.length}
+              scoreData={scoreData}
+              moodCounts={moodCounts}
+            />
           </div>
+          {scoreData && <HolzenScoreDetail scoreData={scoreData} />}
+          <PeriodComparison reflections={reflections} />
+          <InsightsPanel reflections={reflections} />
+          <DecisionQualityCard reflections={reflections} />
+          <VolatilityToleranceCard reflections={reflections} />
+          <RitualStatsCard />
+
+          {hasEnoughForCharts && (
+            <>
+              <StatsTrends reflections={reflections} />
+              <MoodTrendChart reflections={reflections} />
+              <MoodPriceChart reflections={reflections} />
+              <MoodPriceScatter reflections={reflections} />
+            </>
+          )}
         </div>
-      )}
+      </ProLock>
     </div>
   );
 }
