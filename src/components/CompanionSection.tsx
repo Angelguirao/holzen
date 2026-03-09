@@ -600,23 +600,27 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
       )}
 
       {hasSignal && (
-        <CollapsibleCompanion
-          label={labels.signal}
-          expanded={expandedSignal}
-          onToggle={() => {
-            setExpandedSignal((v) => !v);
-            if (!completion.signal) markCompleted('signal');
-          }}
-          completed={completion.signal}
-          isFavorite={favorites['signal']}
-          onToggleFavorite={() => toggleCompanionFavorite('signal')}
-        >
-          <SignalDisplay
-            signal={signal}
-            loading={signalLoading}
-            error={signalError}
-          />
-        </CollapsibleCompanion>
+        isPro ? (
+          <CollapsibleCompanion
+            label={labels.signal}
+            expanded={expandedSignal}
+            onToggle={() => {
+              setExpandedSignal((v) => !v);
+              if (!completion.signal) markCompleted('signal');
+            }}
+            completed={completion.signal}
+            isFavorite={favorites['signal']}
+            onToggleFavorite={() => toggleCompanionFavorite('signal')}
+          >
+            <SignalDisplay
+              signal={signal}
+              loading={signalLoading}
+              error={signalError}
+            />
+          </CollapsibleCompanion>
+        ) : (
+          <ProLockedCompanion label={labels.signal} onUpgrade={() => requirePro('signal')} />
+        )
       )}
 
       {hasZoomOut && (
