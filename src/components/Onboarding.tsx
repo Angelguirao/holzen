@@ -78,7 +78,15 @@ export function Onboarding({ onComplete }: Props) {
               )}
 
               {step === 1 && (
-                <OnboardingCompanions stagger={stagger} />
+                <OnboardingWhy
+                  selected={motivations}
+                  onToggle={(id) =>
+                    setMotivations((prev) =>
+                      prev.includes(id) ? prev.filter((m) => m !== id) : [...prev, id]
+                    )
+                  }
+                  stagger={stagger}
+                />
               )}
 
               {step === 2 && (
