@@ -21,6 +21,8 @@ export interface BtcPriceData {
   fearGreed?: FearGreedData;
   onChain?: OnChainData;
   currency: string;
+  /** True when data comes from localStorage cache due to API failure */
+  _stale?: boolean;
 }
 
 export const SUPPORTED_CURRENCIES = [
@@ -91,6 +93,29 @@ async function fetchOnChainData(): Promise<OnChainData | undefined> {
   }
 }
 
+const BTC_CACHE_KEY = 'holzen_btc_cache';
+
+interface CachedBtcData {
+  data: BtcPriceData;
+  timestamp: number;
+}
+
+function cacheBtcData(data: BtcPriceData): void {
+  try {
+    localStorage.setItem(BTC_CACHE_KEY, JSON.stringify({ data, timestamp: Date.now() }));
+  } catch { /* quota exceeded etc */ }
+}
+
+export function getCachedBtcData(): CachedBtcData | null {
+  try {
+    const raw = localStorage.getItem(BTC_CACHE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as CachedBtcData;
+  } catch {
+    return null;
+  }
+}
+
 export function formatBtcPrice(price: number, currency: string): string {
   const fractionDigits = currency === 'JPY' || currency === 'KRW' ? 0 : 0;
   return price.toLocaleString('en-US', {
@@ -102,45 +127,59 @@ export function formatBtcPrice(price: number, currency: string): string {
 
 export async function fetchBtcData(currency: string = 'USD'): Promise<BtcPriceData> {
   const cur = currency.toLowerCase();
-  const [res1d, res7d, fearGreed, onChain] = await Promise.all([
-    fetchWithRetry(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=${cur}&days=1`),
-    fetchWithRetry(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=${cur}&days=7`),
-    fetchFearGreed(),
-    fetchOnChainData(),
-  ]);
-
-  const data1d = await res1d.json();
-  const prices1d: [number, number][] = data1d.prices;
-  if (!prices1d || prices1d.length < 2) throw new Error('Insufficient price data');
-
-  const price24hAgo = prices1d[0][1];
-  const currentPrice = prices1d[prices1d.length - 1][1];
-  const changePercent = ((currentPrice - price24hAgo) / price24hAgo) * 100;
-
-  let cumulativeChangePercent: number | undefined;
-  let cumulativeDirection: 'up' | 'down' | undefined;
 
   try {
-    const data7d = await res7d.json();
-    const prices7d: [number, number][] = data7d.prices;
-    if (prices7d && prices7d.length >= 2) {
-      const price7dAgo = prices7d[0][1];
-      cumulativeChangePercent = ((currentPrice - price7dAgo) / price7dAgo) * 100;
-      cumulativeDirection = cumulativeChangePercent >= 0 ? 'up' : 'down';
-    }
-  } catch {
-    // 7-day data is optional
-  }
+    const [res1d, res7d, fearGreed, onChain] = await Promise.all([
+      fetchWithRetry(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=${cur}&days=1`),
+      fetchWithRetry(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=${cur}&days=7`),
+      fetchFearGreed(),
+      fetchOnChainData(),
+    ]);
 
-  return {
-    currentPrice,
-    price24hAgo,
-    changePercent,
-    direction: changePercent >= 0 ? 'up' : 'down',
-    cumulativeChangePercent,
-    cumulativeDirection,
-    fearGreed,
-    onChain,
-    currency: currency.toUpperCase(),
-  };
+    const data1d = await res1d.json();
+    const prices1d: [number, number][] = data1d.prices;
+    if (!prices1d || prices1d.length < 2) throw new Error('Insufficient price data');
+
+    const price24hAgo = prices1d[0][1];
+    const currentPrice = prices1d[prices1d.length - 1][1];
+    const changePercent = ((currentPrice - price24hAgo) / price24hAgo) * 100;
+
+    let cumulativeChangePercent: number | undefined;
+    let cumulativeDirection: 'up' | 'down' | undefined;
+
+    try {
+      const data7d = await res7d.json();
+      const prices7d: [number, number][] = data7d.prices;
+      if (prices7d && prices7d.length >= 2) {
+        const price7dAgo = prices7d[0][1];
+        cumulativeChangePercent = ((currentPrice - price7dAgo) / price7dAgo) * 100;
+        cumulativeDirection = cumulativeChangePercent >= 0 ? 'up' : 'down';
+      }
+    } catch {
+      // 7-day data is optional
+    }
+
+    const result: BtcPriceData = {
+      currentPrice,
+      price24hAgo,
+      changePercent,
+      direction: changePercent >= 0 ? 'up' : 'down',
+      cumulativeChangePercent,
+      cumulativeDirection,
+      fearGreed,
+      onChain,
+      currency: currency.toUpperCase(),
+    };
+
+    cacheBtcData(result);
+    return result;
+  } catch (e) {
+    // Fallback to cached data if available
+    const cached = getCachedBtcData();
+    if (cached) {
+      console.warn('Using cached BTC data from', new Date(cached.timestamp).toISOString());
+      return { ...cached.data, _stale: true } as BtcPriceData;
+    }
+    throw e;
+  }
 }

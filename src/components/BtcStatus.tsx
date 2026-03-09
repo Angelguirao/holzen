@@ -1,4 +1,4 @@
-import { Eye, EyeOff, WifiOff, Bitcoin } from 'lucide-react';
+import { Eye, EyeOff, WifiOff, Bitcoin, Clock } from 'lucide-react';
 import { BtcChart } from '@/components/BtcChart';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatBtcPrice, type BtcPriceData } from '@/lib/btc';
@@ -106,7 +106,15 @@ export function BtcStatus({ data, error, hidden, onToggleHidden, currency = 'USD
     <div className="space-y-3">
       <div className="space-y-1">
         <div className="flex items-center justify-between">
-          <p className="text-xs font-mono text-muted-foreground">BTC / {cur}</p>
+          <div className="flex items-center gap-2">
+            <p className="text-xs font-mono text-muted-foreground">BTC / {cur}</p>
+            {data._stale && (
+              <span className="flex items-center gap-1 text-[8px] font-mono text-muted-foreground/40" title="Using cached data — live APIs unavailable">
+                <Clock className="h-2.5 w-2.5" />
+                cached
+              </span>
+            )}
+          </div>
           <div className="flex items-center gap-2">
             {onToggleBtcMode && (
               <button
