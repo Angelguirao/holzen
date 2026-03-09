@@ -76,11 +76,12 @@
       "practice": "Praxis"
     },
     "subscription": {
-      "usedAllFree": "Du hast alle {{freeReflections}} kostenlosen Reflexionen genutzt. Abonniere um fortzufahren.",
+      "monthlyLimitReached": "Du hast deine {{freeReflectionsPerMonth}} kostenlosen Reflexionen diesen Monat genutzt. Upgrade auf Pro für unbegrenzte.",
+      "upgradeToPro": "${{price}}/Monat · Unbegrenzte Reflexionen + KI-Begleiter · Jederzeit kündbar",
       "pricePerMonth": "${{price}} pro Monat · Jederzeit kündbar",
       "openingCheckout": "Zahlung wird geöffnet…",
-      "freeRemaining": "{{count}} kostenlose Reflexion übrig",
-      "freeRemaining_other": "{{count}} kostenlose Reflexionen übrig"
+      "freeRemaining": "{{count}} kostenlose Reflexion diesen Monat übrig",
+      "freeRemaining_other": "{{count}} kostenlose Reflexionen diesen Monat übrig"
     },
     "errors": {
       "couldNotReachPrice": "Preisdaten nicht erreichbar",
