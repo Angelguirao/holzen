@@ -189,10 +189,7 @@ const Home = () => {
   useEffect(() => {
     if (newReflection && message) {
       playNotificationTone();
-      toast('New reflection', {
-        description: message.slice(0, 80) + (message.length > 80 ? '…' : ''),
-        duration: 6000,
-      });
+      setShowTriggerOverlay(true);
       clearNewReflection();
     }
   }, [newReflection, message, clearNewReflection]);
