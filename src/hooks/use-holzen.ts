@@ -72,7 +72,7 @@ export function useHolzen() {
         setFirstNameState((data as any).first_name ?? null);
         setNightReflectionHourState((data as any).night_reflection_hour ?? 21);
         setAiInsightsEnabledState((data as any).ai_insights_enabled ?? true);
-        setRitualTemplateState((data as any).ritual_template ?? 'standard');
+        
         setNotifyBadgesState((data as any).notify_badges ?? true);
         setMotivationsState((data as any).motivations ?? []);
         setMantraState((data as any).mantra ?? null);
