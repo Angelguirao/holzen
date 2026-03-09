@@ -2,9 +2,9 @@ import { useTranslation } from 'react-i18next';
 import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { OnboardingWelcome } from '@/components/onboarding/OnboardingWelcome';
 import { OnboardingWhy } from '@/components/onboarding/OnboardingWhy';
 import { OnboardingThreshold } from '@/components/onboarding/OnboardingThreshold';
+import { OnboardingDemo } from '@/components/onboarding/OnboardingDemo';
 
 interface OnboardingResult {
   threshold: number;
@@ -23,7 +23,6 @@ const TOTAL_STEPS = 3;
 export function Onboarding({ onComplete }: Props) {
   const { t } = useTranslation();
   const [step, setStep] = useState(0);
-  const [firstName, setFirstName] = useState('');
   const [timezone] = useState(detectedTimezone);
   const [threshold, setThreshold] = useState(5);
   const [motivations, setMotivations] = useState<string[]>([]);
@@ -52,7 +51,11 @@ export function Onboarding({ onComplete }: Props) {
   const stagger = (delay: number) =>
     prefersReduced ? {} : { initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 }, transition: { delay, duration: 0.4, ease } };
 
-  const canProceed = step === 0 ? true : true;
+  const toggleMotivation = useCallback((id: string) => {
+    setMotivations((prev) =>
+      prev.includes(id) ? prev.filter((m) => m !== id) : [...prev, id]
+    );
+  }, []);
 
   return (
     <div className="fixed inset-0 z-50 bg-background flex items-center justify-center p-6">
@@ -69,32 +72,23 @@ export function Onboarding({ onComplete }: Props) {
               transition={transition}
             >
               {step === 0 && (
-                <OnboardingWelcome
-                  firstName={firstName}
-                  onFirstNameChange={setFirstName}
-                  timezone={timezone}
+                <OnboardingWhy
+                  selected={motivations}
+                  onToggle={toggleMotivation}
                   stagger={stagger}
                 />
               )}
 
               {step === 1 && (
-                <OnboardingWhy
-                  selected={motivations}
-                  onToggle={(id) =>
-                    setMotivations((prev) =>
-                      prev.includes(id) ? prev.filter((m) => m !== id) : [...prev, id]
-                    )
-                  }
-                  stagger={stagger}
-                />
-              )}
-
-              {step === 2 && (
                 <OnboardingThreshold
                   threshold={threshold}
                   onThresholdChange={setThreshold}
                   stagger={stagger}
                 />
+              )}
+
+              {step === 2 && (
+                <OnboardingDemo stagger={stagger} />
               )}
             </motion.div>
           </AnimatePresence>
@@ -145,7 +139,7 @@ export function Onboarding({ onComplete }: Props) {
               <Button
                 onClick={() => onComplete({
                   threshold,
-                  firstName: firstName.trim() || null,
+                  firstName: null,
                   timezone,
                   motivations,
                 })}
