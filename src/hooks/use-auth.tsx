@@ -26,6 +26,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
       // Record referral on first sign-in
       if (_event === 'SIGNED_IN' && session?.user) {
+        trackOnce('signup');
         const refCode = localStorage.getItem('holzen_ref');
         if (refCode) {
           localStorage.removeItem('holzen_ref');
