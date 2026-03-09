@@ -465,7 +465,7 @@ const Home = () => {
         );
 
       case 'night':
-        if (!nightReflection) return null;
+        if (!nightReflection || !subscribed) return null;
         return (
           <HomeWidget
             id="night"
