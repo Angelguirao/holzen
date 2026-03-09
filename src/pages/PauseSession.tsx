@@ -12,7 +12,6 @@ import { ReflectionNote } from '@/components/ReflectionNote';
 import { ReflectionTags } from '@/components/ReflectionTags';
 import { ShareReflection } from '@/components/ShareReflection';
 import { ReflectionWallpaper } from '@/components/ReflectionWallpaper';
-import { OutcomePrompt } from '@/components/OutcomePrompt';
 import { MoodCheck, type MoodValue } from '@/components/MoodCheck';
 
 const DECISIONS = [
@@ -55,7 +54,7 @@ export default function PauseSession() {
   const companionPrefs: CompanionPrefs = state.companionPrefs ?? { breathing: true, haiku: true, learning: true, signal: true, zoomOut: true, history: true };
   const severity: 'mild' | 'moderate' | 'high' = state.severity ?? 'mild';
 
-  const [phase, setPhase] = useState<'session' | 'outcome' | 'done'>('session');
+  const [phase, setPhase] = useState<'session' | 'done'>('session');
   const [decision, setDecision] = useState<string | null>(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [moodDone, setMoodDone] = useState(false);
@@ -96,18 +95,17 @@ export default function PauseSession() {
     }
   }, [navigate]);
 
-  const handleDecide = useCallback((d: string) => {
+  const handleDecide = useCallback(async (d: string) => {
     hapticFeedback('medium');
     setDecision(d);
-    // Dismiss the reflection from Home state
     dismissMessage();
-    setPhase('outcome');
-  }, [dismissMessage]);
-
-
-  const handleOutcomeComplete = useCallback(() => {
+    // Save outcome directly to DB
+    if (reflectionId) {
+      await supabase.from('reflections').update({ outcome: d }).eq('id', reflectionId);
+    }
+    hapticFeedback('success');
     setPhase('done');
-  }, []);
+  }, [dismissMessage, reflectionId]);
 
   // If no message, redirect back
   if (!message && phase === 'session') {
@@ -313,18 +311,7 @@ export default function PauseSession() {
                 </>
               )}
 
-              {phase === 'outcome' && reflectionId && (
-                <motion.div
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6 }}
-                  className="pt-16"
-                >
-                  <OutcomePrompt reflectionId={reflectionId} onComplete={handleOutcomeComplete} />
-                </motion.div>
-              )}
-
-              {(phase === 'done' || (phase === 'outcome' && !reflectionId)) && (
+              {phase === 'done' && (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
