@@ -55,7 +55,7 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { language } = useHolzen();
-  const { subscribed } = useSubscription();
+  const { subscribed, loading: subLoading } = useSubscription();
   const [allData, setAllData] = useState<InsightsRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
