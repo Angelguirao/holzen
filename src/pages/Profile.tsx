@@ -200,48 +200,48 @@ const Profile = () => {
         </ProLock>
       ) : (
         <ProLock>
-        lettersLoading ? (
-          <div className="space-y-3">
-            <Skeleton className="h-20 w-full rounded-md" />
-            <Skeleton className="h-20 w-full rounded-md" />
-          </div>
-        ) : letters.length === 0 ? (
-          <div className="py-8 text-center space-y-2">
-            <Mail className="h-5 w-5 mx-auto text-muted-foreground/40" />
-            <p className="text-xs text-muted-foreground">
-              {t('profile.noLettersYet')}
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {pendingLetters.length > 0 && (
-              <div className="space-y-3">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Lock className="h-3 w-3" />
-                  <p className="text-[10px] font-mono tracking-widest uppercase">
-                    {t('profile.sealed')} ({pendingLetters.length})
-                  </p>
+          {lettersLoading ? (
+            <div className="space-y-3">
+              <Skeleton className="h-20 w-full rounded-md" />
+              <Skeleton className="h-20 w-full rounded-md" />
+            </div>
+          ) : letters.length === 0 ? (
+            <div className="py-8 text-center space-y-2">
+              <Mail className="h-5 w-5 mx-auto text-muted-foreground/40" />
+              <p className="text-xs text-muted-foreground">
+                {t('profile.noLettersYet')}
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-6">
+              {pendingLetters.length > 0 && (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Lock className="h-3 w-3" />
+                    <p className="text-[10px] font-mono tracking-widest uppercase">
+                      {t('profile.sealed')} ({pendingLetters.length})
+                    </p>
+                  </div>
+                  {pendingLetters.map((l) => (
+                    <LetterCard key={l.id} letter={l} onDelete={deleteLetter} fmtPrice={fmtPrice} type="sealed" />
+                  ))}
                 </div>
-                {pendingLetters.map((l) => (
-                  <LetterCard key={l.id} letter={l} onDelete={deleteLetter} fmtPrice={fmtPrice} type="sealed" />
-                ))}
-              </div>
-            )}
-            {deliveredLetters.length > 0 && (
-              <div className="space-y-3">
-                <div className="flex items-center gap-2 text-muted-foreground">
-                  <Mail className="h-3 w-3" />
-                  <p className="text-[10px] font-mono tracking-widest uppercase">
-                    {t('profile.delivered')} ({deliveredLetters.length})
-                  </p>
+              )}
+              {deliveredLetters.length > 0 && (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Mail className="h-3 w-3" />
+                    <p className="text-[10px] font-mono tracking-widest uppercase">
+                      {t('profile.delivered')} ({deliveredLetters.length})
+                    </p>
+                  </div>
+                  {deliveredLetters.map((l) => (
+                    <LetterCard key={l.id} letter={l} onDelete={deleteLetter} fmtPrice={fmtPrice} type="delivered" />
+                  ))}
                 </div>
-                {deliveredLetters.map((l) => (
-                  <LetterCard key={l.id} letter={l} onDelete={deleteLetter} fmtPrice={fmtPrice} type="delivered" />
-                ))}
-              </div>
-            )}
-          </div>
-        )
+              )}
+            </div>
+          )}
         </ProLock>
       )}
     </div>
