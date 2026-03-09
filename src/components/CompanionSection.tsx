@@ -111,6 +111,20 @@ function CollapsibleCompanion({
   );
 }
 
+function ProLockedCompanion({ label, onUpgrade }: { label: string; onUpgrade: () => void }) {
+  const { t } = useTranslation();
+  return (
+    <button
+      onClick={onUpgrade}
+      className="flex items-center gap-1.5 text-xs font-mono text-muted-foreground/40 hover:text-muted-foreground/60 transition-colors w-full text-left"
+    >
+      <Lock className="h-3 w-3 shrink-0" />
+      <span>{label}</span>
+      <span className="ml-auto text-[9px] uppercase tracking-wider text-primary/40">{t('pro.badge')}</span>
+    </button>
+  );
+}
+
 export const CompanionSection = forwardRef<HTMLDivElement, Props>(function CompanionSection({ companions, prefs, severity = 'mild', reflectionId, context, reflectionMessage }, ref) {
   const { language } = useHolzen();
   const { isPro, requirePro } = useProGate();
