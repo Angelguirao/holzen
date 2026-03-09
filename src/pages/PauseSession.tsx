@@ -255,7 +255,7 @@ export default function PauseSession() {
                           <Heart className={`h-4 w-4 ${isFavorite ? 'fill-current' : ''}`} />
                         </button>
                         <ShareReflection message={message} context={context} haiku={companions?.haiku} />
-                        <ReflectionWallpaper message={message} mood={null} context={context} haiku={companions?.haiku} variant="button" />
+                        {subscribed && <ReflectionWallpaper message={message} mood={null} context={context} haiku={companions?.haiku} variant="button" />}
                       </div>
                     </div>
                   </RevealSection>

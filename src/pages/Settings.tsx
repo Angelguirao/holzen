@@ -1,5 +1,6 @@
 import { useAuth } from '@/hooks/use-auth';
 import { SourceManagement } from '@/components/SourceManagement';
+import { ProLock } from '@/components/ProLock';
 import { isHapticEnabled, setHapticEnabled } from '@/lib/haptics';
 import { useHolzen } from '@/hooks/use-holzen';
 import { useSubscription } from '@/hooks/use-subscription';
@@ -388,7 +389,8 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
               </div>
             </div>
 
-            {/* Tone */}
+            {/* Tone — Pro */}
+            <ProLock>
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.tone')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
@@ -411,8 +413,10 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                 ))}
               </div>
             </div>
+            </ProLock>
 
-            {/* Style */}
+            {/* Style — Pro */}
+            <ProLock>
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.style')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
@@ -441,8 +445,10 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                 ))}
               </div>
             </div>
+            </ProLock>
 
-            {/* Custom Prompt */}
+            {/* Custom Prompt — Pro */}
+            <ProLock>
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.customPrompt')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
@@ -460,6 +466,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                 {(customPrompt?.length ?? 0)}/200
               </p>
             </div>
+            </ProLock>
 
             {/* Silent Mode */}
             <div className="space-y-3">
@@ -518,6 +525,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             {t('settings.companions')}
           </AccordionTrigger>
           <AccordionContent className="space-y-6 pb-4">
+            <ProLock>
             <div className="space-y-3">
               <p className="text-xs text-muted-foreground leading-relaxed">
                 {t('settings.companionsDesc')}
@@ -537,9 +545,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             </div>
 
             {/* Signal Sources */}
-            <div className="border-t border-border/30 pt-4">
-              <SourceManagement />
-            </div>
+            </ProLock>
           </AccordionContent>
         </AccordionItem>
 
@@ -549,6 +555,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             {t('settings.ritual')}
           </AccordionTrigger>
           <AccordionContent className="space-y-3 pb-4">
+            <ProLock>
             <p className="text-xs text-muted-foreground leading-relaxed">
               {t('settings.ritualDesc')}
             </p>
@@ -570,6 +577,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                 </button>
               ))}
             </div>
+            </ProLock>
           </AccordionContent>
         </AccordionItem>
 
@@ -601,7 +609,8 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
               )}
             </div>
 
-            {/* Digest */}
+            {/* Digest — Pro */}
+            <ProLock>
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.digestFrequency')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
@@ -638,8 +647,10 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                 ))}
               </div>
             </div>
+            </ProLock>
 
-            {/* Night Reflection */}
+            {/* Night Reflection — Pro */}
+            <ProLock>
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.nightReflection')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
@@ -670,8 +681,10 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                 </div>
               )}
             </div>
+            </ProLock>
 
-            {/* Quiet Hours */}
+            {/* Quiet Hours — Pro */}
+            <ProLock>
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.quietHours')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
@@ -716,8 +729,9 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                 </div>
               )}
             </div>
+            </ProLock>
 
-            {/* Badge notifications */}
+            {/* Badge notifications — free */}
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.badgeNotifications')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
@@ -731,7 +745,8 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
               </div>
             </div>
 
-            {/* AI Insights */}
+            {/* AI Insights — Pro */}
+            <ProLock>
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.aiInsights')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
@@ -744,6 +759,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                 <Switch id="ai-insights" checked={aiInsightsEnabled} onCheckedChange={setAiInsightsEnabled} />
               </div>
             </div>
+            </ProLock>
           </AccordionContent>
         </AccordionItem>
 
