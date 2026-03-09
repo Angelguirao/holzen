@@ -50,6 +50,7 @@ const App = () => (
         <TooltipProvider>
           <Sonner />
           <OfflineBanner />
+          <CookieConsent />
           <BrowserRouter>
             <AuthProvider>
               <Routes>
