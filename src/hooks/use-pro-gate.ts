@@ -3,7 +3,7 @@ import { useSubscription } from './use-subscription';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import type { ProFeature } from '@/lib/pricing';
-* Returns `isPro` and a `requirePro` guard that shows an upgrade toast.
+at shows an upgrade toast.
  */
 export function useProGate() {
   const { subscribed, startCheckout, checkoutLoading } = useSubscription();
@@ -20,18 +20,13 @@ export function useProGate() {
     (_feature?: ProFeature): boolean => {
       if (subscribed) return true;
       trackEvent('pro_feature_blocked', { feature:   description: t('pro.upgradeDesc'),
-        action: {
-          label: t('pro.upgradeCta'),
-          onClick: () => {
-            trackEvent('upgrade_click', { source: _feature });
+        ent('upgrade_click', { source: _feature });
             startCheckout();
           },
         },
         duration: 6000,
       });
-      return false;
-    },
-    [subscribed, startCheckout, t],
+ eckout, t],
   );
 
   return { isPro, requirePro, startCheckout, checkoutLoading };
