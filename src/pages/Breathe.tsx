@@ -123,7 +123,11 @@ export default function Breathe() {
 
   const handleClose = useCallback(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
-    navigate(-1);
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/', { replace: true });
+    }
   }, [navigate]);
 
   const startVoid = useCallback(() => {
