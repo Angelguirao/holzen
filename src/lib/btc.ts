@@ -21,6 +21,8 @@ export interface BtcPriceData {
   fearGreed?: FearGreedData;
   onChain?: OnChainData;
   currency: string;
+  /** True when data comes from localStorage cache due to API failure */
+  _stale?: boolean;
 }
 
 export const SUPPORTED_CURRENCIES = [
