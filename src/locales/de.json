@@ -76,11 +76,12 @@
       "practice": "Praxis"
     },
     "subscription": {
-      "usedAllFree": "Du hast alle {{freeReflections}} kostenlosen Reflexionen genutzt. Abonniere um fortzufahren.",
+      "monthlyLimitReached": "Du hast deine {{freeReflectionsPerMonth}} kostenlosen Reflexionen diesen Monat genutzt. Upgrade auf Pro für unbegrenzte.",
+      "upgradeToPro": "${{price}}/Monat · Unbegrenzte Reflexionen + KI-Begleiter · Jederzeit kündbar",
       "pricePerMonth": "${{price}} pro Monat · Jederzeit kündbar",
       "openingCheckout": "Zahlung wird geöffnet…",
-      "freeRemaining": "{{count}} kostenlose Reflexion übrig",
-      "freeRemaining_other": "{{count}} kostenlose Reflexionen übrig"
+      "freeRemaining": "{{count}} kostenlose Reflexion diesen Monat übrig",
+      "freeRemaining_other": "{{count}} kostenlose Reflexionen diesen Monat übrig"
     },
     "errors": {
       "couldNotReachPrice": "Preisdaten nicht erreichbar",
@@ -460,8 +461,8 @@
     },
     "scienceQuote": "Impulsive Entscheidungen bei Volatilität führen durchgehend zu schlechteren Ergebnissen.",
     "scienceDesc": "Forschung zur Verhaltensfinanzierung zeigt, dass emotionale Reaktionen — Panikverkäufe bei Rückgängen, euphorische Käufe bei Anstiegen — zu den zuverlässigsten Prädiktoren für schlechte Renditen gehören. Eine kurze Pause vor dem Handeln führt zu besseren Entscheidungen.",
-    "freeToStart": "Kostenlos starten",
-    "pricingDesc": "Deine ersten {{freeReflections}} Reflexionen sind kostenlos — keine Karte erforderlich. Dann ${{price}}/Monat für unbegrenzte Reflexionen, Begleiter, Stimmungstracking und Analysen. Jederzeit kündbar.",
+    "freeToStart": "Kostenloser Plan verfügbar",
+    "pricingDesc": "{{freeReflectionsPerMonth}} Reflexionen pro Monat — für immer kostenlos, ohne Karte. Pro für ${{price}}/Monat: unbegrenzte Reflexionen, KI-Begleiter, Rituale, Analysen, Bibliothek und mehr. Jederzeit kündbar.",
     "getStartedFree": "Kostenlos starten",
     "clarityWorth": "Was ist ein Moment der Klarheit wert?",
     "questions": "Fragen",
@@ -629,5 +630,6 @@
   "calendar": { "su": "So", "mo": "Mo", "tu": "Di", "we": "Mi", "th": "Do", "fr": "Fr", "sa": "Sa", "noActivity": "Keine Aktivität.", "reflectionCount": "{{count}} Reflexion(en)", "ritualCount": "{{count}} Ritual(e)", "letterCount": "{{count}} Brief(e)", "badgeCount": "{{count}} Abzeichen", "ritual": "Ritual", "badge": "Abzeichen" },
   "librarySources": { "reflection": "Reflexion", "reflection_note": "Notiz", "signal": "Signal", "learning": "Lernen", "haiku": "Haiku", "zoom_out": "Zoom Out", "history_insight": "Geschichte", "external": "Extern" },
   "itemDetail": { "onThisDay": "An diesem Tag", "yearsAgo": "vor {{count}}J", "echo": "Echo", "deepTime": "Tiefenzeit", "viewSource": "Quelle ansehen", "source": "Quelle", "companions": "Begleiter", "relatedItems": "Verwandte Einträge", "historicalDataPoints": "{{count}} historische Datenpunkte" },
-  "libraryCard": { "removeFavorite": "Aus Favoriten entfernen", "addFavorite": "Zu Favoriten hinzufügen", "markRead": "Als gelesen markieren", "markUnread": "Als ungelesen markieren", "archive": "Archivieren", "unread": "ungelesen", "archived": "archiviert", "link": "Link", "tag": "Tag", "tagPlaceholder": "Tag eingeben + Enter…", "save": "Speichern", "saved": "Gespeichert", "saveToLibrary": "In Bibliothek speichern", "addTagsPlaceholder": "Tags hinzufügen…", "enterToCreate": "Enter um \"{{tag}}\" zu erstellen" }
+  "libraryCard": { "removeFavorite": "Aus Favoriten entfernen", "addFavorite": "Zu Favoriten hinzufügen", "markRead": "Als gelesen markieren", "markUnread": "Als ungelesen markieren", "archive": "Archivieren", "unread": "ungelesen", "archived": "archiviert", "link": "Link", "tag": "Tag", "tagPlaceholder": "Tag eingeben + Enter…", "save": "Speichern", "saved": "Gespeichert", "saveToLibrary": "In Bibliothek speichern", "addTagsPlaceholder": "Tags hinzufügen…", "enterToCreate": "Enter um \"{{tag}}\" zu erstellen" },
+  "pro": { "featureLocked": "Pro-Funktion", "upgradeDesc": "Upgrade auf Pro für KI-Begleiter, Analysen, Rituale, Bibliothek und mehr.", "upgradeCta": "Auf Pro upgraden", "badge": "PRO" }
 }

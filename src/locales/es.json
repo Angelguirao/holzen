@@ -76,11 +76,12 @@
       "practice": "Práctica"
     },
     "subscription": {
-      "usedAllFree": "Has usado tus {{freeReflections}} reflexiones gratuitas. Suscríbete para continuar.",
+      "monthlyLimitReached": "Has usado tus {{freeReflectionsPerMonth}} reflexiones gratuitas de este mes. Pasa a Pro para ilimitadas.",
+      "upgradeToPro": "${{price}}/mes · Reflexiones ilimitadas + compañeros IA · Cancela cuando quieras",
       "pricePerMonth": "${{price}} por mes · Cancela cuando quieras",
       "openingCheckout": "Abriendo pago…",
-      "freeRemaining": "{{count}} reflexión gratuita restante",
-      "freeRemaining_other": "{{count}} reflexiones gratuitas restantes"
+      "freeRemaining": "{{count}} reflexión gratuita restante este mes",
+      "freeRemaining_other": "{{count}} reflexiones gratuitas restantes este mes"
     },
     "errors": {
       "couldNotReachPrice": "No se pudieron obtener los datos de precio",
@@ -463,8 +464,8 @@
     },
     "scienceQuote": "Las decisiones impulsivas bajo volatilidad consistentemente llevan a peores resultados.",
     "scienceDesc": "La investigación en finanzas conductuales muestra que las reacciones emocionales — vender en pánico durante caídas, comprar en euforia durante subidas — son de los predictores más confiables de malos rendimientos. Una breve pausa antes de actuar lleva a mejores decisiones.",
-    "freeToStart": "Gratis para empezar",
-    "pricingDesc": "Tus primeras {{freeReflections}} reflexiones son gratis — sin tarjeta requerida. Luego ${{price}}/mes para reflexiones ilimitadas, herramientas, rituales, seguimiento de ánimo, biblioteca y análisis. Cancela cuando quieras.",
+    "freeToStart": "Plan gratuito disponible",
+    "pricingDesc": "{{freeReflectionsPerMonth}} reflexiones al mes — gratis para siempre, sin tarjeta. Pro por ${{price}}/mes: reflexiones ilimitadas, compañeros IA, rituales, análisis, biblioteca y más. Cancela cuando quieras.",
     "questions": "Preguntas frecuentes",
     "faq": {
       "whoQuestion": "¿Para quién es Holzen?",
@@ -472,7 +473,7 @@
       "adviceQuestion": "¿Me dirá qué comprar o vender?",
       "adviceAnswer": "Nunca. Holzen no es una herramienta de trading ni un asesor financiero. Cada reflexión es intencionalmente neutral — diseñada para crear conciencia, no acción.",
       "freeQuestion": "¿Qué obtengo gratis?",
-      "freeAnswer": "Tus primeras {{freeReflections}} reflexiones son completamente gratis con todas las funciones incluidas — herramientas, seguimiento de ánimo, rituales, todo. Después, son ${{price}}/mes. Cancela cuando quieras, sin contratos.",
+      "freeAnswer": "{{freeReflectionsPerMonth}} reflexiones al mes con el ciclo básico: datos de mercado, respiración, chequeo emocional y registro de resultado. Pro (${{price}}/mes) desbloquea reflexiones ilimitadas, todos los compañeros IA, análisis, rituales, biblioteca, cartas y más. Cancela cuando quieras.",
       "dataQuestion": "¿Qué pasa con mis datos?",
       "dataAnswer": "Solo almacenamos lo necesario: tu email, umbrales, reflexiones y registros de ánimo. Puedes exportar todo como JSON o CSV cuando quieras, o eliminar tu cuenta completamente con un toque. Consulta nuestra",
       "differentQuestion": "¿En qué se diferencia de una app de diario?",
@@ -867,5 +868,6 @@
   "calendar": { "su": "Do", "mo": "Lu", "tu": "Ma", "we": "Mi", "th": "Ju", "fr": "Vi", "sa": "Sa", "noActivity": "Sin actividad.", "reflectionCount": "{{count}} reflexión(es)", "ritualCount": "{{count}} ritual(es)", "letterCount": "{{count}} carta(s)", "badgeCount": "{{count}} insignia(s)", "ritual": "Ritual", "badge": "Insignia" },
   "librarySources": { "reflection": "Reflexión", "reflection_note": "Nota", "signal": "Señal", "learning": "Aprendizaje", "haiku": "Haiku", "zoom_out": "Zoom Out", "history_insight": "Historia", "external": "Externo" },
   "itemDetail": { "onThisDay": "En este día", "yearsAgo": "hace {{count}}a", "echo": "Eco", "deepTime": "Tiempo profundo", "viewSource": "Ver fuente", "source": "fuente", "companions": "Compañeros", "relatedItems": "Elementos relacionados", "historicalDataPoints": "{{count}} datos históricos" },
-  "libraryCard": { "removeFavorite": "Quitar de favoritos", "addFavorite": "Añadir a favoritos", "markRead": "Marcar leído", "markUnread": "Marcar no leído", "archive": "Archivar", "unread": "no leído", "archived": "archivado", "link": "enlace", "tag": "etiqueta", "tagPlaceholder": "Escribe etiqueta + Enter…", "save": "Guardar", "saved": "Guardado", "saveToLibrary": "Guardar en biblioteca", "addTagsPlaceholder": "Añadir etiquetas…", "enterToCreate": "Enter para crear \"{{tag}}\"" }
+  "libraryCard": { "removeFavorite": "Quitar de favoritos", "addFavorite": "Añadir a favoritos", "markRead": "Marcar leído", "markUnread": "Marcar no leído", "archive": "Archivar", "unread": "no leído", "archived": "archivado", "link": "enlace", "tag": "etiqueta", "tagPlaceholder": "Escribe etiqueta + Enter…", "save": "Guardar", "saved": "Guardado", "saveToLibrary": "Guardar en biblioteca", "addTagsPlaceholder": "Añadir etiquetas…", "enterToCreate": "Enter para crear \"{{tag}}\"" },
+  "pro": { "featureLocked": "Función Pro", "upgradeDesc": "Pasa a Pro para desbloquear compañeros IA, análisis, rituales, biblioteca y más.", "upgradeCta": "Pasar a Pro", "badge": "PRO" }
 }

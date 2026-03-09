@@ -76,11 +76,12 @@
       "practice": "Practice"
     },
     "subscription": {
-      "usedAllFree": "You've used all {{freeReflections}} free reflections. Subscribe to continue.",
+      "monthlyLimitReached": "You've used your {{freeReflectionsPerMonth}} free reflections this month. Upgrade to Pro for unlimited.",
+      "upgradeToPro": "${{price}}/month · Unlimited reflections + AI companions · Cancel anytime",
       "pricePerMonth": "${{price}} per month · Cancel anytime",
       "openingCheckout": "Opening checkout…",
-      "freeRemaining": "{{count}} free reflection remaining",
-      "freeRemaining_other": "{{count}} free reflections remaining"
+      "freeRemaining": "{{count}} free reflection remaining this month",
+      "freeRemaining_other": "{{count}} free reflections remaining this month"
     },
     "errors": {
       "couldNotReachPrice": "Could not reach price data",
@@ -472,8 +473,8 @@
     },
     "scienceQuote": "Impulsive decisions under volatility consistently lead to worse outcomes.",
     "scienceDesc": "Behavioral finance research shows that emotional reactions — panic selling during drops, euphoric buying during surges — are among the most reliable predictors of poor returns. A brief pause before action leads to better decisions.",
-    "freeToStart": "Free to start",
-    "pricingDesc": "Your first {{freeReflections}} reflections are free — no credit card required. Then ${{price}}/month for unlimited reflections, companions, rituals, mood tracking, library, and insights. Cancel anytime.",
+    "freeToStart": "Free plan available",
+    "pricingDesc": "{{freeReflectionsPerMonth}} reflections per month — free forever, no credit card. Upgrade to Pro for ${{price}}/month: unlimited reflections, AI companions, rituals, insights, library, and more. Cancel anytime.",
     "questions": "Common questions",
     "faq": {
       "whoQuestion": "Who is Holzen for?",
@@ -481,7 +482,7 @@
       "adviceQuestion": "Will it tell me what to buy or sell?",
       "adviceAnswer": "Never. Holzen is not a trading tool or financial advisor. Every reflection is intentionally neutral — designed to create awareness, not action.",
       "freeQuestion": "What do I get for free?",
-      "freeAnswer": "Your first {{freeReflections}} reflections are completely free with all features included — companions, mood tracking, rituals, everything. After that, it's ${{price}}/month. Cancel anytime, no contracts.",
+      "freeAnswer": "{{freeReflectionsPerMonth}} reflections per month with the core loop: market data, breathing, mood check, and outcome logging. Pro (${{price}}/mo) unlocks unlimited reflections plus all AI companions, insights, rituals, library, letters, and more. Cancel anytime.",
       "dataQuestion": "What happens to my data?",
       "dataAnswer": "We store only what's needed: your email, thresholds, reflections, and mood entries. You can export everything as JSON or CSV anytime, or delete your account entirely with one tap. See our",
       "differentQuestion": "How is this different from a journal app?",
@@ -1287,5 +1288,11 @@
     "saveToLibrary": "Save to Library",
     "addTagsPlaceholder": "Add tags…",
     "enterToCreate": "Enter to create \"{{tag}}\""
+  },
+  "pro": {
+    "featureLocked": "Pro feature",
+    "upgradeDesc": "Upgrade to Pro to unlock AI companions, insights, rituals, library, and more.",
+    "upgradeCta": "Upgrade to Pro",
+    "badge": "PRO"
   }
 }

@@ -76,11 +76,12 @@
       "practice": "Praktijk"
     },
     "subscription": {
-      "usedAllFree": "Je hebt alle {{freeReflections}} gratis reflecties gebruikt. Abonneer om door te gaan.",
+      "monthlyLimitReached": "Je hebt je {{freeReflectionsPerMonth}} gratis reflecties deze maand gebruikt. Upgrade naar Pro voor onbeperkt.",
+      "upgradeToPro": "${{price}}/maand · Onbeperkte reflecties + AI-begeleiders · Altijd opzegbaar",
       "pricePerMonth": "${{price}} per maand · Altijd opzegbaar",
       "openingCheckout": "Betaling openen…",
-      "freeRemaining": "{{count}} gratis reflectie over",
-      "freeRemaining_other": "{{count}} gratis reflecties over"
+      "freeRemaining": "{{count}} gratis reflectie over deze maand",
+      "freeRemaining_other": "{{count}} gratis reflecties over deze maand"
     },
     "errors": {
       "couldNotReachPrice": "Prijsgegevens niet bereikbaar",
@@ -461,8 +462,8 @@
     },
     "scienceQuote": "Impulsieve beslissingen bij volatiliteit leiden consequent tot slechtere resultaten.",
     "scienceDesc": "Onderzoek naar gedragsfinancien toont aan dat emotionele reacties — paniekverkoop bij dalingen, euforische aankopen bij stijgingen — tot de meest betrouwbare voorspellers van slechte rendementen behoren. Een korte pauze voor actie leidt tot betere beslissingen.",
-    "freeToStart": "Gratis beginnen",
-    "pricingDesc": "Je eerste {{freeReflections}} reflecties zijn gratis — geen kaart vereist. Daarna ${{price}}/maand voor onbeperkte reflecties, begeleiders, stemmingstracking en inzichten. Altijd opzegbaar.",
+    "freeToStart": "Gratis plan beschikbaar",
+    "pricingDesc": "{{freeReflectionsPerMonth}} reflecties per maand — voor altijd gratis, zonder kaart. Pro voor ${{price}}/maand: onbeperkte reflecties, AI-begeleiders, rituelen, inzichten, bibliotheek en meer. Altijd opzegbaar.",
     "getStartedFree": "Gratis beginnen",
     "clarityWorth": "Hoeveel is één moment van helderheid waard?",
     "questions": "Vragen",
@@ -630,5 +631,6 @@
   "calendar": { "su": "Zo", "mo": "Ma", "tu": "Di", "we": "Wo", "th": "Do", "fr": "Vr", "sa": "Za", "noActivity": "Geen activiteit.", "reflectionCount": "{{count}} reflectie(s)", "ritualCount": "{{count}} ritueel/rituelen", "letterCount": "{{count}} brief/brieven", "badgeCount": "{{count}} badge(s)", "ritual": "Ritueel", "badge": "Badge" },
   "librarySources": { "reflection": "Reflectie", "reflection_note": "Notitie", "signal": "Signaal", "learning": "Leren", "haiku": "Haiku", "zoom_out": "Uitzoom", "history_insight": "Geschiedenis", "external": "Extern" },
   "itemDetail": { "onThisDay": "Op deze dag", "yearsAgo": "{{count}}j geleden", "echo": "Echo", "deepTime": "Diepe tijd", "viewSource": "Bron bekijken", "source": "bron", "companions": "Begeleiders", "relatedItems": "Gerelateerde items", "historicalDataPoints": "{{count}} historische datapunten" },
-  "libraryCard": { "removeFavorite": "Uit favorieten verwijderen", "addFavorite": "Aan favorieten toevoegen", "markRead": "Als gelezen markeren", "markUnread": "Als ongelezen markeren", "archive": "Archiveren", "unread": "ongelezen", "archived": "gearchiveerd", "link": "link", "tag": "tag", "tagPlaceholder": "Typ tag + Enter…", "save": "Opslaan", "saved": "Opgeslagen", "saveToLibrary": "Opslaan in bibliotheek", "addTagsPlaceholder": "Tags toevoegen…", "enterToCreate": "Enter om \"{{tag}}\" te maken" }
+  "libraryCard": { "removeFavorite": "Uit favorieten verwijderen", "addFavorite": "Aan favorieten toevoegen", "markRead": "Als gelezen markeren", "markUnread": "Als ongelezen markeren", "archive": "Archiveren", "unread": "ongelezen", "archived": "gearchiveerd", "link": "link", "tag": "tag", "tagPlaceholder": "Typ tag + Enter…", "save": "Opslaan", "saved": "Opgeslagen", "saveToLibrary": "Opslaan in bibliotheek", "addTagsPlaceholder": "Tags toevoegen…", "enterToCreate": "Enter om \"{{tag}}\" te maken" },
+  "pro": { "featureLocked": "Pro-functie", "upgradeDesc": "Upgrade naar Pro voor AI-begeleiders, inzichten, rituelen, bibliotheek en meer.", "upgradeCta": "Upgraden naar Pro", "badge": "PRO" }
 }

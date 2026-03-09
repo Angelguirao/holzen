@@ -76,11 +76,12 @@
       "practice": "Prática"
     },
     "subscription": {
-      "usedAllFree": "Você usou suas {{freeReflections}} reflexões gratuitas. Assine para continuar.",
+      "monthlyLimitReached": "Você usou suas {{freeReflectionsPerMonth}} reflexões gratuitas deste mês. Faça upgrade para Pro.",
+      "upgradeToPro": "${{price}}/mês · Reflexões ilimitadas + companheiros IA · Cancele quando quiser",
       "pricePerMonth": "${{price}} por mês · Cancele quando quiser",
       "openingCheckout": "Abrindo pagamento…",
-      "freeRemaining": "{{count}} reflexão gratuita restante",
-      "freeRemaining_other": "{{count}} reflexões gratuitas restantes"
+      "freeRemaining": "{{count}} reflexão gratuita restante este mês",
+      "freeRemaining_other": "{{count}} reflexões gratuitas restantes este mês"
     },
     "errors": {
       "couldNotReachPrice": "Não foi possível obter dados de preço",
@@ -461,8 +462,8 @@
     },
     "scienceQuote": "Decisões impulsivas sob volatilidade consistentemente levam a piores resultados.",
     "scienceDesc": "Pesquisas de finanças comportamentais mostram que reações emocionais — venda em pânico durante quedas, compra eufórica durante altas — estão entre os preditores mais confiáveis de retornos ruins. Uma breve pausa antes da ação leva a melhores decisões.",
-    "freeToStart": "Grátis para começar",
-    "pricingDesc": "Suas primeiras {{freeReflections}} reflexões são gratuitas — sem cartão necessário. Depois ${{price}}/mês para reflexões ilimitadas, companheiros, rastreamento de humor e análises. Cancele quando quiser.",
+    "freeToStart": "Plano gratuito disponível",
+    "pricingDesc": "{{freeReflectionsPerMonth}} reflexões por mês — grátis para sempre, sem cartão. Pro por ${{price}}/mês: reflexões ilimitadas, companheiros IA, rituais, análises, biblioteca e mais. Cancele quando quiser.",
     "getStartedFree": "Comece grátis",
     "clarityWorth": "Quanto vale um momento de clareza?",
     "questions": "Perguntas",
@@ -630,5 +631,6 @@
   "calendar": { "su": "Do", "mo": "Se", "tu": "Te", "we": "Qu", "th": "Qi", "fr": "Se", "sa": "Sá", "noActivity": "Sem atividade.", "reflectionCount": "{{count}} reflexão(ões)", "ritualCount": "{{count}} ritual(is)", "letterCount": "{{count}} carta(s)", "badgeCount": "{{count}} insígnia(s)", "ritual": "Ritual", "badge": "Insígnia" },
   "librarySources": { "reflection": "Reflexão", "reflection_note": "Nota", "signal": "Sinal", "learning": "Aprendizado", "haiku": "Haiku", "zoom_out": "Ampliar", "history_insight": "História", "external": "Externo" },
   "itemDetail": { "onThisDay": "Neste dia", "yearsAgo": "há {{count}}a", "echo": "Eco", "deepTime": "Tempo profundo", "viewSource": "Ver fonte", "source": "fonte", "companions": "Companheiros", "relatedItems": "Itens relacionados", "historicalDataPoints": "{{count}} pontos de dados históricos" },
-  "libraryCard": { "removeFavorite": "Remover dos favoritos", "addFavorite": "Adicionar aos favoritos", "markRead": "Marcar como lido", "markUnread": "Marcar como não lido", "archive": "Arquivar", "unread": "não lido", "archived": "arquivado", "link": "link", "tag": "tag", "tagPlaceholder": "Digite tag + Enter…", "save": "Salvar", "saved": "Salvo", "saveToLibrary": "Salvar na biblioteca", "addTagsPlaceholder": "Adicionar tags…", "enterToCreate": "Enter para criar \"{{tag}}\"" }
+  "libraryCard": { "removeFavorite": "Remover dos favoritos", "addFavorite": "Adicionar aos favoritos", "markRead": "Marcar como lido", "markUnread": "Marcar como não lido", "archive": "Arquivar", "unread": "não lido", "archived": "arquivado", "link": "link", "tag": "tag", "tagPlaceholder": "Digite tag + Enter…", "save": "Salvar", "saved": "Salvo", "saveToLibrary": "Salvar na biblioteca", "addTagsPlaceholder": "Adicionar tags…", "enterToCreate": "Enter para criar \"{{tag}}\"" },
+  "pro": { "featureLocked": "Recurso Pro", "upgradeDesc": "Faça upgrade para Pro e desbloqueie companheiros IA, análises, rituais, biblioteca e mais.", "upgradeCta": "Upgrade para Pro", "badge": "PRO" }
 }

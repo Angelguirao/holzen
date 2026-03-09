@@ -76,11 +76,12 @@
       "practice": "Pratik"
     },
     "subscription": {
-      "usedAllFree": "{{freeReflections}} ücretsiz düşüncenizi kullandınız. Devam etmek için abone olun.",
+      "monthlyLimitReached": "Bu ay {{freeReflectionsPerMonth}} ücretsiz düşüncenizi kullandınız. Sınırsız için Pro'ya geçin.",
+      "upgradeToPro": "Ayda ${{price}} · Sınırsız düşünce + AI yol arkadaşları · İstediğiniz zaman iptal",
       "pricePerMonth": "Ayda ${{price}} · İstediğiniz zaman iptal edin",
       "openingCheckout": "Ödeme açılıyor…",
-      "freeRemaining": "{{count}} ücretsiz düşünce kaldı",
-      "freeRemaining_other": "{{count}} ücretsiz düşünce kaldı"
+      "freeRemaining": "Bu ay {{count}} ücretsiz düşünce kaldı",
+      "freeRemaining_other": "Bu ay {{count}} ücretsiz düşünce kaldı"
     },
     "errors": {
       "couldNotReachPrice": "Fiyat verilerine ulaşılamadı",
@@ -461,8 +462,8 @@
     },
     "scienceQuote": "Volatilite altında alınan dürtüsel kararlar tutarlı olarak daha kötü sonuçlara yol açar.",
     "scienceDesc": "Davranışsal finans araştırmaları, duygusal tepkilerin — düşüşlerde panik satışı, yükselişlerde coşkulu alımlar — kötü getirilerin en güvenilir öngörücüleri arasında olduğunu gösterir. Eylemden önce kısa bir duraklama daha iyi kararlara yol açar.",
-    "freeToStart": "Başlamak ücretsiz",
-    "pricingDesc": "İlk {{freeReflections}} düşünceniz ücretsiz — kart gerekmez. Sonra sınırsız düşünce, yol arkadaşları, ruh hali takibi ve analizler için ayda ${{price}}. İstediğiniz zaman iptal edin.",
+    "freeToStart": "Ücretsiz plan mevcut",
+    "pricingDesc": "Ayda {{freeReflectionsPerMonth}} düşünce — sonsuza kadar ücretsiz, kart gerekmez. Pro ayda ${{price}}: sınırsız düşünce, AI yol arkadaşları, ritüeller, analizler, kütüphane ve daha fazlası. İstediğiniz zaman iptal edin.",
     "getStartedFree": "Ücretsiz başla",
     "clarityWorth": "Bir an berraklığın değeri ne kadar?",
     "questions": "Sorular",
@@ -630,5 +631,6 @@
   "calendar": { "su": "Pz", "mo": "Pt", "tu": "Sa", "we": "Ça", "th": "Pe", "fr": "Cu", "sa": "Ct", "noActivity": "Aktivite yok.", "reflectionCount": "{{count}} düşünce", "ritualCount": "{{count}} ritüel", "letterCount": "{{count}} mektup", "badgeCount": "{{count}} rozet", "ritual": "Ritüel", "badge": "Rozet" },
   "librarySources": { "reflection": "Düşünce", "reflection_note": "Not", "signal": "Sinyal", "learning": "Öğrenme", "haiku": "Haiku", "zoom_out": "Uzaklaş", "history_insight": "Tarih", "external": "Harici" },
   "itemDetail": { "onThisDay": "Bu günde", "yearsAgo": "{{count}}y önce", "echo": "Yankı", "deepTime": "Derin Zaman", "viewSource": "Kaynağı gör", "source": "kaynak", "companions": "Yol Arkadaşları", "relatedItems": "İlgili öğeler", "historicalDataPoints": "{{count}} tarihsel veri noktası" },
-  "libraryCard": { "removeFavorite": "Favorilerden kaldır", "addFavorite": "Favorilere ekle", "markRead": "Okundu olarak işaretle", "markUnread": "Okunmadı olarak işaretle", "archive": "Arşivle", "unread": "okunmadı", "archived": "arşivlendi", "link": "bağlantı", "tag": "etiket", "tagPlaceholder": "Etiket yaz + Enter…", "save": "Kaydet", "saved": "Kaydedildi", "saveToLibrary": "Kütüphaneye kaydet", "addTagsPlaceholder": "Etiket ekle…", "enterToCreate": "\"{{tag}}\" oluşturmak için Enter" }
+  "libraryCard": { "removeFavorite": "Favorilerden kaldır", "addFavorite": "Favorilere ekle", "markRead": "Okundu olarak işaretle", "markUnread": "Okunmadı olarak işaretle", "archive": "Arşivle", "unread": "okunmadı", "archived": "arşivlendi", "link": "bağlantı", "tag": "etiket", "tagPlaceholder": "Etiket yaz + Enter…", "save": "Kaydet", "saved": "Kaydedildi", "saveToLibrary": "Kütüphaneye kaydet", "addTagsPlaceholder": "Etiket ekle…", "enterToCreate": "\"{{tag}}\" oluşturmak için Enter" },
+  "pro": { "featureLocked": "Pro özellik", "upgradeDesc": "AI yol arkadaşları, analizler, ritüeller, kütüphane ve daha fazlası için Pro'ya geçin.", "upgradeCta": "Pro'ya geç", "badge": "PRO" }
 }
