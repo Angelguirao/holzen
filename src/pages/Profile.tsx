@@ -79,11 +79,15 @@ const Profile = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
   const { subscribed } = useSubscription();
+  const location = useLocation();
+  const locationTab = (location.state as any)?.tab;
   const [reflections, setReflections] = useState<Reflection[]>([]);
   const [letters, setLetters] = useState<Letter[]>([]);
   const [loading, setLoading] = useState(true);
   const [lettersLoading, setLettersLoading] = useState(true);
-  const [tab, setTab] = useState<'stats' | 'insights' | 'badges' | 'letters' | 'activity'>('stats');
+  const [tab, setTab] = useState<'stats' | 'insights' | 'badges' | 'letters' | 'activity'>(
+    ['stats', 'insights', 'badges', 'letters', 'activity'].includes(locationTab) ? locationTab : 'stats'
+  );
 
   useEffect(() => {
     document.title = 'Holzen — Profile';
