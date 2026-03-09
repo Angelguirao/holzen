@@ -117,19 +117,22 @@ export function ItemDetailViewer({ item, linkedItems, allItems, open, onClose, o
     <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
       <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto rounded-t-xl">
         <SheetHeader className="pb-2">
-          <div className="flex items-center justify-between gap-2">
-            <div className="flex items-center gap-2">
-              <span className="text-base">{TYPE_EMOJIS[item.type] ?? '📄'}</span>
-              <SheetTitle className="text-sm font-mono">
-                {isReflection ? t('librarySources.reflection') : sourceLabel}
-              </SheetTitle>
-            </div>
+          <div className="flex items-center gap-2">
+            <span className="text-base">{TYPE_EMOJIS[item.type] ?? '📄'}</span>
+            <SheetTitle className="text-sm font-mono">
+              {isReflection ? t('librarySources.reflection') : sourceLabel}
+            </SheetTitle>
+          </div>
+          <div className="flex items-center gap-2 pt-1">
             <button
               onClick={() => onToggleFavorite(item.id)}
               className={`p-1.5 transition-colors ${item.is_favorite ? 'text-destructive' : 'text-muted-foreground/40 hover:text-destructive'}`}
             >
               <Heart className={`h-4 w-4 ${item.is_favorite ? 'fill-current' : ''}`} />
             </button>
+            <span className="text-[9px] font-mono text-muted-foreground/40">
+              {item.is_favorite ? t('libraryCard.removeFavorite') : t('libraryCard.addFavorite')}
+            </span>
           </div>
         </SheetHeader>
 
