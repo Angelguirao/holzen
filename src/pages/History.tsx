@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
+import { useSubscription } from '@/hooks/use-subscription';
 import { useHolzen } from '@/hooks/use-holzen';
 import { formatBtcPrice } from '@/lib/btc';
 import { format, subDays, isAfter, isBefore, startOfDay, endOfDay, isSameDay } from 'date-fns';
@@ -176,6 +177,7 @@ const History = () => {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { currency } = useHolzen();
+  const { subscribed } = useSubscription();
   const [reflections, setReflections] = useState<Reflection[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -732,7 +734,7 @@ const History = () => {
                     <Heart className={`h-3 w-3 ${r.is_favorite ? 'fill-current' : ''}`} />
                   </button>
                   <ShareReflection message={r.message} context={r.context} haiku={r.haiku} />
-                  <ReflectionWallpaper message={r.message} mood={r.mood} context={r.context} haiku={r.haiku} />
+                  {subscribed && <ReflectionWallpaper message={r.message} mood={r.mood} context={r.context} haiku={r.haiku} />}
                   <AlertDialog>
                     <AlertDialogTrigger asChild>
                       <button

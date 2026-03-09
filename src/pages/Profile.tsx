@@ -3,6 +3,7 @@ import { useEffect, useState, useMemo, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useHolzen } from '@/hooks/use-holzen';
+import { useSubscription } from '@/hooks/use-subscription';
 import { formatBtcPrice } from '@/lib/btc';
 import { format } from 'date-fns';
 import { Mail, Lock, Clock, Trash2 } from 'lucide-react';
@@ -13,6 +14,7 @@ import { InsightsPanel } from '@/components/InsightsPanel';
 import { DecisionQualityCard } from '@/components/DecisionQualityCard';
 import { StreakTimeline } from '@/components/StreakTimeline';
 import { AIInsightsPanel } from '@/components/AIInsightsPanel';
+import { ProLock } from '@/components/ProLock';
 
 import { BadgesPanel } from '@/components/BadgesPanel';
 import { MoodPriceChart } from '@/components/MoodPriceChart';
@@ -75,6 +77,7 @@ interface Letter {
 const Profile = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
+  const { subscribed } = useSubscription();
   const [reflections, setReflections] = useState<Reflection[]>([]);
   const [letters, setLetters] = useState<Letter[]>([]);
   const [loading, setLoading] = useState(true);
@@ -173,14 +176,16 @@ const Profile = () => {
           <StatsContent reflections={reflections} memberSince={user?.created_at} />
         )
       ) : tab === 'insights' ? (
-        loading ? (
-          <div className="space-y-3">
-            <Skeleton className="h-20 w-full rounded-md" />
-            <Skeleton className="h-20 w-full rounded-md" />
-          </div>
-        ) : (
-          <AIInsightsPanel reflectionCount={reflections.length} />
-        )
+        <ProLock>
+          {loading ? (
+            <div className="space-y-3">
+              <Skeleton className="h-20 w-full rounded-md" />
+              <Skeleton className="h-20 w-full rounded-md" />
+            </div>
+          ) : (
+            <AIInsightsPanel reflectionCount={reflections.length} />
+          )}
+        </ProLock>
       ) : tab === 'badges' ? (
         loading ? (
           <div className="space-y-3">
@@ -190,8 +195,11 @@ const Profile = () => {
           <BadgesPanel reflections={reflections} />
         )
       ) : tab === 'activity' ? (
-        <HistoryContent />
+        <ProLock>
+          <HistoryContent />
+        </ProLock>
       ) : (
+        <ProLock>
         lettersLoading ? (
           <div className="space-y-3">
             <Skeleton className="h-20 w-full rounded-md" />
@@ -234,6 +242,7 @@ const Profile = () => {
             )}
           </div>
         )
+        </ProLock>
       )}
     </div>
   );
@@ -255,48 +264,39 @@ function StatsContent({ reflections, memberSince }: { reflections: Reflection[];
 
   return (
     <div className="space-y-5">
-      <div className="flex items-center justify-between">
-        <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
-          {t('profile.overview')}
-        </p>
-        <ShareStats
-          reflectionCount={reflections.length}
-          scoreData={scoreData}
-          moodCounts={moodCounts}
-        />
-      </div>
+      <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
+        {t('profile.overview')}
+      </p>
       <ReflectionStats reflections={reflections} />
-      {scoreData && <HolzenScoreDetail scoreData={scoreData} />}
-      <PeriodComparison reflections={reflections} />
       <StreakTimeline reflections={reflections} memberSince={memberSince} />
-      <InsightsPanel reflections={reflections} />
-      <DecisionQualityCard reflections={reflections} />
-      <VolatilityToleranceCard reflections={reflections} />
-      <RitualStatsCard />
 
-      {hasEnoughForCharts ? (
-        <>
-          <StatsTrends reflections={reflections} />
-          <MoodTrendChart reflections={reflections} />
-          <MoodPriceChart reflections={reflections} />
-          <MoodPriceScatter reflections={reflections} />
-        </>
-      ) : (
-        <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-6 text-center space-y-2">
-          <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground/50">
-            {t('profile.chartsUnlockSoon')}
-          </p>
-          <p className="text-xs text-muted-foreground/60 leading-relaxed max-w-[240px] mx-auto">
-            {t('profile.completeMoreReflections', { count: 5 - reflections.length })}
-          </p>
-          <div className="pt-1 space-y-1">
-            <div className="h-1 w-24 mx-auto rounded-full bg-muted/50 overflow-hidden">
-              <div className="h-full rounded-full bg-primary/30 transition-all" style={{ width: `${(reflections.length / 5) * 100}%` }} />
-            </div>
-            <p className="text-[9px] font-mono text-muted-foreground/40">{reflections.length} / 5</p>
+      {/* Pro-gated advanced stats */}
+      <ProLock>
+        <div className="space-y-5">
+          <div className="flex items-center justify-end">
+            <ShareStats
+              reflectionCount={reflections.length}
+              scoreData={scoreData}
+              moodCounts={moodCounts}
+            />
           </div>
+          {scoreData && <HolzenScoreDetail scoreData={scoreData} />}
+          <PeriodComparison reflections={reflections} />
+          <InsightsPanel reflections={reflections} />
+          <DecisionQualityCard reflections={reflections} />
+          <VolatilityToleranceCard reflections={reflections} />
+          <RitualStatsCard />
+
+          {hasEnoughForCharts && (
+            <>
+              <StatsTrends reflections={reflections} />
+              <MoodTrendChart reflections={reflections} />
+              <MoodPriceChart reflections={reflections} />
+              <MoodPriceScatter reflections={reflections} />
+            </>
+          )}
         </div>
-      )}
+      </ProLock>
     </div>
   );
 }
