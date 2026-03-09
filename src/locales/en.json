@@ -387,8 +387,8 @@
   "landing": {
     "hero": "When Bitcoin moves, pause before you do.",
     "heroDesc": "Holzen is a self-awareness practice for Bitcoin holders. When volatility hits, you get a moment to breathe, reflect, and notice your patterns — before impulse takes over.",
-    "getStartedForFree": "Get started for free",
-    "noCreditCard": "No credit card required",
+    "getStartedForFree": "Start your practice",
+    "noCreditCard": "Free plan available · Pro from $5/mo · no credit card",
     "reflectionLoop": "The reflection loop",
     "reaction": {
       "label": "Without Holzen",
@@ -473,7 +473,7 @@
     "scienceQuote": "Impulsive decisions under volatility consistently lead to worse outcomes.",
     "scienceDesc": "Behavioral finance research shows that emotional reactions — panic selling during drops, euphoric buying during surges — are among the most reliable predictors of poor returns. A brief pause before action leads to better decisions.",
     "freeToStart": "Free to start",
-    "pricingDesc": "Your first 3 reflections are free — no credit card required. Then $3/month for unlimited reflections, companions, rituals, mood tracking, library, and insights. Cancel anytime.",
+    "pricingDesc": "Your first 3 reflections are free — no credit card required. Then $5/month for unlimited reflections, companions, rituals, mood tracking, library, and insights. Cancel anytime.",
     "questions": "Common questions",
     "faq": {
       "whoQuestion": "Who is Holzen for?",
@@ -481,7 +481,7 @@
       "adviceQuestion": "Will it tell me what to buy or sell?",
       "adviceAnswer": "Never. Holzen is not a trading tool or financial advisor. Every reflection is intentionally neutral — designed to create awareness, not action.",
       "freeQuestion": "What do I get for free?",
-      "freeAnswer": "Your first 3 reflections are completely free with all features included — companions, mood tracking, rituals, everything. After that, it's $3/month. Cancel anytime, no contracts.",
+      "freeAnswer": "Your first 3 reflections are completely free with all features included — companions, mood tracking, rituals, everything. After that, it's $5/month. Cancel anytime, no contracts.",
       "dataQuestion": "What happens to my data?",
       "dataAnswer": "We store only what's needed: your email, thresholds, reflections, and mood entries. You can export everything as JSON or CSV anytime, or delete your account entirely with one tap. See our",
       "differentQuestion": "How is this different from a journal app?",
