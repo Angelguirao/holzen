@@ -243,7 +243,7 @@ const Home = () => {
     return <Onboarding onComplete={completeOnboarding} />;
   }
 
-  conscanReflectRemaining > 0);
+  const hasAccess = canReflect;
 
   // Zen mode — unchanged
   if (zenMode) {
