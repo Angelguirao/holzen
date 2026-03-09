@@ -464,7 +464,7 @@
     "scienceQuote": "Las decisiones impulsivas bajo volatilidad consistentemente llevan a peores resultados.",
     "scienceDesc": "La investigación en finanzas conductuales muestra que las reacciones emocionales — vender en pánico durante caídas, comprar en euforia durante subidas — son de los predictores más confiables de malos rendimientos. Una breve pausa antes de actuar lleva a mejores decisiones.",
     "freeToStart": "Gratis para empezar",
-    "pricingDesc": "Tus primeras 3 reflexiones son gratis — sin tarjeta requerida. Luego $5/mes para reflexiones ilimitadas, herramientas, rituales, seguimiento de ánimo, biblioteca y análisis. Cancela cuando quieras.",
+    "pricingDesc": "Tus primeras {{freeReflections}} reflexiones son gratis — sin tarjeta requerida. Luego ${{price}}/mes para reflexiones ilimitadas, herramientas, rituales, seguimiento de ánimo, biblioteca y análisis. Cancela cuando quieras.",
     "questions": "Preguntas frecuentes",
     "faq": {
       "whoQuestion": "¿Para quién es Holzen?",
