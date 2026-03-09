@@ -3,6 +3,7 @@ import { useEffect, useState, useCallback, useMemo } from 'react';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
+import { useSubscription } from '@/hooks/use-subscription';
 import { useHolzen } from '@/hooks/use-holzen';
 import { formatBtcPrice } from '@/lib/btc';
 import { format, subDays, isAfter, isBefore, startOfDay, endOfDay, isSameDay } from 'date-fns';
