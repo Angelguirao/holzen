@@ -6,10 +6,11 @@ import { LearningInput } from './LearningInput';
 import { SignalDisplay } from './SignalDisplay';
 import { ZoomOutDisplay } from './ZoomOutDisplay';
 import { HistoricalInsightDisplay } from './HistoricalInsightDisplay';
-import { ChevronDown, Check, Heart } from 'lucide-react';
+import { ChevronDown, Check, Heart, Lock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { hapticFeedback } from '@/lib/haptics';
 import { useHolzen } from '@/hooks/use-holzen';
+import { useProGate } from '@/hooks/use-pro-gate';
 
 export interface CompanionData {
   haiku: string | null;
