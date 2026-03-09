@@ -475,7 +475,7 @@ export function useHolzen() {
 
     const now = Date.now();
     setLastManualAt(now);
-    localStorage.setItem('holzen_last_manual_at', String(now));
+    localStorage.setItem(manualCooldownKey, String(now));
     try {
       const data = btcData || await fetchBtcData(currency);
       if (!btcData) setBtcData(data);
