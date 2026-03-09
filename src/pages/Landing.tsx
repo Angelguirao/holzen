@@ -46,6 +46,7 @@ const Landing = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const prefersReduced = useReducedMotion();
+  const { theme, setTheme } = useTheme();
 
   useEffect(() => {
     const ref = searchParams.get('ref');
