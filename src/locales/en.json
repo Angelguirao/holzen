@@ -1376,6 +1376,7 @@
     },
     "builder": {
       "title": "Build your ritual",
+      "intro": "Design your own grounding sequence. Pick the steps that work for you — from breathing and journaling to physical movement — and save it as a reusable template.",
       "namePlaceholder": "Ritual name…",
       "addStep": "Add a step",
       "empty": "Add steps to build your ritual",
