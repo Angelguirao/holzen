@@ -289,7 +289,7 @@ const Landing = () => {
               </p>
             </div>
             <Button
-              onClick={() => navigate('/auth')}
+              onClick={() => navigate('/auth?view=sign-up')}
               size="lg"
               className="font-mono text-xs tracking-wider group px-10"
             >
