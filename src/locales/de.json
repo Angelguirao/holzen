@@ -282,7 +282,7 @@
     "enableAiInsights": "KI-Analysen aktivieren",
     "plan": "Plan",
     "manageSubscription": "Abo verwalten",
-    "pricePerMonth": "$3/Monat · Jederzeit kündbar",
+    "pricePerMonth": "${{price}}/Monat · Jederzeit kündbar",
     "openingCheckout": "Zahlung wird geöffnet…",
     "passwordLabel": "Passwort",
     "newPasswordPlaceholder": "Neues Passwort",
