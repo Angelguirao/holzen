@@ -353,6 +353,7 @@ export function useHolzen() {
         }).select('id').single();
 
         if (insertedReflection) {
+          trackOnce('first_reflection');
           setLastReflectionId(insertedReflection.id);
           // Auto-save reflection + haiku to library
           const libraryInserts: any[] = [
