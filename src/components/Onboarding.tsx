@@ -3,13 +3,14 @@ import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { OnboardingWelcome } from '@/components/onboarding/OnboardingWelcome';
-import { OnboardingCompanions } from '@/components/onboarding/OnboardingCompanions';
+import { OnboardingWhy } from '@/components/onboarding/OnboardingWhy';
 import { OnboardingThreshold } from '@/components/onboarding/OnboardingThreshold';
 
 interface OnboardingResult {
   threshold: number;
   firstName: string | null;
   timezone: string;
+  motivations: string[];
 }
 
 interface Props {
@@ -25,6 +26,7 @@ export function Onboarding({ onComplete }: Props) {
   const [firstName, setFirstName] = useState('');
   const [timezone] = useState(detectedTimezone);
   const [threshold, setThreshold] = useState(5);
+  const [motivations, setMotivations] = useState<string[]>([]);
   const [direction, setDirection] = useState(1);
   const prefersReduced = useReducedMotion();
 
@@ -76,7 +78,15 @@ export function Onboarding({ onComplete }: Props) {
               )}
 
               {step === 1 && (
-                <OnboardingCompanions stagger={stagger} />
+                <OnboardingWhy
+                  selected={motivations}
+                  onToggle={(id) =>
+                    setMotivations((prev) =>
+                      prev.includes(id) ? prev.filter((m) => m !== id) : [...prev, id]
+                    )
+                  }
+                  stagger={stagger}
+                />
               )}
 
               {step === 2 && (
@@ -137,6 +147,7 @@ export function Onboarding({ onComplete }: Props) {
                   threshold,
                   firstName: firstName.trim() || null,
                   timezone,
+                  motivations,
                 })}
                 variant="outline"
                 size="sm"
