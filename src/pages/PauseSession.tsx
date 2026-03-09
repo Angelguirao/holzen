@@ -1,5 +1,5 @@
-import { useState, useCallback, useRef } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { useState, useCallback, useRef, useEffect } from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { X, ArrowDown, Check, Heart } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { hapticFeedback } from '@/lib/haptics';
@@ -59,6 +59,13 @@ export default function PauseSession() {
   const [decision, setDecision] = useState<string | null>(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [moodDone, setMoodDone] = useState(false);
+  const [curtainLifted, setCurtainLifted] = useState(false);
+
+  // Cinematic entrance: dark curtain fades away after mount
+  useEffect(() => {
+    const timer = setTimeout(() => setCurtainLifted(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleMoodSelect = useCallback(async (mood: MoodValue) => {
     hapticFeedback('light');
@@ -111,16 +118,27 @@ export default function PauseSession() {
   }
 
   return (
-    <motion.div
-      className="fixed inset-0 z-50 overflow-y-auto"
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 0.6 }}
-      style={{
-        background: 'linear-gradient(160deg, hsl(var(--background)) 0%, hsl(var(--muted)) 50%, hsl(var(--background)) 100%)',
-      }}
-    >
+    <>
+      {/* Dark curtain entrance */}
+      <AnimatePresence>
+        {!curtainLifted && (
+          <motion.div
+            className="fixed inset-0 z-[100] bg-background"
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.8, ease: [0.22, 1, 0.36, 1] }}
+          />
+        )}
+      </AnimatePresence>
+
+      <motion.div
+        className="fixed inset-0 z-50 overflow-y-auto"
+        initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 1.2, delay: 0.3 }}
+        style={{
+          background: 'linear-gradient(160deg, hsl(var(--background)) 0%, hsl(var(--muted)) 50%, hsl(var(--background)) 100%)',
+        }}
+      >
             {/* Ambient orbs */}
             <motion.div
               className="fixed top-1/4 left-1/3 w-[300px] h-[300px] rounded-full pointer-events-none"
@@ -336,5 +354,6 @@ export default function PauseSession() {
               )}
             </div>
           </motion.div>
+    </>
   );
 }
