@@ -76,11 +76,12 @@
       "practice": "Practice"
     },
     "subscription": {
-      "usedAllFree": "You've used all {{freeReflections}} free reflections. Subscribe to continue.",
+      "monthlyLimitReached": "You've used your {{freeReflectionsPerMonth}} free reflections this month. Upgrade to Pro for unlimited.",
+      "upgradeToPro": "${{price}}/month · Unlimited reflections + AI companions · Cancel anytime",
       "pricePerMonth": "${{price}} per month · Cancel anytime",
       "openingCheckout": "Opening checkout…",
-      "freeRemaining": "{{count}} free reflection remaining",
-      "freeRemaining_other": "{{count}} free reflections remaining"
+      "freeRemaining": "{{count}} free reflection remaining this month",
+      "freeRemaining_other": "{{count}} free reflections remaining this month"
     },
     "errors": {
       "couldNotReachPrice": "Could not reach price data",
