@@ -70,7 +70,7 @@ const Home = () => {
   };
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { subscribed, loading: subLoading, monthlyRemaining, canReflectng, canReflect, checkoutLoading, startCheckout, refresh } = useSubscription();
+  const { subscribed, loading: subLoading, monthlyRemaining, canReflect, checkoutLoading, startCheckout, refresh } = useSubscription();
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
