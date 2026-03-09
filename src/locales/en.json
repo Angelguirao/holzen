@@ -473,8 +473,8 @@
     },
     "scienceQuote": "Impulsive decisions under volatility consistently lead to worse outcomes.",
     "scienceDesc": "Behavioral finance research shows that emotional reactions — panic selling during drops, euphoric buying during surges — are among the most reliable predictors of poor returns. A brief pause before action leads to better decisions.",
-    "freeToStart": "Free to start",
-    "pricingDesc": "Your first {{freeReflections}} reflections are free — no credit card required. Then ${{price}}/month for unlimited reflections, companions, rituals, mood tracking, library, and insights. Cancel anytime.",
+    "freeToStart": "Free plan available",
+    "pricingDesc": "{{freeReflectionsPerMonth}} reflections per month — free forever, no credit card. Upgrade to Pro for ${{price}}/month: unlimited reflections, AI companions, rituals, insights, library, and more. Cancel anytime.",
     "questions": "Common questions",
     "faq": {
       "whoQuestion": "Who is Holzen for?",
