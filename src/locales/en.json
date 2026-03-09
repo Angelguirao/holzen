@@ -76,8 +76,8 @@
       "practice": "Practice"
     },
     "subscription": {
-      "usedAllFree": "You've used all 3 free reflections. Subscribe to continue.",
-      "pricePerMonth": "$3 per month · Cancel anytime",
+      "usedAllFree": "You've used all {{freeReflections}} free reflections. Subscribe to continue.",
+      "pricePerMonth": "${{price}} per month · Cancel anytime",
       "openingCheckout": "Opening checkout…",
       "freeRemaining": "{{count}} free reflection remaining",
       "freeRemaining_other": "{{count}} free reflections remaining"
