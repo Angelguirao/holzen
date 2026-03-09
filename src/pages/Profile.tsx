@@ -199,6 +199,7 @@ const Profile = () => {
           <HistoryContent />
         </ProLock>
       ) : (
+        <ProLock>
         lettersLoading ? (
           <div className="space-y-3">
             <Skeleton className="h-20 w-full rounded-md" />
