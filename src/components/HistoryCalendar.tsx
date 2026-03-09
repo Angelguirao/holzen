@@ -1,6 +1,6 @@
 import { useState, useMemo, useCallback } from 'react';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, getDay, isSameDay, addMonths, subMonths, isToday } from 'date-fns';
-import { ChevronLeft, ChevronRight, Sparkles, Scroll, Award } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Sparkles, Scroll, Award, Heart, PenLine, Scan, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 
