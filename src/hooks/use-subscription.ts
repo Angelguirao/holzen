@@ -27,6 +27,9 @@ export function useSubscription() {
       });
       if (error) throw error;
 
+      if (data?.subscribed && !data?.cached) {
+        trackOnce('subscribed');
+      }
       if (data?.subscribed) {
         setSubscribed(true);
         setMonthlyRemaining(undefined);
