@@ -574,25 +574,29 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
       )}
 
       {hasLearning && (
-        <CollapsibleCompanion
-          label={labels.ground}
-          expanded={expandedLearning}
-          onToggle={() => {
-            setExpandedLearning((v) => !v);
-            if (!completion.learning) markCompleted('learning');
-          }}
-          completed={completion.learning}
-          isFavorite={favorites['learning']}
-          onToggleFavorite={() => toggleCompanionFavorite('learning')}
-        >
-          <LearningInput
-            title={companions.learningTitle ?? ''}
-            body={companions.learningBody ?? ''}
-            nudge={nudge}
-            nudgeLoading={nudgeLoading}
-            nudgeError={nudgeError}
-          />
-        </CollapsibleCompanion>
+        isPro ? (
+          <CollapsibleCompanion
+            label={labels.ground}
+            expanded={expandedLearning}
+            onToggle={() => {
+              setExpandedLearning((v) => !v);
+              if (!completion.learning) markCompleted('learning');
+            }}
+            completed={completion.learning}
+            isFavorite={favorites['learning']}
+            onToggleFavorite={() => toggleCompanionFavorite('learning')}
+          >
+            <LearningInput
+              title={companions.learningTitle ?? ''}
+              body={companions.learningBody ?? ''}
+              nudge={nudge}
+              nudgeLoading={nudgeLoading}
+              nudgeError={nudgeError}
+            />
+          </CollapsibleCompanion>
+        ) : (
+          <ProLockedCompanion label={labels.ground} onUpgrade={() => requirePro('learning')} />
+        )
       )}
 
       {hasSignal && (
