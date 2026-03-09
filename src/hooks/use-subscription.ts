@@ -13,7 +13,7 @@ export function useSubscription() {
   const [monthlyUsed, setMonthlyUsed] = useState(0);
   const [monthlyRemaining, setMonthlyRemaining] = useState<number | undefined>(undefined);
 
-  const checkSubscription = useCallback(async () => {
+  const checkSubscription = useCallback(async (force = false) => {
     if (!user) {
       setSubscribed(false);
       setLoading(false);
@@ -21,7 +21,9 @@ export function useSubscription() {
     }
 
     try {
-      const { data, error } = await supabase.functions.invoke('check-subscription');
+      const { data, error } = await supabase.functions.invoke('check-subscription', {
+        body: force ? { force: true } : undefined,
+      });
       if (error) throw error;
 
       if (data?.subscribed) {
@@ -51,8 +53,17 @@ export function useSubscription() {
 
   useEffect(() => {
     checkSubscription();
-    const interval = setInterval(checkSubscription, 60 * 1000);
+    // Poll every 5 minutes instead of every minute — cache handles freshness
+    const interval = setInterval(() => checkSubscription(), 5 * 60 * 1000);
     return () => clearInterval(interval);
+  }, [checkSubscription]);
+
+  // Force-refresh after checkout success
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('subscribed') === 'true') {
+      checkSubscription(true);
+    }
   }, [checkSubscription]);
 
   const startCheckout = useCallback(async () => {
@@ -91,7 +102,7 @@ export function useSubscription() {
     checkoutLoading,
     startCheckout,
     openPortal,
-    refresh: checkSubscription,
+    refresh: () => checkSubscription(true),
     monthlyRemaining,
     monthlyUsed,
     canReflect,
