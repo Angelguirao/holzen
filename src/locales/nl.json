@@ -283,7 +283,7 @@
     "enableAiInsights": "AI-inzichten inschakelen",
     "plan": "Plan",
     "manageSubscription": "Abonnement beheren",
-    "pricePerMonth": "$3/maand · Altijd opzegbaar",
+    "pricePerMonth": "${{price}}/maand · Altijd opzegbaar",
     "openingCheckout": "Betaling openen…",
     "passwordLabel": "Wachtwoord",
     "newPasswordPlaceholder": "Nieuw wachtwoord",
