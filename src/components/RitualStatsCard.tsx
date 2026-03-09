@@ -2,13 +2,15 @@ import { useState, useEffect, useMemo, forwardRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
-import { Sparkles, ChevronDown, Zap, Timer, Layers } from 'lucide-react';
+import { Sparkles, ChevronDown, Zap, Timer, Layers, TrendingUp, TrendingDown } from 'lucide-react';
+import { STEP_REGISTRY } from '@/components/ritual/stepRegistry';
 
 interface RitualCompletion {
   id: string;
   template: string;
   decision: string;
   duration_seconds: number | null;
+  steps_completed: any;
   created_at: string;
 }
 
@@ -27,19 +29,30 @@ interface TemplateStats {
   decisions: Record<string, number>;
 }
 
+interface StepTypeStats {
+  type: string;
+  labelKey: string;
+  totalWithStep: number;
+  holdRateWith: number;
+  totalWithout: number;
+  holdRateWithout: number;
+  delta: number;
+}
+
 export function RitualStatsCard() {
   const { user } = useAuth();
   const { t } = useTranslation();
   const [completions, setCompletions] = useState<RitualCompletion[]>([]);
   const [loading, setLoading] = useState(true);
   const [showBreakdown, setShowBreakdown] = useState(false);
+  const [showStepAnalytics, setShowStepAnalytics] = useState(false);
 
   useEffect(() => {
     if (!user) return;
     (async () => {
       const { data } = await supabase
-        .from('ritual_completions' as any)
-        .select('id, template, decision, duration_seconds, created_at')
+        .from('ritual_completions')
+        .select('id, template, decision, duration_seconds, steps_completed, created_at')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(500);
@@ -48,8 +61,8 @@ export function RitualStatsCard() {
     })();
   }, [user]);
 
-  const { stats, templateStats, bestTemplate } = useMemo(() => {
-    if (!completions.length) return { stats: null, templateStats: [], bestTemplate: null };
+  const { stats, templateStats, bestTemplate, stepTypeStats, bestStep } = useMemo(() => {
+    if (!completions.length) return { stats: null, templateStats: [], bestTemplate: null, stepTypeStats: [], bestStep: null };
 
     const total = completions.length;
     const decisionCounts: Record<string, number> = {};
@@ -70,6 +83,7 @@ export function RitualStatsCard() {
     const topTemplate = Object.entries(templateCounts).sort((a, b) => b[1] - a[1])[0];
     const avgDuration = durationCount > 0 ? Math.round(totalDuration / durationCount) : null;
 
+    // Template stats
     const byTemplate = new Map<string, RitualCompletion[]>();
     for (const c of completions) {
       const arr = byTemplate.get(c.template) || [];
@@ -103,10 +117,88 @@ export function RitualStatsCard() {
     const eligible = templateStats.filter((t) => t.count >= 2);
     const bestTemplate = eligible.length > 0 ? eligible[0] : null;
 
+    // Per-step-type analytics
+    const isHold = (d: string) => d === 'held' || d === 'nothing';
+    const allStepTypes = new Set<string>();
+    const withStep = new Map<string, { total: number; held: number }>();
+    const withoutStep = new Map<string, { total: number; held: number }>();
+
+    for (const c of completions) {
+      const stepsArr = parseSteps(c.steps_completed);
+      const stepTypes = new Set(stepsArr.map((s: any) => s.type ?? s));
+
+      for (const st of stepTypes) {
+        allStepTypes.add(st);
+      }
+
+      // For each known step type, bucket this completion as "with" or "without"
+      for (const st of allStepTypes) {
+        const map = stepTypes.has(st) ? withStep : withoutStep;
+        const curr = map.get(st) || { total: 0, held: 0 };
+        curr.total++;
+        if (isHold(c.decision)) curr.held++;
+        map.set(st, curr);
+      }
+    }
+
+    // Second pass: ensure all step types have both buckets
+    for (const st of allStepTypes) {
+      if (!withStep.has(st)) withStep.set(st, { total: 0, held: 0 });
+      if (!withoutStep.has(st)) withoutStep.set(st, { total: 0, held: 0 });
+    }
+
+    // Recompute properly with full knowledge of all step types
+    const withStepFinal = new Map<string, { total: number; held: number }>();
+    const withoutStepFinal = new Map<string, { total: number; held: number }>();
+    
+    for (const st of allStepTypes) {
+      withStepFinal.set(st, { total: 0, held: 0 });
+      withoutStepFinal.set(st, { total: 0, held: 0 });
+    }
+
+    for (const c of completions) {
+      const stepsArr = parseSteps(c.steps_completed);
+      const stepTypes = new Set(stepsArr.map((s: any) => s.type ?? s));
+      const held = isHold(c.decision);
+
+      for (const st of allStepTypes) {
+        const map = stepTypes.has(st) ? withStepFinal : withoutStepFinal;
+        const curr = map.get(st)!;
+        curr.total++;
+        if (held) curr.held++;
+      }
+    }
+
+    const stepTypeStats: StepTypeStats[] = Array.from(allStepTypes)
+      .filter((st) => st !== 'decide') // exclude decide step — always present
+      .map((type) => {
+        const w = withStepFinal.get(type)!;
+        const wo = withoutStepFinal.get(type)!;
+        const holdRateWith = w.total > 0 ? w.held / w.total : 0;
+        const holdRateWithout = wo.total > 0 ? wo.held / wo.total : 0;
+        const delta = holdRateWith - holdRateWithout;
+        const reg = STEP_REGISTRY[type];
+        return {
+          type,
+          labelKey: reg?.label ?? `ritual.steps.${type}`,
+          totalWithStep: w.total,
+          holdRateWith,
+          totalWithout: wo.total,
+          holdRateWithout,
+          delta,
+        };
+      })
+      .filter((s) => s.totalWithStep >= 2) // need at least 2 completions with step
+      .sort((a, b) => b.delta - a.delta);
+
+    const bestStep = stepTypeStats.length > 0 ? stepTypeStats[0] : null;
+
     return {
       stats: { total, topDecision, topTemplate, avgDuration, decisionCounts },
       templateStats,
       bestTemplate,
+      stepTypeStats,
+      bestStep,
     };
   }, [completions]);
 
@@ -125,6 +217,7 @@ export function RitualStatsCard() {
         <StatItem label={t('ritualStats.mostUsed')} value={stats.topTemplate?.[0] ?? '—'} />
       </div>
 
+      {/* Decision breakdown */}
       <div className="space-y-1.5">
         <p className="text-[10px] font-mono text-muted-foreground/50">{t('ritualStats.decisionBreakdown')}</p>
         <div className="flex gap-1 h-2 rounded-full overflow-hidden bg-muted/50">
@@ -151,6 +244,7 @@ export function RitualStatsCard() {
         </div>
       </div>
 
+      {/* Best template insight */}
       {bestTemplate && templateStats.length > 1 && (
         <p className="text-xs text-muted-foreground leading-relaxed">
           {t('ritualStats.bestTemplateInsight', {
@@ -163,6 +257,26 @@ export function RitualStatsCard() {
         </p>
       )}
 
+      {/* Best step insight */}
+      {bestStep && bestStep.delta > 0 && (
+        <div className="rounded-md border border-primary/15 bg-primary/5 px-3 py-2.5 space-y-1">
+          <div className="flex items-center gap-1.5">
+            <TrendingUp className="h-3 w-3 text-primary/60" />
+            <p className="text-[10px] font-mono tracking-wider uppercase text-primary/70">
+              {t('ritualStats.topStepLabel')}
+            </p>
+          </div>
+          <p className="text-xs text-foreground/80 leading-relaxed">
+            {t('ritualStats.stepInsight', {
+              step: t(bestStep.labelKey),
+              rateWith: Math.round(bestStep.holdRateWith * 100),
+              rateWithout: Math.round(bestStep.holdRateWithout * 100),
+            })}
+          </p>
+        </div>
+      )}
+
+      {/* Template effectiveness */}
       {templateStats.length > 1 && (
         <div className="space-y-2">
           <button
@@ -207,8 +321,74 @@ export function RitualStatsCard() {
           )}
         </div>
       )}
+
+      {/* Per-step-type analytics */}
+      {stepTypeStats.length > 0 && (
+        <div className="space-y-2">
+          <button
+            onClick={() => setShowStepAnalytics(!showStepAnalytics)}
+            className="flex items-center gap-1.5 text-[10px] font-mono text-muted-foreground/60 hover:text-muted-foreground transition-colors"
+          >
+            <ChevronDown className={`h-3 w-3 transition-transform ${showStepAnalytics ? 'rotate-180' : ''}`} />
+            {t('ritualStats.stepEffectiveness')}
+          </button>
+
+          {showStepAnalytics && (
+            <div className="space-y-3 pt-1 border-t border-border/30">
+              {stepTypeStats.map((s) => {
+                const reg = STEP_REGISTRY[s.type];
+                const Icon = reg?.icon ?? Sparkles;
+                const positive = s.delta > 0;
+                const DeltaIcon = positive ? TrendingUp : TrendingDown;
+                return (
+                  <div key={s.type} className="space-y-1.5">
+                    <div className="flex items-center justify-between text-[10px] font-mono">
+                      <span className="flex items-center gap-1.5 text-muted-foreground">
+                        <Icon className="h-2.5 w-2.5 text-muted-foreground/50" />
+                        {t(s.labelKey)}
+                      </span>
+                      <span className={`flex items-center gap-1 ${positive ? 'text-primary' : 'text-destructive/70'}`}>
+                        <DeltaIcon className="h-2.5 w-2.5" />
+                        {positive ? '+' : ''}{Math.round(s.delta * 100)}%
+                      </span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <div className="space-y-0.5">
+                        <div className="flex items-center justify-between text-[9px] font-mono text-muted-foreground/50">
+                          <span>{t('ritualStats.withStep')}</span>
+                          <span>{Math.round(s.holdRateWith * 100)}% ({s.totalWithStep})</span>
+                        </div>
+                        <div className="h-1 rounded-full bg-muted/50 overflow-hidden">
+                          <div className="h-full rounded-full bg-primary/60 transition-all duration-700" style={{ width: `${s.holdRateWith * 100}%` }} />
+                        </div>
+                      </div>
+                      <div className="space-y-0.5">
+                        <div className="flex items-center justify-between text-[9px] font-mono text-muted-foreground/50">
+                          <span>{t('ritualStats.withoutStep')}</span>
+                          <span>{Math.round(s.holdRateWithout * 100)}% ({s.totalWithout})</span>
+                        </div>
+                        <div className="h-1 rounded-full bg-muted/50 overflow-hidden">
+                          <div className="h-full rounded-full bg-muted-foreground/30 transition-all duration-700" style={{ width: `${s.holdRateWithout * 100}%` }} />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
+}
+
+function parseSteps(raw: any): any[] {
+  if (Array.isArray(raw)) return raw;
+  if (typeof raw === 'string') {
+    try { return JSON.parse(raw); } catch { return []; }
+  }
+  return [];
 }
 
 const StatItem = forwardRef<HTMLDivElement, { label: string; value: string }>(
