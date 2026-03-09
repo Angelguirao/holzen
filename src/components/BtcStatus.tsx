@@ -1,4 +1,4 @@
-import { Eye, EyeOff, WifiOff, Bitcoin } from 'lucide-react';
+import { Eye, EyeOff, WifiOff, Bitcoin, Clock } from 'lucide-react';
 import { BtcChart } from '@/components/BtcChart';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatBtcPrice, type BtcPriceData } from '@/lib/btc';
