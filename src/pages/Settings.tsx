@@ -345,37 +345,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
               </div>
             </div>
 
-            {/* Language */}
-            <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.reflectionLanguage')}</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                {t('settings.reflectionLanguageDesc')}
-              </p>
-              <div className="grid grid-cols-2 gap-2">
-                {([
-                  { code: 'en', label: 'English', desc: 'Default' },
-                  { code: 'es', label: 'Español', desc: 'Spanish' },
-                  { code: 'pt', label: 'Português', desc: 'Portuguese' },
-                  { code: 'de', label: 'Deutsch', desc: 'German' },
-                  { code: 'nl', label: 'Nederlands', desc: 'Dutch' },
-                  { code: 'fr', label: 'Français', desc: 'French' },
-                  { code: 'tr', label: 'Türkçe', desc: 'Turkish' },
-                ] as const).map((l) => (
-                  <button
-                    key={l.code}
-                    onClick={() => setLanguage(l.code)}
-                    className={`rounded-md border px-3 py-2.5 text-left transition-colors ${
-                      language === l.code
-                        ? 'border-primary bg-primary/5 text-foreground'
-                        : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
-                    }`}
-                  >
-                    <p className="text-xs font-mono font-medium">{l.label}</p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">{l.desc}</p>
-                  </button>
-                ))}
-              </div>
-            </div>
+            {/* Language — disabled, English only for now */}
           </AccordionContent>
         </AccordionItem>
 
