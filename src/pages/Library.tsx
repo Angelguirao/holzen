@@ -2,10 +2,11 @@ import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLibrary } from '@/hooks/use-library';
 import { PageMeta } from '@/components/PageMeta';
-import { Star, Search, Tag, FolderOpen, Filter, X } from 'lucide-react';
+import { Star, Search, Tag, FolderOpen, Filter, X, Lock } from 'lucide-react';
 import { LibraryItems } from '@/components/library/LibraryItems';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
+import { useProGate } from '@/hooks/use-pro-gate';
 
 const SOURCE_FILTERS: { key: string; label: string }[] = [
   { key: 'reflection', label: 'Reflection' },
@@ -26,6 +27,7 @@ const STATUS_FILTERS: { key: string; label: string }[] = [
 
 export default function Library() {
   const { t } = useTranslation();
+  const { isPro, startCheckout, checkoutLoading } = useProGate();
   const library = useLibrary();
   const [tab, setTab] = useState<'all' | 'favorites'>('all');
   const [search, setSearch] = useState('');
@@ -93,6 +95,26 @@ export default function Library() {
     setTagFilter(null);
     setCollectionFilter(null);
   };
+
+  if (!isPro) {
+    return (
+      <div className="space-y-6 pb-24">
+        <PageMeta title={t('library.pageTitle')} description={t('library.pageDescription')} />
+        <div className="flex flex-col items-center justify-center min-h-[40vh] gap-4 text-center px-6">
+          <Lock className="h-6 w-6 text-muted-foreground/30" />
+          <h2 className="text-sm font-mono text-foreground">{t('pro.featureLocked')}</h2>
+          <p className="text-xs text-muted-foreground max-w-xs">{t('pro.upgradeDesc')}</p>
+          <button
+            onClick={startCheckout}
+            disabled={checkoutLoading}
+            className="text-xs font-mono text-primary hover:text-primary/80 underline transition-colors"
+          >
+            {t('pro.upgradeCta')}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 pb-24">

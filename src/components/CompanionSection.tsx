@@ -6,10 +6,11 @@ import { LearningInput } from './LearningInput';
 import { SignalDisplay } from './SignalDisplay';
 import { ZoomOutDisplay } from './ZoomOutDisplay';
 import { HistoricalInsightDisplay } from './HistoricalInsightDisplay';
-import { ChevronDown, Check, Heart } from 'lucide-react';
+import { ChevronDown, Check, Heart, Lock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { hapticFeedback } from '@/lib/haptics';
 import { useHolzen } from '@/hooks/use-holzen';
+import { useProGate } from '@/hooks/use-pro-gate';
 
 export interface CompanionData {
   haiku: string | null;
@@ -110,8 +111,23 @@ function CollapsibleCompanion({
   );
 }
 
+function ProLockedCompanion({ label, onUpgrade }: { label: string; onUpgrade: () => void }) {
+  const { t } = useTranslation();
+  return (
+    <button
+      onClick={onUpgrade}
+      className="flex items-center gap-1.5 text-xs font-mono text-muted-foreground/40 hover:text-muted-foreground/60 transition-colors w-full text-left"
+    >
+      <Lock className="h-3 w-3 shrink-0" />
+      <span>{label}</span>
+      <span className="ml-auto text-[9px] uppercase tracking-wider text-primary/40">{t('pro.badge')}</span>
+    </button>
+  );
+}
+
 export const CompanionSection = forwardRef<HTMLDivElement, Props>(function CompanionSection({ companions, prefs, severity = 'mild', reflectionId, context, reflectionMessage }, ref) {
   const { language } = useHolzen();
+  const { isPro, requirePro } = useProGate();
 
   // Track favorite state per source_type from library_items
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
@@ -552,101 +568,121 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
       )}
 
       {hasHaiku && (
-        <CollapsibleCompanion
-          label={labels.haiku}
-          expanded={expandedHaiku}
-          onToggle={() => {
-            setExpandedHaiku((v) => !v);
-            if (!completion.haiku) markCompleted('haiku');
-          }}
-          completed={completion.haiku}
-          isFavorite={favorites['haiku']}
-          onToggleFavorite={() => toggleCompanionFavorite('haiku')}
-        >
-          <HaikuDisplay haiku={companions.haiku!} />
-        </CollapsibleCompanion>
+        isPro ? (
+          <CollapsibleCompanion
+            label={labels.haiku}
+            expanded={expandedHaiku}
+            onToggle={() => {
+              setExpandedHaiku((v) => !v);
+              if (!completion.haiku) markCompleted('haiku');
+            }}
+            completed={completion.haiku}
+            isFavorite={favorites['haiku']}
+            onToggleFavorite={() => toggleCompanionFavorite('haiku')}
+          >
+            <HaikuDisplay haiku={companions.haiku!} />
+          </CollapsibleCompanion>
+        ) : (
+          <ProLockedCompanion label={labels.haiku} onUpgrade={() => requirePro('haiku')} />
+        )
       )}
 
       {hasLearning && (
-        <CollapsibleCompanion
-          label={labels.ground}
-          expanded={expandedLearning}
-          onToggle={() => {
-            setExpandedLearning((v) => !v);
-            if (!completion.learning) markCompleted('learning');
-          }}
-          completed={completion.learning}
-          isFavorite={favorites['learning']}
-          onToggleFavorite={() => toggleCompanionFavorite('learning')}
-        >
-          <LearningInput
-            title={companions.learningTitle ?? ''}
-            body={companions.learningBody ?? ''}
-            nudge={nudge}
-            nudgeLoading={nudgeLoading}
-            nudgeError={nudgeError}
-          />
-        </CollapsibleCompanion>
+        isPro ? (
+          <CollapsibleCompanion
+            label={labels.ground}
+            expanded={expandedLearning}
+            onToggle={() => {
+              setExpandedLearning((v) => !v);
+              if (!completion.learning) markCompleted('learning');
+            }}
+            completed={completion.learning}
+            isFavorite={favorites['learning']}
+            onToggleFavorite={() => toggleCompanionFavorite('learning')}
+          >
+            <LearningInput
+              title={companions.learningTitle ?? ''}
+              body={companions.learningBody ?? ''}
+              nudge={nudge}
+              nudgeLoading={nudgeLoading}
+              nudgeError={nudgeError}
+            />
+          </CollapsibleCompanion>
+        ) : (
+          <ProLockedCompanion label={labels.ground} onUpgrade={() => requirePro('learning')} />
+        )
       )}
 
       {hasSignal && (
-        <CollapsibleCompanion
-          label={labels.signal}
-          expanded={expandedSignal}
-          onToggle={() => {
-            setExpandedSignal((v) => !v);
-            if (!completion.signal) markCompleted('signal');
-          }}
-          completed={completion.signal}
-          isFavorite={favorites['signal']}
-          onToggleFavorite={() => toggleCompanionFavorite('signal')}
-        >
-          <SignalDisplay
-            signal={signal}
-            loading={signalLoading}
-            error={signalError}
-          />
-        </CollapsibleCompanion>
+        isPro ? (
+          <CollapsibleCompanion
+            label={labels.signal}
+            expanded={expandedSignal}
+            onToggle={() => {
+              setExpandedSignal((v) => !v);
+              if (!completion.signal) markCompleted('signal');
+            }}
+            completed={completion.signal}
+            isFavorite={favorites['signal']}
+            onToggleFavorite={() => toggleCompanionFavorite('signal')}
+          >
+            <SignalDisplay
+              signal={signal}
+              loading={signalLoading}
+              error={signalError}
+            />
+          </CollapsibleCompanion>
+        ) : (
+          <ProLockedCompanion label={labels.signal} onUpgrade={() => requirePro('signal')} />
+        )
       )}
 
       {hasZoomOut && (
-        <CollapsibleCompanion
-          label={labels.zoomOut}
-          expanded={expandedZoomOut}
-          onToggle={() => {
-            setExpandedZoomOut((v) => !v);
-            if (!completion.zoomOut) markCompleted('zoomOut');
-          }}
-          completed={completion.zoomOut}
-          isFavorite={favorites['zoom_out']}
-          onToggleFavorite={() => toggleCompanionFavorite('zoom_out')}
-        >
-          <ZoomOutDisplay
-            data={zoomOut}
-            loading={zoomOutLoading}
-            error={zoomOutError}
-          />
-        </CollapsibleCompanion>
+        isPro ? (
+          <CollapsibleCompanion
+            label={labels.zoomOut}
+            expanded={expandedZoomOut}
+            onToggle={() => {
+              setExpandedZoomOut((v) => !v);
+              if (!completion.zoomOut) markCompleted('zoomOut');
+            }}
+            completed={completion.zoomOut}
+            isFavorite={favorites['zoom_out']}
+            onToggleFavorite={() => toggleCompanionFavorite('zoom_out')}
+          >
+            <ZoomOutDisplay
+              data={zoomOut}
+              loading={zoomOutLoading}
+              error={zoomOutError}
+            />
+          </CollapsibleCompanion>
+        ) : (
+          <ProLockedCompanion label={labels.zoomOut} onUpgrade={() => requirePro('zoom_out')} />
+        )
       )}
 
       {hasHistory && (
-        <CollapsibleCompanion
-          label={labels.lookBack}
-          expanded={expandedHistory}
-          onToggle={() => {
-            setExpandedHistory((v) => !v);
-            if (!completion.history) markCompleted('history');
-          }}
-          completed={completion.history}
-          isFavorite={favorites['history_insight']}
-          onToggleFavorite={() => toggleCompanionFavorite('history_insight')}
-        >
-          <HistoricalInsightDisplay
-            data={historyInsight}
-            loading={historyLoading}
-            error={historyError}
-          />
-        </CollapsibleCompanion>
+        isPro ? (
+          <CollapsibleCompanion
+            label={labels.lookBack}
+            expanded={expandedHistory}
+            onToggle={() => {
+              setExpandedHistory((v) => !v);
+              if (!completion.history) markCompleted('history');
+            }}
+            completed={completion.history}
+            isFavorite={favorites['history_insight']}
+            onToggleFavorite={() => toggleCompanionFavorite('history_insight')}
+          >
+            <HistoricalInsightDisplay
+              data={historyInsight}
+              loading={historyLoading}
+              error={historyError}
+            />
+          </CollapsibleCompanion>
+        ) : (
+          <ProLockedCompanion label={labels.lookBack} onUpgrade={() => requirePro('history')} />
+        )
       )}
     </div>
   );
