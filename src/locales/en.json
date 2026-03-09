@@ -314,7 +314,7 @@
     "firstNameOptional": "First name (optional)",
     "timezone": "Timezone: {{tz}}",
     "yourCompanions": "Your companions",
-    "companionIntro": "Each reflection comes with tools to help you pause. Try them.",
+    "companionIntro": "Each reflection comes with six companions — tools to help you pause, learn, and see the bigger picture. Tap to explore.",
     "sampleContext": "BTC is down 7.2% in the last 24 hours. Market sentiment: Extreme Fear (18/100).",
     "pauseWithThis": "Pause with this",
     "breatheWithThis": "Breathe with this →",
@@ -324,7 +324,27 @@
     "toggleCompanions": "Toggle companions anytime in Settings.",
     "yourThreshold": "Your threshold",
     "thresholdQuestion": "How much does BTC need to move in 24 hours before you hear from us?",
-    "changeThresholdLater": "You can change this later."
+    "changeThresholdLater": "You can change this later.",
+    "companions": {
+      "breathing": "Breathing",
+      "breathingDesc": "Guided breathwork to calm the impulse",
+      "haiku": "Haiku",
+      "haikuDesc": "Your reflection distilled into three lines",
+      "learning": "Learning",
+      "learningDesc": "Historical context for today's move",
+      "signal": "Signal",
+      "signalDesc": "Curated news beyond the noise",
+      "signalSampleSource": "Lyn Alden · Newsletter",
+      "signalSample": "The current drawdown mirrors the mid-cycle corrections of 2017 and 2013 — structurally healthy within a larger uptrend.",
+      "zoomOut": "Zoom Out",
+      "zoomOutDesc": "Where were things 1, 3, 5 years ago?",
+      "zoomOutSampleLabel": "1 year ago",
+      "zoomOutSample": "BTC was $28,400 — today's price represents a 240% gain. What felt like crisis then became a buying opportunity.",
+      "history": "Historical Echo",
+      "historyDesc": "Parallels from financial history",
+      "historySampleLabel": "Similar moment",
+      "historySample": "When gold dropped 26% in 2013, panic sellers locked in losses. Within 2 years, it consolidated and began a new ascent."
+    }
   },
   "moodCheck": {
     "howAreYouFeeling": "How are you feeling right now?",
