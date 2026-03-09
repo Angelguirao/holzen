@@ -687,7 +687,8 @@
     "whatWillYouDo": "What will you do?",
     "youChose": "You chose deliberately.",
     "return": "Return",
-    "noReflection": "No active reflection. Go back to trigger one."
+    "noReflection": "No active reflection. Go back to trigger one.",
+    "favoriteProHint": "Your favorites will be waiting in your Library with Pro ✨"
   },
   "reflectionNote": {
     "addNote": "Add a note",
