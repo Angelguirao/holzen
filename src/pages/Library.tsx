@@ -27,7 +27,7 @@ const STATUS_FILTERS: { key: string; label: string }[] = [
 
 export default function Library() {
   const { t } = useTranslation();
-  const { isPro, startCheckout, checkoutLoading } = useProGate();
+  const { isPro, isPending, startCheckout, checkoutLoading } = useProGate();
   const library = useLibrary();
   const [tab, setTab] = useState<'all' | 'favorites'>('all');
   const [search, setSearch] = useState('');
@@ -95,6 +95,15 @@ export default function Library() {
     setTagFilter(null);
     setCollectionFilter(null);
   };
+
+  if (isPending) {
+    return (
+      <div className="space-y-6 pb-24">
+        <PageMeta title={t('library.pageTitle')} description={t('library.pageDescription')} />
+        <div className="h-20 w-full rounded-md bg-muted/30 animate-pulse" />
+      </div>
+    );
+  }
 
   if (!isPro) {
     return (
