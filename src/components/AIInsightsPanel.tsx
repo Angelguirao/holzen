@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useHolzen } from '@/hooks/use-holzen';
 import { useTranslation } from 'react-i18next';
-import { RefreshCw, TrendingUp, Clock, Brain, Sparkles, Target, Loader2 } from 'lucide-react';
+import { RefreshCw, TrendingUp, Clock, Brain, Sparkles, Target, Loader2, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
