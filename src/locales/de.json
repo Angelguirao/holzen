@@ -76,8 +76,8 @@
       "practice": "Praxis"
     },
     "subscription": {
-      "usedAllFree": "Du hast alle 3 kostenlosen Reflexionen genutzt. Abonniere um fortzufahren.",
-      "pricePerMonth": "$3 pro Monat · Jederzeit kündbar",
+      "usedAllFree": "Du hast alle {{freeReflections}} kostenlosen Reflexionen genutzt. Abonniere um fortzufahren.",
+      "pricePerMonth": "${{price}} pro Monat · Jederzeit kündbar",
       "openingCheckout": "Zahlung wird geöffnet…",
       "freeRemaining": "{{count}} kostenlose Reflexion übrig",
       "freeRemaining_other": "{{count}} kostenlose Reflexionen übrig"
