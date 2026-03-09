@@ -283,7 +283,7 @@
     "enableAiInsights": "Enable AI insights",
     "plan": "Plan",
     "manageSubscription": "Manage subscription",
-    "pricePerMonth": "$3/month · Cancel anytime",
+    "pricePerMonth": "${{price}}/month · Cancel anytime",
     "openingCheckout": "Opening checkout…",
     "passwordLabel": "Password",
     "newPasswordPlaceholder": "New password",
