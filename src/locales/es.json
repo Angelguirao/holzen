@@ -473,7 +473,7 @@
       "adviceQuestion": "¿Me dirá qué comprar o vender?",
       "adviceAnswer": "Nunca. Holzen no es una herramienta de trading ni un asesor financiero. Cada reflexión es intencionalmente neutral — diseñada para crear conciencia, no acción.",
       "freeQuestion": "¿Qué obtengo gratis?",
-      "freeAnswer": "Tus primeras {{freeReflections}} reflexiones son completamente gratis con todas las funciones incluidas — herramientas, seguimiento de ánimo, rituales, todo. Después, son ${{price}}/mes. Cancela cuando quieras, sin contratos.",
+      "freeAnswer": "{{freeReflectionsPerMonth}} reflexiones al mes con el ciclo básico: datos de mercado, respiración, chequeo emocional y registro de resultado. Pro (${{price}}/mes) desbloquea reflexiones ilimitadas, todos los compañeros IA, análisis, rituales, biblioteca, cartas y más. Cancela cuando quieras.",
       "dataQuestion": "¿Qué pasa con mis datos?",
       "dataAnswer": "Solo almacenamos lo necesario: tu email, umbrales, reflexiones y registros de ánimo. Puedes exportar todo como JSON o CSV cuando quieras, o eliminar tu cuenta completamente con un toque. Consulta nuestra",
       "differentQuestion": "¿En qué se diferencia de una app de diario?",
