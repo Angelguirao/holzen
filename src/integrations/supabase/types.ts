@@ -352,6 +352,56 @@ export type Database = {
         }
         Relationships: []
       }
+      practice_entries: {
+        Row: {
+          body: string | null
+          created_at: string
+          duration_seconds: number | null
+          id: string
+          intensity: number | null
+          mood: string | null
+          prompt: string | null
+          source_reflection_id: string | null
+          trigger_text: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          intensity?: number | null
+          mood?: string | null
+          prompt?: string | null
+          source_reflection_id?: string | null
+          trigger_text?: string | null
+          type?: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          duration_seconds?: number | null
+          id?: string
+          intensity?: number | null
+          mood?: string | null
+          prompt?: string | null
+          source_reflection_id?: string | null
+          trigger_text?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "practice_entries_source_reflection_id_fkey"
+            columns: ["source_reflection_id"]
+            isOneToOne: false
+            referencedRelation: "reflections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           ai_insights_enabled: boolean
