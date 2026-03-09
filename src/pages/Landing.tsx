@@ -126,7 +126,7 @@ const Landing = () => {
         >
           <h1 className="text-xs font-mono tracking-[0.25em] uppercase text-foreground/80">Holzen</h1>
           <div className="flex items-center gap-4">
-            <LandingLanguageSwitcher />
+            
             <button
               onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
               className="text-muted-foreground hover:text-foreground transition-colors"
