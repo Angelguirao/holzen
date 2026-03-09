@@ -462,7 +462,7 @@
     "scienceQuote": "Decisões impulsivas sob volatilidade consistentemente levam a piores resultados.",
     "scienceDesc": "Pesquisas de finanças comportamentais mostram que reações emocionais — venda em pânico durante quedas, compra eufórica durante altas — estão entre os preditores mais confiáveis de retornos ruins. Uma breve pausa antes da ação leva a melhores decisões.",
     "freeToStart": "Grátis para começar",
-    "pricingDesc": "Suas primeiras 3 reflexões são gratuitas — sem cartão necessário. Depois $5/mês para reflexões ilimitadas, companheiros, rastreamento de humor e análises. Cancele quando quiser.",
+    "pricingDesc": "Suas primeiras {{freeReflections}} reflexões são gratuitas — sem cartão necessário. Depois ${{price}}/mês para reflexões ilimitadas, companheiros, rastreamento de humor e análises. Cancele quando quiser.",
     "getStartedFree": "Comece grátis",
     "clarityWorth": "Quanto vale um momento de clareza?",
     "questions": "Perguntas",
