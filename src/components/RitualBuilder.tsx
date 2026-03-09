@@ -154,7 +154,7 @@ export function RitualBuilder({ onSave, onCancel, initialSteps, initialName }: P
                 <p className="text-[9px] font-mono tracking-widest uppercase text-muted-foreground/40">
                   {t(cat.labelKey)}
                 </p>
-                <div className="flex flex-wrap gap-1.5">
+                <div className="space-y-1.5">
                   {catSteps.map(([type, config]) => {
                     if (type === 'physical') {
                       return null; // Handled separately below
@@ -164,10 +164,13 @@ export function RitualBuilder({ onSave, onCancel, initialSteps, initialName }: P
                       <button
                         key={type}
                         onClick={() => addStep(type)}
-                        className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border border-border/30 hover:border-border/60 hover:bg-muted/20 transition-all text-xs font-mono"
+                        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-md border border-border/30 hover:border-border/60 hover:bg-muted/20 transition-all text-left group"
                       >
-                        <Icon className="h-3 w-3 text-muted-foreground/50" />
-                        {t(config.label)}
+                        <Icon className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />
+                        <div className="flex-1 min-w-0">
+                          <span className="text-xs font-mono group-hover:text-foreground transition-colors">{t(config.label)}</span>
+                          <span className="block text-[10px] text-muted-foreground/40 mt-0.5">{t(config.descKey)}</span>
+                        </div>
                       </button>
                     );
                   })}
