@@ -25,7 +25,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { toast } from 'sonner';
-import { AlertCircle, Loader2, Pause, Pin, Timer, Circle, Sparkles, Waves, RotateCcw, RefreshCw } from 'lucide-react';
+import { AlertCircle, Loader2, Pause, Pin, Timer, Circle, Sparkles, Waves, RotateCcw, RefreshCw, Lock } from 'lucide-react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { playNotificationTone, prefetchNotificationTone } from '@/lib/notification-tone';
 import {
@@ -465,7 +465,7 @@ const Home = () => {
         );
 
       case 'night':
-        if (!nightReflection) return null;
+        if (!nightReflection || !subscribed) return null;
         return (
           <HomeWidget
             id="night"
@@ -478,7 +478,12 @@ const Home = () => {
         );
 
       case 'letter':
-        if (!hasAccess || !btcData) return null;
+        if (!btcData) return null;
+        if (!subscribed) return (
+          <HomeWidget id="letter" title={WIDGET_TITLES['letter']} collapsed={collapsed['letter']} onToggleCollapse={() => toggleCollapsed('letter')}>
+            <ProLockedWidget onUpgrade={startCheckout} checkoutLoading={checkoutLoading} />
+          </HomeWidget>
+        );
         return (
           <HomeWidget
             id="letter"
@@ -500,13 +505,21 @@ const Home = () => {
           >
             <div className="space-y-2">
               <button
-                onClick={() => setShowRitual(true)}
+                onClick={() => {
+                  if (!subscribed) {
+                    toast(t('pro.featureLocked'), { description: t('pro.upgradeDesc'), action: { label: t('pro.upgradeCta'), onClick: () => startCheckout() }, duration: 6000 });
+                    return;
+                  }
+                  setShowRitual(true);
+                }}
                 className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors duration-300"
               >
+                {!subscribed && <Lock className="h-3 w-3 text-primary/20" />}
                 <Sparkles className="h-3 w-3 text-primary/40" />
                 <span className="text-[10px] font-mono text-primary/40 tracking-[0.2em] uppercase">
                   {t('home.startARitual')}
                 </span>
+                {!subscribed && <span className="text-[8px] font-mono text-primary/30 uppercase tracking-wider">PRO</span>}
               </button>
               <button
                 onClick={() => setShowVoid(true)}
@@ -708,6 +721,23 @@ function AutoCooldownIndicator({
           />
         </div>
       </div>
+    </div>
+  );
+}
+
+function ProLockedWidget({ onUpgrade, checkoutLoading }: { onUpgrade: () => void; checkoutLoading: boolean }) {
+  const { t } = useTranslation();
+  return (
+    <div className="flex flex-col items-center gap-2 py-4">
+      <Lock className="h-4 w-4 text-muted-foreground/30" />
+      <p className="text-[10px] font-mono text-muted-foreground/50">{t('pro.upgradeDesc')}</p>
+      <button
+        onClick={onUpgrade}
+        disabled={checkoutLoading}
+        className="text-[10px] font-mono text-primary/60 hover:text-primary transition-colors underline"
+      >
+        {t('pro.upgradeCta')}
+      </button>
     </div>
   );
 }

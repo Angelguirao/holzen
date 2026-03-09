@@ -3,11 +3,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useHolzen } from '@/hooks/use-holzen';
 import { useTranslation } from 'react-i18next';
-import { RefreshCw, TrendingUp, Clock, Brain, Sparkles, Target, Loader2 } from 'lucide-react';
+import { RefreshCw, TrendingUp, Clock, Brain, Sparkles, Target, Loader2, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
+import { useSubscription } from '@/hooks/use-subscription';
 
 interface Insight {
   category: 'timing' | 'mood' | 'behavior' | 'engagement' | 'growth';
@@ -54,6 +55,7 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { language } = useHolzen();
+  const { subscribed } = useSubscription();
   const [allData, setAllData] = useState<InsightsRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
@@ -115,6 +117,15 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
       setGenerating(false);
     }
   }, [user, language, loadInsights, t]);
+
+  if (!subscribed) {
+    return (
+      <div className="py-8 text-center space-y-2">
+        <Lock className="h-5 w-5 mx-auto text-muted-foreground/30" />
+        <p className="text-xs text-muted-foreground">{t('pro.upgradeDesc')}</p>
+      </div>
+    );
+  }
 
   if (reflectionCount < 5) {
     return (
