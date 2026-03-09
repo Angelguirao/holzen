@@ -247,14 +247,6 @@ const Home = () => {
                 severity={severity} reflectionId={lastReflectionId}
               />
             </motion.div>
-          ) : showOutcome && outcomeReflectionId ? (
-            <motion.div key="zen-outcome" variants={zenVariants} initial="hidden" animate="visible" exit="hidden">
-              <OutcomePrompt reflectionId={outcomeReflectionId} onComplete={handleOutcomeComplete} />
-            </motion.div>
-          ) : showMoodCheck ? (
-            <motion.div key="zen-mood" variants={zenVariants} initial="hidden" animate="visible" exit="hidden">
-              <MoodCheck onSelect={handleMoodSelected} onSkip={handleMoodSkipped} />
-            </motion.div>
           ) : loading ? (
             <motion.div key="zen-loading" variants={zenVariants} initial="hidden" animate="visible" exit="hidden" className="space-y-4">
               <div className="flex items-center gap-2 text-muted-foreground">
