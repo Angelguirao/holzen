@@ -273,19 +273,41 @@ const Profile = () => {
   );
 };
 
-function StatsContent({ reflections, memberSince }: { reflections: Reflection[]; memberSince?: string }) {
+function StatsContent({ reflections, practiceEntries = [], memberSince }: { reflections: Reflection[]; practiceEntries?: PracticeEntry[]; memberSince?: string }) {
   const { t } = useTranslation();
-  const scoreData = useHolzenScore(reflections);
+  const scoreData = useHolzenScore(reflections, [], practiceEntries);
 
   const moodCounts = useMemo(() => {
     const counts: Record<string, number> = {};
     for (const r of reflections) {
       if (r.mood) counts[r.mood] = (counts[r.mood] || 0) + 1;
     }
+    // Include check-in moods
+    for (const p of practiceEntries) {
+      if (p.type === 'checkin' && p.mood) counts[p.mood] = (counts[p.mood] || 0) + 1;
+    }
     return counts;
-  }, [reflections]);
+  }, [reflections, practiceEntries]);
+
+  // Merge check-in moods into reflection-like objects for mood charts
+  const moodDataForCharts = useMemo(() => {
+    const reflectionMoods = reflections.map(r => ({ created_at: r.created_at, mood: r.mood }));
+    const checkinMoods = practiceEntries
+      .filter(p => p.type === 'checkin' && p.mood)
+      .map(p => ({ created_at: p.created_at, mood: p.mood }));
+    return [...reflectionMoods, ...checkinMoods];
+  }, [reflections, practiceEntries]);
 
   const hasEnoughForCharts = reflections.length >= 5;
+
+  const practiceStats = useMemo(() => {
+    if (practiceEntries.length === 0) return null;
+    const byType: Record<string, number> = {};
+    for (const p of practiceEntries) {
+      byType[p.type] = (byType[p.type] || 0) + 1;
+    }
+    return { total: practiceEntries.length, byType };
+  }, [practiceEntries]);
 
   return (
     <div className="space-y-5">
@@ -294,6 +316,23 @@ function StatsContent({ reflections, memberSince }: { reflections: Reflection[];
       </p>
       <ReflectionStats reflections={reflections} />
       <StreakTimeline reflections={reflections} memberSince={memberSince} />
+
+      {/* Practice summary */}
+      {practiceStats && (
+        <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2">
+          <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
+            {t('profile.practiceActivity')}
+          </p>
+          <div className="flex flex-wrap gap-3">
+            {Object.entries(practiceStats.byType).map(([type, count]) => (
+              <div key={type} className="text-center">
+                <p className="text-sm font-mono">{count}</p>
+                <p className="text-[9px] font-mono text-muted-foreground/50 capitalize">{t(`practice.${type}Label`, type)}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Pro-gated advanced stats */}
       <ProLock>
@@ -315,7 +354,7 @@ function StatsContent({ reflections, memberSince }: { reflections: Reflection[];
           {hasEnoughForCharts && (
             <>
               <StatsTrends reflections={reflections} />
-              <MoodTrendChart reflections={reflections} />
+              <MoodTrendChart reflections={moodDataForCharts} />
               <MoodPriceChart reflections={reflections} />
               <MoodPriceScatter reflections={reflections} />
             </>
