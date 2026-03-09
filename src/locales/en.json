@@ -1288,5 +1288,11 @@
     "saveToLibrary": "Save to Library",
     "addTagsPlaceholder": "Add tags…",
     "enterToCreate": "Enter to create \"{{tag}}\""
+  },
+  "pro": {
+    "featureLocked": "Pro feature",
+    "upgradeDesc": "Upgrade to Pro to unlock AI companions, insights, rituals, library, and more.",
+    "upgradeCta": "Upgrade to Pro",
+    "badge": "PRO"
   }
 }
