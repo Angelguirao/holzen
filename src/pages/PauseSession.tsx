@@ -55,7 +55,7 @@ export default function PauseSession() {
   const companionPrefs: CompanionPrefs = state.companionPrefs ?? { breathing: true, haiku: true, learning: true, signal: true, zoomOut: true, history: true };
   const severity: 'mild' | 'moderate' | 'high' = state.severity ?? 'mild';
 
-  const [phase, setPhase] = useState<'session' | 'outcome' | 'done'>('session');
+  const [phase, setPhase] = useState<'session' | 'done'>('session');
   const [decision, setDecision] = useState<string | null>(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [moodDone, setMoodDone] = useState(false);
