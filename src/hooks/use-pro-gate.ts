@@ -9,7 +9,7 @@ import type { ProFeature } from '@/lib/pricing';
  * Returns `isPro` and a `requirePro` guard that shows an upgrade toast.
  */
 export function useProGate() {
-  const { subscribed, startCheckout, checkoutLoading } = useSubscription();
+  const { subscribed, loading, startCheckout, checkoutLoading } = useSubscription();
   const { t } = useTranslation();
 
   /** Returns true if the user has Pro access */
@@ -37,5 +37,5 @@ export function useProGate() {
     [subscribed, startCheckout, t],
   );
 
-  return { isPro, requirePro, startCheckout, checkoutLoading };
+  return { isPro, isPending: loading, requirePro, startCheckout, checkoutLoading };
 }

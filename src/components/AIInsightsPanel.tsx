@@ -55,7 +55,7 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { language } = useHolzen();
-  const { subscribed } = useSubscription();
+  const { subscribed, loading: subLoading } = useSubscription();
   const [allData, setAllData] = useState<InsightsRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
@@ -117,6 +117,14 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
       setGenerating(false);
     }
   }, [user, language, loadInsights, t]);
+
+  if (subLoading) {
+    return (
+      <div className="space-y-3">
+        <div className="h-20 w-full rounded-md bg-muted/30 animate-pulse" />
+      </div>
+    );
+  }
 
   if (!subscribed) {
     return (
