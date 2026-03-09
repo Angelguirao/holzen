@@ -1331,6 +1331,78 @@
     "enterPause": "Enter the pause",
     "notNow": "Not now"
   },
+  "ritual": {
+    "selectTemplate": "Choose your ritual",
+    "yourTemplates": "Your rituals",
+    "buildYourOwn": "Build your own",
+    "aiSuggest": "AI suggest",
+    "aiGenerating": "Crafting your ritual…",
+    "steps": {
+      "breathe": "Breathe",
+      "grounding": "Grounding",
+      "checkin": "Check-in",
+      "reflect": "Reflect",
+      "review": "Self-review",
+      "journal": "Journal",
+      "physical": "Physical action",
+      "decide": "Decide"
+    },
+    "categories": {
+      "mindfulness": "Mindfulness",
+      "reflection": "Reflection",
+      "journaling": "Journaling",
+      "physical": "Physical",
+      "decision": "Decision"
+    },
+    "presets": {
+      "quick": "Quick",
+      "quickDesc": "Breathe → Decide",
+      "standard": "Standard",
+      "standardDesc": "Breathe → Reflect → Journal → Decide",
+      "deep": "Deep",
+      "deepDesc": "Breathe → Review → Reflect → Journal → Decide",
+      "body": "Body first",
+      "bodyDesc": "Ground → Move → Check-in → Decide"
+    },
+    "builder": {
+      "title": "Build your ritual",
+      "namePlaceholder": "Ritual name…",
+      "addStep": "Add a step",
+      "empty": "Add steps to build your ritual",
+      "customAction": "Physical action",
+      "actionPlaceholder": "Go for a run, stretch…",
+      "actionHint": "Duration in minutes",
+      "saveTemplate": "Save",
+      "startRitual": "Start",
+      "saved": "Ritual saved"
+    },
+    "physical": {
+      "completed": "Done! Nice work.",
+      "finishEarly": "Finish early"
+    },
+    "review": {
+      "last30Days": "Your last 30 days",
+      "reflections": "Reflections",
+      "holdRate": "Hold rate",
+      "dominantMood": "Dominant mood",
+      "lastMarket": "Last market",
+      "acknowledged": "I see my patterns"
+    },
+    "grounding": {
+      "intro": "Notice 5 things you see, 4 you hear, 3 you feel, 2 you smell, 1 you taste."
+    },
+    "reflect": {
+      "prompt": "Sit with what you're feeling. No judgment.",
+      "iveReflected": "I've reflected"
+    },
+    "decide": {
+      "prompt": "What will you do?",
+      "hold": "Hold",
+      "sell": "Sell",
+      "buy": "Buy",
+      "nothing": "Nothing"
+    }
+  },
   "breathe": {
     "startTimer": "Start a 60s timer"
   },
