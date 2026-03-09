@@ -567,7 +567,18 @@ const Home = () => {
         reflectionMessage={message ?? undefined}
         reflectionId={lastReflectionId}
       />
-      <TheVoid open={showVoid} onClose={() => setShowVoid(false)} />
+
+      {/* Trigger overlay */}
+      <ReflectionTriggerOverlay
+        open={showTriggerOverlay}
+        context={context}
+        message={message ?? ''}
+        reflectionId={lastReflectionId}
+        companions={companions}
+        companionPrefs={companionPrefs}
+        severity={severity}
+        onDismiss={() => setShowTriggerOverlay(false)}
+      />
 
       {/* Testimonial request */}
       <TestimonialRequest reflectionCount={reflectionCount} />
