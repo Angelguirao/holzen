@@ -473,13 +473,14 @@ export function useHolzen() {
     const remaining = manualCooldownRemaining();
     if (remaining > 0) return;
 
-    const now = Date.now();
-    setLastManualAt(now);
-    localStorage.setItem(manualCooldownKey, String(now));
     try {
       const data = btcData || await fetchBtcData(currency);
       if (!btcData) setBtcData(data);
       await generateMessage(data, mood);
+      // Only set cooldown AFTER successful generation
+      const now = Date.now();
+      setLastManualAt(now);
+      localStorage.setItem(manualCooldownKey, String(now));
     } catch (e: any) {
       const raw = e?.message || '';
       if (raw.includes('fetch') || raw.includes('Failed to fetch')) {
@@ -488,7 +489,7 @@ export function useHolzen() {
         setError('Reflection could not be generated right now. Try again in a moment.');
       }
     }
-  }, [btcData, generateMessage, manualCooldownRemaining, currency]);
+  }, [btcData, generateMessage, manualCooldownRemaining, currency, manualCooldownKey]);
 
   const dismissMessage = useCallback(async () => {
     setMessage(null);
