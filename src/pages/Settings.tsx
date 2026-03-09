@@ -525,6 +525,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             {t('settings.companions')}
           </AccordionTrigger>
           <AccordionContent className="space-y-6 pb-4">
+            <ProLock>
             <div className="space-y-3">
               <p className="text-xs text-muted-foreground leading-relaxed">
                 {t('settings.companionsDesc')}
