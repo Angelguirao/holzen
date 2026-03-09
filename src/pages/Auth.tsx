@@ -14,7 +14,11 @@ type AuthView = 'sign-in' | 'sign-up' | 'forgot-password';
 
 const Auth = () => {
   const { t } = useTranslation();
-  const [view, setView] = useState<AuthView>('sign-in');
+  const [searchParams] = useSearchParams();
+  const [view, setView] = useState<AuthView>(() => {
+    const v = searchParams.get('view');
+    return v === 'sign-up' ? 'sign-up' : 'sign-in';
+  });
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
