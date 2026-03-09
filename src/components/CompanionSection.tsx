@@ -655,17 +655,28 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
       )}
 
       {hasHistory && (
-        <CollapsibleCompanion
-          label={labels.lookBack}
-          expanded={expandedHistory}
-          onToggle={() => {
-            setExpandedHistory((v) => !v);
-            if (!completion.history) markCompleted('history');
-          }}
-          completed={completion.history}
-          isFavorite={favorites['history_insight']}
-          onToggleFavorite={() => toggleCompanionFavorite('history_insight')}
-        >
+        isPro ? (
+          <CollapsibleCompanion
+            label={labels.lookBack}
+            expanded={expandedHistory}
+            onToggle={() => {
+              setExpandedHistory((v) => !v);
+              if (!completion.history) markCompleted('history');
+            }}
+            completed={completion.history}
+            isFavorite={favorites['history_insight']}
+            onToggleFavorite={() => toggleCompanionFavorite('history_insight')}
+          >
+            <HistoricalInsightDisplay
+              data={historyInsight}
+              loading={historyLoading}
+              error={historyError}
+            />
+          </CollapsibleCompanion>
+        ) : (
+          <ProLockedCompanion label={labels.lookBack} onUpgrade={() => requirePro('history')} />
+        )
+      )}
           <HistoricalInsightDisplay
             data={historyInsight}
             loading={historyLoading}
