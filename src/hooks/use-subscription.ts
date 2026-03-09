@@ -1,8 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
+import { PRICING } from '@/lib/pricing';
 
-const FREE_TRIAL_COUNT = 3;
+const FREE_TRIAL_COUNT = PRICING.freeReflections;
 
 export function useSubscription() {
   const { user } = useAuth();
