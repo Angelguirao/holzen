@@ -95,11 +95,7 @@ export default function PauseSession() {
   }, [reflectionId, isFavorite, subscribed, t]);
 
   const handleReturn = useCallback(() => {
-    if (window.history.length > 1) {
-      navigate(-1);
-    } else {
-      navigate('/', { replace: true });
-    }
+    navigate('/', { replace: true });
   }, [navigate]);
 
   const handleDecide = useCallback(async (d: string) => {
