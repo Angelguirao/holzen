@@ -91,7 +91,6 @@ export function RitualBuilder({ onSave, onCancel, initialSteps, initialName }: P
       <p className="text-[11px] text-muted-foreground/60 leading-relaxed">
         {t('ritual.builder.intro')}
       </p>
-      </p>
 
       {/* Name */}
       <Input
