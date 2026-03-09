@@ -71,30 +71,38 @@ export function PracticeWidget() {
   }
 
   return (
-    <div className="space-y-1.5">
-      {PRACTICES.map((p) => {
-        const Icon = p.icon;
-        const locked = !subscribed;
-        return (
-          <button
-            key={p.id}
-            onClick={() => handleSelect(p.id)}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md transition-colors hover:bg-muted/30 group"
-          >
-            <Icon className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />
-            <div className="flex-1 text-left">
-              <span className="text-xs font-mono text-foreground/70 group-hover:text-foreground transition-colors">
-                {t(p.labelKey)}
-              </span>
-            </div>
-            {locked ? (
-              <Lock className="h-3 w-3 text-muted-foreground/30 shrink-0" />
-            ) : (
-              <ChevronRight className="h-3 w-3 text-muted-foreground/30 shrink-0" />
-            )}
-          </button>
-        );
-      })}
+    <div className="space-y-3">
+      <p className="text-[11px] text-muted-foreground/60 leading-relaxed">
+        {t('practice.intro')}
+      </p>
+      <div className="space-y-1.5">
+        {PRACTICES.map((p) => {
+          const Icon = p.icon;
+          const locked = !subscribed;
+          return (
+            <button
+              key={p.id}
+              onClick={() => handleSelect(p.id)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md transition-colors hover:bg-muted/30 group"
+            >
+              <Icon className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />
+              <div className="flex-1 text-left">
+                <span className="text-xs font-mono text-foreground/70 group-hover:text-foreground transition-colors">
+                  {t(p.labelKey)}
+                </span>
+                <span className="block text-[10px] text-muted-foreground/40 mt-0.5">
+                  {t(p.descKey)}
+                </span>
+              </div>
+              {locked ? (
+                <Lock className="h-3 w-3 text-muted-foreground/30 shrink-0" />
+              ) : (
+                <ChevronRight className="h-3 w-3 text-muted-foreground/30 shrink-0" />
+              )}
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }
