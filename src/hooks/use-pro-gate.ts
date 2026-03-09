@@ -3,6 +3,7 @@ import { useSubscription } from './use-subscription';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import type { ProFeature } from '@/lib/pricing';
+import { trackEvent } from '@/lib/analytics';
 
 /**
  * Hook for gating Pro-only features.
