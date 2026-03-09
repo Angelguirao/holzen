@@ -1,5 +1,6 @@
 import { useAuth } from '@/hooks/use-auth';
 import { SourceManagement } from '@/components/SourceManagement';
+import { ProLock } from '@/components/ProLock';
 import { isHapticEnabled, setHapticEnabled } from '@/lib/haptics';
 import { useHolzen } from '@/hooks/use-holzen';
 import { useSubscription } from '@/hooks/use-subscription';
