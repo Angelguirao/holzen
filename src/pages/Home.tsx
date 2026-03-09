@@ -483,14 +483,17 @@ const Home = () => {
                     }
                     setShowRitual(true);
                   }}
-                  className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors duration-300"
+                  className="w-full flex flex-col items-center gap-1.5 py-3 rounded-md border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors duration-300"
                 >
-                  {!subscribed && <Lock className="h-3 w-3 text-primary/20" />}
-                  <Sparkles className="h-3 w-3 text-primary/40" />
-                  <span className="text-[10px] font-mono text-primary/40 tracking-[0.2em] uppercase">
-                    {t('home.startARitual')}
-                  </span>
-                  {!subscribed && <span className="text-[8px] font-mono text-primary/30 uppercase tracking-wider">PRO</span>}
+                  <div className="flex items-center gap-2">
+                    {!subscribed && <Lock className="h-3 w-3 text-primary/20" />}
+                    <Sparkles className="h-3 w-3 text-primary/40" />
+                    <span className="text-[10px] font-mono text-primary/40 tracking-[0.2em] uppercase">
+                      {t('home.startARitual')}
+                    </span>
+                    {!subscribed && <span className="text-[8px] font-mono text-primary/30 uppercase tracking-wider">PRO</span>}
+                  </div>
+                  <span className="text-[9px] text-muted-foreground/40">{t('home.ritualHint')}</span>
                 </button>
                 <button
                   onClick={() => navigate('/breathe')}
