@@ -12,7 +12,6 @@ import { ReflectionNote } from '@/components/ReflectionNote';
 import { ReflectionTags } from '@/components/ReflectionTags';
 import { ShareReflection } from '@/components/ShareReflection';
 import { ReflectionWallpaper } from '@/components/ReflectionWallpaper';
-import { OutcomePrompt } from '@/components/OutcomePrompt';
 import { MoodCheck, type MoodValue } from '@/components/MoodCheck';
 
 const DECISIONS = [
