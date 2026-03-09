@@ -23,7 +23,7 @@ import About from "./pages/About";
 import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import Roadmap from "./pages/Roadmap";
-import Ambient from "./pages/Ambient";
+import Breathe from "./pages/Breathe";
 import Reserve from "./pages/Reserve";
 import PauseSession from "./pages/PauseSession";
 
@@ -60,7 +60,8 @@ const App = () => (
                   <Route path="/history" element={<Navigate to="/library" replace />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/settings" element={<Settings />} />
-                  <Route path="/ambient" element={<Ambient />} />
+                  <Route path="/breathe" element={<Breathe />} />
+                  <Route path="/ambient" element={<Breathe />} />
                   <Route path="/pause" element={<PauseSession />} />
                 </Route>
                 <Route path="/welcome" element={<PublicOnlyRoute><Landing /></PublicOnlyRoute>} />

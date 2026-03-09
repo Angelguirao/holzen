@@ -4,7 +4,8 @@
     "history": "History",
     "library": "Library",
     "profile": "Profile",
-    "settings": "Settings"
+    "settings": "Settings",
+    "breathe": "Breathe"
   },
   "common": {
     "back": "Back",
@@ -323,6 +324,7 @@
     "demoIntro": "When Bitcoin moves past your threshold, Holzen delivers a reflection — a moment to pause before you act.",
     "demoReflectionLabel": "Your Holzen reflection",
     "demoHint": "This was a simulation. The real ones are written for you by AI, shaped by your motivations.",
+    "demoComplete": "That's Holzen. We'll be here when the market moves.",
     "sampleContext": "BTC is down 7.2% in the last 24 hours. Market sentiment: Extreme Fear (18/100).",
     "pauseWithThis": "Pause with this",
     "breatheWithThis": "Breathe with this →",
@@ -1322,5 +1324,13 @@
     "upgradeDesc": "Upgrade to Pro to unlock AI companions, insights, rituals, library, and more.",
     "upgradeCta": "Upgrade to Pro",
     "badge": "PRO"
+  },
+  "triggerOverlay": {
+    "readyToPause": "Ready to pause?",
+    "enterPause": "Enter the pause",
+    "notNow": "Not now"
+  },
+  "breathe": {
+    "startTimer": "Start a 60s timer"
   }
 }
