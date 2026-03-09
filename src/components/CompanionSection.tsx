@@ -113,6 +113,7 @@ function CollapsibleCompanion({
 
 export const CompanionSection = forwardRef<HTMLDivElement, Props>(function CompanionSection({ companions, prefs, severity = 'mild', reflectionId, context, reflectionMessage }, ref) {
   const { language } = useHolzen();
+  const { isPro, requirePro } = useProGate();
 
   // Track favorite state per source_type from library_items
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
