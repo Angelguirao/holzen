@@ -27,7 +27,7 @@ const STATUS_FILTERS: { key: string; label: string }[] = [
 
 export default function Library() {
   const { t } = useTranslation();
-  const { isPro, startCheckout, checkoutLoading } = useProGate();
+  const { isPro, isPending, startCheckout, checkoutLoading } = useProGate();
   const library = useLibrary();
   const [tab, setTab] = useState<'all' | 'favorites'>('all');
   const [search, setSearch] = useState('');
