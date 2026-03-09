@@ -2,10 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { PRICING } from '@/lib/pricing';
-onth;
-
-export function useSubscription() {
-  const { user } = useAuth();
+r } = useAuth();
   const [subscribed, setSubscribed] = useState(false);
   const [loading, setLoading] = useState(true);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
@@ -30,8 +27,7 @@ export function useSubscription() {
       }
       if (data?.subscriibed(true);
         setMonthlyRemaining(undefined);
-      } else {
-        setSubscribed(false);
+    bscribed(false);
         // Count reflections this month
         const now = new Date();
         const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
@@ -50,9 +46,7 @@ export function useSubscription() {
         }
       }
     } catch {
-      setSubscribed(false);
-    } finally {
-      setLoading(false);
+      setSubscribed   setLoading(false);
     }
   }, [user]);
 

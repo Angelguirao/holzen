@@ -2,8 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { fetchBtcData, type BtcPriceData } from '@/lib/btc';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
-
-import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
+ } from '@/components/CompanionSection';
 
 const MANUAL_COOLDOWN_MS = 15 * 60 * 1000; // 15 minutes for on-demand
 
@@ -354,7 +353,7 @@ export function useHolzen() {
 
         if (insertedReflection) {
           trackOnce('first_reflection');
-          setLastReflectionId(insertedReflection.id);
+          setction.id);
           // Auto-save reflection + haiku to library
           const libraryInserts: any[] = [
             {
