@@ -3,6 +3,7 @@ import { useEffect, useState, useMemo, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useHolzen } from '@/hooks/use-holzen';
+import { useSubscription } from '@/hooks/use-subscription';
 import { formatBtcPrice } from '@/lib/btc';
 import { format } from 'date-fns';
 import { Mail, Lock, Clock, Trash2 } from 'lucide-react';
@@ -13,6 +14,7 @@ import { InsightsPanel } from '@/components/InsightsPanel';
 import { DecisionQualityCard } from '@/components/DecisionQualityCard';
 import { StreakTimeline } from '@/components/StreakTimeline';
 import { AIInsightsPanel } from '@/components/AIInsightsPanel';
+import { ProLock } from '@/components/ProLock';
 
 import { BadgesPanel } from '@/components/BadgesPanel';
 import { MoodPriceChart } from '@/components/MoodPriceChart';
