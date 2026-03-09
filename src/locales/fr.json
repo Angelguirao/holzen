@@ -282,7 +282,7 @@
     "enableAiInsights": "Activer les analyses IA",
     "plan": "Plan",
     "manageSubscription": "Gérer l'abonnement",
-    "pricePerMonth": "3 $/mois · Annulez quand vous voulez",
+    "pricePerMonth": "{{price}} $/mois · Annulez quand vous voulez",
     "openingCheckout": "Ouverture du paiement…",
     "passwordLabel": "Mot de passe",
     "newPasswordPlaceholder": "Nouveau mot de passe",
