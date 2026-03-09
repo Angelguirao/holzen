@@ -77,6 +77,7 @@ interface Letter {
 const Profile = () => {
   const { user } = useAuth();
   const { t } = useTranslation();
+  const { subscribed } = useSubscription();
   const [reflections, setReflections] = useState<Reflection[]>([]);
   const [letters, setLetters] = useState<Letter[]>([]);
   const [loading, setLoading] = useState(true);
