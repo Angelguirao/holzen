@@ -150,6 +150,18 @@ const Auth = () => {
           </Button>
         </form>
 
+        {view === 'sign-up' && (
+          <p className="text-[10px] font-mono text-muted-foreground/60 text-center leading-relaxed">
+            <Trans
+              i18nKey="auth.agreeToTerms"
+              components={{
+                terms: <Link to="/terms" className="underline underline-offset-2 hover:text-foreground transition-colors" />,
+                privacy: <Link to="/privacy" className="underline underline-offset-2 hover:text-foreground transition-colors" />,
+              }}
+            />
+          </p>
+        )}
+
         <button onClick={() => { setView(view === 'sign-up' ? 'sign-in' : 'sign-up'); setError(null); }} className="text-xs font-mono text-muted-foreground underline w-full text-center">
           {view === 'sign-up' ? t('auth.alreadyHaveAccount') : t('auth.createAnAccount')}
         </button>
