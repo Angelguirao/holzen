@@ -105,6 +105,7 @@ const Home = () => {
   const { reflection: nightReflection, dismiss: dismissNight } = useNightReflection();
 
   const [showVoid, setShowVoid] = useState(false);
+  const [showTriggerOverlay, setShowTriggerOverlay] = useState(false);
   const [showRitual, setShowRitual] = useState(false);
   const [priceHidden, setPriceHidden] = useState(() => localStorage.getItem('holzen_hide_price') === 'true');
   const [btcMode, setBtcMode] = useState(() => localStorage.getItem('holzen_btc_mode') === 'true');
