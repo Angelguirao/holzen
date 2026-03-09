@@ -555,6 +555,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             {t('settings.ritual')}
           </AccordionTrigger>
           <AccordionContent className="space-y-3 pb-4">
+            <ProLock>
             <p className="text-xs text-muted-foreground leading-relaxed">
               {t('settings.ritualDesc')}
             </p>
@@ -576,6 +577,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                 </button>
               ))}
             </div>
+            </ProLock>
           </AccordionContent>
         </AccordionItem>
 
