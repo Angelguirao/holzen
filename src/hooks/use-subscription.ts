@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { PRICING } from '@/lib/pricing';
+import { trackOnce, trackEvent } from '@/lib/analytics';
 
 const FREE_MONTHLY_LIMIT = PRICING.freeReflectionsPerMonth;
 
