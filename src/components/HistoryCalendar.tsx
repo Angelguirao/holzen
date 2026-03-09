@@ -210,6 +210,12 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate }: Prop
                   {t('calendar.badgeCount', { count: badgesList.length })}
                 </span>
               )}
+              {practiceList.length > 0 && (
+                <span className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
+                  <Heart className="h-2.5 w-2.5 text-pink-500/60" />
+                  {t('calendar.practiceCount', { count: practiceList.length })}
+                </span>
+              )}
             </div>
 
             {totalMoods > 0 && (
