@@ -254,6 +254,7 @@
       "history": "Historical insight"
     },
     "ritualDesc": "A guided pre-decision sequence. Choose your preferred depth.",
+    "ritualDescUpdated": "Rituals are customizable grounding sequences you run before making a decision. Choose from presets, build your own, or let AI suggest one — directly from the ritual screen.",
     "ritualTemplates": {
       "quick": "Quick",
       "quickDesc": "Breathe → Decide",
@@ -1342,7 +1343,7 @@
   },
   "ritual": {
     "selectTemplate": "Choose your ritual",
-    "intro": "Rituals are guided step-by-step sequences that slow you down before making a financial decision. Breathe, reflect, journal, and then decide — so your choices come from clarity, not impulse.",
+    "intro": "Rituals are guided sequences that slow you down before a financial decision. Pick a preset, build your own, or let AI suggest one — so your choices come from clarity, not impulse.",
     "yourTemplates": "Your rituals",
     "buildYourOwn": "Build your own",
     "aiSuggest": "AI suggest",
