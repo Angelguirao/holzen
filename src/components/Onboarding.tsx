@@ -119,6 +119,14 @@ export function Onboarding({ onComplete }: Props) {
           </div>
 
           <div className="flex items-center gap-3">
+            {step === 0 && motivations.length === 0 && (
+              <button
+                onClick={() => goTo(step + 1)}
+                className="text-[10px] font-mono text-muted-foreground/40 hover:text-foreground transition-colors"
+              >
+                {t('common.skip')}
+              </button>
+            )}
             {step > 0 && (
               <button
                 onClick={() => goTo(step - 1)}
