@@ -70,7 +70,7 @@ const Home = () => {
   };
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { subscribed, loading: subLoading, monthlyRemaining, canReflect, checkoutLoading, startCheckout, refresh } = useSubscription();
+  const { subscribed, loading: subLoading, monthlyRemaining, canReflectng, canReflect, checkoutLoading, startCheckout, refresh } = useSubscription();
   const [searchParams] = useSearchParams();
 
   useEffect(() => {
@@ -243,7 +243,7 @@ const Home = () => {
     return <Onboarding onComplete={completeOnboarding} />;
   }
 
-  const hasAccess = subscribed || (trialRemaining !== undefined && trialRemaining > 0);
+  conscanReflectRemaining > 0);
 
   // Zen mode — unchanged
   if (zenMode) {
