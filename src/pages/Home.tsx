@@ -10,9 +10,7 @@ import { useSubscription } from '@/hooks/use-subscription';
 import { BtcStatus } from '@/components/BtcStatus';
 import { NightReflectionCard, useNightReflection } from '@/components/NightReflectionCard';
 import { ReflectionMessage } from '@/components/ReflectionMessage';
-import { OutcomePrompt } from '@/components/OutcomePrompt';
 import { HolzenNumber } from '@/components/HolzenNumber';
-import { MoodCheck, type MoodValue } from '@/components/MoodCheck';
 import { ReflectionComparison } from '@/components/ReflectionComparison';
 import { Onboarding } from '@/components/Onboarding';
 import { HoldGoalWidget } from '@/components/HoldGoalWidget';
@@ -105,11 +103,8 @@ const Home = () => {
 
   const { reflection: nightReflection, dismiss: dismissNight } = useNightReflection();
 
-  const [showOutcome, setShowOutcome] = useState(false);
   const [showVoid, setShowVoid] = useState(false);
   const [showRitual, setShowRitual] = useState(false);
-  const [outcomeReflectionId, setOutcomeReflectionId] = useState<string | null>(null);
-  const [showMoodCheck, setShowMoodCheck] = useState(false);
   const [priceHidden, setPriceHidden] = useState(() => localStorage.getItem('holzen_hide_price') === 'true');
   const [btcMode, setBtcMode] = useState(() => localStorage.getItem('holzen_btc_mode') === 'true');
   const [zenMode] = useState(() => localStorage.getItem('holzen_zen_mode') === 'true');
@@ -180,30 +175,13 @@ const Home = () => {
     });
   }, []);
 
-  const handleNeedAMoment = () => {
+  const handleNeedAPause = () => {
     if (manualCooldownRemaining() > 0) return;
-    setShowMoodCheck(true);
-  };
-
-  const handleMoodSelected = (mood: MoodValue) => {
-    setShowMoodCheck(false);
-    manualTrigger(mood);
-  };
-
-  const handleMoodSkipped = () => {
-    setShowMoodCheck(false);
     manualTrigger();
   };
 
   const handleDismiss = () => {
-    setOutcomeReflectionId(lastReflectionId);
     dismissMessage();
-    setShowOutcome(true);
-  };
-
-  const handleOutcomeComplete = () => {
-    setShowOutcome(false);
-    setOutcomeReflectionId(null);
   };
 
   useEffect(() => {
@@ -267,14 +245,6 @@ const Home = () => {
                 severity={severity} reflectionId={lastReflectionId}
               />
             </motion.div>
-          ) : showOutcome && outcomeReflectionId ? (
-            <motion.div key="zen-outcome" variants={zenVariants} initial="hidden" animate="visible" exit="hidden">
-              <OutcomePrompt reflectionId={outcomeReflectionId} onComplete={handleOutcomeComplete} />
-            </motion.div>
-          ) : showMoodCheck ? (
-            <motion.div key="zen-mood" variants={zenVariants} initial="hidden" animate="visible" exit="hidden">
-              <MoodCheck onSelect={handleMoodSelected} onSkip={handleMoodSkipped} />
-            </motion.div>
           ) : loading ? (
             <motion.div key="zen-loading" variants={zenVariants} initial="hidden" animate="visible" exit="hidden" className="space-y-4">
               <div className="flex items-center gap-2 text-muted-foreground">
@@ -288,7 +258,7 @@ const Home = () => {
             <motion.div key="zen-empty" variants={zenVariants} initial="hidden" animate="visible" exit="hidden" className="space-y-6 text-center">
               <p className="text-sm text-muted-foreground font-mono leading-relaxed">{t('home.noActiveReflection')}</p>
               {hasAccess && (
-                <NeedAMomentButton onTrigger={handleNeedAMoment} cooldownRemaining={manualCooldownRemaining} loading={loading} />
+                <NeedAMomentButton onTrigger={handleNeedAPause} cooldownRemaining={manualCooldownRemaining} loading={loading} />
               )}
             </motion.div>
           )}
@@ -402,10 +372,6 @@ const Home = () => {
                         {t('common.done')}
                       </button>
                     </div>
-                  ) : showOutcome && outcomeReflectionId ? (
-                    <OutcomePrompt reflectionId={outcomeReflectionId} onComplete={handleOutcomeComplete} />
-                  ) : showMoodCheck ? (
-                    <MoodCheck onSelect={handleMoodSelected} onSkip={handleMoodSkipped} />
                   ) : (
                     <>
                       {loading ? (
@@ -453,7 +419,7 @@ const Home = () => {
                               <p className="text-sm leading-relaxed">{pinnedReflection.message}</p>
                             </div>
                           )}
-                          <NeedAMomentButton onTrigger={handleNeedAMoment} cooldownRemaining={manualCooldownRemaining} loading={loading} />
+                          <NeedAMomentButton onTrigger={handleNeedAPause} cooldownRemaining={manualCooldownRemaining} loading={loading} />
                         </div>
                       )}
                     </>
