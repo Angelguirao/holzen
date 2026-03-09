@@ -624,17 +624,28 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
       )}
 
       {hasZoomOut && (
-        <CollapsibleCompanion
-          label={labels.zoomOut}
-          expanded={expandedZoomOut}
-          onToggle={() => {
-            setExpandedZoomOut((v) => !v);
-            if (!completion.zoomOut) markCompleted('zoomOut');
-          }}
-          completed={completion.zoomOut}
-          isFavorite={favorites['zoom_out']}
-          onToggleFavorite={() => toggleCompanionFavorite('zoom_out')}
-        >
+        isPro ? (
+          <CollapsibleCompanion
+            label={labels.zoomOut}
+            expanded={expandedZoomOut}
+            onToggle={() => {
+              setExpandedZoomOut((v) => !v);
+              if (!completion.zoomOut) markCompleted('zoomOut');
+            }}
+            completed={completion.zoomOut}
+            isFavorite={favorites['zoom_out']}
+            onToggleFavorite={() => toggleCompanionFavorite('zoom_out')}
+          >
+            <ZoomOutDisplay
+              data={zoomOut}
+              loading={zoomOutLoading}
+              error={zoomOutError}
+            />
+          </CollapsibleCompanion>
+        ) : (
+          <ProLockedCompanion label={labels.zoomOut} onUpgrade={() => requirePro('zoom_out')} />
+        )
+      )}
           <ZoomOutDisplay
             data={zoomOut}
             loading={zoomOutLoading}
