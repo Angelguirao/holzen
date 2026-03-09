@@ -89,7 +89,11 @@ export default function PauseSession() {
   }, [reflectionId, isFavorite]);
 
   const handleReturn = useCallback(() => {
-    navigate(-1);
+    if (window.history.length > 1) {
+      navigate(-1);
+    } else {
+      navigate('/', { replace: true });
+    }
   }, [navigate]);
 
   const handleDecide = useCallback((d: string) => {
