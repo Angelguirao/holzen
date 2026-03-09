@@ -354,5 +354,6 @@ export default function PauseSession() {
               )}
             </div>
           </motion.div>
+    </>
   );
 }
