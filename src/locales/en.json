@@ -134,6 +134,7 @@
     "noReflectionsYet": "No reflections yet. Stats will appear after your first reflection.",
     "overview": "Overview",
     "holzenScore": "Holzen Score",
+    "holzenScoreEmpty": "Record moods and outcomes on reflections to calculate your Holzen Score.",
     "moodLabel": "Mood",
     "actionsLabel": "Actions",
     "streakLabel": "Streak",
