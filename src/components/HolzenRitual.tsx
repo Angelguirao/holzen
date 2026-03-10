@@ -262,6 +262,13 @@ export function HolzenRitual({
 
           <div className="w-full max-w-sm mx-auto px-6 max-h-[80vh] overflow-y-auto">
             <AnimatePresence mode="wait">
+              {/* ===== MOOD BEFORE ===== */}
+              {phase === 'mood-before' && (
+                <motion.div key="mood-before" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-4">
+                  <MoodCheck onSelect={handleMoodBefore} onSkip={handleMoodBeforeSkip} variant="before" />
+                </motion.div>
+              )}
+
               {/* ===== TEMPLATE SELECTION ===== */}
               {phase === 'select' && (
                 <motion.div key="select" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-6">
