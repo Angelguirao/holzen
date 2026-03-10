@@ -198,6 +198,7 @@ export default function PauseSession() {
   }, [reflectionId, isFavorite, subscribed, t]);
 
   const handleReturn = useCallback(() => {
+    clearSession();
     navigate('/', { replace: true });
   }, [navigate]);
 
@@ -210,6 +211,7 @@ export default function PauseSession() {
     }
     hapticFeedback('success');
     setPhase('done');
+    clearSession();
   }, [dismissMessage, reflectionId]);
 
   // If no message, redirect back
