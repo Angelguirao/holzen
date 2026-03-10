@@ -475,8 +475,29 @@ function ScoreBarInline({ label, value, detail }: { label: string; value: number
     </div>
   );
 }
+function SummaryTile({ label, value, suffix }: { label: string; value: string | number; suffix?: string }) {
+  return (
+    <div className="rounded-md border border-border/60 bg-muted/30 px-3 py-2.5 text-center space-y-0.5">
+      <p className="text-lg font-mono font-medium leading-none">
+        {value}{suffix && <span className="text-[10px] text-muted-foreground/50 ml-0.5">{suffix}</span>}
+      </p>
+      <p className="text-[9px] font-mono tracking-widest uppercase text-muted-foreground/50">{label}</p>
+    </div>
+  );
+}
 
-function LetterCard({ letter: l, onDelete, fmtPrice, type }: {
+function StatsSection({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="space-y-4">
+      <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground border-b border-border/40 pb-1.5">
+        {label}
+      </p>
+      {children}
+    </div>
+  );
+}
+
+
   letter: Letter;
   onDelete: (id: string) => void;
   fmtPrice: (p: number) => string;
