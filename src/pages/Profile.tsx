@@ -315,11 +315,11 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
       <StreakTimeline reflections={reflections} memberSince={memberSince} />
 
       {/* Practice summary */}
-      {practiceStats && (
-        <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2">
-          <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
-            {t('profile.practiceActivity')}
-          </p>
+      <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2">
+        <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
+          {t('profile.practiceActivity')}
+        </p>
+        {practiceStats ? (
           <div className="flex flex-wrap gap-3">
             {Object.entries(practiceStats.byType).map(([type, count]) => (
               <div key={type} className="text-center">
@@ -328,8 +328,10 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
               </div>
             ))}
           </div>
-        </div>
-      )}
+        ) : (
+          <p className="text-xs text-muted-foreground/50">{t('profile.noPracticeYet', 'No practice sessions yet. Try a check-in or body scan from the Home screen.')}</p>
+        )}
+      </div>
 
       {/* Pro-gated advanced stats */}
       <ProLock>
