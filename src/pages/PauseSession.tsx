@@ -60,6 +60,7 @@ export default function PauseSession() {
   const [decision, setDecision] = useState<string | null>(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [moodDone, setMoodDone] = useState(false);
+  const [moodAfterDone, setMoodAfterDone] = useState(false);
   const [curtainLifted, setCurtainLifted] = useState(false);
 
   // Cinematic entrance: dark curtain fades away after mount
@@ -72,12 +73,24 @@ export default function PauseSession() {
     hapticFeedback('light');
     setMoodDone(true);
     if (reflectionId) {
-      await supabase.from('reflections').update({ mood }).eq('id', reflectionId);
+      await supabase.from('reflections').update({ mood } as any).eq('id', reflectionId);
     }
   }, [reflectionId]);
 
   const handleMoodSkip = useCallback(() => {
     setMoodDone(true);
+  }, []);
+
+  const handleMoodAfterSelect = useCallback(async (mood: MoodValue) => {
+    hapticFeedback('light');
+    setMoodAfterDone(true);
+    if (reflectionId) {
+      await supabase.from('reflections').update({ mood_after: mood } as any).eq('id', reflectionId);
+    }
+  }, [reflectionId]);
+
+  const handleMoodAfterSkip = useCallback(() => {
+    setMoodAfterDone(true);
   }, []);
 
   const { subscribed } = useSubscription();
