@@ -1093,7 +1093,8 @@
       "quick": "Quick",
       "standard": "Standard",
       "deep": "Deep"
-    }
+    },
+    "emptyMessage": "Complete your first ritual to start tracking effectiveness."
   },
   "reflectionNote": {
     "addNote": "Add a note",
