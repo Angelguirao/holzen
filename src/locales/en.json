@@ -958,7 +958,8 @@
       "signal": "Signal",
       "zoomOut": "Zoom Out",
       "history": "History"
-    }
+    },
+    "emptyMessage": "Record outcomes on 3 reflections to unlock decision quality insights."
   },
   "holzenScore": {
     "title": "Holzen Score",
