@@ -25,10 +25,11 @@ export function LandingComparison({ variant = 'side-by-side' }: Props) {
 
   const REFLECTION = [
     { icon: <TrendingDown className="h-3.5 w-3.5" />, title: t('landing.reflection.01title') },
-    { icon: <Wind className="h-3.5 w-3.5" />, title: t('landing.reflection.02title') },
-    { icon: <Eye className="h-3.5 w-3.5" />, title: t('landing.reflection.03title') },
-    { icon: <Target className="h-3.5 w-3.5" />, title: t('landing.reflection.04title') },
-    { icon: <Sparkles className="h-3.5 w-3.5" />, title: t('landing.reflection.05title') },
+    { icon: <Heart className="h-3.5 w-3.5" />, title: t('landing.reflection.02title') },
+    { icon: <Wind className="h-3.5 w-3.5" />, title: t('landing.reflection.03title') },
+    { icon: <Eye className="h-3.5 w-3.5" />, title: t('landing.reflection.04title') },
+    { icon: <Target className="h-3.5 w-3.5" />, title: t('landing.reflection.05title') },
+    { icon: <Sparkles className="h-3.5 w-3.5" />, title: t('landing.reflection.06title') },
   ];
 
   if (variant === 'side-by-side') return <SideBySide reaction={REACTION} reflection={REFLECTION} prefersReduced={prefersReduced} t={t} />;
