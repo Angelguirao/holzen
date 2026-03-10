@@ -4,7 +4,7 @@ import { differenceInCalendarDays, parseISO } from 'date-fns';
 interface Reflection {
   created_at: string;
   mood: string | null;
-  mood_after: string | null;
+  mood_after?: string | null;
   outcome: string | null;
 }
 
