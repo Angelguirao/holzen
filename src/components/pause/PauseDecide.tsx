@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { ChevronLeft } from 'lucide-react';
 import { hapticFeedback } from '@/lib/haptics';
 
 const DECISIONS = [
@@ -11,9 +12,10 @@ const DECISIONS = [
 
 interface Props {
   onDecide: (decision: string) => void;
+  onBack?: () => void;
 }
 
-export function PauseDecide({ onDecide }: Props) {
+export function PauseDecide({ onDecide, onBack }: Props) {
   const { t } = useTranslation();
 
   return (
@@ -46,6 +48,23 @@ export function PauseDecide({ onDecide }: Props) {
           </motion.button>
         ))}
       </div>
+
+      {/* Back link */}
+      {onBack && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.5, duration: 0.8 }}
+        >
+          <button
+            onClick={onBack}
+            className="flex items-center gap-1 text-[9px] font-mono text-muted-foreground/20 hover:text-muted-foreground/40 transition-colors duration-500 tracking-[0.12em] uppercase"
+          >
+            <ChevronLeft className="h-3 w-3" />
+            {t('pause.steps.back', 'Back')}
+          </button>
+        </motion.div>
+      )}
     </motion.div>
   );
 }
