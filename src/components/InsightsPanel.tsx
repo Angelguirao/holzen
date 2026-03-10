@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ChartEmptyState } from './ChartEmptyState';
+import { MOOD_GLYPHS } from '@/components/icons/MoodIcon';
 
 interface ReflectionStats {
   mood: string | null;
@@ -11,15 +12,15 @@ interface Props {
   reflections: ReflectionStats[];
 }
 
-const MOOD_META: Record<string, { emoji: string; color: string; energy: 'high' | 'low' }> = {
-  fomo: { emoji: '🔥', color: 'bg-destructive/70', energy: 'high' },
-  excited: { emoji: '⚡', color: 'bg-accent/50', energy: 'high' },
-  greedy: { emoji: '🤑', color: 'bg-destructive/60', energy: 'high' },
-  anxious: { emoji: '😰', color: 'bg-destructive/50', energy: 'high' },
-  calm: { emoji: '🧘', color: 'bg-primary/70', energy: 'low' },
-  detached: { emoji: '😶', color: 'bg-muted-foreground/40', energy: 'low' },
-  uncertain: { emoji: '🤔', color: 'bg-muted-foreground/50', energy: 'low' },
-  fearful: { emoji: '😨', color: 'bg-destructive/40', energy: 'low' },
+const MOOD_META: Record<string, { glyph: string; color: string; energy: 'high' | 'low' }> = {
+  fomo: { glyph: MOOD_GLYPHS.fomo, color: 'bg-destructive/70', energy: 'high' },
+  excited: { glyph: MOOD_GLYPHS.excited, color: 'bg-accent/50', energy: 'high' },
+  greedy: { glyph: MOOD_GLYPHS.greedy, color: 'bg-destructive/60', energy: 'high' },
+  anxious: { glyph: MOOD_GLYPHS.anxious, color: 'bg-destructive/50', energy: 'high' },
+  calm: { glyph: MOOD_GLYPHS.calm, color: 'bg-primary/70', energy: 'low' },
+  detached: { glyph: MOOD_GLYPHS.detached, color: 'bg-muted-foreground/40', energy: 'low' },
+  uncertain: { glyph: MOOD_GLYPHS.uncertain, color: 'bg-muted-foreground/50', energy: 'low' },
+  fearful: { glyph: MOOD_GLYPHS.fearful, color: 'bg-destructive/40', energy: 'low' },
 };
 
 const MOOD_ORDER = ['fomo', 'excited', 'greedy', 'anxious', 'calm', 'detached', 'uncertain', 'fearful'];
