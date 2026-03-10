@@ -380,22 +380,22 @@
     "heroDesc": "Holzen n'est pas un outil de trading. C'est une pratique de conscience de soi. Quand le Bitcoin bouge, vous avez un moment pour faire une pause, réfléchir et observer vos schémas — avant d'agir impulsivement.",
     "getStartedForFree": "Commencez gratuitement",
     "noCreditCard": "Ensuite {{price}} $/mois · sans carte · annulez quand vous voulez",
-    "reflectionLoop": "Le cycle de réflexion",
+    "reflectionLoop": "Impulsion vs. Intention",
     "reaction": {
-      "label": "Sans Holzen",
+      "label": "Impulsion",
       "01title": "Le marché chute",
-      "02title": "La panique s'installe",
-      "03title": "Vous vendez impulsivement",
-      "04title": "Vous le regrettez après"
+      "02title": "La peur prend le dessus",
+      "03title": "Vous vendez par instinct",
+      "04title": "Le regret suit"
     },
     "reflection": {
-      "label": "Avec Holzen",
+      "label": "Intention",
       "01title": "Le marché chute",
-      "02title": "Vous pausez & ressentez",
+      "02title": "Vous remarquez l'impulsion",
       "03title": "Vous respirez",
-      "04title": "Vous réfléchissez",
-      "05title": "Vous décidez délibérément",
-      "06title": "Vous progressez avec le temps"
+      "04title": "Vous observez, sans réagir",
+      "05title": "Vous décidez avec clarté",
+      "06title": "Vous accumulez la sagesse"
     },
     "steps": {
       "01title": "Le marché bouge",
