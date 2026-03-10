@@ -228,15 +228,42 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
                 {startDate.toDateString() === new Date().toDateString() ? t('holdGoal.today') : format(startDate, 'MMM d, yyyy')}
               </Button>
             </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <CalendarPicker
-                mode="single"
-                selected={startDate}
-                onSelect={(d) => d && setStartDate(d)}
-                disabled={(date) => date > new Date()}
-                initialFocus
-                className={cn("p-3 pointer-events-auto")}
-              />
+            <PopoverContent className="w-auto p-0" align="center" side="bottom" sideOffset={8}>
+              <div className="p-3 pointer-events-auto">
+                {/* Year & Month dropdowns */}
+                <div className="flex items-center gap-2 mb-3">
+                  <select
+                    value={calendarMonth.getFullYear()}
+                    onChange={(e) => setCalendarMonth(new Date(parseInt(e.target.value), calendarMonth.getMonth(), 1))}
+                    className="flex-1 h-7 rounded-md border border-input bg-background text-xs font-mono px-2 focus:outline-none focus:ring-1 focus:ring-ring"
+                  >
+                    {Array.from({ length: new Date().getFullYear() - 2008 }, (_, i) => 2009 + i).map((y) => (
+                      <option key={y} value={y}>{y}</option>
+                    ))}
+                  </select>
+                  <select
+                    value={calendarMonth.getMonth()}
+                    onChange={(e) => setCalendarMonth(new Date(calendarMonth.getFullYear(), parseInt(e.target.value), 1))}
+                    className="flex-1 h-7 rounded-md border border-input bg-background text-xs font-mono px-2 focus:outline-none focus:ring-1 focus:ring-ring"
+                  >
+                    {Array.from({ length: 12 }, (_, i) => (
+                      <option key={i} value={i} disabled={calendarMonth.getFullYear() === new Date().getFullYear() && i > new Date().getMonth()}>
+                        {format(new Date(2000, i, 1), 'MMM')}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <CalendarPicker
+                  mode="single"
+                  selected={startDate}
+                  onSelect={(d) => d && setStartDate(d)}
+                  month={calendarMonth}
+                  onMonthChange={setCalendarMonth}
+                  disabled={(date) => date > new Date() || date < new Date('2009-01-03')}
+                  initialFocus
+                  className="p-0"
+                />
+              </div>
             </PopoverContent>
           </Popover>
         </div>
