@@ -25,6 +25,7 @@ import { MoodPriceScatter } from '@/components/MoodPriceScatter';
 import { RitualStatsCard } from '@/components/RitualStatsCard';
 
 import { StatsTrends } from '@/components/StatsTrends';
+import { MoodShiftChart } from '@/components/MoodShiftChart';
 import { PeriodComparison } from '@/components/PeriodComparison';
 import { VolatilityToleranceCard } from '@/components/VolatilityToleranceCard';
 import { ShareStats } from '@/components/ShareStats';
@@ -54,6 +55,7 @@ interface Reflection {
   learning_body: string | null;
   note: string | null;
   mood: string | null;
+  mood_after: string | null;
   outcome: string | null;
   tags: string[];
   breathing_completed: boolean;
@@ -428,6 +430,7 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
       <ProLock>
         <StatsSection label={t('profile.sectionAdvanced', 'Advanced')}>
           <StatsTrends reflections={reflections} />
+          <MoodShiftChart reflections={reflections} />
           <MoodPriceScatter reflections={reflections} />
         </StatsSection>
       </ProLock>
