@@ -205,7 +205,6 @@ export function PracticeWidget() {
               <div className="flex-1 text-left">
                 <span className="text-xs font-mono text-foreground/70 group-hover:text-foreground transition-colors">
                   {t(p.labelKey)}
-                  {p.free && <span className="ml-1.5 text-[8px] text-primary/50 uppercase tracking-wider">{t('practice.free', 'Free')}</span>}
                 </span>
                 <span className="block text-[10px] text-muted-foreground/40 mt-0.5">
                   {t(p.descKey)}
