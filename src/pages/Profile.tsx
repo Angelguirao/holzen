@@ -312,7 +312,7 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
         {t('profile.overview')}
       </p>
       <ReflectionStats reflections={reflections} />
-      <StreakTimeline reflections={reflections} memberSince={memberSince} />
+      <StreakTimeline reflections={reflections} practiceEntries={practiceEntries} memberSince={memberSince} />
 
       {/* Practice summary */}
       <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2">
