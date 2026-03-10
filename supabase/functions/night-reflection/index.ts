@@ -18,7 +18,7 @@ function getUserLocalHour(timezone: string): number {
     });
     return parseInt(formatter.format(now), 10);
   } catch {
-    return -1; // invalid timezone
+    return -1;
   }
 }
 
@@ -32,7 +32,6 @@ async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise
   throw new Error("Failed to fetch BTC data after retries");
 }
 
-// Cache BTC data per currency to avoid redundant API calls
 const btcCache = new Map<string, { changePercent: number; direction: string; absChange: string }>();
 
 async function fetchBtc1dData(currency: string) {
@@ -58,6 +57,118 @@ async function fetchBtc1dData(currency: string) {
   return result;
 }
 
+// Language-specific fallback messages (used when AI is unavailable)
+const FALLBACKS: Record<string, { reflected: (pct: string) => string; quiet: (pct: string) => string }> = {
+  en: {
+    reflected: (pct) => `BTC moved ${pct}% today. You showed up, paused, and chose intentionally. That compounds.`,
+    quiet: (pct) => `BTC moved ${pct}% today. You didn't react. That's a skill most never develop.`,
+  },
+  es: {
+    reflected: (pct) => `BTC se movió ${pct}% hoy. Te presentaste, pausaste y elegiste con intención. Eso se acumula.`,
+    quiet: (pct) => `BTC se movió ${pct}% hoy. No reaccionaste. Esa es una habilidad que pocos desarrollan.`,
+  },
+  pt: {
+    reflected: (pct) => `BTC moveu ${pct}% hoje. Você apareceu, pausou e escolheu intencionalmente. Isso se acumula.`,
+    quiet: (pct) => `BTC moveu ${pct}% hoje. Você não reagiu. Essa é uma habilidade que poucos desenvolvem.`,
+  },
+  de: {
+    reflected: (pct) => `BTC bewegte sich heute um ${pct}%. Du warst da, hast pausiert und bewusst gewählt. Das summiert sich.`,
+    quiet: (pct) => `BTC bewegte sich heute um ${pct}%. Du hast nicht reagiert. Das ist eine Fähigkeit, die wenige entwickeln.`,
+  },
+  fr: {
+    reflected: (pct) => `BTC a bougé de ${pct}% aujourd'hui. Tu t'es arrêté, tu as pausé et choisi avec intention. Ça s'accumule.`,
+    quiet: (pct) => `BTC a bougé de ${pct}% aujourd'hui. Tu n'as pas réagi. C'est une compétence rare.`,
+  },
+  nl: {
+    reflected: (pct) => `BTC bewoog vandaag ${pct}%. Je was erbij, pauzeerde en koos bewust. Dat cumuleert.`,
+    quiet: (pct) => `BTC bewoog vandaag ${pct}%. Je reageerde niet. Dat is een vaardigheid die weinigen ontwikkelen.`,
+  },
+  tr: {
+    reflected: (pct) => `BTC bugün %${pct} hareket etti. Durdun, nefes aldın ve bilinçli seçim yaptın. Bu birikir.`,
+    quiet: (pct) => `BTC bugün %${pct} hareket etti. Tepki vermedin. Bu çoğunun geliştirmediği bir beceri.`,
+  },
+};
+
+const LANG_NAMES: Record<string, string> = {
+  en: "English", es: "Spanish", pt: "Portuguese",
+  de: "German", fr: "French", nl: "Dutch", tr: "Turkish",
+};
+
+async function generateAIMessage(
+  apiKey: string,
+  lang: string,
+  btcPct: string,
+  btcDirection: string,
+  hadReflection: boolean,
+  recentReflections: any[],
+  recentMoods: string[],
+  streakDays: number,
+  tone: string,
+): Promise<string | null> {
+  try {
+    const moodSummary = recentMoods.length > 0
+      ? `Recent moods (last 7 days): ${recentMoods.join(", ")}`
+      : "No mood data this week.";
+
+    const reflectionSummary = recentReflections.length > 0
+      ? recentReflections.map((r, i) => `${i + 1}. Context: "${r.context || 'none'}" | Mood: ${r.mood || 'unknown'} → ${r.mood_after || '?'} | Decision: ${r.outcome || 'pending'}`).join("\n")
+      : "No reflections today.";
+
+    const systemPrompt = `You are Holzen's night reflection companion — a calm, wise presence that helps Bitcoin holders build emotional composure.
+
+Your task: Write a single personalized end-of-day message (1-3 sentences max). This is NOT a generic motivational quote. It must feel like it was written specifically for THIS person based on their actual day.
+
+Rules:
+- Write in ${LANG_NAMES[lang] || "English"}
+- Tone: ${tone} (stoic, gentle, direct, philosophical — match their preference)
+- Reference specific details from their day when available (their moods, decisions, patterns)
+- Never give financial advice or mention specific prices
+- Never be generic — if you can't personalize, observe something specific about BTC's movement and what it might have stirred
+- Be concise — this appears as a small card notification
+- No emojis, no greeting, no sign-off — just the reflection itself`;
+
+    const userPrompt = `BTC moved ${btcPct}% ${btcDirection} today.
+${hadReflection ? "The user reflected today." : "The user did NOT open the app or reflect today."}
+${moodSummary}
+Active reflection streak: ${streakDays} days
+
+Today's reflections:
+${reflectionSummary}
+
+Write one personalized night reflection message.`;
+
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "google/gemini-2.5-flash-lite",
+        messages: [
+          { role: "system", content: systemPrompt },
+          { role: "user", content: userPrompt },
+        ],
+      }),
+    });
+
+    if (!response.ok) {
+      console.error(`[NIGHT-REFLECTION] AI gateway error: ${response.status}`);
+      return null;
+    }
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content?.trim();
+    if (!content || content.length < 10) return null;
+
+    // Strip any surrounding quotes the model might add
+    return content.replace(/^["']|["']$/g, "").trim();
+  } catch (e) {
+    console.error("[NIGHT-REFLECTION] AI generation error:", e);
+    return null;
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -70,11 +181,11 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
-    // Fetch USD data first for logging
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+
     const usdData = await fetchBtc1dData("USD");
     console.log(`[NIGHT-REFLECTION] BTC 24h: ${usdData.changePercent.toFixed(2)}%`);
 
-    // Get all users with timezone
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
       .select("user_id, reflection_tone, timezone, night_reflection_hour, hold_goal_currency, language");
@@ -95,56 +206,86 @@ serve(async (req) => {
       if (targetHour === null || targetHour === undefined) continue;
       if (localHour !== targetHour) continue;
 
-      // Use the user's currency for percentage (same across currencies, but we use their preference for consistency)
       const currency = (profile as any).hold_goal_currency || "USD";
       const btc = await fetchBtc1dData(currency);
-
-      // Check if user had any reflections today (in their timezone)
-      const today = new Date();
-      today.setHours(0, 0, 0, 0);
-      const { count } = await supabase
-        .from("reflections")
-        .select("id", { count: "exact", head: true })
-        .eq("user_id", profile.user_id)
-        .gte("created_at", today.toISOString());
-
-      const hadReflection = (count ?? 0) > 0;
-
-      // Build the night message (language-aware)
       const userLang = (profile as any).language || "en";
-      const NIGHT_MESSAGES: Record<string, { reflected: (pct: string) => string; quiet: (pct: string) => string }> = {
-        en: {
-          reflected: (pct) => `Today BTC moved ${pct}%. You paused, reflected, and continued. That's the practice.`,
-          quiet: (pct) => `Today BTC moved ${pct}%. You didn't react. That's worth noticing.`,
-        },
-        es: {
-          reflected: (pct) => `Hoy BTC se movió ${pct}%. Pausaste, reflexionaste y continuaste. Esa es la práctica.`,
-          quiet: (pct) => `Hoy BTC se movió ${pct}%. No reaccionaste. Vale la pena notarlo.`,
-        },
-        pt: {
-          reflected: (pct) => `Hoje o BTC moveu ${pct}%. Você pausou, refletiu e continuou. Essa é a prática.`,
-          quiet: (pct) => `Hoje o BTC moveu ${pct}%. Você não reagiu. Vale a pena notar.`,
-        },
-        de: {
-          reflected: (pct) => `Heute bewegte sich BTC um ${pct}%. Du hast innegehalten, reflektiert und weitergemacht. Das ist die Praxis.`,
-          quiet: (pct) => `Heute bewegte sich BTC um ${pct}%. Du hast nicht reagiert. Das ist bemerkenswert.`,
-        },
-        fr: {
-          reflected: (pct) => `Aujourd'hui BTC a bougé de ${pct}%. Tu as fait une pause, réfléchi, et continué. C'est la pratique.`,
-          quiet: (pct) => `Aujourd'hui BTC a bougé de ${pct}%. Tu n'as pas réagi. Ça vaut la peine d'être remarqué.`,
-        },
-        nl: {
-          reflected: (pct) => `Vandaag bewoog BTC ${pct}%. Je pauzeerde, reflecteerde en ging verder. Dat is de praktijk.`,
-          quiet: (pct) => `Vandaag bewoog BTC ${pct}%. Je reageerde niet. Dat is het opmerken waard.`,
-        },
-        tr: {
-          reflected: (pct) => `Bugün BTC %${pct} hareket etti. Durdun, düşündün ve devam ettin. Pratik budur.`,
-          quiet: (pct) => `Bugün BTC %${pct} hareket etti. Tepki vermedin. Bu fark edilmeye değer.`,
-        },
-      };
-      const msgs = NIGHT_MESSAGES[userLang] || NIGHT_MESSAGES.en;
-      const pctStr = btc.absChange.toString();
-      const message = hadReflection ? msgs.reflected(pctStr) : msgs.quiet(pctStr);
+      const tone = (profile as any).reflection_tone || "stoic";
+
+      // Fetch today's reflections for this user
+      const todayStart = new Date();
+      todayStart.setHours(0, 0, 0, 0);
+
+      const [
+        { data: todayReflections },
+        { data: recentMoodEntries },
+        { data: streakReflections },
+      ] = await Promise.all([
+        supabase
+          .from("reflections")
+          .select("context, mood, mood_after, outcome, message")
+          .eq("user_id", profile.user_id)
+          .gte("created_at", todayStart.toISOString())
+          .order("created_at", { ascending: false })
+          .limit(5),
+        supabase
+          .from("reflections")
+          .select("mood")
+          .eq("user_id", profile.user_id)
+          .gte("created_at", new Date(Date.now() - 7 * 86400000).toISOString())
+          .not("mood", "is", null)
+          .order("created_at", { ascending: false })
+          .limit(20),
+        supabase
+          .from("reflections")
+          .select("created_at")
+          .eq("user_id", profile.user_id)
+          .gte("created_at", new Date(Date.now() - 30 * 86400000).toISOString())
+          .order("created_at", { ascending: false }),
+      ]);
+
+      const hadReflection = (todayReflections?.length ?? 0) > 0;
+      const recentMoods = (recentMoodEntries ?? []).map((r: any) => r.mood).filter(Boolean);
+
+      // Calculate streak (consecutive days with at least one reflection)
+      let streakDays = 0;
+      if (streakReflections && streakReflections.length > 0) {
+        const daySet = new Set(
+          streakReflections.map((r: any) => new Date(r.created_at).toISOString().slice(0, 10))
+        );
+        const today = new Date();
+        for (let i = 0; i < 30; i++) {
+          const d = new Date(today);
+          d.setDate(d.getDate() - i);
+          if (daySet.has(d.toISOString().slice(0, 10))) {
+            streakDays++;
+          } else if (i > 0) break; // allow today to be missing
+        }
+      }
+
+      // Try AI generation, fall back to static
+      let message: string;
+      if (LOVABLE_API_KEY) {
+        const aiMessage = await generateAIMessage(
+          LOVABLE_API_KEY,
+          userLang,
+          btc.absChange,
+          btc.direction,
+          hadReflection,
+          todayReflections ?? [],
+          recentMoods,
+          streakDays,
+          tone,
+        );
+        if (aiMessage) {
+          message = aiMessage;
+        } else {
+          const msgs = FALLBACKS[userLang] || FALLBACKS.en;
+          message = hadReflection ? msgs.reflected(btc.absChange) : msgs.quiet(btc.absChange);
+        }
+      } else {
+        const msgs = FALLBACKS[userLang] || FALLBACKS.en;
+        message = hadReflection ? msgs.reflected(btc.absChange) : msgs.quiet(btc.absChange);
+      }
 
       // Store the night reflection
       await supabase.from("night_reflections").insert({
