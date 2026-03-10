@@ -131,16 +131,36 @@ function MempoolViz({ level, pending }: { level: VolatilityLevel; pending: numbe
   );
 }
 
-/** Contemplative phrases revealed word-by-word */
-const VOID_CONTEMPLATIONS = [
-  'No seconds. Only blocks.',
-  'The network keeps time. You don\'t have to.',
-  'Each block — a heartbeat of collective energy.',
-  'Immutable. Like this moment.',
-  'Time is a chain of causes. Sit between them.',
-  'The mempool stirs. Transactions wait. You can wait too.',
-  'Proof of work. Proof of patience.',
-];
+/** Contemplative phrases adapted to volatility level */
+const VOID_CONTEMPLATIONS: Record<VolatilityLevel, string[]> = {
+  calm: [
+    'No seconds. Only blocks.',
+    'The network keeps time. You don\'t have to.',
+    'Each block — a heartbeat of collective energy.',
+    'Immutable. Like this moment.',
+    'Nothing to react to. Nothing to fix.',
+    'Stillness is its own proof of work.',
+    'The chain grows. Quietly. Like patience.',
+  ],
+  moderate: [
+    'The market moves. You don\'t have to.',
+    'Volatility is noise. Blocks are signal.',
+    'Time is a chain of causes. Sit between them.',
+    'The mempool stirs. Transactions wait. You can wait too.',
+    'Price is a feeling. The chain is a fact.',
+    'Between stimulus and response — this space.',
+    'Let the candles flicker. The chain doesn\'t flinch.',
+  ],
+  intense: [
+    'The crowd is loud. The chain is silent.',
+    'This too will be a block in the past.',
+    'Fear and greed are weather. You are the mountain.',
+    'Proof of work. Proof of patience.',
+    'Every panic sold. Every mania bought. The chain remained.',
+    'Breathe. The network is still hashing.',
+    'When everything moves — be the thing that doesn\'t.',
+  ],
+};
 
 function WordByWordText({ text, delay = 0, color }: { text: string; delay?: number; color: string }) {
   const words = text.split(' ');
@@ -265,7 +285,7 @@ export default function Breathe() {
   useEffect(() => {
     if (mode !== 'void' || !voidEntered) return;
     contemplationTimerRef.current = setInterval(() => {
-      setContemplationIndex((prev) => (prev + 1) % VOID_CONTEMPLATIONS.length);
+      setContemplationIndex((prev) => (prev + 1) % VOID_CONTEMPLATIONS[level].length);
     }, 12_000);
     return () => { if (contemplationTimerRef.current) clearInterval(contemplationTimerRef.current); };
   }, [mode, voidEntered]);
@@ -596,7 +616,7 @@ export default function Breathe() {
                   transition={{ duration: 0.8 }}
                 >
                   <WordByWordText
-                    text={VOID_CONTEMPLATIONS[contemplationIndex]}
+                    text={VOID_CONTEMPLATIONS[level][contemplationIndex % VOID_CONTEMPLATIONS[level].length]}
                     delay={0.5}
                     color={textColors[level]}
                   />
