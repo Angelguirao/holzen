@@ -354,6 +354,7 @@ export default function Breathe() {
     setContemplationIndex(0);
     setNewBlockMined(false);
     setNewBlockHeight(null);
+    setVoidElapsed(0);
     setBlockAtEntry(blockData?.height ?? null);
     setMode('void');
   }, [blockData]);
