@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Heart, BookOpen, Scan, RotateCcw, Lock, X, ChevronRight } from 'lucide-react';
+import { Waves, PenLine, Activity, History, Lock, X, ChevronRight } from 'lucide-react';
 import { useSubscription } from '@/hooks/use-subscription';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
