@@ -81,6 +81,36 @@ function RevealSection({ children, delay = 0 }: { children: React.ReactNode; del
   );
 }
 
+const SESSION_KEY = 'holzen_pause_session';
+
+interface PersistedSession {
+  message: string;
+  context: string | null;
+  reflectionId: string | null;
+  companions: CompanionData;
+  companionPrefs: CompanionPrefs;
+  severity: 'mild' | 'moderate' | 'high';
+  moodDone: boolean;
+  moodAfterDone: boolean;
+  phase: 'session' | 'done';
+  decision: string | null;
+}
+
+function saveSession(data: PersistedSession) {
+  try { localStorage.setItem(SESSION_KEY, JSON.stringify(data)); } catch {}
+}
+
+function loadSession(): PersistedSession | null {
+  try {
+    const raw = localStorage.getItem(SESSION_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+}
+
+function clearSession() {
+  try { localStorage.removeItem(SESSION_KEY); } catch {}
+}
+
 export default function PauseSession() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -89,21 +119,32 @@ export default function PauseSession() {
   const { mantra, dismissMessage } = useHolzen();
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // State passed from Home
-  const state = (location.state as any) ?? {};
-  const message: string = state.reflectionMessage ?? '';
-  const context: string | null = state.context ?? null;
-  const reflectionId: string | null = state.reflectionId ?? null;
-  const companions: CompanionData = state.companions ?? { haiku: null, learningTitle: null, learningBody: null };
-  const companionPrefs: CompanionPrefs = state.companionPrefs ?? { breathing: true, haiku: true, learning: true, signal: true, zoomOut: true, history: true };
-  const severity: 'mild' | 'moderate' | 'high' = state.severity ?? 'mild';
+  // Restore from localStorage if no location state (e.g. page refresh)
+  const navState = (location.state as any) ?? {};
+  const restored = useMemo(() => {
+    if (navState.reflectionMessage) return null; // fresh navigation, don't restore
+    return loadSession();
+  }, []); // only on mount
 
-  const [phase, setPhase] = useState<'session' | 'done'>('session');
-  const [decision, setDecision] = useState<string | null>(null);
+  const message: string = navState.reflectionMessage ?? restored?.message ?? '';
+  const context: string | null = navState.context ?? restored?.context ?? null;
+  const reflectionId: string | null = navState.reflectionId ?? restored?.reflectionId ?? null;
+  const companions: CompanionData = navState.companions ?? restored?.companions ?? { haiku: null, learningTitle: null, learningBody: null };
+  const companionPrefs: CompanionPrefs = navState.companionPrefs ?? restored?.companionPrefs ?? { breathing: true, haiku: true, learning: true, signal: true, zoomOut: true, history: true };
+  const severity: 'mild' | 'moderate' | 'high' = navState.severity ?? restored?.severity ?? 'mild';
+
+  const [phase, setPhase] = useState<'session' | 'done'>(restored?.phase ?? 'session');
+  const [decision, setDecision] = useState<string | null>(restored?.decision ?? null);
   const [isFavorite, setIsFavorite] = useState(false);
-  const [moodDone, setMoodDone] = useState(false);
-  const [moodAfterDone, setMoodAfterDone] = useState(false);
+  const [moodDone, setMoodDone] = useState(restored?.moodDone ?? false);
+  const [moodAfterDone, setMoodAfterDone] = useState(restored?.moodAfterDone ?? false);
   const [curtainLifted, setCurtainLifted] = useState(false);
+
+  // Persist session progress
+  useEffect(() => {
+    if (!message) return;
+    saveSession({ message, context, reflectionId, companions, companionPrefs, severity, moodDone, moodAfterDone, phase, decision });
+  }, [message, moodDone, moodAfterDone, phase, decision]);
 
   // Derive current step from state
   const currentStep = useMemo<Step>(() => {
