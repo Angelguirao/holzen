@@ -526,7 +526,16 @@ export default function Breathe() {
             </motion.div>
           )}
 
-          {mode === 'void' && (
+          {mode === 'void' && (() => {
+            // Progressive dimming: darken over 5 minutes (300s), max 40% darker
+            const dimFactor = Math.min(voidElapsed / 300, 1) * 0.4;
+            // Fee pressure warmth: shift glow hue warmer when fees > 20 sat/vB
+            const feeHeat = blockData?.fastestFee ? Math.min(blockData.fastestFee / 50, 1) : 0;
+            const warmGlow = feeHeat > 0.1
+              ? `hsla(${35 - feeHeat * 20}, ${50 + feeHeat * 20}%, 50%, ${0.15 + feeHeat * 0.05})`
+              : glowColors[level];
+
+            return (
             <motion.div
               key="void"
               className="flex flex-col items-center gap-10"
@@ -536,13 +545,21 @@ export default function Breathe() {
               transition={{ duration: 1.2 }}
               onAnimationComplete={() => !voidEntered && setVoidEntered(true)}
             >
-              {/* Ambient glow — slow cosmic pulse */}
+              {/* Progressive dimming overlay */}
+              <motion.div
+                className="fixed inset-0 pointer-events-none"
+                style={{ background: 'black' }}
+                animate={{ opacity: dimFactor }}
+                transition={{ duration: 2, ease: 'easeInOut' }}
+              />
+
+              {/* Ambient glow — pulse speed loosely tied to network energy */}
               <motion.div
                 className="absolute rounded-full pointer-events-none"
                 style={{
                   width: 350,
                   height: 350,
-                  background: `radial-gradient(circle, ${glowColors[level]}, transparent 70%)`,
+                  background: `radial-gradient(circle, ${warmGlow}, transparent 70%)`,
                   filter: 'blur(80px)',
                 }}
                 animate={prefersReducedMotion ? { opacity: 0.3 } : {
@@ -550,11 +567,17 @@ export default function Breathe() {
                   opacity: [0.2, 0.35, 0.2],
                 }}
                 transition={{
-                  duration: 10,
+                  // Hashrate pulse: faster when network energy is high (conceptual ~8-12s range)
+                  duration: btcData?.onChain?.hashrate ? 8 : 10,
                   repeat: Infinity,
                   ease: 'easeInOut',
                 }}
               />
+
+              {/* Difficulty epoch progress arc */}
+              {blockData?.difficultyEpochProgress != null && (
+                <EpochArc progress={blockData.difficultyEpochProgress} color={textColors[level]} />
+              )}
 
               {/* Block height — the only clock */}
               <motion.div
@@ -565,7 +588,7 @@ export default function Breathe() {
               >
                 <p
                   className="font-mono text-3xl tracking-[0.15em] tabular-nums"
-                  style={{ color: textColors[level], opacity: 0.35 }}
+                  style={{ color: textColors[level], opacity: Math.max(0.35 - dimFactor * 0.3, 0.1) }}
                 >
                   {blockData?.height.toLocaleString() ?? '···'}
                 </p>
@@ -616,6 +639,19 @@ export default function Breathe() {
                 </motion.div>
               )}
 
+              {/* Fee pressure indicator */}
+              {feeHeat > 0.2 && (
+                <motion.p
+                  className="relative z-10 font-mono text-[7px] tracking-[0.15em]"
+                  style={{ color: textColors[level], opacity: 0.1 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 0.1 }}
+                  transition={{ delay: 10, duration: 2 }}
+                >
+                  {t('void.feePressure', 'fee pressure: {{fee}} sat/vB', { fee: blockData?.fastestFee })}
+                </motion.p>
+              )}
+
               {/* New block mined — reverent moment */}
               <AnimatePresence>
                 {newBlockMined && newBlockHeight && (
@@ -660,6 +696,19 @@ export default function Breathe() {
                 </motion.div>
               )}
 
+              {/* Epoch progress label */}
+              {blockData?.difficultyEpochProgress != null && (
+                <motion.p
+                  className="relative z-10 font-mono text-[7px] tracking-[0.15em]"
+                  style={{ color: textColors[level], opacity: 0.08 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 0.08 }}
+                  transition={{ delay: 12, duration: 3 }}
+                >
+                  {t('void.epoch', 'epoch {{pct}}%', { pct: Math.round(blockData.difficultyEpochProgress * 100) })}
+                </motion.p>
+              )}
+
               {/* Return — when you're ready */}
               <motion.button
                 onClick={backToAmbient}
@@ -673,7 +722,8 @@ export default function Breathe() {
                 {t('void.return')}
               </motion.button>
             </motion.div>
-          )}
+            );
+          })()}
         </AnimatePresence>
       </div>
     </>
