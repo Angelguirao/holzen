@@ -399,26 +399,9 @@ export function HolzenRitual({
                     )}
                   </AnimatePresence>
 
-                  {/* Step content */}
+                   {/* Step content */}
                   <AnimatePresence mode="wait">
-                    {completed ? (
-                      <motion.div key="completed" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col items-center gap-6 py-8">
-                        <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Check className="h-5 w-5 text-primary" />
-                        </div>
-                        <div className="text-center space-y-2">
-                          <p className="text-sm font-mono">{t('ritualFlow.ritualComplete')}</p>
-                          {decision && (
-                            <p className="text-xs text-muted-foreground">
-                              {t('ritualFlow.decision')}: <span className="text-foreground">{decision}</span>
-                            </p>
-                          )}
-                        </div>
-                        <Button variant="outline" size="sm" onClick={handleClose} className="font-mono text-xs">
-                          {t('ritualFlow.return')}
-                        </Button>
-                      </motion.div>
-                    ) : !showMantra && step ? (
+                    {!showMantra && step ? (
                       <motion.div key={`${step.type}-${currentStep}`} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }}>
                         {step.type === 'breathe' && <RitualBreathing onComplete={advance} />}
                         {step.type === 'reflect' && <RitualReflect message={reflectionMessage} onComplete={advance} />}
@@ -431,6 +414,45 @@ export function HolzenRitual({
                       </motion.div>
                     ) : null}
                   </AnimatePresence>
+                </motion.div>
+              )}
+
+              {/* ===== MOOD AFTER ===== */}
+              {phase === 'mood-after' && (
+                <motion.div key="mood-after" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-4">
+                  {!completed ? (
+                    <MoodCheck onSelect={handleMoodAfter} onSkip={handleMoodAfterSkip} variant="after" />
+                  ) : (
+                    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col items-center gap-6 py-8">
+                      <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                        <Check className="h-5 w-5 text-primary" />
+                      </div>
+                      <div className="text-center space-y-3">
+                        <p className="text-sm font-mono">{t('ritualFlow.ritualComplete')}</p>
+                        {decision && (
+                          <p className="text-xs text-muted-foreground">
+                            {t('ritualFlow.decision')}: <span className="text-foreground capitalize">{decision}</span>
+                          </p>
+                        )}
+                        {moodBefore && moodAfter && (
+                          <div className="flex items-center justify-center gap-3 pt-2">
+                            <div className="text-center">
+                              <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider">{t('moodCheck.before', 'Before')}</p>
+                              <p className="text-xs font-mono text-muted-foreground capitalize">{moodBefore}</p>
+                            </div>
+                            <Zap className="h-3 w-3 text-primary/40" />
+                            <div className="text-center">
+                              <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider">{t('moodCheck.after', 'After')}</p>
+                              <p className="text-xs font-mono text-foreground capitalize">{moodAfter}</p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      <Button variant="outline" size="sm" onClick={handleClose} className="font-mono text-xs">
+                        {t('ritualFlow.return')}
+                      </Button>
+                    </motion.div>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>
