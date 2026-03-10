@@ -127,7 +127,7 @@ export function VolatilityToleranceCard({ reflections }: Props) {
     return (
       <ChartEmptyState
         title={t('volatility.title')}
-        message={t('volatility.emptyMessage')}
+        message={t('volatility.emptyMessage', 'Reflect during 3 price drops to see how you handle volatility. Your composure and decisions during dips will be analyzed.')}
         current={dropCount}
         needed={3}
       />
