@@ -392,10 +392,11 @@
     "reflection": {
       "label": "Com Holzen",
       "01title": "O mercado cai",
-      "02title": "Você respira",
-      "03title": "Você reflete",
-      "04title": "Você decide com intenção",
-      "05title": "Você evolui com o tempo"
+      "02title": "Você pausa e sente",
+      "03title": "Você respira",
+      "04title": "Você reflete",
+      "05title": "Você decide com intenção",
+      "06title": "Você evolui com o tempo"
     },
     "steps": {
       "01title": "O mercado se move",

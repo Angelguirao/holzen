@@ -392,10 +392,11 @@
     "reflection": {
       "label": "Met Holzen",
       "01title": "De markt daalt",
-      "02title": "Je ademt",
-      "03title": "Je reflecteert",
-      "04title": "Je beslist bewust",
-      "05title": "Je groeit met de tijd"
+      "02title": "Je pauzeert & voelt",
+      "03title": "Je ademt",
+      "04title": "Je reflecteert",
+      "05title": "Je beslist bewust",
+      "06title": "Je groeit met de tijd"
     },
     "steps": {
       "01title": "De markt beweegt",
