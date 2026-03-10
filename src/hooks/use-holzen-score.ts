@@ -141,6 +141,7 @@ export function useHolzenScore(reflections: Reflection[], freezeDates: string[] 
     return {
       score: Math.max(0, Math.min(100, score)),
       moodScore: Math.round(moodAvg),
+      deltaScore: Math.round(deltaAvg),
       outcomeScore: Math.round(outcomeAvg),
       streakScore: Math.round(streakPct),
       practiceScore: Math.round(practicePct),
