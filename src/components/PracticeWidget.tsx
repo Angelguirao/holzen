@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Heart, BookOpen, Scan, RotateCcw, Lock, X, ChevronRight } from 'lucide-react';
+import { Waves, PenLine, Activity, History, Lock, X, ChevronRight } from 'lucide-react';
 import { useSubscription } from '@/hooks/use-subscription';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -12,10 +12,10 @@ import { ReflectionReplay } from '@/components/practice/ReflectionReplay';
 type PracticeId = 'checkin' | 'journal' | 'bodyscan' | 'replay';
 
 const PRACTICES = [
-  { id: 'checkin' as const, icon: Heart, labelKey: 'practice.checkinLabel', descKey: 'practice.checkinDesc' },
-  { id: 'journal' as const, icon: BookOpen, labelKey: 'practice.journalLabel', descKey: 'practice.journalDesc' },
-  { id: 'bodyscan' as const, icon: Scan, labelKey: 'practice.bodyscanLabel', descKey: 'practice.bodyscanDesc' },
-  { id: 'replay' as const, icon: RotateCcw, labelKey: 'practice.replayLabel', descKey: 'practice.replayDesc' },
+  { id: 'checkin' as const, icon: Waves, labelKey: 'practice.checkinLabel', descKey: 'practice.checkinDesc' },
+  { id: 'journal' as const, icon: PenLine, labelKey: 'practice.journalLabel', descKey: 'practice.journalDesc' },
+  { id: 'bodyscan' as const, icon: Activity, labelKey: 'practice.bodyscanLabel', descKey: 'practice.bodyscanDesc' },
+  { id: 'replay' as const, icon: History, labelKey: 'practice.replayLabel', descKey: 'practice.replayDesc' },
 ] as const;
 
 // Neutral styling for the inline practice exercises (not immersive like Breathe)
