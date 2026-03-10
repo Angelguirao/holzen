@@ -678,6 +678,7 @@ export type Database = {
           learning_url: string | null
           message: string
           mood: string | null
+          mood_after: string | null
           note: string | null
           outcome: string | null
           signal_body: string | null
@@ -707,6 +708,7 @@ export type Database = {
           learning_url?: string | null
           message: string
           mood?: string | null
+          mood_after?: string | null
           note?: string | null
           outcome?: string | null
           signal_body?: string | null
@@ -736,6 +738,7 @@ export type Database = {
           learning_url?: string | null
           message?: string
           mood?: string | null
+          mood_after?: string | null
           note?: string | null
           outcome?: string | null
           signal_body?: string | null

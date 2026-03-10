@@ -1,0 +1,1 @@
+ALTER TABLE public.reflections ADD COLUMN IF NOT EXISTS mood_after text;
