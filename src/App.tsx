@@ -69,6 +69,10 @@ const App = () => (
                 <Route path="/pause" element={<ProtectedRoute><PauseSession /></ProtectedRoute>} />
                 <Route path="/breathe" element={<ProtectedRoute><Breathe /></ProtectedRoute>} />
                 <Route path="/ambient" element={<ProtectedRoute><Breathe /></ProtectedRoute>} />
+                <Route path="/practice/checkin" element={<ProtectedRoute><PracticeCheckIn /></ProtectedRoute>} />
+                <Route path="/practice/journal" element={<ProtectedRoute><PracticeJournal /></ProtectedRoute>} />
+                <Route path="/practice/bodyscan" element={<ProtectedRoute><PracticeBodyScan /></ProtectedRoute>} />
+                <Route path="/practice/replay" element={<ProtectedRoute><PracticeReplay /></ProtectedRoute>} />
                 <Route path="/welcome" element={<PublicOnlyRoute><Landing /></PublicOnlyRoute>} />
                 <Route path="/auth" element={<PublicOnlyRoute><Auth /></PublicOnlyRoute>} />
                 <Route path="/reset-password" element={<ResetPassword />} />
