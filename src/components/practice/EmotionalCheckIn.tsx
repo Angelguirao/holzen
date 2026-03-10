@@ -21,9 +21,8 @@ interface Props {
 export function EmotionalCheckIn({ onComplete, textColor, ringColor }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const [step, setStep] = useState<'mood' | 'intensity' | 'trigger' | 'mood-after' | 'done'>('mood');
+  const [step, setStep] = useState<'mood' | 'intensity' | 'trigger' | 'done'>('mood');
   const [mood, setMood] = useState<string | null>(null);
-  const [moodAfter, setMoodAfter] = useState<string | null>(null);
   const [intensity, setIntensity] = useState<number>(3);
   const [trigger, setTrigger] = useState('');
   const [saving, setSaving] = useState(false);
