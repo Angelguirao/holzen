@@ -278,6 +278,7 @@ export default function PauseSession() {
                       onMoodSkip={handleMoodSkip}
                       moodDone={moodDone}
                       onContinue={() => goToStep('ground')}
+                      onBack={goBack}
                     />
                   </motion.div>
                 )}
@@ -295,13 +296,14 @@ export default function PauseSession() {
                       onMoodAfterSelect={handleMoodAfterSelect}
                       onMoodAfterSkip={handleMoodAfterSkip}
                       onContinue={() => goToStep('decide')}
+                      onBack={goBack}
                     />
                   </motion.div>
                 )}
 
                 {step === 'decide' && (
                   <motion.div key="decide" {...stepTransition}>
-                    <PauseDecide onDecide={handleDecide} />
+                    <PauseDecide onDecide={handleDecide} onBack={goBack} />
                   </motion.div>
                 )}
               </AnimatePresence>
