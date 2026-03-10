@@ -62,7 +62,7 @@ const SwipeableNotification = forwardRef<HTMLDivElement, {
       transition={{ duration: 0.2 }}
       className="relative overflow-hidden"
     >
-      <div className="absolute inset-0 flex items-center justify-end pr-3 bg-destructive/20">
+      <div className="absolute inset-0 items-center justify-end pr-3 bg-destructive/20 swipe-hint">
         <X className="h-3.5 w-3.5 text-destructive" />
       </div>
       <div
