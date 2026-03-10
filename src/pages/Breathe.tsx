@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
 import { hapticFeedback } from '@/lib/haptics';
 import { fetchBtcData, type BtcPriceData } from '@/lib/btc';
-import { playBlockDiscoveryTone } from '@/lib/notification-tone';
+import { playBlockDiscoveryTone, startAmbientDrone } from '@/lib/notification-tone';
 
 type VolatilityLevel = 'calm' | 'moderate' | 'intense';
 type Mode = 'ambient' | 'void';
@@ -270,10 +270,22 @@ export default function Breathe() {
     return () => { if (contemplationTimerRef.current) clearInterval(contemplationTimerRef.current); };
   }, [mode, voidEntered]);
 
+  // Void: ambient drone
+  const stopDroneRef = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    if (mode !== 'void' || !voidEntered) return;
+    stopDroneRef.current = startAmbientDrone();
+    return () => {
+      stopDroneRef.current?.();
+      stopDroneRef.current = null;
+    };
+  }, [mode, voidEntered]);
+
   const handleClose = useCallback(() => {
     [pollRef, contemplationTimerRef, tickRef].forEach((ref) => {
       if (ref.current) clearInterval(ref.current);
     });
+    stopDroneRef.current?.();
     if (window.history.length > 1) {
       navigate(-1);
     } else {
@@ -294,6 +306,7 @@ export default function Breathe() {
     [pollRef, contemplationTimerRef, tickRef].forEach((ref) => {
       if (ref.current) clearInterval(ref.current);
     });
+    stopDroneRef.current?.();
     setMode('ambient');
   }, []);
 

@@ -112,3 +112,71 @@ export async function playBlockDiscoveryTone() {
 
 /** No-op kept for API compatibility */
 export function prefetchNotificationTone() {}
+
+/**
+ * Ambient drone for the void — barely audible low-frequency hum.
+ * Two detuned sine waves create a slow beating/phasing effect.
+ * Returns a stop function that fades out gracefully.
+ */
+export function startAmbientDrone(): () => void {
+  try {
+    const ctx = getAudioContext();
+    if (ctx.state === 'suspended') ctx.resume();
+
+    const now = ctx.currentTime;
+
+    // Two slightly detuned low sines — creates organic beating
+    const osc1 = ctx.createOscillator();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(55, now); // A1
+
+    const osc2 = ctx.createOscillator();
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(55.3, now); // slightly sharp — ~3s beat cycle
+
+    // Sub-bass layer
+    const osc3 = ctx.createOscillator();
+    osc3.type = 'sine';
+    osc3.frequency.setValueAtTime(110, now); // A2 octave
+
+    const masterGain = ctx.createGain();
+    masterGain.gain.setValueAtTime(0, now);
+    // Very slow fade in over 8 seconds to barely audible
+    masterGain.gain.linearRampToValueAtTime(0.035, now + 8);
+
+    const gain3 = ctx.createGain();
+    gain3.gain.setValueAtTime(0, now);
+    gain3.gain.linearRampToValueAtTime(0.012, now + 10);
+
+    osc1.connect(masterGain).connect(ctx.destination);
+    osc2.connect(masterGain);
+    osc3.connect(gain3).connect(ctx.destination);
+
+    osc1.start(now);
+    osc2.start(now);
+    osc3.start(now);
+
+    let stopped = false;
+
+    return () => {
+      if (stopped) return;
+      stopped = true;
+      const t = ctx.currentTime;
+      // Graceful 3-second fade out
+      masterGain.gain.cancelScheduledValues(t);
+      masterGain.gain.setValueAtTime(masterGain.gain.value, t);
+      masterGain.gain.linearRampToValueAtTime(0, t + 3);
+      gain3.gain.cancelScheduledValues(t);
+      gain3.gain.setValueAtTime(gain3.gain.value, t);
+      gain3.gain.linearRampToValueAtTime(0, t + 3);
+      // Clean up after fade
+      setTimeout(() => {
+        osc1.stop();
+        osc2.stop();
+        osc3.stop();
+      }, 3500);
+    };
+  } catch {
+    return () => {};
+  }
+}
