@@ -68,7 +68,7 @@ export const MoodPriceScatter = forwardRef<HTMLDivElement, Props>(function MoodP
     return (
       <ChartEmptyState
         title={t('moodCharts.moodPriceScatter')}
-        message={t('moodCharts.moodPriceScatterEmpty')}
+        message={t('moodCharts.moodPriceScatterEmpty', 'Need 8 reflections with both mood and price context for meaningful scatter analysis.')}
         current={points.length}
         needed={8}
       />

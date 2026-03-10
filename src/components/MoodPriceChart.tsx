@@ -86,7 +86,7 @@ export function MoodPriceChart({ reflections }: Props) {
     return (
       <ChartEmptyState
         title={t('moodCharts.moodPriceChange')}
-        message={t('moodCharts.moodPriceChangeEmpty')}
+        message={t('moodCharts.moodPriceChangeEmpty', 'Reflect during price movements to see how your mood correlates with BTC changes. Requires reflections with both mood and price context.')}
         current={withBoth}
         needed={3}
       />
