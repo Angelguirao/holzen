@@ -89,7 +89,17 @@ export function DecisionQualityCard({ reflections }: Props) {
     };
   }, [reflections]);
 
-  if (!data) return null;
+  if (!data) {
+    const withOutcome = reflections.filter((r) => r.outcome).length;
+    return (
+      <ChartEmptyState
+        title={t('decisionQuality.title')}
+        message={t('decisionQuality.emptyMessage')}
+        current={withOutcome}
+        needed={3}
+      />
+    );
+  }
 
   const TrendIcon =
     data.trend === 'improving'
