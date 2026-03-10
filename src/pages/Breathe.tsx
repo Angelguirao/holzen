@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { X } from 'lucide-react';
 import { hapticFeedback } from '@/lib/haptics';
 import { fetchBtcData, type BtcPriceData } from '@/lib/btc';
-import { playBlockDiscoveryTone } from '@/lib/notification-tone';
+import { playBlockDiscoveryTone, startAmbientDrone } from '@/lib/notification-tone';
 
 type VolatilityLevel = 'calm' | 'moderate' | 'intense';
 type Mode = 'ambient' | 'void';
