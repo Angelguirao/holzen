@@ -111,9 +111,6 @@ export function PracticeWidget() {
         <p className="text-[11px] text-muted-foreground/60 leading-relaxed">
           {t('practice.intro')}
         </p>
-        <span className="text-[10px] font-mono text-muted-foreground/40 shrink-0">
-          {weeklyCount >= 7 ? '✓ 7' : `${weeklyCount}/7`}
-        </span>
       </div>
 
       {/* Progress dots */}
