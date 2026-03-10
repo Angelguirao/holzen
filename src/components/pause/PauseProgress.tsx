@@ -3,7 +3,12 @@ import { useTranslation } from 'react-i18next';
 const STEPS = ['pause', 'reflect', 'ground', 'decide'] as const;
 export type PauseStep = typeof STEPS[number];
 
-export function PauseProgress({ currentStep }: { currentStep: PauseStep }) {
+interface Props {
+  currentStep: PauseStep;
+  onStepClick?: (step: PauseStep) => void;
+}
+
+export function PauseProgress({ currentStep, onStepClick }: Props) {
   const { t } = useTranslation();
   const stepLabels: Record<PauseStep, string> = {
     pause: t('pause.steps.pause', 'Pause'),
@@ -19,8 +24,14 @@ export function PauseProgress({ currentStep }: { currentStep: PauseStep }) {
       {STEPS.map((step, i) => {
         const isActive = i === currentIndex;
         const isPast = i < currentIndex;
+        const canClick = isPast && onStepClick;
         return (
-          <div key={step} className="flex flex-col items-center gap-1">
+          <button
+            key={step}
+            onClick={() => canClick && onStepClick(step)}
+            disabled={!canClick}
+            className={`flex flex-col items-center gap-1 px-1 ${canClick ? 'cursor-pointer' : 'cursor-default'}`}
+          >
             <div
               className={`h-1 rounded-full transition-all duration-500 ${
                 isActive ? 'w-6 bg-primary/60' : isPast ? 'w-4 bg-primary/25' : 'w-4 bg-border/30'
@@ -28,12 +39,12 @@ export function PauseProgress({ currentStep }: { currentStep: PauseStep }) {
             />
             <span
               className={`text-[8px] font-mono uppercase tracking-[0.15em] transition-colors duration-500 ${
-                isActive ? 'text-primary/60' : isPast ? 'text-muted-foreground/30' : 'text-muted-foreground/15'
+                isActive ? 'text-primary/60' : isPast ? 'text-muted-foreground/30 hover:text-muted-foreground/50' : 'text-muted-foreground/15'
               }`}
             >
               {stepLabels[step]}
             </span>
-          </div>
+          </button>
         );
       })}
     </div>
