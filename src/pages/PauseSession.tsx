@@ -96,6 +96,14 @@ export default function PauseSession() {
     setStep(next);
   }, []);
 
+  const goBack = useCallback(() => {
+    const currentIndex = STEPS.indexOf(step);
+    if (currentIndex > 0) {
+      hapticFeedback('light');
+      setStep(STEPS[currentIndex - 1]);
+    }
+  }, [step]);
+
   const handleMoodSelect = useCallback(async (mood: MoodValue) => {
     hapticFeedback('light');
     setMoodDone(true);
