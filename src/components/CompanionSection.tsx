@@ -114,9 +114,12 @@ function CompanionCard({
 
   return (
     <div className="space-y-0">
-      <button
+      <div
         onClick={onToggle}
-        className={`flex items-center gap-3 px-4 py-3.5 rounded-xl border w-full text-left transition-all duration-300 ${
+        role="button"
+        tabIndex={0}
+        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggle(); } }}
+        className={`flex items-center gap-3 px-4 py-3.5 rounded-xl border w-full text-left cursor-pointer transition-all duration-300 ${
           expanded
             ? 'border-primary/15 bg-primary/3'
             : completed
