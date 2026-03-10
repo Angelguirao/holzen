@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { X, ArrowDown, Check, Heart, Flame } from 'lucide-react';
+import { X, ArrowDown, Heart, Flame } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { hapticFeedback } from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
@@ -102,7 +102,6 @@ export default function PauseSession() {
     hapticFeedback('medium');
     setDecision(d);
     dismissMessage();
-    // Save outcome directly to DB
     if (reflectionId) {
       await supabase.from('reflections').update({ outcome: d }).eq('id', reflectionId);
     }
@@ -144,240 +143,253 @@ export default function PauseSession() {
           background: 'linear-gradient(160deg, hsl(var(--background)) 0%, hsl(var(--muted)) 50%, hsl(var(--background)) 100%)',
         }}
       >
-            {/* Ambient orbs */}
-            <motion.div
-              className="fixed top-1/4 left-1/3 w-[300px] h-[300px] rounded-full pointer-events-none"
-              style={{
-                background: 'radial-gradient(circle, hsl(var(--primary) / 0.04) 0%, transparent 70%)',
-                filter: 'blur(80px)',
-              }}
-              animate={prefersReducedMotion ? {} : {
-                x: [0, 30, -20, 0],
-                y: [0, -20, 15, 0],
-              }}
-              transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
-            />
-            <motion.div
-              className="fixed bottom-1/3 right-1/4 w-[250px] h-[250px] rounded-full pointer-events-none"
-              style={{
-                background: 'radial-gradient(circle, hsl(var(--accent) / 0.03) 0%, transparent 70%)',
-                filter: 'blur(60px)',
-              }}
-              animate={prefersReducedMotion ? {} : {
-                x: [0, -25, 15, 0],
-                y: [0, 20, -10, 0],
-              }}
-              transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
-            />
+        {/* Ambient orbs */}
+        <motion.div
+          className="fixed top-1/4 left-1/3 w-[300px] h-[300px] rounded-full pointer-events-none"
+          style={{
+            background: 'radial-gradient(circle, hsl(var(--primary) / 0.04) 0%, transparent 70%)',
+            filter: 'blur(80px)',
+          }}
+          animate={prefersReducedMotion ? {} : {
+            x: [0, 30, -20, 0],
+            y: [0, -20, 15, 0],
+          }}
+          transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <motion.div
+          className="fixed bottom-1/3 right-1/4 w-[250px] h-[250px] rounded-full pointer-events-none"
+          style={{
+            background: 'radial-gradient(circle, hsl(var(--accent) / 0.03) 0%, transparent 70%)',
+            filter: 'blur(60px)',
+          }}
+          animate={prefersReducedMotion ? {} : {
+            x: [0, -25, 15, 0],
+            y: [0, 20, -10, 0],
+          }}
+          transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
+        />
 
-            {/* Close */}
-            <button
-              onClick={handleReturn}
-              className="fixed top-6 right-6 p-3 text-muted-foreground/30 hover:text-foreground/60 transition-colors duration-500 z-[60]"
-              aria-label="Close"
-            >
-              <X className="h-5 w-5" />
-            </button>
+        {/* Close — positioned safely */}
+        <button
+          onClick={handleReturn}
+          className="fixed top-5 right-5 p-3 rounded-full bg-muted/40 backdrop-blur-sm text-muted-foreground/40 hover:text-foreground/60 hover:bg-muted/60 transition-all duration-300 z-[60]"
+          aria-label="Close"
+        >
+          <X className="h-4 w-4" />
+        </button>
 
-            <div ref={scrollRef} className="relative z-10 max-w-md mx-auto px-6 py-20 space-y-16">
-              {phase === 'session' && (
-                <>
-                  {/* Opening space */}
+        <div ref={scrollRef} className="relative z-10 max-w-md mx-auto px-6 py-20 space-y-20">
+          {phase === 'session' && (
+            <>
+              {/* Opening space */}
+              <motion.div
+                initial={prefersReducedMotion ? {} : { opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 1.5 }}
+                className="flex flex-col items-center gap-8 pt-12"
+              >
+                {/* Breathing circle — refined double-ring */}
+                <div className="relative">
                   <motion.div
-                    initial={prefersReducedMotion ? {} : { opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ duration: 1.5 }}
-                    className="flex flex-col items-center gap-6 pt-8"
-                  >
-                    {/* Breathing circle */}
-                    <motion.div
-                      className="w-20 h-20 rounded-full border border-border/15 relative cursor-pointer"
-                      style={{
-                        background: 'radial-gradient(circle, hsl(var(--primary) / 0.06) 0%, transparent 70%)',
-                      }}
-                      initial={prefersReducedMotion ? {} : { scale: 0, opacity: 0 }}
-                      animate={prefersReducedMotion ? {} : { scale: [1, 1.12, 1], opacity: 1 }}
-                      transition={{
-                        scale: { duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 0.6 },
-                        opacity: { duration: 1.2, ease: 'easeOut' },
-                      }}
-                      whileTap={{ scale: 0.92 }}
-                      onClick={(e) => {
-                        hapticFeedback('light');
-                        const circle = e.currentTarget;
-                        const ripple = document.createElement('span');
-                        ripple.className = 'absolute inset-0 rounded-full animate-ping';
-                        ripple.style.background = 'hsl(var(--primary) / 0.08)';
-                        circle.appendChild(ripple);
-                        setTimeout(() => ripple.remove(), 700);
-                      }}
-                    />
-                    <p className="text-xs font-mono text-muted-foreground/40 tracking-wider">
-                      {t('pause.youPaused')}
-                    </p>
-                    {mantra && (
-                      <motion.p
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 1, duration: 1.5 }}
-                        className="text-[11px] font-mono text-muted-foreground/30 italic text-center max-w-xs"
-                      >
-                        "{mantra}"
-                      </motion.p>
-                    )}
-                    <motion.div
+                    className="w-24 h-24 rounded-full border border-border/10 relative cursor-pointer"
+                    style={{
+                      background: 'radial-gradient(circle, hsl(var(--primary) / 0.05) 0%, transparent 70%)',
+                    }}
+                    initial={prefersReducedMotion ? {} : { scale: 0, opacity: 0 }}
+                    animate={prefersReducedMotion ? {} : { scale: [1, 1.08, 1], opacity: 1 }}
+                    transition={{
+                      scale: { duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 0.6 },
+                      opacity: { duration: 1.2, ease: 'easeOut' },
+                    }}
+                    whileTap={{ scale: 0.92 }}
+                    onClick={(e) => {
+                      hapticFeedback('light');
+                      const circle = e.currentTarget;
+                      const ripple = document.createElement('span');
+                      ripple.className = 'absolute inset-0 rounded-full animate-ping';
+                      ripple.style.background = 'hsl(var(--primary) / 0.06)';
+                      circle.appendChild(ripple);
+                      setTimeout(() => ripple.remove(), 700);
+                    }}
+                  />
+                  {/* Outer ring */}
+                  <motion.div
+                    className="absolute -inset-3 rounded-full border border-border/5 pointer-events-none"
+                    animate={prefersReducedMotion ? {} : { scale: [1, 1.04, 1] }}
+                    transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 0.9 }}
+                  />
+                </div>
+
+                <div className="flex flex-col items-center gap-3">
+                  <p className="text-[11px] font-mono text-muted-foreground/30 tracking-[0.2em] uppercase">
+                    {t('pause.youPaused')}
+                  </p>
+                  {mantra && (
+                    <motion.p
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      transition={{ delay: 2, duration: 1 }}
+                      transition={{ delay: 1.2, duration: 1.5 }}
+                      className="text-[11px] font-mono text-muted-foreground/25 italic text-center max-w-xs leading-relaxed"
                     >
-                      <ArrowDown className="h-3 w-3 text-muted-foreground/20 animate-bounce" />
-                    </motion.div>
-                  </motion.div>
-
-                  {/* Reflection */}
-                  <RevealSection>
-                    <div className="space-y-4">
-                      {context && (
-                        <p className="text-[10px] font-mono text-muted-foreground/40 uppercase tracking-wider">
-                          {context}
-                        </p>
-                      )}
-                      <p className="text-lg leading-relaxed text-foreground/90">{message}</p>
-                      <div className="flex items-center gap-1">
-                        <button
-                          onClick={toggleFavorite}
-                          className={`p-1.5 transition-colors ${isFavorite ? 'text-destructive' : 'text-muted-foreground/40 hover:text-destructive'}`}
-                          aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
-                        >
-                          <Heart className={`h-4 w-4 ${isFavorite ? 'fill-current' : ''}`} />
-                        </button>
-                        <ShareReflection message={message} context={context} haiku={companions?.haiku} />
-                        {subscribed && <ReflectionWallpaper message={message} mood={null} context={context} haiku={companions?.haiku} variant="button" />}
-                      </div>
-                    </div>
-                  </RevealSection>
-
-                  {/* Note & tags */}
-                  {reflectionId && (
-                    <RevealSection>
-                      <div className="space-y-4">
-                        <ReflectionNote reflectionId={reflectionId} initialNote={null} />
-                        <ReflectionTags reflectionId={reflectionId} initialTags={[]} />
-                      </div>
-                    </RevealSection>
+                      "{mantra}"
+                    </motion.p>
                   )}
+                </div>
 
-                  {/* Mood check-in */}
-                  {!moodDone && (
-                    <RevealSection>
-                      <MoodCheck onSelect={handleMoodSelect} onSkip={handleMoodSkip} />
-                    </RevealSection>
-                  )}
-
-                  {/* Companions */}
-                  <RevealSection>
-                    <CompanionSection
-                      companions={companions}
-                      prefs={companionPrefs}
-                      severity={severity}
-                      reflectionId={reflectionId}
-                      context={context}
-                      reflectionMessage={message}
-                    />
-                  </RevealSection>
-
-
-                  {/* Decision */}
-                  <RevealSection>
-                    <div className="space-y-4">
-                      <p className="text-[10px] font-mono text-muted-foreground/40 uppercase tracking-wider text-center">
-                        {t('pause.whatWillYouDo')}
-                      </p>
-                      <div className="grid grid-cols-2 gap-3">
-                        {DECISIONS.map((d) => (
-                          <button
-                            key={d.value}
-                            onClick={() => handleDecide(d.value)}
-                            className="flex flex-col items-center gap-2 py-5 rounded-lg border border-border/20 bg-card/30 hover:bg-card/60 hover:border-border/40 transition-all duration-300"
-                          >
-                            <span className="text-xl">{d.emoji}</span>
-                            <span className="text-[10px] font-mono text-foreground/60 tracking-wider uppercase">
-                              {t(`ritual.decide.${d.key}`)}
-                            </span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </RevealSection>
-
-                  {/* Bottom spacer */}
-                  <div className="h-20" />
-                </>
-              )}
-
-              {phase === 'done' && (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ duration: 0.8 }}
-                  className="flex flex-col items-center gap-8 pt-24 text-center"
+                  transition={{ delay: 2.5, duration: 1 }}
                 >
-                  {/* Streak flame celebration */}
-                  <div className="relative">
-                    <motion.div
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: [0, 1.4, 1], opacity: 1 }}
-                      transition={{ duration: 0.6, times: [0, 0.6, 1], ease: 'easeOut' }}
-                      className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center"
+                  <ArrowDown className="h-3 w-3 text-muted-foreground/15 animate-bounce" />
+                </motion.div>
+              </motion.div>
+
+              {/* Reflection */}
+              <RevealSection>
+                <div className="space-y-5">
+                  {context && (
+                    <p className="text-[10px] font-mono text-muted-foreground/30 uppercase tracking-[0.15em]">
+                      {context}
+                    </p>
+                  )}
+                  <p className="text-[17px] leading-[1.7] text-foreground/85 font-light">{message}</p>
+                  <div className="flex items-center gap-0.5 pt-1">
+                    <button
+                      onClick={toggleFavorite}
+                      className={`p-2 rounded-full transition-all duration-300 ${isFavorite ? 'text-destructive bg-destructive/5' : 'text-muted-foreground/25 hover:text-destructive/60 hover:bg-destructive/5'}`}
+                      aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
                     >
-                      <Flame className="h-7 w-7 text-primary/70" />
-                    </motion.div>
-                    {[...Array(6)].map((_, i) => (
-                      <motion.div
-                        key={i}
-                        className="absolute top-1/2 left-1/2 w-1.5 h-1.5 rounded-full bg-primary/40"
-                        initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
-                        animate={{
-                          x: Math.cos((i * Math.PI * 2) / 6) * 40,
-                          y: Math.sin((i * Math.PI * 2) / 6) * 40,
-                          opacity: 0,
-                          scale: 0,
-                        }}
-                        transition={{ duration: 0.8, delay: 0.3, ease: 'easeOut' }}
-                      />
+                      <Heart className={`h-3.5 w-3.5 ${isFavorite ? 'fill-current' : ''}`} />
+                    </button>
+                    <ShareReflection message={message} context={context} haiku={companions?.haiku} />
+                    {subscribed && <ReflectionWallpaper message={message} mood={null} context={context} haiku={companions?.haiku} variant="button" />}
+                  </div>
+                </div>
+              </RevealSection>
+
+              {/* Note & tags */}
+              {reflectionId && (
+                <RevealSection>
+                  <div className="space-y-5">
+                    <ReflectionNote reflectionId={reflectionId} initialNote={null} />
+                    <ReflectionTags reflectionId={reflectionId} initialTags={[]} />
+                  </div>
+                </RevealSection>
+              )}
+
+              {/* Mood check-in */}
+              {!moodDone && (
+                <RevealSection>
+                  <MoodCheck onSelect={handleMoodSelect} onSkip={handleMoodSkip} />
+                </RevealSection>
+              )}
+
+              {/* Companions */}
+              <RevealSection>
+                <CompanionSection
+                  companions={companions}
+                  prefs={companionPrefs}
+                  severity={severity}
+                  reflectionId={reflectionId}
+                  context={context}
+                  reflectionMessage={message}
+                />
+              </RevealSection>
+
+              {/* Decision */}
+              <RevealSection>
+                <div className="space-y-6">
+                  <p className="text-[10px] font-mono text-muted-foreground/30 uppercase tracking-[0.15em] text-center">
+                    {t('pause.whatWillYouDo')}
+                  </p>
+                  <div className="grid grid-cols-2 gap-2.5">
+                    {DECISIONS.map((d) => (
+                      <motion.button
+                        key={d.value}
+                        onClick={() => handleDecide(d.value)}
+                        whileTap={{ scale: 0.96 }}
+                        className="flex flex-col items-center gap-2.5 py-6 rounded-xl border border-border/15 bg-card/20 backdrop-blur-sm hover:bg-card/40 hover:border-border/30 transition-all duration-300"
+                      >
+                        <span className="text-lg">{d.emoji}</span>
+                        <span className="text-[10px] font-mono text-foreground/50 tracking-[0.12em] uppercase">
+                          {t(`ritual.decide.${d.key}`)}
+                        </span>
+                      </motion.button>
                     ))}
                   </div>
+                </div>
+              </RevealSection>
 
-                  <motion.div
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.4, duration: 0.6 }}
-                    className="flex items-center gap-1.5"
-                  >
-                    <Flame className="h-3 w-3 text-primary/50" />
-                    <p className="text-[10px] font-mono text-muted-foreground/50 tracking-wider uppercase">
-                      {t('outcome.streakUpdated')}
-                    </p>
-                  </motion.div>
+              {/* Bottom spacer */}
+              <div className="h-24" />
+            </>
+          )}
 
-                  <div className="space-y-2">
-                    <p className="text-sm font-mono text-foreground/60">{t('pause.youChose')}</p>
-                    <p className="text-xs font-mono text-muted-foreground/40 capitalize">{decision}</p>
-                  </div>
-
-                  <motion.button
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 1.5, duration: 1 }}
-                    onClick={handleReturn}
-                    className="text-[10px] font-mono text-muted-foreground/25 hover:text-muted-foreground/50 transition-colors duration-500 tracking-[0.15em] uppercase"
-                  >
-                    {t('pause.return')}
-                  </motion.button>
+          {phase === 'done' && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.8 }}
+              className="flex flex-col items-center gap-10 pt-28 text-center"
+            >
+              {/* Streak flame celebration */}
+              <div className="relative">
+                <motion.div
+                  initial={{ scale: 0, opacity: 0 }}
+                  animate={{ scale: [0, 1.4, 1], opacity: 1 }}
+                  transition={{ duration: 0.6, times: [0, 0.6, 1], ease: 'easeOut' }}
+                  className="w-18 h-18 rounded-full bg-primary/8 flex items-center justify-center"
+                  style={{ width: 72, height: 72 }}
+                >
+                  <Flame className="h-7 w-7 text-primary/60" />
                 </motion.div>
-              )}
-            </div>
-          </motion.div>
+                {[...Array(6)].map((_, i) => (
+                  <motion.div
+                    key={i}
+                    className="absolute top-1/2 left-1/2 w-1 h-1 rounded-full bg-primary/30"
+                    initial={{ x: 0, y: 0, opacity: 1, scale: 1 }}
+                    animate={{
+                      x: Math.cos((i * Math.PI * 2) / 6) * 44,
+                      y: Math.sin((i * Math.PI * 2) / 6) * 44,
+                      opacity: 0,
+                      scale: 0,
+                    }}
+                    transition={{ duration: 0.8, delay: 0.3, ease: 'easeOut' }}
+                  />
+                ))}
+              </div>
+
+              <motion.div
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.4, duration: 0.6 }}
+                className="flex items-center gap-2"
+              >
+                <Flame className="h-3 w-3 text-primary/40" />
+                <p className="text-[10px] font-mono text-muted-foreground/40 tracking-[0.15em] uppercase">
+                  {t('outcome.streakUpdated')}
+                </p>
+              </motion.div>
+
+              <div className="space-y-3">
+                <p className="text-sm font-mono text-foreground/50">{t('pause.youChose')}</p>
+                <p className="text-xs font-mono text-muted-foreground/30 capitalize">{decision}</p>
+              </div>
+
+              <motion.button
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1.5, duration: 1 }}
+                onClick={handleReturn}
+                className="text-[10px] font-mono text-muted-foreground/20 hover:text-muted-foreground/40 transition-colors duration-500 tracking-[0.15em] uppercase mt-4"
+              >
+                {t('pause.return')}
+              </motion.button>
+            </motion.div>
+          )}
+        </div>
+      </motion.div>
     </>
   );
 }
