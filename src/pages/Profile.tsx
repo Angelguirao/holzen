@@ -194,10 +194,6 @@ const Profile = () => {
             <Skeleton className="h-20 w-full rounded-md" />
             <Skeleton className="h-40 w-full rounded-md" />
           </div>
-        ) : reflections.length === 0 ? (
-          <p className="text-xs text-muted-foreground py-8 text-center">
-            {t('profile.noReflectionsYet')}
-          </p>
         ) : (
           <StatsContent reflections={reflections} practiceEntries={practiceEntries} memberSince={user?.created_at} />
         )
