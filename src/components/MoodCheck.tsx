@@ -32,14 +32,27 @@ export type MoodValue = (typeof allMoods)[number]['value'];
 interface Props {
   onSelect: (mood: MoodValue) => void;
   onSkip: () => void;
+  /** 'before' = raw entry state, 'after' = post-grounding state */
+  variant?: 'before' | 'after';
 }
 
-export function MoodCheck({ onSelect, onSkip }: Props) {
+export function MoodCheck({ onSelect, onSkip, variant = 'before' }: Props) {
   const { t } = useTranslation();
+
+  const heading = variant === 'after'
+    ? t('moodCheck.howAreYouFeelingNow', 'How are you feeling now?')
+    : t('moodCheck.howAreYouFeeling');
 
   return (
     <div className="space-y-4">
-      <p className="text-sm font-mono text-muted-foreground">{t('moodCheck.howAreYouFeeling')}</p>
+      <div className="space-y-1">
+        <p className="text-sm font-mono text-muted-foreground">{heading}</p>
+        {variant === 'after' && (
+          <p className="text-[10px] text-muted-foreground/40 font-mono">
+            {t('moodCheck.afterDesc', 'After reflecting and grounding, check in again.')}
+          </p>
+        )}
+      </div>
       {moodGroups.map((group) => (
         <div key={group.key} className="space-y-1.5">
           <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground/50">

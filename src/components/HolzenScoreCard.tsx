@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 export function HolzenScoreCard() {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const [reflections, setReflections] = useState<{ created_at: string; mood: string | null; outcome: string | null }[]>([]);
+  const [reflections, setReflections] = useState<{ created_at: string; mood: string | null; mood_after?: string | null; outcome: string | null }[]>([]);
   const [practiceEntries, setPracticeEntries] = useState<{ created_at: string; type: string; mood: string | null }[]>([]);
   const [loaded, setLoaded] = useState(false);
 
@@ -17,7 +17,7 @@ export function HolzenScoreCard() {
     Promise.all([
       supabase
         .from('reflections')
-        .select('created_at, mood, outcome')
+        .select('created_at, mood, mood_after, outcome')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(100),
@@ -86,6 +86,7 @@ export function HolzenScoreCard() {
 
         <div className="space-y-2 flex-1 min-w-0">
           <ScoreBar label={t('holzenScore.mood')} value={scoreData.moodScore} />
+          <ScoreBar label={t('holzenScore.groundingEffect', 'Grounding')} value={scoreData.deltaScore} />
           <ScoreBar label={t('holzenScore.actions')} value={scoreData.outcomeScore} />
           <ScoreBar label={t('holzenScore.streak')} value={scoreData.streakScore} />
           <ScoreBar
