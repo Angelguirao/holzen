@@ -13,6 +13,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { ReflectionStats } from '@/components/ReflectionStats';
 import { InsightsPanel } from '@/components/InsightsPanel';
 import { DecisionQualityCard } from '@/components/DecisionQualityCard';
+import { ChartEmptyState } from '@/components/ChartEmptyState';
 import { StreakTimeline } from '@/components/StreakTimeline';
 import { AIInsightsPanel } from '@/components/AIInsightsPanel';
 import { ProLock } from '@/components/ProLock';
