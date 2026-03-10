@@ -315,43 +315,52 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
     return { total: practiceEntries.length, byType };
   }, [practiceEntries]);
 
-  return (
-    <div className="space-y-5">
-      <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
-        {t('profile.overview')}
-      </p>
-      <ReflectionStats reflections={reflections} />
-      <StreakTimeline reflections={reflections} practiceEntries={practiceEntries} memberSince={memberSince} />
+  // Compute current streak for summary
+  const currentStreak = useMemo(() => {
+    const days = new Set<string>();
+    for (const r of reflections) {
+      if (r.outcome) days.add(new Date(r.created_at).toISOString().slice(0, 10));
+    }
+    for (const p of practiceEntries) {
+      days.add(new Date(p.created_at).toISOString().slice(0, 10));
+    }
+    const sorted = Array.from(days).sort().reverse();
+    if (sorted.length === 0) return 0;
+    const today = new Date().toISOString().slice(0, 10);
+    const gap = Math.floor((new Date(today).getTime() - new Date(sorted[0]).getTime()) / 86400000);
+    if (gap > 1) return 0;
+    let streak = 1;
+    for (let i = 1; i < sorted.length; i++) {
+      const diff = Math.floor((new Date(sorted[i - 1]).getTime() - new Date(sorted[i]).getTime()) / 86400000);
+      if (diff === 1) streak++;
+      else break;
+    }
+    return streak;
+  }, [reflections, practiceEntries]);
 
-      {/* Practice summary */}
-      <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2">
-        <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
-          {t('profile.practiceActivity')}
-        </p>
-        {practiceStats ? (
-          <div className="flex flex-wrap gap-3">
-            {Object.entries(practiceStats.byType).map(([type, count]) => (
-              <div key={type} className="text-center">
-                <p className="text-sm font-mono">{count}</p>
-                <p className="text-[9px] font-mono text-muted-foreground/50 capitalize">{t(`practice.${type}Label`, type)}</p>
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-xs text-muted-foreground/50">{t('profile.noPracticeYet', 'No practice sessions yet. Try a check-in or body scan from the Home screen.')}</p>
-        )}
+  return (
+    <div className="space-y-6">
+      {/* Summary strip */}
+      <div className="grid grid-cols-4 gap-2">
+        <SummaryTile label={t('profile.score', 'Score')} value={scoreData?.score ?? '—'} />
+        <SummaryTile label={t('profile.streak', 'Streak')} value={currentStreak} suffix={t('profile.days', 'd')} />
+        <SummaryTile label={t('profile.reflections', 'Reflects')} value={reflections.length} />
+        <SummaryTile label={t('profile.practice', 'Practice')} value={practiceDays} suffix={t('profile.days', 'd')} />
       </div>
 
-      {/* Pro-gated advanced stats */}
-      <ProLock>
-        <div className="space-y-5">
-          <div className="flex items-center justify-end">
-            <ShareStats
-              reflectionCount={reflections.length}
-              scoreData={scoreData}
-              moodCounts={moodCounts}
-            />
-          </div>
+      <div className="flex items-center justify-end">
+        <ShareStats
+          reflectionCount={reflections.length}
+          scoreData={scoreData}
+          moodCounts={moodCounts}
+        />
+      </div>
+
+      {/* Section: Your Journey */}
+      <StatsSection label={t('profile.sectionJourney', 'Your Journey')}>
+        <ReflectionStats reflections={reflections} />
+        <StreakTimeline reflections={reflections} practiceEntries={practiceEntries} memberSince={memberSince} />
+        <ProLock>
           {scoreData ? <HolzenScoreDetail scoreData={scoreData} practiceDays={practiceDays} /> : (
             <ChartEmptyState
               title={t('profile.holzenScore')}
@@ -360,16 +369,58 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
               needed={1}
             />
           )}
-          <PeriodComparison reflections={reflections} />
-          <InsightsPanel reflections={reflections} />
-          <DecisionQualityCard reflections={reflections} />
-          <VolatilityToleranceCard reflections={reflections} />
-          <RitualStatsCard />
-          <StatsTrends reflections={reflections} />
+        </ProLock>
+      </StatsSection>
+
+      {/* Section: Emotional Patterns */}
+      <ProLock>
+        <StatsSection label={t('profile.sectionEmotional', 'Emotional Patterns')}>
           <MoodTrendChart reflections={moodDataForCharts} />
           <MoodPriceChart reflections={reflections} />
+        </StatsSection>
+      </ProLock>
+
+      {/* Section: Decision Making */}
+      <ProLock>
+        <StatsSection label={t('profile.sectionDecisions', 'Decision Making')}>
+          <PeriodComparison reflections={reflections} />
+          <DecisionQualityCard reflections={reflections} />
+          <VolatilityToleranceCard reflections={reflections} />
+          <InsightsPanel reflections={reflections} />
+        </StatsSection>
+      </ProLock>
+
+      {/* Section: Rituals & Practice */}
+      <ProLock>
+        <StatsSection label={t('profile.sectionPractice', 'Rituals & Practice')}>
+          <RitualStatsCard />
+          {/* Practice summary */}
+          <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2">
+            <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
+              {t('profile.practiceActivity')}
+            </p>
+            {practiceStats ? (
+              <div className="flex flex-wrap gap-3">
+                {Object.entries(practiceStats.byType).map(([type, count]) => (
+                  <div key={type} className="text-center">
+                    <p className="text-sm font-mono">{count}</p>
+                    <p className="text-[9px] font-mono text-muted-foreground/50 capitalize">{t(`practice.${type}Label`, type)}</p>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-muted-foreground/50">{t('profile.noPracticeYet', 'No practice sessions yet. Try a check-in or body scan from the Home screen.')}</p>
+            )}
+          </div>
+        </StatsSection>
+      </ProLock>
+
+      {/* Section: Advanced */}
+      <ProLock>
+        <StatsSection label={t('profile.sectionAdvanced', 'Advanced')}>
+          <StatsTrends reflections={reflections} />
           <MoodPriceScatter reflections={reflections} />
-        </div>
+        </StatsSection>
       </ProLock>
     </div>
   );
