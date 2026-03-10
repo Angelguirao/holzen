@@ -66,7 +66,16 @@ export function InsightsPanel({ reflections }: Props) {
     return { moodCounts: moods, outcomeCounts: outcomes, totalMoods: tm, totalOutcomes: to };
   }, [reflections]);
 
-  if (totalMoods === 0 && totalOutcomes === 0) return null;
+  if (totalMoods === 0 && totalOutcomes === 0) {
+    return (
+      <ChartEmptyState
+        title={t('insightsPanel.title')}
+        message={t('insightsPanel.emptyMessage')}
+        current={reflections.length}
+        needed={1}
+      />
+    );
+  }
 
   return (
     <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-5">
