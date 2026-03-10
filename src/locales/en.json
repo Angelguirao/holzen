@@ -935,7 +935,8 @@
     "howYouFelt": "How you felt before reflecting",
     "whatYouDid": "What you did after",
     "basedOn": "Based on {{count}} reflection",
-    "basedOn_other": "Based on {{count}} reflections"
+    "basedOn_other": "Based on {{count}} reflections",
+    "emptyMessage": "Record a mood or outcome on a reflection to see your patterns."
   },
   "decisionQuality": {
     "title": "Decision Quality",
