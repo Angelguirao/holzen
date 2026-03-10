@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next';
 export function HolzenScoreCard() {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const [reflections, setReflections] = useState<{ created_at: string; mood: string | null; outcome: string | null }[]>([]);
+  const [reflections, setReflections] = useState<{ created_at: string; mood: string | null; mood_after?: string | null; outcome: string | null }[]>([]);
   const [practiceEntries, setPracticeEntries] = useState<{ created_at: string; type: string; mood: string | null }[]>([]);
   const [loaded, setLoaded] = useState(false);
 
