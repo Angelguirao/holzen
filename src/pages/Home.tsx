@@ -488,23 +488,40 @@ const Home = () => {
               <p className="text-[11px] text-muted-foreground/50 leading-relaxed">
                 {t('home.ritualDesc', 'Feeling reactive? Ground yourself before you act.')}
               </p>
-              <button
-                onClick={() => {
-                  if (!subscribed) {
-                    toast(t('pro.featureLocked'), { description: t('pro.upgradeDesc'), action: { label: t('pro.upgradeCta'), onClick: () => startCheckout() }, duration: 6000 });
-                    return;
-                  }
-                  setShowRitual(true);
-                }}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors duration-300"
-              >
-                {!subscribed && <Lock className="h-3 w-3 text-primary/20" />}
-                <Sparkles className="h-3 w-3 text-primary/40" />
-                <span className="text-[10px] font-mono text-primary/40 tracking-[0.2em] uppercase">
-                  {t('home.startARitual')}
-                </span>
-                {!subscribed && <span className="text-[8px] font-mono text-primary/30 uppercase tracking-wider">PRO</span>}
-              </button>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => {
+                    if (!subscribed) {
+                      toast(t('pro.featureLocked'), { description: t('pro.upgradeDesc'), action: { label: t('pro.upgradeCta'), onClick: () => startCheckout() }, duration: 6000 });
+                      return;
+                    }
+                    setRitualQuickStart(true);
+                    setShowRitual(true);
+                  }}
+                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-md border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors duration-300"
+                >
+                  {!subscribed && <Lock className="h-3 w-3 text-primary/20" />}
+                  <Sparkles className="h-3 w-3 text-primary/40" />
+                  <span className="text-[10px] font-mono text-primary/40 tracking-[0.15em] uppercase">
+                    {t('home.quickStart', 'Quick start')}
+                  </span>
+                </button>
+                <button
+                  onClick={() => {
+                    if (!subscribed) {
+                      toast(t('pro.featureLocked'), { description: t('pro.upgradeDesc'), action: { label: t('pro.upgradeCta'), onClick: () => startCheckout() }, duration: 6000 });
+                      return;
+                    }
+                    setRitualQuickStart(false);
+                    setShowRitual(true);
+                  }}
+                  className="flex items-center justify-center gap-1.5 px-4 py-3 rounded-md border border-border/30 hover:bg-muted/20 transition-colors duration-300"
+                >
+                  <span className="text-[10px] font-mono text-muted-foreground/50 tracking-[0.1em] uppercase">
+                    {t('home.chooseRitual', 'Choose')}
+                  </span>
+                </button>
+              </div>
             </div>
           </HomeWidget>
         );
