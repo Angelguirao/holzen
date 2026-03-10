@@ -148,7 +148,7 @@ function CompanionCard({
             <Heart className={`h-3 w-3 ${isFavorite ? 'fill-current' : ''}`} />
           </button>
         )}
-      </button>
+      </div>
       <AnimatePresence>
         {expanded && (
           <motion.div
