@@ -17,7 +17,7 @@ export function HolzenScoreCard() {
     Promise.all([
       supabase
         .from('reflections')
-        .select('created_at, mood, outcome')
+        .select('created_at, mood, mood_after, outcome')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(100),
