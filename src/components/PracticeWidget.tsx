@@ -1,32 +1,21 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Waves, PenLine, Activity, History, Lock, X, ChevronRight, Sparkles } from 'lucide-react';
+import { Waves, PenLine, Activity, History, Lock, ChevronRight, Sparkles } from 'lucide-react';
 import { useSubscription } from '@/hooks/use-subscription';
 import { useAuth } from '@/hooks/use-auth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { motion, AnimatePresence } from 'framer-motion';
-import { EmotionalCheckIn } from '@/components/practice/EmotionalCheckIn';
-import { GuidedJournal } from '@/components/practice/GuidedJournal';
-import { BodyScan } from '@/components/practice/BodyScan';
-import { ReflectionReplay } from '@/components/practice/ReflectionReplay';
+import { useNavigate } from 'react-router-dom';
 
 type PracticeId = 'checkin' | 'journal' | 'bodyscan' | 'replay';
 
 const PRACTICES = [
-  { id: 'checkin' as const, icon: Waves, labelKey: 'practice.checkinLabel', descKey: 'practice.checkinDesc', free: true },
-  { id: 'journal' as const, icon: PenLine, labelKey: 'practice.journalLabel', descKey: 'practice.journalDesc', free: false },
-  { id: 'bodyscan' as const, icon: Activity, labelKey: 'practice.bodyscanLabel', descKey: 'practice.bodyscanDesc', free: false },
-  { id: 'replay' as const, icon: History, labelKey: 'practice.replayLabel', descKey: 'practice.replayDesc', free: false },
+  { id: 'checkin' as const, icon: Waves, labelKey: 'practice.checkinLabel', descKey: 'practice.checkinDesc', free: true, route: '/practice/checkin' },
+  { id: 'journal' as const, icon: PenLine, labelKey: 'practice.journalLabel', descKey: 'practice.journalDesc', free: false, route: '/practice/journal' },
+  { id: 'bodyscan' as const, icon: Activity, labelKey: 'practice.bodyscanLabel', descKey: 'practice.bodyscanDesc', free: false, route: '/practice/bodyscan' },
+  { id: 'replay' as const, icon: History, labelKey: 'practice.replayLabel', descKey: 'practice.replayDesc', free: false, route: '/practice/replay' },
 ] as const;
 
-const INLINE_COLORS = {
-  textColor: 'hsl(var(--foreground) / 0.7)',
-  ringColor: 'hsl(var(--border))',
-  glowColor: 'hsl(var(--primary) / 0.1)',
-};
-
-/** Pick a contextual suggestion based on recent practice data */
 function useSuggestion(userId: string | undefined) {
   const [suggestion, setSuggestion] = useState<{ id: PracticeId; reason: string } | null>(null);
   const { t } = useTranslation();
@@ -35,8 +24,6 @@ function useSuggestion(userId: string | undefined) {
     if (!userId) return;
     (async () => {
       const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-
-      // Get recent practice entries
       const { data: entries } = await supabase
         .from('practice_entries')
         .select('type, mood, created_at')
@@ -50,17 +37,14 @@ function useSuggestion(userId: string | undefined) {
         return;
       }
 
-      // Count by type
       const counts: Record<string, number> = {};
       for (const e of entries) counts[e.type] = (counts[e.type] || 0) + 1;
 
-      // Check last checkin
       const lastCheckin = entries.find(e => e.type === 'checkin');
       const daysSinceCheckin = lastCheckin
         ? Math.floor((Date.now() - new Date(lastCheckin.created_at).getTime()) / 86400000)
         : 999;
 
-      // Check recent moods for reactivity
       const reactiveMoods = ['anxious', 'fearful', 'fomo'];
       const recentMoods = entries.filter(e => e.mood && reactiveMoods.includes(e.mood));
 
@@ -102,13 +86,14 @@ export function PracticeWidget() {
   const { t } = useTranslation();
   const { subscribed, startCheckout } = useSubscription();
   const { user } = useAuth();
-  const [active, setActive] = useState<PracticeId | null>(null);
+  const navigate = useNavigate();
   const suggestion = useSuggestion(user?.id);
   const weeklyCount = useWeeklyProgress(user?.id);
 
   const handleSelect = useCallback((id: PracticeId) => {
     const practice = PRACTICES.find(p => p.id === id);
-    if (!practice?.free && !subscribed) {
+    if (!practice) return;
+    if (!practice.free && !subscribed) {
       toast(t('pro.featureLocked'), {
         description: t('pro.upgradeDesc'),
         action: { label: t('pro.upgradeCta'), onClick: () => startCheckout() },
@@ -116,36 +101,8 @@ export function PracticeWidget() {
       });
       return;
     }
-    setActive(id);
-  }, [subscribed, startCheckout, t]);
-
-  const handleComplete = useCallback(() => {
-    setActive(null);
-  }, []);
-
-  if (active) {
-    return (
-      <div className="space-y-3">
-        <div className="flex items-center justify-between">
-          <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
-            {t(`practice.${active}Label`)}
-          </p>
-          <button
-            onClick={() => setActive(null)}
-            className="p-1 text-muted-foreground/40 hover:text-muted-foreground transition-colors"
-          >
-            <X className="h-3.5 w-3.5" />
-          </button>
-        </div>
-        <AnimatePresence mode="wait">
-          {active === 'checkin' && <EmotionalCheckIn onComplete={handleComplete} {...INLINE_COLORS} />}
-          {active === 'journal' && <GuidedJournal onComplete={handleComplete} textColor={INLINE_COLORS.textColor} ringColor={INLINE_COLORS.ringColor} />}
-          {active === 'bodyscan' && <BodyScan onComplete={handleComplete} {...INLINE_COLORS} />}
-          {active === 'replay' && <ReflectionReplay onComplete={handleComplete} textColor={INLINE_COLORS.textColor} ringColor={INLINE_COLORS.ringColor} />}
-        </AnimatePresence>
-      </div>
-    );
-  }
+    navigate(practice.route);
+  }, [subscribed, startCheckout, t, navigate]);
 
   return (
     <div className="space-y-3">
