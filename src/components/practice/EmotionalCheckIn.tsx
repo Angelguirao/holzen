@@ -37,7 +37,6 @@ export function EmotionalCheckIn({ onComplete, textColor, ringColor }: Props) {
         mood,
         intensity,
         trigger_text: trigger || null,
-        body: moodAfter ? JSON.stringify({ mood_after: moodAfter }) : null,
       });
       hapticFeedback('success');
       setStep('done');
@@ -47,7 +46,7 @@ export function EmotionalCheckIn({ onComplete, textColor, ringColor }: Props) {
     } finally {
       setSaving(false);
     }
-  }, [user, mood, moodAfter, intensity, trigger, onComplete, t]);
+  }, [user, mood, intensity, trigger, onComplete, t]);
 
   return (
     <motion.div
