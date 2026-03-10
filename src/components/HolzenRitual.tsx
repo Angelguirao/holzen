@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Check, ChevronRight, Sparkles, Wand2 } from 'lucide-react';
+import { X, Check, ChevronRight, Sparkles, Wand2, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { hapticFeedback } from '@/lib/haptics';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,6 +13,7 @@ import {
 } from './ritual';
 import { STEP_REGISTRY, PRESET_TEMPLATES, type StepData } from './ritual/stepRegistry';
 import { RitualBuilder } from './RitualBuilder';
+import { MoodCheck, type MoodValue } from './MoodCheck';
 
 interface SavedTemplate {
   id: string;
@@ -31,17 +32,19 @@ interface HolzenRitualProps {
   /** If provided, skip template selection and use these steps */
   initialSteps?: StepData[];
   initialTemplateName?: string;
+  /** Quick-start: skip template selection and use default ritual */
+  quickStart?: boolean;
 }
 
 export function HolzenRitual({
   open, onClose, reflectionMessage, reflectionId, onDecision,
-  initialSteps, initialTemplateName,
+  initialSteps, initialTemplateName, quickStart,
 }: HolzenRitualProps) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { mantra, motivations } = useHolzen();
 
-  const [phase, setPhase] = useState<'select' | 'build' | 'run' | 'ai-loading'>('select');
+  const [phase, setPhase] = useState<'mood-before' | 'select' | 'build' | 'run' | 'ai-loading' | 'mood-after'>('mood-before');
   const [steps, setSteps] = useState<StepData[]>([]);
   const [templateName, setTemplateName] = useState('');
   const [currentStep, setCurrentStep] = useState(0);
@@ -53,6 +56,8 @@ export function HolzenRitual({
   const [savedTemplates, setSavedTemplates] = useState<SavedTemplate[]>([]);
   const [loadingTemplates, setLoadingTemplates] = useState(true);
   const startTimeRef = useRef<number>(Date.now());
+  const [moodBefore, setMoodBefore] = useState<MoodValue | null>(null);
+  const [moodAfter, setMoodAfter] = useState<MoodValue | null>(null);
 
   const hasMantra = !!(mantra || motivations.length > 0);
 
