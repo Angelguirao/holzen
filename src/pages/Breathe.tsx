@@ -270,10 +270,22 @@ export default function Breathe() {
     return () => { if (contemplationTimerRef.current) clearInterval(contemplationTimerRef.current); };
   }, [mode, voidEntered]);
 
+  // Void: ambient drone
+  const stopDroneRef = useRef<(() => void) | null>(null);
+  useEffect(() => {
+    if (mode !== 'void' || !voidEntered) return;
+    stopDroneRef.current = startAmbientDrone();
+    return () => {
+      stopDroneRef.current?.();
+      stopDroneRef.current = null;
+    };
+  }, [mode, voidEntered]);
+
   const handleClose = useCallback(() => {
     [pollRef, contemplationTimerRef, tickRef].forEach((ref) => {
       if (ref.current) clearInterval(ref.current);
     });
+    stopDroneRef.current?.();
     if (window.history.length > 1) {
       navigate(-1);
     } else {
