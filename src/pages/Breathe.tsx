@@ -40,40 +40,41 @@ const textColors: Record<VolatilityLevel, string> = {
   intense: 'hsla(350, 35%, 70%, 0.6)',
 };
 
-const BREATH_DURATION = 8; // 4s in, 4s out — synced to feel like block time
-const VOID_SECONDS = 120; // ~2 min, roughly 1/5 of a block
+const BREATH_DURATION = 8;
 
 interface BlockData {
   height: number;
   mempoolSize: number;
   mempoolPending: number;
+  lastBlockTime?: number; // unix timestamp of latest block
 }
 
-/** Fetch latest block height and mempool info */
+/** Fetch latest block height, mempool info, and last block time */
 async function fetchBlockData(): Promise<BlockData | null> {
   try {
-    const [heightRes, mempoolRes] = await Promise.all([
+    const [heightRes, mempoolRes, blocksRes] = await Promise.all([
       fetch('https://mempool.space/api/blocks/tip/height'),
       fetch('https://mempool.space/api/mempool'),
+      fetch('https://mempool.space/api/blocks'),
     ]);
     const height = await heightRes.json();
     const mempool = await mempoolRes.json();
+    let lastBlockTime: number | undefined;
+    try {
+      const blocks = await blocksRes.json();
+      if (Array.isArray(blocks) && blocks.length > 0) {
+        lastBlockTime = blocks[0].timestamp;
+      }
+    } catch {}
     return {
       height: typeof height === 'number' ? height : parseInt(height),
       mempoolSize: mempool?.vsize ?? 0,
       mempoolPending: mempool?.count ?? 0,
+      lastBlockTime,
     };
   } catch {
     return null;
   }
-}
-
-/** Convert seconds to approximate sats (1 sat ≈ 1 second at ~6.25 BTC/10min block reward) */
-function secondsToSats(seconds: number): number {
-  // Block reward: 3.125 BTC = 312,500,000 sats per ~600 seconds
-  // ≈ 520,833 sats/second
-  // But for display, we use a simpler human-scale: 1 second = 1 sat
-  return seconds;
 }
 
 function formatNumber(n: number): string {
@@ -129,6 +130,47 @@ function MempoolViz({ level, pending }: { level: VolatilityLevel; pending: numbe
   );
 }
 
+/** Contemplative phrases revealed word-by-word */
+const VOID_CONTEMPLATIONS = [
+  'No seconds. Only blocks.',
+  'The network keeps time. You don\'t have to.',
+  'Each block — a heartbeat of collective energy.',
+  'Immutable. Like this moment.',
+  'Time is a chain of causes. Sit between them.',
+  'The mempool stirs. Transactions wait. You can wait too.',
+  'Proof of work. Proof of patience.',
+];
+
+function WordByWordText({ text, delay = 0, color }: { text: string; delay?: number; color: string }) {
+  const words = text.split(' ');
+  return (
+    <p className="font-mono text-[10px] leading-relaxed text-center max-w-[260px]" style={{ color }}>
+      {words.map((word, i) => (
+        <motion.span
+          key={i}
+          className="inline-block mr-[0.35em]"
+          initial={{ opacity: 0, y: 4 }}
+          animate={{ opacity: 0.5, y: 0 }}
+          transition={{ delay: delay + i * 0.35, duration: 0.6, ease: 'easeOut' }}
+        >
+          {word}
+        </motion.span>
+      ))}
+    </p>
+  );
+}
+
+/** Format seconds since last block into human-readable */
+function formatTimeSince(seconds: number): string {
+  if (seconds < 60) return `${seconds}s`;
+  const mins = Math.floor(seconds / 60);
+  const secs = seconds % 60;
+  if (mins < 60) return `${mins}m ${secs > 0 ? `${secs}s` : ''}`.trim();
+  const hrs = Math.floor(mins / 60);
+  const remainMins = mins % 60;
+  return `${hrs}h ${remainMins}m`;
+}
+
 export default function Breathe() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -137,22 +179,25 @@ export default function Breathe() {
   const [mode, setMode] = useState<Mode>('ambient');
   const [btcData, setBtcData] = useState<BtcPriceData | null>(null);
   const [blockData, setBlockData] = useState<BlockData | null>(null);
-  const [blockAtStart, setBlockAtStart] = useState<number | null>(null);
   const [level, setLevel] = useState<VolatilityLevel>('calm');
   const [curtainLifted, setCurtainLifted] = useState(false);
 
-  // Void state
-  const [voidSeconds, setVoidSeconds] = useState(VOID_SECONDS);
-  const [elapsed, setElapsed] = useState(0);
-  const [voidStarted, setVoidStarted] = useState(false);
-  const [voidCompleted, setVoidCompleted] = useState(false);
+  // Void state — no timer, blockchain-synced
+  const [voidEntered, setVoidEntered] = useState(false);
+  const [contemplationIndex, setContemplationIndex] = useState(0);
+  const [timeSinceBlock, setTimeSinceBlock] = useState<number | null>(null);
+  const [blockAtEntry, setBlockAtEntry] = useState<number | null>(null);
+  const [newBlockMined, setNewBlockMined] = useState(false);
+  const [newBlockHeight, setNewBlockHeight] = useState<number | null>(null);
+
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const contemplationTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => setCurtainLifted(true), 100);
     return () => clearTimeout(timer);
   }, []);
-
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Fetch BTC + block data
   const loadData = useCallback(async () => {
@@ -165,11 +210,12 @@ export default function Breathe() {
       setLevel(getVolatilityLevel(btc.changePercent));
     }
     if (block) setBlockData(block);
+    return block;
   }, []);
 
   useEffect(() => {
     loadData();
-    const interval = setInterval(loadData, 30_000); // refresh every 30s for mempool changes
+    const interval = setInterval(loadData, 30_000);
     return () => clearInterval(interval);
   }, [loadData]);
 
@@ -183,30 +229,49 @@ export default function Breathe() {
     };
   }, []);
 
-  // Void timer with elapsed tracking
+  // Void: tick time-since-last-block every second
   useEffect(() => {
-    if (mode !== 'void' || !voidStarted || voidCompleted) return;
-    intervalRef.current = setInterval(() => {
-      setElapsed((prev) => prev + 1);
-      setVoidSeconds((prev) => {
-        if (prev <= 1) {
-          clearInterval(intervalRef.current!);
-          setVoidCompleted(true);
-          hapticFeedback('success');
-          // Re-fetch block data to see if a new block was mined
-          fetchBlockData().then((d) => { if (d) setBlockData(d); });
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
+    if (mode !== 'void' || !voidEntered) return;
+    const tick = () => {
+      if (blockData?.lastBlockTime) {
+        setTimeSinceBlock(Math.floor(Date.now() / 1000) - blockData.lastBlockTime);
+      }
     };
-  }, [mode, voidStarted, voidCompleted]);
+    tick();
+    tickRef.current = setInterval(tick, 1000);
+    return () => { if (tickRef.current) clearInterval(tickRef.current); };
+  }, [mode, voidEntered, blockData?.lastBlockTime]);
+
+  // Void: poll for new blocks every 15s
+  useEffect(() => {
+    if (mode !== 'void' || !voidEntered) return;
+    pollRef.current = setInterval(async () => {
+      const fresh = await fetchBlockData();
+      if (fresh) {
+        if (blockAtEntry && fresh.height > blockAtEntry && !newBlockMined) {
+          setNewBlockMined(true);
+          setNewBlockHeight(fresh.height);
+          hapticFeedback('success');
+        }
+        setBlockData(fresh);
+      }
+    }, 15_000);
+    return () => { if (pollRef.current) clearInterval(pollRef.current); };
+  }, [mode, voidEntered, blockAtEntry, newBlockMined]);
+
+  // Void: cycle contemplations every 12s
+  useEffect(() => {
+    if (mode !== 'void' || !voidEntered) return;
+    contemplationTimerRef.current = setInterval(() => {
+      setContemplationIndex((prev) => (prev + 1) % VOID_CONTEMPLATIONS.length);
+    }, 12_000);
+    return () => { if (contemplationTimerRef.current) clearInterval(contemplationTimerRef.current); };
+  }, [mode, voidEntered]);
 
   const handleClose = useCallback(() => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
+    [pollRef, contemplationTimerRef, tickRef].forEach((ref) => {
+      if (ref.current) clearInterval(ref.current);
+    });
     if (window.history.length > 1) {
       navigate(-1);
     } else {
@@ -214,17 +279,19 @@ export default function Breathe() {
     }
   }, [navigate]);
 
-  const startVoid = useCallback(() => {
-    setVoidSeconds(VOID_SECONDS);
-    setElapsed(0);
-    setVoidStarted(false);
-    setVoidCompleted(false);
-    setBlockAtStart(blockData?.height ?? null);
+  const enterVoid = useCallback(() => {
+    setVoidEntered(false);
+    setContemplationIndex(0);
+    setNewBlockMined(false);
+    setNewBlockHeight(null);
+    setBlockAtEntry(blockData?.height ?? null);
     setMode('void');
   }, [blockData]);
 
   const backToAmbient = useCallback(() => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
+    [pollRef, contemplationTimerRef, tickRef].forEach((ref) => {
+      if (ref.current) clearInterval(ref.current);
+    });
     setMode('ambient');
   }, []);
 
@@ -232,10 +299,6 @@ export default function Breathe() {
   const backgroundStyle = {
     background: `radial-gradient(ellipse at 50% 40%, ${grad.from}, ${grad.via} 50%, ${grad.to} 100%)`,
   };
-
-  const voidProgress = (VOID_SECONDS - voidSeconds) / VOID_SECONDS;
-  const satsElapsed = secondsToSats(elapsed);
-  const newBlockMined = blockAtStart && blockData && blockData.height > blockAtStart;
 
   const labelMap: Record<VolatilityLevel, string> = {
     calm: t('ambient.calm'),
@@ -325,7 +388,6 @@ export default function Breathe() {
                     ease: 'easeInOut',
                   }}
                 >
-                  {/* Block height inside the circle */}
                   {blockData && (
                     <span
                       className="font-mono text-[11px] tabular-nums tracking-wider"
@@ -346,7 +408,6 @@ export default function Breathe() {
                   {labelMap[level]}
                 </p>
 
-                {/* Block grounding prompt */}
                 {blockData && (
                   <motion.p
                     className="text-[10px] font-mono leading-relaxed max-w-[240px]"
@@ -359,7 +420,6 @@ export default function Breathe() {
                   </motion.p>
                 )}
 
-                {/* Mempool context */}
                 {blockData && blockData.mempoolPending > 0 && (
                   <motion.p
                     className="text-[9px] font-mono tabular-nums"
@@ -373,14 +433,14 @@ export default function Breathe() {
                 )}
               </div>
 
-              {/* Mode toggle */}
+              {/* Enter the void */}
               <div className="mt-12 flex flex-col items-center gap-4">
                 <button
-                  onClick={startVoid}
+                  onClick={enterVoid}
                   className="text-[10px] font-mono tracking-[0.2em] uppercase transition-opacity hover:opacity-80"
                   style={{ color: textColors[level], opacity: 0.4 }}
                 >
-                  {t('breathe.startTimer')}
+                  {t('void.enter', 'Enter the void')}
                 </button>
               </div>
 
@@ -397,149 +457,136 @@ export default function Breathe() {
           {mode === 'void' && (
             <motion.div
               key="void"
-              className="flex flex-col items-center gap-12"
+              className="flex flex-col items-center gap-10"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              transition={{ duration: 0.8 }}
+              transition={{ duration: 1.2 }}
+              onAnimationComplete={() => !voidEntered && setVoidEntered(true)}
             >
-              {/* Ambient glow */}
+              {/* Ambient glow — slow cosmic pulse */}
               <motion.div
                 className="absolute rounded-full pointer-events-none"
                 style={{
-                  width: 300,
-                  height: 300,
+                  width: 350,
+                  height: 350,
                   background: `radial-gradient(circle, ${glowColors[level]}, transparent 70%)`,
-                  filter: 'blur(60px)',
+                  filter: 'blur(80px)',
                 }}
-                animate={{
-                  scale: [1, 1.1, 1],
-                  opacity: [0.4, 0.6, 0.4],
+                animate={prefersReducedMotion ? { opacity: 0.3 } : {
+                  scale: [1, 1.08, 1],
+                  opacity: [0.2, 0.35, 0.2],
                 }}
                 transition={{
-                  duration: 6,
+                  duration: 10,
                   repeat: Infinity,
                   ease: 'easeInOut',
                 }}
               />
 
-              {!voidStarted && !voidCompleted ? (
-                <motion.button
-                  onClick={() => {
-                    setVoidStarted(true);
-                    hapticFeedback('light');
-                  }}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: 0.3, duration: 0.8 }}
-                  className="relative z-10 font-mono text-xs tracking-[0.3em] uppercase transition-colors duration-700"
-                  style={{ color: textColors[level], opacity: 0.6 }}
+              {/* Block height — the only clock */}
+              <motion.div
+                className="relative z-10 flex flex-col items-center gap-3"
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.5, duration: 1.5, ease: 'easeOut' }}
+              >
+                <p
+                  className="font-mono text-3xl tracking-[0.15em] tabular-nums"
+                  style={{ color: textColors[level], opacity: 0.35 }}
                 >
-                  {t('void.begin')}
-                </motion.button>
-              ) : voidCompleted ? (
+                  {blockData?.height.toLocaleString() ?? '···'}
+                </p>
+                <motion.p
+                  className="font-mono text-[8px] tracking-[0.3em] uppercase"
+                  style={{ color: textColors[level], opacity: 0.2 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 0.2 }}
+                  transition={{ delay: 2, duration: 1 }}
+                >
+                  {t('void.currentBlock', 'current block')}
+                </motion.p>
+              </motion.div>
+
+              {/* Time since last block — ticking with blockchain time */}
+              {timeSinceBlock !== null && (
                 <motion.div
+                  className="relative z-10 flex flex-col items-center gap-1"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ duration: 1.5 }}
-                  className="relative z-10 flex flex-col items-center gap-6"
+                  transition={{ delay: 3, duration: 1.5 }}
                 >
-                  {/* Sats-as-seconds summary */}
                   <p
-                    className="font-mono text-2xl tracking-[0.1em] tabular-nums"
-                    style={{ color: textColors[level], opacity: 0.5 }}
-                  >
-                    {satsElapsed.toLocaleString()} <span className="text-xs">sats</span>
-                  </p>
-                  <p
-                    className="font-mono text-[10px] tracking-[0.2em] uppercase"
-                    style={{ color: textColors[level], opacity: 0.35 }}
-                  >
-                    {t('breathe.timeInStillness', 'of stillness')}
-                  </p>
-
-                  {/* Block mined during session? */}
-                  {newBlockMined && (
-                    <motion.p
-                      className="font-mono text-[10px] leading-relaxed text-center max-w-[220px]"
-                      style={{ color: textColors[level], opacity: 0.4 }}
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 0.4, y: 0 }}
-                      transition={{ delay: 0.5, duration: 1 }}
-                    >
-                      {t('breathe.blockMined', 'While you were still, block {{height}} was mined.', { height: blockData?.height.toLocaleString() })}
-                    </motion.p>
-                  )}
-
-                  {/* Network kept working */}
-                  <motion.p
-                    className="font-mono text-[9px] max-w-[200px] text-center leading-relaxed"
-                    style={{ color: textColors[level], opacity: 0.25 }}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 0.25 }}
-                    transition={{ delay: 1, duration: 1.5 }}
-                  >
-                    {t('breathe.networkKept', "The network kept working. You didn't have to.")}
-                  </motion.p>
-
-                  <button
-                    onClick={backToAmbient}
-                    className="font-mono text-[10px] tracking-[0.2em] uppercase transition-colors duration-700 mt-4"
-                    style={{ color: textColors[level], opacity: 0.3 }}
-                  >
-                    {t('void.return')}
-                  </button>
-                </motion.div>
-              ) : (
-                <motion.div
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 1 }}
-                  className="relative z-10 flex flex-col items-center gap-8"
-                >
-                  {/* Sats counter instead of time */}
-                  <p
-                    className="font-mono text-2xl tracking-[0.1em] tabular-nums"
-                    style={{ color: textColors[level], opacity: 0.15 + voidProgress * 0.35 }}
-                  >
-                    {satsElapsed.toLocaleString()} <span className="text-xs opacity-50">sats</span>
-                  </p>
-
-                  {/* Progress ring */}
-                  <svg width="120" height="120" className="absolute -z-10 opacity-20">
-                    <circle cx="60" cy="60" r="56" fill="none" stroke={`${ringColors[level]}`} strokeWidth="1" style={{ opacity: 0.3 }} />
-                    <circle
-                      cx="60" cy="60" r="56" fill="none" stroke={ringColors[level]} strokeWidth="1"
-                      strokeLinecap="round"
-                      strokeDasharray={`${2 * Math.PI * 56}`}
-                      strokeDashoffset={`${2 * Math.PI * 56 * (1 - voidProgress)}`}
-                      transform="rotate(-90 60 60)"
-                      style={{ transition: 'stroke-dashoffset 1s linear' }}
-                    />
-                  </svg>
-
-                  {/* Block height grounding */}
-                  {blockData && (
-                    <motion.p
-                      className="font-mono text-[9px] tabular-nums"
-                      style={{ color: textColors[level], opacity: 0.15 }}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 0.15 }}
-                      transition={{ delay: 5, duration: 2 }}
-                    >
-                      {t('breathe.currentBlock', 'block {{height}}', { height: blockData.height.toLocaleString() })}
-                    </motion.p>
-                  )}
-
-                  <button
-                    onClick={backToAmbient}
-                    className="font-mono text-[10px] tracking-[0.2em] uppercase transition-colors duration-700 mt-4"
+                    className="font-mono text-sm tabular-nums tracking-wider"
                     style={{ color: textColors[level], opacity: 0.25 }}
                   >
-                    {t('common.back')}
-                  </button>
+                    {formatTimeSince(timeSinceBlock)}
+                  </p>
+                  <p
+                    className="font-mono text-[8px] tracking-[0.2em] uppercase"
+                    style={{ color: textColors[level], opacity: 0.15 }}
+                  >
+                    {t('void.sinceLastBlock', 'since last block')}
+                  </p>
                 </motion.div>
               )}
+
+              {/* New block mined — reverent moment */}
+              <AnimatePresence>
+                {newBlockMined && newBlockHeight && (
+                  <motion.div
+                    className="relative z-10 flex flex-col items-center gap-3"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 2, ease: 'easeOut' }}
+                  >
+                    <motion.div
+                      className="w-2 h-2 rounded-full"
+                      style={{ background: textColors[level] }}
+                      animate={{ scale: [1, 1.8, 1], opacity: [0.6, 0.3, 0.6] }}
+                      transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
+                    />
+                    <p
+                      className="font-mono text-[10px] tracking-[0.2em] text-center max-w-[220px] leading-relaxed"
+                      style={{ color: textColors[level], opacity: 0.45 }}
+                    >
+                      {t('void.blockMined', 'A new block was found. {{height}}. Time moved forward.', { height: newBlockHeight.toLocaleString() })}
+                    </p>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Contemplative text — word by word */}
+              {voidEntered && (
+                <motion.div
+                  key={contemplationIndex}
+                  className="relative z-10 mt-4"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.8 }}
+                >
+                  <WordByWordText
+                    text={VOID_CONTEMPLATIONS[contemplationIndex]}
+                    delay={0.5}
+                    color={textColors[level]}
+                  />
+                </motion.div>
+              )}
+
+              {/* Return — when you're ready */}
+              <motion.button
+                onClick={backToAmbient}
+                className="relative z-10 font-mono text-[9px] tracking-[0.2em] uppercase transition-colors duration-700 mt-6"
+                style={{ color: textColors[level], opacity: 0.15 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.15 }}
+                transition={{ delay: 6, duration: 2 }}
+                whileHover={{ opacity: 0.4 }}
+              >
+                {t('void.return')}
+              </motion.button>
             </motion.div>
           )}
         </AnimatePresence>
