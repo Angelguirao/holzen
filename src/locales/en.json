@@ -416,20 +416,20 @@
     "noCreditCard": "Free forever · Pro ${{price}}/mo · no credit card",
     "reflectionLoop": "Impulse vs. Intention",
     "reaction": {
-      "label": "Impulse",
+      "label": "Without Holzen",
       "01title": "The market drops",
-      "02title": "Fear takes over",
-      "03title": "You sell on instinct",
-      "04title": "Regret follows"
+      "02title": "Panic sets in",
+      "03title": "You sell impulsively",
+      "04title": "You regret it later"
     },
     "reflection": {
-      "label": "Intention",
+      "label": "With Holzen",
       "01title": "The market drops",
-      "02title": "You notice the impulse",
+      "02title": "You pause & feel",
       "03title": "You breathe",
-      "04title": "You observe, not react",
-      "05title": "You decide with clarity",
-      "06title": "You compound wisdom"
+      "04title": "You reflect",
+      "05title": "You decide deliberately",
+      "06title": "You grow over time"
     },
     "steps": {
       "01title": "The market moves",

@@ -382,20 +382,20 @@
     "noCreditCard": "Dann ${{price}}/Monat · keine Karte · jederzeit kündbar",
     "reflectionLoop": "Impuls vs. Absicht",
     "reaction": {
-      "label": "Impuls",
+      "label": "Ohne Holzen",
       "01title": "Der Markt fällt",
-      "02title": "Angst übernimmt",
-      "03title": "Du verkaufst aus Instinkt",
-      "04title": "Reue folgt"
+      "02title": "Panik setzt ein",
+      "03title": "Du verkaufst impulsiv",
+      "04title": "Du bereust es später"
     },
     "reflection": {
-      "label": "Absicht",
+      "label": "Mit Holzen",
       "01title": "Der Markt fällt",
-      "02title": "Du bemerkst den Impuls",
+      "02title": "Du pausierst & fühlst",
       "03title": "Du atmest",
-      "04title": "Du beobachtest, reagierst nicht",
-      "05title": "Du entscheidest mit Klarheit",
-      "06title": "Du baust Weisheit auf"
+      "04title": "Du reflektierst",
+      "05title": "Du entscheidest bewusst",
+      "06title": "Du wächst mit der Zeit"
     },
     "steps": {
       "01title": "Der Markt bewegt sich",
