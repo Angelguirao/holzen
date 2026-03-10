@@ -96,3 +96,13 @@ body.ambient-active nav,
 body.ambient-active header {
   display: none !important;
 }
+
+/* Swipe-to-dismiss hint: only show on touch devices */
+.swipe-hint {
+  display: none;
+}
+@media (pointer: coarse) {
+  .swipe-hint {
+    display: flex;
+  }
+}
