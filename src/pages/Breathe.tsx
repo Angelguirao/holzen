@@ -253,6 +253,7 @@ export default function Breathe() {
           setNewBlockMined(true);
           setNewBlockHeight(fresh.height);
           hapticFeedback('success');
+          playBlockDiscoveryTone();
         }
         setBlockData(fresh);
       }
