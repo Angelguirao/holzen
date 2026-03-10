@@ -344,21 +344,23 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
               moodCounts={moodCounts}
             />
           </div>
-          {scoreData && <HolzenScoreDetail scoreData={scoreData} />}
+          {scoreData ? <HolzenScoreDetail scoreData={scoreData} /> : (
+            <ChartEmptyState
+              title={t('profile.holzenScore')}
+              message={t('profile.holzenScoreEmpty')}
+              current={reflections.length}
+              needed={1}
+            />
+          )}
           <PeriodComparison reflections={reflections} />
           <InsightsPanel reflections={reflections} />
           <DecisionQualityCard reflections={reflections} />
           <VolatilityToleranceCard reflections={reflections} />
           <RitualStatsCard />
-
-          {hasEnoughForCharts && (
-            <>
-              <StatsTrends reflections={reflections} />
-              <MoodTrendChart reflections={moodDataForCharts} />
-              <MoodPriceChart reflections={reflections} />
-              <MoodPriceScatter reflections={reflections} />
-            </>
-          )}
+          <StatsTrends reflections={reflections} />
+          <MoodTrendChart reflections={moodDataForCharts} />
+          <MoodPriceChart reflections={reflections} />
+          <MoodPriceScatter reflections={reflections} />
         </div>
       </ProLock>
     </div>
