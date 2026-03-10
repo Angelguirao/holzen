@@ -496,8 +496,7 @@ function StatsSection({ label, children }: { label: string; children: React.Reac
     </div>
   );
 }
-
-
+function LetterCard({ letter: l, onDelete, fmtPrice, type }: {
   letter: Letter;
   onDelete: (id: string) => void;
   fmtPrice: (p: number) => string;
