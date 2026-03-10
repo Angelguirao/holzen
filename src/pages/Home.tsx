@@ -614,9 +614,10 @@ const Home = () => {
       {/* Modals (outside widget flow) */}
       <HolzenRitual
         open={showRitual}
-        onClose={() => setShowRitual(false)}
+        onClose={() => { setShowRitual(false); setRitualQuickStart(false); }}
         reflectionMessage={message ?? undefined}
         reflectionId={lastReflectionId}
+        quickStart={ritualQuickStart}
       />
 
       {/* Trigger overlay */}
