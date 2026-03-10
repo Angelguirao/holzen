@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowUpRight, ArrowDownRight, Minus, CalendarDays } from 'lucide-react';
+import { ChartEmptyState } from './ChartEmptyState';
 import {
   startOfWeek, endOfWeek, subWeeks, startOfMonth, endOfMonth, subMonths,
   parseISO, isWithinInterval, format,
