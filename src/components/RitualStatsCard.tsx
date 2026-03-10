@@ -208,7 +208,7 @@ export function RitualStatsCard() {
     return (
       <ChartEmptyState
         title={t('ritualStats.title')}
-        message={t('ritualStats.emptyMessage')}
+        message={t('ritualStats.emptyMessage', 'Complete your first ritual to see effectiveness stats. Rituals are available during price triggers.')}
         current={0}
         needed={1}
       />

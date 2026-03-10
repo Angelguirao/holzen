@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowUpRight, ArrowDownRight, Minus, CalendarDays } from 'lucide-react';
+import { ChartEmptyState } from './ChartEmptyState';
 import {
   startOfWeek, endOfWeek, subWeeks, startOfMonth, endOfMonth, subMonths,
   parseISO, isWithinInterval, format,
@@ -99,7 +100,16 @@ export function PeriodComparison({ reflections }: Props) {
     };
   }, [reflections, view, t]);
 
-  if (current.count === 0 && previous.count === 0) return null;
+  if (current.count === 0 && previous.count === 0) {
+    return (
+      <ChartEmptyState
+        title={t('periodComparison.title', 'Period Comparison')}
+        message={t('periodComparison.emptyMessage', 'Start reflecting this week to compare your progress across periods.')}
+        current={reflections.length}
+        needed={1}
+      />
+    );
+  }
 
   const metrics = [
     {

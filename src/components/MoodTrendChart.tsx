@@ -53,12 +53,14 @@ export function MoodTrendChart({ reflections }: Props) {
 
   const data = useMemo(() => buildData(reflections, granularity), [reflections, granularity]);
 
+  const moodCount = reflections.filter(r => r.mood && MOOD_VAL[r.mood] !== undefined).length;
+
   if (data.length < 3) {
     return (
       <ChartEmptyState
         title={t('moodCharts.moodTrend')}
-        message={t('moodCharts.moodTrendEmpty')}
-        current={data.length}
+        message={t('moodCharts.moodTrendEmpty', 'Log moods across 3 separate weeks to see your trend. Emotional check-ins count too.')}
+        current={moodCount}
         needed={3}
       />
     );
