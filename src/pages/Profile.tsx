@@ -54,6 +54,7 @@ interface Reflection {
   learning_body: string | null;
   note: string | null;
   mood: string | null;
+  mood_after: string | null;
   outcome: string | null;
   tags: string[];
   breathing_completed: boolean;
