@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef, useEffect } from 'react';
+import { useState, useCallback, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { X, ArrowDown, Heart, Flame } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -22,6 +22,48 @@ const DECISIONS = [
   { value: 'bought', key: 'buy', emoji: '📥' },
   { value: 'nothing', key: 'nothing', emoji: '🌿' },
 ] as const;
+
+const STEPS = ['feel', 'ground', 'check', 'decide'] as const;
+type Step = typeof STEPS[number];
+
+function ProgressIndicator({ currentStep }: { currentStep: Step }) {
+  const { t } = useTranslation();
+  const stepLabels: Record<Step, string> = {
+    feel: t('pause.steps.feel', 'Feel'),
+    ground: t('pause.steps.ground', 'Ground'),
+    check: t('pause.steps.check', 'Check'),
+    decide: t('pause.steps.decide', 'Decide'),
+  };
+
+  const currentIndex = STEPS.indexOf(currentStep);
+
+  return (
+    <div className="flex items-center justify-center gap-1">
+      {STEPS.map((step, i) => {
+        const isActive = i === currentIndex;
+        const isPast = i < currentIndex;
+        return (
+          <div key={step} className="flex items-center gap-1">
+            <div className="flex flex-col items-center gap-1">
+              <div
+                className={`h-1 rounded-full transition-all duration-500 ${
+                  isActive ? 'w-6 bg-primary/60' : isPast ? 'w-4 bg-primary/25' : 'w-4 bg-border/30'
+                }`}
+              />
+              <span
+                className={`text-[8px] font-mono uppercase tracking-[0.15em] transition-colors duration-500 ${
+                  isActive ? 'text-primary/60' : isPast ? 'text-muted-foreground/30' : 'text-muted-foreground/15'
+                }`}
+              >
+                {stepLabels[step]}
+              </span>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 function RevealSection({ children, delay = 0 }: { children: React.ReactNode; delay?: number }) {
   const { ref, visible } = useScrollReveal(0.1);
@@ -63,7 +105,14 @@ export default function PauseSession() {
   const [moodAfterDone, setMoodAfterDone] = useState(false);
   const [curtainLifted, setCurtainLifted] = useState(false);
 
-  // Cinematic entrance: dark curtain fades away after mount
+  // Derive current step from state
+  const currentStep = useMemo<Step>(() => {
+    if (!moodDone) return 'feel';
+    if (!moodAfterDone) return 'ground'; // user is in grounding/companions phase
+    return 'decide';
+  }, [moodDone, moodAfterDone]);
+
+  // Cinematic entrance
   useEffect(() => {
     const timer = setTimeout(() => setCurtainLifted(true), 100);
     return () => clearTimeout(timer);
@@ -182,7 +231,7 @@ export default function PauseSession() {
           transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
         />
 
-        {/* Close — positioned safely */}
+        {/* Close button */}
         <button
           onClick={handleReturn}
           className="fixed top-5 right-5 p-3 rounded-full bg-muted/40 backdrop-blur-sm text-muted-foreground/40 hover:text-foreground/60 hover:bg-muted/60 transition-all duration-300 z-[60]"
@@ -191,20 +240,31 @@ export default function PauseSession() {
           <X className="h-4 w-4" />
         </button>
 
-        <div ref={scrollRef} className="relative z-10 max-w-md mx-auto px-6 py-20 space-y-20">
+        {/* Progress indicator — fixed at top */}
+        {phase === 'session' && (
+          <motion.div
+            className="fixed top-6 left-1/2 -translate-x-1/2 z-[55]"
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 2, duration: 1 }}
+          >
+            <ProgressIndicator currentStep={currentStep} />
+          </motion.div>
+        )}
+
+        <div ref={scrollRef} className="relative z-10 max-w-md mx-auto px-6 py-20 space-y-16">
           {phase === 'session' && (
             <>
-              {/* Opening space */}
+              {/* Opening — breathing circle */}
               <motion.div
                 initial={prefersReducedMotion ? {} : { opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ duration: 1.5 }}
-                className="flex flex-col items-center gap-8 pt-12"
+                className="flex flex-col items-center gap-6 pt-10"
               >
-                {/* Breathing circle — refined double-ring */}
                 <div className="relative">
                   <motion.div
-                    className="w-24 h-24 rounded-full border border-border/10 relative cursor-pointer"
+                    className="w-20 h-20 rounded-full border border-border/10 relative cursor-pointer"
                     style={{
                       background: 'radial-gradient(circle, hsl(var(--primary) / 0.05) 0%, transparent 70%)',
                     }}
@@ -225,7 +285,6 @@ export default function PauseSession() {
                       setTimeout(() => ripple.remove(), 700);
                     }}
                   />
-                  {/* Outer ring */}
                   <motion.div
                     className="absolute -inset-3 rounded-full border border-border/5 pointer-events-none"
                     animate={prefersReducedMotion ? {} : { scale: [1, 1.04, 1] }}
@@ -233,7 +292,7 @@ export default function PauseSession() {
                   />
                 </div>
 
-                <div className="flex flex-col items-center gap-3">
+                <div className="flex flex-col items-center gap-2">
                   <p className="text-[11px] font-mono text-muted-foreground/30 tracking-[0.2em] uppercase">
                     {t('pause.youPaused')}
                   </p>
@@ -258,9 +317,9 @@ export default function PauseSession() {
                 </motion.div>
               </motion.div>
 
-              {/* Reflection */}
+              {/* Reflection message */}
               <RevealSection>
-                <div className="space-y-5">
+                <div className="space-y-4">
                   {context && (
                     <p className="text-[10px] font-mono text-muted-foreground/30 uppercase tracking-[0.15em]">
                       {context}
@@ -284,7 +343,7 @@ export default function PauseSession() {
               {/* Note & tags */}
               {reflectionId && (
                 <RevealSection>
-                  <div className="space-y-5">
+                  <div className="space-y-4">
                     <ReflectionNote reflectionId={reflectionId} initialNote={null} />
                     <ReflectionTags reflectionId={reflectionId} initialTags={[]} />
                   </div>
@@ -298,7 +357,7 @@ export default function PauseSession() {
                 </RevealSection>
               )}
 
-              {/* Companions */}
+              {/* Companions — the grounding section */}
               <RevealSection>
                 <CompanionSection
                   companions={companions}
@@ -319,7 +378,7 @@ export default function PauseSession() {
 
               {/* Decision */}
               <RevealSection>
-                <div className="space-y-6">
+                <div className="space-y-5">
                   <p className="text-[10px] font-mono text-muted-foreground/30 uppercase tracking-[0.15em] text-center">
                     {t('pause.whatWillYouDo')}
                   </p>
@@ -329,7 +388,7 @@ export default function PauseSession() {
                         key={d.value}
                         onClick={() => handleDecide(d.value)}
                         whileTap={{ scale: 0.96 }}
-                        className="flex flex-col items-center gap-2.5 py-6 rounded-xl border border-border/15 bg-card/20 backdrop-blur-sm hover:bg-card/40 hover:border-border/30 transition-all duration-300"
+                        className="flex flex-col items-center gap-2 py-5 rounded-xl border border-border/15 bg-card/20 backdrop-blur-sm hover:bg-card/40 hover:border-border/30 transition-all duration-300"
                       >
                         <span className="text-lg">{d.emoji}</span>
                         <span className="text-[10px] font-mono text-foreground/50 tracking-[0.12em] uppercase">
@@ -342,7 +401,7 @@ export default function PauseSession() {
               </RevealSection>
 
               {/* Bottom spacer */}
-              <div className="h-24" />
+              <div className="h-16" />
             </>
           )}
 
