@@ -380,22 +380,22 @@
     "heroDesc": "Holzen ist kein Trading-Tool. Es ist eine Praxis der Selbsterkenntnis. Wenn sich Bitcoin bewegt, bekommst du einen Moment zum Innehalten, Reflektieren und Beobachten deiner Muster — bevor du impulsiv handelst.",
     "getStartedForFree": "Starte kostenlos",
     "noCreditCard": "Dann ${{price}}/Monat · keine Karte · jederzeit kündbar",
-    "reflectionLoop": "Der Reflexionszyklus",
+    "reflectionLoop": "Impuls vs. Absicht",
     "reaction": {
-      "label": "Ohne Holzen",
+      "label": "Impuls",
       "01title": "Der Markt fällt",
-      "02title": "Panik setzt ein",
-      "03title": "Du verkaufst impulsiv",
-      "04title": "Du bereust es später"
+      "02title": "Angst übernimmt",
+      "03title": "Du verkaufst aus Instinkt",
+      "04title": "Reue folgt"
     },
     "reflection": {
-      "label": "Mit Holzen",
+      "label": "Absicht",
       "01title": "Der Markt fällt",
-      "02title": "Du pausierst & fühlst",
+      "02title": "Du bemerkst den Impuls",
       "03title": "Du atmest",
-      "04title": "Du reflektierst",
-      "05title": "Du entscheidest bewusst",
-      "06title": "Du wächst mit der Zeit"
+      "04title": "Du beobachtest, reagierst nicht",
+      "05title": "Du entscheidest mit Klarheit",
+      "06title": "Du baust Weisheit auf"
     },
     "steps": {
       "01title": "Der Markt bewegt sich",
