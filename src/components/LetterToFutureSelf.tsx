@@ -429,7 +429,7 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
             <p className="text-[10px] font-mono tracking-widest uppercase">{t('letter.letterToFutureSelf')}</p>
           </div>
           <p className="text-xs text-muted-foreground/60 leading-relaxed">
-            {t('letter.letterThresholdDesc', { threshold: LETTER_THRESHOLD })}
+            {t('letter.letterThresholdDesc', { threshold: Math.min(threshold, thresholdDown) })}
           </p>
         </div>
       )}
