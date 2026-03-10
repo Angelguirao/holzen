@@ -425,10 +425,11 @@
     "reflection": {
       "label": "With Holzen",
       "01title": "The market drops",
-      "02title": "You breathe",
-      "03title": "You reflect",
-      "04title": "You decide deliberately",
-      "05title": "You grow over time"
+      "02title": "You pause & feel",
+      "03title": "You breathe",
+      "04title": "You reflect",
+      "05title": "You decide deliberately",
+      "06title": "You grow over time"
     },
     "steps": {
       "01title": "The market moves",
