@@ -364,9 +364,9 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
           {scoreData ? <HolzenScoreDetail scoreData={scoreData} practiceDays={practiceDays} /> : (
             <ChartEmptyState
               title={t('profile.holzenScore')}
-              message={t('profile.holzenScoreEmpty')}
+              message={t('profile.holzenScoreEmpty', 'Log 3 reflections with mood or outcome to generate your composure score. Practice check-ins also contribute.')}
               current={reflections.length}
-              needed={1}
+              needed={3}
             />
           )}
         </ProLock>
