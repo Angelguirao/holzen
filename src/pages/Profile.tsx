@@ -299,7 +299,7 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
     return [...reflectionMoods, ...checkinMoods];
   }, [reflections, practiceEntries]);
 
-  const hasEnoughForCharts = reflections.length >= 5;
+  
 
   const practiceStats = useMemo(() => {
     if (practiceEntries.length === 0) return null;
