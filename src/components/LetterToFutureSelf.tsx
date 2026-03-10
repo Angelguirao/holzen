@@ -24,7 +24,7 @@ interface Letter {
   btc_price_at_delivery: number | null;
 }
 
-const LETTER_THRESHOLD = 5;
+// LETTER_THRESHOLD removed — now uses user's actual thresholds from profile
 
 const WRITING_PROMPTS = {
   crash: [
