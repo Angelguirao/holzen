@@ -98,14 +98,14 @@ function formatNumber(n: number): string {
 function MempoolViz({ level, pending }: { level: VolatilityLevel; pending: number }) {
   const prefersReduced = useReducedMotion();
   const dots = useMemo(() => {
-    const count = Math.min(Math.max(Math.floor(pending / 5000), 4), 20);
+    const count = Math.min(Math.max(Math.floor(pending / 3000), 6), 30);
     return Array.from({ length: count }, (_, i) => ({
       id: i,
-      x: 30 + Math.random() * 40,
-      y: 20 + Math.random() * 60,
-      size: 1 + Math.random() * 2,
-      delay: Math.random() * 4,
-      duration: 3 + Math.random() * 4,
+      x: 10 + Math.random() * 80,
+      y: 10 + Math.random() * 80,
+      size: 1.5 + Math.random() * 2.5,
+      delay: Math.random() * 6,
+      duration: 4 + Math.random() * 5,
     }));
   }, [pending]);
 
@@ -125,9 +125,9 @@ function MempoolViz({ level, pending }: { level: VolatilityLevel; pending: numbe
             background: glowColors[level],
           }}
           animate={{
-            opacity: [0, 0.6, 0],
-            y: [0, -20, -40],
-            scale: [1, 0.5, 0],
+            opacity: [0, 0.8, 0],
+            y: [0, -30, -60],
+            scale: [0.8, 1, 0.3],
           }}
           transition={{
             duration: dot.duration,
@@ -138,6 +138,30 @@ function MempoolViz({ level, pending }: { level: VolatilityLevel; pending: numbe
         />
       ))}
     </div>
+  );
+}
+
+/** Difficulty epoch progress arc */
+function EpochArc({ progress, color }: { progress: number; color: string }) {
+  const r = 70;
+  const circumference = 2 * Math.PI * r;
+  return (
+    <motion.svg
+      width="160" height="160"
+      className="absolute pointer-events-none"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 0.08 }}
+      transition={{ delay: 8, duration: 3 }}
+    >
+      <circle cx="80" cy="80" r={r} fill="none" stroke={color} strokeWidth="0.5" opacity={0.3} />
+      <circle
+        cx="80" cy="80" r={r} fill="none" stroke={color} strokeWidth="0.5"
+        strokeLinecap="round"
+        strokeDasharray={circumference}
+        strokeDashoffset={circumference * (1 - progress)}
+        transform="rotate(-90 80 80)"
+      />
+    </motion.svg>
   );
 }
 
