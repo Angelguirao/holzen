@@ -381,22 +381,22 @@
     "heroDesc": "Holzen is geen trading-tool. Het is een zelfbewustzijnspraktijk. Wanneer Bitcoin beweegt, krijg je een moment om te pauzeren, reflecteren en je patronen op te merken — voordat je impulsief handelt.",
     "getStartedForFree": "Begin gratis",
     "noCreditCard": "Daarna ${{price}}/maand · geen kaart · altijd opzegbaar",
-    "reflectionLoop": "De reflectiecyclus",
+    "reflectionLoop": "Impuls vs. Intentie",
     "reaction": {
-      "label": "Zonder Holzen",
+      "label": "Impuls",
       "01title": "De markt daalt",
-      "02title": "Paniek slaat toe",
-      "03title": "Je verkoopt impulsief",
-      "04title": "Je hebt er later spijt van"
+      "02title": "Angst neemt over",
+      "03title": "Je verkoopt op instinct",
+      "04title": "Spijt volgt"
     },
     "reflection": {
-      "label": "Met Holzen",
+      "label": "Intentie",
       "01title": "De markt daalt",
-      "02title": "Je pauzeert & voelt",
+      "02title": "Je merkt de impuls op",
       "03title": "Je ademt",
-      "04title": "Je reflecteert",
-      "05title": "Je beslist bewust",
-      "06title": "Je groeit met de tijd"
+      "04title": "Je observeert, reageert niet",
+      "05title": "Je beslist met helderheid",
+      "06title": "Je bouwt wijsheid op"
     },
     "steps": {
       "01title": "De markt beweegt",

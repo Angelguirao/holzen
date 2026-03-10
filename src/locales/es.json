@@ -381,22 +381,22 @@
     "heroDesc": "Holzen no es una herramienta de trading. Es una práctica de autoconocimiento. Cuando Bitcoin se mueve, tienes un momento para respirar, reflexionar y notar tus patrones — antes de que el impulso tome el control.",
     "getStartedForFree": "Empieza gratis",
     "noCreditCard": "Luego ${{price}}/mes · sin tarjeta · cancela cuando quieras",
-    "reflectionLoop": "El ciclo de reflexión",
+    "reflectionLoop": "Impulso vs. Intención",
     "reaction": {
-      "label": "Sin Holzen",
+      "label": "Impulso",
       "01title": "El mercado cae",
-      "02title": "El pánico se apodera",
-      "03title": "Vendes por impulso",
-      "04title": "Te arrepientes después"
+      "02title": "El miedo toma el control",
+      "03title": "Vendes por instinto",
+      "04title": "El arrepentimiento sigue"
     },
     "reflection": {
-      "label": "Con Holzen",
+      "label": "Intención",
       "01title": "El mercado cae",
-      "02title": "Pausas y sientes",
+      "02title": "Notas el impulso",
       "03title": "Respiras",
-      "04title": "Reflexionas",
-      "05title": "Decides deliberadamente",
-      "06title": "Creces con el tiempo"
+      "04title": "Observas, no reaccionas",
+      "05title": "Decides con claridad",
+      "06title": "Acumulas sabiduría"
     },
     "steps": {
       "01title": "El mercado se mueve",
