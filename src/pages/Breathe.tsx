@@ -530,6 +530,19 @@ export default function Breathe() {
                   >
                     {t('void.sinceLastBlock', 'since last block')}
                   </p>
+                  <motion.p
+                    className="font-mono text-[7px] tracking-[0.15em] italic"
+                    style={{ color: textColors[level], opacity: 0.12 }}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 0.12 }}
+                    transition={{ delay: 5, duration: 1.5 }}
+                  >
+                    {timeSinceBlock > 1200
+                      ? t('void.longWait', 'patience — the network is searching')
+                      : timeSinceBlock > 900
+                        ? t('void.searching', 'the network is searching')
+                        : t('void.typical', 'typical: ~10 min')}
+                  </motion.p>
                 </motion.div>
               )}
 
