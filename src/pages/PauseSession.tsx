@@ -291,10 +291,10 @@ export default function PauseSession() {
                 </RevealSection>
               )}
 
-              {/* Mood check-in */}
+              {/* Mood check-in (before) */}
               {!moodDone && (
                 <RevealSection>
-                  <MoodCheck onSelect={handleMoodSelect} onSkip={handleMoodSkip} />
+                  <MoodCheck onSelect={handleMoodSelect} onSkip={handleMoodSkip} variant="before" />
                 </RevealSection>
               )}
 
@@ -309,6 +309,13 @@ export default function PauseSession() {
                   reflectionMessage={message}
                 />
               </RevealSection>
+
+              {/* Mood check-in (after grounding) */}
+              {!moodAfterDone && (
+                <RevealSection>
+                  <MoodCheck onSelect={handleMoodAfterSelect} onSkip={handleMoodAfterSkip} variant="after" />
+                </RevealSection>
+              )}
 
               {/* Decision */}
               <RevealSection>
