@@ -8,7 +8,6 @@ import { fetchBtcData, type BtcPriceData } from '@/lib/btc';
 import { playBlockDiscoveryTone, startAmbientDrone } from '@/lib/notification-tone';
 
 type VolatilityLevel = 'calm' | 'moderate' | 'intense';
-type Mode = 'ambient' | 'void';
 
 function getVolatilityLevel(changePercent: number): VolatilityLevel {
   const abs = Math.abs(changePercent);
@@ -49,10 +48,9 @@ interface BlockData {
   mempoolPending: number;
   lastBlockTime?: number;
   fastestFee?: number;
-  difficultyEpochProgress?: number; // 0-1 progress through 2016-block epoch
+  difficultyEpochProgress?: number;
 }
 
-/** Fetch latest block height, mempool info, fees, and last block time */
 async function fetchBlockData(): Promise<BlockData | null> {
   try {
     const [heightRes, mempoolRes, blocksRes, feesRes] = await Promise.all([
@@ -95,8 +93,9 @@ function formatNumber(n: number): string {
 }
 
 /** Mempool visualization — pending transactions settling */
-function MempoolViz({ level, pending }: { level: VolatilityLevel; pending: number }) {
+function MempoolViz({ level, pending, depth }: { level: VolatilityLevel; pending: number; depth: number }) {
   const prefersReduced = useReducedMotion();
+
   const dots = useMemo(() => {
     const count = Math.min(Math.max(Math.floor(pending / 3000), 6), 30);
     return Array.from({ length: count }, (_, i) => ({
@@ -110,6 +109,9 @@ function MempoolViz({ level, pending }: { level: VolatilityLevel; pending: numbe
   }, [pending]);
 
   if (prefersReduced) return null;
+
+  // Reduce particle opacity as we go deeper
+  const particleOpacity = Math.max(0.8 - depth * 0.5, 0.15);
 
   return (
     <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -125,7 +127,7 @@ function MempoolViz({ level, pending }: { level: VolatilityLevel; pending: numbe
             background: glowColors[level],
           }}
           animate={{
-            opacity: [0, 0.8, 0],
+            opacity: [0, particleOpacity, 0],
             y: [0, -30, -60],
             scale: [0.8, 1, 0.3],
           }}
@@ -150,12 +152,12 @@ function EpochArc({ progress, color }: { progress: number; color: string }) {
       width="160" height="160"
       className="absolute pointer-events-none"
       initial={{ opacity: 0 }}
-      animate={{ opacity: 0.08 }}
-      transition={{ delay: 8, duration: 3 }}
+      animate={{ opacity: 0.18 }}
+      transition={{ delay: 4, duration: 3 }}
     >
       <circle cx="80" cy="80" r={r} fill="none" stroke={color} strokeWidth="0.5" opacity={0.3} />
       <circle
-        cx="80" cy="80" r={r} fill="none" stroke={color} strokeWidth="0.5"
+        cx="80" cy="80" r={r} fill="none" stroke={color} strokeWidth="0.8"
         strokeLinecap="round"
         strokeDasharray={circumference}
         strokeDashoffset={circumference * (1 - progress)}
@@ -215,7 +217,6 @@ function WordByWordText({ text, delay = 0, color }: { text: string; delay?: numb
   );
 }
 
-/** Format seconds since last block into human-readable */
 function formatTimeSince(seconds: number): string {
   if (seconds < 60) return `${seconds}s`;
   const mins = Math.floor(seconds / 60);
@@ -226,29 +227,38 @@ function formatTimeSince(seconds: number): string {
   return `${hrs}h ${remainMins}m`;
 }
 
+/**
+ * Progressive deepening experience.
+ * depth 0 = ambient surface (breathing, block data, labels)
+ * depth 1 = deep stillness (void — stripped UI, contemplations, blockchain clock)
+ * Tap the center area to descend/ascend.
+ */
 export default function Breathe() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const prefersReducedMotion = useReducedMotion();
 
-  const [mode, setMode] = useState<Mode>('ambient');
   const [btcData, setBtcData] = useState<BtcPriceData | null>(null);
   const [blockData, setBlockData] = useState<BlockData | null>(null);
   const [level, setLevel] = useState<VolatilityLevel>('calm');
   const [curtainLifted, setCurtainLifted] = useState(false);
 
-  // Void state — no timer, blockchain-synced
-  const [voidEntered, setVoidEntered] = useState(false);
+  // Depth: 0 = surface ambient, 1 = deep void
+  const [depth, setDepth] = useState(0);
+  const [deepReady, setDeepReady] = useState(false); // animation settled into deep mode
+
+  // Deep state
   const [contemplationIndex, setContemplationIndex] = useState(0);
   const [timeSinceBlock, setTimeSinceBlock] = useState<number | null>(null);
   const [blockAtEntry, setBlockAtEntry] = useState<number | null>(null);
   const [newBlockMined, setNewBlockMined] = useState(false);
   const [newBlockHeight, setNewBlockHeight] = useState<number | null>(null);
-  const [voidElapsed, setVoidElapsed] = useState(0); // seconds in void for dimming
+  const [deepElapsed, setDeepElapsed] = useState(0);
 
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const contemplationTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const tickRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const stopDroneRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     const timer = setTimeout(() => setCurtainLifted(true), 100);
@@ -285,23 +295,23 @@ export default function Breathe() {
     };
   }, []);
 
-  // Void: tick time-since-last-block every second
+  // Deep: tick time-since-last-block every second
   useEffect(() => {
-    if (mode !== 'void' || !voidEntered) return;
+    if (depth !== 1 || !deepReady) return;
     const tick = () => {
       if (blockData?.lastBlockTime) {
         setTimeSinceBlock(Math.floor(Date.now() / 1000) - blockData.lastBlockTime);
       }
-      setVoidElapsed((prev) => prev + 1);
+      setDeepElapsed((prev) => prev + 1);
     };
     tick();
     tickRef.current = setInterval(tick, 1000);
     return () => { if (tickRef.current) clearInterval(tickRef.current); };
-  }, [mode, voidEntered, blockData?.lastBlockTime]);
+  }, [depth, deepReady, blockData?.lastBlockTime]);
 
-  // Void: poll for new blocks every 15s
+  // Deep: poll for new blocks every 15s
   useEffect(() => {
-    if (mode !== 'void' || !voidEntered) return;
+    if (depth !== 1 || !deepReady) return;
     pollRef.current = setInterval(async () => {
       const fresh = await fetchBlockData();
       if (fresh) {
@@ -315,27 +325,26 @@ export default function Breathe() {
       }
     }, 15_000);
     return () => { if (pollRef.current) clearInterval(pollRef.current); };
-  }, [mode, voidEntered, blockAtEntry, newBlockMined]);
+  }, [depth, deepReady, blockAtEntry, newBlockMined]);
 
-  // Void: cycle contemplations every 12s
+  // Deep: cycle contemplations every 20s
   useEffect(() => {
-    if (mode !== 'void' || !voidEntered) return;
+    if (depth !== 1 || !deepReady) return;
     contemplationTimerRef.current = setInterval(() => {
       setContemplationIndex((prev) => (prev + 1) % VOID_CONTEMPLATIONS[level].length);
     }, 20_000);
     return () => { if (contemplationTimerRef.current) clearInterval(contemplationTimerRef.current); };
-  }, [mode, voidEntered]);
+  }, [depth, deepReady, level]);
 
-  // Void: ambient drone
-  const stopDroneRef = useRef<(() => void) | null>(null);
+  // Deep: ambient drone
   useEffect(() => {
-    if (mode !== 'void' || !voidEntered) return;
+    if (depth !== 1 || !deepReady) return;
     stopDroneRef.current = startAmbientDrone();
     return () => {
       stopDroneRef.current?.();
       stopDroneRef.current = null;
     };
-  }, [mode, voidEntered]);
+  }, [depth, deepReady]);
 
   const handleClose = useCallback(() => {
     [pollRef, contemplationTimerRef, tickRef].forEach((ref) => {
@@ -349,23 +358,28 @@ export default function Breathe() {
     }
   }, [navigate]);
 
-  const enterVoid = useCallback(() => {
-    setVoidEntered(false);
-    setContemplationIndex(0);
-    setNewBlockMined(false);
-    setNewBlockHeight(null);
-    setVoidElapsed(0);
-    setBlockAtEntry(blockData?.height ?? null);
-    setMode('void');
-  }, [blockData]);
-
-  const backToAmbient = useCallback(() => {
-    [pollRef, contemplationTimerRef, tickRef].forEach((ref) => {
-      if (ref.current) clearInterval(ref.current);
-    });
-    stopDroneRef.current?.();
-    setMode('ambient');
-  }, []);
+  const toggleDepth = useCallback(() => {
+    if (depth === 0) {
+      // Descend into stillness
+      hapticFeedback('light');
+      setDeepReady(false);
+      setContemplationIndex(0);
+      setNewBlockMined(false);
+      setNewBlockHeight(null);
+      setDeepElapsed(0);
+      setBlockAtEntry(blockData?.height ?? null);
+      setDepth(1);
+    } else {
+      // Surface back
+      hapticFeedback('light');
+      [pollRef, contemplationTimerRef, tickRef].forEach((ref) => {
+        if (ref.current) clearInterval(ref.current);
+      });
+      stopDroneRef.current?.();
+      setDepth(0);
+      setDeepReady(false);
+    }
+  }, [depth, blockData]);
 
   const grad = gradients[level];
   const backgroundStyle = {
@@ -377,6 +391,21 @@ export default function Breathe() {
     moderate: t('ambient.moderate'),
     intense: t('ambient.intense'),
   };
+
+  // Progressive dimming when deep (over 5 min, max 40%)
+  const dimFactor = depth === 1 ? Math.min(deepElapsed / 300, 1) * 0.4 : 0;
+  // Fee warmth
+  const feeHeat = blockData?.fastestFee ? Math.min(blockData.fastestFee / 50, 1) : 0;
+  const warmGlow = feeHeat > 0.1
+    ? `hsla(${35 - feeHeat * 20}, ${50 + feeHeat * 20}%, 50%, ${0.15 + feeHeat * 0.05})`
+    : glowColors[level];
+
+  // Breathing circle scale — shrinks as we go deeper
+  const breatheScale = depth === 0 ? 1 : 0.6;
+  // Surface elements opacity — fade as we descend
+  const surfaceOpacity = depth === 0 ? 1 : 0;
+  // Deep elements opacity
+  const deepOpacity = depth === 1 ? 1 : 0;
 
   return (
     <>
@@ -395,336 +424,284 @@ export default function Breathe() {
         className="fixed inset-0 z-[100] flex flex-col items-center justify-center select-none"
         style={backgroundStyle}
       >
-        {/* Mempool particles */}
-        {blockData && <MempoolViz level={level} pending={blockData.mempoolPending} />}
+        {/* Mempool particles — fade with depth */}
+        {blockData && <MempoolViz level={level} pending={blockData.mempoolPending} depth={depth} />}
+
+        {/* Progressive dimming overlay */}
+        <motion.div
+          className="fixed inset-0 pointer-events-none z-[101]"
+          style={{ background: 'black' }}
+          animate={{ opacity: dimFactor }}
+          transition={{ duration: 2, ease: 'easeInOut' }}
+        />
 
         {/* Close */}
         <button
           onClick={handleClose}
-          className="absolute top-6 right-6 p-2 rounded-full transition-opacity hover:opacity-80 z-10"
+          className="absolute top-6 right-6 p-2 rounded-full transition-opacity hover:opacity-80 z-[110]"
           style={{ color: textColors[level] }}
           aria-label="Exit"
         >
           <X className="h-5 w-5" />
         </button>
 
-        <AnimatePresence mode="wait">
-          {mode === 'ambient' && (
+        {/* Tap target — the entire center area */}
+        <button
+          onClick={toggleDepth}
+          className="relative z-[105] flex flex-col items-center justify-center focus:outline-none"
+          style={{ width: '100%', maxWidth: 400, minHeight: 400 }}
+          aria-label={depth === 0 ? t('void.enter', 'Enter the void') : t('void.return', 'Return')}
+        >
+          {/* ====== BREATHING CIRCLES — always present, shrink when deep ====== */}
+          <motion.div
+            className="relative flex items-center justify-center"
+            animate={{ scale: breatheScale }}
+            transition={{ duration: 3, ease: [0.22, 1, 0.36, 1] }}
+          >
+            {/* Outer glow ring */}
             <motion.div
-              key="ambient"
-              className="flex flex-col items-center"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.8 }}
-            >
-              {/* Breathing circles */}
-              <div className="relative flex items-center justify-center">
-                {/* Outer glow ring */}
-                <motion.div
-                  className="absolute rounded-full"
-                  style={{
-                    width: 220,
-                    height: 220,
-                    background: `radial-gradient(circle, ${glowColors[level]}, transparent 70%)`,
-                  }}
-                  animate={prefersReducedMotion ? { scale: 1, opacity: 0.15 } : {
-                    scale: [1, 1.25, 1],
-                    opacity: [0.1, 0.2, 0.1],
-                  }}
-                  transition={{
-                    duration: BREATH_DURATION,
-                    repeat: Infinity,
-                    ease: 'easeInOut',
-                    delay: 0.3,
-                  }}
-                />
+              className="absolute rounded-full"
+              style={{
+                width: 220,
+                height: 220,
+                background: `radial-gradient(circle, ${depth === 1 ? warmGlow : glowColors[level]}, transparent 70%)`,
+                filter: depth === 1 ? 'blur(80px)' : 'none',
+              }}
+              animate={prefersReducedMotion ? { scale: 1, opacity: 0.15 } : {
+                scale: [1, 1.25, 1],
+                opacity: [0.1, 0.2, 0.1],
+              }}
+              transition={{
+                duration: depth === 1 && btcData?.onChain?.hashrate ? 8 : BREATH_DURATION,
+                repeat: Infinity,
+                ease: 'easeInOut',
+                delay: 0.3,
+              }}
+            />
 
-                {/* Main breathing circle */}
-                <motion.div
-                  className="relative rounded-full flex items-center justify-center"
-                  style={{
-                    width: 140,
-                    height: 140,
-                    border: `1px solid ${ringColors[level]}`,
-                    background: `radial-gradient(circle at 50% 40%, ${glowColors[level]}, transparent 80%)`,
-                    boxShadow: `0 0 60px 20px ${glowColors[level]}`,
-                  }}
-                  animate={prefersReducedMotion ? { scale: 1, opacity: 0.4 } : {
-                    scale: [1, 1.15, 1],
-                    opacity: [0.3, 0.5, 0.3],
-                  }}
-                  transition={{
-                    duration: BREATH_DURATION,
-                    repeat: Infinity,
-                    ease: 'easeInOut',
-                  }}
-                >
-                  {blockData && (
-                    <span
-                      className="font-mono text-[11px] tabular-nums tracking-wider"
-                      style={{ color: textColors[level], opacity: 0.5 }}
-                    >
-                      {blockData.height.toLocaleString()}
-                    </span>
-                  )}
-                </motion.div>
-              </div>
-
-              {/* Labels */}
-              <div className="mt-14 text-center space-y-4">
-                <p
-                  className="text-[10px] font-mono tracking-[0.3em] uppercase"
-                  style={{ color: textColors[level] }}
-                >
-                  {labelMap[level]}
-                </p>
-
-                {blockData && (
-                  <motion.p
-                    className="text-[10px] font-mono leading-relaxed max-w-[240px]"
-                    style={{ color: textColors[level], opacity: 0.35 }}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 0.35 }}
-                    transition={{ delay: 2, duration: 1.5 }}
-                  >
-                    {t('breathe.blockGrounding', 'Block {{height}}. Immutable. Like this moment.', { height: blockData.height.toLocaleString() })}
-                  </motion.p>
-                )}
-
-                {blockData && blockData.mempoolPending > 0 && (
-                  <motion.p
-                    className="text-[9px] font-mono tabular-nums"
-                    style={{ color: textColors[level], opacity: 0.2 }}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 0.2 }}
-                    transition={{ delay: 3.5, duration: 1.5 }}
-                  >
-                    {formatNumber(blockData.mempoolPending)} {t('breathe.pendingTx', 'transactions waiting to confirm')}
-                  </motion.p>
-                )}
-              </div>
-
-              {/* Enter the void */}
-              <div className="mt-12 flex flex-col items-center gap-4">
-                <button
-                  onClick={enterVoid}
-                  className="text-[10px] font-mono tracking-[0.2em] uppercase transition-opacity hover:opacity-80"
-                  style={{ color: textColors[level], opacity: 0.4 }}
-                >
-                  {t('void.enter', 'Enter the void')}
-                </button>
-              </div>
-
-              {/* Breathing instruction */}
-              <p
-                className="absolute bottom-12 text-[9px] font-mono tracking-[0.2em] uppercase"
-                style={{ color: textColors[level], opacity: 0.3 }}
-              >
-                {t('ambient.breathe')}
-              </p>
-            </motion.div>
-          )}
-
-          {mode === 'void' && (() => {
-            // Progressive dimming: darken over 5 minutes (300s), max 40% darker
-            const dimFactor = Math.min(voidElapsed / 300, 1) * 0.4;
-            // Fee pressure warmth: shift glow hue warmer when fees > 20 sat/vB
-            const feeHeat = blockData?.fastestFee ? Math.min(blockData.fastestFee / 50, 1) : 0;
-            const warmGlow = feeHeat > 0.1
-              ? `hsla(${35 - feeHeat * 20}, ${50 + feeHeat * 20}%, 50%, ${0.15 + feeHeat * 0.05})`
-              : glowColors[level];
-
-            return (
+            {/* Main breathing circle */}
             <motion.div
-              key="void"
-              className="flex flex-col items-center gap-10"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1.2 }}
-              onAnimationComplete={() => !voidEntered && setVoidEntered(true)}
+              className="relative rounded-full flex items-center justify-center"
+              style={{
+                width: 140,
+                height: 140,
+                border: `1px solid ${ringColors[level]}`,
+                background: `radial-gradient(circle at 50% 40%, ${glowColors[level]}, transparent 80%)`,
+                boxShadow: `0 0 60px 20px ${glowColors[level]}`,
+              }}
+              animate={prefersReducedMotion ? { scale: 1, opacity: 0.4 } : {
+                scale: [1, 1.15, 1],
+                opacity: [0.3, 0.5, 0.3],
+              }}
+              transition={{
+                duration: BREATH_DURATION,
+                repeat: Infinity,
+                ease: 'easeInOut',
+              }}
             >
-              {/* Progressive dimming overlay */}
-              <motion.div
-                className="fixed inset-0 pointer-events-none"
-                style={{ background: 'black' }}
-                animate={{ opacity: dimFactor }}
-                transition={{ duration: 2, ease: 'easeInOut' }}
-              />
-
-              {/* Ambient glow — pulse speed loosely tied to network energy */}
-              <motion.div
-                className="absolute rounded-full pointer-events-none"
-                style={{
-                  width: 350,
-                  height: 350,
-                  background: `radial-gradient(circle, ${warmGlow}, transparent 70%)`,
-                  filter: 'blur(80px)',
-                }}
-                animate={prefersReducedMotion ? { opacity: 0.3 } : {
-                  scale: [1, 1.08, 1],
-                  opacity: [0.2, 0.35, 0.2],
-                }}
-                transition={{
-                  // Hashrate pulse: faster when network energy is high (conceptual ~8-12s range)
-                  duration: btcData?.onChain?.hashrate ? 8 : 10,
-                  repeat: Infinity,
-                  ease: 'easeInOut',
-                }}
-              />
-
-              {/* Difficulty epoch progress arc */}
-              {blockData?.difficultyEpochProgress != null && (
-                <EpochArc progress={blockData.difficultyEpochProgress} color={textColors[level]} />
+              {blockData && (
+                <span
+                  className="font-mono text-[11px] tabular-nums tracking-wider"
+                  style={{ color: textColors[level], opacity: 0.5 }}
+                >
+                  {blockData.height.toLocaleString()}
+                </span>
               )}
+            </motion.div>
 
-              {/* Block height — the only clock */}
+            {/* Epoch arc — visible at all depths */}
+            {blockData?.difficultyEpochProgress != null && (
+              <EpochArc progress={blockData.difficultyEpochProgress} color={textColors[level]} />
+            )}
+          </motion.div>
+
+          {/* ====== SURFACE LAYER — fades out when descending ====== */}
+          <motion.div
+            className="flex flex-col items-center mt-14 text-center space-y-4"
+            animate={{ opacity: surfaceOpacity, y: surfaceOpacity === 0 ? 20 : 0 }}
+            transition={{ duration: 2, ease: 'easeInOut' }}
+            style={{ pointerEvents: depth === 0 ? 'auto' : 'none' }}
+          >
+            <p
+              className="text-[10px] font-mono tracking-[0.3em] uppercase"
+              style={{ color: textColors[level] }}
+            >
+              {labelMap[level]}
+            </p>
+
+            {blockData && (
+              <motion.p
+                className="text-[10px] font-mono leading-relaxed max-w-[240px]"
+                style={{ color: textColors[level], opacity: 0.35 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: surfaceOpacity * 0.35 }}
+                transition={{ delay: 2, duration: 1.5 }}
+              >
+                {t('breathe.blockGrounding', 'Block {{height}}. Immutable. Like this moment.', { height: blockData.height.toLocaleString() })}
+              </motion.p>
+            )}
+
+            {blockData && blockData.mempoolPending > 0 && (
+              <motion.p
+                className="text-[9px] font-mono tabular-nums"
+                style={{ color: textColors[level], opacity: 0.2 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: surfaceOpacity * 0.2 }}
+                transition={{ delay: 3.5, duration: 1.5 }}
+              >
+                {formatNumber(blockData.mempoolPending)} {t('breathe.pendingTx', 'transactions waiting to confirm')}
+              </motion.p>
+            )}
+
+            {/* Hint to go deeper */}
+            <motion.p
+              className="text-[9px] font-mono tracking-[0.2em] uppercase mt-8"
+              style={{ color: textColors[level], opacity: 0.25 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.25 }}
+              transition={{ delay: 5, duration: 2 }}
+            >
+              {t('void.tapToDescend', 'tap to go deeper')}
+            </motion.p>
+          </motion.div>
+
+          {/* ====== DEEP LAYER — fades in when descending ====== */}
+          <motion.div
+            className="absolute flex flex-col items-center gap-6"
+            style={{ top: '60%', pointerEvents: depth === 1 ? 'auto' : 'none' }}
+            animate={{ opacity: deepOpacity }}
+            transition={{ duration: 2.5, ease: 'easeInOut', delay: depth === 1 ? 1.5 : 0 }}
+            onAnimationComplete={() => {
+              if (depth === 1 && !deepReady) setDeepReady(true);
+            }}
+          >
+            {/* Time since last block */}
+            {timeSinceBlock !== null && (
               <motion.div
-                className="relative z-10 flex flex-col items-center gap-3"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.5, duration: 1.5, ease: 'easeOut' }}
+                className="flex flex-col items-center gap-1"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 1, duration: 1.5 }}
               >
                 <p
-                  className="font-mono text-3xl tracking-[0.15em] tabular-nums"
-                  style={{ color: textColors[level], opacity: Math.max(0.35 - dimFactor * 0.3, 0.1) }}
+                  className="font-mono text-sm tabular-nums tracking-wider"
+                  style={{ color: textColors[level], opacity: 0.25 }}
                 >
-                  {blockData?.height.toLocaleString() ?? '···'}
+                  {formatTimeSince(timeSinceBlock)}
+                </p>
+                <p
+                  className="font-mono text-[8px] tracking-[0.2em] uppercase"
+                  style={{ color: textColors[level], opacity: 0.15 }}
+                >
+                  {t('void.sinceLastBlock', 'since last block')}
                 </p>
                 <motion.p
-                  className="font-mono text-[8px] tracking-[0.3em] uppercase"
-                  style={{ color: textColors[level], opacity: 0.2 }}
+                  className="font-mono text-[7px] tracking-[0.15em] italic"
+                  style={{ color: textColors[level], opacity: 0.12 }}
                   initial={{ opacity: 0 }}
-                  animate={{ opacity: 0.2 }}
-                  transition={{ delay: 2, duration: 1 }}
-                >
-                  {t('void.currentBlock', 'current block')}
-                </motion.p>
-              </motion.div>
-
-              {/* Time since last block — ticking with blockchain time */}
-              {timeSinceBlock !== null && (
-                <motion.div
-                  className="relative z-10 flex flex-col items-center gap-1"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
+                  animate={{ opacity: 0.12 }}
                   transition={{ delay: 3, duration: 1.5 }}
                 >
-                  <p
-                    className="font-mono text-sm tabular-nums tracking-wider"
-                    style={{ color: textColors[level], opacity: 0.25 }}
-                  >
-                    {formatTimeSince(timeSinceBlock)}
-                  </p>
-                  <p
-                    className="font-mono text-[8px] tracking-[0.2em] uppercase"
-                    style={{ color: textColors[level], opacity: 0.15 }}
-                  >
-                    {t('void.sinceLastBlock', 'since last block')}
-                  </p>
-                  <motion.p
-                    className="font-mono text-[7px] tracking-[0.15em] italic"
-                    style={{ color: textColors[level], opacity: 0.12 }}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 0.12 }}
-                    transition={{ delay: 5, duration: 1.5 }}
-                  >
-                    {timeSinceBlock > 1200
-                      ? t('void.longWait', 'patience — the network is searching')
-                      : timeSinceBlock > 900
-                        ? t('void.searching', 'the network is searching')
-                        : t('void.typical', 'typical: ~10 min')}
-                  </motion.p>
-                </motion.div>
-              )}
-
-              {/* Fee pressure indicator */}
-              {feeHeat > 0.2 && (
-                <motion.p
-                  className="relative z-10 font-mono text-[7px] tracking-[0.15em]"
-                  style={{ color: textColors[level], opacity: 0.1 }}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 0.1 }}
-                  transition={{ delay: 10, duration: 2 }}
-                >
-                  {t('void.feePressure', 'fee pressure: {{fee}} sat/vB', { fee: blockData?.fastestFee })}
+                  {timeSinceBlock > 1200
+                    ? t('void.longWait', 'patience — the network is searching')
+                    : timeSinceBlock > 900
+                      ? t('void.searching', 'the network is searching')
+                      : t('void.typical', 'typical: ~10 min')}
                 </motion.p>
-              )}
+              </motion.div>
+            )}
 
-              {/* New block mined — reverent moment */}
-              <AnimatePresence>
-                {newBlockMined && newBlockHeight && (
-                  <motion.div
-                    className="relative z-10 flex flex-col items-center gap-3"
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={{ duration: 2, ease: 'easeOut' }}
-                  >
-                    <motion.div
-                      className="w-2 h-2 rounded-full"
-                      style={{ background: textColors[level] }}
-                      animate={{ scale: [1, 1.8, 1], opacity: [0.6, 0.3, 0.6] }}
-                      transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
-                    />
-                    <p
-                      className="font-mono text-[10px] tracking-[0.2em] text-center max-w-[220px] leading-relaxed"
-                      style={{ color: textColors[level], opacity: 0.45 }}
-                    >
-                      {t('void.blockMined', 'A new block was found. {{height}}. Time moved forward.', { height: newBlockHeight.toLocaleString() })}
-                    </p>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+            {/* Fee pressure */}
+            {feeHeat > 0.2 && (
+              <motion.p
+                className="font-mono text-[7px] tracking-[0.15em]"
+                style={{ color: textColors[level], opacity: 0.1 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 0.1 }}
+                transition={{ delay: 8, duration: 2 }}
+              >
+                {t('void.feePressure', 'fee pressure: {{fee}} sat/vB', { fee: blockData?.fastestFee })}
+              </motion.p>
+            )}
 
-              {/* Contemplative text — word by word */}
-              {voidEntered && (
+            {/* New block mined */}
+            <AnimatePresence>
+              {newBlockMined && newBlockHeight && (
                 <motion.div
-                  key={contemplationIndex}
-                  className="relative z-10 mt-4"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
+                  className="flex flex-col items-center gap-3"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
                   exit={{ opacity: 0 }}
-                  transition={{ duration: 0.8 }}
+                  transition={{ duration: 2, ease: 'easeOut' }}
                 >
-                  <WordByWordText
-                    text={VOID_CONTEMPLATIONS[level][contemplationIndex % VOID_CONTEMPLATIONS[level].length]}
-                    delay={0.5}
-                    color={textColors[level]}
+                  <motion.div
+                    className="w-2 h-2 rounded-full"
+                    style={{ background: textColors[level] }}
+                    animate={{ scale: [1, 1.8, 1], opacity: [0.6, 0.3, 0.6] }}
+                    transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
                   />
+                  <p
+                    className="font-mono text-[10px] tracking-[0.2em] text-center max-w-[220px] leading-relaxed"
+                    style={{ color: textColors[level], opacity: 0.45 }}
+                  >
+                    {t('void.blockMined', 'A new block was found. {{height}}. Time moved forward.', { height: newBlockHeight.toLocaleString() })}
+                  </p>
                 </motion.div>
               )}
+            </AnimatePresence>
 
-              {/* Epoch progress label */}
-              {blockData?.difficultyEpochProgress != null && (
-                <motion.p
-                  className="relative z-10 font-mono text-[7px] tracking-[0.15em]"
-                  style={{ color: textColors[level], opacity: 0.08 }}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 0.08 }}
-                  transition={{ delay: 12, duration: 3 }}
-                >
-                  {t('void.epoch', 'epoch {{pct}}%', { pct: Math.round(blockData.difficultyEpochProgress * 100) })}
-                </motion.p>
-              )}
+            {/* Contemplative text */}
+            {deepReady && (
+              <motion.div
+                key={contemplationIndex}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.8 }}
+              >
+                <WordByWordText
+                  text={VOID_CONTEMPLATIONS[level][contemplationIndex % VOID_CONTEMPLATIONS[level].length]}
+                  delay={0.5}
+                  color={textColors[level]}
+                />
+              </motion.div>
+            )}
 
-              {/* Return — when you're ready */}
-              <motion.button
-                onClick={backToAmbient}
-                className="relative z-10 font-mono text-[9px] tracking-[0.2em] uppercase transition-colors duration-700 mt-6"
+            {/* Epoch progress label */}
+            {blockData?.difficultyEpochProgress != null && (
+              <motion.p
+                className="font-mono text-[7px] tracking-[0.15em]"
                 style={{ color: textColors[level], opacity: 0.15 }}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 0.15 }}
-                transition={{ delay: 6, duration: 2 }}
-                whileHover={{ opacity: 0.4 }}
+                transition={{ delay: 10, duration: 3 }}
               >
-                {t('void.return')}
-              </motion.button>
-            </motion.div>
-            );
-          })()}
-        </AnimatePresence>
+                {t('void.epoch', 'epoch {{pct}}%', { pct: Math.round(blockData.difficultyEpochProgress * 100) })}
+              </motion.p>
+            )}
+
+            {/* Hint to surface */}
+            <motion.p
+              className="font-mono text-[8px] tracking-[0.2em] uppercase"
+              style={{ color: textColors[level], opacity: 0.1 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 0.1 }}
+              transition={{ delay: 6, duration: 2 }}
+            >
+              {t('void.tapToSurface', 'tap to surface')}
+            </motion.p>
+          </motion.div>
+        </button>
+
+        {/* Breathing instruction — surface only */}
+        <motion.p
+          className="absolute bottom-12 text-[9px] font-mono tracking-[0.2em] uppercase z-[105]"
+          style={{ color: textColors[level], opacity: 0.3 }}
+          animate={{ opacity: surfaceOpacity * 0.3 }}
+          transition={{ duration: 2 }}
+        >
+          {t('ambient.breathe')}
+        </motion.p>
       </div>
     </>
   );
