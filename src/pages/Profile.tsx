@@ -295,7 +295,16 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
     return [...reflectionMoods, ...checkinMoods];
   }, [reflections, practiceEntries]);
 
-  
+  const practiceDays = useMemo(() => {
+    const last30 = new Date();
+    last30.setDate(last30.getDate() - 30);
+    return new Set(
+      practiceEntries
+        .filter(p => new Date(p.created_at) >= last30)
+        .map(p => new Date(p.created_at).toISOString().slice(0, 10))
+    ).size;
+  }, [practiceEntries]);
+
 
   const practiceStats = useMemo(() => {
     if (practiceEntries.length === 0) return null;
