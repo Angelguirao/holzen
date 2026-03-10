@@ -295,7 +295,16 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
     return [...reflectionMoods, ...checkinMoods];
   }, [reflections, practiceEntries]);
 
-  
+  const practiceDays = useMemo(() => {
+    const last30 = new Date();
+    last30.setDate(last30.getDate() - 30);
+    return new Set(
+      practiceEntries
+        .filter(p => new Date(p.created_at) >= last30)
+        .map(p => new Date(p.created_at).toISOString().slice(0, 10))
+    ).size;
+  }, [practiceEntries]);
+
 
   const practiceStats = useMemo(() => {
     if (practiceEntries.length === 0) return null;
@@ -343,7 +352,7 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
               moodCounts={moodCounts}
             />
           </div>
-          {scoreData ? <HolzenScoreDetail scoreData={scoreData} /> : (
+          {scoreData ? <HolzenScoreDetail scoreData={scoreData} practiceDays={practiceDays} /> : (
             <ChartEmptyState
               title={t('profile.holzenScore')}
               message={t('profile.holzenScoreEmpty')}
@@ -366,7 +375,7 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
   );
 }
 
-function HolzenScoreDetail({ scoreData }: { scoreData: import('@/hooks/use-holzen-score').HolzenScoreData }) {
+function HolzenScoreDetail({ scoreData, practiceDays }: { scoreData: import('@/hooks/use-holzen-score').HolzenScoreData; practiceDays: number }) {
   const { t } = useTranslation();
   const circumference = 2 * Math.PI * 36;
   const offset = circumference - (scoreData.score / 100) * circumference;
@@ -388,19 +397,26 @@ function HolzenScoreDetail({ scoreData }: { scoreData: import('@/hooks/use-holze
           <ScoreBarInline label={t('profile.moodLabel')} value={scoreData.moodScore} />
           <ScoreBarInline label={t('profile.actionsLabel')} value={scoreData.outcomeScore} />
           <ScoreBarInline label={t('profile.streakLabel')} value={scoreData.streakScore} />
-          <ScoreBarInline label={t('profile.practiceLabel')} value={scoreData.practiceScore} />
+          <ScoreBarInline
+            label={t('profile.practiceLabel')}
+            value={scoreData.practiceScore}
+            detail={t('holzenScore.practiceDays', '{{count}} days this month', { count: practiceDays })}
+          />
         </div>
       </div>
     </div>
   );
 }
 
-function ScoreBarInline({ label, value }: { label: string; value: number }) {
+function ScoreBarInline({ label, value, detail }: { label: string; value: number; detail?: string }) {
   return (
     <div className="space-y-0.5">
       <div className="flex justify-between text-[10px] font-mono text-muted-foreground">
         <span>{label}</span>
-        <span>{value}</span>
+        <span className="flex items-center gap-1.5">
+          {detail && <span className="text-muted-foreground/40">{detail}</span>}
+          <span>{value}</span>
+        </span>
       </div>
       <div className="h-1 rounded-full bg-muted/50 overflow-hidden">
         <div className="h-full rounded-full bg-primary/60 transition-all duration-700 ease-out" style={{ width: `${value}%` }} />

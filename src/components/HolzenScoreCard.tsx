@@ -9,23 +9,32 @@ export function HolzenScoreCard() {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [reflections, setReflections] = useState<{ created_at: string; mood: string | null; outcome: string | null }[]>([]);
+  const [practiceEntries, setPracticeEntries] = useState<{ created_at: string; type: string; mood: string | null }[]>([]);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     if (!user) return;
-    supabase
-      .from('reflections')
-      .select('created_at, mood, outcome')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .limit(100)
-      .then(({ data }) => {
-        setReflections(data ?? []);
-        setLoaded(true);
-      });
+    Promise.all([
+      supabase
+        .from('reflections')
+        .select('created_at, mood, outcome')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(100),
+      supabase
+        .from('practice_entries')
+        .select('created_at, type, mood')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(200),
+    ]).then(([refRes, pracRes]) => {
+      setReflections(refRes.data ?? []);
+      setPracticeEntries((pracRes.data as any[]) ?? []);
+      setLoaded(true);
+    });
   }, [user]);
 
-  const scoreData = useHolzenScore(reflections);
+  const scoreData = useHolzenScore(reflections, [], practiceEntries);
 
   if (!loaded || !scoreData) return null;
 
@@ -38,6 +47,15 @@ export function HolzenScoreCard() {
 
   const circumference = 2 * Math.PI * 36;
   const offset = circumference - (scoreData.score / 100) * circumference;
+
+  // Compute practice days for context label
+  const last30 = new Date();
+  last30.setDate(last30.getDate() - 30);
+  const practiceDays = new Set(
+    practiceEntries
+      .filter(p => new Date(p.created_at) >= last30)
+      .map(p => new Date(p.created_at).toISOString().slice(0, 10))
+  ).size;
 
   return (
     <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3">
@@ -70,6 +88,11 @@ export function HolzenScoreCard() {
           <ScoreBar label={t('holzenScore.mood')} value={scoreData.moodScore} />
           <ScoreBar label={t('holzenScore.actions')} value={scoreData.outcomeScore} />
           <ScoreBar label={t('holzenScore.streak')} value={scoreData.streakScore} />
+          <ScoreBar
+            label={t('holzenScore.practice', 'Practice')}
+            value={scoreData.practiceScore}
+            detail={t('holzenScore.practiceDays', '{{count}} days this month', { count: practiceDays })}
+          />
         </div>
       </div>
 
@@ -80,12 +103,15 @@ export function HolzenScoreCard() {
   );
 }
 
-function ScoreBar({ label, value }: { label: string; value: number }) {
+function ScoreBar({ label, value, detail }: { label: string; value: number; detail?: string }) {
   return (
     <div className="space-y-0.5">
       <div className="flex justify-between text-[10px] font-mono text-muted-foreground">
         <span>{label}</span>
-        <span>{value}</span>
+        <span className="flex items-center gap-1.5">
+          {detail && <span className="text-muted-foreground/40">{detail}</span>}
+          <span>{value}</span>
+        </span>
       </div>
       <div className="h-1 rounded-full bg-muted/50 overflow-hidden">
         <div
