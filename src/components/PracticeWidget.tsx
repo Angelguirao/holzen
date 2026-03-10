@@ -155,7 +155,7 @@ export function PracticeWidget() {
           {t('practice.intro')}
         </p>
         <span className="text-[10px] font-mono text-muted-foreground/40 shrink-0">
-          {weeklyCount}/7
+          {weeklyCount >= 7 ? '✓ 7' : `${weeklyCount}/7`}
         </span>
       </div>
 
@@ -165,7 +165,7 @@ export function PracticeWidget() {
           <div
             key={i}
             className={`h-1 flex-1 rounded-full transition-colors ${
-              i < weeklyCount ? 'bg-primary/40' : 'bg-border/30'
+              i < Math.min(weeklyCount, 7) ? 'bg-primary/40' : 'bg-border/30'
             }`}
           />
         ))}
