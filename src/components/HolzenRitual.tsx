@@ -1,6 +1,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Check, ChevronRight, Sparkles, Wand2 } from 'lucide-react';
+import { X, Check, ChevronRight, Sparkles, Wand2, Zap } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { hapticFeedback } from '@/lib/haptics';
 import { supabase } from '@/integrations/supabase/client';
@@ -13,6 +13,7 @@ import {
 } from './ritual';
 import { STEP_REGISTRY, PRESET_TEMPLATES, type StepData } from './ritual/stepRegistry';
 import { RitualBuilder } from './RitualBuilder';
+import { MoodCheck, type MoodValue } from './MoodCheck';
 
 interface SavedTemplate {
   id: string;
@@ -31,17 +32,19 @@ interface HolzenRitualProps {
   /** If provided, skip template selection and use these steps */
   initialSteps?: StepData[];
   initialTemplateName?: string;
+  /** Quick-start: skip template selection and use default ritual */
+  quickStart?: boolean;
 }
 
 export function HolzenRitual({
   open, onClose, reflectionMessage, reflectionId, onDecision,
-  initialSteps, initialTemplateName,
+  initialSteps, initialTemplateName, quickStart,
 }: HolzenRitualProps) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { mantra, motivations } = useHolzen();
 
-  const [phase, setPhase] = useState<'select' | 'build' | 'run' | 'ai-loading'>('select');
+  const [phase, setPhase] = useState<'mood-before' | 'select' | 'build' | 'run' | 'ai-loading' | 'mood-after'>('mood-before');
   const [steps, setSteps] = useState<StepData[]>([]);
   const [templateName, setTemplateName] = useState('');
   const [currentStep, setCurrentStep] = useState(0);
@@ -53,6 +56,8 @@ export function HolzenRitual({
   const [savedTemplates, setSavedTemplates] = useState<SavedTemplate[]>([]);
   const [loadingTemplates, setLoadingTemplates] = useState(true);
   const startTimeRef = useRef<number>(Date.now());
+  const [moodBefore, setMoodBefore] = useState<MoodValue | null>(null);
+  const [moodAfter, setMoodAfter] = useState<MoodValue | null>(null);
 
   const hasMantra = !!(mantra || motivations.length > 0);
 
@@ -75,10 +80,21 @@ export function HolzenRitual({
     if (open && initialSteps) {
       setSteps(initialSteps);
       setTemplateName(initialTemplateName || 'Custom');
-      setPhase('run');
+      setPhase('mood-before');
       startTimeRef.current = Date.now();
     }
   }, [open, initialSteps, initialTemplateName]);
+
+  // Quick-start: use default "standard" preset
+  useEffect(() => {
+    if (open && quickStart && !initialSteps) {
+      const std = PRESET_TEMPLATES.find((p) => p.id === 'standard')!;
+      setSteps([...std.steps] as StepData[]);
+      setTemplateName('standard');
+      setPhase('mood-before');
+      startTimeRef.current = Date.now();
+    }
+  }, [open, quickStart, initialSteps]);
 
   // Mantra at start of run
   useEffect(() => {
@@ -134,12 +150,41 @@ export function HolzenRitual({
     setDecision(d);
     onDecision?.(d, journalText);
     persistCompletion(d, journalText);
-    setCompleted(true);
     hapticFeedback('success');
+    // Go to post-ritual mood check instead of immediately completing
+    setPhase('mood-after');
   }, [onDecision, journalText, persistCompletion]);
 
+  const handleMoodBefore = useCallback((mood: MoodValue) => {
+    hapticFeedback('light');
+    setMoodBefore(mood);
+    if (steps.length > 0) {
+      setPhase('run');
+    } else {
+      setPhase('select');
+    }
+  }, [steps.length]);
+
+  const handleMoodBeforeSkip = useCallback(() => {
+    if (steps.length > 0) {
+      setPhase('run');
+    } else {
+      setPhase('select');
+    }
+  }, [steps.length]);
+
+  const handleMoodAfter = useCallback((mood: MoodValue) => {
+    hapticFeedback('light');
+    setMoodAfter(mood);
+    setCompleted(true);
+  }, []);
+
+  const handleMoodAfterSkip = useCallback(() => {
+    setCompleted(true);
+  }, []);
+
   const handleClose = useCallback(() => {
-    setPhase('select');
+    setPhase('mood-before');
     setCurrentStep(0);
     setCompleted(false);
     setJournalText('');
@@ -147,6 +192,8 @@ export function HolzenRitual({
     setShowMantra(false);
     setSteps([]);
     setStepsCompleted([]);
+    setMoodBefore(null);
+    setMoodAfter(null);
     startTimeRef.current = Date.now();
     onClose();
   }, [onClose]);
@@ -215,6 +262,13 @@ export function HolzenRitual({
 
           <div className="w-full max-w-sm mx-auto px-6 max-h-[80vh] overflow-y-auto">
             <AnimatePresence mode="wait">
+              {/* ===== MOOD BEFORE ===== */}
+              {phase === 'mood-before' && (
+                <motion.div key="mood-before" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-4">
+                  <MoodCheck onSelect={handleMoodBefore} onSkip={handleMoodBeforeSkip} variant="before" />
+                </motion.div>
+              )}
+
               {/* ===== TEMPLATE SELECTION ===== */}
               {phase === 'select' && (
                 <motion.div key="select" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-6">
@@ -345,26 +399,9 @@ export function HolzenRitual({
                     )}
                   </AnimatePresence>
 
-                  {/* Step content */}
+                   {/* Step content */}
                   <AnimatePresence mode="wait">
-                    {completed ? (
-                      <motion.div key="completed" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col items-center gap-6 py-8">
-                        <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
-                          <Check className="h-5 w-5 text-primary" />
-                        </div>
-                        <div className="text-center space-y-2">
-                          <p className="text-sm font-mono">{t('ritualFlow.ritualComplete')}</p>
-                          {decision && (
-                            <p className="text-xs text-muted-foreground">
-                              {t('ritualFlow.decision')}: <span className="text-foreground">{decision}</span>
-                            </p>
-                          )}
-                        </div>
-                        <Button variant="outline" size="sm" onClick={handleClose} className="font-mono text-xs">
-                          {t('ritualFlow.return')}
-                        </Button>
-                      </motion.div>
-                    ) : !showMantra && step ? (
+                    {!showMantra && step ? (
                       <motion.div key={`${step.type}-${currentStep}`} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.3 }}>
                         {step.type === 'breathe' && <RitualBreathing onComplete={advance} />}
                         {step.type === 'reflect' && <RitualReflect message={reflectionMessage} onComplete={advance} />}
@@ -377,6 +414,45 @@ export function HolzenRitual({
                       </motion.div>
                     ) : null}
                   </AnimatePresence>
+                </motion.div>
+              )}
+
+              {/* ===== MOOD AFTER ===== */}
+              {phase === 'mood-after' && (
+                <motion.div key="mood-after" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="space-y-4">
+                  {!completed ? (
+                    <MoodCheck onSelect={handleMoodAfter} onSkip={handleMoodAfterSkip} variant="after" />
+                  ) : (
+                    <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col items-center gap-6 py-8">
+                      <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center">
+                        <Check className="h-5 w-5 text-primary" />
+                      </div>
+                      <div className="text-center space-y-3">
+                        <p className="text-sm font-mono">{t('ritualFlow.ritualComplete')}</p>
+                        {decision && (
+                          <p className="text-xs text-muted-foreground">
+                            {t('ritualFlow.decision')}: <span className="text-foreground capitalize">{decision}</span>
+                          </p>
+                        )}
+                        {moodBefore && moodAfter && (
+                          <div className="flex items-center justify-center gap-3 pt-2">
+                            <div className="text-center">
+                              <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider">{t('moodCheck.before', 'Before')}</p>
+                              <p className="text-xs font-mono text-muted-foreground capitalize">{moodBefore}</p>
+                            </div>
+                            <Zap className="h-3 w-3 text-primary/40" />
+                            <div className="text-center">
+                              <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider">{t('moodCheck.after', 'After')}</p>
+                              <p className="text-xs font-mono text-foreground capitalize">{moodAfter}</p>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                      <Button variant="outline" size="sm" onClick={handleClose} className="font-mono text-xs">
+                        {t('ritualFlow.return')}
+                      </Button>
+                    </motion.div>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>

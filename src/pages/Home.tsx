@@ -45,7 +45,7 @@ import {
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 
 // Widget IDs
-const WIDGET_IDS = ['btc-status', 'hold-goal', 'reflection', 'night', 'letter', 'actions'] as const;
+const WIDGET_IDS = ['btc-status', 'hold-goal', 'reflection', 'night', 'letter', 'practice', 'ritual', 'breathe'] as const;
 type WidgetId = typeof WIDGET_IDS[number];
 
 interface PinnedReflection {
@@ -65,7 +65,9 @@ const Home = () => {
     'reflection': t('home.widget.reflection'),
     'night': t('home.widget.evening'),
     'letter': t('home.widget.letter'),
-    'actions': t('home.widget.practice'),
+    'practice': t('home.widget.practice', 'Practice'),
+    'ritual': t('home.widget.ritual', 'Ritual'),
+    'breathe': t('home.widget.breathe', 'Stillness'),
   };
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -105,6 +107,7 @@ const Home = () => {
 
   const [showTriggerOverlay, setShowTriggerOverlay] = useState(false);
   const [showRitual, setShowRitual] = useState(false);
+  const [ritualQuickStart, setRitualQuickStart] = useState(false);
   const [priceHidden, setPriceHidden] = useState(() => localStorage.getItem('holzen_hide_price') === 'true');
   const [btcMode, setBtcMode] = useState(() => localStorage.getItem('holzen_btc_mode') === 'true');
   const [zenMode] = useState(() => localStorage.getItem('holzen_zen_mode') === 'true');
@@ -461,53 +464,89 @@ const Home = () => {
           </HomeWidget>
         );
 
-      case 'actions':
+      case 'practice':
         return (
           <HomeWidget
-            id="actions"
-            title={WIDGET_TITLES['actions']}
-            collapsed={collapsed['actions']}
-            onToggleCollapse={() => toggleCollapsed('actions')}
+            id="practice"
+            title={WIDGET_TITLES['practice']}
+            collapsed={collapsed['practice']}
+            onToggleCollapse={() => toggleCollapsed('practice')}
           >
-            <div className="space-y-3">
-              {/* Daily practice exercises */}
-              <PracticeWidget />
+            <PracticeWidget />
+          </HomeWidget>
+        );
 
-              {/* Divider */}
-              <div className="border-t border-border/30" />
-
-              {/* Quick actions */}
-              <div className="space-y-2">
+      case 'ritual':
+        return (
+          <HomeWidget
+            id="ritual"
+            title={WIDGET_TITLES['ritual']}
+            collapsed={collapsed['ritual']}
+            onToggleCollapse={() => toggleCollapsed('ritual')}
+          >
+            <div className="space-y-2">
+              <p className="text-[11px] text-muted-foreground/50 leading-relaxed">
+                {t('home.ritualDesc', 'Feeling reactive? Ground yourself before you act.')}
+              </p>
+              <div className="flex gap-2">
                 <button
                   onClick={() => {
                     if (!subscribed) {
                       toast(t('pro.featureLocked'), { description: t('pro.upgradeDesc'), action: { label: t('pro.upgradeCta'), onClick: () => startCheckout() }, duration: 6000 });
                       return;
                     }
+                    setRitualQuickStart(true);
                     setShowRitual(true);
                   }}
-                  className="w-full flex flex-col items-center gap-1.5 py-3 rounded-md border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors duration-300"
+                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-md border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors duration-300"
                 >
-                  <div className="flex items-center gap-2">
-                    {!subscribed && <Lock className="h-3 w-3 text-primary/20" />}
-                    <Sparkles className="h-3 w-3 text-primary/40" />
-                    <span className="text-[10px] font-mono text-primary/40 tracking-[0.2em] uppercase">
-                      {t('home.startARitual')}
-                    </span>
-                    {!subscribed && <span className="text-[8px] font-mono text-primary/30 uppercase tracking-wider">PRO</span>}
-                  </div>
-                  <span className="text-[9px] text-muted-foreground/40">{t('home.ritualHint')}</span>
+                  {!subscribed && <Lock className="h-3 w-3 text-primary/20" />}
+                  <Sparkles className="h-3 w-3 text-primary/40" />
+                  <span className="text-[10px] font-mono text-primary/40 tracking-[0.15em] uppercase">
+                    {t('home.quickStart', 'Quick start')}
+                  </span>
                 </button>
                 <button
-                  onClick={() => navigate('/breathe')}
-                  className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-border/30 bg-muted/10 hover:bg-muted/20 transition-colors duration-500"
+                  onClick={() => {
+                    if (!subscribed) {
+                      toast(t('pro.featureLocked'), { description: t('pro.upgradeDesc'), action: { label: t('pro.upgradeCta'), onClick: () => startCheckout() }, duration: 6000 });
+                      return;
+                    }
+                    setRitualQuickStart(false);
+                    setShowRitual(true);
+                  }}
+                  className="flex items-center justify-center gap-1.5 px-4 py-3 rounded-md border border-border/30 hover:bg-muted/20 transition-colors duration-300"
                 >
-                  <Waves className="h-3 w-3 text-muted-foreground/40" />
-                  <span className="text-[10px] font-mono text-muted-foreground/40 tracking-[0.2em] uppercase">
-                    {t('nav.breathe')}
+                  <span className="text-[10px] font-mono text-muted-foreground/50 tracking-[0.1em] uppercase">
+                    {t('home.chooseRitual', 'Choose')}
                   </span>
                 </button>
               </div>
+            </div>
+          </HomeWidget>
+        );
+
+      case 'breathe':
+        return (
+          <HomeWidget
+            id="breathe"
+            title={WIDGET_TITLES['breathe']}
+            collapsed={collapsed['breathe']}
+            onToggleCollapse={() => toggleCollapsed('breathe')}
+          >
+            <div className="space-y-2">
+              <p className="text-[11px] text-muted-foreground/50 leading-relaxed">
+                {t('home.breatheDesc', 'A quiet space to find stillness. No goals, no tracking.')}
+              </p>
+              <button
+                onClick={() => navigate('/breathe')}
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-border/30 bg-muted/10 hover:bg-muted/20 transition-colors duration-500"
+              >
+                <Waves className="h-3 w-3 text-muted-foreground/40" />
+                <span className="text-[10px] font-mono text-muted-foreground/40 tracking-[0.2em] uppercase">
+                  {t('home.enterStillness', 'Enter stillness')}
+                </span>
+              </button>
             </div>
           </HomeWidget>
         );
@@ -575,9 +614,10 @@ const Home = () => {
       {/* Modals (outside widget flow) */}
       <HolzenRitual
         open={showRitual}
-        onClose={() => setShowRitual(false)}
+        onClose={() => { setShowRitual(false); setRitualQuickStart(false); }}
         reflectionMessage={message ?? undefined}
         reflectionId={lastReflectionId}
+        quickStart={ritualQuickStart}
       />
 
       {/* Trigger overlay */}
