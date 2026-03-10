@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ChartEmptyState } from './ChartEmptyState';
 
 interface ReflectionStats {
   mood: string | null;
