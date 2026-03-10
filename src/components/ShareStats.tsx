@@ -3,17 +3,13 @@ import { useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { toast } from 'sonner';
 import type { HolzenScoreData } from '@/hooks/use-holzen-score';
+import { MOOD_GLYPHS } from '@/components/icons/MoodIcon';
 
 interface Props {
   reflectionCount: number;
   scoreData: HolzenScoreData | null;
   moodCounts: Record<string, number>;
 }
-
-const MOOD_EMOJI: Record<string, string> = {
-  fomo: '🔥', excited: '⚡', greedy: '🤑', anxious: '😰',
-  calm: '🧘', detached: '😶', uncertain: '🤔', fearful: '😨',
-};
 
 function buildShareText({ reflectionCount, scoreData, moodCounts }: Props, t: (k: string, opts?: any) => string): string {
   const lines: string[] = [t('share.myStats')];
@@ -30,8 +26,8 @@ function buildShareText({ reflectionCount, scoreData, moodCounts }: Props, t: (k
     lines.push('');
     lines.push(`${t('share.moodBreakdown')}:`);
     for (const [mood, count] of entries.sort((a, b) => b[1] - a[1])) {
-      const emoji = MOOD_EMOJI[mood] || '•';
-      lines.push(`  ${emoji} ${t(`moodCheck.moods.${mood}`, mood)}: ${count}`);
+      const glyph = MOOD_GLYPHS[mood] || '•';
+      lines.push(`  ${glyph} ${t(`moodCheck.moods.${mood}`, mood)}: ${count}`);
     }
   }
 
