@@ -11,7 +11,7 @@ import { hapticFeedback } from '@/lib/haptics';
 import { type MoodValue } from '@/components/MoodCheck';
 import { type CompanionData, type CompanionPrefs } from '@/components/CompanionSection';
 
-import { PauseProgress, type PauseStep } from '@/components/pause/PauseProgress';
+import { PauseProgress, type PauseStep, STEPS } from '@/components/pause/PauseProgress';
 import { PauseHeader } from '@/components/pause/PauseHeader';
 import { PauseBreathing } from '@/components/pause/PauseBreathing';
 import { PauseReflect } from '@/components/pause/PauseReflect';
@@ -95,6 +95,14 @@ export default function PauseSession() {
     hapticFeedback('light');
     setStep(next);
   }, []);
+
+  const goBack = useCallback(() => {
+    const currentIndex = STEPS.indexOf(step);
+    if (currentIndex > 0) {
+      hapticFeedback('light');
+      setStep(STEPS[currentIndex - 1]);
+    }
+  }, [step]);
 
   const handleMoodSelect = useCallback(async (mood: MoodValue) => {
     hapticFeedback('light');
@@ -227,7 +235,7 @@ export default function PauseSession() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 2, duration: 1 }}
           >
-            <PauseProgress currentStep={step} />
+            <PauseProgress currentStep={step} onStepClick={goToStep} />
           </motion.div>
         )}
 
@@ -270,6 +278,7 @@ export default function PauseSession() {
                       onMoodSkip={handleMoodSkip}
                       moodDone={moodDone}
                       onContinue={() => goToStep('ground')}
+                      onBack={goBack}
                     />
                   </motion.div>
                 )}
@@ -287,13 +296,14 @@ export default function PauseSession() {
                       onMoodAfterSelect={handleMoodAfterSelect}
                       onMoodAfterSkip={handleMoodAfterSkip}
                       onContinue={() => goToStep('decide')}
+                      onBack={goBack}
                     />
                   </motion.div>
                 )}
 
                 {step === 'decide' && (
                   <motion.div key="decide" {...stepTransition}>
-                    <PauseDecide onDecide={handleDecide} />
+                    <PauseDecide onDecide={handleDecide} onBack={goBack} />
                   </motion.div>
                 )}
               </AnimatePresence>
