@@ -392,10 +392,11 @@
     "reflection": {
       "label": "Holzen ile",
       "01title": "Piyasa düşer",
-      "02title": "Nefes alırsınız",
-      "03title": "Düşünürsünüz",
-      "04title": "Bilinçli karar verirsiniz",
-      "05title": "Zamanla büyürsünüz"
+      "02title": "Durursunuz ve hissedersiniz",
+      "03title": "Nefes alırsınız",
+      "04title": "Düşünürsünüz",
+      "05title": "Bilinçli karar verirsiniz",
+      "06title": "Zamanla büyürsünüz"
     },
     "steps": {
       "01title": "Piyasa hareket eder",

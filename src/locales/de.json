@@ -391,10 +391,11 @@
     "reflection": {
       "label": "Mit Holzen",
       "01title": "Der Markt fällt",
-      "02title": "Du atmest",
-      "03title": "Du reflektierst",
-      "04title": "Du entscheidest bewusst",
-      "05title": "Du wächst mit der Zeit"
+      "02title": "Du pausierst & fühlst",
+      "03title": "Du atmest",
+      "04title": "Du reflektierst",
+      "05title": "Du entscheidest bewusst",
+      "06title": "Du wächst mit der Zeit"
     },
     "steps": {
       "01title": "Der Markt bewegt sich",
