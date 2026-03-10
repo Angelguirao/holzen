@@ -320,7 +320,7 @@ export default function Breathe() {
     if (mode !== 'void' || !voidEntered) return;
     contemplationTimerRef.current = setInterval(() => {
       setContemplationIndex((prev) => (prev + 1) % VOID_CONTEMPLATIONS[level].length);
-    }, 12_000);
+    }, 20_000);
     return () => { if (contemplationTimerRef.current) clearInterval(contemplationTimerRef.current); };
   }, [mode, voidEntered]);
 
