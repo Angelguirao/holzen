@@ -135,15 +135,57 @@ export function EmotionalCheckIn({ onComplete, textColor, ringColor }: Props) {
             />
             <div className="flex gap-4">
               <button
-                onClick={save}
-                disabled={saving}
+                onClick={() => setStep('mood-after')}
                 className="text-[10px] font-mono tracking-[0.2em] uppercase"
                 style={{ color: textColor, opacity: 0.8 }}
+              >
+                {t('common.done')}
+              </button>
+              <button
+                onClick={() => { setTrigger(''); setStep('mood-after'); }}
+                className="text-[10px] font-mono tracking-[0.2em] uppercase"
+                style={{ color: textColor, opacity: 0.3 }}
+              >
+                {t('common.skip')}
+              </button>
+            </div>
+          </motion.div>
+        )}
+
+        {step === 'mood-after' && (
+          <motion.div key="mood-after" className="flex flex-col items-center gap-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <p className="text-[10px] font-mono tracking-[0.3em] uppercase" style={{ color: textColor }}>
+              {t('practice.howNow', 'How do you feel now?')}
+            </p>
+            <div className="grid grid-cols-4 gap-3">
+              {MOODS.map((m) => (
+                <button
+                  key={m}
+                  onClick={() => { setMoodAfter(m); hapticFeedback('light'); }}
+                  className="flex flex-col items-center gap-1 p-3 rounded-lg border transition-all hover:scale-105"
+                  style={{
+                    borderColor: moodAfter === m ? ringColor : 'transparent',
+                    background: moodAfter === m ? `${ringColor}` : 'rgba(255,255,255,0.03)',
+                  }}
+                >
+                  <span className="text-xl">{MOOD_EMOJI[m]}</span>
+                  <span className="text-[8px] font-mono uppercase tracking-wider" style={{ color: textColor, opacity: 0.7 }}>
+                    {t(`moods.${m}`)}
+                  </span>
+                </button>
+              ))}
+            </div>
+            <div className="flex gap-4">
+              <button
+                onClick={save}
+                disabled={saving || !moodAfter}
+                className="text-[10px] font-mono tracking-[0.2em] uppercase"
+                style={{ color: textColor, opacity: moodAfter ? 0.8 : 0.3 }}
               >
                 {saving ? t('common.loading') : t('common.done')}
               </button>
               <button
-                onClick={() => { setTrigger(''); save(); }}
+                onClick={() => { setMoodAfter(null); save(); }}
                 disabled={saving}
                 className="text-[10px] font-mono tracking-[0.2em] uppercase"
                 style={{ color: textColor, opacity: 0.3 }}
@@ -157,9 +199,15 @@ export function EmotionalCheckIn({ onComplete, textColor, ringColor }: Props) {
         {step === 'done' && (
           <motion.div key="done" className="flex flex-col items-center gap-4" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}>
             <Check className="h-8 w-8" style={{ color: textColor, opacity: 0.6 }} />
-            <p className="text-[10px] font-mono tracking-[0.3em] uppercase" style={{ color: textColor, opacity: 0.5 }}>
-              {t('practice.checkinSaved')}
-            </p>
+            {mood && moodAfter && mood !== moodAfter ? (
+              <p className="text-[10px] font-mono tracking-[0.2em] uppercase" style={{ color: textColor, opacity: 0.5 }}>
+                {MOOD_EMOJI[mood]} → {MOOD_EMOJI[moodAfter]}
+              </p>
+            ) : (
+              <p className="text-[10px] font-mono tracking-[0.3em] uppercase" style={{ color: textColor, opacity: 0.5 }}>
+                {t('practice.checkinSaved')}
+              </p>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
