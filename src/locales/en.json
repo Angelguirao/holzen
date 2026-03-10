@@ -996,6 +996,10 @@
   },
   "void": {
     "begin": "Begin",
+    "enter": "Enter the void",
+    "currentBlock": "current block",
+    "sinceLastBlock": "since last block",
+    "blockMined": "A new block was found. {{height}}. Time moved forward.",
     "youStayed": "You stayed",
     "return": "Return"
   },
