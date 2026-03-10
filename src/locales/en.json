@@ -134,6 +134,7 @@
     "noReflectionsYet": "No reflections yet. Stats will appear after your first reflection.",
     "overview": "Overview",
     "holzenScore": "Holzen Score",
+    "holzenScoreEmpty": "Record moods and outcomes on reflections to calculate your Holzen Score.",
     "moodLabel": "Mood",
     "actionsLabel": "Actions",
     "streakLabel": "Streak",
@@ -927,14 +928,16 @@
       "mixed": "Mixed",
       "composed": "Composed"
     },
-    "held": "{{percent}}% held"
+    "held": "{{percent}}% held",
+    "emptyMessage": "Reflect during 3 price drops to unlock your volatility tolerance grade."
   },
   "insightsPanel": {
     "title": "Mood & Actions",
     "howYouFelt": "How you felt before reflecting",
     "whatYouDid": "What you did after",
     "basedOn": "Based on {{count}} reflection",
-    "basedOn_other": "Based on {{count}} reflections"
+    "basedOn_other": "Based on {{count}} reflections",
+    "emptyMessage": "Record a mood or outcome on a reflection to see your patterns."
   },
   "decisionQuality": {
     "title": "Decision Quality",
@@ -958,7 +961,8 @@
       "signal": "Signal",
       "zoomOut": "Zoom Out",
       "history": "History"
-    }
+    },
+    "emptyMessage": "Record outcomes on 3 reflections to unlock decision quality insights."
   },
   "holzenScore": {
     "title": "Holzen Score",
@@ -1090,7 +1094,8 @@
       "quick": "Quick",
       "standard": "Standard",
       "deep": "Deep"
-    }
+    },
+    "emptyMessage": "Complete your first ritual to start tracking effectiveness."
   },
   "reflectionNote": {
     "addNote": "Add a note",

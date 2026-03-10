@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { Sparkles, ChevronDown, Zap, Timer, Layers, TrendingUp, TrendingDown } from 'lucide-react';
+import { ChartEmptyState } from './ChartEmptyState';
 import { STEP_REGISTRY } from '@/components/ritual/stepRegistry';
 
 interface RitualCompletion {
@@ -202,7 +203,17 @@ export function RitualStatsCard() {
     };
   }, [completions]);
 
-  if (loading || !stats) return null;
+  if (loading) return null;
+  if (!stats) {
+    return (
+      <ChartEmptyState
+        title={t('ritualStats.title')}
+        message={t('ritualStats.emptyMessage')}
+        current={0}
+        needed={1}
+      />
+    );
+  }
 
   return (
     <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3">

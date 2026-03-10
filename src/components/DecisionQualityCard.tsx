@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Shield, TrendingUp, TrendingDown, Minus, ChevronDown, Wind, BookOpen, Feather, Radio, Eye, History } from 'lucide-react';
+import { ChartEmptyState } from './ChartEmptyState';
 import { useTranslation } from 'react-i18next';
 
 interface Reflection {
@@ -89,7 +90,17 @@ export function DecisionQualityCard({ reflections }: Props) {
     };
   }, [reflections]);
 
-  if (!data) return null;
+  if (!data) {
+    const withOutcome = reflections.filter((r) => r.outcome).length;
+    return (
+      <ChartEmptyState
+        title={t('decisionQuality.title')}
+        message={t('decisionQuality.emptyMessage')}
+        current={withOutcome}
+        needed={3}
+      />
+    );
+  }
 
   const TrendIcon =
     data.trend === 'improving'

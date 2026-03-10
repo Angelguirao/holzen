@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { Activity } from 'lucide-react';
+import { ChartEmptyState } from './ChartEmptyState';
 import { useTranslation } from 'react-i18next';
 
 interface Reflection {
@@ -118,7 +119,20 @@ export function VolatilityToleranceCard({ reflections }: Props) {
     return { buckets, overallScore, gradeKey, gradeColor, descKey, totalDrops: drops.length };
   }, [reflections]);
 
-  if (!data) return null;
+  if (!data) {
+    const dropCount = reflections.filter((r) => {
+      const change = extractChange(r.context);
+      return change !== null && change < 0;
+    }).length;
+    return (
+      <ChartEmptyState
+        title={t('volatility.title')}
+        message={t('volatility.emptyMessage')}
+        current={dropCount}
+        needed={3}
+      />
+    );
+  }
 
   return (
     <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-4">
