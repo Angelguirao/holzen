@@ -60,6 +60,7 @@ export default function PauseSession() {
   const [decision, setDecision] = useState<string | null>(null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [moodDone, setMoodDone] = useState(false);
+  const [moodAfterDone, setMoodAfterDone] = useState(false);
   const [curtainLifted, setCurtainLifted] = useState(false);
 
   // Cinematic entrance: dark curtain fades away after mount
@@ -72,12 +73,24 @@ export default function PauseSession() {
     hapticFeedback('light');
     setMoodDone(true);
     if (reflectionId) {
-      await supabase.from('reflections').update({ mood }).eq('id', reflectionId);
+      await supabase.from('reflections').update({ mood } as any).eq('id', reflectionId);
     }
   }, [reflectionId]);
 
   const handleMoodSkip = useCallback(() => {
     setMoodDone(true);
+  }, []);
+
+  const handleMoodAfterSelect = useCallback(async (mood: MoodValue) => {
+    hapticFeedback('light');
+    setMoodAfterDone(true);
+    if (reflectionId) {
+      await supabase.from('reflections').update({ mood_after: mood } as any).eq('id', reflectionId);
+    }
+  }, [reflectionId]);
+
+  const handleMoodAfterSkip = useCallback(() => {
+    setMoodAfterDone(true);
   }, []);
 
   const { subscribed } = useSubscription();
@@ -278,10 +291,10 @@ export default function PauseSession() {
                 </RevealSection>
               )}
 
-              {/* Mood check-in */}
+              {/* Mood check-in (before) */}
               {!moodDone && (
                 <RevealSection>
-                  <MoodCheck onSelect={handleMoodSelect} onSkip={handleMoodSkip} />
+                  <MoodCheck onSelect={handleMoodSelect} onSkip={handleMoodSkip} variant="before" />
                 </RevealSection>
               )}
 
@@ -296,6 +309,13 @@ export default function PauseSession() {
                   reflectionMessage={message}
                 />
               </RevealSection>
+
+              {/* Mood check-in (after grounding) */}
+              {!moodAfterDone && (
+                <RevealSection>
+                  <MoodCheck onSelect={handleMoodAfterSelect} onSkip={handleMoodAfterSkip} variant="after" />
+                </RevealSection>
+              )}
 
               {/* Decision */}
               <RevealSection>
