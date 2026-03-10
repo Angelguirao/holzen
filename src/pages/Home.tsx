@@ -335,15 +335,24 @@ const Home = () => {
 
                   {message ? (
                     <div className="space-y-4">
-                      {/* First-line teaser */}
-                      <p className="text-sm leading-relaxed text-foreground/80">
-                        {message.split(/[.!?]\s/)[0]}{message.split(/[.!?]\s/).length > 1 ? '…' : ''}
-                      </p>
-                      {context && (
-                        <p className="text-[10px] font-mono text-muted-foreground/40 uppercase tracking-wider">
-                          {context.slice(0, 60)}{context.length > 60 ? '…' : ''}
+                      {/* Reflection teaser with dismiss X */}
+                      <div className="relative">
+                        <button
+                          onClick={handleDismiss}
+                          className="absolute -top-1 -right-1 p-1 rounded-full text-muted-foreground/30 hover:text-muted-foreground/60 hover:bg-muted/50 transition-colors"
+                          aria-label={t('common.dismiss', 'Dismiss')}
+                        >
+                          <X className="h-3.5 w-3.5" />
+                        </button>
+                        <p className="text-sm leading-relaxed text-foreground/80 pr-5">
+                          {message.split(/[.!?]\s/)[0]}{message.split(/[.!?]\s/).length > 1 ? '…' : ''}
                         </p>
-                      )}
+                        {context && (
+                          <p className="text-[10px] font-mono text-muted-foreground/40 uppercase tracking-wider mt-2">
+                            {context.slice(0, 60)}{context.length > 60 ? '…' : ''}
+                          </p>
+                        )}
+                      </div>
                       <button
                         onClick={() => navigate('/pause', {
                           state: {
@@ -361,12 +370,6 @@ const Home = () => {
                         <span className="text-[10px] font-mono text-primary/60 tracking-[0.15em] uppercase">
                           {t('onboarding.pauseWithThis')}
                         </span>
-                      </button>
-                      <button
-                        onClick={handleDismiss}
-                        className="w-full text-center text-[10px] font-mono text-muted-foreground/30 hover:text-muted-foreground/50 transition-colors"
-                      >
-                        {t('common.done')}
                       </button>
                     </div>
                   ) : (
