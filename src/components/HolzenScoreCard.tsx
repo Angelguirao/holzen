@@ -86,6 +86,7 @@ export function HolzenScoreCard() {
 
         <div className="space-y-2 flex-1 min-w-0">
           <ScoreBar label={t('holzenScore.mood')} value={scoreData.moodScore} />
+          <ScoreBar label={t('holzenScore.groundingEffect', 'Grounding')} value={scoreData.deltaScore} />
           <ScoreBar label={t('holzenScore.actions')} value={scoreData.outcomeScore} />
           <ScoreBar label={t('holzenScore.streak')} value={scoreData.streakScore} />
           <ScoreBar
