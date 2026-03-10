@@ -352,7 +352,7 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
               moodCounts={moodCounts}
             />
           </div>
-          {scoreData ? <HolzenScoreDetail scoreData={scoreData} /> : (
+          {scoreData ? <HolzenScoreDetail scoreData={scoreData} practiceDays={practiceDays} /> : (
             <ChartEmptyState
               title={t('profile.holzenScore')}
               message={t('profile.holzenScoreEmpty')}
