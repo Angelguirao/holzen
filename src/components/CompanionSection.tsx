@@ -591,138 +591,145 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
   if (!hasBreathing && !hasHaiku && !hasLearning && !hasSignal && !hasZoomOut && !hasHistory) return null;
 
   return (
-    <div ref={ref} className="space-y-3 pt-2 border-t border-border/40">
-      <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">
+    <div ref={ref} className="space-y-2.5">
+      <p className="text-[10px] font-mono text-muted-foreground/40 uppercase tracking-[0.2em] text-center mb-1">
         {labels.pause}
       </p>
 
       {hasBreathing && (
-        <CollapsibleCompanion
+        <CompanionCard
+          id="breathing"
           label={labels.breathe}
+          icon={COMPANION_ICONS.breathing}
           expanded={expandedBreathing}
           onToggle={() => setExpandedBreathing((v) => !v)}
           completed={completion.breathing}
         >
           <BreathingExercise severity={severity} onComplete={() => markCompleted('breathing')} onClose={() => setExpandedBreathing(false)} autoOpen />
-        </CollapsibleCompanion>
+        </CompanionCard>
       )}
 
       {hasHaiku && (
-        isPro ? (
-          <CollapsibleCompanion
-            label={labels.haiku}
-            expanded={expandedHaiku}
-            onToggle={() => {
-              setExpandedHaiku((v) => !v);
-              if (!completion.haiku) markCompleted('haiku');
-            }}
-            completed={completion.haiku}
-            isFavorite={favorites['haiku']}
-            onToggleFavorite={() => toggleCompanionFavorite('haiku')}
-          >
-            <HaikuDisplay haiku={companions.haiku!} />
-          </CollapsibleCompanion>
-        ) : (
-          <ProLockedCompanion label={labels.haiku} onUpgrade={() => requirePro('haiku')} />
-        )
+        <CompanionCard
+          id="haiku"
+          label={labels.haiku}
+          icon={COMPANION_ICONS.haiku}
+          expanded={expandedHaiku}
+          onToggle={() => {
+            if (!isPro) { requirePro('haiku'); return; }
+            setExpandedHaiku((v) => !v);
+            if (!completion.haiku) markCompleted('haiku');
+          }}
+          completed={completion.haiku}
+          isFavorite={favorites['haiku']}
+          onToggleFavorite={() => toggleCompanionFavorite('haiku')}
+          locked={!isPro}
+          onUpgrade={() => requirePro('haiku')}
+        >
+          <HaikuDisplay haiku={companions.haiku!} />
+        </CompanionCard>
       )}
 
       {hasLearning && (
-        isPro ? (
-          <CollapsibleCompanion
-            label={labels.ground}
-            expanded={expandedLearning}
-            onToggle={() => {
-              setExpandedLearning((v) => !v);
-              if (!completion.learning) markCompleted('learning');
-            }}
-            completed={completion.learning}
-            isFavorite={favorites['learning']}
-            onToggleFavorite={() => toggleCompanionFavorite('learning')}
-          >
-            <LearningInput
-              title={companions.learningTitle ?? ''}
-              body={companions.learningBody ?? ''}
-              nudge={nudge}
-              nudgeLoading={nudgeLoading}
-              nudgeError={nudgeError}
-            />
-          </CollapsibleCompanion>
-        ) : (
-          <ProLockedCompanion label={labels.ground} onUpgrade={() => requirePro('learning')} />
-        )
+        <CompanionCard
+          id="learning"
+          label={labels.ground}
+          icon={COMPANION_ICONS.learning}
+          expanded={expandedLearning}
+          onToggle={() => {
+            if (!isPro) { requirePro('learning'); return; }
+            setExpandedLearning((v) => !v);
+            if (!completion.learning) markCompleted('learning');
+          }}
+          completed={completion.learning}
+          isFavorite={favorites['learning']}
+          onToggleFavorite={() => toggleCompanionFavorite('learning')}
+          locked={!isPro}
+          onUpgrade={() => requirePro('learning')}
+        >
+          <LearningInput
+            title={companions.learningTitle ?? ''}
+            body={companions.learningBody ?? ''}
+            nudge={nudge}
+            nudgeLoading={nudgeLoading}
+            nudgeError={nudgeError}
+          />
+        </CompanionCard>
       )}
 
       {hasSignal && (
-        isPro ? (
-          <CollapsibleCompanion
-            label={labels.signal}
-            expanded={expandedSignal}
-            onToggle={() => {
-              setExpandedSignal((v) => !v);
-              if (!completion.signal) markCompleted('signal');
-            }}
-            completed={completion.signal}
-            isFavorite={favorites['signal']}
-            onToggleFavorite={() => toggleCompanionFavorite('signal')}
-          >
-            <SignalDisplay
-              signal={signal}
-              loading={signalLoading}
-              error={signalError}
-            />
-          </CollapsibleCompanion>
-        ) : (
-          <ProLockedCompanion label={labels.signal} onUpgrade={() => requirePro('signal')} />
-        )
+        <CompanionCard
+          id="signal"
+          label={labels.signal}
+          icon={COMPANION_ICONS.signal}
+          expanded={expandedSignal}
+          onToggle={() => {
+            if (!isPro) { requirePro('signal'); return; }
+            setExpandedSignal((v) => !v);
+            if (!completion.signal) markCompleted('signal');
+          }}
+          completed={completion.signal}
+          isFavorite={favorites['signal']}
+          onToggleFavorite={() => toggleCompanionFavorite('signal')}
+          locked={!isPro}
+          onUpgrade={() => requirePro('signal')}
+        >
+          <SignalDisplay
+            signal={signal}
+            loading={signalLoading}
+            error={signalError}
+          />
+        </CompanionCard>
       )}
 
       {hasZoomOut && (
-        isPro ? (
-          <CollapsibleCompanion
-            label={labels.zoomOut}
-            expanded={expandedZoomOut}
-            onToggle={() => {
-              setExpandedZoomOut((v) => !v);
-              if (!completion.zoomOut) markCompleted('zoomOut');
-            }}
-            completed={completion.zoomOut}
-            isFavorite={favorites['zoom_out']}
-            onToggleFavorite={() => toggleCompanionFavorite('zoom_out')}
-          >
-            <ZoomOutDisplay
-              data={zoomOut}
-              loading={zoomOutLoading}
-              error={zoomOutError}
-            />
-          </CollapsibleCompanion>
-        ) : (
-          <ProLockedCompanion label={labels.zoomOut} onUpgrade={() => requirePro('zoom_out')} />
-        )
+        <CompanionCard
+          id="zoomOut"
+          label={labels.zoomOut}
+          icon={COMPANION_ICONS.zoomOut}
+          expanded={expandedZoomOut}
+          onToggle={() => {
+            if (!isPro) { requirePro('zoom_out'); return; }
+            setExpandedZoomOut((v) => !v);
+            if (!completion.zoomOut) markCompleted('zoomOut');
+          }}
+          completed={completion.zoomOut}
+          isFavorite={favorites['zoom_out']}
+          onToggleFavorite={() => toggleCompanionFavorite('zoom_out')}
+          locked={!isPro}
+          onUpgrade={() => requirePro('zoom_out')}
+        >
+          <ZoomOutDisplay
+            data={zoomOut}
+            loading={zoomOutLoading}
+            error={zoomOutError}
+          />
+        </CompanionCard>
       )}
 
       {hasHistory && (
-        isPro ? (
-          <CollapsibleCompanion
-            label={labels.lookBack}
-            expanded={expandedHistory}
-            onToggle={() => {
-              setExpandedHistory((v) => !v);
-              if (!completion.history) markCompleted('history');
-            }}
-            completed={completion.history}
-            isFavorite={favorites['history_insight']}
-            onToggleFavorite={() => toggleCompanionFavorite('history_insight')}
-          >
-            <HistoricalInsightDisplay
-              data={historyInsight}
-              loading={historyLoading}
-              error={historyError}
-            />
-          </CollapsibleCompanion>
-        ) : (
-          <ProLockedCompanion label={labels.lookBack} onUpgrade={() => requirePro('history')} />
-        )
+        <CompanionCard
+          id="history"
+          label={labels.lookBack}
+          icon={COMPANION_ICONS.history}
+          expanded={expandedHistory}
+          onToggle={() => {
+            if (!isPro) { requirePro('history'); return; }
+            setExpandedHistory((v) => !v);
+            if (!completion.history) markCompleted('history');
+          }}
+          completed={completion.history}
+          isFavorite={favorites['history_insight']}
+          onToggleFavorite={() => toggleCompanionFavorite('history_insight')}
+          locked={!isPro}
+          onUpgrade={() => requirePro('history')}
+        >
+          <HistoricalInsightDisplay
+            data={historyInsight}
+            loading={historyLoading}
+            error={historyError}
+          />
+        </CompanionCard>
       )}
     </div>
   );
