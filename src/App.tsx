@@ -25,6 +25,10 @@ import BlogPost from "./pages/BlogPost";
 import Roadmap from "./pages/Roadmap";
 import Breathe from "./pages/Breathe";
 import Reserve from "./pages/Reserve";
+import PracticeCheckIn from "./pages/PracticeCheckIn";
+import PracticeJournal from "./pages/PracticeJournal";
+import PracticeBodyScan from "./pages/PracticeBodyScan";
+import PracticeReplay from "./pages/PracticeReplay";
 import PauseSession from "./pages/PauseSession";
 
 const queryClient = new QueryClient();
