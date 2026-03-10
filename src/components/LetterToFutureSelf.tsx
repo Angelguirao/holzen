@@ -24,7 +24,7 @@ interface Letter {
   btc_price_at_delivery: number | null;
 }
 
-const LETTER_THRESHOLD = 5;
+// LETTER_THRESHOLD removed — now uses user's actual thresholds from profile
 
 const WRITING_PROMPTS = {
   crash: [
@@ -112,7 +112,7 @@ function SealCracks() {
 export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const { currency } = useHolzen();
+  const { currency, threshold, thresholdDown } = useHolzen();
   const prefersReducedMotion = useReducedMotion();
   const [letters, setLetters] = useState<Letter[]>([]);
   const [pendingLetters, setPendingLetters] = useState<Letter[]>([]);
@@ -121,8 +121,11 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
   const [sending, setSending] = useState(false);
   const [sealPhase, setSealPhase] = useState<'idle' | 'sealing' | 'sealed'>('idle');
   const [loaded, setLoaded] = useState(false);
-  const isCrash = changePercent !== null && changePercent <= -LETTER_THRESHOLD;
-  const isSurge = changePercent !== null && changePercent >= LETTER_THRESHOLD;
+  // Calm-mode recipient: who should receive this letter?
+  const [calmTarget, setCalmTarget] = useState<'crash' | 'surge'>('crash');
+
+  const isCrash = changePercent !== null && changePercent <= -thresholdDown;
+  const isSurge = changePercent !== null && changePercent >= threshold;
   const isVolatile = isCrash || isSurge;
   const isCalm = !isVolatile;
 
@@ -130,12 +133,12 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
   const canWrite = isVolatile || (isCalm && currentPrice !== null);
 
   const writtenDuring = effectiveMode === 'calm' ? 'calm' : (isCrash ? 'crash' : 'surge');
-  const deliverDuring = effectiveMode === 'calm' ? 'crash' : (isCrash ? 'surge' : 'crash');
+  const deliverDuring = effectiveMode === 'calm' ? calmTarget : (isCrash ? 'surge' : 'crash');
 
   const prompts = effectiveMode === 'calm'
-    ? WRITING_PROMPTS.calm
+    ? (calmTarget === 'crash' ? WRITING_PROMPTS.calm : WRITING_PROMPTS.crash)
     : (isCrash ? WRITING_PROMPTS.crash : WRITING_PROMPTS.surge);
-  const randomPrompt = useMemo(() => prompts[Math.floor(Math.random() * prompts.length)], [isCrash, effectiveMode]);
+  const randomPrompt = useMemo(() => prompts[Math.floor(Math.random() * prompts.length)], [isCrash, effectiveMode, calmTarget]);
 
   useEffect(() => {
     if (!user) return;
@@ -320,9 +323,38 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
               </p>
             </div>
           </div>
+
+          {/* Calm mode: choose recipient */}
+          {effectiveMode === 'calm' && (
+            <div className="flex gap-1.5">
+              <button
+                onClick={() => setCalmTarget('crash')}
+                className={`flex-1 py-2 rounded-md text-[10px] font-mono tracking-wider transition-colors border ${
+                  calmTarget === 'crash'
+                    ? 'border-primary/30 bg-primary/5 text-primary'
+                    : 'border-border/40 text-muted-foreground/50 hover:text-muted-foreground/70'
+                }`}
+              >
+                {t('letter.forPanicSelf', 'For my panicking self')}
+              </button>
+              <button
+                onClick={() => setCalmTarget('surge')}
+                className={`flex-1 py-2 rounded-md text-[10px] font-mono tracking-wider transition-colors border ${
+                  calmTarget === 'surge'
+                    ? 'border-primary/30 bg-primary/5 text-primary'
+                    : 'border-border/40 text-muted-foreground/50 hover:text-muted-foreground/70'
+                }`}
+              >
+                {t('letter.forEuphoricSelf', 'For my euphoric self')}
+              </button>
+            </div>
+          )}
+
           <p className="text-xs text-muted-foreground leading-relaxed">
             {effectiveMode === 'calm'
-              ? t('letter.calmDesc')
+              ? (calmTarget === 'crash'
+                ? t('letter.calmDescCrash', 'Write to the version of you that panics during a drop. This letter opens when fear hits.')
+                : t('letter.calmDescSurge', 'Write to the version of you that gets carried away during a surge. This letter opens when euphoria strikes.'))
               : isCrash
                 ? t('letter.crashDesc')
                 : t('letter.surgeDesc')}
@@ -345,10 +377,12 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
                 </PopoverTrigger>
                 <PopoverContent side="top" align="end" className="max-w-[240px] text-xs leading-relaxed p-3">
                   {effectiveMode === 'calm'
-                    ? t('letter.deliveryHintCalm', `If BTC drops ${LETTER_THRESHOLD}%+ or surges ${LETTER_THRESHOLD}%+, this letter will be opened for you.`)
+                    ? (calmTarget === 'crash'
+                      ? t('letter.deliveryHintCalmCrash', `When BTC drops ${thresholdDown}%+, this letter will be opened for you.`)
+                      : t('letter.deliveryHintCalmSurge', `When BTC surges ${threshold}%+, this letter will be opened for you.`))
                     : isCrash
-                      ? t('letter.deliveryHintCrash', `When the market recovers and surges ${LETTER_THRESHOLD}%+, this letter will be opened for you.`)
-                      : t('letter.deliveryHintSurge', `When the market drops ${LETTER_THRESHOLD}%+, this letter will be opened for you.`)}
+                      ? t('letter.deliveryHintCrash', `When the market recovers and surges ${threshold}%+, this letter will be opened for you.`)
+                      : t('letter.deliveryHintSurge', `When the market drops ${thresholdDown}%+, this letter will be opened for you.`)}
                 </PopoverContent>
               </Popover>
               <Button
@@ -395,7 +429,7 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
             <p className="text-[10px] font-mono tracking-widest uppercase">{t('letter.letterToFutureSelf')}</p>
           </div>
           <p className="text-xs text-muted-foreground/60 leading-relaxed">
-            {t('letter.letterThresholdDesc', { threshold: LETTER_THRESHOLD })}
+            {t('letter.letterThresholdDesc', { threshold: Math.min(threshold, thresholdDown) })}
           </p>
         </div>
       )}
