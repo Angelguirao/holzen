@@ -150,12 +150,41 @@ export function HolzenRitual({
     setDecision(d);
     onDecision?.(d, journalText);
     persistCompletion(d, journalText);
-    setCompleted(true);
     hapticFeedback('success');
+    // Go to post-ritual mood check instead of immediately completing
+    setPhase('mood-after');
   }, [onDecision, journalText, persistCompletion]);
 
+  const handleMoodBefore = useCallback((mood: MoodValue) => {
+    hapticFeedback('light');
+    setMoodBefore(mood);
+    if (steps.length > 0) {
+      setPhase('run');
+    } else {
+      setPhase('select');
+    }
+  }, [steps.length]);
+
+  const handleMoodBeforeSkip = useCallback(() => {
+    if (steps.length > 0) {
+      setPhase('run');
+    } else {
+      setPhase('select');
+    }
+  }, [steps.length]);
+
+  const handleMoodAfter = useCallback((mood: MoodValue) => {
+    hapticFeedback('light');
+    setMoodAfter(mood);
+    setCompleted(true);
+  }, []);
+
+  const handleMoodAfterSkip = useCallback(() => {
+    setCompleted(true);
+  }, []);
+
   const handleClose = useCallback(() => {
-    setPhase('select');
+    setPhase('mood-before');
     setCurrentStep(0);
     setCompleted(false);
     setJournalText('');
@@ -163,6 +192,8 @@ export function HolzenRitual({
     setShowMantra(false);
     setSteps([]);
     setStepsCompleted([]);
+    setMoodBefore(null);
+    setMoodAfter(null);
     startTimeRef.current = Date.now();
     onClose();
   }, [onClose]);
