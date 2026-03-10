@@ -392,10 +392,11 @@
     "reflection": {
       "label": "Con Holzen",
       "01title": "El mercado cae",
-      "02title": "Respiras",
-      "03title": "Reflexionas",
-      "04title": "Decides deliberadamente",
-      "05title": "Creces con el tiempo"
+      "02title": "Pausas y sientes",
+      "03title": "Respiras",
+      "04title": "Reflexionas",
+      "05title": "Decides deliberadamente",
+      "06title": "Creces con el tiempo"
     },
     "steps": {
       "01title": "El mercado se mueve",

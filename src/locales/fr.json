@@ -391,10 +391,11 @@
     "reflection": {
       "label": "Avec Holzen",
       "01title": "Le marché chute",
-      "02title": "Vous respirez",
-      "03title": "Vous réfléchissez",
-      "04title": "Vous décidez délibérément",
-      "05title": "Vous progressez avec le temps"
+      "02title": "Vous pausez & ressentez",
+      "03title": "Vous respirez",
+      "04title": "Vous réfléchissez",
+      "05title": "Vous décidez délibérément",
+      "06title": "Vous progressez avec le temps"
     },
     "steps": {
       "01title": "Le marché bouge",
