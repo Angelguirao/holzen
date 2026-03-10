@@ -6,7 +6,7 @@ import { useHolzen } from '@/hooks/use-holzen';
 import { formatBtcPrice } from '@/lib/btc';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Mail, Send, Info } from 'lucide-react';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
@@ -337,22 +337,20 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
           <div className="flex items-center justify-between">
             <p className="text-[10px] text-muted-foreground/40">{body.length}/500</p>
             <div className="flex items-center gap-2">
-              <TooltipProvider>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <button type="button" className="text-muted-foreground/40 hover:text-muted-foreground/70 transition-colors">
-                      <Info className="h-3.5 w-3.5" />
-                    </button>
-                  </TooltipTrigger>
-                  <TooltipContent side="top" className="max-w-[220px] text-xs leading-relaxed">
-                    {effectiveMode === 'calm'
-                      ? t('letter.deliveryHintCalm', `If BTC drops ${LETTER_THRESHOLD}%+ or surges ${LETTER_THRESHOLD}%+, this letter will be opened for you.`)
-                      : isCrash
-                        ? t('letter.deliveryHintCrash', `When the market recovers and surges ${LETTER_THRESHOLD}%+, this letter will be opened for you.`)
-                        : t('letter.deliveryHintSurge', `When the market drops ${LETTER_THRESHOLD}%+, this letter will be opened for you.`)}
-                  </TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <button type="button" className="text-muted-foreground/40 hover:text-muted-foreground/70 transition-colors">
+                    <Info className="h-3.5 w-3.5" />
+                  </button>
+                </PopoverTrigger>
+                <PopoverContent side="top" align="end" className="max-w-[240px] text-xs leading-relaxed p-3">
+                  {effectiveMode === 'calm'
+                    ? t('letter.deliveryHintCalm', `If BTC drops ${LETTER_THRESHOLD}%+ or surges ${LETTER_THRESHOLD}%+, this letter will be opened for you.`)
+                    : isCrash
+                      ? t('letter.deliveryHintCrash', `When the market recovers and surges ${LETTER_THRESHOLD}%+, this letter will be opened for you.`)
+                      : t('letter.deliveryHintSurge', `When the market drops ${LETTER_THRESHOLD}%+, this letter will be opened for you.`)}
+                </PopoverContent>
+              </Popover>
               <Button
                 onClick={handleSend}
                 disabled={sending || !body.trim()}
