@@ -463,53 +463,72 @@ const Home = () => {
           </HomeWidget>
         );
 
-      case 'actions':
+      case 'practice':
         return (
           <HomeWidget
-            id="actions"
-            title={WIDGET_TITLES['actions']}
-            collapsed={collapsed['actions']}
-            onToggleCollapse={() => toggleCollapsed('actions')}
+            id="practice"
+            title={WIDGET_TITLES['practice']}
+            collapsed={collapsed['practice']}
+            onToggleCollapse={() => toggleCollapsed('practice')}
           >
-            <div className="space-y-3">
-              {/* Daily practice exercises */}
-              <PracticeWidget />
+            <PracticeWidget />
+          </HomeWidget>
+        );
 
-              {/* Divider */}
-              <div className="border-t border-border/30" />
+      case 'ritual':
+        return (
+          <HomeWidget
+            id="ritual"
+            title={WIDGET_TITLES['ritual']}
+            collapsed={collapsed['ritual']}
+            onToggleCollapse={() => toggleCollapsed('ritual')}
+          >
+            <div className="space-y-2">
+              <p className="text-[11px] text-muted-foreground/50 leading-relaxed">
+                {t('home.ritualDesc', 'Feeling reactive? Ground yourself before you act.')}
+              </p>
+              <button
+                onClick={() => {
+                  if (!subscribed) {
+                    toast(t('pro.featureLocked'), { description: t('pro.upgradeDesc'), action: { label: t('pro.upgradeCta'), onClick: () => startCheckout() }, duration: 6000 });
+                    return;
+                  }
+                  setShowRitual(true);
+                }}
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors duration-300"
+              >
+                {!subscribed && <Lock className="h-3 w-3 text-primary/20" />}
+                <Sparkles className="h-3 w-3 text-primary/40" />
+                <span className="text-[10px] font-mono text-primary/40 tracking-[0.2em] uppercase">
+                  {t('home.startARitual')}
+                </span>
+                {!subscribed && <span className="text-[8px] font-mono text-primary/30 uppercase tracking-wider">PRO</span>}
+              </button>
+            </div>
+          </HomeWidget>
+        );
 
-              {/* Quick actions */}
-              <div className="space-y-2">
-                <button
-                  onClick={() => {
-                    if (!subscribed) {
-                      toast(t('pro.featureLocked'), { description: t('pro.upgradeDesc'), action: { label: t('pro.upgradeCta'), onClick: () => startCheckout() }, duration: 6000 });
-                      return;
-                    }
-                    setShowRitual(true);
-                  }}
-                  className="w-full flex flex-col items-center gap-1.5 py-3 rounded-md border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors duration-300"
-                >
-                  <div className="flex items-center gap-2">
-                    {!subscribed && <Lock className="h-3 w-3 text-primary/20" />}
-                    <Sparkles className="h-3 w-3 text-primary/40" />
-                    <span className="text-[10px] font-mono text-primary/40 tracking-[0.2em] uppercase">
-                      {t('home.startARitual')}
-                    </span>
-                    {!subscribed && <span className="text-[8px] font-mono text-primary/30 uppercase tracking-wider">PRO</span>}
-                  </div>
-                  <span className="text-[9px] text-muted-foreground/40">{t('home.ritualHint')}</span>
-                </button>
-                <button
-                  onClick={() => navigate('/breathe')}
-                  className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-border/30 bg-muted/10 hover:bg-muted/20 transition-colors duration-500"
-                >
-                  <Waves className="h-3 w-3 text-muted-foreground/40" />
-                  <span className="text-[10px] font-mono text-muted-foreground/40 tracking-[0.2em] uppercase">
-                    {t('nav.breathe')}
-                  </span>
-                </button>
-              </div>
+      case 'breathe':
+        return (
+          <HomeWidget
+            id="breathe"
+            title={WIDGET_TITLES['breathe']}
+            collapsed={collapsed['breathe']}
+            onToggleCollapse={() => toggleCollapsed('breathe')}
+          >
+            <div className="space-y-2">
+              <p className="text-[11px] text-muted-foreground/50 leading-relaxed">
+                {t('home.breatheDesc', 'A quiet space to find stillness. No goals, no tracking.')}
+              </p>
+              <button
+                onClick={() => navigate('/breathe')}
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-border/30 bg-muted/10 hover:bg-muted/20 transition-colors duration-500"
+              >
+                <Waves className="h-3 w-3 text-muted-foreground/40" />
+                <span className="text-[10px] font-mono text-muted-foreground/40 tracking-[0.2em] uppercase">
+                  {t('home.enterStillness', 'Enter stillness')}
+                </span>
+              </button>
             </div>
           </HomeWidget>
         );
