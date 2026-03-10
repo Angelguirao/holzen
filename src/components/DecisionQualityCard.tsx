@@ -95,7 +95,7 @@ export function DecisionQualityCard({ reflections }: Props) {
     return (
       <ChartEmptyState
         title={t('decisionQuality.title')}
-        message={t('decisionQuality.emptyMessage')}
+        message={t('decisionQuality.emptyMessage', 'Log an outcome (held, sold, bought) on 3 reflections to see how mindfulness tools affect your decisions.')}
         current={withOutcome}
         needed={3}
       />

@@ -119,7 +119,7 @@ export function StatsTrends({ reflections }: Props) {
     return (
       <ChartEmptyState
         title={t('statsTrends.weeklyTrends')}
-        message={t('statsTrends.emptyMessage')}
+        message={t('statsTrends.emptyMessage', 'Reflect across 3 separate weeks to see your composure trends over time.')}
         current={data.length}
         needed={3}
       />
