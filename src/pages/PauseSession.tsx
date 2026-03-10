@@ -235,7 +235,7 @@ export default function PauseSession() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 2, duration: 1 }}
           >
-            <PauseProgress currentStep={step} />
+            <PauseProgress currentStep={step} onStepClick={goToStep} />
           </motion.div>
         )}
 
