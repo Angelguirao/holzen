@@ -47,19 +47,23 @@ interface BlockData {
   height: number;
   mempoolSize: number;
   mempoolPending: number;
-  lastBlockTime?: number; // unix timestamp of latest block
+  lastBlockTime?: number;
+  fastestFee?: number;
+  difficultyEpochProgress?: number; // 0-1 progress through 2016-block epoch
 }
 
-/** Fetch latest block height, mempool info, and last block time */
+/** Fetch latest block height, mempool info, fees, and last block time */
 async function fetchBlockData(): Promise<BlockData | null> {
   try {
-    const [heightRes, mempoolRes, blocksRes] = await Promise.all([
+    const [heightRes, mempoolRes, blocksRes, feesRes] = await Promise.all([
       fetch('https://mempool.space/api/blocks/tip/height'),
       fetch('https://mempool.space/api/mempool'),
       fetch('https://mempool.space/api/blocks'),
+      fetch('https://mempool.space/api/v1/fees/recommended'),
     ]);
     const height = await heightRes.json();
     const mempool = await mempoolRes.json();
+    const fees = await feesRes.json().catch(() => null);
     let lastBlockTime: number | undefined;
     try {
       const blocks = await blocksRes.json();
@@ -67,11 +71,17 @@ async function fetchBlockData(): Promise<BlockData | null> {
         lastBlockTime = blocks[0].timestamp;
       }
     } catch {}
+
+    const h = typeof height === 'number' ? height : parseInt(height);
+    const epochProgress = (h % 2016) / 2016;
+
     return {
-      height: typeof height === 'number' ? height : parseInt(height),
+      height: h,
       mempoolSize: mempool?.vsize ?? 0,
       mempoolPending: mempool?.count ?? 0,
       lastBlockTime,
+      fastestFee: fees?.fastestFee,
+      difficultyEpochProgress: epochProgress,
     };
   } catch {
     return null;
@@ -88,14 +98,14 @@ function formatNumber(n: number): string {
 function MempoolViz({ level, pending }: { level: VolatilityLevel; pending: number }) {
   const prefersReduced = useReducedMotion();
   const dots = useMemo(() => {
-    const count = Math.min(Math.max(Math.floor(pending / 5000), 4), 20);
+    const count = Math.min(Math.max(Math.floor(pending / 3000), 6), 30);
     return Array.from({ length: count }, (_, i) => ({
       id: i,
-      x: 30 + Math.random() * 40,
-      y: 20 + Math.random() * 60,
-      size: 1 + Math.random() * 2,
-      delay: Math.random() * 4,
-      duration: 3 + Math.random() * 4,
+      x: 10 + Math.random() * 80,
+      y: 10 + Math.random() * 80,
+      size: 1.5 + Math.random() * 2.5,
+      delay: Math.random() * 6,
+      duration: 4 + Math.random() * 5,
     }));
   }, [pending]);
 
@@ -115,9 +125,9 @@ function MempoolViz({ level, pending }: { level: VolatilityLevel; pending: numbe
             background: glowColors[level],
           }}
           animate={{
-            opacity: [0, 0.6, 0],
-            y: [0, -20, -40],
-            scale: [1, 0.5, 0],
+            opacity: [0, 0.8, 0],
+            y: [0, -30, -60],
+            scale: [0.8, 1, 0.3],
           }}
           transition={{
             duration: dot.duration,
@@ -128,6 +138,30 @@ function MempoolViz({ level, pending }: { level: VolatilityLevel; pending: numbe
         />
       ))}
     </div>
+  );
+}
+
+/** Difficulty epoch progress arc */
+function EpochArc({ progress, color }: { progress: number; color: string }) {
+  const r = 70;
+  const circumference = 2 * Math.PI * r;
+  return (
+    <motion.svg
+      width="160" height="160"
+      className="absolute pointer-events-none"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 0.08 }}
+      transition={{ delay: 8, duration: 3 }}
+    >
+      <circle cx="80" cy="80" r={r} fill="none" stroke={color} strokeWidth="0.5" opacity={0.3} />
+      <circle
+        cx="80" cy="80" r={r} fill="none" stroke={color} strokeWidth="0.5"
+        strokeLinecap="round"
+        strokeDasharray={circumference}
+        strokeDashoffset={circumference * (1 - progress)}
+        transform="rotate(-90 80 80)"
+      />
+    </motion.svg>
   );
 }
 
@@ -210,6 +244,7 @@ export default function Breathe() {
   const [blockAtEntry, setBlockAtEntry] = useState<number | null>(null);
   const [newBlockMined, setNewBlockMined] = useState(false);
   const [newBlockHeight, setNewBlockHeight] = useState<number | null>(null);
+  const [voidElapsed, setVoidElapsed] = useState(0); // seconds in void for dimming
 
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const contemplationTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -257,6 +292,7 @@ export default function Breathe() {
       if (blockData?.lastBlockTime) {
         setTimeSinceBlock(Math.floor(Date.now() / 1000) - blockData.lastBlockTime);
       }
+      setVoidElapsed((prev) => prev + 1);
     };
     tick();
     tickRef.current = setInterval(tick, 1000);
@@ -286,7 +322,7 @@ export default function Breathe() {
     if (mode !== 'void' || !voidEntered) return;
     contemplationTimerRef.current = setInterval(() => {
       setContemplationIndex((prev) => (prev + 1) % VOID_CONTEMPLATIONS[level].length);
-    }, 12_000);
+    }, 20_000);
     return () => { if (contemplationTimerRef.current) clearInterval(contemplationTimerRef.current); };
   }, [mode, voidEntered]);
 
@@ -318,6 +354,7 @@ export default function Breathe() {
     setContemplationIndex(0);
     setNewBlockMined(false);
     setNewBlockHeight(null);
+    setVoidElapsed(0);
     setBlockAtEntry(blockData?.height ?? null);
     setMode('void');
   }, [blockData]);
@@ -489,7 +526,16 @@ export default function Breathe() {
             </motion.div>
           )}
 
-          {mode === 'void' && (
+          {mode === 'void' && (() => {
+            // Progressive dimming: darken over 5 minutes (300s), max 40% darker
+            const dimFactor = Math.min(voidElapsed / 300, 1) * 0.4;
+            // Fee pressure warmth: shift glow hue warmer when fees > 20 sat/vB
+            const feeHeat = blockData?.fastestFee ? Math.min(blockData.fastestFee / 50, 1) : 0;
+            const warmGlow = feeHeat > 0.1
+              ? `hsla(${35 - feeHeat * 20}, ${50 + feeHeat * 20}%, 50%, ${0.15 + feeHeat * 0.05})`
+              : glowColors[level];
+
+            return (
             <motion.div
               key="void"
               className="flex flex-col items-center gap-10"
@@ -499,13 +545,21 @@ export default function Breathe() {
               transition={{ duration: 1.2 }}
               onAnimationComplete={() => !voidEntered && setVoidEntered(true)}
             >
-              {/* Ambient glow — slow cosmic pulse */}
+              {/* Progressive dimming overlay */}
+              <motion.div
+                className="fixed inset-0 pointer-events-none"
+                style={{ background: 'black' }}
+                animate={{ opacity: dimFactor }}
+                transition={{ duration: 2, ease: 'easeInOut' }}
+              />
+
+              {/* Ambient glow — pulse speed loosely tied to network energy */}
               <motion.div
                 className="absolute rounded-full pointer-events-none"
                 style={{
                   width: 350,
                   height: 350,
-                  background: `radial-gradient(circle, ${glowColors[level]}, transparent 70%)`,
+                  background: `radial-gradient(circle, ${warmGlow}, transparent 70%)`,
                   filter: 'blur(80px)',
                 }}
                 animate={prefersReducedMotion ? { opacity: 0.3 } : {
@@ -513,11 +567,17 @@ export default function Breathe() {
                   opacity: [0.2, 0.35, 0.2],
                 }}
                 transition={{
-                  duration: 10,
+                  // Hashrate pulse: faster when network energy is high (conceptual ~8-12s range)
+                  duration: btcData?.onChain?.hashrate ? 8 : 10,
                   repeat: Infinity,
                   ease: 'easeInOut',
                 }}
               />
+
+              {/* Difficulty epoch progress arc */}
+              {blockData?.difficultyEpochProgress != null && (
+                <EpochArc progress={blockData.difficultyEpochProgress} color={textColors[level]} />
+              )}
 
               {/* Block height — the only clock */}
               <motion.div
@@ -528,7 +588,7 @@ export default function Breathe() {
               >
                 <p
                   className="font-mono text-3xl tracking-[0.15em] tabular-nums"
-                  style={{ color: textColors[level], opacity: 0.35 }}
+                  style={{ color: textColors[level], opacity: Math.max(0.35 - dimFactor * 0.3, 0.1) }}
                 >
                   {blockData?.height.toLocaleString() ?? '···'}
                 </p>
@@ -579,6 +639,19 @@ export default function Breathe() {
                 </motion.div>
               )}
 
+              {/* Fee pressure indicator */}
+              {feeHeat > 0.2 && (
+                <motion.p
+                  className="relative z-10 font-mono text-[7px] tracking-[0.15em]"
+                  style={{ color: textColors[level], opacity: 0.1 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 0.1 }}
+                  transition={{ delay: 10, duration: 2 }}
+                >
+                  {t('void.feePressure', 'fee pressure: {{fee}} sat/vB', { fee: blockData?.fastestFee })}
+                </motion.p>
+              )}
+
               {/* New block mined — reverent moment */}
               <AnimatePresence>
                 {newBlockMined && newBlockHeight && (
@@ -623,6 +696,19 @@ export default function Breathe() {
                 </motion.div>
               )}
 
+              {/* Epoch progress label */}
+              {blockData?.difficultyEpochProgress != null && (
+                <motion.p
+                  className="relative z-10 font-mono text-[7px] tracking-[0.15em]"
+                  style={{ color: textColors[level], opacity: 0.08 }}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 0.08 }}
+                  transition={{ delay: 12, duration: 3 }}
+                >
+                  {t('void.epoch', 'epoch {{pct}}%', { pct: Math.round(blockData.difficultyEpochProgress * 100) })}
+                </motion.p>
+              )}
+
               {/* Return — when you're ready */}
               <motion.button
                 onClick={backToAmbient}
@@ -636,7 +722,8 @@ export default function Breathe() {
                 {t('void.return')}
               </motion.button>
             </motion.div>
-          )}
+            );
+          })()}
         </AnimatePresence>
       </div>
     </>
