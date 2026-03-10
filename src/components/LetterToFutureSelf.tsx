@@ -336,15 +336,33 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
           />
           <div className="flex items-center justify-between">
             <p className="text-[10px] text-muted-foreground/40">{body.length}/500</p>
-            <Button
-              onClick={handleSend}
-              disabled={sending || !body.trim()}
-              size="sm"
-              className="font-mono text-xs gap-1.5"
-            >
-              <Send className="h-3 w-3" />
-              {sending ? t('letter.sealing') : t('letter.seal')}
-            </Button>
+            <div className="flex items-center gap-2">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <button type="button" className="text-muted-foreground/40 hover:text-muted-foreground/70 transition-colors">
+                      <Info className="h-3.5 w-3.5" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="top" className="max-w-[220px] text-xs leading-relaxed">
+                    {effectiveMode === 'calm'
+                      ? t('letter.deliveryHintCalm', `If BTC drops ${LETTER_THRESHOLD}%+ or surges ${LETTER_THRESHOLD}%+, this letter will be opened for you.`)
+                      : isCrash
+                        ? t('letter.deliveryHintCrash', `When the market recovers and surges ${LETTER_THRESHOLD}%+, this letter will be opened for you.`)
+                        : t('letter.deliveryHintSurge', `When the market drops ${LETTER_THRESHOLD}%+, this letter will be opened for you.`)}
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <Button
+                onClick={handleSend}
+                disabled={sending || !body.trim()}
+                size="sm"
+                className="font-mono text-xs gap-1.5"
+              >
+                <Send className="h-3 w-3" />
+                {sending ? t('letter.sealing') : t('letter.seal')}
+              </Button>
+            </div>
           </div>
         </motion.div>
       ) : pendingLetters.length > 0 ? (
