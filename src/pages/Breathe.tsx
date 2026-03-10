@@ -244,6 +244,7 @@ export default function Breathe() {
   const [blockAtEntry, setBlockAtEntry] = useState<number | null>(null);
   const [newBlockMined, setNewBlockMined] = useState(false);
   const [newBlockHeight, setNewBlockHeight] = useState<number | null>(null);
+  const [voidElapsed, setVoidElapsed] = useState(0); // seconds in void for dimming
 
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const contemplationTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
