@@ -47,19 +47,23 @@ interface BlockData {
   height: number;
   mempoolSize: number;
   mempoolPending: number;
-  lastBlockTime?: number; // unix timestamp of latest block
+  lastBlockTime?: number;
+  fastestFee?: number;
+  difficultyEpochProgress?: number; // 0-1 progress through 2016-block epoch
 }
 
-/** Fetch latest block height, mempool info, and last block time */
+/** Fetch latest block height, mempool info, fees, and last block time */
 async function fetchBlockData(): Promise<BlockData | null> {
   try {
-    const [heightRes, mempoolRes, blocksRes] = await Promise.all([
+    const [heightRes, mempoolRes, blocksRes, feesRes] = await Promise.all([
       fetch('https://mempool.space/api/blocks/tip/height'),
       fetch('https://mempool.space/api/mempool'),
       fetch('https://mempool.space/api/blocks'),
+      fetch('https://mempool.space/api/v1/fees/recommended'),
     ]);
     const height = await heightRes.json();
     const mempool = await mempoolRes.json();
+    const fees = await feesRes.json().catch(() => null);
     let lastBlockTime: number | undefined;
     try {
       const blocks = await blocksRes.json();
@@ -67,11 +71,17 @@ async function fetchBlockData(): Promise<BlockData | null> {
         lastBlockTime = blocks[0].timestamp;
       }
     } catch {}
+
+    const h = typeof height === 'number' ? height : parseInt(height);
+    const epochProgress = (h % 2016) / 2016;
+
     return {
-      height: typeof height === 'number' ? height : parseInt(height),
+      height: h,
       mempoolSize: mempool?.vsize ?? 0,
       mempoolPending: mempool?.count ?? 0,
       lastBlockTime,
+      fastestFee: fees?.fastestFee,
+      difficultyEpochProgress: epochProgress,
     };
   } catch {
     return null;
