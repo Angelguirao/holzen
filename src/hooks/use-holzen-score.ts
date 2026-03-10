@@ -58,6 +58,7 @@ function computeCurrentStreak(reflections: Reflection[], freezeDates: string[] =
 export interface HolzenScoreData {
   score: number;
   moodScore: number;
+  deltaScore: number;
   outcomeScore: number;
   streakScore: number;
   practiceScore: number;
