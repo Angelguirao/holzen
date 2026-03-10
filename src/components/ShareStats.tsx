@@ -26,8 +26,8 @@ function buildShareText({ reflectionCount, scoreData, moodCounts }: Props, t: (k
     lines.push('');
     lines.push(`${t('share.moodBreakdown')}:`);
     for (const [mood, count] of entries.sort((a, b) => b[1] - a[1])) {
-      const emoji = MOOD_EMOJI[mood] || '•';
-      lines.push(`  ${emoji} ${t(`moodCheck.moods.${mood}`, mood)}: ${count}`);
+      const glyph = MOOD_GLYPHS[mood] || '•';
+      lines.push(`  ${glyph} ${t(`moodCheck.moods.${mood}`, mood)}: ${count}`);
     }
   }
 

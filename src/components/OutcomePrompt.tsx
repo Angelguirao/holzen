@@ -2,17 +2,13 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
-import { Hand, TrendingDown, TrendingUp, Minus, Check, Flame } from 'lucide-react';
+import { Check, Flame } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { hapticFeedback } from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
+import { OutcomeIcon } from '@/components/icons/OutcomeIcon';
 
-const outcomes = [
-  { value: 'held', key: 'held', icon: Hand },
-  { value: 'sold', key: 'sold', icon: TrendingDown },
-  { value: 'bought', key: 'bought', icon: TrendingUp },
-  { value: 'nothing', key: 'nothing', icon: Minus },
-] as const;
+const outcomeKeys = ['held', 'sold', 'bought', 'nothing'] as const;
 
 interface Props {
   reflectionId: string;
@@ -100,16 +96,16 @@ export function OutcomePrompt({ reflectionId, onComplete }: Props) {
               )}
             </div>
             <div className="grid grid-cols-4 gap-2">
-              {outcomes.map(({ value, key, icon: Icon }) => (
+              {outcomeKeys.map((key) => (
                 <Button
-                  key={value}
+                  key={key}
                   variant="outline"
                   size="sm"
                   disabled={saving}
-                  onClick={() => handleSelect(value)}
+                  onClick={() => handleSelect(key)}
                   className="flex flex-col items-center gap-1 h-auto py-3 text-xs font-mono"
                 >
-                  <Icon className="h-4 w-4" />
+                  <OutcomeIcon outcome={key} size={18} className="text-muted-foreground" />
                   {t(`outcome.${key}`)}
                 </Button>
               ))}
