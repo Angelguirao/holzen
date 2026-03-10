@@ -383,20 +383,20 @@
     "noCreditCard": "Sonra ayda ${{price}} · kart gerekmez · istediğiniz zaman iptal edin",
     "reflectionLoop": "Dürtü vs. Niyet",
     "reaction": {
-      "label": "Dürtü",
+      "label": "Holzen Olmadan",
       "01title": "Piyasa düşer",
-      "02title": "Korku ele geçirir",
-      "03title": "İçgüdüyle satarsınız",
-      "04title": "Pişmanlık gelir"
+      "02title": "Panik başlar",
+      "03title": "Dürtüsel satarsınız",
+      "04title": "Sonra pişman olursunuz"
     },
     "reflection": {
-      "label": "Niyet",
+      "label": "Holzen ile",
       "01title": "Piyasa düşer",
-      "02title": "Dürtüyü fark edersiniz",
+      "02title": "Durursunuz ve hissedersiniz",
       "03title": "Nefes alırsınız",
-      "04title": "Gözlersiniz, tepki vermezsiniz",
-      "05title": "Berraklıkla karar verirsiniz",
-      "06title": "Bilgelik biriktirirsiniz"
+      "04title": "Düşünürsünüz",
+      "05title": "Bilinçli karar verirsiniz",
+      "06title": "Zamanla büyürsünüz"
     },
     "steps": {
       "01title": "Piyasa hareket eder",

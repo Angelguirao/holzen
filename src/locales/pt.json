@@ -383,20 +383,20 @@
     "noCreditCard": "Depois ${{price}}/mês · sem cartão · cancele quando quiser",
     "reflectionLoop": "Impulso vs. Intenção",
     "reaction": {
-      "label": "Impulso",
+      "label": "Sem Holzen",
       "01title": "O mercado cai",
-      "02title": "O medo assume",
-      "03title": "Você vende por instinto",
-      "04title": "O arrependimento vem"
+      "02title": "O pânico toma conta",
+      "03title": "Você vende por impulso",
+      "04title": "Você se arrepende depois"
     },
     "reflection": {
-      "label": "Intenção",
+      "label": "Com Holzen",
       "01title": "O mercado cai",
-      "02title": "Você nota o impulso",
+      "02title": "Você pausa e sente",
       "03title": "Você respira",
-      "04title": "Você observa, não reage",
-      "05title": "Você decide com clareza",
-      "06title": "Você acumula sabedoria"
+      "04title": "Você reflete",
+      "05title": "Você decide com intenção",
+      "06title": "Você evolui com o tempo"
     },
     "steps": {
       "01title": "O mercado se move",
