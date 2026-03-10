@@ -100,7 +100,16 @@ export function PeriodComparison({ reflections }: Props) {
     };
   }, [reflections, view, t]);
 
-  if (current.count === 0 && previous.count === 0) return null;
+  if (current.count === 0 && previous.count === 0) {
+    return (
+      <ChartEmptyState
+        title={t('periodComparison.title', 'Period Comparison')}
+        message={t('periodComparison.emptyMessage', 'Start reflecting this week to compare your progress across periods.')}
+        current={reflections.length}
+        needed={1}
+      />
+    );
+  }
 
   const metrics = [
     {
