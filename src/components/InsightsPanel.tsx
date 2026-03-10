@@ -92,7 +92,7 @@ export function InsightsPanel({ reflections }: Props) {
             return (
               <Bar
                 key={m}
-                label={`${meta.emoji} ${t(`moodCheck.moods.${m}`, m)}`}
+                label={`${meta.glyph} ${t(`moodCheck.moods.${m}`, m)}`}
                 count={moodCounts[m]}
                 total={totalMoods}
                 color={meta.color}
