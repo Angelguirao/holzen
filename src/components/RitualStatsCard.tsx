@@ -202,7 +202,17 @@ export function RitualStatsCard() {
     };
   }, [completions]);
 
-  if (loading || !stats) return null;
+  if (loading) return null;
+  if (!stats) {
+    return (
+      <ChartEmptyState
+        title={t('ritualStats.title')}
+        message={t('ritualStats.emptyMessage')}
+        current={0}
+        needed={1}
+      />
+    );
+  }
 
   return (
     <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3">
