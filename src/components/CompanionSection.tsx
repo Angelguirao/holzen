@@ -6,11 +6,12 @@ import { LearningInput } from './LearningInput';
 import { SignalDisplay } from './SignalDisplay';
 import { ZoomOutDisplay } from './ZoomOutDisplay';
 import { HistoricalInsightDisplay } from './HistoricalInsightDisplay';
-import { ChevronDown, Check, Heart, Lock } from 'lucide-react';
+import { Check, Heart, Lock, Wind, Feather, Anchor, Radio, Mountain, Clock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { hapticFeedback } from '@/lib/haptics';
 import { useHolzen } from '@/hooks/use-holzen';
 import { useProGate } from '@/hooks/use-pro-gate';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
 export interface CompanionData {
   haiku: string | null;
@@ -59,69 +60,108 @@ interface Props {
   reflectionMessage?: string | null;
 }
 
-function CollapsibleCompanion({
+const COMPANION_ICONS: Record<string, React.ElementType> = {
+  breathing: Wind,
+  haiku: Feather,
+  learning: Anchor,
+  signal: Radio,
+  zoomOut: Mountain,
+  history: Clock,
+};
+
+function CompanionCard({
+  id,
   label,
+  icon: Icon,
   expanded,
   onToggle,
   completed,
   isFavorite,
   onToggleFavorite,
+  locked,
+  onUpgrade,
   children,
 }: {
+  id: string;
   label: string;
+  icon: React.ElementType;
   expanded: boolean;
   onToggle: () => void;
   completed?: boolean;
   isFavorite?: boolean;
   onToggleFavorite?: () => void;
+  locked?: boolean;
+  onUpgrade?: () => void;
   children: React.ReactNode;
 }) {
+  const { t } = useTranslation();
+  const prefersReducedMotion = useReducedMotion();
+
+  if (locked) {
+    return (
+      <button
+        onClick={onUpgrade}
+        className="flex items-center gap-3 px-4 py-3.5 rounded-xl border border-border/10 bg-card/10 text-muted-foreground/30 hover:bg-card/20 hover:text-muted-foreground/50 transition-all duration-300 w-full text-left"
+      >
+        <div className="w-8 h-8 rounded-lg bg-muted/20 flex items-center justify-center shrink-0">
+          <Lock className="h-3.5 w-3.5" />
+        </div>
+        <span className="text-xs font-mono tracking-wide flex-1">{label}</span>
+        <span className="text-[9px] uppercase tracking-wider text-primary/40 font-mono">{t('pro.badge')}</span>
+      </button>
+    );
+  }
+
   return (
-    <div>
-      <div className="flex items-center gap-1">
-        <button
-          onClick={onToggle}
-          className="flex items-center gap-1.5 text-xs font-mono text-muted-foreground hover:text-foreground transition-colors flex-1 text-left"
-        >
+    <div className="space-y-0">
+      <button
+        onClick={onToggle}
+        className={`flex items-center gap-3 px-4 py-3.5 rounded-xl border w-full text-left transition-all duration-300 ${
+          expanded
+            ? 'border-primary/15 bg-primary/3'
+            : completed
+            ? 'border-border/10 bg-card/10'
+            : 'border-border/10 bg-card/15 hover:bg-card/25 hover:border-border/20'
+        }`}
+      >
+        <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors duration-300 ${
+          completed ? 'bg-primary/10' : expanded ? 'bg-primary/8' : 'bg-muted/30'
+        }`}>
           {completed ? (
-            <Check className="h-3 w-3 shrink-0 text-primary" />
+            <Check className="h-3.5 w-3.5 text-primary" />
           ) : (
-            <ChevronDown
-              className={`h-3 w-3 shrink-0 transition-transform duration-200 ${expanded ? 'rotate-0' : '-rotate-90'}`}
-            />
+            <Icon className={`h-3.5 w-3.5 ${expanded ? 'text-primary/70' : 'text-muted-foreground/50'}`} />
           )}
-          <span className={completed ? 'text-muted-foreground/50' : ''}>{label}</span>
-        </button>
+        </div>
+        <span className={`text-xs font-mono tracking-wide flex-1 ${completed ? 'text-muted-foreground/40' : 'text-foreground/70'}`}>
+          {label}
+        </span>
         {onToggleFavorite && (
           <button
-            onClick={onToggleFavorite}
-            className={`p-1 transition-colors ${isFavorite ? 'text-destructive' : 'text-muted-foreground/30 hover:text-destructive'}`}
+            onClick={(e) => { e.stopPropagation(); onToggleFavorite(); }}
+            className={`p-1 transition-colors ${isFavorite ? 'text-destructive' : 'text-muted-foreground/20 hover:text-destructive/60'}`}
             aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
           >
             <Heart className={`h-3 w-3 ${isFavorite ? 'fill-current' : ''}`} />
           </button>
         )}
-      </div>
-      {expanded && (
-        <div className="animate-fade-in mt-2 ml-4.5">
-          {children}
-        </div>
-      )}
+      </button>
+      <AnimatePresence>
+        {expanded && (
+          <motion.div
+            initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, height: 0 }}
+            transition={{ duration: 0.3, ease: 'easeOut' }}
+            className="overflow-hidden"
+          >
+            <div className="pt-3 pb-1 px-1">
+              {children}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
-  );
-}
-
-function ProLockedCompanion({ label, onUpgrade }: { label: string; onUpgrade: () => void }) {
-  const { t } = useTranslation();
-  return (
-    <button
-      onClick={onUpgrade}
-      className="flex items-center gap-1.5 text-xs font-mono text-muted-foreground/40 hover:text-muted-foreground/60 transition-colors w-full text-left"
-    >
-      <Lock className="h-3 w-3 shrink-0" />
-      <span>{label}</span>
-      <span className="ml-auto text-[9px] uppercase tracking-wider text-primary/40">{t('pro.badge')}</span>
-    </button>
   );
 }
 
