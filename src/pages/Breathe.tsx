@@ -616,7 +616,7 @@ export default function Breathe() {
                   transition={{ duration: 0.8 }}
                 >
                   <WordByWordText
-                    text={VOID_CONTEMPLATIONS[contemplationIndex]}
+                    text={VOID_CONTEMPLATIONS[level][contemplationIndex % VOID_CONTEMPLATIONS[level].length]}
                     delay={0.5}
                     color={textColors[level]}
                   />
