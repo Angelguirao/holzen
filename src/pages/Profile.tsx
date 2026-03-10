@@ -7,7 +7,7 @@ import { useHolzen } from '@/hooks/use-holzen';
 import { useSubscription } from '@/hooks/use-subscription';
 import { formatBtcPrice } from '@/lib/btc';
 import { format } from 'date-fns';
-import { Mail, Lock, Clock, Trash2 } from 'lucide-react';
+import { Mail, Lock, Clock, Trash2, BarChart3, Sparkles, Award, CalendarDays } from 'lucide-react';
 import HistoryContent from '@/components/library/HistoryContent';
 import { Skeleton } from '@/components/ui/skeleton';
 import { ReflectionStats } from '@/components/ReflectionStats';
@@ -157,35 +157,40 @@ const Profile = () => {
   const fmtPrice = (p: number) => formatBtcPrice(p, currency);
 
   const tabs = [
-    { id: 'stats' as const, label: t('profile.stats') },
-    { id: 'insights' as const, label: t('profile.insights') },
-    { id: 'badges' as const, label: t('profile.badges') },
-    { id: 'letters' as const, label: t('profile.letters'), count: pendingLetters.length },
-    { id: 'activity' as const, label: t('profile.activity') },
+    { id: 'stats' as const, label: t('profile.stats'), icon: BarChart3 },
+    { id: 'insights' as const, label: t('profile.insights'), icon: Sparkles },
+    { id: 'badges' as const, label: t('profile.badges'), icon: Award },
+    { id: 'letters' as const, label: t('profile.letters'), icon: Mail, count: pendingLetters.length },
+    { id: 'activity' as const, label: t('profile.activity'), icon: CalendarDays },
   ];
 
   return (
     <div className="space-y-6">
       {/* Tab header */}
-      <div className="space-y-4">
-        <div className="flex items-center gap-5 overflow-x-auto">
-          {tabs.map((t) => (
+      <div className="flex gap-1.5 overflow-x-auto pb-0.5 -mx-1 px-1">
+        {tabs.map((tabItem) => {
+          const Icon = tabItem.icon;
+          const isActive = tab === tabItem.id;
+          return (
             <button
-              key={t.id}
-              onClick={() => setTab(t.id)}
-              className={`text-sm font-mono tracking-widest uppercase transition-colors whitespace-nowrap ${
-                tab === t.id ? 'text-foreground' : 'text-muted-foreground/50 hover:text-muted-foreground'
+              key={tabItem.id}
+              onClick={() => setTab(tabItem.id)}
+              className={`relative flex items-center gap-1.5 px-3 py-2 rounded-lg text-[11px] font-mono tracking-wider uppercase transition-all whitespace-nowrap ${
+                isActive
+                  ? 'bg-primary/10 text-primary shadow-sm'
+                  : 'text-muted-foreground/50 hover:text-muted-foreground hover:bg-muted/50'
               }`}
             >
-              {t.label}
-              {t.count && t.count > 0 ? (
-                <span className="ml-1.5 text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">
-                  {t.count}
+              <Icon className={`h-3.5 w-3.5 ${isActive ? 'text-primary' : 'text-muted-foreground/40'}`} />
+              {tabItem.label}
+              {tabItem.count && tabItem.count > 0 ? (
+                <span className="text-[9px] bg-primary/20 text-primary px-1.5 py-0.5 rounded-full leading-none font-medium">
+                  {tabItem.count}
                 </span>
               ) : null}
             </button>
-          ))}
-        </div>
+          );
+        })}
       </div>
 
       {tab === 'stats' ? (
