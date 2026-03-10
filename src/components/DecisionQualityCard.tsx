@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Shield, TrendingUp, TrendingDown, Minus, ChevronDown, Wind, BookOpen, Feather, Radio, Eye, History } from 'lucide-react';
+import { ChartEmptyState } from './ChartEmptyState';
 import { useTranslation } from 'react-i18next';
 
 interface Reflection {

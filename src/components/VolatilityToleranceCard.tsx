@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { Activity } from 'lucide-react';
+import { ChartEmptyState } from './ChartEmptyState';
 import { useTranslation } from 'react-i18next';
 
 interface Reflection {

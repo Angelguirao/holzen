@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { Sparkles, ChevronDown, Zap, Timer, Layers, TrendingUp, TrendingDown } from 'lucide-react';
+import { ChartEmptyState } from './ChartEmptyState';
 import { STEP_REGISTRY } from '@/components/ritual/stepRegistry';
 
 interface RitualCompletion {
