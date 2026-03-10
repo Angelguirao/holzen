@@ -6,14 +6,10 @@ import { useAuth } from '@/hooks/use-auth';
 import { hapticFeedback } from '@/lib/haptics';
 import { toast } from 'sonner';
 import { Check } from 'lucide-react';
+import { MoodIcon, MOOD_GLYPHS } from '@/components/icons/MoodIcon';
 
 const MOODS = ['fomo', 'excited', 'greedy', 'anxious', 'calm', 'detached', 'uncertain', 'fearful'] as const;
 const INTENSITIES = [1, 2, 3, 4, 5] as const;
-
-const MOOD_EMOJI: Record<string, string> = {
-  fomo: '😰', excited: '🤩', greedy: '🤑', anxious: '😟',
-  calm: '😌', detached: '😐', uncertain: '🤔', fearful: '😨',
-};
 
 interface Props {
   onComplete: () => void;
@@ -72,13 +68,13 @@ export function EmotionalCheckIn({ onComplete, textColor, ringColor }: Props) {
                 <button
                   key={m}
                   onClick={() => { setMood(m); hapticFeedback('light'); setStep('intensity'); }}
-                  className="flex flex-col items-center gap-1 p-3 rounded-lg border transition-all hover:scale-105"
+                  className="flex flex-col items-center gap-1.5 p-3 rounded-lg border transition-all hover:scale-105"
                   style={{
                     borderColor: mood === m ? ringColor : 'transparent',
                     background: mood === m ? `${ringColor}` : 'rgba(255,255,255,0.03)',
                   }}
                 >
-                  <span className="text-xl">{MOOD_EMOJI[m]}</span>
+                  <MoodIcon mood={m} size={20} style={{ color: textColor, opacity: 0.7 }} />
                   <span className="text-[8px] font-mono uppercase tracking-wider" style={{ color: textColor, opacity: 0.7 }}>
                     {t(`moods.${m}`)}
                   </span>
@@ -162,13 +158,13 @@ export function EmotionalCheckIn({ onComplete, textColor, ringColor }: Props) {
                 <button
                   key={m}
                   onClick={() => { setMoodAfter(m); hapticFeedback('light'); }}
-                  className="flex flex-col items-center gap-1 p-3 rounded-lg border transition-all hover:scale-105"
+                  className="flex flex-col items-center gap-1.5 p-3 rounded-lg border transition-all hover:scale-105"
                   style={{
                     borderColor: moodAfter === m ? ringColor : 'transparent',
                     background: moodAfter === m ? `${ringColor}` : 'rgba(255,255,255,0.03)',
                   }}
                 >
-                  <span className="text-xl">{MOOD_EMOJI[m]}</span>
+                  <MoodIcon mood={m} size={20} style={{ color: textColor, opacity: 0.7 }} />
                   <span className="text-[8px] font-mono uppercase tracking-wider" style={{ color: textColor, opacity: 0.7 }}>
                     {t(`moods.${m}`)}
                   </span>
@@ -200,9 +196,11 @@ export function EmotionalCheckIn({ onComplete, textColor, ringColor }: Props) {
           <motion.div key="done" className="flex flex-col items-center gap-4" initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}>
             <Check className="h-8 w-8" style={{ color: textColor, opacity: 0.6 }} />
             {mood && moodAfter && mood !== moodAfter ? (
-              <p className="text-[10px] font-mono tracking-[0.2em] uppercase" style={{ color: textColor, opacity: 0.5 }}>
-                {MOOD_EMOJI[mood]} → {MOOD_EMOJI[moodAfter]}
-              </p>
+              <div className="flex items-center gap-3" style={{ color: textColor, opacity: 0.5 }}>
+                <MoodIcon mood={mood} size={16} />
+                <span className="text-[10px] font-mono">→</span>
+                <MoodIcon mood={moodAfter} size={16} />
+              </div>
             ) : (
               <p className="text-[10px] font-mono tracking-[0.3em] uppercase" style={{ color: textColor, opacity: 0.5 }}>
                 {t('practice.checkinSaved')}
