@@ -11,7 +11,7 @@ import { hapticFeedback } from '@/lib/haptics';
 import { type MoodValue } from '@/components/MoodCheck';
 import { type CompanionData, type CompanionPrefs } from '@/components/CompanionSection';
 
-import { PauseProgress, type PauseStep } from '@/components/pause/PauseProgress';
+import { PauseProgress, type PauseStep, STEPS } from '@/components/pause/PauseProgress';
 import { PauseHeader } from '@/components/pause/PauseHeader';
 import { PauseBreathing } from '@/components/pause/PauseBreathing';
 import { PauseReflect } from '@/components/pause/PauseReflect';
