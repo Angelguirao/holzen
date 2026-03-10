@@ -25,6 +25,7 @@ import { MoodPriceScatter } from '@/components/MoodPriceScatter';
 import { RitualStatsCard } from '@/components/RitualStatsCard';
 
 import { StatsTrends } from '@/components/StatsTrends';
+import { MoodShiftChart } from '@/components/MoodShiftChart';
 import { PeriodComparison } from '@/components/PeriodComparison';
 import { VolatilityToleranceCard } from '@/components/VolatilityToleranceCard';
 import { ShareStats } from '@/components/ShareStats';
