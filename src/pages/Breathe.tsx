@@ -306,6 +306,7 @@ export default function Breathe() {
     [pollRef, contemplationTimerRef, tickRef].forEach((ref) => {
       if (ref.current) clearInterval(ref.current);
     });
+    stopDroneRef.current?.();
     setMode('ambient');
   }, []);
 
