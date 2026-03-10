@@ -80,10 +80,21 @@ export function HolzenRitual({
     if (open && initialSteps) {
       setSteps(initialSteps);
       setTemplateName(initialTemplateName || 'Custom');
-      setPhase('run');
+      setPhase('mood-before');
       startTimeRef.current = Date.now();
     }
   }, [open, initialSteps, initialTemplateName]);
+
+  // Quick-start: use default "standard" preset
+  useEffect(() => {
+    if (open && quickStart && !initialSteps) {
+      const std = PRESET_TEMPLATES.find((p) => p.id === 'standard')!;
+      setSteps([...std.steps] as StepData[]);
+      setTemplateName('standard');
+      setPhase('mood-before');
+      startTimeRef.current = Date.now();
+    }
+  }, [open, quickStart, initialSteps]);
 
   // Mantra at start of run
   useEffect(() => {
