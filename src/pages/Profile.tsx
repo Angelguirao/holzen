@@ -430,6 +430,7 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
       <ProLock>
         <StatsSection label={t('profile.sectionAdvanced', 'Advanced')}>
           <StatsTrends reflections={reflections} />
+          <MoodShiftChart reflections={reflections} />
           <MoodPriceScatter reflections={reflections} />
         </StatsSection>
       </ProLock>
