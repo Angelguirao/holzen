@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, useReducedMotion, AnimatePresence } from 'framer-motion';
 import {
-  TrendingDown, Wind, Eye, Target, Sparkles,
+  TrendingDown, Wind, Eye, Target, Sparkles, Heart,
   AlertTriangle, Zap, Frown,
 } from 'lucide-react';
 
