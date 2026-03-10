@@ -414,22 +414,22 @@
     "heroDesc": "Holzen is a self-awareness practice for Bitcoin holders. When volatility hits, you get a moment to breathe, reflect, and notice your patterns — before impulse takes over.",
     "getStartedForFree": "Start for free",
     "noCreditCard": "Free forever · Pro ${{price}}/mo · no credit card",
-    "reflectionLoop": "The reflection loop",
+    "reflectionLoop": "Impulse vs. Intention",
     "reaction": {
-      "label": "Without Holzen",
+      "label": "Impulse",
       "01title": "The market drops",
-      "02title": "Panic sets in",
-      "03title": "You sell impulsively",
-      "04title": "You regret it later"
+      "02title": "Fear takes over",
+      "03title": "You sell on instinct",
+      "04title": "Regret follows"
     },
     "reflection": {
-      "label": "With Holzen",
+      "label": "Intention",
       "01title": "The market drops",
-      "02title": "You pause & feel",
+      "02title": "You notice the impulse",
       "03title": "You breathe",
-      "04title": "You reflect",
-      "05title": "You decide deliberately",
-      "06title": "You grow over time"
+      "04title": "You observe, not react",
+      "05title": "You decide with clarity",
+      "06title": "You compound wisdom"
     },
     "steps": {
       "01title": "The market moves",
