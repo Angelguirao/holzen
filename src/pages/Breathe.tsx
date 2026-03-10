@@ -292,6 +292,7 @@ export default function Breathe() {
       if (blockData?.lastBlockTime) {
         setTimeSinceBlock(Math.floor(Date.now() / 1000) - blockData.lastBlockTime);
       }
+      setVoidElapsed((prev) => prev + 1);
     };
     tick();
     tickRef.current = setInterval(tick, 1000);
