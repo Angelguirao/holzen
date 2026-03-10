@@ -112,7 +112,7 @@ function SealCracks() {
 export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const { currency } = useHolzen();
+  const { currency, threshold, thresholdDown } = useHolzen();
   const prefersReducedMotion = useReducedMotion();
   const [letters, setLetters] = useState<Letter[]>([]);
   const [pendingLetters, setPendingLetters] = useState<Letter[]>([]);
@@ -121,8 +121,11 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
   const [sending, setSending] = useState(false);
   const [sealPhase, setSealPhase] = useState<'idle' | 'sealing' | 'sealed'>('idle');
   const [loaded, setLoaded] = useState(false);
-  const isCrash = changePercent !== null && changePercent <= -LETTER_THRESHOLD;
-  const isSurge = changePercent !== null && changePercent >= LETTER_THRESHOLD;
+  // Calm-mode recipient: who should receive this letter?
+  const [calmTarget, setCalmTarget] = useState<'crash' | 'surge'>('crash');
+
+  const isCrash = changePercent !== null && changePercent <= -thresholdDown;
+  const isSurge = changePercent !== null && changePercent >= threshold;
   const isVolatile = isCrash || isSurge;
   const isCalm = !isVolatile;
 
@@ -130,12 +133,12 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
   const canWrite = isVolatile || (isCalm && currentPrice !== null);
 
   const writtenDuring = effectiveMode === 'calm' ? 'calm' : (isCrash ? 'crash' : 'surge');
-  const deliverDuring = effectiveMode === 'calm' ? 'crash' : (isCrash ? 'surge' : 'crash');
+  const deliverDuring = effectiveMode === 'calm' ? calmTarget : (isCrash ? 'surge' : 'crash');
 
   const prompts = effectiveMode === 'calm'
-    ? WRITING_PROMPTS.calm
+    ? (calmTarget === 'crash' ? WRITING_PROMPTS.calm : WRITING_PROMPTS.crash)
     : (isCrash ? WRITING_PROMPTS.crash : WRITING_PROMPTS.surge);
-  const randomPrompt = useMemo(() => prompts[Math.floor(Math.random() * prompts.length)], [isCrash, effectiveMode]);
+  const randomPrompt = useMemo(() => prompts[Math.floor(Math.random() * prompts.length)], [isCrash, effectiveMode, calmTarget]);
 
   useEffect(() => {
     if (!user) return;
