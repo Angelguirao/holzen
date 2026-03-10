@@ -1,23 +1,24 @@
 import { Button } from '@/components/ui/button';
 import { useTranslation } from 'react-i18next';
+import { MoodIcon } from '@/components/icons/MoodIcon';
 
 const moodGroups = [
   {
     key: 'highEnergy',
     moods: [
-      { value: 'fomo', key: 'fomo', emoji: '🔥' },
-      { value: 'excited', key: 'excited', emoji: '⚡' },
-      { value: 'greedy', key: 'greedy', emoji: '🤑' },
-      { value: 'anxious', key: 'anxious', emoji: '😰' },
+      { value: 'fomo', key: 'fomo' },
+      { value: 'excited', key: 'excited' },
+      { value: 'greedy', key: 'greedy' },
+      { value: 'anxious', key: 'anxious' },
     ],
   },
   {
     key: 'lowEnergy',
     moods: [
-      { value: 'calm', key: 'calm', emoji: '🧘' },
-      { value: 'detached', key: 'detached', emoji: '😶' },
-      { value: 'uncertain', key: 'uncertain', emoji: '🤔' },
-      { value: 'fearful', key: 'fearful', emoji: '😨' },
+      { value: 'calm', key: 'calm' },
+      { value: 'detached', key: 'detached' },
+      { value: 'uncertain', key: 'uncertain' },
+      { value: 'fearful', key: 'fearful' },
     ],
   },
 ] as const;
@@ -59,7 +60,7 @@ export function MoodCheck({ onSelect, onSkip, variant = 'before' }: Props) {
             {t(`moodCheck.${group.key}`)}
           </p>
           <div className="grid grid-cols-4 gap-1.5">
-            {group.moods.map(({ value, key, emoji }) => (
+            {group.moods.map(({ value, key }) => (
               <Button
                 key={value}
                 variant="outline"
@@ -67,7 +68,7 @@ export function MoodCheck({ onSelect, onSkip, variant = 'before' }: Props) {
                 onClick={() => onSelect(value)}
                 className="flex flex-col items-center gap-0.5 h-auto py-2.5 text-[10px] font-mono border-border/50 hover:border-primary/30 hover:bg-primary/5 transition-colors"
               >
-                <span className="text-sm">{emoji}</span>
+                <MoodIcon mood={value} size={18} className="text-muted-foreground" />
                 {t(`moodCheck.moods.${key}`)}
               </Button>
             ))}

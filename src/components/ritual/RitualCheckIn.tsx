@@ -3,12 +3,9 @@ import { Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { hapticFeedback } from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
+import { MoodIcon } from '@/components/icons/MoodIcon';
 
 const MOODS = ['fomo', 'excited', 'greedy', 'anxious', 'calm', 'detached', 'uncertain', 'fearful'] as const;
-const EMOJI: Record<string, string> = {
-  fomo: '😰', excited: '🤩', greedy: '🤑', anxious: '😟',
-  calm: '😌', detached: '😐', uncertain: '🤔', fearful: '😨',
-};
 
 export function RitualCheckIn({ onComplete }: { onComplete: (mood?: string) => void }) {
   const { t } = useTranslation();
@@ -25,11 +22,11 @@ export function RitualCheckIn({ onComplete }: { onComplete: (mood?: string) => v
           <button
             key={m}
             onClick={() => { setSelected(m); hapticFeedback('light'); }}
-            className={`flex flex-col items-center gap-0.5 p-2 rounded-md border transition-all ${
+            className={`flex flex-col items-center gap-1 p-2 rounded-md border transition-all ${
               selected === m ? 'border-primary/40 bg-primary/5' : 'border-border/30 hover:border-border/60'
             }`}
           >
-            <span className="text-lg">{EMOJI[m]}</span>
+            <MoodIcon mood={m} size={18} className={selected === m ? 'text-primary' : 'text-muted-foreground/60'} />
             <span className="text-[8px] font-mono uppercase tracking-wider text-muted-foreground/60">
               {t(`moods.${m}`)}
             </span>
