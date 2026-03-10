@@ -323,9 +323,38 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
               </p>
             </div>
           </div>
+
+          {/* Calm mode: choose recipient */}
+          {effectiveMode === 'calm' && (
+            <div className="flex gap-1.5">
+              <button
+                onClick={() => setCalmTarget('crash')}
+                className={`flex-1 py-2 rounded-md text-[10px] font-mono tracking-wider transition-colors border ${
+                  calmTarget === 'crash'
+                    ? 'border-primary/30 bg-primary/5 text-primary'
+                    : 'border-border/40 text-muted-foreground/50 hover:text-muted-foreground/70'
+                }`}
+              >
+                {t('letter.forPanicSelf', 'For my panicking self')}
+              </button>
+              <button
+                onClick={() => setCalmTarget('surge')}
+                className={`flex-1 py-2 rounded-md text-[10px] font-mono tracking-wider transition-colors border ${
+                  calmTarget === 'surge'
+                    ? 'border-primary/30 bg-primary/5 text-primary'
+                    : 'border-border/40 text-muted-foreground/50 hover:text-muted-foreground/70'
+                }`}
+              >
+                {t('letter.forEuphoricSelf', 'For my euphoric self')}
+              </button>
+            </div>
+          )}
+
           <p className="text-xs text-muted-foreground leading-relaxed">
             {effectiveMode === 'calm'
-              ? t('letter.calmDesc')
+              ? (calmTarget === 'crash'
+                ? t('letter.calmDescCrash', 'Write to the version of you that panics during a drop. This letter opens when fear hits.')
+                : t('letter.calmDescSurge', 'Write to the version of you that gets carried away during a surge. This letter opens when euphoria strikes.'))
               : isCrash
                 ? t('letter.crashDesc')
                 : t('letter.surgeDesc')}
@@ -348,10 +377,12 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
                 </PopoverTrigger>
                 <PopoverContent side="top" align="end" className="max-w-[240px] text-xs leading-relaxed p-3">
                   {effectiveMode === 'calm'
-                    ? t('letter.deliveryHintCalm', `If BTC drops ${LETTER_THRESHOLD}%+ or surges ${LETTER_THRESHOLD}%+, this letter will be opened for you.`)
+                    ? (calmTarget === 'crash'
+                      ? t('letter.deliveryHintCalmCrash', `When BTC drops ${thresholdDown}%+, this letter will be opened for you.`)
+                      : t('letter.deliveryHintCalmSurge', `When BTC surges ${threshold}%+, this letter will be opened for you.`))
                     : isCrash
-                      ? t('letter.deliveryHintCrash', `When the market recovers and surges ${LETTER_THRESHOLD}%+, this letter will be opened for you.`)
-                      : t('letter.deliveryHintSurge', `When the market drops ${LETTER_THRESHOLD}%+, this letter will be opened for you.`)}
+                      ? t('letter.deliveryHintCrash', `When the market recovers and surges ${threshold}%+, this letter will be opened for you.`)
+                      : t('letter.deliveryHintSurge', `When the market drops ${thresholdDown}%+, this letter will be opened for you.`)}
                 </PopoverContent>
               </Popover>
               <Button
