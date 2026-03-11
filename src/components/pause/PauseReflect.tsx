@@ -3,6 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { ChevronLeft } from 'lucide-react';
 import { CompanionSection, type CompanionData, type CompanionPrefs } from '@/components/CompanionSection';
 import { CollapsibleReflectionHeader } from '@/components/pause/CollapsibleReflectionHeader';
+import { ReflectionNote } from '@/components/ReflectionNote';
+import { ReflectionTags } from '@/components/ReflectionTags';
 
 interface Props {
   companions: CompanionData;
@@ -32,7 +34,7 @@ export function PauseReflect({
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.6 }}
     >
-      {/* Collapsible header */}
+      {/* Collapsible header with reflection message */}
       <CollapsibleReflectionHeader
         message={reflectionMessage}
         context={context}
@@ -41,6 +43,19 @@ export function PauseReflect({
         onToggleFavorite={onToggleFavorite}
         subscribed={subscribed}
       />
+
+      {/* Note & tags — cognitive reappraisal tools */}
+      {reflectionId && (
+        <motion.div
+          className="space-y-4"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.6 }}
+        >
+          <ReflectionNote reflectionId={reflectionId} initialNote={null} />
+          <ReflectionTags reflectionId={reflectionId} initialTags={[]} />
+        </motion.div>
+      )}
 
       {/* Companions */}
       <CompanionSection
