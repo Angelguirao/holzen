@@ -167,7 +167,7 @@ export function BreathingExercise({ severity = 'mild', onComplete, onClose, auto
         >
           <button
             onClick={closeOverlay}
-            className="absolute top-6 right-6 text-muted-foreground/40 hover:text-foreground transition-colors"
+            className="absolute top-6 right-6 p-3 rounded-full bg-muted/40 backdrop-blur-sm text-foreground/60 hover:text-foreground hover:bg-muted/60 transition-all duration-300 z-10"
             aria-label={t('common.done')}
           >
             <X className="h-5 w-5" />

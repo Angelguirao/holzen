@@ -1,13 +1,13 @@
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft, Shield, TrendingDown, TrendingUp, Leaf } from 'lucide-react';
 import { hapticFeedback } from '@/lib/haptics';
 
 const DECISIONS = [
-  { value: 'held', key: 'hold', emoji: '🪨' },
-  { value: 'sold', key: 'sell', emoji: '📤' },
-  { value: 'bought', key: 'buy', emoji: '📥' },
-  { value: 'nothing', key: 'nothing', emoji: '🌿' },
+  { value: 'held', key: 'hold', icon: Shield },
+  { value: 'sold', key: 'sell', icon: TrendingDown },
+  { value: 'bought', key: 'buy', icon: TrendingUp },
+  { value: 'nothing', key: 'nothing', icon: Leaf },
 ] as const;
 
 interface Props {
@@ -31,22 +31,27 @@ export function PauseDecide({ onDecide, onBack }: Props) {
       </p>
 
       <div className="grid grid-cols-2 gap-3 w-full max-w-xs">
-        {DECISIONS.map((d) => (
-          <motion.button
-            key={d.value}
-            onClick={() => {
-              hapticFeedback('medium');
-              onDecide(d.value);
-            }}
-            whileTap={{ scale: 0.96 }}
-            className="flex flex-col items-center gap-2.5 py-6 rounded-xl border border-border/15 bg-card/20 backdrop-blur-sm hover:bg-card/40 hover:border-border/30 transition-all duration-300"
-          >
-            <span className="text-xl">{d.emoji}</span>
-            <span className="text-[10px] font-mono text-foreground/50 tracking-[0.12em] uppercase">
-              {t(`ritual.decide.${d.key}`)}
-            </span>
-          </motion.button>
-        ))}
+        {DECISIONS.map((d) => {
+          const Icon = d.icon;
+          return (
+            <motion.button
+              key={d.value}
+              onClick={() => {
+                hapticFeedback('medium');
+                onDecide(d.value);
+              }}
+              whileTap={{ scale: 0.96 }}
+              className="flex flex-col items-center gap-3 py-6 rounded-xl border border-border/15 bg-card/20 backdrop-blur-sm hover:bg-card/40 hover:border-border/30 transition-all duration-300"
+            >
+              <div className="w-10 h-10 rounded-full bg-primary/5 border border-primary/10 flex items-center justify-center">
+                <Icon className="h-4 w-4 text-primary/50" />
+              </div>
+              <span className="text-[10px] font-mono text-foreground/50 tracking-[0.12em] uppercase">
+                {t(`ritual.decide.${d.key}`)}
+              </span>
+            </motion.button>
+          );
+        })}
       </div>
 
       {/* Back link */}
