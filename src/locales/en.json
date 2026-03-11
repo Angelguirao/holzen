@@ -233,7 +233,7 @@
       "koanDesc": "A zen paradox to sit with"
     },
     "customPrompt": "Custom prompt",
-    "customPromptDesc": "Add personal guidance the AI will weave into every reflection.",
+    "customPromptDesc": "Add personal guidance the AI will weave into every pause reflection.",
     "customPromptPlaceholder": "Your personal reflection guidance…",
     "silentMode": "Silent mode",
     "silentModeDesc": "Just \"BTC moved.\" — no reflection text.",
