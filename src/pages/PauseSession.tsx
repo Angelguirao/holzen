@@ -30,7 +30,7 @@ interface PersistedSession {
   severity: 'mild' | 'moderate' | 'high';
   moodDone: boolean;
   moodAfterDone: boolean;
-  phase: 'session' | 'done';
+  phase: 'intro' | 'session' | 'done';
   decision: string | null;
   step: PauseStep;
 }
