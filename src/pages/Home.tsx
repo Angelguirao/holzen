@@ -4,7 +4,6 @@ import { useHolzen } from '@/hooks/use-holzen';
 import { TestimonialRequest } from '@/components/TestimonialRequest';
 import { LetterToFutureSelf } from '@/components/LetterToFutureSelf';
 import { ReflectionTriggerOverlay } from '@/components/ReflectionTriggerOverlay';
-import { ReflectionTriggerOverlay } from '@/components/ReflectionTriggerOverlay';
 import { useSubscription } from '@/hooks/use-subscription';
 import { BtcStatus } from '@/components/BtcStatus';
 import { NightReflectionCard, useNightReflection } from '@/components/NightReflectionCard';
