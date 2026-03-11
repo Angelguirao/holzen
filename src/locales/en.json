@@ -1084,7 +1084,7 @@
     "mixed": "Mixed",
     "reactive": "Reactive",
     "holdRate": "Hold Rate",
-    "holdRateDescription": "% of weeks where you held or did nothing after reflecting"
+    "holdRateDescription": "% of weeks where you held or did nothing after pausing"
   },
   "volatilityTimeline": {
     "title": "Volatility Timeline",
