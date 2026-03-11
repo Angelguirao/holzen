@@ -87,6 +87,42 @@ const About = () => {
           </div>
         </motion.div>
 
+        {/* Section: The 5-step pause */}
+        <motion.div {...m(0.1)}>
+          <div className="space-y-5">
+            <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
+              {t('about.pauseResearchTitle')}
+            </p>
+            <p className="text-sm text-foreground leading-relaxed">
+              {t('about.pauseResearchIntro')}
+            </p>
+            {([
+              { key: 'Breathe', icon: Wind },
+              { key: 'Feel', icon: Heart },
+              { key: 'Reflect', icon: BookOpen },
+              { key: 'Shift', icon: RefreshCw },
+              { key: 'Decide', icon: Target },
+            ] as const).map(({ key, icon: Icon }) => (
+              <div key={key} className="flex gap-3">
+                <div className="mt-0.5 w-6 h-6 rounded-full bg-muted/60 flex items-center justify-center shrink-0">
+                  <Icon className="h-3 w-3 text-muted-foreground/60" />
+                </div>
+                <div className="space-y-0.5">
+                  <p className="text-xs font-medium text-foreground">
+                    {t(`about.pauseResearch${key}`)}
+                  </p>
+                  <p className="text-[11px] text-muted-foreground leading-relaxed">
+                    {t(`about.pauseResearch${key}Desc`)}
+                  </p>
+                </div>
+              </div>
+            ))}
+            <p className="text-[10px] text-muted-foreground/70 leading-relaxed italic">
+              {t('about.pauseResearchCitation')}
+            </p>
+          </div>
+        </motion.div>
+
         {/* Section: Why Bitcoin */}
         <motion.div {...m(0.1)}>
           <div className="space-y-4">
