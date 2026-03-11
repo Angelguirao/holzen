@@ -201,33 +201,8 @@ export function NotificationBell() {
         }
       }
 
-      if (reflections) {
-        for (const r of reflections as any[]) {
-          items.push({
-            id: `reflection-${r.id}`,
-            type: 'reflection',
-            title: t('notifications.reflectionTriggered'),
-            subtitle: r.message.slice(0, 60) + (r.message.length > 60 ? '…' : ''),
-            timestamp: r.created_at,
-            action: {
-              label: t('notifications.pauseWithThis'),
-              path: '/pause',
-              state: {
-                reflectionMessage: r.message,
-                context: r.context,
-                reflectionId: r.id,
-                companions: {
-                  haiku: r.haiku ?? null,
-                  learningTitle: r.learning_title ?? null,
-                  learningBody: r.learning_body ?? null,
-                },
-                companionPrefs: { breathing: true, haiku: true, learning: true, signal: true, zoomOut: true, history: true },
-                severity: 'mild' as const,
-              },
-            },
-          });
-        }
-      }
+
+
 
 
       if (insights) {
