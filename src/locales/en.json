@@ -57,12 +57,12 @@
   },
   "home": {
     "greeting": "{{name}}.",
-    "noActiveReflection": "No active reflection.",
-    "generatingReflection": "Generating reflection…",
+    "noActiveReflection": "No active pause.",
+    "generatingReflection": "Preparing your pause…",
     "needAMoment": "I need a pause",
-    "manualReflectionIn": "Manual reflection in {{minutes}} min",
-    "cooldownMessage": "Take this time to breathe. The next reflection will be here when you need it.",
-    "requestAnytime": "Request a reflection anytime — no threshold required.",
+    "manualReflectionIn": "Next pause in {{minutes}} min",
+    "cooldownMessage": "Take this time to breathe. The next pause will be here when you need it.",
+    "requestAnytime": "Request a pause anytime — no threshold required.",
     "startARitual": "Start a ritual",
     "ritualHint": "Feeling reactive? Ground yourself first.",
     "ambientMode": "Ambient mode",
@@ -71,22 +71,22 @@
     "widget": {
       "market": "Market",
       "goal": "Goal",
-      "reflection": "Reflection",
+      "reflection": "Pause",
       "evening": "Evening",
       "letter": "Letter",
       "practice": "Practice"
     },
     "subscription": {
-      "monthlyLimitReached": "You've used your {{freeReflectionsPerMonth}} free reflections this month. Upgrade to Pro for unlimited.",
-      "upgradeToPro": "${{price}}/month · Unlimited reflections + AI companions · Cancel anytime",
+      "monthlyLimitReached": "You've used your {{freeReflectionsPerMonth}} free pauses this month. Upgrade to Pro for unlimited.",
+      "upgradeToPro": "${{price}}/month · Unlimited pauses + AI companions · Cancel anytime",
       "pricePerMonth": "${{price}} per month · Cancel anytime",
       "openingCheckout": "Opening checkout…",
-      "freeRemaining": "{{count}} free reflection remaining this month",
-      "freeRemaining_other": "{{count}} free reflections remaining this month"
+      "freeRemaining": "{{count}} free pause remaining this month",
+      "freeRemaining_other": "{{count}} free pauses remaining this month"
     },
     "errors": {
       "couldNotReachPrice": "Could not reach price data",
-      "aiUnavailable": "AI reflection unavailable right now",
+      "aiUnavailable": "AI pause unavailable right now",
       "somethingWentWrong": "Something went wrong",
       "checkConnection": "Check your internet connection. Price data comes from CoinGecko and may be temporarily unavailable.",
       "aiTemporarilyUnavailable": "The AI service is temporarily unavailable. Your settings and data are safe — try again in a moment.",
