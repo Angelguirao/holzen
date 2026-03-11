@@ -195,7 +195,7 @@
       "curiosityDesc": "Learning about money"
     },
     "personalMantra": "Personal mantra",
-    "mantraDesc": "Optional. Your own words — shown during rituals and woven into AI reflections.",
+    "mantraDesc": "Optional. Your own words — shown during pauses and woven into AI reflections.",
     "mantraPlaceholder": "e.g. I hold because time is on my side…",
     "btcMode": "1 BTC = 1 BTC",
     "btcModeDesc": "Strip away fiat noise. No prices, no percentages, no red or green. Just Bitcoin.",
