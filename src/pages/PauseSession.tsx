@@ -254,6 +254,36 @@ export default function PauseSession() {
         )}
 
         <div className="relative z-10 max-w-md mx-auto px-6 py-20">
+          {/* Intro screen — "You paused. That's the hardest part." */}
+          {phase === 'intro' && (
+            <motion.div
+              className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-8"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.2, delay: 0.5 }}
+            >
+              <motion.p
+                className="text-xl font-light text-foreground/90 leading-relaxed max-w-[280px]"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 1 }}
+              >
+                {t('pause.youPaused', "You paused. That's the hardest part.")}
+              </motion.p>
+
+              <motion.button
+                onClick={handleIntroComplete}
+                className="text-[10px] font-mono text-primary/40 hover:text-primary/70 transition-colors duration-500 tracking-[0.15em] uppercase"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.8, delay: 2.5 }}
+              >
+                {t('pause.steps.continue', 'Continue')}
+              </motion.button>
+            </motion.div>
+          )}
+
           {phase === 'session' && (
             <AnimatePresence mode="wait">
               {step === 'feel' && (
