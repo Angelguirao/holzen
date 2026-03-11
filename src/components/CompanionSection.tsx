@@ -61,7 +61,6 @@ interface Props {
 }
 
 const COMPANION_ICONS: Record<string, React.ElementType> = {
-  breathing: Wind,
   haiku: Feather,
   learning: Anchor,
   signal: Radio,
