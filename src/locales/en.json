@@ -270,7 +270,7 @@
     "enableNightReflection": "Enable night reflection",
     "deliveryTime": "Delivery time (local)",
     "quietHours": "Quiet hours",
-    "quietHoursDesc": "No automatic reflections during these hours.",
+    "quietHoursDesc": "No automatic pauses during these hours.",
     "enableQuietHours": "Enable quiet hours",
     "badgeNotifications": "Badge notifications",
     "badgeNotifDesc": "Get notified when you unlock new milestone badges.",
