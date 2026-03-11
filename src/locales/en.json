@@ -1074,7 +1074,7 @@
   },
   "statsTrends": {
     "weeklyTrends": "Weekly Trends",
-    "emptyMessage": "Reflect across 3+ different weeks to unlock score, mood, and hold-rate trend charts.",
+    "emptyMessage": "Pause across 3+ different weeks to unlock score, mood, and hold-rate trend charts.",
     "scoreOverTime": "Score Over Time",
     "stable": "stable",
     "score": "Score",
