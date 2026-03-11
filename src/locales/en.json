@@ -1163,7 +1163,7 @@
     "moodPriceScatter": "Mood × Price Scatter",
     "moodPriceScatterEmpty": "Need 8+ pauses with mood & price data to reveal emotional patterns.",
     "mood": "Mood",
-    "reflections": "Reflections",
+    "reflections": "Pauses",
     "scatterInsightDifferent": "You tend to feel {{negLabel}} during drops and {{posLabel}} during surges.",
     "scatterInsightSame": "You tend to feel {{label}} regardless of direction.",
     "scatterFooter": "Each dot is one reflection · {{count}} data points",
