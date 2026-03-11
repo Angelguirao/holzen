@@ -16,9 +16,9 @@ const HistoryContent = () => {
   useEffect(() => {
     if (!user) return;
     const load = async () => {
-      const [{ data: refs }, { data: rits }, { data: lets }, { data: bads }, { data: pracs }] = await Promise.all([
+      const [{ data: refs }, { data: lets }, { data: bads }, { data: pracs }] = await Promise.all([
         supabase.from('reflections').select('id, created_at, mood').eq('user_id', user.id),
-        supabase.from('ritual_completions').select('id, created_at, decision, template').eq('user_id', user.id),
+        supabase.from('future_letters').select('id, written_at, deliver_during').eq('user_id', user.id),
         supabase.from('future_letters').select('id, written_at, deliver_during').eq('user_id', user.id),
         supabase.from('user_badges').select('id, earned_at, badge_id').eq('user_id', user.id),
         supabase.from('practice_entries').select('id, created_at, type, mood, prompt').eq('user_id', user.id),
