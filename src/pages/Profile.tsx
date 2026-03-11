@@ -22,7 +22,7 @@ import { BadgesPanel } from '@/components/BadgesPanel';
 import { MoodPriceChart } from '@/components/MoodPriceChart';
 import { MoodTrendChart } from '@/components/MoodTrendChart';
 import { MoodPriceScatter } from '@/components/MoodPriceScatter';
-import { RitualStatsCard } from '@/components/RitualStatsCard';
+
 
 import { StatsTrends } from '@/components/StatsTrends';
 import { MoodShiftChart } from '@/components/MoodShiftChart';
