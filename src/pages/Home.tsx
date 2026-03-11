@@ -3,7 +3,7 @@ import { usePullToRefresh } from '@/hooks/use-pull-to-refresh';
 import { useHolzen } from '@/hooks/use-holzen';
 import { TestimonialRequest } from '@/components/TestimonialRequest';
 import { LetterToFutureSelf } from '@/components/LetterToFutureSelf';
-import { ReflectionTriggerOverlay } from '@/components/ReflectionTriggerOverlay';
+
 import { useSubscription } from '@/hooks/use-subscription';
 import { BtcStatus } from '@/components/BtcStatus';
 import { NightReflectionCard, useNightReflection } from '@/components/NightReflectionCard';
@@ -102,7 +102,7 @@ const Home = () => {
 
   const { reflection: nightReflection, dismiss: dismissNight } = useNightReflection();
 
-  const [showTriggerOverlay, setShowTriggerOverlay] = useState(false);
+  
   const [priceHidden, setPriceHidden] = useState(() => localStorage.getItem('holzen_hide_price') === 'true');
   const [btcMode, setBtcMode] = useState(() => localStorage.getItem('holzen_btc_mode') === 'true');
   const [zenMode] = useState(() => localStorage.getItem('holzen_zen_mode') === 'true');
@@ -185,7 +185,6 @@ const Home = () => {
   useEffect(() => {
     if (newReflection && message) {
       playNotificationTone();
-      setShowTriggerOverlay(true);
       clearNewReflection();
     }
   }, [newReflection, message, clearNewReflection]);
@@ -557,18 +556,6 @@ const Home = () => {
       </DndContext>
 
       {/* Modals (outside widget flow) */}
-      {/* Trigger overlay */}
-      <ReflectionTriggerOverlay
-        open={showTriggerOverlay}
-        context={context}
-        message={message ?? ''}
-        reflectionId={lastReflectionId}
-        companions={companions}
-        companionPrefs={companionPrefs}
-        severity={severity}
-        firstName={firstName}
-        onDismiss={() => setShowTriggerOverlay(false)}
-      />
 
       {/* Testimonial request */}
       <TestimonialRequest reflectionCount={reflectionCount} />
