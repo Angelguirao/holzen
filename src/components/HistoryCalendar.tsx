@@ -234,14 +234,8 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate }: Prop
               </div>
             )}
 
-            {(ritualsList.length > 0 || badgesList.length > 0 || practiceList.length > 0) && (
+            {(badgesList.length > 0 || practiceList.length > 0) && (
               <div className="space-y-1">
-                {ritualsList.map((r) => (
-                  <div key={r.id} className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <Sparkles className="h-2.5 w-2.5 text-primary/60 shrink-0" />
-                    <span>{r.label || t('calendar.ritual')}</span>
-                  </div>
-                ))}
                 {badgesList.map((b) => (
                   <div key={b.id} className="flex items-center gap-2 text-xs text-muted-foreground">
                     <Award className="h-2.5 w-2.5 text-yellow-500/60 shrink-0" />
