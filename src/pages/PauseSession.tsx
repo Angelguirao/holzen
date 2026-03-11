@@ -100,18 +100,45 @@ export default function PauseSession() {
     return () => clearTimeout(timer);
   }, []);
 
+  // Track swipe direction for animation
+  const [swipeDirection, setSwipeDirection] = useState<'forward' | 'back'>('forward');
+
   const goToStep = useCallback((next: PauseStep) => {
+    const currentIndex = STEPS.indexOf(step);
+    const nextIndex = STEPS.indexOf(next);
+    setSwipeDirection(nextIndex >= currentIndex ? 'forward' : 'back');
     hapticFeedback('light');
     setStep(next);
-  }, []);
+  }, [step]);
 
   const goBack = useCallback(() => {
     const currentIndex = STEPS.indexOf(step);
     if (currentIndex > 0) {
+      setSwipeDirection('back');
       hapticFeedback('light');
       setStep(STEPS[currentIndex - 1]);
     }
   }, [step]);
+
+  const goForward = useCallback(() => {
+    const currentIndex = STEPS.indexOf(step);
+    if (currentIndex < STEPS.length - 1) {
+      setSwipeDirection('forward');
+      hapticFeedback('light');
+      setStep(STEPS[currentIndex + 1]);
+    }
+  }, [step]);
+
+  // Swipe handler
+  const handleDragEnd = useCallback((_: any, info: { offset: { x: number }; velocity: { x: number } }) => {
+    const threshold = 50;
+    const velocityThreshold = 300;
+    if (info.offset.x < -threshold || info.velocity.x < -velocityThreshold) {
+      goForward();
+    } else if (info.offset.x > threshold || info.velocity.x > velocityThreshold) {
+      goBack();
+    }
+  }, [goForward, goBack]);
 
   const handleMoodSelect = useCallback(async (mood: MoodValue) => {
     hapticFeedback('light');
