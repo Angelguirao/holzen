@@ -949,7 +949,7 @@
       "composed": "Composed"
     },
     "held": "{{percent}}% held",
-    "emptyMessage": "Reflect during 3 price drops to unlock your volatility tolerance grade."
+    "emptyMessage": "Pause during 3 price drops to unlock your volatility tolerance grade."
   },
   "insightsPanel": {
     "title": "Mood & Actions",
