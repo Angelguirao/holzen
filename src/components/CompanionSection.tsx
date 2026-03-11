@@ -237,7 +237,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
     zoomOut: i18nT('companions.zoomOut'),
     lookBack: i18nT('companions.lookBack'),
   };
-  const [expandedBreathing, setExpandedBreathing] = useState(false);
+  
   const [expandedHaiku, setExpandedHaiku] = useState(false);
   const [expandedLearning, setExpandedLearning] = useState(false);
   const [expandedSignal, setExpandedSignal] = useState(false);
