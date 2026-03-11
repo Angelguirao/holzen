@@ -18,6 +18,7 @@ import { PauseReflect } from '@/components/pause/PauseReflect';
 import { PauseShift } from '@/components/pause/PauseShift';
 import { PauseDecide } from '@/components/pause/PauseDecide';
 import { PauseDone } from '@/components/pause/PauseDone';
+import { PauseScienceSheet } from '@/components/pause/PauseScienceSheet';
 
 const SESSION_KEY = 'holzen_pause_session';
 
