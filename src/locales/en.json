@@ -953,11 +953,11 @@
   },
   "insightsPanel": {
     "title": "Mood & Actions",
-    "howYouFelt": "How you felt before reflecting",
+    "howYouFelt": "How you felt before pausing",
     "whatYouDid": "What you did after",
-    "basedOn": "Based on {{count}} reflection",
-    "basedOn_other": "Based on {{count}} reflections",
-    "emptyMessage": "Record a mood or outcome on a reflection to see your patterns."
+    "basedOn": "Based on {{count}} pause",
+    "basedOn_other": "Based on {{count}} pauses",
+    "emptyMessage": "Record a mood or outcome on a pause to see your patterns."
   },
   "decisionQuality": {
     "title": "Decision Quality",
