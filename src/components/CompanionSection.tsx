@@ -6,7 +6,7 @@ import { LearningInput } from './LearningInput';
 import { SignalDisplay } from './SignalDisplay';
 import { ZoomOutDisplay } from './ZoomOutDisplay';
 import { HistoricalInsightDisplay } from './HistoricalInsightDisplay';
-import { Check, Heart, Lock, Wind, Feather, Anchor, Radio, Mountain, Clock } from 'lucide-react';
+import { Check, Heart, Lock, Feather, Anchor, Radio, Mountain, Clock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { hapticFeedback } from '@/lib/haptics';
 import { useHolzen } from '@/hooks/use-holzen';
