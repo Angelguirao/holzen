@@ -30,7 +30,7 @@ interface PersistedSession {
   severity: 'mild' | 'moderate' | 'high';
   moodDone: boolean;
   moodAfterDone: boolean;
-  phase: 'intro' | 'session' | 'done';
+  phase: 'session' | 'done';
   decision: string | null;
   step: PauseStep;
 }
@@ -73,15 +73,14 @@ export default function PauseSession() {
 
   // Map old step names to new ones for session restoration
   const mapStep = (s: string): PauseStep => {
-    if (s === 'pause') return 'feel';
+    if (s === 'pause') return 'breathe';
     if (s === 'ground') return 'reflect';
     if (STEPS.includes(s as PauseStep)) return s as PauseStep;
-    return 'feel';
+    return 'breathe';
   };
 
-  const skipIntro = !!restored; // Skip intro for restored sessions
-  const [step, setStep] = useState<PauseStep>(mapStep(restored?.step ?? 'feel'));
-  const [phase, setPhase] = useState<'intro' | 'session' | 'done'>(skipIntro ? (restored?.phase === 'done' ? 'done' : 'session') : 'intro');
+  const [step, setStep] = useState<PauseStep>(mapStep(restored?.step ?? 'breathe'));
+  const [phase, setPhase] = useState<'session' | 'done'>(restored?.phase ?? 'session');
   const [decision, setDecision] = useState<string | null>(restored?.decision ?? null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [moodDone, setMoodDone] = useState(restored?.moodDone ?? false);
@@ -178,11 +177,6 @@ export default function PauseSession() {
     );
   }
 
-  const handleIntroComplete = () => {
-    hapticFeedback('light');
-    setPhase('session');
-  };
-
   const stepTransition = {
     initial: { opacity: 0, y: 30 },
     animate: { opacity: 1, y: 0 },
@@ -254,38 +248,14 @@ export default function PauseSession() {
         )}
 
         <div className="relative z-10 max-w-md mx-auto px-6 py-20">
-          {/* Intro screen — "You paused. That's the hardest part." */}
-          {phase === 'intro' && (
-            <motion.div
-              className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-8"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1.2, delay: 0.5 }}
-            >
-              <motion.p
-                className="text-xl font-light text-foreground/90 leading-relaxed max-w-[280px]"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 1, delay: 1 }}
-              >
-                {t('pause.youPaused', "You paused. That's the hardest part.")}
-              </motion.p>
-
-              <motion.button
-                onClick={handleIntroComplete}
-                className="text-[10px] font-mono text-primary/40 hover:text-primary/70 transition-colors duration-500 tracking-[0.15em] uppercase"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.8, delay: 2.5 }}
-              >
-                {t('pause.steps.continue', 'Continue')}
-              </motion.button>
-            </motion.div>
-          )}
-
           {phase === 'session' && (
             <AnimatePresence mode="wait">
+              {step === 'breathe' && (
+                <motion.div key="breathe" {...stepTransition}>
+                  <PauseBreathing mantra={mantra} onContinue={() => goToStep('feel')} />
+                </motion.div>
+              )}
+
               {step === 'feel' && (
                 <motion.div key="feel" {...stepTransition}>
                   <PauseFeel
@@ -295,14 +265,9 @@ export default function PauseSession() {
                     onMoodSelect={handleMoodSelect}
                     onMoodSkip={handleMoodSkip}
                     moodDone={moodDone}
-                    onContinue={() => goToStep('breathe')}
+                    onContinue={() => goToStep('reflect')}
+                    onBack={goBack}
                   />
-                </motion.div>
-              )}
-
-              {step === 'breathe' && (
-                <motion.div key="breathe" {...stepTransition}>
-                  <PauseBreathing mantra={mantra} onContinue={() => goToStep('reflect')} />
                 </motion.div>
               )}
 
