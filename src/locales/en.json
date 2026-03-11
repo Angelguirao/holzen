@@ -219,7 +219,7 @@
       "bluntDesc": "Direct, no fluff"
     },
     "style": "Style",
-    "styleDesc": "Choose how your reflections are structured.",
+    "styleDesc": "Choose how your pause reflections are structured.",
     "styles": {
       "standard": "Standard",
       "standardDesc": "1-3 sentence reflection",
