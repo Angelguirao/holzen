@@ -1275,9 +1275,9 @@
     "generate": "Generate",
     "generated": "Insights generated",
     "failedToGenerate": "Failed to generate insights",
-    "needMinReflections": "Need at least 5 reflections to generate insights. You have {{count}}.",
-    "noInsightsYet": "No insights generated yet. Click \"Generate\" to analyze your reflection patterns.",
-    "analyzingCount": "Analyzing {{count}} reflections…",
+    "needMinReflections": "Need at least 5 pauses to generate insights. You have {{count}}.",
+    "noInsightsYet": "No insights generated yet. Click \"Generate\" to analyze your pause patterns.",
+    "analyzingCount": "Analyzing {{count}} pauses…",
     "refreshRecommended": "Refresh recommended",
     "reflectionsCount": "{{count}} reflections"
   },
