@@ -1495,7 +1495,7 @@
     "sense_taste": "{{count}} thing you can taste",
     "tapToAck": "Tap to acknowledge",
     "grounded": "You are here",
-    "needMoreReflections": "You need at least a week of reflections before replaying. Keep going.",
+    "needMoreReflections": "You need at least a week of pauses before replaying. Keep going.",
     "replayPrompt": "How has your perspective changed?",
     "replayPlaceholder": "Looking back now, I notice…",
     "replaySaved": "Replay saved"
