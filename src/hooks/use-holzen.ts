@@ -377,6 +377,9 @@ export function useHolzen() {
             });
           }
           await supabase.from('library_items').insert(libraryInserts);
+
+          // Fire-and-forget: pre-generate companion data so it's ready at the Reflect step
+          preGenerateCompanions(insertedReflection.id, ctx, msg, language, user.id);
         }
 
         await supabase.from('profiles').update({
