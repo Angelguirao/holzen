@@ -12,9 +12,10 @@ interface Props {
   onMoodSkip: () => void;
   moodDone: boolean;
   onContinue: () => void;
+  onBack?: () => void;
 }
 
-export function PauseFeel({ reflectionId, message, context, onMoodSelect, onMoodSkip, moodDone, onContinue }: Props) {
+export function PauseFeel({ reflectionId, message, context, onMoodSelect, onMoodSkip, moodDone, onContinue, onBack }: Props) {
   const { t } = useTranslation();
 
   return (
