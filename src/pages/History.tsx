@@ -192,7 +192,7 @@ const History = () => {
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
   const [showFilters, setShowFilters] = useState(false);
   const [calendarDate, setCalendarDate] = useState<Date | null>(null);
-  const [calendarFilters, setCalendarFilters] = useState<Set<ActivityType>>(new Set(['reflection', 'ritual', 'letter', 'badge']));
+  const [calendarFilters, setCalendarFilters] = useState<Set<ActivityType>>(new Set(['reflection', 'letter', 'badge']));
   const [calendarActivities, setCalendarActivities] = useState<CalendarActivity[]>([]);
 
   useEffect(() => {
