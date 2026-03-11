@@ -65,7 +65,6 @@ const Home = () => {
     'letter': t('home.widget.letter'),
     'practice': t('home.widget.practice', 'Practice'),
     'breathe': t('home.widget.breathe', 'Stillness'),
-    'breathe': t('home.widget.breathe', 'Stillness'),
   };
   const { user } = useAuth();
   const navigate = useNavigate();
