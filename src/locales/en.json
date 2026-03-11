@@ -1161,7 +1161,7 @@
     "weekOf": "Week of",
     "averageMoodPer": "Average mood per {{period}} across {{count}} pauses",
     "moodPriceScatter": "Mood × Price Scatter",
-    "moodPriceScatterEmpty": "Need 8+ reflections with mood & price data to reveal emotional patterns.",
+    "moodPriceScatterEmpty": "Need 8+ pauses with mood & price data to reveal emotional patterns.",
     "mood": "Mood",
     "reflections": "Reflections",
     "scatterInsightDifferent": "You tend to feel {{negLabel}} during drops and {{posLabel}} during surges.",
