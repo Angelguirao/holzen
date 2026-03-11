@@ -1363,6 +1363,20 @@
     "enterPause": "Enter the pause",
     "notNow": "Not now"
   },
+  "pauseScience": {
+    "whyThisOrder": "Why this order?",
+    "title": "Each step follows research",
+    "breathe": "Breathe",
+    "breatheDesc": "Slow breathing activates the parasympathetic nervous system, shifting from fight-or-flight to regulation. (Porges, 2011)",
+    "feel": "Feel",
+    "feelDesc": "Labeling emotions ('affect labeling') reduces amygdala activation — but only after arousal is lowered. (Lieberman et al., 2007)",
+    "reflect": "Reflect",
+    "reflectDesc": "Cognitive reappraisal after regulation leads to better decisions than suppression. (Gross, 2002)",
+    "shift": "Shift",
+    "shiftDesc": "Checking in again builds metacognitive awareness — observing your own thinking. (Flavell, 1979)",
+    "decide": "Decide",
+    "decideDesc": "System 2 is now online. You can act from intention, not impulse. (Kahneman, 2011)"
+  },
   "ritual": {
     "selectTemplate": "Choose your ritual",
     "intro": "Rituals are guided sequences that slow you down before a financial decision. Pick a preset, build your own, or let AI suggest one — so your choices come from clarity, not impulse.",
