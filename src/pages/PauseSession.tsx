@@ -177,11 +177,6 @@ export default function PauseSession() {
     );
   }
 
-  const handleIntroComplete = () => {
-    hapticFeedback('light');
-    setPhase('session');
-  };
-
   const stepTransition = {
     initial: { opacity: 0, y: 30 },
     animate: { opacity: 1, y: 0 },
