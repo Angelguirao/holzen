@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
+import { ChevronLeft } from 'lucide-react';
 import { MoodCheck, type MoodValue } from '@/components/MoodCheck';
 import { ReflectionNote } from '@/components/ReflectionNote';
 import { ReflectionTags } from '@/components/ReflectionTags';
