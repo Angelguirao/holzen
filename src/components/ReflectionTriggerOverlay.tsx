@@ -13,6 +13,7 @@ interface Props {
   companions: any;
   companionPrefs: any;
   severity: 'mild' | 'moderate' | 'high';
+  firstName?: string | null;
   onDismiss: () => void;
 }
 
