@@ -515,7 +515,7 @@
       "freeQuestion": "What do I get for free?",
       "freeAnswer": "{{freeReflectionsPerMonth}} pauses per month with the core loop: market data, breathing, mood check, and outcome logging. Pro (${{price}}/mo) unlocks unlimited pauses plus all AI companions, insights, library, letters, and more. Cancel anytime.",
       "dataQuestion": "What happens to my data?",
-      "dataAnswer": "We store only what's needed: your email, thresholds, reflections, and mood entries. You can export everything as JSON or CSV anytime, or delete your account entirely with one tap. See our",
+      "dataAnswer": "We store only what's needed: your email, thresholds, pauses, and mood entries. You can export everything as JSON or CSV anytime, or delete your account entirely with one tap. See our",
       "differentQuestion": "How is this different from a journal app?",
       "differentAnswer": "Holzen is triggered by real market volatility — it meets you in the moment you're most likely to act on impulse. It combines breathing exercises, AI reflections, behavioral science, curated intelligence from your sources, and long-term pattern tracking into a single practice. A journal doesn't know when Bitcoin just dropped 8%."
     },
