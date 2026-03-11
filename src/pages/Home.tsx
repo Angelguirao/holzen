@@ -185,7 +185,6 @@ const Home = () => {
   useEffect(() => {
     if (newReflection && message) {
       playNotificationTone();
-      setShowTriggerOverlay(true);
       clearNewReflection();
     }
   }, [newReflection, message, clearNewReflection]);
