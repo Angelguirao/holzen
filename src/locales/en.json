@@ -936,8 +936,8 @@
       "low": "Drops tend to rattle you. Breathing before acting could help.",
       "veryLow": "Drops hit hard emotionally. The ritual is your best defense."
     },
-    "basedOnDrops": "Based on {{count}} drop reflection",
-    "basedOnDrops_other": "Based on {{count}} drop reflections",
+    "basedOnDrops": "Based on {{count}} drop pause",
+    "basedOnDrops_other": "Based on {{count}} drop pauses",
     "buckets": {
       "mild": "Mild dips",
       "moderate": "Moderate drops",
