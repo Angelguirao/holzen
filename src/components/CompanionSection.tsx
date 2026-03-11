@@ -1,12 +1,12 @@
 import { useState, useCallback, useEffect, useRef, forwardRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { BreathingExercise } from './BreathingExercise';
+
 import { HaikuDisplay } from './HaikuDisplay';
 import { LearningInput } from './LearningInput';
 import { SignalDisplay } from './SignalDisplay';
 import { ZoomOutDisplay } from './ZoomOutDisplay';
 import { HistoricalInsightDisplay } from './HistoricalInsightDisplay';
-import { Check, Heart, Lock, Wind, Feather, Anchor, Radio, Mountain, Clock } from 'lucide-react';
+import { Check, Heart, Lock, Feather, Anchor, Radio, Mountain, Clock } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { hapticFeedback } from '@/lib/haptics';
 import { useHolzen } from '@/hooks/use-holzen';
@@ -61,7 +61,6 @@ interface Props {
 }
 
 const COMPANION_ICONS: Record<string, React.ElementType> = {
-  breathing: Wind,
   haiku: Feather,
   learning: Anchor,
   signal: Radio,
@@ -237,7 +236,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
     zoomOut: i18nT('companions.zoomOut'),
     lookBack: i18nT('companions.lookBack'),
   };
-  const [expandedBreathing, setExpandedBreathing] = useState(false);
+  
   const [expandedHaiku, setExpandedHaiku] = useState(false);
   const [expandedLearning, setExpandedLearning] = useState(false);
   const [expandedSignal, setExpandedSignal] = useState(false);
@@ -584,33 +583,19 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
     }
   }, [reflectionId, completion]);
 
-  const hasBreathing = prefs.breathing;
   const hasHaiku = prefs.haiku && companions.haiku;
   const hasLearning = prefs.learning;
   const hasSignal = prefs.signal && !!reflectionId;
   const hasZoomOut = prefs.zoomOut && !!reflectionId;
   const hasHistory = prefs.history && !!reflectionId;
 
-  if (!hasBreathing && !hasHaiku && !hasLearning && !hasSignal && !hasZoomOut && !hasHistory) return null;
+  if (!hasHaiku && !hasLearning && !hasSignal && !hasZoomOut && !hasHistory) return null;
 
   return (
     <div ref={ref} className="space-y-2.5">
       <p className="text-[10px] font-mono text-muted-foreground/40 uppercase tracking-[0.2em] text-center mb-1">
         {labels.pause}
       </p>
-
-      {hasBreathing && (
-        <CompanionCard
-          id="breathing"
-          label={labels.breathe}
-          icon={COMPANION_ICONS.breathing}
-          expanded={expandedBreathing}
-          onToggle={() => setExpandedBreathing((v) => !v)}
-          completed={completion.breathing}
-        >
-          <BreathingExercise severity={severity} onComplete={() => markCompleted('breathing')} onClose={() => setExpandedBreathing(false)} autoOpen />
-        </CompanionCard>
-      )}
 
       {hasHaiku && (
         <CompanionCard
