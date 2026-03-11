@@ -1337,7 +1337,8 @@
     "badge": "PRO"
   },
   "triggerOverlay": {
-    "readyToPause": "Ready to pause?",
+    "readyToPause": "You paused. That's the hardest part.",
+    "readyToPauseName": "You paused, {{name}}. That's the hardest part.",
     "enterPause": "Enter the pause",
     "notNow": "Not now"
   },
