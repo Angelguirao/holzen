@@ -236,7 +236,7 @@ export default function PauseSession() {
           <X className="h-4 w-4" />
         </button>
 
-        {/* Progress indicator — positioned below close button to avoid overlap */}
+        {/* Progress indicator — hidden during intro */}
         {phase === 'session' && (
           <motion.div
             className="fixed top-5 left-5 z-[55]"
