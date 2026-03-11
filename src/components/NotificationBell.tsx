@@ -311,7 +311,7 @@ export function NotificationBell() {
     letter: '✉️',
     insight: '✨',
     reflection: '📝',
-    ritual: '🔮',
+    
   };
 
   return (
