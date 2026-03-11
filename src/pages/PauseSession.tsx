@@ -79,8 +79,9 @@ export default function PauseSession() {
     return 'feel';
   };
 
+  const skipIntro = !!restored; // Skip intro for restored sessions
   const [step, setStep] = useState<PauseStep>(mapStep(restored?.step ?? 'feel'));
-  const [phase, setPhase] = useState<'session' | 'done'>(restored?.phase ?? 'session');
+  const [phase, setPhase] = useState<'intro' | 'session' | 'done'>(skipIntro ? (restored?.phase === 'done' ? 'done' : 'session') : 'intro');
   const [decision, setDecision] = useState<string | null>(restored?.decision ?? null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [moodDone, setMoodDone] = useState(restored?.moodDone ?? false);
