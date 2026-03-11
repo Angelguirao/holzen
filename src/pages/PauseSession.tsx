@@ -210,7 +210,7 @@ export default function PauseSession() {
     initial: { opacity: 0, x: swipeDirection === 'forward' ? slideX : -slideX },
     animate: { opacity: 1, x: 0 },
     exit: { opacity: 0, x: swipeDirection === 'forward' ? -slideX : slideX },
-    transition: { duration: prefersReducedMotion ? 0.1 : 0.35, ease: [0.25, 0.1, 0.25, 1] },
+    transition: { duration: prefersReducedMotion ? 0.1 : 0.35, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] },
   };
 
   const dragProps = {
