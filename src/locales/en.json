@@ -207,7 +207,7 @@
     "cooldown": "Cooldown",
     "cooldownDesc": "Minimum time between automatic pauses.",
     "tone": "Tone",
-    "toneDesc": "Choose the voice of your reflections.",
+    "toneDesc": "Choose the voice of your pause reflections.",
     "tones": {
       "stoic": "Stoic",
       "stoicDesc": "Grounded, like Marcus Aurelius",
