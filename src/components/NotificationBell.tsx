@@ -108,7 +108,7 @@ const SwipeableNotification = forwardRef<HTMLDivElement, {
 
 type NotificationItem = {
   id: string;
-  type: 'badge' | 'night_reflection' | 'letter' | 'insight' | 'reflection';
+  type: 'badge' | 'night_reflection' | 'letter' | 'insight';
   title: string;
   subtitle: string;
   timestamp: string;
