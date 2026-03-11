@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Wind, Heart, BookOpen, RefreshCw, Target } from 'lucide-react';
 import { PageMeta } from '@/components/PageMeta';
 
 const fade = (delay = 0) => ({
