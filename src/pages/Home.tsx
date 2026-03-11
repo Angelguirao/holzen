@@ -556,18 +556,6 @@ const Home = () => {
       </DndContext>
 
       {/* Modals (outside widget flow) */}
-      {/* Trigger overlay */}
-      <ReflectionTriggerOverlay
-        open={showTriggerOverlay}
-        context={context}
-        message={message ?? ''}
-        reflectionId={lastReflectionId}
-        companions={companions}
-        companionPrefs={companionPrefs}
-        severity={severity}
-        firstName={firstName}
-        onDismiss={() => setShowTriggerOverlay(false)}
-      />
 
       {/* Testimonial request */}
       <TestimonialRequest reflectionCount={reflectionCount} />
