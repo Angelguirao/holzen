@@ -1078,7 +1078,7 @@
     "scoreOverTime": "Score Over Time",
     "stable": "stable",
     "score": "Score",
-    "weeklyComposureScore": "Weekly composure score across {{count}} reflections",
+    "weeklyComposureScore": "Weekly composure score across {{count}} pauses",
     "moodDistribution": "Mood Distribution",
     "composed": "Composed",
     "mixed": "Mixed",
