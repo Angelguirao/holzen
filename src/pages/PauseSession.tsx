@@ -73,10 +73,10 @@ export default function PauseSession() {
 
   // Map old step names to new ones for session restoration
   const mapStep = (s: string): PauseStep => {
-    if (s === 'pause') return 'feel';
+    if (s === 'pause') return 'breathe';
     if (s === 'ground') return 'reflect';
     if (STEPS.includes(s as PauseStep)) return s as PauseStep;
-    return 'feel';
+    return 'breathe';
   };
 
   const skipIntro = !!restored; // Skip intro for restored sessions
