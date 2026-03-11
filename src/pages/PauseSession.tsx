@@ -285,17 +285,17 @@ export default function PauseSession() {
           </motion.div>
         )}
 
-        <div className="relative z-10 max-w-md mx-auto px-6 py-20">
+        <div className="relative z-10 max-w-md mx-auto px-6 py-20 overflow-hidden">
           {phase === 'session' && (
-            <AnimatePresence mode="wait">
+            <AnimatePresence mode="wait" initial={false}>
               {step === 'breathe' && (
-                <motion.div key="breathe" {...stepTransition}>
+                <motion.div key="breathe" {...stepTransition} {...dragProps}>
                   <PauseBreathing mantra={mantra} onContinue={() => goToStep('feel')} />
                 </motion.div>
               )}
 
               {step === 'feel' && (
-                <motion.div key="feel" {...stepTransition}>
+                <motion.div key="feel" {...stepTransition} {...dragProps}>
                   <PauseFeel
                     reflectionId={reflectionId}
                     message={message}
@@ -310,7 +310,7 @@ export default function PauseSession() {
               )}
 
               {step === 'reflect' && (
-                <motion.div key="reflect" {...stepTransition}>
+                <motion.div key="reflect" {...stepTransition} {...dragProps}>
                   <PauseReflect
                     companions={companions}
                     companionPrefs={companionPrefs}
@@ -328,7 +328,7 @@ export default function PauseSession() {
               )}
 
               {step === 'shift' && (
-                <motion.div key="shift" {...stepTransition}>
+                <motion.div key="shift" {...stepTransition} {...dragProps}>
                   <PauseShift
                     onMoodAfterSelect={handleMoodAfterSelect}
                     onMoodAfterSkip={handleMoodAfterSkip}
@@ -340,7 +340,7 @@ export default function PauseSession() {
               )}
 
               {step === 'decide' && (
-                <motion.div key="decide" {...stepTransition}>
+                <motion.div key="decide" {...stepTransition} {...dragProps}>
                   <PauseDecide onDecide={handleDecide} onBack={goBack} />
                 </motion.div>
               )}
