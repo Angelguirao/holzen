@@ -159,7 +159,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
         const a = document.createElement('a');
         a.href = url; a.download = `holzen-export-${dateStr}.json`; a.click();
         URL.revokeObjectURL(url);
-        toast.success('Data exported', { description: `${reflections?.length ?? 0} reflections + ${rituals?.length ?? 0} rituals.` });
+        toast.success('Data exported', { description: `${reflections?.length ?? 0} reflections.` });
       }
     } catch {
       toast.error('Export failed');
