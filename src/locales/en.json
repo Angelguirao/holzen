@@ -1093,7 +1093,7 @@
     "legendCalm": "Calm",
     "legendAnxious": "Anxious",
     "legendNeutral": "Neutral",
-    "reflections": "Reflections ({{count}})",
+    "reflections": "Pauses ({{count}})",
     "context": "Context",
     "outcome": "Outcome",
     "ritual": "Ritual",
