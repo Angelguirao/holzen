@@ -205,7 +205,7 @@
     "reflectionLanguage": "Language",
     "reflectionLanguageDesc": "Choose the language for the entire app, including AI-generated reflections, haikus, and insights.",
     "cooldown": "Cooldown",
-    "cooldownDesc": "Minimum time between automatic reflections.",
+    "cooldownDesc": "Minimum time between automatic pauses.",
     "tone": "Tone",
     "toneDesc": "Choose the voice of your reflections.",
     "tones": {
