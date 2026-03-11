@@ -244,7 +244,7 @@
     "zenMode": "Zen mode",
     "zenModeDesc": "Strips the home screen to just the pause and breathing exercise.",
     "enableZenMode": "Enable zen mode",
-    "companionsDesc": "Optional additions shown below each reflection.",
+    "companionsDesc": "Optional additions shown during each pause.",
     "companionLabels": {
       "breathing": "Breathing exercise",
       "haiku": "Haiku",
