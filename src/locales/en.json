@@ -1302,7 +1302,7 @@
     "fr": "Fr",
     "sa": "Sa",
     "noActivity": "No activity.",
-    "reflectionCount": "{{count}} reflection(s)",
+    "reflectionCount": "{{count}} pause(s)",
     "ritualCount": "{{count}} ritual(s)",
     "letterCount": "{{count}} letter(s)",
     "badgeCount": "{{count}} badge(s)",
