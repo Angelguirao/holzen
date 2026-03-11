@@ -253,6 +253,49 @@ const Landing = () => {
         </Section>
       </div>
 
+      {/* ─── FIVE-STEP SCIENCE ─── */}
+      <div className="bg-muted/30">
+        <div className="max-w-lg mx-auto px-6 py-16">
+          <Section>
+            <SectionLabel>{t('landing.scienceStepsTitle')}</SectionLabel>
+            <p className="text-sm text-muted-foreground leading-relaxed mb-8">
+              {t('landing.scienceStepsIntro')}
+            </p>
+            <div className="space-y-4">
+              {([
+                { key: 'Breathe', icon: Wind },
+                { key: 'Feel', icon: Heart },
+                { key: 'Reflect', icon: BookOpen },
+                { key: 'Shift', icon: RefreshCw },
+                { key: 'Decide', icon: Target },
+              ] as const).map(({ key, icon: Icon }, i) => (
+                <motion.div
+                  key={key}
+                  className="flex gap-3 rounded-lg border border-border/40 bg-background/60 p-4"
+                  initial={prefersReduced ? {} : { opacity: 0, x: -10 }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.4, delay: i * 0.08 }}
+                >
+                  <div className="mt-0.5 w-7 h-7 rounded-full bg-muted/60 flex items-center justify-center shrink-0">
+                    <Icon className="h-3.5 w-3.5 text-muted-foreground/60" />
+                  </div>
+                  <div className="space-y-1 min-w-0">
+                    <p className="text-xs font-medium text-foreground">{key}</p>
+                    <p className="text-[10px] text-muted-foreground leading-relaxed">
+                      {t(`landing.scienceStep${key}`)}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+            <p className="text-[10px] text-muted-foreground/50 leading-relaxed mt-6">
+              {t('landing.scienceStepsCitation')}
+            </p>
+          </Section>
+        </div>
+      </div>
+
       {/* ─── FEATURES ─── */}
       <div className="bg-muted/30">
         <div className="max-w-lg mx-auto px-6 py-16">
