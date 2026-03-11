@@ -367,7 +367,7 @@
   },
   "outcome": {
     "whatDidYouDo": "What did you do?",
-    "pendingOutcomes": "You have {{count}} reflections without an outcome. Logging builds your streak.",
+    "pendingOutcomes": "You have {{count}} pauses without an outcome. Logging builds your streak.",
     "loggingBuildsStreak": "Logging an outcome builds your streak.",
     "streakUpdated": "Streak updated",
     "held": "Held",
