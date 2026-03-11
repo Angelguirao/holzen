@@ -1168,7 +1168,7 @@
     "scatterInsightSame": "You tend to feel {{label}} regardless of direction.",
     "scatterFooter": "Each dot is one pause · {{count}} data points",
     "moodPriceChange": "Mood × Price Change",
-    "moodPriceChangeEmpty": "Log 3+ reflections with mood to compare how you feel vs. market moves.",
+    "moodPriceChangeEmpty": "Log 3+ pauses with mood to compare how you feel vs. market moves.",
     "entries": "{{count}} entries",
     "avgBtcChange": "Average BTC 24h change when each mood was logged",
     "weak": "weak",
