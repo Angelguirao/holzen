@@ -1265,7 +1265,7 @@
     },
     "viewHistory": "View history",
     "aiInsightsReady": "AI insights ready",
-    "basedOnReflections": "Based on {{count}} reflections",
+    "basedOnReflections": "Based on {{count}} pauses",
     "viewInsights": "View insights"
   },
   "aiInsights": {
