@@ -1279,7 +1279,7 @@
     "noInsightsYet": "No insights generated yet. Click \"Generate\" to analyze your pause patterns.",
     "analyzingCount": "Analyzing {{count}} pauses…",
     "refreshRecommended": "Refresh recommended",
-    "reflectionsCount": "{{count}} reflections"
+    "reflectionsCount": "{{count}} pauses"
   },
   "wallpaper": {
     "generating": "Generating wallpaper…",
