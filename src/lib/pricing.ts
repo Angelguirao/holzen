@@ -18,7 +18,7 @@ export const PRO_FEATURES = [
   'learning',
   'ai_insights',
   'night_reflections',
-  'rituals',
+  
   'library',
   'letters',
   'wallpapers',
