@@ -13,6 +13,7 @@ interface Props {
   companions: any;
   companionPrefs: any;
   severity: 'mild' | 'moderate' | 'high';
+  firstName?: string | null;
   onDismiss: () => void;
 }
 
@@ -24,6 +25,7 @@ export function ReflectionTriggerOverlay({
   companions,
   companionPrefs,
   severity,
+  firstName,
   onDismiss,
 }: Props) {
   const { t } = useTranslation();
@@ -110,7 +112,9 @@ export function ReflectionTriggerOverlay({
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6, duration: 0.8 }}
             >
-              {t('triggerOverlay.readyToPause')}
+              {firstName
+                ? t('triggerOverlay.readyToPauseName', { name: firstName })
+                : t('triggerOverlay.readyToPause')}
             </motion.p>
 
             {/* Enter button */}

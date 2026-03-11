@@ -629,6 +629,7 @@ const Home = () => {
         companions={companions}
         companionPrefs={companionPrefs}
         severity={severity}
+        firstName={firstName}
         onDismiss={() => setShowTriggerOverlay(false)}
       />
 
