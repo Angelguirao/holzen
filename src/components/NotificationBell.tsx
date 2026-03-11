@@ -92,13 +92,6 @@ const SwipeableNotification = forwardRef<HTMLDivElement, {
               )}
             </div>
           </div>
-          <button
-            onClick={(e) => { e.stopPropagation(); onDismiss(n.id); }}
-            className="opacity-0 group-hover:opacity-100 p-0.5 rounded hover:bg-accent transition-all shrink-0 mt-0.5"
-            aria-label="Dismiss"
-          >
-            <X className="h-3 w-3 text-muted-foreground" />
-          </button>
         </div>
       </div>
     </motion.div>
