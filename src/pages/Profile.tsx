@@ -22,7 +22,7 @@ import { BadgesPanel } from '@/components/BadgesPanel';
 import { MoodPriceChart } from '@/components/MoodPriceChart';
 import { MoodTrendChart } from '@/components/MoodTrendChart';
 import { MoodPriceScatter } from '@/components/MoodPriceScatter';
-import { RitualStatsCard } from '@/components/RitualStatsCard';
+
 
 import { StatsTrends } from '@/components/StatsTrends';
 import { MoodShiftChart } from '@/components/MoodShiftChart';
@@ -397,10 +397,9 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
         </StatsSection>
       </ProLock>
 
-      {/* Section: Rituals & Practice */}
+      {/* Section: Practice */}
       <ProLock>
-        <StatsSection label={t('profile.sectionPractice', 'Rituals & Practice')}>
-          <RitualStatsCard />
+        <StatsSection label={t('profile.sectionPractice', 'Practice')}>
           {practiceStats ? (
             <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2">
               <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">

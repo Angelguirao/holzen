@@ -26,7 +26,7 @@ const DAY_TINT: Record<string, string> = {
   uncertain: 'bg-purple-500/8',
 };
 
-export type ActivityType = 'reflection' | 'ritual' | 'letter' | 'badge' | 'practice';
+export type ActivityType = 'reflection' | 'letter' | 'badge' | 'practice';
 
 export interface CalendarActivity {
   date: string;
@@ -167,7 +167,6 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate }: Prop
         }
 
         const reflections = dayItems.filter((a) => a.type === 'reflection');
-        const ritualsList = dayItems.filter((a) => a.type === 'ritual');
         const lettersList = dayItems.filter((a) => a.type === 'letter');
         const badgesList = dayItems.filter((a) => a.type === 'badge');
         const practiceList = dayItems.filter((a) => a.type === 'practice');
@@ -190,12 +189,6 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate }: Prop
               {reflections.length > 0 && (
                 <span className="text-[10px] font-mono text-muted-foreground">
                   {t('calendar.reflectionCount', { count: reflections.length })}
-                </span>
-              )}
-              {ritualsList.length > 0 && (
-                <span className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
-                  <Sparkles className="h-2.5 w-2.5 text-primary/60" />
-                  {t('calendar.ritualCount', { count: ritualsList.length })}
                 </span>
               )}
               {lettersList.length > 0 && (
@@ -240,14 +233,8 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate }: Prop
               </div>
             )}
 
-            {(ritualsList.length > 0 || badgesList.length > 0 || practiceList.length > 0) && (
+            {(badgesList.length > 0 || practiceList.length > 0) && (
               <div className="space-y-1">
-                {ritualsList.map((r) => (
-                  <div key={r.id} className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <Sparkles className="h-2.5 w-2.5 text-primary/60 shrink-0" />
-                    <span>{r.label || t('calendar.ritual')}</span>
-                  </div>
-                ))}
                 {badgesList.map((b) => (
                   <div key={b.id} className="flex items-center gap-2 text-xs text-muted-foreground">
                     <Award className="h-2.5 w-2.5 text-yellow-500/60 shrink-0" />

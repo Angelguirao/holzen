@@ -192,7 +192,7 @@ const History = () => {
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
   const [showFilters, setShowFilters] = useState(false);
   const [calendarDate, setCalendarDate] = useState<Date | null>(null);
-  const [calendarFilters, setCalendarFilters] = useState<Set<ActivityType>>(new Set(['reflection', 'ritual', 'letter', 'badge']));
+  const [calendarFilters, setCalendarFilters] = useState<Set<ActivityType>>(new Set(['reflection', 'letter', 'badge']));
   const [calendarActivities, setCalendarActivities] = useState<CalendarActivity[]>([]);
 
   useEffect(() => {
@@ -217,25 +217,21 @@ const History = () => {
     loadReflections();
   }, [user]);
 
-  // Load calendar activities (all reflections + rituals + letters + badges)
-  useEffect(() => {
-    if (!user) return;
-    const loadActivities = async () => {
-      const [{ data: allReflections }, { data: rituals }, { data: letters }, { data: badges }] = await Promise.all([
-        supabase.from('reflections').select('id, created_at, mood').eq('user_id', user.id).order('created_at', { ascending: false }),
-        supabase.from('ritual_completions').select('id, created_at, decision, template').eq('user_id', user.id).order('created_at', { ascending: false }),
-        supabase.from('future_letters').select('id, written_at, deliver_during').eq('user_id', user.id).order('written_at', { ascending: false }),
-        supabase.from('user_badges').select('id, earned_at, badge_id').eq('user_id', user.id).order('earned_at', { ascending: false }),
-      ]);
+    // Load calendar activities (all reflections + letters + badges)
+    useEffect(() => {
+      if (!user) return;
+      const loadActivities = async () => {
+        const [{ data: allReflections }, { data: letters }, { data: badges }] = await Promise.all([
+          supabase.from('reflections').select('id, created_at, mood').eq('user_id', user.id).order('created_at', { ascending: false }),
+          supabase.from('future_letters').select('id, written_at, deliver_during').eq('user_id', user.id).order('written_at', { ascending: false }),
+          supabase.from('user_badges').select('id, earned_at, badge_id').eq('user_id', user.id).order('earned_at', { ascending: false }),
+        ]);
 
-      const activities: CalendarActivity[] = [];
+        const activities: CalendarActivity[] = [];
 
-      (allReflections ?? []).forEach((r: any) => {
-        activities.push({ date: r.created_at, type: 'reflection', mood: r.mood, id: r.id });
-      });
-      (rituals ?? []).forEach((r: any) => {
-        activities.push({ date: r.created_at, type: 'ritual', id: r.id, label: `${r.template} · ${r.decision}` });
-      });
+        (allReflections ?? []).forEach((r: any) => {
+          activities.push({ date: r.created_at, type: 'reflection', mood: r.mood, id: r.id });
+        });
       (letters ?? []).forEach((l: any) => {
         activities.push({ date: l.written_at, type: 'letter', id: l.id, label: `Letter → ${l.deliver_during}` });
       });

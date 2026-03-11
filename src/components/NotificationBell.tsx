@@ -108,7 +108,7 @@ const SwipeableNotification = forwardRef<HTMLDivElement, {
 
 type NotificationItem = {
   id: string;
-  type: 'badge' | 'night_reflection' | 'letter' | 'insight' | 'reflection' | 'ritual';
+  type: 'badge' | 'night_reflection' | 'letter' | 'insight' | 'reflection';
   title: string;
   subtitle: string;
   timestamp: string;
@@ -156,14 +156,12 @@ export function NotificationBell() {
         { data: nights },
         { data: letters },
         { data: reflections },
-        { data: rituals },
         { data: insights },
       ] = await Promise.all([
         supabase.from('user_badges').select('id, badge_id, earned_at').eq('user_id', user!.id).order('earned_at', { ascending: false }).limit(10),
         supabase.from('night_reflections').select('id, message, created_at').eq('user_id', user!.id).order('created_at', { ascending: false }).limit(5),
         supabase.from('future_letters').select('id, delivered_at').eq('user_id', user!.id).eq('delivered', true).not('delivered_at', 'is', null).order('delivered_at', { ascending: false }).limit(5),
         supabase.from('reflections').select('id, message, context, created_at, haiku, learning_title, learning_body').eq('user_id', user!.id).order('created_at', { ascending: false }).limit(5),
-        supabase.from('ritual_completions').select('id, decision, created_at').eq('user_id', user!.id).order('created_at', { ascending: false }).limit(5),
         supabase.from('reflection_insights').select('id, generated_at, reflection_count').eq('user_id', user!.id).order('generated_at', { ascending: false }).limit(3),
       ]);
 
@@ -233,19 +231,6 @@ export function NotificationBell() {
         }
       }
 
-      if (rituals) {
-        for (const r of rituals) {
-          const decisionKey = `notifications.decisions.${r.decision}`;
-          items.push({
-            id: `ritual-${r.id}`,
-            type: 'ritual',
-            title: t('notifications.ritualCompleted'),
-            subtitle: `${t('notifications.decision')}: ${t(decisionKey, r.decision)}`,
-            timestamp: r.created_at,
-            action: { label: t('notifications.viewHistory'), path: '/history' },
-          });
-        }
-      }
 
       if (insights) {
         for (const i of insights) {
@@ -326,7 +311,7 @@ export function NotificationBell() {
     letter: '✉️',
     insight: '✨',
     reflection: '📝',
-    ritual: '🔮',
+    
   };
 
   return (
