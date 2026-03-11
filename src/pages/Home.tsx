@@ -65,7 +65,7 @@ const Home = () => {
     'night': t('home.widget.evening'),
     'letter': t('home.widget.letter'),
     'practice': t('home.widget.practice', 'Practice'),
-    'ritual': t('home.widget.ritual', 'Ritual'),
+    'breathe': t('home.widget.breathe', 'Stillness'),
     'breathe': t('home.widget.breathe', 'Stillness'),
   };
   const { user } = useAuth();
