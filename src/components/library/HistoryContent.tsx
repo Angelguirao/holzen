@@ -33,7 +33,6 @@ const HistoryContent = () => {
 
       const items: CalendarActivity[] = [];
       (refs ?? []).forEach((r: any) => items.push({ date: r.created_at, type: 'reflection', mood: r.mood, id: r.id }));
-      (rits ?? []).forEach((r: any) => items.push({ date: r.created_at, type: 'ritual', id: r.id, label: `${r.template} · ${r.decision}` }));
       (lets ?? []).forEach((l: any) => items.push({ date: l.written_at, type: 'letter', id: l.id, label: `Letter → ${l.deliver_during}` }));
       (bads ?? []).forEach((b: any) => items.push({ date: b.earned_at, type: 'badge', id: b.id, label: b.badge_id }));
       (pracs ?? []).forEach((p: any) => items.push({
