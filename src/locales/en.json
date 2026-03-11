@@ -242,7 +242,7 @@
     "hapticDesc": "Vibration feedback on interactions (mobile only).",
     "enableHaptics": "Enable haptics",
     "zenMode": "Zen mode",
-    "zenModeDesc": "Strips the home screen to just the reflection and breathing exercise.",
+    "zenModeDesc": "Strips the home screen to just the pause and breathing exercise.",
     "enableZenMode": "Enable zen mode",
     "companionsDesc": "Optional additions shown below each reflection.",
     "companionLabels": {
