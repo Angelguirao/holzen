@@ -30,7 +30,7 @@ interface PersistedSession {
   severity: 'mild' | 'moderate' | 'high';
   moodDone: boolean;
   moodAfterDone: boolean;
-  phase: 'session' | 'done';
+  phase: 'intro' | 'session' | 'done';
   decision: string | null;
   step: PauseStep;
 }
@@ -79,8 +79,9 @@ export default function PauseSession() {
     return 'feel';
   };
 
+  const skipIntro = !!restored; // Skip intro for restored sessions
   const [step, setStep] = useState<PauseStep>(mapStep(restored?.step ?? 'feel'));
-  const [phase, setPhase] = useState<'session' | 'done'>(restored?.phase ?? 'session');
+  const [phase, setPhase] = useState<'intro' | 'session' | 'done'>(skipIntro ? (restored?.phase === 'done' ? 'done' : 'session') : 'intro');
   const [decision, setDecision] = useState<string | null>(restored?.decision ?? null);
   const [isFavorite, setIsFavorite] = useState(false);
   const [moodDone, setMoodDone] = useState(restored?.moodDone ?? false);
@@ -166,7 +167,7 @@ export default function PauseSession() {
   }, [dismissMessage, reflectionId]);
 
   // No message fallback
-  if (!message && phase === 'session') {
+  if (!message && phase !== 'done') {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
         <div className="text-center space-y-4">
@@ -176,6 +177,11 @@ export default function PauseSession() {
       </div>
     );
   }
+
+  const handleIntroComplete = () => {
+    hapticFeedback('light');
+    setPhase('session');
+  };
 
   const stepTransition = {
     initial: { opacity: 0, y: 30 },
@@ -235,7 +241,7 @@ export default function PauseSession() {
           <X className="h-4 w-4" />
         </button>
 
-        {/* Progress indicator — positioned below close button to avoid overlap */}
+        {/* Progress indicator — hidden during intro */}
         {phase === 'session' && (
           <motion.div
             className="fixed top-5 left-5 z-[55]"
@@ -248,6 +254,36 @@ export default function PauseSession() {
         )}
 
         <div className="relative z-10 max-w-md mx-auto px-6 py-20">
+          {/* Intro screen — "You paused. That's the hardest part." */}
+          {phase === 'intro' && (
+            <motion.div
+              className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-8"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.2, delay: 0.5 }}
+            >
+              <motion.p
+                className="text-xl font-light text-foreground/90 leading-relaxed max-w-[280px]"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 1, delay: 1 }}
+              >
+                {t('pause.youPaused', "You paused. That's the hardest part.")}
+              </motion.p>
+
+              <motion.button
+                onClick={handleIntroComplete}
+                className="text-[10px] font-mono text-primary/40 hover:text-primary/70 transition-colors duration-500 tracking-[0.15em] uppercase"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.8, delay: 2.5 }}
+              >
+                {t('pause.steps.continue', 'Continue')}
+              </motion.button>
+            </motion.div>
+          )}
+
           {phase === 'session' && (
             <AnimatePresence mode="wait">
               {step === 'feel' && (
