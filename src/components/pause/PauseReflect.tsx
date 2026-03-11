@@ -1,73 +1,71 @@
 import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { ChevronLeft } from 'lucide-react';
-import { MoodCheck, type MoodValue } from '@/components/MoodCheck';
-import { ReflectionNote } from '@/components/ReflectionNote';
-import { ReflectionTags } from '@/components/ReflectionTags';
+import { CompanionSection, type CompanionData, type CompanionPrefs } from '@/components/CompanionSection';
+import { CollapsibleReflectionHeader } from '@/components/pause/CollapsibleReflectionHeader';
 
 interface Props {
+  companions: CompanionData;
+  companionPrefs: CompanionPrefs;
+  severity: 'mild' | 'moderate' | 'high';
   reflectionId: string | null;
-  message: string;
-  onMoodSelect: (mood: MoodValue) => void;
-  onMoodSkip: () => void;
-  moodDone: boolean;
+  context: string | null;
+  reflectionMessage: string;
+  isFavorite: boolean;
+  onToggleFavorite: () => void;
+  subscribed: boolean;
   onContinue: () => void;
   onBack?: () => void;
 }
 
-export function PauseReflect({ reflectionId, message, onMoodSelect, onMoodSkip, moodDone, onContinue, onBack }: Props) {
+export function PauseReflect({
+  companions, companionPrefs, severity, reflectionId, context, reflectionMessage,
+  isFavorite, onToggleFavorite, subscribed, onContinue, onBack,
+}: Props) {
   const { t } = useTranslation();
 
   return (
     <motion.div
-      className="space-y-10"
+      className="space-y-8"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.6 }}
     >
-      {/* Full reflection message */}
-      <div className="space-y-2">
-        <p className="text-[17px] leading-[1.8] text-foreground/85 font-light">{message}</p>
-      </div>
+      {/* Collapsible header */}
+      <CollapsibleReflectionHeader
+        message={reflectionMessage}
+        context={context}
+        haiku={companions?.haiku ?? null}
+        isFavorite={isFavorite}
+        onToggleFavorite={onToggleFavorite}
+        subscribed={subscribed}
+      />
 
-      {/* Note & tags */}
-      {reflectionId && (
-        <motion.div
-          className="space-y-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.6 }}
-        >
-          <ReflectionNote reflectionId={reflectionId} initialNote={null} />
-          <ReflectionTags reflectionId={reflectionId} initialTags={[]} />
-        </motion.div>
-      )}
+      {/* Companions */}
+      <CompanionSection
+        companions={companions}
+        prefs={companionPrefs}
+        severity={severity}
+        reflectionId={reflectionId}
+        context={context}
+        reflectionMessage={reflectionMessage}
+      />
 
-      {/* Mood check */}
-      {!moodDone ? (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.6 }}
+      {/* Continue */}
+      <motion.div
+        className="flex justify-center pt-4"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.3, duration: 0.6 }}
+      >
+        <button
+          onClick={onContinue}
+          className="text-[10px] font-mono text-primary/50 hover:text-primary/70 transition-colors duration-500 tracking-[0.15em] uppercase"
         >
-          <MoodCheck onSelect={onMoodSelect} onSkip={onMoodSkip} variant="before" />
-        </motion.div>
-      ) : (
-        <motion.div
-          className="flex justify-center pt-4"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6 }}
-        >
-          <button
-            onClick={onContinue}
-            className="text-[10px] font-mono text-primary/50 hover:text-primary/70 transition-colors duration-500 tracking-[0.15em] uppercase"
-          >
-            {t('pause.steps.continue', 'Continue')}
-          </button>
-        </motion.div>
-      )}
+          {t('pause.steps.continue', 'Continue')}
+        </button>
+      </motion.div>
 
       {/* Back link */}
       {onBack && (

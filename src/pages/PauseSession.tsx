@@ -12,10 +12,10 @@ import { type MoodValue } from '@/components/MoodCheck';
 import { type CompanionData, type CompanionPrefs } from '@/components/CompanionSection';
 
 import { PauseProgress, type PauseStep, STEPS } from '@/components/pause/PauseProgress';
-import { PauseHeader } from '@/components/pause/PauseHeader';
+import { PauseFeel } from '@/components/pause/PauseFeel';
 import { PauseBreathing } from '@/components/pause/PauseBreathing';
 import { PauseReflect } from '@/components/pause/PauseReflect';
-import { PauseGround } from '@/components/pause/PauseGround';
+import { PauseShift } from '@/components/pause/PauseShift';
 import { PauseDecide } from '@/components/pause/PauseDecide';
 import { PauseDone } from '@/components/pause/PauseDone';
 
@@ -71,7 +71,15 @@ export default function PauseSession() {
   const companionPrefs: CompanionPrefs = navState.companionPrefs ?? restored?.companionPrefs ?? { breathing: true, haiku: true, learning: true, signal: true, zoomOut: true, history: true };
   const severity: 'mild' | 'moderate' | 'high' = navState.severity ?? restored?.severity ?? 'mild';
 
-  const [step, setStep] = useState<PauseStep>(restored?.step ?? 'pause');
+  // Map old step names to new ones for session restoration
+  const mapStep = (s: string): PauseStep => {
+    if (s === 'pause') return 'feel';
+    if (s === 'ground') return 'reflect';
+    if (STEPS.includes(s as PauseStep)) return s as PauseStep;
+    return 'feel';
+  };
+
+  const [step, setStep] = useState<PauseStep>(mapStep(restored?.step ?? 'feel'));
   const [phase, setPhase] = useState<'session' | 'done'>(restored?.phase ?? 'session');
   const [decision, setDecision] = useState<string | null>(restored?.decision ?? null);
   const [isFavorite, setIsFavorite] = useState(false);
@@ -227,10 +235,10 @@ export default function PauseSession() {
           <X className="h-4 w-4" />
         </button>
 
-        {/* Progress indicator */}
+        {/* Progress indicator — positioned below close button to avoid overlap */}
         {phase === 'session' && (
           <motion.div
-            className="fixed top-6 left-1/2 -translate-x-1/2 z-[55]"
+            className="fixed top-5 left-5 z-[55]"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 2, duration: 1 }}
@@ -241,73 +249,63 @@ export default function PauseSession() {
 
         <div className="relative z-10 max-w-md mx-auto px-6 py-20">
           {phase === 'session' && (
-            <>
-              {/* Persistent header — visible after Pause step */}
-              {step !== 'pause' && (
-                <motion.div
-                  className="mb-8 pb-6 border-b border-border/10"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ duration: 0.6 }}
-                >
-                  <PauseHeader
+            <AnimatePresence mode="wait">
+              {step === 'feel' && (
+                <motion.div key="feel" {...stepTransition}>
+                  <PauseFeel
+                    reflectionId={reflectionId}
                     message={message}
                     context={context}
-                    haiku={companions?.haiku ?? null}
-                    isFavorite={isFavorite}
-                    onToggleFavorite={toggleFavorite}
-                    subscribed={subscribed}
+                    onMoodSelect={handleMoodSelect}
+                    onMoodSkip={handleMoodSkip}
+                    moodDone={moodDone}
+                    onContinue={() => goToStep('breathe')}
                   />
                 </motion.div>
               )}
 
-              {/* Step content */}
-              <AnimatePresence mode="wait">
-                {step === 'pause' && (
-                  <motion.div key="pause" {...stepTransition}>
-                    <PauseBreathing mantra={mantra} onContinue={() => goToStep('reflect')} />
-                  </motion.div>
-                )}
+              {step === 'breathe' && (
+                <motion.div key="breathe" {...stepTransition}>
+                  <PauseBreathing mantra={mantra} onContinue={() => goToStep('reflect')} />
+                </motion.div>
+              )}
 
-                {step === 'reflect' && (
-                  <motion.div key="reflect" {...stepTransition}>
-                    <PauseReflect
-                      reflectionId={reflectionId}
-                      message={message}
-                      onMoodSelect={handleMoodSelect}
-                      onMoodSkip={handleMoodSkip}
-                      moodDone={moodDone}
-                      onContinue={() => goToStep('ground')}
-                      onBack={goBack}
-                    />
-                  </motion.div>
-                )}
+              {step === 'reflect' && (
+                <motion.div key="reflect" {...stepTransition}>
+                  <PauseReflect
+                    companions={companions}
+                    companionPrefs={companionPrefs}
+                    severity={severity}
+                    reflectionId={reflectionId}
+                    context={context}
+                    reflectionMessage={message}
+                    isFavorite={isFavorite}
+                    onToggleFavorite={toggleFavorite}
+                    subscribed={subscribed}
+                    onContinue={() => goToStep('shift')}
+                    onBack={goBack}
+                  />
+                </motion.div>
+              )}
 
-                {step === 'ground' && (
-                  <motion.div key="ground" {...stepTransition}>
-                    <PauseGround
-                      companions={companions}
-                      companionPrefs={companionPrefs}
-                      severity={severity}
-                      reflectionId={reflectionId}
-                      context={context}
-                      reflectionMessage={message}
-                      moodAfterDone={moodAfterDone}
-                      onMoodAfterSelect={handleMoodAfterSelect}
-                      onMoodAfterSkip={handleMoodAfterSkip}
-                      onContinue={() => goToStep('decide')}
-                      onBack={goBack}
-                    />
-                  </motion.div>
-                )}
+              {step === 'shift' && (
+                <motion.div key="shift" {...stepTransition}>
+                  <PauseShift
+                    onMoodAfterSelect={handleMoodAfterSelect}
+                    onMoodAfterSkip={handleMoodAfterSkip}
+                    moodAfterDone={moodAfterDone}
+                    onContinue={() => goToStep('decide')}
+                    onBack={goBack}
+                  />
+                </motion.div>
+              )}
 
-                {step === 'decide' && (
-                  <motion.div key="decide" {...stepTransition}>
-                    <PauseDecide onDecide={handleDecide} onBack={goBack} />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </>
+              {step === 'decide' && (
+                <motion.div key="decide" {...stepTransition}>
+                  <PauseDecide onDecide={handleDecide} onBack={goBack} />
+                </motion.div>
+              )}
+            </AnimatePresence>
           )}
 
           {phase === 'done' && (
