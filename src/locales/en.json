@@ -992,7 +992,7 @@
     "mood": "Mood",
     "actions": "Actions",
     "streak": "Streak",
-    "basedOn": "Based on your last 30 reflections. Higher is calmer."
+    "basedOn": "Based on your last 30 pauses. Higher is calmer."
   },
   "ritualFlow": {
     "rememberWhy": "Remember why you hold",
