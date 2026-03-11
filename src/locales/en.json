@@ -446,8 +446,6 @@
     "companionsTitle": "Five companions",
     "companionsDesc": "Every pause comes with companions designed to slow you down and add perspective. Save any to your Library with a tap.",
     "companions": {
-      "breathing": "Breathing exercise",
-      "breathingDesc": "Guided calm before you read",
       "haiku": "Haiku",
       "haikuDesc": "5-7-5 stillness, unique each time",
       "signal": "Read the Signal",
