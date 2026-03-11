@@ -25,6 +25,7 @@ export function ReflectionTriggerOverlay({
   companions,
   companionPrefs,
   severity,
+  firstName,
   onDismiss,
 }: Props) {
   const { t } = useTranslation();
