@@ -167,7 +167,7 @@ export default function PauseSession() {
   }, [dismissMessage, reflectionId]);
 
   // No message fallback
-  if (!message && phase === 'session') {
+  if (!message && phase !== 'done') {
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
         <div className="text-center space-y-4">
@@ -177,6 +177,11 @@ export default function PauseSession() {
       </div>
     );
   }
+
+  const handleIntroComplete = () => {
+    hapticFeedback('light');
+    setPhase('session');
+  };
 
   const stepTransition = {
     initial: { opacity: 0, y: 30 },
