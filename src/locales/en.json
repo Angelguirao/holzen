@@ -1166,7 +1166,7 @@
     "reflections": "Pauses",
     "scatterInsightDifferent": "You tend to feel {{negLabel}} during drops and {{posLabel}} during surges.",
     "scatterInsightSame": "You tend to feel {{label}} regardless of direction.",
-    "scatterFooter": "Each dot is one reflection · {{count}} data points",
+    "scatterFooter": "Each dot is one pause · {{count}} data points",
     "moodPriceChange": "Mood × Price Change",
     "moodPriceChangeEmpty": "Log 3+ reflections with mood to compare how you feel vs. market moves.",
     "entries": "{{count}} entries",
