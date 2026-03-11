@@ -231,19 +231,6 @@ export function NotificationBell() {
         }
       }
 
-      if (rituals) {
-        for (const r of rituals) {
-          const decisionKey = `notifications.decisions.${r.decision}`;
-          items.push({
-            id: `ritual-${r.id}`,
-            type: 'ritual',
-            title: t('notifications.ritualCompleted'),
-            subtitle: `${t('notifications.decision')}: ${t(decisionKey, r.decision)}`,
-            timestamp: r.created_at,
-            action: { label: t('notifications.viewHistory'), path: '/history' },
-          });
-        }
-      }
 
       if (insights) {
         for (const i of insights) {

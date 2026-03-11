@@ -95,7 +95,7 @@ const Landing = () => {
     <div className="min-h-screen bg-background text-foreground">
       <PageMeta
         title="Holzen — When Bitcoin moves, pause before you do"
-        description="Holzen watches Bitcoin volatility and sends AI-generated reflections to help you pause before acting on impulse. Mood tracking, journaling, rituals, and behavioral insights."
+        description="Holzen watches Bitcoin volatility and sends AI-generated reflections to help you pause before acting on impulse. Mood tracking, journaling, and behavioral insights."
         path="/welcome"
       />
 
