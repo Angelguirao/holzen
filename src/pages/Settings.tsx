@@ -549,17 +549,6 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
           </AccordionContent>
         </AccordionItem>
 
-        {/* 4. Ritual */}
-        <AccordionItem value="ritual" className="border border-border/40 rounded-md px-4">
-          <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
-            {t('settings.ritual')}
-          </AccordionTrigger>
-          <AccordionContent className="space-y-3 pb-4">
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              {t('settings.ritualDescUpdated')}
-            </p>
-          </AccordionContent>
-        </AccordionItem>
 
         {/* 5. Notifications & Schedule */}
         <AccordionItem value="notifications" className="border border-border/40 rounded-md px-4">
