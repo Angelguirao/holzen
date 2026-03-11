@@ -235,6 +235,92 @@ export function useHolzen() {
     return Date.now() - new Date(data.last_trigger_at).getTime() < cooldownMs;
   }, [user, cooldownHours]);
 
+  // Fire-and-forget: pre-generate signal, zoom-out, and historical-insight companion data
+  // so it's cached on the reflection row before the user reaches the Reflect step.
+  const preGenerateCompanions = useCallback((reflectionId: string, ctx: string, msg: string, lang: string, userId: string) => {
+    // Helper to fetch user's active sources for a category
+    const fetchSources = async (category: string) => {
+      try {
+        const [{ data: catalog }, { data: userPrefs }] = await Promise.all([
+          supabase.from('signal_sources').select('id, name, type, url, category').eq('category', category),
+          supabase.from('user_signal_preferences').select('source_id, custom_name, custom_url, custom_type, active, category').eq('user_id', userId).eq('category', category),
+        ]);
+        const prefsMap = new Map((userPrefs ?? []).map((p: any) => [p.source_id, p]));
+        const catalogActive = (catalog ?? []).filter((s: any) => {
+          const pref = prefsMap.get(s.id);
+          return pref ? pref.active : true;
+        }).map((s: any) => ({ name: s.name, type: s.type, url: s.url }));
+        const customActive = (userPrefs ?? [])
+          .filter((p: any) => !p.source_id && p.custom_name && p.active)
+          .map((p: any) => ({ name: p.custom_name, type: p.custom_type || 'blog', url: p.custom_url }));
+        return [...catalogActive, ...customActive];
+      } catch { return []; }
+    };
+
+    // Signal companion
+    fetchSources('signal').then(sources => {
+      supabase.functions.invoke('signal-companion', {
+        body: { context: ctx, language: lang, sources: sources.length > 0 ? sources : undefined },
+      }).then(({ data, error }) => {
+        if (error || !data || data.error) return;
+        supabase.from('reflections').update({
+          signal_title: data.title,
+          signal_body: data.body,
+          signal_source: data.source,
+          signal_url: data.url,
+        } as any).eq('id', reflectionId).then(() => {});
+        supabase.from('library_items').insert({
+          user_id: userId, type: 'bookmark', title: data.title, body: data.body,
+          source_type: 'signal', source_url: data.url, reflection_id: reflectionId,
+        }).then(() => {});
+      });
+    });
+
+    // Zoom Out companion
+    supabase.functions.invoke('zoom-out-companion', {
+      body: { context: ctx, reflectionMessage: msg, language: lang },
+    }).then(({ data, error }) => {
+      if (error || !data || data.error) return;
+      supabase.from('reflections').update({ zoom_out_data: data } as any).eq('id', reflectionId).then(() => {});
+      supabase.from('library_items').insert({
+        user_id: userId, type: 'bookmark', title: 'Zoom Out',
+        body: typeof data === 'object' ? JSON.stringify(data) : String(data),
+        source_type: 'zoom_out', reflection_id: reflectionId,
+      }).then(() => {});
+    });
+
+    // Historical Insight companion
+    supabase.functions.invoke('historical-insight', {
+      body: { context: ctx, language: lang },
+    }).then(({ data, error }) => {
+      if (error || !data || data.error) return;
+      supabase.from('reflections').update({ history_insight_data: data } as any).eq('id', reflectionId).then(() => {});
+      supabase.from('library_items').insert({
+        user_id: userId, type: 'bookmark', title: data.title, body: data.btcInsight,
+        source_type: 'history_insight', reflection_id: reflectionId,
+      }).then(() => {});
+    });
+
+    // Ground nudge (learning)
+    fetchSources('learning').then(sources => {
+      supabase.functions.invoke('ground-nudge', {
+        body: { context: ctx, language: lang, sources: sources.length > 0 ? sources : undefined },
+      }).then(({ data, error }) => {
+        if (error || !data || data.error) return;
+        supabase.from('reflections').update({
+          learning_title: data.title,
+          learning_body: data.body,
+          learning_citation: data.citation,
+          learning_url: data.url,
+        } as any).eq('id', reflectionId).then(() => {});
+        supabase.from('library_items').insert({
+          user_id: userId, type: 'bookmark', title: data.title, body: data.body,
+          source_type: 'learning', source_url: data.url, reflection_id: reflectionId,
+        }).then(() => {});
+      });
+    });
+  }, []);
+
   const generateMessage = useCallback(async (data: BtcPriceData, mood?: string) => {
     if (!user) return;
     const dir = data.direction === 'down' ? 'down' : 'up';
@@ -377,6 +463,9 @@ export function useHolzen() {
             });
           }
           await supabase.from('library_items').insert(libraryInserts);
+
+          // Fire-and-forget: pre-generate companion data so it's ready at the Reflect step
+          preGenerateCompanions(insertedReflection.id, ctx, msg, language, user.id);
         }
 
         await supabase.from('profiles').update({
