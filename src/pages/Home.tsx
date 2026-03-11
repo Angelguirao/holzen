@@ -307,7 +307,7 @@ const Home = () => {
             alwaysOpen
           >
             <div className="space-y-4">
-              <RitualCooldownBanner />
+              
 
               {!subLoading && !hasAccess ? (
                 <div className="space-y-3">
