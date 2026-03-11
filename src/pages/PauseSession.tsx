@@ -297,9 +297,6 @@ export default function PauseSession() {
               {step === 'feel' && (
                 <motion.div key="feel" {...stepTransition} {...dragProps}>
                   <PauseFeel
-                    reflectionId={reflectionId}
-                    message={message}
-                    context={context}
                     onMoodSelect={handleMoodSelect}
                     onMoodSkip={handleMoodSkip}
                     moodDone={moodDone}
