@@ -294,7 +294,7 @@
     "installApp": "Install app",
     "signOutConfirm": "Are you sure you want to sign out?",
     "deleteAccount": "Delete account",
-    "deleteAccountDesc": "This will permanently delete your account, all reflections, and all data. This action cannot be undone.",
+    "deleteAccountDesc": "This will permanently delete your account, all pauses, and all data. This action cannot be undone.",
     "deleteForever": "Delete forever",
     "deleting": "Deleting…",
     "emailLabel": "Email",
