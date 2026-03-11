@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -100,18 +100,45 @@ export default function PauseSession() {
     return () => clearTimeout(timer);
   }, []);
 
+  // Track swipe direction for animation
+  const [swipeDirection, setSwipeDirection] = useState<'forward' | 'back'>('forward');
+
   const goToStep = useCallback((next: PauseStep) => {
+    const currentIndex = STEPS.indexOf(step);
+    const nextIndex = STEPS.indexOf(next);
+    setSwipeDirection(nextIndex >= currentIndex ? 'forward' : 'back');
     hapticFeedback('light');
     setStep(next);
-  }, []);
+  }, [step]);
 
   const goBack = useCallback(() => {
     const currentIndex = STEPS.indexOf(step);
     if (currentIndex > 0) {
+      setSwipeDirection('back');
       hapticFeedback('light');
       setStep(STEPS[currentIndex - 1]);
     }
   }, [step]);
+
+  const goForward = useCallback(() => {
+    const currentIndex = STEPS.indexOf(step);
+    if (currentIndex < STEPS.length - 1) {
+      setSwipeDirection('forward');
+      hapticFeedback('light');
+      setStep(STEPS[currentIndex + 1]);
+    }
+  }, [step]);
+
+  // Swipe handler
+  const handleDragEnd = useCallback((_: any, info: { offset: { x: number }; velocity: { x: number } }) => {
+    const threshold = 50;
+    const velocityThreshold = 300;
+    if (info.offset.x < -threshold || info.velocity.x < -velocityThreshold) {
+      goForward();
+    } else if (info.offset.x > threshold || info.velocity.x > velocityThreshold) {
+      goBack();
+    }
+  }, [goForward, goBack]);
 
   const handleMoodSelect = useCallback(async (mood: MoodValue) => {
     hapticFeedback('light');
@@ -178,11 +205,20 @@ export default function PauseSession() {
     );
   }
 
+  const slideX = prefersReducedMotion ? 0 : 80;
   const stepTransition = {
-    initial: { opacity: 0, y: 30 },
-    animate: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: -20 },
-    transition: { duration: prefersReducedMotion ? 0.1 : 0.5 },
+    initial: { opacity: 0, x: swipeDirection === 'forward' ? slideX : -slideX },
+    animate: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: swipeDirection === 'forward' ? -slideX : slideX },
+    transition: { duration: prefersReducedMotion ? 0.1 : 0.35, ease: [0.25, 0.1, 0.25, 1] as [number, number, number, number] },
+  };
+
+  const dragProps = {
+    drag: 'x' as const,
+    dragConstraints: { left: 0, right: 0 },
+    dragElastic: 0.15,
+    onDragEnd: handleDragEnd,
+    dragDirectionLock: true,
   };
 
   return (
@@ -249,17 +285,17 @@ export default function PauseSession() {
           </motion.div>
         )}
 
-        <div className="relative z-10 max-w-md mx-auto px-6 py-20">
+        <div className="relative z-10 max-w-md mx-auto px-6 py-20 overflow-hidden">
           {phase === 'session' && (
-            <AnimatePresence mode="wait">
+            <AnimatePresence mode="wait" initial={false}>
               {step === 'breathe' && (
-                <motion.div key="breathe" {...stepTransition}>
+                <motion.div key="breathe" {...stepTransition} {...dragProps}>
                   <PauseBreathing mantra={mantra} onContinue={() => goToStep('feel')} />
                 </motion.div>
               )}
 
               {step === 'feel' && (
-                <motion.div key="feel" {...stepTransition}>
+                <motion.div key="feel" {...stepTransition} {...dragProps}>
                   <PauseFeel
                     reflectionId={reflectionId}
                     message={message}
@@ -274,7 +310,7 @@ export default function PauseSession() {
               )}
 
               {step === 'reflect' && (
-                <motion.div key="reflect" {...stepTransition}>
+                <motion.div key="reflect" {...stepTransition} {...dragProps}>
                   <PauseReflect
                     companions={companions}
                     companionPrefs={companionPrefs}
@@ -292,7 +328,7 @@ export default function PauseSession() {
               )}
 
               {step === 'shift' && (
-                <motion.div key="shift" {...stepTransition}>
+                <motion.div key="shift" {...stepTransition} {...dragProps}>
                   <PauseShift
                     onMoodAfterSelect={handleMoodAfterSelect}
                     onMoodAfterSkip={handleMoodAfterSkip}
@@ -304,7 +340,7 @@ export default function PauseSession() {
               )}
 
               {step === 'decide' && (
-                <motion.div key="decide" {...stepTransition}>
+                <motion.div key="decide" {...stepTransition} {...dragProps}>
                   <PauseDecide onDecide={handleDecide} onBack={goBack} />
                 </motion.div>
               )}
