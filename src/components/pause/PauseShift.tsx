@@ -37,27 +37,22 @@ export function PauseShift({ onMoodAfterSelect, onMoodAfterSkip, moodAfterDone, 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.4, duration: 0.6 }}
+            className="w-full"
           >
+            {/* MoodCheck already has its own Skip button — no duplicate needed */}
             <MoodCheck onSelect={onMoodAfterSelect} onSkip={onMoodAfterSkip} variant="after" />
           </motion.div>
-
-          <motion.button
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.8, duration: 0.6 }}
-            onClick={onMoodAfterSkip}
-            className="text-[9px] font-mono text-muted-foreground/20 hover:text-muted-foreground/40 transition-colors duration-500 tracking-[0.12em] uppercase"
-          >
-            {t('pause.steps.skip', 'Skip')}
-          </motion.button>
         </>
       ) : (
         <motion.div
-          className="flex justify-center"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          className="flex flex-col items-center gap-6"
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
+          <p className="text-[11px] font-mono text-muted-foreground/30 tracking-[0.15em] uppercase">
+            {t('pause.shiftRecorded', 'Noted')}
+          </p>
           <button
             onClick={onContinue}
             className="text-[10px] font-mono text-primary/50 hover:text-primary/70 transition-colors duration-500 tracking-[0.15em] uppercase"
