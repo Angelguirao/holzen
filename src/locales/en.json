@@ -1159,7 +1159,7 @@
     "day": "day",
     "week": "week",
     "weekOf": "Week of",
-    "averageMoodPer": "Average mood per {{period}} across {{count}} reflections",
+    "averageMoodPer": "Average mood per {{period}} across {{count}} pauses",
     "moodPriceScatter": "Mood × Price Scatter",
     "moodPriceScatterEmpty": "Need 8+ reflections with mood & price data to reveal emotional patterns.",
     "mood": "Mood",
