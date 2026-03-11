@@ -584,33 +584,19 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
     }
   }, [reflectionId, completion]);
 
-  const hasBreathing = prefs.breathing;
   const hasHaiku = prefs.haiku && companions.haiku;
   const hasLearning = prefs.learning;
   const hasSignal = prefs.signal && !!reflectionId;
   const hasZoomOut = prefs.zoomOut && !!reflectionId;
   const hasHistory = prefs.history && !!reflectionId;
 
-  if (!hasBreathing && !hasHaiku && !hasLearning && !hasSignal && !hasZoomOut && !hasHistory) return null;
+  if (!hasHaiku && !hasLearning && !hasSignal && !hasZoomOut && !hasHistory) return null;
 
   return (
     <div ref={ref} className="space-y-2.5">
       <p className="text-[10px] font-mono text-muted-foreground/40 uppercase tracking-[0.2em] text-center mb-1">
         {labels.pause}
       </p>
-
-      {hasBreathing && (
-        <CompanionCard
-          id="breathing"
-          label={labels.breathe}
-          icon={COMPANION_ICONS.breathing}
-          expanded={expandedBreathing}
-          onToggle={() => setExpandedBreathing((v) => !v)}
-          completed={completion.breathing}
-        >
-          <BreathingExercise severity={severity} onComplete={() => markCompleted('breathing')} onClose={() => setExpandedBreathing(false)} autoOpen />
-        </CompanionCard>
-      )}
 
       {hasHaiku && (
         <CompanionCard
