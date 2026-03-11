@@ -236,15 +236,16 @@ export default function PauseSession() {
           <X className="h-4 w-4" />
         </button>
 
-        {/* Progress indicator — hidden during intro */}
+        {/* Progress indicator */}
         {phase === 'session' && (
           <motion.div
-            className="fixed top-5 left-5 z-[55]"
+            className="fixed top-5 left-5 z-[55] flex flex-col items-start gap-2"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 2, duration: 1 }}
           >
             <PauseProgress currentStep={step} onStepClick={goToStep} />
+            <PauseScienceSheet />
           </motion.div>
         )}
 
