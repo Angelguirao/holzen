@@ -74,7 +74,7 @@ export function EmotionalCheckIn({ onComplete, textColor, ringColor }: Props) {
                 >
                   <MoodIcon mood={m} size={20} style={{ color: textColor, opacity: 0.7 }} />
                   <span className="text-[8px] font-mono uppercase tracking-wider" style={{ color: textColor, opacity: 0.7 }}>
-                    {t(`moods.${m}`)}
+                    {t(`moodCheck.moods.${m}`)}
                   </span>
                 </button>
               ))}
