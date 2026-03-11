@@ -205,11 +205,20 @@ export default function PauseSession() {
     );
   }
 
+  const slideX = prefersReducedMotion ? 0 : 80;
   const stepTransition = {
-    initial: { opacity: 0, y: 30 },
-    animate: { opacity: 1, y: 0 },
-    exit: { opacity: 0, y: -20 },
-    transition: { duration: prefersReducedMotion ? 0.1 : 0.5 },
+    initial: { opacity: 0, x: swipeDirection === 'forward' ? slideX : -slideX },
+    animate: { opacity: 1, x: 0 },
+    exit: { opacity: 0, x: swipeDirection === 'forward' ? -slideX : slideX },
+    transition: { duration: prefersReducedMotion ? 0.1 : 0.35, ease: [0.25, 0.1, 0.25, 1] },
+  };
+
+  const dragProps = {
+    drag: 'x' as const,
+    dragConstraints: { left: 0, right: 0 },
+    dragElastic: 0.15,
+    onDragEnd: handleDragEnd,
+    dragDirectionLock: true,
   };
 
   return (
