@@ -67,7 +67,7 @@ const Landing = () => {
   const FEATURES = [
     { icon: <TrendingDown />, label: t('landing.features.detection'), desc: t('landing.features.detectionDesc') },
     { icon: <Brain />, label: t('landing.features.mood'), desc: t('landing.features.moodDesc') },
-    { icon: <Target />, label: t('landing.features.ritual'), desc: t('landing.features.ritualDesc') },
+    { icon: <Target />, label: t('landing.features.practice'), desc: t('landing.features.practiceDesc', 'Body scan, guided journal, emotional check-in, and reflection replay for daily self-awareness practice.') },
     { icon: <Moon />, label: t('landing.features.nightReflections'), desc: t('landing.features.nightReflectionsDesc') },
     { icon: <BarChart3 />, label: t('landing.features.insights'), desc: t('landing.features.insightsDesc') },
     { icon: <Eye />, label: t('landing.features.holdGoals'), desc: t('landing.features.holdGoalsDesc') },
@@ -95,7 +95,7 @@ const Landing = () => {
     <div className="min-h-screen bg-background text-foreground">
       <PageMeta
         title="Holzen — When Bitcoin moves, pause before you do"
-        description="Holzen watches Bitcoin volatility and sends AI-generated reflections to help you pause before acting on impulse. Mood tracking, journaling, rituals, and behavioral insights."
+        description="Holzen watches Bitcoin volatility and sends AI-generated reflections to help you pause before acting on impulse. Mood tracking, journaling, and behavioral insights."
         path="/welcome"
       />
 

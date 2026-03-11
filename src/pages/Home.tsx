@@ -4,8 +4,6 @@ import { useHolzen } from '@/hooks/use-holzen';
 import { TestimonialRequest } from '@/components/TestimonialRequest';
 import { LetterToFutureSelf } from '@/components/LetterToFutureSelf';
 import { ReflectionTriggerOverlay } from '@/components/ReflectionTriggerOverlay';
-import { HolzenRitual } from '@/components/HolzenRitual';
-import { RitualCooldownBanner } from '@/components/RitualCooldownBanner';
 import { useSubscription } from '@/hooks/use-subscription';
 import { BtcStatus } from '@/components/BtcStatus';
 import { NightReflectionCard, useNightReflection } from '@/components/NightReflectionCard';
@@ -45,7 +43,7 @@ import {
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 
 // Widget IDs
-const WIDGET_IDS = ['btc-status', 'hold-goal', 'reflection', 'night', 'letter', 'practice', 'ritual', 'breathe'] as const;
+const WIDGET_IDS = ['btc-status', 'hold-goal', 'reflection', 'night', 'letter', 'practice', 'breathe'] as const;
 type WidgetId = typeof WIDGET_IDS[number];
 
 interface PinnedReflection {
@@ -66,7 +64,6 @@ const Home = () => {
     'night': t('home.widget.evening'),
     'letter': t('home.widget.letter'),
     'practice': t('home.widget.practice', 'Practice'),
-    'ritual': t('home.widget.ritual', 'Ritual'),
     'breathe': t('home.widget.breathe', 'Stillness'),
   };
   const { user } = useAuth();
@@ -106,8 +103,6 @@ const Home = () => {
   const { reflection: nightReflection, dismiss: dismissNight } = useNightReflection();
 
   const [showTriggerOverlay, setShowTriggerOverlay] = useState(false);
-  const [showRitual, setShowRitual] = useState(false);
-  const [ritualQuickStart, setRitualQuickStart] = useState(false);
   const [priceHidden, setPriceHidden] = useState(() => localStorage.getItem('holzen_hide_price') === 'true');
   const [btcMode, setBtcMode] = useState(() => localStorage.getItem('holzen_btc_mode') === 'true');
   const [zenMode] = useState(() => localStorage.getItem('holzen_zen_mode') === 'true');
@@ -309,7 +304,7 @@ const Home = () => {
             alwaysOpen
           >
             <div className="space-y-4">
-              <RitualCooldownBanner />
+              
 
               {!subLoading && !hasAccess ? (
                 <div className="space-y-3">
@@ -476,56 +471,6 @@ const Home = () => {
           </HomeWidget>
         );
 
-      case 'ritual':
-        return (
-          <HomeWidget
-            id="ritual"
-            title={WIDGET_TITLES['ritual']}
-            collapsed={collapsed['ritual']}
-            onToggleCollapse={() => toggleCollapsed('ritual')}
-          >
-            <div className="space-y-2">
-              <p className="text-[11px] text-muted-foreground/50 leading-relaxed">
-                {t('home.ritualDesc', 'Feeling reactive? Ground yourself before you act.')}
-              </p>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => {
-                    if (!subscribed) {
-                      toast(t('pro.featureLocked'), { description: t('pro.upgradeDesc'), action: { label: t('pro.upgradeCta'), onClick: () => startCheckout() }, duration: 6000 });
-                      return;
-                    }
-                    setRitualQuickStart(true);
-                    setShowRitual(true);
-                  }}
-                  className="flex-1 flex items-center justify-center gap-2 py-3 rounded-md border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors duration-300"
-                >
-                  {!subscribed && <Lock className="h-3 w-3 text-primary/20" />}
-                  <Sparkles className="h-3 w-3 text-primary/40" />
-                  <span className="text-[10px] font-mono text-primary/40 tracking-[0.15em] uppercase">
-                    {t('home.quickStart', 'Quick start')}
-                  </span>
-                </button>
-                <button
-                  onClick={() => {
-                    if (!subscribed) {
-                      toast(t('pro.featureLocked'), { description: t('pro.upgradeDesc'), action: { label: t('pro.upgradeCta'), onClick: () => startCheckout() }, duration: 6000 });
-                      return;
-                    }
-                    setRitualQuickStart(false);
-                    setShowRitual(true);
-                  }}
-                  className="flex items-center justify-center gap-1.5 px-4 py-3 rounded-md border border-border/30 hover:bg-muted/20 transition-colors duration-300"
-                >
-                  <span className="text-[10px] font-mono text-muted-foreground/50 tracking-[0.1em] uppercase">
-                    {t('home.chooseRitual', 'Choose')}
-                  </span>
-                </button>
-              </div>
-            </div>
-          </HomeWidget>
-        );
-
       case 'breathe':
         return (
           <HomeWidget
@@ -612,14 +557,6 @@ const Home = () => {
       </DndContext>
 
       {/* Modals (outside widget flow) */}
-      <HolzenRitual
-        open={showRitual}
-        onClose={() => { setShowRitual(false); setRitualQuickStart(false); }}
-        reflectionMessage={message ?? undefined}
-        reflectionId={lastReflectionId}
-        quickStart={ritualQuickStart}
-      />
-
       {/* Trigger overlay */}
       <ReflectionTriggerOverlay
         open={showTriggerOverlay}

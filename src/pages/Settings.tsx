@@ -109,10 +109,9 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
     if (!user) return;
     setExporting(true);
     try {
-      const [{ data: profile }, { data: reflections }, { data: rituals }] = await Promise.all([
+      const [{ data: profile }, { data: reflections }] = await Promise.all([
         supabase.from('profiles').select('*').eq('user_id', user.id).single(),
         supabase.from('reflections').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
-        supabase.from('ritual_completions').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
       ]);
 
       const dateStr = new Date().toISOString().slice(0, 10);
@@ -127,30 +126,13 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
         );
         const refCsv = [refHeaders.join(','), ...refRows].join('\n');
 
-        const ritHeaders = ['created_at', 'decision', 'template', 'journal_text', 'duration_seconds'];
-        const ritRows = (rituals ?? []).map((r: any) =>
-          ritHeaders.map(h => {
-            const val = r[h] ?? '';
-            return `"${String(val).replace(/"/g, '""')}"`;
-          }).join(',')
-        );
-        const ritCsv = [ritHeaders.join(','), ...ritRows].join('\n');
-
         const refBlob = new Blob([refCsv], { type: 'text/csv' });
         const refUrl = URL.createObjectURL(refBlob);
         const a1 = document.createElement('a');
         a1.href = refUrl; a1.download = `holzen-reflections-${dateStr}.csv`; a1.click();
         URL.revokeObjectURL(refUrl);
 
-        if (rituals && rituals.length > 0) {
-          const ritBlob = new Blob([ritCsv], { type: 'text/csv' });
-          const ritUrl = URL.createObjectURL(ritBlob);
-          const a2 = document.createElement('a');
-          a2.href = ritUrl; a2.download = `holzen-rituals-${dateStr}.csv`; a2.click();
-          URL.revokeObjectURL(ritUrl);
-        }
-
-        toast.success('CSV exported', { description: `${reflections?.length ?? 0} reflections + ${rituals?.length ?? 0} rituals.` });
+        toast.success('CSV exported', { description: `${reflections?.length ?? 0} reflections.` });
       } else {
         const exportPayload = {
           exported_at: new Date().toISOString(),
@@ -170,10 +152,6 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             learning_title: r.learning_title, learning_body: r.learning_body,
             signal_title: r.signal_title, signal_body: r.signal_body, created_at: r.created_at,
           })),
-          rituals: (rituals ?? []).map((r: any) => ({
-            decision: r.decision, template: r.template, journal_text: r.journal_text,
-            duration_seconds: r.duration_seconds, created_at: r.created_at,
-          })),
         };
 
         const blob = new Blob([JSON.stringify(exportPayload, null, 2)], { type: 'application/json' });
@@ -181,7 +159,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
         const a = document.createElement('a');
         a.href = url; a.download = `holzen-export-${dateStr}.json`; a.click();
         URL.revokeObjectURL(url);
-        toast.success('Data exported', { description: `${reflections?.length ?? 0} reflections + ${rituals?.length ?? 0} rituals.` });
+        toast.success('Data exported', { description: `${reflections?.length ?? 0} reflections.` });
       }
     } catch {
       toast.error('Export failed');
@@ -549,17 +527,6 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
           </AccordionContent>
         </AccordionItem>
 
-        {/* 4. Ritual */}
-        <AccordionItem value="ritual" className="border border-border/40 rounded-md px-4">
-          <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
-            {t('settings.ritual')}
-          </AccordionTrigger>
-          <AccordionContent className="space-y-3 pb-4">
-            <p className="text-xs text-muted-foreground leading-relaxed">
-              {t('settings.ritualDescUpdated')}
-            </p>
-          </AccordionContent>
-        </AccordionItem>
 
         {/* 5. Notifications & Schedule */}
         <AccordionItem value="notifications" className="border border-border/40 rounded-md px-4">
