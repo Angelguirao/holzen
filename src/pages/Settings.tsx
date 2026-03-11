@@ -109,10 +109,9 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
     if (!user) return;
     setExporting(true);
     try {
-      const [{ data: profile }, { data: reflections }, { data: rituals }] = await Promise.all([
+      const [{ data: profile }, { data: reflections }] = await Promise.all([
         supabase.from('profiles').select('*').eq('user_id', user.id).single(),
         supabase.from('reflections').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
-        supabase.from('ritual_completions').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
       ]);
 
       const dateStr = new Date().toISOString().slice(0, 10);
@@ -127,30 +126,13 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
         );
         const refCsv = [refHeaders.join(','), ...refRows].join('\n');
 
-        const ritHeaders = ['created_at', 'decision', 'template', 'journal_text', 'duration_seconds'];
-        const ritRows = (rituals ?? []).map((r: any) =>
-          ritHeaders.map(h => {
-            const val = r[h] ?? '';
-            return `"${String(val).replace(/"/g, '""')}"`;
-          }).join(',')
-        );
-        const ritCsv = [ritHeaders.join(','), ...ritRows].join('\n');
-
         const refBlob = new Blob([refCsv], { type: 'text/csv' });
         const refUrl = URL.createObjectURL(refBlob);
         const a1 = document.createElement('a');
         a1.href = refUrl; a1.download = `holzen-reflections-${dateStr}.csv`; a1.click();
         URL.revokeObjectURL(refUrl);
 
-        if (rituals && rituals.length > 0) {
-          const ritBlob = new Blob([ritCsv], { type: 'text/csv' });
-          const ritUrl = URL.createObjectURL(ritBlob);
-          const a2 = document.createElement('a');
-          a2.href = ritUrl; a2.download = `holzen-rituals-${dateStr}.csv`; a2.click();
-          URL.revokeObjectURL(ritUrl);
-        }
-
-        toast.success('CSV exported', { description: `${reflections?.length ?? 0} reflections + ${rituals?.length ?? 0} rituals.` });
+        toast.success('CSV exported', { description: `${reflections?.length ?? 0} reflections.` });
       } else {
         const exportPayload = {
           exported_at: new Date().toISOString(),
