@@ -1,6 +1,6 @@
 import { useTranslation } from 'react-i18next';
 
-const STEPS = ['feel', 'breathe', 'reflect', 'shift', 'decide'] as const;
+const STEPS = ['breathe', 'feel', 'reflect', 'shift', 'decide'] as const;
 export type PauseStep = typeof STEPS[number];
 
 interface Props {
