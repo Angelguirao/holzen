@@ -152,10 +152,6 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             learning_title: r.learning_title, learning_body: r.learning_body,
             signal_title: r.signal_title, signal_body: r.signal_body, created_at: r.created_at,
           })),
-          rituals: (rituals ?? []).map((r: any) => ({
-            decision: r.decision, template: r.template, journal_text: r.journal_text,
-            duration_seconds: r.duration_seconds, created_at: r.created_at,
-          })),
         };
 
         const blob = new Blob([JSON.stringify(exportPayload, null, 2)], { type: 'application/json' });
