@@ -192,12 +192,6 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate }: Prop
                   {t('calendar.reflectionCount', { count: reflections.length })}
                 </span>
               )}
-              {ritualsList.length > 0 && (
-                <span className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
-                  <Sparkles className="h-2.5 w-2.5 text-primary/60" />
-                  {t('calendar.ritualCount', { count: ritualsList.length })}
-                </span>
-              )}
               {lettersList.length > 0 && (
                 <span className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
                   <Scroll className="h-2.5 w-2.5 text-amber-500/60" />
