@@ -8,7 +8,7 @@ import { motion, useReducedMotion, useInView } from 'framer-motion';
 import {
   ArrowRight, Twitter, Wind, Feather, BookOpen, TrendingDown, Brain, Tag,
   BarChart3, MessageCircle, Target, Heart, Mail, Globe, Shield, Award,
-  Zap, Moon, Sun, ChevronDown, Timer, Eye, Sparkles,
+  Zap, Moon, Sun, ChevronDown, Timer, Eye, Sparkles, RefreshCw,
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { PageMeta } from '@/components/PageMeta';
