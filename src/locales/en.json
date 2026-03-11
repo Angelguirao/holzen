@@ -384,8 +384,8 @@
   "holzenNumber": {
     "title": "The Holzen Number",
     "heldSteadyToday": "held steady today",
-    "reflectionsRecorded": "of users held steady today · {{count}} reflection recorded",
-    "reflectionsRecorded_other": "of users held steady today · {{count}} reflections recorded"
+    "reflectionsRecorded": "of users held steady today · {{count}} pause recorded",
+    "reflectionsRecorded_other": "of users held steady today · {{count}} pauses recorded"
   },
   "ritual": {
     "decide": {
