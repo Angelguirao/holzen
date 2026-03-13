@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { Pencil, Check } from 'lucide-react';
+import { WritingField } from '@/components/WritingField';
 
 interface Props {
   reflectionId: string;
