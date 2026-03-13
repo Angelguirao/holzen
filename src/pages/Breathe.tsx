@@ -412,6 +412,25 @@ export default function Breathe() {
   // Deep elements opacity
   const deepOpacity = depth === 1 ? 1 : 0;
 
+  // Gate non-Pro users (after all hooks)
+  if (!isPending && !isPro) {
+    return (
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background">
+        <div className="max-w-sm px-6">
+          <ProLock feature="stillness" hideContent>
+            <div />
+          </ProLock>
+          <button
+            onClick={() => navigate(-1)}
+            className="mt-6 w-full text-center text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
+          >
+            {t('common.back')}
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <>
       {/* Dark curtain entrance */}
