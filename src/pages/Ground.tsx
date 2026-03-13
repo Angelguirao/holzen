@@ -249,7 +249,7 @@ export default function Ground() {
                   <span className="text-4xl block">🌱</span>
                   </span>
                   <p className="text-lg font-mono text-foreground/80">
-                    {t(`settings.grounding.${activity}`, activity)}
+                    {activity}
                   </p>
                 </motion.div>
 
