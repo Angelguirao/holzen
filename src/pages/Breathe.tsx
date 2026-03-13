@@ -684,10 +684,10 @@ export default function Breathe() {
             {/* Fee pressure */}
             {feeHeat > 0.2 && (
               <motion.p
-                className="font-mono text-[7px] tracking-[0.15em]"
-                style={{ color: textColors[level], opacity: 0.1 }}
+                className="font-mono text-[8px] tracking-[0.15em]"
+                style={{ color: textColors[level], opacity: 0.2 }}
                 initial={{ opacity: 0 }}
-                animate={{ opacity: 0.1 }}
+                animate={{ opacity: 0.2 }}
                 transition={{ delay: 8, duration: 2 }}
               >
                 {t('void.feePressure', 'fee pressure: {{fee}} sat/vB', { fee: blockData?.fastestFee })}
