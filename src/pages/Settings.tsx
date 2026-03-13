@@ -751,7 +751,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             </div>
 
             {/* AI Insights — Pro */}
-            <ProLock>
+            <ProLock feature="ai_insights">
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.aiInsights')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
