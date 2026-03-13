@@ -734,9 +734,9 @@ export default function Breathe() {
             {/* Hint to surface */}
             <motion.p
               className="font-mono text-[8px] tracking-[0.2em] uppercase"
-              style={{ color: textColors[level], opacity: 0.15 }}
+              style={{ color: textColors[level], opacity: 0.1 }}
               initial={{ opacity: 0 }}
-              animate={{ opacity: 0.15 }}
+              animate={{ opacity: 0.1 }}
               transition={{ delay: 6, duration: 2 }}
             >
               {t('void.tapToSurface', 'tap to surface')}
