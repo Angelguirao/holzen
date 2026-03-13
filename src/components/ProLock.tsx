@@ -22,8 +22,8 @@ export function ProLock({ children, inline, feature, hideContent }: Props) {
   const { isPro, isPending, startCheckout, checkoutLoading } = useProGate();
   const { t } = useTranslation();
 
-  if (isPending || isPro) return <>{children}</>;
-
+  if (isPro) return <>{children}</>;
+  if (isPending) return <div className="rounded-md bg-muted/20 animate-pulse min-h-[60px]" />;
   // Resolve contextual description
   const descKey = feature ? `pro.desc_${feature}` : '';
   const contextualDesc = feature && t(descKey) !== descKey ? t(descKey) : null;
