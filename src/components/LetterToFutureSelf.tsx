@@ -165,6 +165,9 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
     setSealPhase('sealing');
 
     try {
+      // Lock the relevant threshold at write time so future setting changes don't affect delivery
+      const letterThreshold = deliverDuring === 'crash' ? thresholdDown : threshold;
+
       const { data, error } = await supabase
         .from('future_letters')
         .insert({
@@ -173,6 +176,7 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
           written_during: writtenDuring,
           deliver_during: deliverDuring,
           btc_price_at_write: currentPrice,
+          delivery_threshold: letterThreshold,
         } as any)
         .select()
         .single();
