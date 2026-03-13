@@ -45,7 +45,7 @@ const STEPS = [
     sources: [
       {
         label: 'Flavell, 1979 — Metacognition',
-        url: 'https://psycnet.apa.org/record/1980-09388-001',
+        url: 'https://doi.org/10.1037/0003-066X.34.10.906',
       },
     ],
   },
@@ -55,7 +55,7 @@ const STEPS = [
     sources: [
       {
         label: 'Kahneman, 2011 — Thinking, Fast and Slow',
-        url: 'https://psycnet.apa.org/record/2011-26535-000',
+        url: 'https://en.wikipedia.org/wiki/Thinking,_Fast_and_Slow',
       },
     ],
   },
