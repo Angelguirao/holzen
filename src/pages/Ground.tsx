@@ -20,6 +20,7 @@ export default function Ground() {
   const [phase, setPhase] = useState<Phase>('loading');
   const [activity, setActivity] = useState<string>('');
   const [suggestion, setSuggestion] = useState<string>('');
+  const [insight, setInsight] = useState<string | null>(null);
   const [suggestedDuration, setSuggestedDuration] = useState(10);
   const [selectedDuration, setSelectedDuration] = useState<number | null>(null);
   const [timeLeft, setTimeLeft] = useState(0);
