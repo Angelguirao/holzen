@@ -239,7 +239,7 @@ const Profile = () => {
         </ProLock>
       ) : (
         <ProLock>
-          {lettersLoading ? (
+          {lettersLoading || (locationLetterId && !viewingLetter) ? (
             <div className="space-y-3">
               <Skeleton className="h-20 w-full rounded-md" />
               <Skeleton className="h-20 w-full rounded-md" />
