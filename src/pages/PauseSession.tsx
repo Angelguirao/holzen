@@ -145,6 +145,7 @@ export default function PauseSession() {
   const handleMoodSelect = useCallback(async (mood: MoodValue) => {
     hapticFeedback('light');
     setMoodDone(true);
+    setSelectedMood(mood);
     if (reflectionId) {
       await supabase.from('reflections').update({ mood } as any).eq('id', reflectionId);
     }
