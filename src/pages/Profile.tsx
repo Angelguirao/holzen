@@ -424,7 +424,7 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
       </StatsSection>
 
       {/* Section: Emotional Patterns */}
-      <ProLock>
+      <ProLock feature="emotional_patterns">
         <StatsSection label={t('profile.sectionEmotional', 'Emotional Patterns')}>
           <MoodTrendChart reflections={moodDataForCharts} />
           <MoodPriceChart reflections={reflections} />
