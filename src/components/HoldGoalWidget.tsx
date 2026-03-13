@@ -154,7 +154,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
     const error = validate(goalType, inputValue, timeUnit);
     if (error) { setValidationError(error); return; }
 
-    const val = parseFloat(inputValue);
+    const val = parseFloat(stripSeparators(inputValue));
     const months = goalType === 'time' ? (timeUnit === 'years' ? Math.round(val * 12) : Math.round(val)) : null;
 
     const updates: Record<string, any> = {
