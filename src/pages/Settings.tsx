@@ -323,10 +323,12 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             </div>
 
             {/* Grounding Activities */}
-            <GroundingTagInput
-              activities={groundingActivities}
-              onChange={setGroundingActivities}
-            />
+            <ProLock feature="grounding">
+              <GroundingTagInput
+                activities={groundingActivities}
+                onChange={setGroundingActivities}
+              />
+            </ProLock>
 
             {/* 1 BTC = 1 BTC mode */}
             <div className="space-y-3">
