@@ -452,7 +452,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             </ProLock>
 
             {/* Style — Pro */}
-            <ProLock>
+            <ProLock feature="style">
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.style')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
