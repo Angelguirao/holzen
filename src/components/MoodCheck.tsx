@@ -35,9 +35,11 @@ interface Props {
   onSkip: () => void;
   /** 'before' = raw entry state, 'after' = post-grounding state */
   variant?: 'before' | 'after';
+  /** Hide the heading text (when parent provides its own) */
+  hideHeading?: boolean;
 }
 
-export function MoodCheck({ onSelect, onSkip, variant = 'before' }: Props) {
+export function MoodCheck({ onSelect, onSkip, variant = 'before', hideHeading = false }: Props) {
   const { t } = useTranslation();
 
   const heading = variant === 'after'
