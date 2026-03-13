@@ -21,7 +21,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { toast } from 'sonner';
-import { AlertCircle, Loader2, Pause, Pin, Timer, Sparkles, Waves, RotateCcw, RefreshCw, Lock, X } from 'lucide-react';
+import { AlertCircle, Loader2, Pause, Pin, Timer, Sparkles, Waves, RotateCcw, RefreshCw, Lock, X, Anchor } from 'lucide-react';
 import { PracticeWidget } from '@/components/PracticeWidget';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { playNotificationTone, prefetchNotificationTone } from '@/lib/notification-tone';
@@ -43,7 +43,7 @@ import {
 import { restrictToVerticalAxis } from '@dnd-kit/modifiers';
 
 // Widget IDs
-const WIDGET_IDS = ['btc-status', 'hold-goal', 'reflection', 'night', 'letter', 'practice', 'breathe'] as const;
+const WIDGET_IDS = ['btc-status', 'hold-goal', 'reflection', 'ground', 'night', 'letter', 'practice', 'breathe'] as const;
 type WidgetId = typeof WIDGET_IDS[number];
 
 interface PinnedReflection {
@@ -61,6 +61,7 @@ const Home = () => {
     'btc-status': t('home.widget.market'),
     'hold-goal': t('home.widget.goal'),
     'reflection': t('home.widget.reflection'),
+    'ground': t('home.widget.ground', 'Ground'),
     'night': t('home.widget.evening'),
     'letter': t('home.widget.letter'),
     'practice': t('home.widget.practice', 'Practice'),
@@ -98,6 +99,7 @@ const Home = () => {
     cooldownHours,
     firstName,
     currency,
+    groundingActivities,
   } = useHolzen();
 
   const { reflection: nightReflection, dismiss: dismissNight } = useNightReflection();
@@ -423,6 +425,32 @@ const Home = () => {
                   )}
                 </>
               )}
+            </div>
+          </HomeWidget>
+        );
+
+      case 'ground':
+        if (groundingActivities.length === 0) return null;
+        return (
+          <HomeWidget
+            id="ground"
+            title={WIDGET_TITLES['ground']}
+            collapsed={collapsed['ground']}
+            onToggleCollapse={() => toggleCollapsed('ground')}
+          >
+            <div className="space-y-2">
+              <p className="text-[11px] text-muted-foreground/50 leading-relaxed">
+                {t('home.groundDesc', 'A personal grounding moment. The AI picks what fits right now.')}
+              </p>
+              <button
+                onClick={() => navigate('/ground')}
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-border/30 bg-muted/10 hover:bg-muted/20 transition-colors duration-500"
+              >
+                <Anchor className="h-3 w-3 text-muted-foreground/40" />
+                <span className="text-[10px] font-mono text-muted-foreground/40 tracking-[0.2em] uppercase">
+                  {t('home.groundYourself', 'Ground yourself')}
+                </span>
+              </button>
             </div>
           </HomeWidget>
         );

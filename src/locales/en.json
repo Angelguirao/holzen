@@ -931,6 +931,22 @@
   "myWhy": {
     "title": "My Why"
   },
+  "ground": {
+    "title": "Ground yourself",
+    "finding": "Finding what fits…",
+    "fallbackSuggestion": "Take a moment with {{activity}}. Sometimes the simplest thing is the most grounding.",
+    "noActivities": "No grounding activities set up yet.",
+    "noActivitiesHint": "Tell us what grounds you — running, music, cooking — so the AI can suggest what fits each moment.",
+    "goToSettings": "Set up in Settings",
+    "setTimer": "Set a timer",
+    "skipTimer": "Skip timer",
+    "remaining": "remaining",
+    "imDone": "I'm done",
+    "checkIn": "Check in",
+    "howDoYouFeel": "How do you feel now?",
+    "doneMessage": "You chose to ground yourself. That's the kind of awareness that compounds.",
+    "return": "Return home"
+  },
   "breathing": {
     "trigger": "Breathe with this →",
     "choosePattern": "Choose a pattern",
