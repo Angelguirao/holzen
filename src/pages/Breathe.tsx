@@ -660,8 +660,8 @@ export default function Breathe() {
                   {formatTimeSince(timeSinceBlock)}
                 </p>
                 <p
-                  className="font-mono text-[8px] tracking-[0.2em] uppercase"
-                  style={{ color: textColors[level], opacity: 0.15 }}
+                  className="font-mono text-[9px] tracking-[0.2em] uppercase"
+                  style={{ color: textColors[level], opacity: 0.3 }}
                 >
                   {t('void.sinceLastBlock', 'since last block')}
                 </p>
