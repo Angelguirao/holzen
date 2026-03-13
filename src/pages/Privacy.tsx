@@ -109,6 +109,7 @@ const Privacy = () => {
       </div>
       <PublicFooter />
     </div>
+  );
 };
 
 export default Privacy;
