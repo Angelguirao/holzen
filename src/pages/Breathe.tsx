@@ -240,6 +240,26 @@ export default function Breathe() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const prefersReducedMotion = useReducedMotion();
+  const { isPro, isPending } = useProGate();
+
+  // Gate non-Pro users
+  if (!isPending && !isPro) {
+    return (
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background">
+        <div className="max-w-sm px-6">
+          <ProLock feature="stillness" hideContent>
+            <div />
+          </ProLock>
+          <button
+            onClick={() => navigate(-1)}
+            className="mt-6 w-full text-center text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
+          >
+            {t('common.back')}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const [btcData, setBtcData] = useState<BtcPriceData | null>(null);
   const [blockData, setBlockData] = useState<BlockData | null>(null);
