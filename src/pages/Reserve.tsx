@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft, Bitcoin } from 'lucide-react';
 import { PageMeta } from '@/components/PageMeta';
+import { PublicFooter } from '@/components/PublicFooter';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 

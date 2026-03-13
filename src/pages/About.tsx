@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft, Wind, Heart, BookOpen, RefreshCw, Target } from 'lucide-react';
 import { PageMeta } from '@/components/PageMeta';
+import { PublicFooter } from '@/components/PublicFooter';
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 14 },
