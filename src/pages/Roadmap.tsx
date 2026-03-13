@@ -10,14 +10,13 @@ import { PageMeta } from '@/components/PageMeta';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 
 const PAGE_SIZE = 30;
-const CATEGORIES = ['all', 'ux', 'ai', 'data', 'platform', 'general'] as const;
+const CATEGORIES = ['all', 'self', 'together', 'intelligence', 'reach'] as const;
 
 const categoryColors: Record<string, string> = {
-  ux: 'bg-blue-500/15 text-blue-400 border-blue-500/20',
-  ai: 'bg-violet-500/15 text-violet-400 border-violet-500/20',
-  data: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20',
-  platform: 'bg-amber-500/15 text-amber-400 border-amber-500/20',
-  general: 'bg-muted text-muted-foreground border-border/40',
+  self: 'bg-amber-500/15 text-amber-400 border-amber-500/20',
+  together: 'bg-rose-500/15 text-rose-400 border-rose-500/20',
+  intelligence: 'bg-violet-500/15 text-violet-400 border-violet-500/20',
+  reach: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20',
 };
 
 interface RoadmapItem {
@@ -166,8 +165,8 @@ const Roadmap = () => {
                   <div className="space-y-1.5 min-w-0">
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-medium leading-snug">{item.title}</p>
-                      {item.category && item.category !== 'general' && (
-                        <Badge variant="outline" className={`text-[9px] font-mono uppercase px-1.5 py-0 h-4 ${categoryColors[item.category] ?? categoryColors.general}`}>
+                      {item.category && (
+                        <Badge variant="outline" className={`text-[9px] font-mono uppercase px-1.5 py-0 h-4 ${categoryColors[item.category] ?? ''}`}>
                           {t(`roadmap.${item.category}`, item.category)}
                         </Badge>
                       )}
