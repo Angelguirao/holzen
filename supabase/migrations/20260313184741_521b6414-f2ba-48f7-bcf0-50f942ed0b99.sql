@@ -1,0 +1,1 @@
+ALTER TABLE public.future_letters ADD COLUMN delivery_threshold numeric DEFAULT 5;
