@@ -17,7 +17,8 @@ import { useTheme } from 'next-themes';
 import { Moon, Sun } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { useState, useEffect, useCallback, forwardRef } from 'react';
+import { useState, useEffect, useCallback, forwardRef, useRef } from 'react';
+import { AutoSaveIndicator, useAutoSave } from '@/components/AutoSaveIndicator';
 import { Input } from '@/components/ui/input';
 import { useTranslation } from 'react-i18next';
 import {
