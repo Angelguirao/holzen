@@ -167,6 +167,7 @@ export function Onboarding({ onComplete }: Props) {
                   firstName: null,
                   timezone,
                   motivations,
+                  groundingActivities,
                 })}
                 variant="outline"
                 size="sm"
