@@ -429,6 +429,32 @@ const Home = () => {
           </HomeWidget>
         );
 
+      case 'ground':
+        if (groundingActivities.length === 0) return null;
+        return (
+          <HomeWidget
+            id="ground"
+            title={WIDGET_TITLES['ground']}
+            collapsed={collapsed['ground']}
+            onToggleCollapse={() => toggleCollapsed('ground')}
+          >
+            <div className="space-y-2">
+              <p className="text-[11px] text-muted-foreground/50 leading-relaxed">
+                {t('home.groundDesc', 'A personal grounding moment. The AI picks what fits right now.')}
+              </p>
+              <button
+                onClick={() => navigate('/ground')}
+                className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-border/30 bg-muted/10 hover:bg-muted/20 transition-colors duration-500"
+              >
+                <Anchor className="h-3 w-3 text-muted-foreground/40" />
+                <span className="text-[10px] font-mono text-muted-foreground/40 tracking-[0.2em] uppercase">
+                  {t('home.groundYourself', 'Ground yourself')}
+                </span>
+              </button>
+            </div>
+          </HomeWidget>
+        );
+
       case 'night':
         if (!nightReflection || !subscribed) return null;
         return (
