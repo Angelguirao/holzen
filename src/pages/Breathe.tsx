@@ -765,9 +765,9 @@ export default function Breathe() {
 
         {/* Breathing instruction — surface only */}
         <motion.p
-          className="absolute bottom-12 text-[9px] font-mono tracking-[0.2em] uppercase z-[105]"
-          style={{ color: textColors[level], opacity: 0.3 }}
-          animate={{ opacity: surfaceOpacity * 0.3 }}
+          className="absolute bottom-12 text-[10px] font-mono tracking-[0.2em] uppercase z-[105]"
+          style={{ color: textColors[level], opacity: 0.4 }}
+          animate={{ opacity: surfaceOpacity * 0.4 }}
           transition={{ duration: 2 }}
         >
           {t('ambient.breathe')}
