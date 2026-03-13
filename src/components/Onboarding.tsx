@@ -60,6 +60,12 @@ export function Onboarding({ onComplete }: Props) {
     );
   }, []);
 
+  const toggleGrounding = useCallback((id: string) => {
+    setGroundingActivities((prev) =>
+      prev.includes(id) ? prev.filter((g) => g !== id) : [...prev, id]
+    );
+  }, []);
+
   return (
     <div className="fixed inset-0 z-50 bg-background flex items-center justify-center p-6">
       <div className="w-full max-w-sm">
