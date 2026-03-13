@@ -8,6 +8,8 @@ import { useHolzen } from '@/hooks/use-holzen';
 import { hapticFeedback } from '@/lib/haptics';
 import { type MoodValue } from '@/components/MoodCheck';
 import { MoodCheck } from '@/components/MoodCheck';
+import { useProGate } from '@/hooks/use-pro-gate';
+import { ProLock } from '@/components/ProLock';
 
 type Phase = 'loading' | 'suggestion' | 'timer' | 'checkin' | 'done';
 
@@ -16,6 +18,7 @@ export default function Ground() {
   const navigate = useNavigate();
   const prefersReducedMotion = useReducedMotion();
   const { groundingActivities, btcData, severity, language } = useHolzen();
+  const { isPro, isPending } = useProGate();
 
   const [phase, setPhase] = useState<Phase>('loading');
   const [activity, setActivity] = useState<string>('');
