@@ -493,6 +493,8 @@
       "detectionDesc": "Separate up/down thresholds, 24h + 7-day cumulative, configurable cooldown",
       "mood": "Emotional tracking",
       "moodDesc": "8 states from FOMO to detachment, tags, journal notes, outcome logging",
+      "practice": "Mindful practices",
+      "practiceDesc": "Body scan, guided journal, emotional check-in, and reflection replay for daily self-awareness practice",
       "ritual": "Pause session",
       "ritualDesc": "Science-sequenced: breathe, feel, reflect, shift, decide",
       "insights": "AI insights",
