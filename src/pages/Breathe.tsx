@@ -558,12 +558,20 @@ export default function Breathe() {
               }}
             >
               {blockData && (
-                <span
-                  className="font-mono text-[11px] tabular-nums tracking-wider"
-                  style={{ color: textColors[level], opacity: 0.5 }}
-                >
-                  {blockData.height.toLocaleString()}
-                </span>
+                <div className="flex flex-col items-center gap-0.5">
+                  <span
+                    className="font-mono text-[11px] tabular-nums tracking-wider"
+                    style={{ color: textColors[level], opacity: 0.5 }}
+                  >
+                    {blockData.height.toLocaleString()}
+                  </span>
+                  <span
+                    className="font-mono text-[6px] tracking-[0.2em] uppercase"
+                    style={{ color: textColors[level], opacity: 0.2 }}
+                  >
+                    {t('void.blockHeight', 'block height')}
+                  </span>
+                </div>
               )}
             </motion.div>
 
