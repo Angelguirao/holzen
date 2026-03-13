@@ -17,13 +17,17 @@ export function useProGate() {
 
   /**
    * Call before executing a Pro-only action.
-   * Returns `true` if allowed, `false` if blocked (shows upgrade toast).
+   * Returns `true` if allowed, `false` if blocked (shows contextual upgrade toast).
    */
   const requirePro = useCallback(
-    (_feature?: ProFeature): boolean => {
+    (feature?: ProFeature | string): boolean => {
       if (subscribed) return true;
+      const descKey = feature ? `pro.desc_${feature}` : '';
+      const description = feature && t(descKey) !== descKey
+        ? t(descKey)
+        : t('pro.upgradeDesc');
       toast(t('pro.featureLocked'), {
-        description: t('pro.upgradeDesc'),
+        description,
         action: {
           label: t('pro.upgradeCta'),
           onClick: () => {

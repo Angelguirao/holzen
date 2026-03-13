@@ -426,7 +426,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             </div>
 
             {/* Tone — Pro */}
-            <ProLock>
+            <ProLock feature="tone">
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.tone')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
@@ -452,7 +452,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             </ProLock>
 
             {/* Style — Pro */}
-            <ProLock>
+            <ProLock feature="style">
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.style')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
@@ -484,7 +484,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             </ProLock>
 
             {/* Custom Prompt — Pro */}
-            <ProLock>
+            <ProLock feature="custom_prompt">
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.customPrompt')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
@@ -561,7 +561,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             {t('settings.companions')}
           </AccordionTrigger>
           <AccordionContent className="space-y-6 pb-4">
-            <ProLock>
+            <ProLock feature="companions">
             <div className="space-y-3">
               <p className="text-xs text-muted-foreground leading-relaxed">
                 {t('settings.companionsDesc')}
@@ -615,7 +615,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             </div>
 
             {/* Digest — Pro */}
-            <ProLock>
+            <ProLock feature="digest">
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.digestFrequency')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
@@ -655,7 +655,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             </ProLock>
 
             {/* Night Reflection — Pro */}
-            <ProLock>
+            <ProLock feature="night_reflections">
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.nightReflection')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
@@ -689,7 +689,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             </ProLock>
 
             {/* Quiet Hours — Pro */}
-            <ProLock>
+            <ProLock feature="quiet_hours">
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.quietHours')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
@@ -751,7 +751,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             </div>
 
             {/* AI Insights — Pro */}
-            <ProLock>
+            <ProLock feature="ai_insights">
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.aiInsights')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
