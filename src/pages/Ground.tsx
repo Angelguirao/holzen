@@ -8,6 +8,8 @@ import { useHolzen } from '@/hooks/use-holzen';
 import { hapticFeedback } from '@/lib/haptics';
 import { type MoodValue } from '@/components/MoodCheck';
 import { MoodCheck } from '@/components/MoodCheck';
+import { useProGate } from '@/hooks/use-pro-gate';
+import { ProLock } from '@/components/ProLock';
 
 type Phase = 'loading' | 'suggestion' | 'timer' | 'checkin' | 'done';
 
@@ -16,6 +18,7 @@ export default function Ground() {
   const navigate = useNavigate();
   const prefersReducedMotion = useReducedMotion();
   const { groundingActivities, btcData, severity, language } = useHolzen();
+  const { isPro, isPending } = useProGate();
 
   const [phase, setPhase] = useState<Phase>('loading');
   const [activity, setActivity] = useState<string>('');
@@ -140,6 +143,25 @@ export default function Ground() {
   };
 
   const progress = selectedDuration ? 1 - timeLeft / (selectedDuration * 60) : 0;
+
+  // Gate non-Pro users
+  if (!isPending && !isPro) {
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
+        <div className="max-w-sm px-6">
+          <ProLock feature="grounding" hideContent>
+            <div />
+          </ProLock>
+          <button
+            onClick={() => navigate(-1)}
+            className="mt-6 w-full text-center text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
+          >
+            {t('common.back')}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // No grounding activities configured
   if (groundingActivities.length === 0 && phase !== 'loading') {
