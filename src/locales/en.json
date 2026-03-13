@@ -862,19 +862,17 @@
     "proExclusive": "Unlock with Pro",
     "next": "Next",
     "categories": {
-      "streak": "Consistency",
+      "calendar": "Bitcoin Calendar",
       "volume": "Pause Count",
       "composure": "Composure",
       "companions": "Companion Engagement",
       "engagement": "Engagement"
     },
-    "streak3": "Getting Started", "streak3Desc": "3-day pause streak",
-    "streak7": "Week Watcher", "streak7Desc": "7-day pause streak",
-    "streak14": "Fortnight Focus", "streak14Desc": "14-day pause streak",
-    "streak30": "Month Mind", "streak30Desc": "30-day pause streak",
-    "streak60": "Steady Hand", "streak60Desc": "60-day pause streak",
-    "streak100": "Century Stoic", "streak100Desc": "100-day pause streak",
-    "streak365": "Year of Composure", "streak365Desc": "365-day pause streak",
+    "genesis": "Genesis Block", "genesisDesc": "Paused on January 3rd — Genesis Block anniversary",
+    "birthday": "Bitcoin Birthday", "birthdayDesc": "Paused on January 9th — first Bitcoin software release",
+    "pizza": "Pizza Day", "pizzaDesc": "Paused on May 22nd — Bitcoin Pizza Day",
+    "whitepaper": "Whitepaper Day", "whitepaperDesc": "Paused on October 31st — Satoshi's whitepaper",
+    "halving": "Halving Witness", "halvingDesc": "Paused during a Bitcoin halving event",
     "reflect10": "First Steps", "reflect10Desc": "10 pauses logged",
     "reflect50": "Devoted Observer", "reflect50Desc": "50 pauses logged",
     "reflect100": "Deep Practice", "reflect100Desc": "100 pauses logged",
@@ -902,10 +900,7 @@
     "fav25": "Archivist", "fav25Desc": "25 favorited pauses",
     "notes10": "Journaler", "notes10Desc": "10 personal notes",
     "notes50": "Deep Diarist", "notes50Desc": "50 personal notes",
-    "activeStreak7": "On Fire", "activeStreak7Desc": "Currently on a 7+ day streak",
-    "activeStreak30": "Unstoppable", "activeStreak30Desc": "Currently on a 30+ day streak",
     "units": {
-      "days": "days",
       "pauses": "pauses",
       "calmMoods": "calm moods",
       "holds": "holds",
@@ -916,7 +911,7 @@
       "fullSessions": "full sessions",
       "favorites": "favorites",
       "notes": "notes",
-      "dayStreak": "day streak"
+      "event": "event"
     }
   },
   "stats": {
