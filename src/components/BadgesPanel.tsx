@@ -228,32 +228,47 @@ export function BadgesPanel({ reflections, notifyBadges = true }: BadgesPanelPro
               </p>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              {catBadges.map((badge, i) => (
+              {catBadges.map((badge, i) => {
+                const isLocked = badge.proOnly && !subscribed;
+                return (
                 <motion.div
                   key={badge.id}
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.05, duration: 0.3 }}
                   className={`relative rounded-lg border px-3 py-3 space-y-2 transition-all ${
-                    badge.earned
+                    isLocked
+                      ? 'border-border/30 bg-muted/10 opacity-40'
+                      : badge.earned
                       ? 'border-primary/30 bg-primary/5'
                       : 'border-border/40 bg-muted/20 opacity-50'
                   }`}
                 >
+                  {/* Pro badge indicator */}
+                  {badge.proOnly && (
+                    <div className="absolute top-2 right-2 flex items-center gap-0.5">
+                      {isLocked ? (
+                        <Lock className="h-2.5 w-2.5 text-muted-foreground/40" />
+                      ) : (
+                        <Sparkles className="h-2.5 w-2.5 text-primary/50" />
+                      )}
+                    </div>
+                  )}
+
                   <div className="flex items-center gap-2">
                     <badge.icon
                       className="h-3.5 w-3.5 shrink-0"
-                      style={{ color: badge.earned ? badge.color : undefined }}
+                      style={{ color: badge.earned && !isLocked ? badge.color : undefined }}
                     />
-                    <p className={`text-xs font-mono leading-tight ${badge.earned ? 'text-foreground' : 'text-muted-foreground'}`}>
+                    <p className={`text-xs font-mono leading-tight ${badge.earned && !isLocked ? 'text-foreground' : 'text-muted-foreground'}`}>
                       {t(badge.labelKey)}
                     </p>
                   </div>
                   <p className="text-[10px] text-muted-foreground leading-snug">
-                    {t(badge.descKey)}
+                    {isLocked ? t('badges.proExclusive', 'Unlock with Pro') : t(badge.descKey)}
                   </p>
 
-                  {!badge.earned && (
+                  {!badge.earned && !isLocked && (
                     <div className="space-y-1">
                       <div className="h-1 w-full rounded-full bg-border/40 overflow-hidden">
                         <motion.div
@@ -270,11 +285,12 @@ export function BadgesPanel({ reflections, notifyBadges = true }: BadgesPanelPro
                     </div>
                   )}
 
-                  {badge.earned && (
+                  {badge.earned && !isLocked && (
                     <p className="text-[9px] font-mono text-primary/70">{t('badges.earnedCheck')}</p>
                   )}
                 </motion.div>
-              ))}
+                );
+              })}
             </div>
           </div>
         );
