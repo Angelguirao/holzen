@@ -48,7 +48,6 @@ export function PauseBreathing({ mantra, severity = 'mild', onContinue }: Props)
   const { t } = useTranslation();
   const prefersReduced = useReducedMotion();
   const quote = useMemo(() => getSessionQuote(), []);
-  const prefersReduced = useReducedMotion();
 
   const patternIndex = severity === 'high' ? 1 : 0;
   const pattern = PATTERNS[patternIndex];
