@@ -246,8 +246,7 @@ export default function Ground() {
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.5 }}
                 >
-                  <span className="text-4xl block">
-                    {ACTIVITY_ICONS[activity] || '🌱'}
+                  <span className="text-4xl block">🌱</span>
                   </span>
                   <p className="text-lg font-mono text-foreground/80">
                     {t(`settings.grounding.${activity}`, activity)}
