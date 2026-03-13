@@ -591,38 +591,37 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             {t('settings.companionsAi', 'Companions & AI')}
           </AccordionTrigger>
           <AccordionContent className="space-y-6 pb-4">
-            <ProLock feature="companions">
-            <div className="space-y-3">
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                {t('settings.companionsDesc')}
-              </p>
-              {(['breathing', 'haiku', 'learning', 'signal', 'zoomOut', 'history'] as const).map((comp) => (
-                <div key={comp} className="flex items-center justify-between">
-                  <Label htmlFor={`comp-${comp}`} className="text-xs font-mono text-muted-foreground">
-                    {t(`settings.companionLabels.${comp}`)}
-                  </Label>
-                  <Switch
-                    id={`comp-${comp}`}
-                    checked={companionPrefs[comp]}
-                    onCheckedChange={(v) => setCompanionPref(comp, v)}
-                  />
-                </div>
-              ))}
-            </div>
-            </ProLock>
+            <ProLock feature="companions" hideContent>
+            <div className="space-y-6">
+              <div className="space-y-3">
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  {t('settings.companionsDesc')}
+                </p>
+                {(['breathing', 'haiku', 'learning', 'signal', 'zoomOut', 'history'] as const).map((comp) => (
+                  <div key={comp} className="flex items-center justify-between">
+                    <Label htmlFor={`comp-${comp}`} className="text-xs font-mono text-muted-foreground">
+                      {t(`settings.companionLabels.${comp}`)}
+                    </Label>
+                    <Switch
+                      id={`comp-${comp}`}
+                      checked={companionPrefs[comp]}
+                      onCheckedChange={(v) => setCompanionPref(comp, v)}
+                    />
+                  </div>
+                ))}
+              </div>
 
-            {/* AI Insights — Pro */}
-            <ProLock feature="ai_insights">
-            <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.aiInsights')}</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                {t('settings.aiInsightsDesc')}
-              </p>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="ai-insights" className="text-xs font-mono text-muted-foreground">
-                  {t('settings.enableAiInsights')}
-                </Label>
-                <Switch id="ai-insights" checked={aiInsightsEnabled} onCheckedChange={setAiInsightsEnabled} />
+              <div className="space-y-3">
+                <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.aiInsights')}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  {t('settings.aiInsightsDesc')}
+                </p>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="ai-insights" className="text-xs font-mono text-muted-foreground">
+                    {t('settings.enableAiInsights')}
+                  </Label>
+                  <Switch id="ai-insights" checked={aiInsightsEnabled} onCheckedChange={setAiInsightsEnabled} />
+                </div>
               </div>
             </div>
             </ProLock>
