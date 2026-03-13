@@ -111,17 +111,20 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
   const [btcMode, setBtcMode] = useState(() => localStorage.getItem('holzen_btc_mode') === 'true');
   const [latestVersion, setLatestVersion] = useState<string | null>(null);
   const [hasNewVersion, setHasNewVersion] = useState(false);
-  const { saveCount, triggerSave } = useAutoSave();
-  const initialLoadRef = useRef(true);
+  const saveTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
-  // Track profile-level setting changes to show auto-save indicator
+  // Track profile-level setting changes to show auto-save toast
   useEffect(() => {
     if (!profileLoaded) return;
     if (initialLoadRef.current) {
       initialLoadRef.current = false;
       return;
     }
-    triggerSave();
+    clearTimeout(saveTimeoutRef.current);
+    saveTimeoutRef.current = setTimeout(() => {
+      sonnerToast(t('settings.saved', 'Saved'), { duration: 1200, id: 'auto-save' });
+    }, 400);
+    return () => clearTimeout(saveTimeoutRef.current);
   }, [threshold, thresholdDown, cumulativeThreshold, emailNotifications, reflectionTone, reflectionStyle, silentMode, cooldownHours, digestFrequency, customPrompt, quietHoursStart, quietHoursEnd, firstName, nightReflectionHour, aiInsightsEnabled, notifyBadges, mantra, currency, language, groundingActivities, companionPrefs]);
 
 
