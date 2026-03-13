@@ -28,6 +28,7 @@ export function useHolzen() {
   const [notifyBadges, setNotifyBadgesState] = useState(true);
   const [motivations, setMotivationsState] = useState<string[]>([]);
   const [mantra, setMantraState] = useState<string | null>(null);
+  const [groundingActivities, setGroundingActivitiesState] = useState<string[]>([]);
   const [currency, setCurrencyState] = useState<string>('USD');
   const [language, setLanguageState] = useState<string>('en');
   const [btcData, setBtcData] = useState<BtcPriceData | null>(null);
