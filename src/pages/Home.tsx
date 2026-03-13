@@ -213,6 +213,10 @@ const Home = () => {
     onRefresh: handlePullRefresh,
   });
 
+  if (!profileLoaded) {
+    return <AuthLoading />;
+  }
+
   if (!hasOnboarded) {
     return <Onboarding onComplete={completeOnboarding} />;
   }
