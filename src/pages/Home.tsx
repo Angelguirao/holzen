@@ -456,19 +456,32 @@ const Home = () => {
             collapsed={collapsed['ground']}
             onToggleCollapse={() => toggleCollapsed('ground')}
           >
-            <div className="space-y-2">
-              <p className="text-[11px] text-muted-foreground/50 leading-relaxed">
-                {t('home.groundDesc', 'A personal grounding moment. The AI picks what fits right now.')}
-              </p>
-              <button
-                onClick={() => navigate('/ground')}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-border/30 bg-muted/10 hover:bg-muted/20 transition-colors duration-500"
-              >
-                <Anchor className="h-3 w-3 text-muted-foreground/40" />
-                <span className="text-[10px] font-mono text-muted-foreground/40 tracking-[0.2em] uppercase">
-                  {t('home.groundYourself', 'Ground yourself')}
-                </span>
-              </button>
+            <div className="space-y-3">
+              <div className="flex flex-wrap gap-1.5">
+                {groundingActivities.map((activity) => (
+                  <span
+                    key={activity}
+                    className="inline-flex items-center gap-1 text-[10px] font-mono px-2.5 py-1 rounded-full border border-border/30 bg-muted/20 text-muted-foreground/60"
+                  >
+                    {activity}
+                  </span>
+                ))}
+              </div>
+              {subscribed ? (
+                <button
+                  onClick={() => navigate('/ground')}
+                  className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-border/30 bg-muted/10 hover:bg-muted/20 transition-colors duration-500"
+                >
+                  <Anchor className="h-3 w-3 text-muted-foreground/40" />
+                  <span className="text-[10px] font-mono text-muted-foreground/40 tracking-[0.2em] uppercase">
+                    {t('home.groundYourself', 'Ground yourself')}
+                  </span>
+                </button>
+              ) : (
+                <p className="text-[10px] text-muted-foreground/30 text-center">
+                  {t('home.groundProHint', 'Upgrade to Pro for AI-guided grounding sessions')}
+                </p>
+              )}
             </div>
           </HomeWidget>
         );
