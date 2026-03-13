@@ -7,6 +7,8 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { hapticFeedback } from '@/lib/haptics';
 import { fetchBtcData, type BtcPriceData } from '@/lib/btc';
 import { playBlockDiscoveryTone, startAmbientDrone } from '@/lib/notification-tone';
+import { useProGate } from '@/hooks/use-pro-gate';
+import { ProLock } from '@/components/ProLock';
 
 type VolatilityLevel = 'calm' | 'moderate' | 'intense';
 
