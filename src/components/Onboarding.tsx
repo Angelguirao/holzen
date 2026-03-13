@@ -143,7 +143,7 @@ export function Onboarding({ onComplete }: Props) {
               >
                 {t('common.skip')}
               </button>
-            )}
+            ) : null}
             {step > 0 && (
               <button
                 onClick={() => goTo(step - 1)}
