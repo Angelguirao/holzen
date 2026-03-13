@@ -681,12 +681,13 @@ export default function Breathe() {
             {blockData?.difficultyEpochProgress != null && (
               <motion.p
                 className="font-mono text-[7px] tracking-[0.15em]"
-                style={{ color: textColors[level], opacity: 0.15 }}
+                style={{ color: textColors[level], opacity: 0.2 }}
                 initial={{ opacity: 0 }}
-                animate={{ opacity: 0.15 }}
+                animate={{ opacity: 0.2 }}
                 transition={{ delay: 10, duration: 3 }}
               >
                 {t('void.epoch', 'epoch {{pct}}%', { pct: Math.round(blockData.difficultyEpochProgress * 100) })}
+                <span style={{ opacity: 0.6 }}> · {t('void.epochHint', '2,016-block difficulty cycle')}</span>
               </motion.p>
             )}
 
