@@ -94,15 +94,24 @@ const Profile = () => {
   const { subscribed } = useSubscription();
   const location = useLocation();
   const locationTab = (location.state as any)?.tab;
+  const locationLetterId = (location.state as any)?.letterId;
   const [reflections, setReflections] = useState<Reflection[]>([]);
   const [letters, setLetters] = useState<Letter[]>([]);
   const [practiceEntries, setPracticeEntries] = useState<PracticeEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [lettersLoading, setLettersLoading] = useState(true);
+  const [viewingLetter, setViewingLetter] = useState<Letter | null>(null);
   const [tab, setTab] = useState<'stats' | 'insights' | 'badges' | 'letters' | 'activity'>(
     ['stats', 'insights', 'badges', 'letters', 'activity'].includes(locationTab) ? locationTab : 'stats'
   );
 
+  // Open letter viewer when navigating from notification
+  useEffect(() => {
+    if (locationLetterId && letters.length > 0) {
+      const found = letters.find((l) => l.id === locationLetterId && l.delivered);
+      if (found) setViewingLetter(found);
+    }
+  }, [locationLetterId, letters]);
   useEffect(() => {
     document.title = 'Holzen — Profile';
     return () => { document.title = 'Holzen — Pause before you act'; };
