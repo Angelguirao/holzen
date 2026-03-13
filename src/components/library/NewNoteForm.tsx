@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { WritingField } from '@/components/WritingField';
 
 interface Props {
   onSave: (title: string, body: string, tags: string[]) => Promise<void>;
@@ -61,12 +62,11 @@ export function NewNoteForm({ onSave }: Props) {
         className="w-full text-xs font-medium bg-transparent text-foreground placeholder:text-muted-foreground/40 focus:outline-none"
         maxLength={120}
       />
-      <textarea
+      <WritingField
         value={body}
-        onChange={(e) => setBody(e.target.value)}
+        onChange={setBody}
         placeholder={t('library.noteBodyPlaceholder')}
-        rows={3}
-        className="w-full text-[11px] font-mono bg-transparent text-foreground placeholder:text-muted-foreground/40 focus:outline-none resize-none leading-relaxed"
+        minRows={3}
       />
       <div className="flex items-center gap-1 flex-wrap">
         {tags.map((tag) => (
