@@ -12,7 +12,16 @@ serve(async (req) => {
   }
 
   try {
-    const { context, language, sources } = await req.json();
+    let body: any = {};
+    try {
+      body = await req.json();
+    } catch {
+      return new Response(
+        JSON.stringify({ error: "Invalid or empty request body" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+    const { context, language, sources } = body;
 
     const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
     if (!PERPLEXITY_API_KEY) throw new Error("PERPLEXITY_API_KEY is not configured");
@@ -162,7 +171,13 @@ Rules:
       throw new Error("No signal returned from AI");
     }
 
-    const signal = JSON.parse(toolCall.function.arguments);
+    let signal: any;
+    try {
+      signal = JSON.parse(toolCall.function.arguments);
+    } catch {
+      console.error("Failed to parse AI arguments:", toolCall.function.arguments);
+      throw new Error("AI returned invalid JSON");
+    }
 
     // Ensure URL is from citations if possible
     if (citations.length > 0 && !citations.includes(signal.url)) {
