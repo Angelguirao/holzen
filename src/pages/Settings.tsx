@@ -587,7 +587,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             </ProLock>
           </AccordionContent>
         </AccordionItem>
-
+  const { saveCount, triggerSave } = useAutoSave();
 
         {/* 5. Notifications & Schedule */}
         <AccordionItem value="notifications" className="border border-border/40 rounded-md px-4">
