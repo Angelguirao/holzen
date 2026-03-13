@@ -1,11 +1,14 @@
 import { Lock, Sparkles } from 'lucide-react';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { useTranslation } from 'react-i18next';
+import type { ProFeature } from '@/lib/pricing';
 
 interface Props {
   children: React.ReactNode;
   /** If true, show inline lock badge instead of overlay */
   inline?: boolean;
+  /** Feature key for contextual description */
+  feature?: ProFeature | string;
 }
 
 /**
@@ -13,11 +16,15 @@ interface Props {
  * Shows children with a gradient fade + lock overlay so free users
  * can glimpse what they're missing, but can't interact.
  */
-export function ProLock({ children, inline }: Props) {
+export function ProLock({ children, inline, feature }: Props) {
   const { isPro, isPending, startCheckout, checkoutLoading } = useProGate();
   const { t } = useTranslation();
 
   if (isPending || isPro) return <>{children}</>;
+
+  // Resolve contextual description
+  const descKey = feature ? `pro.desc_${feature}` : '';
+  const contextualDesc = feature && t(descKey) !== descKey ? t(descKey) : null;
 
   if (inline) {
     return (
@@ -51,6 +58,11 @@ export function ProLock({ children, inline }: Props) {
             {t('pro.badge')}
           </span>
         </div>
+        {contextualDesc && (
+          <p className="text-[11px] font-mono text-muted-foreground/70 text-center max-w-[240px] leading-relaxed">
+            {contextualDesc}
+          </p>
+        )}
         <button
           onClick={() => startCheckout()}
           disabled={checkoutLoading}
