@@ -571,8 +571,8 @@ export default function Breathe() {
             >
               {blockData && (
                 <span
-                  className="font-mono text-[11px] tabular-nums tracking-wider"
-                  style={{ color: textColors[level], opacity: 0.5 }}
+                  className="font-mono text-xs tabular-nums tracking-wider"
+                  style={{ color: textColors[level], opacity: 0.7 }}
                 >
                   {blockData.height.toLocaleString()}
                 </span>
