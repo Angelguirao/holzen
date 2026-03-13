@@ -608,15 +608,25 @@ export default function Breathe() {
             )}
 
             {blockData && blockData.mempoolPending > 0 && (
-              <motion.p
-                className="text-[9px] font-mono tabular-nums"
-                style={{ color: textColors[level], opacity: 0.2 }}
+              <motion.div
+                className="text-center"
                 initial={{ opacity: 0 }}
-                animate={{ opacity: surfaceOpacity * 0.2 }}
+                animate={{ opacity: surfaceOpacity * 0.25 }}
                 transition={{ delay: 3.5, duration: 1.5 }}
               >
-                {formatNumber(blockData.mempoolPending)} {t('breathe.pendingTx', 'transactions waiting to confirm')}
-              </motion.p>
+                <p
+                  className="text-[9px] font-mono tabular-nums"
+                  style={{ color: textColors[level] }}
+                >
+                  {formatNumber(blockData.mempoolPending)} {t('breathe.pendingTx', 'transactions waiting to confirm')}
+                </p>
+                <p
+                  className="text-[7px] font-mono tracking-[0.15em]"
+                  style={{ color: textColors[level], opacity: 0.6 }}
+                >
+                  {t('void.mempoolHint', 'the mempool — unconfirmed transactions')}
+                </p>
+              </motion.div>
             )}
 
             {/* Hint to go deeper */}
