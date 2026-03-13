@@ -55,13 +55,15 @@ export function CollapsibleReflectionHeader({ message, context, haiku, isFavorit
             className="overflow-hidden"
           >
             <div className="flex items-center gap-0.5 pt-3" onClick={(e) => e.stopPropagation()}>
-              <button
-                onClick={() => { hapticFeedback('light'); onToggleFavorite(); }}
-                className={`p-1.5 rounded-full transition-all duration-300 ${isFavorite ? 'text-destructive bg-destructive/5' : 'text-muted-foreground/25 hover:text-destructive/60'}`}
-                aria-label="Favorite"
-              >
-                <Heart className={`h-3 w-3 ${isFavorite ? 'fill-current' : ''}`} />
-              </button>
+              {subscribed && (
+                <button
+                  onClick={() => { hapticFeedback('light'); onToggleFavorite(); }}
+                  className={`p-1.5 rounded-full transition-all duration-300 ${isFavorite ? 'text-destructive bg-destructive/5' : 'text-muted-foreground/25 hover:text-destructive/60'}`}
+                  aria-label="Favorite"
+                >
+                  <Heart className={`h-3 w-3 ${isFavorite ? 'fill-current' : ''}`} />
+                </button>
+              )}
               <ShareReflection message={message} context={context} haiku={haiku} />
               {subscribed && <ReflectionWallpaper message={message} mood={null} context={context} haiku={haiku} variant="button" />}
             </div>
