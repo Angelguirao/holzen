@@ -277,7 +277,7 @@ export default function Ground() {
                     </p>
                   </motion.div>
                 )}
-
+                <motion.div
                   className="space-y-3"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
