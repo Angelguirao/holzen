@@ -129,6 +129,7 @@ const Terms = () => {
       </div>
       <PublicFooter />
     </div>
+  );
 };
 
 export default Terms;
