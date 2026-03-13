@@ -322,11 +322,9 @@ export default function Ground() {
                 className="text-center space-y-8 w-full"
               >
                 <div className="space-y-2">
-                  <span className="text-2xl block">
-                    {ACTIVITY_ICONS[activity] || '🌱'}
-                  </span>
+                  <span className="text-2xl block">🌱</span>
                   <p className="text-xs font-mono text-muted-foreground/50">
-                    {t(`settings.grounding.${activity}`, activity)}
+                    {activity}
                   </p>
                 </div>
 
