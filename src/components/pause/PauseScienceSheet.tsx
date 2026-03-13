@@ -45,7 +45,7 @@ const STEPS = [
     sources: [
       {
         label: 'Flavell, 1979 — Metacognition',
-        url: 'https://psycnet.apa.org/record/1980-09388-001',
+        url: 'https://doi.org/10.1037/0003-066X.34.10.906',
       },
     ],
   },
