@@ -3,6 +3,7 @@ import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { OnboardingWhy } from '@/components/onboarding/OnboardingWhy';
+import { OnboardingGrounding } from '@/components/onboarding/OnboardingGrounding';
 import { OnboardingThreshold } from '@/components/onboarding/OnboardingThreshold';
 import { OnboardingDemo } from '@/components/onboarding/OnboardingDemo';
 
@@ -11,6 +12,7 @@ interface OnboardingResult {
   firstName: string | null;
   timezone: string;
   motivations: string[];
+  groundingActivities: string[];
 }
 
 interface Props {
