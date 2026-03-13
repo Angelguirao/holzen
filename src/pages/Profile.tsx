@@ -105,13 +105,8 @@ const Profile = () => {
     ['stats', 'insights', 'badges', 'letters', 'activity'].includes(locationTab) ? locationTab : 'stats'
   );
 
-  // Open letter viewer when navigating from notification
-  useEffect(() => {
-    if (locationLetterId && letters.length > 0) {
-      const found = letters.find((l) => l.id === locationLetterId && l.delivered);
-      if (found) setViewingLetter(found);
-    }
-  }, [locationLetterId, letters]);
+  // Track whether we're waiting to open a letter from a notification
+  const [letterViewerPending, setLetterViewerPending] = useState(!!locationLetterId);
   useEffect(() => {
     document.title = 'Holzen — Profile';
     return () => { document.title = 'Holzen — Pause before you act'; };
@@ -135,7 +130,14 @@ const Profile = () => {
         .select('*')
         .eq('user_id', user.id)
         .order('written_at', { ascending: false });
-      setLetters((data as unknown as Letter[]) ?? []);
+      const all = (data as unknown as Letter[]) ?? [];
+      setLetters(all);
+      // Open viewer immediately if navigating from notification
+      if (locationLetterId) {
+        const found = all.find((l) => l.id === locationLetterId && l.delivered);
+        if (found) setViewingLetter(found);
+        setLetterViewerPending(false);
+      }
       setLettersLoading(false);
     };
     const loadPractice = async () => {
@@ -239,7 +241,7 @@ const Profile = () => {
         </ProLock>
       ) : (
         <ProLock>
-          {lettersLoading || (locationLetterId && !viewingLetter) ? (
+          {lettersLoading || letterViewerPending ? (
             <div className="space-y-3">
               <Skeleton className="h-20 w-full rounded-md" />
               <Skeleton className="h-20 w-full rounded-md" />
