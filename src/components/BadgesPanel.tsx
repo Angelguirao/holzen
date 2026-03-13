@@ -34,6 +34,7 @@ interface Badge {
   requirement: number;
   current: number;
   unitKey: string;
+  proOnly: boolean;
 }
 
 function computeLongestStreak(reflections: Reflection[]): number {
