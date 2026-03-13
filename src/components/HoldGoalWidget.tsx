@@ -4,14 +4,12 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useHolzen } from '@/hooks/use-holzen';
 import { formatBtcPrice, SUPPORTED_CURRENCIES } from '@/lib/btc';
-import { Target, Calendar, Coins, Infinity, X, Check, CalendarIcon } from 'lucide-react';
+import { Target, Calendar, Coins, Infinity, X, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { differenceInDays, format } from 'date-fns';
 import { toast } from 'sonner';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar as CalendarPicker } from '@/components/ui/calendar';
-import { cn } from '@/lib/utils';
+
 import {
   AlertDialog,
   AlertDialogAction,
@@ -51,7 +49,6 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
   const [inputValue, setInputValue] = useState('');
   const [validationError, setValidationError] = useState<string | null>(null);
   const [startDate, setStartDate] = useState<Date>(new Date());
-  const [calendarMonth, setCalendarMonth] = useState<Date>(new Date());
 
   const loadGoal = useCallback(async () => {
     if (!user) return;
@@ -212,61 +209,46 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
           ))}
         </div>
 
-        {/* Start date picker */}
+        {/* Start date picker — simple month/year selectors */}
         <div className="flex items-center gap-2">
           <p className="text-[10px] font-mono text-muted-foreground/60 whitespace-nowrap">{t('holdGoal.startFrom')}</p>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className={cn(
-                  "h-7 flex-1 justify-start text-left text-[10px] font-mono",
-                  startDate.toDateString() === new Date().toDateString() && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="h-2.5 w-2.5 mr-1.5" />
-                {startDate.toDateString() === new Date().toDateString() ? t('holdGoal.today') : format(startDate, 'MMM d, yyyy')}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="center" side="bottom" sideOffset={8}>
-              <div className="p-3 pointer-events-auto">
-                {/* Year & Month dropdowns */}
-                <div className="flex items-center gap-2 mb-3">
-                  <select
-                    value={calendarMonth.getFullYear()}
-                    onChange={(e) => setCalendarMonth(new Date(parseInt(e.target.value), calendarMonth.getMonth(), 1))}
-                    className="flex-1 h-7 rounded-md border border-input bg-background text-xs font-mono px-2 focus:outline-none focus:ring-1 focus:ring-ring"
-                  >
-                    {Array.from({ length: new Date().getFullYear() - 2008 }, (_, i) => 2009 + i).map((y) => (
-                      <option key={y} value={y}>{y}</option>
-                    ))}
-                  </select>
-                  <select
-                    value={calendarMonth.getMonth()}
-                    onChange={(e) => setCalendarMonth(new Date(calendarMonth.getFullYear(), parseInt(e.target.value), 1))}
-                    className="flex-1 h-7 rounded-md border border-input bg-background text-xs font-mono px-2 focus:outline-none focus:ring-1 focus:ring-ring"
-                  >
-                    {Array.from({ length: 12 }, (_, i) => (
-                      <option key={i} value={i} disabled={calendarMonth.getFullYear() === new Date().getFullYear() && i > new Date().getMonth()}>
-                        {format(new Date(2000, i, 1), 'MMM')}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <CalendarPicker
-                  mode="single"
-                  selected={startDate}
-                  onSelect={(d) => d && setStartDate(d)}
-                  month={calendarMonth}
-                  onMonthChange={setCalendarMonth}
-                  disabled={(date) => date > new Date() || date < new Date('2009-01-03')}
-                  initialFocus
-                  className="p-0"
-                />
-              </div>
-            </PopoverContent>
-          </Popover>
+          <select
+            value={startDate.getMonth()}
+            onChange={(e) => {
+              const m = parseInt(e.target.value);
+              const y = startDate.getFullYear();
+              const now = new Date();
+              const clamped = new Date(y, m, 1) > now ? now : new Date(y, m, 1);
+              setStartDate(clamped);
+            }}
+            className="h-7 flex-1 rounded-md border border-input bg-background text-[10px] font-mono px-2 focus:outline-none focus:ring-1 focus:ring-ring"
+          >
+            {Array.from({ length: 12 }, (_, i) => {
+              const now = new Date();
+              const disabled = startDate.getFullYear() === now.getFullYear() && i > now.getMonth();
+              return (
+                <option key={i} value={i} disabled={disabled}>
+                  {format(new Date(2000, i, 1), 'MMMM')}
+                </option>
+              );
+            })}
+          </select>
+          <select
+            value={startDate.getFullYear()}
+            onChange={(e) => {
+              const y = parseInt(e.target.value);
+              const now = new Date();
+              const m = y === now.getFullYear() && startDate.getMonth() > now.getMonth()
+                ? now.getMonth()
+                : startDate.getMonth();
+              setStartDate(new Date(y, m, 1));
+            }}
+            className="h-7 w-20 rounded-md border border-input bg-background text-[10px] font-mono px-2 focus:outline-none focus:ring-1 focus:ring-ring"
+          >
+            {Array.from({ length: new Date().getFullYear() - 2008 }, (_, i) => 2009 + i).map((y) => (
+              <option key={y} value={y}>{y}</option>
+            ))}
+          </select>
         </div>
 
         {goalType === 'forever' ? (
