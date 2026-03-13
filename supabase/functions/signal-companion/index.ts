@@ -171,7 +171,13 @@ Rules:
       throw new Error("No signal returned from AI");
     }
 
-    const signal = JSON.parse(toolCall.function.arguments);
+    let signal: any;
+    try {
+      signal = JSON.parse(toolCall.function.arguments);
+    } catch {
+      console.error("Failed to parse AI arguments:", toolCall.function.arguments);
+      throw new Error("AI returned invalid JSON");
+    }
 
     // Ensure URL is from citations if possible
     if (citations.length > 0 && !citations.includes(signal.url)) {
