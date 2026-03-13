@@ -42,7 +42,7 @@ serve(async (req) => {
       ? `CRITICAL: ALL output MUST be in ${langName}. Do NOT use English.\n\n`
       : "";
 
-    const systemPrompt = `${langInstruction}You are a grounding companion for a Bitcoin holder. Your role is to suggest the most fitting personal grounding activity for this moment.
+    const systemPrompt = `${langInstruction}You are a grounding companion for a Bitcoin holder. Your role is to suggest the most fitting personal grounding activity for this moment AND share something genuinely interesting about that activity.
 
 The user has told us these activities help them feel grounded: ${groundingActivities.join(", ")}.
 
@@ -53,10 +53,11 @@ Rules:
 - Write a short, personal suggestion (2-3 sentences max)
 - Include a gentle reason WHY this activity fits right now
 - Suggest a duration that feels right (5, 10, or 15 minutes)
+- Share a genuinely interesting insight, fun fact, or recent discovery about the activity (something the user probably doesn't know — a scientific finding, a technique, a cultural perspective)
 - No exclamation marks, no motivational language, no trading advice
 - Sound like a quiet friend, not a coach`;
 
-    const userPrompt = `${context ? `Market context: ${context}\n` : ""}${mood ? `Current mood: ${mood}\n` : ""}${severity ? `Severity: ${severity}\n` : ""}Suggest the best grounding activity for this moment.`;
+    const userPrompt = `${context ? `Market context: ${context}\n` : ""}${mood ? `Current mood: ${mood}\n` : ""}${severity ? `Severity: ${severity}\n` : ""}Suggest the best grounding activity for this moment, and share something interesting about it.`;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -76,14 +77,14 @@ Rules:
             function: {
               name: "suggest_grounding",
               description: langCode !== "en"
-                ? `Suggest a grounding activity. ALL fields MUST be in ${langName}.`
-                : "Suggest the best grounding activity for this moment.",
+                ? `Suggest a grounding activity with an interesting insight. ALL fields MUST be in ${langName}.`
+                : "Suggest the best grounding activity for this moment with an interesting insight.",
               parameters: {
                 type: "object",
                 properties: {
                   activity: {
                     type: "string",
-                    description: "The activity ID from the user's list (e.g. 'running', 'music')",
+                    description: "The activity name from the user's list (e.g. 'running', 'guitar')",
                   },
                   suggestion: {
                     type: "string",
@@ -95,8 +96,14 @@ Rules:
                     type: "number",
                     description: "Suggested duration in minutes (5, 10, or 15)",
                   },
+                  insight: {
+                    type: "string",
+                    description: langCode !== "en"
+                      ? `An interesting fact, scientific finding, or technique about this activity (1-2 sentences). MUST be in ${langName}.`
+                      : "An interesting fact, scientific finding, technique, or cultural perspective about this activity that the user probably doesn't know (1-2 sentences).",
+                  },
                 },
-                required: ["activity", "suggestion", "duration"],
+                required: ["activity", "suggestion", "duration", "insight"],
                 additionalProperties: false,
               },
             },
@@ -133,6 +140,7 @@ Rules:
         activity: args.activity,
         suggestion: args.suggestion,
         duration: args.duration,
+        insight: args.insight || null,
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -144,6 +152,7 @@ Rules:
       activity: fallbackActivity,
       suggestion: `Take a moment with ${fallbackActivity}. Sometimes the simplest thing is the most grounding.`,
       duration: 10,
+      insight: null,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
