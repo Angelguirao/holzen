@@ -207,10 +207,11 @@ export function useHolzen() {
       .eq('user_id', user.id);
   }, [user]);
 
-  const completeOnboarding = useCallback(async (result: { threshold: number; firstName: string | null; timezone: string; motivations: string[] }) => {
+  const completeOnboarding = useCallback(async (result: { threshold: number; firstName: string | null; timezone: string; motivations: string[]; groundingActivities: string[] }) => {
     setHasOnboarded(true);
     setThresholdState(result.threshold);
     if (result.firstName) setFirstNameState(result.firstName);
+    setGroundingActivitiesState(result.groundingActivities);
     if (!user) return;
     await supabase
       .from('profiles')
@@ -220,6 +221,7 @@ export function useHolzen() {
         first_name: result.firstName,
         timezone: result.timezone,
         motivations: result.motivations.length > 0 ? result.motivations : null,
+        grounding_activities: result.groundingActivities.length > 0 ? result.groundingActivities : [],
       } as any)
       .eq('user_id', user.id);
   }, [user]);
