@@ -15,7 +15,7 @@ const STEPS = [
     sources: [
       {
         label: 'Porges, 2011 — Polyvagal Theory',
-        url: 'https://doi.org/10.1093/acprof:oso/9780393707007.001.0001',
+        url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC3490536/',
       },
     ],
   },
@@ -35,7 +35,7 @@ const STEPS = [
     sources: [
       {
         label: 'Gross, 2002 — Emotion Regulation',
-        url: 'https://doi.org/10.1037/0033-295X.109.2.281',
+        url: 'https://doi.org/10.1017/S0048577201393198',
       },
     ],
   },
@@ -45,7 +45,7 @@ const STEPS = [
     sources: [
       {
         label: 'Flavell, 1979 — Metacognition',
-        url: 'https://doi.org/10.1037/0003-066X.34.10.906',
+        url: 'https://psycnet.apa.org/record/1980-09388-001',
       },
     ],
   },
@@ -55,7 +55,7 @@ const STEPS = [
     sources: [
       {
         label: 'Kahneman, 2011 — Thinking, Fast and Slow',
-        url: 'https://en.wikipedia.org/wiki/Thinking,_Fast_and_Slow',
+        url: 'https://psycnet.apa.org/record/2011-26535-000',
       },
     ],
   },
