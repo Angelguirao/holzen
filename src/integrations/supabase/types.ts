@@ -199,6 +199,7 @@ export type Database = {
           deliver_during: string
           delivered: boolean
           delivered_at: string | null
+          delivery_threshold: number | null
           id: string
           user_id: string
           written_at: string
@@ -211,6 +212,7 @@ export type Database = {
           deliver_during: string
           delivered?: boolean
           delivered_at?: string | null
+          delivery_threshold?: number | null
           id?: string
           user_id: string
           written_at?: string
@@ -223,6 +225,7 @@ export type Database = {
           deliver_during?: string
           delivered?: boolean
           delivered_at?: string | null
+          delivery_threshold?: number | null
           id?: string
           user_id?: string
           written_at?: string

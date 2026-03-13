@@ -42,24 +42,25 @@ serve(async (req) => {
     const currentPriceUsd = prices[prices.length - 1][1];
     const changePercent = ((currentPriceUsd - price24hAgo) / price24hAgo) * 100;
 
-    // Determine current market condition
-    const isCrash = changePercent <= -5;
-    const isSurge = changePercent >= 5;
+    // Determine current market direction (any magnitude — threshold checked per-letter)
+    const isCrash = changePercent < 0;
+    const isSurge = changePercent > 0;
 
-    if (!isCrash && !isSurge) {
-      console.log(`[DELIVER-LETTERS] No extreme condition (${changePercent.toFixed(1)}%), skipping`);
+    if (changePercent === 0) {
+      console.log(`[DELIVER-LETTERS] Flat market, skipping`);
       return new Response(JSON.stringify({ delivered: 0, condition: "neutral" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     const currentCondition = isCrash ? "crash" : "surge";
-    console.log(`[DELIVER-LETTERS] Market condition: ${currentCondition} (${changePercent.toFixed(1)}%)`);
+    const absChange = Math.abs(changePercent);
+    console.log(`[DELIVER-LETTERS] Market: ${currentCondition} ${absChange.toFixed(1)}%`);
 
     // 2. Find letters waiting for this condition
     const { data: letters, error: lettersError } = await supabase
       .from("future_letters")
-      .select("id, user_id, body, btc_price_at_write, written_during, written_at")
+      .select("id, user_id, body, btc_price_at_write, written_during, written_at, delivery_threshold")
       .eq("delivered", false)
       .eq("deliver_during", currentCondition);
 
@@ -72,11 +73,18 @@ serve(async (req) => {
     }
 
     let delivered = 0;
-
-    // Cache for per-currency price lookups
     const priceCache = new Map<string, number>();
 
     for (const letter of letters) {
+      // Use per-letter threshold (locked at write time), fallback to 5% for legacy letters
+      const letterThreshold = letter.delivery_threshold ?? 5;
+
+      // Only deliver if the current change magnitude meets the letter's threshold
+      if (absChange < letterThreshold) {
+        console.log(`[DELIVER-LETTERS] Skipping letter ${letter.id}: needs ${letterThreshold}%, current ${absChange.toFixed(1)}%`);
+        continue;
+      }
+
       // Get user's currency preference for delivery price
       const { data: profile } = await supabase
         .from("profiles")
