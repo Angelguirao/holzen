@@ -239,9 +239,12 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
   return (
     <div ref={ref} className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">
-          {t('settings.title')}
-        </h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">
+            {t('settings.title')}
+          </h1>
+          <AutoSaveIndicator show={saveCount > 0} key={saveCount} />
+        </div>
         <button
           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
           className="text-muted-foreground hover:text-foreground transition-colors"
