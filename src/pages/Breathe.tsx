@@ -208,7 +208,7 @@ function WordByWordText({ text, delay = 0, color }: { text: string; delay?: numb
           key={i}
           className="inline-block mr-[0.35em]"
           initial={{ opacity: 0, y: 4 }}
-          animate={{ opacity: 0.5, y: 0 }}
+          animate={{ opacity: 0.65, y: 0 }}
           transition={{ delay: delay + i * 0.35, duration: 0.6, ease: 'easeOut' }}
         >
           {word}
