@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft, Wind, Heart, BookOpen, RefreshCw, Target } from 'lucide-react';
 import { PageMeta } from '@/components/PageMeta';
+import { PublicFooter } from '@/components/PublicFooter';
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 14 },
@@ -198,18 +199,7 @@ const About = () => {
           </div>
         </motion.div>
 
-        {/* Footer */}
-        <motion.div {...m()}>
-          <div className="flex items-center gap-3 text-xs text-muted-foreground pt-4 border-t border-border">
-            <Link to="/welcome" className="hover:text-foreground transition-colors">{t('about.home')}</Link>
-            <span>·</span>
-            <Link to="/terms" className="hover:text-foreground transition-colors">{t('about.terms')}</Link>
-            <span>·</span>
-            <Link to="/privacy" className="hover:text-foreground transition-colors">{t('about.privacy')}</Link>
-            <span>·</span>
-            <a href="mailto:hello@holzen.app" className="hover:text-foreground transition-colors">{t('about.contact')}</a>
-          </div>
-        </motion.div>
+        <PublicFooter />
       </div>
     </div>
   );
