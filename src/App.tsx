@@ -30,6 +30,7 @@ import PracticeJournal from "./pages/PracticeJournal";
 import PracticeBodyScan from "./pages/PracticeBodyScan";
 import PracticeReplay from "./pages/PracticeReplay";
 import PauseSession from "./pages/PauseSession";
+import Ground from "./pages/Ground";
 
 const queryClient = new QueryClient();
 
