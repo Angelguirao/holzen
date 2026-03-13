@@ -150,8 +150,9 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
       return;
     }
 
-    if (!inputValue) return;
-    const error = validate(goalType, inputValue, timeUnit);
+    const rawInput = stripSeparators(inputValue);
+    if (!rawInput) return;
+    const error = validate(goalType, rawInput, timeUnit);
     if (error) { setValidationError(error); return; }
 
     const val = parseFloat(stripSeparators(inputValue));
