@@ -601,10 +601,10 @@ export default function Breathe() {
 
             {blockData && (
               <motion.p
-                className="text-[10px] font-mono leading-relaxed max-w-[240px]"
-                style={{ color: textColors[level], opacity: 0.35 }}
+                className="text-[11px] font-mono leading-relaxed max-w-[260px]"
+                style={{ color: textColors[level], opacity: 0.5 }}
                 initial={{ opacity: 0 }}
-                animate={{ opacity: surfaceOpacity * 0.35 }}
+                animate={{ opacity: surfaceOpacity * 0.5 }}
                 transition={{ delay: 2, duration: 1.5 }}
               >
                 {t('breathe.blockGrounding', 'Block {{height}}. Immutable. Like this moment.', { height: blockData.height.toLocaleString() })}
