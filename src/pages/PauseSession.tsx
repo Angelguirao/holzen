@@ -175,6 +175,12 @@ export default function PauseSession() {
     setMoodAfterDone(true);
   }, []);
 
+  const handleMoodAfterReset = useCallback(() => {
+    setMoodAfterDone(false);
+    setSelectedMoodAfter(null);
+  }, []);
+  }, []);
+
   const toggleFavorite = useCallback(async () => {
     if (!reflectionId) return;
     const newVal = !isFavorite;
