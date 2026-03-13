@@ -314,16 +314,17 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
             <div className="space-y-1.5">
               <div className="flex items-center gap-2">
                 <Input
-                  type="number"
+                  type={goalType === 'price' ? 'text' : 'number'}
+                  inputMode={goalType === 'price' ? 'decimal' : 'numeric'}
                   value={inputValue}
                   onChange={(e) => handleInputChange(e.target.value)}
                   placeholder={
                     goalType === 'time'
                       ? timeUnit === 'months' ? 'e.g. 6' : 'e.g. 2'
-                      : 'e.g. 150000'
+                      : 'e.g. 150,000'
                   }
                   className={`text-xs font-mono h-8 ${validationError ? 'border-destructive/50' : ''}`}
-                  min={0}
+                  min={goalType === 'time' ? 0 : undefined}
                 />
                 <Button size="sm" onClick={saveGoal} disabled={!inputValue || !!validationError} className="h-8 px-3">
                   <Check className="h-3 w-3" />
