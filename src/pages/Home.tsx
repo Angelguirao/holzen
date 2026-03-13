@@ -3,7 +3,7 @@ import { usePullToRefresh } from '@/hooks/use-pull-to-refresh';
 import { useHolzen } from '@/hooks/use-holzen';
 import { TestimonialRequest } from '@/components/TestimonialRequest';
 import { LetterToFutureSelf } from '@/components/LetterToFutureSelf';
-
+import AuthLoading from '@/components/AuthLoading';
 import { useSubscription } from '@/hooks/use-subscription';
 import { BtcStatus } from '@/components/BtcStatus';
 import { NightReflectionCard, useNightReflection } from '@/components/NightReflectionCard';
@@ -100,11 +100,11 @@ const Home = () => {
     firstName,
     currency,
     groundingActivities,
+    profileLoaded,
   } = useHolzen();
 
   const { reflection: nightReflection, dismiss: dismissNight } = useNightReflection();
 
-  
   const [priceHidden, setPriceHidden] = useState(() => localStorage.getItem('holzen_hide_price') === 'true');
   const [btcMode, setBtcMode] = useState(() => localStorage.getItem('holzen_btc_mode') === 'true');
   const [zenMode] = useState(() => localStorage.getItem('holzen_zen_mode') === 'true');
@@ -212,6 +212,10 @@ const Home = () => {
   const { pullDistance, refreshing: pullRefreshing, handlers: pullHandlers } = usePullToRefresh({
     onRefresh: handlePullRefresh,
   });
+
+  if (!profileLoaded) {
+    return <AuthLoading />;
+  }
 
   if (!hasOnboarded) {
     return <Onboarding onComplete={completeOnboarding} />;
