@@ -122,7 +122,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
     }
     clearTimeout(saveTimeoutRef.current);
     saveTimeoutRef.current = setTimeout(() => {
-      sonnerToast(t('settings.saved', 'Saved'), { duration: 1200, id: 'auto-save' });
+      toast(t('settings.saved', 'Saved'), { duration: 1200, id: 'auto-save' });
     }, 400);
     return () => clearTimeout(saveTimeoutRef.current);
   }, [threshold, thresholdDown, cumulativeThreshold, emailNotifications, reflectionTone, reflectionStyle, silentMode, cooldownHours, digestFrequency, customPrompt, quietHoursStart, quietHoursEnd, firstName, nightReflectionHour, aiInsightsEnabled, notifyBadges, mantra, currency, language, groundingActivities, companionPrefs]);
