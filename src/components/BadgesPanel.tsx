@@ -84,6 +84,7 @@ interface BadgesPanelProps {
 
 export function BadgesPanel({ reflections, notifyBadges = true }: BadgesPanelProps) {
   const { t } = useTranslation();
+  const { subscribed } = useSubscription();
 
   const badges = useMemo(() => {
     const total = reflections.length;
