@@ -270,6 +270,38 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
               </p>
             </div>
 
+            {/* Grounding Activities */}
+            <div className="space-y-3">
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.groundingTitle')}</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {t('settings.groundingDesc')}
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                {(['running', 'walking', 'music', 'cooking', 'meditation', 'breathwork', 'reading', 'journaling', 'nature', 'exercise'] as const).map((value) => {
+                  const selected = groundingActivities.includes(value);
+                  return (
+                    <button
+                      key={value}
+                      onClick={() => {
+                        const next = selected
+                          ? groundingActivities.filter((v) => v !== value)
+                          : [...groundingActivities, value];
+                        setGroundingActivities(next);
+                      }}
+                      className={`rounded-md border px-3 py-2.5 text-left transition-colors ${
+                        selected
+                          ? 'border-primary bg-primary/5 text-foreground'
+                          : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      <p className="text-xs font-mono font-medium">{t(`settings.grounding.${value}`)}</p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5">{t(`settings.grounding.${value}Desc`)}</p>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
             {/* 1 BTC = 1 BTC mode */}
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.btcMode')}</p>
