@@ -17,6 +17,7 @@ import { ChartEmptyState } from '@/components/ChartEmptyState';
 import { StreakTimeline } from '@/components/StreakTimeline';
 import { AIInsightsPanel } from '@/components/AIInsightsPanel';
 import { ProLock } from '@/components/ProLock';
+import { LetterViewer } from '@/components/LetterViewer';
 
 import { BadgesPanel } from '@/components/BadgesPanel';
 import { MoodPriceChart } from '@/components/MoodPriceChart';
