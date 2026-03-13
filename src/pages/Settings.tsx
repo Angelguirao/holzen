@@ -111,6 +111,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
   const [btcMode, setBtcMode] = useState(() => localStorage.getItem('holzen_btc_mode') === 'true');
   const [latestVersion, setLatestVersion] = useState<string | null>(null);
   const [hasNewVersion, setHasNewVersion] = useState(false);
+  const initialLoadRef = useRef(true);
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout>>();
 
   // Track profile-level setting changes to show auto-save toast
