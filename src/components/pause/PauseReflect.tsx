@@ -44,8 +44,8 @@ export function PauseReflect({
         subscribed={subscribed}
       />
 
-      {/* Note & tags — cognitive reappraisal tools */}
-      {reflectionId && (
+      {/* Note & tags — cognitive reappraisal tools (Pro only) */}
+      {reflectionId && subscribed && (
         <motion.div
           className="space-y-4"
           initial={{ opacity: 0, y: 8 }}
