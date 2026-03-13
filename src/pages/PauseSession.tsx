@@ -31,6 +31,8 @@ interface PersistedSession {
   severity: 'mild' | 'moderate' | 'high';
   moodDone: boolean;
   moodAfterDone: boolean;
+  selectedMood?: MoodValue | null;
+  selectedMoodAfter?: MoodValue | null;
   phase: 'session' | 'done';
   decision: string | null;
   step: PauseStep;
