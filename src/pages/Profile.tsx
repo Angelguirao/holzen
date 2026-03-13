@@ -411,7 +411,7 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
       <StatsSection label={t('profile.sectionJourney', 'Your Journey')}>
         <ReflectionStats reflections={reflections} />
         <StreakTimeline reflections={reflections} practiceEntries={practiceEntries} memberSince={memberSince} />
-        <ProLock>
+        <ProLock feature="history">
           {scoreData ? <HolzenScoreDetail scoreData={scoreData} practiceDays={practiceDays} /> : (
             <ChartEmptyState
               title={t('profile.holzenScore')}
