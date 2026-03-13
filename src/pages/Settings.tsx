@@ -615,7 +615,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             </div>
 
             {/* Digest — Pro */}
-            <ProLock>
+            <ProLock feature="digest">
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.digestFrequency')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
