@@ -86,6 +86,8 @@ export default function PauseSession() {
   const [isFavorite, setIsFavorite] = useState(false);
   const [moodDone, setMoodDone] = useState(restored?.moodDone ?? false);
   const [moodAfterDone, setMoodAfterDone] = useState(restored?.moodAfterDone ?? false);
+  const [selectedMood, setSelectedMood] = useState<MoodValue | null>(restored?.selectedMood ?? null);
+  const [selectedMoodAfter, setSelectedMoodAfter] = useState<MoodValue | null>(restored?.selectedMoodAfter ?? null);
   const [curtainLifted, setCurtainLifted] = useState(false);
 
   // Persist session
