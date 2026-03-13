@@ -7,6 +7,8 @@ export const PRICING = {
   monthlyPrice: 5,
   /** Number of free reflections per month */
   freeReflectionsPerMonth: 3,
+  /** Free trial duration in days */
+  trialDays: 7,
 } as const;
 
 /** Features that require a Pro subscription */
