@@ -259,7 +259,6 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
           <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">
             {t('settings.title')}
           </h1>
-          <AutoSaveIndicator show={saveCount > 0} key={saveCount} />
         </div>
         <button
           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
