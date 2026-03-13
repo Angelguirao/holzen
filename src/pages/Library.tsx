@@ -112,7 +112,7 @@ export default function Library() {
         <div className="flex flex-col items-center justify-center min-h-[40vh] gap-4 text-center px-6">
           <Lock className="h-6 w-6 text-muted-foreground/30" />
           <h2 className="text-sm font-mono text-foreground">{t('pro.featureLocked')}</h2>
-          <p className="text-xs text-muted-foreground max-w-xs">{t('pro.upgradeDesc')}</p>
+          <p className="text-xs text-muted-foreground max-w-xs">{t('pro.desc_library')}</p>
           <button
             onClick={startCheckout}
             disabled={checkoutLoading}
