@@ -1398,8 +1398,9 @@
   },
   "pro": {
     "featureLocked": "Pro feature",
-    "upgradeDesc": "Upgrade to Pro to unlock AI companions, insights, library, and more.",
-    "upgradeCta": "Upgrade to Pro",
+    "upgradeDesc": "Start your {{trialDays}}-day free trial — unlock AI companions, insights, library, and more.",
+    "upgradeCta": "Start free trial",
+    "upgradeCtaShort": "Try Pro free",
     "badge": "PRO",
     "desc_haiku": "Each reflection gets a unique haiku — a poetic mirror of your emotional state.",
     "desc_signal": "AI-powered market intelligence that cuts through the noise for you.",
