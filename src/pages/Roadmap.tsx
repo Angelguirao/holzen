@@ -188,6 +188,7 @@ const Roadmap = () => {
             )}
           </div>
         )}
+        <PublicFooter />
       </div>
     </div>
   );
