@@ -654,8 +654,8 @@ export default function Breathe() {
                 transition={{ delay: 1, duration: 1.5 }}
               >
                 <p
-                  className="font-mono text-sm tabular-nums tracking-wider"
-                  style={{ color: textColors[level], opacity: 0.25 }}
+                  className="font-mono text-base tabular-nums tracking-wider"
+                  style={{ color: textColors[level], opacity: 0.4 }}
                 >
                   {formatTimeSince(timeSinceBlock)}
                 </p>
