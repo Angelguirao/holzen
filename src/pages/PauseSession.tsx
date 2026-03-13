@@ -347,6 +347,7 @@ export default function PauseSession() {
                   <PauseShift
                     onMoodAfterSelect={handleMoodAfterSelect}
                     onMoodAfterSkip={handleMoodAfterSkip}
+                    onMoodAfterReset={handleMoodAfterReset}
                     moodAfterDone={moodAfterDone}
                     selectedMoodAfter={selectedMoodAfter}
                     onContinue={() => goToStep('decide')}
