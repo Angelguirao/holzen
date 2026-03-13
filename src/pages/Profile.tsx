@@ -130,7 +130,14 @@ const Profile = () => {
         .select('*')
         .eq('user_id', user.id)
         .order('written_at', { ascending: false });
-      setLetters((data as unknown as Letter[]) ?? []);
+      const all = (data as unknown as Letter[]) ?? [];
+      setLetters(all);
+      // Open viewer immediately if navigating from notification
+      if (locationLetterId) {
+        const found = all.find((l) => l.id === locationLetterId && l.delivered);
+        if (found) setViewingLetter(found);
+        setLetterViewerPending(false);
+      }
       setLettersLoading(false);
     };
     const loadPractice = async () => {
