@@ -95,8 +95,8 @@ export default function PauseSession() {
   // Persist session
   useEffect(() => {
     if (!message) return;
-    saveSession({ message, context, reflectionId, companions, companionPrefs, severity, moodDone, moodAfterDone, phase, decision, step });
-  }, [message, moodDone, moodAfterDone, phase, decision, step]);
+    saveSession({ message, context, reflectionId, companions, companionPrefs, severity, moodDone, moodAfterDone, selectedMood, selectedMoodAfter, phase, decision, step });
+  }, [message, moodDone, moodAfterDone, selectedMood, selectedMoodAfter, phase, decision, step]);
 
   // Cinematic entrance
   useEffect(() => {
