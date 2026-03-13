@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Plus, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { WritingField } from '@/components/WritingField';
 
 interface Props {
   onSave: (title: string, body: string, tags: string[]) => Promise<void>;
