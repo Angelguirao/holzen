@@ -256,9 +256,23 @@ const Home = () => {
             </motion.div>
           ) : (
             <motion.div key="zen-empty" variants={zenVariants} initial="hidden" animate="visible" exit="hidden" className="space-y-6 text-center">
-              <p className="text-sm text-muted-foreground font-mono leading-relaxed">{t('home.noActiveReflection')}</p>
-              {hasAccess && (
-                <NeedAMomentButton onTrigger={handleNeedAPause} cooldownRemaining={manualCooldownRemaining} loading={loading} />
+              {hasAccess ? (
+                <>
+                  <p className="text-sm text-muted-foreground font-mono leading-relaxed">{t('home.noActiveReflection')}</p>
+                  <NeedAMomentButton onTrigger={handleNeedAPause} cooldownRemaining={manualCooldownRemaining} loading={loading} />
+                </>
+              ) : (
+                <>
+                  <p className="text-sm text-muted-foreground font-mono leading-relaxed">
+                    {t('home.subscription.monthlyLimitReached', 'You\'ve used your free pauses this month.')}
+                  </p>
+                  <p className="text-xs text-muted-foreground/60 font-mono leading-relaxed max-w-[280px] mx-auto">
+                    {t('home.subscription.upgradeToPro')}
+                  </p>
+                  <Button onClick={startCheckout} disabled={checkoutLoading} size="sm" className="font-mono text-xs">
+                    {checkoutLoading ? t('home.subscription.openingCheckout') : t('pro.upgradeCta')}
+                  </Button>
+                </>
               )}
             </motion.div>
           )}
