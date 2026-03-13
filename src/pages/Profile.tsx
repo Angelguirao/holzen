@@ -105,13 +105,8 @@ const Profile = () => {
     ['stats', 'insights', 'badges', 'letters', 'activity'].includes(locationTab) ? locationTab : 'stats'
   );
 
-  // Open letter viewer when navigating from notification
-  useEffect(() => {
-    if (locationLetterId && letters.length > 0) {
-      const found = letters.find((l) => l.id === locationLetterId && l.delivered);
-      if (found) setViewingLetter(found);
-    }
-  }, [locationLetterId, letters]);
+  // Track whether we're waiting to open a letter from a notification
+  const [letterViewerPending, setLetterViewerPending] = useState(!!locationLetterId);
   useEffect(() => {
     document.title = 'Holzen — Profile';
     return () => { document.title = 'Holzen — Pause before you act'; };
