@@ -7,6 +7,7 @@ import { ArrowLeft, ChevronUp } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Badge } from '@/components/ui/badge';
 import { PageMeta } from '@/components/PageMeta';
+import { PublicFooter } from '@/components/PublicFooter';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 
 const PAGE_SIZE = 30;
@@ -187,6 +188,7 @@ const Roadmap = () => {
             )}
           </div>
         )}
+        <PublicFooter />
       </div>
     </div>
   );
