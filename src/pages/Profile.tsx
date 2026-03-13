@@ -266,11 +266,11 @@ const Profile = () => {
           <BadgesPanel reflections={reflections} />
         )
       ) : tab === 'activity' ? (
-        <ProLock feature="history">
+        <ProLock feature="history" hideContent>
           <HistoryContent />
         </ProLock>
       ) : (
-        <ProLock feature="letters">
+        <ProLock feature="letters" hideContent>
           {lettersLoading || letterViewerPending ? (
             <div className="space-y-3">
               <Skeleton className="h-20 w-full rounded-md" />
@@ -411,7 +411,7 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
       <StatsSection label={t('profile.sectionJourney', 'Your Journey')}>
         <ReflectionStats reflections={reflections} />
         <StreakTimeline reflections={reflections} practiceEntries={practiceEntries} memberSince={memberSince} />
-        <ProLock>
+        <ProLock feature="history">
           {scoreData ? <HolzenScoreDetail scoreData={scoreData} practiceDays={practiceDays} /> : (
             <ChartEmptyState
               title={t('profile.holzenScore')}
@@ -424,7 +424,7 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
       </StatsSection>
 
       {/* Section: Emotional Patterns */}
-      <ProLock>
+      <ProLock feature="emotional_patterns">
         <StatsSection label={t('profile.sectionEmotional', 'Emotional Patterns')}>
           <MoodTrendChart reflections={moodDataForCharts} />
           <MoodPriceChart reflections={reflections} />
@@ -432,7 +432,7 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
       </ProLock>
 
       {/* Section: Decision Making */}
-      <ProLock>
+      <ProLock feature="decisions">
         <StatsSection label={t('profile.sectionDecisions', 'Decision Making')}>
           <PeriodComparison reflections={reflections} />
           <DecisionQualityCard reflections={reflections} />
@@ -442,7 +442,7 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
       </ProLock>
 
       {/* Section: Practice */}
-      <ProLock>
+      <ProLock feature="practice_stats">
         <StatsSection label={t('profile.sectionPractice', 'Practice')}>
           {practiceStats ? (
             <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2">
@@ -470,7 +470,7 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
       </ProLock>
 
       {/* Section: Advanced */}
-      <ProLock>
+      <ProLock feature="advanced_stats">
         <StatsSection label={t('profile.sectionAdvanced', 'Advanced')}>
           <StatsTrends reflections={reflections} />
           <MoodShiftChart reflections={reflections} />

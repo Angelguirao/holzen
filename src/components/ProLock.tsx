@@ -1,4 +1,4 @@
-import { Lock, Sparkles } from 'lucide-react';
+import { Lock, Sparkles, ArrowRight } from 'lucide-react';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { useTranslation } from 'react-i18next';
 import type { ProFeature } from '@/lib/pricing';
@@ -9,6 +9,8 @@ interface Props {
   inline?: boolean;
   /** Feature key for contextual description */
   feature?: ProFeature | string;
+  /** If true, hide the blurred children entirely and show only the CTA */
+  hideContent?: boolean;
 }
 
 /**
@@ -16,7 +18,7 @@ interface Props {
  * Shows children with a gradient fade + lock overlay so free users
  * can glimpse what they're missing, but can't interact.
  */
-export function ProLock({ children, inline, feature }: Props) {
+export function ProLock({ children, inline, feature, hideContent }: Props) {
   const { isPro, isPending, startCheckout, checkoutLoading } = useProGate();
   const { t } = useTranslation();
 
@@ -25,6 +27,7 @@ export function ProLock({ children, inline, feature }: Props) {
   // Resolve contextual description
   const descKey = feature ? `pro.desc_${feature}` : '';
   const contextualDesc = feature && t(descKey) !== descKey ? t(descKey) : null;
+  const fallbackDesc = t('pro.upgradeDesc');
 
   if (inline) {
     return (
@@ -42,33 +45,34 @@ export function ProLock({ children, inline, feature }: Props) {
   return (
     <div className="relative overflow-hidden rounded-md">
       {/* Teaser peek — visible but non-interactive */}
-      <div className="pointer-events-none select-none" aria-hidden="true">
-        <div className="opacity-30 blur-[2px] max-h-[280px] overflow-hidden">
-          {children}
+      {!hideContent && (
+        <div className="pointer-events-none select-none" aria-hidden="true">
+          <div className="opacity-30 blur-[2px] max-h-[280px] overflow-hidden">
+            {children}
+          </div>
+          {/* Gradient fade to obscure bottom */}
+          <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent" />
         </div>
-        {/* Gradient fade to obscure bottom */}
-        <div className="absolute inset-0 bg-gradient-to-t from-background via-background/80 to-transparent" />
-      </div>
+      )}
 
       {/* Upgrade CTA overlay */}
-      <div className="absolute inset-0 flex flex-col items-center justify-center gap-3">
+      <div className={`${hideContent ? 'py-8' : 'absolute inset-0'} flex flex-col items-center justify-center gap-3`}>
         <div className="flex items-center gap-2 bg-muted/60 backdrop-blur-sm border border-border/40 rounded-full px-4 py-2">
           <Sparkles className="h-3.5 w-3.5 text-primary/70" />
           <span className="text-[11px] font-mono text-muted-foreground uppercase tracking-wider">
             {t('pro.badge')}
           </span>
         </div>
-        {contextualDesc && (
-          <p className="text-[11px] font-mono text-muted-foreground/70 text-center max-w-[240px] leading-relaxed">
-            {contextualDesc}
-          </p>
-        )}
+        <p className="text-xs font-mono text-foreground/60 text-center max-w-[280px] leading-relaxed">
+          {contextualDesc || fallbackDesc}
+        </p>
         <button
           onClick={() => startCheckout()}
           disabled={checkoutLoading}
-          className="text-xs font-mono text-primary/80 hover:text-primary underline underline-offset-4 decoration-primary/30 hover:decoration-primary/60 transition-all"
+          className="flex items-center gap-1.5 mt-1 text-xs font-mono text-primary hover:text-primary/80 transition-all group"
         >
-          {t('pro.upgradeCta')}
+          <span>{t('pro.upgradeCta')}</span>
+          <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
         </button>
       </div>
     </div>
