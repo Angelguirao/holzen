@@ -16,7 +16,7 @@ import { Button } from '@/components/ui/button';
 import { useTheme } from 'next-themes';
 import { Moon, Sun } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
-import { toast } from 'sonner';
+import { toast as sonnerToast } from 'sonner';
 import { useState, useEffect, useCallback, forwardRef, useRef } from 'react';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
