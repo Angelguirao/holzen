@@ -1,19 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
-import { Anchor } from 'lucide-react';
-
-const ACTIVITIES = [
-  'running',
-  'walking',
-  'music',
-  'cooking',
-  'meditation',
-  'breathwork',
-  'reading',
-  'journaling',
-  'nature',
-  'exercise',
-] as const;
+import { Anchor, X } from 'lucide-react';
+import { useState, useCallback } from 'react';
 
 interface Props {
   selected: string[];
@@ -23,6 +11,24 @@ interface Props {
 
 export function OnboardingGrounding({ selected, onToggle, stagger }: Props) {
   const { t } = useTranslation();
+  const [inputValue, setInputValue] = useState('');
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if ((e.key === 'Enter' || e.key === ',') && inputValue.trim()) {
+        e.preventDefault();
+        const tag = inputValue.trim().toLowerCase();
+        if (!selected.includes(tag)) {
+          onToggle(tag);
+        }
+        setInputValue('');
+      }
+      if (e.key === 'Backspace' && !inputValue && selected.length > 0) {
+        onToggle(selected[selected.length - 1]);
+      }
+    },
+    [inputValue, selected, onToggle]
+  );
 
   return (
     <div className="space-y-6">
@@ -40,28 +46,31 @@ export function OnboardingGrounding({ selected, onToggle, stagger }: Props) {
         {t('onboarding.groundingIntro')}
       </motion.p>
 
-      <motion.div className="grid grid-cols-2 gap-2" {...stagger(0.25)}>
-        {ACTIVITIES.map((id) => {
-          const isSelected = selected.includes(id);
-          return (
-            <button
-              key={id}
-              onClick={() => onToggle(id)}
-              className={`text-left px-3 py-2.5 rounded-sm border transition-all duration-200 ${
-                isSelected
-                  ? 'border-foreground/30 bg-foreground/5'
-                  : 'border-border/40 hover:border-border/80 bg-transparent'
-              }`}
+      <motion.div className="space-y-3" {...stagger(0.25)}>
+        <div className="flex flex-wrap gap-1.5 min-h-[2rem]">
+          {selected.map((tag) => (
+            <span
+              key={tag}
+              className="inline-flex items-center gap-1 text-xs font-mono px-2.5 py-1 rounded-full border border-foreground/20 bg-foreground/5 text-foreground/80"
             >
-              <p className={`text-xs font-mono transition-colors ${isSelected ? 'text-foreground' : 'text-foreground/70'}`}>
-                {t(`settings.grounding.${id}`)}
-              </p>
-              <p className="text-[10px] text-muted-foreground/50 mt-0.5">
-                {t(`settings.grounding.${id}Desc`)}
-              </p>
-            </button>
-          );
-        })}
+              {tag}
+              <button
+                onClick={() => onToggle(tag)}
+                className="text-muted-foreground/40 hover:text-foreground transition-colors"
+              >
+                <X className="h-2.5 w-2.5" />
+              </button>
+            </span>
+          ))}
+        </div>
+        <input
+          type="text"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder={t('onboarding.groundingPlaceholder', 'e.g. running, cooking, guitar...')}
+          className="w-full bg-transparent border-b border-border/40 focus:border-foreground/30 outline-none text-sm font-mono py-2 text-foreground placeholder:text-muted-foreground/30 transition-colors"
+        />
       </motion.div>
 
       <motion.p className="text-[10px] text-muted-foreground/40 flex items-center gap-1.5" {...stagger(0.4)}>

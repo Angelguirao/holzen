@@ -40,6 +40,58 @@ import {
 
 const LAST_SEEN_VERSION_KEY = 'holzen_last_seen_version';
 
+function GroundingTagInput({ activities, onChange }: { activities: string[]; onChange: (v: string[]) => void }) {
+  const { t } = useTranslation();
+  const [inputValue, setInputValue] = useState('');
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if ((e.key === 'Enter' || e.key === ',') && inputValue.trim()) {
+      e.preventDefault();
+      const tag = inputValue.trim().toLowerCase();
+      if (!activities.includes(tag)) {
+        onChange([...activities, tag]);
+      }
+      setInputValue('');
+    }
+    if (e.key === 'Backspace' && !inputValue && activities.length > 0) {
+      onChange(activities.slice(0, -1));
+    }
+  };
+
+  return (
+    <div className="space-y-3">
+      <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.groundingTitle')}</p>
+      <p className="text-xs text-muted-foreground leading-relaxed">
+        {t('settings.groundingDesc')}
+      </p>
+      <div className="flex flex-wrap gap-1.5 min-h-[2rem]">
+        {activities.map((tag) => (
+          <span
+            key={tag}
+            className="inline-flex items-center gap-1 text-xs font-mono px-2.5 py-1 rounded-full border border-primary/20 bg-primary/5 text-foreground/80"
+          >
+            {tag}
+            <button
+              onClick={() => onChange(activities.filter((a) => a !== tag))}
+              className="text-muted-foreground/40 hover:text-foreground transition-colors"
+            >
+              ×
+            </button>
+          </span>
+        ))}
+      </div>
+      <input
+        type="text"
+        value={inputValue}
+        onChange={(e) => setInputValue(e.target.value)}
+        onKeyDown={handleKeyDown}
+        placeholder={t('onboarding.groundingPlaceholder', 'e.g. running, cooking, guitar...')}
+        className="w-full bg-transparent border-b border-border/40 focus:border-foreground/30 outline-none text-sm font-mono py-2 text-foreground placeholder:text-muted-foreground/30 transition-colors"
+      />
+    </div>
+  );
+}
+
 const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
   const { t } = useTranslation();
   const { user, signOut } = useAuth();
@@ -271,36 +323,10 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             </div>
 
             {/* Grounding Activities */}
-            <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.groundingTitle')}</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                {t('settings.groundingDesc')}
-              </p>
-              <div className="grid grid-cols-2 gap-2">
-                {(['running', 'walking', 'music', 'cooking', 'meditation', 'breathwork', 'reading', 'journaling', 'nature', 'exercise'] as const).map((value) => {
-                  const selected = groundingActivities.includes(value);
-                  return (
-                    <button
-                      key={value}
-                      onClick={() => {
-                        const next = selected
-                          ? groundingActivities.filter((v) => v !== value)
-                          : [...groundingActivities, value];
-                        setGroundingActivities(next);
-                      }}
-                      className={`rounded-md border px-3 py-2.5 text-left transition-colors ${
-                        selected
-                          ? 'border-primary bg-primary/5 text-foreground'
-                          : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
-                      }`}
-                    >
-                      <p className="text-xs font-mono font-medium">{t(`settings.grounding.${value}`)}</p>
-                      <p className="text-[10px] text-muted-foreground mt-0.5">{t(`settings.grounding.${value}Desc`)}</p>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
+            <GroundingTagInput
+              activities={groundingActivities}
+              onChange={setGroundingActivities}
+            />
 
             {/* 1 BTC = 1 BTC mode */}
             <div className="space-y-3">
