@@ -669,7 +669,7 @@ export default function Breathe() {
                   className="font-mono text-[8px] tracking-[0.15em] italic"
                   style={{ color: textColors[level], opacity: 0.25 }}
                   initial={{ opacity: 0 }}
-                  animate={{ opacity: 0.12 }}
+                  animate={{ opacity: 0.25 }}
                   transition={{ delay: 3, duration: 1.5 }}
                 >
                   {timeSinceBlock > 1200
