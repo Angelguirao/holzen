@@ -61,6 +61,7 @@ const Home = () => {
     'btc-status': t('home.widget.market'),
     'hold-goal': t('home.widget.goal'),
     'reflection': t('home.widget.reflection'),
+    'ground': t('home.widget.ground', 'Ground'),
     'night': t('home.widget.evening'),
     'letter': t('home.widget.letter'),
     'practice': t('home.widget.practice', 'Practice'),
