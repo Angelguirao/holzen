@@ -526,6 +526,36 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             </div>
             </ProLock>
 
+          </AccordionContent>
+        </AccordionItem>
+
+        {/* 3. Experience */}
+        <AccordionItem value="experience" className="border border-border/40 rounded-md px-4">
+          <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
+            {t('settings.experience', 'Experience')}
+          </AccordionTrigger>
+          <AccordionContent className="space-y-6 pb-4">
+            {/* Zen Mode */}
+            <div className="space-y-3">
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.zenMode')}</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {t('settings.zenModeDesc')}
+              </p>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="zen-mode" className="text-xs font-mono text-muted-foreground">
+                  {t('settings.enableZenMode')}
+                </Label>
+                <Switch
+                  id="zen-mode"
+                  checked={zenMode}
+                  onCheckedChange={(v) => {
+                    setZenMode(v);
+                    localStorage.setItem('holzen_zen_mode', String(v));
+                  }}
+                />
+              </div>
+            </div>
+
             {/* Silent Mode */}
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.silentMode')}</p>
@@ -553,34 +583,13 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                 <Switch id="haptic-toggle" checked={hapticEnabled} onCheckedChange={(val) => { setHapticEnabledState(val); setHapticEnabled(val); }} />
               </div>
             </div>
-
-            {/* Zen Mode */}
-            <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.zenMode')}</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                {t('settings.zenModeDesc')}
-              </p>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="zen-mode" className="text-xs font-mono text-muted-foreground">
-                  {t('settings.enableZenMode')}
-                </Label>
-                <Switch
-                  id="zen-mode"
-                  checked={zenMode}
-                  onCheckedChange={(v) => {
-                    setZenMode(v);
-                    localStorage.setItem('holzen_zen_mode', String(v));
-                  }}
-                />
-              </div>
-            </div>
           </AccordionContent>
         </AccordionItem>
 
-        {/* 3. Companions */}
+        {/* 4. Companions & AI */}
         <AccordionItem value="companions" className="border border-border/40 rounded-md px-4">
           <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
-            {t('settings.companions')}
+            {t('settings.companionsAi', 'Companions & AI')}
           </AccordionTrigger>
           <AccordionContent className="space-y-6 pb-4">
             <ProLock feature="companions">
@@ -601,8 +610,22 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                 </div>
               ))}
             </div>
+            </ProLock>
 
-            {/* Signal Sources */}
+            {/* AI Insights — Pro */}
+            <ProLock feature="ai_insights">
+            <div className="space-y-3">
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.aiInsights')}</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {t('settings.aiInsightsDesc')}
+              </p>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="ai-insights" className="text-xs font-mono text-muted-foreground">
+                  {t('settings.enableAiInsights')}
+                </Label>
+                <Switch id="ai-insights" checked={aiInsightsEnabled} onCheckedChange={setAiInsightsEnabled} />
+              </div>
+            </div>
             </ProLock>
           </AccordionContent>
         </AccordionItem>
