@@ -349,59 +349,6 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
               />
             </ProLock>
 
-            {/* 1 BTC = 1 BTC mode */}
-            <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.btcMode')}</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                {t('settings.btcModeDesc')}
-              </p>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="btc-mode" className="text-xs text-muted-foreground cursor-pointer">
-                  {t('settings.enableConvictionMode')}
-                </Label>
-                <Switch
-                  id="btc-mode"
-                  checked={btcMode}
-                  onCheckedChange={(val) => {
-                    setBtcMode(val);
-                    localStorage.setItem('holzen_btc_mode', String(val));
-                  }}
-                />
-              </div>
-            </div>
-
-            {/* Currency */}
-            <div className={`space-y-3 transition-opacity ${btcMode ? 'opacity-30 pointer-events-none' : ''}`}>
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.displayCurrency')}</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                {t('settings.displayCurrencyDesc')}
-              </p>
-              <div className="grid grid-cols-2 gap-2">
-                {([
-                  { code: 'USD', label: 'USD', desc: 'US Dollar ($)' },
-                  { code: 'EUR', label: 'EUR', desc: 'Euro (€)' },
-                  { code: 'GBP', label: 'GBP', desc: 'British Pound (£)' },
-                  { code: 'CHF', label: 'CHF', desc: 'Swiss Franc' },
-                  { code: 'CAD', label: 'CAD', desc: 'Canadian Dollar (C$)' },
-                  { code: 'AUD', label: 'AUD', desc: 'Australian Dollar (A$)' },
-                  { code: 'BRL', label: 'BRL', desc: 'Brazilian Real (R$)' },
-                  { code: 'TRY', label: 'TRY', desc: 'Turkish Lira (₺)' },
-                ] as const).map((c) => (
-                  <button
-                    key={c.code}
-                    onClick={() => setCurrency(c.code)}
-                    className={`rounded-md border px-3 py-2.5 text-left transition-colors ${
-                      currency === c.code
-                        ? 'border-primary bg-primary/5 text-foreground'
-                        : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
-                    }`}
-                  >
-                    <p className="text-xs font-mono font-medium">{c.label}</p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">{c.desc}</p>
-                  </button>
-                ))}
-              </div>
-            </div>
 
             {/* Language — disabled, English only for now */}
           </AccordionContent>
@@ -534,6 +481,60 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             {t('settings.experience', 'Experience')}
           </AccordionTrigger>
           <AccordionContent className="space-y-6 pb-4">
+            {/* 1 BTC = 1 BTC mode */}
+            <div className="space-y-3">
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.btcMode')}</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {t('settings.btcModeDesc')}
+              </p>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="btc-mode" className="text-xs text-muted-foreground cursor-pointer">
+                  {t('settings.enableConvictionMode')}
+                </Label>
+                <Switch
+                  id="btc-mode"
+                  checked={btcMode}
+                  onCheckedChange={(val) => {
+                    setBtcMode(val);
+                    localStorage.setItem('holzen_btc_mode', String(val));
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Currency */}
+            <div className={`space-y-3 transition-opacity ${btcMode ? 'opacity-30 pointer-events-none' : ''}`}>
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.displayCurrency')}</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {t('settings.displayCurrencyDesc')}
+              </p>
+              <div className="grid grid-cols-2 gap-2">
+                {([
+                  { code: 'USD', label: 'USD', desc: 'US Dollar ($)' },
+                  { code: 'EUR', label: 'EUR', desc: 'Euro (€)' },
+                  { code: 'GBP', label: 'GBP', desc: 'British Pound (£)' },
+                  { code: 'CHF', label: 'CHF', desc: 'Swiss Franc' },
+                  { code: 'CAD', label: 'CAD', desc: 'Canadian Dollar (C$)' },
+                  { code: 'AUD', label: 'AUD', desc: 'Australian Dollar (A$)' },
+                  { code: 'BRL', label: 'BRL', desc: 'Brazilian Real (R$)' },
+                  { code: 'TRY', label: 'TRY', desc: 'Turkish Lira (₺)' },
+                ] as const).map((c) => (
+                  <button
+                    key={c.code}
+                    onClick={() => setCurrency(c.code)}
+                    className={`rounded-md border px-3 py-2.5 text-left transition-colors ${
+                      currency === c.code
+                        ? 'border-primary bg-primary/5 text-foreground'
+                        : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
+                    }`}
+                  >
+                    <p className="text-xs font-mono font-medium">{c.label}</p>
+                    <p className="text-[10px] text-muted-foreground mt-0.5">{c.desc}</p>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Zen Mode */}
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.zenMode')}</p>
