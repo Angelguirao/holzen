@@ -194,6 +194,11 @@ export function BadgesPanel({ reflections, notifyBadges = true }: BadgesPanelPro
             <Award className="h-4 w-4 text-primary" />
             <p className="text-xs font-mono text-muted-foreground">
               <span className="text-foreground font-medium">{earnedCount}</span> / {badges.length} {t('badges.earned')}
+              {proLockedCount > 0 && (
+                <span className="text-muted-foreground/40 ml-1">
+                  · {proLockedCount} <Lock className="inline h-2.5 w-2.5 -mt-0.5" />
+                </span>
+              )}
             </p>
           </div>
           <div className="h-1.5 flex-1 max-w-[120px] ml-4 rounded-full bg-muted/50 overflow-hidden">
