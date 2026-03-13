@@ -22,6 +22,7 @@ interface Letter {
   delivered: boolean;
   delivered_at: string | null;
   btc_price_at_delivery: number | null;
+  delivery_threshold: number | null;
 }
 
 // LETTER_THRESHOLD removed — now uses user's actual thresholds from profile
