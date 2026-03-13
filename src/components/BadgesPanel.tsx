@@ -1,10 +1,11 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { differenceInCalendarDays, parseISO } from 'date-fns';
-import { Flame, MessageSquare, Shield, Zap, Eye, Heart, Award, Target, Wind, BookOpen, Feather, Radio, Telescope, Landmark } from 'lucide-react';
+import { Flame, MessageSquare, Shield, Zap, Eye, Heart, Award, Target, Wind, BookOpen, Feather, Radio, Telescope, Landmark, Lock, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { BadgeCelebration } from './BadgeCelebration';
 import { useBadgeSync } from '@/hooks/use-badge-sync';
+import { useSubscription } from '@/hooks/use-subscription';
 
 interface Reflection {
   id: string;
@@ -33,6 +34,7 @@ interface Badge {
   requirement: number;
   current: number;
   unitKey: string;
+  proOnly: boolean;
 }
 
 function computeLongestStreak(reflections: Reflection[]): number {
@@ -82,6 +84,7 @@ interface BadgesPanelProps {
 
 export function BadgesPanel({ reflections, notifyBadges = true }: BadgesPanelProps) {
   const { t } = useTranslation();
+  const { subscribed } = useSubscription();
 
   const badges = useMemo(() => {
     const total = reflections.length;
@@ -110,12 +113,13 @@ export function BadgesPanel({ reflections, notifyBadges = true }: BadgesPanelPro
       color: string,
       current: number,
       requirement: number,
-      unitKey: string
+      unitKey: string,
+      proOnly: boolean = false
     ): Badge => ({
       id, labelKey, descKey, icon, category, color,
       earned: current >= requirement,
       progress: Math.min(current / requirement, 1),
-      requirement, current, unitKey,
+      requirement, current, unitKey, proOnly,
     });
 
     return [
@@ -134,21 +138,21 @@ export function BadgesPanel({ reflections, notifyBadges = true }: BadgesPanelPro
       makeBadge('calm-50', 'badges.calm50', 'badges.calm50Desc', Shield, 'composure', 'hsl(160, 45%, 40%)', calmCount, 50, 'badges.units.calmMoods'),
       makeBadge('held-10', 'badges.held10', 'badges.held10Desc', Target, 'composure', 'hsl(170, 40%, 42%)', heldCount, 10, 'badges.units.holds'),
       makeBadge('held-50', 'badges.held50', 'badges.held50Desc', Target, 'composure', 'hsl(180, 45%, 38%)', heldCount, 50, 'badges.units.holds'),
-      makeBadge('breathe-5', 'badges.breathe5', 'badges.breathe5Desc', Wind, 'companions', 'hsl(190, 50%, 50%)', breathingCount, 5, 'badges.units.sessions'),
-      makeBadge('breathe-25', 'badges.breathe25', 'badges.breathe25Desc', Wind, 'companions', 'hsl(195, 55%, 45%)', breathingCount, 25, 'badges.units.sessions'),
-      makeBadge('breathe-100', 'badges.breathe100', 'badges.breathe100Desc', Wind, 'companions', 'hsl(200, 60%, 40%)', breathingCount, 100, 'badges.units.sessions'),
-      makeBadge('haiku-10', 'badges.haiku10', 'badges.haiku10Desc', Feather, 'companions', 'hsl(280, 40%, 50%)', haikuCount, 10, 'badges.units.haiku'),
-      makeBadge('haiku-50', 'badges.haiku50', 'badges.haiku50Desc', Feather, 'companions', 'hsl(285, 45%, 45%)', haikuCount, 50, 'badges.units.haiku'),
-      makeBadge('learn-10', 'badges.learn10', 'badges.learn10Desc', BookOpen, 'companions', 'hsl(45, 50%, 48%)', groundCount, 10, 'badges.units.sessions'),
-      makeBadge('learn-50', 'badges.learn50', 'badges.learn50Desc', BookOpen, 'companions', 'hsl(50, 55%, 43%)', groundCount, 50, 'badges.units.sessions'),
-      makeBadge('signal-10', 'badges.signal10', 'badges.signal10Desc', Radio, 'companions', 'hsl(30, 50%, 48%)', signalCount, 10, 'badges.units.signals'),
-      makeBadge('signal-50', 'badges.signal50', 'badges.signal50Desc', Radio, 'companions', 'hsl(35, 55%, 43%)', signalCount, 50, 'badges.units.signals'),
-      makeBadge('zoom-5', 'badges.zoom5', 'badges.zoom5Desc', Telescope, 'companions', 'hsl(240, 45%, 50%)', zoomOutCount, 5, 'badges.units.sessions'),
-      makeBadge('zoom-25', 'badges.zoom25', 'badges.zoom25Desc', Telescope, 'companions', 'hsl(245, 50%, 45%)', zoomOutCount, 25, 'badges.units.sessions'),
-      makeBadge('history-5', 'badges.history5', 'badges.history5Desc', Landmark, 'companions', 'hsl(60, 40%, 48%)', historyCount, 5, 'badges.units.insights'),
-      makeBadge('history-25', 'badges.history25', 'badges.history25Desc', Landmark, 'companions', 'hsl(65, 45%, 43%)', historyCount, 25, 'badges.units.insights'),
-      makeBadge('all-6-5', 'badges.allSix5', 'badges.allSix5Desc', Award, 'companions', 'hsl(310, 45%, 48%)', allSixCount, 5, 'badges.units.fullSessions'),
-      makeBadge('all-6-25', 'badges.allSix25', 'badges.allSix25Desc', Award, 'companions', 'hsl(315, 50%, 43%)', allSixCount, 25, 'badges.units.fullSessions'),
+      makeBadge('breathe-5', 'badges.breathe5', 'badges.breathe5Desc', Wind, 'companions', 'hsl(190, 50%, 50%)', breathingCount, 5, 'badges.units.sessions', true),
+      makeBadge('breathe-25', 'badges.breathe25', 'badges.breathe25Desc', Wind, 'companions', 'hsl(195, 55%, 45%)', breathingCount, 25, 'badges.units.sessions', true),
+      makeBadge('breathe-100', 'badges.breathe100', 'badges.breathe100Desc', Wind, 'companions', 'hsl(200, 60%, 40%)', breathingCount, 100, 'badges.units.sessions', true),
+      makeBadge('haiku-10', 'badges.haiku10', 'badges.haiku10Desc', Feather, 'companions', 'hsl(280, 40%, 50%)', haikuCount, 10, 'badges.units.haiku', true),
+      makeBadge('haiku-50', 'badges.haiku50', 'badges.haiku50Desc', Feather, 'companions', 'hsl(285, 45%, 45%)', haikuCount, 50, 'badges.units.haiku', true),
+      makeBadge('learn-10', 'badges.learn10', 'badges.learn10Desc', BookOpen, 'companions', 'hsl(45, 50%, 48%)', groundCount, 10, 'badges.units.sessions', true),
+      makeBadge('learn-50', 'badges.learn50', 'badges.learn50Desc', BookOpen, 'companions', 'hsl(50, 55%, 43%)', groundCount, 50, 'badges.units.sessions', true),
+      makeBadge('signal-10', 'badges.signal10', 'badges.signal10Desc', Radio, 'companions', 'hsl(30, 50%, 48%)', signalCount, 10, 'badges.units.signals', true),
+      makeBadge('signal-50', 'badges.signal50', 'badges.signal50Desc', Radio, 'companions', 'hsl(35, 55%, 43%)', signalCount, 50, 'badges.units.signals', true),
+      makeBadge('zoom-5', 'badges.zoom5', 'badges.zoom5Desc', Telescope, 'companions', 'hsl(240, 45%, 50%)', zoomOutCount, 5, 'badges.units.sessions', true),
+      makeBadge('zoom-25', 'badges.zoom25', 'badges.zoom25Desc', Telescope, 'companions', 'hsl(245, 50%, 45%)', zoomOutCount, 25, 'badges.units.sessions', true),
+      makeBadge('history-5', 'badges.history5', 'badges.history5Desc', Landmark, 'companions', 'hsl(60, 40%, 48%)', historyCount, 5, 'badges.units.insights', true),
+      makeBadge('history-25', 'badges.history25', 'badges.history25Desc', Landmark, 'companions', 'hsl(65, 45%, 43%)', historyCount, 25, 'badges.units.insights', true),
+      makeBadge('all-6-5', 'badges.allSix5', 'badges.allSix5Desc', Award, 'companions', 'hsl(310, 45%, 48%)', allSixCount, 5, 'badges.units.fullSessions', true),
+      makeBadge('all-6-25', 'badges.allSix25', 'badges.allSix25Desc', Award, 'companions', 'hsl(315, 50%, 43%)', allSixCount, 25, 'badges.units.fullSessions', true),
       makeBadge('fav-5', 'badges.fav5', 'badges.fav5Desc', Heart, 'engagement', 'hsl(340, 50%, 50%)', favCount, 5, 'badges.units.favorites'),
       makeBadge('fav-25', 'badges.fav25', 'badges.fav25Desc', Heart, 'engagement', 'hsl(345, 55%, 45%)', favCount, 25, 'badges.units.favorites'),
       makeBadge('notes-10', 'badges.notes10', 'badges.notes10Desc', Eye, 'engagement', 'hsl(270, 40%, 50%)', noteCount, 10, 'badges.units.notes'),
@@ -158,7 +162,9 @@ export function BadgesPanel({ reflections, notifyBadges = true }: BadgesPanelPro
     ];
   }, [reflections]);
 
-  const earnedCount = badges.filter((b) => b.earned).length;
+  const visibleBadges = subscribed ? badges : badges.filter((b) => !b.proOnly);
+  const earnedCount = visibleBadges.filter((b) => b.earned).length;
+  const proLockedCount = subscribed ? 0 : badges.filter((b) => b.proOnly).length;
   const categories = ['streak', 'volume', 'composure', 'companions', 'engagement'] as const;
 
   const nextBadge = badges.find((b) => !b.earned && b.progress > 0);
@@ -188,6 +194,11 @@ export function BadgesPanel({ reflections, notifyBadges = true }: BadgesPanelPro
             <Award className="h-4 w-4 text-primary" />
             <p className="text-xs font-mono text-muted-foreground">
               <span className="text-foreground font-medium">{earnedCount}</span> / {badges.length} {t('badges.earned')}
+              {proLockedCount > 0 && (
+                <span className="text-muted-foreground/40 ml-1">
+                  · {proLockedCount} <Lock className="inline h-2.5 w-2.5 -mt-0.5" />
+                </span>
+              )}
             </p>
           </div>
           <div className="h-1.5 flex-1 max-w-[120px] ml-4 rounded-full bg-muted/50 overflow-hidden">
@@ -224,32 +235,47 @@ export function BadgesPanel({ reflections, notifyBadges = true }: BadgesPanelPro
               </p>
             </div>
             <div className="grid grid-cols-2 gap-2">
-              {catBadges.map((badge, i) => (
+              {catBadges.map((badge, i) => {
+                const isLocked = badge.proOnly && !subscribed;
+                return (
                 <motion.div
                   key={badge.id}
                   initial={{ opacity: 0, y: 8 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.05, duration: 0.3 }}
                   className={`relative rounded-lg border px-3 py-3 space-y-2 transition-all ${
-                    badge.earned
+                    isLocked
+                      ? 'border-border/30 bg-muted/10 opacity-40'
+                      : badge.earned
                       ? 'border-primary/30 bg-primary/5'
                       : 'border-border/40 bg-muted/20 opacity-50'
                   }`}
                 >
+                  {/* Pro badge indicator */}
+                  {badge.proOnly && (
+                    <div className="absolute top-2 right-2 flex items-center gap-0.5">
+                      {isLocked ? (
+                        <Lock className="h-2.5 w-2.5 text-muted-foreground/40" />
+                      ) : (
+                        <Sparkles className="h-2.5 w-2.5 text-primary/50" />
+                      )}
+                    </div>
+                  )}
+
                   <div className="flex items-center gap-2">
                     <badge.icon
                       className="h-3.5 w-3.5 shrink-0"
-                      style={{ color: badge.earned ? badge.color : undefined }}
+                      style={{ color: badge.earned && !isLocked ? badge.color : undefined }}
                     />
-                    <p className={`text-xs font-mono leading-tight ${badge.earned ? 'text-foreground' : 'text-muted-foreground'}`}>
+                    <p className={`text-xs font-mono leading-tight ${badge.earned && !isLocked ? 'text-foreground' : 'text-muted-foreground'}`}>
                       {t(badge.labelKey)}
                     </p>
                   </div>
                   <p className="text-[10px] text-muted-foreground leading-snug">
-                    {t(badge.descKey)}
+                    {isLocked ? t('badges.proExclusive', 'Unlock with Pro') : t(badge.descKey)}
                   </p>
 
-                  {!badge.earned && (
+                  {!badge.earned && !isLocked && (
                     <div className="space-y-1">
                       <div className="h-1 w-full rounded-full bg-border/40 overflow-hidden">
                         <motion.div
@@ -266,11 +292,12 @@ export function BadgesPanel({ reflections, notifyBadges = true }: BadgesPanelPro
                     </div>
                   )}
 
-                  {badge.earned && (
+                  {badge.earned && !isLocked && (
                     <p className="text-[9px] font-mono text-primary/70">{t('badges.earnedCheck')}</p>
                   )}
                 </motion.div>
-              ))}
+                );
+              })}
             </div>
           </div>
         );
