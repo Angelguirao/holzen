@@ -11,19 +11,6 @@ import { MoodCheck } from '@/components/MoodCheck';
 
 type Phase = 'loading' | 'suggestion' | 'timer' | 'checkin' | 'done';
 
-const ACTIVITY_ICONS: Record<string, string> = {
-  running: '🏃',
-  walking: '🚶',
-  music: '🎵',
-  cooking: '🍳',
-  meditation: '🧘',
-  breathwork: '🌬️',
-  reading: '📖',
-  journaling: '✍️',
-  nature: '🌿',
-  exercise: '💪',
-};
-
 export default function Ground() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -33,6 +20,7 @@ export default function Ground() {
   const [phase, setPhase] = useState<Phase>('loading');
   const [activity, setActivity] = useState<string>('');
   const [suggestion, setSuggestion] = useState<string>('');
+  const [insight, setInsight] = useState<string | null>(null);
   const [suggestedDuration, setSuggestedDuration] = useState(10);
   const [selectedDuration, setSelectedDuration] = useState<number | null>(null);
   const [timeLeft, setTimeLeft] = useState(0);
@@ -74,6 +62,7 @@ export default function Ground() {
         setActivity(data.activity);
         setSuggestion(data.suggestion);
         setSuggestedDuration(data.duration || 10);
+        setInsight(data.insight || null);
         setPhase('suggestion');
       } catch {
         // Fallback: pick random activity
@@ -257,11 +246,9 @@ export default function Ground() {
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.5 }}
                 >
-                  <span className="text-4xl block">
-                    {ACTIVITY_ICONS[activity] || '🌱'}
-                  </span>
+                  <span className="text-4xl block">🌱</span>
                   <p className="text-lg font-mono text-foreground/80">
-                    {t(`settings.grounding.${activity}`, activity)}
+                    {activity}
                   </p>
                 </motion.div>
 
@@ -274,6 +261,21 @@ export default function Ground() {
                   {suggestion}
                 </motion.p>
 
+                {insight && (
+                  <motion.div
+                    className="mx-auto max-w-xs rounded-md border border-border/20 bg-muted/20 px-4 py-3"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 1.0 }}
+                  >
+                    <p className="text-[10px] font-mono text-muted-foreground/40 tracking-wider uppercase mb-1.5">
+                      {t('ground.didYouKnow', 'Did you know?')}
+                    </p>
+                    <p className="text-xs text-muted-foreground/60 leading-relaxed">
+                      {insight}
+                    </p>
+                  </motion.div>
+                )}
                 <motion.div
                   className="space-y-3"
                   initial={{ opacity: 0 }}
@@ -319,11 +321,9 @@ export default function Ground() {
                 className="text-center space-y-8 w-full"
               >
                 <div className="space-y-2">
-                  <span className="text-2xl block">
-                    {ACTIVITY_ICONS[activity] || '🌱'}
-                  </span>
+                  <span className="text-2xl block">🌱</span>
                   <p className="text-xs font-mono text-muted-foreground/50">
-                    {t(`settings.grounding.${activity}`, activity)}
+                    {activity}
                   </p>
                 </div>
 

@@ -5,7 +5,6 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { OnboardingWhy } from '@/components/onboarding/OnboardingWhy';
 import { OnboardingGrounding } from '@/components/onboarding/OnboardingGrounding';
 import { OnboardingThreshold } from '@/components/onboarding/OnboardingThreshold';
-import { OnboardingDemo } from '@/components/onboarding/OnboardingDemo';
 
 interface OnboardingResult {
   threshold: number;
@@ -20,7 +19,7 @@ interface Props {
 }
 
 const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-const TOTAL_STEPS = 4;
+const TOTAL_STEPS = 3;
 
 export function Onboarding({ onComplete }: Props) {
   const { t } = useTranslation();
@@ -102,10 +101,6 @@ export function Onboarding({ onComplete }: Props) {
                   onThresholdChange={setThreshold}
                   stagger={stagger}
                 />
-              )}
-
-              {step === 3 && (
-                <OnboardingDemo stagger={stagger} />
               )}
             </motion.div>
           </AnimatePresence>
