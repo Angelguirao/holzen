@@ -3,6 +3,7 @@ import { useState, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { OnboardingWhy } from '@/components/onboarding/OnboardingWhy';
+import { OnboardingGrounding } from '@/components/onboarding/OnboardingGrounding';
 import { OnboardingThreshold } from '@/components/onboarding/OnboardingThreshold';
 import { OnboardingDemo } from '@/components/onboarding/OnboardingDemo';
 
@@ -11,6 +12,7 @@ interface OnboardingResult {
   firstName: string | null;
   timezone: string;
   motivations: string[];
+  groundingActivities: string[];
 }
 
 interface Props {
@@ -18,7 +20,7 @@ interface Props {
 }
 
 const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-const TOTAL_STEPS = 3;
+const TOTAL_STEPS = 4;
 
 export function Onboarding({ onComplete }: Props) {
   const { t } = useTranslation();
@@ -26,6 +28,7 @@ export function Onboarding({ onComplete }: Props) {
   const [timezone] = useState(detectedTimezone);
   const [threshold, setThreshold] = useState(5);
   const [motivations, setMotivations] = useState<string[]>([]);
+  const [groundingActivities, setGroundingActivities] = useState<string[]>([]);
   const [direction, setDirection] = useState(1);
   const prefersReduced = useReducedMotion();
 
@@ -57,6 +60,12 @@ export function Onboarding({ onComplete }: Props) {
     );
   }, []);
 
+  const toggleGrounding = useCallback((id: string) => {
+    setGroundingActivities((prev) =>
+      prev.includes(id) ? prev.filter((g) => g !== id) : [...prev, id]
+    );
+  }, []);
+
   return (
     <div className="fixed inset-0 z-50 bg-background flex items-center justify-center p-6">
       <div className="w-full max-w-sm">
@@ -80,6 +89,14 @@ export function Onboarding({ onComplete }: Props) {
               )}
 
               {step === 1 && (
+                <OnboardingGrounding
+                  selected={groundingActivities}
+                  onToggle={toggleGrounding}
+                  stagger={stagger}
+                />
+              )}
+
+              {step === 2 && (
                 <OnboardingThreshold
                   threshold={threshold}
                   onThresholdChange={setThreshold}
@@ -87,7 +104,7 @@ export function Onboarding({ onComplete }: Props) {
                 />
               )}
 
-              {step === 2 && (
+              {step === 3 && (
                 <OnboardingDemo stagger={stagger} />
               )}
             </motion.div>
@@ -119,14 +136,14 @@ export function Onboarding({ onComplete }: Props) {
           </div>
 
           <div className="flex items-center gap-3">
-            {step === 0 && motivations.length === 0 && (
+            {(step === 0 && motivations.length === 0) || (step === 1 && groundingActivities.length === 0) ? (
               <button
                 onClick={() => goTo(step + 1)}
                 className="text-[10px] font-mono text-muted-foreground/40 hover:text-foreground transition-colors"
               >
                 {t('common.skip')}
               </button>
-            )}
+            ) : null}
             {step > 0 && (
               <button
                 onClick={() => goTo(step - 1)}
@@ -150,6 +167,7 @@ export function Onboarding({ onComplete }: Props) {
                   firstName: null,
                   timezone,
                   motivations,
+                  groundingActivities,
                 })}
                 variant="outline"
                 size="sm"

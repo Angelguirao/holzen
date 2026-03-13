@@ -28,6 +28,7 @@ export function useHolzen() {
   const [notifyBadges, setNotifyBadgesState] = useState(true);
   const [motivations, setMotivationsState] = useState<string[]>([]);
   const [mantra, setMantraState] = useState<string | null>(null);
+  const [groundingActivities, setGroundingActivitiesState] = useState<string[]>([]);
   const [currency, setCurrencyState] = useState<string>('USD');
   const [language, setLanguageState] = useState<string>('en');
   const [btcData, setBtcData] = useState<BtcPriceData | null>(null);
@@ -48,7 +49,7 @@ export function useHolzen() {
     const load = async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('threshold, threshold_down, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_learning, companion_signal, companion_zoom_out, companion_history, reflection_tone, cooldown_hours, last_trigger_at, silent_mode, streak_freeze_dates, digest_frequency, custom_prompt, reflection_style, quiet_hours_start, quiet_hours_end, first_name, night_reflection_hour, ai_insights_enabled, ritual_template, notify_badges, motivations, mantra, hold_goal_currency, language')
+        .select('threshold, threshold_down, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_learning, companion_signal, companion_zoom_out, companion_history, reflection_tone, cooldown_hours, last_trigger_at, silent_mode, streak_freeze_dates, digest_frequency, custom_prompt, reflection_style, quiet_hours_start, quiet_hours_end, first_name, night_reflection_hour, ai_insights_enabled, ritual_template, notify_badges, motivations, mantra, hold_goal_currency, language, grounding_activities')
         .eq('user_id', user.id)
         .single();
 
@@ -78,6 +79,7 @@ export function useHolzen() {
         setMantraState((data as any).mantra ?? null);
         setCurrencyState((data as any).hold_goal_currency ?? 'USD');
         setLanguageState((data as any).language ?? 'en');
+        setGroundingActivitiesState((data as any).grounding_activities ?? []);
         setHasOnboarded(data.has_onboarded ?? false);
         setCompanionPrefsState({
           breathing: data.companion_breathing ?? true,
@@ -205,10 +207,11 @@ export function useHolzen() {
       .eq('user_id', user.id);
   }, [user]);
 
-  const completeOnboarding = useCallback(async (result: { threshold: number; firstName: string | null; timezone: string; motivations: string[] }) => {
+  const completeOnboarding = useCallback(async (result: { threshold: number; firstName: string | null; timezone: string; motivations: string[]; groundingActivities: string[] }) => {
     setHasOnboarded(true);
     setThresholdState(result.threshold);
     if (result.firstName) setFirstNameState(result.firstName);
+    setGroundingActivitiesState(result.groundingActivities);
     if (!user) return;
     await supabase
       .from('profiles')
@@ -218,6 +221,7 @@ export function useHolzen() {
         first_name: result.firstName,
         timezone: result.timezone,
         motivations: result.motivations.length > 0 ? result.motivations : null,
+        grounding_activities: result.groundingActivities.length > 0 ? result.groundingActivities : [],
       } as any)
       .eq('user_id', user.id);
   }, [user]);
@@ -407,6 +411,7 @@ export function useHolzen() {
           severity: Math.abs(data.changePercent),
           motivations: motivations.length > 0 ? motivations : undefined,
           mantra: mantra || undefined,
+          groundingActivities: groundingActivities.length > 0 ? groundingActivities : undefined,
           currency,
           language,
         },
@@ -684,6 +689,12 @@ export function useHolzen() {
       setMotivationsState(val);
       if (!user) return;
       await supabase.from('profiles').update({ motivations: val } as any).eq('user_id', user.id);
+    },
+    groundingActivities,
+    setGroundingActivities: async (val: string[]) => {
+      setGroundingActivitiesState(val);
+      if (!user) return;
+      await supabase.from('profiles').update({ grounding_activities: val } as any).eq('user_id', user.id);
     },
     mantra,
     setMantra: async (val: string | null) => {
