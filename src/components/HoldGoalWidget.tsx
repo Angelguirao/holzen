@@ -96,10 +96,36 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
     return null;
   };
 
+  const formatWithSeparators = (val: string) => {
+    // Strip non-numeric except decimal point
+    const clean = val.replace(/[^\d.]/g, '');
+    const parts = clean.split('.');
+    // Add thousand separators to integer part
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return parts.join('.');
+  };
+
+  const stripSeparators = (val: string) => val.replace(/,/g, '');
+
   const handleInputChange = (value: string) => {
-    setInputValue(value);
-    if (value) {
-      setValidationError(validate(goalType, value, timeUnit));
+    if (goalType === 'price') {
+      // Allow digits, commas, and one decimal point
+      const raw = stripSeparators(value);
+      if (raw && !/^\d*\.?\d*$/.test(raw)) return;
+      setInputValue(raw ? formatWithSeparators(raw) : '');
+      if (raw) {
+        setValidationError(validate(goalType, raw, timeUnit));
+      } else {
+        setValidationError(null);
+      }
+    } else {
+      setInputValue(value);
+      if (value) {
+        setValidationError(validate(goalType, value, timeUnit));
+      } else {
+        setValidationError(null);
+      }
+    }
     } else {
       setValidationError(null);
     }
