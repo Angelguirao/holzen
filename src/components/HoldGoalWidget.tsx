@@ -96,12 +96,35 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
     return null;
   };
 
+  const formatWithSeparators = (val: string) => {
+    // Strip non-numeric except decimal point
+    const clean = val.replace(/[^\d.]/g, '');
+    const parts = clean.split('.');
+    // Add thousand separators to integer part
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return parts.join('.');
+  };
+
+  const stripSeparators = (val: string) => val.replace(/,/g, '');
+
   const handleInputChange = (value: string) => {
-    setInputValue(value);
-    if (value) {
-      setValidationError(validate(goalType, value, timeUnit));
+    if (goalType === 'price') {
+      // Allow digits, commas, and one decimal point
+      const raw = stripSeparators(value);
+      if (raw && !/^\d*\.?\d*$/.test(raw)) return;
+      setInputValue(raw ? formatWithSeparators(raw) : '');
+      if (raw) {
+        setValidationError(validate(goalType, raw, timeUnit));
+      } else {
+        setValidationError(null);
+      }
     } else {
-      setValidationError(null);
+      setInputValue(value);
+      if (value) {
+        setValidationError(validate(goalType, value, timeUnit));
+      } else {
+        setValidationError(null);
+      }
     }
   };
 
@@ -124,11 +147,12 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
       return;
     }
 
-    if (!inputValue) return;
-    const error = validate(goalType, inputValue, timeUnit);
+    const rawInput = stripSeparators(inputValue);
+    if (!rawInput) return;
+    const error = validate(goalType, rawInput, timeUnit);
     if (error) { setValidationError(error); return; }
 
-    const val = parseFloat(inputValue);
+    const val = parseFloat(stripSeparators(inputValue));
     const months = goalType === 'time' ? (timeUnit === 'years' ? Math.round(val * 12) : Math.round(val)) : null;
 
     const updates: Record<string, any> = {
@@ -287,16 +311,17 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
             <div className="space-y-1.5">
               <div className="flex items-center gap-2">
                 <Input
-                  type="number"
+                  type={goalType === 'price' ? 'text' : 'number'}
+                  inputMode={goalType === 'price' ? 'decimal' : 'numeric'}
                   value={inputValue}
                   onChange={(e) => handleInputChange(e.target.value)}
                   placeholder={
                     goalType === 'time'
                       ? timeUnit === 'months' ? 'e.g. 6' : 'e.g. 2'
-                      : 'e.g. 150000'
+                      : 'e.g. 150,000'
                   }
                   className={`text-xs font-mono h-8 ${validationError ? 'border-destructive/50' : ''}`}
-                  min={0}
+                  min={goalType === 'time' ? 0 : undefined}
                 />
                 <Button size="sm" onClick={saveGoal} disabled={!inputValue || !!validationError} className="h-8 px-3">
                   <Check className="h-3 w-3" />
