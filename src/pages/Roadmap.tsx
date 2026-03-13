@@ -1,14 +1,24 @@
 import { useTranslation } from 'react-i18next';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { Link } from 'react-router-dom';
 import { ArrowLeft, ChevronUp } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Badge } from '@/components/ui/badge';
 import { PageMeta } from '@/components/PageMeta';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 
 const PAGE_SIZE = 30;
+const CATEGORIES = ['all', 'ux', 'ai', 'data', 'platform', 'general'] as const;
+
+const categoryColors: Record<string, string> = {
+  ux: 'bg-blue-500/15 text-blue-400 border-blue-500/20',
+  ai: 'bg-violet-500/15 text-violet-400 border-violet-500/20',
+  data: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20',
+  platform: 'bg-amber-500/15 text-amber-400 border-amber-500/20',
+  general: 'bg-muted text-muted-foreground border-border/40',
+};
 
 interface RoadmapItem {
   id: string;
@@ -16,6 +26,7 @@ interface RoadmapItem {
   description: string | null;
   status: string;
   vote_count: number;
+  category: string;
 }
 
 const Roadmap = () => {
@@ -26,12 +37,13 @@ const Roadmap = () => {
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
+  const [activeCategory, setActiveCategory] = useState<string>('all');
 
   useEffect(() => {
     const load = async () => {
       const { data } = await supabase
         .from('roadmap_items')
-        .select('id, title, description, status, vote_count')
+        .select('id, title, description, status, vote_count, category')
         .order('vote_count', { ascending: false })
         .limit(PAGE_SIZE);
 
@@ -57,7 +69,7 @@ const Roadmap = () => {
     setLoadingMore(true);
     const { data } = await supabase
       .from('roadmap_items')
-      .select('id, title, description, status, vote_count')
+      .select('id, title, description, status, vote_count, category')
       .order('vote_count', { ascending: false })
       .range(items.length, items.length + PAGE_SIZE - 1);
     const rows = (data as unknown as RoadmapItem[]) ?? [];
@@ -83,7 +95,10 @@ const Roadmap = () => {
     }
   }, [user, votes]);
 
-  const sorted = [...items].sort((a, b) => b.vote_count - a.vote_count);
+  const filtered = useMemo(() => {
+    const base = activeCategory === 'all' ? items : items.filter((i) => i.category === activeCategory);
+    return [...base].sort((a, b) => b.vote_count - a.vote_count);
+  }, [items, activeCategory]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -102,6 +117,23 @@ const Roadmap = () => {
           </div>
         </div>
 
+        {/* Category filter chips */}
+        <div className="flex flex-wrap gap-1.5">
+          {CATEGORIES.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              className={`px-2.5 py-1 rounded-full text-[10px] font-mono uppercase tracking-wider border transition-colors ${
+                activeCategory === cat
+                  ? 'bg-foreground text-background border-foreground'
+                  : 'bg-muted/40 text-muted-foreground border-border/40 hover:border-foreground/20'
+              }`}
+            >
+              {t(`roadmap.${cat}`)}
+            </button>
+          ))}
+        </div>
+
         {loading ? (
           <div className="space-y-3">
             {[1, 2, 3].map((i) => (
@@ -113,7 +145,7 @@ const Roadmap = () => {
           </div>
         ) : (
           <div className="space-y-3">
-            {sorted.map((item) => {
+            {filtered.map((item) => {
               const voted = votes.has(item.id);
               return (
                 <div
@@ -131,8 +163,15 @@ const Roadmap = () => {
                     <ChevronUp className={`h-3.5 w-3.5 ${voted ? 'text-primary' : ''}`} />
                     <span className="text-[10px] font-mono">{item.vote_count}</span>
                   </button>
-                  <div className="space-y-0.5 min-w-0">
-                    <p className="text-sm font-medium leading-snug">{item.title}</p>
+                  <div className="space-y-1.5 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm font-medium leading-snug">{item.title}</p>
+                      {item.category && item.category !== 'general' && (
+                        <Badge variant="outline" className={`text-[9px] font-mono uppercase px-1.5 py-0 h-4 ${categoryColors[item.category] ?? categoryColors.general}`}>
+                          {t(`roadmap.${item.category}`, item.category)}
+                        </Badge>
+                      )}
+                    </div>
                     {item.description && (
                       <p className="text-xs text-muted-foreground leading-relaxed">{item.description}</p>
                     )}
@@ -140,6 +179,9 @@ const Roadmap = () => {
                 </div>
               );
             })}
+            {filtered.length === 0 && (
+              <p className="text-xs text-muted-foreground text-center py-6 font-mono">{t('common.noResults', 'No items in this category yet.')}</p>
+            )}
             <div ref={sentinelRef} className="h-1" />
             {loadingMore && (
               <p className="text-[10px] font-mono text-muted-foreground animate-pulse text-center py-2">{t('common.loadingMore')}</p>

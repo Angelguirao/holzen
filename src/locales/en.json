@@ -591,7 +591,13 @@
   "roadmap": {
     "title": "Roadmap",
     "voteOnNext": "Vote on what we build next.",
-    "signInToVote": "Sign in to vote."
+    "signInToVote": "Sign in to vote.",
+    "all": "All",
+    "ux": "UX",
+    "ai": "AI",
+    "data": "Data",
+    "general": "General",
+    "platform": "Platform"
   },
   "reserve": {
     "title": "BTC Reserve Strategy",
