@@ -145,13 +145,15 @@ export function GuidedJournal({ onComplete, textColor, ringColor }: Props) {
               </div>
             )}
 
-            <textarea
+            <WritingField
               value={body}
-              onChange={(e) => setBody(e.target.value)}
+              onChange={setBody}
               placeholder={t('practice.journalPlaceholder')}
-              className="w-full h-40 bg-transparent border rounded-md p-4 text-sm leading-relaxed resize-none focus:outline-none"
-              style={{ borderColor: ringColor, color: textColor, opacity: 0.8 }}
+              minRows={5}
               autoFocus
+              disableFocusMode
+              textareaStyle={{ borderColor: ringColor, color: textColor, opacity: 0.8 }}
+              textareaClassName="bg-transparent"
             />
 
             <button

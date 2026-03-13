@@ -82,14 +82,12 @@ export function ReflectionNote({ reflectionId, initialNote }: Props) {
 
   return (
     <div className="space-y-1.5">
-      <textarea
-        autoFocus
+      <WritingField
         value={note}
-        onChange={(e) => setNote(e.target.value)}
-        onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); save(); } }}
+        onChange={setNote}
         placeholder={t('reflectionNote.placeholder')}
-        rows={2}
-        className="w-full rounded-md border border-border/60 bg-muted/30 px-3 py-2 text-xs font-mono text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:ring-1 focus:ring-ring resize-none"
+        minRows={2}
+        autoFocus
       />
       <div className="flex justify-end">
         <button
