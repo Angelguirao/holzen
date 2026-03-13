@@ -593,11 +593,10 @@
     "voteOnNext": "Vote on what we build next.",
     "signInToVote": "Sign in to vote.",
     "all": "All",
-    "ux": "UX",
-    "ai": "AI",
-    "data": "Data",
-    "general": "General",
-    "platform": "Platform"
+    "self": "Self",
+    "together": "Together",
+    "intelligence": "Intelligence",
+    "reach": "Reach"
   },
   "reserve": {
     "title": "BTC Reserve Strategy",
