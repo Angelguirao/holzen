@@ -14,8 +14,12 @@ const STEPS = [
     icon: Wind,
     sources: [
       {
-        label: 'Porges, 2011 — Polyvagal Theory',
-        url: 'https://doi.org/10.1002/icd.688',
+        label: 'Porges, S. W. (2011). The Polyvagal Theory. W. W. Norton.',
+        url: 'https://wwnorton.com/books/9780393707007',
+      },
+      {
+        label: 'Lehrer, P. & Gevirtz, R. (2014). Heart rate variability biofeedback. Frontiers in Psychology, 5, 756.',
+        url: 'https://doi.org/10.3389/fpsyg.2014.00756',
       },
     ],
   },
@@ -24,7 +28,7 @@ const STEPS = [
     icon: Heart,
     sources: [
       {
-        label: 'Lieberman et al., 2007 — Affect Labeling',
+        label: 'Lieberman, M. D. et al. (2007). Putting feelings into words. Psychological Science, 18(5), 421–428.',
         url: 'https://doi.org/10.1111/j.1467-9280.2007.01916.x',
       },
     ],
@@ -34,8 +38,12 @@ const STEPS = [
     icon: BookOpen,
     sources: [
       {
-        label: 'Gross, 2002 — Emotion Regulation',
-        url: 'https://doi.org/10.1017/S0048577201393198',
+        label: 'Gross, J. J. (2002). Emotion regulation: Affective, cognitive, and social consequences. Handbook of Emotions.',
+        url: 'https://www.guilford.com/books/Handbook-of-Emotions/Lewis-Haviland-Jones-Barrett/9781462536368',
+      },
+      {
+        label: 'Gross, J. J. (1998). The emerging field of emotion regulation. Review of General Psychology, 2(3), 271–299.',
+        url: 'https://doi.org/10.1037/1089-2680.2.3.271',
       },
     ],
   },
@@ -44,7 +52,7 @@ const STEPS = [
     icon: RefreshCw,
     sources: [
       {
-        label: 'Flavell, 1979 — Metacognition',
+        label: 'Flavell, J. H. (1979). Metacognition and cognitive monitoring. American Psychologist, 34(10), 906–911.',
         url: 'https://doi.org/10.1037/0003-066X.34.10.906',
       },
     ],
@@ -54,8 +62,12 @@ const STEPS = [
     icon: Target,
     sources: [
       {
-        label: 'Kahneman, 2011 — Thinking, Fast and Slow',
-        url: 'https://en.wikipedia.org/wiki/Thinking,_Fast_and_Slow',
+        label: 'Kahneman, D. (2011). Thinking, Fast and Slow. Farrar, Straus and Giroux.',
+        url: 'https://us.macmillan.com/books/9780374533557/thinkingfastandslow',
+      },
+      {
+        label: 'Kahneman, D. & Tversky, A. (1974). Judgment under uncertainty. Science, 185(4157), 1124–1131.',
+        url: 'https://doi.org/10.1126/science.185.4157.1124',
       },
     ],
   },
