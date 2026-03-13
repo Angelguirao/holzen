@@ -16,6 +16,7 @@ interface Letter {
   delivered: boolean;
   delivered_at: string | null;
   btc_price_at_delivery: number | null;
+  delivery_threshold: number | null;
 }
 
 interface Props {
