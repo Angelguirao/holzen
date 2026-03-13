@@ -112,6 +112,18 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
   const [latestVersion, setLatestVersion] = useState<string | null>(null);
   const [hasNewVersion, setHasNewVersion] = useState(false);
   const { saveCount, triggerSave } = useAutoSave();
+  const initialLoadRef = useRef(true);
+
+  // Track profile-level setting changes to show auto-save indicator
+  useEffect(() => {
+    if (!profileLoaded) return;
+    if (initialLoadRef.current) {
+      initialLoadRef.current = false;
+      return;
+    }
+    triggerSave();
+  }, [threshold, thresholdDown, cumulativeThreshold, emailNotifications, reflectionTone, reflectionStyle, silentMode, cooldownHours, digestFrequency, customPrompt, quietHoursStart, quietHoursEnd, firstName, nightReflectionHour, aiInsightsEnabled, notifyBadges, mantra, currency, language, groundingActivities, companionPrefs]);
+
 
   useEffect(() => {
     supabase
