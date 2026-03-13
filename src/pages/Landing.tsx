@@ -65,22 +65,37 @@ const Landing = () => {
   ];
 
   const FEATURES = [
+    // Core experience
+    { icon: <Wind />, label: t('landing.features.pause'), desc: t('landing.features.pauseDesc') },
+    { icon: <Sparkles />, label: t('landing.features.companions'), desc: t('landing.features.companionsDesc') },
     { icon: <TrendingDown />, label: t('landing.features.detection'), desc: t('landing.features.detectionDesc') },
     { icon: <Brain />, label: t('landing.features.mood'), desc: t('landing.features.moodDesc') },
-    { icon: <Target />, label: t('landing.features.practice'), desc: t('landing.features.practiceDesc', 'Body scan, guided journal, emotional check-in, and reflection replay for daily self-awareness practice.') },
-    { icon: <Moon />, label: t('landing.features.nightReflections'), desc: t('landing.features.nightReflectionsDesc') },
+    { icon: <Compass />, label: t('landing.features.decisionMirror'), desc: t('landing.features.decisionMirrorDesc') },
+    { icon: <Anchor />, label: t('landing.features.grounding'), desc: t('landing.features.groundingDesc') },
+    // Intelligence & tracking
     { icon: <BarChart3 />, label: t('landing.features.insights'), desc: t('landing.features.insightsDesc') },
+    { icon: <Moon />, label: t('landing.features.nightReflections'), desc: t('landing.features.nightReflectionsDesc') },
     { icon: <Eye />, label: t('landing.features.holdGoals'), desc: t('landing.features.holdGoalsDesc') },
-    { icon: <Heart />, label: t('landing.features.library'), desc: t('landing.features.libraryDesc') },
-    { icon: <Mail />, label: t('landing.features.letters'), desc: t('landing.features.lettersDesc') },
-    { icon: <Sparkles />, label: t('landing.features.personalization'), desc: t('landing.features.personalizationDesc') },
     { icon: <BarChart3 />, label: t('landing.features.profileStats'), desc: t('landing.features.profileStatsDesc') },
     { icon: <Award />, label: t('landing.features.badges'), desc: t('landing.features.badgesDesc') },
-    { icon: <Shield />, label: t('landing.features.privacy'), desc: t('landing.features.privacyDesc') },
+    // Content & reflection
+    { icon: <Heart />, label: t('landing.features.library'), desc: t('landing.features.libraryDesc') },
+    { icon: <Mail />, label: t('landing.features.letters'), desc: t('landing.features.lettersDesc') },
+    { icon: <Quote />, label: t('landing.features.wisdomQuotes'), desc: t('landing.features.wisdomQuotesDesc') },
+    { icon: <Target />, label: t('landing.features.practice'), desc: t('landing.features.practiceDesc') },
+    { icon: <Wind />, label: t('landing.features.breatheGround'), desc: t('landing.features.breatheGroundDesc') },
+    // Personalization & platform
+    { icon: <Sparkles />, label: t('landing.features.personalization'), desc: t('landing.features.personalizationDesc') },
+    { icon: <Feather />, label: t('landing.features.mantra'), desc: t('landing.features.mantraDesc') },
     { icon: <Moon />, label: t('landing.features.mindfulSpaces'), desc: t('landing.features.mindfulSpacesDesc') },
     { icon: <Globe />, label: t('landing.features.globalDefault'), desc: t('landing.features.globalDefaultDesc') },
+    { icon: <Smartphone />, label: t('landing.features.pwa'), desc: t('landing.features.pwaDesc') },
+    // Social & data
     { icon: <MessageCircle />, label: t('landing.features.shareTrack'), desc: t('landing.features.shareTrackDesc') },
+    { icon: <Users />, label: t('landing.features.referral'), desc: t('landing.features.referralDesc') },
+    { icon: <MapPin />, label: t('landing.features.roadmap'), desc: t('landing.features.roadmapDesc') },
     { icon: <BarChart3 />, label: t('landing.features.activityLog'), desc: t('landing.features.activityLogDesc') },
+    { icon: <Shield />, label: t('landing.features.privacy'), desc: t('landing.features.privacyDesc') },
   ];
 
   const FAQ = [
