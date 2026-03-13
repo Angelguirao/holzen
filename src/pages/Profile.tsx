@@ -266,7 +266,7 @@ const Profile = () => {
           <BadgesPanel reflections={reflections} />
         )
       ) : tab === 'activity' ? (
-        <ProLock feature="history">
+        <ProLock feature="history" hideContent>
           <HistoryContent />
         </ProLock>
       ) : (
