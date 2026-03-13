@@ -380,7 +380,7 @@
     "hero": "Als Bitcoin beweegt, pauzeer voordat jij beweegt.",
     "heroDesc": "Holzen is geen trading-tool. Het is een zelfbewustzijnspraktijk. Wanneer Bitcoin beweegt, krijg je een moment om te pauzeren, reflecteren en je patronen op te merken — voordat je impulsief handelt.",
     "getStartedForFree": "Begin gratis",
-    "noCreditCard": "Daarna ${{price}}/maand · geen kaart · altijd opzegbaar",
+    "noCreditCard": "Voor altijd gratis · {{trialDays}} dagen Pro proef · daarna ${{price}}/maand",
     "reflectionLoop": "Impuls vs. Intentie",
     "reaction": {
       "label": "Zonder Holzen",
