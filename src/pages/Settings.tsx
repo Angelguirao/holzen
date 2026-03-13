@@ -655,7 +655,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             </ProLock>
 
             {/* Night Reflection — Pro */}
-            <ProLock>
+            <ProLock feature="night_reflections">
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.nightReflection')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
