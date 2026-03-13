@@ -202,7 +202,7 @@ const VOID_CONTEMPLATIONS: Record<VolatilityLevel, string[]> = {
 function WordByWordText({ text, delay = 0, color }: { text: string; delay?: number; color: string }) {
   const words = text.split(' ');
   return (
-    <p className="font-mono text-[10px] leading-relaxed text-center max-w-[260px]" style={{ color }}>
+    <p className="font-mono text-[11px] leading-relaxed text-center max-w-[280px]" style={{ color }}>
       {words.map((word, i) => (
         <motion.span
           key={i}
