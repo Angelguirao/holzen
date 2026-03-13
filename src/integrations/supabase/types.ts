@@ -421,6 +421,7 @@ export type Database = {
           digest_frequency: string
           email_notifications: boolean
           first_name: string | null
+          grounding_activities: string[] | null
           has_onboarded: boolean
           hold_goal_currency: string | null
           hold_goal_start: string | null
@@ -470,6 +471,7 @@ export type Database = {
           digest_frequency?: string
           email_notifications?: boolean
           first_name?: string | null
+          grounding_activities?: string[] | null
           has_onboarded?: boolean
           hold_goal_currency?: string | null
           hold_goal_start?: string | null
@@ -519,6 +521,7 @@ export type Database = {
           digest_frequency?: string
           email_notifications?: boolean
           first_name?: string | null
+          grounding_activities?: string[] | null
           has_onboarded?: boolean
           hold_goal_currency?: string | null
           hold_goal_start?: string | null
