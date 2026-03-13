@@ -22,6 +22,7 @@ interface Letter {
   delivered: boolean;
   delivered_at: string | null;
   btc_price_at_delivery: number | null;
+  delivery_threshold: number | null;
 }
 
 // LETTER_THRESHOLD removed — now uses user's actual thresholds from profile
@@ -164,6 +165,9 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
     setSealPhase('sealing');
 
     try {
+      // Lock the relevant threshold at write time so future setting changes don't affect delivery
+      const letterThreshold = deliverDuring === 'crash' ? thresholdDown : threshold;
+
       const { data, error } = await supabase
         .from('future_letters')
         .insert({
@@ -172,6 +176,7 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
           written_during: writtenDuring,
           deliver_during: deliverDuring,
           btc_price_at_write: currentPrice,
+          delivery_threshold: letterThreshold,
         } as any)
         .select()
         .single();
@@ -207,6 +212,14 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
   };
 
   const fmtPrice = (p: number) => formatBtcPrice(p, currency);
+
+  const getDeliveryConditionLabel = (l: Letter) => {
+    const pct = l.delivery_threshold ?? 5;
+    if (l.deliver_during === 'crash') {
+      return t('letter.opensWhenDrops', { threshold: pct, defaultValue: `Opens when BTC drops ≥${pct}%` });
+    }
+    return t('letter.opensWhenSurges', { threshold: pct, defaultValue: `Opens when BTC surges ≥${pct}%` });
+  };
 
   const getStatusCopy = (l: Letter) => {
     if (l.written_during === 'calm') return t('letter.sealedInCalm');
@@ -411,10 +424,10 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
               <div key={l.id} className="flex items-center gap-3 rounded-sm border border-border/40 bg-background/30 px-3 py-2.5">
                 <WaxSeal size={16} />
                 <div className="min-w-0 space-y-0.5">
-                  <p className="text-[10px] font-mono text-muted-foreground/60 italic">
-                    {getStatusCopy(l)}
+                  <p className="text-[10px] font-mono text-primary/70 font-medium">
+                    {getDeliveryConditionLabel(l)}
                   </p>
-                  <p className="text-[9px] font-mono text-muted-foreground/30">
+                  <p className="text-[9px] font-mono text-muted-foreground/40">
                     {getTimeCopy(l)} · BTC at {fmtPrice(l.btc_price_at_write)}
                   </p>
                 </div>
