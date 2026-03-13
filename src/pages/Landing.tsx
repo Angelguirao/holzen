@@ -279,34 +279,24 @@ const Landing = () => {
             <p className="text-sm text-muted-foreground leading-relaxed mb-6">
               {t('landing.scienceStepsIntro')}
             </p>
-            <div className="flex items-center gap-3 mb-6">
+            <div className="space-y-4 mb-4">
               {([
-                { icon: Wind, label: 'Breathe' },
-                { icon: Heart, label: 'Feel' },
-                { icon: BookOpen, label: 'Reflect' },
-                { icon: RefreshCw, label: 'Shift' },
-                { icon: Target, label: 'Decide' },
-              ] as const).map(({ icon: Icon, label }, i) => (
-                <div key={label} className="flex items-center gap-2">
-                  {i > 0 && <span className="text-muted-foreground/30 text-[10px]">→</span>}
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-6 h-6 rounded-full bg-muted/60 flex items-center justify-center">
-                      <Icon className="h-3 w-3 text-muted-foreground/60" />
-                    </div>
-                    <span className="text-[10px] font-medium text-foreground">{label}</span>
+                { icon: Wind, key: 'Breathe' },
+                { icon: Heart, key: 'Feel' },
+                { icon: BookOpen, key: 'Reflect' },
+                { icon: RefreshCw, key: 'Shift' },
+                { icon: Target, key: 'Decide' },
+              ] as const).map(({ icon: Icon, key }) => (
+                <div key={key} className="flex gap-3">
+                  <div className="mt-0.5 w-6 h-6 rounded-full bg-muted/60 flex items-center justify-center shrink-0">
+                    <Icon className="h-3 w-3 text-muted-foreground/60" />
                   </div>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    {t(`landing.scienceStep${key}`)}
+                  </p>
                 </div>
               ))}
             </div>
-            <p className="text-xs text-muted-foreground leading-relaxed mb-4">
-              {t('landing.scienceStepsSummary')}
-            </p>
-            <Link
-              to="/about"
-              className="inline-flex items-center gap-1.5 text-xs font-mono text-primary hover:text-primary/80 transition-colors"
-            >
-              {t('landing.readFullResearch')}
-            </Link>
           </Section>
         </div>
       </div>
