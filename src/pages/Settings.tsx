@@ -689,7 +689,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             </ProLock>
 
             {/* Quiet Hours — Pro */}
-            <ProLock>
+            <ProLock feature="quiet_hours">
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.quietHours')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
