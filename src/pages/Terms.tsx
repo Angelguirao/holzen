@@ -7,9 +7,9 @@ const Terms = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen flex justify-center p-6 py-16">
+    <div className="min-h-screen flex flex-col items-center">
       <PageMeta title="Terms of Service — Holzen" description="Terms of service for Holzen, the Bitcoin self-awareness app." path="/terms" />
-      <div className="w-full max-w-lg space-y-10">
+      <div className="flex-1 w-full max-w-lg px-6 py-16 space-y-10">
         <div className="space-y-4">
           <button
             onClick={() => navigate(-1)}
