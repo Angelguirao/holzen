@@ -77,8 +77,8 @@
       "practice": "Practice"
     },
     "subscription": {
-      "monthlyLimitReached": "You've used your {{freeReflectionsPerMonth}} free pauses this month. Upgrade to Pro for unlimited.",
-      "upgradeToPro": "${{price}}/month · Unlimited pauses + AI companions · Cancel anytime",
+      "monthlyLimitReached": "You've used your {{freeReflectionsPerMonth}} free pauses this month. Start your {{trialDays}}-day free trial for unlimited.",
+      "upgradeToPro": "{{trialDays}}-day free trial · ${{price}}/month after · Cancel anytime",
       "pricePerMonth": "${{price}} per month · Cancel anytime",
       "openingCheckout": "Opening checkout…",
       "freeRemaining": "{{count}} free pause remaining this month",
