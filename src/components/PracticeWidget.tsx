@@ -87,8 +87,13 @@ export function PracticeWidget() {
   const { subscribed, startCheckout } = useSubscription();
   const { user } = useAuth();
   const navigate = useNavigate();
-  const suggestion = useSuggestion(user?.id);
+  const rawSuggestion = useSuggestion(user?.id);
   const weeklyCount = useWeeklyProgress(user?.id);
+
+  // Only show AI suggestion for Pro users, or if it suggests a free practice
+  const suggestion = rawSuggestion && (subscribed || PRACTICES.find(p => p.id === rawSuggestion.id)?.free)
+    ? rawSuggestion
+    : null;
 
   const handleSelect = useCallback((id: PracticeId) => {
     const practice = PRACTICES.find(p => p.id === id);
