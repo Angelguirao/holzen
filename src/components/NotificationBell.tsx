@@ -189,7 +189,7 @@ export function NotificationBell() {
             title: t('notifications.letterDelivered'),
             subtitle: t('notifications.letterFromPast'),
             timestamp: l.delivered_at!,
-            action: { label: t('notifications.readLetter'), path: '/profile' },
+            action: { label: t('notifications.readLetter'), path: '/profile', state: { tab: 'letters' } },
           });
         }
       }
