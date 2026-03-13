@@ -442,7 +442,7 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
       </ProLock>
 
       {/* Section: Practice */}
-      <ProLock>
+      <ProLock feature="practice_stats">
         <StatsSection label={t('profile.sectionPractice', 'Practice')}>
           {practiceStats ? (
             <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2">
