@@ -48,6 +48,7 @@ serve(async (req) => {
       success_url: `${origin}/?subscribed=true`,
       cancel_url: `${origin}/`,
       subscription_data: {
+        trial_period_days: 7,
         description: "Holzen — Bitcoin self-awareness companion",
       },
     });
