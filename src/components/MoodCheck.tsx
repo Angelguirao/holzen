@@ -35,9 +35,11 @@ interface Props {
   onSkip: () => void;
   /** 'before' = raw entry state, 'after' = post-grounding state */
   variant?: 'before' | 'after';
+  /** Hide the heading text (when parent provides its own) */
+  hideHeading?: boolean;
 }
 
-export function MoodCheck({ onSelect, onSkip, variant = 'before' }: Props) {
+export function MoodCheck({ onSelect, onSkip, variant = 'before', hideHeading = false }: Props) {
   const { t } = useTranslation();
 
   const heading = variant === 'after'
@@ -46,14 +48,16 @@ export function MoodCheck({ onSelect, onSkip, variant = 'before' }: Props) {
 
   return (
     <div className="space-y-4">
-      <div className="space-y-1">
-        <p className="text-sm font-mono text-muted-foreground">{heading}</p>
-        {variant === 'after' && (
-          <p className="text-[10px] text-muted-foreground/40 font-mono">
-            {t('moodCheck.afterDesc', 'After reflecting and grounding, check in again.')}
-          </p>
-        )}
-      </div>
+      {!hideHeading && (
+        <div className="space-y-1">
+          <p className="text-sm font-mono text-muted-foreground">{heading}</p>
+          {variant === 'after' && (
+            <p className="text-[10px] text-muted-foreground/40 font-mono">
+              {t('moodCheck.afterDesc', 'After reflecting and grounding, check in again.')}
+            </p>
+          )}
+        </div>
+      )}
       {moodGroups.map((group) => (
         <div key={group.key} className="space-y-1.5">
           <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground/50">
