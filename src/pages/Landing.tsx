@@ -15,6 +15,7 @@ import { useTheme } from 'next-themes';
 import { PageMeta } from '@/components/PageMeta';
 import { LandingTestimonials } from '@/components/LandingTestimonials';
 import { LandingLanguageSwitcher } from '@/components/LandingLanguageSwitcher';
+import { PRICING } from '@/lib/pricing';
 
 function Section({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   const ref = useRef(null);
