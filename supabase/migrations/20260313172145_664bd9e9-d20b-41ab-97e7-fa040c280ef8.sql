@@ -1,0 +1,1 @@
+ALTER TABLE public.roadmap_items ADD COLUMN category text NOT NULL DEFAULT 'general';

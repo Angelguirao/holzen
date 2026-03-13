@@ -842,6 +842,7 @@ export type Database = {
       }
       roadmap_items: {
         Row: {
+          category: string
           created_at: string
           description: string | null
           id: string
@@ -850,6 +851,7 @@ export type Database = {
           vote_count: number
         }
         Insert: {
+          category?: string
           created_at?: string
           description?: string | null
           id?: string
@@ -858,6 +860,7 @@ export type Database = {
           vote_count?: number
         }
         Update: {
+          category?: string
           created_at?: string
           description?: string | null
           id?: string
