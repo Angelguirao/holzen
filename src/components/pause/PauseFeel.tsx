@@ -2,16 +2,18 @@ import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { ChevronLeft } from 'lucide-react';
 import { MoodCheck, type MoodValue } from '@/components/MoodCheck';
+import { MoodIcon } from '@/components/icons/MoodIcon';
 
 interface Props {
   onMoodSelect: (mood: MoodValue) => void;
   onMoodSkip: () => void;
   moodDone: boolean;
+  selectedMood?: MoodValue | null;
   onContinue: () => void;
   onBack?: () => void;
 }
 
-export function PauseFeel({ onMoodSelect, onMoodSkip, moodDone, onContinue, onBack }: Props) {
+export function PauseFeel({ onMoodSelect, onMoodSkip, moodDone, selectedMood, onContinue, onBack }: Props) {
   const { t } = useTranslation();
 
   return (
@@ -44,14 +46,23 @@ export function PauseFeel({ onMoodSelect, onMoodSkip, moodDone, onContinue, onBa
         </>
       ) : (
         <motion.div
-          className="flex flex-col items-center gap-6"
+          className="flex flex-col items-center gap-4"
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <p className="text-[11px] font-mono text-muted-foreground/30 tracking-[0.15em] uppercase">
-            {t('pause.feelRecorded', 'Noted')}
-          </p>
+          {selectedMood ? (
+            <>
+              <MoodIcon mood={selectedMood} size={28} className="text-muted-foreground/60" />
+              <p className="text-xs font-mono text-muted-foreground/50 tracking-wide">
+                {t(`moodCheck.moods.${selectedMood}`)}
+              </p>
+            </>
+          ) : (
+            <p className="text-[11px] font-mono text-muted-foreground/30 tracking-[0.15em] uppercase">
+              {t('common.skipped', 'Skipped')}
+            </p>
+          )}
           <button
             onClick={onContinue}
             className="text-[10px] font-mono text-primary/50 hover:text-primary/70 transition-colors duration-500 tracking-[0.15em] uppercase"

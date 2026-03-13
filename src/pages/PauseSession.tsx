@@ -31,6 +31,8 @@ interface PersistedSession {
   severity: 'mild' | 'moderate' | 'high';
   moodDone: boolean;
   moodAfterDone: boolean;
+  selectedMood?: MoodValue | null;
+  selectedMoodAfter?: MoodValue | null;
   phase: 'session' | 'done';
   decision: string | null;
   step: PauseStep;
@@ -86,13 +88,15 @@ export default function PauseSession() {
   const [isFavorite, setIsFavorite] = useState(false);
   const [moodDone, setMoodDone] = useState(restored?.moodDone ?? false);
   const [moodAfterDone, setMoodAfterDone] = useState(restored?.moodAfterDone ?? false);
+  const [selectedMood, setSelectedMood] = useState<MoodValue | null>(restored?.selectedMood ?? null);
+  const [selectedMoodAfter, setSelectedMoodAfter] = useState<MoodValue | null>(restored?.selectedMoodAfter ?? null);
   const [curtainLifted, setCurtainLifted] = useState(false);
 
   // Persist session
   useEffect(() => {
     if (!message) return;
-    saveSession({ message, context, reflectionId, companions, companionPrefs, severity, moodDone, moodAfterDone, phase, decision, step });
-  }, [message, moodDone, moodAfterDone, phase, decision, step]);
+    saveSession({ message, context, reflectionId, companions, companionPrefs, severity, moodDone, moodAfterDone, selectedMood, selectedMoodAfter, phase, decision, step });
+  }, [message, moodDone, moodAfterDone, selectedMood, selectedMoodAfter, phase, decision, step]);
 
   // Cinematic entrance
   useEffect(() => {
@@ -143,6 +147,7 @@ export default function PauseSession() {
   const handleMoodSelect = useCallback(async (mood: MoodValue) => {
     hapticFeedback('light');
     setMoodDone(true);
+    setSelectedMood(mood);
     if (reflectionId) {
       await supabase.from('reflections').update({ mood } as any).eq('id', reflectionId);
     }
@@ -155,6 +160,7 @@ export default function PauseSession() {
   const handleMoodAfterSelect = useCallback(async (mood: MoodValue) => {
     hapticFeedback('light');
     setMoodAfterDone(true);
+    setSelectedMoodAfter(mood);
     if (reflectionId) {
       await supabase.from('reflections').update({ mood_after: mood } as any).eq('id', reflectionId);
     }
@@ -300,6 +306,7 @@ export default function PauseSession() {
                     onMoodSelect={handleMoodSelect}
                     onMoodSkip={handleMoodSkip}
                     moodDone={moodDone}
+                    selectedMood={selectedMood}
                     onContinue={() => goToStep('reflect')}
                     onBack={goBack}
                   />
@@ -330,6 +337,7 @@ export default function PauseSession() {
                     onMoodAfterSelect={handleMoodAfterSelect}
                     onMoodAfterSkip={handleMoodAfterSkip}
                     moodAfterDone={moodAfterDone}
+                    selectedMoodAfter={selectedMoodAfter}
                     onContinue={() => goToStep('decide')}
                     onBack={goBack}
                   />

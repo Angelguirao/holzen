@@ -2,16 +2,18 @@ import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { ChevronLeft } from 'lucide-react';
 import { MoodCheck, type MoodValue } from '@/components/MoodCheck';
+import { MoodIcon } from '@/components/icons/MoodIcon';
 
 interface Props {
   onMoodAfterSelect: (mood: MoodValue) => void;
   onMoodAfterSkip: () => void;
   moodAfterDone: boolean;
+  selectedMoodAfter?: MoodValue | null;
   onContinue: () => void;
   onBack?: () => void;
 }
 
-export function PauseShift({ onMoodAfterSelect, onMoodAfterSkip, moodAfterDone, onContinue, onBack }: Props) {
+export function PauseShift({ onMoodAfterSelect, onMoodAfterSkip, moodAfterDone, selectedMoodAfter, onContinue, onBack }: Props) {
   const { t } = useTranslation();
 
   return (
@@ -39,20 +41,28 @@ export function PauseShift({ onMoodAfterSelect, onMoodAfterSkip, moodAfterDone, 
             transition={{ delay: 0.4, duration: 0.6 }}
             className="w-full"
           >
-            {/* MoodCheck already has its own Skip button — no duplicate needed */}
             <MoodCheck onSelect={onMoodAfterSelect} onSkip={onMoodAfterSkip} variant="after" />
           </motion.div>
         </>
       ) : (
         <motion.div
-          className="flex flex-col items-center gap-6"
+          className="flex flex-col items-center gap-4"
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <p className="text-[11px] font-mono text-muted-foreground/30 tracking-[0.15em] uppercase">
-            {t('pause.shiftRecorded', 'Noted')}
-          </p>
+          {selectedMoodAfter ? (
+            <>
+              <MoodIcon mood={selectedMoodAfter} size={28} className="text-muted-foreground/60" />
+              <p className="text-xs font-mono text-muted-foreground/50 tracking-wide">
+                {t(`moodCheck.moods.${selectedMoodAfter}`)}
+              </p>
+            </>
+          ) : (
+            <p className="text-[11px] font-mono text-muted-foreground/30 tracking-[0.15em] uppercase">
+              {t('common.skipped', 'Skipped')}
+            </p>
+          )}
           <button
             onClick={onContinue}
             className="text-[10px] font-mono text-primary/50 hover:text-primary/70 transition-colors duration-500 tracking-[0.15em] uppercase"
