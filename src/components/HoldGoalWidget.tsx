@@ -4,13 +4,11 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useHolzen } from '@/hooks/use-holzen';
 import { formatBtcPrice, SUPPORTED_CURRENCIES } from '@/lib/btc';
-import { Target, Calendar, Coins, Infinity, X, Check, CalendarIcon } from 'lucide-react';
+import { Target, Calendar, Coins, Infinity, X, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { differenceInDays, format } from 'date-fns';
 import { toast } from 'sonner';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar as CalendarPicker } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import {
   AlertDialog,
