@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import { differenceInCalendarDays, parseISO } from 'date-fns';
-import { Flame, MessageSquare, Shield, Zap, Eye, Heart, Award, Target, Wind, BookOpen, Feather, Radio, Telescope, Landmark, Lock, Sparkles } from 'lucide-react';
+import { parseISO } from 'date-fns';
+import { Flame, MessageSquare, Shield, Eye, Heart, Award, Target, Wind, BookOpen, Feather, Radio, Telescope, Landmark, Lock, Sparkles, Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { BadgeCelebration } from './BadgeCelebration';
 import { useBadgeSync } from '@/hooks/use-badge-sync';
@@ -27,7 +27,7 @@ interface Badge {
   labelKey: string;
   descKey: string;
   icon: typeof Flame;
-  category: 'streak' | 'volume' | 'composure' | 'engagement' | 'companions';
+  category: 'calendar' | 'volume' | 'composure' | 'engagement' | 'companions';
   color: string;
   earned: boolean;
   progress: number;
@@ -37,44 +37,38 @@ interface Badge {
   proOnly: boolean;
 }
 
-function computeLongestStreak(reflections: Reflection[]): number {
-  if (reflections.length === 0) return 0;
-  const days = new Set<string>();
-  for (const r of reflections) {
-    days.add(parseISO(r.created_at).toISOString().slice(0, 10));
-  }
-  const sorted = Array.from(days).sort();
-  let longest = 1;
-  let current = 1;
-  for (let i = 1; i < sorted.length; i++) {
-    const diff = differenceInCalendarDays(new Date(sorted[i]), new Date(sorted[i - 1]));
-    if (diff === 1) {
-      current++;
-      longest = Math.max(longest, current);
-    } else {
-      current = 1;
-    }
-  }
-  return longest;
+// Bitcoin Calendar dates (month is 0-indexed)
+const BTC_CALENDAR_DATES = [
+  { id: 'genesis', month: 0, day: 3 },      // Jan 3 — Genesis Block
+  { id: 'birthday', month: 0, day: 9 },      // Jan 9 — First Bitcoin release
+  { id: 'pizza', month: 4, day: 22 },         // May 22 — Pizza Day
+  { id: 'whitepaper', month: 9, day: 31 },    // Oct 31 — Whitepaper Day
+] as const;
+
+// Known halving dates
+const HALVING_DATES = [
+  '2012-11-28', '2016-07-09', '2020-05-11', '2024-04-20',
+  // Future approximations
+  '2028-04-15', '2032-04-15',
+];
+
+function countCalendarBadge(reflections: Reflection[], month: number, day: number): number {
+  return reflections.filter((r) => {
+    const d = parseISO(r.created_at);
+    return d.getMonth() === month && d.getDate() === day;
+  }).length > 0 ? 1 : 0;
 }
 
-function computeCurrentStreak(reflections: Reflection[]): number {
-  if (reflections.length === 0) return 0;
-  const days = new Set<string>();
-  for (const r of reflections) {
-    days.add(parseISO(r.created_at).toISOString().slice(0, 10));
-  }
-  const sorted = Array.from(days).sort().reverse();
-  const today = new Date().toISOString().slice(0, 10);
-  const daysSinceLast = differenceInCalendarDays(new Date(today), new Date(sorted[0]));
-  if (daysSinceLast > 1) return 0;
-  let streak = 1;
-  for (let i = 1; i < sorted.length; i++) {
-    const diff = differenceInCalendarDays(new Date(sorted[i - 1]), new Date(sorted[i]));
-    if (diff === 1) streak++;
-    else break;
-  }
-  return streak;
+function countHalvingBadge(reflections: Reflection[]): number {
+  // Check if user paused within ±3 days of any halving
+  return reflections.filter((r) => {
+    const refDate = parseISO(r.created_at);
+    return HALVING_DATES.some((hd) => {
+      const halvDate = new Date(hd);
+      const diff = Math.abs(refDate.getTime() - halvDate.getTime());
+      return diff <= 3 * 24 * 60 * 60 * 1000; // within 3 days
+    });
+  }).length > 0 ? 1 : 0;
 }
 
 interface BadgesPanelProps {
@@ -88,8 +82,6 @@ export function BadgesPanel({ reflections, notifyBadges = true }: BadgesPanelPro
 
   const badges = useMemo(() => {
     const total = reflections.length;
-    const longestStreak = computeLongestStreak(reflections);
-    const currentStreak = computeCurrentStreak(reflections);
     const calmCount = reflections.filter((r) => r.mood === 'calm').length;
     const heldCount = reflections.filter((r) => r.outcome === 'held' || r.outcome === 'nothing').length;
     const favCount = reflections.filter((r) => r.is_favorite).length;
@@ -103,6 +95,13 @@ export function BadgesPanel({ reflections, notifyBadges = true }: BadgesPanelPro
     const allSixCount = reflections.filter(
       (r) => r.breathing_completed && r.haiku_read && r.learning_read && !!r.signal_source && r.zoom_out_read && r.history_read
     ).length;
+
+    // Bitcoin Calendar counts
+    const genesisCount = countCalendarBadge(reflections, 0, 3);
+    const birthdayCount = countCalendarBadge(reflections, 0, 9);
+    const pizzaCount = countCalendarBadge(reflections, 4, 22);
+    const whitepaperCount = countCalendarBadge(reflections, 9, 31);
+    const halvingCount = countHalvingBadge(reflections);
 
     const makeBadge = (
       id: string,
@@ -123,21 +122,26 @@ export function BadgesPanel({ reflections, notifyBadges = true }: BadgesPanelPro
     });
 
     return [
-      makeBadge('streak-3', 'badges.streak3', 'badges.streak3Desc', Flame, 'streak', 'hsl(35, 65%, 60%)', longestStreak, 3, 'badges.units.days'),
-      makeBadge('streak-7', 'badges.streak7', 'badges.streak7Desc', Flame, 'streak', 'hsl(25, 70%, 55%)', longestStreak, 7, 'badges.units.days'),
-      makeBadge('streak-14', 'badges.streak14', 'badges.streak14Desc', Flame, 'streak', 'hsl(20, 72%, 52%)', longestStreak, 14, 'badges.units.days'),
-      makeBadge('streak-30', 'badges.streak30', 'badges.streak30Desc', Flame, 'streak', 'hsl(15, 75%, 50%)', longestStreak, 30, 'badges.units.days'),
-      makeBadge('streak-60', 'badges.streak60', 'badges.streak60Desc', Flame, 'streak', 'hsl(10, 78%, 47%)', longestStreak, 60, 'badges.units.days'),
-      makeBadge('streak-100', 'badges.streak100', 'badges.streak100Desc', Flame, 'streak', 'hsl(5, 80%, 45%)', longestStreak, 100, 'badges.units.days'),
-      makeBadge('streak-365', 'badges.streak365', 'badges.streak365Desc', Flame, 'streak', 'hsl(0, 85%, 42%)', longestStreak, 365, 'badges.units.days'),
+      // Bitcoin Calendar badges
+      makeBadge('btc-genesis', 'badges.genesis', 'badges.genesisDesc', Calendar, 'calendar', 'hsl(35, 65%, 55%)', genesisCount, 1, 'badges.units.event'),
+      makeBadge('btc-birthday', 'badges.birthday', 'badges.birthdayDesc', Calendar, 'calendar', 'hsl(25, 70%, 52%)', birthdayCount, 1, 'badges.units.event'),
+      makeBadge('btc-pizza', 'badges.pizza', 'badges.pizzaDesc', Calendar, 'calendar', 'hsl(40, 75%, 55%)', pizzaCount, 1, 'badges.units.event'),
+      makeBadge('btc-whitepaper', 'badges.whitepaper', 'badges.whitepaperDesc', Calendar, 'calendar', 'hsl(45, 60%, 50%)', whitepaperCount, 1, 'badges.units.event'),
+      makeBadge('btc-halving', 'badges.halving', 'badges.halvingDesc', Calendar, 'calendar', 'hsl(15, 80%, 50%)', halvingCount, 1, 'badges.units.event'),
+
+      // Volume
       makeBadge('reflect-10', 'badges.reflect10', 'badges.reflect10Desc', MessageSquare, 'volume', 'hsl(200, 50%, 50%)', total, 10, 'badges.units.pauses'),
       makeBadge('reflect-50', 'badges.reflect50', 'badges.reflect50Desc', MessageSquare, 'volume', 'hsl(210, 55%, 45%)', total, 50, 'badges.units.pauses'),
       makeBadge('reflect-100', 'badges.reflect100', 'badges.reflect100Desc', MessageSquare, 'volume', 'hsl(220, 60%, 40%)', total, 100, 'badges.units.pauses'),
       makeBadge('reflect-500', 'badges.reflect500', 'badges.reflect500Desc', MessageSquare, 'volume', 'hsl(230, 65%, 35%)', total, 500, 'badges.units.pauses'),
+
+      // Composure
       makeBadge('calm-10', 'badges.calm10', 'badges.calm10Desc', Shield, 'composure', 'hsl(150, 40%, 45%)', calmCount, 10, 'badges.units.calmMoods'),
       makeBadge('calm-50', 'badges.calm50', 'badges.calm50Desc', Shield, 'composure', 'hsl(160, 45%, 40%)', calmCount, 50, 'badges.units.calmMoods'),
       makeBadge('held-10', 'badges.held10', 'badges.held10Desc', Target, 'composure', 'hsl(170, 40%, 42%)', heldCount, 10, 'badges.units.holds'),
       makeBadge('held-50', 'badges.held50', 'badges.held50Desc', Target, 'composure', 'hsl(180, 45%, 38%)', heldCount, 50, 'badges.units.holds'),
+
+      // Companions (Pro)
       makeBadge('breathe-5', 'badges.breathe5', 'badges.breathe5Desc', Wind, 'companions', 'hsl(190, 50%, 50%)', breathingCount, 5, 'badges.units.sessions', true),
       makeBadge('breathe-25', 'badges.breathe25', 'badges.breathe25Desc', Wind, 'companions', 'hsl(195, 55%, 45%)', breathingCount, 25, 'badges.units.sessions', true),
       makeBadge('breathe-100', 'badges.breathe100', 'badges.breathe100Desc', Wind, 'companions', 'hsl(200, 60%, 40%)', breathingCount, 100, 'badges.units.sessions', true),
@@ -153,19 +157,19 @@ export function BadgesPanel({ reflections, notifyBadges = true }: BadgesPanelPro
       makeBadge('history-25', 'badges.history25', 'badges.history25Desc', Landmark, 'companions', 'hsl(65, 45%, 43%)', historyCount, 25, 'badges.units.insights', true),
       makeBadge('all-6-5', 'badges.allSix5', 'badges.allSix5Desc', Award, 'companions', 'hsl(310, 45%, 48%)', allSixCount, 5, 'badges.units.fullSessions', true),
       makeBadge('all-6-25', 'badges.allSix25', 'badges.allSix25Desc', Award, 'companions', 'hsl(315, 50%, 43%)', allSixCount, 25, 'badges.units.fullSessions', true),
+
+      // Engagement (Pro)
       makeBadge('fav-5', 'badges.fav5', 'badges.fav5Desc', Heart, 'engagement', 'hsl(340, 50%, 50%)', favCount, 5, 'badges.units.favorites', true),
       makeBadge('fav-25', 'badges.fav25', 'badges.fav25Desc', Heart, 'engagement', 'hsl(345, 55%, 45%)', favCount, 25, 'badges.units.favorites', true),
       makeBadge('notes-10', 'badges.notes10', 'badges.notes10Desc', Eye, 'engagement', 'hsl(270, 40%, 50%)', noteCount, 10, 'badges.units.notes', true),
       makeBadge('notes-50', 'badges.notes50', 'badges.notes50Desc', Eye, 'engagement', 'hsl(275, 45%, 45%)', noteCount, 50, 'badges.units.notes', true),
-      makeBadge('active-streak', 'badges.activeStreak7', 'badges.activeStreak7Desc', Zap, 'engagement', 'hsl(40, 70%, 50%)', currentStreak, 7, 'badges.units.dayStreak'),
-      makeBadge('active-streak-30', 'badges.activeStreak30', 'badges.activeStreak30Desc', Zap, 'engagement', 'hsl(35, 75%, 45%)', currentStreak, 30, 'badges.units.dayStreak'),
     ];
   }, [reflections]);
 
   const visibleBadges = subscribed ? badges : badges.filter((b) => !b.proOnly);
   const earnedCount = visibleBadges.filter((b) => b.earned).length;
   const proLockedCount = subscribed ? 0 : badges.filter((b) => b.proOnly).length;
-  const categories = ['streak', 'volume', 'composure', 'companions', 'engagement'] as const;
+  const categories = ['calendar', 'volume', 'composure', 'companions', 'engagement'] as const;
 
   const nextBadge = badges.find((b) => !b.earned && b.progress > 0);
 
