@@ -165,8 +165,8 @@ const Roadmap = () => {
                   <div className="space-y-1.5 min-w-0">
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-medium leading-snug">{item.title}</p>
-                      {item.category && item.category !== 'general' && (
-                        <Badge variant="outline" className={`text-[9px] font-mono uppercase px-1.5 py-0 h-4 ${categoryColors[item.category] ?? categoryColors.general}`}>
+                      {item.category && (
+                        <Badge variant="outline" className={`text-[9px] font-mono uppercase px-1.5 py-0 h-4 ${categoryColors[item.category] ?? ''}`}>
                           {t(`roadmap.${item.category}`, item.category)}
                         </Badge>
                       )}
