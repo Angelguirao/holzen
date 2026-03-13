@@ -15,7 +15,7 @@ const STEPS = [
     sources: [
       {
         label: 'Porges, 2011 — Polyvagal Theory',
-        url: 'https://pmc.ncbi.nlm.nih.gov/articles/PMC3490536/',
+        url: 'https://doi.org/10.1002/icd.688',
       },
     ],
   },
