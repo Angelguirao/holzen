@@ -262,7 +262,22 @@ export default function Ground() {
                   {suggestion}
                 </motion.p>
 
-                <motion.div
+                {insight && (
+                  <motion.div
+                    className="mx-auto max-w-xs rounded-md border border-border/20 bg-muted/20 px-4 py-3"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 1.0 }}
+                  >
+                    <p className="text-[10px] font-mono text-muted-foreground/40 tracking-wider uppercase mb-1.5">
+                      {t('ground.didYouKnow', 'Did you know?')}
+                    </p>
+                    <p className="text-xs text-muted-foreground/60 leading-relaxed">
+                      {insight}
+                    </p>
+                  </motion.div>
+                )}
+
                   className="space-y-3"
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
