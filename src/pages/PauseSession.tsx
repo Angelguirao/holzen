@@ -179,7 +179,6 @@ export default function PauseSession() {
     setMoodAfterDone(false);
     setSelectedMoodAfter(null);
   }, []);
-  }, []);
 
   const toggleFavorite = useCallback(async () => {
     if (!reflectionId) return;
