@@ -82,9 +82,6 @@ const About = () => {
             <p className="text-xs text-muted-foreground leading-relaxed">
               {t('about.researchBody4')}
             </p>
-            <p className="text-[10px] text-muted-foreground/70 leading-relaxed italic">
-              {t('about.researchCitation')}
-            </p>
           </div>
         </motion.div>
 
