@@ -15,6 +15,7 @@ import { useTheme } from 'next-themes';
 import { PageMeta } from '@/components/PageMeta';
 import { LandingTestimonials } from '@/components/LandingTestimonials';
 import { LandingLanguageSwitcher } from '@/components/LandingLanguageSwitcher';
+import { PRICING } from '@/lib/pricing';
 
 function Section({ children, className = '', delay = 0 }: { children: React.ReactNode; className?: string; delay?: number }) {
   const ref = useRef(null);
@@ -100,10 +101,12 @@ const Landing = () => {
 
   const FAQ = [
     { key: 'who', q: t('landing.faq.whoQuestion'), a: t('landing.faq.whoAnswer') },
-    { key: 'advice', q: t('landing.faq.adviceQuestion'), a: t('landing.faq.adviceAnswer') },
-    { key: 'free', q: t('landing.faq.freeQuestion'), a: t('landing.faq.freeAnswer') },
+    { key: 'breathe', q: t('landing.faq.breatheQuestion'), a: t('landing.faq.breatheAnswer') },
+    { key: 'meditation', q: t('landing.faq.meditationQuestion'), a: t('landing.faq.meditationAnswer') },
+    { key: 'value', q: t('landing.faq.valueQuestion'), a: t('landing.faq.valueAnswer', { freeReflectionsPerMonth: PRICING.freeReflectionsPerMonth }) },
+    { key: 'works', q: t('landing.faq.worksQuestion'), a: t('landing.faq.worksAnswer') },
+    { key: 'rational', q: t('landing.faq.rationalQuestion'), a: t('landing.faq.rationalAnswer') },
     { key: 'data', q: t('landing.faq.dataQuestion'), a: t('landing.faq.dataAnswer') },
-    { key: 'different', q: t('landing.faq.differentQuestion'), a: t('landing.faq.differentAnswer') },
   ];
 
   return (
