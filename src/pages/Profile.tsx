@@ -519,19 +519,23 @@ function StatsSection({ label, children }: { label: string; children: React.Reac
     </div>
   );
 }
-function LetterCard({ letter: l, onDelete, fmtPrice, type }: {
+function LetterCard({ letter: l, onDelete, fmtPrice, type, onView }: {
   letter: Letter;
   onDelete: (id: string) => void;
   fmtPrice: (p: number) => string;
   type: 'sealed' | 'delivered';
+  onView?: () => void;
 }) {
   const { t } = useTranslation();
   const isDelivered = type === 'delivered';
 
   return (
-    <div className={`rounded-md border px-4 py-3 space-y-2 ${
-      isDelivered ? 'border-primary/20 bg-primary/5' : 'border-border/60 bg-muted/30'
-    }`}>
+    <div
+      className={`rounded-md border px-4 py-3 space-y-2 ${
+        isDelivered ? 'border-primary/20 bg-primary/5 cursor-pointer hover:bg-primary/8 transition-colors' : 'border-border/60 bg-muted/30'
+      }`}
+      onClick={isDelivered && onView ? onView : undefined}
+    >
       <div className="flex items-start justify-between gap-2">
         {isDelivered ? (
           <div className="flex items-center gap-2">
