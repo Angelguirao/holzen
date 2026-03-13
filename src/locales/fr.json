@@ -379,7 +379,7 @@
     "hero": "Quand le Bitcoin bouge, faites une pause avant d'agir.",
     "heroDesc": "Holzen n'est pas un outil de trading. C'est une pratique de conscience de soi. Quand le Bitcoin bouge, vous avez un moment pour faire une pause, réfléchir et observer vos schémas — avant d'agir impulsivement.",
     "getStartedForFree": "Commencez gratuitement",
-    "noCreditCard": "Ensuite {{price}} $/mois · sans carte · annulez quand vous voulez",
+    "noCreditCard": "Gratuit pour toujours · Essai Pro {{trialDays}} jours · {{price}} $/mois après",
     "reflectionLoop": "Impulsion vs. Intention",
     "reaction": {
       "label": "Sans Holzen",
