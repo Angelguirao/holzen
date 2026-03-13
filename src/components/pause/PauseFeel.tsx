@@ -39,7 +39,7 @@ export function PauseFeel({ onMoodSelect, onMoodSkip, moodDone, onContinue, onBa
             transition={{ delay: 0.4, duration: 0.6 }}
             className="w-full"
           >
-            <MoodCheck onSelect={onMoodSelect} onSkip={onMoodSkip} variant="before" />
+            <MoodCheck onSelect={onMoodSelect} onSkip={onMoodSkip} variant="before" hideHeading />
           </motion.div>
         </>
       ) : (
