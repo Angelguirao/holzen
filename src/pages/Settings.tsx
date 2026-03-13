@@ -342,12 +342,10 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             </div>
 
             {/* Grounding Activities */}
-            <ProLock feature="grounding">
-              <GroundingTagInput
-                activities={groundingActivities}
-                onChange={setGroundingActivities}
-              />
-            </ProLock>
+            <GroundingTagInput
+              activities={groundingActivities}
+              onChange={setGroundingActivities}
+            />
 
 
             {/* Language — disabled, English only for now */}

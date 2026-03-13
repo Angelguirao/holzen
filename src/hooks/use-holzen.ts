@@ -211,6 +211,7 @@ export function useHolzen() {
     setHasOnboarded(true);
     setThresholdState(result.threshold);
     if (result.firstName) setFirstNameState(result.firstName);
+    setMotivationsState(result.motivations);
     setGroundingActivitiesState(result.groundingActivities);
     if (!user) return;
     await supabase
