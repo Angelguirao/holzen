@@ -112,12 +112,13 @@ export function BadgesPanel({ reflections, notifyBadges = true }: BadgesPanelPro
       color: string,
       current: number,
       requirement: number,
-      unitKey: string
+      unitKey: string,
+      proOnly: boolean = false
     ): Badge => ({
       id, labelKey, descKey, icon, category, color,
       earned: current >= requirement,
       progress: Math.min(current / requirement, 1),
-      requirement, current, unitKey,
+      requirement, current, unitKey, proOnly,
     });
 
     return [
