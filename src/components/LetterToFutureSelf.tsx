@@ -424,10 +424,10 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
               <div key={l.id} className="flex items-center gap-3 rounded-sm border border-border/40 bg-background/30 px-3 py-2.5">
                 <WaxSeal size={16} />
                 <div className="min-w-0 space-y-0.5">
-                  <p className="text-[10px] font-mono text-muted-foreground/60 italic">
-                    {getStatusCopy(l)}
+                  <p className="text-[10px] font-mono text-primary/70 font-medium">
+                    {getDeliveryConditionLabel(l)}
                   </p>
-                  <p className="text-[9px] font-mono text-muted-foreground/30">
+                  <p className="text-[9px] font-mono text-muted-foreground/40">
                     {getTimeCopy(l)} · BTC at {fmtPrice(l.btc_price_at_write)}
                   </p>
                 </div>
