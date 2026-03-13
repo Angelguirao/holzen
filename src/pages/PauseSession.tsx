@@ -335,6 +335,7 @@ export default function PauseSession() {
                     onMoodAfterSelect={handleMoodAfterSelect}
                     onMoodAfterSkip={handleMoodAfterSkip}
                     moodAfterDone={moodAfterDone}
+                    selectedMoodAfter={selectedMoodAfter}
                     onContinue={() => goToStep('decide')}
                     onBack={goBack}
                   />
