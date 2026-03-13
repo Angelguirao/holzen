@@ -613,10 +613,10 @@ export default function Breathe() {
 
             {blockData && blockData.mempoolPending > 0 && (
               <motion.p
-                className="text-[9px] font-mono tabular-nums"
-                style={{ color: textColors[level], opacity: 0.2 }}
+                className="text-[10px] font-mono tabular-nums"
+                style={{ color: textColors[level], opacity: 0.35 }}
                 initial={{ opacity: 0 }}
-                animate={{ opacity: surfaceOpacity * 0.2 }}
+                animate={{ opacity: surfaceOpacity * 0.35 }}
                 transition={{ delay: 3.5, duration: 1.5 }}
               >
                 {formatNumber(blockData.mempoolPending)} {t('breathe.pendingTx', 'transactions waiting to confirm')}
