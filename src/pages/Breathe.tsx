@@ -565,10 +565,10 @@ export default function Breathe() {
             {/* Hint to go deeper */}
             <motion.p
               className="text-[9px] font-mono tracking-[0.2em] uppercase mt-8"
-              style={{ color: textColors[level], opacity: 0.25 }}
+              style={{ color: textColors[level], opacity: 0.35 }}
               initial={{ opacity: 0 }}
-              animate={{ opacity: 0.25 }}
-              transition={{ delay: 5, duration: 2 }}
+              animate={{ opacity: 0.35 }}
+              transition={{ delay: 4, duration: 2 }}
             >
               {t('void.tapToDescend', 'tap to go deeper')}
             </motion.p>
