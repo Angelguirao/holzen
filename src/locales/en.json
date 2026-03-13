@@ -1427,7 +1427,8 @@
     "desc_decisions": "Track your decision quality, volatility tolerance, and composure trends.",
     "desc_practice_stats": "Detailed practice analytics — sessions, types, and consistency.",
     "desc_advanced_stats": "Deep analysis: mood shifts, scatter plots, and statistical trends.",
-    "desc_badges_pro": "Unlock exclusive Pro badges and track deeper milestones."
+    "desc_badges_pro": "Unlock exclusive Pro badges and track deeper milestones.",
+    "desc_grounding": "Choose personal grounding activities and get AI-powered suggestions tailored to the market moment."
   },
   "triggerOverlay": {
     "readyToPause": "You paused. That's the hardest part.",
