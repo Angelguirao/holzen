@@ -20,7 +20,7 @@ interface Props {
 }
 
 const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-const TOTAL_STEPS = 3;
+const TOTAL_STEPS = 4;
 
 export function Onboarding({ onComplete }: Props) {
   const { t } = useTranslation();
@@ -28,6 +28,7 @@ export function Onboarding({ onComplete }: Props) {
   const [timezone] = useState(detectedTimezone);
   const [threshold, setThreshold] = useState(5);
   const [motivations, setMotivations] = useState<string[]>([]);
+  const [groundingActivities, setGroundingActivities] = useState<string[]>([]);
   const [direction, setDirection] = useState(1);
   const prefersReduced = useReducedMotion();
 
