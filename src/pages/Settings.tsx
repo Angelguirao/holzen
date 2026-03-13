@@ -657,128 +657,6 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
               )}
             </div>
 
-            {/* Digest — Pro */}
-            <ProLock feature="digest">
-            <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.digestFrequency')}</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                {t('settings.digestDesc')}
-              </p>
-              <div className="grid grid-cols-3 gap-2">
-                {(['daily', 'weekly', 'biweekly'] as const).map((opt) => (
-                  <button
-                    key={opt}
-                    onClick={() => setDigestFrequency(opt)}
-                    className={`rounded-md border px-3 py-2 text-center transition-colors ${
-                      digestFrequency === opt
-                        ? 'border-primary bg-primary/5 text-foreground'
-                        : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
-                    }`}
-                  >
-                    <p className="text-xs font-mono">{t(`settings.digestOptions.${opt}`)}</p>
-                  </button>
-                ))}
-              </div>
-              <div className="grid grid-cols-2 gap-2">
-                {(['monthly', 'off'] as const).map((opt) => (
-                  <button
-                    key={opt}
-                    onClick={() => setDigestFrequency(opt)}
-                    className={`rounded-md border px-3 py-2 text-center transition-colors ${
-                      digestFrequency === opt
-                        ? 'border-primary bg-primary/5 text-foreground'
-                        : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
-                    }`}
-                  >
-                    <p className="text-xs font-mono">{t(`settings.digestOptions.${opt}`)}</p>
-                  </button>
-                ))}
-              </div>
-            </div>
-            </ProLock>
-
-            {/* Night Reflection — Pro */}
-            <ProLock feature="night_reflections">
-            <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.nightReflection')}</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                {t('settings.nightReflectionDesc')}
-              </p>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="night-reflection-enabled" className="text-xs font-mono text-muted-foreground">
-                  {t('settings.enableNightReflection')}
-                </Label>
-                <Switch
-                  id="night-reflection-enabled"
-                  checked={nightReflectionHour !== null}
-                  onCheckedChange={(v) => v ? setNightReflectionHour(21) : setNightReflectionHour(null)}
-                />
-              </div>
-              {nightReflectionHour !== null && (
-                <div className="space-y-1.5">
-                  <p className="text-[10px] font-mono text-muted-foreground/60">{t('settings.deliveryTime')}</p>
-                  <select
-                    value={nightReflectionHour}
-                    onChange={(e) => setNightReflectionHour(Number(e.target.value))}
-                    className="w-full text-xs font-mono px-2 py-1.5 rounded-md border border-border/60 bg-background text-foreground"
-                  >
-                    {Array.from({ length: 24 }, (_, i) => (
-                      <option key={i} value={i}>{String(i).padStart(2, '0')}:00</option>
-                    ))}
-                  </select>
-                </div>
-              )}
-            </div>
-            </ProLock>
-
-            {/* Quiet Hours — Pro */}
-            <ProLock feature="quiet_hours">
-            <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.quietHours')}</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                {t('settings.quietHoursDesc')}
-              </p>
-              <div className="flex items-center justify-between">
-                <Label htmlFor="quiet-enabled" className="text-xs font-mono text-muted-foreground">
-                  {t('settings.enableQuietHours')}
-                </Label>
-                <Switch
-                  id="quiet-enabled"
-                  checked={quietHoursStart !== null}
-                  onCheckedChange={(v) => v ? setQuietHours(22, 7) : setQuietHours(null, null)}
-                />
-              </div>
-              {quietHoursStart !== null && quietHoursEnd !== null && (
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-1.5">
-                    <p className="text-[10px] font-mono text-muted-foreground/60">{t('common.from')}</p>
-                    <select
-                      value={quietHoursStart}
-                      onChange={(e) => setQuietHours(Number(e.target.value), quietHoursEnd)}
-                      className="w-full text-xs font-mono px-2 py-1.5 rounded-md border border-border/60 bg-background text-foreground"
-                    >
-                      {Array.from({ length: 24 }, (_, i) => (
-                        <option key={i} value={i}>{String(i).padStart(2, '0')}:00</option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="space-y-1.5">
-                    <p className="text-[10px] font-mono text-muted-foreground/60">{t('common.until')}</p>
-                    <select
-                      value={quietHoursEnd}
-                      onChange={(e) => setQuietHours(quietHoursStart, Number(e.target.value))}
-                      className="w-full text-xs font-mono px-2 py-1.5 rounded-md border border-border/60 bg-background text-foreground"
-                    >
-                      {Array.from({ length: 24 }, (_, i) => (
-                        <option key={i} value={i}>{String(i).padStart(2, '0')}:00</option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-              )}
-            </div>
-            </ProLock>
-
             {/* Badge notifications — free */}
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.badgeNotifications')}</p>
@@ -792,6 +670,127 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                 <Switch id="notify-badges" checked={notifyBadges} onCheckedChange={setNotifyBadges} />
               </div>
             </div>
+
+            {/* Pro notification settings — single ProLock */}
+            <ProLock feature="notifications" hideContent>
+            <div className="space-y-6">
+              {/* Digest */}
+              <div className="space-y-3">
+                <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.digestFrequency')}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  {t('settings.digestDesc')}
+                </p>
+                <div className="grid grid-cols-3 gap-2">
+                  {(['daily', 'weekly', 'biweekly'] as const).map((opt) => (
+                    <button
+                      key={opt}
+                      onClick={() => setDigestFrequency(opt)}
+                      className={`rounded-md border px-3 py-2 text-center transition-colors ${
+                        digestFrequency === opt
+                          ? 'border-primary bg-primary/5 text-foreground'
+                          : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      <p className="text-xs font-mono">{t(`settings.digestOptions.${opt}`)}</p>
+                    </button>
+                  ))}
+                </div>
+                <div className="grid grid-cols-2 gap-2">
+                  {(['monthly', 'off'] as const).map((opt) => (
+                    <button
+                      key={opt}
+                      onClick={() => setDigestFrequency(opt)}
+                      className={`rounded-md border px-3 py-2 text-center transition-colors ${
+                        digestFrequency === opt
+                          ? 'border-primary bg-primary/5 text-foreground'
+                          : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      <p className="text-xs font-mono">{t(`settings.digestOptions.${opt}`)}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Night Reflection */}
+              <div className="space-y-3">
+                <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.nightReflection')}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  {t('settings.nightReflectionDesc')}
+                </p>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="night-reflection-enabled" className="text-xs font-mono text-muted-foreground">
+                    {t('settings.enableNightReflection')}
+                  </Label>
+                  <Switch
+                    id="night-reflection-enabled"
+                    checked={nightReflectionHour !== null}
+                    onCheckedChange={(v) => v ? setNightReflectionHour(21) : setNightReflectionHour(null)}
+                  />
+                </div>
+                {nightReflectionHour !== null && (
+                  <div className="space-y-1.5">
+                    <p className="text-[10px] font-mono text-muted-foreground/60">{t('settings.deliveryTime')}</p>
+                    <select
+                      value={nightReflectionHour}
+                      onChange={(e) => setNightReflectionHour(Number(e.target.value))}
+                      className="w-full text-xs font-mono px-2 py-1.5 rounded-md border border-border/60 bg-background text-foreground"
+                    >
+                      {Array.from({ length: 24 }, (_, i) => (
+                        <option key={i} value={i}>{String(i).padStart(2, '0')}:00</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+              </div>
+
+              {/* Quiet Hours */}
+              <div className="space-y-3">
+                <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.quietHours')}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  {t('settings.quietHoursDesc')}
+                </p>
+                <div className="flex items-center justify-between">
+                  <Label htmlFor="quiet-enabled" className="text-xs font-mono text-muted-foreground">
+                    {t('settings.enableQuietHours')}
+                  </Label>
+                  <Switch
+                    id="quiet-enabled"
+                    checked={quietHoursStart !== null}
+                    onCheckedChange={(v) => v ? setQuietHours(22, 7) : setQuietHours(null, null)}
+                  />
+                </div>
+                {quietHoursStart !== null && quietHoursEnd !== null && (
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1.5">
+                      <p className="text-[10px] font-mono text-muted-foreground/60">{t('common.from')}</p>
+                      <select
+                        value={quietHoursStart}
+                        onChange={(e) => setQuietHours(Number(e.target.value), quietHoursEnd)}
+                        className="w-full text-xs font-mono px-2 py-1.5 rounded-md border border-border/60 bg-background text-foreground"
+                      >
+                        {Array.from({ length: 24 }, (_, i) => (
+                          <option key={i} value={i}>{String(i).padStart(2, '0')}:00</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="space-y-1.5">
+                      <p className="text-[10px] font-mono text-muted-foreground/60">{t('common.until')}</p>
+                      <select
+                        value={quietHoursEnd}
+                        onChange={(e) => setQuietHours(quietHoursStart, Number(e.target.value))}
+                        className="w-full text-xs font-mono px-2 py-1.5 rounded-md border border-border/60 bg-background text-foreground"
+                      >
+                        {Array.from({ length: 24 }, (_, i) => (
+                          <option key={i} value={i}>{String(i).padStart(2, '0')}:00</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            </ProLock>
           </AccordionContent>
         </AccordionItem>
 
