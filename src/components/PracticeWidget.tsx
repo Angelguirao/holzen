@@ -99,8 +99,10 @@ export function PracticeWidget() {
     const practice = PRACTICES.find(p => p.id === id);
     if (!practice) return;
     if (!practice.free && !subscribed) {
+      const descKey = `pro.desc_${id}`;
+      const description = t(descKey) !== descKey ? t(descKey) : t('pro.upgradeDesc');
       toast(t('pro.featureLocked'), {
-        description: t('pro.upgradeDesc'),
+        description,
         action: { label: t('pro.upgradeCta'), onClick: () => startCheckout() },
         duration: 6000,
       });

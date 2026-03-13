@@ -701,12 +701,14 @@ function AutoCooldownIndicator({
   );
 }
 
-function ProLockedWidget({ onUpgrade, checkoutLoading }: { onUpgrade: () => void; checkoutLoading: boolean }) {
+function ProLockedWidget({ onUpgrade, checkoutLoading, feature }: { onUpgrade: () => void; checkoutLoading: boolean; feature?: string }) {
   const { t } = useTranslation();
+  const descKey = feature ? `pro.desc_${feature}` : '';
+  const description = feature && t(descKey) !== descKey ? t(descKey) : t('pro.upgradeDesc');
   return (
     <div className="flex flex-col items-center gap-2 py-4">
       <Lock className="h-4 w-4 text-muted-foreground/30" />
-      <p className="text-[10px] font-mono text-muted-foreground/50">{t('pro.upgradeDesc')}</p>
+      <p className="text-[10px] font-mono text-muted-foreground/50 text-center max-w-[200px]">{description}</p>
       <button
         onClick={onUpgrade}
         disabled={checkoutLoading}
