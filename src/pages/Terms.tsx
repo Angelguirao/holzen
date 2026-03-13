@@ -127,8 +127,8 @@ const Terms = () => {
           Holzen is not a financial product. Nothing in this Service constitutes financial advice.
         </p>
       </div>
+      <PublicFooter />
     </div>
-  );
 };
 
 export default Terms;

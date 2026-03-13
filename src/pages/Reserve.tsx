@@ -157,19 +157,7 @@ const Reserve = () => {
           </div>
         </motion.div>
 
-        <motion.div {...m()}>
-          <div className="flex items-center gap-3 text-xs text-muted-foreground pt-4 border-t border-border">
-            <Link to="/welcome" className="hover:text-foreground transition-colors">{t('about.home')}</Link>
-            <span>·</span>
-            <Link to="/about" className="hover:text-foreground transition-colors">{t('landing.about')}</Link>
-            <span>·</span>
-            <Link to="/terms" className="hover:text-foreground transition-colors">{t('landing.terms')}</Link>
-            <span>·</span>
-            <Link to="/privacy" className="hover:text-foreground transition-colors">{t('landing.privacy')}</Link>
-            <span>·</span>
-            <a href="mailto:hello@holzen.app" className="hover:text-foreground transition-colors">{t('about.contact')}</a>
-          </div>
-        </motion.div>
+        <PublicFooter />
       </div>
     </div>
   );
