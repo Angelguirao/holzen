@@ -77,8 +77,8 @@
       "practice": "Practice"
     },
     "subscription": {
-      "monthlyLimitReached": "You've used your {{freeReflectionsPerMonth}} free pauses this month. Upgrade to Pro for unlimited.",
-      "upgradeToPro": "${{price}}/month · Unlimited pauses + AI companions · Cancel anytime",
+      "monthlyLimitReached": "You've used your {{freeReflectionsPerMonth}} free pauses this month. Start your {{trialDays}}-day free trial for unlimited.",
+      "upgradeToPro": "{{trialDays}}-day free trial · ${{price}}/month after · Cancel anytime",
       "pricePerMonth": "${{price}} per month · Cancel anytime",
       "openingCheckout": "Opening checkout…",
       "freeRemaining": "{{count}} free pause remaining this month",
@@ -534,8 +534,8 @@
     "scienceStepShift": "Shift — Notice what changed. Checking in after reflection creates metacognitive awareness — the ability to observe your own thinking, which Flavell (1979) identified as key to self-regulation.",
     "scienceStepDecide": "Decide — Act from intention, not impulse. Kahneman's System 2 (2011) is now online: you've moved from reactive to deliberate processing.",
     "scienceStepsCitation": "Porges, S. (2011). The Polyvagal Theory. · Lieberman, M. et al. (2007). Putting Feelings into Words. Psychological Science, 18(5). · Gross, J. (2002). Emotion Regulation. Handbook of Emotions. · Kahneman, D. (2011). Thinking, Fast and Slow.",
-    "freeToStart": "Free plan available",
-    "pricingDesc": "{{freeReflectionsPerMonth}} pauses per month — free forever, no credit card. Upgrade to Pro for ${{price}}/month: unlimited pauses, AI companions, insights, library, and more. Cancel anytime.",
+    "freeToStart": "{{trialDays}}-day free trial",
+    "pricingDesc": "{{freeReflectionsPerMonth}} pauses per month — free forever, no credit card. Or start a {{trialDays}}-day free trial of Pro (${{price}}/month after): unlimited pauses, AI companions, insights, library, and more. Cancel anytime.",
     "questions": "Common questions",
     "faq": {
       "whoQuestion": "Who is Holzen for?",
@@ -543,7 +543,7 @@
       "adviceQuestion": "Will it tell me what to buy or sell?",
       "adviceAnswer": "Never. Holzen is not a trading tool or financial advisor. Every reflection is intentionally neutral — designed to create awareness, not action.",
       "freeQuestion": "What do I get for free?",
-      "freeAnswer": "{{freeReflectionsPerMonth}} pauses per month with the core loop: market data, breathing, mood check, and outcome logging. Pro (${{price}}/mo) unlocks unlimited pauses plus all AI companions, insights, library, letters, and more. Cancel anytime.",
+      "freeAnswer": "{{freeReflectionsPerMonth}} pauses per month with the core loop: market data, breathing, mood check, and outcome logging. Pro starts with a {{trialDays}}-day free trial, then ${{price}}/mo — unlimited pauses plus all AI companions, insights, library, letters, and more. Cancel anytime.",
       "dataQuestion": "What happens to my data?",
       "dataAnswer": "We store only what's needed: your email, thresholds, pauses, and mood entries. You can export everything as JSON or CSV anytime, or delete your account entirely with one tap. See our",
       "differentQuestion": "How is this different from a journal app?",
@@ -1398,8 +1398,9 @@
   },
   "pro": {
     "featureLocked": "Pro feature",
-    "upgradeDesc": "Upgrade to Pro to unlock AI companions, insights, library, and more.",
-    "upgradeCta": "Upgrade to Pro",
+    "upgradeDesc": "Start your {{trialDays}}-day free trial — unlock AI companions, insights, library, and more.",
+    "upgradeCta": "Start free trial",
+    "upgradeCtaShort": "Try Pro free",
     "badge": "PRO",
     "desc_haiku": "Each reflection gets a unique haiku — a poetic mirror of your emotional state.",
     "desc_signal": "AI-powered market intelligence that cuts through the noise for you.",
