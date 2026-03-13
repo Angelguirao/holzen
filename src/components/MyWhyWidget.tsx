@@ -17,7 +17,7 @@ export function MyWhyWidget() {
         </p>
       </div>
       {mantra && (
-        <p className="text-xs font-mono text-foreground/60 italic leading-relaxed">
+        <p className="text-xs font-mono text-foreground/60 italic leading-relaxed line-clamp-2">
           "{mantra}"
         </p>
       )}
