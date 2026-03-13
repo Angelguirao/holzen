@@ -476,7 +476,7 @@ const Home = () => {
         if (!btcData) return null;
         if (!subscribed) return (
           <HomeWidget id="letter" title={WIDGET_TITLES['letter']} collapsed={collapsed['letter']} onToggleCollapse={() => toggleCollapsed('letter')}>
-            <ProLockedWidget onUpgrade={startCheckout} checkoutLoading={checkoutLoading} />
+            <ProLockedWidget onUpgrade={startCheckout} checkoutLoading={checkoutLoading} feature="letters" />
           </HomeWidget>
         );
         return (
