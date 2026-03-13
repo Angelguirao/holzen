@@ -233,6 +233,8 @@ function formatTimeSince(seconds: number): string {
  * depth 1 = deep stillness (void — stripped UI, contemplations, blockchain clock)
  * Tap the center area to descend/ascend.
  */
+const VOID_VISITED_KEY = 'holzen_void_visited';
+
 export default function Breathe() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -242,6 +244,13 @@ export default function Breathe() {
   const [blockData, setBlockData] = useState<BlockData | null>(null);
   const [level, setLevel] = useState<VolatilityLevel>('calm');
   const [curtainLifted, setCurtainLifted] = useState(false);
+
+  // First-visit guide
+  const [showGuide, setShowGuide] = useState(() => !localStorage.getItem(VOID_VISITED_KEY));
+  const dismissGuide = useCallback(() => {
+    setShowGuide(false);
+    localStorage.setItem(VOID_VISITED_KEY, '1');
+  }, []);
 
   // Depth: 0 = surface ambient, 1 = deep void
   const [depth, setDepth] = useState(0);
