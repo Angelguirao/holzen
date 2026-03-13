@@ -213,6 +213,14 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
 
   const fmtPrice = (p: number) => formatBtcPrice(p, currency);
 
+  const getDeliveryConditionLabel = (l: Letter) => {
+    const pct = l.delivery_threshold ?? 5;
+    if (l.deliver_during === 'crash') {
+      return t('letter.opensWhenDrops', { threshold: pct, defaultValue: `Opens when BTC drops ≥${pct}%` });
+    }
+    return t('letter.opensWhenSurges', { threshold: pct, defaultValue: `Opens when BTC surges ≥${pct}%` });
+  };
+
   const getStatusCopy = (l: Letter) => {
     if (l.written_during === 'calm') return t('letter.sealedInCalm');
     if (l.written_during === 'crash') return t('letter.sealedInFear');
