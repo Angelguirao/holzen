@@ -454,7 +454,56 @@ export default function Breathe() {
           <X className="h-5 w-5" />
         </button>
 
-        {/* Tap target — the entire center area */}
+        {/* First-visit guide */}
+        <AnimatePresence>
+          {showGuide && curtainLifted && (
+            <motion.div
+              className="absolute inset-0 z-[115] flex items-center justify-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.5, delay: 2 }}
+            >
+              <motion.div
+                className="max-w-[280px] text-center space-y-5"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 1.2, delay: 2.5 }}
+              >
+                <p
+                  className="font-mono text-[10px] tracking-[0.25em] uppercase"
+                  style={{ color: textColors[level], opacity: 0.5 }}
+                >
+                  {t('void.guideTitle', 'Enter the stillness')}
+                </p>
+                <div className="space-y-3">
+                  <p
+                    className="font-mono text-[11px] leading-relaxed"
+                    style={{ color: textColors[level], opacity: 0.4 }}
+                  >
+                    {t('void.guideSurface', 'Surface — breathe with the Bitcoin network. Block height, mempool, the rhythm of proof-of-work.')}
+                  </p>
+                  <p
+                    className="font-mono text-[11px] leading-relaxed"
+                    style={{ color: textColors[level], opacity: 0.4 }}
+                  >
+                    {t('void.guideDeep', 'Deeper — sit with the blockchain clock. Time since the last block. Contemplations. A singing bowl when a new block is found.')}
+                  </p>
+                </div>
+                <button
+                  onClick={dismissGuide}
+                  className="font-mono text-[9px] tracking-[0.2em] uppercase underline underline-offset-4 transition-opacity hover:opacity-80"
+                  style={{ color: textColors[level], opacity: 0.35 }}
+                >
+                  {t('void.guideBegin', 'begin')}
+                </button>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+
         <button
           onClick={toggleDepth}
           className="relative z-[105] flex flex-col items-center justify-center focus:outline-none"
