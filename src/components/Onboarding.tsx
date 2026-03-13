@@ -19,7 +19,7 @@ interface Props {
 }
 
 const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-const TOTAL_STEPS = 4;
+const TOTAL_STEPS = 3;
 
 export function Onboarding({ onComplete }: Props) {
   const { t } = useTranslation();
