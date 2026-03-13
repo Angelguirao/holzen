@@ -690,6 +690,12 @@ export function useHolzen() {
       if (!user) return;
       await supabase.from('profiles').update({ motivations: val } as any).eq('user_id', user.id);
     },
+    groundingActivities,
+    setGroundingActivities: async (val: string[]) => {
+      setGroundingActivitiesState(val);
+      if (!user) return;
+      await supabase.from('profiles').update({ grounding_activities: val } as any).eq('user_id', user.id);
+    },
     mantra,
     setMantra: async (val: string | null) => {
       setMantraState(val);
