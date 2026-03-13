@@ -79,6 +79,7 @@ export function useHolzen() {
         setMantraState((data as any).mantra ?? null);
         setCurrencyState((data as any).hold_goal_currency ?? 'USD');
         setLanguageState((data as any).language ?? 'en');
+        setGroundingActivitiesState((data as any).grounding_activities ?? []);
         setHasOnboarded(data.has_onboarded ?? false);
         setCompanionPrefsState({
           breathing: data.companion_breathing ?? true,
