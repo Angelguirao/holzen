@@ -107,8 +107,8 @@ const Privacy = () => {
           Holzen exists to create space between impulse and decision — not to collect or exploit your data.
         </p>
       </div>
+      <PublicFooter />
     </div>
-  );
 };
 
 export default Privacy;

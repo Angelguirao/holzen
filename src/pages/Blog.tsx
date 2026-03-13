@@ -130,17 +130,7 @@ const Blog = () => {
           </motion.div>
         )}
 
-        <motion.div {...m()}>
-          <div className="flex items-center gap-3 text-xs text-muted-foreground pt-4 border-t border-border">
-            <Link to="/welcome" className="hover:text-foreground transition-colors">{t('blog.home')}</Link>
-            <span>·</span>
-            <Link to="/about" className="hover:text-foreground transition-colors">{t('blog.about')}</Link>
-            <span>·</span>
-            <Link to="/terms" className="hover:text-foreground transition-colors">{t('blog.terms')}</Link>
-            <span>·</span>
-            <Link to="/privacy" className="hover:text-foreground transition-colors">{t('blog.privacy')}</Link>
-          </div>
-        </motion.div>
+        <PublicFooter />
       </div>
     </div>
   );
