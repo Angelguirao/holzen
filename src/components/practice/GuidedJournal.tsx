@@ -7,6 +7,7 @@ import { useHolzen } from '@/hooks/use-holzen';
 import { hapticFeedback } from '@/lib/haptics';
 import { toast } from 'sonner';
 import { Check, RefreshCw, Sparkles, Loader2 } from 'lucide-react';
+import { WritingField } from '@/components/WritingField';
 
 const FALLBACK_PROMPTS = [
   'practice.prompt1',
