@@ -9,6 +9,7 @@ import {
   ArrowRight, Twitter, Wind, Feather, BookOpen, TrendingDown, Brain, Tag,
   BarChart3, MessageCircle, Target, Heart, Mail, Globe, Shield, Award,
   Zap, Moon, Sun, ChevronDown, Timer, Eye, Sparkles, RefreshCw,
+  Smartphone, Users, MapPin, Compass, Quote, Anchor, Footprints,
 } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { PageMeta } from '@/components/PageMeta';
