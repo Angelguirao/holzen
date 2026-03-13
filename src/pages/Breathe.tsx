@@ -740,10 +740,10 @@ export default function Breathe() {
             {/* Epoch progress label */}
             {blockData?.difficultyEpochProgress != null && (
               <motion.p
-                className="font-mono text-[7px] tracking-[0.15em]"
-                style={{ color: textColors[level], opacity: 0.15 }}
+                className="font-mono text-[8px] tracking-[0.15em]"
+                style={{ color: textColors[level], opacity: 0.25 }}
                 initial={{ opacity: 0 }}
-                animate={{ opacity: 0.15 }}
+                animate={{ opacity: 0.25 }}
                 transition={{ delay: 10, duration: 3 }}
               >
                 {t('void.epoch', 'epoch {{pct}}%', { pct: Math.round(blockData.difficultyEpochProgress * 100) })}
