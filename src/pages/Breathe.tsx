@@ -233,6 +233,8 @@ function formatTimeSince(seconds: number): string {
  * depth 1 = deep stillness (void — stripped UI, contemplations, blockchain clock)
  * Tap the center area to descend/ascend.
  */
+const VOID_VISITED_KEY = 'holzen_void_visited';
+
 export default function Breathe() {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -242,6 +244,13 @@ export default function Breathe() {
   const [blockData, setBlockData] = useState<BlockData | null>(null);
   const [level, setLevel] = useState<VolatilityLevel>('calm');
   const [curtainLifted, setCurtainLifted] = useState(false);
+
+  // First-visit guide
+  const [showGuide, setShowGuide] = useState(() => !localStorage.getItem(VOID_VISITED_KEY));
+  const dismissGuide = useCallback(() => {
+    setShowGuide(false);
+    localStorage.setItem(VOID_VISITED_KEY, '1');
+  }, []);
 
   // Depth: 0 = surface ambient, 1 = deep void
   const [depth, setDepth] = useState(0);
@@ -445,7 +454,56 @@ export default function Breathe() {
           <X className="h-5 w-5" />
         </button>
 
-        {/* Tap target — the entire center area */}
+        {/* First-visit guide */}
+        <AnimatePresence>
+          {showGuide && curtainLifted && (
+            <motion.div
+              className="absolute inset-0 z-[115] flex items-center justify-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.5, delay: 2 }}
+            >
+              <motion.div
+                className="max-w-[280px] text-center space-y-5"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 1.2, delay: 2.5 }}
+              >
+                <p
+                  className="font-mono text-[10px] tracking-[0.25em] uppercase"
+                  style={{ color: textColors[level], opacity: 0.5 }}
+                >
+                  {t('void.guideTitle', 'Enter the stillness')}
+                </p>
+                <div className="space-y-3">
+                  <p
+                    className="font-mono text-[11px] leading-relaxed"
+                    style={{ color: textColors[level], opacity: 0.4 }}
+                  >
+                    {t('void.guideSurface', 'Surface — breathe with the Bitcoin network. Block height, mempool, the rhythm of proof-of-work.')}
+                  </p>
+                  <p
+                    className="font-mono text-[11px] leading-relaxed"
+                    style={{ color: textColors[level], opacity: 0.4 }}
+                  >
+                    {t('void.guideDeep', 'Deeper — sit with the blockchain clock. Time since the last block. Contemplations. A singing bowl when a new block is found.')}
+                  </p>
+                </div>
+                <button
+                  onClick={dismissGuide}
+                  className="font-mono text-[9px] tracking-[0.2em] uppercase underline underline-offset-4 transition-opacity hover:opacity-80"
+                  style={{ color: textColors[level], opacity: 0.35 }}
+                >
+                  {t('void.guideBegin', 'begin')}
+                </button>
+              </motion.div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+
         <button
           onClick={toggleDepth}
           className="relative z-[105] flex flex-col items-center justify-center focus:outline-none"
@@ -500,12 +558,20 @@ export default function Breathe() {
               }}
             >
               {blockData && (
-                <span
-                  className="font-mono text-[11px] tabular-nums tracking-wider"
-                  style={{ color: textColors[level], opacity: 0.5 }}
-                >
-                  {blockData.height.toLocaleString()}
-                </span>
+                <div className="flex flex-col items-center gap-0.5">
+                  <span
+                    className="font-mono text-[11px] tabular-nums tracking-wider"
+                    style={{ color: textColors[level], opacity: 0.5 }}
+                  >
+                    {blockData.height.toLocaleString()}
+                  </span>
+                  <span
+                    className="font-mono text-[6px] tracking-[0.2em] uppercase"
+                    style={{ color: textColors[level], opacity: 0.2 }}
+                  >
+                    {t('void.blockHeight', 'block height')}
+                  </span>
+                </div>
               )}
             </motion.div>
 
@@ -542,24 +608,34 @@ export default function Breathe() {
             )}
 
             {blockData && blockData.mempoolPending > 0 && (
-              <motion.p
-                className="text-[9px] font-mono tabular-nums"
-                style={{ color: textColors[level], opacity: 0.2 }}
+              <motion.div
+                className="text-center"
                 initial={{ opacity: 0 }}
-                animate={{ opacity: surfaceOpacity * 0.2 }}
+                animate={{ opacity: surfaceOpacity * 0.25 }}
                 transition={{ delay: 3.5, duration: 1.5 }}
               >
-                {formatNumber(blockData.mempoolPending)} {t('breathe.pendingTx', 'transactions waiting to confirm')}
-              </motion.p>
+                <p
+                  className="text-[9px] font-mono tabular-nums"
+                  style={{ color: textColors[level] }}
+                >
+                  {formatNumber(blockData.mempoolPending)} {t('breathe.pendingTx', 'transactions waiting to confirm')}
+                </p>
+                <p
+                  className="text-[7px] font-mono tracking-[0.15em]"
+                  style={{ color: textColors[level], opacity: 0.6 }}
+                >
+                  {t('void.mempoolHint', 'the mempool — unconfirmed transactions')}
+                </p>
+              </motion.div>
             )}
 
             {/* Hint to go deeper */}
             <motion.p
               className="text-[9px] font-mono tracking-[0.2em] uppercase mt-8"
-              style={{ color: textColors[level], opacity: 0.25 }}
+              style={{ color: textColors[level], opacity: 0.35 }}
               initial={{ opacity: 0 }}
-              animate={{ opacity: 0.25 }}
-              transition={{ delay: 5, duration: 2 }}
+              animate={{ opacity: 0.35 }}
+              transition={{ delay: 4, duration: 2 }}
             >
               {t('void.tapToDescend', 'tap to go deeper')}
             </motion.p>
@@ -585,21 +661,21 @@ export default function Breathe() {
               >
                 <p
                   className="font-mono text-sm tabular-nums tracking-wider"
-                  style={{ color: textColors[level], opacity: 0.25 }}
+                  style={{ color: textColors[level], opacity: 0.35 }}
                 >
                   {formatTimeSince(timeSinceBlock)}
                 </p>
                 <p
                   className="font-mono text-[8px] tracking-[0.2em] uppercase"
-                  style={{ color: textColors[level], opacity: 0.15 }}
+                  style={{ color: textColors[level], opacity: 0.2 }}
                 >
                   {t('void.sinceLastBlock', 'since last block')}
                 </p>
                 <motion.p
                   className="font-mono text-[7px] tracking-[0.15em] italic"
-                  style={{ color: textColors[level], opacity: 0.12 }}
+                  style={{ color: textColors[level], opacity: 0.18 }}
                   initial={{ opacity: 0 }}
-                  animate={{ opacity: 0.12 }}
+                  animate={{ opacity: 0.18 }}
                   transition={{ delay: 3, duration: 1.5 }}
                 >
                   {timeSinceBlock > 1200
@@ -615,12 +691,13 @@ export default function Breathe() {
             {feeHeat > 0.2 && (
               <motion.p
                 className="font-mono text-[7px] tracking-[0.15em]"
-                style={{ color: textColors[level], opacity: 0.1 }}
+                style={{ color: textColors[level], opacity: 0.18 }}
                 initial={{ opacity: 0 }}
-                animate={{ opacity: 0.1 }}
+                animate={{ opacity: 0.18 }}
                 transition={{ delay: 8, duration: 2 }}
               >
                 {t('void.feePressure', 'fee pressure: {{fee}} sat/vB', { fee: blockData?.fastestFee })}
+                <span style={{ opacity: 0.6 }}> · {t('void.feeHint', 'network demand')}</span>
               </motion.p>
             )}
 
@@ -671,21 +748,22 @@ export default function Breathe() {
             {blockData?.difficultyEpochProgress != null && (
               <motion.p
                 className="font-mono text-[7px] tracking-[0.15em]"
-                style={{ color: textColors[level], opacity: 0.15 }}
+                style={{ color: textColors[level], opacity: 0.2 }}
                 initial={{ opacity: 0 }}
-                animate={{ opacity: 0.15 }}
+                animate={{ opacity: 0.2 }}
                 transition={{ delay: 10, duration: 3 }}
               >
                 {t('void.epoch', 'epoch {{pct}}%', { pct: Math.round(blockData.difficultyEpochProgress * 100) })}
+                <span style={{ opacity: 0.6 }}> · {t('void.epochHint', '2,016-block difficulty cycle')}</span>
               </motion.p>
             )}
 
             {/* Hint to surface */}
             <motion.p
               className="font-mono text-[8px] tracking-[0.2em] uppercase"
-              style={{ color: textColors[level], opacity: 0.1 }}
+              style={{ color: textColors[level], opacity: 0.15 }}
               initial={{ opacity: 0 }}
-              animate={{ opacity: 0.1 }}
+              animate={{ opacity: 0.15 }}
               transition={{ delay: 6, duration: 2 }}
             >
               {t('void.tapToSurface', 'tap to surface')}
