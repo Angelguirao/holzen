@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { hapticFeedback } from '@/lib/haptics';
+import { getSessionQuote } from '@/lib/wisdom-quotes';
 
 type Phase = { labelKey: string; duration: number };
 
@@ -46,6 +47,7 @@ interface Props {
 export function PauseBreathing({ mantra, severity = 'mild', onContinue }: Props) {
   const { t } = useTranslation();
   const prefersReduced = useReducedMotion();
+  const quote = useMemo(() => getSessionQuote(), []);
 
   const patternIndex = severity === 'high' ? 1 : 0;
   const pattern = PATTERNS[patternIndex];
@@ -128,6 +130,20 @@ export function PauseBreathing({ mantra, severity = 'mild', onContinue }: Props)
                 "{mantra}"
               </motion.p>
             )}
+            {/* Wisdom quote */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: mantra ? 2.5 : 1.2, duration: 2 }}
+              className="flex flex-col items-center gap-1.5 max-w-[280px]"
+            >
+              <p className="text-[11px] font-mono text-muted-foreground/20 italic leading-relaxed text-center">
+                "{quote.text}"
+              </p>
+              <p className="text-[9px] font-mono text-muted-foreground/15 tracking-[0.1em]">
+                — {quote.author}
+              </p>
+            </motion.div>
           </div>
 
           <motion.button
