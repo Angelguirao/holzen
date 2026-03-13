@@ -36,9 +36,9 @@ const ringColors: Record<VolatilityLevel, string> = {
 };
 
 const textColors: Record<VolatilityLevel, string> = {
-  calm: 'hsla(180, 30%, 70%, 0.6)',
-  moderate: 'hsla(35, 40%, 70%, 0.6)',
-  intense: 'hsla(350, 35%, 70%, 0.6)',
+  calm: 'hsla(180, 30%, 75%, 0.8)',
+  moderate: 'hsla(35, 40%, 75%, 0.8)',
+  intense: 'hsla(350, 35%, 75%, 0.8)',
 };
 
 const BREATH_DURATION = 8;
