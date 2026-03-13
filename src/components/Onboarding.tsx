@@ -89,6 +89,14 @@ export function Onboarding({ onComplete }: Props) {
               )}
 
               {step === 1 && (
+                <OnboardingGrounding
+                  selected={groundingActivities}
+                  onToggle={toggleGrounding}
+                  stagger={stagger}
+                />
+              )}
+
+              {step === 2 && (
                 <OnboardingThreshold
                   threshold={threshold}
                   onThresholdChange={setThreshold}
@@ -96,7 +104,7 @@ export function Onboarding({ onComplete }: Props) {
                 />
               )}
 
-              {step === 2 && (
+              {step === 3 && (
                 <OnboardingDemo stagger={stagger} />
               )}
             </motion.div>
