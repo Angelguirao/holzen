@@ -293,7 +293,7 @@ const Landing = () => {
                   { label: 'Gross (1998). Integrative review', url: 'https://doi.org/10.1037/1089-2680.2.3.271' },
                 ]},
                 { key: 'Shift', icon: RefreshCw, sources: [
-                  { label: 'Flavell (1979). Metacognition', url: 'https://doi.org/10.1037/0003-066X.34.10.906' },
+                  { label: 'Flavell (1979). Metacognition', url: 'https://www.researchgate.net/publication/232599909_Metacognition_and_cognitive_monitoring_A_new_area_of_cognitive-developmental_inquiry' },
                 ]},
                 { key: 'Decide', icon: Target, sources: [
                   { label: 'Kahneman (2011). Thinking, Fast and Slow', url: 'https://us.macmillan.com/books/9780374533557/thinkingfastandslow' },

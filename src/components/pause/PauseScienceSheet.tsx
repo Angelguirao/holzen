@@ -53,7 +53,7 @@ const STEPS = [
     sources: [
       {
         label: 'Flavell, J. H. (1979). Metacognition and cognitive monitoring. American Psychologist, 34(10), 906–911.',
-        url: 'https://doi.org/10.1037/0003-066X.34.10.906',
+        url: 'https://www.researchgate.net/publication/232599909_Metacognition_and_cognitive_monitoring_A_new_area_of_cognitive-developmental_inquiry',
       },
     ],
   },
