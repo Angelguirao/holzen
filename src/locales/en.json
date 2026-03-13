@@ -859,6 +859,7 @@
   "badges": {
     "earned": "earned",
     "earnedCheck": "Earned ✓",
+    "proExclusive": "Unlock with Pro",
     "next": "Next",
     "categories": {
       "streak": "Consistency",
