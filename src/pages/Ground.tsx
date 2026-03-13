@@ -21,6 +21,7 @@ export default function Ground() {
   const [activity, setActivity] = useState<string>('');
   const [suggestion, setSuggestion] = useState<string>('');
   const [insight, setInsight] = useState<string | null>(null);
+  const [article, setArticle] = useState<{ snippet: string; url: string | null } | null>(null);
   const [suggestedDuration, setSuggestedDuration] = useState(10);
   const [selectedDuration, setSelectedDuration] = useState<number | null>(null);
   const [timeLeft, setTimeLeft] = useState(0);
