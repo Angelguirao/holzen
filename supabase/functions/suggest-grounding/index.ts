@@ -6,6 +6,52 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+async function searchRecentArticle(activity: string, langCode: string): Promise<{ title: string; url: string; snippet: string } | null> {
+  const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
+  if (!PERPLEXITY_API_KEY) return null;
+
+  try {
+    const query = `latest interesting discovery or technique about "${activity}" for wellbeing or mindfulness`;
+    const response = await fetch("https://api.perplexity.ai/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${PERPLEXITY_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "sonar",
+        messages: [
+          { role: "system", content: "Return a single recent, interesting finding or article about the given activity. Be concise — 1-2 sentences max." },
+          { role: "user", content: query },
+        ],
+        search_recency_filter: "month",
+      }),
+    });
+
+    if (!response.ok) {
+      console.error("Perplexity error:", response.status);
+      return null;
+    }
+
+    const data = await response.json();
+    const content = data.choices?.[0]?.message?.content || "";
+    const citations = data.citations || [];
+    const firstCitation = citations[0] || null;
+
+    if (content && firstCitation) {
+      return {
+        title: activity,
+        url: firstCitation,
+        snippet: content.slice(0, 300),
+      };
+    }
+    return content ? { title: activity, url: "", snippet: content.slice(0, 300) } : null;
+  } catch (e) {
+    console.error("Perplexity search failed:", e);
+    return null;
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -59,7 +105,8 @@ Rules:
 
     const userPrompt = `${context ? `Market context: ${context}\n` : ""}${mood ? `Current mood: ${mood}\n` : ""}${severity ? `Severity: ${severity}\n` : ""}Suggest the best grounding activity for this moment, and share something interesting about it.`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    // Run AI suggestion and Perplexity search in parallel (we'll search for all activities, then pick the right one after AI responds)
+    const aiPromise = fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${LOVABLE_API_KEY}`,
@@ -113,6 +160,8 @@ Rules:
       }),
     });
 
+    const response = await aiPromise;
+
     if (!response.ok) {
       if (response.status === 429) {
         return new Response(
@@ -136,11 +185,20 @@ Rules:
 
     if (toolCall?.function?.arguments) {
       const args = JSON.parse(toolCall.function.arguments);
+      const chosenActivity = args.activity;
+
+      // Now search Perplexity for a recent article about the chosen activity
+      const article = await searchRecentArticle(chosenActivity, langCode);
+
       return new Response(JSON.stringify({
-        activity: args.activity,
+        activity: chosenActivity,
         suggestion: args.suggestion,
         duration: args.duration,
         insight: args.insight || null,
+        article: article ? {
+          snippet: article.snippet,
+          url: article.url || null,
+        } : null,
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -153,6 +211,7 @@ Rules:
       suggestion: `Take a moment with ${fallbackActivity}. Sometimes the simplest thing is the most grounding.`,
       duration: 10,
       insight: null,
+      article: null,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
