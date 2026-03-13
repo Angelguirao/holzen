@@ -446,66 +446,66 @@ export default function Breathe() {
           <X className="h-5 w-5" />
         </button>
 
-        {/* Info button — opens explanation sheet */}
+        {/* Info button — top left, opens explanation sheet */}
         <Sheet>
           <SheetTrigger asChild>
             <button
-              className="absolute bottom-6 left-6 flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border border-border/20 bg-background/10 backdrop-blur-sm transition-opacity hover:opacity-90 z-[120]"
+              className="absolute top-6 left-6 flex items-center gap-1.5 px-3 py-2 rounded-full border border-border/20 bg-background/10 backdrop-blur-sm transition-opacity hover:opacity-90 z-[120]"
               style={{ color: textColors[level] }}
               aria-label={t('void.infoLabel', 'About this experience')}
               onClick={(e) => e.stopPropagation()}
             >
-              <Info className="h-3 w-3" />
-              <span className="font-mono text-[8px] tracking-[0.15em] uppercase opacity-60">
+              <Info className="h-3.5 w-3.5" />
+              <span className="font-mono text-[9px] tracking-[0.12em] uppercase">
                 {t('void.infoButton', 'what is this?')}
               </span>
             </button>
           </SheetTrigger>
-          <SheetContent side="bottom" className="bg-background/95 backdrop-blur-md border-border/30 z-[200] max-h-[70vh]">
-            <div className="max-w-md mx-auto py-4 space-y-5 overflow-y-auto max-h-[calc(70vh-3rem)] pb-8">
-              <p className="font-mono text-[10px] tracking-[0.25em] uppercase text-muted-foreground">
+          <SheetContent side="bottom" className="bg-background/95 backdrop-blur-md border-border/30 z-[200] max-h-[75vh]">
+            <div className="max-w-md mx-auto py-4 space-y-5 overflow-y-auto max-h-[calc(75vh-3rem)] pb-10">
+              <p className="font-mono text-[11px] tracking-[0.2em] uppercase text-foreground/60">
                 {t('void.guideTitle', 'Enter the stillness')}
               </p>
               <div className="space-y-4">
                 <div className="space-y-1.5">
-                  <p className="font-mono text-xs text-foreground/70 font-medium">
+                  <p className="font-mono text-sm text-foreground/80 font-medium">
                     {t('void.infoSurfaceTitle', 'Surface')}
                   </p>
-                  <p className="font-mono text-[11px] text-muted-foreground leading-relaxed">
+                  <p className="font-mono text-xs text-foreground/50 leading-relaxed">
                     {t('void.guideSurface', 'Breathe with the Bitcoin network. Block height, mempool, the rhythm of proof-of-work.')}
                   </p>
                 </div>
                 <div className="space-y-1.5">
-                  <p className="font-mono text-xs text-foreground/70 font-medium">
+                  <p className="font-mono text-sm text-foreground/80 font-medium">
                     {t('void.infoDeepTitle', 'Deeper')}
                   </p>
-                  <p className="font-mono text-[11px] text-muted-foreground leading-relaxed">
+                  <p className="font-mono text-xs text-foreground/50 leading-relaxed">
                     {t('void.guideDeep', 'Sit with the blockchain clock. Time since the last block. Contemplations. A singing bowl when a new block is found.')}
                   </p>
                 </div>
                 <div className="border-t border-border/30 pt-3 space-y-2.5">
-                  <p className="font-mono text-[10px] text-muted-foreground/60 uppercase tracking-wider">
+                  <p className="font-mono text-[11px] text-foreground/50 uppercase tracking-wider">
                     {t('void.infoDataTitle', 'What you see')}
                   </p>
-                  <ul className="space-y-2 text-[11px] font-mono text-muted-foreground">
+                  <ul className="space-y-2.5 text-xs font-mono text-foreground/50">
                     <li className="flex gap-2">
-                      <span className="text-primary/50 shrink-0">·</span>
+                      <span className="text-primary/60 shrink-0">·</span>
                       {t('void.infoBlockHeight', 'Block height — the latest confirmed block on the Bitcoin blockchain')}
                     </li>
                     <li className="flex gap-2">
-                      <span className="text-primary/50 shrink-0">·</span>
+                      <span className="text-primary/60 shrink-0">·</span>
                       {t('void.infoMempool', 'Pending transactions — unconfirmed transactions waiting in the mempool')}
                     </li>
                     <li className="flex gap-2">
-                      <span className="text-primary/50 shrink-0">·</span>
+                      <span className="text-primary/60 shrink-0">·</span>
                       {t('void.infoEpoch', 'Epoch arc — progress through the 2,016-block difficulty adjustment cycle')}
                     </li>
                     <li className="flex gap-2">
-                      <span className="text-primary/50 shrink-0">·</span>
+                      <span className="text-primary/60 shrink-0">·</span>
                       {t('void.infoFee', 'Fee pressure — current network demand in sat/vB')}
                     </li>
                     <li className="flex gap-2">
-                      <span className="text-primary/50 shrink-0">·</span>
+                      <span className="text-primary/60 shrink-0">·</span>
                       {t('void.infoTimeSince', 'Time since last block — how long since the network found the latest block (~10 min average)')}
                     </li>
                   </ul>
