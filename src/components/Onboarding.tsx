@@ -102,10 +102,6 @@ export function Onboarding({ onComplete }: Props) {
                   stagger={stagger}
                 />
               )}
-
-              {step === 3 && (
-                <OnboardingDemo stagger={stagger} />
-              )}
             </motion.div>
           </AnimatePresence>
         </div>
