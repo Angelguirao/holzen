@@ -711,8 +711,8 @@ export default function Breathe() {
                     transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut' }}
                   />
                   <p
-                    className="font-mono text-[10px] tracking-[0.2em] text-center max-w-[220px] leading-relaxed"
-                    style={{ color: textColors[level], opacity: 0.45 }}
+                    className="font-mono text-[11px] tracking-[0.2em] text-center max-w-[240px] leading-relaxed"
+                    style={{ color: textColors[level], opacity: 0.6 }}
                   >
                     {t('void.blockMined', 'A new block was found. {{height}}. Time moved forward.', { height: newBlockHeight.toLocaleString() })}
                   </p>
