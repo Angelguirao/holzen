@@ -263,19 +263,40 @@ export default function Ground() {
                   {suggestion}
                 </motion.p>
 
-                {insight && (
+                {(insight || article) && (
                   <motion.div
-                    className="mx-auto max-w-xs rounded-md border border-border/20 bg-muted/20 px-4 py-3"
+                    className="mx-auto max-w-xs rounded-md border border-border/20 bg-muted/20 px-4 py-3 space-y-2.5"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 1.0 }}
                   >
-                    <p className="text-[10px] font-mono text-muted-foreground/40 tracking-wider uppercase mb-1.5">
-                      {t('ground.didYouKnow', 'Did you know?')}
-                    </p>
-                    <p className="text-xs text-muted-foreground/60 leading-relaxed">
-                      {insight}
-                    </p>
+                    {insight && (
+                      <>
+                        <p className="text-[10px] font-mono text-muted-foreground/40 tracking-wider uppercase">
+                          {t('ground.didYouKnow', 'Did you know?')}
+                        </p>
+                        <p className="text-xs text-muted-foreground/60 leading-relaxed">
+                          {insight}
+                        </p>
+                      </>
+                    )}
+                    {article && (
+                      <div className="pt-1 border-t border-border/10">
+                        <p className="text-xs text-muted-foreground/50 leading-relaxed">
+                          {article.snippet}
+                        </p>
+                        {article.url && (
+                          <a
+                            href={article.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-block mt-1.5 text-[10px] font-mono text-primary/50 hover:text-primary/80 underline underline-offset-2 transition-colors"
+                          >
+                            {t('ground.readMore', 'Read more →')}
+                          </a>
+                        )}
+                      </div>
+                    )}
                   </motion.div>
                 )}
                 <motion.div
