@@ -107,14 +107,26 @@ export function LetterViewer({ letter, onClose }: Props) {
       return;
     }
 
-    if (prefersReducedMotion) {
+    // Only play the seal-breaking ceremony the first time a letter is opened
+    const seenKey = 'holzen_seen_letters';
+    const seen: string[] = JSON.parse(localStorage.getItem(seenKey) || '[]');
+    const alreadySeen = seen.includes(letter.id);
+
+    if (prefersReducedMotion || alreadySeen) {
       setPhase('revealed');
+      if (!alreadySeen) {
+        localStorage.setItem(seenKey, JSON.stringify([...seen, letter.id]));
+      }
       return;
     }
 
+    // First time — play ceremony then mark as seen
     setPhase('seal');
     const t1 = setTimeout(() => setPhase('cracking'), 800);
-    const t2 = setTimeout(() => setPhase('revealed'), 2200);
+    const t2 = setTimeout(() => {
+      setPhase('revealed');
+      localStorage.setItem(seenKey, JSON.stringify([...seen, letter.id]));
+    }, 2200);
     return () => { clearTimeout(t1); clearTimeout(t2); };
   }, [letter?.id, prefersReducedMotion]);
 
