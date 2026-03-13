@@ -17,7 +17,8 @@ import { useTheme } from 'next-themes';
 import { Moon, Sun } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { useState, useEffect, useCallback, forwardRef } from 'react';
+import { useState, useEffect, useCallback, forwardRef, useRef } from 'react';
+import { AutoSaveIndicator, useAutoSave } from '@/components/AutoSaveIndicator';
 import { Input } from '@/components/ui/input';
 import { useTranslation } from 'react-i18next';
 import {
@@ -110,6 +111,19 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
   const [btcMode, setBtcMode] = useState(() => localStorage.getItem('holzen_btc_mode') === 'true');
   const [latestVersion, setLatestVersion] = useState<string | null>(null);
   const [hasNewVersion, setHasNewVersion] = useState(false);
+  const { saveCount, triggerSave } = useAutoSave();
+  const initialLoadRef = useRef(true);
+
+  // Track profile-level setting changes to show auto-save indicator
+  useEffect(() => {
+    if (!profileLoaded) return;
+    if (initialLoadRef.current) {
+      initialLoadRef.current = false;
+      return;
+    }
+    triggerSave();
+  }, [threshold, thresholdDown, cumulativeThreshold, emailNotifications, reflectionTone, reflectionStyle, silentMode, cooldownHours, digestFrequency, customPrompt, quietHoursStart, quietHoursEnd, firstName, nightReflectionHour, aiInsightsEnabled, notifyBadges, mantra, currency, language, groundingActivities, companionPrefs]);
+
 
   useEffect(() => {
     supabase
@@ -237,9 +251,12 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
   return (
     <div ref={ref} className="space-y-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">
-          {t('settings.title')}
-        </h1>
+        <div className="flex items-center gap-2">
+          <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">
+            {t('settings.title')}
+          </h1>
+          <AutoSaveIndicator show={saveCount > 0} key={saveCount} />
+        </div>
         <button
           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
           className="text-muted-foreground hover:text-foreground transition-colors"
@@ -586,7 +603,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             </ProLock>
           </AccordionContent>
         </AccordionItem>
-
+  
 
         {/* 5. Notifications & Schedule */}
         <AccordionItem value="notifications" className="border border-border/40 rounded-md px-4">
