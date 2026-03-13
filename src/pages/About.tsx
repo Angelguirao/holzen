@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import { motion, useReducedMotion } from 'framer-motion';
-import { ArrowLeft, Wind, Heart, BookOpen, RefreshCw, Target } from 'lucide-react';
+import { ArrowLeft, Wind, Heart, BookOpen, RefreshCw, Target, ExternalLink } from 'lucide-react';
 import { PageMeta } from '@/components/PageMeta';
 import { PublicFooter } from '@/components/PublicFooter';
 
@@ -82,9 +82,6 @@ const About = () => {
             <p className="text-xs text-muted-foreground leading-relaxed">
               {t('about.researchBody4')}
             </p>
-            <p className="text-[10px] text-muted-foreground/70 leading-relaxed italic">
-              {t('about.researchCitation')}
-            </p>
           </div>
         </motion.div>
 
@@ -98,29 +95,53 @@ const About = () => {
               {t('about.pauseResearchIntro')}
             </p>
             {([
-              { key: 'Breathe', icon: Wind },
-              { key: 'Feel', icon: Heart },
-              { key: 'Reflect', icon: BookOpen },
-              { key: 'Shift', icon: RefreshCw },
-              { key: 'Decide', icon: Target },
-            ] as const).map(({ key, icon: Icon }) => (
+              { key: 'Breathe', icon: Wind, sources: [
+                { label: 'Porges (2011). The Polyvagal Theory', url: 'https://wwnorton.com/books/9780393707007' },
+                { label: 'Lehrer & Gevirtz (2014). HRV biofeedback', url: 'https://doi.org/10.3389/fpsyg.2014.00756' },
+              ]},
+              { key: 'Feel', icon: Heart, sources: [
+                { label: 'Lieberman et al. (2007). Affect labeling', url: 'https://doi.org/10.1111/j.1467-9280.2007.01916.x' },
+              ]},
+              { key: 'Reflect', icon: BookOpen, sources: [
+                { label: 'Gross (2002). Emotion regulation', url: 'https://www.guilford.com/books/Handbook-of-Emotions/Lewis-Haviland-Jones-Barrett/9781462536368' },
+                { label: 'Gross (1998). Integrative review', url: 'https://doi.org/10.1037/1089-2680.2.3.271' },
+              ]},
+              { key: 'Shift', icon: RefreshCw, sources: [
+                { label: 'Flavell (1979). Metacognition', url: 'https://www.researchgate.net/publication/232599909_Metacognition_and_cognitive_monitoring_A_new_area_of_cognitive-developmental_inquiry' },
+              ]},
+              { key: 'Decide', icon: Target, sources: [
+                { label: 'Kahneman (2011). Thinking, Fast and Slow', url: 'https://us.macmillan.com/books/9780374533557/thinkingfastandslow' },
+                { label: 'Kahneman & Tversky (1974). Heuristics and biases', url: 'https://doi.org/10.1126/science.185.4157.1124' },
+              ]},
+            ] as const).map(({ key, icon: Icon, sources }) => (
               <div key={key} className="flex gap-3">
                 <div className="mt-0.5 w-6 h-6 rounded-full bg-muted/60 flex items-center justify-center shrink-0">
                   <Icon className="h-3 w-3 text-muted-foreground/60" />
                 </div>
-                <div className="space-y-0.5">
+                <div className="space-y-1.5">
                   <p className="text-xs font-medium text-foreground">
                     {t(`about.pauseResearch${key}`)}
                   </p>
                   <p className="text-[11px] text-muted-foreground leading-relaxed">
                     {t(`about.pauseResearch${key}Desc`)}
                   </p>
+                  <div className="flex flex-wrap gap-x-3 gap-y-1">
+                    {sources.map((s) => (
+                      <a
+                        key={s.url}
+                        href={s.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-[9px] font-mono text-primary/60 hover:text-primary transition-colors"
+                      >
+                        <ExternalLink className="h-2.5 w-2.5 shrink-0" />
+                        {s.label}
+                      </a>
+                    ))}
+                  </div>
                 </div>
               </div>
             ))}
-            <p className="text-[10px] text-muted-foreground/70 leading-relaxed italic">
-              {t('about.pauseResearchCitation')}
-            </p>
           </div>
         </motion.div>
 
