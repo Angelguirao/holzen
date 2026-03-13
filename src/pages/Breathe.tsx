@@ -7,6 +7,8 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { hapticFeedback } from '@/lib/haptics';
 import { fetchBtcData, type BtcPriceData } from '@/lib/btc';
 import { playBlockDiscoveryTone, startAmbientDrone } from '@/lib/notification-tone';
+import { useProGate } from '@/hooks/use-pro-gate';
+import { ProLock } from '@/components/ProLock';
 
 type VolatilityLevel = 'calm' | 'moderate' | 'intense';
 
@@ -238,6 +240,7 @@ export default function Breathe() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const prefersReducedMotion = useReducedMotion();
+  const { isPro, isPending } = useProGate();
 
   const [btcData, setBtcData] = useState<BtcPriceData | null>(null);
   const [blockData, setBlockData] = useState<BlockData | null>(null);
@@ -246,7 +249,7 @@ export default function Breathe() {
 
   // Depth: 0 = surface ambient, 1 = deep void
   const [depth, setDepth] = useState(0);
-  const [deepReady, setDeepReady] = useState(false); // animation settled into deep mode
+  const [deepReady, setDeepReady] = useState(false);
 
   // Deep state
   const [contemplationIndex, setContemplationIndex] = useState(0);
@@ -262,11 +265,11 @@ export default function Breathe() {
   const stopDroneRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
+    if (!isPro) return;
     const timer = setTimeout(() => setCurtainLifted(true), 100);
     return () => clearTimeout(timer);
-  }, []);
+  }, [isPro]);
 
-  // Fetch BTC + block data
   const loadData = useCallback(async () => {
     const [btc, block] = await Promise.all([
       fetchBtcData().catch(() => null),
@@ -281,20 +284,21 @@ export default function Breathe() {
   }, []);
 
   useEffect(() => {
+    if (!isPro) return;
     loadData();
     const interval = setInterval(loadData, 30_000);
     return () => clearInterval(interval);
-  }, [loadData]);
+  }, [loadData, isPro]);
 
-  // Hide nav + prevent scroll
   useEffect(() => {
+    if (!isPro) return;
     document.body.classList.add('ambient-active');
     document.body.style.overflow = 'hidden';
     return () => {
       document.body.classList.remove('ambient-active');
       document.body.style.overflow = '';
     };
-  }, []);
+  }, [isPro]);
 
   // Deep: tick time-since-last-block every second
   useEffect(() => {
@@ -407,6 +411,25 @@ export default function Breathe() {
   const surfaceOpacity = depth === 0 ? 1 : 0;
   // Deep elements opacity
   const deepOpacity = depth === 1 ? 1 : 0;
+
+  // Gate non-Pro users (after all hooks)
+  if (!isPending && !isPro) {
+    return (
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background">
+        <div className="max-w-sm px-6">
+          <ProLock feature="stillness" hideContent>
+            <div />
+          </ProLock>
+          <button
+            onClick={() => navigate(-1)}
+            className="mt-6 w-full text-center text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
+          >
+            {t('common.back')}
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
