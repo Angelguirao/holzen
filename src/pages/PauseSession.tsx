@@ -157,6 +157,11 @@ export default function PauseSession() {
     setMoodDone(true);
   }, []);
 
+  const handleMoodReset = useCallback(() => {
+    setMoodDone(false);
+    setSelectedMood(null);
+  }, []);
+
   const handleMoodAfterSelect = useCallback(async (mood: MoodValue) => {
     hapticFeedback('light');
     setMoodAfterDone(true);
@@ -168,6 +173,11 @@ export default function PauseSession() {
 
   const handleMoodAfterSkip = useCallback(() => {
     setMoodAfterDone(true);
+  }, []);
+
+  const handleMoodAfterReset = useCallback(() => {
+    setMoodAfterDone(false);
+    setSelectedMoodAfter(null);
   }, []);
 
   const toggleFavorite = useCallback(async () => {
@@ -305,6 +315,7 @@ export default function PauseSession() {
                   <PauseFeel
                     onMoodSelect={handleMoodSelect}
                     onMoodSkip={handleMoodSkip}
+                    onMoodReset={handleMoodReset}
                     moodDone={moodDone}
                     selectedMood={selectedMood}
                     onContinue={() => goToStep('reflect')}
@@ -336,6 +347,7 @@ export default function PauseSession() {
                   <PauseShift
                     onMoodAfterSelect={handleMoodAfterSelect}
                     onMoodAfterSkip={handleMoodAfterSkip}
+                    onMoodAfterReset={handleMoodAfterReset}
                     moodAfterDone={moodAfterDone}
                     selectedMoodAfter={selectedMoodAfter}
                     onContinue={() => goToStep('decide')}

@@ -7,13 +7,14 @@ import { MoodIcon } from '@/components/icons/MoodIcon';
 interface Props {
   onMoodSelect: (mood: MoodValue) => void;
   onMoodSkip: () => void;
+  onMoodReset: () => void;
   moodDone: boolean;
   selectedMood?: MoodValue | null;
   onContinue: () => void;
   onBack?: () => void;
 }
 
-export function PauseFeel({ onMoodSelect, onMoodSkip, moodDone, selectedMood, onContinue, onBack }: Props) {
+export function PauseFeel({ onMoodSelect, onMoodSkip, onMoodReset, moodDone, selectedMood, onContinue, onBack }: Props) {
   const { t } = useTranslation();
 
   return (
@@ -52,16 +53,30 @@ export function PauseFeel({ onMoodSelect, onMoodSkip, moodDone, selectedMood, on
           transition={{ duration: 0.6 }}
         >
           {selectedMood ? (
-            <>
-              <MoodIcon mood={selectedMood} size={28} className="text-muted-foreground/60" />
-              <p className="text-xs font-mono text-muted-foreground/50 tracking-wide">
+            <button
+              onClick={onMoodReset}
+              className="flex flex-col items-center gap-2 group"
+            >
+              <MoodIcon mood={selectedMood} size={28} className="text-muted-foreground/60 group-hover:text-muted-foreground transition-colors" />
+              <p className="text-xs font-mono text-muted-foreground/50 tracking-wide group-hover:text-muted-foreground transition-colors">
                 {t(`moodCheck.moods.${selectedMood}`)}
               </p>
-            </>
+              <p className="text-[9px] font-mono text-muted-foreground/25 group-hover:text-muted-foreground/50 transition-colors">
+                {t('pause.tapToChange', 'tap to change')}
+              </p>
+            </button>
           ) : (
-            <p className="text-[11px] font-mono text-muted-foreground/30 tracking-[0.15em] uppercase">
-              {t('common.skipped', 'Skipped')}
-            </p>
+            <button
+              onClick={onMoodReset}
+              className="group flex flex-col items-center gap-1"
+            >
+              <p className="text-[11px] font-mono text-muted-foreground/30 tracking-[0.15em] uppercase group-hover:text-muted-foreground/50 transition-colors">
+                {t('common.skipped', 'Skipped')}
+              </p>
+              <p className="text-[9px] font-mono text-muted-foreground/25 group-hover:text-muted-foreground/50 transition-colors">
+                {t('pause.tapToChange', 'tap to change')}
+              </p>
+            </button>
           )}
           <button
             onClick={onContinue}
