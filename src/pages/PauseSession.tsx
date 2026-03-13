@@ -157,6 +157,11 @@ export default function PauseSession() {
     setMoodDone(true);
   }, []);
 
+  const handleMoodReset = useCallback(() => {
+    setMoodDone(false);
+    setSelectedMood(null);
+  }, []);
+
   const handleMoodAfterSelect = useCallback(async (mood: MoodValue) => {
     hapticFeedback('light');
     setMoodAfterDone(true);
