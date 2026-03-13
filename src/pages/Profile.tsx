@@ -17,6 +17,7 @@ import { ChartEmptyState } from '@/components/ChartEmptyState';
 import { StreakTimeline } from '@/components/StreakTimeline';
 import { AIInsightsPanel } from '@/components/AIInsightsPanel';
 import { ProLock } from '@/components/ProLock';
+import { LetterViewer } from '@/components/LetterViewer';
 
 import { BadgesPanel } from '@/components/BadgesPanel';
 import { MoodPriceChart } from '@/components/MoodPriceChart';
@@ -93,15 +94,24 @@ const Profile = () => {
   const { subscribed } = useSubscription();
   const location = useLocation();
   const locationTab = (location.state as any)?.tab;
+  const locationLetterId = (location.state as any)?.letterId;
   const [reflections, setReflections] = useState<Reflection[]>([]);
   const [letters, setLetters] = useState<Letter[]>([]);
   const [practiceEntries, setPracticeEntries] = useState<PracticeEntry[]>([]);
   const [loading, setLoading] = useState(true);
   const [lettersLoading, setLettersLoading] = useState(true);
+  const [viewingLetter, setViewingLetter] = useState<Letter | null>(null);
   const [tab, setTab] = useState<'stats' | 'insights' | 'badges' | 'letters' | 'activity'>(
     ['stats', 'insights', 'badges', 'letters', 'activity'].includes(locationTab) ? locationTab : 'stats'
   );
 
+  // Open letter viewer when navigating from notification
+  useEffect(() => {
+    if (locationLetterId && letters.length > 0) {
+      const found = letters.find((l) => l.id === locationLetterId && l.delivered);
+      if (found) setViewingLetter(found);
+    }
+  }, [locationLetterId, letters]);
   useEffect(() => {
     document.title = 'Holzen — Profile';
     return () => { document.title = 'Holzen — Pause before you act'; };
@@ -265,7 +275,7 @@ const Profile = () => {
                     </p>
                   </div>
                   {deliveredLetters.map((l) => (
-                    <LetterCard key={l.id} letter={l} onDelete={deleteLetter} fmtPrice={fmtPrice} type="delivered" />
+                    <LetterCard key={l.id} letter={l} onDelete={deleteLetter} fmtPrice={fmtPrice} type="delivered" onView={() => setViewingLetter(l)} />
                   ))}
                 </div>
               )}
@@ -273,6 +283,8 @@ const Profile = () => {
           )}
         </ProLock>
       )}
+
+      <LetterViewer letter={viewingLetter} onClose={() => setViewingLetter(null)} />
     </div>
   );
 };
@@ -507,19 +519,23 @@ function StatsSection({ label, children }: { label: string; children: React.Reac
     </div>
   );
 }
-function LetterCard({ letter: l, onDelete, fmtPrice, type }: {
+function LetterCard({ letter: l, onDelete, fmtPrice, type, onView }: {
   letter: Letter;
   onDelete: (id: string) => void;
   fmtPrice: (p: number) => string;
   type: 'sealed' | 'delivered';
+  onView?: () => void;
 }) {
   const { t } = useTranslation();
   const isDelivered = type === 'delivered';
 
   return (
-    <div className={`rounded-md border px-4 py-3 space-y-2 ${
-      isDelivered ? 'border-primary/20 bg-primary/5' : 'border-border/60 bg-muted/30'
-    }`}>
+    <div
+      className={`rounded-md border px-4 py-3 space-y-2 ${
+        isDelivered ? 'border-primary/20 bg-primary/5 cursor-pointer hover:bg-primary/8 transition-colors' : 'border-border/60 bg-muted/30'
+      }`}
+      onClick={isDelivered && onView ? onView : undefined}
+    >
       <div className="flex items-start justify-between gap-2">
         {isDelivered ? (
           <div className="flex items-center gap-2">
