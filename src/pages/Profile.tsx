@@ -107,6 +107,35 @@ const Profile = () => {
 
   // Track whether we're waiting to open a letter from a notification
   const [letterViewerPending, setLetterViewerPending] = useState(!!locationLetterId);
+
+  // Keep tab in sync with navigation state (important when already on /profile)
+  useEffect(() => {
+    if (locationTab && ['stats', 'insights', 'badges', 'letters', 'activity'].includes(locationTab)) {
+      setTab(locationTab as 'stats' | 'insights' | 'badges' | 'letters' | 'activity');
+    }
+  }, [locationTab]);
+
+  // Handle opening a specific letter when navigation state changes on the same route
+  useEffect(() => {
+    if (!locationLetterId) {
+      setLetterViewerPending(false);
+      return;
+    }
+
+    const found = letters.find((l) => l.id === locationLetterId && l.delivered);
+    if (found) {
+      setViewingLetter(found);
+      setLetterViewerPending(false);
+      return;
+    }
+
+    if (lettersLoading) {
+      setLetterViewerPending(true);
+    } else {
+      setLetterViewerPending(false);
+    }
+  }, [locationLetterId, letters, lettersLoading]);
+
   useEffect(() => {
     document.title = 'Holzen — Profile';
     return () => { document.title = 'Holzen — Pause before you act'; };
