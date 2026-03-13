@@ -126,9 +126,6 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
         setValidationError(null);
       }
     }
-    } else {
-      setValidationError(null);
-    }
   };
 
   const saveGoal = async () => {
