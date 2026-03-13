@@ -636,21 +636,21 @@ export default function Breathe() {
               >
                 <p
                   className="font-mono text-sm tabular-nums tracking-wider"
-                  style={{ color: textColors[level], opacity: 0.35 }}
+                  style={{ color: textColors[level], opacity: 0.25 }}
                 >
                   {formatTimeSince(timeSinceBlock)}
                 </p>
                 <p
                   className="font-mono text-[8px] tracking-[0.2em] uppercase"
-                  style={{ color: textColors[level], opacity: 0.2 }}
+                  style={{ color: textColors[level], opacity: 0.15 }}
                 >
                   {t('void.sinceLastBlock', 'since last block')}
                 </p>
                 <motion.p
                   className="font-mono text-[7px] tracking-[0.15em] italic"
-                  style={{ color: textColors[level], opacity: 0.18 }}
+                  style={{ color: textColors[level], opacity: 0.12 }}
                   initial={{ opacity: 0 }}
-                  animate={{ opacity: 0.18 }}
+                  animate={{ opacity: 0.12 }}
                   transition={{ delay: 3, duration: 1.5 }}
                 >
                   {timeSinceBlock > 1200
