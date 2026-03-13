@@ -100,6 +100,7 @@ const Home = () => {
     firstName,
     currency,
     groundingActivities,
+    profileLoaded,
   } = useHolzen();
 
   const { reflection: nightReflection, dismiss: dismissNight } = useNightReflection();
