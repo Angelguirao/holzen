@@ -315,6 +315,7 @@ export default function PauseSession() {
                   <PauseFeel
                     onMoodSelect={handleMoodSelect}
                     onMoodSkip={handleMoodSkip}
+                    onMoodReset={handleMoodReset}
                     moodDone={moodDone}
                     selectedMood={selectedMood}
                     onContinue={() => goToStep('reflect')}
