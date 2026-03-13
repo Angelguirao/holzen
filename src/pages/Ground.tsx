@@ -11,19 +11,6 @@ import { MoodCheck } from '@/components/MoodCheck';
 
 type Phase = 'loading' | 'suggestion' | 'timer' | 'checkin' | 'done';
 
-const ACTIVITY_ICONS: Record<string, string> = {
-  running: '🏃',
-  walking: '🚶',
-  music: '🎵',
-  cooking: '🍳',
-  meditation: '🧘',
-  breathwork: '🌬️',
-  reading: '📖',
-  journaling: '✍️',
-  nature: '🌿',
-  exercise: '💪',
-};
-
 export default function Ground() {
   const { t } = useTranslation();
   const navigate = useNavigate();
