@@ -275,7 +275,7 @@ const Profile = () => {
                     </p>
                   </div>
                   {deliveredLetters.map((l) => (
-                    <LetterCard key={l.id} letter={l} onDelete={deleteLetter} fmtPrice={fmtPrice} type="delivered" />
+                    <LetterCard key={l.id} letter={l} onDelete={deleteLetter} fmtPrice={fmtPrice} type="delivered" onView={() => setViewingLetter(l)} />
                   ))}
                 </div>
               )}
