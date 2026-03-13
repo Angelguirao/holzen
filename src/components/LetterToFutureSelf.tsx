@@ -5,7 +5,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useHolzen } from '@/hooks/use-holzen';
 import { formatBtcPrice } from '@/lib/btc';
 import { Button } from '@/components/ui/button';
-import { Textarea } from '@/components/ui/textarea';
+import { WritingField } from '@/components/WritingField';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Mail, Send, Info } from 'lucide-react';
 import { toast } from 'sonner';
@@ -359,12 +359,12 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
                 ? t('letter.crashDesc')
                 : t('letter.surgeDesc')}
           </p>
-          <Textarea
+          <WritingField
             value={body}
-            onChange={(e) => setBody(e.target.value)}
+            onChange={setBody}
             placeholder={randomPrompt}
-            className="text-xs font-mono min-h-[80px] resize-none bg-background/50"
             maxLength={500}
+            minRows={3}
           />
           <div className="flex items-center justify-between">
             <p className="text-[10px] text-muted-foreground/40">{body.length}/500</p>
