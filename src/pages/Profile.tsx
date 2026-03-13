@@ -283,6 +283,8 @@ const Profile = () => {
           )}
         </ProLock>
       )}
+
+      <LetterViewer letter={viewingLetter} onClose={() => setViewingLetter(null)} />
     </div>
   );
 };
