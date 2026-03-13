@@ -63,6 +63,7 @@ const App = () => (
           <Sonner />
           <OfflineBanner />
           <BrowserRouter>
+            <ScrollToTop />
             <CookieConsent />
             <AuthProvider>
               <Routes>
