@@ -624,12 +624,13 @@ export default function Breathe() {
             {feeHeat > 0.2 && (
               <motion.p
                 className="font-mono text-[7px] tracking-[0.15em]"
-                style={{ color: textColors[level], opacity: 0.1 }}
+                style={{ color: textColors[level], opacity: 0.18 }}
                 initial={{ opacity: 0 }}
-                animate={{ opacity: 0.1 }}
+                animate={{ opacity: 0.18 }}
                 transition={{ delay: 8, duration: 2 }}
               >
                 {t('void.feePressure', 'fee pressure: {{fee}} sat/vB', { fee: blockData?.fastestFee })}
+                <span style={{ opacity: 0.6 }}> · {t('void.feeHint', 'network demand')}</span>
               </motion.p>
             )}
 
