@@ -446,54 +446,55 @@ export default function Breathe() {
           <X className="h-5 w-5" />
         </button>
 
-        {/* First-visit guide */}
-        <AnimatePresence>
-          {showGuide && curtainLifted && (
-            <motion.div
-              className="absolute inset-0 z-[115] flex items-center justify-center"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 1.5, delay: 2 }}
+        {/* Info button — opens explanation sheet */}
+        <Sheet>
+          <SheetTrigger asChild>
+            <button
+              className="absolute bottom-6 right-6 p-2 rounded-full transition-opacity hover:opacity-80 z-[110]"
+              style={{ color: textColors[level], opacity: 0.3 }}
+              aria-label={t('void.infoLabel', 'About this experience')}
             >
-              <motion.div
-                className="max-w-[280px] text-center space-y-5"
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 1.2, delay: 2.5 }}
-              >
-                <p
-                  className="font-mono text-[10px] tracking-[0.25em] uppercase"
-                  style={{ color: textColors[level], opacity: 0.5 }}
-                >
-                  {t('void.guideTitle', 'Enter the stillness')}
-                </p>
-                <div className="space-y-3">
-                  <p
-                    className="font-mono text-[11px] leading-relaxed"
-                    style={{ color: textColors[level], opacity: 0.4 }}
-                  >
-                    {t('void.guideSurface', 'Surface — breathe with the Bitcoin network. Block height, mempool, the rhythm of proof-of-work.')}
+              <Info className="h-4 w-4" />
+            </button>
+          </SheetTrigger>
+          <SheetContent side="bottom" className="bg-background/95 backdrop-blur-md border-border/30 max-h-[60vh]">
+            <div className="max-w-md mx-auto py-4 space-y-5">
+              <p className="font-mono text-[10px] tracking-[0.25em] uppercase text-muted-foreground">
+                {t('void.guideTitle', 'Enter the stillness')}
+              </p>
+              <div className="space-y-3">
+                <div className="space-y-1">
+                  <p className="font-mono text-xs text-foreground/70 font-medium">
+                    {t('void.infoSurfaceTitle', 'Surface')}
                   </p>
-                  <p
-                    className="font-mono text-[11px] leading-relaxed"
-                    style={{ color: textColors[level], opacity: 0.4 }}
-                  >
-                    {t('void.guideDeep', 'Deeper — sit with the blockchain clock. Time since the last block. Contemplations. A singing bowl when a new block is found.')}
+                  <p className="font-mono text-[11px] text-muted-foreground leading-relaxed">
+                    {t('void.guideSurface', 'Breathe with the Bitcoin network. Block height, mempool, the rhythm of proof-of-work.')}
                   </p>
                 </div>
-                <button
-                  onClick={dismissGuide}
-                  className="font-mono text-[9px] tracking-[0.2em] uppercase underline underline-offset-4 transition-opacity hover:opacity-80"
-                  style={{ color: textColors[level], opacity: 0.35 }}
-                >
-                  {t('void.guideBegin', 'begin')}
-                </button>
-              </motion.div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+                <div className="space-y-1">
+                  <p className="font-mono text-xs text-foreground/70 font-medium">
+                    {t('void.infoDeepTitle', 'Deeper')}
+                  </p>
+                  <p className="font-mono text-[11px] text-muted-foreground leading-relaxed">
+                    {t('void.guideDeep', 'Sit with the blockchain clock. Time since the last block. Contemplations. A singing bowl when a new block is found.')}
+                  </p>
+                </div>
+                <div className="border-t border-border/30 pt-3 space-y-2">
+                  <p className="font-mono text-[10px] text-muted-foreground/60 uppercase tracking-wider">
+                    {t('void.infoDataTitle', 'What you see')}
+                  </p>
+                  <ul className="space-y-1.5 text-[11px] font-mono text-muted-foreground">
+                    <li>{t('void.infoBlockHeight', 'Block height — the latest confirmed block on the Bitcoin blockchain')}</li>
+                    <li>{t('void.infoMempool', 'Pending transactions — unconfirmed transactions waiting in the mempool')}</li>
+                    <li>{t('void.infoEpoch', 'Epoch arc — progress through the 2,016-block difficulty adjustment cycle')}</li>
+                    <li>{t('void.infoFee', 'Fee pressure — current network demand in sat/vB')}</li>
+                    <li>{t('void.infoTimeSince', 'Time since last block — how long since the network found the latest block (~10 min average)')}</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </SheetContent>
+        </Sheet>
 
 
         <button
