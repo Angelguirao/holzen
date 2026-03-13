@@ -64,6 +64,7 @@ export default function Ground() {
         setSuggestion(data.suggestion);
         setSuggestedDuration(data.duration || 10);
         setInsight(data.insight || null);
+        setArticle(data.article || null);
         setPhase('suggestion');
       } catch {
         // Fallback: pick random activity
