@@ -7,13 +7,14 @@ import { MoodIcon } from '@/components/icons/MoodIcon';
 interface Props {
   onMoodAfterSelect: (mood: MoodValue) => void;
   onMoodAfterSkip: () => void;
+  onMoodAfterReset: () => void;
   moodAfterDone: boolean;
   selectedMoodAfter?: MoodValue | null;
   onContinue: () => void;
   onBack?: () => void;
 }
 
-export function PauseShift({ onMoodAfterSelect, onMoodAfterSkip, moodAfterDone, selectedMoodAfter, onContinue, onBack }: Props) {
+export function PauseShift({ onMoodAfterSelect, onMoodAfterSkip, onMoodAfterReset, moodAfterDone, selectedMoodAfter, onContinue, onBack }: Props) {
   const { t } = useTranslation();
 
   return (
@@ -52,16 +53,30 @@ export function PauseShift({ onMoodAfterSelect, onMoodAfterSkip, moodAfterDone, 
           transition={{ duration: 0.6 }}
         >
           {selectedMoodAfter ? (
-            <>
-              <MoodIcon mood={selectedMoodAfter} size={28} className="text-muted-foreground/60" />
-              <p className="text-xs font-mono text-muted-foreground/50 tracking-wide">
+            <button
+              onClick={onMoodAfterReset}
+              className="flex flex-col items-center gap-2 group"
+            >
+              <MoodIcon mood={selectedMoodAfter} size={28} className="text-muted-foreground/60 group-hover:text-muted-foreground transition-colors" />
+              <p className="text-xs font-mono text-muted-foreground/50 tracking-wide group-hover:text-muted-foreground transition-colors">
                 {t(`moodCheck.moods.${selectedMoodAfter}`)}
               </p>
-            </>
+              <p className="text-[9px] font-mono text-muted-foreground/25 group-hover:text-muted-foreground/50 transition-colors">
+                {t('pause.tapToChange', 'tap to change')}
+              </p>
+            </button>
           ) : (
-            <p className="text-[11px] font-mono text-muted-foreground/30 tracking-[0.15em] uppercase">
-              {t('common.skipped', 'Skipped')}
-            </p>
+            <button
+              onClick={onMoodAfterReset}
+              className="group flex flex-col items-center gap-1"
+            >
+              <p className="text-[11px] font-mono text-muted-foreground/30 tracking-[0.15em] uppercase group-hover:text-muted-foreground/50 transition-colors">
+                {t('common.skipped', 'Skipped')}
+              </p>
+              <p className="text-[9px] font-mono text-muted-foreground/25 group-hover:text-muted-foreground/50 transition-colors">
+                {t('pause.tapToChange', 'tap to change')}
+              </p>
+            </button>
           )}
           <button
             onClick={onContinue}
