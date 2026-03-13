@@ -247,7 +247,7 @@ const Profile = () => {
           <StatsContent reflections={reflections} practiceEntries={practiceEntries} memberSince={user?.created_at} />
         )
       ) : tab === 'insights' ? (
-        <ProLock feature="ai_insights">
+        <ProLock feature="ai_insights" hideContent>
           {loading ? (
             <div className="space-y-3">
               <Skeleton className="h-20 w-full rounded-md" />
