@@ -450,14 +450,15 @@ export default function Breathe() {
         <Sheet>
           <SheetTrigger asChild>
             <button
-              className="absolute bottom-6 right-6 p-2 rounded-full transition-opacity hover:opacity-80 z-[110]"
+              className="absolute bottom-6 right-6 p-2 rounded-full transition-opacity hover:opacity-80 z-[120]"
               style={{ color: textColors[level], opacity: 0.3 }}
               aria-label={t('void.infoLabel', 'About this experience')}
+              onClick={(e) => e.stopPropagation()}
             >
               <Info className="h-4 w-4" />
             </button>
           </SheetTrigger>
-          <SheetContent side="bottom" className="bg-background/95 backdrop-blur-md border-border/30 max-h-[60vh]">
+          <SheetContent side="bottom" className="bg-background/95 backdrop-blur-md border-border/30 max-h-[60vh] z-[200]">
             <div className="max-w-md mx-auto py-4 space-y-5">
               <p className="font-mono text-[10px] tracking-[0.25em] uppercase text-muted-foreground">
                 {t('void.guideTitle', 'Enter the stillness')}
