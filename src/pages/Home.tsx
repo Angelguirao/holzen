@@ -503,6 +503,11 @@ const Home = () => {
         );
 
       case 'breathe':
+        if (!subscribed) return (
+          <HomeWidget id="breathe" title={WIDGET_TITLES['breathe']} collapsed={collapsed['breathe']} onToggleCollapse={() => toggleCollapsed('breathe')}>
+            <ProLockedWidget onUpgrade={startCheckout} checkoutLoading={checkoutLoading} feature="stillness" />
+          </HomeWidget>
+        );
         return (
           <HomeWidget
             id="breathe"

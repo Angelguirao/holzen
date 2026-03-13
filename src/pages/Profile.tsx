@@ -270,7 +270,7 @@ const Profile = () => {
           <HistoryContent />
         </ProLock>
       ) : (
-        <ProLock feature="letters">
+        <ProLock feature="letters" hideContent>
           {lettersLoading || letterViewerPending ? (
             <div className="space-y-3">
               <Skeleton className="h-20 w-full rounded-md" />

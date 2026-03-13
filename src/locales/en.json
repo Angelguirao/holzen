@@ -1421,7 +1421,13 @@
     "desc_custom_prompt": "Shape your reflection experience with your own guiding instructions.",
     "desc_companions": "AI companions that offer unique perspectives alongside each reflection.",
     "desc_digest": "Weekly or daily email summaries of your emotional patterns.",
-    "desc_quiet_hours": "Set hours when Holzen won't send notifications."
+    "desc_quiet_hours": "Set hours when Holzen won't send notifications.",
+    "desc_stillness": "An immersive experience breathing with the Bitcoin network. Real-time blocks, contemplations, and ambient sound.",
+    "desc_emotional_patterns": "See how your moods correlate with price movements over time.",
+    "desc_decisions": "Track your decision quality, volatility tolerance, and composure trends.",
+    "desc_practice_stats": "Detailed practice analytics — sessions, types, and consistency.",
+    "desc_advanced_stats": "Deep analysis: mood shifts, scatter plots, and statistical trends.",
+    "desc_badges_pro": "Unlock exclusive Pro badges and track deeper milestones."
   },
   "triggerOverlay": {
     "readyToPause": "You paused. That's the hardest part.",
