@@ -65,14 +65,14 @@ export function OnboardingReady({
         </motion.div>
       )}
 
-      {/* What you get */}
+      {/* Free plan — what's included */}
       <motion.div className="space-y-3" {...stagger(0.25)}>
         <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-foreground/40">
-          {t('onboarding.ready.whatYouGet', 'What you get')}
+          {t('onboarding.ready.includedFree', 'Included free')}
         </p>
-        <div className="space-y-2.5">
+        <div className="space-y-2">
           {[
-            { icon: Wind, text: t('onboarding.ready.featurePauses', '{{count}} free pauses per month', { count: PRICING.freeReflectionsPerMonth }) },
+            { icon: Wind, text: t('onboarding.ready.featurePauses', '{{count}} pauses per month', { count: PRICING.freeReflectionsPerMonth }) },
             { icon: Brain, text: t('onboarding.ready.featureAI', 'AI companions in every pause') },
             { icon: Anchor, text: t('onboarding.ready.featureGrounding', 'Personalized grounding prompts') },
           ].map(({ icon: Icon, text }, i) => (
@@ -87,18 +87,19 @@ export function OnboardingReady({
       {/* CTAs */}
       <motion.div className="space-y-3 pt-2" {...stagger(0.4)}>
         <Button
-          onClick={onStartTrial}
-          disabled={checkoutLoading}
-          className="w-full font-mono text-xs h-10 gap-2"
+          onClick={onBeginFree}
+          variant="outline"
+          className="w-full font-mono text-xs h-10"
         >
-          <Sparkles className="h-3 w-3" />
-          {t('onboarding.ready.startTrial', 'Start {{days}}-day free trial', { days: PRICING.trialDays })}
+          {t('onboarding.ready.beginFree', 'Begin')}
         </Button>
         <button
-          onClick={onBeginFree}
-          className="w-full text-center text-[10px] font-mono text-muted-foreground/40 hover:text-foreground transition-colors py-2"
+          onClick={onStartTrial}
+          disabled={checkoutLoading}
+          className="w-full flex items-center justify-center gap-1.5 text-[10px] font-mono text-muted-foreground/50 hover:text-foreground transition-colors py-2"
         >
-          {t('onboarding.ready.beginFree', 'Continue with free plan →')}
+          <Sparkles className="h-2.5 w-2.5" />
+          {t('onboarding.ready.startTrial', 'Or unlock unlimited with a {{days}}-day free trial →', { days: PRICING.trialDays })}
         </button>
       </motion.div>
     </div>
