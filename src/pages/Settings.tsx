@@ -14,7 +14,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { useTheme } from 'next-themes';
-import { Moon, Sun } from 'lucide-react';
+import { Moon, Sun, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useState, useEffect, useCallback, forwardRef, useRef } from 'react';
@@ -646,12 +646,15 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                   <Label htmlFor="push-notif" className="text-xs font-mono text-muted-foreground">
                     {t('settings.pushNotifications')}
                   </Label>
-                  <Switch
-                    id="push-notif"
-                    checked={pushSubscribed}
-                    disabled={pushLoading}
-                    onCheckedChange={(checked) => checked ? pushSubscribe() : pushUnsubscribe()}
-                  />
+                  <div className="flex items-center gap-2">
+                    {pushLoading && <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />}
+                    <Switch
+                      id="push-notif"
+                      checked={pushSubscribed}
+                      disabled={pushLoading}
+                      onCheckedChange={(checked) => checked ? pushSubscribe() : pushUnsubscribe()}
+                    />
+                  </div>
                 </div>
               )}
             </div>
@@ -889,14 +892,14 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                   disabled={exporting}
                   className="text-xs font-mono text-muted-foreground underline"
                 >
-                  {exporting ? t('settings.exporting') : t('settings.exportJson')}
+                  {exporting ? <><Loader2 className="h-3 w-3 animate-spin inline mr-1" />{t('settings.exporting')}</> : t('settings.exportJson')}
                 </button>
                 <button
                   onClick={() => exportData('csv')}
                   disabled={exporting}
                   className="text-xs font-mono text-muted-foreground underline"
                 >
-                  {exporting ? t('settings.exporting') : t('settings.exportCsv')}
+                  {exporting ? <><Loader2 className="h-3 w-3 animate-spin inline mr-1" />{t('settings.exporting')}</> : t('settings.exportCsv')}
                 </button>
               </div>
             </div>
@@ -955,6 +958,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                     disabled={deleting}
                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90 font-mono text-xs"
                   >
+                    {deleting && <Loader2 className="h-3 w-3 animate-spin mr-1" />}
                     {deleting ? t('settings.deleting') : t('settings.deleteForever')}
                   </AlertDialogAction>
                 </AlertDialogFooter>
