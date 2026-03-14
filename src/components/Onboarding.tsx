@@ -5,6 +5,9 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { OnboardingWhy } from '@/components/onboarding/OnboardingWhy';
 import { OnboardingGrounding } from '@/components/onboarding/OnboardingGrounding';
 import { OnboardingThreshold } from '@/components/onboarding/OnboardingThreshold';
+import { useSubscription } from '@/hooks/use-subscription';
+import { PRICING } from '@/lib/pricing';
+import { Sparkles } from 'lucide-react';
 
 interface OnboardingResult {
   threshold: number;
@@ -23,6 +26,7 @@ const TOTAL_STEPS = 3;
 
 export function Onboarding({ onComplete }: Props) {
   const { t } = useTranslation();
+  const { startCheckout, checkoutLoading } = useSubscription();
   const [step, setStep] = useState(0);
   const [timezone] = useState(detectedTimezone);
   const [threshold, setThreshold] = useState(5);
@@ -173,6 +177,25 @@ export function Onboarding({ onComplete }: Props) {
             )}
           </div>
         </motion.div>
+
+        {/* Eager Pro trial CTA on last step */}
+        {step === TOTAL_STEPS - 1 && (
+          <motion.div
+            className="flex justify-center mt-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+          >
+            <button
+              onClick={() => startCheckout()}
+              disabled={checkoutLoading}
+              className="flex items-center gap-1.5 text-[10px] font-mono text-muted-foreground/40 hover:text-muted-foreground transition-colors"
+            >
+              <Sparkles className="h-2.5 w-2.5" />
+              <span>{t('onboarding.trialHint', { trialDays: PRICING.trialDays })}</span>
+            </button>
+          </motion.div>
+        )}
       </div>
     </div>
   );
