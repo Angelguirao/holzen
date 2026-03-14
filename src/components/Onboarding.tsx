@@ -177,6 +177,25 @@ export function Onboarding({ onComplete }: Props) {
             )}
           </div>
         </motion.div>
+
+        {/* Eager Pro trial CTA on last step */}
+        {step === TOTAL_STEPS - 1 && (
+          <motion.div
+            className="flex justify-center mt-4"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.8 }}
+          >
+            <button
+              onClick={() => startCheckout()}
+              disabled={checkoutLoading}
+              className="flex items-center gap-1.5 text-[10px] font-mono text-muted-foreground/40 hover:text-muted-foreground transition-colors"
+            >
+              <Sparkles className="h-2.5 w-2.5" />
+              <span>{t('onboarding.trialHint', { trialDays: PRICING.trialDays })}</span>
+            </button>
+          </motion.div>
+        )}
       </div>
     </div>
   );
