@@ -187,6 +187,8 @@ export default function Ground() {
         trigger_text: activity || null,
       };
       supabase.from('practice_entries').insert(entry).then(() => {});
+      // Clear cached suggestion — session completed
+      try { localStorage.removeItem(`holzen_ground_suggestion_${user.id}`); } catch { /* ignore */ }
     }
 
     setPhase('done');
