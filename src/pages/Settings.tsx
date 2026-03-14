@@ -899,7 +899,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                   disabled={exporting}
                   className="text-xs font-mono text-muted-foreground underline"
                 >
-                  {exporting ? t('settings.exporting') : t('settings.exportCsv')}
+                  {exporting ? <><Loader2 className="h-3 w-3 animate-spin inline mr-1" />{t('settings.exporting')}</> : t('settings.exportCsv')}
                 </button>
               </div>
             </div>
