@@ -156,9 +156,9 @@ const Auth = () => {
             <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} className="font-mono text-sm" />
           </div>
           {error && <p className="text-xs text-destructive font-mono">{error}</p>}
-          <Button type="submit" className="w-full font-mono text-xs" disabled={loading}>
+          <LoadingButton type="submit" className="w-full font-mono text-xs" loading={loading}>
             {view === 'sign-up' ? t('common.signUp') : t('common.signIn')}
-          </Button>
+          </LoadingButton>
         </form>
 
         {view === 'sign-up' && (
