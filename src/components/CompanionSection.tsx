@@ -297,13 +297,15 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
       .then(async ({ data: row }) => {
         if (cancelled) return;
         if (row?.learning_citation) {
-          setNudge({
+          const cachedNudge = {
             title: row.learning_title ?? '',
             body: row.learning_body ?? '',
             citation: row.learning_citation,
             url: row.learning_url ?? '',
-          });
+          };
+          setNudge(cachedNudge);
           setNudgeLoading(false);
+          autoSaveToLibrary({ title: cachedNudge.title, body: cachedNudge.body, sourceType: 'learning', sourceUrl: cachedNudge.url });
           return;
         }
 
