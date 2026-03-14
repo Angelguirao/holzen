@@ -484,19 +484,32 @@ const Home = () => {
           </HomeWidget>
         );
 
-      case 'ground':
+      case 'ground': {
         if (groundingActivities.length === 0) return null;
+        const isVolatile = severity === 'high' || severity === 'moderate';
+        const glowClass = isVolatile && subscribed
+          ? 'ring-1 ring-primary/15 shadow-[0_0_20px_-4px_hsl(var(--primary)/0.12)]'
+          : '';
+        // Auto-expand when volatile and user had it collapsed
+        const effectiveCollapsed = isVolatile && subscribed ? false : collapsed['ground'];
         return (
           <HomeWidget
             id="ground"
-            title={WIDGET_TITLES['ground']}
-            collapsed={collapsed['ground']}
+            title={isVolatile && subscribed
+              ? `${WIDGET_TITLES['ground']} · ${t('home.groundNudge', 'maybe now?')}`
+              : WIDGET_TITLES['ground']}
+            collapsed={effectiveCollapsed}
             onToggleCollapse={() => toggleCollapsed('ground')}
+            className={glowClass}
           >
             <div className="space-y-3">
+              {isVolatile && subscribed && groundingData && (
+                <p className="text-[10px] font-mono text-primary/40 tracking-wider">
+                  {t('home.groundVolatileHint', 'The market is moving. A good moment to ground.')}
+                </p>
+              )}
               {subscribed && groundingData ? (
                 <>
-                  {/* Pre-generated suggestion preview */}
                   <div className="space-y-2">
                     <p className="text-[11px] text-foreground/60 leading-relaxed">
                       {groundingData.suggestion}
@@ -508,10 +521,14 @@ const Home = () => {
                   </div>
                   <button
                     onClick={() => navigate('/ground', { state: { preGenerated: groundingData } })}
-                    className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors duration-500"
+                    className={`w-full flex items-center justify-center gap-2 py-3 rounded-md border transition-colors duration-500 ${
+                      isVolatile
+                        ? 'border-primary/30 bg-primary/10 hover:bg-primary/15'
+                        : 'border-primary/20 bg-primary/5 hover:bg-primary/10'
+                    }`}
                   >
-                    <Anchor className="h-3 w-3 text-primary/50" />
-                    <span className="text-[10px] font-mono text-primary/50 tracking-[0.15em] uppercase">
+                    <Anchor className={`h-3 w-3 ${isVolatile ? 'text-primary/70' : 'text-primary/50'}`} />
+                    <span className={`text-[10px] font-mono tracking-[0.15em] uppercase ${isVolatile ? 'text-primary/70' : 'text-primary/50'}`}>
                       {t('home.groundYourself', 'Ground yourself')}
                     </span>
                   </button>
@@ -551,6 +568,7 @@ const Home = () => {
             </div>
           </HomeWidget>
         );
+      }
 
       case 'night':
         if (!nightReflection || !subscribed) return null;
