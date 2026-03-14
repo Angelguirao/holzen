@@ -111,7 +111,7 @@ const Auth = () => {
               <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="font-mono text-sm" />
             </div>
             {error && <p className="text-xs text-destructive font-mono">{error}</p>}
-            <Button type="submit" className="w-full font-mono text-xs" disabled={loading}>{t('auth.sendResetLink')}</Button>
+            <LoadingButton type="submit" className="w-full font-mono text-xs" loading={loading}>{t('auth.sendResetLink')}</LoadingButton>
           </form>
           <button onClick={() => { setView('sign-in'); setError(null); }} className="text-xs font-mono text-muted-foreground underline w-full text-center">{t('auth.backToSignIn')}</button>
         </div>
