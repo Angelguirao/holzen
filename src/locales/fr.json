@@ -322,8 +322,8 @@
     "learnFromHistory": "Apprendre de l'histoire →",
     "toggleCompanions": "Activez ou désactivez les compagnons dans les Paramètres.",
     "yourThreshold": "Votre seuil",
-    "thresholdQuestion": "De combien le BTC doit-il bouger en 24 heures avant que nous vous contactions ?",
-    "changeThresholdLater": "Vous pouvez changer cela plus tard."
+    "thresholdQuestion": "De combien Bitcoin doit-il bouger (hausse ou baisse) avant que vous souhaitiez faire une pause ?",
+    "changeThresholdLater": "Vous pourrez définir des seuils séparés pour hausse et baisse dans les Paramètres"
   },
   "moodCheck": {
     "howAreYouFeeling": "Comment vous sentez-vous maintenant ?",
