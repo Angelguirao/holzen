@@ -16,8 +16,12 @@ interface OnboardingResult {
   groundingActivities: string[];
 }
 
+interface OnboardingCompleteOptions {
+  setLocalOnboarded?: boolean;
+}
+
 interface Props {
-  onComplete: (result: OnboardingResult) => void;
+  onComplete: (result: OnboardingResult, options?: OnboardingCompleteOptions) => Promise<void> | void;
 }
 
 const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -32,6 +36,7 @@ export function Onboarding({ onComplete }: Props) {
   const [motivations, setMotivations] = useState<string[]>([]);
   const [groundingActivities, setGroundingActivities] = useState<string[]>([]);
   const [direction, setDirection] = useState(1);
+  const [startingTrial, setStartingTrial] = useState(false);
   const prefersReduced = useReducedMotion();
 
   const goTo = useCallback((next: number) => {
@@ -119,17 +124,24 @@ export function Onboarding({ onComplete }: Props) {
                     groundingActivities,
                   })}
                   onStartTrial={() => {
-                    // Save onboarding FIRST, then redirect to Stripe (same tab)
-                    onComplete({
-                      threshold,
-                      firstName: null,
-                      timezone,
-                      motivations,
-                      groundingActivities,
-                    });
-                    startCheckout();
+                    void (async () => {
+                      setStartingTrial(true);
+                      try {
+                        // Save onboarding first, but keep onboarding visible until redirect starts
+                        await onComplete({
+                          threshold,
+                          firstName: null,
+                          timezone,
+                          motivations,
+                          groundingActivities,
+                        }, { setLocalOnboarded: false });
+                        await startCheckout();
+                      } finally {
+                        setStartingTrial(false);
+                      }
+                    })();
                   }}
-                  checkoutLoading={checkoutLoading}
+                  checkoutLoading={checkoutLoading || startingTrial}
                   stagger={stagger}
                 />
               )}
