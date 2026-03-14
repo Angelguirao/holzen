@@ -958,6 +958,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                     disabled={deleting}
                     className="bg-destructive text-destructive-foreground hover:bg-destructive/90 font-mono text-xs"
                   >
+                    {deleting && <Loader2 className="h-3 w-3 animate-spin mr-1" />}
                     {deleting ? t('settings.deleting') : t('settings.deleteForever')}
                   </AlertDialogAction>
                 </AlertDialogFooter>
