@@ -4,6 +4,8 @@ import { useAuth } from '@/hooks/use-auth';
 import { PRICING } from '@/lib/pricing';
 
 const FREE_MONTHLY_LIMIT = PRICING.freeReflectionsPerMonth;
+const CHECKOUT_RETURN_KEY = 'holzen_checkout_started_at';
+const CHECKOUT_RETURN_WINDOW_MS = 30 * 60 * 1000;
 
 export function useSubscription() {
   const { user } = useAuth();
@@ -53,24 +55,28 @@ export function useSubscription() {
   }, [user]);
 
   useEffect(() => {
-    checkSubscription();
-    // Poll every 5 minutes instead of every minute — cache handles freshness
+    const params = new URLSearchParams(window.location.search);
+    const hasCheckoutQuery = params.get('subscribed') === 'true';
+    const checkoutStartedAt = Number(sessionStorage.getItem(CHECKOUT_RETURN_KEY) ?? 0);
+    const returnedFromRecentCheckout = checkoutStartedAt > 0 && (Date.now() - checkoutStartedAt) < CHECKOUT_RETURN_WINDOW_MS;
+    const shouldForce = hasCheckoutQuery || returnedFromRecentCheckout;
+
+    if (shouldForce) {
+      sessionStorage.removeItem(CHECKOUT_RETURN_KEY);
+    }
+
+    checkSubscription(shouldForce);
+
+    // Poll every 5 minutes — cache handles freshness
     const interval = setInterval(() => checkSubscription(), 5 * 60 * 1000);
-    // Force-refresh when tab regains focus (e.g. returning from Stripe)
+    // Force-refresh when tab regains focus (e.g. returning from checkout)
     const onFocus = () => checkSubscription(true);
     window.addEventListener('focus', onFocus);
+
     return () => {
       clearInterval(interval);
       window.removeEventListener('focus', onFocus);
     };
-  }, [checkSubscription]);
-
-  // Force-refresh after checkout success
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('subscribed') === 'true') {
-      checkSubscription(true);
-    }
   }, [checkSubscription]);
 
   const startCheckout = useCallback(async () => {
