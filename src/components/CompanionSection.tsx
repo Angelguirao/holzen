@@ -383,13 +383,15 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
       .then(async ({ data: row }) => {
         if (cancelled) return;
         if (row?.signal_source) {
-          setSignal({
+          const cachedSignal = {
             title: row.signal_title ?? '',
             body: row.signal_body ?? '',
             source: row.signal_source,
             url: row.signal_url ?? '',
-          });
+          };
+          setSignal(cachedSignal);
           setSignalLoading(false);
+          autoSaveToLibrary({ title: cachedSignal.title, body: cachedSignal.body, sourceType: 'signal', sourceUrl: cachedSignal.url });
           return;
         }
 
