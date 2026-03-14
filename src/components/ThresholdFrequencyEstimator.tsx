@@ -123,7 +123,7 @@ function computeStatsDaily(
   const crossings30d = last30.filter((c) => c >= effectiveThreshold).length;
   const crossings90d = dailyChanges.filter((c) => c >= effectiveThreshold).length;
   const avgDailyMove = dailyChanges.reduce((s, c) => s + c, 0) / dailyChanges.length;
-  return { crossings30d, crossings90d, avgDailyMove };
+  return { crossings30d, crossings90d, avgDailyMove, rawSignals30d: crossings30d };
 }
 
 /**
