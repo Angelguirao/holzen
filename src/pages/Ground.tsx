@@ -51,13 +51,27 @@ export default function Ground() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Fetch AI suggestion once
+  // Fetch AI suggestion — skip if pre-generated data was passed from Home
   useEffect(() => {
     if (fetchedRef.current) return;
     if (isPending) return;
     if (!isPro || groundingActivities.length === 0) return;
 
     fetchedRef.current = true;
+
+    // Use pre-generated data from Home if available
+    if (navState.preGenerated) {
+      const pg = navState.preGenerated;
+      setActivity(pg.activity);
+      setSuggestion(pg.suggestion);
+      const dur = pg.duration || 10;
+      setSuggestedDuration(dur);
+      setCustomDuration(dur);
+      setInsight(pg.insight || null);
+      setArticle(pg.article || null);
+      setPhase('suggestion');
+      return;
+    }
 
     const fetchSuggestion = async () => {
       try {
@@ -89,7 +103,7 @@ export default function Ground() {
     };
 
     fetchSuggestion();
-  }, [isPending, isPro, groundingActivities, btcData, severity, language, t]);
+  }, [isPending, isPro, groundingActivities, btcData, severity, language, t, navState.preGenerated]);
 
   // Timer
   useEffect(() => {
