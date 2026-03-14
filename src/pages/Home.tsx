@@ -105,6 +105,7 @@ const Home = () => {
     threshold,
     thresholdDown,
     cumulativeThreshold,
+    language,
     profileLoaded,
   } = useHolzen();
 
