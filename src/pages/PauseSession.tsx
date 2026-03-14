@@ -352,6 +352,7 @@ export default function PauseSession() {
                     selectedMoodAfter={selectedMoodAfter}
                     onContinue={() => goToStep('decide')}
                     onBack={goBack}
+                    groundingActivities={groundingActivities}
                   />
                 </motion.div>
               )}
