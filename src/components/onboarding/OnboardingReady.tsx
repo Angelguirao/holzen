@@ -110,8 +110,17 @@ export function OnboardingReady({
           disabled={checkoutLoading}
           className="w-full font-mono text-xs h-10 gap-2"
         >
-          <Sparkles className="h-3 w-3" />
-          {t('onboarding.ready.startTrial', 'Start {{days}}-day free trial', { days: PRICING.trialDays })}
+          {checkoutLoading ? (
+            <>
+              <Loader2 className="h-3 w-3 animate-spin" />
+              {t('onboarding.ready.redirecting', 'Redirecting to checkout…')}
+            </>
+          ) : (
+            <>
+              <Sparkles className="h-3 w-3" />
+              {t('onboarding.ready.startTrial', 'Start {{days}}-day free trial', { days: PRICING.trialDays })}
+            </>
+          )}
         </Button>
         <button
           onClick={onBeginFree}

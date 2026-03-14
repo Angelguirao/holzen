@@ -33,6 +33,11 @@ const Auth = () => {
     setLoading(true);
     try {
       if (view === 'sign-up') {
+        if (!SIGNUPS_ENABLED) {
+          setError(t('auth.signupsPaused', 'Signups are temporarily paused. Please try again later.'));
+          setLoading(false);
+          return;
+        }
         const { error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin } });
         if (error) throw error;
         setConfirmSent(true);
