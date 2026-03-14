@@ -604,15 +604,12 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           icon={COMPANION_ICONS.haiku}
           expanded={expandedHaiku}
           onToggle={() => {
-            if (!isPro) { requirePro('haiku'); return; }
             setExpandedHaiku((v) => !v);
             if (!completion.haiku) markCompleted('haiku');
           }}
           completed={completion.haiku}
-          isFavorite={favorites['haiku']}
-          onToggleFavorite={() => toggleCompanionFavorite('haiku')}
-          locked={!isPro}
-          onUpgrade={() => requirePro('haiku')}
+          isFavorite={isPro ? favorites['haiku'] : undefined}
+          onToggleFavorite={isPro ? () => toggleCompanionFavorite('haiku') : undefined}
         >
           <HaikuDisplay haiku={companions.haiku!} />
         </CompanionCard>
