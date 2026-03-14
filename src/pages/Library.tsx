@@ -62,15 +62,6 @@ export default function Library() {
     return result;
   }, [items, tab, sourceFilter, search]);
 
-  const handleAddNote = async (title: string, body: string, tags: string[]) => {
-    await library.addItem({
-      type: 'note',
-      title: title || null,
-      body,
-      source_type: 'reflection_note',
-      tags,
-    } as any);
-  };
 
   if (isPending) {
     return (
