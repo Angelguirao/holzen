@@ -3,6 +3,7 @@ import { Slider } from '@/components/ui/slider';
 import { Button } from '@/components/ui/button';
 import { ArrowUp, ArrowDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { ThresholdFrequencyEstimator } from '@/components/ThresholdFrequencyEstimator';
 
 interface Props {
   thresholdUp: number;
@@ -28,7 +29,8 @@ export const ThresholdSetting = forwardRef<HTMLDivElement, Props>(function Thres
 
   return (
     <div ref={ref} className="space-y-8">
-      {/* Daily threshold — UP */}
+      <ThresholdFrequencyEstimator threshold={upVal} />
+
       <div className="space-y-4">
         <div className="space-y-2">
           <div className="flex items-center gap-2">

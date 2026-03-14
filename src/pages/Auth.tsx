@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { useTranslation } from 'react-i18next';
+import { SIGNUPS_ENABLED } from '@/lib/signup-gate';
 
 type AuthView = 'sign-in' | 'sign-up' | 'forgot-password';
 
@@ -32,6 +33,11 @@ const Auth = () => {
     setLoading(true);
     try {
       if (view === 'sign-up') {
+        if (!SIGNUPS_ENABLED) {
+          setError(t('auth.signupsPaused', 'Signups are temporarily paused. Please try again later.'));
+          setLoading(false);
+          return;
+        }
         const { error } = await supabase.auth.signUp({ email, password, options: { emailRedirectTo: window.location.origin } });
         if (error) throw error;
         setConfirmSent(true);
