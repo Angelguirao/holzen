@@ -75,8 +75,9 @@ const Home = () => {
   useEffect(() => {
     if (searchParams.get('subscribed') === 'true') {
       refresh();
+      toast.success(t('pro.welcomeToast', '🎉 Welcome to Pro! All features are now unlocked.'));
     }
-  }, [searchParams, refresh]);
+  }, [searchParams, refresh, t]);
 
   const {
     btcData,
