@@ -118,8 +118,8 @@ export function Onboarding({ onComplete }: Props) {
                     motivations,
                     groundingActivities,
                   })}
-                  onStartTrial={async () => {
-                    await startCheckout();
+                  onStartTrial={() => {
+                    // Save onboarding FIRST, then redirect to Stripe (same tab)
                     onComplete({
                       threshold,
                       firstName: null,
@@ -127,6 +127,7 @@ export function Onboarding({ onComplete }: Props) {
                       motivations,
                       groundingActivities,
                     });
+                    startCheckout();
                   }}
                   checkoutLoading={checkoutLoading}
                   stagger={stagger}

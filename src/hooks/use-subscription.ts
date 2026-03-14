@@ -56,7 +56,13 @@ export function useSubscription() {
     checkSubscription();
     // Poll every 5 minutes instead of every minute — cache handles freshness
     const interval = setInterval(() => checkSubscription(), 5 * 60 * 1000);
-    return () => clearInterval(interval);
+    // Force-refresh when tab regains focus (e.g. returning from Stripe)
+    const onFocus = () => checkSubscription(true);
+    window.addEventListener('focus', onFocus);
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', onFocus);
+    };
   }, [checkSubscription]);
 
   // Force-refresh after checkout success
@@ -73,11 +79,11 @@ export function useSubscription() {
       const { data, error } = await supabase.functions.invoke('create-checkout');
       if (error) throw error;
       if (data?.url) {
-        window.open(data.url, '_blank');
+        // Redirect in same tab so ?subscribed=true comes back here
+        window.location.href = data.url;
       }
     } catch (e) {
       console.error('Checkout error:', e);
-    } finally {
       setCheckoutLoading(false);
     }
   }, []);
