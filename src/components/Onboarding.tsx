@@ -69,7 +69,7 @@ export function Onboarding({ onComplete }: Props) {
   }, []);
 
   return (
-    <div className="fixed inset-0 z-50 bg-background flex items-center justify-center p-6">
+    <div className="fixed inset-0 z-[60] bg-background flex items-center justify-center p-6">
       <div className="w-full max-w-sm">
         <div className="min-h-[440px] relative">
           <AnimatePresence mode="wait" custom={direction}>
