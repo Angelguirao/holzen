@@ -690,15 +690,12 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           icon={COMPANION_ICONS.history}
           expanded={expandedHistory}
           onToggle={() => {
-            if (!isPro) { requirePro('history'); return; }
             setExpandedHistory((v) => !v);
             if (!completion.history) markCompleted('history');
           }}
           completed={completion.history}
-          isFavorite={favorites['history_insight']}
-          onToggleFavorite={() => toggleCompanionFavorite('history_insight')}
-          locked={!isPro}
-          onUpgrade={() => requirePro('history')}
+          isFavorite={isPro ? favorites['history_insight'] : undefined}
+          onToggleFavorite={isPro ? () => toggleCompanionFavorite('history_insight') : undefined}
         >
           <HistoricalInsightDisplay
             data={historyInsight}
