@@ -117,6 +117,24 @@ const Home = () => {
   const prefersReducedMotion = useReducedMotion();
   const [reflectionCount, setReflectionCount] = useState(0);
 
+  // Grounding suggestion state (mirrors pause message pattern)
+  interface GroundingSuggestion {
+    activity: string;
+    suggestion: string;
+    duration: number;
+    insight: string | null;
+    article: { snippet: string; url: string | null } | null;
+  }
+  const groundStorageKey = user ? `holzen_ground_suggestion_${user.id}` : 'holzen_ground_suggestion';
+  const [groundSuggestion, setGroundSuggestion] = useState<GroundingSuggestion | null>(() => {
+    try {
+      const stored = localStorage.getItem(user ? `holzen_ground_suggestion_${user.id}` : 'holzen_ground_suggestion');
+      return stored ? JSON.parse(stored) : null;
+    } catch { return null; }
+  });
+  const [groundLoading, setGroundLoading] = useState(false);
+  const groundFetchingRef = useRef(false);
+
 
   // Widget layout
   const defaultOrder = useMemo(() => [...WIDGET_IDS], []);
