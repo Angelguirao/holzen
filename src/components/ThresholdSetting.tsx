@@ -12,6 +12,7 @@ interface Props {
   onSetDown: (val: number) => void;
   cumulativeThreshold: number;
   onSetCumulative: (val: number) => void;
+  cooldownHours?: number;
 }
 
 export const ThresholdSetting = forwardRef<HTMLDivElement, Props>(function ThresholdSetting(

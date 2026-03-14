@@ -4,6 +4,7 @@ import { Activity } from 'lucide-react';
 
 interface Props {
   threshold: number;
+  cooldownHours?: number;
   className?: string;
 }
 
@@ -16,12 +17,18 @@ interface VolatilityStats {
 const CACHE_KEY = 'holzen_btc_volatility_stats';
 const CACHE_TTL = 6 * 60 * 60 * 1000; // 6 hours
 
-async function fetchVolatilityStats(): Promise<number[] | null> {
+interface CachedData {
+  dailyChanges: number[];
+  hourlyPrices: [number, number][];
+  timestamp: number;
+}
+
+async function fetchVolatilityData(): Promise<CachedData | null> {
   try {
     const cached = localStorage.getItem(CACHE_KEY);
     if (cached) {
-      const { dailyChanges, timestamp } = JSON.parse(cached);
-      if (Date.now() - timestamp < CACHE_TTL) return dailyChanges;
+      const parsed: CachedData = JSON.parse(cached);
+      if (Date.now() - parsed.timestamp < CACHE_TTL) return parsed;
     }
 
     const res = await fetch(
@@ -47,14 +54,15 @@ async function fetchVolatilityStats(): Promise<number[] | null> {
       }
     }
 
-    localStorage.setItem(CACHE_KEY, JSON.stringify({ dailyChanges, timestamp: Date.now() }));
-    return dailyChanges;
+    const result: CachedData = { dailyChanges, hourlyPrices: prices, timestamp: Date.now() };
+    localStorage.setItem(CACHE_KEY, JSON.stringify(result));
+    return result;
   } catch {
     return null;
   }
 }
 
-function computeStats(dailyChanges: number[], threshold: number): VolatilityStats {
+function computeStatsDaily(dailyChanges: number[], threshold: number): VolatilityStats {
   const last30 = dailyChanges.slice(-30);
   const crossings30d = last30.filter((c) => c >= threshold).length;
   const crossings90d = dailyChanges.filter((c) => c >= threshold).length;
@@ -62,22 +70,76 @@ function computeStats(dailyChanges: number[], threshold: number): VolatilityStat
   return { crossings30d, crossings90d, avgDailyMove };
 }
 
-export function ThresholdFrequencyEstimator({ threshold, className }: Props) {
+function computeStatsHourly(
+  hourlyPrices: [number, number][],
+  threshold: number,
+  cooldownHours: number
+): VolatilityStats {
+  const cooldownMs = cooldownHours * 60 * 60 * 1000;
+  const msPerDay = 24 * 60 * 60 * 1000;
+  const now = hourlyPrices[hourlyPrices.length - 1][0];
+  const t30 = now - 30 * msPerDay;
+  const t90 = now - 90 * msPerDay;
+
+  let triggers90 = 0;
+  let triggers30 = 0;
+  let lastTriggerTime = -Infinity;
+  let anchorPrice = hourlyPrices[0][1];
+
+  // Walk through hourly data, simulate triggers with cooldown
+  for (let i = 1; i < hourlyPrices.length; i++) {
+    const [ts, price] = hourlyPrices[i];
+    const change = Math.abs(((price - anchorPrice) / anchorPrice) * 100);
+
+    if (change >= threshold && ts - lastTriggerTime >= cooldownMs) {
+      if (ts >= t90) triggers90++;
+      if (ts >= t30) triggers30++;
+      lastTriggerTime = ts;
+      anchorPrice = price; // reset anchor after trigger
+    } else if (ts - lastTriggerTime >= cooldownMs) {
+      // Update anchor when cooldown has passed even without trigger
+      anchorPrice = price;
+    }
+  }
+
+  // Avg daily move from daily samples for consistency
+  const dailyChanges: number[] = [];
+  let lp = hourlyPrices[0][1];
+  let lt = hourlyPrices[0][0];
+  for (let i = 1; i < hourlyPrices.length; i++) {
+    if (hourlyPrices[i][0] - lt >= msPerDay * 0.8) {
+      dailyChanges.push(Math.abs(((hourlyPrices[i][1] - lp) / lp) * 100));
+      lp = hourlyPrices[i][1];
+      lt = hourlyPrices[i][0];
+    }
+  }
+  const avgDailyMove = dailyChanges.length > 0
+    ? dailyChanges.reduce((s, c) => s + c, 0) / dailyChanges.length
+    : 0;
+
+  return { crossings30d: triggers30, crossings90d: triggers90, avgDailyMove };
+}
+
+export function ThresholdFrequencyEstimator({ threshold, cooldownHours, className }: Props) {
   const { t } = useTranslation();
   const [stats, setStats] = useState<VolatilityStats | null>(null);
-  const [dailyChanges, setDailyChanges] = useState<number[] | null>(null);
+  const [cachedData, setCachedData] = useState<CachedData | null>(null);
 
   useEffect(() => {
-    fetchVolatilityStats().then((changes) => {
-      if (changes) setDailyChanges(changes);
+    fetchVolatilityData().then((d) => {
+      if (d) setCachedData(d);
     });
   }, []);
 
   useEffect(() => {
-    if (dailyChanges) {
-      setStats(computeStats(dailyChanges, threshold));
+    if (!cachedData) return;
+
+    if (cooldownHours && cooldownHours < 24) {
+      setStats(computeStatsHourly(cachedData.hourlyPrices, threshold, cooldownHours));
+    } else {
+      setStats(computeStatsDaily(cachedData.dailyChanges, threshold));
     }
-  }, [dailyChanges, threshold]);
+  }, [cachedData, threshold, cooldownHours]);
 
   if (!stats) return null;
 
