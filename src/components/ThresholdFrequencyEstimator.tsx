@@ -241,6 +241,7 @@ export function ThresholdFrequencyEstimator({
         <div className="space-y-0.5">
           <p className="text-[11px] font-mono text-foreground/70 leading-snug">
             {t('threshold.estimator.result', 'With your current thresholds, you\'d have paused ~{{count}} times in the last 30 days', {
+              threshold: thresholdUp.toFixed(1),
               count: stats.crossings30d,
             })}
           </p>
