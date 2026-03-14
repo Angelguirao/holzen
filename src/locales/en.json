@@ -359,6 +359,7 @@
     "yourThreshold": "Your threshold",
     "thresholdQuestion": "How much does BTC need to move in 24 hours before you hear from us?",
     "changeThresholdLater": "You can change this later.",
+    "trialHint": "Or start with a {{trialDays}}-day free trial →",
     "companions": {
       "breathing": "Breathing",
       "breathingDesc": "Guided breathwork to calm the impulse",
