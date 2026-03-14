@@ -55,19 +55,16 @@ export function CollectionDetail({
 
       {/* Items */}
       {collectionItems.length > 0 ? (
-        <div className="space-y-1.5">
+        <div className="divide-y divide-border/20">
           {collectionItems.map((item) => (
             <div key={item.id} className="relative">
               <LibraryItemCard
                 item={item}
-                onTogglePin={onTogglePin}
                 onToggleFavorite={onToggleFavorite}
-                onDelete={onDeleteItem}
-                onStatusChange={onStatusChange}
               />
               <button
                 onClick={() => onRemoveItem(collection.id, item.id)}
-                className="absolute top-1 right-1 text-[9px] font-mono text-muted-foreground/30 hover:text-destructive transition-colors px-1"
+                className="absolute top-2 right-2 text-[9px] font-mono text-muted-foreground/30 hover:text-destructive transition-colors px-1"
               >
                 remove
               </button>
