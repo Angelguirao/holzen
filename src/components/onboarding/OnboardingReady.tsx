@@ -44,7 +44,7 @@ export function OnboardingReady({
     <div className="space-y-7">
       <motion.div className="space-y-2" {...stagger(0.1)}>
         <p className="text-xs font-mono tracking-[0.25em] uppercase text-muted-foreground">
-          {t('onboarding.ready.title', 'You're set')}
+          {t('onboarding.ready.title', "You're set")}
         </p>
         <div className="h-px w-8 bg-foreground/20" />
       </motion.div>
