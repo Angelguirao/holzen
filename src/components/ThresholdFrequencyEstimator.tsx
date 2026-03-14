@@ -150,12 +150,11 @@ function computeStatsSimulated(
 
   let triggers90 = 0;
   let triggers30 = 0;
+  let rawSignals30d = 0;
   let lastTriggerTime = -Infinity;
 
   for (let i = 1; i < hourlyPrices.length; i++) {
     const [ts, priceNow] = hourlyPrices[i];
-
-    if (ts - lastTriggerTime < cooldownMs) continue;
 
     const has24hHistory = ts - hourlyPrices[0][0] >= msPerDay;
     const has7dHistory = ts - hourlyPrices[0][0] >= msPer7Days;
@@ -180,13 +179,19 @@ function computeStatsSimulated(
     }
 
     if (dailyTriggered || cumulativeTriggered) {
-      if (ts >= t90) triggers90++;
-      if (ts >= t30) triggers30++;
-      lastTriggerTime = ts;
+      // Count raw signals (no cooldown filter)
+      if (ts >= t30) rawSignals30d++;
+
+      // Count deduplicated pauses (with cooldown)
+      if (ts - lastTriggerTime >= cooldownMs) {
+        if (ts >= t90) triggers90++;
+        if (ts >= t30) triggers30++;
+        lastTriggerTime = ts;
+      }
     }
   }
 
-  return { crossings30d: triggers30, crossings90d: triggers90, avgDailyMove };
+  return { crossings30d: triggers30, crossings90d: triggers90, avgDailyMove, rawSignals30d };
 }
 
 export function ThresholdFrequencyEstimator({
