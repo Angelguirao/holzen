@@ -56,6 +56,14 @@ interface PinnedReflection {
   learning_body: string | null;
 }
 
+interface GroundingSuggestion {
+  activity: string;
+  suggestion: string;
+  duration: number;
+  insight: string | null;
+  article: { snippet: string; url: string | null } | null;
+}
+
 const Home = () => {
   const { t } = useTranslation();
   const WIDGET_TITLES: Record<WidgetId, string> = {
