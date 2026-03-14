@@ -521,9 +521,14 @@ export default function Ground() {
                 {t('ground.doneMessage', 'You took a moment. That matters.')}
               </motion.p>
 
-              <motion.button onClick={handleReturn} className="text-xs font-mono text-muted-foreground/30 hover:text-foreground/60 transition-colors underline underline-offset-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}>
-                {t('ground.return', 'Return')}
-              </motion.button>
+              <motion.div className="flex flex-col items-center gap-3" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}>
+                <button onClick={handleReturn} className="text-xs font-mono text-muted-foreground/30 hover:text-foreground/60 transition-colors underline underline-offset-4">
+                  {t('ground.return', 'Return')}
+                </button>
+                <button onClick={() => navigate('/ground/history', { replace: true })} className="text-[10px] font-mono text-muted-foreground/20 hover:text-muted-foreground/50 transition-colors tracking-[0.15em] uppercase">
+                  {t('ground.viewHistory', 'View journal')}
+                </button>
+              </motion.div>
             </motion.div>
           )}
         </AnimatePresence>
