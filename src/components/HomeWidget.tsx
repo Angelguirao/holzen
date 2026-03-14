@@ -15,6 +15,8 @@ interface HomeWidgetProps {
   onToggleCollapse?: () => void;
   /** If true, renders without the card wrapper (for transient content) */
   bare?: boolean;
+  /** Extra classes on the card wrapper */
+  className?: string;
 }
 
 export function HomeWidget({
