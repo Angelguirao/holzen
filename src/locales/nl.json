@@ -323,8 +323,8 @@
     "learnFromHistory": "Leer van de geschiedenis →",
     "toggleCompanions": "Schakel begeleiders in of uit in Instellingen.",
     "yourThreshold": "Je drempel",
-    "thresholdQuestion": "Hoeveel moet BTC in 24 uur bewegen voordat we contact opnemen?",
-    "changeThresholdLater": "Je kunt dit later wijzigen."
+    "thresholdQuestion": "Hoeveel moet Bitcoin bewegen (omhoog of omlaag) voordat je wilt pauzeren en reflecteren?",
+    "changeThresholdLater": "Je kunt aparte drempels voor stijging & daling later instellen in Instellingen"
   },
   "moodCheck": {
     "howAreYouFeeling": "Hoe voel je je nu?",

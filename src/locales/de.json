@@ -322,8 +322,8 @@
     "learnFromHistory": "Aus der Geschichte lernen →",
     "toggleCompanions": "Begleiter jederzeit in den Einstellungen umschalten.",
     "yourThreshold": "Dein Schwellenwert",
-    "thresholdQuestion": "Wie stark muss sich BTC in 24 Stunden bewegen, bevor wir dich kontaktieren?",
-    "changeThresholdLater": "Du kannst das später ändern."
+    "thresholdQuestion": "Wie stark muss sich Bitcoin bewegen (rauf oder runter), bevor du pausieren und reflektieren möchtest?",
+    "changeThresholdLater": "Du kannst separate Schwellenwerte für Anstieg & Rückgang später in den Einstellungen festlegen"
   },
   "moodCheck": {
     "howAreYouFeeling": "Wie fühlst du dich gerade?",
