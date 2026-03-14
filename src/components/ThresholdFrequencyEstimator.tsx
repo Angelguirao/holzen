@@ -14,6 +14,7 @@ interface VolatilityStats {
   crossings30d: number;
   crossings90d: number;
   avgDailyMove: number;
+  rawSignals30d: number;
 }
 
 const CACHE_KEY = 'holzen_btc_volatility_stats_v2';
@@ -122,7 +123,7 @@ function computeStatsDaily(
   const crossings30d = last30.filter((c) => c >= effectiveThreshold).length;
   const crossings90d = dailyChanges.filter((c) => c >= effectiveThreshold).length;
   const avgDailyMove = dailyChanges.reduce((s, c) => s + c, 0) / dailyChanges.length;
-  return { crossings30d, crossings90d, avgDailyMove };
+  return { crossings30d, crossings90d, avgDailyMove, rawSignals30d: crossings30d };
 }
 
 /**
@@ -149,12 +150,11 @@ function computeStatsSimulated(
 
   let triggers90 = 0;
   let triggers30 = 0;
+  let rawSignals30d = 0;
   let lastTriggerTime = -Infinity;
 
   for (let i = 1; i < hourlyPrices.length; i++) {
     const [ts, priceNow] = hourlyPrices[i];
-
-    if (ts - lastTriggerTime < cooldownMs) continue;
 
     const has24hHistory = ts - hourlyPrices[0][0] >= msPerDay;
     const has7dHistory = ts - hourlyPrices[0][0] >= msPer7Days;
@@ -179,13 +179,19 @@ function computeStatsSimulated(
     }
 
     if (dailyTriggered || cumulativeTriggered) {
-      if (ts >= t90) triggers90++;
-      if (ts >= t30) triggers30++;
-      lastTriggerTime = ts;
+      // Count raw signals (no cooldown filter)
+      if (ts >= t30) rawSignals30d++;
+
+      // Count deduplicated pauses (with cooldown)
+      if (ts - lastTriggerTime >= cooldownMs) {
+        if (ts >= t90) triggers90++;
+        if (ts >= t30) triggers30++;
+        lastTriggerTime = ts;
+      }
     }
   }
 
-  return { crossings30d: triggers30, crossings90d: triggers90, avgDailyMove };
+  return { crossings30d: triggers30, crossings90d: triggers90, avgDailyMove, rawSignals30d };
 }
 
 export function ThresholdFrequencyEstimator({
@@ -240,13 +246,14 @@ export function ThresholdFrequencyEstimator({
         <Activity className="h-3 w-3 text-primary/50 mt-0.5 shrink-0" />
         <div className="space-y-0.5">
           <p className="text-[11px] font-mono text-foreground/70 leading-snug">
-            {t('threshold.estimator.result', 'With your current thresholds, you\'d have paused ~{{count}} times in the last 30 days', {
-              threshold: thresholdUp.toFixed(1),
+            {t('threshold.estimator.result', '~{{count}} pauses in 30 days (from {{raw}} raw signals, merged by {{cooldown}}h cooldown)', {
               count: stats.crossings30d,
+              raw: stats.rawSignals30d,
+              cooldown: cooldownHours ?? 24,
             })}
           </p>
           <p className="text-[10px] font-mono text-muted-foreground/50 leading-snug">
-            {t('threshold.estimator.monthly', '~{{count}}/month estimated · overlapping up/down/7-day signals merge during cooldown · avg daily move: {{avg}}%', {
+            {t('threshold.estimator.monthly', '~{{count}}/month · avg daily move: {{avg}}%', {
               count: monthlyEstimate,
               avg: stats.avgDailyMove.toFixed(1),
             })}
