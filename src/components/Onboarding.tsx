@@ -26,6 +26,7 @@ const TOTAL_STEPS = 3;
 
 export function Onboarding({ onComplete }: Props) {
   const { t } = useTranslation();
+  const { startCheckout, checkoutLoading } = useSubscription();
   const [step, setStep] = useState(0);
   const [timezone] = useState(detectedTimezone);
   const [threshold, setThreshold] = useState(5);
