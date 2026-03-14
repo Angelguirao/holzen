@@ -124,17 +124,24 @@ export function Onboarding({ onComplete }: Props) {
                     groundingActivities,
                   })}
                   onStartTrial={() => {
-                    // Save onboarding FIRST, then redirect to Stripe (same tab)
-                    onComplete({
-                      threshold,
-                      firstName: null,
-                      timezone,
-                      motivations,
-                      groundingActivities,
-                    });
-                    startCheckout();
+                    void (async () => {
+                      setStartingTrial(true);
+                      try {
+                        // Save onboarding first, but keep onboarding visible until redirect starts
+                        await onComplete({
+                          threshold,
+                          firstName: null,
+                          timezone,
+                          motivations,
+                          groundingActivities,
+                        }, { setLocalOnboarded: false });
+                        await startCheckout();
+                      } finally {
+                        setStartingTrial(false);
+                      }
+                    })();
                   }}
-                  checkoutLoading={checkoutLoading}
+                  checkoutLoading={checkoutLoading || startingTrial}
                   stagger={stagger}
                 />
               )}
