@@ -228,6 +228,46 @@ const Home = () => {
     prefetchNotificationTone();
   }, []);
 
+  // Pre-generate grounding suggestion when thresholds are met (mirrors pause pre-generation)
+  useEffect(() => {
+    if (!user || !profileLoaded || !subscribed || !btcData || groundingActivities.length === 0) return;
+    // Don't pre-generate if there's an active pause message (pause takes priority)
+    if (message) return;
+    // Don't pre-generate if we already have a cached suggestion or are already fetching
+    if (groundSuggestion || groundFetchingRef.current) return;
+
+    const effectiveThreshold = btcData.changePercent < 0 ? thresholdDown : threshold;
+    const dailyTriggered = Math.abs(btcData.changePercent) >= effectiveThreshold;
+    const cumulativeTriggered = btcData.cumulativeChangePercent !== undefined
+      ? Math.abs(btcData.cumulativeChangePercent) >= cumulativeThreshold
+      : false;
+
+    if (!dailyTriggered && !cumulativeTriggered) return;
+
+    groundFetchingRef.current = true;
+    setGroundLoading(true);
+
+    const ctx = `BTC is ${btcData.direction === 'down' ? 'down' : 'up'} ${Math.abs(btcData.changePercent).toFixed(1)}% in the last 24 hours.`;
+
+    supabase.functions.invoke('suggest-grounding', {
+      body: { groundingActivities, context: ctx, severity, language },
+    }).then(({ data, error }) => {
+      if (error || !data || data.error) return;
+      const suggestion: GroundingSuggestion = {
+        activity: data.activity,
+        suggestion: data.suggestion,
+        duration: data.duration || 10,
+        insight: data.insight || null,
+        article: data.article || null,
+      };
+      setGroundSuggestion(suggestion);
+      localStorage.setItem(groundStorageKey, JSON.stringify(suggestion));
+    }).finally(() => {
+      setGroundLoading(false);
+      groundFetchingRef.current = false;
+    });
+  }, [user, profileLoaded, subscribed, btcData, message, groundSuggestion, groundingActivities, threshold, thresholdDown, cumulativeThreshold, severity, language, groundStorageKey]);
+
   useEffect(() => {
     document.title = 'Holzen — Home';
     return () => { document.title = 'Holzen — Pause before you act'; };
