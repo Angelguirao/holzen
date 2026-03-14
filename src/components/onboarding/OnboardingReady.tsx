@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Wind, Brain, Anchor, Infinity, BookOpen, Lightbulb } from 'lucide-react';
+import { Sparkles, Wind, Brain, Infinity, Anchor, Lightbulb, BookOpen, Moon, Image, Mail } from 'lucide-react';
 import { PRICING } from '@/lib/pricing';
 
 interface Props {
@@ -88,9 +88,12 @@ export function OnboardingReady({
           </p>
           {[
             { icon: Infinity, text: t('onboarding.ready.proUnlimited', 'Unlimited pauses') },
-            { icon: Anchor, text: t('onboarding.ready.proGrounding', 'AI-guided grounding sessions') },
-            { icon: Lightbulb, text: t('onboarding.ready.proInsights', 'AI pattern insights') },
-            { icon: BookOpen, text: t('onboarding.ready.proLibrary', 'Personal library & letters') },
+            { icon: Anchor, text: t('onboarding.ready.proGrounding', 'AI-guided grounding & stillness') },
+            { icon: Lightbulb, text: t('onboarding.ready.proInsights', 'AI pattern insights across pauses') },
+            { icon: Moon, text: t('onboarding.ready.proNight', 'Evening reflection prompts') },
+            { icon: BookOpen, text: t('onboarding.ready.proLibrary', 'Personal library & collections') },
+            { icon: Mail, text: t('onboarding.ready.proLetters', 'Letters to your future self') },
+            { icon: Image, text: t('onboarding.ready.proWallpapers', 'AI-generated wallpapers') },
           ].map(({ icon: Icon, text }, i) => (
             <div key={i} className="flex items-center gap-2.5">
               <Icon className="h-3 w-3 text-foreground/50 shrink-0" />

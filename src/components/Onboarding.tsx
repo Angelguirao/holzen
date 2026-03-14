@@ -69,7 +69,7 @@ export function Onboarding({ onComplete }: Props) {
   }, []);
 
   return (
-    <div className="fixed inset-0 z-50 bg-background flex items-center justify-center p-6">
+    <div className="fixed inset-0 z-[60] bg-background flex items-center justify-center p-6">
       <div className="w-full max-w-sm">
         <div className="min-h-[440px] relative">
           <AnimatePresence mode="wait" custom={direction}>
@@ -136,8 +136,7 @@ export function Onboarding({ onComplete }: Props) {
           </AnimatePresence>
         </div>
 
-        {/* Navigation — hide on final step since it has its own CTAs */}
-        {step < TOTAL_STEPS - 1 && (
+        {/* Navigation */}
         <motion.div
           className="flex items-center justify-between mt-8"
           initial={prefersReduced ? {} : { opacity: 0 }}
@@ -162,7 +161,7 @@ export function Onboarding({ onComplete }: Props) {
           </div>
 
           <div className="flex items-center gap-3">
-            {(step === 0 && motivations.length === 0) || (step === 1 && groundingActivities.length === 0) ? (
+            {step < TOTAL_STEPS - 1 && ((step === 0 && motivations.length === 0) || (step === 1 && groundingActivities.length === 0)) ? (
               <button
                 onClick={() => goTo(step + 1)}
                 className="text-[10px] font-mono text-muted-foreground/40 hover:text-foreground transition-colors"
@@ -179,15 +178,16 @@ export function Onboarding({ onComplete }: Props) {
               </button>
             )}
 
-            <button
-              onClick={() => goTo(step + 1)}
-              className="text-[10px] font-mono text-muted-foreground underline underline-offset-4 hover:text-foreground transition-colors"
-            >
-              {t('common.continue')}
-            </button>
+            {step < TOTAL_STEPS - 1 && (
+              <button
+                onClick={() => goTo(step + 1)}
+                className="text-[10px] font-mono text-muted-foreground underline underline-offset-4 hover:text-foreground transition-colors"
+              >
+                {t('common.continue')}
+              </button>
+            )}
           </div>
         </motion.div>
-        )}
       </div>
     </div>
   );
