@@ -208,6 +208,15 @@ const Home = () => {
     dismissMessage();
   };
 
+  const dismissGroundSuggestion = useCallback(() => {
+    setGroundSuggestion(null);
+    localStorage.removeItem(groundStorageKey);
+  }, [groundStorageKey]);
+
+  const handleStartGround = useCallback(() => {
+    navigate('/ground', { state: { preGenerated: groundSuggestion } });
+  }, [navigate, groundSuggestion]);
+
   useEffect(() => {
     if (newReflection && message) {
       playNotificationTone();
