@@ -478,6 +478,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
         if ((row as any)?.zoom_out_data) {
           setZoomOut((row as any).zoom_out_data);
           setZoomOutLoading(false);
+          autoSaveToLibrary({ title: 'Zoom Out', body: JSON.stringify((row as any).zoom_out_data), sourceType: 'zoom_out' });
           return;
         }
 
