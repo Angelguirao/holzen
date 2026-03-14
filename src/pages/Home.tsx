@@ -510,9 +510,7 @@ const Home = () => {
               </button>
 
               {!subscribed && (
-                <p className="text-[10px] text-muted-foreground/30 text-center">
-                  {t('home.groundProHint', 'Upgrade to Pro for AI-guided grounding sessions')}
-                </p>
+                <ProLockedWidget onUpgrade={startCheckout} checkoutLoading={checkoutLoading} feature="grounding" />
               )}
 
               <button
