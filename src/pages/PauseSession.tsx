@@ -58,7 +58,7 @@ export default function PauseSession() {
   const navigate = useNavigate();
   const location = useLocation();
   const prefersReducedMotion = useReducedMotion();
-  const { mantra, dismissMessage } = useHolzen();
+  const { mantra, dismissMessage, groundingActivities } = useHolzen();
   const { subscribed } = useSubscription();
 
   const navState = (location.state as any) ?? {};
@@ -352,6 +352,7 @@ export default function PauseSession() {
                     selectedMoodAfter={selectedMoodAfter}
                     onContinue={() => goToStep('decide')}
                     onBack={goBack}
+                    groundingActivities={groundingActivities}
                   />
                 </motion.div>
               )}
