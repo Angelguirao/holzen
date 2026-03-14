@@ -63,21 +63,26 @@ async function fetchVolatilityData(): Promise<CachedData | null> {
   }
 }
 
-/** Check if 7-day cumulative change exceeds threshold */
-function get7dChange(prices: [number, number][], currentIdx: number): number {
-  const currentTs = prices[currentIdx][0];
-  const target = currentTs - 7 * 24 * 60 * 60 * 1000;
-  // Find closest price ~7 days ago
-  let bestIdx = 0;
-  for (let j = currentIdx - 1; j >= 0; j--) {
-    if (prices[j][0] <= target) {
-      bestIdx = j;
-      break;
+function findIndexAtOrBeforeTimestamp(
+  prices: [number, number][],
+  targetTimestamp: number,
+  maxIndex: number
+): number {
+  let lo = 0;
+  let hi = maxIndex;
+  let ans = 0;
+
+  while (lo <= hi) {
+    const mid = (lo + hi) >> 1;
+    if (prices[mid][0] <= targetTimestamp) {
+      ans = mid;
+      lo = mid + 1;
+    } else {
+      hi = mid - 1;
     }
-    bestIdx = j;
   }
-  if (bestIdx === currentIdx) return 0;
-  return Math.abs(((prices[currentIdx][1] - prices[bestIdx][1]) / prices[bestIdx][1]) * 100);
+
+  return ans;
 }
 
 function computeStatsDaily(
@@ -85,8 +90,6 @@ function computeStatsDaily(
   thresholdUp: number,
   thresholdDown: number,
 ): VolatilityStats {
-  // With daily data we can't distinguish up vs down direction from abs changes,
-  // so use min(up, down) as the effective threshold (conservative estimate)
   const effectiveThreshold = Math.min(thresholdUp, thresholdDown);
   const last30 = dailyChanges.slice(-30);
   const crossings30d = last30.filter((c) => c >= effectiveThreshold).length;
@@ -95,15 +98,24 @@ function computeStatsDaily(
   return { crossings30d, crossings90d, avgDailyMove };
 }
 
-function computeStatsHourly(
+/**
+ * Simulates the real trigger logic used in the app:
+ * - 24h directional threshold (up/down)
+ * - 7d cumulative threshold (absolute move, up or down)
+ * - cooldown gating
+ */
+function computeStatsSimulated(
   hourlyPrices: [number, number][],
   thresholdUp: number,
   thresholdDown: number,
   cumulativeThreshold: number,
-  cooldownHours: number
+  cooldownHours: number,
+  avgDailyMove: number,
 ): VolatilityStats {
-  const cooldownMs = cooldownHours * 60 * 60 * 1000;
   const msPerDay = 24 * 60 * 60 * 1000;
+  const msPer7Days = 7 * msPerDay;
+  const cooldownMs = cooldownHours * 60 * 60 * 1000;
+
   const now = hourlyPrices[hourlyPrices.length - 1][0];
   const t30 = now - 30 * msPerDay;
   const t90 = now - 90 * msPerDay;
@@ -111,48 +123,40 @@ function computeStatsHourly(
   let triggers90 = 0;
   let triggers30 = 0;
   let lastTriggerTime = -Infinity;
-  let anchorPrice = hourlyPrices[0][1];
 
   for (let i = 1; i < hourlyPrices.length; i++) {
-    const [ts, price] = hourlyPrices[i];
-    const offCooldown = ts - lastTriggerTime >= cooldownMs;
+    const [ts, priceNow] = hourlyPrices[i];
 
-    if (!offCooldown) continue;
+    if (ts - lastTriggerTime < cooldownMs) continue;
 
-    // Check daily directional thresholds
-    const changePercent = ((price - anchorPrice) / anchorPrice) * 100;
-    const isRise = changePercent >= thresholdUp;
-    const isDrop = changePercent <= -thresholdDown;
+    const has24hHistory = ts - hourlyPrices[0][0] >= msPerDay;
+    const has7dHistory = ts - hourlyPrices[0][0] >= msPer7Days;
 
-    // Check 7-day cumulative
-    const cumChange = cumulativeThreshold > 0 ? get7dChange(hourlyPrices, i) : 0;
-    const isCumulative = cumulativeThreshold > 0 && cumChange >= cumulativeThreshold;
+    let dailyTriggered = false;
+    if (has24hHistory) {
+      const idx24 = findIndexAtOrBeforeTimestamp(hourlyPrices, ts - msPerDay, i - 1);
+      const price24hAgo = hourlyPrices[idx24][1];
+      const change24h = ((priceNow - price24hAgo) / price24hAgo) * 100;
 
-    if (isRise || isDrop || isCumulative) {
+      dailyTriggered = change24h >= 0
+        ? change24h >= thresholdUp
+        : Math.abs(change24h) >= thresholdDown;
+    }
+
+    let cumulativeTriggered = false;
+    if (cumulativeThreshold > 0 && has7dHistory) {
+      const idx7d = findIndexAtOrBeforeTimestamp(hourlyPrices, ts - msPer7Days, i - 1);
+      const price7dAgo = hourlyPrices[idx7d][1];
+      const change7d = ((priceNow - price7dAgo) / price7dAgo) * 100;
+      cumulativeTriggered = Math.abs(change7d) >= cumulativeThreshold;
+    }
+
+    if (dailyTriggered || cumulativeTriggered) {
       if (ts >= t90) triggers90++;
       if (ts >= t30) triggers30++;
       lastTriggerTime = ts;
-      anchorPrice = price;
-    } else {
-      // Update anchor when cooldown has passed even without trigger
-      anchorPrice = price;
     }
   }
-
-  // Avg daily move
-  const dailyChanges: number[] = [];
-  let lp = hourlyPrices[0][1];
-  let lt = hourlyPrices[0][0];
-  for (let i = 1; i < hourlyPrices.length; i++) {
-    if (hourlyPrices[i][0] - lt >= msPerDay * 0.8) {
-      dailyChanges.push(Math.abs(((hourlyPrices[i][1] - lp) / lp) * 100));
-      lp = hourlyPrices[i][1];
-      lt = hourlyPrices[i][0];
-    }
-  }
-  const avgDailyMove = dailyChanges.length > 0
-    ? dailyChanges.reduce((s, c) => s + c, 0) / dailyChanges.length
-    : 0;
 
   return { crossings30d: triggers30, crossings90d: triggers90, avgDailyMove };
 }
@@ -179,18 +183,21 @@ export function ThresholdFrequencyEstimator({
   useEffect(() => {
     if (!cachedData) return;
 
-    const hasHourly = cachedData.hourlyPrices?.length > 1;
-    const needsHourly = (cooldownHours && cooldownHours < 24) || thresholdDown !== undefined || cumulativeThreshold > 0;
+    const avgDailyMove = cachedData.dailyChanges.length > 0
+      ? cachedData.dailyChanges.reduce((s, c) => s + c, 0) / cachedData.dailyChanges.length
+      : 0;
 
-    if (hasHourly && needsHourly) {
-      setStats(computeStatsHourly(
-        cachedData.hourlyPrices, thresholdUp, effectiveDown, cumulativeThreshold, cooldownHours ?? 24
-      ));
-    } else if (hasHourly) {
-      // Even for simple case, use hourly for better accuracy
-      setStats(computeStatsHourly(
-        cachedData.hourlyPrices, thresholdUp, effectiveDown, 0, 24
-      ));
+    if (cachedData.hourlyPrices?.length > 1) {
+      setStats(
+        computeStatsSimulated(
+          cachedData.hourlyPrices,
+          thresholdUp,
+          effectiveDown,
+          cumulativeThreshold,
+          cooldownHours ?? 24,
+          avgDailyMove,
+        )
+      );
     } else {
       setStats(computeStatsDaily(cachedData.dailyChanges, thresholdUp, effectiveDown));
     }
