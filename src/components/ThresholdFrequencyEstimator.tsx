@@ -179,9 +179,17 @@ export function ThresholdFrequencyEstimator({
   useEffect(() => {
     if (!cachedData) return;
 
-    if (cooldownHours && cooldownHours < 24 && cachedData.hourlyPrices?.length > 1) {
+    const hasHourly = cachedData.hourlyPrices?.length > 1;
+    const needsHourly = (cooldownHours && cooldownHours < 24) || thresholdDown !== undefined || cumulativeThreshold > 0;
+
+    if (hasHourly && needsHourly) {
       setStats(computeStatsHourly(
-        cachedData.hourlyPrices, thresholdUp, effectiveDown, cumulativeThreshold, cooldownHours
+        cachedData.hourlyPrices, thresholdUp, effectiveDown, cumulativeThreshold, cooldownHours ?? 24
+      ));
+    } else if (hasHourly) {
+      // Even for simple case, use hourly for better accuracy
+      setStats(computeStatsHourly(
+        cachedData.hourlyPrices, thresholdUp, effectiveDown, 0, 24
       ));
     } else {
       setStats(computeStatsDaily(cachedData.dailyChanges, thresholdUp, effectiveDown));
