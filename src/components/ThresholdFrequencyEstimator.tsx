@@ -16,7 +16,8 @@ interface VolatilityStats {
   avgDailyMove: number;
 }
 
-const CACHE_KEY = 'holzen_btc_volatility_stats';
+const CACHE_KEY = 'holzen_btc_volatility_stats_v2';
+const LEGACY_CACHE_KEY = 'holzen_btc_volatility_stats';
 const CACHE_TTL = 6 * 60 * 60 * 1000;
 
 interface CachedData {
@@ -25,12 +26,37 @@ interface CachedData {
   timestamp: number;
 }
 
+function isValidCachedData(value: unknown): value is CachedData {
+  if (!value || typeof value !== 'object') return false;
+  const v = value as Record<string, unknown>;
+  if (typeof v.timestamp !== 'number') return false;
+  if (!Array.isArray(v.dailyChanges) || !Array.isArray(v.hourlyPrices)) return false;
+
+  const hasValidDaily = v.dailyChanges.every((n) => typeof n === 'number');
+  const hasValidHourly = v.hourlyPrices.every(
+    (entry) => Array.isArray(entry) && entry.length === 2 && entry.every((n) => typeof n === 'number')
+  );
+
+  return hasValidDaily && hasValidHourly;
+}
+
 async function fetchVolatilityData(): Promise<CachedData | null> {
   try {
-    const cached = localStorage.getItem(CACHE_KEY);
+    const readCached = (key: string): CachedData | null => {
+      const cached = localStorage.getItem(key);
+      if (!cached) return null;
+      const parsed: unknown = JSON.parse(cached);
+      if (!isValidCachedData(parsed)) return null;
+      if (Date.now() - parsed.timestamp >= CACHE_TTL) return null;
+      return parsed;
+    };
+
+    const cached = readCached(CACHE_KEY) ?? readCached(LEGACY_CACHE_KEY);
     if (cached) {
-      const parsed: CachedData = JSON.parse(cached);
-      if (Date.now() - parsed.timestamp < CACHE_TTL) return parsed;
+      // Migrate legacy cache shape to the current key.
+      localStorage.setItem(CACHE_KEY, JSON.stringify(cached));
+      localStorage.removeItem(LEGACY_CACHE_KEY);
+      return cached;
     }
 
     const res = await fetch(
@@ -57,6 +83,7 @@ async function fetchVolatilityData(): Promise<CachedData | null> {
 
     const result: CachedData = { dailyChanges, hourlyPrices: prices, timestamp: Date.now() };
     localStorage.setItem(CACHE_KEY, JSON.stringify(result));
+    localStorage.removeItem(LEGACY_CACHE_KEY);
     return result;
   } catch {
     return null;
