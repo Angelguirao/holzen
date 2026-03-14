@@ -27,6 +27,7 @@ export function HomeWidget({
   collapsed = false,
   onToggleCollapse,
   bare = false,
+  className = '',
 }: HomeWidgetProps) {
   const prefersReduced = useReducedMotion();
   const {
