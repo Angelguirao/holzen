@@ -21,6 +21,8 @@ const MAX_DURATION = 30;
 export default function Ground() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
+  const navState = (location.state as any) ?? {};
   const prefersReducedMotion = useReducedMotion();
   const { groundingActivities, btcData, severity, language } = useHolzen();
   const { user } = useAuth();
