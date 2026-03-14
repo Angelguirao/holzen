@@ -537,8 +537,10 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
       .then(({ data: row }) => {
         if (cancelled) return;
         if ((row as any)?.history_insight_data) {
-          setHistoryInsight((row as any).history_insight_data);
+          const cachedHistory = (row as any).history_insight_data as HistoricalInsightData;
+          setHistoryInsight(cachedHistory);
           setHistoryLoading(false);
+          autoSaveToLibrary({ title: cachedHistory.title, body: cachedHistory.btcInsight, sourceType: 'history_insight' });
           return;
         }
 
