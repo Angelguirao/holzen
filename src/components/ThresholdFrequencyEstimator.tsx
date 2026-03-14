@@ -14,6 +14,7 @@ interface VolatilityStats {
   crossings30d: number;
   crossings90d: number;
   avgDailyMove: number;
+  rawSignals30d: number;
 }
 
 const CACHE_KEY = 'holzen_btc_volatility_stats_v2';
