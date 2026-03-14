@@ -16,7 +16,7 @@ import { MyWhyWidget } from '@/components/MyWhyWidget';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { HomeWidget, useWidgetLayout } from '@/components/HomeWidget';
-import { useCallback, useEffect, useState, useMemo, useRef } from 'react';
+import { useCallback, useEffect, useState, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
@@ -56,7 +56,7 @@ interface PinnedReflection {
 }
 
 const Home = () => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const WIDGET_TITLES: Record<WidgetId, string> = {
     'btc-status': t('home.widget.market'),
     'hold-goal': t('home.widget.goal'),
@@ -100,6 +100,9 @@ const Home = () => {
     firstName,
     currency,
     groundingActivities,
+    threshold,
+    thresholdDown,
+    cumulativeThreshold,
     profileLoaded,
   } = useHolzen();
 
@@ -112,12 +115,6 @@ const Home = () => {
   const prefersReducedMotion = useReducedMotion();
   const [reflectionCount, setReflectionCount] = useState(0);
 
-  // Pre-generated grounding data
-  const [groundingData, setGroundingData] = useState<{
-    activity: string; suggestion: string; duration: number;
-    insight: string | null; article: { snippet: string; url: string | null } | null;
-  } | null>(null);
-  const groundingFetchedRef = useRef(false);
 
   // Widget layout
   const defaultOrder = useMemo(() => [...WIDGET_IDS], []);
@@ -165,36 +162,6 @@ const Home = () => {
     supabase.from('reflections').select('id', { count: 'exact', head: true }).eq('user_id', user.id)
       .then(({ count }) => { if (count != null) setReflectionCount(count); });
   }, [user]);
-
-  // Pre-generate grounding suggestion in background
-  useEffect(() => {
-    if (groundingFetchedRef.current) return;
-    if (!subscribed || !user || groundingActivities.length === 0) return;
-    groundingFetchedRef.current = true;
-
-    const ctx = btcData
-      ? `BTC is ${btcData.direction === 'down' ? 'down' : 'up'} ${Math.abs(btcData.changePercent).toFixed(1)}% in the last 24 hours.`
-      : undefined;
-
-    supabase.functions.invoke('suggest-grounding', {
-      body: { groundingActivities, context: ctx, severity, language: i18n.language },
-    }).then(({ data, error: err }) => {
-      if (err || !data) {
-        // Fallback
-        const fallback = groundingActivities[Math.floor(Math.random() * groundingActivities.length)];
-        setGroundingData({ activity: fallback, suggestion: t('ground.fallbackSuggestion', { activity: fallback }), duration: 10, insight: null, article: null });
-        return;
-      }
-      setGroundingData({
-        activity: data.activity,
-        suggestion: data.suggestion,
-        duration: data.duration || 10,
-        insight: data.insight || null,
-        article: data.article || null,
-      });
-    });
-  }, [subscribed, user, groundingActivities, btcData, severity, t, i18n.language]);
-
 
   const togglePriceHidden = useCallback(() => {
     setPriceHidden(prev => {
@@ -486,16 +453,27 @@ const Home = () => {
 
       case 'ground': {
         if (groundingActivities.length === 0) return null;
-        const isVolatile = severity === 'high' || severity === 'moderate';
-        const glowClass = isVolatile && subscribed
+
+        const effectiveThreshold = btcData
+          ? (btcData.changePercent < 0 ? thresholdDown : threshold)
+          : threshold;
+        const dailyTriggered = btcData ? Math.abs(btcData.changePercent) >= effectiveThreshold : false;
+        const cumulativeTriggered = btcData?.cumulativeChangePercent !== undefined
+          ? Math.abs(btcData.cumulativeChangePercent) >= cumulativeThreshold
+          : false;
+        const followsPauseThresholds = dailyTriggered || cumulativeTriggered;
+
+        // Keep Pause as the primary flow: nudge Ground only when no active pause message.
+        const shouldNudgeGround = followsPauseThresholds && subscribed && !message;
+        const glowClass = shouldNudgeGround
           ? 'ring-1 ring-primary/15 shadow-[0_0_20px_-4px_hsl(var(--primary)/0.12)]'
           : '';
-        // Auto-expand when volatile and user had it collapsed
-        const effectiveCollapsed = isVolatile && subscribed ? false : collapsed['ground'];
+        const effectiveCollapsed = shouldNudgeGround ? false : collapsed['ground'];
+
         return (
           <HomeWidget
             id="ground"
-            title={isVolatile && subscribed
+            title={shouldNudgeGround
               ? `${WIDGET_TITLES['ground']} · ${t('home.groundNudge', 'maybe now?')}`
               : WIDGET_TITLES['ground']}
             collapsed={effectiveCollapsed}
@@ -503,71 +481,40 @@ const Home = () => {
             className={glowClass}
           >
             <div className="space-y-3">
-              {isVolatile && subscribed && (
+              {shouldNudgeGround && (
                 <p className="text-[10px] font-mono text-primary/40 tracking-wider">
                   {t('home.groundVolatileHint', 'The market is moving. A good moment to ground.')}
                 </p>
               )}
 
-              {subscribed && groundingData ? (
-                <div className="space-y-4">
-                  {/* AI suggestion teaser with dismiss */}
-                  <div className="relative">
-                    <button
-                      onClick={() => setGroundingData(null)}
-                      className="absolute -top-1 -right-1 p-1 rounded-full text-muted-foreground/30 hover:text-muted-foreground/60 hover:bg-muted/50 transition-colors"
-                      aria-label={t('common.dismiss', 'Dismiss')}
-                    >
-                      <X className="h-3.5 w-3.5" />
-                    </button>
-                    <p className="text-sm leading-relaxed text-foreground/80 pr-5">
-                      {groundingData.suggestion.split(/[.!?]\s/)[0]}{groundingData.suggestion.split(/[.!?]\s/).length > 1 ? '…' : ''}
-                    </p>
-                    <p className="text-[10px] font-mono text-muted-foreground/40 uppercase tracking-wider mt-2">
-                      {groundingData.duration} min · {groundingData.activity}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => navigate('/ground', { state: { preGenerated: groundingData } })}
-                    className={`w-full flex items-center justify-center gap-2 py-3 rounded-md border transition-colors duration-500 ${
-                      isVolatile
-                        ? 'border-primary/30 bg-primary/10 hover:bg-primary/15'
-                        : 'border-primary/20 bg-primary/5 hover:bg-primary/10'
-                    }`}
-                  >
-                    <Anchor className={`h-3 w-3 ${isVolatile ? 'text-primary/70' : 'text-primary/50'}`} />
-                    <span className={`text-[10px] font-mono tracking-[0.15em] uppercase ${isVolatile ? 'text-primary/70' : 'text-primary/50'}`}>
-                      {t('home.groundYourself', 'Ground yourself')}
-                    </span>
-                  </button>
-                </div>
-              ) : (
-                <>
-                  {/* Activity tags — static state while loading or after dismiss */}
-                  <div className="flex flex-wrap gap-1.5">
-                    {groundingActivities.slice(0, 4).map((activity) => (
-                      <span key={activity} className="text-[10px] font-mono px-2.5 py-1 rounded-full border border-border/20 bg-muted/10 text-muted-foreground/40">
-                        {activity}
-                      </span>
-                    ))}
-                  </div>
-                  <button
-                    onClick={() => navigate('/ground', { state: groundingData ? { preGenerated: groundingData } : undefined })}
-                    className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors duration-500"
-                  >
-                    <Anchor className="h-3 w-3 text-primary/50" />
-                    <span className="text-[10px] font-mono text-primary/50 tracking-[0.15em] uppercase">
-                      {t('home.groundYourself', 'Ground yourself')}
-                    </span>
-                  </button>
-                  {!subscribed && (
-                    <p className="text-[10px] text-muted-foreground/30 text-center">
-                      {t('home.groundProHint', 'Upgrade to Pro for AI-guided grounding sessions')}
-                    </p>
-                  )}
-                </>
+              <div className="flex flex-wrap gap-1.5">
+                {groundingActivities.slice(0, 4).map((activity) => (
+                  <span key={activity} className="text-[10px] font-mono px-2.5 py-1 rounded-full border border-border/20 bg-muted/10 text-muted-foreground/40">
+                    {activity}
+                  </span>
+                ))}
+              </div>
+
+              <button
+                onClick={() => navigate('/ground')}
+                className={`w-full flex items-center justify-center gap-2 py-3 rounded-md border transition-colors duration-500 ${
+                  shouldNudgeGround
+                    ? 'border-primary/30 bg-primary/10 hover:bg-primary/15'
+                    : 'border-primary/20 bg-primary/5 hover:bg-primary/10'
+                }`}
+              >
+                <Anchor className={`h-3 w-3 ${shouldNudgeGround ? 'text-primary/70' : 'text-primary/50'}`} />
+                <span className={`text-[10px] font-mono tracking-[0.15em] uppercase ${shouldNudgeGround ? 'text-primary/70' : 'text-primary/50'}`}>
+                  {t('home.groundYourself', 'Ground yourself')}
+                </span>
+              </button>
+
+              {!subscribed && (
+                <p className="text-[10px] text-muted-foreground/30 text-center">
+                  {t('home.groundProHint', 'Upgrade to Pro for AI-guided grounding sessions')}
+                </p>
               )}
-              {/* Journal link */}
+
               <button
                 onClick={() => navigate('/ground/history')}
                 className="w-full text-center text-[9px] font-mono tracking-[0.15em] uppercase text-muted-foreground/25 hover:text-muted-foreground/50 transition-colors pt-1"
