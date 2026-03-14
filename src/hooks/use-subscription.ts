@@ -82,12 +82,17 @@ export function useSubscription() {
   const startCheckout = useCallback(async () => {
     setCheckoutLoading(true);
     try {
+      sessionStorage.setItem(CHECKOUT_RETURN_KEY, String(Date.now()));
       const { data, error } = await supabase.functions.invoke('create-checkout');
       if (error) throw error;
+
       if (data?.url) {
-        // Redirect in same tab so ?subscribed=true comes back here
+        // Redirect in same tab so return state stays in sessionStorage
         window.location.href = data.url;
+        return;
       }
+
+      setCheckoutLoading(false);
     } catch (e) {
       console.error('Checkout error:', e);
       setCheckoutLoading(false);
