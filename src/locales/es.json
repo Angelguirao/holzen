@@ -323,8 +323,8 @@
     "learnFromHistory": "Aprende de la historia →",
     "toggleCompanions": "Activa o desactiva compañeros en Ajustes.",
     "yourThreshold": "Tu umbral",
-    "thresholdQuestion": "¿Cuánto necesita moverse BTC en 24 horas antes de que te contactemos?",
-    "changeThresholdLater": "Puedes cambiarlo después."
+    "thresholdQuestion": "¿Cuánto necesita moverse Bitcoin (subida o bajada) antes de que quieras pausar y reflexionar?",
+    "changeThresholdLater": "Puedes configurar umbrales separados para subida y bajada en Ajustes"
   },
   "moodCheck": {
     "howAreYouFeeling": "¿Cómo te sientes ahora mismo?",

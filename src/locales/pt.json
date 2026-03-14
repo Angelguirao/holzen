@@ -323,8 +323,8 @@
     "learnFromHistory": "Aprenda com a história →",
     "toggleCompanions": "Ative ou desative companheiros nas Configurações.",
     "yourThreshold": "Seu limite",
-    "thresholdQuestion": "Quanto o BTC precisa se mover em 24 horas antes de entrarmos em contato?",
-    "changeThresholdLater": "Você pode mudar isso depois."
+    "thresholdQuestion": "Quanto o Bitcoin precisa se mover (para cima ou para baixo) antes de você querer pausar e refletir?",
+    "changeThresholdLater": "Você pode definir limites separados para alta e queda nas Configurações"
   },
   "moodCheck": {
     "howAreYouFeeling": "Como você está se sentindo agora?",

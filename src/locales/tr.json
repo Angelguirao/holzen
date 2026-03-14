@@ -323,8 +323,8 @@
     "learnFromHistory": "Tarihten öğren →",
     "toggleCompanions": "Yol arkadaşlarını Ayarlar'da açıp kapatın.",
     "yourThreshold": "Eşiğiniz",
-    "thresholdQuestion": "BTC'nin 24 saatte ne kadar hareket etmesi gerekiyor sizinle iletişime geçmemiz için?",
-    "changeThresholdLater": "Bunu daha sonra değiştirebilirsiniz."
+    "thresholdQuestion": "Bitcoin ne kadar hareket etmeli (yukarı veya aşağı) duraklamak ve düşünmek istemeniz için?",
+    "changeThresholdLater": "Yükseliş ve düşüş için ayrı eşikler Ayarlar'dan belirleyebilirsiniz"
   },
   "moodCheck": {
     "howAreYouFeeling": "Şu anda nasıl hissediyorsunuz?",
