@@ -118,7 +118,8 @@ export function Onboarding({ onComplete }: Props) {
                     motivations,
                     groundingActivities,
                   })}
-                  onStartTrial={() => {
+                  onStartTrial={async () => {
+                    await startCheckout();
                     onComplete({
                       threshold,
                       firstName: null,
@@ -126,7 +127,6 @@ export function Onboarding({ onComplete }: Props) {
                       motivations,
                       groundingActivities,
                     });
-                    startCheckout();
                   }}
                   checkoutLoading={checkoutLoading}
                   stagger={stagger}
