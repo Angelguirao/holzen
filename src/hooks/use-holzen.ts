@@ -207,13 +207,23 @@ export function useHolzen() {
       .eq('user_id', user.id);
   }, [user]);
 
-  const completeOnboarding = useCallback(async (result: { threshold: number; firstName: string | null; timezone: string; motivations: string[]; groundingActivities: string[] }) => {
-    setHasOnboarded(true);
+  const completeOnboarding = useCallback(async (
+    result: { threshold: number; firstName: string | null; timezone: string; motivations: string[]; groundingActivities: string[] },
+    options?: { setLocalOnboarded?: boolean },
+  ) => {
+    const setLocalOnboarded = options?.setLocalOnboarded ?? true;
+
+    if (setLocalOnboarded) {
+      setHasOnboarded(true);
+    }
+
     setThresholdState(result.threshold);
     if (result.firstName) setFirstNameState(result.firstName);
     setMotivationsState(result.motivations);
     setGroundingActivitiesState(result.groundingActivities);
+
     if (!user) return;
+
     await supabase
       .from('profiles')
       .update({
