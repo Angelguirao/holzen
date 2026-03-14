@@ -16,7 +16,8 @@ interface VolatilityStats {
   avgDailyMove: number;
 }
 
-const CACHE_KEY = 'holzen_btc_volatility_stats';
+const CACHE_KEY = 'holzen_btc_volatility_stats_v2';
+const LEGACY_CACHE_KEY = 'holzen_btc_volatility_stats';
 const CACHE_TTL = 6 * 60 * 60 * 1000;
 
 interface CachedData {
@@ -25,12 +26,37 @@ interface CachedData {
   timestamp: number;
 }
 
+function isValidCachedData(value: unknown): value is CachedData {
+  if (!value || typeof value !== 'object') return false;
+  const v = value as Record<string, unknown>;
+  if (typeof v.timestamp !== 'number') return false;
+  if (!Array.isArray(v.dailyChanges) || !Array.isArray(v.hourlyPrices)) return false;
+
+  const hasValidDaily = v.dailyChanges.every((n) => typeof n === 'number');
+  const hasValidHourly = v.hourlyPrices.every(
+    (entry) => Array.isArray(entry) && entry.length === 2 && entry.every((n) => typeof n === 'number')
+  );
+
+  return hasValidDaily && hasValidHourly;
+}
+
 async function fetchVolatilityData(): Promise<CachedData | null> {
   try {
-    const cached = localStorage.getItem(CACHE_KEY);
+    const readCached = (key: string): CachedData | null => {
+      const cached = localStorage.getItem(key);
+      if (!cached) return null;
+      const parsed: unknown = JSON.parse(cached);
+      if (!isValidCachedData(parsed)) return null;
+      if (Date.now() - parsed.timestamp >= CACHE_TTL) return null;
+      return parsed;
+    };
+
+    const cached = readCached(CACHE_KEY) ?? readCached(LEGACY_CACHE_KEY);
     if (cached) {
-      const parsed: CachedData = JSON.parse(cached);
-      if (Date.now() - parsed.timestamp < CACHE_TTL) return parsed;
+      // Migrate legacy cache shape to the current key.
+      localStorage.setItem(CACHE_KEY, JSON.stringify(cached));
+      localStorage.removeItem(LEGACY_CACHE_KEY);
+      return cached;
     }
 
     const res = await fetch(
@@ -57,6 +83,7 @@ async function fetchVolatilityData(): Promise<CachedData | null> {
 
     const result: CachedData = { dailyChanges, hourlyPrices: prices, timestamp: Date.now() };
     localStorage.setItem(CACHE_KEY, JSON.stringify(result));
+    localStorage.removeItem(LEGACY_CACHE_KEY);
     return result;
   } catch {
     return null;
@@ -213,13 +240,13 @@ export function ThresholdFrequencyEstimator({
         <Activity className="h-3 w-3 text-primary/50 mt-0.5 shrink-0" />
         <div className="space-y-0.5">
           <p className="text-[11px] font-mono text-foreground/70 leading-snug">
-            {t('threshold.estimator.result', 'At {{threshold}}%, you\'d have paused ~{{count}} times in the last 30 days', {
+            {t('threshold.estimator.result', 'With your current thresholds, you\'d have paused ~{{count}} times in the last 30 days', {
               threshold: thresholdUp.toFixed(1),
               count: stats.crossings30d,
             })}
           </p>
           <p className="text-[10px] font-mono text-muted-foreground/50 leading-snug">
-            {t('threshold.estimator.monthly', '~{{count}}/month estimated · avg daily move: {{avg}}%', {
+            {t('threshold.estimator.monthly', '~{{count}}/month estimated · overlapping up/down/7-day signals merge during cooldown · avg daily move: {{avg}}%', {
               count: monthlyEstimate,
               avg: stats.avgDailyMove.toFixed(1),
             })}
