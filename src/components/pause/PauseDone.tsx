@@ -1,6 +1,8 @@
 import { motion } from 'framer-motion';
-import { Flame } from 'lucide-react';
+import { Flame, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useSubscription } from '@/hooks/use-subscription';
+import { PRICING } from '@/lib/pricing';
 
 interface Props {
   decision: string | null;
@@ -9,6 +11,9 @@ interface Props {
 
 export function PauseDone({ decision, onReturn }: Props) {
   const { t } = useTranslation();
+  const { subscribed, monthlyUsed, startCheckout, checkoutLoading } = useSubscription();
+
+  const justHitLimit = !subscribed && monthlyUsed >= PRICING.freeReflectionsPerMonth;
 
   return (
     <motion.div
