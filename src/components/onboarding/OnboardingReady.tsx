@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Wind, Brain, Infinity, Anchor, Lightbulb, BookOpen, Moon, Image, Mail, Loader2 } from 'lucide-react';
+import { LoadingButton } from '@/components/ui/loading-button';
+import { Sparkles, Wind, Brain, Infinity, Anchor, Lightbulb, BookOpen, Moon, Image, Mail } from 'lucide-react';
 import { PRICING } from '@/lib/pricing';
 
 interface Props {
@@ -105,23 +106,15 @@ export function OnboardingReady({
 
       {/* CTAs */}
       <motion.div className="space-y-3 pt-1" {...stagger(0.4)}>
-        <Button
+        <LoadingButton
           onClick={onStartTrial}
-          disabled={checkoutLoading}
+          loading={checkoutLoading}
+          loadingText={t('onboarding.ready.redirecting', 'Redirecting to checkout…')}
           className="w-full font-mono text-xs h-10 gap-2"
         >
-          {checkoutLoading ? (
-            <>
-              <Loader2 className="h-3 w-3 animate-spin" />
-              {t('onboarding.ready.redirecting', 'Redirecting to checkout…')}
-            </>
-          ) : (
-            <>
-              <Sparkles className="h-3 w-3" />
-              {t('onboarding.ready.startTrial', 'Start {{days}}-day free trial', { days: PRICING.trialDays })}
-            </>
-          )}
-        </Button>
+          <Sparkles className="h-3 w-3" />
+          {t('onboarding.ready.startTrial', 'Start {{days}}-day free trial', { days: PRICING.trialDays })}
+        </LoadingButton>
         <button
           onClick={onBeginFree}
           className="w-full text-center text-[10px] font-mono text-muted-foreground/40 hover:text-foreground transition-colors py-2"

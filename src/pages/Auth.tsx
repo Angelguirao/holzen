@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable/index';
 import { Button } from '@/components/ui/button';
+import { LoadingButton } from '@/components/ui/loading-button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
@@ -111,7 +112,7 @@ const Auth = () => {
               <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="font-mono text-sm" />
             </div>
             {error && <p className="text-xs text-destructive font-mono">{error}</p>}
-            <Button type="submit" className="w-full font-mono text-xs" disabled={loading}>{t('auth.sendResetLink')}</Button>
+            <LoadingButton type="submit" className="w-full font-mono text-xs" loading={loading}>{t('auth.sendResetLink')}</LoadingButton>
           </form>
           <button onClick={() => { setView('sign-in'); setError(null); }} className="text-xs font-mono text-muted-foreground underline w-full text-center">{t('auth.backToSignIn')}</button>
         </div>
@@ -156,9 +157,9 @@ const Auth = () => {
             <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} className="font-mono text-sm" />
           </div>
           {error && <p className="text-xs text-destructive font-mono">{error}</p>}
-          <Button type="submit" className="w-full font-mono text-xs" disabled={loading}>
+          <LoadingButton type="submit" className="w-full font-mono text-xs" loading={loading}>
             {view === 'sign-up' ? t('common.signUp') : t('common.signIn')}
-          </Button>
+          </LoadingButton>
         </form>
 
         {view === 'sign-up' && (

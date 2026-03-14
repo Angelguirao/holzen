@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, X, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { LoadingButton } from '@/components/ui/loading-button';
 import { Textarea } from '@/components/ui/textarea';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
@@ -106,15 +107,16 @@ export function TestimonialRequest({ reflectionCount }: Props) {
           />
           <div className="flex items-center justify-between">
             <span className="text-[10px] text-muted-foreground">{quote.length}/280</span>
-            <Button
+            <LoadingButton
               size="sm"
               onClick={submit}
-              disabled={submitting || !quote.trim() || !displayName.trim()}
+              loading={submitting}
+              disabled={!quote.trim() || !displayName.trim()}
               className="text-xs font-mono gap-1.5"
             >
               <Send className="h-3 w-3" />
               {t('testimonial.submit')}
-            </Button>
+            </LoadingButton>
           </div>
         </motion.div>
       )}
