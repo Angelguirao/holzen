@@ -425,14 +425,49 @@ export default function Ground() {
             </motion.div>
           )}
 
-          {/* Check-in */}
+          {/* Check-in — soft mood picker */}
           {phase === 'checkin' && (
-            <motion.div key="checkin" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.6, ease }} className="text-center space-y-8 w-full">
-              <div className="space-y-2">
+            <motion.div key="checkin" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.8, ease }} className="text-center space-y-10 w-full">
+              <div className="space-y-3">
                 <p className="text-[10px] font-mono tracking-[0.25em] uppercase text-muted-foreground/40">{t('ground.checkIn', 'Check in')}</p>
                 <div className="h-px w-8 bg-foreground/10 mx-auto" />
+                <p className="text-sm text-muted-foreground/50 leading-relaxed">
+                  {t('moodCheck.howAreYouFeelingNow', 'How are you feeling now?')}
+                </p>
               </div>
-              <MoodCheck onSelect={handleMoodSelect} onSkip={handleMoodSkip} variant="after" />
+
+              <div className="grid grid-cols-4 gap-x-4 gap-y-6 max-w-[280px] mx-auto">
+                {(['fomo', 'excited', 'greedy', 'anxious', 'calm', 'detached', 'uncertain', 'fearful'] as const).map((mood, i) => (
+                  <motion.button
+                    key={mood}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 0.15 + i * 0.06, ease }}
+                    onClick={() => handleMoodSelect(mood)}
+                    className="flex flex-col items-center gap-2 group"
+                  >
+                    <motion.div
+                      className="w-12 h-12 rounded-full flex items-center justify-center border border-border/30 bg-muted/30 backdrop-blur-sm transition-all duration-300 group-hover:border-primary/30 group-hover:bg-primary/5 group-hover:scale-110"
+                      whileTap={{ scale: 0.92 }}
+                    >
+                      <MoodIcon mood={mood} size={22} className="text-muted-foreground/60 transition-colors duration-300 group-hover:text-foreground/70" />
+                    </motion.div>
+                    <span className="text-[8px] font-mono tracking-wider uppercase text-muted-foreground/40 transition-colors duration-300 group-hover:text-muted-foreground/70">
+                      {t(`moodCheck.moods.${mood}`)}
+                    </span>
+                  </motion.button>
+                ))}
+              </div>
+
+              <motion.button
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.8 }}
+                onClick={handleMoodSkip}
+                className="text-[10px] font-mono text-muted-foreground/30 hover:text-muted-foreground/50 transition-colors duration-300"
+              >
+                {t('common.skip')}
+              </motion.button>
             </motion.div>
           )}
 
