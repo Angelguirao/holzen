@@ -5,7 +5,7 @@ import { PageMeta } from '@/components/PageMeta';
 import { Heart, Search, X, Lock, Plus } from 'lucide-react';
 import { LibraryItems } from '@/components/library/LibraryItems';
 import { LibraryCollections } from '@/components/library/LibraryCollections';
-import { NewNoteForm } from '@/components/library/NewNoteForm';
+
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { useProGate } from '@/hooks/use-pro-gate';
@@ -62,15 +62,6 @@ export default function Library() {
     return result;
   }, [items, tab, sourceFilter, search]);
 
-  const handleAddNote = async (title: string, body: string, tags: string[]) => {
-    await library.addItem({
-      type: 'note',
-      title: title || null,
-      body,
-      source_type: 'reflection_note',
-      tags,
-    } as any);
-  };
 
   if (isPending) {
     return (
@@ -204,12 +195,11 @@ export default function Library() {
             </button>
           )}
 
-          {/* Count + Add note */}
-          <div className="flex items-center justify-between px-1">
+          {/* Count */}
+          <div className="px-1">
             <span className="text-[9px] font-mono text-muted-foreground/30">
               {filtered.length} {filtered.length === 1 ? 'item' : 'items'}
             </span>
-            <NewNoteForm onSave={handleAddNote} />
           </div>
 
           {/* Item list with date grouping */}
