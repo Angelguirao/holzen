@@ -1251,7 +1251,7 @@
     "priceDrops": "Price drops threshold",
     "triggerDrops": "trigger when BTC drops this much in 24h",
     "cumulative": "7-day cumulative threshold",
-    "rolling7day": "rolling 7-day window",
+    "rolling7day": "trigger when BTC moves this much over 7 days (up or down)",
     "confirm": "Confirm"
   },
   "changelog": {
