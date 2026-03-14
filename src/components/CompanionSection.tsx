@@ -668,15 +668,12 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           icon={COMPANION_ICONS.zoomOut}
           expanded={expandedZoomOut}
           onToggle={() => {
-            if (!isPro) { requirePro('zoom_out'); return; }
             setExpandedZoomOut((v) => !v);
             if (!completion.zoomOut) markCompleted('zoomOut');
           }}
           completed={completion.zoomOut}
-          isFavorite={favorites['zoom_out']}
-          onToggleFavorite={() => toggleCompanionFavorite('zoom_out')}
-          locked={!isPro}
-          onUpgrade={() => requirePro('zoom_out')}
+          isFavorite={isPro ? favorites['zoom_out'] : undefined}
+          onToggleFavorite={isPro ? () => toggleCompanionFavorite('zoom_out') : undefined}
         >
           <ZoomOutDisplay
             data={zoomOut}
