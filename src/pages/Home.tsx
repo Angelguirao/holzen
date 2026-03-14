@@ -565,6 +565,13 @@ const Home = () => {
                   </p>
                 </>
               )}
+              {/* Journal link */}
+              <button
+                onClick={() => navigate('/ground/history')}
+                className="w-full text-center text-[9px] font-mono tracking-[0.15em] uppercase text-muted-foreground/25 hover:text-muted-foreground/50 transition-colors pt-1"
+              >
+                {t('home.groundJournal', 'View journal')}
+              </button>
             </div>
           </HomeWidget>
         );
