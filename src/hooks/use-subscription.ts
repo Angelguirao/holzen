@@ -73,11 +73,11 @@ export function useSubscription() {
       const { data, error } = await supabase.functions.invoke('create-checkout');
       if (error) throw error;
       if (data?.url) {
-        window.open(data.url, '_blank');
+        // Redirect in same tab so ?subscribed=true comes back here
+        window.location.href = data.url;
       }
     } catch (e) {
       console.error('Checkout error:', e);
-    } finally {
       setCheckoutLoading(false);
     }
   }, []);
