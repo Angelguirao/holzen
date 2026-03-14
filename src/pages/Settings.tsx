@@ -646,12 +646,15 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                   <Label htmlFor="push-notif" className="text-xs font-mono text-muted-foreground">
                     {t('settings.pushNotifications')}
                   </Label>
-                  <Switch
-                    id="push-notif"
-                    checked={pushSubscribed}
-                    disabled={pushLoading}
-                    onCheckedChange={(checked) => checked ? pushSubscribe() : pushUnsubscribe()}
-                  />
+                  <div className="flex items-center gap-2">
+                    {pushLoading && <Loader2 className="h-3 w-3 animate-spin text-muted-foreground" />}
+                    <Switch
+                      id="push-notif"
+                      checked={pushSubscribed}
+                      disabled={pushLoading}
+                      onCheckedChange={(checked) => checked ? pushSubscribe() : pushUnsubscribe()}
+                    />
+                  </div>
                 </div>
               )}
             </div>
