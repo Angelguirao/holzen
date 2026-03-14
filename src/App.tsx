@@ -32,6 +32,7 @@ import PracticeBodyScan from "./pages/PracticeBodyScan";
 import PracticeReplay from "./pages/PracticeReplay";
 import PauseSession from "./pages/PauseSession";
 import Ground from "./pages/Ground";
+import GroundHistory from "./pages/GroundHistory";
 
 const queryClient = new QueryClient();
 
@@ -78,6 +79,7 @@ const App = () => (
                 <Route path="/pause" element={<ProtectedRoute><PauseSession /></ProtectedRoute>} />
                 <Route path="/breathe" element={<ProtectedRoute><Breathe /></ProtectedRoute>} />
                 <Route path="/ground" element={<ProtectedRoute><Ground /></ProtectedRoute>} />
+                <Route path="/ground/history" element={<ProtectedRoute><GroundHistory /></ProtectedRoute>} />
                 <Route path="/ambient" element={<ProtectedRoute><Breathe /></ProtectedRoute>} />
                 <Route path="/practice/checkin" element={<ProtectedRoute><PracticeCheckIn /></ProtectedRoute>} />
                 <Route path="/practice/journal" element={<ProtectedRoute><PracticeJournal /></ProtectedRoute>} />
