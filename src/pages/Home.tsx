@@ -115,12 +115,6 @@ const Home = () => {
   const prefersReducedMotion = useReducedMotion();
   const [reflectionCount, setReflectionCount] = useState(0);
 
-  // Pre-generated grounding data
-  const [groundingData, setGroundingData] = useState<{
-    activity: string; suggestion: string; duration: number;
-    insight: string | null; article: { snippet: string; url: string | null } | null;
-  } | null>(null);
-  const groundingFetchedRef = useRef(false);
 
   // Widget layout
   const defaultOrder = useMemo(() => [...WIDGET_IDS], []);
