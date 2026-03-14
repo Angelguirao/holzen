@@ -495,24 +495,22 @@ const Home = () => {
                 ))}
               </div>
 
-              <button
-                onClick={() => navigate('/ground')}
-                className={`w-full flex items-center justify-center gap-2 py-3 rounded-md border transition-colors duration-500 ${
-                  shouldNudgeGround
-                    ? 'border-primary/30 bg-primary/10 hover:bg-primary/15'
-                    : 'border-primary/20 bg-primary/5 hover:bg-primary/10'
-                }`}
-              >
-                <Anchor className={`h-3 w-3 ${shouldNudgeGround ? 'text-primary/70' : 'text-primary/50'}`} />
-                <span className={`text-[10px] font-mono tracking-[0.15em] uppercase ${shouldNudgeGround ? 'text-primary/70' : 'text-primary/50'}`}>
-                  {t('home.groundYourself', 'Ground yourself')}
-                </span>
-              </button>
-
-              {!subscribed && (
-                <p className="text-[10px] text-muted-foreground/30 text-center">
-                  {t('home.groundProHint', 'Upgrade to Pro for AI-guided grounding sessions')}
-                </p>
+              {subscribed ? (
+                <button
+                  onClick={() => navigate('/ground')}
+                  className={`w-full flex items-center justify-center gap-2 py-3 rounded-md border transition-colors duration-500 ${
+                    shouldNudgeGround
+                      ? 'border-primary/30 bg-primary/10 hover:bg-primary/15'
+                      : 'border-primary/20 bg-primary/5 hover:bg-primary/10'
+                  }`}
+                >
+                  <Anchor className={`h-3 w-3 ${shouldNudgeGround ? 'text-primary/70' : 'text-primary/50'}`} />
+                  <span className={`text-[10px] font-mono tracking-[0.15em] uppercase ${shouldNudgeGround ? 'text-primary/70' : 'text-primary/50'}`}>
+                    {t('home.groundYourself', 'Ground yourself')}
+                  </span>
+                </button>
+              ) : (
+                <ProLockedWidget onUpgrade={startCheckout} checkoutLoading={checkoutLoading} feature="grounding" />
               )}
 
               <button
