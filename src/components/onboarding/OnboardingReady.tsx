@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Wind, Brain, Anchor } from 'lucide-react';
+import { Sparkles, Wind, Brain, Anchor, Infinity, BookOpen, Lightbulb } from 'lucide-react';
 import { PRICING } from '@/lib/pricing';
 
 interface Props {
@@ -41,7 +41,7 @@ export function OnboardingReady({
   ].filter(Boolean) as { label: string; value: string }[];
 
   return (
-    <div className="space-y-7">
+    <div className="space-y-6">
       <motion.div className="space-y-2" {...stagger(0.1)}>
         <p className="text-xs font-mono tracking-[0.25em] uppercase text-muted-foreground">
           {t('onboarding.ready.title', "You're set")}
@@ -65,41 +65,56 @@ export function OnboardingReady({
         </motion.div>
       )}
 
-      {/* Free plan — what's included */}
-      <motion.div className="space-y-3" {...stagger(0.25)}>
-        <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-foreground/40">
-          {t('onboarding.ready.includedFree', 'Included free')}
-        </p>
+      {/* Free vs Pro comparison */}
+      <motion.div className="space-y-4" {...stagger(0.25)}>
         <div className="space-y-2">
+          <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-foreground/40">
+            {t('onboarding.ready.freePlan', 'Free')}
+          </p>
           {[
             { icon: Wind, text: t('onboarding.ready.featurePauses', '{{count}} pauses per month', { count: PRICING.freeReflectionsPerMonth }) },
             { icon: Brain, text: t('onboarding.ready.featureAI', 'AI companions in every pause') },
-            { icon: Anchor, text: t('onboarding.ready.featureGrounding', 'Personalized grounding prompts') },
           ].map(({ icon: Icon, text }, i) => (
             <div key={i} className="flex items-center gap-2.5">
-              <Icon className="h-3 w-3 text-muted-foreground/50 shrink-0" />
-              <span className="text-sm text-muted-foreground leading-snug">{text}</span>
+              <Icon className="h-3 w-3 text-muted-foreground/40 shrink-0" />
+              <span className="text-xs text-muted-foreground/60 leading-snug">{text}</span>
+            </div>
+          ))}
+        </div>
+
+        <div className="space-y-2">
+          <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-foreground/60">
+            {t('onboarding.ready.proPlan', 'Pro')}
+          </p>
+          {[
+            { icon: Infinity, text: t('onboarding.ready.proUnlimited', 'Unlimited pauses') },
+            { icon: Anchor, text: t('onboarding.ready.proGrounding', 'AI-guided grounding sessions') },
+            { icon: Lightbulb, text: t('onboarding.ready.proInsights', 'AI pattern insights') },
+            { icon: BookOpen, text: t('onboarding.ready.proLibrary', 'Personal library & letters') },
+          ].map(({ icon: Icon, text }, i) => (
+            <div key={i} className="flex items-center gap-2.5">
+              <Icon className="h-3 w-3 text-foreground/50 shrink-0" />
+              <span className="text-xs text-foreground/80 leading-snug">{text}</span>
             </div>
           ))}
         </div>
       </motion.div>
 
       {/* CTAs */}
-      <motion.div className="space-y-3 pt-2" {...stagger(0.4)}>
+      <motion.div className="space-y-3 pt-1" {...stagger(0.4)}>
         <Button
-          onClick={onBeginFree}
-          variant="outline"
-          className="w-full font-mono text-xs h-10"
-        >
-          {t('onboarding.ready.beginFree', 'Begin')}
-        </Button>
-        <button
           onClick={onStartTrial}
           disabled={checkoutLoading}
-          className="w-full flex items-center justify-center gap-1.5 text-[10px] font-mono text-muted-foreground/50 hover:text-foreground transition-colors py-2"
+          className="w-full font-mono text-xs h-10 gap-2"
         >
-          <Sparkles className="h-2.5 w-2.5" />
-          {t('onboarding.ready.startTrial', 'Or unlock unlimited with a {{days}}-day free trial →', { days: PRICING.trialDays })}
+          <Sparkles className="h-3 w-3" />
+          {t('onboarding.ready.startTrial', 'Start {{days}}-day free trial', { days: PRICING.trialDays })}
+        </Button>
+        <button
+          onClick={onBeginFree}
+          className="w-full text-center text-[10px] font-mono text-muted-foreground/40 hover:text-foreground transition-colors py-2"
+        >
+          {t('onboarding.ready.beginFree', 'Continue with free plan →')}
         </button>
       </motion.div>
     </div>
