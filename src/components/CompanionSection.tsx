@@ -646,15 +646,12 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           icon={COMPANION_ICONS.signal}
           expanded={expandedSignal}
           onToggle={() => {
-            if (!isPro) { requirePro('signal'); return; }
             setExpandedSignal((v) => !v);
             if (!completion.signal) markCompleted('signal');
           }}
           completed={completion.signal}
-          isFavorite={favorites['signal']}
-          onToggleFavorite={() => toggleCompanionFavorite('signal')}
-          locked={!isPro}
-          onUpgrade={() => requirePro('signal')}
+          isFavorite={isPro ? favorites['signal'] : undefined}
+          onToggleFavorite={isPro ? () => toggleCompanionFavorite('signal') : undefined}
         >
           <SignalDisplay
             signal={signal}
