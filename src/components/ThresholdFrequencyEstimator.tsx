@@ -240,13 +240,12 @@ export function ThresholdFrequencyEstimator({
         <Activity className="h-3 w-3 text-primary/50 mt-0.5 shrink-0" />
         <div className="space-y-0.5">
           <p className="text-[11px] font-mono text-foreground/70 leading-snug">
-            {t('threshold.estimator.result', 'At {{threshold}}%, you\'d have paused ~{{count}} times in the last 30 days', {
-              threshold: thresholdUp.toFixed(1),
+            {t('threshold.estimator.result', 'With your current thresholds, you\'d have paused ~{{count}} times in the last 30 days', {
               count: stats.crossings30d,
             })}
           </p>
           <p className="text-[10px] font-mono text-muted-foreground/50 leading-snug">
-            {t('threshold.estimator.monthly', '~{{count}}/month estimated · avg daily move: {{avg}}%', {
+            {t('threshold.estimator.monthly', '~{{count}}/month estimated · overlapping up/down/7-day signals merge during cooldown · avg daily move: {{avg}}%', {
               count: monthlyEstimate,
               avg: stats.avgDailyMove.toFixed(1),
             })}
