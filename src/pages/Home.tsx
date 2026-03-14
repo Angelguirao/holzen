@@ -56,7 +56,7 @@ interface PinnedReflection {
 }
 
 const Home = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const WIDGET_TITLES: Record<WidgetId, string> = {
     'btc-status': t('home.widget.market'),
     'hold-goal': t('home.widget.goal'),
