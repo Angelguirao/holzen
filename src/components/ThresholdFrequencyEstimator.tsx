@@ -134,7 +134,7 @@ export function ThresholdFrequencyEstimator({ threshold, cooldownHours, classNam
   useEffect(() => {
     if (!cachedData) return;
 
-    if (cooldownHours && cooldownHours < 24) {
+    if (cooldownHours && cooldownHours < 24 && cachedData.hourlyPrices?.length > 1) {
       setStats(computeStatsHourly(cachedData.hourlyPrices, threshold, cooldownHours));
     } else {
       setStats(computeStatsDaily(cachedData.dailyChanges, threshold));
