@@ -127,13 +127,6 @@ const Home = () => {
   const [reflectionCount, setReflectionCount] = useState(0);
 
   // Grounding suggestion state (mirrors pause message pattern)
-  interface GroundingSuggestion {
-    activity: string;
-    suggestion: string;
-    duration: number;
-    insight: string | null;
-    article: { snippet: string; url: string | null } | null;
-  }
   const groundStorageKey = user ? `holzen_ground_suggestion_${user.id}` : 'holzen_ground_suggestion';
   const [groundSuggestion, setGroundSuggestion] = useState<GroundingSuggestion | null>(() => {
     try {
