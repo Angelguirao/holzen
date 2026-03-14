@@ -297,13 +297,15 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
       .then(async ({ data: row }) => {
         if (cancelled) return;
         if (row?.learning_citation) {
-          setNudge({
+          const cachedNudge = {
             title: row.learning_title ?? '',
             body: row.learning_body ?? '',
             citation: row.learning_citation,
             url: row.learning_url ?? '',
-          });
+          };
+          setNudge(cachedNudge);
           setNudgeLoading(false);
+          autoSaveToLibrary({ title: cachedNudge.title, body: cachedNudge.body, sourceType: 'learning', sourceUrl: cachedNudge.url });
           return;
         }
 
@@ -381,13 +383,15 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
       .then(async ({ data: row }) => {
         if (cancelled) return;
         if (row?.signal_source) {
-          setSignal({
+          const cachedSignal = {
             title: row.signal_title ?? '',
             body: row.signal_body ?? '',
             source: row.signal_source,
             url: row.signal_url ?? '',
-          });
+          };
+          setSignal(cachedSignal);
           setSignalLoading(false);
+          autoSaveToLibrary({ title: cachedSignal.title, body: cachedSignal.body, sourceType: 'signal', sourceUrl: cachedSignal.url });
           return;
         }
 
@@ -474,6 +478,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
         if ((row as any)?.zoom_out_data) {
           setZoomOut((row as any).zoom_out_data);
           setZoomOutLoading(false);
+          autoSaveToLibrary({ title: 'Zoom Out', body: JSON.stringify((row as any).zoom_out_data), sourceType: 'zoom_out' });
           return;
         }
 
@@ -532,8 +537,10 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
       .then(({ data: row }) => {
         if (cancelled) return;
         if ((row as any)?.history_insight_data) {
-          setHistoryInsight((row as any).history_insight_data);
+          const cachedHistory = (row as any).history_insight_data as HistoricalInsightData;
+          setHistoryInsight(cachedHistory);
           setHistoryLoading(false);
+          autoSaveToLibrary({ title: cachedHistory.title, body: cachedHistory.btcInsight, sourceType: 'history_insight' });
           return;
         }
 
