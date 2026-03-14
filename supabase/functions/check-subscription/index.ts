@@ -8,6 +8,7 @@ const corsHeaders = {
 };
 
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+const SUBSCRIBED_STATUSES = new Set(["active", "trialing"]);
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -70,7 +71,7 @@ serve(async (req) => {
       const now = Date.now();
       if (now - checkedAt < CACHE_TTL_MS) {
         // Return cached result
-        const cachedSubscribed = profile.subscription_status === "active";
+        const cachedSubscribed = SUBSCRIBED_STATUSES.has(profile.subscription_status);
         return new Response(JSON.stringify({
           subscribed: cachedSubscribed,
           lifetime: false,
@@ -88,19 +89,22 @@ serve(async (req) => {
 
     let hasActive = false;
     let subscriptionEnd: string | null = null;
+    let subscriptionStatus = "free";
 
     if (customers.data.length > 0) {
       const subscriptions = await stripe.subscriptions.list({
         customer: customers.data[0].id,
-        status: "active",
-        limit: 1,
+        status: "all",
+        limit: 10,
       });
 
-      hasActive = subscriptions.data.length > 0;
-      if (hasActive) {
-        const sub = subscriptions.data[0];
-        const itemEnd = sub.items?.data?.[0]?.current_period_end;
-        const raw = itemEnd ?? (sub as any).current_period_end ?? sub.billing_cycle_anchor;
+      const eligibleSub = subscriptions.data.find((sub) => SUBSCRIBED_STATUSES.has(sub.status));
+      hasActive = Boolean(eligibleSub);
+
+      if (eligibleSub) {
+        subscriptionStatus = eligibleSub.status;
+        const itemEnd = eligibleSub.items?.data?.[0]?.current_period_end;
+        const raw = itemEnd ?? (eligibleSub as any).current_period_end ?? eligibleSub.billing_cycle_anchor;
         try {
           if (typeof raw === "number") {
             subscriptionEnd = new Date(raw * 1000).toISOString();
@@ -117,7 +121,7 @@ serve(async (req) => {
     await serviceClient
       .from("profiles")
       .update({
-        subscription_status: hasActive ? "active" : "free",
+        subscription_status: subscriptionStatus,
         subscription_end: subscriptionEnd,
         subscription_checked_at: new Date().toISOString(),
       })
