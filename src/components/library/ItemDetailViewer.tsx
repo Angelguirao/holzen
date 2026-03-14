@@ -1,14 +1,27 @@
-import { useMemo } from 'react';
+import { useMemo, useState, useRef, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Heart, ExternalLink, Tag, Link2, Clock } from 'lucide-react';
+import { Heart, ExternalLink, Tag, Link2, Clock, Pin, PinOff, Trash2, Archive, Eye, EyeOff, X, FolderPlus, Check } from 'lucide-react';
 import { format } from 'date-fns';
-import type { LibraryItem } from '@/hooks/use-library';
+import type { LibraryItem, Collection } from '@/hooks/use-library';
 
 const TYPE_EMOJIS: Record<string, string> = {
   bookmark: '🔖',
   note: '📝',
   clipping: '✂️',
+};
+
+const SOURCE_EMOJIS: Record<string, string> = {
+  reflection: '⏸',
+  signal: '📡',
+  learning: '📖',
+  haiku: '🍃',
+  zoom_out: '🔭',
+  history_insight: '📜',
+  reflection_note: '✏️',
+  external: '🔗',
+  ground: '🌿',
+  practice: '🧘',
 };
 
 interface Props {
@@ -18,84 +31,66 @@ interface Props {
   open: boolean;
   onClose: () => void;
   onToggleFavorite: (id: string) => void;
+  onTogglePin: (id: string) => void;
+  onDelete: (id: string) => void;
+  onStatusChange: (id: string, status: 'unread' | 'read' | 'archived') => void;
+  onUpdateTags: (id: string, tags: string[]) => void;
   onSelectItem?: (item: LibraryItem) => void;
+  collections?: Collection[];
+  getItemCollections?: (itemId: string) => Collection[];
+  onAddToCollection?: (collectionId: string, itemId: string) => Promise<any>;
+  onRemoveFromCollection?: (collectionId: string, itemId: string) => Promise<void>;
 }
 
 function CompanionCard({ item, onSelect }: { item: LibraryItem; onSelect?: (item: LibraryItem) => void }) {
   const { t } = useTranslation();
   const sourceLabel = t(`librarySources.${item.source_type}`, item.source_type ?? 'Item');
-
   const bodyText = typeof item.body === 'string' ? item.body : item.body ? JSON.stringify(item.body) : null;
-
-  const zoomOutData = useMemo(() => {
-    if (item.source_type !== 'zoom_out' || !item.body) return null;
-    try { return JSON.parse(item.body); } catch { return null; }
-  }, [item.source_type, item.body]);
 
   return (
     <button
       onClick={() => onSelect?.(item)}
-      className="w-full text-left rounded-md border border-border/40 bg-card/30 px-3 py-2.5 space-y-1.5 hover:bg-card/60 transition-colors"
+      className="w-full text-left rounded-md border border-border/40 bg-card/30 px-3 py-2.5 space-y-1 hover:bg-card/60 transition-colors"
     >
       <div className="flex items-center justify-between gap-2">
-        <span className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{sourceLabel}</span>
+        <span className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">
+          {SOURCE_EMOJIS[item.source_type ?? ''] ?? '📄'} {sourceLabel}
+        </span>
         {item.is_favorite && <Heart className="h-2.5 w-2.5 text-destructive fill-current" />}
       </div>
-      {item.title && item.title !== 'Reflection' && typeof item.title === 'string' && (
+      {item.title && item.title !== 'Reflection' && (
         <p className="text-xs font-medium text-foreground leading-snug">{item.title}</p>
       )}
-      {item.source_type === 'haiku' && bodyText && (
-        <p className="text-xs text-foreground/80 leading-relaxed whitespace-pre-line italic">{bodyText}</p>
-      )}
-      {item.source_type === 'zoom_out' && zoomOutData && (
-        <div className="space-y-1">
-          {zoomOutData.onThisDay?.length > 0 && (
-            <p className="text-[10px] font-mono text-muted-foreground/50">
-              {t('itemDetail.historicalDataPoints', { count: zoomOutData.onThisDay.length })}
-            </p>
-          )}
-          {zoomOutData.echo?.message && (
-            <p className="text-[11px] text-muted-foreground/70 italic line-clamp-2">"{zoomOutData.echo.message}"</p>
-          )}
-          {zoomOutData.deepTime && (
-            <p className="text-[11px] text-muted-foreground/70 line-clamp-2">
-              {typeof zoomOutData.deepTime === 'string' ? zoomOutData.deepTime : zoomOutData.deepTime.title}
-            </p>
-          )}
-        </div>
-      )}
-      {item.source_type === 'history_insight' && bodyText && (
-        <p className="text-[11px] text-muted-foreground/70 leading-relaxed line-clamp-3">{bodyText}</p>
-      )}
-      {item.source_type === 'signal' && (
-        <div className="space-y-1">
-          {bodyText && <p className="text-[11px] text-muted-foreground/70 leading-relaxed line-clamp-3">{bodyText}</p>}
-          {item.source_url && (
-            <span className="inline-flex items-center gap-0.5 text-[9px] font-mono text-primary/60">
-              <ExternalLink className="h-2 w-2" /> {t('itemDetail.source')}
-            </span>
-          )}
-        </div>
-      )}
-      {item.source_type === 'learning' && (
-        <div className="space-y-1">
-          {bodyText && <p className="text-[11px] text-muted-foreground/70 leading-relaxed line-clamp-3">{bodyText}</p>}
-          {item.source_url && (
-            <span className="inline-flex items-center gap-0.5 text-[9px] font-mono text-primary/60">
-              <ExternalLink className="h-2 w-2" /> {t('itemDetail.source')}
-            </span>
-          )}
-        </div>
-      )}
-      {!['haiku', 'zoom_out', 'history_insight', 'signal', 'learning', 'reflection'].includes(item.source_type ?? '') && bodyText && (
-        <p className="text-[11px] text-muted-foreground/70 leading-relaxed line-clamp-3">{bodyText}</p>
+      {bodyText && (
+        <p className="text-[11px] text-muted-foreground/70 leading-relaxed line-clamp-2">
+          {item.source_type === 'haiku' ? <span className="italic">{bodyText}</span> : bodyText}
+        </p>
       )}
     </button>
   );
 }
 
-export function ItemDetailViewer({ item, linkedItems, allItems, open, onClose, onToggleFavorite, onSelectItem }: Props) {
+export function ItemDetailViewer({
+  item, linkedItems, allItems, open, onClose, onToggleFavorite,
+  onTogglePin, onDelete, onStatusChange, onUpdateTags, onSelectItem,
+  collections, getItemCollections, onAddToCollection, onRemoveFromCollection,
+}: Props) {
   const { t } = useTranslation();
+  const [editingTags, setEditingTags] = useState(false);
+  const [tagInput, setTagInput] = useState('');
+  const [showCollections, setShowCollections] = useState(false);
+  const tagInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (editingTags) tagInputRef.current?.focus();
+  }, [editingTags]);
+
+  // Reset editing state when item changes
+  useEffect(() => {
+    setEditingTags(false);
+    setTagInput('');
+    setShowCollections(false);
+  }, [item?.id]);
 
   const siblings = useMemo(() => {
     if (!item?.reflection_id || !allItems) return [];
@@ -107,52 +102,77 @@ export function ItemDetailViewer({ item, linkedItems, allItems, open, onClose, o
     try { return JSON.parse(item.body); } catch { return null; }
   }, [item?.source_type, item?.body]);
 
+  const itemCollections = useMemo(() => {
+    if (!item || !getItemCollections) return [];
+    return getItemCollections(item.id);
+  }, [item, getItemCollections]);
+
+  const addTag = useCallback((tag: string) => {
+    const trimmed = tag.trim().toLowerCase();
+    if (!trimmed || !item || item.tags.includes(trimmed)) return;
+    onUpdateTags(item.id, [...item.tags, trimmed]);
+    setTagInput('');
+  }, [item, onUpdateTags]);
+
+  const removeTag = useCallback((tag: string) => {
+    if (!item) return;
+    onUpdateTags(item.id, item.tags.filter((t) => t !== tag));
+  }, [item, onUpdateTags]);
+
   if (!item) return null;
 
   const companions = linkedItems && linkedItems.length > 0 ? linkedItems : siblings;
   const isReflection = item.source_type === 'reflection';
   const sourceLabel = t(`librarySources.${item.source_type}`, item.source_type ?? 'Item');
+  const emoji = SOURCE_EMOJIS[item.source_type ?? ''] ?? TYPE_EMOJIS[item.type] ?? '📄';
+
+  const handleDelete = () => {
+    onDelete(item.id);
+    onClose();
+  };
 
   return (
     <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
       <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto rounded-t-xl">
         <SheetHeader className="pb-2">
           <div className="flex items-center gap-2">
-            <span className="text-base">{TYPE_EMOJIS[item.type] ?? '📄'}</span>
-            <SheetTitle className="text-sm font-mono">
+            <span className="text-base">{emoji}</span>
+            <SheetTitle className="text-sm font-mono flex-1">
               {isReflection ? t('librarySources.reflection') : sourceLabel}
             </SheetTitle>
-          </div>
-          <div className="flex items-center gap-2 pt-1">
-            <button
-              onClick={() => onToggleFavorite(item.id)}
-              className={`p-1.5 transition-colors ${item.is_favorite ? 'text-destructive' : 'text-muted-foreground/40 hover:text-destructive'}`}
-            >
-              <Heart className={`h-4 w-4 ${item.is_favorite ? 'fill-current' : ''}`} />
-            </button>
-            <span className="text-[9px] font-mono text-muted-foreground/40">
-              {item.is_favorite ? t('libraryCard.removeFavorite') : t('libraryCard.addFavorite')}
-            </span>
           </div>
         </SheetHeader>
 
         <div className="space-y-4 pb-6">
+          {/* Timestamp + status */}
           <div className="flex items-center gap-1.5 flex-wrap">
             <span className="text-[9px] font-mono text-muted-foreground/50 flex items-center gap-1">
               <Clock className="h-2.5 w-2.5" />
               {format(new Date(item.created_at), 'MMM d, yyyy · h:mm a')}
             </span>
-            {item.source_type && !isReflection && (
-              <span className="text-[9px] font-mono px-1 py-0.5 rounded bg-muted text-muted-foreground">
-                {sourceLabel}
+            {item.status === 'unread' && (
+              <span className="text-[9px] font-mono px-1 py-0.5 rounded bg-primary/15 text-primary">
+                {t('libraryCard.unread')}
+              </span>
+            )}
+            {item.status === 'archived' && (
+              <span className="text-[9px] font-mono px-1 py-0.5 rounded bg-muted text-muted-foreground/50">
+                {t('libraryCard.archived')}
+              </span>
+            )}
+            {item.pinned && (
+              <span className="text-[9px] font-mono px-1 py-0.5 rounded bg-primary/10 text-primary">
+                📌 {t('common.pinned')}
               </span>
             )}
           </div>
 
-          {item.title && typeof item.title === 'string' && !(isReflection && item.title === 'Reflection') && (
+          {/* Title */}
+          {item.title && !(isReflection && item.title === 'Reflection') && (
             <p className="text-sm font-medium text-foreground leading-snug">{item.title}</p>
           )}
 
+          {/* Body content */}
           {(() => {
             const bodyStr = typeof item.body === 'string' ? item.body : item.body ? JSON.stringify(item.body) : null;
             if (item.source_type === 'haiku' && bodyStr) {
@@ -204,6 +224,7 @@ export function ItemDetailViewer({ item, linkedItems, allItems, open, onClose, o
             return null;
           })()}
 
+          {/* Source URL */}
           {item.source_url && (
             <a
               href={item.source_url}
@@ -216,16 +237,59 @@ export function ItemDetailViewer({ item, linkedItems, allItems, open, onClose, o
             </a>
           )}
 
-          {item.tags.length > 0 && (
+          {/* Tags */}
+          <div className="space-y-1.5">
             <div className="flex items-center gap-1.5 flex-wrap">
               {item.tags.map((tag) => (
-                <span key={tag} className="inline-flex items-center gap-0.5 text-[9px] font-mono px-1.5 py-0.5 rounded bg-primary/5 text-primary/70">
-                  <Tag className="h-2 w-2" />{tag}
+                editingTags ? (
+                  <button
+                    key={tag}
+                    onClick={() => removeTag(tag)}
+                    className="inline-flex items-center gap-0.5 text-[9px] font-mono px-1.5 py-0.5 rounded bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+                  >
+                    <Tag className="h-2 w-2" />{tag}
+                    <X className="h-2 w-2 text-primary/50 ml-0.5" />
+                  </button>
+                ) : (
+                  <span key={tag} className="inline-flex items-center gap-0.5 text-[9px] font-mono px-1.5 py-0.5 rounded bg-primary/5 text-primary/70">
+                    <Tag className="h-2 w-2" />{tag}
+                  </span>
+                )
+              ))}
+              <button
+                onClick={() => setEditingTags(!editingTags)}
+                className="text-[9px] font-mono text-muted-foreground/40 hover:text-muted-foreground transition-colors"
+              >
+                {editingTags ? t('common.done') : `+ ${t('libraryCard.tag')}`}
+              </button>
+            </div>
+            {editingTags && (
+              <input
+                ref={tagInputRef}
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && tagInput.trim()) { e.preventDefault(); addTag(tagInput); }
+                  if (e.key === 'Escape') setEditingTags(false);
+                }}
+                placeholder={t('libraryCard.tagPlaceholder')}
+                className="w-full text-[10px] font-mono px-2 py-1 rounded border border-border/60 bg-background text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/40 transition-colors"
+              />
+            )}
+          </div>
+
+          {/* Collection badges */}
+          {itemCollections.length > 0 && (
+            <div className="flex items-center gap-1.5 flex-wrap">
+              {itemCollections.map((col) => (
+                <span key={col.id} className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-accent/50 text-accent-foreground/70">
+                  {col.icon ?? '📂'} {col.name}
                 </span>
               ))}
             </div>
           )}
 
+          {/* Companions */}
           {companions.length > 0 && (
             <div className="space-y-2 pt-2 border-t border-border/40">
               <div className="flex items-center gap-1.5">
@@ -241,6 +305,81 @@ export function ItemDetailViewer({ item, linkedItems, allItems, open, onClose, o
               </div>
             </div>
           )}
+
+          {/* Actions toolbar */}
+          <div className="pt-3 border-t border-border/40">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => onToggleFavorite(item.id)}
+                  className={`p-2 rounded-md transition-colors ${item.is_favorite ? 'text-destructive bg-destructive/10' : 'text-muted-foreground/50 hover:text-destructive hover:bg-destructive/5'}`}
+                  aria-label={item.is_favorite ? t('libraryCard.removeFavorite') : t('libraryCard.addFavorite')}
+                >
+                  <Heart className={`h-4 w-4 ${item.is_favorite ? 'fill-current' : ''}`} />
+                </button>
+                <button
+                  onClick={() => onTogglePin(item.id)}
+                  className={`p-2 rounded-md transition-colors ${item.pinned ? 'text-primary bg-primary/10' : 'text-muted-foreground/50 hover:text-foreground hover:bg-muted'}`}
+                  aria-label={item.pinned ? t('common.unpin') : t('common.pinned')}
+                >
+                  {item.pinned ? <PinOff className="h-4 w-4" /> : <Pin className="h-4 w-4" />}
+                </button>
+                <button
+                  onClick={() => onStatusChange(item.id, item.status === 'unread' ? 'read' : 'unread')}
+                  className="p-2 rounded-md text-muted-foreground/50 hover:text-foreground hover:bg-muted transition-colors"
+                  aria-label={item.status === 'unread' ? t('libraryCard.markRead') : t('libraryCard.markUnread')}
+                >
+                  {item.status === 'unread' ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                </button>
+                <button
+                  onClick={() => onStatusChange(item.id, item.status === 'archived' ? 'read' : 'archived')}
+                  className={`p-2 rounded-md transition-colors ${item.status === 'archived' ? 'text-foreground bg-muted' : 'text-muted-foreground/50 hover:text-foreground hover:bg-muted'}`}
+                  aria-label={t('libraryCard.archive')}
+                >
+                  <Archive className="h-4 w-4" />
+                </button>
+                {collections && collections.length > 0 && onAddToCollection && onRemoveFromCollection && (
+                  <button
+                    onClick={() => setShowCollections(!showCollections)}
+                    className={`p-2 rounded-md transition-colors ${showCollections ? 'text-foreground bg-muted' : 'text-muted-foreground/50 hover:text-foreground hover:bg-muted'}`}
+                    aria-label="Add to collection"
+                  >
+                    <FolderPlus className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+              <button
+                onClick={handleDelete}
+                className="p-2 rounded-md text-muted-foreground/50 hover:text-destructive hover:bg-destructive/5 transition-colors"
+                aria-label={t('common.delete')}
+              >
+                <Trash2 className="h-4 w-4" />
+              </button>
+            </div>
+
+            {/* Collection picker */}
+            {showCollections && collections && onAddToCollection && onRemoveFromCollection && (
+              <div className="mt-2 space-y-1 rounded-md border border-border/40 bg-card/30 p-2">
+                {collections.map((col) => {
+                  const isIn = itemCollections.some((c) => c.id === col.id);
+                  return (
+                    <button
+                      key={col.id}
+                      onClick={async () => {
+                        if (isIn) await onRemoveFromCollection(col.id, item.id);
+                        else await onAddToCollection(col.id, item.id);
+                      }}
+                      className="flex items-center gap-2 w-full px-2 py-1.5 rounded text-left hover:bg-muted transition-colors"
+                    >
+                      <span className="text-xs">{col.icon ?? '📂'}</span>
+                      <span className="text-[11px] font-mono text-foreground flex-1 truncate">{col.name}</span>
+                      {isIn && <Check className="h-3 w-3 text-primary shrink-0" />}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
       </SheetContent>
     </Sheet>
