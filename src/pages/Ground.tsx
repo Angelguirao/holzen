@@ -432,8 +432,7 @@ export default function Ground() {
                 <p className="text-[10px] font-mono tracking-[0.25em] uppercase text-muted-foreground/40">{t('ground.checkIn', 'Check in')}</p>
                 <div className="h-px w-8 bg-foreground/10 mx-auto" />
               </div>
-              <p className="text-sm text-muted-foreground/60 leading-relaxed">{t('ground.howDoYouFeel', 'How do you feel now?')}</p>
-              <MoodCheck onSelect={handleMoodSelect} onSkip={handleMoodSkip} />
+              <MoodCheck onSelect={handleMoodSelect} onSkip={handleMoodSkip} variant="after" />
             </motion.div>
           )}
 
