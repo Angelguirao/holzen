@@ -533,17 +533,20 @@ const Home = () => {
           : false;
         const followsPauseThresholds = dailyTriggered || cumulativeTriggered;
 
-        // Keep Pause as the primary flow: nudge Ground only when no active pause message.
         const shouldNudgeGround = followsPauseThresholds && subscribed && !message;
-        const glowClass = shouldNudgeGround
+        const hasPreview = groundSuggestion !== null;
+        const showGlow = shouldNudgeGround || hasPreview;
+        const glowClass = showGlow
           ? 'ring-1 ring-primary/15 shadow-[0_0_20px_-4px_hsl(var(--primary)/0.12)]'
           : '';
-        const effectiveCollapsed = shouldNudgeGround ? false : collapsed['ground'];
+        const effectiveCollapsed = showGlow ? false : collapsed['ground'];
 
         return (
           <HomeWidget
             id="ground"
-            title={shouldNudgeGround
+            title={hasPreview
+              ? `${WIDGET_TITLES['ground']} · ${groundSuggestion.activity}`
+              : shouldNudgeGround
               ? `${WIDGET_TITLES['ground']} · ${t('home.groundNudge', 'maybe now?')}`
               : WIDGET_TITLES['ground']}
             collapsed={effectiveCollapsed}
@@ -551,36 +554,77 @@ const Home = () => {
             className={glowClass}
           >
             <div className="space-y-3">
-              {shouldNudgeGround && (
-                <p className="text-[10px] font-mono text-primary/40 tracking-wider">
-                  {t('home.groundVolatileHint', 'The market is moving. A good moment to ground.')}
-                </p>
-              )}
-
-              <div className="flex flex-wrap gap-1.5">
-                {groundingActivities.slice(0, 4).map((activity) => (
-                  <span key={activity} className="text-[10px] font-mono px-2.5 py-1 rounded-full border border-border/20 bg-muted/10 text-muted-foreground/40">
-                    {activity}
-                  </span>
-                ))}
-              </div>
-
-              {subscribed ? (
-                <button
-                  onClick={() => navigate('/ground')}
-                  className={`w-full flex items-center justify-center gap-2 py-3 rounded-md border transition-colors duration-500 ${
-                    shouldNudgeGround
-                      ? 'border-primary/30 bg-primary/10 hover:bg-primary/15'
-                      : 'border-primary/20 bg-primary/5 hover:bg-primary/10'
-                  }`}
-                >
-                  <Anchor className={`h-3 w-3 ${shouldNudgeGround ? 'text-primary/70' : 'text-primary/50'}`} />
-                  <span className={`text-[10px] font-mono tracking-[0.15em] uppercase ${shouldNudgeGround ? 'text-primary/70' : 'text-primary/50'}`}>
-                    {t('home.groundYourself', 'Ground yourself')}
-                  </span>
-                </button>
+              {/* Pre-generated suggestion preview (mirrors pause message preview) */}
+              {hasPreview ? (
+                <>
+                  <div className="relative">
+                    <button
+                      onClick={dismissGroundSuggestion}
+                      className="absolute -top-1 -right-1 p-1 rounded-full text-muted-foreground/30 hover:text-muted-foreground/60 hover:bg-muted/50 transition-colors"
+                      aria-label={t('common.dismiss', 'Dismiss')}
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                    <p className="text-sm leading-relaxed text-foreground/80 pr-5">
+                      {groundSuggestion.suggestion}
+                    </p>
+                    <p className="text-[10px] font-mono text-muted-foreground/40 uppercase tracking-wider mt-2">
+                      {groundSuggestion.duration} min · {groundSuggestion.activity}
+                    </p>
+                  </div>
+                  <button
+                    onClick={handleStartGround}
+                    className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-primary/30 bg-primary/10 hover:bg-primary/15 transition-colors duration-500"
+                  >
+                    <Anchor className="h-3 w-3 text-primary/70" />
+                    <span className="text-[10px] font-mono tracking-[0.15em] uppercase text-primary/70">
+                      {t('home.groundYourself', 'Ground yourself')}
+                    </span>
+                  </button>
+                </>
+              ) : groundLoading ? (
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2 text-muted-foreground">
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    <p className="text-xs font-mono">{t('home.groundFinding', 'Finding what fits…')}</p>
+                  </div>
+                  <Skeleton className="h-4 w-full" />
+                  <Skeleton className="h-4 w-3/4" />
+                </div>
               ) : (
-                <ProLockedWidget onUpgrade={startCheckout} checkoutLoading={checkoutLoading} feature="grounding" />
+                <>
+                  {shouldNudgeGround && (
+                    <p className="text-[10px] font-mono text-primary/40 tracking-wider">
+                      {t('home.groundVolatileHint', 'The market is moving. A good moment to ground.')}
+                    </p>
+                  )}
+
+                  <div className="flex flex-wrap gap-1.5">
+                    {groundingActivities.slice(0, 4).map((activity) => (
+                      <span key={activity} className="text-[10px] font-mono px-2.5 py-1 rounded-full border border-border/20 bg-muted/10 text-muted-foreground/40">
+                        {activity}
+                      </span>
+                    ))}
+                  </div>
+
+                  {subscribed ? (
+                    <button
+                      onClick={() => navigate('/ground')}
+                      className={`w-full flex items-center justify-center gap-2 py-3 rounded-md border transition-colors duration-500 ${
+                        shouldNudgeGround
+                          ? 'border-primary/30 bg-primary/10 hover:bg-primary/15'
+                          : 'border-primary/20 bg-primary/5 hover:bg-primary/10'
+                      }`}
+                    >
+                      <Anchor className={`h-3 w-3 ${shouldNudgeGround ? 'text-primary/70' : 'text-primary/50'}`} />
+                      <span className={`text-[10px] font-mono tracking-[0.15em] uppercase ${shouldNudgeGround ? 'text-primary/70' : 'text-primary/50'}`}>
+                        {t('home.groundYourself', 'Ground yourself')}
+                      </span>
+                    </button>
+                  ) : (
+                    <ProLockedWidget onUpgrade={startCheckout} checkoutLoading={checkoutLoading} feature="grounding" />
+                  )}
+                </>
               )}
 
               {subscribed && (
