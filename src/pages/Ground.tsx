@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { X, Play, Pause, Anchor, Loader2, ExternalLink, Eye, EyeOff } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useHolzen } from '@/hooks/use-holzen';
@@ -21,6 +21,8 @@ const MAX_DURATION = 30;
 export default function Ground() {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
+  const navState = (location.state as any) ?? {};
   const prefersReducedMotion = useReducedMotion();
   const { groundingActivities, btcData, severity, language } = useHolzen();
   const { user } = useAuth();
@@ -49,13 +51,27 @@ export default function Ground() {
     return () => clearTimeout(timer);
   }, []);
 
-  // Fetch AI suggestion once
+  // Fetch AI suggestion — skip if pre-generated data was passed from Home
   useEffect(() => {
     if (fetchedRef.current) return;
     if (isPending) return;
     if (!isPro || groundingActivities.length === 0) return;
 
     fetchedRef.current = true;
+
+    // Use pre-generated data from Home if available
+    if (navState.preGenerated) {
+      const pg = navState.preGenerated;
+      setActivity(pg.activity);
+      setSuggestion(pg.suggestion);
+      const dur = pg.duration || 10;
+      setSuggestedDuration(dur);
+      setCustomDuration(dur);
+      setInsight(pg.insight || null);
+      setArticle(pg.article || null);
+      setPhase('suggestion');
+      return;
+    }
 
     const fetchSuggestion = async () => {
       try {
@@ -87,7 +103,7 @@ export default function Ground() {
     };
 
     fetchSuggestion();
-  }, [isPending, isPro, groundingActivities, btcData, severity, language, t]);
+  }, [isPending, isPro, groundingActivities, btcData, severity, language, t, navState.preGenerated]);
 
   // Timer
   useEffect(() => {

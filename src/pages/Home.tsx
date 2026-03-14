@@ -16,7 +16,7 @@ import { MyWhyWidget } from '@/components/MyWhyWidget';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
 import { HomeWidget, useWidgetLayout } from '@/components/HomeWidget';
-import { useCallback, useEffect, useState, useMemo } from 'react';
+import { useCallback, useEffect, useState, useMemo, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
@@ -56,7 +56,7 @@ interface PinnedReflection {
 }
 
 const Home = () => {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const WIDGET_TITLES: Record<WidgetId, string> = {
     'btc-status': t('home.widget.market'),
     'hold-goal': t('home.widget.goal'),
@@ -112,6 +112,13 @@ const Home = () => {
   const prefersReducedMotion = useReducedMotion();
   const [reflectionCount, setReflectionCount] = useState(0);
 
+  // Pre-generated grounding data
+  const [groundingData, setGroundingData] = useState<{
+    activity: string; suggestion: string; duration: number;
+    insight: string | null; article: { snippet: string; url: string | null } | null;
+  } | null>(null);
+  const groundingFetchedRef = useRef(false);
+
   // Widget layout
   const defaultOrder = useMemo(() => [...WIDGET_IDS], []);
   const { order, collapsed, reorder, toggleCollapsed, resetLayout } = useWidgetLayout(defaultOrder);
@@ -158,6 +165,36 @@ const Home = () => {
     supabase.from('reflections').select('id', { count: 'exact', head: true }).eq('user_id', user.id)
       .then(({ count }) => { if (count != null) setReflectionCount(count); });
   }, [user]);
+
+  // Pre-generate grounding suggestion in background
+  useEffect(() => {
+    if (groundingFetchedRef.current) return;
+    if (!subscribed || !user || groundingActivities.length === 0) return;
+    groundingFetchedRef.current = true;
+
+    const ctx = btcData
+      ? `BTC is ${btcData.direction === 'down' ? 'down' : 'up'} ${Math.abs(btcData.changePercent).toFixed(1)}% in the last 24 hours.`
+      : undefined;
+
+    supabase.functions.invoke('suggest-grounding', {
+      body: { groundingActivities, context: ctx, severity, language: i18n.language },
+    }).then(({ data, error: err }) => {
+      if (err || !data) {
+        // Fallback
+        const fallback = groundingActivities[Math.floor(Math.random() * groundingActivities.length)];
+        setGroundingData({ activity: fallback, suggestion: t('ground.fallbackSuggestion', { activity: fallback }), duration: 10, insight: null, article: null });
+        return;
+      }
+      setGroundingData({
+        activity: data.activity,
+        suggestion: data.suggestion,
+        duration: data.duration || 10,
+        insight: data.insight || null,
+        article: data.article || null,
+      });
+    });
+  }, [subscribed, user, groundingActivities, btcData, severity, t, i18n.language]);
+
 
   const togglePriceHidden = useCallback(() => {
     setPriceHidden(prev => {
@@ -457,31 +494,59 @@ const Home = () => {
             onToggleCollapse={() => toggleCollapsed('ground')}
           >
             <div className="space-y-3">
-              <div className="flex flex-wrap gap-1.5">
-                {groundingActivities.map((activity) => (
+              {subscribed && groundingData ? (
+                <>
+                  {/* Pre-generated suggestion preview */}
+                  <div className="space-y-2">
+                    <p className="text-[11px] text-foreground/60 leading-relaxed">
+                      {groundingData.suggestion}
+                    </p>
+                    <div className="flex items-center gap-2 text-muted-foreground/40">
+                      <Timer className="h-3 w-3" />
+                      <span className="text-[10px] font-mono">{groundingData.duration} min · {groundingData.activity}</span>
+                    </div>
+                  </div>
                   <button
-                    key={activity}
-                    onClick={() => navigate('/settings')}
-                    className="inline-flex items-center gap-1 text-[10px] font-mono px-2.5 py-1 rounded-full border border-border/30 bg-muted/20 text-muted-foreground/60 hover:border-border/50 hover:text-muted-foreground transition-colors cursor-pointer"
+                    onClick={() => navigate('/ground', { state: { preGenerated: groundingData } })}
+                    className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors duration-500"
                   >
-                    {activity}
+                    <Anchor className="h-3 w-3 text-primary/50" />
+                    <span className="text-[10px] font-mono text-primary/50 tracking-[0.15em] uppercase">
+                      {t('home.groundYourself', 'Ground yourself')}
+                    </span>
                   </button>
-                ))}
-              </div>
-              {subscribed ? (
-                <button
-                  onClick={() => navigate('/ground')}
-                  className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-border/30 bg-muted/10 hover:bg-muted/20 transition-colors duration-500"
-                >
-                  <Anchor className="h-3 w-3 text-muted-foreground/40" />
-                  <span className="text-[10px] font-mono text-muted-foreground/40 tracking-[0.2em] uppercase">
-                    {t('home.groundYourself', 'Ground yourself')}
-                  </span>
-                </button>
+                </>
+              ) : subscribed ? (
+                <>
+                  <div className="flex items-center gap-2 text-muted-foreground/30">
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    <span className="text-[10px] font-mono">{t('ground.finding', 'Finding what fits...')}</span>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {groundingActivities.slice(0, 4).map((activity) => (
+                      <span key={activity} className="text-[10px] font-mono px-2.5 py-1 rounded-full border border-border/20 bg-muted/10 text-muted-foreground/30">
+                        {activity}
+                      </span>
+                    ))}
+                  </div>
+                </>
               ) : (
-                <p className="text-[10px] text-muted-foreground/30 text-center">
-                  {t('home.groundProHint', 'Upgrade to Pro for AI-guided grounding sessions')}
-                </p>
+                <>
+                  <div className="flex flex-wrap gap-1.5">
+                    {groundingActivities.map((activity) => (
+                      <button
+                        key={activity}
+                        onClick={() => navigate('/settings')}
+                        className="inline-flex items-center gap-1 text-[10px] font-mono px-2.5 py-1 rounded-full border border-border/30 bg-muted/20 text-muted-foreground/60 hover:border-border/50 hover:text-muted-foreground transition-colors cursor-pointer"
+                      >
+                        {activity}
+                      </button>
+                    ))}
+                  </div>
+                  <p className="text-[10px] text-muted-foreground/30 text-center">
+                    {t('home.groundProHint', 'Upgrade to Pro for AI-guided grounding sessions')}
+                  </p>
+                </>
               )}
             </div>
           </HomeWidget>
