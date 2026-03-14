@@ -622,15 +622,12 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           icon={COMPANION_ICONS.learning}
           expanded={expandedLearning}
           onToggle={() => {
-            if (!isPro) { requirePro('learning'); return; }
             setExpandedLearning((v) => !v);
             if (!completion.learning) markCompleted('learning');
           }}
           completed={completion.learning}
-          isFavorite={favorites['learning']}
-          onToggleFavorite={() => toggleCompanionFavorite('learning')}
-          locked={!isPro}
-          onUpgrade={() => requirePro('learning')}
+          isFavorite={isPro ? favorites['learning'] : undefined}
+          onToggleFavorite={isPro ? () => toggleCompanionFavorite('learning') : undefined}
         >
           <LearningInput
             title={companions.learningTitle ?? ''}
