@@ -459,12 +459,13 @@ const Home = () => {
             <div className="space-y-3">
               <div className="flex flex-wrap gap-1.5">
                 {groundingActivities.map((activity) => (
-                  <span
+                  <button
                     key={activity}
-                    className="inline-flex items-center gap-1 text-[10px] font-mono px-2.5 py-1 rounded-full border border-border/30 bg-muted/20 text-muted-foreground/60"
+                    onClick={() => navigate('/settings')}
+                    className="inline-flex items-center gap-1 text-[10px] font-mono px-2.5 py-1 rounded-full border border-border/30 bg-muted/20 text-muted-foreground/60 hover:border-border/50 hover:text-muted-foreground transition-colors cursor-pointer"
                   >
                     {activity}
-                  </span>
+                  </button>
                 ))}
               </div>
               {subscribed ? (
