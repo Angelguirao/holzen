@@ -503,67 +503,37 @@ const Home = () => {
             className={glowClass}
           >
             <div className="space-y-3">
-              {isVolatile && subscribed && groundingData && (
+              {isVolatile && subscribed && (
                 <p className="text-[10px] font-mono text-primary/40 tracking-wider">
                   {t('home.groundVolatileHint', 'The market is moving. A good moment to ground.')}
                 </p>
               )}
-              {subscribed && groundingData ? (
-                <>
-                  <div className="space-y-2">
-                    <p className="text-[11px] text-foreground/60 leading-relaxed">
-                      {groundingData.suggestion}
-                    </p>
-                    <div className="flex items-center gap-2 text-muted-foreground/40">
-                      <Timer className="h-3 w-3" />
-                      <span className="text-[10px] font-mono">{groundingData.duration} min · {groundingData.activity}</span>
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => navigate('/ground', { state: { preGenerated: groundingData } })}
-                    className={`w-full flex items-center justify-center gap-2 py-3 rounded-md border transition-colors duration-500 ${
-                      isVolatile
-                        ? 'border-primary/30 bg-primary/10 hover:bg-primary/15'
-                        : 'border-primary/20 bg-primary/5 hover:bg-primary/10'
-                    }`}
-                  >
-                    <Anchor className={`h-3 w-3 ${isVolatile ? 'text-primary/70' : 'text-primary/50'}`} />
-                    <span className={`text-[10px] font-mono tracking-[0.15em] uppercase ${isVolatile ? 'text-primary/70' : 'text-primary/50'}`}>
-                      {t('home.groundYourself', 'Ground yourself')}
-                    </span>
-                  </button>
-                </>
-              ) : subscribed ? (
-                <>
-                  <div className="flex items-center gap-2 text-muted-foreground/30">
-                    <Loader2 className="h-3 w-3 animate-spin" />
-                    <span className="text-[10px] font-mono">{t('ground.finding', 'Finding what fits...')}</span>
-                  </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {groundingActivities.slice(0, 4).map((activity) => (
-                      <span key={activity} className="text-[10px] font-mono px-2.5 py-1 rounded-full border border-border/20 bg-muted/10 text-muted-foreground/30">
-                        {activity}
-                      </span>
-                    ))}
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="flex flex-wrap gap-1.5">
-                    {groundingActivities.map((activity) => (
-                      <button
-                        key={activity}
-                        onClick={() => navigate('/settings')}
-                        className="inline-flex items-center gap-1 text-[10px] font-mono px-2.5 py-1 rounded-full border border-border/30 bg-muted/20 text-muted-foreground/60 hover:border-border/50 hover:text-muted-foreground transition-colors cursor-pointer"
-                      >
-                        {activity}
-                      </button>
-                    ))}
-                  </div>
-                  <p className="text-[10px] text-muted-foreground/30 text-center">
-                    {t('home.groundProHint', 'Upgrade to Pro for AI-guided grounding sessions')}
-                  </p>
-                </>
+              {/* Activity tags */}
+              <div className="flex flex-wrap gap-1.5">
+                {groundingActivities.slice(0, 4).map((activity) => (
+                  <span key={activity} className="text-[10px] font-mono px-2.5 py-1 rounded-full border border-border/20 bg-muted/10 text-muted-foreground/40">
+                    {activity}
+                  </span>
+                ))}
+              </div>
+              {/* CTA — passes pre-generated data silently if ready */}
+              <button
+                onClick={() => navigate('/ground', { state: groundingData ? { preGenerated: groundingData } : undefined })}
+                className={`w-full flex items-center justify-center gap-2 py-3 rounded-md border transition-colors duration-500 ${
+                  isVolatile && subscribed
+                    ? 'border-primary/30 bg-primary/10 hover:bg-primary/15'
+                    : 'border-primary/20 bg-primary/5 hover:bg-primary/10'
+                }`}
+              >
+                <Anchor className={`h-3 w-3 ${isVolatile && subscribed ? 'text-primary/70' : 'text-primary/50'}`} />
+                <span className={`text-[10px] font-mono tracking-[0.15em] uppercase ${isVolatile && subscribed ? 'text-primary/70' : 'text-primary/50'}`}>
+                  {t('home.groundYourself', 'Ground yourself')}
+                </span>
+              </button>
+              {!subscribed && (
+                <p className="text-[10px] text-muted-foreground/30 text-center">
+                  {t('home.groundProHint', 'Upgrade to Pro for AI-guided grounding sessions')}
+                </p>
               )}
               {/* Journal link */}
               <button
