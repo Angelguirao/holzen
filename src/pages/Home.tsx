@@ -338,9 +338,9 @@ const Home = () => {
                   <p className="text-xs font-mono text-muted-foreground">
                     {t('home.subscription.upgradeToPro')}
                   </p>
-                  <Button onClick={startCheckout} disabled={checkoutLoading} className="w-full font-mono text-xs">
-                    {checkoutLoading ? t('home.subscription.openingCheckout') : t('pro.upgradeCta')}
-                  </Button>
+                  <LoadingButton onClick={startCheckout} loading={checkoutLoading} loadingText={t('home.subscription.openingCheckout')} className="w-full font-mono text-xs">
+                    {t('pro.upgradeCta')}
+                  </LoadingButton>
                 </div>
               ) : subLoading ? (
                 <div className="space-y-3">
