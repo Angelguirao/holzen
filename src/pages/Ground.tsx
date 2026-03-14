@@ -97,6 +97,20 @@ export default function Ground() {
         setCustomDuration(dur);
         setInsight(data.insight || null);
         setArticle(data.article || null);
+
+        // Cache to localStorage so it persists on Home if user navigates back
+        try {
+          const uid = user?.id;
+          if (uid) {
+            localStorage.setItem(`holzen_ground_suggestion_${uid}`, JSON.stringify({
+              activity: data.activity,
+              suggestion: data.suggestion,
+              duration: dur,
+              insight: data.insight || null,
+              article: data.article || null,
+            }));
+          }
+        } catch { /* ignore */ }
       } catch {
         const fallback = groundingActivities[Math.floor(Math.random() * groundingActivities.length)];
         setActivity(fallback);
