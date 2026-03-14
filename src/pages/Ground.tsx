@@ -70,11 +70,6 @@ export default function Ground() {
       setInsight(pg.insight || null);
       setArticle(pg.article || null);
       setPhase('suggestion');
-      // Clear cached suggestion from Home so it doesn't reappear
-      try {
-        const uid = user?.id;
-        if (uid) localStorage.removeItem(`holzen_ground_suggestion_${uid}`);
-      } catch { /* ignore */ }
       return;
     }
 
@@ -97,6 +92,20 @@ export default function Ground() {
         setCustomDuration(dur);
         setInsight(data.insight || null);
         setArticle(data.article || null);
+
+        // Cache to localStorage so it persists on Home if user navigates back
+        try {
+          const uid = user?.id;
+          if (uid) {
+            localStorage.setItem(`holzen_ground_suggestion_${uid}`, JSON.stringify({
+              activity: data.activity,
+              suggestion: data.suggestion,
+              duration: dur,
+              insight: data.insight || null,
+              article: data.article || null,
+            }));
+          }
+        } catch { /* ignore */ }
       } catch {
         const fallback = groundingActivities[Math.floor(Math.random() * groundingActivities.length)];
         setActivity(fallback);
@@ -173,6 +182,8 @@ export default function Ground() {
         trigger_text: activity || null,
       };
       supabase.from('practice_entries').insert(entry).then(() => {});
+      // Clear cached suggestion — session completed
+      try { localStorage.removeItem(`holzen_ground_suggestion_${user.id}`); } catch { /* ignore */ }
     }
 
     setPhase('done');
