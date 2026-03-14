@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Slider } from '@/components/ui/slider';
 import { motion } from 'framer-motion';
+import { ThresholdFrequencyEstimator } from '@/components/ThresholdFrequencyEstimator';
 
 interface Props {
   threshold: number;
@@ -37,6 +38,7 @@ export function OnboardingThreshold({ threshold, onThresholdChange, stagger }: P
           step={0.5}
           className="w-full"
         />
+        <ThresholdFrequencyEstimator threshold={threshold} className="mt-4" />
         <p className="text-[10px] text-muted-foreground/40 mt-3">
           {t('onboarding.changeThresholdLater')}
         </p>
