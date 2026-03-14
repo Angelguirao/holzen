@@ -196,6 +196,7 @@ const Home = () => {
   }, [subscribed, user, groundingActivities, btcData, severity, t, i18n.language]);
 
 
+  const togglePriceHidden = useCallback(() => {
     setPriceHidden(prev => {
       const next = !prev;
       localStorage.setItem('holzen_hide_price', String(next));
