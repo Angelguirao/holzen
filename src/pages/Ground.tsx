@@ -70,11 +70,6 @@ export default function Ground() {
       setInsight(pg.insight || null);
       setArticle(pg.article || null);
       setPhase('suggestion');
-      // Clear cached suggestion from Home so it doesn't reappear
-      try {
-        const uid = user?.id;
-        if (uid) localStorage.removeItem(`holzen_ground_suggestion_${uid}`);
-      } catch { /* ignore */ }
       return;
     }
 
