@@ -12,7 +12,7 @@ import { Changelog } from '@/components/Changelog';
 import { FeedbackForm } from '@/components/FeedbackForm';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
-import { Button } from '@/components/ui/button';
+import { LoadingButton } from '@/components/ui/loading-button';
 import { useTheme } from 'next-themes';
 import { Moon, Sun, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
