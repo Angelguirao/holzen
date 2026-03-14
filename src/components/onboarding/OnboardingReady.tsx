@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
-import { Sparkles, Wind, Brain, Anchor, Infinity, BookOpen, Lightbulb } from 'lucide-react';
+import { Sparkles, Wind, Brain, Infinity, Anchor, Lightbulb, BookOpen, Moon, Image, Mail } from 'lucide-react';
 import { PRICING } from '@/lib/pricing';
 
 interface Props {
