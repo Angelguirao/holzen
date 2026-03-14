@@ -5,9 +5,8 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { OnboardingWhy } from '@/components/onboarding/OnboardingWhy';
 import { OnboardingGrounding } from '@/components/onboarding/OnboardingGrounding';
 import { OnboardingThreshold } from '@/components/onboarding/OnboardingThreshold';
+import { OnboardingReady } from '@/components/onboarding/OnboardingReady';
 import { useSubscription } from '@/hooks/use-subscription';
-import { PRICING } from '@/lib/pricing';
-import { Sparkles } from 'lucide-react';
 
 interface OnboardingResult {
   threshold: number;
