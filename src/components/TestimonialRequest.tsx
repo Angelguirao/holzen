@@ -106,15 +106,16 @@ export function TestimonialRequest({ reflectionCount }: Props) {
           />
           <div className="flex items-center justify-between">
             <span className="text-[10px] text-muted-foreground">{quote.length}/280</span>
-            <Button
+            <LoadingButton
               size="sm"
               onClick={submit}
-              disabled={submitting || !quote.trim() || !displayName.trim()}
+              loading={submitting}
+              disabled={!quote.trim() || !displayName.trim()}
               className="text-xs font-mono gap-1.5"
             >
               <Send className="h-3 w-3" />
               {t('testimonial.submit')}
-            </Button>
+            </LoadingButton>
           </div>
         </motion.div>
       )}

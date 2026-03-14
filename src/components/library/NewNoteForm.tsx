@@ -92,9 +92,9 @@ export function NewNoteForm({ onSave }: Props) {
         <Button size="sm" variant="ghost" onClick={() => setOpen(false)} className="text-xs font-mono h-7">
           {t('common.cancel')}
         </Button>
-        <Button size="sm" onClick={handleSave} disabled={!body.trim() || saving} className="text-xs font-mono h-7">
+        <LoadingButton size="sm" onClick={handleSave} loading={saving} disabled={!body.trim()} className="text-xs font-mono h-7">
           {t('library.save')}
-        </Button>
+        </LoadingButton>
       </div>
     </div>
   );

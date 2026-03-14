@@ -704,17 +704,19 @@ function NeedAMomentButtonInner({ onTrigger, inCooldown, loading, minutes }: { o
   const { t } = useTranslation();
   return (
     <>
-      <Button
+      <LoadingButton
         onClick={onTrigger}
-        disabled={inCooldown || loading}
+        loading={loading}
+        loadingText={t('home.generatingReflection')}
+        disabled={inCooldown}
         variant="outline"
         className="w-full font-mono text-xs gap-2"
       >
         <Pause className="h-3.5 w-3.5" />
-        {loading ? t('home.generatingReflection') : inCooldown
+        {inCooldown
           ? t('home.manualReflectionIn', { minutes })
           : t('home.needAMoment')}
-      </Button>
+      </LoadingButton>
       <p className="text-[10px] text-muted-foreground text-center leading-relaxed">
         {inCooldown
           ? t('home.cooldownMessage')

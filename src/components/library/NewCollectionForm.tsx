@@ -82,9 +82,9 @@ export function NewCollectionForm({ onSave }: Props) {
         <Button size="sm" variant="ghost" onClick={() => setOpen(false)} className="text-xs font-mono h-7">
           {t('common.cancel')}
         </Button>
-        <Button size="sm" onClick={handleSave} disabled={!name.trim() || saving} className="text-xs font-mono h-7">
+        <LoadingButton size="sm" onClick={handleSave} loading={saving} disabled={!name.trim()} className="text-xs font-mono h-7">
           {t('library.create')}
-        </Button>
+        </LoadingButton>
       </div>
     </div>
   );
