@@ -16,8 +16,12 @@ interface OnboardingResult {
   groundingActivities: string[];
 }
 
+interface OnboardingCompleteOptions {
+  setLocalOnboarded?: boolean;
+}
+
 interface Props {
-  onComplete: (result: OnboardingResult) => void;
+  onComplete: (result: OnboardingResult, options?: OnboardingCompleteOptions) => Promise<void> | void;
 }
 
 const detectedTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
