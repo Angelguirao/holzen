@@ -9,7 +9,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { hapticFeedback } from '@/lib/haptics';
 import { playGroundingChime } from '@/lib/grounding-chime';
 import { type MoodValue } from '@/components/MoodCheck';
-import { MoodCheck } from '@/components/MoodCheck';
+import { MoodIcon } from '@/components/icons/MoodIcon';
 import { useProGate } from '@/hooks/use-pro-gate';
 
 type Phase = 'idle' | 'suggestion' | 'timer' | 'checkin' | 'reflect' | 'done';
