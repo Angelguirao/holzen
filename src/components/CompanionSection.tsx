@@ -169,7 +169,7 @@ function CompanionCard({
 
 export const CompanionSection = forwardRef<HTMLDivElement, Props>(function CompanionSection({ companions, prefs, severity = 'mild', reflectionId, context, reflectionMessage }, ref) {
   const { language } = useHolzen();
-  const { isPro, requirePro } = useProGate();
+  const { isPro } = useProGate();
 
   // Track favorite state per source_type from library_items
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
@@ -604,15 +604,12 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           icon={COMPANION_ICONS.haiku}
           expanded={expandedHaiku}
           onToggle={() => {
-            if (!isPro) { requirePro('haiku'); return; }
             setExpandedHaiku((v) => !v);
             if (!completion.haiku) markCompleted('haiku');
           }}
           completed={completion.haiku}
-          isFavorite={favorites['haiku']}
-          onToggleFavorite={() => toggleCompanionFavorite('haiku')}
-          locked={!isPro}
-          onUpgrade={() => requirePro('haiku')}
+          isFavorite={isPro ? favorites['haiku'] : undefined}
+          onToggleFavorite={isPro ? () => toggleCompanionFavorite('haiku') : undefined}
         >
           <HaikuDisplay haiku={companions.haiku!} />
         </CompanionCard>
@@ -625,15 +622,12 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           icon={COMPANION_ICONS.learning}
           expanded={expandedLearning}
           onToggle={() => {
-            if (!isPro) { requirePro('learning'); return; }
             setExpandedLearning((v) => !v);
             if (!completion.learning) markCompleted('learning');
           }}
           completed={completion.learning}
-          isFavorite={favorites['learning']}
-          onToggleFavorite={() => toggleCompanionFavorite('learning')}
-          locked={!isPro}
-          onUpgrade={() => requirePro('learning')}
+          isFavorite={isPro ? favorites['learning'] : undefined}
+          onToggleFavorite={isPro ? () => toggleCompanionFavorite('learning') : undefined}
         >
           <LearningInput
             title={companions.learningTitle ?? ''}
@@ -652,15 +646,12 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           icon={COMPANION_ICONS.signal}
           expanded={expandedSignal}
           onToggle={() => {
-            if (!isPro) { requirePro('signal'); return; }
             setExpandedSignal((v) => !v);
             if (!completion.signal) markCompleted('signal');
           }}
           completed={completion.signal}
-          isFavorite={favorites['signal']}
-          onToggleFavorite={() => toggleCompanionFavorite('signal')}
-          locked={!isPro}
-          onUpgrade={() => requirePro('signal')}
+          isFavorite={isPro ? favorites['signal'] : undefined}
+          onToggleFavorite={isPro ? () => toggleCompanionFavorite('signal') : undefined}
         >
           <SignalDisplay
             signal={signal}
@@ -677,15 +668,12 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           icon={COMPANION_ICONS.zoomOut}
           expanded={expandedZoomOut}
           onToggle={() => {
-            if (!isPro) { requirePro('zoom_out'); return; }
             setExpandedZoomOut((v) => !v);
             if (!completion.zoomOut) markCompleted('zoomOut');
           }}
           completed={completion.zoomOut}
-          isFavorite={favorites['zoom_out']}
-          onToggleFavorite={() => toggleCompanionFavorite('zoom_out')}
-          locked={!isPro}
-          onUpgrade={() => requirePro('zoom_out')}
+          isFavorite={isPro ? favorites['zoom_out'] : undefined}
+          onToggleFavorite={isPro ? () => toggleCompanionFavorite('zoom_out') : undefined}
         >
           <ZoomOutDisplay
             data={zoomOut}
@@ -702,15 +690,12 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           icon={COMPANION_ICONS.history}
           expanded={expandedHistory}
           onToggle={() => {
-            if (!isPro) { requirePro('history'); return; }
             setExpandedHistory((v) => !v);
             if (!completion.history) markCompleted('history');
           }}
           completed={completion.history}
-          isFavorite={favorites['history_insight']}
-          onToggleFavorite={() => toggleCompanionFavorite('history_insight')}
-          locked={!isPro}
-          onUpgrade={() => requirePro('history')}
+          isFavorite={isPro ? favorites['history_insight'] : undefined}
+          onToggleFavorite={isPro ? () => toggleCompanionFavorite('history_insight') : undefined}
         >
           <HistoricalInsightDisplay
             data={historyInsight}
