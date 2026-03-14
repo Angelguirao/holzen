@@ -1,6 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { Slider } from '@/components/ui/slider';
 import { motion } from 'framer-motion';
+import { ThresholdFrequencyEstimator } from '@/components/ThresholdFrequencyEstimator';
 
 interface Props {
   threshold: number;
