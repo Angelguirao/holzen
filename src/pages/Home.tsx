@@ -15,6 +15,7 @@ import { HoldGoalWidget } from '@/components/HoldGoalWidget';
 import { MyWhyWidget } from '@/components/MyWhyWidget';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
+import { LoadingButton } from '@/components/ui/loading-button';
 import { HomeWidget, useWidgetLayout } from '@/components/HomeWidget';
 import { useCallback, useEffect, useState, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
