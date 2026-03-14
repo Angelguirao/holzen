@@ -246,7 +246,7 @@ export function ThresholdFrequencyEstimator({
         <Activity className="h-3 w-3 text-primary/50 mt-0.5 shrink-0" />
         <div className="space-y-0.5">
           <p className="text-[11px] font-mono text-foreground/70 leading-snug">
-            {t('threshold.estimator.result', '~{{count}} pauses in the last 30 days', {
+            {t('threshold.estimator.result', 'You\'d have paused ~{{count}} times last month', {
               count: stats.crossings30d,
             })}
           </p>
