@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { useTranslation } from 'react-i18next';
+import { SIGNUPS_ENABLED } from '@/lib/signup-gate';
 
 type AuthView = 'sign-in' | 'sign-up' | 'forgot-password';
 
