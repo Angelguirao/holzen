@@ -5,6 +5,7 @@ import { useHolzen } from '@/hooks/use-holzen';
 import { useTranslation } from 'react-i18next';
 import { RefreshCw, TrendingUp, Clock, Brain, Sparkles, Target, Loader2, Lock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { LoadingButton } from '@/components/ui/loading-button';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
@@ -166,20 +167,17 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
         <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
           {t('aiInsights.title')}
         </p>
-        <Button
+        <LoadingButton
           variant="ghost"
           size="sm"
           onClick={generateInsights}
-          disabled={generating}
+          loading={generating}
+          loadingText={t('aiInsights.analyzing')}
           className="text-[10px] font-mono text-muted-foreground gap-1.5 h-7"
         >
-          {generating ? (
-            <Loader2 className="h-3 w-3 animate-spin" />
-          ) : (
-            <RefreshCw className="h-3 w-3" />
-          )}
-          {generating ? t('aiInsights.analyzing') : latest ? t('aiInsights.refresh') : t('aiInsights.generate')}
-        </Button>
+          <RefreshCw className="h-3 w-3" />
+          {latest ? t('aiInsights.refresh') : t('aiInsights.generate')}
+        </LoadingButton>
       </div>
 
       {allData.length === 0 && !generating && (

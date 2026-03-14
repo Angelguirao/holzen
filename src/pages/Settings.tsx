@@ -13,6 +13,7 @@ import { FeedbackForm } from '@/components/FeedbackForm';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
+import { LoadingButton } from '@/components/ui/loading-button';
 import { useTheme } from 'next-themes';
 import { Moon, Sun, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -828,14 +829,15 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                   <p className="text-xs font-mono text-muted-foreground">
                     {t('settings.pricePerMonth')}
                   </p>
-                  <Button
+                  <LoadingButton
                     onClick={startCheckout}
-                    disabled={checkoutLoading}
+                    loading={checkoutLoading}
+                    loadingText={t('settings.openingCheckout')}
                     className="w-full font-mono text-xs"
                     size="sm"
                   >
-                    {checkoutLoading ? t('settings.openingCheckout') : t('pro.upgradeCta')}
-                  </Button>
+                    {t('pro.upgradeCta')}
+                  </LoadingButton>
                 </div>
               )}
             </div>
@@ -887,20 +889,24 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.data')}</p>
               <div className="flex gap-4">
-                <button
+                <LoadingButton
+                  variant="link"
                   onClick={() => exportData('json')}
-                  disabled={exporting}
-                  className="text-xs font-mono text-muted-foreground underline"
+                  loading={exporting}
+                  loadingText={t('settings.exporting')}
+                  className="text-xs font-mono text-muted-foreground underline p-0 h-auto"
                 >
-                  {exporting ? <><Loader2 className="h-3 w-3 animate-spin inline mr-1" />{t('settings.exporting')}</> : t('settings.exportJson')}
-                </button>
-                <button
+                  {t('settings.exportJson')}
+                </LoadingButton>
+                <LoadingButton
+                  variant="link"
                   onClick={() => exportData('csv')}
-                  disabled={exporting}
-                  className="text-xs font-mono text-muted-foreground underline"
+                  loading={exporting}
+                  loadingText={t('settings.exporting')}
+                  className="text-xs font-mono text-muted-foreground underline p-0 h-auto"
                 >
-                  {exporting ? <><Loader2 className="h-3 w-3 animate-spin inline mr-1" />{t('settings.exporting')}</> : t('settings.exportCsv')}
-                </button>
+                  {t('settings.exportCsv')}
+                </LoadingButton>
               </div>
             </div>
 

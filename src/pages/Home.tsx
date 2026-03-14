@@ -15,6 +15,7 @@ import { HoldGoalWidget } from '@/components/HoldGoalWidget';
 import { MyWhyWidget } from '@/components/MyWhyWidget';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
+import { LoadingButton } from '@/components/ui/loading-button';
 import { HomeWidget, useWidgetLayout } from '@/components/HomeWidget';
 import { useCallback, useEffect, useState, useMemo } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
@@ -274,9 +275,9 @@ const Home = () => {
                   <p className="text-xs text-muted-foreground/60 font-mono leading-relaxed max-w-[280px] mx-auto">
                     {t('home.subscription.upgradeToPro')}
                   </p>
-                  <Button onClick={startCheckout} disabled={checkoutLoading} size="sm" className="font-mono text-xs">
-                    {checkoutLoading ? t('home.subscription.openingCheckout') : t('pro.upgradeCta')}
-                  </Button>
+                  <LoadingButton onClick={startCheckout} loading={checkoutLoading} loadingText={t('home.subscription.openingCheckout')} size="sm" className="font-mono text-xs">
+                    {t('pro.upgradeCta')}
+                  </LoadingButton>
                 </>
               )}
             </motion.div>
@@ -338,9 +339,9 @@ const Home = () => {
                   <p className="text-xs font-mono text-muted-foreground">
                     {t('home.subscription.upgradeToPro')}
                   </p>
-                  <Button onClick={startCheckout} disabled={checkoutLoading} className="w-full font-mono text-xs">
-                    {checkoutLoading ? t('home.subscription.openingCheckout') : t('pro.upgradeCta')}
-                  </Button>
+                  <LoadingButton onClick={startCheckout} loading={checkoutLoading} loadingText={t('home.subscription.openingCheckout')} className="w-full font-mono text-xs">
+                    {t('pro.upgradeCta')}
+                  </LoadingButton>
                 </div>
               ) : subLoading ? (
                 <div className="space-y-3">
@@ -704,17 +705,19 @@ function NeedAMomentButtonInner({ onTrigger, inCooldown, loading, minutes }: { o
   const { t } = useTranslation();
   return (
     <>
-      <Button
+      <LoadingButton
         onClick={onTrigger}
-        disabled={inCooldown || loading}
+        loading={loading}
+        loadingText={t('home.generatingReflection')}
+        disabled={inCooldown}
         variant="outline"
         className="w-full font-mono text-xs gap-2"
       >
         <Pause className="h-3.5 w-3.5" />
-        {loading ? t('home.generatingReflection') : inCooldown
+        {inCooldown
           ? t('home.manualReflectionIn', { minutes })
           : t('home.needAMoment')}
-      </Button>
+      </LoadingButton>
       <p className="text-[10px] text-muted-foreground text-center leading-relaxed">
         {inCooldown
           ? t('home.cooldownMessage')
