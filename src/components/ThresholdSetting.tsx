@@ -12,10 +12,11 @@ interface Props {
   onSetDown: (val: number) => void;
   cumulativeThreshold: number;
   onSetCumulative: (val: number) => void;
+  cooldownHours?: number;
 }
 
 export const ThresholdSetting = forwardRef<HTMLDivElement, Props>(function ThresholdSetting(
-  { thresholdUp, onSetUp, thresholdDown, onSetDown, cumulativeThreshold, onSetCumulative },
+  { thresholdUp, onSetUp, thresholdDown, onSetDown, cumulativeThreshold, onSetCumulative, cooldownHours },
   ref
 ) {
   const { t } = useTranslation();
@@ -29,7 +30,7 @@ export const ThresholdSetting = forwardRef<HTMLDivElement, Props>(function Thres
 
   return (
     <div ref={ref} className="space-y-8">
-      <ThresholdFrequencyEstimator threshold={upVal} />
+      <ThresholdFrequencyEstimator threshold={upVal} cooldownHours={cooldownHours} />
 
       <div className="space-y-4">
         <div className="space-y-2">

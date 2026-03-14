@@ -359,7 +359,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
           </AccordionTrigger>
           <AccordionContent className="space-y-6 pb-4">
             {profileLoaded ? (
-              <ThresholdSetting thresholdUp={threshold} onSetUp={setThreshold} thresholdDown={thresholdDown} onSetDown={setThresholdDown} cumulativeThreshold={cumulativeThreshold} onSetCumulative={setCumulativeThreshold} />
+              <ThresholdSetting thresholdUp={threshold} onSetUp={setThreshold} thresholdDown={thresholdDown} onSetDown={setThresholdDown} cumulativeThreshold={cumulativeThreshold} onSetCumulative={setCumulativeThreshold} cooldownHours={cooldownHours} />
             ) : (
               <div className="space-y-4 animate-pulse">
                 <div className="h-4 w-40 bg-muted rounded" />
