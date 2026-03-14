@@ -100,6 +100,9 @@ const Home = () => {
     firstName,
     currency,
     groundingActivities,
+    threshold,
+    thresholdDown,
+    cumulativeThreshold,
     profileLoaded,
   } = useHolzen();
 
