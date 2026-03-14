@@ -87,8 +87,19 @@ export function useSubscription() {
       if (error) throw error;
 
       if (data?.url) {
-        // Redirect in same tab so return state stays in sessionStorage
-        window.location.href = data.url;
+        const checkoutUrl = data.url as string;
+
+        // In embedded previews, Stripe cannot render in-frame.
+        // Try top-level navigation first, then fall back to same-frame.
+        try {
+          if (window.self !== window.top && window.top) {
+            window.top.location.href = checkoutUrl;
+          } else {
+            window.location.href = checkoutUrl;
+          }
+        } catch {
+          window.location.href = checkoutUrl;
+        }
         return;
       }
 
