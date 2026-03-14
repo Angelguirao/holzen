@@ -16,7 +16,7 @@ export function OnboardingThreshold({ threshold, onThresholdChange, stagger }: P
     <div className="space-y-8">
       <motion.div className="space-y-2" {...stagger(0.1)}>
         <p className="text-xs font-mono tracking-[0.25em] uppercase text-muted-foreground">
-          {t('onboarding.yourThreshold')}
+          {t('onboarding.yourThreshold', 'Your threshold')}
         </p>
         <div className="h-px w-8 bg-foreground/20" />
       </motion.div>
@@ -25,11 +25,11 @@ export function OnboardingThreshold({ threshold, onThresholdChange, stagger }: P
         className="text-sm text-muted-foreground leading-relaxed"
         {...stagger(0.15)}
       >
-        {t('onboarding.thresholdQuestion')}
+        {t('onboarding.thresholdQuestion', 'How much does Bitcoin need to move (up or down) before you want to pause and reflect?')}
       </motion.p>
 
       <motion.div {...stagger(0.25)}>
-        <p className="text-4xl font-mono tracking-tight mb-6">{threshold.toFixed(1)}%</p>
+        <p className="text-4xl font-mono tracking-tight mb-6">± {threshold.toFixed(1)}%</p>
         <Slider
           value={[threshold]}
           onValueChange={([v]) => onThresholdChange(v)}
@@ -40,7 +40,7 @@ export function OnboardingThreshold({ threshold, onThresholdChange, stagger }: P
         />
         <ThresholdFrequencyEstimator thresholdUp={threshold} className="mt-4" />
         <p className="text-[10px] text-muted-foreground/40 mt-3">
-          {t('onboarding.changeThresholdLater')}
+          {t('onboarding.changeThresholdLater', 'You can set separate up & down thresholds later in Settings')}
         </p>
       </motion.div>
     </div>
