@@ -16,7 +16,7 @@ interface Props {
 }
 
 export const ThresholdSetting = forwardRef<HTMLDivElement, Props>(function ThresholdSetting(
-  { thresholdUp, onSetUp, thresholdDown, onSetDown, cumulativeThreshold, onSetCumulative },
+  { thresholdUp, onSetUp, thresholdDown, onSetDown, cumulativeThreshold, onSetCumulative, cooldownHours },
   ref
 ) {
   const { t } = useTranslation();
