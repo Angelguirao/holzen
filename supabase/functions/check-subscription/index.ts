@@ -34,10 +34,10 @@ serve(async (req) => {
     if (!stripeKey) throw new Error("STRIPE_SECRET_KEY is not set");
 
     const token = authHeader.replace("Bearer ", "");
-    const { data: claimsData, error: claimsError } = await supabaseClient.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims) throw new Error("Unauthorized");
-    const email = claimsData.claims.email as string;
-    const userId = claimsData.claims.sub as string;
+    const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
+    if (userError || !userData?.user) throw new Error("Unauthorized");
+    const email = userData.user.email as string;
+    const userId = userData.user.id;
     if (!email) throw new Error("No email in token");
 
     // Fetch cached subscription data from profiles
