@@ -58,7 +58,7 @@ export default function PauseSession() {
   const navigate = useNavigate();
   const location = useLocation();
   const prefersReducedMotion = useReducedMotion();
-  const { mantra, dismissMessage } = useHolzen();
+  const { mantra, dismissMessage, groundingActivities } = useHolzen();
   const { subscribed } = useSubscription();
 
   const navState = (location.state as any) ?? {};
