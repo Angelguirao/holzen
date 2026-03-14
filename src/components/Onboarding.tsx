@@ -36,6 +36,7 @@ export function Onboarding({ onComplete }: Props) {
   const [motivations, setMotivations] = useState<string[]>([]);
   const [groundingActivities, setGroundingActivities] = useState<string[]>([]);
   const [direction, setDirection] = useState(1);
+  const [startingTrial, setStartingTrial] = useState(false);
   const prefersReduced = useReducedMotion();
 
   const goTo = useCallback((next: number) => {
