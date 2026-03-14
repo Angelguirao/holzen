@@ -28,7 +28,7 @@ export function OnboardingReady({
   const recapItems = [
     motivations.length > 0 && {
       label: t('onboarding.ready.recapWhy', 'Your why'),
-      value: motivations.map((m) => t(`onboarding.motivations.${m}`, m)).join(', '),
+      value: motivations.map((m) => t(`settings.motivations.${m}`, m)).join(', '),
     },
     groundingActivities.length > 0 && {
       label: t('onboarding.ready.recapGrounding', 'Grounds you'),
