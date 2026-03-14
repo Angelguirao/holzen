@@ -828,14 +828,15 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                   <p className="text-xs font-mono text-muted-foreground">
                     {t('settings.pricePerMonth')}
                   </p>
-                  <Button
+                  <LoadingButton
                     onClick={startCheckout}
-                    disabled={checkoutLoading}
+                    loading={checkoutLoading}
+                    loadingText={t('settings.openingCheckout')}
                     className="w-full font-mono text-xs"
                     size="sm"
                   >
-                    {checkoutLoading ? t('settings.openingCheckout') : t('pro.upgradeCta')}
-                  </Button>
+                    {t('pro.upgradeCta')}
+                  </LoadingButton>
                 </div>
               )}
             </div>
