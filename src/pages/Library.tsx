@@ -5,7 +5,7 @@ import { PageMeta } from '@/components/PageMeta';
 import { Heart, Search, X, Lock, Plus } from 'lucide-react';
 import { LibraryItems } from '@/components/library/LibraryItems';
 import { LibraryCollections } from '@/components/library/LibraryCollections';
-import { NewNoteForm } from '@/components/library/NewNoteForm';
+
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import { useProGate } from '@/hooks/use-pro-gate';
