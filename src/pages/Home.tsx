@@ -166,7 +166,36 @@ const Home = () => {
       .then(({ count }) => { if (count != null) setReflectionCount(count); });
   }, [user]);
 
-  const togglePriceHidden = useCallback(() => {
+  // Pre-generate grounding suggestion in background
+  useEffect(() => {
+    if (groundingFetchedRef.current) return;
+    if (!subscribed || !user || groundingActivities.length === 0) return;
+    groundingFetchedRef.current = true;
+
+    const ctx = btcData
+      ? `BTC is ${btcData.direction === 'down' ? 'down' : 'up'} ${Math.abs(btcData.changePercent).toFixed(1)}% in the last 24 hours.`
+      : undefined;
+
+    supabase.functions.invoke('suggest-grounding', {
+      body: { groundingActivities, context: ctx, severity, language: i18n.language },
+    }).then(({ data, error: err }) => {
+      if (err || !data) {
+        // Fallback
+        const fallback = groundingActivities[Math.floor(Math.random() * groundingActivities.length)];
+        setGroundingData({ activity: fallback, suggestion: t('ground.fallbackSuggestion', { activity: fallback }), duration: 10, insight: null, article: null });
+        return;
+      }
+      setGroundingData({
+        activity: data.activity,
+        suggestion: data.suggestion,
+        duration: data.duration || 10,
+        insight: data.insight || null,
+        article: data.article || null,
+      });
+    });
+  }, [subscribed, user, groundingActivities, btcData, severity, t, i18n.language]);
+
+
     setPriceHidden(prev => {
       const next = !prev;
       localStorage.setItem('holzen_hide_price', String(next));
