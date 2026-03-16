@@ -10,6 +10,7 @@ import { format } from 'date-fns';
 import { Mail, Lock, Clock, Trash2, BarChart3, Sparkles, Award, CalendarDays, Info } from 'lucide-react';
 import HistoryContent from '@/components/library/HistoryContent';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 
 
 import { DecisionQualityCard } from '@/components/DecisionQualityCard';
