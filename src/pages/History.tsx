@@ -792,6 +792,22 @@ const History = () => {
                 </div>
               </div>
               <p className="text-sm leading-relaxed">{r.message}</p>
+
+              {/* Skill badges */}
+              {(() => {
+                const skills = detectSkills(r);
+                if (skills.length === 0) return null;
+                return (
+                  <div className="flex flex-wrap gap-1">
+                    {skills.map((s) => (
+                      <span key={s} className={`text-[9px] font-mono px-1.5 py-0.5 rounded ${SKILL_COLORS[s]}`}>
+                        {t(SKILL_LABELS[s])}
+                      </span>
+                    ))}
+                  </div>
+                );
+              })()}
+
               <ReflectionNote reflectionId={r.id} initialNote={r.note} />
               <ReflectionTags reflectionId={r.id} initialTags={r.tags ?? []} />
 
