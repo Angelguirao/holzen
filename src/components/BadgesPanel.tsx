@@ -5,7 +5,7 @@ import { Flame, MessageSquare, Shield, Eye, Heart, Award, Target, Wind, BookOpen
 import { motion } from 'framer-motion';
 import { BadgeCelebration } from './BadgeCelebration';
 import { useBadgeSync } from '@/hooks/use-badge-sync';
-import { useSubscription } from '@/hooks/use-subscription';
+
 
 interface Reflection {
   id: string;
@@ -73,12 +73,12 @@ function countHalvingBadge(reflections: Reflection[]): number {
 
 interface BadgesPanelProps {
   reflections: Reflection[];
+  subscribed: boolean;
   notifyBadges?: boolean;
 }
 
-export function BadgesPanel({ reflections, notifyBadges = true }: BadgesPanelProps) {
+export function BadgesPanel({ reflections, subscribed, notifyBadges = true }: BadgesPanelProps) {
   const { t } = useTranslation();
-  const { subscribed } = useSubscription();
 
   const badges = useMemo(() => {
     const total = reflections.length;
@@ -167,7 +167,7 @@ export function BadgesPanel({ reflections, notifyBadges = true }: BadgesPanelPro
   }, [reflections]);
 
   const visibleBadges = subscribed ? badges : badges.filter((b) => !b.proOnly);
-  const earnedCount = visibleBadges.filter((b) => b.earned).length;
+  const earnedCount = badges.filter((b) => b.earned).length;
   const proLockedCount = subscribed ? 0 : badges.filter((b) => b.proOnly).length;
   const categories = ['calendar', 'volume', 'composure', 'companions', 'engagement'] as const;
 
