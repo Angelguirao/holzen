@@ -477,7 +477,7 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
 
         {!scoreData && (
           <p className="text-[10px] text-muted-foreground/40 font-mono text-center">
-            {t('profile.holzenScoreEmpty', 'Log 3 reflections with mood or outcome to generate your composure score.')}
+            {t('profile.holzenScoreEmpty', 'Log 3 pauses with mood or outcome to generate your composure score.')}
           </p>
         )}
       </div>

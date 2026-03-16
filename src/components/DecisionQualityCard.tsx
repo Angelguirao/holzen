@@ -147,7 +147,7 @@ export function DecisionQualityCard({ reflections }: Props) {
         </div>
       ) : (
         <p className="text-xs text-muted-foreground">
-          {t('decisionQuality.keepReflecting')}
+          {t('decisionQuality.keepPausing', 'Keep pausing to unlock this insight.')}
         </p>
       )}
 
