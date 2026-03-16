@@ -194,6 +194,7 @@ const History = () => {
   const [filter, setFilter] = useState<'all' | 'favorites'>('all');
   const [tagFilter, setTagFilter] = useState<string | null>(null);
   const [moodFilter, setMoodFilter] = useState<string | null>(null);
+  const [skillFilter, setSkillFilter] = useState<SkillType | null>(null);
   const [search, setSearch] = useState('');
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
