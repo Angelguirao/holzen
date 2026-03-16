@@ -192,6 +192,11 @@ export default function PauseSession() {
     }
   }, [reflectionId, isFavorite, subscribed, t]);
 
+  const handleClose = useCallback(() => {
+    // Preserve session so user can resume later
+    navigate('/', { replace: true });
+  }, [navigate]);
+
   const handleReturn = useCallback(() => {
     clearSession();
     navigate('/', { replace: true });
@@ -281,7 +286,7 @@ export default function PauseSession() {
 
         {/* Close button */}
         <button
-          onClick={handleReturn}
+          onClick={handleClose}
           className="fixed top-5 right-5 p-3 rounded-full bg-muted/40 backdrop-blur-sm text-muted-foreground/40 hover:text-foreground/60 hover:bg-muted/60 transition-all duration-300 z-[60]"
           aria-label="Close"
         >

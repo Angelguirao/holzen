@@ -94,7 +94,9 @@ export function useLibrary() {
           inserts.push({ user_id: user.id, type: 'bookmark', title: r.learning_title, body: r.learning_body, source_type: 'learning', source_url: r.learning_url, reflection_id: r.id, created_at: r.created_at });
         }
         if (r.zoom_out_data && !existingKeys.has(`${r.id}:zoom_out`)) {
-          inserts.push({ user_id: user.id, type: 'bookmark', title: 'Zoom Out', body: typeof r.zoom_out_data === 'object' ? JSON.stringify(r.zoom_out_data) : String(r.zoom_out_data), source_type: 'zoom_out', reflection_id: r.id, created_at: r.created_at });
+          const zd = r.zoom_out_data as any;
+          const zoomBody = zd?.deepTime?.body || zd?.echo?.message || zd?.deepTime?.title || (typeof zd === 'object' ? JSON.stringify(zd) : String(zd));
+          inserts.push({ user_id: user.id, type: 'bookmark', title: zd?.deepTime?.title || 'Zoom Out', body: zoomBody, source_type: 'zoom_out', reflection_id: r.id, created_at: r.created_at });
         }
         if (r.history_insight_data && !existingKeys.has(`${r.id}:history_insight`)) {
           const hd = r.history_insight_data as any;

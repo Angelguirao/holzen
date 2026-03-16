@@ -297,9 +297,10 @@ export function useHolzen() {
     }).then(({ data, error }) => {
       if (error || !data || data.error) return;
       supabase.from('reflections').update({ zoom_out_data: data } as any).eq('id', reflectionId).then(() => {});
+      const zoomBody = data?.deepTime?.body || data?.echo?.message || data?.deepTime?.title || (typeof data === 'object' ? JSON.stringify(data) : String(data));
       supabase.from('library_items').insert({
-        user_id: userId, type: 'bookmark', title: 'Zoom Out',
-        body: typeof data === 'object' ? JSON.stringify(data) : String(data),
+        user_id: userId, type: 'bookmark', title: data?.deepTime?.title || 'Zoom Out',
+        body: zoomBody,
         source_type: 'zoom_out', reflection_id: reflectionId,
       }).then(() => {});
     });
