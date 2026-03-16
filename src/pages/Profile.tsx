@@ -181,9 +181,25 @@ const Profile = () => {
         .limit(500);
       setPracticeEntries((data as unknown as PracticeEntry[]) ?? []);
     };
+    const loadProfile = async () => {
+      const { data } = await supabase
+        .from('profiles')
+        .select('hold_goal_type, hold_goal_target_months, hold_goal_target_price, hold_goal_start')
+        .eq('user_id', user.id)
+        .single();
+      if (data) {
+        setHoldGoal({
+          type: data.hold_goal_type,
+          targetMonths: data.hold_goal_target_months,
+          targetPrice: data.hold_goal_target_price,
+          start: data.hold_goal_start,
+        });
+      }
+    };
     loadReflections();
     loadLetters();
     loadPractice();
+    loadProfile();
   }, [user]);
 
   const deleteLetter = useCallback(async (id: string) => {
