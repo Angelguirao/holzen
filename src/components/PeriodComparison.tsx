@@ -173,7 +173,7 @@ export function PeriodComparison({ reflections }: Props) {
 
   const metrics = [
     {
-      label: t('periodComparison.reflections'),
+      label: t('periodComparison.pauses', 'Pauses'),
       current: current.count,
       previous: previous.count,
       format: (v: number) => `${v}`,
