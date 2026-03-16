@@ -29,7 +29,7 @@ import { StatsTrends } from '@/components/StatsTrends';
 import { MoodShiftChart } from '@/components/MoodShiftChart';
 import { PeriodComparison } from '@/components/PeriodComparison';
 import { VolatilityToleranceCard } from '@/components/VolatilityToleranceCard';
-import { SkillBalanceCard } from '@/components/SkillBalanceCard';
+
 import { ShareStats } from '@/components/ShareStats';
 import { useHolzenScore } from '@/hooks/use-holzen-score';
 
