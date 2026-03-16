@@ -377,12 +377,13 @@ const History = () => {
 
   const displayedReflections = tab === 'recent' ? filteredRecent : filtered;
 
-  const hasActiveFilters = !!tagFilter || !!moodFilter || !!dateFrom || !!dateTo || filter === 'favorites';
+  const hasActiveFilters = !!tagFilter || !!moodFilter || !!skillFilter || !!dateFrom || !!dateTo || filter === 'favorites';
 
   const clearAllFilters = useCallback(() => {
     setFilter('all');
     setTagFilter(null);
     setMoodFilter(null);
+    setSkillFilter(null);
     setDateFrom(undefined);
     setDateTo(undefined);
     setSearch('');
