@@ -164,7 +164,7 @@ export function PeriodComparison({ reflections }: Props) {
     return (
       <ChartEmptyState
         title={t('periodComparison.title', 'Period Comparison')}
-        message={t('periodComparison.emptyMessage', 'Start reflecting this week to compare your progress across periods.')}
+        message={t('periodComparison.emptyMessage', 'Start pausing this week to compare your progress across periods.')}
         current={reflections.length}
         needed={1}
       />
