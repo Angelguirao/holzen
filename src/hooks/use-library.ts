@@ -14,7 +14,7 @@ export interface LibraryItem {
   tags: string[];
   pinned: boolean;
   is_favorite: boolean;
-  status: 'unread' | 'read' | 'archived';
+  status: 'unread' | 'read' | 'archived' | 'deleted';
   created_at: string;
 }
 
