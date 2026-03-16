@@ -26,34 +26,6 @@ const OUTCOME_SCORES: Record<string, number> = {
   sold: 20,
 };
 
-function computeCurrentStreak(reflections: Reflection[], freezeDates: string[] = [], practiceEntries: PracticeEntry[] = []): number {
-  const days = new Set<string>();
-  for (const r of reflections) {
-    days.add(parseISO(r.created_at).toISOString().slice(0, 10));
-  }
-  // Practice days count toward streaks
-  for (const p of practiceEntries) {
-    days.add(parseISO(p.created_at).toISOString().slice(0, 10));
-  }
-  for (const d of freezeDates) {
-    days.add(d);
-  }
-
-  if (days.size === 0) return 0;
-
-  const sorted = Array.from(days).sort().reverse();
-  const today = new Date().toISOString().slice(0, 10);
-  const daysSinceLast = differenceInCalendarDays(new Date(today), new Date(sorted[0]));
-  if (daysSinceLast > 1) return 0;
-
-  let streak = 1;
-  for (let i = 1; i < sorted.length; i++) {
-    const diff = differenceInCalendarDays(new Date(sorted[i - 1]), new Date(sorted[i]));
-    if (diff === 1) streak++;
-    else break;
-  }
-  return streak;
-}
 
 export interface HolzenScoreData {
   score: number;
