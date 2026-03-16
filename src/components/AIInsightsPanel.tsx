@@ -35,6 +35,12 @@ const LANG_LABELS: Record<string, string> = {
 };
 
 const CATEGORY_ICONS: Record<string, typeof TrendingUp> = {
+  regulation: Sparkles,
+  tolerance: Target,
+  alignment: Brain,
+  reappraisal: Clock,
+  awareness: TrendingUp,
+  // Legacy fallbacks
   timing: Clock,
   mood: Sparkles,
   behavior: Brain,
