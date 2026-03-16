@@ -381,6 +381,32 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
     return days.size;
   }, [reflections, practiceEntries]);
 
+  // Score grade label
+  const scoreGrade = scoreData
+    ? scoreData.score >= 80 ? 'Composed'
+    : scoreData.score >= 60 ? 'Steady'
+    : scoreData.score >= 40 ? 'Building'
+    : 'Starting'
+    : null;
+
+  const scoreColor = scoreData
+    ? scoreData.score >= 80 ? 'text-primary'
+    : scoreData.score >= 60 ? 'text-primary/70'
+    : scoreData.score >= 40 ? 'text-muted-foreground'
+    : 'text-muted-foreground/50'
+    : 'text-muted-foreground/50';
+
+  // Compute time context for reflections
+  const firstReflection = reflections.length > 0 ? reflections[reflections.length - 1] : null;
+  const daysSinceFirst = firstReflection
+    ? Math.max(1, Math.ceil((Date.now() - new Date(firstReflection.created_at).getTime()) / 86400000))
+    : 0;
+  const reflectionContext = daysSinceFirst <= 7
+    ? `${daysSinceFirst}d`
+    : daysSinceFirst <= 31
+    ? `${Math.ceil(daysSinceFirst / 7)}w`
+    : `${Math.ceil(daysSinceFirst / 30)}mo`;
+
   const circumference = 2 * Math.PI * 44;
   const scoreOffset = scoreData ? circumference - (scoreData.score / 100) * circumference : circumference;
 
