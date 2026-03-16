@@ -493,11 +493,11 @@ function StatsContent({ reflections, practiceEntries = [], memberSince, holdGoal
         {/* Score component bars */}
         {scoreData && (
           <div className="space-y-1.5 pt-2 border-t border-border/30">
-            <ScoreBarInline label={t('holzenScore.emotionalRegulation', 'Regulation')} value={scoreData.emotionalRegulation} />
-            <ScoreBarInline label={t('holzenScore.distressTolerance', 'Tolerance')} value={scoreData.distressTolerance} />
-            {hasHoldGoal && <ScoreBarInline label={t('holzenScore.decisionAlignment', 'Alignment')} value={scoreData.decisionAlignment} />}
-            <ScoreBarInline label={t('holzenScore.cognitiveReappraisal', 'Reappraisal')} value={scoreData.cognitiveReappraisal} />
-            <ScoreBarInline label={t('holzenScore.selfAwareness', 'Awareness')} value={scoreData.selfAwareness} />
+            <ScoreBarInline label={t('holzenScore.emotionalRegulation', 'Regulation')} value={scoreData.emotionalRegulation} hint={t('scoreHint.regulation', 'Mood improvement during pauses + breathing completion')} />
+            <ScoreBarInline label={t('holzenScore.distressTolerance', 'Tolerance')} value={scoreData.distressTolerance} hint={t('scoreHint.tolerance', 'Holding steady during high volatility')} />
+            {hasHoldGoal && <ScoreBarInline label={t('holzenScore.decisionAlignment', 'Alignment')} value={scoreData.decisionAlignment} hint={t('scoreHint.alignment', 'Actions aligned with your hold goal')} />}
+            <ScoreBarInline label={t('holzenScore.cognitiveReappraisal', 'Reappraisal')} value={scoreData.cognitiveReappraisal} hint={t('scoreHint.reappraisal', 'Engaging perspective tools during pauses')} />
+            <ScoreBarInline label={t('holzenScore.selfAwareness', 'Awareness')} value={scoreData.selfAwareness} hint={t('scoreHint.awareness', 'Notes, tags, favorites & completing full pause flow')} />
           </div>
         )}
 
@@ -591,19 +591,22 @@ function MicroStat({ value, suffix, label, context, isText }: {
   );
 }
 
-function ScoreBarInline({ label, value, detail }: { label: string; value: number; detail?: string }) {
+function ScoreBarInline({ label, value, hint }: { label: string; value: number; hint?: string }) {
+  const [open, setOpen] = useState(false);
   return (
-    <div className="space-y-0.5">
+    <div className="space-y-0.5 cursor-pointer" onClick={() => hint && setOpen(!open)}>
       <div className="flex justify-between text-[10px] font-mono text-muted-foreground">
         <span>{label}</span>
-        <span className="flex items-center gap-1.5">
-          {detail && <span className="text-muted-foreground/40">{detail}</span>}
-          <span>{value}</span>
-        </span>
+        <span>{value}</span>
       </div>
       <div className="h-1 rounded-full bg-muted/50 overflow-hidden">
         <div className="h-full rounded-full bg-primary/60 transition-all duration-700 ease-out" style={{ width: `${value}%` }} />
       </div>
+      {open && hint && (
+        <p className="text-[10px] text-muted-foreground/50 leading-relaxed pt-0.5 animate-in fade-in duration-200">
+          {hint}
+        </p>
+      )}
     </div>
   );
 }
