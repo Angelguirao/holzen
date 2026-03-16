@@ -206,11 +206,9 @@ export function BadgesPanel({ reflections, notifyBadges = true }: BadgesPanelPro
             </p>
           </div>
           <div className="h-1.5 flex-1 max-w-[120px] ml-4 rounded-full bg-muted/50 overflow-hidden">
-            <motion.div
-              className="h-full rounded-full bg-primary/60"
-              initial={{ width: 0 }}
-              animate={{ width: `${(earnedCount / badges.length) * 100}%` }}
-              transition={{ duration: 0.8 }}
+            <div
+              className="h-full rounded-full bg-primary/60 transition-all duration-700 ease-out"
+              style={{ width: `${(earnedCount / badges.length) * 100}%` }}
             />
           </div>
         </div>
