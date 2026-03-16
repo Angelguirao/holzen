@@ -428,13 +428,16 @@ function StatsContent({ reflections, practiceEntries = [], memberSince, holdGoal
   const circumference = 2 * Math.PI * 44;
   const scoreOffset = scoreData ? circumference - (scoreData.score / 100) * circumference : circumference;
 
+  const [showScoreInfo, setShowScoreInfo] = useState(false);
+  const hasHoldGoal = holdGoal?.type != null;
+
   return (
     <div className="space-y-6">
       {/* Hero score + merged summary */}
       <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-5 space-y-4">
         <div className="flex items-center gap-5">
           {/* Score ring — hero size */}
-          <div className="relative shrink-0">
+          <div className="relative shrink-0 cursor-pointer" onClick={() => scoreData && setShowScoreInfo(true)}>
             <svg width="108" height="108" viewBox="0 0 108 108">
               <circle cx="54" cy="54" r="44" fill="none" stroke="hsl(var(--border))" strokeWidth="4" opacity="0.3" />
               <circle
@@ -451,6 +454,11 @@ function StatsContent({ reflections, practiceEntries = [], memberSince, holdGoal
                 <span className={`text-[9px] font-mono mt-0.5 ${scoreColor}`}>{scoreGrade}</span>
               )}
             </div>
+            {scoreData && (
+              <div className="absolute -top-1 -right-1 rounded-full bg-muted p-0.5">
+                <Info className="h-3 w-3 text-muted-foreground/50" />
+              </div>
+            )}
           </div>
 
           {/* Summary metrics with micro-context */}
@@ -486,7 +494,7 @@ function StatsContent({ reflections, practiceEntries = [], memberSince, holdGoal
           <div className="space-y-1.5 pt-2 border-t border-border/30">
             <ScoreBarInline label={t('holzenScore.emotionalRegulation', 'Regulation')} value={scoreData.emotionalRegulation} />
             <ScoreBarInline label={t('holzenScore.distressTolerance', 'Tolerance')} value={scoreData.distressTolerance} />
-            <ScoreBarInline label={t('holzenScore.decisionAlignment', 'Alignment')} value={scoreData.decisionAlignment} />
+            {hasHoldGoal && <ScoreBarInline label={t('holzenScore.decisionAlignment', 'Alignment')} value={scoreData.decisionAlignment} />}
             <ScoreBarInline label={t('holzenScore.cognitiveReappraisal', 'Reappraisal')} value={scoreData.cognitiveReappraisal} />
             <ScoreBarInline label={t('holzenScore.selfAwareness', 'Awareness')} value={scoreData.selfAwareness} />
           </div>
@@ -498,6 +506,9 @@ function StatsContent({ reflections, practiceEntries = [], memberSince, holdGoal
           </p>
         )}
       </div>
+
+      {/* Score explainer sheet */}
+      <ScoreExplainerSheet open={showScoreInfo} onOpenChange={setShowScoreInfo} hasHoldGoal={hasHoldGoal} />
 
       <div className="flex items-center justify-end">
         <ShareStats
