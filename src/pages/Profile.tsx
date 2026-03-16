@@ -440,7 +440,7 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
           <div className="flex-1 min-w-0 grid grid-cols-2 gap-x-4 gap-y-3">
             <MicroStat
               value={reflections.length}
-              label={t('profile.reflections', 'Reflects')}
+              label={t('profile.pauses', 'Pauses')}
               context={reflectionContext ? `in ${reflectionContext}` : undefined}
             />
             <MicroStat
@@ -477,7 +477,7 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
 
         {!scoreData && (
           <p className="text-[10px] text-muted-foreground/40 font-mono text-center">
-            {t('profile.holzenScoreEmpty', 'Log 3 reflections with mood or outcome to generate your composure score.')}
+            {t('profile.holzenScoreEmpty', 'Log 3 pauses with mood or outcome to generate your composure score.')}
           </p>
         )}
       </div>
