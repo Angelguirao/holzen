@@ -1,8 +1,8 @@
-import { useState, useMemo, lazy, Suspense } from 'react';
+import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLibrary } from '@/hooks/use-library';
 import { PageMeta } from '@/components/PageMeta';
-import { Heart, Search, X, Lock, Plus } from 'lucide-react';
+import { Heart, Search, X, Lock } from 'lucide-react';
 import { LibraryItems } from '@/components/library/LibraryItems';
 import { LibraryCollections } from '@/components/library/LibraryCollections';
 
@@ -21,6 +21,12 @@ const SOURCE_CHIPS: { key: string; emoji: string; label: string }[] = [
   { key: 'external', emoji: '🔗', label: 'External' },
 ];
 
+const STATUS_CHIPS: { key: string; label: string }[] = [
+  { key: 'unread', label: 'statusUnread' },
+  { key: 'read', label: 'statusRead' },
+  { key: 'archived', label: 'statusArchived' },
+];
+
 type Tab = 'all' | 'favorites' | 'collections';
 
 export default function Library() {
@@ -30,8 +36,10 @@ export default function Library() {
   const [tab, setTab] = useState<Tab>('all');
   const [search, setSearch] = useState('');
   const [sourceFilter, setSourceFilter] = useState<string | null>('reflection');
+  const [statusFilter, setStatusFilter] = useState<string | null>(null);
+  const [tagFilter, setTagFilter] = useState<string | null>(null);
 
-  const { items, collections, collectionItems } = library;
+  const { items, collections } = library;
 
   // Available source types from actual data
   const availableSources = useMemo(() => {
@@ -39,19 +47,39 @@ export default function Library() {
     return SOURCE_CHIPS.filter((f) => existing.has(f.key));
   }, [items]);
 
+  // Available tags from actual data (sorted by frequency)
+  const availableTags = useMemo(() => {
+    const tagCount = new Map<string, number>();
+    items.forEach((i) => {
+      i.tags?.forEach((tag) => {
+        tagCount.set(tag, (tagCount.get(tag) ?? 0) + 1);
+      });
+    });
+    return Array.from(tagCount.entries())
+      .sort((a, b) => b[1] - a[1])
+      .map(([tag]) => tag);
+  }, [items]);
+
+  const hasActiveFilters = !!sourceFilter || !!statusFilter || !!tagFilter;
+
   // Filtering
   const filtered = useMemo(() => {
     let result = items;
     // Tab
     if (tab === 'favorites') result = result.filter((i) => i.is_favorite);
-    // Always hide deleted (soft-deleted backfill items)
+    // Always hide deleted
     result = result.filter((i) => i.status !== 'deleted');
-    // Hide archived by default (unless searching)
-    if (!search.trim()) {
+    // Status filter
+    if (statusFilter) {
+      result = result.filter((i) => i.status === statusFilter);
+    } else if (!search.trim()) {
+      // Hide archived by default when no status filter active
       result = result.filter((i) => i.status !== 'archived');
     }
     // Source type
     if (sourceFilter) result = result.filter((i) => i.source_type === sourceFilter);
+    // Tag
+    if (tagFilter) result = result.filter((i) => i.tags?.includes(tagFilter));
     // Search
     if (search.trim()) {
       const q = search.toLowerCase();
@@ -62,8 +90,7 @@ export default function Library() {
       );
     }
     return result;
-  }, [items, tab, sourceFilter, search]);
-
+  }, [items, tab, sourceFilter, statusFilter, tagFilter, search]);
 
   if (isPending) {
     return (
@@ -93,6 +120,12 @@ export default function Library() {
       </div>
     );
   }
+
+  const clearAllFilters = () => {
+    setSourceFilter(null);
+    setStatusFilter(null);
+    setTagFilter(null);
+  };
 
   return (
     <div className="space-y-4 pb-24">
@@ -166,7 +199,7 @@ export default function Library() {
             )}
           </div>
 
-          {/* Source type chips — horizontal scroll */}
+          {/* Source type chips */}
           {availableSources.length > 1 && (
             <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 -mx-1 px-1 scrollbar-none">
               {availableSources.map(({ key, emoji, label }) => (
@@ -187,13 +220,51 @@ export default function Library() {
             </div>
           )}
 
-          {/* Active filter indicator */}
-          {sourceFilter && (
+          {/* Status chips */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 -mx-1 px-1 scrollbar-none">
+            {STATUS_CHIPS.map(({ key, label }) => (
+              <button
+                key={key}
+                onClick={() => setStatusFilter(statusFilter === key ? null : key)}
+                className={cn(
+                  'text-[10px] font-mono px-2 py-1 rounded-full border transition-colors whitespace-nowrap',
+                  statusFilter === key
+                    ? 'border-foreground/20 bg-foreground/5 text-foreground'
+                    : 'border-border/30 text-muted-foreground/50 hover:text-muted-foreground/70'
+                )}
+              >
+                {t(`library.${label}`)}
+              </button>
+            ))}
+          </div>
+
+          {/* Tag chips */}
+          {availableTags.length > 0 && (
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 -mx-1 px-1 scrollbar-none">
+              {availableTags.slice(0, 15).map((tag) => (
+                <button
+                  key={tag}
+                  onClick={() => setTagFilter(tagFilter === tag ? null : tag)}
+                  className={cn(
+                    'text-[10px] font-mono px-2 py-1 rounded-full border transition-colors whitespace-nowrap',
+                    tagFilter === tag
+                      ? 'border-primary/30 bg-primary/10 text-primary'
+                      : 'border-border/30 text-muted-foreground/50 hover:text-muted-foreground/70'
+                  )}
+                >
+                  #{tag}
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Active filter clear-all */}
+          {hasActiveFilters && (
             <button
-              onClick={() => setSourceFilter(null)}
+              onClick={clearAllFilters}
               className="flex items-center gap-1 text-[9px] font-mono text-muted-foreground/50 hover:text-muted-foreground transition-colors"
             >
-              <X className="h-2.5 w-2.5" /> {t('library.clearFilter')}
+              <X className="h-2.5 w-2.5" /> {t('library.clearAll')}
             </button>
           )}
 
