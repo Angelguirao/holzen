@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { differenceInCalendarDays, parseISO } from 'date-fns';
+import { parseISO } from 'date-fns';
 
 interface Reflection {
   created_at: string;
@@ -26,41 +26,12 @@ const OUTCOME_SCORES: Record<string, number> = {
   sold: 20,
 };
 
-function computeCurrentStreak(reflections: Reflection[], freezeDates: string[] = [], practiceEntries: PracticeEntry[] = []): number {
-  const days = new Set<string>();
-  for (const r of reflections) {
-    days.add(parseISO(r.created_at).toISOString().slice(0, 10));
-  }
-  // Practice days count toward streaks
-  for (const p of practiceEntries) {
-    days.add(parseISO(p.created_at).toISOString().slice(0, 10));
-  }
-  for (const d of freezeDates) {
-    days.add(d);
-  }
-
-  if (days.size === 0) return 0;
-
-  const sorted = Array.from(days).sort().reverse();
-  const today = new Date().toISOString().slice(0, 10);
-  const daysSinceLast = differenceInCalendarDays(new Date(today), new Date(sorted[0]));
-  if (daysSinceLast > 1) return 0;
-
-  let streak = 1;
-  for (let i = 1; i < sorted.length; i++) {
-    const diff = differenceInCalendarDays(new Date(sorted[i - 1]), new Date(sorted[i]));
-    if (diff === 1) streak++;
-    else break;
-  }
-  return streak;
-}
 
 export interface HolzenScoreData {
   score: number;
   moodScore: number;
   deltaScore: number;
   outcomeScore: number;
-  streakScore: number;
   practiceScore: number;
   trend: 'improving' | 'declining' | 'stable';
 }
@@ -72,7 +43,7 @@ export function useHolzenScore(reflections: Reflection[], freezeDates: string[] 
     // Use last 30 reflections for scoring
     const recent = reflections.slice(0, 30);
 
-    // Mood score (30%) — include check-in moods
+    // Mood score (15%) — include check-in moods
     const reflectionMoods = recent.filter((r) => r.mood && MOOD_SCORES[r.mood] !== undefined);
     const checkinMoods = practiceEntries
       .filter((p) => p.type === 'checkin' && p.mood && MOOD_SCORES[p.mood] !== undefined)
@@ -85,7 +56,7 @@ export function useHolzenScore(reflections: Reflection[], freezeDates: string[] 
       ? allMoods.reduce((s, v) => s + v, 0) / allMoods.length
       : 60;
 
-    // Mood delta score (10%) — measures before→after improvement from grounding
+    // Grounding delta score (35%) — measures before→after improvement from pause flow
     const withDelta = recent.filter(
       (r) => r.mood && r.mood_after && MOOD_SCORES[r.mood] !== undefined && MOOD_SCORES[r.mood_after] !== undefined
     );
@@ -94,7 +65,6 @@ export function useHolzenScore(reflections: Reflection[], freezeDates: string[] 
       const deltas = withDelta.map(r => {
         const before = MOOD_SCORES[r.mood!] ?? 50;
         const after = MOOD_SCORES[r.mood_after!] ?? 50;
-        // Normalize: improvement from 0-100 scale, clamped
         return Math.min(100, Math.max(0, 50 + (after - before)));
       });
       deltaAvg = deltas.reduce((s, v) => s + v, 0) / deltas.length;
@@ -107,18 +77,15 @@ export function useHolzenScore(reflections: Reflection[], freezeDates: string[] 
         ? outcomesWithScore.reduce((sum, r) => sum + (OUTCOME_SCORES[r.outcome!] ?? 50), 0) / outcomesWithScore.length
         : 50;
 
-    // Streak score (15%) — includes practice days
-    const streak = computeCurrentStreak(reflections, freezeDates, practiceEntries);
-    const streakPct = Math.min(streak / 14, 1) * 100;
-
-    // Practice engagement score (15%) — rewards consistent practice
+    // Practice engagement score (20%) — rewards consistent practice
     const last30Days = new Date();
     last30Days.setDate(last30Days.getDate() - 30);
     const recentPractice = practiceEntries.filter(p => new Date(p.created_at) >= last30Days);
     const uniquePracticeDays = new Set(recentPractice.map(p => parseISO(p.created_at).toISOString().slice(0, 10))).size;
     const practicePct = Math.min(uniquePracticeDays / 10, 1) * 100;
 
-    const score = Math.round(moodAvg * 0.30 + deltaAvg * 0.10 + outcomeAvg * 0.30 + streakPct * 0.15 + practicePct * 0.15);
+    // Weights: Mood 15%, Delta 35%, Outcome 30%, Practice 20%
+    const score = Math.round(moodAvg * 0.15 + deltaAvg * 0.35 + outcomeAvg * 0.30 + practicePct * 0.20);
 
     // Trend
     let trend: 'improving' | 'declining' | 'stable' = 'stable';
@@ -143,7 +110,6 @@ export function useHolzenScore(reflections: Reflection[], freezeDates: string[] 
       moodScore: Math.round(moodAvg),
       deltaScore: Math.round(deltaAvg),
       outcomeScore: Math.round(outcomeAvg),
-      streakScore: Math.round(streakPct),
       practiceScore: Math.round(practicePct),
       trend,
     };
