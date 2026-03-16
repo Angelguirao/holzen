@@ -283,11 +283,11 @@ export function useHolzen() {
           signal_body: data.body,
           signal_source: data.source,
           signal_url: data.url,
-        } as any).eq('id', reflectionId).then(() => {});
+        } as any).eq('id', reflectionId).then(({ error }) => { if (error) console.error('[signal] reflection update failed:', error.message); });
         supabase.from('library_items').insert({
           user_id: userId, type: 'bookmark', title: data.title, body: data.body,
           source_type: 'signal', source_url: data.url, reflection_id: reflectionId,
-        }).then(() => {});
+        }).then(({ error }) => { if (error) console.error('[signal] library insert failed:', error.message); });
       });
     });
 
@@ -296,13 +296,13 @@ export function useHolzen() {
       body: { context: ctx, reflectionMessage: msg, language: lang },
     }).then(({ data, error }) => {
       if (error || !data || data.error) return;
-      supabase.from('reflections').update({ zoom_out_data: data } as any).eq('id', reflectionId).then(() => {});
+      supabase.from('reflections').update({ zoom_out_data: data } as any).eq('id', reflectionId).then(({ error }) => { if (error) console.error('[zoom_out] reflection update failed:', error.message); });
       const zoomBody = data?.deepTime?.body || data?.echo?.message || data?.deepTime?.title || (typeof data === 'object' ? JSON.stringify(data) : String(data));
       supabase.from('library_items').insert({
         user_id: userId, type: 'bookmark', title: data?.deepTime?.title || 'Zoom Out',
         body: zoomBody,
         source_type: 'zoom_out', reflection_id: reflectionId,
-      }).then(() => {});
+      }).then(({ error }) => { if (error) console.error('[zoom_out] library insert failed:', error.message); });
     });
 
     // Historical Insight companion
@@ -310,11 +310,11 @@ export function useHolzen() {
       body: { context: ctx, language: lang },
     }).then(({ data, error }) => {
       if (error || !data || data.error) return;
-      supabase.from('reflections').update({ history_insight_data: data } as any).eq('id', reflectionId).then(() => {});
+      supabase.from('reflections').update({ history_insight_data: data } as any).eq('id', reflectionId).then(({ error }) => { if (error) console.error('[history] reflection update failed:', error.message); });
       supabase.from('library_items').insert({
         user_id: userId, type: 'bookmark', title: data.title, body: data.btcInsight,
         source_type: 'history_insight', reflection_id: reflectionId,
-      }).then(() => {});
+      }).then(({ error }) => { if (error) console.error('[history] library insert failed:', error.message); });
     });
 
     // Ground nudge (learning)
@@ -328,11 +328,11 @@ export function useHolzen() {
           learning_body: data.body,
           learning_citation: data.citation,
           learning_url: data.url,
-        } as any).eq('id', reflectionId).then(() => {});
+        } as any).eq('id', reflectionId).then(({ error }) => { if (error) console.error('[learning] reflection update failed:', error.message); });
         supabase.from('library_items').insert({
           user_id: userId, type: 'bookmark', title: data.title, body: data.body,
           source_type: 'learning', source_url: data.url, reflection_id: reflectionId,
-        }).then(() => {});
+        }).then(({ error }) => { if (error) console.error('[learning] library insert failed:', error.message); });
       });
     });
   }, []);
