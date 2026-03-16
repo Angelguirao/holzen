@@ -14,7 +14,7 @@ interface Props {
 function buildShareText({ reflectionCount, scoreData, moodCounts }: Props, t: (k: string, opts?: any) => string): string {
   const lines: string[] = [t('share.myStats')];
   lines.push('');
-  lines.push(`📊 ${t('share.reflectionsCount', { count: reflectionCount })}`);
+  lines.push(`📊 ${t('share.pausesCount', { count: reflectionCount })}`);
 
   if (scoreData) {
     lines.push(`🎯 ${t('share.holzenScoreShare', { score: scoreData.score, trend: scoreData.trend })}`);

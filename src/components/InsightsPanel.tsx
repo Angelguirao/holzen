@@ -72,7 +72,7 @@ export function InsightsPanel({ reflections }: Props) {
     return (
       <ChartEmptyState
         title={t('insightsPanel.title')}
-        message={t('insightsPanel.emptyMessage', 'Log a mood or outcome during a reflection to see your patterns. Emotional check-ins also contribute.')}
+        message={t('insightsPanel.emptyMessage', 'Log a mood or outcome during a pause to see your patterns. Emotional check-ins also contribute.')}
         current={reflections.length}
         needed={1}
       />

@@ -140,7 +140,7 @@ export function StreakTimeline({ reflections, practiceEntries = [], streakFreeze
           <span className="h-2 w-2 rounded-sm bg-primary" /> {t('streakTimeline.legend.outcomeLogged')}
         </span>
         <span className="flex items-center gap-1">
-          <span className="h-2 w-2 rounded-sm bg-primary/30" /> {t('streakTimeline.legend.reflectedNoOutcome')}
+          <span className="h-2 w-2 rounded-sm bg-primary/30" /> {t('streakTimeline.legend.pausedNoOutcome', 'Paused (no outcome)')}
         </span>
         <span className="flex items-center gap-1">
           <span className="h-2 w-2 rounded-sm bg-accent-foreground/20" /> {t('streakTimeline.legend.practiceOnly', 'Practice only')}

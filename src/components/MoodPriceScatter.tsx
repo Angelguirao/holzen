@@ -68,7 +68,7 @@ export const MoodPriceScatter = forwardRef<HTMLDivElement, Props>(function MoodP
     return (
       <ChartEmptyState
         title={t('moodCharts.moodPriceScatter')}
-        message={t('moodCharts.moodPriceScatterEmpty', 'Need 8 reflections with both mood and price context for meaningful scatter analysis.')}
+        message={t('moodCharts.moodPriceScatterEmpty', 'Need 8 pauses with both mood and price context for meaningful scatter analysis.')}
         current={points.length}
         needed={8}
       />
@@ -113,7 +113,7 @@ export const MoodPriceScatter = forwardRef<HTMLDivElement, Props>(function MoodP
               }}
               labelFormatter={() => ''}
             />
-            <Scatter data={points} name={t('moodCharts.reflections')}>
+            <Scatter data={points} name={t('moodCharts.pauses', 'Pauses')}>
               {points.map((p, i) => (
                 <Cell key={i} fill={MOOD_COLORS[p.mood] ?? 'hsl(var(--muted-foreground))'} fillOpacity={0.6} r={4} />
               ))}
