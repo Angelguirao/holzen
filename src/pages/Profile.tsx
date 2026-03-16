@@ -29,7 +29,7 @@ import { StatsTrends } from '@/components/StatsTrends';
 import { MoodShiftChart } from '@/components/MoodShiftChart';
 import { PeriodComparison } from '@/components/PeriodComparison';
 import { VolatilityToleranceCard } from '@/components/VolatilityToleranceCard';
-import { SkillBalanceCard } from '@/components/SkillBalanceCard';
+
 import { ShareStats } from '@/components/ShareStats';
 import { useHolzenScore } from '@/hooks/use-holzen-score';
 
@@ -513,7 +513,7 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
       {/* Section: Skill Development */}
       <ProLock feature="decisions">
         <StatsSection label={t('profile.sectionSkills', 'Skill Development')}>
-          <SkillBalanceCard reflections={reflections} />
+          
           <PeriodComparison reflections={reflections} />
           <StatsTrends reflections={reflections} />
         </StatsSection>
