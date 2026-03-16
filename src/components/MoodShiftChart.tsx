@@ -77,8 +77,8 @@ export function MoodShiftChart({ reflections }: Props) {
   if (data.length < 2) {
     return (
       <ChartEmptyState
-        title={t('statsTrends.moodShift', 'Grounding Effect')}
-        message={t('statsTrends.moodShiftEmpty', 'Complete sessions with both mood checks across 2 weeks to see how grounding shifts your composure.')}
+        title={t('statsTrends.regulationEffect', 'Regulation Effect')}
+        message={t('statsTrends.regulationEffectEmpty', 'Complete sessions with both mood checks across 2 weeks to see how your regulation skills shift composure.')}
         current={data.length}
         needed={2}
       />
