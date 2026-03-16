@@ -25,8 +25,16 @@ interface Reflection {
   is_favorite?: boolean;
 }
 
+interface HoldGoal {
+  type: string | null;
+  targetMonths: number | null;
+  targetPrice: number | null;
+  start: string | null;
+}
+
 interface Props {
   reflections: Reflection[];
+  holdGoal?: HoldGoal | null;
 }
 
 interface PeriodStats {
