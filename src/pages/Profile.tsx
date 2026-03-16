@@ -100,6 +100,7 @@ const Profile = () => {
   const [reflections, setReflections] = useState<Reflection[]>([]);
   const [letters, setLetters] = useState<Letter[]>([]);
   const [practiceEntries, setPracticeEntries] = useState<PracticeEntry[]>([]);
+  const [holdGoal, setHoldGoal] = useState<{ type: string | null; targetMonths: number | null; targetPrice: number | null; start: string | null } | null>(null);
   const [loading, setLoading] = useState(true);
   const [lettersLoading, setLettersLoading] = useState(true);
   const [viewingLetter, setViewingLetter] = useState<Letter | null>(null);
@@ -180,9 +181,25 @@ const Profile = () => {
         .limit(500);
       setPracticeEntries((data as unknown as PracticeEntry[]) ?? []);
     };
+    const loadProfile = async () => {
+      const { data } = await supabase
+        .from('profiles')
+        .select('hold_goal_type, hold_goal_target_months, hold_goal_target_price, hold_goal_start')
+        .eq('user_id', user.id)
+        .single();
+      if (data) {
+        setHoldGoal({
+          type: data.hold_goal_type,
+          targetMonths: data.hold_goal_target_months,
+          targetPrice: data.hold_goal_target_price,
+          start: data.hold_goal_start,
+        });
+      }
+    };
     loadReflections();
     loadLetters();
     loadPractice();
+    loadProfile();
   }, [user]);
 
   const deleteLetter = useCallback(async (id: string) => {
@@ -245,7 +262,7 @@ const Profile = () => {
             <Skeleton className="h-40 w-full rounded-md" />
           </div>
         ) : (
-          <StatsContent reflections={reflections} practiceEntries={practiceEntries} memberSince={user?.created_at} />
+          <StatsContent reflections={reflections} practiceEntries={practiceEntries} memberSince={user?.created_at} holdGoal={holdGoal} />
         )
       ) : tab === 'insights' ? (
         <ProLock feature="ai_insights" hideContent>
@@ -322,9 +339,9 @@ const Profile = () => {
   );
 };
 
-function StatsContent({ reflections, practiceEntries = [], memberSince }: { reflections: Reflection[]; practiceEntries?: PracticeEntry[]; memberSince?: string }) {
+function StatsContent({ reflections, practiceEntries = [], memberSince, holdGoal }: { reflections: Reflection[]; practiceEntries?: PracticeEntry[]; memberSince?: string; holdGoal?: { type: string | null; targetMonths: number | null; targetPrice: number | null; start: string | null } | null }) {
   const { t } = useTranslation();
-  const scoreData = useHolzenScore(reflections, [], practiceEntries);
+  const scoreData = useHolzenScore(reflections, [], practiceEntries, holdGoal);
 
   const moodCounts = useMemo(() => {
     const counts: Record<string, number> = {};
@@ -512,7 +529,7 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
 
       {/* Section: Skill Development */}
       <ProLock feature="decisions">
-        <StatsSection label={t('profile.sectionSkills', 'Skill Development')}>
+        <StatsSection label={t('profile.sectionProgress', 'Progress')}>
           
           <PeriodComparison reflections={reflections} />
           <StatsTrends reflections={reflections} />
