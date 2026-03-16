@@ -55,7 +55,7 @@ function computeStats(refs: Reflection[]): Omit<PeriodStats, 'score'> {
 
 type View = 'weekly' | 'monthly';
 
-export function PeriodComparison({ reflections }: Props) {
+export function PeriodComparison({ reflections, holdGoal }: Props) {
   const { t } = useTranslation();
   const [view, setView] = useState<View>('weekly');
 
