@@ -192,21 +192,14 @@ export function PeriodComparison({ reflections, holdGoal }: Props) {
   );
 }
 
-function MetricRow({
-  label,
-  current,
-  previous,
-  format: fmt,
-  delta,
-  deltaFormat,
-}: {
+const MetricRow = forwardRef<HTMLDivElement, {
   label: string;
   current: number | null;
   previous: number | null;
   format: (v: number) => string;
   delta: number | null;
   deltaFormat: (d: number) => string;
-}) {
+}>(({ label, current, previous, format: fmt, delta, deltaFormat }, ref) => {
   const DeltaIcon = delta !== null && delta > 0 ? ArrowUpRight : delta !== null && delta < 0 ? ArrowDownRight : Minus;
   const deltaColor = delta !== null && delta > 0
     ? 'text-primary'
@@ -215,7 +208,7 @@ function MetricRow({
       : 'text-muted-foreground/40';
 
   return (
-    <div className="grid grid-cols-[1fr_auto_auto] gap-x-4 items-center">
+    <div ref={ref} className="grid grid-cols-[1fr_auto_auto] gap-x-4 items-center">
       <div className="flex items-center gap-2">
         <span className="text-[10px] font-mono text-muted-foreground">{label}</span>
         {delta !== null && delta !== 0 && (
@@ -233,4 +226,6 @@ function MetricRow({
       </span>
     </div>
   );
-}
+});
+
+MetricRow.displayName = 'MetricRow';
