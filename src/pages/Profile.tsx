@@ -604,7 +604,23 @@ function MicroStat({ value, suffix, label, context, isText }: {
     </div>
   );
 }
-function StatsSection({ label, children }: { label: string; children: React.ReactNode }) {
+
+function ScoreBarInline({ label, value, detail }: { label: string; value: number; detail?: string }) {
+  return (
+    <div className="space-y-0.5">
+      <div className="flex justify-between text-[10px] font-mono text-muted-foreground">
+        <span>{label}</span>
+        <span className="flex items-center gap-1.5">
+          {detail && <span className="text-muted-foreground/40">{detail}</span>}
+          <span>{value}</span>
+        </span>
+      </div>
+      <div className="h-1 rounded-full bg-muted/50 overflow-hidden">
+        <div className="h-full rounded-full bg-primary/60 transition-all duration-700 ease-out" style={{ width: `${value}%` }} />
+      </div>
+    </div>
+  );
+}
   return (
     <div className="space-y-4">
       <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground border-b border-border/40 pb-1.5">
