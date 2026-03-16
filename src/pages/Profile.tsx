@@ -339,9 +339,9 @@ const Profile = () => {
   );
 };
 
-function StatsContent({ reflections, practiceEntries = [], memberSince }: { reflections: Reflection[]; practiceEntries?: PracticeEntry[]; memberSince?: string }) {
+function StatsContent({ reflections, practiceEntries = [], memberSince, holdGoal }: { reflections: Reflection[]; practiceEntries?: PracticeEntry[]; memberSince?: string; holdGoal?: { type: string | null; targetMonths: number | null; targetPrice: number | null; start: string | null } | null }) {
   const { t } = useTranslation();
-  const scoreData = useHolzenScore(reflections, [], practiceEntries);
+  const scoreData = useHolzenScore(reflections, [], practiceEntries, holdGoal);
 
   const moodCounts = useMemo(() => {
     const counts: Record<string, number> = {};
