@@ -11,7 +11,7 @@ import { Mail, Lock, Clock, Trash2, BarChart3, Sparkles, Award, CalendarDays } f
 import HistoryContent from '@/components/library/HistoryContent';
 import { Skeleton } from '@/components/ui/skeleton';
 
-import { InsightsPanel } from '@/components/InsightsPanel';
+
 import { DecisionQualityCard } from '@/components/DecisionQualityCard';
 import { ChartEmptyState } from '@/components/ChartEmptyState';
 import { StreakTimeline } from '@/components/StreakTimeline';
@@ -490,62 +490,49 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
         />
       </div>
 
-      {/* Section: Your Journey — without redundant ReflectionStats tiles */}
+      {/* Section: Your Journey */}
       <StatsSection label={t('profile.sectionJourney', 'Your Journey')}>
         <StreakTimeline reflections={reflections} practiceEntries={practiceEntries} memberSince={memberSince} />
+        {practiceStats && (
+          <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2">
+            <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
+              {t('profile.practiceActivity')}
+            </p>
+            <div className="flex flex-wrap gap-3">
+              {Object.entries(practiceStats.byType).map(([type, count]) => (
+                <div key={type} className="text-center">
+                  <p className="text-sm font-mono">{count}</p>
+                  <p className="text-[9px] font-mono text-muted-foreground/50 capitalize">{t(`practice.${type}Label`, type)}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </StatsSection>
-      {/* Section: Emotional Patterns */}
-      <ProLock feature="emotional_patterns">
-        <StatsSection label={t('profile.sectionEmotional', 'Emotional Patterns')}>
-          <MoodTrendChart reflections={moodDataForCharts} />
-          <MoodPriceChart reflections={reflections} />
+
+      {/* Section: Skill Development */}
+      <ProLock feature="decisions">
+        <StatsSection label={t('profile.sectionSkills', 'Skill Development')}>
+          <SkillBalanceCard reflections={reflections} />
+          <PeriodComparison reflections={reflections} />
+          <StatsTrends reflections={reflections} />
         </StatsSection>
       </ProLock>
 
       {/* Section: Decision Making */}
-      <ProLock feature="decisions">
+      <ProLock feature="emotional_patterns">
         <StatsSection label={t('profile.sectionDecisions', 'Decision Making')}>
-          <SkillBalanceCard reflections={reflections} />
-          <PeriodComparison reflections={reflections} />
           <DecisionQualityCard reflections={reflections} />
           <VolatilityToleranceCard reflections={reflections} />
-          <InsightsPanel reflections={reflections} />
         </StatsSection>
       </ProLock>
 
-      {/* Section: Practice */}
-      <ProLock feature="practice_stats">
-        <StatsSection label={t('profile.sectionPractice', 'Practice')}>
-          {practiceStats ? (
-            <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2">
-              <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
-                {t('profile.practiceActivity')}
-              </p>
-              <div className="flex flex-wrap gap-3">
-                {Object.entries(practiceStats.byType).map(([type, count]) => (
-                  <div key={type} className="text-center">
-                    <p className="text-sm font-mono">{count}</p>
-                    <p className="text-[9px] font-mono text-muted-foreground/50 capitalize">{t(`practice.${type}Label`, type)}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          ) : (
-            <ChartEmptyState
-              title={t('profile.practiceActivity')}
-              message={t('profile.noPracticeYet', 'No practice sessions yet. Try a check-in or body scan from the Home screen.')}
-              current={0}
-              needed={1}
-            />
-          )}
-        </StatsSection>
-      </ProLock>
-
-      {/* Section: Advanced */}
+      {/* Section: Deep Patterns */}
       <ProLock feature="advanced_stats">
-        <StatsSection label={t('profile.sectionAdvanced', 'Advanced')}>
-          <StatsTrends reflections={reflections} />
+        <StatsSection label={t('profile.sectionDeepPatterns', 'Deep Patterns')}>
           <MoodShiftChart reflections={reflections} />
+          <MoodTrendChart reflections={moodDataForCharts} />
+          <MoodPriceChart reflections={reflections} />
           <MoodPriceScatter reflections={reflections} />
         </StatsSection>
       </ProLock>
