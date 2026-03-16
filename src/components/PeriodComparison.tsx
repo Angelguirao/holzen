@@ -131,7 +131,7 @@ export function PeriodComparison({ reflections, holdGoal }: Props) {
       deltaFormat: (d: number) => `${d > 0 ? '+' : ''}${d}pp`,
     },
     {
-      label: t('periodComparison.composureScore', 'Score'),
+      label: t('periodComparison.composureScorePeriod', 'Period Score'),
       current: currentScore?.score ?? null,
       previous: previousScore?.score ?? null,
       format: (v: number) => `${v}`,
