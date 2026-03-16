@@ -77,7 +77,7 @@ export function HolzenNumber({ variant = 'default' }: { variant?: 'default' | 'c
         {data.percent}%
       </p>
       <p className="text-[10px] text-muted-foreground leading-relaxed">
-        of users held steady today · {data.total} reflection{data.total !== 1 ? 's' : ''} recorded
+        of users held steady today · {data.total} pause{data.total !== 1 ? 's' : ''} recorded
       </p>
     </motion.div>
   );
