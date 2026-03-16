@@ -367,26 +367,18 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
   }, [practiceEntries]);
 
   // Compute current streak for summary
-  const currentStreak = useMemo(() => {
+  // Activity days in last 30 days (replaces streak as a soft context metric)
+  const activeDaysLast30 = useMemo(() => {
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 30);
     const days = new Set<string>();
     for (const r of reflections) {
-      if (r.outcome) days.add(new Date(r.created_at).toISOString().slice(0, 10));
+      if (new Date(r.created_at) >= cutoff) days.add(new Date(r.created_at).toISOString().slice(0, 10));
     }
     for (const p of practiceEntries) {
-      days.add(new Date(p.created_at).toISOString().slice(0, 10));
+      if (new Date(p.created_at) >= cutoff) days.add(new Date(p.created_at).toISOString().slice(0, 10));
     }
-    const sorted = Array.from(days).sort().reverse();
-    if (sorted.length === 0) return 0;
-    const today = new Date().toISOString().slice(0, 10);
-    const gap = Math.floor((new Date(today).getTime() - new Date(sorted[0]).getTime()) / 86400000);
-    if (gap > 1) return 0;
-    let streak = 1;
-    for (let i = 1; i < sorted.length; i++) {
-      const diff = Math.floor((new Date(sorted[i - 1]).getTime() - new Date(sorted[i]).getTime()) / 86400000);
-      if (diff === 1) streak++;
-      else break;
-    }
-    return streak;
+    return days.size;
   }, [reflections, practiceEntries]);
 
   // Score grade label
@@ -414,26 +406,6 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
     : daysSinceFirst <= 31
     ? `${Math.ceil(daysSinceFirst / 7)}w`
     : `${Math.ceil(daysSinceFirst / 30)}mo`;
-
-  // Longest streak for context
-  const longestStreak = useMemo(() => {
-    const days = new Set<string>();
-    for (const r of reflections) {
-      if (r.outcome) days.add(new Date(r.created_at).toISOString().slice(0, 10));
-    }
-    for (const p of practiceEntries) {
-      days.add(new Date(p.created_at).toISOString().slice(0, 10));
-    }
-    const sorted = Array.from(days).sort().reverse();
-    if (sorted.length === 0) return 0;
-    let longest = 1, streak = 1;
-    for (let i = 1; i < sorted.length; i++) {
-      const diff = Math.floor((new Date(sorted[i - 1]).getTime() - new Date(sorted[i]).getTime()) / 86400000);
-      if (diff === 1) { streak++; longest = Math.max(longest, streak); }
-      else streak = 1;
-    }
-    return longest;
-  }, [reflections, practiceEntries]);
 
   const circumference = 2 * Math.PI * 44;
   const scoreOffset = scoreData ? circumference - (scoreData.score / 100) * circumference : circumference;
@@ -466,15 +438,15 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
           {/* Summary metrics with micro-context */}
           <div className="flex-1 min-w-0 grid grid-cols-2 gap-x-4 gap-y-3">
             <MicroStat
-              value={currentStreak}
-              suffix="d"
-              label={t('profile.streak', 'Streak')}
-              context={longestStreak > currentStreak ? `best ${longestStreak}d` : currentStreak > 0 ? '🔥' : undefined}
-            />
-            <MicroStat
               value={reflections.length}
               label={t('profile.reflections', 'Reflects')}
               context={reflectionContext ? `in ${reflectionContext}` : undefined}
+            />
+            <MicroStat
+              value={activeDaysLast30}
+              suffix="d"
+              label={t('profile.activeDays', 'Active')}
+              context="last 30d"
             />
             <MicroStat
               value={practiceDays}
@@ -497,7 +469,7 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
             <ScoreBarInline label={t('profile.moodLabel')} value={scoreData.moodScore} />
             <ScoreBarInline label={t('profile.actionsLabel')} value={scoreData.outcomeScore} />
             <ScoreBarInline label={t('holzenScore.groundingEffect', 'Grounding')} value={scoreData.deltaScore} />
-            <ScoreBarInline label={t('profile.streakLabel')} value={scoreData.streakScore} />
+            
             <ScoreBarInline
               label={t('profile.practiceLabel')}
               value={scoreData.practiceScore}
