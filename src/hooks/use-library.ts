@@ -85,22 +85,22 @@ export function useLibrary() {
           inserts.push({ user_id: user.id, type: 'bookmark', title: 'Reflection', body: r.message, source_type: 'reflection', reflection_id: r.id, tags: ['reflection'], created_at: r.created_at });
         }
         if (r.haiku && !existingKeys.has(`${r.id}:haiku`)) {
-          inserts.push({ user_id: user.id, type: 'bookmark', title: 'Haiku', body: r.haiku, source_type: 'haiku', reflection_id: r.id, created_at: r.created_at });
+          inserts.push({ user_id: user.id, type: 'bookmark', title: 'Haiku', body: r.haiku, source_type: 'haiku', reflection_id: r.id, tags: [], created_at: r.created_at });
         }
         if (r.signal_source && !existingKeys.has(`${r.id}:signal`)) {
-          inserts.push({ user_id: user.id, type: 'bookmark', title: r.signal_title, body: r.signal_body, source_type: 'signal', source_url: r.signal_url, reflection_id: r.id, created_at: r.created_at });
+          inserts.push({ user_id: user.id, type: 'bookmark', title: r.signal_title, body: r.signal_body, source_type: 'signal', source_url: r.signal_url, reflection_id: r.id, tags: [], created_at: r.created_at });
         }
         if (r.learning_title && !existingKeys.has(`${r.id}:learning`)) {
-          inserts.push({ user_id: user.id, type: 'bookmark', title: r.learning_title, body: r.learning_body, source_type: 'learning', source_url: r.learning_url, reflection_id: r.id, created_at: r.created_at });
+          inserts.push({ user_id: user.id, type: 'bookmark', title: r.learning_title, body: r.learning_body, source_type: 'learning', source_url: r.learning_url, reflection_id: r.id, tags: [], created_at: r.created_at });
         }
         if (r.zoom_out_data && !existingKeys.has(`${r.id}:zoom_out`)) {
           const zd = r.zoom_out_data as any;
           const zoomBody = zd?.deepTime?.body || zd?.echo?.message || zd?.deepTime?.title || (typeof zd === 'object' ? JSON.stringify(zd) : String(zd));
-          inserts.push({ user_id: user.id, type: 'bookmark', title: zd?.deepTime?.title || 'Zoom Out', body: zoomBody, source_type: 'zoom_out', reflection_id: r.id, created_at: r.created_at });
+          inserts.push({ user_id: user.id, type: 'bookmark', title: zd?.deepTime?.title || 'Zoom Out', body: zoomBody, source_type: 'zoom_out', reflection_id: r.id, tags: [], created_at: r.created_at });
         }
         if (r.history_insight_data && !existingKeys.has(`${r.id}:history_insight`)) {
           const hd = r.history_insight_data as any;
-          inserts.push({ user_id: user.id, type: 'bookmark', title: hd.title ?? 'History Insight', body: hd.btcInsight ?? '', source_type: 'history_insight', reflection_id: r.id, created_at: r.created_at });
+          inserts.push({ user_id: user.id, type: 'bookmark', title: hd.title ?? 'History Insight', body: hd.btcInsight ?? '', source_type: 'history_insight', reflection_id: r.id, tags: [], created_at: r.created_at });
         }
       }
       if (inserts.length > 0) {
