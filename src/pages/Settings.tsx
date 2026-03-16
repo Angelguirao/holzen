@@ -202,7 +202,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
         a1.href = refUrl; a1.download = `holzen-reflections-${dateStr}.csv`; a1.click();
         URL.revokeObjectURL(refUrl);
 
-        toast.success('CSV exported', { description: `${reflections?.length ?? 0} reflections.` });
+        toast.success('CSV exported', { description: `${reflections?.length ?? 0} pauses.` });
       } else {
         const exportPayload = {
           exported_at: new Date().toISOString(),
@@ -229,7 +229,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
         const a = document.createElement('a');
         a.href = url; a.download = `holzen-export-${dateStr}.json`; a.click();
         URL.revokeObjectURL(url);
-        toast.success('Data exported', { description: `${reflections?.length ?? 0} reflections.` });
+        toast.success('Data exported', { description: `${reflections?.length ?? 0} pauses.` });
       }
     } catch {
       toast.error('Export failed');
