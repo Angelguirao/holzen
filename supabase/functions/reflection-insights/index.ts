@@ -22,7 +22,6 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
-    // Determine if this is a cron call (all users) or a single-user call
     const body = await req.json().catch(() => ({}));
     const singleUserId = body.user_id as string | undefined;
     const bodyLanguage = body.language as string | undefined;
@@ -32,13 +31,11 @@ serve(async (req) => {
     if (singleUserId) {
       userIds = [singleUserId];
     } else {
-      // Cron: generate for all users, respecting quiet hours & timezone
       const { data: profiles } = await supabase
         .from("profiles")
         .select("user_id, quiet_hours_start, quiet_hours_end, timezone, ai_insights_enabled, language");
 
       const eligibleProfiles = (profiles ?? []).filter((p: any) => {
-        // Skip users who disabled AI insights
         if (p.ai_insights_enabled === false) return false;
         if (p.quiet_hours_start == null || p.quiet_hours_end == null) return true;
         const tz = p.timezone || "UTC";
@@ -55,7 +52,6 @@ serve(async (req) => {
         if (start <= end) {
           return !(nowHour >= start && nowHour < end);
         }
-        // Wraps midnight (e.g., 22-7)
         return !(nowHour >= start || nowHour < end);
       });
       userIds = eligibleProfiles.map((p: any) => p.user_id);
@@ -64,76 +60,97 @@ serve(async (req) => {
     let generated = 0;
 
     for (const userId of userIds) {
-      // Determine language for this user
       let userLanguage = bodyLanguage || "en";
       if (!bodyLanguage && !singleUserId) {
-        // Cron mode — look up from profile data we already fetched
         const prof = (await supabase.from("profiles").select("language").eq("user_id", userId).single()).data;
         userLanguage = (prof as any)?.language || "en";
       }
-      // Get all reflections for this user
+
       const { data: reflections, error: refError } = await supabase
         .from("reflections")
-        .select("message, context, mood, outcome, tags, created_at, breathing_completed, haiku_read, learning_read")
+        .select("message, context, mood, mood_after, outcome, tags, created_at, breathing_completed, haiku_read, learning_read, signal_read, zoom_out_read, history_read, note")
         .eq("user_id", userId)
         .order("created_at", { ascending: false })
         .limit(200);
 
       if (refError || !reflections || reflections.length < 5) continue;
 
-      // Build a compact summary for AI analysis
+      // Build skill-oriented summary
       const summary = reflections.map((r: any) => {
         const date = new Date(r.created_at);
         const dayName = date.toLocaleDateString("en-US", { weekday: "short" });
         const hour = date.getHours();
+        const volMatch = r.context?.match(/[↑↓](\d+(?:\.\d+)?)%/);
+        const volatility = volMatch ? parseFloat(volMatch[1]) : 0;
+
+        // Detect skills exercised
+        const skills: string[] = [];
+        if (r.mood_after && r.mood) {
+          const COMPOSURE: Record<string, number> = { fomo: 10, greedy: 15, anxious: 20, fearful: 25, excited: 40, uncertain: 50, detached: 75, calm: 100 };
+          if ((COMPOSURE[r.mood_after] ?? 50) > (COMPOSURE[r.mood] ?? 50)) skills.push("regulation");
+        }
+        if (r.breathing_completed && !skills.includes("regulation")) skills.push("regulation");
+        if (volatility >= 3 && (r.outcome === "held" || r.outcome === "nothing")) skills.push("tolerance");
+        if (r.outcome === "held" || r.outcome === "nothing") skills.push("alignment");
+        if (r.zoom_out_read || r.history_read || r.signal_read || r.learning_read) skills.push("reappraisal");
+        if ((r.note && r.note.length > 10) || (r.tags && r.tags.length > 0)) skills.push("awareness");
+
         return {
           day: dayName,
           hour,
           date: r.created_at.slice(0, 10),
           mood: r.mood || "none",
+          mood_after: r.mood_after || "none",
           outcome: r.outcome || "none",
-          tags: r.tags?.join(",") || "",
-          context: r.context?.slice(0, 80) || "",
-          breathing: r.breathing_completed,
-          haiku: r.haiku_read,
-          learning: r.learning_read,
+          volatility,
+          skills,
+          tools: [r.breathing_completed && "breathing", r.zoom_out_read && "zoom_out", r.history_read && "history", r.signal_read && "signal", r.learning_read && "learning"].filter(Boolean),
+          hasNote: !!(r.note && r.note.length > 10),
+          tagCount: r.tags?.length || 0,
         };
       });
 
-      // Mood distribution
-      const moods = { anxious: 0, neutral: 0, calm: 0, none: 0 };
-      const outcomes = { held: 0, bought: 0, sold: 0, none: 0 };
-      for (const r of summary) {
-        moods[r.mood as keyof typeof moods] = (moods[r.mood as keyof typeof moods] || 0) + 1;
-        outcomes[r.outcome as keyof typeof outcomes] = (outcomes[r.outcome as keyof typeof outcomes] || 0) + 1;
+      // Skill frequency stats
+      const skillCounts: Record<string, number> = { regulation: 0, tolerance: 0, alignment: 0, reappraisal: 0, awareness: 0 };
+      for (const s of summary) {
+        for (const skill of s.skills) {
+          skillCounts[skill] = (skillCounts[skill] || 0) + 1;
+        }
       }
 
       const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
       const langName = LANG_NAMES[userLanguage] || "English";
       const langInstruction = userLanguage !== "en" ? `\n\nLANGUAGE: Write all insight titles and bodies in ${langName}.` : "";
 
-      const systemPrompt = `You are a behavioral pattern analyst for a Bitcoin mindfulness app called Holzen. Users reflect during BTC volatility to build emotional composure.
+      const systemPrompt = `You are a skill development analyst for Holzen, a Bitcoin composure app. Users build 5 skills through pause sessions during BTC volatility:
 
-Analyze the user's reflection data and identify 3-5 specific, actionable patterns. Each insight should be:
-- Based on actual data patterns (day-of-week, time-of-day, mood→outcome correlations, companion usage, tag frequency)
-- Specific and personal, not generic advice
-- 1-2 sentences max
-- Categorized as: timing, mood, behavior, engagement, or growth
+1. EMOTIONAL REGULATION — shifting from reactive to composed states (mood→mood_after improvement, breathing)
+2. DISTRESS TOLERANCE — holding steady during high volatility (≥3% change) without impulsive action
+3. DECISION ALIGNMENT — making choices consistent with their hold goals
+4. COGNITIVE REAPPRAISAL — engaging perspective-shifting tools (zoom out, history, signals, learning) especially during volatile moments
+5. SELF-AWARENESS — depth of reflection through notes, tags, and pattern recognition
 
-Examples of good insights:
-- "You reflect most on Mondays and Wednesdays — and your hold rate is 20% higher on those days."
-- "When you log 'anxious' mood, you sell 40% of the time. When you breathe first, that drops to 15%."
-- "Your calm mood percentage has increased from 30% to 55% over the last 30 reflections."${langInstruction}`;
+Analyze the user's data through this skill lens. Generate 3-5 insights about their SKILL DEVELOPMENT — not mood patterns or generic advice. Each insight should:
+- Reference a specific skill and how it's developing
+- Be based on actual data patterns (which skills are strong/weak, when they're exercised, correlations between skills)
+- Be 1-2 sentences max
+- Frame reactivity as OPPORTUNITY, not failure
 
-      const userPrompt = `Here is the user's reflection data (${reflections.length} total reflections):
+Examples of good skill-based insights:
+- "Your regulation skill is strongest on weekdays — you shifted from anxious to calm 80% of the time vs 40% on weekends."
+- "You've exercised distress tolerance 12 times during >5% volatility. Your hold rate in those moments is 92%."
+- "Cognitive reappraisal is your least-used skill (used in 15% of pauses), but when you do use it, your regulation success rate doubles."
+- "Your self-awareness depth is growing — you've added notes in 60% of recent pauses, up from 20% a month ago."${langInstruction}`;
 
-Mood distribution: ${JSON.stringify(moods)}
-Outcome distribution: ${JSON.stringify(outcomes)}
+      const userPrompt = `Here is the user's skill data (${reflections.length} total pauses):
 
-Recent reflections (newest first):
+Skill frequency (out of ${reflections.length} pauses):
+${JSON.stringify(skillCounts)}
+
+Recent pauses with skill tags (newest first):
 ${JSON.stringify(summary.slice(0, 50), null, 0)}
 
-Generate 3-5 behavioral insights based on real patterns in this data.`;
+Generate 3-5 skill development insights based on real patterns in this data.`;
 
       const response = await fetch(
         "https://ai.gateway.lovable.dev/v1/chat/completions",
@@ -154,7 +171,7 @@ Generate 3-5 behavioral insights based on real patterns in this data.`;
                 type: "function",
                 function: {
                   name: "return_insights",
-                  description: "Return behavioral pattern insights for the user.",
+                  description: "Return skill development insights for the user.",
                   parameters: {
                     type: "object",
                     properties: {
@@ -165,8 +182,8 @@ Generate 3-5 behavioral insights based on real patterns in this data.`;
                           properties: {
                             category: {
                               type: "string",
-                              enum: ["timing", "mood", "behavior", "engagement", "growth"],
-                              description: "Category of the insight",
+                              enum: ["regulation", "tolerance", "alignment", "reappraisal", "awareness"],
+                              description: "Which composure skill this insight relates to",
                             },
                             title: {
                               type: "string",
@@ -174,7 +191,7 @@ Generate 3-5 behavioral insights based on real patterns in this data.`;
                             },
                             body: {
                               type: "string",
-                              description: "1-2 sentence insight based on actual data patterns",
+                              description: "1-2 sentence insight about skill development based on actual data patterns",
                             },
                             sentiment: {
                               type: "string",
@@ -220,7 +237,6 @@ Generate 3-5 behavioral insights based on real patterns in this data.`;
 
       if (!insights || !Array.isArray(insights)) continue;
 
-      // Insert new insights (keep old ones)
       await supabase.from("reflection_insights").insert({
         user_id: userId,
         insights,

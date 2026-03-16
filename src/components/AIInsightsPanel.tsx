@@ -12,7 +12,7 @@ import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { useSubscription } from '@/hooks/use-subscription';
 
 interface Insight {
-  category: 'timing' | 'mood' | 'behavior' | 'engagement' | 'growth';
+  category: 'regulation' | 'tolerance' | 'alignment' | 'reappraisal' | 'awareness' | 'timing' | 'mood' | 'behavior' | 'engagement' | 'growth';
   title: string;
   body: string;
   sentiment: 'positive' | 'neutral' | 'actionable';
@@ -35,6 +35,12 @@ const LANG_LABELS: Record<string, string> = {
 };
 
 const CATEGORY_ICONS: Record<string, typeof TrendingUp> = {
+  regulation: Sparkles,
+  tolerance: Target,
+  alignment: Brain,
+  reappraisal: Clock,
+  awareness: TrendingUp,
+  // Legacy fallbacks
   timing: Clock,
   mood: Sparkles,
   behavior: Brain,
