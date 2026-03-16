@@ -7,9 +7,10 @@ import { useHolzen } from '@/hooks/use-holzen';
 import { useSubscription } from '@/hooks/use-subscription';
 import { formatBtcPrice } from '@/lib/btc';
 import { format } from 'date-fns';
-import { Mail, Lock, Clock, Trash2, BarChart3, Sparkles, Award, CalendarDays } from 'lucide-react';
+import { Mail, Lock, Clock, Trash2, BarChart3, Sparkles, Award, CalendarDays, Info } from 'lucide-react';
 import HistoryContent from '@/components/library/HistoryContent';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 
 
 import { DecisionQualityCard } from '@/components/DecisionQualityCard';
@@ -428,13 +429,16 @@ function StatsContent({ reflections, practiceEntries = [], memberSince, holdGoal
   const circumference = 2 * Math.PI * 44;
   const scoreOffset = scoreData ? circumference - (scoreData.score / 100) * circumference : circumference;
 
+  const [showScoreInfo, setShowScoreInfo] = useState(false);
+  const hasHoldGoal = holdGoal?.type != null;
+
   return (
     <div className="space-y-6">
       {/* Hero score + merged summary */}
       <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-5 space-y-4">
         <div className="flex items-center gap-5">
           {/* Score ring — hero size */}
-          <div className="relative shrink-0">
+          <div className="relative shrink-0 cursor-pointer" onClick={() => scoreData && setShowScoreInfo(true)}>
             <svg width="108" height="108" viewBox="0 0 108 108">
               <circle cx="54" cy="54" r="44" fill="none" stroke="hsl(var(--border))" strokeWidth="4" opacity="0.3" />
               <circle
@@ -451,6 +455,11 @@ function StatsContent({ reflections, practiceEntries = [], memberSince, holdGoal
                 <span className={`text-[9px] font-mono mt-0.5 ${scoreColor}`}>{scoreGrade}</span>
               )}
             </div>
+            {scoreData && (
+              <div className="absolute -top-1 -right-1 rounded-full bg-muted p-0.5">
+                <Info className="h-3 w-3 text-muted-foreground/50" />
+              </div>
+            )}
           </div>
 
           {/* Summary metrics with micro-context */}
@@ -486,7 +495,7 @@ function StatsContent({ reflections, practiceEntries = [], memberSince, holdGoal
           <div className="space-y-1.5 pt-2 border-t border-border/30">
             <ScoreBarInline label={t('holzenScore.emotionalRegulation', 'Regulation')} value={scoreData.emotionalRegulation} />
             <ScoreBarInline label={t('holzenScore.distressTolerance', 'Tolerance')} value={scoreData.distressTolerance} />
-            <ScoreBarInline label={t('holzenScore.decisionAlignment', 'Alignment')} value={scoreData.decisionAlignment} />
+            {hasHoldGoal && <ScoreBarInline label={t('holzenScore.decisionAlignment', 'Alignment')} value={scoreData.decisionAlignment} />}
             <ScoreBarInline label={t('holzenScore.cognitiveReappraisal', 'Reappraisal')} value={scoreData.cognitiveReappraisal} />
             <ScoreBarInline label={t('holzenScore.selfAwareness', 'Awareness')} value={scoreData.selfAwareness} />
           </div>
@@ -498,6 +507,9 @@ function StatsContent({ reflections, practiceEntries = [], memberSince, holdGoal
           </p>
         )}
       </div>
+
+      {/* Score explainer sheet */}
+      <ScoreExplainerSheet open={showScoreInfo} onOpenChange={setShowScoreInfo} hasHoldGoal={hasHoldGoal} />
 
       <div className="flex items-center justify-end">
         <ShareStats
@@ -685,6 +697,72 @@ function LetterCard({ letter: l, onDelete, fmtPrice, type, onView }: {
         </>
       )}
     </div>
+  );
+}
+
+function ScoreExplainerSheet({ open, onOpenChange, hasHoldGoal }: { open: boolean; onOpenChange: (v: boolean) => void; hasHoldGoal: boolean }) {
+  const { t } = useTranslation();
+
+  const components = [
+    {
+      label: t('holzenScore.emotionalRegulation', 'Regulation'),
+      weight: hasHoldGoal ? '30%' : '37%',
+      desc: t('scoreExplainer.regulation', 'Measures mood improvement between the Feel and Shift steps of each pause. Breathing completion adds a bonus.'),
+    },
+    {
+      label: t('holzenScore.distressTolerance', 'Tolerance'),
+      weight: hasHoldGoal ? '25%' : '31%',
+      desc: t('scoreExplainer.tolerance', 'Rewards holding or doing nothing during high volatility. Selling during volatile moments lowers this score.'),
+    },
+    ...(hasHoldGoal ? [{
+      label: t('holzenScore.decisionAlignment', 'Alignment'),
+      weight: '20%',
+      desc: t('scoreExplainer.alignment', 'How well your actions align with your hold goal. Holding scores highest, selling scores lowest.'),
+    }] : []),
+    {
+      label: t('holzenScore.cognitiveReappraisal', 'Reappraisal'),
+      weight: hasHoldGoal ? '15%' : '19%',
+      desc: t('scoreExplainer.reappraisal', 'Engaging with perspective tools (Zoom Out, History, Signal, Learning) during a pause. Extra credit during volatile moments.'),
+    },
+    {
+      label: t('holzenScore.selfAwareness', 'Awareness'),
+      weight: hasHoldGoal ? '10%' : '13%',
+      desc: t('scoreExplainer.awareness', 'Depth of reflection: writing notes, adding tags, marking favorites, and completing the full pause flow.'),
+    },
+  ];
+
+  return (
+    <Sheet open={open} onOpenChange={onOpenChange}>
+      <SheetContent side="bottom" className="max-h-[85vh] overflow-y-auto rounded-t-xl">
+        <SheetHeader className="pb-2">
+          <SheetTitle className="text-sm font-mono tracking-wider uppercase">
+            {t('scoreExplainer.title', 'How your score works')}
+          </SheetTitle>
+        </SheetHeader>
+
+        <p className="text-xs text-muted-foreground leading-relaxed mb-4">
+          {t('scoreExplainer.intro', 'Your composure score (0–100) is calculated from your last 30 pauses. It measures skills, not feelings — how well you regulate emotions and make aligned decisions under pressure.')}
+        </p>
+
+        <div className="space-y-3">
+          {components.map((c) => (
+            <div key={c.label} className="space-y-1">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-medium">{c.label}</span>
+                <span className="text-[10px] font-mono text-muted-foreground/60">{c.weight}</span>
+              </div>
+              <p className="text-[11px] text-muted-foreground/70 leading-relaxed">{c.desc}</p>
+            </div>
+          ))}
+        </div>
+
+        {!hasHoldGoal && (
+          <p className="text-[10px] text-muted-foreground/40 mt-4 leading-relaxed">
+            {t('scoreExplainer.noGoalNote', 'Set a hold goal to unlock the Alignment component and get a more complete score.')}
+          </p>
+        )}
+      </SheetContent>
+    </Sheet>
   );
 }
 
