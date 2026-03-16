@@ -331,7 +331,7 @@ export function useHolzen() {
         } as any).eq('id', reflectionId).then(({ error }) => { if (error) console.error('[learning] reflection update failed:', error.message); });
         supabase.from('library_items').insert({
           user_id: userId, type: 'bookmark', title: data.title, body: data.body,
-          source_type: 'learning', source_url: data.url, reflection_id: reflectionId,
+          source_type: 'learning', source_url: data.url, reflection_id: reflectionId, tags: [],
         }).then(({ error }) => { if (error) console.error('[learning] library insert failed:', error.message); });
       });
     });
