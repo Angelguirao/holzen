@@ -310,11 +310,11 @@ export function useHolzen() {
       body: { context: ctx, language: lang },
     }).then(({ data, error }) => {
       if (error || !data || data.error) return;
-      supabase.from('reflections').update({ history_insight_data: data } as any).eq('id', reflectionId).then(() => {});
+      supabase.from('reflections').update({ history_insight_data: data } as any).eq('id', reflectionId).then(({ error }) => { if (error) console.error('[history] reflection update failed:', error.message); });
       supabase.from('library_items').insert({
         user_id: userId, type: 'bookmark', title: data.title, body: data.btcInsight,
         source_type: 'history_insight', reflection_id: reflectionId,
-      }).then(() => {});
+      }).then(({ error }) => { if (error) console.error('[history] library insert failed:', error.message); });
     });
 
     // Ground nudge (learning)
