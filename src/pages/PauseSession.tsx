@@ -213,10 +213,31 @@ export default function PauseSession() {
     if (reflectionId) {
       await supabase.from('reflections').update({ outcome: d }).eq('id', reflectionId);
     }
+    // Fetch final reflection state for score impact
+    if (reflectionId) {
+      const { data: ref } = await supabase
+        .from('reflections')
+        .select('zoom_out_read, history_read, signal_read, learning_read, note, tags')
+        .eq('id', reflectionId)
+        .single();
+      if (ref) {
+        const tools = [ref.zoom_out_read, ref.history_read, ref.signal_read, ref.learning_read].filter(Boolean).length;
+        setPauseImpactData({
+          mood: selectedMood,
+          moodAfter: selectedMoodAfter,
+          breathingCompleted: true, // they went through breathing step
+          decision: d,
+          context,
+          engagedTools: tools,
+          wroteNote: !!(ref.note && ref.note.length > 10),
+          usedTags: !!(ref.tags && ref.tags.length > 0),
+        });
+      }
+    }
     hapticFeedback('success');
     setPhase('done');
     clearSession();
-  }, [dismissMessage, reflectionId]);
+  }, [dismissMessage, reflectionId, selectedMood, selectedMoodAfter, context]);
 
   // No message fallback
   if (!message && phase !== 'done') {
