@@ -543,7 +543,7 @@ function StatsContent({ reflections, practiceEntries = [], memberSince, holdGoal
       <ProLock feature="decisions">
         <StatsSection label={t('profile.sectionProgress', 'Progress')}>
           
-          <PeriodComparison reflections={reflections} />
+          <PeriodComparison reflections={reflections} holdGoal={holdGoal} />
           <StatsTrends reflections={reflections} />
         </StatsSection>
       </ProLock>
