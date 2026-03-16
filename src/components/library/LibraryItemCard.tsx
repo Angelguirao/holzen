@@ -34,9 +34,16 @@ export function LibraryItemCard({ item, onToggleFavorite, onClick }: Props) {
 
   const preview = useMemo(() => {
     if (!item.body) return null;
-    const text = typeof item.body === 'string' ? item.body : JSON.stringify(item.body);
+    let text = typeof item.body === 'string' ? item.body : JSON.stringify(item.body);
+    // Parse zoom_out JSON to show readable text
+    if (item.source_type === 'zoom_out' && text.startsWith('{')) {
+      try {
+        const parsed = JSON.parse(text);
+        text = parsed?.deepTime?.body || parsed?.echo?.message || parsed?.deepTime?.title || 'Zoom Out';
+      } catch {}
+    }
     return text.length > 120 ? text.slice(0, 120) + '…' : text;
-  }, [item.body]);
+  }, [item.body, item.source_type]);
 
   const timeAgo = useMemo(() => {
     try {

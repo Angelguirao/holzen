@@ -192,6 +192,11 @@ export default function PauseSession() {
     }
   }, [reflectionId, isFavorite, subscribed, t]);
 
+  const handleClose = useCallback(() => {
+    // Preserve session so user can resume later
+    navigate('/', { replace: true });
+  }, [navigate]);
+
   const handleReturn = useCallback(() => {
     clearSession();
     navigate('/', { replace: true });
