@@ -440,7 +440,7 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
           <div className="flex-1 min-w-0 grid grid-cols-2 gap-x-4 gap-y-3">
             <MicroStat
               value={reflections.length}
-              label={t('profile.reflections', 'Reflects')}
+              label={t('profile.pauses', 'Pauses')}
               context={reflectionContext ? `in ${reflectionContext}` : undefined}
             />
             <MicroStat
