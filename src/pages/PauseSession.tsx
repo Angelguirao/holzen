@@ -63,8 +63,12 @@ export default function PauseSession() {
 
   const navState = (location.state as any) ?? {};
   const restored = useMemo(() => {
-    if (navState.reflectionMessage) return null;
-    return loadSession();
+    const saved = loadSession();
+    if (!saved) return null;
+    // If navigating with fresh state for a DIFFERENT reflection, discard saved session
+    if (navState.reflectionMessage && navState.reflectionId && saved.reflectionId !== navState.reflectionId) return null;
+    // Otherwise prefer the saved session (user is resuming)
+    return saved;
   }, []);
 
   const message: string = navState.reflectionMessage ?? restored?.message ?? '';
