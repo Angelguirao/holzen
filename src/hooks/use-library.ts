@@ -139,10 +139,17 @@ export function useLibrary() {
   }, []);
 
   const deleteItem = useCallback(async (id: string) => {
-    await supabase.from('library_items').delete().eq('id', id);
-    setItems((prev) => prev.filter((i) => i.id !== id));
+    const item = items.find((i) => i.id === id);
+    // Soft-delete backfilled items so the backfill doesn't re-import them
+    if (item?.reflection_id) {
+      await supabase.from('library_items').update({ status: 'deleted' } as any).eq('id', id);
+      setItems((prev) => prev.map((i) => i.id === id ? { ...i, status: 'deleted' as const } : i));
+    } else {
+      await supabase.from('library_items').delete().eq('id', id);
+      setItems((prev) => prev.filter((i) => i.id !== id));
+    }
     setCollectionItems((prev) => prev.filter((ci) => ci.library_item_id !== id));
-  }, []);
+  }, [items]);
 
   const togglePin = useCallback(async (id: string) => {
     const item = items.find((i) => i.id === id);
