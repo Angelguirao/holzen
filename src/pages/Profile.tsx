@@ -493,11 +493,11 @@ function StatsContent({ reflections, practiceEntries = [], memberSince, holdGoal
         {/* Score component bars */}
         {scoreData && (
           <div className="space-y-1.5 pt-2 border-t border-border/30">
-            <ScoreBarInline label={t('holzenScore.emotionalRegulation', 'Regulation')} value={scoreData.emotionalRegulation} />
-            <ScoreBarInline label={t('holzenScore.distressTolerance', 'Tolerance')} value={scoreData.distressTolerance} />
-            {hasHoldGoal && <ScoreBarInline label={t('holzenScore.decisionAlignment', 'Alignment')} value={scoreData.decisionAlignment} />}
-            <ScoreBarInline label={t('holzenScore.cognitiveReappraisal', 'Reappraisal')} value={scoreData.cognitiveReappraisal} />
-            <ScoreBarInline label={t('holzenScore.selfAwareness', 'Awareness')} value={scoreData.selfAwareness} />
+            <ScoreBarInline label={t('holzenScore.emotionalRegulation', 'Regulation')} value={scoreData.emotionalRegulation} hint={t('scoreHint.regulation', 'Mood improvement during pauses + breathing completion')} />
+            <ScoreBarInline label={t('holzenScore.distressTolerance', 'Tolerance')} value={scoreData.distressTolerance} hint={t('scoreHint.tolerance', 'Holding steady during high volatility')} />
+            {hasHoldGoal && <ScoreBarInline label={t('holzenScore.decisionAlignment', 'Alignment')} value={scoreData.decisionAlignment} hint={t('scoreHint.alignment', 'Actions aligned with your hold goal')} />}
+            <ScoreBarInline label={t('holzenScore.cognitiveReappraisal', 'Reappraisal')} value={scoreData.cognitiveReappraisal} hint={t('scoreHint.reappraisal', 'Engaging perspective tools during pauses')} />
+            <ScoreBarInline label={t('holzenScore.selfAwareness', 'Awareness')} value={scoreData.selfAwareness} hint={t('scoreHint.awareness', 'Notes, tags, favorites & completing full pause flow')} />
           </div>
         )}
 
