@@ -69,7 +69,7 @@ export function useLibrary() {
     setCollectionItems((colItemsData as unknown as CollectionItem[]) ?? []);
     setLoading(false);
 
-    // One-time backfill: import reflections and their companions not yet in library
+    // Backfill: import reflections and their companions not yet in library (runs every load)
     const existingKeys = new Set(
       libItems.filter((i) => i.reflection_id).map((i) => `${i.reflection_id}:${i.source_type}`)
     );
