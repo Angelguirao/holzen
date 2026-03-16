@@ -328,11 +328,11 @@ export function useHolzen() {
           learning_body: data.body,
           learning_citation: data.citation,
           learning_url: data.url,
-        } as any).eq('id', reflectionId).then(() => {});
+        } as any).eq('id', reflectionId).then(({ error }) => { if (error) console.error('[learning] reflection update failed:', error.message); });
         supabase.from('library_items').insert({
           user_id: userId, type: 'bookmark', title: data.title, body: data.body,
           source_type: 'learning', source_url: data.url, reflection_id: reflectionId,
-        }).then(() => {});
+        }).then(({ error }) => { if (error) console.error('[learning] library insert failed:', error.message); });
       });
     });
   }, []);
