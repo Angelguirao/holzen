@@ -583,66 +583,27 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
   );
 }
 
-function HolzenScoreDetail({ scoreData, practiceDays }: { scoreData: import('@/hooks/use-holzen-score').HolzenScoreData; practiceDays: number }) {
-  const { t } = useTranslation();
-  const circumference = 2 * Math.PI * 36;
-  const offset = circumference - (scoreData.score / 100) * circumference;
-
-  return (
-    <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3">
-      <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">{t('profile.holzenScore')}</p>
-      <div className="flex items-center gap-5">
-        <div className="relative shrink-0">
-          <svg width="88" height="88" viewBox="0 0 88 88">
-            <circle cx="44" cy="44" r="36" fill="none" stroke="hsl(var(--border))" strokeWidth="4" opacity="0.3" />
-            <circle cx="44" cy="44" r="36" fill="none" stroke="hsl(var(--primary))" strokeWidth="4" strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={offset} transform="rotate(-90 44 44)" className="transition-all duration-1000 ease-out" />
-          </svg>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-xl font-mono font-medium">{scoreData.score}</span>
-          </div>
-        </div>
-        <div className="space-y-2 flex-1 min-w-0">
-          <ScoreBarInline label={t('profile.moodLabel')} value={scoreData.moodScore} />
-          <ScoreBarInline label={t('profile.actionsLabel')} value={scoreData.outcomeScore} />
-          <ScoreBarInline label={t('profile.streakLabel')} value={scoreData.streakScore} />
-          <ScoreBarInline
-            label={t('profile.practiceLabel')}
-            value={scoreData.practiceScore}
-            detail={t('holzenScore.practiceDays', '{{count}} days this month', { count: practiceDays })}
-          />
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function ScoreBarInline({ label, value, detail }: { label: string; value: number; detail?: string }) {
+function MicroStat({ value, suffix, label, context, isText }: {
+  value: string | number;
+  suffix?: string;
+  label: string;
+  context?: string;
+  isText?: boolean;
+}) {
   return (
     <div className="space-y-0.5">
-      <div className="flex justify-between text-[10px] font-mono text-muted-foreground">
-        <span>{label}</span>
-        <span className="flex items-center gap-1.5">
-          {detail && <span className="text-muted-foreground/40">{detail}</span>}
-          <span>{value}</span>
+      <div className="flex items-baseline gap-1">
+        <span className={`font-mono font-medium leading-none ${isText ? 'text-base' : 'text-lg'}`}>
+          {value}{suffix && <span className="text-[10px] text-muted-foreground/50 ml-0.5">{suffix}</span>}
         </span>
+        {context && (
+          <span className="text-[9px] font-mono text-muted-foreground/40">{context}</span>
+        )}
       </div>
-      <div className="h-1 rounded-full bg-muted/50 overflow-hidden">
-        <div className="h-full rounded-full bg-primary/60 transition-all duration-700 ease-out" style={{ width: `${value}%` }} />
-      </div>
-    </div>
-  );
-}
-function SummaryTile({ label, value, suffix }: { label: string; value: string | number; suffix?: string }) {
-  return (
-    <div className="rounded-md border border-border/60 bg-muted/30 px-3 py-2.5 text-center space-y-0.5">
-      <p className="text-lg font-mono font-medium leading-none">
-        {value}{suffix && <span className="text-[10px] text-muted-foreground/50 ml-0.5">{suffix}</span>}
-      </p>
       <p className="text-[9px] font-mono tracking-widest uppercase text-muted-foreground/50">{label}</p>
     </div>
   );
 }
-
 function StatsSection({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-4">
