@@ -513,7 +513,7 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
       {/* Section: Skill Development */}
       <ProLock feature="decisions">
         <StatsSection label={t('profile.sectionSkills', 'Skill Development')}>
-          <SkillBalanceCard reflections={reflections} />
+          
           <PeriodComparison reflections={reflections} />
           <StatsTrends reflections={reflections} />
         </StatsSection>
