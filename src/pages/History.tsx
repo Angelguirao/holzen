@@ -55,12 +55,18 @@ interface Reflection {
   history_insight_data: any | null;
   note: string | null;
   mood: string | null;
+  mood_after?: string | null;
   outcome: string | null;
   tags: string[];
+  breathing_completed?: boolean;
+  zoom_out_read?: boolean;
+  history_read?: boolean;
+  signal_read?: boolean;
+  learning_read?: boolean;
 }
 
 const PAGE_SIZE = 30;
-const FIELDS = 'id, message, context, created_at, is_favorite, haiku, learning_title, learning_body, learning_citation, learning_url, signal_title, signal_body, signal_source, signal_url, zoom_out_data, history_insight_data, note, mood, outcome, tags';
+const FIELDS = 'id, message, context, created_at, is_favorite, haiku, learning_title, learning_body, learning_citation, learning_url, signal_title, signal_body, signal_source, signal_url, zoom_out_data, history_insight_data, note, mood, mood_after, outcome, tags, breathing_completed, zoom_out_read, history_read, signal_read, learning_read';
 
 function HistoryCompanions({ label, r }: { label: string; r: Reflection }) {
   const [open, setOpen] = useState(false);
