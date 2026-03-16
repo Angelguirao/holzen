@@ -164,7 +164,7 @@ export function PeriodComparison({ reflections }: Props) {
     return (
       <ChartEmptyState
         title={t('periodComparison.title', 'Period Comparison')}
-        message={t('periodComparison.emptyMessage', 'Start reflecting this week to compare your progress across periods.')}
+        message={t('periodComparison.emptyMessage', 'Start pausing this week to compare your progress across periods.')}
         current={reflections.length}
         needed={1}
       />
@@ -173,7 +173,7 @@ export function PeriodComparison({ reflections }: Props) {
 
   const metrics = [
     {
-      label: t('periodComparison.reflections'),
+      label: t('periodComparison.pauses', 'Pauses'),
       current: current.count,
       previous: previous.count,
       format: (v: number) => `${v}`,
