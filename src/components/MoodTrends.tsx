@@ -47,7 +47,7 @@ export function MoodTrends({ reflections }: Props) {
   if (!data || data.length < 3) {
     return (
       <ChartEmptyState
-        title={t('moodCharts.moodOverTime')}
+        title={t('skillBalance.composureBaseline', 'Composure Baseline')}
         message={t('moodCharts.moodOverTimeEmpty')}
         current={data?.length ?? 0}
         needed={3}
@@ -58,7 +58,7 @@ export function MoodTrends({ reflections }: Props) {
   return (
     <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3">
       <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
-        {t('moodCharts.moodOverTime')}
+        {t('skillBalance.composureBaseline', 'Composure Baseline')}
       </p>
       <div className="h-40">
         <ResponsiveContainer width="100%" height="100%">
@@ -74,7 +74,7 @@ export function MoodTrends({ reflections }: Props) {
             <YAxis domain={[1, 5]} ticks={[1, 3, 5]} tickFormatter={(v: number) => MOOD_LABELS[v] ?? ''} tick={{ fontSize: 9, fontFamily: 'monospace', fill: 'hsl(var(--muted-foreground))' }} axisLine={false} tickLine={false} />
             <Tooltip
               contentStyle={{ background: 'hsl(var(--muted))', border: '1px solid hsl(var(--border))', borderRadius: '6px', fontSize: '11px', fontFamily: 'monospace' }}
-              formatter={(value: number) => [value < 2 ? t('moodCharts.reactive') : value < 3.5 ? t('moodCharts.mixed') : t('moodCharts.composed'), t('moodCharts.avgComposure')]}
+              formatter={(value: number) => [value < 2 ? t('moodCharts.reactive') : value < 3.5 ? t('moodCharts.mixed') : t('moodCharts.composed'), t('skillBalance.baselineComposure', 'Baseline Composure')]}
               labelStyle={{ fontSize: '10px', color: 'hsl(var(--muted-foreground))' }}
             />
             <Area type="monotone" dataKey="avg" stroke="hsl(var(--primary))" strokeWidth={2} fill="url(#moodGrad)" dot={{ r: 3, fill: 'hsl(var(--primary))' }} activeDot={{ r: 5 }} />
@@ -82,7 +82,7 @@ export function MoodTrends({ reflections }: Props) {
         </ResponsiveContainer>
       </div>
       <p className="text-[10px] text-muted-foreground/40 leading-relaxed">
-        {t('moodCharts.weeklyAverageMoodChecks')}
+        {t('skillBalance.composureDesc', 'Your resting emotional state trend — independent of actions taken.')}
       </p>
     </div>
   );
