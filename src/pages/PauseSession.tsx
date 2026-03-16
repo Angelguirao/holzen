@@ -401,7 +401,7 @@ export default function PauseSession() {
           )}
 
           {phase === 'done' && (
-            <PauseDone decision={decision} onReturn={handleReturn} />
+            <PauseDone decision={decision} onReturn={handleReturn} pauseData={pauseImpactData} />
           )}
         </div>
       </motion.div>
