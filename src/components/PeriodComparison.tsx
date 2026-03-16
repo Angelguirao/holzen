@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { forwardRef, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowUpRight, ArrowDownRight, Minus, CalendarDays } from 'lucide-react';
 import { ChartEmptyState } from './ChartEmptyState';
@@ -25,8 +25,16 @@ interface Reflection {
   is_favorite?: boolean;
 }
 
+interface HoldGoal {
+  type: string | null;
+  targetMonths: number | null;
+  targetPrice: number | null;
+  start: string | null;
+}
+
 interface Props {
   reflections: Reflection[];
+  holdGoal?: HoldGoal | null;
 }
 
 interface PeriodStats {
@@ -47,7 +55,7 @@ function computeStats(refs: Reflection[]): Omit<PeriodStats, 'score'> {
 
 type View = 'weekly' | 'monthly';
 
-export function PeriodComparison({ reflections }: Props) {
+export function PeriodComparison({ reflections, holdGoal }: Props) {
   const { t } = useTranslation();
   const [view, setView] = useState<View>('weekly');
 
@@ -89,8 +97,8 @@ export function PeriodComparison({ reflections }: Props) {
   const previous = computeStats(prevRefs);
 
   // Use the same score algorithm as the hero
-  const currentScore = useHolzenScore(currentRefs, []);
-  const previousScore = useHolzenScore(prevRefs, []);
+  const currentScore = useHolzenScore(currentRefs, [], [], holdGoal);
+  const previousScore = useHolzenScore(prevRefs, [], [], holdGoal);
 
   if (current.count === 0 && previous.count === 0) {
     return (
@@ -123,7 +131,7 @@ export function PeriodComparison({ reflections }: Props) {
       deltaFormat: (d: number) => `${d > 0 ? '+' : ''}${d}pp`,
     },
     {
-      label: t('periodComparison.composureScore', 'Score'),
+      label: t('periodComparison.composureScorePeriod', 'Period Score'),
       current: currentScore?.score ?? null,
       previous: previousScore?.score ?? null,
       format: (v: number) => `${v}`,
@@ -184,21 +192,14 @@ export function PeriodComparison({ reflections }: Props) {
   );
 }
 
-function MetricRow({
-  label,
-  current,
-  previous,
-  format: fmt,
-  delta,
-  deltaFormat,
-}: {
+const MetricRow = forwardRef<HTMLDivElement, {
   label: string;
   current: number | null;
   previous: number | null;
   format: (v: number) => string;
   delta: number | null;
   deltaFormat: (d: number) => string;
-}) {
+}>(({ label, current, previous, format: fmt, delta, deltaFormat }, ref) => {
   const DeltaIcon = delta !== null && delta > 0 ? ArrowUpRight : delta !== null && delta < 0 ? ArrowDownRight : Minus;
   const deltaColor = delta !== null && delta > 0
     ? 'text-primary'
@@ -207,7 +208,7 @@ function MetricRow({
       : 'text-muted-foreground/40';
 
   return (
-    <div className="grid grid-cols-[1fr_auto_auto] gap-x-4 items-center">
+    <div ref={ref} className="grid grid-cols-[1fr_auto_auto] gap-x-4 items-center">
       <div className="flex items-center gap-2">
         <span className="text-[10px] font-mono text-muted-foreground">{label}</span>
         {delta !== null && delta !== 0 && (
@@ -225,4 +226,6 @@ function MetricRow({
       </span>
     </div>
   );
-}
+});
+
+MetricRow.displayName = 'MetricRow';
