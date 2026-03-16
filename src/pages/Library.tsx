@@ -44,6 +44,8 @@ export default function Library() {
     let result = items;
     // Tab
     if (tab === 'favorites') result = result.filter((i) => i.is_favorite);
+    // Always hide deleted (soft-deleted backfill items)
+    result = result.filter((i) => i.status !== 'deleted');
     // Hide archived by default (unless searching)
     if (!search.trim()) {
       result = result.filter((i) => i.status !== 'archived');
