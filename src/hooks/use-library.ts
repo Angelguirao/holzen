@@ -104,7 +104,8 @@ export function useLibrary() {
         }
       }
       if (inserts.length > 0) {
-        await supabase.from('library_items').insert(inserts);
+        const { error: backfillErr } = await supabase.from('library_items').insert(inserts);
+        if (backfillErr) console.error('[library backfill] insert failed:', backfillErr.message);
         const { data: refreshed } = await supabase
           .from('library_items')
           .select('*')
