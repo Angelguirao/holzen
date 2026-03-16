@@ -23,6 +23,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
+import { detectSkills, SKILL_LABELS, SKILL_COLORS, type SkillType } from '@/lib/skill-detection';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -54,12 +55,18 @@ interface Reflection {
   history_insight_data: any | null;
   note: string | null;
   mood: string | null;
+  mood_after?: string | null;
   outcome: string | null;
   tags: string[];
+  breathing_completed?: boolean;
+  zoom_out_read?: boolean;
+  history_read?: boolean;
+  signal_read?: boolean;
+  learning_read?: boolean;
 }
 
 const PAGE_SIZE = 30;
-const FIELDS = 'id, message, context, created_at, is_favorite, haiku, learning_title, learning_body, learning_citation, learning_url, signal_title, signal_body, signal_source, signal_url, zoom_out_data, history_insight_data, note, mood, outcome, tags';
+const FIELDS = 'id, message, context, created_at, is_favorite, haiku, learning_title, learning_body, learning_citation, learning_url, signal_title, signal_body, signal_source, signal_url, zoom_out_data, history_insight_data, note, mood, mood_after, outcome, tags, breathing_completed, zoom_out_read, history_read, signal_read, learning_read';
 
 function HistoryCompanions({ label, r }: { label: string; r: Reflection }) {
   const [open, setOpen] = useState(false);
@@ -187,6 +194,7 @@ const History = () => {
   const [filter, setFilter] = useState<'all' | 'favorites'>('all');
   const [tagFilter, setTagFilter] = useState<string | null>(null);
   const [moodFilter, setMoodFilter] = useState<string | null>(null);
+  const [skillFilter, setSkillFilter] = useState<SkillType | null>(null);
   const [search, setSearch] = useState('');
   const [dateFrom, setDateFrom] = useState<Date | undefined>(undefined);
   const [dateTo, setDateTo] = useState<Date | undefined>(undefined);
@@ -328,6 +336,9 @@ const History = () => {
     if (moodFilter) {
       result = result.filter((r) => r.mood === moodFilter);
     }
+    if (skillFilter) {
+      result = result.filter((r) => detectSkills(r).includes(skillFilter));
+    }
     if (dateFrom) {
       result = result.filter((r) => isAfter(new Date(r.created_at), startOfDay(dateFrom)));
     }
@@ -341,7 +352,7 @@ const History = () => {
       );
     }
     return result;
-  }, [reflections, filter, tagFilter, moodFilter, dateFrom, dateTo, search]);
+  }, [reflections, filter, tagFilter, moodFilter, skillFilter, dateFrom, dateTo, search]);
 
   const filteredRecent = useMemo(() => {
     let result = recentReflections;
@@ -366,12 +377,13 @@ const History = () => {
 
   const displayedReflections = tab === 'recent' ? filteredRecent : filtered;
 
-  const hasActiveFilters = !!tagFilter || !!moodFilter || !!dateFrom || !!dateTo || filter === 'favorites';
+  const hasActiveFilters = !!tagFilter || !!moodFilter || !!skillFilter || !!dateFrom || !!dateTo || filter === 'favorites';
 
   const clearAllFilters = useCallback(() => {
     setFilter('all');
     setTagFilter(null);
     setMoodFilter(null);
+    setSkillFilter(null);
     setDateFrom(undefined);
     setDateTo(undefined);
     setSearch('');
@@ -578,7 +590,26 @@ const History = () => {
                     </div>
                   </div>
 
-                  {/* Tag filter */}
+                  {/* Skill filter */}
+                  <div className="space-y-1.5">
+                    <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">{t('history.skill', 'Skill')}</p>
+                    <div className="flex flex-wrap gap-1">
+                      {(['regulation', 'tolerance', 'alignment', 'reappraisal', 'awareness'] as SkillType[]).map((s) => (
+                        <button
+                          key={s}
+                          onClick={() => setSkillFilter(skillFilter === s ? null : s)}
+                          className={`text-[10px] font-mono px-1.5 py-0.5 rounded transition-colors ${
+                            skillFilter === s
+                              ? 'bg-primary/10 text-primary'
+                              : 'border border-border/60 text-muted-foreground hover:text-foreground'
+                          }`}
+                        >
+                          {t(SKILL_LABELS[s])}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                   {allTags.length > 0 && (
                     <div className="space-y-1.5">
                       <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">{t('history.tags')}</p>
@@ -761,6 +792,22 @@ const History = () => {
                 </div>
               </div>
               <p className="text-sm leading-relaxed">{r.message}</p>
+
+              {/* Skill badges */}
+              {(() => {
+                const skills = detectSkills(r);
+                if (skills.length === 0) return null;
+                return (
+                  <div className="flex flex-wrap gap-1">
+                    {skills.map((s) => (
+                      <span key={s} className={`text-[9px] font-mono px-1.5 py-0.5 rounded ${SKILL_COLORS[s]}`}>
+                        {t(SKILL_LABELS[s])}
+                      </span>
+                    ))}
+                  </div>
+                );
+              })()}
+
               <ReflectionNote reflectionId={r.id} initialNote={r.note} />
               <ReflectionTags reflectionId={r.id} initialTags={r.tags ?? []} />
 
