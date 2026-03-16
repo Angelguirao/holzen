@@ -73,12 +73,12 @@ function countHalvingBadge(reflections: Reflection[]): number {
 
 interface BadgesPanelProps {
   reflections: Reflection[];
+  subscribed: boolean;
   notifyBadges?: boolean;
 }
 
-export function BadgesPanel({ reflections, notifyBadges = true }: BadgesPanelProps) {
+export function BadgesPanel({ reflections, subscribed, notifyBadges = true }: BadgesPanelProps) {
   const { t } = useTranslation();
-  const { subscribed } = useSubscription();
 
   const badges = useMemo(() => {
     const total = reflections.length;
