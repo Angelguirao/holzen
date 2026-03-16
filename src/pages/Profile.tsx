@@ -100,6 +100,7 @@ const Profile = () => {
   const [reflections, setReflections] = useState<Reflection[]>([]);
   const [letters, setLetters] = useState<Letter[]>([]);
   const [practiceEntries, setPracticeEntries] = useState<PracticeEntry[]>([]);
+  const [holdGoal, setHoldGoal] = useState<{ type: string | null; targetMonths: number | null; targetPrice: number | null; start: string | null } | null>(null);
   const [loading, setLoading] = useState(true);
   const [lettersLoading, setLettersLoading] = useState(true);
   const [viewingLetter, setViewingLetter] = useState<Letter | null>(null);
