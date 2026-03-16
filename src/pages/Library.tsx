@@ -29,7 +29,7 @@ export default function Library() {
   const library = useLibrary();
   const [tab, setTab] = useState<Tab>('all');
   const [search, setSearch] = useState('');
-  const [sourceFilter, setSourceFilter] = useState<string | null>(null);
+  const [sourceFilter, setSourceFilter] = useState<string | null>('reflection');
 
   const { items, collections, collectionItems } = library;
 
