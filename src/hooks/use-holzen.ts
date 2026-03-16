@@ -301,7 +301,7 @@ export function useHolzen() {
       supabase.from('library_items').insert({
         user_id: userId, type: 'bookmark', title: data?.deepTime?.title || 'Zoom Out',
         body: zoomBody,
-        source_type: 'zoom_out', reflection_id: reflectionId,
+        source_type: 'zoom_out', reflection_id: reflectionId, tags: [],
       }).then(({ error }) => { if (error) console.error('[zoom_out] library insert failed:', error.message); });
     });
 
