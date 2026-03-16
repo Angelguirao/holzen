@@ -97,8 +97,8 @@ export function PeriodComparison({ reflections, holdGoal }: Props) {
   const previous = computeStats(prevRefs);
 
   // Use the same score algorithm as the hero
-  const currentScore = useHolzenScore(currentRefs, []);
-  const previousScore = useHolzenScore(prevRefs, []);
+  const currentScore = useHolzenScore(currentRefs, [], [], holdGoal);
+  const previousScore = useHolzenScore(prevRefs, [], [], holdGoal);
 
   if (current.count === 0 && previous.count === 0) {
     return (
