@@ -17,59 +17,125 @@ import { startOfWeek, parseISO, format } from 'date-fns';
 interface Reflection {
   created_at: string;
   mood: string | null;
+  mood_after?: string | null;
   outcome: string | null;
+  context?: string | null;
+  breathing_completed?: boolean;
+  zoom_out_read?: boolean;
+  history_read?: boolean;
+  signal_read?: boolean;
+  learning_read?: boolean;
+  note?: string | null;
+  tags?: string[] | null;
 }
 
-// Composure scale: higher = more composed
-const MOOD_SCORES: Record<string, number> = {
+const COMPOSURE: Record<string, number> = {
   fomo: 10, greedy: 15, anxious: 20, fearful: 25,
   excited: 40, uncertain: 50, detached: 75, calm: 100,
 };
-const OUTCOME_SCORES: Record<string, number> = { held: 100, nothing: 100, bought: 50, sold: 20 };
+
+function parseVolatility(context: string | null | undefined): number {
+  if (!context) return 0;
+  const match = context.match(/[↑↓](\d+(?:\.\d+)?)%/);
+  return match ? parseFloat(match[1]) : 0;
+}
+
+function volatilityTier(pct: number): number {
+  if (pct >= 7) return 2;
+  if (pct >= 3) return 1.5;
+  return 1;
+}
 
 interface WeekBucket {
   key: string;
   label: string;
   score: number;
-  moodAvg: number;
-  outcomeAvg: number;
   holdRate: number;
-  reactive: number;
-  mixed: number;
-  composed: number;
+  highRegulation: number;
+  navigated: number;
+  lowRegulation: number;
   count: number;
 }
 
 function buildWeeklyData(reflections: Reflection[]): WeekBucket[] {
   const buckets = new Map<string, {
-    moods: number[]; outcomes: number[];
-    reactive: number; mixed: number; composed: number;
-    held: number; totalOutcomes: number; count: number;
+    scores: number[];
+    held: number; totalOutcomes: number;
+    highReg: number; navigatedHigh: number; lowReg: number;
+    count: number;
   }>();
 
   for (const r of reflections) {
     const date = parseISO(r.created_at);
     const key = startOfWeek(date, { weekStartsOn: 1 }).toISOString().slice(0, 10);
     const entry = buckets.get(key) || {
-      moods: [], outcomes: [],
-      reactive: 0, mixed: 0, composed: 0,
-      held: 0, totalOutcomes: 0, count: 0,
+      scores: [],
+      held: 0, totalOutcomes: 0,
+      highReg: 0, navigatedHigh: 0, lowReg: 0,
+      count: 0,
     };
 
     entry.count++;
 
-    if (r.mood && MOOD_SCORES[r.mood] !== undefined) {
-      const score = MOOD_SCORES[r.mood];
-      entry.moods.push(score);
-      if (score <= 30) entry.reactive++;
-      else if (score <= 60) entry.mixed++;
-      else entry.composed++;
+    // Skill-based weekly score per reflection
+    let refScore = 50; // baseline
+    const components: number[] = [];
+
+    // Emotional Regulation component
+    if (r.mood && r.mood_after && COMPOSURE[r.mood] !== undefined && COMPOSURE[r.mood_after] !== undefined) {
+      const delta = Math.min(100, Math.max(0, 50 + (COMPOSURE[r.mood_after] - COMPOSURE[r.mood])));
+      components.push(delta + (r.breathing_completed ? 10 : 0));
     }
 
-    if (r.outcome && OUTCOME_SCORES[r.outcome] !== undefined) {
-      entry.outcomes.push(OUTCOME_SCORES[r.outcome]);
+    // Distress Tolerance component
+    const vol = parseVolatility(r.context);
+    if (r.outcome) {
+      const tier = volatilityTier(vol);
+      if (r.outcome === 'held' || r.outcome === 'nothing') {
+        components.push(Math.min(100, 60 + tier * 20));
+      } else if (r.outcome === 'sold') {
+        components.push(Math.max(0, 40 - tier * 15));
+      } else {
+        components.push(45);
+      }
+    }
+
+    // Cognitive Reappraisal component
+    const toolsUsed = [r.zoom_out_read, r.history_read, r.signal_read, r.learning_read].filter(Boolean).length;
+    if (toolsUsed > 0) {
+      const volMult = vol >= 3 ? 1.5 : 1;
+      components.push(Math.min(100, (toolsUsed / 4) * 100 * volMult));
+    }
+
+    // Self-Awareness component
+    let depth = 0;
+    if (r.note && r.note.length > 10) depth += 50;
+    if (r.tags && r.tags.length > 0) depth += 30;
+    if (r.mood_after) depth += 20;
+    if (depth > 0) components.push(Math.min(100, depth));
+
+    if (components.length > 0) {
+      refScore = Math.round(components.reduce((a, c) => a + c, 0) / components.length);
+    }
+    entry.scores.push(Math.max(0, Math.min(100, refScore)));
+
+    // Outcomes
+    if (r.outcome) {
       entry.totalOutcomes++;
       if (r.outcome === 'held' || r.outcome === 'nothing') entry.held++;
+    }
+
+    // Regulation opportunity tracking
+    const moodScore = r.mood ? COMPOSURE[r.mood] ?? 60 : 60;
+    if (moodScore <= 30) {
+      // High regulation opportunity (reactive mood)
+      entry.highReg++;
+      // Did they navigate it? (mood improved, held, or used tools)
+      const improved = r.mood_after && COMPOSURE[r.mood_after] !== undefined && (COMPOSURE[r.mood_after] ?? 0) > moodScore;
+      const heldSteady = r.outcome === 'held' || r.outcome === 'nothing';
+      if (improved || heldSteady) entry.navigatedHigh++;
+    } else {
+      entry.lowReg++;
     }
 
     buckets.set(key, entry);
@@ -77,22 +143,20 @@ function buildWeeklyData(reflections: Reflection[]): WeekBucket[] {
 
   return Array.from(buckets.entries())
     .map(([key, b]) => {
-      const moodAvg = b.moods.length > 0 ? b.moods.reduce((a, c) => a + c, 0) / b.moods.length : 60;
-      const outcomeAvg = b.outcomes.length > 0 ? b.outcomes.reduce((a, c) => a + c, 0) / b.outcomes.length : 50;
-      const score = Math.round(moodAvg * 0.4 + outcomeAvg * 0.35 + 50 * 0.25);
-      const totalMoods = b.reactive + b.mixed + b.composed;
+      const score = b.scores.length > 0
+        ? Math.round(b.scores.reduce((a, c) => a + c, 0) / b.scores.length)
+        : 50;
       const holdRate = b.totalOutcomes > 0 ? Math.round((b.held / b.totalOutcomes) * 100) : 0;
+      const totalMoods = b.highReg + b.lowReg;
 
       return {
         key,
         label: format(new Date(key), 'MMM d'),
         score: Math.max(0, Math.min(100, score)),
-        moodAvg: Math.round(moodAvg),
-        outcomeAvg: Math.round(outcomeAvg),
         holdRate,
-        reactive: totalMoods > 0 ? Math.round((b.reactive / totalMoods) * 100) : 0,
-        mixed: totalMoods > 0 ? Math.round((b.mixed / totalMoods) * 100) : 0,
-        composed: totalMoods > 0 ? Math.round((b.composed / totalMoods) * 100) : 0,
+        highRegulation: totalMoods > 0 ? Math.round((b.highReg / totalMoods) * 100) : 0,
+        navigated: b.highReg > 0 ? Math.round((b.navigatedHigh / b.highReg) * 100) : 0,
+        lowRegulation: totalMoods > 0 ? Math.round((b.lowReg / totalMoods) * 100) : 0,
         count: b.count,
       };
     })
@@ -134,6 +198,13 @@ export function StatsTrends({ reflections }: Props) {
   const firstHold = data[0].holdRate;
   const lastHold = data[data.length - 1].holdRate;
   const holdDelta = lastHold - firstHold;
+
+  // Avg navigation rate for high-regulation moments
+  const avgNavRate = (() => {
+    const withHigh = data.filter(d => d.highRegulation > 0);
+    if (withHigh.length === 0) return null;
+    return Math.round(withHigh.reduce((s, d) => s + d.navigated, 0) / withHigh.length);
+  })();
 
   return (
     <div className="space-y-5">
@@ -178,15 +249,22 @@ export function StatsTrends({ reflections }: Props) {
           </ResponsiveContainer>
         </div>
         <p className="text-[10px] text-muted-foreground/40">
-          {t('statsTrends.weeklyComposureScore', { count: data.reduce((s, d) => s + d.count, 0) })}
+          {t('statsTrends.weeklySkillScore', 'Skill-weighted weekly score across {{count}} pauses', { count: data.reduce((s, d) => s + d.count, 0) })}
         </p>
       </div>
 
-      {/* Mood distribution shift */}
+      {/* Regulation Opportunity */}
       <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3">
-        <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
-          {t('statsTrends.moodDistribution')}
-        </p>
+        <div className="flex items-center justify-between">
+          <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
+            {t('statsTrends.regulationOpportunity', 'Regulation Opportunity')}
+          </p>
+          {avgNavRate !== null && (
+            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-muted/50 text-primary">
+              {t('statsTrends.navigatedRate', '{{rate}}% navigated', { rate: avgNavRate })}
+            </span>
+          )}
+        </div>
         <div className="h-36">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: -16 }} stackOffset="expand">
@@ -205,19 +283,25 @@ export function StatsTrends({ reflections }: Props) {
               />
               <Tooltip
                 contentStyle={tooltipStyle}
-                formatter={(v: number, name: string) => [`${Math.round(v * 100)}%`, t(`statsTrends.${name}`)]}
+                formatter={(v: number, name: string) => {
+                  const label = name === 'highRegulation'
+                    ? t('statsTrends.highRegulation', 'High regulation')
+                    : t('statsTrends.lowRegulation', 'Low regulation');
+                  return [`${Math.round(v * 100)}%`, label];
+                }}
               />
-              <Area type="monotone" dataKey="composed" stackId="1" stroke="hsl(var(--primary))" fill="hsl(var(--primary) / 0.3)" />
-              <Area type="monotone" dataKey="mixed" stackId="1" stroke="hsl(var(--muted-foreground))" fill="hsl(var(--muted-foreground) / 0.2)" />
-              <Area type="monotone" dataKey="reactive" stackId="1" stroke="hsl(var(--destructive))" fill="hsl(var(--destructive) / 0.2)" />
+              <Area type="monotone" dataKey="lowRegulation" stackId="1" stroke="hsl(var(--primary))" fill="hsl(var(--primary) / 0.3)" />
+              <Area type="monotone" dataKey="highRegulation" stackId="1" stroke="hsl(var(--destructive))" fill="hsl(var(--destructive) / 0.15)" />
             </AreaChart>
           </ResponsiveContainer>
         </div>
         <div className="flex items-center gap-4 text-[10px] font-mono text-muted-foreground/50">
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-primary/60" />{t('statsTrends.composed')}</span>
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-muted-foreground/40" />{t('statsTrends.mixed')}</span>
-          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-destructive/40" />{t('statsTrends.reactive')}</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-destructive/40" />{t('statsTrends.highRegulation', 'High regulation needed')}</span>
+          <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-primary/60" />{t('statsTrends.lowRegulation', 'Low regulation needed')}</span>
         </div>
+        <p className="text-[10px] text-muted-foreground/40">
+          {t('statsTrends.regulationDesc', 'Shows how often you faced reactive emotions — and how often you navigated them successfully.')}
+        </p>
       </div>
 
       {/* Hold rate over time */}
