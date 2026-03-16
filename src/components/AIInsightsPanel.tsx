@@ -12,7 +12,7 @@ import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { useSubscription } from '@/hooks/use-subscription';
 
 interface Insight {
-  category: 'timing' | 'mood' | 'behavior' | 'engagement' | 'growth';
+  category: 'regulation' | 'tolerance' | 'alignment' | 'reappraisal' | 'awareness' | 'timing' | 'mood' | 'behavior' | 'engagement' | 'growth';
   title: string;
   body: string;
   sentiment: 'positive' | 'neutral' | 'actionable';
