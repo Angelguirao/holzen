@@ -10,7 +10,7 @@ import { format } from 'date-fns';
 import { Mail, Lock, Clock, Trash2, BarChart3, Sparkles, Award, CalendarDays } from 'lucide-react';
 import HistoryContent from '@/components/library/HistoryContent';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ReflectionStats } from '@/components/ReflectionStats';
+
 import { InsightsPanel } from '@/components/InsightsPanel';
 import { DecisionQualityCard } from '@/components/DecisionQualityCard';
 import { ChartEmptyState } from '@/components/ChartEmptyState';
@@ -31,7 +31,7 @@ import { PeriodComparison } from '@/components/PeriodComparison';
 import { VolatilityToleranceCard } from '@/components/VolatilityToleranceCard';
 import { ShareStats } from '@/components/ShareStats';
 import { useHolzenScore } from '@/hooks/use-holzen-score';
-import { HolzenScoreCard } from '@/components/HolzenScoreCard';
+
 import { toast } from 'sonner';
 import {
   AlertDialog,
@@ -389,14 +389,128 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
     return streak;
   }, [reflections, practiceEntries]);
 
+  // Score grade label
+  const scoreGrade = scoreData
+    ? scoreData.score >= 80 ? 'Composed'
+    : scoreData.score >= 60 ? 'Steady'
+    : scoreData.score >= 40 ? 'Building'
+    : 'Starting'
+    : null;
+
+  const scoreColor = scoreData
+    ? scoreData.score >= 80 ? 'text-primary'
+    : scoreData.score >= 60 ? 'text-primary/70'
+    : scoreData.score >= 40 ? 'text-muted-foreground'
+    : 'text-muted-foreground/50'
+    : 'text-muted-foreground/50';
+
+  // Compute time context for reflections
+  const firstReflection = reflections.length > 0 ? reflections[reflections.length - 1] : null;
+  const daysSinceFirst = firstReflection
+    ? Math.max(1, Math.ceil((Date.now() - new Date(firstReflection.created_at).getTime()) / 86400000))
+    : 0;
+  const reflectionContext = daysSinceFirst <= 7
+    ? `${daysSinceFirst}d`
+    : daysSinceFirst <= 31
+    ? `${Math.ceil(daysSinceFirst / 7)}w`
+    : `${Math.ceil(daysSinceFirst / 30)}mo`;
+
+  // Longest streak for context
+  const longestStreak = useMemo(() => {
+    const days = new Set<string>();
+    for (const r of reflections) {
+      if (r.outcome) days.add(new Date(r.created_at).toISOString().slice(0, 10));
+    }
+    for (const p of practiceEntries) {
+      days.add(new Date(p.created_at).toISOString().slice(0, 10));
+    }
+    const sorted = Array.from(days).sort().reverse();
+    if (sorted.length === 0) return 0;
+    let longest = 1, streak = 1;
+    for (let i = 1; i < sorted.length; i++) {
+      const diff = Math.floor((new Date(sorted[i - 1]).getTime() - new Date(sorted[i]).getTime()) / 86400000);
+      if (diff === 1) { streak++; longest = Math.max(longest, streak); }
+      else streak = 1;
+    }
+    return longest;
+  }, [reflections, practiceEntries]);
+
+  const circumference = 2 * Math.PI * 44;
+  const scoreOffset = scoreData ? circumference - (scoreData.score / 100) * circumference : circumference;
+
   return (
     <div className="space-y-6">
-      {/* Summary strip */}
-      <div className="grid grid-cols-4 gap-2">
-        <SummaryTile label={t('profile.score', 'Score')} value={scoreData?.score ?? '—'} />
-        <SummaryTile label={t('profile.streak', 'Streak')} value={currentStreak} suffix={t('profile.days', 'd')} />
-        <SummaryTile label={t('profile.reflections', 'Reflects')} value={reflections.length} />
-        <SummaryTile label={t('profile.practice', 'Practice')} value={practiceDays} suffix={t('profile.days', 'd')} />
+      {/* Hero score + merged summary */}
+      <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-5 space-y-4">
+        <div className="flex items-center gap-5">
+          {/* Score ring — hero size */}
+          <div className="relative shrink-0">
+            <svg width="108" height="108" viewBox="0 0 108 108">
+              <circle cx="54" cy="54" r="44" fill="none" stroke="hsl(var(--border))" strokeWidth="4" opacity="0.3" />
+              <circle
+                cx="54" cy="54" r="44" fill="none"
+                stroke="hsl(var(--primary))" strokeWidth="4" strokeLinecap="round"
+                strokeDasharray={circumference} strokeDashoffset={scoreOffset}
+                transform="rotate(-90 54 54)"
+                className="transition-all duration-1000 ease-out"
+              />
+            </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className="text-2xl font-mono font-semibold leading-none">{scoreData?.score ?? '—'}</span>
+              {scoreGrade && (
+                <span className={`text-[9px] font-mono mt-0.5 ${scoreColor}`}>{scoreGrade}</span>
+              )}
+            </div>
+          </div>
+
+          {/* Summary metrics with micro-context */}
+          <div className="flex-1 min-w-0 grid grid-cols-2 gap-x-4 gap-y-3">
+            <MicroStat
+              value={currentStreak}
+              suffix="d"
+              label={t('profile.streak', 'Streak')}
+              context={longestStreak > currentStreak ? `best ${longestStreak}d` : currentStreak > 0 ? '🔥' : undefined}
+            />
+            <MicroStat
+              value={reflections.length}
+              label={t('profile.reflections', 'Reflects')}
+              context={reflectionContext ? `in ${reflectionContext}` : undefined}
+            />
+            <MicroStat
+              value={practiceDays}
+              suffix="d"
+              label={t('profile.practice', 'Practice')}
+              context="this month"
+            />
+            <MicroStat
+              value={scoreData?.trend === 'improving' ? '↑' : scoreData?.trend === 'declining' ? '↓' : '→'}
+              label={t('profile.trend', 'Trend')}
+              context={scoreData ? t(`holzenScore.${scoreData.trend}`) : undefined}
+              isText
+            />
+          </div>
+        </div>
+
+        {/* Score component bars */}
+        {scoreData && (
+          <div className="space-y-1.5 pt-2 border-t border-border/30">
+            <ScoreBarInline label={t('profile.moodLabel')} value={scoreData.moodScore} />
+            <ScoreBarInline label={t('profile.actionsLabel')} value={scoreData.outcomeScore} />
+            <ScoreBarInline label={t('holzenScore.groundingEffect', 'Grounding')} value={scoreData.deltaScore} />
+            <ScoreBarInline label={t('profile.streakLabel')} value={scoreData.streakScore} />
+            <ScoreBarInline
+              label={t('profile.practiceLabel')}
+              value={scoreData.practiceScore}
+              detail={t('holzenScore.practiceDays', '{{count}} days this month', { count: practiceDays })}
+            />
+          </div>
+        )}
+
+        {!scoreData && (
+          <p className="text-[10px] text-muted-foreground/40 font-mono text-center">
+            {t('profile.holzenScoreEmpty', 'Log 3 reflections with mood or outcome to generate your composure score.')}
+          </p>
+        )}
       </div>
 
       <div className="flex items-center justify-end">
@@ -407,22 +521,10 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
         />
       </div>
 
-      {/* Section: Your Journey */}
+      {/* Section: Your Journey — without redundant ReflectionStats tiles */}
       <StatsSection label={t('profile.sectionJourney', 'Your Journey')}>
-        <ReflectionStats reflections={reflections} />
         <StreakTimeline reflections={reflections} practiceEntries={practiceEntries} memberSince={memberSince} />
-        <ProLock feature="history">
-          {scoreData ? <HolzenScoreDetail scoreData={scoreData} practiceDays={practiceDays} /> : (
-            <ChartEmptyState
-              title={t('profile.holzenScore')}
-              message={t('profile.holzenScoreEmpty', 'Log 3 reflections with mood or outcome to generate your composure score. Practice check-ins also contribute.')}
-              current={reflections.length}
-              needed={3}
-            />
-          )}
-        </ProLock>
       </StatsSection>
-
       {/* Section: Emotional Patterns */}
       <ProLock feature="emotional_patterns">
         <StatsSection label={t('profile.sectionEmotional', 'Emotional Patterns')}>
@@ -481,35 +583,24 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
   );
 }
 
-function HolzenScoreDetail({ scoreData, practiceDays }: { scoreData: import('@/hooks/use-holzen-score').HolzenScoreData; practiceDays: number }) {
-  const { t } = useTranslation();
-  const circumference = 2 * Math.PI * 36;
-  const offset = circumference - (scoreData.score / 100) * circumference;
-
+function MicroStat({ value, suffix, label, context, isText }: {
+  value: string | number;
+  suffix?: string;
+  label: string;
+  context?: string;
+  isText?: boolean;
+}) {
   return (
-    <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3">
-      <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">{t('profile.holzenScore')}</p>
-      <div className="flex items-center gap-5">
-        <div className="relative shrink-0">
-          <svg width="88" height="88" viewBox="0 0 88 88">
-            <circle cx="44" cy="44" r="36" fill="none" stroke="hsl(var(--border))" strokeWidth="4" opacity="0.3" />
-            <circle cx="44" cy="44" r="36" fill="none" stroke="hsl(var(--primary))" strokeWidth="4" strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={offset} transform="rotate(-90 44 44)" className="transition-all duration-1000 ease-out" />
-          </svg>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-xl font-mono font-medium">{scoreData.score}</span>
-          </div>
-        </div>
-        <div className="space-y-2 flex-1 min-w-0">
-          <ScoreBarInline label={t('profile.moodLabel')} value={scoreData.moodScore} />
-          <ScoreBarInline label={t('profile.actionsLabel')} value={scoreData.outcomeScore} />
-          <ScoreBarInline label={t('profile.streakLabel')} value={scoreData.streakScore} />
-          <ScoreBarInline
-            label={t('profile.practiceLabel')}
-            value={scoreData.practiceScore}
-            detail={t('holzenScore.practiceDays', '{{count}} days this month', { count: practiceDays })}
-          />
-        </div>
+    <div className="space-y-0.5">
+      <div className="flex items-baseline gap-1">
+        <span className={`font-mono font-medium leading-none ${isText ? 'text-base' : 'text-lg'}`}>
+          {value}{suffix && <span className="text-[10px] text-muted-foreground/50 ml-0.5">{suffix}</span>}
+        </span>
+        {context && (
+          <span className="text-[9px] font-mono text-muted-foreground/40">{context}</span>
+        )}
       </div>
+      <p className="text-[9px] font-mono tracking-widest uppercase text-muted-foreground/50">{label}</p>
     </div>
   );
 }
@@ -527,16 +618,6 @@ function ScoreBarInline({ label, value, detail }: { label: string; value: number
       <div className="h-1 rounded-full bg-muted/50 overflow-hidden">
         <div className="h-full rounded-full bg-primary/60 transition-all duration-700 ease-out" style={{ width: `${value}%` }} />
       </div>
-    </div>
-  );
-}
-function SummaryTile({ label, value, suffix }: { label: string; value: string | number; suffix?: string }) {
-  return (
-    <div className="rounded-md border border-border/60 bg-muted/30 px-3 py-2.5 text-center space-y-0.5">
-      <p className="text-lg font-mono font-medium leading-none">
-        {value}{suffix && <span className="text-[10px] text-muted-foreground/50 ml-0.5">{suffix}</span>}
-      </p>
-      <p className="text-[9px] font-mono tracking-widest uppercase text-muted-foreground/50">{label}</p>
     </div>
   );
 }
