@@ -31,7 +31,7 @@ import { PeriodComparison } from '@/components/PeriodComparison';
 import { VolatilityToleranceCard } from '@/components/VolatilityToleranceCard';
 import { ShareStats } from '@/components/ShareStats';
 import { useHolzenScore } from '@/hooks/use-holzen-score';
-import { HolzenScoreCard } from '@/components/HolzenScoreCard';
+
 import { toast } from 'sonner';
 import {
   AlertDialog,
