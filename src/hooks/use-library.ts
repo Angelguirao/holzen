@@ -63,10 +63,45 @@ export function useLibrary() {
         .select('*')
         .order('position', { ascending: true }),
     ]);
-    setItems((itemsData as unknown as LibraryItem[]) ?? []);
+    const libItems = (itemsData as unknown as LibraryItem[]) ?? [];
+    setItems(libItems);
     setCollections((collectionsData as unknown as Collection[]) ?? []);
     setCollectionItems((colItemsData as unknown as CollectionItem[]) ?? []);
     setLoading(false);
+
+    // One-time backfill: import reflections not yet in library
+    const existingRefIds = new Set(
+      libItems.filter((i) => i.source_type === 'reflection' && i.reflection_id).map((i) => i.reflection_id)
+    );
+    const { data: allReflections } = await supabase
+      .from('reflections')
+      .select('id, message, context, created_at, haiku')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+    if (allReflections && allReflections.length > 0) {
+      const missing = allReflections.filter((r: any) => !existingRefIds.has(r.id));
+      if (missing.length > 0) {
+        const inserts = missing.map((r: any) => ({
+          user_id: user.id,
+          type: 'bookmark',
+          title: 'Reflection',
+          body: r.message,
+          source_type: 'reflection',
+          reflection_id: r.id,
+          tags: ['reflection'],
+          created_at: r.created_at,
+        }));
+        await supabase.from('library_items').insert(inserts as any);
+        // Re-fetch to include backfilled items
+        const { data: refreshed } = await supabase
+          .from('library_items')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('pinned', { ascending: false })
+          .order('created_at', { ascending: false });
+        if (refreshed) setItems(refreshed as unknown as LibraryItem[]);
+      }
+    }
   }, [user]);
 
   useEffect(() => { fetchAll(); }, [fetchAll]);
