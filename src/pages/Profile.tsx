@@ -262,7 +262,7 @@ const Profile = () => {
             <Skeleton className="h-40 w-full rounded-md" />
           </div>
         ) : (
-          <StatsContent reflections={reflections} practiceEntries={practiceEntries} memberSince={user?.created_at} />
+          <StatsContent reflections={reflections} practiceEntries={practiceEntries} memberSince={user?.created_at} holdGoal={holdGoal} />
         )
       ) : tab === 'insights' ? (
         <ProLock feature="ai_insights" hideContent>
