@@ -477,6 +477,7 @@ export function useHolzen() {
               body: companionData.haiku,
               source_type: 'haiku',
               reflection_id: insertedReflection.id,
+              tags: [],
             });
           }
           const { error: libErr } = await supabase.from('library_items').insert(libraryInserts);
