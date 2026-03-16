@@ -11,7 +11,7 @@ import { Mail, Lock, Clock, Trash2, BarChart3, Sparkles, Award, CalendarDays } f
 import HistoryContent from '@/components/library/HistoryContent';
 import { Skeleton } from '@/components/ui/skeleton';
 
-import { InsightsPanel } from '@/components/InsightsPanel';
+
 import { DecisionQualityCard } from '@/components/DecisionQualityCard';
 import { ChartEmptyState } from '@/components/ChartEmptyState';
 import { StreakTimeline } from '@/components/StreakTimeline';
