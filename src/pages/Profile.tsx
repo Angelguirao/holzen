@@ -367,72 +367,18 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
   }, [practiceEntries]);
 
   // Compute current streak for summary
-  const currentStreak = useMemo(() => {
+  // Activity days in last 30 days (replaces streak as a soft context metric)
+  const activeDaysLast30 = useMemo(() => {
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 30);
     const days = new Set<string>();
     for (const r of reflections) {
-      if (r.outcome) days.add(new Date(r.created_at).toISOString().slice(0, 10));
+      if (new Date(r.created_at) >= cutoff) days.add(new Date(r.created_at).toISOString().slice(0, 10));
     }
     for (const p of practiceEntries) {
-      days.add(new Date(p.created_at).toISOString().slice(0, 10));
+      if (new Date(p.created_at) >= cutoff) days.add(new Date(p.created_at).toISOString().slice(0, 10));
     }
-    const sorted = Array.from(days).sort().reverse();
-    if (sorted.length === 0) return 0;
-    const today = new Date().toISOString().slice(0, 10);
-    const gap = Math.floor((new Date(today).getTime() - new Date(sorted[0]).getTime()) / 86400000);
-    if (gap > 1) return 0;
-    let streak = 1;
-    for (let i = 1; i < sorted.length; i++) {
-      const diff = Math.floor((new Date(sorted[i - 1]).getTime() - new Date(sorted[i]).getTime()) / 86400000);
-      if (diff === 1) streak++;
-      else break;
-    }
-    return streak;
-  }, [reflections, practiceEntries]);
-
-  // Score grade label
-  const scoreGrade = scoreData
-    ? scoreData.score >= 80 ? 'Composed'
-    : scoreData.score >= 60 ? 'Steady'
-    : scoreData.score >= 40 ? 'Building'
-    : 'Starting'
-    : null;
-
-  const scoreColor = scoreData
-    ? scoreData.score >= 80 ? 'text-primary'
-    : scoreData.score >= 60 ? 'text-primary/70'
-    : scoreData.score >= 40 ? 'text-muted-foreground'
-    : 'text-muted-foreground/50'
-    : 'text-muted-foreground/50';
-
-  // Compute time context for reflections
-  const firstReflection = reflections.length > 0 ? reflections[reflections.length - 1] : null;
-  const daysSinceFirst = firstReflection
-    ? Math.max(1, Math.ceil((Date.now() - new Date(firstReflection.created_at).getTime()) / 86400000))
-    : 0;
-  const reflectionContext = daysSinceFirst <= 7
-    ? `${daysSinceFirst}d`
-    : daysSinceFirst <= 31
-    ? `${Math.ceil(daysSinceFirst / 7)}w`
-    : `${Math.ceil(daysSinceFirst / 30)}mo`;
-
-  // Longest streak for context
-  const longestStreak = useMemo(() => {
-    const days = new Set<string>();
-    for (const r of reflections) {
-      if (r.outcome) days.add(new Date(r.created_at).toISOString().slice(0, 10));
-    }
-    for (const p of practiceEntries) {
-      days.add(new Date(p.created_at).toISOString().slice(0, 10));
-    }
-    const sorted = Array.from(days).sort().reverse();
-    if (sorted.length === 0) return 0;
-    let longest = 1, streak = 1;
-    for (let i = 1; i < sorted.length; i++) {
-      const diff = Math.floor((new Date(sorted[i - 1]).getTime() - new Date(sorted[i]).getTime()) / 86400000);
-      if (diff === 1) { streak++; longest = Math.max(longest, streak); }
-      else streak = 1;
-    }
-    return longest;
+    return days.size;
   }, [reflections, practiceEntries]);
 
   const circumference = 2 * Math.PI * 44;
