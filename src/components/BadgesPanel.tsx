@@ -167,7 +167,7 @@ export function BadgesPanel({ reflections, subscribed, notifyBadges = true }: Ba
   }, [reflections]);
 
   const visibleBadges = subscribed ? badges : badges.filter((b) => !b.proOnly);
-  const earnedCount = visibleBadges.filter((b) => b.earned).length;
+  const earnedCount = badges.filter((b) => b.earned).length;
   const proLockedCount = subscribed ? 0 : badges.filter((b) => b.proOnly).length;
   const categories = ['calendar', 'volume', 'composure', 'companions', 'engagement'] as const;
 
