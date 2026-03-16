@@ -51,7 +51,7 @@ export function PeriodComparison({ reflections }: Props) {
   const { t } = useTranslation();
   const [view, setView] = useState<View>('weekly');
 
-  const { current, previous, currentLabel, previousLabel } = useMemo(() => {
+  const { currentRefs, prevRefs, currentLabel, previousLabel } = useMemo(() => {
     const now = new Date();
 
     let currentStart: Date, currentEnd: Date, prevStart: Date, prevEnd: Date;
@@ -82,13 +82,15 @@ export function PeriodComparison({ reflections }: Props) {
       return isWithinInterval(d, { start: prevStart, end: prevEnd });
     });
 
-    return {
-      current: computeStats(currentRefs),
-      previous: computeStats(prevRefs),
-      currentLabel,
-      previousLabel,
-    };
+    return { currentRefs, prevRefs, currentLabel, previousLabel };
   }, [reflections, view, t]);
+
+  const current = computeStats(currentRefs);
+  const previous = computeStats(prevRefs);
+
+  // Use the same score algorithm as the hero
+  const currentScore = useHolzenScore(currentRefs, []);
+  const previousScore = useHolzenScore(prevRefs, []);
 
   if (current.count === 0 && previous.count === 0) {
     return (
