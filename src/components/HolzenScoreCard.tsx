@@ -5,11 +5,28 @@ import { useHolzenScore } from '@/hooks/use-holzen-score';
 import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
+interface ReflectionRow {
+  created_at: string;
+  mood: string | null;
+  mood_after: string | null;
+  outcome: string | null;
+  context: string | null;
+  breathing_completed: boolean;
+  note: string | null;
+  tags: string[] | null;
+  is_favorite: boolean;
+  zoom_out_read: boolean;
+  history_read: boolean;
+  signal_read: boolean;
+  learning_read: boolean;
+}
+
 export function HolzenScoreCard() {
   const { t } = useTranslation();
   const { user } = useAuth();
-  const [reflections, setReflections] = useState<{ created_at: string; mood: string | null; mood_after?: string | null; outcome: string | null }[]>([]);
+  const [reflections, setReflections] = useState<ReflectionRow[]>([]);
   const [practiceEntries, setPracticeEntries] = useState<{ created_at: string; type: string; mood: string | null }[]>([]);
+  const [holdGoal, setHoldGoal] = useState<{ type: string | null; targetMonths: number | null; targetPrice: number | null; start: string | null } | null>(null);
   const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
@@ -17,7 +34,7 @@ export function HolzenScoreCard() {
     Promise.all([
       supabase
         .from('reflections')
-        .select('created_at, mood, mood_after, outcome')
+        .select('created_at, mood, mood_after, outcome, context, breathing_completed, note, tags, is_favorite, zoom_out_read, history_read, signal_read, learning_read')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(100),
@@ -27,14 +44,27 @@ export function HolzenScoreCard() {
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(200),
-    ]).then(([refRes, pracRes]) => {
-      setReflections(refRes.data ?? []);
+      supabase
+        .from('profiles')
+        .select('hold_goal_type, hold_goal_target_months, hold_goal_target_price, hold_goal_start')
+        .eq('user_id', user.id)
+        .single(),
+    ]).then(([refRes, pracRes, profileRes]) => {
+      setReflections((refRes.data ?? []) as ReflectionRow[]);
       setPracticeEntries((pracRes.data as any[]) ?? []);
+      if (profileRes.data) {
+        setHoldGoal({
+          type: profileRes.data.hold_goal_type,
+          targetMonths: profileRes.data.hold_goal_target_months,
+          targetPrice: profileRes.data.hold_goal_target_price,
+          start: profileRes.data.hold_goal_start,
+        });
+      }
       setLoaded(true);
     });
   }, [user]);
 
-  const scoreData = useHolzenScore(reflections, [], practiceEntries);
+  const scoreData = useHolzenScore(reflections, [], practiceEntries, holdGoal);
 
   if (!loaded || !scoreData) return null;
 
@@ -47,15 +77,6 @@ export function HolzenScoreCard() {
 
   const circumference = 2 * Math.PI * 36;
   const offset = circumference - (scoreData.score / 100) * circumference;
-
-  // Compute practice days for context label
-  const last30 = new Date();
-  last30.setDate(last30.getDate() - 30);
-  const practiceDays = new Set(
-    practiceEntries
-      .filter(p => new Date(p.created_at) >= last30)
-      .map(p => new Date(p.created_at).toISOString().slice(0, 10))
-  ).size;
 
   return (
     <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3">
@@ -85,20 +106,18 @@ export function HolzenScoreCard() {
         </div>
 
         <div className="space-y-2 flex-1 min-w-0">
-          <ScoreBar label={t('holzenScore.mood')} value={scoreData.moodScore} />
-          <ScoreBar label={t('holzenScore.groundingEffect', 'Grounding')} value={scoreData.deltaScore} />
-          <ScoreBar label={t('holzenScore.actions')} value={scoreData.outcomeScore} />
-          
-          <ScoreBar
-            label={t('holzenScore.practice', 'Practice')}
-            value={scoreData.practiceScore}
-            detail={t('holzenScore.practiceDays', '{{count}} days this month', { count: practiceDays })}
-          />
+          <ScoreBar label={t('holzenScore.emotionalRegulation', 'Regulation')} value={scoreData.emotionalRegulation} />
+          <ScoreBar label={t('holzenScore.distressTolerance', 'Tolerance')} value={scoreData.distressTolerance} />
+          {holdGoal?.type && (
+            <ScoreBar label={t('holzenScore.decisionAlignment', 'Alignment')} value={scoreData.decisionAlignment} />
+          )}
+          <ScoreBar label={t('holzenScore.cognitiveReappraisal', 'Reappraisal')} value={scoreData.cognitiveReappraisal} />
+          <ScoreBar label={t('holzenScore.selfAwareness', 'Awareness')} value={scoreData.selfAwareness} />
         </div>
       </div>
 
       <p className="text-[10px] text-muted-foreground/40 leading-relaxed">
-        {t('holzenScore.basedOn')}
+        {t('holzenScore.basedOnSkills', 'Based on your last 30 pauses. Measures composure skills, not feelings.')}
       </p>
     </div>
   );

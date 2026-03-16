@@ -1,11 +1,19 @@
 import { useMemo } from 'react';
-import { parseISO } from 'date-fns';
 
 interface Reflection {
   created_at: string;
   mood: string | null;
   mood_after?: string | null;
   outcome: string | null;
+  context?: string | null;
+  breathing_completed?: boolean;
+  note?: string | null;
+  tags?: string[] | null;
+  is_favorite?: boolean;
+  zoom_out_read?: boolean;
+  history_read?: boolean;
+  signal_read?: boolean;
+  learning_read?: boolean;
 }
 
 interface PracticeEntry {
@@ -14,104 +22,202 @@ interface PracticeEntry {
   mood: string | null;
 }
 
+interface HoldGoal {
+  type: string | null;
+  targetMonths: number | null;
+  targetPrice: number | null;
+  start: string | null;
+}
+
 const MOOD_SCORES: Record<string, number> = {
   fomo: 10, greedy: 15, anxious: 20, fearful: 25,
   excited: 40, uncertain: 50, detached: 75, calm: 100,
 };
 
-const OUTCOME_SCORES: Record<string, number> = {
-  held: 100,
-  nothing: 100,
-  bought: 50,
-  sold: 20,
+// Composure scores: calm/detached = composed, fomo/greedy/fearful = reactive
+const COMPOSURE: Record<string, number> = {
+  calm: 100, detached: 85, uncertain: 60, excited: 50,
+  anxious: 30, fearful: 25, greedy: 20, fomo: 10,
 };
-
 
 export interface HolzenScoreData {
   score: number;
-  moodScore: number;
-  deltaScore: number;
-  outcomeScore: number;
-  practiceScore: number;
+  emotionalRegulation: number;
+  distressTolerance: number;
+  decisionAlignment: number;
+  cognitiveReappraisal: number;
+  selfAwareness: number;
   trend: 'improving' | 'declining' | 'stable';
 }
 
-export function useHolzenScore(reflections: Reflection[], freezeDates: string[] = [], practiceEntries: PracticeEntry[] = []): HolzenScoreData | null {
+/** Parse volatility % from context string like "BTC ↑5.2% in 24h" */
+function parseVolatility(context: string | null | undefined): number {
+  if (!context) return 0;
+  const match = context.match(/[↑↓](\d+(?:\.\d+)?)%/);
+  return match ? parseFloat(match[1]) : 0;
+}
+
+/** Tiered volatility multiplier: <3% = 1, 3-7% = 1.5, >7% = 2 */
+function volatilityTier(pct: number): number {
+  if (pct >= 7) return 2;
+  if (pct >= 3) return 1.5;
+  return 1;
+}
+
+export function useHolzenScore(
+  reflections: Reflection[],
+  _freezeDates: string[] = [],
+  practiceEntries: PracticeEntry[] = [],
+  holdGoal?: HoldGoal | null,
+): HolzenScoreData | null {
   return useMemo(() => {
     if (reflections.length < 3) return null;
 
-    // Use last 30 reflections for scoring
     const recent = reflections.slice(0, 30);
+    const hasHoldGoal = holdGoal?.type != null;
 
-    // Mood score (15%) — include check-in moods
-    const reflectionMoods = recent.filter((r) => r.mood && MOOD_SCORES[r.mood] !== undefined);
-    const checkinMoods = practiceEntries
-      .filter((p) => p.type === 'checkin' && p.mood && MOOD_SCORES[p.mood] !== undefined)
-      .slice(0, 20);
-    const allMoods = [
-      ...reflectionMoods.map(r => MOOD_SCORES[r.mood!] ?? 60),
-      ...checkinMoods.map(p => MOOD_SCORES[p.mood!] ?? 60),
-    ];
-    const moodAvg = allMoods.length > 0
-      ? allMoods.reduce((s, v) => s + v, 0) / allMoods.length
-      : 60;
+    // --- WEIGHTS (redistribute Decision Alignment if no hold goal) ---
+    let wEmotional = 0.30;
+    let wDistress = 0.25;
+    let wDecision = 0.20;
+    let wReappraisal = 0.15;
+    let wAwareness = 0.10;
 
-    // Grounding delta score (35%) — measures before→after improvement from pause flow
-    const withDelta = recent.filter(
-      (r) => r.mood && r.mood_after && MOOD_SCORES[r.mood] !== undefined && MOOD_SCORES[r.mood_after] !== undefined
-    );
-    let deltaAvg = 50; // neutral default
-    if (withDelta.length > 0) {
-      const deltas = withDelta.map(r => {
-        const before = MOOD_SCORES[r.mood!] ?? 50;
-        const after = MOOD_SCORES[r.mood_after!] ?? 50;
-        return Math.min(100, Math.max(0, 50 + (after - before)));
-      });
-      deltaAvg = deltas.reduce((s, v) => s + v, 0) / deltas.length;
+    if (!hasHoldGoal) {
+      // Redistribute 20% across other 4 skills proportionally
+      const redistrib = wDecision;
+      wDecision = 0;
+      const otherTotal = wEmotional + wDistress + wReappraisal + wAwareness;
+      wEmotional += redistrib * (wEmotional / otherTotal);
+      wDistress += redistrib * (wDistress / otherTotal);
+      wReappraisal += redistrib * (wReappraisal / otherTotal);
+      wAwareness += redistrib * (wAwareness / otherTotal);
     }
 
-    // Outcome score (30%)
-    const outcomesWithScore = recent.filter((r) => r.outcome && OUTCOME_SCORES[r.outcome] !== undefined);
-    const outcomeAvg =
-      outcomesWithScore.length > 0
-        ? outcomesWithScore.reduce((sum, r) => sum + (OUTCOME_SCORES[r.outcome!] ?? 50), 0) / outcomesWithScore.length
-        : 50;
+    // ─── 1. EMOTIONAL REGULATION (30%) ───
+    // Measures mood→mood_after improvement + breathing completion
+    const withDelta = recent.filter(
+      r => r.mood && r.mood_after && COMPOSURE[r.mood] !== undefined && COMPOSURE[r.mood_after] !== undefined
+    );
+    let emotionalScore = 50;
+    if (withDelta.length > 0) {
+      const deltas = withDelta.map(r => {
+        const before = COMPOSURE[r.mood!] ?? 50;
+        const after = COMPOSURE[r.mood_after!] ?? 50;
+        // Shift from reactive→composed = positive, capped 0-100
+        const delta = Math.min(100, Math.max(0, 50 + (after - before)));
+        // Breathing bonus: +10 if completed
+        const breathingBonus = r.breathing_completed ? 10 : 0;
+        return Math.min(100, delta + breathingBonus);
+      });
+      emotionalScore = deltas.reduce((s, v) => s + v, 0) / deltas.length;
+    }
 
-    // Practice engagement score (20%) — rewards consistent practice
-    const last30Days = new Date();
-    last30Days.setDate(last30Days.getDate() - 30);
-    const recentPractice = practiceEntries.filter(p => new Date(p.created_at) >= last30Days);
-    const uniquePracticeDays = new Set(recentPractice.map(p => parseISO(p.created_at).toISOString().slice(0, 10))).size;
-    const practicePct = Math.min(uniquePracticeDays / 10, 1) * 100;
+    // ─── 2. DISTRESS TOLERANCE (25%) ───
+    // Did you hold/do nothing during high volatility? Weighted penalty for selling.
+    const withOutcomeAndContext = recent.filter(r => r.outcome && r.context);
+    let distressScore = 50;
+    if (withOutcomeAndContext.length > 0) {
+      const scores = withOutcomeAndContext.map(r => {
+        const vol = parseVolatility(r.context);
+        const tier = volatilityTier(vol);
+        const outcome = r.outcome!;
+        if (outcome === 'held' || outcome === 'nothing') {
+          // Reward: higher for higher volatility
+          return Math.min(100, 60 + tier * 20);
+        } else if (outcome === 'sold') {
+          // Weighted penalty: bigger during high vol
+          return Math.max(0, 40 - tier * 15);
+        } else if (outcome === 'bought') {
+          // Mild: buying is less impulsive than selling
+          return 45;
+        }
+        return 50;
+      });
+      distressScore = scores.reduce((s, v) => s + v, 0) / scores.length;
+    }
 
-    // Weights: Mood 15%, Delta 35%, Outcome 30%, Practice 20%
-    const score = Math.round(moodAvg * 0.15 + deltaAvg * 0.35 + outcomeAvg * 0.30 + practicePct * 0.20);
+    // ─── 3. DECISION ALIGNMENT (20%) ───
+    // How well do outcomes align with hold goal?
+    let decisionScore = 50;
+    if (hasHoldGoal) {
+      const withOutcome = recent.filter(r => r.outcome);
+      if (withOutcome.length > 0) {
+        const scores = withOutcome.map(r => {
+          const o = r.outcome!;
+          if (holdGoal!.type === 'forever') {
+            // Forever: held/nothing = 100, bought = 60, sold = 15
+            return o === 'held' || o === 'nothing' ? 100 : o === 'bought' ? 60 : 15;
+          }
+          // Time or price based: holding is aligned
+          return o === 'held' || o === 'nothing' ? 100 : o === 'bought' ? 50 : 20;
+        });
+        decisionScore = scores.reduce((s, v) => s + v, 0) / scores.length;
+      }
+    }
 
-    // Trend
+    // ─── 4. COGNITIVE REAPPRAISAL (15%) ───
+    // Engaging with perspective-shifting tools. Weighted higher during volatility.
+    const reappraisalTools = recent.map(r => {
+      const engaged = [r.zoom_out_read, r.history_read, r.signal_read, r.learning_read]
+        .filter(Boolean).length; // 0-4
+      const vol = parseVolatility(r.context);
+      const volMultiplier = vol >= 3 ? 1.5 : 1; // bonus during volatile moments
+      return Math.min(100, (engaged / 4) * 100 * volMultiplier);
+    });
+    const reappraisalScore = reappraisalTools.length > 0
+      ? reappraisalTools.reduce((s, v) => s + v, 0) / reappraisalTools.length
+      : 0;
+
+    // ─── 5. SELF-AWARENESS (10%) ───
+    // Depth of reflection: notes, tags, favorites
+    const awarenessScores = recent.map(r => {
+      let depth = 0;
+      if (r.note && r.note.length > 10) depth += 40;
+      else if (r.note && r.note.length > 0) depth += 20;
+      if (r.tags && r.tags.length > 0) depth += 30;
+      if (r.is_favorite) depth += 15;
+      // Having a mood_after means they completed the full pause flow
+      if (r.mood_after) depth += 15;
+      return Math.min(100, depth);
+    });
+    const awarenessScore = awarenessScores.reduce((s, v) => s + v, 0) / awarenessScores.length;
+
+    // ─── COMPOSITE SCORE ───
+    const score = Math.round(
+      emotionalScore * wEmotional +
+      distressScore * wDistress +
+      decisionScore * wDecision +
+      reappraisalScore * wReappraisal +
+      awarenessScore * wAwareness
+    );
+
+    // ─── TREND (based on emotional regulation trajectory) ───
     let trend: 'improving' | 'declining' | 'stable' = 'stable';
     if (recent.length >= 6) {
       const mid = Math.floor(recent.length / 2);
-      const olderHalf = recent.slice(mid);
-      const newerHalf = recent.slice(0, mid);
+      const older = recent.slice(mid);
+      const newer = recent.slice(0, mid);
 
-      const avgMood = (arr: Reflection[]) => {
-        const withMood = arr.filter((r) => r.mood && MOOD_SCORES[r.mood]);
-        if (withMood.length === 0) return 60;
-        return withMood.reduce((s, r) => s + (MOOD_SCORES[r.mood!] ?? 60), 0) / withMood.length;
+      const avgComposure = (arr: Reflection[]) => {
+        const withMood = arr.filter(r => r.mood_after && COMPOSURE[r.mood_after]);
+        if (withMood.length === 0) return 50;
+        return withMood.reduce((s, r) => s + (COMPOSURE[r.mood_after!] ?? 50), 0) / withMood.length;
       };
 
-      const diff = avgMood(newerHalf) - avgMood(olderHalf);
+      const diff = avgComposure(newer) - avgComposure(older);
       if (diff > 10) trend = 'improving';
       else if (diff < -10) trend = 'declining';
     }
 
     return {
       score: Math.max(0, Math.min(100, score)),
-      moodScore: Math.round(moodAvg),
-      deltaScore: Math.round(deltaAvg),
-      outcomeScore: Math.round(outcomeAvg),
-      practiceScore: Math.round(practicePct),
+      emotionalRegulation: Math.round(emotionalScore),
+      distressTolerance: Math.round(distressScore),
+      decisionAlignment: Math.round(decisionScore),
+      cognitiveReappraisal: Math.round(reappraisalScore),
+      selfAwareness: Math.round(awarenessScore),
       trend,
     };
-  }, [reflections, freezeDates, practiceEntries]);
+  }, [reflections, _freezeDates, practiceEntries, holdGoal]);
 }
