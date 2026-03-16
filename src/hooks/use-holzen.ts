@@ -296,13 +296,13 @@ export function useHolzen() {
       body: { context: ctx, reflectionMessage: msg, language: lang },
     }).then(({ data, error }) => {
       if (error || !data || data.error) return;
-      supabase.from('reflections').update({ zoom_out_data: data } as any).eq('id', reflectionId).then(() => {});
+      supabase.from('reflections').update({ zoom_out_data: data } as any).eq('id', reflectionId).then(({ error }) => { if (error) console.error('[zoom_out] reflection update failed:', error.message); });
       const zoomBody = data?.deepTime?.body || data?.echo?.message || data?.deepTime?.title || (typeof data === 'object' ? JSON.stringify(data) : String(data));
       supabase.from('library_items').insert({
         user_id: userId, type: 'bookmark', title: data?.deepTime?.title || 'Zoom Out',
         body: zoomBody,
         source_type: 'zoom_out', reflection_id: reflectionId,
-      }).then(() => {});
+      }).then(({ error }) => { if (error) console.error('[zoom_out] library insert failed:', error.message); });
     });
 
     // Historical Insight companion
