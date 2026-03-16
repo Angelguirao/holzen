@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { differenceInCalendarDays, parseISO } from 'date-fns';
+import { parseISO } from 'date-fns';
 
 interface Reflection {
   created_at: string;
