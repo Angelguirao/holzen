@@ -263,7 +263,7 @@ const Profile = () => {
             <Skeleton className="h-40 w-full rounded-md" />
           </div>
         ) : (
-          <BadgesPanel reflections={reflections} />
+          <BadgesPanel reflections={reflections} subscribed={subscribed} />
         )
       ) : tab === 'activity' ? (
         <ProLock feature="history" hideContent>
