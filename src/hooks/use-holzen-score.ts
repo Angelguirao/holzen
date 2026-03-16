@@ -60,7 +60,6 @@ export interface HolzenScoreData {
   moodScore: number;
   deltaScore: number;
   outcomeScore: number;
-  streakScore: number;
   practiceScore: number;
   trend: 'improving' | 'declining' | 'stable';
 }
