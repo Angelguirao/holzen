@@ -466,15 +466,11 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
         {/* Score component bars */}
         {scoreData && (
           <div className="space-y-1.5 pt-2 border-t border-border/30">
-            <ScoreBarInline label={t('profile.moodLabel')} value={scoreData.moodScore} />
-            <ScoreBarInline label={t('profile.actionsLabel')} value={scoreData.outcomeScore} />
-            <ScoreBarInline label={t('holzenScore.groundingEffect', 'Grounding')} value={scoreData.deltaScore} />
-            
-            <ScoreBarInline
-              label={t('profile.practiceLabel')}
-              value={scoreData.practiceScore}
-              detail={t('holzenScore.practiceDays', '{{count}} days this month', { count: practiceDays })}
-            />
+            <ScoreBarInline label={t('holzenScore.emotionalRegulation', 'Regulation')} value={scoreData.emotionalRegulation} />
+            <ScoreBarInline label={t('holzenScore.distressTolerance', 'Tolerance')} value={scoreData.distressTolerance} />
+            <ScoreBarInline label={t('holzenScore.decisionAlignment', 'Alignment')} value={scoreData.decisionAlignment} />
+            <ScoreBarInline label={t('holzenScore.cognitiveReappraisal', 'Reappraisal')} value={scoreData.cognitiveReappraisal} />
+            <ScoreBarInline label={t('holzenScore.selfAwareness', 'Awareness')} value={scoreData.selfAwareness} />
           </div>
         )}
 
