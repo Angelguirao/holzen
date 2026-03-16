@@ -591,19 +591,22 @@ function MicroStat({ value, suffix, label, context, isText }: {
   );
 }
 
-function ScoreBarInline({ label, value, detail }: { label: string; value: number; detail?: string }) {
+function ScoreBarInline({ label, value, hint }: { label: string; value: number; hint?: string }) {
+  const [open, setOpen] = useState(false);
   return (
-    <div className="space-y-0.5">
+    <div className="space-y-0.5 cursor-pointer" onClick={() => hint && setOpen(!open)}>
       <div className="flex justify-between text-[10px] font-mono text-muted-foreground">
         <span>{label}</span>
-        <span className="flex items-center gap-1.5">
-          {detail && <span className="text-muted-foreground/40">{detail}</span>}
-          <span>{value}</span>
-        </span>
+        <span>{value}</span>
       </div>
       <div className="h-1 rounded-full bg-muted/50 overflow-hidden">
         <div className="h-full rounded-full bg-primary/60 transition-all duration-700 ease-out" style={{ width: `${value}%` }} />
       </div>
+      {open && hint && (
+        <p className="text-[10px] text-muted-foreground/50 leading-relaxed pt-0.5 animate-in fade-in duration-200">
+          {hint}
+        </p>
+      )}
     </div>
   );
 }
