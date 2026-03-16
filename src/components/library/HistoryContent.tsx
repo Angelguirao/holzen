@@ -19,7 +19,6 @@ const HistoryContent = () => {
       const [{ data: refs }, { data: lets }, { data: bads }, { data: pracs }] = await Promise.all([
         supabase.from('reflections').select('id, created_at, mood').eq('user_id', user.id),
         supabase.from('future_letters').select('id, written_at, deliver_during').eq('user_id', user.id),
-        supabase.from('future_letters').select('id, written_at, deliver_during').eq('user_id', user.id),
         supabase.from('user_badges').select('id, earned_at, badge_id').eq('user_id', user.id),
         supabase.from('practice_entries').select('id, created_at, type, mood, prompt').eq('user_id', user.id),
       ]);
