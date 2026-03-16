@@ -277,7 +277,7 @@ export function useHolzen() {
       supabase.functions.invoke('signal-companion', {
         body: { context: ctx, language: lang, sources: sources.length > 0 ? sources : undefined },
       }).then(({ data, error }) => {
-        if (error || !data || data.error) return;
+        if (error || !data || data.error) { console.warn('[signal-companion] failed:', error?.message ?? data?.error ?? 'no data'); return; }
         supabase.from('reflections').update({
           signal_title: data.title,
           signal_body: data.body,
