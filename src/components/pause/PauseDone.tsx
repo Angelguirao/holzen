@@ -3,13 +3,26 @@ import { Flame, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useSubscription } from '@/hooks/use-subscription';
 import { PRICING } from '@/lib/pricing';
+import { ScoreImpact } from './ScoreImpact';
+
+interface PauseData {
+  mood: string | null;
+  moodAfter: string | null;
+  breathingCompleted: boolean;
+  decision: string | null;
+  context: string | null;
+  engagedTools: number;
+  wroteNote: boolean;
+  usedTags: boolean;
+}
 
 interface Props {
   decision: string | null;
   onReturn: () => void;
+  pauseData?: PauseData | null;
 }
 
-export function PauseDone({ decision, onReturn }: Props) {
+export function PauseDone({ decision, onReturn, pauseData }: Props) {
   const { t } = useTranslation();
   const { subscribed, monthlyUsed, startCheckout, checkoutLoading } = useSubscription();
 
@@ -64,6 +77,9 @@ export function PauseDone({ decision, onReturn }: Props) {
         <p className="text-sm font-mono text-foreground/50">{t('pause.youChose')}</p>
         <p className="text-xs font-mono text-muted-foreground/30 capitalize">{decision}</p>
       </div>
+
+      {/* Score impact summary */}
+      {pauseData && <ScoreImpact data={pauseData} />}
 
       {/* Gentle upsell when free user hits limit */}
       {justHitLimit && (
