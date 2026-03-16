@@ -479,7 +479,8 @@ export function useHolzen() {
               reflection_id: insertedReflection.id,
             });
           }
-          await supabase.from('library_items').insert(libraryInserts);
+          const { error: libErr } = await supabase.from('library_items').insert(libraryInserts);
+          if (libErr) console.error('[library] reflection+haiku insert failed:', libErr.message);
 
           // Fire-and-forget: pre-generate companion data so it's ready at the Reflect step
           preGenerateCompanions(insertedReflection.id, ctx, msg, language, user.id);
