@@ -443,7 +443,7 @@ function StatsContent({ reflections, practiceEntries = [], memberSince }: { refl
             <ScoreBarInline label={t('profile.moodLabel')} value={scoreData.moodScore} />
             <ScoreBarInline label={t('profile.actionsLabel')} value={scoreData.outcomeScore} />
             <ScoreBarInline label={t('holzenScore.groundingEffect', 'Grounding')} value={scoreData.deltaScore} />
-            <ScoreBarInline label={t('profile.streakLabel')} value={scoreData.streakScore} />
+            
             <ScoreBarInline
               label={t('profile.practiceLabel')}
               value={scoreData.practiceScore}
