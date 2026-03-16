@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowUpRight, ArrowDownRight, Minus, CalendarDays } from 'lucide-react';
 import { ChartEmptyState } from './ChartEmptyState';
+import { detectSkills } from '@/lib/skill-detection';
 import {
   startOfWeek, endOfWeek, subWeeks, startOfMonth, endOfMonth, subMonths,
   parseISO, isWithinInterval, format,
@@ -10,49 +11,108 @@ import {
 interface Reflection {
   created_at: string;
   mood: string | null;
+  mood_after?: string | null;
   outcome: string | null;
+  context?: string | null;
   breathing_completed: boolean;
   haiku_read: boolean;
   learning_read: boolean;
   signal_read?: boolean;
   zoom_out_read?: boolean;
   history_read?: boolean;
+  note?: string | null;
+  tags?: string[] | null;
+  is_favorite?: boolean;
 }
 
 interface Props {
   reflections: Reflection[];
 }
 
-const MOOD_SCORES: Record<string, number> = {
+const COMPOSURE: Record<string, number> = {
   fomo: 10, greedy: 15, anxious: 20, fearful: 25,
   excited: 40, uncertain: 50, detached: 75, calm: 100,
 };
 
+function parseVolatility(context: string | null | undefined): number {
+  if (!context) return 0;
+  const match = context.match(/[↑↓](\d+(?:\.\d+)?)%/);
+  return match ? parseFloat(match[1]) : 0;
+}
+
+function volatilityTier(pct: number): number {
+  if (pct >= 7) return 2;
+  if (pct >= 3) return 1.5;
+  return 1;
+}
+
+function computeSkillScore(r: Reflection): number {
+  const components: number[] = [];
+
+  // Emotional Regulation
+  if (r.mood && r.mood_after && COMPOSURE[r.mood] !== undefined && COMPOSURE[r.mood_after] !== undefined) {
+    const delta = Math.min(100, Math.max(0, 50 + (COMPOSURE[r.mood_after] - COMPOSURE[r.mood])));
+    components.push(delta + (r.breathing_completed ? 10 : 0));
+  }
+
+  // Distress Tolerance
+  const vol = parseVolatility(r.context);
+  if (r.outcome) {
+    const tier = volatilityTier(vol);
+    if (r.outcome === 'held' || r.outcome === 'nothing') {
+      components.push(Math.min(100, 60 + tier * 20));
+    } else if (r.outcome === 'sold') {
+      components.push(Math.max(0, 40 - tier * 15));
+    } else {
+      components.push(45);
+    }
+  }
+
+  // Cognitive Reappraisal
+  const toolsUsed = [r.zoom_out_read, r.history_read, r.signal_read, r.learning_read].filter(Boolean).length;
+  if (toolsUsed > 0) {
+    const volMult = vol >= 3 ? 1.5 : 1;
+    components.push(Math.min(100, (toolsUsed / 4) * 100 * volMult));
+  }
+
+  // Self-Awareness
+  let depth = 0;
+  if (r.note && r.note.length > 10) depth += 50;
+  if (r.tags && r.tags.length > 0) depth += 30;
+  if (r.mood_after) depth += 20;
+  if (depth > 0) components.push(Math.min(100, depth));
+
+  if (components.length === 0) return 50;
+  return Math.max(0, Math.min(100, Math.round(components.reduce((a, c) => a + c, 0) / components.length)));
+}
+
 interface PeriodStats {
   count: number;
   holdRate: number | null;
-  composure: number | null;
-  companionUsage: number | null;
+  skillScore: number | null;
+  skillsPracticed: number | null;
 }
 
 function computeStats(refs: Reflection[]): PeriodStats {
-  if (refs.length === 0) return { count: 0, holdRate: null, composure: null, companionUsage: null };
+  if (refs.length === 0) return { count: 0, holdRate: null, skillScore: null, skillsPracticed: null };
 
   const withOutcome = refs.filter((r) => r.outcome);
   const held = withOutcome.filter((r) => r.outcome === 'held' || r.outcome === 'nothing');
   const holdRate = withOutcome.length > 0 ? held.length / withOutcome.length : null;
 
-  const moods = refs.filter((r) => r.mood && MOOD_SCORES[r.mood] !== undefined);
-  const composure = moods.length > 0
-    ? moods.reduce((s, r) => s + (MOOD_SCORES[r.mood!] ?? 50), 0) / moods.length
+  const scores = refs.map(computeSkillScore);
+  const skillScore = scores.length > 0
+    ? Math.round(scores.reduce((a, c) => a + c, 0) / scores.length)
     : null;
 
-  const withCompanion = refs.filter(
-    (r) => r.breathing_completed || r.haiku_read || r.learning_read || r.signal_read || r.zoom_out_read || r.history_read
-  );
-  const companionUsage = refs.length > 0 ? withCompanion.length / refs.length : null;
+  // Unique skills practiced across all reflections
+  const allSkills = new Set<string>();
+  for (const r of refs) {
+    for (const s of detectSkills(r)) allSkills.add(s);
+  }
+  const skillsPracticed = allSkills.size;
 
-  return { count: refs.length, holdRate, composure, companionUsage };
+  return { count: refs.length, holdRate, skillScore, skillsPracticed };
 }
 
 type View = 'weekly' | 'monthly';
@@ -131,24 +191,24 @@ export function PeriodComparison({ reflections }: Props) {
       deltaFormat: (d: number) => `${d > 0 ? '+' : ''}${d}pp`,
     },
     {
-      label: t('periodComparison.composure'),
-      current: current.composure,
-      previous: previous.composure,
-      format: (v: number) => `${Math.round(v)}`,
-      delta: current.composure !== null && previous.composure !== null
-        ? Math.round(current.composure - previous.composure)
+      label: t('periodComparison.skillScore', 'Skill Score'),
+      current: current.skillScore,
+      previous: previous.skillScore,
+      format: (v: number) => `${v}`,
+      delta: current.skillScore !== null && previous.skillScore !== null
+        ? current.skillScore - previous.skillScore
         : null,
       deltaFormat: (d: number) => `${d > 0 ? '+' : ''}${d}`,
     },
     {
-      label: t('periodComparison.companionUse'),
-      current: current.companionUsage,
-      previous: previous.companionUsage,
-      format: (v: number) => `${Math.round(v * 100)}%`,
-      delta: current.companionUsage !== null && previous.companionUsage !== null
-        ? Math.round((current.companionUsage - previous.companionUsage) * 100)
+      label: t('periodComparison.skillsPracticed', 'Skills Practiced'),
+      current: current.skillsPracticed,
+      previous: previous.skillsPracticed,
+      format: (v: number) => `${v}/5`,
+      delta: current.skillsPracticed !== null && previous.skillsPracticed !== null
+        ? current.skillsPracticed - previous.skillsPracticed
         : null,
-      deltaFormat: (d: number) => `${d > 0 ? '+' : ''}${d}pp`,
+      deltaFormat: (d: number) => `${d > 0 ? '+' : ''}${d}`,
     },
   ];
 
