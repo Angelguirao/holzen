@@ -74,6 +74,24 @@ export type Database = {
         }
         Relationships: []
       }
+      btc_price_cache: {
+        Row: {
+          date: string
+          fetched_at: string
+          price: number
+        }
+        Insert: {
+          date: string
+          fetched_at?: string
+          price: number
+        }
+        Update: {
+          date?: string
+          fetched_at?: string
+          price?: number
+        }
+        Relationships: []
+      }
       changelog_entries: {
         Row: {
           changes: string[]
