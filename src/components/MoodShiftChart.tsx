@@ -148,7 +148,7 @@ export function MoodShiftChart({ reflections }: Props) {
 
       <div className="flex items-center justify-between text-[10px] text-muted-foreground/40">
         <span>
-          {t('statsTrends.moodShiftDescription', 'Before → after composure shift per week. Positive = grounding helped.')}
+          {t('statsTrends.regulationEffectDesc', 'Before → after composure shift per week. Positive = regulation working.')}
         </span>
         <span className="font-mono">
           {totalWithDelta} {t('statsTrends.sessions', 'sessions')}
