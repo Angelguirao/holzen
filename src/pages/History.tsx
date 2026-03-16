@@ -35,31 +35,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
-import { VolatilityTimeline } from '@/components/VolatilityTimeline';
-import { ShareReflection } from '@/components/ShareReflection';
-import { ReflectionNote } from '@/components/ReflectionNote';
-import { ReflectionWallpaper } from '@/components/ReflectionWallpaper';
-import { ReflectionTags } from '@/components/ReflectionTags';
-import { ReflectionComparison } from '@/components/ReflectionComparison';
-import { HaikuDisplay } from '@/components/HaikuDisplay';
-import { LearningInput } from '@/components/LearningInput';
-import { HistoryCalendar, type CalendarActivity, type ActivityType } from '@/components/HistoryCalendar';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Calendar } from '@/components/ui/calendar';
-import { cn } from '@/lib/utils';
-import { toast } from 'sonner';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
 
 interface Reflection {
   id: string;
