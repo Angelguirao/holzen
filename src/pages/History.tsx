@@ -590,7 +590,26 @@ const History = () => {
                     </div>
                   </div>
 
-                  {/* Tag filter */}
+                  {/* Skill filter */}
+                  <div className="space-y-1.5">
+                    <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">{t('history.skill', 'Skill')}</p>
+                    <div className="flex flex-wrap gap-1">
+                      {(['regulation', 'tolerance', 'alignment', 'reappraisal', 'awareness'] as SkillType[]).map((s) => (
+                        <button
+                          key={s}
+                          onClick={() => setSkillFilter(skillFilter === s ? null : s)}
+                          className={`text-[10px] font-mono px-1.5 py-0.5 rounded transition-colors ${
+                            skillFilter === s
+                              ? 'bg-primary/10 text-primary'
+                              : 'border border-border/60 text-muted-foreground hover:text-foreground'
+                          }`}
+                        >
+                          {t(SKILL_LABELS[s])}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                   {allTags.length > 0 && (
                     <div className="space-y-1.5">
                       <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">{t('history.tags')}</p>
