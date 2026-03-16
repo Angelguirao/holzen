@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowUpRight, ArrowDownRight, Minus, CalendarDays } from 'lucide-react';
 import { ChartEmptyState } from './ChartEmptyState';
-import { detectSkills } from '@/lib/skill-detection';
+import { useHolzenScore } from '@/hooks/use-holzen-score';
 import {
   startOfWeek, endOfWeek, subWeeks, startOfMonth, endOfMonth, subMonths,
   parseISO, isWithinInterval, format,
@@ -29,90 +29,20 @@ interface Props {
   reflections: Reflection[];
 }
 
-const COMPOSURE: Record<string, number> = {
-  fomo: 10, greedy: 15, anxious: 20, fearful: 25,
-  excited: 40, uncertain: 50, detached: 75, calm: 100,
-};
-
-function parseVolatility(context: string | null | undefined): number {
-  if (!context) return 0;
-  const match = context.match(/[↑↓](\d+(?:\.\d+)?)%/);
-  return match ? parseFloat(match[1]) : 0;
-}
-
-function volatilityTier(pct: number): number {
-  if (pct >= 7) return 2;
-  if (pct >= 3) return 1.5;
-  return 1;
-}
-
-function computeSkillScore(r: Reflection): number {
-  const components: number[] = [];
-
-  // Emotional Regulation
-  if (r.mood && r.mood_after && COMPOSURE[r.mood] !== undefined && COMPOSURE[r.mood_after] !== undefined) {
-    const delta = Math.min(100, Math.max(0, 50 + (COMPOSURE[r.mood_after] - COMPOSURE[r.mood])));
-    components.push(delta + (r.breathing_completed ? 10 : 0));
-  }
-
-  // Distress Tolerance
-  const vol = parseVolatility(r.context);
-  if (r.outcome) {
-    const tier = volatilityTier(vol);
-    if (r.outcome === 'held' || r.outcome === 'nothing') {
-      components.push(Math.min(100, 60 + tier * 20));
-    } else if (r.outcome === 'sold') {
-      components.push(Math.max(0, 40 - tier * 15));
-    } else {
-      components.push(45);
-    }
-  }
-
-  // Cognitive Reappraisal
-  const toolsUsed = [r.zoom_out_read, r.history_read, r.signal_read, r.learning_read].filter(Boolean).length;
-  if (toolsUsed > 0) {
-    const volMult = vol >= 3 ? 1.5 : 1;
-    components.push(Math.min(100, (toolsUsed / 4) * 100 * volMult));
-  }
-
-  // Self-Awareness
-  let depth = 0;
-  if (r.note && r.note.length > 10) depth += 50;
-  if (r.tags && r.tags.length > 0) depth += 30;
-  if (r.mood_after) depth += 20;
-  if (depth > 0) components.push(Math.min(100, depth));
-
-  if (components.length === 0) return 50;
-  return Math.max(0, Math.min(100, Math.round(components.reduce((a, c) => a + c, 0) / components.length)));
-}
-
 interface PeriodStats {
   count: number;
   holdRate: number | null;
-  skillScore: number | null;
-  skillsPracticed: number | null;
+  score: number | null;
 }
 
-function computeStats(refs: Reflection[]): PeriodStats {
-  if (refs.length === 0) return { count: 0, holdRate: null, skillScore: null, skillsPracticed: null };
+function computeStats(refs: Reflection[]): Omit<PeriodStats, 'score'> {
+  if (refs.length === 0) return { count: 0, holdRate: null };
 
   const withOutcome = refs.filter((r) => r.outcome);
   const held = withOutcome.filter((r) => r.outcome === 'held' || r.outcome === 'nothing');
   const holdRate = withOutcome.length > 0 ? held.length / withOutcome.length : null;
 
-  const scores = refs.map(computeSkillScore);
-  const skillScore = scores.length > 0
-    ? Math.round(scores.reduce((a, c) => a + c, 0) / scores.length)
-    : null;
-
-  // Unique skills practiced across all reflections
-  const allSkills = new Set<string>();
-  for (const r of refs) {
-    for (const s of detectSkills(r)) allSkills.add(s);
-  }
-  const skillsPracticed = allSkills.size;
-
-  return { count: refs.length, holdRate, skillScore, skillsPracticed };
+  return { count: refs.length, holdRate };
 }
 
 type View = 'weekly' | 'monthly';
