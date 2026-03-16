@@ -621,6 +621,8 @@ function ScoreBarInline({ label, value, detail }: { label: string; value: number
     </div>
   );
 }
+
+function StatsSection({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-4">
       <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground border-b border-border/40 pb-1.5">
