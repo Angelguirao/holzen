@@ -77,8 +77,8 @@ export function MoodShiftChart({ reflections }: Props) {
   if (data.length < 2) {
     return (
       <ChartEmptyState
-        title={t('statsTrends.moodShift', 'Grounding Effect')}
-        message={t('statsTrends.moodShiftEmpty', 'Complete sessions with both mood checks across 2 weeks to see how grounding shifts your composure.')}
+        title={t('statsTrends.regulationEffect', 'Regulation Effect')}
+        message={t('statsTrends.regulationEffectEmpty', 'Complete sessions with both mood checks across 2 weeks to see how your regulation skills shift composure.')}
         current={data.length}
         needed={2}
       />
@@ -92,7 +92,7 @@ export function MoodShiftChart({ reflections }: Props) {
     <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3">
       <div className="flex items-center justify-between">
         <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
-          {t('statsTrends.moodShift', 'Grounding Effect')}
+          {t('statsTrends.regulationEffect', 'Regulation Effect')}
         </p>
         <span className={`text-[10px] font-mono px-2 py-0.5 rounded bg-muted/50 ${
           avgDelta > 0 ? 'text-primary' : avgDelta < 0 ? 'text-destructive' : 'text-muted-foreground'
@@ -148,7 +148,7 @@ export function MoodShiftChart({ reflections }: Props) {
 
       <div className="flex items-center justify-between text-[10px] text-muted-foreground/40">
         <span>
-          {t('statsTrends.moodShiftDescription', 'Before → after composure shift per week. Positive = grounding helped.')}
+          {t('statsTrends.regulationEffectDesc', 'Before → after composure shift per week. Positive = regulation working.')}
         </span>
         <span className="font-mono">
           {totalWithDelta} {t('statsTrends.sessions', 'sessions')}
