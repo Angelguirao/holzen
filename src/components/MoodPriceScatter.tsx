@@ -113,7 +113,7 @@ export const MoodPriceScatter = forwardRef<HTMLDivElement, Props>(function MoodP
               }}
               labelFormatter={() => ''}
             />
-            <Scatter data={points} name={t('moodCharts.reflections')}>
+            <Scatter data={points} name={t('moodCharts.pauses', 'Pauses')}>
               {points.map((p, i) => (
                 <Cell key={i} fill={MOOD_COLORS[p.mood] ?? 'hsl(var(--muted-foreground))'} fillOpacity={0.6} r={4} />
               ))}
