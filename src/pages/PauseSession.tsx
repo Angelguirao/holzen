@@ -95,6 +95,11 @@ export default function PauseSession() {
   const [selectedMood, setSelectedMood] = useState<MoodValue | null>(restored?.selectedMood ?? null);
   const [selectedMoodAfter, setSelectedMoodAfter] = useState<MoodValue | null>(restored?.selectedMoodAfter ?? null);
   const [curtainLifted, setCurtainLifted] = useState(false);
+  const [pauseImpactData, setPauseImpactData] = useState<{
+    mood: string | null; moodAfter: string | null; breathingCompleted: boolean;
+    decision: string | null; context: string | null; engagedTools: number;
+    wroteNote: boolean; usedTags: boolean;
+  } | null>(null);
 
   // Persist session
   useEffect(() => {
