@@ -123,22 +123,12 @@ export function PeriodComparison({ reflections }: Props) {
       deltaFormat: (d: number) => `${d > 0 ? '+' : ''}${d}pp`,
     },
     {
-      label: t('periodComparison.skillScore', 'Skill Score'),
-      current: current.skillScore,
-      previous: previous.skillScore,
+      label: t('periodComparison.composureScore', 'Score'),
+      current: currentScore?.score ?? null,
+      previous: previousScore?.score ?? null,
       format: (v: number) => `${v}`,
-      delta: current.skillScore !== null && previous.skillScore !== null
-        ? current.skillScore - previous.skillScore
-        : null,
-      deltaFormat: (d: number) => `${d > 0 ? '+' : ''}${d}`,
-    },
-    {
-      label: t('periodComparison.skillsPracticed', 'Skills Practiced'),
-      current: current.skillsPracticed,
-      previous: previous.skillsPracticed,
-      format: (v: number) => `${v}/5`,
-      delta: current.skillsPracticed !== null && previous.skillsPracticed !== null
-        ? current.skillsPracticed - previous.skillsPracticed
+      delta: currentScore && previousScore
+        ? currentScore.score - previousScore.score
         : null,
       deltaFormat: (d: number) => `${d > 0 ? '+' : ''}${d}`,
     },
