@@ -1070,10 +1070,12 @@
     "improving": "Improving",
     "declining": "Declining",
     "stable": "Stable",
-    "mood": "Mood",
-    "actions": "Actions",
-    "streak": "Streak",
-    "basedOn": "Based on your last 30 pauses. Higher is calmer."
+    "emotionalRegulation": "Regulation",
+    "distressTolerance": "Tolerance",
+    "decisionAlignment": "Alignment",
+    "cognitiveReappraisal": "Reappraisal",
+    "selfAwareness": "Awareness",
+    "basedOnSkills": "Based on your last 30 pauses. Measures composure skills, not feelings."
   },
   "ritualFlow": {
     "rememberWhy": "Remember why you hold",

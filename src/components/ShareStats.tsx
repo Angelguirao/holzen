@@ -18,7 +18,7 @@ function buildShareText({ reflectionCount, scoreData, moodCounts }: Props, t: (k
 
   if (scoreData) {
     lines.push(`🎯 ${t('share.holzenScoreShare', { score: scoreData.score, trend: scoreData.trend })}`);
-    lines.push(`  ${t('profile.moodLabel')} ${scoreData.moodScore} · ${t('profile.actionsLabel')} ${scoreData.outcomeScore} · ${t('holzenScore.groundingEffect', 'Grounding')} ${scoreData.deltaScore}`);
+    lines.push(`  ${t('holzenScore.emotionalRegulation', 'Regulation')} ${scoreData.emotionalRegulation} · ${t('holzenScore.distressTolerance', 'Tolerance')} ${scoreData.distressTolerance} · ${t('holzenScore.selfAwareness', 'Awareness')} ${scoreData.selfAwareness}`);
   }
 
   const entries = Object.entries(moodCounts).filter(([, c]) => c > 0);
