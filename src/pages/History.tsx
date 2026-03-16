@@ -336,6 +336,9 @@ const History = () => {
     if (moodFilter) {
       result = result.filter((r) => r.mood === moodFilter);
     }
+    if (skillFilter) {
+      result = result.filter((r) => detectSkills(r).includes(skillFilter));
+    }
     if (dateFrom) {
       result = result.filter((r) => isAfter(new Date(r.created_at), startOfDay(dateFrom)));
     }
@@ -349,7 +352,7 @@ const History = () => {
       );
     }
     return result;
-  }, [reflections, filter, tagFilter, moodFilter, dateFrom, dateTo, search]);
+  }, [reflections, filter, tagFilter, moodFilter, skillFilter, dateFrom, dateTo, search]);
 
   const filteredRecent = useMemo(() => {
     let result = recentReflections;
