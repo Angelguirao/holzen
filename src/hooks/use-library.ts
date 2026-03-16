@@ -69,30 +69,40 @@ export function useLibrary() {
     setCollectionItems((colItemsData as unknown as CollectionItem[]) ?? []);
     setLoading(false);
 
-    // One-time backfill: import reflections not yet in library
-    const existingRefIds = new Set(
-      libItems.filter((i) => i.source_type === 'reflection' && i.reflection_id).map((i) => i.reflection_id)
+    // One-time backfill: import reflections and their companions not yet in library
+    const existingKeys = new Set(
+      libItems.filter((i) => i.reflection_id).map((i) => `${i.reflection_id}:${i.source_type}`)
     );
     const { data: allReflections } = await supabase
       .from('reflections')
-      .select('id, message, context, created_at, haiku')
+      .select('id, message, context, created_at, haiku, learning_title, learning_body, learning_url, signal_title, signal_body, signal_source, signal_url, zoom_out_data, history_insight_data')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
     if (allReflections && allReflections.length > 0) {
-      const missing = allReflections.filter((r: any) => !existingRefIds.has(r.id));
-      if (missing.length > 0) {
-        const inserts = missing.map((r: any) => ({
-          user_id: user.id,
-          type: 'bookmark',
-          title: 'Reflection',
-          body: r.message,
-          source_type: 'reflection',
-          reflection_id: r.id,
-          tags: ['reflection'],
-          created_at: r.created_at,
-        }));
-        await supabase.from('library_items').insert(inserts as any);
-        // Re-fetch to include backfilled items
+      const inserts: any[] = [];
+      for (const r of allReflections as any[]) {
+        if (!existingKeys.has(`${r.id}:reflection`)) {
+          inserts.push({ user_id: user.id, type: 'bookmark', title: 'Reflection', body: r.message, source_type: 'reflection', reflection_id: r.id, tags: ['reflection'], created_at: r.created_at });
+        }
+        if (r.haiku && !existingKeys.has(`${r.id}:haiku`)) {
+          inserts.push({ user_id: user.id, type: 'bookmark', title: 'Haiku', body: r.haiku, source_type: 'haiku', reflection_id: r.id, created_at: r.created_at });
+        }
+        if (r.signal_source && !existingKeys.has(`${r.id}:signal`)) {
+          inserts.push({ user_id: user.id, type: 'bookmark', title: r.signal_title, body: r.signal_body, source_type: 'signal', source_url: r.signal_url, reflection_id: r.id, created_at: r.created_at });
+        }
+        if (r.learning_title && !existingKeys.has(`${r.id}:learning`)) {
+          inserts.push({ user_id: user.id, type: 'bookmark', title: r.learning_title, body: r.learning_body, source_type: 'learning', source_url: r.learning_url, reflection_id: r.id, created_at: r.created_at });
+        }
+        if (r.zoom_out_data && !existingKeys.has(`${r.id}:zoom_out`)) {
+          inserts.push({ user_id: user.id, type: 'bookmark', title: 'Zoom Out', body: typeof r.zoom_out_data === 'object' ? JSON.stringify(r.zoom_out_data) : String(r.zoom_out_data), source_type: 'zoom_out', reflection_id: r.id, created_at: r.created_at });
+        }
+        if (r.history_insight_data && !existingKeys.has(`${r.id}:history_insight`)) {
+          const hd = r.history_insight_data as any;
+          inserts.push({ user_id: user.id, type: 'bookmark', title: hd.title ?? 'History Insight', body: hd.btcInsight ?? '', source_type: 'history_insight', reflection_id: r.id, created_at: r.created_at });
+        }
+      }
+      if (inserts.length > 0) {
+        await supabase.from('library_items').insert(inserts);
         const { data: refreshed } = await supabase
           .from('library_items')
           .select('*')
