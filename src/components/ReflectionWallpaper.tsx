@@ -122,6 +122,10 @@ export function ReflectionWallpaper({ message, mood, context, haiku, variant = '
         body: { message, mood, context },
       });
 
+      // Check for limit errors (returned as 429 with error body)
+      if (data?.error === 'monthly_wallpaper_limit') {
+        throw new Error(data.message || 'monthly_wallpaper_limit');
+      }
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
 
