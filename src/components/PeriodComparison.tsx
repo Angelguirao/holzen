@@ -123,7 +123,7 @@ export function PeriodComparison({ reflections, holdGoal }: Props) {
       deltaFormat: (d: number) => `${d > 0 ? '+' : ''}${d}`,
     },
     {
-      label: t('periodComparison.holdRate'),
+      label: t('periodComparison.holdRate', 'Hold rate'),
       current: current.holdRate,
       previous: previous.holdRate,
       format: (v: number) => `${Math.round(v * 100)}%`,
@@ -133,34 +133,14 @@ export function PeriodComparison({ reflections, holdGoal }: Props) {
       deltaFormat: (d: number) => `${d > 0 ? '+' : ''}${d}pp`,
     },
     {
-      label: t('periodComparison.avgComposure', 'Composure'),
-      current: current.avgComposure,
-      previous: previous.avgComposure,
-      format: (v: number) => `${Math.round(v)}`,
-      delta: current.avgComposure !== null && previous.avgComposure !== null
-        ? Math.round(current.avgComposure - previous.avgComposure)
+      label: t('periodComparison.calmExits', 'Calm exits'),
+      current: current.calmExitRate,
+      previous: previous.calmExitRate,
+      format: (v: number) => `${Math.round(v * 100)}%`,
+      delta: current.calmExitRate !== null && previous.calmExitRate !== null
+        ? Math.round((current.calmExitRate - previous.calmExitRate) * 100)
         : null,
-      deltaFormat: (d: number) => `${d > 0 ? '+' : ''}${d}`,
-    },
-    {
-      label: t('periodComparison.toolsUsed', 'Tools/pause'),
-      current: current.toolsUsed,
-      previous: previous.toolsUsed,
-      format: (v: number) => `${v.toFixed(1)}`,
-      delta: current.toolsUsed !== null && previous.toolsUsed !== null
-        ? current.toolsUsed - previous.toolsUsed
-        : null,
-      deltaFormat: (d: number) => `${d > 0 ? '+' : ''}${d.toFixed(1)}`,
-    },
-    {
-      label: t('periodComparison.composureScorePeriod', 'Period Score'),
-      current: currentScore?.score ?? null,
-      previous: previousScore?.score ?? null,
-      format: (v: number) => `${v}`,
-      delta: currentScore && previousScore
-        ? currentScore.score - previousScore.score
-        : null,
-      deltaFormat: (d: number) => `${d > 0 ? '+' : ''}${d}`,
+      deltaFormat: (d: number) => `${d > 0 ? '+' : ''}${d}pp`,
     },
   ];
 
