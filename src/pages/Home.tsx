@@ -594,10 +594,10 @@ const Home = () => {
                   </div>
                   <button
                     onClick={handleStartGround}
-                    className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-primary/30 bg-primary/10 hover:bg-primary/15 transition-colors duration-500"
+                    className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-border/40 bg-muted/30 hover:bg-muted/50 transition-colors duration-500"
                   >
-                    <Anchor className="h-3 w-3 text-primary/70" />
-                    <span className="text-[10px] font-mono tracking-[0.15em] uppercase text-primary/70">
+                    <Anchor className="h-3 w-3 text-muted-foreground/60" />
+                    <span className="text-[10px] font-mono tracking-[0.15em] uppercase text-muted-foreground/60">
                       {t('home.groundYourself', 'Ground yourself')}
                     </span>
                   </button>
