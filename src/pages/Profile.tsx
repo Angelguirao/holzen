@@ -341,7 +341,7 @@ const Profile = () => {
   );
 };
 
-function StatsContent({ reflections, practiceEntries = [], memberSince, holdGoal }: { reflections: Reflection[]; practiceEntries?: PracticeEntry[]; memberSince?: string; holdGoal?: { type: string | null; targetMonths: number | null; targetPrice: number | null; start: string | null } | null }) {
+function StatsContent({ reflections, practiceEntries = [], letters = [], memberSince, holdGoal }: { reflections: Reflection[]; practiceEntries?: PracticeEntry[]; letters?: Letter[]; memberSince?: string; holdGoal?: { type: string | null; targetMonths: number | null; targetPrice: number | null; start: string | null } | null }) {
   const { t } = useTranslation();
   const scoreData = useHolzenScore(reflections, [], practiceEntries, holdGoal);
 
