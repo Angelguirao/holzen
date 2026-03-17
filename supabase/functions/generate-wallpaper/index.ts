@@ -31,7 +31,7 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
       { auth: { persistSession: false } }
     );
-    await svcClient.from("analytics_events").insert({ user_id: user.id, event: "wallpaper_generation" }).catch(() => {});
+    try { await svcClient.from("analytics_events").insert({ user_id: user.id, event: "wallpaper_generation" }); } catch (_) { /* non-fatal */ }
 
     const { message, mood, context } = await req.json();
     if (!message) throw new Error("Missing reflection message");
