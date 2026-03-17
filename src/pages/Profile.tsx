@@ -532,7 +532,7 @@ function StatsContent({ reflections, practiceEntries = [], memberSince, holdGoal
       {/* Section: Your Journey */}
       <StatsSection label={t('profile.sectionJourney', 'Your Journey')}>
         <JourneyWidget reflections={reflections} practiceEntries={practiceEntries} memberSince={memberSince} />
-        <MilestoneTimeline reflections={reflections} practiceEntries={practiceEntries} memberSince={memberSince} />
+        <MilestoneTimeline reflections={reflections} practiceEntries={practiceEntries} letters={letters} memberSince={memberSince} />
       </StatsSection>
 
       {/* Section: Progress */}
