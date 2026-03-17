@@ -47,7 +47,7 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
       { auth: { persistSession: false } }
     );
-    await svcClient.from("analytics_events").insert({ user_id: userId, event: "pause_ai_call" }).catch(() => {});
+    try { await svcClient.from("analytics_events").insert({ user_id: userId, event: "pause_ai_call" }); } catch (_) { /* tracking failure is non-fatal */ }
 
     const { context, tone, customPrompt, style, moodHistory, severity, motivations, mantra, groundingActivities, currency, language } = await req.json();
     if (!context) {
