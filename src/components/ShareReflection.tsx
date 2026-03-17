@@ -168,10 +168,10 @@ export const ShareReflection = forwardRef<HTMLButtonElement, Props>(
     const { t } = useTranslation();
 
     const copyText = useCallback(async () => {
-      const text = buildShareText(message, context);
+      const text = buildShareText(message);
       await navigator.clipboard.writeText(text);
       toast(t('share.copied'));
-    }, [message, context, t]);
+    }, [message, t]);
 
     const shareImage = useCallback(async () => {
       try {
@@ -200,22 +200,22 @@ export const ShareReflection = forwardRef<HTMLButtonElement, Props>(
     }, [message, context, haiku, t]);
 
     const shareToX = useCallback(() => {
-      const text = buildShareText(message, context);
+      const text = buildShareText(message);
       const url = `https://x.com/intent/tweet?text=${encodeURIComponent(text)}`;
       window.open(url, '_blank', 'noopener,noreferrer');
-    }, [message, context]);
+    }, [message]);
 
     const shareToWhatsApp = useCallback(() => {
-      const text = buildShareText(message, context);
+      const text = buildShareText(message);
       const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
       window.open(url, '_blank', 'noopener,noreferrer');
-    }, [message, context]);
+    }, [message]);
 
     const shareToTelegram = useCallback(() => {
-      const text = buildShareText(message, context);
+      const text = buildShareText(message);
       const url = `https://t.me/share/url?url=${encodeURIComponent('https://holzen.lovable.app')}&text=${encodeURIComponent(text)}`;
       window.open(url, '_blank', 'noopener,noreferrer');
-    }, [message, context]);
+    }, [message]);
 
     return (
       <DropdownMenu>
