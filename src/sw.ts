@@ -28,13 +28,20 @@ registerRoute(
 self.addEventListener("push", (event) => {
   const data = event.data?.json() ?? {};
   const title = data.title || "Holzen";
+
+  // Build deep-link URL: navigate to Home with pause=ready flag
+  const baseUrl = self.registration.scope.replace(/\/$/, "");
+  const targetUrl = data.action === "pause_ready"
+    ? `${baseUrl}/?pause=ready`
+    : baseUrl;
+
   const options = {
     body: data.body || "A moment to pause.",
     icon: "/icon-512.png",
     badge: "/icon-512.png",
     tag: "holzen-reflection",
     renotify: true,
-    data: { url: self.registration.scope },
+    data: { url: targetUrl, reflectionId: data.reflectionId ?? null },
   } as NotificationOptions & { renotify: boolean };
 
   event.waitUntil(self.registration.showNotification(title, options));
