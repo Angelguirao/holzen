@@ -144,6 +144,11 @@ const Home = () => {
 
   // Grounding suggestion state (mirrors pause message pattern)
   const groundStorageKey = user ? `holzen_ground_suggestion_${user.id}` : 'holzen_ground_suggestion';
+  const groundDismissedKey = user ? `holzen_ground_dismissed_${user.id}` : 'holzen_ground_dismissed';
+  const groundDismissedRef = useRef(() => {
+    try { return localStorage.getItem(groundDismissedKey) === 'true'; } catch { return false; }
+  });
+  const [groundDismissed, setGroundDismissed] = useState(() => groundDismissedRef.current());
   const [groundSuggestion, setGroundSuggestion] = useState<GroundingSuggestion | null>(() => {
     try {
       const stored = localStorage.getItem(user ? `holzen_ground_suggestion_${user.id}` : 'holzen_ground_suggestion');
@@ -229,7 +234,9 @@ const Home = () => {
   const dismissGroundSuggestion = useCallback(() => {
     setGroundSuggestion(null);
     localStorage.removeItem(groundStorageKey);
-  }, [groundStorageKey]);
+    setGroundDismissed(true);
+    localStorage.setItem(groundDismissedKey, 'true');
+  }, [groundStorageKey, groundDismissedKey]);
 
   const handleStartGround = useCallback(() => {
     navigate('/ground', { state: { preGenerated: groundSuggestion } });
@@ -246,13 +253,24 @@ const Home = () => {
     prefetchNotificationTone();
   }, []);
 
+  // Reset grounding dismissed flag when a new pause message arrives (new volatility cycle)
+  const prevMessageRef = useRef(message);
+  useEffect(() => {
+    if (message && !prevMessageRef.current) {
+      // A new pause just appeared — reset dismissed so grounding can auto-suggest after pause
+      setGroundDismissed(false);
+      localStorage.removeItem(groundDismissedKey);
+    }
+    prevMessageRef.current = message;
+  }, [message, groundDismissedKey]);
+
   // Pre-generate grounding suggestion when thresholds are met (mirrors pause pre-generation)
   useEffect(() => {
     if (!user || !profileLoaded || !subscribed || !btcData || groundingActivities.length === 0) return;
     // Don't pre-generate if there's an active pause message (pause takes priority)
     if (message) return;
-    // Don't pre-generate if we already have a cached suggestion or are already fetching
-    if (groundSuggestion || groundFetchingRef.current) return;
+    // Don't pre-generate if user already dismissed this session, or we already have one
+    if (groundDismissed || groundSuggestion || groundFetchingRef.current) return;
 
     const effectiveThreshold = btcData.changePercent < 0 ? thresholdDown : threshold;
     const dailyTriggered = Math.abs(btcData.changePercent) >= effectiveThreshold;
@@ -284,7 +302,7 @@ const Home = () => {
       setGroundLoading(false);
       groundFetchingRef.current = false;
     });
-  }, [user, profileLoaded, subscribed, btcData, message, groundSuggestion, groundingActivities, threshold, thresholdDown, cumulativeThreshold, severity, language, groundStorageKey]);
+  }, [user, profileLoaded, subscribed, btcData, message, groundDismissed, groundSuggestion, groundingActivities, threshold, thresholdDown, cumulativeThreshold, severity, language, groundStorageKey]);
 
   useEffect(() => {
     document.title = 'Holzen — Home';
@@ -555,11 +573,12 @@ const Home = () => {
         const shouldNudgeGround = followsPauseThresholds && subscribed && !message;
         const hasPreview = groundSuggestion !== null;
         // Ground should NEVER glow when an active pause message exists — pause is always the hero
-        const showGlow = !message && (shouldNudgeGround || hasPreview);
+        // Even without pause, grounding glow is deliberately subtle to not steal focus
+        const showGlow = !message && hasPreview;
         const glowClass = showGlow
-          ? 'ring-1 ring-primary/15 shadow-[0_0_20px_-4px_hsl(var(--primary)/0.12)]'
+          ? 'ring-1 ring-border/20'
           : '';
-        const effectiveCollapsed = showGlow ? false : collapsed['ground'];
+        const effectiveCollapsed = hasPreview ? false : collapsed['ground'];
 
         return (
           <HomeWidget
