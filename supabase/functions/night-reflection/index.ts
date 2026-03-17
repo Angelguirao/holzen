@@ -265,6 +265,8 @@ serve(async (req) => {
       // Try AI generation, fall back to static
       let message: string;
       if (LOVABLE_API_KEY) {
+        // Track AI usage
+        try { await supabase.from("analytics_events").insert({ user_id: profile.user_id, event: "night_reflection_ai_call" }); } catch (_) { /* non-fatal */ }
         const aiMessage = await generateAIMessage(
           LOVABLE_API_KEY,
           userLang,
