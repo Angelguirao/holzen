@@ -17,10 +17,8 @@ interface Props {
   haiku?: string | null;
 }
 
-function buildShareText(message: string, context?: string | null): string {
-  return context
-    ? `${context}\n\n${message}\n\n— Holzen\nholzen.lovable.app`
-    : `${message}\n\n— Holzen\nholzen.lovable.app`;
+function buildShareText(message: string): string {
+  return `${message}\n\n— Holzen\nholzen.lovable.app`;
 }
 
 function wrapText(
