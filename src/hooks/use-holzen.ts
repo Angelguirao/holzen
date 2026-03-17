@@ -611,6 +611,38 @@ export function useHolzen() {
       .eq('user_id', user.id);
   }, [user]);
 
+  /** Re-read profile from DB — used when realtime detects a server-side trigger */
+  const refreshProfile = useCallback(async () => {
+    if (!user) return;
+    const { data } = await supabase
+      .from('profiles')
+      .select('last_message, last_context')
+      .eq('user_id', user.id)
+      .single();
+    if (!data) return;
+    if (data.last_message && data.last_message !== message) {
+      setMessage(data.last_message);
+      setContext(data.last_context);
+      setNewReflection(true);
+      // Also load companion data from latest reflection
+      const { data: latest } = await supabase
+        .from('reflections')
+        .select('id, haiku, learning_title, learning_body')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+      if (latest) {
+        setLastReflectionId(latest.id);
+        setCompanions({
+          haiku: latest.haiku ?? null,
+          learningTitle: latest.learning_title ?? null,
+          learningBody: latest.learning_body ?? null,
+        });
+      }
+    }
+  }, [user, message]);
+
   // Compute severity from btcData
   const severity: 'mild' | 'moderate' | 'high' = btcData
     ? Math.abs(btcData.changePercent) >= 10 ? 'high'
