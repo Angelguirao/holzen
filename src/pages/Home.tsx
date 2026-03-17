@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { usePullToRefresh } from '@/hooks/use-pull-to-refresh';
+import { useOutletContext } from 'react-router-dom';
 import { useHolzen } from '@/hooks/use-holzen';
 import { TestimonialRequest } from '@/components/TestimonialRequest';
 import { LetterToFutureSelf } from '@/components/LetterToFutureSelf';
@@ -116,7 +117,21 @@ const Home = () => {
     cumulativeThreshold,
     language,
     profileLoaded,
+    refreshProfile,
   } = useHolzen();
+
+  // Consume auto-trigger context from AppLayout
+  const outletCtx = useOutletContext<{ pauseReady?: boolean; dismissPauseReady?: () => void }>();
+  const pauseReady = outletCtx?.pauseReady ?? false;
+  const dismissPauseReady = outletCtx?.dismissPauseReady;
+
+  // When realtime detects a server-side trigger, refresh profile to get new message
+  useEffect(() => {
+    if (pauseReady && !message && !loading) {
+      refreshProfile();
+      dismissPauseReady?.();
+    }
+  }, [pauseReady, message, loading, refreshProfile, dismissPauseReady]);
 
   const { reflection: nightReflection, dismiss: dismissNight } = useNightReflection();
 
@@ -539,7 +554,8 @@ const Home = () => {
 
         const shouldNudgeGround = followsPauseThresholds && subscribed && !message;
         const hasPreview = groundSuggestion !== null;
-        const showGlow = shouldNudgeGround || hasPreview;
+        // Ground should NEVER glow when an active pause message exists — pause is always the hero
+        const showGlow = !message && (shouldNudgeGround || hasPreview);
         const glowClass = showGlow
           ? 'ring-1 ring-primary/15 shadow-[0_0_20px_-4px_hsl(var(--primary)/0.12)]'
           : '';
@@ -578,10 +594,10 @@ const Home = () => {
                   </div>
                   <button
                     onClick={handleStartGround}
-                    className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-primary/30 bg-primary/10 hover:bg-primary/15 transition-colors duration-500"
+                    className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-border/40 bg-muted/30 hover:bg-muted/50 transition-colors duration-500"
                   >
-                    <Anchor className="h-3 w-3 text-primary/70" />
-                    <span className="text-[10px] font-mono tracking-[0.15em] uppercase text-primary/70">
+                    <Anchor className="h-3 w-3 text-muted-foreground/60" />
+                    <span className="text-[10px] font-mono tracking-[0.15em] uppercase text-muted-foreground/60">
                       {t('home.groundYourself', 'Ground yourself')}
                     </span>
                   </button>
