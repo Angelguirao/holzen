@@ -28,6 +28,10 @@ serve(async (req) => {
       });
     }
 
+    // Track AI usage
+    const svcClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false } });
+    try { await svcClient.from("analytics_events").insert({ user_id: user.id, event: "journal_prompt_ai_call" }); } catch (_) { /* non-fatal */ }
+
     const { language } = await req.json().catch(() => ({ language: "en" }));
 
     // Fetch recent reflections for context
