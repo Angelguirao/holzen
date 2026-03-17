@@ -264,7 +264,7 @@ const Profile = () => {
             <Skeleton className="h-40 w-full rounded-md" />
           </div>
         ) : (
-          <StatsContent reflections={reflections} practiceEntries={practiceEntries} memberSince={user?.created_at} holdGoal={holdGoal} />
+          <StatsContent reflections={reflections} practiceEntries={practiceEntries} letters={letters} memberSince={user?.created_at} holdGoal={holdGoal} />
         )
       ) : tab === 'insights' ? (
         <ProLock feature="ai_insights" hideContent>
@@ -341,7 +341,7 @@ const Profile = () => {
   );
 };
 
-function StatsContent({ reflections, practiceEntries = [], memberSince, holdGoal }: { reflections: Reflection[]; practiceEntries?: PracticeEntry[]; memberSince?: string; holdGoal?: { type: string | null; targetMonths: number | null; targetPrice: number | null; start: string | null } | null }) {
+function StatsContent({ reflections, practiceEntries = [], letters = [], memberSince, holdGoal }: { reflections: Reflection[]; practiceEntries?: PracticeEntry[]; letters?: Letter[]; memberSince?: string; holdGoal?: { type: string | null; targetMonths: number | null; targetPrice: number | null; start: string | null } | null }) {
   const { t } = useTranslation();
   const scoreData = useHolzenScore(reflections, [], practiceEntries, holdGoal);
 
@@ -532,7 +532,7 @@ function StatsContent({ reflections, practiceEntries = [], memberSince, holdGoal
       {/* Section: Your Journey */}
       <StatsSection label={t('profile.sectionJourney', 'Your Journey')}>
         <JourneyWidget reflections={reflections} practiceEntries={practiceEntries} memberSince={memberSince} />
-        <MilestoneTimeline reflections={reflections} practiceEntries={practiceEntries} memberSince={memberSince} />
+        <MilestoneTimeline reflections={reflections} practiceEntries={practiceEntries} letters={letters} memberSince={memberSince} />
       </StatsSection>
 
       {/* Section: Progress */}
