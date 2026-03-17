@@ -24,6 +24,15 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
+    // Track AI usage
+    const userId = claimsData.claims.sub as string;
+    const svcClient = (await import("npm:@supabase/supabase-js@2.57.2")).createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { auth: { persistSession: false } }
+    );
+    try { await svcClient.from("analytics_events").insert({ user_id: userId, event: "historical_insight_ai_call" }); } catch (_) { /* non-fatal */ }
+
     const { context, language } = await req.json();
 
     const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
