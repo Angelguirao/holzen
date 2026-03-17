@@ -531,64 +531,58 @@ function StatsContent({ reflections, practiceEntries = [], memberSince, holdGoal
 
       {/* Section: Your Journey */}
       <StatsSection label={t('profile.sectionJourney', 'Your Journey')}>
+        <JourneyWidget reflections={reflections} practiceEntries={practiceEntries} memberSince={memberSince} />
         <MilestoneTimeline reflections={reflections} practiceEntries={practiceEntries} memberSince={memberSince} />
-        {practiceStats && (() => {
-          const totalMin = Math.round(practiceStats.totalSeconds / 60);
-          const maxW = Math.max(...practiceStats.weeks, 1);
-          return (
-            <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-3">
-              <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
-                {t('profile.practiceActivity')}
-              </p>
+      </StatsSection>
 
-              {/* Summary row */}
-              <div className="flex items-baseline gap-4">
-                <div>
-                  <span className="text-lg font-mono font-medium">{practiceStats.total}</span>
-                  <span className="text-[9px] font-mono text-muted-foreground/50 ml-1">{t('profile.sessions', 'sessions')}</span>
-                </div>
-                {totalMin > 0 && (
+      {/* Section: Progress */}
+      <ProLock feature="decisions">
+        <StatsSection label={t('profile.sectionProgress', 'Progress')}>
+          <PeriodComparison reflections={reflections} holdGoal={holdGoal} />
+          <StatsTrends reflections={reflections} />
+          {practiceStats && (() => {
+            const totalMin = Math.round(practiceStats.totalSeconds / 60);
+            const maxW = Math.max(...practiceStats.weeks, 1);
+            return (
+              <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-3">
+                <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
+                  {t('profile.practiceActivity')}
+                </p>
+                <div className="flex items-baseline gap-4">
                   <div>
-                    <span className="text-lg font-mono font-medium">{totalMin}</span>
-                    <span className="text-[9px] font-mono text-muted-foreground/50 ml-1">min</span>
+                    <span className="text-lg font-mono font-medium">{practiceStats.total}</span>
+                    <span className="text-[9px] font-mono text-muted-foreground/50 ml-1">{t('profile.sessions', 'sessions')}</span>
                   </div>
-                )}
-              </div>
-
-              {/* Weekly sparkline */}
-              <div className="space-y-1">
-                <p className="text-[9px] font-mono text-muted-foreground/40">{t('profile.last8Weeks', 'Last 8 weeks')}</p>
-                <div className="flex items-end gap-[3px] h-6">
-                  {practiceStats.weeks.map((w, i) => (
-                    <div
-                      key={i}
-                      className="flex-1 rounded-sm bg-primary/60 transition-all"
-                      style={{ height: `${Math.max((w / maxW) * 100, w > 0 ? 12 : 4)}%`, opacity: w > 0 ? 1 : 0.15 }}
-                    />
+                  {totalMin > 0 && (
+                    <div>
+                      <span className="text-lg font-mono font-medium">{totalMin}</span>
+                      <span className="text-[9px] font-mono text-muted-foreground/50 ml-1">min</span>
+                    </div>
+                  )}
+                </div>
+                <div className="space-y-1">
+                  <p className="text-[9px] font-mono text-muted-foreground/40">{t('profile.last8Weeks', 'Last 8 weeks')}</p>
+                  <div className="flex items-end gap-[3px] h-6">
+                    {practiceStats.weeks.map((w, i) => (
+                      <div
+                        key={i}
+                        className="flex-1 rounded-sm bg-primary/60 transition-all"
+                        style={{ height: `${Math.max((w / maxW) * 100, w > 0 ? 12 : 4)}%`, opacity: w > 0 ? 1 : 0.15 }}
+                      />
+                    ))}
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-3 pt-1 border-t border-border/30">
+                  {Object.entries(practiceStats.byType).map(([type, count]) => (
+                    <div key={type} className="text-center">
+                      <p className="text-sm font-mono">{count}</p>
+                      <p className="text-[9px] font-mono text-muted-foreground/50 capitalize">{t(`practice.${type}Label`, type)}</p>
+                    </div>
                   ))}
                 </div>
               </div>
-
-              {/* Per-type breakdown */}
-              <div className="flex flex-wrap gap-3 pt-1 border-t border-border/30">
-                {Object.entries(practiceStats.byType).map(([type, count]) => (
-                  <div key={type} className="text-center">
-                    <p className="text-sm font-mono">{count}</p>
-                    <p className="text-[9px] font-mono text-muted-foreground/50 capitalize">{t(`practice.${type}Label`, type)}</p>
-                  </div>
-                ))}
-              </div>
-            </div>
-          );
-        })()}
-      </StatsSection>
-
-      {/* Section: Skill Development */}
-      <ProLock feature="decisions">
-        <StatsSection label={t('profile.sectionProgress', 'Progress')}>
-          
-          <PeriodComparison reflections={reflections} holdGoal={holdGoal} />
-          <StatsTrends reflections={reflections} />
+            );
+          })()}
         </StatsSection>
       </ProLock>
 
