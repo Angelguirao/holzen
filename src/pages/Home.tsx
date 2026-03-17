@@ -291,7 +291,7 @@ const Home = () => {
       setGroundLoading(false);
       groundFetchingRef.current = false;
     });
-  }, [user, profileLoaded, subscribed, btcData, message, groundSuggestion, groundingActivities, threshold, thresholdDown, cumulativeThreshold, severity, language, groundStorageKey]);
+  }, [user, profileLoaded, subscribed, btcData, message, groundDismissed, groundSuggestion, groundingActivities, threshold, thresholdDown, cumulativeThreshold, severity, language, groundStorageKey]);
 
   useEffect(() => {
     document.title = 'Holzen — Home';
