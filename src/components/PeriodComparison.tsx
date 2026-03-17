@@ -151,6 +151,26 @@ export function PeriodComparison({ reflections, holdGoal }: Props) {
       deltaFormat: (d: number) => `${d > 0 ? '+' : ''}${d}pp`,
     },
     {
+      label: t('periodComparison.avgComposure', 'Composure'),
+      current: current.avgComposure,
+      previous: previous.avgComposure,
+      format: (v: number) => `${Math.round(v)}`,
+      delta: current.avgComposure !== null && previous.avgComposure !== null
+        ? Math.round(current.avgComposure - previous.avgComposure)
+        : null,
+      deltaFormat: (d: number) => `${d > 0 ? '+' : ''}${d}`,
+    },
+    {
+      label: t('periodComparison.toolsUsed', 'Tools/pause'),
+      current: current.toolsUsed,
+      previous: previous.toolsUsed,
+      format: (v: number) => `${v.toFixed(1)}`,
+      delta: current.toolsUsed !== null && previous.toolsUsed !== null
+        ? current.toolsUsed - previous.toolsUsed
+        : null,
+      deltaFormat: (d: number) => `${d > 0 ? '+' : ''}${d.toFixed(1)}`,
+    },
+    {
       label: t('periodComparison.composureScorePeriod', 'Period Score'),
       current: currentScore?.score ?? null,
       previous: previousScore?.score ?? null,
