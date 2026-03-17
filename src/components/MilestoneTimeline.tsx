@@ -134,6 +134,29 @@ export function MilestoneTimeline({ reflections, practiceEntries = [], letters =
       });
     }
 
+    // 7. First letter written
+    if (letters.length > 0) {
+      const firstLetter = [...letters].sort((a, b) => a.written_at.localeCompare(b.written_at))[0];
+      items.push({
+        date: firstLetter.written_at,
+        icon: Scroll,
+        label: t('milestones.firstLetter', 'First letter written'),
+        detail: format(new Date(firstLetter.written_at), 'MMM d'),
+      });
+    }
+
+    // 8. First letter delivered
+    const delivered = letters.filter((l) => l.delivered && l.delivered_at);
+    if (delivered.length > 0) {
+      const firstDelivered = [...delivered].sort((a, b) => a.delivered_at!.localeCompare(b.delivered_at!))[0];
+      items.push({
+        date: firstDelivered.delivered_at!,
+        icon: Mail,
+        label: t('milestones.firstDelivery', 'First letter delivered'),
+        detail: format(new Date(firstDelivered.delivered_at!), 'MMM d'),
+      });
+    }
+
     // Sort by date descending (most recent first)
     items.sort((a, b) => b.date.localeCompare(a.date));
 
