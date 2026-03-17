@@ -40,34 +40,14 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    // --- Daily pause cap: 10/day ---
+    // Track AI usage (no enforcement yet — monitoring only)
     const userId = claimsData.claims.sub as string;
-    const todayStart = new Date();
-    todayStart.setUTCHours(0, 0, 0, 0);
-
     const svcClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
       { auth: { persistSession: false } }
     );
-
-    const { count: pausesToday } = await svcClient
-      .from("analytics_events")
-      .select("*", { count: "exact", head: true })
-      .eq("user_id", userId)
-      .eq("event", "pause_ai_call")
-      .gte("created_at", todayStart.toISOString());
-
-    const DAILY_PAUSE_CAP = 10;
-    if ((pausesToday ?? 0) >= DAILY_PAUSE_CAP) {
-      return new Response(
-        JSON.stringify({ error: "daily_pause_limit", message: "You've reached your daily pause limit. Rest and return tomorrow." }),
-        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    // Log this pause usage
-    await svcClient.from("analytics_events").insert({ user_id: userId, event: "pause_ai_call" });
+    await svcClient.from("analytics_events").insert({ user_id: userId, event: "pause_ai_call" }).catch(() => {});
 
     const { context, tone, customPrompt, style, moodHistory, severity, motivations, mantra, groundingActivities, currency, language } = await req.json();
     if (!context) {
