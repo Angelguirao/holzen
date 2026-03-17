@@ -412,8 +412,19 @@ export default function Breathe() {
   // Deep elements opacity
   const deepOpacity = depth === 1 ? 1 : 0;
 
+  // Loading while subscription status resolves
+  if (isPending) {
+    return (
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background">
+        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
+          <div className="h-4 w-4 border-2 border-muted-foreground/20 border-t-muted-foreground/60 rounded-full animate-spin" />
+        </motion.div>
+      </div>
+    );
+  }
+
   // Gate non-Pro users (after all hooks)
-  if (!isPending && !isPro) {
+  if (!isPro) {
     return (
       <div className="fixed inset-0 z-[100] flex items-center justify-center bg-background">
         <div className="max-w-sm px-6">
