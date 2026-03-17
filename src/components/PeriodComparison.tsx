@@ -43,33 +43,20 @@ interface PeriodStats {
   calmExitRate: number | null;
 }
 
-const COMPOSURE: Record<string, number> = {
-  calm: 100, detached: 85, uncertain: 60, excited: 50,
-  anxious: 30, fearful: 25, greedy: 20, fomo: 10,
-};
+const CALM_MOODS = ['calm', 'detached'];
 
-function computeStats(refs: Reflection[]): Omit<PeriodStats, 'score'> {
-  if (refs.length === 0) return { count: 0, holdRate: null, avgComposure: null, toolsUsed: null };
+function computeStats(refs: Reflection[]): PeriodStats {
+  if (refs.length === 0) return { count: 0, holdRate: null, calmExitRate: null };
 
   const withOutcome = refs.filter((r) => r.outcome);
   const held = withOutcome.filter((r) => r.outcome === 'held' || r.outcome === 'nothing');
   const holdRate = withOutcome.length > 0 ? held.length / withOutcome.length : null;
 
-  // Avg composure from mood_after
-  const withMoodAfter = refs.filter((r) => r.mood_after && COMPOSURE[r.mood_after] !== undefined);
-  const avgComposure = withMoodAfter.length > 0
-    ? withMoodAfter.reduce((s, r) => s + (COMPOSURE[r.mood_after!] ?? 50), 0) / withMoodAfter.length
-    : null;
+  const withMoodAfter = refs.filter((r) => r.mood_after);
+  const calmExits = withMoodAfter.filter((r) => CALM_MOODS.includes(r.mood_after!));
+  const calmExitRate = withMoodAfter.length > 0 ? calmExits.length / withMoodAfter.length : null;
 
-  // Avg tools engaged per pause
-  const toolCounts = refs.map((r) =>
-    [r.signal_read, r.zoom_out_read, r.history_read, r.learning_read].filter(Boolean).length
-  );
-  const toolsUsed = toolCounts.length > 0
-    ? toolCounts.reduce((s, v) => s + v, 0) / toolCounts.length
-    : null;
-
-  return { count: refs.length, holdRate, avgComposure, toolsUsed };
+  return { count: refs.length, holdRate, calmExitRate };
 }
 
 type View = 'weekly' | 'monthly';
