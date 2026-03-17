@@ -37,7 +37,7 @@ interface Milestone {
 
 const COMPOSURE_MOODS = ['calm', 'detached'];
 
-export function MilestoneTimeline({ reflections, practiceEntries = [], memberSince }: Props) {
+export function MilestoneTimeline({ reflections, practiceEntries = [], letters = [], memberSince }: Props) {
   const { t } = useTranslation();
 
   const milestones = useMemo(() => {
