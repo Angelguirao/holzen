@@ -1,0 +1,176 @@
+import { useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import { differenceInCalendarDays, format } from 'date-fns';
+import { Flag, Star, Flame, Shield, Heart, Zap } from 'lucide-react';
+
+interface Reflection {
+  created_at: string;
+  mood: string | null;
+  mood_after: string | null;
+  outcome: string | null;
+}
+
+interface PracticeEntry {
+  created_at: string;
+  type: string;
+}
+
+interface Props {
+  reflections: Reflection[];
+  practiceEntries?: PracticeEntry[];
+  memberSince?: string | null;
+}
+
+interface Milestone {
+  date: string;
+  icon: typeof Flag;
+  label: string;
+  detail: string;
+}
+
+const COMPOSURE_MOODS = ['calm', 'detached'];
+
+export function MilestoneTimeline({ reflections, practiceEntries = [], memberSince }: Props) {
+  const { t } = useTranslation();
+
+  const milestones = useMemo(() => {
+    const items: Milestone[] = [];
+    const sorted = [...reflections].sort((a, b) => a.created_at.localeCompare(b.created_at));
+
+    // 1. First pause
+    if (sorted.length >= 1) {
+      items.push({
+        date: sorted[0].created_at,
+        icon: Flag,
+        label: t('milestones.firstPause', 'First pause'),
+        detail: format(new Date(sorted[0].created_at), 'MMM d, yyyy'),
+      });
+    }
+
+    // 2. First calm outcome
+    const firstCalm = sorted.find(
+      (r) => r.mood_after && COMPOSURE_MOODS.includes(r.mood_after)
+    );
+    if (firstCalm) {
+      items.push({
+        date: firstCalm.created_at,
+        icon: Heart,
+        label: t('milestones.firstCalm', 'First calm exit'),
+        detail: format(new Date(firstCalm.created_at), 'MMM d'),
+      });
+    }
+
+    // 3. First hold
+    const firstHold = sorted.find((r) => r.outcome === 'held' || r.outcome === 'nothing');
+    if (firstHold) {
+      items.push({
+        date: firstHold.created_at,
+        icon: Shield,
+        label: t('milestones.firstHold', 'First hold'),
+        detail: format(new Date(firstHold.created_at), 'MMM d'),
+      });
+    }
+
+    // 4. Pause count milestones
+    const countMilestones = [5, 10, 25, 50, 100, 250, 500];
+    for (const m of countMilestones) {
+      if (sorted.length >= m) {
+        items.push({
+          date: sorted[m - 1].created_at,
+          icon: Star,
+          label: t('milestones.pauseCount', '{{count}} pauses', { count: m }),
+          detail: format(new Date(sorted[m - 1].created_at), 'MMM d'),
+        });
+      }
+    }
+
+    // 5. Longest streak
+    const allDays = new Set<string>();
+    for (const r of sorted) {
+      if (r.outcome) allDays.add(new Date(r.created_at).toISOString().slice(0, 10));
+    }
+    for (const p of practiceEntries) {
+      allDays.add(new Date(p.created_at).toISOString().slice(0, 10));
+    }
+    const daysSorted = Array.from(allDays).sort();
+    let longestStreak = 0;
+    let longestEnd = '';
+    let current = 1;
+    for (let i = 1; i < daysSorted.length; i++) {
+      const diff = differenceInCalendarDays(new Date(daysSorted[i]), new Date(daysSorted[i - 1]));
+      if (diff === 1) {
+        current++;
+        if (current > longestStreak) {
+          longestStreak = current;
+          longestEnd = daysSorted[i];
+        }
+      } else {
+        current = 1;
+      }
+    }
+    if (longestStreak >= 3) {
+      items.push({
+        date: longestEnd,
+        icon: Flame,
+        label: t('milestones.longestStreak', '{{days}}-day streak', { days: longestStreak }),
+        detail: format(new Date(longestEnd), 'MMM d'),
+      });
+    }
+
+    // 6. First practice
+    if (practiceEntries.length > 0) {
+      const firstPractice = [...practiceEntries].sort((a, b) => a.created_at.localeCompare(b.created_at))[0];
+      items.push({
+        date: firstPractice.created_at,
+        icon: Zap,
+        label: t('milestones.firstPractice', 'First practice'),
+        detail: format(new Date(firstPractice.created_at), 'MMM d'),
+      });
+    }
+
+    // Sort by date descending (most recent first)
+    items.sort((a, b) => b.date.localeCompare(a.date));
+
+    return items;
+  }, [reflections, practiceEntries, t]);
+
+  if (milestones.length === 0) {
+    return (
+      <div className="py-8 text-center space-y-2">
+        <Flag className="h-5 w-5 mx-auto text-muted-foreground/30" />
+        <p className="text-xs font-mono text-muted-foreground/50">
+          {t('milestones.empty', 'Your milestones will appear here as you build your practice.')}
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-1">
+      {milestones.map((milestone, i) => {
+        const Icon = milestone.icon;
+        const isFirst = i === 0;
+        const isLast = i === milestones.length - 1;
+
+        return (
+          <div key={`${milestone.label}-${milestone.date}`} className="flex items-stretch gap-3">
+            {/* Timeline line + dot */}
+            <div className="flex flex-col items-center w-6 shrink-0">
+              {!isFirst && <div className="w-px flex-1 bg-border/40" />}
+              <div className="rounded-full p-1.5 bg-muted border border-border/60">
+                <Icon className="h-3 w-3 text-primary/70" />
+              </div>
+              {!isLast && <div className="w-px flex-1 bg-border/40" />}
+            </div>
+
+            {/* Content */}
+            <div className="py-2.5 min-w-0">
+              <p className="text-xs font-mono text-foreground/80 leading-tight">{milestone.label}</p>
+              <p className="text-[9px] font-mono text-muted-foreground/40 mt-0.5">{milestone.detail}</p>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
