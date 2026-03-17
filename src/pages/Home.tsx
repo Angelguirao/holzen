@@ -258,8 +258,8 @@ const Home = () => {
     if (!user || !profileLoaded || !subscribed || !btcData || groundingActivities.length === 0) return;
     // Don't pre-generate if there's an active pause message (pause takes priority)
     if (message) return;
-    // Don't pre-generate if we already have a cached suggestion or are already fetching
-    if (groundSuggestion || groundFetchingRef.current) return;
+    // Don't pre-generate if user already dismissed this session, or we already have one
+    if (groundDismissed || groundSuggestion || groundFetchingRef.current) return;
 
     const effectiveThreshold = btcData.changePercent < 0 ? thresholdDown : threshold;
     const dailyTriggered = Math.abs(btcData.changePercent) >= effectiveThreshold;
