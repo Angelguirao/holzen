@@ -14,6 +14,7 @@ import { Onboarding } from '@/components/Onboarding';
 import { HoldGoalWidget } from '@/components/HoldGoalWidget';
 import { MyWhyWidget } from '@/components/MyWhyWidget';
 import { Skeleton } from '@/components/ui/skeleton';
+import { SubscriptionSkeleton } from '@/components/SubscriptionSkeleton';
 import { Button } from '@/components/ui/button';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { HomeWidget, useWidgetLayout } from '@/components/HomeWidget';
