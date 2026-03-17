@@ -521,7 +521,7 @@ function StatsContent({ reflections, practiceEntries = [], memberSince, holdGoal
 
       {/* Section: Your Journey */}
       <StatsSection label={t('profile.sectionJourney', 'Your Journey')}>
-        <StreakTimeline reflections={reflections} practiceEntries={practiceEntries} memberSince={memberSince} />
+        <JourneyWidget reflections={reflections} practiceEntries={practiceEntries} memberSince={memberSince} />
         {practiceStats && (
           <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2">
             <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
