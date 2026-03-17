@@ -2,7 +2,6 @@ import { forwardRef, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowUpRight, ArrowDownRight, Minus, CalendarDays } from 'lucide-react';
 import { ChartEmptyState } from './ChartEmptyState';
-import { useHolzenScore } from '@/hooks/use-holzen-score';
 import {
   startOfWeek, endOfWeek, subWeeks, startOfMonth, endOfMonth, subMonths,
   parseISO, isWithinInterval, format,
@@ -40,37 +39,23 @@ interface Props {
 interface PeriodStats {
   count: number;
   holdRate: number | null;
-  avgComposure: number | null;
-  toolsUsed: number | null;
+  calmExitRate: number | null;
 }
 
-const COMPOSURE: Record<string, number> = {
-  calm: 100, detached: 85, uncertain: 60, excited: 50,
-  anxious: 30, fearful: 25, greedy: 20, fomo: 10,
-};
+const CALM_MOODS = ['calm', 'detached'];
 
-function computeStats(refs: Reflection[]): Omit<PeriodStats, 'score'> {
-  if (refs.length === 0) return { count: 0, holdRate: null, avgComposure: null, toolsUsed: null };
+function computeStats(refs: Reflection[]): PeriodStats {
+  if (refs.length === 0) return { count: 0, holdRate: null, calmExitRate: null };
 
   const withOutcome = refs.filter((r) => r.outcome);
   const held = withOutcome.filter((r) => r.outcome === 'held' || r.outcome === 'nothing');
   const holdRate = withOutcome.length > 0 ? held.length / withOutcome.length : null;
 
-  // Avg composure from mood_after
-  const withMoodAfter = refs.filter((r) => r.mood_after && COMPOSURE[r.mood_after] !== undefined);
-  const avgComposure = withMoodAfter.length > 0
-    ? withMoodAfter.reduce((s, r) => s + (COMPOSURE[r.mood_after!] ?? 50), 0) / withMoodAfter.length
-    : null;
+  const withMoodAfter = refs.filter((r) => r.mood_after);
+  const calmExits = withMoodAfter.filter((r) => CALM_MOODS.includes(r.mood_after!));
+  const calmExitRate = withMoodAfter.length > 0 ? calmExits.length / withMoodAfter.length : null;
 
-  // Avg tools engaged per pause
-  const toolCounts = refs.map((r) =>
-    [r.signal_read, r.zoom_out_read, r.history_read, r.learning_read].filter(Boolean).length
-  );
-  const toolsUsed = toolCounts.length > 0
-    ? toolCounts.reduce((s, v) => s + v, 0) / toolCounts.length
-    : null;
-
-  return { count: refs.length, holdRate, avgComposure, toolsUsed };
+  return { count: refs.length, holdRate, calmExitRate };
 }
 
 type View = 'weekly' | 'monthly';
@@ -116,10 +101,6 @@ export function PeriodComparison({ reflections, holdGoal }: Props) {
   const current = computeStats(currentRefs);
   const previous = computeStats(prevRefs);
 
-  // Use the same score algorithm as the hero
-  const currentScore = useHolzenScore(currentRefs, [], [], holdGoal);
-  const previousScore = useHolzenScore(prevRefs, [], [], holdGoal);
-
   if (current.count === 0 && previous.count === 0) {
     return (
       <ChartEmptyState
@@ -141,7 +122,7 @@ export function PeriodComparison({ reflections, holdGoal }: Props) {
       deltaFormat: (d: number) => `${d > 0 ? '+' : ''}${d}`,
     },
     {
-      label: t('periodComparison.holdRate'),
+      label: t('periodComparison.holdRate', 'Hold rate'),
       current: current.holdRate,
       previous: previous.holdRate,
       format: (v: number) => `${Math.round(v * 100)}%`,
@@ -151,34 +132,14 @@ export function PeriodComparison({ reflections, holdGoal }: Props) {
       deltaFormat: (d: number) => `${d > 0 ? '+' : ''}${d}pp`,
     },
     {
-      label: t('periodComparison.avgComposure', 'Composure'),
-      current: current.avgComposure,
-      previous: previous.avgComposure,
-      format: (v: number) => `${Math.round(v)}`,
-      delta: current.avgComposure !== null && previous.avgComposure !== null
-        ? Math.round(current.avgComposure - previous.avgComposure)
+      label: t('periodComparison.calmExits', 'Calm exits'),
+      current: current.calmExitRate,
+      previous: previous.calmExitRate,
+      format: (v: number) => `${Math.round(v * 100)}%`,
+      delta: current.calmExitRate !== null && previous.calmExitRate !== null
+        ? Math.round((current.calmExitRate - previous.calmExitRate) * 100)
         : null,
-      deltaFormat: (d: number) => `${d > 0 ? '+' : ''}${d}`,
-    },
-    {
-      label: t('periodComparison.toolsUsed', 'Tools/pause'),
-      current: current.toolsUsed,
-      previous: previous.toolsUsed,
-      format: (v: number) => `${v.toFixed(1)}`,
-      delta: current.toolsUsed !== null && previous.toolsUsed !== null
-        ? current.toolsUsed - previous.toolsUsed
-        : null,
-      deltaFormat: (d: number) => `${d > 0 ? '+' : ''}${d.toFixed(1)}`,
-    },
-    {
-      label: t('periodComparison.composureScorePeriod', 'Period Score'),
-      current: currentScore?.score ?? null,
-      previous: previousScore?.score ?? null,
-      format: (v: number) => `${v}`,
-      delta: currentScore && previousScore
-        ? currentScore.score - previousScore.score
-        : null,
-      deltaFormat: (d: number) => `${d > 0 ? '+' : ''}${d}`,
+      deltaFormat: (d: number) => `${d > 0 ? '+' : ''}${d}pp`,
     },
   ];
 
