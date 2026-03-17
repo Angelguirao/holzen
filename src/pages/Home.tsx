@@ -554,7 +554,8 @@ const Home = () => {
 
         const shouldNudgeGround = followsPauseThresholds && subscribed && !message;
         const hasPreview = groundSuggestion !== null;
-        const showGlow = shouldNudgeGround || hasPreview;
+        // Ground should NEVER glow when an active pause message exists — pause is always the hero
+        const showGlow = !message && (shouldNudgeGround || hasPreview);
         const glowClass = showGlow
           ? 'ring-1 ring-primary/15 shadow-[0_0_20px_-4px_hsl(var(--primary)/0.12)]'
           : '';
