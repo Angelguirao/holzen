@@ -6,14 +6,35 @@ import { PRICING } from '@/lib/pricing';
 const FREE_MONTHLY_LIMIT = PRICING.freeReflectionsPerMonth;
 const CHECKOUT_RETURN_KEY = 'holzen_checkout_started_at';
 const CHECKOUT_RETURN_WINDOW_MS = 30 * 60 * 1000;
+const SUB_CACHE_KEY = 'holzen_sub_cache';
+
+interface SubCache {
+  subscribed: boolean;
+  monthlyUsed: number;
+  monthlyRemaining: number | undefined;
+  ts: number;
+}
+
+function readSubCache(): SubCache | null {
+  try {
+    const raw = localStorage.getItem(SUB_CACHE_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as SubCache;
+  } catch { return null; }
+}
+
+function writeSubCache(c: SubCache) {
+  try { localStorage.setItem(SUB_CACHE_KEY, JSON.stringify(c)); } catch {}
+}
 
 export function useSubscription() {
   const { user } = useAuth();
-  const [subscribed, setSubscribed] = useState(false);
+  const cached = readSubCache();
+  const [subscribed, setSubscribed] = useState(cached?.subscribed ?? false);
   const [loading, setLoading] = useState(true);
   const [checkoutLoading, setCheckoutLoading] = useState(false);
-  const [monthlyUsed, setMonthlyUsed] = useState(0);
-  const [monthlyRemaining, setMonthlyRemaining] = useState<number | undefined>(undefined);
+  const [monthlyUsed, setMonthlyUsed] = useState(cached?.monthlyUsed ?? 0);
+  const [monthlyRemaining, setMonthlyRemaining] = useState<number | undefined>(cached?.monthlyRemaining);
 
   const checkSubscription = useCallback(async (force = false) => {
     if (!user) {
