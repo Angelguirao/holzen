@@ -1,8 +1,6 @@
 import { forwardRef, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { ArrowUpRight, ArrowDownRight, Minus, CalendarDays } from 'lucide-react';
-import { ChartEmptyState } from './ChartEmptyState';
-import { useHolzenScore } from '@/hooks/use-holzen-score';
 import {
   startOfWeek, endOfWeek, subWeeks, startOfMonth, endOfMonth, subMonths,
   parseISO, isWithinInterval, format,
