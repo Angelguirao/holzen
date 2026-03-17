@@ -14,6 +14,7 @@ import { Onboarding } from '@/components/Onboarding';
 import { HoldGoalWidget } from '@/components/HoldGoalWidget';
 import { MyWhyWidget } from '@/components/MyWhyWidget';
 import { Skeleton } from '@/components/ui/skeleton';
+import { SubscriptionSkeleton } from '@/components/SubscriptionSkeleton';
 import { Button } from '@/components/ui/button';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { HomeWidget, useWidgetLayout } from '@/components/HomeWidget';
@@ -331,9 +332,8 @@ const Home = () => {
               <Skeleton className="h-4 w-3/4" />
             </motion.div>
           ) : !subscriptionReady ? (
-            <motion.div key="zen-hydrating" variants={zenVariants} initial="hidden" animate="visible" exit="hidden" className="space-y-4">
-              <Skeleton className="h-4 w-3/4 mx-auto" />
-              <Skeleton className="h-3 w-1/2 mx-auto" />
+            <motion.div key="zen-hydrating" variants={zenVariants} initial="hidden" animate="visible" exit="hidden">
+              <SubscriptionSkeleton variant="centered" />
             </motion.div>
           ) : (
             <motion.div key="zen-empty" variants={zenVariants} initial="hidden" animate="visible" exit="hidden" className="space-y-6 text-center">
@@ -419,10 +419,7 @@ const Home = () => {
                   </LoadingButton>
                 </div>
               ) : subLoading ? (
-                <div className="space-y-3">
-                  <Skeleton className="h-4 w-48" />
-                  <Skeleton className="h-4 w-32" />
-                </div>
+                <SubscriptionSkeleton variant="inline" />
               ) : (
                 <>
                   {!subscribed && monthlyRemaining !== undefined && monthlyRemaining > 0 && (
