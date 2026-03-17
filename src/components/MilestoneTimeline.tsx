@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { differenceInCalendarDays, format } from 'date-fns';
-import { Flag, Star, Flame, Shield, Heart, Zap } from 'lucide-react';
+import { Flag, Star, Flame, Shield, Heart, Zap, Mail, Scroll } from 'lucide-react';
 
 interface Reflection {
   created_at: string;
@@ -15,9 +15,16 @@ interface PracticeEntry {
   type: string;
 }
 
+interface LetterEntry {
+  written_at: string;
+  delivered: boolean;
+  delivered_at: string | null;
+}
+
 interface Props {
   reflections: Reflection[];
   practiceEntries?: PracticeEntry[];
+  letters?: LetterEntry[];
   memberSince?: string | null;
 }
 
