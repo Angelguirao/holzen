@@ -40,8 +40,7 @@ interface Props {
 interface PeriodStats {
   count: number;
   holdRate: number | null;
-  avgComposure: number | null;
-  toolsUsed: number | null;
+  calmExitRate: number | null;
 }
 
 const COMPOSURE: Record<string, number> = {
