@@ -332,9 +332,8 @@ const Home = () => {
               <Skeleton className="h-4 w-3/4" />
             </motion.div>
           ) : !subscriptionReady ? (
-            <motion.div key="zen-hydrating" variants={zenVariants} initial="hidden" animate="visible" exit="hidden" className="space-y-4">
-              <Skeleton className="h-4 w-3/4 mx-auto" />
-              <Skeleton className="h-3 w-1/2 mx-auto" />
+            <motion.div key="zen-hydrating" variants={zenVariants} initial="hidden" animate="visible" exit="hidden">
+              <SubscriptionSkeleton variant="centered" />
             </motion.div>
           ) : (
             <motion.div key="zen-empty" variants={zenVariants} initial="hidden" animate="visible" exit="hidden" className="space-y-6 text-center">
