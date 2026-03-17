@@ -252,6 +252,34 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
     }
   };
 
+  if (!profileLoaded) {
+    return (
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">
+            {t('settings.title')}
+          </h1>
+          <button
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            className="text-muted-foreground hover:text-foreground transition-colors"
+            aria-label="Toggle dark mode"
+          >
+            {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </button>
+        </div>
+        <div className="space-y-3 animate-pulse">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="border border-border/40 rounded-md px-4 py-4 space-y-2">
+              <div className="h-3 w-24 bg-muted rounded" />
+              <div className="h-2 w-full bg-muted/60 rounded" />
+              <div className="h-2 w-3/4 bg-muted/40 rounded" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div ref={ref} className="space-y-4">
       <div className="flex items-center justify-between">
