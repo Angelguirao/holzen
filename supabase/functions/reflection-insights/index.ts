@@ -60,6 +60,8 @@ serve(async (req) => {
     let generated = 0;
 
     for (const userId of userIds) {
+      // Track AI usage per user
+      try { await supabase.from("analytics_events").insert({ user_id: userId, event: "reflection_insights_ai_call" }); } catch (_) { /* non-fatal */ }
       let userLanguage = bodyLanguage || "en";
       if (!bodyLanguage && !singleUserId) {
         const prof = (await supabase.from("profiles").select("language").eq("user_id", userId).single()).data;
