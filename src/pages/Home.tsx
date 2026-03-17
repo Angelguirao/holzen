@@ -117,7 +117,21 @@ const Home = () => {
     cumulativeThreshold,
     language,
     profileLoaded,
+    refreshProfile,
   } = useHolzen();
+
+  // Consume auto-trigger context from AppLayout
+  const outletCtx = useOutletContext<{ pauseReady?: boolean; dismissPauseReady?: () => void }>();
+  const pauseReady = outletCtx?.pauseReady ?? false;
+  const dismissPauseReady = outletCtx?.dismissPauseReady;
+
+  // When realtime detects a server-side trigger, refresh profile to get new message
+  useEffect(() => {
+    if (pauseReady && !message && !loading) {
+      refreshProfile();
+      dismissPauseReady?.();
+    }
+  }, [pauseReady, message, loading, refreshProfile, dismissPauseReady]);
 
   const { reflection: nightReflection, dismiss: dismissNight } = useNightReflection();
 
