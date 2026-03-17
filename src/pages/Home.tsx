@@ -234,7 +234,9 @@ const Home = () => {
   const dismissGroundSuggestion = useCallback(() => {
     setGroundSuggestion(null);
     localStorage.removeItem(groundStorageKey);
-  }, [groundStorageKey]);
+    setGroundDismissed(true);
+    localStorage.setItem(groundDismissedKey, 'true');
+  }, [groundStorageKey, groundDismissedKey]);
 
   const handleStartGround = useCallback(() => {
     navigate('/ground', { state: { preGenerated: groundSuggestion } });
