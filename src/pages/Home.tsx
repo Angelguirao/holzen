@@ -419,10 +419,7 @@ const Home = () => {
                   </LoadingButton>
                 </div>
               ) : subLoading ? (
-                <div className="space-y-3">
-                  <Skeleton className="h-4 w-48" />
-                  <Skeleton className="h-4 w-32" />
-                </div>
+                <SubscriptionSkeleton variant="inline" />
               ) : (
                 <>
                   {!subscribed && monthlyRemaining !== undefined && monthlyRemaining > 0 && (
