@@ -27,6 +27,22 @@ serve(async (req) => {
     const { context, language, sources } = body;
     log("parsed body");
 
+    // Track AI usage (best-effort, non-blocking)
+    const authHeader = req.headers.get("Authorization");
+    if (authHeader?.startsWith("Bearer ")) {
+      try {
+        const { createClient } = await import("npm:@supabase/supabase-js@2.57.2");
+        const sbUrl = Deno.env.get("SUPABASE_URL") ?? "";
+        const sbUser = createClient(sbUrl, Deno.env.get("SUPABASE_ANON_KEY") ?? "", { global: { headers: { Authorization: authHeader } } });
+        const { data: { user } } = await sbUser.auth.getUser();
+        if (user) {
+          const svc = createClient(sbUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "", { auth: { persistSession: false } });
+          await svc.from("analytics_events").insert({ user_id: user.id, event: "signal_companion_ai_call" });
+        }
+      } catch (_) { /* non-fatal */ }
+      log("tracked usage");
+    }
+
     const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
     if (!PERPLEXITY_API_KEY) throw new Error("PERPLEXITY_API_KEY is not configured");
 
