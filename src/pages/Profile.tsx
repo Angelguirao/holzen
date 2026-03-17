@@ -379,10 +379,19 @@ function StatsContent({ reflections, practiceEntries = [], memberSince, holdGoal
   const practiceStats = useMemo(() => {
     if (practiceEntries.length === 0) return null;
     const byType: Record<string, number> = {};
+    let totalSeconds = 0;
     for (const p of practiceEntries) {
       byType[p.type] = (byType[p.type] || 0) + 1;
+      if (p.duration_seconds) totalSeconds += p.duration_seconds;
     }
-    return { total: practiceEntries.length, byType };
+    // Weekly counts for last 8 weeks (sparkline data)
+    const weeks: number[] = Array(8).fill(0);
+    const now = Date.now();
+    for (const p of practiceEntries) {
+      const age = Math.floor((now - new Date(p.created_at).getTime()) / (7 * 86400000));
+      if (age < 8) weeks[7 - age]++;
+    }
+    return { total: practiceEntries.length, byType, totalSeconds, weeks };
   }, [practiceEntries]);
 
   // Compute current streak for summary
