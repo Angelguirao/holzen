@@ -253,6 +253,17 @@ const Home = () => {
     prefetchNotificationTone();
   }, []);
 
+  // Reset grounding dismissed flag when a new pause message arrives (new volatility cycle)
+  const prevMessageRef = useRef(message);
+  useEffect(() => {
+    if (message && !prevMessageRef.current) {
+      // A new pause just appeared — reset dismissed so grounding can auto-suggest after pause
+      setGroundDismissed(false);
+      localStorage.removeItem(groundDismissedKey);
+    }
+    prevMessageRef.current = message;
+  }, [message, groundDismissedKey]);
+
   // Pre-generate grounding suggestion when thresholds are met (mirrors pause pre-generation)
   useEffect(() => {
     if (!user || !profileLoaded || !subscribed || !btcData || groundingActivities.length === 0) return;
