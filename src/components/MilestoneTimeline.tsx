@@ -71,17 +71,16 @@ export function MilestoneTimeline({ reflections, practiceEntries = [], memberSin
       });
     }
 
-    // 4. Pause count milestones
+    // 4. Highest pause count milestone only
     const countMilestones = [5, 10, 25, 50, 100, 250, 500];
-    for (const m of countMilestones) {
-      if (sorted.length >= m) {
-        items.push({
-          date: sorted[m - 1].created_at,
-          icon: Star,
-          label: t('milestones.pauseCount', '{{count}} pauses', { count: m }),
-          detail: format(new Date(sorted[m - 1].created_at), 'MMM d'),
-        });
-      }
+    const highest = [...countMilestones].reverse().find((m) => sorted.length >= m);
+    if (highest) {
+      items.push({
+        date: sorted[highest - 1].created_at,
+        icon: Star,
+        label: t('milestones.pauseCount', '{{count}} pauses', { count: highest }),
+        detail: format(new Date(sorted[highest - 1].created_at), 'MMM d'),
+      });
     }
 
     // 5. Longest streak
