@@ -27,6 +27,9 @@ serve(async (req) => {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error("Not authenticated");
 
+    // Track AI usage
+    try { await serviceClient.from("analytics_events").insert({ user_id: user.id, event: "zoom_out_ai_call" }); } catch (_) { /* non-fatal */ }
+
     const { context, reflectionMessage, language } = await req.json();
 
     // --- 1. Fetch "on this day" BTC prices with DB caching ---
