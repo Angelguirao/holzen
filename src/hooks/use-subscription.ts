@@ -52,6 +52,7 @@ export function useSubscription() {
       if (data?.subscribed) {
         setSubscribed(true);
         setMonthlyRemaining(undefined);
+        writeSubCache({ subscribed: true, monthlyUsed: 0, monthlyRemaining: undefined, ts: Date.now() });
       } else {
         setSubscribed(false);
         // Count reflections this month
@@ -67,9 +68,10 @@ export function useSubscription() {
         setMonthlyUsed(used);
         const remaining = Math.max(0, FREE_MONTHLY_LIMIT - used);
         setMonthlyRemaining(remaining);
+        writeSubCache({ subscribed: false, monthlyUsed: used, monthlyRemaining: remaining, ts: Date.now() });
       }
     } catch {
-      setSubscribed(false);
+      // Offline or network error — keep current state (initialized from cache)
     } finally {
       setLoading(false);
     }
