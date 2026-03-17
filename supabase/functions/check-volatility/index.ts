@@ -333,7 +333,7 @@ serve(async (req) => {
       const learningUrl = (profile as any).companion_learning ? result.learning_url : null;
 
       // Save to reflection history
-      await supabase
+      const { data: insertedReflection } = await supabase
         .from("reflections")
         .insert({
           user_id: profile.user_id,
@@ -344,7 +344,9 @@ serve(async (req) => {
           learning_body: learningBody,
           learning_citation: learningCitation,
           learning_url: learningUrl,
-        });
+        })
+        .select("id")
+        .single();
 
       // Update profile with new reflection
       await supabase
@@ -420,6 +422,8 @@ serve(async (req) => {
             const payload = JSON.stringify({
               title: "Holzen",
               body: result.message.slice(0, 120),
+              reflectionId: insertedReflection?.id ?? null,
+              action: "pause_ready",
             });
 
             for (const sub of pushSubs) {
