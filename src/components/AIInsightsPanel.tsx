@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { useSubscription } from '@/hooks/use-subscription';
+import { SubscriptionSkeleton } from '@/components/SubscriptionSkeleton';
 
 interface Insight {
   category: 'regulation' | 'tolerance' | 'alignment' | 'reappraisal' | 'awareness' | 'timing' | 'mood' | 'behavior' | 'engagement' | 'growth';
