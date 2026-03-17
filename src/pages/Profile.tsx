@@ -8,7 +8,7 @@ import { useSubscription } from '@/hooks/use-subscription';
 import { formatBtcPrice } from '@/lib/btc';
 import { format } from 'date-fns';
 import { Mail, Lock, Clock, Trash2, BarChart3, Sparkles, Award, CalendarDays, Info } from 'lucide-react';
-import HistoryContent from '@/components/library/HistoryContent';
+import { MilestoneTimeline } from '@/components/MilestoneTimeline';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 
@@ -286,7 +286,13 @@ const Profile = () => {
         )
       ) : tab === 'activity' ? (
         <ProLock feature="history" hideContent>
-          <HistoryContent />
+          {loading ? (
+            <div className="space-y-3">
+              <Skeleton className="h-40 w-full rounded-md" />
+            </div>
+          ) : (
+            <MilestoneTimeline reflections={reflections} practiceEntries={practiceEntries} memberSince={user?.created_at} />
+          )}
         </ProLock>
       ) : (
         <ProLock feature="letters" hideContent>
@@ -503,7 +509,7 @@ function StatsContent({ reflections, practiceEntries = [], memberSince, holdGoal
 
         {!scoreData && (
           <p className="text-[10px] text-muted-foreground/40 font-mono text-center">
-            {t('profile.holzenScoreEmpty', 'Log 3 pauses with mood or outcome to generate your composure score.')}
+            {t('profile.holzenScoreEmpty', 'Log a pause with mood or outcome to generate your composure score.')}
           </p>
         )}
       </div>

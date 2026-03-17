@@ -71,7 +71,7 @@ export function useHolzenScore(
   holdGoal?: HoldGoal | null,
 ): HolzenScoreData | null {
   return useMemo(() => {
-    if (reflections.length < 3) return null;
+    if (reflections.length < 1) return null;
 
     const recent = reflections.slice(0, 30);
     const hasHoldGoal = holdGoal?.type != null;
