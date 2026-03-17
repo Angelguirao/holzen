@@ -286,7 +286,13 @@ const Profile = () => {
         )
       ) : tab === 'activity' ? (
         <ProLock feature="history" hideContent>
-          <HistoryContent />
+          {loading ? (
+            <div className="space-y-3">
+              <Skeleton className="h-40 w-full rounded-md" />
+            </div>
+          ) : (
+            <MilestoneTimeline reflections={reflections} practiceEntries={practiceEntries} memberSince={user?.created_at} />
+          )}
         </ProLock>
       ) : (
         <ProLock feature="letters" hideContent>
