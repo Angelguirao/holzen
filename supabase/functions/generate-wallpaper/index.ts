@@ -25,6 +25,35 @@ serve(async (req) => {
     } = await supabase.auth.getUser();
     if (!user) throw new Error("Not authenticated");
 
+    // --- Monthly wallpaper cap: 5/month ---
+    const svcClient = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+      { auth: { persistSession: false } }
+    );
+
+    const monthStart = new Date();
+    monthStart.setUTCDate(1);
+    monthStart.setUTCHours(0, 0, 0, 0);
+
+    const { count: wallpapersThisMonth } = await svcClient
+      .from("analytics_events")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .eq("event", "wallpaper_generation")
+      .gte("created_at", monthStart.toISOString());
+
+    const MONTHLY_WALLPAPER_CAP = 5;
+    if ((wallpapersThisMonth ?? 0) >= MONTHLY_WALLPAPER_CAP) {
+      return new Response(
+        JSON.stringify({ error: "monthly_wallpaper_limit", message: "You've used all 5 wallpaper generations this month. Resets next month." }),
+        { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Log wallpaper usage
+    await svcClient.from("analytics_events").insert({ user_id: user.id, event: "wallpaper_generation" });
+
     const { message, mood, context } = await req.json();
     if (!message) throw new Error("Missing reflection message");
 
