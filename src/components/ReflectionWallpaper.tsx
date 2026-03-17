@@ -122,13 +122,22 @@ export function ReflectionWallpaper({ message, mood, context, haiku, variant = '
         body: { message, mood, context },
       });
 
+      // Check for limit errors (returned as 429 with error body)
+      if (data?.error === 'monthly_wallpaper_limit') {
+        throw new Error(data.message || 'monthly_wallpaper_limit');
+      }
       if (error) throw error;
       if (data?.error) throw new Error(data.error);
 
       const finalUrl = await compositeWallpaper(data.image, message, haiku);
       setCompositeUrl(finalUrl);
     } catch (e: any) {
-      toast.error(e.message || t('wallpaper.failedToGenerate'));
+      const msg = e.message || '';
+      if (msg.includes('monthly_wallpaper_limit') || msg.includes('wallpaper generations')) {
+        toast.info(t('wallpaper.monthlyLimitReached', "You've used all 5 wallpaper creations this month. Resets next month."));
+      } else {
+        toast.error(msg || t('wallpaper.failedToGenerate'));
+      }
       setOpen(false);
     } finally {
       setGenerating(false);
