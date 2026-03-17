@@ -1075,6 +1075,10 @@ export type Database = {
         Args: { _collection_id: string; _user_id: string }
         Returns: boolean
       }
+      update_profile_safe: {
+        Args: { _updates: Json; _user_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
