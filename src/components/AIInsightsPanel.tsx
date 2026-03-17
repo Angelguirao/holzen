@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { useSubscription } from '@/hooks/use-subscription';
+import { SubscriptionSkeleton } from '@/components/SubscriptionSkeleton';
 
 interface Insight {
   category: 'regulation' | 'tolerance' | 'alignment' | 'reappraisal' | 'awareness' | 'timing' | 'mood' | 'behavior' | 'engagement' | 'growth';
@@ -126,11 +127,7 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
   }, [user, language, loadInsights, t]);
 
   if (subLoading) {
-    return (
-      <div className="space-y-3">
-        <div className="h-20 w-full rounded-md bg-muted/30 animate-pulse" />
-      </div>
-    );
+    return <SubscriptionSkeleton variant="inline" />;
   }
 
   if (!subscribed) {

@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { useLibrary } from '@/hooks/use-library';
 import { PageMeta } from '@/components/PageMeta';
 import { Heart, Search, X, Lock } from 'lucide-react';
+import { SubscriptionSkeleton } from '@/components/SubscriptionSkeleton';
 import { LibraryItems } from '@/components/library/LibraryItems';
 import { LibraryCollections } from '@/components/library/LibraryCollections';
 
@@ -96,7 +97,7 @@ export default function Library() {
     return (
       <div className="space-y-6 pb-24">
         <PageMeta title={t('library.pageTitle')} description={t('library.pageDescription')} />
-        <div className="h-20 w-full rounded-md bg-muted/30 animate-pulse" />
+        <SubscriptionSkeleton variant="inline" />
       </div>
     );
   }
