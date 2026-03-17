@@ -429,7 +429,16 @@ export function useHolzen() {
         },
       });
 
-      if (fnError) throw fnError;
+      if (fnError) {
+        // Check if it's a daily limit error
+        if (fnData?.error === 'daily_pause_limit') {
+          setMessage(fnData.message || "You've reached your daily pause limit. Rest and return tomorrow.");
+          setContext(ctx);
+          setNewReflection(false);
+          return;
+        }
+        throw fnError;
+      }
 
       const msg = fnData?.message;
       if (msg) {
