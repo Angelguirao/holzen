@@ -144,6 +144,11 @@ const Home = () => {
 
   // Grounding suggestion state (mirrors pause message pattern)
   const groundStorageKey = user ? `holzen_ground_suggestion_${user.id}` : 'holzen_ground_suggestion';
+  const groundDismissedKey = user ? `holzen_ground_dismissed_${user.id}` : 'holzen_ground_dismissed';
+  const groundDismissedRef = useRef(() => {
+    try { return localStorage.getItem(groundDismissedKey) === 'true'; } catch { return false; }
+  });
+  const [groundDismissed, setGroundDismissed] = useState(() => groundDismissedRef.current());
   const [groundSuggestion, setGroundSuggestion] = useState<GroundingSuggestion | null>(() => {
     try {
       const stored = localStorage.getItem(user ? `holzen_ground_suggestion_${user.id}` : 'holzen_ground_suggestion');
