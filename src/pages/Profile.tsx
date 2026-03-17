@@ -8,14 +8,14 @@ import { useSubscription } from '@/hooks/use-subscription';
 import { formatBtcPrice } from '@/lib/btc';
 import { format } from 'date-fns';
 import { Mail, Lock, Clock, Trash2, BarChart3, Sparkles, Award, CalendarDays, Info } from 'lucide-react';
-import { MilestoneTimeline } from '@/components/MilestoneTimeline';
+import HistoryContent from '@/components/library/HistoryContent';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 
 
 import { DecisionQualityCard } from '@/components/DecisionQualityCard';
 import { ChartEmptyState } from '@/components/ChartEmptyState';
-import { StreakTimeline } from '@/components/StreakTimeline';
+import { JourneyWidget } from '@/components/JourneyWidget';
 import { AIInsightsPanel } from '@/components/AIInsightsPanel';
 import { ProLock } from '@/components/ProLock';
 import { LetterViewer } from '@/components/LetterViewer';
@@ -286,13 +286,7 @@ const Profile = () => {
         )
       ) : tab === 'activity' ? (
         <ProLock feature="history" hideContent>
-          {loading ? (
-            <div className="space-y-3">
-              <Skeleton className="h-40 w-full rounded-md" />
-            </div>
-          ) : (
-            <MilestoneTimeline reflections={reflections} practiceEntries={practiceEntries} memberSince={user?.created_at} />
-          )}
+          <HistoryContent />
         </ProLock>
       ) : (
         <ProLock feature="letters" hideContent>
@@ -527,7 +521,7 @@ function StatsContent({ reflections, practiceEntries = [], memberSince, holdGoal
 
       {/* Section: Your Journey */}
       <StatsSection label={t('profile.sectionJourney', 'Your Journey')}>
-        <StreakTimeline reflections={reflections} practiceEntries={practiceEntries} memberSince={memberSince} />
+        <JourneyWidget reflections={reflections} practiceEntries={practiceEntries} memberSince={memberSince} />
         {practiceStats && (
           <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2">
             <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
