@@ -422,6 +422,8 @@ serve(async (req) => {
             const payload = JSON.stringify({
               title: "Holzen",
               body: result.message.slice(0, 120),
+              reflectionId: insertedReflection?.id ?? null,
+              action: "pause_ready",
             });
 
             for (const sub of pushSubs) {
