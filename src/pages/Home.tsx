@@ -296,8 +296,9 @@ const Home = () => {
     return <Onboarding onComplete={completeOnboarding} />;
   }
 
-  const hasAccess = canReflect;
-
+  const hasAccess = subscribed || ((monthlyRemaining ?? 0) > 0);
+  const subscriptionReady = !subLoading && (subscribed || monthlyRemaining !== undefined);
+  const showLimitUpsell = subscriptionReady && !subscribed && monthlyRemaining === 0;
   // Zen mode — unchanged
   if (zenMode) {
     const zenTransition = { duration: 0.8, ease: "easeOut" as const };
