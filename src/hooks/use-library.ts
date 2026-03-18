@@ -140,16 +140,43 @@ export function useLibrary() {
 
   const deleteItem = useCallback(async (id: string) => {
     const item = items.find((i) => i.id === id);
-    // Soft-delete backfilled items so the backfill doesn't re-import them
-    if (item?.reflection_id) {
+    if (!item) return;
+
+    if (item.reflection_id && item.source_type === 'reflection') {
+      // Deleting a reflection: soft-delete ALL library items sharing this reflection_id,
+      // then delete the underlying reflection record so it disappears from Home too.
+      const reflectionId = item.reflection_id;
+      const siblingIds = items.filter((i) => i.reflection_id === reflectionId).map((i) => i.id);
+
+      await supabase.from('library_items').update({ status: 'deleted' } as any).in('id', siblingIds);
+      setItems((prev) => prev.map((i) => siblingIds.includes(i.id) ? { ...i, status: 'deleted' as const } : i));
+      setCollectionItems((prev) => prev.filter((ci) => !siblingIds.includes(ci.library_item_id)));
+
+      // Delete the actual reflection
+      await supabase.from('reflections').delete().eq('id', reflectionId);
+
+      // Clear active pause if it matches this reflection
+      if (user) {
+        const { data: profile } = await supabase.from('profiles').select('last_message').eq('user_id', user.id).single();
+        if (profile?.last_message === item.body) {
+          await supabase.rpc('update_profile_safe', {
+            _user_id: user.id,
+            _updates: { last_message: null, last_context: null },
+          });
+        }
+      }
+    } else if (item.reflection_id) {
+      // Deleting a companion item: soft-delete so backfill doesn't re-import
       await supabase.from('library_items').update({ status: 'deleted' } as any).eq('id', id);
       setItems((prev) => prev.map((i) => i.id === id ? { ...i, status: 'deleted' as const } : i));
+      setCollectionItems((prev) => prev.filter((ci) => ci.library_item_id !== id));
     } else {
+      // Standalone item: hard delete
       await supabase.from('library_items').delete().eq('id', id);
       setItems((prev) => prev.filter((i) => i.id !== id));
+      setCollectionItems((prev) => prev.filter((ci) => ci.library_item_id !== id));
     }
-    setCollectionItems((prev) => prev.filter((ci) => ci.library_item_id !== id));
-  }, [items]);
+  }, [items, user]);
 
   const togglePin = useCallback(async (id: string) => {
     const item = items.find((i) => i.id === id);
