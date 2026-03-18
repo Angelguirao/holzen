@@ -885,6 +885,7 @@ function AutoCooldownIndicator({
   cooldownRemaining: () => number;
   cooldownHours: number;
 }) {
+  const { t } = useTranslation();
   const [remaining, setRemaining] = useState(cooldownRemaining());
 
   useEffect(() => {
@@ -894,7 +895,20 @@ function AutoCooldownIndicator({
     return () => clearInterval(interval);
   }, [cooldownRemaining]);
 
-  if (remaining <= 0) return null;
+  // When cooldown has expired, show "monitoring · ready" state
+  if (remaining <= 0) {
+    return (
+      <div className="flex items-center gap-3 py-2">
+        <Timer className="h-3.5 w-3.5 text-primary/60 shrink-0" />
+        <div className="flex-1">
+          <p className="text-[10px] font-mono text-primary/60 uppercase tracking-wider">
+            {t('home.monitoringReady', 'Monitoring · ready')}
+          </p>
+        </div>
+        <span className="h-1.5 w-1.5 rounded-full bg-primary/50 animate-pulse shrink-0" />
+      </div>
+    );
+  }
 
   const totalMs = cooldownHours * 60 * 60 * 1000;
   const progress = ((totalMs - remaining) / totalMs) * 100;
@@ -911,7 +925,7 @@ function AutoCooldownIndicator({
       <div className="flex-1 space-y-1.5">
         <div className="flex items-center justify-between">
           <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">
-            Next auto-check · {timeLabel}
+            {t('home.nextAutoCheck', { time: timeLabel })}
           </p>
           <p className="text-[10px] font-mono text-muted-foreground">
             {Math.round(progress)}%
