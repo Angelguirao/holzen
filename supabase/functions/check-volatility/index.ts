@@ -263,7 +263,7 @@ serve(async (req) => {
     // 2. Get all profiles - we need to check both thresholds
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
-      .select("user_id, threshold, cumulative_threshold, email_notifications, last_trigger_at, cooldown_hours, reflection_tone, companion_haiku, companion_learning, quiet_hours_start, quiet_hours_end, timezone, language");
+      .select("user_id, threshold, threshold_down, cumulative_threshold, email_notifications, last_trigger_at, cooldown_hours, reflection_tone, companion_haiku, companion_learning, quiet_hours_start, quiet_hours_end, timezone, language");
 
     if (profilesError) throw profilesError;
     if (!profiles || profiles.length === 0) {
@@ -294,7 +294,11 @@ serve(async (req) => {
 
     // Filter: must exceed at least one threshold AND not in cooldown AND not in quiet hours
     const eligible = profiles.filter((p) => {
-      const dailyTriggered = absChange >= (p.threshold ?? 5);
+      // Use direction-aware thresholds: threshold for up moves, threshold_down for down moves
+      const effectiveThreshold = btc.direction === "down"
+        ? ((p as any).threshold_down ?? p.threshold ?? 5)
+        : (p.threshold ?? 5);
+      const dailyTriggered = absChange >= effectiveThreshold;
       const cumulativeTriggered = absCumChange >= ((p as any).cumulative_threshold ?? 15);
       if (!dailyTriggered && !cumulativeTriggered) return false;
       if (isInQuietHours(p)) return false;
