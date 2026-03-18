@@ -490,10 +490,7 @@ export function useHolzen() {
         await supabase.from('profiles').update({
           last_message: msg,
           last_context: ctx,
-          last_trigger_at: new Date().toISOString(),
         }).eq('user_id', user.id);
-
-        setLastTriggerAt(new Date().toISOString());
       }
     } catch (e: any) {
       const raw = e?.message || '';
