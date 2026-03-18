@@ -194,17 +194,17 @@ serve(async (req) => {
       }
 
       const structureData = await structureResponse.json();
-      const toolCall = structureData.choices?.[0]?.message?.tool_calls?.[0];
+      const content = structureData.choices?.[0]?.message?.content;
 
-      if (!toolCall?.function?.arguments) {
+      if (!content) {
         throw new Error("No signal returned from AI");
       }
 
       let signal: any;
       try {
-        signal = JSON.parse(toolCall.function.arguments);
+        signal = typeof content === "string" ? JSON.parse(content) : content;
       } catch {
-        console.error("Failed to parse AI arguments:", toolCall.function.arguments);
+        console.error("Failed to parse AI content:", content);
         throw new Error("AI returned invalid JSON");
       }
 
@@ -220,7 +220,7 @@ serve(async (req) => {
     } catch (e) {
       clearTimeout(aiTimeout);
       if (e instanceof DOMException && e.name === "AbortError") {
-        log("AI timed out after 10s");
+        log("AI timed out after 18s");
         return new Response(
           JSON.stringify({ error: "AI structuring timed out" }),
           { status: 504, headers: { ...corsHeaders, "Content-Type": "application/json" } }
