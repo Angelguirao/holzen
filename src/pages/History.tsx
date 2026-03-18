@@ -791,6 +791,14 @@ const History = () => {
                   </AlertDialog>
                 </div>
               </div>
+              {/* Outcome / Incomplete indicator */}
+              {r.outcome ? (
+                <p className="text-[10px] font-mono text-muted-foreground/50 capitalize">→ {r.outcome}</p>
+              ) : (
+                <p className="text-[10px] font-mono text-muted-foreground/30 italic">
+                  {t('history.incomplete', 'Incomplete — no decision recorded')}
+                </p>
+              )}
               <p className="text-sm leading-relaxed">{r.message}</p>
 
               {/* Skill badges */}

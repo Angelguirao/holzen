@@ -71,9 +71,11 @@ export function useHolzenScore(
   holdGoal?: HoldGoal | null,
 ): HolzenScoreData | null {
   return useMemo(() => {
-    if (reflections.length < 1) return null;
+    // Only count completed pauses (those with a decision/outcome)
+    const completed = reflections.filter(r => r.outcome != null && r.outcome !== '');
+    if (completed.length < 1) return null;
 
-    const recent = reflections.slice(0, 30);
+    const recent = completed.slice(0, 30);
     const hasHoldGoal = holdGoal?.type != null;
 
     // --- WEIGHTS (redistribute Decision Alignment if no hold goal) ---

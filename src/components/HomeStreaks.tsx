@@ -19,6 +19,7 @@ export function HomeStreaks({ streakFreezeDates, onUseFreeze }: Props) {
       .from('reflections')
       .select('created_at, outcome')
       .eq('user_id', user.id)
+      .not('outcome', 'is', null)
       .order('created_at', { ascending: false })
       .then(({ data }) => {
         setReflections(data ?? []);
