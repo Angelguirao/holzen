@@ -27,20 +27,21 @@ serve(async (req) => {
     const { context, language, sources } = body;
     log("parsed body");
 
-    // Track AI usage (best-effort, non-blocking)
+    // Track AI usage — fire-and-forget (no await)
     const authHeader = req.headers.get("Authorization");
     if (authHeader?.startsWith("Bearer ")) {
-      try {
-        const { createClient } = await import("npm:@supabase/supabase-js@2.57.2");
-        const sbUrl = Deno.env.get("SUPABASE_URL") ?? "";
-        const sbUser = createClient(sbUrl, Deno.env.get("SUPABASE_ANON_KEY") ?? "", { global: { headers: { Authorization: authHeader } } });
-        const { data: { user } } = await sbUser.auth.getUser();
-        if (user) {
-          const svc = createClient(sbUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "", { auth: { persistSession: false } });
-          await svc.from("analytics_events").insert({ user_id: user.id, event: "signal_companion_ai_call" });
-        }
-      } catch (_) { /* non-fatal */ }
-      log("tracked usage");
+      (async () => {
+        try {
+          const { createClient } = await import("npm:@supabase/supabase-js@2.57.2");
+          const sbUrl = Deno.env.get("SUPABASE_URL") ?? "";
+          const sbUser = createClient(sbUrl, Deno.env.get("SUPABASE_ANON_KEY") ?? "", { global: { headers: { Authorization: authHeader } } });
+          const { data: { user } } = await sbUser.auth.getUser();
+          if (user) {
+            const svc = createClient(sbUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "", { auth: { persistSession: false } });
+            await svc.from("analytics_events").insert({ user_id: user.id, event: "signal_companion_ai_call" });
+          }
+        } catch (_) { /* non-fatal */ }
+      })();
     }
 
     const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
@@ -140,12 +141,12 @@ serve(async (req) => {
       throw new Error("No search content returned");
     }
 
-    // Step 2: Use Lovable AI to structure the result with 10s timeout
-    const langInstruction = langCode !== "en" ? `CRITICAL: Write title and body in ${langName}. Source name and URL remain as-is.\n\n` : "";
+    // Step 2: Use Lovable AI to structure the result with 18s timeout
+    const langInstruction = langCode !== "en" ? `Write in ${langName}. Keep source name/URL as-is.\n` : "";
 
     log("calling AI structuring");
     const aiController = new AbortController();
-    const aiTimeout = setTimeout(() => aiController.abort(), 10000);
+    const aiTimeout = setTimeout(() => aiController.abort(), 18000);
 
     try {
       const structureResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -159,42 +160,14 @@ serve(async (req) => {
           messages: [
             {
               role: "system",
-              content: `${langInstruction}You are a signal curator for a Bitcoin mindfulness app. Given grounded search results with real citations, extract ONE clean signal. You MUST call the "return_signal" function.
-
-Rules:
-- Use ONLY facts from the provided search results — do not invent anything
-- Title: short headline (5-12 words), factual, not clickbait
-- Body: 2-3 sentences max, calm and educational tone
-- Source: name the actual source (analyst, publication, or data provider)
-- URL: use one of the provided citation URLs. Pick the most relevant one.
-- No hype, no advice, no predictions`,
+              content: `${langInstruction}Extract ONE signal from the search results as JSON: {"title":"5-12 word headline","body":"2-3 sentences, calm tone","source":"source name","url":"citation URL"}. Use only facts from the results. No hype, no advice.`,
             },
             {
               role: "user",
-              content: `Search results:\n${searchContent}\n\nAvailable citation URLs:\n${citations.map((c: string, i: number) => `[${i + 1}] ${c}`).join("\n")}\n\nExtract one clean signal from these results.`,
+              content: `Search results:\n${searchContent}\n\nCitation URLs:\n${citations.map((c: string, i: number) => `[${i + 1}] ${c}`).join("\n")}`,
             },
           ],
-          tools: [
-            {
-              type: "function",
-              function: {
-                name: "return_signal",
-                description: "Return a curated Bitcoin signal/insight.",
-                parameters: {
-                  type: "object",
-                  properties: {
-                    title: { type: "string", description: "Short headline (5-12 words)." },
-                    body: { type: "string", description: "2-3 sentence insight." },
-                    source: { type: "string", description: "Name of the source." },
-                    url: { type: "string", description: "A real URL from the citations." },
-                  },
-                  required: ["title", "body", "source", "url"],
-                  additionalProperties: false,
-                },
-              },
-            },
-          ],
-          tool_choice: { type: "function", function: { name: "return_signal" } },
+          response_format: { type: "json_object" },
         }),
         signal: aiController.signal,
       });
@@ -221,17 +194,17 @@ Rules:
       }
 
       const structureData = await structureResponse.json();
-      const toolCall = structureData.choices?.[0]?.message?.tool_calls?.[0];
+      const content = structureData.choices?.[0]?.message?.content;
 
-      if (!toolCall?.function?.arguments) {
+      if (!content) {
         throw new Error("No signal returned from AI");
       }
 
       let signal: any;
       try {
-        signal = JSON.parse(toolCall.function.arguments);
+        signal = typeof content === "string" ? JSON.parse(content) : content;
       } catch {
-        console.error("Failed to parse AI arguments:", toolCall.function.arguments);
+        console.error("Failed to parse AI content:", content);
         throw new Error("AI returned invalid JSON");
       }
 
@@ -247,7 +220,7 @@ Rules:
     } catch (e) {
       clearTimeout(aiTimeout);
       if (e instanceof DOMException && e.name === "AbortError") {
-        log("AI timed out after 10s");
+        log("AI timed out after 18s");
         return new Response(
           JSON.stringify({ error: "AI structuring timed out" }),
           { status: 504, headers: { ...corsHeaders, "Content-Type": "application/json" } }
