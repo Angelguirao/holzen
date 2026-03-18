@@ -95,92 +95,79 @@ serve(async (req) => {
     const searchContent = searchData.choices?.[0]?.message?.content || "";
     const citations: string[] = searchData.citations || [];
 
-    // Step 2: Lovable AI structures the grounded result
-    const langInstruction = langCode !== "en" ? `CRITICAL: Write title and body in ${langName}. Keep citation names and URLs as-is.\n\n` : "";
+    // Step 2: Lovable AI structures the grounded result (18s timeout, JSON mode)
+    const langInstruction = langCode !== "en" ? `Write in ${langName}. Keep citation names and URLs as-is.\n` : "";
 
-    const structureResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
-        messages: [
-          {
-            role: "system",
-            content: `${langInstruction}You are a behavioral science curator for a Bitcoin mindfulness app. Given grounded research results with citations, extract ONE grounding nudge. Call the "return_nudge" function.
+    const aiController = new AbortController();
+    const aiTimeout = setTimeout(() => aiController.abort(), 18000);
 
-Rules:
-- Use ONLY facts from the provided search results
-- Reference specific researchers and years
-- Title: short summary of the bias or finding
-- Body: 2-3 sentences explaining the research and how it relates to the market context
-- Citation: formatted like "Kahneman & Tversky (1979), Prospect Theory"
-- URL: use one of the provided citation URLs
-- Tone: calm, grounding, no advice`,
-          },
-          {
-            role: "user",
-            content: `Market context: ${marketContext}\n\nSearch results:\n${searchContent}\n\nAvailable citation URLs:\n${citations.map((c: string, i: number) => `[${i + 1}] ${c}`).join("\n")}\n\nExtract one grounding nudge.`,
-          },
-        ],
-        tools: [
-          {
-            type: "function",
-            function: {
-              name: "return_nudge",
-              description: "Return a behavioral science grounding nudge with citation.",
-              parameters: {
-                type: "object",
-                properties: {
-                  title: { type: "string", description: "Short title summarizing the bias or finding." },
-                  body: { type: "string", description: "2-3 sentence explanation referencing the study." },
-                  citation: { type: "string", description: "Formatted citation like 'Kahneman & Tversky (1979), Prospect Theory'." },
-                  url: { type: "string", description: "URL from the citations." },
-                },
-                required: ["title", "body", "citation", "url"],
-                additionalProperties: false,
-              },
+    try {
+      const structureResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash-lite",
+          messages: [
+            {
+              role: "system",
+              content: `${langInstruction}Extract ONE grounding nudge from the search results as JSON: {"title":"short bias/finding summary","body":"2-3 sentences referencing researchers and years","citation":"formatted like Kahneman & Tversky (1979), Prospect Theory","url":"citation URL"}. Use only facts from the results. Tone: calm, grounding, no advice.`,
             },
-          },
-        ],
-        tool_choice: { type: "function", function: { name: "return_nudge" } },
-      }),
-    });
+            {
+              role: "user",
+              content: `Market context: ${marketContext}\n\nSearch results:\n${searchContent}\n\nCitation URLs:\n${citations.map((c: string, i: number) => `[${i + 1}] ${c}`).join("\n")}`,
+            },
+          ],
+          response_format: { type: "json_object" },
+        }),
+        signal: aiController.signal,
+      });
+      clearTimeout(aiTimeout);
 
-    if (!structureResponse.ok) {
-      if (structureResponse.status === 429) {
+      if (!structureResponse.ok) {
+        if (structureResponse.status === 429) {
+          return new Response(
+            JSON.stringify({ error: "Rate limited, please try again later." }),
+            { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        if (structureResponse.status === 402) {
+          return new Response(
+            JSON.stringify({ error: "AI credits exhausted." }),
+            { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        const t = await structureResponse.text();
+        console.error("AI structure error:", structureResponse.status, t);
+        throw new Error("AI structuring failed");
+      }
+
+      const structureData = await structureResponse.json();
+      const content = structureData.choices?.[0]?.message?.content;
+      if (!content) throw new Error("No nudge returned from AI");
+
+      const nudge = typeof content === "string" ? JSON.parse(content) : content;
+
+      // Ensure URL is from citations
+      if (citations.length > 0 && !citations.includes(nudge.url)) {
+        nudge.url = citations[0];
+      }
+
+      return new Response(JSON.stringify(nudge), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    } catch (e) {
+      clearTimeout(aiTimeout);
+      if (e instanceof DOMException && e.name === "AbortError") {
         return new Response(
-          JSON.stringify({ error: "Rate limited, please try again later." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          JSON.stringify({ error: "AI structuring timed out" }),
+          { status: 504, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      if (structureResponse.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "AI credits exhausted." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      const t = await structureResponse.text();
-      console.error("AI structure error:", structureResponse.status, t);
-      throw new Error("AI structuring failed");
+      throw e;
     }
-
-    const structureData = await structureResponse.json();
-    const toolCall = structureData.choices?.[0]?.message?.tool_calls?.[0];
-    if (!toolCall) throw new Error("No tool call in response");
-
-    const nudge = JSON.parse(toolCall.function.arguments);
-
-    // Ensure URL is from citations
-    if (citations.length > 0 && !citations.includes(nudge.url)) {
-      nudge.url = citations[0];
-    }
-
-    return new Response(JSON.stringify(nudge), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
   } catch (e) {
     console.error("ground-nudge error:", e);
     return new Response(
