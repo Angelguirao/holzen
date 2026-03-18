@@ -4,12 +4,13 @@ import { LibraryItemCard } from './LibraryItemCard';
 import { ItemDetailViewer } from './ItemDetailViewer';
 import type { useLibrary } from '@/hooks/use-library';
 import type { LibraryItem } from '@/hooks/use-library';
+import { Trash2, Archive, Heart, X, CheckSquare } from 'lucide-react';
+import { cn } from '@/lib/utils';
 import {
   isToday,
   isYesterday,
   isThisWeek,
   isThisMonth,
-  startOfDay,
 } from 'date-fns';
 
 interface Props {
@@ -62,6 +63,60 @@ export function LibraryItems({ library, filtered }: Props) {
   } = library;
 
   const [selectedItem, setSelectedItem] = useState<LibraryItem | null>(null);
+  const [selectMode, setSelectMode] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkLoading, setBulkLoading] = useState(false);
+
+  const toggleSelect = useCallback((id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }, []);
+
+  const exitSelectMode = useCallback(() => {
+    setSelectMode(false);
+    setSelectedIds(new Set());
+  }, []);
+
+  const enterSelectMode = useCallback(() => {
+    setSelectMode(true);
+    setSelectedIds(new Set());
+  }, []);
+
+  const selectAll = useCallback(() => {
+    setSelectedIds(new Set(filtered.map((i) => i.id)));
+  }, [filtered]);
+
+  const handleBulkDelete = useCallback(async () => {
+    if (selectedIds.size === 0) return;
+    setBulkLoading(true);
+    await Promise.all(Array.from(selectedIds).map((id) => deleteItem(id)));
+    setBulkLoading(false);
+    exitSelectMode();
+  }, [selectedIds, deleteItem, exitSelectMode]);
+
+  const handleBulkArchive = useCallback(async () => {
+    if (selectedIds.size === 0) return;
+    setBulkLoading(true);
+    await Promise.all(
+      Array.from(selectedIds).map((id) => updateItem(id, { status: 'archived' } as any))
+    );
+    setBulkLoading(false);
+    exitSelectMode();
+  }, [selectedIds, updateItem, exitSelectMode]);
+
+  const handleBulkFavorite = useCallback(async () => {
+    if (selectedIds.size === 0) return;
+    setBulkLoading(true);
+    await Promise.all(
+      Array.from(selectedIds).map((id) => updateItem(id, { is_favorite: true } as any))
+    );
+    setBulkLoading(false);
+    exitSelectMode();
+  }, [selectedIds, updateItem, exitSelectMode]);
 
   const handleStatusChange = async (id: string, status: 'unread' | 'read' | 'archived') => {
     await updateItem(id, { status } as any);
@@ -71,7 +126,6 @@ export function LibraryItems({ library, filtered }: Props) {
     await updateItem(id, { tags } as any);
   };
 
-  // Build a map of reflection_id → linked companion items
   const linkedMap = useMemo(() => {
     const map = new Map<string, LibraryItem[]>();
     items.forEach((i) => {
@@ -84,7 +138,6 @@ export function LibraryItems({ library, filtered }: Props) {
     return map;
   }, [items]);
 
-  // Keep selectedItem in sync with items state (e.g. after favorite toggle)
   const currentSelectedItem = useMemo(() => {
     if (!selectedItem) return null;
     return items.find((i) => i.id === selectedItem.id) ?? selectedItem;
@@ -99,25 +152,103 @@ export function LibraryItems({ library, filtered }: Props) {
     setSelectedItem(item);
   }, []);
 
-  // Date-grouped sections
-  const dateGroups = useMemo(() => groupByDate(filtered, t), [filtered, t]);
-
-  // Pinned items shown at top, separately
   const pinnedItems = filtered.filter((i) => i.pinned);
   const unpinnedFiltered = filtered.filter((i) => !i.pinned);
   const unpinnedGroups = useMemo(() => groupByDate(unpinnedFiltered, t), [unpinnedFiltered, t]);
 
   const renderCard = (item: LibraryItem) => (
-    <LibraryItemCard
-      key={item.id}
-      item={item}
-      onToggleFavorite={toggleFavorite}
-      onClick={() => setSelectedItem(item)}
-    />
+    <div key={item.id} className="flex items-center">
+      {selectMode && (
+        <button
+          onClick={() => toggleSelect(item.id)}
+          className={cn(
+            'shrink-0 w-5 h-5 rounded border flex items-center justify-center ml-2 mr-0.5 transition-colors',
+            selectedIds.has(item.id)
+              ? 'bg-primary border-primary text-primary-foreground'
+              : 'border-border/60 text-transparent hover:border-muted-foreground/40'
+          )}
+        >
+          {selectedIds.has(item.id) && (
+            <svg viewBox="0 0 12 12" className="h-3 w-3"><path d="M10 3L4.5 8.5 2 6" stroke="currentColor" strokeWidth="1.5" fill="none" strokeLinecap="round" strokeLinejoin="round" /></svg>
+          )}
+        </button>
+      )}
+      <div className="flex-1 min-w-0">
+        <LibraryItemCard
+          item={item}
+          onToggleFavorite={selectMode ? () => toggleSelect(item.id) : toggleFavorite}
+          onClick={() => {
+            if (selectMode) {
+              toggleSelect(item.id);
+            } else {
+              setSelectedItem(item);
+            }
+          }}
+        />
+      </div>
+    </div>
   );
 
   return (
     <>
+      {/* Select mode toggle + bulk action bar */}
+      <div className="flex items-center justify-between px-1 min-h-[28px]">
+        {selectMode ? (
+          <div className="flex items-center gap-2 w-full">
+            <button
+              onClick={exitSelectMode}
+              className="p-1 text-muted-foreground/60 hover:text-foreground transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+            <span className="text-[10px] font-mono text-muted-foreground/70">
+              {selectedIds.size} {t('library.selected', { defaultValue: 'selected' })}
+            </span>
+            <button
+              onClick={selectAll}
+              className="text-[10px] font-mono text-primary/70 hover:text-primary transition-colors"
+            >
+              {t('library.selectAll', { defaultValue: 'Select all' })}
+            </button>
+            <div className="flex-1" />
+            <button
+              onClick={handleBulkFavorite}
+              disabled={bulkLoading || selectedIds.size === 0}
+              className="p-1.5 text-muted-foreground/50 hover:text-destructive disabled:opacity-30 transition-colors"
+              title={t('library.bulkFavorite', { defaultValue: 'Favorite' })}
+            >
+              <Heart className="h-3.5 w-3.5" />
+            </button>
+            <button
+              onClick={handleBulkArchive}
+              disabled={bulkLoading || selectedIds.size === 0}
+              className="p-1.5 text-muted-foreground/50 hover:text-foreground disabled:opacity-30 transition-colors"
+              title={t('library.bulkArchive', { defaultValue: 'Archive' })}
+            >
+              <Archive className="h-3.5 w-3.5" />
+            </button>
+            <button
+              onClick={handleBulkDelete}
+              disabled={bulkLoading || selectedIds.size === 0}
+              className="p-1.5 text-muted-foreground/50 hover:text-destructive disabled:opacity-30 transition-colors"
+              title={t('library.bulkDelete', { defaultValue: 'Delete' })}
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        ) : (
+          filtered.length > 0 && (
+            <button
+              onClick={enterSelectMode}
+              className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground/40 hover:text-muted-foreground transition-colors ml-auto"
+            >
+              <CheckSquare className="h-3 w-3" />
+              {t('library.select', { defaultValue: 'Select' })}
+            </button>
+          )
+        )}
+      </div>
+
       <div className="space-y-4">
         {pinnedItems.length > 0 && (
           <div className="space-y-0.5">
@@ -152,7 +283,7 @@ export function LibraryItems({ library, filtered }: Props) {
         item={currentSelectedItem}
         linkedItems={selectedLinkedItems}
         allItems={items}
-        open={!!selectedItem}
+        open={!!selectedItem && !selectMode}
         onClose={() => setSelectedItem(null)}
         onToggleFavorite={toggleFavorite}
         onTogglePin={togglePin}
