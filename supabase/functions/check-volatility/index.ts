@@ -379,13 +379,12 @@ serve(async (req) => {
         .select("id")
         .single();
 
-      // Update profile with new reflection
+      // Update profile with new reflection (last_trigger_at already set by optimistic lock above)
       await supabase
         .from("profiles")
         .update({
           last_message: result.message,
           last_context: ctx,
-          last_trigger_at: new Date().toISOString(),
         })
         .eq("user_id", profile.user_id);
 
