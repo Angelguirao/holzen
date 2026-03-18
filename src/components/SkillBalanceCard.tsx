@@ -37,18 +37,20 @@ export function SkillBalanceCard({ reflections }: Props) {
   const { t } = useTranslation();
 
   const data = useMemo(() => {
-    if (reflections.length < 3) return null;
+    // Only count completed pauses (with outcome)
+    const completed = reflections.filter(r => r.outcome != null && r.outcome !== '');
+    if (completed.length < 3) return null;
 
     const counts: Record<SkillType, number> = {
       regulation: 0, tolerance: 0, alignment: 0, reappraisal: 0, awareness: 0,
     };
 
-    for (const r of reflections) {
+    for (const r of completed) {
       const skills = detectSkills(r);
       for (const s of skills) counts[s]++;
     }
 
-    const total = reflections.length;
+    const total = completed.length;
     return SKILL_ORDER.map((skill) => ({
       skill,
       count: counts[skill],
@@ -57,11 +59,12 @@ export function SkillBalanceCard({ reflections }: Props) {
   }, [reflections]);
 
   if (!data) {
+    const completedCount = reflections.filter(r => r.outcome != null && r.outcome !== '').length;
     return (
       <ChartEmptyState
         title={t('skillBalance.title', 'Skill Balance')}
         message={t('skillBalance.emptyMessage', 'Complete at least 3 pauses to see which skills you practice most.')}
-        current={reflections.length}
+        current={completedCount}
         needed={3}
       />
     );

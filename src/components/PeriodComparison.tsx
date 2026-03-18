@@ -45,17 +45,18 @@ interface PeriodStats {
 const CALM_MOODS = ['calm', 'detached'];
 
 function computeStats(refs: Reflection[]): PeriodStats {
-  if (refs.length === 0) return { count: 0, holdRate: null, calmExitRate: null };
+  // Only count completed pauses (with outcome)
+  const completed = refs.filter((r) => r.outcome != null && r.outcome !== '');
+  if (completed.length === 0) return { count: 0, holdRate: null, calmExitRate: null };
 
-  const withOutcome = refs.filter((r) => r.outcome);
-  const held = withOutcome.filter((r) => r.outcome === 'held' || r.outcome === 'nothing');
-  const holdRate = withOutcome.length > 0 ? held.length / withOutcome.length : null;
+  const held = completed.filter((r) => r.outcome === 'held' || r.outcome === 'nothing');
+  const holdRate = completed.length > 0 ? held.length / completed.length : null;
 
-  const withMoodAfter = refs.filter((r) => r.mood_after);
+  const withMoodAfter = completed.filter((r) => r.mood_after);
   const calmExits = withMoodAfter.filter((r) => CALM_MOODS.includes(r.mood_after!));
   const calmExitRate = withMoodAfter.length > 0 ? calmExits.length / withMoodAfter.length : null;
 
-  return { count: refs.length, holdRate, calmExitRate };
+  return { count: completed.length, holdRate, calmExitRate };
 }
 
 type View = 'weekly' | 'monthly';
