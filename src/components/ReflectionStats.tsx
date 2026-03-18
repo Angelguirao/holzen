@@ -19,10 +19,11 @@ export function ReflectionStats({ reflections, streakFreezeDates = [], onUseFree
   const { total, currentStreak, longestStreak, streakAtRisk, canFreeze, nextFreezeAvailable } = useMemo(() => {
     if (reflections.length === 0) return { total: 0, currentStreak: 0, longestStreak: 0, streakAtRisk: false, canFreeze: false, nextFreezeAvailable: null };
 
+    // Only count completed pauses (with outcome) for all metrics
     const withOutcome = reflections.filter(r => r.outcome != null && r.outcome !== '');
-    const totalOutcomes = withOutcome.length;
+    const totalCompleted = withOutcome.length;
 
-    if (totalOutcomes === 0) return { total: reflections.length, currentStreak: 0, longestStreak: 0, streakAtRisk: false, canFreeze: false, nextFreezeAvailable: null };
+    if (totalCompleted === 0) return { total: 0, currentStreak: 0, longestStreak: 0, streakAtRisk: false, canFreeze: false, nextFreezeAvailable: null };
 
     const days = new Set<string>();
     for (const r of withOutcome) {
