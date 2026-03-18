@@ -197,7 +197,7 @@ Rules:
 You MUST respond by calling the "generate_deep_time" function.`;
 
         const aiController = new AbortController();
-        const aiTimeout = setTimeout(() => aiController.abort(), 10000);
+        const aiTimeout = setTimeout(() => aiController.abort(), 18000);
 
         const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
