@@ -253,6 +253,16 @@ export function useHolzen() {
   // Fire-and-forget: pre-generate signal, zoom-out, and historical-insight companion data
   // so it's cached on the reflection row before the user reaches the Reflect step.
   const preGenerateCompanions = useCallback((reflectionId: string, ctx: string, msg: string, lang: string, userId: string) => {
+    // Helper: invoke edge function with 1 retry on failure
+    const invokeWithRetry = async (fnName: string, body: any, retries = 1): Promise<{ data: any; error: any }> => {
+      const result = await supabase.functions.invoke(fnName, { body });
+      if ((result.error || !result.data || result.data?.error) && retries > 0) {
+        await new Promise((r) => setTimeout(r, 3000)); // wait 3s before retry
+        return invokeWithRetry(fnName, body, retries - 1);
+      }
+      return result;
+    };
+
     // Helper to fetch user's active sources for a category
     const fetchSources = async (category: string) => {
       try {
@@ -274,10 +284,10 @@ export function useHolzen() {
 
     // Signal companion
     fetchSources('signal').then(sources => {
-      supabase.functions.invoke('signal-companion', {
-        body: { context: ctx, language: lang, sources: sources.length > 0 ? sources : undefined },
+      invokeWithRetry('signal-companion', {
+        context: ctx, language: lang, sources: sources.length > 0 ? sources : undefined,
       }).then(({ data, error }) => {
-        if (error || !data || data.error) { console.warn('[signal-companion] failed:', error?.message ?? data?.error ?? 'no data'); return; }
+        if (error || !data || data.error) { console.warn('[signal-companion] failed after retry:', error?.message ?? data?.error ?? 'no data'); return; }
         supabase.from('reflections').update({
           signal_title: data.title,
           signal_body: data.body,
@@ -292,8 +302,8 @@ export function useHolzen() {
     });
 
     // Zoom Out companion
-    supabase.functions.invoke('zoom-out-companion', {
-      body: { context: ctx, reflectionMessage: msg, language: lang },
+    invokeWithRetry('zoom-out-companion', {
+      context: ctx, reflectionMessage: msg, language: lang,
     }).then(({ data, error }) => {
       if (error || !data || data.error) return;
       supabase.from('reflections').update({ zoom_out_data: data } as any).eq('id', reflectionId).then(({ error }) => { if (error) console.error('[zoom_out] reflection update failed:', error.message); });
@@ -306,8 +316,8 @@ export function useHolzen() {
     });
 
     // Historical Insight companion
-    supabase.functions.invoke('historical-insight', {
-      body: { context: ctx, language: lang },
+    invokeWithRetry('historical-insight', {
+      context: ctx, language: lang,
     }).then(({ data, error }) => {
       if (error || !data || data.error) return;
       supabase.from('reflections').update({ history_insight_data: data } as any).eq('id', reflectionId).then(({ error }) => { if (error) console.error('[history] reflection update failed:', error.message); });
@@ -319,8 +329,8 @@ export function useHolzen() {
 
     // Ground nudge (learning)
     fetchSources('learning').then(sources => {
-      supabase.functions.invoke('ground-nudge', {
-        body: { context: ctx, language: lang, sources: sources.length > 0 ? sources : undefined },
+      invokeWithRetry('ground-nudge', {
+        context: ctx, language: lang, sources: sources.length > 0 ? sources : undefined,
       }).then(({ data, error }) => {
         if (error || !data || data.error) return;
         supabase.from('reflections').update({
@@ -490,10 +500,7 @@ export function useHolzen() {
         await supabase.from('profiles').update({
           last_message: msg,
           last_context: ctx,
-          last_trigger_at: new Date().toISOString(),
         }).eq('user_id', user.id);
-
-        setLastTriggerAt(new Date().toISOString());
       }
     } catch (e: any) {
       const raw = e?.message || '';
@@ -530,16 +537,24 @@ export function useHolzen() {
       const data = await fetchBtcData(currency);
       setBtcData(data);
 
-      if (user && !(await isInCooldown()) && !isInQuietHours()) {
+      if (user && !isInQuietHours()) {
         const effectiveThreshold = data.changePercent < 0 ? thresholdDown : threshold;
         const dailyTriggered = Math.abs(data.changePercent) >= effectiveThreshold;
         const cumulativeTriggered = data.cumulativeChangePercent !== undefined && Math.abs(data.cumulativeChangePercent) >= cumulativeThreshold;
 
         if (dailyTriggered || cumulativeTriggered) {
-          // Optimistically set cooldown BEFORE AI call to prevent duplicate triggers
-          const nowIso = new Date().toISOString();
-          await supabase.from('profiles').update({ last_trigger_at: nowIso }).eq('user_id', user.id);
-          setLastTriggerAt(nowIso);
+          // Atomically claim the trigger slot in the DB — prevents all race conditions
+          const { data: claimed, error: claimErr } = await supabase.rpc('claim_trigger_slot', {
+            _user_id: user.id,
+            _cooldown_hours: cooldownHours,
+          });
+
+          if (claimErr || !claimed) {
+            // Another tab/call already claimed it, or still in cooldown
+            return;
+          }
+
+          setLastTriggerAt(new Date().toISOString());
           await generateMessage(data);
         }
       }
@@ -553,7 +568,7 @@ export function useHolzen() {
     } finally {
       checkingRef.current = false;
     }
-  }, [user, threshold, thresholdDown, cumulativeThreshold, isInCooldown, isInQuietHours, generateMessage, currency]);
+  }, [user, threshold, thresholdDown, cumulativeThreshold, cooldownHours, isInQuietHours, generateMessage, currency]);
 
   const [lastTriggerAt, setLastTriggerAt] = useState<string | null>(null);
   const manualCooldownKey = user ? `holzen_last_manual_at_${user.id}` : 'holzen_last_manual_at';
