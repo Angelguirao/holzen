@@ -194,7 +194,7 @@ Rules:
 - Vary the theme: sometimes civilizational, sometimes planetary, sometimes about the nature of patience itself.
 - Ground in real facts and numbers when possible.
 
-You MUST respond by calling the "generate_deep_time" function.`;
+You MUST respond with a JSON object containing "title" and "body" keys. No other text.`;
 
         const aiController = new AbortController();
         const aiTimeout = setTimeout(() => aiController.abort(), 18000);
