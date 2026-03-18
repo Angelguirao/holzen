@@ -8,6 +8,7 @@ import AuthLoading from '@/components/AuthLoading';
 import { useSubscription } from '@/hooks/use-subscription';
 import { BtcStatus } from '@/components/BtcStatus';
 import { NightReflectionCard, useNightReflection } from '@/components/NightReflectionCard';
+import { FollowUpCard } from '@/components/FollowUpCard';
 import { ReflectionMessage } from '@/components/ReflectionMessage';
 import { HolzenNumber } from '@/components/HolzenNumber';
 import { ReflectionComparison } from '@/components/ReflectionComparison';
