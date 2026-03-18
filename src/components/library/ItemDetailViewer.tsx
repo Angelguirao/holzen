@@ -94,7 +94,7 @@ export function ItemDetailViewer({
 
   const siblings = useMemo(() => {
     if (!item?.reflection_id || !allItems) return [];
-    return allItems.filter((i) => i.reflection_id === item.reflection_id && i.id !== item.id);
+    return allItems.filter((i) => i.reflection_id === item.reflection_id && i.id !== item.id && i.status !== 'deleted');
   }, [item, allItems]);
 
   const zoomOutData = useMemo(() => {
