@@ -1053,6 +1053,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      claim_trigger_slot: {
+        Args: { _cooldown_hours: number; _user_id: string }
+        Returns: boolean
+      }
       find_similar_reflection: {
         Args: {
           _min_age_days?: number
