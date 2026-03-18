@@ -591,6 +591,7 @@ function StatsContent({ reflections, practiceEntries = [], letters = [], memberS
       <ProLock feature="emotional_patterns">
         <StatsSection label={t('profile.sectionDecisions', 'Decision Making')}>
           <DecisionQualityCard reflections={reflections} />
+          <DecisionAccuracyCard />
           <VolatilityToleranceCard reflections={reflections} />
         </StatsSection>
       </ProLock>
