@@ -530,16 +530,24 @@ export function useHolzen() {
       const data = await fetchBtcData(currency);
       setBtcData(data);
 
-      if (user && !(await isInCooldown()) && !isInQuietHours()) {
+      if (user && !isInQuietHours()) {
         const effectiveThreshold = data.changePercent < 0 ? thresholdDown : threshold;
         const dailyTriggered = Math.abs(data.changePercent) >= effectiveThreshold;
         const cumulativeTriggered = data.cumulativeChangePercent !== undefined && Math.abs(data.cumulativeChangePercent) >= cumulativeThreshold;
 
         if (dailyTriggered || cumulativeTriggered) {
-          // Optimistically set cooldown BEFORE AI call to prevent duplicate triggers
-          const nowIso = new Date().toISOString();
-          await supabase.from('profiles').update({ last_trigger_at: nowIso }).eq('user_id', user.id);
-          setLastTriggerAt(nowIso);
+          // Atomically claim the trigger slot in the DB — prevents all race conditions
+          const { data: claimed, error: claimErr } = await supabase.rpc('claim_trigger_slot', {
+            _user_id: user.id,
+            _cooldown_hours: cooldownHours,
+          });
+
+          if (claimErr || !claimed) {
+            // Another tab/call already claimed it, or still in cooldown
+            return;
+          }
+
+          setLastTriggerAt(new Date().toISOString());
           await generateMessage(data);
         }
       }
@@ -553,7 +561,7 @@ export function useHolzen() {
     } finally {
       checkingRef.current = false;
     }
-  }, [user, threshold, thresholdDown, cumulativeThreshold, isInCooldown, isInQuietHours, generateMessage, currency]);
+  }, [user, threshold, thresholdDown, cumulativeThreshold, cooldownHours, isInQuietHours, generateMessage, currency]);
 
   const [lastTriggerAt, setLastTriggerAt] = useState<string | null>(null);
   const manualCooldownKey = user ? `holzen_last_manual_at_${user.id}` : 'holzen_last_manual_at';
