@@ -37,18 +37,20 @@ export function SkillBalanceCard({ reflections }: Props) {
   const { t } = useTranslation();
 
   const data = useMemo(() => {
-    if (reflections.length < 3) return null;
+    // Only count completed pauses (with outcome)
+    const completed = reflections.filter(r => r.outcome != null && r.outcome !== '');
+    if (completed.length < 3) return null;
 
     const counts: Record<SkillType, number> = {
       regulation: 0, tolerance: 0, alignment: 0, reappraisal: 0, awareness: 0,
     };
 
-    for (const r of reflections) {
+    for (const r of completed) {
       const skills = detectSkills(r);
       for (const s of skills) counts[s]++;
     }
 
-    const total = reflections.length;
+    const total = completed.length;
     return SKILL_ORDER.map((skill) => ({
       skill,
       count: counts[skill],
