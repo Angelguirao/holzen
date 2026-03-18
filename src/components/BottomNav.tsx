@@ -33,6 +33,7 @@ export function BottomNav() {
           </NavLink>
         ))}
       </div>
+      <span className="absolute top-1 right-2 text-[7px] font-mono text-muted-foreground/25">v2</span>
     </nav>
   );
 }
