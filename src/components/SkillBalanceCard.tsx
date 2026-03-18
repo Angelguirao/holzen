@@ -59,11 +59,12 @@ export function SkillBalanceCard({ reflections }: Props) {
   }, [reflections]);
 
   if (!data) {
+    const completedCount = reflections.filter(r => r.outcome != null && r.outcome !== '').length;
     return (
       <ChartEmptyState
         title={t('skillBalance.title', 'Skill Balance')}
         message={t('skillBalance.emptyMessage', 'Complete at least 3 pauses to see which skills you practice most.')}
-        current={reflections.length}
+        current={completedCount}
         needed={3}
       />
     );

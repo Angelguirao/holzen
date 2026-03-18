@@ -78,7 +78,7 @@ export function ReflectionStats({ reflections, streakFreezeDates = [], onUseFree
       nextFreezeAvailable = formatDistanceToNow(nextDate, { addSuffix: true });
     }
 
-    return { total: reflections.length, currentStreak: current, longestStreak: longest, streakAtRisk: atRisk, canFreeze: freezeAvailable, nextFreezeAvailable };
+    return { total: totalCompleted, currentStreak: current, longestStreak: longest, streakAtRisk: atRisk, canFreeze: freezeAvailable, nextFreezeAvailable };
   }, [reflections, streakFreezeDates]);
 
   const handleFreeze = async () => {

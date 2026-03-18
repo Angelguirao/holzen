@@ -58,6 +58,8 @@ interface WeekBucket {
 }
 
 function buildWeeklyData(reflections: Reflection[]): WeekBucket[] {
+  // Only process completed pauses (with outcome)
+  const completed = reflections.filter(r => r.outcome != null && r.outcome !== '');
   const buckets = new Map<string, {
     scores: number[];
     held: number; totalOutcomes: number;
@@ -65,7 +67,7 @@ function buildWeeklyData(reflections: Reflection[]): WeekBucket[] {
     count: number;
   }>();
 
-  for (const r of reflections) {
+  for (const r of completed) {
     const date = parseISO(r.created_at);
     const key = startOfWeek(date, { weekStartsOn: 1 }).toISOString().slice(0, 10);
     const entry = buckets.get(key) || {
