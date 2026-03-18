@@ -312,6 +312,33 @@ serve(async (req) => {
     let triggered = 0;
 
     for (const profile of eligible) {
+      // Optimistic lock: claim the cooldown slot BEFORE generating the reflection
+      // to prevent race conditions with client-side triggers
+      const nowIso = new Date().toISOString();
+      const { data: claimResult } = await supabase
+        .from("profiles")
+        .update({ last_trigger_at: nowIso })
+        .eq("user_id", profile.user_id)
+        .lt("last_trigger_at", new Date(Date.now() - ((profile as any).cooldown_hours ?? 6) * 60 * 60 * 1000).toISOString())
+        .select("user_id")
+        .single();
+
+      // If last_trigger_at was already updated (by client or another run), skip
+      if (!claimResult) {
+        // Also handle case where last_trigger_at is null
+        const { data: nullClaim } = await supabase
+          .from("profiles")
+          .update({ last_trigger_at: nowIso })
+          .eq("user_id", profile.user_id)
+          .is("last_trigger_at", null)
+          .select("user_id")
+          .single();
+        if (!nullClaim) {
+          console.log(`[CHECK-VOLATILITY] Skipping ${profile.user_id} — cooldown claimed by another trigger`);
+          continue;
+        }
+      }
+
       const dir = btc.direction === "down" ? "down" : "up";
       const pct = absChange.toFixed(1);
       let ctx = `BTC is ${dir} ${pct}% in the last 24 hours.`;
