@@ -388,6 +388,93 @@ serve(async (req) => {
         })
         .eq("user_id", profile.user_id);
 
+      // Fire-and-forget: pre-generate companion data (Signal, Zoom Out, History, Ground Nudge)
+      // so it's cached on the reflection row before the user opens the session.
+      if (insertedReflection?.id) {
+        const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
+        const anonKey = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
+        const companionHeaders = {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${anonKey}`,
+          "apikey": anonKey,
+        };
+
+        // Fetch user's active signal/learning sources
+        const fetchSources = async (category: string) => {
+          try {
+            const [{ data: catalog }, { data: userPrefs }] = await Promise.all([
+              supabase.from("signal_sources").select("id, name, type, url, category").eq("category", category),
+              supabase.from("user_signal_preferences").select("source_id, custom_name, custom_url, custom_type, active, category").eq("user_id", profile.user_id).eq("category", category),
+            ]);
+            const prefsMap = new Map((userPrefs ?? []).map((p: any) => [p.source_id, p]));
+            const catalogActive = (catalog ?? []).filter((s: any) => { const pref = prefsMap.get(s.id); return pref ? pref.active : true; }).map((s: any) => ({ name: s.name, type: s.type, url: s.url }));
+            const customActive = (userPrefs ?? []).filter((p: any) => !p.source_id && p.custom_name && p.active).map((p: any) => ({ name: p.custom_name, type: p.custom_type || "blog", url: p.custom_url }));
+            return [...catalogActive, ...customActive];
+          } catch { return []; }
+        };
+
+        const reflectionId = insertedReflection.id;
+        const companionLang = userLang;
+
+        // Fire all companion calls in parallel (fire-and-forget — don't await)
+        Promise.allSettled([
+          // Signal companion
+          fetchSources("signal").then(sources =>
+            fetch(`${supabaseUrl}/functions/v1/signal-companion`, {
+              method: "POST", headers: companionHeaders,
+              body: JSON.stringify({ context: ctx, language: companionLang, sources: sources.length > 0 ? sources : undefined }),
+            }).then(async (res) => {
+              if (!res.ok) { await res.text(); return; }
+              const data = await res.json();
+              if (data?.title) {
+                await supabase.from("reflections").update({
+                  signal_title: data.title, signal_body: data.body,
+                  signal_source: data.source, signal_url: data.url,
+                }).eq("id", reflectionId);
+              }
+            })
+          ),
+          // Zoom Out companion
+          fetch(`${supabaseUrl}/functions/v1/zoom-out-companion`, {
+            method: "POST", headers: companionHeaders,
+            body: JSON.stringify({ context: ctx, reflectionMessage: result.message, language: companionLang }),
+          }).then(async (res) => {
+            if (!res.ok) { await res.text(); return; }
+            const data = await res.json();
+            if (data && !data.error) {
+              await supabase.from("reflections").update({ zoom_out_data: data }).eq("id", reflectionId);
+            }
+          }),
+          // Historical Insight companion
+          fetch(`${supabaseUrl}/functions/v1/historical-insight`, {
+            method: "POST", headers: companionHeaders,
+            body: JSON.stringify({ context: ctx, language: companionLang }),
+          }).then(async (res) => {
+            if (!res.ok) { await res.text(); return; }
+            const data = await res.json();
+            if (data && !data.error) {
+              await supabase.from("reflections").update({ history_insight_data: data }).eq("id", reflectionId);
+            }
+          }),
+          // Ground Nudge (learning)
+          fetchSources("learning").then(sources =>
+            fetch(`${supabaseUrl}/functions/v1/ground-nudge`, {
+              method: "POST", headers: companionHeaders,
+              body: JSON.stringify({ context: ctx, language: companionLang, sources: sources.length > 0 ? sources : undefined }),
+            }).then(async (res) => {
+              if (!res.ok) { await res.text(); return; }
+              const data = await res.json();
+              if (data?.title) {
+                await supabase.from("reflections").update({
+                  learning_title: data.title, learning_body: data.body,
+                  learning_citation: data.citation, learning_url: data.url,
+                }).eq("id", reflectionId);
+              }
+            })
+          ),
+        ]).catch((e) => console.error("[CHECK-VOLATILITY] Companion generation error:", e));
+      }
+
       // Send email notification if enabled
       if (profile.email_notifications) {
         // Get user email from auth
