@@ -75,7 +75,7 @@ export function LibraryItems({ library, filtered }: Props) {
   const linkedMap = useMemo(() => {
     const map = new Map<string, LibraryItem[]>();
     items.forEach((i) => {
-      if (i.reflection_id && i.source_type !== 'reflection') {
+      if (i.reflection_id && i.source_type !== 'reflection' && i.status !== 'deleted') {
         const arr = map.get(i.reflection_id) ?? [];
         arr.push(i);
         map.set(i.reflection_id, arr);
