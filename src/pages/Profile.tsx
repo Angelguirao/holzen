@@ -14,6 +14,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 
 
 import { DecisionQualityCard } from '@/components/DecisionQualityCard';
+import { DecisionAccuracyCard } from '@/components/DecisionAccuracyCard';
 import { ChartEmptyState } from '@/components/ChartEmptyState';
 import { MilestoneTimeline } from '@/components/MilestoneTimeline';
 import { JourneyWidget } from '@/components/JourneyWidget';
