@@ -209,6 +209,44 @@ export type Database = {
         }
         Relationships: []
       }
+      follow_ups: {
+        Row: {
+          created_at: string
+          decision_held: boolean | null
+          id: string
+          original_decision: string
+          reflection_id: string
+          responded_at: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          decision_held?: boolean | null
+          id?: string
+          original_decision: string
+          reflection_id: string
+          responded_at?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          decision_held?: boolean | null
+          id?: string
+          original_decision?: string
+          reflection_id?: string
+          responded_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "follow_ups_reflection_id_fkey"
+            columns: ["reflection_id"]
+            isOneToOne: true
+            referencedRelation: "reflections"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       future_letters: {
         Row: {
           body: string
