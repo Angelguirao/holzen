@@ -438,7 +438,8 @@ const Home = () => {
             alwaysOpen
           >
             <div className="space-y-4">
-              
+              {/* 24h follow-up check-in */}
+              <FollowUpCard />
 
               {!subLoading && !hasAccess ? (
                 <div className="space-y-3">
