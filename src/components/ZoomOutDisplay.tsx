@@ -38,7 +38,7 @@ const outcomeLabels: Record<string, string> = {
   held: 'Held', hold: 'Held', sold: 'Sold', bought: 'Bought', nothing: 'Did nothing',
 };
 
-export function ZoomOutDisplay({ data, loading, error }: Props) {
+export function ZoomOutDisplay({ data, loading, error, onRetry }: Props) {
   const { currency } = useHolzen();
   const fmtPrice = (n: number) => formatBtcPrice(n, currency);
   if (loading) {
@@ -52,11 +52,7 @@ export function ZoomOutDisplay({ data, loading, error }: Props) {
   }
 
   if (error || !data) {
-    return (
-      <p className="text-xs text-muted-foreground/60 font-mono">
-        Could not load zoom out data.
-      </p>
-    );
+    return <CompanionError message="Could not load zoom out data." onRetry={onRetry} />;
   }
 
   const { onThisDay, currentPrice, echo, deepTime } = data;
