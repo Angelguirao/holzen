@@ -1,5 +1,6 @@
 import { useMemo, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { motion, AnimatePresence } from 'framer-motion';
 import { LibraryItemCard } from './LibraryItemCard';
 import { ItemDetailViewer } from './ItemDetailViewer';
 import { SwipeableCard } from './SwipeableCard';
