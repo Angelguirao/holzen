@@ -2,6 +2,7 @@ import { useMemo, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LibraryItemCard } from './LibraryItemCard';
 import { ItemDetailViewer } from './ItemDetailViewer';
+import { SwipeableCard } from './SwipeableCard';
 import type { useLibrary } from '@/hooks/use-library';
 import type { LibraryItem } from '@/hooks/use-library';
 import { Trash2, Archive, Heart, X, CheckSquare } from 'lucide-react';
@@ -175,19 +176,27 @@ export function LibraryItems({ library, filtered }: Props) {
         </button>
       )}
       <div className="flex-1 min-w-0">
-        <LibraryItemCard
-          item={item}
-          onToggleFavorite={selectMode ? () => toggleSelect(item.id) : toggleFavorite}
-          engaged={isCompanionEngaged(item)}
-          incomplete={isReflectionIncomplete(item)}
-          onClick={() => {
-            if (selectMode) {
-              toggleSelect(item.id);
-            } else {
-              setSelectedItem(item);
-            }
-          }}
-        />
+        <SwipeableCard
+          disabled={selectMode}
+          onSwipeRight={() => toggleFavorite(item.id)}
+          onSwipeLeft={() => deleteItem(item.id)}
+          leftLabel={t('common.delete')}
+          rightLabel={item.is_favorite ? t('libraryCard.removeFavorite', { defaultValue: 'Unfavorite' }) : t('libraryCard.addFavorite', { defaultValue: 'Favorite' })}
+        >
+          <LibraryItemCard
+            item={item}
+            onToggleFavorite={selectMode ? () => toggleSelect(item.id) : toggleFavorite}
+            engaged={isCompanionEngaged(item)}
+            incomplete={isReflectionIncomplete(item)}
+            onClick={() => {
+              if (selectMode) {
+                toggleSelect(item.id);
+              } else {
+                setSelectedItem(item);
+              }
+            }}
+          />
+        </SwipeableCard>
       </div>
     </div>
   );
@@ -276,9 +285,15 @@ export function LibraryItems({ library, filtered }: Props) {
         ))}
 
         {filtered.length === 0 && (
-          <p className="text-xs text-muted-foreground/40 text-center py-12 font-mono">
-            {t('library.emptyState')}
-          </p>
+          <div className="text-center py-12 space-y-3">
+            <p className="text-2xl">📚</p>
+            <p className="text-xs text-muted-foreground/60 font-mono max-w-[240px] mx-auto">
+              {t('library.emptyStateAction', { defaultValue: 'Complete a pause session to see your reflections, companions, and insights here.' })}
+            </p>
+            <p className="text-[9px] text-muted-foreground/30 font-mono">
+              {t('library.emptyStateHint', { defaultValue: 'Swipe cards left to delete, right to favorite' })}
+            </p>
+          </div>
         )}
       </div>
 

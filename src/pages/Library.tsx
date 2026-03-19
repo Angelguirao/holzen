@@ -2,10 +2,11 @@ import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLibrary } from '@/hooks/use-library';
 import { PageMeta } from '@/components/PageMeta';
-import { Heart, Search, X, Lock } from 'lucide-react';
+import { Heart, Search, X, Lock, ArrowUpDown } from 'lucide-react';
 import { SubscriptionSkeleton } from '@/components/SubscriptionSkeleton';
 import { LibraryItems } from '@/components/library/LibraryItems';
 import { LibraryCollections } from '@/components/library/LibraryCollections';
+import { SmartCollections } from '@/components/library/SmartCollections';
 
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
@@ -24,6 +25,7 @@ const SOURCE_CHIPS: { key: string; emoji: string; label: string }[] = [
 
 
 type Tab = 'all' | 'favorites' | 'collections';
+type SortMode = 'newest' | 'oldest' | 'alphabetical';
 
 export default function Library() {
   const { t } = useTranslation();
@@ -33,6 +35,8 @@ export default function Library() {
   const [search, setSearch] = useState('');
   const [sourceFilter, setSourceFilter] = useState<string | null>('reflection');
   const [tagFilter, setTagFilter] = useState<string | null>(null);
+  const [sortMode, setSortMode] = useState<SortMode>('newest');
+  const [smartFilter, setSmartFilter] = useState<{ name: string; itemIds: Set<string> } | null>(null);
 
   const { items, collections } = library;
 
@@ -55,7 +59,7 @@ export default function Library() {
       .map(([tag]) => tag);
   }, [items]);
 
-  const hasActiveFilters = !!sourceFilter || !!tagFilter;
+  const hasActiveFilters = !!sourceFilter || !!tagFilter || !!smartFilter;
 
   // Filtering
   const filtered = useMemo(() => {
@@ -64,6 +68,8 @@ export default function Library() {
     if (tab === 'favorites') result = result.filter((i) => i.is_favorite);
     // Always hide deleted and archived
     result = result.filter((i) => i.status !== 'deleted' && i.status !== 'archived');
+    // Smart filter
+    if (smartFilter) result = result.filter((i) => smartFilter.itemIds.has(i.id));
     // Source type
     if (sourceFilter) result = result.filter((i) => i.source_type === sourceFilter);
     // Tag
@@ -77,8 +83,15 @@ export default function Library() {
         i.tags?.some((t) => t.includes(q))
       );
     }
+    // Sort
+    if (sortMode === 'oldest') {
+      result = [...result].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+    } else if (sortMode === 'alphabetical') {
+      result = [...result].sort((a, b) => (a.title ?? '').localeCompare(b.title ?? ''));
+    }
+    // newest is the default order from the hook
     return result;
-  }, [items, tab, sourceFilter, tagFilter, search]);
+  }, [items, tab, sourceFilter, tagFilter, search, sortMode, smartFilter]);
 
   if (isPending) {
     return (
@@ -112,7 +125,16 @@ export default function Library() {
   const clearAllFilters = () => {
     setSourceFilter(null);
     setTagFilter(null);
+    setSmartFilter(null);
   };
+
+  const cycleSortMode = () => {
+    setSortMode((prev) =>
+      prev === 'newest' ? 'oldest' : prev === 'oldest' ? 'alphabetical' : 'newest'
+    );
+  };
+
+  const sortLabel = sortMode === 'newest' ? t('library.sortNewest', { defaultValue: 'Newest' }) : sortMode === 'oldest' ? t('library.sortOldest', { defaultValue: 'Oldest' }) : t('library.sortAlpha', { defaultValue: 'A–Z' });
 
   return (
     <div className="space-y-4 pb-24">
@@ -161,7 +183,16 @@ export default function Library() {
 
       {/* Collections tab */}
       {tab === 'collections' && (
-        <LibraryCollections library={library} />
+        <div className="space-y-4">
+          <SmartCollections
+            items={items}
+            onSelect={(sc) => {
+              setSmartFilter({ name: sc.name, itemIds: new Set(sc.items.map((i) => i.id)) });
+              setTab('all');
+            }}
+          />
+          <LibraryCollections library={library} />
+        </div>
       )}
 
       {/* All / Favorites tabs */}
@@ -228,8 +259,23 @@ export default function Library() {
             </div>
           )}
 
+          {/* Smart filter badge */}
+          {smartFilter && (
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] font-mono px-2 py-1 rounded-full border border-primary/30 bg-primary/10 text-primary">
+                {smartFilter.name}
+              </span>
+              <button
+                onClick={() => setSmartFilter(null)}
+                className="text-muted-foreground/40 hover:text-muted-foreground"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </div>
+          )}
+
           {/* Active filter clear-all */}
-          {hasActiveFilters && (
+          {hasActiveFilters && !smartFilter && (
             <button
               onClick={clearAllFilters}
               className="flex items-center gap-1 text-[9px] font-mono text-muted-foreground/50 hover:text-muted-foreground transition-colors"
@@ -238,11 +284,18 @@ export default function Library() {
             </button>
           )}
 
-          {/* Count */}
-          <div className="px-1">
+          {/* Count + Sort */}
+          <div className="flex items-center justify-between px-1">
             <span className="text-[9px] font-mono text-muted-foreground/30">
               {filtered.length} {filtered.length === 1 ? 'item' : 'items'}
             </span>
+            <button
+              onClick={cycleSortMode}
+              className="flex items-center gap-1 text-[9px] font-mono text-muted-foreground/40 hover:text-muted-foreground transition-colors"
+            >
+              <ArrowUpDown className="h-2.5 w-2.5" />
+              {sortLabel}
+            </button>
           </div>
 
           {/* Item list with date grouping */}
