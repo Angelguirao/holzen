@@ -183,7 +183,16 @@ export default function Library() {
 
       {/* Collections tab */}
       {tab === 'collections' && (
-        <LibraryCollections library={library} />
+        <div className="space-y-4">
+          <SmartCollections
+            items={items}
+            onSelect={(sc) => {
+              setSmartFilter({ name: sc.name, itemIds: new Set(sc.items.map((i) => i.id)) });
+              setTab('all');
+            }}
+          />
+          <LibraryCollections library={library} />
+        </div>
       )}
 
       {/* All / Favorites tabs */}
