@@ -225,12 +225,7 @@ Haiku rules:
 - Traditional 5-7-5 syllable structure.
 - Captures the essence of the moment. Match the chosen tone.
 - No trading advice or price predictions.
-- MUST be original and unique — never repeat common phrases like "red screens" or "breath moves".${haikuDedup}
-    ${learningInstruction || `
-Learning input rules:
-- Title: a short, factual headline about a psychological principle or cognitive bias (5-10 words).
-- Body: 1-2 sentences about a behavioral finance principle (loss aversion, anchoring, endowment effect, herd behavior, etc.), decision psychology research, or emotional regulation technique relevant to the current emotional context. Cite real researchers (Kahneman, Tversky, Thaler, Ariely, etc.) when possible. Do NOT write about Bitcoin price history, market patterns, or on-chain data — focus on the HUMAN psychology of the moment.
-- Citation: Name the researcher, paper, or book (e.g. "Kahneman & Tversky, 1979", "Richard Thaler, Nudge").`}`;
+- MUST be original and unique — never repeat common phrases like "red screens" or "breath moves".${haikuDedup}`;
 
     const aiBody = {
       messages: [
