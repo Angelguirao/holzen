@@ -502,6 +502,7 @@ export type Database = {
           reflection_tone: string
           ritual_template: string
           silent_mode: boolean
+          snoozed_until: string | null
           streak_freeze_dates: string[]
           subscription_checked_at: string | null
           subscription_end: string | null
@@ -552,6 +553,7 @@ export type Database = {
           reflection_tone?: string
           ritual_template?: string
           silent_mode?: boolean
+          snoozed_until?: string | null
           streak_freeze_dates?: string[]
           subscription_checked_at?: string | null
           subscription_end?: string | null
@@ -602,6 +604,7 @@ export type Database = {
           reflection_tone?: string
           ritual_template?: string
           silent_mode?: boolean
+          snoozed_until?: string | null
           streak_freeze_dates?: string[]
           subscription_checked_at?: string | null
           subscription_end?: string | null
