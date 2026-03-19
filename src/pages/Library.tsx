@@ -40,6 +40,15 @@ export default function Library() {
   const [sortMode, setSortMode] = useState<SortMode>('newest');
   const [smartFilter, setSmartFilter] = useState<{ name: string; itemIds: Set<string> } | null>(null);
 
+  const handleRefresh = useCallback(async () => {
+    await library.refetch();
+  }, [library]);
+
+  const { pullDistance, refreshing, handlers } = usePullToRefresh({
+    onRefresh: handleRefresh,
+    threshold: 70,
+  });
+
   const { items, collections } = library;
 
   // Available source types from actual data
