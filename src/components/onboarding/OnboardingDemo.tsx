@@ -11,7 +11,6 @@ const DECISIONS = [
   { key: 'hold', emoji: '🪨' },
   { key: 'sell', emoji: '📤' },
   { key: 'buy', emoji: '📥' },
-  { key: 'nothing', emoji: '🌿' },
 ] as const;
 
 type Phase = 'breathing' | 'reflection' | 'haiku' | 'decide' | 'done';

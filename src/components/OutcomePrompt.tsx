@@ -95,7 +95,7 @@ export function OutcomePrompt({ reflectionId, onComplete }: Props) {
                 </p>
               )}
             </div>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-3 gap-2">
               {outcomeKeys.map((key) => (
                 <Button
                   key={key}
