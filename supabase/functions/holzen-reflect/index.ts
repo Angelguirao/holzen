@@ -256,6 +256,7 @@ You MUST respond with a JSON object containing these keys:
 - "learning_url": A URL from the citation list if available, or "" if none
 
 Tone: ${baseTone}
+THEMATIC ANGLE FOR THIS SESSION: ${thematicFraming}
 ${adaptiveContext}
 
 CURRENCY: The user views BTC prices in ${currencyCode}. When mentioning any price or monetary value, format it in ${currencyCode}.
