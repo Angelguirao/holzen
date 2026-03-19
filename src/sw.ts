@@ -45,7 +45,7 @@ self.addEventListener("push", (event) => {
     body: data.body || "A moment to pause.",
     icon: "/icon-512.png",
     badge: "/icon-512.png",
-    tag: "holzen-reflection",
+    tag: `holzen-${data.reflectionId || Date.now()}`,
     renotify: true,
     data: { url: targetUrl, reflectionId: data.reflectionId ?? null },
   } as NotificationOptions & { renotify: boolean };
