@@ -4,7 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useHolzen } from '@/hooks/use-holzen';
 import { formatBtcPrice, SUPPORTED_CURRENCIES } from '@/lib/btc';
-import { Target, Calendar, Coins, Infinity, X, Check } from 'lucide-react';
+import { Target, Calendar, Coins, Infinity, X, Check, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { differenceInDays, format } from 'date-fns';
@@ -343,25 +343,51 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
     );
   }
 
-  // Clear goal dialog (shared)
-  const clearDialog = (
-    <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <button className="text-[10px] font-mono text-muted-foreground/30 hover:text-foreground transition-colors">
-          {t('holdGoal.clear')}
-        </button>
-      </AlertDialogTrigger>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle className="font-mono text-sm">{t('holdGoal.clearTitle')}</AlertDialogTitle>
-          <AlertDialogDescription className="text-xs">{t('holdGoal.clearDesc')}</AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel className="font-mono text-xs">{t('common.cancel')}</AlertDialogCancel>
-          <AlertDialogAction onClick={clearGoal} className="bg-destructive text-destructive-foreground hover:bg-destructive/90 font-mono text-xs">{t('holdGoal.clear')}</AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
+  const editGoal = () => {
+    if (!goal) return;
+    setGoalType(goal.type);
+    setStartDate(new Date(goal.start));
+    if (goal.type === 'time' && goal.targetMonths) {
+      if (goal.targetMonths >= 12 && goal.targetMonths % 12 === 0) {
+        setTimeUnit('years');
+        setInputValue(String(goal.targetMonths / 12));
+      } else {
+        setTimeUnit('months');
+        setInputValue(String(goal.targetMonths));
+      }
+    } else if (goal.type === 'price' && goal.targetPrice) {
+      setInputValue(formatWithSeparators(String(goal.targetPrice)));
+    } else {
+      setInputValue('');
+    }
+    setValidationError(null);
+    setSetting(true);
+  };
+
+  // Action buttons (edit + clear)
+  const goalActions = (
+    <div className="flex items-center gap-2">
+      <button onClick={editGoal} className="text-[10px] font-mono text-muted-foreground/30 hover:text-foreground transition-colors">
+        <Pencil className="h-2.5 w-2.5" />
+      </button>
+      <AlertDialog>
+        <AlertDialogTrigger asChild>
+          <button className="text-[10px] font-mono text-muted-foreground/30 hover:text-foreground transition-colors">
+            {t('holdGoal.clear')}
+          </button>
+        </AlertDialogTrigger>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="font-mono text-sm">{t('holdGoal.clearTitle')}</AlertDialogTitle>
+            <AlertDialogDescription className="text-xs">{t('holdGoal.clearDesc')}</AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel className="font-mono text-xs">{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={clearGoal} className="bg-destructive text-destructive-foreground hover:bg-destructive/90 font-mono text-xs">{t('holdGoal.clear')}</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
   );
 
   // Forever goal display
@@ -380,7 +406,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
               {t('holdGoal.holdForever')}
             </p>
           </div>
-          {clearDialog}
+          {goalActions}
         </div>
         <div className="space-y-1">
           <span className="text-xs font-mono text-foreground/80">
@@ -416,7 +442,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
               {t('holdGoal.title')}
             </p>
           </div>
-          {clearDialog}
+          {goalActions}
         </div>
 
         <div className="space-y-1.5">
@@ -459,7 +485,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
               {t('holdGoal.title')}
             </p>
           </div>
-          {clearDialog}
+          {goalActions}
         </div>
 
         <div className="space-y-1.5">
