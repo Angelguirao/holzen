@@ -62,15 +62,8 @@ export default function Library() {
     let result = items;
     // Tab
     if (tab === 'favorites') result = result.filter((i) => i.is_favorite);
-    // Always hide deleted
-    result = result.filter((i) => i.status !== 'deleted');
-    // Status filter
-    if (statusFilter) {
-      result = result.filter((i) => i.status === statusFilter);
-    } else if (!search.trim()) {
-      // Hide archived by default when no status filter active
-      result = result.filter((i) => i.status !== 'archived');
-    }
+    // Always hide deleted and archived
+    result = result.filter((i) => i.status !== 'deleted' && i.status !== 'archived');
     // Source type
     if (sourceFilter) result = result.filter((i) => i.source_type === sourceFilter);
     // Tag
