@@ -8,7 +8,7 @@ import { hapticFeedback } from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
 import { OutcomeIcon } from '@/components/icons/OutcomeIcon';
 
-const outcomeKeys = ['held', 'sold', 'bought', 'nothing'] as const;
+const outcomeKeys = ['held', 'sold', 'bought'] as const;
 
 interface Props {
   reflectionId: string;
