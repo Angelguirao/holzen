@@ -299,7 +299,7 @@ export function LibraryItems({ library, filtered }: Props) {
         </div>
       ) : useVirtual ? (
         <GroupedVirtuoso
-          style={{ height: 'calc(100vh - 280px)' }}
+          style={{ height: '100%' }}
           groupCounts={groupCounts}
           groupContent={(index) => (
             <div className="bg-background/95 backdrop-blur-sm pt-2 pb-1 px-3">

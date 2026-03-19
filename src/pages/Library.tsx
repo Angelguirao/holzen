@@ -232,119 +232,123 @@ export default function Library() {
 
       {/* All / Favorites tabs */}
       {tab !== 'collections' && (
-        <div className="space-y-3">
-          {/* Search - sticky */}
-          <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm pb-2 -mx-1 px-1">
-            <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/40" />
-            <Input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder={t('library.searchPlaceholder')}
-              className="pl-8 h-8 text-xs font-mono border-border/30"
-            />
-            {search && (
+        <div className="flex flex-col" style={{ height: 'calc(100vh - 140px)' }}>
+          {/* Fixed controls area */}
+          <div className="shrink-0 space-y-3 pb-2">
+            {/* Search */}
+            <div className="relative -mx-1 px-1">
+              <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/40" />
+              <Input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder={t('library.searchPlaceholder')}
+                className="pl-8 h-8 text-xs font-mono border-border/30"
+              />
+              {search && (
+                <button
+                  onClick={() => setSearch('')}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground/40 hover:text-muted-foreground"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              )}
+            </div>
+
+            {/* Source type chips */}
+            {availableSources.length > 1 && (
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 -mx-1 px-1 scrollbar-none">
+                {availableSources.map(({ key, emoji, label }) => (
+                  <button
+                    key={key}
+                    onClick={() => setSourceFilter(sourceFilter === key ? null : key)}
+                    className={cn(
+                      'text-[10px] font-mono px-2 py-1 rounded-full border transition-colors whitespace-nowrap flex items-center gap-1',
+                      sourceFilter === key
+                        ? 'border-foreground/20 bg-foreground/5 text-foreground'
+                        : 'border-border/30 text-muted-foreground/50 hover:text-muted-foreground/70'
+                    )}
+                  >
+                    <span>{emoji}</span>
+                    {label}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Tag chips */}
+            {availableTags.length > 0 && (
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 -mx-1 px-1 scrollbar-none">
+                {availableTags.slice(0, 15).map((tag) => (
+                  <button
+                    key={tag}
+                    onClick={() => setTagFilter(tagFilter === tag ? null : tag)}
+                    className={cn(
+                      'text-[10px] font-mono px-2 py-1 rounded-full border transition-colors whitespace-nowrap',
+                      tagFilter === tag
+                        ? 'border-primary/30 bg-primary/10 text-primary'
+                        : 'border-border/30 text-muted-foreground/50 hover:text-muted-foreground/70'
+                    )}
+                  >
+                    #{tag}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Smart filter badge */}
+            {smartFilter && (
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] font-mono px-2 py-1 rounded-full border border-primary/30 bg-primary/10 text-primary">
+                  {smartFilter.name}
+                </span>
+                <button
+                  onClick={() => setSmartFilter(null)}
+                  className="text-muted-foreground/40 hover:text-muted-foreground"
+                >
+                  <X className="h-3 w-3" />
+                </button>
+              </div>
+            )}
+
+            {/* Active filter clear-all */}
+            {hasActiveFilters && !smartFilter && (
               <button
-                onClick={() => setSearch('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-muted-foreground/40 hover:text-muted-foreground"
+                onClick={clearAllFilters}
+                className="flex items-center gap-1 text-[9px] font-mono text-muted-foreground/50 hover:text-muted-foreground transition-colors"
               >
-                <X className="h-3 w-3" />
+                <X className="h-2.5 w-2.5" /> {t('library.clearAll')}
               </button>
             )}
-          </div>
 
-          {/* Source type chips */}
-          {availableSources.length > 1 && (
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 -mx-1 px-1 scrollbar-none">
-              {availableSources.map(({ key, emoji, label }) => (
-                <button
-                  key={key}
-                  onClick={() => setSourceFilter(sourceFilter === key ? null : key)}
-                  className={cn(
-                    'text-[10px] font-mono px-2 py-1 rounded-full border transition-colors whitespace-nowrap flex items-center gap-1',
-                    sourceFilter === key
-                      ? 'border-foreground/20 bg-foreground/5 text-foreground'
-                      : 'border-border/30 text-muted-foreground/50 hover:text-muted-foreground/70'
-                  )}
-                >
-                  <span>{emoji}</span>
-                  {label}
-                </button>
-              ))}
-            </div>
-          )}
-
-
-          {/* Tag chips */}
-          {availableTags.length > 0 && (
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 -mx-1 px-1 scrollbar-none">
-              {availableTags.slice(0, 15).map((tag) => (
-                <button
-                  key={tag}
-                  onClick={() => setTagFilter(tagFilter === tag ? null : tag)}
-                  className={cn(
-                    'text-[10px] font-mono px-2 py-1 rounded-full border transition-colors whitespace-nowrap',
-                    tagFilter === tag
-                      ? 'border-primary/30 bg-primary/10 text-primary'
-                      : 'border-border/30 text-muted-foreground/50 hover:text-muted-foreground/70'
-                  )}
-                >
-                  #{tag}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* Smart filter badge */}
-          {smartFilter && (
-            <div className="flex items-center gap-1.5">
-              <span className="text-[10px] font-mono px-2 py-1 rounded-full border border-primary/30 bg-primary/10 text-primary">
-                {smartFilter.name}
+            {/* Count + Sort */}
+            <div className="flex items-center justify-between px-1">
+              <span className="text-[9px] font-mono text-muted-foreground/30">
+                {filtered.length} {filtered.length === 1 ? 'item' : 'items'}
               </span>
-              <button
-                onClick={() => setSmartFilter(null)}
-                className="text-muted-foreground/40 hover:text-muted-foreground"
-              >
-                <X className="h-3 w-3" />
-              </button>
+              <div className="flex items-center gap-3">
+                <ExportMenu items={filtered} />
+                <button
+                  onClick={cycleSortMode}
+                  className="flex items-center gap-1 text-[9px] font-mono text-muted-foreground/40 hover:text-muted-foreground transition-colors"
+                >
+                  <ArrowUpDown className="h-2.5 w-2.5" />
+                  {sortLabel}
+                </button>
+              </div>
             </div>
-          )}
 
-          {/* Active filter clear-all */}
-          {hasActiveFilters && !smartFilter && (
-            <button
-              onClick={clearAllFilters}
-              className="flex items-center gap-1 text-[9px] font-mono text-muted-foreground/50 hover:text-muted-foreground transition-colors"
-            >
-              <X className="h-2.5 w-2.5" /> {t('library.clearAll')}
-            </button>
-          )}
-
-          {/* Count + Sort */}
-          <div className="flex items-center justify-between px-1">
-            <span className="text-[9px] font-mono text-muted-foreground/30">
-              {filtered.length} {filtered.length === 1 ? 'item' : 'items'}
-            </span>
-            <div className="flex items-center gap-3">
-              <ExportMenu items={filtered} />
-              <button
-                onClick={cycleSortMode}
-                className="flex items-center gap-1 text-[9px] font-mono text-muted-foreground/40 hover:text-muted-foreground transition-colors"
-              >
-                <ArrowUpDown className="h-2.5 w-2.5" />
-                {sortLabel}
-              </button>
-            </div>
+            {/* Duplicate detection banner */}
+            <DuplicateBanner
+              items={items}
+              onDeleteItem={library.deleteItem}
+              onSelectItem={() => {}}
+            />
           </div>
 
-          {/* Duplicate detection banner */}
-          <DuplicateBanner
-            items={items}
-            onDeleteItem={library.deleteItem}
-            onSelectItem={() => {}}
-          />
-
-          {/* Item list with date grouping */}
-          <LibraryItems library={library} filtered={filtered} />
+          {/* Scrollable item list */}
+          <div className="flex-1 min-h-0">
+            <LibraryItems library={library} filtered={filtered} />
+          </div>
         </div>
       )}
     </div>
