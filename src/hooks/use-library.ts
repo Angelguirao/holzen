@@ -52,6 +52,7 @@ export function useLibrary() {
   const [loading, setLoading] = useState(true);
   const [readFlagsMap, setReadFlagsMap] = useState<Record<string, ReflectionReadFlags>>({});
   const [incompleteReflections, setIncompleteReflections] = useState<Set<string>>(new Set());
+  const [reflectionOutcomes, setReflectionOutcomes] = useState<Record<string, string>>({});
 
   const fetchAll = useCallback(async () => {
     if (!user) return;
