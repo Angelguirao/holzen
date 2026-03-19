@@ -44,11 +44,28 @@ export interface ReflectionReadFlags {
   history_read: boolean;
 }
 
+const CACHE_KEY_ITEMS = 'holzen_library_items';
+const CACHE_KEY_COLLECTIONS = 'holzen_library_collections';
+const CACHE_KEY_COL_ITEMS = 'holzen_library_col_items';
+
+function readCache<T>(key: string): T | null {
+  try {
+    const raw = localStorage.getItem(key);
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+}
+
+function writeCache<T>(key: string, data: T) {
+  try { localStorage.setItem(key, JSON.stringify(data)); } catch {}
+}
+
 export function useLibrary() {
   const { user } = useAuth();
-  const [items, setItems] = useState<LibraryItem[]>([]);
-  const [collections, setCollections] = useState<Collection[]>([]);
-  const [collectionItems, setCollectionItems] = useState<CollectionItem[]>([]);
+
+  // Initialize state from cache for instant render
+  const [items, setItems] = useState<LibraryItem[]>(() => readCache<LibraryItem[]>(CACHE_KEY_ITEMS) ?? []);
+  const [collections, setCollections] = useState<Collection[]>(() => readCache<Collection[]>(CACHE_KEY_COLLECTIONS) ?? []);
+  const [collectionItems, setCollectionItems] = useState<CollectionItem[]>(() => readCache<CollectionItem[]>(CACHE_KEY_COL_ITEMS) ?? []);
   const [loading, setLoading] = useState(true);
   const [readFlagsMap, setReadFlagsMap] = useState<Record<string, ReflectionReadFlags>>({});
   const [incompleteReflections, setIncompleteReflections] = useState<Set<string>>(new Set());
@@ -75,10 +92,17 @@ export function useLibrary() {
         .order('position', { ascending: true }),
     ]);
     const libItems = (itemsData as unknown as LibraryItem[]) ?? [];
+    const cols = (collectionsData as unknown as Collection[]) ?? [];
+    const colItems = (colItemsData as unknown as CollectionItem[]) ?? [];
     setItems(libItems);
-    setCollections((collectionsData as unknown as Collection[]) ?? []);
-    setCollectionItems((colItemsData as unknown as CollectionItem[]) ?? []);
+    setCollections(cols);
+    setCollectionItems(colItems);
     setLoading(false);
+
+    // Persist to cache for offline-first reads
+    writeCache(CACHE_KEY_ITEMS, libItems);
+    writeCache(CACHE_KEY_COLLECTIONS, cols);
+    writeCache(CACHE_KEY_COL_ITEMS, colItems);
 
     // Backfill: import reflections and their companions not yet in library (runs every load)
     const existingKeys = new Set(
