@@ -1,5 +1,4 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -15,25 +14,26 @@ serve(async (req) => {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) throw new Error("Missing authorization");
 
+    const { createClient } = await import("npm:@supabase/supabase-js@2.57.2");
+
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-    const serviceClient = createClient(supabaseUrl, serviceRoleKey);
+    const serviceClient = createClient(supabaseUrl, serviceRoleKey, { auth: { persistSession: false } });
 
     // Support both user JWT and service role key auth
     let resolvedUserId: string | null = null;
-    let userClient: ReturnType<typeof createClient> | null = null;
     const token = authHeader.replace("Bearer ", "");
     if (token === serviceRoleKey) {
       // Called server-to-server; userId must be in the body
     } else {
-      userClient = createClient(supabaseUrl, supabaseAnonKey, {
+      const userClient = createClient(supabaseUrl, supabaseAnonKey, {
         global: { headers: { Authorization: authHeader } },
       });
-      const { data: { user } } = await userClient.auth.getUser();
-      if (!user) throw new Error("Not authenticated");
-      resolvedUserId = user.id;
+      const { data: claimsData, error: claimsError } = await userClient.auth.getClaims(token);
+      if (claimsError || !claimsData?.claims) throw new Error("Not authenticated");
+      resolvedUserId = claimsData.claims.sub as string;
     }
 
     const { context, reflectionMessage, language, userId: bodyUserId } = await req.json();
@@ -50,7 +50,7 @@ serve(async (req) => {
     const month = today.getUTCMonth();
     const day = today.getUTCDate();
 
-    // Build date keys for years 1-4 ago (reduced from 5)
+    // Build date keys for years 1-4 ago
     const yearTargets = [1, 2, 3, 4].map(y => {
       const d = new Date(Date.UTC(currentYear - y, month, day));
       return { yearsAgo: y, dateKey: d.toISOString().slice(0, 10), ts: Math.floor(d.getTime() / 1000) };
@@ -69,17 +69,17 @@ serve(async (req) => {
     let rateLimited = false;
     console.log(`[zoom-out] cache hit: ${cachedMap.size}/${yearTargets.length}, fetching ${missingTargets.length} from CoinGecko`);
 
-    // Fetch only missing prices from CoinGecko (with conservative rate limiting)
+    // Fetch missing prices with a SINGLE batched CoinGecko call spanning the full range
     const newPrices: { date: string; price: number }[] = [];
-    for (let i = 0; i < missingTargets.length; i++) {
-      const target = missingTargets[i];
-      if (i > 0) await new Promise(r => setTimeout(r, 1500)); // 1.5s delay between requests
+    if (missingTargets.length > 0) {
+      // Use the earliest and latest missing dates to define one range
+      const timestamps = missingTargets.map(t => t.ts);
+      const from = Math.min(...timestamps) - 86400;
+      const to = Math.max(...timestamps) + 86400;
 
       try {
-        const from = target.ts - 86400;
-        const to = target.ts + 86400;
         const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 8000);
+        const timeout = setTimeout(() => controller.abort(), 10000);
 
         const res = await fetch(
           `https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=usd&from=${from}&to=${to}`,
@@ -88,23 +88,39 @@ serve(async (req) => {
         clearTimeout(timeout);
 
         if (res.status === 429) {
-          console.warn(`[zoom-out] CoinGecko 429 for ${target.dateKey}, skipping remaining`);
+          console.warn(`[zoom-out] CoinGecko 429 on batched call`);
           await res.text();
           rateLimited = true;
-          break; // Stop trying once rate limited
-        }
-        if (!res.ok) { await res.text(); continue; }
+        } else if (res.ok) {
+          const json = await res.json();
+          const prices: [number, number][] = json?.prices || [];
 
-        const json = await res.json();
-        if (json?.prices?.length > 0) {
-          const price = Math.round(json.prices[0][1]);
-          newPrices.push({ date: target.dateKey, price });
+          // For each missing target, find the closest data point
+          for (const target of missingTargets) {
+            const targetMs = target.ts * 1000;
+            let closest: [number, number] | null = null;
+            let closestDist = Infinity;
+
+            for (const [ts, price] of prices) {
+              const dist = Math.abs(ts - targetMs);
+              if (dist < closestDist) {
+                closestDist = dist;
+                closest = [ts, price];
+              }
+            }
+
+            // Accept if within 48h of target date
+            if (closest && closestDist < 48 * 3600 * 1000) {
+              newPrices.push({ date: target.dateKey, price: Math.round(closest[1]) });
+            }
+          }
+        } else {
+          await res.text();
         }
       } catch (e) {
         if (e instanceof DOMException && e.name === "AbortError") {
-          console.warn(`[zoom-out] CoinGecko timeout for ${target.dateKey}`);
+          console.warn(`[zoom-out] CoinGecko timeout on batched call`);
         }
-        // Continue with next
       }
     }
 
@@ -119,13 +135,13 @@ serve(async (req) => {
     // Combine cached + freshly fetched
     const onThisDay: { yearsAgo: number; price: number; date: string }[] = [];
     for (const target of yearTargets) {
-      const cached = cachedMap.get(target.dateKey);
+      const cachedPrice = cachedMap.get(target.dateKey);
       const fresh = newPrices.find(p => p.date === target.dateKey);
-      const price = cached ?? fresh?.price;
+      const price = cachedPrice ?? fresh?.price;
       if (price) onThisDay.push({ yearsAgo: target.yearsAgo, date: target.dateKey, price: Math.round(price) });
     }
 
-    // Current price
+    // Current price — single lightweight call
     let currentPrice: number | null = null;
     if (!rateLimited) {
       try {
@@ -156,7 +172,6 @@ serve(async (req) => {
     let echoReflection: { message: string; created_at: string; mood: string | null; outcome: string | null } | null = null;
     if (effectiveUserId) {
       try {
-        // Use service client to query reflections for this user
         const direction = context?.toLowerCase().includes("is down") ? "down" : context?.toLowerCase().includes("is up") ? "up" : null;
 
         if (direction) {
