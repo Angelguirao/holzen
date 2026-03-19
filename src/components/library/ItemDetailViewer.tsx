@@ -4,6 +4,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sh
 import { Heart, ExternalLink, Tag, Link2, Clock, Pin, PinOff, Trash2, Archive, Eye, EyeOff, X, FolderPlus, Check } from 'lucide-react';
 import { format } from 'date-fns';
 import type { LibraryItem, Collection } from '@/hooks/use-library';
+import { supabase } from '@/integrations/supabase/client';
 
 const TYPE_EMOJIS: Record<string, string> = {
   bookmark: '🔖',
@@ -24,6 +25,12 @@ const SOURCE_EMOJIS: Record<string, string> = {
   practice: '🧘',
 };
 
+const OUTCOME_OPTIONS = [
+  { key: 'hold', emoji: '💎', labelKey: 'pause.outcomes.hold' },
+  { key: 'sell', emoji: '📉', labelKey: 'pause.outcomes.sell' },
+  { key: 'nothing', emoji: '🤷', labelKey: 'pause.outcomes.nothing' },
+] as const;
+
 interface Props {
   item: LibraryItem | null;
   linkedItems?: LibraryItem[];
@@ -40,6 +47,8 @@ interface Props {
   getItemCollections?: (itemId: string) => Collection[];
   onAddToCollection?: (collectionId: string, itemId: string) => Promise<any>;
   onRemoveFromCollection?: (collectionId: string, itemId: string) => Promise<void>;
+  isIncomplete?: boolean;
+  onOutcomeRecorded?: () => void;
 }
 
 function CompanionCard({ item, onSelect }: { item: LibraryItem; onSelect?: (item: LibraryItem) => void }) {
@@ -74,11 +83,14 @@ export function ItemDetailViewer({
   item, linkedItems, allItems, open, onClose, onToggleFavorite,
   onTogglePin, onDelete, onStatusChange, onUpdateTags, onSelectItem,
   collections, getItemCollections, onAddToCollection, onRemoveFromCollection,
+  isIncomplete, onOutcomeRecorded,
 }: Props) {
   const { t } = useTranslation();
   const [editingTags, setEditingTags] = useState(false);
   const [tagInput, setTagInput] = useState('');
   const [showCollections, setShowCollections] = useState(false);
+  const [outcomeLoading, setOutcomeLoading] = useState(false);
+  const [outcomeRecorded, setOutcomeRecorded] = useState(false);
   const tagInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -90,7 +102,15 @@ export function ItemDetailViewer({
     setEditingTags(false);
     setTagInput('');
     setShowCollections(false);
+    setOutcomeRecorded(false);
   }, [item?.id]);
+
+  // Auto-mark as read when opened
+  useEffect(() => {
+    if (open && item && item.status === 'unread') {
+      onStatusChange(item.id, 'read');
+    }
+  }, [open, item?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const siblings = useMemo(() => {
     if (!item?.reflection_id || !allItems) return [];
@@ -119,12 +139,25 @@ export function ItemDetailViewer({
     onUpdateTags(item.id, item.tags.filter((t) => t !== tag));
   }, [item, onUpdateTags]);
 
+  const handleRecordOutcome = useCallback(async (outcome: string) => {
+    if (!item?.reflection_id || outcomeLoading) return;
+    setOutcomeLoading(true);
+    await supabase
+      .from('reflections')
+      .update({ outcome })
+      .eq('id', item.reflection_id);
+    setOutcomeLoading(false);
+    setOutcomeRecorded(true);
+    onOutcomeRecorded?.();
+  }, [item?.reflection_id, outcomeLoading, onOutcomeRecorded]);
+
   if (!item) return null;
 
   const companions = linkedItems && linkedItems.length > 0 ? linkedItems : siblings;
   const isReflection = item.source_type === 'reflection';
   const sourceLabel = t(`librarySources.${item.source_type}`, item.source_type ?? 'Item');
   const emoji = SOURCE_EMOJIS[item.source_type ?? ''] ?? TYPE_EMOJIS[item.type] ?? '📄';
+  const showOutcomePicker = isIncomplete && !outcomeRecorded;
 
   const handleDelete = () => {
     onDelete(item.id);
@@ -150,16 +183,6 @@ export function ItemDetailViewer({
               <Clock className="h-2.5 w-2.5" />
               {format(new Date(item.created_at), 'MMM d, yyyy · h:mm a')}
             </span>
-            {item.status === 'unread' && (
-              <span className="text-[9px] font-mono px-1 py-0.5 rounded bg-primary/15 text-primary">
-                {t('libraryCard.unread')}
-              </span>
-            )}
-            {item.status === 'archived' && (
-              <span className="text-[9px] font-mono px-1 py-0.5 rounded bg-muted text-muted-foreground/50">
-                {t('libraryCard.archived')}
-              </span>
-            )}
             {item.pinned && (
               <span className="text-[9px] font-mono px-1 py-0.5 rounded bg-primary/10 text-primary">
                 📌 {t('common.pinned')}
@@ -223,6 +246,39 @@ export function ItemDetailViewer({
             }
             return null;
           })()}
+
+          {/* Retroactive decision recording */}
+          {showOutcomePicker && (
+            <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-3 space-y-2.5">
+              <p className="text-[10px] font-mono text-destructive/70 uppercase tracking-wider">
+                {t('library.incompleteLabel', 'No decision recorded')}
+              </p>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {t('library.incompleteDescription', 'What did you end up doing after this pause?')}
+              </p>
+              <div className="flex items-center gap-2">
+                {OUTCOME_OPTIONS.map(({ key, emoji: emo, labelKey }) => (
+                  <button
+                    key={key}
+                    onClick={() => handleRecordOutcome(key)}
+                    disabled={outcomeLoading}
+                    className="flex-1 flex items-center justify-center gap-1.5 text-[10px] font-mono py-2 px-2 rounded-md border border-border/40 bg-card/50 text-foreground/70 hover:bg-card hover:border-foreground/20 transition-colors disabled:opacity-50"
+                  >
+                    <span>{emo}</span>
+                    {t(labelKey, key)}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {outcomeRecorded && (
+            <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
+              <p className="text-[10px] font-mono text-primary/70 text-center">
+                ✓ {t('library.outcomeRecorded', 'Decision recorded')}
+              </p>
+            </div>
+          )}
 
           {/* Source URL */}
           {item.source_url && (
@@ -323,13 +379,6 @@ export function ItemDetailViewer({
                   aria-label={item.pinned ? t('common.unpin') : t('common.pinned')}
                 >
                   {item.pinned ? <PinOff className="h-4 w-4" /> : <Pin className="h-4 w-4" />}
-                </button>
-                <button
-                  onClick={() => onStatusChange(item.id, item.status === 'unread' ? 'read' : 'unread')}
-                  className="p-2 rounded-md text-muted-foreground/50 hover:text-foreground hover:bg-muted transition-colors"
-                  aria-label={item.status === 'unread' ? t('libraryCard.markRead') : t('libraryCard.markUnread')}
-                >
-                  {item.status === 'unread' ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
                 </button>
                 <button
                   onClick={() => onStatusChange(item.id, item.status === 'archived' ? 'read' : 'archived')}
