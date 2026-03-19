@@ -341,15 +341,15 @@ export function SourceManagement() {
           <TabsTrigger value="signal" className="text-xs font-mono">
             {t('sources.signalTab')}
           </TabsTrigger>
-          <TabsTrigger value="learning" className="text-xs font-mono">
-            {t('sources.learningTab')}
+          <TabsTrigger value="grounding" className="text-xs font-mono">
+            {t('sources.groundingTab')}
           </TabsTrigger>
         </TabsList>
         <TabsContent value="signal" className="mt-3">
           {renderSourceList('signal')}
         </TabsContent>
-        <TabsContent value="learning" className="mt-3">
-          {renderSourceList('learning')}
+        <TabsContent value="grounding" className="mt-3">
+          {renderSourceList('grounding')}
         </TabsContent>
       </Tabs>
     </div>
