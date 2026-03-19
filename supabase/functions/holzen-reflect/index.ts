@@ -69,15 +69,36 @@ serve(async (req) => {
 
     if (PERPLEXITY_API_KEY) {
       try {
-        // Build source hints for learning
-        const learningSourceHint = (learningSources && Array.isArray(learningSources) && learningSources.length > 0)
-          ? ` Prefer insights from: ${learningSources.sort(() => Math.random() - 0.5).slice(0, 4).join(", ")}.`
-          : "";
+        // Build domain filter from active learning sources
+        const learningDomains: string[] = [];
+        if (learningSources && Array.isArray(learningSources)) {
+          for (const src of learningSources) {
+            if (src.url) {
+              try {
+                const domain = new URL(src.url).hostname.replace(/^www\./, "");
+                if (!learningDomains.includes(domain)) learningDomains.push(domain);
+              } catch { /* skip invalid URLs */ }
+            }
+          }
+        }
 
-        const learningQuery = `Bitcoin behavioral finance or market psychology insight relevant to: ${context}. Find a specific educational fact, historical pattern, or research finding with real data.${learningSourceHint}`;
+        const learningQuery = `Bitcoin behavioral finance or market psychology insight relevant to: ${context}. Find a specific educational fact, historical pattern, or research finding with real data.`;
 
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 8000);
+
+        const searchBody: Record<string, unknown> = {
+          model: "sonar",
+          messages: [
+            { role: "system", content: "Find one specific, factual educational insight about Bitcoin market behavior, behavioral finance, or investor psychology. Include real data, dates, or research citations. Be concise — 2-3 sentences max." },
+            { role: "user", content: learningQuery },
+          ],
+          search_recency_filter: "month",
+        };
+        // Apply domain filter if we have active sources (limit to 5 domains)
+        if (learningDomains.length > 0) {
+          searchBody.search_domain_filter = learningDomains.slice(0, 5);
+        }
 
         const searchResp = await fetch("https://api.perplexity.ai/chat/completions", {
           method: "POST",
@@ -85,14 +106,7 @@ serve(async (req) => {
             Authorization: `Bearer ${PERPLEXITY_API_KEY}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            model: "sonar",
-            messages: [
-              { role: "system", content: "Find one specific, factual educational insight about Bitcoin market behavior, behavioral finance, or investor psychology. Include real data, dates, or research citations. Be concise — 2-3 sentences max." },
-              { role: "user", content: learningQuery },
-            ],
-            search_recency_filter: "month",
-          }),
+          body: JSON.stringify(searchBody),
           signal: controller.signal,
         });
         clearTimeout(timeout);
