@@ -58,8 +58,21 @@ serve(async (req) => {
 
     const marketContext = context || "Bitcoin market movement";
 
-    // Step 1: Perplexity search for historical parallels (open web, no domain filter)
-    const searchQuery = `Historical financial event parallel to current Bitcoin market: ${marketContext}. Find a specific historical event from Bitcoin history, gold markets, tech stocks, or other asset classes that mirrors the current conditions. Include specific dates, prices, and percentage moves.`;
+    // Randomize the historical era to avoid always returning Mt. Gox / same event
+    const HISTORICAL_ERAS = [
+      { era: "early Bitcoin (2011-2013)", examples: "Bitcoin's first bubble to $32 then crash to $2, the 2013 China ban crash" },
+      { era: "Mt. Gox era (2014-2015)", examples: "Mt. Gox collapse, the long crypto winter of 2014-2015" },
+      { era: "ICO boom and bust (2017-2018)", examples: "Bitcoin's rise to $20k, the 2018 crash, ICO mania" },
+      { era: "COVID and institutional era (2020-2021)", examples: "March 2020 crash, MicroStrategy buys, El Salvador adoption, $69k peak" },
+      { era: "crypto winter (2022-2023)", examples: "Luna/Terra collapse, FTX fraud, contagion effects" },
+      { era: "traditional finance parallels", examples: "1987 Black Monday, dot-com bubble 2000, 2008 financial crisis, gold's 1980 peak" },
+      { era: "commodity and forex history", examples: "oil price shocks, Swiss franc unpegging, Asian financial crisis 1997" },
+      { era: "tech stock parallels", examples: "Amazon's 95% crash, Apple near-bankruptcy, Cisco post-dot-com" },
+    ];
+    const randomEra = HISTORICAL_ERAS[Math.floor(Math.random() * HISTORICAL_ERAS.length)];
+
+    // Step 1: Perplexity search for historical parallels
+    const searchQuery = `Find a specific historical financial event from ${randomEra.era} (examples: ${randomEra.examples}) that parallels current Bitcoin market conditions: ${marketContext}. Include exact dates, prices, percentage moves, and what happened in the months/years after. Be specific — name the exact event, not a general overview.`;
 
     const searchResponse = await fetch("https://api.perplexity.ai/chat/completions", {
       method: "POST",
@@ -72,7 +85,7 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: "You are a financial historian. Search for specific historical events from Bitcoin, gold, equities, tech stocks, commodities, or macro economics that parallel current market conditions. Always include specific dates, prices, percentage moves, and factual data. Draw from diverse eras: Bitcoin crashes, gold's 1980 peak, dot-com bubble, 2008 crisis, tech stock collapses, oil price shocks, etc.",
+            content: `You are a financial historian specializing in ${randomEra.era}. Search for ONE specific historical event with exact dates, prices, and percentage moves. Do NOT give a general market overview — find a specific incident, crash, rally, or turning point. Include what happened afterward (recovery timeline). Draw from: ${randomEra.examples}. Be precise with numbers.`,
           },
           { role: "user", content: searchQuery },
         ],
@@ -106,20 +119,21 @@ serve(async (req) => {
           content: `${langInstruction}You are a financial historian for a Bitcoin mindfulness app. Given grounded search results with citations, extract ONE historical insight with a cross-asset analogy.
 
 Respond with a JSON object containing exactly these keys:
-- "title": Short evocative title
+- "title": Short evocative title (NOT generic like "Market Volatility" — be specific to the event)
 - "btcInsight": 2-3 sentences about a specific historical event with real dates/numbers
-- "analogy": 1-2 sentences drawing a parallel from another asset class
-- "assetClass": The other asset class (e.g. "Gold", "Tech stocks")
-- "period": Historical period (e.g. "2014", "March 2020")
+- "analogy": 1-2 sentences drawing a parallel from another asset class or era
+- "assetClass": The other asset class (e.g. "Gold", "Tech stocks", "Oil")
+- "period": Historical period (e.g. "January 2015", "March 2020")
 - "source": Name of the source
 - "url": URL from the provided citations
 
 Rules:
 - Use ONLY facts from the provided search results
 - Include specific dates, prices, and percentage moves
-- Draw a clear parallel between a historical event and the current context
-- End with a grounding observation, not hype
-- URL: use one of the provided citation URLs`,
+- Draw a clear parallel between the historical event and the current context
+- End with a grounding observation — "this too passed" energy, not hype or doom
+- URL: use one of the provided citation URLs
+- Be SPECIFIC — name the exact event, not a vague "market crash"`,
         },
         {
           role: "user",
