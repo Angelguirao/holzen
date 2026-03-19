@@ -449,7 +449,7 @@ serve(async (req) => {
           // Historical Insight companion
           fetch(`${supabaseUrl}/functions/v1/historical-insight`, {
             method: "POST", headers: companionHeaders,
-            body: JSON.stringify({ context: ctx, language: companionLang }),
+            body: JSON.stringify({ context: ctx, language: companionLang, userId: profile.user_id }),
           }).then(async (res) => {
             if (!res.ok) { await res.text(); return; }
             const data = await res.json();
