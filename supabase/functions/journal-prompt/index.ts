@@ -32,7 +32,10 @@ serve(async (req) => {
     const svcClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false } });
     try { await svcClient.from("analytics_events").insert({ user_id: user.id, event: "journal_prompt_ai_call" }); } catch (_) { /* non-fatal */ }
 
-    const { language } = await req.json().catch(() => ({ language: "en" }));
+    const { language: rawLang } = await req.json().catch(() => ({ language: "en" }));
+    const langCode = rawLang || "en";
+    const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
+    const langName = LANG_NAMES[langCode] || "English";
 
     // Fetch recent reflections for context
     const { data: reflections } = await sb
