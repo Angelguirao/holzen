@@ -34,6 +34,10 @@ export function listenForSwUpdate() {
               waitingSW.postMessage({ type: 'SKIP_WAITING' });
             },
           },
+          cancel: {
+            label: 'Later',
+            onClick: () => {},
+          },
         });
       };
 
