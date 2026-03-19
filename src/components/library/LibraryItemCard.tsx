@@ -65,7 +65,8 @@ export function LibraryItemCard({ item, onToggleFavorite, onClick, engaged = tru
 
   const emoji = SOURCE_EMOJIS[item.source_type ?? ''] ?? TYPE_LABELS[item.type] ?? '📄';
   const isCompanion = item.source_type && !['reflection', 'reflection_note', 'ground', 'practice', 'external'].includes(item.source_type);
-  const dimmed = isCompanion && !engaged;
+  // Only show as skipped if the pause is complete (has outcome) and user didn't engage
+  const dimmed = isCompanion && !engaged && !incomplete;
 
   return (
     <div

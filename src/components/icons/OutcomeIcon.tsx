@@ -1,7 +1,7 @@
 /**
  * BTC-native metaphor icons for outcome decisions.
  * hold = diamond (diamond hands), sell = pickaxe (mining out),
- * buy/bought = lightning bolt (stacking sats), nothing = block (unmoved block)
+ * buy/bought = lightning bolt (stacking sats)
  */
 
 interface IconProps {
@@ -62,18 +62,6 @@ function BuyIcon(props: IconProps) {
   );
 }
 
-/** Nothing — block / cube (unmoved, solid, a bitcoin block) */
-function NothingIcon(props: IconProps) {
-  return wrap(
-    <>
-      <path d="M12 2L2 7l10 5 10-5-10-5z" />
-      <path d="M2 7v10l10 5V12" />
-      <path d="M22 7v10l-10 5V12" />
-    </>,
-    props,
-  );
-}
-
 const OUTCOME_ICONS: Record<string, React.FC<IconProps>> = {
   held: HoldIcon,
   hold: HoldIcon,
@@ -81,7 +69,6 @@ const OUTCOME_ICONS: Record<string, React.FC<IconProps>> = {
   sell: SellIcon,
   bought: BuyIcon,
   buy: BuyIcon,
-  nothing: NothingIcon,
 };
 
 export function OutcomeIcon({ outcome, ...props }: IconProps & { outcome: string }) {
