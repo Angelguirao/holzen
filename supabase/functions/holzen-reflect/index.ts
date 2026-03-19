@@ -170,10 +170,23 @@ serve(async (req) => {
       adaptiveContext += "\nMARKET SEVERITY: Significant move (7%+). Balance grounding with perspective.";
     }
 
-    // Build haiku dedup instruction
+    // Build haiku dedup instruction — extract banned imagery words
     let haikuDedup = "";
     if (recentHaikus && Array.isArray(recentHaikus) && recentHaikus.length > 0) {
+      // Extract key imagery words to explicitly ban
+      const stopWords = new Set(["the","a","an","is","in","on","of","and","to","with","its","that","this","for","are","was","has","had","but","not","from","they","all","been","have","will","can","just","or","as","at","be","it","so","no","do","my","by"]);
+      const wordCounts: Record<string, number> = {};
+      for (const h of recentHaikus.slice(0, 5)) {
+        const words = h.toLowerCase().replace(/[^\w\s]/g, "").split(/\s+/).filter((w: string) => w.length > 2 && !stopWords.has(w));
+        for (const w of words) { wordCounts[w] = (wordCounts[w] || 0) + 1; }
+      }
+      // Words appearing 2+ times across recent haikus are "overused"
+      const bannedWords = Object.entries(wordCounts).filter(([_, c]) => c >= 2).map(([w]) => w);
+
       haikuDedup = `\n\nHAIKU DEDUPLICATION: The user has recently received these haikus. You MUST write something COMPLETELY DIFFERENT — different imagery, different words, different structure:\n${recentHaikus.slice(0, 5).map((h: string, i: number) => `${i + 1}. "${h}"`).join("\n")}`;
+      if (bannedWords.length > 0) {
+        haikuDedup += `\n\nBANNED IMAGERY — these words/images appeared repeatedly and MUST NOT appear in your haiku: ${bannedWords.join(", ")}. Find entirely fresh imagery — seasons, objects, textures, sounds, landscapes, body sensations — anything NOT in this list.`;
+      }
     }
 
     // Build learning grounding section
