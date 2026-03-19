@@ -32,7 +32,7 @@ const TYPE_LABELS: Record<string, string> = {
   clipping: '✂️',
 };
 
-export function LibraryItemCard({ item, onToggleFavorite, onClick, engaged = true }: Props) {
+export function LibraryItemCard({ item, onToggleFavorite, onClick, engaged = true, incomplete = false }: Props) {
   const { t } = useTranslation();
 
   const preview = useMemo(() => {
