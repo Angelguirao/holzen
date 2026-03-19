@@ -84,26 +84,15 @@ serve(async (req) => {
     const searchContent = searchData.choices?.[0]?.message?.content || "";
     const citations: string[] = searchData.citations || [];
 
-    // Step 2: Lovable AI structures the grounded result (JSON mode — faster than tool calling)
+    // Step 2: Lovable AI structures the grounded result (JSON mode, fallback model retry)
     const langInstruction = langCode !== "en" ? `CRITICAL: Write title, btcInsight, and analogy in ${langName}. Keep source URLs as-is.\n\n` : "";
 
-    const aiController = new AbortController();
-    const aiTimeout = setTimeout(() => aiController.abort(), 18000);
-
-    const structureResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      signal: aiController.signal,
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
-        response_format: { type: "json_object" },
-        messages: [
-          {
-            role: "system",
-            content: `${langInstruction}You are a financial historian for a Bitcoin mindfulness app. Given grounded search results with citations, extract ONE historical insight with a cross-asset analogy.
+    const aiBody = {
+      response_format: { type: "json_object" },
+      messages: [
+        {
+          role: "system",
+          content: `${langInstruction}You are a financial historian for a Bitcoin mindfulness app. Given grounded search results with citations, extract ONE historical insight with a cross-asset analogy.
 
 Respond with a JSON object containing exactly these keys:
 - "title": Short evocative title
@@ -120,44 +109,72 @@ Rules:
 - Draw a clear parallel between a historical event and the current context
 - End with a grounding observation, not hype
 - URL: use one of the provided citation URLs`,
-          },
-          {
-            role: "user",
-            content: `Market context: ${marketContext}\n\nSearch results:\n${searchContent}\n\nAvailable citation URLs:\n${citations.map((c: string, i: number) => `[${i + 1}] ${c}`).join("\n")}\n\nExtract one historical insight with cross-asset analogy. Return JSON only.`,
-          },
-        ],
-      }),
-    });
+        },
+        {
+          role: "user",
+          content: `Market context: ${marketContext}\n\nSearch results:\n${searchContent}\n\nAvailable citation URLs:\n${citations.map((c: string, i: number) => `[${i + 1}] ${c}`).join("\n")}\n\nExtract one historical insight with cross-asset analogy. Return JSON only.`,
+        },
+      ],
+    };
 
-    clearTimeout(aiTimeout);
+    const models = ["google/gemini-2.5-flash-lite", "google/gemini-2.5-flash"];
+    let insight: Record<string, string> | null = null;
+    let lastStatus = 500;
 
-    if (!structureResponse.ok) {
-      if (structureResponse.status === 429) {
-        return new Response(
-          JSON.stringify({ error: "Rate limited, please try again later." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+    for (const model of models) {
+      const aiController = new AbortController();
+      const aiTimeout = setTimeout(() => aiController.abort(), 18000);
+      try {
+        const structureResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          signal: aiController.signal,
+          body: JSON.stringify({ ...aiBody, model }),
+        });
+        clearTimeout(aiTimeout);
+
+        if (structureResponse.status === 429 || structureResponse.status === 402) {
+          lastStatus = structureResponse.status;
+          await structureResponse.text();
+          break;
+        }
+        if (!structureResponse.ok) {
+          const t = await structureResponse.text();
+          console.error(`AI ${model} error:`, structureResponse.status, t);
+          lastStatus = structureResponse.status;
+          if (model !== models[models.length - 1]) continue;
+          break;
+        }
+
+        const structureData = await structureResponse.json();
+        const raw = structureData.choices?.[0]?.message?.content || "";
+        try {
+          insight = JSON.parse(raw);
+        } catch {
+          const m = raw.match(/\{[\s\S]*\}/);
+          if (m) insight = JSON.parse(m[0]);
+          else if (model !== models[models.length - 1]) continue;
+          else throw new Error("Could not parse AI JSON response");
+        }
+        break;
+      } catch (e) {
+        clearTimeout(aiTimeout);
+        if (e instanceof DOMException && e.name === "AbortError") {
+          lastStatus = 504;
+          if (model !== models[models.length - 1]) continue;
+          return new Response(JSON.stringify({ error: "AI structuring timed out" }), { status: 504, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        }
+        throw e;
       }
-      if (structureResponse.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "AI credits exhausted." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      const t = await structureResponse.text();
-      console.error("AI structure error:", structureResponse.status, t);
-      throw new Error("AI structuring failed");
     }
 
-    const structureData = await structureResponse.json();
-    const raw = structureData.choices?.[0]?.message?.content || "";
-    let insight: Record<string, string>;
-    try {
-      insight = JSON.parse(raw);
-    } catch {
-      const m = raw.match(/\{[\s\S]*\}/);
-      if (!m) throw new Error("Could not parse AI JSON response");
-      insight = JSON.parse(m[0]);
+    if (!insight) {
+      if (lastStatus === 429) return new Response(JSON.stringify({ error: "Rate limited, please try again later." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      if (lastStatus === 402) return new Response(JSON.stringify({ error: "AI credits exhausted." }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      throw new Error("AI structuring failed");
     }
 
     // Ensure URL is from citations
