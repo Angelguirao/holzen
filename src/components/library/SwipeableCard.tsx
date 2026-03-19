@@ -1,6 +1,7 @@
 import { useRef, useState, useCallback, type ReactNode } from 'react';
 import { Heart, Archive, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { hapticFeedback } from '@/lib/haptics';
 
 interface Props {
   children: ReactNode;
