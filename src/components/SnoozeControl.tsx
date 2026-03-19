@@ -2,10 +2,15 @@ import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useTranslation } from 'react-i18next';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Moon, Clock, X } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Moon, Clock } from 'lucide-react';
 import { hapticFeedback } from '@/lib/haptics';
 import { toast } from 'sonner';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 
 const SNOOZE_OPTIONS = [
   { hours: 2, labelKey: 'snooze.2h' },
@@ -26,7 +31,7 @@ export function useSnooze() {
       .eq('user_id', user.id)
       .single()
       .then(({ data }) => {
-        const val = (data as any)?.snoozed_until;
+        const val = data?.snoozed_until;
         if (val) {
           const d = new Date(val);
           setSnoozedUntil(d > new Date() ? d : null);
@@ -103,47 +108,32 @@ export function SnoozeControl() {
   }
 
   return (
-    <div className="relative">
-      <button
-        onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 text-[10px] font-mono text-muted-foreground/40 hover:text-muted-foreground/60 transition-colors py-1"
-      >
-        <Moon className="h-3 w-3" />
-        {t('snooze.pausePauses', 'Snooze pauses')}
-      </button>
-
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, y: -4, scale: 0.97 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={{ opacity: 0, y: -4, scale: 0.97 }}
-            transition={{ duration: 0.15 }}
-            className="absolute left-0 right-0 top-full mt-1 z-20 rounded-lg border border-border/60 bg-background shadow-lg p-2 space-y-1"
+    <Popover open={open} onOpenChange={setOpen}>
+      <PopoverTrigger asChild>
+        <button
+          className="flex items-center gap-1.5 text-[10px] font-mono text-muted-foreground/40 hover:text-muted-foreground/60 transition-colors py-1"
+        >
+          <Moon className="h-3 w-3" />
+          {t('snooze.pausePauses', 'Snooze pauses')}
+        </button>
+      </PopoverTrigger>
+      <PopoverContent align="start" className="w-48 p-2 space-y-1">
+        <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider px-2 pb-1">
+          {t('snooze.snoozeFor', 'Snooze for')}
+        </p>
+        {SNOOZE_OPTIONS.map(({ hours, labelKey }) => (
+          <button
+            key={hours}
+            onClick={() => handleSnooze(hours)}
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-md hover:bg-muted/50 transition-colors text-left"
           >
-            <div className="flex items-center justify-between px-2 pb-1">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">
-                {t('snooze.snoozeFor', 'Snooze for')}
-              </p>
-              <button onClick={() => setOpen(false)} className="p-0.5 text-muted-foreground/40 hover:text-muted-foreground">
-                <X className="h-3 w-3" />
-              </button>
-            </div>
-            {SNOOZE_OPTIONS.map(({ hours, labelKey }) => (
-              <button
-                key={hours}
-                onClick={() => handleSnooze(hours)}
-                className="w-full flex items-center gap-2 px-3 py-2 rounded-md hover:bg-muted/50 transition-colors text-left"
-              >
-                <Clock className="h-3 w-3 text-muted-foreground/40" />
-                <span className="text-xs font-mono text-foreground/70">
-                  {t(labelKey, `${hours} hours`)}
-                </span>
-              </button>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+            <Clock className="h-3 w-3 text-muted-foreground/40" />
+            <span className="text-xs font-mono text-foreground/70">
+              {t(labelKey, `${hours} hours`)}
+            </span>
+          </button>
+        ))}
+      </PopoverContent>
+    </Popover>
   );
 }

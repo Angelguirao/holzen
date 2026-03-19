@@ -644,6 +644,39 @@ export type Database = {
         }
         Relationships: []
       }
+      quiet_windows: {
+        Row: {
+          active: boolean
+          created_at: string
+          days: number[]
+          end_hour: number
+          id: string
+          label: string
+          start_hour: number
+          user_id: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          days?: number[]
+          end_hour: number
+          id?: string
+          label?: string
+          start_hour: number
+          user_id: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          days?: number[]
+          end_hour?: number
+          id?: string
+          label?: string
+          start_hour?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       referral_rewards: {
         Row: {
           granted_at: string
