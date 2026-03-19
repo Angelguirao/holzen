@@ -49,7 +49,7 @@ serve(async (req) => {
     );
     try { await svcClient.from("analytics_events").insert({ user_id: userId, event: "pause_ai_call" }); } catch (_) { /* tracking failure is non-fatal */ }
 
-    const { context, tone, customPrompt, style, moodHistory, severity, motivations, mantra, groundingActivities, currency, language } = await req.json();
+    const { context, tone, customPrompt, style, moodHistory, severity, motivations, mantra, groundingActivities, currency, language, recentHaikus, learningSources } = await req.json();
     if (!context) {
       return new Response(JSON.stringify({ error: "Missing context" }), {
         status: 400,
@@ -60,6 +60,52 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
       throw new Error("LOVABLE_API_KEY is not configured");
+    }
+
+    // --- Perplexity search for learning content (grounded, not hallucinated) ---
+    let learningSearchContent = "";
+    let learningCitations: string[] = [];
+    const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
+
+    if (PERPLEXITY_API_KEY) {
+      try {
+        // Build source hints for learning
+        const learningSourceHint = (learningSources && Array.isArray(learningSources) && learningSources.length > 0)
+          ? ` Prefer insights from: ${learningSources.sort(() => Math.random() - 0.5).slice(0, 4).join(", ")}.`
+          : "";
+
+        const learningQuery = `Bitcoin behavioral finance or market psychology insight relevant to: ${context}. Find a specific educational fact, historical pattern, or research finding with real data.${learningSourceHint}`;
+
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 8000);
+
+        const searchResp = await fetch("https://api.perplexity.ai/chat/completions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${PERPLEXITY_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            model: "sonar",
+            messages: [
+              { role: "system", content: "Find one specific, factual educational insight about Bitcoin market behavior, behavioral finance, or investor psychology. Include real data, dates, or research citations. Be concise — 2-3 sentences max." },
+              { role: "user", content: learningQuery },
+            ],
+            search_recency_filter: "month",
+          }),
+          signal: controller.signal,
+        });
+        clearTimeout(timeout);
+
+        if (searchResp.ok) {
+          const searchData = await searchResp.json();
+          learningSearchContent = searchData.choices?.[0]?.message?.content || "";
+          learningCitations = searchData.citations || [];
+        }
+      } catch (e) {
+        // Non-fatal — fall back to AI-only learning
+        console.warn("Learning Perplexity search failed:", e instanceof Error ? e.message : e);
+      }
     }
 
     // --- Adaptive tone logic ---
@@ -77,12 +123,10 @@ serve(async (req) => {
       const anxiousRate = anxiousCount / total;
       const calmRate = calmCount / total;
 
-      // Check recent streak (last 3)
       const recentMoods = moods.slice(0, 3);
       const recentAllAnxious = recentMoods.every((m: string) => m === "anxious");
       const recentAllCalm = recentMoods.every((m: string) => m === "calm");
 
-      // Check outcomes
       const outcomes = moodHistory.map((m: any) => m.outcome).filter(Boolean);
       const soldCount = outcomes.filter((o: string) => o === "sold").length;
       const soldRate = outcomes.length > 0 ? soldCount / outcomes.length : 0;
@@ -112,11 +156,27 @@ serve(async (req) => {
       adaptiveContext += "\nMARKET SEVERITY: Significant move (7%+). Balance grounding with perspective.";
     }
 
+    // Build haiku dedup instruction
+    let haikuDedup = "";
+    if (recentHaikus && Array.isArray(recentHaikus) && recentHaikus.length > 0) {
+      haikuDedup = `\n\nHAIKU DEDUPLICATION: The user has recently received these haikus. You MUST write something COMPLETELY DIFFERENT — different imagery, different words, different structure:\n${recentHaikus.slice(0, 5).map((h: string, i: number) => `${i + 1}. "${h}"`).join("\n")}`;
+    }
+
+    // Build learning grounding section
+    let learningInstruction = "";
+    if (learningSearchContent) {
+      const citationRef = learningCitations.length > 0
+        ? `\nAvailable citation URLs for learning_url:\n${learningCitations.map((c: string, i: number) => `[${i + 1}] ${c}`).join("\n")}`
+        : "";
+      learningInstruction = `\n\nLEARNING GROUNDING: Use the following search results to write the learning_title and learning_body. Extract real facts, dates, and data points. Do NOT invent information.\nSearch results: ${learningSearchContent}${citationRef}`;
+    }
+
     const currencyCode = currency || "USD";
     const langCode = language || "en";
     const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
     const langName = LANG_NAMES[langCode] || "English";
     const langInstruction = langCode !== "en" ? `CRITICAL LANGUAGE REQUIREMENT: You MUST write ALL output — message, haiku, learning_title, and learning_body — in ${langName}. Every single field must be in ${langName}. Do NOT use English for any generated text. This is non-negotiable.\n\n` : "";
+
     const systemPrompt = `${langInstruction}You generate a reflection with optional companions in response to Bitcoin volatility.
 
 You MUST respond with a JSON object containing these keys:
@@ -124,11 +184,13 @@ You MUST respond with a JSON object containing these keys:
 - "haiku": A haiku (3 lines separated by newlines, 5-7-5 syllables)${langCode !== "en" ? ` in ${langName}` : ""}
 - "learning_title": Short factual headline (5-10 words)${langCode !== "en" ? ` in ${langName}` : ""}
 - "learning_body": 1-2 sentences of factual educational context${langCode !== "en" ? ` in ${langName}` : ""}
+- "learning_citation": Source name (e.g. "Kahneman & Tversky, 1979" or "Glassnode Research")
+- "learning_url": A URL from the citation list if available, or "" if none
 
 Tone: ${baseTone}
 ${adaptiveContext}
 
-CURRENCY: The user views BTC prices in ${currencyCode}. When mentioning any price or monetary value, format it in ${currencyCode} (e.g. use the appropriate currency symbol). Never use USD unless the user's currency IS USD.
+CURRENCY: The user views BTC prices in ${currencyCode}. When mentioning any price or monetary value, format it in ${currencyCode}.
 
 The context may include a Fear & Greed Index score (0-100). Use this to subtly adjust your reflection:
 - Extreme Fear (0-24): The crowd is panicking. Reflect on what happens when fear spreads.
@@ -151,11 +213,12 @@ Haiku rules:
 - Traditional 5-7-5 syllable structure.
 - Captures the essence of the moment. Match the chosen tone.
 - No trading advice or price predictions.
-
+- MUST be original and unique — never repeat common phrases like "red screens" or "breath moves".${haikuDedup}
+${learningInstruction || `
 Learning input rules:
 - Title: a short, factual headline (5-10 words).
 - Body: 1-2 sentences about a historical Bitcoin event, market pattern, or behavioral finance insight relevant to the current context. Factual, educational, no advice.
-- If on-chain data is provided in the context (mempool size, fees, hashrate, block height), USE IT to make the learning insight factually grounded. Reference actual current conditions rather than generic history.`;
+- If on-chain data is provided in the context (mempool size, fees, hashrate, block height), USE IT to make the learning insight factually grounded.`}`;
 
     const aiBody = {
       messages: [
@@ -229,11 +292,21 @@ Learning input rules:
       throw new Error("AI generation failed after all retries");
     }
 
+    // Post-process learning URL — ensure it's from citations
+    let learningUrl = result.learning_url || "";
+    if (learningUrl && learningCitations.length > 0 && !learningCitations.includes(learningUrl)) {
+      learningUrl = learningCitations[0];
+    } else if (!learningUrl && learningCitations.length > 0) {
+      learningUrl = learningCitations[0];
+    }
+
     return new Response(JSON.stringify({
       message: result.message,
       haiku: result.haiku || null,
       learning_title: result.learning_title || null,
       learning_body: result.learning_body || null,
+      learning_citation: result.learning_citation || null,
+      learning_url: learningUrl || null,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
