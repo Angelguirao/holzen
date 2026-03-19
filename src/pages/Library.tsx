@@ -2,10 +2,11 @@ import { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLibrary } from '@/hooks/use-library';
 import { PageMeta } from '@/components/PageMeta';
-import { Heart, Search, X, Lock } from 'lucide-react';
+import { Heart, Search, X, Lock, ArrowUpDown } from 'lucide-react';
 import { SubscriptionSkeleton } from '@/components/SubscriptionSkeleton';
 import { LibraryItems } from '@/components/library/LibraryItems';
 import { LibraryCollections } from '@/components/library/LibraryCollections';
+import { SmartCollections } from '@/components/library/SmartCollections';
 
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
