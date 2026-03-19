@@ -1,5 +1,6 @@
 import { ExternalLink } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { CompanionError } from './CompanionError';
 
 interface Props {
   title: string;
@@ -12,9 +13,10 @@ interface SignalDisplayProps {
   signal: Props | null;
   loading: boolean;
   error: boolean;
+  onRetry?: () => void;
 }
 
-export function SignalDisplay({ signal, loading, error }: SignalDisplayProps) {
+export function SignalDisplay({ signal, loading, error, onRetry }: SignalDisplayProps) {
   if (loading) {
     return (
       <div className="space-y-2">
@@ -26,11 +28,7 @@ export function SignalDisplay({ signal, loading, error }: SignalDisplayProps) {
   }
 
   if (error || !signal) {
-    return (
-      <p className="text-xs text-muted-foreground/50 italic">
-        Couldn't load signal right now.
-      </p>
-    );
+    return <CompanionError message="Couldn't load signal right now." onRetry={onRetry} />;
   }
 
   return (

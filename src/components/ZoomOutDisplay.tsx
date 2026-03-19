@@ -1,5 +1,6 @@
 import { Skeleton } from '@/components/ui/skeleton';
 import { TrendingUp, TrendingDown, Clock, Globe, CloudOff } from 'lucide-react';
+import { CompanionError } from './CompanionError';
 import { format } from 'date-fns';
 import { useHolzen } from '@/hooks/use-holzen';
 import { formatBtcPrice } from '@/lib/btc';
@@ -30,13 +31,14 @@ interface Props {
   data: ZoomOutData | null;
   loading: boolean;
   error: boolean;
+  onRetry?: () => void;
 }
 
 const outcomeLabels: Record<string, string> = {
   held: 'Held', hold: 'Held', sold: 'Sold', bought: 'Bought', nothing: 'Did nothing',
 };
 
-export function ZoomOutDisplay({ data, loading, error }: Props) {
+export function ZoomOutDisplay({ data, loading, error, onRetry }: Props) {
   const { currency } = useHolzen();
   const fmtPrice = (n: number) => formatBtcPrice(n, currency);
   if (loading) {
@@ -50,11 +52,7 @@ export function ZoomOutDisplay({ data, loading, error }: Props) {
   }
 
   if (error || !data) {
-    return (
-      <p className="text-xs text-muted-foreground/60 font-mono">
-        Could not load zoom out data.
-      </p>
-    );
+    return <CompanionError message="Could not load zoom out data." onRetry={onRetry} />;
   }
 
   const { onThisDay, currentPrice, echo, deepTime } = data;
