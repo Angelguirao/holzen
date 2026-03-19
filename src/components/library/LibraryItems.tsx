@@ -60,6 +60,7 @@ export function LibraryItems({ library, filtered }: Props) {
   const {
     items, collections, updateItem, deleteItem, togglePin, toggleFavorite,
     addToCollection, removeFromCollection, getItemCollections, isCompanionEngaged, isReflectionIncomplete,
+    refetch,
   } = library;
 
   const [selectedItem, setSelectedItem] = useState<LibraryItem | null>(null);
