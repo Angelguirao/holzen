@@ -21,6 +21,43 @@ const STYLE_INSTRUCTIONS: Record<string, string> = {
   koan: "Write a short zen koan or paradox related to the moment. 1-2 sentences.",
 };
 
+// Thematic framings that rotate per session to prevent repetitive structures.
+// Each tone has its own pool of angles — the system picks one at random.
+const TONE_FRAMINGS: Record<string, string[]> = {
+  stoic: [
+    "Frame this through Seneca's lens: what is within your control vs. what is not.",
+    "Channel Marcus Aurelius' 'view from above' — zoom out to see this moment in the arc of a lifetime.",
+    "Apply Epictetus' distinction between events and our judgments about events.",
+    "Consider what a stoic sage would notice about the gap between stimulus and response right now.",
+    "Reflect through the stoic concept of amor fati — loving one's fate, including this very moment.",
+    "Use the stoic practice of premeditatio malorum — this was always a possibility, and you prepared for it.",
+  ],
+  zen: [
+    "Use the image of water — rivers, rain, still ponds — to reflect on impermanence.",
+    "Frame this as a koan-like observation about the nature of attachment to outcomes.",
+    "Draw from the beginner's mind (shoshin) — what would someone seeing this for the first time notice?",
+    "Use the metaphor of seasons changing — nothing about this moment is permanent.",
+    "Reflect through the zen concept of mu (emptiness) — what remains when the numbers are stripped away?",
+    "Frame through kintsukuroi — the beauty in broken things, the gold in the cracks.",
+  ],
+  poetic: [
+    "Use the imagery of the ocean — tides, depths, horizons — to frame this moment.",
+    "Draw from the language of astronomy — constellations, orbits, the vastness of space.",
+    "Frame through the lens of music — rhythm, silence between notes, dissonance resolving.",
+    "Use the imagery of geology — tectonic shifts, erosion, the patience of stone.",
+    "Draw from weather — not storms (too obvious), but the quiet before, the light after, the way clouds reshape.",
+    "Frame through the language of gardening — seeds, dormancy, seasons of growth and rest.",
+  ],
+  blunt: [
+    "Name the emotion plainly. No metaphor, no spin.",
+    "State what actually changed vs. what the mind is making up about it.",
+    "Point out the gap between what happened and the story being told about it.",
+    "Ask one hard question about what this reaction reveals.",
+    "Name the cognitive bias at play — no sugar-coating.",
+    "Separate the signal from the noise in one sentence.",
+  ],
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
