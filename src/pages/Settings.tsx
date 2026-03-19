@@ -108,6 +108,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
   const [changingPassword, setChangingPassword] = useState(false);
   const [zenMode, setZenMode] = useState(() => localStorage.getItem('holzen_zen_mode') === 'true');
   const [hapticEnabled, setHapticEnabledState] = useState(isHapticEnabled);
+  const [soundEnabled, setSoundEnabled] = useState(() => localStorage.getItem('holzen_sound_enabled') !== 'false');
   const [btcMode, setBtcMode] = useState(() => localStorage.getItem('holzen_btc_mode') === 'true');
   const [latestVersion, setLatestVersion] = useState<string | null>(null);
   const [hasNewVersion, setHasNewVersion] = useState(false);
@@ -594,6 +595,20 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                   {t('settings.enableSilentMode')}
                 </Label>
                 <Switch id="silent-mode" checked={silentMode} onCheckedChange={setSilentMode} />
+              </div>
+            </div>
+
+            {/* Notification Sound */}
+            <div className="space-y-3">
+              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.notificationSound', 'Notification sound')}</p>
+              <p className="text-xs text-muted-foreground leading-relaxed">
+                {t('settings.notificationSoundDesc', 'Play a singing-bowl chime when a new reflection arrives.')}
+              </p>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="sound-toggle" className="text-xs font-mono text-muted-foreground">
+                  {t('settings.enableSound', 'Enable sound')}
+                </Label>
+                <Switch id="sound-toggle" checked={soundEnabled} onCheckedChange={(val) => { setSoundEnabled(val); localStorage.setItem('holzen_sound_enabled', String(val)); }} />
               </div>
             </div>
 
