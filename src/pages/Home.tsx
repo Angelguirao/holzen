@@ -422,6 +422,7 @@ const Home = () => {
               <BtcStatus data={btcData} error={error} hidden={priceHidden} onToggleHidden={togglePriceHidden} currency={currency} btcMode={btcMode} onToggleBtcMode={toggleBtcMode} />
               <HolzenNumber variant="compact" />
               <AutoCooldownIndicator cooldownRemaining={autoCooldownRemaining} cooldownHours={cooldownHours} nextCronCheckIn={nextCronCheckIn} />
+              <SnoozeControl />
             </div>
           </HomeWidget>
         );
