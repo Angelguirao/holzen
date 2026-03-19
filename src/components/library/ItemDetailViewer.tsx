@@ -1,10 +1,11 @@
 import { useMemo, useState, useRef, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Heart, ExternalLink, Tag, Link2, Clock, Pin, PinOff, Trash2, Archive, Eye, EyeOff, X, FolderPlus, Check } from 'lucide-react';
+import { Heart, ExternalLink, Tag, Link2, Clock, Pin, PinOff, Trash2, Archive, X, FolderPlus, Check } from 'lucide-react';
 import { format } from 'date-fns';
 import type { LibraryItem, Collection } from '@/hooks/use-library';
 import { supabase } from '@/integrations/supabase/client';
+import { OutcomeIcon } from '@/components/icons/OutcomeIcon';
 
 const TYPE_EMOJIS: Record<string, string> = {
   bookmark: '🔖',
@@ -26,9 +27,9 @@ const SOURCE_EMOJIS: Record<string, string> = {
 };
 
 const OUTCOME_OPTIONS = [
-  { key: 'hold', emoji: '💎', labelKey: 'pause.outcomes.hold' },
-  { key: 'sell', emoji: '📉', labelKey: 'pause.outcomes.sell' },
-  { key: 'nothing', emoji: '🤷', labelKey: 'pause.outcomes.nothing' },
+  { key: 'held', labelKey: 'ritual.decide.hold' },
+  { key: 'sold', labelKey: 'ritual.decide.sell' },
+  { key: 'bought', labelKey: 'ritual.decide.buy' },
 ] as const;
 
 interface Props {
@@ -49,6 +50,7 @@ interface Props {
   onRemoveFromCollection?: (collectionId: string, itemId: string) => Promise<void>;
   isIncomplete?: boolean;
   onOutcomeRecorded?: () => void;
+  currentOutcome?: string | null;
 }
 
 function CompanionCard({ item, onSelect }: { item: LibraryItem; onSelect?: (item: LibraryItem) => void }) {
@@ -83,14 +85,15 @@ export function ItemDetailViewer({
   item, linkedItems, allItems, open, onClose, onToggleFavorite,
   onTogglePin, onDelete, onStatusChange, onUpdateTags, onSelectItem,
   collections, getItemCollections, onAddToCollection, onRemoveFromCollection,
-  isIncomplete, onOutcomeRecorded,
+  isIncomplete, onOutcomeRecorded, currentOutcome,
 }: Props) {
   const { t } = useTranslation();
   const [editingTags, setEditingTags] = useState(false);
   const [tagInput, setTagInput] = useState('');
   const [showCollections, setShowCollections] = useState(false);
   const [outcomeLoading, setOutcomeLoading] = useState(false);
-  const [outcomeRecorded, setOutcomeRecorded] = useState(false);
+  const [recordedOutcome, setRecordedOutcome] = useState<string | null>(null);
+  const [showOutcomePicker, setShowOutcomePicker] = useState(false);
   const tagInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -102,7 +105,8 @@ export function ItemDetailViewer({
     setEditingTags(false);
     setTagInput('');
     setShowCollections(false);
-    setOutcomeRecorded(false);
+    setRecordedOutcome(null);
+    setShowOutcomePicker(false);
   }, [item?.id]);
 
   // Auto-mark as read when opened
@@ -147,7 +151,8 @@ export function ItemDetailViewer({
       .update({ outcome })
       .eq('id', item.reflection_id);
     setOutcomeLoading(false);
-    setOutcomeRecorded(true);
+    setRecordedOutcome(outcome);
+    setShowOutcomePicker(false);
     onOutcomeRecorded?.();
   }, [item?.reflection_id, outcomeLoading, onOutcomeRecorded]);
 
@@ -157,7 +162,11 @@ export function ItemDetailViewer({
   const isReflection = item.source_type === 'reflection';
   const sourceLabel = t(`librarySources.${item.source_type}`, item.source_type ?? 'Item');
   const emoji = SOURCE_EMOJIS[item.source_type ?? ''] ?? TYPE_EMOJIS[item.type] ?? '📄';
-  const showOutcomePicker = isIncomplete && !outcomeRecorded;
+
+  // Determine the effective outcome: freshly recorded > current from DB
+  const effectiveOutcome = recordedOutcome ?? currentOutcome;
+  // Show the outcome section for reflections: either incomplete or has an outcome to display
+  const showOutcomeSection = isReflection && item.reflection_id;
 
   const handleDelete = () => {
     onDelete(item.id);
@@ -247,37 +256,67 @@ export function ItemDetailViewer({
             return null;
           })()}
 
-          {/* Retroactive decision recording */}
-          {showOutcomePicker && (
-            <div className="rounded-lg border border-destructive/20 bg-destructive/5 p-3 space-y-2.5">
-              <p className="text-[10px] font-mono text-destructive/70 uppercase tracking-wider">
-                {t('library.incompleteLabel', 'No decision recorded')}
-              </p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
-                {t('library.incompleteDescription', 'What did you end up doing after this pause?')}
-              </p>
-              <div className="flex items-center gap-2">
-                {OUTCOME_OPTIONS.map(({ key, emoji: emo, labelKey }) => (
-                  <button
-                    key={key}
-                    onClick={() => handleRecordOutcome(key)}
-                    disabled={outcomeLoading}
-                    className="flex-1 flex items-center justify-center gap-1.5 text-[10px] font-mono py-2 px-2 rounded-md border border-border/40 bg-card/50 text-foreground/70 hover:bg-card hover:border-foreground/20 transition-colors disabled:opacity-50"
-                  >
-                    <span>{emo}</span>
-                    {t(labelKey, key)}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {outcomeRecorded && (
-            <div className="rounded-lg border border-primary/20 bg-primary/5 p-3">
-              <p className="text-[10px] font-mono text-primary/70 text-center">
-                ✓ {t('library.outcomeRecorded', 'Decision recorded')}
-              </p>
-            </div>
+          {/* Decision outcome section */}
+          {showOutcomeSection && (
+            <>
+              {effectiveOutcome && !showOutcomePicker ? (
+                <button
+                  onClick={() => setShowOutcomePicker(true)}
+                  className="w-full rounded-lg border border-border/30 bg-card/30 p-3 flex items-center gap-3 hover:bg-card/50 transition-colors group"
+                >
+                  <OutcomeIcon outcome={effectiveOutcome} size={18} className="text-primary/60" />
+                  <div className="flex-1 text-left">
+                    <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider">
+                      {t('library.decisionLabel', 'Decision')}
+                    </p>
+                    <p className="text-xs font-mono text-foreground/70">
+                      {t(`ritual.decide.${effectiveOutcome === 'held' ? 'hold' : effectiveOutcome === 'sold' ? 'sell' : 'buy'}`, effectiveOutcome)}
+                    </p>
+                  </div>
+                  <span className="text-[8px] font-mono text-muted-foreground/20 group-hover:text-muted-foreground/40 uppercase tracking-wider transition-colors">
+                    {t('library.changeDecision', 'Change')}
+                  </span>
+                </button>
+              ) : (
+                <div className="rounded-lg border border-border/30 bg-card/30 p-3 space-y-2.5">
+                  <p className="text-[10px] font-mono text-muted-foreground/50 uppercase tracking-wider">
+                    {effectiveOutcome
+                      ? t('library.changeDecisionLabel', 'Change decision')
+                      : t('library.incompleteLabel', 'No decision recorded')}
+                  </p>
+                  {!effectiveOutcome && (
+                    <p className="text-xs text-muted-foreground/60 leading-relaxed">
+                      {t('library.incompleteDescription', 'What did you end up doing after this pause?')}
+                    </p>
+                  )}
+                  <div className="flex items-center gap-2">
+                    {OUTCOME_OPTIONS.map(({ key, labelKey }) => (
+                      <button
+                        key={key}
+                        onClick={() => handleRecordOutcome(key)}
+                        disabled={outcomeLoading}
+                        className={`flex-1 flex items-center justify-center gap-1.5 text-[10px] font-mono py-2 px-2 rounded-md border transition-colors disabled:opacity-50 ${
+                          effectiveOutcome === key
+                            ? 'border-primary/30 bg-primary/10 text-primary'
+                            : 'border-border/40 bg-card/50 text-foreground/70 hover:bg-card hover:border-foreground/20'
+                        }`}
+                      >
+                        <OutcomeIcon outcome={key} size={14} />
+                        {t(labelKey, key)}
+                      </button>
+                    ))}
+                  </div>
+                  {effectiveOutcome && (
+                    <button
+                      onClick={() => setShowOutcomePicker(false)}
+                      className="text-[9px] font-mono text-muted-foreground/30 hover:text-muted-foreground/50 transition-colors"
+                    >
+                      {t('common.cancel', 'Cancel')}
+                    </button>
+                  )}
+                </div>
+              )}
+            </>
           )}
 
           {/* Source URL */}

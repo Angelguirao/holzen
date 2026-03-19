@@ -1,15 +1,9 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
-import { ChevronLeft, Shield, TrendingDown, TrendingUp, Leaf } from 'lucide-react';
+import { ChevronLeft } from 'lucide-react';
+import { OutcomeIcon } from '@/components/icons/OutcomeIcon';
 import { hapticFeedback } from '@/lib/haptics';
-
-const DECISIONS = [
-  { value: 'held', key: 'hold', icon: Shield },
-  { value: 'sold', key: 'sell', icon: TrendingDown },
-  { value: 'bought', key: 'buy', icon: TrendingUp },
-  { value: 'nothing', key: 'nothing', icon: Leaf },
-] as const;
 
 /** Decisions that trigger the mirror */
 const MIRROR_DECISIONS = ['sold', 'bought'];
@@ -23,13 +17,14 @@ export function PauseDecide({ onDecide, onBack }: Props) {
   const { t } = useTranslation();
   const [mirrorDecision, setMirrorDecision] = useState<string | null>(null);
 
-  const handleDecision = (value: string) => {
+  const handleHold = () => {
     hapticFeedback('medium');
-    if (MIRROR_DECISIONS.includes(value)) {
-      setMirrorDecision(value);
-    } else {
-      onDecide(value);
-    }
+    onDecide('held');
+  };
+
+  const handleAction = (value: 'sold' | 'bought') => {
+    hapticFeedback('medium');
+    setMirrorDecision(value);
   };
 
   const confirmMirror = () => {
@@ -58,7 +53,7 @@ export function PauseDecide({ onDecide, onBack }: Props) {
         {!mirrorDecision ? (
           <motion.div
             key="choices"
-            className="flex flex-col items-center gap-8"
+            className="flex flex-col items-center gap-8 w-full max-w-xs"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
@@ -68,25 +63,37 @@ export function PauseDecide({ onDecide, onBack }: Props) {
               {t('pause.whatWillYouDo')}
             </p>
 
-            <div className="grid grid-cols-2 gap-3 w-full max-w-xs">
-              {DECISIONS.map((d) => {
-                const Icon = d.icon;
-                return (
-                  <motion.button
-                    key={d.value}
-                    onClick={() => handleDecision(d.value)}
-                    whileTap={{ scale: 0.96 }}
-                    className="flex flex-col items-center gap-3 py-6 rounded-xl border border-border/15 bg-card/20 backdrop-blur-sm hover:bg-card/40 hover:border-border/30 transition-all duration-300"
-                  >
-                    <div className="w-10 h-10 rounded-full bg-primary/5 border border-primary/10 flex items-center justify-center">
-                      <Icon className="h-4 w-4 text-primary/50" />
-                    </div>
-                    <span className="text-[10px] font-mono text-foreground/50 tracking-[0.12em] uppercase">
-                      {t(`ritual.decide.${d.key}`)}
-                    </span>
-                  </motion.button>
-                );
-              })}
+            {/* Primary: Hold */}
+            <motion.button
+              onClick={handleHold}
+              whileTap={{ scale: 0.97 }}
+              className="w-full flex items-center justify-center gap-3 py-5 rounded-xl border border-primary/20 bg-primary/5 hover:bg-primary/10 hover:border-primary/30 transition-all duration-300"
+            >
+              <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/15 flex items-center justify-center">
+                <OutcomeIcon outcome="held" size={18} className="text-primary/60" />
+              </div>
+              <span className="text-xs font-mono text-foreground/70 tracking-[0.12em] uppercase">
+                {t('ritual.decide.hold', 'I\'m holding')}
+              </span>
+            </motion.button>
+
+            {/* Secondary: Sell / Buy */}
+            <div className="flex items-center gap-6">
+              <button
+                onClick={() => handleAction('sold')}
+                className="flex items-center gap-1.5 text-[9px] font-mono text-muted-foreground/30 hover:text-muted-foreground/50 transition-colors duration-500 tracking-[0.12em] uppercase"
+              >
+                <OutcomeIcon outcome="sold" size={14} className="opacity-50" />
+                {t('ritual.decide.sell', 'I sold')}
+              </button>
+              <span className="text-muted-foreground/10">·</span>
+              <button
+                onClick={() => handleAction('bought')}
+                className="flex items-center gap-1.5 text-[9px] font-mono text-muted-foreground/30 hover:text-muted-foreground/50 transition-colors duration-500 tracking-[0.12em] uppercase"
+              >
+                <OutcomeIcon outcome="bought" size={14} className="opacity-50" />
+                {t('ritual.decide.buy', 'I bought')}
+              </button>
             </div>
           </motion.div>
         ) : (
