@@ -212,8 +212,15 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
         return;
       }
 
+      // Pass recent bias topics to avoid repetition
+      let recentTopics: string[] = [];
+      try {
+        const stored = localStorage.getItem('holzen_recent_nudge_topics');
+        if (stored) recentTopics = JSON.parse(stored);
+      } catch { /* ignore */ }
+
       supabase.functions
-        .invoke('ground-nudge', { body: { context: context ?? '', language } })
+        .invoke('ground-nudge', { body: { context: context ?? '', language, recentTopics } })
         .then(({ data, error: fnError }) => {
           if (cancelled) return;
           if (fnError || !data || data.error) {
