@@ -78,6 +78,7 @@ serve(async (req) => {
         if (res.status === 429) {
           console.warn(`[zoom-out] CoinGecko 429 for ${target.dateKey}, skipping remaining`);
           await res.text();
+          rateLimited = true;
           break; // Stop trying once rate limited
         }
         if (!res.ok) { await res.text(); continue; }
