@@ -194,10 +194,10 @@ Rules:
 - Vary the theme: sometimes civilizational, sometimes planetary, sometimes about the nature of patience itself.
 - Ground in real facts and numbers when possible.
 
-You MUST respond by calling the "generate_deep_time" function.`;
+You MUST respond with a JSON object containing "title" and "body" keys. No other text.`;
 
         const aiController = new AbortController();
-        const aiTimeout = setTimeout(() => aiController.abort(), 10000);
+        const aiTimeout = setTimeout(() => aiController.abort(), 18000);
 
         const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
@@ -211,23 +211,7 @@ You MUST respond by calling the "generate_deep_time" function.`;
               { role: "system", content: systemPrompt },
               { role: "user", content: `${context || "BTC is moving today."} ${priceContext} ${historyContext}` },
             ],
-            tools: [{
-              type: "function",
-              function: {
-                name: "generate_deep_time",
-                description: "Generate a deep-time perspective.",
-                parameters: {
-                  type: "object",
-                  properties: {
-                    title: { type: "string", description: "Short evocative title (3-8 words)." },
-                    body: { type: "string", description: "1-2 sentences of deep-time perspective." },
-                  },
-                  required: ["title", "body"],
-                  additionalProperties: false,
-                },
-              },
-            }],
-            tool_choice: { type: "function", function: { name: "generate_deep_time" } },
+            response_format: { type: "json_object" },
           }),
           signal: aiController.signal,
         });
@@ -235,13 +219,15 @@ You MUST respond by calling the "generate_deep_time" function.`;
 
         if (aiRes.ok) {
           const aiData = await aiRes.json();
-          const toolCall = aiData.choices?.[0]?.message?.tool_calls?.[0];
-          if (toolCall?.function?.arguments) {
-            const args = typeof toolCall.function.arguments === "string"
-              ? JSON.parse(toolCall.function.arguments)
-              : toolCall.function.arguments;
-            if (args.title && args.body) {
-              deepTime = { title: args.title, body: args.body };
+          const raw = aiData.choices?.[0]?.message?.content;
+          if (raw) {
+            try {
+              const parsed = JSON.parse(raw);
+              if (parsed.title && parsed.body) {
+                deepTime = { title: parsed.title, body: parsed.body };
+              }
+            } catch {
+              console.warn("[zoom-out] Failed to parse AI JSON:", raw?.slice?.(0, 200));
             }
           }
         } else {
