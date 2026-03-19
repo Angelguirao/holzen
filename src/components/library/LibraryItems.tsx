@@ -177,6 +177,7 @@ export function LibraryItems({ library, filtered }: Props) {
         <LibraryItemCard
           item={item}
           onToggleFavorite={selectMode ? () => toggleSelect(item.id) : toggleFavorite}
+          engaged={isCompanionEngaged(item)}
           onClick={() => {
             if (selectMode) {
               toggleSelect(item.id);
