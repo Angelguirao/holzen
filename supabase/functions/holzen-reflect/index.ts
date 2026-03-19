@@ -90,7 +90,7 @@ serve(async (req) => {
         const searchBody: Record<string, unknown> = {
           model: "sonar",
           messages: [
-            { role: "system", content: "Find one specific, factual educational insight about Bitcoin market behavior, behavioral finance, or investor psychology. Include real data, dates, or research citations. Be concise — 2-3 sentences max." },
+            { role: "system", content: "Find one specific, factual insight about behavioral finance, cognitive biases, decision psychology, or emotional regulation. Focus on research findings (e.g. Kahneman, Thaler, Ariely), psychological principles (loss aversion, anchoring, sunk cost), or decision science. Do NOT discuss Bitcoin prices, market analysis, or on-chain data. Be concise — 2-3 sentences max." },
             { role: "user", content: learningQuery },
           ],
           search_recency_filter: "month",
