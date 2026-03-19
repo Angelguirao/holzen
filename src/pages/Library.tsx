@@ -221,6 +221,7 @@ export default function Library() {
         <div className="space-y-4">
           <SmartCollections
             items={items}
+            isReflectionIncomplete={library.isReflectionIncomplete}
             onSelect={(sc) => {
               setSmartFilter({ name: sc.name, itemIds: new Set(sc.items.map((i) => i.id)) });
               setTab('all');
