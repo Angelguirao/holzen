@@ -19,18 +19,29 @@ serve(async (req) => {
     const supabaseAnonKey = Deno.env.get("SUPABASE_ANON_KEY")!;
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-      global: { headers: { Authorization: authHeader } },
-    });
     const serviceClient = createClient(supabaseUrl, serviceRoleKey);
 
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) throw new Error("Not authenticated");
+    // Support both user JWT and service role key auth
+    let resolvedUserId: string | null = null;
+    const token = authHeader.replace("Bearer ", "");
+    if (token === serviceRoleKey) {
+      // Called server-to-server; userId must be in the body
+    } else {
+      const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+        global: { headers: { Authorization: authHeader } },
+      });
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+      resolvedUserId = user.id;
+    }
+
+    const { context, reflectionMessage, language, userId: bodyUserId } = await req.json();
+    const effectiveUserId = resolvedUserId || bodyUserId;
 
     // Track AI usage
-    try { await serviceClient.from("analytics_events").insert({ user_id: user.id, event: "zoom_out_ai_call" }); } catch (_) { /* non-fatal */ }
-
-    const { context, reflectionMessage, language } = await req.json();
+    if (effectiveUserId) {
+      try { await serviceClient.from("analytics_events").insert({ user_id: effectiveUserId, event: "zoom_out_ai_call" }); } catch (_) { /* non-fatal */ }
+    }
 
     // --- 1. Fetch "on this day" BTC prices with DB caching ---
     const today = new Date();
