@@ -138,9 +138,40 @@ export default function Library() {
 
   const sortLabel = sortMode === 'newest' ? t('library.sortNewest', { defaultValue: 'Newest' }) : sortMode === 'oldest' ? t('library.sortOldest', { defaultValue: 'Oldest' }) : t('library.sortAlpha', { defaultValue: 'A–Z' });
 
+  const handleRefresh = useCallback(async () => {
+    await library.refetch();
+  }, [library]);
+
+  const { pullDistance, refreshing, handlers } = usePullToRefresh({
+    onRefresh: handleRefresh,
+    threshold: 70,
+  });
+
   return (
-    <div className="space-y-4 pb-24">
+    <div className="space-y-4 pb-24" {...handlers}>
       <PageMeta title={t('library.pageTitle')} description={t('library.pageDescription')} />
+
+      {/* Pull-to-refresh indicator */}
+      <AnimatePresence>
+        {(pullDistance > 10 || refreshing) && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: Math.max(pullDistance, refreshing ? 36 : 0), opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="flex items-center justify-center overflow-hidden"
+          >
+            <RefreshCw
+              className={cn(
+                'h-4 w-4 text-muted-foreground/40 transition-transform',
+                refreshing && 'animate-spin',
+                pullDistance > 70 && !refreshing && 'text-primary/60'
+              )}
+              style={{ transform: refreshing ? undefined : `rotate(${pullDistance * 3}deg)` }}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Tab bar */}
       <div className="flex items-center gap-1 border-b border-border/30 overflow-x-auto">
