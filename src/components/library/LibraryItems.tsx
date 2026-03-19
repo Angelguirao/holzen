@@ -176,19 +176,27 @@ export function LibraryItems({ library, filtered }: Props) {
         </button>
       )}
       <div className="flex-1 min-w-0">
-        <LibraryItemCard
-          item={item}
-          onToggleFavorite={selectMode ? () => toggleSelect(item.id) : toggleFavorite}
-          engaged={isCompanionEngaged(item)}
-          incomplete={isReflectionIncomplete(item)}
-          onClick={() => {
-            if (selectMode) {
-              toggleSelect(item.id);
-            } else {
-              setSelectedItem(item);
-            }
-          }}
-        />
+        <SwipeableCard
+          disabled={selectMode}
+          onSwipeRight={() => toggleFavorite(item.id)}
+          onSwipeLeft={() => deleteItem(item.id)}
+          leftLabel={t('common.delete')}
+          rightLabel={item.is_favorite ? t('libraryCard.removeFavorite', { defaultValue: 'Unfavorite' }) : t('libraryCard.addFavorite', { defaultValue: 'Favorite' })}
+        >
+          <LibraryItemCard
+            item={item}
+            onToggleFavorite={selectMode ? () => toggleSelect(item.id) : toggleFavorite}
+            engaged={isCompanionEngaged(item)}
+            incomplete={isReflectionIncomplete(item)}
+            onClick={() => {
+              if (selectMode) {
+                toggleSelect(item.id);
+              } else {
+                setSelectedItem(item);
+              }
+            }}
+          />
+        </SwipeableCard>
       </div>
     </div>
   );
