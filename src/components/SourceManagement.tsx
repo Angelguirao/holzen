@@ -70,6 +70,7 @@ export function SourceManagement() {
 
   const isActive = useCallback((sourceId: string) => {
     const pref = prefs.find((p) => p.source_id === sourceId);
+    // If user has a pref, use it. If no pref exists, source is active by default.
     return pref ? pref.active : true;
   }, [prefs]);
 
