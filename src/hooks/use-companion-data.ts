@@ -228,6 +228,14 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
           } else {
             const nudgeData = data as NudgeData;
             setNudge(nudgeData);
+            // Track topic for cross-session dedup
+            try {
+              const prev: string[] = JSON.parse(localStorage.getItem('holzen_recent_nudge_topics') || '[]');
+              if (nudgeData.title) {
+                prev.unshift(nudgeData.title);
+                localStorage.setItem('holzen_recent_nudge_topics', JSON.stringify(prev.slice(0, 5)));
+              }
+            } catch { /* ignore */ }
             supabase
               .from('reflections')
               .update({
