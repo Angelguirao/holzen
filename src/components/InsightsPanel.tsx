@@ -29,7 +29,6 @@ const OUTCOME_COLORS: Record<string, string> = {
   held: 'bg-primary/70',
   sold: 'bg-destructive/70',
   bought: 'bg-chart-2',
-  nothing: 'bg-muted-foreground/50',
 };
 
 function Bar({ label, count, total, color }: { label: string; count: number; total: number; color: string }) {
@@ -62,7 +61,11 @@ export function InsightsPanel({ reflections }: Props) {
 
     for (const r of reflections) {
       if (r.mood) { moods[r.mood] = (moods[r.mood] || 0) + 1; tm++; }
-      if (r.outcome) { outcomes[r.outcome] = (outcomes[r.outcome] || 0) + 1; to++; }
+      if (r.outcome) {
+        // Merge legacy 'nothing' into 'held'
+        const key = r.outcome === 'nothing' ? 'held' : r.outcome;
+        outcomes[key] = (outcomes[key] || 0) + 1; to++;
+      }
     }
 
     return { moodCounts: moods, outcomeCounts: outcomes, totalMoods: tm, totalOutcomes: to };
@@ -105,7 +108,7 @@ export function InsightsPanel({ reflections }: Props) {
       {totalOutcomes > 0 && (
         <div className="space-y-2">
           <p className="text-xs font-mono text-muted-foreground/70">{t('insightsPanel.whatYouDid')}</p>
-          {(['held', 'nothing', 'bought', 'sold'] as const).map((o) => (
+          {(['held', 'bought', 'sold'] as const).map((o) => (
             <Bar key={o} label={t(`outcome.${o}`, o)} count={outcomeCounts[o] || 0} total={totalOutcomes} color={OUTCOME_COLORS[o]} />
           ))}
         </div>

@@ -8,7 +8,7 @@ import { hapticFeedback } from '@/lib/haptics';
 import { useTranslation } from 'react-i18next';
 import { OutcomeIcon } from '@/components/icons/OutcomeIcon';
 
-const outcomeKeys = ['held', 'sold', 'bought', 'nothing'] as const;
+const outcomeKeys = ['held', 'sold', 'bought'] as const;
 
 interface Props {
   reflectionId: string;
@@ -95,7 +95,7 @@ export function OutcomePrompt({ reflectionId, onComplete }: Props) {
                 </p>
               )}
             </div>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-3 gap-2">
               {outcomeKeys.map((key) => (
                 <Button
                   key={key}
