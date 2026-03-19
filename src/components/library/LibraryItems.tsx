@@ -1,6 +1,7 @@
-import { useMemo, useState, useCallback } from 'react';
+import { useMemo, useState, useCallback, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
+import { GroupedVirtuoso, Virtuoso } from 'react-virtuoso';
 import { LibraryItemCard } from './LibraryItemCard';
 import { ItemDetailViewer } from './ItemDetailViewer';
 import { SwipeableCard } from './SwipeableCard';
@@ -159,14 +160,29 @@ export function LibraryItems({ library, filtered }: Props) {
   const unpinnedFiltered = filtered.filter((i) => !i.pinned);
   const unpinnedGroups = useMemo(() => groupByDate(unpinnedFiltered, t), [unpinnedFiltered, t]);
 
-  const renderCard = (item: LibraryItem, index: number) => (
-    <motion.div
-      key={item.id}
-      initial={{ opacity: 0, y: 6 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.2, delay: Math.min(index * 0.03, 0.3) }}
-      className="flex items-center"
-    >
+  // Build flat list with group info for virtuoso
+  const { flatItems, groupCounts, groupLabels } = useMemo(() => {
+    const flat: LibraryItem[] = [];
+    const counts: number[] = [];
+    const labels: string[] = [];
+
+    if (pinnedItems.length > 0) {
+      labels.push(`📌 ${t('common.pinned')}`);
+      counts.push(pinnedItems.length);
+      flat.push(...pinnedItems);
+    }
+
+    unpinnedGroups.forEach((group) => {
+      labels.push(group.label);
+      counts.push(group.items.length);
+      flat.push(...group.items);
+    });
+
+    return { flatItems: flat, groupCounts: counts, groupLabels: labels };
+  }, [pinnedItems, unpinnedGroups, t]);
+
+  const renderCard = useCallback((index: number, item: LibraryItem) => (
+    <div className="flex items-center border-b border-border/20">
       {selectMode && (
         <button
           onClick={() => toggleSelect(item.id)}
@@ -205,8 +221,11 @@ export function LibraryItems({ library, filtered }: Props) {
           />
         </SwipeableCard>
       </div>
-    </motion.div>
-  );
+    </div>
+  ), [selectMode, selectedIds, toggleSelect, toggleFavorite, deleteItem, isCompanionEngaged, isReflectionIncomplete, t]);
+
+  // Use virtual scrolling only when the list is large enough to benefit
+  const useVirtual = flatItems.length > 30;
 
   return (
     <>
@@ -268,41 +287,73 @@ export function LibraryItems({ library, filtered }: Props) {
         )}
       </div>
 
-      <div className="space-y-4">
-        {pinnedItems.length > 0 && (
-          <div className="space-y-0.5">
-            <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider px-3 pb-1">
-              📌 {t('common.pinned')}
-            </p>
-            <div className="divide-y divide-border/20">
-              {pinnedItems.map((item, i) => renderCard(item, i))}
+      {filtered.length === 0 ? (
+        <div className="text-center py-12 space-y-3">
+          <p className="text-2xl">📚</p>
+          <p className="text-xs text-muted-foreground/60 font-mono max-w-[240px] mx-auto">
+            {t('library.emptyStateAction', { defaultValue: 'Complete a pause session to see your reflections, companions, and insights here.' })}
+          </p>
+          <p className="text-[9px] text-muted-foreground/30 font-mono">
+            {t('library.emptyStateHint', { defaultValue: 'Swipe cards left to delete, right to favorite' })}
+          </p>
+        </div>
+      ) : useVirtual ? (
+        <GroupedVirtuoso
+          style={{ height: 'calc(100vh - 280px)' }}
+          groupCounts={groupCounts}
+          groupContent={(index) => (
+            <div className="bg-background/95 backdrop-blur-sm pt-2 pb-1 px-3">
+              <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider">
+                {groupLabels[index]}
+              </p>
             </div>
-          </div>
-        )}
-
-        {unpinnedGroups.map((group) => (
-          <div key={group.key} className="space-y-0.5">
-            <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider px-3 pb-1">
-              {group.label}
-            </p>
-            <div className="divide-y divide-border/20">
-              {group.items.map((item, i) => renderCard(item, i))}
+          )}
+          itemContent={(index) => renderCard(index, flatItems[index])}
+          overscan={200}
+        />
+      ) : (
+        <div className="space-y-4">
+          {pinnedItems.length > 0 && (
+            <div className="space-y-0.5">
+              <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider px-3 pb-1">
+                📌 {t('common.pinned')}
+              </p>
+              <div className="divide-y divide-border/20">
+                {pinnedItems.map((item, i) => (
+                  <motion.div
+                    key={item.id}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2, delay: Math.min(i * 0.03, 0.3) }}
+                  >
+                    {renderCard(i, item)}
+                  </motion.div>
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          )}
 
-        {filtered.length === 0 && (
-          <div className="text-center py-12 space-y-3">
-            <p className="text-2xl">📚</p>
-            <p className="text-xs text-muted-foreground/60 font-mono max-w-[240px] mx-auto">
-              {t('library.emptyStateAction', { defaultValue: 'Complete a pause session to see your reflections, companions, and insights here.' })}
-            </p>
-            <p className="text-[9px] text-muted-foreground/30 font-mono">
-              {t('library.emptyStateHint', { defaultValue: 'Swipe cards left to delete, right to favorite' })}
-            </p>
-          </div>
-        )}
-      </div>
+          {unpinnedGroups.map((group) => (
+            <div key={group.key} className="space-y-0.5">
+              <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider px-3 pb-1">
+                {group.label}
+              </p>
+              <div className="divide-y divide-border/20">
+                {group.items.map((item, i) => (
+                  <motion.div
+                    key={item.id}
+                    initial={{ opacity: 0, y: 6 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.2, delay: Math.min(i * 0.03, 0.3) }}
+                  >
+                    {renderCard(i, item)}
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
 
       <ItemDetailViewer
         item={currentSelectedItem}
