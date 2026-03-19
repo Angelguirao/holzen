@@ -109,6 +109,7 @@ const Home = () => {
     manualTrigger,
     manualCooldownRemaining,
     autoCooldownRemaining,
+    nextCronCheckIn,
     cooldownHours,
     firstName,
     currency,
@@ -418,7 +419,7 @@ const Home = () => {
             <div className="space-y-4">
               <BtcStatus data={btcData} error={error} hidden={priceHidden} onToggleHidden={togglePriceHidden} currency={currency} btcMode={btcMode} onToggleBtcMode={toggleBtcMode} />
               <HolzenNumber variant="compact" />
-              <AutoCooldownIndicator cooldownRemaining={autoCooldownRemaining} cooldownHours={cooldownHours} />
+              <AutoCooldownIndicator cooldownRemaining={autoCooldownRemaining} cooldownHours={cooldownHours} nextCronCheckIn={nextCronCheckIn} />
             </div>
           </HomeWidget>
         );
@@ -891,28 +892,34 @@ function NeedAMomentButtonInner({ onTrigger, inCooldown, loading, minutes }: { o
 function AutoCooldownIndicator({
   cooldownRemaining,
   cooldownHours,
+  nextCronCheckIn,
 }: {
   cooldownRemaining: () => number;
   cooldownHours: number;
+  nextCronCheckIn: () => number;
 }) {
   const { t } = useTranslation();
   const [remaining, setRemaining] = useState(cooldownRemaining());
+  const [cronIn, setCronIn] = useState(nextCronCheckIn());
 
   useEffect(() => {
     const interval = setInterval(() => {
       setRemaining(cooldownRemaining());
+      setCronIn(nextCronCheckIn());
     }, 1000);
     return () => clearInterval(interval);
-  }, [cooldownRemaining]);
+  }, [cooldownRemaining, nextCronCheckIn]);
 
-  // When cooldown has expired, show "monitoring · ready" state
+  // When cooldown has expired, show next cron check countdown
   if (remaining <= 0) {
+    const cronMinutes = Math.max(1, Math.ceil(cronIn / 60000));
+
     return (
       <div className="flex items-center gap-3 py-2">
         <Timer className="h-3.5 w-3.5 text-primary/60 shrink-0" />
         <div className="flex-1">
           <p className="text-[10px] font-mono text-primary/60 uppercase tracking-wider">
-            {t('home.monitoringReady', 'Monitoring · ready')}
+            {t('home.monitoringNextCheck', { minutes: cronMinutes, defaultValue: `Monitoring · next check ≈ {{minutes}}m` })}
           </p>
         </div>
         <span className="h-1.5 w-1.5 rounded-full bg-primary/50 animate-pulse shrink-0" />

@@ -526,38 +526,11 @@ export function useHolzen() {
     return nowHour >= quietHoursStart || nowHour < quietHoursEnd;
   }, [quietHoursStart, quietHoursEnd]);
 
-  const checkingRef = useRef(false);
-
-  const checkAndTrigger = useCallback(async () => {
-    // Prevent concurrent checks that could fire duplicate reflections
-    if (checkingRef.current) return;
-    checkingRef.current = true;
-
+  // Fetch BTC data for display (no trigger logic — server cron handles that)
+  const fetchBtcDisplay = useCallback(async () => {
     try {
       const data = await fetchBtcData(currency);
       setBtcData(data);
-
-      if (user && !isInQuietHours()) {
-        const effectiveThreshold = data.changePercent < 0 ? thresholdDown : threshold;
-        const dailyTriggered = Math.abs(data.changePercent) >= effectiveThreshold;
-        const cumulativeTriggered = data.cumulativeChangePercent !== undefined && Math.abs(data.cumulativeChangePercent) >= cumulativeThreshold;
-
-        if (dailyTriggered || cumulativeTriggered) {
-          // Atomically claim the trigger slot in the DB — prevents all race conditions
-          const { data: claimed, error: claimErr } = await supabase.rpc('claim_trigger_slot', {
-            _user_id: user.id,
-            _cooldown_hours: cooldownHours,
-          });
-
-          if (claimErr || !claimed) {
-            // Another tab/call already claimed it, or still in cooldown
-            return;
-          }
-
-          setLastTriggerAt(new Date().toISOString());
-          await generateMessage(data);
-        }
-      }
     } catch (e: any) {
       const raw = e?.message || '';
       if (raw.includes('fetch') || raw.includes('Failed to fetch')) {
@@ -565,10 +538,8 @@ export function useHolzen() {
       } else {
         setError('Could not check market data. Will retry automatically.');
       }
-    } finally {
-      checkingRef.current = false;
     }
-  }, [user, threshold, thresholdDown, cumulativeThreshold, cooldownHours, isInQuietHours, generateMessage, currency]);
+  }, [currency]);
 
   const [lastTriggerAt, setLastTriggerAt] = useState<string | null>(null);
   const manualCooldownKey = user ? `holzen_last_manual_at_${user.id}` : 'holzen_last_manual_at';
@@ -592,6 +563,16 @@ export function useHolzen() {
     const elapsed = Date.now() - new Date(lastTriggerAt).getTime();
     return Math.max(0, cooldownMs - elapsed);
   }, [lastTriggerAt, cooldownHours]);
+
+  /** Milliseconds until the next server cron quarter-hour (:00, :15, :30, :45) */
+  const nextCronCheckIn = useCallback(() => {
+    const now = new Date();
+    const mins = now.getMinutes();
+    const secs = now.getSeconds();
+    const msIntoQuarter = ((mins % 15) * 60 + secs) * 1000 + now.getMilliseconds();
+    const quarterMs = 15 * 60 * 1000;
+    return quarterMs - msIntoQuarter;
+  }, []);
 
   const manualTrigger = useCallback(async (mood?: string) => {
     const remaining = manualCooldownRemaining();
@@ -631,10 +612,13 @@ export function useHolzen() {
     if (!user) return;
     const { data } = await supabase
       .from('profiles')
-      .select('last_message, last_context')
+      .select('last_message, last_context, last_trigger_at')
       .eq('user_id', user.id)
       .single();
     if (!data) return;
+    if (data.last_trigger_at) {
+      setLastTriggerAt(data.last_trigger_at);
+    }
     if (data.last_message && data.last_message !== message) {
       setMessage(data.last_message);
       setContext(data.last_context);
@@ -665,13 +649,26 @@ export function useHolzen() {
       : 'mild'
     : 'mild';
 
-  // Fetch BTC data on load and periodically
+  // Fetch BTC data on load and periodically (display only — no trigger logic)
   useEffect(() => {
     if (!profileLoaded) return;
-    checkAndTrigger();
-    const interval = setInterval(checkAndTrigger, 5 * 60 * 1000);
+    fetchBtcDisplay();
+    const interval = setInterval(fetchBtcDisplay, 5 * 60 * 1000);
     return () => clearInterval(interval);
-  }, [checkAndTrigger, profileLoaded]);
+  }, [fetchBtcDisplay, profileLoaded]);
+
+  // Load last_trigger_at from profile on init
+  useEffect(() => {
+    if (!user) return;
+    supabase
+      .from('profiles')
+      .select('last_trigger_at')
+      .eq('user_id', user.id)
+      .single()
+      .then(({ data }) => {
+        if (data?.last_trigger_at) setLastTriggerAt(data.last_trigger_at);
+      });
+  }, [user]);
 
   const setCooldownHours = useCallback(async (val: number) => {
     setCooldownHoursState(val);
@@ -794,6 +791,7 @@ export function useHolzen() {
     manualTrigger,
     manualCooldownRemaining,
     autoCooldownRemaining,
+    nextCronCheckIn,
     profileLoaded,
     refreshProfile,
   };
