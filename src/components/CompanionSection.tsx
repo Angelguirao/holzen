@@ -537,7 +537,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
       });
 
     return () => { cancelled = true; };
-  }, [prefs.zoomOut, reflectionId, context, reflectionMessage]);
+  }, [prefs.zoomOut, reflectionId, context, reflectionMessage, zoomOutRetry]);
 
   // Historical Insight companion state
   interface HistoricalInsightData {
