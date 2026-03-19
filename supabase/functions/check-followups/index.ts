@@ -23,10 +23,11 @@ serve(async (req) => {
     const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
     const fortyEightHoursAgo = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
 
+    // Only create follow-ups for active sell/buy decisions — hold is the desired behavior
     const { data: reflections, error: refError } = await supabase
       .from("reflections")
       .select("id, user_id, outcome")
-      .not("outcome", "is", null)
+      .in("outcome", ["sold", "bought"])
       .gte("created_at", fortyEightHoursAgo)
       .lte("created_at", twentyFourHoursAgo)
       .limit(200);
