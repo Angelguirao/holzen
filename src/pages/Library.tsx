@@ -111,7 +111,6 @@ export default function Library() {
 
   const clearAllFilters = () => {
     setSourceFilter(null);
-    setStatusFilter(null);
     setTagFilter(null);
   };
 
