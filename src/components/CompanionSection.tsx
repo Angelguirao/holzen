@@ -381,7 +381,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
   const signalFetchedRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!reflectionId) return;
+    if (!prefs.signal || !reflectionId) return;
     const key = reflectionId;
     if (signalFetchedRef.current === key && signalRetry === 0) return;
     signalFetchedRef.current = key;
@@ -480,7 +480,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
       });
 
     return () => { cancelled = true; };
-  }, [reflectionId, context, signalRetry]);
+  }, [prefs.signal, reflectionId, context, signalRetry]);
 
   // Zoom Out companion state
   const [zoomOut, setZoomOut] = useState<import('./ZoomOutDisplay').ZoomOutData | null>(null);
@@ -506,9 +506,11 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
     ).then((row) => {
       if (cancelled) return;
       if ((row as any)?.zoom_out_data) {
-        setZoomOut((row as any).zoom_out_data);
+        const zoomData = (row as any).zoom_out_data;
+        setZoomOut(zoomData);
         setZoomOutLoading(false);
-        autoSaveToLibrary({ title: 'Zoom Out', body: JSON.stringify((row as any).zoom_out_data), sourceType: 'zoom_out' });
+        const zoomBody = zoomData?.deepTime?.body || zoomData?.echo?.message || 'Zoom Out perspective';
+        autoSaveToLibrary({ title: zoomData?.deepTime?.title || 'Zoom Out', body: zoomBody, sourceType: 'zoom_out' });
         return;
       }
 
@@ -526,7 +528,8 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
                 .update({ zoom_out_data: data } as any)
                 .eq('id', reflectionId)
                 .then(() => {});
-              autoSaveToLibrary({ title: 'Zoom Out', body: typeof data === 'object' ? JSON.stringify(data) : String(data), sourceType: 'zoom_out' });
+              const zoomBody = (data as any)?.deepTime?.body || (data as any)?.echo?.message || 'Zoom Out perspective';
+              autoSaveToLibrary({ title: (data as any)?.deepTime?.title || 'Zoom Out', body: zoomBody, sourceType: 'zoom_out' });
             }
             setZoomOutLoading(false);
           });
