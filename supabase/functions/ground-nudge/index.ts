@@ -95,79 +95,96 @@ serve(async (req) => {
     const searchContent = searchData.choices?.[0]?.message?.content || "";
     const citations: string[] = searchData.citations || [];
 
-    // Step 2: Lovable AI structures the grounded result (18s timeout, JSON mode)
+    // Step 2: Lovable AI structures the grounded result (JSON mode, fallback model retry)
     const langInstruction = langCode !== "en" ? `Write in ${langName}. Keep citation names and URLs as-is.\n` : "";
 
-    const aiController = new AbortController();
-    const aiTimeout = setTimeout(() => aiController.abort(), 18000);
-
-    try {
-      const structureResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
+    const aiBody = {
+      messages: [
+        {
+          role: "system",
+          content: `${langInstruction}Extract ONE grounding nudge from the search results as JSON: {"title":"short bias/finding summary","body":"2-3 sentences referencing researchers and years","citation":"formatted like Kahneman & Tversky (1979), Prospect Theory","url":"citation URL"}. Use only facts from the results. Tone: calm, grounding, no advice.`,
         },
-        body: JSON.stringify({
-          model: "google/gemini-2.5-flash-lite",
-          messages: [
-            {
-              role: "system",
-              content: `${langInstruction}Extract ONE grounding nudge from the search results as JSON: {"title":"short bias/finding summary","body":"2-3 sentences referencing researchers and years","citation":"formatted like Kahneman & Tversky (1979), Prospect Theory","url":"citation URL"}. Use only facts from the results. Tone: calm, grounding, no advice.`,
-            },
-            {
-              role: "user",
-              content: `Market context: ${marketContext}\n\nSearch results:\n${searchContent}\n\nCitation URLs:\n${citations.map((c: string, i: number) => `[${i + 1}] ${c}`).join("\n")}`,
-            },
-          ],
-          response_format: { type: "json_object" },
-        }),
-        signal: aiController.signal,
-      });
-      clearTimeout(aiTimeout);
+        {
+          role: "user",
+          content: `Market context: ${marketContext}\n\nSearch results:\n${searchContent}\n\nCitation URLs:\n${citations.map((c: string, i: number) => `[${i + 1}] ${c}`).join("\n")}`,
+        },
+      ],
+      response_format: { type: "json_object" },
+    };
 
-      if (!structureResponse.ok) {
-        if (structureResponse.status === 429) {
-          return new Response(
-            JSON.stringify({ error: "Rate limited, please try again later." }),
-            { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
+    const models = ["google/gemini-2.5-flash-lite", "google/gemini-2.5-flash"];
+    let nudge: any = null;
+    let lastStatus = 500;
+
+    for (const model of models) {
+      const aiController = new AbortController();
+      const aiTimeout = setTimeout(() => aiController.abort(), 18000);
+      try {
+        const structureResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ ...aiBody, model }),
+          signal: aiController.signal,
+        });
+        clearTimeout(aiTimeout);
+
+        if (structureResponse.status === 429 || structureResponse.status === 402) {
+          lastStatus = structureResponse.status;
+          await structureResponse.text();
+          break;
         }
-        if (structureResponse.status === 402) {
-          return new Response(
-            JSON.stringify({ error: "AI credits exhausted." }),
-            { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
+        if (!structureResponse.ok) {
+          const t = await structureResponse.text();
+          console.error(`AI ${model} error:`, structureResponse.status, t);
+          lastStatus = structureResponse.status;
+          if (model !== models[models.length - 1]) continue;
+          break;
         }
-        const t = await structureResponse.text();
-        console.error("AI structure error:", structureResponse.status, t);
-        throw new Error("AI structuring failed");
+
+        const structureData = await structureResponse.json();
+        const content = structureData.choices?.[0]?.message?.content;
+        if (!content) {
+          if (model !== models[models.length - 1]) continue;
+          throw new Error("No nudge returned from AI");
+        }
+
+        try {
+          nudge = typeof content === "string" ? JSON.parse(content) : content;
+        } catch {
+          const m = (typeof content === "string" ? content : "").match(/\{[\s\S]*\}/);
+          if (m) nudge = JSON.parse(m[0]);
+          else if (model !== models[models.length - 1]) continue;
+          else throw new Error("AI returned invalid JSON");
+        }
+        break;
+      } catch (e) {
+        clearTimeout(aiTimeout);
+        if (e instanceof DOMException && e.name === "AbortError") {
+          lastStatus = 504;
+          if (model !== models[models.length - 1]) continue;
+          return new Response(JSON.stringify({ error: "AI structuring timed out" }), { status: 504, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        }
+        throw e;
       }
-
-      const structureData = await structureResponse.json();
-      const content = structureData.choices?.[0]?.message?.content;
-      if (!content) throw new Error("No nudge returned from AI");
-
-      const nudge = typeof content === "string" ? JSON.parse(content) : content;
-
-      // Ensure URL is from citations
-      if (citations.length > 0 && !citations.includes(nudge.url)) {
-        nudge.url = citations[0];
-      }
-
-      return new Response(JSON.stringify(nudge), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    } catch (e) {
-      clearTimeout(aiTimeout);
-      if (e instanceof DOMException && e.name === "AbortError") {
-        return new Response(
-          JSON.stringify({ error: "AI structuring timed out" }),
-          { status: 504, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      throw e;
     }
+
+    if (!nudge) {
+      if (lastStatus === 429) return new Response(JSON.stringify({ error: "Rate limited, please try again later." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      if (lastStatus === 402) return new Response(JSON.stringify({ error: "AI credits exhausted." }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      throw new Error("AI structuring failed");
+    }
+
+    // Ensure URL is from citations
+    if (citations.length > 0 && !citations.includes(nudge.url)) {
+      nudge.url = citations[0];
+    }
+
+    return new Response(JSON.stringify(nudge), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   } catch (e) {
     console.error("ground-nudge error:", e);
     return new Response(
