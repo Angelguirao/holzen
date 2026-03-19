@@ -23,6 +23,7 @@ export interface ZoomOutData {
     title: string;
     body: string;
   } | null;
+  partial?: boolean;
 }
 
 interface Props {
