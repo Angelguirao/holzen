@@ -89,8 +89,9 @@ export function useLibrary() {
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
     if (allReflections && allReflections.length > 0) {
-      // Build read flags map for companion engagement tracking
+      // Build read flags map and incomplete set
       const flags: Record<string, ReflectionReadFlags> = {};
+      const incomplete = new Set<string>();
       for (const r of allReflections as any[]) {
         flags[r.id] = {
           haiku_read: !!r.haiku_read,
