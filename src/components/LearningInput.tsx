@@ -1,4 +1,5 @@
-import { Loader2, ExternalLink } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useTranslation } from 'react-i18next';
 
 interface NudgeData {
@@ -24,9 +25,10 @@ export function LearningInput({ title, body, nudge, nudgeLoading = false, nudgeE
 
   if (nudgeLoading) {
     return (
-      <div className="py-3 flex items-center gap-2 text-muted-foreground">
-        <Loader2 className="h-3 w-3 animate-spin" />
-        <span className="text-xs font-mono">{t('learning.findingResearch')}</span>
+      <div className="py-3 space-y-2">
+        <Skeleton className="h-3.5 w-3/4" />
+        <Skeleton className="h-3 w-full" />
+        <Skeleton className="h-3 w-2/3" />
       </div>
     );
   }
