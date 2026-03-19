@@ -235,6 +235,12 @@ Think like the Long Now Foundation. Think in centuries and millennia. Put today'
 - The scale of Bitcoin (15 years old in a 5,000-year history of money)
 - Deep time numbers (total gold ever mined, world population at BTC genesis vs now, global debt, energy from the sun)
 
+ACCURACY RULES (CRITICAL):
+- Every number, date, or fact you mention MUST be verifiable and widely accepted
+- Do NOT invent statistics, timelines, or historical claims
+- If unsure about a specific number, use a well-known approximate (e.g. "roughly 300,000 years" not "287,413 years")
+- Prefer iconic, well-known facts over obscure claims that might be wrong
+
 Rules:
 - Title: a short, evocative phrase (3-8 words). Not a sentence.
 - Body: 1-2 sentences. Poetic but factual. Should make the reader feel the smallness of today's price move against deep time.
@@ -250,9 +256,10 @@ You MUST respond with a JSON object containing "title" and "body" keys. No other
             { role: "user", content: `${context || "BTC is moving today."} ${priceContext} ${historyContext}` },
           ],
           response_format: { type: "json_object" },
+          temperature: 0.7,
         };
 
-        const models = ["google/gemini-2.5-flash-lite", "google/gemini-2.5-flash"];
+        const models = ["google/gemini-2.5-flash", "google/gemini-2.5-flash-lite"];
         for (const model of models) {
           const aiController = new AbortController();
           const aiTimeout = setTimeout(() => aiController.abort(), 18000);

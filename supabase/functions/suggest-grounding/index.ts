@@ -126,6 +126,8 @@ Rules:
     const userPrompt = `${context ? `Market context: ${context}\n` : ""}${mood ? `Current mood: ${mood}\n` : ""}${severity ? `Severity: ${severity}\n` : ""}Suggest the best grounding activity for this moment, and share something interesting about it.`;
 
     // Run AI suggestion and Perplexity search in parallel (we'll search for all activities, then pick the right one after AI responds)
+    const aiController = new AbortController();
+    const aiTimeout = setTimeout(() => aiController.abort(), 15000);
     const aiPromise = fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -166,8 +168,8 @@ Rules:
                   insight: {
                     type: "string",
                     description: langCode !== "en"
-                      ? `An interesting fact, scientific finding, or technique about this activity (1-2 sentences). MUST be in ${langName}.`
-                      : "An interesting fact, scientific finding, technique, or cultural perspective about this activity that the user probably doesn't know (1-2 sentences).",
+                      ? `A verifiable interesting fact about this activity (1-2 sentences). MUST be in ${langName}. Do NOT invent researcher names or statistics.`
+                      : "A verifiable interesting fact, well-known scientific finding, or cultural perspective about this activity (1-2 sentences). Do NOT invent researcher names or statistics.",
                   },
                 },
                 required: ["activity", "suggestion", "duration", "insight"],
@@ -178,6 +180,7 @@ Rules:
         ],
         tool_choice: { type: "function", function: { name: "suggest_grounding" } },
       }),
+      signal: aiController.signal,
     });
 
     const response = await aiPromise;
