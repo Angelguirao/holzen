@@ -22,11 +22,6 @@ const SOURCE_CHIPS: { key: string; emoji: string; label: string }[] = [
   { key: 'external', emoji: '🔗', label: 'External' },
 ];
 
-const STATUS_CHIPS: { key: string; label: string }[] = [
-  { key: 'unread', label: 'statusUnread' },
-  { key: 'read', label: 'statusRead' },
-  { key: 'archived', label: 'statusArchived' },
-];
 
 type Tab = 'all' | 'favorites' | 'collections';
 
@@ -37,7 +32,6 @@ export default function Library() {
   const [tab, setTab] = useState<Tab>('all');
   const [search, setSearch] = useState('');
   const [sourceFilter, setSourceFilter] = useState<string | null>('reflection');
-  const [statusFilter, setStatusFilter] = useState<string | null>(null);
   const [tagFilter, setTagFilter] = useState<string | null>(null);
 
   const { items, collections } = library;
@@ -61,22 +55,15 @@ export default function Library() {
       .map(([tag]) => tag);
   }, [items]);
 
-  const hasActiveFilters = !!sourceFilter || !!statusFilter || !!tagFilter;
+  const hasActiveFilters = !!sourceFilter || !!tagFilter;
 
   // Filtering
   const filtered = useMemo(() => {
     let result = items;
     // Tab
     if (tab === 'favorites') result = result.filter((i) => i.is_favorite);
-    // Always hide deleted
-    result = result.filter((i) => i.status !== 'deleted');
-    // Status filter
-    if (statusFilter) {
-      result = result.filter((i) => i.status === statusFilter);
-    } else if (!search.trim()) {
-      // Hide archived by default when no status filter active
-      result = result.filter((i) => i.status !== 'archived');
-    }
+    // Always hide deleted and archived
+    result = result.filter((i) => i.status !== 'deleted' && i.status !== 'archived');
     // Source type
     if (sourceFilter) result = result.filter((i) => i.source_type === sourceFilter);
     // Tag
@@ -91,7 +78,7 @@ export default function Library() {
       );
     }
     return result;
-  }, [items, tab, sourceFilter, statusFilter, tagFilter, search]);
+  }, [items, tab, sourceFilter, tagFilter, search]);
 
   if (isPending) {
     return (
@@ -124,7 +111,6 @@ export default function Library() {
 
   const clearAllFilters = () => {
     setSourceFilter(null);
-    setStatusFilter(null);
     setTagFilter(null);
   };
 
@@ -221,23 +207,6 @@ export default function Library() {
             </div>
           )}
 
-          {/* Status chips */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 -mx-1 px-1 scrollbar-none">
-            {STATUS_CHIPS.map(({ key, label }) => (
-              <button
-                key={key}
-                onClick={() => setStatusFilter(statusFilter === key ? null : key)}
-                className={cn(
-                  'text-[10px] font-mono px-2 py-1 rounded-full border transition-colors whitespace-nowrap',
-                  statusFilter === key
-                    ? 'border-foreground/20 bg-foreground/5 text-foreground'
-                    : 'border-border/30 text-muted-foreground/50 hover:text-muted-foreground/70'
-                )}
-              >
-                {t(`library.${label}`)}
-              </button>
-            ))}
-          </div>
 
           {/* Tag chips */}
           {availableTags.length > 0 && (

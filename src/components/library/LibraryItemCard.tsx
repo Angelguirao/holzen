@@ -2,19 +2,15 @@ import { useMemo } from 'react';
 import { Heart } from 'lucide-react';
 import type { LibraryItem } from '@/hooks/use-library';
 import { useTranslation } from 'react-i18next';
-import { formatDistanceToNow } from 'date-fns';
+import { formatDistanceToNow, differenceInHours } from 'date-fns';
+import { cn } from '@/lib/utils';
 
 interface Props {
   item: LibraryItem;
   onToggleFavorite: (id: string) => void;
   onClick?: () => void;
+  engaged?: boolean;
 }
-
-const TYPE_LABELS: Record<string, string> = {
-  bookmark: '🔖',
-  note: '📝',
-  clipping: '✂️',
-};
 
 const SOURCE_EMOJIS: Record<string, string> = {
   reflection: '⏸',
@@ -29,13 +25,18 @@ const SOURCE_EMOJIS: Record<string, string> = {
   practice: '🧘',
 };
 
-export function LibraryItemCard({ item, onToggleFavorite, onClick }: Props) {
+const TYPE_LABELS: Record<string, string> = {
+  bookmark: '🔖',
+  note: '📝',
+  clipping: '✂️',
+};
+
+export function LibraryItemCard({ item, onToggleFavorite, onClick, engaged = true }: Props) {
   const { t } = useTranslation();
 
   const preview = useMemo(() => {
     if (!item.body) return null;
     let text = typeof item.body === 'string' ? item.body : JSON.stringify(item.body);
-    // Parse zoom_out JSON to show readable text
     if (item.source_type === 'zoom_out' && text.startsWith('{')) {
       try {
         const parsed = JSON.parse(text);
@@ -53,11 +54,24 @@ export function LibraryItemCard({ item, onToggleFavorite, onClick }: Props) {
     }
   }, [item.created_at]);
 
+  const isNew = useMemo(() => {
+    try {
+      return differenceInHours(new Date(), new Date(item.created_at)) < 24 && item.status === 'unread';
+    } catch {
+      return false;
+    }
+  }, [item.created_at, item.status]);
+
   const emoji = SOURCE_EMOJIS[item.source_type ?? ''] ?? TYPE_LABELS[item.type] ?? '📄';
+  const isCompanion = item.source_type && !['reflection', 'reflection_note', 'ground', 'practice', 'external'].includes(item.source_type);
+  const dimmed = isCompanion && !engaged;
 
   return (
     <div
-      className="group flex items-start gap-2.5 rounded-lg px-3 py-2.5 transition-colors hover:bg-card/80 cursor-pointer"
+      className={cn(
+        'group flex items-start gap-2.5 rounded-lg px-3 py-2.5 transition-colors hover:bg-card/80 cursor-pointer',
+        dimmed && 'opacity-40'
+      )}
       onClick={(e) => {
         if ((e.target as HTMLElement).closest('button')) return;
         onClick?.();
@@ -66,9 +80,17 @@ export function LibraryItemCard({ item, onToggleFavorite, onClick }: Props) {
       <span className="text-sm mt-0.5 shrink-0">{emoji}</span>
 
       <div className="flex-1 min-w-0 space-y-0.5">
-        {item.title && item.title !== 'Reflection' && (
-          <p className="text-xs font-medium text-foreground leading-snug truncate">{item.title}</p>
-        )}
+        <div className="flex items-center gap-1.5">
+          {item.title && item.title !== 'Reflection' && (
+            <p className="text-xs font-medium text-foreground leading-snug truncate">{item.title}</p>
+          )}
+          {isNew && (
+            <span className="shrink-0 h-1.5 w-1.5 rounded-full bg-primary" />
+          )}
+          {dimmed && (
+            <span className="text-[8px] font-mono text-muted-foreground/40 uppercase tracking-wider">skipped</span>
+          )}
+        </div>
         {preview && (
           <p className="text-[11px] text-muted-foreground/70 leading-relaxed line-clamp-2">
             {item.source_type === 'haiku' ? (
