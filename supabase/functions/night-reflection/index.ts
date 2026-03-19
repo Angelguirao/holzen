@@ -105,16 +105,15 @@ async function generateAIMessage(
   streakDays: number,
   tone: string,
 ): Promise<string | null> {
-  try {
-    const moodSummary = recentMoods.length > 0
-      ? `Recent moods (last 7 days): ${recentMoods.join(", ")}`
-      : "No mood data this week.";
+  const moodSummary = recentMoods.length > 0
+    ? `Recent moods (last 7 days): ${recentMoods.join(", ")}`
+    : "No mood data this week.";
 
-    const reflectionSummary = recentReflections.length > 0
-      ? recentReflections.map((r, i) => `${i + 1}. Context: "${r.context || 'none'}" | Mood: ${r.mood || 'unknown'} → ${r.mood_after || '?'} | Decision: ${r.outcome || 'pending'}`).join("\n")
-      : "No reflections today.";
+  const reflectionSummary = recentReflections.length > 0
+    ? recentReflections.map((r, i) => `${i + 1}. Context: "${r.context || 'none'}" | Mood: ${r.mood || 'unknown'} → ${r.mood_after || '?'} | Decision: ${r.outcome || 'pending'}`).join("\n")
+    : "No reflections today.";
 
-    const systemPrompt = `You are Holzen's night reflection companion — a calm, wise presence that helps Bitcoin holders build emotional composure.
+  const systemPrompt = `You are Holzen's night reflection companion — a calm, wise presence that helps Bitcoin holders build emotional composure.
 
 Your task: Write a single personalized end-of-day message (1-3 sentences max). This is NOT a generic motivational quote. It must feel like it was written specifically for THIS person based on their actual day.
 
@@ -127,46 +126,62 @@ Rules:
 - Be concise — this appears as a small card notification
 - No emojis, no greeting, no sign-off — just the reflection itself`;
 
-    const userPrompt = `BTC moved ${btcPct}% ${btcDirection} today.
-${hadReflection ? "The user reflected today." : "The user did NOT open the app or reflect today."}
+  const userPrompt = `BTC moved ${btcPct}% ${btcDirection} today.
+${hadReflection ? "The user paused today." : "The user did NOT open the app or pause today."}
 ${moodSummary}
-Active reflection streak: ${streakDays} days
+Active pause streak: ${streakDays} days
 
-Today's reflections:
+Today's pauses:
 ${reflectionSummary}
 
 Write one personalized night reflection message.`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-      }),
-    });
+  const models = ["google/gemini-2.5-flash", "google/gemini-2.5-flash-lite"];
+  
+  for (const model of models) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 15000);
+      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model,
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt },
+          ],
+          temperature: 0.6,
+        }),
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
 
-    if (!response.ok) {
-      console.error(`[NIGHT-REFLECTION] AI gateway error: ${response.status}`);
+      if (!response.ok) {
+        console.error(`[NIGHT-REFLECTION] AI ${model} error: ${response.status}`);
+        if (model !== models[models.length - 1]) continue;
+        return null;
+      }
+
+      const data = await response.json();
+      const content = data.choices?.[0]?.message?.content?.trim();
+      if (!content || content.length < 10) {
+        if (model !== models[models.length - 1]) continue;
+        return null;
+      }
+
+      // Strip any surrounding quotes the model might add
+      return content.replace(/^["']|["']$/g, "").trim();
+    } catch (e) {
+      console.error(`[NIGHT-REFLECTION] AI ${model} error:`, e);
+      if (model !== models[models.length - 1]) continue;
       return null;
     }
-
-    const data = await response.json();
-    const content = data.choices?.[0]?.message?.content?.trim();
-    if (!content || content.length < 10) return null;
-
-    // Strip any surrounding quotes the model might add
-    return content.replace(/^["']|["']$/g, "").trim();
-  } catch (e) {
-    console.error("[NIGHT-REFLECTION] AI generation error:", e);
-    return null;
   }
+  return null;
 }
 
 serve(async (req) => {
