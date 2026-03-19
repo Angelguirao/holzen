@@ -823,7 +823,7 @@ const History = () => {
               {(() => {
                 const companionItems: string[] = [];
                 if (r.haiku) companionItems.push('Haiku');
-                if (r.learning_title) companionItems.push('Learning');
+                if (r.learning_title) companionItems.push('Grounding');
                 if (r.signal_source) companionItems.push('Signal');
                 if (r.zoom_out_data) companionItems.push('Zoom Out');
                 if (r.history_insight_data) companionItems.push('History');
