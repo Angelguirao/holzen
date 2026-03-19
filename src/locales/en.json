@@ -681,9 +681,9 @@
   "sources": {
     "title": "Sources",
     "signalTab": "Signal",
-    "learningTab": "Learning",
+    "groundingTab": "Grounding",
     "signalDescription": "Sources for Read the Signal — market analysis, analysts, news.",
-    "learningDescription": "Sources for Ground Yourself — research papers, books, behavioral science.",
+    "groundingDescription": "Sources for Ground Yourself — behavioral finance, psychology, decision science.",
     "activeCount": "{{active}} of {{total}} active",
     "types": {
       "analyst": "Analysts",
