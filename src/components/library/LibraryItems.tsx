@@ -275,7 +275,7 @@ export function LibraryItems({ library, filtered }: Props) {
               📌 {t('common.pinned')}
             </p>
             <div className="divide-y divide-border/20">
-              {pinnedItems.map(renderCard)}
+              {pinnedItems.map((item, i) => renderCard(item, i))}
             </div>
           </div>
         )}
