@@ -282,23 +282,35 @@ export function useHolzen() {
       } catch { return []; }
     };
 
-    // Signal companion
+    // Signal companion — pass recentSignalSources for diversity
     fetchSources('signal').then(sources => {
-      invokeWithRetry('signal-companion', {
-        context: ctx, language: lang, sources: sources.length > 0 ? sources : undefined,
-      }).then(({ data, error }) => {
-        if (error || !data || data.error) { console.warn('[signal-companion] failed after retry:', error?.message ?? data?.error ?? 'no data'); return; }
-        supabase.from('reflections').update({
-          signal_title: data.title,
-          signal_body: data.body,
-          signal_source: data.source,
-          signal_url: data.url,
-        } as any).eq('id', reflectionId).then(({ error }) => { if (error) console.error('[signal] reflection update failed:', error.message); });
-        supabase.from('library_items').insert({
-          user_id: userId, type: 'bookmark', title: data.title, body: data.body,
-          source_type: 'signal', source_url: data.url, reflection_id: reflectionId, tags: [],
-        }).then(({ error }) => { if (error) console.error('[signal] library insert failed:', error.message); });
-      });
+      // Fetch recent signal sources to exclude for diversity
+      supabase.from('reflections')
+        .select('signal_source')
+        .eq('user_id', userId)
+        .not('signal_source', 'is', null)
+        .order('created_at', { ascending: false })
+        .limit(5)
+        .then(({ data: recentSigs }) => {
+          const recentSignalSources = (recentSigs ?? []).map((r: any) => r.signal_source).filter(Boolean);
+          invokeWithRetry('signal-companion', {
+            context: ctx, language: lang,
+            sources: sources.length > 0 ? sources : undefined,
+            recentSignalSources: recentSignalSources.length > 0 ? recentSignalSources : undefined,
+          }).then(({ data, error }) => {
+            if (error || !data || data.error) { console.warn('[signal-companion] failed after retry:', error?.message ?? data?.error ?? 'no data'); return; }
+            supabase.from('reflections').update({
+              signal_title: data.title,
+              signal_body: data.body,
+              signal_source: data.source,
+              signal_url: data.url,
+            } as any).eq('id', reflectionId).then(({ error }) => { if (error) console.error('[signal] reflection update failed:', error.message); });
+            supabase.from('library_items').insert({
+              user_id: userId, type: 'bookmark', title: data.title, body: data.body,
+              source_type: 'signal', source_url: data.url, reflection_id: reflectionId, tags: [],
+            }).then(({ error }) => { if (error) console.error('[signal] library insert failed:', error.message); });
+          });
+        });
     });
 
     // Zoom Out companion
