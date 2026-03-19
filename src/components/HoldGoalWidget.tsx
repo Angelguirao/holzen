@@ -406,7 +406,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
               {t('holdGoal.holdForever')}
             </p>
           </div>
-          {clearDialog}
+          {goalActions}
         </div>
         <div className="space-y-1">
           <span className="text-xs font-mono text-foreground/80">
@@ -442,7 +442,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
               {t('holdGoal.title')}
             </p>
           </div>
-          {clearDialog}
+          {goalActions}
         </div>
 
         <div className="space-y-1.5">
@@ -485,7 +485,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
               {t('holdGoal.title')}
             </p>
           </div>
-          {clearDialog}
+          {goalActions}
         </div>
 
         <div className="space-y-1.5">
