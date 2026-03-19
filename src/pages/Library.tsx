@@ -332,6 +332,13 @@ export default function Library() {
             </button>
           </div>
 
+          {/* Duplicate detection banner */}
+          <DuplicateBanner
+            items={items}
+            onDeleteItem={library.deleteItem}
+            onSelectItem={() => {}}
+          />
+
           {/* Item list with date grouping */}
           <LibraryItems library={library} filtered={filtered} />
         </div>
