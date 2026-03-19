@@ -37,38 +37,20 @@ serve(async (req) => {
     const langCode = language || "en";
     const langName = LANG_NAMES[langCode] || "English";
 
-    // Build domain filter from user's active learning sources
-    const domainFilter: string[] = [];
-    if (sources && Array.isArray(sources) && sources.length > 0) {
-      for (const s of sources) {
-        if (s.url) {
-          try {
-            const domain = new URL(s.url).hostname.replace(/^www\./, '');
-            domainFilter.push(domain);
-          } catch { /* skip */ }
-        }
-      }
-    }
-
-    // Step 1: Perplexity search for behavioral finance research
-    const marketContext = context || "Bitcoin market volatility";
-    const searchQuery = `Behavioral finance research relevant to: ${marketContext}. Find a specific study, paper, or finding from behavioral economics, psychology, or neuroscience about investor decision-making during market volatility. Include researcher names and year of publication.`;
-
-    const perplexityBody: any = {
-      model: "sonar",
-      messages: [
-        {
-          role: "system",
-          content: "You are a behavioral finance research assistant. Search for real academic research, published papers, and credible findings about investor psychology and decision-making biases. Focus on loss aversion, panic selling, FOMO, herding behavior, disposition effect, anchoring, and emotional regulation. Always include specific researcher names, publication years, and factual findings.",
-        },
-        { role: "user", content: searchQuery },
-      ],
-      search_mode: "academic",
-    };
-
-    if (domainFilter.length > 0) {
-      perplexityBody.search_domain_filter = domainFilter.slice(0, 5);
-    }
+    // Pick a random bias category to ensure variety across sessions
+    const BIAS_TOPICS = [
+      "loss aversion and panic selling during market drops",
+      "FOMO and herding behavior during market rallies",
+      "disposition effect — selling winners too early and holding losers too long",
+      "anchoring bias and mental accounting in investment decisions",
+      "emotional regulation and prefrontal cortex function during financial stress",
+      "endowment effect and status quo bias in portfolio management",
+      "recency bias and availability heuristic in market predictions",
+      "overconfidence bias and illusion of control in trading decisions",
+      "regret aversion and its effect on long-term investment holding",
+      "social proof and information cascading in crypto markets",
+    ];
+    const randomBias = BIAS_TOPICS[Math.floor(Math.random() * BIAS_TOPICS.length)];
 
     const searchResponse = await fetch("https://api.perplexity.ai/chat/completions", {
       method: "POST",
