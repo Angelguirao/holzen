@@ -506,9 +506,11 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
     ).then((row) => {
       if (cancelled) return;
       if ((row as any)?.zoom_out_data) {
-        setZoomOut((row as any).zoom_out_data);
+        const zoomData = (row as any).zoom_out_data;
+        setZoomOut(zoomData);
         setZoomOutLoading(false);
-        autoSaveToLibrary({ title: 'Zoom Out', body: JSON.stringify((row as any).zoom_out_data), sourceType: 'zoom_out' });
+        const zoomBody = zoomData?.deepTime?.body || zoomData?.echo?.message || 'Zoom Out perspective';
+        autoSaveToLibrary({ title: zoomData?.deepTime?.title || 'Zoom Out', body: zoomBody, sourceType: 'zoom_out' });
         return;
       }
 
