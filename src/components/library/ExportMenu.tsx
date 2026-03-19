@@ -11,7 +11,7 @@ interface Props {
   label?: string;
 }
 
-export function ExportMenu({ items }: Props) {
+export function ExportMenu({ items, label }: Props) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const stamp = format(new Date(), 'yyyy-MM-dd');
