@@ -116,10 +116,14 @@ serve(async (req) => {
     const langCode = language || "en";
     const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
     const langName = LANG_NAMES[langCode] || "English";
-    const langInstruction = langCode !== "en" ? `CRITICAL LANGUAGE REQUIREMENT: You MUST write ALL output — reflection message, haiku, learning_title, and learning_body — in ${langName}. Every single field must be in ${langName}. Do NOT use English for any generated text. This is non-negotiable.\n\n` : "";
+    const langInstruction = langCode !== "en" ? `CRITICAL LANGUAGE REQUIREMENT: You MUST write ALL output — message, haiku, learning_title, and learning_body — in ${langName}. Every single field must be in ${langName}. Do NOT use English for any generated text. This is non-negotiable.\n\n` : "";
     const systemPrompt = `${langInstruction}You generate a reflection with optional companions in response to Bitcoin volatility.
 
-You MUST respond by calling the "generate_reflection" function. Do not respond with plain text.
+You MUST respond with a JSON object containing these keys:
+- "message": The core reflection message (1-3 sentences)${langCode !== "en" ? ` in ${langName}` : ""}
+- "haiku": A haiku (3 lines separated by newlines, 5-7-5 syllables)${langCode !== "en" ? ` in ${langName}` : ""}
+- "learning_title": Short factual headline (5-10 words)${langCode !== "en" ? ` in ${langName}` : ""}
+- "learning_body": 1-2 sentences of factual educational context${langCode !== "en" ? ` in ${langName}` : ""}
 
 Tone: ${baseTone}
 ${adaptiveContext}
@@ -153,94 +157,84 @@ Learning input rules:
 - Body: 1-2 sentences about a historical Bitcoin event, market pattern, or behavioral finance insight relevant to the current context. Factual, educational, no advice.
 - If on-chain data is provided in the context (mempool size, fees, hashrate, block height), USE IT to make the learning insight factually grounded. Reference actual current conditions rather than generic history.`;
 
-    const response = await fetch(
-      "https://ai.gateway.lovable.dev/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "google/gemini-3-flash-preview",
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: context },
-          ],
-          tools: [
-            {
-              type: "function",
-              function: {
-                name: "generate_reflection",
-                description: langCode !== "en" ? `Generate a reflection. ALL fields MUST be written in ${langName}.` : "Generate a reflection message with optional haiku and learning companions.",
-                parameters: {
-                  type: "object",
-                  properties: {
-                    message: {
-                      type: "string",
-                      description: langCode !== "en" ? `The core reflection message (1-3 sentences). MUST be in ${langName}.` : "The core reflection message (1-3 sentences).",
-                    },
-                    haiku: {
-                      type: "string",
-                      description: langCode !== "en" ? `A haiku (3 lines, 5-7-5 syllables). MUST be in ${langName}. Lines separated by newlines.` : "A haiku (3 lines, 5-7-5 syllables) about this moment. Lines separated by newlines.",
-                    },
-                    learning_title: {
-                      type: "string",
-                      description: langCode !== "en" ? `Short factual headline (5-10 words). MUST be in ${langName}.` : "Short factual headline for a historical/educational insight.",
-                    },
-                    learning_body: {
-                      type: "string",
-                      description: langCode !== "en" ? `1-2 sentences of factual educational context. MUST be in ${langName}.` : "1-2 sentences of factual, educational context about Bitcoin history or behavioral finance.",
-                    },
-                  },
-                  required: ["message", "haiku", "learning_title", "learning_body"],
-                  additionalProperties: false,
-                },
-              },
-            },
-          ],
-          tool_choice: { type: "function", function: { name: "generate_reflection" } },
-        }),
-      }
-    );
+    const aiBody = {
+      messages: [
+        { role: "system", content: systemPrompt },
+        { role: "user", content: context },
+      ],
+      response_format: { type: "json_object" },
+    };
 
-    if (!response.ok) {
-      if (response.status === 429) {
-        return new Response(
-          JSON.stringify({ error: "Rate limited. Try again later." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+    const models = ["google/gemini-3-flash-preview", "google/gemini-2.5-flash"];
+    let result: any = null;
+    let lastStatus = 500;
+
+    for (const model of models) {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 20000);
+      try {
+        const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ ...aiBody, model }),
+          signal: controller.signal,
+        });
+        clearTimeout(timeout);
+
+        if (response.status === 429 || response.status === 402) {
+          lastStatus = response.status;
+          await response.text();
+          break;
+        }
+        if (!response.ok) {
+          const text = await response.text();
+          console.error(`AI ${model} error:`, response.status, text);
+          lastStatus = response.status;
+          if (model !== models[models.length - 1]) continue;
+          break;
+        }
+
+        const data = await response.json();
+        const raw = data.choices?.[0]?.message?.content || "";
+
+        try {
+          result = typeof raw === "string" ? JSON.parse(raw) : raw;
+        } catch {
+          const m = (typeof raw === "string" ? raw : "").match(/\{[\s\S]*\}/);
+          if (m) result = JSON.parse(m[0]);
+          else if (model !== models[models.length - 1]) continue;
+          else throw new Error("AI returned invalid JSON");
+        }
+
+        if (result?.message) break;
+        if (model !== models[models.length - 1]) { result = null; continue; }
+      } catch (e) {
+        clearTimeout(timeout);
+        if (e instanceof DOMException && e.name === "AbortError") {
+          console.warn(`[holzen-reflect] AI ${model} timed out`);
+          lastStatus = 504;
+          if (model !== models[models.length - 1]) continue;
+          return new Response(JSON.stringify({ error: "AI timed out" }), { status: 504, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        }
+        throw e;
       }
-      if (response.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "AI usage limit reached." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
-      const text = await response.text();
-      console.error("AI gateway error:", response.status, text);
-      throw new Error("AI gateway error");
     }
 
-    const data = await response.json();
-
-    // Extract from tool call
-    const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
-    if (toolCall?.function?.arguments) {
-      const args = JSON.parse(toolCall.function.arguments);
-      return new Response(JSON.stringify({
-        message: args.message,
-        haiku: args.haiku || null,
-        learning_title: args.learning_title || null,
-        learning_body: args.learning_body || null,
-      }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+    if (!result?.message) {
+      if (lastStatus === 429) return new Response(JSON.stringify({ error: "Rate limited. Try again later." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      if (lastStatus === 402) return new Response(JSON.stringify({ error: "AI usage limit reached." }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      throw new Error("AI generation failed after all retries");
     }
 
-    // Fallback to plain content if tool call didn't work
-    const message = data.choices?.[0]?.message?.content?.trim();
-    return new Response(JSON.stringify({ message, haiku: null, learning_title: null, learning_body: null }), {
+    return new Response(JSON.stringify({
+      message: result.message,
+      haiku: result.haiku || null,
+      learning_title: result.learning_title || null,
+      learning_body: result.learning_body || null,
+    }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
