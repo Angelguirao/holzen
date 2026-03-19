@@ -119,20 +119,21 @@ serve(async (req) => {
           content: `${langInstruction}You are a financial historian for a Bitcoin mindfulness app. Given grounded search results with citations, extract ONE historical insight with a cross-asset analogy.
 
 Respond with a JSON object containing exactly these keys:
-- "title": Short evocative title
+- "title": Short evocative title (NOT generic like "Market Volatility" — be specific to the event)
 - "btcInsight": 2-3 sentences about a specific historical event with real dates/numbers
-- "analogy": 1-2 sentences drawing a parallel from another asset class
-- "assetClass": The other asset class (e.g. "Gold", "Tech stocks")
-- "period": Historical period (e.g. "2014", "March 2020")
+- "analogy": 1-2 sentences drawing a parallel from another asset class or era
+- "assetClass": The other asset class (e.g. "Gold", "Tech stocks", "Oil")
+- "period": Historical period (e.g. "January 2015", "March 2020")
 - "source": Name of the source
 - "url": URL from the provided citations
 
 Rules:
 - Use ONLY facts from the provided search results
 - Include specific dates, prices, and percentage moves
-- Draw a clear parallel between a historical event and the current context
-- End with a grounding observation, not hype
-- URL: use one of the provided citation URLs`,
+- Draw a clear parallel between the historical event and the current context
+- End with a grounding observation — "this too passed" energy, not hype or doom
+- URL: use one of the provided citation URLs
+- Be SPECIFIC — name the exact event, not a vague "market crash"`,
         },
         {
           role: "user",
