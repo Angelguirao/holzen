@@ -88,17 +88,40 @@ serve(async (req) => {
       ? ` Look for insights from sources like: ${sourceNames.sort(() => Math.random() - 0.5).slice(0, 5).join(", ")}.`
       : "";
 
+    // Extract URLs from user sources for domain filtering
+    const sourceUrls: string[] = [];
+    if (sources && Array.isArray(sources)) {
+      for (const s of sources) {
+        if (s.url && typeof s.url === "string") {
+          try {
+            const hostname = new URL(s.url.startsWith("http") ? s.url : `https://${s.url}`).hostname.replace(/^www\./, "");
+            if (hostname && !sourceUrls.includes(hostname)) sourceUrls.push(hostname);
+          } catch { /* skip invalid */ }
+        }
+      }
+    }
+
+    const ANTI_TRADING_INSTRUCTION = `CRITICAL CONTENT RULES:
+- Do NOT return content about short-term trading signals, chart patterns, technical analysis setups, entry/exit points, or price targets
+- Do NOT cite trading educators, signal groups, or chart pattern analysts (e.g. "Chart Champions", trading Telegram groups)
+- FOCUS ON: on-chain data, macro trends, adoption metrics, network health, long-term holder behavior, institutional flows, mining economics, supply dynamics
+- Prefer sources like: on-chain analysts, macro researchers, Bitcoin-focused newsletters, network data dashboards`;
+
     const searchQuery = context
-      ? `Current Bitcoin market: ${context}. Find one specific, data-driven insight from a Bitcoin analyst, newsletter, podcast summary, or on-chain researcher.${sourceHint}${recentExclusion}`
-      : `Latest Bitcoin market analysis with specific data points from analysts, newsletters, or researchers.${sourceHint}${recentExclusion}`;
+      ? `Current Bitcoin market: ${context}. Find one specific, data-driven insight about on-chain metrics, macro trends, adoption, or long-term holder behavior from a Bitcoin researcher or analyst.${sourceHint}${recentExclusion}`
+      : `Latest Bitcoin on-chain analysis, macro trends, or long-term holder metrics with specific data points from researchers or analysts.${sourceHint}${recentExclusion}`;
 
     const perplexityBody: any = {
       model: "sonar",
       messages: [
         {
           role: "system",
-          content: `You are a Bitcoin market research assistant. Find one specific, data-driven insight with real numbers and dates. CRITICAL DIVERSITY RULES:
-- Use a DIFFERENT source every time — rotate between analysts, blogs, newsletters, dashboards, podcasts, and YouTube channels
+          content: `You are a Bitcoin market research assistant focused on LONG-TERM holder perspective. Find one specific, data-driven insight with real numbers and dates.
+
+${ANTI_TRADING_INSTRUCTION}
+
+DIVERSITY RULES:
+- Use a DIFFERENT source every time — rotate between on-chain analysts, macro blogs, newsletters, dashboards, and podcasts
 - Do NOT default to Glassnode or any single source
 - Prefer recent analysis (last 7 days) from named analysts or publications
 - Include the exact source name and a working URL to the specific article/page${recentExclusion}`,
@@ -106,6 +129,7 @@ serve(async (req) => {
         { role: "user", content: searchQuery },
       ],
       search_recency_filter: "week",
+      ...(sourceUrls.length > 0 ? { search_domain_filter: sourceUrls.slice(0, 5) } : {}),
     };
 
     log("calling perplexity");
@@ -176,6 +200,12 @@ serve(async (req) => {
         {
           role: "system",
           content: `${langInstruction}Extract ONE market signal from the search results below. Return JSON: {"title":"5-12 word headline","body":"2-3 sentences with specific data points","source":"exact source/analyst name","url":"citation URL"}
+
+HOLDER PERSPECTIVE FILTER (CRITICAL):
+- If the search result is about short-term trading, chart patterns, entry/exit signals, or price targets, you MUST reframe it as a long-term holder insight instead
+- Replace trading language ("buy signal", "breakout", "resistance") with holder language ("accumulation trend", "network growth", "supply dynamics")
+- Focus on what the data means for someone holding Bitcoin for years, not days
+- NEVER include phrases like "trading opportunity", "price target", "buy/sell signal", "chart pattern"
 
 URL RULES (CRITICAL):
 - You MUST select a url from the citation list below. Copy it character-for-character.
