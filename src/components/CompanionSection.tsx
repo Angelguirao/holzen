@@ -393,7 +393,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
       });
 
     return () => { cancelled = true; };
-  }, [prefs.learning, reflectionId, context]);
+  }, [prefs.learning, reflectionId, context, nudgeRetry]);
 
   // Signal companion state
   const [signal, setSignal] = useState<SignalData | null>(null);
