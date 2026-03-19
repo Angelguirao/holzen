@@ -391,14 +391,13 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
     setSignalLoading(true);
     setSignalError(false);
 
-    supabase
-      .from('reflections')
-      .select('signal_title, signal_body, signal_source, signal_url')
-      .eq('id', reflectionId)
-      .single()
-      .then(async ({ data: row }) => {
-        if (cancelled) return;
-        if (row?.signal_source) {
+    pollForCachedData(
+      reflectionId,
+      'signal_title, signal_body, signal_source, signal_url',
+      (row) => !!row?.signal_source,
+    ).then(async (row) => {
+      if (cancelled) return;
+      if (row?.signal_source) {
           const cachedSignal = {
             title: row.signal_title ?? '',
             body: row.signal_body ?? '',
