@@ -1,5 +1,5 @@
 import { Skeleton } from '@/components/ui/skeleton';
-import { TrendingUp, TrendingDown, Clock, Globe } from 'lucide-react';
+import { TrendingUp, TrendingDown, Clock, Globe, CloudOff } from 'lucide-react';
 import { format } from 'date-fns';
 import { useHolzen } from '@/hooks/use-holzen';
 import { formatBtcPrice } from '@/lib/btc';
