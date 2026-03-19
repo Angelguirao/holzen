@@ -212,6 +212,11 @@ export function useLibrary() {
 
   useEffect(() => { fetchAll(); }, [fetchAll]);
 
+  // Sync state to localStorage cache on every change
+  useEffect(() => { if (items.length > 0) writeCache(CACHE_KEY_ITEMS, items); }, [items]);
+  useEffect(() => { writeCache(CACHE_KEY_COLLECTIONS, collections); }, [collections]);
+  useEffect(() => { writeCache(CACHE_KEY_COL_ITEMS, collectionItems); }, [collectionItems]);
+
   // Library items CRUD
   const addItem = useCallback(async (item: Partial<LibraryItem>) => {
     if (!user) return null;
