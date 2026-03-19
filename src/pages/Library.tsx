@@ -147,15 +147,6 @@ export default function Library() {
 
   const sortLabel = sortMode === 'newest' ? t('library.sortNewest', { defaultValue: 'Newest' }) : sortMode === 'oldest' ? t('library.sortOldest', { defaultValue: 'Oldest' }) : t('library.sortAlpha', { defaultValue: 'A–Z' });
 
-  const handleRefresh = useCallback(async () => {
-    await library.refetch();
-  }, [library]);
-
-  const { pullDistance, refreshing, handlers } = usePullToRefresh({
-    onRefresh: handleRefresh,
-    threshold: 70,
-  });
-
   return (
     <div className="space-y-4 pb-24" {...handlers}>
       <PageMeta title={t('library.pageTitle')} description={t('library.pageDescription')} />
