@@ -154,42 +154,47 @@ serve(async (req) => {
 
     // --- 2. Fetch a real past reflection for "echo" ---
     let echoReflection: { message: string; created_at: string; mood: string | null; outcome: string | null } | null = null;
-    try {
-      const direction = context?.toLowerCase().includes("is down") ? "down" : context?.toLowerCase().includes("is up") ? "up" : null;
+    if (effectiveUserId) {
+      try {
+        // Use service client to query reflections for this user
+        const direction = context?.toLowerCase().includes("is down") ? "down" : context?.toLowerCase().includes("is up") ? "up" : null;
 
-      if (direction) {
-        const { data } = await supabase
-          .from("reflections")
-          .select("message, created_at, mood, outcome, context")
-          .eq("user_id", user.id)
-          .not("outcome", "is", null)
-          .lt("created_at", new Date(Date.now() - 14 * 86400000).toISOString())
-          .order("created_at", { ascending: false })
-          .limit(50);
+        if (direction) {
+          const { data } = await serviceClient
+            .from("reflections")
+            .select("message, created_at, mood, outcome, context")
+            .eq("user_id", effectiveUserId)
+            .not("outcome", "is", null)
+            .lt("created_at", new Date(Date.now() - 14 * 86400000).toISOString())
+            .order("created_at", { ascending: false })
+            .limit(50);
 
-        if (data && data.length > 0) {
-          const matching = data.filter((r: any) => {
-            if (direction === "down") return r.context?.toLowerCase().includes("is down");
-            return r.context?.toLowerCase().includes("is up");
-          });
-          const pool = matching.length > 0 ? matching : data;
-          echoReflection = pool[Math.floor(Math.random() * Math.min(pool.length, 10))] as any;
+          if (data && data.length > 0) {
+            const matching = data.filter((r: any) => {
+              if (direction === "down") return r.context?.toLowerCase().includes("is down");
+              return r.context?.toLowerCase().includes("is up");
+            });
+            const pool = matching.length > 0 ? matching : data;
+            echoReflection = pool[Math.floor(Math.random() * Math.min(pool.length, 10))] as any;
+          }
+        } else {
+          const { data } = await serviceClient
+            .from("reflections")
+            .select("message, created_at, mood, outcome")
+            .eq("user_id", effectiveUserId)
+            .not("outcome", "is", null)
+            .lt("created_at", new Date(Date.now() - 14 * 86400000).toISOString())
+            .order("created_at", { ascending: false })
+            .limit(10);
+
+          if (data && data.length > 0) {
+            echoReflection = data[0] as any;
+          }
         }
-      } else {
-        const { data } = await supabase
-          .from("reflections")
-          .select("message, created_at, mood, outcome")
-          .eq("user_id", user.id)
-          .not("outcome", "is", null)
-          .lt("created_at", new Date(Date.now() - 14 * 86400000).toISOString())
-          .order("created_at", { ascending: false })
-          .limit(10);
-
-        if (data && data.length > 0) {
-          echoReflection = data[0] as any;
-        }
+      } catch (e) {
+        console.warn("[zoom-out] echo fetch failed:", e);
       }
-    } catch { /* non-critical */ }
+    }
 
     // --- 3. Generate deep-time perspective via AI ---
     let deepTime: { title: string; body: string } | null = null;
