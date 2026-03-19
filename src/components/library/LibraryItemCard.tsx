@@ -10,6 +10,7 @@ interface Props {
   onToggleFavorite: (id: string) => void;
   onClick?: () => void;
   engaged?: boolean;
+  incomplete?: boolean;
 }
 
 const SOURCE_EMOJIS: Record<string, string> = {
