@@ -75,6 +75,7 @@ function CompanionCard({
   expanded,
   onToggle,
   completed,
+  loading,
   isFavorite,
   onToggleFavorite,
   locked,
@@ -87,6 +88,7 @@ function CompanionCard({
   expanded: boolean;
   onToggle: () => void;
   completed?: boolean;
+  loading?: boolean;
   isFavorite?: boolean;
   onToggleFavorite?: () => void;
   locked?: boolean;
