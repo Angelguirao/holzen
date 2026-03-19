@@ -23,14 +23,15 @@ serve(async (req) => {
 
     // Support both user JWT and service role key auth
     let resolvedUserId: string | null = null;
+    let userClient: ReturnType<typeof createClient> | null = null;
     const token = authHeader.replace("Bearer ", "");
     if (token === serviceRoleKey) {
       // Called server-to-server; userId must be in the body
     } else {
-      const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      userClient = createClient(supabaseUrl, supabaseAnonKey, {
         global: { headers: { Authorization: authHeader } },
       });
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } } = await userClient.auth.getUser();
       if (!user) throw new Error("Not authenticated");
       resolvedUserId = user.id;
     }

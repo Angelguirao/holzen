@@ -132,50 +132,76 @@ DIVERSITY RULES:
       ...(sourceUrls.length > 0 ? { search_domain_filter: sourceUrls.slice(0, 5) } : {}),
     };
 
-    log("calling perplexity");
-    const perplexityController = new AbortController();
-    const perplexityTimeout = setTimeout(() => perplexityController.abort(), 12000);
+    // Helper to call Perplexity with given body
+    async function callPerplexity(pBody: any): Promise<{ content: string; citations: string[] }> {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 12000);
+      try {
+        const res = await fetch("https://api.perplexity.ai/chat/completions", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${PERPLEXITY_API_KEY}`, "Content-Type": "application/json" },
+          body: JSON.stringify(pBody),
+          signal: controller.signal,
+        });
+        clearTimeout(timeout);
+        log(`perplexity responded ${res.status}`);
+        if (!res.ok) {
+          const errText = await res.text();
+          console.error("Perplexity error:", res.status, errText);
+          if (res.status === 429) throw new Error("RATE_LIMITED");
+          throw new Error("Perplexity search failed");
+        }
+        const data = await res.json();
+        return {
+          content: data.choices?.[0]?.message?.content || "",
+          citations: data.citations || [],
+        };
+      } catch (e) {
+        clearTimeout(timeout);
+        throw e;
+      }
+    }
 
+    log("calling perplexity");
     let searchContent = "";
     let citations: string[] = [];
 
     try {
-      const searchResponse = await fetch("https://api.perplexity.ai/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${PERPLEXITY_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(perplexityBody),
-        signal: perplexityController.signal,
-      });
-      clearTimeout(perplexityTimeout);
-
-      log(`perplexity responded ${searchResponse.status}`);
-
-      if (!searchResponse.ok) {
-        const errText = await searchResponse.text();
-        console.error("Perplexity error:", searchResponse.status, errText);
-        if (searchResponse.status === 429) {
-          return new Response(
-            JSON.stringify({ error: "Rate limited. Try again later." }),
-            { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
-        throw new Error("Perplexity search failed");
-      }
-
-      const searchData = await searchResponse.json();
-      searchContent = searchData.choices?.[0]?.message?.content || "";
-      citations = searchData.citations || [];
+      // First attempt: with domain filter if available
+      const result = await callPerplexity(perplexityBody);
+      searchContent = result.content;
+      citations = result.citations;
       log(`perplexity content length: ${searchContent.length}, citations: ${citations.length}`);
+
+      // If domain filter was used but got 0 citations, retry WITHOUT the filter
+      if (citations.length === 0 && sourceUrls.length > 0 && searchContent.length > 0) {
+        log("0 citations with domain filter — retrying without filter");
+        const retryBody = { ...perplexityBody };
+        delete retryBody.search_domain_filter;
+        try {
+          const retry = await callPerplexity(retryBody);
+          if (retry.citations.length > 0) {
+            searchContent = retry.content;
+            citations = retry.citations;
+            log(`retry got ${citations.length} citations`);
+          }
+        } catch (retryErr) {
+          log(`retry failed, using original content: ${retryErr}`);
+          // Keep original searchContent, just no citations
+        }
+      }
     } catch (e) {
-      clearTimeout(perplexityTimeout);
       if (e instanceof DOMException && e.name === "AbortError") {
         log("perplexity timed out after 12s");
         return new Response(
           JSON.stringify({ error: "Search timed out" }),
           { status: 504, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      if (e instanceof Error && e.message === "RATE_LIMITED") {
+        return new Response(
+          JSON.stringify({ error: "Rate limited. Try again later." }),
+          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
       throw e;
