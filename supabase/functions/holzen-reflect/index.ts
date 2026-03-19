@@ -86,7 +86,7 @@ serve(async (req) => {
     );
     try { await svcClient.from("analytics_events").insert({ user_id: userId, event: "pause_ai_call" }); } catch (_) { /* tracking failure is non-fatal */ }
 
-    const { context, tone, customPrompt, style, moodHistory, severity, motivations, mantra, groundingActivities, currency, language, recentHaikus, learningSources } = await req.json();
+    const { context, tone, customPrompt, style, moodHistory, severity, motivations, mantra, groundingActivities, currency, language, recentHaikus } = await req.json();
     if (!context) {
       return new Response(JSON.stringify({ error: "Missing context" }), {
         status: 400,
