@@ -31,6 +31,15 @@ serve(async (req) => {
   const log = (msg: string) => console.log(`[signal] ${msg} (+${Date.now() - t0}ms)`);
 
   try {
+    // Auth check
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     let body: any = {};
     try {
       body = await req.json();
@@ -43,22 +52,28 @@ serve(async (req) => {
     const { context, language, sources, recentSignalSources } = body;
     log("parsed body");
 
-    // Track AI usage — fire-and-forget (no await)
-    const authHeader = req.headers.get("Authorization");
-    if (authHeader?.startsWith("Bearer ")) {
-      (async () => {
-        try {
-          const { createClient } = await import("npm:@supabase/supabase-js@2.57.2");
-          const sbUrl = Deno.env.get("SUPABASE_URL") ?? "";
-          const sbUser = createClient(sbUrl, Deno.env.get("SUPABASE_ANON_KEY") ?? "", { global: { headers: { Authorization: authHeader } } });
-          const { data: { user } } = await sbUser.auth.getUser();
-          if (user) {
-            const svc = createClient(sbUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "", { auth: { persistSession: false } });
-            await svc.from("analytics_events").insert({ user_id: user.id, event: "signal_companion_ai_call" });
-          }
-        } catch (_) { /* non-fatal */ }
-      })();
+    // Verify JWT and track AI usage
+    const { createClient } = await import("npm:@supabase/supabase-js@2.57.2");
+    const sbUrl = Deno.env.get("SUPABASE_URL") ?? "";
+    const sbClient = createClient(sbUrl, Deno.env.get("SUPABASE_ANON_KEY") ?? "", { global: { headers: { Authorization: authHeader } } });
+    const token = authHeader.replace("Bearer ", "");
+    const { data: claimsData, error: claimsError } = await sbClient.auth.getClaims(token);
+    if (claimsError || !claimsData?.claims) {
+      return new Response(
+        JSON.stringify({ error: "Unauthorized" }),
+        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
     }
+    log("auth verified");
+
+    // Track AI usage — fire-and-forget
+    const userId = claimsData.claims.sub as string;
+    (async () => {
+      try {
+        const svc = createClient(sbUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "", { auth: { persistSession: false } });
+        await svc.from("analytics_events").insert({ user_id: userId, event: "signal_companion_ai_call" });
+      } catch (_) { /* non-fatal */ }
+    })();
 
     const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
     if (!PERPLEXITY_API_KEY) throw new Error("PERPLEXITY_API_KEY is not configured");
