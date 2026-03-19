@@ -162,6 +162,10 @@ serve(async (req) => {
     // --- Adaptive tone logic ---
     const baseTone = TONE_INSTRUCTIONS[tone] || TONE_INSTRUCTIONS.stoic;
     const baseStyle = STYLE_INSTRUCTIONS[style] || STYLE_INSTRUCTIONS.standard;
+    
+    // Pick a random thematic framing for this session
+    const framingPool = TONE_FRAMINGS[tone] || TONE_FRAMINGS.stoic;
+    const thematicFraming = framingPool[Math.floor(Math.random() * framingPool.length)];
 
     let adaptiveContext = "";
 
