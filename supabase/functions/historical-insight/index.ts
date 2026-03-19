@@ -117,6 +117,7 @@ serve(async (req) => {
 
     const aiBody = {
       response_format: { type: "json_object" },
+      temperature: 0.3,
       messages: [
         {
           role: "system",
@@ -131,12 +132,16 @@ Respond with a JSON object containing exactly these keys:
 - "source": Name of the source
 - "url": URL from the provided citations
 
+ACCURACY RULES (CRITICAL):
+- Use ONLY dates, prices, percentages, and event details that appear in the search results
+- Do NOT invent or estimate historical prices, crash percentages, or recovery timelines
+- If the search results lack specific numbers for the analogy, describe the pattern qualitatively
+- Copy the URL character-for-character from the citation list
+
 Rules:
-- Use ONLY facts from the provided search results
-- Include specific dates, prices, and percentage moves
+- Include specific dates, prices, and percentage moves FROM the search results
 - Draw a clear parallel between the historical event and the current context
 - End with a grounding observation — "this too passed" energy, not hype or doom
-- URL: use one of the provided citation URLs
 - Be SPECIFIC — name the exact event, not a vague "market crash"`,
         },
         {
@@ -146,7 +151,7 @@ Rules:
       ],
     };
 
-    const models = ["google/gemini-2.5-flash-lite", "google/gemini-2.5-flash"];
+    const models = ["google/gemini-2.5-flash", "google/gemini-3-flash-preview"];
     let insight: Record<string, string> | null = null;
     let lastStatus = 500;
 
