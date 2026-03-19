@@ -99,65 +99,12 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
-    // --- Perplexity search for learning content (grounded, not hallucinated) ---
-    let learningSearchContent = "";
-    let learningCitations: string[] = [];
-    const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
-
-    if (PERPLEXITY_API_KEY) {
-      try {
-        // Build domain filter from active learning sources
-        const learningDomains: string[] = [];
-        if (learningSources && Array.isArray(learningSources)) {
-          for (const src of learningSources) {
-            if (src.url) {
-              try {
-                const domain = new URL(src.url).hostname.replace(/^www\./, "");
-                if (!learningDomains.includes(domain)) learningDomains.push(domain);
-              } catch { /* skip invalid URLs */ }
-            }
-          }
-        }
-
-        const learningQuery = `behavioral finance, cognitive bias, or decision psychology insight relevant to someone feeling emotional about a financial loss or gain. Context: ${context}. Find a specific research finding, psychological principle, or decision science fact — NOT market analysis or price data.`;
-
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 8000);
-
-        const searchBody: Record<string, unknown> = {
-          model: "sonar",
-          messages: [
-            { role: "system", content: "Find one specific, factual insight about behavioral finance, cognitive biases, decision psychology, or emotional regulation. Focus on research findings (e.g. Kahneman, Thaler, Ariely), psychological principles (loss aversion, anchoring, sunk cost), or decision science. Do NOT discuss Bitcoin prices, market analysis, or on-chain data. Be concise — 2-3 sentences max." },
-            { role: "user", content: learningQuery },
-          ],
-          search_recency_filter: "month",
-        };
-        // Apply domain filter if we have active sources (limit to 5 domains)
-        if (learningDomains.length > 0) {
-          searchBody.search_domain_filter = learningDomains.slice(0, 5);
-        }
-
-        const searchResp = await fetch("https://api.perplexity.ai/chat/completions", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${PERPLEXITY_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(searchBody),
-          signal: controller.signal,
-        });
-        clearTimeout(timeout);
-
-        if (searchResp.ok) {
-          const searchData = await searchResp.json();
-          learningSearchContent = searchData.choices?.[0]?.message?.content || "";
-          learningCitations = searchData.citations || [];
-        }
-      } catch (e) {
-        // Non-fatal — fall back to AI-only learning
-        console.warn("Learning Perplexity search failed:", e instanceof Error ? e.message : e);
-      }
-    }
+    // --- Learning content is now handled entirely by the dedicated ground-nudge function ---
+    // No Perplexity search here — avoids duplicate paths and domain filter issues.
+    // holzen-reflect still generates fallback learning_title/body via AI for backward compat,
+    // but ground-nudge is the primary source of grounding content.
+    const learningSearchContent = "";
+    const learningCitations: string[] = [];
 
     // --- Adaptive tone logic ---
     const baseTone = TONE_INSTRUCTIONS[tone] || TONE_INSTRUCTIONS.stoic;
