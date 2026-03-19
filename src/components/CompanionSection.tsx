@@ -75,6 +75,7 @@ function CompanionCard({
   expanded,
   onToggle,
   completed,
+  loading,
   isFavorite,
   onToggleFavorite,
   locked,
@@ -87,6 +88,7 @@ function CompanionCard({
   expanded: boolean;
   onToggle: () => void;
   completed?: boolean;
+  loading?: boolean;
   isFavorite?: boolean;
   onToggleFavorite?: () => void;
   locked?: boolean;
@@ -127,12 +129,12 @@ function CompanionCard({
         }`}
       >
         <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors duration-300 ${
-          completed ? 'bg-primary/10' : expanded ? 'bg-primary/8' : 'bg-muted/30'
+          loading && !completed ? 'bg-muted/30 animate-pulse' : completed ? 'bg-primary/10' : expanded ? 'bg-primary/8' : 'bg-muted/30'
         }`}>
           {completed ? (
             <Check className="h-3.5 w-3.5 text-primary" />
           ) : (
-            <Icon className={`h-3.5 w-3.5 ${expanded ? 'text-primary/70' : 'text-muted-foreground/50'}`} />
+            <Icon className={`h-3.5 w-3.5 ${loading ? 'text-muted-foreground/30' : expanded ? 'text-primary/70' : 'text-muted-foreground/50'}`} />
           )}
         </div>
         <span className={`text-xs font-mono tracking-wide flex-1 ${completed ? 'text-muted-foreground/40' : 'text-foreground/70'}`}>
@@ -658,6 +660,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             if (!completion.learning) markCompleted('learning');
           }}
           completed={completion.learning}
+          loading={nudgeLoading}
           isFavorite={isPro ? favorites['learning'] : undefined}
           onToggleFavorite={isPro ? () => toggleCompanionFavorite('learning') : undefined}
         >
@@ -682,6 +685,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             if (!completion.signal) markCompleted('signal');
           }}
           completed={completion.signal}
+          loading={signalLoading}
           isFavorite={isPro ? favorites['signal'] : undefined}
           onToggleFavorite={isPro ? () => toggleCompanionFavorite('signal') : undefined}
         >
@@ -704,6 +708,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             if (!completion.zoomOut) markCompleted('zoomOut');
           }}
           completed={completion.zoomOut}
+          loading={zoomOutLoading}
           isFavorite={isPro ? favorites['zoom_out'] : undefined}
           onToggleFavorite={isPro ? () => toggleCompanionFavorite('zoom_out') : undefined}
         >
@@ -726,6 +731,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             if (!completion.history) markCompleted('history');
           }}
           completed={completion.history}
+          loading={historyLoading}
           isFavorite={isPro ? favorites['history_insight'] : undefined}
           onToggleFavorite={isPro ? () => toggleCompanionFavorite('history_insight') : undefined}
         >
