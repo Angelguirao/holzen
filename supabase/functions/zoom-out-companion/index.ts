@@ -54,6 +54,7 @@ serve(async (req) => {
     const cachedMap = new Map((cached || []).map((r: any) => [r.date, r.price]));
     const missingTargets = yearTargets.filter(t => !cachedMap.has(t.dateKey));
 
+    let rateLimited = false;
     console.log(`[zoom-out] cache hit: ${cachedMap.size}/${yearTargets.length}, fetching ${missingTargets.length} from CoinGecko`);
 
     // Fetch only missing prices from CoinGecko (with conservative rate limiting)
@@ -77,6 +78,7 @@ serve(async (req) => {
         if (res.status === 429) {
           console.warn(`[zoom-out] CoinGecko 429 for ${target.dateKey}, skipping remaining`);
           await res.text();
+          rateLimited = true;
           break; // Stop trying once rate limited
         }
         if (!res.ok) { await res.text(); continue; }
@@ -113,16 +115,30 @@ serve(async (req) => {
 
     // Current price
     let currentPrice: number | null = null;
-    try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 5000);
-      const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd", { signal: controller.signal });
-      clearTimeout(timeout);
-      if (res.ok) {
-        const json = await res.json();
-        currentPrice = json?.bitcoin?.usd ? Math.round(json.bitcoin.usd) : null;
-      } else { await res.text(); }
-    } catch { /* ignore */ }
+    if (!rateLimited) {
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 5000);
+        const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd", { signal: controller.signal });
+        clearTimeout(timeout);
+        if (res.ok) {
+          const json = await res.json();
+          currentPrice = json?.bitcoin?.usd ? Math.round(json.bitcoin.usd) : null;
+        } else {
+          if (res.status === 429) rateLimited = true;
+          await res.text();
+        }
+      } catch { /* ignore */ }
+    }
+
+    // Fallback: extract price from context string (e.g. "BTC is down 3.8% · $71,141")
+    if (!currentPrice && context) {
+      const priceMatch = context.match(/\$[\d,]+/);
+      if (priceMatch) {
+        const parsed = parseInt(priceMatch[0].replace(/[$,]/g, ''), 10);
+        if (parsed > 0) currentPrice = parsed;
+      }
+    }
 
     // --- 2. Fetch a real past reflection for "echo" ---
     let echoReflection: { message: string; created_at: string; mood: string | null; outcome: string | null } | null = null;
@@ -255,6 +271,11 @@ You MUST respond with a JSON object containing "title" and "body" keys. No other
     }
 
     // --- 4. Build response ---
+    const isPartial = rateLimited || onThisDay.length < yearTargets.length;
+    if (isPartial) {
+      console.log(`[zoom-out] returning partial data: ${onThisDay.length}/${yearTargets.length} prices, rateLimited=${rateLimited}, currentPrice=${currentPrice ?? 'fallback'}`);
+    }
+
     const result = {
       onThisDay,
       currentPrice,
@@ -267,6 +288,7 @@ You MUST respond with a JSON object containing "title" and "body" keys. No other
           }
         : null,
       deepTime,
+      partial: isPartial,
     };
 
     return new Response(JSON.stringify(result), {
