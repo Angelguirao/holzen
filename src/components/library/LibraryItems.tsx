@@ -286,7 +286,7 @@ export function LibraryItems({ library, filtered }: Props) {
               {group.label}
             </p>
             <div className="divide-y divide-border/20">
-              {group.items.map(renderCard)}
+              {group.items.map((item, i) => renderCard(item, i))}
             </div>
           </div>
         ))}
