@@ -449,6 +449,9 @@ const Home = () => {
             alwaysOpen
           >
             <div className="space-y-4">
+              {/* Bulk hold for accumulated pauses */}
+              <BulkHoldCard />
+
               {/* 24h follow-up check-in */}
               <FollowUpCard />
 
