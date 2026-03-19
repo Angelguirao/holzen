@@ -172,15 +172,6 @@ serve(async (req) => {
       }
     }
 
-    // Build learning grounding section
-    let learningInstruction = "";
-    if (learningSearchContent) {
-      const citationRef = learningCitations.length > 0
-        ? `\nAvailable citation URLs for learning_url:\n${learningCitations.map((c: string, i: number) => `[${i + 1}] ${c}`).join("\n")}`
-        : "";
-      learningInstruction = `\n\nLEARNING GROUNDING: Use the following search results to write the learning_title and learning_body. Extract real facts, dates, and data points. Do NOT invent information.\nSearch results: ${learningSearchContent}${citationRef}`;
-    }
-
     const currencyCode = currency || "USD";
     const langCode = language || "en";
     const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
