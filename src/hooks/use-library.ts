@@ -112,7 +112,7 @@ export function useLibrary() {
       const inserts: any[] = [];
       for (const r of allReflections as any[]) {
         if (!existingKeys.has(`${r.id}:reflection`)) {
-          inserts.push({ user_id: user.id, type: 'bookmark', title: 'Reflection', body: r.message, source_type: 'reflection', reflection_id: r.id, tags: ['reflection'], created_at: r.created_at });
+          inserts.push({ user_id: user.id, type: 'bookmark', title: 'Reflection', body: r.message, source_type: 'reflection', reflection_id: r.id, tags: ['reflection'], created_at: r.created_at, status: 'read' });
         }
         if (r.haiku && !existingKeys.has(`${r.id}:haiku`)) {
           inserts.push({ user_id: user.id, type: 'bookmark', title: 'Haiku', body: r.haiku, source_type: 'haiku', reflection_id: r.id, tags: [], created_at: r.created_at, status: r.haiku_read ? 'read' : 'unread' });
