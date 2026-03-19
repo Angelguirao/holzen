@@ -655,6 +655,9 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                 ))}
               </div>
 
+              {/* Source Management */}
+              <SourceManagement />
+
               <div className="space-y-3">
                 <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.aiInsights')}</p>
                 <p className="text-xs text-muted-foreground leading-relaxed">
