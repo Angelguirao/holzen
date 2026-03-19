@@ -88,6 +88,19 @@ export function useLibrary() {
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
     if (allReflections && allReflections.length > 0) {
+      // Build read flags map for companion engagement tracking
+      const flags: Record<string, ReflectionReadFlags> = {};
+      for (const r of allReflections as any[]) {
+        flags[r.id] = {
+          haiku_read: !!r.haiku_read,
+          learning_read: !!r.learning_read,
+          signal_read: !!r.signal_read,
+          zoom_out_read: !!r.zoom_out_read,
+          history_read: !!r.history_read,
+        };
+      }
+      setReadFlagsMap(flags);
+
       const inserts: any[] = [];
       for (const r of allReflections as any[]) {
         if (!existingKeys.has(`${r.id}:reflection`)) {
