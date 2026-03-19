@@ -1,5 +1,6 @@
 import { useMemo, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { motion, AnimatePresence } from 'framer-motion';
 import { LibraryItemCard } from './LibraryItemCard';
 import { ItemDetailViewer } from './ItemDetailViewer';
 import { SwipeableCard } from './SwipeableCard';
@@ -158,8 +159,14 @@ export function LibraryItems({ library, filtered }: Props) {
   const unpinnedFiltered = filtered.filter((i) => !i.pinned);
   const unpinnedGroups = useMemo(() => groupByDate(unpinnedFiltered, t), [unpinnedFiltered, t]);
 
-  const renderCard = (item: LibraryItem) => (
-    <div key={item.id} className="flex items-center">
+  const renderCard = (item: LibraryItem, index: number) => (
+    <motion.div
+      key={item.id}
+      initial={{ opacity: 0, y: 6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2, delay: Math.min(index * 0.03, 0.3) }}
+      className="flex items-center"
+    >
       {selectMode && (
         <button
           onClick={() => toggleSelect(item.id)}
@@ -198,7 +205,7 @@ export function LibraryItems({ library, filtered }: Props) {
           />
         </SwipeableCard>
       </div>
-    </div>
+    </motion.div>
   );
 
   return (
@@ -268,7 +275,7 @@ export function LibraryItems({ library, filtered }: Props) {
               📌 {t('common.pinned')}
             </p>
             <div className="divide-y divide-border/20">
-              {pinnedItems.map(renderCard)}
+              {pinnedItems.map((item, i) => renderCard(item, i))}
             </div>
           </div>
         )}
@@ -279,7 +286,7 @@ export function LibraryItems({ library, filtered }: Props) {
               {group.label}
             </p>
             <div className="divide-y divide-border/20">
-              {group.items.map(renderCard)}
+              {group.items.map((item, i) => renderCard(item, i))}
             </div>
           </div>
         ))}

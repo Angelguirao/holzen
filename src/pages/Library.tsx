@@ -1,12 +1,14 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useLibrary } from '@/hooks/use-library';
 import { PageMeta } from '@/components/PageMeta';
-import { Heart, Search, X, Lock, ArrowUpDown } from 'lucide-react';
+import { Heart, Search, X, Lock, ArrowUpDown, RefreshCw } from 'lucide-react';
 import { SubscriptionSkeleton } from '@/components/SubscriptionSkeleton';
 import { LibraryItems } from '@/components/library/LibraryItems';
 import { LibraryCollections } from '@/components/library/LibraryCollections';
 import { SmartCollections } from '@/components/library/SmartCollections';
+import { usePullToRefresh } from '@/hooks/use-pull-to-refresh';
 
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
@@ -37,6 +39,15 @@ export default function Library() {
   const [tagFilter, setTagFilter] = useState<string | null>(null);
   const [sortMode, setSortMode] = useState<SortMode>('newest');
   const [smartFilter, setSmartFilter] = useState<{ name: string; itemIds: Set<string> } | null>(null);
+
+  const handleRefresh = useCallback(async () => {
+    await library.refetch();
+  }, [library]);
+
+  const { pullDistance, refreshing, handlers } = usePullToRefresh({
+    onRefresh: handleRefresh,
+    threshold: 70,
+  });
 
   const { items, collections } = library;
 
@@ -137,8 +148,30 @@ export default function Library() {
   const sortLabel = sortMode === 'newest' ? t('library.sortNewest', { defaultValue: 'Newest' }) : sortMode === 'oldest' ? t('library.sortOldest', { defaultValue: 'Oldest' }) : t('library.sortAlpha', { defaultValue: 'A–Z' });
 
   return (
-    <div className="space-y-4 pb-24">
+    <div className="space-y-4 pb-24" {...handlers}>
       <PageMeta title={t('library.pageTitle')} description={t('library.pageDescription')} />
+
+      {/* Pull-to-refresh indicator */}
+      <AnimatePresence>
+        {(pullDistance > 10 || refreshing) && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: Math.max(pullDistance, refreshing ? 36 : 0), opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.2 }}
+            className="flex items-center justify-center overflow-hidden"
+          >
+            <RefreshCw
+              className={cn(
+                'h-4 w-4 text-muted-foreground/40 transition-transform',
+                refreshing && 'animate-spin',
+                pullDistance > 70 && !refreshing && 'text-primary/60'
+              )}
+              style={{ transform: refreshing ? undefined : `rotate(${pullDistance * 3}deg)` }}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Tab bar */}
       <div className="flex items-center gap-1 border-b border-border/30 overflow-x-auto">

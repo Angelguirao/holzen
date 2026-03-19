@@ -1,6 +1,7 @@
 import { useRef, useState, useCallback, type ReactNode } from 'react';
 import { Heart, Archive, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { hapticFeedback } from '@/lib/haptics';
 
 interface Props {
   children: ReactNode;
@@ -12,6 +13,7 @@ interface Props {
 }
 
 const THRESHOLD = 80;
+const HAPTIC_TRIGGERED = { left: false, right: false };
 
 export function SwipeableCard({
   children,
@@ -40,6 +42,19 @@ export function SwipeableCard({
     const diff = clientX - startX.current;
     // Dampen the offset for resistance feel
     const dampened = diff > 0 ? Math.min(diff * 0.6, 120) : Math.max(diff * 0.6, -120);
+    // Haptic feedback when crossing threshold
+    if (dampened < -THRESHOLD && !HAPTIC_TRIGGERED.left) {
+      HAPTIC_TRIGGERED.left = true;
+      hapticFeedback('medium');
+    } else if (dampened > -THRESHOLD) {
+      HAPTIC_TRIGGERED.left = false;
+    }
+    if (dampened > THRESHOLD && !HAPTIC_TRIGGERED.right) {
+      HAPTIC_TRIGGERED.right = true;
+      hapticFeedback('medium');
+    } else if (dampened < THRESHOLD) {
+      HAPTIC_TRIGGERED.right = false;
+    }
     setOffset(dampened);
   }, []);
 
