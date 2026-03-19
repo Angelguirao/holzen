@@ -94,6 +94,11 @@ serve(async (req) => {
       ? ` Do NOT use insights from: ${recentSignalSources.slice(0, 5).join(", ")}. Pick a DIFFERENT source.`
       : "";
 
+    // Build topic exclusion to avoid repeating the same headline/story
+    const topicExclusion = (recentSignalTitles && Array.isArray(recentSignalTitles) && recentSignalTitles.length > 0)
+      ? `\nDo NOT cover these topics (already shown to user): ${recentSignalTitles.slice(0, 5).join("; ")}. Find a COMPLETELY DIFFERENT angle or metric.`
+      : "";
+
     const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
     const langCode = language || "en";
     const langName = LANG_NAMES[langCode] || "English";
