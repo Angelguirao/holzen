@@ -125,7 +125,16 @@ export default function Library() {
   const clearAllFilters = () => {
     setSourceFilter(null);
     setTagFilter(null);
+    setSmartFilter(null);
   };
+
+  const cycleSortMode = () => {
+    setSortMode((prev) =>
+      prev === 'newest' ? 'oldest' : prev === 'oldest' ? 'alphabetical' : 'newest'
+    );
+  };
+
+  const sortLabel = sortMode === 'newest' ? t('library.sortNewest', { defaultValue: 'Newest' }) : sortMode === 'oldest' ? t('library.sortOldest', { defaultValue: 'Oldest' }) : t('library.sortAlpha', { defaultValue: 'A–Z' });
 
   return (
     <div className="space-y-4 pb-24">
