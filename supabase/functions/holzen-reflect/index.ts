@@ -241,10 +241,11 @@ Haiku rules:
 
     const aiBody = {
       messages: [
-        { role: "system", content: systemPrompt },
+        { role: "system", content: fullSystemPrompt },
         { role: "user", content: context },
       ],
       response_format: { type: "json_object" },
+      temperature: 0.7,
     };
 
     const models = ["google/gemini-3-flash-preview", "google/gemini-2.5-flash"];
