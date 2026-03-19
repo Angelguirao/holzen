@@ -40,7 +40,7 @@ const TYPE_ICONS: Record<string, React.ReactNode> = {
 };
 
 const SIGNAL_TYPE_ORDER = ['analyst', 'podcast', 'newsletter', 'blog', 'dashboard', 'youtube'];
-const LEARNING_TYPE_ORDER = ['book', 'blog', 'podcast', 'newsletter', 'analyst'];
+const GROUNDING_TYPE_ORDER = ['book', 'blog', 'podcast', 'newsletter', 'analyst'];
 
 export function SourceManagement() {
   const { t } = useTranslation();
