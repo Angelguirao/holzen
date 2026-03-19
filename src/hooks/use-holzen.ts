@@ -340,7 +340,7 @@ export function useHolzen() {
     });
 
     // Ground nudge (learning)
-    fetchSources('learning').then(sources => {
+    fetchSources('grounding').then(sources => {
       invokeWithRetry('ground-nudge', {
         context: ctx, language: lang, sources: sources.length > 0 ? sources : undefined,
       }).then(({ data, error }) => {
