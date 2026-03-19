@@ -381,7 +381,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
   const signalFetchedRef = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!reflectionId) return;
+    if (!prefs.signal || !reflectionId) return;
     const key = reflectionId;
     if (signalFetchedRef.current === key && signalRetry === 0) return;
     signalFetchedRef.current = key;
