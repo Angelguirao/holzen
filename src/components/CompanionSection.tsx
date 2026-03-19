@@ -303,6 +303,12 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
     return null;
   }, []);
 
+  // Retry counters — incrementing these re-triggers the corresponding useEffect
+  const [nudgeRetry, setNudgeRetry] = useState(0);
+  const [signalRetry, setSignalRetry] = useState(0);
+  const [zoomOutRetry, setZoomOutRetry] = useState(0);
+  const [historyRetry, setHistoryRetry] = useState(0);
+
   // Lift nudge state here so it survives expand/collapse cycles
   const [nudge, setNudge] = useState<NudgeData | null>(null);
   const [nudgeLoading, setNudgeLoading] = useState(false);
@@ -312,7 +318,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
   useEffect(() => {
     if (!prefs.learning || !reflectionId) return;
     const key = reflectionId;
-    if (nudgeFetchedRef.current === key) return;
+    if (nudgeFetchedRef.current === key && nudgeRetry === 0) return;
     nudgeFetchedRef.current = key;
 
     let cancelled = false;
@@ -387,7 +393,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
       });
 
     return () => { cancelled = true; };
-  }, [prefs.learning, reflectionId, context]);
+  }, [prefs.learning, reflectionId, context, nudgeRetry]);
 
   // Signal companion state
   const [signal, setSignal] = useState<SignalData | null>(null);
@@ -398,7 +404,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
   useEffect(() => {
     if (!reflectionId) return;
     const key = reflectionId;
-    if (signalFetchedRef.current === key) return;
+    if (signalFetchedRef.current === key && signalRetry === 0) return;
     signalFetchedRef.current = key;
 
     let cancelled = false;
@@ -478,7 +484,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
       });
 
     return () => { cancelled = true; };
-  }, [reflectionId, context]);
+  }, [reflectionId, context, signalRetry]);
 
   // Zoom Out companion state
   const [zoomOut, setZoomOut] = useState<import('./ZoomOutDisplay').ZoomOutData | null>(null);
@@ -489,7 +495,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
   useEffect(() => {
     if (!prefs.zoomOut || !reflectionId) return;
     const key = reflectionId;
-    if (zoomOutFetchedRef.current === key) return;
+    if (zoomOutFetchedRef.current === key && zoomOutRetry === 0) return;
     zoomOutFetchedRef.current = key;
 
     let cancelled = false;
@@ -531,7 +537,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
       });
 
     return () => { cancelled = true; };
-  }, [prefs.zoomOut, reflectionId, context, reflectionMessage]);
+  }, [prefs.zoomOut, reflectionId, context, reflectionMessage, zoomOutRetry]);
 
   // Historical Insight companion state
   interface HistoricalInsightData {
@@ -549,7 +555,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
   useEffect(() => {
     if (!prefs.history || !reflectionId) return;
     const key = reflectionId;
-    if (historyFetchedRef.current === key) return;
+    if (historyFetchedRef.current === key && historyRetry === 0) return;
     historyFetchedRef.current = key;
 
     let cancelled = false;
@@ -592,7 +598,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
       });
 
     return () => { cancelled = true; };
-  }, [prefs.history, reflectionId, context]);
+  }, [prefs.history, reflectionId, context, historyRetry]);
 
   const markCompleted = useCallback(async (key: keyof CompletionState) => {
     if (completion[key]) return;
@@ -670,6 +676,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             nudge={nudge}
             nudgeLoading={nudgeLoading}
             nudgeError={nudgeError}
+            onRetry={() => { nudgeFetchedRef.current = null; setNudgeRetry(c => c + 1); }}
           />
         </CompanionCard>
       )}
@@ -693,6 +700,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             signal={signal}
             loading={signalLoading}
             error={signalError}
+            onRetry={() => { signalFetchedRef.current = null; setSignalRetry(c => c + 1); }}
           />
         </CompanionCard>
       )}
@@ -716,6 +724,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             data={zoomOut}
             loading={zoomOutLoading}
             error={zoomOutError}
+            onRetry={() => { zoomOutFetchedRef.current = null; setZoomOutRetry(c => c + 1); }}
           />
         </CompanionCard>
       )}
@@ -739,6 +748,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             data={historyInsight}
             loading={historyLoading}
             error={historyError}
+            onRetry={() => { historyFetchedRef.current = null; setHistoryRetry(c => c + 1); }}
           />
         </CompanionCard>
       )}

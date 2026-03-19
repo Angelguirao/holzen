@@ -1,5 +1,6 @@
 import { Skeleton } from '@/components/ui/skeleton';
 import { History, ArrowRight } from 'lucide-react';
+import { CompanionError } from './CompanionError';
 
 interface HistoricalInsightData {
   title: string;
@@ -13,9 +14,10 @@ interface Props {
   data: HistoricalInsightData | null;
   loading: boolean;
   error: boolean;
+  onRetry?: () => void;
 }
 
-export function HistoricalInsightDisplay({ data, loading, error }: Props) {
+export function HistoricalInsightDisplay({ data, loading, error, onRetry }: Props) {
   if (loading) {
     return (
       <div className="space-y-3">
@@ -28,11 +30,7 @@ export function HistoricalInsightDisplay({ data, loading, error }: Props) {
   }
 
   if (error || !data) {
-    return (
-      <p className="text-xs text-muted-foreground/60 font-mono">
-        Could not load historical insight.
-      </p>
-    );
+    return <CompanionError message="Could not load historical insight." onRetry={onRetry} />;
   }
 
   return (
