@@ -84,8 +84,11 @@ serve(async (req) => {
     const searchContent = searchData.choices?.[0]?.message?.content || "";
     const citations: string[] = searchData.citations || [];
 
-    // Step 2: Lovable AI structures the grounded result
+    // Step 2: Lovable AI structures the grounded result (JSON mode — faster than tool calling)
     const langInstruction = langCode !== "en" ? `CRITICAL: Write title, btcInsight, and analogy in ${langName}. Keep source URLs as-is.\n\n` : "";
+
+    const aiController = new AbortController();
+    const aiTimeout = setTimeout(() => aiController.abort(), 18000);
 
     const structureResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -93,12 +96,23 @@ serve(async (req) => {
         Authorization: `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
+      signal: aiController.signal,
       body: JSON.stringify({
         model: "google/gemini-2.5-flash-lite",
+        response_format: { type: "json_object" },
         messages: [
           {
             role: "system",
-            content: `${langInstruction}You are a financial historian for a Bitcoin mindfulness app. Given grounded search results with citations, extract ONE historical insight with a cross-asset analogy. Call the "return_historical_insight" function.
+            content: `${langInstruction}You are a financial historian for a Bitcoin mindfulness app. Given grounded search results with citations, extract ONE historical insight with a cross-asset analogy.
+
+Respond with a JSON object containing exactly these keys:
+- "title": Short evocative title
+- "btcInsight": 2-3 sentences about a specific historical event with real dates/numbers
+- "analogy": 1-2 sentences drawing a parallel from another asset class
+- "assetClass": The other asset class (e.g. "Gold", "Tech stocks")
+- "period": Historical period (e.g. "2014", "March 2020")
+- "source": Name of the source
+- "url": URL from the provided citations
 
 Rules:
 - Use ONLY facts from the provided search results
@@ -109,35 +123,13 @@ Rules:
           },
           {
             role: "user",
-            content: `Market context: ${marketContext}\n\nSearch results:\n${searchContent}\n\nAvailable citation URLs:\n${citations.map((c: string, i: number) => `[${i + 1}] ${c}`).join("\n")}\n\nExtract one historical insight with cross-asset analogy.`,
+            content: `Market context: ${marketContext}\n\nSearch results:\n${searchContent}\n\nAvailable citation URLs:\n${citations.map((c: string, i: number) => `[${i + 1}] ${c}`).join("\n")}\n\nExtract one historical insight with cross-asset analogy. Return JSON only.`,
           },
         ],
-        tools: [
-          {
-            type: "function",
-            function: {
-              name: "return_historical_insight",
-              description: "Return a historical insight with cross-asset analogy and source",
-              parameters: {
-                type: "object",
-                properties: {
-                  title: { type: "string", description: "Short evocative title." },
-                  btcInsight: { type: "string", description: "2-3 sentences about a specific historical event with real dates/numbers." },
-                  analogy: { type: "string", description: "1-2 sentences drawing a parallel from another asset class." },
-                  assetClass: { type: "string", description: "The other asset class (e.g. 'Gold', 'Tech stocks')." },
-                  period: { type: "string", description: "Historical period (e.g. '2014', 'March 2020')." },
-                  source: { type: "string", description: "Name of the source." },
-                  url: { type: "string", description: "URL from the citations." },
-                },
-                required: ["title", "btcInsight", "analogy", "assetClass", "period", "source", "url"],
-                additionalProperties: false,
-              },
-            },
-          },
-        ],
-        tool_choice: { type: "function", function: { name: "return_historical_insight" } },
       }),
     });
+
+    clearTimeout(aiTimeout);
 
     if (!structureResponse.ok) {
       if (structureResponse.status === 429) {
@@ -158,10 +150,15 @@ Rules:
     }
 
     const structureData = await structureResponse.json();
-    const toolCall = structureData.choices?.[0]?.message?.tool_calls?.[0];
-    if (!toolCall) throw new Error("No tool call in response");
-
-    const insight = JSON.parse(toolCall.function.arguments);
+    const raw = structureData.choices?.[0]?.message?.content || "";
+    let insight: Record<string, string>;
+    try {
+      insight = JSON.parse(raw);
+    } catch {
+      const m = raw.match(/\{[\s\S]*\}/);
+      if (!m) throw new Error("Could not parse AI JSON response");
+      insight = JSON.parse(m[0]);
+    }
 
     // Ensure URL is from citations
     if (citations.length > 0 && !citations.includes(insight.url)) {
