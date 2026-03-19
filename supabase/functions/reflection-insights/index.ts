@@ -7,6 +7,55 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+/** Call AI with automatic model fallback: try primary, on failure retry with fallback model */
+async function callAIWithFallback(
+  apiKey: string,
+  body: Record<string, unknown>,
+  primaryModel: string,
+  fallbackModel: string,
+  timeoutMs = 18000,
+): Promise<{ data: any; status: number }> {
+  for (const model of [primaryModel, fallbackModel]) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${apiKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ...body, model }),
+        signal: controller.signal,
+      });
+      clearTimeout(timeout);
+
+      if (res.status === 429 || res.status === 402) {
+        return { data: null, status: res.status };
+      }
+      if (!res.ok) {
+        const t = await res.text();
+        console.error(`[AI ${model}] error ${res.status}: ${t}`);
+        if (model === fallbackModel) return { data: null, status: res.status };
+        console.log(`[AI] Retrying with fallback model ${fallbackModel}`);
+        continue;
+      }
+      const data = await res.json();
+      return { data, status: 200 };
+    } catch (e) {
+      clearTimeout(timeout);
+      if (e instanceof DOMException && e.name === "AbortError") {
+        console.warn(`[AI ${model}] timed out after ${timeoutMs}ms`);
+        if (model === fallbackModel) return { data: null, status: 504 };
+        console.log(`[AI] Retrying with fallback model ${fallbackModel}`);
+        continue;
+      }
+      throw e;
+    }
+  }
+  return { data: null, status: 500 };
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -60,7 +109,6 @@ serve(async (req) => {
     let generated = 0;
 
     for (const userId of userIds) {
-      // Track AI usage per user
       try { await supabase.from("analytics_events").insert({ user_id: userId, event: "reflection_insights_ai_call" }); } catch (_) { /* non-fatal */ }
       let userLanguage = bodyLanguage || "en";
       if (!bodyLanguage && !singleUserId) {
@@ -85,7 +133,6 @@ serve(async (req) => {
         const volMatch = r.context?.match(/[↑↓](\d+(?:\.\d+)?)%/);
         const volatility = volMatch ? parseFloat(volMatch[1]) : 0;
 
-        // Detect skills exercised
         const skills: string[] = [];
         if (r.mood_after && r.mood) {
           const COMPOSURE: Record<string, number> = { fomo: 10, greedy: 15, anxious: 20, fearful: 25, excited: 40, uncertain: 50, detached: 75, calm: 100 };
@@ -98,21 +145,14 @@ serve(async (req) => {
         if ((r.note && r.note.length > 10) || (r.tags && r.tags.length > 0)) skills.push("awareness");
 
         return {
-          day: dayName,
-          hour,
-          date: r.created_at.slice(0, 10),
-          mood: r.mood || "none",
-          mood_after: r.mood_after || "none",
-          outcome: r.outcome || "none",
-          volatility,
-          skills,
+          day: dayName, hour, date: r.created_at.slice(0, 10),
+          mood: r.mood || "none", mood_after: r.mood_after || "none",
+          outcome: r.outcome || "none", volatility, skills,
           tools: [r.breathing_completed && "breathing", r.zoom_out_read && "zoom_out", r.history_read && "history", r.signal_read && "signal", r.learning_read && "learning"].filter(Boolean),
-          hasNote: !!(r.note && r.note.length > 10),
-          tagCount: r.tags?.length || 0,
+          hasNote: !!(r.note && r.note.length > 10), tagCount: r.tags?.length || 0,
         };
       });
 
-      // Skill frequency stats
       const skillCounts: Record<string, number> = { regulation: 0, tolerance: 0, alignment: 0, reappraisal: 0, awareness: 0 };
       for (const s of summary) {
         for (const skill of s.skills) {
@@ -132,17 +172,15 @@ serve(async (req) => {
 4. COGNITIVE REAPPRAISAL — engaging perspective-shifting tools (zoom out, history, signals, learning) especially during volatile moments
 5. SELF-AWARENESS — depth of reflection through notes, tags, and pattern recognition
 
-Analyze the user's data through this skill lens. Generate 3-5 insights about their SKILL DEVELOPMENT — not mood patterns or generic advice. Each insight should:
-- Reference a specific skill and how it's developing
-- Be based on actual data patterns (which skills are strong/weak, when they're exercised, correlations between skills)
-- Be 1-2 sentences max
-- Frame reactivity as OPPORTUNITY, not failure
+Analyze the user's data through this skill lens. Generate 3-5 insights about their SKILL DEVELOPMENT — not mood patterns or generic advice.
 
-Examples of good skill-based insights:
-- "Your regulation skill is strongest on weekdays — you shifted from anxious to calm 80% of the time vs 40% on weekends."
-- "You've exercised distress tolerance 12 times during >5% volatility. Your hold rate in those moments is 92%."
-- "Cognitive reappraisal is your least-used skill (used in 15% of pauses), but when you do use it, your regulation success rate doubles."
-- "Your self-awareness depth is growing — you've added notes in 60% of recent pauses, up from 20% a month ago."${langInstruction}`;
+Each insight must have these JSON keys:
+- "category": one of "regulation", "tolerance", "alignment", "reappraisal", "awareness"
+- "title": Short headline (5-10 words)
+- "body": 1-2 sentence insight about skill development based on actual data patterns
+- "sentiment": one of "positive", "neutral", "actionable"
+
+Return a JSON object with a single key "insights" containing an array of these objects.${langInstruction}`;
 
       const userPrompt = `Here is the user's skill data (${reflections.length} total pauses):
 
@@ -152,90 +190,42 @@ ${JSON.stringify(skillCounts)}
 Recent pauses with skill tags (newest first):
 ${JSON.stringify(summary.slice(0, 50), null, 0)}
 
-Generate 3-5 skill development insights based on real patterns in this data.`;
+Generate 3-5 skill development insights based on real patterns in this data. Return JSON only.`;
 
-      const response = await fetch(
-        "https://ai.gateway.lovable.dev/v1/chat/completions",
+      const { data: aiData, status } = await callAIWithFallback(
+        LOVABLE_API_KEY,
         {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${LOVABLE_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            model: "google/gemini-3-flash-preview",
-            messages: [
-              { role: "system", content: systemPrompt },
-              { role: "user", content: userPrompt },
-            ],
-            tools: [
-              {
-                type: "function",
-                function: {
-                  name: "return_insights",
-                  description: "Return skill development insights for the user.",
-                  parameters: {
-                    type: "object",
-                    properties: {
-                      insights: {
-                        type: "array",
-                        items: {
-                          type: "object",
-                          properties: {
-                            category: {
-                              type: "string",
-                              enum: ["regulation", "tolerance", "alignment", "reappraisal", "awareness"],
-                              description: "Which composure skill this insight relates to",
-                            },
-                            title: {
-                              type: "string",
-                              description: "Short headline (5-10 words)",
-                            },
-                            body: {
-                              type: "string",
-                              description: "1-2 sentence insight about skill development based on actual data patterns",
-                            },
-                            sentiment: {
-                              type: "string",
-                              enum: ["positive", "neutral", "actionable"],
-                              description: "Whether this is good news, neutral observation, or something to work on",
-                            },
-                          },
-                          required: ["category", "title", "body", "sentiment"],
-                          additionalProperties: false,
-                        },
-                      },
-                    },
-                    required: ["insights"],
-                    additionalProperties: false,
-                  },
-                },
-              },
-            ],
-            tool_choice: {
-              type: "function",
-              function: { name: "return_insights" },
-            },
-          }),
-        }
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: userPrompt },
+          ],
+          response_format: { type: "json_object" },
+        },
+        "google/gemini-3-flash-preview",
+        "google/gemini-2.5-flash-lite",
+        20000,
       );
 
-      if (!response.ok) {
-        if (response.status === 429 || response.status === 402) {
-          console.error(`[INSIGHTS] Rate limited or credits exhausted for user ${userId}`);
-          continue;
-        }
-        const t = await response.text();
-        console.error("[INSIGHTS] AI error:", response.status, t);
+      if (status === 429 || status === 402) {
+        console.error(`[INSIGHTS] Rate limited or credits exhausted for user ${userId}`);
+        continue;
+      }
+      if (!aiData) {
+        console.error(`[INSIGHTS] AI failed for user ${userId} with status ${status}`);
         continue;
       }
 
-      const data = await response.json();
-      const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
-      if (!toolCall) continue;
-
-      const parsed = JSON.parse(toolCall.function.arguments);
-      const insights = parsed.insights;
+      const raw = aiData.choices?.[0]?.message?.content || "";
+      let insights: any[];
+      try {
+        const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
+        insights = parsed.insights || parsed;
+      } catch {
+        const m = raw.match(/\{[\s\S]*\}/);
+        if (!m) { console.error("[INSIGHTS] Failed to parse AI JSON"); continue; }
+        const parsed = JSON.parse(m[0]);
+        insights = parsed.insights || parsed;
+      }
 
       if (!insights || !Array.isArray(insights)) continue;
 
