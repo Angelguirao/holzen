@@ -19,7 +19,7 @@ import { useProGate } from '@/hooks/use-pro-gate';
 const SOURCE_CHIPS: { key: string; emoji: string; label: string }[] = [
   { key: 'reflection', emoji: '⏸', label: 'Pause' },
   { key: 'signal', emoji: '📡', label: 'Signal' },
-  { key: 'learning', emoji: '📖', label: 'Learning' },
+  { key: 'learning', emoji: '🌿', label: 'Grounding' },
   { key: 'haiku', emoji: '🍃', label: 'Haiku' },
   { key: 'zoom_out', emoji: '🔭', label: 'Zoom Out' },
   { key: 'history_insight', emoji: '📜', label: 'History' },
