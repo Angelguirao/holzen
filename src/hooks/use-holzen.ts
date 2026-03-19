@@ -408,18 +408,28 @@ export function useHolzen() {
     setLoading(true);
     setError(null);
 
-    // Fetch recent mood history for adaptive tone
+    // Fetch recent mood history + haikus + signal sources for adaptive tone & dedup
     let moodHistory: { mood: string; outcome: string | null; created_at: string }[] = [];
+    let recentHaikus: string[] = [];
+    let recentSignalSources: string[] = [];
     try {
-      const { data: recentMoods } = await supabase
+      const { data: recentReflections } = await supabase
         .from('reflections')
-        .select('mood, outcome, created_at')
+        .select('mood, outcome, created_at, haiku, signal_source')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(20);
-      moodHistory = (recentMoods ?? [])
+      moodHistory = (recentReflections ?? [])
         .filter((r: any) => r.mood)
         .map((r: any) => ({ mood: r.mood, outcome: r.outcome, created_at: r.created_at }));
+      recentHaikus = (recentReflections ?? [])
+        .filter((r: any) => r.haiku)
+        .map((r: any) => r.haiku as string)
+        .slice(0, 5);
+      recentSignalSources = (recentReflections ?? [])
+        .filter((r: any) => r.signal_source)
+        .map((r: any) => r.signal_source as string)
+        .slice(0, 5);
     } catch { /* non-critical */ }
 
     try {
@@ -436,6 +446,7 @@ export function useHolzen() {
           groundingActivities: groundingActivities.length > 0 ? groundingActivities : undefined,
           currency,
           language,
+          recentHaikus,
         },
       });
 
