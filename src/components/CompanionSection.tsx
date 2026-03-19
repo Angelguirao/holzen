@@ -202,28 +202,40 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
   }, [reflectionId, favorites]);
 
   // Helper: auto-save companion to library (dedup by reflection_id + source_type)
+  // Track in-flight saves to prevent race-condition duplicates
+  const savingRef = useRef<Set<string>>(new Set());
+
   const autoSaveToLibrary = useCallback(async (params: { title: string; body: string; sourceType: string; sourceUrl?: string }) => {
     if (!reflectionId) return;
-    const { data: authData } = await supabase.auth.getUser();
-    const userId = authData?.user?.id;
-    if (!userId) return;
-    const { data: existing } = await supabase
-      .from('library_items')
-      .select('id')
-      .eq('user_id', userId)
-      .eq('reflection_id', reflectionId)
-      .eq('source_type', params.sourceType)
-      .limit(1);
-    if (existing && existing.length > 0) return;
-    await supabase.from('library_items').insert({
-      user_id: userId,
-      type: 'bookmark',
-      title: params.title,
-      body: params.body,
-      source_type: params.sourceType,
-      source_url: params.sourceUrl || null,
-      reflection_id: reflectionId,
-    });
+    const dedupKey = `${reflectionId}:${params.sourceType}`;
+    if (savingRef.current.has(dedupKey)) return;
+    savingRef.current.add(dedupKey);
+
+    try {
+      const { data: authData } = await supabase.auth.getUser();
+      const userId = authData?.user?.id;
+      if (!userId) return;
+      const { data: existing } = await supabase
+        .from('library_items')
+        .select('id')
+        .eq('user_id', userId)
+        .eq('reflection_id', reflectionId)
+        .eq('source_type', params.sourceType)
+        .limit(1);
+      if (existing && existing.length > 0) return;
+      await supabase.from('library_items').insert({
+        user_id: userId,
+        type: 'bookmark',
+        title: params.title,
+        body: params.body,
+        source_type: params.sourceType,
+        source_url: params.sourceUrl || null,
+        reflection_id: reflectionId,
+        tags: [],
+      });
+    } finally {
+      // Keep the key to prevent future attempts within same component lifecycle
+    }
   }, [reflectionId]);
 
   const { t: i18nT } = useTranslation();
