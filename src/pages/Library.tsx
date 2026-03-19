@@ -324,13 +324,16 @@ export default function Library() {
             <span className="text-[9px] font-mono text-muted-foreground/30">
               {filtered.length} {filtered.length === 1 ? 'item' : 'items'}
             </span>
-            <button
-              onClick={cycleSortMode}
-              className="flex items-center gap-1 text-[9px] font-mono text-muted-foreground/40 hover:text-muted-foreground transition-colors"
-            >
-              <ArrowUpDown className="h-2.5 w-2.5" />
-              {sortLabel}
-            </button>
+            <div className="flex items-center gap-3">
+              <ExportMenu items={filtered} />
+              <button
+                onClick={cycleSortMode}
+                className="flex items-center gap-1 text-[9px] font-mono text-muted-foreground/40 hover:text-muted-foreground transition-colors"
+              >
+                <ArrowUpDown className="h-2.5 w-2.5" />
+                {sortLabel}
+              </button>
+            </div>
           </div>
 
           {/* Duplicate detection banner */}
