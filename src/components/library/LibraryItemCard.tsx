@@ -82,10 +82,13 @@ export function LibraryItemCard({ item, onToggleFavorite, onClick, engaged = tru
   // Only show as skipped if the pause is complete (has outcome) and user didn't engage
   const dimmed = isCompanion && !engaged && !incomplete;
 
+  const sourceColor = SOURCE_COLORS[item.source_type ?? ''] ?? 'border-l-transparent';
+
   return (
     <div
       className={cn(
-        'group flex items-start gap-2.5 rounded-lg px-3 py-2.5 transition-colors hover:bg-card/80 cursor-pointer',
+        'group flex items-start gap-2.5 rounded-lg border-l-2 px-3 py-2.5 transition-colors hover:bg-card/80 cursor-pointer',
+        sourceColor,
         dimmed && 'opacity-40'
       )}
       onClick={(e) => {
