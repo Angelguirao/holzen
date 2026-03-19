@@ -528,7 +528,8 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
                 .update({ zoom_out_data: data } as any)
                 .eq('id', reflectionId)
                 .then(() => {});
-              autoSaveToLibrary({ title: 'Zoom Out', body: typeof data === 'object' ? JSON.stringify(data) : String(data), sourceType: 'zoom_out' });
+              const zoomBody = (data as any)?.deepTime?.body || (data as any)?.echo?.message || 'Zoom Out perspective';
+              autoSaveToLibrary({ title: (data as any)?.deepTime?.title || 'Zoom Out', body: zoomBody, sourceType: 'zoom_out' });
             }
             setZoomOutLoading(false);
           });
