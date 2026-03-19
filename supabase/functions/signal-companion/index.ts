@@ -49,7 +49,7 @@ serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-    const { context, language, sources, recentSignalSources } = body;
+    const { context, language, sources, recentSignalSources, recentSignalTitles } = body;
     log("parsed body");
 
     // Verify JWT and track AI usage
@@ -92,6 +92,11 @@ serve(async (req) => {
     // Build exclusion hint from recently used sources to enforce diversity
     const recentExclusion = (recentSignalSources && Array.isArray(recentSignalSources) && recentSignalSources.length > 0)
       ? ` Do NOT use insights from: ${recentSignalSources.slice(0, 5).join(", ")}. Pick a DIFFERENT source.`
+      : "";
+
+    // Build topic exclusion to avoid repeating the same headline/story
+    const topicExclusion = (recentSignalTitles && Array.isArray(recentSignalTitles) && recentSignalTitles.length > 0)
+      ? `\nDo NOT cover these topics (already shown to user): ${recentSignalTitles.slice(0, 5).join("; ")}. Find a COMPLETELY DIFFERENT angle or metric.`
       : "";
 
     const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
@@ -139,7 +144,7 @@ DIVERSITY RULES:
 - Use a DIFFERENT source every time — rotate between on-chain analysts, macro blogs, newsletters, dashboards, and podcasts
 - Do NOT default to Glassnode or any single source
 - Prefer recent analysis (last 7 days) from named analysts or publications
-- Include the exact source name and a working URL to the specific article/page${recentExclusion}`,
+- Include the exact source name and a working URL to the specific article/page${recentExclusion}${topicExclusion}`,
         },
         { role: "user", content: searchQuery },
       ],
