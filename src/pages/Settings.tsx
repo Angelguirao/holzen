@@ -108,6 +108,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
   const [changingPassword, setChangingPassword] = useState(false);
   const [zenMode, setZenMode] = useState(() => localStorage.getItem('holzen_zen_mode') === 'true');
   const [hapticEnabled, setHapticEnabledState] = useState(isHapticEnabled);
+  const [soundEnabled, setSoundEnabled] = useState(() => localStorage.getItem('holzen_sound_enabled') !== 'false');
   const [btcMode, setBtcMode] = useState(() => localStorage.getItem('holzen_btc_mode') === 'true');
   const [latestVersion, setLatestVersion] = useState<string | null>(null);
   const [hasNewVersion, setHasNewVersion] = useState(false);
