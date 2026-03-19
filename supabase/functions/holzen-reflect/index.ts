@@ -82,7 +82,7 @@ serve(async (req) => {
           }
         }
 
-        const learningQuery = `Bitcoin behavioral finance or market psychology insight relevant to: ${context}. Find a specific educational fact, historical pattern, or research finding with real data.`;
+        const learningQuery = `behavioral finance, cognitive bias, or decision psychology insight relevant to someone feeling emotional about a financial loss or gain. Context: ${context}. Find a specific research finding, psychological principle, or decision science fact — NOT market analysis or price data.`;
 
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 8000);
@@ -90,7 +90,7 @@ serve(async (req) => {
         const searchBody: Record<string, unknown> = {
           model: "sonar",
           messages: [
-            { role: "system", content: "Find one specific, factual educational insight about Bitcoin market behavior, behavioral finance, or investor psychology. Include real data, dates, or research citations. Be concise — 2-3 sentences max." },
+            { role: "system", content: "Find one specific, factual insight about behavioral finance, cognitive biases, decision psychology, or emotional regulation. Focus on research findings (e.g. Kahneman, Thaler, Ariely), psychological principles (loss aversion, anchoring, sunk cost), or decision science. Do NOT discuss Bitcoin prices, market analysis, or on-chain data. Be concise — 2-3 sentences max." },
             { role: "user", content: learningQuery },
           ],
           search_recency_filter: "month",
@@ -196,8 +196,8 @@ serve(async (req) => {
 You MUST respond with a JSON object containing these keys:
 - "message": The core reflection message (1-3 sentences)${langCode !== "en" ? ` in ${langName}` : ""}
 - "haiku": A haiku (3 lines separated by newlines, 5-7-5 syllables)${langCode !== "en" ? ` in ${langName}` : ""}
-- "learning_title": Short factual headline (5-10 words)${langCode !== "en" ? ` in ${langName}` : ""}
-- "learning_body": 1-2 sentences of factual educational context${langCode !== "en" ? ` in ${langName}` : ""}
+- "learning_title": Short factual headline about a psychological principle or cognitive bias (5-10 words)${langCode !== "en" ? ` in ${langName}` : ""}
+- "learning_body": 1-2 sentences about a behavioral finance principle, cognitive bias, or decision psychology research finding relevant to the emotional moment${langCode !== "en" ? ` in ${langName}` : ""}
 - "learning_citation": Source name (e.g. "Kahneman & Tversky, 1979" or "Glassnode Research")
 - "learning_url": A URL from the citation list if available, or "" if none
 
@@ -228,11 +228,11 @@ Haiku rules:
 - Captures the essence of the moment. Match the chosen tone.
 - No trading advice or price predictions.
 - MUST be original and unique — never repeat common phrases like "red screens" or "breath moves".${haikuDedup}
-${learningInstruction || `
+    ${learningInstruction || `
 Learning input rules:
-- Title: a short, factual headline (5-10 words).
-- Body: 1-2 sentences about a historical Bitcoin event, market pattern, or behavioral finance insight relevant to the current context. Factual, educational, no advice.
-- If on-chain data is provided in the context (mempool size, fees, hashrate, block height), USE IT to make the learning insight factually grounded.`}`;
+- Title: a short, factual headline about a psychological principle or cognitive bias (5-10 words).
+- Body: 1-2 sentences about a behavioral finance principle (loss aversion, anchoring, endowment effect, herd behavior, etc.), decision psychology research, or emotional regulation technique relevant to the current emotional context. Cite real researchers (Kahneman, Tversky, Thaler, Ariely, etc.) when possible. Do NOT write about Bitcoin price history, market patterns, or on-chain data — focus on the HUMAN psychology of the moment.
+- Citation: Name the researcher, paper, or book (e.g. "Kahneman & Tversky, 1979", "Richard Thaler, Nudge").`}`;
 
     const aiBody = {
       messages: [
