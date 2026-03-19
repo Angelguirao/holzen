@@ -834,6 +834,9 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                     </div>
                   </div>
                 )}
+
+                {/* Extended Quiet Windows */}
+                <QuietWindowsManager userId={user?.id} />
               </div>
             </div>
             </ProLock>
