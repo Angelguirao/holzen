@@ -109,6 +109,7 @@ const Home = () => {
     manualTrigger,
     manualCooldownRemaining,
     autoCooldownRemaining,
+    nextCronCheckIn,
     cooldownHours,
     firstName,
     currency,
