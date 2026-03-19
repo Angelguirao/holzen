@@ -345,30 +345,9 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           return;
         }
 
-        // Fetch learning sources for ground-nudge
-        let learningSources: { name: string; type: string; url?: string }[] = [];
-        try {
-          const { data: authData } = await supabase.auth.getUser();
-          const userId = authData?.user?.id;
-          if (userId) {
-            const [{ data: catalog }, { data: userPrefs }] = await Promise.all([
-              supabase.from('signal_sources').select('id, name, type, url, category').eq('category', 'grounding'),
-              supabase.from('user_signal_preferences').select('source_id, custom_name, custom_url, custom_type, active, category').eq('user_id', userId).eq('category', 'grounding'),
-            ]);
-            const prefsMap = new Map((userPrefs ?? []).map((p: any) => [p.source_id, p]));
-            const catalogActive = (catalog ?? []).filter((s: any) => {
-              const pref = prefsMap.get(s.id);
-              return pref ? pref.active : true;
-            }).map((s: any) => ({ name: s.name, type: s.type, url: s.url }));
-            const customActive = (userPrefs ?? [])
-              .filter((p: any) => !p.source_id && p.custom_name && p.active)
-              .map((p: any) => ({ name: p.custom_name, type: p.custom_type || 'blog', url: p.custom_url }));
-            learningSources = [...catalogActive, ...customActive];
-          }
-        } catch { /* non-critical */ }
-
+        // ground-nudge uses academic search mode — no sources needed
         supabase.functions
-          .invoke('ground-nudge', { body: { context: context ?? '', language, sources: learningSources.length > 0 ? learningSources : undefined } })
+          .invoke('ground-nudge', { body: { context: context ?? '', language } })
           .then(({ data, error: fnError }) => {
             if (cancelled) return;
             if (fnError || !data || data.error) {
@@ -452,12 +431,19 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           }
         } catch { /* non-critical */ }
 
+        // Get recently used signal sources from localStorage to enforce diversity
+        let recentSignalSources: string[] = [];
+        try {
+          recentSignalSources = JSON.parse(localStorage.getItem('holzen_recent_signal_sources') || '[]');
+        } catch { /* ignore */ }
+
         supabase.functions
           .invoke('signal-companion', {
             body: {
               context: context ?? '',
               language,
               sources: activeSources.length > 0 ? activeSources : undefined,
+              recentSignalSources,
             },
           })
           .then(({ data, error: fnError }) => {
@@ -467,6 +453,16 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             } else {
               const signalData = data as SignalData;
               setSignal(signalData);
+
+              // Track this source for future diversity
+              if (signalData.source) {
+                try {
+                  const recent = JSON.parse(localStorage.getItem('holzen_recent_signal_sources') || '[]');
+                  const updated = [signalData.source, ...recent.filter((s: string) => s !== signalData.source)].slice(0, 5);
+                  localStorage.setItem('holzen_recent_signal_sources', JSON.stringify(updated));
+                } catch { /* ignore */ }
+              }
+
               supabase
                 .from('reflections')
                 .update({

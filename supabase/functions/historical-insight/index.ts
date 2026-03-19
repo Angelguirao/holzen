@@ -74,6 +74,8 @@ serve(async (req) => {
     // Step 1: Perplexity search for historical parallels
     const searchQuery = `Find a specific historical financial event from ${randomEra.era} (examples: ${randomEra.examples}) that parallels current Bitcoin market conditions: ${marketContext}. Include exact dates, prices, percentage moves, and what happened in the months/years after. Be specific — name the exact event, not a general overview.`;
 
+    const searchController = new AbortController();
+    const searchTimeout = setTimeout(() => searchController.abort(), 12000);
     const searchResponse = await fetch("https://api.perplexity.ai/chat/completions", {
       method: "POST",
       headers: {
@@ -90,7 +92,9 @@ serve(async (req) => {
           { role: "user", content: searchQuery },
         ],
       }),
+      signal: searchController.signal,
     });
+    clearTimeout(searchTimeout);
 
     if (!searchResponse.ok) {
       const errText = await searchResponse.text();
