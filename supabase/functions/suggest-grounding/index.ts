@@ -12,6 +12,8 @@ async function searchRecentArticle(activity: string, langCode: string): Promise<
 
   try {
     const query = `latest interesting discovery or technique about "${activity}" for wellbeing or mindfulness`;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
     const response = await fetch("https://api.perplexity.ai/chat/completions", {
       method: "POST",
       headers: {
@@ -26,7 +28,9 @@ async function searchRecentArticle(activity: string, langCode: string): Promise<
         ],
         search_recency_filter: "month",
       }),
+      signal: controller.signal,
     });
+    clearTimeout(timeout);
 
     if (!response.ok) {
       console.error("Perplexity error:", response.status);
@@ -47,6 +51,10 @@ async function searchRecentArticle(activity: string, langCode: string): Promise<
     }
     return content ? { title: activity, url: "", snippet: content.slice(0, 300) } : null;
   } catch (e) {
+    if (e instanceof DOMException && e.name === "AbortError") {
+      console.warn("[suggest-grounding] Perplexity search timed out for:", activity);
+      return null;
+    }
     console.error("Perplexity search failed:", e);
     return null;
   }
