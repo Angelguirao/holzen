@@ -273,6 +273,22 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
       });
   }, [reflectionId]);
 
+  /** Poll DB for pre-generated companion data before falling back to live edge function call.
+   *  Checks up to 3 times with 2s intervals, giving pre-generation time to land. */
+  const pollForCachedData = useCallback(async (
+    reflectionId: string,
+    fields: string,
+    checkFn: (row: any) => boolean,
+    maxAttempts = 3,
+  ): Promise<any | null> => {
+    for (let i = 0; i < maxAttempts; i++) {
+      if (i > 0) await new Promise(r => setTimeout(r, 2000));
+      const { data: row } = await supabase.from('reflections').select(fields).eq('id', reflectionId).single();
+      if (row && checkFn(row)) return row;
+    }
+    return null;
+  }, []);
+
   // Lift nudge state here so it survives expand/collapse cycles
   const [nudge, setNudge] = useState<NudgeData | null>(null);
   const [nudgeLoading, setNudgeLoading] = useState(false);
@@ -289,14 +305,14 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
     setNudgeLoading(true);
     setNudgeError(false);
 
-    supabase
-      .from('reflections')
-      .select('learning_title, learning_body, learning_citation, learning_url')
-      .eq('id', reflectionId)
-      .single()
-      .then(async ({ data: row }) => {
-        if (cancelled) return;
-        if (row?.learning_citation) {
+    // Poll for pre-generated data, then fall back to live call
+    pollForCachedData(
+      reflectionId,
+      'learning_title, learning_body, learning_citation, learning_url',
+      (row) => !!row?.learning_citation,
+    ).then(async (row) => {
+      if (cancelled) return;
+      if (row?.learning_citation) {
           const cachedNudge = {
             title: row.learning_title ?? '',
             body: row.learning_body ?? '',
@@ -375,14 +391,13 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
     setSignalLoading(true);
     setSignalError(false);
 
-    supabase
-      .from('reflections')
-      .select('signal_title, signal_body, signal_source, signal_url')
-      .eq('id', reflectionId)
-      .single()
-      .then(async ({ data: row }) => {
-        if (cancelled) return;
-        if (row?.signal_source) {
+    pollForCachedData(
+      reflectionId,
+      'signal_title, signal_body, signal_source, signal_url',
+      (row) => !!row?.signal_source,
+    ).then(async (row) => {
+      if (cancelled) return;
+      if (row?.signal_source) {
           const cachedSignal = {
             title: row.signal_title ?? '',
             body: row.signal_body ?? '',
@@ -467,20 +482,19 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
     setZoomOutLoading(true);
     setZoomOutError(false);
 
-    // Check if already persisted
-    supabase
-      .from('reflections')
-      .select('zoom_out_data')
-      .eq('id', reflectionId)
-      .single()
-      .then(({ data: row }) => {
-        if (cancelled) return;
-        if ((row as any)?.zoom_out_data) {
-          setZoomOut((row as any).zoom_out_data);
-          setZoomOutLoading(false);
-          autoSaveToLibrary({ title: 'Zoom Out', body: JSON.stringify((row as any).zoom_out_data), sourceType: 'zoom_out' });
-          return;
-        }
+    // Poll for pre-generated data, then fall back to live call
+    pollForCachedData(
+      reflectionId,
+      'zoom_out_data',
+      (row) => !!(row as any)?.zoom_out_data,
+    ).then((row) => {
+      if (cancelled) return;
+      if ((row as any)?.zoom_out_data) {
+        setZoomOut((row as any).zoom_out_data);
+        setZoomOutLoading(false);
+        autoSaveToLibrary({ title: 'Zoom Out', body: JSON.stringify((row as any).zoom_out_data), sourceType: 'zoom_out' });
+        return;
+      }
 
         supabase.functions
           .invoke('zoom-out-companion', { body: { context: context ?? '', reflectionMessage: reflectionMessage ?? '', language } })
@@ -528,20 +542,19 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
     setHistoryLoading(true);
     setHistoryError(false);
 
-    // Check if already persisted
-    supabase
-      .from('reflections')
-      .select('history_insight_data')
-      .eq('id', reflectionId)
-      .single()
-      .then(({ data: row }) => {
-        if (cancelled) return;
-        if ((row as any)?.history_insight_data) {
-          const cachedHistory = (row as any).history_insight_data as HistoricalInsightData;
-          setHistoryInsight(cachedHistory);
-          setHistoryLoading(false);
-          autoSaveToLibrary({ title: cachedHistory.title, body: cachedHistory.btcInsight, sourceType: 'history_insight' });
-          return;
+    // Poll for pre-generated data, then fall back to live call
+    pollForCachedData(
+      reflectionId,
+      'history_insight_data',
+      (row) => !!(row as any)?.history_insight_data,
+    ).then((row) => {
+      if (cancelled) return;
+      if ((row as any)?.history_insight_data) {
+        const cachedHistory = (row as any).history_insight_data as HistoricalInsightData;
+        setHistoryInsight(cachedHistory);
+        setHistoryLoading(false);
+        autoSaveToLibrary({ title: cachedHistory.title, body: cachedHistory.btcInsight, sourceType: 'history_insight' });
+        return;
         }
 
         supabase.functions

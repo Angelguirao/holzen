@@ -196,42 +196,58 @@ Rules:
 
 You MUST respond with a JSON object containing "title" and "body" keys. No other text.`;
 
-        const aiController = new AbortController();
-        const aiTimeout = setTimeout(() => aiController.abort(), 18000);
+        const aiBody = {
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: `${context || "BTC is moving today."} ${priceContext} ${historyContext}` },
+          ],
+          response_format: { type: "json_object" },
+        };
 
-        const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${LOVABLE_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            model: "google/gemini-2.5-flash-lite",
-            messages: [
-              { role: "system", content: systemPrompt },
-              { role: "user", content: `${context || "BTC is moving today."} ${priceContext} ${historyContext}` },
-            ],
-            response_format: { type: "json_object" },
-          }),
-          signal: aiController.signal,
-        });
-        clearTimeout(aiTimeout);
+        const models = ["google/gemini-2.5-flash-lite", "google/gemini-2.5-flash"];
+        for (const model of models) {
+          const aiController = new AbortController();
+          const aiTimeout = setTimeout(() => aiController.abort(), 18000);
+          try {
+            const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+              method: "POST",
+              headers: {
+                Authorization: `Bearer ${LOVABLE_API_KEY}`,
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ ...aiBody, model }),
+              signal: aiController.signal,
+            });
+            clearTimeout(aiTimeout);
 
-        if (aiRes.ok) {
-          const aiData = await aiRes.json();
-          const raw = aiData.choices?.[0]?.message?.content;
-          if (raw) {
-            try {
-              const parsed = JSON.parse(raw);
-              if (parsed.title && parsed.body) {
-                deepTime = { title: parsed.title, body: parsed.body };
-              }
-            } catch {
-              console.warn("[zoom-out] Failed to parse AI JSON:", raw?.slice?.(0, 200));
+            if (aiRes.ok) {
+              const aiData = await aiRes.json();
+              const raw = aiData.choices?.[0]?.message?.content;
+              if (raw) {
+                try {
+                  const parsed = JSON.parse(raw);
+                  if (parsed.title && parsed.body) {
+                    deepTime = { title: parsed.title, body: parsed.body };
+                    break;
+                  }
+                } catch {
+                  console.warn(`[zoom-out] Failed to parse AI JSON from ${model}:`, raw?.slice?.(0, 200));
+                  if (model !== models[models.length - 1]) continue;
+                }
+              } else if (model !== models[models.length - 1]) continue;
+            } else {
+              await aiRes.text();
+              if (model !== models[models.length - 1]) continue;
+            }
+          } catch (e) {
+            clearTimeout(aiTimeout);
+            if (e instanceof DOMException && e.name === "AbortError") {
+              console.warn(`[zoom-out] AI ${model} timed out`);
+              if (model !== models[models.length - 1]) continue;
+            } else {
+              throw e;
             }
           }
-        } else {
-          await aiRes.text();
         }
       }
     } catch (e) {
