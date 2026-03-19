@@ -6,5 +6,5 @@ import { listenForSwUpdate } from "./lib/sw-update";
 
 createRoot(document.getElementById("root")!).render(<App />);
 
-// Auto-reload when a new service worker version activates
+// Show "Update available" banner when a new service worker is ready
 listenForSwUpdate();
