@@ -100,11 +100,6 @@ serve(async (req) => {
     }
 
     // --- Learning content is now handled entirely by the dedicated ground-nudge function ---
-    // No Perplexity search here — avoids duplicate paths and domain filter issues.
-    // holzen-reflect still generates fallback learning_title/body via AI for backward compat,
-    // but ground-nudge is the primary source of grounding content.
-    const learningSearchContent = "";
-    const learningCitations: string[] = [];
 
     // --- Adaptive tone logic ---
     const baseTone = TONE_INSTRUCTIONS[tone] || TONE_INSTRUCTIONS.stoic;
