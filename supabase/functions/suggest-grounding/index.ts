@@ -119,6 +119,7 @@ Rules:
 - Include a gentle reason WHY this activity fits right now
 - Suggest a duration that feels right (5, 10, or 15 minutes)
 - Share a genuinely interesting insight, fun fact, or recent discovery about the activity (something the user probably doesn't know — a scientific finding, a technique, a cultural perspective)
+- ACCURACY: The insight MUST be a well-known, verifiable fact. Do NOT invent researcher names, study dates, or statistics. If unsure, share a cultural or historical perspective instead.
 - No exclamation marks, no motivational language, no trading advice
 - Sound like a quiet friend, not a coach`;
 
