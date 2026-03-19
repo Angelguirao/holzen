@@ -52,6 +52,22 @@ serve(async (req) => {
     ];
     const randomBias = BIAS_TOPICS[Math.floor(Math.random() * BIAS_TOPICS.length)];
 
+    // Step 1: Perplexity search for behavioral finance research
+    const marketContext = context || "Bitcoin market volatility";
+    const searchQuery = `Find a specific academic study or research paper about ${randomBias}. The research should be relevant to: ${marketContext}. Include the researcher names, university, year of publication, sample size or key methodology detail, and the main finding. Prefer peer-reviewed journals.`;
+
+    const perplexityBody: any = {
+      model: "sonar",
+      messages: [
+        {
+          role: "system",
+          content: "You are a behavioral finance research assistant. Search for real, specific academic research papers and credible findings. Return ONE specific study with exact researcher names, publication year, journal name, and quantitative findings. Do NOT return generic overviews — find a specific paper. Prefer lesser-known but fascinating studies over the most commonly cited ones (e.g. avoid just repeating Kahneman & Tversky prospect theory unless highly specific).",
+        },
+        { role: "user", content: searchQuery },
+      ],
+      search_mode: "academic",
+    };
+
     const searchResponse = await fetch("https://api.perplexity.ai/chat/completions", {
       method: "POST",
       headers: {
