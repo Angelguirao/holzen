@@ -393,9 +393,10 @@ serve(async (req) => {
       if (insertedReflection?.id) {
         const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
         const anonKey = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
+        const svcKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
         const companionHeaders = {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${anonKey}`,
+          "Authorization": `Bearer ${svcKey}`,
           "apikey": anonKey,
         };
 
@@ -437,9 +438,9 @@ serve(async (req) => {
           // Zoom Out companion
           fetch(`${supabaseUrl}/functions/v1/zoom-out-companion`, {
             method: "POST", headers: companionHeaders,
-            body: JSON.stringify({ context: ctx, reflectionMessage: result.message, language: companionLang }),
+            body: JSON.stringify({ context: ctx, reflectionMessage: result.message, language: companionLang, userId: profile.user_id }),
           }).then(async (res) => {
-            if (!res.ok) { await res.text(); return; }
+            if (!res.ok) { const t = await res.text(); console.error("[CHECK-VOLATILITY] zoom-out failed:", res.status, t); return; }
             const data = await res.json();
             if (data && !data.error) {
               await supabase.from("reflections").update({ zoom_out_data: data }).eq("id", reflectionId);
@@ -448,9 +449,9 @@ serve(async (req) => {
           // Historical Insight companion
           fetch(`${supabaseUrl}/functions/v1/historical-insight`, {
             method: "POST", headers: companionHeaders,
-            body: JSON.stringify({ context: ctx, language: companionLang }),
+            body: JSON.stringify({ context: ctx, language: companionLang, userId: profile.user_id }),
           }).then(async (res) => {
-            if (!res.ok) { await res.text(); return; }
+            if (!res.ok) { const t = await res.text(); console.error("[CHECK-VOLATILITY] historical-insight failed:", res.status, t); return; }
             const data = await res.json();
             if (data && !data.error) {
               await supabase.from("reflections").update({ history_insight_data: data }).eq("id", reflectionId);
