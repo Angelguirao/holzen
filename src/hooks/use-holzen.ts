@@ -485,6 +485,8 @@ export function useHolzen() {
           haiku: companionData.haiku,
           learning_title: companionData.learningTitle,
           learning_body: companionData.learningBody,
+          learning_citation: fnData?.learning_citation ?? null,
+          learning_url: fnData?.learning_url ?? null,
           ...(mood ? { mood } : {}),
         }).select('id').single();
 
