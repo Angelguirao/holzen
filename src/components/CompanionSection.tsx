@@ -318,7 +318,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
   useEffect(() => {
     if (!prefs.learning || !reflectionId) return;
     const key = reflectionId;
-    if (nudgeFetchedRef.current === key) return;
+    if (nudgeFetchedRef.current === key && nudgeRetry === 0) return;
     nudgeFetchedRef.current = key;
 
     let cancelled = false;
