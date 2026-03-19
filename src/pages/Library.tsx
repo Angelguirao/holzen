@@ -25,6 +25,7 @@ const SOURCE_CHIPS: { key: string; emoji: string; label: string }[] = [
 
 
 type Tab = 'all' | 'favorites' | 'collections';
+type SortMode = 'newest' | 'oldest' | 'alphabetical';
 
 export default function Library() {
   const { t } = useTranslation();
@@ -34,6 +35,8 @@ export default function Library() {
   const [search, setSearch] = useState('');
   const [sourceFilter, setSourceFilter] = useState<string | null>('reflection');
   const [tagFilter, setTagFilter] = useState<string | null>(null);
+  const [sortMode, setSortMode] = useState<SortMode>('newest');
+  const [smartFilter, setSmartFilter] = useState<{ name: string; itemIds: Set<string> } | null>(null);
 
   const { items, collections } = library;
 
