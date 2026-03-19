@@ -192,15 +192,11 @@ serve(async (req) => {
     const langName = LANG_NAMES[langCode] || "English";
     const langInstruction = langCode !== "en" ? `CRITICAL LANGUAGE REQUIREMENT: You MUST write ALL output — message, haiku, learning_title, and learning_body — in ${langName}. Every single field must be in ${langName}. Do NOT use English for any generated text. This is non-negotiable.\n\n` : "";
 
-    const systemPrompt = `${langInstruction}You generate a reflection with optional companions in response to Bitcoin volatility.
+    const systemPrompt = `${langInstruction}You generate a reflection with a haiku in response to Bitcoin volatility.
 
 You MUST respond with a JSON object containing these keys:
 - "message": The core reflection message (1-3 sentences)${langCode !== "en" ? ` in ${langName}` : ""}
 - "haiku": A haiku (3 lines separated by newlines, 5-7-5 syllables)${langCode !== "en" ? ` in ${langName}` : ""}
-- "learning_title": Short factual headline about a psychological principle or cognitive bias (5-10 words)${langCode !== "en" ? ` in ${langName}` : ""}
-- "learning_body": 1-2 sentences about a behavioral finance principle, cognitive bias, or decision psychology research finding relevant to the emotional moment${langCode !== "en" ? ` in ${langName}` : ""}
-- "learning_citation": Source name (e.g. "Kahneman & Tversky, 1979" or "Glassnode Research")
-- "learning_url": A URL from the citation list if available, or "" if none
 
 Tone: ${baseTone}
 THEMATIC ANGLE FOR THIS SESSION: ${thematicFraming}
