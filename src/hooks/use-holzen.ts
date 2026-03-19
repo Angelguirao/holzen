@@ -420,16 +420,17 @@ export function useHolzen() {
     setLoading(true);
     setError(null);
 
-    // Fetch recent mood history + haikus + signal sources + learning sources for adaptive tone & dedup
+    // Fetch recent mood history + haikus + messages + signal sources + learning sources for adaptive tone & dedup
     let moodHistory: { mood: string; outcome: string | null; created_at: string }[] = [];
     let recentHaikus: string[] = [];
+    let recentMessages: string[] = [];
     let recentSignalSources: string[] = [];
     let learningSources: { name: string; url?: string }[] = [];
     try {
       const [{ data: recentReflections }, { data: catalogSources }, { data: userPrefs }] = await Promise.all([
         supabase
           .from('reflections')
-          .select('mood, outcome, created_at, haiku, signal_source')
+          .select('mood, outcome, created_at, haiku, signal_source, message')
           .eq('user_id', user.id)
           .order('created_at', { ascending: false })
           .limit(20),
@@ -442,6 +443,10 @@ export function useHolzen() {
       recentHaikus = (recentReflections ?? [])
         .filter((r: any) => r.haiku)
         .map((r: any) => r.haiku as string)
+        .slice(0, 5);
+      recentMessages = (recentReflections ?? [])
+        .filter((r: any) => r.message)
+        .map((r: any) => r.message as string)
         .slice(0, 5);
       recentSignalSources = (recentReflections ?? [])
         .filter((r: any) => r.signal_source)
