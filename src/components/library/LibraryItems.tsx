@@ -298,6 +298,8 @@ export function LibraryItems({ library, filtered }: Props) {
         getItemCollections={getItemCollections}
         onAddToCollection={addToCollection}
         onRemoveFromCollection={removeFromCollection}
+        isIncomplete={currentSelectedItem ? isReflectionIncomplete(currentSelectedItem) : false}
+        onOutcomeRecorded={refetch}
       />
     </>
   );
