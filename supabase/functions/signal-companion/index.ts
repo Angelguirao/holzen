@@ -49,7 +49,7 @@ serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-    const { context, language, sources, recentSignalSources } = body;
+    const { context, language, sources, recentSignalSources, recentSignalTitles } = body;
     log("parsed body");
 
     // Verify JWT and track AI usage
