@@ -418,7 +418,7 @@ const Home = () => {
             <div className="space-y-4">
               <BtcStatus data={btcData} error={error} hidden={priceHidden} onToggleHidden={togglePriceHidden} currency={currency} btcMode={btcMode} onToggleBtcMode={toggleBtcMode} />
               <HolzenNumber variant="compact" />
-              <AutoCooldownIndicator cooldownRemaining={autoCooldownRemaining} cooldownHours={cooldownHours} />
+              <AutoCooldownIndicator cooldownRemaining={autoCooldownRemaining} cooldownHours={cooldownHours} nextCronCheckIn={nextCronCheckIn} />
             </div>
           </HomeWidget>
         );
