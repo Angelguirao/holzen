@@ -598,7 +598,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
       });
 
     return () => { cancelled = true; };
-  }, [prefs.history, reflectionId, context]);
+  }, [prefs.history, reflectionId, context, historyRetry]);
 
   const markCompleted = useCallback(async (key: keyof CompletionState) => {
     if (completion[key]) return;
