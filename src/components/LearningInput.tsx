@@ -15,9 +15,10 @@ interface Props {
   nudge?: NudgeData | null;
   nudgeLoading?: boolean;
   nudgeError?: boolean;
+  onRetry?: () => void;
 }
 
-export function LearningInput({ title, body, nudge, nudgeLoading = false, nudgeError = false }: Props) {
+export function LearningInput({ title, body, nudge, nudgeLoading = false, nudgeError = false, onRetry }: Props) {
   const { t } = useTranslation();
   const hasNudgeSystem = nudge !== undefined || nudgeLoading || nudgeError;
   const displayTitle = nudge?.title ?? (!hasNudgeSystem || nudgeError ? title : '');
