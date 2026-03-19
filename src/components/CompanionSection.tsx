@@ -708,6 +708,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             if (!completion.zoomOut) markCompleted('zoomOut');
           }}
           completed={completion.zoomOut}
+          loading={zoomOutLoading}
           isFavorite={isPro ? favorites['zoom_out'] : undefined}
           onToggleFavorite={isPro ? () => toggleCompanionFavorite('zoom_out') : undefined}
         >
@@ -730,6 +731,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             if (!completion.history) markCompleted('history');
           }}
           completed={completion.history}
+          loading={historyLoading}
           isFavorite={isPro ? favorites['history_insight'] : undefined}
           onToggleFavorite={isPro ? () => toggleCompanionFavorite('history_insight') : undefined}
         >
