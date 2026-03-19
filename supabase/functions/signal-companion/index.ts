@@ -40,7 +40,7 @@ serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-    const { context, language, sources } = body;
+    const { context, language, sources, recentSignalSources } = body;
     log("parsed body");
 
     // Track AI usage — fire-and-forget (no await)
@@ -66,7 +66,7 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    // Build source name list for context (NOT domain filter — that over-constrains results)
+    // Build source name list for context — used as diversity hints
     const sourceNames: string[] = [];
     if (sources && Array.isArray(sources) && sources.length > 0) {
       for (const s of sources) {
@@ -74,31 +74,38 @@ serve(async (req) => {
       }
     }
 
+    // Build exclusion hint from recently used sources to enforce diversity
+    const recentExclusion = (recentSignalSources && Array.isArray(recentSignalSources) && recentSignalSources.length > 0)
+      ? ` Do NOT use insights from: ${recentSignalSources.slice(0, 5).join(", ")}. Pick a DIFFERENT source.`
+      : "";
+
     const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
     const langCode = language || "en";
     const langName = LANG_NAMES[langCode] || "English";
 
-    // Step 1: Perplexity search — use source names as context hints, not domain filters
+    // Step 1: Perplexity search — rotate source hints, exclude recent
     const sourceHint = sourceNames.length > 0
-      ? ` Prefer insights from: ${sourceNames.slice(0, 8).join(", ")}.`
+      ? ` Look for insights from sources like: ${sourceNames.sort(() => Math.random() - 0.5).slice(0, 5).join(", ")}.`
       : "";
 
     const searchQuery = context
-      ? `Current Bitcoin market analysis: ${context}. Find one high-signal insight from a reputable Bitcoin analyst, researcher, or data source.${sourceHint}`
-      : `Latest high-signal Bitcoin market analysis or insight from reputable analysts or researchers.${sourceHint}`;
+      ? `Current Bitcoin market: ${context}. Find one specific, data-driven insight from a Bitcoin analyst, newsletter, podcast summary, or on-chain researcher.${sourceHint}${recentExclusion}`
+      : `Latest Bitcoin market analysis with specific data points from analysts, newsletters, or researchers.${sourceHint}${recentExclusion}`;
 
     const perplexityBody: any = {
       model: "sonar",
       messages: [
         {
           role: "system",
-          content: "You are a Bitcoin market research assistant. Find one specific, high-signal piece of Bitcoin analysis or insight. Use diverse sources — do NOT default to the same source every time. Rotate between analysts, blogs, newsletters, dashboards, and podcasts. Focus on real, verifiable information with working URLs.",
+          content: `You are a Bitcoin market research assistant. Find one specific, data-driven insight with real numbers and dates. CRITICAL DIVERSITY RULES:
+- Use a DIFFERENT source every time — rotate between analysts, blogs, newsletters, dashboards, podcasts, and YouTube channels
+- Do NOT default to Glassnode or any single source
+- Prefer recent analysis (last 7 days) from named analysts or publications
+- Include the exact source name and a working URL to the specific article/page${recentExclusion}`,
         },
         { role: "user", content: searchQuery },
       ],
       search_recency_filter: "week",
-      // NOTE: Deliberately NOT using search_domain_filter — it over-constrains 
-      // results and causes Perplexity to always return the same source (e.g. Glassnode)
     };
 
     log("calling perplexity");
@@ -154,11 +161,13 @@ serve(async (req) => {
       throw new Error("No search content returned");
     }
 
-    // Step 2: Use Lovable AI to structure the result with fallback model retry
-    const langInstruction = langCode !== "en" ? `Write in ${langName}. Keep source name/URL as-is.\n` : "";
+    // Step 2: Use Lovable AI to structure the result
+    const langInstruction = langCode !== "en" ? `Write title and body in ${langName}. Keep source name/URL as-is.\n` : "";
 
-    // Build a numbered citation list for the AI
-    const citationList = citations.map((c: string, i: number) => `[${i + 1}] ${c}`).join("\n");
+    // Build a numbered citation list for the AI to pick from
+    const citationList = citations.length > 0
+      ? citations.map((c: string, i: number) => `[${i + 1}] ${c}`).join("\n")
+      : "(No citations available — leave url empty)";
 
     log("calling AI structuring");
 
@@ -166,16 +175,22 @@ serve(async (req) => {
       messages: [
         {
           role: "system",
-          content: `${langInstruction}Extract ONE signal from the search results as JSON: {"title":"5-12 word headline","body":"2-3 sentences, calm tone","source":"source name","url":"full citation URL from the list below"}.
-CRITICAL URL RULES:
-- You MUST pick a "url" value from the citation URLs listed below. Copy it EXACTLY.
-- If no citation URL matches, use the FIRST citation URL.
-- The URL must start with "https://" — never use partial URLs like "glassnode.com" or "N/A".
-- Do NOT invent or fabricate URLs.`,
+          content: `${langInstruction}Extract ONE market signal from the search results below. Return JSON: {"title":"5-12 word headline","body":"2-3 sentences with specific data points","source":"exact source/analyst name","url":"citation URL"}
+
+URL RULES (CRITICAL):
+- You MUST select a url from the citation list below. Copy it character-for-character.
+- If none match, use the FIRST citation URL.
+- If no citations exist, set url to "".
+- NEVER fabricate or shorten URLs. NEVER return partial domains like "glassnode.com".
+
+CONTENT RULES:
+- Include specific numbers: percentages, dates, prices, metrics
+- The body must contain verifiable claims from the search results
+- Do NOT invent data points not present in the search results`,
         },
         {
           role: "user",
-          content: `Search results:\n${searchContent}\n\nAvailable citation URLs (pick one):\n${citationList}`,
+          content: `Search results:\n${searchContent}\n\nCitation URLs (pick one EXACTLY):\n${citationList}`,
         },
       ],
       response_format: { type: "json_object" },
@@ -253,21 +268,21 @@ CRITICAL URL RULES:
       throw new Error("AI structuring failed after all retries");
     }
 
-    // POST-PROCESSING: Validate and fix the URL
-    // 1. If the AI returned a valid URL from citations, keep it
-    // 2. If not, find the best citation URL
-    // 3. Normalize all URLs to start with https://
-    if (!isValidUrl(signal.url) || !signal.url.startsWith("http")) {
-      // Try to find a matching citation
-      const bestCitation = citations.find((c) => isValidUrl(c)) || "";
-      signal.url = bestCitation ? normalizeUrl(bestCitation) : "";
+    // POST-PROCESSING: Force URL to be from citations
+    // Check if AI URL matches any citation exactly
+    const aiUrl = signal.url || "";
+    const exactMatch = citations.find((c) => c === aiUrl);
+    if (exactMatch) {
+      signal.url = exactMatch;
     } else {
-      signal.url = normalizeUrl(signal.url);
+      // AI didn't use an exact citation — find best match or use first
+      const partialMatch = citations.find((c) => aiUrl && c.includes(new URL(normalizeUrl(aiUrl)).hostname));
+      signal.url = partialMatch || (citations.length > 0 ? citations[0] : "");
     }
 
-    // Final fallback: if still no valid URL, use first citation
-    if (!isValidUrl(signal.url) && citations.length > 0) {
-      signal.url = normalizeUrl(citations[0]);
+    // Ensure URL is normalized
+    if (signal.url && !signal.url.startsWith("http")) {
+      signal.url = normalizeUrl(signal.url);
     }
 
     log(`done, signal: ${signal.title}, source: ${signal.source}, url: ${signal.url}`);
