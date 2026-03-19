@@ -58,8 +58,15 @@ export function ZoomOutDisplay({ data, loading, error }: Props) {
 
   const { onThisDay, currentPrice, echo, deepTime } = data;
 
+  const isEmpty = (!currentPrice || onThisDay.length === 0) && !deepTime && !echo;
+
   return (
     <div className="space-y-4">
+      {isEmpty && (
+        <p className="text-xs text-muted-foreground/50 font-mono italic leading-relaxed">
+          Not enough data to zoom out today. Keep reflecting — perspective builds over time.
+        </p>
+      )}
       {/* On this day - price timeline */}
       {currentPrice && onThisDay.length > 0 && (
         <div className="space-y-2">
