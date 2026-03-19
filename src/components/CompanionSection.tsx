@@ -482,20 +482,19 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
     setZoomOutLoading(true);
     setZoomOutError(false);
 
-    // Check if already persisted
-    supabase
-      .from('reflections')
-      .select('zoom_out_data')
-      .eq('id', reflectionId)
-      .single()
-      .then(({ data: row }) => {
-        if (cancelled) return;
-        if ((row as any)?.zoom_out_data) {
-          setZoomOut((row as any).zoom_out_data);
-          setZoomOutLoading(false);
-          autoSaveToLibrary({ title: 'Zoom Out', body: JSON.stringify((row as any).zoom_out_data), sourceType: 'zoom_out' });
-          return;
-        }
+    // Poll for pre-generated data, then fall back to live call
+    pollForCachedData(
+      reflectionId,
+      'zoom_out_data',
+      (row) => !!(row as any)?.zoom_out_data,
+    ).then((row) => {
+      if (cancelled) return;
+      if ((row as any)?.zoom_out_data) {
+        setZoomOut((row as any).zoom_out_data);
+        setZoomOutLoading(false);
+        autoSaveToLibrary({ title: 'Zoom Out', body: JSON.stringify((row as any).zoom_out_data), sourceType: 'zoom_out' });
+        return;
+      }
 
         supabase.functions
           .invoke('zoom-out-companion', { body: { context: context ?? '', reflectionMessage: reflectionMessage ?? '', language } })
