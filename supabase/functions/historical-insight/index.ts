@@ -11,29 +11,40 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
 
   try {
-    // Auth check
+    // Auth check — support both user JWT and service role key
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
+
     const { createClient } = await import("npm:@supabase/supabase-js@2.57.2");
-    const sbClient = createClient(Deno.env.get("SUPABASE_URL") ?? "", Deno.env.get("SUPABASE_ANON_KEY") ?? "", { global: { headers: { Authorization: authHeader } } });
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
     const token = authHeader.replace("Bearer ", "");
-    const { data: claimsData, error: claimsError } = await sbClient.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+
+    let resolvedUserId: string | null = null;
+    if (token === serviceRoleKey) {
+      // Called server-to-server; userId must be in the body
+    } else {
+      const sbClient = createClient(Deno.env.get("SUPABASE_URL") ?? "", Deno.env.get("SUPABASE_ANON_KEY") ?? "", { global: { headers: { Authorization: authHeader } } });
+      const { data: claimsData, error: claimsError } = await sbClient.auth.getClaims(token);
+      if (claimsError || !claimsData?.claims) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      resolvedUserId = claimsData.claims.sub as string;
     }
 
-    // Track AI usage
-    const userId = claimsData.claims.sub as string;
-    const svcClient = (await import("npm:@supabase/supabase-js@2.57.2")).createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-      { auth: { persistSession: false } }
-    );
-    try { await svcClient.from("analytics_events").insert({ user_id: userId, event: "historical_insight_ai_call" }); } catch (_) { /* non-fatal */ }
+    const { context, language, userId: bodyUserId } = await req.json();
+    const effectiveUserId = resolvedUserId || bodyUserId;
 
-    const { context, language } = await req.json();
+    // Track AI usage
+    if (effectiveUserId) {
+      const svcClient = createClient(
+        Deno.env.get("SUPABASE_URL") ?? "",
+        serviceRoleKey,
+        { auth: { persistSession: false } }
+      );
+      try { await svcClient.from("analytics_events").insert({ user_id: effectiveUserId, event: "historical_insight_ai_call" }); } catch (_) { /* non-fatal */ }
+    }
 
     const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
     if (!PERPLEXITY_API_KEY) throw new Error("PERPLEXITY_API_KEY is not configured");
