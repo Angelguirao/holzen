@@ -542,20 +542,19 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
     setHistoryLoading(true);
     setHistoryError(false);
 
-    // Check if already persisted
-    supabase
-      .from('reflections')
-      .select('history_insight_data')
-      .eq('id', reflectionId)
-      .single()
-      .then(({ data: row }) => {
-        if (cancelled) return;
-        if ((row as any)?.history_insight_data) {
-          const cachedHistory = (row as any).history_insight_data as HistoricalInsightData;
-          setHistoryInsight(cachedHistory);
-          setHistoryLoading(false);
-          autoSaveToLibrary({ title: cachedHistory.title, body: cachedHistory.btcInsight, sourceType: 'history_insight' });
-          return;
+    // Poll for pre-generated data, then fall back to live call
+    pollForCachedData(
+      reflectionId,
+      'history_insight_data',
+      (row) => !!(row as any)?.history_insight_data,
+    ).then((row) => {
+      if (cancelled) return;
+      if ((row as any)?.history_insight_data) {
+        const cachedHistory = (row as any).history_insight_data as HistoricalInsightData;
+        setHistoryInsight(cachedHistory);
+        setHistoryLoading(false);
+        autoSaveToLibrary({ title: cachedHistory.title, body: cachedHistory.btcInsight, sourceType: 'history_insight' });
+        return;
         }
 
         supabase.functions
