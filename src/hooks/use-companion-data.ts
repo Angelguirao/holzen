@@ -346,6 +346,13 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
                 localStorage.setItem('holzen_recent_signal_sources', JSON.stringify(updated));
               } catch { /* ignore */ }
             }
+            if (signalData.title) {
+              try {
+                const recentTitles = JSON.parse(localStorage.getItem('holzen_recent_signal_titles') || '[]');
+                const updatedTitles = [signalData.title, ...recentTitles].slice(0, 5);
+                localStorage.setItem('holzen_recent_signal_titles', JSON.stringify(updatedTitles));
+              } catch { /* ignore */ }
+            }
 
             supabase
               .from('reflections')
