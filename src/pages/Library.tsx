@@ -55,7 +55,7 @@ export default function Library() {
       .map(([tag]) => tag);
   }, [items]);
 
-  const hasActiveFilters = !!sourceFilter || !!statusFilter || !!tagFilter;
+  const hasActiveFilters = !!sourceFilter || !!tagFilter;
 
   // Filtering
   const filtered = useMemo(() => {
