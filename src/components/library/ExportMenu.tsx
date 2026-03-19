@@ -8,6 +8,7 @@ import { useState } from 'react';
 
 interface Props {
   items: LibraryItem[];
+  label?: string;
 }
 
 export function ExportMenu({ items }: Props) {
