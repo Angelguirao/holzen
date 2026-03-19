@@ -243,9 +243,17 @@ const Home = () => {
     navigate('/ground', { state: { preGenerated: groundSuggestion } });
   }, [navigate, groundSuggestion]);
 
+  const lastToneMsgRef = useRef<string | null>(null);
   useEffect(() => {
     if (newReflection && message) {
-      playNotificationTone();
+      // Only play tone once per unique message to prevent double-play
+      if (message !== lastToneMsgRef.current) {
+        lastToneMsgRef.current = message;
+        const soundEnabled = localStorage.getItem('holzen_sound_enabled') !== 'false';
+        if (soundEnabled) {
+          playNotificationTone();
+        }
+      }
       clearNewReflection();
     }
   }, [newReflection, message, clearNewReflection]);
