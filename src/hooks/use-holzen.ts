@@ -282,23 +282,35 @@ export function useHolzen() {
       } catch { return []; }
     };
 
-    // Signal companion
+    // Signal companion — pass recentSignalSources for diversity
     fetchSources('signal').then(sources => {
-      invokeWithRetry('signal-companion', {
-        context: ctx, language: lang, sources: sources.length > 0 ? sources : undefined,
-      }).then(({ data, error }) => {
-        if (error || !data || data.error) { console.warn('[signal-companion] failed after retry:', error?.message ?? data?.error ?? 'no data'); return; }
-        supabase.from('reflections').update({
-          signal_title: data.title,
-          signal_body: data.body,
-          signal_source: data.source,
-          signal_url: data.url,
-        } as any).eq('id', reflectionId).then(({ error }) => { if (error) console.error('[signal] reflection update failed:', error.message); });
-        supabase.from('library_items').insert({
-          user_id: userId, type: 'bookmark', title: data.title, body: data.body,
-          source_type: 'signal', source_url: data.url, reflection_id: reflectionId, tags: [],
-        }).then(({ error }) => { if (error) console.error('[signal] library insert failed:', error.message); });
-      });
+      // Fetch recent signal sources to exclude for diversity
+      supabase.from('reflections')
+        .select('signal_source')
+        .eq('user_id', userId)
+        .not('signal_source', 'is', null)
+        .order('created_at', { ascending: false })
+        .limit(5)
+        .then(({ data: recentSigs }) => {
+          const recentSignalSources = (recentSigs ?? []).map((r: any) => r.signal_source).filter(Boolean);
+          invokeWithRetry('signal-companion', {
+            context: ctx, language: lang,
+            sources: sources.length > 0 ? sources : undefined,
+            recentSignalSources: recentSignalSources.length > 0 ? recentSignalSources : undefined,
+          }).then(({ data, error }) => {
+            if (error || !data || data.error) { console.warn('[signal-companion] failed after retry:', error?.message ?? data?.error ?? 'no data'); return; }
+            supabase.from('reflections').update({
+              signal_title: data.title,
+              signal_body: data.body,
+              signal_source: data.source,
+              signal_url: data.url,
+            } as any).eq('id', reflectionId).then(({ error }) => { if (error) console.error('[signal] reflection update failed:', error.message); });
+            supabase.from('library_items').insert({
+              user_id: userId, type: 'bookmark', title: data.title, body: data.body,
+              source_type: 'signal', source_url: data.url, reflection_id: reflectionId, tags: [],
+            }).then(({ error }) => { if (error) console.error('[signal] library insert failed:', error.message); });
+          });
+        });
     });
 
     // Zoom Out companion
@@ -408,18 +420,28 @@ export function useHolzen() {
     setLoading(true);
     setError(null);
 
-    // Fetch recent mood history for adaptive tone
+    // Fetch recent mood history + haikus + signal sources for adaptive tone & dedup
     let moodHistory: { mood: string; outcome: string | null; created_at: string }[] = [];
+    let recentHaikus: string[] = [];
+    let recentSignalSources: string[] = [];
     try {
-      const { data: recentMoods } = await supabase
+      const { data: recentReflections } = await supabase
         .from('reflections')
-        .select('mood, outcome, created_at')
+        .select('mood, outcome, created_at, haiku, signal_source')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(20);
-      moodHistory = (recentMoods ?? [])
+      moodHistory = (recentReflections ?? [])
         .filter((r: any) => r.mood)
         .map((r: any) => ({ mood: r.mood, outcome: r.outcome, created_at: r.created_at }));
+      recentHaikus = (recentReflections ?? [])
+        .filter((r: any) => r.haiku)
+        .map((r: any) => r.haiku as string)
+        .slice(0, 5);
+      recentSignalSources = (recentReflections ?? [])
+        .filter((r: any) => r.signal_source)
+        .map((r: any) => r.signal_source as string)
+        .slice(0, 5);
     } catch { /* non-critical */ }
 
     try {
@@ -436,6 +458,7 @@ export function useHolzen() {
           groundingActivities: groundingActivities.length > 0 ? groundingActivities : undefined,
           currency,
           language,
+          recentHaikus,
         },
       });
 
@@ -462,6 +485,8 @@ export function useHolzen() {
           haiku: companionData.haiku,
           learning_title: companionData.learningTitle,
           learning_body: companionData.learningBody,
+          learning_citation: fnData?.learning_citation ?? null,
+          learning_url: fnData?.learning_url ?? null,
           ...(mood ? { mood } : {}),
         }).select('id').single();
 
