@@ -791,6 +791,7 @@ export function useHolzen() {
     manualTrigger,
     manualCooldownRemaining,
     autoCooldownRemaining,
+    nextCronCheckIn,
     profileLoaded,
     refreshProfile,
   };
