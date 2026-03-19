@@ -54,6 +54,7 @@ serve(async (req) => {
     const cachedMap = new Map((cached || []).map((r: any) => [r.date, r.price]));
     const missingTargets = yearTargets.filter(t => !cachedMap.has(t.dateKey));
 
+    let rateLimited = false;
     console.log(`[zoom-out] cache hit: ${cachedMap.size}/${yearTargets.length}, fetching ${missingTargets.length} from CoinGecko`);
 
     // Fetch only missing prices from CoinGecko (with conservative rate limiting)
