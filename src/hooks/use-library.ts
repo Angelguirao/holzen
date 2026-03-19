@@ -201,7 +201,11 @@ export function useLibrary() {
           .eq('user_id', user.id)
           .order('pinned', { ascending: false })
           .order('created_at', { ascending: false });
-        if (refreshed) setItems(refreshed as unknown as LibraryItem[]);
+        if (refreshed) {
+          const updated = refreshed as unknown as LibraryItem[];
+          setItems(updated);
+          writeCache(CACHE_KEY_ITEMS, updated);
+        }
       }
     }
   }, [user]);
