@@ -1,4 +1,5 @@
 import { useAuth } from '@/hooks/use-auth';
+import { QuietWindowsManager } from '@/components/QuietWindowsManager';
 import { SourceManagement } from '@/components/SourceManagement';
 import { ProLock } from '@/components/ProLock';
 import { isHapticEnabled, setHapticEnabled } from '@/lib/haptics';
@@ -834,6 +835,9 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                     </div>
                   </div>
                 )}
+
+                {/* Extended Quiet Windows */}
+                <QuietWindowsManager userId={user?.id} />
               </div>
             </div>
             </ProLock>
