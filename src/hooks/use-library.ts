@@ -93,6 +93,7 @@ export function useLibrary() {
       // Build read flags map and incomplete set
       const flags: Record<string, ReflectionReadFlags> = {};
       const incomplete = new Set<string>();
+      const outcomes: Record<string, string> = {};
       for (const r of allReflections as any[]) {
         flags[r.id] = {
           haiku_read: !!r.haiku_read,
@@ -102,9 +103,11 @@ export function useLibrary() {
           history_read: !!r.history_read,
         };
         if (!r.outcome) incomplete.add(r.id);
+        if (r.outcome) outcomes[r.id] = r.outcome;
       }
       setReadFlagsMap(flags);
       setIncompleteReflections(incomplete);
+      setReflectionOutcomes(outcomes);
 
       const inserts: any[] = [];
       for (const r of allReflections as any[]) {
