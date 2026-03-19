@@ -183,7 +183,25 @@ Rules:
       signal: aiController.signal,
     });
 
-    const response = await aiPromise;
+    let response: Response;
+    try {
+      response = await aiPromise;
+    } catch (e) {
+      clearTimeout(aiTimeout);
+      if (e instanceof DOMException && e.name === "AbortError") {
+        // Timeout — return fallback
+        const fallbackActivity = groundingActivities[Math.floor(Math.random() * groundingActivities.length)];
+        return new Response(JSON.stringify({
+          activity: fallbackActivity,
+          suggestion: `Take a moment with ${fallbackActivity}. Sometimes the simplest thing is the most grounding.`,
+          duration: 10,
+          insight: null,
+          article: null,
+        }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      throw e;
+    }
+    clearTimeout(aiTimeout);
 
     if (!response.ok) {
       if (response.status === 429) {
