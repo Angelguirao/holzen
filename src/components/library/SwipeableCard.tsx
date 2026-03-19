@@ -13,6 +13,7 @@ interface Props {
 }
 
 const THRESHOLD = 80;
+const HAPTIC_TRIGGERED = { left: false, right: false };
 
 export function SwipeableCard({
   children,
