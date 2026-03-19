@@ -660,6 +660,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             if (!completion.learning) markCompleted('learning');
           }}
           completed={completion.learning}
+          loading={nudgeLoading}
           isFavorite={isPro ? favorites['learning'] : undefined}
           onToggleFavorite={isPro ? () => toggleCompanionFavorite('learning') : undefined}
         >
@@ -684,6 +685,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             if (!completion.signal) markCompleted('signal');
           }}
           completed={completion.signal}
+          loading={signalLoading}
           isFavorite={isPro ? favorites['signal'] : undefined}
           onToggleFavorite={isPro ? () => toggleCompanionFavorite('signal') : undefined}
         >
