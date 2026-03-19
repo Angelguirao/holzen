@@ -271,6 +271,11 @@ You MUST respond with a JSON object containing "title" and "body" keys. No other
     }
 
     // --- 4. Build response ---
+    const isPartial = rateLimited || onThisDay.length < yearTargets.length;
+    if (isPartial) {
+      console.log(`[zoom-out] returning partial data: ${onThisDay.length}/${yearTargets.length} prices, rateLimited=${rateLimited}, currentPrice=${currentPrice ?? 'fallback'}`);
+    }
+
     const result = {
       onThisDay,
       currentPrice,
@@ -283,6 +288,7 @@ You MUST respond with a JSON object containing "title" and "body" keys. No other
           }
         : null,
       deepTime,
+      partial: isPartial,
     };
 
     return new Response(JSON.stringify(result), {
