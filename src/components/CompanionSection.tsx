@@ -484,7 +484,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
       });
 
     return () => { cancelled = true; };
-  }, [reflectionId, context]);
+  }, [reflectionId, context, signalRetry]);
 
   // Zoom Out companion state
   const [zoomOut, setZoomOut] = useState<import('./ZoomOutDisplay').ZoomOutData | null>(null);
