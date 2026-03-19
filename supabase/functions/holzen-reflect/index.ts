@@ -86,7 +86,7 @@ serve(async (req) => {
     );
     try { await svcClient.from("analytics_events").insert({ user_id: userId, event: "pause_ai_call" }); } catch (_) { /* tracking failure is non-fatal */ }
 
-    const { context, tone, customPrompt, style, moodHistory, severity, motivations, mantra, groundingActivities, currency, language, recentHaikus, learningSources } = await req.json();
+    const { context, tone, customPrompt, style, moodHistory, severity, motivations, mantra, groundingActivities, currency, language, recentHaikus } = await req.json();
     if (!context) {
       return new Response(JSON.stringify({ error: "Missing context" }), {
         status: 400,
@@ -100,11 +100,6 @@ serve(async (req) => {
     }
 
     // --- Learning content is now handled entirely by the dedicated ground-nudge function ---
-    // No Perplexity search here — avoids duplicate paths and domain filter issues.
-    // holzen-reflect still generates fallback learning_title/body via AI for backward compat,
-    // but ground-nudge is the primary source of grounding content.
-    const learningSearchContent = "";
-    const learningCitations: string[] = [];
 
     // --- Adaptive tone logic ---
     const baseTone = TONE_INSTRUCTIONS[tone] || TONE_INSTRUCTIONS.stoic;
@@ -177,30 +172,17 @@ serve(async (req) => {
       }
     }
 
-    // Build learning grounding section
-    let learningInstruction = "";
-    if (learningSearchContent) {
-      const citationRef = learningCitations.length > 0
-        ? `\nAvailable citation URLs for learning_url:\n${learningCitations.map((c: string, i: number) => `[${i + 1}] ${c}`).join("\n")}`
-        : "";
-      learningInstruction = `\n\nLEARNING GROUNDING: Use the following search results to write the learning_title and learning_body. Extract real facts, dates, and data points. Do NOT invent information.\nSearch results: ${learningSearchContent}${citationRef}`;
-    }
-
     const currencyCode = currency || "USD";
     const langCode = language || "en";
     const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
     const langName = LANG_NAMES[langCode] || "English";
-    const langInstruction = langCode !== "en" ? `CRITICAL LANGUAGE REQUIREMENT: You MUST write ALL output — message, haiku, learning_title, and learning_body — in ${langName}. Every single field must be in ${langName}. Do NOT use English for any generated text. This is non-negotiable.\n\n` : "";
+    const langInstruction = langCode !== "en" ? `CRITICAL LANGUAGE REQUIREMENT: You MUST write ALL output — message and haiku — in ${langName}. Every single field must be in ${langName}. Do NOT use English for any generated text. This is non-negotiable.\n\n` : "";
 
-    const systemPrompt = `${langInstruction}You generate a reflection with optional companions in response to Bitcoin volatility.
+    const systemPrompt = `${langInstruction}You generate a reflection with a haiku in response to Bitcoin volatility.
 
 You MUST respond with a JSON object containing these keys:
 - "message": The core reflection message (1-3 sentences)${langCode !== "en" ? ` in ${langName}` : ""}
 - "haiku": A haiku (3 lines separated by newlines, 5-7-5 syllables)${langCode !== "en" ? ` in ${langName}` : ""}
-- "learning_title": Short factual headline about a psychological principle or cognitive bias (5-10 words)${langCode !== "en" ? ` in ${langName}` : ""}
-- "learning_body": 1-2 sentences about a behavioral finance principle, cognitive bias, or decision psychology research finding relevant to the emotional moment${langCode !== "en" ? ` in ${langName}` : ""}
-- "learning_citation": Source name (e.g. "Kahneman & Tversky, 1979" or "Glassnode Research")
-- "learning_url": A URL from the citation list if available, or "" if none
 
 Tone: ${baseTone}
 THEMATIC ANGLE FOR THIS SESSION: ${thematicFraming}
@@ -229,12 +211,7 @@ Haiku rules:
 - Traditional 5-7-5 syllable structure.
 - Captures the essence of the moment. Match the chosen tone.
 - No trading advice or price predictions.
-- MUST be original and unique — never repeat common phrases like "red screens" or "breath moves".${haikuDedup}
-    ${learningInstruction || `
-Learning input rules:
-- Title: a short, factual headline about a psychological principle or cognitive bias (5-10 words).
-- Body: 1-2 sentences about a behavioral finance principle (loss aversion, anchoring, endowment effect, herd behavior, etc.), decision psychology research, or emotional regulation technique relevant to the current emotional context. Cite real researchers (Kahneman, Tversky, Thaler, Ariely, etc.) when possible. Do NOT write about Bitcoin price history, market patterns, or on-chain data — focus on the HUMAN psychology of the moment.
-- Citation: Name the researcher, paper, or book (e.g. "Kahneman & Tversky, 1979", "Richard Thaler, Nudge").`}`;
+- MUST be original and unique — never repeat common phrases like "red screens" or "breath moves".${haikuDedup}`;
 
     const aiBody = {
       messages: [
@@ -308,21 +285,9 @@ Learning input rules:
       throw new Error("AI generation failed after all retries");
     }
 
-    // Post-process learning URL — ensure it's from citations
-    let learningUrl = result.learning_url || "";
-    if (learningUrl && learningCitations.length > 0 && !learningCitations.includes(learningUrl)) {
-      learningUrl = learningCitations[0];
-    } else if (!learningUrl && learningCitations.length > 0) {
-      learningUrl = learningCitations[0];
-    }
-
     return new Response(JSON.stringify({
       message: result.message,
       haiku: result.haiku || null,
-      learning_title: result.learning_title || null,
-      learning_body: result.learning_body || null,
-      learning_citation: result.learning_citation || null,
-      learning_url: learningUrl || null,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

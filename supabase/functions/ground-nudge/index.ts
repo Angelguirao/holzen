@@ -19,13 +19,12 @@ serve(async (req) => {
     }
     const { createClient } = await import("npm:@supabase/supabase-js@2.57.2");
     const sbClient = createClient(Deno.env.get("SUPABASE_URL") ?? "", Deno.env.get("SUPABASE_ANON_KEY") ?? "", { global: { headers: { Authorization: authHeader } } });
-    const token = authHeader.replace("Bearer ", "");
-    const { data: claimsData, error: claimsError } = await sbClient.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims) {
+    const { data: { user }, error: authError } = await sbClient.auth.getUser();
+    if (authError || !user) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const { context, language, sources } = await req.json();
+    const { context, language } = await req.json();
 
     const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
     if (!PERPLEXITY_API_KEY) throw new Error("PERPLEXITY_API_KEY is not configured");
@@ -68,14 +67,30 @@ serve(async (req) => {
       search_mode: "academic",
     };
 
-    const searchResponse = await fetch("https://api.perplexity.ai/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${PERPLEXITY_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(perplexityBody),
-    });
+    const searchController = new AbortController();
+    const searchTimeout = setTimeout(() => searchController.abort(), 12000);
+    let searchResponse: Response;
+    try {
+      searchResponse = await fetch("https://api.perplexity.ai/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${PERPLEXITY_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(perplexityBody),
+        signal: searchController.signal,
+      });
+      clearTimeout(searchTimeout);
+    } catch (e) {
+      clearTimeout(searchTimeout);
+      if (e instanceof DOMException && e.name === "AbortError") {
+        return new Response(
+          JSON.stringify({ error: "Search timed out" }),
+          { status: 504, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      throw e;
+    }
 
     if (!searchResponse.ok) {
       const errText = await searchResponse.text();
