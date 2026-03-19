@@ -2,6 +2,7 @@ import { useMemo, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { LibraryItemCard } from './LibraryItemCard';
 import { ItemDetailViewer } from './ItemDetailViewer';
+import { SwipeableCard } from './SwipeableCard';
 import type { useLibrary } from '@/hooks/use-library';
 import type { LibraryItem } from '@/hooks/use-library';
 import { Trash2, Archive, Heart, X, CheckSquare } from 'lucide-react';
