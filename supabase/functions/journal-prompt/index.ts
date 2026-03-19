@@ -62,14 +62,17 @@ serve(async (req) => {
       ? `\n\nRecent journal prompts (DO NOT repeat these):\n${recentJournals.map((j: any) => `- ${j.prompt}`).join("\n")}`
       : "";
 
-    const systemPrompt = `You are a reflective journaling guide for Bitcoin holders who use a mindfulness app called Holzen. Your job is to generate 3 unique, thought-provoking journal prompts that help the user explore their emotional relationship with their investment decisions.
+    const langInstruction = langCode !== "en" ? `CRITICAL LANGUAGE REQUIREMENT: You MUST write ALL prompts in ${langName}. Do NOT use English.\n\n` : "";
+
+    const systemPrompt = `${langInstruction}You are a reflective journaling guide for Bitcoin holders who use a mindfulness app called Holzen. Your job is to generate 3 unique, thought-provoking journal prompts that help the user explore their emotional relationship with their investment decisions.
 
 Rules:
 - Each prompt should be 1 sentence, open-ended, and introspective
 - Draw from the user's recent reflections when available — reference patterns, moods, or decisions you notice
 - Vary the angle: one about emotions, one about patterns/behavior, one about future intention
 - Be warm but not patronizing. Speak like a wise friend, not a therapist
-- Respond in ${language === "en" ? "English" : language}
+- Do NOT reference specific prices, percentages, or trading terms unless they appear in the user's reflections
+- Do NOT fabricate patterns — if only 1-2 reflections exist, keep prompts more general
 
 Return a JSON object with key "prompts" containing an array of 3 strings.
 
