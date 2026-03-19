@@ -352,8 +352,8 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           const userId = authData?.user?.id;
           if (userId) {
             const [{ data: catalog }, { data: userPrefs }] = await Promise.all([
-              supabase.from('signal_sources').select('id, name, type, url, category').eq('category', 'learning'),
-              supabase.from('user_signal_preferences').select('source_id, custom_name, custom_url, custom_type, active, category').eq('user_id', userId).eq('category', 'learning'),
+              supabase.from('signal_sources').select('id, name, type, url, category').eq('category', 'grounding'),
+              supabase.from('user_signal_preferences').select('source_id, custom_name, custom_url, custom_type, active, category').eq('user_id', userId).eq('category', 'grounding'),
             ]);
             const prefsMap = new Map((userPrefs ?? []).map((p: any) => [p.source_id, p]));
             const catalogActive = (catalog ?? []).filter((s: any) => {

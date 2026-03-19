@@ -252,7 +252,7 @@
     "companionLabels": {
       "breathing": "Breathing exercise",
       "haiku": "Haiku",
-      "learning": "Learning nudge",
+      "learning": "Grounding nudge",
       "signal": "Signal",
       "zoomOut": "Zoom out",
       "history": "Historical insight"
@@ -366,8 +366,8 @@
       "breathingDesc": "Guided breathwork to calm the impulse",
       "haiku": "Haiku",
       "haikuDesc": "Your reflection distilled into three lines",
-      "learning": "Learning",
-      "learningDesc": "Historical context for today's move",
+      "learning": "Grounding",
+      "learningDesc": "Behavioral finance research for today's move",
       "signal": "Signal",
       "signalDesc": "Curated news beyond the noise",
       "signalSampleSource": "Lyn Alden · Newsletter",
@@ -494,7 +494,7 @@
       "pause": "The Pause",
       "pauseDesc": "Science-sequenced 5-step flow: breathe, feel, reflect, shift, decide — triggered by real market volatility",
       "companions": "5 AI Companions",
-      "companionsDesc": "Haiku, Signal intelligence, Learning, Zoom Out (historical BTC prices), and Historical Echo — all pre-generated for zero latency",
+      "companionsDesc": "Haiku, Signal intelligence, Grounding, Zoom Out (historical BTC prices), and Historical Echo — all pre-generated for zero latency",
       "detection": "Smart detection",
       "detectionDesc": "Separate up/down thresholds, 24h + 7-day cumulative, configurable cooldown",
       "mood": "Emotional tracking",
@@ -681,9 +681,9 @@
   "sources": {
     "title": "Sources",
     "signalTab": "Signal",
-    "learningTab": "Learning",
+    "groundingTab": "Grounding",
     "signalDescription": "Sources for Read the Signal — market analysis, analysts, news.",
-    "learningDescription": "Sources for Ground Yourself — research papers, books, behavioral science.",
+    "groundingDescription": "Sources for Ground Yourself — behavioral finance, psychology, decision science.",
     "activeCount": "{{active}} of {{total}} active",
     "types": {
       "analyst": "Analysts",
@@ -700,7 +700,9 @@
     "customUrlPlaceholder": "URL (optional)",
     "add": "Add",
     "addFailed": "Failed to add source",
-    "sourceAdded": "Source added"
+    "sourceAdded": "Source added",
+    "showRemoved": "{{count}} removed sources",
+    "restore": "Restore"
   },
   "notFound": {
     "title": "404",
@@ -1059,7 +1061,7 @@
     "companionLabels": {
       "breathing": "Breathing",
       "haiku": "Haiku",
-      "learning": "Learning",
+      "learning": "Grounding",
       "signal": "Signal",
       "zoomOut": "Zoom Out",
       "history": "History"
@@ -1286,7 +1288,7 @@
     "priceIsNoise": "Price is noise. Value is constant.",
     "in24h": "in 24h"
   },
-  "learning": {
+  "grounding": {
     "findingResearch": "Finding research…",
     "viewResearch": "View research",
     "researchGrounded": "Behavioral science · Research-grounded"
@@ -1399,7 +1401,7 @@
     "reflection": "Pause",
     "reflection_note": "Note",
     "signal": "Signal",
-    "learning": "Learning",
+    "learning": "Grounding",
     "haiku": "Haiku",
     "zoom_out": "Zoom Out",
     "history_insight": "History",

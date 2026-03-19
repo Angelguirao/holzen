@@ -40,7 +40,7 @@ const TYPE_ICONS: Record<string, React.ReactNode> = {
 };
 
 const SIGNAL_TYPE_ORDER = ['analyst', 'podcast', 'newsletter', 'blog', 'dashboard', 'youtube'];
-const LEARNING_TYPE_ORDER = ['book', 'blog', 'podcast', 'newsletter', 'analyst'];
+const GROUNDING_TYPE_ORDER = ['book', 'blog', 'podcast', 'newsletter', 'analyst'];
 
 export function SourceManagement() {
   const { t } = useTranslation();
@@ -70,26 +70,35 @@ export function SourceManagement() {
 
   const isActive = useCallback((sourceId: string) => {
     const pref = prefs.find((p) => p.source_id === sourceId);
+    // If user has a pref, use it. If no pref exists, source is active by default.
     return pref ? pref.active : true;
   }, [prefs]);
 
-  const toggleSource = useCallback(async (sourceId: string) => {
+  const removeCatalogSource = useCallback(async (sourceId: string) => {
     if (!user) return;
     const existing = prefs.find((p) => p.source_id === sourceId);
-    const newActive = existing ? !existing.active : false;
-
     if (existing) {
-      await supabase.from('user_signal_preferences').update({ active: newActive }).eq('id', existing.id);
-      setPrefs((prev) => prev.map((p) => p.id === existing.id ? { ...p, active: newActive } : p));
+      await supabase.from('user_signal_preferences').update({ active: false }).eq('id', existing.id);
+      setPrefs((prev) => prev.map((p) => p.id === existing.id ? { ...p, active: false } : p));
     } else {
+      const cat = catalog.find((s) => s.id === sourceId)?.category || activeTab;
       const { data } = await supabase
         .from('user_signal_preferences')
-        .insert({ user_id: user.id, source_id: sourceId, active: false, category: activeTab } as any)
+        .insert({ user_id: user.id, source_id: sourceId, active: false, category: cat } as any)
         .select()
         .single();
       if (data) setPrefs((prev) => [...prev, data as unknown as UserPref]);
     }
-  }, [user, prefs, activeTab]);
+  }, [user, prefs, catalog, activeTab]);
+
+  const restoreCatalogSource = useCallback(async (sourceId: string) => {
+    if (!user) return;
+    const existing = prefs.find((p) => p.source_id === sourceId);
+    if (existing) {
+      await supabase.from('user_signal_preferences').update({ active: true }).eq('id', existing.id);
+      setPrefs((prev) => prev.map((p) => p.id === existing.id ? { ...p, active: true } : p));
+    }
+  }, [user, prefs]);
 
   const addCustomSource = useCallback(async () => {
     if (!user || !customName.trim()) return;
@@ -140,23 +149,28 @@ export function SourceManagement() {
   }
 
   const renderSourceList = (category: string) => {
-    const typeOrder = category === 'signal' ? SIGNAL_TYPE_ORDER : LEARNING_TYPE_ORDER;
+    const typeOrder = category === 'signal' ? SIGNAL_TYPE_ORDER : GROUNDING_TYPE_ORDER;
     const categoryCatalog = catalog.filter((s) => s.category === category);
     const customSources = prefs.filter((p) => !p.source_id && p.custom_name && (p.category === category));
 
+    // Active catalog sources (not dismissed)
+    const activeCatalog = categoryCatalog.filter((s) => isActive(s.id));
+    // Dismissed catalog sources
+    const dismissedCatalog = categoryCatalog.filter((s) => !isActive(s.id));
+
     const grouped = typeOrder.map((type) => ({
       type,
-      sources: categoryCatalog.filter((s) => s.type === type),
+      sources: activeCatalog.filter((s) => s.type === type),
     })).filter((g) => g.sources.length > 0);
 
-    const activeCount = categoryCatalog.filter((s) => isActive(s.id)).length + customSources.filter((c) => c.active).length;
-    const totalCount = categoryCatalog.length + customSources.length;
+    const activeCount = activeCatalog.length + customSources.filter((c) => c.active).length;
+    const totalCount = activeCatalog.length + customSources.length;
 
     return (
       <div className="space-y-4">
         <div className="space-y-1">
           <p className="text-xs text-muted-foreground leading-relaxed">
-            {t(category === 'signal' ? 'sources.signalDescription' : 'sources.learningDescription')}
+            {t(category === 'signal' ? 'sources.signalDescription' : 'sources.groundingDescription')}
           </p>
           <p className="text-[10px] font-mono text-muted-foreground/40">
             {t('sources.activeCount', { active: activeCount, total: totalCount })}
@@ -185,11 +199,13 @@ export function SourceManagement() {
                       </p>
                     )}
                   </div>
-                  <Switch
-                    checked={isActive(source.id)}
-                    onCheckedChange={() => toggleSource(source.id)}
-                    className="shrink-0"
-                  />
+                  <button
+                    onClick={() => removeCatalogSource(source.id)}
+                    className="text-muted-foreground/40 hover:text-destructive transition-colors shrink-0"
+                    aria-label="Remove"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
                 </div>
               ))}
             </div>
@@ -283,6 +299,33 @@ export function SourceManagement() {
             {t('sources.addCustom')}
           </button>
         )}
+
+        {dismissedCatalog.length > 0 && (
+          <details className="group">
+            <summary className="text-[10px] font-mono text-muted-foreground/40 cursor-pointer hover:text-muted-foreground transition-colors list-none flex items-center gap-1">
+              <Plus className="h-2.5 w-2.5 transition-transform group-open:rotate-45" />
+              {t('sources.showRemoved', { count: dismissedCatalog.length })}
+            </summary>
+            <div className="space-y-1 mt-2">
+              {dismissedCatalog.map((source) => (
+                <div
+                  key={source.id}
+                  className="flex items-center gap-3 rounded-md border border-border/20 px-3 py-2 bg-muted/5 opacity-60"
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-foreground truncate">{source.name}</p>
+                  </div>
+                  <button
+                    onClick={() => restoreCatalogSource(source.id)}
+                    className="text-[10px] font-mono text-muted-foreground hover:text-foreground transition-colors shrink-0"
+                  >
+                    {t('sources.restore')}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </details>
+        )}
       </div>
     );
   };
@@ -298,15 +341,15 @@ export function SourceManagement() {
           <TabsTrigger value="signal" className="text-xs font-mono">
             {t('sources.signalTab')}
           </TabsTrigger>
-          <TabsTrigger value="learning" className="text-xs font-mono">
-            {t('sources.learningTab')}
+          <TabsTrigger value="grounding" className="text-xs font-mono">
+            {t('sources.groundingTab')}
           </TabsTrigger>
         </TabsList>
         <TabsContent value="signal" className="mt-3">
           {renderSourceList('signal')}
         </TabsContent>
-        <TabsContent value="learning" className="mt-3">
-          {renderSourceList('learning')}
+        <TabsContent value="grounding" className="mt-3">
+          {renderSourceList('grounding')}
         </TabsContent>
       </Tabs>
     </div>
