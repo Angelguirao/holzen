@@ -61,7 +61,11 @@ export function InsightsPanel({ reflections }: Props) {
 
     for (const r of reflections) {
       if (r.mood) { moods[r.mood] = (moods[r.mood] || 0) + 1; tm++; }
-      if (r.outcome) { outcomes[r.outcome] = (outcomes[r.outcome] || 0) + 1; to++; }
+      if (r.outcome) {
+        // Merge legacy 'nothing' into 'held'
+        const key = r.outcome === 'nothing' ? 'held' : r.outcome;
+        outcomes[key] = (outcomes[key] || 0) + 1; to++;
+      }
     }
 
     return { moodCounts: moods, outcomeCounts: outcomes, totalMoods: tm, totalOutcomes: to };
