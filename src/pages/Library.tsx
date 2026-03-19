@@ -259,8 +259,23 @@ export default function Library() {
             </div>
           )}
 
+          {/* Smart filter badge */}
+          {smartFilter && (
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] font-mono px-2 py-1 rounded-full border border-primary/30 bg-primary/10 text-primary">
+                {smartFilter.name}
+              </span>
+              <button
+                onClick={() => setSmartFilter(null)}
+                className="text-muted-foreground/40 hover:text-muted-foreground"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </div>
+          )}
+
           {/* Active filter clear-all */}
-          {hasActiveFilters && (
+          {hasActiveFilters && !smartFilter && (
             <button
               onClick={clearAllFilters}
               className="flex items-center gap-1 text-[9px] font-mono text-muted-foreground/50 hover:text-muted-foreground transition-colors"
@@ -269,11 +284,18 @@ export default function Library() {
             </button>
           )}
 
-          {/* Count */}
-          <div className="px-1">
+          {/* Count + Sort */}
+          <div className="flex items-center justify-between px-1">
             <span className="text-[9px] font-mono text-muted-foreground/30">
               {filtered.length} {filtered.length === 1 ? 'item' : 'items'}
             </span>
+            <button
+              onClick={cycleSortMode}
+              className="flex items-center gap-1 text-[9px] font-mono text-muted-foreground/40 hover:text-muted-foreground transition-colors"
+            >
+              <ArrowUpDown className="h-2.5 w-2.5" />
+              {sortLabel}
+            </button>
           </div>
 
           {/* Item list with date grouping */}
