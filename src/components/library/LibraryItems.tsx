@@ -5,9 +5,10 @@ import { GroupedVirtuoso, Virtuoso } from 'react-virtuoso';
 import { LibraryItemCard } from './LibraryItemCard';
 import { ItemDetailViewer } from './ItemDetailViewer';
 import { SwipeableCard } from './SwipeableCard';
+import { ExportMenu } from './ExportMenu';
 import type { useLibrary } from '@/hooks/use-library';
 import type { LibraryItem } from '@/hooks/use-library';
-import { Trash2, Archive, Heart, X, CheckSquare } from 'lucide-react';
+import { Trash2, Archive, Heart, X, CheckSquare, Download } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   isToday,
