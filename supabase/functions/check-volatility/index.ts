@@ -451,7 +451,7 @@ serve(async (req) => {
             method: "POST", headers: companionHeaders,
             body: JSON.stringify({ context: ctx, language: companionLang, userId: profile.user_id }),
           }).then(async (res) => {
-            if (!res.ok) { await res.text(); return; }
+            if (!res.ok) { const t = await res.text(); console.error("[CHECK-VOLATILITY] historical-insight failed:", res.status, t); return; }
             const data = await res.json();
             if (data && !data.error) {
               await supabase.from("reflections").update({ history_insight_data: data }).eq("id", reflectionId);
