@@ -282,14 +282,54 @@ serve(async (req) => {
     }
 
     // Helper: check if user is in quiet hours (timezone-aware)
+    // Checks both the legacy single-window profile fields AND the new quiet_windows table
+    const { data: allQuietWindows } = await supabase
+      .from("quiet_windows")
+      .select("user_id, start_hour, end_hour, days, active");
+
+    const quietWindowsByUser = new Map<string, Array<{ start_hour: number; end_hour: number; days: number[] }>>();
+    for (const w of (allQuietWindows || [])) {
+      if (!w.active) continue;
+      if (!quietWindowsByUser.has(w.user_id)) quietWindowsByUser.set(w.user_id, []);
+      quietWindowsByUser.get(w.user_id)!.push(w);
+    }
+
     function isInQuietHours(p: any): boolean {
-      const start = p.quiet_hours_start;
-      const end = p.quiet_hours_end;
-      if (start == null || end == null) return false;
       const tz = p.timezone || "UTC";
       const localHour = getUserLocalHour(tz);
-      if (start <= end) return localHour >= start && localHour < end;
-      return localHour >= start || localHour < end; // wraps midnight
+
+      // Check legacy single-window
+      const start = p.quiet_hours_start;
+      const end = p.quiet_hours_end;
+      if (start != null && end != null) {
+        if (start <= end ? (localHour >= start && localHour < end) : (localHour >= start || localHour < end)) {
+          return true;
+        }
+      }
+
+      // Check extended quiet windows
+      const windows = quietWindowsByUser.get(p.user_id);
+      if (windows) {
+        // Get local day of week (0=Sunday)
+        let localDay: number;
+        try {
+          const formatter = new Intl.DateTimeFormat("en-US", { weekday: "short", timeZone: tz });
+          const dayStr = formatter.format(new Date());
+          const dayMap: Record<string, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 };
+          localDay = dayMap[dayStr] ?? new Date().getDay();
+        } catch { localDay = new Date().getDay(); }
+
+        for (const w of windows) {
+          if (!w.days.includes(localDay)) continue;
+          const s = w.start_hour;
+          const e = w.end_hour;
+          if (s <= e ? (localHour >= s && localHour < e) : (localHour >= s || localHour < e)) {
+            return true;
+          }
+        }
+      }
+
+      return false;
     }
 
     // Filter: must exceed at least one threshold AND not in cooldown AND not in quiet hours
