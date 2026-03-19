@@ -1,5 +1,5 @@
 import { Skeleton } from '@/components/ui/skeleton';
-import { TrendingUp, TrendingDown, Clock, Globe } from 'lucide-react';
+import { TrendingUp, TrendingDown, Clock, Globe, CloudOff } from 'lucide-react';
 import { format } from 'date-fns';
 import { useHolzen } from '@/hooks/use-holzen';
 import { formatBtcPrice } from '@/lib/btc';
@@ -23,6 +23,7 @@ export interface ZoomOutData {
     title: string;
     body: string;
   } | null;
+  partial?: boolean;
 }
 
 interface Props {
@@ -70,9 +71,17 @@ export function ZoomOutDisplay({ data, loading, error }: Props) {
       {/* On this day - price timeline */}
       {currentPrice && onThisDay.length > 0 && (
         <div className="space-y-2">
-          <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">
-            BTC on this day
-          </p>
+          <div className="flex items-center justify-between">
+            <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">
+              BTC on this day
+            </p>
+            {data.partial && (
+              <span className="flex items-center gap-1 text-[8px] font-mono text-muted-foreground/35">
+                <CloudOff className="h-2.5 w-2.5" />
+                partial
+              </span>
+            )}
+          </div>
           <div className="space-y-1.5">
             {[...onThisDay].reverse().map((entry) => {
               const changePct = ((currentPrice - entry.price) / entry.price) * 100;
