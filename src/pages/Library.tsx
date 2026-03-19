@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useLibrary } from '@/hooks/use-library';
 import { PageMeta } from '@/components/PageMeta';
 import { Heart, Search, X, Lock, ArrowUpDown, RefreshCw } from 'lucide-react';
+import { ExportMenu } from '@/components/library/ExportMenu';
 import { SubscriptionSkeleton } from '@/components/SubscriptionSkeleton';
 import { LibraryItems } from '@/components/library/LibraryItems';
 import { LibraryCollections } from '@/components/library/LibraryCollections';
