@@ -495,7 +495,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
   useEffect(() => {
     if (!prefs.zoomOut || !reflectionId) return;
     const key = reflectionId;
-    if (zoomOutFetchedRef.current === key) return;
+    if (zoomOutFetchedRef.current === key && zoomOutRetry === 0) return;
     zoomOutFetchedRef.current = key;
 
     let cancelled = false;
