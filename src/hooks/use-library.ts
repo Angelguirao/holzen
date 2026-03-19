@@ -280,12 +280,29 @@ export function useLibrary() {
     return collections.filter((c) => colIds.includes(c.id));
   }, [collectionItems, collections]);
 
+  const isCompanionEngaged = useCallback((item: LibraryItem): boolean => {
+    if (!item.reflection_id || !item.source_type) return true;
+    if (item.source_type === 'reflection' || item.source_type === 'reflection_note') return true;
+    const flags = readFlagsMap[item.reflection_id];
+    if (!flags) return true; // no data, assume engaged
+    const sourceToFlag: Record<string, keyof ReflectionReadFlags> = {
+      haiku: 'haiku_read',
+      learning: 'learning_read',
+      signal: 'signal_read',
+      zoom_out: 'zoom_out_read',
+      history_insight: 'history_read',
+    };
+    const flagKey = sourceToFlag[item.source_type];
+    return flagKey ? flags[flagKey] : true;
+  }, [readFlagsMap]);
+
   return {
     items, collections, collectionItems, loading,
     addItem, updateItem, deleteItem, togglePin, toggleFavorite,
     addCollection, updateCollection, deleteCollection,
     addToCollection, removeFromCollection,
     getCollectionItemIds, getCollectionItemCount, getItemCollections,
+    isCompanionEngaged,
     refetch: fetchAll,
   };
 }
