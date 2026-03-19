@@ -78,7 +78,7 @@ export default function Library() {
       );
     }
     return result;
-  }, [items, tab, sourceFilter, statusFilter, tagFilter, search]);
+  }, [items, tab, sourceFilter, tagFilter, search]);
 
   if (isPending) {
     return (
