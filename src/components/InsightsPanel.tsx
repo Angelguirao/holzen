@@ -29,7 +29,6 @@ const OUTCOME_COLORS: Record<string, string> = {
   held: 'bg-primary/70',
   sold: 'bg-destructive/70',
   bought: 'bg-chart-2',
-  nothing: 'bg-muted-foreground/50',
 };
 
 function Bar({ label, count, total, color }: { label: string; count: number; total: number; color: string }) {
