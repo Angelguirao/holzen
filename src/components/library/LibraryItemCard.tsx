@@ -89,7 +89,7 @@ export function LibraryItemCard({ item, onToggleFavorite, onClick, engaged = tru
             <span className="shrink-0 h-1.5 w-1.5 rounded-full bg-primary" />
           )}
           {incomplete && (
-            <span className="shrink-0 text-[8px] font-mono text-amber-500/70 uppercase tracking-wider">incomplete</span>
+            <span className="shrink-0 text-[8px] font-mono text-destructive/60 uppercase tracking-wider">incomplete</span>
           )}
           {dimmed && (
             <span className="text-[8px] font-mono text-muted-foreground/40 uppercase tracking-wider">skipped</span>
