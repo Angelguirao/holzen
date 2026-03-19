@@ -74,23 +74,31 @@ export function SourceManagement() {
     return pref ? pref.active : true;
   }, [prefs]);
 
-  const toggleSource = useCallback(async (sourceId: string) => {
+  const removeCatalogSource = useCallback(async (sourceId: string) => {
     if (!user) return;
     const existing = prefs.find((p) => p.source_id === sourceId);
-    const newActive = existing ? !existing.active : false;
-
     if (existing) {
-      await supabase.from('user_signal_preferences').update({ active: newActive }).eq('id', existing.id);
-      setPrefs((prev) => prev.map((p) => p.id === existing.id ? { ...p, active: newActive } : p));
+      await supabase.from('user_signal_preferences').update({ active: false }).eq('id', existing.id);
+      setPrefs((prev) => prev.map((p) => p.id === existing.id ? { ...p, active: false } : p));
     } else {
+      const cat = catalog.find((s) => s.id === sourceId)?.category || activeTab;
       const { data } = await supabase
         .from('user_signal_preferences')
-        .insert({ user_id: user.id, source_id: sourceId, active: false, category: activeTab } as any)
+        .insert({ user_id: user.id, source_id: sourceId, active: false, category: cat } as any)
         .select()
         .single();
       if (data) setPrefs((prev) => [...prev, data as unknown as UserPref]);
     }
-  }, [user, prefs, activeTab]);
+  }, [user, prefs, catalog, activeTab]);
+
+  const restoreCatalogSource = useCallback(async (sourceId: string) => {
+    if (!user) return;
+    const existing = prefs.find((p) => p.source_id === sourceId);
+    if (existing) {
+      await supabase.from('user_signal_preferences').update({ active: true }).eq('id', existing.id);
+      setPrefs((prev) => prev.map((p) => p.id === existing.id ? { ...p, active: true } : p));
+    }
+  }, [user, prefs]);
 
   const addCustomSource = useCallback(async () => {
     if (!user || !customName.trim()) return;
