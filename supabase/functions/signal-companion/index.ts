@@ -6,6 +6,22 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+function isValidUrl(s: string): boolean {
+  if (!s || s === "N/A" || s.length < 10) return false;
+  try {
+    const u = new URL(s.startsWith("http") ? s : `https://${s}`);
+    return u.protocol === "https:" || u.protocol === "http:";
+  } catch {
+    return false;
+  }
+}
+
+function normalizeUrl(s: string): string {
+  if (!s) return "";
+  if (!s.startsWith("http")) return `https://${s}`;
+  return s;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -50,16 +66,11 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    // Build domain filter from user's active sources
-    const domainFilter: string[] = [];
+    // Build source name list for context (NOT domain filter — that over-constrains results)
+    const sourceNames: string[] = [];
     if (sources && Array.isArray(sources) && sources.length > 0) {
       for (const s of sources) {
-        if (s.url) {
-          try {
-            const domain = new URL(s.url).hostname.replace(/^www\./, '');
-            domainFilter.push(domain);
-          } catch { /* skip invalid URLs */ }
-        }
+        if (s.name) sourceNames.push(s.name);
       }
     }
 
@@ -67,26 +78,28 @@ serve(async (req) => {
     const langCode = language || "en";
     const langName = LANG_NAMES[langCode] || "English";
 
-    // Step 1: Perplexity search with 12s timeout
+    // Step 1: Perplexity search — use source names as context hints, not domain filters
+    const sourceHint = sourceNames.length > 0
+      ? ` Prefer insights from: ${sourceNames.slice(0, 8).join(", ")}.`
+      : "";
+
     const searchQuery = context
-      ? `Current Bitcoin market analysis: ${context}. Find one high-signal insight from a reputable Bitcoin analyst, researcher, or data source.`
-      : "Latest high-signal Bitcoin market analysis or insight from reputable analysts or researchers.";
+      ? `Current Bitcoin market analysis: ${context}. Find one high-signal insight from a reputable Bitcoin analyst, researcher, or data source.${sourceHint}`
+      : `Latest high-signal Bitcoin market analysis or insight from reputable analysts or researchers.${sourceHint}`;
 
     const perplexityBody: any = {
       model: "sonar",
       messages: [
         {
           role: "system",
-          content: "You are a Bitcoin market research assistant. Find one specific, high-signal piece of Bitcoin analysis or insight that is relevant to the current market conditions. Focus on real analysts, real data, and real sources. Provide factual, grounded information — no hype, no predictions.",
+          content: "You are a Bitcoin market research assistant. Find one specific, high-signal piece of Bitcoin analysis or insight. Use diverse sources — do NOT default to the same source every time. Rotate between analysts, blogs, newsletters, dashboards, and podcasts. Focus on real, verifiable information with working URLs.",
         },
         { role: "user", content: searchQuery },
       ],
       search_recency_filter: "week",
+      // NOTE: Deliberately NOT using search_domain_filter — it over-constrains 
+      // results and causes Perplexity to always return the same source (e.g. Glassnode)
     };
-
-    if (domainFilter.length > 0) {
-      perplexityBody.search_domain_filter = domainFilter.slice(0, 5);
-    }
 
     log("calling perplexity");
     const perplexityController = new AbortController();
@@ -144,17 +157,25 @@ serve(async (req) => {
     // Step 2: Use Lovable AI to structure the result with fallback model retry
     const langInstruction = langCode !== "en" ? `Write in ${langName}. Keep source name/URL as-is.\n` : "";
 
+    // Build a numbered citation list for the AI
+    const citationList = citations.map((c: string, i: number) => `[${i + 1}] ${c}`).join("\n");
+
     log("calling AI structuring");
 
     const aiBody = {
       messages: [
         {
           role: "system",
-          content: `${langInstruction}Extract ONE signal from the search results as JSON: {"title":"5-12 word headline","body":"2-3 sentences, calm tone","source":"source name","url":"citation URL"}. Use only facts from the results. No hype, no advice.`,
+          content: `${langInstruction}Extract ONE signal from the search results as JSON: {"title":"5-12 word headline","body":"2-3 sentences, calm tone","source":"source name","url":"full citation URL from the list below"}.
+CRITICAL URL RULES:
+- You MUST pick a "url" value from the citation URLs listed below. Copy it EXACTLY.
+- If no citation URL matches, use the FIRST citation URL.
+- The URL must start with "https://" — never use partial URLs like "glassnode.com" or "N/A".
+- Do NOT invent or fabricate URLs.`,
         },
         {
           role: "user",
-          content: `Search results:\n${searchContent}\n\nCitation URLs:\n${citations.map((c: string, i: number) => `[${i + 1}] ${c}`).join("\n")}`,
+          content: `Search results:\n${searchContent}\n\nAvailable citation URLs (pick one):\n${citationList}`,
         },
       ],
       response_format: { type: "json_object" },
@@ -184,7 +205,7 @@ serve(async (req) => {
         if (structureResponse.status === 429 || structureResponse.status === 402) {
           lastStatus = structureResponse.status;
           await structureResponse.text();
-          break; // rate limit applies to all models
+          break;
         }
 
         if (!structureResponse.ok) {
@@ -210,7 +231,7 @@ serve(async (req) => {
           else if (model !== models[models.length - 1]) { log(`Bad JSON, retrying`); continue; }
           else throw new Error("AI returned invalid JSON");
         }
-        break; // success
+        break;
       } catch (e) {
         clearTimeout(aiTimeout);
         if (e instanceof DOMException && e.name === "AbortError") {
@@ -232,12 +253,24 @@ serve(async (req) => {
       throw new Error("AI structuring failed after all retries");
     }
 
-    // Ensure URL is from citations if possible
-    if (citations.length > 0 && !citations.includes(signal.url)) {
-      signal.url = citations[0];
+    // POST-PROCESSING: Validate and fix the URL
+    // 1. If the AI returned a valid URL from citations, keep it
+    // 2. If not, find the best citation URL
+    // 3. Normalize all URLs to start with https://
+    if (!isValidUrl(signal.url) || !signal.url.startsWith("http")) {
+      // Try to find a matching citation
+      const bestCitation = citations.find((c) => isValidUrl(c)) || "";
+      signal.url = bestCitation ? normalizeUrl(bestCitation) : "";
+    } else {
+      signal.url = normalizeUrl(signal.url);
     }
 
-    log(`done, signal: ${signal.title}`);
+    // Final fallback: if still no valid URL, use first citation
+    if (!isValidUrl(signal.url) && citations.length > 0) {
+      signal.url = normalizeUrl(citations[0]);
+    }
+
+    log(`done, signal: ${signal.title}, source: ${signal.source}, url: ${signal.url}`);
     return new Response(JSON.stringify(signal), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
