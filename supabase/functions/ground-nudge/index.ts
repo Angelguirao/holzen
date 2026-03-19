@@ -24,7 +24,7 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const { context, language } = await req.json();
+    const { context, language, recentTopics } = await req.json();
 
     const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
     if (!PERPLEXITY_API_KEY) throw new Error("PERPLEXITY_API_KEY is not configured");
@@ -36,7 +36,7 @@ serve(async (req) => {
     const langCode = language || "en";
     const langName = LANG_NAMES[langCode] || "English";
 
-    // Pick a random bias category to ensure variety across sessions
+    // Pick a bias category, avoiding recently used ones
     const BIAS_TOPICS = [
       "loss aversion and panic selling during market drops",
       "FOMO and herding behavior during market rallies",
@@ -49,7 +49,10 @@ serve(async (req) => {
       "regret aversion and its effect on long-term investment holding",
       "social proof and information cascading in crypto markets",
     ];
-    const randomBias = BIAS_TOPICS[Math.floor(Math.random() * BIAS_TOPICS.length)];
+    const recentSet = new Set((recentTopics || []).map((t: string) => t.toLowerCase()));
+    const available = BIAS_TOPICS.filter(t => !recentSet.has(t.toLowerCase()));
+    const pool = available.length > 0 ? available : BIAS_TOPICS;
+    const randomBias = pool[Math.floor(Math.random() * pool.length)];
 
     // Step 1: Perplexity search for behavioral finance research
     const marketContext = context || "Bitcoin market volatility";

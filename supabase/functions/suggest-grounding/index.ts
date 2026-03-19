@@ -12,6 +12,8 @@ async function searchRecentArticle(activity: string, langCode: string): Promise<
 
   try {
     const query = `latest interesting discovery or technique about "${activity}" for wellbeing or mindfulness`;
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 10000);
     const response = await fetch("https://api.perplexity.ai/chat/completions", {
       method: "POST",
       headers: {
@@ -26,7 +28,9 @@ async function searchRecentArticle(activity: string, langCode: string): Promise<
         ],
         search_recency_filter: "month",
       }),
+      signal: controller.signal,
     });
+    clearTimeout(timeout);
 
     if (!response.ok) {
       console.error("Perplexity error:", response.status);
@@ -47,6 +51,10 @@ async function searchRecentArticle(activity: string, langCode: string): Promise<
     }
     return content ? { title: activity, url: "", snippet: content.slice(0, 300) } : null;
   } catch (e) {
+    if (e instanceof DOMException && e.name === "AbortError") {
+      console.warn("[suggest-grounding] Perplexity search timed out for:", activity);
+      return null;
+    }
     console.error("Perplexity search failed:", e);
     return null;
   }
@@ -111,12 +119,15 @@ Rules:
 - Include a gentle reason WHY this activity fits right now
 - Suggest a duration that feels right (5, 10, or 15 minutes)
 - Share a genuinely interesting insight, fun fact, or recent discovery about the activity (something the user probably doesn't know — a scientific finding, a technique, a cultural perspective)
+- ACCURACY: The insight MUST be a well-known, verifiable fact. Do NOT invent researcher names, study dates, or statistics. If unsure, share a cultural or historical perspective instead.
 - No exclamation marks, no motivational language, no trading advice
 - Sound like a quiet friend, not a coach`;
 
     const userPrompt = `${context ? `Market context: ${context}\n` : ""}${mood ? `Current mood: ${mood}\n` : ""}${severity ? `Severity: ${severity}\n` : ""}Suggest the best grounding activity for this moment, and share something interesting about it.`;
 
     // Run AI suggestion and Perplexity search in parallel (we'll search for all activities, then pick the right one after AI responds)
+    const aiController = new AbortController();
+    const aiTimeout = setTimeout(() => aiController.abort(), 15000);
     const aiPromise = fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -157,8 +168,8 @@ Rules:
                   insight: {
                     type: "string",
                     description: langCode !== "en"
-                      ? `An interesting fact, scientific finding, or technique about this activity (1-2 sentences). MUST be in ${langName}.`
-                      : "An interesting fact, scientific finding, technique, or cultural perspective about this activity that the user probably doesn't know (1-2 sentences).",
+                      ? `A verifiable interesting fact about this activity (1-2 sentences). MUST be in ${langName}. Do NOT invent researcher names or statistics.`
+                      : "A verifiable interesting fact, well-known scientific finding, or cultural perspective about this activity (1-2 sentences). Do NOT invent researcher names or statistics.",
                   },
                 },
                 required: ["activity", "suggestion", "duration", "insight"],
@@ -169,9 +180,28 @@ Rules:
         ],
         tool_choice: { type: "function", function: { name: "suggest_grounding" } },
       }),
+      signal: aiController.signal,
     });
 
-    const response = await aiPromise;
+    let response: Response;
+    try {
+      response = await aiPromise;
+    } catch (e) {
+      clearTimeout(aiTimeout);
+      if (e instanceof DOMException && e.name === "AbortError") {
+        // Timeout — return fallback
+        const fallbackActivity = groundingActivities[Math.floor(Math.random() * groundingActivities.length)];
+        return new Response(JSON.stringify({
+          activity: fallbackActivity,
+          suggestion: `Take a moment with ${fallbackActivity}. Sometimes the simplest thing is the most grounding.`,
+          duration: 10,
+          insight: null,
+          article: null,
+        }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      throw e;
+    }
+    clearTimeout(aiTimeout);
 
     if (!response.ok) {
       if (response.status === 429) {
