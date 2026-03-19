@@ -299,6 +299,33 @@ export function SourceManagement() {
             {t('sources.addCustom')}
           </button>
         )}
+
+        {dismissedCatalog.length > 0 && (
+          <details className="group">
+            <summary className="text-[10px] font-mono text-muted-foreground/40 cursor-pointer hover:text-muted-foreground transition-colors list-none flex items-center gap-1">
+              <Plus className="h-2.5 w-2.5 transition-transform group-open:rotate-45" />
+              {t('sources.showRemoved', { count: dismissedCatalog.length })}
+            </summary>
+            <div className="space-y-1 mt-2">
+              {dismissedCatalog.map((source) => (
+                <div
+                  key={source.id}
+                  className="flex items-center gap-3 rounded-md border border-border/20 px-3 py-2 bg-muted/5 opacity-60"
+                >
+                  <div className="flex-1 min-w-0">
+                    <p className="text-xs font-medium text-foreground truncate">{source.name}</p>
+                  </div>
+                  <button
+                    onClick={() => restoreCatalogSource(source.id)}
+                    className="text-[10px] font-mono text-muted-foreground hover:text-foreground transition-colors shrink-0"
+                  >
+                    {t('sources.restore')}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </details>
+        )}
       </div>
     );
   };
