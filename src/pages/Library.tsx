@@ -59,7 +59,7 @@ export default function Library() {
       .map(([tag]) => tag);
   }, [items]);
 
-  const hasActiveFilters = !!sourceFilter || !!tagFilter;
+  const hasActiveFilters = !!sourceFilter || !!tagFilter || !!smartFilter;
 
   // Filtering
   const filtered = useMemo(() => {
@@ -68,6 +68,8 @@ export default function Library() {
     if (tab === 'favorites') result = result.filter((i) => i.is_favorite);
     // Always hide deleted and archived
     result = result.filter((i) => i.status !== 'deleted' && i.status !== 'archived');
+    // Smart filter
+    if (smartFilter) result = result.filter((i) => smartFilter.itemIds.has(i.id));
     // Source type
     if (sourceFilter) result = result.filter((i) => i.source_type === sourceFilter);
     // Tag
@@ -81,8 +83,15 @@ export default function Library() {
         i.tags?.some((t) => t.includes(q))
       );
     }
+    // Sort
+    if (sortMode === 'oldest') {
+      result = [...result].sort((a, b) => new Date(a.created_at).getTime() - new Date(b.created_at).getTime());
+    } else if (sortMode === 'alphabetical') {
+      result = [...result].sort((a, b) => (a.title ?? '').localeCompare(b.title ?? ''));
+    }
+    // newest is the default order from the hook
     return result;
-  }, [items, tab, sourceFilter, tagFilter, search]);
+  }, [items, tab, sourceFilter, tagFilter, search, sortMode, smartFilter]);
 
   if (isPending) {
     return (
