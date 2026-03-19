@@ -230,135 +230,139 @@ export function LibraryItems({ library, filtered }: Props) {
 
   return (
     <>
-      {/* Select mode toggle + bulk action bar */}
-      <div className="flex items-center justify-between px-1 min-h-[28px]">
-        {selectMode ? (
-          <div className="flex items-center gap-2 w-full">
-            <button
-              onClick={exitSelectMode}
-              className="p-1 text-muted-foreground/60 hover:text-foreground transition-colors"
-            >
-              <X className="h-4 w-4" />
-            </button>
-            <span className="text-[10px] font-mono text-muted-foreground/70">
-              {selectedIds.size} {t('library.selected', { defaultValue: 'selected' })}
-            </span>
-            <button
-              onClick={selectAll}
-              className="text-[10px] font-mono text-primary/70 hover:text-primary transition-colors"
-            >
-              {t('library.selectAll', { defaultValue: 'Select all' })}
-            </button>
-            <div className="flex-1" />
-            <ExportMenu
-              items={filtered.filter((i) => selectedIds.has(i.id))}
-              label={`${selectedIds.size}`}
+      <div className="flex h-full min-h-0 flex-col">
+        {/* Select mode toggle + bulk action bar */}
+        <div className="flex items-center justify-between px-1 min-h-[28px] shrink-0">
+          {selectMode ? (
+            <div className="flex items-center gap-2 w-full">
+              <button
+                onClick={exitSelectMode}
+                className="p-1 text-muted-foreground/60 hover:text-foreground transition-colors"
+              >
+                <X className="h-4 w-4" />
+              </button>
+              <span className="text-[10px] font-mono text-muted-foreground/70">
+                {selectedIds.size} {t('library.selected', { defaultValue: 'selected' })}
+              </span>
+              <button
+                onClick={selectAll}
+                className="text-[10px] font-mono text-primary/70 hover:text-primary transition-colors"
+              >
+                {t('library.selectAll', { defaultValue: 'Select all' })}
+              </button>
+              <div className="flex-1" />
+              <ExportMenu
+                items={filtered.filter((i) => selectedIds.has(i.id))}
+                label={`${selectedIds.size}`}
+              />
+              <button
+                onClick={handleBulkFavorite}
+                disabled={bulkLoading || selectedIds.size === 0}
+                className="p-1.5 text-muted-foreground/50 hover:text-destructive disabled:opacity-30 transition-colors"
+                title={t('library.bulkFavorite', { defaultValue: 'Favorite' })}
+              >
+                <Heart className="h-3.5 w-3.5" />
+              </button>
+              <button
+                onClick={handleBulkArchive}
+                disabled={bulkLoading || selectedIds.size === 0}
+                className="p-1.5 text-muted-foreground/50 hover:text-foreground disabled:opacity-30 transition-colors"
+                title={t('library.bulkArchive', { defaultValue: 'Archive' })}
+              >
+                <Archive className="h-3.5 w-3.5" />
+              </button>
+              <button
+                onClick={handleBulkDelete}
+                disabled={bulkLoading || selectedIds.size === 0}
+                className="p-1.5 text-muted-foreground/50 hover:text-destructive disabled:opacity-30 transition-colors"
+                title={t('library.bulkDelete', { defaultValue: 'Delete' })}
+              >
+                <Trash2 className="h-3.5 w-3.5" />
+              </button>
+            </div>
+          ) : (
+            filtered.length > 0 && (
+              <button
+                onClick={enterSelectMode}
+                className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground/40 hover:text-muted-foreground transition-colors ml-auto"
+              >
+                <CheckSquare className="h-3 w-3" />
+                {t('library.select', { defaultValue: 'Select' })}
+              </button>
+            )
+          )}
+        </div>
+
+        <div className="flex-1 min-h-0">
+          {filtered.length === 0 ? (
+            <div className="text-center py-12 space-y-3">
+              <p className="text-2xl">📚</p>
+              <p className="text-xs text-muted-foreground/60 font-mono max-w-[240px] mx-auto">
+                {t('library.emptyStateAction', { defaultValue: 'Complete a pause session to see your reflections, companions, and insights here.' })}
+              </p>
+              <p className="text-[9px] text-muted-foreground/30 font-mono">
+                {t('library.emptyStateHint', { defaultValue: 'Swipe cards left to delete, right to favorite' })}
+              </p>
+            </div>
+          ) : useVirtual ? (
+            <GroupedVirtuoso
+              style={{ height: '100%' }}
+              groupCounts={groupCounts}
+              groupContent={(index) => (
+                <div className="bg-background/95 backdrop-blur-sm pt-2 pb-1 px-3">
+                  <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider">
+                    {groupLabels[index]}
+                  </p>
+                </div>
+              )}
+              itemContent={(index) => renderCard(index, flatItems[index])}
+              overscan={200}
             />
-            <button
-              onClick={handleBulkFavorite}
-              disabled={bulkLoading || selectedIds.size === 0}
-              className="p-1.5 text-muted-foreground/50 hover:text-destructive disabled:opacity-30 transition-colors"
-              title={t('library.bulkFavorite', { defaultValue: 'Favorite' })}
-            >
-              <Heart className="h-3.5 w-3.5" />
-            </button>
-            <button
-              onClick={handleBulkArchive}
-              disabled={bulkLoading || selectedIds.size === 0}
-              className="p-1.5 text-muted-foreground/50 hover:text-foreground disabled:opacity-30 transition-colors"
-              title={t('library.bulkArchive', { defaultValue: 'Archive' })}
-            >
-              <Archive className="h-3.5 w-3.5" />
-            </button>
-            <button
-              onClick={handleBulkDelete}
-              disabled={bulkLoading || selectedIds.size === 0}
-              className="p-1.5 text-muted-foreground/50 hover:text-destructive disabled:opacity-30 transition-colors"
-              title={t('library.bulkDelete', { defaultValue: 'Delete' })}
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-            </button>
-          </div>
-        ) : (
-          filtered.length > 0 && (
-            <button
-              onClick={enterSelectMode}
-              className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground/40 hover:text-muted-foreground transition-colors ml-auto"
-            >
-              <CheckSquare className="h-3 w-3" />
-              {t('library.select', { defaultValue: 'Select' })}
-            </button>
-          )
-        )}
+          ) : (
+            <div className="h-full overflow-y-auto space-y-4 pr-1">
+              {pinnedItems.length > 0 && (
+                <div className="space-y-0.5">
+                  <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider px-3 pb-1">
+                    📌 {t('common.pinned')}
+                  </p>
+                  <div className="divide-y divide-border/20">
+                    {pinnedItems.map((item, i) => (
+                      <motion.div
+                        key={item.id}
+                        initial={{ opacity: 0, y: 6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.2, delay: Math.min(i * 0.03, 0.3) }}
+                      >
+                        {renderCard(i, item)}
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {unpinnedGroups.map((group) => (
+                <div key={group.key} className="space-y-0.5">
+                  <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider px-3 pb-1">
+                    {group.label}
+                  </p>
+                  <div className="divide-y divide-border/20">
+                    {group.items.map((item, i) => (
+                      <motion.div
+                        key={item.id}
+                        initial={{ opacity: 0, y: 6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.2, delay: Math.min(i * 0.03, 0.3) }}
+                      >
+                        {renderCard(i, item)}
+                      </motion.div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
-
-      {filtered.length === 0 ? (
-        <div className="text-center py-12 space-y-3">
-          <p className="text-2xl">📚</p>
-          <p className="text-xs text-muted-foreground/60 font-mono max-w-[240px] mx-auto">
-            {t('library.emptyStateAction', { defaultValue: 'Complete a pause session to see your reflections, companions, and insights here.' })}
-          </p>
-          <p className="text-[9px] text-muted-foreground/30 font-mono">
-            {t('library.emptyStateHint', { defaultValue: 'Swipe cards left to delete, right to favorite' })}
-          </p>
-        </div>
-      ) : useVirtual ? (
-        <GroupedVirtuoso
-          style={{ height: '100%' }}
-          groupCounts={groupCounts}
-          groupContent={(index) => (
-            <div className="bg-background/95 backdrop-blur-sm pt-2 pb-1 px-3">
-              <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider">
-                {groupLabels[index]}
-              </p>
-            </div>
-          )}
-          itemContent={(index) => renderCard(index, flatItems[index])}
-          overscan={200}
-        />
-      ) : (
-        <div className="space-y-4">
-          {pinnedItems.length > 0 && (
-            <div className="space-y-0.5">
-              <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider px-3 pb-1">
-                📌 {t('common.pinned')}
-              </p>
-              <div className="divide-y divide-border/20">
-                {pinnedItems.map((item, i) => (
-                  <motion.div
-                    key={item.id}
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.2, delay: Math.min(i * 0.03, 0.3) }}
-                  >
-                    {renderCard(i, item)}
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {unpinnedGroups.map((group) => (
-            <div key={group.key} className="space-y-0.5">
-              <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider px-3 pb-1">
-                {group.label}
-              </p>
-              <div className="divide-y divide-border/20">
-                {group.items.map((item, i) => (
-                  <motion.div
-                    key={item.id}
-                    initial={{ opacity: 0, y: 6 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.2, delay: Math.min(i * 0.03, 0.3) }}
-                  >
-                    {renderCard(i, item)}
-                  </motion.div>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
 
       <ItemDetailViewer
         item={currentSelectedItem}
