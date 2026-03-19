@@ -9,6 +9,7 @@ import { LibraryItems } from '@/components/library/LibraryItems';
 import { LibraryCollections } from '@/components/library/LibraryCollections';
 import { SmartCollections } from '@/components/library/SmartCollections';
 import { usePullToRefresh } from '@/hooks/use-pull-to-refresh';
+import { DuplicateBanner } from '@/components/library/DuplicateBanner';
 
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
@@ -330,6 +331,13 @@ export default function Library() {
               {sortLabel}
             </button>
           </div>
+
+          {/* Duplicate detection banner */}
+          <DuplicateBanner
+            items={items}
+            onDeleteItem={library.deleteItem}
+            onSelectItem={() => {}}
+          />
 
           {/* Item list with date grouping */}
           <LibraryItems library={library} filtered={filtered} />
