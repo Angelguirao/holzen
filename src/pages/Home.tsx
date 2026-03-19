@@ -27,6 +27,8 @@ import { useAuth } from '@/hooks/use-auth';
 import { toast } from 'sonner';
 import { AlertCircle, Loader2, Pause, Pin, Timer, Sparkles, Waves, RotateCcw, RefreshCw, Lock, X, Anchor } from 'lucide-react';
 import { PracticeWidget } from '@/components/PracticeWidget';
+import { BulkHoldCard } from '@/components/BulkHoldCard';
+import { SnoozeControl } from '@/components/SnoozeControl';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { playNotificationTone, prefetchNotificationTone } from '@/lib/notification-tone';
 import {
@@ -420,6 +422,7 @@ const Home = () => {
               <BtcStatus data={btcData} error={error} hidden={priceHidden} onToggleHidden={togglePriceHidden} currency={currency} btcMode={btcMode} onToggleBtcMode={toggleBtcMode} />
               <HolzenNumber variant="compact" />
               <AutoCooldownIndicator cooldownRemaining={autoCooldownRemaining} cooldownHours={cooldownHours} nextCronCheckIn={nextCronCheckIn} />
+              <SnoozeControl />
             </div>
           </HomeWidget>
         );
@@ -447,6 +450,9 @@ const Home = () => {
             alwaysOpen
           >
             <div className="space-y-4">
+              {/* Bulk hold for accumulated pauses */}
+              <BulkHoldCard />
+
               {/* 24h follow-up check-in */}
               <FollowUpCard />
 
