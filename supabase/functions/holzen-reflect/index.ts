@@ -213,6 +213,32 @@ Haiku rules:
 - No trading advice or price predictions.
 - MUST be original and unique — never repeat common phrases like "red screens" or "breath moves".${haikuDedup}`;
 
+    // Build message dedup instruction — extract structural patterns to avoid repetitive reflections
+    let messageDedup = "";
+    if (recentMessages && Array.isArray(recentMessages) && recentMessages.length > 0) {
+      const stopWords = new Set(["the","a","an","is","in","on","of","and","to","with","its","that","this","for","are","was","has","had","but","not","from","they","all","been","have","will","can","just","or","as","at","be","it","so","no","do","my","by","your","you"]);
+      const openingPhrases = recentMessages.slice(0, 5).map((m: string) => {
+        const words = m.split(/\s+/).slice(0, 6).join(" ");
+        return words;
+      });
+      const wordCounts: Record<string, number> = {};
+      for (const m of recentMessages.slice(0, 5)) {
+        const words = m.toLowerCase().replace(/[^\w\s]/g, "").split(/\s+/).filter((w: string) => w.length > 3 && !stopWords.has(w));
+        for (const w of words) { wordCounts[w] = (wordCounts[w] || 0) + 1; }
+      }
+      const overusedWords = Object.entries(wordCounts).filter(([_, c]) => c >= 3).map(([w]) => w);
+
+      messageDedup = `\n\nMESSAGE DEDUPLICATION: The user has recently received these reflections. You MUST write something structurally DIFFERENT — different opening, different metaphor, different sentence structure:\n${recentMessages.slice(0, 5).map((m: string, i: number) => `${i + 1}. "${m}"`).join("\n")}`;
+      if (openingPhrases.length > 0) {
+        messageDedup += `\n\nBANNED OPENINGS — do NOT start your message with any of these patterns:\n${openingPhrases.map((p: string) => `- "${p}..."`).join("\n")}`;
+      }
+      if (overusedWords.length > 0) {
+        messageDedup += `\nOVERUSED WORDS — avoid these: ${overusedWords.join(", ")}. Use fresh vocabulary.`;
+      }
+    }
+
+    const fullSystemPrompt = systemPrompt + messageDedup;
+
     const aiBody = {
       messages: [
         { role: "system", content: systemPrompt },
