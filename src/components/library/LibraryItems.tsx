@@ -59,7 +59,7 @@ export function LibraryItems({ library, filtered }: Props) {
   const { t } = useTranslation();
   const {
     items, collections, updateItem, deleteItem, togglePin, toggleFavorite,
-    addToCollection, removeFromCollection, getItemCollections, isCompanionEngaged,
+    addToCollection, removeFromCollection, getItemCollections, isCompanionEngaged, isReflectionIncomplete,
   } = library;
 
   const [selectedItem, setSelectedItem] = useState<LibraryItem | null>(null);
