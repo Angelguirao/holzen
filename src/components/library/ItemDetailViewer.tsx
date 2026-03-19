@@ -16,7 +16,7 @@ const TYPE_EMOJIS: Record<string, string> = {
 const SOURCE_EMOJIS: Record<string, string> = {
   reflection: '⏸',
   signal: '📡',
-  learning: '📖',
+  learning: '🌿',
   haiku: '🍃',
   zoom_out: '🔭',
   history_insight: '📜',
