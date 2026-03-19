@@ -309,13 +309,18 @@ export function useLibrary() {
     return incompleteReflections.has(item.reflection_id);
   }, [incompleteReflections]);
 
+  const getReflectionOutcome = useCallback((item: LibraryItem): string | null => {
+    if (item.source_type !== 'reflection' || !item.reflection_id) return null;
+    return reflectionOutcomes[item.reflection_id] ?? null;
+  }, [reflectionOutcomes]);
+
   return {
     items, collections, collectionItems, loading,
     addItem, updateItem, deleteItem, togglePin, toggleFavorite,
     addCollection, updateCollection, deleteCollection,
     addToCollection, removeFromCollection,
     getCollectionItemIds, getCollectionItemCount, getItemCollections,
-    isCompanionEngaged, isReflectionIncomplete,
+    isCompanionEngaged, isReflectionIncomplete, getReflectionOutcome,
     refetch: fetchAll,
   };
 }
