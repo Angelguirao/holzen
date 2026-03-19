@@ -36,12 +36,21 @@ export interface CollectionItem {
   added_at: string;
 }
 
+export interface ReflectionReadFlags {
+  haiku_read: boolean;
+  learning_read: boolean;
+  signal_read: boolean;
+  zoom_out_read: boolean;
+  history_read: boolean;
+}
+
 export function useLibrary() {
   const { user } = useAuth();
   const [items, setItems] = useState<LibraryItem[]>([]);
   const [collections, setCollections] = useState<Collection[]>([]);
   const [collectionItems, setCollectionItems] = useState<CollectionItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [readFlagsMap, setReadFlagsMap] = useState<Record<string, ReflectionReadFlags>>({});
 
   const fetchAll = useCallback(async () => {
     if (!user) return;
