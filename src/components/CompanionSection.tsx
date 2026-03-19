@@ -303,6 +303,12 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
     return null;
   }, []);
 
+  // Retry counters — incrementing these re-triggers the corresponding useEffect
+  const [nudgeRetry, setNudgeRetry] = useState(0);
+  const [signalRetry, setSignalRetry] = useState(0);
+  const [zoomOutRetry, setZoomOutRetry] = useState(0);
+  const [historyRetry, setHistoryRetry] = useState(0);
+
   // Lift nudge state here so it survives expand/collapse cycles
   const [nudge, setNudge] = useState<NudgeData | null>(null);
   const [nudgeLoading, setNudgeLoading] = useState(false);
