@@ -676,6 +676,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             nudge={nudge}
             nudgeLoading={nudgeLoading}
             nudgeError={nudgeError}
+            onRetry={() => { nudgeFetchedRef.current = null; setNudgeRetry(c => c + 1); }}
           />
         </CompanionCard>
       )}
@@ -699,6 +700,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             signal={signal}
             loading={signalLoading}
             error={signalError}
+            onRetry={() => { signalFetchedRef.current = null; setSignalRetry(c => c + 1); }}
           />
         </CompanionCard>
       )}
@@ -722,6 +724,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             data={zoomOut}
             loading={zoomOutLoading}
             error={zoomOutError}
+            onRetry={() => { zoomOutFetchedRef.current = null; setZoomOutRetry(c => c + 1); }}
           />
         </CompanionCard>
       )}
@@ -745,6 +748,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             data={historyInsight}
             loading={historyLoading}
             error={historyError}
+            onRetry={() => { historyFetchedRef.current = null; setHistoryRetry(c => c + 1); }}
           />
         </CompanionCard>
       )}
