@@ -393,9 +393,10 @@ serve(async (req) => {
       if (insertedReflection?.id) {
         const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
         const anonKey = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
+        const svcKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
         const companionHeaders = {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${anonKey}`,
+          "Authorization": `Bearer ${svcKey}`,
           "apikey": anonKey,
         };
 
