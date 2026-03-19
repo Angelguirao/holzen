@@ -115,7 +115,15 @@ serve(async (req) => {
       messages: [
         {
           role: "system",
-          content: `${langInstruction}Extract ONE grounding nudge from the search results as JSON: {"title":"short bias/finding summary","body":"2-3 sentences referencing researchers and years","citation":"formatted like Kahneman & Tversky (1979), Prospect Theory","url":"citation URL"}. Use only facts from the results. Tone: calm, grounding, no advice.`,
+          content: `${langInstruction}Extract ONE grounding nudge from the search results as JSON: {"title":"short bias/finding summary","body":"2-3 sentences referencing researchers and years","citation":"formatted like Kahneman & Tversky (1979), Prospect Theory","url":"citation URL"}.
+
+ACCURACY RULES (CRITICAL):
+- Use ONLY facts, names, dates, and numbers that appear in the search results below
+- Do NOT invent researcher names, publication years, journal names, or statistics
+- If the search results are vague, keep the body general rather than fabricating specifics
+- Copy citation URLs character-for-character from the provided list
+
+Tone: calm, grounding, no advice.`,
         },
         {
           role: "user",
@@ -123,9 +131,10 @@ serve(async (req) => {
         },
       ],
       response_format: { type: "json_object" },
+      temperature: 0.3,
     };
 
-    const models = ["google/gemini-2.5-flash-lite", "google/gemini-2.5-flash"];
+    const models = ["google/gemini-2.5-flash", "google/gemini-3-flash-preview"];
     let nudge: any = null;
     let lastStatus = 500;
 
