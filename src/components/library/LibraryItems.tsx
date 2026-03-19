@@ -285,9 +285,15 @@ export function LibraryItems({ library, filtered }: Props) {
         ))}
 
         {filtered.length === 0 && (
-          <p className="text-xs text-muted-foreground/40 text-center py-12 font-mono">
-            {t('library.emptyState')}
-          </p>
+          <div className="text-center py-12 space-y-3">
+            <p className="text-2xl">📚</p>
+            <p className="text-xs text-muted-foreground/60 font-mono max-w-[240px] mx-auto">
+              {t('library.emptyStateAction', { defaultValue: 'Complete a pause session to see your reflections, companions, and insights here.' })}
+            </p>
+            <p className="text-[9px] text-muted-foreground/30 font-mono">
+              {t('library.emptyStateHint', { defaultValue: 'Swipe cards left to delete, right to favorite' })}
+            </p>
+          </div>
         )}
       </div>
 
