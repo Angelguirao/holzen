@@ -248,16 +248,17 @@ HOLDER PERSPECTIVE FILTER (CRITICAL):
 - Focus on what the data means for someone holding Bitcoin for years, not days
 - NEVER include phrases like "trading opportunity", "price target", "buy/sell signal", "chart pattern"
 
+ACCURACY RULES (CRITICAL):
+- Use ONLY data points, numbers, dates, and analyst names that appear in the search results
+- Do NOT invent statistics, percentages, or metrics not present in the source material
+- If the search results lack specific numbers, describe the trend qualitatively rather than fabricating data
+- The body must contain ONLY verifiable claims from the search results
+
 URL RULES (CRITICAL):
 - You MUST select a url from the citation list below. Copy it character-for-character.
 - If none match, use the FIRST citation URL.
 - If no citations exist, set url to "".
-- NEVER fabricate or shorten URLs. NEVER return partial domains like "glassnode.com".
-
-CONTENT RULES:
-- Include specific numbers: percentages, dates, prices, metrics
-- The body must contain verifiable claims from the search results
-- Do NOT invent data points not present in the search results`,
+- NEVER fabricate or shorten URLs. NEVER return partial domains like "glassnode.com".`,
         },
         {
           role: "user",
@@ -265,9 +266,10 @@ CONTENT RULES:
         },
       ],
       response_format: { type: "json_object" },
+      temperature: 0.3,
     };
 
-    const models = ["google/gemini-2.5-flash-lite", "google/gemini-2.5-flash"];
+    const models = ["google/gemini-2.5-flash", "google/gemini-3-flash-preview"];
     let signal: any = null;
     let lastStatus = 500;
 
