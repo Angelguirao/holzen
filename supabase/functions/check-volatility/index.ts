@@ -293,6 +293,13 @@ serve(async (req) => {
     }
 
     // Filter: must exceed at least one threshold AND not in cooldown AND not in quiet hours
+    // Helper: check if user has an active snooze
+    function isSnoozed(p: any): boolean {
+      const snoozedUntil = p.snoozed_until;
+      if (!snoozedUntil) return false;
+      return new Date(snoozedUntil).getTime() > Date.now();
+    }
+
     const eligible = profiles.filter((p) => {
       // Use direction-aware thresholds: threshold for up moves, threshold_down for down moves
       const effectiveThreshold = btc.direction === "down"
@@ -302,6 +309,7 @@ serve(async (req) => {
       const cumulativeTriggered = absCumChange >= ((p as any).cumulative_threshold ?? 15);
       if (!dailyTriggered && !cumulativeTriggered) return false;
       if (isInQuietHours(p)) return false;
+      if (isSnoozed(p)) return false;
       if (!p.last_trigger_at) return true;
       const cooldownMs = ((p as any).cooldown_hours ?? 6) * 60 * 60 * 1000;
       return new Date(p.last_trigger_at).getTime() < Date.now() - cooldownMs;
