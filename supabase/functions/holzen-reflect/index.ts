@@ -299,21 +299,9 @@ Haiku rules:
       throw new Error("AI generation failed after all retries");
     }
 
-    // Post-process learning URL — ensure it's from citations
-    let learningUrl = result.learning_url || "";
-    if (learningUrl && learningCitations.length > 0 && !learningCitations.includes(learningUrl)) {
-      learningUrl = learningCitations[0];
-    } else if (!learningUrl && learningCitations.length > 0) {
-      learningUrl = learningCitations[0];
-    }
-
     return new Response(JSON.stringify({
       message: result.message,
       haiku: result.haiku || null,
-      learning_title: result.learning_title || null,
-      learning_body: result.learning_body || null,
-      learning_citation: result.learning_citation || null,
-      learning_url: learningUrl || null,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

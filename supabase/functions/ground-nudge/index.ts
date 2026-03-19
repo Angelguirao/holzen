@@ -67,14 +67,30 @@ serve(async (req) => {
       search_mode: "academic",
     };
 
-    const searchResponse = await fetch("https://api.perplexity.ai/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${PERPLEXITY_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(perplexityBody),
-    });
+    const searchController = new AbortController();
+    const searchTimeout = setTimeout(() => searchController.abort(), 12000);
+    let searchResponse: Response;
+    try {
+      searchResponse = await fetch("https://api.perplexity.ai/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${PERPLEXITY_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(perplexityBody),
+        signal: searchController.signal,
+      });
+      clearTimeout(searchTimeout);
+    } catch (e) {
+      clearTimeout(searchTimeout);
+      if (e instanceof DOMException && e.name === "AbortError") {
+        return new Response(
+          JSON.stringify({ error: "Search timed out" }),
+          { status: 504, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+      throw e;
+    }
 
     if (!searchResponse.ok) {
       const errText = await searchResponse.text();
