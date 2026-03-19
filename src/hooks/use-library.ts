@@ -100,8 +100,10 @@ export function useLibrary() {
           zoom_out_read: !!r.zoom_out_read,
           history_read: !!r.history_read,
         };
+        if (!r.outcome) incomplete.add(r.id);
       }
       setReadFlagsMap(flags);
+      setIncompleteReflections(incomplete);
 
       const inserts: any[] = [];
       for (const r of allReflections as any[]) {
