@@ -207,23 +207,6 @@ export default function Library() {
             </div>
           )}
 
-          {/* Status chips */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-0.5 -mx-1 px-1 scrollbar-none">
-            {STATUS_CHIPS.map(({ key, label }) => (
-              <button
-                key={key}
-                onClick={() => setStatusFilter(statusFilter === key ? null : key)}
-                className={cn(
-                  'text-[10px] font-mono px-2 py-1 rounded-full border transition-colors whitespace-nowrap',
-                  statusFilter === key
-                    ? 'border-foreground/20 bg-foreground/5 text-foreground'
-                    : 'border-border/30 text-muted-foreground/50 hover:text-muted-foreground/70'
-                )}
-              >
-                {t(`library.${label}`)}
-              </button>
-            ))}
-          </div>
 
           {/* Tag chips */}
           {availableTags.length > 0 && (
