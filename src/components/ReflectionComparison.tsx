@@ -196,7 +196,7 @@ function GrowthInsight({ current, past, t }: { current: ComparisonReflection; pa
   const currentComposure = current.mood ? composureScale[current.mood] ?? -1 : -1;
   const pastComposure = past.mood ? composureScale[past.mood] ?? -1 : -1;
 
-  const holdOutcomes = ['held', 'hold', 'nothing'];
+  const holdOutcomes = ['held', 'hold', 'nothing']; // nothing kept for legacy data
   const currentHeld = current.outcome ? holdOutcomes.includes(current.outcome) : false;
   const pastHeld = past.outcome ? holdOutcomes.includes(past.outcome) : false;
 
