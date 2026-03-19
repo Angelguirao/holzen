@@ -10,6 +10,7 @@ interface Props {
   onToggleFavorite: (id: string) => void;
   onClick?: () => void;
   engaged?: boolean;
+  incomplete?: boolean;
 }
 
 const SOURCE_EMOJIS: Record<string, string> = {
@@ -31,7 +32,7 @@ const TYPE_LABELS: Record<string, string> = {
   clipping: '✂️',
 };
 
-export function LibraryItemCard({ item, onToggleFavorite, onClick, engaged = true }: Props) {
+export function LibraryItemCard({ item, onToggleFavorite, onClick, engaged = true, incomplete = false }: Props) {
   const { t } = useTranslation();
 
   const preview = useMemo(() => {
@@ -86,6 +87,9 @@ export function LibraryItemCard({ item, onToggleFavorite, onClick, engaged = tru
           )}
           {isNew && (
             <span className="shrink-0 h-1.5 w-1.5 rounded-full bg-primary" />
+          )}
+          {incomplete && (
+            <span className="shrink-0 text-[8px] font-mono text-destructive/60 uppercase tracking-wider">incomplete</span>
           )}
           {dimmed && (
             <span className="text-[8px] font-mono text-muted-foreground/40 uppercase tracking-wider">skipped</span>
