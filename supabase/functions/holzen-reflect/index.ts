@@ -82,7 +82,7 @@ serve(async (req) => {
           }
         }
 
-        const learningQuery = `Bitcoin behavioral finance or market psychology insight relevant to: ${context}. Find a specific educational fact, historical pattern, or research finding with real data.`;
+        const learningQuery = `behavioral finance, cognitive bias, or decision psychology insight relevant to someone feeling emotional about a financial loss or gain. Context: ${context}. Find a specific research finding, psychological principle, or decision science fact — NOT market analysis or price data.`;
 
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 8000);
