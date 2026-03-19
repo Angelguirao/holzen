@@ -176,7 +176,7 @@ serve(async (req) => {
     const langCode = language || "en";
     const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
     const langName = LANG_NAMES[langCode] || "English";
-    const langInstruction = langCode !== "en" ? `CRITICAL LANGUAGE REQUIREMENT: You MUST write ALL output — message, haiku, learning_title, and learning_body — in ${langName}. Every single field must be in ${langName}. Do NOT use English for any generated text. This is non-negotiable.\n\n` : "";
+    const langInstruction = langCode !== "en" ? `CRITICAL LANGUAGE REQUIREMENT: You MUST write ALL output — message and haiku — in ${langName}. Every single field must be in ${langName}. Do NOT use English for any generated text. This is non-negotiable.\n\n` : "";
 
     const systemPrompt = `${langInstruction}You generate a reflection with a haiku in response to Bitcoin volatility.
 
