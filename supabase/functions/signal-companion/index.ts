@@ -201,6 +201,12 @@ DIVERSITY RULES:
           role: "system",
           content: `${langInstruction}Extract ONE market signal from the search results below. Return JSON: {"title":"5-12 word headline","body":"2-3 sentences with specific data points","source":"exact source/analyst name","url":"citation URL"}
 
+HOLDER PERSPECTIVE FILTER (CRITICAL):
+- If the search result is about short-term trading, chart patterns, entry/exit signals, or price targets, you MUST reframe it as a long-term holder insight instead
+- Replace trading language ("buy signal", "breakout", "resistance") with holder language ("accumulation trend", "network growth", "supply dynamics")
+- Focus on what the data means for someone holding Bitcoin for years, not days
+- NEVER include phrases like "trading opportunity", "price target", "buy/sell signal", "chart pattern"
+
 URL RULES (CRITICAL):
 - You MUST select a url from the citation list below. Copy it character-for-character.
 - If none match, use the FIRST citation URL.
