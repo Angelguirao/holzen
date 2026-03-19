@@ -300,13 +300,18 @@ export function useLibrary() {
     return flagKey ? flags[flagKey] : true;
   }, [readFlagsMap]);
 
+  const isReflectionIncomplete = useCallback((item: LibraryItem): boolean => {
+    if (item.source_type !== 'reflection' || !item.reflection_id) return false;
+    return incompleteReflections.has(item.reflection_id);
+  }, [incompleteReflections]);
+
   return {
     items, collections, collectionItems, loading,
     addItem, updateItem, deleteItem, togglePin, toggleFavorite,
     addCollection, updateCollection, deleteCollection,
     addToCollection, removeFromCollection,
     getCollectionItemIds, getCollectionItemCount, getItemCollections,
-    isCompanionEngaged,
+    isCompanionEngaged, isReflectionIncomplete,
     refetch: fetchAll,
   };
 }
