@@ -438,7 +438,7 @@ serve(async (req) => {
           // Zoom Out companion
           fetch(`${supabaseUrl}/functions/v1/zoom-out-companion`, {
             method: "POST", headers: companionHeaders,
-            body: JSON.stringify({ context: ctx, reflectionMessage: result.message, language: companionLang }),
+            body: JSON.stringify({ context: ctx, reflectionMessage: result.message, language: companionLang, userId: profile.user_id }),
           }).then(async (res) => {
             if (!res.ok) { await res.text(); return; }
             const data = await res.json();
