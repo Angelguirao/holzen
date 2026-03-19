@@ -2,19 +2,19 @@ import { toast } from "sonner";
 
 /**
  * Registers the service worker and listens for updates.
- * When a new version activates, shows a toast then reloads.
+ * When a new version is ready, shows a persistent "Update available" toast
+ * with a Refresh button — the user decides when to reload.
  */
 export function listenForSwUpdate() {
   if (!('serviceWorker' in navigator)) return;
 
   let refreshing = false;
 
-  // Reload when a new SW takes control
+  // Reload when a new SW takes control (only after user clicks Refresh)
   navigator.serviceWorker.addEventListener('controllerchange', () => {
     if (refreshing) return;
     refreshing = true;
-    toast('Holzen updated — reloading…', { duration: 1500 });
-    setTimeout(() => window.location.reload(), 1200);
+    window.location.reload();
   });
 
   // Register the service worker
@@ -24,9 +24,22 @@ export function listenForSwUpdate() {
       // Check for updates periodically (every 60s)
       setInterval(() => registration.update(), 60 * 1000);
 
-      // If a new SW is already waiting (installed before this page loaded), activate it
+      const showUpdateToast = (waitingSW: ServiceWorker) => {
+        toast('A new version is available', {
+          duration: Infinity,
+          id: 'sw-update',
+          action: {
+            label: 'Refresh',
+            onClick: () => {
+              waitingSW.postMessage({ type: 'SKIP_WAITING' });
+            },
+          },
+        });
+      };
+
+      // If a new SW is already waiting, prompt user
       if (registration.waiting) {
-        registration.waiting.postMessage({ type: 'SKIP_WAITING' });
+        showUpdateToast(registration.waiting);
       }
 
       // Listen for new SW installations
@@ -35,9 +48,9 @@ export function listenForSwUpdate() {
         if (!newWorker) return;
 
         newWorker.addEventListener('statechange', () => {
-          // When the new SW is installed and waiting, activate it immediately
+          // When the new SW is installed and waiting, prompt user
           if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-            newWorker.postMessage({ type: 'SKIP_WAITING' });
+            showUpdateToast(newWorker);
           }
         });
       });
