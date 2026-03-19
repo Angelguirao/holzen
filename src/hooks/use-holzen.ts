@@ -479,6 +479,7 @@ export function useHolzen() {
           currency,
           language,
           recentHaikus,
+          recentMessages,
           learningSources: learningSources.length > 0 ? learningSources : undefined,
         },
       });
