@@ -51,7 +51,7 @@ export function LearningInput({ title, body, nudge, nudgeLoading = false, nudgeE
               target="_blank"
               rel="noopener noreferrer"
               className="text-primary/50 hover:text-primary transition-colors"
-              aria-label={t('learning.viewResearch')}
+              aria-label={t('grounding.viewResearch')}
             >
               <ExternalLink className="h-2.5 w-2.5" />
             </a>
@@ -61,7 +61,7 @@ export function LearningInput({ title, body, nudge, nudgeLoading = false, nudgeE
       {nudgeError && !nudge && (
         <div className="flex items-center gap-3 pt-1">
           <p className="text-[9px] font-mono text-muted-foreground/30">
-            {t('learning.researchGrounded')}
+            {t('grounding.researchGrounded')}
           </p>
           {onRetry && (
             <button
