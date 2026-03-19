@@ -431,12 +431,19 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           }
         } catch { /* non-critical */ }
 
+        // Get recently used signal sources from localStorage to enforce diversity
+        let recentSignalSources: string[] = [];
+        try {
+          recentSignalSources = JSON.parse(localStorage.getItem('holzen_recent_signal_sources') || '[]');
+        } catch { /* ignore */ }
+
         supabase.functions
           .invoke('signal-companion', {
             body: {
               context: context ?? '',
               language,
               sources: activeSources.length > 0 ? activeSources : undefined,
+              recentSignalSources,
             },
           })
           .then(({ data, error: fnError }) => {
@@ -446,6 +453,16 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             } else {
               const signalData = data as SignalData;
               setSignal(signalData);
+
+              // Track this source for future diversity
+              if (signalData.source) {
+                try {
+                  const recent = JSON.parse(localStorage.getItem('holzen_recent_signal_sources') || '[]');
+                  const updated = [signalData.source, ...recent.filter((s: string) => s !== signalData.source)].slice(0, 5);
+                  localStorage.setItem('holzen_recent_signal_sources', JSON.stringify(updated));
+                } catch { /* ignore */ }
+              }
+
               supabase
                 .from('reflections')
                 .update({
