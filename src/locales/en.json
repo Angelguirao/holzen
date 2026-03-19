@@ -1286,7 +1286,7 @@
     "priceIsNoise": "Price is noise. Value is constant.",
     "in24h": "in 24h"
   },
-  "learning": {
+  "grounding": {
     "findingResearch": "Finding research…",
     "viewResearch": "View research",
     "researchGrounded": "Behavioral science · Research-grounded"
