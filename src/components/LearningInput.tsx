@@ -59,9 +59,20 @@ export function LearningInput({ title, body, nudge, nudgeLoading = false, nudgeE
         </div>
       )}
       {nudgeError && !nudge && (
-        <p className="text-[9px] font-mono text-muted-foreground/30 pt-1">
-          {t('learning.researchGrounded')}
-        </p>
+        <div className="flex items-center gap-3 pt-1">
+          <p className="text-[9px] font-mono text-muted-foreground/30">
+            {t('learning.researchGrounded')}
+          </p>
+          {onRetry && (
+            <button
+              onClick={onRetry}
+              className="flex items-center gap-1 text-[10px] font-mono text-primary/50 hover:text-primary/80 transition-colors shrink-0"
+            >
+              <RefreshCw className="h-3 w-3" />
+              {t('common.retry', 'Retry')}
+            </button>
+          )}
+        </div>
       )}
     </div>
   );
