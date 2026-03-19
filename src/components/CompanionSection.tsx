@@ -305,14 +305,14 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
     setNudgeLoading(true);
     setNudgeError(false);
 
-    supabase
-      .from('reflections')
-      .select('learning_title, learning_body, learning_citation, learning_url')
-      .eq('id', reflectionId)
-      .single()
-      .then(async ({ data: row }) => {
-        if (cancelled) return;
-        if (row?.learning_citation) {
+    // Poll for pre-generated data, then fall back to live call
+    pollForCachedData(
+      reflectionId,
+      'learning_title, learning_body, learning_citation, learning_url',
+      (row) => !!row?.learning_citation,
+    ).then(async (row) => {
+      if (cancelled) return;
+      if (row?.learning_citation) {
           const cachedNudge = {
             title: row.learning_title ?? '',
             body: row.learning_body ?? '',
