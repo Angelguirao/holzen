@@ -51,6 +51,7 @@ export function useLibrary() {
   const [collectionItems, setCollectionItems] = useState<CollectionItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [readFlagsMap, setReadFlagsMap] = useState<Record<string, ReflectionReadFlags>>({});
+  const [incompleteReflections, setIncompleteReflections] = useState<Set<string>>(new Set());
 
   const fetchAll = useCallback(async () => {
     if (!user) return;
@@ -84,12 +85,13 @@ export function useLibrary() {
     );
     const { data: allReflections } = await supabase
       .from('reflections')
-      .select('id, message, context, created_at, haiku, learning_title, learning_body, learning_url, signal_title, signal_body, signal_source, signal_url, zoom_out_data, history_insight_data, haiku_read, learning_read, signal_read, zoom_out_read, history_read')
+      .select('id, message, context, created_at, outcome, haiku, learning_title, learning_body, learning_url, signal_title, signal_body, signal_source, signal_url, zoom_out_data, history_insight_data, haiku_read, learning_read, signal_read, zoom_out_read, history_read')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
     if (allReflections && allReflections.length > 0) {
-      // Build read flags map for companion engagement tracking
+      // Build read flags map and incomplete set
       const flags: Record<string, ReflectionReadFlags> = {};
+      const incomplete = new Set<string>();
       for (const r of allReflections as any[]) {
         flags[r.id] = {
           haiku_read: !!r.haiku_read,
@@ -98,8 +100,10 @@ export function useLibrary() {
           zoom_out_read: !!r.zoom_out_read,
           history_read: !!r.history_read,
         };
+        if (!r.outcome) incomplete.add(r.id);
       }
       setReadFlagsMap(flags);
+      setIncompleteReflections(incomplete);
 
       const inserts: any[] = [];
       for (const r of allReflections as any[]) {
@@ -296,13 +300,18 @@ export function useLibrary() {
     return flagKey ? flags[flagKey] : true;
   }, [readFlagsMap]);
 
+  const isReflectionIncomplete = useCallback((item: LibraryItem): boolean => {
+    if (item.source_type !== 'reflection' || !item.reflection_id) return false;
+    return incompleteReflections.has(item.reflection_id);
+  }, [incompleteReflections]);
+
   return {
     items, collections, collectionItems, loading,
     addItem, updateItem, deleteItem, togglePin, toggleFavorite,
     addCollection, updateCollection, deleteCollection,
     addToCollection, removeFromCollection,
     getCollectionItemIds, getCollectionItemCount, getItemCollections,
-    isCompanionEngaged,
+    isCompanionEngaged, isReflectionIncomplete,
     refetch: fetchAll,
   };
 }
