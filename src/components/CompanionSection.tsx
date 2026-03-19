@@ -404,7 +404,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
   useEffect(() => {
     if (!reflectionId) return;
     const key = reflectionId;
-    if (signalFetchedRef.current === key) return;
+    if (signalFetchedRef.current === key && signalRetry === 0) return;
     signalFetchedRef.current = key;
 
     let cancelled = false;
