@@ -31,6 +31,7 @@ interface Props {
   data: ZoomOutData | null;
   loading: boolean;
   error: boolean;
+  onRetry?: () => void;
 }
 
 const outcomeLabels: Record<string, string> = {
