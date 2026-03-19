@@ -149,23 +149,28 @@ export function SourceManagement() {
   }
 
   const renderSourceList = (category: string) => {
-    const typeOrder = category === 'signal' ? SIGNAL_TYPE_ORDER : LEARNING_TYPE_ORDER;
+    const typeOrder = category === 'signal' ? SIGNAL_TYPE_ORDER : GROUNDING_TYPE_ORDER;
     const categoryCatalog = catalog.filter((s) => s.category === category);
     const customSources = prefs.filter((p) => !p.source_id && p.custom_name && (p.category === category));
 
+    // Active catalog sources (not dismissed)
+    const activeCatalog = categoryCatalog.filter((s) => isActive(s.id));
+    // Dismissed catalog sources
+    const dismissedCatalog = categoryCatalog.filter((s) => !isActive(s.id));
+
     const grouped = typeOrder.map((type) => ({
       type,
-      sources: categoryCatalog.filter((s) => s.type === type),
+      sources: activeCatalog.filter((s) => s.type === type),
     })).filter((g) => g.sources.length > 0);
 
-    const activeCount = categoryCatalog.filter((s) => isActive(s.id)).length + customSources.filter((c) => c.active).length;
-    const totalCount = categoryCatalog.length + customSources.length;
+    const activeCount = activeCatalog.length + customSources.filter((c) => c.active).length;
+    const totalCount = activeCatalog.length + customSources.length;
 
     return (
       <div className="space-y-4">
         <div className="space-y-1">
           <p className="text-xs text-muted-foreground leading-relaxed">
-            {t(category === 'signal' ? 'sources.signalDescription' : 'sources.learningDescription')}
+            {t(category === 'signal' ? 'sources.signalDescription' : 'sources.groundingDescription')}
           </p>
           <p className="text-[10px] font-mono text-muted-foreground/40">
             {t('sources.activeCount', { active: activeCount, total: totalCount })}
@@ -194,11 +199,13 @@ export function SourceManagement() {
                       </p>
                     )}
                   </div>
-                  <Switch
-                    checked={isActive(source.id)}
-                    onCheckedChange={() => toggleSource(source.id)}
-                    className="shrink-0"
-                  />
+                  <button
+                    onClick={() => removeCatalogSource(source.id)}
+                    className="text-muted-foreground/40 hover:text-destructive transition-colors shrink-0"
+                    aria-label="Remove"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
                 </div>
               ))}
             </div>
