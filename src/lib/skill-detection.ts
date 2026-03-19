@@ -41,13 +41,13 @@ export function detectSkills(r: ReflectionForSkills): SkillType[] {
     if (!skills.includes('regulation')) skills.push('regulation');
   }
 
-  // Distress Tolerance: held/nothing during volatility
+  // Distress Tolerance: held during volatility (nothing treated as held for legacy)
   const vol = parseVolatility(r.context);
   if (vol >= 3 && (r.outcome === 'held' || r.outcome === 'nothing')) {
     skills.push('tolerance');
   }
 
-  // Decision Alignment: had an outcome recorded
+  // Decision Alignment: held steady (nothing treated as held for legacy)
   if (r.outcome === 'held' || r.outcome === 'nothing') {
     skills.push('alignment');
   }

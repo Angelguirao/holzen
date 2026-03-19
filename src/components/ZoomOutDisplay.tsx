@@ -35,7 +35,7 @@ interface Props {
 }
 
 const outcomeLabels: Record<string, string> = {
-  held: 'Held', hold: 'Held', sold: 'Sold', bought: 'Bought', nothing: 'Did nothing',
+  held: 'Held', hold: 'Held', sold: 'Sold', bought: 'Bought', nothing: 'Held',
 };
 
 export function ZoomOutDisplay({ data, loading, error, onRetry }: Props) {

@@ -104,7 +104,7 @@ export function InsightsPanel({ reflections }: Props) {
       {totalOutcomes > 0 && (
         <div className="space-y-2">
           <p className="text-xs font-mono text-muted-foreground/70">{t('insightsPanel.whatYouDid')}</p>
-          {(['held', 'nothing', 'bought', 'sold'] as const).map((o) => (
+          {(['held', 'bought', 'sold'] as const).map((o) => (
             <Bar key={o} label={t(`outcome.${o}`, o)} count={outcomeCounts[o] || 0} total={totalOutcomes} color={OUTCOME_COLORS[o]} />
           ))}
         </div>
