@@ -555,7 +555,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
   useEffect(() => {
     if (!prefs.history || !reflectionId) return;
     const key = reflectionId;
-    if (historyFetchedRef.current === key) return;
+    if (historyFetchedRef.current === key && historyRetry === 0) return;
     historyFetchedRef.current = key;
 
     let cancelled = false;
