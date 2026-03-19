@@ -918,7 +918,7 @@ function AutoCooldownIndicator({
         <Timer className="h-3.5 w-3.5 text-primary/60 shrink-0" />
         <div className="flex-1">
           <p className="text-[10px] font-mono text-primary/60 uppercase tracking-wider">
-            {t('home.monitoringNextCheck', { minutes: cronMinutes }, `Monitoring · next check ≈ ${cronMinutes}m`)}
+            {t('home.monitoringNextCheck', { minutes: cronMinutes, defaultValue: `Monitoring · next check ≈ {{minutes}}m` })}
           </p>
         </div>
         <span className="h-1.5 w-1.5 rounded-full bg-primary/50 animate-pulse shrink-0" />
