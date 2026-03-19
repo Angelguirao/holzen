@@ -15,9 +15,10 @@ interface SmartCollection {
 interface Props {
   items: LibraryItem[];
   onSelect: (collection: SmartCollection) => void;
+  isReflectionIncomplete?: (item: LibraryItem) => boolean;
 }
 
-export function SmartCollections({ items, onSelect }: Props) {
+export function SmartCollections({ items, onSelect, isReflectionIncomplete }: Props) {
   const { t } = useTranslation();
 
   const activeItems = useMemo(
@@ -28,20 +29,23 @@ export function SmartCollections({ items, onSelect }: Props) {
   const smartCollections = useMemo<SmartCollection[]>(() => {
     const collections: SmartCollection[] = [];
 
-    // Unresolved decisions — reflections without an outcome
-    const unresolved = activeItems.filter(
-      (i) => i.source_type === 'reflection' && i.tags?.includes('reflection')
-    );
-    // We check for items that were marked incomplete via title pattern or missing outcome tag
-    // Since we don't have outcome in library_items, use the "incomplete" notion from the tag/status
-    if (unresolved.length > 0) {
-      collections.push({
-        id: 'smart_unresolved',
-        name: t('library.smartUnresolved', { defaultValue: 'Open loops' }),
-        emoji: '🔄',
-        description: t('library.smartUnresolvedDesc', { defaultValue: 'Reflections without a recorded outcome' }),
-        items: unresolved,
-      });
+    // Decisions without outcome — actually checks reflection completeness
+    if (isReflectionIncomplete) {
+      const noOutcome = activeItems.filter(
+        (i) => i.source_type === 'reflection' && isReflectionIncomplete(i)
+      );
+      if (noOutcome.length > 0) {
+        collections.push({
+          id: 'smart_no_outcome',
+          name: t('library.smartNoOutcome', { defaultValue: 'No outcome yet' }),
+          emoji: '⏳',
+          description: t('library.smartNoOutcomeDesc', {
+            defaultValue: `${noOutcome.length} reflections awaiting a decision`,
+            count: noOutcome.length,
+          }),
+          items: noOutcome,
+        });
+      }
     }
 
     // This week's highlights
@@ -70,20 +74,20 @@ export function SmartCollections({ items, onSelect }: Props) {
       });
     }
 
-    // Unread items
-    const unread = activeItems.filter((i) => i.status === 'unread');
-    if (unread.length > 0) {
+    // Pinned items
+    const pinned = activeItems.filter((i) => i.pinned);
+    if (pinned.length > 0) {
       collections.push({
-        id: 'smart_unread',
-        name: t('library.smartUnread', { defaultValue: 'Unread' }),
-        emoji: '🆕',
-        description: t('library.smartUnreadDesc', { defaultValue: `${unread.length} items you haven't opened` }),
-        items: unread,
+        id: 'smart_pinned',
+        name: t('library.smartPinned', { defaultValue: 'Pinned' }),
+        emoji: '📌',
+        description: t('library.smartPinnedDesc', { defaultValue: `${pinned.length} pinned items` }),
+        items: pinned,
       });
     }
 
     return collections;
-  }, [activeItems, t]);
+  }, [activeItems, t, isReflectionIncomplete]);
 
   if (smartCollections.length === 0) return null;
 
