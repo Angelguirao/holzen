@@ -9,6 +9,7 @@ import { LibraryItems } from '@/components/library/LibraryItems';
 import { LibraryCollections } from '@/components/library/LibraryCollections';
 import { SmartCollections } from '@/components/library/SmartCollections';
 import { usePullToRefresh } from '@/hooks/use-pull-to-refresh';
+import { DuplicateBanner } from '@/components/library/DuplicateBanner';
 
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
