@@ -129,12 +129,12 @@ function CompanionCard({
         }`}
       >
         <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors duration-300 ${
-          completed ? 'bg-primary/10' : expanded ? 'bg-primary/8' : 'bg-muted/30'
+          loading && !completed ? 'bg-muted/30 animate-pulse' : completed ? 'bg-primary/10' : expanded ? 'bg-primary/8' : 'bg-muted/30'
         }`}>
           {completed ? (
             <Check className="h-3.5 w-3.5 text-primary" />
           ) : (
-            <Icon className={`h-3.5 w-3.5 ${expanded ? 'text-primary/70' : 'text-muted-foreground/50'}`} />
+            <Icon className={`h-3.5 w-3.5 ${loading ? 'text-muted-foreground/30' : expanded ? 'text-primary/70' : 'text-muted-foreground/50'}`} />
           )}
         </div>
         <span className={`text-xs font-mono tracking-wide flex-1 ${completed ? 'text-muted-foreground/40' : 'text-foreground/70'}`}>
