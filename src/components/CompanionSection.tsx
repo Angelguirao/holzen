@@ -273,6 +273,22 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
       });
   }, [reflectionId]);
 
+  /** Poll DB for pre-generated companion data before falling back to live edge function call.
+   *  Checks up to 3 times with 2s intervals, giving pre-generation time to land. */
+  const pollForCachedData = useCallback(async (
+    reflectionId: string,
+    fields: string,
+    checkFn: (row: any) => boolean,
+    maxAttempts = 3,
+  ): Promise<any | null> => {
+    for (let i = 0; i < maxAttempts; i++) {
+      if (i > 0) await new Promise(r => setTimeout(r, 2000));
+      const { data: row } = await supabase.from('reflections').select(fields).eq('id', reflectionId).single();
+      if (row && checkFn(row)) return row;
+    }
+    return null;
+  }, []);
+
   // Lift nudge state here so it survives expand/collapse cycles
   const [nudge, setNudge] = useState<NudgeData | null>(null);
   const [nudgeLoading, setNudgeLoading] = useState(false);
