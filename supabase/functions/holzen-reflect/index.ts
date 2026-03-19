@@ -196,8 +196,8 @@ serve(async (req) => {
 You MUST respond with a JSON object containing these keys:
 - "message": The core reflection message (1-3 sentences)${langCode !== "en" ? ` in ${langName}` : ""}
 - "haiku": A haiku (3 lines separated by newlines, 5-7-5 syllables)${langCode !== "en" ? ` in ${langName}` : ""}
-- "learning_title": Short factual headline (5-10 words)${langCode !== "en" ? ` in ${langName}` : ""}
-- "learning_body": 1-2 sentences of factual educational context${langCode !== "en" ? ` in ${langName}` : ""}
+- "learning_title": Short factual headline about a psychological principle or cognitive bias (5-10 words)${langCode !== "en" ? ` in ${langName}` : ""}
+- "learning_body": 1-2 sentences about a behavioral finance principle, cognitive bias, or decision psychology research finding relevant to the emotional moment${langCode !== "en" ? ` in ${langName}` : ""}
 - "learning_citation": Source name (e.g. "Kahneman & Tversky, 1979" or "Glassnode Research")
 - "learning_url": A URL from the citation list if available, or "" if none
 
