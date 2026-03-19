@@ -315,8 +315,10 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       } catch { /* non-critical */ }
 
       let recentSignalSources: string[] = [];
+      let recentSignalTitles: string[] = [];
       try {
         recentSignalSources = JSON.parse(localStorage.getItem('holzen_recent_signal_sources') || '[]');
+        recentSignalTitles = JSON.parse(localStorage.getItem('holzen_recent_signal_titles') || '[]');
       } catch { /* ignore */ }
 
       supabase.functions
@@ -326,6 +328,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
             language,
             sources: activeSources.length > 0 ? activeSources : undefined,
             recentSignalSources,
+            recentSignalTitles,
           },
         })
         .then(({ data, error: fnError }) => {
