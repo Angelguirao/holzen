@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 
@@ -36,12 +36,21 @@ export interface CollectionItem {
   added_at: string;
 }
 
+export interface ReflectionReadFlags {
+  haiku_read: boolean;
+  learning_read: boolean;
+  signal_read: boolean;
+  zoom_out_read: boolean;
+  history_read: boolean;
+}
+
 export function useLibrary() {
   const { user } = useAuth();
   const [items, setItems] = useState<LibraryItem[]>([]);
   const [collections, setCollections] = useState<Collection[]>([]);
   const [collectionItems, setCollectionItems] = useState<CollectionItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [readFlagsMap, setReadFlagsMap] = useState<Record<string, ReflectionReadFlags>>({});
 
   const fetchAll = useCallback(async () => {
     if (!user) return;
@@ -75,10 +84,23 @@ export function useLibrary() {
     );
     const { data: allReflections } = await supabase
       .from('reflections')
-      .select('id, message, context, created_at, haiku, learning_title, learning_body, learning_url, signal_title, signal_body, signal_source, signal_url, zoom_out_data, history_insight_data')
+      .select('id, message, context, created_at, haiku, learning_title, learning_body, learning_url, signal_title, signal_body, signal_source, signal_url, zoom_out_data, history_insight_data, haiku_read, learning_read, signal_read, zoom_out_read, history_read')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
     if (allReflections && allReflections.length > 0) {
+      // Build read flags map for companion engagement tracking
+      const flags: Record<string, ReflectionReadFlags> = {};
+      for (const r of allReflections as any[]) {
+        flags[r.id] = {
+          haiku_read: !!r.haiku_read,
+          learning_read: !!r.learning_read,
+          signal_read: !!r.signal_read,
+          zoom_out_read: !!r.zoom_out_read,
+          history_read: !!r.history_read,
+        };
+      }
+      setReadFlagsMap(flags);
+
       const inserts: any[] = [];
       for (const r of allReflections as any[]) {
         if (!existingKeys.has(`${r.id}:reflection`)) {
@@ -258,12 +280,29 @@ export function useLibrary() {
     return collections.filter((c) => colIds.includes(c.id));
   }, [collectionItems, collections]);
 
+  const isCompanionEngaged = useCallback((item: LibraryItem): boolean => {
+    if (!item.reflection_id || !item.source_type) return true;
+    if (item.source_type === 'reflection' || item.source_type === 'reflection_note') return true;
+    const flags = readFlagsMap[item.reflection_id];
+    if (!flags) return true; // no data, assume engaged
+    const sourceToFlag: Record<string, keyof ReflectionReadFlags> = {
+      haiku: 'haiku_read',
+      learning: 'learning_read',
+      signal: 'signal_read',
+      zoom_out: 'zoom_out_read',
+      history_insight: 'history_read',
+    };
+    const flagKey = sourceToFlag[item.source_type];
+    return flagKey ? flags[flagKey] : true;
+  }, [readFlagsMap]);
+
   return {
     items, collections, collectionItems, loading,
     addItem, updateItem, deleteItem, togglePin, toggleFavorite,
     addCollection, updateCollection, deleteCollection,
     addToCollection, removeFromCollection,
     getCollectionItemIds, getCollectionItemCount, getItemCollections,
+    isCompanionEngaged,
     refetch: fetchAll,
   };
 }

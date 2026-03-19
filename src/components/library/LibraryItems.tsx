@@ -59,7 +59,7 @@ export function LibraryItems({ library, filtered }: Props) {
   const { t } = useTranslation();
   const {
     items, collections, updateItem, deleteItem, togglePin, toggleFavorite,
-    addToCollection, removeFromCollection, getItemCollections,
+    addToCollection, removeFromCollection, getItemCollections, isCompanionEngaged,
   } = library;
 
   const [selectedItem, setSelectedItem] = useState<LibraryItem | null>(null);
@@ -177,6 +177,7 @@ export function LibraryItems({ library, filtered }: Props) {
         <LibraryItemCard
           item={item}
           onToggleFavorite={selectMode ? () => toggleSelect(item.id) : toggleFavorite}
+          engaged={isCompanionEngaged(item)}
           onClick={() => {
             if (selectMode) {
               toggleSelect(item.id);
