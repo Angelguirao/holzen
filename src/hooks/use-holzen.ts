@@ -420,17 +420,22 @@ export function useHolzen() {
     setLoading(true);
     setError(null);
 
-    // Fetch recent mood history + haikus + signal sources for adaptive tone & dedup
+    // Fetch recent mood history + haikus + signal sources + learning sources for adaptive tone & dedup
     let moodHistory: { mood: string; outcome: string | null; created_at: string }[] = [];
     let recentHaikus: string[] = [];
     let recentSignalSources: string[] = [];
+    let learningSources: { name: string; url?: string }[] = [];
     try {
-      const { data: recentReflections } = await supabase
-        .from('reflections')
-        .select('mood, outcome, created_at, haiku, signal_source')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(20);
+      const [{ data: recentReflections }, { data: catalogSources }, { data: userPrefs }] = await Promise.all([
+        supabase
+          .from('reflections')
+          .select('mood, outcome, created_at, haiku, signal_source')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(20),
+        supabase.from('signal_sources').select('id, name, url').eq('category', 'learning'),
+        supabase.from('user_signal_preferences').select('source_id, active, custom_name, custom_url, category').eq('user_id', user.id).eq('category', 'learning'),
+      ]);
       moodHistory = (recentReflections ?? [])
         .filter((r: any) => r.mood)
         .map((r: any) => ({ mood: r.mood, outcome: r.outcome, created_at: r.created_at }));
@@ -442,6 +447,16 @@ export function useHolzen() {
         .filter((r: any) => r.signal_source)
         .map((r: any) => r.signal_source as string)
         .slice(0, 5);
+
+      // Build active learning sources list
+      const disabledIds = new Set((userPrefs ?? []).filter((p: any) => p.source_id && !p.active).map((p: any) => p.source_id));
+      const catalogActive = (catalogSources ?? [])
+        .filter((s: any) => !disabledIds.has(s.id))
+        .map((s: any) => ({ name: s.name, url: s.url }));
+      const customActive = (userPrefs ?? [])
+        .filter((p: any) => !p.source_id && p.custom_name && p.active)
+        .map((p: any) => ({ name: p.custom_name, url: p.custom_url }));
+      learningSources = [...catalogActive, ...customActive];
     } catch { /* non-critical */ }
 
     try {
@@ -459,6 +474,7 @@ export function useHolzen() {
           currency,
           language,
           recentHaikus,
+          learningSources: learningSources.length > 0 ? learningSources : undefined,
         },
       });
 
