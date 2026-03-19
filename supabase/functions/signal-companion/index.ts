@@ -141,93 +141,106 @@ serve(async (req) => {
       throw new Error("No search content returned");
     }
 
-    // Step 2: Use Lovable AI to structure the result with 18s timeout
+    // Step 2: Use Lovable AI to structure the result with fallback model retry
     const langInstruction = langCode !== "en" ? `Write in ${langName}. Keep source name/URL as-is.\n` : "";
 
     log("calling AI structuring");
-    const aiController = new AbortController();
-    const aiTimeout = setTimeout(() => aiController.abort(), 18000);
 
-    try {
-      const structureResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
+    const aiBody = {
+      messages: [
+        {
+          role: "system",
+          content: `${langInstruction}Extract ONE signal from the search results as JSON: {"title":"5-12 word headline","body":"2-3 sentences, calm tone","source":"source name","url":"citation URL"}. Use only facts from the results. No hype, no advice.`,
         },
-        body: JSON.stringify({
-          model: "google/gemini-2.5-flash-lite",
-          messages: [
-            {
-              role: "system",
-              content: `${langInstruction}Extract ONE signal from the search results as JSON: {"title":"5-12 word headline","body":"2-3 sentences, calm tone","source":"source name","url":"citation URL"}. Use only facts from the results. No hype, no advice.`,
-            },
-            {
-              role: "user",
-              content: `Search results:\n${searchContent}\n\nCitation URLs:\n${citations.map((c: string, i: number) => `[${i + 1}] ${c}`).join("\n")}`,
-            },
-          ],
-          response_format: { type: "json_object" },
-        }),
-        signal: aiController.signal,
-      });
-      clearTimeout(aiTimeout);
+        {
+          role: "user",
+          content: `Search results:\n${searchContent}\n\nCitation URLs:\n${citations.map((c: string, i: number) => `[${i + 1}] ${c}`).join("\n")}`,
+        },
+      ],
+      response_format: { type: "json_object" },
+    };
 
-      log(`AI responded ${structureResponse.status}`);
+    const models = ["google/gemini-2.5-flash-lite", "google/gemini-2.5-flash"];
+    let signal: any = null;
+    let lastStatus = 500;
 
-      if (!structureResponse.ok) {
-        if (structureResponse.status === 429) {
-          return new Response(
-            JSON.stringify({ error: "Rate limited. Try again later." }),
-            { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
-        if (structureResponse.status === 402) {
-          return new Response(
-            JSON.stringify({ error: "AI usage limit reached." }),
-            { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
-        }
-        const text = await structureResponse.text();
-        console.error("AI structure error:", structureResponse.status, text);
-        throw new Error("AI structuring failed");
-      }
-
-      const structureData = await structureResponse.json();
-      const content = structureData.choices?.[0]?.message?.content;
-
-      if (!content) {
-        throw new Error("No signal returned from AI");
-      }
-
-      let signal: any;
+    for (const model of models) {
+      const aiController = new AbortController();
+      const aiTimeout = setTimeout(() => aiController.abort(), 18000);
       try {
-        signal = typeof content === "string" ? JSON.parse(content) : content;
-      } catch {
-        console.error("Failed to parse AI content:", content);
-        throw new Error("AI returned invalid JSON");
-      }
+        const structureResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${LOVABLE_API_KEY}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ ...aiBody, model }),
+          signal: aiController.signal,
+        });
+        clearTimeout(aiTimeout);
 
-      // Ensure URL is from citations if possible
-      if (citations.length > 0 && !citations.includes(signal.url)) {
-        signal.url = citations[0];
-      }
+        log(`AI ${model} responded ${structureResponse.status}`);
 
-      log(`done, signal: ${signal.title}`);
-      return new Response(JSON.stringify(signal), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    } catch (e) {
-      clearTimeout(aiTimeout);
-      if (e instanceof DOMException && e.name === "AbortError") {
-        log("AI timed out after 18s");
-        return new Response(
-          JSON.stringify({ error: "AI structuring timed out" }),
-          { status: 504, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+        if (structureResponse.status === 429 || structureResponse.status === 402) {
+          lastStatus = structureResponse.status;
+          await structureResponse.text();
+          break; // rate limit applies to all models
+        }
+
+        if (!structureResponse.ok) {
+          const text = await structureResponse.text();
+          console.error(`AI ${model} error:`, structureResponse.status, text);
+          lastStatus = structureResponse.status;
+          if (model !== models[models.length - 1]) { log(`Retrying with fallback model`); continue; }
+          break;
+        }
+
+        const structureData = await structureResponse.json();
+        const content = structureData.choices?.[0]?.message?.content;
+        if (!content) {
+          if (model !== models[models.length - 1]) { log(`Empty response, retrying`); continue; }
+          throw new Error("No signal returned from AI");
+        }
+
+        try {
+          signal = typeof content === "string" ? JSON.parse(content) : content;
+        } catch {
+          const m = (typeof content === "string" ? content : "").match(/\{[\s\S]*\}/);
+          if (m) signal = JSON.parse(m[0]);
+          else if (model !== models[models.length - 1]) { log(`Bad JSON, retrying`); continue; }
+          else throw new Error("AI returned invalid JSON");
+        }
+        break; // success
+      } catch (e) {
+        clearTimeout(aiTimeout);
+        if (e instanceof DOMException && e.name === "AbortError") {
+          log(`AI ${model} timed out after 18s`);
+          lastStatus = 504;
+          if (model !== models[models.length - 1]) { log(`Retrying with fallback model`); continue; }
+          return new Response(
+            JSON.stringify({ error: "AI structuring timed out" }),
+            { status: 504, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
+        throw e;
       }
-      throw e;
     }
+
+    if (!signal) {
+      if (lastStatus === 429) return new Response(JSON.stringify({ error: "Rate limited. Try again later." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      if (lastStatus === 402) return new Response(JSON.stringify({ error: "AI usage limit reached." }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      throw new Error("AI structuring failed after all retries");
+    }
+
+    // Ensure URL is from citations if possible
+    if (citations.length > 0 && !citations.includes(signal.url)) {
+      signal.url = citations[0];
+    }
+
+    log(`done, signal: ${signal.title}`);
+    return new Response(JSON.stringify(signal), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
   } catch (e) {
     console.error("signal-companion error:", e);
     return new Response(

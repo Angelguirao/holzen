@@ -67,9 +67,13 @@ Rules:
 - Vary the angle: one about emotions, one about patterns/behavior, one about future intention
 - Be warm but not patronizing. Speak like a wise friend, not a therapist
 - Respond in ${language === "en" ? "English" : language}
-- Return ONLY a JSON array of 3 strings, nothing else
+
+Return a JSON object with key "prompts" containing an array of 3 strings.
 
 ${contextBlock}${recentPromptsBlock}`;
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -78,14 +82,17 @@ ${contextBlock}${recentPromptsBlock}`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: "google/gemini-2.5-flash-lite",
         messages: [
           { role: "system", content: systemPrompt },
           { role: "user", content: "Generate 3 journal prompts for me." },
         ],
+        response_format: { type: "json_object" },
         temperature: 0.9,
       }),
+      signal: controller.signal,
     });
+    clearTimeout(timeout);
 
     if (!response.ok) {
       if (response.status === 429) {
@@ -106,11 +113,20 @@ ${contextBlock}${recentPromptsBlock}`;
     }
 
     const result = await response.json();
-    const raw = result.choices?.[0]?.message?.content ?? "[]";
+    const raw = result.choices?.[0]?.message?.content ?? "{}";
 
-    // Extract JSON array from response (handle markdown code blocks)
-    const jsonMatch = raw.match(/\[[\s\S]*\]/);
-    const prompts = jsonMatch ? JSON.parse(jsonMatch[0]) : [];
+    let prompts: string[];
+    try {
+      const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
+      prompts = parsed.prompts || parsed;
+      if (!Array.isArray(prompts)) {
+        const jsonMatch = raw.match(/\[[\s\S]*\]/);
+        prompts = jsonMatch ? JSON.parse(jsonMatch[0]) : [];
+      }
+    } catch {
+      const jsonMatch = raw.match(/\[[\s\S]*\]/);
+      prompts = jsonMatch ? JSON.parse(jsonMatch[0]) : [];
+    }
 
     return new Response(JSON.stringify({ prompts }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
