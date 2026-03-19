@@ -250,6 +250,10 @@ export function LibraryItems({ library, filtered }: Props) {
               {t('library.selectAll', { defaultValue: 'Select all' })}
             </button>
             <div className="flex-1" />
+            <ExportMenu
+              items={filtered.filter((i) => selectedIds.has(i.id))}
+              label={`${selectedIds.size}`}
+            />
             <button
               onClick={handleBulkFavorite}
               disabled={bulkLoading || selectedIds.size === 0}
