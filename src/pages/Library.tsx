@@ -22,11 +22,6 @@ const SOURCE_CHIPS: { key: string; emoji: string; label: string }[] = [
   { key: 'external', emoji: '🔗', label: 'External' },
 ];
 
-const STATUS_CHIPS: { key: string; label: string }[] = [
-  { key: 'unread', label: 'statusUnread' },
-  { key: 'read', label: 'statusRead' },
-  { key: 'archived', label: 'statusArchived' },
-];
 
 type Tab = 'all' | 'favorites' | 'collections';
 
