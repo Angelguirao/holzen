@@ -795,7 +795,7 @@ const History = () => {
               {r.outcome ? (
                 <p className="text-[10px] font-mono text-muted-foreground/50 capitalize">→ {r.outcome}</p>
               ) : (
-                <p className="text-[10px] font-mono text-muted-foreground/30 italic">
+                <p className="text-[10px] font-mono text-muted-foreground/50 italic">
                   {t('history.incomplete', 'Incomplete — no decision recorded')}
                 </p>
               )}
