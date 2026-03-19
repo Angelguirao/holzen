@@ -249,6 +249,10 @@ You MUST respond with a JSON object containing "title" and "body" keys. No other
             }
           }
         }
+      }
+    } catch (e) {
+      console.warn("Deep time generation failed:", e);
+    }
 
     // --- 4. Build response ---
     const result = {
