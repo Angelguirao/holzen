@@ -61,7 +61,7 @@ export function LearningInput({ title, body, nudge, nudgeLoading = false, nudgeE
       {nudgeError && !nudge && (
         <div className="flex items-center gap-3 pt-1">
           <p className="text-[9px] font-mono text-muted-foreground/30">
-            {t('learning.researchGrounded')}
+            {t('grounding.researchGrounded')}
           </p>
           {onRetry && (
             <button
