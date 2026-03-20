@@ -68,8 +68,8 @@ function passesQualityGate(nudge: any): boolean {
   return true;
 }
 
-/** Fallback chain: cache → curated. Returns { data, source } for observability. */
-async function serveFallback(svcClient: any): Promise<{ data: any; source: string }> {
+/** Fallback chain: cache → curated. Returns { data, source, cacheId } for observability + feedback. */
+async function serveFallback(svcClient: any): Promise<{ data: any; source: string; cacheId: string | null }> {
   try {
     const { data } = await svcClient
       .from("companion_cache")
@@ -82,7 +82,7 @@ async function serveFallback(svcClient: any): Promise<{ data: any; source: strin
     if (data && data.length > 0) {
       const pick = data[Math.floor(Math.random() * data.length)];
       svcClient.from("companion_cache").update({ used_count: (pick.used_count || 0) + 1 }).eq("id", pick.id).then(() => {});
-      return { data: pick.content, source: "cache" };
+      return { data: pick.content, source: "cache", cacheId: pick.id };
     }
     const { data: anyQ } = await svcClient
       .from("companion_cache")
@@ -94,10 +94,10 @@ async function serveFallback(svcClient: any): Promise<{ data: any; source: strin
     if (anyQ && anyQ.length > 0) {
       const pick = anyQ[Math.floor(Math.random() * anyQ.length)];
       svcClient.from("companion_cache").update({ used_count: (pick.used_count || 0) + 1 }).eq("id", pick.id).then(() => {});
-      return { data: pick.content, source: "cache" };
+      return { data: pick.content, source: "cache", cacheId: pick.id };
     }
   } catch { /* continue to curated */ }
-  return { data: CURATED_FALLBACKS[Math.floor(Math.random() * CURATED_FALLBACKS.length)], source: "curated" };
+  return { data: CURATED_FALLBACKS[Math.floor(Math.random() * CURATED_FALLBACKS.length)], source: "curated", cacheId: null };
 }
 
 serve(async (req) => {
@@ -139,7 +139,7 @@ serve(async (req) => {
       log("missing API keys, serving fallback");
       const fb = await serveFallback(svcClient);
       trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
-      return new Response(JSON.stringify(fb.data), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     // Pick a bias category, avoiding recently used ones
@@ -203,13 +203,13 @@ serve(async (req) => {
       log(`perplexity failed: ${e}`);
       const fb = await serveFallback(svcClient);
       trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
-      return new Response(JSON.stringify(fb.data), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     if (!searchContent) {
       const fb = await serveFallback(svcClient);
       trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
-      return new Response(JSON.stringify(fb.data), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     // ── Step 2: AI structuring ──
@@ -305,7 +305,7 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
       log(`quality gate failed: ${!nudge ? "no nudge" : `body=${(nudge.body||"").length}chars, slop=${containsSlop(nudge?.body||"") || containsSlop(nudge?.title||"")}`}`);
       const fb = await serveFallback(svcClient);
       trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated", { reason: "quality_gate" });
-      return new Response(JSON.stringify(fb.data), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     // ── Post-processing: URL validation ──

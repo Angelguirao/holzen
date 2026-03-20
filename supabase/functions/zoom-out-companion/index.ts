@@ -33,6 +33,20 @@ const CURATED_DEEP_TIME = [
 // ── BANNED AI-SLOP PHRASES ──
 const BANNED_PHRASES = ["dive into", "game-changer", "paradigm shift", "revolutionary", "unprecedented", "navigate the", "in the world of", "it's worth noting", "at the end of the day", "moving forward", "leverage", "synergy", "ecosystem", "disruptive", "next-gen", "cutting-edge"];
 
+const MIN_BODY_LENGTH = 60;
+
+function containsSlop(text: string): boolean {
+  const lower = text.toLowerCase();
+  return BANNED_PHRASES.some(p => lower.includes(p));
+}
+
+function passesDeepTimeQuality(dt: any): boolean {
+  if (!dt?.title || !dt?.body) return false;
+  if ((dt.body || "").length < MIN_BODY_LENGTH) return false;
+  if (containsSlop(dt.body) || containsSlop(dt.title)) return false;
+  return true;
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS")
     return new Response(null, { headers: corsHeaders });
@@ -236,7 +250,7 @@ No trading advice, no price predictions, no exclamation marks.${mood ? `\n\nUSER
             if (raw) {
               try {
                 const parsed = JSON.parse(raw);
-                if (parsed.title && parsed.body) {
+                if (parsed.title && parsed.body && passesDeepTimeQuality(parsed)) {
                   deepTime = { title: parsed.title, body: parsed.body };
                   deepTimeSource = "live";
                   // Cache with title-based dedup
@@ -250,6 +264,9 @@ No trading advice, no price predictions, no exclamation marks.${mood ? `\n\nUSER
                     } catch { /* non-fatal */ }
                   })();
                   break;
+                } else if (parsed.title && parsed.body) {
+                  log(`deepTime quality gate failed: body=${(parsed.body||"").length}chars slop=${containsSlop(parsed.body||"")}`);
+                  if (model !== models[models.length - 1]) continue;
                 }
               } catch { if (model !== models[models.length - 1]) continue; }
             } else if (model !== models[models.length - 1]) continue;

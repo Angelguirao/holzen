@@ -70,8 +70,24 @@ async function isUrlReachable(url: string): Promise<boolean> {
   }
 }
 
-/** Fallback chain: cache → curated. Returns { data, source } for observability. */
-async function serveFallback(svcClient: any): Promise<{ data: any; source: string }> {
+const BANNED_PHRASES = ["dive into", "game-changer", "paradigm shift", "revolutionary", "unprecedented", "navigate the", "in the world of", "it's worth noting", "at the end of the day", "moving forward", "leverage", "synergy", "ecosystem", "disruptive", "next-gen", "cutting-edge"];
+const MIN_BODY_LENGTH = 80;
+
+function containsSlop(text: string): boolean {
+  const lower = text.toLowerCase();
+  return BANNED_PHRASES.some(p => lower.includes(p));
+}
+
+function passesQualityGate(sig: any): boolean {
+  if (!sig?.title || !sig?.body) return false;
+  if ((sig.body || "").length < MIN_BODY_LENGTH) return false;
+  if (containsSlop(sig.body) || containsSlop(sig.title)) return false;
+  if (/\d{2,}%|\$\d/.test(sig.body)) return false; // no market data in philosophy
+  return true;
+}
+
+/** Fallback chain: cache → curated. Returns { data, source, cacheId } for observability. */
+async function serveFallback(svcClient: any): Promise<{ data: any; source: string; cacheId: string | null }> {
   try {
     const { data } = await svcClient
       .from("companion_cache")
@@ -84,7 +100,7 @@ async function serveFallback(svcClient: any): Promise<{ data: any; source: strin
     if (data && data.length > 0) {
       const pick = data[Math.floor(Math.random() * data.length)];
       svcClient.from("companion_cache").update({ used_count: (pick.used_count || 0) + 1 }).eq("id", pick.id).then(() => {});
-      return { data: pick.content, source: "cache" };
+      return { data: pick.content, source: "cache", cacheId: pick.id };
     }
     const { data: anyQ } = await svcClient
       .from("companion_cache")
@@ -96,11 +112,11 @@ async function serveFallback(svcClient: any): Promise<{ data: any; source: strin
     if (anyQ && anyQ.length > 0) {
       const pick = anyQ[Math.floor(Math.random() * anyQ.length)];
       svcClient.from("companion_cache").update({ used_count: (pick.used_count || 0) + 1 }).eq("id", pick.id).then(() => {});
-      return { data: pick.content, source: "cache" };
+      return { data: pick.content, source: "cache", cacheId: pick.id };
     }
   } catch { /* continue to curated */ }
 
-  return { data: CURATED_FALLBACKS[Math.floor(Math.random() * CURATED_FALLBACKS.length)], source: "curated" };
+  return { data: CURATED_FALLBACKS[Math.floor(Math.random() * CURATED_FALLBACKS.length)], source: "curated", cacheId: null };
 }
 
 serve(async (req) => {
@@ -150,7 +166,7 @@ serve(async (req) => {
       log("missing API keys, serving fallback");
       const fb = await serveFallback(svcClient);
       trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
-      return new Response(JSON.stringify(fb.data), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     // Build source hints
@@ -264,13 +280,13 @@ DIVERSITY: Use a DIFFERENT thinker every time. Prefer timeless essays over recen
       log(`perplexity failed: ${e}`);
       const fb = await serveFallback(svcClient);
       trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
-      return new Response(JSON.stringify(fb.data), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     if (!searchContent) {
       const fb = await serveFallback(svcClient);
       trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
-      return new Response(JSON.stringify(fb.data), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     // ── Step 2: AI structuring ──
@@ -381,11 +397,11 @@ URL RULES (CRITICAL):
       }
     }
 
-    if (!signal || !signal.title || !signal.body) {
-      log("AI structuring failed, serving fallback");
+    if (!signal || !passesQualityGate(signal)) {
+      log(`quality gate failed: ${!signal ? "no signal" : `body=${(signal.body||"").length}chars, slop=${containsSlop(signal?.body||"")||containsSlop(signal?.title||"")}`}`);
       const fb = await serveFallback(svcClient);
-      trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
-      return new Response(JSON.stringify(fb.data), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated", { reason: "quality_gate" });
+      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     // ── Post-processing: URL validation ──
@@ -427,13 +443,8 @@ URL RULES (CRITICAL):
       }
     }
 
-    // ── Quality gate ──
-    const hasNumbers = /\d{2,}%|\$\d/.test(signal.body);
-    const tooShort = (signal.body?.length || 0) < 40;
-    if (hasNumbers || tooShort) {
-      log(`quality gate failed: hasNumbers=${hasNumbers} tooShort=${tooShort}`);
-      qualityScore = 0;
-    }
+    // Quality gate already passed via passesQualityGate above
+    let qualityScore = 1;
 
     // Cache good content with title-based dedup
     if (signal.title && signal.body && signal.source && qualityScore > 0) {
