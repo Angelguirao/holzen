@@ -86,6 +86,8 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const t0 = Date.now();
+
   try {
     // Auth check — use getUser() for full server-side validation
     const authHeader = req.headers.get("Authorization");
@@ -107,6 +109,14 @@ serve(async (req) => {
     );
     try { await svcClient.from("analytics_events").insert({ user_id: userId, event: "pause_ai_call" }); } catch (_) { /* tracking failure is non-fatal */ }
 
+    // Observability helper — fire-and-forget
+    const trackObs = (event: string, meta?: Record<string, any>) => {
+      svcClient.from("analytics_events").insert({
+        user_id: userId, event,
+        metadata: { companion_type: "reflection", latency_ms: Date.now() - t0, ...meta },
+      }).then(() => {});
+    };
+
     const { context, tone, customPrompt, style, moodHistory, severity, motivations, mantra, groundingActivities, currency, language, recentHaikus, recentMessages } = await req.json();
     if (!context) {
       return new Response(JSON.stringify({ error: "Missing context" }), {
@@ -117,8 +127,8 @@ serve(async (req) => {
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
-      // No API key — serve curated fallback
       const fallback = CURATED_REFLECTIONS[Math.floor(Math.random() * CURATED_REFLECTIONS.length)];
+      trackObs("companion_fallback_curated");
       return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
@@ -317,7 +327,6 @@ Haiku rules:
           console.warn(`[holzen-reflect] AI ${model} timed out after ${timeoutMs}ms`);
           lastStatus = 504;
           if (i < models.length - 1) continue;
-          // Both models timed out — serve curated fallback
           break;
         }
         throw e;
@@ -332,14 +341,15 @@ Haiku rules:
       if (lastStatus === 402) {
         return new Response(JSON.stringify({ error: "AI usage limit reached." }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
-      // Serve curated fallback instead of erroring
       console.warn("[holzen-reflect] All AI models failed, serving curated fallback");
       const fallback = CURATED_REFLECTIONS[Math.floor(Math.random() * CURATED_REFLECTIONS.length)];
+      trackObs("companion_fallback_curated");
       return new Response(JSON.stringify(fallback), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
+    trackObs("companion_live_generated");
     return new Response(JSON.stringify({
       message: result.message,
       haiku: result.haiku || null,
@@ -348,7 +358,6 @@ Haiku rules:
     });
   } catch (e) {
     console.error("holzen-reflect error:", e);
-    // Even on unexpected errors, try to serve curated content
     try {
       const fallback = CURATED_REFLECTIONS[Math.floor(Math.random() * CURATED_REFLECTIONS.length)];
       return new Response(JSON.stringify(fallback), {
