@@ -205,7 +205,9 @@ Tone: calm, grounding, no advice.`,
         }
 
         const structureData = await structureResponse.json();
-        const content = structureData.choices?.[0]?.message?.content;
+        // Handle tool_call response format
+        const toolCall = structureData.choices?.[0]?.message?.tool_calls?.[0];
+        const content = toolCall?.function?.arguments || structureData.choices?.[0]?.message?.content;
         if (!content) {
           if (model !== models[models.length - 1]) continue;
           throw new Error("No nudge returned from AI");
