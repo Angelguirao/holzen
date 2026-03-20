@@ -1,26 +1,65 @@
-import { RefreshCw } from 'lucide-react';
+import { RefreshCw, BookOpenText, Anchor, Clock, Mountain, Feather } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+
+const COMPANION_EMPTY_STATES: Record<string, { icon: React.ElementType; message: string; hint: string }> = {
+  signal: {
+    icon: BookOpenText,
+    message: 'No philosophical insight available right now.',
+    hint: 'Timeless Bitcoin thinking from the best minds — coming shortly.',
+  },
+  learning: {
+    icon: Anchor,
+    message: 'Grounding research is taking a moment.',
+    hint: 'Behavioral science to anchor your thinking — try again in a few seconds.',
+  },
+  history: {
+    icon: Clock,
+    message: 'Historical parallel unavailable.',
+    hint: 'Financial history rhymes — we\'ll find the right echo next time.',
+  },
+  zoomOut: {
+    icon: Mountain,
+    message: 'Zoom out view couldn\'t load.',
+    hint: 'Perspective needs a moment to gather — your past reflections and prices will appear here.',
+  },
+  haiku: {
+    icon: Feather,
+    message: 'Haiku couldn\'t be composed.',
+    hint: 'A poetic mirror for this moment — try refreshing.',
+  },
+};
 
 interface Props {
   message?: string;
+  companionType?: string;
   onRetry?: () => void;
 }
 
-export function CompanionError({ message, onRetry }: Props) {
+export function CompanionError({ message, companionType, onRetry }: Props) {
   const { t } = useTranslation();
+  const empty = companionType ? COMPANION_EMPTY_STATES[companionType] : null;
+  const Icon = empty?.icon;
 
   return (
-    <div className="flex items-center justify-between gap-3 py-1">
-      <p className="text-xs text-muted-foreground/50 italic">
-        {message ?? t('companions.loadError', 'Couldn\'t load right now.')}
-      </p>
+    <div className="rounded-lg border border-border/20 bg-muted/10 px-4 py-3.5 space-y-2">
+      <div className="flex items-center gap-2">
+        {Icon && <Icon className="h-3.5 w-3.5 text-muted-foreground/30 shrink-0" />}
+        <p className="text-xs text-muted-foreground/60">
+          {message ?? empty?.message ?? t('companions.loadError', 'Couldn\'t load right now.')}
+        </p>
+      </div>
+      {empty?.hint && (
+        <p className="text-[10px] text-muted-foreground/35 leading-relaxed">
+          {empty.hint}
+        </p>
+      )}
       {onRetry && (
         <button
           onClick={onRetry}
-          className="flex items-center gap-1.5 text-[10px] font-mono text-primary/50 hover:text-primary/80 transition-colors shrink-0"
+          className="flex items-center gap-1.5 text-[10px] font-mono text-primary/60 hover:text-primary transition-colors active:scale-[0.97]"
         >
           <RefreshCw className="h-3 w-3" />
-          {t('common.retry', 'Retry')}
+          {t('common.retry', 'Try again')}
         </button>
       )}
     </div>
