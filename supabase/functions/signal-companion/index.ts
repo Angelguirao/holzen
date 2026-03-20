@@ -171,7 +171,7 @@ serve(async (req) => {
       : `Latest Bitcoin on-chain analysis, macro trends, or long-term holder metrics with specific data points from researchers or analysts.${sourceHint}${recentExclusion}`;
 
     const perplexityBody: any = {
-      model: "sonar",
+      model: "sonar-pro",
       messages: [
         {
           role: "system",
@@ -182,12 +182,12 @@ ${ANTI_TRADING_INSTRUCTION}
 DIVERSITY RULES:
 - Use a DIFFERENT source every time — rotate between on-chain analysts, macro blogs, newsletters, dashboards, and podcasts
 - Do NOT default to Glassnode or any single source
-- Prefer recent analysis (last 7 days) from named analysts or publications
+- Prefer recent analysis (last 30 days) from named analysts or publications
 - Include the exact source name and a working URL to the specific article/page${recentExclusion}${topicExclusion}`,
         },
         { role: "user", content: searchQuery },
       ],
-      search_recency_filter: "week",
+      search_recency_filter: "month",
       ...(sourceUrls.length > 0 ? { search_domain_filter: sourceUrls.slice(0, 5) } : {}),
     };
 
@@ -277,7 +277,7 @@ DIVERSITY RULES:
       messages: [
         {
           role: "system",
-          content: `${langInstruction}Extract ONE market signal from the search results below. Return JSON: {"title":"5-12 word headline","body":"2-3 sentences with specific data points","source":"exact source/analyst name","url":"citation URL"}
+          content: `${langInstruction}Extract ONE market signal from the search results below.
 
 HOLDER PERSPECTIVE FILTER (CRITICAL):
 - If the search result is about short-term trading, chart patterns, entry/exit signals, or price targets, you MUST reframe it as a long-term holder insight instead
@@ -300,7 +300,25 @@ URL RULES (CRITICAL):
           content: `Search results:\n${searchContent}\n\nCitation URLs (pick one EXACTLY):\n${citationList}`,
         },
       ],
-      response_format: { type: "json_object" },
+      tools: [{
+        type: "function",
+        function: {
+          name: "return_signal",
+          description: "Return a single market signal extracted from search results",
+          parameters: {
+            type: "object",
+            properties: {
+              title: { type: "string", description: "5-12 word headline" },
+              body: { type: "string", description: "2-3 sentences with specific data points" },
+              source: { type: "string", description: "Exact source or analyst name" },
+              url: { type: "string", description: "Citation URL copied character-for-character from the list" },
+            },
+            required: ["title", "body", "source", "url"],
+            additionalProperties: false,
+          },
+        },
+      }],
+      tool_choice: { type: "function", function: { name: "return_signal" } },
       temperature: 0.3,
     };
 
@@ -335,7 +353,9 @@ URL RULES (CRITICAL):
         }
 
         const structureData = await structureResponse.json();
-        const content = structureData.choices?.[0]?.message?.content;
+        // Handle tool_call response format
+        const toolCall = structureData.choices?.[0]?.message?.tool_calls?.[0];
+        const content = toolCall?.function?.arguments || structureData.choices?.[0]?.message?.content;
         if (!content) {
           if (model !== models[models.length - 1]) { log("Empty response, retrying"); continue; }
           throw new Error("No signal returned from AI");
