@@ -70,8 +70,16 @@ async function isUrlReachable(url: string): Promise<boolean> {
   }
 }
 
-const BANNED_PHRASES = ["dive into", "game-changer", "paradigm shift", "revolutionary", "unprecedented", "navigate the", "in the world of", "it's worth noting", "at the end of the day", "moving forward", "leverage", "synergy", "ecosystem", "disruptive", "next-gen", "cutting-edge"];
+const BANNED_PHRASES = [
+  "dive into", "game-changer", "paradigm shift", "revolutionary", "unprecedented",
+  "navigate the", "in the world of", "it's worth noting", "at the end of the day",
+  "moving forward", "leverage", "synergy", "ecosystem", "disruptive", "next-gen",
+  "cutting-edge", "in today's", "it is important to", "crucial to understand",
+  "let's explore", "without a doubt", "it goes without saying", "needless to say",
+  "in conclusion", "at its core", "when it comes to", "in this article",
+];
 const MIN_BODY_LENGTH = 80;
+const MAX_BODY_LENGTH = 600;
 
 function containsSlop(text: string): boolean {
   const lower = text.toLowerCase();
@@ -79,10 +87,18 @@ function containsSlop(text: string): boolean {
 }
 
 function passesQualityGate(sig: any): boolean {
-  if (!sig?.title || !sig?.body) return false;
-  if ((sig.body || "").length < MIN_BODY_LENGTH) return false;
+  // Schema validation: all required fields must be non-empty strings
+  if (typeof sig?.title !== "string" || sig.title.trim().length < 5) return false;
+  if (typeof sig?.body !== "string" || sig.body.trim().length < MIN_BODY_LENGTH) return false;
+  if (typeof sig?.source !== "string" || sig.source.trim().length < 2) return false;
+  // Max length guard — overly long output is usually regurgitation
+  if (sig.body.length > MAX_BODY_LENGTH) return false;
+  // Slop check
   if (containsSlop(sig.body) || containsSlop(sig.title)) return false;
-  if (/\d{2,}%|\$\d/.test(sig.body)) return false; // no market data in philosophy
+  // No market data in philosophy
+  if (/\d{2,}%|\$\d/.test(sig.body)) return false;
+  // Title shouldn't be too long (headline, not a sentence)
+  if (sig.title.split(/\s+/).length > 14) return false;
   return true;
 }
 
