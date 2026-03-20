@@ -28,7 +28,7 @@ export function SignalDisplay({ signal, loading, error, onRetry }: SignalDisplay
   }
 
   if (error || !signal) {
-    return <CompanionError message="Couldn't load signal right now." onRetry={onRetry} />;
+    return <CompanionError companionType="signal" onRetry={onRetry} />;
   }
 
   return (
