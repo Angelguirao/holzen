@@ -187,33 +187,147 @@ export type Database = {
       }
       companion_cache: {
         Row: {
+          automated_score: number | null
+          citations: Json | null
           companion_type: string
           content: Json
           created_at: string
+          emotion_bucket: string | null
+          expires_at: string | null
+          fingerprint: string | null
           id: string
           language: string
+          last_served_at: string | null
+          last_validated_at: string | null
+          market_regime: string | null
+          quality_flags: Json | null
           quality_score: number
+          source_author: string | null
+          source_host: string | null
+          source_kind: string | null
+          source_title: string | null
+          source_url: string | null
+          thumbs_down: number | null
+          thumbs_up: number | null
+          title: string | null
+          title_norm: string | null
+          topic_slug: string | null
           used_count: number
+          user_score: number | null
         }
         Insert: {
+          automated_score?: number | null
+          citations?: Json | null
           companion_type: string
           content: Json
           created_at?: string
+          emotion_bucket?: string | null
+          expires_at?: string | null
+          fingerprint?: string | null
           id?: string
           language?: string
+          last_served_at?: string | null
+          last_validated_at?: string | null
+          market_regime?: string | null
+          quality_flags?: Json | null
           quality_score?: number
+          source_author?: string | null
+          source_host?: string | null
+          source_kind?: string | null
+          source_title?: string | null
+          source_url?: string | null
+          thumbs_down?: number | null
+          thumbs_up?: number | null
+          title?: string | null
+          title_norm?: string | null
+          topic_slug?: string | null
           used_count?: number
+          user_score?: number | null
         }
         Update: {
+          automated_score?: number | null
+          citations?: Json | null
           companion_type?: string
           content?: Json
           created_at?: string
+          emotion_bucket?: string | null
+          expires_at?: string | null
+          fingerprint?: string | null
           id?: string
           language?: string
+          last_served_at?: string | null
+          last_validated_at?: string | null
+          market_regime?: string | null
+          quality_flags?: Json | null
           quality_score?: number
+          source_author?: string | null
+          source_host?: string | null
+          source_kind?: string | null
+          source_title?: string | null
+          source_url?: string | null
+          thumbs_down?: number | null
+          thumbs_up?: number | null
+          title?: string | null
+          title_norm?: string | null
+          topic_slug?: string | null
           used_count?: number
+          user_score?: number | null
         }
         Relationships: []
+      }
+      companion_serves: {
+        Row: {
+          cache_entry_id: string | null
+          companion_type: string
+          content_fingerprint: string | null
+          content_title: string | null
+          created_at: string
+          id: string
+          latency_ms: number | null
+          reflection_id: string | null
+          serve_source: string
+          user_id: string
+        }
+        Insert: {
+          cache_entry_id?: string | null
+          companion_type: string
+          content_fingerprint?: string | null
+          content_title?: string | null
+          created_at?: string
+          id?: string
+          latency_ms?: number | null
+          reflection_id?: string | null
+          serve_source: string
+          user_id: string
+        }
+        Update: {
+          cache_entry_id?: string | null
+          companion_type?: string
+          content_fingerprint?: string | null
+          content_title?: string | null
+          created_at?: string
+          id?: string
+          latency_ms?: number | null
+          reflection_id?: string | null
+          serve_source?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "companion_serves_cache_entry_id_fkey"
+            columns: ["cache_entry_id"]
+            isOneToOne: false
+            referencedRelation: "companion_cache"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "companion_serves_reflection_id_fkey"
+            columns: ["reflection_id"]
+            isOneToOne: false
+            referencedRelation: "reflections"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       feedback: {
         Row: {
@@ -316,6 +430,54 @@ export type Database = {
           user_id?: string
           written_at?: string
           written_during?: string
+        }
+        Relationships: []
+      }
+      generation_attempts: {
+        Row: {
+          attempt_order: number
+          companion_type: string
+          created_at: string
+          error_message: string | null
+          estimated_cost_usd: number | null
+          id: string
+          input_tokens: number | null
+          latency_ms: number | null
+          model: string
+          output_tokens: number | null
+          provider: string
+          quality_gate_reason: string | null
+          status: string
+        }
+        Insert: {
+          attempt_order?: number
+          companion_type: string
+          created_at?: string
+          error_message?: string | null
+          estimated_cost_usd?: number | null
+          id?: string
+          input_tokens?: number | null
+          latency_ms?: number | null
+          model: string
+          output_tokens?: number | null
+          provider: string
+          quality_gate_reason?: string | null
+          status: string
+        }
+        Update: {
+          attempt_order?: number
+          companion_type?: string
+          created_at?: string
+          error_message?: string | null
+          estimated_cost_usd?: number | null
+          id?: string
+          input_tokens?: number | null
+          latency_ms?: number | null
+          model?: string
+          output_tokens?: number | null
+          provider?: string
+          quality_gate_reason?: string | null
+          status?: string
         }
         Relationships: []
       }
