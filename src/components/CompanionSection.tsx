@@ -304,6 +304,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             error={historyError}
             onRetry={retryHistory}
           />
+          {historyInsight && !historyLoading && <CompanionFeedback reflectionId={reflectionId} companionType="history_insight" />}
         </CompanionCard>
       )}
     </div>
