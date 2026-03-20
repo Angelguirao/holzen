@@ -31,9 +31,9 @@ serve(async (req) => {
       const userClient = createClient(supabaseUrl, supabaseAnonKey, {
         global: { headers: { Authorization: authHeader } },
       });
-      const { data: claimsData, error: claimsError } = await userClient.auth.getClaims(token);
-      if (claimsError || !claimsData?.claims) throw new Error("Not authenticated");
-      resolvedUserId = claimsData.claims.sub as string;
+      const { data: { user }, error: authError } = await userClient.auth.getUser();
+      if (authError || !user) throw new Error("Not authenticated");
+      resolvedUserId = user.id;
     }
 
     const { context, reflectionMessage, language, userId: bodyUserId } = await req.json();
@@ -50,7 +50,6 @@ serve(async (req) => {
     const month = today.getUTCMonth();
     const day = today.getUTCDate();
 
-    // Build date keys for years 1-4 ago
     const yearTargets = [1, 2, 3, 4].map(y => {
       const d = new Date(Date.UTC(currentYear - y, month, day));
       return { yearsAgo: y, dateKey: d.toISOString().slice(0, 10), ts: Math.floor(d.getTime() / 1000) };
@@ -69,10 +68,8 @@ serve(async (req) => {
     let rateLimited = false;
     console.log(`[zoom-out] cache hit: ${cachedMap.size}/${yearTargets.length}, fetching ${missingTargets.length} from CoinGecko`);
 
-    // Fetch missing prices with a SINGLE batched CoinGecko call spanning the full range
     const newPrices: { date: string; price: number }[] = [];
     if (missingTargets.length > 0) {
-      // Use the earliest and latest missing dates to define one range
       const timestamps = missingTargets.map(t => t.ts);
       const from = Math.min(...timestamps) - 86400;
       const to = Math.max(...timestamps) + 86400;
@@ -80,7 +77,6 @@ serve(async (req) => {
       try {
         const controller = new AbortController();
         const timeout = setTimeout(() => controller.abort(), 10000);
-
         const res = await fetch(
           `https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=usd&from=${from}&to=${to}`,
           { signal: controller.signal }
@@ -95,7 +91,6 @@ serve(async (req) => {
           const json = await res.json();
           const prices: [number, number][] = json?.prices || [];
 
-          // For each missing target, find the closest data point
           for (const target of missingTargets) {
             const targetMs = target.ts * 1000;
             let closest: [number, number] | null = null;
@@ -109,7 +104,6 @@ serve(async (req) => {
               }
             }
 
-            // Accept if within 48h of target date
             if (closest && closestDist < 48 * 3600 * 1000) {
               newPrices.push({ date: target.dateKey, price: Math.round(closest[1]) });
             }
@@ -124,7 +118,7 @@ serve(async (req) => {
       }
     }
 
-    // Cache new prices (fire-and-forget via service role)
+    // Cache new prices
     if (newPrices.length > 0) {
       serviceClient
         .from("btc_price_cache")
@@ -141,7 +135,7 @@ serve(async (req) => {
       if (price) onThisDay.push({ yearsAgo: target.yearsAgo, date: target.dateKey, price: Math.round(price) });
     }
 
-    // Current price — single lightweight call
+    // Current price
     let currentPrice: number | null = null;
     if (!rateLimited) {
       try {
@@ -159,7 +153,7 @@ serve(async (req) => {
       } catch { /* ignore */ }
     }
 
-    // Fallback: extract price from context string (e.g. "BTC is down 3.8% · $71,141")
+    // Fallback: extract price from context
     if (!currentPrice && context) {
       const priceMatch = context.match(/\$[\d,]+/);
       if (priceMatch) {
@@ -246,7 +240,6 @@ Rules:
 - Body: 1-2 sentences. Poetic but factual. Should make the reader feel the smallness of today's price move against deep time.
 - No trading advice, no price predictions, no exclamation marks.
 - Vary the theme: sometimes civilizational, sometimes planetary, sometimes about the nature of patience itself.
-- Ground in real facts and numbers when possible.
 
 You MUST respond with a JSON object containing "title" and "body" keys. No other text.`;
 
@@ -283,6 +276,15 @@ You MUST respond with a JSON object containing "title" and "body" keys. No other
                   const parsed = JSON.parse(raw);
                   if (parsed.title && parsed.body) {
                     deepTime = { title: parsed.title, body: parsed.body };
+
+                    // Cache deep time content
+                    serviceClient.from("companion_cache").insert({
+                      companion_type: "zoom_out_deep_time",
+                      language: language || "en",
+                      content: deepTime,
+                      quality_score: 2,
+                    }).then(() => {});
+
                     break;
                   }
                 } catch {
@@ -303,6 +305,24 @@ You MUST respond with a JSON object containing "title" and "body" keys. No other
               throw e;
             }
           }
+        }
+
+        // If AI failed, try fallback cache for deep time
+        if (!deepTime) {
+          try {
+            const { data: cached } = await serviceClient
+              .from("companion_cache")
+              .select("content, used_count, id")
+              .eq("companion_type", "zoom_out_deep_time")
+              .eq("language", language || "en")
+              .order("used_count", { ascending: true })
+              .limit(5);
+            if (cached && cached.length > 0) {
+              const pick = cached[Math.floor(Math.random() * cached.length)];
+              deepTime = pick.content as any;
+              serviceClient.from("companion_cache").update({ used_count: (pick.used_count || 0) + 1 }).eq("id", pick.id).then(() => {});
+            }
+          } catch { /* non-fatal */ }
         }
       }
     } catch (e) {
