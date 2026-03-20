@@ -37,13 +37,13 @@ async function isUrlReachable(url: string): Promise<boolean> {
 }
 
 /** Serve a random cached entry as fallback */
-async function serveFallback(svcClient: any, lang: string): Promise<any | null> {
+async function serveFallback(svcClient: any): Promise<any | null> {
   try {
     const { data } = await svcClient
       .from("companion_cache")
       .select("id, content, used_count")
       .eq("companion_type", "signal")
-      .eq("language", lang)
+      .eq("language", "en")
       .gte("quality_score", 2)
       .order("used_count", { ascending: true })
       .limit(5);
@@ -52,7 +52,7 @@ async function serveFallback(svcClient: any, lang: string): Promise<any | null> 
         .from("companion_cache")
         .select("id, content, used_count")
         .eq("companion_type", "signal")
-        .eq("language", lang)
+        .eq("language", "en")
         .order("used_count", { ascending: true })
         .limit(5);
       if (!anyQ || anyQ.length === 0) return null;
@@ -95,7 +95,7 @@ serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-    const { context, language, sources, recentSignalSources, recentSignalTitles } = body;
+    const { context, sources, recentSignalSources, recentSignalTitles } = body;
     log("parsed body");
 
     // Verify JWT via getUser
@@ -122,8 +122,6 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const langCode = language || "en";
-
     // Build source name list for context
     const sourceNames: string[] = [];
     if (sources && Array.isArray(sources) && sources.length > 0) {
@@ -137,11 +135,8 @@ serve(async (req) => {
       : "";
 
     const topicExclusion = (recentSignalTitles && Array.isArray(recentSignalTitles) && recentSignalTitles.length > 0)
-      ? `\nDo NOT cover these topics (already shown to user): ${recentSignalTitles.slice(0, 5).join("; ")}. Find a COMPLETELY DIFFERENT angle or metric.`
+      ? `\nDo NOT cover these topics (already shown to user): ${recentSignalTitles.slice(0, 5).join("; ")}. Find a COMPLETELY DIFFERENT angle.`
       : "";
-
-    const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
-    const langName = LANG_NAMES[langCode] || "English";
 
     const sourceHint = sourceNames.length > 0
       ? ` Look for insights from sources like: ${sourceNames.sort(() => Math.random() - 0.5).slice(0, 5).join(", ")}.`
@@ -160,34 +155,48 @@ serve(async (req) => {
       }
     }
 
-    const ANTI_TRADING_INSTRUCTION = `CRITICAL CONTENT RULES:
-- Do NOT return content about short-term trading signals, chart patterns, technical analysis setups, entry/exit points, or price targets
-- Do NOT cite trading educators, signal groups, or chart pattern analysts
-- FOCUS ON: on-chain data, macro trends, adoption metrics, network health, long-term holder behavior, institutional flows, mining economics, supply dynamics
-- Prefer sources like: on-chain analysts, macro researchers, Bitcoin-focused newsletters, network data dashboards`;
+    // PHILOSOPHICAL SIGNAL — not trading data, not metrics. Deep Bitcoin thinking.
+    const SIGNAL_PHILOSOPHY = `CRITICAL CONTENT IDENTITY:
+You are searching for PROFOUND, PHILOSOPHICAL Bitcoin thinking — NOT market data, NOT trading signals, NOT on-chain metrics.
+
+WHAT "SIGNAL" MEANS HERE:
+- Deep ideas about what Bitcoin represents for human freedom, sovereignty, and self-custody
+- Philosophical perspectives on money, time preference, proof of work as a life principle
+- Thoughtful essays about Bitcoin's role in reshaping trust, institutions, and individual agency
+- Long-form thinking from Bitcoin writers, philosophers, economists, and thinkers
+- Perspectives on sound money, Austrian economics, game theory, and civilizational impact
+- Reflections on patience, conviction, and the psychology of holding through uncertainty
+
+WHAT IT IS NOT:
+- Price predictions, chart analysis, trading setups, entry/exit points
+- On-chain metrics, hash rate stats, exchange flows, whale movements
+- Short-term market commentary or news cycle reactions
+- Technical analysis or quantitative data dashboards
+
+IDEAL SOURCES: Bitcoin Magazine, Unchained, Nakamoto Institute, Allen Farrington, Vijay Boyapati, Lyn Alden (philosophical pieces), Parker Lewis, Gigi, Robert Breedlove, Saifedean Ammous, Jeff Booth, Michael Saylor (philosophical talks), Bitcoin Audible, Swan Signal`;
 
     const searchQuery = context
-      ? `Current Bitcoin market: ${context}. Find one specific, data-driven insight about on-chain metrics, macro trends, adoption, or long-term holder behavior from a Bitcoin researcher or analyst.${sourceHint}${recentExclusion}`
-      : `Latest Bitcoin on-chain analysis, macro trends, or long-term holder metrics with specific data points from researchers or analysts.${sourceHint}${recentExclusion}`;
+      ? `Bitcoin philosophical perspective relevant when ${context}. Find a profound insight about conviction, patience, sound money, sovereignty, or long-term thinking from a respected Bitcoin thinker or writer.${sourceHint}${recentExclusion}`
+      : `Find a profound, philosophical Bitcoin essay or insight about sovereignty, sound money, time preference, proof of work as philosophy, or the meaning of holding from a respected thinker.${sourceHint}${recentExclusion}`;
 
     const perplexityBody: any = {
       model: "sonar-pro",
       messages: [
         {
           role: "system",
-          content: `You are a Bitcoin market research assistant focused on LONG-TERM holder perspective. Find one specific, data-driven insight with real numbers and dates.
+          content: `You are searching for deep, philosophical Bitcoin writing — essays and ideas that make a holder feel grounded in WHY they hold.
 
-${ANTI_TRADING_INSTRUCTION}
+${SIGNAL_PHILOSOPHY}
 
 DIVERSITY RULES:
-- Use a DIFFERENT source every time — rotate between on-chain analysts, macro blogs, newsletters, dashboards, and podcasts
-- Do NOT default to Glassnode or any single source
-- Prefer recent analysis (last 30 days) from named analysts or publications
-- Include the exact source name and a working URL to the specific article/page${recentExclusion}${topicExclusion}`,
+- Use a DIFFERENT thinker or writer every time
+- Rotate between essayists, podcasters, book authors, and newsletter writers
+- Prefer timeless ideas over news reactions
+- Include the exact source name and a working URL to the specific essay/article/talk${recentExclusion}${topicExclusion}`,
         },
         { role: "user", content: searchQuery },
       ],
-      search_recency_filter: "month",
+      search_recency_filter: "year",
       ...(sourceUrls.length > 0 ? { search_domain_filter: sourceUrls.slice(0, 5) } : {}),
     };
 
@@ -246,12 +255,12 @@ DIVERSITY RULES:
     } catch (e) {
       if (e instanceof DOMException && e.name === "AbortError") {
         log("perplexity timed out after 12s");
-        const fallback = await serveFallback(svcClient, langCode);
+        const fallback = await serveFallback(svcClient);
         if (fallback) return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
         return new Response(JSON.stringify({ error: "Search timed out" }), { status: 504, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
       if (e instanceof Error && e.message === "RATE_LIMITED") {
-        const fallback = await serveFallback(svcClient, langCode);
+        const fallback = await serveFallback(svcClient);
         if (fallback) return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
         return new Response(JSON.stringify({ error: "Rate limited. Try again later." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
@@ -259,14 +268,12 @@ DIVERSITY RULES:
     }
 
     if (!searchContent) {
-      const fallback = await serveFallback(svcClient, langCode);
+      const fallback = await serveFallback(svcClient);
       if (fallback) return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
       throw new Error("No search content returned");
     }
 
-    // Step 2: AI structuring
-    const langInstruction = langCode !== "en" ? `Write title and body in ${langName}. Keep source name/URL as-is.\n` : "";
-
+    // Step 2: AI structuring — extract philosophical insight
     const citationList = citations.length > 0
       ? citations.map((c: string, i: number) => `[${i + 1}] ${c}`).join("\n")
       : "(No citations available — leave url empty)";
@@ -277,23 +284,31 @@ DIVERSITY RULES:
       messages: [
         {
           role: "system",
-          content: `${langInstruction}Extract ONE market signal from the search results below.
+          content: `Extract ONE philosophical Bitcoin insight from the search results below.
 
-HOLDER PERSPECTIVE FILTER (CRITICAL):
-- If the search result is about short-term trading, chart patterns, entry/exit signals, or price targets, you MUST reframe it as a long-term holder insight instead
-- Replace trading language with holder language ("accumulation trend", "network growth", "supply dynamics")
-- NEVER include phrases like "trading opportunity", "price target", "buy/sell signal"
+TONE: Profound, calm, grounding. Like a wise friend reminding you why you hold.
+LENGTH: Title should be evocative (5-10 words). Body should be 2-3 sentences that capture the CORE IDEA — not a summary of the article, but the philosophical essence.
+
+EXAMPLES OF GOOD TITLES:
+- "Proof of work is proof of sacrifice"
+- "Sound money teaches patience before it teaches wealth"
+- "Sovereignty begins with what you refuse to delegate"
+
+EXAMPLES OF BAD TITLES:
+- "Bitcoin hash rate reaches new all-time high"
+- "Analyst predicts BTC price target"
+- "On-chain metrics show accumulation"
 
 ACCURACY RULES (CRITICAL):
-- Use ONLY data points, numbers, dates, and analyst names that appear in the search results
-- Do NOT invent statistics, percentages, or metrics not present in the source material
-- The body must contain ONLY verifiable claims from the search results
+- Attribute the idea to the correct thinker/writer from the search results
+- Do NOT invent quotes or misattribute ideas
+- The body should distill the philosophical point, not regurgitate data
 
 URL RULES (CRITICAL):
-- You MUST select a url from the citation list below. Copy it character-for-character.
+- Select a url from the citation list below. Copy it character-for-character.
 - If none match, use the FIRST citation URL.
 - If no citations exist, set url to "".
-- NEVER fabricate or shorten URLs.`,
+- NEVER fabricate URLs.`,
         },
         {
           role: "user",
@@ -304,14 +319,14 @@ URL RULES (CRITICAL):
         type: "function",
         function: {
           name: "return_signal",
-          description: "Return a single market signal extracted from search results",
+          description: "Return a single philosophical Bitcoin insight",
           parameters: {
             type: "object",
             properties: {
-              title: { type: "string", description: "5-12 word headline" },
-              body: { type: "string", description: "2-3 sentences with specific data points" },
-              source: { type: "string", description: "Exact source or analyst name" },
-              url: { type: "string", description: "Citation URL copied character-for-character from the list" },
+              title: { type: "string", description: "Evocative 5-10 word philosophical headline" },
+              body: { type: "string", description: "2-3 sentences capturing the philosophical essence" },
+              source: { type: "string", description: "Thinker, writer, or publication name" },
+              url: { type: "string", description: "Citation URL copied character-for-character" },
             },
             required: ["title", "body", "source", "url"],
             additionalProperties: false,
@@ -319,7 +334,7 @@ URL RULES (CRITICAL):
         },
       }],
       tool_choice: { type: "function", function: { name: "return_signal" } },
-      temperature: 0.3,
+      temperature: 0.5,
     };
 
     const models = ["google/gemini-2.5-flash", "google/gemini-3-flash-preview"];
@@ -376,7 +391,7 @@ URL RULES (CRITICAL):
           log(`AI ${model} timed out after 18s`);
           lastStatus = 504;
           if (model !== models[models.length - 1]) { log("Retrying with fallback model"); continue; }
-          const fallback = await serveFallback(svcClient, langCode);
+          const fallback = await serveFallback(svcClient);
           if (fallback) return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
           return new Response(JSON.stringify({ error: "AI structuring timed out" }), { status: 504, headers: { ...corsHeaders, "Content-Type": "application/json" } });
         }
@@ -385,7 +400,7 @@ URL RULES (CRITICAL):
     }
 
     if (!signal) {
-      const fallback = await serveFallback(svcClient, langCode);
+      const fallback = await serveFallback(svcClient);
       if (fallback) return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
       if (lastStatus === 429) return new Response(JSON.stringify({ error: "Rate limited. Try again later." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       if (lastStatus === 402) return new Response(JSON.stringify({ error: "AI usage limit reached." }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
@@ -426,7 +441,7 @@ URL RULES (CRITICAL):
         }
         if (!found && signal.url) {
           // Fallback to a search URL
-          const searchTerm = encodeURIComponent(signal.source || signal.title || "Bitcoin on-chain analysis");
+          const searchTerm = encodeURIComponent(signal.source || signal.title || "Bitcoin philosophy sound money sovereignty");
           signal.url = `https://www.google.com/search?q=${searchTerm}`;
         }
       } else {
@@ -438,7 +453,7 @@ URL RULES (CRITICAL):
     if (signal.title && signal.body && signal.source) {
       svcClient.from("companion_cache").insert({
         companion_type: "signal",
-        language: langCode,
+        language: "en",
         content: signal,
         quality_score: qualityScore,
       }).then(() => {});
