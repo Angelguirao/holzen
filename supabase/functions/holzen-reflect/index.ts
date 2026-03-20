@@ -117,6 +117,21 @@ serve(async (req) => {
       }).then(() => {});
     };
 
+    // Cost estimation per 1M tokens (input/output) in USD
+    const COST_MAP: Record<string, [number, number]> = {
+      "google/gemini-2.5-flash": [0.15, 0.6], "google/gemini-3-flash-preview": [0.15, 0.6],
+      "google/gemini-2.5-flash-lite": [0.075, 0.3],
+    };
+    let attemptOrder = 0;
+    const logAttempt = (params: { companion_type: string; provider: string; model: string; status: string; latency_ms: number; input_tokens?: number; output_tokens?: number; error_message?: string; quality_gate_reason?: string }) => {
+      attemptOrder++;
+      const costs = COST_MAP[params.model] || [0.5, 1.5];
+      const inTok = params.input_tokens || 0;
+      const outTok = params.output_tokens || 0;
+      const cost = inTok > 0 || outTok > 0 ? (inTok * costs[0] + outTok * costs[1]) / 1_000_000 : null;
+      svcClient.from("generation_attempts").insert({ ...params, attempt_order: attemptOrder, estimated_cost_usd: cost }).then(() => {});
+    };
+
     const { context, tone, customPrompt, style, moodHistory, severity, motivations, mantra, groundingActivities, currency, language, recentHaikus, recentMessages } = await req.json();
     if (!context) {
       return new Response(JSON.stringify({ error: "Missing context" }), {
@@ -283,6 +298,7 @@ Haiku rules:
       const timeoutMs = TIMEOUTS[i];
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), timeoutMs);
+      const attemptT0 = Date.now();
       try {
         const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
@@ -298,17 +314,20 @@ Haiku rules:
         if (response.status === 429 || response.status === 402) {
           lastStatus = response.status;
           await response.text();
+          logAttempt({ companion_type: "reflection", provider: "lovable", model, status: "error", latency_ms: Date.now() - attemptT0, error_message: `HTTP ${response.status}` });
           break;
         }
         if (!response.ok) {
           const text = await response.text();
           console.error(`AI ${model} error:`, response.status, text);
           lastStatus = response.status;
+          logAttempt({ companion_type: "reflection", provider: "lovable", model, status: "error", latency_ms: Date.now() - attemptT0, error_message: `HTTP ${response.status}` });
           if (i < models.length - 1) continue;
           break;
         }
 
         const data = await response.json();
+        const usage = data.usage;
         const raw = data.choices?.[0]?.message?.content || "";
 
         try {
@@ -316,17 +335,24 @@ Haiku rules:
         } catch {
           const m = (typeof raw === "string" ? raw : "").match(/\{[\s\S]*\}/);
           if (m) result = JSON.parse(m[0]);
-          else if (i < models.length - 1) continue;
-          else break;
+          else {
+            logAttempt({ companion_type: "reflection", provider: "lovable", model, status: "error", latency_ms: Date.now() - attemptT0, error_message: "json_parse_failed", input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
+            if (i < models.length - 1) continue; else break;
+          }
         }
 
-        if (result?.message) break;
+        if (result?.message) {
+          logAttempt({ companion_type: "reflection", provider: "lovable", model, status: "success", latency_ms: Date.now() - attemptT0, input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
+          break;
+        }
+        logAttempt({ companion_type: "reflection", provider: "lovable", model, status: "error", latency_ms: Date.now() - attemptT0, error_message: "missing message field", input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
         if (i < models.length - 1) { result = null; continue; }
       } catch (e) {
         clearTimeout(timeout);
         if (e instanceof DOMException && e.name === "AbortError") {
           console.warn(`[holzen-reflect] AI ${model} timed out after ${timeoutMs}ms`);
           lastStatus = 504;
+          logAttempt({ companion_type: "reflection", provider: "lovable", model, status: "timeout", latency_ms: Date.now() - attemptT0 });
           if (i < models.length - 1) continue;
           break;
         }

@@ -1316,7 +1316,63 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      v_companion_avg_latency: {
+        Row: {
+          avg_latency_ms: number | null
+          companion_type: string | null
+          p95_latency_ms: number | null
+          sample_count: number | null
+        }
+        Relationships: []
+      }
+      v_companion_cache_hit_rate: {
+        Row: {
+          cache_hit_pct: number | null
+          cache_hits: number | null
+          companion_type: string | null
+          curated_fallbacks: number | null
+          live_generated: number | null
+          total_serves: number | null
+        }
+        Relationships: []
+      }
+      v_companion_cost_per_day: {
+        Row: {
+          attempts: number | null
+          companion_type: string | null
+          day: string | null
+          total_cost_usd: number | null
+          total_input_tokens: number | null
+          total_output_tokens: number | null
+        }
+        Relationships: []
+      }
+      v_companion_feedback_ratio: {
+        Row: {
+          approval_pct: number | null
+          companion_type: string | null
+          items_with_feedback: number | null
+          total_thumbs_down: number | null
+          total_thumbs_up: number | null
+        }
+        Relationships: []
+      }
+      v_generation_failure_rate: {
+        Row: {
+          avg_latency_ms: number | null
+          companion_type: string | null
+          errors: number | null
+          failure_pct: number | null
+          model: string | null
+          p95_latency_ms: number | null
+          provider: string | null
+          quality_gate_failures: number | null
+          successes: number | null
+          timeouts: number | null
+          total_attempts: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       claim_trigger_slot: {
