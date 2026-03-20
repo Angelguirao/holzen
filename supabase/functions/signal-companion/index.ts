@@ -6,6 +6,41 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+// ── CURATED FALLBACKS ──
+// Hand-written, verified, high-quality philosophical Bitcoin insights
+const CURATED_FALLBACKS = [
+  {
+    title: "Proof of work is proof of sacrifice",
+    body: "Gigi argues that Bitcoin's proof-of-work mechanism mirrors a universal truth: nothing of value comes without cost. The energy expended isn't wasted — it's transformed into trust, the most scarce resource in human coordination.",
+    source: "Gigi — 21 Lessons",
+    url: "https://21lessons.com/",
+  },
+  {
+    title: "Sound money teaches patience before it teaches wealth",
+    body: "Saifedean Ammous observes that the hardest lesson Bitcoin teaches isn't about returns — it's about time preference. A society that saves in hard money naturally extends its planning horizon, building cathedrals instead of strip malls.",
+    source: "Saifedean Ammous — The Bitcoin Standard",
+    url: "https://saifedean.com/thebitcoinstandard/",
+  },
+  {
+    title: "Sovereignty begins with what you refuse to delegate",
+    body: "Parker Lewis writes that holding your own keys isn't a technical preference — it's a philosophical stance. Every system that asks you to trust a third party is a system that can betray you. Self-custody is the first act of self-sovereignty.",
+    source: "Parker Lewis — Gradually, Then Suddenly",
+    url: "https://unchained.com/gradually-then-suddenly/",
+  },
+  {
+    title: "The price is the least interesting thing about Bitcoin",
+    body: "Allen Farrington argues that fixating on price is like judging the printing press by the cost of paper. Bitcoin's real innovation is the separation of money and state — a shift as consequential as the separation of church and state.",
+    source: "Allen Farrington — Bitcoin Is Venice",
+    url: "https://allenfarrington.medium.com/",
+  },
+  {
+    title: "Volatility is the price of admission to a new monetary order",
+    body: "Vijay Boyapati observes that every new monetary good must pass through a period of extreme volatility on its path to stable purchasing power. Gold was volatile for centuries. Bitcoin is compressing that journey into decades.",
+    source: "Vijay Boyapati — The Bullish Case for Bitcoin",
+    url: "https://vijayboyapati.medium.com/the-bullish-case-for-bitcoin-6ecc8bdecc1",
+  },
+];
+
 function isValidUrl(s: string): boolean {
   if (!s || s === "N/A" || s.length < 10) return false;
   try {
@@ -22,7 +57,6 @@ function normalizeUrl(s: string): string {
   return s;
 }
 
-/** HEAD-check a URL, return true if reachable (2xx/3xx) */
 async function isUrlReachable(url: string): Promise<boolean> {
   if (!url || url.length < 10) return false;
   try {
@@ -36,8 +70,9 @@ async function isUrlReachable(url: string): Promise<boolean> {
   }
 }
 
-/** Serve a random cached entry as fallback */
-async function serveFallback(svcClient: any): Promise<any | null> {
+/** Fallback chain: cache → curated */
+async function serveFallback(svcClient: any): Promise<any> {
+  // Try cache first
   try {
     const { data } = await svcClient
       .from("companion_cache")
@@ -47,25 +82,28 @@ async function serveFallback(svcClient: any): Promise<any | null> {
       .gte("quality_score", 2)
       .order("used_count", { ascending: true })
       .limit(5);
-    if (!data || data.length === 0) {
-      const { data: anyQ } = await svcClient
-        .from("companion_cache")
-        .select("id, content, used_count")
-        .eq("companion_type", "signal")
-        .eq("language", "en")
-        .order("used_count", { ascending: true })
-        .limit(5);
-      if (!anyQ || anyQ.length === 0) return null;
+    if (data && data.length > 0) {
+      const pick = data[Math.floor(Math.random() * data.length)];
+      svcClient.from("companion_cache").update({ used_count: (pick.used_count || 0) + 1 }).eq("id", pick.id).then(() => {});
+      return pick.content;
+    }
+    // Try any quality
+    const { data: anyQ } = await svcClient
+      .from("companion_cache")
+      .select("id, content, used_count")
+      .eq("companion_type", "signal")
+      .eq("language", "en")
+      .order("used_count", { ascending: true })
+      .limit(5);
+    if (anyQ && anyQ.length > 0) {
       const pick = anyQ[Math.floor(Math.random() * anyQ.length)];
       svcClient.from("companion_cache").update({ used_count: (pick.used_count || 0) + 1 }).eq("id", pick.id).then(() => {});
       return pick.content;
     }
-    const pick = data[Math.floor(Math.random() * data.length)];
-    svcClient.from("companion_cache").update({ used_count: (pick.used_count || 0) + 1 }).eq("id", pick.id).then(() => {});
-    return pick.content;
-  } catch {
-    return null;
-  }
+  } catch { /* continue to curated */ }
+
+  // Curated fallback — always works
+  return CURATED_FALLBACKS[Math.floor(Math.random() * CURATED_FALLBACKS.length)];
 }
 
 serve(async (req) => {
@@ -77,75 +115,44 @@ serve(async (req) => {
   const log = (msg: string) => console.log(`[signal] ${msg} (+${Date.now() - t0}ms)`);
 
   try {
-    // Auth check
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
-      return new Response(
-        JSON.stringify({ error: "Unauthorized" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     let body: any = {};
-    try {
-      body = await req.json();
-    } catch {
-      return new Response(
-        JSON.stringify({ error: "Invalid or empty request body" }),
-        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+    try { body = await req.json(); } catch {
+      return new Response(JSON.stringify({ error: "Invalid or empty request body" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
     const { context, sources, recentSignalSources, recentSignalTitles } = body;
     log("parsed body");
 
-    // Verify JWT via getUser
     const { createClient } = await import("npm:@supabase/supabase-js@2.57.2");
     const sbUrl = Deno.env.get("SUPABASE_URL") ?? "";
     const sbClient = createClient(sbUrl, Deno.env.get("SUPABASE_ANON_KEY") ?? "", { global: { headers: { Authorization: authHeader } } });
     const { data: { user }, error: authError } = await sbClient.auth.getUser();
     if (authError || !user) {
-      return new Response(
-        JSON.stringify({ error: "Unauthorized" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
     log("auth verified");
 
     const svcClient = createClient(sbUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "", { auth: { persistSession: false } });
-
-    // Track AI usage — fire-and-forget
     svcClient.from("analytics_events").insert({ user_id: user.id, event: "signal_companion_ai_call" }).then(() => {});
 
     const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
-    if (!PERPLEXITY_API_KEY) throw new Error("PERPLEXITY_API_KEY is not configured");
-
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
-
-    // Build source name list for context
-    const sourceNames: string[] = [];
-    if (sources && Array.isArray(sources) && sources.length > 0) {
-      for (const s of sources) {
-        if (s.name) sourceNames.push(s.name);
-      }
+    if (!PERPLEXITY_API_KEY || !LOVABLE_API_KEY) {
+      log("missing API keys, serving fallback");
+      const fallback = await serveFallback(svcClient);
+      return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const recentExclusion = (recentSignalSources && Array.isArray(recentSignalSources) && recentSignalSources.length > 0)
-      ? ` Do NOT use insights from: ${recentSignalSources.slice(0, 5).join(", ")}. Pick a DIFFERENT source.`
-      : "";
-
-    const topicExclusion = (recentSignalTitles && Array.isArray(recentSignalTitles) && recentSignalTitles.length > 0)
-      ? `\nDo NOT cover these topics (already shown to user): ${recentSignalTitles.slice(0, 5).join("; ")}. Find a COMPLETELY DIFFERENT angle.`
-      : "";
-
-    const sourceHint = sourceNames.length > 0
-      ? ` Look for insights from sources like: ${sourceNames.sort(() => Math.random() - 0.5).slice(0, 5).join(", ")}.`
-      : "";
-
-    // Extract URLs from user sources for domain filtering
+    // Build source hints
+    const sourceNames: string[] = [];
     const sourceUrls: string[] = [];
     if (sources && Array.isArray(sources)) {
       for (const s of sources) {
+        if (s.name) sourceNames.push(s.name);
         if (s.url && typeof s.url === "string") {
           try {
             const hostname = new URL(s.url.startsWith("http") ? s.url : `https://${s.url}`).hostname.replace(/^www\./, "");
@@ -155,25 +162,15 @@ serve(async (req) => {
       }
     }
 
-    // PHILOSOPHICAL SIGNAL — not trading data, not metrics. Deep Bitcoin thinking.
-    const SIGNAL_PHILOSOPHY = `CRITICAL CONTENT IDENTITY:
-You are searching for PROFOUND, PHILOSOPHICAL Bitcoin thinking — NOT market data, NOT trading signals, NOT on-chain metrics.
-
-WHAT "SIGNAL" MEANS HERE:
-- Deep ideas about what Bitcoin represents for human freedom, sovereignty, and self-custody
-- Philosophical perspectives on money, time preference, proof of work as a life principle
-- Thoughtful essays about Bitcoin's role in reshaping trust, institutions, and individual agency
-- Long-form thinking from Bitcoin writers, philosophers, economists, and thinkers
-- Perspectives on sound money, Austrian economics, game theory, and civilizational impact
-- Reflections on patience, conviction, and the psychology of holding through uncertainty
-
-WHAT IT IS NOT:
-- Price predictions, chart analysis, trading setups, entry/exit points
-- On-chain metrics, hash rate stats, exchange flows, whale movements
-- Short-term market commentary or news cycle reactions
-- Technical analysis or quantitative data dashboards
-
-IDEAL SOURCES: Bitcoin Magazine, Unchained, Nakamoto Institute, Allen Farrington, Vijay Boyapati, Lyn Alden (philosophical pieces), Parker Lewis, Gigi, Robert Breedlove, Saifedean Ammous, Jeff Booth, Michael Saylor (philosophical talks), Bitcoin Audible, Swan Signal`;
+    const recentExclusion = (recentSignalSources?.length > 0)
+      ? ` Do NOT use insights from: ${recentSignalSources.slice(0, 5).join(", ")}. Pick a DIFFERENT thinker.`
+      : "";
+    const topicExclusion = (recentSignalTitles?.length > 0)
+      ? `\nDo NOT cover these topics (already shown): ${recentSignalTitles.slice(0, 5).join("; ")}. Find a COMPLETELY DIFFERENT angle.`
+      : "";
+    const sourceHint = sourceNames.length > 0
+      ? ` Look for insights from sources like: ${sourceNames.sort(() => Math.random() - 0.5).slice(0, 5).join(", ")}.`
+      : "";
 
     const searchQuery = context
       ? `Bitcoin philosophical perspective relevant when ${context}. Find a profound insight about conviction, patience, sound money, sovereignty, or long-term thinking from a respected Bitcoin thinker or writer.${sourceHint}${recentExclusion}`
@@ -186,13 +183,20 @@ IDEAL SOURCES: Bitcoin Magazine, Unchained, Nakamoto Institute, Allen Farrington
           role: "system",
           content: `You are searching for deep, philosophical Bitcoin writing — essays and ideas that make a holder feel grounded in WHY they hold.
 
-${SIGNAL_PHILOSOPHY}
+WHAT TO SEARCH FOR:
+- Deep ideas about what Bitcoin represents for human freedom, sovereignty, and self-custody
+- Philosophical perspectives on money, time preference, proof of work as a life principle
+- Long-form thinking from Bitcoin writers, philosophers, economists
+- Perspectives on sound money, Austrian economics, game theory, civilizational impact
 
-DIVERSITY RULES:
-- Use a DIFFERENT thinker or writer every time
-- Rotate between essayists, podcasters, book authors, and newsletter writers
-- Prefer timeless ideas over news reactions
-- Include the exact source name and a working URL to the specific essay/article/talk${recentExclusion}${topicExclusion}`,
+WHAT TO AVOID:
+- Price predictions, chart analysis, trading setups
+- On-chain metrics, hash rate stats, exchange flows
+- Short-term market commentary or news
+
+IDEAL SOURCES: Bitcoin Magazine, Nakamoto Institute, Allen Farrington, Vijay Boyapati, Lyn Alden, Parker Lewis, Gigi, Robert Breedlove, Saifedean Ammous, Jeff Booth, Knut Svanholm
+
+DIVERSITY: Use a DIFFERENT thinker every time. Prefer timeless essays over recent posts.${recentExclusion}${topicExclusion}`,
         },
         { role: "user", content: searchQuery },
       ],
@@ -200,7 +204,7 @@ DIVERSITY RULES:
       ...(sourceUrls.length > 0 ? { search_domain_filter: sourceUrls.slice(0, 5) } : {}),
     };
 
-    // Helper to call Perplexity
+    // ── Step 1: Perplexity search ──
     async function callPerplexity(pBody: any): Promise<{ content: string; citations: string[] }> {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 12000);
@@ -237,6 +241,7 @@ DIVERSITY RULES:
       citations = result.citations;
       log(`perplexity content length: ${searchContent.length}, citations: ${citations.length}`);
 
+      // Retry without domain filter if no citations
       if (citations.length === 0 && sourceUrls.length > 0 && searchContent.length > 0) {
         log("0 citations with domain filter — retrying without filter");
         const retryBody = { ...perplexityBody };
@@ -248,32 +253,20 @@ DIVERSITY RULES:
             citations = retry.citations;
             log(`retry got ${citations.length} citations`);
           }
-        } catch (retryErr) {
-          log(`retry failed, using original content: ${retryErr}`);
-        }
+        } catch { log("retry failed, using original content"); }
       }
     } catch (e) {
-      if (e instanceof DOMException && e.name === "AbortError") {
-        log("perplexity timed out after 12s");
-        const fallback = await serveFallback(svcClient);
-        if (fallback) return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
-        return new Response(JSON.stringify({ error: "Search timed out" }), { status: 504, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      }
-      if (e instanceof Error && e.message === "RATE_LIMITED") {
-        const fallback = await serveFallback(svcClient);
-        if (fallback) return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
-        return new Response(JSON.stringify({ error: "Rate limited. Try again later." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      }
-      throw e;
+      log(`perplexity failed: ${e}`);
+      const fallback = await serveFallback(svcClient);
+      return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     if (!searchContent) {
       const fallback = await serveFallback(svcClient);
-      if (fallback) return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      throw new Error("No search content returned");
+      return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    // Step 2: AI structuring — extract philosophical insight
+    // ── Step 2: AI structuring ──
     const citationList = citations.length > 0
       ? citations.map((c: string, i: number) => `[${i + 1}] ${c}`).join("\n")
       : "(No citations available — leave url empty)";
@@ -287,25 +280,19 @@ DIVERSITY RULES:
           content: `Extract ONE philosophical Bitcoin insight from the search results below.
 
 TONE: Profound, calm, grounding. Like a wise friend reminding you why you hold.
-LENGTH: Title should be evocative (5-10 words). Body should be 2-3 sentences that capture the CORE IDEA — not a summary of the article, but the philosophical essence.
+TITLE: Evocative, poetic, 5-10 words. Should read like a book chapter title, not a headline.
+BODY: 2-3 sentences capturing the philosophical ESSENCE — not a summary. Distill the core idea.
 
-EXAMPLES OF GOOD TITLES:
-- "Proof of work is proof of sacrifice"
-- "Sound money teaches patience before it teaches wealth"
-- "Sovereignty begins with what you refuse to delegate"
-
-EXAMPLES OF BAD TITLES:
-- "Bitcoin hash rate reaches new all-time high"
-- "Analyst predicts BTC price target"
-- "On-chain metrics show accumulation"
+GOOD TITLES: "Proof of work is proof of sacrifice" / "Sound money teaches patience before wealth" / "Sovereignty begins with what you refuse to delegate"
+BAD TITLES: "Bitcoin hash rate reaches new high" / "Analyst predicts BTC target" / anything with numbers or dates
 
 ACCURACY RULES (CRITICAL):
-- Attribute the idea to the correct thinker/writer from the search results
+- Attribute ideas to the correct thinker from the search results
 - Do NOT invent quotes or misattribute ideas
-- The body should distill the philosophical point, not regurgitate data
+- The body distills the philosophical point — no data regurgitation
 
 URL RULES (CRITICAL):
-- Select a url from the citation list below. Copy it character-for-character.
+- Pick a url from the citation list below. Copy it character-for-character.
 - If none match, use the FIRST citation URL.
 - If no citations exist, set url to "".
 - NEVER fabricate URLs.`,
@@ -339,7 +326,6 @@ URL RULES (CRITICAL):
 
     const models = ["google/gemini-2.5-flash", "google/gemini-3-flash-preview"];
     let signal: any = null;
-    let lastStatus = 500;
 
     for (const model of models) {
       const aiController = new AbortController();
@@ -354,26 +340,18 @@ URL RULES (CRITICAL):
         clearTimeout(aiTimeout);
         log(`AI ${model} responded ${structureResponse.status}`);
 
-        if (structureResponse.status === 429 || structureResponse.status === 402) {
-          lastStatus = structureResponse.status;
-          await structureResponse.text();
-          break;
-        }
         if (!structureResponse.ok) {
-          const text = await structureResponse.text();
-          console.error(`AI ${model} error:`, structureResponse.status, text);
-          lastStatus = structureResponse.status;
+          await structureResponse.text();
           if (model !== models[models.length - 1]) { log("Retrying with fallback model"); continue; }
           break;
         }
 
         const structureData = await structureResponse.json();
-        // Handle tool_call response format
         const toolCall = structureData.choices?.[0]?.message?.tool_calls?.[0];
         const content = toolCall?.function?.arguments || structureData.choices?.[0]?.message?.content;
         if (!content) {
-          if (model !== models[models.length - 1]) { log("Empty response, retrying"); continue; }
-          throw new Error("No signal returned from AI");
+          if (model !== models[models.length - 1]) continue;
+          break;
         }
 
         try {
@@ -381,33 +359,25 @@ URL RULES (CRITICAL):
         } catch {
           const m = (typeof content === "string" ? content : "").match(/\{[\s\S]*\}/);
           if (m) signal = JSON.parse(m[0]);
-          else if (model !== models[models.length - 1]) { log("Bad JSON, retrying"); continue; }
-          else throw new Error("AI returned invalid JSON");
+          else if (model !== models[models.length - 1]) continue;
+          else break;
         }
         break;
       } catch (e) {
         clearTimeout(aiTimeout);
-        if (e instanceof DOMException && e.name === "AbortError") {
-          log(`AI ${model} timed out after 18s`);
-          lastStatus = 504;
-          if (model !== models[models.length - 1]) { log("Retrying with fallback model"); continue; }
-          const fallback = await serveFallback(svcClient);
-          if (fallback) return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
-          return new Response(JSON.stringify({ error: "AI structuring timed out" }), { status: 504, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-        }
-        throw e;
+        if (model !== models[models.length - 1]) { log(`${model} failed, retrying`); continue; }
+        break;
       }
     }
 
-    if (!signal) {
+    // If AI structuring failed entirely → fallback
+    if (!signal || !signal.title || !signal.body) {
+      log("AI structuring failed, serving fallback");
       const fallback = await serveFallback(svcClient);
-      if (fallback) return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      if (lastStatus === 429) return new Response(JSON.stringify({ error: "Rate limited. Try again later." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      if (lastStatus === 402) return new Response(JSON.stringify({ error: "AI usage limit reached." }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      throw new Error("AI structuring failed after all retries");
+      return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    // POST-PROCESSING: Force URL to be from citations + validate
+    // ── Post-processing: URL validation ──
     const aiUrl = signal.url || "";
     const exactMatch = citations.find((c) => c === aiUrl);
     if (exactMatch) {
@@ -425,12 +395,10 @@ URL RULES (CRITICAL):
       signal.url = normalizeUrl(signal.url);
     }
 
-    // URL validation — verify the URL is actually reachable
     let qualityScore = 1;
     if (signal.url) {
       const reachable = await isUrlReachable(signal.url);
       if (!reachable) {
-        // Try other citations
         let found = false;
         for (const c of citations) {
           if (c !== signal.url && await isUrlReachable(c)) {
@@ -439,8 +407,7 @@ URL RULES (CRITICAL):
             break;
           }
         }
-        if (!found && signal.url) {
-          // Fallback to a search URL
+        if (!found) {
           const searchTerm = encodeURIComponent(signal.source || signal.title || "Bitcoin philosophy sound money sovereignty");
           signal.url = `https://www.google.com/search?q=${searchTerm}`;
         }
@@ -449,8 +416,17 @@ URL RULES (CRITICAL):
       }
     }
 
-    // Cache good content for future fallback
-    if (signal.title && signal.body && signal.source) {
+    // ── Quality gate: reject low-quality before returning ──
+    const hasNumbers = /\d{2,}%|\$\d/.test(signal.body);
+    const tooShort = (signal.body?.length || 0) < 40;
+    if (hasNumbers || tooShort) {
+      log(`quality gate failed: hasNumbers=${hasNumbers} tooShort=${tooShort}`);
+      qualityScore = 0; // Don't cache
+      // Still return it but don't cache low-quality
+    }
+
+    // Cache good content
+    if (signal.title && signal.body && signal.source && qualityScore > 0) {
       svcClient.from("companion_cache").insert({
         companion_type: "signal",
         language: "en",
@@ -459,15 +435,21 @@ URL RULES (CRITICAL):
       }).then(() => {});
     }
 
-    log(`done, signal: ${signal.title}, source: ${signal.source}, url: ${signal.url}`);
+    log(`done, signal: ${signal.title}, source: ${signal.source}`);
     return new Response(JSON.stringify(signal), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
     console.error("signal-companion error:", e);
-    return new Response(
-      JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    // Final safety net: curated fallback
+    try {
+      const fallback = CURATED_FALLBACKS[Math.floor(Math.random() * CURATED_FALLBACKS.length)];
+      return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    } catch {
+      return new Response(
+        JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
   }
 });
