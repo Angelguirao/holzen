@@ -37,13 +37,13 @@ async function isUrlReachable(url: string): Promise<boolean> {
 }
 
 /** Serve a random cached entry as fallback */
-async function serveFallback(svcClient: any, lang: string): Promise<any | null> {
+async function serveFallback(svcClient: any): Promise<any | null> {
   try {
     const { data } = await svcClient
       .from("companion_cache")
       .select("id, content, used_count")
       .eq("companion_type", "signal")
-      .eq("language", lang)
+      .eq("language", "en")
       .gte("quality_score", 2)
       .order("used_count", { ascending: true })
       .limit(5);
@@ -52,7 +52,7 @@ async function serveFallback(svcClient: any, lang: string): Promise<any | null> 
         .from("companion_cache")
         .select("id, content, used_count")
         .eq("companion_type", "signal")
-        .eq("language", lang)
+        .eq("language", "en")
         .order("used_count", { ascending: true })
         .limit(5);
       if (!anyQ || anyQ.length === 0) return null;
@@ -255,12 +255,12 @@ DIVERSITY RULES:
     } catch (e) {
       if (e instanceof DOMException && e.name === "AbortError") {
         log("perplexity timed out after 12s");
-        const fallback = await serveFallback(svcClient, langCode);
+        const fallback = await serveFallback(svcClient);
         if (fallback) return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
         return new Response(JSON.stringify({ error: "Search timed out" }), { status: 504, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
       if (e instanceof Error && e.message === "RATE_LIMITED") {
-        const fallback = await serveFallback(svcClient, langCode);
+        const fallback = await serveFallback(svcClient);
         if (fallback) return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
         return new Response(JSON.stringify({ error: "Rate limited. Try again later." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
@@ -268,7 +268,7 @@ DIVERSITY RULES:
     }
 
     if (!searchContent) {
-      const fallback = await serveFallback(svcClient, langCode);
+      const fallback = await serveFallback(svcClient);
       if (fallback) return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
       throw new Error("No search content returned");
     }
@@ -391,7 +391,7 @@ URL RULES (CRITICAL):
           log(`AI ${model} timed out after 18s`);
           lastStatus = 504;
           if (model !== models[models.length - 1]) { log("Retrying with fallback model"); continue; }
-          const fallback = await serveFallback(svcClient, langCode);
+          const fallback = await serveFallback(svcClient);
           if (fallback) return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
           return new Response(JSON.stringify({ error: "AI structuring timed out" }), { status: 504, headers: { ...corsHeaders, "Content-Type": "application/json" } });
         }
@@ -400,7 +400,7 @@ URL RULES (CRITICAL):
     }
 
     if (!signal) {
-      const fallback = await serveFallback(svcClient, langCode);
+      const fallback = await serveFallback(svcClient);
       if (fallback) return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
       if (lastStatus === 429) return new Response(JSON.stringify({ error: "Rate limited. Try again later." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       if (lastStatus === 402) return new Response(JSON.stringify({ error: "AI usage limit reached." }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
