@@ -273,9 +273,7 @@ DIVERSITY RULES:
       throw new Error("No search content returned");
     }
 
-    // Step 2: AI structuring
-    const langInstruction = langCode !== "en" ? `Write title and body in ${langName}. Keep source name/URL as-is.\n` : "";
-
+    // Step 2: AI structuring — extract philosophical insight
     const citationList = citations.length > 0
       ? citations.map((c: string, i: number) => `[${i + 1}] ${c}`).join("\n")
       : "(No citations available — leave url empty)";
@@ -286,23 +284,31 @@ DIVERSITY RULES:
       messages: [
         {
           role: "system",
-          content: `${langInstruction}Extract ONE market signal from the search results below.
+          content: `Extract ONE philosophical Bitcoin insight from the search results below.
 
-HOLDER PERSPECTIVE FILTER (CRITICAL):
-- If the search result is about short-term trading, chart patterns, entry/exit signals, or price targets, you MUST reframe it as a long-term holder insight instead
-- Replace trading language with holder language ("accumulation trend", "network growth", "supply dynamics")
-- NEVER include phrases like "trading opportunity", "price target", "buy/sell signal"
+TONE: Profound, calm, grounding. Like a wise friend reminding you why you hold.
+LENGTH: Title should be evocative (5-10 words). Body should be 2-3 sentences that capture the CORE IDEA — not a summary of the article, but the philosophical essence.
+
+EXAMPLES OF GOOD TITLES:
+- "Proof of work is proof of sacrifice"
+- "Sound money teaches patience before it teaches wealth"
+- "Sovereignty begins with what you refuse to delegate"
+
+EXAMPLES OF BAD TITLES:
+- "Bitcoin hash rate reaches new all-time high"
+- "Analyst predicts BTC price target"
+- "On-chain metrics show accumulation"
 
 ACCURACY RULES (CRITICAL):
-- Use ONLY data points, numbers, dates, and analyst names that appear in the search results
-- Do NOT invent statistics, percentages, or metrics not present in the source material
-- The body must contain ONLY verifiable claims from the search results
+- Attribute the idea to the correct thinker/writer from the search results
+- Do NOT invent quotes or misattribute ideas
+- The body should distill the philosophical point, not regurgitate data
 
 URL RULES (CRITICAL):
-- You MUST select a url from the citation list below. Copy it character-for-character.
+- Select a url from the citation list below. Copy it character-for-character.
 - If none match, use the FIRST citation URL.
 - If no citations exist, set url to "".
-- NEVER fabricate or shorten URLs.`,
+- NEVER fabricate URLs.`,
         },
         {
           role: "user",
@@ -313,14 +319,14 @@ URL RULES (CRITICAL):
         type: "function",
         function: {
           name: "return_signal",
-          description: "Return a single market signal extracted from search results",
+          description: "Return a single philosophical Bitcoin insight",
           parameters: {
             type: "object",
             properties: {
-              title: { type: "string", description: "5-12 word headline" },
-              body: { type: "string", description: "2-3 sentences with specific data points" },
-              source: { type: "string", description: "Exact source or analyst name" },
-              url: { type: "string", description: "Citation URL copied character-for-character from the list" },
+              title: { type: "string", description: "Evocative 5-10 word philosophical headline" },
+              body: { type: "string", description: "2-3 sentences capturing the philosophical essence" },
+              source: { type: "string", description: "Thinker, writer, or publication name" },
+              url: { type: "string", description: "Citation URL copied character-for-character" },
             },
             required: ["title", "body", "source", "url"],
             additionalProperties: false,
@@ -328,7 +334,7 @@ URL RULES (CRITICAL):
         },
       }],
       tool_choice: { type: "function", function: { name: "return_signal" } },
-      temperature: 0.3,
+      temperature: 0.5,
     };
 
     const models = ["google/gemini-2.5-flash", "google/gemini-3-flash-preview"];
