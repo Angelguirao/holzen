@@ -253,14 +253,28 @@ No trading advice, no price predictions, no exclamation marks.${mood ? `\n\nUSER
                 if (parsed.title && parsed.body && passesDeepTimeQuality(parsed)) {
                   deepTime = { title: parsed.title, body: parsed.body };
                   deepTimeSource = "live";
-                  // Cache with title-based dedup
+                  // Cache with rich metadata and title-based dedup
                   (async () => {
                     try {
                       const { data: existing } = await serviceClient.from("companion_cache").select("content").eq("companion_type", "zoom_out_deep_time").eq("language", "en").limit(30);
                       const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
                       const newNorm = norm(parsed.title);
                       const isDup = existing?.some((e: any) => { const t = norm(e.content?.title || ""); return t === newNorm || t.includes(newNorm) || newNorm.includes(t); });
-                      if (!isDup) await serviceClient.from("companion_cache").insert({ companion_type: "zoom_out_deep_time", language: "en", content: deepTime, quality_score: 2 });
+                      if (!isDup) {
+                        const fingerprint = btoa(newNorm).slice(0, 32);
+                        await serviceClient.from("companion_cache").insert({
+                          companion_type: "zoom_out_deep_time",
+                          language: "en",
+                          content: deepTime,
+                          quality_score: 2,
+                          title: parsed.title,
+                          title_norm: newNorm,
+                          fingerprint,
+                          source_kind: "deep_time",
+                          expires_at: new Date(Date.now() + 14 * 86400000).toISOString(),
+                          automated_score: 2,
+                        });
+                      }
                     } catch { /* non-fatal */ }
                   })();
                   break;
