@@ -279,6 +279,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             error={zoomOutError}
             onRetry={retryZoomOut}
           />
+          {zoomOut && !zoomOutLoading && <CompanionFeedback reflectionId={reflectionId} companionType="zoom_out" />}
         </CompanionCard>
       )}
 
