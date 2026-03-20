@@ -7,7 +7,7 @@ import { SignalDisplay } from './SignalDisplay';
 import { ZoomOutDisplay } from './ZoomOutDisplay';
 import { HistoricalInsightDisplay } from './HistoricalInsightDisplay';
 import { CompanionFeedback } from './CompanionFeedback';
-import { Check, Heart, Lock, Feather, Anchor, Radio, Mountain, Clock } from 'lucide-react';
+import { Check, Heart, Lock, Feather, Anchor, BookOpenText, Mountain, Clock } from 'lucide-react';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { useCompanionData } from '@/hooks/use-companion-data';
@@ -39,7 +39,7 @@ interface Props {
 const COMPANION_ICONS: Record<string, React.ElementType> = {
   haiku: Feather,
   learning: Anchor,
-  signal: Radio,
+  signal: BookOpenText,
   zoomOut: Mountain,
   history: Clock,
 };
