@@ -57,14 +57,22 @@ export function ZoomOutDisplay({ data, loading, error, onRetry }: Props) {
 
   const { onThisDay, currentPrice, echo, deepTime } = data;
 
-  const isEmpty = (!currentPrice || onThisDay.length === 0) && !deepTime && !echo;
+  // Show deep time or echo even without price data — the companion is still valuable
+  const hasPrices = currentPrice && onThisDay.length > 0;
+  const hasContent = !!deepTime || !!echo;
+  const isEmpty = !hasPrices && !hasContent;
 
   return (
     <div className="space-y-4">
       {isEmpty && (
-        <p className="text-xs text-muted-foreground/50 font-mono italic leading-relaxed">
-          Not enough data to zoom out today. Keep reflecting — perspective builds over time.
-        </p>
+        <div className="rounded-lg border border-border/30 bg-muted/20 px-4 py-3.5 space-y-1.5">
+          <p className="text-xs font-mono text-muted-foreground/70 leading-relaxed">
+            Perspective takes time to build.
+          </p>
+          <p className="text-[10px] text-muted-foreground/40 leading-relaxed">
+            The more you reflect, the richer your zoom-out view becomes. Historical price data and your past reflections will appear here over time.
+          </p>
+        </div>
       )}
       {/* On this day - price timeline */}
       {currentPrice && onThisDay.length > 0 && (
