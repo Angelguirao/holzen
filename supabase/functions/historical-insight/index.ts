@@ -58,6 +58,20 @@ const CURATED_FALLBACKS = [
 // ── BANNED AI-SLOP PHRASES ──
 const BANNED_PHRASES = ["dive into", "game-changer", "paradigm shift", "revolutionary", "unprecedented", "navigate the", "in the world of", "it's worth noting", "at the end of the day", "moving forward", "leverage", "synergy", "ecosystem", "disruptive", "next-gen", "cutting-edge"];
 
+const MIN_BODY_LENGTH = 80;
+
+function containsSlop(text: string): boolean {
+  const lower = text.toLowerCase();
+  return BANNED_PHRASES.some(p => lower.includes(p));
+}
+
+function passesQualityGate(insight: any): boolean {
+  if (!insight?.title || !insight?.btcInsight) return false;
+  if ((insight.btcInsight || "").length < MIN_BODY_LENGTH) return false;
+  if (containsSlop(insight.btcInsight) || containsSlop(insight.analogy || "")) return false;
+  return true;
+}
+
 /** Fallback chain: cache → curated. Returns { data, source } for observability. */
 async function serveFallback(svcClient: any, excludeIds?: string[]): Promise<{ data: any; source: string }> {
   try {
@@ -167,7 +181,7 @@ serve(async (req) => {
         method: "POST",
         headers: { Authorization: `Bearer ${PERPLEXITY_API_KEY}`, "Content-Type": "application/json" },
         body: JSON.stringify({
-          model: "sonar",
+          model: "sonar-pro",
           messages: [
             {
               role: "system",
@@ -273,10 +287,10 @@ BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? 
       }
     }
 
-    if (!insight || !insight.title || !insight.btcInsight) {
-      log("AI failed, serving fallback");
+    if (!insight || !passesQualityGate(insight)) {
+      log(`quality gate failed: ${!insight ? "no insight" : `body=${(insight.btcInsight||"").length}chars, slop=${containsSlop(insight?.btcInsight||"") || containsSlop(insight?.analogy||"")}`}`);
       const fb = await serveFallback(svcClient);
-      trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
+      trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated", { reason: "quality_gate" });
       return new Response(JSON.stringify(fb.data), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
@@ -313,7 +327,7 @@ BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? 
     }
 
     // Cache good content with title-based dedup
-    if (insight.title && insight.btcInsight) {
+    if (insight.title && insight.btcInsight && passesQualityGate(insight)) {
       (async () => {
         try {
           const { data: existing } = await svcClient.from("companion_cache").select("content").eq("companion_type", "historical_insight").eq("language", "en").limit(30);
