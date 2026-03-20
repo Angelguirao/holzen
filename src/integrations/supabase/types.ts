@@ -185,6 +185,36 @@ export type Database = {
         }
         Relationships: []
       }
+      companion_cache: {
+        Row: {
+          companion_type: string
+          content: Json
+          created_at: string
+          id: string
+          language: string
+          quality_score: number
+          used_count: number
+        }
+        Insert: {
+          companion_type: string
+          content: Json
+          created_at?: string
+          id?: string
+          language?: string
+          quality_score?: number
+          used_count?: number
+        }
+        Update: {
+          companion_type?: string
+          content?: Json
+          created_at?: string
+          id?: string
+          language?: string
+          quality_score?: number
+          used_count?: number
+        }
+        Relationships: []
+      }
       feedback: {
         Row: {
           category: string
