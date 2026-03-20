@@ -30,6 +30,9 @@ const CURATED_DEEP_TIME = [
   },
 ];
 
+// ── BANNED AI-SLOP PHRASES ──
+const BANNED_PHRASES = ["dive into", "game-changer", "paradigm shift", "revolutionary", "unprecedented", "navigate the", "in the world of", "it's worth noting", "at the end of the day", "moving forward", "leverage", "synergy", "ecosystem", "disruptive", "next-gen", "cutting-edge"];
+
 serve(async (req) => {
   if (req.method === "OPTIONS")
     return new Response(null, { headers: corsHeaders });
@@ -58,7 +61,7 @@ serve(async (req) => {
       resolvedUserId = user.id;
     }
 
-    const { context, reflectionMessage, userId: bodyUserId } = await req.json();
+    const { context, reflectionMessage, userId: bodyUserId, mood, recentTitles } = await req.json();
     const effectiveUserId = resolvedUserId || bodyUserId;
 
     if (effectiveUserId) {
@@ -182,6 +185,10 @@ serve(async (req) => {
         ? `BTC prices on this day: ${onThisDay.map(e => `${e.yearsAgo}y ago: $${e.price.toLocaleString()}`).join(", ")}.`
         : "";
 
+      const titleExclusion = (recentTitles && Array.isArray(recentTitles) && recentTitles.length > 0)
+        ? `\nDo NOT reuse these titles or topics (already shown): ${recentTitles.slice(0, 5).join("; ")}. Find a COMPLETELY DIFFERENT perspective.`
+        : "";
+
       const systemPrompt = `You generate ONE deep-time perspective for a Bitcoin mindfulness app. Zoom WAY out — beyond markets, beyond decades — into civilizational, planetary, or epochal timescales.
 
 Think like the Long Now Foundation. Think in centuries and millennia. Context:
@@ -195,8 +202,10 @@ ACCURACY RULES (CRITICAL):
 - Prefer well-known facts over obscure claims
 - Use approximate numbers when unsure ("roughly 300,000 years")
 
+BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}
+
 FORMAT: JSON with "title" (3-8 word evocative phrase) and "body" (1-2 poetic but factual sentences).
-No trading advice, no price predictions, no exclamation marks.`;
+No trading advice, no price predictions, no exclamation marks.${mood ? `\n\nUSER MOOD: The user is feeling "${mood}". Let this subtly inform which deep-time perspective you choose.` : ""}${titleExclusion}`;
 
       const aiBody = {
         messages: [
