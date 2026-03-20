@@ -404,24 +404,58 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
         setZoomOutLoading(false);
         const zoomBody = zoomData?.deepTime?.body || zoomData?.echo?.message || 'Zoom Out perspective';
         autoSaveToLibrary({ title: zoomData?.deepTime?.title || 'Zoom Out', body: zoomBody, sourceType: 'zoom_out' });
+        // Track for dedup
+        if (zoomData?.deepTime?.title) {
+          try {
+            const prev: string[] = JSON.parse(localStorage.getItem('holzen_recent_zoom_out_titles') || '[]');
+            prev.unshift(zoomData.deepTime.title);
+            localStorage.setItem('holzen_recent_zoom_out_titles', JSON.stringify(prev.slice(0, 5)));
+          } catch { /* ignore */ }
+        }
         return;
       }
 
+      // Get recent titles for dedup
+      let recentZoomOutTitles: string[] = [];
+      try {
+        recentZoomOutTitles = JSON.parse(localStorage.getItem('holzen_recent_zoom_out_titles') || '[]');
+      } catch { /* ignore */ }
+
+      // Get user mood from companions context
+      const mood = (companions as any)?.mood || null;
+
       supabase.functions
-        .invoke('zoom-out-companion', { body: { context: context ?? '', reflectionMessage: reflectionMessage ?? '', language } })
+        .invoke('zoom-out-companion', {
+          body: {
+            context: context ?? '',
+            reflectionMessage: reflectionMessage ?? '',
+            language,
+            mood,
+            recentTitles: recentZoomOutTitles,
+          },
+        })
         .then(({ data, error: fnError }) => {
           if (cancelled) return;
           if (fnError || !data || data.error) {
             setZoomOutError(true);
           } else {
             setZoomOut(data as any);
+            // Track title for dedup
+            const title = (data as any)?.deepTime?.title;
+            if (title) {
+              try {
+                const prev: string[] = JSON.parse(localStorage.getItem('holzen_recent_zoom_out_titles') || '[]');
+                prev.unshift(title);
+                localStorage.setItem('holzen_recent_zoom_out_titles', JSON.stringify(prev.slice(0, 5)));
+              } catch { /* ignore */ }
+            }
             supabase
               .from('reflections')
               .update({ zoom_out_data: data } as any)
               .eq('id', reflectionId)
               .then(() => {});
             const zoomBody = (data as any)?.deepTime?.body || (data as any)?.echo?.message || 'Zoom Out perspective';
-            autoSaveToLibrary({ title: (data as any)?.deepTime?.title || 'Zoom Out', body: zoomBody, sourceType: 'zoom_out' });
+            autoSaveToLibrary({ title: title || 'Zoom Out', body: zoomBody, sourceType: 'zoom_out' });
           }
           setZoomOutLoading(false);
         });
@@ -460,17 +494,49 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
         setHistoryInsight(cachedHistory);
         setHistoryLoading(false);
         autoSaveToLibrary({ title: cachedHistory.title, body: cachedHistory.btcInsight, sourceType: 'history_insight' });
+        // Track for dedup
+        if (cachedHistory.title) {
+          try {
+            const prev: string[] = JSON.parse(localStorage.getItem('holzen_recent_history_titles') || '[]');
+            prev.unshift(cachedHistory.title);
+            localStorage.setItem('holzen_recent_history_titles', JSON.stringify(prev.slice(0, 5)));
+          } catch { /* ignore */ }
+        }
         return;
       }
 
+      // Get recent titles for dedup
+      let recentHistoryTitles: string[] = [];
+      try {
+        recentHistoryTitles = JSON.parse(localStorage.getItem('holzen_recent_history_titles') || '[]');
+      } catch { /* ignore */ }
+
+      // Get user mood from companions context
+      const mood = (companions as any)?.mood || null;
+
       supabase.functions
-        .invoke('historical-insight', { body: { context: context ?? '', language } })
+        .invoke('historical-insight', {
+          body: {
+            context: context ?? '',
+            language,
+            mood,
+            recentTitles: recentHistoryTitles,
+          },
+        })
         .then(({ data, error: fnError }) => {
           if (cancelled) return;
           if (fnError || !data || data.error) {
             setHistoryError(true);
           } else {
             setHistoryInsight(data as HistoricalInsightData);
+            // Track title for dedup
+            if ((data as HistoricalInsightData).title) {
+              try {
+                const prev: string[] = JSON.parse(localStorage.getItem('holzen_recent_history_titles') || '[]');
+                prev.unshift((data as HistoricalInsightData).title);
+                localStorage.setItem('holzen_recent_history_titles', JSON.stringify(prev.slice(0, 5)));
+              } catch { /* ignore */ }
+            }
             supabase
               .from('reflections')
               .update({ history_insight_data: data } as any)
