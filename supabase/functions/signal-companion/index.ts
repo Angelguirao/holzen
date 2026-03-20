@@ -122,8 +122,6 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const langCode = language || "en";
-
     // Build source name list for context
     const sourceNames: string[] = [];
     if (sources && Array.isArray(sources) && sources.length > 0) {
@@ -137,11 +135,8 @@ serve(async (req) => {
       : "";
 
     const topicExclusion = (recentSignalTitles && Array.isArray(recentSignalTitles) && recentSignalTitles.length > 0)
-      ? `\nDo NOT cover these topics (already shown to user): ${recentSignalTitles.slice(0, 5).join("; ")}. Find a COMPLETELY DIFFERENT angle or metric.`
+      ? `\nDo NOT cover these topics (already shown to user): ${recentSignalTitles.slice(0, 5).join("; ")}. Find a COMPLETELY DIFFERENT angle.`
       : "";
-
-    const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
-    const langName = LANG_NAMES[langCode] || "English";
 
     const sourceHint = sourceNames.length > 0
       ? ` Look for insights from sources like: ${sourceNames.sort(() => Math.random() - 0.5).slice(0, 5).join(", ")}.`
@@ -160,34 +155,48 @@ serve(async (req) => {
       }
     }
 
-    const ANTI_TRADING_INSTRUCTION = `CRITICAL CONTENT RULES:
-- Do NOT return content about short-term trading signals, chart patterns, technical analysis setups, entry/exit points, or price targets
-- Do NOT cite trading educators, signal groups, or chart pattern analysts
-- FOCUS ON: on-chain data, macro trends, adoption metrics, network health, long-term holder behavior, institutional flows, mining economics, supply dynamics
-- Prefer sources like: on-chain analysts, macro researchers, Bitcoin-focused newsletters, network data dashboards`;
+    // PHILOSOPHICAL SIGNAL — not trading data, not metrics. Deep Bitcoin thinking.
+    const SIGNAL_PHILOSOPHY = `CRITICAL CONTENT IDENTITY:
+You are searching for PROFOUND, PHILOSOPHICAL Bitcoin thinking — NOT market data, NOT trading signals, NOT on-chain metrics.
+
+WHAT "SIGNAL" MEANS HERE:
+- Deep ideas about what Bitcoin represents for human freedom, sovereignty, and self-custody
+- Philosophical perspectives on money, time preference, proof of work as a life principle
+- Thoughtful essays about Bitcoin's role in reshaping trust, institutions, and individual agency
+- Long-form thinking from Bitcoin writers, philosophers, economists, and thinkers
+- Perspectives on sound money, Austrian economics, game theory, and civilizational impact
+- Reflections on patience, conviction, and the psychology of holding through uncertainty
+
+WHAT IT IS NOT:
+- Price predictions, chart analysis, trading setups, entry/exit points
+- On-chain metrics, hash rate stats, exchange flows, whale movements
+- Short-term market commentary or news cycle reactions
+- Technical analysis or quantitative data dashboards
+
+IDEAL SOURCES: Bitcoin Magazine, Unchained, Nakamoto Institute, Allen Farrington, Vijay Boyapati, Lyn Alden (philosophical pieces), Parker Lewis, Gigi, Robert Breedlove, Saifedean Ammous, Jeff Booth, Michael Saylor (philosophical talks), Bitcoin Audible, Swan Signal`;
 
     const searchQuery = context
-      ? `Current Bitcoin market: ${context}. Find one specific, data-driven insight about on-chain metrics, macro trends, adoption, or long-term holder behavior from a Bitcoin researcher or analyst.${sourceHint}${recentExclusion}`
-      : `Latest Bitcoin on-chain analysis, macro trends, or long-term holder metrics with specific data points from researchers or analysts.${sourceHint}${recentExclusion}`;
+      ? `Bitcoin philosophical perspective relevant when ${context}. Find a profound insight about conviction, patience, sound money, sovereignty, or long-term thinking from a respected Bitcoin thinker or writer.${sourceHint}${recentExclusion}`
+      : `Find a profound, philosophical Bitcoin essay or insight about sovereignty, sound money, time preference, proof of work as philosophy, or the meaning of holding from a respected thinker.${sourceHint}${recentExclusion}`;
 
     const perplexityBody: any = {
       model: "sonar-pro",
       messages: [
         {
           role: "system",
-          content: `You are a Bitcoin market research assistant focused on LONG-TERM holder perspective. Find one specific, data-driven insight with real numbers and dates.
+          content: `You are searching for deep, philosophical Bitcoin writing — essays and ideas that make a holder feel grounded in WHY they hold.
 
-${ANTI_TRADING_INSTRUCTION}
+${SIGNAL_PHILOSOPHY}
 
 DIVERSITY RULES:
-- Use a DIFFERENT source every time — rotate between on-chain analysts, macro blogs, newsletters, dashboards, and podcasts
-- Do NOT default to Glassnode or any single source
-- Prefer recent analysis (last 30 days) from named analysts or publications
-- Include the exact source name and a working URL to the specific article/page${recentExclusion}${topicExclusion}`,
+- Use a DIFFERENT thinker or writer every time
+- Rotate between essayists, podcasters, book authors, and newsletter writers
+- Prefer timeless ideas over news reactions
+- Include the exact source name and a working URL to the specific essay/article/talk${recentExclusion}${topicExclusion}`,
         },
         { role: "user", content: searchQuery },
       ],
-      search_recency_filter: "month",
+      search_recency_filter: "year",
       ...(sourceUrls.length > 0 ? { search_domain_filter: sourceUrls.slice(0, 5) } : {}),
     };
 
