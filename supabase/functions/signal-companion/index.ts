@@ -86,36 +86,46 @@ function passesQualityGate(sig: any): boolean {
   return true;
 }
 
-/** Fallback chain: cache → curated. Returns { data, source, cacheId } for observability. */
-async function serveFallback(svcClient: any): Promise<{ data: any; source: string; cacheId: string | null }> {
+/** Fallback chain: cache (highest rated, unexpired, least recently served) → curated. */
+async function serveFallback(svcClient: any, excludeIds?: string[]): Promise<{ data: any; source: string; cacheId: string | null }> {
   try {
+    const now = new Date().toISOString();
     const { data } = await svcClient
       .from("companion_cache")
-      .select("id, content, used_count")
+      .select("id, content, quality_score, used_count")
       .eq("companion_type", "signal")
       .eq("language", "en")
       .gte("quality_score", 2)
+      .or(`expires_at.is.null,expires_at.gt.${now}`)
+      .order("quality_score", { ascending: false })
+      .order("last_served_at", { ascending: true, nullsFirst: true })
       .order("used_count", { ascending: true })
-      .limit(5);
-    if (data && data.length > 0) {
-      const pick = data[Math.floor(Math.random() * data.length)];
-      svcClient.from("companion_cache").update({ used_count: (pick.used_count || 0) + 1 }).eq("id", pick.id).then(() => {});
+      .limit(10);
+    const filtered = excludeIds?.length ? (data || []).filter((d: any) => !excludeIds.includes(d.id)) : (data || []);
+    const pool = filtered.length > 0 ? filtered : (data || []);
+    if (pool.length > 0) {
+      const pick = pool[Math.floor(Math.random() * Math.min(pool.length, 3))];
+      svcClient.from("companion_cache").update({ used_count: (pick.used_count || 0) + 1, last_served_at: now }).eq("id", pick.id).then(() => {});
       return { data: pick.content, source: "cache", cacheId: pick.id };
     }
+    // Second pass: any quality
     const { data: anyQ } = await svcClient
       .from("companion_cache")
       .select("id, content, used_count")
       .eq("companion_type", "signal")
       .eq("language", "en")
+      .or(`expires_at.is.null,expires_at.gt.${now}`)
+      .order("quality_score", { ascending: false })
       .order("used_count", { ascending: true })
       .limit(5);
-    if (anyQ && anyQ.length > 0) {
-      const pick = anyQ[Math.floor(Math.random() * anyQ.length)];
-      svcClient.from("companion_cache").update({ used_count: (pick.used_count || 0) + 1 }).eq("id", pick.id).then(() => {});
+    const anyFiltered = excludeIds?.length ? (anyQ || []).filter((d: any) => !excludeIds.includes(d.id)) : (anyQ || []);
+    const anyPool = anyFiltered.length > 0 ? anyFiltered : (anyQ || []);
+    if (anyPool.length > 0) {
+      const pick = anyPool[Math.floor(Math.random() * Math.min(anyPool.length, 3))];
+      svcClient.from("companion_cache").update({ used_count: (pick.used_count || 0) + 1, last_served_at: now }).eq("id", pick.id).then(() => {});
       return { data: pick.content, source: "cache", cacheId: pick.id };
     }
   } catch { /* continue to curated */ }
-
   return { data: CURATED_FALLBACKS[Math.floor(Math.random() * CURATED_FALLBACKS.length)], source: "curated", cacheId: null };
 }
 
@@ -166,7 +176,7 @@ serve(async (req) => {
       log("missing API keys, serving fallback");
       const fb = await serveFallback(svcClient);
       trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
-      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId, _serve_source: fb.source }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     // Build source hints
@@ -280,13 +290,13 @@ DIVERSITY: Use a DIFFERENT thinker every time. Prefer timeless essays over recen
       log(`perplexity failed: ${e}`);
       const fb = await serveFallback(svcClient);
       trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
-      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId, _serve_source: fb.source }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     if (!searchContent) {
       const fb = await serveFallback(svcClient);
       trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
-      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId, _serve_source: fb.source }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     // ── Step 2: AI structuring ──
@@ -401,7 +411,7 @@ URL RULES (CRITICAL):
       log(`quality gate failed: ${!signal ? "no signal" : `body=${(signal.body||"").length}chars, slop=${containsSlop(signal?.body||"")||containsSlop(signal?.title||"")}`}`);
       const fb = await serveFallback(svcClient);
       trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated", { reason: "quality_gate" });
-      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId, _serve_source: fb.source }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     // ── Post-processing: URL validation ──
@@ -466,7 +476,7 @@ URL RULES (CRITICAL):
 
     trackObs("companion_live_generated");
     log(`done, signal: ${signal.title}, source: ${signal.source}`);
-    return new Response(JSON.stringify(signal), {
+    return new Response(JSON.stringify({ ...signal, _serve_source: "live" }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
