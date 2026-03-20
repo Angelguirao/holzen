@@ -236,6 +236,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
           } else {
             const nudgeData = data as NudgeData;
             setNudge(nudgeData);
+            if ((data as any)._cache_id) setCacheIds(prev => ({ ...prev, nudge: (data as any)._cache_id }));
             // Track topic for cross-session dedup
             try {
               const prev: string[] = JSON.parse(localStorage.getItem('holzen_recent_nudge_topics') || '[]');
@@ -346,6 +347,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
           } else {
             const signalData = data as SignalData;
             setSignal(signalData);
+            if ((data as any)._cache_id) setCacheIds(prev => ({ ...prev, signal: (data as any)._cache_id }));
 
             if (signalData.source) {
               try {
@@ -448,6 +450,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
             setZoomOutError(true);
           } else {
             setZoomOut(data as any);
+            if ((data as any)._cache_id) setCacheIds(prev => ({ ...prev, zoomOut: (data as any)._cache_id }));
             // Track title for dedup
             const title = (data as any)?.deepTime?.title;
             if (title) {
@@ -537,6 +540,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
             setHistoryError(true);
           } else {
             setHistoryInsight(data as HistoricalInsightData);
+            if ((data as any)._cache_id) setCacheIds(prev => ({ ...prev, history: (data as any)._cache_id }));
             // Track title for dedup
             if ((data as HistoricalInsightData).title) {
               try {
@@ -566,6 +570,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     toggleCompanionFavorite,
     completion,
     markCompleted,
+    cacheIds,
     nudge, nudgeLoading, nudgeError, retryNudge,
     signal, signalLoading, signalError, retrySignal,
     zoomOut, zoomOutLoading, zoomOutError, retryZoomOut,
