@@ -13,6 +13,13 @@ interface CompletionState {
   history: boolean;
 }
 
+interface CacheIds {
+  nudge: string | null;
+  signal: string | null;
+  zoomOut: string | null;
+  history: string | null;
+}
+
 interface NudgeData {
   title: string;
   body: string;
@@ -116,6 +123,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
   const [completion, setCompletion] = useState<CompletionState>({
     breathing: false, haiku: false, learning: false, signal: false, zoomOut: false, history: false,
   });
+  const [cacheIds, setCacheIds] = useState<CacheIds>({ nudge: null, signal: null, zoomOut: null, history: null });
 
   useEffect(() => {
     if (!reflectionId) return;
