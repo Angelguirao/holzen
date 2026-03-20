@@ -350,7 +350,7 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
 
     trackObs("companion_live_generated");
     log(`done: ${nudge.title}`);
-    return new Response(JSON.stringify(nudge), {
+    return new Response(JSON.stringify({ ...nudge, _serve_source: "live" }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {

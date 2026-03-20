@@ -346,7 +346,7 @@ BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? 
 
     trackObs("companion_live_generated");
     log(`done: ${insight.title}`);
-    return new Response(JSON.stringify(insight), {
+    return new Response(JSON.stringify({ ...insight, _serve_source: "live" }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
