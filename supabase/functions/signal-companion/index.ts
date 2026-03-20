@@ -95,7 +95,7 @@ serve(async (req) => {
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
-    const { context, language, sources, recentSignalSources, recentSignalTitles } = body;
+    const { context, sources, recentSignalSources, recentSignalTitles } = body;
     log("parsed body");
 
     // Verify JWT via getUser
@@ -441,7 +441,7 @@ URL RULES (CRITICAL):
         }
         if (!found && signal.url) {
           // Fallback to a search URL
-          const searchTerm = encodeURIComponent(signal.source || signal.title || "Bitcoin on-chain analysis");
+          const searchTerm = encodeURIComponent(signal.source || signal.title || "Bitcoin philosophy sound money sovereignty");
           signal.url = `https://www.google.com/search?q=${searchTerm}`;
         }
       } else {
@@ -453,7 +453,7 @@ URL RULES (CRITICAL):
     if (signal.title && signal.body && signal.source) {
       svcClient.from("companion_cache").insert({
         companion_type: "signal",
-        language: langCode,
+        language: "en",
         content: signal,
         quality_score: qualityScore,
       }).then(() => {});
