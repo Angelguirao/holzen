@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { HaikuDisplay } from '@/components/HaikuDisplay';
 import { LearningInput } from '@/components/LearningInput';
-import { Wind, BookOpen, Newspaper, History, Eye, Pen } from 'lucide-react';
+import { Wind, BookOpen, BookOpenText, History, Eye, Pen } from 'lucide-react';
 
 interface Props {
   stagger: (delay: number) => object;
@@ -13,7 +13,7 @@ const COMPANIONS = [
   { id: 'breathing', icon: Wind, labelKey: 'onboarding.companions.breathing', descKey: 'onboarding.companions.breathingDesc' },
   { id: 'haiku', icon: Pen, labelKey: 'onboarding.companions.haiku', descKey: 'onboarding.companions.haikuDesc' },
   { id: 'learning', icon: BookOpen, labelKey: 'onboarding.companions.learning', descKey: 'onboarding.companions.learningDesc' },
-  { id: 'signal', icon: Newspaper, labelKey: 'onboarding.companions.signal', descKey: 'onboarding.companions.signalDesc' },
+  { id: 'signal', icon: BookOpenText, labelKey: 'onboarding.companions.signal', descKey: 'onboarding.companions.signalDesc' },
   { id: 'zoomOut', icon: Eye, labelKey: 'onboarding.companions.zoomOut', descKey: 'onboarding.companions.zoomOutDesc' },
   { id: 'history', icon: History, labelKey: 'onboarding.companions.history', descKey: 'onboarding.companions.historyDesc' },
 ] as const;
