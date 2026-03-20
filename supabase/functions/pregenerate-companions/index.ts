@@ -57,7 +57,8 @@ serve(async (req) => {
       "social proof and information cascading in crypto",
     ];
 
-    for (const lang of languages) {
+    // Generate 2 ground nudges
+    for (let i = 0; i < 2; i++) {
       const topic = BIAS_TOPICS[Math.floor(Math.random() * BIAS_TOPICS.length)];
       try {
         const searchRes = await fetch("https://api.perplexity.ai/chat/completions", {
@@ -86,7 +87,7 @@ serve(async (req) => {
                 model: "google/gemini-2.5-flash",
                 messages: [
                   { role: "system", content: "Extract ONE grounding nudge from the search results. Tone: calm, grounding, no advice." },
-                  { role: "user", content: `Search results:\n${searchContent}\n\nCitations:\n${citations.map((c, i) => `[${i + 1}] ${c}`).join("\n")}` },
+                  { role: "user", content: `Search results:\n${searchContent}\n\nCitations:\n${citations.map((c: string, j: number) => `[${j + 1}] ${c}`).join("\n")}` },
                 ],
                 tools: [{
                   type: "function",
@@ -117,7 +118,6 @@ serve(async (req) => {
               const content = toolCall?.function?.arguments || aiData.choices?.[0]?.message?.content;
               if (content) {
                 const nudge = typeof content === "string" ? JSON.parse(content) : content;
-                // Validate URL
                 let qualityScore = 1;
                 if (nudge.url && citations.includes(nudge.url)) {
                   try {
@@ -125,106 +125,114 @@ serve(async (req) => {
                     if (headRes.status >= 200 && headRes.status < 400) qualityScore = 2;
                   } catch { /* */ }
                 }
-
                 await svcClient.from("companion_cache").insert({
                   companion_type: "ground_nudge",
                   language: lang,
                   content: nudge,
                   quality_score: qualityScore,
                 });
-                results.push(`ground_nudge/${lang}: ${nudge.title}`);
+                results.push(`ground_nudge: ${nudge.title}`);
               }
             }
           }
         }
       } catch (e) {
-        results.push(`ground_nudge/${lang} error: ${e}`);
+        results.push(`ground_nudge error: ${e}`);
       }
-
-      // Small delay to avoid rate limits
       await new Promise(r => setTimeout(r, 3000));
+    }
 
-      // Generate 1 signal
-      try {
-        const signalSearchRes = await fetch("https://api.perplexity.ai/chat/completions", {
-          method: "POST",
-          headers: { Authorization: `Bearer ${PERPLEXITY_API_KEY}`, "Content-Type": "application/json" },
-          body: JSON.stringify({
-            model: "sonar-pro",
-            messages: [
-              { role: "system", content: "Find one specific, data-driven Bitcoin insight about on-chain metrics, macro trends, or long-term holder behavior. Include exact numbers and source names." },
-              { role: "user", content: "Latest Bitcoin on-chain analysis or macro trend with specific data points from a named researcher or analyst." },
-            ],
-            search_recency_filter: "month",
-          }),
-        });
+    // Generate 1 philosophical signal
+    const SIGNAL_TOPICS = [
+      "Bitcoin as sound money and its philosophical implications for human freedom",
+      "Time preference and proof of work as a life philosophy",
+      "Self-sovereignty and the meaning of financial independence through Bitcoin",
+      "The philosophical case for patience and conviction in Bitcoin holding",
+      "Bitcoin and Austrian economics: what sound money teaches about civilization",
+      "The game theory of Bitcoin adoption and why holders matter",
+      "Proof of work as sacrifice: the deeper meaning behind Bitcoin mining",
+      "Bitcoin as a tool for individual sovereignty against institutional trust",
+    ];
+    const signalTopic = SIGNAL_TOPICS[Math.floor(Math.random() * SIGNAL_TOPICS.length)];
 
-        if (signalSearchRes.ok) {
-          const signalData = await signalSearchRes.json();
-          const searchContent = signalData.choices?.[0]?.message?.content || "";
-          const citations: string[] = signalData.citations || [];
+    try {
+      const signalSearchRes = await fetch("https://api.perplexity.ai/chat/completions", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${PERPLEXITY_API_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "sonar-pro",
+          messages: [
+            { role: "system", content: "Find a profound philosophical essay, talk, or piece of writing about Bitcoin. Focus on ideas, not market data. Look for thinkers like Allen Farrington, Vijay Boyapati, Parker Lewis, Gigi, Robert Breedlove, Saifedean Ammous, Jeff Booth, Lyn Alden, or similar." },
+            { role: "user", content: `Find a specific philosophical Bitcoin essay or insight about: ${signalTopic}. Include the author/thinker name and a link to the original piece.` },
+          ],
+          search_recency_filter: "year",
+        }),
+      });
 
-          if (searchContent) {
-            const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-              method: "POST",
-              headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-              body: JSON.stringify({
-                model: "google/gemini-2.5-flash",
-                messages: [
-                  { role: "system", content: "Extract ONE holder-focused market signal from the search results." },
-                  { role: "user", content: `Search results:\n${searchContent}\n\nCitations:\n${citations.map((c, i) => `[${i + 1}] ${c}`).join("\n")}` },
-                ],
-                tools: [{
-                  type: "function",
-                  function: {
-                    name: "return_signal",
-                    description: "Return a market signal",
-                    parameters: {
-                      type: "object",
-                      properties: {
-                        title: { type: "string" },
-                        body: { type: "string" },
-                        source: { type: "string" },
-                        url: { type: "string" },
-                      },
-                      required: ["title", "body", "source", "url"],
-                      additionalProperties: false,
+      if (signalSearchRes.ok) {
+        const signalData = await signalSearchRes.json();
+        const searchContent = signalData.choices?.[0]?.message?.content || "";
+        const citations: string[] = signalData.citations || [];
+
+        if (searchContent) {
+          const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+            method: "POST",
+            headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+            body: JSON.stringify({
+              model: "google/gemini-2.5-flash",
+              messages: [
+                { role: "system", content: "Extract ONE philosophical Bitcoin insight from the search results. Tone: profound, calm, grounding. Not data-driven — idea-driven. The title should be evocative (5-10 words). The body should be 2-3 sentences capturing the philosophical essence." },
+                { role: "user", content: `Search results:\n${searchContent}\n\nCitations:\n${citations.map((c: string, i: number) => `[${i + 1}] ${c}`).join("\n")}` },
+              ],
+              tools: [{
+                type: "function",
+                function: {
+                  name: "return_signal",
+                  description: "Return a philosophical Bitcoin insight",
+                  parameters: {
+                    type: "object",
+                    properties: {
+                      title: { type: "string" },
+                      body: { type: "string" },
+                      source: { type: "string" },
+                      url: { type: "string" },
                     },
+                    required: ["title", "body", "source", "url"],
+                    additionalProperties: false,
                   },
-                }],
-                tool_choice: { type: "function", function: { name: "return_signal" } },
-                temperature: 0.3,
-              }),
-            });
+                },
+              }],
+              tool_choice: { type: "function", function: { name: "return_signal" } },
+              temperature: 0.5,
+            }),
+          });
 
-            if (aiRes.ok) {
-              const aiData = await aiRes.json();
-              const toolCall = aiData.choices?.[0]?.message?.tool_calls?.[0];
-              const content = toolCall?.function?.arguments || aiData.choices?.[0]?.message?.content;
-              if (content) {
-                const signal = typeof content === "string" ? JSON.parse(content) : content;
-                let qualityScore = 1;
-                if (signal.url && citations.includes(signal.url)) {
-                  try {
-                    const headRes = await fetch(signal.url, { method: "HEAD", redirect: "follow" });
-                    if (headRes.status >= 200 && headRes.status < 400) qualityScore = 2;
-                  } catch { /* */ }
-                }
-
-                await svcClient.from("companion_cache").insert({
-                  companion_type: "signal",
-                  language: lang,
-                  content: signal,
-                  quality_score: qualityScore,
-                });
-                results.push(`signal/${lang}: ${signal.title}`);
+          if (aiRes.ok) {
+            const aiData = await aiRes.json();
+            const toolCall = aiData.choices?.[0]?.message?.tool_calls?.[0];
+            const content = toolCall?.function?.arguments || aiData.choices?.[0]?.message?.content;
+            if (content) {
+              const signal = typeof content === "string" ? JSON.parse(content) : content;
+              let qualityScore = 1;
+              if (signal.url && citations.includes(signal.url)) {
+                try {
+                  const headRes = await fetch(signal.url, { method: "HEAD", redirect: "follow" });
+                  if (headRes.status >= 200 && headRes.status < 400) qualityScore = 2;
+                } catch { /* */ }
               }
+              await svcClient.from("companion_cache").insert({
+                companion_type: "signal",
+                language: lang,
+                content: signal,
+                quality_score: qualityScore,
+              });
+              results.push(`signal: ${signal.title}`);
             }
           }
         }
-      } catch (e) {
-        results.push(`signal/${lang} error: ${e}`);
       }
+    } catch (e) {
+      results.push(`signal error: ${e}`);
     }
 
     // Also process feedback: upgrade/downgrade quality based on analytics
