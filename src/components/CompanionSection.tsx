@@ -254,6 +254,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             error={signalError}
             onRetry={retrySignal}
           />
+          {signal && !signalLoading && <CompanionFeedback reflectionId={reflectionId} companionType="signal" />}
         </CompanionCard>
       )}
 
