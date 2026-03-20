@@ -146,6 +146,22 @@ serve(async (req) => {
       }).then(() => {});
     };
 
+    // Cost estimation per 1M tokens (input/output) in USD
+    const COST_MAP: Record<string, [number, number]> = {
+      "sonar-pro": [3, 15], "sonar": [1, 5],
+      "google/gemini-2.5-flash": [0.15, 0.6], "google/gemini-3-flash-preview": [0.15, 0.6],
+      "google/gemini-2.5-flash-lite": [0.075, 0.3],
+    };
+    let attemptOrder = 0;
+    const logAttempt = (params: { companion_type: string; provider: string; model: string; status: string; latency_ms: number; input_tokens?: number; output_tokens?: number; error_message?: string; quality_gate_reason?: string }) => {
+      attemptOrder++;
+      const costs = COST_MAP[params.model] || [0.5, 1.5];
+      const inTok = params.input_tokens || 0;
+      const outTok = params.output_tokens || 0;
+      const cost = inTok > 0 || outTok > 0 ? (inTok * costs[0] + outTok * costs[1]) / 1_000_000 : null;
+      svcClient.from("generation_attempts").insert({ ...params, attempt_order: attemptOrder, estimated_cost_usd: cost }).then(() => {});
+    };
+
     if (!PERPLEXITY_API_KEY || !LOVABLE_API_KEY) {
       log("missing API keys, serving fallback");
       const fb = await serveFallback(svcClient);
@@ -279,6 +295,7 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
       const model = models[idx];
       const aiController = new AbortController();
       const aiTimeout = setTimeout(() => aiController.abort(), AI_TIMEOUTS[idx]);
+      const attemptT0 = Date.now();
       try {
         const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
@@ -289,24 +306,36 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
         clearTimeout(aiTimeout);
         log(`AI ${model} responded ${res.status}`);
 
-        if (!res.ok) { await res.text(); if (model !== models[models.length - 1]) continue; break; }
+        if (!res.ok) {
+          await res.text();
+          logAttempt({ companion_type: "ground_nudge", provider: "lovable", model, status: "error", latency_ms: Date.now() - attemptT0, error_message: `HTTP ${res.status}` });
+          if (model !== models[models.length - 1]) continue; break;
+        }
 
         const data = await res.json();
+        const usage = data.usage;
         const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
         const content = toolCall?.function?.arguments || data.choices?.[0]?.message?.content;
-        if (!content) { if (model !== models[models.length - 1]) continue; break; }
+        if (!content) {
+          logAttempt({ companion_type: "ground_nudge", provider: "lovable", model, status: "error", latency_ms: Date.now() - attemptT0, error_message: "empty content", input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
+          if (model !== models[models.length - 1]) continue; break;
+        }
 
         try {
           nudge = typeof content === "string" ? JSON.parse(content) : content;
         } catch {
           const m = (typeof content === "string" ? content : "").match(/\{[\s\S]*\}/);
           if (m) nudge = JSON.parse(m[0]);
-          else if (model !== models[models.length - 1]) continue;
-          else break;
+          else {
+            logAttempt({ companion_type: "ground_nudge", provider: "lovable", model, status: "error", latency_ms: Date.now() - attemptT0, error_message: "json_parse_failed", input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
+            if (model !== models[models.length - 1]) continue; else break;
+          }
         }
+        logAttempt({ companion_type: "ground_nudge", provider: "lovable", model, status: "success", latency_ms: Date.now() - attemptT0, input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
         break;
       } catch (e) {
         clearTimeout(aiTimeout);
+        logAttempt({ companion_type: "ground_nudge", provider: "lovable", model, status: e instanceof DOMException && e.name === "AbortError" ? "timeout" : "error", latency_ms: Date.now() - attemptT0, error_message: String(e) });
         if (model !== models[models.length - 1]) continue;
         break;
       }
