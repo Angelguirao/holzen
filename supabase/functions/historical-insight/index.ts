@@ -55,8 +55,8 @@ const CURATED_FALLBACKS = [
   },
 ];
 
-/** Fallback chain: cache → curated */
-async function serveFallback(svcClient: any): Promise<any> {
+/** Fallback chain: cache → curated. Returns { data, source } for observability. */
+async function serveFallback(svcClient: any): Promise<{ data: any; source: string }> {
   try {
     const { data } = await svcClient
       .from("companion_cache")
@@ -69,10 +69,10 @@ async function serveFallback(svcClient: any): Promise<any> {
     if (data && data.length > 0) {
       const pick = data[Math.floor(Math.random() * data.length)];
       svcClient.from("companion_cache").update({ used_count: (pick.used_count || 0) + 1 }).eq("id", pick.id).then(() => {});
-      return pick.content;
+      return { data: pick.content, source: "cache" };
     }
   } catch { /* continue to curated */ }
-  return CURATED_FALLBACKS[Math.floor(Math.random() * CURATED_FALLBACKS.length)];
+  return { data: CURATED_FALLBACKS[Math.floor(Math.random() * CURATED_FALLBACKS.length)], source: "curated" };
 }
 
 serve(async (req) => {
@@ -113,13 +113,23 @@ serve(async (req) => {
       try { await svcClient.from("analytics_events").insert({ user_id: effectiveUserId, event: "historical_insight_ai_call" }); } catch (_) { /* non-fatal */ }
     }
 
+    // Observability helper — fire-and-forget
+    const trackObs = (event: string, meta?: Record<string, any>) => {
+      if (!effectiveUserId) return;
+      svcClient.from("analytics_events").insert({
+        user_id: effectiveUserId, event,
+        metadata: { companion_type: "historical_insight", latency_ms: Date.now() - t0, ...meta },
+      }).then(() => {});
+    };
+
     const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
     if (!PERPLEXITY_API_KEY || !LOVABLE_API_KEY) {
       log("missing API keys, serving fallback");
-      const fallback = await serveFallback(svcClient);
-      return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      const fb = await serveFallback(svcClient);
+      trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
+      return new Response(JSON.stringify(fb.data), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     const marketContext = context || "Bitcoin market movement";
@@ -172,13 +182,15 @@ serve(async (req) => {
       citations = searchData.citations || [];
     } catch (e) {
       log(`perplexity failed: ${e}`);
-      const fallback = await serveFallback(svcClient);
-      return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      const fb = await serveFallback(svcClient);
+      trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
+      return new Response(JSON.stringify(fb.data), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     if (!searchContent) {
-      const fallback = await serveFallback(svcClient);
-      return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      const fb = await serveFallback(svcClient);
+      trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
+      return new Response(JSON.stringify(fb.data), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     // ── Step 2: AI structuring ──
@@ -215,7 +227,6 @@ ACCURACY RULES (CRITICAL):
     const models = ["google/gemini-2.5-flash", "google/gemini-3-flash-preview"];
     let insight: any = null;
 
-    // Timeout budget: 8s primary + 6s fallback (10s Perplexity + 14s AI = 24s total)
     const AI_TIMEOUTS = [8000, 6000];
     for (let idx = 0; idx < models.length; idx++) {
       const model = models[idx];
@@ -253,8 +264,9 @@ ACCURACY RULES (CRITICAL):
 
     if (!insight || !insight.title || !insight.btcInsight) {
       log("AI failed, serving fallback");
-      const fallback = await serveFallback(svcClient);
-      return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      const fb = await serveFallback(svcClient);
+      trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
+      return new Response(JSON.stringify(fb.data), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     // Ensure URL is from citations
@@ -271,7 +283,6 @@ ACCURACY RULES (CRITICAL):
         clearTimeout(urlTimeout);
         if (headRes.status >= 400) {
           log(`URL ${insight.url} returned ${headRes.status}, clearing`);
-          // Try other citations
           let validUrl = "";
           for (const c of citations) {
             if (c === insight.url) continue;
@@ -286,7 +297,6 @@ ACCURACY RULES (CRITICAL):
           insight.url = validUrl || insight.source || "";
         }
       } catch {
-        // Timeout or network error — keep the URL but mark as unverified
         log(`URL validation timed out for ${insight.url}`);
       }
     }
@@ -309,6 +319,7 @@ ACCURACY RULES (CRITICAL):
       })();
     }
 
+    trackObs("companion_live_generated");
     log(`done: ${insight.title}`);
     return new Response(JSON.stringify(insight), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
