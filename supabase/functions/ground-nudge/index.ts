@@ -139,7 +139,7 @@ serve(async (req) => {
       log("missing API keys, serving fallback");
       const fb = await serveFallback(svcClient);
       trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
-      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId, _serve_source: fb.source }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     // Pick a bias category, avoiding recently used ones
@@ -203,13 +203,13 @@ serve(async (req) => {
       log(`perplexity failed: ${e}`);
       const fb = await serveFallback(svcClient);
       trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
-      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId, _serve_source: fb.source }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     if (!searchContent) {
       const fb = await serveFallback(svcClient);
       trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
-      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId, _serve_source: fb.source }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     // ── Step 2: AI structuring ──
@@ -305,7 +305,7 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
       log(`quality gate failed: ${!nudge ? "no nudge" : `body=${(nudge.body||"").length}chars, slop=${containsSlop(nudge?.body||"") || containsSlop(nudge?.title||"")}`}`);
       const fb = await serveFallback(svcClient);
       trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated", { reason: "quality_gate" });
-      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId, _serve_source: fb.source }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     // ── Post-processing: URL validation ──
