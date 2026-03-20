@@ -30,7 +30,7 @@ export function HistoricalInsightDisplay({ data, loading, error, onRetry }: Prop
   }
 
   if (error || !data) {
-    return <CompanionError message="Could not load historical insight." onRetry={onRetry} />;
+    return <CompanionError companionType="history" onRetry={onRetry} />;
   }
 
   return (

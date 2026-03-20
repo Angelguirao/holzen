@@ -50,6 +50,14 @@ interface UseCompanionDataParams {
   reflectionMessage?: string | null;
 }
 
+interface CompanionResult {
+  data: any | null;
+  source: 'live' | 'cache' | 'curated' | 'empty';
+  cacheId: string | null;
+  latencyMs: number;
+  error?: string;
+}
+
 export function useCompanionData({ companions, prefs, reflectionId, context, reflectionMessage }: UseCompanionDataParams) {
   const { language } = useHolzen();
 
@@ -169,401 +177,276 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     }
   }, [reflectionId, completion]);
 
-  // ── Poll helper ──
-  const pollForCachedData = useCallback(async (
-    rid: string,
-    fields: string,
-    checkFn: (row: any) => boolean,
-    maxAttempts = 3,
-  ): Promise<any | null> => {
-    for (let i = 0; i < maxAttempts; i++) {
-      if (i > 0) await new Promise(r => setTimeout(r, 2000));
-      const { data: row } = await supabase.from('reflections').select(fields).eq('id', rid).single();
-      if (row && checkFn(row)) return row;
-    }
-    return null;
-  }, []);
-
-  // ── Nudge (Grounding) ──
-  const [nudgeRetry, setNudgeRetry] = useState(0);
+  // ── Companion state ──
   const [nudge, setNudge] = useState<NudgeData | null>(null);
   const [nudgeLoading, setNudgeLoading] = useState(false);
   const [nudgeError, setNudgeError] = useState(false);
-  const nudgeFetchedRef = useRef<string | null>(null);
 
-  useEffect(() => {
-    if (!prefs.learning || !reflectionId) return;
-    const key = reflectionId;
-    if (nudgeFetchedRef.current === key && nudgeRetry === 0) return;
-    nudgeFetchedRef.current = key;
-
-    let cancelled = false;
-    setNudgeLoading(true);
-    setNudgeError(false);
-
-    pollForCachedData(
-      reflectionId,
-      'learning_title, learning_body, learning_citation, learning_url',
-      (row) => !!row?.learning_citation,
-    ).then(async (row) => {
-      if (cancelled) return;
-      if (row?.learning_citation) {
-        const cachedNudge = {
-          title: row.learning_title ?? '',
-          body: row.learning_body ?? '',
-          citation: row.learning_citation,
-          url: row.learning_url ?? '',
-        };
-        setNudge(cachedNudge);
-        setNudgeLoading(false);
-        autoSaveToLibrary({ title: cachedNudge.title, body: cachedNudge.body, sourceType: 'learning', sourceUrl: cachedNudge.url });
-        return;
-      }
-
-      // Pass recent bias topics to avoid repetition
-      let recentTopics: string[] = [];
-      try {
-        const stored = localStorage.getItem('holzen_recent_nudge_topics');
-        if (stored) recentTopics = JSON.parse(stored);
-      } catch { /* ignore */ }
-
-      supabase.functions
-        .invoke('ground-nudge', { body: { context: context ?? '', language, recentTopics } })
-        .then(({ data, error: fnError }) => {
-          if (cancelled) return;
-          if (fnError || !data || data.error) {
-            setNudgeError(true);
-          } else {
-            const nudgeData = data as NudgeData;
-            setNudge(nudgeData);
-            if ((data as any)._cache_id) setCacheIds(prev => ({ ...prev, nudge: (data as any)._cache_id }));
-            // Track topic for cross-session dedup
-            try {
-              const prev: string[] = JSON.parse(localStorage.getItem('holzen_recent_nudge_topics') || '[]');
-              if (nudgeData.title) {
-                prev.unshift(nudgeData.title);
-                localStorage.setItem('holzen_recent_nudge_topics', JSON.stringify(prev.slice(0, 5)));
-              }
-            } catch { /* ignore */ }
-            supabase
-              .from('reflections')
-              .update({
-                learning_title: nudgeData.title,
-                learning_body: nudgeData.body,
-                learning_citation: nudgeData.citation,
-                learning_url: nudgeData.url,
-              } as any)
-              .eq('id', reflectionId)
-              .then(() => {});
-            autoSaveToLibrary({ title: nudgeData.title, body: nudgeData.body, sourceType: 'learning', sourceUrl: nudgeData.url });
-          }
-          setNudgeLoading(false);
-        });
-    });
-
-    return () => { cancelled = true; };
-  }, [prefs.learning, reflectionId, context, nudgeRetry]);
-
-  const retryNudge = useCallback(() => { nudgeFetchedRef.current = null; setNudgeRetry(c => c + 1); }, []);
-
-  // ── Signal ──
-  const [signalRetry, setSignalRetry] = useState(0);
   const [signal, setSignal] = useState<SignalData | null>(null);
   const [signalLoading, setSignalLoading] = useState(false);
   const [signalError, setSignalError] = useState(false);
-  const signalFetchedRef = useRef<string | null>(null);
 
-  useEffect(() => {
-    if (!prefs.signal || !reflectionId) return;
-    const key = reflectionId;
-    if (signalFetchedRef.current === key && signalRetry === 0) return;
-    signalFetchedRef.current = key;
-
-    let cancelled = false;
-    setSignalLoading(true);
-    setSignalError(false);
-
-    pollForCachedData(
-      reflectionId,
-      'signal_title, signal_body, signal_source, signal_url',
-      (row) => !!row?.signal_source,
-    ).then(async (row) => {
-      if (cancelled) return;
-      if (row?.signal_source) {
-        const cachedSignal = {
-          title: row.signal_title ?? '',
-          body: row.signal_body ?? '',
-          source: row.signal_source,
-          url: row.signal_url ?? '',
-        };
-        setSignal(cachedSignal);
-        setSignalLoading(false);
-        autoSaveToLibrary({ title: cachedSignal.title, body: cachedSignal.body, sourceType: 'signal', sourceUrl: cachedSignal.url });
-        return;
-      }
-
-      let activeSources: { name: string; type: string; url?: string }[] = [];
-      try {
-        const { data: authData } = await supabase.auth.getUser();
-        const userId = authData?.user?.id;
-        if (userId) {
-          const [{ data: catalog }, { data: userPrefs }] = await Promise.all([
-            supabase.from('signal_sources').select('id, name, type, url, category').eq('category', 'signal'),
-            supabase.from('user_signal_preferences').select('source_id, custom_name, custom_url, custom_type, active, category').eq('user_id', userId).eq('category', 'signal'),
-          ]);
-          const prefsMap = new Map((userPrefs ?? []).map((p: any) => [p.source_id, p]));
-          const catalogActive = (catalog ?? []).filter((s: any) => {
-            const pref = prefsMap.get(s.id);
-            return pref ? pref.active : true;
-          }).map((s: any) => ({ name: s.name, type: s.type, url: s.url }));
-          const customActive = (userPrefs ?? [])
-            .filter((p: any) => !p.source_id && p.custom_name && p.active)
-            .map((p: any) => ({ name: p.custom_name, type: p.custom_type || 'blog', url: p.custom_url }));
-          activeSources = [...catalogActive, ...customActive];
-        }
-      } catch { /* non-critical */ }
-
-      let recentSignalSources: string[] = [];
-      let recentSignalTitles: string[] = [];
-      try {
-        recentSignalSources = JSON.parse(localStorage.getItem('holzen_recent_signal_sources') || '[]');
-        recentSignalTitles = JSON.parse(localStorage.getItem('holzen_recent_signal_titles') || '[]');
-      } catch { /* ignore */ }
-
-      supabase.functions
-        .invoke('signal-companion', {
-          body: {
-            context: context ?? '',
-            language,
-            sources: activeSources.length > 0 ? activeSources : undefined,
-            recentSignalSources,
-            recentSignalTitles,
-          },
-        })
-        .then(({ data, error: fnError }) => {
-          if (cancelled) return;
-          if (fnError || !data || data.error) {
-            setSignalError(true);
-          } else {
-            const signalData = data as SignalData;
-            setSignal(signalData);
-            if ((data as any)._cache_id) setCacheIds(prev => ({ ...prev, signal: (data as any)._cache_id }));
-
-            if (signalData.source) {
-              try {
-                const recent = JSON.parse(localStorage.getItem('holzen_recent_signal_sources') || '[]');
-                const updated = [signalData.source, ...recent.filter((s: string) => s !== signalData.source)].slice(0, 5);
-                localStorage.setItem('holzen_recent_signal_sources', JSON.stringify(updated));
-              } catch { /* ignore */ }
-            }
-            if (signalData.title) {
-              try {
-                const recentTitles = JSON.parse(localStorage.getItem('holzen_recent_signal_titles') || '[]');
-                const updatedTitles = [signalData.title, ...recentTitles].slice(0, 5);
-                localStorage.setItem('holzen_recent_signal_titles', JSON.stringify(updatedTitles));
-              } catch { /* ignore */ }
-            }
-
-            supabase
-              .from('reflections')
-              .update({
-                signal_title: signalData.title,
-                signal_body: signalData.body,
-                signal_source: signalData.source,
-                signal_url: signalData.url,
-              } as any)
-              .eq('id', reflectionId)
-              .then(() => {});
-            autoSaveToLibrary({ title: signalData.title, body: signalData.body, sourceType: 'signal', sourceUrl: signalData.url });
-          }
-          setSignalLoading(false);
-        });
-    });
-
-    return () => { cancelled = true; };
-  }, [prefs.signal, reflectionId, context, signalRetry]);
-
-  const retrySignal = useCallback(() => { signalFetchedRef.current = null; setSignalRetry(c => c + 1); }, []);
-
-  // ── Zoom Out ──
-  const [zoomOutRetry, setZoomOutRetry] = useState(0);
   const [zoomOut, setZoomOut] = useState<any>(null);
   const [zoomOutLoading, setZoomOutLoading] = useState(false);
   const [zoomOutError, setZoomOutError] = useState(false);
-  const zoomOutFetchedRef = useRef<string | null>(null);
 
-  useEffect(() => {
-    if (!prefs.zoomOut || !reflectionId) return;
-    const key = reflectionId;
-    if (zoomOutFetchedRef.current === key && zoomOutRetry === 0) return;
-    zoomOutFetchedRef.current = key;
-
-    let cancelled = false;
-    setZoomOutLoading(true);
-    setZoomOutError(false);
-
-    pollForCachedData(
-      reflectionId,
-      'zoom_out_data',
-      (row) => !!(row as any)?.zoom_out_data,
-    ).then((row) => {
-      if (cancelled) return;
-      if ((row as any)?.zoom_out_data) {
-        const zoomData = (row as any).zoom_out_data;
-        setZoomOut(zoomData);
-        setZoomOutLoading(false);
-        const zoomBody = zoomData?.deepTime?.body || zoomData?.echo?.message || 'Zoom Out perspective';
-        autoSaveToLibrary({ title: zoomData?.deepTime?.title || 'Zoom Out', body: zoomBody, sourceType: 'zoom_out' });
-        // Track for dedup
-        if (zoomData?.deepTime?.title) {
-          try {
-            const prev: string[] = JSON.parse(localStorage.getItem('holzen_recent_zoom_out_titles') || '[]');
-            prev.unshift(zoomData.deepTime.title);
-            localStorage.setItem('holzen_recent_zoom_out_titles', JSON.stringify(prev.slice(0, 5)));
-          } catch { /* ignore */ }
-        }
-        return;
-      }
-
-      // Get recent titles for dedup
-      let recentZoomOutTitles: string[] = [];
-      try {
-        recentZoomOutTitles = JSON.parse(localStorage.getItem('holzen_recent_zoom_out_titles') || '[]');
-      } catch { /* ignore */ }
-
-      // Get user mood from companions context
-      const mood = (companions as any)?.mood || null;
-
-      supabase.functions
-        .invoke('zoom-out-companion', {
-          body: {
-            context: context ?? '',
-            reflectionMessage: reflectionMessage ?? '',
-            language,
-            mood,
-            recentTitles: recentZoomOutTitles,
-          },
-        })
-        .then(({ data, error: fnError }) => {
-          if (cancelled) return;
-          if (fnError || !data || data.error) {
-            setZoomOutError(true);
-          } else {
-            setZoomOut(data as any);
-            if ((data as any)._cache_id) setCacheIds(prev => ({ ...prev, zoomOut: (data as any)._cache_id }));
-            // Track title for dedup
-            const title = (data as any)?.deepTime?.title;
-            if (title) {
-              try {
-                const prev: string[] = JSON.parse(localStorage.getItem('holzen_recent_zoom_out_titles') || '[]');
-                prev.unshift(title);
-                localStorage.setItem('holzen_recent_zoom_out_titles', JSON.stringify(prev.slice(0, 5)));
-              } catch { /* ignore */ }
-            }
-            supabase
-              .from('reflections')
-              .update({ zoom_out_data: data } as any)
-              .eq('id', reflectionId)
-              .then(() => {});
-            const zoomBody = (data as any)?.deepTime?.body || (data as any)?.echo?.message || 'Zoom Out perspective';
-            autoSaveToLibrary({ title: title || 'Zoom Out', body: zoomBody, sourceType: 'zoom_out' });
-          }
-          setZoomOutLoading(false);
-        });
-    });
-
-    return () => { cancelled = true; };
-  }, [prefs.zoomOut, reflectionId, context, reflectionMessage, zoomOutRetry]);
-
-  const retryZoomOut = useCallback(() => { zoomOutFetchedRef.current = null; setZoomOutRetry(c => c + 1); }, []);
-
-  // ── Historical Insight ──
-  const [historyRetry, setHistoryRetry] = useState(0);
   const [historyInsight, setHistoryInsight] = useState<HistoricalInsightData | null>(null);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [historyError, setHistoryError] = useState(false);
-  const historyFetchedRef = useRef<string | null>(null);
 
+  const [retryCount, setRetryCount] = useState(0);
+  const fetchedRef = useRef<string | null>(null);
+
+  // ── Check for already-cached data on the reflection row ──
+  const checkCachedReflection = useCallback(async (rid: string): Promise<{
+    signal?: SignalData | null;
+    grounding?: NudgeData | null;
+    history?: HistoricalInsightData | null;
+    zoomOut?: any;
+  }> => {
+    const { data: row } = await supabase
+      .from('reflections')
+      .select('signal_title, signal_body, signal_source, signal_url, learning_title, learning_body, learning_citation, learning_url, zoom_out_data, history_insight_data')
+      .eq('id', rid)
+      .single();
+    if (!row) return {};
+
+    const result: any = {};
+    if ((row as any).signal_source) {
+      result.signal = { title: (row as any).signal_title ?? '', body: (row as any).signal_body ?? '', source: (row as any).signal_source, url: (row as any).signal_url ?? '' };
+    }
+    if ((row as any).learning_citation) {
+      result.grounding = { title: (row as any).learning_title ?? '', body: (row as any).learning_body ?? '', citation: (row as any).learning_citation, url: (row as any).learning_url ?? '' };
+    }
+    if ((row as any).history_insight_data) {
+      result.history = (row as any).history_insight_data;
+    }
+    if ((row as any).zoom_out_data) {
+      result.zoomOut = (row as any).zoom_out_data;
+    }
+    return result;
+  }, []);
+
+  // ── Get localStorage dedup hints ──
+  const getRecencyHints = useCallback(() => {
+    const safeGet = (key: string): string[] => {
+      try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; }
+    };
+    return {
+      recentSignalSources: safeGet('holzen_recent_signal_sources'),
+      recentSignalTitles: safeGet('holzen_recent_signal_titles'),
+      recentNudgeTopics: safeGet('holzen_recent_nudge_topics'),
+      recentHistoryTitles: safeGet('holzen_recent_history_titles'),
+      recentZoomOutTitles: safeGet('holzen_recent_zoom_out_titles'),
+    };
+  }, []);
+
+  // ── Update localStorage after receiving results ──
+  const updateRecencyHints = useCallback((type: string, title: string, source?: string) => {
+    if (!title) return;
+    const keyMap: Record<string, string> = {
+      signal_title: 'holzen_recent_signal_titles',
+      signal_source: 'holzen_recent_signal_sources',
+      grounding: 'holzen_recent_nudge_topics',
+      history: 'holzen_recent_history_titles',
+      zoomOut: 'holzen_recent_zoom_out_titles',
+    };
+    const key = keyMap[type];
+    if (!key) return;
+    try {
+      const prev: string[] = JSON.parse(localStorage.getItem(key) || '[]');
+      const updated = [title, ...prev.filter(s => s !== title)].slice(0, 5);
+      localStorage.setItem(key, JSON.stringify(updated));
+    } catch { /* ignore */ }
+  }, []);
+
+  // ── Get active signal sources ──
+  const getSignalSources = useCallback(async () => {
+    try {
+      const { data: authData } = await supabase.auth.getUser();
+      const userId = authData?.user?.id;
+      if (!userId) return undefined;
+      const [{ data: catalog }, { data: userPrefs }] = await Promise.all([
+        supabase.from('signal_sources').select('id, name, type, url, category').eq('category', 'signal'),
+        supabase.from('user_signal_preferences').select('source_id, custom_name, custom_url, custom_type, active, category').eq('user_id', userId).eq('category', 'signal'),
+      ]);
+      const prefsMap = new Map((userPrefs ?? []).map((p: any) => [p.source_id, p]));
+      const catalogActive = (catalog ?? []).filter((s: any) => {
+        const pref = prefsMap.get(s.id);
+        return pref ? pref.active : true;
+      }).map((s: any) => ({ name: s.name, type: s.type, url: s.url }));
+      const customActive = (userPrefs ?? [])
+        .filter((p: any) => !p.source_id && p.custom_name && p.active)
+        .map((p: any) => ({ name: p.custom_name, type: p.custom_type || 'blog', url: p.custom_url }));
+      const sources = [...catalogActive, ...customActive];
+      return sources.length > 0 ? sources : undefined;
+    } catch { return undefined; }
+  }, []);
+
+  // ── Main orchestrated fetch ──
   useEffect(() => {
-    if (!prefs.history || !reflectionId) return;
-    const key = reflectionId;
-    if (historyFetchedRef.current === key && historyRetry === 0) return;
-    historyFetchedRef.current = key;
+    if (!reflectionId) return;
+
+    const enableSignal = prefs.signal;
+    const enableGrounding = prefs.learning;
+    const enableHistory = prefs.history;
+    const enableZoomOut = prefs.zoomOut;
+
+    if (!enableSignal && !enableGrounding && !enableHistory && !enableZoomOut) return;
+
+    const key = `${reflectionId}:${retryCount}`;
+    if (fetchedRef.current === key) return;
+    fetchedRef.current = key;
 
     let cancelled = false;
-    setHistoryLoading(true);
-    setHistoryError(false);
 
-    pollForCachedData(
-      reflectionId,
-      'history_insight_data',
-      (row) => !!(row as any)?.history_insight_data,
-    ).then((row) => {
+    // Set loading states
+    if (enableSignal) setSignalLoading(true);
+    if (enableGrounding) setNudgeLoading(true);
+    if (enableHistory) setHistoryLoading(true);
+    if (enableZoomOut) setZoomOutLoading(true);
+
+    setSignalError(false);
+    setNudgeError(false);
+    setHistoryError(false);
+    setZoomOutError(false);
+
+    (async () => {
+      // First check if reflection already has cached data
+      const cached = await checkCachedReflection(reflectionId);
+
       if (cancelled) return;
-      if ((row as any)?.history_insight_data) {
-        const cachedHistory = (row as any).history_insight_data as HistoricalInsightData;
-        setHistoryInsight(cachedHistory);
+
+      // Determine which companions still need fetching
+      const needSignal = enableSignal && !cached.signal;
+      const needGrounding = enableGrounding && !cached.grounding;
+      const needHistory = enableHistory && !cached.history;
+      const needZoomOut = enableZoomOut && !cached.zoomOut;
+
+      // Set already-cached companions immediately
+      if (cached.signal && enableSignal) {
+        setSignal(cached.signal);
+        setSignalLoading(false);
+        autoSaveToLibrary({ title: cached.signal.title, body: cached.signal.body, sourceType: 'signal', sourceUrl: cached.signal.url });
+      }
+      if (cached.grounding && enableGrounding) {
+        setNudge(cached.grounding);
+        setNudgeLoading(false);
+        autoSaveToLibrary({ title: cached.grounding.title, body: cached.grounding.body, sourceType: 'learning', sourceUrl: cached.grounding.url });
+      }
+      if (cached.history && enableHistory) {
+        setHistoryInsight(cached.history);
         setHistoryLoading(false);
-        autoSaveToLibrary({ title: cachedHistory.title, body: cachedHistory.btcInsight, sourceType: 'history_insight' });
-        // Track for dedup
-        if (cachedHistory.title) {
-          try {
-            const prev: string[] = JSON.parse(localStorage.getItem('holzen_recent_history_titles') || '[]');
-            prev.unshift(cachedHistory.title);
-            localStorage.setItem('holzen_recent_history_titles', JSON.stringify(prev.slice(0, 5)));
-          } catch { /* ignore */ }
-        }
+        autoSaveToLibrary({ title: cached.history.title, body: cached.history.btcInsight, sourceType: 'history_insight' });
+      }
+      if (cached.zoomOut && enableZoomOut) {
+        setZoomOut(cached.zoomOut);
+        setZoomOutLoading(false);
+        const zoomBody = cached.zoomOut?.deepTime?.body || cached.zoomOut?.echo?.message || 'Zoom Out perspective';
+        autoSaveToLibrary({ title: cached.zoomOut?.deepTime?.title || 'Zoom Out', body: zoomBody, sourceType: 'zoom_out' });
+      }
+
+      // If nothing needs fetching, done
+      if (!needSignal && !needGrounding && !needHistory && !needZoomOut) return;
+
+      // Build orchestrator payload
+      const recency = getRecencyHints();
+      const signalSources = needSignal ? await getSignalSources() : undefined;
+      const mood = (companions as any)?.mood || null;
+
+      const { data, error: fnError } = await supabase.functions.invoke('companion-orchestrate', {
+        body: {
+          reflectionId,
+          context: context ?? '',
+          language,
+          reflectionMessage: reflectionMessage ?? '',
+          mood,
+          signalSources,
+          ...recency,
+          enableSignal: needSignal,
+          enableGrounding: needGrounding,
+          enableHistory: needHistory,
+          enableZoomOut: needZoomOut,
+        },
+      });
+
+      if (cancelled) return;
+
+      if (fnError || !data) {
+        if (needSignal) { setSignalError(true); setSignalLoading(false); }
+        if (needGrounding) { setNudgeError(true); setNudgeLoading(false); }
+        if (needHistory) { setHistoryError(true); setHistoryLoading(false); }
+        if (needZoomOut) { setZoomOutError(true); setZoomOutLoading(false); }
         return;
       }
 
-      // Get recent titles for dedup
-      let recentHistoryTitles: string[] = [];
-      try {
-        recentHistoryTitles = JSON.parse(localStorage.getItem('holzen_recent_history_titles') || '[]');
-      } catch { /* ignore */ }
+      // Process signal
+      if (needSignal) {
+        const r = data.signal as CompanionResult | null;
+        if (r?.data && r.source !== 'empty') {
+          setSignal(r.data as SignalData);
+          if (r.cacheId) setCacheIds(prev => ({ ...prev, signal: r.cacheId }));
+          updateRecencyHints('signal_title', r.data.title);
+          updateRecencyHints('signal_source', r.data.source);
+          autoSaveToLibrary({ title: r.data.title, body: r.data.body, sourceType: 'signal', sourceUrl: r.data.url });
+        } else {
+          setSignalError(true);
+        }
+        setSignalLoading(false);
+      }
 
-      // Get user mood from companions context
-      const mood = (companions as any)?.mood || null;
+      // Process grounding
+      if (needGrounding) {
+        const r = data.grounding as CompanionResult | null;
+        if (r?.data && r.source !== 'empty') {
+          setNudge(r.data as NudgeData);
+          if (r.cacheId) setCacheIds(prev => ({ ...prev, nudge: r.cacheId }));
+          updateRecencyHints('grounding', r.data.title);
+          autoSaveToLibrary({ title: r.data.title, body: r.data.body, sourceType: 'learning', sourceUrl: r.data.url });
+        } else {
+          setNudgeError(true);
+        }
+        setNudgeLoading(false);
+      }
 
-      supabase.functions
-        .invoke('historical-insight', {
-          body: {
-            context: context ?? '',
-            language,
-            mood,
-            recentTitles: recentHistoryTitles,
-          },
-        })
-        .then(({ data, error: fnError }) => {
-          if (cancelled) return;
-          if (fnError || !data || data.error) {
-            setHistoryError(true);
-          } else {
-            setHistoryInsight(data as HistoricalInsightData);
-            if ((data as any)._cache_id) setCacheIds(prev => ({ ...prev, history: (data as any)._cache_id }));
-            // Track title for dedup
-            if ((data as HistoricalInsightData).title) {
-              try {
-                const prev: string[] = JSON.parse(localStorage.getItem('holzen_recent_history_titles') || '[]');
-                prev.unshift((data as HistoricalInsightData).title);
-                localStorage.setItem('holzen_recent_history_titles', JSON.stringify(prev.slice(0, 5)));
-              } catch { /* ignore */ }
-            }
-            supabase
-              .from('reflections')
-              .update({ history_insight_data: data } as any)
-              .eq('id', reflectionId)
-              .then(() => {});
-            autoSaveToLibrary({ title: (data as HistoricalInsightData).title, body: (data as HistoricalInsightData).btcInsight, sourceType: 'history_insight' });
-          }
-          setHistoryLoading(false);
-        });
-    });
+      // Process history
+      if (needHistory) {
+        const r = data.history as CompanionResult | null;
+        if (r?.data && r.source !== 'empty') {
+          setHistoryInsight(r.data as HistoricalInsightData);
+          if (r.cacheId) setCacheIds(prev => ({ ...prev, history: r.cacheId }));
+          updateRecencyHints('history', r.data.title);
+          autoSaveToLibrary({ title: r.data.title, body: r.data.btcInsight, sourceType: 'history_insight' });
+        } else {
+          setHistoryError(true);
+        }
+        setHistoryLoading(false);
+      }
+
+      // Process zoomOut
+      if (needZoomOut) {
+        const r = data.zoomOut as CompanionResult | null;
+        if (r?.data && r.source !== 'empty') {
+          setZoomOut(r.data);
+          if (r.cacheId) setCacheIds(prev => ({ ...prev, zoomOut: r.cacheId }));
+          updateRecencyHints('zoomOut', r.data?.deepTime?.title);
+          const zoomBody = r.data?.deepTime?.body || r.data?.echo?.message || 'Zoom Out perspective';
+          autoSaveToLibrary({ title: r.data?.deepTime?.title || 'Zoom Out', body: zoomBody, sourceType: 'zoom_out' });
+        } else {
+          setZoomOutError(true);
+        }
+        setZoomOutLoading(false);
+      }
+    })();
 
     return () => { cancelled = true; };
-  }, [prefs.history, reflectionId, context, historyRetry]);
+  }, [reflectionId, retryCount, prefs.signal, prefs.learning, prefs.history, prefs.zoomOut, context, reflectionMessage]);
 
-  const retryHistory = useCallback(() => { historyFetchedRef.current = null; setHistoryRetry(c => c + 1); }, []);
+  // ── Retry helpers ──
+  const retryNudge = useCallback(() => { setRetryCount(c => c + 1); }, []);
+  const retrySignal = useCallback(() => { setRetryCount(c => c + 1); }, []);
+  const retryZoomOut = useCallback(() => { setRetryCount(c => c + 1); }, []);
+  const retryHistory = useCallback(() => { setRetryCount(c => c + 1); }, []);
 
   return {
     favorites,
