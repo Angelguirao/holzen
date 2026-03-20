@@ -6,9 +6,10 @@ import { hapticFeedback } from '@/lib/haptics';
 interface Props {
   reflectionId?: string | null;
   companionType: string;
+  cacheId?: string | null;
 }
 
-export function CompanionFeedback({ reflectionId, companionType }: Props) {
+export function CompanionFeedback({ reflectionId, companionType, cacheId }: Props) {
   const [vote, setVote] = useState<'up' | 'down' | null>(null);
 
   const handleVote = async (type: 'up' | 'down') => {
@@ -20,26 +21,14 @@ export function CompanionFeedback({ reflectionId, companionType }: Props) {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Map companion types to cache types for feedback tracking
       const cacheTypeMap: Record<string, string> = {
         learning: 'ground_nudge',
         signal: 'signal',
         zoom_out: 'zoom_out_deep_time',
         history_insight: 'historical_insight',
+        haiku: 'haiku',
       };
       const cacheType = cacheTypeMap[companionType];
-
-      // Find the most recent cache entry of this type to link feedback
-      let cacheId: string | null = null;
-      if (cacheType) {
-        const { data: cacheEntries } = await supabase
-          .from('companion_cache')
-          .select('id')
-          .eq('companion_type', cacheType)
-          .order('created_at', { ascending: false })
-          .limit(1);
-        cacheId = cacheEntries?.[0]?.id || null;
-      }
 
       await supabase.from('analytics_events').insert({
         user_id: user.id,
@@ -48,7 +37,7 @@ export function CompanionFeedback({ reflectionId, companionType }: Props) {
           companion_type: companionType,
           cache_type: cacheType || companionType,
           vote: type,
-          cache_id: cacheId,
+          cache_id: cacheId || null,
           reflection_id: reflectionId,
         },
       });
