@@ -31,9 +31,17 @@ const CURATED_DEEP_TIME = [
 ];
 
 // ── BANNED AI-SLOP PHRASES ──
-const BANNED_PHRASES = ["dive into", "game-changer", "paradigm shift", "revolutionary", "unprecedented", "navigate the", "in the world of", "it's worth noting", "at the end of the day", "moving forward", "leverage", "synergy", "ecosystem", "disruptive", "next-gen", "cutting-edge"];
+const BANNED_PHRASES = [
+  "dive into", "game-changer", "paradigm shift", "revolutionary", "unprecedented",
+  "navigate the", "in the world of", "it's worth noting", "at the end of the day",
+  "moving forward", "leverage", "synergy", "ecosystem", "disruptive", "next-gen",
+  "cutting-edge", "in today's", "it is important to", "crucial to understand",
+  "let's explore", "without a doubt", "it goes without saying", "needless to say",
+  "in conclusion", "at its core", "when it comes to", "in this article",
+];
 
-const MIN_BODY_LENGTH = 60;
+const MIN_BODY_LENGTH = 80;
+const MAX_BODY_LENGTH = 500;
 
 function containsSlop(text: string): boolean {
   const lower = text.toLowerCase();
@@ -41,9 +49,18 @@ function containsSlop(text: string): boolean {
 }
 
 function passesDeepTimeQuality(dt: any): boolean {
-  if (!dt?.title || !dt?.body) return false;
-  if ((dt.body || "").length < MIN_BODY_LENGTH) return false;
+  // Schema: title and body must be non-empty strings of appropriate length
+  if (typeof dt?.title !== "string" || dt.title.trim().length < 5) return false;
+  if (typeof dt?.body !== "string" || dt.body.trim().length < MIN_BODY_LENGTH) return false;
+  // Max length — deep-time should be concise, not an essay
+  if (dt.body.length > MAX_BODY_LENGTH) return false;
+  // Title word count: 3-10 words
+  const titleWords = dt.title.trim().split(/\s+/).length;
+  if (titleWords < 3 || titleWords > 10) return false;
+  // Slop check
   if (containsSlop(dt.body) || containsSlop(dt.title)) return false;
+  // No market data in deep-time perspective
+  if (/\d{2,}%|\$\d/.test(dt.body)) return false;
   return true;
 }
 
