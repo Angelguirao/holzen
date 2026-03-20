@@ -26,7 +26,7 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: "Missing API keys" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const languages = ["en"];
+    const lang = "en";
     const results: string[] = [];
 
     // Check current cache size to avoid over-generating
