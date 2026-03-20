@@ -207,7 +207,7 @@ DIVERSITY: Use a DIFFERENT thinker every time. Prefer timeless essays over recen
     // ── Step 1: Perplexity search ──
     async function callPerplexity(pBody: any): Promise<{ content: string; citations: string[] }> {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 12000);
+      const timeout = setTimeout(() => controller.abort(), 10000);
       try {
         const res = await fetch("https://api.perplexity.ai/chat/completions", {
           method: "POST",
