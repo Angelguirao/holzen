@@ -171,7 +171,7 @@ serve(async (req) => {
       : `Latest Bitcoin on-chain analysis, macro trends, or long-term holder metrics with specific data points from researchers or analysts.${sourceHint}${recentExclusion}`;
 
     const perplexityBody: any = {
-      model: "sonar",
+      model: "sonar-pro",
       messages: [
         {
           role: "system",
@@ -182,12 +182,12 @@ ${ANTI_TRADING_INSTRUCTION}
 DIVERSITY RULES:
 - Use a DIFFERENT source every time — rotate between on-chain analysts, macro blogs, newsletters, dashboards, and podcasts
 - Do NOT default to Glassnode or any single source
-- Prefer recent analysis (last 7 days) from named analysts or publications
+- Prefer recent analysis (last 30 days) from named analysts or publications
 - Include the exact source name and a working URL to the specific article/page${recentExclusion}${topicExclusion}`,
         },
         { role: "user", content: searchQuery },
       ],
-      search_recency_filter: "week",
+      search_recency_filter: "month",
       ...(sourceUrls.length > 0 ? { search_domain_filter: sourceUrls.slice(0, 5) } : {}),
     };
 
