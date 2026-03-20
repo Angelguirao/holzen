@@ -72,8 +72,8 @@ function passesQualityGate(insight: any): boolean {
   return true;
 }
 
-/** Fallback chain: cache → curated. Returns { data, source } for observability. */
-async function serveFallback(svcClient: any, excludeIds?: string[]): Promise<{ data: any; source: string }> {
+/** Fallback chain: cache → curated. Returns { data, source, cacheId } for observability + feedback. */
+async function serveFallback(svcClient: any, excludeIds?: string[]): Promise<{ data: any; source: string; cacheId: string | null }> {
   try {
     let query = svcClient
       .from("companion_cache")
@@ -89,10 +89,10 @@ async function serveFallback(svcClient: any, excludeIds?: string[]): Promise<{ d
     if (pool.length > 0) {
       const pick = pool[Math.floor(Math.random() * Math.min(pool.length, 5))];
       svcClient.from("companion_cache").update({ used_count: (pick.used_count || 0) + 1 }).eq("id", pick.id).then(() => {});
-      return { data: pick.content, source: "cache" };
+      return { data: pick.content, source: "cache", cacheId: pick.id };
     }
   } catch { /* continue to curated */ }
-  return { data: CURATED_FALLBACKS[Math.floor(Math.random() * CURATED_FALLBACKS.length)], source: "curated" };
+  return { data: CURATED_FALLBACKS[Math.floor(Math.random() * CURATED_FALLBACKS.length)], source: "curated", cacheId: null };
 }
 
 serve(async (req) => {
