@@ -176,23 +176,45 @@ serve(async (req) => {
           Object.assign(reflectionUpdates, updates);
         }
       } else {
-        response[key] = {
-          data: null,
-          source: "empty",
-          cacheId: null,
-          latencyMs: Date.now() - t0,
-          error: result.reason?.message || "Unknown error",
-        };
-        serveInserts.push({
-          user_id: user.id,
-          reflection_id: reflectionId || null,
-          companion_type: companionTypeMap[key],
-          serve_source: "empty",
-          cache_entry_id: null,
-          content_title: null,
-          content_fingerprint: null,
-          latency_ms: Date.now() - t0,
-        });
+        // Sub-function failed entirely — try orchestrator-level curated fallback
+        const curatedPool = ORCHESTRATOR_CURATED[key];
+        if (curatedPool && curatedPool.length > 0) {
+          const pick = curatedPool[Math.floor(Math.random() * curatedPool.length)];
+          response[key] = {
+            data: pick,
+            source: "curated",
+            cacheId: null,
+            latencyMs: Date.now() - t0,
+          };
+          serveInserts.push({
+            user_id: user.id,
+            reflection_id: reflectionId || null,
+            companion_type: companionTypeMap[key],
+            serve_source: "curated",
+            cache_entry_id: null,
+            content_title: pick.title || pick.deepTime?.title || null,
+            content_fingerprint: null,
+            latency_ms: Date.now() - t0,
+          });
+        } else {
+          response[key] = {
+            data: null,
+            source: "empty",
+            cacheId: null,
+            latencyMs: Date.now() - t0,
+            error: result.reason?.message || "Unknown error",
+          };
+          serveInserts.push({
+            user_id: user.id,
+            reflection_id: reflectionId || null,
+            companion_type: companionTypeMap[key],
+            serve_source: "empty",
+            cache_entry_id: null,
+            content_title: null,
+            content_fingerprint: null,
+            latency_ms: Date.now() - t0,
+          });
+        }
       }
     }
 
