@@ -166,7 +166,7 @@ serve(async (req) => {
       log("missing API keys, serving fallback");
       const fb = await serveFallback(svcClient);
       trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
-      return new Response(JSON.stringify(fb.data), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     // Build source hints
@@ -280,13 +280,13 @@ DIVERSITY: Use a DIFFERENT thinker every time. Prefer timeless essays over recen
       log(`perplexity failed: ${e}`);
       const fb = await serveFallback(svcClient);
       trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
-      return new Response(JSON.stringify(fb.data), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     if (!searchContent) {
       const fb = await serveFallback(svcClient);
       trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
-      return new Response(JSON.stringify(fb.data), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     // ── Step 2: AI structuring ──
