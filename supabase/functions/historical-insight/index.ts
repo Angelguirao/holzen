@@ -143,7 +143,7 @@ serve(async (req) => {
 
     try {
       const searchController = new AbortController();
-      const searchTimeout = setTimeout(() => searchController.abort(), 12000);
+      const searchTimeout = setTimeout(() => searchController.abort(), 10000);
       const searchResponse = await fetch("https://api.perplexity.ai/chat/completions", {
         method: "POST",
         headers: { Authorization: `Bearer ${PERPLEXITY_API_KEY}`, "Content-Type": "application/json" },
@@ -215,9 +215,12 @@ ACCURACY RULES (CRITICAL):
     const models = ["google/gemini-2.5-flash", "google/gemini-3-flash-preview"];
     let insight: any = null;
 
-    for (const model of models) {
+    // Timeout budget: 8s primary + 6s fallback (10s Perplexity + 14s AI = 24s total)
+    const AI_TIMEOUTS = [8000, 6000];
+    for (let idx = 0; idx < models.length; idx++) {
+      const model = models[idx];
       const aiController = new AbortController();
-      const aiTimeout = setTimeout(() => aiController.abort(), 18000);
+      const aiTimeout = setTimeout(() => aiController.abort(), AI_TIMEOUTS[idx]);
       try {
         const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
@@ -257,6 +260,35 @@ ACCURACY RULES (CRITICAL):
     // Ensure URL is from citations
     if (citations.length > 0 && !citations.includes(insight.url)) {
       insight.url = citations[0];
+    }
+
+    // ── URL validation via HEAD request ──
+    if (insight.url) {
+      try {
+        const urlController = new AbortController();
+        const urlTimeout = setTimeout(() => urlController.abort(), 3000);
+        const headRes = await fetch(insight.url, { method: "HEAD", redirect: "follow", signal: urlController.signal });
+        clearTimeout(urlTimeout);
+        if (headRes.status >= 400) {
+          log(`URL ${insight.url} returned ${headRes.status}, clearing`);
+          // Try other citations
+          let validUrl = "";
+          for (const c of citations) {
+            if (c === insight.url) continue;
+            try {
+              const uc = new AbortController();
+              const ut = setTimeout(() => uc.abort(), 2000);
+              const r = await fetch(c, { method: "HEAD", redirect: "follow", signal: uc.signal });
+              clearTimeout(ut);
+              if (r.status < 400) { validUrl = c; break; }
+            } catch { continue; }
+          }
+          insight.url = validUrl || insight.source || "";
+        }
+      } catch {
+        // Timeout or network error — keep the URL but mark as unverified
+        log(`URL validation timed out for ${insight.url}`);
+      }
     }
 
     // Cache good content

@@ -146,7 +146,7 @@ serve(async (req) => {
 
     try {
       const searchController = new AbortController();
-      const searchTimeout = setTimeout(() => searchController.abort(), 12000);
+      const searchTimeout = setTimeout(() => searchController.abort(), 10000);
       const searchResponse = await fetch("https://api.perplexity.ai/chat/completions", {
         method: "POST",
         headers: { Authorization: `Bearer ${PERPLEXITY_API_KEY}`, "Content-Type": "application/json" },
@@ -235,9 +235,12 @@ ACCURACY RULES (CRITICAL):
     const models = ["google/gemini-2.5-flash", "google/gemini-3-flash-preview"];
     let nudge: any = null;
 
-    for (const model of models) {
+    // Timeout budget: 8s primary + 6s fallback (10s Perplexity + 14s AI = 24s total)
+    const AI_TIMEOUTS = [8000, 6000];
+    for (let idx = 0; idx < models.length; idx++) {
+      const model = models[idx];
       const aiController = new AbortController();
-      const aiTimeout = setTimeout(() => aiController.abort(), 18000);
+      const aiTimeout = setTimeout(() => aiController.abort(), AI_TIMEOUTS[idx]);
       try {
         const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
