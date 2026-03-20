@@ -229,6 +229,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             nudgeError={nudgeError}
             onRetry={retryNudge}
           />
+          {nudge && !nudgeLoading && <CompanionFeedback reflectionId={reflectionId} companionType="learning" />}
         </CompanionCard>
       )}
 
