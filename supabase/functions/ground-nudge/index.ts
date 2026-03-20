@@ -214,7 +214,9 @@ ACCURACY RULES (CRITICAL):
 - Use ONLY facts, names, dates, and numbers from the search results
 - Do NOT invent researcher names, years, journals, or statistics
 - If the search results are vague, keep the body general
-- Copy citation URLs character-for-character from the list`,
+- Copy citation URLs character-for-character from the list
+
+BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shift, revolutionary, unprecedented, navigate the, in the world of, it's worth noting, at the end of the day, moving forward, leverage, synergy, ecosystem, disruptive, next-gen, cutting-edge`,
         },
         {
           role: "user",

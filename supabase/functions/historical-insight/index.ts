@@ -55,19 +55,25 @@ const CURATED_FALLBACKS = [
   },
 ];
 
+// ── BANNED AI-SLOP PHRASES ──
+const BANNED_PHRASES = ["dive into", "game-changer", "paradigm shift", "revolutionary", "unprecedented", "navigate the", "in the world of", "it's worth noting", "at the end of the day", "moving forward", "leverage", "synergy", "ecosystem", "disruptive", "next-gen", "cutting-edge"];
+
 /** Fallback chain: cache → curated. Returns { data, source } for observability. */
-async function serveFallback(svcClient: any): Promise<{ data: any; source: string }> {
+async function serveFallback(svcClient: any, excludeIds?: string[]): Promise<{ data: any; source: string }> {
   try {
-    const { data } = await svcClient
+    let query = svcClient
       .from("companion_cache")
       .select("id, content, used_count")
       .eq("companion_type", "historical_insight")
       .eq("language", "en")
       .gte("quality_score", 2)
       .order("used_count", { ascending: true })
-      .limit(5);
-    if (data && data.length > 0) {
-      const pick = data[Math.floor(Math.random() * data.length)];
+      .limit(10);
+    const { data } = await query;
+    const filtered = excludeIds?.length ? (data || []).filter((d: any) => !excludeIds.includes(d.id)) : (data || []);
+    const pool = filtered.length > 0 ? filtered : (data || []);
+    if (pool.length > 0) {
+      const pick = pool[Math.floor(Math.random() * Math.min(pool.length, 5))];
       svcClient.from("companion_cache").update({ used_count: (pick.used_count || 0) + 1 }).eq("id", pick.id).then(() => {});
       return { data: pick.content, source: "cache" };
     }
@@ -106,7 +112,7 @@ serve(async (req) => {
       resolvedUserId = user.id;
     }
 
-    const { context, userId: bodyUserId } = await req.json();
+    const { context, userId: bodyUserId, mood, recentTitles } = await req.json();
     const effectiveUserId = resolvedUserId || bodyUserId;
 
     if (effectiveUserId) {
@@ -133,7 +139,10 @@ serve(async (req) => {
     }
 
     const marketContext = context || "Bitcoin market movement";
-
+    const moodContext = mood ? `The user is currently feeling "${mood}".` : "";
+    const titleExclusion = (recentTitles && Array.isArray(recentTitles) && recentTitles.length > 0)
+      ? `\nDo NOT cover these topics (already shown recently): ${recentTitles.slice(0, 5).join("; ")}. Find a COMPLETELY DIFFERENT historical event.`
+      : "";
     const HISTORICAL_ERAS = [
       { era: "early Bitcoin (2011-2013)", examples: "Bitcoin's first bubble to $32 then crash to $2, the 2013 China ban crash" },
       { era: "Mt. Gox era (2014-2015)", examples: "Mt. Gox collapse, the long crypto winter of 2014-2015" },
@@ -162,9 +171,9 @@ serve(async (req) => {
           messages: [
             {
               role: "system",
-              content: `You are a financial historian specializing in ${randomEra.era}. Search for ONE specific historical event with exact dates, prices, and percentage moves. Do NOT give a general overview — find a specific incident. Include what happened afterward (recovery timeline). Draw from: ${randomEra.examples}. Be precise with numbers.`,
+              content: `You are a financial historian specializing in ${randomEra.era}. Search for ONE specific historical event with exact dates, prices, and percentage moves. Do NOT give a general overview — find a specific incident. Include what happened afterward (recovery timeline). Draw from: ${randomEra.examples}. Be precise with numbers.${titleExclusion}`,
             },
-            { role: "user", content: `Find a specific historical financial event from ${randomEra.era} that parallels current Bitcoin conditions: ${marketContext}. Include exact dates, prices, percentage moves, and what happened after.` },
+            { role: "user", content: `Find a specific historical financial event from ${randomEra.era} that parallels current Bitcoin conditions: ${marketContext}. ${moodContext} Include exact dates, prices, percentage moves, and what happened after.` },
           ],
         }),
         signal: searchController.signal,
@@ -215,7 +224,9 @@ Return a JSON object with these keys:
 ACCURACY RULES (CRITICAL):
 - Use ONLY dates, prices, percentages from the search results
 - Do NOT invent historical prices or recovery timelines
-- End with "this too passed" energy, not hype or doom`,
+- End with "this too passed" energy, not hype or doom
+
+BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? `\n\nUSER MOOD: The user is feeling "${mood}". Subtly calibrate the historical parallel to resonate with this emotional state.` : ""}${titleExclusion}`,
         },
         {
           role: "user",
