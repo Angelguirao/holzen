@@ -70,9 +70,8 @@ async function isUrlReachable(url: string): Promise<boolean> {
   }
 }
 
-/** Fallback chain: cache → curated */
-async function serveFallback(svcClient: any): Promise<any> {
-  // Try cache first
+/** Fallback chain: cache → curated. Returns { data, source } for observability. */
+async function serveFallback(svcClient: any): Promise<{ data: any; source: string }> {
   try {
     const { data } = await svcClient
       .from("companion_cache")
@@ -85,9 +84,8 @@ async function serveFallback(svcClient: any): Promise<any> {
     if (data && data.length > 0) {
       const pick = data[Math.floor(Math.random() * data.length)];
       svcClient.from("companion_cache").update({ used_count: (pick.used_count || 0) + 1 }).eq("id", pick.id).then(() => {});
-      return pick.content;
+      return { data: pick.content, source: "cache" };
     }
-    // Try any quality
     const { data: anyQ } = await svcClient
       .from("companion_cache")
       .select("id, content, used_count")
@@ -98,12 +96,11 @@ async function serveFallback(svcClient: any): Promise<any> {
     if (anyQ && anyQ.length > 0) {
       const pick = anyQ[Math.floor(Math.random() * anyQ.length)];
       svcClient.from("companion_cache").update({ used_count: (pick.used_count || 0) + 1 }).eq("id", pick.id).then(() => {});
-      return pick.content;
+      return { data: pick.content, source: "cache" };
     }
   } catch { /* continue to curated */ }
 
-  // Curated fallback — always works
-  return CURATED_FALLBACKS[Math.floor(Math.random() * CURATED_FALLBACKS.length)];
+  return { data: CURATED_FALLBACKS[Math.floor(Math.random() * CURATED_FALLBACKS.length)], source: "curated" };
 }
 
 serve(async (req) => {
@@ -139,12 +136,21 @@ serve(async (req) => {
     const svcClient = createClient(sbUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "", { auth: { persistSession: false } });
     svcClient.from("analytics_events").insert({ user_id: user.id, event: "signal_companion_ai_call" }).then(() => {});
 
+    // Observability helper — fire-and-forget
+    const trackObs = (event: string, meta?: Record<string, any>) => {
+      svcClient.from("analytics_events").insert({
+        user_id: user.id, event,
+        metadata: { companion_type: "signal", latency_ms: Date.now() - t0, ...meta },
+      }).then(() => {});
+    };
+
     const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!PERPLEXITY_API_KEY || !LOVABLE_API_KEY) {
       log("missing API keys, serving fallback");
-      const fallback = await serveFallback(svcClient);
-      return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      const fb = await serveFallback(svcClient);
+      trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
+      return new Response(JSON.stringify(fb.data), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     // Build source hints
@@ -241,7 +247,6 @@ DIVERSITY: Use a DIFFERENT thinker every time. Prefer timeless essays over recen
       citations = result.citations;
       log(`perplexity content length: ${searchContent.length}, citations: ${citations.length}`);
 
-      // Retry without domain filter if no citations
       if (citations.length === 0 && sourceUrls.length > 0 && searchContent.length > 0) {
         log("0 citations with domain filter — retrying without filter");
         const retryBody = { ...perplexityBody };
@@ -257,13 +262,15 @@ DIVERSITY: Use a DIFFERENT thinker every time. Prefer timeless essays over recen
       }
     } catch (e) {
       log(`perplexity failed: ${e}`);
-      const fallback = await serveFallback(svcClient);
-      return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      const fb = await serveFallback(svcClient);
+      trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
+      return new Response(JSON.stringify(fb.data), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     if (!searchContent) {
-      const fallback = await serveFallback(svcClient);
-      return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      const fb = await serveFallback(svcClient);
+      trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
+      return new Response(JSON.stringify(fb.data), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     // ── Step 2: AI structuring ──
@@ -327,7 +334,6 @@ URL RULES (CRITICAL):
     const models = ["google/gemini-2.5-flash", "google/gemini-3-flash-preview"];
     let signal: any = null;
 
-    // Timeout budget: 8s primary + 6s fallback (10s Perplexity + 14s AI = 24s total)
     const AI_TIMEOUTS = [8000, 6000];
     for (let idx = 0; idx < models.length; idx++) {
       const model = models[idx];
@@ -373,11 +379,11 @@ URL RULES (CRITICAL):
       }
     }
 
-    // If AI structuring failed entirely → fallback
     if (!signal || !signal.title || !signal.body) {
       log("AI structuring failed, serving fallback");
-      const fallback = await serveFallback(svcClient);
-      return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      const fb = await serveFallback(svcClient);
+      trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
+      return new Response(JSON.stringify(fb.data), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     // ── Post-processing: URL validation ──
@@ -419,13 +425,12 @@ URL RULES (CRITICAL):
       }
     }
 
-    // ── Quality gate: reject low-quality before returning ──
+    // ── Quality gate ──
     const hasNumbers = /\d{2,}%|\$\d/.test(signal.body);
     const tooShort = (signal.body?.length || 0) < 40;
     if (hasNumbers || tooShort) {
       log(`quality gate failed: hasNumbers=${hasNumbers} tooShort=${tooShort}`);
-      qualityScore = 0; // Don't cache
-      // Still return it but don't cache low-quality
+      qualityScore = 0;
     }
 
     // Cache good content with title-based dedup
@@ -446,13 +451,13 @@ URL RULES (CRITICAL):
       })();
     }
 
+    trackObs("companion_live_generated");
     log(`done, signal: ${signal.title}, source: ${signal.source}`);
     return new Response(JSON.stringify(signal), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
     console.error("signal-companion error:", e);
-    // Final safety net: curated fallback
     try {
       const fallback = CURATED_FALLBACKS[Math.floor(Math.random() * CURATED_FALLBACKS.length)];
       return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });

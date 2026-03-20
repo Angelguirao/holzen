@@ -65,6 +65,15 @@ serve(async (req) => {
       try { await serviceClient.from("analytics_events").insert({ user_id: effectiveUserId, event: "zoom_out_ai_call" }); } catch (_) { /* non-fatal */ }
     }
 
+    // Observability helper — fire-and-forget
+    const trackObs = (event: string, meta?: Record<string, any>) => {
+      if (!effectiveUserId) return;
+      serviceClient.from("analytics_events").insert({
+        user_id: effectiveUserId, event,
+        metadata: { companion_type: "zoom_out", latency_ms: Date.now() - t0, ...meta },
+      }).then(() => {});
+    };
+
     // ── 1. Fetch historical BTC prices with DB caching ──
     const today = new Date();
     const currentYear = today.getUTCFullYear();
@@ -164,6 +173,7 @@ serve(async (req) => {
 
     // ── 3. Generate deep-time perspective via AI ──
     let deepTime: { title: string; body: string } | null = null;
+    let deepTimeSource = "none"; // Track source for observability
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
     if (LOVABLE_API_KEY) {
@@ -198,7 +208,6 @@ No trading advice, no price predictions, no exclamation marks.`;
       };
 
       const models = ["google/gemini-2.5-flash", "google/gemini-2.5-flash-lite"];
-      // Timeout budget: 8s primary + 6s fallback
       const AI_TIMEOUTS = [8000, 6000];
       for (let idx = 0; idx < models.length; idx++) {
         const model = models[idx];
@@ -220,6 +229,7 @@ No trading advice, no price predictions, no exclamation marks.`;
                 const parsed = JSON.parse(raw);
                 if (parsed.title && parsed.body) {
                   deepTime = { title: parsed.title, body: parsed.body };
+                  deepTimeSource = "live";
                   // Cache with title-based dedup
                   (async () => {
                     try {
@@ -248,19 +258,25 @@ No trading advice, no price predictions, no exclamation marks.`;
           if (cachedDt && cachedDt.length > 0) {
             const pick = cachedDt[Math.floor(Math.random() * cachedDt.length)];
             deepTime = pick.content as any;
+            deepTimeSource = "cache";
             serviceClient.from("companion_cache").update({ used_count: (pick.used_count || 0) + 1 }).eq("id", pick.id).then(() => {});
           }
         } catch { /* continue */ }
 
-        // Curated fallback
         if (!deepTime) {
           deepTime = CURATED_DEEP_TIME[Math.floor(Math.random() * CURATED_DEEP_TIME.length)];
+          deepTimeSource = "curated";
         }
       }
     } else {
-      // No API key — curated fallback
       deepTime = CURATED_DEEP_TIME[Math.floor(Math.random() * CURATED_DEEP_TIME.length)];
+      deepTimeSource = "curated";
     }
+
+    // Track deep-time observability
+    if (deepTimeSource === "live") trackObs("companion_live_generated");
+    else if (deepTimeSource === "cache") trackObs("companion_cache_hit");
+    else if (deepTimeSource === "curated") trackObs("companion_fallback_curated");
 
     // ── 4. Build response ──
     const isPartial = rateLimited || onThisDay.length < yearTargets.length;
