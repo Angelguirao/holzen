@@ -156,6 +156,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
     signal, signalLoading, signalError, retrySignal,
     zoomOut, zoomOutLoading, zoomOutError, retryZoomOut,
     historyInsight, historyLoading, historyError, retryHistory,
+    cacheIds,
   } = useCompanionData({ companions, prefs, reflectionId, context, reflectionMessage });
 
   const labels = {
@@ -229,7 +230,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             nudgeError={nudgeError}
             onRetry={retryNudge}
           />
-          {nudge && !nudgeLoading && <CompanionFeedback reflectionId={reflectionId} companionType="learning" />}
+          {nudge && !nudgeLoading && <CompanionFeedback reflectionId={reflectionId} companionType="learning" cacheId={cacheIds.nudge} />}
         </CompanionCard>
       )}
 
@@ -254,7 +255,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             error={signalError}
             onRetry={retrySignal}
           />
-          {signal && !signalLoading && <CompanionFeedback reflectionId={reflectionId} companionType="signal" />}
+          {signal && !signalLoading && <CompanionFeedback reflectionId={reflectionId} companionType="signal" cacheId={cacheIds.signal} />}
         </CompanionCard>
       )}
 
@@ -279,7 +280,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             error={zoomOutError}
             onRetry={retryZoomOut}
           />
-          {zoomOut && !zoomOutLoading && <CompanionFeedback reflectionId={reflectionId} companionType="zoom_out" />}
+          {zoomOut && !zoomOutLoading && <CompanionFeedback reflectionId={reflectionId} companionType="zoom_out" cacheId={cacheIds.zoomOut} />}
         </CompanionCard>
       )}
 
@@ -304,7 +305,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             error={historyError}
             onRetry={retryHistory}
           />
-          {historyInsight && !historyLoading && <CompanionFeedback reflectionId={reflectionId} companionType="history_insight" />}
+          {historyInsight && !historyLoading && <CompanionFeedback reflectionId={reflectionId} companionType="history_insight" cacheId={cacheIds.history} />}
         </CompanionCard>
       )}
     </div>
