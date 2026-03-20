@@ -207,7 +207,7 @@ DIVERSITY: Use a DIFFERENT thinker every time. Prefer timeless essays over recen
     // ── Step 1: Perplexity search ──
     async function callPerplexity(pBody: any): Promise<{ content: string; citations: string[] }> {
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 12000);
+      const timeout = setTimeout(() => controller.abort(), 10000);
       try {
         const res = await fetch("https://api.perplexity.ai/chat/completions", {
           method: "POST",
@@ -327,9 +327,12 @@ URL RULES (CRITICAL):
     const models = ["google/gemini-2.5-flash", "google/gemini-3-flash-preview"];
     let signal: any = null;
 
-    for (const model of models) {
+    // Timeout budget: 8s primary + 6s fallback (10s Perplexity + 14s AI = 24s total)
+    const AI_TIMEOUTS = [8000, 6000];
+    for (let idx = 0; idx < models.length; idx++) {
+      const model = models[idx];
       const aiController = new AbortController();
-      const aiTimeout = setTimeout(() => aiController.abort(), 18000);
+      const aiTimeout = setTimeout(() => aiController.abort(), AI_TIMEOUTS[idx]);
       try {
         const structureResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",

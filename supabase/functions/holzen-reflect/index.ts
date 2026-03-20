@@ -21,8 +21,6 @@ const STYLE_INSTRUCTIONS: Record<string, string> = {
   koan: "Write a short zen koan or paradox related to the moment. 1-2 sentences.",
 };
 
-// Thematic framings that rotate per session to prevent repetitive structures.
-// Each tone has its own pool of angles — the system picks one at random.
 const TONE_FRAMINGS: Record<string, string[]> = {
   stoic: [
     "Frame this through Seneca's lens: what is within your control vs. what is not.",
@@ -58,27 +56,50 @@ const TONE_FRAMINGS: Record<string, string[]> = {
   ],
 };
 
+// ── CURATED FALLBACK REFLECTIONS ──
+// Used when ALL AI models fail — ensures the user always gets a meaningful reflection
+const CURATED_REFLECTIONS = [
+  {
+    message: "The number changed. You didn't. That distinction is worth sitting with.",
+    haiku: "Digits on a screen\nshift like sand beneath the tide\nthe shore remains still",
+  },
+  {
+    message: "Between the price alert and your next action, there is a space. That space is yours.",
+    haiku: "A bell rings somewhere\nthe hand pauses, breath arrives\nchoice lives in the gap",
+  },
+  {
+    message: "Every holder who came before you sat exactly where you're sitting now, feeling exactly what you feel.",
+    haiku: "Footprints in the snow\nthousands walked this path before\nspring remembered them",
+  },
+  {
+    message: "What would the version of you one year from now think about this moment?",
+    haiku: "Tomorrow's calm self\nlooks back at today's sharp edge\nand finds it was round",
+  },
+  {
+    message: "Volatility is not the enemy of conviction. It's the price of it.",
+    haiku: "The mountain does not\napologize for its storms\nit simply endures",
+  },
+];
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    // Auth check
+    // Auth check — use getUser() for full server-side validation
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
     const { createClient } = await import("npm:@supabase/supabase-js@2.57.2");
     const sbClient = createClient(Deno.env.get("SUPABASE_URL") ?? "", Deno.env.get("SUPABASE_ANON_KEY") ?? "", { global: { headers: { Authorization: authHeader } } });
-    const token = authHeader.replace("Bearer ", "");
-    const { data: claimsData, error: claimsError } = await sbClient.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims) {
+    const { data: { user }, error: authError } = await sbClient.auth.getUser();
+    if (authError || !user) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    // Track AI usage (no enforcement yet — monitoring only)
-    const userId = claimsData.claims.sub as string;
+    const userId = user.id;
     const svcClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
@@ -96,22 +117,19 @@ serve(async (req) => {
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
-      throw new Error("LOVABLE_API_KEY is not configured");
+      // No API key — serve curated fallback
+      const fallback = CURATED_REFLECTIONS[Math.floor(Math.random() * CURATED_REFLECTIONS.length)];
+      return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
-
-    // --- Learning content is now handled entirely by the dedicated ground-nudge function ---
 
     // --- Adaptive tone logic ---
     const baseTone = TONE_INSTRUCTIONS[tone] || TONE_INSTRUCTIONS.stoic;
     const baseStyle = STYLE_INSTRUCTIONS[style] || STYLE_INSTRUCTIONS.standard;
-    
-    // Pick a random thematic framing for this session
     const framingPool = TONE_FRAMINGS[tone] || TONE_FRAMINGS.stoic;
     const thematicFraming = framingPool[Math.floor(Math.random() * framingPool.length)];
 
     let adaptiveContext = "";
 
-    // Analyze mood history for patterns
     if (moodHistory && Array.isArray(moodHistory) && moodHistory.length > 0) {
       const moods = moodHistory.map((m: any) => m.mood);
       const anxiousCount = moods.filter((m: string) => m === "anxious").length;
@@ -143,7 +161,6 @@ serve(async (req) => {
       }
     }
 
-    // Adjust for market severity
     const sev = typeof severity === "number" ? severity : 0;
     if (sev >= 15) {
       adaptiveContext += "\nMARKET SEVERITY: Extreme move (15%+). This is a rare, high-stress moment. Be exceptionally calm and anchoring. Shorter is better.";
@@ -153,17 +170,14 @@ serve(async (req) => {
       adaptiveContext += "\nMARKET SEVERITY: Significant move (7%+). Balance grounding with perspective.";
     }
 
-    // Build haiku dedup instruction — extract banned imagery words
     let haikuDedup = "";
     if (recentHaikus && Array.isArray(recentHaikus) && recentHaikus.length > 0) {
-      // Extract key imagery words to explicitly ban
       const stopWords = new Set(["the","a","an","is","in","on","of","and","to","with","its","that","this","for","are","was","has","had","but","not","from","they","all","been","have","will","can","just","or","as","at","be","it","so","no","do","my","by"]);
       const wordCounts: Record<string, number> = {};
       for (const h of recentHaikus.slice(0, 5)) {
         const words = h.toLowerCase().replace(/[^\w\s]/g, "").split(/\s+/).filter((w: string) => w.length > 2 && !stopWords.has(w));
         for (const w of words) { wordCounts[w] = (wordCounts[w] || 0) + 1; }
       }
-      // Words appearing 2+ times across recent haikus are "overused"
       const bannedWords = Object.entries(wordCounts).filter(([_, c]) => c >= 2).map(([w]) => w);
 
       haikuDedup = `\n\nHAIKU DEDUPLICATION: The user has recently received these haikus. You MUST write something COMPLETELY DIFFERENT — different imagery, different words, different structure:\n${recentHaikus.slice(0, 5).map((h: string, i: number) => `${i + 1}. "${h}"`).join("\n")}`;
@@ -213,7 +227,6 @@ Haiku rules:
 - No trading advice or price predictions.
 - MUST be original and unique — never repeat common phrases like "red screens" or "breath moves".${haikuDedup}`;
 
-    // Build message dedup instruction — extract structural patterns to avoid repetitive reflections
     let messageDedup = "";
     if (recentMessages && Array.isArray(recentMessages) && recentMessages.length > 0) {
       const stopWords = new Set(["the","a","an","is","in","on","of","and","to","with","its","that","this","for","are","was","has","had","but","not","from","they","all","been","have","will","can","just","or","as","at","be","it","so","no","do","my","by","your","you"]);
@@ -248,13 +261,17 @@ Haiku rules:
       temperature: 0.7,
     };
 
+    // Timeout budget: 12s primary + 8s fallback = 20s total (within 25s Supabase limit)
+    const TIMEOUTS = [12000, 8000];
     const models = ["google/gemini-3-flash-preview", "google/gemini-2.5-flash"];
     let result: any = null;
     let lastStatus = 500;
 
-    for (const model of models) {
+    for (let i = 0; i < models.length; i++) {
+      const model = models[i];
+      const timeoutMs = TIMEOUTS[i];
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 20000);
+      const timeout = setTimeout(() => controller.abort(), timeoutMs);
       try {
         const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
@@ -276,7 +293,7 @@ Haiku rules:
           const text = await response.text();
           console.error(`AI ${model} error:`, response.status, text);
           lastStatus = response.status;
-          if (model !== models[models.length - 1]) continue;
+          if (i < models.length - 1) continue;
           break;
         }
 
@@ -288,28 +305,39 @@ Haiku rules:
         } catch {
           const m = (typeof raw === "string" ? raw : "").match(/\{[\s\S]*\}/);
           if (m) result = JSON.parse(m[0]);
-          else if (model !== models[models.length - 1]) continue;
-          else throw new Error("AI returned invalid JSON");
+          else if (i < models.length - 1) continue;
+          else break;
         }
 
         if (result?.message) break;
-        if (model !== models[models.length - 1]) { result = null; continue; }
+        if (i < models.length - 1) { result = null; continue; }
       } catch (e) {
         clearTimeout(timeout);
         if (e instanceof DOMException && e.name === "AbortError") {
-          console.warn(`[holzen-reflect] AI ${model} timed out`);
+          console.warn(`[holzen-reflect] AI ${model} timed out after ${timeoutMs}ms`);
           lastStatus = 504;
-          if (model !== models[models.length - 1]) continue;
-          return new Response(JSON.stringify({ error: "AI timed out" }), { status: 504, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+          if (i < models.length - 1) continue;
+          // Both models timed out — serve curated fallback
+          break;
         }
         throw e;
       }
     }
 
+    // ── Fallback chain: if AI failed, serve curated content ──
     if (!result?.message) {
-      if (lastStatus === 429) return new Response(JSON.stringify({ error: "Rate limited. Try again later." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      if (lastStatus === 402) return new Response(JSON.stringify({ error: "AI usage limit reached." }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      throw new Error("AI generation failed after all retries");
+      if (lastStatus === 429) {
+        return new Response(JSON.stringify({ error: "Rate limited. Try again later." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      if (lastStatus === 402) {
+        return new Response(JSON.stringify({ error: "AI usage limit reached." }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+      // Serve curated fallback instead of erroring
+      console.warn("[holzen-reflect] All AI models failed, serving curated fallback");
+      const fallback = CURATED_REFLECTIONS[Math.floor(Math.random() * CURATED_REFLECTIONS.length)];
+      return new Response(JSON.stringify(fallback), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     return new Response(JSON.stringify({
@@ -320,9 +348,17 @@ Haiku rules:
     });
   } catch (e) {
     console.error("holzen-reflect error:", e);
-    return new Response(
-      JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    // Even on unexpected errors, try to serve curated content
+    try {
+      const fallback = CURATED_REFLECTIONS[Math.floor(Math.random() * CURATED_REFLECTIONS.length)];
+      return new Response(JSON.stringify(fallback), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    } catch {
+      return new Response(
+        JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
+        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
   }
 });

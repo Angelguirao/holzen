@@ -198,9 +198,12 @@ No trading advice, no price predictions, no exclamation marks.`;
       };
 
       const models = ["google/gemini-2.5-flash", "google/gemini-2.5-flash-lite"];
-      for (const model of models) {
+      // Timeout budget: 8s primary + 6s fallback
+      const AI_TIMEOUTS = [8000, 6000];
+      for (let idx = 0; idx < models.length; idx++) {
+        const model = models[idx];
         const aiController = new AbortController();
-        const aiTimeout = setTimeout(() => aiController.abort(), 18000);
+        const aiTimeout = setTimeout(() => aiController.abort(), AI_TIMEOUTS[idx]);
         try {
           const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
             method: "POST",
