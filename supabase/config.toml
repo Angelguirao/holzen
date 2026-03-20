@@ -41,3 +41,5 @@ project_id = "edgbwdecaoottowliimu"
     verify_jwt = false
   [functions.check-followups]
     verify_jwt = false
+  [functions.pregenerate-companions]
+    verify_jwt = false
