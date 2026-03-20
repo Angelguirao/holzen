@@ -6,7 +6,40 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-/** HEAD-check a URL, return true if reachable (2xx/3xx) */
+// ── CURATED FALLBACKS ──
+const CURATED_FALLBACKS = [
+  {
+    title: "Loss aversion doubles the sting of dropping prices",
+    body: "Kahneman and Tversky's 1979 prospect theory study showed that losses feel roughly twice as painful as equivalent gains feel good. When BTC drops 5%, your brain processes it as if you lost 10%. This asymmetry is hardwired — recognizing it is the first step to not acting on it.",
+    citation: "Kahneman & Tversky (1979), Prospect Theory: An Analysis of Decision under Risk",
+    url: "https://scholar.google.com/scholar?q=kahneman+tversky+prospect+theory+1979",
+  },
+  {
+    title: "The disposition effect: why we sell winners and hold losers",
+    body: "Shefrin and Statman's 1985 study found that investors are 50% more likely to sell a winning position than a losing one. We lock in gains too early out of fear, and hold losses too long out of hope. The pattern repeats across every asset class — including Bitcoin.",
+    citation: "Shefrin & Statman (1985), The Disposition to Sell Winners Too Early and Ride Losers Too Long",
+    url: "https://scholar.google.com/scholar?q=shefrin+statman+disposition+effect+1985",
+  },
+  {
+    title: "Social proof cascades: when everyone sells, your brain wants to follow",
+    body: "Bikhchandani, Hirshleifer, and Welch's 1992 research on information cascades showed that rational individuals can make irrational collective decisions by mimicking others. In crypto markets, this amplifies both panic selling and FOMO buying beyond any fundamental justification.",
+    citation: "Bikhchandani, Hirshleifer & Welch (1992), A Theory of Fads, Fashion, Custom, and Cultural Change as Informational Cascades",
+    url: "https://scholar.google.com/scholar?q=bikhchandani+hirshleifer+welch+informational+cascades+1992",
+  },
+  {
+    title: "Your prefrontal cortex goes offline during financial stress",
+    body: "Lo and Repin's 2002 study using real-time physiological monitoring of traders found that market volatility triggers measurable autonomic nervous system responses — elevated heart rate, skin conductance changes — that impair the prefrontal cortex's capacity for rational decision-making.",
+    citation: "Lo & Repin (2002), The Psychophysiology of Real-Time Financial Risk Processing",
+    url: "https://scholar.google.com/scholar?q=lo+repin+psychophysiology+financial+risk+2002",
+  },
+  {
+    title: "Recency bias: your brain over-weights the last 48 hours",
+    body: "Tversky and Kahneman's availability heuristic research demonstrated that people judge probability based on how easily examples come to mind. A sharp BTC drop yesterday looms larger than years of steady gains. Your memory is not a balanced ledger — it's a highlight reel biased toward the recent.",
+    citation: "Tversky & Kahneman (1973), Availability: A Heuristic for Judging Frequency and Probability",
+    url: "https://scholar.google.com/scholar?q=tversky+kahneman+availability+heuristic+1973",
+  },
+];
+
 async function isUrlReachable(url: string): Promise<boolean> {
   if (!url || url.length < 10) return false;
   try {
@@ -20,39 +53,70 @@ async function isUrlReachable(url: string): Promise<boolean> {
   }
 }
 
+/** Fallback chain: cache → curated */
+async function serveFallback(svcClient: any): Promise<any> {
+  try {
+    const { data } = await svcClient
+      .from("companion_cache")
+      .select("id, content, used_count")
+      .eq("companion_type", "ground_nudge")
+      .eq("language", "en")
+      .gte("quality_score", 2)
+      .order("used_count", { ascending: true })
+      .limit(5);
+    if (data && data.length > 0) {
+      const pick = data[Math.floor(Math.random() * data.length)];
+      svcClient.from("companion_cache").update({ used_count: (pick.used_count || 0) + 1 }).eq("id", pick.id).then(() => {});
+      return pick.content;
+    }
+    const { data: anyQ } = await svcClient
+      .from("companion_cache")
+      .select("id, content, used_count")
+      .eq("companion_type", "ground_nudge")
+      .eq("language", "en")
+      .order("used_count", { ascending: true })
+      .limit(5);
+    if (anyQ && anyQ.length > 0) {
+      const pick = anyQ[Math.floor(Math.random() * anyQ.length)];
+      svcClient.from("companion_cache").update({ used_count: (pick.used_count || 0) + 1 }).eq("id", pick.id).then(() => {});
+      return pick.content;
+    }
+  } catch { /* continue to curated */ }
+  return CURATED_FALLBACKS[Math.floor(Math.random() * CURATED_FALLBACKS.length)];
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
+  const t0 = Date.now();
+  const log = (msg: string) => console.log(`[ground-nudge] ${msg} (+${Date.now() - t0}ms)`);
+
   try {
-    // Auth check
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
     const { createClient } = await import("npm:@supabase/supabase-js@2.57.2");
     const sbUrl = Deno.env.get("SUPABASE_URL") ?? "";
-    const sbAnon = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
-    const sbClient = createClient(sbUrl, sbAnon, { global: { headers: { Authorization: authHeader } } });
+    const sbClient = createClient(sbUrl, Deno.env.get("SUPABASE_ANON_KEY") ?? "", { global: { headers: { Authorization: authHeader } } });
     const { data: { user }, error: authError } = await sbClient.auth.getUser();
     if (authError || !user) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const { context, language, recentTopics } = await req.json();
+    const { context, recentTopics } = await req.json();
 
     const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
-    if (!PERPLEXITY_API_KEY) throw new Error("PERPLEXITY_API_KEY is not configured");
-
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
-
     const svcClient = createClient(sbUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "", { auth: { persistSession: false } });
 
-    const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
-    const langCode = language || "en";
-    const langName = LANG_NAMES[langCode] || "English";
+    if (!PERPLEXITY_API_KEY || !LOVABLE_API_KEY) {
+      log("missing API keys, serving fallback");
+      const fallback = await serveFallback(svcClient);
+      return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
 
     // Pick a bias category, avoiding recently used ones
     const BIAS_TOPICS = [
@@ -72,78 +136,74 @@ serve(async (req) => {
     const pool = available.length > 0 ? available : BIAS_TOPICS;
     const randomBias = pool[Math.floor(Math.random() * pool.length)];
 
-    // Step 1: Perplexity search for behavioral finance research
     const marketContext = context || "Bitcoin market volatility";
     const searchQuery = `Find a specific academic study or research paper about ${randomBias}. The research should be relevant to: ${marketContext}. Include the researcher names, university, year of publication, sample size or key methodology detail, and the main finding. Prefer peer-reviewed journals.`;
 
-    const perplexityBody: any = {
-      model: "sonar-pro",
-      messages: [
-        {
-          role: "system",
-          content: "You are a behavioral finance research assistant. Search for real, specific academic research papers and credible findings. Return ONE specific study with exact researcher names, publication year, journal name, and quantitative findings. Do NOT return generic overviews — find a specific paper. Prefer lesser-known but fascinating studies over the most commonly cited ones (e.g. avoid just repeating Kahneman & Tversky prospect theory unless highly specific).",
-        },
-        { role: "user", content: searchQuery },
-      ],
-      search_mode: "academic",
-    };
+    // ── Step 1: Perplexity academic search ──
+    log("calling perplexity");
+    let searchContent = "";
+    let citations: string[] = [];
 
-    const searchController = new AbortController();
-    const searchTimeout = setTimeout(() => searchController.abort(), 12000);
-    let searchResponse: Response;
     try {
-      searchResponse = await fetch("https://api.perplexity.ai/chat/completions", {
+      const searchController = new AbortController();
+      const searchTimeout = setTimeout(() => searchController.abort(), 12000);
+      const searchResponse = await fetch("https://api.perplexity.ai/chat/completions", {
         method: "POST",
-        headers: {
-          Authorization: `Bearer ${PERPLEXITY_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(perplexityBody),
+        headers: { Authorization: `Bearer ${PERPLEXITY_API_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "sonar-pro",
+          messages: [
+            {
+              role: "system",
+              content: "You are a behavioral finance research assistant. Search for real, specific academic research papers. Return ONE specific study with exact researcher names, publication year, journal name, and quantitative findings. Prefer lesser-known but fascinating studies over the most commonly cited ones.",
+            },
+            { role: "user", content: searchQuery },
+          ],
+          search_mode: "academic",
+        }),
         signal: searchController.signal,
       });
       clearTimeout(searchTimeout);
+      log(`perplexity responded ${searchResponse.status}`);
+
+      if (!searchResponse.ok) {
+        await searchResponse.text();
+        throw new Error(`Perplexity ${searchResponse.status}`);
+      }
+
+      const searchData = await searchResponse.json();
+      searchContent = searchData.choices?.[0]?.message?.content || "";
+      citations = searchData.citations || [];
+      log(`content length: ${searchContent.length}, citations: ${citations.length}`);
     } catch (e) {
-      clearTimeout(searchTimeout);
-      if (e instanceof DOMException && e.name === "AbortError") {
-        // Try fallback cache
-        const fallback = await serveFallback(svcClient, "ground_nudge", langCode);
-        if (fallback) return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
-        return new Response(JSON.stringify({ error: "Search timed out" }), { status: 504, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      }
-      throw e;
+      log(`perplexity failed: ${e}`);
+      const fallback = await serveFallback(svcClient);
+      return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    if (!searchResponse.ok) {
-      const errText = await searchResponse.text();
-      console.error("Perplexity error:", searchResponse.status, errText);
-      if (searchResponse.status === 429) {
-        const fallback = await serveFallback(svcClient, "ground_nudge", langCode);
-        if (fallback) return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
-        return new Response(JSON.stringify({ error: "Rate limited, please try again later." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      }
-      throw new Error("Perplexity search failed");
+    if (!searchContent) {
+      const fallback = await serveFallback(svcClient);
+      return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const searchData = await searchResponse.json();
-    const searchContent = searchData.choices?.[0]?.message?.content || "";
-    const citations: string[] = searchData.citations || [];
-
-    // Step 2: Lovable AI structures the grounded result
-    const langInstruction = langCode !== "en" ? `Write in ${langName}. Keep citation names and URLs as-is.\n` : "";
-
+    // ── Step 2: AI structuring ──
+    log("calling AI structuring");
     const aiBody = {
       messages: [
         {
           role: "system",
-          content: `${langInstruction}Extract ONE grounding nudge from the search results below.
+          content: `Extract ONE grounding nudge from the search results below.
+
+TONE: Calm, grounding, educational. Like a professor gently explaining why your brain is lying to you right now.
+TITLE: Name the bias or finding clearly (5-15 words). Should feel like a section heading in a textbook.
+BODY: 2-3 sentences that explain the research finding and why it matters right now. Reference the researchers by name and year.
+CITATION: Formatted as "Author(s) (Year), Paper Title" — exactly as it appears in the search results.
 
 ACCURACY RULES (CRITICAL):
-- Use ONLY facts, names, dates, and numbers that appear in the search results below
-- Do NOT invent researcher names, publication years, journal names, or statistics
-- If the search results are vague, keep the body general rather than fabricating specifics
-- Copy citation URLs character-for-character from the provided list
-
-Tone: calm, grounding, no advice.`,
+- Use ONLY facts, names, dates, and numbers from the search results
+- Do NOT invent researcher names, years, journals, or statistics
+- If the search results are vague, keep the body general
+- Copy citation URLs character-for-character from the list`,
         },
         {
           role: "user",
@@ -160,8 +220,8 @@ Tone: calm, grounding, no advice.`,
             properties: {
               title: { type: "string", description: "Short bias/finding summary (5-15 words)" },
               body: { type: "string", description: "2-3 sentences referencing researchers and years" },
-              citation: { type: "string", description: "Formatted like: Kahneman & Tversky (1979), Prospect Theory" },
-              url: { type: "string", description: "Citation URL copied character-for-character from the list" },
+              citation: { type: "string", description: "Formatted: Author(s) (Year), Paper Title" },
+              url: { type: "string", description: "Citation URL copied character-for-character" },
             },
             required: ["title", "body", "citation", "url"],
             additionalProperties: false,
@@ -174,44 +234,26 @@ Tone: calm, grounding, no advice.`,
 
     const models = ["google/gemini-2.5-flash", "google/gemini-3-flash-preview"];
     let nudge: any = null;
-    let lastStatus = 500;
 
     for (const model of models) {
       const aiController = new AbortController();
       const aiTimeout = setTimeout(() => aiController.abort(), 18000);
       try {
-        const structureResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
-          headers: {
-            Authorization: `Bearer ${LOVABLE_API_KEY}`,
-            "Content-Type": "application/json",
-          },
+          headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
           body: JSON.stringify({ ...aiBody, model }),
           signal: aiController.signal,
         });
         clearTimeout(aiTimeout);
+        log(`AI ${model} responded ${res.status}`);
 
-        if (structureResponse.status === 429 || structureResponse.status === 402) {
-          lastStatus = structureResponse.status;
-          await structureResponse.text();
-          break;
-        }
-        if (!structureResponse.ok) {
-          const t = await structureResponse.text();
-          console.error(`AI ${model} error:`, structureResponse.status, t);
-          lastStatus = structureResponse.status;
-          if (model !== models[models.length - 1]) continue;
-          break;
-        }
+        if (!res.ok) { await res.text(); if (model !== models[models.length - 1]) continue; break; }
 
-        const structureData = await structureResponse.json();
-        // Handle tool_call response format
-        const toolCall = structureData.choices?.[0]?.message?.tool_calls?.[0];
-        const content = toolCall?.function?.arguments || structureData.choices?.[0]?.message?.content;
-        if (!content) {
-          if (model !== models[models.length - 1]) continue;
-          throw new Error("No nudge returned from AI");
-        }
+        const data = await res.json();
+        const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
+        const content = toolCall?.function?.arguments || data.choices?.[0]?.message?.content;
+        if (!content) { if (model !== models[models.length - 1]) continue; break; }
 
         try {
           nudge = typeof content === "string" ? JSON.parse(content) : content;
@@ -219,110 +261,65 @@ Tone: calm, grounding, no advice.`,
           const m = (typeof content === "string" ? content : "").match(/\{[\s\S]*\}/);
           if (m) nudge = JSON.parse(m[0]);
           else if (model !== models[models.length - 1]) continue;
-          else throw new Error("AI returned invalid JSON");
+          else break;
         }
         break;
       } catch (e) {
         clearTimeout(aiTimeout);
-        if (e instanceof DOMException && e.name === "AbortError") {
-          lastStatus = 504;
-          if (model !== models[models.length - 1]) continue;
-          const fallback = await serveFallback(svcClient, "ground_nudge", langCode);
-          if (fallback) return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
-          return new Response(JSON.stringify({ error: "AI structuring timed out" }), { status: 504, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-        }
-        throw e;
+        if (model !== models[models.length - 1]) continue;
+        break;
       }
     }
 
-    if (!nudge) {
-      const fallback = await serveFallback(svcClient, "ground_nudge", langCode);
-      if (fallback) return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      if (lastStatus === 429) return new Response(JSON.stringify({ error: "Rate limited, please try again later." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      if (lastStatus === 402) return new Response(JSON.stringify({ error: "AI credits exhausted." }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      throw new Error("AI structuring failed");
+    if (!nudge || !nudge.title || !nudge.body) {
+      log("AI structuring failed, serving fallback");
+      const fallback = await serveFallback(svcClient);
+      return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    // Ensure URL is from citations
+    // ── Post-processing: URL validation ──
     if (citations.length > 0 && !citations.includes(nudge.url)) {
       nudge.url = citations[0];
     }
 
-    // URL validation — verify the URL is reachable
     let qualityScore = 1;
     if (nudge.url) {
       const reachable = await isUrlReachable(nudge.url);
       if (!reachable) {
-        // Try other citations
         let found = false;
         for (const c of citations) {
-          if (c !== nudge.url && await isUrlReachable(c)) {
-            nudge.url = c;
-            found = true;
-            break;
-          }
+          if (c !== nudge.url && await isUrlReachable(c)) { nudge.url = c; found = true; break; }
         }
         if (!found) {
-          // Use a Google Scholar search as fallback
           const searchTerm = encodeURIComponent(nudge.citation || nudge.title || "behavioral finance");
           nudge.url = `https://scholar.google.com/scholar?q=${searchTerm}`;
         }
       } else {
-        qualityScore = 2; // URL verified = higher quality
+        qualityScore = 2;
       }
     }
 
-    // Cache good content for future fallback
-    if (nudge.title && nudge.body && nudge.citation) {
+    // Cache good content
+    if (nudge.title && nudge.body && nudge.citation && qualityScore > 0) {
       svcClient.from("companion_cache").insert({
         companion_type: "ground_nudge",
-        language: langCode,
+        language: "en",
         content: nudge,
         quality_score: qualityScore,
       }).then(() => {});
     }
 
+    log(`done: ${nudge.title}`);
     return new Response(JSON.stringify(nudge), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
     console.error("ground-nudge error:", e);
-    return new Response(
-      JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
-      { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-    );
+    try {
+      const fallback = CURATED_FALLBACKS[Math.floor(Math.random() * CURATED_FALLBACKS.length)];
+      return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    } catch {
+      return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
   }
 });
-
-/** Serve a random high-quality cached entry as fallback */
-async function serveFallback(svcClient: any, type: string, lang: string): Promise<any | null> {
-  try {
-    const { data } = await svcClient
-      .from("companion_cache")
-      .select("id, content, used_count")
-      .eq("companion_type", type)
-      .eq("language", lang)
-      .gte("quality_score", 2)
-      .order("used_count", { ascending: true })
-      .limit(5);
-    if (!data || data.length === 0) {
-      // Try any quality
-      const { data: any } = await svcClient
-        .from("companion_cache")
-        .select("id, content, used_count")
-        .eq("companion_type", type)
-        .eq("language", lang)
-        .order("used_count", { ascending: true })
-        .limit(5);
-      if (!any || any.length === 0) return null;
-      const pick = any[Math.floor(Math.random() * any.length)];
-      svcClient.from("companion_cache").update({ used_count: (pick.used_count || 0) + 1 }).eq("id", pick.id).then(() => {});
-      return pick.content;
-    }
-    const pick = data[Math.floor(Math.random() * data.length)];
-    svcClient.from("companion_cache").update({ used_count: (pick.used_count || 0) + 1 }).eq("id", pick.id).then(() => {});
-    return pick.content;
-  } catch {
-    return null;
-  }
-}
