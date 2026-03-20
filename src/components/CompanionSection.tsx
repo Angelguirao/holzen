@@ -6,6 +6,7 @@ import { LearningInput } from './LearningInput';
 import { SignalDisplay } from './SignalDisplay';
 import { ZoomOutDisplay } from './ZoomOutDisplay';
 import { HistoricalInsightDisplay } from './HistoricalInsightDisplay';
+import { CompanionFeedback } from './CompanionFeedback';
 import { Check, Heart, Lock, Feather, Anchor, Radio, Mountain, Clock } from 'lucide-react';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
@@ -228,6 +229,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             nudgeError={nudgeError}
             onRetry={retryNudge}
           />
+          {nudge && !nudgeLoading && <CompanionFeedback reflectionId={reflectionId} companionType="learning" />}
         </CompanionCard>
       )}
 
@@ -252,6 +254,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             error={signalError}
             onRetry={retrySignal}
           />
+          {signal && !signalLoading && <CompanionFeedback reflectionId={reflectionId} companionType="signal" />}
         </CompanionCard>
       )}
 
@@ -276,6 +279,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             error={zoomOutError}
             onRetry={retryZoomOut}
           />
+          {zoomOut && !zoomOutLoading && <CompanionFeedback reflectionId={reflectionId} companionType="zoom_out" />}
         </CompanionCard>
       )}
 
@@ -300,6 +304,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             error={historyError}
             onRetry={retryHistory}
           />
+          {historyInsight && !historyLoading && <CompanionFeedback reflectionId={reflectionId} companionType="history_insight" />}
         </CompanionCard>
       )}
     </div>

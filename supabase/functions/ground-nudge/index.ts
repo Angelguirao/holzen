@@ -77,7 +77,7 @@ serve(async (req) => {
     const searchQuery = `Find a specific academic study or research paper about ${randomBias}. The research should be relevant to: ${marketContext}. Include the researcher names, university, year of publication, sample size or key methodology detail, and the main finding. Prefer peer-reviewed journals.`;
 
     const perplexityBody: any = {
-      model: "sonar",
+      model: "sonar-pro",
       messages: [
         {
           role: "system",
@@ -135,7 +135,7 @@ serve(async (req) => {
       messages: [
         {
           role: "system",
-          content: `${langInstruction}Extract ONE grounding nudge from the search results as JSON: {"title":"short bias/finding summary","body":"2-3 sentences referencing researchers and years","citation":"formatted like Kahneman & Tversky (1979), Prospect Theory","url":"citation URL"}.
+          content: `${langInstruction}Extract ONE grounding nudge from the search results below.
 
 ACCURACY RULES (CRITICAL):
 - Use ONLY facts, names, dates, and numbers that appear in the search results below
@@ -150,7 +150,25 @@ Tone: calm, grounding, no advice.`,
           content: `Market context: ${marketContext}\n\nSearch results:\n${searchContent}\n\nCitation URLs:\n${citations.map((c: string, i: number) => `[${i + 1}] ${c}`).join("\n")}`,
         },
       ],
-      response_format: { type: "json_object" },
+      tools: [{
+        type: "function",
+        function: {
+          name: "return_grounding_nudge",
+          description: "Return a single grounding nudge extracted from search results",
+          parameters: {
+            type: "object",
+            properties: {
+              title: { type: "string", description: "Short bias/finding summary (5-15 words)" },
+              body: { type: "string", description: "2-3 sentences referencing researchers and years" },
+              citation: { type: "string", description: "Formatted like: Kahneman & Tversky (1979), Prospect Theory" },
+              url: { type: "string", description: "Citation URL copied character-for-character from the list" },
+            },
+            required: ["title", "body", "citation", "url"],
+            additionalProperties: false,
+          },
+        },
+      }],
+      tool_choice: { type: "function", function: { name: "return_grounding_nudge" } },
       temperature: 0.3,
     };
 
@@ -187,7 +205,9 @@ Tone: calm, grounding, no advice.`,
         }
 
         const structureData = await structureResponse.json();
-        const content = structureData.choices?.[0]?.message?.content;
+        // Handle tool_call response format
+        const toolCall = structureData.choices?.[0]?.message?.tool_calls?.[0];
+        const content = toolCall?.function?.arguments || structureData.choices?.[0]?.message?.content;
         if (!content) {
           if (model !== models[models.length - 1]) continue;
           throw new Error("No nudge returned from AI");
