@@ -53,6 +53,21 @@ async function isUrlReachable(url: string): Promise<boolean> {
   }
 }
 
+const BANNED_PHRASES = ["dive into", "game-changer", "paradigm shift", "revolutionary", "unprecedented", "navigate the", "in the world of", "it's worth noting", "at the end of the day", "moving forward", "leverage", "synergy", "ecosystem", "disruptive", "next-gen", "cutting-edge"];
+const MIN_BODY_LENGTH = 80;
+
+function containsSlop(text: string): boolean {
+  const lower = text.toLowerCase();
+  return BANNED_PHRASES.some(p => lower.includes(p));
+}
+
+function passesQualityGate(nudge: any): boolean {
+  if (!nudge?.title || !nudge?.body) return false;
+  if ((nudge.body || "").length < MIN_BODY_LENGTH) return false;
+  if (containsSlop(nudge.body) || containsSlop(nudge.title)) return false;
+  return true;
+}
+
 /** Fallback chain: cache → curated. Returns { data, source } for observability. */
 async function serveFallback(svcClient: any): Promise<{ data: any; source: string }> {
   try {
@@ -286,10 +301,10 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
       }
     }
 
-    if (!nudge || !nudge.title || !nudge.body) {
-      log("AI structuring failed, serving fallback");
+    if (!nudge || !passesQualityGate(nudge)) {
+      log(`quality gate failed: ${!nudge ? "no nudge" : `body=${(nudge.body||"").length}chars, slop=${containsSlop(nudge?.body||"") || containsSlop(nudge?.title||"")}`}`);
       const fb = await serveFallback(svcClient);
-      trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
+      trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated", { reason: "quality_gate" });
       return new Response(JSON.stringify(fb.data), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
@@ -316,7 +331,7 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
     }
 
     // Cache good content with title-based dedup
-    if (nudge.title && nudge.body && nudge.citation && qualityScore > 0) {
+    if (nudge.title && nudge.body && nudge.citation && qualityScore > 0 && passesQualityGate(nudge)) {
       (async () => {
         try {
           const { data: existing } = await svcClient.from("companion_cache").select("content").eq("companion_type", "ground_nudge").eq("language", "en").limit(30);
