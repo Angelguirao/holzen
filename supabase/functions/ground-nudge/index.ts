@@ -6,6 +6,20 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+/** HEAD-check a URL, return true if reachable (2xx/3xx) */
+async function isUrlReachable(url: string): Promise<boolean> {
+  if (!url || url.length < 10) return false;
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 4000);
+    const res = await fetch(url, { method: "HEAD", redirect: "follow", signal: controller.signal });
+    clearTimeout(timeout);
+    return res.status >= 200 && res.status < 400;
+  } catch {
+    return false;
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -18,7 +32,9 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
     const { createClient } = await import("npm:@supabase/supabase-js@2.57.2");
-    const sbClient = createClient(Deno.env.get("SUPABASE_URL") ?? "", Deno.env.get("SUPABASE_ANON_KEY") ?? "", { global: { headers: { Authorization: authHeader } } });
+    const sbUrl = Deno.env.get("SUPABASE_URL") ?? "";
+    const sbAnon = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
+    const sbClient = createClient(sbUrl, sbAnon, { global: { headers: { Authorization: authHeader } } });
     const { data: { user }, error: authError } = await sbClient.auth.getUser();
     if (authError || !user) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
@@ -31,6 +47,8 @@ serve(async (req) => {
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+
+    const svcClient = createClient(sbUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "", { auth: { persistSession: false } });
 
     const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
     const langCode = language || "en";
@@ -87,10 +105,10 @@ serve(async (req) => {
     } catch (e) {
       clearTimeout(searchTimeout);
       if (e instanceof DOMException && e.name === "AbortError") {
-        return new Response(
-          JSON.stringify({ error: "Search timed out" }),
-          { status: 504, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+        // Try fallback cache
+        const fallback = await serveFallback(svcClient, "ground_nudge", langCode);
+        if (fallback) return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        return new Response(JSON.stringify({ error: "Search timed out" }), { status: 504, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
       throw e;
     }
@@ -99,10 +117,9 @@ serve(async (req) => {
       const errText = await searchResponse.text();
       console.error("Perplexity error:", searchResponse.status, errText);
       if (searchResponse.status === 429) {
-        return new Response(
-          JSON.stringify({ error: "Rate limited, please try again later." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+        const fallback = await serveFallback(svcClient, "ground_nudge", langCode);
+        if (fallback) return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        return new Response(JSON.stringify({ error: "Rate limited, please try again later." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
       throw new Error("Perplexity search failed");
     }
@@ -111,7 +128,7 @@ serve(async (req) => {
     const searchContent = searchData.choices?.[0]?.message?.content || "";
     const citations: string[] = searchData.citations || [];
 
-    // Step 2: Lovable AI structures the grounded result (JSON mode, fallback model retry)
+    // Step 2: Lovable AI structures the grounded result
     const langInstruction = langCode !== "en" ? `Write in ${langName}. Keep citation names and URLs as-is.\n` : "";
 
     const aiBody = {
@@ -190,6 +207,8 @@ Tone: calm, grounding, no advice.`,
         if (e instanceof DOMException && e.name === "AbortError") {
           lastStatus = 504;
           if (model !== models[models.length - 1]) continue;
+          const fallback = await serveFallback(svcClient, "ground_nudge", langCode);
+          if (fallback) return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
           return new Response(JSON.stringify({ error: "AI structuring timed out" }), { status: 504, headers: { ...corsHeaders, "Content-Type": "application/json" } });
         }
         throw e;
@@ -197,6 +216,8 @@ Tone: calm, grounding, no advice.`,
     }
 
     if (!nudge) {
+      const fallback = await serveFallback(svcClient, "ground_nudge", langCode);
+      if (fallback) return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
       if (lastStatus === 429) return new Response(JSON.stringify({ error: "Rate limited, please try again later." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       if (lastStatus === 402) return new Response(JSON.stringify({ error: "AI credits exhausted." }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       throw new Error("AI structuring failed");
@@ -205,6 +226,40 @@ Tone: calm, grounding, no advice.`,
     // Ensure URL is from citations
     if (citations.length > 0 && !citations.includes(nudge.url)) {
       nudge.url = citations[0];
+    }
+
+    // URL validation — verify the URL is reachable
+    let qualityScore = 1;
+    if (nudge.url) {
+      const reachable = await isUrlReachable(nudge.url);
+      if (!reachable) {
+        // Try other citations
+        let found = false;
+        for (const c of citations) {
+          if (c !== nudge.url && await isUrlReachable(c)) {
+            nudge.url = c;
+            found = true;
+            break;
+          }
+        }
+        if (!found) {
+          // Use a Google Scholar search as fallback
+          const searchTerm = encodeURIComponent(nudge.citation || nudge.title || "behavioral finance");
+          nudge.url = `https://scholar.google.com/scholar?q=${searchTerm}`;
+        }
+      } else {
+        qualityScore = 2; // URL verified = higher quality
+      }
+    }
+
+    // Cache good content for future fallback
+    if (nudge.title && nudge.body && nudge.citation) {
+      svcClient.from("companion_cache").insert({
+        companion_type: "ground_nudge",
+        language: langCode,
+        content: nudge,
+        quality_score: qualityScore,
+      }).then(() => {});
     }
 
     return new Response(JSON.stringify(nudge), {
@@ -218,3 +273,36 @@ Tone: calm, grounding, no advice.`,
     );
   }
 });
+
+/** Serve a random high-quality cached entry as fallback */
+async function serveFallback(svcClient: any, type: string, lang: string): Promise<any | null> {
+  try {
+    const { data } = await svcClient
+      .from("companion_cache")
+      .select("id, content, used_count")
+      .eq("companion_type", type)
+      .eq("language", lang)
+      .gte("quality_score", 2)
+      .order("used_count", { ascending: true })
+      .limit(5);
+    if (!data || data.length === 0) {
+      // Try any quality
+      const { data: any } = await svcClient
+        .from("companion_cache")
+        .select("id, content, used_count")
+        .eq("companion_type", type)
+        .eq("language", lang)
+        .order("used_count", { ascending: true })
+        .limit(5);
+      if (!any || any.length === 0) return null;
+      const pick = any[Math.floor(Math.random() * any.length)];
+      svcClient.from("companion_cache").update({ used_count: (pick.used_count || 0) + 1 }).eq("id", pick.id).then(() => {});
+      return pick.content;
+    }
+    const pick = data[Math.floor(Math.random() * data.length)];
+    svcClient.from("companion_cache").update({ used_count: (pick.used_count || 0) + 1 }).eq("id", pick.id).then(() => {});
+    return pick.content;
+  } catch {
+    return null;
+  }
+}

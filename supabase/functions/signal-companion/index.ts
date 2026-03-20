@@ -22,6 +22,52 @@ function normalizeUrl(s: string): string {
   return s;
 }
 
+/** HEAD-check a URL, return true if reachable (2xx/3xx) */
+async function isUrlReachable(url: string): Promise<boolean> {
+  if (!url || url.length < 10) return false;
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 4000);
+    const res = await fetch(url, { method: "HEAD", redirect: "follow", signal: controller.signal });
+    clearTimeout(timeout);
+    return res.status >= 200 && res.status < 400;
+  } catch {
+    return false;
+  }
+}
+
+/** Serve a random cached entry as fallback */
+async function serveFallback(svcClient: any, lang: string): Promise<any | null> {
+  try {
+    const { data } = await svcClient
+      .from("companion_cache")
+      .select("id, content, used_count")
+      .eq("companion_type", "signal")
+      .eq("language", lang)
+      .gte("quality_score", 2)
+      .order("used_count", { ascending: true })
+      .limit(5);
+    if (!data || data.length === 0) {
+      const { data: anyQ } = await svcClient
+        .from("companion_cache")
+        .select("id, content, used_count")
+        .eq("companion_type", "signal")
+        .eq("language", lang)
+        .order("used_count", { ascending: true })
+        .limit(5);
+      if (!anyQ || anyQ.length === 0) return null;
+      const pick = anyQ[Math.floor(Math.random() * anyQ.length)];
+      svcClient.from("companion_cache").update({ used_count: (pick.used_count || 0) + 1 }).eq("id", pick.id).then(() => {});
+      return pick.content;
+    }
+    const pick = data[Math.floor(Math.random() * data.length)];
+    svcClient.from("companion_cache").update({ used_count: (pick.used_count || 0) + 1 }).eq("id", pick.id).then(() => {});
+    return pick.content;
+  } catch {
+    return null;
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -52,13 +98,12 @@ serve(async (req) => {
     const { context, language, sources, recentSignalSources, recentSignalTitles } = body;
     log("parsed body");
 
-    // Verify JWT and track AI usage
+    // Verify JWT via getUser
     const { createClient } = await import("npm:@supabase/supabase-js@2.57.2");
     const sbUrl = Deno.env.get("SUPABASE_URL") ?? "";
     const sbClient = createClient(sbUrl, Deno.env.get("SUPABASE_ANON_KEY") ?? "", { global: { headers: { Authorization: authHeader } } });
-    const token = authHeader.replace("Bearer ", "");
-    const { data: claimsData, error: claimsError } = await sbClient.auth.getClaims(token);
-    if (claimsError || !claimsData?.claims) {
+    const { data: { user }, error: authError } = await sbClient.auth.getUser();
+    if (authError || !user) {
       return new Response(
         JSON.stringify({ error: "Unauthorized" }),
         { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -66,14 +111,10 @@ serve(async (req) => {
     }
     log("auth verified");
 
+    const svcClient = createClient(sbUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "", { auth: { persistSession: false } });
+
     // Track AI usage — fire-and-forget
-    const userId = claimsData.claims.sub as string;
-    (async () => {
-      try {
-        const svc = createClient(sbUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "", { auth: { persistSession: false } });
-        await svc.from("analytics_events").insert({ user_id: userId, event: "signal_companion_ai_call" });
-      } catch (_) { /* non-fatal */ }
-    })();
+    svcClient.from("analytics_events").insert({ user_id: user.id, event: "signal_companion_ai_call" }).then(() => {});
 
     const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
     if (!PERPLEXITY_API_KEY) throw new Error("PERPLEXITY_API_KEY is not configured");
@@ -81,7 +122,9 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    // Build source name list for context — used as diversity hints
+    const langCode = language || "en";
+
+    // Build source name list for context
     const sourceNames: string[] = [];
     if (sources && Array.isArray(sources) && sources.length > 0) {
       for (const s of sources) {
@@ -89,21 +132,17 @@ serve(async (req) => {
       }
     }
 
-    // Build exclusion hint from recently used sources to enforce diversity
     const recentExclusion = (recentSignalSources && Array.isArray(recentSignalSources) && recentSignalSources.length > 0)
       ? ` Do NOT use insights from: ${recentSignalSources.slice(0, 5).join(", ")}. Pick a DIFFERENT source.`
       : "";
 
-    // Build topic exclusion to avoid repeating the same headline/story
     const topicExclusion = (recentSignalTitles && Array.isArray(recentSignalTitles) && recentSignalTitles.length > 0)
       ? `\nDo NOT cover these topics (already shown to user): ${recentSignalTitles.slice(0, 5).join("; ")}. Find a COMPLETELY DIFFERENT angle or metric.`
       : "";
 
     const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
-    const langCode = language || "en";
     const langName = LANG_NAMES[langCode] || "English";
 
-    // Step 1: Perplexity search — rotate source hints, exclude recent
     const sourceHint = sourceNames.length > 0
       ? ` Look for insights from sources like: ${sourceNames.sort(() => Math.random() - 0.5).slice(0, 5).join(", ")}.`
       : "";
@@ -116,14 +155,14 @@ serve(async (req) => {
           try {
             const hostname = new URL(s.url.startsWith("http") ? s.url : `https://${s.url}`).hostname.replace(/^www\./, "");
             if (hostname && !sourceUrls.includes(hostname)) sourceUrls.push(hostname);
-          } catch { /* skip invalid */ }
+          } catch { /* skip */ }
         }
       }
     }
 
     const ANTI_TRADING_INSTRUCTION = `CRITICAL CONTENT RULES:
 - Do NOT return content about short-term trading signals, chart patterns, technical analysis setups, entry/exit points, or price targets
-- Do NOT cite trading educators, signal groups, or chart pattern analysts (e.g. "Chart Champions", trading Telegram groups)
+- Do NOT cite trading educators, signal groups, or chart pattern analysts
 - FOCUS ON: on-chain data, macro trends, adoption metrics, network health, long-term holder behavior, institutional flows, mining economics, supply dynamics
 - Prefer sources like: on-chain analysts, macro researchers, Bitcoin-focused newsletters, network data dashboards`;
 
@@ -152,7 +191,7 @@ DIVERSITY RULES:
       ...(sourceUrls.length > 0 ? { search_domain_filter: sourceUrls.slice(0, 5) } : {}),
     };
 
-    // Helper to call Perplexity with given body
+    // Helper to call Perplexity
     async function callPerplexity(pBody: any): Promise<{ content: string; citations: string[] }> {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 12000);
@@ -172,10 +211,7 @@ DIVERSITY RULES:
           throw new Error("Perplexity search failed");
         }
         const data = await res.json();
-        return {
-          content: data.choices?.[0]?.message?.content || "",
-          citations: data.citations || [],
-        };
+        return { content: data.choices?.[0]?.message?.content || "", citations: data.citations || [] };
       } catch (e) {
         clearTimeout(timeout);
         throw e;
@@ -187,13 +223,11 @@ DIVERSITY RULES:
     let citations: string[] = [];
 
     try {
-      // First attempt: with domain filter if available
       const result = await callPerplexity(perplexityBody);
       searchContent = result.content;
       citations = result.citations;
       log(`perplexity content length: ${searchContent.length}, citations: ${citations.length}`);
 
-      // If domain filter was used but got 0 citations, retry WITHOUT the filter
       if (citations.length === 0 && sourceUrls.length > 0 && searchContent.length > 0) {
         log("0 citations with domain filter — retrying without filter");
         const retryBody = { ...perplexityBody };
@@ -207,34 +241,32 @@ DIVERSITY RULES:
           }
         } catch (retryErr) {
           log(`retry failed, using original content: ${retryErr}`);
-          // Keep original searchContent, just no citations
         }
       }
     } catch (e) {
       if (e instanceof DOMException && e.name === "AbortError") {
         log("perplexity timed out after 12s");
-        return new Response(
-          JSON.stringify({ error: "Search timed out" }),
-          { status: 504, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+        const fallback = await serveFallback(svcClient, langCode);
+        if (fallback) return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        return new Response(JSON.stringify({ error: "Search timed out" }), { status: 504, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
       if (e instanceof Error && e.message === "RATE_LIMITED") {
-        return new Response(
-          JSON.stringify({ error: "Rate limited. Try again later." }),
-          { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
+        const fallback = await serveFallback(svcClient, langCode);
+        if (fallback) return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        return new Response(JSON.stringify({ error: "Rate limited. Try again later." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
       throw e;
     }
 
     if (!searchContent) {
+      const fallback = await serveFallback(svcClient, langCode);
+      if (fallback) return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
       throw new Error("No search content returned");
     }
 
-    // Step 2: Use Lovable AI to structure the result
+    // Step 2: AI structuring
     const langInstruction = langCode !== "en" ? `Write title and body in ${langName}. Keep source name/URL as-is.\n` : "";
 
-    // Build a numbered citation list for the AI to pick from
     const citationList = citations.length > 0
       ? citations.map((c: string, i: number) => `[${i + 1}] ${c}`).join("\n")
       : "(No citations available — leave url empty)";
@@ -249,21 +281,19 @@ DIVERSITY RULES:
 
 HOLDER PERSPECTIVE FILTER (CRITICAL):
 - If the search result is about short-term trading, chart patterns, entry/exit signals, or price targets, you MUST reframe it as a long-term holder insight instead
-- Replace trading language ("buy signal", "breakout", "resistance") with holder language ("accumulation trend", "network growth", "supply dynamics")
-- Focus on what the data means for someone holding Bitcoin for years, not days
-- NEVER include phrases like "trading opportunity", "price target", "buy/sell signal", "chart pattern"
+- Replace trading language with holder language ("accumulation trend", "network growth", "supply dynamics")
+- NEVER include phrases like "trading opportunity", "price target", "buy/sell signal"
 
 ACCURACY RULES (CRITICAL):
 - Use ONLY data points, numbers, dates, and analyst names that appear in the search results
 - Do NOT invent statistics, percentages, or metrics not present in the source material
-- If the search results lack specific numbers, describe the trend qualitatively rather than fabricating data
 - The body must contain ONLY verifiable claims from the search results
 
 URL RULES (CRITICAL):
 - You MUST select a url from the citation list below. Copy it character-for-character.
 - If none match, use the FIRST citation URL.
 - If no citations exist, set url to "".
-- NEVER fabricate or shorten URLs. NEVER return partial domains like "glassnode.com".`,
+- NEVER fabricate or shorten URLs.`,
         },
         {
           role: "user",
@@ -284,15 +314,11 @@ URL RULES (CRITICAL):
       try {
         const structureResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
-          headers: {
-            Authorization: `Bearer ${LOVABLE_API_KEY}`,
-            "Content-Type": "application/json",
-          },
+          headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
           body: JSON.stringify({ ...aiBody, model }),
           signal: aiController.signal,
         });
         clearTimeout(aiTimeout);
-
         log(`AI ${model} responded ${structureResponse.status}`);
 
         if (structureResponse.status === 429 || structureResponse.status === 402) {
@@ -300,19 +326,18 @@ URL RULES (CRITICAL):
           await structureResponse.text();
           break;
         }
-
         if (!structureResponse.ok) {
           const text = await structureResponse.text();
           console.error(`AI ${model} error:`, structureResponse.status, text);
           lastStatus = structureResponse.status;
-          if (model !== models[models.length - 1]) { log(`Retrying with fallback model`); continue; }
+          if (model !== models[models.length - 1]) { log("Retrying with fallback model"); continue; }
           break;
         }
 
         const structureData = await structureResponse.json();
         const content = structureData.choices?.[0]?.message?.content;
         if (!content) {
-          if (model !== models[models.length - 1]) { log(`Empty response, retrying`); continue; }
+          if (model !== models[models.length - 1]) { log("Empty response, retrying"); continue; }
           throw new Error("No signal returned from AI");
         }
 
@@ -321,7 +346,7 @@ URL RULES (CRITICAL):
         } catch {
           const m = (typeof content === "string" ? content : "").match(/\{[\s\S]*\}/);
           if (m) signal = JSON.parse(m[0]);
-          else if (model !== models[models.length - 1]) { log(`Bad JSON, retrying`); continue; }
+          else if (model !== models[models.length - 1]) { log("Bad JSON, retrying"); continue; }
           else throw new Error("AI returned invalid JSON");
         }
         break;
@@ -330,37 +355,73 @@ URL RULES (CRITICAL):
         if (e instanceof DOMException && e.name === "AbortError") {
           log(`AI ${model} timed out after 18s`);
           lastStatus = 504;
-          if (model !== models[models.length - 1]) { log(`Retrying with fallback model`); continue; }
-          return new Response(
-            JSON.stringify({ error: "AI structuring timed out" }),
-            { status: 504, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
+          if (model !== models[models.length - 1]) { log("Retrying with fallback model"); continue; }
+          const fallback = await serveFallback(svcClient, langCode);
+          if (fallback) return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+          return new Response(JSON.stringify({ error: "AI structuring timed out" }), { status: 504, headers: { ...corsHeaders, "Content-Type": "application/json" } });
         }
         throw e;
       }
     }
 
     if (!signal) {
+      const fallback = await serveFallback(svcClient, langCode);
+      if (fallback) return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
       if (lastStatus === 429) return new Response(JSON.stringify({ error: "Rate limited. Try again later." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       if (lastStatus === 402) return new Response(JSON.stringify({ error: "AI usage limit reached." }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       throw new Error("AI structuring failed after all retries");
     }
 
-    // POST-PROCESSING: Force URL to be from citations
-    // Check if AI URL matches any citation exactly
+    // POST-PROCESSING: Force URL to be from citations + validate
     const aiUrl = signal.url || "";
     const exactMatch = citations.find((c) => c === aiUrl);
     if (exactMatch) {
       signal.url = exactMatch;
     } else {
-      // AI didn't use an exact citation — find best match or use first
-      const partialMatch = citations.find((c) => aiUrl && c.includes(new URL(normalizeUrl(aiUrl)).hostname));
-      signal.url = partialMatch || (citations.length > 0 ? citations[0] : "");
+      try {
+        const partialMatch = aiUrl ? citations.find((c) => c.includes(new URL(normalizeUrl(aiUrl)).hostname)) : null;
+        signal.url = partialMatch || (citations.length > 0 ? citations[0] : "");
+      } catch {
+        signal.url = citations.length > 0 ? citations[0] : "";
+      }
     }
 
-    // Ensure URL is normalized
     if (signal.url && !signal.url.startsWith("http")) {
       signal.url = normalizeUrl(signal.url);
+    }
+
+    // URL validation — verify the URL is actually reachable
+    let qualityScore = 1;
+    if (signal.url) {
+      const reachable = await isUrlReachable(signal.url);
+      if (!reachable) {
+        // Try other citations
+        let found = false;
+        for (const c of citations) {
+          if (c !== signal.url && await isUrlReachable(c)) {
+            signal.url = c;
+            found = true;
+            break;
+          }
+        }
+        if (!found && signal.url) {
+          // Fallback to a search URL
+          const searchTerm = encodeURIComponent(signal.source || signal.title || "Bitcoin on-chain analysis");
+          signal.url = `https://www.google.com/search?q=${searchTerm}`;
+        }
+      } else {
+        qualityScore = 2;
+      }
+    }
+
+    // Cache good content for future fallback
+    if (signal.title && signal.body && signal.source) {
+      svcClient.from("companion_cache").insert({
+        companion_type: "signal",
+        language: langCode,
+        content: signal,
+        quality_score: qualityScore,
+      }).then(() => {});
     }
 
     log(`done, signal: ${signal.title}, source: ${signal.source}, url: ${signal.url}`);
