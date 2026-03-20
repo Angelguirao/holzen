@@ -295,6 +295,7 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
       const model = models[idx];
       const aiController = new AbortController();
       const aiTimeout = setTimeout(() => aiController.abort(), AI_TIMEOUTS[idx]);
+      const attemptT0 = Date.now();
       try {
         const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
@@ -305,24 +306,36 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
         clearTimeout(aiTimeout);
         log(`AI ${model} responded ${res.status}`);
 
-        if (!res.ok) { await res.text(); if (model !== models[models.length - 1]) continue; break; }
+        if (!res.ok) {
+          await res.text();
+          logAttempt({ companion_type: "ground_nudge", provider: "lovable", model, status: "error", latency_ms: Date.now() - attemptT0, error_message: `HTTP ${res.status}` });
+          if (model !== models[models.length - 1]) continue; break;
+        }
 
         const data = await res.json();
+        const usage = data.usage;
         const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
         const content = toolCall?.function?.arguments || data.choices?.[0]?.message?.content;
-        if (!content) { if (model !== models[models.length - 1]) continue; break; }
+        if (!content) {
+          logAttempt({ companion_type: "ground_nudge", provider: "lovable", model, status: "error", latency_ms: Date.now() - attemptT0, error_message: "empty content", input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
+          if (model !== models[models.length - 1]) continue; break;
+        }
 
         try {
           nudge = typeof content === "string" ? JSON.parse(content) : content;
         } catch {
           const m = (typeof content === "string" ? content : "").match(/\{[\s\S]*\}/);
           if (m) nudge = JSON.parse(m[0]);
-          else if (model !== models[models.length - 1]) continue;
-          else break;
+          else {
+            logAttempt({ companion_type: "ground_nudge", provider: "lovable", model, status: "error", latency_ms: Date.now() - attemptT0, error_message: "json_parse_failed", input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
+            if (model !== models[models.length - 1]) continue; else break;
+          }
         }
+        logAttempt({ companion_type: "ground_nudge", provider: "lovable", model, status: "success", latency_ms: Date.now() - attemptT0, input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
         break;
       } catch (e) {
         clearTimeout(aiTimeout);
+        logAttempt({ companion_type: "ground_nudge", provider: "lovable", model, status: e instanceof DOMException && e.name === "AbortError" ? "timeout" : "error", latency_ms: Date.now() - attemptT0, error_message: String(e) });
         if (model !== models[models.length - 1]) continue;
         break;
       }

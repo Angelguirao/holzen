@@ -399,6 +399,7 @@ URL RULES (CRITICAL):
       const model = models[idx];
       const aiController = new AbortController();
       const aiTimeout = setTimeout(() => aiController.abort(), AI_TIMEOUTS[idx]);
+      const attemptT0 = Date.now();
       try {
         const structureResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
@@ -411,14 +412,17 @@ URL RULES (CRITICAL):
 
         if (!structureResponse.ok) {
           await structureResponse.text();
+          logAttempt({ companion_type: "signal", provider: "lovable", model, status: "error", latency_ms: Date.now() - attemptT0, error_message: `HTTP ${structureResponse.status}` });
           if (model !== models[models.length - 1]) { log("Retrying with fallback model"); continue; }
           break;
         }
 
         const structureData = await structureResponse.json();
+        const usage = structureData.usage;
         const toolCall = structureData.choices?.[0]?.message?.tool_calls?.[0];
         const content = toolCall?.function?.arguments || structureData.choices?.[0]?.message?.content;
         if (!content) {
+          logAttempt({ companion_type: "signal", provider: "lovable", model, status: "error", latency_ms: Date.now() - attemptT0, error_message: "empty content", input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
           if (model !== models[models.length - 1]) continue;
           break;
         }
@@ -428,12 +432,16 @@ URL RULES (CRITICAL):
         } catch {
           const m = (typeof content === "string" ? content : "").match(/\{[\s\S]*\}/);
           if (m) signal = JSON.parse(m[0]);
-          else if (model !== models[models.length - 1]) continue;
-          else break;
+          else {
+            logAttempt({ companion_type: "signal", provider: "lovable", model, status: "error", latency_ms: Date.now() - attemptT0, error_message: "json_parse_failed", input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
+            if (model !== models[models.length - 1]) continue; else break;
+          }
         }
+        logAttempt({ companion_type: "signal", provider: "lovable", model, status: "success", latency_ms: Date.now() - attemptT0, input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
         break;
       } catch (e) {
         clearTimeout(aiTimeout);
+        logAttempt({ companion_type: "signal", provider: "lovable", model, status: e instanceof DOMException && e.name === "AbortError" ? "timeout" : "error", latency_ms: Date.now() - attemptT0, error_message: String(e) });
         if (model !== models[models.length - 1]) { log(`${model} failed, retrying`); continue; }
         break;
       }

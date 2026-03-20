@@ -298,6 +298,7 @@ Haiku rules:
       const timeoutMs = TIMEOUTS[i];
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), timeoutMs);
+      const attemptT0 = Date.now();
       try {
         const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
@@ -313,17 +314,20 @@ Haiku rules:
         if (response.status === 429 || response.status === 402) {
           lastStatus = response.status;
           await response.text();
+          logAttempt({ companion_type: "reflection", provider: "lovable", model, status: "error", latency_ms: Date.now() - attemptT0, error_message: `HTTP ${response.status}` });
           break;
         }
         if (!response.ok) {
           const text = await response.text();
           console.error(`AI ${model} error:`, response.status, text);
           lastStatus = response.status;
+          logAttempt({ companion_type: "reflection", provider: "lovable", model, status: "error", latency_ms: Date.now() - attemptT0, error_message: `HTTP ${response.status}` });
           if (i < models.length - 1) continue;
           break;
         }
 
         const data = await response.json();
+        const usage = data.usage;
         const raw = data.choices?.[0]?.message?.content || "";
 
         try {
@@ -331,17 +335,24 @@ Haiku rules:
         } catch {
           const m = (typeof raw === "string" ? raw : "").match(/\{[\s\S]*\}/);
           if (m) result = JSON.parse(m[0]);
-          else if (i < models.length - 1) continue;
-          else break;
+          else {
+            logAttempt({ companion_type: "reflection", provider: "lovable", model, status: "error", latency_ms: Date.now() - attemptT0, error_message: "json_parse_failed", input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
+            if (i < models.length - 1) continue; else break;
+          }
         }
 
-        if (result?.message) break;
+        if (result?.message) {
+          logAttempt({ companion_type: "reflection", provider: "lovable", model, status: "success", latency_ms: Date.now() - attemptT0, input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
+          break;
+        }
+        logAttempt({ companion_type: "reflection", provider: "lovable", model, status: "error", latency_ms: Date.now() - attemptT0, error_message: "missing message field", input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
         if (i < models.length - 1) { result = null; continue; }
       } catch (e) {
         clearTimeout(timeout);
         if (e instanceof DOMException && e.name === "AbortError") {
           console.warn(`[holzen-reflect] AI ${model} timed out after ${timeoutMs}ms`);
           lastStatus = 504;
+          logAttempt({ companion_type: "reflection", provider: "lovable", model, status: "timeout", latency_ms: Date.now() - attemptT0 });
           if (i < models.length - 1) continue;
           break;
         }
