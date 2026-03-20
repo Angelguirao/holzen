@@ -6,6 +6,7 @@ import { LearningInput } from './LearningInput';
 import { SignalDisplay } from './SignalDisplay';
 import { ZoomOutDisplay } from './ZoomOutDisplay';
 import { HistoricalInsightDisplay } from './HistoricalInsightDisplay';
+import { CompanionFeedback } from './CompanionFeedback';
 import { Check, Heart, Lock, Feather, Anchor, Radio, Mountain, Clock } from 'lucide-react';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
