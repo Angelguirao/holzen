@@ -277,7 +277,7 @@ DIVERSITY RULES:
       messages: [
         {
           role: "system",
-          content: `${langInstruction}Extract ONE market signal from the search results below. Return JSON: {"title":"5-12 word headline","body":"2-3 sentences with specific data points","source":"exact source/analyst name","url":"citation URL"}
+          content: `${langInstruction}Extract ONE market signal from the search results below.
 
 HOLDER PERSPECTIVE FILTER (CRITICAL):
 - If the search result is about short-term trading, chart patterns, entry/exit signals, or price targets, you MUST reframe it as a long-term holder insight instead
@@ -300,7 +300,25 @@ URL RULES (CRITICAL):
           content: `Search results:\n${searchContent}\n\nCitation URLs (pick one EXACTLY):\n${citationList}`,
         },
       ],
-      response_format: { type: "json_object" },
+      tools: [{
+        type: "function",
+        function: {
+          name: "return_signal",
+          description: "Return a single market signal extracted from search results",
+          parameters: {
+            type: "object",
+            properties: {
+              title: { type: "string", description: "5-12 word headline" },
+              body: { type: "string", description: "2-3 sentences with specific data points" },
+              source: { type: "string", description: "Exact source or analyst name" },
+              url: { type: "string", description: "Citation URL copied character-for-character from the list" },
+            },
+            required: ["title", "body", "source", "url"],
+            additionalProperties: false,
+          },
+        },
+      }],
+      tool_choice: { type: "function", function: { name: "return_signal" } },
       temperature: 0.3,
     };
 
