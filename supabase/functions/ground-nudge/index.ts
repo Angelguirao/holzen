@@ -77,7 +77,7 @@ serve(async (req) => {
     const searchQuery = `Find a specific academic study or research paper about ${randomBias}. The research should be relevant to: ${marketContext}. Include the researcher names, university, year of publication, sample size or key methodology detail, and the main finding. Prefer peer-reviewed journals.`;
 
     const perplexityBody: any = {
-      model: "sonar",
+      model: "sonar-pro",
       messages: [
         {
           role: "system",
