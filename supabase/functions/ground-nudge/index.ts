@@ -53,8 +53,8 @@ async function isUrlReachable(url: string): Promise<boolean> {
   }
 }
 
-/** Fallback chain: cache → curated */
-async function serveFallback(svcClient: any): Promise<any> {
+/** Fallback chain: cache → curated. Returns { data, source } for observability. */
+async function serveFallback(svcClient: any): Promise<{ data: any; source: string }> {
   try {
     const { data } = await svcClient
       .from("companion_cache")
@@ -67,7 +67,7 @@ async function serveFallback(svcClient: any): Promise<any> {
     if (data && data.length > 0) {
       const pick = data[Math.floor(Math.random() * data.length)];
       svcClient.from("companion_cache").update({ used_count: (pick.used_count || 0) + 1 }).eq("id", pick.id).then(() => {});
-      return pick.content;
+      return { data: pick.content, source: "cache" };
     }
     const { data: anyQ } = await svcClient
       .from("companion_cache")
@@ -79,10 +79,10 @@ async function serveFallback(svcClient: any): Promise<any> {
     if (anyQ && anyQ.length > 0) {
       const pick = anyQ[Math.floor(Math.random() * anyQ.length)];
       svcClient.from("companion_cache").update({ used_count: (pick.used_count || 0) + 1 }).eq("id", pick.id).then(() => {});
-      return pick.content;
+      return { data: pick.content, source: "cache" };
     }
   } catch { /* continue to curated */ }
-  return CURATED_FALLBACKS[Math.floor(Math.random() * CURATED_FALLBACKS.length)];
+  return { data: CURATED_FALLBACKS[Math.floor(Math.random() * CURATED_FALLBACKS.length)], source: "curated" };
 }
 
 serve(async (req) => {
@@ -112,10 +112,19 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     const svcClient = createClient(sbUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "", { auth: { persistSession: false } });
 
+    // Observability helper — fire-and-forget
+    const trackObs = (event: string, meta?: Record<string, any>) => {
+      svcClient.from("analytics_events").insert({
+        user_id: user.id, event,
+        metadata: { companion_type: "ground_nudge", latency_ms: Date.now() - t0, ...meta },
+      }).then(() => {});
+    };
+
     if (!PERPLEXITY_API_KEY || !LOVABLE_API_KEY) {
       log("missing API keys, serving fallback");
-      const fallback = await serveFallback(svcClient);
-      return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      const fb = await serveFallback(svcClient);
+      trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
+      return new Response(JSON.stringify(fb.data), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     // Pick a bias category, avoiding recently used ones
@@ -177,13 +186,15 @@ serve(async (req) => {
       log(`content length: ${searchContent.length}, citations: ${citations.length}`);
     } catch (e) {
       log(`perplexity failed: ${e}`);
-      const fallback = await serveFallback(svcClient);
-      return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      const fb = await serveFallback(svcClient);
+      trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
+      return new Response(JSON.stringify(fb.data), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     if (!searchContent) {
-      const fallback = await serveFallback(svcClient);
-      return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      const fb = await serveFallback(svcClient);
+      trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
+      return new Response(JSON.stringify(fb.data), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     // ── Step 2: AI structuring ──
@@ -235,7 +246,6 @@ ACCURACY RULES (CRITICAL):
     const models = ["google/gemini-2.5-flash", "google/gemini-3-flash-preview"];
     let nudge: any = null;
 
-    // Timeout budget: 8s primary + 6s fallback (10s Perplexity + 14s AI = 24s total)
     const AI_TIMEOUTS = [8000, 6000];
     for (let idx = 0; idx < models.length; idx++) {
       const model = models[idx];
@@ -276,8 +286,9 @@ ACCURACY RULES (CRITICAL):
 
     if (!nudge || !nudge.title || !nudge.body) {
       log("AI structuring failed, serving fallback");
-      const fallback = await serveFallback(svcClient);
-      return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      const fb = await serveFallback(svcClient);
+      trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
+      return new Response(JSON.stringify(fb.data), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     // ── Post-processing: URL validation ──
@@ -320,6 +331,7 @@ ACCURACY RULES (CRITICAL):
       })();
     }
 
+    trackObs("companion_live_generated");
     log(`done: ${nudge.title}`);
     return new Response(JSON.stringify(nudge), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
