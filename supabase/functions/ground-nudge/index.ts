@@ -341,7 +341,7 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
       }
     }
 
-    // Cache good content with title-based dedup
+    // Cache good content with rich metadata and title-based dedup
     if (nudge.title && nudge.body && nudge.citation && qualityScore > 0 && passesQualityGate(nudge)) {
       (async () => {
         try {
@@ -353,7 +353,27 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
             return t === newNorm || t.includes(newNorm) || newNorm.includes(t);
           });
           if (!isDup) {
-            await svcClient.from("companion_cache").insert({ companion_type: "ground_nudge", language: "en", content: nudge, quality_score: qualityScore });
+            let sourceHost = "";
+            try { sourceHost = nudge.url ? new URL(nudge.url.startsWith("http") ? nudge.url : `https://${nudge.url}`).hostname.replace(/^www\./, "") : ""; } catch {}
+            const fingerprint = btoa(newNorm).slice(0, 32);
+            await svcClient.from("companion_cache").insert({
+              companion_type: "ground_nudge",
+              language: "en",
+              content: nudge,
+              quality_score: qualityScore,
+              title: nudge.title,
+              title_norm: newNorm,
+              fingerprint,
+              source_kind: "academic_paper",
+              source_title: nudge.citation || null,
+              source_author: nudge.citation?.split("(")[0]?.trim() || null,
+              source_url: nudge.url || null,
+              source_host: sourceHost || null,
+              citations: citations.length > 0 ? JSON.stringify(citations) : null,
+              expires_at: new Date(Date.now() + 14 * 86400000).toISOString(),
+              last_validated_at: qualityScore >= 2 ? new Date().toISOString() : null,
+              automated_score: qualityScore,
+            });
           } else { log("cache dedup: skipped duplicate title"); }
         } catch { /* non-fatal */ }
       })();
