@@ -298,6 +298,8 @@ ACCURACY RULES (CRITICAL):
 - Do NOT invent quotes or misattribute ideas
 - The body distills the philosophical point — no data regurgitation
 
+BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shift, revolutionary, unprecedented, navigate the, in the world of, it's worth noting, at the end of the day, moving forward, leverage, synergy, ecosystem, disruptive, next-gen, cutting-edge
+
 URL RULES (CRITICAL):
 - Pick a url from the citation list below. Copy it character-for-character.
 - If none match, use the FIRST citation URL.
