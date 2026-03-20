@@ -220,7 +220,16 @@ No trading advice, no price predictions, no exclamation marks.`;
                 const parsed = JSON.parse(raw);
                 if (parsed.title && parsed.body) {
                   deepTime = { title: parsed.title, body: parsed.body };
-                  serviceClient.from("companion_cache").insert({ companion_type: "zoom_out_deep_time", language: "en", content: deepTime, quality_score: 2 }).then(() => {});
+                  // Cache with title-based dedup
+                  (async () => {
+                    try {
+                      const { data: existing } = await serviceClient.from("companion_cache").select("content").eq("companion_type", "zoom_out_deep_time").eq("language", "en").limit(30);
+                      const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
+                      const newNorm = norm(parsed.title);
+                      const isDup = existing?.some((e: any) => { const t = norm(e.content?.title || ""); return t === newNorm || t.includes(newNorm) || newNorm.includes(t); });
+                      if (!isDup) await serviceClient.from("companion_cache").insert({ companion_type: "zoom_out_deep_time", language: "en", content: deepTime, quality_score: 2 });
+                    } catch { /* non-fatal */ }
+                  })();
                   break;
                 }
               } catch { if (model !== models[models.length - 1]) continue; }

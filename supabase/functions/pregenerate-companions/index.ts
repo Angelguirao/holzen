@@ -6,14 +6,63 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-/**
- * Pre-generates companion content overnight and populates the companion_cache.
- * Called via cron job. Generates a few pieces for each companion type across languages.
- */
+// ── Title-based dedup helper ──
+// Returns true if a similar title already exists in cache for this companion type
+async function isDuplicate(svcClient: any, companionType: string, newTitle: string): Promise<boolean> {
+  if (!newTitle || newTitle.length < 5) return false;
+  const { data } = await svcClient
+    .from("companion_cache")
+    .select("content")
+    .eq("companion_type", companionType)
+    .eq("language", "en")
+    .limit(50);
+  if (!data || data.length === 0) return false;
+
+  const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
+  const newNorm = normalize(newTitle);
+  const newWords = new Set(newNorm.split(/\s+/).filter(w => w.length > 3));
+
+  for (const entry of data) {
+    const existingTitle = (entry.content as any)?.title;
+    if (!existingTitle) continue;
+    const existNorm = normalize(existingTitle);
+
+    // Exact match
+    if (existNorm === newNorm) return true;
+
+    // Substring containment
+    if (existNorm.includes(newNorm) || newNorm.includes(existNorm)) return true;
+
+    // Word overlap: >60% of significant words match
+    const existWords = new Set(existNorm.split(/\s+/).filter((w: string) => w.length > 3));
+    if (newWords.size === 0 || existWords.size === 0) continue;
+    let overlap = 0;
+    for (const w of newWords) { if (existWords.has(w)) overlap++; }
+    const overlapRatio = overlap / Math.min(newWords.size, existWords.size);
+    if (overlapRatio > 0.6) return true;
+  }
+  return false;
+}
+
+// ── URL validation ──
+async function isUrlReachable(url: string): Promise<boolean> {
+  if (!url || url.length < 10) return false;
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 4000);
+    const res = await fetch(url, { method: "HEAD", redirect: "follow", signal: controller.signal });
+    clearTimeout(timeout);
+    return res.status >= 200 && res.status < 400;
+  } catch { return false; }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
+
+  const t0 = Date.now();
+  const log = (msg: string) => console.log(`[pregenerate] ${msg} (+${Date.now() - t0}ms)`);
 
   try {
     const { createClient } = await import("npm:@supabase/supabase-js@2.57.2");
@@ -26,26 +75,39 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: "Missing API keys" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
-    const lang = "en";
     const results: string[] = [];
 
-    // Check current cache size to avoid over-generating
-    const { count } = await svcClient
+    // ═══════════════════════════════════════════
+    // STEP 1: Cache TTL Enforcement (14 days)
+    // ═══════════════════════════════════════════
+    const fourteenDaysAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
+    const { data: expired, error: expErr } = await svcClient
       .from("companion_cache")
-      .select("id", { count: "exact", head: true });
-
-    if ((count ?? 0) > 100) {
-      // Prune old low-quality entries
-      const oneWeekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
-      await svcClient
-        .from("companion_cache")
-        .delete()
-        .lt("quality_score", 2)
-        .lt("created_at", oneWeekAgo);
-      results.push("Pruned old low-quality entries");
+      .delete()
+      .lt("created_at", fourteenDaysAgo)
+      .select("id");
+    if (expErr) {
+      log(`TTL cleanup error: ${expErr.message}`);
+    } else {
+      const count = expired?.length ?? 0;
+      if (count > 0) results.push(`TTL: removed ${count} entries older than 14 days`);
     }
 
-    // Generate 2 ground nudges
+    // Also prune low-quality entries older than 3 days
+    const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
+    const { data: pruned } = await svcClient
+      .from("companion_cache")
+      .delete()
+      .lt("quality_score", 2)
+      .lt("created_at", threeDaysAgo)
+      .select("id");
+    if (pruned && pruned.length > 0) results.push(`Pruned ${pruned.length} low-quality entries`);
+
+    log(`Cache cleanup done`);
+
+    // ═══════════════════════════════════════════
+    // STEP 2: Generate Grounding (2 entries)
+    // ═══════════════════════════════════════════
     const BIAS_TOPICS = [
       "loss aversion and panic selling during market drops",
       "FOMO and herding behavior during market rallies",
@@ -55,9 +117,10 @@ serve(async (req) => {
       "recency bias in market predictions",
       "overconfidence bias in trading decisions",
       "social proof and information cascading in crypto",
+      "endowment effect in portfolio management",
+      "sunk cost fallacy in declining markets",
     ];
 
-    // Generate 2 ground nudges
     for (let i = 0; i < 2; i++) {
       const topic = BIAS_TOPICS[Math.floor(Math.random() * BIAS_TOPICS.length)];
       try {
@@ -86,7 +149,7 @@ serve(async (req) => {
               body: JSON.stringify({
                 model: "google/gemini-2.5-flash",
                 messages: [
-                  { role: "system", content: "Extract ONE grounding nudge from the search results. Tone: calm, grounding, no advice." },
+                  { role: "system", content: "Extract ONE grounding nudge from the search results. Tone: calm, grounding, no advice. Title: evocative, 5-10 words. Body: 2-3 sentences with specific findings." },
                   { role: "user", content: `Search results:\n${searchContent}\n\nCitations:\n${citations.map((c: string, j: number) => `[${j + 1}] ${c}`).join("\n")}` },
                 ],
                 tools: [{
@@ -118,20 +181,23 @@ serve(async (req) => {
               const content = toolCall?.function?.arguments || aiData.choices?.[0]?.message?.content;
               if (content) {
                 const nudge = typeof content === "string" ? JSON.parse(content) : content;
-                let qualityScore = 1;
-                if (nudge.url && citations.includes(nudge.url)) {
-                  try {
-                    const headRes = await fetch(nudge.url, { method: "HEAD", redirect: "follow" });
-                    if (headRes.status >= 200 && headRes.status < 400) qualityScore = 2;
-                  } catch { /* */ }
+
+                // Dedup check
+                if (await isDuplicate(svcClient, "ground_nudge", nudge.title)) {
+                  results.push(`ground_nudge: SKIPPED duplicate "${nudge.title}"`);
+                } else {
+                  let qualityScore = 1;
+                  if (nudge.url) {
+                    if (await isUrlReachable(nudge.url)) qualityScore = 2;
+                  }
+                  await svcClient.from("companion_cache").insert({
+                    companion_type: "ground_nudge",
+                    language: "en",
+                    content: nudge,
+                    quality_score: qualityScore,
+                  });
+                  results.push(`ground_nudge: ${nudge.title} (q=${qualityScore})`);
                 }
-                await svcClient.from("companion_cache").insert({
-                  companion_type: "ground_nudge",
-                  language: lang,
-                  content: nudge,
-                  quality_score: qualityScore,
-                });
-                results.push(`ground_nudge: ${nudge.title}`);
               }
             }
           }
@@ -139,19 +205,21 @@ serve(async (req) => {
       } catch (e) {
         results.push(`ground_nudge error: ${e}`);
       }
-      await new Promise(r => setTimeout(r, 3000));
+      await new Promise(r => setTimeout(r, 2000));
     }
 
-    // Generate 1 philosophical signal
+    // ═══════════════════════════════════════════
+    // STEP 3: Generate Philosophy/Signal (1 entry)
+    // ═══════════════════════════════════════════
     const SIGNAL_TOPICS = [
       "Bitcoin as sound money and its philosophical implications for human freedom",
       "Time preference and proof of work as a life philosophy",
       "Self-sovereignty and the meaning of financial independence through Bitcoin",
       "The philosophical case for patience and conviction in Bitcoin holding",
       "Bitcoin and Austrian economics: what sound money teaches about civilization",
-      "The game theory of Bitcoin adoption and why holders matter",
       "Proof of work as sacrifice: the deeper meaning behind Bitcoin mining",
       "Bitcoin as a tool for individual sovereignty against institutional trust",
+      "The separation of money and state as a civilizational shift",
     ];
     const signalTopic = SIGNAL_TOPICS[Math.floor(Math.random() * SIGNAL_TOPICS.length)];
 
@@ -181,7 +249,7 @@ serve(async (req) => {
             body: JSON.stringify({
               model: "google/gemini-2.5-flash",
               messages: [
-                { role: "system", content: "Extract ONE philosophical Bitcoin insight from the search results. Tone: profound, calm, grounding. Not data-driven — idea-driven. The title should be evocative (5-10 words). The body should be 2-3 sentences capturing the philosophical essence." },
+                { role: "system", content: "Extract ONE philosophical Bitcoin insight. Tone: profound, calm, grounding. Not data-driven — idea-driven. Title: evocative, 5-10 words. Body: 2-3 sentences. No numbers, percentages, or price mentions." },
                 { role: "user", content: `Search results:\n${searchContent}\n\nCitations:\n${citations.map((c: string, i: number) => `[${i + 1}] ${c}`).join("\n")}` },
               ],
               tools: [{
@@ -213,20 +281,20 @@ serve(async (req) => {
             const content = toolCall?.function?.arguments || aiData.choices?.[0]?.message?.content;
             if (content) {
               const signal = typeof content === "string" ? JSON.parse(content) : content;
-              let qualityScore = 1;
-              if (signal.url && citations.includes(signal.url)) {
-                try {
-                  const headRes = await fetch(signal.url, { method: "HEAD", redirect: "follow" });
-                  if (headRes.status >= 200 && headRes.status < 400) qualityScore = 2;
-                } catch { /* */ }
+
+              if (await isDuplicate(svcClient, "signal", signal.title)) {
+                results.push(`signal: SKIPPED duplicate "${signal.title}"`);
+              } else {
+                let qualityScore = 1;
+                if (signal.url && await isUrlReachable(signal.url)) qualityScore = 2;
+                await svcClient.from("companion_cache").insert({
+                  companion_type: "signal",
+                  language: "en",
+                  content: signal,
+                  quality_score: qualityScore,
+                });
+                results.push(`signal: ${signal.title} (q=${qualityScore})`);
               }
-              await svcClient.from("companion_cache").insert({
-                companion_type: "signal",
-                language: lang,
-                content: signal,
-                quality_score: qualityScore,
-              });
-              results.push(`signal: ${signal.title}`);
             }
           }
         }
@@ -235,7 +303,148 @@ serve(async (req) => {
       results.push(`signal error: ${e}`);
     }
 
-    // Also process feedback: upgrade/downgrade quality based on analytics
+    await new Promise(r => setTimeout(r, 2000));
+
+    // ═══════════════════════════════════════════
+    // STEP 4: Generate History (1 entry) — NEW
+    // ═══════════════════════════════════════════
+    const HISTORICAL_ERAS = [
+      "1637 Dutch Tulip Mania and speculative bubbles",
+      "1929 Wall Street Crash and its aftermath",
+      "1970s gold price volatility after Nixon shock",
+      "1987 Black Monday stock market crash",
+      "1997 Asian financial crisis and currency collapses",
+      "2000 dot-com bubble burst and tech stock crash",
+      "2008 global financial crisis and bank failures",
+      "2013 gold price crash of 26% in three days",
+      "2015 Swiss franc shock and currency market chaos",
+      "2020 COVID crash and rapid market recovery",
+    ];
+    const historyEra = HISTORICAL_ERAS[Math.floor(Math.random() * HISTORICAL_ERAS.length)];
+
+    try {
+      const histSearchRes = await fetch("https://api.perplexity.ai/chat/completions", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${PERPLEXITY_API_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "sonar-pro",
+          messages: [
+            { role: "system", content: "Find a detailed historical account of this financial event. Include specific dates, percentage changes, key figures involved, and the long-term outcome. Focus on the emotional experience of investors during the crisis." },
+            { role: "user", content: `Tell me about ${historyEra} — what happened, how investors felt, and what the outcome was years later.` },
+          ],
+        }),
+      });
+
+      if (histSearchRes.ok) {
+        const histData = await histSearchRes.json();
+        const searchContent = histData.choices?.[0]?.message?.content || "";
+        const citations: string[] = histData.citations || [];
+
+        if (searchContent) {
+          const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+            method: "POST",
+            headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+            body: JSON.stringify({
+              model: "google/gemini-2.5-flash",
+              messages: [
+                { role: "system", content: `You are a financial historian. Extract ONE historical parallel from the search results. The title should be evocative (e.g., "When gold crashed 26% in 2013"). btcInsight: 2-3 sentences about what happened with specific dates and numbers. analogy: 1-2 sentences connecting it to Bitcoin holding. Include assetClass, period, source name.` },
+                { role: "user", content: `Search results:\n${searchContent}\n\nCitations:\n${citations.map((c: string, i: number) => `[${i + 1}] ${c}`).join("\n")}` },
+              ],
+              response_format: { type: "json_object" },
+              temperature: 0.4,
+            }),
+          });
+
+          if (aiRes.ok) {
+            const aiData = await aiRes.json();
+            const raw = aiData.choices?.[0]?.message?.content;
+            if (raw) {
+              const insight = JSON.parse(raw);
+              if (insight.title && insight.btcInsight) {
+                // Pin URL to first citation if available
+                if (!insight.url && citations.length > 0) insight.url = citations[0];
+
+                if (await isDuplicate(svcClient, "historical_insight", insight.title)) {
+                  results.push(`history: SKIPPED duplicate "${insight.title}"`);
+                } else {
+                  let qualityScore = 1;
+                  if (insight.url && await isUrlReachable(insight.url)) qualityScore = 2;
+                  await svcClient.from("companion_cache").insert({
+                    companion_type: "historical_insight",
+                    language: "en",
+                    content: insight,
+                    quality_score: qualityScore,
+                  });
+                  results.push(`history: ${insight.title} (q=${qualityScore})`);
+                }
+              }
+            }
+          }
+        }
+      }
+    } catch (e) {
+      results.push(`history error: ${e}`);
+    }
+
+    await new Promise(r => setTimeout(r, 2000));
+
+    // ═══════════════════════════════════════════
+    // STEP 5: Generate Zoom Out deep-time (1 entry) — NEW
+    // ═══════════════════════════════════════════
+    const ZOOM_OUT_THEMES = [
+      "Compare Bitcoin's 15-year existence to the 5,000-year history of money",
+      "Place today's market volatility against the geological timescale of Earth",
+      "Compare Bitcoin adoption speed to the spread of the printing press, electricity, and internet",
+      "Bitcoin's energy use in context of the sun's output and civilizational energy growth",
+      "The patience of cathedral builders: multi-generational projects and monetary systems",
+      "The Long Now Foundation perspective: thinking in 10,000-year timescales about money",
+      "Compare Bitcoin's price history to gold's millennia-long journey to monetary status",
+      "Civilizational time preference: what societies that save in hard money build vs. those that don't",
+    ];
+    const zoomTheme = ZOOM_OUT_THEMES[Math.floor(Math.random() * ZOOM_OUT_THEMES.length)];
+
+    try {
+      const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash",
+          messages: [
+            { role: "system", content: `You provide deep-time civilizational perspective on Bitcoin. Frame everything against thousands or millions of years. Tone: calm, vast, philosophical. No market data, no price predictions, no trading advice. Return JSON with "title" (evocative, 5-8 words) and "body" (2-3 sentences).` },
+            { role: "user", content: zoomTheme },
+          ],
+          response_format: { type: "json_object" },
+          temperature: 0.6,
+        }),
+      });
+
+      if (aiRes.ok) {
+        const aiData = await aiRes.json();
+        const raw = aiData.choices?.[0]?.message?.content;
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed.title && parsed.body) {
+            if (await isDuplicate(svcClient, "zoom_out_deep_time", parsed.title)) {
+              results.push(`zoom_out: SKIPPED duplicate "${parsed.title}"`);
+            } else {
+              await svcClient.from("companion_cache").insert({
+                companion_type: "zoom_out_deep_time",
+                language: "en",
+                content: { title: parsed.title, body: parsed.body },
+                quality_score: 2,
+              });
+              results.push(`zoom_out: ${parsed.title}`);
+            }
+          }
+        }
+      }
+    } catch (e) {
+      results.push(`zoom_out error: ${e}`);
+    }
+
+    // ═══════════════════════════════════════════
+    // STEP 6: Process feedback (same as before)
+    // ═══════════════════════════════════════════
     try {
       const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
       const { data: feedback } = await svcClient
@@ -274,6 +483,7 @@ serve(async (req) => {
       results.push(`Feedback processing error: ${e}`);
     }
 
+    log(`All done. Results: ${results.length} items`);
     return new Response(JSON.stringify({ success: true, results }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

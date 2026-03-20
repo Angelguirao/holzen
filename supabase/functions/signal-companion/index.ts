@@ -428,14 +428,22 @@ URL RULES (CRITICAL):
       // Still return it but don't cache low-quality
     }
 
-    // Cache good content
+    // Cache good content with title-based dedup
     if (signal.title && signal.body && signal.source && qualityScore > 0) {
-      svcClient.from("companion_cache").insert({
-        companion_type: "signal",
-        language: "en",
-        content: signal,
-        quality_score: qualityScore,
-      }).then(() => {});
+      (async () => {
+        try {
+          const { data: existing } = await svcClient.from("companion_cache").select("content").eq("companion_type", "signal").eq("language", "en").limit(30);
+          const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
+          const newNorm = norm(signal.title);
+          const isDup = existing?.some((e: any) => {
+            const t = norm(e.content?.title || "");
+            return t === newNorm || t.includes(newNorm) || newNorm.includes(t);
+          });
+          if (!isDup) {
+            await svcClient.from("companion_cache").insert({ companion_type: "signal", language: "en", content: signal, quality_score: qualityScore });
+          } else { log("cache dedup: skipped duplicate title"); }
+        } catch { /* non-fatal */ }
+      })();
     }
 
     log(`done, signal: ${signal.title}, source: ${signal.source}`);
