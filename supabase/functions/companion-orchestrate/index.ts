@@ -232,6 +232,26 @@ const companionTypeMap: Record<string, string> = {
   zoomOut: "zoom_out",
 };
 
+// ── Orchestrator-level curated fallbacks (last resort if sub-function fails entirely) ──
+const ORCHESTRATOR_CURATED: Record<string, any[]> = {
+  signal: [
+    { title: "Proof of work is proof of sacrifice", body: "Gigi argues that Bitcoin's proof-of-work mechanism mirrors a universal truth: nothing of value comes without cost. The energy expended isn't wasted — it's transformed into trust.", source: "Gigi — 21 Lessons", url: "https://21lessons.com/" },
+    { title: "Sound money teaches patience before it teaches wealth", body: "Saifedean Ammous observes that the hardest lesson Bitcoin teaches isn't about returns — it's about time preference. A society that saves in hard money naturally extends its planning horizon.", source: "Saifedean Ammous — The Bitcoin Standard", url: "https://saifedean.com/thebitcoinstandard/" },
+  ],
+  grounding: [
+    { title: "Loss aversion doubles the sting of dropping prices", body: "Kahneman and Tversky's 1979 prospect theory study showed that losses feel roughly twice as painful as equivalent gains feel good. When BTC drops 5%, your brain processes it as if you lost 10%.", citation: "Kahneman & Tversky (1979), Prospect Theory", url: "https://scholar.google.com/scholar?q=kahneman+tversky+prospect+theory+1979" },
+    { title: "Your prefrontal cortex goes offline during financial stress", body: "Lo and Repin's 2002 study found that market volatility triggers measurable autonomic nervous system responses that impair the prefrontal cortex's capacity for rational decision-making.", citation: "Lo & Repin (2002), The Psychophysiology of Real-Time Financial Risk Processing", url: "https://scholar.google.com/scholar?q=lo+repin+psychophysiology+financial+risk+2002" },
+  ],
+  history: [
+    { title: "Amazon lost 95% and became the everything store", btcInsight: "From its 1999 peak of $106.69, Amazon crashed to $5.51 by 2001 — a 95% drawdown. Anyone who sold at $5.51 missed a stock that would eventually reach $3,000+.", analogy: "Bitcoin has experienced five drawdowns of 70%+ in its history. Each time, the 'it's dead' narrative peaked at the bottom.", assetClass: "Tech stocks", period: "2000-2001" },
+    { title: "The 2020 COVID crash recovered in 40 days", btcInsight: "On March 12, 2020, Bitcoin fell from $7,900 to $3,800 in 24 hours. Yet within 40 days, BTC had recovered to pre-crash levels.", analogy: "The S&P 500 followed a similar pattern, crashing 34% and fully recovering by August 2020.", assetClass: "S&P 500", period: "March 2020" },
+  ],
+  zoomOut: [
+    { deepTime: { title: "Fifteen years in five thousand", body: "Humans have used money for roughly 5,000 years — shells, salt, gold, paper, digits. Bitcoin is 15 years old. You're watching the first chapter of a new monetary epoch." }, onThisDay: [], currentPrice: null, echo: null },
+    { deepTime: { title: "Gold took centuries to become gold", body: "For thousands of years, humans carried gold without knowing why it was valuable beyond its beauty. It took until 1717 for Isaac Newton to formally establish the gold standard." }, onThisDay: [], currentPrice: null, echo: null },
+  ],
+};
+
 async function callCompanion(
   functionName: string,
   body: any,
