@@ -453,10 +453,7 @@ URL RULES (CRITICAL):
       }
     }
 
-    // Quality gate already passed via passesQualityGate above
-    let qualityScore = 1;
-
-    // Cache good content with title-based dedup
+    // Cache good content with rich metadata and title-based dedup
     if (signal.title && signal.body && signal.source && qualityScore > 0) {
       (async () => {
         try {
@@ -468,7 +465,27 @@ URL RULES (CRITICAL):
             return t === newNorm || t.includes(newNorm) || newNorm.includes(t);
           });
           if (!isDup) {
-            await svcClient.from("companion_cache").insert({ companion_type: "signal", language: "en", content: signal, quality_score: qualityScore });
+            let sourceHost = "";
+            try { sourceHost = signal.url ? new URL(signal.url.startsWith("http") ? signal.url : `https://${signal.url}`).hostname.replace(/^www\./, "") : ""; } catch {}
+            const fingerprint = btoa(newNorm).slice(0, 32);
+            await svcClient.from("companion_cache").insert({
+              companion_type: "signal",
+              language: "en",
+              content: signal,
+              quality_score: qualityScore,
+              title: signal.title,
+              title_norm: newNorm,
+              fingerprint,
+              source_kind: "essay",
+              source_title: signal.source || null,
+              source_author: signal.source || null,
+              source_url: signal.url || null,
+              source_host: sourceHost || null,
+              citations: citations.length > 0 ? JSON.stringify(citations) : null,
+              expires_at: new Date(Date.now() + 14 * 86400000).toISOString(),
+              last_validated_at: qualityScore >= 2 ? new Date().toISOString() : null,
+              automated_score: qualityScore,
+            });
           } else { log("cache dedup: skipped duplicate title"); }
         } catch { /* non-fatal */ }
       })();

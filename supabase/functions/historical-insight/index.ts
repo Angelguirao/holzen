@@ -346,7 +346,9 @@ BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? 
       }
     }
 
-    // Cache good content with title-based dedup
+    // Cache good content with rich metadata and title-based dedup
+    const urlReachable = insight.url && insight.url.startsWith("http");
+    const histQuality = urlReachable ? 2 : 1;
     if (insight.title && insight.btcInsight && passesQualityGate(insight)) {
       (async () => {
         try {
@@ -358,7 +360,28 @@ BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? 
             return t === newNorm || t.includes(newNorm) || newNorm.includes(t);
           });
           if (!isDup) {
-            await svcClient.from("companion_cache").insert({ companion_type: "historical_insight", language: "en", content: insight, quality_score: 2 });
+            let sourceHost = "";
+            try { sourceHost = insight.url ? new URL(insight.url.startsWith("http") ? insight.url : `https://${insight.url}`).hostname.replace(/^www\./, "") : ""; } catch {}
+            const fingerprint = btoa(newNorm).slice(0, 32);
+            await svcClient.from("companion_cache").insert({
+              companion_type: "historical_insight",
+              language: "en",
+              content: insight,
+              quality_score: histQuality,
+              title: insight.title,
+              title_norm: newNorm,
+              fingerprint,
+              source_kind: "historical_event",
+              source_title: insight.source || null,
+              source_author: null,
+              source_url: insight.url || null,
+              source_host: sourceHost || null,
+              citations: citations.length > 0 ? JSON.stringify(citations) : null,
+              market_regime: insight.assetClass || null,
+              expires_at: new Date(Date.now() + 14 * 86400000).toISOString(),
+              last_validated_at: histQuality >= 2 ? new Date().toISOString() : null,
+              automated_score: histQuality,
+            });
           }
         } catch { /* non-fatal */ }
       })();
