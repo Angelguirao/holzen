@@ -44,7 +44,7 @@ serve(async (req) => {
     svcClient.from("analytics_events").insert({ user_id: user.id, event: "signal_companion_ai_call" }).then(() => {});
 
     const trackObs = createObsTracker(svcClient, user.id, "signal", t0);
-    const logAttempt = createAttemptLogger(svcClient);
+    const logAttempt = createAttemptLogger(svcClient, { userId: user.id });
 
     const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");

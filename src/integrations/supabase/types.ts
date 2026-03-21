@@ -447,7 +447,9 @@ export type Database = {
           output_tokens: number | null
           provider: string
           quality_gate_reason: string | null
+          reflection_id: string | null
           status: string
+          user_id: string | null
         }
         Insert: {
           attempt_order?: number
@@ -462,7 +464,9 @@ export type Database = {
           output_tokens?: number | null
           provider: string
           quality_gate_reason?: string | null
+          reflection_id?: string | null
           status: string
+          user_id?: string | null
         }
         Update: {
           attempt_order?: number
@@ -477,7 +481,9 @@ export type Database = {
           output_tokens?: number | null
           provider?: string
           quality_gate_reason?: string | null
+          reflection_id?: string | null
           status?: string
+          user_id?: string | null
         }
         Relationships: []
       }

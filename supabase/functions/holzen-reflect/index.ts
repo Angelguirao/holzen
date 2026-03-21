@@ -78,7 +78,7 @@ serve(async (req) => {
     try { await svcClient.from("analytics_events").insert({ user_id: userId, event: "pause_ai_call" }); } catch (_) { /* tracking failure is non-fatal */ }
 
     const trackObs = createObsTracker(svcClient, userId, "reflection", t0);
-    const logAttempt = createAttemptLogger(svcClient);
+    const logAttempt = createAttemptLogger(svcClient, { userId });
 
     const { context, tone, customPrompt, style, moodHistory, severity, motivations, mantra, groundingActivities, currency, language, recentHaikus, recentMessages } = await req.json();
     if (!context) {
