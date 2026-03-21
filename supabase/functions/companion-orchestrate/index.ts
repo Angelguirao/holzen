@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { checkRateLimit, checkDailyBudget } from "../_shared/ratelimit.ts";
 import { createLogger } from "../_shared/observe.ts";
+import { writeCompanionData } from "../_shared/companion-data.ts";
 import { generateSignal } from "../_shared/generators/signal.ts";
 import { generateGrounding } from "../_shared/generators/grounding.ts";
 import { generateHistory } from "../_shared/generators/history.ts";
@@ -163,7 +164,7 @@ serve(async (req) => {
     };
 
     const serveInserts: any[] = [];
-    const reflectionUpdates: Record<string, any> = {};
+    const writePromises: Promise<void>[] = [];
 
     for (let i = 0; i < keys.length; i++) {
       const key = keys[i] as keyof OrchestrateResponse;
@@ -183,9 +184,14 @@ serve(async (req) => {
           latency_ms: result.value.latencyMs,
         });
 
+        // Write companion data to both new join table and old denormalized columns
         if (result.value.data && reflectionId) {
-          const updates = buildReflectionUpdate(key, result.value.data);
-          Object.assign(reflectionUpdates, updates);
+          const cType = companionTypeMap[key];
+          if (cType) {
+            writePromises.push(
+              writeCompanionData(svcClient, reflectionId, cType, result.value.data)
+            );
+          }
         }
       } else {
         // Generator threw — surface as empty with error
@@ -209,30 +215,20 @@ serve(async (req) => {
       }
     }
 
-    // Await critical writes before returning response
-    const writePromises: Promise<void>[] = [];
-
+    // Add serve log writes
     if (serveInserts.length > 0) {
       writePromises.push(
-        svcClient.from("companion_serves").insert(serveInserts).then(({ error }) => {
+        svcClient.from("companion_serves").insert(serveInserts).then(({ error }: any) => {
           if (error) log.error("serve insert error", { error: error.message });
         })
       );
     }
 
-    if (reflectionId && Object.keys(reflectionUpdates).length > 0) {
-      writePromises.push(
-        svcClient.from("reflections").update(reflectionUpdates).eq("id", reflectionId).then(({ error }) => {
-          if (error) log.error("reflection update error", { error: error.message });
-        })
-      );
-    }
-
-    // Wait for all writes to complete (with a safety timeout to avoid blocking forever)
+    // Await all critical writes before returning (with safety timeout)
     if (writePromises.length > 0) {
       await Promise.race([
         Promise.allSettled(writePromises),
-        new Promise(resolve => setTimeout(resolve, 3000)),
+        new Promise(resolve => setTimeout(resolve, 5000)), // 5s for companion data + serve logs
       ]);
     }
 
@@ -255,31 +251,5 @@ serve(async (req) => {
 import { ORCHESTRATOR_KEY_MAP } from "../_shared/companion-types.ts";
 const companionTypeMap = ORCHESTRATOR_KEY_MAP;
 
-function buildReflectionUpdate(key: string, data: any): Record<string, any> {
-  switch (key) {
-    case "signal":
-      return {
-        signal_title: data.title || null,
-        signal_body: data.body || null,
-        signal_source: data.source || null,
-        signal_url: data.url || null,
-      };
-    case "grounding":
-      return {
-        learning_title: data.title || null,
-        learning_body: data.body || null,
-        learning_citation: data.citation || null,
-        learning_url: data.url || null,
-      };
-    case "history":
-      return {
-        history_insight_data: data,
-      };
-    case "zoomOut":
-      return {
-        zoom_out_data: data,
-      };
-    default:
-      return {};
-  }
-}
+// buildReflectionUpdate removed — replaced by writeCompanionData() from companion-data.ts
+// which dual-writes to both the new reflection_companions table and old denormalized columns.
