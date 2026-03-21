@@ -142,6 +142,9 @@ WHAT TO AVOID:
 - Price predictions, chart analysis, trading setups
 - On-chain metrics, hash rate stats, exchange flows
 - Short-term market commentary or news
+- Generic "crypto" or "blockchain" content — this is BITCOIN ONLY
+- Altcoins, Ethereum, DeFi, NFTs, tokens, Web3 — NEVER mention these
+- "Crypto market" framing — always say "Bitcoin", never "crypto"
 
 IDEAL SOURCES: Bitcoin Magazine, Nakamoto Institute, Allen Farrington, Vijay Boyapati, Lyn Alden, Parker Lewis, Gigi, Robert Breedlove, Saifedean Ammous, Jeff Booth, Knut Svanholm
 
@@ -210,6 +213,11 @@ ACCURACY RULES (CRITICAL):
 - Attribute ideas to the correct thinker from the search results
 - Do NOT invent quotes or misattribute ideas
 - The body distills the philosophical point — no data regurgitation
+
+BITCOIN ONLY — CRITICAL:
+- This is about BITCOIN, not "crypto" or "blockchain" in general
+- NEVER use the words: crypto, cryptocurrency, altcoin, token, blockchain technology, Web3, DeFi
+- Always say "Bitcoin" — never generalize to "crypto market" or "digital assets"
 
 BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shift, revolutionary, unprecedented, navigate the, in the world of, it's worth noting, at the end of the day, moving forward, leverage, synergy, ecosystem, disruptive, next-gen, cutting-edge
 

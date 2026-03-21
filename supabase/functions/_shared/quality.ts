@@ -21,6 +21,23 @@ export function containsSlop(text: string): boolean {
   return BANNED_PHRASES.some(p => lower.includes(p));
 }
 
+// ── Banned crypto-generic language ──
+// This app is Bitcoin-only. Content should never use generic crypto framing.
+const BANNED_CRYPTO_TERMS = [
+  "crypto market", "cryptocurrency market", "crypto space", "crypto industry",
+  "crypto investor", "crypto trading", "digital asset class",
+  "altcoin", "altcoins", "ethereum", "eth ", "solana", "cardano",
+  "defi", "nft", "nfts", "web3", "token", "tokens",
+  "blockchain technology", "blockchain industry",
+];
+
+/** Check if text uses generic crypto language instead of Bitcoin-specific language */
+export function containsCryptoLanguage(text: string): boolean {
+  if (!text) return false;
+  const lower = text.toLowerCase();
+  return BANNED_CRYPTO_TERMS.some(term => lower.includes(term));
+}
+
 // ── Per-companion-type quality gate configurations ──
 
 interface QualityConfig {
@@ -119,6 +136,10 @@ export function qualityGate(
   if (config.noMarketData && /\d{2,}%|\$\d/.test(body)) {
     return { pass: false, reason: "body_contains_market_data" };
   }
+
+  // Bitcoin-only check — reject generic crypto language
+  if (containsCryptoLanguage(body)) return { pass: false, reason: "body_contains_crypto_language" };
+  if (containsCryptoLanguage(title)) return { pass: false, reason: "title_contains_crypto_language" };
 
   return { pass: true };
 }

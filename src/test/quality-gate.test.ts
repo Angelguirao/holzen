@@ -9,6 +9,7 @@ import { describe, it, expect } from 'vitest';
 // Import directly from the shared module (no Deno deps in these functions)
 import {
   containsSlop,
+  containsCryptoLanguage,
   qualityGate,
   isValidUrl,
   normalizeUrl,
@@ -40,6 +41,29 @@ describe('containsSlop', () => {
   it('handles null/undefined gracefully', () => {
     expect(containsSlop(null as any)).toBe(false);
     expect(containsSlop(undefined as any)).toBe(false);
+  });
+});
+
+describe('containsCryptoLanguage', () => {
+  it('detects generic crypto terms', () => {
+    expect(containsCryptoLanguage('The crypto market is volatile')).toBe(true);
+    expect(containsCryptoLanguage('As a crypto investor, you should hold')).toBe(true);
+    expect(containsCryptoLanguage('DeFi and NFTs are changing finance')).toBe(true);
+    expect(containsCryptoLanguage('Ethereum also experienced a crash')).toBe(true);
+    expect(containsCryptoLanguage('Web3 technology is evolving')).toBe(true);
+    expect(containsCryptoLanguage('Many altcoins lost 95%')).toBe(true);
+  });
+
+  it('allows Bitcoin-specific language', () => {
+    expect(containsCryptoLanguage('Bitcoin teaches patience through proof of work')).toBe(false);
+    expect(containsCryptoLanguage('BTC dropped 5% today')).toBe(false);
+    expect(containsCryptoLanguage('The Bitcoin network processes transactions')).toBe(false);
+    expect(containsCryptoLanguage('Sound money and Austrian economics')).toBe(false);
+  });
+
+  it('handles null/undefined', () => {
+    expect(containsCryptoLanguage(null as any)).toBe(false);
+    expect(containsCryptoLanguage(undefined as any)).toBe(false);
   });
 });
 
@@ -110,6 +134,15 @@ describe('qualityGate - signal', () => {
     });
     expect(result.pass).toBe(false);
     expect(result.reason).toBe('body_contains_market_data');
+  });
+
+  it('rejects body with generic crypto language', () => {
+    const result = qualityGate('signal', {
+      ...validSignal,
+      body: 'The crypto market has shown that Bitcoin and other digital assets require patience. The cryptocurrency industry continues to evolve and mature over time.',
+    });
+    expect(result.pass).toBe(false);
+    expect(result.reason).toBe('body_contains_crypto_language');
   });
 
   it('rejects title with too many words', () => {

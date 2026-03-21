@@ -86,7 +86,7 @@ export const GROUNDING_FALLBACKS = [
   },
   {
     title: "Social proof cascades: when everyone sells, your brain wants to follow",
-    body: "Bikhchandani, Hirshleifer, and Welch's 1992 research on information cascades showed that rational individuals can make irrational collective decisions by mimicking others. In crypto markets, this amplifies both panic selling and FOMO buying beyond any fundamental justification.",
+    body: "Bikhchandani, Hirshleifer, and Welch's 1992 research on information cascades showed that rational individuals can make irrational collective decisions by mimicking others. In Bitcoin markets, this amplifies both panic selling and FOMO buying beyond any fundamental justification.",
     citation: "Bikhchandani, Hirshleifer & Welch (1992), A Theory of Fads, Fashion, Custom, and Cultural Change as Informational Cascades",
     url: "https://scholar.google.com/scholar?q=bikhchandani+hirshleifer+welch+informational+cascades+1992",
   },
@@ -174,7 +174,7 @@ export const HISTORY_FALLBACKS = [
   },
   {
     title: "Bitcoin's 2018 winter lasted 12 months",
-    btcInsight: "After reaching $19,783 in December 2017, Bitcoin entered a 12-month bear market that bottomed at $3,122 in December 2018 — an 84% drawdown. Most altcoins lost 95%+. The narrative shifted entirely from 'new paradigm' to 'dead technology.'",
+    btcInsight: "After reaching $19,783 in December 2017, Bitcoin entered a 12-month bear market that bottomed at $3,122 in December 2018 — an 84% drawdown. The narrative shifted entirely from 'new paradigm' to 'dead technology.' Yet Bitcoin survived and went on to set new all-time highs.",
     analogy: "The dot-com bust of 2000 saw the NASDAQ lose 78% over 30 months. Both events cleared speculative excess while the underlying technology continued developing.",
     assetClass: "NASDAQ",
     period: "December 2017 – December 2018",
