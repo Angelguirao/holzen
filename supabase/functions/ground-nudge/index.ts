@@ -1,172 +1,57 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
-
-// ── CURATED FALLBACKS ──
-const CURATED_FALLBACKS = [
-  {
-    title: "Loss aversion doubles the sting of dropping prices",
-    body: "Kahneman and Tversky's 1979 prospect theory study showed that losses feel roughly twice as painful as equivalent gains feel good. When BTC drops 5%, your brain processes it as if you lost 10%. This asymmetry is hardwired — recognizing it is the first step to not acting on it.",
-    citation: "Kahneman & Tversky (1979), Prospect Theory: An Analysis of Decision under Risk",
-    url: "https://scholar.google.com/scholar?q=kahneman+tversky+prospect+theory+1979",
-  },
-  {
-    title: "The disposition effect: why we sell winners and hold losers",
-    body: "Shefrin and Statman's 1985 study found that investors are 50% more likely to sell a winning position than a losing one. We lock in gains too early out of fear, and hold losses too long out of hope. The pattern repeats across every asset class — including Bitcoin.",
-    citation: "Shefrin & Statman (1985), The Disposition to Sell Winners Too Early and Ride Losers Too Long",
-    url: "https://scholar.google.com/scholar?q=shefrin+statman+disposition+effect+1985",
-  },
-  {
-    title: "Social proof cascades: when everyone sells, your brain wants to follow",
-    body: "Bikhchandani, Hirshleifer, and Welch's 1992 research on information cascades showed that rational individuals can make irrational collective decisions by mimicking others. In crypto markets, this amplifies both panic selling and FOMO buying beyond any fundamental justification.",
-    citation: "Bikhchandani, Hirshleifer & Welch (1992), A Theory of Fads, Fashion, Custom, and Cultural Change as Informational Cascades",
-    url: "https://scholar.google.com/scholar?q=bikhchandani+hirshleifer+welch+informational+cascades+1992",
-  },
-  {
-    title: "Your prefrontal cortex goes offline during financial stress",
-    body: "Lo and Repin's 2002 study using real-time physiological monitoring of traders found that market volatility triggers measurable autonomic nervous system responses — elevated heart rate, skin conductance changes — that impair the prefrontal cortex's capacity for rational decision-making.",
-    citation: "Lo & Repin (2002), The Psychophysiology of Real-Time Financial Risk Processing",
-    url: "https://scholar.google.com/scholar?q=lo+repin+psychophysiology+financial+risk+2002",
-  },
-  {
-    title: "Recency bias: your brain over-weights the last 48 hours",
-    body: "Tversky and Kahneman's availability heuristic research demonstrated that people judge probability based on how easily examples come to mind. A sharp BTC drop yesterday looms larger than years of steady gains. Your memory is not a balanced ledger — it's a highlight reel biased toward the recent.",
-    citation: "Tversky & Kahneman (1973), Availability: A Heuristic for Judging Frequency and Probability",
-    url: "https://scholar.google.com/scholar?q=tversky+kahneman+availability+heuristic+1973",
-  },
-];
-
-async function isUrlReachable(url: string): Promise<boolean> {
-  if (!url || url.length < 10) return false;
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 4000);
-    const res = await fetch(url, { method: "HEAD", redirect: "follow", signal: controller.signal });
-    clearTimeout(timeout);
-    return res.status >= 200 && res.status < 400;
-  } catch {
-    return false;
-  }
-}
-
-const BANNED_PHRASES = ["dive into", "game-changer", "paradigm shift", "revolutionary", "unprecedented", "navigate the", "in the world of", "it's worth noting", "at the end of the day", "moving forward", "leverage", "synergy", "ecosystem", "disruptive", "next-gen", "cutting-edge"];
-const MIN_BODY_LENGTH = 80;
-
-function containsSlop(text: string): boolean {
-  const lower = text.toLowerCase();
-  return BANNED_PHRASES.some(p => lower.includes(p));
-}
-
-function passesQualityGate(nudge: any): boolean {
-  if (!nudge?.title || !nudge?.body) return false;
-  if ((nudge.body || "").length < MIN_BODY_LENGTH) return false;
-  if (containsSlop(nudge.body) || containsSlop(nudge.title)) return false;
-  return true;
-}
+import { handleCors, jsonResponse, errorResponse } from "../_shared/cors.ts";
+import { createAuthenticatedClient, createServiceClient } from "../_shared/auth.ts";
+import { qualityGate, isUrlReachable, containsSlop } from "../_shared/quality.ts";
+import { createAttemptLogger, createObsTracker, createLogger } from "../_shared/observe.ts";
+import { GROUNDING_FALLBACKS, pickRandom } from "../_shared/fallbacks.ts";
+import { serveFromCache } from "../_shared/cache.ts";
 
 /** Fallback chain: cache (highest rated, unexpired, least recently served) → curated. */
 async function serveFallback(svcClient: any, excludeIds?: string[]): Promise<{ data: any; source: string; cacheId: string | null }> {
-  try {
-    const now = new Date().toISOString();
-    const { data } = await svcClient
-      .from("companion_cache")
-      .select("id, content, quality_score, used_count")
-      .eq("companion_type", "ground_nudge")
-      .eq("language", "en")
-      .gte("quality_score", 2)
-      .or(`expires_at.is.null,expires_at.gt.${now}`)
-      .order("quality_score", { ascending: false })
-      .order("last_served_at", { ascending: true, nullsFirst: true })
-      .order("used_count", { ascending: true })
-      .limit(10);
-    const filtered = excludeIds?.length ? (data || []).filter((d: any) => !excludeIds.includes(d.id)) : (data || []);
-    const pool = filtered.length > 0 ? filtered : (data || []);
-    if (pool.length > 0) {
-      const pick = pool[Math.floor(Math.random() * Math.min(pool.length, 3))];
-      svcClient.from("companion_cache").update({ used_count: (pick.used_count || 0) + 1, last_served_at: now }).eq("id", pick.id).then(() => {});
-      return { data: pick.content, source: "cache", cacheId: pick.id };
-    }
-    // Second pass: any quality
-    const { data: anyQ } = await svcClient
-      .from("companion_cache")
-      .select("id, content, used_count")
-      .eq("companion_type", "ground_nudge")
-      .eq("language", "en")
-      .or(`expires_at.is.null,expires_at.gt.${now}`)
-      .order("quality_score", { ascending: false })
-      .order("used_count", { ascending: true })
-      .limit(5);
-    const anyFiltered = excludeIds?.length ? (anyQ || []).filter((d: any) => !excludeIds.includes(d.id)) : (anyQ || []);
-    const anyPool = anyFiltered.length > 0 ? anyFiltered : (anyQ || []);
-    if (anyPool.length > 0) {
-      const pick = anyPool[Math.floor(Math.random() * Math.min(anyPool.length, 3))];
-      svcClient.from("companion_cache").update({ used_count: (pick.used_count || 0) + 1, last_served_at: now }).eq("id", pick.id).then(() => {});
-      return { data: pick.content, source: "cache", cacheId: pick.id };
-    }
-  } catch { /* continue to curated */ }
-  return { data: CURATED_FALLBACKS[Math.floor(Math.random() * CURATED_FALLBACKS.length)], source: "curated", cacheId: null };
+  const cached = await serveFromCache(svcClient, "ground_nudge", "en", excludeIds);
+  if (cached) return { data: cached.data, source: "cache", cacheId: cached.cacheId };
+  return { data: pickRandom(GROUNDING_FALLBACKS), source: "curated", cacheId: null };
 }
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsRes = handleCors(req);
+  if (corsRes) return corsRes;
 
   const t0 = Date.now();
-  const log = (msg: string) => console.log(`[ground-nudge] ${msg} (+${Date.now() - t0}ms)`);
+  const log = createLogger("ground-nudge");
 
   try {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    }
-    const { createClient } = await import("npm:@supabase/supabase-js@2.57.2");
-    const sbUrl = Deno.env.get("SUPABASE_URL") ?? "";
-    const sbClient = createClient(sbUrl, Deno.env.get("SUPABASE_ANON_KEY") ?? "", { global: { headers: { Authorization: authHeader } } });
-    const { data: { user }, error: authError } = await sbClient.auth.getUser();
-    if (authError || !user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return errorResponse("Unauthorized", 401);
     }
 
-    const { context, recentTopics } = await req.json();
+    let body: any = {};
+    try {
+      body = await req.json();
+    } catch {
+      return errorResponse("Invalid or empty request body", 400);
+    }
+    const { context, recentTopics } = body;
+
+    const sbClient = await createAuthenticatedClient(authHeader);
+    const { data: { user }, error: authError } = await sbClient.auth.getUser();
+    if (authError || !user) {
+      return errorResponse("Unauthorized", 401);
+    }
 
     const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    const svcClient = createClient(sbUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "", { auth: { persistSession: false } });
+    const svcClient = await createServiceClient();
 
-    // Observability helper — fire-and-forget
-    const trackObs = (event: string, meta?: Record<string, any>) => {
-      svcClient.from("analytics_events").insert({
-        user_id: user.id, event,
-        metadata: { companion_type: "ground_nudge", latency_ms: Date.now() - t0, ...meta },
-      }).then(() => {});
-    };
-
-    // Cost estimation per 1M tokens (input/output) in USD
-    const COST_MAP: Record<string, [number, number]> = {
-      "sonar-pro": [3, 15], "sonar": [1, 5],
-      "google/gemini-2.5-flash": [0.15, 0.6], "google/gemini-3-flash-preview": [0.15, 0.6],
-      "google/gemini-2.5-flash-lite": [0.075, 0.3],
-    };
-    let attemptOrder = 0;
-    const logAttempt = (params: { companion_type: string; provider: string; model: string; status: string; latency_ms: number; input_tokens?: number; output_tokens?: number; error_message?: string; quality_gate_reason?: string }) => {
-      attemptOrder++;
-      const costs = COST_MAP[params.model] || [0.5, 1.5];
-      const inTok = params.input_tokens || 0;
-      const outTok = params.output_tokens || 0;
-      const cost = inTok > 0 || outTok > 0 ? (inTok * costs[0] + outTok * costs[1]) / 1_000_000 : null;
-      svcClient.from("generation_attempts").insert({ ...params, attempt_order: attemptOrder, estimated_cost_usd: cost }).then(() => {});
-    };
+    const trackObs = createObsTracker(svcClient, user.id, "ground_nudge", t0);
+    const logAttempt = createAttemptLogger(svcClient);
 
     if (!PERPLEXITY_API_KEY || !LOVABLE_API_KEY) {
       log("missing API keys, serving fallback");
       const fb = await serveFallback(svcClient);
       trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
-      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId, _serve_source: fb.source }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return jsonResponse({ ...fb.data, _cache_id: fb.cacheId, _serve_source: fb.source });
     }
 
     // Pick a bias category, avoiding recently used ones
@@ -230,13 +115,13 @@ serve(async (req) => {
       log(`perplexity failed: ${e}`);
       const fb = await serveFallback(svcClient);
       trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
-      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId, _serve_source: fb.source }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return jsonResponse({ ...fb.data, _cache_id: fb.cacheId, _serve_source: fb.source });
     }
 
     if (!searchContent) {
       const fb = await serveFallback(svcClient);
       trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
-      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId, _serve_source: fb.source }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return jsonResponse({ ...fb.data, _cache_id: fb.cacheId, _serve_source: fb.source });
     }
 
     // ── Step 2: AI structuring ──
@@ -341,11 +226,12 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
       }
     }
 
-    if (!nudge || !passesQualityGate(nudge)) {
-      log(`quality gate failed: ${!nudge ? "no nudge" : `body=${(nudge.body||"").length}chars, slop=${containsSlop(nudge?.body||"") || containsSlop(nudge?.title||"")}`}`);
+    const qg = qualityGate("ground_nudge", nudge);
+    if (!nudge || !qg.pass) {
+      log(`quality gate failed: ${!nudge ? "no nudge" : `body=${(nudge.body || "").length}chars, slop=${containsSlop(nudge?.body || "") || containsSlop(nudge?.title || "")}, reason=${qg.reason ?? "unknown"}`}`);
       const fb = await serveFallback(svcClient);
       trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated", { reason: "quality_gate" });
-      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId, _serve_source: fb.source }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return jsonResponse({ ...fb.data, _cache_id: fb.cacheId, _serve_source: fb.source });
     }
 
     // ── Post-processing: URL validation ──
@@ -371,7 +257,8 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
     }
 
     // Cache good content with rich metadata and title-based dedup (awaited to prevent data loss)
-    if (nudge.title && nudge.body && nudge.citation && qualityScore > 0 && passesQualityGate(nudge)) {
+    const cacheQg = qualityGate("ground_nudge", nudge);
+    if (nudge.title && nudge.body && nudge.citation && qualityScore > 0 && cacheQg.pass) {
       try {
         const { data: existing } = await svcClient.from("companion_cache").select("content").eq("companion_type", "ground_nudge").eq("language", "en").limit(30);
         const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
@@ -409,16 +296,13 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
 
     trackObs("companion_live_generated");
     log(`done: ${nudge.title}`);
-    return new Response(JSON.stringify({ ...nudge, _serve_source: "live" }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return jsonResponse({ ...nudge, _serve_source: "live" });
   } catch (e) {
     console.error("ground-nudge error:", e);
     try {
-      const fallback = CURATED_FALLBACKS[Math.floor(Math.random() * CURATED_FALLBACKS.length)];
-      return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return jsonResponse(pickRandom(GROUNDING_FALLBACKS));
     } catch {
-      return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return errorResponse(e instanceof Error ? e.message : "Unknown error", 500);
     }
   }
 });
