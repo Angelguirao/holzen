@@ -65,9 +65,29 @@ serve(async (req) => {
   const log = (msg: string) => console.log(`[pregenerate] ${msg} (+${Date.now() - t0}ms)`);
 
   try {
+    // ── Auth: require service role key or a valid cron secret ──
+    const authHeader = req.headers.get("Authorization");
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+    const cronSecret = Deno.env.get("CRON_SECRET") ?? "";
+    const token = authHeader?.replace("Bearer ", "") ?? "";
+
+    const isServiceRole = token === serviceRoleKey;
+    const isCronSecret = cronSecret.length > 0 && token === cronSecret;
+    // Also allow Supabase's internal cron invocations (they pass the anon key + service role context)
+    const isInternalCron = req.headers.get("x-supabase-cron") === "true";
+
+    if (!isServiceRole && !isCronSecret && !isInternalCron) {
+      log("unauthorized: missing or invalid credentials");
+      return new Response(JSON.stringify({ error: "Unauthorized. Requires service role key or cron secret." }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    log("auth verified");
+
     const { createClient } = await import("npm:@supabase/supabase-js@2.57.2");
     const sbUrl = Deno.env.get("SUPABASE_URL") ?? "";
-    const svcClient = createClient(sbUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "", { auth: { persistSession: false } });
+    const svcClient = createClient(sbUrl, serviceRoleKey, { auth: { persistSession: false } });
 
     const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
