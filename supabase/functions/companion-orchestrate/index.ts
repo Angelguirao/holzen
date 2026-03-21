@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { checkRateLimit, checkDailyBudget } from "../_shared/ratelimit.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -67,6 +68,26 @@ serve(async (req) => {
     const svcClient = createClient(sbUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "", {
       auth: { persistSession: false },
     });
+
+    // ── Per-user rate limit check ──
+    const rateLimit = await checkRateLimit(svcClient, user.id, 60, 30);
+    if (!rateLimit.allowed) {
+      log(`rate limited: ${rateLimit.reason}`);
+      return new Response(JSON.stringify({ error: "Rate limited. Try again later." }), {
+        status: 429,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // ── Daily budget check ──
+    const budget = await checkDailyBudget(svcClient, 10.0);
+    if (!budget.allowed) {
+      log(`budget exceeded: ${budget.reason}`);
+      return new Response(JSON.stringify({ error: "Generation budget exceeded for today." }), {
+        status: 503,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const body = await req.json();
     const {
