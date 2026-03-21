@@ -1,8 +1,30 @@
 import { useAdminStats } from '@/hooks/use-admin-stats';
+import { useAuth } from '@/hooks/use-auth';
 import { supabase } from '@/integrations/supabase/client';
-import { RefreshCw, Activity, Database, DollarSign, AlertTriangle, ThumbsUp, Clock, Loader2, Zap } from 'lucide-react';
+import { RefreshCw, Activity, Database, DollarSign, AlertTriangle, ThumbsUp, Clock, Loader2, Zap, ShieldX } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { useMemo, useState, useEffect } from 'react';
+
+/**
+ * Admin access control.
+ * Set VITE_ADMIN_USER_IDS in .env as a comma-separated list of Supabase user UUIDs.
+ * If not set, falls back to allowing any authenticated user (dev convenience).
+ */
+function useIsAdmin(): { isAdmin: boolean; loading: boolean } {
+  const { user, loading } = useAuth();
+
+  if (loading) return { isAdmin: false, loading: true };
+  if (!user) return { isAdmin: false, loading: false };
+
+  const adminIds = import.meta.env.VITE_ADMIN_USER_IDS;
+  if (!adminIds) {
+    // No admin list configured — allow any authenticated user (backwards compatible)
+    return { isAdmin: true, loading: false };
+  }
+
+  const allowedIds = adminIds.split(',').map((id: string) => id.trim());
+  return { isAdmin: allowedIds.includes(user.id), loading: false };
+}
 
 const TYPE_LABELS: Record<string, string> = {
   // Canonical DB types
@@ -50,7 +72,25 @@ function StatCard({ icon: Icon, title, value, subtitle, alert }: {
 }
 
 export default function Admin() {
+  const { isAdmin, loading: adminLoading } = useIsAdmin();
   const { cacheHits, costs, failures, feedback, loading, error, refresh, lastUpdated } = useAdminStats();
+
+  if (adminLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground/30" />
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="space-y-4 py-10 text-center">
+        <ShieldX className="h-8 w-8 text-muted-foreground/20 mx-auto" />
+        <p className="text-xs font-mono text-muted-foreground/40">Admin access required</p>
+      </div>
+    );
+  }
 
   // ── Aggregate overview metrics ──
   const overview = useMemo(() => {
