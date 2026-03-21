@@ -98,22 +98,33 @@ serve(async (req) => {
     const results: string[] = [];
 
     // ═══════════════════════════════════════════
-    // STEP 1: Cache TTL Enforcement (14 days)
+    // STEP 1: Smart Cache Lifecycle
     // ═══════════════════════════════════════════
-    const fourteenDaysAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
-    const { data: expired, error: expErr } = await svcClient
-      .from("companion_cache")
-      .delete()
-      .lt("created_at", fourteenDaysAgo)
-      .select("id");
-    if (expErr) {
-      log(`TTL cleanup error: ${expErr.message}`);
-    } else {
-      const count = expired?.length ?? 0;
-      if (count > 0) results.push(`TTL: removed ${count} entries older than 14 days`);
-    }
+    // Instead of blindly deleting old entries, we:
+    // 1. PROMOTE high-quality entries to permanent (no expiry) — these become curated
+    // 2. PRUNE low-quality entries after 3 days
+    // 3. EXPIRE medium entries after 30 days (extended from 14)
 
-    // Also prune low-quality entries older than 3 days
+    // 1a. Promote: quality_score >= 3 → set expires_at = null (permanent/curated)
+    const { data: promoted } = await svcClient
+      .from("companion_cache")
+      .update({ expires_at: null })
+      .gte("quality_score", 3)
+      .not("expires_at", "is", null)
+      .select("id");
+    if (promoted && promoted.length > 0) results.push(`Promoted ${promoted.length} high-quality entries to permanent`);
+
+    // 1b. Auto-promote: quality_score >= 2 AND used_count >= 3 (served 3+ times successfully)
+    const { data: autoPromoted } = await svcClient
+      .from("companion_cache")
+      .update({ expires_at: null, quality_score: 3 })
+      .gte("quality_score", 2)
+      .gte("used_count", 3)
+      .not("expires_at", "is", null)
+      .select("id");
+    if (autoPromoted && autoPromoted.length > 0) results.push(`Auto-promoted ${autoPromoted.length} proven entries to permanent`);
+
+    // 2. Prune: low-quality (score < 2) older than 3 days → delete
     const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
     const { data: pruned } = await svcClient
       .from("companion_cache")
@@ -123,7 +134,18 @@ serve(async (req) => {
       .select("id");
     if (pruned && pruned.length > 0) results.push(`Pruned ${pruned.length} low-quality entries`);
 
-    log(`Cache cleanup done`);
+    // 3. Expire: medium entries (score 1-2, not permanent) older than 30 days → delete
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+    const { data: expired } = await svcClient
+      .from("companion_cache")
+      .delete()
+      .lt("quality_score", 3)
+      .lt("created_at", thirtyDaysAgo)
+      .not("expires_at", "is", null)  // don't touch permanent entries
+      .select("id");
+    if (expired && expired.length > 0) results.push(`Expired ${expired.length} stale medium-quality entries`);
+
+    log(`Cache lifecycle done`);
 
     // ═══════════════════════════════════════════
     // STEP 2: Generate Grounding (2 entries)
