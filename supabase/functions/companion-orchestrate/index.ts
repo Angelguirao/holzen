@@ -282,12 +282,9 @@ serve(async (req) => {
 
 // ── Helpers ──
 
-const companionTypeMap: Record<string, string> = {
-  signal: "signal",
-  grounding: "ground_nudge",
-  history: "historical_insight",
-  zoomOut: "zoom_out",
-};
+// Import canonical companion type map
+import { ORCHESTRATOR_KEY_MAP } from "../_shared/companion-types.ts";
+const companionTypeMap = ORCHESTRATOR_KEY_MAP;
 
 // ── Orchestrator-level curated fallbacks (last resort if sub-function fails entirely) ──
 const ORCHESTRATOR_CURATED: Record<string, any[]> = {
