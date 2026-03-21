@@ -4,6 +4,7 @@ import { createAuthenticatedClient, createServiceClient } from "../_shared/auth.
 import { createAttemptLogger, createObsTracker, createLogger } from "../_shared/observe.ts";
 import { REFLECTION_FALLBACKS, pickRandom } from "../_shared/fallbacks.ts";
 import { sanitizePromptInput, sanitizePromptArray } from "../_shared/sanitize.ts";
+import { containsSlop, containsCryptoLanguage } from "../_shared/quality.ts";
 
 const TONE_INSTRUCTIONS: Record<string, string> = {
   stoic: "Write in a calm, stoic tone. Brief and grounded. Like Marcus Aurelius observing the market.",
@@ -312,7 +313,41 @@ Haiku rules:
       }
     }
 
-    // ── Fallback chain: if AI failed, serve curated content ──
+    // ── Quality gate for reflection messages ──
+    if (result?.message) {
+      const msg = result.message;
+      let qgFailed = false;
+      let qgReason = "";
+
+      // Slop check
+      if (containsSlop(msg)) { qgFailed = true; qgReason = "reflection_slop"; }
+      // Crypto language check
+      else if (containsCryptoLanguage(msg)) { qgFailed = true; qgReason = "reflection_crypto_language"; }
+      // Too short (< 20 chars is likely broken)
+      else if (msg.length < 20) { qgFailed = true; qgReason = "reflection_too_short"; }
+      // Too long (> 500 chars is an essay, not a reflection)
+      else if (msg.length > 500) { qgFailed = true; qgReason = "reflection_too_long"; }
+      // Contains exclamation marks (against the calm tone)
+      else if (msg.includes("!")) { qgFailed = true; qgReason = "reflection_exclamation"; }
+
+      // Haiku validation
+      if (result.haiku) {
+        const lines = result.haiku.split("\n").filter((l: string) => l.trim().length > 0);
+        if (lines.length !== 3) {
+          // Not a valid haiku structure — strip it rather than serving broken haiku
+          log(`haiku has ${lines.length} lines instead of 3, stripping`);
+          result.haiku = null;
+        }
+      }
+
+      if (qgFailed) {
+        log(`reflection quality gate failed: ${qgReason}`);
+        logAttempt({ companion_type: "reflection", provider: "lovable", model: "quality_gate", status: "quality_gate_failed", latency_ms: 0, quality_gate_reason: qgReason });
+        result = null; // Fall through to curated fallback
+      }
+    }
+
+    // ── Fallback chain: if AI failed or quality gate rejected, serve curated content ──
     if (!result?.message) {
       if (lastStatus === 429) {
         return errorResponse("Rate limited. Try again later.", 429);

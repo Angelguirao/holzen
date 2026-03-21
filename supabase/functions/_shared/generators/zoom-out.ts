@@ -378,6 +378,19 @@ export async function generateZoomOut(params: GenerateZoomOutParams): Promise<Zo
   // ── 1. Fetch historical BTC prices with DB caching ──
   const prices = await fetchHistoricalAndCurrentPrices(svcClient, context, log);
 
+  // Track CoinGecko failures for admin visibility
+  if (prices.rateLimited) {
+    const logAttempt = createAttemptLogger(svcClient, { userId });
+    logAttempt({
+      companion_type: "zoom_out",
+      provider: "coingecko",
+      model: "price_api",
+      status: "error",
+      latency_ms: 0,
+      error_message: "rate_limited",
+    });
+  }
+
   // ── 2. Fetch past echo reflection ──
   let echoReflection: any = null;
   if (userId) {
