@@ -87,7 +87,7 @@ export const HISTORY_FALLBACKS = [
   },
   {
     title: "Amazon lost 95% and became the everything store",
-    btcInsight: "From its December 1999 peak of $106.69, Amazon crashed to $5.51 by October 2001 — a 95% drawdown. The narrative shifted from 'revolutionary' to 'overvalued dot-com.' Anyone who sold at $5.51 missed a stock that would eventually reach $3,000+.",
+    btcInsight: "From its December 1999 peak of $106.69, Amazon crashed to $5.51 by October 2001 — a 95% drawdown. The narrative shifted from 'world-changing company' to 'overvalued dot-com.' Anyone who sold at $5.51 missed a stock that would eventually reach $3,000+.",
     analogy: "Bitcoin has experienced five drawdowns of 70%+ in its history. Each time, the 'it's dead' narrative peaked at the bottom.",
     assetClass: "Tech stocks",
     period: "2000-2001",
@@ -105,8 +105,8 @@ export const HISTORY_FALLBACKS = [
   },
   {
     title: "The Swiss franc shock of 2015",
-    btcInsight: "On January 15, 2015, the Swiss National Bank unexpectedly removed the EUR/CHF floor. The franc surged 30% in minutes, wiping out leveraged traders and bankrupting multiple brokerages. It was the largest single-day move in a major currency in modern history.",
-    analogy: "Like Bitcoin's sudden moves, the Swiss franc shock demonstrated that markets can reprice decades of assumptions in minutes. Those with no leverage and long time horizons were unscathed.",
+    btcInsight: "On January 15, 2015, the Swiss National Bank unexpectedly removed the EUR/CHF floor. The franc surged 30% in minutes, wiping out over-exposed traders and bankrupting multiple brokerages. It was the largest single-day move in a major currency in modern history.",
+    analogy: "Like Bitcoin's sudden moves, the Swiss franc shock demonstrated that markets can reprice decades of assumptions in minutes. Those with no borrowed exposure and long time horizons were unscathed.",
     assetClass: "Forex",
     period: "January 2015",
     source: "Bloomberg historical archive",
