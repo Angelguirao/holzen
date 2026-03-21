@@ -1,9 +1,9 @@
-import { useAdminStats } from '@/hooks/use-admin-stats';
+import { useAdminStats, CacheEntryRow, SignalSourceRow } from '@/hooks/use-admin-stats';
 import { useAuth } from '@/hooks/use-auth';
 import { supabase } from '@/integrations/supabase/client';
-import { RefreshCw, Activity, Database, DollarSign, AlertTriangle, ThumbsUp, Clock, Loader2, Zap, ShieldX } from 'lucide-react';
+import { RefreshCw, Activity, Database, DollarSign, AlertTriangle, ThumbsUp, Clock, Loader2, Zap, ShieldX, ChevronDown, ChevronRight, Trash2, ArrowUp, ArrowDown, Globe } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useCallback } from 'react';
 
 /**
  * Admin access control.
@@ -73,7 +73,7 @@ function StatCard({ icon: Icon, title, value, subtitle, alert }: {
 
 export default function Admin() {
   const { isAdmin, loading: adminLoading } = useIsAdmin();
-  const { cacheHits, costs, failures, feedback, loading, error, refresh, lastUpdated } = useAdminStats();
+  const { cacheHits, costs, failures, feedback, cacheEntries, signalSources, loading, error, refresh, refreshCacheEntries, lastUpdated } = useAdminStats();
 
   if (adminLoading) {
     return (
@@ -396,6 +396,12 @@ export default function Admin() {
         </div>
       </div>
 
+      {/* Curated Content Manager */}
+      <CuratedContentManager entries={cacheEntries} onRefresh={refreshCacheEntries} />
+
+      {/* Source Catalog */}
+      <SourceCatalogViewer sources={signalSources} />
+
       {/* Dev Mode */}
       <DevModeToggle />
 
@@ -403,6 +409,223 @@ export default function Admin() {
       <p className="text-[9px] text-muted-foreground/20 text-center pb-4">
         AI Companion System Monitor · Data from Supabase views
       </p>
+    </div>
+  );
+}
+
+// ── Quality score visual indicator ──
+function QualityBadge({ score }: { score: number }) {
+  if (score >= 3) return <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">curated</span>;
+  if (score >= 2) return <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full bg-blue-500/15 text-blue-600 dark:text-blue-400">good</span>;
+  return <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full bg-orange-500/15 text-orange-600 dark:text-orange-400">low</span>;
+}
+
+function CuratedContentManager({ entries, onRefresh }: { entries: CacheEntryRow[]; onRefresh: () => Promise<void> }) {
+  const [open, setOpen] = useState(false);
+  const [acting, setActing] = useState<string | null>(null);
+
+  const grouped = useMemo(() => {
+    const map = new Map<string, CacheEntryRow[]>();
+    for (const e of entries) {
+      const key = e.companion_type;
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(e);
+    }
+    return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b));
+  }, [entries]);
+
+  const promote = useCallback(async (id: string) => {
+    setActing(id);
+    await supabase.from('companion_cache').update({ quality_score: 3, expires_at: null } as any).eq('id', id);
+    await onRefresh();
+    setActing(null);
+  }, [onRefresh]);
+
+  const demote = useCallback(async (id: string) => {
+    setActing(id);
+    const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+    await supabase.from('companion_cache').update({ quality_score: 1, expires_at: expires } as any).eq('id', id);
+    await onRefresh();
+    setActing(null);
+  }, [onRefresh]);
+
+  const remove = useCallback(async (id: string) => {
+    if (!window.confirm('Delete this cache entry? This cannot be undone.')) return;
+    setActing(id);
+    await supabase.from('companion_cache').delete().eq('id', id);
+    await onRefresh();
+    setActing(null);
+  }, [onRefresh]);
+
+  return (
+    <div className="space-y-2">
+      <button onClick={() => setOpen(!open)} className="flex items-center gap-1.5 w-full text-left">
+        {open ? <ChevronDown className="h-3 w-3 text-muted-foreground/40" /> : <ChevronRight className="h-3 w-3 text-muted-foreground/40" />}
+        <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">
+          Curated Content <span className="text-muted-foreground/25">({entries.length})</span>
+        </p>
+      </button>
+      {open && (
+        <div className="space-y-3">
+          {grouped.map(([type, items]) => (
+            <div key={type} className="space-y-1.5">
+              <div className="flex items-center gap-2">
+                <span
+                  className="h-2 w-2 rounded-full"
+                  style={{ backgroundColor: TYPE_COLORS[type] ?? 'hsl(var(--primary) / 0.4)' }}
+                />
+                <span className="text-[10px] font-mono text-foreground/60">{label(type)}</span>
+                <span className="text-[9px] text-muted-foreground/30">{items.length} entries</span>
+              </div>
+              {items.map(entry => {
+                const isPermanent = entry.expires_at === null;
+                const isCurated = entry.quality_score >= 3;
+                const isActing = acting === entry.id;
+                return (
+                  <div key={entry.id} className="rounded-lg border border-border/10 bg-card/5 px-3 py-2 space-y-1.5">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[10px] font-mono text-foreground/70 truncate">{entry.title || '(untitled)'}</p>
+                        <div className="flex flex-wrap items-center gap-2 mt-0.5">
+                          <QualityBadge score={entry.quality_score} />
+                          {isPermanent && <span className="text-[9px] font-mono text-muted-foreground/40">♾ permanent</span>}
+                          {!isPermanent && entry.expires_at && (
+                            <span className="text-[9px] font-mono text-muted-foreground/30">
+                              expires {new Date(entry.expires_at).toLocaleDateString()}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <span className="text-[9px] text-muted-foreground/30">used: {entry.used_count}</span>
+                      {(entry.thumbs_up != null || entry.thumbs_down != null) && (
+                        <>
+                          <span className="text-[9px] text-muted-foreground/30">👍 {entry.thumbs_up ?? 0}</span>
+                          <span className="text-[9px] text-muted-foreground/30">👎 {entry.thumbs_down ?? 0}</span>
+                        </>
+                      )}
+                      <span className="text-[9px] text-muted-foreground/25">{new Date(entry.created_at).toLocaleDateString()}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 pt-0.5">
+                      {!isCurated && (
+                        <button
+                          onClick={() => promote(entry.id)}
+                          disabled={isActing}
+                          className="flex items-center gap-0.5 text-[9px] font-mono text-emerald-600/70 dark:text-emerald-400/70 hover:text-emerald-600 dark:hover:text-emerald-400 disabled:opacity-30 transition-colors"
+                        >
+                          <ArrowUp className="h-2.5 w-2.5" /> Promote
+                        </button>
+                      )}
+                      {(isCurated || entry.quality_score >= 2) && (
+                        <button
+                          onClick={() => demote(entry.id)}
+                          disabled={isActing}
+                          className="flex items-center gap-0.5 text-[9px] font-mono text-orange-600/70 dark:text-orange-400/70 hover:text-orange-600 dark:hover:text-orange-400 disabled:opacity-30 transition-colors"
+                        >
+                          <ArrowDown className="h-2.5 w-2.5" /> Demote
+                        </button>
+                      )}
+                      <button
+                        onClick={() => remove(entry.id)}
+                        disabled={isActing}
+                        className="flex items-center gap-0.5 text-[9px] font-mono text-destructive/50 hover:text-destructive/80 disabled:opacity-30 transition-colors"
+                      >
+                        <Trash2 className="h-2.5 w-2.5" /> Delete
+                      </button>
+                      {isActing && <Loader2 className="h-2.5 w-2.5 animate-spin text-muted-foreground/30 ml-1" />}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ))}
+          {entries.length === 0 && (
+            <p className="text-[10px] text-muted-foreground/30 text-center py-3">No cache entries</p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
+const SOURCE_TYPE_COLORS: Record<string, string> = {
+  blog: '#8b5cf6',
+  podcast: '#06b6d4',
+  book: '#f59e0b',
+  newsletter: '#10b981',
+  twitter: '#6366f1',
+  video: '#ec4899',
+};
+
+const CATEGORY_LABELS: Record<string, string> = {
+  signal: 'Signal',
+  grounding: 'Grounding',
+  learning: 'Learning',
+};
+
+function SourceCatalogViewer({ sources }: { sources: SignalSourceRow[] }) {
+  const [open, setOpen] = useState(false);
+
+  const grouped = useMemo(() => {
+    const map = new Map<string, SignalSourceRow[]>();
+    for (const s of sources) {
+      const key = s.category;
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(s);
+    }
+    return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b));
+  }, [sources]);
+
+  return (
+    <div className="space-y-2">
+      <button onClick={() => setOpen(!open)} className="flex items-center gap-1.5 w-full text-left">
+        {open ? <ChevronDown className="h-3 w-3 text-muted-foreground/40" /> : <ChevronRight className="h-3 w-3 text-muted-foreground/40" />}
+        <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">
+          Source Catalog <span className="text-muted-foreground/25">({sources.length})</span>
+        </p>
+      </button>
+      {open && (
+        <div className="space-y-3">
+          {grouped.map(([category, items]) => (
+            <div key={category} className="space-y-1.5">
+              <span className="text-[10px] font-mono text-foreground/60">{CATEGORY_LABELS[category] ?? category}</span>
+              {items.map(src => (
+                <div key={src.id} className="rounded-lg border border-border/10 bg-card/5 px-3 py-2 flex items-center justify-between gap-2">
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[10px] font-mono text-foreground/70 truncate">{src.name}</p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span
+                        className="text-[9px] font-mono px-1.5 py-0.5 rounded-full"
+                        style={{
+                          backgroundColor: `${SOURCE_TYPE_COLORS[src.type] ?? '#64748b'}20`,
+                          color: SOURCE_TYPE_COLORS[src.type] ?? '#64748b',
+                        }}
+                      >
+                        {src.type}
+                      </span>
+                      {src.url && (
+                        <a
+                          href={src.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[9px] text-primary/40 hover:text-primary/70 flex items-center gap-0.5 truncate transition-colors"
+                        >
+                          <Globe className="h-2.5 w-2.5 flex-shrink-0" />
+                          <span className="truncate">{src.url.replace(/^https?:\/\//, '').slice(0, 40)}</span>
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ))}
+          {sources.length === 0 && (
+            <p className="text-[10px] text-muted-foreground/30 text-center py-3">No sources configured</p>
+          )}
+        </div>
+      )}
     </div>
   );
 }
