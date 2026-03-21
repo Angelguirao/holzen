@@ -6,6 +6,13 @@ import { useProfile } from '@/hooks/use-profile';
 import type { CompanionData } from '@/components/CompanionSection';
 
 const MANUAL_COOLDOWN_MS = 15 * 60 * 1000; // 15 minutes for on-demand
+const DEV_COOLDOWN_MS = 5 * 1000; // 5 seconds in dev mode
+
+function getEffectiveCooldownMs(): number {
+  try {
+    return localStorage.getItem('holzen_dev_mode') === 'true' ? DEV_COOLDOWN_MS : MANUAL_COOLDOWN_MS;
+  } catch { return MANUAL_COOLDOWN_MS; }
+}
 
 export function useHolzen() {
   const { user } = useAuth();
@@ -292,7 +299,7 @@ export function useHolzen() {
   const manualCooldownRemaining = useCallback(() => {
     if (!lastManualAt) return 0;
     const elapsed = Date.now() - lastManualAt;
-    return Math.max(0, MANUAL_COOLDOWN_MS - elapsed);
+    return Math.max(0, getEffectiveCooldownMs() - elapsed);
   }, [lastManualAt]);
 
   const autoCooldownRemaining = useCallback(() => {
