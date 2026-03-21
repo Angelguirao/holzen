@@ -41,14 +41,38 @@ interface FeedbackRow {
   approval_pct: number | null;
 }
 
+export interface CacheEntryRow {
+  id: string;
+  companion_type: string;
+  title: string | null;
+  quality_score: number;
+  used_count: number;
+  expires_at: string | null;
+  thumbs_up: number | null;
+  thumbs_down: number | null;
+  created_at: string;
+  content: any;
+}
+
+export interface SignalSourceRow {
+  id: string;
+  name: string;
+  type: string;
+  url: string | null;
+  category: string;
+}
+
 export interface AdminStats {
   cacheHits: CacheHitRow[];
   costs: CostRow[];
   failures: FailureRow[];
   feedback: FeedbackRow[];
+  cacheEntries: CacheEntryRow[];
+  signalSources: SignalSourceRow[];
   loading: boolean;
   error: string | null;
   refresh: () => void;
+  refreshCacheEntries: () => Promise<void>;
   lastUpdated: Date | null;
 }
 
@@ -57,9 +81,22 @@ export function useAdminStats(): AdminStats {
   const [costs, setCosts] = useState<CostRow[]>([]);
   const [failures, setFailures] = useState<FailureRow[]>([]);
   const [feedback, setFeedback] = useState<FeedbackRow[]>([]);
+  const [cacheEntries, setCacheEntries] = useState<CacheEntryRow[]>([]);
+  const [signalSources, setSignalSources] = useState<SignalSourceRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+
+  const fetchCacheEntries = useCallback(async () => {
+    const { data, error: err } = await supabase
+      .from('companion_cache')
+      .select('id, companion_type, title, quality_score, used_count, expires_at, thumbs_up, thumbs_down, created_at, content')
+      .order('quality_score', { ascending: false })
+      .order('used_count', { ascending: false })
+      .limit(200);
+    if (err) throw new Error(`Cache entries: ${err.message}`);
+    setCacheEntries((data ?? []) as CacheEntryRow[]);
+  }, []);
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
@@ -82,17 +119,31 @@ export function useAdminStats(): AdminStats {
       setCosts((costRes.data ?? []) as CostRow[]);
       setFailures((failRes.data ?? []) as FailureRow[]);
       setFeedback((feedRes.data ?? []) as FeedbackRow[]);
+
+      await fetchCacheEntries();
+
+      const sourcesRes = await supabase
+        .from('signal_sources')
+        .select('id, name, type, url, category')
+        .order('category', { ascending: true })
+        .order('name', { ascending: true });
+      if (sourcesRes.error) throw new Error(`Signal sources: ${sourcesRes.error.message}`);
+      setSignalSources((sourcesRes.data ?? []) as SignalSourceRow[]);
+
       setLastUpdated(new Date());
     } catch (e: any) {
       setError(e.message || 'Failed to load monitoring data');
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [fetchCacheEntries]);
 
   useEffect(() => {
     fetchAll();
   }, [fetchAll]);
 
-  return { cacheHits, costs, failures, feedback, loading, error, refresh: fetchAll, lastUpdated };
+  return {
+    cacheHits, costs, failures, feedback, cacheEntries, signalSources,
+    loading, error, refresh: fetchAll, refreshCacheEntries: fetchCacheEntries, lastUpdated,
+  };
 }
