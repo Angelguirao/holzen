@@ -124,6 +124,34 @@ export default function Admin() {
         </button>
       </div>
 
+      {/* Health Summary */}
+      {(() => {
+        const issues: string[] = [];
+        if (overview.cacheHitRate < 20 && overview.totalServes > 10) issues.push('Cache hit rate is very low — the cache warmer (pregenerate-companions) may not be running');
+        if (overview.cacheHitRate < 40 && overview.cacheHitRate >= 20 && overview.totalServes > 10) issues.push('Cache hit rate is below target — consider running the cache warmer more frequently');
+        if (overview.failureRate > 20) issues.push('High failure rate — check if API keys (Perplexity/Lovable) are valid and not rate-limited');
+        if (overview.failureRate > 5 && overview.failureRate <= 20) issues.push('Some generation failures — check the Generation Health section for which model is struggling');
+        if (overview.todayCost > 8) issues.push('Approaching daily budget cap ($10) — generation will be blocked when exceeded');
+
+        if (issues.length === 0 && overview.totalServes > 0) {
+          return (
+            <div className="rounded-xl border border-primary/15 bg-primary/3 px-4 py-2.5">
+              <p className="text-[10px] font-mono text-primary/60">✓ System healthy — cache hit {overview.cacheHitRate}%, failure rate {overview.failureRate}%, cost ${overview.todayCost.toFixed(3)} today</p>
+            </div>
+          );
+        }
+        if (issues.length > 0) {
+          return (
+            <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-2.5 space-y-1">
+              {issues.map((issue, i) => (
+                <p key={i} className="text-[10px] font-mono text-amber-600/70">⚠ {issue}</p>
+              ))}
+            </div>
+          );
+        }
+        return null;
+      })()}
+
       {/* Overview Cards */}
       <div className="grid grid-cols-2 gap-3">
         <StatCard
@@ -136,21 +164,21 @@ export default function Admin() {
           icon={Database}
           title="Cache Hit"
           value={`${overview.cacheHitRate}%`}
-          subtitle="from cache vs live"
+          subtitle="target: >40%"
           alert={overview.cacheHitRate < 20}
         />
         <StatCard
           icon={DollarSign}
           title="Cost Today"
           value={`$${overview.todayCost.toFixed(3)}`}
-          subtitle="estimated"
+          subtitle="cap: $10/day"
           alert={overview.todayCost > 8}
         />
         <StatCard
           icon={AlertTriangle}
           title="Failure Rate"
           value={`${overview.failureRate}%`}
-          subtitle="errors + timeouts"
+          subtitle="target: <10%"
           alert={overview.failureRate > 20}
         />
       </div>
