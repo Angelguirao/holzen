@@ -3,6 +3,7 @@ import { handleCors, jsonResponse, errorResponse } from "../_shared/cors.ts";
 import { createAuthenticatedClient, createServiceClient } from "../_shared/auth.ts";
 import { createAttemptLogger, createObsTracker, createLogger } from "../_shared/observe.ts";
 import { REFLECTION_FALLBACKS, pickRandom } from "../_shared/fallbacks.ts";
+import { sanitizePromptInput, sanitizePromptArray } from "../_shared/sanitize.ts";
 
 const TONE_INSTRUCTIONS: Record<string, string> = {
   stoic: "Write in a calm, stoic tone. Brief and grounded. Like Marcus Aurelius observing the market.",
@@ -80,7 +81,13 @@ serve(async (req) => {
     const trackObs = createObsTracker(svcClient, userId, "reflection", t0);
     const logAttempt = createAttemptLogger(svcClient, { userId });
 
-    const { context, tone, customPrompt, style, moodHistory, severity, motivations, mantra, groundingActivities, currency, language, recentHaikus, recentMessages } = await req.json();
+    const body = await req.json();
+    const { context, tone, style, moodHistory, severity, currency, language, recentHaikus, recentMessages } = body;
+    // Sanitize user-controlled fields that are embedded in AI prompts
+    const customPrompt = sanitizePromptInput(body.customPrompt, 500);
+    const motivations = sanitizePromptArray(body.motivations, 10, 100);
+    const mantra = sanitizePromptInput(body.mantra, 200);
+    const groundingActivities = sanitizePromptArray(body.groundingActivities, 10, 100);
     if (!context) {
       return errorResponse("Missing context", 400);
     }
