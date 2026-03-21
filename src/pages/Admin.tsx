@@ -1,14 +1,20 @@
 import { useAdminStats } from '@/hooks/use-admin-stats';
-import { RefreshCw, Activity, Database, DollarSign, AlertTriangle, ThumbsUp, Clock, Loader2 } from 'lucide-react';
+import { RefreshCw, Activity, Database, DollarSign, AlertTriangle, ThumbsUp, Clock, Loader2, Zap } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { useMemo } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 
 const TYPE_LABELS: Record<string, string> = {
+  // Canonical DB types
   signal: 'Signal',
   ground_nudge: 'Grounding',
   historical_insight: 'History',
   zoom_out: 'Zoom Out',
+  zoom_out_deep_time: 'Zoom Out',
   reflection: 'Reflection',
+  // Frontend keys (used in older feedback events)
+  learning: 'Grounding',
+  history_insight: 'History',
+  haiku: 'Haiku',
 };
 
 const TYPE_COLORS: Record<string, string> = {
@@ -313,10 +319,67 @@ export default function Admin() {
         </div>
       </div>
 
+      {/* Dev Mode */}
+      <DevModeToggle />
+
       {/* Footer */}
       <p className="text-[9px] text-muted-foreground/20 text-center pb-4">
         AI Companion System Monitor · Data from Supabase views
       </p>
+    </div>
+  );
+}
+
+function DevModeToggle() {
+  const [devMode, setDevMode] = useState(false);
+
+  useEffect(() => {
+    try {
+      setDevMode(localStorage.getItem('holzen_dev_mode') === 'true');
+    } catch { /* ignore */ }
+  }, []);
+
+  const toggle = () => {
+    const next = !devMode;
+    setDevMode(next);
+    try {
+      if (next) {
+        localStorage.setItem('holzen_dev_mode', 'true');
+      } else {
+        localStorage.removeItem('holzen_dev_mode');
+      }
+    } catch { /* ignore */ }
+  };
+
+  return (
+    <div className="space-y-2">
+      <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">Dev Tools</p>
+      <button
+        onClick={toggle}
+        className={`w-full rounded-xl border px-4 py-3 flex items-center gap-3 transition-all ${
+          devMode
+            ? 'border-amber-500/30 bg-amber-500/5'
+            : 'border-border/15 bg-card/10 hover:bg-card/20'
+        }`}
+      >
+        <Zap className={`h-3.5 w-3.5 ${devMode ? 'text-amber-500/70' : 'text-muted-foreground/30'}`} />
+        <div className="flex-1 text-left">
+          <p className={`text-[10px] font-mono ${devMode ? 'text-amber-600/80' : 'text-foreground/60'}`}>
+            Rapid Testing Mode
+          </p>
+          <p className="text-[9px] text-muted-foreground/40">
+            {devMode ? '5s cooldown between pauses (active)' : '15min cooldown between pauses (normal)'}
+          </p>
+        </div>
+        <span className={`text-[9px] font-mono ${devMode ? 'text-amber-500/60' : 'text-muted-foreground/30'}`}>
+          {devMode ? 'ON' : 'OFF'}
+        </span>
+      </button>
+      {devMode && (
+        <p className="text-[9px] text-amber-600/50 px-1">
+          ⚡ Generate pause sessions rapidly to gather data. Each session costs ~$0.01-0.05 in API calls. Disable when done testing.
+        </p>
+      )}
     </div>
   );
 }

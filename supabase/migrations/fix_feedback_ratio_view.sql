@@ -5,9 +5,11 @@
 --   event = 'companion_feedback'
 --   metadata = { companion_type, cache_type, vote: 'up'|'down', cache_id, reflection_id }
 
+-- Uses cache_type (canonical DB type like 'signal', 'ground_nudge') for consistency
+-- with the other companion views. Falls back to companion_type if cache_type is missing.
 CREATE OR REPLACE VIEW public.v_companion_feedback_ratio AS
 SELECT
-  metadata->>'companion_type' AS companion_type,
+  COALESCE(metadata->>'cache_type', metadata->>'companion_type') AS companion_type,
   COUNT(*) FILTER (WHERE metadata->>'vote' = 'up') AS total_thumbs_up,
   COUNT(*) FILTER (WHERE metadata->>'vote' = 'down') AS total_thumbs_down,
   COUNT(*) AS items_with_feedback,
@@ -18,6 +20,6 @@ SELECT
 FROM analytics_events
 WHERE event = 'companion_feedback'
   AND metadata->>'vote' IS NOT NULL
-GROUP BY metadata->>'companion_type';
+GROUP BY COALESCE(metadata->>'cache_type', metadata->>'companion_type');
 
 ALTER VIEW public.v_companion_feedback_ratio SET (security_invoker = true);
