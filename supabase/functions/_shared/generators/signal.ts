@@ -12,6 +12,7 @@ import { qualityGate, normalizeUrl, isUrlReachable, contentFingerprint } from ".
 import { SIGNAL_FALLBACKS, pickRandom } from "../fallbacks.ts";
 import { serveFromCache } from "../cache.ts";
 import { createAttemptLogger } from "../observe.ts";
+import { validateSource } from "../source-validation.ts";
 
 // ── Public types ──
 
@@ -210,8 +211,11 @@ GOOD TITLES: "Proof of work is proof of sacrifice" / "Sound money teaches patien
 BAD TITLES: "Bitcoin hash rate reaches new high" / "Analyst predicts BTC target" / anything with numbers or dates
 
 ACCURACY RULES (CRITICAL):
-- Attribute ideas to the correct thinker from the search results
-- Do NOT invent quotes or misattribute ideas
+- The "source" field must be the REAL author's name as it appears in the search results
+- If the search results say "Parker Lewis writes..." then source = "Parker Lewis"
+- If you cannot identify a SINGLE author with confidence, use the publication name from the citation URL (e.g. "Bitcoin Magazine", "Nakamoto Institute")
+- Do NOT invent author names or combine multiple authors
+- Do NOT use generic attributions like "Bitcoin thinkers" or "various authors"
 - The body distills the philosophical point — no data regurgitation
 
 BITCOIN ONLY — CRITICAL:
@@ -335,6 +339,14 @@ URL RULES (CRITICAL):
 
   if (signal.url && !signal.url.startsWith("http")) {
     signal.url = normalizeUrl(signal.url);
+  }
+
+  // ── Step 4b: Source attribution validation ──
+  // Cross-reference the AI's source against known authors and citation URLs
+  const originalSource = signal.source;
+  signal.source = validateSource(signal.source, signal.url || "", citations, sources as any);
+  if (signal.source !== originalSource) {
+    log(`source corrected: "${originalSource}" → "${signal.source}"`);
   }
 
   // ── Step 5: Cache write ──

@@ -141,6 +141,98 @@ export function qualityGate(
   if (containsCryptoLanguage(body)) return { pass: false, reason: "body_contains_crypto_language" };
   if (containsCryptoLanguage(title)) return { pass: false, reason: "title_contains_crypto_language" };
 
+  // Sentence diversity check — detect repetitive sentence structure
+  const diversityResult = checkSentenceDiversity(body);
+  if (!diversityResult.pass) return { pass: false, reason: diversityResult.reason };
+
+  // Specificity check — companion-type-aware content depth
+  const specificityResult = checkSpecificity(companionType, content);
+  if (!specificityResult.pass) return { pass: false, reason: specificityResult.reason };
+
+  return { pass: true };
+}
+
+// ── Sentence diversity check ──
+
+/**
+ * Detect repetitive sentence structure.
+ * AI often produces sentences that all start the same way:
+ * "Bitcoin is...", "Bitcoin is...", "Bitcoin is..."
+ */
+function checkSentenceDiversity(text: string): { pass: boolean; reason?: string } {
+  const sentences = text
+    .split(/[.!?]+/)
+    .map(s => s.trim())
+    .filter(s => s.length > 10);
+
+  if (sentences.length < 2) return { pass: true }; // Too short to check
+
+  // Check if >50% of sentences start with the same 2 words
+  const openings = sentences.map(s => {
+    const words = s.split(/\s+/).slice(0, 2).join(" ").toLowerCase();
+    return words;
+  });
+
+  const openingCounts = new Map<string, number>();
+  for (const o of openings) {
+    openingCounts.set(o, (openingCounts.get(o) || 0) + 1);
+  }
+
+  for (const [opening, count] of openingCounts) {
+    if (count > 1 && count / sentences.length > 0.5) {
+      return { pass: false, reason: `repetitive_structure: "${opening}" starts ${count}/${sentences.length} sentences` };
+    }
+  }
+
+  return { pass: true };
+}
+
+// ── Specificity check ──
+
+/**
+ * Check content has appropriate specificity for its companion type.
+ * - Grounding: should have researcher names and years
+ * - History: should have dates and specific numbers
+ * - Signal: should have an author attribution
+ * - Zoom out: more lenient (poetic/philosophical)
+ */
+function checkSpecificity(companionType: string, content: any): { pass: boolean; reason?: string } {
+  switch (companionType) {
+    case "ground_nudge": {
+      const body = content.body || "";
+      const citation = content.citation || "";
+      // Grounding content should reference specific research
+      // Check body OR citation for a year
+      const hasYear = /\b(19|20)\d{2}\b/.test(body) || /\b(19|20)\d{2}\b/.test(citation);
+      // Check for academic-style names: "Firstname Lastname" (two adjacent capitalized words)
+      // or "Name's YYYY" or "Name and Name" or "Name (YYYY)"
+      const hasResearcherName = /[A-Z][a-z]{2,}\s+[A-Z][a-z]{2,}/.test(body);
+      if (!hasYear && !hasResearcherName) {
+        return { pass: false, reason: "grounding_lacks_specificity: no researcher names or years" };
+      }
+      break;
+    }
+    case "historical_insight": {
+      const insight = content.btcInsight || "";
+      // History should have specific dates or price points
+      const hasDate = /\b(19|20)\d{2}\b|\b(January|February|March|April|May|June|July|August|September|October|November|December)\b/i.test(insight);
+      const hasNumber = /\$[\d,]+|\d+%/.test(insight);
+      if (!hasDate && !hasNumber) {
+        return { pass: false, reason: "history_lacks_specificity: no dates or numbers" };
+      }
+      break;
+    }
+    case "signal": {
+      // Signal should have a meaningful source (not generic)
+      const source = (content.source || "").toLowerCase();
+      const genericSources = ["bitcoin", "various", "multiple", "unknown", "anonymous", "n/a"];
+      if (genericSources.some(g => source === g || source.startsWith(g + " "))) {
+        return { pass: false, reason: "signal_generic_source" };
+      }
+      break;
+    }
+    // zoom_out_deep_time — more lenient, philosophical content doesn't need specifics
+  }
   return { pass: true };
 }
 
