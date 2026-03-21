@@ -1,10 +1,8 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+import { handleCors, jsonResponse, errorResponse } from "../_shared/cors.ts";
+import { createAuthenticatedClient, createServiceClient } from "../_shared/auth.ts";
+import { createAttemptLogger, createObsTracker, createLogger } from "../_shared/observe.ts";
+import { REFLECTION_FALLBACKS, pickRandom } from "../_shared/fallbacks.ts";
 
 const TONE_INSTRUCTIONS: Record<string, string> = {
   stoic: "Write in a calm, stoic tone. Brief and grounded. Like Marcus Aurelius observing the market.",
@@ -56,95 +54,42 @@ const TONE_FRAMINGS: Record<string, string[]> = {
   ],
 };
 
-// ── CURATED FALLBACK REFLECTIONS ──
-// Used when ALL AI models fail — ensures the user always gets a meaningful reflection
-const CURATED_REFLECTIONS = [
-  {
-    message: "The number changed. You didn't. That distinction is worth sitting with.",
-    haiku: "Digits on a screen\nshift like sand beneath the tide\nthe shore remains still",
-  },
-  {
-    message: "Between the price alert and your next action, there is a space. That space is yours.",
-    haiku: "A bell rings somewhere\nthe hand pauses, breath arrives\nchoice lives in the gap",
-  },
-  {
-    message: "Every holder who came before you sat exactly where you're sitting now, feeling exactly what you feel.",
-    haiku: "Footprints in the snow\nthousands walked this path before\nspring remembered them",
-  },
-  {
-    message: "What would the version of you one year from now think about this moment?",
-    haiku: "Tomorrow's calm self\nlooks back at today's sharp edge\nand finds it was round",
-  },
-  {
-    message: "Volatility is not the enemy of conviction. It's the price of it.",
-    haiku: "The mountain does not\napologize for its storms\nit simply endures",
-  },
-];
-
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsRes = handleCors(req);
+  if (corsRes) return corsRes;
 
   const t0 = Date.now();
+  const log = createLogger("holzen-reflect");
 
   try {
-    // Auth check — use getUser() for full server-side validation
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return errorResponse("Unauthorized", 401);
     }
-    const { createClient } = await import("npm:@supabase/supabase-js@2.57.2");
-    const sbClient = createClient(Deno.env.get("SUPABASE_URL") ?? "", Deno.env.get("SUPABASE_ANON_KEY") ?? "", { global: { headers: { Authorization: authHeader } } });
+
+    const sbClient = await createAuthenticatedClient(authHeader);
     const { data: { user }, error: authError } = await sbClient.auth.getUser();
     if (authError || !user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return errorResponse("Unauthorized", 401);
     }
 
     const userId = user.id;
-    const svcClient = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-      { auth: { persistSession: false } }
-    );
+    const svcClient = await createServiceClient();
     try { await svcClient.from("analytics_events").insert({ user_id: userId, event: "pause_ai_call" }); } catch (_) { /* tracking failure is non-fatal */ }
 
-    // Observability helper — fire-and-forget
-    const trackObs = (event: string, meta?: Record<string, any>) => {
-      svcClient.from("analytics_events").insert({
-        user_id: userId, event,
-        metadata: { companion_type: "reflection", latency_ms: Date.now() - t0, ...meta },
-      }).then(() => {});
-    };
-
-    // Cost estimation per 1M tokens (input/output) in USD
-    const COST_MAP: Record<string, [number, number]> = {
-      "google/gemini-2.5-flash": [0.15, 0.6], "google/gemini-3-flash-preview": [0.15, 0.6],
-      "google/gemini-2.5-flash-lite": [0.075, 0.3],
-    };
-    let attemptOrder = 0;
-    const logAttempt = (params: { companion_type: string; provider: string; model: string; status: string; latency_ms: number; input_tokens?: number; output_tokens?: number; error_message?: string; quality_gate_reason?: string }) => {
-      attemptOrder++;
-      const costs = COST_MAP[params.model] || [0.5, 1.5];
-      const inTok = params.input_tokens || 0;
-      const outTok = params.output_tokens || 0;
-      const cost = inTok > 0 || outTok > 0 ? (inTok * costs[0] + outTok * costs[1]) / 1_000_000 : null;
-      svcClient.from("generation_attempts").insert({ ...params, attempt_order: attemptOrder, estimated_cost_usd: cost }).then(() => {});
-    };
+    const trackObs = createObsTracker(svcClient, userId, "reflection", t0);
+    const logAttempt = createAttemptLogger(svcClient);
 
     const { context, tone, customPrompt, style, moodHistory, severity, motivations, mantra, groundingActivities, currency, language, recentHaikus, recentMessages } = await req.json();
     if (!context) {
-      return new Response(JSON.stringify({ error: "Missing context" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return errorResponse("Missing context", 400);
     }
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
-      const fallback = CURATED_REFLECTIONS[Math.floor(Math.random() * CURATED_REFLECTIONS.length)];
+      const fallback = pickRandom(REFLECTION_FALLBACKS);
       trackObs("companion_fallback_curated");
-      return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return jsonResponse(fallback);
     }
 
     // --- Adaptive tone logic ---
@@ -350,7 +295,7 @@ Haiku rules:
       } catch (e) {
         clearTimeout(timeout);
         if (e instanceof DOMException && e.name === "AbortError") {
-          console.warn(`[holzen-reflect] AI ${model} timed out after ${timeoutMs}ms`);
+          log(`AI ${model} timed out after ${timeoutMs}ms`);
           lastStatus = 504;
           logAttempt({ companion_type: "reflection", provider: "lovable", model, status: "timeout", latency_ms: Date.now() - attemptT0 });
           if (i < models.length - 1) continue;
@@ -363,38 +308,29 @@ Haiku rules:
     // ── Fallback chain: if AI failed, serve curated content ──
     if (!result?.message) {
       if (lastStatus === 429) {
-        return new Response(JSON.stringify({ error: "Rate limited. Try again later." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        return errorResponse("Rate limited. Try again later.", 429);
       }
       if (lastStatus === 402) {
-        return new Response(JSON.stringify({ error: "AI usage limit reached." }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        return errorResponse("AI usage limit reached.", 402);
       }
-      console.warn("[holzen-reflect] All AI models failed, serving curated fallback");
-      const fallback = CURATED_REFLECTIONS[Math.floor(Math.random() * CURATED_REFLECTIONS.length)];
+      log("All AI models failed, serving curated fallback");
+      const fallback = pickRandom(REFLECTION_FALLBACKS);
       trackObs("companion_fallback_curated");
-      return new Response(JSON.stringify(fallback), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return jsonResponse(fallback);
     }
 
     trackObs("companion_live_generated");
-    return new Response(JSON.stringify({
+    return jsonResponse({
       message: result.message,
       haiku: result.haiku || null,
-    }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
     console.error("holzen-reflect error:", e);
     try {
-      const fallback = CURATED_REFLECTIONS[Math.floor(Math.random() * CURATED_REFLECTIONS.length)];
-      return new Response(JSON.stringify(fallback), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      const fallback = pickRandom(REFLECTION_FALLBACKS);
+      return jsonResponse(fallback);
     } catch {
-      return new Response(
-        JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return errorResponse(e instanceof Error ? e.message : "Unknown error", 500);
     }
   }
 });
