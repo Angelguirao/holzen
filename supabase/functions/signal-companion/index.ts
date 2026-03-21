@@ -1,206 +1,54 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { handleCors, jsonResponse, errorResponse } from "../_shared/cors.ts";
+import { createAuthenticatedClient, createServiceClient } from "../_shared/auth.ts";
+import { qualityGate, normalizeUrl, isUrlReachable } from "../_shared/quality.ts";
+import { createAttemptLogger, createObsTracker, createLogger } from "../_shared/observe.ts";
+import { SIGNAL_FALLBACKS, pickRandom } from "../_shared/fallbacks.ts";
+import { serveFromCache } from "../_shared/cache.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
-
-// ── CURATED FALLBACKS ──
-// Hand-written, verified, high-quality philosophical Bitcoin insights
-const CURATED_FALLBACKS = [
-  {
-    title: "Proof of work is proof of sacrifice",
-    body: "Gigi argues that Bitcoin's proof-of-work mechanism mirrors a universal truth: nothing of value comes without cost. The energy expended isn't wasted — it's transformed into trust, the most scarce resource in human coordination.",
-    source: "Gigi — 21 Lessons",
-    url: "https://21lessons.com/",
-  },
-  {
-    title: "Sound money teaches patience before it teaches wealth",
-    body: "Saifedean Ammous observes that the hardest lesson Bitcoin teaches isn't about returns — it's about time preference. A society that saves in hard money naturally extends its planning horizon, building cathedrals instead of strip malls.",
-    source: "Saifedean Ammous — The Bitcoin Standard",
-    url: "https://saifedean.com/thebitcoinstandard/",
-  },
-  {
-    title: "Sovereignty begins with what you refuse to delegate",
-    body: "Parker Lewis writes that holding your own keys isn't a technical preference — it's a philosophical stance. Every system that asks you to trust a third party is a system that can betray you. Self-custody is the first act of self-sovereignty.",
-    source: "Parker Lewis — Gradually, Then Suddenly",
-    url: "https://unchained.com/gradually-then-suddenly/",
-  },
-  {
-    title: "The price is the least interesting thing about Bitcoin",
-    body: "Allen Farrington argues that fixating on price is like judging the printing press by the cost of paper. Bitcoin's real innovation is the separation of money and state — a shift as consequential as the separation of church and state.",
-    source: "Allen Farrington — Bitcoin Is Venice",
-    url: "https://allenfarrington.medium.com/",
-  },
-  {
-    title: "Volatility is the price of admission to a new monetary order",
-    body: "Vijay Boyapati observes that every new monetary good must pass through a period of extreme volatility on its path to stable purchasing power. Gold was volatile for centuries. Bitcoin is compressing that journey into decades.",
-    source: "Vijay Boyapati — The Bullish Case for Bitcoin",
-    url: "https://vijayboyapati.medium.com/the-bullish-case-for-bitcoin-6ecc8bdecc1",
-  },
-];
-
-function isValidUrl(s: string): boolean {
-  if (!s || s === "N/A" || s.length < 10) return false;
-  try {
-    const u = new URL(s.startsWith("http") ? s : `https://${s}`);
-    return u.protocol === "https:" || u.protocol === "http:";
-  } catch {
-    return false;
-  }
-}
-
-function normalizeUrl(s: string): string {
-  if (!s) return "";
-  if (!s.startsWith("http")) return `https://${s}`;
-  return s;
-}
-
-async function isUrlReachable(url: string): Promise<boolean> {
-  if (!url || url.length < 10) return false;
-  try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 4000);
-    const res = await fetch(url, { method: "HEAD", redirect: "follow", signal: controller.signal });
-    clearTimeout(timeout);
-    return res.status >= 200 && res.status < 400;
-  } catch {
-    return false;
-  }
-}
-
-const BANNED_PHRASES = [
-  "dive into", "game-changer", "paradigm shift", "revolutionary", "unprecedented",
-  "navigate the", "in the world of", "it's worth noting", "at the end of the day",
-  "moving forward", "leverage", "synergy", "ecosystem", "disruptive", "next-gen",
-  "cutting-edge", "in today's", "it is important to", "crucial to understand",
-  "let's explore", "without a doubt", "it goes without saying", "needless to say",
-  "in conclusion", "at its core", "when it comes to", "in this article",
-];
-const MIN_BODY_LENGTH = 80;
-const MAX_BODY_LENGTH = 600;
-
-function containsSlop(text: string): boolean {
-  const lower = text.toLowerCase();
-  return BANNED_PHRASES.some(p => lower.includes(p));
-}
-
-function passesQualityGate(sig: any): boolean {
-  // Schema validation: all required fields must be non-empty strings
-  if (typeof sig?.title !== "string" || sig.title.trim().length < 5) return false;
-  if (typeof sig?.body !== "string" || sig.body.trim().length < MIN_BODY_LENGTH) return false;
-  if (typeof sig?.source !== "string" || sig.source.trim().length < 2) return false;
-  // Max length guard — overly long output is usually regurgitation
-  if (sig.body.length > MAX_BODY_LENGTH) return false;
-  // Slop check
-  if (containsSlop(sig.body) || containsSlop(sig.title)) return false;
-  // No market data in philosophy
-  if (/\d{2,}%|\$\d/.test(sig.body)) return false;
-  // Title shouldn't be too long (headline, not a sentence)
-  if (sig.title.split(/\s+/).length > 14) return false;
-  return true;
-}
-
-/** Fallback chain: cache (highest rated, unexpired, least recently served) → curated. */
+/** Cache (ranked) → curated fallbacks. */
 async function serveFallback(svcClient: any, excludeIds?: string[]): Promise<{ data: any; source: string; cacheId: string | null }> {
-  try {
-    const now = new Date().toISOString();
-    const { data } = await svcClient
-      .from("companion_cache")
-      .select("id, content, quality_score, used_count")
-      .eq("companion_type", "signal")
-      .eq("language", "en")
-      .gte("quality_score", 2)
-      .or(`expires_at.is.null,expires_at.gt.${now}`)
-      .order("quality_score", { ascending: false })
-      .order("last_served_at", { ascending: true, nullsFirst: true })
-      .order("used_count", { ascending: true })
-      .limit(10);
-    const filtered = excludeIds?.length ? (data || []).filter((d: any) => !excludeIds.includes(d.id)) : (data || []);
-    const pool = filtered.length > 0 ? filtered : (data || []);
-    if (pool.length > 0) {
-      const pick = pool[Math.floor(Math.random() * Math.min(pool.length, 3))];
-      svcClient.from("companion_cache").update({ used_count: (pick.used_count || 0) + 1, last_served_at: now }).eq("id", pick.id).then(() => {});
-      return { data: pick.content, source: "cache", cacheId: pick.id };
-    }
-    // Second pass: any quality
-    const { data: anyQ } = await svcClient
-      .from("companion_cache")
-      .select("id, content, used_count")
-      .eq("companion_type", "signal")
-      .eq("language", "en")
-      .or(`expires_at.is.null,expires_at.gt.${now}`)
-      .order("quality_score", { ascending: false })
-      .order("used_count", { ascending: true })
-      .limit(5);
-    const anyFiltered = excludeIds?.length ? (anyQ || []).filter((d: any) => !excludeIds.includes(d.id)) : (anyQ || []);
-    const anyPool = anyFiltered.length > 0 ? anyFiltered : (anyQ || []);
-    if (anyPool.length > 0) {
-      const pick = anyPool[Math.floor(Math.random() * Math.min(anyPool.length, 3))];
-      svcClient.from("companion_cache").update({ used_count: (pick.used_count || 0) + 1, last_served_at: now }).eq("id", pick.id).then(() => {});
-      return { data: pick.content, source: "cache", cacheId: pick.id };
-    }
-  } catch { /* continue to curated */ }
-  return { data: CURATED_FALLBACKS[Math.floor(Math.random() * CURATED_FALLBACKS.length)], source: "curated", cacheId: null };
+  const cached = await serveFromCache(svcClient, "signal", "en", excludeIds);
+  if (cached) {
+    return { data: cached.data, source: "cache", cacheId: cached.cacheId };
+  }
+  return { data: pickRandom(SIGNAL_FALLBACKS), source: "curated", cacheId: null };
 }
 
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsRes = handleCors(req);
+  if (corsRes) return corsRes;
 
   const t0 = Date.now();
-  const log = (msg: string) => console.log(`[signal] ${msg} (+${Date.now() - t0}ms)`);
+  const log = createLogger("signal");
 
   try {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return errorResponse("Unauthorized", 401);
     }
 
     let body: any = {};
-    try { body = await req.json(); } catch {
-      return new Response(JSON.stringify({ error: "Invalid or empty request body" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    try {
+      body = await req.json();
+    } catch {
+      return errorResponse("Invalid or empty request body", 400);
     }
     const { context, sources, recentSignalSources, recentSignalTitles } = body;
     log("parsed body");
 
-    const { createClient } = await import("npm:@supabase/supabase-js@2.57.2");
-    const sbUrl = Deno.env.get("SUPABASE_URL") ?? "";
-    const sbClient = createClient(sbUrl, Deno.env.get("SUPABASE_ANON_KEY") ?? "", { global: { headers: { Authorization: authHeader } } });
+    const sbClient = await createAuthenticatedClient(authHeader);
     const { data: { user }, error: authError } = await sbClient.auth.getUser();
     if (authError || !user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return errorResponse("Unauthorized", 401);
     }
     log("auth verified");
 
-    const svcClient = createClient(sbUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "", { auth: { persistSession: false } });
+    const svcClient = await createServiceClient();
     svcClient.from("analytics_events").insert({ user_id: user.id, event: "signal_companion_ai_call" }).then(() => {});
 
-    // Observability helper — fire-and-forget
-    const trackObs = (event: string, meta?: Record<string, any>) => {
-      svcClient.from("analytics_events").insert({
-        user_id: user.id, event,
-        metadata: { companion_type: "signal", latency_ms: Date.now() - t0, ...meta },
-      }).then(() => {});
-    };
-
-    // Cost estimation per 1M tokens (input/output) in USD
-    const COST_MAP: Record<string, [number, number]> = {
-      "sonar-pro": [3, 15], "sonar": [1, 5],
-      "google/gemini-2.5-flash": [0.15, 0.6], "google/gemini-3-flash-preview": [0.15, 0.6],
-      "google/gemini-2.5-flash-lite": [0.075, 0.3],
-    };
-    let attemptOrder = 0;
-    const logAttempt = (params: { companion_type: string; provider: string; model: string; status: string; latency_ms: number; input_tokens?: number; output_tokens?: number; error_message?: string; quality_gate_reason?: string }) => {
-      attemptOrder++;
-      const costs = COST_MAP[params.model] || [0.5, 1.5];
-      const inTok = params.input_tokens || 0;
-      const outTok = params.output_tokens || 0;
-      const cost = inTok > 0 || outTok > 0 ? (inTok * costs[0] + outTok * costs[1]) / 1_000_000 : null;
-      svcClient.from("generation_attempts").insert({ ...params, attempt_order: attemptOrder, estimated_cost_usd: cost }).then(() => {});
-    };
+    const trackObs = createObsTracker(svcClient, user.id, "signal", t0);
+    const logAttempt = createAttemptLogger(svcClient);
 
     const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -208,7 +56,7 @@ serve(async (req) => {
       log("missing API keys, serving fallback");
       const fb = await serveFallback(svcClient);
       trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
-      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId, _serve_source: fb.source }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return jsonResponse({ ...fb.data, _cache_id: fb.cacheId, _serve_source: fb.source });
     }
 
     // Build source hints
@@ -322,13 +170,13 @@ DIVERSITY: Use a DIFFERENT thinker every time. Prefer timeless essays over recen
       log(`perplexity failed: ${e}`);
       const fb = await serveFallback(svcClient);
       trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
-      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId, _serve_source: fb.source }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return jsonResponse({ ...fb.data, _cache_id: fb.cacheId, _serve_source: fb.source });
     }
 
     if (!searchContent) {
       const fb = await serveFallback(svcClient);
       trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
-      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId, _serve_source: fb.source }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return jsonResponse({ ...fb.data, _cache_id: fb.cacheId, _serve_source: fb.source });
     }
 
     // ── Step 2: AI structuring ──
@@ -447,11 +295,12 @@ URL RULES (CRITICAL):
       }
     }
 
-    if (!signal || !passesQualityGate(signal)) {
-      log(`quality gate failed: ${!signal ? "no signal" : `body=${(signal.body||"").length}chars, slop=${containsSlop(signal?.body||"")||containsSlop(signal?.title||"")}`}`);
+    const qg = qualityGate("signal", signal);
+    if (!signal || !qg.pass) {
+      log(`quality gate failed: ${!signal ? "no signal" : (qg.reason ?? "unknown")}`);
       const fb = await serveFallback(svcClient);
       trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated", { reason: "quality_gate" });
-      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId, _serve_source: fb.source }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return jsonResponse({ ...fb.data, _cache_id: fb.cacheId, _serve_source: fb.source });
     }
 
     // ── Post-processing: URL validation ──
@@ -505,7 +354,7 @@ URL RULES (CRITICAL):
         });
         if (!isDup) {
           let sourceHost = "";
-          try { sourceHost = signal.url ? new URL(signal.url.startsWith("http") ? signal.url : `https://${signal.url}`).hostname.replace(/^www\./, "") : ""; } catch {}
+          try { sourceHost = signal.url ? new URL(signal.url.startsWith("http") ? signal.url : `https://${signal.url}`).hostname.replace(/^www\./, "") : ""; } catch { /* ignore */ }
           const fingerprint = btoa(newNorm).slice(0, 32);
           const { error: cacheErr } = await svcClient.from("companion_cache").insert({
             companion_type: "signal",
@@ -532,19 +381,13 @@ URL RULES (CRITICAL):
 
     trackObs("companion_live_generated");
     log(`done, signal: ${signal.title}, source: ${signal.source}`);
-    return new Response(JSON.stringify({ ...signal, _serve_source: "live" }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return jsonResponse({ ...signal, _serve_source: "live" });
   } catch (e) {
     console.error("signal-companion error:", e);
     try {
-      const fallback = CURATED_FALLBACKS[Math.floor(Math.random() * CURATED_FALLBACKS.length)];
-      return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return jsonResponse(pickRandom(SIGNAL_FALLBACKS));
     } catch {
-      return new Response(
-        JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return errorResponse(e instanceof Error ? e.message : "Unknown error", 500);
     }
   }
 });
