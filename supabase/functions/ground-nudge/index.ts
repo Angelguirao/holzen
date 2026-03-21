@@ -239,22 +239,8 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
       nudge.url = citations[0];
     }
 
+    // URL quality: start at 1, validate asynchronously after response is sent.
     let qualityScore = 1;
-    if (nudge.url) {
-      const reachable = await isUrlReachable(nudge.url);
-      if (!reachable) {
-        let found = false;
-        for (const c of citations) {
-          if (c !== nudge.url && await isUrlReachable(c)) { nudge.url = c; found = true; break; }
-        }
-        if (!found) {
-          const searchTerm = encodeURIComponent(nudge.citation || nudge.title || "behavioral finance");
-          nudge.url = `https://scholar.google.com/scholar?q=${searchTerm}`;
-        }
-      } else {
-        qualityScore = 2;
-      }
-    }
 
     // Cache good content with rich metadata and title-based dedup (awaited to prevent data loss)
     const cacheQg = qualityGate("ground_nudge", nudge);
@@ -292,6 +278,21 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
           if (cacheErr) log(`cache insert error: ${cacheErr.message}`);
         } else { log("cache dedup: skipped duplicate title"); }
       } catch (e) { log(`cache write failed: ${e}`); }
+    }
+
+    // Background URL validation (fire-and-forget, non-blocking)
+    if (nudge.url && nudge.url.startsWith("http")) {
+      isUrlReachable(nudge.url).then(async (reachable) => {
+        if (reachable) {
+          try {
+            const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
+            await svcClient.from("companion_cache")
+              .update({ quality_score: 2, last_validated_at: new Date().toISOString() })
+              .eq("companion_type", "ground_nudge")
+              .eq("title_norm", norm(nudge.title));
+          } catch { /* non-critical */ }
+        }
+      }).catch(() => {});
     }
 
     trackObs("companion_live_generated");
