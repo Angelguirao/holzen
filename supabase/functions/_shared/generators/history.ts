@@ -35,10 +35,10 @@ export interface GenerateHistoryParams {
 
 const HISTORICAL_ERAS = [
   { era: "early Bitcoin (2011-2013)", examples: "Bitcoin's first bubble to $32 then crash to $2, the 2013 China ban crash" },
-  { era: "Mt. Gox era (2014-2015)", examples: "Mt. Gox collapse, the long crypto winter of 2014-2015" },
-  { era: "ICO boom and bust (2017-2018)", examples: "Bitcoin's rise to $20k, the 2018 crash, ICO mania" },
+  { era: "Mt. Gox era (2014-2015)", examples: "Mt. Gox collapse, the long Bitcoin bear market of 2014-2015" },
+  { era: "2017 mania and aftermath (2017-2018)", examples: "Bitcoin's rise to $20k, the 2018 bear market, speculative excess" },
   { era: "COVID and institutional era (2020-2021)", examples: "March 2020 crash, MicroStrategy buys, El Salvador adoption, $69k peak" },
-  { era: "crypto winter (2022-2023)", examples: "Luna/Terra collapse, FTX fraud, contagion effects" },
+  { era: "Bitcoin bear market (2022-2023)", examples: "Industry contagion from Luna/Terra and FTX failures, Bitcoin's resilience" },
   { era: "traditional finance parallels", examples: "1987 Black Monday, dot-com bubble 2000, 2008 financial crisis, gold's 1980 peak" },
   { era: "commodity and forex history", examples: "oil price shocks, Swiss franc unpegging, Asian financial crisis 1997" },
   { era: "tech stock parallels", examples: "Amazon's 95% crash, Apple near-bankruptcy, Cisco post-dot-com" },
@@ -158,6 +158,11 @@ ACCURACY RULES (CRITICAL):
 - Use ONLY dates, prices, percentages from the search results
 - Do NOT invent historical prices or recovery timelines
 - End with "this too passed" energy, not hype or doom
+
+BITCOIN ONLY:
+- The analogy must connect back to Bitcoin specifically, not "crypto" in general
+- Say "Bitcoin" not "crypto", "cryptocurrency", or "digital assets"
+- The user is a Bitcoin holder — not a "crypto investor"
 
 BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? `\n\nUSER MOOD: The user is feeling "${mood}". Subtly calibrate the historical parallel to resonate with this emotional state.` : ""}${titleExclusion}`,
       },

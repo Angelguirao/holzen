@@ -42,7 +42,7 @@ const BIAS_TOPICS = [
   "recency bias and availability heuristic in market predictions",
   "overconfidence bias and illusion of control in trading decisions",
   "regret aversion and its effect on long-term investment holding",
-  "social proof and information cascading in crypto markets",
+  "social proof and information cascading in Bitcoin markets",
 ];
 
 async function serveFallback(
@@ -157,6 +157,11 @@ ACCURACY RULES (CRITICAL):
 - Do NOT invent researcher names, years, journals, or statistics
 - If the search results are vague, keep the body general
 - Copy citation URLs character-for-character from the list
+
+BITCOIN ONLY:
+- Frame everything in terms of Bitcoin holders, not "crypto investors"
+- Say "Bitcoin" not "crypto" or "cryptocurrency"
+- The user holds Bitcoin specifically — this is not about altcoins or "the crypto market"
 
 BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shift, revolutionary, unprecedented, navigate the, in the world of, it's worth noting, at the end of the day, moving forward, leverage, synergy, ecosystem, disruptive, next-gen, cutting-edge`,
       },
