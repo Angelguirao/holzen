@@ -4,13 +4,30 @@
  */
 
 // ── Cost estimation per 1M tokens [input, output] in USD ──
-export const COST_MAP: Record<string, [number, number]> = {
+// Default costs; can be overridden via COST_MAP_OVERRIDE env var
+// (JSON string, e.g. '{"google/gemini-2.5-flash":[0.15,0.6]}')
+const DEFAULT_COST_MAP: Record<string, [number, number]> = {
   "sonar-pro": [3, 15],
   "sonar": [1, 5],
   "google/gemini-2.5-flash": [0.15, 0.6],
   "google/gemini-3-flash-preview": [0.15, 0.6],
   "google/gemini-2.5-flash-lite": [0.075, 0.3],
 };
+
+function loadCostMap(): Record<string, [number, number]> {
+  try {
+    const override = typeof Deno !== "undefined" ? Deno.env.get("COST_MAP_OVERRIDE") : undefined;
+    if (override) {
+      const parsed = JSON.parse(override);
+      return { ...DEFAULT_COST_MAP, ...parsed };
+    }
+  } catch (e) {
+    console.warn("[observe] Failed to parse COST_MAP_OVERRIDE, using defaults:", e);
+  }
+  return DEFAULT_COST_MAP;
+}
+
+export const COST_MAP = loadCostMap();
 
 interface AttemptParams {
   companion_type: string;
