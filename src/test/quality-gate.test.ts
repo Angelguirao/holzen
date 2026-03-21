@@ -13,6 +13,8 @@ import {
   isValidUrl,
   normalizeUrl,
   normalizeTitle,
+  contentFingerprint,
+  contentFingerprintSync,
   BANNED_PHRASES,
 } from '../../supabase/functions/_shared/quality';
 
@@ -254,5 +256,45 @@ describe('BANNED_PHRASES', () => {
   it('has a reasonable number of phrases', () => {
     expect(BANNED_PHRASES.length).toBeGreaterThan(10);
     expect(BANNED_PHRASES.length).toBeLessThan(100);
+  });
+});
+
+describe('contentFingerprint', () => {
+  it('returns a 32-char hex string', async () => {
+    const fp = await contentFingerprint('proof of work is proof of sacrifice');
+    expect(fp).toMatch(/^[0-9a-f]{32}$/);
+    expect(fp.length).toBe(32);
+  });
+
+  it('is deterministic', async () => {
+    const fp1 = await contentFingerprint('sound money');
+    const fp2 = await contentFingerprint('sound money');
+    expect(fp1).toBe(fp2);
+  });
+
+  it('produces different hashes for different inputs', async () => {
+    const fp1 = await contentFingerprint('bitcoin philosophy');
+    const fp2 = await contentFingerprint('ethereum philosophy');
+    expect(fp1).not.toBe(fp2);
+  });
+});
+
+describe('contentFingerprintSync', () => {
+  it('returns a 32-char hex string', () => {
+    const fp = contentFingerprintSync('proof of work is proof of sacrifice');
+    expect(fp).toMatch(/^[0-9a-f]{32}$/);
+    expect(fp.length).toBe(32);
+  });
+
+  it('is deterministic', () => {
+    const fp1 = contentFingerprintSync('sound money');
+    const fp2 = contentFingerprintSync('sound money');
+    expect(fp1).toBe(fp2);
+  });
+
+  it('produces different hashes for different inputs', () => {
+    const fp1 = contentFingerprintSync('bitcoin philosophy');
+    const fp2 = contentFingerprintSync('ethereum philosophy');
+    expect(fp1).not.toBe(fp2);
   });
 });

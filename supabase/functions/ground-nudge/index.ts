@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { handleCors, jsonResponse, errorResponse } from "../_shared/cors.ts";
 import { createAuthenticatedClient, createServiceClient } from "../_shared/auth.ts";
-import { qualityGate, isUrlReachable, containsSlop } from "../_shared/quality.ts";
+import { qualityGate, isUrlReachable, containsSlop, contentFingerprint } from "../_shared/quality.ts";
 import { createAttemptLogger, createObsTracker, createLogger } from "../_shared/observe.ts";
 import { GROUNDING_FALLBACKS, pickRandom } from "../_shared/fallbacks.ts";
 import { serveFromCache } from "../_shared/cache.ts";
@@ -270,7 +270,7 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
         if (!isDup) {
           let sourceHost = "";
           try { sourceHost = nudge.url ? new URL(nudge.url.startsWith("http") ? nudge.url : `https://${nudge.url}`).hostname.replace(/^www\./, "") : ""; } catch {}
-          const fingerprint = btoa(newNorm).slice(0, 32);
+          const fingerprint = await contentFingerprint(newNorm);
           const { error: cacheErr } = await svcClient.from("companion_cache").insert({
             companion_type: "ground_nudge",
             language: "en",

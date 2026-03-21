@@ -157,6 +157,56 @@ export async function isUrlReachable(url: string): Promise<boolean> {
   }
 }
 
+// ── Content fingerprinting ──
+
+/**
+ * Generate a content fingerprint using SHA-256 hash.
+ * Used for dedup in companion_cache. Deterministic for the same input.
+ *
+ * @param content - The text to fingerprint (typically normalized title + body prefix)
+ * @returns 32-char hex string (first 128 bits of SHA-256)
+ */
+export async function contentFingerprint(content: string): Promise<string> {
+  const data = new TextEncoder().encode(content);
+  const hash = await crypto.subtle.digest("SHA-256", data);
+  const bytes = new Uint8Array(hash);
+  return Array.from(bytes.slice(0, 16))
+    .map(b => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+/**
+ * Synchronous fingerprint fallback using simple string hash.
+ * Use contentFingerprint (async) when possible; this is for contexts
+ * where async isn't convenient.
+ */
+export function contentFingerprintSync(content: string): string {
+  // djb2 hash → hex, 32 chars
+  let hash = 5381;
+  for (let i = 0; i < content.length; i++) {
+    hash = ((hash << 5) + hash + content.charCodeAt(i)) >>> 0;
+  }
+  // Repeat to fill 32 chars
+  const h1 = hash.toString(16).padStart(8, "0");
+  let hash2 = 2166136261;
+  for (let i = 0; i < content.length; i++) {
+    hash2 = ((hash2 ^ content.charCodeAt(i)) * 16777619) >>> 0;
+  }
+  const h2 = hash2.toString(16).padStart(8, "0");
+  let hash3 = 0;
+  for (let i = 0; i < content.length; i++) {
+    hash3 = content.charCodeAt(i) + ((hash3 << 6) + (hash3 << 16) - hash3);
+    hash3 = hash3 >>> 0;
+  }
+  const h3 = hash3.toString(16).padStart(8, "0");
+  let hash4 = 0x811c9dc5;
+  for (let i = content.length - 1; i >= 0; i--) {
+    hash4 = ((hash4 ^ content.charCodeAt(i)) * 0x01000193) >>> 0;
+  }
+  const h4 = hash4.toString(16).padStart(8, "0");
+  return (h1 + h2 + h3 + h4).slice(0, 32);
+}
+
 // ── Title-based dedup helper ──
 
 /** Normalize a title for dedup comparison */

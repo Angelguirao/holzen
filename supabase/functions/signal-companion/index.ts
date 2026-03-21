@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { handleCors, jsonResponse, errorResponse } from "../_shared/cors.ts";
 import { createAuthenticatedClient, createServiceClient } from "../_shared/auth.ts";
-import { qualityGate, normalizeUrl, isUrlReachable } from "../_shared/quality.ts";
+import { qualityGate, normalizeUrl, isUrlReachable, contentFingerprint } from "../_shared/quality.ts";
 import { createAttemptLogger, createObsTracker, createLogger } from "../_shared/observe.ts";
 import { SIGNAL_FALLBACKS, pickRandom } from "../_shared/fallbacks.ts";
 import { serveFromCache } from "../_shared/cache.ts";
@@ -351,7 +351,7 @@ URL RULES (CRITICAL):
         if (!isDup) {
           let sourceHost = "";
           try { sourceHost = signal.url ? new URL(signal.url.startsWith("http") ? signal.url : `https://${signal.url}`).hostname.replace(/^www\./, "") : ""; } catch {}
-          const fingerprint = btoa(newNorm).slice(0, 32);
+          const fingerprint = await contentFingerprint(newNorm);
           const { error: cacheErr } = await svcClient.from("companion_cache").insert({
             companion_type: "signal",
             language: "en",
