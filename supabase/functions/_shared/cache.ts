@@ -3,6 +3,9 @@
  * Centralises the cache fallback chain logic used by all companion functions.
  */
 
+/** `companion_cache.companion_type` for zoom-out deep-time entries */
+export const COMPANION_ZOOM_OUT_DEEP_TIME = "zoom_out_deep_time";
+
 /**
  * Serve from cache with quality-ranked selection.
  * Returns the best available cached content, or null if cache is empty.

@@ -1,127 +1,49 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
-
-// ── CURATED DEEP TIME FALLBACKS ──
-const CURATED_DEEP_TIME = [
-  {
-    title: "Fifteen years in five thousand",
-    body: "Humans have used money for roughly 5,000 years — shells, salt, gold, paper, digits. Bitcoin is 15 years old. You're watching the first chapter of a new monetary epoch being written in real time.",
-  },
-  {
-    title: "The patience of geology",
-    body: "The Grand Canyon took 6 million years to carve. Today's price movement is a single grain of sand in that process. The forces shaping Bitcoin — cryptography, energy, mathematics — operate on timescales your portfolio screen cannot display.",
-  },
-  {
-    title: "Gold took centuries to become gold",
-    body: "For thousands of years, humans carried gold without knowing why it was valuable beyond its beauty. It took until 1717 for Isaac Newton to formally establish the gold standard. Monetary consensus is measured in centuries, not quarters.",
-  },
-  {
-    title: "A technology adopted in the blink of history",
-    body: "The printing press took 50 years to spread across Europe. The internet took 30 years to connect the world. Bitcoin has connected 200 million people in 15 years. You're living through the fastest monetary adoption in human history.",
-  },
-  {
-    title: "The sun sends more energy in one hour",
-    body: "The sun delivers more energy to Earth in a single hour than humanity uses in an entire year. Bitcoin's energy usage, often criticized, represents a rounding error against the cosmic backdrop. Perspective is a function of the frame you choose.",
-  },
-];
-
-// ── BANNED AI-SLOP PHRASES ──
-const BANNED_PHRASES = [
-  "dive into", "game-changer", "paradigm shift", "revolutionary", "unprecedented",
-  "navigate the", "in the world of", "it's worth noting", "at the end of the day",
-  "moving forward", "leverage", "synergy", "ecosystem", "disruptive", "next-gen",
-  "cutting-edge", "in today's", "it is important to", "crucial to understand",
-  "let's explore", "without a doubt", "it goes without saying", "needless to say",
-  "in conclusion", "at its core", "when it comes to", "in this article",
-];
-
-const MIN_BODY_LENGTH = 80;
-const MAX_BODY_LENGTH = 500;
-
-function containsSlop(text: string): boolean {
-  const lower = text.toLowerCase();
-  return BANNED_PHRASES.some(p => lower.includes(p));
-}
-
-function passesDeepTimeQuality(dt: any): boolean {
-  // Schema: title and body must be non-empty strings of appropriate length
-  if (typeof dt?.title !== "string" || dt.title.trim().length < 5) return false;
-  if (typeof dt?.body !== "string" || dt.body.trim().length < MIN_BODY_LENGTH) return false;
-  // Max length — deep-time should be concise, not an essay
-  if (dt.body.length > MAX_BODY_LENGTH) return false;
-  // Title word count: 3-10 words
-  const titleWords = dt.title.trim().split(/\s+/).length;
-  if (titleWords < 3 || titleWords > 10) return false;
-  // Slop check
-  if (containsSlop(dt.body) || containsSlop(dt.title)) return false;
-  // No market data in deep-time perspective
-  if (/\d{2,}%|\$\d/.test(dt.body)) return false;
-  return true;
-}
+import { handleCors, jsonResponse, errorResponse } from "../_shared/cors.ts";
+import { verifyFlexAuth, createServiceClient } from "../_shared/auth.ts";
+import { qualityGate, BANNED_PHRASES, containsSlop } from "../_shared/quality.ts";
+import { createAttemptLogger, createObsTracker, createLogger } from "../_shared/observe.ts";
+import { ZOOM_OUT_FALLBACKS, pickRandom } from "../_shared/fallbacks.ts";
+import { COMPANION_ZOOM_OUT_DEEP_TIME } from "../_shared/cache.ts";
 
 serve(async (req) => {
-  if (req.method === "OPTIONS")
-    return new Response(null, { headers: corsHeaders });
+  const corsRes = handleCors(req);
+  if (corsRes) return corsRes;
 
   const t0 = Date.now();
-  const log = (msg: string) => console.log(`[zoom-out] ${msg} (+${Date.now() - t0}ms)`);
+  const log = createLogger("zoom-out");
 
   try {
     const authHeader = req.headers.get("Authorization");
-    if (!authHeader) throw new Error("Missing authorization");
+    if (!authHeader) return errorResponse("Missing authorization", 401);
 
-    const { createClient } = await import("npm:@supabase/supabase-js@2.57.2");
-    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
-    const serviceClient = createClient(supabaseUrl, serviceRoleKey, { auth: { persistSession: false } });
-
-    // Auth: support both user JWT and service role key
-    let resolvedUserId: string | null = null;
-    const token = authHeader.replace("Bearer ", "");
-    if (token === serviceRoleKey) {
-      // server-to-server
-    } else {
-      const userClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!, { global: { headers: { Authorization: authHeader } } });
-      const { data: { user }, error: authError } = await userClient.auth.getUser();
-      if (authError || !user) throw new Error("Not authenticated");
-      resolvedUserId = user.id;
+    let body: any = {};
+    try {
+      body = await req.json();
+    } catch {
+      return errorResponse("Invalid or empty request body", 400);
     }
+    const { context, reflectionMessage, userId: bodyUserId, mood, recentTitles } = body;
 
-    const { context, reflectionMessage, userId: bodyUserId, mood, recentTitles } = await req.json();
+    const { userId: resolvedUserId, isService } = await verifyFlexAuth(req, bodyUserId);
+    if (!isService && !resolvedUserId) {
+      return errorResponse("Not authenticated", 401);
+    }
     const effectiveUserId = resolvedUserId || bodyUserId;
 
+    const serviceClient = await createServiceClient();
+
     if (effectiveUserId) {
-      try { await serviceClient.from("analytics_events").insert({ user_id: effectiveUserId, event: "zoom_out_ai_call" }); } catch (_) { /* non-fatal */ }
+      try {
+        await serviceClient.from("analytics_events").insert({ user_id: effectiveUserId, event: "zoom_out_ai_call" });
+      } catch (_) { /* non-fatal */ }
     }
 
-    // Observability helper — fire-and-forget
-    const trackObs = (event: string, meta?: Record<string, any>) => {
-      if (!effectiveUserId) return;
-      serviceClient.from("analytics_events").insert({
-        user_id: effectiveUserId, event,
-        metadata: { companion_type: "zoom_out", latency_ms: Date.now() - t0, ...meta },
-      }).then(() => {});
-    };
+    const trackObs = effectiveUserId
+      ? createObsTracker(serviceClient, effectiveUserId, "zoom_out", t0)
+      : (_event: string, _meta?: Record<string, any>) => {};
 
-    // Cost estimation per 1M tokens (input/output) in USD
-    const COST_MAP: Record<string, [number, number]> = {
-      "google/gemini-2.5-flash": [0.15, 0.6], "google/gemini-3-flash-preview": [0.15, 0.6],
-      "google/gemini-2.5-flash-lite": [0.075, 0.3],
-    };
-    let attemptOrder = 0;
-    const logAttempt = (params: { companion_type: string; provider: string; model: string; status: string; latency_ms: number; input_tokens?: number; output_tokens?: number; error_message?: string; quality_gate_reason?: string }) => {
-      attemptOrder++;
-      const costs = COST_MAP[params.model] || [0.5, 1.5];
-      const inTok = params.input_tokens || 0;
-      const outTok = params.output_tokens || 0;
-      const cost = inTok > 0 || outTok > 0 ? (inTok * costs[0] + outTok * costs[1]) / 1_000_000 : null;
-      serviceClient.from("generation_attempts").insert({ ...params, attempt_order: attemptOrder, estimated_cost_usd: cost }).then(() => {});
-    };
+    const logAttempt = createAttemptLogger(serviceClient);
 
     // ── 1. Fetch historical BTC prices with DB caching ──
     const today = new Date();
@@ -285,20 +207,21 @@ No trading advice, no price predictions, no exclamation marks.${mood ? `\n\nUSER
             if (raw) {
               try {
                 const parsed = JSON.parse(raw);
-                if (parsed.title && parsed.body && passesDeepTimeQuality(parsed)) {
+                const qg = qualityGate("zoom_out_deep_time", parsed);
+                if (parsed.title && parsed.body && qg.pass) {
                   deepTime = { title: parsed.title, body: parsed.body };
                   deepTimeSource = "live";
                   logAttempt({ companion_type: "zoom_out", provider: "lovable", model, status: "success", latency_ms: Date.now() - attemptT0, input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
                   // Cache with rich metadata and title-based dedup (awaited to prevent data loss)
                   try {
-                    const { data: existing } = await serviceClient.from("companion_cache").select("content").eq("companion_type", "zoom_out_deep_time").eq("language", "en").limit(30);
+                    const { data: existing } = await serviceClient.from("companion_cache").select("content").eq("companion_type", COMPANION_ZOOM_OUT_DEEP_TIME).eq("language", "en").limit(30);
                     const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
                     const newNorm = norm(parsed.title);
                     const isDup = existing?.some((e: any) => { const t = norm(e.content?.title || ""); return t === newNorm || t.includes(newNorm) || newNorm.includes(t); });
                     if (!isDup) {
                       const fingerprint = btoa(newNorm).slice(0, 32);
                       const { error: cacheErr } = await serviceClient.from("companion_cache").insert({
-                        companion_type: "zoom_out_deep_time",
+                        companion_type: COMPANION_ZOOM_OUT_DEEP_TIME,
                         language: "en",
                         content: deepTime,
                         quality_score: 2,
@@ -314,7 +237,7 @@ No trading advice, no price predictions, no exclamation marks.${mood ? `\n\nUSER
                   } catch (e) { log(`cache write failed: ${e}`); }
                   break;
                 } else if (parsed.title && parsed.body) {
-                  log(`deepTime quality gate failed: body=${(parsed.body||"").length}chars slop=${containsSlop(parsed.body||"")}`);
+                  log(`deepTime quality gate failed: body=${(parsed.body || "").length}chars slop=${containsSlop(parsed.body || "")}`);
                   logAttempt({ companion_type: "zoom_out", provider: "lovable", model, status: "quality_gate_failed", latency_ms: Date.now() - attemptT0, quality_gate_reason: "deep_time_quality", input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
                   if (model !== models[models.length - 1]) continue;
                 }
@@ -341,7 +264,7 @@ No trading advice, no price predictions, no exclamation marks.${mood ? `\n\nUSER
       // Fallback chain: cache → curated
       if (!deepTime) {
         try {
-          const { data: cachedDt } = await serviceClient.from("companion_cache").select("content, used_count, id").eq("companion_type", "zoom_out_deep_time").eq("language", "en").order("used_count", { ascending: true }).limit(5);
+          const { data: cachedDt } = await serviceClient.from("companion_cache").select("content, used_count, id").eq("companion_type", COMPANION_ZOOM_OUT_DEEP_TIME).eq("language", "en").order("used_count", { ascending: true }).limit(5);
           if (cachedDt && cachedDt.length > 0) {
             const pick = cachedDt[Math.floor(Math.random() * cachedDt.length)];
             deepTime = pick.content as any;
@@ -351,12 +274,12 @@ No trading advice, no price predictions, no exclamation marks.${mood ? `\n\nUSER
         } catch { /* continue */ }
 
         if (!deepTime) {
-          deepTime = CURATED_DEEP_TIME[Math.floor(Math.random() * CURATED_DEEP_TIME.length)];
+          deepTime = pickRandom(ZOOM_OUT_FALLBACKS);
           deepTimeSource = "curated";
         }
       }
     } else {
-      deepTime = CURATED_DEEP_TIME[Math.floor(Math.random() * CURATED_DEEP_TIME.length)];
+      deepTime = pickRandom(ZOOM_OUT_FALLBACKS);
       deepTimeSource = "curated";
     }
 
@@ -376,9 +299,9 @@ No trading advice, no price predictions, no exclamation marks.${mood ? `\n\nUSER
     };
 
     log("done");
-    return new Response(JSON.stringify(result), { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return jsonResponse(result);
   } catch (e) {
     console.error("zoom-out error:", e);
-    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    return errorResponse(e instanceof Error ? e.message : "Unknown error", 500);
   }
 });
