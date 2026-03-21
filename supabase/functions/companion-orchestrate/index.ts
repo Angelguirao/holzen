@@ -218,17 +218,31 @@ serve(async (req) => {
       }
     }
 
-    // Fire-and-forget: write serve logs + reflection updates
+    // Await critical writes before returning response
+    const writePromises: Promise<void>[] = [];
+
     if (serveInserts.length > 0) {
-      svcClient.from("companion_serves").insert(serveInserts).then(({ error }) => {
-        if (error) console.error("[orchestrate] serve insert error:", error.message);
-      });
+      writePromises.push(
+        svcClient.from("companion_serves").insert(serveInserts).then(({ error }) => {
+          if (error) console.error("[orchestrate] serve insert error:", error.message);
+        })
+      );
     }
 
     if (reflectionId && Object.keys(reflectionUpdates).length > 0) {
-      svcClient.from("reflections").update(reflectionUpdates).eq("id", reflectionId).then(({ error }) => {
-        if (error) console.error("[orchestrate] reflection update error:", error.message);
-      });
+      writePromises.push(
+        svcClient.from("reflections").update(reflectionUpdates).eq("id", reflectionId).then(({ error }) => {
+          if (error) console.error("[orchestrate] reflection update error:", error.message);
+        })
+      );
+    }
+
+    // Wait for all writes to complete (with a safety timeout to avoid blocking forever)
+    if (writePromises.length > 0) {
+      await Promise.race([
+        Promise.allSettled(writePromises),
+        new Promise(resolve => setTimeout(resolve, 3000)), // 3s max wait for writes
+      ]);
     }
 
     log(`done, returning ${keys.length} companions`);

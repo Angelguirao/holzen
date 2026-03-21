@@ -175,7 +175,8 @@ serve(async (req) => {
     }
 
     if (newPrices.length > 0) {
-      serviceClient.from("btc_price_cache").upsert(newPrices.map(p => ({ date: p.date, price: p.price, fetched_at: new Date().toISOString() }))).then(() => {});
+      const { error: priceErr } = await serviceClient.from("btc_price_cache").upsert(newPrices.map(p => ({ date: p.date, price: p.price, fetched_at: new Date().toISOString() })));
+      if (priceErr) log(`btc_price_cache upsert error: ${priceErr.message}`);
     }
 
     const onThisDay: { yearsAgo: number; price: number; date: string }[] = [];
@@ -288,30 +289,29 @@ No trading advice, no price predictions, no exclamation marks.${mood ? `\n\nUSER
                   deepTime = { title: parsed.title, body: parsed.body };
                   deepTimeSource = "live";
                   logAttempt({ companion_type: "zoom_out", provider: "lovable", model, status: "success", latency_ms: Date.now() - attemptT0, input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
-                  // Cache with rich metadata and title-based dedup
-                  (async () => {
-                    try {
-                      const { data: existing } = await serviceClient.from("companion_cache").select("content").eq("companion_type", "zoom_out_deep_time").eq("language", "en").limit(30);
-                      const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
-                      const newNorm = norm(parsed.title);
-                      const isDup = existing?.some((e: any) => { const t = norm(e.content?.title || ""); return t === newNorm || t.includes(newNorm) || newNorm.includes(t); });
-                      if (!isDup) {
-                        const fingerprint = btoa(newNorm).slice(0, 32);
-                        await serviceClient.from("companion_cache").insert({
-                          companion_type: "zoom_out_deep_time",
-                          language: "en",
-                          content: deepTime,
-                          quality_score: 2,
-                          title: parsed.title,
-                          title_norm: newNorm,
-                          fingerprint,
-                          source_kind: "deep_time",
-                          expires_at: new Date(Date.now() + 14 * 86400000).toISOString(),
-                          automated_score: 2,
-                        });
-                      }
-                    } catch { /* non-fatal */ }
-                  })();
+                  // Cache with rich metadata and title-based dedup (awaited to prevent data loss)
+                  try {
+                    const { data: existing } = await serviceClient.from("companion_cache").select("content").eq("companion_type", "zoom_out_deep_time").eq("language", "en").limit(30);
+                    const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
+                    const newNorm = norm(parsed.title);
+                    const isDup = existing?.some((e: any) => { const t = norm(e.content?.title || ""); return t === newNorm || t.includes(newNorm) || newNorm.includes(t); });
+                    if (!isDup) {
+                      const fingerprint = btoa(newNorm).slice(0, 32);
+                      const { error: cacheErr } = await serviceClient.from("companion_cache").insert({
+                        companion_type: "zoom_out_deep_time",
+                        language: "en",
+                        content: deepTime,
+                        quality_score: 2,
+                        title: parsed.title,
+                        title_norm: newNorm,
+                        fingerprint,
+                        source_kind: "deep_time",
+                        expires_at: new Date(Date.now() + 14 * 86400000).toISOString(),
+                        automated_score: 2,
+                      });
+                      if (cacheErr) log(`cache insert error: ${cacheErr.message}`);
+                    }
+                  } catch (e) { log(`cache write failed: ${e}`); }
                   break;
                 } else if (parsed.title && parsed.body) {
                   log(`deepTime quality gate failed: body=${(parsed.body||"").length}chars slop=${containsSlop(parsed.body||"")}`);
