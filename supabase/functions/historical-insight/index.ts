@@ -1,182 +1,51 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { handleCors, jsonResponse, errorResponse } from "../_shared/cors.ts";
+import { createServiceClient, verifyFlexAuth } from "../_shared/auth.ts";
+import { qualityGate, BANNED_PHRASES } from "../_shared/quality.ts";
+import { createAttemptLogger, createObsTracker, createLogger } from "../_shared/observe.ts";
+import { HISTORY_FALLBACKS, pickRandom } from "../_shared/fallbacks.ts";
+import { serveFromCache } from "../_shared/cache.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
-
-// ── CURATED FALLBACKS ──
-const CURATED_FALLBACKS = [
-  {
-    title: "When gold crashed 26% in 2013",
-    btcInsight: "Between April 12-15, 2013, gold plummeted from $1,560 to $1,321 per ounce — a 26% crash in three days. Panic sellers locked in generational losses. Those who held saw gold consolidate and stabilize, eventually becoming a cornerstone of central bank reserves again.",
-    analogy: "The same pattern preceded every major Bitcoin recovery: sharp fear, forced selling, then quiet accumulation by those who understood what they owned.",
-    assetClass: "Gold",
-    period: "April 2013",
-    source: "Financial Times historical archive",
-    url: "https://www.ft.com/",
-  },
-  {
-    title: "Amazon lost 95% and became the everything store",
-    btcInsight: "From its December 1999 peak of $106.69, Amazon crashed to $5.51 by October 2001 — a 95% drawdown. The narrative shifted from 'revolutionary' to 'overvalued dot-com.' Anyone who sold at $5.51 missed a stock that would eventually reach $3,000+.",
-    analogy: "Bitcoin has experienced five drawdowns of 70%+ in its history. Each time, the 'it's dead' narrative peaked at the bottom.",
-    assetClass: "Tech stocks",
-    period: "2000-2001",
-    source: "Historical stock data",
-    url: "https://en.wikipedia.org/wiki/Amazon_(company)#Stock",
-  },
-  {
-    title: "The 2020 COVID crash recovered in 40 days",
-    btcInsight: "On March 12, 2020 — 'Black Thursday' — Bitcoin fell from $7,900 to $3,800 in 24 hours, a 52% single-day crash. It was the fastest drawdown in Bitcoin's history. Yet within 40 days, BTC had recovered to pre-crash levels, and within 9 months it set a new all-time high.",
-    analogy: "The S&P 500 followed a similar pattern, crashing 34% and fully recovering by August 2020. The lesson: the speed of the crash rarely predicts the timeline of recovery.",
-    assetClass: "S&P 500",
-    period: "March 2020",
-    source: "CoinDesk historical data",
-    url: "https://www.coindesk.com/",
-  },
-  {
-    title: "The Swiss franc shock of 2015",
-    btcInsight: "On January 15, 2015, the Swiss National Bank unexpectedly removed the EUR/CHF floor. The franc surged 30% in minutes, wiping out leveraged traders and bankrupting multiple brokerages. It was the largest single-day move in a major currency in modern history.",
-    analogy: "Like Bitcoin's sudden moves, the Swiss franc shock demonstrated that markets can reprice decades of assumptions in minutes. Those with no leverage and long time horizons were unscathed.",
-    assetClass: "Forex",
-    period: "January 2015",
-    source: "Bloomberg historical archive",
-    url: "https://www.bloomberg.com/",
-  },
-  {
-    title: "Bitcoin's 2018 winter lasted 12 months",
-    btcInsight: "After reaching $19,783 in December 2017, Bitcoin entered a 12-month bear market that bottomed at $3,122 in December 2018 — an 84% drawdown. Most altcoins lost 95%+. The narrative shifted entirely from 'new paradigm' to 'dead technology.'",
-    analogy: "The dot-com bust of 2000 saw the NASDAQ lose 78% over 30 months. Both events cleared speculative excess while the underlying technology continued developing.",
-    assetClass: "NASDAQ",
-    period: "December 2017 – December 2018",
-    source: "CoinMarketCap historical data",
-    url: "https://coinmarketcap.com/currencies/bitcoin/",
-  },
-];
-
-// ── BANNED AI-SLOP PHRASES ──
-const BANNED_PHRASES = ["dive into", "game-changer", "paradigm shift", "revolutionary", "unprecedented", "navigate the", "in the world of", "it's worth noting", "at the end of the day", "moving forward", "leverage", "synergy", "ecosystem", "disruptive", "next-gen", "cutting-edge"];
-
-const MIN_BODY_LENGTH = 80;
-
-function containsSlop(text: string): boolean {
-  const lower = text.toLowerCase();
-  return BANNED_PHRASES.some(p => lower.includes(p));
-}
-
-function passesQualityGate(insight: any): boolean {
-  if (!insight?.title || !insight?.btcInsight) return false;
-  if ((insight.btcInsight || "").length < MIN_BODY_LENGTH) return false;
-  if (containsSlop(insight.btcInsight) || containsSlop(insight.analogy || "")) return false;
-  return true;
-}
-
-/** Fallback chain: cache (highest rated, unexpired, least recently served) → curated. */
+/** Cache (ranked) → curated fallbacks. */
 async function serveFallback(svcClient: any, excludeIds?: string[]): Promise<{ data: any; source: string; cacheId: string | null }> {
-  try {
-    const now = new Date().toISOString();
-    const { data } = await svcClient
-      .from("companion_cache")
-      .select("id, content, quality_score, used_count")
-      .eq("companion_type", "historical_insight")
-      .eq("language", "en")
-      .gte("quality_score", 2)
-      .or(`expires_at.is.null,expires_at.gt.${now}`)
-      .order("quality_score", { ascending: false })
-      .order("last_served_at", { ascending: true, nullsFirst: true })
-      .order("used_count", { ascending: true })
-      .limit(10);
-    const filtered = excludeIds?.length ? (data || []).filter((d: any) => !excludeIds.includes(d.id)) : (data || []);
-    const pool = filtered.length > 0 ? filtered : (data || []);
-    if (pool.length > 0) {
-      const pick = pool[Math.floor(Math.random() * Math.min(pool.length, 3))];
-      svcClient.from("companion_cache").update({ used_count: (pick.used_count || 0) + 1, last_served_at: now }).eq("id", pick.id).then(() => {});
-      return { data: pick.content, source: "cache", cacheId: pick.id };
-    }
-    // Second pass: any quality
-    const { data: anyQ } = await svcClient
-      .from("companion_cache")
-      .select("id, content, used_count")
-      .eq("companion_type", "historical_insight")
-      .eq("language", "en")
-      .or(`expires_at.is.null,expires_at.gt.${now}`)
-      .order("quality_score", { ascending: false })
-      .order("used_count", { ascending: true })
-      .limit(5);
-    const anyFiltered = excludeIds?.length ? (anyQ || []).filter((d: any) => !excludeIds.includes(d.id)) : (anyQ || []);
-    const anyPool = anyFiltered.length > 0 ? anyFiltered : (anyQ || []);
-    if (anyPool.length > 0) {
-      const pick = anyPool[Math.floor(Math.random() * Math.min(anyPool.length, 3))];
-      svcClient.from("companion_cache").update({ used_count: (pick.used_count || 0) + 1, last_served_at: now }).eq("id", pick.id).then(() => {});
-      return { data: pick.content, source: "cache", cacheId: pick.id };
-    }
-  } catch { /* continue to curated */ }
-  return { data: CURATED_FALLBACKS[Math.floor(Math.random() * CURATED_FALLBACKS.length)], source: "curated", cacheId: null };
+  const cached = await serveFromCache(svcClient, "historical_insight", "en", excludeIds);
+  if (cached) return { data: cached.data, source: "cache", cacheId: cached.cacheId };
+  return { data: pickRandom(HISTORY_FALLBACKS), source: "curated", cacheId: null };
 }
 
 serve(async (req) => {
-  if (req.method === "OPTIONS")
-    return new Response(null, { headers: corsHeaders });
+  const corsRes = handleCors(req);
+  if (corsRes) return corsRes;
 
   const t0 = Date.now();
-  const log = (msg: string) => console.log(`[historical-insight] ${msg} (+${Date.now() - t0}ms)`);
+  const log = createLogger("historical-insight");
 
   try {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-    }
-
-    const { createClient } = await import("npm:@supabase/supabase-js@2.57.2");
-    const sbUrl = Deno.env.get("SUPABASE_URL") ?? "";
-    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
-    const svcClient = createClient(sbUrl, serviceRoleKey, { auth: { persistSession: false } });
-    const token = authHeader.replace("Bearer ", "");
-
-    let resolvedUserId: string | null = null;
-    if (token === serviceRoleKey) {
-      // server-to-server
-    } else {
-      const sbClient = createClient(sbUrl, Deno.env.get("SUPABASE_ANON_KEY") ?? "", { global: { headers: { Authorization: authHeader } } });
-      const { data: { user }, error: authError } = await sbClient.auth.getUser();
-      if (authError || !user) {
-        return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
-      }
-      resolvedUserId = user.id;
+      return errorResponse("Unauthorized", 401);
     }
 
     const { context, userId: bodyUserId, mood, recentTitles } = await req.json();
-    const effectiveUserId = resolvedUserId || bodyUserId;
+
+    const auth = await verifyFlexAuth(req, bodyUserId);
+    if (!auth.isService && auth.userId === null) {
+      return errorResponse("Unauthorized", 401);
+    }
+
+    const effectiveUserId = auth.userId || bodyUserId;
+
+    const svcClient = await createServiceClient();
 
     if (effectiveUserId) {
       try { await svcClient.from("analytics_events").insert({ user_id: effectiveUserId, event: "historical_insight_ai_call" }); } catch (_) { /* non-fatal */ }
     }
 
-    // Observability helper — fire-and-forget
-    const trackObs = (event: string, meta?: Record<string, any>) => {
-      if (!effectiveUserId) return;
-      svcClient.from("analytics_events").insert({
-        user_id: effectiveUserId, event,
-        metadata: { companion_type: "historical_insight", latency_ms: Date.now() - t0, ...meta },
-      }).then(() => {});
-    };
+    const trackObs = effectiveUserId
+      ? createObsTracker(svcClient, effectiveUserId, "historical_insight", t0)
+      : (_event: string, _meta?: Record<string, any>) => {};
 
-    // Cost estimation per 1M tokens (input/output) in USD
-    const COST_MAP: Record<string, [number, number]> = {
-      "sonar-pro": [3, 15], "sonar": [1, 5],
-      "google/gemini-2.5-flash": [0.15, 0.6], "google/gemini-3-flash-preview": [0.15, 0.6],
-      "google/gemini-2.5-flash-lite": [0.075, 0.3],
-    };
-    let attemptOrder = 0;
-    const logAttempt = (params: { companion_type: string; provider: string; model: string; status: string; latency_ms: number; input_tokens?: number; output_tokens?: number; error_message?: string; quality_gate_reason?: string }) => {
-      attemptOrder++;
-      const costs = COST_MAP[params.model] || [0.5, 1.5];
-      const inTok = params.input_tokens || 0;
-      const outTok = params.output_tokens || 0;
-      const cost = inTok > 0 || outTok > 0 ? (inTok * costs[0] + outTok * costs[1]) / 1_000_000 : null;
-      svcClient.from("generation_attempts").insert({ ...params, attempt_order: attemptOrder, estimated_cost_usd: cost }).then(() => {});
-    };
+    const logAttempt = createAttemptLogger(svcClient);
 
     const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -185,7 +54,7 @@ serve(async (req) => {
       log("missing API keys, serving fallback");
       const fb = await serveFallback(svcClient);
       trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
-      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId, _serve_source: fb.source }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return jsonResponse({ ...fb.data, _cache_id: fb.cacheId, _serve_source: fb.source });
     }
 
     const marketContext = context || "Bitcoin market movement";
@@ -243,13 +112,13 @@ serve(async (req) => {
       log(`perplexity failed: ${e}`);
       const fb = await serveFallback(svcClient);
       trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
-      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId, _serve_source: fb.source }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return jsonResponse({ ...fb.data, _cache_id: fb.cacheId, _serve_source: fb.source });
     }
 
     if (!searchContent) {
       const fb = await serveFallback(svcClient);
       trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated");
-      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId, _serve_source: fb.source }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return jsonResponse({ ...fb.data, _cache_id: fb.cacheId, _serve_source: fb.source });
     }
 
     // ── Step 2: AI structuring ──
@@ -333,11 +202,12 @@ BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? 
       }
     }
 
-    if (!insight || !passesQualityGate(insight)) {
-      log(`quality gate failed: ${!insight ? "no insight" : `body=${(insight.btcInsight||"").length}chars, slop=${containsSlop(insight?.btcInsight||"") || containsSlop(insight?.analogy||"")}`}`);
+    const qg = qualityGate("historical_insight", insight);
+    if (!insight || !qg.pass) {
+      log(`quality gate failed: ${!insight ? "no insight" : (qg.reason ?? "unknown")}`);
       const fb = await serveFallback(svcClient);
       trackObs(fb.source === "cache" ? "companion_cache_hit" : "companion_fallback_curated", { reason: "quality_gate" });
-      return new Response(JSON.stringify({ ...fb.data, _cache_id: fb.cacheId, _serve_source: fb.source }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return jsonResponse({ ...fb.data, _cache_id: fb.cacheId, _serve_source: fb.source });
     }
 
     // Ensure URL is from citations
@@ -375,7 +245,7 @@ BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? 
     // Cache good content with rich metadata and title-based dedup (awaited to prevent data loss)
     const urlReachable = insight.url && insight.url.startsWith("http");
     const histQuality = urlReachable ? 2 : 1;
-    if (insight.title && insight.btcInsight && passesQualityGate(insight)) {
+    if (insight.title && insight.btcInsight && qg.pass) {
       try {
         const { data: existing } = await svcClient.from("companion_cache").select("content").eq("companion_type", "historical_insight").eq("language", "en").limit(30);
         const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
@@ -414,16 +284,13 @@ BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? 
 
     trackObs("companion_live_generated");
     log(`done: ${insight.title}`);
-    return new Response(JSON.stringify({ ...insight, _serve_source: "live" }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return jsonResponse({ ...insight, _serve_source: "live" });
   } catch (e) {
     console.error("historical-insight error:", e);
     try {
-      const fallback = CURATED_FALLBACKS[Math.floor(Math.random() * CURATED_FALLBACKS.length)];
-      return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return jsonResponse(pickRandom(HISTORY_FALLBACKS));
     } catch {
-      return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return errorResponse(e instanceof Error ? e.message : "Unknown error", 500);
     }
   }
 });
