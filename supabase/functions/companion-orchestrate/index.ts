@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { checkRateLimit, checkDailyBudget } from "../_shared/ratelimit.ts";
+import { createLogger } from "../_shared/observe.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -39,7 +40,7 @@ serve(async (req) => {
   }
 
   const t0 = Date.now();
-  const log = (msg: string) => console.log(`[orchestrate] ${msg} (+${Date.now() - t0}ms)`);
+  const log = createLogger("orchestrate");
 
   try {
     const authHeader = req.headers.get("Authorization");
@@ -245,7 +246,7 @@ serve(async (req) => {
     if (serveInserts.length > 0) {
       writePromises.push(
         svcClient.from("companion_serves").insert(serveInserts).then(({ error }) => {
-          if (error) console.error("[orchestrate] serve insert error:", error.message);
+          if (error) log.error("serve insert error", { error: error.message });
         })
       );
     }
@@ -253,7 +254,7 @@ serve(async (req) => {
     if (reflectionId && Object.keys(reflectionUpdates).length > 0) {
       writePromises.push(
         svcClient.from("reflections").update(reflectionUpdates).eq("id", reflectionId).then(({ error }) => {
-          if (error) console.error("[orchestrate] reflection update error:", error.message);
+          if (error) log.error("reflection update error", { error: error.message });
         })
       );
     }
@@ -272,7 +273,7 @@ serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
-    console.error("[orchestrate] error:", e);
+    log.error("unhandled error", { error: e instanceof Error ? e.message : String(e) });
     return new Response(
       JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },

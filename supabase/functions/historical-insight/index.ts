@@ -286,7 +286,7 @@ BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? 
     log(`done: ${insight.title}`);
     return jsonResponse({ ...insight, _serve_source: "live" });
   } catch (e) {
-    console.error("historical-insight error:", e);
+    log.error("unhandled error", { error: e instanceof Error ? e.message : String(e) });
     try {
       return jsonResponse(pickRandom(HISTORY_FALLBACKS));
     } catch {

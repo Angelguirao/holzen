@@ -298,7 +298,7 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
     log(`done: ${nudge.title}`);
     return jsonResponse({ ...nudge, _serve_source: "live" });
   } catch (e) {
-    console.error("ground-nudge error:", e);
+    log.error("unhandled error", { error: e instanceof Error ? e.message : String(e) });
     try {
       return jsonResponse(pickRandom(GROUNDING_FALLBACKS));
     } catch {

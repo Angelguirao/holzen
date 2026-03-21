@@ -379,7 +379,7 @@ URL RULES (CRITICAL):
     log(`done, signal: ${signal.title}, source: ${signal.source}`);
     return jsonResponse({ ...signal, _serve_source: "live" });
   } catch (e) {
-    console.error("signal-companion error:", e);
+    log.error("unhandled error", { error: e instanceof Error ? e.message : String(e) });
     try {
       return jsonResponse(pickRandom(SIGNAL_FALLBACKS));
     } catch {
