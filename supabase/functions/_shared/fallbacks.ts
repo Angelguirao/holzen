@@ -38,6 +38,36 @@ export const SIGNAL_FALLBACKS = [
     source: "Vijay Boyapati — The Bullish Case for Bitcoin",
     url: "https://vijayboyapati.medium.com/the-bullish-case-for-bitcoin-6ecc8bdecc1",
   },
+  {
+    title: "Collectibles carried trust before coins had portraits",
+    body: "Nick Szabo argues that scarce, costly-to-fake objects let strangers cooperate long before mints existed. Bitcoin continues that lineage in software: anyone can verify the rules, yet copying a valid entry is prohibitively expensive in energy and time.",
+    source: "Nick Szabo — Shelling Out",
+    url: "https://nakamotoinstitute.org/shelling-out/",
+  },
+  {
+    title: "Privacy belongs with speech in an open society",
+    body: "Eric Hughes urged cypherpunks to build anonymous systems because privacy protects association and inquiry. Bitcoin does not solve every anonymity problem, yet it inherits that instinct: verify balances without granting every merchant a lifelong dossier.",
+    source: "Eric Hughes — A Cypherpunk's Manifesto",
+    url: "https://activism.net/cypherpunk/manifesto.html",
+  },
+  {
+    title: "Hashcash taxed spam before miners taxed blocks",
+    body: "Adam Back proposed hashcash so senders paid a small computational stamp per message, making bulk abuse expensive. The same pattern anchors Bitcoin: work that is quick to check yet painful to fake at industrial scale.",
+    source: "Adam Back — Hashcash",
+    url: "https://www.hashcash.org/",
+  },
+  {
+    title: "The first on-chain gift was quiet curiosity",
+    body: "Hal Finney ran early Bitcoin code, traded notes with Satoshi, and received the first on-chain transfer in January 2009. His public posts read like lab notes—hypotheses, stack traces, and modest claims instead of bravado.",
+    source: "Hal Finney — Bitcoin and Me",
+    url: "https://nakamotoinstitute.org/library/bitcoin-and-me/",
+  },
+  {
+    title: "Free banking once thrived without a single issuer",
+    body: "Murray Rothbard chronicled periods when competing banks issued redeemable notes instead of waiting for a national charter. Bitcoin echoes that pluralism: many actors, one transparent rule set, and no gatekeeper who can freeze the protocol by decree.",
+    source: "Murray Rothbard — What Has Government Done to Our Money",
+    url: "https://mises.org/library/what-has-government-done-our-money",
+  },
 ];
 
 // ── Grounding (behavioral finance research) ──
@@ -71,6 +101,36 @@ export const GROUNDING_FALLBACKS = [
     body: "Tversky and Kahneman's availability heuristic research demonstrated that people judge probability based on how easily examples come to mind. A sharp BTC drop yesterday looms larger than years of steady gains. Your memory is not a balanced ledger — it's a highlight reel biased toward the recent.",
     citation: "Tversky & Kahneman (1973), Availability: A Heuristic for Judging Frequency and Probability",
     url: "https://scholar.google.com/scholar?q=tversky+kahneman+availability+heuristic+1973",
+  },
+  {
+    title: "Anchoring: the first number warps what feels fair",
+    body: "Tversky and Kahneman showed that irrelevant anchors—like a spun roulette wheel—shift later estimates of unknown quantities. In trading, the last high or low often becomes an unconscious reference point. Naming that anchor aloud weakens its grip more than arguing with the chart.",
+    citation: "Tversky & Kahneman (1974), Judgment under Uncertainty: Heuristics and Biases",
+    url: "https://scholar.google.com/scholar?q=tversky+kahneman+judgment+under+uncertainty+heuristics+biases+1974",
+  },
+  {
+    title: "Overconfidence makes traders trade too often",
+    body: "Brad Barber and Terrance Odean studied retail brokerage records and found that men traded about 45% more than women and earned lower net returns after costs. Confidence about timing often exceeds skill; friction—fees, taxes, and slippage—quietly punishes the busiest accounts.",
+    citation: "Barber & Odean (2001), Boys Will Be Boys: Gender, Overconfidence, and Common Stock Investment",
+    url: "https://doi.org/10.1093/rfs/14.1.1",
+  },
+  {
+    title: "Mental accounting splits one wallet into many stories",
+    body: "Richard Thaler documented how people label money into separate mental jars—house money, rent money, vacation funds—even when dollars are fungible. A gain labeled 'house money' invites riskier bets, while a loss in the 'serious' jar feels existential. Seeing the labels helps you question them.",
+    citation: "Thaler (1985), Mental Accounting and Consumer Choice",
+    url: "https://scholar.google.com/scholar?q=thaler+mental+accounting+consumer+choice+1985",
+  },
+  {
+    title: "The endowment effect: owning it inflates its worth",
+    body: "Kahneman, Knetsch, and Thaler demonstrated that people demand far more to sell a mug they were given than they would pay to acquire the same mug. Possession rewrites perceived value overnight. That bias shows up whenever exiting a position feels like losing a limb.",
+    citation: "Kahneman, Knetsch & Thaler (1991), Anomalies: The Endowment Effect, Loss Aversion, and Status Quo Bias",
+    url: "https://scholar.google.com/scholar?q=kahneman+knetsch+thaler+endowment+effect+1991",
+  },
+  {
+    title: "Sunk costs whisper that quitting equals failure",
+    body: "Arkes and Blumer's classic experiments showed that people throw good resources after bad to justify past spending. A losing trade already spent its tuition; adding size to 'make it back' compounds the error. The relevant question is forward-looking: would you enter today at this price?",
+    citation: "Arkes & Blumer (1985), The Psychology of Sunk Cost",
+    url: "https://scholar.google.com/scholar?q=arkes+blumer+psychology+of+sunk+cost+1985",
   },
 ];
 
@@ -121,6 +181,51 @@ export const HISTORY_FALLBACKS = [
     source: "CoinMarketCap historical data",
     url: "https://coinmarketcap.com/currencies/bitcoin/",
   },
+  {
+    title: "Black Monday erased a fifth of the Dow in hours",
+    btcInsight: "On October 19, 1987, the Dow Jones Industrial Average closed 22.6% below the prior session—the largest one-day U.S. percentage drop of the modern era. Program trading and portfolio insurance amplified the slide. Within two years the index had reclaimed its pre-crash high, a pattern many volatile assets later echoed.",
+    analogy: "Bitcoin has seen single-session shocks that felt terminal in the moment yet were followed by long repair phases; the speed of a crash rarely maps neatly onto how long fear lasts.",
+    assetClass: "U.S. equities",
+    period: "October 1987",
+    source: "Federal Reserve history",
+    url: "https://www.federalreservehistory.org/essays/stock-market-crash-of-1987",
+  },
+  {
+    title: "Lehman's fall froze credit markets overnight",
+    btcInsight: "Lehman Brothers filed for Chapter 11 on September 15, 2008, listing roughly $613 billion in debts—the largest bankruptcy filing in U.S. history at the time. Interbank lending seized up, the TED spread spiked, and policy makers rushed emergency facilities. Recovery took years, not weeks.",
+    analogy: "Liquidity can vanish faster than narratives change; assets with 24/7 markets can compress that shock into shorter calendar spans while the emotional aftertaste lingers.",
+    assetClass: "Credit / banking",
+    period: "September 2008",
+    source: "Federal Reserve Bank of St. Louis — financial crisis timeline",
+    url: "https://www.stlouisfed.org/on-the-economy/2018/september/financial-crisis-timeline",
+  },
+  {
+    title: "Gold spiked in 1980 then slept for two decades",
+    btcInsight: "Gold touched about $850 per ounce in January 1980 during panic and inflation hedging, then drifted down toward roughly $250 by mid-1999—a long grind that outlasted most headlines. Holders who bought the spike waited years for a new nominal high.",
+    analogy: "Long drawdowns test whether you own an asset for a thesis or for the last tick; Bitcoin's multi-year bears rhyme with that endurance problem even though the mechanics differ.",
+    assetClass: "Precious metals",
+    period: "January 1980 – 1999",
+    source: "World Gold Council data hub",
+    url: "https://www.gold.org/goldhub/data",
+  },
+  {
+    title: "The Nikkei peak in 1989 needed decades to revisit",
+    btcInsight: "Japan's Nikkei 225 closed near 38,915 on December 29, 1989, then entered a prolonged slide that erased most of the bubble's gains. The index did not sustainably exceed that 1989 closing high until February 2024—more than thirty-four years later.",
+    analogy: "Index-level recoveries can take human careers, not quarters; comparing personal holding periods to headline index timelines keeps expectations honest.",
+    assetClass: "Japanese equities",
+    period: "December 1989 – February 2024",
+    source: "Nikkei Inc. index methodology",
+    url: "https://indexes.nikkei.co.jp/en/nkave/index/profile?idx=nk225",
+  },
+  {
+    title: "Silver Thursday broke the Hunts in March 1980",
+    btcInsight: "On March 27, 1980—Silver Thursday—COMEX raised margin requirements and restricted trading as silver crashed from roughly $21 to about $10.50 in two months after briefly touching near $50 in January. The Hunt brothers, who had borrowed heavily to corner silver, faced massive margin calls and later bankruptcy.",
+    analogy: "Concentrated bets financed with credit can unravel faster than spot prices suggest; forced selling turns a liquidity pinch into a rout.",
+    assetClass: "Commodities futures",
+    period: "January – March 1980",
+    source: "Commodity Futures Trading Commission",
+    url: "https://www.cftc.gov/",
+  },
 ];
 
 // ── Zoom Out (deep-time perspective) ──
@@ -145,6 +250,26 @@ export const ZOOM_OUT_FALLBACKS = [
     title: "The sun sends more energy in one hour",
     body: "The sun delivers more energy to Earth in a single hour than humanity uses in an entire year. Bitcoin's energy usage, often criticized, represents a rounding error against the cosmic backdrop. Perspective is a function of the frame you choose.",
   },
+  {
+    title: "DNA outlasts every empire's bookkeeping",
+    body: "Your mitochondrial line stretches back perhaps two hundred thousand years—longer than writing, longer than coined money, longer than most states on today's map. A volatile afternoon is a flicker against that inheritance. Depth is not denial; it is proportion.",
+  },
+  {
+    title: "Voyager probes still coast in deep silence",
+    body: "NASA's Voyager spacecraft left Earth in 1977 and now drift in interstellar space, carrying gold-plated records meant for unknown listeners. Their journey is measured in billions of miles and decades of quiet persistence. Some projects are valued in centuries, not sessions.",
+  },
+  {
+    title: "Stone rings stood before English had a name",
+    body: "Stonehenge's main phases span roughly four thousand years of rearrangement and use. The people who raised the largest stones had no notion of ticker symbols. Yet they coordinated labor across generations. Patience is an ancient human skill that screens forget to teach.",
+  },
+  {
+    title: "Light from Andromeda crossed space for eons",
+    body: "The Andromeda galaxy sits about two and a half million light-years away; the photons hitting your retina began traveling long before Homo sapiens appeared. Scale like that does not tell you what to buy—it shrinks the authority of a single candle on a chart.",
+  },
+  {
+    title: "Cuneiform ledgers counted barley in wet clay",
+    body: "Five thousand years ago, Sumerian scribes pressed reeds into clay to track loans and harvests—early memory machines. Bitcoin's ledger is newer, yet it answers the same old question: who agreed to what, and can anyone quietly rewrite the past?",
+  },
 ];
 
 // ── Reflection (curated fallback reflections for holzen-reflect) ──
@@ -168,6 +293,26 @@ export const REFLECTION_FALLBACKS = [
   {
     message: "Volatility is not the enemy of conviction. It's the price of it.",
     haiku: "The mountain does not\napologize for its storms\nit simply endures",
+  },
+  {
+    message: "Breathing does not wait for the chart to finish its story.",
+    haiku: "The chart keeps moving\nYour exhale was always here\nBefore the pixels",
+  },
+  {
+    message: "Stillness is allowed even when alerts stack like unread mail.",
+    haiku: "Snow falls on signal\nthe masts forgot their long names\nQuiet white fields wait",
+  },
+  {
+    message: "You can notice fear without handing it the keys to your hands.",
+    haiku: "Fear knocks the same door\nseasons return with soft rain\nSoft breath holds the lock",
+  },
+  {
+    message: "The body knows noon light whether markets agree with the sky.",
+    haiku: "Sun warms your shoulders\nDistant rooms hum on softly\nNoon rests on your skin",
+  },
+  {
+    message: "Curiosity toward the feeling beats verdicts about the number.",
+    haiku: "Candle melts its wax\nevening rounds each jagged edge\nGlow holds the dark room",
   },
 ];
 
