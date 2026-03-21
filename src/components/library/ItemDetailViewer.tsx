@@ -6,6 +6,7 @@ import { format } from 'date-fns';
 import type { LibraryItem, Collection } from '@/hooks/use-library';
 import { supabase } from '@/integrations/supabase/client';
 import { OutcomeIcon } from '@/components/icons/OutcomeIcon';
+import { CompanionFeedback } from '@/components/CompanionFeedback';
 
 const TYPE_EMOJIS: Record<string, string> = {
   bookmark: '🔖',
@@ -255,6 +256,14 @@ export function ItemDetailViewer({
             }
             return null;
           })()}
+
+          {/* Companion feedback — for companion-type library items */}
+          {item.source_type && ['signal', 'learning', 'zoom_out', 'history_insight', 'haiku'].includes(item.source_type) && item.reflection_id && (
+            <CompanionFeedback
+              reflectionId={item.reflection_id}
+              companionType={item.source_type}
+            />
+          )}
 
           {/* Decision outcome section */}
           {showOutcomeSection && (
