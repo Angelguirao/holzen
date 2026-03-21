@@ -2,6 +2,7 @@ import { ThumbsUp, ThumbsDown } from 'lucide-react';
 import { useState } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { hapticFeedback } from '@/lib/haptics';
+import { FEEDBACK_TO_CACHE_TYPE } from '@/lib/companion-types';
 
 interface Props {
   reflectionId?: string | null;
@@ -21,14 +22,7 @@ export function CompanionFeedback({ reflectionId, companionType, cacheId }: Prop
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const cacheTypeMap: Record<string, string> = {
-        learning: 'ground_nudge',
-        signal: 'signal',
-        zoom_out: 'zoom_out_deep_time',
-        history_insight: 'historical_insight',
-        haiku: 'haiku',
-      };
-      const cacheType = cacheTypeMap[companionType];
+      const cacheType = FEEDBACK_TO_CACHE_TYPE[companionType];
 
       await supabase.from('analytics_events').insert({
         user_id: user.id,
