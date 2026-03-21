@@ -32,17 +32,17 @@ export interface GenerateGroundingParams {
 
 // ── Internals ──
 
-const BIAS_TOPICS = [
-  "loss aversion and panic selling during market drops",
-  "FOMO and herding behavior during market rallies",
-  "disposition effect — selling winners too early and holding losers too long",
-  "anchoring bias and mental accounting in investment decisions",
-  "emotional regulation and prefrontal cortex function during financial stress",
-  "endowment effect and status quo bias in portfolio management",
-  "recency bias and availability heuristic in market predictions",
-  "overconfidence bias and illusion of control in trading decisions",
-  "regret aversion and its effect on long-term investment holding",
-  "social proof and information cascading in Bitcoin markets",
+const BIAS_TOPICS: { topic: string; direction: "down" | "up" | "both" }[] = [
+  { topic: "loss aversion and panic selling during market drops", direction: "down" },
+  { topic: "FOMO and herding behavior during market rallies", direction: "up" },
+  { topic: "disposition effect — selling winners too early and holding losers too long", direction: "up" },
+  { topic: "anchoring bias and mental accounting in investment decisions", direction: "both" },
+  { topic: "emotional regulation and prefrontal cortex function during financial stress", direction: "down" },
+  { topic: "endowment effect and status quo bias in portfolio management", direction: "both" },
+  { topic: "recency bias and availability heuristic in market predictions", direction: "down" },
+  { topic: "overconfidence bias and illusion of control in trading decisions", direction: "up" },
+  { topic: "regret aversion and its effect on long-term investment holding", direction: "both" },
+  { topic: "social proof and information cascading in Bitcoin markets", direction: "down" },
 ];
 
 async function serveFallback(
@@ -101,11 +101,22 @@ export async function generateGrounding(params: GenerateGroundingParams): Promis
     return serveFallback(svcClient);
   }
 
-  // ── Bias topic selection, avoiding recently used ones ──
+  // ── Bias topic selection, matching market direction and avoiding recently used ones ──
   const recentSet = new Set((recentTopics || []).map((t: string) => t.toLowerCase()));
-  const available = BIAS_TOPICS.filter(t => !recentSet.has(t.toLowerCase()));
-  const pool = available.length > 0 ? available : BIAS_TOPICS;
-  const randomBias = pool[Math.floor(Math.random() * pool.length)];
+  const contextLower = (context || "").toLowerCase();
+  const marketDirection: "down" | "up" | null =
+    contextLower.includes("is down") || contextLower.includes("dropped") || contextLower.includes("fell")
+      ? "down"
+      : contextLower.includes("is up") || contextLower.includes("rallied") || contextLower.includes("surged")
+        ? "up"
+        : null;
+
+  const directionFiltered = marketDirection
+    ? BIAS_TOPICS.filter(t => t.direction === marketDirection || t.direction === "both")
+    : BIAS_TOPICS;
+  const available = directionFiltered.filter(t => !recentSet.has(t.topic.toLowerCase()));
+  const pool = available.length > 0 ? available : directionFiltered.length > 0 ? directionFiltered : BIAS_TOPICS;
+  const randomBias = pool[Math.floor(Math.random() * pool.length)].topic;
 
   const marketContext = context || "Bitcoin market volatility";
   const searchQuery = `Find a specific academic study or research paper about ${randomBias}. The research should be relevant to: ${marketContext}. Include the researcher names, university, year of publication, sample size or key methodology detail, and the main finding. Prefer peer-reviewed journals.`;
@@ -157,6 +168,11 @@ ACCURACY RULES (CRITICAL):
 - Do NOT invent researcher names, years, journals, or statistics
 - If the search results are vague, keep the body general
 - Copy citation URLs character-for-character from the list
+
+CONNECTION TO THE MOMENT:
+- End the body with one sentence connecting the finding to what the user might be feeling RIGHT NOW
+- Example: "Recognizing this pattern is the first step to not acting on it."
+- This sentence should feel like a gentle mirror, not advice
 
 BITCOIN ONLY:
 - Frame everything in terms of Bitcoin holders, not "crypto investors"
