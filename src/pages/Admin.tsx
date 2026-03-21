@@ -131,27 +131,64 @@ export default function Admin() {
         </button>
       </div>
 
-      {/* Health Summary */}
+      {/* Health Summary — context-aware, not just threshold-based */}
       {(() => {
         const issues: string[] = [];
-        if (overview.cacheHitRate < 20 && overview.totalServes > 10) issues.push('Cache hit rate is very low — the cache warmer (pregenerate-companions) may not be running');
-        if (overview.cacheHitRate < 40 && overview.cacheHitRate >= 20 && overview.totalServes > 10) issues.push('Cache hit rate is below target — consider running the cache warmer more frequently');
-        if (overview.failureRate > 20) issues.push('High failure rate — check if API keys (Perplexity/Lovable) are valid and not rate-limited');
-        if (overview.failureRate > 5 && overview.failureRate <= 20) issues.push('Some generation failures — check the Generation Health section for which model is struggling');
-        if (overview.todayCost > 8) issues.push('Approaching daily budget cap ($10) — generation will be blocked when exceeded');
+        const tips: string[] = [];
 
-        if (issues.length === 0 && overview.totalServes > 0) {
+        // Failure rate — always important
+        if (overview.failureRate > 20) {
+          issues.push('High failure rate — check if API keys (Perplexity/Lovable) are valid and not rate-limited');
+        } else if (overview.failureRate > 5) {
+          tips.push('Some generation failures — check Generation Health for details');
+        }
+
+        // Cost — warn when approaching budget
+        if (overview.todayCost > 8) {
+          issues.push('Approaching daily budget cap ($10) — generation will be blocked when exceeded');
+        } else if (overview.todayCost > 5) {
+          tips.push(`Moderate spend today ($${overview.todayCost.toFixed(2)}) — on track for budget cap`);
+        }
+
+        // Cache hit rate — only relevant at higher volume or cost
+        if (overview.cacheHitRate < 10 && overview.todayCost > 3) {
+          tips.push('Low cache hit rate with moderate cost — consider scheduling the cache warmer cron to reduce API spend');
+        } else if (overview.cacheHitRate < 10 && overview.totalServes > 50) {
+          tips.push('Cache hit rate is low — the cache warmer (pregenerate-companions) could help as usage grows');
+        }
+
+        if (issues.length === 0 && tips.length === 0 && overview.totalServes > 0) {
+          const parts = [`${overview.failureRate}% failure rate`];
+          if (overview.todayCost > 0) parts.push(`$${overview.todayCost.toFixed(3)} today`);
+          if (overview.cacheHitRate > 0) parts.push(`${overview.cacheHitRate}% cache hit`);
+          parts.push(`${overview.totalServes} serves`);
           return (
             <div className="rounded-xl border border-primary/15 bg-primary/3 px-4 py-2.5">
-              <p className="text-[10px] font-mono text-primary/60">✓ System healthy — cache hit {overview.cacheHitRate}%, failure rate {overview.failureRate}%, cost ${overview.todayCost.toFixed(3)} today</p>
+              <p className="text-[10px] font-mono text-primary/60">✓ System healthy — {parts.join(' · ')}</p>
             </div>
           );
         }
-        if (issues.length > 0) {
+
+        const allMessages = [
+          ...issues.map(msg => ({ msg, level: 'issue' as const })),
+          ...tips.map(msg => ({ msg, level: 'tip' as const })),
+        ];
+
+        if (allMessages.length > 0) {
           return (
-            <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 dark:bg-amber-500/10 px-4 py-2.5 space-y-1">
-              {issues.map((issue, i) => (
-                <p key={i} className="text-[10px] font-mono text-amber-700/70 dark:text-amber-400/70">⚠ {issue}</p>
+            <div className={`rounded-xl border px-4 py-2.5 space-y-1 ${
+              issues.length > 0
+                ? 'border-amber-500/20 bg-amber-500/5 dark:bg-amber-500/10'
+                : 'border-border/20 bg-card/10'
+            }`}>
+              {allMessages.map(({ msg, level }, i) => (
+                <p key={i} className={`text-[10px] font-mono ${
+                  level === 'issue'
+                    ? 'text-amber-700/70 dark:text-amber-400/70'
+                    : 'text-muted-foreground/50'
+                }`}>
+                  {level === 'issue' ? '⚠' : '💡'} {msg}
+                </p>
               ))}
             </div>
           );
@@ -171,8 +208,7 @@ export default function Admin() {
           icon={Database}
           title="Cache Hit"
           value={`${overview.cacheHitRate}%`}
-          subtitle="target: >40%"
-          alert={overview.cacheHitRate < 20}
+          subtitle={overview.cacheHitRate === 0 ? 'all live — fresh content' : overview.cacheHitRate < 30 ? 'mostly live generation' : 'good cache usage'}
         />
         <StatCard
           icon={DollarSign}
