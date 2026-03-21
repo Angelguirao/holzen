@@ -275,6 +275,51 @@ export type Database = {
         }
         Relationships: []
       }
+      reflection_companions: {
+        Row: {
+          id: string
+          reflection_id: string
+          companion_type: string
+          content: Json
+          cache_entry_id: string | null
+          read: boolean
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          reflection_id: string
+          companion_type: string
+          content: Json
+          cache_entry_id?: string | null
+          read?: boolean
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          reflection_id?: string
+          companion_type?: string
+          content?: Json
+          cache_entry_id?: string | null
+          read?: boolean
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reflection_companions_reflection_id_fkey"
+            columns: ["reflection_id"]
+            isOneToOne: false
+            referencedRelation: "reflections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reflection_companions_cache_entry_id_fkey"
+            columns: ["cache_entry_id"]
+            isOneToOne: false
+            referencedRelation: "companion_cache"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       companion_serves: {
         Row: {
           cache_entry_id: string | null
