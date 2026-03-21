@@ -8,10 +8,15 @@ import type { CompanionData } from '@/components/CompanionSection';
 const MANUAL_COOLDOWN_MS = 15 * 60 * 1000; // 15 minutes for on-demand
 const DEV_COOLDOWN_MS = 5 * 1000; // 5 seconds in dev mode
 
-function getEffectiveCooldownMs(): number {
+/** Check if dev mode is active (localStorage synced from DB via Admin page) */
+function isDevMode(): boolean {
   try {
-    return localStorage.getItem('holzen_dev_mode') === 'true' ? DEV_COOLDOWN_MS : MANUAL_COOLDOWN_MS;
-  } catch { return MANUAL_COOLDOWN_MS; }
+    return localStorage.getItem('holzen_dev_mode') === 'true';
+  } catch { return false; }
+}
+
+function getEffectiveCooldownMs(): number {
+  return isDevMode() ? DEV_COOLDOWN_MS : MANUAL_COOLDOWN_MS;
 }
 
 export function useHolzen() {

@@ -1,4 +1,5 @@
 import { useAdminStats } from '@/hooks/use-admin-stats';
+import { supabase } from '@/integrations/supabase/client';
 import { RefreshCw, Activity, Database, DollarSign, AlertTriangle, ThumbsUp, Clock, Loader2, Zap } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { useMemo, useState, useEffect } from 'react';
@@ -148,9 +149,9 @@ export default function Admin() {
         }
         if (issues.length > 0) {
           return (
-            <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 px-4 py-2.5 space-y-1">
+            <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 dark:bg-amber-500/10 px-4 py-2.5 space-y-1">
               {issues.map((issue, i) => (
-                <p key={i} className="text-[10px] font-mono text-amber-600/70">⚠ {issue}</p>
+                <p key={i} className="text-[10px] font-mono text-amber-700/70 dark:text-amber-400/70">⚠ {issue}</p>
               ))}
             </div>
           );
@@ -332,23 +333,59 @@ export default function Admin() {
 
 function DevModeToggle() {
   const [devMode, setDevMode] = useState(false);
+  const [syncing, setSyncing] = useState(false);
 
+  // Load from localStorage first (instant), then sync from DB (cross-device)
   useEffect(() => {
     try {
       setDevMode(localStorage.getItem('holzen_dev_mode') === 'true');
     } catch { /* ignore */ }
+
+    // Sync from DB for cross-device support
+    (async () => {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+        const { data } = await supabase
+          .from('analytics_events')
+          .select('metadata')
+          .eq('user_id', user.id)
+          .eq('event', 'dev_mode_setting')
+          .order('created_at', { ascending: false })
+          .limit(1);
+        if (data && data.length > 0) {
+          const dbValue = (data[0].metadata as any)?.enabled === true;
+          setDevMode(dbValue);
+          try {
+            if (dbValue) localStorage.setItem('holzen_dev_mode', 'true');
+            else localStorage.removeItem('holzen_dev_mode');
+          } catch { /* ignore */ }
+        }
+      } catch { /* non-critical */ }
+    })();
   }, []);
 
-  const toggle = () => {
+  const toggle = async () => {
     const next = !devMode;
     setDevMode(next);
+    setSyncing(true);
     try {
-      if (next) {
-        localStorage.setItem('holzen_dev_mode', 'true');
-      } else {
-        localStorage.removeItem('holzen_dev_mode');
-      }
+      // Save to localStorage (instant, same device)
+      if (next) localStorage.setItem('holzen_dev_mode', 'true');
+      else localStorage.removeItem('holzen_dev_mode');
     } catch { /* ignore */ }
+    try {
+      // Save to DB (syncs across devices)
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase.from('analytics_events').insert({
+          user_id: user.id,
+          event: 'dev_mode_setting',
+          metadata: { enabled: next },
+        });
+      }
+    } catch { /* non-critical */ }
+    setSyncing(false);
   };
 
   return (
@@ -358,25 +395,25 @@ function DevModeToggle() {
         onClick={toggle}
         className={`w-full rounded-xl border px-4 py-3 flex items-center gap-3 transition-all ${
           devMode
-            ? 'border-amber-500/30 bg-amber-500/5'
+            ? 'border-amber-500/30 bg-amber-500/5 dark:bg-amber-500/10'
             : 'border-border/15 bg-card/10 hover:bg-card/20'
         }`}
       >
-        <Zap className={`h-3.5 w-3.5 ${devMode ? 'text-amber-500/70' : 'text-muted-foreground/30'}`} />
+        <Zap className={`h-3.5 w-3.5 ${devMode ? 'text-amber-500 dark:text-amber-400' : 'text-muted-foreground/30'}`} />
         <div className="flex-1 text-left">
-          <p className={`text-[10px] font-mono ${devMode ? 'text-amber-600/80' : 'text-foreground/60'}`}>
-            Rapid Testing Mode
+          <p className={`text-[10px] font-mono ${devMode ? 'text-amber-700 dark:text-amber-300' : 'text-foreground/60'}`}>
+            Rapid Testing Mode {syncing && '…'}
           </p>
           <p className="text-[9px] text-muted-foreground/40">
             {devMode ? '5s cooldown between pauses (active)' : '15min cooldown between pauses (normal)'}
           </p>
         </div>
-        <span className={`text-[9px] font-mono ${devMode ? 'text-amber-500/60' : 'text-muted-foreground/30'}`}>
+        <span className={`text-[9px] font-mono ${devMode ? 'text-amber-600 dark:text-amber-400' : 'text-muted-foreground/30'}`}>
           {devMode ? 'ON' : 'OFF'}
         </span>
       </button>
       {devMode && (
-        <p className="text-[9px] text-amber-600/50 px-1">
+        <p className="text-[9px] text-amber-700/50 dark:text-amber-400/50 px-1">
           ⚡ Generate pause sessions rapidly to gather data. Each session costs ~$0.01-0.05 in API calls. Disable when done testing.
         </p>
       )}
