@@ -250,114 +250,10 @@ export function useHolzen() {
     return Date.now() - new Date(data.last_trigger_at).getTime() < cooldownMs;
   }, [user, cooldownHours]);
 
-  // Fire-and-forget: pre-generate signal, zoom-out, and historical-insight companion data
-  // so it's cached on the reflection row before the user reaches the Reflect step.
-  const preGenerateCompanions = useCallback((reflectionId: string, ctx: string, msg: string, lang: string, userId: string) => {
-    // Helper: invoke edge function with 1 retry on failure
-    const invokeWithRetry = async (fnName: string, body: any, retries = 1): Promise<{ data: any; error: any }> => {
-      const result = await supabase.functions.invoke(fnName, { body });
-      if ((result.error || !result.data || result.data?.error) && retries > 0) {
-        await new Promise((r) => setTimeout(r, 3000)); // wait 3s before retry
-        return invokeWithRetry(fnName, body, retries - 1);
-      }
-      return result;
-    };
-
-    // Helper to fetch user's active sources for a category
-    const fetchSources = async (category: string) => {
-      try {
-        const [{ data: catalog }, { data: userPrefs }] = await Promise.all([
-          supabase.from('signal_sources').select('id, name, type, url, category').eq('category', category),
-          supabase.from('user_signal_preferences').select('source_id, custom_name, custom_url, custom_type, active, category').eq('user_id', userId).eq('category', category),
-        ]);
-        const prefsMap = new Map((userPrefs ?? []).map((p: any) => [p.source_id, p]));
-        const catalogActive = (catalog ?? []).filter((s: any) => {
-          const pref = prefsMap.get(s.id);
-          return pref ? pref.active : true;
-        }).map((s: any) => ({ name: s.name, type: s.type, url: s.url }));
-        const customActive = (userPrefs ?? [])
-          .filter((p: any) => !p.source_id && p.custom_name && p.active)
-          .map((p: any) => ({ name: p.custom_name, type: p.custom_type || 'blog', url: p.custom_url }));
-        return [...catalogActive, ...customActive];
-      } catch { return []; }
-    };
-
-    // Signal companion — pass recentSignalSources for diversity
-    fetchSources('signal').then(sources => {
-      // Fetch recent signal sources to exclude for diversity
-      supabase.from('reflections')
-        .select('signal_source')
-        .eq('user_id', userId)
-        .not('signal_source', 'is', null)
-        .order('created_at', { ascending: false })
-        .limit(5)
-        .then(({ data: recentSigs }) => {
-          const recentSignalSources = (recentSigs ?? []).map((r: any) => r.signal_source).filter(Boolean);
-          invokeWithRetry('signal-companion', {
-            context: ctx, language: lang,
-            sources: sources.length > 0 ? sources : undefined,
-            recentSignalSources: recentSignalSources.length > 0 ? recentSignalSources : undefined,
-          }).then(({ data, error }) => {
-            if (error || !data || data.error) { console.warn('[signal-companion] failed after retry:', error?.message ?? data?.error ?? 'no data'); return; }
-            supabase.from('reflections').update({
-              signal_title: data.title,
-              signal_body: data.body,
-              signal_source: data.source,
-              signal_url: data.url,
-            } as any).eq('id', reflectionId).then(({ error }) => { if (error) console.error('[signal] reflection update failed:', error.message); });
-            supabase.from('library_items').insert({
-              user_id: userId, type: 'bookmark', title: data.title, body: data.body,
-              source_type: 'signal', source_url: data.url, reflection_id: reflectionId, tags: [],
-            }).then(({ error }) => { if (error) console.error('[signal] library insert failed:', error.message); });
-          });
-        });
-    });
-
-    // Zoom Out companion
-    invokeWithRetry('zoom-out-companion', {
-      context: ctx, reflectionMessage: msg, language: lang,
-    }).then(({ data, error }) => {
-      if (error || !data || data.error) return;
-      supabase.from('reflections').update({ zoom_out_data: data } as any).eq('id', reflectionId).then(({ error }) => { if (error) console.error('[zoom_out] reflection update failed:', error.message); });
-      const zoomBody = data?.deepTime?.body || data?.echo?.message || data?.deepTime?.title || (typeof data === 'object' ? JSON.stringify(data) : String(data));
-      supabase.from('library_items').insert({
-        user_id: userId, type: 'bookmark', title: data?.deepTime?.title || 'Zoom Out',
-        body: zoomBody,
-        source_type: 'zoom_out', reflection_id: reflectionId, tags: [],
-      }).then(({ error }) => { if (error) console.error('[zoom_out] library insert failed:', error.message); });
-    });
-
-    // Historical Insight companion
-    invokeWithRetry('historical-insight', {
-      context: ctx, language: lang,
-    }).then(({ data, error }) => {
-      if (error || !data || data.error) return;
-      supabase.from('reflections').update({ history_insight_data: data } as any).eq('id', reflectionId).then(({ error }) => { if (error) console.error('[history] reflection update failed:', error.message); });
-      supabase.from('library_items').insert({
-        user_id: userId, type: 'bookmark', title: data.title, body: data.btcInsight,
-        source_type: 'history_insight', reflection_id: reflectionId, tags: [],
-      }).then(({ error }) => { if (error) console.error('[history] library insert failed:', error.message); });
-    });
-
-    // Ground nudge (learning)
-    fetchSources('grounding').then(sources => {
-      invokeWithRetry('ground-nudge', {
-        context: ctx, language: lang, sources: sources.length > 0 ? sources : undefined,
-      }).then(({ data, error }) => {
-        if (error || !data || data.error) return;
-        supabase.from('reflections').update({
-          learning_title: data.title,
-          learning_body: data.body,
-          learning_citation: data.citation,
-          learning_url: data.url,
-        } as any).eq('id', reflectionId).then(({ error }) => { if (error) console.error('[learning] reflection update failed:', error.message); });
-        supabase.from('library_items').insert({
-          user_id: userId, type: 'bookmark', title: data.title, body: data.body,
-          source_type: 'learning', source_url: data.url, reflection_id: reflectionId, tags: [],
-        }).then(({ error }) => { if (error) console.error('[learning] library insert failed:', error.message); });
-      });
-    });
-  }, []);
+  // Companion pre-generation is handled by the companion-orchestrate edge function,
+  // called from use-companion-data.ts when the companion section renders.
+  // Server-side triggers (check-volatility) also pre-generate via the orchestrator.
+  // This eliminates the previous triple-invocation race condition.
 
   const generateMessage = useCallback(async (data: BtcPriceData, mood?: string) => {
     if (!user) return;
@@ -540,8 +436,9 @@ export function useHolzen() {
           const { error: libErr } = await supabase.from('library_items').insert(libraryInserts);
           if (libErr) console.error('[library] reflection+haiku insert failed:', libErr.message);
 
-          // Fire-and-forget: pre-generate companion data so it's ready at the Reflect step
-          preGenerateCompanions(insertedReflection.id, ctx, msg, language, user.id);
+          // Companion data (signal, grounding, history, zoom-out) is generated on-demand
+          // by the companion-orchestrate edge function when the companion section renders.
+          // This avoids race conditions from multiple invocation paths.
         }
 
         await supabase.from('profiles').update({
