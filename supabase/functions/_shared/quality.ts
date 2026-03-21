@@ -62,7 +62,7 @@ const QUALITY_CONFIGS: Record<string, QualityConfig> = {
   },
   ground_nudge: {
     minBodyLength: 80,
-    maxBodyLength: 800,
+    maxBodyLength: 400,
     minTitleWords: 1,
     maxTitleWords: 15,
     bodyField: "body",

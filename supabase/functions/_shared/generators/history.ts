@@ -33,16 +33,52 @@ export interface GenerateHistoryParams {
 
 // ── Internals ──
 
-const HISTORICAL_ERAS = [
-  { era: "early Bitcoin (2011-2013)", examples: "Bitcoin's first bubble to $32 then crash to $2, the 2013 China ban crash" },
-  { era: "Mt. Gox era (2014-2015)", examples: "Mt. Gox collapse, the long Bitcoin bear market of 2014-2015" },
-  { era: "2017 mania and aftermath (2017-2018)", examples: "Bitcoin's rise to $20k, the 2018 bear market, speculative excess" },
-  { era: "COVID and institutional era (2020-2021)", examples: "March 2020 crash, MicroStrategy buys, El Salvador adoption, $69k peak" },
-  { era: "Bitcoin bear market (2022-2023)", examples: "Industry contagion from Luna/Terra and FTX failures, Bitcoin's resilience" },
-  { era: "traditional finance parallels", examples: "1987 Black Monday, dot-com bubble 2000, 2008 financial crisis, gold's 1980 peak" },
-  { era: "commodity and forex history", examples: "oil price shocks, Swiss franc unpegging, Asian financial crisis 1997" },
-  { era: "tech stock parallels", examples: "Amazon's 95% crash, Apple near-bankruptcy, Cisco post-dot-com" },
+// Eras tagged by emotional resonance for mood-aware selection
+interface HistoricalEra {
+  era: string;
+  examples: string;
+  mood: "recovery" | "caution" | "neutral"; // recovery=good for anxious, caution=good for excited
+}
+
+const HISTORICAL_ERAS: HistoricalEra[] = [
+  // Recovery stories — best for anxious/fearful users (show that crashes end)
+  { era: "COVID and institutional era (2020-2021)", examples: "March 2020 crash recovered in 40 days, MicroStrategy buys, El Salvador adoption, $69k peak", mood: "recovery" },
+  { era: "tech stock parallels", examples: "Amazon's 95% crash then becoming a trillion-dollar company, Apple near-bankruptcy then iPhone revolution", mood: "recovery" },
+  { era: "early Bitcoin (2011-2013)", examples: "Bitcoin's crash from $32 to $2 then recovery to $1,000+, the 2013 China ban crash and recovery", mood: "recovery" },
+
+  // Cautionary tales — best for excited/greedy users (show that euphoria precedes crashes)
+  { era: "2017 mania and aftermath (2017-2018)", examples: "Bitcoin's rise to $20k driven by hype, the painful 2018 bear market, speculative excess", mood: "caution" },
+  { era: "traditional finance bubbles", examples: "1987 Black Monday, dot-com bubble 2000, 2008 financial crisis, gold's 1980 peak and 20-year decline", mood: "caution" },
+
+  // Neutral — good for calm users or when mood is unknown
+  { era: "Mt. Gox era (2014-2015)", examples: "Mt. Gox collapse, the long Bitcoin bear market of 2014-2015, survival of the protocol", mood: "neutral" },
+  { era: "Bitcoin bear market (2022-2023)", examples: "Industry contagion from Luna/Terra and FTX failures, Bitcoin's resilience and recovery", mood: "neutral" },
+  { era: "commodity and forex history", examples: "oil price shocks, Swiss franc unpegging 2015, Asian financial crisis 1997", mood: "neutral" },
 ];
+
+/** Select a historical era that matches the user's emotional state */
+function selectEra(mood: string | undefined, recentTitles: string[] | undefined): HistoricalEra {
+  const recentSet = new Set((recentTitles || []).map(t => t.toLowerCase()));
+
+  // Mood-aware filtering
+  let preferred: HistoricalEra[];
+  if (mood === "anxious" || mood === "fearful") {
+    preferred = HISTORICAL_ERAS.filter(e => e.mood === "recovery");
+  } else if (mood === "excited" || mood === "fomo" || mood === "greedy") {
+    preferred = HISTORICAL_ERAS.filter(e => e.mood === "caution");
+  } else {
+    preferred = HISTORICAL_ERAS; // Any era for calm/neutral
+  }
+
+  // Filter out recently shown eras
+  const available = preferred.filter(e =>
+    !recentSet.has(e.era.toLowerCase()) &&
+    !Array.from(recentSet).some(t => e.era.toLowerCase().includes(t) || t.includes(e.era.toLowerCase()))
+  );
+
+  const pool = available.length > 0 ? available : preferred.length > 0 ? preferred : HISTORICAL_ERAS;
+  return pool[Math.floor(Math.random() * pool.length)];
+}
 
 async function serveFallback(
   svcClient: any,
@@ -105,7 +141,7 @@ export async function generateHistory(params: GenerateHistoryParams): Promise<Hi
   const titleExclusion = (recentTitles && Array.isArray(recentTitles) && recentTitles.length > 0)
     ? `\nDo NOT cover these topics (already shown recently): ${recentTitles.slice(0, 5).join("; ")}. Find a COMPLETELY DIFFERENT historical event.`
     : "";
-  const randomEra = HISTORICAL_ERAS[Math.floor(Math.random() * HISTORICAL_ERAS.length)];
+  const randomEra = selectEra(mood, recentTitles);
 
   // ── Step 1: Perplexity search ──
   log("calling perplexity");

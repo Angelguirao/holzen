@@ -122,8 +122,17 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
     ? ` Look for insights from sources like: ${sourceNames.sort(() => Math.random() - 0.5).slice(0, 5).join(", ")}.`
     : "";
 
+  // Market direction awareness — different philosophical angles for up vs down
+  const isDown = context?.toLowerCase().includes("is down");
+  const isUp = context?.toLowerCase().includes("is up");
+  const directionHint = isDown
+    ? " Focus on conviction, patience, long-term thinking, and the wisdom of holding through difficulty."
+    : isUp
+    ? " Focus on humility, caution against euphoria, and the discipline of not chasing momentum."
+    : "";
+
   const searchQuery = context
-    ? `Bitcoin philosophical perspective relevant when ${context}. Find a profound insight about conviction, patience, sound money, sovereignty, or long-term thinking from a respected Bitcoin thinker or writer.${sourceHint}${recentExclusion}`
+    ? `Bitcoin philosophical perspective relevant when ${context}.${directionHint} Find a profound insight from a respected Bitcoin thinker or writer.${sourceHint}${recentExclusion}`
     : `Find a profound, philosophical Bitcoin essay or insight about sovereignty, sound money, time preference, proof of work as philosophy, or the meaning of holding from a respected thinker.${sourceHint}${recentExclusion}`;
 
   const perplexityBody: any = {
@@ -153,7 +162,7 @@ DIVERSITY: Use a DIFFERENT thinker every time. Prefer timeless essays over recen
       },
       { role: "user", content: searchQuery },
     ],
-    search_recency_filter: "year",
+    // No recency filter — Bitcoin philosophy is timeless. Essays from 2018 are as valuable as 2025.
     ...(sourceUrls.length > 0 ? { search_domain_filter: sourceUrls.slice(0, 5) } : {}),
   };
 
