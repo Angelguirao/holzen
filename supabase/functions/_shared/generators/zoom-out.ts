@@ -71,30 +71,52 @@ async function fetchHistoricalAndCurrentPrices(
     const timestamps = missingTargets.map(t => t.ts);
     const from = Math.min(...timestamps) - 86400;
     const to = Math.max(...timestamps) + 86400;
-    try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 10000);
-      const res = await fetch(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=usd&from=${from}&to=${to}`, { signal: controller.signal });
-      clearTimeout(timeout);
-      if (res.status === 429) { await res.text(); rateLimited = true; }
-      else if (res.ok) {
-        const json = await res.json();
-        const prices: [number, number][] = json?.prices || [];
-        for (const target of missingTargets) {
-          const targetMs = target.ts * 1000;
-          let closest: [number, number] | null = null;
-          let closestDist = Infinity;
-          for (const [ts, price] of prices) {
-            const dist = Math.abs(ts - targetMs);
-            if (dist < closestDist) { closestDist = dist; closest = [ts, price]; }
-          }
-          if (closest && closestDist < 48 * 3600 * 1000) {
-            newPrices.push({ date: target.dateKey, price: Math.round(closest[1]) });
-          }
+
+    // Retry with backoff for CoinGecko rate limiting
+    for (let attempt = 0; attempt < 3; attempt++) {
+      try {
+        if (attempt > 0) {
+          const waitMs = attempt * 2000; // 2s, 4s backoff
+          log(`CoinGecko retry ${attempt + 1} after ${waitMs}ms`);
+          await new Promise(r => setTimeout(r, waitMs));
         }
-      } else { await res.text(); }
-    } catch (e) {
-      if (e instanceof DOMException && e.name === "AbortError") log("CoinGecko timeout");
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 10000);
+        const res = await fetch(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=usd&from=${from}&to=${to}`, { signal: controller.signal });
+        clearTimeout(timeout);
+        if (res.status === 429) {
+          await res.text();
+          log(`CoinGecko rate limited (attempt ${attempt + 1})`);
+          if (attempt < 2) continue; // retry
+          rateLimited = true;
+          break;
+        }
+        if (res.ok) {
+          const json = await res.json();
+          const prices: [number, number][] = json?.prices || [];
+          for (const target of missingTargets) {
+            const targetMs = target.ts * 1000;
+            let closest: [number, number] | null = null;
+            let closestDist = Infinity;
+            for (const [ts, price] of prices) {
+              const dist = Math.abs(ts - targetMs);
+              if (dist < closestDist) { closestDist = dist; closest = [ts, price]; }
+            }
+            if (closest && closestDist < 48 * 3600 * 1000) {
+              newPrices.push({ date: target.dateKey, price: Math.round(closest[1]) });
+            }
+          }
+          break; // success
+        }
+        await res.text();
+        break; // non-429 error, don't retry
+      } catch (e) {
+        if (e instanceof DOMException && e.name === "AbortError") {
+          log(`CoinGecko timeout (attempt ${attempt + 1})`);
+          if (attempt < 2) continue;
+        }
+        break;
+      }
     }
   }
 
@@ -109,17 +131,26 @@ async function fetchHistoricalAndCurrentPrices(
     if (price) onThisDay.push({ yearsAgo: target.yearsAgo, date: target.dateKey, price: Math.round(price) });
   }
 
-  // Current price
+  // Current price (with retry)
   let currentPrice: number | null = null;
-  if (!rateLimited) {
+  for (let attempt = 0; attempt < 2 && !rateLimited; attempt++) {
     try {
+      if (attempt > 0) await new Promise(r => setTimeout(r, 2000));
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 5000);
       const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd", { signal: controller.signal });
       clearTimeout(timeout);
-      if (res.ok) { const json = await res.json(); currentPrice = json?.bitcoin?.usd ? Math.round(json.bitcoin.usd) : null; }
-      else { if (res.status === 429) rateLimited = true; await res.text(); }
-    } catch { /* ignore */ }
+      if (res.ok) {
+        const json = await res.json();
+        currentPrice = json?.bitcoin?.usd ? Math.round(json.bitcoin.usd) : null;
+        break;
+      }
+      if (res.status === 429) {
+        await res.text();
+        if (attempt < 1) continue;
+        rateLimited = true;
+      } else { await res.text(); break; }
+    } catch { if (attempt >= 1) break; }
   }
   if (!currentPrice && context) {
     const priceMatch = context.match(/\$[\d,]+/);
@@ -195,13 +226,35 @@ async function generateDeepTime(
     ? `\nDo NOT reuse these titles or topics (already shown): ${recentTitles.slice(0, 5).join("; ")}. Find a COMPLETELY DIFFERENT perspective.`
     : "";
 
+  // Pick a random thematic seed to force diversity in generated content
+  const DEEP_TIME_SEEDS = [
+    "Compare Bitcoin's age to the history of money (shells, salt, gold, paper, digital)",
+    "Frame today's volatility against geological timescales (Grand Canyon, tectonic plates, ice ages)",
+    "Technology adoption speed: printing press (50y), electricity (40y), internet (30y), Bitcoin (15y)",
+    "The patience of cathedral builders — Notre-Dame took 182 years, Sagrada Familia still ongoing",
+    "Light from distant stars: what we see in the sky happened thousands of years ago",
+    "The Long Now Foundation's 10,000-year clock and what it means to think in deep time",
+    "DNA has stored information for 3.5 billion years — the original proof of work",
+    "Human memory vs geological memory: we remember decades, rocks remember eons",
+    "The oldest living organism (Pando aspen grove, ~80,000 years) and what persistence means",
+    "Voyager 1 has traveled for 47 years and is barely outside our solar system",
+    "The Svalbard seed vault: humanity's 1,000-year bet on the future",
+    "Stonehenge was built over 1,500 years — longer than the entire history of banking",
+    "The cosmic calendar: if the universe's age is one year, humans appear at 11:59 PM on Dec 31",
+    "Ancient Sumerian clay tablets recorded debts 5,000 years ago — the first ledgers",
+    "The sun has enough fuel for another 5 billion years — perspective on 'long-term'",
+    "Continental drift moves plates 2.5cm/year — in Bitcoin's lifetime, they've moved ~40cm",
+    "The Library of Alexandria held all human knowledge; Bitcoin holds all human trust",
+    "Bristlecone pines in California are 5,000 years old — they were saplings when money was invented",
+  ];
+  const seed = DEEP_TIME_SEEDS[Math.floor(Math.random() * DEEP_TIME_SEEDS.length)];
+
   const systemPrompt = `You generate ONE deep-time perspective for a Bitcoin mindfulness app. Zoom WAY out — beyond markets, beyond decades — into civilizational, planetary, or epochal timescales.
 
-Think like the Long Now Foundation. Think in centuries and millennia. Context:
-- Human civilization's 5,000-year relationship with money
-- Technology adoption curves (printing press: 50 years; internet: 30 years)
-- Planetary scale (Earth: 4.5B years; modern humans: 300,000 years; agriculture: 10,000 years)
-- Bitcoin: 15 years old in a 5,000-year history of money
+Think like the Long Now Foundation. Think in centuries and millennia.
+
+THEMATIC SEED FOR THIS SESSION (use this as your starting point, but make it your own):
+${seed}
 
 ACCURACY RULES (CRITICAL):
 - Every number must be verifiable and widely accepted
