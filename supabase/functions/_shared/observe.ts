@@ -99,9 +99,49 @@ export function trackEvent(svcClient: any, userId: string, event: string) {
 }
 
 /**
- * Create a timestamped logger with a prefix.
+ * Create a structured JSON logger with a prefix and correlation ID.
+ *
+ * Each log entry includes:
+ * - ts: ISO timestamp
+ * - fn: function name (prefix)
+ * - cid: correlation ID (unique per request)
+ * - elapsed_ms: time since logger creation
+ * - msg: the log message
+ * - level: "info" | "warn" | "error"
+ * - extra: optional additional data
+ *
+ * Falls back to simple console.log format for readability in dev.
  */
-export function createLogger(prefix: string) {
+export function createLogger(prefix: string, correlationId?: string) {
   const t0 = Date.now();
-  return (msg: string) => console.log(`[${prefix}] ${msg} (+${Date.now() - t0}ms)`);
+  const cid = correlationId || crypto.randomUUID().slice(0, 8);
+
+  const log = (msg: string, level: "info" | "warn" | "error" = "info", extra?: Record<string, unknown>) => {
+    const entry = {
+      ts: new Date().toISOString(),
+      fn: prefix,
+      cid,
+      elapsed_ms: Date.now() - t0,
+      level,
+      msg,
+      ...(extra ? { extra } : {}),
+    };
+
+    if (level === "error") {
+      console.error(JSON.stringify(entry));
+    } else if (level === "warn") {
+      console.warn(JSON.stringify(entry));
+    } else {
+      console.log(JSON.stringify(entry));
+    }
+  };
+
+  // Return a callable that defaults to info level, with .warn and .error methods
+  const logger = (msg: string, extra?: Record<string, unknown>) => log(msg, "info", extra);
+  logger.warn = (msg: string, extra?: Record<string, unknown>) => log(msg, "warn", extra);
+  logger.error = (msg: string, extra?: Record<string, unknown>) => log(msg, "error", extra);
+  logger.cid = cid;
+  logger.t0 = t0;
+
+  return logger;
 }
