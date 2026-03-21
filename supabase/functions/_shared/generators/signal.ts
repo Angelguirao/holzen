@@ -215,6 +215,7 @@ DIVERSITY: Use a DIFFERENT thinker every time. Prefer timeless essays over recen
 TONE: Profound, calm, grounding. Like a wise friend reminding you why you hold.
 TITLE: Evocative, poetic, 5-10 words. Should read like a book chapter title, not a headline.
 BODY: 2-3 sentences capturing the philosophical ESSENCE — not a summary. Distill the core idea.
+QUOTE (optional): If the search results contain a memorable direct quote from the thinker (1 sentence max), include it. Must be a REAL quote from the search results — do NOT fabricate. Leave empty if no direct quote is found.
 
 GOOD TITLES: "Proof of work is proof of sacrifice" / "Sound money teaches patience before wealth" / "Sovereignty begins with what you refuse to delegate"
 BAD TITLES: "Bitcoin hash rate reaches new high" / "Analyst predicts BTC target" / anything with numbers or dates
@@ -257,6 +258,7 @@ URL RULES (CRITICAL):
             body: { type: "string", description: "2-3 sentences capturing the philosophical essence" },
             source: { type: "string", description: "Thinker, writer, or publication name" },
             url: { type: "string", description: "Citation URL copied character-for-character" },
+            quote: { type: "string", description: "Optional: a real direct quote from the thinker (1 sentence, from search results only)" },
           },
           required: ["title", "body", "source", "url"],
           additionalProperties: false,

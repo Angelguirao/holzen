@@ -187,6 +187,7 @@ Return a JSON object with these keys:
 - "analogy": 1-2 sentences drawing a parallel from another asset class
 - "assetClass": The other asset class (e.g. "Gold", "Tech stocks")
 - "period": Historical period (e.g. "January 2015")
+- "recovery": 1 sentence about what happened months/years later (e.g. "Within 18 months, the index had fully recovered and set new highs")
 - "source": Source name
 - "url": URL from citations
 

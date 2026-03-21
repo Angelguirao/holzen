@@ -137,6 +137,28 @@ serve(async (req) => {
       if (soldRate > 0.4 && outcomes.length >= 3) {
         adaptiveContext += "\nThe user has a pattern of selling during volatility. Gently invite pause without judgment.";
       }
+
+      // Journey context — reference specific past outcomes in similar moods
+      const currentContext = context?.toLowerCase() || "";
+      const isCurrentDown = currentContext.includes("is down");
+      const isCurrentUp = currentContext.includes("is up");
+
+      const pastHeld = moodHistory.find((m: any) => {
+        if (m.outcome !== "held" && m.outcome !== "nothing") return false;
+        if (isCurrentDown && m.mood === "anxious") return true;
+        if (isCurrentUp && (m.mood === "excited" || m.mood === "fomo")) return true;
+        return false;
+      });
+
+      if (pastHeld) {
+        const daysAgo = Math.floor((Date.now() - new Date(pastHeld.created_at).getTime()) / 86400000);
+        adaptiveContext += `\nJOURNEY CONTEXT: ${daysAgo} days ago, the user felt "${pastHeld.mood}" during a similar market moment and chose to hold. Gently acknowledge this pattern of composure — they've been here before and made a considered choice.`;
+      }
+
+      const recentSells = moodHistory.filter((m: any) => m.outcome === "sold").slice(0, 3);
+      if (recentSells.length === 0 && moodHistory.length >= 5) {
+        adaptiveContext += `\nThe user has a track record of holding through volatility. Acknowledge their consistency.`;
+      }
     }
 
     const sev = typeof severity === "number" ? severity : 0;
