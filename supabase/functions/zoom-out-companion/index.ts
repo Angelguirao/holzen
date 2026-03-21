@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { handleCors, jsonResponse, errorResponse } from "../_shared/cors.ts";
 import { verifyFlexAuth, createServiceClient } from "../_shared/auth.ts";
-import { qualityGate, BANNED_PHRASES, containsSlop } from "../_shared/quality.ts";
+import { qualityGate, BANNED_PHRASES, containsSlop, contentFingerprint } from "../_shared/quality.ts";
 import { createAttemptLogger, createObsTracker, createLogger } from "../_shared/observe.ts";
 import { ZOOM_OUT_FALLBACKS, pickRandom } from "../_shared/fallbacks.ts";
 import { COMPANION_ZOOM_OUT_DEEP_TIME } from "../_shared/cache.ts";
@@ -219,7 +219,7 @@ No trading advice, no price predictions, no exclamation marks.${mood ? `\n\nUSER
                     const newNorm = norm(parsed.title);
                     const isDup = existing?.some((e: any) => { const t = norm(e.content?.title || ""); return t === newNorm || t.includes(newNorm) || newNorm.includes(t); });
                     if (!isDup) {
-                      const fingerprint = btoa(newNorm).slice(0, 32);
+                      const fingerprint = await contentFingerprint(newNorm);
                       const { error: cacheErr } = await serviceClient.from("companion_cache").insert({
                         companion_type: COMPANION_ZOOM_OUT_DEEP_TIME,
                         language: "en",
