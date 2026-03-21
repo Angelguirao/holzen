@@ -152,6 +152,26 @@ async function fetchHistoricalAndCurrentPrices(
       } else { await res.text(); break; }
     } catch { if (attempt >= 1) break; }
   }
+  // Fallback: Blockchain.info ticker API
+  if (!currentPrice && !rateLimited) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 5000);
+      const res = await fetch("https://blockchain.info/ticker", { signal: controller.signal });
+      clearTimeout(timeout);
+      if (res.ok) {
+        const json = await res.json();
+        const usdPrice = json?.USD?.last;
+        if (typeof usdPrice === "number" && usdPrice > 0) {
+          currentPrice = Math.round(usdPrice);
+          log("current price from blockchain.info fallback");
+        }
+      }
+    } catch (e) {
+      log(`blockchain.info fallback failed: ${e}`);
+    }
+  }
+
   if (!currentPrice && context) {
     const priceMatch = context.match(/\$[\d,]+/);
     if (priceMatch) { const parsed = parseInt(priceMatch[0].replace(/[$,]/g, ''), 10); if (parsed > 0) currentPrice = parsed; }
@@ -176,14 +196,14 @@ async function fetchEchoReflection(
   try {
     const direction = context?.toLowerCase().includes("is down") ? "down" : context?.toLowerCase().includes("is up") ? "up" : null;
     if (direction) {
-      const { data } = await svcClient.from("reflections").select("message, created_at, mood, outcome, context").eq("user_id", userId).not("outcome", "is", null).lt("created_at", new Date(Date.now() - 14 * 86400000).toISOString()).order("created_at", { ascending: false }).limit(50);
+      const { data } = await svcClient.from("reflections").select("message, created_at, mood, outcome, context").eq("user_id", userId).not("outcome", "is", null).lt("created_at", new Date(Date.now() - 3 * 86400000).toISOString()).order("created_at", { ascending: false }).limit(50);
       if (data && data.length > 0) {
         const matching = data.filter((r: any) => direction === "down" ? r.context?.toLowerCase().includes("is down") : r.context?.toLowerCase().includes("is up"));
         const pool = matching.length > 0 ? matching : data;
         return pool[Math.floor(Math.random() * Math.min(pool.length, 10))];
       }
     } else {
-      const { data } = await svcClient.from("reflections").select("message, created_at, mood, outcome").eq("user_id", userId).not("outcome", "is", null).lt("created_at", new Date(Date.now() - 14 * 86400000).toISOString()).order("created_at", { ascending: false }).limit(10);
+      const { data } = await svcClient.from("reflections").select("message, created_at, mood, outcome").eq("user_id", userId).not("outcome", "is", null).lt("created_at", new Date(Date.now() - 3 * 86400000).toISOString()).order("created_at", { ascending: false }).limit(10);
       if (data && data.length > 0) return data[0];
     }
   } catch (e) { log(`echo fetch failed: ${e}`); }

@@ -334,8 +334,10 @@ Haiku rules:
       if (result.haiku) {
         const lines = result.haiku.split("\n").filter((l: string) => l.trim().length > 0);
         if (lines.length !== 3) {
-          // Not a valid haiku structure — strip it rather than serving broken haiku
           log(`haiku has ${lines.length} lines instead of 3, stripping`);
+          result.haiku = null;
+        } else if (lines.some((l: string) => l.trim().split(/\s+/).length < 2)) {
+          log("haiku has a line with fewer than 2 words, stripping");
           result.haiku = null;
         }
       }
@@ -362,6 +364,14 @@ Haiku rules:
     }
 
     trackObs("companion_live_generated");
+
+    // Track tone + style for quality analysis
+    svcClient.from("analytics_events").insert({
+      user_id: userId,
+      event: "reflection_generated",
+      metadata: { tone, style, message_length: result.message.length, has_haiku: !!result.haiku },
+    }).then(() => {});
+
     return jsonResponse({
       message: result.message,
       haiku: result.haiku || null,
