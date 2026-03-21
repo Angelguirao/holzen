@@ -370,42 +370,41 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
       }
     }
 
-    // Cache good content with rich metadata and title-based dedup
+    // Cache good content with rich metadata and title-based dedup (awaited to prevent data loss)
     if (nudge.title && nudge.body && nudge.citation && qualityScore > 0 && passesQualityGate(nudge)) {
-      (async () => {
-        try {
-          const { data: existing } = await svcClient.from("companion_cache").select("content").eq("companion_type", "ground_nudge").eq("language", "en").limit(30);
-          const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
-          const newNorm = norm(nudge.title);
-          const isDup = existing?.some((e: any) => {
-            const t = norm(e.content?.title || "");
-            return t === newNorm || t.includes(newNorm) || newNorm.includes(t);
+      try {
+        const { data: existing } = await svcClient.from("companion_cache").select("content").eq("companion_type", "ground_nudge").eq("language", "en").limit(30);
+        const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
+        const newNorm = norm(nudge.title);
+        const isDup = existing?.some((e: any) => {
+          const t = norm(e.content?.title || "");
+          return t === newNorm || t.includes(newNorm) || newNorm.includes(t);
+        });
+        if (!isDup) {
+          let sourceHost = "";
+          try { sourceHost = nudge.url ? new URL(nudge.url.startsWith("http") ? nudge.url : `https://${nudge.url}`).hostname.replace(/^www\./, "") : ""; } catch {}
+          const fingerprint = btoa(newNorm).slice(0, 32);
+          const { error: cacheErr } = await svcClient.from("companion_cache").insert({
+            companion_type: "ground_nudge",
+            language: "en",
+            content: nudge,
+            quality_score: qualityScore,
+            title: nudge.title,
+            title_norm: newNorm,
+            fingerprint,
+            source_kind: "academic_paper",
+            source_title: nudge.citation || null,
+            source_author: nudge.citation?.split("(")[0]?.trim() || null,
+            source_url: nudge.url || null,
+            source_host: sourceHost || null,
+            citations: citations.length > 0 ? JSON.stringify(citations) : null,
+            expires_at: new Date(Date.now() + 14 * 86400000).toISOString(),
+            last_validated_at: qualityScore >= 2 ? new Date().toISOString() : null,
+            automated_score: qualityScore,
           });
-          if (!isDup) {
-            let sourceHost = "";
-            try { sourceHost = nudge.url ? new URL(nudge.url.startsWith("http") ? nudge.url : `https://${nudge.url}`).hostname.replace(/^www\./, "") : ""; } catch {}
-            const fingerprint = btoa(newNorm).slice(0, 32);
-            await svcClient.from("companion_cache").insert({
-              companion_type: "ground_nudge",
-              language: "en",
-              content: nudge,
-              quality_score: qualityScore,
-              title: nudge.title,
-              title_norm: newNorm,
-              fingerprint,
-              source_kind: "academic_paper",
-              source_title: nudge.citation || null,
-              source_author: nudge.citation?.split("(")[0]?.trim() || null,
-              source_url: nudge.url || null,
-              source_host: sourceHost || null,
-              citations: citations.length > 0 ? JSON.stringify(citations) : null,
-              expires_at: new Date(Date.now() + 14 * 86400000).toISOString(),
-              last_validated_at: qualityScore >= 2 ? new Date().toISOString() : null,
-              automated_score: qualityScore,
-            });
-          } else { log("cache dedup: skipped duplicate title"); }
-        } catch { /* non-fatal */ }
-      })();
+          if (cacheErr) log(`cache insert error: ${cacheErr.message}`);
+        } else { log("cache dedup: skipped duplicate title"); }
+      } catch (e) { log(`cache write failed: ${e}`); }
     }
 
     trackObs("companion_live_generated");
