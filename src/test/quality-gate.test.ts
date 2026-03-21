@@ -145,6 +145,24 @@ describe('qualityGate - signal', () => {
     expect(result.reason).toBe('body_contains_crypto_language');
   });
 
+  it('rejects repetitive sentence structure', () => {
+    const result = qualityGate('signal', {
+      ...validSignal,
+      body: 'Bitcoin is a form of sound money. Bitcoin is a store of value. Bitcoin is the future of finance. Bitcoin is unlike anything before it.',
+    });
+    expect(result.pass).toBe(false);
+    expect(result.reason).toContain('repetitive_structure');
+  });
+
+  it('rejects generic source attribution', () => {
+    const result = qualityGate('signal', {
+      ...validSignal,
+      source: 'Various Bitcoin thinkers',
+    });
+    expect(result.pass).toBe(false);
+    expect(result.reason).toBe('signal_generic_source');
+  });
+
   it('rejects title with too many words', () => {
     const result = qualityGate('signal', {
       ...validSignal,
@@ -170,9 +188,19 @@ describe('qualityGate - ground_nudge', () => {
   it('allows market data in grounding (unlike signal)', () => {
     const result = qualityGate('ground_nudge', {
       ...validNudge,
-      body: 'Studies show that when assets drop 15%, panic selling increases by 300%. This is a well-documented phenomenon in behavioral finance research.',
+      body: 'Odean\'s 1998 study of 10,000 trading accounts showed that when assets drop 15%, panic selling increases by 300%. This well-documented phenomenon drives poor returns.',
     });
     expect(result.pass).toBe(true);
+  });
+
+  it('rejects grounding without researcher names or years', () => {
+    const result = qualityGate('ground_nudge', {
+      ...validNudge,
+      body: 'People tend to feel more pain from losses than pleasure from gains. This makes them sell too early and hold losers too long. It is a common pattern.',
+      citation: 'General behavioral finance knowledge',
+    });
+    expect(result.pass).toBe(false);
+    expect(result.reason).toContain('grounding_lacks_specificity');
   });
 });
 
@@ -193,6 +221,15 @@ describe('qualityGate - historical_insight', () => {
     const result = qualityGate('historical_insight', { ...validInsight, btcInsight: '' });
     expect(result.pass).toBe(false);
     expect(result.reason).toBe('missing_btcInsight');
+  });
+
+  it('rejects history without specific dates or numbers', () => {
+    const result = qualityGate('historical_insight', {
+      ...validInsight,
+      btcInsight: 'Gold once crashed significantly and many investors panicked. Those who held saw the price recover over time, just as it always does with sound assets.',
+    });
+    expect(result.pass).toBe(false);
+    expect(result.reason).toContain('history_lacks_specificity');
   });
 });
 
