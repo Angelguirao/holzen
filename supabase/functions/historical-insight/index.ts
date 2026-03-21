@@ -45,7 +45,7 @@ serve(async (req) => {
       ? createObsTracker(svcClient, effectiveUserId, "historical_insight", t0)
       : (_event: string, _meta?: Record<string, any>) => {};
 
-    const logAttempt = createAttemptLogger(svcClient);
+    const logAttempt = createAttemptLogger(svcClient, { userId: effectiveUserId || undefined });
 
     const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");

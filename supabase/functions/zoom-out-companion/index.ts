@@ -43,7 +43,7 @@ serve(async (req) => {
       ? createObsTracker(serviceClient, effectiveUserId, "zoom_out", t0)
       : (_event: string, _meta?: Record<string, any>) => {};
 
-    const logAttempt = createAttemptLogger(serviceClient);
+    const logAttempt = createAttemptLogger(serviceClient, { userId: effectiveUserId || undefined });
 
     // ── 1. Fetch historical BTC prices with DB caching ──
     const today = new Date();

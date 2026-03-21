@@ -45,7 +45,7 @@ serve(async (req) => {
     const svcClient = await createServiceClient();
 
     const trackObs = createObsTracker(svcClient, user.id, "ground_nudge", t0);
-    const logAttempt = createAttemptLogger(svcClient);
+    const logAttempt = createAttemptLogger(svcClient, { userId: user.id });
 
     if (!PERPLEXITY_API_KEY || !LOVABLE_API_KEY) {
       log("missing API keys, serving fallback");

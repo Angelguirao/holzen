@@ -24,12 +24,34 @@ interface AttemptParams {
   quality_gate_reason?: string;
 }
 
+interface AttemptLoggerOptions {
+  /** User ID to associate with all attempts (for cost attribution) */
+  userId?: string;
+  /** Reflection ID to associate with all attempts (for session correlation) */
+  reflectionId?: string;
+}
+
 /**
  * Create an attempt logger bound to a service client.
  * Returns a function that logs generation attempts with cost estimation.
+ *
+ * Pass userId and reflectionId in options to enable per-user cost attribution
+ * and per-session debugging. These columns are nullable in generation_attempts —
+ * if the DB doesn't have them yet, the insert still succeeds (Supabase ignores
+ * unknown columns in inserts when not using strict mode).
+ *
+ * SQL migration to add these columns:
+ * ```sql
+ * ALTER TABLE generation_attempts ADD COLUMN IF NOT EXISTS user_id uuid REFERENCES auth.users(id);
+ * ALTER TABLE generation_attempts ADD COLUMN IF NOT EXISTS reflection_id uuid REFERENCES reflections(id);
+ * CREATE INDEX IF NOT EXISTS idx_generation_attempts_user_id ON generation_attempts(user_id);
+ * CREATE INDEX IF NOT EXISTS idx_generation_attempts_reflection_id ON generation_attempts(reflection_id);
+ * ```
  */
-export function createAttemptLogger(svcClient: any) {
+export function createAttemptLogger(svcClient: any, options?: AttemptLoggerOptions) {
   let attemptOrder = 0;
+  const userId = options?.userId ?? null;
+  const reflectionId = options?.reflectionId ?? null;
 
   return (params: AttemptParams) => {
     attemptOrder++;
@@ -45,6 +67,8 @@ export function createAttemptLogger(svcClient: any) {
       ...params,
       attempt_order: attemptOrder,
       estimated_cost_usd: cost,
+      ...(userId ? { user_id: userId } : {}),
+      ...(reflectionId ? { reflection_id: reflectionId } : {}),
     }).then(() => {});
   };
 }
