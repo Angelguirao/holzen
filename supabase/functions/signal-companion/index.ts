@@ -317,26 +317,9 @@ URL RULES (CRITICAL):
       signal.url = normalizeUrl(signal.url);
     }
 
+    // URL quality: start at 1, validate asynchronously after response is sent.
+    // This removes 4-12s of blocking HEAD requests from the critical path.
     let qualityScore = 1;
-    if (signal.url) {
-      const reachable = await isUrlReachable(signal.url);
-      if (!reachable) {
-        let found = false;
-        for (const c of citations) {
-          if (c !== signal.url && await isUrlReachable(c)) {
-            signal.url = c;
-            found = true;
-            break;
-          }
-        }
-        if (!found) {
-          const searchTerm = encodeURIComponent(signal.source || signal.title || "Bitcoin philosophy sound money sovereignty");
-          signal.url = `https://www.google.com/search?q=${searchTerm}`;
-        }
-      } else {
-        qualityScore = 2;
-      }
-    }
 
     // Cache good content with rich metadata and title-based dedup (awaited to prevent data loss)
     if (signal.title && signal.body && signal.source && qualityScore > 0) {
@@ -373,6 +356,26 @@ URL RULES (CRITICAL):
           if (cacheErr) log(`cache insert error: ${cacheErr.message}`);
         } else { log("cache dedup: skipped duplicate title"); }
       } catch (e) { log(`cache write failed: ${e}`); }
+    }
+
+    // Background URL validation: update quality score and fix broken URLs
+    // after the response is sent (fire-and-forget, non-blocking)
+    if (signal.url && signal.url.startsWith("http")) {
+      isUrlReachable(signal.url).then(async (reachable) => {
+        if (reachable) {
+          // URL works — upgrade quality score in cache
+          try {
+            const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
+            const titleNorm = norm(signal.title);
+            await svcClient.from("companion_cache")
+              .update({ quality_score: 2, last_validated_at: new Date().toISOString() })
+              .eq("companion_type", "signal")
+              .eq("title_norm", titleNorm);
+          } catch { /* non-critical */ }
+        } else {
+          log("background URL validation failed", { url: signal.url });
+        }
+      }).catch(() => {});
     }
 
     trackObs("companion_live_generated");

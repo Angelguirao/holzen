@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { handleCors, jsonResponse, errorResponse } from "../_shared/cors.ts";
 import { createServiceClient, verifyFlexAuth } from "../_shared/auth.ts";
-import { qualityGate, BANNED_PHRASES, contentFingerprint } from "../_shared/quality.ts";
+import { qualityGate, BANNED_PHRASES, contentFingerprint, isUrlReachable } from "../_shared/quality.ts";
 import { createAttemptLogger, createObsTracker, createLogger } from "../_shared/observe.ts";
 import { HISTORY_FALLBACKS, pickRandom } from "../_shared/fallbacks.ts";
 import { serveFromCache } from "../_shared/cache.ts";
@@ -215,36 +215,9 @@ BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? 
       insight.url = citations[0];
     }
 
-    // ── URL validation via HEAD request ──
-    if (insight.url) {
-      try {
-        const urlController = new AbortController();
-        const urlTimeout = setTimeout(() => urlController.abort(), 3000);
-        const headRes = await fetch(insight.url, { method: "HEAD", redirect: "follow", signal: urlController.signal });
-        clearTimeout(urlTimeout);
-        if (headRes.status >= 400) {
-          log(`URL ${insight.url} returned ${headRes.status}, clearing`);
-          let validUrl = "";
-          for (const c of citations) {
-            if (c === insight.url) continue;
-            try {
-              const uc = new AbortController();
-              const ut = setTimeout(() => uc.abort(), 2000);
-              const r = await fetch(c, { method: "HEAD", redirect: "follow", signal: uc.signal });
-              clearTimeout(ut);
-              if (r.status < 400) { validUrl = c; break; }
-            } catch { continue; }
-          }
-          insight.url = validUrl || insight.source || "";
-        }
-      } catch {
-        log(`URL validation timed out for ${insight.url}`);
-      }
-    }
-
-    // Cache good content with rich metadata and title-based dedup (awaited to prevent data loss)
-    const urlReachable = insight.url && insight.url.startsWith("http");
-    const histQuality = urlReachable ? 2 : 1;
+    // URL quality: start at 1, validate asynchronously after response is sent.
+    // This removes 3-9s of blocking HEAD requests from the critical path.
+    const histQuality = 1;
     if (insight.title && insight.btcInsight && qg.pass) {
       try {
         const { data: existing } = await svcClient.from("companion_cache").select("content").eq("companion_type", "historical_insight").eq("language", "en").limit(30);
@@ -280,6 +253,21 @@ BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? 
           if (cacheErr) log(`cache insert error: ${cacheErr.message}`);
         }
       } catch (e) { log(`cache write failed: ${e}`); }
+    }
+
+    // Background URL validation (fire-and-forget, non-blocking)
+    if (insight.url && insight.url.startsWith("http")) {
+      isUrlReachable(insight.url).then(async (reachable) => {
+        if (reachable) {
+          try {
+            const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
+            await svcClient.from("companion_cache")
+              .update({ quality_score: 2, last_validated_at: new Date().toISOString() })
+              .eq("companion_type", "historical_insight")
+              .eq("title_norm", norm(insight.title));
+          } catch { /* non-critical */ }
+        }
+      }).catch(() => {});
     }
 
     trackObs("companion_live_generated");
