@@ -9,9 +9,7 @@ import { serveFromCache } from "../_shared/cache.ts";
 /** Cache (ranked) → curated fallbacks. */
 async function serveFallback(svcClient: any, excludeIds?: string[]): Promise<{ data: any; source: string; cacheId: string | null }> {
   const cached = await serveFromCache(svcClient, "signal", "en", excludeIds);
-  if (cached) {
-    return { data: cached.data, source: "cache", cacheId: cached.cacheId };
-  }
+  if (cached) return { data: cached.data, source: "cache", cacheId: cached.cacheId };
   return { data: pickRandom(SIGNAL_FALLBACKS), source: "curated", cacheId: null };
 }
 
@@ -29,9 +27,7 @@ serve(async (req) => {
     }
 
     let body: any = {};
-    try {
-      body = await req.json();
-    } catch {
+    try { body = await req.json(); } catch {
       return errorResponse("Invalid or empty request body", 400);
     }
     const { context, sources, recentSignalSources, recentSignalTitles } = body;
@@ -354,7 +350,7 @@ URL RULES (CRITICAL):
         });
         if (!isDup) {
           let sourceHost = "";
-          try { sourceHost = signal.url ? new URL(signal.url.startsWith("http") ? signal.url : `https://${signal.url}`).hostname.replace(/^www\./, "") : ""; } catch { /* ignore */ }
+          try { sourceHost = signal.url ? new URL(signal.url.startsWith("http") ? signal.url : `https://${signal.url}`).hostname.replace(/^www\./, "") : ""; } catch {}
           const fingerprint = btoa(newNorm).slice(0, 32);
           const { error: cacheErr } = await svcClient.from("companion_cache").insert({
             companion_type: "signal",
