@@ -1,6 +1,7 @@
 import { useAdminStats, CacheEntryRow, SignalSourceRow } from '@/hooks/use-admin-stats';
 import { useAuth } from '@/hooks/use-auth';
 import { supabase } from '@/integrations/supabase/client';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { RefreshCw, Activity, Database, DollarSign, AlertTriangle, ThumbsUp, Clock, Loader2, Zap, ShieldX, ChevronDown, ChevronRight, Trash2, ArrowUp, ArrowDown, Globe } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { useMemo, useState, useEffect, useCallback } from 'react';
@@ -18,7 +19,6 @@ function useIsAdmin(): { isAdmin: boolean; loading: boolean } {
 
   const adminIds = import.meta.env.VITE_ADMIN_USER_IDS;
   if (!adminIds) {
-    // No admin list configured — allow any authenticated user (backwards compatible)
     return { isAdmin: true, loading: false };
   }
 
@@ -27,14 +27,12 @@ function useIsAdmin(): { isAdmin: boolean; loading: boolean } {
 }
 
 const TYPE_LABELS: Record<string, string> = {
-  // Canonical DB types
   signal: 'Signal',
   ground_nudge: 'Grounding',
   historical_insight: 'History',
   zoom_out: 'Zoom Out',
   zoom_out_deep_time: 'Zoom Out',
   reflection: 'Reflection',
-  // Frontend keys (used in older feedback events)
   learning: 'Grounding',
   history_insight: 'History',
   haiku: 'Haiku',
@@ -70,6 +68,8 @@ function StatCard({ icon: Icon, title, value, subtitle, alert }: {
     </div>
   );
 }
+
+const TAB_TRIGGER_CLASS = "text-[10px] font-mono uppercase tracking-wider px-2.5 py-1 rounded-full data-[state=active]:bg-primary/10 data-[state=active]:text-primary";
 
 export default function Admin() {
   const { isAdmin, loading: adminLoading } = useIsAdmin();
@@ -124,7 +124,7 @@ export default function Admin() {
     }
 
     return Array.from(dayMap.entries())
-      .map(([day, data]) => ({ day: day.slice(5), ...data })) // MM-DD format
+      .map(([day, data]) => ({ day: day.slice(5), ...data }))
       .sort((a, b) => a.day.localeCompare(b.day))
       .slice(-14);
   }, [costs]);
@@ -171,239 +171,255 @@ export default function Admin() {
         </button>
       </div>
 
-      {/* Health Summary — context-aware, not just threshold-based */}
-      {(() => {
-        const issues: string[] = [];
-        const tips: string[] = [];
+      {/* Tabs */}
+      <Tabs defaultValue="monitor" className="space-y-4">
+        <TabsList className="inline-flex h-auto items-center gap-1 rounded-lg bg-muted/30 p-1">
+          <TabsTrigger value="monitor" className={TAB_TRIGGER_CLASS}>Monitor</TabsTrigger>
+          <TabsTrigger value="content" className={TAB_TRIGGER_CLASS}>Content</TabsTrigger>
+          <TabsTrigger value="sources" className={TAB_TRIGGER_CLASS}>Sources</TabsTrigger>
+          <TabsTrigger value="tools" className={TAB_TRIGGER_CLASS}>Tools</TabsTrigger>
+        </TabsList>
 
-        // Failure rate — always important
-        if (overview.failureRate > 20) {
-          issues.push('High failure rate — check if API keys (Perplexity/Lovable) are valid and not rate-limited');
-        } else if (overview.failureRate > 5) {
-          tips.push('Some generation failures — check Generation Health for details');
-        }
+        {/* Tab 1: Monitor */}
+        <TabsContent value="monitor" className="space-y-6 mt-0">
+          {/* Health Summary */}
+          {(() => {
+            const issues: string[] = [];
+            const tips: string[] = [];
 
-        // Cost — warn when approaching budget
-        if (overview.todayCost > 8) {
-          issues.push('Approaching daily budget cap ($10) — generation will be blocked when exceeded');
-        } else if (overview.todayCost > 5) {
-          tips.push(`Moderate spend today ($${overview.todayCost.toFixed(2)}) — on track for budget cap`);
-        }
+            if (overview.failureRate > 20) {
+              issues.push('High failure rate — check if API keys (Perplexity/Lovable) are valid and not rate-limited');
+            } else if (overview.failureRate > 5) {
+              tips.push('Some generation failures — check Generation Health for details');
+            }
 
-        // Cache hit rate — only relevant at higher volume or cost
-        if (overview.cacheHitRate < 10 && overview.todayCost > 3) {
-          tips.push('Low cache hit rate with moderate cost — consider scheduling the cache warmer cron to reduce API spend');
-        } else if (overview.cacheHitRate < 10 && overview.totalServes > 50) {
-          tips.push('Cache hit rate is low — the cache warmer (pregenerate-companions) could help as usage grows');
-        }
+            if (overview.todayCost > 8) {
+              issues.push('Approaching daily budget cap ($10) — generation will be blocked when exceeded');
+            } else if (overview.todayCost > 5) {
+              tips.push(`Moderate spend today ($${overview.todayCost.toFixed(2)}) — on track for budget cap`);
+            }
 
-        if (issues.length === 0 && tips.length === 0 && overview.totalServes > 0) {
-          const parts = [`${overview.failureRate}% failure rate`];
-          if (overview.todayCost > 0) parts.push(`$${overview.todayCost.toFixed(3)} today`);
-          if (overview.cacheHitRate > 0) parts.push(`${overview.cacheHitRate}% cache hit`);
-          parts.push(`${overview.totalServes} serves`);
-          return (
-            <div className="rounded-xl border border-primary/15 bg-primary/3 px-4 py-2.5">
-              <p className="text-[10px] font-mono text-primary/60">✓ System healthy — {parts.join(' · ')}</p>
-            </div>
-          );
-        }
+            if (overview.cacheHitRate < 10 && overview.todayCost > 3) {
+              tips.push('Low cache hit rate with moderate cost — consider scheduling the cache warmer cron to reduce API spend');
+            } else if (overview.cacheHitRate < 10 && overview.totalServes > 50) {
+              tips.push('Cache hit rate is low — the cache warmer (pregenerate-companions) could help as usage grows');
+            }
 
-        const allMessages = [
-          ...issues.map(msg => ({ msg, level: 'issue' as const })),
-          ...tips.map(msg => ({ msg, level: 'tip' as const })),
-        ];
+            if (issues.length === 0 && tips.length === 0 && overview.totalServes > 0) {
+              const parts = [`${overview.failureRate}% failure rate`];
+              if (overview.todayCost > 0) parts.push(`$${overview.todayCost.toFixed(3)} today`);
+              if (overview.cacheHitRate > 0) parts.push(`${overview.cacheHitRate}% cache hit`);
+              parts.push(`${overview.totalServes} serves`);
+              return (
+                <div className="rounded-xl border border-primary/15 bg-primary/3 px-4 py-2.5">
+                  <p className="text-[10px] font-mono text-primary/60">✓ System healthy — {parts.join(' · ')}</p>
+                </div>
+              );
+            }
 
-        if (allMessages.length > 0) {
-          return (
-            <div className={`rounded-xl border px-4 py-2.5 space-y-1 ${
-              issues.length > 0
-                ? 'border-amber-500/20 bg-amber-500/5 dark:bg-amber-500/10'
-                : 'border-border/20 bg-card/10'
-            }`}>
-              {allMessages.map(({ msg, level }, i) => (
-                <p key={i} className={`text-[10px] font-mono ${
-                  level === 'issue'
-                    ? 'text-amber-700/70 dark:text-amber-400/70'
-                    : 'text-muted-foreground/50'
+            const allMessages = [
+              ...issues.map(msg => ({ msg, level: 'issue' as const })),
+              ...tips.map(msg => ({ msg, level: 'tip' as const })),
+            ];
+
+            if (allMessages.length > 0) {
+              return (
+                <div className={`rounded-xl border px-4 py-2.5 space-y-1 ${
+                  issues.length > 0
+                    ? 'border-amber-500/20 bg-amber-500/5 dark:bg-amber-500/10'
+                    : 'border-border/20 bg-card/10'
                 }`}>
-                  {level === 'issue' ? '⚠' : '💡'} {msg}
-                </p>
-              ))}
-            </div>
-          );
-        }
-        return null;
-      })()}
-
-      {/* Overview Cards */}
-      <div className="grid grid-cols-2 gap-3">
-        <StatCard
-          icon={Activity}
-          title="Serves"
-          value={overview.totalServes.toLocaleString()}
-          subtitle="all time"
-        />
-        <StatCard
-          icon={Database}
-          title="Cache Hit"
-          value={`${overview.cacheHitRate}%`}
-          subtitle={overview.cacheHitRate === 0 ? 'all live — fresh content' : overview.cacheHitRate < 30 ? 'mostly live generation' : 'good cache usage'}
-        />
-        <StatCard
-          icon={DollarSign}
-          title="Cost Today"
-          value={`$${overview.todayCost.toFixed(3)}`}
-          subtitle="cap: $10/day"
-          alert={overview.todayCost > 8}
-        />
-        <StatCard
-          icon={AlertTriangle}
-          title="Failure Rate"
-          value={`${overview.failureRate}%`}
-          subtitle="target: <10%"
-          alert={overview.failureRate > 20}
-        />
-      </div>
-
-      {/* Cost Chart */}
-      {costChartData.length > 0 && (
-        <div className="space-y-2">
-          <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">Daily Cost (14d)</p>
-          <div className="rounded-xl border border-border/15 bg-card/5 p-3">
-            <ResponsiveContainer width="100%" height={160}>
-              <BarChart data={costChartData}>
-                <XAxis dataKey="day" tick={{ fontSize: 9, fill: 'hsl(var(--muted-foreground) / 0.3)' }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 9, fill: 'hsl(var(--muted-foreground) / 0.3)' }} axisLine={false} tickLine={false} width={35} tickFormatter={(v) => `$${v.toFixed(2)}`} />
-                <Tooltip
-                  contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border) / 0.2)', borderRadius: '8px', fontSize: '10px', fontFamily: 'monospace' }}
-                  formatter={(value: number) => [`$${value.toFixed(4)}`, '']}
-                  labelStyle={{ fontSize: '10px', color: 'hsl(var(--muted-foreground) / 0.6)' }}
-                />
-                <Bar dataKey="total" radius={[4, 4, 0, 0]} maxBarSize={24}>
-                  {costChartData.map((_, i) => (
-                    <Cell key={i} fill="hsl(var(--primary) / 0.3)" />
+                  {allMessages.map(({ msg, level }, i) => (
+                    <p key={i} className={`text-[10px] font-mono ${
+                      level === 'issue'
+                        ? 'text-amber-700/70 dark:text-amber-400/70'
+                        : 'text-muted-foreground/50'
+                    }`}>
+                      {level === 'issue' ? '⚠' : '💡'} {msg}
+                    </p>
                   ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
+                </div>
+              );
+            }
+            return null;
+          })()}
+
+          {/* Overview Cards */}
+          <div className="grid grid-cols-2 gap-3">
+            <StatCard
+              icon={Activity}
+              title="Serves"
+              value={overview.totalServes.toLocaleString()}
+              subtitle="all time"
+            />
+            <StatCard
+              icon={Database}
+              title="Cache Hit"
+              value={`${overview.cacheHitRate}%`}
+              subtitle={overview.cacheHitRate === 0 ? 'all live — fresh content' : overview.cacheHitRate < 30 ? 'mostly live generation' : 'good cache usage'}
+            />
+            <StatCard
+              icon={DollarSign}
+              title="Cost Today"
+              value={`$${overview.todayCost.toFixed(3)}`}
+              subtitle="cap: $10/day"
+              alert={overview.todayCost > 8}
+            />
+            <StatCard
+              icon={AlertTriangle}
+              title="Failure Rate"
+              value={`${overview.failureRate}%`}
+              subtitle="target: <10%"
+              alert={overview.failureRate > 20}
+            />
           </div>
-        </div>
-      )}
 
-      {/* Cache Hit Rates */}
-      <div className="space-y-2">
-        <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">Cache Hit Rates</p>
-        <div className="space-y-1.5">
-          {cacheHits.map((row, i) => {
-            const pct = row.cache_hit_pct ?? 0;
-            const type = row.companion_type ?? 'unknown';
-            return (
-              <div key={i} className="rounded-lg border border-border/10 bg-card/5 px-3 py-2">
-                <div className="flex items-center justify-between mb-1">
-                  <span className="text-[10px] font-mono text-foreground/60">{label(type)}</span>
-                  <span className="text-[10px] font-mono text-muted-foreground/40">
-                    {pct.toFixed(0)}% · {row.total_serves ?? 0} serves
-                  </span>
-                </div>
-                <div className="h-1.5 bg-muted/20 rounded-full overflow-hidden">
-                  <div
-                    className="h-full rounded-full transition-all duration-500"
-                    style={{
-                      width: `${Math.min(pct, 100)}%`,
-                      backgroundColor: TYPE_COLORS[type] ?? 'hsl(var(--primary) / 0.4)',
-                    }}
-                  />
-                </div>
-                <div className="flex gap-3 mt-1">
-                  <span className="text-[9px] text-muted-foreground/30">live: {row.live_generated ?? 0}</span>
-                  <span className="text-[9px] text-muted-foreground/30">cache: {row.cache_hits ?? 0}</span>
-                  <span className="text-[9px] text-muted-foreground/30">curated: {row.curated_fallbacks ?? 0}</span>
-                </div>
-              </div>
-            );
-          })}
-          {cacheHits.length === 0 && (
-            <p className="text-[10px] text-muted-foreground/30 text-center py-3">No serve data yet</p>
-          )}
-        </div>
-      </div>
-
-      {/* Generation Health */}
-      <div className="space-y-2">
-        <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">Generation Health</p>
-        <div className="space-y-1.5">
-          {failures.map((row, i) => {
-            const failPct = row.failure_pct ?? 0;
-            const isAlert = failPct > 20;
-            return (
-              <div key={i} className={`rounded-lg border px-3 py-2 ${isAlert ? 'border-destructive/20 bg-destructive/5' : 'border-border/10 bg-card/5'}`}>
-                <div className="flex items-center justify-between">
-                  <div>
-                    <span className="text-[10px] font-mono text-foreground/60">{label(row.companion_type)}</span>
-                    <span className="text-[9px] text-muted-foreground/30 ml-2">{row.model}</span>
-                  </div>
-                  <span className={`text-[10px] font-mono ${isAlert ? 'text-destructive/70' : 'text-muted-foreground/40'}`}>
-                    {failPct.toFixed(1)}% fail
-                  </span>
-                </div>
-                <div className="flex gap-3 mt-1">
-                  <span className="text-[9px] text-muted-foreground/30">✓ {row.successes ?? 0}</span>
-                  <span className="text-[9px] text-muted-foreground/30">✗ {row.errors ?? 0}</span>
-                  <span className="text-[9px] text-muted-foreground/30">⏱ {row.timeouts ?? 0}</span>
-                  <span className="text-[9px] text-muted-foreground/30">⚠ {row.quality_gate_failures ?? 0} QG</span>
-                </div>
-                <div className="flex gap-3 mt-0.5">
-                  <span className="text-[9px] text-muted-foreground/30 flex items-center gap-0.5">
-                    <Clock className="h-2.5 w-2.5" /> avg {((row.avg_latency_ms ?? 0) / 1000).toFixed(1)}s
-                  </span>
-                  <span className="text-[9px] text-muted-foreground/30">
-                    P95 {((row.p95_latency_ms ?? 0) / 1000).toFixed(1)}s
-                  </span>
-                </div>
-              </div>
-            );
-          })}
-          {failures.length === 0 && (
-            <p className="text-[10px] text-muted-foreground/30 text-center py-3">No generation data yet</p>
-          )}
-        </div>
-      </div>
-
-      {/* Feedback */}
-      <div className="space-y-2">
-        <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">User Feedback</p>
-        <div className="space-y-1.5">
-          {feedback.map((row, i) => (
-            <div key={i} className="rounded-lg border border-border/10 bg-card/5 px-3 py-2 flex items-center justify-between">
-              <span className="text-[10px] font-mono text-foreground/60">{label(row.companion_type)}</span>
-              <div className="flex items-center gap-2">
-                <span className="text-[9px] text-muted-foreground/30">
-                  <ThumbsUp className="h-2.5 w-2.5 inline mr-0.5" />{row.total_thumbs_up ?? 0}
-                </span>
-                <span className="text-[9px] text-muted-foreground/30">
-                  👎 {row.total_thumbs_down ?? 0}
-                </span>
-                <span className="text-[10px] font-mono text-primary/50">
-                  {(row.approval_pct ?? 0).toFixed(0)}%
-                </span>
+          {/* Cost Chart */}
+          {costChartData.length > 0 && (
+            <div className="space-y-2">
+              <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">Daily Cost (14d)</p>
+              <div className="rounded-xl border border-border/15 bg-card/5 p-3">
+                <ResponsiveContainer width="100%" height={160}>
+                  <BarChart data={costChartData}>
+                    <XAxis dataKey="day" tick={{ fontSize: 9, fill: 'hsl(var(--muted-foreground) / 0.3)' }} axisLine={false} tickLine={false} />
+                    <YAxis tick={{ fontSize: 9, fill: 'hsl(var(--muted-foreground) / 0.3)' }} axisLine={false} tickLine={false} width={35} tickFormatter={(v) => `$${v.toFixed(2)}`} />
+                    <Tooltip
+                      contentStyle={{ background: 'hsl(var(--card))', border: '1px solid hsl(var(--border) / 0.2)', borderRadius: '8px', fontSize: '10px', fontFamily: 'monospace' }}
+                      formatter={(value: number) => [`$${value.toFixed(4)}`, '']}
+                      labelStyle={{ fontSize: '10px', color: 'hsl(var(--muted-foreground) / 0.6)' }}
+                    />
+                    <Bar dataKey="total" radius={[4, 4, 0, 0]} maxBarSize={24}>
+                      {costChartData.map((_, i) => (
+                        <Cell key={i} fill="hsl(var(--primary) / 0.3)" />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
             </div>
-          ))}
-          {feedback.length === 0 && (
-            <p className="text-[10px] text-muted-foreground/30 text-center py-3">No feedback data yet</p>
           )}
-        </div>
-      </div>
 
-      {/* Curated Content Manager */}
-      <CuratedContentManager entries={cacheEntries} onRefresh={refreshCacheEntries} />
+          {/* Cache Hit Rates */}
+          <div className="space-y-2">
+            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">Cache Hit Rates</p>
+            <div className="space-y-1.5">
+              {cacheHits.map((row, i) => {
+                const pct = row.cache_hit_pct ?? 0;
+                const type = row.companion_type ?? 'unknown';
+                return (
+                  <div key={i} className="rounded-lg border border-border/10 bg-card/5 px-3 py-2">
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-[10px] font-mono text-foreground/60">{label(type)}</span>
+                      <span className="text-[10px] font-mono text-muted-foreground/40">
+                        {pct.toFixed(0)}% · {row.total_serves ?? 0} serves
+                      </span>
+                    </div>
+                    <div className="h-1.5 bg-muted/20 rounded-full overflow-hidden">
+                      <div
+                        className="h-full rounded-full transition-all duration-500"
+                        style={{
+                          width: `${Math.min(pct, 100)}%`,
+                          backgroundColor: TYPE_COLORS[type] ?? 'hsl(var(--primary) / 0.4)',
+                        }}
+                      />
+                    </div>
+                    <div className="flex gap-3 mt-1">
+                      <span className="text-[9px] text-muted-foreground/30">live: {row.live_generated ?? 0}</span>
+                      <span className="text-[9px] text-muted-foreground/30">cache: {row.cache_hits ?? 0}</span>
+                      <span className="text-[9px] text-muted-foreground/30">curated: {row.curated_fallbacks ?? 0}</span>
+                    </div>
+                  </div>
+                );
+              })}
+              {cacheHits.length === 0 && (
+                <p className="text-[10px] text-muted-foreground/30 text-center py-3">No serve data yet</p>
+              )}
+            </div>
+          </div>
 
-      {/* Source Catalog */}
-      <SourceCatalogViewer sources={signalSources} />
+          {/* Generation Health */}
+          <div className="space-y-2">
+            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">Generation Health</p>
+            <div className="space-y-1.5">
+              {failures.map((row, i) => {
+                const failPct = row.failure_pct ?? 0;
+                const isAlert = failPct > 20;
+                return (
+                  <div key={i} className={`rounded-lg border px-3 py-2 ${isAlert ? 'border-destructive/20 bg-destructive/5' : 'border-border/10 bg-card/5'}`}>
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-[10px] font-mono text-foreground/60">{label(row.companion_type)}</span>
+                        <span className="text-[9px] text-muted-foreground/30 ml-2">{row.model}</span>
+                      </div>
+                      <span className={`text-[10px] font-mono ${isAlert ? 'text-destructive/70' : 'text-muted-foreground/40'}`}>
+                        {failPct.toFixed(1)}% fail
+                      </span>
+                    </div>
+                    <div className="flex gap-3 mt-1">
+                      <span className="text-[9px] text-muted-foreground/30">✓ {row.successes ?? 0}</span>
+                      <span className="text-[9px] text-muted-foreground/30">✗ {row.errors ?? 0}</span>
+                      <span className="text-[9px] text-muted-foreground/30">⏱ {row.timeouts ?? 0}</span>
+                      <span className="text-[9px] text-muted-foreground/30">⚠ {row.quality_gate_failures ?? 0} QG</span>
+                    </div>
+                    <div className="flex gap-3 mt-0.5">
+                      <span className="text-[9px] text-muted-foreground/30 flex items-center gap-0.5">
+                        <Clock className="h-2.5 w-2.5" /> avg {((row.avg_latency_ms ?? 0) / 1000).toFixed(1)}s
+                      </span>
+                      <span className="text-[9px] text-muted-foreground/30">
+                        P95 {((row.p95_latency_ms ?? 0) / 1000).toFixed(1)}s
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
+              {failures.length === 0 && (
+                <p className="text-[10px] text-muted-foreground/30 text-center py-3">No generation data yet</p>
+              )}
+            </div>
+          </div>
 
-      {/* Dev Mode */}
-      <DevModeToggle />
+          {/* Feedback */}
+          <div className="space-y-2">
+            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">User Feedback</p>
+            <div className="space-y-1.5">
+              {feedback.map((row, i) => (
+                <div key={i} className="rounded-lg border border-border/10 bg-card/5 px-3 py-2 flex items-center justify-between">
+                  <span className="text-[10px] font-mono text-foreground/60">{label(row.companion_type)}</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[9px] text-muted-foreground/30">
+                      <ThumbsUp className="h-2.5 w-2.5 inline mr-0.5" />{row.total_thumbs_up ?? 0}
+                    </span>
+                    <span className="text-[9px] text-muted-foreground/30">
+                      👎 {row.total_thumbs_down ?? 0}
+                    </span>
+                    <span className="text-[10px] font-mono text-primary/50">
+                      {(row.approval_pct ?? 0).toFixed(0)}%
+                    </span>
+                  </div>
+                </div>
+              ))}
+              {feedback.length === 0 && (
+                <p className="text-[10px] text-muted-foreground/30 text-center py-3">No feedback data yet</p>
+              )}
+            </div>
+          </div>
+        </TabsContent>
+
+        {/* Tab 2: Content */}
+        <TabsContent value="content" className="mt-0">
+          <CuratedContentManager entries={cacheEntries} onRefresh={refreshCacheEntries} />
+        </TabsContent>
+
+        {/* Tab 3: Sources */}
+        <TabsContent value="sources" className="mt-0">
+          <SourceCatalogViewer sources={signalSources} />
+        </TabsContent>
+
+        {/* Tab 4: Tools */}
+        <TabsContent value="tools" className="mt-0">
+          <DevModeToggle />
+        </TabsContent>
+      </Tabs>
 
       {/* Footer */}
       <p className="text-[9px] text-muted-foreground/20 text-center pb-4">
@@ -634,13 +650,11 @@ function DevModeToggle() {
   const [devMode, setDevMode] = useState(false);
   const [syncing, setSyncing] = useState(false);
 
-  // Load from localStorage first (instant), then sync from DB (cross-device)
   useEffect(() => {
     try {
       setDevMode(localStorage.getItem('holzen_dev_mode') === 'true');
     } catch { /* ignore */ }
 
-    // Sync from DB for cross-device support
     (async () => {
       try {
         const { data: { user } } = await supabase.auth.getUser();
@@ -669,12 +683,10 @@ function DevModeToggle() {
     setDevMode(next);
     setSyncing(true);
     try {
-      // Save to localStorage (instant, same device)
       if (next) localStorage.setItem('holzen_dev_mode', 'true');
       else localStorage.removeItem('holzen_dev_mode');
     } catch { /* ignore */ }
     try {
-      // Save to DB (syncs across devices)
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         await supabase.from('analytics_events').insert({
