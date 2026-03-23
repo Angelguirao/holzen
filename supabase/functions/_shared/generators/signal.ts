@@ -10,7 +10,7 @@
 
 import { qualityGate, normalizeUrl, isUrlReachable, contentFingerprint } from "../quality.ts";
 import { SIGNAL_FALLBACKS, pickRandom } from "../fallbacks.ts";
-import { serveFromCache } from "../cache.ts";
+import { parseMarketDirection, serveFromCache } from "../cache.ts";
 import { createAttemptLogger } from "../observe.ts";
 import { validateSource } from "../source-validation.ts";
 
@@ -37,9 +37,11 @@ export interface GenerateSignalParams {
 
 async function serveFallback(
   svcClient: any,
+  userId?: string,
+  marketDirection?: "up" | "down" | "neutral",
   excludeIds?: string[],
 ): Promise<SignalResult> {
-  const cached = await serveFromCache(svcClient, "signal", "en", excludeIds);
+  const cached = await serveFromCache(svcClient, "signal", "en", { userId, marketDirection, excludeIds });
   if (cached) return { data: cached.data, source: "cache", cacheId: cached.cacheId };
   return { data: pickRandom(SIGNAL_FALLBACKS), source: "curated", cacheId: null };
 }
@@ -99,6 +101,7 @@ async function callPerplexity(
 
 export async function generateSignal(params: GenerateSignalParams): Promise<SignalResult> {
   const { svcClient, context, sources, recentSignalSources, recentSignalTitles, userId, log } = params;
+  const marketDirection = parseMarketDirection(context);
 
   const logAttempt = createAttemptLogger(svcClient, { userId });
 
@@ -106,7 +109,7 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   if (!PERPLEXITY_API_KEY || !LOVABLE_API_KEY) {
     log("missing API keys, serving fallback");
-    return serveFallback(svcClient);
+    return serveFallback(svcClient, userId, marketDirection);
   }
 
   // ── Source hints & exclusions ──
@@ -192,11 +195,11 @@ DIVERSITY: Use a DIFFERENT thinker every time. Prefer timeless essays over recen
     }
   } catch (e) {
     log(`perplexity failed: ${e}`);
-    return serveFallback(svcClient);
+    return serveFallback(svcClient, userId, marketDirection);
   }
 
   if (!searchContent) {
-    return serveFallback(svcClient);
+    return serveFallback(svcClient, userId, marketDirection);
   }
 
   // ── Step 2: AI structuring ──
@@ -329,7 +332,7 @@ URL RULES (CRITICAL):
   const qg = qualityGate("signal", signal);
   if (!signal || !qg.pass) {
     log(`quality gate failed: ${!signal ? "no signal" : (qg.reason ?? "unknown")}`);
-    return serveFallback(svcClient);
+    return serveFallback(svcClient, userId, marketDirection);
   }
 
   // ── Step 4: URL post-processing ──
@@ -398,6 +401,7 @@ URL RULES (CRITICAL):
           source_url: signal.url || null,
           source_host: sourceHost || null,
           citations: citations.length > 0 ? JSON.stringify(citations) : null,
+          market_regime: parseMarketDirection(context),
           expires_at: new Date(Date.now() + 14 * 86400000).toISOString(),
           last_validated_at: qualityScore >= 2 ? new Date().toISOString() : null,
           automated_score: qualityScore,

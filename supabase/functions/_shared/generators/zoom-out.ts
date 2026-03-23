@@ -12,7 +12,7 @@
 
 import { qualityGate, BANNED_PHRASES, containsSlop, contentFingerprint } from "../quality.ts";
 import { ZOOM_OUT_FALLBACKS, pickRandom } from "../fallbacks.ts";
-import { COMPANION_ZOOM_OUT_DEEP_TIME } from "../cache.ts";
+import { COMPANION_ZOOM_OUT_DEEP_TIME, parseMarketDirection, serveFromCache } from "../cache.ts";
 import { createAttemptLogger } from "../observe.ts";
 
 // ── Public types ──
@@ -340,6 +340,7 @@ No trading advice, no price predictions, no exclamation marks.${mood ? `\n\nUSER
                     title_norm: newNorm,
                     fingerprint,
                     source_kind: "deep_time",
+                    market_regime: parseMarketDirection(context),
                     expires_at: new Date(Date.now() + 14 * 86400000).toISOString(),
                     automated_score: 2,
                   });
@@ -372,17 +373,13 @@ No trading advice, no price predictions, no exclamation marks.${mood ? `\n\nUSER
     }
   }
 
-  // Fallback chain: cache → curated
+  // Fallback chain: cache (per-user + market-aware) → curated
   if (!deepTime) {
-    try {
-      const { data: cachedDt } = await svcClient.from("companion_cache").select("content, used_count, id").eq("companion_type", COMPANION_ZOOM_OUT_DEEP_TIME).eq("language", "en").order("used_count", { ascending: true }).limit(5);
-      if (cachedDt && cachedDt.length > 0) {
-        const pick = cachedDt[Math.floor(Math.random() * cachedDt.length)];
-        deepTime = pick.content as any;
-        svcClient.from("companion_cache").update({ used_count: (pick.used_count || 0) + 1 }).eq("id", pick.id).then(() => {});
-        return { deepTime, source: "cache" };
-      }
-    } catch { /* continue */ }
+    const marketDirection = parseMarketDirection(context);
+    const cached = await serveFromCache(svcClient, COMPANION_ZOOM_OUT_DEEP_TIME, "en", { userId, marketDirection });
+    if (cached) {
+      return { deepTime: cached.data as { title: string; body: string }, source: "cache" };
+    }
 
     return { deepTime: pickRandom(ZOOM_OUT_FALLBACKS), source: "curated" };
   }
