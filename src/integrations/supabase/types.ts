@@ -1424,6 +1424,36 @@ export type Database = {
         }
         Relationships: []
       }
+      v_companion_serves_per_day: {
+        Row: {
+          day: string | null
+          companion_type: string | null
+          serve_source: string | null
+          serve_count: number | null
+        }
+        Relationships: []
+      }
+      v_generation_failures_per_day: {
+        Row: {
+          day: string | null
+          companion_type: string | null
+          model: string | null
+          status: string | null
+          attempt_count: number | null
+          avg_latency_ms: number | null
+          total_cost_usd: number | null
+        }
+        Relationships: []
+      }
+      v_companion_feedback_per_day: {
+        Row: {
+          day: string | null
+          companion_type: string | null
+          vote: string | null
+          vote_count: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       claim_trigger_slot: {
