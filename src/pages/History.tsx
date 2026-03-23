@@ -285,12 +285,16 @@ const History = () => {
     const reflection = reflections.find((r) => r.id === id);
     if (!reflection) return;
     const newVal = !reflection.is_favorite;
-    await supabase.from('reflections').update({ is_favorite: newVal }).eq('id', id);
-    // Also sync to library_items linked to this reflection
-    await supabase.from('library_items').update({ is_favorite: newVal }).eq('reflection_id', id).eq('source_type', 'reflection');
-    setReflections((prev) =>
-      prev.map((r) => (r.id === id ? { ...r, is_favorite: newVal } : r))
-    );
+    // Optimistic update
+    setReflections((prev) => prev.map((r) => (r.id === id ? { ...r, is_favorite: newVal } : r)));
+    const [r1, r2] = await Promise.all([
+      supabase.from('reflections').update({ is_favorite: newVal }).eq('id', id),
+      supabase.from('library_items').update({ is_favorite: newVal }).eq('reflection_id', id).eq('source_type', 'reflection'),
+    ]);
+    if (r1.error || r2.error) {
+      // Roll back optimistic update on failure
+      setReflections((prev) => prev.map((r) => (r.id === id ? { ...r, is_favorite: !newVal } : r)));
+    }
   }, [reflections]);
 
   const pinReflection = useCallback((id: string) => {
