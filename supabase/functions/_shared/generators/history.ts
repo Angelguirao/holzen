@@ -12,6 +12,7 @@ import { qualityGate, BANNED_PHRASES, isUrlReachable, contentFingerprint } from 
 import { HISTORY_FALLBACKS, pickRandom } from "../fallbacks.ts";
 import { parseMarketDirection, serveFromCache } from "../cache.ts";
 import { createAttemptLogger } from "../observe.ts";
+import { searchLibrary, eventToHistory } from "../content-library.ts";
 
 // ── Public types ──
 
@@ -153,6 +154,90 @@ export async function generateHistory(params: GenerateHistoryParams): Promise<Hi
     ? `\nDo NOT cover these topics (already shown recently): ${recentTitles.slice(0, 5).join("; ")}. Find a COMPLETELY DIFFERENT historical event.`
     : "";
   const randomEra = selectEra(mood, recentTitles, preferredMood);
+
+  const historyMoodTag: string | undefined =
+    preferredMood ??
+    (mood === "anxious" || mood === "fearful"
+      ? "recovery"
+      : mood === "excited" || mood === "fomo" || mood === "greedy"
+        ? "caution"
+        : undefined);
+
+  // ── Try local content library first ──
+  const libraryResults = await searchLibrary(svcClient, {
+    type: "event",
+    companionType: "historical_insight",
+    moodTag: historyMoodTag,
+    excludeTitles: recentTitles,
+    limit: 3,
+  });
+
+  if (libraryResults.length > 0) {
+    const pick = libraryResults[0];
+    const result = eventToHistory(pick);
+    log(`served from content library: "${pick.title}"`);
+    const citations = pick.url ? [pick.url] : [];
+    const qualityScore = 1;
+    const cacheQg = qualityGate("historical_insight", result);
+    if (result.title && result.btcInsight && cacheQg.pass) {
+      try {
+        const { data: existing } = await svcClient.from("companion_cache").select("content").eq("companion_type", "historical_insight").eq("language", "en").limit(30);
+        const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
+        const newNorm = norm(result.title);
+        const isDup = existing?.some((e: any) => {
+          const t = norm(e.content?.title || "");
+          return t === newNorm || t.includes(newNorm) || newNorm.includes(t);
+        });
+        if (!isDup) {
+          let sourceHost = "";
+          try { sourceHost = result.url ? new URL(result.url.startsWith("http") ? result.url : `https://${result.url}`).hostname.replace(/^www\./, "") : ""; } catch { /* ignore */ }
+          const fingerprint = await contentFingerprint(newNorm);
+          const { error: cacheErr } = await svcClient.from("companion_cache").insert({
+            companion_type: "historical_insight",
+            language: "en",
+            content: result,
+            quality_score: qualityScore,
+            title: result.title,
+            title_norm: newNorm,
+            fingerprint,
+            source_kind: "historical_event",
+            source_title: result.source || null,
+            source_author: null,
+            source_url: result.url || null,
+            source_host: sourceHost || null,
+            citations: citations.length > 0 ? JSON.stringify(citations) : null,
+            market_regime: parseMarketDirection(context),
+            expires_at: new Date(Date.now() + 14 * 86400000).toISOString(),
+            last_validated_at: qualityScore >= 2 ? new Date().toISOString() : null,
+            automated_score: qualityScore,
+          });
+          if (cacheErr) log(`cache insert error: ${cacheErr.message}`);
+        } else {
+          log("cache dedup: skipped duplicate title");
+        }
+      } catch (e) {
+        log(`cache write failed: ${e}`);
+      }
+    }
+    if (result.url && result.url.startsWith("http")) {
+      isUrlReachable(result.url).then(async (reachable) => {
+        if (reachable) {
+          try {
+            const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
+            await svcClient.from("companion_cache")
+              .update({ quality_score: 2, last_validated_at: new Date().toISOString() })
+              .eq("companion_type", "historical_insight")
+              .eq("title_norm", norm(result.title));
+          } catch { /* non-critical */ }
+        } else {
+          log("background URL validation failed", { url: result.url });
+        }
+      }).catch(() => {});
+    }
+    return { data: result, source: "live", cacheId: null };
+  }
+
+  // ── No local match — fall through to Perplexity ──
 
   // ── Step 1: Perplexity search ──
   log("calling perplexity");
