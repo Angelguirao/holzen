@@ -180,65 +180,65 @@ export function useAdminStats(): AdminStats {
     if (!err) setCacheEntries((data ?? []) as CacheEntryRow[]);
   }, []);
 
-  const fetchPeriodData = useCallback(async (p: TimePeriod) => {
+  /**
+   * Compute period stats from already-fetched view data (client-side filtering).
+   * This avoids RLS issues with raw tables — the views already have proper access.
+   * 
+   * Uses: costs (v_companion_cost_per_day), cacheHits (v_companion_cache_hit_rate),
+   * failures (v_generation_failure_rate), feedback (v_companion_feedback_ratio)
+   */
+  const computePeriodStats = useCallback((
+    p: TimePeriod,
+    costsData: CostRow[],
+    cacheHitsData: CacheHitRow[],
+    failuresData: FailureRow[],
+    feedbackData: FeedbackRow[],
+  ) => {
+    // Filter costs by period
     const start = periodStart(p);
-    const ms = periodToMs(p);
+    const filteredCosts = start
+      ? costsData.filter(r => r.day && r.day >= start.slice(0, 10))
+      : costsData;
 
-    // Current period stats from companion_serves
-    let servesQuery = supabase.from('companion_serves').select('id, serve_source', { count: 'exact', head: true });
-    if (start) servesQuery = servesQuery.gte('created_at', start);
-    const { count: servesCount } = await servesQuery;
+    const totalCost = filteredCosts.reduce((s, r) => s + (r.total_cost_usd ?? 0), 0);
+    const totalAttempts = filteredCosts.reduce((s, r) => s + (r.attempts ?? 0), 0);
 
-    // Cost from generation_attempts
-    let costQuery = supabase.from('generation_attempts').select('estimated_cost_usd');
-    if (start) costQuery = costQuery.gte('created_at', start);
-    const { data: costData } = await costQuery;
-    const totalCost = (costData ?? []).reduce((s: number, r: any) => s + (r.estimated_cost_usd || 0), 0);
+    // Serves and cache hits are from the all-time views (can't filter by period)
+    // Use total from all cache hit rows
+    const totalServes = cacheHitsData.reduce((s, r) => s + (r.total_serves ?? 0), 0);
 
-    // Failures
-    let failQuery = supabase.from('generation_attempts').select('status', { count: 'exact', head: true }).in('status', ['error', 'timeout']);
-    if (start) failQuery = failQuery.gte('created_at', start);
-    const { count: failCount } = await failQuery;
-
-    let totalQuery = supabase.from('generation_attempts').select('id', { count: 'exact', head: true });
-    if (start) totalQuery = totalQuery.gte('created_at', start);
-    const { count: totalCount } = await totalQuery;
+    // Failures from the failure rate view (also all-time)
+    const totalFails = failuresData.reduce((s, r) => s + (r.errors ?? 0) + (r.timeouts ?? 0), 0);
+    const totalFailAttempts = failuresData.reduce((s, r) => s + (r.total_attempts ?? 0), 0);
 
     // Feedback
-    let fbUpQuery = supabase.from('analytics_events').select('id', { count: 'exact', head: true }).eq('event', 'companion_feedback').contains('metadata', { vote: 'up' } as any);
-    if (start) fbUpQuery = fbUpQuery.gte('created_at', start);
-    const { count: fbUp } = await fbUpQuery;
-
-    let fbDownQuery = supabase.from('analytics_events').select('id', { count: 'exact', head: true }).eq('event', 'companion_feedback').contains('metadata', { vote: 'down' } as any);
-    if (start) fbDownQuery = fbDownQuery.gte('created_at', start);
-    const { count: fbDown } = await fbDownQuery;
+    const fbUp = feedbackData.reduce((s, r) => s + (r.total_thumbs_up ?? 0), 0);
+    const fbDown = feedbackData.reduce((s, r) => s + (r.total_thumbs_down ?? 0), 0);
 
     const current: PeriodStats = {
-      serves: servesCount ?? 0,
+      serves: totalServes,
       cost: totalCost,
-      failures: failCount ?? 0,
-      totalAttempts: totalCount ?? 0,
-      feedbackUp: fbUp ?? 0,
-      feedbackDown: fbDown ?? 0,
+      failures: totalFails,
+      totalAttempts: totalFailAttempts,
+      feedbackUp: fbUp,
+      feedbackDown: fbDown,
     };
     setPeriodStats(current);
 
-    // Previous period for comparison (same duration, earlier window)
-    if (ms) {
-      const prevStart = new Date(Date.now() - ms * 2).toISOString();
-      const prevEnd = start!;
-
-      const { count: prevServes } = await supabase.from('companion_serves').select('id', { count: 'exact', head: true }).gte('created_at', prevStart).lt('created_at', prevEnd);
-      const { data: prevCostData } = await supabase.from('generation_attempts').select('estimated_cost_usd').gte('created_at', prevStart).lt('created_at', prevEnd);
-      const prevCost = (prevCostData ?? []).reduce((s: number, r: any) => s + (r.estimated_cost_usd || 0), 0);
-      const { count: prevFails } = await supabase.from('generation_attempts').select('id', { count: 'exact', head: true }).in('status', ['error', 'timeout']).gte('created_at', prevStart).lt('created_at', prevEnd);
-      const { count: prevTotal } = await supabase.from('generation_attempts').select('id', { count: 'exact', head: true }).gte('created_at', prevStart).lt('created_at', prevEnd);
+    // Previous period comparison — only for cost (the only view with daily granularity)
+    const ms = periodToMs(p);
+    if (ms && start) {
+      const prevStart = new Date(Date.now() - ms * 2).toISOString().slice(0, 10);
+      const prevEnd = start.slice(0, 10);
+      const prevCosts = costsData.filter(r => r.day && r.day >= prevStart && r.day < prevEnd);
+      const prevCost = prevCosts.reduce((s, r) => s + (r.total_cost_usd ?? 0), 0);
+      const prevAttempts = prevCosts.reduce((s, r) => s + (r.attempts ?? 0), 0);
 
       setPrevPeriodStats({
-        serves: prevServes ?? 0,
+        serves: 0, // Can't compute from views
         cost: prevCost,
-        failures: prevFails ?? 0,
-        totalAttempts: prevTotal ?? 0,
+        failures: 0,
+        totalAttempts: prevAttempts,
         feedbackUp: 0,
         feedbackDown: 0,
       });
@@ -296,9 +296,17 @@ export function useAdminStats(): AdminStats {
       setFailures((failRes.data ?? []) as FailureRow[]);
       setFeedback((feedRes.data ?? []) as FeedbackRow[]);
 
+      // Compute period stats from the view data we just fetched
+      computePeriodStats(
+        period,
+        (costRes.data ?? []) as CostRow[],
+        (cacheRes.data ?? []) as CacheHitRow[],
+        (failRes.data ?? []) as FailureRow[],
+        (feedRes.data ?? []) as FeedbackRow[],
+      );
+
       await Promise.all([
         fetchCacheEntries(),
-        fetchPeriodData(period),
         fetchFeeds(),
       ]);
 
@@ -315,15 +323,15 @@ export function useAdminStats(): AdminStats {
     } finally {
       setLoading(false);
     }
-  }, [fetchCacheEntries, fetchPeriodData, fetchFeeds, period]);
+  }, [fetchCacheEntries, computePeriodStats, fetchFeeds, period]);
 
   useEffect(() => { fetchAll(); }, [fetchAll]);
 
-  // Re-fetch period data when period changes
+  // Recompute period stats when period changes (no network call needed — uses cached view data)
   const handleSetPeriod = useCallback((p: TimePeriod) => {
     setPeriod(p);
-    fetchPeriodData(p);
-  }, [fetchPeriodData]);
+    computePeriodStats(p, costs, cacheHits, failures, feedback);
+  }, [computePeriodStats, costs, cacheHits, failures, feedback]);
 
   return {
     cacheHits, costs, failures, feedback, cacheEntries, signalSources,
