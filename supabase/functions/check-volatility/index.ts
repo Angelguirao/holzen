@@ -357,11 +357,48 @@ serve(async (req) => {
 
     console.log(`[CHECK-VOLATILITY] ${eligible.length} users eligible (${profiles.length} total)`);
 
-    let triggered = 0;
+    // Parse and configure VAPID once — all users share the same keys
+    const vapidPublicKey = Deno.env.get("VAPID_PUBLIC_KEY");
+    const vapidPrivateKeyJwk = Deno.env.get("VAPID_PRIVATE_KEY");
+    let vapidReady = false;
+    if (vapidPublicKey && vapidPrivateKeyJwk) {
+      try {
+        let privateKey = vapidPrivateKeyJwk;
+        try {
+          const parsed = JSON.parse(vapidPrivateKeyJwk);
+          privateKey = parsed.d || vapidPrivateKeyJwk;
+        } catch {
+          if (vapidPrivateKeyJwk.length > 44) {
+            let stdBase64 = vapidPrivateKeyJwk.replace(/-/g, "+").replace(/_/g, "/");
+            while (stdBase64.length % 4) stdBase64 += "=";
+            try {
+              const binaryStr = atob(stdBase64);
+              const pkcs8Bytes = new Uint8Array(binaryStr.length);
+              for (let i = 0; i < binaryStr.length; i++) pkcs8Bytes[i] = binaryStr.charCodeAt(i);
+              const cryptoKey = await crypto.subtle.importKey(
+                "pkcs8", pkcs8Bytes.buffer, { name: "ECDSA", namedCurve: "P-256" }, true, ["sign"]
+              );
+              const jwk = await crypto.subtle.exportKey("jwk", cryptoKey);
+              if (jwk.d) privateKey = jwk.d;
+            } catch (decodeErr) {
+              console.error("[PUSH] Failed to extract key from PKCS8:", decodeErr);
+            }
+          }
+        }
+        webpush.setVapidDetails("mailto:noreply@holzen.app", vapidPublicKey, privateKey);
+        vapidReady = true;
+      } catch (vapidErr) {
+        console.error("[PUSH] VAPID setup error:", vapidErr);
+      }
+    }
 
-    for (const profile of eligible) {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
+    const svcKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
+
+    // Process all eligible users in parallel
+    const results = await Promise.all(eligible.map(async (profile) => {
       // Optimistic lock: claim the cooldown slot BEFORE generating the reflection
-      // to prevent race conditions with client-side triggers
       const nowIso = new Date().toISOString();
       const { data: claimResult } = await supabase
         .from("profiles")
@@ -371,9 +408,7 @@ serve(async (req) => {
         .select("user_id")
         .single();
 
-      // If last_trigger_at was already updated (by client or another run), skip
       if (!claimResult) {
-        // Also handle case where last_trigger_at is null
         const { data: nullClaim } = await supabase
           .from("profiles")
           .update({ last_trigger_at: nowIso })
@@ -383,7 +418,7 @@ serve(async (req) => {
           .single();
         if (!nullClaim) {
           console.log(`[CHECK-VOLATILITY] Skipping ${profile.user_id} — cooldown claimed by another trigger`);
-          continue;
+          return false;
         }
       }
 
@@ -395,23 +430,20 @@ serve(async (req) => {
         ctx += ` Over 7 days, it's ${cumDir} ${absCumChange.toFixed(1)}%.`;
       }
 
-      // Generate reflection with companions
       const tone = (profile as any).reflection_tone || "stoic";
       const userLang = (profile as any).language || "en";
       const result = await generateReflection(ctx, LOVABLE_API_KEY, tone, userLang);
       if (!result) {
         console.log(`[CHECK-VOLATILITY] Failed to generate reflection for ${profile.user_id}`);
-        continue;
+        return false;
       }
 
-      // Respect user companion preferences
       const haiku = (profile as any).companion_haiku ? result.haiku : null;
       const learningTitle = (profile as any).companion_learning ? result.learning_title : null;
       const learningBody = (profile as any).companion_learning ? result.learning_body : null;
       const learningCitation = (profile as any).companion_learning ? result.learning_citation : null;
       const learningUrl = (profile as any).companion_learning ? result.learning_url : null;
 
-      // Save to reflection history
       const { data: insertedReflection } = await supabase
         .from("reflections")
         .insert({
@@ -427,25 +459,15 @@ serve(async (req) => {
         .select("id")
         .single();
 
-      // Update profile with new reflection (last_trigger_at already set by optimistic lock above)
-      await supabase
+      // Profile update and orchestrator dispatch can run in parallel
+      const profileUpdate = supabase
         .from("profiles")
-        .update({
-          last_message: result.message,
-          last_context: ctx,
-        })
+        .update({ last_message: result.message, last_context: ctx })
         .eq("user_id", profile.user_id);
 
-      // Pre-generate companion data via the orchestrator (single invocation path).
-      // The orchestrator fires all enabled companions in parallel, writes results
-      // back to the reflection row, and logs to companion_serves + generation_attempts.
       if (insertedReflection?.id) {
-        const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
-        const svcKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
-        const anonKey = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
         const reflectionId = insertedReflection.id;
-
-        // Fire-and-forget: don't await so we don't block per-user notification delivery
+        // Fire-and-forget orchestrator
         fetch(`${supabaseUrl}/functions/v1/companion-orchestrate`, {
           method: "POST",
           headers: {
@@ -469,103 +491,52 @@ serve(async (req) => {
         }).catch((e) => console.error(`[CHECK-VOLATILITY] Orchestrator dispatch error:`, e));
       }
 
-      // Send email notification if enabled
-      if (profile.email_notifications) {
-        // Get user email from auth
-        const { data: userData } = await supabase.auth.admin.getUserById(profile.user_id);
-        const email = userData?.user?.email;
-        if (email) {
-          await sendNotificationEmail(email, result.message, ctx);
-        }
-      }
+      await profileUpdate;
 
-      // Send push notifications
-      const { data: pushSubs } = await supabase
-        .from("push_subscriptions")
-        .select("endpoint, p256dh, auth")
-        .eq("user_id", profile.user_id);
+      // Email + push in parallel
+      await Promise.all([
+        // Email
+        (async () => {
+          if (!profile.email_notifications) return;
+          const { data: userData } = await supabase.auth.admin.getUserById(profile.user_id);
+          const email = userData?.user?.email;
+          if (email) await sendNotificationEmail(email, result.message, ctx);
+        })(),
+        // Push
+        (async () => {
+          if (!vapidReady) return;
+          const { data: pushSubs } = await supabase
+            .from("push_subscriptions")
+            .select("endpoint, p256dh, auth")
+            .eq("user_id", profile.user_id);
+          if (!pushSubs || pushSubs.length === 0) return;
 
-      if (pushSubs && pushSubs.length > 0) {
-        const vapidPublicKey = Deno.env.get("VAPID_PUBLIC_KEY");
-        const vapidPrivateKeyJwk = Deno.env.get("VAPID_PRIVATE_KEY");
-
-        if (vapidPublicKey && vapidPrivateKeyJwk) {
-          try {
-            let privateKey = vapidPrivateKeyJwk;
-
+          const payload = JSON.stringify({
+            title: "Holzen",
+            body: result.message.slice(0, 120),
+            reflectionId: insertedReflection?.id ?? null,
+            action: "pause_ready",
+          });
+          await Promise.all(pushSubs.map(async (sub) => {
             try {
-              const parsed = JSON.parse(vapidPrivateKeyJwk);
-              privateKey = parsed.d || vapidPrivateKeyJwk;
-            } catch {
-              if (vapidPrivateKeyJwk.length > 44) {
-                // PKCS8 EC P-256 key - extract raw 32-byte private key using Web Crypto
-                let stdBase64 = vapidPrivateKeyJwk.replace(/-/g, "+").replace(/_/g, "/");
-                while (stdBase64.length % 4) stdBase64 += "=";
-                try {
-                  const binaryStr = atob(stdBase64);
-                  const pkcs8Bytes = new Uint8Array(binaryStr.length);
-                  for (let i = 0; i < binaryStr.length; i++) pkcs8Bytes[i] = binaryStr.charCodeAt(i);
-                  
-                  // Import as CryptoKey then export as JWK to get the raw 'd' value
-                  const cryptoKey = await crypto.subtle.importKey(
-                    "pkcs8",
-                    pkcs8Bytes.buffer,
-                    { name: "ECDSA", namedCurve: "P-256" },
-                    true,
-                    ["sign"]
-                  );
-                  const jwk = await crypto.subtle.exportKey("jwk", cryptoKey);
-                  if (jwk.d) {
-                    privateKey = jwk.d;
-                  }
-                } catch (decodeErr) {
-                  console.error("[PUSH] Failed to extract key from PKCS8:", decodeErr);
-                }
+              await webpush.sendNotification(
+                { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
+                payload
+              );
+            } catch (pushErr: any) {
+              console.error(`[PUSH] Failed for ${sub.endpoint}:`, pushErr.message, "statusCode:", pushErr.statusCode);
+              if (pushErr.statusCode === 410 || pushErr.statusCode === 404) {
+                await supabase.from("push_subscriptions").delete().eq("endpoint", sub.endpoint);
               }
             }
+          }));
+        })(),
+      ]);
 
-            webpush.setVapidDetails(
-              "mailto:noreply@holzen.app",
-              vapidPublicKey,
-              privateKey
-            );
+      return true;
+    }));
 
-            const payload = JSON.stringify({
-              title: "Holzen",
-              body: result.message.slice(0, 120),
-              reflectionId: insertedReflection?.id ?? null,
-              action: "pause_ready",
-            });
-
-            for (const sub of pushSubs) {
-              try {
-                await webpush.sendNotification(
-                  {
-                    endpoint: sub.endpoint,
-                    keys: { p256dh: sub.p256dh, auth: sub.auth },
-                  },
-                  payload
-                );
-              } catch (pushErr: any) {
-                console.error(`[PUSH] Failed for ${sub.endpoint}:`, pushErr.message, "statusCode:", pushErr.statusCode, "body:", pushErr.body);
-                // Remove invalid subscriptions (410 Gone or 404)
-                if (pushErr.statusCode === 410 || pushErr.statusCode === 404) {
-                  await supabase
-                    .from("push_subscriptions")
-                    .delete()
-                    .eq("endpoint", sub.endpoint);
-                }
-              }
-            }
-          } catch (vapidErr) {
-            console.error("[PUSH] VAPID setup error:", vapidErr);
-          }
-        }
-      }
-
-      triggered++;
-    }
-
+    const triggered = results.filter(Boolean).length;
     console.log(`[CHECK-VOLATILITY] Triggered ${triggered} notifications`);
 
     return new Response(JSON.stringify({ triggered, btcChange: btc.changePercent }), {
