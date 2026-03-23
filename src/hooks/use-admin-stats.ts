@@ -180,12 +180,16 @@ export function useAdminStats(): AdminStats {
     if (!err) setCacheEntries((data ?? []) as CacheEntryRow[]);
   }, []);
 
+  // Store daily view data for period filtering
+  const [servesPerDay, setServesPerDay] = useState<any[]>([]);
+  const [failuresPerDay, setFailuresPerDay] = useState<any[]>([]);
+  const [feedbackPerDay, setFeedbackPerDay] = useState<any[]>([]);
+
   /**
-   * Compute period stats from already-fetched view data (client-side filtering).
-   * This avoids RLS issues with raw tables — the views already have proper access.
-   * 
-   * Uses: costs (v_companion_cost_per_day), cacheHits (v_companion_cache_hit_rate),
-   * failures (v_generation_failure_rate), feedback (v_companion_feedback_ratio)
+   * Compute period stats from daily views (client-side filtering).
+   * Uses the new v_companion_serves_per_day, v_generation_failures_per_day,
+   * and v_companion_feedback_per_day views (after running the migration).
+   * Falls back to all-time view data if daily views return empty.
    */
   const computePeriodStats = useCallback((
     p: TimePeriod,
@@ -193,52 +197,82 @@ export function useAdminStats(): AdminStats {
     cacheHitsData: CacheHitRow[],
     failuresData: FailureRow[],
     feedbackData: FeedbackRow[],
+    dailyServes: any[],
+    dailyFailures: any[],
+    dailyFeedback: any[],
   ) => {
-    // Filter costs by period
     const start = periodStart(p);
-    const filteredCosts = start
-      ? costsData.filter(r => r.day && r.day >= start.slice(0, 10))
+    const startDate = start?.slice(0, 10);
+
+    // ── Serves (from daily view, or fall back to all-time) ──
+    let totalServes: number;
+    if (dailyServes.length > 0) {
+      const filtered = startDate
+        ? dailyServes.filter((r: any) => r.day && r.day >= startDate)
+        : dailyServes;
+      totalServes = filtered.reduce((s: number, r: any) => s + (r.serve_count ?? 0), 0);
+    } else {
+      totalServes = cacheHitsData.reduce((s, r) => s + (r.total_serves ?? 0), 0);
+    }
+
+    // ── Cost (from costs view — always has daily granularity) ──
+    const filteredCosts = startDate
+      ? costsData.filter(r => r.day && r.day >= startDate)
       : costsData;
-
     const totalCost = filteredCosts.reduce((s, r) => s + (r.total_cost_usd ?? 0), 0);
-    const totalAttempts = filteredCosts.reduce((s, r) => s + (r.attempts ?? 0), 0);
 
-    // Serves and cache hits are from the all-time views (can't filter by period)
-    // Use total from all cache hit rows
-    const totalServes = cacheHitsData.reduce((s, r) => s + (r.total_serves ?? 0), 0);
+    // ── Failures (from daily view, or fall back to all-time) ──
+    let totalFails: number;
+    let totalAttempts: number;
+    if (dailyFailures.length > 0) {
+      const filtered = startDate
+        ? dailyFailures.filter((r: any) => r.day && r.day >= startDate)
+        : dailyFailures;
+      totalFails = filtered
+        .filter((r: any) => r.status === 'error' || r.status === 'timeout')
+        .reduce((s: number, r: any) => s + (r.attempt_count ?? 0), 0);
+      totalAttempts = filtered.reduce((s: number, r: any) => s + (r.attempt_count ?? 0), 0);
+    } else {
+      totalFails = failuresData.reduce((s, r) => s + (r.errors ?? 0) + (r.timeouts ?? 0), 0);
+      totalAttempts = failuresData.reduce((s, r) => s + (r.total_attempts ?? 0), 0);
+    }
 
-    // Failures from the failure rate view (also all-time)
-    const totalFails = failuresData.reduce((s, r) => s + (r.errors ?? 0) + (r.timeouts ?? 0), 0);
-    const totalFailAttempts = failuresData.reduce((s, r) => s + (r.total_attempts ?? 0), 0);
+    // ── Feedback (from daily view, or fall back to all-time) ──
+    let fbUp: number;
+    let fbDown: number;
+    if (dailyFeedback.length > 0) {
+      const filtered = startDate
+        ? dailyFeedback.filter((r: any) => r.day && r.day >= startDate)
+        : dailyFeedback;
+      fbUp = filtered.filter((r: any) => r.vote === 'up').reduce((s: number, r: any) => s + (r.vote_count ?? 0), 0);
+      fbDown = filtered.filter((r: any) => r.vote === 'down').reduce((s: number, r: any) => s + (r.vote_count ?? 0), 0);
+    } else {
+      fbUp = feedbackData.reduce((s, r) => s + (r.total_thumbs_up ?? 0), 0);
+      fbDown = feedbackData.reduce((s, r) => s + (r.total_thumbs_down ?? 0), 0);
+    }
 
-    // Feedback
-    const fbUp = feedbackData.reduce((s, r) => s + (r.total_thumbs_up ?? 0), 0);
-    const fbDown = feedbackData.reduce((s, r) => s + (r.total_thumbs_down ?? 0), 0);
+    setPeriodStats({ serves: totalServes, cost: totalCost, failures: totalFails, totalAttempts, feedbackUp: fbUp, feedbackDown: fbDown });
 
-    const current: PeriodStats = {
-      serves: totalServes,
-      cost: totalCost,
-      failures: totalFails,
-      totalAttempts: totalFailAttempts,
-      feedbackUp: fbUp,
-      feedbackDown: fbDown,
-    };
-    setPeriodStats(current);
-
-    // Previous period comparison — only for cost (the only view with daily granularity)
+    // ── Previous period for trend comparison ──
     const ms = periodToMs(p);
-    if (ms && start) {
-      const prevStart = new Date(Date.now() - ms * 2).toISOString().slice(0, 10);
-      const prevEnd = start.slice(0, 10);
-      const prevCosts = costsData.filter(r => r.day && r.day >= prevStart && r.day < prevEnd);
-      const prevCost = prevCosts.reduce((s, r) => s + (r.total_cost_usd ?? 0), 0);
-      const prevAttempts = prevCosts.reduce((s, r) => s + (r.attempts ?? 0), 0);
+    if (ms && startDate) {
+      const prevStartDate = new Date(Date.now() - ms * 2).toISOString().slice(0, 10);
+
+      const prevCosts = costsData.filter(r => r.day && r.day >= prevStartDate && r.day < startDate);
+      const prevServes = dailyServes.length > 0
+        ? dailyServes.filter((r: any) => r.day && r.day >= prevStartDate && r.day < startDate).reduce((s: number, r: any) => s + (r.serve_count ?? 0), 0)
+        : 0;
+      const prevFailFiltered = dailyFailures.length > 0
+        ? dailyFailures.filter((r: any) => r.day && r.day >= prevStartDate && r.day < startDate)
+        : [];
+      const prevFails = prevFailFiltered.filter((r: any) => r.status === 'error' || r.status === 'timeout').reduce((s: number, r: any) => s + (r.attempt_count ?? 0), 0);
+      const prevTotalAttempts = prevFailFiltered.reduce((s: number, r: any) => s + (r.attempt_count ?? 0), 0);
 
       setPrevPeriodStats({
-        serves: 0, // Can't compute from views
-        cost: prevCost,
-        failures: 0,
-        totalAttempts: prevAttempts,
+        serves: prevServes,
+        cost: prevCosts.reduce((s, r) => s + (r.total_cost_usd ?? 0), 0),
+        failures: prevFails,
+        totalAttempts: prevTotalAttempts,
         feedbackUp: 0,
         feedbackDown: 0,
       });
@@ -296,13 +330,31 @@ export function useAdminStats(): AdminStats {
       setFailures((failRes.data ?? []) as FailureRow[]);
       setFeedback((feedRes.data ?? []) as FeedbackRow[]);
 
-      // Compute period stats from the view data we just fetched
+      // Fetch daily breakdown views (may return empty if migration hasn't run)
+      const [servesRes, failDayRes, fbDayRes] = await Promise.all([
+        supabase.from('v_companion_serves_per_day' as any).select('*').limit(500),
+        supabase.from('v_generation_failures_per_day' as any).select('*').limit(500),
+        supabase.from('v_companion_feedback_per_day' as any).select('*').limit(500),
+      ]);
+
+      const dailyServes = servesRes.error ? [] : (servesRes.data ?? []);
+      const dailyFailures = failDayRes.error ? [] : (failDayRes.data ?? []);
+      const dailyFeedback = fbDayRes.error ? [] : (fbDayRes.data ?? []);
+
+      setServesPerDay(dailyServes);
+      setFailuresPerDay(dailyFailures);
+      setFeedbackPerDay(dailyFeedback);
+
+      // Compute period stats from view data
       computePeriodStats(
         period,
         (costRes.data ?? []) as CostRow[],
         (cacheRes.data ?? []) as CacheHitRow[],
         (failRes.data ?? []) as FailureRow[],
         (feedRes.data ?? []) as FeedbackRow[],
+        dailyServes,
+        dailyFailures,
+        dailyFeedback,
       );
 
       await Promise.all([
@@ -330,8 +382,8 @@ export function useAdminStats(): AdminStats {
   // Recompute period stats when period changes (no network call needed — uses cached view data)
   const handleSetPeriod = useCallback((p: TimePeriod) => {
     setPeriod(p);
-    computePeriodStats(p, costs, cacheHits, failures, feedback);
-  }, [computePeriodStats, costs, cacheHits, failures, feedback]);
+    computePeriodStats(p, costs, cacheHits, failures, feedback, servesPerDay, failuresPerDay, feedbackPerDay);
+  }, [computePeriodStats, costs, cacheHits, failures, feedback, servesPerDay, failuresPerDay, feedbackPerDay]);
 
   return {
     cacheHits, costs, failures, feedback, cacheEntries, signalSources,
