@@ -104,6 +104,20 @@ export interface SessionRow {
   haiku: string | null;
 }
 
+export interface LibraryEntryRow {
+  id: string;
+  type: string;
+  title: string;
+  author: string | null;
+  summary: string;
+  url: string | null;
+  tags: string[];
+  companion_types: string[];
+  quality_score: number;
+  active: boolean;
+  created_at: string;
+}
+
 export interface PeriodStats {
   serves: number;
   cacheHits: number;
@@ -132,6 +146,7 @@ export interface AdminStats {
   rejections: RejectionRow[];
   recentContent: RecentContentRow[];
   sessions: SessionRow[];
+  libraryEntries: LibraryEntryRow[];
   // State
   loading: boolean;
   error: string | null;
@@ -165,6 +180,7 @@ export function useAdminStats(): AdminStats {
   const [rejections, setRejections] = useState<RejectionRow[]>([]);
   const [recentContent, setRecentContent] = useState<RecentContentRow[]>([]);
   const [sessions, setSessions] = useState<SessionRow[]>([]);
+  const [libraryEntries, setLibraryEntries] = useState<LibraryEntryRow[]>([]);
   const [period, setPeriod] = useState<TimePeriod>('7d');
   const [periodStats, setPeriodStats] = useState<PeriodStats>({ serves: 0, cacheHits: 0, cacheHitRate: 0, cost: 0, failures: 0, totalAttempts: 0, feedbackUp: 0, feedbackDown: 0 });
   const [prevPeriodStats, setPrevPeriodStats] = useState<PeriodStats | null>(null);
@@ -320,6 +336,15 @@ export function useAdminStats(): AdminStats {
       .order('created_at', { ascending: false })
       .limit(20);
     setSessions((sessionData ?? []) as SessionRow[]);
+
+    // Content library entries
+    const { data: libraryData } = await supabase
+      .from('content_library')
+      .select('id, type, title, author, summary, url, tags, companion_types, quality_score, active, created_at')
+      .eq('active', true)
+      .order('created_at', { ascending: false })
+      .limit(100);
+    setLibraryEntries((libraryData ?? []) as LibraryEntryRow[]);
   }, []);
 
   const fetchAll = useCallback(async () => {
@@ -402,7 +427,7 @@ export function useAdminStats(): AdminStats {
   return {
     cacheHits, costs, failures, feedback, cacheEntries, signalSources,
     period, setPeriod: handleSetPeriod, periodStats, prevPeriodStats,
-    rejections, recentContent, sessions,
+    rejections, recentContent, sessions, libraryEntries,
     loading, error, refresh: fetchAll, refreshCacheEntries: fetchCacheEntries, lastUpdated,
   };
 }
