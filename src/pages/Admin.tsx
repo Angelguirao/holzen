@@ -147,25 +147,7 @@ export default function Admin() {
     loading, error, refresh, refreshCacheEntries, lastUpdated,
   } = useAdminStats();
 
-  if (adminLoading) {
-    return (
-      <div className="flex items-center justify-center py-20">
-        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground/30" />
-      </div>
-    );
-  }
-
-  if (!isAdmin) {
-    return (
-      <div className="space-y-4 py-10 text-center">
-        <ShieldX className="h-8 w-8 text-muted-foreground/40 mx-auto" />
-        <p className="text-xs font-mono text-muted-foreground/40">Admin access required</p>
-      </div>
-    );
-  }
-
-  // ── Cache hit rate (all-time from views) ──
-  // Cache hit rate now comes from periodStats (period-aware)
+  // ── ALL HOOKS MUST BE ABOVE EARLY RETURNS ──
 
   // ── Failure rate from periodStats ──
   const failureRate = periodStats.totalAttempts > 0
@@ -177,7 +159,7 @@ export default function Admin() {
 
   // ── Trends ──
   const servesTrend = computeTrend(periodStats.serves, prevPeriodStats?.serves ?? null, false);
-  const cacheHitTrend = computeTrend(periodStats.cacheHitRate, prevPeriodStats?.cacheHitRate ?? null, false); // higher cache hit = good
+  const cacheHitTrend = computeTrend(periodStats.cacheHitRate, prevPeriodStats?.cacheHitRate ?? null, false);
   const costTrend = computeTrend(periodStats.cost, prevPeriodStats?.cost ?? null, true);
   const failureTrend = computeTrend(failureRate, prevFailureRate, true);
 
@@ -202,6 +184,24 @@ export default function Admin() {
 
   // ── Period label for subtitle ──
   const periodLabel = PERIOD_OPTIONS.find(p => p.value === period)?.label.toLowerCase() ?? period;
+
+  // ── Early returns (after all hooks) ──
+  if (adminLoading) {
+    return (
+      <div className="flex items-center justify-center py-20">
+        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground/30" />
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="space-y-4 py-10 text-center">
+        <ShieldX className="h-8 w-8 text-muted-foreground/40 mx-auto" />
+        <p className="text-xs font-mono text-muted-foreground/40">Admin access required</p>
+      </div>
+    );
+  }
 
   if (loading) {
     return (
