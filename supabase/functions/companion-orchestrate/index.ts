@@ -6,6 +6,7 @@ import { generateSignal } from "../_shared/generators/signal.ts";
 import { generateGrounding } from "../_shared/generators/grounding.ts";
 import { generateHistory } from "../_shared/generators/history.ts";
 import { generateZoomOut } from "../_shared/generators/zoom-out.ts";
+import { determineSessionIntent } from "../_shared/session-intent.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -117,13 +118,23 @@ serve(async (req) => {
 
     log(`companions: signal=${enableSignal} grounding=${enableGrounding} history=${enableHistory} zoomOut=${enableZoomOut}`);
 
+    // ── Determine session intent for coherent companion theming ──
+    const moodHistory = body.moodHistory; // Passed from client if available
+    const intent = determineSessionIntent({
+      context: context ?? undefined,
+      mood: mood ?? undefined,
+      severity: body.severity,
+      moodHistory,
+    });
+    log(`session intent: ${intent.theme}`, { theme: intent.theme, tone: intent.emotionalTone });
+
     // ── Fire all enabled companions in parallel via direct generator calls ──
     const tasks: Record<string, Promise<CompanionResult>> = {};
 
     if (enableSignal) {
       tasks.signal = (async (): Promise<CompanionResult> => {
         const t = Date.now();
-        const result = await generateSignal({ svcClient, context, language, sources: signalSources, recentSignalSources, recentSignalTitles, userId: user.id, log });
+        const result = await generateSignal({ svcClient, context, language, sources: signalSources, recentSignalSources, recentSignalTitles, userId: user.id, log, searchAngle: intent.signalAngle });
         return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t };
       })();
     }
@@ -131,7 +142,7 @@ serve(async (req) => {
     if (enableGrounding) {
       tasks.grounding = (async (): Promise<CompanionResult> => {
         const t = Date.now();
-        const result = await generateGrounding({ svcClient, context, language, recentTopics: recentNudgeTopics, userId: user.id, log });
+        const result = await generateGrounding({ svcClient, context, language, recentTopics: recentNudgeTopics, userId: user.id, log, preferredBias: intent.groundingBias });
         return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t };
       })();
     }
@@ -139,7 +150,7 @@ serve(async (req) => {
     if (enableHistory) {
       tasks.history = (async (): Promise<CompanionResult> => {
         const t = Date.now();
-        const result = await generateHistory({ svcClient, context, language, mood, recentTitles: recentHistoryTitles, userId: user.id, log });
+        const result = await generateHistory({ svcClient, context, language, mood, recentTitles: recentHistoryTitles, userId: user.id, log, preferredMood: intent.historyMood });
         return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t };
       })();
     }
@@ -147,7 +158,7 @@ serve(async (req) => {
     if (enableZoomOut) {
       tasks.zoomOut = (async (): Promise<CompanionResult> => {
         const t = Date.now();
-        const result = await generateZoomOut({ svcClient, context, language, reflectionMessage, mood, userId: user.id, recentTitles: recentZoomOutTitles, log });
+        const result = await generateZoomOut({ svcClient, context, language, reflectionMessage, mood, userId: user.id, recentTitles: recentZoomOutTitles, log, zoomOutAngle: intent.zoomOutAngle });
         return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t };
       })();
     }
