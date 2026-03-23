@@ -1,4 +1,4 @@
-import { useAdminStats, CacheEntryRow, SignalSourceRow } from '@/hooks/use-admin-stats';
+import { useAdminStats, CacheEntryRow, SignalSourceRow, TimePeriod, PeriodStats, RejectionRow, RecentContentRow, SessionRow } from '@/hooks/use-admin-stats';
 import { useAuth } from '@/hooks/use-auth';
 import { supabase } from '@/integrations/supabase/client';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
@@ -50,30 +50,81 @@ function label(type: string | null): string {
   return TYPE_LABELS[type ?? ''] ?? type ?? 'Unknown';
 }
 
-function StatCard({ icon: Icon, title, value, subtitle, alert }: {
+interface TrendInfo {
+  direction: 'up' | 'down' | 'flat';
+  label: string;
+}
+
+function StatCard({ icon: Icon, title, value, subtitle, alert, trend }: {
   icon: typeof Activity;
   title: string;
   value: string;
   subtitle?: string;
   alert?: boolean;
+  trend?: TrendInfo;
 }) {
+  const trendColor = trend
+    ? trend.direction === 'flat'
+      ? 'text-muted-foreground/40'
+      : trend.direction === 'up'
+        ? 'text-emerald-500'
+        : 'text-red-500'
+    : '';
+  const trendArrow = trend
+    ? trend.direction === 'up' ? '↑' : trend.direction === 'down' ? '↓' : '—'
+    : '';
+
   return (
     <div className={`rounded-xl border px-4 py-3 space-y-1 ${alert ? 'border-destructive/30 bg-destructive/5' : 'border-border/15 bg-card/10'}`}>
       <div className="flex items-center gap-2">
         <Icon className={`h-3.5 w-3.5 ${alert ? 'text-destructive/60' : 'text-muted-foreground/40'}`} />
         <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/50">{title}</span>
       </div>
-      <p className={`text-lg font-mono ${alert ? 'text-destructive/80' : 'text-foreground/80'}`}>{value}</p>
+      <div className="flex items-baseline gap-1.5">
+        <p className={`text-lg font-mono ${alert ? 'text-destructive/80' : 'text-foreground/80'}`}>{value}</p>
+        {trend && (
+          <span className={`text-[9px] font-mono ${trendColor}`}>
+            {trendArrow} {trend.label}
+          </span>
+        )}
+      </div>
       {subtitle && <p className="text-[10px] text-muted-foreground/40">{subtitle}</p>}
     </div>
   );
+}
+
+const PERIOD_OPTIONS: { value: TimePeriod; label: string }[] = [
+  { value: 'today', label: 'Today' },
+  { value: '7d', label: '7 days' },
+  { value: '30d', label: '30 days' },
+  { value: 'all', label: 'All time' },
+];
+
+function computeTrend(
+  current: number,
+  previous: number | null,
+  invertColor: boolean,
+): TrendInfo | undefined {
+  if (previous === null || previous === undefined) return undefined;
+  if (previous === 0 && current === 0) return { direction: 'flat', label: '0%' };
+  if (previous === 0) return { direction: invertColor ? 'down' : 'up', label: 'new' };
+  const pctChange = Math.round(((current - previous) / previous) * 100);
+  if (pctChange === 0) return { direction: 'flat', label: '0%' };
+  const raw: 'up' | 'down' = pctChange > 0 ? 'up' : 'down';
+  const displayed = invertColor ? (raw === 'up' ? 'down' : 'up') : raw;
+  return { direction: displayed, label: `${Math.abs(pctChange)}%` };
 }
 
 const TAB_TRIGGER_CLASS = "text-[10px] font-mono uppercase tracking-wider px-2.5 py-1 rounded-full data-[state=active]:bg-primary/10 data-[state=active]:text-primary";
 
 export default function Admin() {
   const { isAdmin, loading: adminLoading } = useIsAdmin();
-  const { cacheHits, costs, failures, feedback, cacheEntries, signalSources, loading, error, refresh, refreshCacheEntries, lastUpdated } = useAdminStats();
+  const {
+    cacheHits, costs, failures, feedback, cacheEntries, signalSources,
+    period, setPeriod, periodStats, prevPeriodStats,
+    rejections, recentContent, sessions,
+    loading, error, refresh, refreshCacheEntries, lastUpdated,
+  } = useAdminStats();
 
   if (adminLoading) {
     return (
@@ -92,23 +143,26 @@ export default function Admin() {
     );
   }
 
-  // ── Aggregate overview metrics ──
-  const overview = useMemo(() => {
+  // ── Cache hit rate (all-time from views) ──
+  const cacheOverview = useMemo(() => {
     const totalServes = cacheHits.reduce((s, r) => s + (r.total_serves ?? 0), 0);
     const totalCacheHits = cacheHits.reduce((s, r) => s + (r.cache_hits ?? 0), 0);
     const cacheHitRate = totalServes > 0 ? Math.round((totalCacheHits / totalServes) * 100) : 0;
+    return { totalServes, cacheHitRate };
+  }, [cacheHits]);
 
-    const today = new Date().toISOString().slice(0, 10);
-    const todayCost = costs
-      .filter(r => r.day?.startsWith(today))
-      .reduce((s, r) => s + (r.total_cost_usd ?? 0), 0);
+  // ── Failure rate from periodStats ──
+  const failureRate = periodStats.totalAttempts > 0
+    ? Math.round((periodStats.failures / periodStats.totalAttempts) * 100)
+    : 0;
+  const prevFailureRate = prevPeriodStats && prevPeriodStats.totalAttempts > 0
+    ? Math.round((prevPeriodStats.failures / prevPeriodStats.totalAttempts) * 100)
+    : null;
 
-    const totalAttempts = failures.reduce((s, r) => s + (r.total_attempts ?? 0), 0);
-    const totalErrors = failures.reduce((s, r) => s + (r.errors ?? 0) + (r.timeouts ?? 0), 0);
-    const failureRate = totalAttempts > 0 ? Math.round((totalErrors / totalAttempts) * 100) : 0;
-
-    return { totalServes, cacheHitRate, todayCost, failureRate };
-  }, [cacheHits, costs, failures]);
+  // ── Trends ──
+  const servesTrend = computeTrend(periodStats.serves, prevPeriodStats?.serves ?? null, false);
+  const costTrend = computeTrend(periodStats.cost, prevPeriodStats?.cost ?? null, true);
+  const failureTrend = computeTrend(failureRate, prevFailureRate, true);
 
   // ── Cost chart data (last 14 days, aggregated by day) ──
   const costChartData = useMemo(() => {
@@ -128,6 +182,9 @@ export default function Admin() {
       .sort((a, b) => a.day.localeCompare(b.day))
       .slice(-14);
   }, [costs]);
+
+  // ── Period label for subtitle ──
+  const periodLabel = PERIOD_OPTIONS.find(p => p.value === period)?.label.toLowerCase() ?? period;
 
   if (loading) {
     return (
@@ -178,6 +235,8 @@ export default function Admin() {
           <TabsTrigger value="content" className={TAB_TRIGGER_CLASS}>Content</TabsTrigger>
           <TabsTrigger value="sources" className={TAB_TRIGGER_CLASS}>Sources</TabsTrigger>
           <TabsTrigger value="tools" className={TAB_TRIGGER_CLASS}>Tools</TabsTrigger>
+          <TabsTrigger value="feed" className={TAB_TRIGGER_CLASS}>Feed</TabsTrigger>
+          <TabsTrigger value="rejections" className={TAB_TRIGGER_CLASS}>Rejections</TabsTrigger>
         </TabsList>
 
         {/* Tab 1: Monitor */}
@@ -187,29 +246,29 @@ export default function Admin() {
             const issues: string[] = [];
             const tips: string[] = [];
 
-            if (overview.failureRate > 20) {
+            if (failureRate > 20) {
               issues.push('High failure rate — check if API keys (Perplexity/Lovable) are valid and not rate-limited');
-            } else if (overview.failureRate > 5) {
+            } else if (failureRate > 5) {
               tips.push('Some generation failures — check Generation Health for details');
             }
 
-            if (overview.todayCost > 8) {
+            if (periodStats.cost > 8) {
               issues.push('Approaching daily budget cap ($10) — generation will be blocked when exceeded');
-            } else if (overview.todayCost > 5) {
-              tips.push(`Moderate spend today ($${overview.todayCost.toFixed(2)}) — on track for budget cap`);
+            } else if (periodStats.cost > 5) {
+              tips.push(`Moderate spend ($${periodStats.cost.toFixed(2)}) — on track for budget cap`);
             }
 
-            if (overview.cacheHitRate < 10 && overview.todayCost > 3) {
+            if (cacheOverview.cacheHitRate < 10 && periodStats.cost > 3) {
               tips.push('Low cache hit rate with moderate cost — consider scheduling the cache warmer cron to reduce API spend');
-            } else if (overview.cacheHitRate < 10 && overview.totalServes > 50) {
+            } else if (cacheOverview.cacheHitRate < 10 && cacheOverview.totalServes > 50) {
               tips.push('Cache hit rate is low — the cache warmer (pregenerate-companions) could help as usage grows');
             }
 
-            if (issues.length === 0 && tips.length === 0 && overview.totalServes > 0) {
-              const parts = [`${overview.failureRate}% failure rate`];
-              if (overview.todayCost > 0) parts.push(`$${overview.todayCost.toFixed(3)} today`);
-              if (overview.cacheHitRate > 0) parts.push(`${overview.cacheHitRate}% cache hit`);
-              parts.push(`${overview.totalServes} serves`);
+            if (issues.length === 0 && tips.length === 0 && periodStats.serves > 0) {
+              const parts = [`${failureRate}% failure rate`];
+              if (periodStats.cost > 0) parts.push(`$${periodStats.cost.toFixed(3)} cost`);
+              if (cacheOverview.cacheHitRate > 0) parts.push(`${cacheOverview.cacheHitRate}% cache hit`);
+              parts.push(`${periodStats.serves} serves`);
               return (
                 <div className="rounded-xl border border-primary/15 bg-primary/3 px-4 py-2.5">
                   <p className="text-[10px] font-mono text-primary/60">✓ System healthy — {parts.join(' · ')}</p>
@@ -244,33 +303,53 @@ export default function Admin() {
             return null;
           })()}
 
+          {/* Period Selector */}
+          <div className="flex items-center gap-1.5">
+            {PERIOD_OPTIONS.map(opt => (
+              <button
+                key={opt.value}
+                onClick={() => setPeriod(opt.value)}
+                className={`text-[9px] font-mono px-2 py-0.5 rounded-full transition-colors ${
+                  period === opt.value
+                    ? 'bg-primary/15 text-primary'
+                    : 'text-muted-foreground/40 hover:text-muted-foreground/60 hover:bg-muted/20'
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+
           {/* Overview Cards */}
           <div className="grid grid-cols-2 gap-3">
             <StatCard
               icon={Activity}
               title="Serves"
-              value={overview.totalServes.toLocaleString()}
-              subtitle="all time"
+              value={periodStats.serves.toLocaleString()}
+              subtitle={periodLabel}
+              trend={servesTrend}
             />
             <StatCard
               icon={Database}
               title="Cache Hit"
-              value={`${overview.cacheHitRate}%`}
-              subtitle={overview.cacheHitRate === 0 ? 'all live — fresh content' : overview.cacheHitRate < 30 ? 'mostly live generation' : 'good cache usage'}
+              value={`${cacheOverview.cacheHitRate}%`}
+              subtitle={cacheOverview.cacheHitRate === 0 ? 'all live — fresh content' : cacheOverview.cacheHitRate < 30 ? 'mostly live generation' : 'good cache usage'}
             />
             <StatCard
               icon={DollarSign}
-              title="Cost Today"
-              value={`$${overview.todayCost.toFixed(3)}`}
-              subtitle="cap: $10/day"
-              alert={overview.todayCost > 8}
+              title="Cost"
+              value={`$${periodStats.cost.toFixed(3)}`}
+              subtitle={periodLabel}
+              alert={periodStats.cost > 8}
+              trend={costTrend}
             />
             <StatCard
               icon={AlertTriangle}
               title="Failure Rate"
-              value={`${overview.failureRate}%`}
+              value={`${failureRate}%`}
               subtitle="target: <10%"
-              alert={overview.failureRate > 20}
+              alert={failureRate > 20}
+              trend={failureTrend}
             />
           </div>
 
@@ -403,6 +482,38 @@ export default function Admin() {
               )}
             </div>
           </div>
+
+          {/* Sessions Timeline */}
+          <div className="space-y-2">
+            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">Recent Sessions</p>
+            <div className="space-y-1">
+              {sessions.map(s => (
+                <div key={s.id} className="rounded-lg border border-border/10 bg-card/5 px-3 py-1.5 flex items-center gap-2">
+                  <span className="text-[9px] font-mono text-muted-foreground/30 flex-shrink-0">
+                    {new Date(s.created_at).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                  {s.mood && (
+                    <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full bg-primary/10 text-primary/60 flex-shrink-0">
+                      {s.mood}
+                    </span>
+                  )}
+                  <span className="text-[9px] font-mono text-foreground/50 truncate flex-1 min-w-0">
+                    {s.message?.slice(0, 60)}{(s.message?.length ?? 0) > 60 ? '…' : ''}
+                  </span>
+                  <div className="flex items-center gap-1 flex-shrink-0">
+                    <span className={`text-[8px] font-mono ${s.signal_title ? 'text-emerald-500/60' : 'text-muted-foreground/20'}`}>S{s.signal_title ? '✓' : '·'}</span>
+                    <span className={`text-[8px] font-mono ${s.learning_title ? 'text-emerald-500/60' : 'text-muted-foreground/20'}`}>L{s.learning_title ? '✓' : '·'}</span>
+                    <span className={`text-[8px] font-mono ${s.history_insight_data ? 'text-emerald-500/60' : 'text-muted-foreground/20'}`}>H{s.history_insight_data ? '✓' : '·'}</span>
+                    <span className={`text-[8px] font-mono ${s.zoom_out_data ? 'text-emerald-500/60' : 'text-muted-foreground/20'}`}>Z{s.zoom_out_data ? '✓' : '·'}</span>
+                    <span className={`text-[8px] font-mono ${s.haiku ? 'text-emerald-500/60' : 'text-muted-foreground/20'}`}>K{s.haiku ? '✓' : '·'}</span>
+                  </div>
+                </div>
+              ))}
+              {sessions.length === 0 && (
+                <p className="text-[10px] text-muted-foreground/30 text-center py-3">No sessions yet</p>
+              )}
+            </div>
+          </div>
         </TabsContent>
 
         {/* Tab 2: Content */}
@@ -419,12 +530,129 @@ export default function Admin() {
         <TabsContent value="tools" className="mt-0">
           <DevModeToggle />
         </TabsContent>
+
+        {/* Tab 5: Feed */}
+        <TabsContent value="feed" className="space-y-3 mt-0">
+          <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">
+            Recent Content <span className="text-muted-foreground/25">({recentContent.length})</span>
+          </p>
+          {recentContent.map(item => (
+            <FeedCard key={item.id} item={item} />
+          ))}
+          {recentContent.length === 0 && (
+            <p className="text-[10px] text-muted-foreground/30 text-center py-3">No content generated yet</p>
+          )}
+        </TabsContent>
+
+        {/* Tab 6: Rejections */}
+        <TabsContent value="rejections" className="space-y-3 mt-0">
+          <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">
+            Quality Gate Failures <span className="text-muted-foreground/25">({rejections.length})</span>
+          </p>
+          <div className="space-y-1.5">
+            {rejections.map(r => (
+              <RejectionEntry key={r.id} row={r} />
+            ))}
+            {rejections.length === 0 && (
+              <p className="text-[10px] text-muted-foreground/30 text-center py-3">No rejections</p>
+            )}
+          </div>
+        </TabsContent>
       </Tabs>
 
       {/* Footer */}
       <p className="text-[9px] text-muted-foreground/20 text-center pb-4">
         AI Companion System Monitor · Data from Supabase views
       </p>
+    </div>
+  );
+}
+
+// ── Feed Card (expandable) ──
+function FeedCard({ item }: { item: RecentContentRow }) {
+  const [expanded, setExpanded] = useState(false);
+  const body = typeof item.content === 'string'
+    ? item.content
+    : typeof item.content?.body === 'string'
+      ? item.content.body
+      : JSON.stringify(item.content);
+
+  return (
+    <button
+      onClick={() => setExpanded(!expanded)}
+      className="w-full text-left rounded-lg border border-border/10 bg-card/5 px-3 py-2 space-y-1 transition-colors hover:bg-card/10"
+    >
+      <div className="flex items-center gap-2">
+        <span
+          className="text-[9px] font-mono px-1.5 py-0.5 rounded-full flex-shrink-0"
+          style={{
+            backgroundColor: `${TYPE_COLORS[item.companion_type] ?? '#64748b'}20`,
+            color: TYPE_COLORS[item.companion_type] ?? '#64748b',
+          }}
+        >
+          {label(item.companion_type)}
+        </span>
+        <span className="text-[10px] font-mono text-foreground/60 truncate flex-1 min-w-0">
+          {item.title || '(untitled)'}
+        </span>
+        <QualityBadge score={item.quality_score} />
+        {expanded ? <ChevronDown className="h-2.5 w-2.5 text-muted-foreground/30 flex-shrink-0" /> : <ChevronRight className="h-2.5 w-2.5 text-muted-foreground/30 flex-shrink-0" />}
+      </div>
+      <p className="text-[9px] font-mono text-muted-foreground/40 truncate">
+        {expanded ? body : body?.slice(0, 100)}{!expanded && (body?.length ?? 0) > 100 ? '…' : ''}
+      </p>
+      <div className="flex items-center gap-3">
+        {item.source_author && <span className="text-[9px] text-muted-foreground/30">by {item.source_author}</span>}
+        <span className="text-[9px] text-muted-foreground/25">{new Date(item.created_at).toLocaleDateString()}</span>
+        <span className="text-[9px] text-muted-foreground/25">used: {item.used_count}</span>
+      </div>
+      {expanded && (
+        <div className="pt-1 border-t border-border/5">
+          <p className="text-[9px] font-mono text-foreground/40 whitespace-pre-wrap break-words">{body}</p>
+        </div>
+      )}
+    </button>
+  );
+}
+
+// ── Rejection Entry ──
+function RejectionEntry({ row }: { row: RejectionRow }) {
+  const statusColor: Record<string, string> = {
+    error: 'bg-red-500/15 text-red-600 dark:text-red-400',
+    timeout: 'bg-amber-500/15 text-amber-600 dark:text-amber-400',
+    quality_gate_failed: 'bg-orange-500/15 text-orange-600 dark:text-orange-400',
+  };
+
+  return (
+    <div className="rounded-lg border border-border/10 bg-card/5 px-3 py-2">
+      <div className="flex items-center gap-2">
+        <span
+          className="text-[9px] font-mono px-1.5 py-0.5 rounded-full flex-shrink-0"
+          style={{
+            backgroundColor: `${TYPE_COLORS[row.companion_type] ?? '#64748b'}20`,
+            color: TYPE_COLORS[row.companion_type] ?? '#64748b',
+          }}
+        >
+          {label(row.companion_type)}
+        </span>
+        <span className="text-[9px] font-mono text-muted-foreground/30">{row.model}</span>
+        <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded-full ${statusColor[row.status] ?? 'bg-muted/20 text-muted-foreground/40'}`}>
+          {row.status}
+        </span>
+        <span className="text-[9px] text-muted-foreground/25 ml-auto flex-shrink-0">
+          {new Date(row.created_at).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+        </span>
+      </div>
+      <div className="flex items-center gap-3 mt-1">
+        <span className="text-[9px] font-mono text-muted-foreground/40 truncate">
+          {row.quality_gate_reason || row.error_message || '—'}
+        </span>
+        {row.latency_ms != null && (
+          <span className="text-[9px] text-muted-foreground/30 flex-shrink-0 flex items-center gap-0.5">
+            <Clock className="h-2.5 w-2.5" /> {(row.latency_ms / 1000).toFixed(1)}s
+          </span>
+        )}
+      </div>
     </div>
   );
 }
