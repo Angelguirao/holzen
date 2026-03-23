@@ -43,6 +43,13 @@ interface PriceFetchResult {
   isPartial: boolean;
 }
 
+/**
+ * Read BTC prices from btc_price_cache ONLY.
+ *
+ * No external API calls — prices are kept fresh by the refresh-btc-prices
+ * cron job (every 15 min). This eliminates CoinGecko rate limit issues
+ * during user sessions.
+ */
 async function fetchHistoricalAndCurrentPrices(
   svcClient: any,
   context: string | undefined,
@@ -52,136 +59,41 @@ async function fetchHistoricalAndCurrentPrices(
   const currentYear = today.getUTCFullYear();
   const month = today.getUTCMonth();
   const day = today.getUTCDate();
+  const todayKey = today.toISOString().slice(0, 10);
 
+  // Build date keys for today + 1-4 years ago
   const yearTargets = [1, 2, 3, 4].map(y => {
     const d = new Date(Date.UTC(currentYear - y, month, day));
-    return { yearsAgo: y, dateKey: d.toISOString().slice(0, 10), ts: Math.floor(d.getTime() / 1000) };
+    return { yearsAgo: y, dateKey: d.toISOString().slice(0, 10) };
   });
 
-  const dateKeys = yearTargets.map(t => t.dateKey);
-  const { data: cached } = await svcClient.from("btc_price_cache").select("date, price").in("date", dateKeys);
-  const cachedMap = new Map((cached || []).map((r: any) => [r.date, r.price]));
-  const missingTargets = yearTargets.filter(t => !cachedMap.has(t.dateKey));
+  const allDateKeys = [todayKey, ...yearTargets.map(t => t.dateKey)];
 
-  let rateLimited = false;
-  log(`cache hit: ${cachedMap.size}/${yearTargets.length}, fetching ${missingTargets.length}`);
+  // Single DB query — fetch all needed prices from cache
+  const { data: cached } = await svcClient
+    .from("btc_price_cache")
+    .select("date, price")
+    .in("date", allDateKeys);
 
-  const newPrices: { date: string; price: number }[] = [];
-  if (missingTargets.length > 0) {
-    const timestamps = missingTargets.map(t => t.ts);
-    const from = Math.min(...timestamps) - 86400;
-    const to = Math.max(...timestamps) + 86400;
+  const priceMap = new Map((cached || []).map((r: any) => [r.date, r.price]));
 
-    // Retry with backoff for CoinGecko rate limiting
-    for (let attempt = 0; attempt < 3; attempt++) {
-      try {
-        if (attempt > 0) {
-          const waitMs = attempt * 2000; // 2s, 4s backoff
-          log(`CoinGecko retry ${attempt + 1} after ${waitMs}ms`);
-          await new Promise(r => setTimeout(r, waitMs));
-        }
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 10000);
-        const res = await fetch(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=usd&from=${from}&to=${to}`, { signal: controller.signal });
-        clearTimeout(timeout);
-        if (res.status === 429) {
-          await res.text();
-          log(`CoinGecko rate limited (attempt ${attempt + 1})`);
-          if (attempt < 2) continue; // retry
-          rateLimited = true;
-          break;
-        }
-        if (res.ok) {
-          const json = await res.json();
-          const prices: [number, number][] = json?.prices || [];
-          for (const target of missingTargets) {
-            const targetMs = target.ts * 1000;
-            let closest: [number, number] | null = null;
-            let closestDist = Infinity;
-            for (const [ts, price] of prices) {
-              const dist = Math.abs(ts - targetMs);
-              if (dist < closestDist) { closestDist = dist; closest = [ts, price]; }
-            }
-            if (closest && closestDist < 48 * 3600 * 1000) {
-              newPrices.push({ date: target.dateKey, price: Math.round(closest[1]) });
-            }
-          }
-          break; // success
-        }
-        await res.text();
-        break; // non-429 error, don't retry
-      } catch (e) {
-        if (e instanceof DOMException && e.name === "AbortError") {
-          log(`CoinGecko timeout (attempt ${attempt + 1})`);
-          if (attempt < 2) continue;
-        }
-        break;
-      }
-    }
-  }
+  // Current price from today's cache entry
+  const currentPrice = priceMap.get(todayKey) ?? null;
 
-  if (newPrices.length > 0) {
-    const { error: priceErr } = await svcClient.from("btc_price_cache").upsert(newPrices.map(p => ({ date: p.date, price: p.price, fetched_at: new Date().toISOString() })));
-    if (priceErr) log(`btc_price_cache upsert error: ${priceErr.message}`);
-  }
-
+  // Historical "on this day" prices
   const onThisDay: { yearsAgo: number; price: number; date: string }[] = [];
   for (const target of yearTargets) {
-    const price = cachedMap.get(target.dateKey) ?? newPrices.find(p => p.date === target.dateKey)?.price;
+    const price = priceMap.get(target.dateKey);
     if (price) onThisDay.push({ yearsAgo: target.yearsAgo, date: target.dateKey, price: Math.round(price) });
   }
 
-  // Current price (with retry)
-  let currentPrice: number | null = null;
-  for (let attempt = 0; attempt < 2 && !rateLimited; attempt++) {
-    try {
-      if (attempt > 0) await new Promise(r => setTimeout(r, 2000));
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 5000);
-      const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd", { signal: controller.signal });
-      clearTimeout(timeout);
-      if (res.ok) {
-        const json = await res.json();
-        currentPrice = json?.bitcoin?.usd ? Math.round(json.bitcoin.usd) : null;
-        break;
-      }
-      if (res.status === 429) {
-        await res.text();
-        if (attempt < 1) continue;
-        rateLimited = true;
-      } else { await res.text(); break; }
-    } catch { if (attempt >= 1) break; }
-  }
-  // Fallback: Blockchain.info ticker API
-  if (!currentPrice && !rateLimited) {
-    try {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 5000);
-      const res = await fetch("https://blockchain.info/ticker", { signal: controller.signal });
-      clearTimeout(timeout);
-      if (res.ok) {
-        const json = await res.json();
-        const usdPrice = json?.USD?.last;
-        if (typeof usdPrice === "number" && usdPrice > 0) {
-          currentPrice = Math.round(usdPrice);
-          log("current price from blockchain.info fallback");
-        }
-      }
-    } catch (e) {
-      log(`blockchain.info fallback failed: ${e}`);
-    }
-  }
-
-  if (!currentPrice && context) {
-    const priceMatch = context.match(/\$[\d,]+/);
-    if (priceMatch) { const parsed = parseInt(priceMatch[0].replace(/[$,]/g, ''), 10); if (parsed > 0) currentPrice = parsed; }
-  }
+  log(`prices from cache: current=${currentPrice ?? 'none'}, historical=${onThisDay.length}/4`);
 
   return {
     onThisDay,
-    currentPrice,
-    rateLimited,
-    isPartial: rateLimited || onThisDay.length < yearTargets.length,
+    currentPrice: currentPrice ? Math.round(currentPrice) : null,
+    rateLimited: false, // No API calls = no rate limits
+    isPartial: onThisDay.length < yearTargets.length,
   };
 }
 
@@ -395,18 +307,8 @@ export async function generateZoomOut(params: GenerateZoomOutParams): Promise<Zo
   // ── 1. Fetch historical BTC prices with DB caching ──
   const prices = await fetchHistoricalAndCurrentPrices(svcClient, context, log);
 
-  // Track CoinGecko failures for admin visibility
-  if (prices.rateLimited) {
-    const logAttempt = createAttemptLogger(svcClient, { userId });
-    logAttempt({
-      companion_type: "zoom_out",
-      provider: "coingecko",
-      model: "price_api",
-      status: "error",
-      latency_ms: 0,
-      error_message: "rate_limited",
-    });
-  }
+  // CoinGecko is no longer called during sessions — prices come from
+  // the refresh-btc-prices cron job via btc_price_cache.
 
   // ── 2. Fetch past echo reflection ──
   let echoReflection: any = null;
