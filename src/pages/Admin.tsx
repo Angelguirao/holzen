@@ -1,5 +1,6 @@
 import { useAdminStats, CacheEntryRow, SignalSourceRow, TimePeriod, PeriodStats, RejectionRow, RecentContentRow, SessionRow, LibraryEntryRow } from '@/hooks/use-admin-stats';
 import { useAuth } from '@/hooks/use-auth';
+import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { RefreshCw, Activity, Database, DollarSign, AlertTriangle, ThumbsUp, Clock, Loader2, Zap, ShieldX, ChevronDown, ChevronRight, Trash2, ArrowUp, ArrowDown, Globe, BookOpen } from 'lucide-react';
@@ -35,7 +36,7 @@ function useIsAdmin(): { isAdmin: boolean; loading: boolean } {
           // Column doesn't exist yet — fall back to env var
           const adminIds = import.meta.env.VITE_ADMIN_USER_IDS;
           if (!adminIds) {
-            setIsAdmin(true); // No restriction configured
+            setIsAdmin(false); // Deny by default when unconfigured
           } else {
             setIsAdmin(adminIds.split(',').map((id: string) => id.trim()).includes(user.id));
           }
@@ -894,6 +895,7 @@ function QualityBadge({ score }: { score: number }) {
 }
 
 function CuratedContentManager({ entries, onRefresh }: { entries: CacheEntryRow[]; onRefresh: () => Promise<void> }) {
+  const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [acting, setActing] = useState<string | null>(null);
   const [qualityFilter, setQualityFilter] = useState<string>('all');
@@ -935,26 +937,29 @@ function CuratedContentManager({ entries, onRefresh }: { entries: CacheEntryRow[
 
   const promote = useCallback(async (id: string) => {
     setActing(id);
-    await supabase.from('companion_cache').update({ quality_score: 3, expires_at: null } as any).eq('id', id);
+    const { error } = await supabase.from('companion_cache').update({ quality_score: 3, expires_at: null } as any).eq('id', id);
+    if (error) { toast({ title: 'Promote failed', description: error.message, variant: 'destructive' }); setActing(null); return; }
     await onRefresh();
     setActing(null);
-  }, [onRefresh]);
+  }, [onRefresh, toast]);
 
   const demote = useCallback(async (id: string) => {
     setActing(id);
     const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
-    await supabase.from('companion_cache').update({ quality_score: 1, expires_at: expires } as any).eq('id', id);
+    const { error } = await supabase.from('companion_cache').update({ quality_score: 1, expires_at: expires } as any).eq('id', id);
+    if (error) { toast({ title: 'Demote failed', description: error.message, variant: 'destructive' }); setActing(null); return; }
     await onRefresh();
     setActing(null);
-  }, [onRefresh]);
+  }, [onRefresh, toast]);
 
   const remove = useCallback(async (id: string) => {
     if (!window.confirm('Delete this cache entry? This cannot be undone.')) return;
     setActing(id);
-    await supabase.from('companion_cache').delete().eq('id', id);
+    const { error } = await supabase.from('companion_cache').delete().eq('id', id);
+    if (error) { toast({ title: 'Delete failed', description: error.message, variant: 'destructive' }); setActing(null); return; }
     await onRefresh();
     setActing(null);
-  }, [onRefresh]);
+  }, [onRefresh, toast]);
 
   return (
     <div className="space-y-3">
@@ -1092,6 +1097,7 @@ const CATEGORY_LABELS: Record<string, string> = {
 };
 
 function SourceCatalogViewer({ sources, onRefresh, libraryEntries = [] }: { sources: SignalSourceRow[]; onRefresh: () => void; libraryEntries?: LibraryEntryRow[] }) {
+  const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [adding, setAdding] = useState(false);
   const [newName, setNewName] = useState('');
@@ -1113,22 +1119,24 @@ function SourceCatalogViewer({ sources, onRefresh, libraryEntries = [] }: { sour
   const addSource = async () => {
     if (!newName.trim()) return;
     setSaving(true);
-    await supabase.from('signal_sources').insert({
+    const { error } = await supabase.from('signal_sources').insert({
       name: newName.trim(),
       url: newUrl.trim() || null,
       type: newType,
       category: newCategory,
     } as any);
+    setSaving(false);
+    if (error) { toast({ title: 'Add source failed', description: error.message, variant: 'destructive' }); return; }
     setNewName('');
     setNewUrl('');
     setAdding(false);
-    setSaving(false);
     onRefresh();
   };
 
   const deleteSource = async (id: string, name: string) => {
     if (!window.confirm(`Remove "${name}" from sources?`)) return;
-    await supabase.from('signal_sources').delete().eq('id', id);
+    const { error } = await supabase.from('signal_sources').delete().eq('id', id);
+    if (error) { toast({ title: 'Delete source failed', description: error.message, variant: 'destructive' }); return; }
     onRefresh();
   };
 
@@ -1271,6 +1279,7 @@ const LIBRARY_TYPE_COLORS: Record<string, string> = {
 };
 
 function ContentLibraryViewer({ entries, onRefresh }: { entries: LibraryEntryRow[]; onRefresh: () => void }) {
+  const { toast } = useToast();
   const [typeFilter, setTypeFilter] = useState<string>('all');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
@@ -1291,10 +1300,11 @@ function ContentLibraryViewer({ entries, onRefresh }: { entries: LibraryEntryRow
   const deleteEntry = useCallback(async (id: string, title: string) => {
     if (!window.confirm(`Remove "${title}" from library?`)) return;
     setDeleting(id);
-    await supabase.from('content_library').update({ active: false } as any).eq('id', id);
-    onRefresh();
+    const { error } = await supabase.from('content_library').update({ active: false } as any).eq('id', id);
     setDeleting(null);
-  }, [onRefresh]);
+    if (error) { toast({ title: 'Remove entry failed', description: error.message, variant: 'destructive' }); return; }
+    onRefresh();
+  }, [onRefresh, toast]);
 
   return (
     <div className="space-y-3">

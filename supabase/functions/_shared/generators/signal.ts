@@ -385,7 +385,7 @@ URL RULES (CRITICAL):
     temperature: 0.5,
   };
 
-  const models = ["google/gemini-2.5-flash", "google/gemini-3-flash-preview"];
+  const models = ["google/gemini-2.5-flash", "google/gemini-2.5-flash-lite"];
   let signal: any = null;
 
   const AI_TIMEOUTS = [8000, 6000];

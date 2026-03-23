@@ -235,12 +235,17 @@ serve(async (req) => {
       );
     }
 
-    // Await all critical writes before returning (with safety timeout)
+    // Fire DB writes in the background — do not block the response.
+    // allSettled ensures all writes run to completion; errors are logged but
+    // don't affect the companion data returned to the client.
     if (writePromises.length > 0) {
-      await Promise.race([
-        Promise.allSettled(writePromises),
-        new Promise(resolve => setTimeout(resolve, 5000)), // 5s for companion data + serve logs
-      ]);
+      Promise.allSettled(writePromises).then((outcomes) => {
+        for (const outcome of outcomes) {
+          if (outcome.status === "rejected") {
+            log.error("background write failed", { error: String(outcome.reason) });
+          }
+        }
+      });
     }
 
     log(`done, returning ${keys.length} companions`);
