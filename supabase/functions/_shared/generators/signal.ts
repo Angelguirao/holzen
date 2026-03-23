@@ -30,6 +30,7 @@ export interface GenerateSignalParams {
   recentSignalSources?: string[];
   recentSignalTitles?: string[];
   userId?: string;
+  searchAngle?: string;
   log: (msg: string, extra?: Record<string, unknown>) => void;
 }
 
@@ -100,7 +101,7 @@ async function callPerplexity(
 // ── Public entry point ──
 
 export async function generateSignal(params: GenerateSignalParams): Promise<SignalResult> {
-  const { svcClient, context, sources, recentSignalSources, recentSignalTitles, userId, log } = params;
+  const { svcClient, context, sources, recentSignalSources, recentSignalTitles, userId, searchAngle, log } = params;
   const marketDirection = parseMarketDirection(context);
 
   const logAttempt = createAttemptLogger(svcClient, { userId });
@@ -134,7 +135,10 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
     ? " Focus on humility, caution against euphoria, and the discipline of not chasing momentum."
     : "";
 
-  const searchQuery = context
+  const trimmedSearchAngle = searchAngle?.trim();
+  const searchQuery = trimmedSearchAngle
+    ? `${trimmedSearchAngle}${sourceHint}${recentExclusion}`
+    : context
     ? `Bitcoin philosophical perspective relevant when ${context}.${directionHint} Find a profound insight from a respected Bitcoin thinker or writer.${sourceHint}${recentExclusion}`
     : `Find a profound, philosophical Bitcoin essay or insight about sovereignty, sound money, time preference, proof of work as philosophy, or the meaning of holding from a respected thinker.${sourceHint}${recentExclusion}`;
 
