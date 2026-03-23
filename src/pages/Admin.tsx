@@ -8,22 +8,43 @@ import { useMemo, useState, useEffect, useCallback } from 'react';
 
 /**
  * Admin access control.
- * Set VITE_ADMIN_USER_IDS in .env as a comma-separated list of Supabase user UUIDs.
- * If not set, falls back to allowing any authenticated user (dev convenience).
+ * 
+ * Checks profiles.is_admin (server-side, used by RLS policies).
+ * Falls back to VITE_ADMIN_USER_IDS env var if the DB column
+ * doesn't exist yet (before migration).
  */
 function useIsAdmin(): { isAdmin: boolean; loading: boolean } {
-  const { user, loading } = useAuth();
+  const { user, loading: authLoading } = useAuth();
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [checked, setChecked] = useState(false);
 
-  if (loading) return { isAdmin: false, loading: true };
-  if (!user) return { isAdmin: false, loading: false };
+  useEffect(() => {
+    if (!user) { setChecked(true); return; }
 
-  const adminIds = import.meta.env.VITE_ADMIN_USER_IDS;
-  if (!adminIds) {
-    return { isAdmin: true, loading: false };
-  }
+    // Check DB first (authoritative after migration)
+    supabase
+      .from('profiles')
+      .select('is_admin')
+      .eq('user_id', user.id)
+      .single()
+      .then(({ data, error }) => {
+        if (!error && data && typeof (data as any).is_admin === 'boolean') {
+          // DB column exists — use it as source of truth
+          setIsAdmin((data as any).is_admin);
+        } else {
+          // Column doesn't exist yet — fall back to env var
+          const adminIds = import.meta.env.VITE_ADMIN_USER_IDS;
+          if (!adminIds) {
+            setIsAdmin(true); // No restriction configured
+          } else {
+            setIsAdmin(adminIds.split(',').map((id: string) => id.trim()).includes(user.id));
+          }
+        }
+        setChecked(true);
+      });
+  }, [user]);
 
-  const allowedIds = adminIds.split(',').map((id: string) => id.trim());
-  return { isAdmin: allowedIds.includes(user.id), loading: false };
+  return { isAdmin, loading: authLoading || !checked };
 }
 
 const TYPE_LABELS: Record<string, string> = {
