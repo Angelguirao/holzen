@@ -523,12 +523,20 @@ export default function Admin() {
                   <span className="text-[9px] font-mono text-foreground/50 truncate flex-1 min-w-0">
                     {s.message?.slice(0, 60)}{(s.message?.length ?? 0) > 60 ? '…' : ''}
                   </span>
-                  <div className="flex items-center gap-1 flex-shrink-0">
-                    <span className={`text-[8px] font-mono ${s.signal_title ? 'text-emerald-500/60' : 'text-muted-foreground/40'}`}>S{s.signal_title ? '✓' : '·'}</span>
-                    <span className={`text-[8px] font-mono ${s.learning_title ? 'text-emerald-500/60' : 'text-muted-foreground/40'}`}>L{s.learning_title ? '✓' : '·'}</span>
-                    <span className={`text-[8px] font-mono ${s.history_insight_data ? 'text-emerald-500/60' : 'text-muted-foreground/40'}`}>H{s.history_insight_data ? '✓' : '·'}</span>
-                    <span className={`text-[8px] font-mono ${s.zoom_out_data ? 'text-emerald-500/60' : 'text-muted-foreground/40'}`}>Z{s.zoom_out_data ? '✓' : '·'}</span>
-                    <span className={`text-[8px] font-mono ${s.haiku ? 'text-emerald-500/60' : 'text-muted-foreground/40'}`}>K{s.haiku ? '✓' : '·'}</span>
+                  <div className="flex items-center gap-1.5 flex-shrink-0 flex-wrap justify-end">
+                    {[
+                      { loaded: !!s.signal_title, name: 'Signal' },
+                      { loaded: !!s.learning_title, name: 'Ground' },
+                      { loaded: !!s.history_insight_data, name: 'History' },
+                      { loaded: !!s.zoom_out_data, name: 'Zoom' },
+                      { loaded: !!s.haiku, name: 'Haiku' },
+                    ].map(c => (
+                      <span key={c.name} className={`text-[8px] font-mono px-1 py-0.5 rounded ${
+                        c.loaded ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400' : 'bg-muted/20 text-muted-foreground/40'
+                      }`}>
+                        {c.name}
+                      </span>
+                    ))}
                   </div>
                 </div>
               ))}
@@ -546,7 +554,7 @@ export default function Admin() {
 
         {/* Tab 3: Sources */}
         <TabsContent value="sources" className="mt-0">
-          <SourceCatalogViewer sources={signalSources} />
+          <SourceCatalogViewer sources={signalSources} onRefresh={refresh} />
         </TabsContent>
 
         {/* Tab 4: Tools */}
@@ -725,11 +733,32 @@ function CuratedContentManager({ entries, onRefresh }: { entries: CacheEntryRow[
   }, [onRefresh]);
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
+      {/* Explanation */}
+      <div className="rounded-xl border border-border/20 bg-card/10 px-4 py-3 space-y-2">
+        <p className="text-[10px] font-mono text-foreground/70">
+          Content that AI generates gets cached here. You can manage its lifecycle:
+        </p>
+        <div className="space-y-1">
+          <p className="text-[9px] text-muted-foreground/60">
+            <span className="text-emerald-600 dark:text-emerald-400 font-mono">↑ Promote</span> — Makes content permanent (never expires). Best content gets served as fallback when AI is down.
+          </p>
+          <p className="text-[9px] text-muted-foreground/60">
+            <span className="text-orange-600 dark:text-orange-400 font-mono">↓ Demote</span> — Lowers quality score and sets 7-day expiry. For content that isn't good enough.
+          </p>
+          <p className="text-[9px] text-muted-foreground/60">
+            <span className="text-destructive font-mono">🗑 Delete</span> — Permanently removes from cache.
+          </p>
+        </div>
+        <p className="text-[9px] text-muted-foreground/50">
+          Quality badges: <span className="text-emerald-600 dark:text-emerald-400">curated</span> = permanent, <span className="text-blue-600 dark:text-blue-400">good</span> = verified URL, <span className="text-orange-600 dark:text-orange-400">low</span> = unverified
+        </p>
+      </div>
+
       <button onClick={() => setOpen(!open)} className="flex items-center gap-1.5 w-full text-left">
-        {open ? <ChevronDown className="h-3 w-3 text-muted-foreground/40" /> : <ChevronRight className="h-3 w-3 text-muted-foreground/40" />}
-        <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">
-          Curated Content <span className="text-muted-foreground/45">({entries.length})</span>
+        {open ? <ChevronDown className="h-3 w-3 text-muted-foreground/60" /> : <ChevronRight className="h-3 w-3 text-muted-foreground/60" />}
+        <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">
+          Cache Entries <span className="text-muted-foreground/45">({entries.length})</span>
         </p>
       </button>
       {open && (
@@ -831,8 +860,14 @@ const CATEGORY_LABELS: Record<string, string> = {
   learning: 'Learning',
 };
 
-function SourceCatalogViewer({ sources }: { sources: SignalSourceRow[] }) {
+function SourceCatalogViewer({ sources, onRefresh }: { sources: SignalSourceRow[]; onRefresh: () => void }) {
   const [open, setOpen] = useState(false);
+  const [adding, setAdding] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [newUrl, setNewUrl] = useState('');
+  const [newType, setNewType] = useState('blog');
+  const [newCategory, setNewCategory] = useState('signal');
+  const [saving, setSaving] = useState(false);
 
   const grouped = useMemo(() => {
     const map = new Map<string, SignalSourceRow[]>();
@@ -844,11 +879,94 @@ function SourceCatalogViewer({ sources }: { sources: SignalSourceRow[] }) {
     return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b));
   }, [sources]);
 
+  const addSource = async () => {
+    if (!newName.trim()) return;
+    setSaving(true);
+    await supabase.from('signal_sources').insert({
+      name: newName.trim(),
+      url: newUrl.trim() || null,
+      type: newType,
+      category: newCategory,
+    } as any);
+    setNewName('');
+    setNewUrl('');
+    setAdding(false);
+    setSaving(false);
+    onRefresh();
+  };
+
+  const deleteSource = async (id: string, name: string) => {
+    if (!window.confirm(`Remove "${name}" from sources?`)) return;
+    await supabase.from('signal_sources').delete().eq('id', id);
+    onRefresh();
+  };
+
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
+      {/* Explanation */}
+      <div className="rounded-xl border border-border/20 bg-card/10 px-4 py-3 space-y-2">
+        <p className="text-[10px] font-mono text-foreground/70">
+          Sources the AI searches when generating Signal and Grounding companions.
+        </p>
+        <div className="space-y-1">
+          <p className="text-[9px] text-muted-foreground/60">
+            <span className="font-mono font-medium">signal</span> sources — Bitcoin thinkers, essayists, publications for philosophical insights
+          </p>
+          <p className="text-[9px] text-muted-foreground/60">
+            <span className="font-mono font-medium">grounding</span> sources — Academic researchers, behavioral finance journals
+          </p>
+        </div>
+      </div>
+
+      {/* Add new source */}
+      {!adding ? (
+        <button
+          onClick={() => setAdding(true)}
+          className="text-[10px] font-mono text-primary/70 hover:text-primary transition-colors"
+        >
+          + Add source
+        </button>
+      ) : (
+        <div className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 space-y-2">
+          <input
+            value={newName}
+            onChange={e => setNewName(e.target.value)}
+            placeholder="Source name (e.g. Parker Lewis)"
+            className="w-full text-[10px] font-mono bg-transparent border-b border-border/30 pb-1 outline-none placeholder:text-muted-foreground/40"
+          />
+          <input
+            value={newUrl}
+            onChange={e => setNewUrl(e.target.value)}
+            placeholder="URL (optional)"
+            className="w-full text-[10px] font-mono bg-transparent border-b border-border/30 pb-1 outline-none placeholder:text-muted-foreground/40"
+          />
+          <div className="flex gap-2">
+            <select value={newType} onChange={e => setNewType(e.target.value)} className="text-[10px] font-mono bg-transparent border border-border/30 rounded px-1.5 py-0.5">
+              <option value="blog">blog</option>
+              <option value="book">book</option>
+              <option value="podcast">podcast</option>
+              <option value="essay">essay</option>
+              <option value="academic">academic</option>
+            </select>
+            <select value={newCategory} onChange={e => setNewCategory(e.target.value)} className="text-[10px] font-mono bg-transparent border border-border/30 rounded px-1.5 py-0.5">
+              <option value="signal">signal</option>
+              <option value="grounding">grounding</option>
+            </select>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={addSource} disabled={saving || !newName.trim()} className="text-[10px] font-mono text-primary hover:text-primary/80 disabled:opacity-30">
+              {saving ? 'Saving...' : 'Save'}
+            </button>
+            <button onClick={() => setAdding(false)} className="text-[10px] font-mono text-muted-foreground/60 hover:text-muted-foreground">
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
       <button onClick={() => setOpen(!open)} className="flex items-center gap-1.5 w-full text-left">
-        {open ? <ChevronDown className="h-3 w-3 text-muted-foreground/40" /> : <ChevronRight className="h-3 w-3 text-muted-foreground/40" />}
-        <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">
+        {open ? <ChevronDown className="h-3 w-3 text-muted-foreground/60" /> : <ChevronRight className="h-3 w-3 text-muted-foreground/60" />}
+        <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">
           Source Catalog <span className="text-muted-foreground/45">({sources.length})</span>
         </p>
       </button>
@@ -860,7 +978,7 @@ function SourceCatalogViewer({ sources }: { sources: SignalSourceRow[] }) {
               {items.map(src => (
                 <div key={src.id} className="rounded-lg border border-border/20 bg-card/10 px-3 py-2 flex items-center justify-between gap-2">
                   <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-mono text-foreground/70 truncate">{src.name}</p>
+                    <p className="text-[10px] font-mono text-foreground/80 truncate">{src.name}</p>
                     <div className="flex items-center gap-2 mt-0.5">
                       <span
                         className="text-[9px] font-mono px-1.5 py-0.5 rounded-full"
@@ -876,7 +994,7 @@ function SourceCatalogViewer({ sources }: { sources: SignalSourceRow[] }) {
                           href={src.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-[9px] text-primary/40 hover:text-primary/70 flex items-center gap-0.5 truncate transition-colors"
+                          className="text-[9px] text-primary/60 hover:text-primary flex items-center gap-0.5 truncate transition-colors"
                         >
                           <Globe className="h-2.5 w-2.5 flex-shrink-0" />
                           <span className="truncate">{src.url.replace(/^https?:\/\//, '').slice(0, 40)}</span>
@@ -884,6 +1002,13 @@ function SourceCatalogViewer({ sources }: { sources: SignalSourceRow[] }) {
                       )}
                     </div>
                   </div>
+                  <button
+                    onClick={() => deleteSource(src.id, src.name)}
+                    className="text-destructive/40 hover:text-destructive transition-colors flex-shrink-0"
+                    title="Remove source"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                  </button>
                 </div>
               ))}
             </div>
