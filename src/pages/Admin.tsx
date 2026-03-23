@@ -96,20 +96,20 @@ function StatCard({ icon: Icon, title, value, subtitle, alert, trend }: {
     : '';
 
   return (
-    <div className={`rounded-xl border px-4 py-3 space-y-1 ${alert ? 'border-destructive/30 bg-destructive/5' : 'border-border/15 bg-card/10'}`}>
+    <div className={`rounded-xl border px-4 py-3 space-y-1 ${alert ? 'border-destructive/40 bg-destructive/10' : 'border-border/30 bg-card/20'}`}>
       <div className="flex items-center gap-2">
-        <Icon className={`h-3.5 w-3.5 ${alert ? 'text-destructive/60' : 'text-muted-foreground/40'}`} />
-        <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/50">{title}</span>
+        <Icon className={`h-3.5 w-3.5 ${alert ? 'text-destructive' : 'text-muted-foreground/60'}`} />
+        <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/70">{title}</span>
       </div>
       <div className="flex items-baseline gap-1.5">
-        <p className={`text-lg font-mono ${alert ? 'text-destructive/80' : 'text-foreground/80'}`}>{value}</p>
+        <p className={`text-lg font-mono ${alert ? 'text-destructive' : 'text-foreground'}`}>{value}</p>
         {trend && (
           <span className={`text-[9px] font-mono ${trendColor}`}>
             {trendArrow} {trend.label}
           </span>
         )}
       </div>
-      {subtitle && <p className="text-[10px] text-muted-foreground/40">{subtitle}</p>}
+      {subtitle && <p className="text-[10px] text-muted-foreground/60">{subtitle}</p>}
     </div>
   );
 }
@@ -158,7 +158,7 @@ export default function Admin() {
   if (!isAdmin) {
     return (
       <div className="space-y-4 py-10 text-center">
-        <ShieldX className="h-8 w-8 text-muted-foreground/20 mx-auto" />
+        <ShieldX className="h-8 w-8 text-muted-foreground/40 mx-auto" />
         <p className="text-xs font-mono text-muted-foreground/40">Admin access required</p>
       </div>
     );
@@ -207,7 +207,7 @@ export default function Admin() {
     return (
       <div className="space-y-6 animate-in fade-in">
         <div className="flex items-center justify-between">
-          <h2 className="text-xs font-mono tracking-widest uppercase text-muted-foreground/60">System Monitor</h2>
+          <h2 className="text-xs font-mono tracking-widest uppercase text-muted-foreground/80">System Monitor</h2>
           <Loader2 className="h-3.5 w-3.5 animate-spin text-muted-foreground/30" />
         </div>
         <div className="grid grid-cols-2 gap-3">
@@ -223,7 +223,7 @@ export default function Admin() {
   if (error) {
     return (
       <div className="space-y-4">
-        <h2 className="text-xs font-mono tracking-widest uppercase text-muted-foreground/60">System Monitor</h2>
+        <h2 className="text-xs font-mono tracking-widest uppercase text-muted-foreground/80">System Monitor</h2>
         <div className="rounded-xl border border-destructive/20 bg-destructive/5 px-4 py-3">
           <p className="text-xs text-destructive/70">{error}</p>
           <button onClick={refresh} className="mt-2 text-[10px] font-mono text-primary/60 hover:text-primary flex items-center gap-1">
@@ -238,8 +238,8 @@ export default function Admin() {
     <div className="space-y-6 animate-in fade-in">
       {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="text-xs font-mono tracking-widest uppercase text-muted-foreground/60">System Monitor</h2>
-        <button onClick={refresh} className="flex items-center gap-1.5 text-[10px] font-mono text-muted-foreground/40 hover:text-primary/60 transition-colors">
+        <h2 className="text-xs font-mono tracking-widest uppercase text-muted-foreground/80">System Monitor</h2>
+        <button onClick={refresh} className="flex items-center gap-1.5 text-[10px] font-mono text-muted-foreground/60 hover:text-primary transition-colors">
           <RefreshCw className="h-3 w-3" />
           {lastUpdated && <span>{lastUpdated.toLocaleTimeString()}</span>}
         </button>
@@ -334,7 +334,7 @@ export default function Admin() {
                 className={`text-[9px] font-mono px-2 py-0.5 rounded-full transition-colors ${
                   period === opt.value
                     ? 'bg-primary/15 text-primary'
-                    : 'text-muted-foreground/40 hover:text-muted-foreground/60 hover:bg-muted/20'
+                    : 'text-muted-foreground/50 hover:text-muted-foreground/80 hover:bg-muted/20'
                 }`}
               >
                 {opt.label}
@@ -379,7 +379,7 @@ export default function Admin() {
           {/* Cost Chart */}
           {costChartData.length > 0 && (
             <div className="space-y-2">
-              <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">Daily Cost (14d)</p>
+              <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">Daily Cost (14d)</p>
               <div className="rounded-xl border border-border/15 bg-card/5 p-3">
                 <ResponsiveContainer width="100%" height={160}>
                   <BarChart data={costChartData}>
@@ -403,20 +403,20 @@ export default function Admin() {
 
           {/* Cache Hit Rates (detail breakdown is always all-time from views) */}
           <div className="space-y-2">
-            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">Cache Hit Rates <span className="text-muted-foreground/20 normal-case">(all time)</span></p>
+            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">Cache Hit Rates <span className="text-muted-foreground/40 normal-case">(all time)</span></p>
             <div className="space-y-1.5">
               {cacheHits.map((row, i) => {
                 const pct = row.cache_hit_pct ?? 0;
                 const type = row.companion_type ?? 'unknown';
                 return (
-                  <div key={i} className="rounded-lg border border-border/10 bg-card/5 px-3 py-2">
+                  <div key={i} className="rounded-lg border border-border/20 bg-card/10 px-3 py-2">
                     <div className="flex items-center justify-between mb-1">
-                      <span className="text-[10px] font-mono text-foreground/60">{label(type)}</span>
-                      <span className="text-[10px] font-mono text-muted-foreground/40">
+                      <span className="text-[10px] font-mono text-foreground/80">{label(type)}</span>
+                      <span className="text-[10px] font-mono text-muted-foreground/60">
                         {pct.toFixed(0)}% · {row.total_serves ?? 0} serves
                       </span>
                     </div>
-                    <div className="h-1.5 bg-muted/20 rounded-full overflow-hidden">
+                    <div className="h-1.5 bg-muted/40 rounded-full overflow-hidden">
                       <div
                         className="h-full rounded-full transition-all duration-500"
                         style={{
@@ -426,22 +426,22 @@ export default function Admin() {
                       />
                     </div>
                     <div className="flex gap-3 mt-1">
-                      <span className="text-[9px] text-muted-foreground/30">live: {row.live_generated ?? 0}</span>
-                      <span className="text-[9px] text-muted-foreground/30">cache: {row.cache_hits ?? 0}</span>
-                      <span className="text-[9px] text-muted-foreground/30">curated: {row.curated_fallbacks ?? 0}</span>
+                      <span className="text-[9px] text-muted-foreground/50">live: {row.live_generated ?? 0}</span>
+                      <span className="text-[9px] text-muted-foreground/50">cache: {row.cache_hits ?? 0}</span>
+                      <span className="text-[9px] text-muted-foreground/50">curated: {row.curated_fallbacks ?? 0}</span>
                     </div>
                   </div>
                 );
               })}
               {cacheHits.length === 0 && (
-                <p className="text-[10px] text-muted-foreground/30 text-center py-3">No serve data yet</p>
+                <p className="text-[10px] text-muted-foreground/50 text-center py-3">No serve data yet</p>
               )}
             </div>
           </div>
 
           {/* Generation Health (detail breakdown is always all-time from views) */}
           <div className="space-y-2">
-            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">Generation Health <span className="text-muted-foreground/20 normal-case">(all time)</span></p>
+            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">Generation Health <span className="text-muted-foreground/40 normal-case">(all time)</span></p>
             <div className="space-y-1.5">
               {failures.map((row, i) => {
                 const failPct = row.failure_pct ?? 0;
@@ -450,24 +450,24 @@ export default function Admin() {
                   <div key={i} className={`rounded-lg border px-3 py-2 ${isAlert ? 'border-destructive/20 bg-destructive/5' : 'border-border/10 bg-card/5'}`}>
                     <div className="flex items-center justify-between">
                       <div>
-                        <span className="text-[10px] font-mono text-foreground/60">{label(row.companion_type)}</span>
-                        <span className="text-[9px] text-muted-foreground/30 ml-2">{row.model}</span>
+                        <span className="text-[10px] font-mono text-foreground/80">{label(row.companion_type)}</span>
+                        <span className="text-[9px] text-muted-foreground/50 ml-2">{row.model}</span>
                       </div>
                       <span className={`text-[10px] font-mono ${isAlert ? 'text-destructive/70' : 'text-muted-foreground/40'}`}>
                         {failPct.toFixed(1)}% fail
                       </span>
                     </div>
                     <div className="flex gap-3 mt-1">
-                      <span className="text-[9px] text-muted-foreground/30">✓ {row.successes ?? 0}</span>
-                      <span className="text-[9px] text-muted-foreground/30">✗ {row.errors ?? 0}</span>
-                      <span className="text-[9px] text-muted-foreground/30">⏱ {row.timeouts ?? 0}</span>
-                      <span className="text-[9px] text-muted-foreground/30">⚠ {row.quality_gate_failures ?? 0} QG</span>
+                      <span className="text-[9px] text-muted-foreground/50">✓ {row.successes ?? 0}</span>
+                      <span className="text-[9px] text-muted-foreground/50">✗ {row.errors ?? 0}</span>
+                      <span className="text-[9px] text-muted-foreground/50">⏱ {row.timeouts ?? 0}</span>
+                      <span className="text-[9px] text-muted-foreground/50">⚠ {row.quality_gate_failures ?? 0} QG</span>
                     </div>
                     <div className="flex gap-3 mt-0.5">
-                      <span className="text-[9px] text-muted-foreground/30 flex items-center gap-0.5">
+                      <span className="text-[9px] text-muted-foreground/50 flex items-center gap-0.5">
                         <Clock className="h-2.5 w-2.5" /> avg {((row.avg_latency_ms ?? 0) / 1000).toFixed(1)}s
                       </span>
-                      <span className="text-[9px] text-muted-foreground/30">
+                      <span className="text-[9px] text-muted-foreground/50">
                         P95 {((row.p95_latency_ms ?? 0) / 1000).toFixed(1)}s
                       </span>
                     </div>
@@ -475,23 +475,23 @@ export default function Admin() {
                 );
               })}
               {failures.length === 0 && (
-                <p className="text-[10px] text-muted-foreground/30 text-center py-3">No generation data yet</p>
+                <p className="text-[10px] text-muted-foreground/50 text-center py-3">No generation data yet</p>
               )}
             </div>
           </div>
 
           {/* Feedback (detail breakdown is always all-time from views) */}
           <div className="space-y-2">
-            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">User Feedback <span className="text-muted-foreground/20 normal-case">(all time)</span></p>
+            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">User Feedback <span className="text-muted-foreground/40 normal-case">(all time)</span></p>
             <div className="space-y-1.5">
               {feedback.map((row, i) => (
-                <div key={i} className="rounded-lg border border-border/10 bg-card/5 px-3 py-2 flex items-center justify-between">
-                  <span className="text-[10px] font-mono text-foreground/60">{label(row.companion_type)}</span>
+                <div key={i} className="rounded-lg border border-border/20 bg-card/10 px-3 py-2 flex items-center justify-between">
+                  <span className="text-[10px] font-mono text-foreground/80">{label(row.companion_type)}</span>
                   <div className="flex items-center gap-2">
-                    <span className="text-[9px] text-muted-foreground/30">
+                    <span className="text-[9px] text-muted-foreground/50">
                       <ThumbsUp className="h-2.5 w-2.5 inline mr-0.5" />{row.total_thumbs_up ?? 0}
                     </span>
-                    <span className="text-[9px] text-muted-foreground/30">
+                    <span className="text-[9px] text-muted-foreground/50">
                       👎 {row.total_thumbs_down ?? 0}
                     </span>
                     <span className="text-[10px] font-mono text-primary/50">
@@ -501,17 +501,17 @@ export default function Admin() {
                 </div>
               ))}
               {feedback.length === 0 && (
-                <p className="text-[10px] text-muted-foreground/30 text-center py-3">No feedback data yet</p>
+                <p className="text-[10px] text-muted-foreground/50 text-center py-3">No feedback data yet</p>
               )}
             </div>
           </div>
 
           {/* Sessions Timeline */}
           <div className="space-y-2">
-            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">Recent Sessions</p>
+            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">Recent Sessions</p>
             <div className="space-y-1">
               {sessions.map(s => (
-                <div key={s.id} className="rounded-lg border border-border/10 bg-card/5 px-3 py-1.5 flex items-center gap-2">
+                <div key={s.id} className="rounded-lg border border-border/20 bg-card/10 px-3 py-1.5 flex items-center gap-2">
                   <span className="text-[9px] font-mono text-muted-foreground/30 flex-shrink-0">
                     {new Date(s.created_at).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                   </span>
@@ -524,16 +524,16 @@ export default function Admin() {
                     {s.message?.slice(0, 60)}{(s.message?.length ?? 0) > 60 ? '…' : ''}
                   </span>
                   <div className="flex items-center gap-1 flex-shrink-0">
-                    <span className={`text-[8px] font-mono ${s.signal_title ? 'text-emerald-500/60' : 'text-muted-foreground/20'}`}>S{s.signal_title ? '✓' : '·'}</span>
-                    <span className={`text-[8px] font-mono ${s.learning_title ? 'text-emerald-500/60' : 'text-muted-foreground/20'}`}>L{s.learning_title ? '✓' : '·'}</span>
-                    <span className={`text-[8px] font-mono ${s.history_insight_data ? 'text-emerald-500/60' : 'text-muted-foreground/20'}`}>H{s.history_insight_data ? '✓' : '·'}</span>
-                    <span className={`text-[8px] font-mono ${s.zoom_out_data ? 'text-emerald-500/60' : 'text-muted-foreground/20'}`}>Z{s.zoom_out_data ? '✓' : '·'}</span>
-                    <span className={`text-[8px] font-mono ${s.haiku ? 'text-emerald-500/60' : 'text-muted-foreground/20'}`}>K{s.haiku ? '✓' : '·'}</span>
+                    <span className={`text-[8px] font-mono ${s.signal_title ? 'text-emerald-500/60' : 'text-muted-foreground/40'}`}>S{s.signal_title ? '✓' : '·'}</span>
+                    <span className={`text-[8px] font-mono ${s.learning_title ? 'text-emerald-500/60' : 'text-muted-foreground/40'}`}>L{s.learning_title ? '✓' : '·'}</span>
+                    <span className={`text-[8px] font-mono ${s.history_insight_data ? 'text-emerald-500/60' : 'text-muted-foreground/40'}`}>H{s.history_insight_data ? '✓' : '·'}</span>
+                    <span className={`text-[8px] font-mono ${s.zoom_out_data ? 'text-emerald-500/60' : 'text-muted-foreground/40'}`}>Z{s.zoom_out_data ? '✓' : '·'}</span>
+                    <span className={`text-[8px] font-mono ${s.haiku ? 'text-emerald-500/60' : 'text-muted-foreground/40'}`}>K{s.haiku ? '✓' : '·'}</span>
                   </div>
                 </div>
               ))}
               {sessions.length === 0 && (
-                <p className="text-[10px] text-muted-foreground/30 text-center py-3">No sessions yet</p>
+                <p className="text-[10px] text-muted-foreground/50 text-center py-3">No sessions yet</p>
               )}
             </div>
           </div>
@@ -557,34 +557,34 @@ export default function Admin() {
         {/* Tab 5: Feed */}
         <TabsContent value="feed" className="space-y-3 mt-0">
           <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">
-            Recent Content <span className="text-muted-foreground/25">({recentContent.length})</span>
+            Recent Content <span className="text-muted-foreground/45">({recentContent.length})</span>
           </p>
           {recentContent.map(item => (
             <FeedCard key={item.id} item={item} />
           ))}
           {recentContent.length === 0 && (
-            <p className="text-[10px] text-muted-foreground/30 text-center py-3">No content generated yet</p>
+            <p className="text-[10px] text-muted-foreground/50 text-center py-3">No content generated yet</p>
           )}
         </TabsContent>
 
         {/* Tab 6: Rejections */}
         <TabsContent value="rejections" className="space-y-3 mt-0">
           <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">
-            Quality Gate Failures <span className="text-muted-foreground/25">({rejections.length})</span>
+            Quality Gate Failures <span className="text-muted-foreground/45">({rejections.length})</span>
           </p>
           <div className="space-y-1.5">
             {rejections.map(r => (
               <RejectionEntry key={r.id} row={r} />
             ))}
             {rejections.length === 0 && (
-              <p className="text-[10px] text-muted-foreground/30 text-center py-3">No rejections</p>
+              <p className="text-[10px] text-muted-foreground/50 text-center py-3">No rejections</p>
             )}
           </div>
         </TabsContent>
       </Tabs>
 
       {/* Footer */}
-      <p className="text-[9px] text-muted-foreground/20 text-center pb-4">
+      <p className="text-[9px] text-muted-foreground/40 text-center pb-4">
         AI Companion System Monitor · Data from Supabase views
       </p>
     </div>
@@ -603,7 +603,7 @@ function FeedCard({ item }: { item: RecentContentRow }) {
   return (
     <button
       onClick={() => setExpanded(!expanded)}
-      className="w-full text-left rounded-lg border border-border/10 bg-card/5 px-3 py-2 space-y-1 transition-colors hover:bg-card/10"
+      className="w-full text-left rounded-lg border border-border/20 bg-card/10 px-3 py-2 space-y-1 transition-colors hover:bg-card/10"
     >
       <div className="flex items-center gap-2">
         <span
@@ -615,7 +615,7 @@ function FeedCard({ item }: { item: RecentContentRow }) {
         >
           {label(item.companion_type)}
         </span>
-        <span className="text-[10px] font-mono text-foreground/60 truncate flex-1 min-w-0">
+        <span className="text-[10px] font-mono text-foreground/80 truncate flex-1 min-w-0">
           {item.title || '(untitled)'}
         </span>
         <QualityBadge score={item.quality_score} />
@@ -625,9 +625,9 @@ function FeedCard({ item }: { item: RecentContentRow }) {
         {expanded ? body : body?.slice(0, 100)}{!expanded && (body?.length ?? 0) > 100 ? '…' : ''}
       </p>
       <div className="flex items-center gap-3">
-        {item.source_author && <span className="text-[9px] text-muted-foreground/30">by {item.source_author}</span>}
-        <span className="text-[9px] text-muted-foreground/25">{new Date(item.created_at).toLocaleDateString()}</span>
-        <span className="text-[9px] text-muted-foreground/25">used: {item.used_count}</span>
+        {item.source_author && <span className="text-[9px] text-muted-foreground/50">by {item.source_author}</span>}
+        <span className="text-[9px] text-muted-foreground/45">{new Date(item.created_at).toLocaleDateString()}</span>
+        <span className="text-[9px] text-muted-foreground/45">used: {item.used_count}</span>
       </div>
       {expanded && (
         <div className="pt-1 border-t border-border/5">
@@ -647,7 +647,7 @@ function RejectionEntry({ row }: { row: RejectionRow }) {
   };
 
   return (
-    <div className="rounded-lg border border-border/10 bg-card/5 px-3 py-2">
+    <div className="rounded-lg border border-border/20 bg-card/10 px-3 py-2">
       <div className="flex items-center gap-2">
         <span
           className="text-[9px] font-mono px-1.5 py-0.5 rounded-full flex-shrink-0"
@@ -662,7 +662,7 @@ function RejectionEntry({ row }: { row: RejectionRow }) {
         <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded-full ${statusColor[row.status] ?? 'bg-muted/20 text-muted-foreground/40'}`}>
           {row.status}
         </span>
-        <span className="text-[9px] text-muted-foreground/25 ml-auto flex-shrink-0">
+        <span className="text-[9px] text-muted-foreground/45 ml-auto flex-shrink-0">
           {new Date(row.created_at).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
         </span>
       </div>
@@ -671,7 +671,7 @@ function RejectionEntry({ row }: { row: RejectionRow }) {
           {row.quality_gate_reason || row.error_message || '—'}
         </span>
         {row.latency_ms != null && (
-          <span className="text-[9px] text-muted-foreground/30 flex-shrink-0 flex items-center gap-0.5">
+          <span className="text-[9px] text-muted-foreground/50 flex-shrink-0 flex items-center gap-0.5">
             <Clock className="h-2.5 w-2.5" /> {(row.latency_ms / 1000).toFixed(1)}s
           </span>
         )}
@@ -729,7 +729,7 @@ function CuratedContentManager({ entries, onRefresh }: { entries: CacheEntryRow[
       <button onClick={() => setOpen(!open)} className="flex items-center gap-1.5 w-full text-left">
         {open ? <ChevronDown className="h-3 w-3 text-muted-foreground/40" /> : <ChevronRight className="h-3 w-3 text-muted-foreground/40" />}
         <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">
-          Curated Content <span className="text-muted-foreground/25">({entries.length})</span>
+          Curated Content <span className="text-muted-foreground/45">({entries.length})</span>
         </p>
       </button>
       {open && (
@@ -741,15 +741,15 @@ function CuratedContentManager({ entries, onRefresh }: { entries: CacheEntryRow[
                   className="h-2 w-2 rounded-full"
                   style={{ backgroundColor: TYPE_COLORS[type] ?? 'hsl(var(--primary) / 0.4)' }}
                 />
-                <span className="text-[10px] font-mono text-foreground/60">{label(type)}</span>
-                <span className="text-[9px] text-muted-foreground/30">{items.length} entries</span>
+                <span className="text-[10px] font-mono text-foreground/80">{label(type)}</span>
+                <span className="text-[9px] text-muted-foreground/50">{items.length} entries</span>
               </div>
               {items.map(entry => {
                 const isPermanent = entry.expires_at === null;
                 const isCurated = entry.quality_score >= 3;
                 const isActing = acting === entry.id;
                 return (
-                  <div key={entry.id} className="rounded-lg border border-border/10 bg-card/5 px-3 py-2 space-y-1.5">
+                  <div key={entry.id} className="rounded-lg border border-border/20 bg-card/10 px-3 py-2 space-y-1.5">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1 min-w-0">
                         <p className="text-[10px] font-mono text-foreground/70 truncate">{entry.title || '(untitled)'}</p>
@@ -765,14 +765,14 @@ function CuratedContentManager({ entries, onRefresh }: { entries: CacheEntryRow[
                       </div>
                     </div>
                     <div className="flex flex-wrap items-center gap-3">
-                      <span className="text-[9px] text-muted-foreground/30">used: {entry.used_count}</span>
+                      <span className="text-[9px] text-muted-foreground/50">used: {entry.used_count}</span>
                       {(entry.thumbs_up != null || entry.thumbs_down != null) && (
                         <>
-                          <span className="text-[9px] text-muted-foreground/30">👍 {entry.thumbs_up ?? 0}</span>
-                          <span className="text-[9px] text-muted-foreground/30">👎 {entry.thumbs_down ?? 0}</span>
+                          <span className="text-[9px] text-muted-foreground/50">👍 {entry.thumbs_up ?? 0}</span>
+                          <span className="text-[9px] text-muted-foreground/50">👎 {entry.thumbs_down ?? 0}</span>
                         </>
                       )}
-                      <span className="text-[9px] text-muted-foreground/25">{new Date(entry.created_at).toLocaleDateString()}</span>
+                      <span className="text-[9px] text-muted-foreground/45">{new Date(entry.created_at).toLocaleDateString()}</span>
                     </div>
                     <div className="flex items-center gap-1.5 pt-0.5">
                       {!isCurated && (
@@ -808,7 +808,7 @@ function CuratedContentManager({ entries, onRefresh }: { entries: CacheEntryRow[
             </div>
           ))}
           {entries.length === 0 && (
-            <p className="text-[10px] text-muted-foreground/30 text-center py-3">No cache entries</p>
+            <p className="text-[10px] text-muted-foreground/50 text-center py-3">No cache entries</p>
           )}
         </div>
       )}
@@ -849,16 +849,16 @@ function SourceCatalogViewer({ sources }: { sources: SignalSourceRow[] }) {
       <button onClick={() => setOpen(!open)} className="flex items-center gap-1.5 w-full text-left">
         {open ? <ChevronDown className="h-3 w-3 text-muted-foreground/40" /> : <ChevronRight className="h-3 w-3 text-muted-foreground/40" />}
         <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">
-          Source Catalog <span className="text-muted-foreground/25">({sources.length})</span>
+          Source Catalog <span className="text-muted-foreground/45">({sources.length})</span>
         </p>
       </button>
       {open && (
         <div className="space-y-3">
           {grouped.map(([category, items]) => (
             <div key={category} className="space-y-1.5">
-              <span className="text-[10px] font-mono text-foreground/60">{CATEGORY_LABELS[category] ?? category}</span>
+              <span className="text-[10px] font-mono text-foreground/80">{CATEGORY_LABELS[category] ?? category}</span>
               {items.map(src => (
-                <div key={src.id} className="rounded-lg border border-border/10 bg-card/5 px-3 py-2 flex items-center justify-between gap-2">
+                <div key={src.id} className="rounded-lg border border-border/20 bg-card/10 px-3 py-2 flex items-center justify-between gap-2">
                   <div className="flex-1 min-w-0">
                     <p className="text-[10px] font-mono text-foreground/70 truncate">{src.name}</p>
                     <div className="flex items-center gap-2 mt-0.5">
@@ -889,7 +889,7 @@ function SourceCatalogViewer({ sources }: { sources: SignalSourceRow[] }) {
             </div>
           ))}
           {sources.length === 0 && (
-            <p className="text-[10px] text-muted-foreground/30 text-center py-3">No sources configured</p>
+            <p className="text-[10px] text-muted-foreground/50 text-center py-3">No sources configured</p>
           )}
         </div>
       )}
