@@ -165,12 +165,7 @@ export default function Admin() {
   }
 
   // ── Cache hit rate (all-time from views) ──
-  const cacheOverview = useMemo(() => {
-    const totalServes = cacheHits.reduce((s, r) => s + (r.total_serves ?? 0), 0);
-    const totalCacheHits = cacheHits.reduce((s, r) => s + (r.cache_hits ?? 0), 0);
-    const cacheHitRate = totalServes > 0 ? Math.round((totalCacheHits / totalServes) * 100) : 0;
-    return { totalServes, cacheHitRate };
-  }, [cacheHits]);
+  // Cache hit rate now comes from periodStats (period-aware)
 
   // ── Failure rate from periodStats ──
   const failureRate = periodStats.totalAttempts > 0
@@ -182,6 +177,7 @@ export default function Admin() {
 
   // ── Trends ──
   const servesTrend = computeTrend(periodStats.serves, prevPeriodStats?.serves ?? null, false);
+  const cacheHitTrend = computeTrend(periodStats.cacheHitRate, prevPeriodStats?.cacheHitRate ?? null, false); // higher cache hit = good
   const costTrend = computeTrend(periodStats.cost, prevPeriodStats?.cost ?? null, true);
   const failureTrend = computeTrend(failureRate, prevFailureRate, true);
 
@@ -279,16 +275,16 @@ export default function Admin() {
               tips.push(`Moderate spend ($${periodStats.cost.toFixed(2)}) — on track for budget cap`);
             }
 
-            if (cacheOverview.cacheHitRate < 10 && periodStats.cost > 3) {
+            if (periodStats.cacheHitRate < 10 && periodStats.cost > 3) {
               tips.push('Low cache hit rate with moderate cost — consider scheduling the cache warmer cron to reduce API spend');
-            } else if (cacheOverview.cacheHitRate < 10 && cacheOverview.totalServes > 50) {
+            } else if (periodStats.cacheHitRate < 10 && periodStats.serves > 50) {
               tips.push('Cache hit rate is low — the cache warmer (pregenerate-companions) could help as usage grows');
             }
 
             if (issues.length === 0 && tips.length === 0 && periodStats.serves > 0) {
               const parts = [`${failureRate}% failure rate`];
               if (periodStats.cost > 0) parts.push(`$${periodStats.cost.toFixed(3)} cost`);
-              if (cacheOverview.cacheHitRate > 0) parts.push(`${cacheOverview.cacheHitRate}% cache hit`);
+              if (periodStats.cacheHitRate > 0) parts.push(`${periodStats.cacheHitRate}% cache hit`);
               parts.push(`${periodStats.serves} serves`);
               return (
                 <div className="rounded-xl border border-primary/15 bg-primary/3 px-4 py-2.5">
@@ -353,8 +349,9 @@ export default function Admin() {
             <StatCard
               icon={Database}
               title="Cache Hit"
-              value={`${cacheOverview.cacheHitRate}%`}
-              subtitle={cacheOverview.cacheHitRate === 0 ? 'all live — fresh content' : cacheOverview.cacheHitRate < 30 ? 'mostly live generation' : 'good cache usage'}
+              value={`${periodStats.cacheHitRate}%`}
+              subtitle={periodStats.cacheHitRate === 0 ? 'all live — fresh content' : periodStats.cacheHitRate < 30 ? 'mostly live generation' : 'good cache usage'}
+              trend={cacheHitTrend}
             />
             <StatCard
               icon={DollarSign}

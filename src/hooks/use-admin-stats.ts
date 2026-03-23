@@ -106,6 +106,8 @@ export interface SessionRow {
 
 export interface PeriodStats {
   serves: number;
+  cacheHits: number;
+  cacheHitRate: number;
   cost: number;
   failures: number;
   totalAttempts: number;
@@ -164,7 +166,7 @@ export function useAdminStats(): AdminStats {
   const [recentContent, setRecentContent] = useState<RecentContentRow[]>([]);
   const [sessions, setSessions] = useState<SessionRow[]>([]);
   const [period, setPeriod] = useState<TimePeriod>('7d');
-  const [periodStats, setPeriodStats] = useState<PeriodStats>({ serves: 0, cost: 0, failures: 0, totalAttempts: 0, feedbackUp: 0, feedbackDown: 0 });
+  const [periodStats, setPeriodStats] = useState<PeriodStats>({ serves: 0, cacheHits: 0, cacheHitRate: 0, cost: 0, failures: 0, totalAttempts: 0, feedbackUp: 0, feedbackDown: 0 });
   const [prevPeriodStats, setPrevPeriodStats] = useState<PeriodStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -204,16 +206,22 @@ export function useAdminStats(): AdminStats {
     const start = periodStart(p);
     const startDate = start?.slice(0, 10);
 
-    // ── Serves (from daily view, or fall back to all-time) ──
+    // ── Serves + Cache Hit Rate (from daily view, or fall back to all-time) ──
     let totalServes: number;
+    let totalCacheHits: number;
     if (dailyServes.length > 0) {
       const filtered = startDate
         ? dailyServes.filter((r: any) => r.day && r.day >= startDate)
         : dailyServes;
       totalServes = filtered.reduce((s: number, r: any) => s + (r.serve_count ?? 0), 0);
+      totalCacheHits = filtered
+        .filter((r: any) => r.serve_source === 'cache')
+        .reduce((s: number, r: any) => s + (r.serve_count ?? 0), 0);
     } else {
       totalServes = cacheHitsData.reduce((s, r) => s + (r.total_serves ?? 0), 0);
+      totalCacheHits = cacheHitsData.reduce((s, r) => s + (r.cache_hits ?? 0), 0);
     }
+    const cacheHitRate = totalServes > 0 ? Math.round((totalCacheHits / totalServes) * 100) : 0;
 
     // ── Cost (from costs view — always has daily granularity) ──
     const filteredCosts = startDate
@@ -251,7 +259,7 @@ export function useAdminStats(): AdminStats {
       fbDown = feedbackData.reduce((s, r) => s + (r.total_thumbs_down ?? 0), 0);
     }
 
-    setPeriodStats({ serves: totalServes, cost: totalCost, failures: totalFails, totalAttempts, feedbackUp: fbUp, feedbackDown: fbDown });
+    setPeriodStats({ serves: totalServes, cacheHits: totalCacheHits, cacheHitRate, cost: totalCost, failures: totalFails, totalAttempts, feedbackUp: fbUp, feedbackDown: fbDown });
 
     // ── Previous period for trend comparison ──
     const ms = periodToMs(p);
@@ -268,8 +276,14 @@ export function useAdminStats(): AdminStats {
       const prevFails = prevFailFiltered.filter((r: any) => r.status === 'error' || r.status === 'timeout').reduce((s: number, r: any) => s + (r.attempt_count ?? 0), 0);
       const prevTotalAttempts = prevFailFiltered.reduce((s: number, r: any) => s + (r.attempt_count ?? 0), 0);
 
+      const prevCacheHits = dailyServes.length > 0
+        ? dailyServes.filter((r: any) => r.day && r.day >= prevStartDate && r.day < startDate && r.serve_source === 'cache').reduce((s: number, r: any) => s + (r.serve_count ?? 0), 0)
+        : 0;
+
       setPrevPeriodStats({
         serves: prevServes,
+        cacheHits: prevCacheHits,
+        cacheHitRate: prevServes > 0 ? Math.round((prevCacheHits / prevServes) * 100) : 0,
         cost: prevCosts.reduce((s, r) => s + (r.total_cost_usd ?? 0), 0),
         failures: prevFails,
         totalAttempts: prevTotalAttempts,
