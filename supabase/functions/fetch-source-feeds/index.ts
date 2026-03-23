@@ -9,13 +9,114 @@ const corsHeaders = {
 /**
  * Active Source Feeds — fetches latest content from signal_sources URLs.
  *
- * For each source with a URL, uses Perplexity to find and summarize
- * recent content, then stores it in content_library with proper attribution.
+ * Uses Firecrawl to scrape source URLs into clean text, then Gemini to
+ * structure the content into content_library entries.
  *
- * Scheduled via cron (daily or twice daily).
- * This is what makes sources ACTIVELY FEED the system instead of being
- * passive hints to Perplexity searches.
+ * Falls back to Perplexity search if Firecrawl is not configured.
+ *
+ * Scheduled via cron (twice daily).
  */
+
+// ── Firecrawl scraper ──
+
+async function scrapeWithFirecrawl(url: string, apiKey: string, log: (msg: string) => void): Promise<string | null> {
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 20000);
+
+    const res = await fetch("https://api.firecrawl.dev/v2/scrape", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        url,
+        formats: ["markdown"],
+        onlyMainContent: true, // Skip navs, footers, sidebars
+        timeout: 15000,
+      }),
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+
+    if (!res.ok) {
+      const errText = await res.text().catch(() => "");
+      log(`Firecrawl error ${res.status}: ${errText.slice(0, 200)}`);
+      return null;
+    }
+
+    const data = await res.json();
+    if (!data.success || !data.data?.markdown) {
+      log(`Firecrawl returned no content for ${url}`);
+      return null;
+    }
+
+    // Return markdown content, truncated to ~4000 chars for Gemini context
+    const markdown = data.data.markdown;
+    return markdown.slice(0, 4000);
+  } catch (e) {
+    if (e instanceof DOMException && e.name === "AbortError") {
+      log(`Firecrawl timeout for ${url}`);
+    } else {
+      log(`Firecrawl error: ${e}`);
+    }
+    return null;
+  }
+}
+
+// ── Perplexity search fallback ──
+
+async function searchWithPerplexity(
+  sourceName: string,
+  sourceUrl: string,
+  category: string,
+  apiKey: string,
+  log: (msg: string) => void,
+): Promise<{ content: string; citations: string[] } | null> {
+  try {
+    const searchPrompt = category === "signal"
+      ? `Find the most profound or recent philosophical essay or insight from ${sourceName}. Look at ${sourceUrl}. Return ONE specific essay with its title, main argument in 2-3 sentences, and a memorable quote if available.`
+      : `Find a specific research paper or finding from ${sourceName} about behavioral finance, investor psychology, or decision-making. Return ONE specific finding with the researcher name, year, and key result.`;
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+    let hostname = "";
+    try { hostname = new URL(sourceUrl).hostname.replace(/^www\./, ""); } catch { /* ignore */ }
+
+    const res = await fetch("https://api.perplexity.ai/chat/completions", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        model: "sonar",
+        messages: [
+          { role: "system", content: `You find specific content from ${sourceName}. Be precise — return the actual title, author, and key ideas.` },
+          { role: "user", content: searchPrompt },
+        ],
+        ...(hostname ? { search_domain_filter: [hostname] } : {}),
+      }),
+      signal: controller.signal,
+    });
+    clearTimeout(timeout);
+
+    if (!res.ok) {
+      if (res.status === 429) { log(`Perplexity rate limited`); return null; }
+      log(`Perplexity error ${res.status}`);
+      return null;
+    }
+
+    const data = await res.json();
+    return {
+      content: data.choices?.[0]?.message?.content || "",
+      citations: data.citations || [],
+    };
+  } catch (e) {
+    log(`Perplexity error: ${e}`);
+    return null;
+  }
+}
+
+// ── Main handler ──
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -35,12 +136,20 @@ serve(async (req) => {
     }
 
     const supabase = createClient(Deno.env.get("SUPABASE_URL") ?? "", serviceRoleKey, { auth: { persistSession: false } });
+
+    const FIRECRAWL_API_KEY = Deno.env.get("FIRECRAWL_API_KEY");
     const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
-    if (!PERPLEXITY_API_KEY || !LOVABLE_API_KEY) {
-      return new Response(JSON.stringify({ error: "Missing API keys" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    if (!LOVABLE_API_KEY) {
+      return new Response(JSON.stringify({ error: "Missing LOVABLE_API_KEY" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
+    if (!FIRECRAWL_API_KEY && !PERPLEXITY_API_KEY) {
+      return new Response(JSON.stringify({ error: "Need either FIRECRAWL_API_KEY or PERPLEXITY_API_KEY" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    const scrapeMode = FIRECRAWL_API_KEY ? "firecrawl" : "perplexity";
+    log(`scrape mode: ${scrapeMode}`);
 
     // Fetch all active sources with URLs
     const { data: sources } = await supabase
@@ -50,69 +159,59 @@ serve(async (req) => {
 
     if (!sources || sources.length === 0) {
       log("no sources with URLs");
-      return new Response(JSON.stringify({ fetched: 0 }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return new Response(JSON.stringify({ fetched: 0, mode: scrapeMode }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     const results: string[] = [];
     let fetched = 0;
 
-    // Process up to 5 sources per run (to stay within Perplexity rate limits)
+    // Process up to 5 sources per run
     const toProcess = sources.slice(0, 5);
 
     for (const source of toProcess) {
       try {
-        log(`fetching: ${source.name} (${source.url})`);
+        if (!source.url) continue;
+        log(`processing: ${source.name} (${source.url})`);
 
-        // Use Perplexity to find the latest/best content from this source
         const contentType = source.category === "signal" ? "essay" : "paper";
-        const searchPrompt = source.category === "signal"
-          ? `Find the most profound or recent philosophical essay or insight from ${source.name}. Look at ${source.url}. Return ONE specific essay with its title, main argument in 2-3 sentences, and a memorable quote if available.`
-          : `Find a specific research paper or finding from ${source.name} about behavioral finance, investor psychology, or decision-making. Return ONE specific finding with the researcher name, year, and key result.`;
+        let scrapedContent: string | null = null;
+        let citations: string[] = [];
 
-        const controller = new AbortController();
-        const timeout = setTimeout(() => controller.abort(), 15000);
+        // ── Step 1: Scrape content ──
+        if (scrapeMode === "firecrawl") {
+          scrapedContent = await scrapeWithFirecrawl(source.url, FIRECRAWL_API_KEY!, log);
+          if (scrapedContent) {
+            citations = [source.url]; // Firecrawl source is the URL itself
+          }
+        }
 
-        const searchRes = await fetch("https://api.perplexity.ai/chat/completions", {
-          method: "POST",
-          headers: { Authorization: `Bearer ${PERPLEXITY_API_KEY}`, "Content-Type": "application/json" },
-          body: JSON.stringify({
-            model: "sonar",  // Use cheaper model for feed fetching
-            messages: [
-              { role: "system", content: `You find specific content from ${source.name}. Be precise — return the actual title, author, and key ideas.` },
-              { role: "user", content: searchPrompt },
-            ],
-            search_domain_filter: source.url ? [new URL(source.url).hostname.replace(/^www\./, "")] : undefined,
-          }),
-          signal: controller.signal,
-        });
-        clearTimeout(timeout);
+        // Fallback to Perplexity if Firecrawl failed or not configured
+        if (!scrapedContent && PERPLEXITY_API_KEY) {
+          const searchResult = await searchWithPerplexity(source.name, source.url, source.category, PERPLEXITY_API_KEY, log);
+          if (searchResult) {
+            scrapedContent = searchResult.content;
+            citations = searchResult.citations;
+          }
+        }
 
-        if (!searchRes.ok) {
-          if (searchRes.status === 429) { log(`rate limited for ${source.name}`); break; }
-          results.push(`${source.name}: error ${searchRes.status}`);
+        if (!scrapedContent) {
+          results.push(`${source.name}: no content found`);
           continue;
         }
 
-        const searchData = await searchRes.json();
-        const searchContent = searchData.choices?.[0]?.message?.content || "";
-        const citations = searchData.citations || [];
+        // ── Step 2: Structure with Gemini ──
+        const structurePrompt = contentType === "essay"
+          ? `Extract the ONE most compelling essay or insight from this content by ${source.name}. Return JSON with: title, author (must be "${source.name}" or the specific writer found), summary (2-3 sentences distilling the core idea), key_quote (optional, a real quote from the text only — do NOT fabricate), url (use: ${citations[0] || source.url}).`
+          : `Extract ONE specific research finding from this content. Return JSON with: title, author, summary (2-3 sentences), citation (Author (Year), Title format), finding (key result in plain language), url (use: ${citations[0] || source.url}).`;
 
-        if (!searchContent) { results.push(`${source.name}: empty search`); continue; }
-
-        // Structure with Gemini
         const structureRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
           headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
           body: JSON.stringify({
-            model: "google/gemini-2.5-flash-lite", // Cheapest model for structuring
+            model: "google/gemini-2.5-flash-lite",
             messages: [
-              {
-                role: "system",
-                content: contentType === "essay"
-                  ? `Extract ONE essay/insight from the search results. Return JSON with: title, author (must be "${source.name}" or the specific writer), summary (2-3 sentences), key_quote (optional, real quote only), url (from citations).`
-                  : `Extract ONE research finding. Return JSON with: title, author, summary (2-3 sentences), citation (Author (Year), Title format), finding (key result), url (from citations).`,
-              },
-              { role: "user", content: `Source: ${source.name}\n\nSearch results:\n${searchContent}\n\nCitations:\n${citations.map((c: string, i: number) => `[${i + 1}] ${c}`).join("\n")}` },
+              { role: "system", content: structurePrompt },
+              { role: "user", content: `Source: ${source.name}\nURL: ${source.url}\n\nContent:\n${scrapedContent.slice(0, 3000)}` },
             ],
             response_format: { type: "json_object" },
             temperature: 0.3,
@@ -128,10 +227,11 @@ serve(async (req) => {
         const raw = structureData.choices?.[0]?.message?.content;
         if (!raw) { results.push(`${source.name}: empty structure`); continue; }
 
-        const entry = JSON.parse(raw);
+        let entry: any;
+        try { entry = JSON.parse(raw); } catch { results.push(`${source.name}: JSON parse error`); continue; }
         if (!entry.title || !entry.summary) { results.push(`${source.name}: invalid structure`); continue; }
 
-        // Check for duplicates in content_library
+        // ── Step 3: Dedup check ──
         const { data: existing } = await supabase
           .from("content_library")
           .select("id")
@@ -143,13 +243,13 @@ serve(async (req) => {
           continue;
         }
 
-        // Insert into content_library
+        // ── Step 4: Insert into content_library ──
         const insertData: any = {
           type: contentType,
           title: entry.title,
           author: entry.author || source.name,
           summary: entry.summary,
-          url: entry.url || (citations.length > 0 ? citations[0] : source.url),
+          url: entry.url || citations[0] || source.url,
           tags: [source.category, source.name.toLowerCase().replace(/\s+/g, '-')],
           companion_types: [source.category === "signal" ? "signal" : "ground_nudge"],
           language: "en",
@@ -164,18 +264,18 @@ serve(async (req) => {
         }
 
         await supabase.from("content_library").insert(insertData);
-        results.push(`${source.name}: added "${entry.title}"`);
+        results.push(`${source.name}: added "${entry.title}" (via ${scrapeMode})`);
         fetched++;
 
-        // Rate limit respect: wait between sources
-        await new Promise(r => setTimeout(r, 3000));
+        // Rate limit respect
+        await new Promise(r => setTimeout(r, 2000));
       } catch (e) {
         results.push(`${source.name}: ${e}`);
       }
     }
 
-    log(`done: fetched ${fetched} from ${toProcess.length} sources`);
-    return new Response(JSON.stringify({ fetched, results }), {
+    log(`done: fetched ${fetched} from ${toProcess.length} sources via ${scrapeMode}`);
+    return new Response(JSON.stringify({ fetched, mode: scrapeMode, results }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
