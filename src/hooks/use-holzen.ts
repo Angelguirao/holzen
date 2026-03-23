@@ -119,22 +119,24 @@ export function useHolzen() {
 
       if (insertedReflection) {
         setLastReflectionId(insertedReflection.id);
-        await supabase.from('library_items').insert({
-          user_id: user.id,
-          type: 'bookmark',
-          title: 'Reflection',
-          body: silentMsg,
-          source_type: 'reflection',
-          reflection_id: insertedReflection.id,
-          tags: ['reflection'],
-        });
+        // Run library bookmark and profile update in parallel — neither depends on the other
+        await Promise.all([
+          supabase.from('library_items').insert({
+            user_id: user.id,
+            type: 'bookmark',
+            title: 'Reflection',
+            body: silentMsg,
+            source_type: 'reflection',
+            reflection_id: insertedReflection.id,
+            tags: ['reflection'],
+          }),
+          supabase.from('profiles').update({
+            last_message: silentMsg,
+            last_context: ctx,
+            last_trigger_at: new Date().toISOString(),
+          }).eq('user_id', user.id),
+        ]);
       }
-
-      await supabase.from('profiles').update({
-        last_message: silentMsg,
-        last_context: ctx,
-        last_trigger_at: new Date().toISOString(),
-      }).eq('user_id', user.id);
 
       setLastTriggerAt(new Date().toISOString());
       return;
@@ -256,14 +258,16 @@ export function useHolzen() {
               tags: [],
             });
           }
-          const { error: libErr } = await supabase.from('library_items').insert(libraryInserts);
+          // Run library bookmarks and profile update in parallel — neither depends on the other
+          const [{ error: libErr }] = await Promise.all([
+            supabase.from('library_items').insert(libraryInserts),
+            supabase.from('profiles').update({
+              last_message: msg,
+              last_context: ctx,
+            }).eq('user_id', user.id),
+          ]);
           if (libErr) console.error('[library] reflection+haiku insert failed:', libErr.message);
         }
-
-        await supabase.from('profiles').update({
-          last_message: msg,
-          last_context: ctx,
-        }).eq('user_id', user.id);
       }
     } catch (e: any) {
       const raw = e?.message || '';
