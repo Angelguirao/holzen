@@ -246,12 +246,10 @@ export default function Admin() {
     return [{ value: 'all', label: 'All' }, ...types.map(t => ({ value: t, label: label(t) }))];
   }, [rejections]);
 
-  const rejectionStatusOptions = [
-    { value: 'all', label: 'All' },
-    { value: 'error', label: 'error' },
-    { value: 'timeout', label: 'timeout' },
-    { value: 'quality_gate_failed', label: 'quality_gate_failed' },
-  ];
+  const rejectionStatusOptions = useMemo(() => {
+    const statuses = Array.from(new Set(rejections.map(r => r.status))).sort();
+    return [{ value: 'all', label: 'All' }, ...statuses.map(s => ({ value: s, label: s }))];
+  }, [rejections]);
 
   const filteredRejections = useMemo(() => {
     return rejections.filter(r => {
@@ -716,7 +714,7 @@ export default function Admin() {
         {/* Tab 6: Rejections */}
         <TabsContent value="rejections" className="space-y-3 mt-0">
           <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">
-            Quality Gate Failures <span className="text-muted-foreground/45">({rejections.length})</span>
+            Generation Failures <span className="text-muted-foreground/45">({rejections.length})</span>
           </p>
           <FilterRow label="Type" options={rejectionTypeOptions} value={rejectionTypeFilter} onChange={setRejectionTypeFilter} />
           <FilterRow label="Status" options={rejectionStatusOptions} value={rejectionStatusFilter} onChange={setRejectionStatusFilter} />

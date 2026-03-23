@@ -300,7 +300,7 @@ export function useAdminStats(): AdminStats {
     const { data: rejectData } = await supabase
       .from('generation_attempts')
       .select('id, companion_type, model, quality_gate_reason, error_message, status, created_at, latency_ms')
-      .in('status', ['quality_gate_failed', 'error', 'timeout'])
+      .in('status', ['quality_gate_failed', 'error', 'timeout', 'rate_limited'])
       .order('created_at', { ascending: false })
       .limit(50);
     setRejections((rejectData ?? []) as RejectionRow[]);
