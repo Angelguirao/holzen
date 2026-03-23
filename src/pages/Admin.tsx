@@ -159,7 +159,7 @@ export default function Admin() {
     period, setPeriod, periodStats, prevPeriodStats,
     rejections, recentContent, sessions, libraryEntries,
     loading, error, refresh, refreshCacheEntries, lastUpdated,
-  } = useAdminStats();
+  } = useAdminStats(!adminLoading && isAdmin);
 
   // ── ALL HOOKS MUST BE ABOVE EARLY RETURNS ──
 

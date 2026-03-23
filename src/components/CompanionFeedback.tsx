@@ -38,19 +38,13 @@ export function CompanionFeedback({ reflectionId, companionType, cacheId, compac
           .select('metadata')
           .eq('user_id', user.id)
           .eq('event', 'companion_feedback')
-          .limit(20);
+          .filter('metadata->>reflection_id', 'eq', reflectionId)
+          .filter('metadata->>companion_type', 'eq', companionType)
+          .limit(1);
 
-        if (cancelled || !data) return;
+        if (cancelled || !data || data.length === 0) return;
 
-        // Find an existing vote for this reflection+companion
-        const existing = data.find((row: any) => {
-          const meta = row.metadata as any;
-          return meta?.reflection_id === reflectionId && meta?.companion_type === companionType;
-        });
-
-        if (existing) {
-          setVote((existing.metadata as any)?.vote ?? null);
-        }
+        setVote((data[0].metadata as any)?.vote ?? null);
       } catch {
         // Non-critical
       }

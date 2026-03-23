@@ -170,7 +170,7 @@ function periodStart(period: TimePeriod): string | null {
   return new Date(Date.now() - ms).toISOString();
 }
 
-export function useAdminStats(): AdminStats {
+export function useAdminStats(enabled = true): AdminStats {
   const [cacheHits, setCacheHits] = useState<CacheHitRow[]>([]);
   const [costs, setCosts] = useState<CostRow[]>([]);
   const [failures, setFailures] = useState<FailureRow[]>([]);
@@ -416,7 +416,7 @@ export function useAdminStats(): AdminStats {
     }
   }, [fetchCacheEntries, computePeriodStats, fetchFeeds, period]);
 
-  useEffect(() => { fetchAll(); }, [fetchAll]);
+  useEffect(() => { if (enabled) fetchAll(); }, [fetchAll, enabled]);
 
   // Recompute period stats when period changes (no network call needed — uses cached view data)
   const handleSetPeriod = useCallback((p: TimePeriod) => {

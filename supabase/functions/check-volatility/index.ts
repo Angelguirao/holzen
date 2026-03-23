@@ -443,42 +443,30 @@ serve(async (req) => {
         const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
         const svcKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
         const anonKey = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
+        const reflectionId = insertedReflection.id;
 
-        try {
-          const orchestrateController = new AbortController();
-          const orchestrateTimeout = setTimeout(() => orchestrateController.abort(), 25000);
-
-          const orchestrateRes = await fetch(`${supabaseUrl}/functions/v1/companion-orchestrate`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${svcKey}`,
-              "apikey": anonKey,
-            },
-            body: JSON.stringify({
-              reflectionId: insertedReflection.id,
-              context: ctx,
-              language: userLang,
-              reflectionMessage: result.message,
-              enableSignal: true,
-              enableGrounding: true,
-              enableHistory: true,
-              enableZoomOut: true,
-            }),
-            signal: orchestrateController.signal,
-          });
-          clearTimeout(orchestrateTimeout);
-
-          if (!orchestrateRes.ok) {
-            const errText = await orchestrateRes.text().catch(() => "");
-            console.error(`[CHECK-VOLATILITY] Orchestrator failed (${orchestrateRes.status}): ${errText}`);
-          } else {
-            console.log(`[CHECK-VOLATILITY] Orchestrator completed for reflection ${insertedReflection.id}`);
-          }
-        } catch (e) {
-          const isTimeout = e instanceof DOMException && e.name === "AbortError";
-          console.error(`[CHECK-VOLATILITY] Orchestrator ${isTimeout ? "timed out" : "failed"}:`, e);
-        }
+        // Fire-and-forget: don't await so we don't block per-user notification delivery
+        fetch(`${supabaseUrl}/functions/v1/companion-orchestrate`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${svcKey}`,
+            "apikey": anonKey,
+          },
+          body: JSON.stringify({
+            reflectionId,
+            context: ctx,
+            language: userLang,
+            reflectionMessage: result.message,
+            enableSignal: true,
+            enableGrounding: true,
+            enableHistory: true,
+            enableZoomOut: true,
+          }),
+        }).then((res) => {
+          if (!res.ok) res.text().then((t) => console.error(`[CHECK-VOLATILITY] Orchestrator failed (${res.status}): ${t}`));
+          else console.log(`[CHECK-VOLATILITY] Orchestrator dispatched for reflection ${reflectionId}`);
+        }).catch((e) => console.error(`[CHECK-VOLATILITY] Orchestrator dispatch error:`, e));
       }
 
       // Send email notification if enabled
