@@ -167,10 +167,12 @@ export async function generateHistory(params: GenerateHistoryParams): Promise<Hi
     log(`content length: ${searchContent.length}, citations: ${citations.length}`);
   } catch (e) {
     log(`perplexity failed: ${e}`);
+    logAttempt({ companion_type: "historical_insight", provider: "perplexity", model: "sonar-pro", status: String(e).includes("RATE_LIMITED") ? "rate_limited" : "error", latency_ms: 0, error_message: String(e) });
     return serveFallback(svcClient, userId, marketDirection);
   }
 
   if (!searchContent) {
+    logAttempt({ companion_type: "historical_insight", provider: "perplexity", model: "sonar-pro", status: "error", latency_ms: 0, error_message: "empty_search_content" });
     return serveFallback(svcClient, userId, marketDirection);
   }
 
