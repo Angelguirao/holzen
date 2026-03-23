@@ -12,6 +12,7 @@ import { qualityGate, containsSlop, isUrlReachable, contentFingerprint } from ".
 import { GROUNDING_FALLBACKS, pickRandom } from "../fallbacks.ts";
 import { parseMarketDirection, serveFromCache } from "../cache.ts";
 import { createAttemptLogger } from "../observe.ts";
+import { searchLibrary, paperToGrounding } from "../content-library.ts";
 
 // ── Public types ──
 
@@ -45,6 +46,18 @@ const BIAS_TOPICS: { topic: string; direction: "down" | "up" | "both" }[] = [
   { topic: "regret aversion and its effect on long-term investment holding", direction: "both" },
   { topic: "social proof and information cascading in Bitcoin markets", direction: "down" },
 ];
+
+function groundingPreferTags(preferredBias: string | undefined, biasTopic: string): string[] {
+  const words = new Set<string>();
+  for (const text of [preferredBias, biasTopic]) {
+    if (!text) continue;
+    for (const w of text.split(/\s+/)) {
+      const t = w.replace(/[^a-zA-Z]/g, "");
+      if (t.length > 4) words.add(t.toLowerCase());
+    }
+  }
+  return [...words];
+}
 
 function findMatchingBiasTopic(preferredBias: string | undefined): (typeof BIAS_TOPICS)[number] | null {
   const pref = preferredBias?.trim().toLowerCase();
@@ -139,6 +152,83 @@ export async function generateGrounding(params: GenerateGroundingParams): Promis
     : pool[Math.floor(Math.random() * pool.length)].topic;
 
   const marketContext = context || "Bitcoin market volatility";
+
+  // ── Try local content library first ──
+  const libraryResults = await searchLibrary(svcClient, {
+    type: "paper",
+    companionType: "ground_nudge",
+    preferTags: groundingPreferTags(preferredBias, randomBias),
+    excludeTitles: recentTopics,
+    limit: 3,
+  });
+
+  if (libraryResults.length > 0) {
+    const pick = libraryResults[0];
+    const result = paperToGrounding(pick);
+    log(`served from content library: "${pick.title}"`);
+    const citations = pick.url ? [pick.url] : [];
+    let qualityScore = 1;
+    const cacheQg = qualityGate("ground_nudge", result);
+    if (result.title && result.body && result.citation && qualityScore > 0 && cacheQg.pass) {
+      try {
+        const { data: existing } = await svcClient.from("companion_cache").select("content").eq("companion_type", "ground_nudge").eq("language", "en").limit(30);
+        const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
+        const newNorm = norm(result.title);
+        const isDup = existing?.some((e: any) => {
+          const t = norm(e.content?.title || "");
+          return t === newNorm || t.includes(newNorm) || newNorm.includes(t);
+        });
+        if (!isDup) {
+          let sourceHost = "";
+          try { sourceHost = result.url ? new URL(result.url.startsWith("http") ? result.url : `https://${result.url}`).hostname.replace(/^www\./, "") : ""; } catch { /* ignore */ }
+          const fingerprint = await contentFingerprint(newNorm);
+          const { error: cacheErr } = await svcClient.from("companion_cache").insert({
+            companion_type: "ground_nudge",
+            language: "en",
+            content: result,
+            quality_score: qualityScore,
+            title: result.title,
+            title_norm: newNorm,
+            fingerprint,
+            source_kind: "academic_paper",
+            source_title: result.citation || null,
+            source_author: result.citation?.split("(")[0]?.trim() || null,
+            source_url: result.url || null,
+            source_host: sourceHost || null,
+            citations: citations.length > 0 ? JSON.stringify(citations) : null,
+            market_regime: parseMarketDirection(context),
+            expires_at: new Date(Date.now() + 14 * 86400000).toISOString(),
+            last_validated_at: qualityScore >= 2 ? new Date().toISOString() : null,
+            automated_score: qualityScore,
+          });
+          if (cacheErr) log(`cache insert error: ${cacheErr.message}`);
+        } else {
+          log("cache dedup: skipped duplicate title");
+        }
+      } catch (e) {
+        log(`cache write failed: ${e}`);
+      }
+    }
+    if (result.url && result.url.startsWith("http")) {
+      isUrlReachable(result.url).then(async (reachable) => {
+        if (reachable) {
+          try {
+            const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
+            await svcClient.from("companion_cache")
+              .update({ quality_score: 2, last_validated_at: new Date().toISOString() })
+              .eq("companion_type", "ground_nudge")
+              .eq("title_norm", norm(result.title));
+          } catch { /* non-critical */ }
+        } else {
+          log("background URL validation failed", { url: result.url });
+        }
+      }).catch(() => {});
+    }
+    return { data: result, source: "live", cacheId: null };
+  }
+
+  // ── No local match — fall through to Perplexity ──
+
   const searchQuery = `Find a specific academic study or research paper about ${randomBias}. The research should be relevant to: ${marketContext}. Include the researcher names, university, year of publication, sample size or key methodology detail, and the main finding. Prefer peer-reviewed journals.`;
 
   // ── Step 1: Perplexity academic search ──
