@@ -48,7 +48,6 @@ export function verifyServiceAuth(req: Request): boolean {
 
   if (token === serviceRoleKey) return true;
   if (cronSecret.length > 0 && token === cronSecret) return true;
-  if (req.headers.get("x-supabase-cron") === "true") return true;
 
   return false;
 }
