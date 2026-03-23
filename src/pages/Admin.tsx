@@ -127,8 +127,8 @@ function computeTrend(
   invertColor: boolean,
 ): TrendInfo | undefined {
   if (previous === null || previous === undefined) return undefined;
-  if (previous === 0 && current === 0) return { direction: 'flat', label: '0%' };
-  if (previous === 0) return { direction: invertColor ? 'down' : 'up', label: 'new' };
+  if (previous === 0 && current === 0) return undefined; // No data in either period
+  if (previous === 0) return undefined; // No previous data to compare against
   const pctChange = Math.round(((current - previous) / previous) * 100);
   if (pctChange === 0) return { direction: 'flat', label: '0%' };
   const raw: 'up' | 'down' = pctChange > 0 ? 'up' : 'down';
@@ -269,10 +269,15 @@ export default function Admin() {
               tips.push('Some generation failures — check Generation Health for details');
             }
 
-            if (periodStats.cost > 8) {
-              issues.push('Approaching daily budget cap ($10) — generation will be blocked when exceeded');
-            } else if (periodStats.cost > 5) {
-              tips.push(`Moderate spend ($${periodStats.cost.toFixed(2)}) — on track for budget cap`);
+            // Cost thresholds scale with period
+            const costWarn = period === 'today' ? 8 : period === '7d' ? 50 : period === '30d' ? 200 : 999;
+            const costTip = period === 'today' ? 5 : period === '7d' ? 30 : period === '30d' ? 100 : 999;
+            if (periodStats.cost > costWarn) {
+              issues.push(period === 'today'
+                ? 'Approaching daily budget cap ($10) — generation will be blocked when exceeded'
+                : `High spend for ${periodLabel}: $${periodStats.cost.toFixed(2)}`);
+            } else if (periodStats.cost > costTip) {
+              tips.push(`Moderate spend ($${periodStats.cost.toFixed(2)}) for ${periodLabel}`);
             }
 
             if (periodStats.cacheHitRate < 10 && periodStats.cost > 3) {
@@ -396,9 +401,9 @@ export default function Admin() {
             </div>
           )}
 
-          {/* Cache Hit Rates */}
+          {/* Cache Hit Rates (detail breakdown is always all-time from views) */}
           <div className="space-y-2">
-            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">Cache Hit Rates</p>
+            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">Cache Hit Rates <span className="text-muted-foreground/20 normal-case">(all time)</span></p>
             <div className="space-y-1.5">
               {cacheHits.map((row, i) => {
                 const pct = row.cache_hit_pct ?? 0;
@@ -434,9 +439,9 @@ export default function Admin() {
             </div>
           </div>
 
-          {/* Generation Health */}
+          {/* Generation Health (detail breakdown is always all-time from views) */}
           <div className="space-y-2">
-            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">Generation Health</p>
+            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">Generation Health <span className="text-muted-foreground/20 normal-case">(all time)</span></p>
             <div className="space-y-1.5">
               {failures.map((row, i) => {
                 const failPct = row.failure_pct ?? 0;
@@ -475,9 +480,9 @@ export default function Admin() {
             </div>
           </div>
 
-          {/* Feedback */}
+          {/* Feedback (detail breakdown is always all-time from views) */}
           <div className="space-y-2">
-            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">User Feedback</p>
+            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">User Feedback <span className="text-muted-foreground/20 normal-case">(all time)</span></p>
             <div className="space-y-1.5">
               {feedback.map((row, i) => (
                 <div key={i} className="rounded-lg border border-border/10 bg-card/5 px-3 py-2 flex items-center justify-between">
