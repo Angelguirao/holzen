@@ -1,0 +1,180 @@
+import { useState, useMemo, useCallback } from 'react';
+import { ChevronDown, ChevronRight, ArrowUp, ArrowDown, Trash2, Loader2 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import type { CacheEntryRow } from '@/hooks/use-admin-stats';
+import { TYPE_COLORS, label } from './admin-constants';
+import { FilterRow } from './FilterRow';
+import { QualityBadge } from './QualityBadge';
+
+const QUALITY_OPTIONS = [
+  { value: 'all', label: 'All' },
+  { value: 'curated', label: 'Curated' },
+  { value: 'good', label: 'Good' },
+  { value: 'low', label: 'Low' },
+];
+
+const STATUS_OPTIONS = [
+  { value: 'all', label: 'All' },
+  { value: 'permanent', label: 'Permanent' },
+  { value: 'expiring', label: 'Expiring' },
+];
+
+export function CuratedContentManager({ entries, onRefresh }: { entries: CacheEntryRow[]; onRefresh: () => Promise<void> }) {
+  const { toast } = useToast();
+  const [open, setOpen] = useState(false);
+  const [acting, setActing] = useState<string | null>(null);
+  const [qualityFilter, setQualityFilter] = useState('all');
+  const [statusFilter, setStatusFilter] = useState('all');
+
+  const filteredEntries = useMemo(() => entries.filter(e => {
+    if (qualityFilter === 'curated' && e.quality_score < 3) return false;
+    if (qualityFilter === 'good' && e.quality_score !== 2) return false;
+    if (qualityFilter === 'low' && e.quality_score >= 2) return false;
+    if (statusFilter === 'permanent' && e.expires_at !== null) return false;
+    if (statusFilter === 'expiring' && e.expires_at === null) return false;
+    return true;
+  }), [entries, qualityFilter, statusFilter]);
+
+  const grouped = useMemo(() => {
+    const map = new Map<string, CacheEntryRow[]>();
+    for (const e of filteredEntries) {
+      if (!map.has(e.companion_type)) map.set(e.companion_type, []);
+      map.get(e.companion_type)!.push(e);
+    }
+    return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b));
+  }, [filteredEntries]);
+
+  const promote = useCallback(async (id: string) => {
+    setActing(id);
+    const { error } = await supabase.from('companion_cache').update({ quality_score: 3, expires_at: null } as any).eq('id', id);
+    if (error) { toast({ title: 'Promote failed', description: error.message, variant: 'destructive' }); setActing(null); return; }
+    await onRefresh();
+    setActing(null);
+  }, [onRefresh, toast]);
+
+  const demote = useCallback(async (id: string) => {
+    setActing(id);
+    const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+    const { error } = await supabase.from('companion_cache').update({ quality_score: 1, expires_at: expires } as any).eq('id', id);
+    if (error) { toast({ title: 'Demote failed', description: error.message, variant: 'destructive' }); setActing(null); return; }
+    await onRefresh();
+    setActing(null);
+  }, [onRefresh, toast]);
+
+  const remove = useCallback(async (id: string) => {
+    if (!window.confirm('Delete this cache entry? This cannot be undone.')) return;
+    setActing(id);
+    const { error } = await supabase.from('companion_cache').delete().eq('id', id);
+    if (error) { toast({ title: 'Delete failed', description: error.message, variant: 'destructive' }); setActing(null); return; }
+    await onRefresh();
+    setActing(null);
+  }, [onRefresh, toast]);
+
+  return (
+    <div className="space-y-3">
+      <div className="rounded-xl border border-border/20 bg-card/10 px-4 py-3 space-y-2">
+        <p className="text-[10px] font-mono text-foreground/70">
+          Content that AI generates gets cached here. You can manage its lifecycle:
+        </p>
+        <div className="space-y-1">
+          <p className="text-[9px] text-muted-foreground/60">
+            <span className="text-emerald-600 dark:text-emerald-400 font-mono">↑ Promote</span> — Makes content permanent (never expires). Best content gets served as fallback when AI is down.
+          </p>
+          <p className="text-[9px] text-muted-foreground/60">
+            <span className="text-orange-600 dark:text-orange-400 font-mono">↓ Demote</span> — Lowers quality score and sets 7-day expiry. For content that isn't good enough.
+          </p>
+          <p className="text-[9px] text-muted-foreground/60">
+            <span className="text-destructive font-mono">🗑 Delete</span> — Permanently removes from cache.
+          </p>
+        </div>
+        <p className="text-[9px] text-muted-foreground/50">
+          Quality badges: <span className="text-emerald-600 dark:text-emerald-400">curated</span> = permanent, <span className="text-blue-600 dark:text-blue-400">good</span> = verified URL, <span className="text-orange-600 dark:text-orange-400">low</span> = unverified
+        </p>
+      </div>
+
+      <button onClick={() => setOpen(!open)} className="flex items-center gap-1.5 w-full text-left">
+        {open ? <ChevronDown className="h-3 w-3 text-muted-foreground/60" /> : <ChevronRight className="h-3 w-3 text-muted-foreground/60" />}
+        <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">
+          Cache Entries <span className="text-muted-foreground/45">({entries.length})</span>
+        </p>
+      </button>
+
+      {open && (
+        <div className="space-y-3">
+          <FilterRow label="Quality" options={QUALITY_OPTIONS} value={qualityFilter} onChange={setQualityFilter} />
+          <FilterRow label="Status" options={STATUS_OPTIONS} value={statusFilter} onChange={setStatusFilter} />
+          {(qualityFilter !== 'all' || statusFilter !== 'all') && (
+            <p className="text-[9px] font-mono text-muted-foreground/40">Showing {filteredEntries.length} of {entries.length}</p>
+          )}
+          {grouped.map(([type, items]) => (
+            <div key={type} className="space-y-1.5">
+              <div className="flex items-center gap-2">
+                <span className="h-2 w-2 rounded-full" style={{ backgroundColor: TYPE_COLORS[type] ?? 'hsl(var(--primary) / 0.4)' }} />
+                <span className="text-[10px] font-mono text-foreground/80">{label(type)}</span>
+                <span className="text-[9px] text-muted-foreground/50">{items.length} entries</span>
+              </div>
+              {items.map(entry => {
+                const isPermanent = entry.expires_at === null;
+                const isCurated = entry.quality_score >= 3;
+                const isActing = acting === entry.id;
+                return (
+                  <div key={entry.id} className="rounded-lg border border-border/20 bg-card/10 px-3 py-2 space-y-1.5">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[10px] font-mono text-foreground/70 truncate">{entry.title || '(untitled)'}</p>
+                        <div className="flex flex-wrap items-center gap-2 mt-0.5">
+                          <QualityBadge score={entry.quality_score} />
+                          {isPermanent && <span className="text-[9px] font-mono text-muted-foreground/40">♾ permanent</span>}
+                          {!isPermanent && entry.expires_at && (
+                            <span className="text-[9px] font-mono text-muted-foreground/30">
+                              expires {new Date(entry.expires_at).toLocaleDateString()}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <span className="text-[9px] text-muted-foreground/50">used: {entry.used_count}</span>
+                      {(entry.thumbs_up != null || entry.thumbs_down != null) && (
+                        <>
+                          <span className="text-[9px] text-muted-foreground/50">👍 {entry.thumbs_up ?? 0}</span>
+                          <span className="text-[9px] text-muted-foreground/50">👎 {entry.thumbs_down ?? 0}</span>
+                        </>
+                      )}
+                      <span className="text-[9px] text-muted-foreground/45">{new Date(entry.created_at).toLocaleDateString()}</span>
+                    </div>
+                    <div className="flex items-center gap-1.5 pt-0.5">
+                      {!isCurated && (
+                        <button onClick={() => promote(entry.id)} disabled={isActing}
+                          className="flex items-center gap-0.5 text-[9px] font-mono text-emerald-600/70 dark:text-emerald-400/70 hover:text-emerald-600 dark:hover:text-emerald-400 disabled:opacity-30 transition-colors">
+                          <ArrowUp className="h-2.5 w-2.5" /> Promote
+                        </button>
+                      )}
+                      {(isCurated || entry.quality_score >= 2) && (
+                        <button onClick={() => demote(entry.id)} disabled={isActing}
+                          className="flex items-center gap-0.5 text-[9px] font-mono text-orange-600/70 dark:text-orange-400/70 hover:text-orange-600 dark:hover:text-orange-400 disabled:opacity-30 transition-colors">
+                          <ArrowDown className="h-2.5 w-2.5" /> Demote
+                        </button>
+                      )}
+                      <button onClick={() => remove(entry.id)} disabled={isActing}
+                        className="flex items-center gap-0.5 text-[9px] font-mono text-destructive/50 hover:text-destructive/80 disabled:opacity-30 transition-colors">
+                        <Trash2 className="h-2.5 w-2.5" /> Delete
+                      </button>
+                      {isActing && <Loader2 className="h-2.5 w-2.5 animate-spin text-muted-foreground/30 ml-1" />}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ))}
+          {filteredEntries.length === 0 && (
+            <p className="text-[10px] text-muted-foreground/50 text-center py-3">
+              {entries.length === 0 ? 'No cache entries' : 'No entries match filters'}
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}

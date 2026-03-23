@@ -1,15 +1,23 @@
-import { useAdminStats, CacheEntryRow, SignalSourceRow, TimePeriod, PeriodStats, RejectionRow, RecentContentRow, SessionRow, LibraryEntryRow } from '@/hooks/use-admin-stats';
+import { useAdminStats, TimePeriod, PeriodStats } from '@/hooks/use-admin-stats';
 import { useAuth } from '@/hooks/use-auth';
-import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { RefreshCw, Activity, Database, DollarSign, AlertTriangle, ThumbsUp, Clock, Loader2, Zap, ShieldX, ChevronDown, ChevronRight, Trash2, ArrowUp, ArrowDown, Globe, BookOpen } from 'lucide-react';
+import { RefreshCw, Activity, Database, DollarSign, AlertTriangle, ThumbsUp, Clock, Loader2, ShieldX } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { useMemo, useState, useEffect, useCallback } from 'react';
+import { useMemo, useState, useEffect } from 'react';
+import { label, PERIOD_OPTIONS, TAB_TRIGGER_CLASS, TYPE_COLORS } from '@/components/admin/admin-constants';
+import { StatCard, TrendInfo } from '@/components/admin/StatCard';
+import { FilterRow } from '@/components/admin/FilterRow';
+import { FeedCard } from '@/components/admin/FeedCard';
+import { RejectionEntry } from '@/components/admin/RejectionEntry';
+import { CuratedContentManager } from '@/components/admin/CuratedContentManager';
+import { SourceCatalogViewer } from '@/components/admin/SourceCatalogViewer';
+import { ContentLibraryViewer } from '@/components/admin/ContentLibraryViewer';
+import { DevModeToggle } from '@/components/admin/DevModeToggle';
 
 /**
  * Admin access control.
- * 
+ *
  * Checks profiles.is_admin (server-side, used by RLS policies).
  * Falls back to VITE_ADMIN_USER_IDS env var if the DB column
  * doesn't exist yet (before migration).
@@ -22,7 +30,6 @@ function useIsAdmin(): { isAdmin: boolean; loading: boolean } {
   useEffect(() => {
     if (!user) { setChecked(true); return; }
 
-    // Check DB first (authoritative after migration)
     supabase
       .from('profiles')
       .select('is_admin')
@@ -30,13 +37,11 @@ function useIsAdmin(): { isAdmin: boolean; loading: boolean } {
       .single()
       .then(({ data, error }) => {
         if (!error && data && typeof (data as any).is_admin === 'boolean') {
-          // DB column exists — use it as source of truth
           setIsAdmin((data as any).is_admin);
         } else {
-          // Column doesn't exist yet — fall back to env var
           const adminIds = import.meta.env.VITE_ADMIN_USER_IDS;
           if (!adminIds) {
-            setIsAdmin(false); // Deny by default when unconfigured
+            setIsAdmin(false);
           } else {
             setIsAdmin(adminIds.split(',').map((id: string) => id.trim()).includes(user.id));
           }
@@ -48,28 +53,15 @@ function useIsAdmin(): { isAdmin: boolean; loading: boolean } {
   return { isAdmin, loading: authLoading || !checked };
 }
 
-const TYPE_LABELS: Record<string, string> = {
-  signal: 'Signal',
-  ground_nudge: 'Grounding',
-  historical_insight: 'History',
-  zoom_out: 'Zoom Out',
-  zoom_out_deep_time: 'Zoom Out',
-  reflection: 'Reflection',
-  learning: 'Grounding',
-  history_insight: 'History',
-  haiku: 'Haiku',
-};
-
-const TYPE_COLORS: Record<string, string> = {
-  signal: '#8b5cf6',
-  ground_nudge: '#06b6d4',
-  historical_insight: '#f59e0b',
-  zoom_out: '#10b981',
-  reflection: '#6366f1',
-};
-
-function label(type: string | null): string {
-  return TYPE_LABELS[type ?? ''] ?? type ?? 'Unknown';
+function computeTrend(current: number, previous: number | null, invertColor: boolean): TrendInfo | undefined {
+  if (previous === null || previous === undefined) return undefined;
+  if (previous === 0 && current === 0) return undefined;
+  if (previous === 0) return undefined;
+  const pctChange = Math.round(((current - previous) / previous) * 100);
+  if (pctChange === 0) return { direction: 'flat', label: '0%' };
+  const raw: 'up' | 'down' = pctChange > 0 ? 'up' : 'down';
+  const displayed = invertColor ? (raw === 'up' ? 'down' : 'up') : raw;
+  return { direction: displayed, label: `${Math.abs(pctChange)}%` };
 }
 
 const inferTheme = (context: string | null, mood: string | null): string | null => {
@@ -85,73 +77,6 @@ const inferTheme = (context: string | null, mood: string | null): string | null 
   return null;
 };
 
-interface TrendInfo {
-  direction: 'up' | 'down' | 'flat';
-  label: string;
-}
-
-function StatCard({ icon: Icon, title, value, subtitle, alert, trend }: {
-  icon: typeof Activity;
-  title: string;
-  value: string;
-  subtitle?: string;
-  alert?: boolean;
-  trend?: TrendInfo;
-}) {
-  const trendColor = trend
-    ? trend.direction === 'flat'
-      ? 'text-muted-foreground/40'
-      : trend.direction === 'up'
-        ? 'text-emerald-500'
-        : 'text-red-500'
-    : '';
-  const trendArrow = trend
-    ? trend.direction === 'up' ? '↑' : trend.direction === 'down' ? '↓' : '—'
-    : '';
-
-  return (
-    <div className={`rounded-xl border px-4 py-3 space-y-1 ${alert ? 'border-destructive/40 bg-destructive/10' : 'border-border/30 bg-card/20'}`}>
-      <div className="flex items-center gap-2">
-        <Icon className={`h-3.5 w-3.5 ${alert ? 'text-destructive' : 'text-muted-foreground/60'}`} />
-        <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/70">{title}</span>
-      </div>
-      <div className="flex items-baseline gap-1.5">
-        <p className={`text-lg font-mono ${alert ? 'text-destructive' : 'text-foreground'}`}>{value}</p>
-        {trend && (
-          <span className={`text-[9px] font-mono ${trendColor}`}>
-            {trendArrow} {trend.label}
-          </span>
-        )}
-      </div>
-      {subtitle && <p className="text-[10px] text-muted-foreground/60">{subtitle}</p>}
-    </div>
-  );
-}
-
-const PERIOD_OPTIONS: { value: TimePeriod; label: string }[] = [
-  { value: 'today', label: 'Today' },
-  { value: '7d', label: '7 days' },
-  { value: '30d', label: '30 days' },
-  { value: 'all', label: 'All time' },
-];
-
-function computeTrend(
-  current: number,
-  previous: number | null,
-  invertColor: boolean,
-): TrendInfo | undefined {
-  if (previous === null || previous === undefined) return undefined;
-  if (previous === 0 && current === 0) return undefined; // No data in either period
-  if (previous === 0) return undefined; // No previous data to compare against
-  const pctChange = Math.round(((current - previous) / previous) * 100);
-  if (pctChange === 0) return { direction: 'flat', label: '0%' };
-  const raw: 'up' | 'down' = pctChange > 0 ? 'up' : 'down';
-  const displayed = invertColor ? (raw === 'up' ? 'down' : 'up') : raw;
-  return { direction: displayed, label: `${Math.abs(pctChange)}%` };
-}
-
-const TAB_TRIGGER_CLASS = "text-[10px] font-mono uppercase tracking-wider px-2.5 py-1 rounded-full data-[state=active]:bg-primary/10 data-[state=active]:text-primary";
-
 export default function Admin() {
   const { isAdmin, loading: adminLoading } = useIsAdmin();
   const {
@@ -163,7 +88,6 @@ export default function Admin() {
 
   // ── ALL HOOKS MUST BE ABOVE EARLY RETURNS ──
 
-  // ── Failure rate from periodStats ──
   const failureRate = periodStats.totalAttempts > 0
     ? Math.round((periodStats.failures / periodStats.totalAttempts) * 100)
     : 0;
@@ -171,13 +95,11 @@ export default function Admin() {
     ? Math.round((prevPeriodStats.failures / prevPeriodStats.totalAttempts) * 100)
     : null;
 
-  // ── Trends ──
   const servesTrend = computeTrend(periodStats.serves, prevPeriodStats?.serves ?? null, false);
   const cacheHitTrend = computeTrend(periodStats.cacheHitRate, prevPeriodStats?.cacheHitRate ?? null, false);
   const costTrend = computeTrend(periodStats.cost, prevPeriodStats?.cost ?? null, true);
   const failureTrend = computeTrend(failureRate, prevFailureRate, true);
 
-  // ── Cost chart data (last 14 days, aggregated by day) ──
   const costChartData = useMemo(() => {
     const dayMap = new Map<string, Record<string, number>>();
     for (const row of costs) {
@@ -189,20 +111,18 @@ export default function Admin() {
       entry[type] = (entry[type] ?? 0) + (row.total_cost_usd ?? 0);
       entry.total = (entry.total ?? 0) + (row.total_cost_usd ?? 0);
     }
-
     return Array.from(dayMap.entries())
       .map(([day, data]) => ({ day: day.slice(5), ...data }))
       .sort((a, b) => a.day.localeCompare(b.day))
       .slice(-14);
   }, [costs]);
 
-  // ── Period label for subtitle ──
   const periodLabel = PERIOD_OPTIONS.find(p => p.value === period)?.label.toLowerCase() ?? period;
 
   // ── Session filters ──
-  const [sessionMoodFilter, setSessionMoodFilter] = useState<string>('all');
-  const [sessionOutcomeFilter, setSessionOutcomeFilter] = useState<string>('all');
-  const [sessionCompanionFilter, setSessionCompanionFilter] = useState<string>('all');
+  const [sessionMoodFilter, setSessionMoodFilter] = useState('all');
+  const [sessionOutcomeFilter, setSessionOutcomeFilter] = useState('all');
+  const [sessionCompanionFilter, setSessionCompanionFilter] = useState('all');
 
   const sessionMoodOptions = useMemo(() => {
     const moods = Array.from(new Set(sessions.map(s => s.mood).filter(Boolean) as string[])).sort();
@@ -222,56 +142,46 @@ export default function Admin() {
     { value: 'missing', label: 'Missing' },
   ];
 
-  const filteredSessions = useMemo(() => {
-    return sessions.filter(s => {
-      if (sessionMoodFilter !== 'all' && s.mood !== sessionMoodFilter) return false;
-      if (sessionOutcomeFilter !== 'all') {
-        if (sessionOutcomeFilter === 'pending') {
-          if (s.outcome) return false;
-        } else if (s.outcome !== sessionOutcomeFilter) return false;
-      }
-      if (sessionCompanionFilter === 'missing') {
-        const allLoaded = !!s.signal_title && !!s.learning_title && !!s.history_insight_data && !!s.zoom_out_data && !!s.haiku;
-        if (allLoaded) return false;
-      }
-      return true;
-    });
-  }, [sessions, sessionMoodFilter, sessionOutcomeFilter, sessionCompanionFilter]);
+  const filteredSessions = useMemo(() => sessions.filter(s => {
+    if (sessionMoodFilter !== 'all' && s.mood !== sessionMoodFilter) return false;
+    if (sessionOutcomeFilter !== 'all') {
+      if (sessionOutcomeFilter === 'pending') { if (s.outcome) return false; }
+      else if (s.outcome !== sessionOutcomeFilter) return false;
+    }
+    if (sessionCompanionFilter === 'missing') {
+      const allLoaded = !!s.signal_title && !!s.learning_title && !!s.history_insight_data && !!s.zoom_out_data && !!s.haiku;
+      if (allLoaded) return false;
+    }
+    return true;
+  }), [sessions, sessionMoodFilter, sessionOutcomeFilter, sessionCompanionFilter]);
 
   // ── Feed filters ──
-  const [feedTypeFilter, setFeedTypeFilter] = useState<string>('all');
-
+  const [feedTypeFilter, setFeedTypeFilter] = useState('all');
   const feedTypeOptions = useMemo(() => {
     const types = Array.from(new Set(recentContent.map(c => c.companion_type))).sort();
     return [{ value: 'all', label: 'All' }, ...types.map(t => ({ value: t, label: label(t) }))];
   }, [recentContent]);
-
   const filteredFeed = useMemo(() => {
     if (feedTypeFilter === 'all') return recentContent;
     return recentContent.filter(c => c.companion_type === feedTypeFilter);
   }, [recentContent, feedTypeFilter]);
 
   // ── Rejection filters ──
-  const [rejectionTypeFilter, setRejectionTypeFilter] = useState<string>('all');
-  const [rejectionStatusFilter, setRejectionStatusFilter] = useState<string>('all');
-
+  const [rejectionTypeFilter, setRejectionTypeFilter] = useState('all');
+  const [rejectionStatusFilter, setRejectionStatusFilter] = useState('all');
   const rejectionTypeOptions = useMemo(() => {
     const types = Array.from(new Set(rejections.map(r => r.companion_type))).sort();
     return [{ value: 'all', label: 'All' }, ...types.map(t => ({ value: t, label: label(t) }))];
   }, [rejections]);
-
   const rejectionStatusOptions = useMemo(() => {
     const statuses = Array.from(new Set(rejections.map(r => r.status))).sort();
     return [{ value: 'all', label: 'All' }, ...statuses.map(s => ({ value: s, label: s }))];
   }, [rejections]);
-
-  const filteredRejections = useMemo(() => {
-    return rejections.filter(r => {
-      if (rejectionTypeFilter !== 'all' && r.companion_type !== rejectionTypeFilter) return false;
-      if (rejectionStatusFilter !== 'all' && r.status !== rejectionStatusFilter) return false;
-      return true;
-    });
-  }, [rejections, rejectionTypeFilter, rejectionStatusFilter]);
+  const filteredRejections = useMemo(() => rejections.filter(r => {
+    if (rejectionTypeFilter !== 'all' && r.companion_type !== rejectionTypeFilter) return false;
+    if (rejectionStatusFilter !== 'all' && r.status !== rejectionStatusFilter) return false;
+    return true;
+  }), [rejections, rejectionTypeFilter, rejectionStatusFilter]);
 
   // ── Early returns (after all hooks) ──
   if (adminLoading) {
@@ -322,6 +232,25 @@ export default function Admin() {
     );
   }
 
+  const costWarn = period === 'today' ? 8 : period === '7d' ? 50 : period === '30d' ? 200 : 999;
+  const costTip = period === 'today' ? 5 : period === '7d' ? 30 : period === '30d' ? 100 : 999;
+  const issues: string[] = [];
+  const tips: string[] = [];
+  if (failureRate > 20) issues.push('High failure rate — check if API keys (Perplexity/Lovable) are valid and not rate-limited');
+  else if (failureRate > 5) tips.push('Some generation failures — check Generation Health for details');
+  if (periodStats.cost > costWarn) {
+    issues.push(period === 'today'
+      ? 'Approaching daily budget cap ($10) — generation will be blocked when exceeded'
+      : `High spend for ${periodLabel}: $${periodStats.cost.toFixed(2)}`);
+  } else if (periodStats.cost > costTip) {
+    tips.push(`Moderate spend ($${periodStats.cost.toFixed(2)}) for ${periodLabel}`);
+  }
+  if (periodStats.cacheHitRate < 10 && periodStats.cost > 3) {
+    tips.push('Low cache hit rate with moderate cost — consider scheduling the cache warmer cron to reduce API spend');
+  } else if (periodStats.cacheHitRate < 10 && periodStats.serves > 50) {
+    tips.push('Cache hit rate is low — the cache warmer (pregenerate-companions) could help as usage grows');
+  }
+
   return (
     <div className="space-y-6 animate-in fade-in">
       {/* Header */}
@@ -333,7 +262,6 @@ export default function Admin() {
         </button>
       </div>
 
-      {/* Tabs */}
       <Tabs defaultValue="monitor" className="space-y-4">
         <TabsList className="inline-flex h-auto items-center gap-1 rounded-lg bg-muted/30 p-1">
           <TabsTrigger value="monitor" className={TAB_TRIGGER_CLASS}>Monitor</TabsTrigger>
@@ -348,84 +276,36 @@ export default function Admin() {
         {/* Tab 1: Monitor */}
         <TabsContent value="monitor" className="space-y-6 mt-0">
           {/* Health Summary */}
-          {(() => {
-            const issues: string[] = [];
-            const tips: string[] = [];
-
-            if (failureRate > 20) {
-              issues.push('High failure rate — check if API keys (Perplexity/Lovable) are valid and not rate-limited');
-            } else if (failureRate > 5) {
-              tips.push('Some generation failures — check Generation Health for details');
-            }
-
-            // Cost thresholds scale with period
-            const costWarn = period === 'today' ? 8 : period === '7d' ? 50 : period === '30d' ? 200 : 999;
-            const costTip = period === 'today' ? 5 : period === '7d' ? 30 : period === '30d' ? 100 : 999;
-            if (periodStats.cost > costWarn) {
-              issues.push(period === 'today'
-                ? 'Approaching daily budget cap ($10) — generation will be blocked when exceeded'
-                : `High spend for ${periodLabel}: $${periodStats.cost.toFixed(2)}`);
-            } else if (periodStats.cost > costTip) {
-              tips.push(`Moderate spend ($${periodStats.cost.toFixed(2)}) for ${periodLabel}`);
-            }
-
-            if (periodStats.cacheHitRate < 10 && periodStats.cost > 3) {
-              tips.push('Low cache hit rate with moderate cost — consider scheduling the cache warmer cron to reduce API spend');
-            } else if (periodStats.cacheHitRate < 10 && periodStats.serves > 50) {
-              tips.push('Cache hit rate is low — the cache warmer (pregenerate-companions) could help as usage grows');
-            }
-
-            if (issues.length === 0 && tips.length === 0 && periodStats.serves > 0) {
-              const parts = [`${failureRate}% failure rate`];
-              if (periodStats.cost > 0) parts.push(`$${periodStats.cost.toFixed(3)} cost`);
-              if (periodStats.cacheHitRate > 0) parts.push(`${periodStats.cacheHitRate}% cache hit`);
-              parts.push(`${periodStats.serves} serves`);
-              return (
-                <div className="rounded-xl border border-primary/15 bg-primary/3 px-4 py-2.5">
-                  <p className="text-[10px] font-mono text-primary/60">✓ System healthy — {parts.join(' · ')}</p>
-                </div>
-              );
-            }
-
-            const allMessages = [
-              ...issues.map(msg => ({ msg, level: 'issue' as const })),
-              ...tips.map(msg => ({ msg, level: 'tip' as const })),
-            ];
-
-            if (allMessages.length > 0) {
-              return (
-                <div className={`rounded-xl border px-4 py-2.5 space-y-1 ${
-                  issues.length > 0
-                    ? 'border-amber-500/20 bg-amber-500/5 dark:bg-amber-500/10'
-                    : 'border-border/20 bg-card/10'
-                }`}>
-                  {allMessages.map(({ msg, level }, i) => (
-                    <p key={i} className={`text-[10px] font-mono ${
-                      level === 'issue'
-                        ? 'text-amber-700/70 dark:text-amber-400/70'
-                        : 'text-muted-foreground/50'
-                    }`}>
-                      {level === 'issue' ? '⚠' : '💡'} {msg}
-                    </p>
-                  ))}
-                </div>
-              );
-            }
-            return null;
-          })()}
+          {issues.length > 0 || tips.length > 0 ? (
+            <div className={`rounded-xl border px-4 py-2.5 space-y-1 ${
+              issues.length > 0 ? 'border-amber-500/20 bg-amber-500/5 dark:bg-amber-500/10' : 'border-border/20 bg-card/10'
+            }`}>
+              {[...issues.map(msg => ({ msg, level: 'issue' as const })), ...tips.map(msg => ({ msg, level: 'tip' as const }))].map(({ msg, level }, i) => (
+                <p key={i} className={`text-[10px] font-mono ${level === 'issue' ? 'text-amber-700/70 dark:text-amber-400/70' : 'text-muted-foreground/50'}`}>
+                  {level === 'issue' ? '⚠' : '💡'} {msg}
+                </p>
+              ))}
+            </div>
+          ) : periodStats.serves > 0 ? (
+            <div className="rounded-xl border border-primary/15 bg-primary/3 px-4 py-2.5">
+              <p className="text-[10px] font-mono text-primary/60">
+                ✓ System healthy — {[
+                  `${failureRate}% failure rate`,
+                  periodStats.cost > 0 && `$${periodStats.cost.toFixed(3)} cost`,
+                  periodStats.cacheHitRate > 0 && `${periodStats.cacheHitRate}% cache hit`,
+                  `${periodStats.serves} serves`,
+                ].filter(Boolean).join(' · ')}
+              </p>
+            </div>
+          ) : null}
 
           {/* Period Selector */}
           <div className="flex items-center gap-1.5">
             {PERIOD_OPTIONS.map(opt => (
-              <button
-                key={opt.value}
-                onClick={() => setPeriod(opt.value)}
+              <button key={opt.value} onClick={() => setPeriod(opt.value)}
                 className={`text-[9px] font-mono px-2 py-0.5 rounded-full transition-colors ${
-                  period === opt.value
-                    ? 'bg-primary/15 text-primary'
-                    : 'text-muted-foreground/50 hover:text-muted-foreground/80 hover:bg-muted/20'
-                }`}
-              >
+                  period === opt.value ? 'bg-primary/15 text-primary' : 'text-muted-foreground/50 hover:text-muted-foreground/80 hover:bg-muted/20'
+                }`}>
                 {opt.label}
               </button>
             ))}
@@ -433,47 +313,15 @@ export default function Admin() {
 
           {/* Overview Cards */}
           <div className="grid grid-cols-2 gap-3">
-            <StatCard
-              icon={Activity}
-              title="Serves"
-              value={periodStats.serves.toLocaleString()}
-              subtitle={periodLabel}
-              trend={servesTrend}
-            />
-            <StatCard
-              icon={Database}
-              title="Cache Hit"
-              value={`${periodStats.cacheHitRate}%`}
+            <StatCard icon={Activity} title="Serves" value={periodStats.serves.toLocaleString()} subtitle={periodLabel} trend={servesTrend} />
+            <StatCard icon={Database} title="Cache Hit" value={`${periodStats.cacheHitRate}%`}
               subtitle={periodStats.cacheHitRate === 0 ? 'all live — fresh content' : periodStats.cacheHitRate < 30 ? 'mostly live generation' : 'good cache usage'}
-              trend={cacheHitTrend}
-            />
-            <StatCard
-              icon={DollarSign}
-              title="Cost"
-              value={`$${periodStats.cost.toFixed(3)}`}
-              subtitle={periodLabel}
-              alert={periodStats.cost > 8}
-              trend={costTrend}
-            />
-            <StatCard
-              icon={AlertTriangle}
-              title="Failure Rate"
-              value={`${failureRate}%`}
-              subtitle="target: <10%"
-              alert={failureRate > 20}
-              trend={failureTrend}
-            />
+              trend={cacheHitTrend} />
+            <StatCard icon={DollarSign} title="Cost" value={`$${periodStats.cost.toFixed(3)}`} subtitle={periodLabel} alert={periodStats.cost > 8} trend={costTrend} />
+            <StatCard icon={AlertTriangle} title="Failure Rate" value={`${failureRate}%`} subtitle="target: <10%" alert={failureRate > 20} trend={failureTrend} />
           </div>
 
           {/* Cost Chart */}
-          {costChartData.length === 0 && (
-            <div className="space-y-2">
-              <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">Daily Cost</p>
-              <div className="rounded-xl border border-border/20 bg-card/10 p-6 text-center">
-                <p className="text-[10px] text-muted-foreground/50">No cost data yet — generate some sessions to see the chart</p>
-              </div>
-            </div>
-          )}
           {costChartData.length > 0 && (
             <div className="space-y-2">
               <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">Daily Cost (14d)</p>
@@ -488,17 +336,23 @@ export default function Admin() {
                       labelStyle={{ fontSize: '10px', color: 'hsl(var(--muted-foreground) / 0.6)' }}
                     />
                     <Bar dataKey="total" radius={[4, 4, 0, 0]} maxBarSize={24}>
-                      {costChartData.map((_, i) => (
-                        <Cell key={i} fill="hsl(var(--primary) / 0.3)" />
-                      ))}
+                      {costChartData.map((_, i) => <Cell key={i} fill="hsl(var(--primary) / 0.3)" />)}
                     </Bar>
                   </BarChart>
                 </ResponsiveContainer>
               </div>
             </div>
           )}
+          {costChartData.length === 0 && (
+            <div className="space-y-2">
+              <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">Daily Cost</p>
+              <div className="rounded-xl border border-border/20 bg-card/10 p-6 text-center">
+                <p className="text-[10px] text-muted-foreground/50">No cost data yet — generate some sessions to see the chart</p>
+              </div>
+            </div>
+          )}
 
-          {/* Cache Hit Rates (detail breakdown is always all-time from views) */}
+          {/* Cache Hit Rates */}
           <div className="space-y-2">
             <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">Cache Hit Rates <span className="text-muted-foreground/40 normal-case">(all time)</span></p>
             <div className="space-y-1.5">
@@ -509,18 +363,11 @@ export default function Admin() {
                   <div key={i} className="rounded-lg border border-border/20 bg-card/10 px-3 py-2">
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-[10px] font-mono text-foreground/80">{label(type)}</span>
-                      <span className="text-[10px] font-mono text-muted-foreground/60">
-                        {pct.toFixed(0)}% · {row.total_serves ?? 0} serves
-                      </span>
+                      <span className="text-[10px] font-mono text-muted-foreground/60">{pct.toFixed(0)}% · {row.total_serves ?? 0} serves</span>
                     </div>
                     <div className="h-1.5 bg-muted/40 rounded-full overflow-hidden">
-                      <div
-                        className="h-full rounded-full transition-all duration-500"
-                        style={{
-                          width: `${Math.min(pct, 100)}%`,
-                          backgroundColor: TYPE_COLORS[type] ?? 'hsl(var(--primary) / 0.4)',
-                        }}
-                      />
+                      <div className="h-full rounded-full transition-all duration-500"
+                        style={{ width: `${Math.min(pct, 100)}%`, backgroundColor: TYPE_COLORS[type] ?? 'hsl(var(--primary) / 0.4)' }} />
                     </div>
                     <div className="flex gap-3 mt-1">
                       <span className="text-[9px] text-muted-foreground/50">live: {row.live_generated ?? 0}</span>
@@ -530,13 +377,11 @@ export default function Admin() {
                   </div>
                 );
               })}
-              {cacheHits.length === 0 && (
-                <p className="text-[10px] text-muted-foreground/50 text-center py-3">No serve data yet</p>
-              )}
+              {cacheHits.length === 0 && <p className="text-[10px] text-muted-foreground/50 text-center py-3">No serve data yet</p>}
             </div>
           </div>
 
-          {/* Generation Health (detail breakdown is always all-time from views) */}
+          {/* Generation Health */}
           <div className="space-y-2">
             <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">Generation Health <span className="text-muted-foreground/40 normal-case">(all time)</span></p>
             <div className="space-y-1.5">
@@ -550,9 +395,7 @@ export default function Admin() {
                         <span className="text-[10px] font-mono text-foreground/80">{label(row.companion_type)}</span>
                         <span className="text-[9px] text-muted-foreground/50 ml-2">{row.model}</span>
                       </div>
-                      <span className={`text-[10px] font-mono ${isAlert ? 'text-destructive/70' : 'text-muted-foreground/40'}`}>
-                        {failPct.toFixed(1)}% fail
-                      </span>
+                      <span className={`text-[10px] font-mono ${isAlert ? 'text-destructive/70' : 'text-muted-foreground/40'}`}>{failPct.toFixed(1)}% fail</span>
                     </div>
                     <div className="flex gap-3 mt-1">
                       <span className="text-[9px] text-muted-foreground/50">✓ {row.successes ?? 0}</span>
@@ -564,20 +407,16 @@ export default function Admin() {
                       <span className="text-[9px] text-muted-foreground/50 flex items-center gap-0.5">
                         <Clock className="h-2.5 w-2.5" /> avg {((row.avg_latency_ms ?? 0) / 1000).toFixed(1)}s
                       </span>
-                      <span className="text-[9px] text-muted-foreground/50">
-                        P95 {((row.p95_latency_ms ?? 0) / 1000).toFixed(1)}s
-                      </span>
+                      <span className="text-[9px] text-muted-foreground/50">P95 {((row.p95_latency_ms ?? 0) / 1000).toFixed(1)}s</span>
                     </div>
                   </div>
                 );
               })}
-              {failures.length === 0 && (
-                <p className="text-[10px] text-muted-foreground/50 text-center py-3">No generation data yet</p>
-              )}
+              {failures.length === 0 && <p className="text-[10px] text-muted-foreground/50 text-center py-3">No generation data yet</p>}
             </div>
           </div>
 
-          {/* Feedback (detail breakdown is always all-time from views) */}
+          {/* User Feedback */}
           <div className="space-y-2">
             <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">User Feedback <span className="text-muted-foreground/40 normal-case">(all time)</span></p>
             <div className="space-y-1.5">
@@ -589,12 +428,8 @@ export default function Admin() {
                     <div className="flex items-center justify-between">
                       <span className="text-[10px] font-mono text-foreground/80">{label(row.companion_type)}</span>
                       <div className="flex items-center gap-2">
-                        <span className="text-[9px] text-muted-foreground/50">
-                          <ThumbsUp className="h-2.5 w-2.5 inline mr-0.5" />{row.total_thumbs_up ?? 0}
-                        </span>
-                        <span className="text-[9px] text-muted-foreground/50">
-                          👎 {row.total_thumbs_down ?? 0}
-                        </span>
+                        <span className="text-[9px] text-muted-foreground/50"><ThumbsUp className="h-2.5 w-2.5 inline mr-0.5" />{row.total_thumbs_up ?? 0}</span>
+                        <span className="text-[9px] text-muted-foreground/50">👎 {row.total_thumbs_down ?? 0}</span>
                         <span className={`text-[10px] font-mono ${pct >= 70 ? 'text-emerald-600 dark:text-emerald-400' : pct >= 40 ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400'}`}>
                           {pct.toFixed(0)}%
                         </span>
@@ -602,21 +437,14 @@ export default function Admin() {
                     </div>
                     {total > 0 && (
                       <div className="h-1.5 bg-muted/40 rounded-full overflow-hidden">
-                        <div
-                          className="h-full rounded-full transition-all duration-500"
-                          style={{
-                            width: `${pct}%`,
-                            backgroundColor: pct >= 70 ? '#10b981' : pct >= 40 ? '#f59e0b' : '#ef4444',
-                          }}
-                        />
+                        <div className="h-full rounded-full transition-all duration-500"
+                          style={{ width: `${pct}%`, backgroundColor: pct >= 70 ? '#10b981' : pct >= 40 ? '#f59e0b' : '#ef4444' }} />
                       </div>
                     )}
                   </div>
                 );
               })}
-              {feedback.length === 0 && (
-                <p className="text-[10px] text-muted-foreground/50 text-center py-3">No feedback data yet</p>
-              )}
+              {feedback.length === 0 && <p className="text-[10px] text-muted-foreground/50 text-center py-3">No feedback data yet</p>}
             </div>
           </div>
 
@@ -635,47 +463,41 @@ export default function Admin() {
               {filteredSessions.map(s => {
                 const theme = inferTheme(s.context, s.mood);
                 return (
-                <div key={s.id} className="rounded-lg border border-border/20 bg-card/10 px-3 py-2 space-y-1.5">
-                  <div className="flex items-center gap-2">
-                    <span className="text-[9px] font-mono text-muted-foreground/50 flex-shrink-0">
-                      {new Date(s.created_at).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                    </span>
-                    {s.mood && (
-                      <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full bg-primary/15 text-primary flex-shrink-0">
-                        {s.mood}
+                  <div key={s.id} className="rounded-lg border border-border/20 bg-card/10 px-3 py-2 space-y-1.5">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[9px] font-mono text-muted-foreground/50 flex-shrink-0">
+                        {new Date(s.created_at).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                       </span>
-                    )}
-                    {theme && <span className="text-[8px] font-mono px-1.5 py-0.5 rounded-full bg-muted/30 text-muted-foreground/60">{theme}</span>}
-                    {s.outcome && (
-                      <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded-full flex-shrink-0 ${
-                        s.outcome === 'held' ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
-                        : s.outcome === 'sold' ? 'bg-red-500/15 text-red-600 dark:text-red-400'
-                        : 'bg-blue-500/15 text-blue-600 dark:text-blue-400'
-                      }`}>
-                        {s.outcome}
-                      </span>
-                    )}
+                      {s.mood && <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full bg-primary/15 text-primary flex-shrink-0">{s.mood}</span>}
+                      {theme && <span className="text-[8px] font-mono px-1.5 py-0.5 rounded-full bg-muted/30 text-muted-foreground/60">{theme}</span>}
+                      {s.outcome && (
+                        <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded-full flex-shrink-0 ${
+                          s.outcome === 'held' ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
+                          : s.outcome === 'sold' ? 'bg-red-500/15 text-red-600 dark:text-red-400'
+                          : 'bg-blue-500/15 text-blue-600 dark:text-blue-400'
+                        }`}>
+                          {s.outcome}
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[9px] font-mono text-foreground/70 leading-relaxed">
+                      {s.message?.slice(0, 100)}{(s.message?.length ?? 0) > 100 ? '…' : ''}
+                    </p>
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      {[
+                        { loaded: !!s.signal_title, name: 'Signal' },
+                        { loaded: !!s.learning_title, name: 'Ground' },
+                        { loaded: !!s.history_insight_data, name: 'History' },
+                        { loaded: !!s.zoom_out_data, name: 'Zoom' },
+                        { loaded: !!s.haiku, name: 'Haiku' },
+                      ].map(c => (
+                        <span key={c.name} className={`text-[8px] font-mono px-1.5 py-0.5 rounded ${c.loaded ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400' : 'bg-muted/30 text-muted-foreground/40'}`}>
+                          {c.name}
+                        </span>
+                      ))}
+                    </div>
                   </div>
-                  <p className="text-[9px] font-mono text-foreground/70 leading-relaxed">
-                    {s.message?.slice(0, 100)}{(s.message?.length ?? 0) > 100 ? '…' : ''}
-                  </p>
-                  <div className="flex items-center gap-1.5 flex-wrap">
-                    {[
-                      { loaded: !!s.signal_title, name: 'Signal' },
-                      { loaded: !!s.learning_title, name: 'Ground' },
-                      { loaded: !!s.history_insight_data, name: 'History' },
-                      { loaded: !!s.zoom_out_data, name: 'Zoom' },
-                      { loaded: !!s.haiku, name: 'Haiku' },
-                    ].map(c => (
-                      <span key={c.name} className={`text-[8px] font-mono px-1.5 py-0.5 rounded ${
-                        c.loaded ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400' : 'bg-muted/30 text-muted-foreground/40'
-                      }`}>
-                        {c.name}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              );
+                );
               })}
               {filteredSessions.length === 0 && (
                 <p className="text-[10px] text-muted-foreground/50 text-center py-3">
@@ -686,27 +508,22 @@ export default function Admin() {
           </div>
         </TabsContent>
 
-        {/* Tab 2: Content */}
         <TabsContent value="content" className="mt-0">
           <CuratedContentManager entries={cacheEntries} onRefresh={refreshCacheEntries} />
         </TabsContent>
 
-        {/* Tab 3: Sources */}
         <TabsContent value="sources" className="mt-0">
           <SourceCatalogViewer sources={signalSources} onRefresh={refresh} libraryEntries={libraryEntries} />
         </TabsContent>
 
-        {/* Tab 4: Tools */}
         <TabsContent value="tools" className="mt-0">
           <DevModeToggle />
         </TabsContent>
 
-        {/* Tab 5: Library */}
         <TabsContent value="library" className="mt-0">
           <ContentLibraryViewer entries={libraryEntries} onRefresh={refresh} />
         </TabsContent>
 
-        {/* Tab 6: Feed */}
         <TabsContent value="feed" className="space-y-3 mt-0">
           <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">
             Recent Content <span className="text-muted-foreground/45">({recentContent.length})</span>
@@ -719,15 +536,8 @@ export default function Admin() {
             {filteredFeed.length < recentContent.length && (
               <button onClick={() => setFeedTypeFilter('all')} className="text-primary/70 hover:text-primary">clear filter</button>
             )}
-            {feedTypeOptions.length === 2 && feedTypeOptions[1] && (
-              <span className="text-muted-foreground/40 ml-2">
-                (only {feedTypeOptions[1].label} in cache — other types generated live)
-              </span>
-            )}
           </p>
-          {filteredFeed.map(item => (
-            <FeedCard key={item.id} item={item} />
-          ))}
+          {filteredFeed.map(item => <FeedCard key={item.id} item={item} />)}
           {filteredFeed.length === 0 && (
             <p className="text-[10px] text-muted-foreground/50 text-center py-3">
               {recentContent.length === 0 ? 'No content generated yet' : 'No content matches filter'}
@@ -735,7 +545,6 @@ export default function Admin() {
           )}
         </TabsContent>
 
-        {/* Tab 7: Rejections */}
         <TabsContent value="rejections" className="space-y-3 mt-0">
           <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">
             Generation Failures <span className="text-muted-foreground/45">({rejections.length})</span>
@@ -751,9 +560,7 @@ export default function Admin() {
             )}
           </p>
           <div className="space-y-1.5">
-            {filteredRejections.map(r => (
-              <RejectionEntry key={r.id} row={r} />
-            ))}
+            {filteredRejections.map(r => <RejectionEntry key={r.id} row={r} />)}
             {filteredRejections.length === 0 && (
               <p className="text-[10px] text-muted-foreground/50 text-center py-3">
                 {rejections.length === 0 ? 'No rejections' : 'No rejections match filters'}
@@ -763,728 +570,9 @@ export default function Admin() {
         </TabsContent>
       </Tabs>
 
-      {/* Footer */}
       <p className="text-[9px] text-muted-foreground/40 text-center pb-4">
         AI Companion System Monitor · Data from Supabase views
       </p>
-    </div>
-  );
-}
-
-// ── Reusable filter row ──
-function FilterRow({ label: filterLabel, options, value, onChange }: {
-  label: string;
-  options: { value: string; label: string }[];
-  value: string;
-  onChange: (v: string) => void;
-}) {
-  return (
-    <div className="flex flex-wrap items-center gap-1.5">
-      <span className="text-[9px] font-mono text-muted-foreground/50 mr-1">{filterLabel}:</span>
-      {options.map(opt => (
-        <button
-          key={opt.value}
-          onClick={() => onChange(opt.value)}
-          className={`text-[9px] font-mono px-2 py-0.5 rounded-full transition-colors ${
-            value === opt.value
-              ? 'bg-primary/15 text-primary'
-              : 'text-muted-foreground/50 hover:text-muted-foreground/80 hover:bg-muted/20'
-          }`}
-        >
-          {opt.label}
-        </button>
-      ))}
-    </div>
-  );
-}
-
-// ── Feed Card (expandable) ──
-function FeedCard({ item }: { item: RecentContentRow }) {
-  const [expanded, setExpanded] = useState(false);
-  const body = typeof item.content === 'string'
-    ? item.content
-    : typeof item.content?.body === 'string'
-      ? item.content.body
-      : JSON.stringify(item.content);
-
-  return (
-    <button
-      onClick={() => setExpanded(!expanded)}
-      className="w-full text-left rounded-lg border border-border/20 bg-card/10 px-3 py-2 space-y-1 transition-colors hover:bg-card/10"
-    >
-      <div className="flex items-center gap-2">
-        <span
-          className="text-[9px] font-mono px-1.5 py-0.5 rounded-full flex-shrink-0"
-          style={{
-            backgroundColor: `${TYPE_COLORS[item.companion_type] ?? '#64748b'}20`,
-            color: TYPE_COLORS[item.companion_type] ?? '#64748b',
-          }}
-        >
-          {label(item.companion_type)}
-        </span>
-        <span className="text-[10px] font-mono text-foreground/80 truncate flex-1 min-w-0">
-          {item.title || '(untitled)'}
-        </span>
-        <QualityBadge score={item.quality_score} />
-        {expanded ? <ChevronDown className="h-2.5 w-2.5 text-muted-foreground/30 flex-shrink-0" /> : <ChevronRight className="h-2.5 w-2.5 text-muted-foreground/30 flex-shrink-0" />}
-      </div>
-      <p className="text-[9px] font-mono text-muted-foreground/40 truncate">
-        {expanded ? body : body?.slice(0, 100)}{!expanded && (body?.length ?? 0) > 100 ? '…' : ''}
-      </p>
-      <div className="flex items-center gap-3">
-        {item.source_author && <span className="text-[9px] text-muted-foreground/50">by {item.source_author}</span>}
-        <span className="text-[9px] text-muted-foreground/45">{new Date(item.created_at).toLocaleDateString()}</span>
-        <span className="text-[9px] text-muted-foreground/45">used: {item.used_count}</span>
-      </div>
-      {expanded && (
-        <div className="pt-1 border-t border-border/5">
-          <p className="text-[9px] font-mono text-foreground/40 whitespace-pre-wrap break-words">{body}</p>
-        </div>
-      )}
-    </button>
-  );
-}
-
-// ── Rejection Entry ──
-function RejectionEntry({ row }: { row: RejectionRow }) {
-  const statusColor: Record<string, string> = {
-    error: 'bg-red-500/15 text-red-600 dark:text-red-400',
-    timeout: 'bg-amber-500/15 text-amber-600 dark:text-amber-400',
-    quality_gate_failed: 'bg-orange-500/15 text-orange-600 dark:text-orange-400',
-  };
-
-  return (
-    <div className="rounded-lg border border-border/20 bg-card/10 px-3 py-2">
-      <div className="flex items-center gap-2">
-        <span
-          className="text-[9px] font-mono px-1.5 py-0.5 rounded-full flex-shrink-0"
-          style={{
-            backgroundColor: `${TYPE_COLORS[row.companion_type] ?? '#64748b'}20`,
-            color: TYPE_COLORS[row.companion_type] ?? '#64748b',
-          }}
-        >
-          {label(row.companion_type)}
-        </span>
-        <span className="text-[9px] font-mono text-muted-foreground/30">{row.model}</span>
-        <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded-full ${statusColor[row.status] ?? 'bg-muted/20 text-muted-foreground/40'}`}>
-          {row.status}
-        </span>
-        <span className="text-[9px] text-muted-foreground/45 ml-auto flex-shrink-0">
-          {new Date(row.created_at).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-        </span>
-      </div>
-      <div className="flex items-center gap-3 mt-1">
-        <span className="text-[9px] font-mono text-muted-foreground/40 truncate">
-          {row.quality_gate_reason || row.error_message || '—'}
-        </span>
-        {row.latency_ms != null && (
-          <span className="text-[9px] text-muted-foreground/50 flex-shrink-0 flex items-center gap-0.5">
-            <Clock className="h-2.5 w-2.5" /> {(row.latency_ms / 1000).toFixed(1)}s
-          </span>
-        )}
-      </div>
-    </div>
-  );
-}
-
-// ── Quality score visual indicator ──
-function QualityBadge({ score }: { score: number }) {
-  if (score >= 3) return <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400">curated</span>;
-  if (score >= 2) return <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full bg-blue-500/15 text-blue-600 dark:text-blue-400">good</span>;
-  return <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full bg-orange-500/15 text-orange-600 dark:text-orange-400">low</span>;
-}
-
-function CuratedContentManager({ entries, onRefresh }: { entries: CacheEntryRow[]; onRefresh: () => Promise<void> }) {
-  const { toast } = useToast();
-  const [open, setOpen] = useState(false);
-  const [acting, setActing] = useState<string | null>(null);
-  const [qualityFilter, setQualityFilter] = useState<string>('all');
-  const [contentStatusFilter, setContentStatusFilter] = useState<string>('all');
-
-  const contentQualityOptions = [
-    { value: 'all', label: 'All' },
-    { value: 'curated', label: 'Curated' },
-    { value: 'good', label: 'Good' },
-    { value: 'low', label: 'Low' },
-  ];
-
-  const contentStatusOptions = [
-    { value: 'all', label: 'All' },
-    { value: 'permanent', label: 'Permanent' },
-    { value: 'expiring', label: 'Expiring' },
-  ];
-
-  const filteredEntries = useMemo(() => {
-    return entries.filter(e => {
-      if (qualityFilter === 'curated' && e.quality_score < 3) return false;
-      if (qualityFilter === 'good' && e.quality_score !== 2) return false;
-      if (qualityFilter === 'low' && e.quality_score >= 2) return false;
-      if (contentStatusFilter === 'permanent' && e.expires_at !== null) return false;
-      if (contentStatusFilter === 'expiring' && e.expires_at === null) return false;
-      return true;
-    });
-  }, [entries, qualityFilter, contentStatusFilter]);
-
-  const grouped = useMemo(() => {
-    const map = new Map<string, CacheEntryRow[]>();
-    for (const e of filteredEntries) {
-      const key = e.companion_type;
-      if (!map.has(key)) map.set(key, []);
-      map.get(key)!.push(e);
-    }
-    return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b));
-  }, [filteredEntries]);
-
-  const promote = useCallback(async (id: string) => {
-    setActing(id);
-    const { error } = await supabase.from('companion_cache').update({ quality_score: 3, expires_at: null } as any).eq('id', id);
-    if (error) { toast({ title: 'Promote failed', description: error.message, variant: 'destructive' }); setActing(null); return; }
-    await onRefresh();
-    setActing(null);
-  }, [onRefresh, toast]);
-
-  const demote = useCallback(async (id: string) => {
-    setActing(id);
-    const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
-    const { error } = await supabase.from('companion_cache').update({ quality_score: 1, expires_at: expires } as any).eq('id', id);
-    if (error) { toast({ title: 'Demote failed', description: error.message, variant: 'destructive' }); setActing(null); return; }
-    await onRefresh();
-    setActing(null);
-  }, [onRefresh, toast]);
-
-  const remove = useCallback(async (id: string) => {
-    if (!window.confirm('Delete this cache entry? This cannot be undone.')) return;
-    setActing(id);
-    const { error } = await supabase.from('companion_cache').delete().eq('id', id);
-    if (error) { toast({ title: 'Delete failed', description: error.message, variant: 'destructive' }); setActing(null); return; }
-    await onRefresh();
-    setActing(null);
-  }, [onRefresh, toast]);
-
-  return (
-    <div className="space-y-3">
-      {/* Explanation */}
-      <div className="rounded-xl border border-border/20 bg-card/10 px-4 py-3 space-y-2">
-        <p className="text-[10px] font-mono text-foreground/70">
-          Content that AI generates gets cached here. You can manage its lifecycle:
-        </p>
-        <div className="space-y-1">
-          <p className="text-[9px] text-muted-foreground/60">
-            <span className="text-emerald-600 dark:text-emerald-400 font-mono">↑ Promote</span> — Makes content permanent (never expires). Best content gets served as fallback when AI is down.
-          </p>
-          <p className="text-[9px] text-muted-foreground/60">
-            <span className="text-orange-600 dark:text-orange-400 font-mono">↓ Demote</span> — Lowers quality score and sets 7-day expiry. For content that isn't good enough.
-          </p>
-          <p className="text-[9px] text-muted-foreground/60">
-            <span className="text-destructive font-mono">🗑 Delete</span> — Permanently removes from cache.
-          </p>
-        </div>
-        <p className="text-[9px] text-muted-foreground/50">
-          Quality badges: <span className="text-emerald-600 dark:text-emerald-400">curated</span> = permanent, <span className="text-blue-600 dark:text-blue-400">good</span> = verified URL, <span className="text-orange-600 dark:text-orange-400">low</span> = unverified
-        </p>
-      </div>
-
-      <button onClick={() => setOpen(!open)} className="flex items-center gap-1.5 w-full text-left">
-        {open ? <ChevronDown className="h-3 w-3 text-muted-foreground/60" /> : <ChevronRight className="h-3 w-3 text-muted-foreground/60" />}
-        <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">
-          Cache Entries <span className="text-muted-foreground/45">({entries.length})</span>
-        </p>
-      </button>
-      {open && (
-        <div className="space-y-3">
-          <FilterRow label="Quality" options={contentQualityOptions} value={qualityFilter} onChange={setQualityFilter} />
-          <FilterRow label="Status" options={contentStatusOptions} value={contentStatusFilter} onChange={setContentStatusFilter} />
-          {(qualityFilter !== 'all' || contentStatusFilter !== 'all') && (
-            <p className="text-[9px] font-mono text-muted-foreground/40">Showing {filteredEntries.length} of {entries.length}</p>
-          )}
-          {grouped.map(([type, items]) => (
-            <div key={type} className="space-y-1.5">
-              <div className="flex items-center gap-2">
-                <span
-                  className="h-2 w-2 rounded-full"
-                  style={{ backgroundColor: TYPE_COLORS[type] ?? 'hsl(var(--primary) / 0.4)' }}
-                />
-                <span className="text-[10px] font-mono text-foreground/80">{label(type)}</span>
-                <span className="text-[9px] text-muted-foreground/50">{items.length} entries</span>
-              </div>
-              {items.map(entry => {
-                const isPermanent = entry.expires_at === null;
-                const isCurated = entry.quality_score >= 3;
-                const isActing = acting === entry.id;
-                return (
-                  <div key={entry.id} className="rounded-lg border border-border/20 bg-card/10 px-3 py-2 space-y-1.5">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1 min-w-0">
-                        <p className="text-[10px] font-mono text-foreground/70 truncate">{entry.title || '(untitled)'}</p>
-                        <div className="flex flex-wrap items-center gap-2 mt-0.5">
-                          <QualityBadge score={entry.quality_score} />
-                          {isPermanent && <span className="text-[9px] font-mono text-muted-foreground/40">♾ permanent</span>}
-                          {!isPermanent && entry.expires_at && (
-                            <span className="text-[9px] font-mono text-muted-foreground/30">
-                              expires {new Date(entry.expires_at).toLocaleDateString()}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap items-center gap-3">
-                      <span className="text-[9px] text-muted-foreground/50">used: {entry.used_count}</span>
-                      {(entry.thumbs_up != null || entry.thumbs_down != null) && (
-                        <>
-                          <span className="text-[9px] text-muted-foreground/50">👍 {entry.thumbs_up ?? 0}</span>
-                          <span className="text-[9px] text-muted-foreground/50">👎 {entry.thumbs_down ?? 0}</span>
-                        </>
-                      )}
-                      <span className="text-[9px] text-muted-foreground/45">{new Date(entry.created_at).toLocaleDateString()}</span>
-                    </div>
-                    <div className="flex items-center gap-1.5 pt-0.5">
-                      {!isCurated && (
-                        <button
-                          onClick={() => promote(entry.id)}
-                          disabled={isActing}
-                          className="flex items-center gap-0.5 text-[9px] font-mono text-emerald-600/70 dark:text-emerald-400/70 hover:text-emerald-600 dark:hover:text-emerald-400 disabled:opacity-30 transition-colors"
-                        >
-                          <ArrowUp className="h-2.5 w-2.5" /> Promote
-                        </button>
-                      )}
-                      {(isCurated || entry.quality_score >= 2) && (
-                        <button
-                          onClick={() => demote(entry.id)}
-                          disabled={isActing}
-                          className="flex items-center gap-0.5 text-[9px] font-mono text-orange-600/70 dark:text-orange-400/70 hover:text-orange-600 dark:hover:text-orange-400 disabled:opacity-30 transition-colors"
-                        >
-                          <ArrowDown className="h-2.5 w-2.5" /> Demote
-                        </button>
-                      )}
-                      <button
-                        onClick={() => remove(entry.id)}
-                        disabled={isActing}
-                        className="flex items-center gap-0.5 text-[9px] font-mono text-destructive/50 hover:text-destructive/80 disabled:opacity-30 transition-colors"
-                      >
-                        <Trash2 className="h-2.5 w-2.5" /> Delete
-                      </button>
-                      {isActing && <Loader2 className="h-2.5 w-2.5 animate-spin text-muted-foreground/30 ml-1" />}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          ))}
-          {filteredEntries.length === 0 && (
-            <p className="text-[10px] text-muted-foreground/50 text-center py-3">
-              {entries.length === 0 ? 'No cache entries' : 'No entries match filters'}
-            </p>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-const SOURCE_TYPE_COLORS: Record<string, string> = {
-  blog: '#8b5cf6',
-  podcast: '#06b6d4',
-  book: '#f59e0b',
-  newsletter: '#10b981',
-  twitter: '#6366f1',
-  video: '#ec4899',
-};
-
-const CATEGORY_LABELS: Record<string, string> = {
-  signal: 'Signal',
-  grounding: 'Grounding',
-  learning: 'Learning',
-};
-
-function SourceCatalogViewer({ sources, onRefresh, libraryEntries = [] }: { sources: SignalSourceRow[]; onRefresh: () => void; libraryEntries?: LibraryEntryRow[] }) {
-  const { toast } = useToast();
-  const [open, setOpen] = useState(false);
-  const [adding, setAdding] = useState(false);
-  const [newName, setNewName] = useState('');
-  const [newUrl, setNewUrl] = useState('');
-  const [newType, setNewType] = useState('blog');
-  const [newCategory, setNewCategory] = useState('signal');
-  const [saving, setSaving] = useState(false);
-
-  const grouped = useMemo(() => {
-    const map = new Map<string, SignalSourceRow[]>();
-    for (const s of sources) {
-      const key = s.category;
-      if (!map.has(key)) map.set(key, []);
-      map.get(key)!.push(s);
-    }
-    return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b));
-  }, [sources]);
-
-  const addSource = async () => {
-    if (!newName.trim()) return;
-    setSaving(true);
-    const { error } = await supabase.from('signal_sources').insert({
-      name: newName.trim(),
-      url: newUrl.trim() || null,
-      type: newType,
-      category: newCategory,
-    } as any);
-    setSaving(false);
-    if (error) { toast({ title: 'Add source failed', description: error.message, variant: 'destructive' }); return; }
-    setNewName('');
-    setNewUrl('');
-    setAdding(false);
-    onRefresh();
-  };
-
-  const deleteSource = async (id: string, name: string) => {
-    if (!window.confirm(`Remove "${name}" from sources?`)) return;
-    const { error } = await supabase.from('signal_sources').delete().eq('id', id);
-    if (error) { toast({ title: 'Delete source failed', description: error.message, variant: 'destructive' }); return; }
-    onRefresh();
-  };
-
-  return (
-    <div className="space-y-3">
-      {/* Explanation */}
-      <div className="rounded-xl border border-border/20 bg-card/10 px-4 py-3 space-y-2">
-        <p className="text-[10px] font-mono text-foreground/70">
-          Sources the AI searches when generating Signal and Grounding companions.
-        </p>
-        <div className="space-y-1">
-          <p className="text-[9px] text-muted-foreground/60">
-            <span className="font-mono font-medium">signal</span> sources — Bitcoin thinkers, essayists, publications for philosophical insights
-          </p>
-          <p className="text-[9px] text-muted-foreground/60">
-            <span className="font-mono font-medium">grounding</span> sources — Academic researchers, behavioral finance journals
-          </p>
-        </div>
-      </div>
-
-      {/* Add new source */}
-      {!adding ? (
-        <button
-          onClick={() => setAdding(true)}
-          className="text-[10px] font-mono text-primary/70 hover:text-primary transition-colors"
-        >
-          + Add source
-        </button>
-      ) : (
-        <div className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 space-y-2">
-          <input
-            value={newName}
-            onChange={e => setNewName(e.target.value)}
-            placeholder="Source name (e.g. Parker Lewis)"
-            className="w-full text-[10px] font-mono bg-transparent border-b border-border/30 pb-1 outline-none placeholder:text-muted-foreground/40"
-          />
-          <input
-            value={newUrl}
-            onChange={e => setNewUrl(e.target.value)}
-            placeholder="URL (optional)"
-            className="w-full text-[10px] font-mono bg-transparent border-b border-border/30 pb-1 outline-none placeholder:text-muted-foreground/40"
-          />
-          <div className="flex gap-2">
-            <select value={newType} onChange={e => setNewType(e.target.value)} className="text-[10px] font-mono bg-transparent border border-border/30 rounded px-1.5 py-0.5">
-              <option value="blog">blog</option>
-              <option value="book">book</option>
-              <option value="podcast">podcast</option>
-              <option value="essay">essay</option>
-              <option value="academic">academic</option>
-            </select>
-            <select value={newCategory} onChange={e => setNewCategory(e.target.value)} className="text-[10px] font-mono bg-transparent border border-border/30 rounded px-1.5 py-0.5">
-              <option value="signal">signal</option>
-              <option value="grounding">grounding</option>
-            </select>
-          </div>
-          <div className="flex gap-2">
-            <button onClick={addSource} disabled={saving || !newName.trim()} className="text-[10px] font-mono text-primary hover:text-primary/80 disabled:opacity-30">
-              {saving ? 'Saving...' : 'Save'}
-            </button>
-            <button onClick={() => setAdding(false)} className="text-[10px] font-mono text-muted-foreground/60 hover:text-muted-foreground">
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
-
-      <button onClick={() => setOpen(!open)} className="flex items-center gap-1.5 w-full text-left">
-        {open ? <ChevronDown className="h-3 w-3 text-muted-foreground/60" /> : <ChevronRight className="h-3 w-3 text-muted-foreground/60" />}
-        <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">
-          Source Catalog <span className="text-muted-foreground/45">({sources.length})</span>
-        </p>
-      </button>
-      {open && (
-        <div className="space-y-3">
-          {grouped.map(([category, items]) => (
-            <div key={category} className="space-y-1.5">
-              <span className="text-[10px] font-mono text-foreground/80">{CATEGORY_LABELS[category] ?? category}</span>
-              {items.map(src => {
-                const libCount = libraryEntries.filter(le => le.author?.toLowerCase() === src.name.toLowerCase()).length;
-                return (
-                <div key={src.id} className="rounded-lg border border-border/20 bg-card/10 px-3 py-2 flex items-center justify-between gap-2">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-[10px] font-mono text-foreground/80 truncate">{src.name}</p>
-                    <div className="flex items-center gap-2 mt-0.5">
-                      <span
-                        className="text-[9px] font-mono px-1.5 py-0.5 rounded-full"
-                        style={{
-                          backgroundColor: `${SOURCE_TYPE_COLORS[src.type] ?? '#64748b'}20`,
-                          color: SOURCE_TYPE_COLORS[src.type] ?? '#64748b',
-                        }}
-                      >
-                        {src.type}
-                      </span>
-                      {libCount > 0 && (
-                        <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full bg-primary/10 text-primary/70">
-                          <BookOpen className="h-2.5 w-2.5 inline mr-0.5" />{libCount} in library
-                        </span>
-                      )}
-                      {src.url && (
-                        <a
-                          href={src.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-[9px] text-primary/60 hover:text-primary flex items-center gap-0.5 truncate transition-colors"
-                        >
-                          <Globe className="h-2.5 w-2.5 flex-shrink-0" />
-                          <span className="truncate">{src.url.replace(/^https?:\/\//, '').slice(0, 40)}</span>
-                        </a>
-                      )}
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => deleteSource(src.id, src.name)}
-                    className="text-destructive/40 hover:text-destructive transition-colors flex-shrink-0"
-                    title="Remove source"
-                  >
-                    <Trash2 className="h-3 w-3" />
-                  </button>
-                </div>
-                );
-              })}
-            </div>
-          ))}
-          {sources.length === 0 && (
-            <p className="text-[10px] text-muted-foreground/50 text-center py-3">No sources configured</p>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-const LIBRARY_TYPE_COLORS: Record<string, string> = {
-  essay: '#8b5cf6',
-  paper: '#06b6d4',
-  event: '#f59e0b',
-  article: '#10b981',
-  book: '#6366f1',
-  podcast: '#ec4899',
-};
-
-function ContentLibraryViewer({ entries, onRefresh }: { entries: LibraryEntryRow[]; onRefresh: () => void }) {
-  const { toast } = useToast();
-  const [typeFilter, setTypeFilter] = useState<string>('all');
-  const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [deleting, setDeleting] = useState<string | null>(null);
-
-  const typeOptions = useMemo(() => {
-    const types = Array.from(new Set(entries.map(e => e.type))).sort();
-    return [
-      { value: 'all', label: 'All' },
-      ...types.map(t => ({ value: t, label: t.charAt(0).toUpperCase() + t.slice(1) + 's' })),
-    ];
-  }, [entries]);
-
-  const filtered = useMemo(() => {
-    if (typeFilter === 'all') return entries;
-    return entries.filter(e => e.type === typeFilter);
-  }, [entries, typeFilter]);
-
-  const deleteEntry = useCallback(async (id: string, title: string) => {
-    if (!window.confirm(`Remove "${title}" from library?`)) return;
-    setDeleting(id);
-    const { error } = await supabase.from('content_library').update({ active: false } as any).eq('id', id);
-    setDeleting(null);
-    if (error) { toast({ title: 'Remove entry failed', description: error.message, variant: 'destructive' }); return; }
-    onRefresh();
-  }, [onRefresh, toast]);
-
-  return (
-    <div className="space-y-3">
-      <div className="rounded-xl border border-border/20 bg-card/10 px-4 py-3 space-y-2">
-        <p className="text-[10px] font-mono text-foreground/70">
-          Curated content library — essays, papers, and events used by AI companions.
-        </p>
-        <p className="text-[9px] text-muted-foreground/50">
-          Entries are matched to sources by author name. Deleting sets <span className="font-mono">active = false</span>.
-        </p>
-      </div>
-
-      <FilterRow label="Type" options={typeOptions} value={typeFilter} onChange={setTypeFilter} />
-      <p className="text-[9px] font-mono text-muted-foreground/50">
-        {filtered.length === entries.length
-          ? `${entries.length} entr${entries.length !== 1 ? 'ies' : 'y'}`
-          : `Showing ${filtered.length} of ${entries.length} — `}
-        {filtered.length < entries.length && (
-          <button onClick={() => setTypeFilter('all')} className="text-primary/70 hover:text-primary">clear filter</button>
-        )}
-      </p>
-
-      <div className="space-y-1.5">
-        {filtered.map(entry => {
-          const isExpanded = expandedId === entry.id;
-          const isDeleting = deleting === entry.id;
-          return (
-            <div key={entry.id} className="rounded-lg border border-border/20 bg-card/10 px-3 py-2 space-y-1.5">
-              <div className="flex items-center gap-2">
-                <span
-                  className="text-[9px] font-mono px-1.5 py-0.5 rounded-full flex-shrink-0"
-                  style={{
-                    backgroundColor: `${LIBRARY_TYPE_COLORS[entry.type] ?? '#64748b'}20`,
-                    color: LIBRARY_TYPE_COLORS[entry.type] ?? '#64748b',
-                  }}
-                >
-                  {entry.type}
-                </span>
-                <button
-                  onClick={() => setExpandedId(isExpanded ? null : entry.id)}
-                  className="text-[10px] font-mono text-foreground/80 truncate flex-1 min-w-0 text-left hover:text-primary transition-colors"
-                >
-                  {entry.title}
-                </button>
-                <QualityBadge score={entry.quality_score} />
-                <button
-                  onClick={() => deleteEntry(entry.id, entry.title)}
-                  disabled={isDeleting}
-                  className="text-destructive/40 hover:text-destructive transition-colors flex-shrink-0 disabled:opacity-30"
-                  title="Remove entry"
-                >
-                  {isDeleting ? <Loader2 className="h-3 w-3 animate-spin" /> : <Trash2 className="h-3 w-3" />}
-                </button>
-              </div>
-              <div className="flex items-center gap-3">
-                {entry.author && <span className="text-[9px] text-muted-foreground/50">by {entry.author}</span>}
-                <span className="text-[9px] text-muted-foreground/45">{new Date(entry.created_at).toLocaleDateString()}</span>
-                {entry.url && (
-                  <a href={entry.url} target="_blank" rel="noopener noreferrer" className="text-[9px] text-primary/60 hover:text-primary flex items-center gap-0.5 transition-colors">
-                    <Globe className="h-2.5 w-2.5" /> link
-                  </a>
-                )}
-              </div>
-              <p className="text-[9px] font-mono text-muted-foreground/40">
-                {isExpanded ? entry.summary : entry.summary.slice(0, 80)}{!isExpanded && entry.summary.length > 80 ? '…' : ''}
-              </p>
-              {isExpanded && (
-                <div className="pt-1 border-t border-border/5 space-y-1.5">
-                  <p className="text-[9px] font-mono text-foreground/40 whitespace-pre-wrap break-words">{entry.summary}</p>
-                  {entry.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-1">
-                      {entry.tags.map(tag => (
-                        <span key={tag} className="text-[8px] font-mono px-1.5 py-0.5 rounded-full bg-muted/30 text-muted-foreground/50">{tag}</span>
-                      ))}
-                    </div>
-                  )}
-                  {entry.companion_types.length > 0 && (
-                    <div className="flex flex-wrap gap-1">
-                      {entry.companion_types.map(ct => (
-                        <span key={ct} className="text-[8px] font-mono px-1.5 py-0.5 rounded-full bg-primary/10 text-primary/60">{label(ct)}</span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          );
-        })}
-        {filtered.length === 0 && (
-          <p className="text-[10px] text-muted-foreground/50 text-center py-3">
-            {entries.length === 0 ? 'No library entries yet' : 'No entries match filter'}
-          </p>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function DevModeToggle() {
-  const [devMode, setDevMode] = useState(false);
-  const [syncing, setSyncing] = useState(false);
-
-  useEffect(() => {
-    try {
-      setDevMode(localStorage.getItem('holzen_dev_mode') === 'true');
-    } catch { /* ignore */ }
-
-    (async () => {
-      try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-        const { data } = await supabase
-          .from('analytics_events')
-          .select('metadata')
-          .eq('user_id', user.id)
-          .eq('event', 'dev_mode_setting')
-          .order('created_at', { ascending: false })
-          .limit(1);
-        if (data && data.length > 0) {
-          const dbValue = (data[0].metadata as any)?.enabled === true;
-          setDevMode(dbValue);
-          try {
-            if (dbValue) localStorage.setItem('holzen_dev_mode', 'true');
-            else localStorage.removeItem('holzen_dev_mode');
-          } catch { /* ignore */ }
-        }
-      } catch { /* non-critical */ }
-    })();
-  }, []);
-
-  const toggle = async () => {
-    const next = !devMode;
-    setDevMode(next);
-    setSyncing(true);
-    try {
-      if (next) localStorage.setItem('holzen_dev_mode', 'true');
-      else localStorage.removeItem('holzen_dev_mode');
-    } catch { /* ignore */ }
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) {
-        await supabase.from('analytics_events').insert({
-          user_id: user.id,
-          event: 'dev_mode_setting',
-          metadata: { enabled: next },
-        });
-      }
-    } catch { /* non-critical */ }
-    setSyncing(false);
-  };
-
-  return (
-    <div className="space-y-2">
-      <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">Dev Tools</p>
-      <button
-        onClick={toggle}
-        className={`w-full rounded-xl border px-4 py-3 flex items-center gap-3 transition-all ${
-          devMode
-            ? 'border-amber-500/30 bg-amber-500/5 dark:bg-amber-500/10'
-            : 'border-border/15 bg-card/10 hover:bg-card/20'
-        }`}
-      >
-        <Zap className={`h-3.5 w-3.5 ${devMode ? 'text-amber-500 dark:text-amber-400' : 'text-muted-foreground/30'}`} />
-        <div className="flex-1 text-left">
-          <p className={`text-[10px] font-mono ${devMode ? 'text-amber-700 dark:text-amber-300' : 'text-foreground/60'}`}>
-            Rapid Testing Mode {syncing && '…'}
-          </p>
-          <p className="text-[9px] text-muted-foreground/40">
-            {devMode ? '5s cooldown between pauses (active)' : '15min cooldown between pauses (normal)'}
-          </p>
-        </div>
-        <span className={`text-[9px] font-mono ${devMode ? 'text-amber-600 dark:text-amber-400' : 'text-muted-foreground/30'}`}>
-          {devMode ? 'ON' : 'OFF'}
-        </span>
-      </button>
-      {devMode && (
-        <p className="text-[9px] text-amber-700/50 dark:text-amber-400/50 px-1">
-          ⚡ Generate pause sessions rapidly to gather data. Each session costs ~$0.01-0.05 in API calls. Disable when done testing.
-        </p>
-      )}
     </div>
   );
 }
