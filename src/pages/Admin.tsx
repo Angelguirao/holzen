@@ -185,6 +185,82 @@ export default function Admin() {
   // ── Period label for subtitle ──
   const periodLabel = PERIOD_OPTIONS.find(p => p.value === period)?.label.toLowerCase() ?? period;
 
+  // ── Session filters ──
+  const [sessionMoodFilter, setSessionMoodFilter] = useState<string>('all');
+  const [sessionOutcomeFilter, setSessionOutcomeFilter] = useState<string>('all');
+  const [sessionCompanionFilter, setSessionCompanionFilter] = useState<string>('all');
+
+  const sessionMoodOptions = useMemo(() => {
+    const moods = Array.from(new Set(sessions.map(s => s.mood).filter(Boolean) as string[])).sort();
+    return [{ value: 'all', label: 'All' }, ...moods.map(m => ({ value: m, label: m }))];
+  }, [sessions]);
+
+  const sessionOutcomeOptions = [
+    { value: 'all', label: 'All' },
+    { value: 'held', label: 'held' },
+    { value: 'sold', label: 'sold' },
+    { value: 'bought', label: 'bought' },
+    { value: 'pending', label: 'pending' },
+  ];
+
+  const sessionCompanionOptions = [
+    { value: 'all', label: 'All' },
+    { value: 'missing', label: 'Missing' },
+  ];
+
+  const filteredSessions = useMemo(() => {
+    return sessions.filter(s => {
+      if (sessionMoodFilter !== 'all' && s.mood !== sessionMoodFilter) return false;
+      if (sessionOutcomeFilter !== 'all') {
+        if (sessionOutcomeFilter === 'pending') {
+          if (s.outcome) return false;
+        } else if (s.outcome !== sessionOutcomeFilter) return false;
+      }
+      if (sessionCompanionFilter === 'missing') {
+        const allLoaded = !!s.signal_title && !!s.learning_title && !!s.history_insight_data && !!s.zoom_out_data && !!s.haiku;
+        if (allLoaded) return false;
+      }
+      return true;
+    });
+  }, [sessions, sessionMoodFilter, sessionOutcomeFilter, sessionCompanionFilter]);
+
+  // ── Feed filters ──
+  const [feedTypeFilter, setFeedTypeFilter] = useState<string>('all');
+
+  const feedTypeOptions = useMemo(() => {
+    const types = Array.from(new Set(recentContent.map(c => c.companion_type))).sort();
+    return [{ value: 'all', label: 'All' }, ...types.map(t => ({ value: t, label: label(t) }))];
+  }, [recentContent]);
+
+  const filteredFeed = useMemo(() => {
+    if (feedTypeFilter === 'all') return recentContent;
+    return recentContent.filter(c => c.companion_type === feedTypeFilter);
+  }, [recentContent, feedTypeFilter]);
+
+  // ── Rejection filters ──
+  const [rejectionTypeFilter, setRejectionTypeFilter] = useState<string>('all');
+  const [rejectionStatusFilter, setRejectionStatusFilter] = useState<string>('all');
+
+  const rejectionTypeOptions = useMemo(() => {
+    const types = Array.from(new Set(rejections.map(r => r.companion_type))).sort();
+    return [{ value: 'all', label: 'All' }, ...types.map(t => ({ value: t, label: label(t) }))];
+  }, [rejections]);
+
+  const rejectionStatusOptions = [
+    { value: 'all', label: 'All' },
+    { value: 'error', label: 'error' },
+    { value: 'timeout', label: 'timeout' },
+    { value: 'quality_gate_failed', label: 'quality_gate_failed' },
+  ];
+
+  const filteredRejections = useMemo(() => {
+    return rejections.filter(r => {
+      if (rejectionTypeFilter !== 'all' && r.companion_type !== rejectionTypeFilter) return false;
+      if (rejectionStatusFilter !== 'all' && r.status !== rejectionStatusFilter) return false;
+      return true;
+    });
+  }, [rejections, rejectionTypeFilter, rejectionStatusFilter]);
+
   // ── Early returns (after all hooks) ──
   if (adminLoading) {
     return (
@@ -534,8 +610,16 @@ export default function Admin() {
           {/* Sessions Timeline */}
           <div className="space-y-2">
             <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">Recent Sessions</p>
+            <div className="space-y-1.5">
+              <FilterRow label="Mood" options={sessionMoodOptions} value={sessionMoodFilter} onChange={setSessionMoodFilter} />
+              <FilterRow label="Outcome" options={sessionOutcomeOptions} value={sessionOutcomeFilter} onChange={setSessionOutcomeFilter} />
+              <FilterRow label="Companion" options={sessionCompanionOptions} value={sessionCompanionFilter} onChange={setSessionCompanionFilter} />
+              {(sessionMoodFilter !== 'all' || sessionOutcomeFilter !== 'all' || sessionCompanionFilter !== 'all') && (
+                <p className="text-[9px] font-mono text-muted-foreground/40">Showing {filteredSessions.length} of {sessions.length}</p>
+              )}
+            </div>
             <div className="space-y-1">
-              {sessions.map(s => (
+              {filteredSessions.map(s => (
                 <div key={s.id} className="rounded-lg border border-border/20 bg-card/10 px-3 py-2 space-y-1.5">
                   <div className="flex items-center gap-2">
                     <span className="text-[9px] font-mono text-muted-foreground/50 flex-shrink-0">
@@ -576,8 +660,10 @@ export default function Admin() {
                   </div>
                 </div>
               ))}
-              {sessions.length === 0 && (
-                <p className="text-[10px] text-muted-foreground/50 text-center py-3">No sessions yet</p>
+              {filteredSessions.length === 0 && (
+                <p className="text-[10px] text-muted-foreground/50 text-center py-3">
+                  {sessions.length === 0 ? 'No sessions yet' : 'No sessions match filters'}
+                </p>
               )}
             </div>
           </div>
@@ -603,11 +689,17 @@ export default function Admin() {
           <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">
             Recent Content <span className="text-muted-foreground/45">({recentContent.length})</span>
           </p>
-          {recentContent.map(item => (
+          <FilterRow label="Type" options={feedTypeOptions} value={feedTypeFilter} onChange={setFeedTypeFilter} />
+          {feedTypeFilter !== 'all' && (
+            <p className="text-[9px] font-mono text-muted-foreground/40">Showing {filteredFeed.length} of {recentContent.length}</p>
+          )}
+          {filteredFeed.map(item => (
             <FeedCard key={item.id} item={item} />
           ))}
-          {recentContent.length === 0 && (
-            <p className="text-[10px] text-muted-foreground/50 text-center py-3">No content generated yet</p>
+          {filteredFeed.length === 0 && (
+            <p className="text-[10px] text-muted-foreground/50 text-center py-3">
+              {recentContent.length === 0 ? 'No content generated yet' : 'No content matches filter'}
+            </p>
           )}
         </TabsContent>
 
@@ -616,12 +708,19 @@ export default function Admin() {
           <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">
             Quality Gate Failures <span className="text-muted-foreground/45">({rejections.length})</span>
           </p>
+          <FilterRow label="Type" options={rejectionTypeOptions} value={rejectionTypeFilter} onChange={setRejectionTypeFilter} />
+          <FilterRow label="Status" options={rejectionStatusOptions} value={rejectionStatusFilter} onChange={setRejectionStatusFilter} />
+          {(rejectionTypeFilter !== 'all' || rejectionStatusFilter !== 'all') && (
+            <p className="text-[9px] font-mono text-muted-foreground/40">Showing {filteredRejections.length} of {rejections.length}</p>
+          )}
           <div className="space-y-1.5">
-            {rejections.map(r => (
+            {filteredRejections.map(r => (
               <RejectionEntry key={r.id} row={r} />
             ))}
-            {rejections.length === 0 && (
-              <p className="text-[10px] text-muted-foreground/50 text-center py-3">No rejections</p>
+            {filteredRejections.length === 0 && (
+              <p className="text-[10px] text-muted-foreground/50 text-center py-3">
+                {rejections.length === 0 ? 'No rejections' : 'No rejections match filters'}
+              </p>
             )}
           </div>
         </TabsContent>
@@ -631,6 +730,33 @@ export default function Admin() {
       <p className="text-[9px] text-muted-foreground/40 text-center pb-4">
         AI Companion System Monitor · Data from Supabase views
       </p>
+    </div>
+  );
+}
+
+// ── Reusable filter row ──
+function FilterRow({ label: filterLabel, options, value, onChange }: {
+  label: string;
+  options: { value: string; label: string }[];
+  value: string;
+  onChange: (v: string) => void;
+}) {
+  return (
+    <div className="flex flex-wrap items-center gap-1.5">
+      <span className="text-[9px] font-mono text-muted-foreground/50 mr-1">{filterLabel}:</span>
+      {options.map(opt => (
+        <button
+          key={opt.value}
+          onClick={() => onChange(opt.value)}
+          className={`text-[9px] font-mono px-2 py-0.5 rounded-full transition-colors ${
+            value === opt.value
+              ? 'bg-primary/15 text-primary'
+              : 'text-muted-foreground/50 hover:text-muted-foreground/80 hover:bg-muted/20'
+          }`}
+        >
+          {opt.label}
+        </button>
+      ))}
     </div>
   );
 }
@@ -734,16 +860,42 @@ function QualityBadge({ score }: { score: number }) {
 function CuratedContentManager({ entries, onRefresh }: { entries: CacheEntryRow[]; onRefresh: () => Promise<void> }) {
   const [open, setOpen] = useState(false);
   const [acting, setActing] = useState<string | null>(null);
+  const [qualityFilter, setQualityFilter] = useState<string>('all');
+  const [contentStatusFilter, setContentStatusFilter] = useState<string>('all');
+
+  const contentQualityOptions = [
+    { value: 'all', label: 'All' },
+    { value: 'curated', label: 'Curated' },
+    { value: 'good', label: 'Good' },
+    { value: 'low', label: 'Low' },
+  ];
+
+  const contentStatusOptions = [
+    { value: 'all', label: 'All' },
+    { value: 'permanent', label: 'Permanent' },
+    { value: 'expiring', label: 'Expiring' },
+  ];
+
+  const filteredEntries = useMemo(() => {
+    return entries.filter(e => {
+      if (qualityFilter === 'curated' && e.quality_score < 3) return false;
+      if (qualityFilter === 'good' && e.quality_score !== 2) return false;
+      if (qualityFilter === 'low' && e.quality_score >= 2) return false;
+      if (contentStatusFilter === 'permanent' && e.expires_at !== null) return false;
+      if (contentStatusFilter === 'expiring' && e.expires_at === null) return false;
+      return true;
+    });
+  }, [entries, qualityFilter, contentStatusFilter]);
 
   const grouped = useMemo(() => {
     const map = new Map<string, CacheEntryRow[]>();
-    for (const e of entries) {
+    for (const e of filteredEntries) {
       const key = e.companion_type;
       if (!map.has(key)) map.set(key, []);
       map.get(key)!.push(e);
     }
     return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b));
-  }, [entries]);
+  }, [filteredEntries]);
 
   const promote = useCallback(async (id: string) => {
     setActing(id);
@@ -799,6 +951,11 @@ function CuratedContentManager({ entries, onRefresh }: { entries: CacheEntryRow[
       </button>
       {open && (
         <div className="space-y-3">
+          <FilterRow label="Quality" options={contentQualityOptions} value={qualityFilter} onChange={setQualityFilter} />
+          <FilterRow label="Status" options={contentStatusOptions} value={contentStatusFilter} onChange={setContentStatusFilter} />
+          {(qualityFilter !== 'all' || contentStatusFilter !== 'all') && (
+            <p className="text-[9px] font-mono text-muted-foreground/40">Showing {filteredEntries.length} of {entries.length}</p>
+          )}
           {grouped.map(([type, items]) => (
             <div key={type} className="space-y-1.5">
               <div className="flex items-center gap-2">
@@ -872,8 +1029,10 @@ function CuratedContentManager({ entries, onRefresh }: { entries: CacheEntryRow[
               })}
             </div>
           ))}
-          {entries.length === 0 && (
-            <p className="text-[10px] text-muted-foreground/50 text-center py-3">No cache entries</p>
+          {filteredEntries.length === 0 && (
+            <p className="text-[10px] text-muted-foreground/50 text-center py-3">
+              {entries.length === 0 ? 'No cache entries' : 'No entries match filters'}
+            </p>
           )}
         </div>
       )}
