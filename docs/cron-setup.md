@@ -19,6 +19,25 @@ SELECT cron.schedule(
 );
 ```
 
+## Source Feed Fetcher (fetch-source-feeds)
+
+Fetches latest content from signal_sources URLs, structures it, and stores in content_library. This is what makes sources actively feed the system.
+
+```sql
+-- Run twice daily (6 AM and 6 PM UTC)
+SELECT cron.schedule(
+  'fetch-source-feeds',
+  '0 6,18 * * *',
+  $$
+  SELECT net.http_post(
+    url := 'https://edgbwdecaoottowliimu.supabase.co/functions/v1/fetch-source-feeds',
+    headers := '{"Content-Type": "application/json", "Authorization": "Bearer YOUR_SERVICE_ROLE_KEY"}'::jsonb,
+    body := '{}'::jsonb
+  );
+  $$
+);
+```
+
 ## Cache Warmer (pregenerate-companions)
 
 Generates fresh companion content for the cache, promotes high-quality entries to permanent, prunes low-quality ones, and processes user feedback.
