@@ -690,9 +690,19 @@ export default function Admin() {
             Recent Content <span className="text-muted-foreground/45">({recentContent.length})</span>
           </p>
           <FilterRow label="Type" options={feedTypeOptions} value={feedTypeFilter} onChange={setFeedTypeFilter} />
-          {feedTypeFilter !== 'all' && (
-            <p className="text-[9px] font-mono text-muted-foreground/40">Showing {filteredFeed.length} of {recentContent.length}</p>
-          )}
+          <p className="text-[9px] font-mono text-muted-foreground/50">
+            {filteredFeed.length === recentContent.length
+              ? `${recentContent.length} item${recentContent.length !== 1 ? 's' : ''}`
+              : `Showing ${filteredFeed.length} of ${recentContent.length} — `}
+            {filteredFeed.length < recentContent.length && (
+              <button onClick={() => setFeedTypeFilter('all')} className="text-primary/70 hover:text-primary">clear filter</button>
+            )}
+            {feedTypeOptions.length === 2 && feedTypeOptions[1] && (
+              <span className="text-muted-foreground/40 ml-2">
+                (only {feedTypeOptions[1].label} in cache — other types generated live)
+              </span>
+            )}
+          </p>
           {filteredFeed.map(item => (
             <FeedCard key={item.id} item={item} />
           ))}
@@ -710,9 +720,14 @@ export default function Admin() {
           </p>
           <FilterRow label="Type" options={rejectionTypeOptions} value={rejectionTypeFilter} onChange={setRejectionTypeFilter} />
           <FilterRow label="Status" options={rejectionStatusOptions} value={rejectionStatusFilter} onChange={setRejectionStatusFilter} />
-          {(rejectionTypeFilter !== 'all' || rejectionStatusFilter !== 'all') && (
-            <p className="text-[9px] font-mono text-muted-foreground/40">Showing {filteredRejections.length} of {rejections.length}</p>
-          )}
+          <p className="text-[9px] font-mono text-muted-foreground/50">
+            {filteredRejections.length === rejections.length
+              ? `${rejections.length} rejection${rejections.length !== 1 ? 's' : ''}`
+              : `Showing ${filteredRejections.length} of ${rejections.length} — `}
+            {filteredRejections.length < rejections.length && (
+              <button onClick={() => { setRejectionTypeFilter('all'); setRejectionStatusFilter('all'); }} className="text-primary/70 hover:text-primary">clear filters</button>
+            )}
+          </p>
           <div className="space-y-1.5">
             {filteredRejections.map(r => (
               <RejectionEntry key={r.id} row={r} />
