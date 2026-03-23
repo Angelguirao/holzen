@@ -10,7 +10,7 @@
 
 import { qualityGate, containsSlop, isUrlReachable, contentFingerprint } from "../quality.ts";
 import { GROUNDING_FALLBACKS, pickRandom } from "../fallbacks.ts";
-import { serveFromCache } from "../cache.ts";
+import { parseMarketDirection, serveFromCache } from "../cache.ts";
 import { createAttemptLogger } from "../observe.ts";
 
 // ── Public types ──
@@ -47,9 +47,11 @@ const BIAS_TOPICS: { topic: string; direction: "down" | "up" | "both" }[] = [
 
 async function serveFallback(
   svcClient: any,
+  userId?: string,
+  marketDirection?: "up" | "down" | "neutral",
   excludeIds?: string[],
 ): Promise<GroundingResult> {
-  const cached = await serveFromCache(svcClient, "ground_nudge", "en", excludeIds);
+  const cached = await serveFromCache(svcClient, "ground_nudge", "en", { userId, marketDirection, excludeIds });
   if (cached) return { data: cached.data, source: "cache", cacheId: cached.cacheId };
   return { data: pickRandom(GROUNDING_FALLBACKS), source: "curated", cacheId: null };
 }
@@ -91,6 +93,7 @@ async function callPerplexity(
 
 export async function generateGrounding(params: GenerateGroundingParams): Promise<GroundingResult> {
   const { svcClient, context, recentTopics, userId, log } = params;
+  const marketDirectionForCache = parseMarketDirection(context);
 
   const logAttempt = createAttemptLogger(svcClient, { userId });
 
@@ -98,7 +101,7 @@ export async function generateGrounding(params: GenerateGroundingParams): Promis
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   if (!PERPLEXITY_API_KEY || !LOVABLE_API_KEY) {
     log("missing API keys, serving fallback");
-    return serveFallback(svcClient);
+    return serveFallback(svcClient, userId, marketDirectionForCache);
   }
 
   // ── Bias topic selection, matching market direction and avoiding recently used ones ──
@@ -143,11 +146,11 @@ export async function generateGrounding(params: GenerateGroundingParams): Promis
     log(`content length: ${searchContent.length}, citations: ${citations.length}`);
   } catch (e) {
     log(`perplexity failed: ${e}`);
-    return serveFallback(svcClient);
+    return serveFallback(svcClient, userId, marketDirectionForCache);
   }
 
   if (!searchContent) {
-    return serveFallback(svcClient);
+    return serveFallback(svcClient, userId, marketDirectionForCache);
   }
 
   // ── Step 2: AI structuring ──
@@ -266,7 +269,7 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
   const qg = qualityGate("ground_nudge", nudge);
   if (!nudge || !qg.pass) {
     log(`quality gate failed: ${!nudge ? "no nudge" : `body=${(nudge.body || "").length}chars, slop=${containsSlop(nudge?.body || "") || containsSlop(nudge?.title || "")}, reason=${qg.reason ?? "unknown"}`}`);
-    return serveFallback(svcClient);
+    return serveFallback(svcClient, userId, marketDirectionForCache);
   }
 
   // ── Step 4: URL post-processing ──
@@ -304,6 +307,7 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
           source_url: nudge.url || null,
           source_host: sourceHost || null,
           citations: citations.length > 0 ? JSON.stringify(citations) : null,
+          market_regime: parseMarketDirection(context),
           expires_at: new Date(Date.now() + 14 * 86400000).toISOString(),
           last_validated_at: qualityScore >= 2 ? new Date().toISOString() : null,
           automated_score: qualityScore,
