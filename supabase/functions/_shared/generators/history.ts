@@ -28,6 +28,7 @@ export interface GenerateHistoryParams {
   mood?: string;
   recentTitles?: string[];
   userId?: string;
+  preferredMood?: "recovery" | "caution" | "neutral";
   log: (msg: string, extra?: Record<string, unknown>) => void;
 }
 
@@ -57,12 +58,19 @@ const HISTORICAL_ERAS: HistoricalEra[] = [
 ];
 
 /** Select a historical era that matches the user's emotional state */
-function selectEra(mood: string | undefined, recentTitles: string[] | undefined): HistoricalEra {
+function selectEra(
+  mood: string | undefined,
+  recentTitles: string[] | undefined,
+  preferredMood?: "recovery" | "caution" | "neutral",
+): HistoricalEra {
   const recentSet = new Set((recentTitles || []).map(t => t.toLowerCase()));
 
   // Mood-aware filtering
   let preferred: HistoricalEra[];
-  if (mood === "anxious" || mood === "fearful") {
+  if (preferredMood) {
+    preferred = HISTORICAL_ERAS.filter(e => e.mood === preferredMood);
+    if (preferred.length === 0) preferred = HISTORICAL_ERAS;
+  } else if (mood === "anxious" || mood === "fearful") {
     preferred = HISTORICAL_ERAS.filter(e => e.mood === "recovery");
   } else if (mood === "excited" || mood === "fomo" || mood === "greedy") {
     preferred = HISTORICAL_ERAS.filter(e => e.mood === "caution");
@@ -127,7 +135,7 @@ async function callPerplexity(
 // ── Public entry point ──
 
 export async function generateHistory(params: GenerateHistoryParams): Promise<HistoryResult> {
-  const { svcClient, context, mood, recentTitles, userId, log } = params;
+  const { svcClient, context, mood, recentTitles, userId, preferredMood, log } = params;
   const marketDirection = parseMarketDirection(context);
 
   const logAttempt = createAttemptLogger(svcClient, { userId });
@@ -144,7 +152,7 @@ export async function generateHistory(params: GenerateHistoryParams): Promise<Hi
   const titleExclusion = (recentTitles && Array.isArray(recentTitles) && recentTitles.length > 0)
     ? `\nDo NOT cover these topics (already shown recently): ${recentTitles.slice(0, 5).join("; ")}. Find a COMPLETELY DIFFERENT historical event.`
     : "";
-  const randomEra = selectEra(mood, recentTitles);
+  const randomEra = selectEra(mood, recentTitles, preferredMood);
 
   // ── Step 1: Perplexity search ──
   log("calling perplexity");

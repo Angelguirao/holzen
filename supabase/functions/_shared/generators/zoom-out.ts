@@ -31,6 +31,7 @@ export interface GenerateZoomOutParams {
   mood?: string;
   userId?: string;
   recentTitles?: string[];
+  zoomOutAngle?: string;
   log: (msg: string, extra?: Record<string, unknown>) => void;
 }
 
@@ -135,13 +136,14 @@ async function generateDeepTime(
     context?: string;
     mood?: string;
     recentTitles?: string[];
+    zoomOutAngle?: string;
     currentPrice: number | null;
     onThisDay: { yearsAgo: number; price: number; date: string }[];
     userId?: string;
     log: GenerateZoomOutParams["log"];
   },
 ): Promise<DeepTimeResult> {
-  const { context, mood, recentTitles, currentPrice, onThisDay, userId, log } = params;
+  const { context, mood, recentTitles, zoomOutAngle, currentPrice, onThisDay, userId, log } = params;
   const logAttempt = createAttemptLogger(svcClient, { userId });
 
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -179,7 +181,10 @@ async function generateDeepTime(
     "The Library of Alexandria held all human knowledge; Bitcoin holds all human trust",
     "Bristlecone pines in California are 5,000 years old — they were saplings when money was invented",
   ];
-  const seed = DEEP_TIME_SEEDS[Math.floor(Math.random() * DEEP_TIME_SEEDS.length)];
+  const trimmedAngle = zoomOutAngle?.trim();
+  const seed = trimmedAngle
+    ? trimmedAngle
+    : DEEP_TIME_SEEDS[Math.floor(Math.random() * DEEP_TIME_SEEDS.length)];
 
   const systemPrompt = `You generate ONE deep-time perspective for a Bitcoin mindfulness app. Zoom WAY out — beyond markets, beyond decades — into civilizational, planetary, or epochal timescales.
 
@@ -302,7 +307,7 @@ No trading advice, no price predictions, no exclamation marks.${mood ? `\n\nUSER
 // ── Public entry point ──
 
 export async function generateZoomOut(params: GenerateZoomOutParams): Promise<ZoomOutResult> {
-  const { svcClient, context, mood, recentTitles, userId, log } = params;
+  const { svcClient, context, mood, recentTitles, userId, zoomOutAngle, log } = params;
 
   // ── 1. Fetch historical BTC prices with DB caching ──
   const prices = await fetchHistoricalAndCurrentPrices(svcClient, context, log);
@@ -321,6 +326,7 @@ export async function generateZoomOut(params: GenerateZoomOutParams): Promise<Zo
     context,
     mood,
     recentTitles,
+    zoomOutAngle,
     currentPrice: prices.currentPrice,
     onThisDay: prices.onThisDay,
     userId,

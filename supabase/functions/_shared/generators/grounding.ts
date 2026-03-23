@@ -27,6 +27,7 @@ export interface GenerateGroundingParams {
   language?: string;
   recentTopics?: string[];
   userId?: string;
+  preferredBias?: string;
   log: (msg: string, extra?: Record<string, unknown>) => void;
 }
 
@@ -44,6 +45,18 @@ const BIAS_TOPICS: { topic: string; direction: "down" | "up" | "both" }[] = [
   { topic: "regret aversion and its effect on long-term investment holding", direction: "both" },
   { topic: "social proof and information cascading in Bitcoin markets", direction: "down" },
 ];
+
+function findMatchingBiasTopic(preferredBias: string | undefined): (typeof BIAS_TOPICS)[number] | null {
+  const pref = preferredBias?.trim().toLowerCase();
+  if (!pref) return null;
+  for (const t of BIAS_TOPICS) {
+    const tl = t.topic.toLowerCase();
+    if (tl.includes(pref) || pref.includes(tl)) return t;
+    const words = pref.split(/\s+/).filter((w) => w.length > 4);
+    if (words.some((w) => tl.includes(w))) return t;
+  }
+  return null;
+}
 
 async function serveFallback(
   svcClient: any,
@@ -92,7 +105,7 @@ async function callPerplexity(
 // ── Public entry point ──
 
 export async function generateGrounding(params: GenerateGroundingParams): Promise<GroundingResult> {
-  const { svcClient, context, recentTopics, userId, log } = params;
+  const { svcClient, context, recentTopics, userId, preferredBias, log } = params;
   const marketDirectionForCache = parseMarketDirection(context);
 
   const logAttempt = createAttemptLogger(svcClient, { userId });
@@ -119,7 +132,11 @@ export async function generateGrounding(params: GenerateGroundingParams): Promis
     : BIAS_TOPICS;
   const available = directionFiltered.filter(t => !recentSet.has(t.topic.toLowerCase()));
   const pool = available.length > 0 ? available : directionFiltered.length > 0 ? directionFiltered : BIAS_TOPICS;
-  const randomBias = pool[Math.floor(Math.random() * pool.length)].topic;
+  const preferredEntry = findMatchingBiasTopic(preferredBias);
+  const preferredUsable = preferredEntry && !recentSet.has(preferredEntry.topic.toLowerCase());
+  const randomBias = preferredUsable
+    ? preferredEntry.topic
+    : pool[Math.floor(Math.random() * pool.length)].topic;
 
   const marketContext = context || "Bitcoin market volatility";
   const searchQuery = `Find a specific academic study or research paper about ${randomBias}. The research should be relevant to: ${marketContext}. Include the researcher names, university, year of publication, sample size or key methodology detail, and the main finding. Prefer peer-reviewed journals.`;
