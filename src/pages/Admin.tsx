@@ -252,8 +252,8 @@ export default function Admin() {
           <TabsTrigger value="content" className={TAB_TRIGGER_CLASS}>Content</TabsTrigger>
           <TabsTrigger value="sources" className={TAB_TRIGGER_CLASS}>Sources</TabsTrigger>
           <TabsTrigger value="tools" className={TAB_TRIGGER_CLASS}>Tools</TabsTrigger>
-          <TabsTrigger value="feed" className={TAB_TRIGGER_CLASS}>Feed</TabsTrigger>
-          <TabsTrigger value="rejections" className={TAB_TRIGGER_CLASS}>Rejections</TabsTrigger>
+          <TabsTrigger value="feed" className={TAB_TRIGGER_CLASS}>Feed{recentContent.length > 0 ? ` (${recentContent.length})` : ''}</TabsTrigger>
+          <TabsTrigger value="rejections" className={TAB_TRIGGER_CLASS}>Rejections{rejections.length > 0 ? ` (${rejections.length})` : ''}</TabsTrigger>
         </TabsList>
 
         {/* Tab 1: Monitor */}
@@ -377,6 +377,14 @@ export default function Admin() {
           </div>
 
           {/* Cost Chart */}
+          {costChartData.length === 0 && (
+            <div className="space-y-2">
+              <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">Daily Cost</p>
+              <div className="rounded-xl border border-border/20 bg-card/10 p-6 text-center">
+                <p className="text-[10px] text-muted-foreground/50">No cost data yet — generate some sessions to see the chart</p>
+              </div>
+            </div>
+          )}
           {costChartData.length > 0 && (
             <div className="space-y-2">
               <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">Daily Cost (14d)</p>
@@ -484,22 +492,39 @@ export default function Admin() {
           <div className="space-y-2">
             <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">User Feedback <span className="text-muted-foreground/40 normal-case">(all time)</span></p>
             <div className="space-y-1.5">
-              {feedback.map((row, i) => (
-                <div key={i} className="rounded-lg border border-border/20 bg-card/10 px-3 py-2 flex items-center justify-between">
-                  <span className="text-[10px] font-mono text-foreground/80">{label(row.companion_type)}</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[9px] text-muted-foreground/50">
-                      <ThumbsUp className="h-2.5 w-2.5 inline mr-0.5" />{row.total_thumbs_up ?? 0}
-                    </span>
-                    <span className="text-[9px] text-muted-foreground/50">
-                      👎 {row.total_thumbs_down ?? 0}
-                    </span>
-                    <span className="text-[10px] font-mono text-primary/50">
-                      {(row.approval_pct ?? 0).toFixed(0)}%
-                    </span>
+              {feedback.map((row, i) => {
+                const pct = row.approval_pct ?? 0;
+                const total = (row.total_thumbs_up ?? 0) + (row.total_thumbs_down ?? 0);
+                return (
+                  <div key={i} className="rounded-lg border border-border/20 bg-card/10 px-3 py-2 space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[10px] font-mono text-foreground/80">{label(row.companion_type)}</span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-[9px] text-muted-foreground/50">
+                          <ThumbsUp className="h-2.5 w-2.5 inline mr-0.5" />{row.total_thumbs_up ?? 0}
+                        </span>
+                        <span className="text-[9px] text-muted-foreground/50">
+                          👎 {row.total_thumbs_down ?? 0}
+                        </span>
+                        <span className={`text-[10px] font-mono ${pct >= 70 ? 'text-emerald-600 dark:text-emerald-400' : pct >= 40 ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400'}`}>
+                          {pct.toFixed(0)}%
+                        </span>
+                      </div>
+                    </div>
+                    {total > 0 && (
+                      <div className="h-1.5 bg-muted/40 rounded-full overflow-hidden">
+                        <div
+                          className="h-full rounded-full transition-all duration-500"
+                          style={{
+                            width: `${pct}%`,
+                            backgroundColor: pct >= 70 ? '#10b981' : pct >= 40 ? '#f59e0b' : '#ef4444',
+                          }}
+                        />
+                      </div>
+                    )}
                   </div>
-                </div>
-              ))}
+                );
+              })}
               {feedback.length === 0 && (
                 <p className="text-[10px] text-muted-foreground/50 text-center py-3">No feedback data yet</p>
               )}
@@ -511,19 +536,30 @@ export default function Admin() {
             <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">Recent Sessions</p>
             <div className="space-y-1">
               {sessions.map(s => (
-                <div key={s.id} className="rounded-lg border border-border/20 bg-card/10 px-3 py-1.5 flex items-center gap-2">
-                  <span className="text-[9px] font-mono text-muted-foreground/30 flex-shrink-0">
-                    {new Date(s.created_at).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                  </span>
-                  {s.mood && (
-                    <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full bg-primary/10 text-primary/60 flex-shrink-0">
-                      {s.mood}
+                <div key={s.id} className="rounded-lg border border-border/20 bg-card/10 px-3 py-2 space-y-1.5">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[9px] font-mono text-muted-foreground/50 flex-shrink-0">
+                      {new Date(s.created_at).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                     </span>
-                  )}
-                  <span className="text-[9px] font-mono text-foreground/50 truncate flex-1 min-w-0">
-                    {s.message?.slice(0, 60)}{(s.message?.length ?? 0) > 60 ? '…' : ''}
-                  </span>
-                  <div className="flex items-center gap-1.5 flex-shrink-0 flex-wrap justify-end">
+                    {s.mood && (
+                      <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full bg-primary/15 text-primary flex-shrink-0">
+                        {s.mood}
+                      </span>
+                    )}
+                    {s.outcome && (
+                      <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded-full flex-shrink-0 ${
+                        s.outcome === 'held' ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
+                        : s.outcome === 'sold' ? 'bg-red-500/15 text-red-600 dark:text-red-400'
+                        : 'bg-blue-500/15 text-blue-600 dark:text-blue-400'
+                      }`}>
+                        {s.outcome}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[9px] font-mono text-foreground/70 leading-relaxed">
+                    {s.message?.slice(0, 100)}{(s.message?.length ?? 0) > 100 ? '…' : ''}
+                  </p>
+                  <div className="flex items-center gap-1.5 flex-wrap">
                     {[
                       { loaded: !!s.signal_title, name: 'Signal' },
                       { loaded: !!s.learning_title, name: 'Ground' },
@@ -531,8 +567,8 @@ export default function Admin() {
                       { loaded: !!s.zoom_out_data, name: 'Zoom' },
                       { loaded: !!s.haiku, name: 'Haiku' },
                     ].map(c => (
-                      <span key={c.name} className={`text-[8px] font-mono px-1 py-0.5 rounded ${
-                        c.loaded ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400' : 'bg-muted/20 text-muted-foreground/40'
+                      <span key={c.name} className={`text-[8px] font-mono px-1.5 py-0.5 rounded ${
+                        c.loaded ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400' : 'bg-muted/30 text-muted-foreground/40'
                       }`}>
                         {c.name}
                       </span>
