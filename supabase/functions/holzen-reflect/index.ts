@@ -202,7 +202,11 @@ Tone: ${baseTone}
 THEMATIC ANGLE FOR THIS SESSION: ${thematicFraming}
 ${adaptiveContext}
 
-CURRENCY: The user views BTC prices in ${currencyCode}. When mentioning any price or monetary value, format it in ${currencyCode}.
+PRICE RULES (CRITICAL):
+- Do NOT include specific dollar amounts, BTC prices, or exchange rates in the reflection
+- Do NOT invent or estimate the current price — you do not know it
+- You may reference the DIRECTION ("the price moved", "the number changed") but NEVER a specific number
+- If the context mentions a percentage change, you may reference it generally ("a significant move") but do not repeat the exact percentage
 
 The context may include a Fear & Greed Index score (0-100). Use this to subtly adjust your reflection:
 - Extreme Fear (0-24): The crowd is panicking. Reflect on what happens when fear spreads.
@@ -351,6 +355,8 @@ Haiku rules:
       else if (msg.length > 500) { qgFailed = true; qgReason = "reflection_too_long"; }
       // Contains exclamation marks (against the calm tone)
       else if (msg.includes("!")) { qgFailed = true; qgReason = "reflection_exclamation"; }
+      // Contains fabricated prices (the AI should never include $ amounts or BTC values)
+      else if (/\$[\d,]+(\.\d+)?/.test(msg) || /\d+(\.\d+)?\s*BTC\b/i.test(msg)) { qgFailed = true; qgReason = "reflection_fabricated_price"; }
 
       // Haiku validation
       if (result.haiku) {
