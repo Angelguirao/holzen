@@ -1,5 +1,24 @@
 # Cron Job Setup
 
+## BTC Price Refresh (refresh-btc-prices) — MOST IMPORTANT
+
+Keeps btc_price_cache fresh so the Zoom Out companion never needs to call CoinGecko during user sessions. Without this cron, Zoom Out won't have price data.
+
+```sql
+-- Run every 15 minutes
+SELECT cron.schedule(
+  'refresh-btc-prices',
+  '*/15 * * * *',
+  $$
+  SELECT net.http_post(
+    url := 'https://edgbwdecaoottowliimu.supabase.co/functions/v1/refresh-btc-prices',
+    headers := '{"Content-Type": "application/json", "Authorization": "Bearer YOUR_SERVICE_ROLE_KEY"}'::jsonb,
+    body := '{}'::jsonb
+  );
+  $$
+);
+```
+
 ## Cache Warmer (pregenerate-companions)
 
 Generates fresh companion content for the cache, promotes high-quality entries to permanent, prunes low-quality ones, and processes user feedback.
