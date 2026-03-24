@@ -65,9 +65,29 @@ serve(async (req) => {
   const log = (msg: string) => console.log(`[pregenerate] ${msg} (+${Date.now() - t0}ms)`);
 
   try {
+    // ── Auth: require service role key or a valid cron secret ──
+    const authHeader = req.headers.get("Authorization");
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+    const cronSecret = Deno.env.get("CRON_SECRET") ?? "";
+    const token = authHeader?.replace("Bearer ", "") ?? "";
+
+    const isServiceRole = token === serviceRoleKey;
+    const isCronSecret = cronSecret.length > 0 && token === cronSecret;
+    // Also allow Supabase's internal cron invocations (they pass the anon key + service role context)
+    const isInternalCron = req.headers.get("x-supabase-cron") === "true";
+
+    if (!isServiceRole && !isCronSecret && !isInternalCron) {
+      log("unauthorized: missing or invalid credentials");
+      return new Response(JSON.stringify({ error: "Unauthorized. Requires service role key or cron secret." }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    log("auth verified");
+
     const { createClient } = await import("npm:@supabase/supabase-js@2.57.2");
     const sbUrl = Deno.env.get("SUPABASE_URL") ?? "";
-    const svcClient = createClient(sbUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "", { auth: { persistSession: false } });
+    const svcClient = createClient(sbUrl, serviceRoleKey, { auth: { persistSession: false } });
 
     const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -78,22 +98,33 @@ serve(async (req) => {
     const results: string[] = [];
 
     // ═══════════════════════════════════════════
-    // STEP 1: Cache TTL Enforcement (14 days)
+    // STEP 1: Smart Cache Lifecycle
     // ═══════════════════════════════════════════
-    const fourteenDaysAgo = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000).toISOString();
-    const { data: expired, error: expErr } = await svcClient
-      .from("companion_cache")
-      .delete()
-      .lt("created_at", fourteenDaysAgo)
-      .select("id");
-    if (expErr) {
-      log(`TTL cleanup error: ${expErr.message}`);
-    } else {
-      const count = expired?.length ?? 0;
-      if (count > 0) results.push(`TTL: removed ${count} entries older than 14 days`);
-    }
+    // Instead of blindly deleting old entries, we:
+    // 1. PROMOTE high-quality entries to permanent (no expiry) — these become curated
+    // 2. PRUNE low-quality entries after 3 days
+    // 3. EXPIRE medium entries after 30 days (extended from 14)
 
-    // Also prune low-quality entries older than 3 days
+    // 1a. Promote: quality_score >= 3 → set expires_at = null (permanent/curated)
+    const { data: promoted } = await svcClient
+      .from("companion_cache")
+      .update({ expires_at: null })
+      .gte("quality_score", 3)
+      .not("expires_at", "is", null)
+      .select("id");
+    if (promoted && promoted.length > 0) results.push(`Promoted ${promoted.length} high-quality entries to permanent`);
+
+    // 1b. Auto-promote: quality_score >= 2 AND used_count >= 3 (served 3+ times successfully)
+    const { data: autoPromoted } = await svcClient
+      .from("companion_cache")
+      .update({ expires_at: null, quality_score: 3 })
+      .gte("quality_score", 2)
+      .gte("used_count", 3)
+      .not("expires_at", "is", null)
+      .select("id");
+    if (autoPromoted && autoPromoted.length > 0) results.push(`Auto-promoted ${autoPromoted.length} proven entries to permanent`);
+
+    // 2. Prune: low-quality (score < 2) older than 3 days → delete
     const threeDaysAgo = new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString();
     const { data: pruned } = await svcClient
       .from("companion_cache")
@@ -103,7 +134,18 @@ serve(async (req) => {
       .select("id");
     if (pruned && pruned.length > 0) results.push(`Pruned ${pruned.length} low-quality entries`);
 
-    log(`Cache cleanup done`);
+    // 3. Expire: medium entries (score 1-2, not permanent) older than 30 days → delete
+    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+    const { data: expired } = await svcClient
+      .from("companion_cache")
+      .delete()
+      .lt("quality_score", 3)
+      .lt("created_at", thirtyDaysAgo)
+      .not("expires_at", "is", null)  // don't touch permanent entries
+      .select("id");
+    if (expired && expired.length > 0) results.push(`Expired ${expired.length} stale medium-quality entries`);
+
+    log(`Cache lifecycle done`);
 
     // ═══════════════════════════════════════════
     // STEP 2: Generate Grounding (2 entries)
