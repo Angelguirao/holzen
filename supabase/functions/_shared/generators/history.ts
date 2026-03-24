@@ -308,7 +308,7 @@ BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? 
     ],
   };
 
-  const models = ["google/gemini-2.5-flash", "google/gemini-3-flash-preview"];
+  const models = ["google/gemini-2.5-flash", "google/gemini-2.5-flash-lite"];
   let insight: any = null;
 
   const AI_TIMEOUTS = [8000, 6000];

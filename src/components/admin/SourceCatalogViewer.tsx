@@ -1,0 +1,177 @@
+import { useState, useMemo } from 'react';
+import { ChevronDown, ChevronRight, Trash2, Globe, BookOpen } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import type { SignalSourceRow, LibraryEntryRow } from '@/hooks/use-admin-stats';
+
+const SOURCE_TYPE_COLORS: Record<string, string> = {
+  blog: '#8b5cf6',
+  podcast: '#06b6d4',
+  book: '#f59e0b',
+  newsletter: '#10b981',
+  twitter: '#6366f1',
+  video: '#ec4899',
+};
+
+const CATEGORY_LABELS: Record<string, string> = {
+  signal: 'Signal',
+  grounding: 'Grounding',
+  learning: 'Learning',
+};
+
+export function SourceCatalogViewer({ sources, onRefresh, libraryEntries = [] }: {
+  sources: SignalSourceRow[];
+  onRefresh: () => void;
+  libraryEntries?: LibraryEntryRow[];
+}) {
+  const { toast } = useToast();
+  const [open, setOpen] = useState(false);
+  const [adding, setAdding] = useState(false);
+  const [newName, setNewName] = useState('');
+  const [newUrl, setNewUrl] = useState('');
+  const [newType, setNewType] = useState('blog');
+  const [newCategory, setNewCategory] = useState('signal');
+  const [saving, setSaving] = useState(false);
+
+  const grouped = useMemo(() => {
+    const map = new Map<string, SignalSourceRow[]>();
+    for (const s of sources) {
+      if (!map.has(s.category)) map.set(s.category, []);
+      map.get(s.category)!.push(s);
+    }
+    return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b));
+  }, [sources]);
+
+  const addSource = async () => {
+    if (!newName.trim()) return;
+    setSaving(true);
+    const { error } = await supabase.from('signal_sources').insert({
+      name: newName.trim(),
+      url: newUrl.trim() || null,
+      type: newType,
+      category: newCategory,
+    } as any);
+    setSaving(false);
+    if (error) { toast({ title: 'Add source failed', description: error.message, variant: 'destructive' }); return; }
+    setNewName('');
+    setNewUrl('');
+    setAdding(false);
+    onRefresh();
+  };
+
+  const deleteSource = async (id: string, name: string) => {
+    if (!window.confirm(`Remove "${name}" from sources?`)) return;
+    const { error } = await supabase.from('signal_sources').delete().eq('id', id);
+    if (error) { toast({ title: 'Delete source failed', description: error.message, variant: 'destructive' }); return; }
+    onRefresh();
+  };
+
+  return (
+    <div className="space-y-3">
+      <div className="rounded-xl border border-border/20 bg-card/10 px-4 py-3 space-y-2">
+        <p className="text-[10px] font-mono text-foreground/70">
+          Sources the AI searches when generating Signal and Grounding companions.
+        </p>
+        <div className="space-y-1">
+          <p className="text-[9px] text-muted-foreground/60">
+            <span className="font-mono font-medium">signal</span> sources — Bitcoin thinkers, essayists, publications for philosophical insights
+          </p>
+          <p className="text-[9px] text-muted-foreground/60">
+            <span className="font-mono font-medium">grounding</span> sources — Academic researchers, behavioral finance journals
+          </p>
+        </div>
+      </div>
+
+      {!adding ? (
+        <button onClick={() => setAdding(true)} className="text-[10px] font-mono text-primary/70 hover:text-primary transition-colors">
+          + Add source
+        </button>
+      ) : (
+        <div className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 space-y-2">
+          <input value={newName} onChange={e => setNewName(e.target.value)}
+            placeholder="Source name (e.g. Parker Lewis)"
+            className="w-full text-[10px] font-mono bg-transparent border-b border-border/30 pb-1 outline-none placeholder:text-muted-foreground/40" />
+          <input value={newUrl} onChange={e => setNewUrl(e.target.value)}
+            placeholder="URL (optional)"
+            className="w-full text-[10px] font-mono bg-transparent border-b border-border/30 pb-1 outline-none placeholder:text-muted-foreground/40" />
+          <div className="flex gap-2">
+            <select value={newType} onChange={e => setNewType(e.target.value)} className="text-[10px] font-mono bg-transparent border border-border/30 rounded px-1.5 py-0.5">
+              <option value="blog">blog</option>
+              <option value="book">book</option>
+              <option value="podcast">podcast</option>
+              <option value="essay">essay</option>
+              <option value="academic">academic</option>
+            </select>
+            <select value={newCategory} onChange={e => setNewCategory(e.target.value)} className="text-[10px] font-mono bg-transparent border border-border/30 rounded px-1.5 py-0.5">
+              <option value="signal">signal</option>
+              <option value="grounding">grounding</option>
+            </select>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={addSource} disabled={saving || !newName.trim()} className="text-[10px] font-mono text-primary hover:text-primary/80 disabled:opacity-30">
+              {saving ? 'Saving...' : 'Save'}
+            </button>
+            <button onClick={() => setAdding(false)} className="text-[10px] font-mono text-muted-foreground/60 hover:text-muted-foreground">
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      <button onClick={() => setOpen(!open)} className="flex items-center gap-1.5 w-full text-left">
+        {open ? <ChevronDown className="h-3 w-3 text-muted-foreground/60" /> : <ChevronRight className="h-3 w-3 text-muted-foreground/60" />}
+        <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">
+          Source Catalog <span className="text-muted-foreground/45">({sources.length})</span>
+        </p>
+      </button>
+
+      {open && (
+        <div className="space-y-3">
+          {grouped.map(([category, items]) => (
+            <div key={category} className="space-y-1.5">
+              <span className="text-[10px] font-mono text-foreground/80">{CATEGORY_LABELS[category] ?? category}</span>
+              {items.map(src => {
+                const libCount = libraryEntries.filter(le => le.author?.toLowerCase() === src.name.toLowerCase()).length;
+                return (
+                  <div key={src.id} className="rounded-lg border border-border/20 bg-card/10 px-3 py-2 flex items-center justify-between gap-2">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-[10px] font-mono text-foreground/80 truncate">{src.name}</p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full"
+                          style={{
+                            backgroundColor: `${SOURCE_TYPE_COLORS[src.type] ?? '#64748b'}20`,
+                            color: SOURCE_TYPE_COLORS[src.type] ?? '#64748b',
+                          }}>
+                          {src.type}
+                        </span>
+                        {libCount > 0 && (
+                          <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full bg-primary/10 text-primary/70">
+                            <BookOpen className="h-2.5 w-2.5 inline mr-0.5" />{libCount} in library
+                          </span>
+                        )}
+                        {src.url && (
+                          <a href={src.url} target="_blank" rel="noopener noreferrer"
+                            className="text-[9px] text-primary/60 hover:text-primary flex items-center gap-0.5 truncate transition-colors">
+                            <Globe className="h-2.5 w-2.5 flex-shrink-0" />
+                            <span className="truncate">{src.url.replace(/^https?:\/\//, '').slice(0, 40)}</span>
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                    <button onClick={() => deleteSource(src.id, src.name)}
+                      className="text-destructive/40 hover:text-destructive transition-colors flex-shrink-0" title="Remove source">
+                      <Trash2 className="h-3 w-3" />
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          ))}
+          {sources.length === 0 && (
+            <p className="text-[10px] text-muted-foreground/50 text-center py-3">No sources configured</p>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}

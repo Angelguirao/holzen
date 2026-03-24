@@ -38,19 +38,13 @@ export function CompanionFeedback({ reflectionId, companionType, cacheId, compac
           .select('metadata')
           .eq('user_id', user.id)
           .eq('event', 'companion_feedback')
-          .limit(20);
+          .filter('metadata->>reflection_id', 'eq', reflectionId)
+          .filter('metadata->>companion_type', 'eq', companionType)
+          .limit(1);
 
-        if (cancelled || !data) return;
+        if (cancelled || !data || data.length === 0) return;
 
-        // Find an existing vote for this reflection+companion
-        const existing = data.find((row: any) => {
-          const meta = row.metadata as any;
-          return meta?.reflection_id === reflectionId && meta?.companion_type === companionType;
-        });
-
-        if (existing) {
-          setVote((existing.metadata as any)?.vote ?? null);
-        }
+        setVote((data[0].metadata as any)?.vote ?? null);
       } catch {
         // Non-critical
       }
@@ -67,11 +61,11 @@ export function CompanionFeedback({ reflectionId, companionType, cacheId, compac
 
     try {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) { setVote(null); return; }
 
       const cacheType = FEEDBACK_TO_CACHE_TYPE[companionType];
 
-      await supabase.from('analytics_events').insert({
+      const { error } = await supabase.from('analytics_events').insert({
         user_id: user.id,
         event: 'companion_feedback',
         metadata: {
@@ -82,8 +76,9 @@ export function CompanionFeedback({ reflectionId, companionType, cacheId, compac
           reflection_id: reflectionId || null,
         },
       });
+      if (error) setVote(null); // rollback optimistic update on failure
     } catch {
-      // Non-critical, fail silently
+      setVote(null); // rollback on unexpected error
     } finally {
       setLoading(false);
     }

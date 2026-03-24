@@ -194,8 +194,14 @@ export default function PauseSession() {
     const newVal = !isFavorite;
     setIsFavorite(newVal);
     hapticFeedback('light');
-    await supabase.from('reflections').update({ is_favorite: newVal }).eq('id', reflectionId);
-    await supabase.from('library_items').update({ is_favorite: newVal }).eq('reflection_id', reflectionId).eq('source_type', 'reflection');
+    const [r1, r2] = await Promise.all([
+      supabase.from('reflections').update({ is_favorite: newVal }).eq('id', reflectionId),
+      supabase.from('library_items').update({ is_favorite: newVal }).eq('reflection_id', reflectionId).eq('source_type', 'reflection'),
+    ]);
+    if (r1.error || r2.error) {
+      setIsFavorite(!newVal); // roll back optimistic update
+      return;
+    }
     if (newVal && !subscribed) {
       toast(t('pause.favoriteProHint'), { duration: 4000 });
     }

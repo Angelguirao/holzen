@@ -320,7 +320,7 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
     temperature: 0.3,
   };
 
-  const models = ["google/gemini-2.5-flash", "google/gemini-3-flash-preview"];
+  const models = ["google/gemini-2.5-flash", "google/gemini-2.5-flash-lite"];
   let nudge: any = null;
 
   const AI_TIMEOUTS = [8000, 6000];
