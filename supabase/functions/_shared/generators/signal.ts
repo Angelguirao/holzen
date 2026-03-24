@@ -60,18 +60,6 @@ async function serveFallback(
   return { data: pickRandom(SIGNAL_FALLBACKS), source: "curated", cacheId: null };
 }
 
-function signalPreferTags(searchAngle?: string, context?: string): string[] {
-  const words = new Set<string>();
-  for (const text of [searchAngle, context]) {
-    if (!text) continue;
-    for (const w of text.split(/\s+/)) {
-      const t = w.replace(/[^a-zA-Z]/g, "");
-      if (t.length > 4) words.add(t.toLowerCase());
-    }
-  }
-  return [...words];
-}
-
 function buildSourceHints(sources?: Array<{ name: string; type: string; url?: string }>) {
   const sourceNames: string[] = [];
   const sourceUrls: string[] = [];
@@ -139,101 +127,6 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
   }
 
   const trimmedSearchAngle = searchAngle?.trim();
-
-  // ── Try local content library first (FRESH entries only) ──
-  const libraryResults = await searchLibrary(svcClient, {
-    type: "essay",
-    companionType: "signal",
-    userId,
-    preferTags: signalPreferTags(trimmedSearchAngle, context),
-    excludeTitles: recentSignalTitles,
-    limit: 3,
-  });
-
-  if (libraryResults.length > 0) {
-    const pick = libraryResults[0];
-    const result = essayToSignal(pick);
-    log(`served from library (fresh): "${pick.title}"`);
-    recordLibraryServe(svcClient, userId, pick.id, "signal");
-    const citations = pick.url ? [pick.url] : [];
-    if (result.url && !result.url.startsWith("http")) {
-      result.url = normalizeUrl(result.url);
-    }
-    const originalSource = result.source;
-    result.source = validateSource(result.source, result.url || "", citations, sources as any);
-    if (result.source !== originalSource) {
-      log(`source corrected: "${originalSource}" → "${result.source}"`);
-    }
-    let qualityScore = 1;
-    if (result.title && result.body && result.source && qualityScore > 0) {
-      try {
-        const { data: existing } = await svcClient
-          .from("companion_cache")
-          .select("content")
-          .eq("companion_type", "signal")
-          .eq("language", "en")
-          .limit(30);
-        const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
-        const newNorm = norm(result.title);
-        const isDup = existing?.some((e: any) => {
-          const t = norm(e.content?.title || "");
-          return t === newNorm || t.includes(newNorm) || newNorm.includes(t);
-        });
-        if (!isDup) {
-          let sourceHost = "";
-          try {
-            sourceHost = result.url
-              ? new URL(result.url.startsWith("http") ? result.url : `https://${result.url}`).hostname.replace(/^www\./, "")
-              : "";
-          } catch { /* ignore */ }
-          const fingerprint = await contentFingerprint(newNorm);
-          const { error: cacheErr } = await svcClient.from("companion_cache").insert({
-            companion_type: "signal",
-            language: "en",
-            content: result,
-            quality_score: qualityScore,
-            title: result.title,
-            title_norm: newNorm,
-            fingerprint,
-            source_kind: "essay",
-            source_title: result.source || null,
-            source_author: result.source || null,
-            source_url: result.url || null,
-            source_host: sourceHost || null,
-            citations: citations.length > 0 ? JSON.stringify(citations) : null,
-            market_regime: parseMarketDirection(context),
-            expires_at: new Date(Date.now() + 14 * 86400000).toISOString(),
-            last_validated_at: qualityScore >= 2 ? new Date().toISOString() : null,
-            automated_score: qualityScore,
-          });
-          if (cacheErr) log(`cache insert error: ${cacheErr.message}`);
-        } else {
-          log("cache dedup: skipped duplicate title");
-        }
-      } catch (e) {
-        log(`cache write failed: ${e}`);
-      }
-    }
-    if (result.url && result.url.startsWith("http")) {
-      isUrlReachable(result.url).then(async (reachable) => {
-        if (reachable) {
-          try {
-            const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
-            const titleNorm = norm(result.title);
-            await svcClient.from("companion_cache")
-              .update({ quality_score: 2, last_validated_at: new Date().toISOString() })
-              .eq("companion_type", "signal")
-              .eq("title_norm", titleNorm);
-          } catch { /* non-critical */ }
-        } else {
-          log("background URL validation failed", { url: result.url });
-        }
-      }).catch(() => {});
-    }
-    return { data: result, source: "live", cacheId: null };
-  }
-
-  // ── No local match — fall through to Perplexity ──
 
   // ── Source hints & exclusions ──
   const { sourceNames, sourceUrls } = buildSourceHints(sources);
