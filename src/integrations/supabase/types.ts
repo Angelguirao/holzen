@@ -1453,6 +1453,38 @@ export type Database = {
         }
         Relationships: []
       }
+      user_companion_serves: {
+        Row: {
+          cache_entry_id: string
+          companion_type: string
+          id: string
+          served_at: string | null
+          user_id: string
+        }
+        Insert: {
+          cache_entry_id: string
+          companion_type: string
+          id?: string
+          served_at?: string | null
+          user_id: string
+        }
+        Update: {
+          cache_entry_id?: string
+          companion_type?: string
+          id?: string
+          served_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_companion_serves_cache_entry_id_fkey"
+            columns: ["cache_entry_id"]
+            isOneToOne: false
+            referencedRelation: "companion_cache"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_signal_preferences: {
         Row: {
           active: boolean
