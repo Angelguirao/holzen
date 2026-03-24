@@ -54,6 +54,59 @@
 
   <body>
     <div id="root"></div>
+    <script>
+      (function () {
+        const params = new URLSearchParams(window.location.search);
+
+        async function resetAppCache() {
+          try {
+            if ("serviceWorker" in navigator) {
+              const registrations = await navigator.serviceWorker.getRegistrations();
+              await Promise.all(registrations.map((registration) => registration.unregister()));
+            }
+            if ("caches" in window) {
+              const cacheKeys = await caches.keys();
+              await Promise.all(cacheKeys.map((key) => caches.delete(key)));
+            }
+          } catch (error) {
+            console.warn("[boot-recovery] cache reset failed", error);
+          }
+        }
+
+        if (params.get("reset-app-cache") === "1") {
+          resetAppCache().finally(() => {
+            params.delete("reset-app-cache");
+            const nextSearch = params.toString();
+            const nextUrl = `${window.location.pathname}${nextSearch ? `?${nextSearch}` : ""}${window.location.hash}`;
+            window.location.replace(nextUrl);
+          });
+          return;
+        }
+
+        // If app bundle fails to boot (e.g. stale SW/chunk mismatch),
+        // render a self-healing recovery UI instead of a blank white page.
+        window.setTimeout(() => {
+          const root = document.getElementById("root");
+          if (!root || root.children.length > 0) return;
+
+          root.innerHTML = `
+            <main style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:#f5f2ec;color:#1f2937;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;">
+              <section style="max-width:460px;text-align:center;line-height:1.5;">
+                <h1 style="font-size:22px;margin:0 0 12px;">Holzen needs a quick refresh</h1>
+                <p style="margin:0 0 18px;opacity:0.82;">Your browser likely has an old cached app version. Resetting local app cache will fix this.</p>
+                <button id="reset-app-cache-btn" style="border:0;border-radius:999px;padding:12px 18px;background:#111827;color:#ffffff;font-weight:600;cursor:pointer;">Reset app cache</button>
+              </section>
+            </main>
+          `;
+
+          const button = document.getElementById("reset-app-cache-btn");
+          button?.addEventListener("click", async () => {
+            await resetAppCache();
+            window.location.reload();
+          });
+        }, 4000);
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

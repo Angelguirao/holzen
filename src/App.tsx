@@ -71,6 +71,7 @@ const App = () => (
               <Routes>
                 <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
                   <Route path="/" element={<Home />} />
+                  <Route path="/index" element={<Navigate to="/" replace />} />
                   <Route path="/library" element={<Library />} />
                   <Route path="/history" element={<Navigate to="/library" replace />} />
                   <Route path="/profile" element={<Profile />} />
