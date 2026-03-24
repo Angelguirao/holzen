@@ -316,9 +316,24 @@ export default function Admin() {
             <StatCard icon={Activity} title="Serves" value={periodStats.serves.toLocaleString()} subtitle={periodLabel} trend={servesTrend} />
             <StatCard icon={Database} title="Cache Hit" value={`${periodStats.cacheHitRate}%`}
               subtitle={periodStats.cacheHitRate === 0 ? 'all live — fresh content' : periodStats.cacheHitRate < 30 ? 'mostly live generation' : 'good cache usage'}
-              trend={cacheHitTrend} />
-            <StatCard icon={DollarSign} title="Cost" value={`$${periodStats.cost.toFixed(3)}`} subtitle={periodLabel} alert={periodStats.cost > 8} trend={costTrend} />
-            <StatCard icon={AlertTriangle} title="Failure Rate" value={`${failureRate}%`} subtitle="target: <10%" alert={failureRate > 20} trend={failureTrend} />
+              trend={cacheHitTrend}
+            />
+            <StatCard
+              icon={DollarSign}
+              title="Cost"
+              value={`$${periodStats.cost.toFixed(3)}`}
+              subtitle={periodLabel}
+              alert={periodStats.cost > (period === 'today' ? 8 : period === '7d' ? 50 : period === '30d' ? 200 : false)}
+              trend={costTrend}
+            />
+            <StatCard
+              icon={AlertTriangle}
+              title="Failure Rate"
+              value={`${failureRate}%`}
+              subtitle="target: <10%"
+              alert={failureRate > 20}
+              trend={failureTrend}
+            />
           </div>
 
           {/* Cost Chart */}

@@ -165,6 +165,11 @@ function periodToMs(period: TimePeriod): number | null {
 }
 
 function periodStart(period: TimePeriod): string | null {
+  if (period === 'today') {
+    // Today means just today's date (not last 24h)
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+  }
   const ms = periodToMs(period);
   if (!ms) return null;
   return new Date(Date.now() - ms).toISOString();
@@ -337,14 +342,16 @@ export function useAdminStats(enabled = true): AdminStats {
       .limit(20);
     setSessions((sessionData ?? []) as SessionRow[]);
 
-    // Content library entries
-    const { data: libraryData } = await supabase
-      .from('content_library')
-      .select('id, type, title, author, summary, url, tags, companion_types, quality_score, active, created_at')
-      .eq('active', true)
-      .order('created_at', { ascending: false })
-      .limit(100);
-    setLibraryEntries((libraryData ?? []) as LibraryEntryRow[]);
+    // Content library entries (table may not exist before migration — fail gracefully)
+    try {
+      const { data: libraryData, error: libErr } = await supabase
+        .from('content_library')
+        .select('id, type, title, author, summary, url, tags, companion_types, quality_score, active, created_at')
+        .eq('active', true)
+        .order('created_at', { ascending: false })
+        .limit(100);
+      if (!libErr) setLibraryEntries((libraryData ?? []) as LibraryEntryRow[]);
+    } catch { /* table may not exist yet */ }
   }, []);
 
   const fetchAll = useCallback(async () => {
