@@ -13,7 +13,7 @@ import { SIGNAL_FALLBACKS, pickRandom } from "../fallbacks.ts";
 import { parseMarketDirection, serveFromCache } from "../cache.ts";
 import { createAttemptLogger } from "../observe.ts";
 import { validateSource } from "../source-validation.ts";
-import { searchLibrary, essayToSignal } from "../content-library.ts";
+import { searchLibrary, essayToSignal, recordLibraryServe } from "../content-library.ts";
 
 // ── Public types ──
 
@@ -43,6 +43,18 @@ async function serveFallback(
   marketDirection?: "up" | "down" | "neutral",
   excludeIds?: string[],
 ): Promise<SignalResult> {
+  const staleLibrary = await searchLibrary(svcClient, {
+    type: "essay",
+    companionType: "signal",
+    userId,
+    includeStale: true,
+  });
+  if (staleLibrary.length > 0) {
+    const pick = staleLibrary[Math.floor(Math.random() * Math.min(staleLibrary.length, 3))];
+    const result = essayToSignal(pick);
+    recordLibraryServe(svcClient, userId, pick.id, "signal");
+    return { data: result, source: "cache", cacheId: null };
+  }
   const cached = await serveFromCache(svcClient, "signal", "en", { userId, marketDirection, excludeIds });
   if (cached) return { data: cached.data, source: "cache", cacheId: cached.cacheId };
   return { data: pickRandom(SIGNAL_FALLBACKS), source: "curated", cacheId: null };
@@ -128,10 +140,11 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
 
   const trimmedSearchAngle = searchAngle?.trim();
 
-  // ── Try local content library first ──
+  // ── Try local content library first (FRESH entries only) ──
   const libraryResults = await searchLibrary(svcClient, {
     type: "essay",
     companionType: "signal",
+    userId,
     preferTags: signalPreferTags(trimmedSearchAngle, context),
     excludeTitles: recentSignalTitles,
     limit: 3,
@@ -140,7 +153,8 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
   if (libraryResults.length > 0) {
     const pick = libraryResults[0];
     const result = essayToSignal(pick);
-    log(`served from content library: "${pick.title}"`);
+    log(`served from library (fresh): "${pick.title}"`);
+    recordLibraryServe(svcClient, userId, pick.id, "signal");
     const citations = pick.url ? [pick.url] : [];
     if (result.url && !result.url.startsWith("http")) {
       result.url = normalizeUrl(result.url);

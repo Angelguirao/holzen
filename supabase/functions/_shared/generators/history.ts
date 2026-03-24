@@ -12,7 +12,7 @@ import { qualityGate, BANNED_PHRASES, isUrlReachable, contentFingerprint } from 
 import { HISTORY_FALLBACKS, pickRandom } from "../fallbacks.ts";
 import { parseMarketDirection, serveFromCache } from "../cache.ts";
 import { createAttemptLogger } from "../observe.ts";
-import { searchLibrary, eventToHistory } from "../content-library.ts";
+import { searchLibrary, eventToHistory, recordLibraryServe } from "../content-library.ts";
 
 // ── Public types ──
 
@@ -94,7 +94,21 @@ async function serveFallback(
   userId?: string,
   marketDirection?: "up" | "down" | "neutral",
   excludeIds?: string[],
+  moodTag?: string,
 ): Promise<HistoryResult> {
+  const staleLibrary = await searchLibrary(svcClient, {
+    type: "event",
+    companionType: "historical_insight",
+    userId,
+    includeStale: true,
+    moodTag,
+  });
+  if (staleLibrary.length > 0) {
+    const pick = staleLibrary[Math.floor(Math.random() * Math.min(staleLibrary.length, 3))];
+    const result = eventToHistory(pick);
+    recordLibraryServe(svcClient, userId, pick.id, "historical_insight");
+    return { data: result, source: "cache", cacheId: null };
+  }
   const cached = await serveFromCache(svcClient, "historical_insight", "en", { userId, marketDirection, excludeIds });
   if (cached) return { data: cached.data, source: "cache", cacheId: cached.cacheId };
   return { data: pickRandom(HISTORY_FALLBACKS), source: "curated", cacheId: null };
@@ -163,10 +177,11 @@ export async function generateHistory(params: GenerateHistoryParams): Promise<Hi
         ? "caution"
         : undefined);
 
-  // ── Try local content library first ──
+  // ── Try local content library first (FRESH entries only) ──
   const libraryResults = await searchLibrary(svcClient, {
     type: "event",
     companionType: "historical_insight",
+    userId,
     moodTag: historyMoodTag,
     excludeTitles: recentTitles,
     limit: 3,
@@ -175,7 +190,8 @@ export async function generateHistory(params: GenerateHistoryParams): Promise<Hi
   if (libraryResults.length > 0) {
     const pick = libraryResults[0];
     const result = eventToHistory(pick);
-    log(`served from content library: "${pick.title}"`);
+    log(`served from library (fresh): "${pick.title}"`);
+    recordLibraryServe(svcClient, userId, pick.id, "historical_insight");
     const citations = pick.url ? [pick.url] : [];
     const qualityScore = 1;
     const cacheQg = qualityGate("historical_insight", result);
@@ -261,12 +277,12 @@ export async function generateHistory(params: GenerateHistoryParams): Promise<Hi
   } catch (e) {
     log(`perplexity failed: ${e}`);
     logAttempt({ companion_type: "historical_insight", provider: "perplexity", model: "sonar-pro", status: String(e).includes("RATE_LIMITED") ? "rate_limited" : "error", latency_ms: 0, error_message: String(e) });
-    return serveFallback(svcClient, userId, marketDirection);
+    return serveFallback(svcClient, userId, marketDirection, undefined, historyMoodTag);
   }
 
   if (!searchContent) {
     logAttempt({ companion_type: "historical_insight", provider: "perplexity", model: "sonar-pro", status: "error", latency_ms: 0, error_message: "empty_search_content" });
-    return serveFallback(svcClient, userId, marketDirection);
+    return serveFallback(svcClient, userId, marketDirection, undefined, historyMoodTag);
   }
 
   // ── Step 2: AI structuring ──
@@ -360,7 +376,7 @@ BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? 
   const qg = qualityGate("historical_insight", insight);
   if (!insight || !qg.pass) {
     log(`quality gate failed: ${!insight ? "no insight" : (qg.reason ?? "unknown")}`);
-    return serveFallback(svcClient, userId, marketDirection);
+    return serveFallback(svcClient, userId, marketDirection, undefined, historyMoodTag);
   }
 
   // ── Step 4: URL post-processing ──
