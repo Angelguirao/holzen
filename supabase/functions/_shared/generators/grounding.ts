@@ -12,7 +12,7 @@ import { qualityGate, containsSlop, isUrlReachable, contentFingerprint } from ".
 import { GROUNDING_FALLBACKS, pickRandom } from "../fallbacks.ts";
 import { parseMarketDirection, serveFromCache } from "../cache.ts";
 import { createAttemptLogger } from "../observe.ts";
-import { searchLibrary, paperToGrounding } from "../content-library.ts";
+import { searchLibrary, paperToGrounding, recordLibraryServe } from "../content-library.ts";
 
 // ── Public types ──
 
@@ -77,6 +77,18 @@ async function serveFallback(
   marketDirection?: "up" | "down" | "neutral",
   excludeIds?: string[],
 ): Promise<GroundingResult> {
+  const staleLibrary = await searchLibrary(svcClient, {
+    type: "paper",
+    companionType: "ground_nudge",
+    userId,
+    includeStale: true,
+  });
+  if (staleLibrary.length > 0) {
+    const pick = staleLibrary[Math.floor(Math.random() * Math.min(staleLibrary.length, 3))];
+    const result = paperToGrounding(pick);
+    recordLibraryServe(svcClient, userId, pick.id, "ground_nudge");
+    return { data: result, source: "cache", cacheId: null };
+  }
   const cached = await serveFromCache(svcClient, "ground_nudge", "en", { userId, marketDirection, excludeIds });
   if (cached) return { data: cached.data, source: "cache", cacheId: cached.cacheId };
   return { data: pickRandom(GROUNDING_FALLBACKS), source: "curated", cacheId: null };
@@ -153,10 +165,11 @@ export async function generateGrounding(params: GenerateGroundingParams): Promis
 
   const marketContext = context || "Bitcoin market volatility";
 
-  // ── Try local content library first ──
+  // ── Try local content library first (FRESH entries only) ──
   const libraryResults = await searchLibrary(svcClient, {
     type: "paper",
     companionType: "ground_nudge",
+    userId,
     preferTags: groundingPreferTags(preferredBias, randomBias),
     excludeTitles: recentTopics,
     limit: 3,
@@ -165,7 +178,8 @@ export async function generateGrounding(params: GenerateGroundingParams): Promis
   if (libraryResults.length > 0) {
     const pick = libraryResults[0];
     const result = paperToGrounding(pick);
-    log(`served from content library: "${pick.title}"`);
+    log(`served from library (fresh): "${pick.title}"`);
+    recordLibraryServe(svcClient, userId, pick.id, "ground_nudge");
     const citations = pick.url ? [pick.url] : [];
     let qualityScore = 1;
     const cacheQg = qualityGate("ground_nudge", result);
