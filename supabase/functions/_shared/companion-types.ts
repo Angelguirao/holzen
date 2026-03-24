@@ -37,7 +37,7 @@ export const ORCHESTRATOR_KEY_MAP: Record<string, string> = {
   signal: COMPANION_TYPES.SIGNAL,
   grounding: COMPANION_TYPES.GROUNDING,
   history: COMPANION_TYPES.HISTORY,
-  zoomOut: COMPANION_TYPES.ZOOM_OUT,
+  zoomOut: COMPANION_TYPES.ZOOM_OUT_DEEP_TIME,
 };
 
 /**
