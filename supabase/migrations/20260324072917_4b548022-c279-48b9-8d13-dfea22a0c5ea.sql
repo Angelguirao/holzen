@@ -1,0 +1,1 @@
+CREATE INDEX IF NOT EXISTS idx_analytics_events_feedback ON analytics_events(user_id, created_at) WHERE event LIKE 'companion_feedback_%';
