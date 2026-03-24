@@ -153,21 +153,6 @@ const PERIOD_OPTIONS: { value: TimePeriod; label: string }[] = [
   { value: 'all', label: 'All time' },
 ];
 
-function computeTrend(
-  current: number,
-  previous: number | null,
-  invertColor: boolean,
-): TrendInfo | undefined {
-  if (previous === null || previous === undefined) return undefined;
-  if (previous === 0 && current === 0) return undefined; // No data in either period
-  if (previous === 0) return undefined; // No previous data to compare against
-  const pctChange = Math.round(((current - previous) / previous) * 100);
-  if (pctChange === 0) return { direction: 'flat', label: '0%' };
-  const raw: 'up' | 'down' = pctChange > 0 ? 'up' : 'down';
-  const displayed = invertColor ? (raw === 'up' ? 'down' : 'up') : raw;
-  return { direction: displayed, label: `${Math.abs(pctChange)}%` };
-}
-
 const TAB_TRIGGER_CLASS = "text-[10px] font-mono uppercase tracking-wider px-2.5 py-1 rounded-full data-[state=active]:bg-primary/10 data-[state=active]:text-primary";
 
 export default function Admin() {
