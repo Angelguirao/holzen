@@ -336,6 +336,78 @@ export type Database = {
           },
         ]
       }
+      content_library: {
+        Row: {
+          active: boolean | null
+          analogy: string | null
+          asset_class: string | null
+          author: string | null
+          citation: string | null
+          companion_types: string[] | null
+          created_at: string | null
+          event_date: string | null
+          finding: string | null
+          id: string
+          key_quote: string | null
+          language: string | null
+          mood_tag: string | null
+          quality_score: number | null
+          recovery: string | null
+          summary: string
+          tags: string[] | null
+          title: string
+          type: string
+          updated_at: string | null
+          url: string | null
+        }
+        Insert: {
+          active?: boolean | null
+          analogy?: string | null
+          asset_class?: string | null
+          author?: string | null
+          citation?: string | null
+          companion_types?: string[] | null
+          created_at?: string | null
+          event_date?: string | null
+          finding?: string | null
+          id?: string
+          key_quote?: string | null
+          language?: string | null
+          mood_tag?: string | null
+          quality_score?: number | null
+          recovery?: string | null
+          summary: string
+          tags?: string[] | null
+          title: string
+          type: string
+          updated_at?: string | null
+          url?: string | null
+        }
+        Update: {
+          active?: boolean | null
+          analogy?: string | null
+          asset_class?: string | null
+          author?: string | null
+          citation?: string | null
+          companion_types?: string[] | null
+          created_at?: string | null
+          event_date?: string | null
+          finding?: string | null
+          id?: string
+          key_quote?: string | null
+          language?: string | null
+          mood_tag?: string | null
+          quality_score?: number | null
+          recovery?: string | null
+          summary?: string
+          tags?: string[] | null
+          title?: string
+          type?: string
+          updated_at?: string | null
+          url?: string | null
+        }
+        Relationships: []
+      }
       feedback: {
         Row: {
           category: string
