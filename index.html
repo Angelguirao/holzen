@@ -57,6 +57,27 @@
     <script>
       (function () {
         const params = new URLSearchParams(window.location.search);
+        let bootScriptError = "";
+
+        window.addEventListener(
+          "error",
+          (event) => {
+            const target = event.target;
+            if (target instanceof HTMLScriptElement) {
+              bootScriptError = `Failed to load script: ${target.src}`;
+              console.error("[boot-recovery]", bootScriptError);
+            }
+          },
+          true
+        );
+
+        function buildFreshUrl() {
+          const nextParams = new URLSearchParams(window.location.search);
+          nextParams.delete("reset-app-cache");
+          nextParams.set("cache-bust", String(Date.now()));
+          const nextSearch = nextParams.toString();
+          return `${window.location.origin}/${nextSearch ? `?${nextSearch}` : ""}${window.location.hash}`;
+        }
 
         async function resetAppCache() {
           try {
@@ -68,6 +89,8 @@
               const cacheKeys = await caches.keys();
               await Promise.all(cacheKeys.map((key) => caches.delete(key)));
             }
+            localStorage.clear();
+            sessionStorage.clear();
           } catch (error) {
             console.warn("[boot-recovery] cache reset failed", error);
           }
@@ -75,10 +98,7 @@
 
         if (params.get("reset-app-cache") === "1") {
           resetAppCache().finally(() => {
-            params.delete("reset-app-cache");
-            const nextSearch = params.toString();
-            const nextUrl = `${window.location.pathname}${nextSearch ? `?${nextSearch}` : ""}${window.location.hash}`;
-            window.location.replace(nextUrl);
+            window.location.replace(buildFreshUrl());
           });
           return;
         }
@@ -89,11 +109,16 @@
           const root = document.getElementById("root");
           if (!root || root.children.length > 0) return;
 
+          const detail = bootScriptError
+            ? `<p style="margin:0 0 14px;opacity:0.72;font-size:12px;word-break:break-word;">${bootScriptError}</p>`
+            : "";
+
           root.innerHTML = `
             <main style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;background:#f5f2ec;color:#1f2937;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;">
               <section style="max-width:460px;text-align:center;line-height:1.5;">
                 <h1 style="font-size:22px;margin:0 0 12px;">Holzen needs a quick refresh</h1>
                 <p style="margin:0 0 18px;opacity:0.82;">Your browser likely has an old cached app version. Resetting local app cache will fix this.</p>
+                ${detail}
                 <button id="reset-app-cache-btn" style="border:0;border-radius:999px;padding:12px 18px;background:#111827;color:#ffffff;font-weight:600;cursor:pointer;">Reset app cache</button>
               </section>
             </main>
@@ -101,10 +126,12 @@
 
           const button = document.getElementById("reset-app-cache-btn");
           button?.addEventListener("click", async () => {
+            button.setAttribute("disabled", "true");
+            button.textContent = "Resetting...";
             await resetAppCache();
-            window.location.reload();
+            window.location.replace(buildFreshUrl());
           });
-        }, 4000);
+        }, 8000);
       })();
     </script>
     <script type="module" src="/src/main.tsx"></script>
