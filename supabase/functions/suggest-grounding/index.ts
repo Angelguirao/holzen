@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { sanitizePromptArray } from "../_shared/sanitize.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -88,7 +89,10 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const { groundingActivities, context, mood, severity, language } = await req.json();
+    const body = await req.json();
+    const { context, mood, severity, language } = body;
+    // Sanitize user-controlled grounding activities before embedding in prompt
+    const groundingActivities = sanitizePromptArray(body.groundingActivities, 10, 100);
 
     if (!groundingActivities || groundingActivities.length === 0) {
       return new Response(

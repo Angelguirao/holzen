@@ -1,10 +1,10 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+import { handleCors, jsonResponse, errorResponse } from "../_shared/cors.ts";
+import { createAuthenticatedClient, createServiceClient } from "../_shared/auth.ts";
+import { createAttemptLogger, createObsTracker, createLogger } from "../_shared/observe.ts";
+import { REFLECTION_FALLBACKS, pickRandom } from "../_shared/fallbacks.ts";
+import { sanitizePromptInput, sanitizePromptArray } from "../_shared/sanitize.ts";
+import { containsSlop, containsCryptoLanguage } from "../_shared/quality.ts";
 
 const TONE_INSTRUCTIONS: Record<string, string> = {
   stoic: "Write in a calm, stoic tone. Brief and grounded. Like Marcus Aurelius observing the market.",
@@ -56,95 +56,48 @@ const TONE_FRAMINGS: Record<string, string[]> = {
   ],
 };
 
-// ── CURATED FALLBACK REFLECTIONS ──
-// Used when ALL AI models fail — ensures the user always gets a meaningful reflection
-const CURATED_REFLECTIONS = [
-  {
-    message: "The number changed. You didn't. That distinction is worth sitting with.",
-    haiku: "Digits on a screen\nshift like sand beneath the tide\nthe shore remains still",
-  },
-  {
-    message: "Between the price alert and your next action, there is a space. That space is yours.",
-    haiku: "A bell rings somewhere\nthe hand pauses, breath arrives\nchoice lives in the gap",
-  },
-  {
-    message: "Every holder who came before you sat exactly where you're sitting now, feeling exactly what you feel.",
-    haiku: "Footprints in the snow\nthousands walked this path before\nspring remembered them",
-  },
-  {
-    message: "What would the version of you one year from now think about this moment?",
-    haiku: "Tomorrow's calm self\nlooks back at today's sharp edge\nand finds it was round",
-  },
-  {
-    message: "Volatility is not the enemy of conviction. It's the price of it.",
-    haiku: "The mountain does not\napologize for its storms\nit simply endures",
-  },
-];
-
 serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
+  const corsRes = handleCors(req);
+  if (corsRes) return corsRes;
 
   const t0 = Date.now();
+  const log = createLogger("holzen-reflect");
 
   try {
-    // Auth check — use getUser() for full server-side validation
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return errorResponse("Unauthorized", 401);
     }
-    const { createClient } = await import("npm:@supabase/supabase-js@2.57.2");
-    const sbClient = createClient(Deno.env.get("SUPABASE_URL") ?? "", Deno.env.get("SUPABASE_ANON_KEY") ?? "", { global: { headers: { Authorization: authHeader } } });
+
+    const sbClient = await createAuthenticatedClient(authHeader);
     const { data: { user }, error: authError } = await sbClient.auth.getUser();
     if (authError || !user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return errorResponse("Unauthorized", 401);
     }
 
     const userId = user.id;
-    const svcClient = createClient(
-      Deno.env.get("SUPABASE_URL") ?? "",
-      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
-      { auth: { persistSession: false } }
-    );
+    const svcClient = await createServiceClient();
     try { await svcClient.from("analytics_events").insert({ user_id: userId, event: "pause_ai_call" }); } catch (_) { /* tracking failure is non-fatal */ }
 
-    // Observability helper — fire-and-forget
-    const trackObs = (event: string, meta?: Record<string, any>) => {
-      svcClient.from("analytics_events").insert({
-        user_id: userId, event,
-        metadata: { companion_type: "reflection", latency_ms: Date.now() - t0, ...meta },
-      }).then(() => {});
-    };
+    const trackObs = createObsTracker(svcClient, userId, "reflection", t0);
+    const logAttempt = createAttemptLogger(svcClient, { userId });
 
-    // Cost estimation per 1M tokens (input/output) in USD
-    const COST_MAP: Record<string, [number, number]> = {
-      "google/gemini-2.5-flash": [0.15, 0.6], "google/gemini-3-flash-preview": [0.15, 0.6],
-      "google/gemini-2.5-flash-lite": [0.075, 0.3],
-    };
-    let attemptOrder = 0;
-    const logAttempt = (params: { companion_type: string; provider: string; model: string; status: string; latency_ms: number; input_tokens?: number; output_tokens?: number; error_message?: string; quality_gate_reason?: string }) => {
-      attemptOrder++;
-      const costs = COST_MAP[params.model] || [0.5, 1.5];
-      const inTok = params.input_tokens || 0;
-      const outTok = params.output_tokens || 0;
-      const cost = inTok > 0 || outTok > 0 ? (inTok * costs[0] + outTok * costs[1]) / 1_000_000 : null;
-      svcClient.from("generation_attempts").insert({ ...params, attempt_order: attemptOrder, estimated_cost_usd: cost }).then(() => {});
-    };
-
-    const { context, tone, customPrompt, style, moodHistory, severity, motivations, mantra, groundingActivities, currency, language, recentHaikus, recentMessages } = await req.json();
+    const body = await req.json();
+    const { context, tone, style, moodHistory, severity, currency, language, recentHaikus, recentMessages } = body;
+    // Sanitize user-controlled fields that are embedded in AI prompts
+    const customPrompt = sanitizePromptInput(body.customPrompt, 500);
+    const motivations = sanitizePromptArray(body.motivations, 10, 100);
+    const mantra = sanitizePromptInput(body.mantra, 200);
+    const groundingActivities = sanitizePromptArray(body.groundingActivities, 10, 100);
     if (!context) {
-      return new Response(JSON.stringify({ error: "Missing context" }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return errorResponse("Missing context", 400);
     }
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
-      const fallback = CURATED_REFLECTIONS[Math.floor(Math.random() * CURATED_REFLECTIONS.length)];
+      const fallback = pickRandom(REFLECTION_FALLBACKS);
       trackObs("companion_fallback_curated");
-      return new Response(JSON.stringify(fallback), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      return jsonResponse(fallback);
     }
 
     // --- Adaptive tone logic ---
@@ -183,6 +136,28 @@ serve(async (req) => {
 
       if (soldRate > 0.4 && outcomes.length >= 3) {
         adaptiveContext += "\nThe user has a pattern of selling during volatility. Gently invite pause without judgment.";
+      }
+
+      // Journey context — reference specific past outcomes in similar moods
+      const currentContext = context?.toLowerCase() || "";
+      const isCurrentDown = currentContext.includes("is down");
+      const isCurrentUp = currentContext.includes("is up");
+
+      const pastHeld = moodHistory.find((m: any) => {
+        if (m.outcome !== "held" && m.outcome !== "nothing") return false;
+        if (isCurrentDown && m.mood === "anxious") return true;
+        if (isCurrentUp && (m.mood === "excited" || m.mood === "fomo")) return true;
+        return false;
+      });
+
+      if (pastHeld) {
+        const daysAgo = Math.floor((Date.now() - new Date(pastHeld.created_at).getTime()) / 86400000);
+        adaptiveContext += `\nJOURNEY CONTEXT: ${daysAgo} days ago, the user felt "${pastHeld.mood}" during a similar market moment and chose to hold. Gently acknowledge this pattern of composure — they've been here before and made a considered choice.`;
+      }
+
+      const recentSells = moodHistory.filter((m: any) => m.outcome === "sold").slice(0, 3);
+      if (recentSells.length === 0 && moodHistory.length >= 5) {
+        adaptiveContext += `\nThe user has a track record of holding through volatility. Acknowledge their consistency.`;
       }
     }
 
@@ -227,7 +202,11 @@ Tone: ${baseTone}
 THEMATIC ANGLE FOR THIS SESSION: ${thematicFraming}
 ${adaptiveContext}
 
-CURRENCY: The user views BTC prices in ${currencyCode}. When mentioning any price or monetary value, format it in ${currencyCode}.
+PRICE RULES (CRITICAL):
+- Do NOT include specific dollar amounts, BTC prices, or exchange rates in the reflection
+- Do NOT invent or estimate the current price — you do not know it
+- You may reference the DIRECTION ("the price moved", "the number changed") but NEVER a specific number
+- If the context mentions a percentage change, you may reference it generally ("a significant move") but do not repeat the exact percentage
 
 The context may include a Fear & Greed Index score (0-100). Use this to subtly adjust your reflection:
 - Extreme Fear (0-24): The crowd is panicking. Reflect on what happens when fear spreads.
@@ -350,7 +329,7 @@ Haiku rules:
       } catch (e) {
         clearTimeout(timeout);
         if (e instanceof DOMException && e.name === "AbortError") {
-          console.warn(`[holzen-reflect] AI ${model} timed out after ${timeoutMs}ms`);
+          log(`AI ${model} timed out after ${timeoutMs}ms`);
           lastStatus = 504;
           logAttempt({ companion_type: "reflection", provider: "lovable", model, status: "timeout", latency_ms: Date.now() - attemptT0 });
           if (i < models.length - 1) continue;
@@ -360,41 +339,78 @@ Haiku rules:
       }
     }
 
-    // ── Fallback chain: if AI failed, serve curated content ──
+    // ── Quality gate for reflection messages ──
+    if (result?.message) {
+      const msg = result.message;
+      let qgFailed = false;
+      let qgReason = "";
+
+      // Slop check
+      if (containsSlop(msg)) { qgFailed = true; qgReason = "reflection_slop"; }
+      // Crypto language check
+      else if (containsCryptoLanguage(msg)) { qgFailed = true; qgReason = "reflection_crypto_language"; }
+      // Too short (< 20 chars is likely broken)
+      else if (msg.length < 20) { qgFailed = true; qgReason = "reflection_too_short"; }
+      // Too long (> 500 chars is an essay, not a reflection)
+      else if (msg.length > 500) { qgFailed = true; qgReason = "reflection_too_long"; }
+      // Contains exclamation marks (against the calm tone)
+      else if (msg.includes("!")) { qgFailed = true; qgReason = "reflection_exclamation"; }
+      // Contains fabricated prices (the AI should never include $ amounts or BTC values)
+      else if (/\$[\d,]+(\.\d+)?/.test(msg) || /\d+(\.\d+)?\s*BTC\b/i.test(msg)) { qgFailed = true; qgReason = "reflection_fabricated_price"; }
+
+      // Haiku validation
+      if (result.haiku) {
+        const lines = result.haiku.split("\n").filter((l: string) => l.trim().length > 0);
+        if (lines.length !== 3) {
+          log(`haiku has ${lines.length} lines instead of 3, stripping`);
+          result.haiku = null;
+        } else if (lines.some((l: string) => l.trim().split(/\s+/).length < 2)) {
+          log("haiku has a line with fewer than 2 words, stripping");
+          result.haiku = null;
+        }
+      }
+
+      if (qgFailed) {
+        log(`reflection quality gate failed: ${qgReason}`);
+        logAttempt({ companion_type: "reflection", provider: "lovable", model: "quality_gate", status: "quality_gate_failed", latency_ms: 0, quality_gate_reason: qgReason });
+        result = null; // Fall through to curated fallback
+      }
+    }
+
+    // ── Fallback chain: if AI failed or quality gate rejected, serve curated content ──
     if (!result?.message) {
       if (lastStatus === 429) {
-        return new Response(JSON.stringify({ error: "Rate limited. Try again later." }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        return errorResponse("Rate limited. Try again later.", 429);
       }
       if (lastStatus === 402) {
-        return new Response(JSON.stringify({ error: "AI usage limit reached." }), { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+        return errorResponse("AI usage limit reached.", 402);
       }
-      console.warn("[holzen-reflect] All AI models failed, serving curated fallback");
-      const fallback = CURATED_REFLECTIONS[Math.floor(Math.random() * CURATED_REFLECTIONS.length)];
+      log("All AI models failed, serving curated fallback");
+      const fallback = pickRandom(REFLECTION_FALLBACKS);
       trackObs("companion_fallback_curated");
-      return new Response(JSON.stringify(fallback), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      return jsonResponse(fallback);
     }
 
     trackObs("companion_live_generated");
-    return new Response(JSON.stringify({
+
+    // Track tone + style for quality analysis
+    svcClient.from("analytics_events").insert({
+      user_id: userId,
+      event: "reflection_generated",
+      metadata: { tone, style, message_length: result.message.length, has_haiku: !!result.haiku },
+    }).then(() => {});
+
+    return jsonResponse({
       message: result.message,
       haiku: result.haiku || null,
-    }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
     console.error("holzen-reflect error:", e);
     try {
-      const fallback = CURATED_REFLECTIONS[Math.floor(Math.random() * CURATED_REFLECTIONS.length)];
-      return new Response(JSON.stringify(fallback), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      const fallback = pickRandom(REFLECTION_FALLBACKS);
+      return jsonResponse(fallback);
     } catch {
-      return new Response(
-        JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
-        { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
+      return errorResponse(e instanceof Error ? e.message : "Unknown error", 500);
     }
   }
 });

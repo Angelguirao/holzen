@@ -327,6 +327,13 @@ export type Database = {
             referencedRelation: "reflections"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "companion_serves_reflection_id_fkey"
+            columns: ["reflection_id"]
+            isOneToOne: false
+            referencedRelation: "v_reflection_with_companions"
+            referencedColumns: ["id"]
+          },
         ]
       }
       feedback: {
@@ -389,6 +396,13 @@ export type Database = {
             referencedRelation: "reflections"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "follow_ups_reflection_id_fkey"
+            columns: ["reflection_id"]
+            isOneToOne: true
+            referencedRelation: "v_reflection_with_companions"
+            referencedColumns: ["id"]
+          },
         ]
       }
       future_letters: {
@@ -447,7 +461,9 @@ export type Database = {
           output_tokens: number | null
           provider: string
           quality_gate_reason: string | null
+          reflection_id: string | null
           status: string
+          user_id: string | null
         }
         Insert: {
           attempt_order?: number
@@ -462,7 +478,9 @@ export type Database = {
           output_tokens?: number | null
           provider: string
           quality_gate_reason?: string | null
+          reflection_id?: string | null
           status: string
+          user_id?: string | null
         }
         Update: {
           attempt_order?: number
@@ -477,9 +495,26 @@ export type Database = {
           output_tokens?: number | null
           provider?: string
           quality_gate_reason?: string | null
+          reflection_id?: string | null
           status?: string
+          user_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "generation_attempts_reflection_id_fkey"
+            columns: ["reflection_id"]
+            isOneToOne: false
+            referencedRelation: "reflections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "generation_attempts_reflection_id_fkey"
+            columns: ["reflection_id"]
+            isOneToOne: false
+            referencedRelation: "v_reflection_with_companions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       graph_edges: {
         Row: {
@@ -568,6 +603,13 @@ export type Database = {
             referencedRelation: "reflections"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "library_items_reflection_id_fkey"
+            columns: ["reflection_id"]
+            isOneToOne: false
+            referencedRelation: "v_reflection_with_companions"
+            referencedColumns: ["id"]
+          },
         ]
       }
       night_reflections: {
@@ -651,6 +693,13 @@ export type Database = {
             referencedRelation: "reflections"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "practice_entries_source_reflection_id_fkey"
+            columns: ["source_reflection_id"]
+            isOneToOne: false
+            referencedRelation: "v_reflection_with_companions"
+            referencedColumns: ["id"]
+          },
         ]
       }
       profiles: {
@@ -677,6 +726,7 @@ export type Database = {
           hold_goal_target_price: number | null
           hold_goal_type: string | null
           id: string
+          is_admin: boolean | null
           language: string
           last_context: string | null
           last_message: string | null
@@ -728,6 +778,7 @@ export type Database = {
           hold_goal_target_price?: number | null
           hold_goal_type?: string | null
           id?: string
+          is_admin?: boolean | null
           language?: string
           last_context?: string | null
           last_message?: string | null
@@ -779,6 +830,7 @@ export type Database = {
           hold_goal_target_price?: number | null
           hold_goal_type?: string | null
           id?: string
+          is_admin?: boolean | null
           language?: string
           last_context?: string | null
           last_message?: string | null
@@ -913,6 +965,58 @@ export type Database = {
           referrer_id?: string
         }
         Relationships: []
+      }
+      reflection_companions: {
+        Row: {
+          cache_entry_id: string | null
+          companion_type: string
+          content: Json
+          created_at: string | null
+          id: string
+          read: boolean | null
+          reflection_id: string
+        }
+        Insert: {
+          cache_entry_id?: string | null
+          companion_type: string
+          content: Json
+          created_at?: string | null
+          id?: string
+          read?: boolean | null
+          reflection_id: string
+        }
+        Update: {
+          cache_entry_id?: string | null
+          companion_type?: string
+          content?: Json
+          created_at?: string | null
+          id?: string
+          read?: boolean | null
+          reflection_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reflection_companions_cache_entry_id_fkey"
+            columns: ["cache_entry_id"]
+            isOneToOne: false
+            referencedRelation: "companion_cache"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reflection_companions_reflection_id_fkey"
+            columns: ["reflection_id"]
+            isOneToOne: false
+            referencedRelation: "reflections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reflection_companions_reflection_id_fkey"
+            columns: ["reflection_id"]
+            isOneToOne: false
+            referencedRelation: "v_reflection_with_companions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       reflection_insights: {
         Row: {
@@ -1093,6 +1197,13 @@ export type Database = {
             columns: ["reflection_id"]
             isOneToOne: false
             referencedRelation: "reflections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ritual_completions_reflection_id_fkey"
+            columns: ["reflection_id"]
+            isOneToOne: false
+            referencedRelation: "v_reflection_with_companions"
             referencedColumns: ["id"]
           },
         ]
@@ -1347,6 +1458,15 @@ export type Database = {
         }
         Relationships: []
       }
+      v_companion_feedback_per_day: {
+        Row: {
+          companion_type: string | null
+          day: string | null
+          vote: string | null
+          vote_count: number | null
+        }
+        Relationships: []
+      }
       v_companion_feedback_ratio: {
         Row: {
           approval_pct: number | null
@@ -1354,6 +1474,15 @@ export type Database = {
           items_with_feedback: number | null
           total_thumbs_down: number | null
           total_thumbs_up: number | null
+        }
+        Relationships: []
+      }
+      v_companion_serves_per_day: {
+        Row: {
+          companion_type: string | null
+          day: string | null
+          serve_count: number | null
+          serve_source: string | null
         }
         Relationships: []
       }
@@ -1370,6 +1499,65 @@ export type Database = {
           successes: number | null
           timeouts: number | null
           total_attempts: number | null
+        }
+        Relationships: []
+      }
+      v_generation_failures_per_day: {
+        Row: {
+          attempt_count: number | null
+          avg_latency_ms: number | null
+          companion_type: string | null
+          day: string | null
+          model: string | null
+          status: string | null
+          total_cost_usd: number | null
+        }
+        Relationships: []
+      }
+      v_reflection_with_companions: {
+        Row: {
+          breathing_completed: boolean | null
+          companion_grounding_body: string | null
+          companion_grounding_citation: string | null
+          companion_grounding_read: boolean | null
+          companion_grounding_title: string | null
+          companion_grounding_url: string | null
+          companion_history_data: Json | null
+          companion_history_read: boolean | null
+          companion_signal_body: string | null
+          companion_signal_read: boolean | null
+          companion_signal_source: string | null
+          companion_signal_title: string | null
+          companion_signal_url: string | null
+          companion_zoom_out_data: Json | null
+          companion_zoom_out_read: boolean | null
+          context: string | null
+          created_at: string | null
+          haiku: string | null
+          haiku_read: boolean | null
+          history_insight_data: Json | null
+          history_read: boolean | null
+          id: string | null
+          is_favorite: boolean | null
+          learning_body: string | null
+          learning_citation: string | null
+          learning_read: boolean | null
+          learning_title: string | null
+          learning_url: string | null
+          message: string | null
+          mood: string | null
+          mood_after: string | null
+          note: string | null
+          outcome: string | null
+          signal_body: string | null
+          signal_read: boolean | null
+          signal_source: string | null
+          signal_title: string | null
+          signal_url: string | null
+          tags: string[] | null
+          user_id: string | null
+          zoom_out_data: Json | null
+          zoom_out_read: boolean | null
         }
         Relationships: []
       }
@@ -1397,6 +1585,7 @@ export type Database = {
         }[]
       }
       get_holzen_number: { Args: never; Returns: Json }
+      is_admin: { Args: never; Returns: boolean }
       owns_collection: {
         Args: { _collection_id: string; _user_id: string }
         Returns: boolean

@@ -357,11 +357,48 @@ serve(async (req) => {
 
     console.log(`[CHECK-VOLATILITY] ${eligible.length} users eligible (${profiles.length} total)`);
 
-    let triggered = 0;
+    // Parse and configure VAPID once — all users share the same keys
+    const vapidPublicKey = Deno.env.get("VAPID_PUBLIC_KEY");
+    const vapidPrivateKeyJwk = Deno.env.get("VAPID_PRIVATE_KEY");
+    let vapidReady = false;
+    if (vapidPublicKey && vapidPrivateKeyJwk) {
+      try {
+        let privateKey = vapidPrivateKeyJwk;
+        try {
+          const parsed = JSON.parse(vapidPrivateKeyJwk);
+          privateKey = parsed.d || vapidPrivateKeyJwk;
+        } catch {
+          if (vapidPrivateKeyJwk.length > 44) {
+            let stdBase64 = vapidPrivateKeyJwk.replace(/-/g, "+").replace(/_/g, "/");
+            while (stdBase64.length % 4) stdBase64 += "=";
+            try {
+              const binaryStr = atob(stdBase64);
+              const pkcs8Bytes = new Uint8Array(binaryStr.length);
+              for (let i = 0; i < binaryStr.length; i++) pkcs8Bytes[i] = binaryStr.charCodeAt(i);
+              const cryptoKey = await crypto.subtle.importKey(
+                "pkcs8", pkcs8Bytes.buffer, { name: "ECDSA", namedCurve: "P-256" }, true, ["sign"]
+              );
+              const jwk = await crypto.subtle.exportKey("jwk", cryptoKey);
+              if (jwk.d) privateKey = jwk.d;
+            } catch (decodeErr) {
+              console.error("[PUSH] Failed to extract key from PKCS8:", decodeErr);
+            }
+          }
+        }
+        webpush.setVapidDetails("mailto:noreply@holzen.app", vapidPublicKey, privateKey);
+        vapidReady = true;
+      } catch (vapidErr) {
+        console.error("[PUSH] VAPID setup error:", vapidErr);
+      }
+    }
 
-    for (const profile of eligible) {
+    const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
+    const svcKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+    const anonKey = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
+
+    // Process all eligible users in parallel
+    const results = await Promise.all(eligible.map(async (profile) => {
       // Optimistic lock: claim the cooldown slot BEFORE generating the reflection
-      // to prevent race conditions with client-side triggers
       const nowIso = new Date().toISOString();
       const { data: claimResult } = await supabase
         .from("profiles")
@@ -371,9 +408,7 @@ serve(async (req) => {
         .select("user_id")
         .single();
 
-      // If last_trigger_at was already updated (by client or another run), skip
       if (!claimResult) {
-        // Also handle case where last_trigger_at is null
         const { data: nullClaim } = await supabase
           .from("profiles")
           .update({ last_trigger_at: nowIso })
@@ -383,7 +418,7 @@ serve(async (req) => {
           .single();
         if (!nullClaim) {
           console.log(`[CHECK-VOLATILITY] Skipping ${profile.user_id} — cooldown claimed by another trigger`);
-          continue;
+          return false;
         }
       }
 
@@ -395,23 +430,20 @@ serve(async (req) => {
         ctx += ` Over 7 days, it's ${cumDir} ${absCumChange.toFixed(1)}%.`;
       }
 
-      // Generate reflection with companions
       const tone = (profile as any).reflection_tone || "stoic";
       const userLang = (profile as any).language || "en";
       const result = await generateReflection(ctx, LOVABLE_API_KEY, tone, userLang);
       if (!result) {
         console.log(`[CHECK-VOLATILITY] Failed to generate reflection for ${profile.user_id}`);
-        continue;
+        return false;
       }
 
-      // Respect user companion preferences
       const haiku = (profile as any).companion_haiku ? result.haiku : null;
       const learningTitle = (profile as any).companion_learning ? result.learning_title : null;
       const learningBody = (profile as any).companion_learning ? result.learning_body : null;
       const learningCitation = (profile as any).companion_learning ? result.learning_citation : null;
       const learningUrl = (profile as any).companion_learning ? result.learning_url : null;
 
-      // Save to reflection history
       const { data: insertedReflection } = await supabase
         .from("reflections")
         .insert({
@@ -427,200 +459,84 @@ serve(async (req) => {
         .select("id")
         .single();
 
-      // Update profile with new reflection (last_trigger_at already set by optimistic lock above)
-      await supabase
+      // Profile update and orchestrator dispatch can run in parallel
+      const profileUpdate = supabase
         .from("profiles")
-        .update({
-          last_message: result.message,
-          last_context: ctx,
-        })
+        .update({ last_message: result.message, last_context: ctx })
         .eq("user_id", profile.user_id);
 
-      // Fire-and-forget: pre-generate companion data (Signal, Zoom Out, History, Ground Nudge)
-      // so it's cached on the reflection row before the user opens the session.
       if (insertedReflection?.id) {
-        const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
-        const anonKey = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
-        const svcKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
-        const companionHeaders = {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${svcKey}`,
-          "apikey": anonKey,
-        };
-
-        // Fetch user's active signal/learning sources
-        const fetchSources = async (category: string) => {
-          try {
-            const [{ data: catalog }, { data: userPrefs }] = await Promise.all([
-              supabase.from("signal_sources").select("id, name, type, url, category").eq("category", category),
-              supabase.from("user_signal_preferences").select("source_id, custom_name, custom_url, custom_type, active, category").eq("user_id", profile.user_id).eq("category", category),
-            ]);
-            const prefsMap = new Map((userPrefs ?? []).map((p: any) => [p.source_id, p]));
-            const catalogActive = (catalog ?? []).filter((s: any) => { const pref = prefsMap.get(s.id); return pref ? pref.active : true; }).map((s: any) => ({ name: s.name, type: s.type, url: s.url }));
-            const customActive = (userPrefs ?? []).filter((p: any) => !p.source_id && p.custom_name && p.active).map((p: any) => ({ name: p.custom_name, type: p.custom_type || "blog", url: p.custom_url }));
-            return [...catalogActive, ...customActive];
-          } catch { return []; }
-        };
-
         const reflectionId = insertedReflection.id;
-        const companionLang = userLang;
-
-        // Fire all companion calls in parallel (fire-and-forget — don't await)
-        Promise.allSettled([
-          // Signal companion
-          fetchSources("signal").then(sources =>
-            fetch(`${supabaseUrl}/functions/v1/signal-companion`, {
-              method: "POST", headers: companionHeaders,
-              body: JSON.stringify({ context: ctx, language: companionLang, sources: sources.length > 0 ? sources : undefined }),
-            }).then(async (res) => {
-              if (!res.ok) { await res.text(); return; }
-              const data = await res.json();
-              if (data?.title) {
-                await supabase.from("reflections").update({
-                  signal_title: data.title, signal_body: data.body,
-                  signal_source: data.source, signal_url: data.url,
-                }).eq("id", reflectionId);
-              }
-            })
-          ),
-          // Zoom Out companion
-          fetch(`${supabaseUrl}/functions/v1/zoom-out-companion`, {
-            method: "POST", headers: companionHeaders,
-            body: JSON.stringify({ context: ctx, reflectionMessage: result.message, language: companionLang, userId: profile.user_id }),
-          }).then(async (res) => {
-            if (!res.ok) { const t = await res.text(); console.error("[CHECK-VOLATILITY] zoom-out failed:", res.status, t); return; }
-            const data = await res.json();
-            if (data && !data.error) {
-              await supabase.from("reflections").update({ zoom_out_data: data }).eq("id", reflectionId);
-            }
+        // Fire-and-forget orchestrator
+        fetch(`${supabaseUrl}/functions/v1/companion-orchestrate`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${svcKey}`,
+            "apikey": anonKey,
+          },
+          body: JSON.stringify({
+            reflectionId,
+            context: ctx,
+            language: userLang,
+            reflectionMessage: result.message,
+            enableSignal: true,
+            enableGrounding: true,
+            enableHistory: true,
+            enableZoomOut: true,
           }),
-          // Historical Insight companion
-          fetch(`${supabaseUrl}/functions/v1/historical-insight`, {
-            method: "POST", headers: companionHeaders,
-            body: JSON.stringify({ context: ctx, language: companionLang, userId: profile.user_id }),
-          }).then(async (res) => {
-            if (!res.ok) { const t = await res.text(); console.error("[CHECK-VOLATILITY] historical-insight failed:", res.status, t); return; }
-            const data = await res.json();
-            if (data && !data.error) {
-              await supabase.from("reflections").update({ history_insight_data: data }).eq("id", reflectionId);
-            }
-          }),
-          // Ground Nudge (learning)
-          fetchSources("learning").then(sources =>
-            fetch(`${supabaseUrl}/functions/v1/ground-nudge`, {
-              method: "POST", headers: companionHeaders,
-              body: JSON.stringify({ context: ctx, language: companionLang, sources: sources.length > 0 ? sources : undefined }),
-            }).then(async (res) => {
-              if (!res.ok) { await res.text(); return; }
-              const data = await res.json();
-              if (data?.title) {
-                await supabase.from("reflections").update({
-                  learning_title: data.title, learning_body: data.body,
-                  learning_citation: data.citation, learning_url: data.url,
-                }).eq("id", reflectionId);
-              }
-            })
-          ),
-        ]).catch((e) => console.error("[CHECK-VOLATILITY] Companion generation error:", e));
+        }).then((res) => {
+          if (!res.ok) res.text().then((t) => console.error(`[CHECK-VOLATILITY] Orchestrator failed (${res.status}): ${t}`));
+          else console.log(`[CHECK-VOLATILITY] Orchestrator dispatched for reflection ${reflectionId}`);
+        }).catch((e) => console.error(`[CHECK-VOLATILITY] Orchestrator dispatch error:`, e));
       }
 
-      // Send email notification if enabled
-      if (profile.email_notifications) {
-        // Get user email from auth
-        const { data: userData } = await supabase.auth.admin.getUserById(profile.user_id);
-        const email = userData?.user?.email;
-        if (email) {
-          await sendNotificationEmail(email, result.message, ctx);
-        }
-      }
+      await profileUpdate;
 
-      // Send push notifications
-      const { data: pushSubs } = await supabase
-        .from("push_subscriptions")
-        .select("endpoint, p256dh, auth")
-        .eq("user_id", profile.user_id);
+      // Email + push in parallel
+      await Promise.all([
+        // Email
+        (async () => {
+          if (!profile.email_notifications) return;
+          const { data: userData } = await supabase.auth.admin.getUserById(profile.user_id);
+          const email = userData?.user?.email;
+          if (email) await sendNotificationEmail(email, result.message, ctx);
+        })(),
+        // Push
+        (async () => {
+          if (!vapidReady) return;
+          const { data: pushSubs } = await supabase
+            .from("push_subscriptions")
+            .select("endpoint, p256dh, auth")
+            .eq("user_id", profile.user_id);
+          if (!pushSubs || pushSubs.length === 0) return;
 
-      if (pushSubs && pushSubs.length > 0) {
-        const vapidPublicKey = Deno.env.get("VAPID_PUBLIC_KEY");
-        const vapidPrivateKeyJwk = Deno.env.get("VAPID_PRIVATE_KEY");
-
-        if (vapidPublicKey && vapidPrivateKeyJwk) {
-          try {
-            let privateKey = vapidPrivateKeyJwk;
-
+          const payload = JSON.stringify({
+            title: "Holzen",
+            body: result.message.slice(0, 120),
+            reflectionId: insertedReflection?.id ?? null,
+            action: "pause_ready",
+          });
+          await Promise.all(pushSubs.map(async (sub) => {
             try {
-              const parsed = JSON.parse(vapidPrivateKeyJwk);
-              privateKey = parsed.d || vapidPrivateKeyJwk;
-            } catch {
-              if (vapidPrivateKeyJwk.length > 44) {
-                // PKCS8 EC P-256 key - extract raw 32-byte private key using Web Crypto
-                let stdBase64 = vapidPrivateKeyJwk.replace(/-/g, "+").replace(/_/g, "/");
-                while (stdBase64.length % 4) stdBase64 += "=";
-                try {
-                  const binaryStr = atob(stdBase64);
-                  const pkcs8Bytes = new Uint8Array(binaryStr.length);
-                  for (let i = 0; i < binaryStr.length; i++) pkcs8Bytes[i] = binaryStr.charCodeAt(i);
-                  
-                  // Import as CryptoKey then export as JWK to get the raw 'd' value
-                  const cryptoKey = await crypto.subtle.importKey(
-                    "pkcs8",
-                    pkcs8Bytes.buffer,
-                    { name: "ECDSA", namedCurve: "P-256" },
-                    true,
-                    ["sign"]
-                  );
-                  const jwk = await crypto.subtle.exportKey("jwk", cryptoKey);
-                  if (jwk.d) {
-                    privateKey = jwk.d;
-                  }
-                } catch (decodeErr) {
-                  console.error("[PUSH] Failed to extract key from PKCS8:", decodeErr);
-                }
+              await webpush.sendNotification(
+                { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
+                payload
+              );
+            } catch (pushErr: any) {
+              console.error(`[PUSH] Failed for ${sub.endpoint}:`, pushErr.message, "statusCode:", pushErr.statusCode);
+              if (pushErr.statusCode === 410 || pushErr.statusCode === 404) {
+                await supabase.from("push_subscriptions").delete().eq("endpoint", sub.endpoint);
               }
             }
+          }));
+        })(),
+      ]);
 
-            webpush.setVapidDetails(
-              "mailto:noreply@holzen.app",
-              vapidPublicKey,
-              privateKey
-            );
+      return true;
+    }));
 
-            const payload = JSON.stringify({
-              title: "Holzen",
-              body: result.message.slice(0, 120),
-              reflectionId: insertedReflection?.id ?? null,
-              action: "pause_ready",
-            });
-
-            for (const sub of pushSubs) {
-              try {
-                await webpush.sendNotification(
-                  {
-                    endpoint: sub.endpoint,
-                    keys: { p256dh: sub.p256dh, auth: sub.auth },
-                  },
-                  payload
-                );
-              } catch (pushErr: any) {
-                console.error(`[PUSH] Failed for ${sub.endpoint}:`, pushErr.message, "statusCode:", pushErr.statusCode, "body:", pushErr.body);
-                // Remove invalid subscriptions (410 Gone or 404)
-                if (pushErr.statusCode === 410 || pushErr.statusCode === 404) {
-                  await supabase
-                    .from("push_subscriptions")
-                    .delete()
-                    .eq("endpoint", sub.endpoint);
-                }
-              }
-            }
-          } catch (vapidErr) {
-            console.error("[PUSH] VAPID setup error:", vapidErr);
-          }
-        }
-      }
-
-      triggered++;
-    }
-
+    const triggered = results.filter(Boolean).length;
     console.log(`[CHECK-VOLATILITY] Triggered ${triggered} notifications`);
 
     return new Response(JSON.stringify({ triggered, btcChange: btc.changePercent }), {

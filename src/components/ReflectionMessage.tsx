@@ -4,6 +4,7 @@ import { ShareReflection } from './ShareReflection';
 import { ReflectionNote } from './ReflectionNote';
 import { ReflectionTags } from './ReflectionTags';
 import { ReflectionWallpaper } from './ReflectionWallpaper';
+import { CompanionFeedback } from './CompanionFeedback';
 import { CompanionSection, type CompanionData, type CompanionPrefs } from './CompanionSection';
 import { useTranslation } from 'react-i18next';
 
@@ -23,6 +24,9 @@ export const ReflectionMessage = forwardRef<HTMLDivElement, Props>(function Refl
   return (
     <div ref={ref} className="space-y-6">
       <p className="text-lg leading-relaxed">{message}</p>
+      {reflectionId && (
+        <CompanionFeedback reflectionId={reflectionId} companionType="reflection" compact />
+      )}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-1">
           <ShareReflection message={message} context={context} haiku={companions?.haiku} />
