@@ -2,9 +2,11 @@ import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { ChevronLeft } from 'lucide-react';
 import { CompanionSection, type CompanionData, type CompanionPrefs } from '@/components/CompanionSection';
+import { InterventionSection } from '@/components/InterventionSection';
 import { CollapsibleReflectionHeader } from '@/components/pause/CollapsibleReflectionHeader';
 import { ReflectionNote } from '@/components/ReflectionNote';
 import { ReflectionTags } from '@/components/ReflectionTags';
+import { useCompanionData } from '@/hooks/use-companion-data';
 
 interface Props {
   companions: CompanionData;
@@ -27,6 +29,14 @@ export function PauseReflect({
   isFavorite, onToggleFavorite, subscribed, onContinue, onBack, mood,
 }: Props) {
   const { t } = useTranslation();
+
+  const { intervention, interventionLoading, interventionError } = useCompanionData({
+    companions,
+    prefs: companionPrefs,
+    reflectionId,
+    context,
+    reflectionMessage,
+  });
 
   return (
     <motion.div
