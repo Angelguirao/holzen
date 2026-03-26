@@ -67,6 +67,10 @@ interface UseCompanionDataParams {
   reflectionId?: string | null;
   context?: string | null;
   reflectionMessage?: string | null;
+  /** Current user mood — passed to intervention selector */
+  mood?: string | null;
+  /** Raw numeric BTC % change — passed to intervention selector for bucketing */
+  severityNumber?: number;
 }
 
 interface CompanionResult {
@@ -77,7 +81,7 @@ interface CompanionResult {
   error?: string;
 }
 
-export function useCompanionData({ companions, prefs, reflectionId, context, reflectionMessage }: UseCompanionDataParams) {
+export function useCompanionData({ companions, prefs, reflectionId, context, reflectionMessage, mood, severityNumber }: UseCompanionDataParams) {
   const { language } = useHolzen();
 
   // ── Favorites ──
@@ -379,7 +383,27 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       // Build orchestrator payload
       const recency = getRecencyHints();
       const signalSources = needSignal ? await getSignalSources() : undefined;
-      const mood = (companions as any)?.mood || null;
+
+      // Fetch recent mood history from DB for intervention selection
+      let moodHistory: Array<{ mood: string; outcome?: string | null }> = [];
+      try {
+        const { data: authData } = await supabase.auth.getUser();
+        const uid = authData?.user?.id;
+        if (uid) {
+          const { data: recentRows } = await supabase
+            .from('reflections')
+            .select('mood, outcome')
+            .eq('user_id', uid)
+            .not('mood', 'is', null)
+            .order('created_at', { ascending: false })
+            .limit(20);
+          if (recentRows) {
+            moodHistory = recentRows
+              .filter((r: any) => r.mood)
+              .map((r: any) => ({ mood: r.mood, outcome: r.outcome ?? null }));
+          }
+        }
+      } catch { /* non-fatal */ }
 
       const { data, error: fnError } = await supabase.functions.invoke('companion-orchestrate', {
         body: {
@@ -387,7 +411,9 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
           context: context ?? '',
           language,
           reflectionMessage: reflectionMessage ?? '',
-          mood,
+          mood: mood ?? null,
+          severity: severityNumber ?? 0,
+          moodHistory,
           signalSources,
           ...recency,
           enableSignal: needSignal,
