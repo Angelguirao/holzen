@@ -7,6 +7,7 @@ import { SignalDisplay } from './SignalDisplay';
 import { ZoomOutDisplay } from './ZoomOutDisplay';
 import { HistoricalInsightDisplay } from './HistoricalInsightDisplay';
 import { CompanionFeedback } from './CompanionFeedback';
+import { InterventionSection } from './InterventionSection';
 import { Check, Heart, Lock, Feather, Anchor, BookOpenText, Mountain, Clock } from 'lucide-react';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
@@ -27,6 +28,8 @@ export interface CompanionPrefs {
   history: boolean;
 }
 
+const SEVERITY_NUMBER: Record<string, number> = { mild: 3, moderate: 6, high: 10 };
+
 interface Props {
   companions: CompanionData;
   prefs: CompanionPrefs;
@@ -34,6 +37,8 @@ interface Props {
   reflectionId?: string | null;
   context?: string | null;
   reflectionMessage?: string | null;
+  /** Current user mood — drives intervention selection */
+  mood?: string | null;
 }
 
 const COMPANION_ICONS: Record<string, React.ElementType> = {
@@ -145,7 +150,7 @@ function CompanionCard({
   );
 }
 
-export const CompanionSection = forwardRef<HTMLDivElement, Props>(function CompanionSection({ companions, prefs, severity = 'mild', reflectionId, context, reflectionMessage }, ref) {
+export const CompanionSection = forwardRef<HTMLDivElement, Props>(function CompanionSection({ companions, prefs, severity = 'mild', reflectionId, context, reflectionMessage, mood }, ref) {
   const { isPro } = useProGate();
   const { t: i18nT } = useTranslation();
 
@@ -157,7 +162,8 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
     zoomOut, zoomOutLoading, zoomOutError, retryZoomOut,
     historyInsight, historyLoading, historyError, retryHistory,
     cacheIds,
-  } = useCompanionData({ companions, prefs, reflectionId, context, reflectionMessage });
+    intervention, interventionLoading,
+  } = useCompanionData({ companions, prefs, reflectionId, context, reflectionMessage, mood, severityNumber: SEVERITY_NUMBER[severity] ?? 3 });
 
   const labels = {
     pause: i18nT('companions.pause'),
@@ -185,6 +191,21 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
 
   return (
     <div ref={ref} className="space-y-2.5">
+      {/* Featured intervention — shown above companions when available */}
+      {(intervention || interventionLoading) && (
+        <div className="mb-4">
+          <InterventionSection
+            mode={intervention?.mode ?? 'insight'}
+            primary={intervention?.primary ?? null}
+            secondary={intervention?.secondary ?? null}
+            question={intervention?.question ?? null}
+            loading={interventionLoading}
+            reflectionId={reflectionId}
+          />
+          <div className="border-t border-border/10 mt-6" />
+        </div>
+      )}
+
       <p className="text-[10px] font-mono text-muted-foreground/40 uppercase tracking-[0.2em] text-center mb-1">
         {labels.pause}
       </p>
