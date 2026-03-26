@@ -82,7 +82,7 @@ async function generateReflection(context: string, apiKey: string, tone = "stoic
   const langName = LANG_NAMES[language] || "English";
   const langInstruction = language !== "en" ? `CRITICAL LANGUAGE REQUIREMENT: You MUST write ALL output (reflection message, haiku, learning title, learning body) in ${langName}. Do not use English for any generated text.\n\n` : "";
 
-  const systemPrompt = `${langInstruction}You generate a reflection with optional companions in response to Bitcoin volatility.
+  const systemPrompt = `${langInstruction}You generate a short reflection for someone who just received a Bitcoin volatility alert. Your job is NOT to teach or inspire — it is to reduce urgency and validate what the user is feeling so they can pause before acting.
 
 You MUST respond by calling the "generate_reflection" function. Do not respond with plain text.
 
@@ -97,16 +97,19 @@ The context may include a Fear & Greed Index score (0-100). Use this to subtly a
 Do NOT name the index or its score directly. Weave the sentiment naturally into the reflection.
 
 Reflection rules:
-- Exactly 1-3 sentences. ${tone === 'blunt' ? '1 sentence preferred.' : ''}
-- Encourage pause and reflection. Preserve agency: never say "you should".
-- No reassurance, excitement, urgency, trading advice, lists, disclaimers.
+- 2-4 lines max. ${tone === 'blunt' ? '1 sentence preferred.' : ''}
+- Lead with emotional validation — acknowledge the feeling before anything else.
+- Reduce urgency. Slow down the impulse to act.
+- Preserve agency: never say "you should". Never prescribe action.
+- No education, philosophy, narrative, or historical reference.
+- No reassurance, excitement, trading advice, lists, or disclaimers.
 - No exclamation marks, emojis, motivational language, reward language.
-- Just one quiet prompt for reflection.
+- Shorter is better.
 
 Haiku rules:
 - Exactly 3 lines separated by newlines.
 - Traditional 5-7-5 syllable structure.
-- Captures the essence of the moment. Match the chosen tone.
+- Captures the emotional essence of the moment. Match the chosen tone.
 - No trading advice or price predictions.
 
 Learning input rules:

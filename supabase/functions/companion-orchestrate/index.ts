@@ -6,7 +6,9 @@ import { generateSignal } from "../_shared/generators/signal.ts";
 import { generateGrounding } from "../_shared/generators/grounding.ts";
 import { generateHistory } from "../_shared/generators/history.ts";
 import { generateZoomOut } from "../_shared/generators/zoom-out.ts";
+import { generateQuestion } from "../_shared/generators/question.ts";
 import { determineSessionIntent } from "../_shared/session-intent.ts";
+import { selectIntervention, parseDirection, bucketSeverity, type InterventionSelection } from "../_shared/intervention-selector.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -32,11 +34,21 @@ interface CompanionResult {
   error?: string;
 }
 
+interface InterventionPayload {
+  mode: "insight" | "question";
+  primary: { type: string; data: any } | null;
+  secondary: { type: string; data: any } | null;
+  question: string | null;
+}
+
 interface OrchestrateResponse {
+  // Legacy fields — kept for backward compat, null in the new intervention flow
   signal: CompanionResult | null;
   grounding: CompanionResult | null;
   history: CompanionResult | null;
   zoomOut: CompanionResult | null;
+  // New structured intervention response
+  intervention: InterventionPayload | null;
 }
 
 serve(async (req) => {
@@ -102,24 +114,25 @@ serve(async (req) => {
       language = "en",
       reflectionMessage,
       mood,
-      // Companion-specific params
+      // Companion-specific params (kept for legacy callers and signal/learn system)
       signalSources,
       recentSignalSources,
       recentSignalTitles,
       recentNudgeTopics,
       recentHistoryTitles,
       recentZoomOutTitles,
-      // Which companions are enabled
+      // Legacy enable flags (only used when intervention=false is explicitly set)
       enableSignal = false,
       enableGrounding = false,
       enableHistory = false,
       enableZoomOut = false,
+      // New: set to false to bypass intervention selection (for non-pause callers)
+      useIntervention = true,
     } = body;
 
-    log(`companions: signal=${enableSignal} grounding=${enableGrounding} history=${enableHistory} zoomOut=${enableZoomOut}`);
+    const moodHistory = body.moodHistory;
 
     // ── Determine session intent for coherent companion theming ──
-    const moodHistory = body.moodHistory; // Passed from client if available
     const intent = determineSessionIntent({
       context: context ?? undefined,
       mood: mood ?? undefined,
@@ -128,42 +141,114 @@ serve(async (req) => {
     });
     log(`session intent: ${intent.theme}`, { theme: intent.theme, tone: intent.emotionalTone });
 
-    // ── Fire all enabled companions in parallel via direct generator calls ──
+    // ── Intervention selection (new pause flow) ──
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY") ?? "";
+
+    let selection: InterventionSelection | null = null;
+    if (useIntervention && reflectionId) {
+      const rawSeverity = typeof body.severity === "number" ? body.severity : 0;
+      const direction = parseDirection(context);
+      const severity = bucketSeverity(rawSeverity);
+      log(`selecting intervention: mood=${mood} severity=${severity} direction=${direction}`);
+
+      selection = await selectIntervention({
+        userId: user.id,
+        reflectionId,
+        mood: mood ?? undefined,
+        severity,
+        direction,
+        moodHistory,
+        svcClient,
+      });
+      log(`intervention selected: mode=${selection.mode} primary=${selection.primary ?? "none"}`);
+    }
+
+    // ── Build the intervention response ──
+    const interventionPayload: InterventionPayload = {
+      mode: selection?.mode ?? "insight",
+      primary: null,
+      secondary: null,
+      question: null,
+    };
+
+    // ── Fire only the selected companion(s) ──
     const tasks: Record<string, Promise<CompanionResult>> = {};
 
-    if (enableSignal) {
-      tasks.signal = (async (): Promise<CompanionResult> => {
-        const t = Date.now();
-        const result = await generateSignal({ svcClient, context, language, sources: signalSources, recentSignalSources, recentSignalTitles, userId: user.id, log, searchAngle: intent.signalAngle });
-        return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t };
-      })();
+    if (selection) {
+      if (selection.mode === "question") {
+        // Question Mode: generate a single dynamic question, skip all generators
+        const question = await generateQuestion({
+          context: context ?? "",
+          mood: mood ?? undefined,
+          direction: parseDirection(context),
+          severity: bucketSeverity(typeof body.severity === "number" ? body.severity : 0),
+          moodHistory,
+          apiKey: LOVABLE_API_KEY,
+          language,
+        });
+        interventionPayload.question = question;
+      } else {
+        // Insight Mode: generate only the selected primary (and optional secondary)
+        if (selection.primary === "mirror" && selection.mirrorData) {
+          // Mirror data was pre-fetched in selectIntervention — no generator call needed
+          interventionPayload.primary = { type: "mirror", data: selection.mirrorData };
+        } else if (selection.primary === "trap") {
+          tasks.grounding = (async (): Promise<CompanionResult> => {
+            const t = Date.now();
+            const result = await generateGrounding({ svcClient, context, language, recentTopics: recentNudgeTopics, userId: user.id, log, preferredBias: intent.groundingBias });
+            return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t };
+          })();
+        } else if (selection.primary === "pattern") {
+          tasks.history = (async (): Promise<CompanionResult> => {
+            const t = Date.now();
+            const result = await generateHistory({ svcClient, context, language, mood, recentTitles: recentHistoryTitles, userId: user.id, log, preferredMood: intent.historyMood });
+            return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t };
+          })();
+        }
+
+        if (selection.secondary === "zoom_out") {
+          tasks.zoomOut = (async (): Promise<CompanionResult> => {
+            const t = Date.now();
+            const result = await generateZoomOut({ svcClient, context, language, reflectionMessage, mood, userId: user.id, recentTitles: recentZoomOutTitles, log, zoomOutAngle: intent.zoomOutAngle });
+            return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t };
+          })();
+        }
+      }
+    } else {
+      // Legacy path: caller opted out of intervention selection (useIntervention=false)
+      // Signal is intentionally excluded from the pause flow — preserved for Learn system only
+      if (enableGrounding) {
+        tasks.grounding = (async (): Promise<CompanionResult> => {
+          const t = Date.now();
+          const result = await generateGrounding({ svcClient, context, language, recentTopics: recentNudgeTopics, userId: user.id, log, preferredBias: intent.groundingBias });
+          return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t };
+        })();
+      }
+      if (enableHistory) {
+        tasks.history = (async (): Promise<CompanionResult> => {
+          const t = Date.now();
+          const result = await generateHistory({ svcClient, context, language, mood, recentTitles: recentHistoryTitles, userId: user.id, log, preferredMood: intent.historyMood });
+          return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t };
+        })();
+      }
+      if (enableZoomOut) {
+        tasks.zoomOut = (async (): Promise<CompanionResult> => {
+          const t = Date.now();
+          const result = await generateZoomOut({ svcClient, context, language, reflectionMessage, mood, userId: user.id, recentTitles: recentZoomOutTitles, log, zoomOutAngle: intent.zoomOutAngle });
+          return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t };
+        })();
+      }
+      // Signal — only for explicit Learn system calls (enableSignal=true, useIntervention=false)
+      if (enableSignal) {
+        tasks.signal = (async (): Promise<CompanionResult> => {
+          const t = Date.now();
+          const result = await generateSignal({ svcClient, context, language, sources: signalSources, recentSignalSources, recentSignalTitles, userId: user.id, log, searchAngle: intent.signalAngle });
+          return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t };
+        })();
+      }
     }
 
-    if (enableGrounding) {
-      tasks.grounding = (async (): Promise<CompanionResult> => {
-        const t = Date.now();
-        const result = await generateGrounding({ svcClient, context, language, recentTopics: recentNudgeTopics, userId: user.id, log, preferredBias: intent.groundingBias });
-        return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t };
-      })();
-    }
-
-    if (enableHistory) {
-      tasks.history = (async (): Promise<CompanionResult> => {
-        const t = Date.now();
-        const result = await generateHistory({ svcClient, context, language, mood, recentTitles: recentHistoryTitles, userId: user.id, log, preferredMood: intent.historyMood });
-        return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t };
-      })();
-    }
-
-    if (enableZoomOut) {
-      tasks.zoomOut = (async (): Promise<CompanionResult> => {
-        const t = Date.now();
-        const result = await generateZoomOut({ svcClient, context, language, reflectionMessage, mood, userId: user.id, recentTitles: recentZoomOutTitles, log, zoomOutAngle: intent.zoomOutAngle });
-        return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t };
-      })();
-    }
-
-    // Await all in parallel
+    // Await all tasks in parallel
     const keys = Object.keys(tasks);
     const results = await Promise.allSettled(Object.values(tasks));
 
@@ -172,17 +257,29 @@ serve(async (req) => {
       grounding: null,
       history: null,
       zoomOut: null,
+      intervention: null,
     };
 
     const serveInserts: any[] = [];
     const writePromises: Promise<void>[] = [];
 
     for (let i = 0; i < keys.length; i++) {
-      const key = keys[i] as keyof OrchestrateResponse;
+      const key = keys[i] as keyof Omit<OrchestrateResponse, "intervention">;
       const result = results[i];
 
       if (result.status === "fulfilled") {
         response[key] = result.value;
+
+        // Populate intervention payload from task results
+        if (selection?.mode === "insight") {
+          if (key === "grounding" && selection.primary === "trap") {
+            interventionPayload.primary = { type: "trap", data: result.value.data };
+          } else if (key === "history" && selection.primary === "pattern") {
+            interventionPayload.primary = { type: "pattern", data: result.value.data };
+          } else if (key === "zoomOut" && selection.secondary === "zoom_out") {
+            interventionPayload.secondary = { type: "zoom_out", data: result.value.data };
+          }
+        }
 
         serveInserts.push({
           user_id: user.id,
@@ -224,6 +321,11 @@ serve(async (req) => {
           latency_ms: Date.now() - t0,
         });
       }
+    }
+
+    // Attach the intervention payload if intervention selection was used
+    if (selection) {
+      response.intervention = interventionPayload;
     }
 
     // Add serve log writes
