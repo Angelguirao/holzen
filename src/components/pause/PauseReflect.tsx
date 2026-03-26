@@ -2,9 +2,11 @@ import { motion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { ChevronLeft } from 'lucide-react';
 import { CompanionSection, type CompanionData, type CompanionPrefs } from '@/components/CompanionSection';
+import { InterventionSection } from '@/components/InterventionSection';
 import { CollapsibleReflectionHeader } from '@/components/pause/CollapsibleReflectionHeader';
 import { ReflectionNote } from '@/components/ReflectionNote';
 import { ReflectionTags } from '@/components/ReflectionTags';
+import { useCompanionData } from '@/hooks/use-companion-data';
 
 interface Props {
   companions: CompanionData;
@@ -27,6 +29,14 @@ export function PauseReflect({
   isFavorite, onToggleFavorite, subscribed, onContinue, onBack, mood,
 }: Props) {
   const { t } = useTranslation();
+
+  const { intervention, interventionLoading, interventionError } = useCompanionData({
+    companions,
+    prefs: companionPrefs,
+    reflectionId,
+    context,
+    reflectionMessage,
+  });
 
   return (
     <motion.div
@@ -59,16 +69,29 @@ export function PauseReflect({
         </motion.div>
       )}
 
-      {/* Companions — intervention featured at top, all companions below */}
-      <CompanionSection
-        companions={companions}
-        prefs={companionPrefs}
-        severity={severity}
-        reflectionId={reflectionId}
-        context={context}
-        reflectionMessage={reflectionMessage}
-        mood={mood}
-      />
+      {/* Single adaptive intervention (new flow) */}
+      {(intervention || interventionLoading) && (
+        <InterventionSection
+          mode={intervention?.mode ?? 'insight'}
+          primary={intervention?.primary ?? null}
+          secondary={intervention?.secondary ?? null}
+          question={intervention?.question ?? null}
+          loading={interventionLoading}
+          reflectionId={reflectionId}
+        />
+      )}
+
+      {/* Legacy multi-companion display — shown only if intervention is unavailable */}
+      {!intervention && !interventionLoading && !interventionError && (
+        <CompanionSection
+          companions={companions}
+          prefs={companionPrefs}
+          severity={severity}
+          reflectionId={reflectionId}
+          context={context}
+          reflectionMessage={reflectionMessage}
+        />
+      )}
 
       {/* Continue */}
       <motion.div
