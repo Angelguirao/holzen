@@ -8,6 +8,8 @@ import { ReflectionNote } from '@/components/ReflectionNote';
 import { ReflectionTags } from '@/components/ReflectionTags';
 import { useCompanionData } from '@/hooks/use-companion-data';
 
+const SEVERITY_NUMBER: Record<string, number> = { mild: 3, moderate: 6, high: 10 };
+
 interface Props {
   companions: CompanionData;
   companionPrefs: CompanionPrefs;
@@ -20,11 +22,13 @@ interface Props {
   subscribed: boolean;
   onContinue: () => void;
   onBack?: () => void;
+  /** Current mood selected by the user in the Feel step */
+  mood?: string | null;
 }
 
 export function PauseReflect({
   companions, companionPrefs, severity, reflectionId, context, reflectionMessage,
-  isFavorite, onToggleFavorite, subscribed, onContinue, onBack,
+  isFavorite, onToggleFavorite, subscribed, onContinue, onBack, mood,
 }: Props) {
   const { t } = useTranslation();
 
@@ -34,6 +38,8 @@ export function PauseReflect({
     reflectionId,
     context,
     reflectionMessage,
+    mood,
+    severityNumber: SEVERITY_NUMBER[severity] ?? 3,
   });
 
   return (

@@ -379,6 +379,7 @@ export default function PauseSession() {
                     subscribed={subscribed}
                     onContinue={() => goToStep('shift')}
                     onBack={goBack}
+                    mood={selectedMood}
                   />
                 </motion.div>
               )}
