@@ -260,8 +260,8 @@ serve(async (req) => {
         })();
       }
     }
-    // Signal — only for explicit Learn system calls (enableSignal=true, useIntervention=false)
-    if (enableSignal && !useIntervention) {
+    // Signal — included in pause flow when enabled; provides market context for cognitive reappraisal
+    if (enableSignal) {
       tasks.signal = (async (): Promise<CompanionResult> => {
         const t = Date.now();
         const result = await generateSignal({ svcClient, context, language, sources: signalSources, recentSignalSources, recentSignalTitles, userId: user.id, log, searchAngle: intent.signalAngle });
