@@ -1,12 +1,13 @@
 /**
- * InterventionSection — renders the single cognitive intervention for a pause session.
+ * InterventionSection — featured cognitive intervention at the top of the reflect step.
  *
- * Replaces CompanionSection in the Reflect step. Shows ONE primary intervention
- * and an optional collapsed secondary (zoom_out). In Question Mode, shows a single
- * centered question with no companion cards.
+ * Sits above the full companion list. Each type adds a framing sentence that explains
+ * WHY this was surfaced before showing the content itself.
  *
- * Reuses existing display components: HistoricalInsightDisplay, LearningInput,
- * ZoomOutDisplay. Adds MirrorDisplay for the new Mirror intervention.
+ * Mirror: pure DB/template — no AI call, surfaces the user's own past session.
+ * Trap:   grounding generator data + "you may be in a cognitive trap" framing.
+ * Pattern: history generator data + "this has happened before" framing.
+ * Question: single Gemini-generated question, no companion data.
  */
 
 import { useState } from 'react';
@@ -54,7 +55,26 @@ function MirrorDisplay({ data }: { data: MirrorData }) {
   );
 }
 
-// ── Intervention labels ───────────────────────────────────────────────────────
+// ── Framing sentences — explain WHY this was surfaced ────────────────────────
+
+function TrapFraming({ biasTitle }: { biasTitle?: string }) {
+  return (
+    <p className="text-xs font-mono text-muted-foreground/60 leading-relaxed mb-3">
+      Your brain may be in a{biasTitle ? ` ${biasTitle.toLowerCase()}` : ' cognitive'} trap right now.
+      Recognizing the pattern is the first step out of it.
+    </p>
+  );
+}
+
+function PatternFraming() {
+  return (
+    <p className="text-xs font-mono text-muted-foreground/60 leading-relaxed mb-3">
+      This has happened before — many times. Here&rsquo;s what history actually shows.
+    </p>
+  );
+}
+
+// ── Section label by type ─────────────────────────────────────────────────────
 
 const PRIMARY_LABELS: Record<string, string> = {
   mirror: 'Your Pattern',
@@ -142,20 +162,26 @@ export function InterventionSection({
               <MirrorDisplay data={primary.data as MirrorData} />
             )}
             {primary.type === 'pattern' && (
-              <HistoricalInsightDisplay
-                data={primary.data}
-                loading={false}
-                error={!primary.data}
-              />
+              <>
+                <PatternFraming />
+                <HistoricalInsightDisplay
+                  data={primary.data}
+                  loading={false}
+                  error={!primary.data}
+                />
+              </>
             )}
             {primary.type === 'trap' && (
-              <LearningInput
-                title={primary.data?.title ?? ''}
-                body={primary.data?.body ?? ''}
-                nudge={primary.data}
-                nudgeLoading={false}
-                nudgeError={!primary.data}
-              />
+              <>
+                <TrapFraming biasTitle={primary.data?.title} />
+                <LearningInput
+                  title={primary.data?.title ?? ''}
+                  body={primary.data?.body ?? ''}
+                  nudge={primary.data}
+                  nudgeLoading={false}
+                  nudgeError={!primary.data}
+                />
+              </>
             )}
           </>
         )}
