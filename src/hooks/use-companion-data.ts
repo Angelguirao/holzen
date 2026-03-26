@@ -4,6 +4,25 @@ import { hapticFeedback } from '@/lib/haptics';
 import { useHolzen } from '@/hooks/use-holzen';
 import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
 
+// ── Intervention types (new pause flow) ──────────────────────────────────────
+
+export interface InterventionPrimary {
+  type: 'mirror' | 'pattern' | 'trap';
+  data: any;
+}
+
+export interface InterventionSecondary {
+  type: 'zoom_out';
+  data: any;
+}
+
+export interface InterventionState {
+  mode: 'insight' | 'question';
+  primary: InterventionPrimary | null;
+  secondary: InterventionSecondary | null;
+  question: string | null;
+}
+
 interface CompletionState {
   breathing: boolean;
   haiku: boolean;
@@ -197,6 +216,11 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
   const [retryCount, setRetryCount] = useState(0);
   const fetchedRef = useRef<string | null>(null);
 
+  // ── Intervention state (new pause flow) ──
+  const [intervention, setIntervention] = useState<InterventionState | null>(null);
+  const [interventionLoading, setInterventionLoading] = useState(false);
+  const [interventionError, setInterventionError] = useState(false);
+
   // ── Check for already-cached data on the reflection row ──
   const checkCachedReflection = useCallback(async (rid: string): Promise<{
     signal?: SignalData | null;
@@ -292,7 +316,8 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     const enableHistory = prefs.history;
     const enableZoomOut = prefs.zoomOut;
 
-    if (!enableSignal && !enableGrounding && !enableHistory && !enableZoomOut) return;
+    // Always fire — intervention selection runs regardless of companion prefs.
+    // Individual prefs control which legacy companions are additionally generated.
 
     const key = `${reflectionId}:${retryCount}`;
     if (fetchedRef.current === key) return;
@@ -305,11 +330,13 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     if (enableGrounding) setNudgeLoading(true);
     if (enableHistory) setHistoryLoading(true);
     if (enableZoomOut) setZoomOutLoading(true);
+    setInterventionLoading(true);
 
     setSignalError(false);
     setNudgeError(false);
     setHistoryError(false);
     setZoomOutError(false);
+    setInterventionError(false);
 
     (async () => {
       // First check if reflection already has cached data
@@ -367,6 +394,8 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
           enableGrounding: needGrounding,
           enableHistory: needHistory,
           enableZoomOut: needZoomOut,
+          // Always request intervention selection in the pause flow
+          useIntervention: true,
         },
       });
 
@@ -377,8 +406,18 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
         if (needGrounding) { setNudgeError(true); setNudgeLoading(false); }
         if (needHistory) { setHistoryError(true); setHistoryLoading(false); }
         if (needZoomOut) { setZoomOutError(true); setZoomOutLoading(false); }
+        setInterventionError(true);
+        setInterventionLoading(false);
         return;
       }
+
+      // Process intervention (new pause flow)
+      if (data.intervention) {
+        setIntervention(data.intervention as InterventionState);
+      } else {
+        setInterventionError(true);
+      }
+      setInterventionLoading(false);
 
       // Process signal
       if (needSignal) {
@@ -458,5 +497,6 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     signal, signalLoading, signalError, retrySignal,
     zoomOut, zoomOutLoading, zoomOutError, retryZoomOut,
     historyInsight, historyLoading, historyError, retryHistory,
+    intervention, interventionLoading, interventionError,
   };
 }

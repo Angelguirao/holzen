@@ -192,10 +192,10 @@ serve(async (req) => {
     const langName = LANG_NAMES[langCode] || "English";
     const langInstruction = langCode !== "en" ? `CRITICAL LANGUAGE REQUIREMENT: You MUST write ALL output — message and haiku — in ${langName}. Every single field must be in ${langName}. Do NOT use English for any generated text. This is non-negotiable.\n\n` : "";
 
-    const systemPrompt = `${langInstruction}You generate a reflection with a haiku in response to Bitcoin volatility.
+    const systemPrompt = `${langInstruction}You generate a short reflection for someone opening a mindfulness app during Bitcoin volatility. Your job is NOT to teach, inspire, or inform — it is to reduce urgency and validate what the user is feeling so they can think clearly.
 
 You MUST respond with a JSON object containing these keys:
-- "message": The core reflection message (1-3 sentences)${langCode !== "en" ? ` in ${langName}` : ""}
+- "message": The reflection (2-4 lines max)${langCode !== "en" ? ` in ${langName}` : ""}
 - "haiku": A haiku (3 lines separated by newlines, 5-7-5 syllables)${langCode !== "en" ? ` in ${langName}` : ""}
 
 Tone: ${baseTone}
@@ -219,16 +219,19 @@ Do NOT name the index or its score directly. Weave the sentiment naturally into 
 Reflection rules:
 - Style: ${baseStyle}
 - ${tone === 'blunt' ? '1 sentence preferred.' : ''}
-- Encourage pause and reflection. Preserve agency: never say "you should".
-- No reassurance, excitement, urgency, trading advice, lists, disclaimers.
+- Lead with emotional validation — acknowledge what the user is feeling before anything else.
+- Reduce urgency. The goal is to slow down the impulse to act, not to provide perspective or wisdom.
+- Preserve agency: never say "you should". Never tell the user what to do.
+- No education, philosophy, narrative, or historical reference — those come in the intervention step.
+- No reassurance, excitement, trading advice, lists, or disclaimers.
 - No exclamation marks, emojis, motivational language, reward language.
 - BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shift, revolutionary, unprecedented, navigate the, in the world of, it's worth noting, at the end of the day, moving forward, leverage, synergy, ecosystem, disruptive, next-gen, cutting-edge, elevate, seamless, unleash
-- Just one quiet prompt for reflection.${customPrompt ? `\n\nUser's personal reflection guidance: "${customPrompt}"` : ''}${motivations && motivations.length > 0 ? `\n\nThe user's core motivations for holding: ${motivations.join(', ')}. Subtly weave this context into the reflection when relevant — don't lecture about it.` : ''}${mantra ? `\n\nThe user's personal mantra: "${mantra}". You may gently echo its spirit when it fits the moment.` : ''}${groundingActivities && groundingActivities.length > 0 ? `\n\nThe user's personal grounding activities: ${groundingActivities.join(', ')}. When the moment calls for it, gently suggest one of these as a way to ground before deciding. Frame it as a personal reminder, not generic advice.` : ''}
+- Shorter is better. If you can say it in 2 lines, don't use 4.${customPrompt ? `\n\nUser's personal reflection guidance: "${customPrompt}"` : ''}${motivations && motivations.length > 0 ? `\n\nThe user's core motivations for holding: ${motivations.join(', ')}. Reference only if it fits naturally — don't lecture.` : ''}${mantra ? `\n\nThe user's personal mantra: "${mantra}". Echo its spirit gently if it fits.` : ''}${groundingActivities && groundingActivities.length > 0 ? `\n\nThe user's personal grounding activities: ${groundingActivities.join(', ')}. Suggest one only if the moment clearly calls for it.` : ''}
 
 Haiku rules:
 - Exactly 3 lines separated by newlines.
 - Traditional 5-7-5 syllable structure.
-- Captures the essence of the moment. Match the chosen tone.
+- Captures the emotional essence of the moment. Match the chosen tone.
 - No trading advice or price predictions.
 - MUST be original and unique — never repeat common phrases like "red screens" or "breath moves".${haikuDedup}`;
 
