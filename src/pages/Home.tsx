@@ -233,6 +233,9 @@ const Home = () => {
 
   const handleDismiss = () => {
     dismissMessage();
+    // Suppress grounding auto-generation when user explicitly dismisses a pause notification
+    setGroundDismissed(true);
+    localStorage.setItem(groundDismissedKey, 'true');
   };
 
   const dismissGroundSuggestion = useCallback(() => {
