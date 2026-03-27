@@ -101,7 +101,7 @@ const SwipeableNotification = forwardRef<HTMLDivElement, {
 
 type NotificationItem = {
   id: string;
-  type: 'badge' | 'night_reflection' | 'letter' | 'insight';
+  type: 'badge' | 'night_reflection' | 'letter' | 'insight' | 'pause';
   title: string;
   subtitle: string;
   timestamp: string;
@@ -144,16 +144,20 @@ export function NotificationBell() {
       setLoading(true);
       const items: NotificationItem[] = [];
 
+      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+
       const [
         { data: badges },
         { data: nights },
         { data: letters },
         { data: insights },
+        { data: pauses },
       ] = await Promise.all([
         supabase.from('user_badges').select('id, badge_id, earned_at').eq('user_id', user!.id).order('earned_at', { ascending: false }).limit(10),
         supabase.from('night_reflections').select('id, message, created_at').eq('user_id', user!.id).order('created_at', { ascending: false }).limit(5),
         supabase.from('future_letters').select('id, delivered_at').eq('user_id', user!.id).eq('delivered', true).not('delivered_at', 'is', null).order('delivered_at', { ascending: false }).limit(5),
         supabase.from('reflection_insights').select('id, generated_at, reflection_count').eq('user_id', user!.id).order('generated_at', { ascending: false }).limit(3),
+        supabase.from('pause_notifications').select('id, message, context, reflection_id, created_at').eq('user_id', user!.id).gte('created_at', sevenDaysAgo).order('created_at', { ascending: false }).limit(5),
       ]);
 
       if (badges) {
@@ -207,6 +211,21 @@ export function NotificationBell() {
             subtitle: t('notifications.basedOnReflections', { count: i.reflection_count }),
             timestamp: i.generated_at,
             action: { label: t('notifications.viewInsights'), path: '/profile', state: { tab: 'insights' } },
+          });
+        }
+      }
+
+      if (pauses) {
+        for (const p of pauses) {
+          items.push({
+            id: `pause-${p.id}`,
+            type: 'pause',
+            title: t('notifications.pauseReady', 'Pause ready'),
+            subtitle: p.message.slice(0, 80) + (p.message.length > 80 ? '…' : ''),
+            timestamp: p.created_at,
+            action: p.reflection_id
+              ? { label: t('notifications.openPause', 'Open pause'), path: '/pause', state: { reflectionId: p.reflection_id } }
+              : undefined,
           });
         }
       }
@@ -276,6 +295,7 @@ export function NotificationBell() {
     night_reflection: '🌙',
     letter: '✉️',
     insight: '✨',
+    pause: '⚡',
   };
 
   return (

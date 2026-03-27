@@ -505,7 +505,7 @@ serve(async (req) => {
 
       await profileUpdate;
 
-      // Email + push in parallel
+      // Email + push + in-app bell notification in parallel
       await Promise.all([
         // Email
         (async () => {
@@ -543,6 +543,14 @@ serve(async (req) => {
             }
           }));
         })(),
+        // In-app bell record
+        supabase.from("pause_notifications").insert({
+          user_id: profile.user_id,
+          reflection_id: insertedReflection?.id ?? null,
+          message: result.message,
+          context: ctx,
+          severity: absChange >= 10 ? "high" : absChange >= 5 ? "moderate" : "mild",
+        }),
       ]);
 
       return true;
