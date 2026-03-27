@@ -6,6 +6,9 @@
  * external information or teach. No static pool; fully context-aware.
  */
 
+/** Bump when the system prompt or style rules change. */
+export const PROMPT_VERSION = "v1";
+
 export interface GenerateQuestionParams {
   context: string;
   mood?: string;
@@ -98,6 +101,23 @@ Return JSON: { "question": "..." }`;
     const question = typeof parsed?.question === "string" ? parsed.question.trim() : null;
 
     if (!question || question.length < 10 || question.length > 200) return null;
+
+    // ── Soft quality checks — log violations but don't discard ──
+    const forbiddenOpeners = ["are you", "do you", "have you", "did you"];
+    const lc = question.toLowerCase();
+    if (forbiddenOpeners.some((o) => lc.startsWith(o))) {
+      console.warn(`[QUESTION] quality: starts with forbidden opener — "${question.slice(0, 40)}"`);
+    }
+    // A question should end with "?" (not a statement slipping through)
+    if (!question.trim().endsWith("?")) {
+      console.warn(`[QUESTION] quality: does not end with "?" — "${question.slice(0, 60)}"`);
+    }
+    // Single sentence check — more than one "?" means multiple questions
+    const questionMarks = (question.match(/\?/g) || []).length;
+    if (questionMarks > 1) {
+      console.warn(`[QUESTION] quality: contains ${questionMarks} question marks (expected 1)`);
+    }
+
     return question;
   } catch (e) {
     clearTimeout(timeout);

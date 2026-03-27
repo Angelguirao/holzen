@@ -87,11 +87,20 @@ export async function selectIntervention(
   // We fetch Mirror data here so the orchestrator can return it without a second DB call.
   const mirrorData = await buildMirror(svcClient, userId, reflectionId);
   if (mirrorData) {
+    console.log(`[INTERVENTION] mirror: eligible — past session found`);
     return {
       mode: "insight",
       primary: "mirror",
       mirrorData,
     };
+  }
+
+  // Mirror not eligible — log which case so we can track eligibility rate
+  const sessionCount = await countPastSessions(svcClient, userId);
+  if (sessionCount <= 1) {
+    console.log(`[INTERVENTION] mirror: ineligible — new user (${sessionCount} sessions)`);
+  } else {
+    console.log(`[INTERVENTION] mirror: ineligible — ${sessionCount} sessions but no qualifying match (need same direction + recorded outcome ≥30 days ago)`);
   }
 
   // ── 2. Trap — emotionally activated states ──
