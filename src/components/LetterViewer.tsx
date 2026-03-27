@@ -240,9 +240,9 @@ export function LetterViewer({ letter, onClose }: Props) {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.2, duration: 0.5 }}
-                    className="rounded-lg border border-border/40 bg-muted/20 px-5 py-6"
+                    className="rounded-lg border border-border/40 bg-muted/20 px-5 py-6 overflow-hidden"
                   >
-                    <p className="text-sm leading-[1.8] text-foreground/90">
+                    <p className="text-sm leading-[1.8] text-foreground/90 break-words">
                       {letter.body}
                     </p>
                   </motion.div>

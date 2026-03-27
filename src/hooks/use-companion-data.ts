@@ -377,9 +377,6 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
         autoSaveToLibrary({ title: cached.zoomOut?.deepTime?.title || 'Zoom Out', body: zoomBody, sourceType: 'zoom_out' });
       }
 
-      // If nothing needs fetching, done
-      if (!needSignal && !needGrounding && !needHistory && !needZoomOut) return;
-
       // Build orchestrator payload
       const recency = getRecencyHints();
       const signalSources = needSignal ? await getSignalSources() : undefined;

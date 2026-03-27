@@ -723,7 +723,7 @@ function LetterCard({ letter: l, onDelete, fmtPrice, type, onView }: {
       </div>
       {isDelivered ? (
         <>
-          <p className="text-sm leading-relaxed">{l.body}</p>
+          <p className="text-sm leading-relaxed break-words">{l.body}</p>
           <p className="text-[10px] font-mono text-muted-foreground/50">
             Written {format(new Date(l.written_at), 'MMM d, yyyy')} at {fmtPrice(l.btc_price_at_write)}
             {l.btc_price_at_delivery && ` · Delivered at ${fmtPrice(l.btc_price_at_delivery)}`}
@@ -734,7 +734,7 @@ function LetterCard({ letter: l, onDelete, fmtPrice, type, onView }: {
           <p className="text-xs text-muted-foreground/50">
             Delivers during next {l.deliver_during === 'surge' ? 'surge' : 'drop'}
           </p>
-          <p className="text-sm leading-relaxed blur-[8px] select-none pointer-events-none">
+          <p className="text-sm leading-relaxed blur-[8px] select-none pointer-events-none break-words">
             {l.body}
           </p>
         </>

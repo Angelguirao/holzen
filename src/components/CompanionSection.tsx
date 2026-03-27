@@ -184,7 +184,9 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
   const hasHaiku = prefs.haiku && companions.haiku;
   const hasLearning = prefs.learning;
   const hasSignal = prefs.signal && !!reflectionId;
-  const hasZoomOut = prefs.zoomOut && !!reflectionId;
+  // Skip zoomOut companion card when intervention already shows it as secondary (avoid double-render)
+  const interventionHasZoomOut = intervention?.secondary?.type === 'zoom_out';
+  const hasZoomOut = prefs.zoomOut && !!reflectionId && !interventionHasZoomOut;
   const hasHistory = prefs.history && !!reflectionId;
 
   if (!hasHaiku && !hasLearning && !hasSignal && !hasZoomOut && !hasHistory) return null;

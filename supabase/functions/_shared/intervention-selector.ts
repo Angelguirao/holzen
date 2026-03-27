@@ -147,7 +147,7 @@ export async function selectIntervention(
   // Only show Question Mode to users with enough history to have something to reflect on.
   if (severity === "mild") {
     const sessionCount = await countPastSessions(svcClient, userId);
-    if (sessionCount >= 5) {
+    if (sessionCount >= 20) {
       return { mode: "question" };
     }
   }
