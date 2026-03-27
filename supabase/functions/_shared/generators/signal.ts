@@ -15,6 +15,9 @@ import { createAttemptLogger } from "../observe.ts";
 import { validateSource } from "../source-validation.ts";
 import { searchLibrary, essayToSignal, recordLibraryServe } from "../content-library.ts";
 
+/** Bump when the search query, structuring prompt, or quality rules change. */
+export const PROMPT_VERSION = "v2";
+
 // ── Public types ──
 
 export interface SignalResult {

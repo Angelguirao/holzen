@@ -6,6 +6,9 @@ import { REFLECTION_FALLBACKS, pickRandom } from "../_shared/fallbacks.ts";
 import { sanitizePromptInput, sanitizePromptArray } from "../_shared/sanitize.ts";
 import { containsSlop, containsCryptoLanguage } from "../_shared/quality.ts";
 
+/** Bump when the system prompt, tone rules, or quality gate changes. */
+const PROMPT_VERSION = "v3";
+
 const TONE_INSTRUCTIONS: Record<string, string> = {
   stoic: "Write in a calm, stoic tone. Brief and grounded. Like Marcus Aurelius observing the market.",
   zen: "Write in a gentle zen tone. Spacious, almost meditative. Use natural metaphors.",
@@ -361,6 +364,13 @@ Haiku rules:
       // Contains fabricated prices (the AI should never include $ amounts or BTC values)
       else if (/\$[\d,]+(\.\d+)?/.test(msg) || /\d+(\.\d+)?\s*BTC\b/i.test(msg)) { qgFailed = true; qgReason = "reflection_fabricated_price"; }
 
+      // Line count check — warn but don't discard (line count is a style concern, not a safety one)
+      const nonEmptyLines = msg.split("\n").filter((l: string) => l.trim().length > 0);
+      if (nonEmptyLines.length > 4) {
+        log(`reflection line count: ${nonEmptyLines.length} lines (expected ≤4) — consider tightening prompt`);
+        logAttempt({ companion_type: "reflection", provider: "lovable", model: "quality_gate", status: "quality_gate_warning", latency_ms: 0, quality_gate_reason: "reflection_too_many_lines" });
+      }
+
       // Haiku validation
       if (result.haiku) {
         const lines = result.haiku.split("\n").filter((l: string) => l.trim().length > 0);
@@ -400,7 +410,7 @@ Haiku rules:
     svcClient.from("analytics_events").insert({
       user_id: userId,
       event: "reflection_generated",
-      metadata: { tone, style, message_length: result.message.length, has_haiku: !!result.haiku },
+      metadata: { tone, style, message_length: result.message.length, has_haiku: !!result.haiku, prompt_version: PROMPT_VERSION },
     }).then(() => {});
 
     return jsonResponse({

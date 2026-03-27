@@ -2,10 +2,10 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { checkRateLimit, checkDailyBudget } from "../_shared/ratelimit.ts";
 import { createLogger } from "../_shared/observe.ts";
 import { writeCompanionData } from "../_shared/companion-data.ts";
-import { generateSignal } from "../_shared/generators/signal.ts";
-import { generateGrounding } from "../_shared/generators/grounding.ts";
-import { generateHistory } from "../_shared/generators/history.ts";
-import { generateZoomOut } from "../_shared/generators/zoom-out.ts";
+import { generateSignal, PROMPT_VERSION as SIGNAL_VERSION } from "../_shared/generators/signal.ts";
+import { generateGrounding, PROMPT_VERSION as GROUNDING_VERSION } from "../_shared/generators/grounding.ts";
+import { generateHistory, PROMPT_VERSION as HISTORY_VERSION } from "../_shared/generators/history.ts";
+import { generateZoomOut, PROMPT_VERSION as ZOOM_OUT_VERSION } from "../_shared/generators/zoom-out.ts";
 import { generateQuestion } from "../_shared/generators/question.ts";
 import { determineSessionIntent } from "../_shared/session-intent.ts";
 import { selectIntervention, parseDirection, bucketSeverity, type InterventionSelection } from "../_shared/intervention-selector.ts";
@@ -31,6 +31,8 @@ interface CompanionResult {
   source: "live" | "cache" | "curated" | "empty";
   cacheId: string | null;
   latencyMs: number;
+  /** Prompt version from the generator — stored as content_fingerprint for regression tracking. */
+  promptVersion?: string;
   error?: string;
 }
 
@@ -161,6 +163,17 @@ serve(async (req) => {
         svcClient,
       });
       log(`intervention selected: mode=${selection.mode} primary=${selection.primary ?? "none"}`);
+      // Track which intervention type is being served — critical for outcome analysis
+      svcClient.from("analytics_events").insert({
+        user_id: user.id,
+        event: "intervention_selected",
+        metadata: {
+          mode: selection.mode,
+          primary: selection.primary ?? null,
+          secondary: selection.secondary ?? null,
+          reflection_id: reflectionId ?? null,
+        },
+      }).catch(() => {});
     }
 
     // ── Build the intervention response ──
@@ -174,85 +187,33 @@ serve(async (req) => {
     // ── Fire only the selected companion(s) ──
     const tasks: Record<string, Promise<CompanionResult>> = {};
 
-    if (selection) {
-      if (selection.mode === "question") {
-        // Question Mode: generate a single dynamic question, skip all generators
-        const question = await generateQuestion({
-          context: context ?? "",
-          mood: mood ?? undefined,
-          direction: parseDirection(context),
-          severity: bucketSeverity(typeof body.severity === "number" ? body.severity : 0),
-          moodHistory,
-          apiKey: LOVABLE_API_KEY,
-          language,
-        });
-        interventionPayload.question = question;
-      } else {
-        // Insight Mode: generate only the selected primary (and optional secondary)
-        if (selection.primary === "mirror" && selection.mirrorData) {
-          // Mirror data was pre-fetched in selectIntervention — no generator call needed
-          interventionPayload.primary = { type: "mirror", data: selection.mirrorData };
-        } else if (selection.primary === "trap") {
-          tasks.grounding = (async (): Promise<CompanionResult> => {
-            const t = Date.now();
-            const result = await generateGrounding({ svcClient, context, language, recentTopics: recentNudgeTopics, userId: user.id, log, preferredBias: intent.groundingBias });
-            return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t };
-          })();
-        } else if (selection.primary === "pattern") {
-          tasks.history = (async (): Promise<CompanionResult> => {
-            const t = Date.now();
-            const result = await generateHistory({ svcClient, context, language, mood, recentTitles: recentHistoryTitles, userId: user.id, log, preferredMood: intent.historyMood });
-            return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t };
-          })();
-        }
-
-        if (selection.secondary === "zoom_out") {
-          tasks.zoomOut = (async (): Promise<CompanionResult> => {
-            const t = Date.now();
-            const result = await generateZoomOut({ svcClient, context, language, reflectionMessage, mood, userId: user.id, recentTitles: recentZoomOutTitles, log, zoomOutAngle: intent.zoomOutAngle });
-            return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t };
-          })();
-        }
-      }
-    } else {
-      // Legacy path: caller opted out of intervention selection (useIntervention=false)
-      // Signal is intentionally excluded from the pause flow — preserved for Learn system only
-      if (enableGrounding) {
-        tasks.grounding = (async (): Promise<CompanionResult> => {
-          const t = Date.now();
-          const result = await generateGrounding({ svcClient, context, language, recentTopics: recentNudgeTopics, userId: user.id, log, preferredBias: intent.groundingBias });
-          return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t };
-        })();
-      }
-      if (enableHistory) {
-        tasks.history = (async (): Promise<CompanionResult> => {
-          const t = Date.now();
-          const result = await generateHistory({ svcClient, context, language, mood, recentTitles: recentHistoryTitles, userId: user.id, log, preferredMood: intent.historyMood });
-          return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t };
-        })();
-      }
-      if (enableZoomOut) {
-        tasks.zoomOut = (async (): Promise<CompanionResult> => {
-          const t = Date.now();
-          const result = await generateZoomOut({ svcClient, context, language, reflectionMessage, mood, userId: user.id, recentTitles: recentZoomOutTitles, log, zoomOutAngle: intent.zoomOutAngle });
-          return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t };
-        })();
-      }
-      // Signal — only for explicit Learn system calls (enableSignal=true, useIntervention=false)
-      if (enableSignal) {
-        tasks.signal = (async (): Promise<CompanionResult> => {
-          const t = Date.now();
-          const result = await generateSignal({ svcClient, context, language, sources: signalSources, recentSignalSources, recentSignalTitles, userId: user.id, log, searchAngle: intent.signalAngle });
-          return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t };
-        })();
-      }
+    if (enableGrounding) {
+      tasks.grounding = (async (): Promise<CompanionResult> => {
+        const t = Date.now();
+        const result = await generateGrounding({ svcClient, context, language, recentTopics: recentNudgeTopics, userId: user.id, log, preferredBias: intent.groundingBias });
+        return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t, promptVersion: GROUNDING_VERSION };
+      })();
+    }
+    if (enableHistory) {
+      tasks.history = (async (): Promise<CompanionResult> => {
+        const t = Date.now();
+        const result = await generateHistory({ svcClient, context, language, mood, recentTitles: recentHistoryTitles, userId: user.id, log, preferredMood: intent.historyMood });
+        return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t, promptVersion: HISTORY_VERSION };
+      })();
+    }
+    if (enableZoomOut) {
+      tasks.zoomOut = (async (): Promise<CompanionResult> => {
+        const t = Date.now();
+        const result = await generateZoomOut({ svcClient, context, language, reflectionMessage, mood, userId: user.id, recentTitles: recentZoomOutTitles, log, zoomOutAngle: intent.zoomOutAngle });
+        return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t, promptVersion: ZOOM_OUT_VERSION };
+      })();
     }
     // Signal — included in pause flow when enabled; provides market context for cognitive reappraisal
     if (enableSignal) {
       tasks.signal = (async (): Promise<CompanionResult> => {
         const t = Date.now();
         const result = await generateSignal({ svcClient, context, language, sources: signalSources, recentSignalSources, recentSignalTitles, userId: user.id, log, searchAngle: intent.signalAngle });
-        return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t };
+        return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t, promptVersion: SIGNAL_VERSION };
       })();
     }
 
@@ -303,7 +264,7 @@ serve(async (req) => {
           serve_source: result.value.source,
           cache_entry_id: result.value.cacheId || null,
           content_title: result.value.data?.title || result.value.data?.deepTime?.title || null,
-          content_fingerprint: null,
+          content_fingerprint: result.value.promptVersion ?? null,
           latency_ms: result.value.latencyMs,
         });
 

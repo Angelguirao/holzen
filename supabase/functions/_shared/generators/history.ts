@@ -14,6 +14,9 @@ import { parseMarketDirection, serveFromCache } from "../cache.ts";
 import { createAttemptLogger } from "../observe.ts";
 import { searchLibrary, eventToHistory, recordLibraryServe } from "../content-library.ts";
 
+/** Bump when the search query, structuring prompt, or quality rules change. */
+export const PROMPT_VERSION = "v2";
+
 // ── Public types ──
 
 export interface HistoryResult {

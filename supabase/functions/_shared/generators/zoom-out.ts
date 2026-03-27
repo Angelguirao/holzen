@@ -15,6 +15,9 @@ import { ZOOM_OUT_FALLBACKS, pickRandom } from "../fallbacks.ts";
 import { COMPANION_ZOOM_OUT_DEEP_TIME, parseMarketDirection, serveFromCache } from "../cache.ts";
 import { createAttemptLogger } from "../observe.ts";
 
+/** Bump when the deep-time prompt, seed pool, or quality rules change. */
+export const PROMPT_VERSION = "v2";
+
 // ── Public types ──
 
 export interface ZoomOutResult {
