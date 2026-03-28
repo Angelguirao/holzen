@@ -1688,6 +1688,7 @@ export type Database = {
           tags: string[]
         }[]
       }
+      get_admin_stats: { Args: never; Returns: Json }
       get_holzen_number: { Args: never; Returns: Json }
       is_admin: { Args: never; Returns: boolean }
       owns_collection: {

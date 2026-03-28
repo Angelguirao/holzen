@@ -7,6 +7,9 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const escapeHtml = (str: string) =>
+  str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -53,16 +56,16 @@ serve(async (req) => {
         body: JSON.stringify({
           from: "Holzen Feedback <notify@notify.holzen.app>",
           to: ["hello@holzen.app"],
-          subject: `${categoryEmoji[category] || ""} [${category.toUpperCase()}] New feedback from ${user.email}`,
+          subject: `${categoryEmoji[category] || ""} [${category.toUpperCase()}] New feedback from ${escapeHtml(user.email || '')}`,
           html: `
             <div style="font-family: monospace; max-width: 600px; margin: 0 auto;">
               <h2 style="font-size: 14px; color: #666;">New Feedback</h2>
               <table style="font-size: 13px; border-collapse: collapse; width: 100%;">
-                <tr><td style="padding: 4px 8px; color: #999;">Category</td><td style="padding: 4px 8px;">${category}</td></tr>
-                <tr><td style="padding: 4px 8px; color: #999;">User</td><td style="padding: 4px 8px;">${user.email}</td></tr>
-                <tr><td style="padding: 4px 8px; color: #999;">User ID</td><td style="padding: 4px 8px; font-size: 11px;">${user.id}</td></tr>
+                <tr><td style="padding: 4px 8px; color: #999;">Category</td><td style="padding: 4px 8px;">${escapeHtml(category)}</td></tr>
+                <tr><td style="padding: 4px 8px; color: #999;">User</td><td style="padding: 4px 8px;">${escapeHtml(user.email || '')}</td></tr>
+                <tr><td style="padding: 4px 8px; color: #999;">User ID</td><td style="padding: 4px 8px; font-size: 11px;">${escapeHtml(user.id)}</td></tr>
               </table>
-              <div style="margin-top: 16px; padding: 12px; background: #f5f5f5; border-radius: 6px; font-size: 13px; white-space: pre-wrap;">${message.trim()}</div>
+              <div style="margin-top: 16px; padding: 12px; background: #f5f5f5; border-radius: 6px; font-size: 13px; white-space: pre-wrap;">${escapeHtml(message.trim())}</div>
             </div>
           `,
         }),
