@@ -260,7 +260,8 @@ flowchart TB
 ## 5. `companion-orchestrate` (single entry point)
 
 - **File:** `supabase/functions/companion-orchestrate/index.ts`
-- **Role:** Auth → rate limit → daily budget → parse body → **`determineSessionIntent`** → **`selectIntervention`** → optional **`generateQuestion`** (question mode) → parallel **generator tasks** (gated by `enableSignal` / `enableGrounding` / `enableHistory` / `enableZoomOut`) → assemble **`intervention`** + legacy companion results → `companion_serves` inserts → **`writeCompanionData`** (dual-write to **`reflection_companions`** + denormalized columns on **`reflections`** where supported — all orchestrated types including **`zoom_out_deep_time` → `zoom_out_data`**).
+- **Role:** Auth → rate limit → daily budget → parse body → **`determineSessionIntent`** → **`selectIntervention`** (when **`useIntervention`** is true **and** **`reflectionId`** is present) → **`Promise.all`** of **`generateQuestion`** (question mode only) **and** enabled generator tasks → assemble **`intervention`** + legacy companion results → `companion_serves` inserts → **`writeCompanionData`** (dual-write to **`reflection_companions`** + denormalized columns on **`reflections`** where supported — all orchestrated types including **`zoom_out_deep_time` → `zoom_out_data`**).
+- **Typical JSON body:** **`reflectionId`**, **`context`**, **`reflectionMessage`**, **`language`**, **`mood`**, numeric **`severity`** (absolute % move → **`bucketSeverity`** in `intervention-selector.ts`), **`moodHistory`**, **`signalSources`** / **`groundingSources`** (merged catalog URLs when Signal/Ground are on), recency arrays (**`recentNudgeTopics`**, **`recentGroundingSources`**, **`recentSignalSources`**, …), **`enableSignal` / `enableGrounding` / `enableHistory` / `enableZoomOut`**, **`useIntervention`** (default true). If **`reflectionId`** is missing or **`useIntervention: false`**, no intervention is selected (**`response.intervention`** omitted); generators still run per **`enable*`**.
 
 ### Diagram — inside `companion-orchestrate`
 
@@ -269,22 +270,16 @@ flowchart TD
   IN[HTTP request] --> AUTH[Validate JWT or\nservice role + userId]
   AUTH --> RL[Rate limit +\ndaily budget]
   RL --> SI[determineSessionIntent]
-  SI --> SEL[selectIntervention]
-  SEL --> Q[generateQuestion\nif question mode]
-  SEL --> GS[Signal]
-  SEL --> GG[Grounding]
-  SEL --> GH[History]
-  SEL --> GZ[Zoom out]
-  Q --> ASM[Assemble intervention +\ncompanion payloads]
-  GS --> ASM
-  GG --> ASM
-  GH --> ASM
-  GZ --> ASM
-  ASM --> SRV[companion_serves +\nwriteCompanionData]
+  SI --> SEL[selectIntervention\nwhen useIntervention + reflectionId]
+  SEL --> PAR["Parallel: questionPromise\n+ enabled generator tasks"]
+  PAR --> ASM[Map task results →\nintervention.primary/secondary\n+ legacy companion fields]
+  ASM --> SRV[Insert companion_serves;\nqueue writeCompanionData]
   SRV --> OUT[(reflections +\nreflection_companions)]
 ```
 
-**Parallelism:** question (when selected) and the four companion generators run **alongside** each other after intervention selection; the diagram shows logical inputs to **assemble**, not strict sequencing. Generators run **in process** (not HTTP to standalone companion functions). Each slot is skipped if disabled by **`enable*`** flags or satisfied from cache.
+**Parallelism:** After selection, **`generateQuestion`** (if question mode) and **Signal / Grounding / History / Zoom out** run **concurrently** (`Promise.all` + `Promise.allSettled` on tasks). Generators are **in-process** imports. Each slot is omitted if its **`enable*`** flag is false or the client skipped it (e.g. already cached on the row).
+
+**Intervention vs generators:** **`intervention.primary`** for **trap** / **pattern** and **`intervention.secondary`** for **zoom_out** are filled **from the same task results** as the Ground / History / Zoom cards. If the user disables **`enableGrounding`** but **`selectIntervention`** returns **trap**, the trap headline may **lack** grounding data (task never ran). Same idea for **pattern** + **`enableHistory`**, and **zoom_out** secondary + **`enableZoomOut`**. See **§11.3** (*Intervention vs “run every enabled generator”*).
 
 ### 5.1 Authentication (important)
 
@@ -338,9 +333,9 @@ The pause UI and **`check-volatility`** only call **`companion-orchestrate`**, w
 | Generator | File | First hop | Fallback chain (simplified) |
 |-----------|------|-----------|------------------------------|
 | Signal | `_shared/generators/signal.ts` | Perplexity + structure via Lovable/Gemini | `content_library` (essays) → `serveFromCache` → curated |
-| Grounding | `grounding.ts` | Perplexity academic + structure | library (papers) → cache → curated |
-| History | `history.ts` | Perplexity + structure | library (events) → cache → curated |
-| Zoom out | `zoom-out.ts` | `btc_price_cache` + echo + deep-time AI | cache → curated (**no** live CoinGecko in request path) |
+| Grounding | `_shared/generators/grounding.ts` | Perplexity academic + structure | library (papers) → cache → curated |
+| History | `_shared/generators/history.ts` | Perplexity + structure | library (events) → cache → curated |
+| Zoom out | `_shared/generators/zoom-out.ts` | `btc_price_cache` + echo + deep-time AI | cache → curated (**no** live CoinGecko in request path) |
 
 **Zoom out dependency:** Cron **`refresh-btc-prices`** must keep `btc_price_cache` fresh ([cron-setup.md](./cron-setup.md)).
 
@@ -400,7 +395,7 @@ flowchart TB
 | **AI** | **No** — template assembly from DB fields only. |
 | **Orchestrator** | Sets `intervention.primary = { type: "mirror", data: mirrorData }` immediately; **does not** use Signal/Ground/History/Zoom results to build mirror. |
 | **UI** | `InterventionSection` → `MirrorDisplay` (“You’ve been here before”, narrative + Then / Decision / When). |
-| **Companion overlap** | Enabled companions **still run** if flags allow (§11). Mirror does not consume a dedicated “mirror generator.” |
+| **Companion overlap** | Enabled companions **still run** if flags allow (**§11.3**). Mirror does not consume a dedicated “mirror generator.” |
 
 ---
 
@@ -415,6 +410,7 @@ flowchart TB
 | **Secondary** | If **`severity === "high"`**, selection may add **`secondary: "zoom_out"`**; zoom payload comes from the **`zoomOut`** task when fulfilled. |
 | **AI** | **Yes** (Grounding generator — Perplexity + structure; see §6). |
 | **Product note** | If **Ground** companion pref is **on**, the user can see **the same grounding payload** both in the **trap** intervention and in the **Ground** card — same generator, two surfaces. |
+| **Gating** | Trap **copy** in **`intervention.primary`** comes from the **grounding** task; **`enableGrounding`** must be **true** (and the task must succeed) or the trap headline can be empty. |
 
 ---
 
@@ -427,6 +423,7 @@ flowchart TB
 | **Framing** | `PatternFraming` + **`HistoricalInsightDisplay`**. |
 | **Secondary** | High-severity pattern **always** includes zoom-out secondary; moderate default includes zoom-out; mild default does **not**. |
 | **AI** | **Yes** (History generator; Zoom secondary uses Zoom Out generator when enabled). |
+| **Gating** | Pattern **copy** needs the **history** task; **`enableHistory`** must be **true** for **`intervention.primary`**. Zoom **secondary** needs **`enableZoomOut`** (and a fulfilled **`zoomOut`** task). |
 
 ---
 
@@ -438,7 +435,7 @@ flowchart TB
 | **Payload** | No `primary` / `trap` / `pattern` / `mirror`. `intervention.mode === "question"` and **`intervention.question`** string from **`generateQuestion`** (`_shared/generators/question.ts`, Lovable/Gemini). |
 | **AI** | **Yes** — dedicated question path, parallel with companion tasks. |
 | **UI** | Centered question copy + “Sit with this before deciding.” **No** companion-shaped body for the headline. |
-| **Companion overlap** | Other generators still run per **`enable*`** flags (§11). |
+| **Companion overlap** | Other generators still run per **`enable*`** flags (cost note: **§11.3**). |
 
 ---
 
@@ -450,6 +447,7 @@ flowchart TB
 | **Data** | Same **`generateZoomOut`** result as the **Zoom Out companion** task. Orchestrator assigns it when `key === "zoomOut" && selection.secondary === "zoom_out"`. |
 | **UI** | Collapsible **“Zoom out”** under the primary intervention (`InterventionSection`), **`ZoomOutDisplay`**. |
 | **Duplicate avoidance** | `CompanionSection` **hides the Zoom Out card** when `intervention?.secondary?.type === "zoom_out"` so the same payload is not shown twice. If zoom-out is **only** in the intervention secondary, the card is suppressed even when the pref is on. |
+| **Gating** | Secondary payload is only attached when **`enableZoomOut`** runs the **`zoomOut`** task successfully; selection may still **request** `secondary: "zoom_out"` from `intervention-selector.ts`. |
 
 ---
 
