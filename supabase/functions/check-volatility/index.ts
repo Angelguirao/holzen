@@ -336,7 +336,7 @@ serve(async (req) => {
       const { result } = await generateUnifiedReflection({
         context: ctx,
         apiKey: LOVABLE_API_KEY,
-        includeLearning: true,
+        includeLearning: false,
         tone,
         language: userLang,
         severity: absChange,
@@ -348,10 +348,7 @@ serve(async (req) => {
       }
 
       const haiku = (profile as any).companion_haiku ? result.haiku : null;
-      const learningTitle = (profile as any).companion_learning ? result.learning_title : null;
-      const learningBody = (profile as any).companion_learning ? result.learning_body : null;
-      const learningCitation = (profile as any).companion_learning ? result.learning_citation : null;
-      const learningUrl = (profile as any).companion_learning ? result.learning_url : null;
+      // learning_* on the row are filled by companion-orchestrate (Grounding, etc.), not reflection AI
 
       const { data: insertedReflection } = await supabase
         .from("reflections")
@@ -360,10 +357,10 @@ serve(async (req) => {
           message: result.message,
           context: ctx,
           haiku,
-          learning_title: learningTitle,
-          learning_body: learningBody,
-          learning_citation: learningCitation,
-          learning_url: learningUrl,
+          learning_title: null,
+          learning_body: null,
+          learning_citation: null,
+          learning_url: null,
         })
         .select("id")
         .single();
