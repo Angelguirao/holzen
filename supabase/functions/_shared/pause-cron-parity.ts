@@ -1,7 +1,7 @@
 /**
  * Helpers so automatic pause (check-volatility) matches manual pause inputs:
- * same market-sentiment line in context, signal sources, and DB-derived recency hints
- * for companion-orchestrate (mirrors use-holzen / use-companion-data behavior).
+ * Fear & Greed, optional on-chain snippet (keep in sync with `src/lib/btc.ts` + `use-holzen.ts`),
+ * signal sources, and DB-derived recency hints for companion-orchestrate.
  */
 
 export interface FearGreedSnapshot {
@@ -29,6 +29,65 @@ export async function fetchFearGreedSnapshot(): Promise<FearGreedSnapshot | null
 export function appendFearGreedToContext(ctx: string, fg: FearGreedSnapshot | null): string {
   if (!fg) return ctx;
   return `${ctx} Market sentiment: ${fg.label} (${fg.value}/100).`;
+}
+
+/** Mirrors `OnChainData` / append logic in `use-holzen.ts` (generateMessage). */
+export interface OnChainSnapshot {
+  mempoolSize?: number;
+  fastestFee?: number;
+  medianFee?: number;
+  hashrate?: string;
+  blockHeight?: number;
+}
+
+/** One shared mempool.space round-trip per cron run (same as `fetchOnChainData` in `src/lib/btc.ts`). */
+export async function fetchOnChainSnapshot(): Promise<OnChainSnapshot | null> {
+  try {
+    const [mempoolRes, feesRes, hashrateRes, tipRes] = await Promise.all([
+      fetch("https://mempool.space/api/mempool").then((r) => (r.ok ? r.json() : null)).catch(() => null),
+      fetch("https://mempool.space/api/v1/fees/recommended").then((r) => (r.ok ? r.json() : null)).catch(() => null),
+      fetch("https://mempool.space/api/v1/mining/hashrate/1d").then((r) => (r.ok ? r.json() : null)).catch(() => null),
+      fetch("https://mempool.space/api/blocks/tip/height").then((r) => (r.ok ? r.text() : null)).catch(() => null),
+    ]);
+
+    const result: OnChainSnapshot = {};
+    if (mempoolRes) result.mempoolSize = mempoolRes.count;
+    if (feesRes) {
+      result.fastestFee = feesRes.fastestFee;
+      result.medianFee = feesRes.halfHourFee;
+    }
+    if (hashrateRes?.currentHashrate) {
+      const eh = hashrateRes.currentHashrate / 1e18;
+      result.hashrate = `${eh.toFixed(1)} EH/s`;
+    }
+    if (tipRes) result.blockHeight = parseInt(tipRes, 10);
+    return Object.keys(result).length > 0 ? result : null;
+  } catch {
+    return null;
+  }
+}
+
+export function appendOnChainToContext(ctx: string, oc: OnChainSnapshot | null): string {
+  if (!oc) return ctx;
+  let out = ctx;
+  if (oc.mempoolSize != null) {
+    out += ` Mempool: ${oc.mempoolSize.toLocaleString()} unconfirmed txs.`;
+  }
+  if (oc.fastestFee != null) {
+    out += ` Fees: ${oc.fastestFee} sat/vB (fastest), ${oc.medianFee ?? "?"} sat/vB (medium).`;
+  }
+  if (oc.hashrate) out += ` Hashrate: ${oc.hashrate}.`;
+  if (oc.blockHeight != null) out += ` Block height: ${oc.blockHeight.toLocaleString()}.`;
+  return out;
+}
+
+/** Apply Fear & Greed + on-chain in the same order as manual `generateMessage`. */
+export function enrichAutomaticPauseContext(
+  baseCtx: string,
+  fearGreed: FearGreedSnapshot | null,
+  onChain: OnChainSnapshot | null,
+): string {
+  return appendOnChainToContext(appendFearGreedToContext(baseCtx, fearGreed), onChain);
 }
 
 export interface OrchestratorRecencyHints {

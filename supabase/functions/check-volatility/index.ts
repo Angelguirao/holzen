@@ -7,8 +7,9 @@ import {
   type MoodHistoryEntry,
 } from "../_shared/reflection-generate.ts";
 import {
-  appendFearGreedToContext,
+  enrichAutomaticPauseContext,
   fetchFearGreedSnapshot,
+  fetchOnChainSnapshot,
   fetchSignalSourcesForOrchestrate,
   recencyHintsFromReflectionRows,
 } from "../_shared/pause-cron-parity.ts";
@@ -33,10 +34,24 @@ async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise
   throw new Error("Failed to fetch BTC data after retries");
 }
 
-async function fetchBtcVolatility(): Promise<{ changePercent: number; direction: string; cumulativeChangePercent: number; cumulativeDirection: string }> {
+/** CoinGecko quote currency — matches `use-holzen` / `fetchBtcData(currency)` (`profiles.hold_goal_currency`). */
+function normalizeHoldGoalCurrency(raw: unknown): string {
+  if (typeof raw === "string" && raw.trim().length >= 3) return raw.trim().toLowerCase();
+  return "usd";
+}
+
+type BtcVolatilityMetrics = {
+  changePercent: number;
+  direction: string;
+  cumulativeChangePercent: number;
+  cumulativeDirection: string;
+};
+
+async function fetchBtcVolatilityForCurrency(vsCurrency: string): Promise<BtcVolatilityMetrics> {
+  const cur = vsCurrency.toLowerCase();
   const [res1d, res7d] = await Promise.all([
-    fetchWithRetry("https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=1"),
-    fetchWithRetry("https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=7"),
+    fetchWithRetry(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=${cur}&days=1`),
+    fetchWithRetry(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=${cur}&days=7`),
   ]);
 
   const data1d = await res1d.json();
@@ -142,29 +157,63 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
-    // 1. Fetch current BTC volatility
-    const btc = await fetchBtcVolatility();
-    const absChange = Math.abs(btc.changePercent);
-    const absCumChange = Math.abs(btc.cumulativeChangePercent);
-    console.log(`[CHECK-VOLATILITY] BTC 24h: ${btc.changePercent.toFixed(2)}%, 7d: ${btc.cumulativeChangePercent.toFixed(2)}%`);
-
-    // Fear & Greed once per run — same context line as manual pause (`use-holzen` / `fetchBtcData`).
-    const fearGreedSnapshot = await fetchFearGreedSnapshot();
-
-    // 2. Get all profiles - we need to check both thresholds
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
       .select(
-        "user_id, threshold, threshold_down, cumulative_threshold, email_notifications, last_trigger_at, cooldown_hours, reflection_tone, companion_haiku, companion_grounding, companion_signal, companion_zoom_out, companion_history, quiet_hours_start, quiet_hours_end, timezone, language, snoozed_until, custom_prompt, reflection_style, motivations, mantra, grounding_activities",
+        "user_id, threshold, threshold_down, cumulative_threshold, hold_goal_currency, email_notifications, last_trigger_at, cooldown_hours, reflection_tone, companion_haiku, companion_grounding, companion_signal, companion_zoom_out, companion_history, quiet_hours_start, quiet_hours_end, timezone, language, snoozed_until, custom_prompt, reflection_style, motivations, mantra, grounding_activities",
       );
 
     if (profilesError) throw profilesError;
     if (!profiles || profiles.length === 0) {
-      console.log("[CHECK-VOLATILITY] No users exceeded threshold");
+      console.log("[CHECK-VOLATILITY] No profiles");
       return new Response(JSON.stringify({ triggered: 0 }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    const currencyCodes = new Set<string>();
+    for (const p of profiles) {
+      currencyCodes.add(normalizeHoldGoalCurrency((p as { hold_goal_currency?: string }).hold_goal_currency));
+    }
+    if (!currencyCodes.has("usd")) currencyCodes.add("usd");
+
+    const [btcEntries, fearGreedSnapshot, onChainSnapshot] = await Promise.all([
+      Promise.all(
+        [...currencyCodes].map(async (c) => {
+          try {
+            const m = await fetchBtcVolatilityForCurrency(c);
+            return [c, m] as const;
+          } catch (e) {
+            console.error(`[CHECK-VOLATILITY] CoinGecko failed for vs_currency=${c}`, e);
+            return [c, null] as const;
+          }
+        }),
+      ),
+      fetchFearGreedSnapshot(),
+      fetchOnChainSnapshot(),
+    ]);
+
+    const btcByCur = new Map<string, BtcVolatilityMetrics>();
+    for (const [c, m] of btcEntries) {
+      if (m) btcByCur.set(c, m);
+    }
+    if (!btcByCur.has("usd")) {
+      console.error("[CHECK-VOLATILITY] Could not load USD BTC metrics");
+      return new Response(JSON.stringify({ error: "btc_fetch_failed" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    function metricsForProfile(p: { hold_goal_currency?: string | null }): BtcVolatilityMetrics {
+      const c = normalizeHoldGoalCurrency(p.hold_goal_currency);
+      return btcByCur.get(c) ?? btcByCur.get("usd")!;
+    }
+
+    const usdPeek = btcByCur.get("usd")!;
+    console.log(
+      `[CHECK-VOLATILITY] BTC 24h (USD sample): ${usdPeek.changePercent.toFixed(2)}%, 7d: ${usdPeek.cumulativeChangePercent.toFixed(2)}% (${btcByCur.size} quote currency fetch(es)); F&G + on-chain cached for run`,
+    );
 
     // Helper: get user's local hour
     function getUserLocalHour(timezone: string): number {
@@ -234,8 +283,10 @@ serve(async (req) => {
     }
 
     const eligible = profiles.filter((p) => {
-      // Use direction-aware thresholds: threshold for up moves, threshold_down for down moves
-      const effectiveThreshold = btc.direction === "down"
+      const b = metricsForProfile(p as { hold_goal_currency?: string | null });
+      const absChange = Math.abs(b.changePercent);
+      const absCumChange = Math.abs(b.cumulativeChangePercent);
+      const effectiveThreshold = b.direction === "down"
         ? ((p as any).threshold_down ?? p.threshold ?? 5)
         : (p.threshold ?? 5);
       const dailyTriggered = absChange >= effectiveThreshold;
@@ -315,14 +366,17 @@ serve(async (req) => {
         }
       }
 
-      const dir = btc.direction === "down" ? "down" : "up";
+      const userBtc = metricsForProfile(profile as { hold_goal_currency?: string | null });
+      const absChange = Math.abs(userBtc.changePercent);
+      const absCumChange = Math.abs(userBtc.cumulativeChangePercent);
+      const dir = userBtc.direction === "down" ? "down" : "up";
       const pct = absChange.toFixed(1);
       let ctx = `BTC is ${dir} ${pct}% in the last 24 hours.`;
       if (absCumChange >= ((profile as any).cumulative_threshold ?? 15)) {
-        const cumDir = btc.cumulativeDirection === "down" ? "down" : "up";
+        const cumDir = userBtc.cumulativeDirection === "down" ? "down" : "up";
         ctx += ` Over 7 days, it's ${cumDir} ${absCumChange.toFixed(1)}%.`;
       }
-      ctx = appendFearGreedToContext(ctx, fearGreedSnapshot);
+      ctx = enrichAutomaticPauseContext(ctx, fearGreedSnapshot, onChainSnapshot);
 
       const p = profile as Record<string, unknown>;
       const tone = (p.reflection_tone as string) || "stoic";
@@ -397,6 +451,9 @@ serve(async (req) => {
         tone,
         style,
         language: userLang,
+        currency: typeof p.hold_goal_currency === "string" && p.hold_goal_currency.trim()
+          ? p.hold_goal_currency.trim().toUpperCase()
+          : "USD",
         severity: absChange,
         moodHistory,
         recentHaikus,
@@ -551,9 +608,12 @@ serve(async (req) => {
     const triggered = results.filter(Boolean).length;
     console.log(`[CHECK-VOLATILITY] Triggered ${triggered} notifications`);
 
-    return new Response(JSON.stringify({ triggered, btcChange: btc.changePercent }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({ triggered, btcChangeUsd: usdPeek.changePercent, quoteCurrenciesLoaded: btcByCur.size }),
+      {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     console.error("[CHECK-VOLATILITY] Error:", msg);
