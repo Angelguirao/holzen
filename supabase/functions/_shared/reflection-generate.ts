@@ -1,7 +1,7 @@
 /**
  * Unified reflection generation for manual pause (holzen-reflect) and
- * automatic volatility (check-volatility). Single prompt surface + quality gate;
- * optional grounding companion fields via tool-call when includeLearning is true.
+ * automatic volatility (check-volatility). JSON message + haiku only; companion
+ * columns are filled by companion-orchestrate.
  */
 
 import { containsSlop, containsCryptoLanguage } from "./quality.ts";
@@ -27,8 +27,6 @@ export interface MoodHistoryEntry {
 export interface GenerateUnifiedReflectionParams {
   context: string;
   apiKey: string;
-  /** false = JSON message+haiku (manual). true = tool call + grounding_* fields (legacy name: includeLearning). */
-  includeLearning: boolean;
   tone?: string;
   style?: string;
   language?: string;
@@ -111,13 +109,14 @@ const LANG_NAMES: Record<string, string> = {
   tr: "Turkish",
 };
 
-async function validateUrl(url: string, fallbackQuery: string): Promise<string> {
-  try {
-    const res = await fetch(url, { method: "HEAD", redirect: "follow" });
-    if (res.ok || res.status === 405 || res.status === 403) return url;
-  } catch { /* broken */ }
-  return `https://www.google.com/search?q=${encodeURIComponent(fallbackQuery)}`;
-}
+/** Injected into system prompt: model must return JSON with message + haiku only. */
+const REFLECTION_JSON_OUTPUT_INSTRUCTION =
+  `You MUST respond with a JSON object only (no markdown). The object must contain exactly these keys:
+- "message": The reflection (2-4 lines max)
+- "haiku": A haiku (3 lines separated by newlines, 5-7-5 syllables)`;
+
+const REFLECTION_NO_COMPANION_IN_MESSAGE = `
+- No education, philosophy, narrative, or historical reference in the reflection — those come in the intervention step.`;
 
 function buildAdaptiveContext(
   context: string,
@@ -339,8 +338,6 @@ function buildCoreSystemPrompt(params: {
   mantra?: string;
   groundingActivities?: string[];
   haikuDedup: string;
-  includeLearning: string;
-  learningBlock: string;
 }): string {
   const {
     langInstruction,
@@ -356,13 +353,11 @@ function buildCoreSystemPrompt(params: {
     mantra,
     groundingActivities,
     haikuDedup,
-    includeLearning,
-    learningBlock,
   } = params;
 
   return `${langInstruction}You generate a short reflection for someone during Bitcoin volatility — either opening a mindfulness app or receiving an alert. Your job is NOT to teach, inspire, or inform — it is to reduce urgency and validate what the user is feeling so they can think clearly.
 
-${includeLearning}
+${REFLECTION_JSON_OUTPUT_INSTRUCTION}
 
 Tone: ${baseTone}
 THEMATIC ANGLE FOR THIS SESSION: ${thematicFraming}
@@ -409,14 +404,12 @@ Haiku rules:
 - Captures the emotional essence of the moment. Match the chosen tone.
 - No trading advice or price predictions.
 - MUST be original and unique — never repeat common phrases like "red screens" or "breath moves".${haikuDedup}
-${learningBlock}
-${langCode !== "en" ? `\n\nAll user-visible fields (message, haiku${
-  learningBlock ? ", grounding title/body" : ""
-}) must be in ${langName}.` : ""}`;
+${REFLECTION_NO_COMPANION_IN_MESSAGE}
+${langCode !== "en" ? `\n\nAll user-visible fields (message and haiku) must be in ${langName}.` : ""}`;
 }
 
 /**
- * Generate reflection (+ optional grounding companion payload) using one shared prompt stack.
+ * Generate reflection (message + haiku JSON). Grounding companion fields on the row come from companion-orchestrate.
  */
 export async function generateUnifiedReflection(
   params: GenerateUnifiedReflectionParams,
@@ -424,7 +417,6 @@ export async function generateUnifiedReflection(
   const {
     context,
     apiKey,
-    includeLearning,
     tone = "stoic",
     style = "standard",
     language = "en",
@@ -444,28 +436,8 @@ export async function generateUnifiedReflection(
   const langCode = language || "en";
   const langName = LANG_NAMES[langCode] || "English";
 
-  const learningOutputInstruction = includeLearning
-    ? `You MUST respond by calling the "generate_reflection" function. Do not respond with plain text for the structured fields.`
-    : `You MUST respond with a JSON object only (no markdown). The object must contain exactly these keys:
-- "message": The reflection (2-4 lines max)
-- "haiku": A haiku (3 lines separated by newlines, 5-7-5 syllables)`;
-
-  const learningBlock = includeLearning
-    ? `
-No education, philosophy, narrative, or historical reference in the main reflection message — those belong in the grounding companion fields below.
-
-Learning input rules (for the function arguments):
-- Title: a short, factual headline (5-10 words).
-- Body: 1-2 sentences about a historical Bitcoin event, market pattern, or behavioral finance insight relevant to the current context. Factual, educational, no advice.
-- Citation: formatted source reference (e.g. "CoinDesk, 2020" or "Kahneman & Tversky, 1979")
-- URL: a real, working URL to a reputable source documenting the event or research referenced.`
-    : `
-- No education, philosophy, narrative, or historical reference in the reflection — those come in the intervention step.`;
-
   const langInstruction = langCode !== "en"
-    ? includeLearning
-      ? `CRITICAL LANGUAGE REQUIREMENT: You MUST write ALL output (reflection message, haiku, grounding title, grounding body) in ${langName}. Do not use English for any generated text.\n\n`
-      : `CRITICAL LANGUAGE REQUIREMENT: You MUST write ALL output — message and haiku — in ${langName}. Every single field must be in ${langName}. Do NOT use English for any generated text. This is non-negotiable.\n\n`
+    ? `CRITICAL LANGUAGE REQUIREMENT: You MUST write ALL output — message and haiku — in ${langName}. Every single field must be in ${langName}. Do NOT use English for any generated text. This is non-negotiable.\n\n`
     : "";
 
   const baseTone = TONE_INSTRUCTIONS[tone] || TONE_INSTRUCTIONS.stoic;
@@ -490,22 +462,9 @@ Learning input rules (for the function arguments):
     mantra,
     groundingActivities,
     haikuDedup,
-    includeLearning: learningOutputInstruction,
-    learningBlock,
   });
 
   const fullSystemPrompt = systemPromptBase + messageDedup;
-
-  if (includeLearning) {
-    return await generateWithToolCall({
-      fullSystemPrompt,
-      context,
-      apiKey,
-      langCode,
-      log,
-      logAttempt,
-    });
-  }
 
   return await generateWithJson({
     fullSystemPrompt,
@@ -657,176 +616,4 @@ async function generateWithJson(opts: {
 
   const gated = parsed ? applyQualityGateAndHaikuTrim(parsed, log, logAttempt) : null;
   return { result: gated, lastStatus };
-}
-
-async function generateWithToolCall(opts: {
-  fullSystemPrompt: string;
-  context: string;
-  apiKey: string;
-  langCode: string;
-  log?: (msg: string) => void;
-  logAttempt?: (e: Record<string, unknown>) => void;
-}): Promise<GenerateUnifiedReflectionOutcome> {
-  const { fullSystemPrompt, context, apiKey, logAttempt } = opts;
-  const models = ["google/gemini-3-flash-preview", "google/gemini-2.5-flash"];
-  let lastStatus = 500;
-
-  for (let i = 0; i < models.length; i++) {
-    const model = models[i];
-    const attemptT0 = Date.now();
-    try {
-      const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${apiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model,
-          messages: [
-            { role: "system", content: fullSystemPrompt },
-            { role: "user", content: context },
-          ],
-          tools: [
-            {
-              type: "function",
-              function: {
-                name: "generate_reflection",
-                description: "Generate a reflection message with haiku and grounding companion fields.",
-                parameters: {
-                  type: "object",
-                  properties: {
-                    message: { type: "string", description: "The core reflection message (1-3 sentences)." },
-                    haiku: { type: "string", description: "A haiku (3 lines, 5-7-5 syllables)." },
-                    grounding_title: { type: "string", description: "Short factual headline." },
-                    grounding_body: { type: "string", description: "1-2 sentences factual context." },
-                    grounding_citation: { type: "string", description: "Source reference." },
-                    grounding_url: { type: "string", description: "URL to reputable source." },
-                  },
-                  required: [
-                    "message",
-                    "haiku",
-                    "grounding_title",
-                    "grounding_body",
-                    "grounding_citation",
-                    "grounding_url",
-                  ],
-                  additionalProperties: false,
-                },
-              },
-            },
-          ],
-          tool_choice: { type: "function", function: { name: "generate_reflection" } },
-          temperature: 0.7,
-        }),
-      });
-
-      if (response.status === 429 || response.status === 402) {
-        lastStatus = response.status;
-        await response.text();
-        logAttempt?.({
-          companion_type: "reflection",
-          provider: "lovable",
-          model,
-          status: "error",
-          latency_ms: Date.now() - attemptT0,
-          error_message: `HTTP ${response.status}`,
-        });
-        break;
-      }
-
-      if (!response.ok) {
-        const text = await response.text();
-        console.error(`[reflection] tool AI ${model} error:`, response.status, text);
-        lastStatus = response.status;
-        logAttempt?.({
-          companion_type: "reflection",
-          provider: "lovable",
-          model,
-          status: "error",
-          latency_ms: Date.now() - attemptT0,
-          error_message: `HTTP ${response.status}`,
-        });
-        if (i < models.length - 1) continue;
-        break;
-      }
-
-      const data = await response.json();
-      const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
-      if (toolCall?.function?.arguments) {
-        const args = JSON.parse(toolCall.function.arguments);
-        let groundingUrlValidated = args.grounding_url || null;
-        if (groundingUrlValidated && args.grounding_title) {
-          groundingUrlValidated = await validateUrl(groundingUrlValidated, `${args.grounding_title} ${args.grounding_citation || ""}`);
-        }
-
-        const gated = applyQualityGateAndHaikuTrim(
-          { message: args.message, haiku: args.haiku },
-          opts.log,
-          logAttempt,
-        );
-        if (!gated) {
-          if (i < models.length - 1) continue;
-          return { result: null, lastStatus };
-        }
-
-        logAttempt?.({
-          companion_type: "reflection",
-          provider: "lovable",
-          model,
-          status: "success",
-          latency_ms: Date.now() - attemptT0,
-        });
-
-        return {
-          result: {
-            ...gated,
-            grounding_title: args.grounding_title || null,
-            grounding_body: args.grounding_body || null,
-            grounding_citation: args.grounding_citation || null,
-            grounding_url: groundingUrlValidated,
-          },
-          lastStatus: 200,
-        };
-      }
-
-      const plain = data.choices?.[0]?.message?.content?.trim();
-      if (plain) {
-        const gated = applyQualityGateAndHaikuTrim({ message: plain, haiku: null }, opts.log, logAttempt);
-        if (gated) {
-          logAttempt?.({
-            companion_type: "reflection",
-            provider: "lovable",
-            model,
-            status: "success",
-            latency_ms: Date.now() - attemptT0,
-          });
-          return { result: gated, lastStatus: 200 };
-        }
-      }
-
-      logAttempt?.({
-        companion_type: "reflection",
-        provider: "lovable",
-        model,
-        status: "error",
-        latency_ms: Date.now() - attemptT0,
-        error_message: "no_tool_call",
-      });
-      if (i < models.length - 1) continue;
-    } catch (e) {
-      console.error("[reflection] tool call error:", e);
-      logAttempt?.({
-        companion_type: "reflection",
-        provider: "lovable",
-        model,
-        status: "error",
-        latency_ms: Date.now() - attemptT0,
-        error_message: e instanceof Error ? e.message : String(e),
-      });
-      if (i < models.length - 1) continue;
-    }
-  }
-
-  return { result: null, lastStatus };
 }
