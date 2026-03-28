@@ -11,7 +11,11 @@ project_id = "edgbwdecaoottowliimu"
     verify_jwt = false
   [functions.customer-portal]
     verify_jwt = false
+  [functions.holzen-number]
+    verify_jwt = false
   [functions.holzen-reflect]
+    verify_jwt = false
+  [functions.reflection-insights]
     verify_jwt = false
   [functions.register-push]
     verify_jwt = false
@@ -38,6 +42,10 @@ project_id = "edgbwdecaoottowliimu"
   [functions.pregenerate-companions]
     verify_jwt = false
   [functions.refresh-btc-prices]
+    verify_jwt = false
+  [functions.suggest-grounding]
+    verify_jwt = false
+  [functions.suggest-ritual]
     verify_jwt = false
   [functions.fetch-source-feeds]
     verify_jwt = false
