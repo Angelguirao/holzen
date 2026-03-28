@@ -39,7 +39,7 @@ This document describes **how Holzen turns Bitcoin volatility into a pause exper
 | **Notifications** | In-app session | Push, optional email, `pause_notifications` row |
 | **Orchestrator auth** | User JWT via `supabase.functions.invoke` | **Service role** `Authorization` + **`userId` in JSON body** (required for `companion-orchestrate` to attribute work to the correct user) |
 
-**Implication:** Prompt changes, quality gates, or model lists must be updated in **both** `holzen-reflect` and `check-volatility` if you want parity. Today they are **not** shared code.
+**Implication:** Prompt changes, quality gates, or model lists must be updated in **both** places for parity — easy to miss one. This split is **not** desirable long term; treat it as **debt**. A cleaner approach is a **single code path** (extract shared reflection generation into `_shared/` and call it from both, or invoke `holzen-reflect` from `check-volatility` with the service-role + `userId` pattern already used for `companion-orchestrate`, passing context/tone/language only).
 
 ---
 
