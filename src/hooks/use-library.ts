@@ -48,7 +48,7 @@ const CACHE_KEY_ITEMS = 'holzen_library_items';
 const CACHE_KEY_COLLECTIONS = 'holzen_library_collections';
 const CACHE_KEY_COL_ITEMS = 'holzen_library_col_items';
 
-/** Matches unique index idx_library_items_user_reflection_source — use upsert to avoid 23505 on races. */
+/** Matches unique index idx_library_items_user_reflection_source (full index, not partial — PostgREST upsert). */
 const LIBRARY_ITEM_CONFLICT_COLUMNS = 'user_id,reflection_id,source_type';
 
 function readCache<T>(key: string): T | null {
