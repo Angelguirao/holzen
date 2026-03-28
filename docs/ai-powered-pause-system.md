@@ -22,7 +22,7 @@ This document describes **how Holzen turns Bitcoin volatility into a pause exper
 
 1. **Trigger** — User opens Pause (client) *or* the `check-volatility` cron decides a user crossed thresholds.
 2. **Reflection** — Short copy (+ optional haiku) anchored to market **context** (e.g. “BTC is down 5.2%…”).
-3. **Persist** — Insert a `reflections` row; update `profiles.last_message` / `last_context` where applicable.
+3. **Persist** — Insert a `reflections` row; update **`profiles.last_message`** / **`last_context`** (and **`last_trigger_at`** only on automatic triggers or manual **silent** mode — see §3).
 4. **Companions & intervention** — `companion-orchestrate` chooses an **intervention** (mirror / trap / pattern / question) and, according to **enable flags**, runs **Signal, Grounding, History, Zoom Out** generators in process, then writes structured data back to the reflection (and related tables).
 5. **Surface** — Client shows `InterventionSection` plus optional companion cards from user preferences.
 
@@ -63,6 +63,7 @@ Reflection text and haiku land on the new row first; companion columns and inter
 | **Orchestrator body** | `use-companion-data`: prefs → **`needSignal` / `needGrounding` / `needHistory` / `needZoomOut`**, plus `mood`, `severity`, etc. | **`userId`, `severity` (24h abs %), `reflectionMessage`, `mood`, `moodHistory`**, and **`enableSignal` / `enableGrounding` / `enableHistory` / `enableZoomOut`** from profile columns **`companion_signal`**, **`companion_grounding`**, **`companion_history`**, **`companion_zoom_out`** (each defaults **true** if unset). Client pref key is **`grounding`** → **`companion_grounding`** (legacy **`learning`** may still appear in old analytics or library `source_type` until migrated). |
 | **Notifications** | In-app session | Push, optional email, `pause_notifications` row |
 | **Orchestrator auth** | User JWT via `supabase.functions.invoke` | **Service role** `Authorization` + **`userId` in JSON body** |
+| **Profile fields** | After **`holzen-reflect`** insert: **`last_message`**, **`last_context`** only (no **`last_trigger_at`**). **Silent mode** insert also sets **`last_trigger_at`**. | **`last_trigger_at`** updated with **optimistic cooldown claiming** before work; **`last_message`** / **`last_context`** updated when a reflection is created |
 
 **Shared logic:** One implementation for adaptive context (mood history, severity bands, Fear & Greed guidance, banned phrases, haiku/message dedup when inputs provided), model fallback order, and the reflection quality gate. Bump **`REFLECTION_PROMPT_VERSION`** in `reflection-generate.ts` when you change that behavior.
 
@@ -99,8 +100,9 @@ Both paths share **`generateUnifiedReflection`** (via **`holzen-reflect`** vs in
 
 ## 4. Reflection generation (`_shared/reflection-generate.ts`)
 
-- **`generateUnifiedReflection(params)`** — Lovable gateway, primary `google/gemini-3-flash-preview` then `google/gemini-2.5-flash`.
-- **`includeLearning: false`** (default for both **`holzen-reflect`** and **`check-volatility`**): `response_format: json_object` with `message` + `haiku` only; quality gate. **`includeLearning: true`** remains in the module for optional use (tool call + learning fields + URL check) but **cron no longer uses it** — companion columns are filled by **`companion-orchestrate`** only.
+- **`generateUnifiedReflection(params)`** — Calls **`https://ai.gateway.lovable.dev/v1/chat/completions`** with **`LOVABLE_API_KEY`**, trying models in order: **`google/gemini-3-flash-preview`**, then **`google/gemini-2.5-flash`** (JSON path uses per-attempt timeouts **12s** then **8s**).
+- **`includeLearning`** — Parameter name is **legacy** (historical “learning” path); when **`true`**, uses a tool-call flow that can populate **`grounding_*`** fields on the result. Production callers use **`includeLearning: false`**: `response_format: json_object` with **`message`** + **`haiku`** only, plus the shared quality gate. The returned object type still includes **`grounding_*`** keys; they are **usually null** in this mode, and **`holzen-reflect`** echoes them in JSON for API stability.
+- **`includeLearning: false`** — Companion columns on **`reflections`** are filled by **`companion-orchestrate`**, not the reflection step.
 - **Callers:** `holzen-reflect/index.ts` (auth, sanitization, analytics, curated fallback) and `check-volatility/index.ts` (eligibility, notifications, orchestrator dispatch).
 
 ---
@@ -150,7 +152,12 @@ flowchart TD
 ### 6.2 Intervention selection
 
 - **File:** `supabase/functions/_shared/intervention-selector.ts`
-- **Order:** Mirror (past similar session via `find_similar_reflection`) → trap (mood + direction) → pattern (high severity) → **question mode** (mild + ≥20 past sessions) → default pattern (+ optional zoom_out).
+- **Order (first match wins):**  
+  1. **Mirror** — qualifying past session (**`buildMirror`** in `_shared/generators/mirror.ts`, backed by Postgres **`find_similar_reflection`**).  
+  2. **Trap** — mood **and** market direction aligned to a bias: e.g. fearful/anxious on a **down** move; FOMO/greed/excited on an **up** move; FOMO/greedy on a **down** move (capitulation framing). High severity can attach **`zoom_out`** as **secondary**.  
+  3. **Pattern** — **high** severity (no trap).  
+  4. **Question mode** — **mild** severity **and** **`countPastSessions` ≥ 20** (total reflections for user).  
+  5. **Default** — **`primary: pattern`**; **`secondary: zoom_out`** when severity is **moderate** (not for mild).
 - **Mirror payload:** When `primary === "mirror"`, the orchestrator sets **`intervention.primary = { type: "mirror", data: mirrorData }`** from `selectIntervention`.
 
 ### Diagram — intervention selection order
@@ -159,10 +166,10 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-  A[Mirror\nsimilar past session] --> B[Trap\nmood + direction]
-  B --> C[Pattern\nhigh severity]
-  C --> D[Question\nmild + enough history]
-  D --> E[Default pattern\n+ optional zoom_out secondary]
+  A[Mirror] --> B[Trap]
+  B --> C[Pattern high]
+  C --> D[Question mild\n≥20 sessions]
+  D --> E[Default pattern\nzoom_out if moderate]
 ```
 
 **Note:** Even when the headline is mirror / question / etc., enabled companion generators may still run in parallel (see §11 drift — *Intervention vs “run every enabled generator”*).
@@ -206,7 +213,7 @@ All are imported **directly** in `companion-orchestrate` (not HTTP to `signal-co
 - **`analytics_events`** — e.g. `pause_ai_call`, `intervention_selected`, `reflection_generated`.
 - **`companion_cache`**, **`user_companion_serves`**, **`content_library`** — Cache / dedup / fallback content.
 - **`pause_notifications`** — In-app bell for server-triggered sessions.
-- **`profiles.last_message` / `last_context` / `last_trigger_at`** — Updated on automatic triggers with optimistic cooldown claiming.
+- **`profiles`** — **`last_message`** / **`last_context`**: updated on **automatic** triggers when a reflection is created; **manual `holzen-reflect`** path updates these after insert (see §3). **`last_trigger_at`**: **automatic** triggers (optimistic cooldown claiming); **manual silent-mode** insert also sets it; **manual normal** AI path does **not** set it.
 
 ---
 
@@ -245,15 +252,17 @@ Exact SQL lives in **[cron-setup.md](./cron-setup.md)**. Typical schedules docum
 
 **What the server does** is split across phases: (1) **reflection** — `holzen-reflect` or `check-volatility` calling `generateUnifiedReflection` (message + haiku when `includeLearning: false`); (2) **orchestration** — `companion-orchestrate` may run **multiple** model-backed generators in parallel (Signal, Grounding, History, Zoom Out, and question mode when selected), then dual-write results to `reflections` / `reflection_companions` / analytics.
 
-**Rate limits and budgets** do not line up 1:1 with that UX split. Per-user **throttling** (`checkRateLimit` in `_shared/ratelimit.ts`) keys off a fixed allowlist of **`analytics_events.event`** values centered on the reflection path; **orchestrator-only** events (e.g. `intervention_selected`) are outside that list, so a single “pause” from the user’s perspective can still trigger **many** generation attempts that are not all reflected in the same counters. **Daily cost** is capped separately via **`checkDailyBudget`** on summed **`generation_attempts.estimated_cost_usd`** (UTC day). When you change UX (what to show) or cost (how hard to hit the models), treat **reflection**, **orchestrator fan-out**, and **rate-limit event wiring** as three different levers — e.g. hiding a companion in the UI does not reduce server work unless **`enable*`** flags or generator gating in `companion-orchestrate` change too.
+**Rate limits and budgets** do not line up 1:1 with that UX split. Per-user **throttling** (`checkRateLimit` in `_shared/ratelimit.ts`) counts only **`analytics_events.event`** values in a **fixed allowlist** (e.g. **`pause_ai_call`**, **`signal_companion_ai_call`**, **`zoom_out_ai_call`**, **`historical_insight_ai_call`**, plus several other named AI events — see the file). **`reflection_generated`** is **not** in that list; **`holzen-reflect`** inserts **`pause_ai_call`** at the start of each invoke, so it shares the **same** sliding window the orchestrator checks. **Orchestrator-only** events such as **`intervention_selected`** are **not** in the allowlist, so companion fan-out does not increment that counter. **Daily cost** is capped separately via **`checkDailyBudget`** on summed **`generation_attempts.estimated_cost_usd`** (UTC day). When you change UX (what to show) or cost (how hard to hit the models), treat **reflection**, **orchestrator fan-out**, and **rate-limit event wiring** as three different levers — e.g. hiding a companion in the UI does not reduce server work unless **`enable*`** flags or generator gating in `companion-orchestrate` change too.
 
-### Fixed alongside this doc (code)
+### Resolved implementation issues (historical)
 
-1. **`questionPromise` undefined** — `companion-orchestrate` referenced `questionPromise` without defining it, which would **throw** when question mode was selected. **Fixed** by defining `questionPromise` from `generateQuestion` when `selection.mode === "question"`.
-2. **Cron → orchestrator auth** — Orchestrator required a **user** JWT; `check-volatility` sent **only** the service role key → **`getUser()` failed**, so companions never generated for automatic sessions. **Fixed** by accepting **service role + `userId` in body** and by **`check-volatility` sending `userId` and `severity`**.
-3. **Mirror intervention not returned** — `selectIntervention` could return `primary: "mirror"` with `mirrorData`, but the orchestrator never copied that into **`intervention.primary`**, so the UI could not show mirror. **Fixed** by assigning `interventionPayload.primary` when mirror is selected.
-4. **Unified reflection pipeline** — **`_shared/reflection-generate.ts`** (`generateUnifiedReflection`) is used by **`holzen-reflect`** and **`check-volatility`** with **`includeLearning: false`** (message + haiku only). **`grounding_*`** on **`reflections`** are written by **`companion-orchestrate`**, not the reflection step.
-5. **Cron parity with manual pause** — **`check-volatility`** loads the same profile-backed reflection fields (style, custom prompt, motivations, mantra, grounding activities, sanitized like **`holzen-reflect`**), builds **recent message/haiku** lists from recent rows, and calls **`companion-orchestrate`** with **per-user `enable*` flags** and **mood / moodHistory** when available.
+These were bugs or gaps that **current `main` is expected to contain fixes for**; kept here so “why does the code look this way?” stays traceable.
+
+1. **`questionPromise` undefined** — Question mode could throw until `questionPromise` was wired from **`generateQuestion`** when **`selection.mode === "question"`**.
+2. **Cron → orchestrator auth** — Orchestrator now accepts **service role + `userId` in body**; **`check-volatility`** sends **`userId`** and **`severity`** so automatic sessions get companions.
+3. **Mirror intervention not returned** — **`intervention.primary`** is populated when mirror is selected so the UI can render it.
+4. **Unified reflection pipeline** — Shared **`generateUnifiedReflection`** with **`includeLearning: false`**; **`grounding_*`** on **`reflections`** come from **`companion-orchestrate`**, not the reflection step.
+5. **Cron parity with manual pause** — **`check-volatility`** uses the same profile-backed reflection inputs (sanitized like **`holzen-reflect`**), recent haiku/message lists, **`companion-orchestrate`** **`enable*`** flags, and **mood / moodHistory** when available.
 
 ### Remaining / product-level drift (monitor)
 
@@ -273,20 +282,20 @@ These are **not bugs** in the parity work; they describe how the system behaves 
 
 **Rate limit and analytics events**
 
-- **What:** Per-user rate limiting (`checkRateLimit`) looks at **specific** `analytics_events.event` values (e.g. reflection-related names).
-- **Reality:** **`intervention_selected`** and other orchestrator-only events are **not** in that allowlist, and **`companion-orchestrate`** does not log **`pause_ai_call`** the same way **`holzen-reflect`** does.
-- **Why it matters:** Throttling is **tighter** around “user hit reflect” than around “orchestrator ran many companions.” That is intentional or legacy depending on your product goals; worth knowing when tuning abuse limits or cost.
+- **What:** `checkRateLimit` only counts **`analytics_events.event`** values listed in **`_shared/ratelimit.ts`**.
+- **Reality:** **`holzen-reflect`** inserts **`pause_ai_call`** (in the allowlist) before generation; **`reflection_generated`** is **not** in the allowlist. **`intervention_selected`** is **not** in the allowlist. **`companion-orchestrate`** does not insert **`pause_ai_call`** per companion.
+- **Why it matters:** One manual reflect consumes at least one allowlisted event before orchestration; orchestrator work is bounded mainly by **daily budget** and **generator** logic, not by multiplying the same sliding-window counter per companion.
 
 **Admin surface**
 
-- **What:** `Admin.tsx` has seven tabs (Monitor, Content, Sources, Tools, Library, Feed, Rejections). Listed here so doc readers know where ops tooling lives.
+- **What:** `Admin.tsx` exposes **seven** tabs: Monitor, Content, Sources, Tools, Library, Feed, Rejections. Ops / content tooling entry point.
 
 ---
 
 ## 12. Cost and limits (orchestrator)
 
-- **Daily budget:** `checkDailyBudget(svcClient, 10.0)` — sums `generation_attempts.estimated_cost_usd` from UTC midnight (`_shared/ratelimit.ts`).
-- **Rate limit:** 30 requests / 60 minutes per user over a fixed allowlist of `analytics_events.event` values (does **not** include orchestrator-only events — see §11).
+- **Daily budget:** `checkDailyBudget(svcClient, 10.0)` — sums **`generation_attempts.estimated_cost_usd`** from **UTC midnight** (`_shared/ratelimit.ts`).
+- **Rate limit:** **`checkRateLimit(svcClient, userId, 60, 30)`** — at most **30** allowlisted **`analytics_events`** rows for that user in the last **60** minutes. The allowlist is **not** “all AI events”; copy the current array from **`ratelimit.ts`** when documenting integrations (see §11).
 
 ---
 
@@ -325,7 +334,7 @@ supabase/functions/
 src/hooks/use-holzen.ts
 src/hooks/use-companion-data.ts
 src/components/InterventionSection.tsx
-src/components/CompanionSection.tsx
+src/components/CompanionSection.tsx   # embeds InterventionSection + useCompanionData
 ```
 
 ---
