@@ -37,7 +37,7 @@ This document describes **how Holzen turns Bitcoin volatility into a pause exper
 | **Mood** | Collected in UI; stored on `reflections.mood` | Not set on the new row; **reflection prompts** use **mood history** from the last 20 `reflections` with `mood`. **Orchestrator** receives **`mood`** = most recent prior mood (if any) plus **`moodHistory`** for session intent (same idea as the client path). |
 | **Style / extras** | Full: `style`, `customPrompt`, `motivations`, `mantra`, `groundingActivities`, client-supplied `recentHaikus` / `recentMessages` | Profile-backed: `reflection_style`, sanitized `custom_prompt`, `motivations`, `mantra`, `grounding_activities` (same **`sanitize.ts`** limits as **`holzen-reflect`**). **`recentMessages`** / **`recentHaikus`**: up to 5 each from the user’s last 20 reflection rows (dedup signal for the shared generator). |
 | **Reflection row `learning_*`** | **Null** at insert (JSON path); Ground content comes from **`companion-orchestrate`** | **Null** at insert; **`companion_haiku`** still toggles haiku; Ground / Signal / etc. come **only** from orchestrate |
-| **Orchestrator body** | `use-companion-data`: prefs → **`needSignal` / `needGrounding` / `needHistory` / `needZoomOut`**, plus `mood`, `severity`, etc. | **`userId`, `severity` (24h abs %), `reflectionMessage`, `mood`, `moodHistory`**, and **`enableSignal` / `enableGrounding` / `enableHistory` / `enableZoomOut`** from profile columns **`companion_signal`**, **`companion_learning`**, **`companion_history`**, **`companion_zoom_out`** (each defaults **true** if unset). |
+| **Orchestrator body** | `use-companion-data`: prefs → **`needSignal` / `needGrounding` / `needHistory` / `needZoomOut`**, plus `mood`, `severity`, etc. | **`userId`, `severity` (24h abs %), `reflectionMessage`, `mood`, `moodHistory`**, and **`enableSignal` / `enableGrounding` / `enableHistory` / `enableZoomOut`** from profile columns **`companion_signal`**, **`companion_grounding`**, **`companion_history`**, **`companion_zoom_out`** (each defaults **true** if unset). Client pref key is still **`learning`** → maps to **`companion_grounding`**. |
 | **Notifications** | In-app session | Push, optional email, `pause_notifications` row |
 | **Orchestrator auth** | User JWT via `supabase.functions.invoke` | **Service role** `Authorization` + **`userId` in JSON body** |
 
@@ -159,12 +159,29 @@ Exact SQL lives in **[cron-setup.md](./cron-setup.md)**. Typical schedules docum
 
 ### Remaining / product-level drift (monitor)
 
-| Topic | Detail |
-|-------|--------|
-| **Optional tool+learning path** | `generateUnifiedReflection({ includeLearning: true })` still exists for experiments or one-off flows; neither production trigger uses it today. |
-| **Intervention vs “run all generators”** | Orchestrator still runs **every** companion task whose `enable*` is true, even when intervention is mirror/question; the **UI** leads with intervention. Narrowing generation to “only what intervention needs” would save cost (future optimization). |
-| **Rate limit list** | `checkRateLimit` counts specific `analytics_events` event names. **`intervention_selected` is not in the list**; **`companion-orchestrate` does not log `pause_ai_call`**. Manual reflection remains the main throttle for “pause AI” spend per user. |
-| **Admin surface** | Seven tabs in `Admin.tsx`: Monitor, Content, Sources, Tools, Library, Feed, Rejections. |
+These are **not bugs** in the parity work; they describe how the system behaves today and what you might change later.
+
+**Optional tool + learning fields on reflection**
+
+- **What:** `generateUnifiedReflection` can be called with **`includeLearning: true`** (tool call + `learning_*` fields in the model response).
+- **Reality:** Production uses **`includeLearning: false`** for both manual pause and cron. Ground / Signal content is written by **`companion-orchestrate`**, not the reflection step.
+- **Why it’s listed:** The code path still exists if you experiment; it is easy to confuse with **`reflections.learning_*`** columns (those are the stored Ground companion payload, unrelated to the old profile column name).
+
+**Intervention vs “run every enabled generator”**
+
+- **What:** `companion-orchestrate` picks a **primary intervention** (mirror, trap, pattern, question, etc.) for the top of the pause UI.
+- **Reality:** It **still runs** Signal, Grounding, History, and Zoom Out **in parallel** for every slot whose **`enable*`** flag is true (and not cached), even when the headline intervention is something like **mirror** or **question** that might not “need” all of them.
+- **Why it matters:** Extra model calls and cost. A future optimization could skip generators that the chosen intervention does not use (would need careful product rules).
+
+**Rate limit and analytics events**
+
+- **What:** Per-user rate limiting (`checkRateLimit`) looks at **specific** `analytics_events.event` values (e.g. reflection-related names).
+- **Reality:** **`intervention_selected`** and other orchestrator-only events are **not** in that allowlist, and **`companion-orchestrate`** does not log **`pause_ai_call`** the same way **`holzen-reflect`** does.
+- **Why it matters:** Throttling is **tighter** around “user hit reflect” than around “orchestrator ran many companions.” That is intentional or legacy depending on your product goals; worth knowing when tuning abuse limits or cost.
+
+**Admin surface**
+
+- **What:** `Admin.tsx` has seven tabs (Monitor, Content, Sources, Tools, Library, Feed, Rejections). Listed here so doc readers know where ops tooling lives.
 
 ---
 

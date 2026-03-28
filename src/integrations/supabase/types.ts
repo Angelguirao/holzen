@@ -780,7 +780,7 @@ export type Database = {
           companion_breathing: boolean
           companion_haiku: boolean
           companion_history: boolean
-          companion_learning: boolean
+          companion_grounding: boolean
           companion_signal: boolean
           companion_zoom_out: boolean
           cooldown_hours: number
@@ -832,7 +832,7 @@ export type Database = {
           companion_breathing?: boolean
           companion_haiku?: boolean
           companion_history?: boolean
-          companion_learning?: boolean
+          companion_grounding?: boolean
           companion_signal?: boolean
           companion_zoom_out?: boolean
           cooldown_hours?: number
@@ -884,7 +884,7 @@ export type Database = {
           companion_breathing?: boolean
           companion_haiku?: boolean
           companion_history?: boolean
-          companion_learning?: boolean
+          companion_grounding?: boolean
           companion_signal?: boolean
           companion_zoom_out?: boolean
           cooldown_hours?: number
