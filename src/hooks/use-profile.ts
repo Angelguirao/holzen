@@ -45,7 +45,7 @@ export function useProfile() {
     const load = async () => {
       const { data } = await supabase
         .from('profiles')
-        .select('threshold, threshold_down, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_learning, companion_signal, companion_zoom_out, companion_history, reflection_tone, cooldown_hours, last_trigger_at, silent_mode, streak_freeze_dates, digest_frequency, custom_prompt, reflection_style, quiet_hours_start, quiet_hours_end, first_name, night_reflection_hour, ai_insights_enabled, ritual_template, notify_badges, motivations, mantra, hold_goal_currency, language, grounding_activities')
+        .select('threshold, threshold_down, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_grounding, companion_signal, companion_zoom_out, companion_history, reflection_tone, cooldown_hours, last_trigger_at, silent_mode, streak_freeze_dates, digest_frequency, custom_prompt, reflection_style, quiet_hours_start, quiet_hours_end, first_name, night_reflection_hour, ai_insights_enabled, ritual_template, notify_badges, motivations, mantra, hold_goal_currency, language, grounding_activities')
         .eq('user_id', user.id)
         .single();
 
@@ -76,7 +76,7 @@ export function useProfile() {
         setCompanionPrefsState({
           breathing: data.companion_breathing ?? true,
           haiku: data.companion_haiku ?? true,
-          learning: data.companion_learning ?? true,
+          learning: data.companion_grounding ?? true,
           signal: (data as any).companion_signal ?? true,
           zoomOut: (data as any).companion_zoom_out ?? true,
           history: (data as any).companion_history ?? true,
@@ -176,7 +176,10 @@ export function useProfile() {
   const setCompanionPref = useCallback(async (key: keyof CompanionPrefs, val: boolean) => {
     setCompanionPrefsState((prev) => ({ ...prev, [key]: val }));
     if (!user) return;
-    const snakeKey = key === 'zoomOut' ? 'zoom_out' : key;
+    const snakeKey =
+      key === 'zoomOut' ? 'zoom_out' :
+      key === 'learning' ? 'grounding' :
+      key;
     const dbKey = `companion_${snakeKey}` as string;
     await supabase
       .from('profiles')

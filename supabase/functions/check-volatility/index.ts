@@ -145,7 +145,7 @@ serve(async (req) => {
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
       .select(
-        "user_id, threshold, threshold_down, cumulative_threshold, email_notifications, last_trigger_at, cooldown_hours, reflection_tone, companion_haiku, companion_learning, companion_signal, companion_zoom_out, companion_history, quiet_hours_start, quiet_hours_end, timezone, language, snoozed_until, custom_prompt, reflection_style, motivations, mantra, grounding_activities",
+        "user_id, threshold, threshold_down, cumulative_threshold, email_notifications, last_trigger_at, cooldown_hours, reflection_tone, companion_haiku, companion_grounding, companion_signal, companion_zoom_out, companion_history, quiet_hours_start, quiet_hours_end, timezone, language, snoozed_until, custom_prompt, reflection_style, motivations, mantra, grounding_activities",
       );
 
     if (profilesError) throw profilesError;
@@ -410,7 +410,7 @@ serve(async (req) => {
       if (insertedReflection?.id) {
         const reflectionId = insertedReflection.id;
         const enableSignal = (p.companion_signal as boolean | undefined) ?? true;
-        const enableGrounding = (p.companion_learning as boolean | undefined) ?? true;
+        const enableGrounding = (p.companion_grounding as boolean | undefined) ?? true;
         const enableHistory = (p.companion_history as boolean | undefined) ?? true;
         const enableZoomOut = (p.companion_zoom_out as boolean | undefined) ?? true;
         const lastReportedMood = moodHistory?.[0]?.mood;

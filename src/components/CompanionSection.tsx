@@ -22,6 +22,7 @@ export interface CompanionData {
 export interface CompanionPrefs {
   breathing: boolean;
   haiku: boolean;
+  /** Grounding companion; persisted as `profiles.companion_grounding`. */
   learning: boolean;
   signal: boolean;
   zoomOut: boolean;
