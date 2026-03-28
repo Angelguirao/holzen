@@ -21,7 +21,7 @@ This guide walks a new contributor through the repository in roughly the order y
 | `supabase/migrations/` | Postgres schema and RLS — **source of truth** for the database. |
 | `supabase/functions/` | Deno edge functions (HTTP APIs, crons, webhooks). |
 | `supabase/config.toml` | Supabase project id and **`[functions.<name>]`** per deployable folder — keep **one block per function** so local serve and hosted deploys match. |
-| `vite.config.ts` | Dev server (port 8080), `@` alias, PWA inject-manifest, **optional Supabase URL/key fallbacks** when not in `localstack` mode. |
+| `vite.config.ts` | Dev server (port 8080), `@` alias, PWA inject-manifest, **optional Supabase URL/key fallbacks** on dev serve and `vite build` when not in `localstack` mode. |
 | `vitest.config.ts` | Tests: jsdom, `src/test/setup.ts`, same `@` alias as Vite. |
 
 ---
@@ -179,7 +179,8 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 
 | Script | Mode | Supabase env behavior (see `vite.config.ts`) |
 |--------|------|-----------------------------------------------|
-| `npm run dev` | `development` | Can use `.env`; dev server may use **hosted fallbacks** if vars missing (`localstack` mode never does). |
+| `npm run dev` | `development` | Can use `.env`; **hosted fallbacks** if vars missing (`localstack` never). |
+| `npm run build` | `production` (default) | Same fallbacks if vars missing; override with `.env.production` / CI / Lovable env. |
 | `npm run dev:hosted` | `hosted` | Loads env for hosted backend (e.g. `.env.hosted` / `.env.hosted.local` per README). |
 | `npm run dev:local` | `localstack` | **No** hosted URL/key fallback — forces explicit local Supabase values. |
 
