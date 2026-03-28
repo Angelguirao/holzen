@@ -75,11 +75,47 @@ serve(async (req) => {
     const singleUserId = body.user_id as string | undefined;
     const bodyLanguage = body.language as string | undefined;
 
+    const authHeader = req.headers.get("Authorization");
+    const sbUrl = Deno.env.get("SUPABASE_URL") ?? "";
+    const sbAnon = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+    const cronSecret = Deno.env.get("CRON_SECRET") ?? "";
+
     let userIds: string[] = [];
 
     if (singleUserId) {
+      if (!authHeader?.startsWith("Bearer ")) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const anonClient = createClient(sbUrl, sbAnon, {
+        global: { headers: { Authorization: authHeader } },
+      });
+      const { data: { user }, error: userErr } = await anonClient.auth.getUser();
+      if (userErr || !user || user.id !== singleUserId) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
       userIds = [singleUserId];
     } else {
+      const token = authHeader?.replace(/^Bearer\s+/i, "")?.trim() ?? "";
+      const okCron = cronSecret.length > 0 && token === cronSecret;
+      const okService = token.length > 0 && token === serviceRoleKey;
+      const okSupabaseCron = req.headers.get("x-supabase-cron") === "true";
+      if (!okCron && !okService && !okSupabaseCron) {
+        return new Response(
+          JSON.stringify({
+            error:
+              "Unauthorized. Batch mode requires service role, cron secret, or Supabase scheduled invoke.",
+          }),
+          { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+
       const { data: profiles } = await supabase
         .from("profiles")
         .select("user_id, quiet_hours_start, quiet_hours_end, timezone, ai_insights_enabled, language");
