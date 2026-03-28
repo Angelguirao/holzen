@@ -344,7 +344,9 @@ The pause UI and **`check-volatility`** only call **`companion-orchestrate`**, w
 
 **Zoom out dependency:** Cron **`refresh-btc-prices`** must keep `btc_price_cache` fresh ([cron-setup.md](./cron-setup.md)).
 
-**Library “freshness”:** Generators use `includeStale: true` in fallback paths; the 7-day freshness branch in `content-library.ts` is largely **unused** on the live-first path unless you add stricter reads.
+**Library “freshness”:** After live AI fails, **`searchLibrary`** runs with **`includeStale: false`**, so rows this user was served from **`content_library`** in the last **7 days** are skipped (`content-library.ts`). If nothing is left, the chain continues to **`companion_cache`** then static curated fallbacks.
+
+**Why live-first today:** Perplexity (etc.) gives topical, one-off material; the library is the **controlled** backup. **Library-first** would be reasonable if you invest in a large, high-quality catalog and want lower API cost/latency— that would mean calling **`searchLibrary`** *before* the live hop when fresh rows exist (not implemented today).
 
 For a full breakdown of **which intervention** maps to **which generator output** and **which UI block** shows it, see **§7**.
 

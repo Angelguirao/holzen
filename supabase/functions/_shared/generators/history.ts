@@ -99,15 +99,15 @@ async function serveFallback(
   excludeIds?: string[],
   moodTag?: string,
 ): Promise<HistoryResult> {
-  const staleLibrary = await searchLibrary(svcClient, {
+  const libraryRows = await searchLibrary(svcClient, {
     type: "event",
     companionType: "historical_insight",
     userId,
-    includeStale: true,
+    includeStale: false,
     moodTag,
   });
-  if (staleLibrary.length > 0) {
-    const pick = staleLibrary[Math.floor(Math.random() * Math.min(staleLibrary.length, 3))];
+  if (libraryRows.length > 0) {
+    const pick = libraryRows[Math.floor(Math.random() * Math.min(libraryRows.length, 3))];
     const result = eventToHistory(pick);
     recordLibraryServe(svcClient, userId, pick.id, "historical_insight");
     return { data: result, source: "cache", cacheId: null };

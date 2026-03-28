@@ -1,11 +1,13 @@
 /**
- * Content Library — local-first content search with per-user freshness.
+ * Content Library — curated rows in `content_library` with per-user freshness.
  *
- * The library is the primary content source. Perplexity is the fallback
- * for when the library has no FRESH content for this user.
+ * Companion generators (Signal, Grounding, History) are **live-first** (Perplexity, etc.),
+ * then fall back to this library, then `companion_cache`, then static curated fallbacks.
  *
- * Freshness: A library entry is "fresh" for a user if they haven't
- * seen it in the last 7 days. After 7 days, it becomes fresh again.
+ * When `includeStale` is false (fallback path), entries the user was served in the last
+ * **7 days** are skipped so repeats are less likely. Use `includeStale: true` only if you
+ * need any library row regardless of recency (e.g. a future library-before-live path that
+ * still wants a guaranteed hit).
  */
 
 const FRESHNESS_WINDOW_DAYS = 7;
