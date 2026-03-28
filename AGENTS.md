@@ -45,7 +45,7 @@ Instructions for AI assistants and automation working in this repository (e.g. C
 
 - **Required for a custom project:** `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` (see `.env.example` and `src/integrations/supabase/client.ts`).
 - **Optional:** `VITE_ADMIN_USER_IDS` — comma-separated auth user UUIDs allowed to use `/admin`.
-- `vite.config.ts` uses `loadEnv`; **dev server only** may inject Holzen hosted Supabase URL/key when `VITE_*` are missing (`localstack` never). **`vite build` does not** — set `VITE_SUPABASE_*` for production/CI/forks.
+- `vite.config.ts` uses `loadEnv`; when `VITE_*` are missing and mode is not `localstack`, **dev server and `vite build`** may inject Holzen hosted Supabase URL/key (see `vite.config.ts`). Set `VITE_SUPABASE_*` explicitly for another project or stricter CI.
 
 Never commit `.env` or service role keys.
 
