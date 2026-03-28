@@ -34,10 +34,10 @@ This document describes **how Holzen turns Bitcoin volatility into a pause exper
 | **BTC data** | Client `fetchBtcData` (`src/lib/btc.ts`) for context string | CoinGecko `market_chart` 1d + 7d inside the function |
 | **Thresholds** | User-initiated (cooldown in hook: 15 min, or 5 s in dev mode) | Per-profile `threshold` / `threshold_down`, `cumulative_threshold`, `cooldown_hours`, quiet hours, `snoozed_until` |
 | **Reflection AI** | **`holzen-reflect`** → **`generateUnifiedReflection({ includeLearning: false })`** | **`check-volatility`** → **same** (`includeLearning: false`) — `_shared/reflection-generate.ts` |
-| **Mood** | Collected in UI; stored on `reflections.mood` | Not set on the new row; **mood history for prompts** comes from the last 20 `reflections` with `mood` (server-side query) when available |
-| **Style / extras** | Full: `style`, `customPrompt`, `motivations`, `mantra`, `groundingActivities`, client-supplied `recentHaikus` / `recentMessages` | Default `style: standard`; no custom prompt/mantra/activities; no client dedup lists |
+| **Mood** | Collected in UI; stored on `reflections.mood` | Not set on the new row; **reflection prompts** use **mood history** from the last 20 `reflections` with `mood`. **Orchestrator** receives **`mood`** = most recent prior mood (if any) plus **`moodHistory`** for session intent (same idea as the client path). |
+| **Style / extras** | Full: `style`, `customPrompt`, `motivations`, `mantra`, `groundingActivities`, client-supplied `recentHaikus` / `recentMessages` | Profile-backed: `reflection_style`, sanitized `custom_prompt`, `motivations`, `mantra`, `grounding_activities` (same **`sanitize.ts`** limits as **`holzen-reflect`**). **`recentMessages`** / **`recentHaikus`**: up to 5 each from the user’s last 20 reflection rows (dedup signal for the shared generator). |
 | **Reflection row `learning_*`** | **Null** at insert (JSON path); Ground content comes from **`companion-orchestrate`** | **Null** at insert; **`companion_haiku`** still toggles haiku; Ground / Signal / etc. come **only** from orchestrate |
-| **Severity sent to orchestrator** | `use-companion-data` passes numeric `severity` from client | **`userId`, `severity` (24h abs %), `reflectionMessage`** on orchestrate body |
+| **Orchestrator body** | `use-companion-data`: prefs → **`needSignal` / `needGrounding` / `needHistory` / `needZoomOut`**, plus `mood`, `severity`, etc. | **`userId`, `severity` (24h abs %), `reflectionMessage`, `mood`, `moodHistory`**, and **`enableSignal` / `enableGrounding` / `enableHistory` / `enableZoomOut`** from profile columns **`companion_signal`**, **`companion_learning`**, **`companion_history`**, **`companion_zoom_out`** (each defaults **true** if unset). |
 | **Notifications** | In-app session | Push, optional email, `pause_notifications` row |
 | **Orchestrator auth** | User JWT via `supabase.functions.invoke` | **Service role** `Authorization` + **`userId` in JSON body** |
 
@@ -86,7 +86,7 @@ This document describes **how Holzen turns Bitcoin volatility into a pause exper
 
 - **File:** `supabase/functions/_shared/session-intent.ts`
 - **Inputs:** `context` (parse “is up” / “is down”), `mood`, numeric `severity`, `moodHistory` (selling pattern).
-- **Automatic path:** Until recently, **no mood** and **no severity** were sent from `check-volatility`, so intent skewed toward **neutral-exploration** and severity branches did not run. **`severity` is now sent** (24h absolute % change) so bucketing aligns better with manual sessions.
+- **Automatic path:** **`severity`** (24h absolute % change) and a **mood proxy** (latest prior `reflections.mood` when present) plus **`moodHistory`** are sent from `check-volatility`, so **`selectIntervention`** / session intent align more closely with manual sessions when the user has reported moods before.
 
 ---
 
@@ -155,13 +155,13 @@ Exact SQL lives in **[cron-setup.md](./cron-setup.md)**. Typical schedules docum
 2. **Cron → orchestrator auth** — Orchestrator required a **user** JWT; `check-volatility` sent **only** the service role key → **`getUser()` failed**, so companions never generated for automatic sessions. **Fixed** by accepting **service role + `userId` in body** and by **`check-volatility` sending `userId` and `severity`**.
 3. **Mirror intervention not returned** — `selectIntervention` could return `primary: "mirror"` with `mirrorData`, but the orchestrator never copied that into **`intervention.primary`**, so the UI could not show mirror. **Fixed** by assigning `interventionPayload.primary` when mirror is selected.
 4. **Unified reflection pipeline** — **`_shared/reflection-generate.ts`** (`generateUnifiedReflection`) is used by **`holzen-reflect`** and **`check-volatility`** with **`includeLearning: false`** (message + haiku only). **`learning_*`** on **`reflections`** are written by **`companion-orchestrate`**, not the reflection step.
+5. **Cron parity with manual pause** — **`check-volatility`** loads the same profile-backed reflection fields (style, custom prompt, motivations, mantra, grounding activities, sanitized like **`holzen-reflect`**), builds **recent message/haiku** lists from recent rows, and calls **`companion-orchestrate`** with **per-user `enable*` flags** and **mood / moodHistory** when available.
 
 ### Remaining / product-level drift (monitor)
 
 | Topic | Detail |
 |-------|--------|
 | **Optional tool+learning path** | `generateUnifiedReflection({ includeLearning: true })` still exists for experiments or one-off flows; neither production trigger uses it today. |
-| **Server path vs user prefs** | Cron dispatch uses **all** `enable*` flags `true`, independent of per-user companion toggles. The client respects prefs when **it** calls the orchestrator. |
 | **Intervention vs “run all generators”** | Orchestrator still runs **every** companion task whose `enable*` is true, even when intervention is mirror/question; the **UI** leads with intervention. Narrowing generation to “only what intervention needs” would save cost (future optimization). |
 | **Rate limit list** | `checkRateLimit` counts specific `analytics_events` event names. **`intervention_selected` is not in the list**; **`companion-orchestrate` does not log `pause_ai_call`**. Manual reflection remains the main throttle for “pause AI” spend per user. |
 | **Admin surface** | Seven tabs in `Admin.tsx`: Monitor, Content, Sources, Tools, Library, Feed, Rejections. |

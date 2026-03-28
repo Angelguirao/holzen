@@ -5,6 +5,7 @@ import {
   generateUnifiedReflection,
   type MoodHistoryEntry,
 } from "../_shared/reflection-generate.ts";
+import { sanitizePromptInput, sanitizePromptArray } from "../_shared/sanitize.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -143,7 +144,9 @@ serve(async (req) => {
     // 2. Get all profiles - we need to check both thresholds
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
-      .select("user_id, threshold, threshold_down, cumulative_threshold, email_notifications, last_trigger_at, cooldown_hours, reflection_tone, companion_haiku, companion_learning, quiet_hours_start, quiet_hours_end, timezone, language, snoozed_until");
+      .select(
+        "user_id, threshold, threshold_down, cumulative_threshold, email_notifications, last_trigger_at, cooldown_hours, reflection_tone, companion_haiku, companion_learning, companion_signal, companion_zoom_out, companion_history, quiet_hours_start, quiet_hours_end, timezone, language, snoozed_until, custom_prompt, reflection_style, motivations, mantra, grounding_activities",
+      );
 
     if (profilesError) throw profilesError;
     if (!profiles || profiles.length === 0) {
@@ -310,26 +313,52 @@ serve(async (req) => {
         ctx += ` Over 7 days, it's ${cumDir} ${absCumChange.toFixed(1)}%.`;
       }
 
-      const tone = (profile as any).reflection_tone || "stoic";
-      const userLang = (profile as any).language || "en";
+      const p = profile as Record<string, unknown>;
+      const tone = (p.reflection_tone as string) || "stoic";
+      const userLang = (p.language as string) || "en";
+      const style =
+        typeof p.reflection_style === "string" && p.reflection_style.length > 0
+          ? p.reflection_style
+          : "standard";
+      const customPrompt = sanitizePromptInput(p.custom_prompt as string | null | undefined, 500);
+      const motivations = sanitizePromptArray(p.motivations as string[] | null | undefined, 10, 100);
+      const mantra = sanitizePromptInput(p.mantra as string | null | undefined, 200);
+      const groundingActivities = sanitizePromptArray(
+        p.grounding_activities as string[] | null | undefined,
+        10,
+        100,
+      );
 
       let moodHistory: MoodHistoryEntry[] | undefined;
+      let recentMessages: string[] | undefined;
+      let recentHaikus: string[] | undefined;
       try {
         const { data: recentRows } = await supabase
           .from("reflections")
-          .select("mood, outcome, created_at")
+          .select("mood, outcome, created_at, message, haiku")
           .eq("user_id", profile.user_id)
-          .not("mood", "is", null)
           .order("created_at", { ascending: false })
           .limit(20);
         if (recentRows?.length) {
-          moodHistory = recentRows
-            .filter((r: { mood?: string }) => r.mood)
-            .map((r: { mood: string; outcome?: string | null; created_at?: string }) => ({
-              mood: r.mood,
+          const rows = recentRows as Array<{
+            mood?: string | null;
+            outcome?: string | null;
+            created_at?: string;
+            message?: string | null;
+            haiku?: string | null;
+          }>;
+          const withMood = rows.filter((r) => r.mood);
+          if (withMood.length > 0) {
+            moodHistory = withMood.map((r) => ({
+              mood: r.mood as string,
               outcome: r.outcome ?? null,
               created_at: r.created_at,
             }));
+          }
+          const msgs = rows.filter((r) => r.message).map((r) => r.message as string);
+          if (msgs.length > 0) recentMessages = msgs.slice(0, 5);
+          const haikus = rows.filter((r) => r.haiku).map((r) => r.haiku as string);
+          if (haikus.length > 0) recentHaikus = haikus.slice(0, 5);
         }
       } catch { /* non-fatal */ }
 
@@ -338,9 +367,16 @@ serve(async (req) => {
         apiKey: LOVABLE_API_KEY,
         includeLearning: false,
         tone,
+        style,
         language: userLang,
         severity: absChange,
         moodHistory,
+        recentHaikus,
+        recentMessages,
+        customPrompt: customPrompt || undefined,
+        motivations: motivations.length > 0 ? motivations : undefined,
+        mantra: mantra || undefined,
+        groundingActivities: groundingActivities.length > 0 ? groundingActivities : undefined,
       });
       if (!result) {
         console.log(`[CHECK-VOLATILITY] Failed to generate reflection for ${profile.user_id}`);
@@ -373,7 +409,13 @@ serve(async (req) => {
 
       if (insertedReflection?.id) {
         const reflectionId = insertedReflection.id;
-        // Fire-and-forget orchestrator
+        const enableSignal = (p.companion_signal as boolean | undefined) ?? true;
+        const enableGrounding = (p.companion_learning as boolean | undefined) ?? true;
+        const enableHistory = (p.companion_history as boolean | undefined) ?? true;
+        const enableZoomOut = (p.companion_zoom_out as boolean | undefined) ?? true;
+        const lastReportedMood = moodHistory?.[0]?.mood;
+
+        // Fire-and-forget orchestrator (respects profile companion toggles; mood from latest past session)
         fetch(`${supabaseUrl}/functions/v1/companion-orchestrate`, {
           method: "POST",
           headers: {
@@ -388,10 +430,12 @@ serve(async (req) => {
             language: userLang,
             reflectionMessage: result.message,
             severity: absChange,
-            enableSignal: true,
-            enableGrounding: true,
-            enableHistory: true,
-            enableZoomOut: true,
+            mood: lastReportedMood ?? null,
+            moodHistory: moodHistory ?? [],
+            enableSignal,
+            enableGrounding,
+            enableHistory,
+            enableZoomOut,
           }),
         }).then((res) => {
           if (!res.ok) res.text().then((t) => console.error(`[CHECK-VOLATILITY] Orchestrator failed (${res.status}): ${t}`));
