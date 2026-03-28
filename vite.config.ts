@@ -10,6 +10,14 @@ const FALLBACK_SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), "");
+  // `localstack` = local Docker Supabase only: never fall back to hosted keys (see .env.localstack.example).
+  const useHostedFallback = mode !== "localstack";
+  const supabaseUrl = useHostedFallback
+    ? env.VITE_SUPABASE_URL || FALLBACK_SUPABASE_URL
+    : env.VITE_SUPABASE_URL || "";
+  const supabaseKey = useHostedFallback
+    ? env.VITE_SUPABASE_PUBLISHABLE_KEY || FALLBACK_SUPABASE_PUBLISHABLE_KEY
+    : env.VITE_SUPABASE_PUBLISHABLE_KEY || "";
 
   return {
     server: {
@@ -20,16 +28,13 @@ export default defineConfig(({ mode }) => {
       },
     },
     define: {
-      "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(
-        env.VITE_SUPABASE_URL || FALLBACK_SUPABASE_URL,
-      ),
-      "import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY": JSON.stringify(
-        env.VITE_SUPABASE_PUBLISHABLE_KEY || FALLBACK_SUPABASE_PUBLISHABLE_KEY,
-      ),
+      "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(supabaseUrl),
+      "import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY": JSON.stringify(supabaseKey),
     },
     plugins: [
       react(),
-      mode === "development" && componentTagger(),
+      (mode === "development" || mode === "hosted" || mode === "localstack") &&
+        componentTagger(),
       VitePWA({
         strategies: "injectManifest",
         srcDir: "src",
