@@ -58,7 +58,6 @@ serve(async (req) => {
     const { result, lastStatus } = await generateUnifiedReflection({
       context,
       apiKey: LOVABLE_API_KEY,
-      includeLearning: false,
       tone,
       style,
       language,

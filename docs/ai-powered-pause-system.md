@@ -68,7 +68,7 @@ Reflection text and haiku land on the new row first; companion columns and inter
 | **Entry** | User flow in app → `use-holzen.ts` | `supabase/functions/check-volatility/index.ts` (HTTP + service auth) |
 | **BTC data** | Client `fetchBtcData` (`src/lib/btc.ts`) for context string | CoinGecko `market_chart` 1d + 7d inside the function |
 | **Thresholds** | User-initiated (cooldown in hook: 15 min, or 5 s in dev mode) | Per-profile `threshold` / `threshold_down`, `cumulative_threshold`, `cooldown_hours`, quiet hours, `snoozed_until` |
-| **Reflection AI** | **`holzen-reflect`** → **`generateUnifiedReflection({ includeLearning: false })`** | **`check-volatility`** → **same** (`includeLearning: false`) — `_shared/reflection-generate.ts` |
+| **Reflection AI** | **`holzen-reflect`** → **`generateUnifiedReflection`** | **`check-volatility`** → **same** module (`_shared/reflection-generate.ts`) |
 | **Mood** | Collected in UI; stored on `reflections.mood` | Not set on the new row; **reflection prompts** use **mood history** from the last 20 `reflections` with `mood`. **Orchestrator** receives **`mood`** = most recent prior mood (if any) plus **`moodHistory`** for session intent (same idea as the client path). |
 | **Style / extras** | Full: `style`, `customPrompt`, `motivations`, `mantra`, `groundingActivities`, client-supplied `recentHaikus` / `recentMessages` | Profile-backed: `reflection_style`, sanitized `custom_prompt`, `motivations`, `mantra`, `grounding_activities` (same **`sanitize.ts`** limits as **`holzen-reflect`**). **`recentMessages`** / **`recentHaikus`**: up to 5 each from the user’s last 20 reflection rows (dedup signal for the shared generator). |
 | **Reflection row `grounding_*`** | **Null** at insert (JSON path); Ground content comes from **`companion-orchestrate`** | **Null** at insert; **`companion_haiku`** still toggles haiku; Ground / Signal / etc. come **only** from orchestrate |
@@ -116,7 +116,7 @@ Both paths share **`generateUnifiedReflection`** (via **`holzen-reflect`** vs in
 ## 3. Reflection generation (`_shared/reflection-generate.ts`)
 
 - **`generateUnifiedReflection(params)`** — Calls **`https://ai.gateway.lovable.dev/v1/chat/completions`** with **`LOVABLE_API_KEY`**, trying models in order: **`google/gemini-3-flash-preview`**, then **`google/gemini-2.5-flash`** (JSON path uses per-attempt timeouts **12s** then **8s**).
-- **Pause and cron callers** always pass **`includeLearning: false`**: `response_format: json_object` with **`message`** + **`haiku`**, plus the shared quality gate. **`reflections.grounding_*`** (and other companion columns) are filled by **`companion-orchestrate`**, not the reflection step. **`holzen-reflect`** may still echo **`grounding_*`** keys in JSON for API stability. The shared module retains a legacy **`includeLearning: true`** tool-call branch that **no deployed path uses** — remove it in a dedicated refactor if you want less surface area.
+- **Output** — JSON object with **`message`** + **`haiku`** only (`response_format: json_object`), plus the shared quality gate. **`reflections.grounding_*`** (and other companion columns) are filled by **`companion-orchestrate`**, not the reflection step. **`holzen-reflect`** may still echo **`grounding_*`** keys in JSON for API stability (always null from this path).
 - **Callers:** `holzen-reflect/index.ts` (auth, sanitization, analytics, curated fallback) and `check-volatility/index.ts` (eligibility, notifications, orchestrator dispatch).
 
 ---
@@ -331,7 +331,7 @@ flowchart TB
 
 | Aspect | Detail |
 |--------|--------|
-| **Source** | **`generateUnifiedReflection`** with **`includeLearning: false`** → `message` + **`haiku`** on the reflection row; **not** produced by `companion-orchestrate`. |
+| **Source** | **`generateUnifiedReflection`** → `message` + **`haiku`** on the reflection row; **not** produced by `companion-orchestrate`. |
 | **Profile pref** | **`companion_haiku`** (UI: `prefs.haiku`). |
 | **Storage** | Reflection columns (haiku text + read flags as implemented). |
 | **UI** | `HaikuDisplay` in `CompanionSection`; card id **`haiku`**. |
@@ -465,7 +465,7 @@ Exact SQL lives in **[cron-setup.md](./cron-setup.md)**. Typical schedules docum
 
 **What the user sees** is one pause surface: reflection copy, an intervention (mirror / trap / pattern / question / default), and optional companion cards driven by preferences.
 
-**What the server does** is split across phases: (1) **reflection** — `holzen-reflect` or `check-volatility` calling `generateUnifiedReflection` (message + haiku when `includeLearning: false`); (2) **orchestration** — `companion-orchestrate` may run **multiple** model-backed generators in parallel (Signal, Grounding, History, Zoom Out, and question mode when selected), then dual-write results to `reflections` / `reflection_companions` / analytics.
+**What the server does** is split across phases: (1) **reflection** — `holzen-reflect` or `check-volatility` calling `generateUnifiedReflection` (JSON message + haiku only); (2) **orchestration** — `companion-orchestrate` may run **multiple** model-backed generators in parallel (Signal, Grounding, History, Zoom Out, and question mode when selected), then dual-write results to `reflections` / `reflection_companions` / analytics.
 
 **Rate limits and budgets** do not line up 1:1 with that UX split:
 
@@ -481,7 +481,7 @@ Brief archaeology — **current `main` is expected to include these fixes**; lis
 1. **`questionPromise` undefined** — Question mode could throw until `questionPromise` was wired from **`generateQuestion`** when **`selection.mode === "question"`**.
 2. **Cron → orchestrator auth** — Service role + **`userId` in body`**; **`check-volatility`** sends **`userId`** and **`severity`** for automatic sessions.
 3. **Mirror intervention not returned** — **`intervention.primary`** populated when mirror is selected.
-4. **Unified reflection pipeline** — **`generateUnifiedReflection`** with **`includeLearning: false`**; **`reflections.grounding_*`** filled by **`companion-orchestrate`**, not the reflection step.
+4. **Unified reflection pipeline** — **`generateUnifiedReflection`** (message + haiku JSON); **`reflections.grounding_*`** filled by **`companion-orchestrate`**, not the reflection step.
 5. **Cron parity with manual pause** — Profile-backed reflection inputs (sanitized like **`holzen-reflect`**), recent haiku/message lists, orchestrator **`enable*`** flags, **mood / moodHistory** when available.
 
 ### 11.3 Product-level drift (monitor)

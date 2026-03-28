@@ -376,7 +376,6 @@ serve(async (req) => {
       const { result } = await generateUnifiedReflection({
         context: ctx,
         apiKey: LOVABLE_API_KEY,
-        includeLearning: false,
         tone,
         style,
         language: userLang,
