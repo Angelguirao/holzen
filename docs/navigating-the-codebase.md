@@ -181,7 +181,7 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 
 ## 16. Related documentation in `docs/`
 
-- **[ai-powered-pause-system.md](./ai-powered-pause-system.md)** — Manual vs automatic pause, dual reflection paths, `companion-orchestrate`, interventions, generators, drift and ops notes.
+- **[ai-powered-pause-system.md](./ai-powered-pause-system.md)** — Manual vs automatic pause, shared reflection AI, `companion-orchestrate`, interventions, generators, drift and ops notes.
 - **[cron-setup.md](./cron-setup.md)** — Scheduling edge functions (BTC refresh, feeds, digests, etc.).
 
 ---
@@ -200,9 +200,7 @@ These are observations from a structural pass — not a full security or QA audi
 
 5. **Vite Supabase fallbacks** (`FALLBACK_SUPABASE_*` in `vite.config.ts`) let the app boot without a `.env`; for a **fork or production**, you should rely on explicit env vars so you are not tied to the template project URL/key.
 
-6. **Reflection AI:** Both **`holzen-reflect`** and **`check-volatility`** call **`_shared/reflection-generate.ts`** (`generateUnifiedReflection`, message + haiku only); companions come from **`companion-orchestrate`**. See [ai-powered-pause-system.md](./ai-powered-pause-system.md) §3–4.
-
-7. **ESLint debt:** Expect a large baseline of issues; scope cleanups to files you change unless you run a dedicated lint initiative.
+6. **ESLint debt:** Expect a large baseline of issues; scope cleanups to files you change unless you run a dedicated lint initiative.
 
 ---
 
