@@ -128,10 +128,32 @@ If two rows in the reference table below look “duplicated,” check whether th
 
 **E. Mood, style, and “recent” hints**
 
-- **Manual:** Mood from the **UI** when available; **`recentHaikus` / `recentMessages`** built from the client’s last queries; grounding catalog merged with **live** user prefs.
-- **Automatic:** **`reflections.mood`** may be set from the **most recent prior mood** in DB when there is history (no screen to ask on). **`recent*`** lists come from the **last 20 reflection rows**. Style fields come from **profile** columns with the same **`sanitize.ts`** limits as **`holzen-reflect`**.
+`generateUnifiedReflection` does not magically know you are on Pause in the app or in a cron job. It only sees **what the caller puts in the JSON**. Those fields fall into three buckets:
 
-*Why:* the server has **no open Pause screen** during cron; it **reconstructs** the same *kinds* of inputs the model expects (mood history, dedup strings) from **Postgres** so prompts stay comparable.
+**1. Style / personalization (same meaning on both paths)**  
+Tone, reflection style, custom prompt, motivations, mantra, grounding activities — all passed through the same **`sanitize.ts`** limits.  
+- **Manual:** Values live in the SPA (they were loaded from **`profiles`**).  
+- **Automatic:** The cron reads **`profiles`** for that user.  
+*Why it matches:* it is still the same saved settings; only **where** the code reads them changes (React state vs SQL).
+
+**2. `moodHistory` — “how have they been feeling lately?”**  
+This is a **list of past reflections that already have a `mood` saved** (`mood`, `outcome`, `created_at`). The reflection prompt uses it to adapt language (e.g. streaks, outcomes).  
+- **Manual:** Before calling **`holzen-reflect`**, the client loads the latest reflections and builds this list.  
+- **Automatic:** **`check-volatility`** runs the same logic: last **20** rows, keep rows with `mood`, same structure.  
+**Nuance (easy to miss):** For **this** pause, the model only sees moods that were **already in the database** before the call. On **manual** pause, a mood you pick **in the UI** is written onto the **new** `reflections` row **after** **`holzen-reflect`** returns — so that fresh pick is **not** inside `moodHistory` for that same request (it will appear in history **next** time). The cron never shows a picker, so it never has a “fresh” mood either — only history.
+
+**3. `recentHaikus` / `recentMessages` — “don’t repeat yourself”**  
+Up to **five** recent haikus and **five** recent reflection **messages** (plain text). The prompt uses them as **dedup hints** (avoid the same openings, similar haiku shapes).  
+- **Manual:** Built from the same pre-flight reflection query on the client.  
+- **Automatic:** Built from the same last-20 rows on the server.
+
+**What about the `reflections.mood` column on the *new* row?**  
+That is **separate** from `moodHistory`: it tags **this** row for storage, analytics, and **`companion-orchestrate`**.  
+- **Manual:** If the Pause flow collected a mood, the client saves it on insert **after** generation.  
+- **Automatic:** If there was any prior mood history, the cron copies the **newest** mood from that history onto the new row (**`lastReportedMood`**). If the user never saved moods before, the new row may have **no** `mood`.  
+*Why:* the orchestrator expects a comparable payload; automatic pause should not leave the row blank when we already know a recent label.
+
+*Why reconstruct everything on the server for cron:* there is **no open Pause screen** and no browser session — **`Postgres`** is the only place to get mood history and recent text, so the cron **replays the same data shapes** the manual path assembled on the client.
 
 ---
 
