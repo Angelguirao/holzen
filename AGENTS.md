@@ -55,6 +55,11 @@ Never commit `.env` or service role keys.
 - User-visible copy: follow existing **i18n** usage in the same feature; do not hardcode English in places that already use `t('...')` without a good reason.
 - **Scope:** Make minimal, task-focused diffs; avoid drive-by refactors and unrelated formatting sweeps.
 
+## Git
+
+- **Commit as you go** when a logical chunk of work is done (e.g. one fix, one migration, one doc update)—do not leave the tree dirty at the end of a task unless the user asked for WIP only.
+- Use clear commit messages (what changed and why). Prefer `git` from the system install if it is not on `PATH` (e.g. `C:\Program Files\Git\bin\git.exe` on Windows).
+
 ## Related docs
 
 - [README.md](README.md) — clone/setup, scripts, high-level layout.
