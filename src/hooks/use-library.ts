@@ -48,6 +48,9 @@ const CACHE_KEY_ITEMS = 'holzen_library_items';
 const CACHE_KEY_COLLECTIONS = 'holzen_library_collections';
 const CACHE_KEY_COL_ITEMS = 'holzen_library_col_items';
 
+/** Matches unique index idx_library_items_user_reflection_source — use upsert to avoid 23505 on races. */
+const LIBRARY_ITEM_CONFLICT_COLUMNS = 'user_id,reflection_id,source_type';
+
 function readCache<T>(key: string): T | null {
   try {
     const raw = localStorage.getItem(key);
@@ -106,7 +109,9 @@ export function useLibrary() {
 
     // Backfill: import reflections and their companions not yet in library (runs every load)
     const existingKeys = new Set(
-      libItems.filter((i) => i.reflection_id).map((i) => `${i.reflection_id}:${i.source_type}`)
+      libItems
+        .filter((i) => i.reflection_id && i.source_type)
+        .map((i) => `${i.reflection_id}:${i.source_type}`),
     );
     const { data: allReflections } = await supabase
       .from('reflections')
@@ -158,43 +163,33 @@ export function useLibrary() {
         }
       }
       if (inserts.length > 0) {
-        // Retry logic: attempt batch insert, on failure try individual inserts
-        const tryInsert = async (items: any[], retries = 2): Promise<void> => {
-          const { error: batchErr } = await supabase.from('library_items').insert(items);
-          if (!batchErr) return;
-          
-          console.warn(`[library backfill] batch insert failed (${items.length} items): ${batchErr.message}`);
-          
-          if (retries > 0) {
-            // Wait briefly then retry the whole batch
-            await new Promise((r) => setTimeout(r, 1000));
-            const { error: retryErr } = await supabase.from('library_items').insert(items);
-            if (!retryErr) return;
-            console.warn(`[library backfill] batch retry failed: ${retryErr.message}`);
-          }
+        const batchKeys = new Set<string>();
+        const deduped = inserts.filter((row) => {
+          const k = `${row.user_id}:${row.reflection_id}:${row.source_type}`;
+          if (batchKeys.has(k)) return false;
+          batchKeys.add(k);
+          return true;
+        });
 
-          // Fall back to individual inserts so partial failures don't lose everything
-          let failed = 0;
-          for (const item of items) {
-            const { error: singleErr } = await supabase.from('library_items').insert(item);
-            if (singleErr) {
-              // Skip duplicates silently (unique constraint), log others
-              if (!singleErr.message.includes('duplicate') && !singleErr.message.includes('unique')) {
-                failed++;
-                console.error(`[library backfill] single insert failed (${item.source_type}/${item.reflection_id}):`, singleErr.message);
-              }
+        const backfillUpsert = async (rows: any[]) => {
+          const { error: batchErr } = await supabase.from('library_items').upsert(rows, {
+            onConflict: LIBRARY_ITEM_CONFLICT_COLUMNS,
+            ignoreDuplicates: true,
+          });
+          if (!batchErr) return;
+          console.warn(`[library backfill] batch upsert failed (${rows.length} rows): ${batchErr.message}`);
+          for (const item of rows) {
+            const { error: oneErr } = await supabase.from('library_items').upsert(item, {
+              onConflict: LIBRARY_ITEM_CONFLICT_COLUMNS,
+              ignoreDuplicates: true,
+            });
+            if (oneErr && !oneErr.message.includes('duplicate') && !oneErr.message.includes('unique')) {
+              console.warn(`[library backfill] row upsert failed (${item.source_type}/${item.reflection_id}):`, oneErr.message);
             }
-          }
-          if (failed > 0) {
-            // Store failed count in localStorage so we can retry on next load
-            const retryKey = `holzen_backfill_retry_${user!.id}`;
-            const prev = parseInt(localStorage.getItem(retryKey) ?? '0', 10);
-            localStorage.setItem(retryKey, String(prev + failed));
-            console.warn(`[library backfill] ${failed} items failed, queued for next load`);
           }
         };
 
-        await tryInsert(inserts);
+        await backfillUpsert(deduped);
         const { data: refreshed } = await supabase
           .from('library_items')
           .select('*')

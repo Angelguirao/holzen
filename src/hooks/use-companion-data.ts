@@ -135,16 +135,19 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
         .eq('source_type', params.sourceType)
         .limit(1);
       if (existing && existing.length > 0) return;
-      await supabase.from('library_items').insert({
-        user_id: userId,
-        type: 'bookmark',
-        title: params.title,
-        body: params.body,
-        source_type: params.sourceType,
-        source_url: params.sourceUrl || null,
-        reflection_id: reflectionId,
-        tags: [],
-      });
+      await supabase.from('library_items').upsert(
+        {
+          user_id: userId,
+          type: 'bookmark',
+          title: params.title,
+          body: params.body,
+          source_type: params.sourceType,
+          source_url: params.sourceUrl || null,
+          reflection_id: reflectionId,
+          tags: [],
+        },
+        { onConflict: 'user_id,reflection_id,source_type', ignoreDuplicates: true },
+      );
     } finally {
       // Keep the key to prevent future attempts within same component lifecycle
     }

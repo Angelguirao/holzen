@@ -121,15 +121,18 @@ export function useHolzen() {
         setLastReflectionId(insertedReflection.id);
         // Run library bookmark and profile update in parallel — neither depends on the other
         await Promise.all([
-          supabase.from('library_items').insert({
-            user_id: user.id,
-            type: 'bookmark',
-            title: 'Reflection',
-            body: silentMsg,
-            source_type: 'reflection',
-            reflection_id: insertedReflection.id,
-            tags: ['reflection'],
-          }),
+          supabase.from('library_items').upsert(
+            {
+              user_id: user.id,
+              type: 'bookmark',
+              title: 'Reflection',
+              body: silentMsg,
+              source_type: 'reflection',
+              reflection_id: insertedReflection.id,
+              tags: ['reflection'],
+            },
+            { onConflict: 'user_id,reflection_id,source_type', ignoreDuplicates: true },
+          ),
           supabase.from('profiles').update({
             last_message: silentMsg,
             last_context: ctx,
@@ -260,7 +263,10 @@ export function useHolzen() {
           }
           // Run library bookmarks and profile update in parallel — neither depends on the other
           const [{ error: libErr }] = await Promise.all([
-            supabase.from('library_items').insert(libraryInserts),
+            supabase.from('library_items').upsert(libraryInserts, {
+              onConflict: 'user_id,reflection_id,source_type',
+              ignoreDuplicates: true,
+            }),
             supabase.from('profiles').update({
               last_message: msg,
               last_context: ctx,
