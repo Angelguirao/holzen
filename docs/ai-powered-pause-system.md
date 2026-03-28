@@ -116,8 +116,7 @@ Both paths share **`generateUnifiedReflection`** (via **`holzen-reflect`** vs in
 ## 3. Reflection generation (`_shared/reflection-generate.ts`)
 
 - **`generateUnifiedReflection(params)`** — Calls **`https://ai.gateway.lovable.dev/v1/chat/completions`** with **`LOVABLE_API_KEY`**, trying models in order: **`google/gemini-3-flash-preview`**, then **`google/gemini-2.5-flash`** (JSON path uses per-attempt timeouts **12s** then **8s**).
-- **`includeLearning`** — Parameter name is **legacy** (historical “learning” path); when **`true`**, uses a tool-call flow that can populate **`grounding_*`** fields on the result. Production callers use **`includeLearning: false`**: `response_format: json_object` with **`message`** + **`haiku`** only, plus the shared quality gate. The returned object type still includes **`grounding_*`** keys; they are **usually null** in this mode, and **`holzen-reflect`** echoes them in JSON for API stability.
-- **`includeLearning: false`** — Companion columns on **`reflections`** are filled by **`companion-orchestrate`**, not the reflection step.
+- **Pause and cron callers** always pass **`includeLearning: false`**: `response_format: json_object` with **`message`** + **`haiku`**, plus the shared quality gate. **`reflections.grounding_*`** (and other companion columns) are filled by **`companion-orchestrate`**, not the reflection step. **`holzen-reflect`** may still echo **`grounding_*`** keys in JSON for API stability. The shared module retains a legacy **`includeLearning: true`** tool-call branch that **no deployed path uses** — remove it in a dedicated refactor if you want less surface area.
 - **Callers:** `holzen-reflect/index.ts` (auth, sanitization, analytics, curated fallback) and `check-volatility/index.ts` (eligibility, notifications, orchestrator dispatch).
 
 ---
@@ -488,12 +487,6 @@ Brief archaeology — **current `main` is expected to include these fixes**; lis
 ### 11.3 Product-level drift (monitor)
 
 Intentional or deferred behavior — **not** parity bugs.
-
-**Optional `includeLearning` on reflection**
-
-- **What:** `generateUnifiedReflection` can be called with **`includeLearning: true`** (tool call + `grounding_*` in the model response).
-- **Reality:** Production uses **`includeLearning: false`**. Ground / Signal content is written by **`companion-orchestrate`**.
-- **Why it’s listed:** The path still exists for experiments; easy to confuse with **`reflections.grounding_*`** (Ground companion denormalized fields). Prefer **`grounding`** in UI and i18n; **`learning`** is a **legacy alias** in some maps (feedback → cache, old library rows).
 
 **Intervention vs “run every enabled generator”**
 
