@@ -30,7 +30,7 @@ npm install
 Environment variables (see [.env.example](.env.example)):
 
 - **Lovable Cloud only:** If you only edit and preview in [Lovable](https://lovable.dev), the platform **injects `VITE_SUPABASE_*` for you** — you do not maintain a `.env` file there. That does **not** apply to **`npm run dev` on your computer**; Vite reads files from disk locally (see below).
-- **Default (local machine):** `cp .env.example .env` then `npm run dev` — uses your `.env` values, with **optional** fallbacks in `vite.config.ts` when vars are missing (handy for quick UI work against the linked hosted project).
+- **Default (local machine):** `cp .env.example .env` then `npm run dev` — uses your `.env` values. If `VITE_SUPABASE_*` are missing, the **dev server only** can fall back to the bundled Holzen hosted keys (see `vite.config.ts`); **`npm run build` never does** — forks and CI must supply real `VITE_SUPABASE_*` for production bundles.
 - **Two files / two backends (optional on your machine):** Lovable Cloud does **not** read `.env.hosted`; that file is only for **`npm run dev:hosted`** when you want the app on your laptop to use **hosted** Supabase. If you **only** develop against **local Docker** Supabase, use **`.env.localstack`** / **`npm run dev:local`** and you can **ignore** `.env.hosted` entirely.
   - **Hosted from local Vite:** copy [.env.hosted.example](.env.hosted.example) to **`.env.hosted.local`**, fill in URL + anon key, run **`npm run dev:hosted`**.
   - **Local Docker only:** copy [.env.localstack.example](.env.localstack.example) to **`.env.localstack.local`**, set the anon key from `npm run supabase:status`, run **`npm run dev:local`** (no hosted URL/key fallback for that mode).

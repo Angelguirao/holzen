@@ -4,14 +4,17 @@ import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { VitePWA } from "vite-plugin-pwa";
 
+// Dev-server-only defaults so `npm run dev` can boot without `.env`. Never used for `vite build`
+// (forks/CI production bundles must set `VITE_SUPABASE_*` or the client gets empty strings).
 const FALLBACK_SUPABASE_URL = "https://edgbwdecaoottowliimu.supabase.co";
 const FALLBACK_SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkZ2J3ZGVjYW9vdHRvd2xpaW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3MzgyMzcsImV4cCI6MjA4ODMxNDIzN30.ZNh2feSmMhdZmEk6omdd8q5HDjBHytz-gzktI0txwM8";
 
 // https://vitejs.dev/config/
-export default defineConfig(({ mode }) => {
+export default defineConfig(({ mode, command }) => {
   const env = loadEnv(mode, process.cwd(), "");
-  // `localstack` = local Docker Supabase only: never fall back to hosted keys (see .env.localstack.example).
-  const useHostedFallback = mode !== "localstack";
+  // `localstack` = local Docker Supabase only (see .env.localstack.example).
+  // Fall back to Holzen hosted keys only while running the dev server — not during `vite build`.
+  const useHostedFallback = command === "serve" && mode !== "localstack";
   const supabaseUrl = useHostedFallback
     ? env.VITE_SUPABASE_URL || FALLBACK_SUPABASE_URL
     : env.VITE_SUPABASE_URL || "";

@@ -179,7 +179,7 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 
 | Script | Mode | Supabase env behavior (see `vite.config.ts`) |
 |--------|------|-----------------------------------------------|
-| `npm run dev` | `development` | Can use `.env`; may use **hosted fallbacks** if vars missing (unless you rely on explicit `.env` only). |
+| `npm run dev` | `development` | Can use `.env`; dev server may use **hosted fallbacks** if vars missing (`localstack` mode never does). |
 | `npm run dev:hosted` | `hosted` | Loads env for hosted backend (e.g. `.env.hosted` / `.env.hosted.local` per README). |
 | `npm run dev:local` | `localstack` | **No** hosted URL/key fallback — forces explicit local Supabase values. |
 
@@ -212,9 +212,7 @@ These are observations from a structural pass — not a full security or QA audi
 
 1. **Locales:** Translation files beyond English are present but not wired in `i18n.ts`. Re-enabling is a small, deliberate change (import + `resources`).
 
-2. **Vite Supabase fallbacks** (`FALLBACK_SUPABASE_*` in `vite.config.ts`) let the app boot without a `.env`; for a **fork or production**, you should rely on explicit env vars so you are not tied to the template project URL/key.
-
-3. **ESLint debt:** Expect a large baseline of issues; scope cleanups to files you change unless you run a dedicated lint initiative.
+2. **ESLint debt:** Expect a large baseline of issues; scope cleanups to files you change unless you run a dedicated lint initiative.
 
 ---
 
