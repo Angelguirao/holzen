@@ -333,7 +333,9 @@ flowchart LR
 
 ## 6. Generator family (orchestrated)
 
-All are imported **directly** in `companion-orchestrate` (not HTTP to `signal-companion`, `historical-insight`, etc. — those remain thin standalone endpoints if needed).
+The pause UI and **`check-volatility`** only call **`companion-orchestrate`**, which imports **`_shared/generators/*`** in-process.
+
+**Standalone edge functions** **`signal-companion`**, **`ground-nudge`**, **`historical-insight`**, and **`zoom-out-companion`** are thin HTTP wrappers around the **same** generator modules (auth + analytics + one `generate*` call). **This repository does not invoke them** from the React app or from other functions—so for shipping behavior they are effectively **unused**. They remain useful for **manual testing**, **curl/Postman**, or **external callers** you may have outside the repo; if you confirm nothing hits those URLs in production, you could remove them to reduce deploy surface.
 
 | Generator | File | First hop | Fallback chain (simplified) |
 |-----------|------|-----------|------------------------------|
@@ -655,7 +657,7 @@ supabase/functions/
 ├── fetch-source-feeds/index.ts
 ├── check-followups/index.ts
 ├── night-reflection/index.ts
-├── signal-companion/index.ts          # thin standalone
+├── signal-companion/index.ts          # optional HTTP wrapper (same generator; not called from app)
 ├── historical-insight/index.ts
 ├── zoom-out-companion/index.ts
 ├── ground-nudge/index.ts
