@@ -29,10 +29,15 @@ CREATE INDEX IF NOT EXISTS idx_content_library_mood ON content_library(mood_tag)
 
 ALTER TABLE content_library ENABLE ROW LEVEL SECURITY;
 
+-- Idempotent: content_library + policies may already exist (20260321000003_content_library.sql).
+DROP POLICY IF EXISTS "Admins can manage content library" ON content_library;
+DROP POLICY IF EXISTS "Authenticated users can read content library" ON content_library;
+
 CREATE POLICY "Admins can manage content library"
   ON content_library FOR ALL
   USING (public.is_admin());
 
+-- Prefer explicit TO authenticated + USING (true) for read access
 CREATE POLICY "Authenticated users can read content library"
   ON content_library FOR SELECT
   TO authenticated
