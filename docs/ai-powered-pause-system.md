@@ -2,6 +2,8 @@
 
 This document describes **how Holzen turns Bitcoin volatility into a pause experience**: server triggers, reflection text, the intervention layer, companion generation, storage, and the React hooks that tie it together. It is the **system-level** companion to [cron-setup.md](./cron-setup.md) (scheduling SQL) and [navigating-the-codebase.md](./navigating-the-codebase.md) (repo layout).
 
+**Diagrams** below use [Mermaid](https://mermaid.js.org/) (`flowchart`). They render on GitHub and in many Markdown previews (e.g. Cursor); use a Mermaid extension or [mermaid.live](https://mermaid.live) if your viewer does not draw them.
+
 ---
 
 ## 1. Scope
@@ -24,6 +26,27 @@ This document describes **how Holzen turns Bitcoin volatility into a pause exper
 4. **Companions & intervention** — `companion-orchestrate` chooses an **intervention** (mirror / trap / pattern / question) and, according to **enable flags**, runs **Signal, Grounding, History, Zoom Out** generators in process, then writes structured data back to the reflection (and related tables).
 5. **Surface** — Client shows `InterventionSection` plus optional companion cards from user preferences.
 
+### Diagram — end-to-end pipeline
+
+```mermaid
+flowchart TB
+  M[Manual pause\nuse-holzen / holzen-reflect]
+  C[Automatic pause\ncheck-volatility]
+  GR[generateUnifiedReflection]
+  DB[(reflections +\nprofile updates)]
+  CO[companion-orchestrate]
+  UI[Pause UI\nInterventionSection + companions]
+  M --> GR
+  C --> GR
+  GR --> DB
+  DB --> CO
+  CO --> DB
+  CO --> UI
+  C -.->|optional| N[Push / email /\npause_notifications]
+```
+
+Reflection text and haiku land on the new row first; companion columns and intervention payload are filled (or updated) when **`companion-orchestrate`** completes. **Who calls the orchestrator:** the **client** after insert (manual) vs **`check-volatility`** with service role + **`userId`** (automatic).
+
 ---
 
 ## 3. Two triggers: comparison
@@ -42,6 +65,35 @@ This document describes **how Holzen turns Bitcoin volatility into a pause exper
 | **Orchestrator auth** | User JWT via `supabase.functions.invoke` | **Service role** `Authorization` + **`userId` in JSON body** |
 
 **Shared logic:** One implementation for adaptive context (mood history, severity bands, Fear & Greed guidance, banned phrases, haiku/message dedup when inputs provided), model fallback order, and the reflection quality gate. Bump **`REFLECTION_PROMPT_VERSION`** in `reflection-generate.ts` when you change that behavior.
+
+### Diagram — manual vs automatic (who calls what)
+
+```mermaid
+flowchart TB
+  subgraph MANUAL [Manual pause — client]
+    BTC[fetchBtcData\ncontext string]
+    HR[holzen-reflect\nuser JWT]
+    INS[Insert reflections\nupdate profile]
+    UCD[use-companion-data\ncompanion-orchestrate\nuser JWT]
+    BTC --> HR --> INS --> UCD
+  end
+  subgraph AUTO [Automatic pause — server]
+    CV[check-volatility\nCoinGecko + thresholds]
+    GUR[generateUnifiedReflection\nsame shared module]
+    INS2[Insert reflections\nnotifications]
+    COS[companion-orchestrate\nservice role + userId body]
+    CV --> GUR --> INS2 --> COS
+  end
+  subgraph SHARED [Shared backend]
+    ORCH[companion-orchestrate]
+    ROW[(reflections\nreflection_companions\nanalytics)]
+  end
+  UCD --> ORCH
+  COS --> ORCH
+  ORCH --> ROW
+```
+
+Both paths share **`generateUnifiedReflection`** (via **`holzen-reflect`** vs inline in **`check-volatility`**) and the same orchestrator implementation; **auth to the orchestrator** differs (user JWT vs service role + **`userId`**).
 
 ---
 
@@ -66,6 +118,30 @@ This document describes **how Holzen turns Bitcoin volatility into a pause exper
 - **File:** `supabase/functions/companion-orchestrate/index.ts`
 - **Role:** Auth → rate limit → daily budget → parse body → **`determineSessionIntent`** → **`selectIntervention`** → optional **`generateQuestion`** (question mode) → parallel **generator tasks** (gated by `enableSignal` / `enableGrounding` / `enableHistory` / `enableZoomOut`) → assemble **`intervention`** + legacy companion results → `companion_serves` inserts → **`writeCompanionData`** (dual-write to join table + denormalized columns on `reflections`).
 
+### Diagram — inside `companion-orchestrate`
+
+```mermaid
+flowchart TD
+  IN[HTTP request] --> AUTH[Validate JWT or\nservice role + userId]
+  AUTH --> RL[Rate limit +\ndaily budget]
+  RL --> SI[determineSessionIntent]
+  SI --> SEL[selectIntervention]
+  SEL --> Q[generateQuestion\nif question mode]
+  SEL --> GS[Signal]
+  SEL --> GG[Grounding]
+  SEL --> GH[History]
+  SEL --> GZ[Zoom out]
+  Q --> ASM[Assemble intervention +\ncompanion payloads]
+  GS --> ASM
+  GG --> ASM
+  GH --> ASM
+  GZ --> ASM
+  ASM --> SRV[companion_serves +\nwriteCompanionData]
+  SRV --> OUT[(reflections +\nreflection_companions)]
+```
+
+**Parallelism:** question (when selected) and the four companion generators run **alongside** each other after intervention selection; the diagram shows logical inputs to **assemble**, not strict sequencing. Generators run **in process** (not HTTP to standalone companion functions). Each slot is skipped if disabled by **`enable*`** flags or satisfied from cache.
+
 ### 6.1 Authentication (important)
 
 - **User calls:** `Authorization: Bearer <user JWT>` (Supabase anon client + JWT).
@@ -76,6 +152,20 @@ This document describes **how Holzen turns Bitcoin volatility into a pause exper
 - **File:** `supabase/functions/_shared/intervention-selector.ts`
 - **Order:** Mirror (past similar session via `find_similar_reflection`) → trap (mood + direction) → pattern (high severity) → **question mode** (mild + ≥20 past sessions) → default pattern (+ optional zoom_out).
 - **Mirror payload:** When `primary === "mirror"`, the orchestrator sets **`intervention.primary = { type: "mirror", data: mirrorData }`** from `selectIntervention`.
+
+### Diagram — intervention selection order
+
+`selectIntervention` evaluates **roughly** in this order; the first applicable branch wins (see `intervention-selector.ts` for exact conditions).
+
+```mermaid
+flowchart LR
+  A[Mirror\nsimilar past session] --> B[Trap\nmood + direction]
+  B --> C[Pattern\nhigh severity]
+  C --> D[Question\nmild + enough history]
+  D --> E[Default pattern\n+ optional zoom_out secondary]
+```
+
+**Note:** Even when the headline is mirror / question / etc., enabled companion generators may still run in parallel (see §11 drift — *Intervention vs “run every enabled generator”*).
 
 ### 6.3 Question mode
 
