@@ -163,7 +163,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     if (!reflectionId) return;
     supabase
       .from('reflections')
-      .select('breathing_completed, haiku_read, learning_read, signal_read, zoom_out_read, history_read')
+      .select('breathing_completed, haiku_read, grounding_read, signal_read, zoom_out_read, history_read')
       .eq('id', reflectionId)
       .single()
       .then(({ data }) => {
@@ -171,7 +171,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
           setCompletion({
             breathing: (data as any).breathing_completed ?? false,
             haiku: (data as any).haiku_read ?? false,
-            learning: (data as any).learning_read ?? false,
+            learning: (data as any).grounding_read ?? false,
             signal: (data as any).signal_read ?? false,
             zoomOut: (data as any).zoom_out_read ?? false,
             history: (data as any).history_read ?? false,
@@ -188,7 +188,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       const dbKeyMap: Record<string, string> = {
         breathing: 'breathing_completed',
         haiku: 'haiku_read',
-        learning: 'learning_read',
+        learning: 'grounding_read',
         signal: 'signal_read',
         zoomOut: 'zoom_out_read',
         history: 'history_read',
@@ -237,7 +237,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
   }> => {
     const { data: row } = await supabase
       .from('reflections')
-      .select('signal_title, signal_body, signal_source, signal_url, learning_title, learning_body, learning_citation, learning_url, zoom_out_data, history_insight_data')
+      .select('signal_title, signal_body, signal_source, signal_url, grounding_title, grounding_body, grounding_citation, grounding_url, zoom_out_data, history_insight_data')
       .eq('id', rid)
       .single();
     if (!row) return {};
@@ -246,8 +246,8 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     if ((row as any).signal_source) {
       result.signal = { title: (row as any).signal_title ?? '', body: (row as any).signal_body ?? '', source: (row as any).signal_source, url: (row as any).signal_url ?? '' };
     }
-    if ((row as any).learning_citation) {
-      result.grounding = { title: (row as any).learning_title ?? '', body: (row as any).learning_body ?? '', citation: (row as any).learning_citation, url: (row as any).learning_url ?? '' };
+    if ((row as any).grounding_citation) {
+      result.grounding = { title: (row as any).grounding_title ?? '', body: (row as any).grounding_body ?? '', citation: (row as any).grounding_citation, url: (row as any).grounding_url ?? '' };
     }
     if ((row as any).history_insight_data) {
       result.history = (row as any).history_insight_data;

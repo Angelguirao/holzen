@@ -15,8 +15,8 @@ import { useCompanionData } from '@/hooks/use-companion-data';
 
 export interface CompanionData {
   haiku: string | null;
-  learningTitle: string | null;
-  learningBody: string | null;
+  groundingTitle: string | null;
+  groundingBody: string | null;
 }
 
 export interface CompanionPrefs {
@@ -247,8 +247,8 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           onToggleFavorite={isPro ? () => toggleCompanionFavorite('learning') : undefined}
         >
           <LearningInput
-            title={companions.learningTitle ?? ''}
-            body={companions.learningBody ?? ''}
+            title={companions.groundingTitle ?? ''}
+            body={companions.groundingBody ?? ''}
             nudge={nudge}
             nudgeLoading={nudgeLoading}
             nudgeError={nudgeError}

@@ -118,7 +118,7 @@ serve(async (req) => {
 
       const { data: reflections, error: refError } = await supabase
         .from("reflections")
-        .select("message, context, mood, mood_after, outcome, tags, created_at, breathing_completed, haiku_read, learning_read, signal_read, zoom_out_read, history_read, note")
+        .select("message, context, mood, mood_after, outcome, tags, created_at, breathing_completed, haiku_read, grounding_read, signal_read, zoom_out_read, history_read, note")
         .eq("user_id", userId)
         .order("created_at", { ascending: false })
         .limit(200);
@@ -141,14 +141,14 @@ serve(async (req) => {
         if (r.breathing_completed && !skills.includes("regulation")) skills.push("regulation");
         if (volatility >= 3 && (r.outcome === "held" || r.outcome === "nothing")) skills.push("tolerance");
         if (r.outcome === "held" || r.outcome === "nothing") skills.push("alignment");
-        if (r.zoom_out_read || r.history_read || r.signal_read || r.learning_read) skills.push("reappraisal");
+        if (r.zoom_out_read || r.history_read || r.signal_read || r.grounding_read) skills.push("reappraisal");
         if ((r.note && r.note.length > 10) || (r.tags && r.tags.length > 0)) skills.push("awareness");
 
         return {
           day: dayName, hour, date: r.created_at.slice(0, 10),
           mood: r.mood || "none", mood_after: r.mood_after || "none",
           outcome: r.outcome || "none", volatility, skills,
-          tools: [r.breathing_completed && "breathing", r.zoom_out_read && "zoom_out", r.history_read && "history", r.signal_read && "signal", r.learning_read && "learning"].filter(Boolean),
+          tools: [r.breathing_completed && "breathing", r.zoom_out_read && "zoom_out", r.history_read && "history", r.signal_read && "signal", r.grounding_read && "grounding"].filter(Boolean),
           hasNote: !!(r.note && r.note.length > 10), tagCount: r.tags?.length || 0,
         };
       });

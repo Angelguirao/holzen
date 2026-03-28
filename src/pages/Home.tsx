@@ -57,8 +57,8 @@ interface PinnedReflection {
   message: string;
   context: string | null;
   haiku: string | null;
-  learning_title: string | null;
-  learning_body: string | null;
+  grounding_title: string | null;
+  grounding_body: string | null;
 }
 
 interface GroundingSuggestion {
@@ -193,7 +193,7 @@ const Home = () => {
     if (!pinnedId) return;
     supabase
       .from('reflections')
-      .select('id, message, context, haiku, learning_title, learning_body')
+      .select('id, message, context, haiku, grounding_title, grounding_body')
       .eq('id', pinnedId)
       .eq('user_id', user.id)
       .single()

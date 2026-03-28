@@ -16,7 +16,7 @@ interface Reflection {
   note: string | null;
   breathing_completed?: boolean;
   haiku_read?: boolean;
-  learning_read?: boolean;
+  grounding_read?: boolean;
   signal_source?: string | null;
   zoom_out_read?: boolean;
   history_read?: boolean;
@@ -88,12 +88,12 @@ export function BadgesPanel({ reflections, subscribed, notifyBadges = true }: Ba
     const noteCount = reflections.filter((r) => r.note).length;
     const breathingCount = reflections.filter((r) => r.breathing_completed).length;
     const haikuCount = reflections.filter((r) => r.haiku_read).length;
-    const groundCount = reflections.filter((r) => r.learning_read).length;
+    const groundCount = reflections.filter((r) => r.grounding_read).length;
     const signalCount = reflections.filter((r) => !!r.signal_source).length;
     const zoomOutCount = reflections.filter((r) => r.zoom_out_read).length;
     const historyCount = reflections.filter((r) => r.history_read).length;
     const allSixCount = reflections.filter(
-      (r) => r.breathing_completed && r.haiku_read && r.learning_read && !!r.signal_source && r.zoom_out_read && r.history_read
+      (r) => r.breathing_completed && r.haiku_read && r.grounding_read && !!r.signal_source && r.zoom_out_read && r.history_read
     ).length;
 
     // Bitcoin Calendar counts

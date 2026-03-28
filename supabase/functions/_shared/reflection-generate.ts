@@ -1,21 +1,21 @@
 /**
  * Unified reflection generation for manual pause (holzen-reflect) and
  * automatic volatility (check-volatility). Single prompt surface + quality gate;
- * optional learning fields via tool-call when includeLearning is true (cron).
+ * optional grounding companion fields via tool-call when includeLearning is true.
  */
 
 import { containsSlop, containsCryptoLanguage } from "./quality.ts";
 
 /** Bump when the system prompt, tone rules, or quality gate changes. */
-export const REFLECTION_PROMPT_VERSION = "v4";
+export const REFLECTION_PROMPT_VERSION = "v5";
 
 export interface UnifiedReflectionResult {
   message: string;
   haiku: string | null;
-  learning_title: string | null;
-  learning_body: string | null;
-  learning_citation: string | null;
-  learning_url: string | null;
+  grounding_title: string | null;
+  grounding_body: string | null;
+  grounding_citation: string | null;
+  grounding_url: string | null;
 }
 
 export interface MoodHistoryEntry {
@@ -27,7 +27,7 @@ export interface MoodHistoryEntry {
 export interface GenerateUnifiedReflectionParams {
   context: string;
   apiKey: string;
-  /** false = JSON message+haiku (manual). true = tool call + learning fields (cron). */
+  /** false = JSON message+haiku (manual). true = tool call + grounding_* fields (legacy name: includeLearning). */
   includeLearning: boolean;
   tone?: string;
   style?: string;
@@ -318,10 +318,10 @@ function applyQualityGateAndHaikuTrim(
   return {
     message: msg,
     haiku,
-    learning_title: null,
-    learning_body: null,
-    learning_citation: null,
-    learning_url: null,
+    grounding_title: null,
+    grounding_body: null,
+    grounding_citation: null,
+    grounding_url: null,
   };
 }
 
@@ -411,12 +411,12 @@ Haiku rules:
 - MUST be original and unique — never repeat common phrases like "red screens" or "breath moves".${haikuDedup}
 ${learningBlock}
 ${langCode !== "en" ? `\n\nAll user-visible fields (message, haiku${
-  learningBlock ? ", learning title/body" : ""
+  learningBlock ? ", grounding title/body" : ""
 }) must be in ${langName}.` : ""}`;
 }
 
 /**
- * Generate reflection (+ optional learning) using one shared prompt stack.
+ * Generate reflection (+ optional grounding companion payload) using one shared prompt stack.
  */
 export async function generateUnifiedReflection(
   params: GenerateUnifiedReflectionParams,
@@ -452,7 +452,7 @@ export async function generateUnifiedReflection(
 
   const learningBlock = includeLearning
     ? `
-No education, philosophy, narrative, or historical reference in the main reflection message — those belong in the learning fields below.
+No education, philosophy, narrative, or historical reference in the main reflection message — those belong in the grounding companion fields below.
 
 Learning input rules (for the function arguments):
 - Title: a short, factual headline (5-10 words).
@@ -464,7 +464,7 @@ Learning input rules (for the function arguments):
 
   const langInstruction = langCode !== "en"
     ? includeLearning
-      ? `CRITICAL LANGUAGE REQUIREMENT: You MUST write ALL output (reflection message, haiku, learning title, learning body) in ${langName}. Do not use English for any generated text.\n\n`
+      ? `CRITICAL LANGUAGE REQUIREMENT: You MUST write ALL output (reflection message, haiku, grounding title, grounding body) in ${langName}. Do not use English for any generated text.\n\n`
       : `CRITICAL LANGUAGE REQUIREMENT: You MUST write ALL output — message and haiku — in ${langName}. Every single field must be in ${langName}. Do NOT use English for any generated text. This is non-negotiable.\n\n`
     : "";
 
@@ -692,24 +692,24 @@ async function generateWithToolCall(opts: {
               type: "function",
               function: {
                 name: "generate_reflection",
-                description: "Generate a reflection message with haiku and learning companions.",
+                description: "Generate a reflection message with haiku and grounding companion fields.",
                 parameters: {
                   type: "object",
                   properties: {
                     message: { type: "string", description: "The core reflection message (1-3 sentences)." },
                     haiku: { type: "string", description: "A haiku (3 lines, 5-7-5 syllables)." },
-                    learning_title: { type: "string", description: "Short factual headline." },
-                    learning_body: { type: "string", description: "1-2 sentences factual context." },
-                    learning_citation: { type: "string", description: "Source reference." },
-                    learning_url: { type: "string", description: "URL to reputable source." },
+                    grounding_title: { type: "string", description: "Short factual headline." },
+                    grounding_body: { type: "string", description: "1-2 sentences factual context." },
+                    grounding_citation: { type: "string", description: "Source reference." },
+                    grounding_url: { type: "string", description: "URL to reputable source." },
                   },
                   required: [
                     "message",
                     "haiku",
-                    "learning_title",
-                    "learning_body",
-                    "learning_citation",
-                    "learning_url",
+                    "grounding_title",
+                    "grounding_body",
+                    "grounding_citation",
+                    "grounding_url",
                   ],
                   additionalProperties: false,
                 },
@@ -755,9 +755,9 @@ async function generateWithToolCall(opts: {
       const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
       if (toolCall?.function?.arguments) {
         const args = JSON.parse(toolCall.function.arguments);
-        let learningUrl = args.learning_url || null;
-        if (learningUrl && args.learning_title) {
-          learningUrl = await validateUrl(learningUrl, `${args.learning_title} ${args.learning_citation || ""}`);
+        let groundingUrlValidated = args.grounding_url || null;
+        if (groundingUrlValidated && args.grounding_title) {
+          groundingUrlValidated = await validateUrl(groundingUrlValidated, `${args.grounding_title} ${args.grounding_citation || ""}`);
         }
 
         const gated = applyQualityGateAndHaikuTrim(
@@ -781,10 +781,10 @@ async function generateWithToolCall(opts: {
         return {
           result: {
             ...gated,
-            learning_title: args.learning_title || null,
-            learning_body: args.learning_body || null,
-            learning_citation: args.learning_citation || null,
-            learning_url: learningUrl,
+            grounding_title: args.grounding_title || null,
+            grounding_body: args.grounding_body || null,
+            grounding_citation: args.grounding_citation || null,
+            grounding_url: groundingUrlValidated,
           },
           lastStatus: 200,
         };

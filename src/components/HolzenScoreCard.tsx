@@ -18,7 +18,7 @@ interface ReflectionRow {
   zoom_out_read: boolean;
   history_read: boolean;
   signal_read: boolean;
-  learning_read: boolean;
+  grounding_read: boolean;
 }
 
 export function HolzenScoreCard() {
@@ -34,7 +34,7 @@ export function HolzenScoreCard() {
     Promise.all([
       supabase
         .from('reflections')
-        .select('created_at, mood, mood_after, outcome, context, breathing_completed, note, tags, is_favorite, zoom_out_read, history_read, signal_read, learning_read')
+        .select('created_at, mood, mood_after, outcome, context, breathing_completed, note, tags, is_favorite, zoom_out_read, history_read, signal_read, grounding_read')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(100),

@@ -14,7 +14,7 @@ interface ReflectionForSkills {
   zoom_out_read?: boolean;
   history_read?: boolean;
   signal_read?: boolean;
-  learning_read?: boolean;
+  grounding_read?: boolean;
 }
 
 const COMPOSURE: Record<string, number> = {
@@ -53,7 +53,7 @@ export function detectSkills(r: ReflectionForSkills): SkillType[] {
   }
 
   // Cognitive Reappraisal: engaged perspective tools
-  if (r.zoom_out_read || r.history_read || r.signal_read || r.learning_read) {
+  if (r.zoom_out_read || r.history_read || r.signal_read || r.grounding_read) {
     skills.push('reappraisal');
   }
 

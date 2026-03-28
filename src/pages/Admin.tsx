@@ -176,7 +176,7 @@ export default function Admin() {
       else if (s.outcome !== sessionOutcomeFilter) return false;
     }
     if (sessionCompanionFilter === 'missing') {
-      const allLoaded = !!s.signal_title && !!s.learning_title && !!s.history_insight_data && !!s.zoom_out_data && !!s.haiku;
+      const allLoaded = !!s.signal_title && !!s.grounding_title && !!s.history_insight_data && !!s.zoom_out_data && !!s.haiku;
       if (allLoaded) return false;
     }
     return true;
@@ -547,7 +547,7 @@ export default function Admin() {
                     <div className="flex items-center gap-1.5 flex-wrap pl-4">
                       {[
                         { loaded: !!s.signal_title, name: 'Signal' },
-                        { loaded: !!s.learning_title, name: 'Ground' },
+                        { loaded: !!s.grounding_title, name: 'Ground' },
                         { loaded: !!s.history_insight_data, name: 'History' },
                         { loaded: !!s.zoom_out_data, name: 'Zoom' },
                         { loaded: !!s.haiku, name: 'Haiku' },
@@ -575,10 +575,10 @@ export default function Admin() {
                             {signalSource ? <p className="text-muted-foreground/60">source · {signalSource}</p> : null}
                           </div>
                         )}
-                        {s.learning_title && (
+                        {s.grounding_title && (
                           <div className="space-y-0.5">
                             <p className="text-muted-foreground/40">Grounding</p>
-                            <p className="text-foreground/70">{s.learning_title}</p>
+                            <p className="text-foreground/70">{s.grounding_title}</p>
                           </div>
                         )}
                         {s.history_insight_data && (

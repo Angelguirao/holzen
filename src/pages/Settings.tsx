@@ -221,7 +221,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
           reflections: (reflections ?? []).map((r: any) => ({
             message: r.message, context: r.context, mood: r.mood, outcome: r.outcome,
             note: r.note, tags: r.tags, haiku: r.haiku, is_favorite: r.is_favorite,
-            learning_title: r.learning_title, learning_body: r.learning_body,
+            grounding_title: r.grounding_title, grounding_body: r.grounding_body,
             signal_title: r.signal_title, signal_body: r.signal_body, created_at: r.created_at,
           })),
         };

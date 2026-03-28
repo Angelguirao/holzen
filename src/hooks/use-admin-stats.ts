@@ -100,7 +100,7 @@ export interface SessionRow {
   outcome: string | null;
   signal_title: string | null;
   signal_source: string | null;
-  learning_title: string | null;
+  grounding_title: string | null;
   history_insight_data: any;
   zoom_out_data: any;
   haiku: string | null;
@@ -339,7 +339,7 @@ export function useAdminStats(enabled = true): AdminStats {
     // Recent sessions (last 20 reflections)
     const { data: sessionData } = await supabase
       .from('reflections')
-      .select('id, created_at, message, context, mood, outcome, signal_title, signal_source, learning_title, history_insight_data, zoom_out_data, haiku')
+      .select('id, created_at, message, context, mood, outcome, signal_title, signal_source, grounding_title, history_insight_data, zoom_out_data, haiku')
       .order('created_at', { ascending: false })
       .limit(20);
     setSessions((sessionData ?? []) as SessionRow[]);

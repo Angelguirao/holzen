@@ -104,10 +104,10 @@ serve(async (req) => {
     return jsonResponse({
       message: result.message,
       haiku: result.haiku || null,
-      learning_title: result.learning_title,
-      learning_body: result.learning_body,
-      learning_citation: result.learning_citation,
-      learning_url: result.learning_url,
+      grounding_title: result.grounding_title,
+      grounding_body: result.grounding_body,
+      grounding_citation: result.grounding_citation,
+      grounding_url: result.grounding_url,
     });
   } catch (e) {
     console.error("holzen-reflect error:", e);
