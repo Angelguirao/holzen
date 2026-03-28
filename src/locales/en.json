@@ -817,7 +817,17 @@
     "daysLater_other": "{{count}} days later",
     "letterNotSaved": "Letter not saved",
     "letterNotSavedDesc": "Something went wrong. Your words are not lost — try sealing again.",
-    "letterSealed": "Letter sealed"
+    "letterSealed": "Letter sealed",
+    "requirementsHint": "At least {{minChars}} characters and {{minWords}} words · max {{maxChars}} characters",
+    "validationTooShort": "Write a bit more — at least {{min}} characters.",
+    "validationTooLong": "Letter is too long (max {{max}} characters).",
+    "validationTooFewWords": "Use at least {{min}} words so your future self gets something to hold onto.",
+    "validationTooRepetitive": "Use more varied words — repetition alone doesn’t make a letter.",
+    "deleteDelivered": "Delete letter",
+    "deleteDeliveredTitle": "Delete this letter?",
+    "deleteDeliveredDesc": "This removes the opened letter from your account. You cannot undo this.",
+    "deleteDeliveredFailed": "Could not delete letter",
+    "deleted": "Letter removed"
   },
   "testimonial": {
     "title": "Enjoying Holzen?",

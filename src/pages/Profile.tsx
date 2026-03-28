@@ -206,14 +206,14 @@ const Profile = () => {
   }, [user]);
 
   const deleteLetter = useCallback(async (id: string) => {
-    try {
-      await supabase.from('future_letters').delete().eq('id', id);
-      setLetters((prev) => prev.filter((l) => l.id !== id));
-      toast('Letter deleted');
-    } catch {
-      toast('Failed to delete letter');
+    const { error } = await supabase.from('future_letters').delete().eq('id', id);
+    if (error) {
+      toast.error(t('letter.deleteDeliveredFailed'));
+      return;
     }
-  }, []);
+    setLetters((prev) => prev.filter((l) => l.id !== id));
+    toast(t('letter.deleted'));
+  }, [t]);
 
   const pendingLetters = useMemo(() => letters.filter((l) => !l.delivered), [letters]);
   const deliveredLetters = useMemo(() => letters.filter((l) => l.delivered), [letters]);

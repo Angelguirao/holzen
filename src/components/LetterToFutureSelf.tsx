@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
@@ -7,7 +7,24 @@ import { formatBtcPrice } from '@/lib/btc';
 import { Button } from '@/components/ui/button';
 import { WritingField } from '@/components/WritingField';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Mail, Send, Info } from 'lucide-react';
+import { Mail, Send, Info, Trash2 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
+import {
+  FUTURE_LETTER_MAX_CHARS,
+  FUTURE_LETTER_MIN_CHARS,
+  FUTURE_LETTER_MIN_WORDS,
+  validateFutureLetterBody,
+} from '@/lib/future-letter-validation';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
@@ -140,6 +157,7 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
     ? (calmTarget === 'crash' ? WRITING_PROMPTS.calm : WRITING_PROMPTS.crash)
     : (isCrash ? WRITING_PROMPTS.crash : WRITING_PROMPTS.surge);
   const randomPrompt = useMemo(() => prompts[Math.floor(Math.random() * prompts.length)], [isCrash, effectiveMode, calmTarget]);
+  const letterValidation = useMemo(() => validateFutureLetterBody(body), [body]);
 
   useEffect(() => {
     if (!user) return;
@@ -157,10 +175,37 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
       });
   }, [user]);
 
+  const handleDeleteDelivered = useCallback(
+    async (id: string) => {
+      const { error } = await supabase.from('future_letters').delete().eq('id', id);
+      if (error) {
+        toast.error(t('letter.deleteDeliveredFailed'));
+        return;
+      }
+      setLetters((prev) => prev.filter((l) => l.id !== id));
+      setDeliveredLetters((prev) => prev.filter((l) => l.id !== id));
+      toast(t('letter.deleted'));
+    },
+    [t],
+  );
+
   if (!loaded || !user) return null;
 
   const handleSend = async () => {
-    if (!body.trim() || !currentPrice || !canWrite) return;
+    if (!currentPrice || !canWrite) return;
+    const v = validateFutureLetterBody(body);
+    if (!v.valid) {
+      if (v.reason === 'too_short') {
+        toast.error(t('letter.validationTooShort', { min: FUTURE_LETTER_MIN_CHARS }));
+      } else if (v.reason === 'too_long') {
+        toast.error(t('letter.validationTooLong', { max: FUTURE_LETTER_MAX_CHARS }));
+      } else if (v.reason === 'too_few_words') {
+        toast.error(t('letter.validationTooFewWords', { min: FUTURE_LETTER_MIN_WORDS }));
+      } else {
+        toast.error(t('letter.validationTooRepetitive'));
+      }
+      return;
+    }
     setSending(true);
     setSealPhase('sealing');
 
@@ -376,11 +421,31 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
             value={body}
             onChange={setBody}
             placeholder={randomPrompt}
-            maxLength={500}
+            maxLength={FUTURE_LETTER_MAX_CHARS}
             minRows={3}
           />
+          <p className="text-[10px] text-muted-foreground/50 leading-relaxed">
+            {t('letter.requirementsHint', {
+              minChars: FUTURE_LETTER_MIN_CHARS,
+              minWords: FUTURE_LETTER_MIN_WORDS,
+              maxChars: FUTURE_LETTER_MAX_CHARS,
+            })}
+          </p>
+          {body.trim().length > 0 && !letterValidation.valid && (
+            <p className="text-[10px] text-destructive/80 leading-relaxed">
+              {letterValidation.reason === 'too_short' &&
+                t('letter.validationTooShort', { min: FUTURE_LETTER_MIN_CHARS })}
+              {letterValidation.reason === 'too_long' &&
+                t('letter.validationTooLong', { max: FUTURE_LETTER_MAX_CHARS })}
+              {letterValidation.reason === 'too_few_words' &&
+                t('letter.validationTooFewWords', { min: FUTURE_LETTER_MIN_WORDS })}
+              {letterValidation.reason === 'too_repetitive' && t('letter.validationTooRepetitive')}
+            </p>
+          )}
           <div className="flex items-center justify-between">
-            <p className="text-[10px] text-muted-foreground/40">{body.length}/500</p>
+            <p className="text-[10px] text-muted-foreground/40">
+              {body.length}/{FUTURE_LETTER_MAX_CHARS}
+            </p>
             <div className="flex items-center gap-2">
               <Popover>
                 <PopoverTrigger asChild>
@@ -400,7 +465,7 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
               </Popover>
               <Button
                 onClick={handleSend}
-                disabled={sending || !body.trim()}
+                disabled={sending || !letterValidation.valid}
                 size="sm"
                 className="font-mono text-xs gap-1.5"
               >
@@ -464,24 +529,56 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
                 transition={{ duration: 0.5 }}
                 className="rounded-md border border-primary/20 bg-primary/5 px-4 py-4 space-y-4"
               >
-                <div className="flex items-center gap-3">
-                  <div className="relative">
-                    <WaxSeal size={24} breaking />
-                    <SealCracks />
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-mono text-primary uppercase tracking-wider">
-                      {t('letter.opened')}
-                    </p>
-                    {l.delivered_at && (
-                      <p className="text-[9px] font-mono text-muted-foreground/40">
-                        {format(new Date(l.delivered_at), 'MMM d, yyyy')}
+                <div className="flex items-start justify-between gap-2">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="relative shrink-0">
+                      <WaxSeal size={24} breaking />
+                      <SealCracks />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-mono text-primary uppercase tracking-wider">
+                        {t('letter.opened')}
                       </p>
-                    )}
+                      {l.delivered_at && (
+                        <p className="text-[9px] font-mono text-muted-foreground/40">
+                          {format(new Date(l.delivered_at), 'MMM d, yyyy')}
+                        </p>
+                      )}
+                    </div>
                   </div>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <button
+                        type="button"
+                        className="shrink-0 rounded-md p-1.5 text-muted-foreground/50 hover:text-destructive hover:bg-destructive/10 transition-colors"
+                        aria-label={t('letter.deleteDelivered')}
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle className="font-mono text-sm">
+                          {t('letter.deleteDeliveredTitle')}
+                        </AlertDialogTitle>
+                        <AlertDialogDescription className="text-xs">
+                          {t('letter.deleteDeliveredDesc')}
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel className="font-mono text-xs">{t('common.cancel')}</AlertDialogCancel>
+                        <AlertDialogAction
+                          className="bg-destructive text-destructive-foreground hover:bg-destructive/90 font-mono text-xs"
+                          onClick={() => handleDeleteDelivered(l.id)}
+                        >
+                          {t('common.delete')}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
                 </div>
 
-                <p className="text-sm leading-relaxed pl-1">{l.body}</p>
+                <p className="text-sm leading-relaxed pl-1 whitespace-pre-wrap break-words">{l.body}</p>
 
                 <div className="space-y-2 pt-2 border-t border-primary/10">
                   <div className="grid grid-cols-2 gap-2">
