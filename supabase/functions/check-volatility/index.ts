@@ -488,10 +488,12 @@ serve(async (req) => {
             "apikey": anonKey,
           },
           body: JSON.stringify({
+            userId: profile.user_id,
             reflectionId,
             context: ctx,
             language: userLang,
             reflectionMessage: result.message,
+            severity: absChange,
             enableSignal: true,
             enableGrounding: true,
             enableHistory: true,

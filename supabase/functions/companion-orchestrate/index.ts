@@ -70,27 +70,56 @@ serve(async (req) => {
       });
     }
 
-    const { createClient } = await import("npm:@supabase/supabase-js@2.57.2");
-    const sbUrl = Deno.env.get("SUPABASE_URL") ?? "";
-    const sbAnon = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
-    const sbClient = createClient(sbUrl, sbAnon, {
-      global: { headers: { Authorization: authHeader } },
-    });
-    const { data: { user }, error: authError } = await sbClient.auth.getUser();
-    if (authError || !user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
+    const rawText = await req.text();
+    let body: Record<string, unknown>;
+    try {
+      body = JSON.parse(rawText || "{}") as Record<string, unknown>;
+    } catch {
+      return new Response(JSON.stringify({ error: "Invalid JSON body" }), {
+        status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    log("auth verified");
+
+    const { createClient } = await import("npm:@supabase/supabase-js@2.57.2");
+    const sbUrl = Deno.env.get("SUPABASE_URL") ?? "";
+    const sbAnon = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+    const token = authHeader.replace("Bearer ", "");
+
+    let userId: string;
+
+    if (token === serviceKey) {
+      const uid = body.userId;
+      if (typeof uid !== "string" || uid.length === 0) {
+        return new Response(
+          JSON.stringify({ error: "Service calls must include userId in the JSON body" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+      userId = uid;
+      log("auth verified (service role)");
+    } else {
+      const sbClient = createClient(sbUrl, sbAnon, {
+        global: { headers: { Authorization: authHeader } },
+      });
+      const { data: { user }, error: authError } = await sbClient.auth.getUser();
+      if (authError || !user) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      userId = user.id;
+      log("auth verified (user JWT)");
+    }
 
     const svcClient = createClient(sbUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "", {
       auth: { persistSession: false },
     });
 
     // ── Per-user rate limit check ──
-    const rateLimit = await checkRateLimit(svcClient, user.id, 60, 30);
+    const rateLimit = await checkRateLimit(svcClient, userId, 60, 30);
     if (!rateLimit.allowed) {
       log(`rate limited: ${rateLimit.reason}`);
       return new Response(JSON.stringify({ error: "Rate limited. Try again later." }), {
@@ -109,36 +138,34 @@ serve(async (req) => {
       });
     }
 
-    const body = await req.json();
     const {
       reflectionId,
       context,
       language = "en",
       reflectionMessage,
       mood,
-      // Companion-specific params (kept for legacy callers and signal/learn system)
       signalSources,
       recentSignalSources,
       recentSignalTitles,
       recentNudgeTopics,
       recentHistoryTitles,
       recentZoomOutTitles,
-      // Legacy enable flags (only used when intervention=false is explicitly set)
       enableSignal = false,
       enableGrounding = false,
       enableHistory = false,
       enableZoomOut = false,
-      // New: set to false to bypass intervention selection (for non-pause callers)
       useIntervention = true,
-    } = body;
+    } = body as Record<string, unknown>;
 
-    const moodHistory = body.moodHistory;
+    const moodHistory = body.moodHistory as
+      | Array<{ mood: string; outcome?: string | null }>
+      | undefined;
 
     // ── Determine session intent for coherent companion theming ──
     const intent = determineSessionIntent({
-      context: context ?? undefined,
-      mood: mood ?? undefined,
-      severity: body.severity,
+      context: (context as string | undefined) ?? undefined,
+      mood: (mood as string | undefined) ?? undefined,
+      severity: typeof body.severity === "number" ? body.severity : undefined,
       moodHistory,
     });
     log(`session intent: ${intent.theme}`, { theme: intent.theme, tone: intent.emotionalTone });
@@ -149,14 +176,14 @@ serve(async (req) => {
     let selection: InterventionSelection | null = null;
     if (useIntervention && reflectionId) {
       const rawSeverity = typeof body.severity === "number" ? body.severity : 0;
-      const direction = parseDirection(context);
+      const direction = parseDirection(context as string | undefined);
       const severity = bucketSeverity(rawSeverity);
       log(`selecting intervention: mood=${mood} severity=${severity} direction=${direction}`);
 
       selection = await selectIntervention({
-        userId: user.id,
-        reflectionId,
-        mood: mood ?? undefined,
+        userId,
+        reflectionId: reflectionId as string,
+        mood: (mood as string | undefined) ?? undefined,
         severity,
         direction,
         moodHistory,
@@ -165,7 +192,7 @@ serve(async (req) => {
       log(`intervention selected: mode=${selection.mode} primary=${selection.primary ?? "none"}`);
       // Track which intervention type is being served — critical for outcome analysis
       svcClient.from("analytics_events").insert({
-        user_id: user.id,
+        user_id: userId,
         event: "intervention_selected",
         metadata: {
           mode: selection.mode,
@@ -184,27 +211,48 @@ serve(async (req) => {
       question: null,
     };
 
+    if (selection?.primary === "mirror" && selection.mirrorData) {
+      interventionPayload.primary = { type: "mirror", data: selection.mirrorData };
+    }
+
+    const directionForQuestion = parseDirection(context as string | undefined);
+    const rawSeverityForQuestion = typeof body.severity === "number" ? body.severity : 0;
+    const severityBucketForQuestion = bucketSeverity(rawSeverityForQuestion);
+
+    const questionPromise =
+      selection?.mode === "question" && LOVABLE_API_KEY
+        ? generateQuestion({
+            context: (context as string) ?? "",
+            mood: (mood as string | undefined) ?? undefined,
+            direction: directionForQuestion,
+            severity: severityBucketForQuestion,
+            moodHistory,
+            apiKey: LOVABLE_API_KEY,
+            language: (language as string) || "en",
+          })
+        : Promise.resolve<string | null>(null);
+
     // ── Fire only the selected companion(s) ──
     const tasks: Record<string, Promise<CompanionResult>> = {};
 
     if (enableGrounding) {
       tasks.grounding = (async (): Promise<CompanionResult> => {
         const t = Date.now();
-        const result = await generateGrounding({ svcClient, context, language, recentTopics: recentNudgeTopics, userId: user.id, log, preferredBias: intent.groundingBias });
+        const result = await generateGrounding({ svcClient, context, language, recentTopics: recentNudgeTopics, userId, log, preferredBias: intent.groundingBias });
         return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t, promptVersion: GROUNDING_VERSION };
       })();
     }
     if (enableHistory) {
       tasks.history = (async (): Promise<CompanionResult> => {
         const t = Date.now();
-        const result = await generateHistory({ svcClient, context, language, mood, recentTitles: recentHistoryTitles, userId: user.id, log, preferredMood: intent.historyMood });
+        const result = await generateHistory({ svcClient, context, language, mood, recentTitles: recentHistoryTitles, userId, log, preferredMood: intent.historyMood });
         return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t, promptVersion: HISTORY_VERSION };
       })();
     }
     if (enableZoomOut) {
       tasks.zoomOut = (async (): Promise<CompanionResult> => {
         const t = Date.now();
-        const result = await generateZoomOut({ svcClient, context, language, reflectionMessage, mood, userId: user.id, recentTitles: recentZoomOutTitles, log, zoomOutAngle: intent.zoomOutAngle });
+        const result = await generateZoomOut({ svcClient, context, language, reflectionMessage, mood, userId, recentTitles: recentZoomOutTitles, log, zoomOutAngle: intent.zoomOutAngle });
         return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t, promptVersion: ZOOM_OUT_VERSION };
       })();
     }
@@ -212,7 +260,7 @@ serve(async (req) => {
     if (enableSignal) {
       tasks.signal = (async (): Promise<CompanionResult> => {
         const t = Date.now();
-        const result = await generateSignal({ svcClient, context, language, sources: signalSources, recentSignalSources, recentSignalTitles, userId: user.id, log, searchAngle: intent.signalAngle });
+        const result = await generateSignal({ svcClient, context, language, sources: signalSources, recentSignalSources, recentSignalTitles, userId, log, searchAngle: intent.signalAngle });
         return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t, promptVersion: SIGNAL_VERSION };
       })();
     }
@@ -258,8 +306,8 @@ serve(async (req) => {
         }
 
         serveInserts.push({
-          user_id: user.id,
-          reflection_id: reflectionId || null,
+          user_id: userId,
+          reflection_id: (reflectionId as string) || null,
           companion_type: companionTypeMap[key],
           serve_source: result.value.source,
           cache_entry_id: result.value.cacheId || null,
@@ -287,8 +335,8 @@ serve(async (req) => {
           error: result.reason?.message || "Unknown error",
         };
         serveInserts.push({
-          user_id: user.id,
-          reflection_id: reflectionId || null,
+          user_id: userId,
+          reflection_id: (reflectionId as string) || null,
           companion_type: companionTypeMap[key],
           serve_source: "empty",
           cache_entry_id: null,

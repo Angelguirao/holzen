@@ -1,6 +1,6 @@
 # Navigating the Holzen codebase
 
-This guide walks a new contributor through the repository in roughly the order you would discover it while running the app locally. It complements [README.md](../README.md) (setup and scripts) and [AGENTS.md](../AGENTS.md) (conventions for automation). Deep dives on companions and cron jobs live in [ai-companion-system.md](./ai-companion-system.md) and [cron-setup.md](./cron-setup.md).
+This guide walks a new contributor through the repository in roughly the order you would discover it while running the app locally. It complements [README.md](../README.md) (setup and scripts) and [AGENTS.md](../AGENTS.md) (conventions for automation). Deep dives on the AI pause pipeline and cron jobs live in [ai-powered-pause-system.md](./ai-powered-pause-system.md) and [cron-setup.md](./cron-setup.md).
 
 ---
 
@@ -181,7 +181,7 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 
 ## 16. Related documentation in `docs/`
 
-- **[ai-companion-system.md](./ai-companion-system.md)** — Volatility vs manual pause, reflection paths, `companion-orchestrate`, content types, known gaps (e.g. cron payload vs mood).
+- **[ai-powered-pause-system.md](./ai-powered-pause-system.md)** — Manual vs automatic pause, dual reflection paths, `companion-orchestrate`, interventions, generators, drift and ops notes.
 - **[cron-setup.md](./cron-setup.md)** — Scheduling edge functions (BTC refresh, feeds, digests, etc.).
 
 ---
@@ -200,7 +200,7 @@ These are observations from a structural pass — not a full security or QA audi
 
 5. **Vite Supabase fallbacks** (`FALLBACK_SUPABASE_*` in `vite.config.ts`) let the app boot without a `.env`; for a **fork or production**, you should rely on explicit env vars so you are not tied to the template project URL/key.
 
-6. **Companion architecture nuance** (documented in more detail in `ai-companion-system.md`): automatic volatility flows and manual pause use **different** reflection generation paths; extending behavior in one path may not affect the other until you unify them.
+6. **Dual reflection implementations:** automatic `check-volatility` and manual `holzen-reflect` use **separate** prompts and capabilities — see [ai-powered-pause-system.md](./ai-powered-pause-system.md) §3–4.
 
 7. **ESLint debt:** Expect a large baseline of issues; scope cleanups to files you change unless you run a dedicated lint initiative.
 
@@ -212,6 +212,6 @@ These are observations from a structural pass — not a full security or QA audi
 2. Trace **`/` → `Home` → `useHolzen` / `use-profile`** and one Supabase table read.
 3. Sign in, trigger **Pause** (`/pause`) and follow **`use-holzen`** → `holzen-reflect` then **`use-companion-data`** → `companion-orchestrate`.
 4. Skim **`supabase/migrations/`** for `profiles`, `reflections`, and RLS policy names you see in the app.
-5. Read **[ai-companion-system.md](./ai-companion-system.md)** if you touch companions or volatility.
+5. Read **[ai-powered-pause-system.md](./ai-powered-pause-system.md)** if you touch pause, companions, or volatility.
 
 Welcome aboard.
