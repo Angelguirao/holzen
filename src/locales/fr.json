@@ -239,7 +239,7 @@
     "zenMode": "Mode zen",
     "zenModeDesc": "Réduit l'écran d'accueil à la réflexion et l'exercice de respiration.",
     "enableZenMode": "Activer le mode zen",
-    "companionsDesc": "Ajouts optionnels affichés sous chaque réflexion.",
+    "companionsDesc": "Choisissez quelles cartes compagnons s'affichent sous votre réflexion. Désactiver une option ne masque que cette carte — la pause mise en avant en haut peut encore inclure un insight similaire si c'est pertinent.",
     "companionLabels": {
       "breathing": "Exercice de respiration",
       "haiku": "Haïku",
@@ -320,7 +320,7 @@
     "inhaleHoldExhale": "Inspirez… retenez… expirez…",
     "readAsHaiku": "Lire en haïku →",
     "learnFromHistory": "Apprendre de l'histoire →",
-    "toggleCompanions": "Activez ou désactivez les compagnons dans les Paramètres.",
+    "toggleCompanions": "Affichez ou masquez les cartes compagnons dans les Paramètres quand vous voulez.",
     "yourThreshold": "Votre seuil",
     "thresholdQuestion": "De combien Bitcoin doit-il bouger (hausse ou baisse) avant que vous souhaitiez faire une pause ?",
     "changeThresholdLater": "Vous pourrez définir des seuils séparés pour hausse et baisse dans les Paramètres"
