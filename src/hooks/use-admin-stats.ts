@@ -352,22 +352,30 @@ export function useAdminStats(enabled = true): AdminStats {
     setError(null);
 
     try {
-      const [cacheRes, costRes, failRes, feedRes] = await Promise.all([
-        supabase.from('v_companion_cache_hit_rate').select('*'),
-        supabase.from('v_companion_cost_per_day').select('*').order('day', { ascending: false }).limit(100),
-        supabase.from('v_generation_failure_rate').select('*'),
-        supabase.from('v_companion_feedback_ratio').select('*'),
-      ]);
+      // Use the admin-only RPC that checks is_admin() server-side
+      const { data: adminData, error: rpcError } = await supabase.rpc('get_admin_stats' as any);
 
-      if (cacheRes.error) throw new Error(`Cache hits: ${cacheRes.error.message}`);
-      if (costRes.error) throw new Error(`Costs: ${costRes.error.message}`);
-      if (failRes.error) throw new Error(`Failures: ${failRes.error.message}`);
-      if (feedRes.error) throw new Error(`Feedback: ${feedRes.error.message}`);
+      let cacheData: CacheHitRow[] = [];
+      let costData: CostRow[] = [];
+      let failData: FailureRow[] = [];
+      let feedData: FeedbackRow[] = [];
 
-      setCacheHits((cacheRes.data ?? []) as CacheHitRow[]);
-      setCosts((costRes.data ?? []) as CostRow[]);
-      setFailures((failRes.data ?? []) as FailureRow[]);
-      setFeedback((feedRes.data ?? []) as FeedbackRow[]);
+      if (rpcError) {
+        throw new Error(`Admin stats: ${rpcError.message}`);
+      }
+
+      if (adminData) {
+        const parsed = typeof adminData === 'string' ? JSON.parse(adminData) : adminData;
+        cacheData = (parsed.cache_hits ?? []) as CacheHitRow[];
+        costData = (parsed.costs ?? []) as CostRow[];
+        failData = (parsed.failures ?? []) as FailureRow[];
+        feedData = (parsed.feedback ?? []) as FeedbackRow[];
+      }
+
+      setCacheHits(cacheData);
+      setCosts(costData);
+      setFailures(failData);
+      setFeedback(feedData);
 
       // Fetch daily breakdown views (may return empty if migration hasn't run)
       const [servesRes, failDayRes, fbDayRes] = await Promise.all([
@@ -387,10 +395,10 @@ export function useAdminStats(enabled = true): AdminStats {
       // Compute period stats from view data
       computePeriodStats(
         period,
-        (costRes.data ?? []) as CostRow[],
-        (cacheRes.data ?? []) as CacheHitRow[],
-        (failRes.data ?? []) as FailureRow[],
-        (feedRes.data ?? []) as FeedbackRow[],
+        costData,
+        cacheData,
+        failData,
+        feedData,
         dailyServes,
         dailyFailures,
         dailyFeedback,
