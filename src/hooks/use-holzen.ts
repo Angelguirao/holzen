@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { fetchBtcData, type BtcPriceData } from '@/lib/btc';
+import { enrichPauseContextWithMarketData } from '@holzen-pause-context';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useProfile } from '@/hooks/use-profile';
@@ -92,16 +93,7 @@ export function useHolzen() {
       const cumDir = data.cumulativeDirection === 'down' ? 'down' : 'up';
       ctx += ` Over 7 days, it's ${cumDir} ${Math.abs(data.cumulativeChangePercent).toFixed(1)}%.`;
     }
-    if (data.fearGreed) {
-      ctx += ` Market sentiment: ${data.fearGreed.label} (${data.fearGreed.value}/100).`;
-    }
-    if (data.onChain) {
-      const oc = data.onChain;
-      if (oc.mempoolSize) ctx += ` Mempool: ${oc.mempoolSize.toLocaleString()} unconfirmed txs.`;
-      if (oc.fastestFee) ctx += ` Fees: ${oc.fastestFee} sat/vB (fastest), ${oc.medianFee ?? '?'} sat/vB (medium).`;
-      if (oc.hashrate) ctx += ` Hashrate: ${oc.hashrate}.`;
-      if (oc.blockHeight) ctx += ` Block height: ${oc.blockHeight.toLocaleString()}.`;
-    }
+    ctx = enrichPauseContextWithMarketData(ctx, data.fearGreed, data.onChain);
 
     if (silentMode) {
       const silentMsg = 'BTC moved.';

@@ -1,12 +1,21 @@
 /**
- * Helpers so automatic pause (check-volatility) matches manual pause inputs:
- * Fear & Greed, optional on-chain snippet (keep in sync with `src/lib/btc.ts` + `use-holzen.ts`),
- * signal sources, and DB-derived recency hints for companion-orchestrate.
+ * Cron-side fetches + orchestrator hints. Context suffix wording lives in `pause-context-suffix.ts`
+ * (shared with the client via `@holzen-pause-context`).
  */
 
-export interface FearGreedSnapshot {
-  value: number;
-  label: string;
+import type { PauseContextFearGreed, PauseContextOnChain } from "./pause-context-suffix.ts";
+import { enrichPauseContextWithMarketData } from "./pause-context-suffix.ts";
+
+export type FearGreedSnapshot = PauseContextFearGreed;
+export type OnChainSnapshot = PauseContextOnChain;
+
+/** Re-export for `check-volatility` — identical to `enrichPauseContextWithMarketData` in `use-holzen`. */
+export function enrichAutomaticPauseContext(
+  baseCtx: string,
+  fearGreed: FearGreedSnapshot | null,
+  onChain: OnChainSnapshot | null,
+): string {
+  return enrichPauseContextWithMarketData(baseCtx, fearGreed, onChain);
 }
 
 /** One shared Fear & Greed fetch per cron run (same index for all users that tick). */
@@ -25,22 +34,7 @@ export async function fetchFearGreedSnapshot(): Promise<FearGreedSnapshot | null
   }
 }
 
-/** Same suffix as `use-holzen.ts` / `fetchBtcData` context string. */
-export function appendFearGreedToContext(ctx: string, fg: FearGreedSnapshot | null): string {
-  if (!fg) return ctx;
-  return `${ctx} Market sentiment: ${fg.label} (${fg.value}/100).`;
-}
-
-/** Mirrors `OnChainData` / append logic in `use-holzen.ts` (generateMessage). */
-export interface OnChainSnapshot {
-  mempoolSize?: number;
-  fastestFee?: number;
-  medianFee?: number;
-  hashrate?: string;
-  blockHeight?: number;
-}
-
-/** One shared mempool.space round-trip per cron run (same as `fetchOnChainData` in `src/lib/btc.ts`). */
+/** One shared mempool.space round-trip per cron run (same parsing as `fetchOnChainData` in `src/lib/btc.ts`). */
 export async function fetchOnChainSnapshot(): Promise<OnChainSnapshot | null> {
   try {
     const [mempoolRes, feesRes, hashrateRes, tipRes] = await Promise.all([
@@ -65,29 +59,6 @@ export async function fetchOnChainSnapshot(): Promise<OnChainSnapshot | null> {
   } catch {
     return null;
   }
-}
-
-export function appendOnChainToContext(ctx: string, oc: OnChainSnapshot | null): string {
-  if (!oc) return ctx;
-  let out = ctx;
-  if (oc.mempoolSize != null) {
-    out += ` Mempool: ${oc.mempoolSize.toLocaleString()} unconfirmed txs.`;
-  }
-  if (oc.fastestFee != null) {
-    out += ` Fees: ${oc.fastestFee} sat/vB (fastest), ${oc.medianFee ?? "?"} sat/vB (medium).`;
-  }
-  if (oc.hashrate) out += ` Hashrate: ${oc.hashrate}.`;
-  if (oc.blockHeight != null) out += ` Block height: ${oc.blockHeight.toLocaleString()}.`;
-  return out;
-}
-
-/** Apply Fear & Greed + on-chain in the same order as manual `generateMessage`. */
-export function enrichAutomaticPauseContext(
-  baseCtx: string,
-  fearGreed: FearGreedSnapshot | null,
-  onChain: OnChainSnapshot | null,
-): string {
-  return appendOnChainToContext(appendFearGreedToContext(baseCtx, fearGreed), onChain);
 }
 
 export interface OrchestratorRecencyHints {
