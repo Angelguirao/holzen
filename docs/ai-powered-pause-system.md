@@ -37,7 +37,7 @@ This document describes **how Holzen turns Bitcoin volatility into a pause exper
 | **Mood** | Collected in UI; stored on `reflections.mood` | Not set on the new row; **reflection prompts** use **mood history** from the last 20 `reflections` with `mood`. **Orchestrator** receives **`mood`** = most recent prior mood (if any) plus **`moodHistory`** for session intent (same idea as the client path). |
 | **Style / extras** | Full: `style`, `customPrompt`, `motivations`, `mantra`, `groundingActivities`, client-supplied `recentHaikus` / `recentMessages` | Profile-backed: `reflection_style`, sanitized `custom_prompt`, `motivations`, `mantra`, `grounding_activities` (same **`sanitize.ts`** limits as **`holzen-reflect`**). **`recentMessages`** / **`recentHaikus`**: up to 5 each from the user’s last 20 reflection rows (dedup signal for the shared generator). |
 | **Reflection row `grounding_*`** | **Null** at insert (JSON path); Ground content comes from **`companion-orchestrate`** | **Null** at insert; **`companion_haiku`** still toggles haiku; Ground / Signal / etc. come **only** from orchestrate |
-| **Orchestrator body** | `use-companion-data`: prefs → **`needSignal` / `needGrounding` / `needHistory` / `needZoomOut`**, plus `mood`, `severity`, etc. | **`userId`, `severity` (24h abs %), `reflectionMessage`, `mood`, `moodHistory`**, and **`enableSignal` / `enableGrounding` / `enableHistory` / `enableZoomOut`** from profile columns **`companion_signal`**, **`companion_grounding`**, **`companion_history`**, **`companion_zoom_out`** (each defaults **true** if unset). Client pref key is still **`learning`** → maps to **`companion_grounding`**. |
+| **Orchestrator body** | `use-companion-data`: prefs → **`needSignal` / `needGrounding` / `needHistory` / `needZoomOut`**, plus `mood`, `severity`, etc. | **`userId`, `severity` (24h abs %), `reflectionMessage`, `mood`, `moodHistory`**, and **`enableSignal` / `enableGrounding` / `enableHistory` / `enableZoomOut`** from profile columns **`companion_signal`**, **`companion_grounding`**, **`companion_history`**, **`companion_zoom_out`** (each defaults **true** if unset). Client pref key is **`grounding`** → **`companion_grounding`** (legacy **`learning`** may still appear in old analytics or library `source_type` until migrated). |
 | **Notifications** | In-app session | Push, optional email, `pause_notifications` row |
 | **Orchestrator auth** | User JWT via `supabase.functions.invoke` | **Service role** `Authorization` + **`userId` in JSON body** |
 
@@ -149,6 +149,14 @@ Exact SQL lives in **[cron-setup.md](./cron-setup.md)**. Typical schedules docum
 
 ## 11. Known inconsistencies, drift, and fixes
 
+### UX vs server work vs rate limits
+
+**What the user sees** is one pause surface: reflection copy, an intervention (mirror / trap / pattern / question / default), and optional companion cards driven by preferences.
+
+**What the server does** is split across phases: (1) **reflection** — `holzen-reflect` or `check-volatility` calling `generateUnifiedReflection` (message + haiku when `includeLearning: false`); (2) **orchestration** — `companion-orchestrate` may run **multiple** model-backed generators in parallel (Signal, Grounding, History, Zoom Out, and question mode when selected), then dual-write results to `reflections` / `reflection_companions` / analytics.
+
+**Rate limits and budgets** do not line up 1:1 with that UX split. Per-user **throttling** (`checkRateLimit` in `_shared/ratelimit.ts`) keys off a fixed allowlist of **`analytics_events.event`** values centered on the reflection path; **orchestrator-only** events (e.g. `intervention_selected`) are outside that list, so a single “pause” from the user’s perspective can still trigger **many** generation attempts that are not all reflected in the same counters. **Daily cost** is capped separately via **`checkDailyBudget`** on summed **`generation_attempts.estimated_cost_usd`** (UTC day). When you change UX (what to show) or cost (how hard to hit the models), treat **reflection**, **orchestrator fan-out**, and **rate-limit event wiring** as three different levers — e.g. hiding a companion in the UI does not reduce server work unless **`enable*`** flags or generator gating in `companion-orchestrate` change too.
+
 ### Fixed alongside this doc (code)
 
 1. **`questionPromise` undefined** — `companion-orchestrate` referenced `questionPromise` without defining it, which would **throw** when question mode was selected. **Fixed** by defining `questionPromise` from `generateQuestion` when `selection.mode === "question"`.
@@ -165,7 +173,7 @@ These are **not bugs** in the parity work; they describe how the system behaves 
 
 - **What:** `generateUnifiedReflection` can be called with **`includeLearning: true`** (tool call + `grounding_*` fields in the model response).
 - **Reality:** Production uses **`includeLearning: false`** for both manual pause and cron. Ground / Signal content is written by **`companion-orchestrate`**, not the reflection step.
-- **Why it’s listed:** The code path still exists if you experiment; it is easy to confuse with **`reflections.grounding_*`** columns (stored Ground companion payload). UI/analytics may still use the string **`learning`** for companion keys (e.g. favorites) where that is not a DB column name.
+- **Why it’s listed:** The code path still exists if you experiment; it is easy to confuse with **`reflections.grounding_*`** columns (stored Ground companion payload). Prefer **`grounding`** in UI and i18n; **`learning`** remains a **legacy alias** in some maps (e.g. feedback → cache type, old library rows) and is not a Postgres column name for the Ground card.
 
 **Intervention vs “run every enabled generator”**
 
