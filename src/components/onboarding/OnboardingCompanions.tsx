@@ -12,7 +12,7 @@ interface Props {
 const COMPANIONS = [
   { id: 'breathing', icon: Wind, labelKey: 'onboarding.companions.breathing', descKey: 'onboarding.companions.breathingDesc' },
   { id: 'haiku', icon: Pen, labelKey: 'onboarding.companions.haiku', descKey: 'onboarding.companions.haikuDesc' },
-  { id: 'learning', icon: BookOpen, labelKey: 'onboarding.companions.learning', descKey: 'onboarding.companions.learningDesc' },
+  { id: 'grounding', icon: BookOpen, labelKey: 'onboarding.companions.grounding', descKey: 'onboarding.companions.groundingDesc' },
   { id: 'signal', icon: BookOpenText, labelKey: 'onboarding.companions.signal', descKey: 'onboarding.companions.signalDesc' },
   { id: 'zoomOut', icon: Eye, labelKey: 'onboarding.companions.zoomOut', descKey: 'onboarding.companions.zoomOutDesc' },
   { id: 'history', icon: History, labelKey: 'onboarding.companions.history', descKey: 'onboarding.companions.historyDesc' },
@@ -116,12 +116,12 @@ function CompanionPreview({ id }: { id: string }) {
           <HaikuDisplay haiku={t('onboardingSample.haiku')} />
         </div>
       );
-    case 'learning':
+    case 'grounding':
       return (
         <div className="rounded-md bg-muted/20 border border-border/30 p-3">
           <LearningInput
-            title={t('onboardingSample.learningTitle')}
-            body={t('onboardingSample.learningBody')}
+            title={t('onboardingSample.groundingTitle')}
+            body={t('onboardingSample.groundingBody')}
           />
         </div>
       );

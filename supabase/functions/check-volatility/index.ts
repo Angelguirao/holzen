@@ -1,6 +1,20 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 import webpush from "npm:web-push@3.6.7";
+import {
+  generateUnifiedReflection,
+  REFLECTION_PROMPT_VERSION,
+  type MoodHistoryEntry,
+} from "../_shared/reflection-generate.ts";
+import {
+  enrichAutomaticPauseContext,
+  fetchFearGreedSnapshot,
+  fetchOnChainSnapshot,
+  fetchGroundingSourcesForOrchestrate,
+  fetchSignalSourcesForOrchestrate,
+  recencyHintsFromReflectionRows,
+} from "../_shared/pause-cron-parity.ts";
+import { sanitizePromptInput, sanitizePromptArray } from "../_shared/sanitize.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -9,14 +23,6 @@ const corsHeaders = {
 };
 
 const DEFAULT_COOLDOWN_MS = 6 * 60 * 60 * 1000; // 6 hours fallback
-
-async function validateUrl(url: string, fallbackQuery: string): Promise<string> {
-  try {
-    const res = await fetch(url, { method: 'HEAD', redirect: 'follow' });
-    if (res.ok || res.status === 405 || res.status === 403) return url;
-  } catch { /* broken */ }
-  return `https://www.google.com/search?q=${encodeURIComponent(fallbackQuery)}`;
-}
 
 async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise<Response> {
   for (let i = 0; i < retries; i++) {
@@ -29,10 +35,24 @@ async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise
   throw new Error("Failed to fetch BTC data after retries");
 }
 
-async function fetchBtcVolatility(): Promise<{ changePercent: number; direction: string; cumulativeChangePercent: number; cumulativeDirection: string }> {
+/** CoinGecko quote currency — matches `use-holzen` / `fetchBtcData(currency)` (`profiles.hold_goal_currency`). */
+function normalizeHoldGoalCurrency(raw: unknown): string {
+  if (typeof raw === "string" && raw.trim().length >= 3) return raw.trim().toLowerCase();
+  return "usd";
+}
+
+type BtcVolatilityMetrics = {
+  changePercent: number;
+  direction: string;
+  cumulativeChangePercent: number;
+  cumulativeDirection: string;
+};
+
+async function fetchBtcVolatilityForCurrency(vsCurrency: string): Promise<BtcVolatilityMetrics> {
+  const cur = vsCurrency.toLowerCase();
   const [res1d, res7d] = await Promise.all([
-    fetchWithRetry("https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=1"),
-    fetchWithRetry("https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=usd&days=7"),
+    fetchWithRetry(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=${cur}&days=1`),
+    fetchWithRetry(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart?vs_currency=${cur}&days=7`),
   ]);
 
   const data1d = await res1d.json();
@@ -57,131 +77,6 @@ async function fetchBtcVolatility(): Promise<{ changePercent: number; direction:
     cumulativeChangePercent,
     cumulativeDirection: cumulativeChangePercent >= 0 ? "up" : "down",
   };
-}
-
-interface ReflectionResult {
-  message: string;
-  haiku: string | null;
-  learning_title: string | null;
-  learning_body: string | null;
-  learning_citation: string | null;
-  learning_url: string | null;
-}
-
-async function generateReflection(context: string, apiKey: string, tone = "stoic", language = "en"): Promise<ReflectionResult | null> {
-  const TONE_INSTRUCTIONS: Record<string, string> = {
-    stoic: "Write in a calm, stoic tone. Brief and grounded. Like Marcus Aurelius observing the market.",
-    zen: "Write in a gentle zen tone. Spacious, almost meditative. Use natural metaphors.",
-    poetic: "Write in a poetic, literary tone. Evocative and beautiful. Use imagery and rhythm.",
-    blunt: "Write in a direct, blunt tone. No fluff. Say it plainly in as few words as possible.",
-  };
-
-  const toneInstruction = TONE_INSTRUCTIONS[tone] || TONE_INSTRUCTIONS.stoic;
-
-  const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
-  const langName = LANG_NAMES[language] || "English";
-  const langInstruction = language !== "en" ? `CRITICAL LANGUAGE REQUIREMENT: You MUST write ALL output (reflection message, haiku, learning title, learning body) in ${langName}. Do not use English for any generated text.\n\n` : "";
-
-  const systemPrompt = `${langInstruction}You generate a reflection with optional companions in response to Bitcoin volatility.
-
-You MUST respond by calling the "generate_reflection" function. Do not respond with plain text.
-
-Tone: ${toneInstruction}
-
-The context may include a Fear & Greed Index score (0-100). Use this to subtly adjust your reflection:
-- Extreme Fear (0-24): The crowd is panicking. Reflect on what happens when fear spreads.
-- Fear (25-44): Unease is building. A good moment to notice what's driving decisions.
-- Neutral (45-55): The market is quiet. Sometimes stillness is its own signal.
-- Greed (56-75): Optimism is growing. Worth noticing if excitement is clouding judgment.
-- Extreme Greed (76-100): Euphoria is everywhere. The hardest time to stay grounded.
-Do NOT name the index or its score directly. Weave the sentiment naturally into the reflection.
-
-Reflection rules:
-- Exactly 1-3 sentences. ${tone === 'blunt' ? '1 sentence preferred.' : ''}
-- Encourage pause and reflection. Preserve agency: never say "you should".
-- No reassurance, excitement, urgency, trading advice, lists, disclaimers.
-- No exclamation marks, emojis, motivational language, reward language.
-- Just one quiet prompt for reflection.
-
-Haiku rules:
-- Exactly 3 lines separated by newlines.
-- Traditional 5-7-5 syllable structure.
-- Captures the essence of the moment. Match the chosen tone.
-- No trading advice or price predictions.
-
-Learning input rules:
-- Title: a short, factual headline (5-10 words).
-- Body: 1-2 sentences about a historical Bitcoin event, market pattern, or behavioral finance insight relevant to the current context. Factual, educational, no advice.
-- Citation: formatted source reference (e.g. "CoinDesk, 2020" or "Kahneman & Tversky, 1979")
-- URL: a real, working URL to a reputable source documenting the event or research referenced.`;
-
-  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: "google/gemini-3-flash-preview",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: context },
-      ],
-      tools: [
-        {
-          type: "function",
-          function: {
-            name: "generate_reflection",
-            description: "Generate a reflection message with optional haiku and learning companions.",
-            parameters: {
-              type: "object",
-              properties: {
-                message: { type: "string", description: "The core reflection message (1-3 sentences)." },
-                haiku: { type: "string", description: "A haiku (3 lines, 5-7-5 syllables). Lines separated by newlines." },
-                learning_title: { type: "string", description: "Short factual headline for a historical/educational insight." },
-                learning_body: { type: "string", description: "1-2 sentences of factual, educational context." },
-                learning_citation: { type: "string", description: "Formatted source reference (e.g. 'CoinDesk, 2020')." },
-                learning_url: { type: "string", description: "URL to a reputable source for the referenced event or research." },
-              },
-              required: ["message", "haiku", "learning_title", "learning_body", "learning_citation", "learning_url"],
-              additionalProperties: false,
-            },
-          },
-        },
-      ],
-      tool_choice: { type: "function", function: { name: "generate_reflection" } },
-    }),
-  });
-
-  if (!response.ok) {
-    const text = await response.text();
-    console.error("AI gateway error:", response.status, text);
-    return null;
-  }
-
-  const data = await response.json();
-
-  const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
-  if (toolCall?.function?.arguments) {
-    const args = JSON.parse(toolCall.function.arguments);
-    let learningUrl = args.learning_url || null;
-    if (learningUrl && args.learning_title) {
-      learningUrl = await validateUrl(learningUrl, `${args.learning_title} ${args.learning_citation || ''}`);
-    }
-    return {
-      message: args.message,
-      haiku: args.haiku || null,
-      learning_title: args.learning_title || null,
-      learning_body: args.learning_body || null,
-      learning_citation: args.learning_citation || null,
-      learning_url: learningUrl,
-    };
-  }
-
-  // Fallback to plain content
-  const message = data.choices?.[0]?.message?.content?.trim();
-  if (!message) return null;
-  return { message, haiku: null, learning_title: null, learning_body: null, learning_citation: null, learning_url: null };
 }
 
 async function sendNotificationEmail(
@@ -263,24 +158,63 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
-    // 1. Fetch current BTC volatility
-    const btc = await fetchBtcVolatility();
-    const absChange = Math.abs(btc.changePercent);
-    const absCumChange = Math.abs(btc.cumulativeChangePercent);
-    console.log(`[CHECK-VOLATILITY] BTC 24h: ${btc.changePercent.toFixed(2)}%, 7d: ${btc.cumulativeChangePercent.toFixed(2)}%`);
-
-    // 2. Get all profiles - we need to check both thresholds
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
-      .select("user_id, threshold, threshold_down, cumulative_threshold, email_notifications, last_trigger_at, cooldown_hours, reflection_tone, companion_haiku, companion_learning, quiet_hours_start, quiet_hours_end, timezone, language, snoozed_until");
+      .select(
+        "user_id, threshold, threshold_down, cumulative_threshold, hold_goal_currency, email_notifications, last_trigger_at, cooldown_hours, reflection_tone, companion_haiku, companion_grounding, companion_signal, companion_zoom_out, companion_history, quiet_hours_start, quiet_hours_end, timezone, language, snoozed_until, custom_prompt, reflection_style, motivations, mantra, grounding_activities",
+      );
 
     if (profilesError) throw profilesError;
     if (!profiles || profiles.length === 0) {
-      console.log("[CHECK-VOLATILITY] No users exceeded threshold");
+      console.log("[CHECK-VOLATILITY] No profiles");
       return new Response(JSON.stringify({ triggered: 0 }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+
+    const currencyCodes = new Set<string>();
+    for (const p of profiles) {
+      currencyCodes.add(normalizeHoldGoalCurrency((p as { hold_goal_currency?: string }).hold_goal_currency));
+    }
+    if (!currencyCodes.has("usd")) currencyCodes.add("usd");
+
+    const [btcEntries, fearGreedSnapshot, onChainSnapshot] = await Promise.all([
+      Promise.all(
+        [...currencyCodes].map(async (c) => {
+          try {
+            const m = await fetchBtcVolatilityForCurrency(c);
+            return [c, m] as const;
+          } catch (e) {
+            console.error(`[CHECK-VOLATILITY] CoinGecko failed for vs_currency=${c}`, e);
+            return [c, null] as const;
+          }
+        }),
+      ),
+      fetchFearGreedSnapshot(),
+      fetchOnChainSnapshot(),
+    ]);
+
+    const btcByCur = new Map<string, BtcVolatilityMetrics>();
+    for (const [c, m] of btcEntries) {
+      if (m) btcByCur.set(c, m);
+    }
+    if (!btcByCur.has("usd")) {
+      console.error("[CHECK-VOLATILITY] Could not load USD BTC metrics");
+      return new Response(JSON.stringify({ error: "btc_fetch_failed" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    function metricsForProfile(p: { hold_goal_currency?: string | null }): BtcVolatilityMetrics {
+      const c = normalizeHoldGoalCurrency(p.hold_goal_currency);
+      return btcByCur.get(c) ?? btcByCur.get("usd")!;
+    }
+
+    const usdPeek = btcByCur.get("usd")!;
+    console.log(
+      `[CHECK-VOLATILITY] BTC 24h (USD sample): ${usdPeek.changePercent.toFixed(2)}%, 7d: ${usdPeek.cumulativeChangePercent.toFixed(2)}% (${btcByCur.size} quote currency fetch(es)); F&G + on-chain cached for run`,
+    );
 
     // Helper: get user's local hour
     function getUserLocalHour(timezone: string): number {
@@ -350,8 +284,10 @@ serve(async (req) => {
     }
 
     const eligible = profiles.filter((p) => {
-      // Use direction-aware thresholds: threshold for up moves, threshold_down for down moves
-      const effectiveThreshold = btc.direction === "down"
+      const b = metricsForProfile(p as { hold_goal_currency?: string | null });
+      const absChange = Math.abs(b.changePercent);
+      const absCumChange = Math.abs(b.cumulativeChangePercent);
+      const effectiveThreshold = b.direction === "down"
         ? ((p as any).threshold_down ?? p.threshold ?? 5)
         : (p.threshold ?? 5);
       const dailyTriggered = absChange >= effectiveThreshold;
@@ -431,27 +367,123 @@ serve(async (req) => {
         }
       }
 
-      const dir = btc.direction === "down" ? "down" : "up";
+      const userBtc = metricsForProfile(profile as { hold_goal_currency?: string | null });
+      const absChange = Math.abs(userBtc.changePercent);
+      const absCumChange = Math.abs(userBtc.cumulativeChangePercent);
+      const dir = userBtc.direction === "down" ? "down" : "up";
       const pct = absChange.toFixed(1);
       let ctx = `BTC is ${dir} ${pct}% in the last 24 hours.`;
       if (absCumChange >= ((profile as any).cumulative_threshold ?? 15)) {
-        const cumDir = btc.cumulativeDirection === "down" ? "down" : "up";
+        const cumDir = userBtc.cumulativeDirection === "down" ? "down" : "up";
         ctx += ` Over 7 days, it's ${cumDir} ${absCumChange.toFixed(1)}%.`;
       }
+      ctx = enrichAutomaticPauseContext(ctx, fearGreedSnapshot, onChainSnapshot);
 
-      const tone = (profile as any).reflection_tone || "stoic";
-      const userLang = (profile as any).language || "en";
-      const result = await generateReflection(ctx, LOVABLE_API_KEY, tone, userLang);
-      if (!result) {
+      const p = profile as Record<string, unknown>;
+      const tone = (p.reflection_tone as string) || "stoic";
+      const userLang = (p.language as string) || "en";
+      const style =
+        typeof p.reflection_style === "string" && p.reflection_style.length > 0
+          ? p.reflection_style
+          : "standard";
+      const customPrompt = sanitizePromptInput(p.custom_prompt as string | null | undefined, 500);
+      const motivations = sanitizePromptArray(p.motivations as string[] | null | undefined, 10, 100);
+      const mantra = sanitizePromptInput(p.mantra as string | null | undefined, 200);
+      const groundingActivities = sanitizePromptArray(
+        p.grounding_activities as string[] | null | undefined,
+        10,
+        100,
+      );
+
+      let moodHistory: MoodHistoryEntry[] | undefined;
+      let recentMessages: string[] | undefined;
+      let recentHaikus: string[] | undefined;
+      let rowsForRecency: Parameters<typeof recencyHintsFromReflectionRows>[0] = [];
+      try {
+        const { data: recentRows } = await supabase
+          .from("reflections")
+          .select(
+            "mood, outcome, created_at, message, haiku, signal_title, signal_source, grounding_title, grounding_url, zoom_out_data, history_insight_data",
+          )
+          .eq("user_id", profile.user_id)
+          .order("created_at", { ascending: false })
+          .limit(20);
+        if (recentRows?.length) {
+          rowsForRecency = recentRows as Parameters<typeof recencyHintsFromReflectionRows>[0];
+          const rows = recentRows as Array<{
+            mood?: string | null;
+            outcome?: string | null;
+            created_at?: string;
+            message?: string | null;
+            haiku?: string | null;
+          }>;
+          const withMood = rows.filter((r) => r.mood);
+          if (withMood.length > 0) {
+            moodHistory = withMood.map((r) => ({
+              mood: r.mood as string,
+              outcome: r.outcome ?? null,
+              created_at: r.created_at,
+            }));
+          }
+          const msgs = rows.filter((r) => r.message).map((r) => r.message as string);
+          if (msgs.length > 0) recentMessages = msgs.slice(0, 5);
+          const haikus = rows.filter((r) => r.haiku).map((r) => r.haiku as string);
+          if (haikus.length > 0) recentHaikus = haikus.slice(0, 5);
+        }
+      } catch { /* non-fatal */ }
+
+      const recency = recencyHintsFromReflectionRows(rowsForRecency);
+      const lastReportedMood = moodHistory?.[0]?.mood;
+
+      // Parity with holzen-reflect: same allowlisted event before reflection AI so per-user
+      // throttle (companion-orchestrate checkRateLimit) sees a consistent signal for manual vs cron.
+      try {
+        await supabase.from("analytics_events").insert({
+          user_id: profile.user_id,
+          event: "pause_ai_call",
+        });
+      } catch {
+        /* tracking failure is non-fatal */
+      }
+
+      const { result } = await generateUnifiedReflection({
+        context: ctx,
+        apiKey: LOVABLE_API_KEY,
+        tone,
+        style,
+        language: userLang,
+        currency: typeof p.hold_goal_currency === "string" && p.hold_goal_currency.trim()
+          ? p.hold_goal_currency.trim().toUpperCase()
+          : "USD",
+        severity: absChange,
+        moodHistory,
+        recentHaikus,
+        recentMessages,
+        customPrompt: customPrompt || undefined,
+        motivations: motivations.length > 0 ? motivations : undefined,
+        mantra: mantra || undefined,
+        groundingActivities: groundingActivities.length > 0 ? groundingActivities : undefined,
+      });
+      if (!result?.message) {
         console.log(`[CHECK-VOLATILITY] Failed to generate reflection for ${profile.user_id}`);
         return false;
       }
 
+      supabase.from("analytics_events").insert({
+        user_id: profile.user_id,
+        event: "reflection_generated",
+        metadata: {
+          tone,
+          style,
+          message_length: result.message.length,
+          has_haiku: !!result.haiku,
+          prompt_version: REFLECTION_PROMPT_VERSION,
+          source: "check-volatility",
+        },
+      }).then(() => {});
+
       const haiku = (profile as any).companion_haiku ? result.haiku : null;
-      const learningTitle = (profile as any).companion_learning ? result.learning_title : null;
-      const learningBody = (profile as any).companion_learning ? result.learning_body : null;
-      const learningCitation = (profile as any).companion_learning ? result.learning_citation : null;
-      const learningUrl = (profile as any).companion_learning ? result.learning_url : null;
+      // grounding_* on the row are filled by companion-orchestrate (Grounding, etc.), not reflection AI
 
       const { data: insertedReflection } = await supabase
         .from("reflections")
@@ -460,10 +492,11 @@ serve(async (req) => {
           message: result.message,
           context: ctx,
           haiku,
-          learning_title: learningTitle,
-          learning_body: learningBody,
-          learning_citation: learningCitation,
-          learning_url: learningUrl,
+          grounding_title: null,
+          grounding_body: null,
+          grounding_citation: null,
+          grounding_url: null,
+          ...(lastReportedMood ? { mood: lastReportedMood } : {}),
         })
         .select("id")
         .single();
@@ -476,7 +509,19 @@ serve(async (req) => {
 
       if (insertedReflection?.id) {
         const reflectionId = insertedReflection.id;
-        // Fire-and-forget orchestrator
+        const enableSignal = (p.companion_signal as boolean | undefined) ?? true;
+        const enableGrounding = (p.companion_grounding as boolean | undefined) ?? true;
+        const enableHistory = (p.companion_history as boolean | undefined) ?? true;
+        const enableZoomOut = (p.companion_zoom_out as boolean | undefined) ?? true;
+
+        const signalSources = enableSignal
+          ? await fetchSignalSourcesForOrchestrate(supabase, profile.user_id)
+          : undefined;
+        const groundingSources = enableGrounding
+          ? await fetchGroundingSourcesForOrchestrate(supabase, profile.user_id)
+          : undefined;
+
+        // Fire-and-forget orchestrator — same payload shape as manual pause (use-companion-data + holzen-reflect parity).
         fetch(`${supabaseUrl}/functions/v1/companion-orchestrate`, {
           method: "POST",
           headers: {
@@ -485,14 +530,27 @@ serve(async (req) => {
             "apikey": anonKey,
           },
           body: JSON.stringify({
+            userId: profile.user_id,
             reflectionId,
             context: ctx,
             language: userLang,
             reflectionMessage: result.message,
-            enableSignal: true,
-            enableGrounding: true,
-            enableHistory: true,
-            enableZoomOut: true,
+            severity: absChange,
+            mood: lastReportedMood ?? null,
+            moodHistory: moodHistory ?? [],
+            signalSources,
+            groundingSources,
+            recentSignalSources: recency.recentSignalSources,
+            recentSignalTitles: recency.recentSignalTitles,
+            recentNudgeTopics: recency.recentNudgeTopics,
+            recentGroundingSources: recency.recentGroundingSources,
+            recentHistoryTitles: recency.recentHistoryTitles,
+            recentZoomOutTitles: recency.recentZoomOutTitles,
+            enableSignal,
+            enableGrounding,
+            enableHistory,
+            enableZoomOut,
+            useIntervention: true,
           }),
         }).then((res) => {
           if (!res.ok) res.text().then((t) => console.error(`[CHECK-VOLATILITY] Orchestrator failed (${res.status}): ${t}`));
@@ -502,7 +560,7 @@ serve(async (req) => {
 
       await profileUpdate;
 
-      // Email + push in parallel
+      // Email + push + in-app bell notification in parallel
       await Promise.all([
         // Email
         (async () => {
@@ -540,6 +598,14 @@ serve(async (req) => {
             }
           }));
         })(),
+        // In-app bell record
+        supabase.from("pause_notifications").insert({
+          user_id: profile.user_id,
+          reflection_id: insertedReflection?.id ?? null,
+          message: result.message,
+          context: ctx,
+          severity: absChange >= 10 ? "high" : absChange >= 5 ? "moderate" : "mild",
+        }),
       ]);
 
       return true;
@@ -548,9 +614,12 @@ serve(async (req) => {
     const triggered = results.filter(Boolean).length;
     console.log(`[CHECK-VOLATILITY] Triggered ${triggered} notifications`);
 
-    return new Response(JSON.stringify({ triggered, btcChange: btc.changePercent }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({ triggered, btcChangeUsd: usdPeek.changePercent, quoteCurrenciesLoaded: btcByCur.size }),
+      {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      },
+    );
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     console.error("[CHECK-VOLATILITY] Error:", msg);

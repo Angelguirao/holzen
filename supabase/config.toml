@@ -11,7 +11,11 @@ project_id = "edgbwdecaoottowliimu"
     verify_jwt = false
   [functions.customer-portal]
     verify_jwt = false
+  [functions.holzen-number]
+    verify_jwt = false
   [functions.holzen-reflect]
+    verify_jwt = false
+  [functions.reflection-insights]
     verify_jwt = false
   [functions.register-push]
     verify_jwt = false
@@ -23,19 +27,15 @@ project_id = "edgbwdecaoottowliimu"
     verify_jwt = false
   [functions.deliver-letters]
     verify_jwt = false
-  [functions.ground-nudge]
-    verify_jwt = false
   [functions.personalized-nudge]
     verify_jwt = false
   [functions.monthly-report]
     verify_jwt = false
   [functions.record-referral]
     verify_jwt = false
+  [functions.send-feedback]
+    verify_jwt = false
   [functions.generate-wallpaper]
-    verify_jwt = false
-  [functions.zoom-out-companion]
-    verify_jwt = false
-  [functions.historical-insight]
     verify_jwt = false
   [functions.journal-prompt]
     verify_jwt = false
@@ -44,6 +44,10 @@ project_id = "edgbwdecaoottowliimu"
   [functions.pregenerate-companions]
     verify_jwt = false
   [functions.refresh-btc-prices]
+    verify_jwt = false
+  [functions.suggest-grounding]
+    verify_jwt = false
+  [functions.suggest-ritual]
     verify_jwt = false
   [functions.fetch-source-feeds]
     verify_jwt = false

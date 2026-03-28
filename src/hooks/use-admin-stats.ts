@@ -30,6 +30,7 @@ interface FailureRow {
   errors: number | null;
   timeouts: number | null;
   quality_gate_failures: number | null;
+  rate_limited: number | null;
   failure_pct: number | null;
   avg_latency_ms: number | null;
   p95_latency_ms: number | null;
@@ -98,7 +99,8 @@ export interface SessionRow {
   mood: string | null;
   outcome: string | null;
   signal_title: string | null;
-  learning_title: string | null;
+  signal_source: string | null;
+  grounding_title: string | null;
   history_insight_data: any;
   zoom_out_data: any;
   haiku: string | null;
@@ -165,6 +167,11 @@ function periodToMs(period: TimePeriod): number | null {
 }
 
 function periodStart(period: TimePeriod): string | null {
+  if (period === 'today') {
+    // Today means just today's date (not last 24h)
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
+  }
   const ms = periodToMs(period);
   if (!ms) return null;
   return new Date(Date.now() - ms).toISOString();
@@ -332,19 +339,21 @@ export function useAdminStats(enabled = true): AdminStats {
     // Recent sessions (last 20 reflections)
     const { data: sessionData } = await supabase
       .from('reflections')
-      .select('id, created_at, message, context, mood, outcome, signal_title, learning_title, history_insight_data, zoom_out_data, haiku')
+      .select('id, created_at, message, context, mood, outcome, signal_title, signal_source, grounding_title, history_insight_data, zoom_out_data, haiku')
       .order('created_at', { ascending: false })
       .limit(20);
     setSessions((sessionData ?? []) as SessionRow[]);
 
-    // Content library entries
-    const { data: libraryData } = await supabase
-      .from('content_library')
-      .select('id, type, title, author, summary, url, tags, companion_types, quality_score, active, created_at')
-      .eq('active', true)
-      .order('created_at', { ascending: false })
-      .limit(100);
-    setLibraryEntries((libraryData ?? []) as LibraryEntryRow[]);
+    // Content library entries (table may not exist before migration — fail gracefully)
+    try {
+      const { data: libraryData, error: libErr } = await supabase
+        .from('content_library')
+        .select('id, type, title, author, summary, url, tags, companion_types, quality_score, active, created_at')
+        .eq('active', true)
+        .order('created_at', { ascending: false })
+        .limit(100);
+      if (!libErr) setLibraryEntries((libraryData ?? []) as LibraryEntryRow[]);
+    } catch { /* table may not exist yet */ }
   }, []);
 
   const fetchAll = useCallback(async () => {

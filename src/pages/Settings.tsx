@@ -137,9 +137,9 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
       .select('version')
       .order('created_at', { ascending: false })
       .limit(1)
-      .single()
+      .maybeSingle()
       .then(({ data }) => {
-        if (data) {
+        if (data?.version) {
           const v = data.version;
           setLatestVersion(v);
           const lastSeen = localStorage.getItem(LAST_SEEN_VERSION_KEY);
@@ -221,7 +221,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
           reflections: (reflections ?? []).map((r: any) => ({
             message: r.message, context: r.context, mood: r.mood, outcome: r.outcome,
             note: r.note, tags: r.tags, haiku: r.haiku, is_favorite: r.is_favorite,
-            learning_title: r.learning_title, learning_body: r.learning_body,
+            grounding_title: r.grounding_title, grounding_body: r.grounding_body,
             signal_title: r.signal_title, signal_body: r.signal_body, created_at: r.created_at,
           })),
         };
@@ -641,7 +641,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   {t('settings.companionsDesc')}
                 </p>
-                {(['breathing', 'haiku', 'learning', 'signal', 'zoomOut', 'history'] as const).map((comp) => (
+                {(['breathing', 'haiku', 'grounding', 'signal', 'zoomOut', 'history'] as const).map((comp) => (
                   <div key={comp} className="flex items-center justify-between">
                     <Label htmlFor={`comp-${comp}`} className="text-xs font-mono text-muted-foreground">
                       {t(`settings.companionLabels.${comp}`)}

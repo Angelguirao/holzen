@@ -75,11 +75,47 @@ serve(async (req) => {
     const singleUserId = body.user_id as string | undefined;
     const bodyLanguage = body.language as string | undefined;
 
+    const authHeader = req.headers.get("Authorization");
+    const sbUrl = Deno.env.get("SUPABASE_URL") ?? "";
+    const sbAnon = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+    const cronSecret = Deno.env.get("CRON_SECRET") ?? "";
+
     let userIds: string[] = [];
 
     if (singleUserId) {
+      if (!authHeader?.startsWith("Bearer ")) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const anonClient = createClient(sbUrl, sbAnon, {
+        global: { headers: { Authorization: authHeader } },
+      });
+      const { data: { user }, error: userErr } = await anonClient.auth.getUser();
+      if (userErr || !user || user.id !== singleUserId) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
       userIds = [singleUserId];
     } else {
+      const token = authHeader?.replace(/^Bearer\s+/i, "")?.trim() ?? "";
+      const okCron = cronSecret.length > 0 && token === cronSecret;
+      const okService = token.length > 0 && token === serviceRoleKey;
+      const okSupabaseCron = req.headers.get("x-supabase-cron") === "true";
+      if (!okCron && !okService && !okSupabaseCron) {
+        return new Response(
+          JSON.stringify({
+            error:
+              "Unauthorized. Batch mode requires service role, cron secret, or Supabase scheduled invoke.",
+          }),
+          { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+
       const { data: profiles } = await supabase
         .from("profiles")
         .select("user_id, quiet_hours_start, quiet_hours_end, timezone, ai_insights_enabled, language");
@@ -118,7 +154,7 @@ serve(async (req) => {
 
       const { data: reflections, error: refError } = await supabase
         .from("reflections")
-        .select("message, context, mood, mood_after, outcome, tags, created_at, breathing_completed, haiku_read, learning_read, signal_read, zoom_out_read, history_read, note")
+        .select("message, context, mood, mood_after, outcome, tags, created_at, breathing_completed, haiku_read, grounding_read, signal_read, zoom_out_read, history_read, note")
         .eq("user_id", userId)
         .order("created_at", { ascending: false })
         .limit(200);
@@ -141,14 +177,14 @@ serve(async (req) => {
         if (r.breathing_completed && !skills.includes("regulation")) skills.push("regulation");
         if (volatility >= 3 && (r.outcome === "held" || r.outcome === "nothing")) skills.push("tolerance");
         if (r.outcome === "held" || r.outcome === "nothing") skills.push("alignment");
-        if (r.zoom_out_read || r.history_read || r.signal_read || r.learning_read) skills.push("reappraisal");
+        if (r.zoom_out_read || r.history_read || r.signal_read || r.grounding_read) skills.push("reappraisal");
         if ((r.note && r.note.length > 10) || (r.tags && r.tags.length > 0)) skills.push("awareness");
 
         return {
           day: dayName, hour, date: r.created_at.slice(0, 10),
           mood: r.mood || "none", mood_after: r.mood_after || "none",
           outcome: r.outcome || "none", volatility, skills,
-          tools: [r.breathing_completed && "breathing", r.zoom_out_read && "zoom_out", r.history_read && "history", r.signal_read && "signal", r.learning_read && "learning"].filter(Boolean),
+          tools: [r.breathing_completed && "breathing", r.zoom_out_read && "zoom_out", r.history_read && "history", r.signal_read && "signal", r.grounding_read && "grounding"].filter(Boolean),
           hasNote: !!(r.note && r.note.length > 10), tagCount: r.tags?.length || 0,
         };
       });
@@ -169,7 +205,7 @@ serve(async (req) => {
 1. EMOTIONAL REGULATION — shifting from reactive to composed states (mood→mood_after improvement, breathing)
 2. DISTRESS TOLERANCE — holding steady during high volatility (≥3% change) without impulsive action
 3. DECISION ALIGNMENT — making choices consistent with their hold goals
-4. COGNITIVE REAPPRAISAL — engaging perspective-shifting tools (zoom out, history, signals, learning) especially during volatile moments
+4. COGNITIVE REAPPRAISAL — engaging perspective-shifting tools (zoom out, history, signals, grounding research) especially during volatile moments
 5. SELF-AWARENESS — depth of reflection through notes, tags, and pattern recognition
 
 Analyze the user's data through this skill lens. Generate 3-5 insights about their SKILL DEVELOPMENT — not mood patterns or generic advice.

@@ -92,7 +92,7 @@ export async function readCompanionData(
   // Fall back to old denormalized columns
   const { data: row } = await svcClient
     .from("reflections")
-    .select("signal_title, signal_body, signal_source, signal_url, signal_read, learning_title, learning_body, learning_citation, learning_url, learning_read, zoom_out_data, zoom_out_read, history_insight_data, history_read")
+    .select("signal_title, signal_body, signal_source, signal_url, signal_read, grounding_title, grounding_body, grounding_citation, grounding_url, grounding_read, zoom_out_data, zoom_out_read, history_insight_data, history_read")
     .eq("id", reflectionId)
     .single();
 
@@ -110,15 +110,15 @@ export async function readCompanionData(
     };
   }
 
-  if ((row as any).learning_citation) {
+  if ((row as any).grounding_citation) {
     result.ground_nudge = {
       content: {
-        title: (row as any).learning_title ?? "",
-        body: (row as any).learning_body ?? "",
-        citation: (row as any).learning_citation,
-        url: (row as any).learning_url ?? "",
+        title: (row as any).grounding_title ?? "",
+        body: (row as any).grounding_body ?? "",
+        citation: (row as any).grounding_citation,
+        url: (row as any).grounding_url ?? "",
       },
-      read: (row as any).learning_read ?? false,
+      read: (row as any).grounding_read ?? false,
     };
   }
 
@@ -160,9 +160,11 @@ export async function markCompanionRead(
   // Old column
   const readColumnMap: Record<string, string> = {
     [COMPANION_TYPES.SIGNAL]: "signal_read",
-    [COMPANION_TYPES.GROUNDING]: "learning_read",
+    [COMPANION_TYPES.GROUNDING]: "grounding_read",
     [COMPANION_TYPES.HISTORY]: "history_read",
     [COMPANION_TYPES.ZOOM_OUT]: "zoom_out_read",
+    /** Orchestrator uses `zoom_out_deep_time` in join table; same legacy read column as `zoom_out`. */
+    [COMPANION_TYPES.ZOOM_OUT_DEEP_TIME]: "zoom_out_read",
   };
   const col = readColumnMap[companionType];
   if (col) {
@@ -186,14 +188,15 @@ function buildLegacyUpdate(companionType: string, content: CompanionContent): Re
       };
     case COMPANION_TYPES.GROUNDING:
       return {
-        learning_title: content.title || null,
-        learning_body: content.body || null,
-        learning_citation: content.citation || null,
-        learning_url: content.url || null,
+        grounding_title: content.title || null,
+        grounding_body: content.body || null,
+        grounding_citation: content.citation || null,
+        grounding_url: content.url || null,
       };
     case COMPANION_TYPES.HISTORY:
       return { history_insight_data: content };
     case COMPANION_TYPES.ZOOM_OUT:
+    case COMPANION_TYPES.ZOOM_OUT_DEEP_TIME:
       return { zoom_out_data: content };
     default:
       return {};

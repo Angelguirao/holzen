@@ -10,7 +10,10 @@ lerna-debug.log*
 node_modules
 dist
 dist-ssr
-*.local
+
+# Supabase CLI local state (not repo config)
+supabase/.temp/
+supabase/.branches/
 
 # Editor directories and files
 .vscode/*
@@ -25,5 +28,6 @@ dist-ssr
 
 # Environment variables — never commit secrets
 .env
-.env.local
-.env.*.local
+.env.*
+!.env.example
+!.env.*.example

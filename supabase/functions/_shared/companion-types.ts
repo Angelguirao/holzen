@@ -46,6 +46,7 @@ export const ORCHESTRATOR_KEY_MAP: Record<string, string> = {
  */
 export const FEEDBACK_CACHE_MAP: Record<string, string> = {
   signal: COMPANION_TYPES.SIGNAL,
+  grounding: COMPANION_TYPES.GROUNDING,
   learning: COMPANION_TYPES.GROUNDING,
   zoom_out: COMPANION_TYPES.ZOOM_OUT_DEEP_TIME,
   history_insight: COMPANION_TYPES.HISTORY,

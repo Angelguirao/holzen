@@ -57,8 +57,8 @@ interface PinnedReflection {
   message: string;
   context: string | null;
   haiku: string | null;
-  learning_title: string | null;
-  learning_body: string | null;
+  grounding_title: string | null;
+  grounding_body: string | null;
 }
 
 interface GroundingSuggestion {
@@ -193,7 +193,7 @@ const Home = () => {
     if (!pinnedId) return;
     supabase
       .from('reflections')
-      .select('id, message, context, haiku, learning_title, learning_body')
+      .select('id, message, context, haiku, grounding_title, grounding_body')
       .eq('id', pinnedId)
       .eq('user_id', user.id)
       .single()
@@ -233,6 +233,9 @@ const Home = () => {
 
   const handleDismiss = () => {
     dismissMessage();
+    // Suppress grounding auto-generation when user explicitly dismisses a pause notification
+    setGroundDismissed(true);
+    localStorage.setItem(groundDismissedKey, 'true');
   };
 
   const dismissGroundSuggestion = useCallback(() => {
@@ -363,7 +366,7 @@ const Home = () => {
               <ReflectionMessage
                 message={message} context={context} onDismiss={handleDismiss}
                 companions={companions}
-                companionPrefs={{ breathing: companionPrefs.breathing, haiku: false, learning: false, signal: false, zoomOut: false, history: false }}
+                companionPrefs={{ breathing: companionPrefs.breathing, haiku: false, grounding: false, signal: false, zoomOut: false, history: false }}
                 severity={severity} reflectionId={lastReflectionId}
               />
             </motion.div>

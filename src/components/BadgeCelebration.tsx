@@ -116,6 +116,7 @@ export function BadgeCelebration({ badges, onDismiss }: BadgeCelebrationProps) {
           </motion.div>
 
           <motion.div
+            className="flex flex-col items-center gap-2"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.8 }}
@@ -128,6 +129,14 @@ export function BadgeCelebration({ badges, onDismiss }: BadgeCelebrationProps) {
             >
               {currentIndex < badges.length - 1 ? 'Next badge' : 'Continue'}
             </Button>
+            {badges.length > 1 && currentIndex < badges.length - 1 && (
+              <button
+                onClick={onDismiss}
+                className="text-[9px] font-mono text-muted-foreground/30 hover:text-muted-foreground/60 transition-colors tracking-[0.1em] uppercase"
+              >
+                Skip all
+              </button>
+            )}
           </motion.div>
 
           {badges.length > 1 && (

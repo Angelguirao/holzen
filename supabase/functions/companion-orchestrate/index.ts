@@ -2,11 +2,14 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { checkRateLimit, checkDailyBudget } from "../_shared/ratelimit.ts";
 import { createLogger } from "../_shared/observe.ts";
 import { writeCompanionData } from "../_shared/companion-data.ts";
-import { generateSignal } from "../_shared/generators/signal.ts";
-import { generateGrounding } from "../_shared/generators/grounding.ts";
-import { generateHistory } from "../_shared/generators/history.ts";
-import { generateZoomOut } from "../_shared/generators/zoom-out.ts";
+import { generateSignal, PROMPT_VERSION as SIGNAL_VERSION } from "../_shared/generators/signal.ts";
+import { generateGrounding, PROMPT_VERSION as GROUNDING_VERSION } from "../_shared/generators/grounding.ts";
+import { generateHistory, PROMPT_VERSION as HISTORY_VERSION } from "../_shared/generators/history.ts";
+import { generateZoomOut, PROMPT_VERSION as ZOOM_OUT_VERSION } from "../_shared/generators/zoom-out.ts";
+import { generateQuestion } from "../_shared/generators/question.ts";
 import { determineSessionIntent } from "../_shared/session-intent.ts";
+import { selectIntervention, parseDirection, bucketSeverity, type InterventionSelection } from "../_shared/intervention-selector.ts";
+import { fetchGroundingSourcesForOrchestrate } from "../_shared/pause-cron-parity.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -17,7 +20,9 @@ const corsHeaders = {
 /**
  * Companion Orchestrator
  *
- * Single entry point that fires all enabled companion generators in parallel,
+ * Single entry point that fires companion generators in parallel — user **enable***
+ * flags **or** intervention requirements (trap → grounding, pattern → history,
+ * zoom_out secondary → zoom out) determine which tasks run.
  * writes results back to the reflections row, logs companion_serves and
  * generation_attempts, and returns a unified response.
  *
@@ -29,14 +34,26 @@ interface CompanionResult {
   source: "live" | "cache" | "curated" | "empty";
   cacheId: string | null;
   latencyMs: number;
+  /** Prompt version from the generator — stored as content_fingerprint for regression tracking. */
+  promptVersion?: string;
   error?: string;
 }
 
+interface InterventionPayload {
+  mode: "insight" | "question";
+  primary: { type: string; data: any } | null;
+  secondary: { type: string; data: any } | null;
+  question: string | null;
+}
+
 interface OrchestrateResponse {
+  // Legacy fields — kept for backward compat, null in the new intervention flow
   signal: CompanionResult | null;
   grounding: CompanionResult | null;
   history: CompanionResult | null;
   zoomOut: CompanionResult | null;
+  // New structured intervention response
+  intervention: InterventionPayload | null;
 }
 
 serve(async (req) => {
@@ -56,27 +73,56 @@ serve(async (req) => {
       });
     }
 
-    const { createClient } = await import("npm:@supabase/supabase-js@2.57.2");
-    const sbUrl = Deno.env.get("SUPABASE_URL") ?? "";
-    const sbAnon = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
-    const sbClient = createClient(sbUrl, sbAnon, {
-      global: { headers: { Authorization: authHeader } },
-    });
-    const { data: { user }, error: authError } = await sbClient.auth.getUser();
-    if (authError || !user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
+    const rawText = await req.text();
+    let body: Record<string, unknown>;
+    try {
+      body = JSON.parse(rawText || "{}") as Record<string, unknown>;
+    } catch {
+      return new Response(JSON.stringify({ error: "Invalid JSON body" }), {
+        status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    log("auth verified");
+
+    const { createClient } = await import("npm:@supabase/supabase-js@2.57.2");
+    const sbUrl = Deno.env.get("SUPABASE_URL") ?? "";
+    const sbAnon = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+    const token = authHeader.replace("Bearer ", "");
+
+    let userId: string;
+
+    if (token === serviceKey) {
+      const uid = body.userId;
+      if (typeof uid !== "string" || uid.length === 0) {
+        return new Response(
+          JSON.stringify({ error: "Service calls must include userId in the JSON body" }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+      userId = uid;
+      log("auth verified (service role)");
+    } else {
+      const sbClient = createClient(sbUrl, sbAnon, {
+        global: { headers: { Authorization: authHeader } },
+      });
+      const { data: { user }, error: authError } = await sbClient.auth.getUser();
+      if (authError || !user) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      userId = user.id;
+      log("auth verified (user JWT)");
+    }
 
     const svcClient = createClient(sbUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "", {
       auth: { persistSession: false },
     });
 
     // ── Per-user rate limit check ──
-    const rateLimit = await checkRateLimit(svcClient, user.id, 60, 30);
+    const rateLimit = await checkRateLimit(svcClient, userId, 60, 30);
     if (!rateLimit.allowed) {
       log(`rate limited: ${rateLimit.reason}`);
       return new Response(JSON.stringify({ error: "Rate limited. Try again later." }), {
@@ -95,103 +141,220 @@ serve(async (req) => {
       });
     }
 
-    const body = await req.json();
     const {
       reflectionId,
       context,
       language = "en",
       reflectionMessage,
       mood,
-      // Companion-specific params
       signalSources,
+      groundingSources,
       recentSignalSources,
       recentSignalTitles,
       recentNudgeTopics,
+      recentGroundingSources,
       recentHistoryTitles,
       recentZoomOutTitles,
-      // Which companions are enabled
       enableSignal = false,
       enableGrounding = false,
       enableHistory = false,
       enableZoomOut = false,
-    } = body;
+      useIntervention = true,
+    } = body as Record<string, unknown>;
 
-    log(`companions: signal=${enableSignal} grounding=${enableGrounding} history=${enableHistory} zoomOut=${enableZoomOut}`);
+    const moodHistory = body.moodHistory as
+      | Array<{ mood: string; outcome?: string | null }>
+      | undefined;
 
     // ── Determine session intent for coherent companion theming ──
-    const moodHistory = body.moodHistory; // Passed from client if available
     const intent = determineSessionIntent({
-      context: context ?? undefined,
-      mood: mood ?? undefined,
-      severity: body.severity,
+      context: (context as string | undefined) ?? undefined,
+      mood: (mood as string | undefined) ?? undefined,
+      severity: typeof body.severity === "number" ? body.severity : undefined,
       moodHistory,
     });
     log(`session intent: ${intent.theme}`, { theme: intent.theme, tone: intent.emotionalTone });
 
-    // ── Fire all enabled companions in parallel via direct generator calls ──
+    // ── Intervention selection (new pause flow) ──
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY") ?? "";
+
+    let selection: InterventionSelection | null = null;
+    if (useIntervention && reflectionId) {
+      const rawSeverity = typeof body.severity === "number" ? body.severity : 0;
+      const direction = parseDirection(context as string | undefined);
+      const severity = bucketSeverity(rawSeverity);
+      log(`selecting intervention: mood=${mood} severity=${severity} direction=${direction}`);
+
+      selection = await selectIntervention({
+        userId,
+        reflectionId: reflectionId as string,
+        mood: (mood as string | undefined) ?? undefined,
+        severity,
+        direction,
+        moodHistory,
+        svcClient,
+      });
+      log(`intervention selected: mode=${selection.mode} primary=${selection.primary ?? "none"}`);
+      // Track which intervention type is being served — critical for outcome analysis
+      void svcClient.from("analytics_events").insert({
+        user_id: userId,
+        event: "intervention_selected",
+        metadata: {
+          mode: selection.mode,
+          primary: selection.primary ?? null,
+          secondary: selection.secondary ?? null,
+          reflection_id: reflectionId ?? null,
+        },
+      }).then(({ error: insErr }: { error: { message: string } | null }) => {
+        if (insErr) log.error("analytics intervention_selected insert failed", { error: insErr.message });
+      });
+    }
+
+    // ── Build the intervention response ──
+    const interventionPayload: InterventionPayload = {
+      mode: selection?.mode ?? "insight",
+      primary: null,
+      secondary: null,
+      question: null,
+    };
+
+    if (selection?.primary === "mirror" && selection.mirrorData) {
+      interventionPayload.primary = { type: "mirror", data: selection.mirrorData };
+    }
+
+    const directionForQuestion = parseDirection(context as string | undefined);
+    const rawSeverityForQuestion = typeof body.severity === "number" ? body.severity : 0;
+    const severityBucketForQuestion = bucketSeverity(rawSeverityForQuestion);
+
+    const questionPromise =
+      selection?.mode === "question" && LOVABLE_API_KEY
+        ? generateQuestion({
+            context: (context as string) ?? "",
+            mood: (mood as string | undefined) ?? undefined,
+            direction: directionForQuestion,
+            severity: severityBucketForQuestion,
+            moodHistory,
+            apiKey: LOVABLE_API_KEY,
+            language: (language as string) || "en",
+          })
+        : Promise.resolve<string | null>(null);
+
+    const insightSelection = selection?.mode === "insight" ? selection : null;
+    const interventionNeedsGrounding = insightSelection?.primary === "trap";
+    const interventionNeedsHistory = insightSelection?.primary === "pattern";
+    const interventionNeedsZoomOut = insightSelection?.secondary === "zoom_out";
+
+    const shouldRunGrounding = Boolean(enableGrounding || interventionNeedsGrounding);
+    const shouldRunHistory = Boolean(enableHistory || interventionNeedsHistory);
+    const shouldRunZoomOut = Boolean(enableZoomOut || interventionNeedsZoomOut);
+
+    let effectiveGroundingSources = groundingSources as Array<{ name: string; type: string; url?: string }> | undefined;
+    if (shouldRunGrounding && (!effectiveGroundingSources || effectiveGroundingSources.length === 0)) {
+      effectiveGroundingSources = await fetchGroundingSourcesForOrchestrate(svcClient, userId) ?? undefined;
+    }
+
+    if (interventionNeedsGrounding && !enableGrounding) {
+      log("grounding task forced for trap intervention (companion pref off)");
+    }
+    if (interventionNeedsHistory && !enableHistory) {
+      log("history task forced for pattern intervention (companion pref off)");
+    }
+    if (interventionNeedsZoomOut && !enableZoomOut) {
+      log("zoomOut task forced for intervention secondary (companion pref off)");
+    }
+
+    // ── Fire companion generators (prefs and/or intervention headline requirements) ──
     const tasks: Record<string, Promise<CompanionResult>> = {};
 
-    if (enableSignal) {
-      tasks.signal = (async (): Promise<CompanionResult> => {
-        const t = Date.now();
-        const result = await generateSignal({ svcClient, context, language, sources: signalSources, recentSignalSources, recentSignalTitles, userId: user.id, log, searchAngle: intent.signalAngle });
-        return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t };
-      })();
-    }
-
-    if (enableGrounding) {
+    if (shouldRunGrounding) {
       tasks.grounding = (async (): Promise<CompanionResult> => {
         const t = Date.now();
-        const result = await generateGrounding({ svcClient, context, language, recentTopics: recentNudgeTopics, userId: user.id, log, preferredBias: intent.groundingBias });
-        return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t };
+        const result = await generateGrounding({
+          svcClient,
+          context,
+          language,
+          recentTopics: recentNudgeTopics as string[] | undefined,
+          sources: effectiveGroundingSources,
+          recentGroundingSources: recentGroundingSources as string[] | undefined,
+          recentGroundingTitles: recentNudgeTopics as string[] | undefined,
+          userId,
+          log,
+          preferredBias: intent.groundingBias,
+        });
+        return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t, promptVersion: GROUNDING_VERSION };
       })();
     }
-
     if (enableHistory) {
       tasks.history = (async (): Promise<CompanionResult> => {
         const t = Date.now();
-        const result = await generateHistory({ svcClient, context, language, mood, recentTitles: recentHistoryTitles, userId: user.id, log, preferredMood: intent.historyMood });
-        return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t };
+        const result = await generateHistory({ svcClient, context, language, mood, recentTitles: recentHistoryTitles, userId, log, preferredMood: intent.historyMood });
+        return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t, promptVersion: HISTORY_VERSION };
       })();
     }
-
-    if (enableZoomOut) {
+    if (shouldRunZoomOut) {
       tasks.zoomOut = (async (): Promise<CompanionResult> => {
         const t = Date.now();
-        const result = await generateZoomOut({ svcClient, context, language, reflectionMessage, mood, userId: user.id, recentTitles: recentZoomOutTitles, log, zoomOutAngle: intent.zoomOutAngle });
-        return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t };
+        const result = await generateZoomOut({ svcClient, context, language, reflectionMessage, mood, userId, recentTitles: recentZoomOutTitles, log, zoomOutAngle: intent.zoomOutAngle });
+        return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t, promptVersion: ZOOM_OUT_VERSION };
+      })();
+    }
+    // Signal — included in pause flow when enabled; provides market context for cognitive reappraisal
+    if (enableSignal) {
+      tasks.signal = (async (): Promise<CompanionResult> => {
+        const t = Date.now();
+        const result = await generateSignal({ svcClient, context, language, sources: signalSources, recentSignalSources, recentSignalTitles, userId, log, searchAngle: intent.signalAngle });
+        return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t, promptVersion: SIGNAL_VERSION };
       })();
     }
 
-    // Await all in parallel
+    // Await all tasks in parallel
     const keys = Object.keys(tasks);
-    const results = await Promise.allSettled(Object.values(tasks));
+    const [results, resolvedQuestion] = await Promise.all([
+      Promise.allSettled(Object.values(tasks)),
+      questionPromise,
+    ]);
+
+    if (resolvedQuestion !== null) {
+      interventionPayload.question = resolvedQuestion;
+    }
 
     const response: OrchestrateResponse = {
       signal: null,
       grounding: null,
       history: null,
       zoomOut: null,
+      intervention: null,
     };
 
     const serveInserts: any[] = [];
     const writePromises: Promise<void>[] = [];
 
     for (let i = 0; i < keys.length; i++) {
-      const key = keys[i] as keyof OrchestrateResponse;
+      const key = keys[i] as keyof Omit<OrchestrateResponse, "intervention">;
       const result = results[i];
 
       if (result.status === "fulfilled") {
         response[key] = result.value;
 
+        // Populate intervention payload from task results
+        if (selection?.mode === "insight") {
+          if (key === "grounding" && selection.primary === "trap") {
+            interventionPayload.primary = { type: "trap", data: result.value.data };
+          } else if (key === "history" && selection.primary === "pattern") {
+            interventionPayload.primary = { type: "pattern", data: result.value.data };
+          } else if (key === "zoomOut" && selection.secondary === "zoom_out") {
+            interventionPayload.secondary = { type: "zoom_out", data: result.value.data };
+          }
+        }
+
         serveInserts.push({
-          user_id: user.id,
-          reflection_id: reflectionId || null,
+          user_id: userId,
+          reflection_id: (reflectionId as string) || null,
           companion_type: companionTypeMap[key],
           serve_source: result.value.source,
           cache_entry_id: result.value.cacheId || null,
           content_title: result.value.data?.title || result.value.data?.deepTime?.title || null,
-          content_fingerprint: null,
+          content_fingerprint: result.value.promptVersion ?? null,
           latency_ms: result.value.latencyMs,
         });
 
@@ -214,8 +377,8 @@ serve(async (req) => {
           error: result.reason?.message || "Unknown error",
         };
         serveInserts.push({
-          user_id: user.id,
-          reflection_id: reflectionId || null,
+          user_id: userId,
+          reflection_id: (reflectionId as string) || null,
           companion_type: companionTypeMap[key],
           serve_source: "empty",
           cache_entry_id: null,
@@ -224,6 +387,11 @@ serve(async (req) => {
           latency_ms: Date.now() - t0,
         });
       }
+    }
+
+    // Attach the intervention payload if intervention selection was used
+    if (selection) {
+      response.intervention = interventionPayload;
     }
 
     // Add serve log writes

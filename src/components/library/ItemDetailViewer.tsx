@@ -17,6 +17,7 @@ const TYPE_EMOJIS: Record<string, string> = {
 const SOURCE_EMOJIS: Record<string, string> = {
   reflection: '⏸',
   signal: '📡',
+  grounding: '🌿',
   learning: '🌿',
   haiku: '🍃',
   zoom_out: '🔭',
@@ -258,7 +259,7 @@ export function ItemDetailViewer({
           })()}
 
           {/* Companion feedback — for companion-type library items */}
-          {item.source_type && ['signal', 'learning', 'zoom_out', 'history_insight', 'haiku'].includes(item.source_type) && item.reflection_id && (
+          {item.source_type && ['signal', 'grounding', 'learning', 'zoom_out', 'history_insight', 'haiku'].includes(item.source_type) && item.reflection_id && (
             <CompanionFeedback
               reflectionId={item.reflection_id}
               companionType={item.source_type}

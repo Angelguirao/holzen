@@ -1,8 +1,8 @@
-import { useAdminStats, TimePeriod, PeriodStats } from '@/hooks/use-admin-stats';
+import { useAdminStats } from '@/hooks/use-admin-stats';
 import { useAuth } from '@/hooks/use-auth';
 import { supabase } from '@/integrations/supabase/client';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { RefreshCw, Activity, Database, DollarSign, AlertTriangle, ThumbsUp, Clock, Loader2, ShieldX } from 'lucide-react';
+import { RefreshCw, Activity, Database, DollarSign, AlertTriangle, ThumbsUp, Clock, Loader2, ShieldX, ChevronDown, ChevronRight } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { useMemo, useState, useEffect } from 'react';
 import { label, PERIOD_OPTIONS, TAB_TRIGGER_CLASS, TYPE_COLORS } from '@/components/admin/admin-constants';
@@ -77,6 +77,32 @@ const inferTheme = (context: string | null, mood: string | null): string | null 
   return null;
 };
 
+function parseJsonObject(raw: unknown): Record<string, unknown> | null {
+  if (raw == null) return null;
+  if (typeof raw === 'object' && !Array.isArray(raw)) return raw as Record<string, unknown>;
+  if (typeof raw === 'string') {
+    try {
+      const v = JSON.parse(raw) as unknown;
+      if (typeof v === 'object' && v !== null && !Array.isArray(v)) return v as Record<string, unknown>;
+    } catch { /* ignore */ }
+  }
+  return null;
+}
+
+function historyInsightTitleFromData(data: unknown): string | null {
+  const o = parseJsonObject(data);
+  const t = o?.title;
+  return typeof t === 'string' ? t : null;
+}
+
+function zoomOutDeepTimeTitleFromData(data: unknown): string | null {
+  const o = parseJsonObject(data);
+  const deepTime = o?.deepTime;
+  if (typeof deepTime !== 'object' || deepTime === null || Array.isArray(deepTime)) return null;
+  const t = (deepTime as Record<string, unknown>).title;
+  return typeof t === 'string' ? t : null;
+}
+
 export default function Admin() {
   const { isAdmin, loading: adminLoading } = useIsAdmin();
   const {
@@ -120,9 +146,10 @@ export default function Admin() {
   const periodLabel = PERIOD_OPTIONS.find(p => p.value === period)?.label.toLowerCase() ?? period;
 
   // ── Session filters ──
-  const [sessionMoodFilter, setSessionMoodFilter] = useState('all');
-  const [sessionOutcomeFilter, setSessionOutcomeFilter] = useState('all');
-  const [sessionCompanionFilter, setSessionCompanionFilter] = useState('all');
+  const [sessionMoodFilter, setSessionMoodFilter] = useState<string>('all');
+  const [sessionOutcomeFilter, setSessionOutcomeFilter] = useState<string>('all');
+  const [sessionCompanionFilter, setSessionCompanionFilter] = useState<string>('all');
+  const [expandedSessionId, setExpandedSessionId] = useState<string | null>(null);
 
   const sessionMoodOptions = useMemo(() => {
     const moods = Array.from(new Set(sessions.map(s => s.mood).filter(Boolean) as string[])).sort();
@@ -149,7 +176,7 @@ export default function Admin() {
       else if (s.outcome !== sessionOutcomeFilter) return false;
     }
     if (sessionCompanionFilter === 'missing') {
-      const allLoaded = !!s.signal_title && !!s.learning_title && !!s.history_insight_data && !!s.zoom_out_data && !!s.haiku;
+      const allLoaded = !!s.signal_title && !!s.grounding_title && !!s.history_insight_data && !!s.zoom_out_data && !!s.haiku;
       if (allLoaded) return false;
     }
     return true;
@@ -316,9 +343,24 @@ export default function Admin() {
             <StatCard icon={Activity} title="Serves" value={periodStats.serves.toLocaleString()} subtitle={periodLabel} trend={servesTrend} />
             <StatCard icon={Database} title="Cache Hit" value={`${periodStats.cacheHitRate}%`}
               subtitle={periodStats.cacheHitRate === 0 ? 'all live — fresh content' : periodStats.cacheHitRate < 30 ? 'mostly live generation' : 'good cache usage'}
-              trend={cacheHitTrend} />
-            <StatCard icon={DollarSign} title="Cost" value={`$${periodStats.cost.toFixed(3)}`} subtitle={periodLabel} alert={periodStats.cost > 8} trend={costTrend} />
-            <StatCard icon={AlertTriangle} title="Failure Rate" value={`${failureRate}%`} subtitle="target: <10%" alert={failureRate > 20} trend={failureTrend} />
+              trend={cacheHitTrend}
+            />
+            <StatCard
+              icon={DollarSign}
+              title="Cost"
+              value={`$${periodStats.cost.toFixed(3)}`}
+              subtitle={periodLabel}
+              alert={periodStats.cost > costWarn}
+              trend={costTrend}
+            />
+            <StatCard
+              icon={AlertTriangle}
+              title="Failure Rate"
+              value={`${failureRate}%`}
+              subtitle="target: <10%"
+              alert={failureRate > 20}
+              trend={failureTrend}
+            />
           </div>
 
           {/* Cost Chart */}
@@ -354,7 +396,7 @@ export default function Admin() {
 
           {/* Cache Hit Rates */}
           <div className="space-y-2">
-            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">Cache Hit Rates <span className="text-muted-foreground/40 normal-case">(all time)</span></p>
+            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">Cache Hit Rates <span className="text-muted-foreground/40 normal-case">(30 days)</span></p>
             <div className="space-y-1.5">
               {cacheHits.map((row, i) => {
                 const pct = row.cache_hit_pct ?? 0;
@@ -383,7 +425,7 @@ export default function Admin() {
 
           {/* Generation Health */}
           <div className="space-y-2">
-            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">Generation Health <span className="text-muted-foreground/40 normal-case">(all time)</span></p>
+            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">Generation Health <span className="text-muted-foreground/40 normal-case">(30 days)</span></p>
             <div className="space-y-1.5">
               {failures.map((row, i) => {
                 const failPct = row.failure_pct ?? 0;
@@ -399,9 +441,10 @@ export default function Admin() {
                     </div>
                     <div className="flex gap-3 mt-1">
                       <span className="text-[9px] text-muted-foreground/50">✓ {row.successes ?? 0}</span>
-                      <span className="text-[9px] text-muted-foreground/50">✗ {row.errors ?? 0}</span>
-                      <span className="text-[9px] text-muted-foreground/50">⏱ {row.timeouts ?? 0}</span>
-                      <span className="text-[9px] text-muted-foreground/50">⚠ {row.quality_gate_failures ?? 0} QG</span>
+                      <span className="text-[9px] text-muted-foreground/50">✗ {row.errors ?? 0} err</span>
+                      <span className="text-[9px] text-muted-foreground/50">⏱ {row.timeouts ?? 0} timeout</span>
+                      <span className="text-[9px] text-muted-foreground/50">⚠ {row.quality_gate_failures ?? 0} quality</span>
+                      {(row as any).rate_limited > 0 && <span className="text-[9px] text-amber-600 dark:text-amber-400">🚫 {(row as any).rate_limited} rate limit</span>}
                     </div>
                     <div className="flex gap-3 mt-0.5">
                       <span className="text-[9px] text-muted-foreground/50 flex items-center gap-0.5">
@@ -462,13 +505,31 @@ export default function Admin() {
             <div className="space-y-1">
               {filteredSessions.map(s => {
                 const theme = inferTheme(s.context, s.mood);
+                const expanded = expandedSessionId === s.id;
+                const historyTitle = historyInsightTitleFromData(s.history_insight_data);
+                const zoomTitle = zoomOutDeepTimeTitleFromData(s.zoom_out_data);
+                const signalSource = s.signal_source;
                 return (
-                  <div key={s.id} className="rounded-lg border border-border/20 bg-card/10 px-3 py-2 space-y-1.5">
+                <div key={s.id} className="rounded-lg border border-border/20 bg-card/10 px-3 py-2 space-y-1.5">
+                  <button
+                    type="button"
+                    onClick={() => setExpandedSessionId(expanded ? null : s.id)}
+                    className="w-full text-left space-y-1.5 rounded-md outline-none focus-visible:ring-1 focus-visible:ring-primary/30"
+                  >
                     <div className="flex items-center gap-2">
+                      {expanded ? (
+                        <ChevronDown className="h-2.5 w-2.5 text-muted-foreground/30 flex-shrink-0" />
+                      ) : (
+                        <ChevronRight className="h-2.5 w-2.5 text-muted-foreground/30 flex-shrink-0" />
+                      )}
                       <span className="text-[9px] font-mono text-muted-foreground/50 flex-shrink-0">
                         {new Date(s.created_at).toLocaleString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
                       </span>
-                      {s.mood && <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full bg-primary/15 text-primary flex-shrink-0">{s.mood}</span>}
+                      {s.mood && (
+                        <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full bg-primary/15 text-primary flex-shrink-0">
+                          {s.mood}
+                        </span>
+                      )}
                       {theme && <span className="text-[8px] font-mono px-1.5 py-0.5 rounded-full bg-muted/30 text-muted-foreground/60">{theme}</span>}
                       {s.outcome && (
                         <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded-full flex-shrink-0 ${
@@ -480,24 +541,73 @@ export default function Admin() {
                         </span>
                       )}
                     </div>
-                    <p className="text-[9px] font-mono text-foreground/70 leading-relaxed">
+                    <p className="text-[9px] font-mono text-foreground/70 leading-relaxed pl-4">
                       {s.message?.slice(0, 100)}{(s.message?.length ?? 0) > 100 ? '…' : ''}
                     </p>
-                    <div className="flex items-center gap-1.5 flex-wrap">
+                    <div className="flex items-center gap-1.5 flex-wrap pl-4">
                       {[
                         { loaded: !!s.signal_title, name: 'Signal' },
-                        { loaded: !!s.learning_title, name: 'Ground' },
+                        { loaded: !!s.grounding_title, name: 'Ground' },
                         { loaded: !!s.history_insight_data, name: 'History' },
                         { loaded: !!s.zoom_out_data, name: 'Zoom' },
                         { loaded: !!s.haiku, name: 'Haiku' },
                       ].map(c => (
-                        <span key={c.name} className={`text-[8px] font-mono px-1.5 py-0.5 rounded ${c.loaded ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400' : 'bg-muted/30 text-muted-foreground/40'}`}>
+                        <span key={c.name} className={`text-[8px] font-mono px-1.5 py-0.5 rounded ${
+                          c.loaded ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400' : 'bg-muted/30 text-muted-foreground/40'
+                        }`}>
                           {c.name}
                         </span>
                       ))}
                     </div>
-                  </div>
-                );
+                  </button>
+                  {expanded && (
+                    <div className="mt-1.5 space-y-2 rounded border border-border/20 bg-card/10 px-3 py-2 text-[9px] font-mono">
+                      <div className="space-y-0.5">
+                        <p className="text-muted-foreground/50 uppercase tracking-wider">Reflection</p>
+                        <p className="text-foreground/70 whitespace-pre-wrap break-words leading-relaxed">{s.message ?? '—'}</p>
+                      </div>
+                      <div className="space-y-1.5 border-t border-border/10 pt-2">
+                        <p className="text-muted-foreground/50 uppercase tracking-wider">Companions</p>
+                        {s.signal_title && (
+                          <div className="space-y-0.5">
+                            <p className="text-muted-foreground/40">Signal</p>
+                            <p className="text-foreground/70">{s.signal_title}</p>
+                            {signalSource ? <p className="text-muted-foreground/60">source · {signalSource}</p> : null}
+                          </div>
+                        )}
+                        {s.grounding_title && (
+                          <div className="space-y-0.5">
+                            <p className="text-muted-foreground/40">Grounding</p>
+                            <p className="text-foreground/70">{s.grounding_title}</p>
+                          </div>
+                        )}
+                        {s.history_insight_data && (
+                          <div className="space-y-0.5">
+                            <p className="text-muted-foreground/40">History</p>
+                            <p className="text-foreground/70">{historyTitle ?? '—'}</p>
+                          </div>
+                        )}
+                        {s.zoom_out_data && (
+                          <div className="space-y-0.5">
+                            <p className="text-muted-foreground/40">Zoom Out</p>
+                            <p className="text-foreground/70">{zoomTitle ?? '—'}</p>
+                          </div>
+                        )}
+                        {s.haiku && (
+                          <div className="space-y-0.5">
+                            <p className="text-muted-foreground/40">Haiku</p>
+                            <p className="text-foreground/70 whitespace-pre-wrap break-words leading-relaxed">{s.haiku}</p>
+                          </div>
+                        )}
+                      </div>
+                      <div className="space-y-0.5 border-t border-border/10 pt-2">
+                        <p className="text-muted-foreground/50 uppercase tracking-wider">Context</p>
+                        <p className="text-foreground/70 whitespace-pre-wrap break-words leading-relaxed">{s.context ?? '—'}</p>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
               })}
               {filteredSessions.length === 0 && (
                 <p className="text-[10px] text-muted-foreground/50 text-center py-3">

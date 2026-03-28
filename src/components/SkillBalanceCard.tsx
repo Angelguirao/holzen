@@ -16,7 +16,7 @@ interface Reflection {
   zoom_out_read?: boolean;
   history_read?: boolean;
   signal_read?: boolean;
-  learning_read?: boolean;
+  grounding_read?: boolean;
 }
 
 interface Props {

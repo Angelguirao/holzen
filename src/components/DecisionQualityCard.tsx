@@ -8,7 +8,7 @@ interface Reflection {
   outcome: string | null;
   breathing_completed: boolean;
   haiku_read: boolean;
-  learning_read: boolean;
+  grounding_read: boolean;
   signal_read?: boolean;
   zoom_out_read?: boolean;
   history_read?: boolean;
@@ -35,10 +35,10 @@ export function DecisionQualityCard({ reflections }: Props) {
     if (withOutcome.length < 3) return null;
 
     const engaged = withOutcome.filter(
-      (r) => r.breathing_completed || r.haiku_read || r.learning_read || r.signal_read || r.zoom_out_read || r.history_read
+      (r) => r.breathing_completed || r.haiku_read || r.grounding_read || r.signal_read || r.zoom_out_read || r.history_read
     );
     const notEngaged = withOutcome.filter(
-      (r) => !r.breathing_completed && !r.haiku_read && !r.learning_read && !r.signal_read && !r.zoom_out_read && !r.history_read
+      (r) => !r.breathing_completed && !r.haiku_read && !r.grounding_read && !r.signal_read && !r.zoom_out_read && !r.history_read
     );
 
     const holdRate = (arr: typeof withOutcome) => {
@@ -66,7 +66,7 @@ export function DecisionQualityCard({ reflections }: Props) {
     const companions: CompanionStat[] = [
       { labelKey: 'decisionQuality.companionLabels.breathing', icon: Wind, used: withOutcome.filter((r) => r.breathing_completed).length, holdRate: holdRate(withOutcome.filter((r) => r.breathing_completed)) },
       { labelKey: 'decisionQuality.companionLabels.haiku', icon: Feather, used: withOutcome.filter((r) => r.haiku_read).length, holdRate: holdRate(withOutcome.filter((r) => r.haiku_read)) },
-      { labelKey: 'decisionQuality.companionLabels.learning', icon: BookOpen, used: withOutcome.filter((r) => r.learning_read).length, holdRate: holdRate(withOutcome.filter((r) => r.learning_read)) },
+      { labelKey: 'decisionQuality.companionLabels.grounding', icon: BookOpen, used: withOutcome.filter((r) => r.grounding_read).length, holdRate: holdRate(withOutcome.filter((r) => r.grounding_read)) },
       { labelKey: 'decisionQuality.companionLabels.signal', icon: Radio, used: withOutcome.filter((r) => r.signal_read).length, holdRate: holdRate(withOutcome.filter((r) => r.signal_read)) },
       { labelKey: 'decisionQuality.companionLabels.zoomOut', icon: Eye, used: withOutcome.filter((r) => r.zoom_out_read).length, holdRate: holdRate(withOutcome.filter((r) => r.zoom_out_read)) },
       { labelKey: 'decisionQuality.companionLabels.history', icon: History, used: withOutcome.filter((r) => r.history_read).length, holdRate: holdRate(withOutcome.filter((r) => r.history_read)) },

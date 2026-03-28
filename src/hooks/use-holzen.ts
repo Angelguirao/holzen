@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { fetchBtcData, type BtcPriceData } from '@/lib/btc';
+import { enrichPauseContextWithMarketData } from '@holzen-pause-context';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useProfile } from '@/hooks/use-profile';
@@ -42,7 +43,7 @@ export function useHolzen() {
   const [btcData, setBtcData] = useState<BtcPriceData | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [context, setContext] = useState<string | null>(null);
-  const [companions, setCompanions] = useState<CompanionData>({ haiku: null, learningTitle: null, learningBody: null });
+  const [companions, setCompanions] = useState<CompanionData>({ haiku: null, groundingTitle: null, groundingBody: null });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [newReflection, setNewReflection] = useState(false);
@@ -60,7 +61,7 @@ export function useHolzen() {
     if (lastMessage && user) {
       supabase
         .from('reflections')
-        .select('id, haiku, learning_title, learning_body')
+        .select('id, haiku, grounding_title, grounding_body')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(1)
@@ -70,8 +71,8 @@ export function useHolzen() {
             setLastReflectionId(latestReflection.id);
             setCompanions({
               haiku: latestReflection.haiku ?? null,
-              learningTitle: latestReflection.learning_title ?? null,
-              learningBody: latestReflection.learning_body ?? null,
+              groundingTitle: latestReflection.grounding_title ?? null,
+              groundingBody: latestReflection.grounding_body ?? null,
             });
           }
         });
@@ -92,22 +93,13 @@ export function useHolzen() {
       const cumDir = data.cumulativeDirection === 'down' ? 'down' : 'up';
       ctx += ` Over 7 days, it's ${cumDir} ${Math.abs(data.cumulativeChangePercent).toFixed(1)}%.`;
     }
-    if (data.fearGreed) {
-      ctx += ` Market sentiment: ${data.fearGreed.label} (${data.fearGreed.value}/100).`;
-    }
-    if (data.onChain) {
-      const oc = data.onChain;
-      if (oc.mempoolSize) ctx += ` Mempool: ${oc.mempoolSize.toLocaleString()} unconfirmed txs.`;
-      if (oc.fastestFee) ctx += ` Fees: ${oc.fastestFee} sat/vB (fastest), ${oc.medianFee ?? '?'} sat/vB (medium).`;
-      if (oc.hashrate) ctx += ` Hashrate: ${oc.hashrate}.`;
-      if (oc.blockHeight) ctx += ` Block height: ${oc.blockHeight.toLocaleString()}.`;
-    }
+    ctx = enrichPauseContextWithMarketData(ctx, data.fearGreed, data.onChain);
 
     if (silentMode) {
       const silentMsg = 'BTC moved.';
       setMessage(silentMsg);
       setContext(ctx);
-      setCompanions({ haiku: null, learningTitle: null, learningBody: null });
+      setCompanions({ haiku: null, groundingTitle: null, groundingBody: null });
       setNewReflection(true);
 
       const { data: insertedReflection } = await supabase.from('reflections').insert({
@@ -121,15 +113,18 @@ export function useHolzen() {
         setLastReflectionId(insertedReflection.id);
         // Run library bookmark and profile update in parallel — neither depends on the other
         await Promise.all([
-          supabase.from('library_items').insert({
-            user_id: user.id,
-            type: 'bookmark',
-            title: 'Reflection',
-            body: silentMsg,
-            source_type: 'reflection',
-            reflection_id: insertedReflection.id,
-            tags: ['reflection'],
-          }),
+          supabase.from('library_items').upsert(
+            {
+              user_id: user.id,
+              type: 'bookmark',
+              title: 'Reflection',
+              body: silentMsg,
+              source_type: 'reflection',
+              reflection_id: insertedReflection.id,
+              tags: ['reflection'],
+            },
+            { onConflict: 'user_id,reflection_id,source_type', ignoreDuplicates: true },
+          ),
           supabase.from('profiles').update({
             last_message: silentMsg,
             last_context: ctx,
@@ -148,19 +143,13 @@ export function useHolzen() {
     let moodHistory: { mood: string; outcome: string | null; created_at: string }[] = [];
     let recentHaikus: string[] = [];
     let recentMessages: string[] = [];
-    let recentSignalSources: string[] = [];
-    let learningSources: { name: string; url?: string }[] = [];
     try {
-      const [{ data: recentReflections }, { data: catalogSources }, { data: userPrefs }] = await Promise.all([
-        supabase
-          .from('reflections')
-          .select('mood, outcome, created_at, haiku, signal_source, message')
-          .eq('user_id', user.id)
-          .order('created_at', { ascending: false })
-          .limit(20),
-        supabase.from('signal_sources').select('id, name, url').eq('category', 'learning'),
-        supabase.from('user_signal_preferences').select('source_id, active, custom_name, custom_url, category').eq('user_id', user.id).eq('category', 'learning'),
-      ]);
+      const { data: recentReflections } = await supabase
+        .from('reflections')
+        .select('mood, outcome, created_at, haiku, message')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(20);
       moodHistory = (recentReflections ?? [])
         .filter((r: any) => r.mood)
         .map((r: any) => ({ mood: r.mood, outcome: r.outcome, created_at: r.created_at }));
@@ -172,19 +161,6 @@ export function useHolzen() {
         .filter((r: any) => r.message)
         .map((r: any) => r.message as string)
         .slice(0, 5);
-      recentSignalSources = (recentReflections ?? [])
-        .filter((r: any) => r.signal_source)
-        .map((r: any) => r.signal_source as string)
-        .slice(0, 5);
-
-      const disabledIds = new Set((userPrefs ?? []).filter((p: any) => p.source_id && !p.active).map((p: any) => p.source_id));
-      const catalogActive = (catalogSources ?? [])
-        .filter((s: any) => !disabledIds.has(s.id))
-        .map((s: any) => ({ name: s.name, url: s.url }));
-      const customActive = (userPrefs ?? [])
-        .filter((p: any) => !p.source_id && p.custom_name && p.active)
-        .map((p: any) => ({ name: p.custom_name, url: p.custom_url }));
-      learningSources = [...catalogActive, ...customActive];
     } catch { /* non-critical */ }
 
     try {
@@ -203,7 +179,6 @@ export function useHolzen() {
           language,
           recentHaikus,
           recentMessages,
-          learningSources: learningSources.length > 0 ? learningSources : undefined,
         },
       });
 
@@ -217,8 +192,8 @@ export function useHolzen() {
 
         const companionData: CompanionData = {
           haiku: fnData?.haiku ?? null,
-          learningTitle: fnData?.learning_title ?? null,
-          learningBody: fnData?.learning_body ?? null,
+          groundingTitle: fnData?.grounding_title ?? null,
+          groundingBody: fnData?.grounding_body ?? null,
         };
         setCompanions(companionData);
 
@@ -227,10 +202,10 @@ export function useHolzen() {
           message: msg,
           context: ctx,
           haiku: companionData.haiku,
-          learning_title: companionData.learningTitle,
-          learning_body: companionData.learningBody,
-          learning_citation: fnData?.learning_citation ?? null,
-          learning_url: fnData?.learning_url ?? null,
+          grounding_title: companionData.groundingTitle,
+          grounding_body: companionData.groundingBody,
+          grounding_citation: fnData?.grounding_citation ?? null,
+          grounding_url: fnData?.grounding_url ?? null,
           ...(mood ? { mood } : {}),
         }).select('id').single();
 
@@ -260,7 +235,10 @@ export function useHolzen() {
           }
           // Run library bookmarks and profile update in parallel — neither depends on the other
           const [{ error: libErr }] = await Promise.all([
-            supabase.from('library_items').insert(libraryInserts),
+            supabase.from('library_items').upsert(libraryInserts, {
+              onConflict: 'user_id,reflection_id,source_type',
+              ignoreDuplicates: true,
+            }),
             supabase.from('profiles').update({
               last_message: msg,
               last_context: ctx,
@@ -352,7 +330,7 @@ export function useHolzen() {
   const dismissMessage = useCallback(async () => {
     setMessage(null);
     setContext(null);
-    setCompanions({ haiku: null, learningTitle: null, learningBody: null });
+    setCompanions({ haiku: null, groundingTitle: null, groundingBody: null });
     if (!user) return;
     await supabase
       .from('profiles')
@@ -378,7 +356,7 @@ export function useHolzen() {
       setNewReflection(true);
       const { data: latest } = await supabase
         .from('reflections')
-        .select('id, haiku, learning_title, learning_body')
+        .select('id, haiku, grounding_title, grounding_body')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(1)
@@ -387,8 +365,8 @@ export function useHolzen() {
         setLastReflectionId(latest.id);
         setCompanions({
           haiku: latest.haiku ?? null,
-          learningTitle: latest.learning_title ?? null,
-          learningBody: latest.learning_body ?? null,
+          groundingTitle: latest.grounding_title ?? null,
+          groundingBody: latest.grounding_body ?? null,
         });
       }
     }

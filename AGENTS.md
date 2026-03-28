@@ -36,7 +36,8 @@ Instructions for AI assistants and automation working in this repository (e.g. C
 ## Supabase and edge functions
 
 - **Migrations:** `supabase/migrations/` — SQL is the source of truth for schema; follow the project’s normal flow to apply (CLI linked project, dashboard, etc.).
-- **Edge functions:** `supabase/functions/<name>/index.ts` (Deno). Shared helpers: `supabase/functions/_shared/`. **JWT / `verify_jwt` behavior** is set per function in `supabase/config.toml`.
+- **Edge functions:** `supabase/functions/<name>/index.ts` (Deno). Shared helpers: `supabase/functions/_shared/`. Add **`[functions.<name>]`** in **`supabase/config.toml`** for **every** new function (same PR). Unlisted names use **Supabase defaults** and can **401** on `invoke` or disagree with `functions serve` until you add the block and redeploy. **401** → session/`Authorization`, dashboard secrets, deployed `config.toml`.
+- **Lovable + GitHub sync:** migrations and edge functions often **deploy to the linked project immediately** on sync; the **React app** still needs a **publish / Update** in Lovable. See [docs/navigating-the-codebase.md](docs/navigating-the-codebase.md) §17.
 - **Runtime:** Functions run on Supabase in deployed environments. You typically **do not** start them locally during ordinary frontend work unless you are explicitly developing/testing a function.
 - **Secrets** (Stripe, Resend, VAPID, model keys, etc.) belong in the **Supabase dashboard** for edge functions — not in `VITE_*` or committed files.
 
@@ -44,7 +45,7 @@ Instructions for AI assistants and automation working in this repository (e.g. C
 
 - **Required for a custom project:** `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY` (see `.env.example` and `src/integrations/supabase/client.ts`).
 - **Optional:** `VITE_ADMIN_USER_IDS` — comma-separated auth user UUIDs allowed to use `/admin`.
-- `vite.config.ts` uses `loadEnv` and may supply **fallback** Supabase URL/key when vars are missing so dev can boot; prefer explicit `.env` for forks and CI.
+- `vite.config.ts` uses `loadEnv`; **dev server only** may inject Holzen hosted Supabase URL/key when `VITE_*` are missing (`localstack` never). **`vite build` does not** — set `VITE_SUPABASE_*` for production/CI/forks.
 
 Never commit `.env` or service role keys.
 
@@ -54,6 +55,11 @@ Never commit `.env` or service role keys.
 - Prefer extending existing components over duplicating UI logic.
 - User-visible copy: follow existing **i18n** usage in the same feature; do not hardcode English in places that already use `t('...')` without a good reason.
 - **Scope:** Make minimal, task-focused diffs; avoid drive-by refactors and unrelated formatting sweeps.
+
+## Git
+
+- **Commit as you go** when a logical chunk of work is done (e.g. one fix, one migration, one doc update)—do not leave the tree dirty at the end of a task unless the user asked for WIP only.
+- Use clear commit messages (what changed and why). Prefer `git` from the system install if it is not on `PATH` (e.g. `C:\Program Files\Git\bin\git.exe` on Windows).
 
 ## Related docs
 

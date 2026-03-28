@@ -74,8 +74,8 @@ export default function PauseSession() {
   const message: string = navState.reflectionMessage ?? restored?.message ?? '';
   const context: string | null = navState.context ?? restored?.context ?? null;
   const reflectionId: string | null = navState.reflectionId ?? restored?.reflectionId ?? null;
-  const companions: CompanionData = navState.companions ?? restored?.companions ?? { haiku: null, learningTitle: null, learningBody: null };
-  const companionPrefs: CompanionPrefs = navState.companionPrefs ?? restored?.companionPrefs ?? { breathing: true, haiku: true, learning: true, signal: true, zoomOut: true, history: true };
+  const companions: CompanionData = navState.companions ?? restored?.companions ?? { haiku: null, groundingTitle: null, groundingBody: null };
+  const companionPrefs: CompanionPrefs = navState.companionPrefs ?? restored?.companionPrefs ?? { breathing: true, haiku: true, grounding: true, signal: true, zoomOut: true, history: true };
   const severity: 'mild' | 'moderate' | 'high' = navState.severity ?? restored?.severity ?? 'mild';
 
   // Map old step names to new ones for session restoration
@@ -228,11 +228,11 @@ export default function PauseSession() {
     if (reflectionId) {
       const { data: ref } = await supabase
         .from('reflections')
-        .select('zoom_out_read, history_read, signal_read, learning_read, note, tags')
+        .select('zoom_out_read, history_read, signal_read, grounding_read, note, tags')
         .eq('id', reflectionId)
         .single();
       if (ref) {
-        const tools = [ref.zoom_out_read, ref.history_read, ref.signal_read, ref.learning_read].filter(Boolean).length;
+        const tools = [ref.zoom_out_read, ref.history_read, ref.signal_read, ref.grounding_read].filter(Boolean).length;
         setPauseImpactData({
           mood: selectedMood,
           moodAfter: selectedMoodAfter,
@@ -379,6 +379,7 @@ export default function PauseSession() {
                     subscribed={subscribed}
                     onContinue={() => goToStep('shift')}
                     onBack={goBack}
+                    mood={selectedMood}
                   />
                 </motion.div>
               )}
