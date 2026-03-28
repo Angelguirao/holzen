@@ -11,8 +11,9 @@ node_modules
 dist
 dist-ssr
 
-# Supabase CLI local cache
+# Supabase CLI local state (not repo config)
 supabase/.temp/
+supabase/.branches/
 
 # Editor directories and files
 .vscode/*
