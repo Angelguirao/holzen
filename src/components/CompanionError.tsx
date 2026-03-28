@@ -12,11 +12,6 @@ const COMPANION_EMPTY_STATES: Record<string, { icon: React.ElementType; message:
     message: 'Grounding research is taking a moment.',
     hint: 'Behavioral science to anchor your thinking — try again in a few seconds.',
   },
-  learning: {
-    icon: Anchor,
-    message: 'Grounding research is taking a moment.',
-    hint: 'Behavioral science to anchor your thinking — try again in a few seconds.',
-  },
   history: {
     icon: Clock,
     message: 'Historical parallel unavailable.',
@@ -40,9 +35,16 @@ interface Props {
   onRetry?: () => void;
 }
 
+/** Legacy library `source_type`; same empty state as Ground companion. */
+function normalizeCompanionType(type: string | undefined): string | undefined {
+  if (!type) return undefined;
+  return type === 'learning' ? 'grounding' : type;
+}
+
 export function CompanionError({ message, companionType, onRetry }: Props) {
   const { t } = useTranslation();
-  const empty = companionType ? COMPANION_EMPTY_STATES[companionType] : null;
+  const key = normalizeCompanionType(companionType);
+  const empty = key ? COMPANION_EMPTY_STATES[key] : null;
   const Icon = empty?.icon;
 
   return (
