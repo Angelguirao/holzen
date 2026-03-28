@@ -73,10 +73,8 @@ serve(async (req) => {
 
     const isServiceRole = token === serviceRoleKey;
     const isCronSecret = cronSecret.length > 0 && token === cronSecret;
-    // Also allow Supabase's internal cron invocations (they pass the anon key + service role context)
-    const isInternalCron = req.headers.get("x-supabase-cron") === "true";
 
-    if (!isServiceRole && !isCronSecret && !isInternalCron) {
+    if (!isServiceRole && !isCronSecret) {
       log("unauthorized: missing or invalid credentials");
       return new Response(JSON.stringify({ error: "Unauthorized. Requires service role key or cron secret." }), {
         status: 401,
