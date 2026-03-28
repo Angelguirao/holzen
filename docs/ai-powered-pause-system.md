@@ -4,7 +4,28 @@ This document describes **how Holzen turns Bitcoin volatility into a pause exper
 
 **Diagrams** below use [Mermaid](https://mermaid.js.org/) (`flowchart`). They render on GitHub and in many Markdown previews (e.g. Cursor); use a Mermaid extension or [mermaid.live](https://mermaid.live) if your viewer does not draw them.
 
+## Table of contents
+
+1. [Conceptual model](#toc-conceptual-model)
+2. [Two triggers: comparison](#toc-two-triggers)
+3. [Reflection generation](#toc-reflection-generation)
+4. [Client flow after reflection (manual path)](#toc-client-flow)
+5. [`companion-orchestrate` (single entry point)](#toc-companion-orchestrate)
+6. [Generator family (orchestrated)](#toc-generator-family)
+7. [Data written by this system](#toc-data-written)
+8. [Frontend surfaces](#toc-frontend-surfaces)
+9. [Background jobs (pause-adjacent)](#toc-background-jobs)
+10. [Known inconsistencies, drift, and fixes](#toc-known-issues)
+11. [Cost and limits (orchestrator)](#toc-cost-limits)
+12. [Security notes](#toc-security)
+13. [File index (pause core)](#toc-file-index)
+14. [Related reading](#toc-related-reading)
+
+Links use explicit HTML anchors before each numbered section so jumps behave consistently in GitHub, Cursor, and other Markdown previews (auto-generated heading slugs vary by tool).
+
 ---
+
+<a id="toc-conceptual-model"></a>
 
 ## 1. Conceptual model
 
@@ -36,6 +57,8 @@ flowchart TB
 Reflection text and haiku land on the new row first; companion columns and intervention payload are filled (or updated) when **`companion-orchestrate`** completes. **Who calls the orchestrator:** the **client** after insert (manual) vs **`check-volatility`** with service role + **`userId`** (automatic).
 
 ---
+
+<a id="toc-two-triggers"></a>
 
 ## 2. Two triggers: comparison
 
@@ -86,6 +109,8 @@ Both paths share **`generateUnifiedReflection`** (via **`holzen-reflect`** vs in
 
 ---
 
+<a id="toc-reflection-generation"></a>
+
 ## 3. Reflection generation (`_shared/reflection-generate.ts`)
 
 - **`generateUnifiedReflection(params)`** — Calls **`https://ai.gateway.lovable.dev/v1/chat/completions`** with **`LOVABLE_API_KEY`**, trying models in order: **`google/gemini-3-flash-preview`**, then **`google/gemini-2.5-flash`** (JSON path uses per-attempt timeouts **12s** then **8s**).
@@ -95,13 +120,17 @@ Both paths share **`generateUnifiedReflection`** (via **`holzen-reflect`** vs in
 
 ---
 
-## 5. Client flow after reflection (manual path)
+<a id="toc-client-flow"></a>
+
+## 4. Client flow after reflection (manual path)
 
 1. **`use-holzen.ts`** — Calls `holzen-reflect`, inserts `reflections`, updates profile, sets companion state from response (haiku; **`grounding_*` null** at insert — same as cron; orchestrate fills companion columns).
 2. **Pause UI** — Uses `use-companion-data.ts` with `reflectionId`, `context`, `reflectionMessage`, **`mood`**, **`severityNumber`**, language.
 3. **`use-companion-data`** — Loads partial companion data from the reflection row if already present; builds **`moodHistory`** from recent `reflections` (`mood`, `outcome`); invokes **`companion-orchestrate`** with `useIntervention: true` and per-preference **`needSignal` / `needGrounding` / `needHistory` / `needZoomOut`** (cached slots skipped).
 
 ---
+
+<a id="toc-companion-orchestrate"></a>
 
 ## 5. `companion-orchestrate` (single entry point)
 
@@ -162,7 +191,7 @@ flowchart LR
 
 **Note:** Even when the headline is mirror / question / etc., enabled companion generators may still run in parallel (see §10 drift — *Intervention vs “run every enabled generator”*).
 
-### 6.3 Question mode
+### 5.3 Question mode
 
 - **File:** `supabase/functions/_shared/generators/question.ts`
 - **Invocation:** When `selection.mode === "question"`, orchestrator awaits **`generateQuestion`** in parallel with generator tasks (`questionPromise`).
@@ -174,6 +203,8 @@ flowchart LR
 - **Automatic path:** **`severity`** (24h absolute % change) and a **mood proxy** (latest prior `reflections.mood` when present) plus **`moodHistory`** are sent from `check-volatility`, so **`selectIntervention`** / session intent align more closely with manual sessions when the user has reported moods before.
 
 ---
+
+<a id="toc-generator-family"></a>
 
 ## 6. Generator family (orchestrated)
 
@@ -192,7 +223,9 @@ All are imported **directly** in `companion-orchestrate` (not HTTP to `signal-co
 
 ---
 
-## 8. Data written by this system
+<a id="toc-data-written"></a>
+
+## 7. Data written by this system
 
 - **`reflections`** — Core row: message, context, mood (manual), haiku, **`grounding_*`** (Ground companion denormalized fields), structured JSON columns for other companions (via `writeCompanionData` / migrations).
 - **`reflection_companions`** — Normalized companion payloads (dual-write).
@@ -205,6 +238,8 @@ All are imported **directly** in `companion-orchestrate` (not HTTP to `signal-co
 
 ---
 
+<a id="toc-frontend-surfaces"></a>
+
 ## 8. Frontend surfaces
 
 | Piece | Role |
@@ -216,6 +251,8 @@ All are imported **directly** in `companion-orchestrate` (not HTTP to `signal-co
 | `src/lib/companion-types.ts` | Canonical type strings shared with tests |
 
 ---
+
+<a id="toc-background-jobs"></a>
 
 ## 9. Background jobs (pause-adjacent)
 
@@ -231,6 +268,8 @@ Exact SQL lives in **[cron-setup.md](./cron-setup.md)**. Typical schedules docum
 | `night-reflection` | Separate end-of-day message path |
 
 ---
+
+<a id="toc-known-issues"></a>
 
 ## 10. Known inconsistencies, drift, and fixes
 
@@ -280,12 +319,16 @@ These are **not bugs** in the parity work; they describe how the system behaves 
 
 ---
 
+<a id="toc-cost-limits"></a>
+
 ## 11. Cost and limits (orchestrator)
 
 - **Daily budget:** `checkDailyBudget(svcClient, 10.0)` — sums **`generation_attempts.estimated_cost_usd`** from **UTC midnight** (`_shared/ratelimit.ts`).
 - **Rate limit:** **`checkRateLimit(svcClient, userId, 60, 30)`** — at most **30** allowlisted **`analytics_events`** rows for that user in the last **60** minutes. The allowlist is **not** “all AI events”; copy the current array from **`ratelimit.ts`** when documenting integrations (see §10).
 
 ---
+
+<a id="toc-security"></a>
 
 ## 12. Security notes
 
@@ -294,6 +337,8 @@ These are **not bugs** in the parity work; they describe how the system behaves 
 - Prompt hardening: `sanitize.ts`, quality gates, `containsCryptoLanguage`, etc., in shared modules.
 
 ---
+
+<a id="toc-file-index"></a>
 
 ## 13. File index (pause core)
 
@@ -326,6 +371,8 @@ src/components/CompanionSection.tsx   # embeds InterventionSection + useCompanio
 ```
 
 ---
+
+<a id="toc-related-reading"></a>
 
 ## 14. Related reading
 
