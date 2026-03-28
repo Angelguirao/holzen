@@ -61,34 +61,135 @@ Reflection text and haiku land on the new row first; companion columns and inter
 
 <a id="toc-two-triggers"></a>
 
-## 2. Two triggers: comparison
+## 2. Two triggers: manual vs automatic
 
-| Aspect | Manual pause (client) | Automatic (`check-volatility` cron) |
-|--------|------------------------|-------------------------------------|
-| **Entry** | User flow in app → `use-holzen.ts` | `supabase/functions/check-volatility/index.ts` (HTTP + service auth) |
-| **BTC data** | Client `fetchBtcData` (`src/lib/btc.ts`) for context string: user **`hold_goal_currency`**, **Fear & Greed**, optional **on-chain** (mempool.space). Suffix wording is **`_shared/pause-context-suffix.ts`** (imported in the app as `@holzen-pause-context`). | **Per-profile `hold_goal_currency`**: CoinGecko `market_chart` 1d + 7d for each distinct quote currency among loaded profiles (fallback **USD** if a quote fails). **Fear & Greed** + **on-chain** use the same module via `pause-cron-parity` (`enrichAutomaticPauseContext`). **Eligibility thresholds** use that user’s quote currency’s move (not a single global USD series). |
-| **Thresholds** | User-initiated (cooldown in hook: 15 min, or 5 s in dev mode) | Per-profile `threshold` / `threshold_down`, `cumulative_threshold`, `cooldown_hours`, quiet hours, `snoozed_until` |
-| **Reflection AI** | **`holzen-reflect`** → **`generateUnifiedReflection`** | **`check-volatility`** → **same** module (`_shared/reflection-generate.ts`) |
-| **Mood** | Collected in UI; stored on `reflections.mood` | **`reflections.mood`** set to **most recent prior mood** when history exists (same proxy as orchestrator). **Reflection prompts** use **mood history** from the last 20 `reflections` with `mood`. **Orchestrator** receives **`mood`** + **`moodHistory`** like the client path. |
-| **Style / extras** | Full: `style`, `customPrompt`, `motivations`, `mantra`, `groundingActivities`, client-supplied `recentHaikus` / `recentMessages` | Profile-backed: `reflection_style`, sanitized `custom_prompt`, `motivations`, `mantra`, `grounding_activities` (same **`sanitize.ts`** limits as **`holzen-reflect`**). **`recentMessages`** / **`recentHaikus`**: up to 5 each from the user’s last 20 reflection rows (dedup signal for the shared generator). |
-| **Reflection row `grounding_*`** | **Null** at insert (JSON path); Ground content comes from **`companion-orchestrate`** | **Null** at insert; **`companion_haiku`** still toggles haiku; Ground / Signal / etc. come **only** from orchestrate |
-| **Orchestrator body** | `use-companion-data`: prefs → **`enable*`** flags (via **`need*`** and cache), **`signalSources`**, localStorage **recency** hints, **`useIntervention: true`**. | Same **field names** as manual: profile **`companion_*`** → **`enable*`**, **`signalSources`** from DB (when Signal on), **recency** derived from last 20 reflection rows (`signal_*`, `grounding_title`, history/zoom JSON titles), **`useIntervention: true`**. Client pref key **`grounding`** maps to **`companion_grounding`**. |
-| **Notifications** | In-app session | Push, optional email, `pause_notifications` row |
-| **Orchestrator auth** | User JWT via `supabase.functions.invoke` | **Service role** `Authorization` + **`userId` in JSON body** |
-| **Profile fields** | After **`holzen-reflect`** insert: **`last_message`**, **`last_context`** only (no **`last_trigger_at`**). **Silent mode** insert also sets **`last_trigger_at`**. | **`last_trigger_at`** updated with **optimistic cooldown claiming** before work; **`last_message`** / **`last_context`** updated when a reflection is created |
-| **Allowlisted `analytics_events` on reflection AI** | **`holzen-reflect`** inserts **`pause_ai_call`** before **`generateUnifiedReflection`**. | **`check-volatility`** inserts the same **`pause_ai_call`** before **`generateUnifiedReflection`** (parity with manual). **`companion-orchestrate`** still invokes **`checkRateLimit`**. See **§11.1**. |
-| **`reflection_generated`** | **`holzen-reflect`** after a successful model response. | **`check-volatility`** after success too; metadata includes **`source: "check-volatility"`** for dashboards. |
+### 2.1 Why there are two paths at all
 
-**Shared logic:** One implementation for adaptive context (mood history, severity bands, Fear & Greed guidance, banned phrases, haiku/message dedup when inputs provided), model fallback order, and the reflection quality gate. Bump **`REFLECTION_PROMPT_VERSION`** in `reflection-generate.ts` when you change that behavior.
+Holzen needs **both** because “pause” means something different when **you ask for it** vs when the **app suggests it while you are away**.
 
-### Diagram — manual vs automatic (who calls what)
+| Situation | What the product is doing |
+|-----------|----------------------------|
+| **Manual pause** | You opened Pause and chose to run the flow. That is a strong signal: minimal extra permission is needed to run reflection + companions. |
+| **Automatic pause** | The server **infers** “this user might want a pause” from price moves. That can be wrong, noisy, or poorly timed—so it needs **gates** (thresholds, cooldown, quiet hours, snooze) and **delivery** (push/email) the manual path does not need. |
+
+**Engineering consequence:** manual code runs in the **browser** with the **user’s session**; automatic code runs in **`check-volatility`** with the **service role** so it can run on a schedule for many users without anyone opening the app.
+
+---
+
+### 2.2 What is intentionally the same (read this first)
+
+These pieces are **shared on purpose** so the experience does not feel like “two different products”:
+
+- **Reflection quality and wording rules** — One implementation: **`generateUnifiedReflection`** in **`_shared/reflection-generate.ts`** (mood history, severity, Fear & Greed guidance, banned phrases, dedup hints, model fallback order, quality gate). Bump **`REFLECTION_PROMPT_VERSION`** there when that behavior changes.
+- **Fear & Greed + on-chain sentence** — One formatter: **`_shared/pause-context-suffix.ts`** (client import **`@holzen-pause-context`**; cron uses it via **`enrichAutomaticPauseContext`** in **`pause-cron-parity.ts`**). Same English template; only **where** the numbers are fetched differs.
+- **Companion pipeline** — Same **`companion-orchestrate`** function and DB writes; only **how the caller authenticates** differs (see below).
+
+If two rows in the reference table below look “duplicated,” check whether they are **shared behavior** (same) vs **who invokes / where data is loaded** (different).
+
+---
+
+### 2.3 How they differ — and why each difference exists
+
+**A. Who starts the flow**
+
+- **Manual:** **`use-holzen.ts`** after you trigger Pause in the UI.
+- **Automatic:** HTTP invoke of **`check-volatility`** (cron / ops), which loads profiles and filters to **eligible** users.
+
+*Why:* automatic pause must exist **without** a device online; manual pause only runs when the client is active.
+
+---
+
+**B. Guards: when a pause is allowed**
+
+- **Manual:** A **short client cooldown** (15 minutes in production, 5 seconds in dev) so repeated taps do not hammer APIs. There is **no** “market must have moved X%” rule—you already decided to pause. **Normal** manual reflection updates **`last_message` / `last_context`** only; it does **not** advance **`last_trigger_at`** (so your **automatic** cooldown timer is not consumed by a voluntary pause). **Silent mode** is special: it **does** set **`last_trigger_at`** because it is meant to align with “trigger-like” behavior.
+- **Automatic:** Per-profile **thresholds** (`threshold` / `threshold_down`, `cumulative_threshold`), **`cooldown_hours`**, **quiet hours** (timezone + **`quiet_windows`**), **`snoozed_until`**, plus **optimistic claiming** on **`last_trigger_at`** so two workers do not double-fire.
+
+*Why:* proactive interrupts need **strong anti-spam** rules. Voluntary pauses need a **light** throttle only. Splitting **`last_trigger_at`** avoids punishing automatic cadence when someone reflects manually.
+
+---
+
+**C. Building the BTC context string**
+
+- **Manual:** **`fetchBtcData`** in **`src/lib/btc.ts`** (user’s **`hold_goal_currency`**, CoinGecko-style data, Fear & Greed, optional mempool.space). Runs in the **browser** next to the session.
+- **Automatic:** For each **distinct** quote currency among loaded profiles, **`check-volatility`** fetches CoinGecko **`market_chart`** (1d + 7d), maps each user to **their** currency’s series, then appends **one** Fear & Greed snapshot and **one** on-chain snapshot **per cron run** for everyone processed in that batch.
+
+*Why:* the **sentence** is shared (§2.2); the **fetch strategy** differs because the cron must scale to **many users** and respect **API limits**—fetching F&G and mempool data **per user** would be slow and expensive. Eligibility still uses **each user’s** quote currency, not “USD only for the world.”
+
+---
+
+**D. Calling the reflection model**
+
+- **Manual:** Edge function **`holzen-reflect`** (auth, sanitization, analytics) calls **`generateUnifiedReflection`**.
+- **Automatic:** **`check-volatility`** calls **`generateUnifiedReflection`** **inline** (same module, same parameters shape after sanitization).
+
+*Why:* one thin HTTP wrapper for the client; the cron already has service auth and batch logic, so it can call the generator directly without an extra hop.
+
+---
+
+**E. Mood, style, and “recent” hints**
+
+- **Manual:** Mood from the **UI** when available; **`recentHaikus` / `recentMessages`** built from the client’s last queries; grounding catalog merged with **live** user prefs.
+- **Automatic:** **`reflections.mood`** may be set from the **most recent prior mood** in DB when there is history (no screen to ask on). **`recent*`** lists come from the **last 20 reflection rows**. Style fields come from **profile** columns with the same **`sanitize.ts`** limits as **`holzen-reflect`**.
+
+*Why:* the server has **no open Pause screen** during cron; it **reconstructs** the same *kinds* of inputs the model expects (mood history, dedup strings) from **Postgres** so prompts stay comparable.
+
+---
+
+**F. `reflections` row at insert**
+
+- **Both:** **`grounding_*`** (and other orchestrated companion columns) are **null** at insert for the JSON reflection path; **`companion-orchestrate`** fills them afterward. Profile **`companion_*`** flags still control which generators run (e.g. haiku toggles).
+
+*Why:* one write path: reflection text lands first, then the orchestrator enriches the same row.
+
+---
+
+**G. Invoking `companion-orchestrate`**
+
+- **Manual:** **`use-companion-data`** sends **user JWT** + the usual body (enable flags, **`signalSources`**, recency hints, **`useIntervention: true`**).
+- **Automatic:** **`check-volatility`** uses **service role** **`Authorization`** and passes **`userId`** in the JSON body so the orchestrator acts **as that user** with the same field names.
+
+*Why:* the orchestrator is one implementation; the cron is not logged in as each user, so it uses **service role + explicit `userId`** instead of a browser session.
+
+---
+
+**H. Notifications and profile bookkeeping**
+
+- **Manual:** In-app; profile gets **`last_message` / `last_context`** after **`holzen-reflect` succeeds** and the **client** inserts **`reflections`** and updates **`profiles`** (see §2.3.B for **`last_trigger_at`**).
+- **Automatic:** Push / optional email / **`pause_notifications`** as configured; **`last_trigger_at`** updated when claiming work; **`last_message` / `last_context`** updated when a reflection is created.
+
+*Why:* automatic pause must **reach** the user outside the app; manual pause already has them in-session.
+
+---
+
+**I. Analytics parity**
+
+- **Both:** **`pause_ai_call`** is inserted **before** **`generateUnifiedReflection`** so rate limiting and dashboards see the same pattern. **`reflection_generated`** fires after success; cron metadata can tag **`source: "check-volatility"`**. **`companion-orchestrate`** still runs **`checkRateLimit`** on its own invoke. Details: **§11.1**.
+
+*Why:* manual and automatic should not diverge in **cost accounting** or **allowlisted** event semantics.
+
+---
+
+### 2.4 Quick reference table
+
+| Topic | Manual | Automatic |
+|--------|--------|------------|
+| **Entry** | `use-holzen.ts` | `check-volatility/index.ts` |
+| **BTC + suffix** | `fetchBtcData` + `pause-context-suffix` | CoinGecko per currency + one F&G / on-chain per run + same suffix module |
+| **Cooldown / gates** | Short client cooldown; no volatility gate | Thresholds, `cooldown_hours`, quiet hours, snooze, `last_trigger_at` claim |
+| **Reflection AI** | `holzen-reflect` → `generateUnifiedReflection` | `check-volatility` → same generator |
+| **Orchestrator auth** | User JWT | Service role + `userId` in body |
+| **Notifications** | In-app | Push / email / `pause_notifications` |
+
+---
+
+### 2.5 Diagram — who calls what
 
 ```mermaid
 flowchart TB
   subgraph MANUAL [Manual pause — client]
     BTC[fetchBtcData\ncontext string]
     HR[holzen-reflect\nuser JWT]
-    INS[Insert reflections\nupdate profile]
+    INS[Client: insert reflections\nupdate profile]
     UCD[use-companion-data\ncompanion-orchestrate\nuser JWT]
     BTC --> HR --> INS --> UCD
   end
@@ -108,7 +209,7 @@ flowchart TB
   ORCH --> ROW
 ```
 
-Both paths share **`generateUnifiedReflection`** (via **`holzen-reflect`** vs inline in **`check-volatility`**) and the same orchestrator implementation; **auth to the orchestrator** differs (user JWT vs service role + **`userId`**).
+**Caption:** Both paths end in the **same** orchestrator and **same** reflection generator; arrows differ only in **where** each step runs and **which credential** is used.
 
 ---
 
