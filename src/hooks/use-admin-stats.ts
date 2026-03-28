@@ -395,10 +395,10 @@ export function useAdminStats(enabled = true): AdminStats {
       // Compute period stats from view data
       computePeriodStats(
         period,
-        (costRes.data ?? []) as CostRow[],
-        (cacheRes.data ?? []) as CacheHitRow[],
-        (failRes.data ?? []) as FailureRow[],
-        (feedRes.data ?? []) as FeedbackRow[],
+        costData,
+        cacheData,
+        failData,
+        feedData,
         dailyServes,
         dailyFailures,
         dailyFeedback,
