@@ -362,6 +362,17 @@ serve(async (req) => {
         }
       } catch { /* non-fatal */ }
 
+      // Parity with holzen-reflect: same allowlisted event before reflection AI so per-user
+      // throttle (companion-orchestrate checkRateLimit) sees a consistent signal for manual vs cron.
+      try {
+        await supabase.from("analytics_events").insert({
+          user_id: profile.user_id,
+          event: "pause_ai_call",
+        });
+      } catch {
+        /* tracking failure is non-fatal */
+      }
+
       const { result } = await generateUnifiedReflection({
         context: ctx,
         apiKey: LOVABLE_API_KEY,
