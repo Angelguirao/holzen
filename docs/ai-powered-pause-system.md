@@ -66,7 +66,7 @@ Reflection text and haiku land on the new row first; companion columns and inter
 | Aspect | Manual pause (client) | Automatic (`check-volatility` cron) |
 |--------|------------------------|-------------------------------------|
 | **Entry** | User flow in app → `use-holzen.ts` | `supabase/functions/check-volatility/index.ts` (HTTP + service auth) |
-| **BTC data** | Client `fetchBtcData` (`src/lib/btc.ts`) for context string: user **`hold_goal_currency`**, **Fear & Greed**, optional **on-chain** (mempool.space). | **Per-profile `hold_goal_currency`**: CoinGecko `market_chart` 1d + 7d for each distinct quote currency among loaded profiles (fallback **USD** if a quote fails). **Fear & Greed** + **on-chain** appended once per cron run via `_shared/pause-cron-parity.ts` in the **same order** as `use-holzen` / `fetchBtcData`. **Eligibility thresholds** use that user’s quote currency’s move (not a single global USD series). |
+| **BTC data** | Client `fetchBtcData` (`src/lib/btc.ts`) for context string: user **`hold_goal_currency`**, **Fear & Greed**, optional **on-chain** (mempool.space). Suffix wording is **`_shared/pause-context-suffix.ts`** (imported in the app as `@holzen-pause-context`). | **Per-profile `hold_goal_currency`**: CoinGecko `market_chart` 1d + 7d for each distinct quote currency among loaded profiles (fallback **USD** if a quote fails). **Fear & Greed** + **on-chain** use the same module via `pause-cron-parity` (`enrichAutomaticPauseContext`). **Eligibility thresholds** use that user’s quote currency’s move (not a single global USD series). |
 | **Thresholds** | User-initiated (cooldown in hook: 15 min, or 5 s in dev mode) | Per-profile `threshold` / `threshold_down`, `cumulative_threshold`, `cooldown_hours`, quiet hours, `snoozed_until` |
 | **Reflection AI** | **`holzen-reflect`** → **`generateUnifiedReflection`** | **`check-volatility`** → **same** module (`_shared/reflection-generate.ts`) |
 | **Mood** | Collected in UI; stored on `reflections.mood` | **`reflections.mood`** set to **most recent prior mood** when history exists (same proxy as orchestrator). **Reflection prompts** use **mood history** from the last 20 `reflections` with `mood`. **Orchestrator** receives **`mood`** + **`moodHistory`** like the client path. |
@@ -538,7 +538,8 @@ supabase/functions/
 ├── ground-nudge/index.ts
 └── _shared/
     ├── reflection-generate.ts      # shared manual + cron reflection AI
-    ├── pause-cron-parity.ts        # Fear & Greed context + orchestrator hints for check-volatility
+    ├── pause-context-suffix.ts     # single formatter: Fear & Greed + on-chain context suffix (client + cron)
+    ├── pause-cron-parity.ts        # fetches + enrichAutomaticPauseContext + orchestrator hints for check-volatility
     ├── session-intent.ts
     ├── intervention-selector.ts
     ├── companion-data.ts

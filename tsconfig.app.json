@@ -19,6 +19,9 @@
     "paths": {
       "@/*": [
         "./src/*"
+      ],
+      "@holzen-pause-context": [
+        "./supabase/functions/_shared/pause-context-suffix.ts"
       ]
     },
     "skipLibCheck": true,
@@ -30,6 +33,7 @@
     "useDefineForClassFields": true
   },
   "include": [
-    "src"
+    "src",
+    "supabase/functions/_shared/pause-context-suffix.ts"
   ]
 }
