@@ -1,8 +1,8 @@
-import { useAdminStats, TimePeriod, PeriodStats } from '@/hooks/use-admin-stats';
+import { useAdminStats } from '@/hooks/use-admin-stats';
 import { useAuth } from '@/hooks/use-auth';
 import { supabase } from '@/integrations/supabase/client';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { RefreshCw, Activity, Database, DollarSign, AlertTriangle, ThumbsUp, Clock, Loader2, ShieldX } from 'lucide-react';
+import { RefreshCw, Activity, Database, DollarSign, AlertTriangle, ThumbsUp, Clock, Loader2, ShieldX, ChevronDown, ChevronRight } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { useMemo, useState, useEffect } from 'react';
 import { label, PERIOD_OPTIONS, TAB_TRIGGER_CLASS, TYPE_COLORS } from '@/components/admin/admin-constants';
@@ -102,58 +102,6 @@ function zoomOutDeepTimeTitleFromData(data: unknown): string | null {
   const t = (deepTime as Record<string, unknown>).title;
   return typeof t === 'string' ? t : null;
 }
-
-interface TrendInfo {
-  direction: 'up' | 'down' | 'flat';
-  label: string;
-}
-
-function StatCard({ icon: Icon, title, value, subtitle, alert, trend }: {
-  icon: typeof Activity;
-  title: string;
-  value: string;
-  subtitle?: string;
-  alert?: boolean;
-  trend?: TrendInfo;
-}) {
-  const trendColor = trend
-    ? trend.direction === 'flat'
-      ? 'text-muted-foreground/40'
-      : trend.direction === 'up'
-        ? 'text-emerald-500'
-        : 'text-red-500'
-    : '';
-  const trendArrow = trend
-    ? trend.direction === 'up' ? '↑' : trend.direction === 'down' ? '↓' : '—'
-    : '';
-
-  return (
-    <div className={`rounded-xl border px-4 py-3 space-y-1 ${alert ? 'border-destructive/40 bg-destructive/10' : 'border-border/30 bg-card/20'}`}>
-      <div className="flex items-center gap-2">
-        <Icon className={`h-3.5 w-3.5 ${alert ? 'text-destructive' : 'text-muted-foreground/60'}`} />
-        <span className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/70">{title}</span>
-      </div>
-      <div className="flex items-baseline gap-1.5">
-        <p className={`text-lg font-mono ${alert ? 'text-destructive' : 'text-foreground'}`}>{value}</p>
-        {trend && (
-          <span className={`text-[9px] font-mono ${trendColor}`}>
-            {trendArrow} {trend.label}
-          </span>
-        )}
-      </div>
-      {subtitle && <p className="text-[10px] text-muted-foreground/60">{subtitle}</p>}
-    </div>
-  );
-}
-
-const PERIOD_OPTIONS: { value: TimePeriod; label: string }[] = [
-  { value: 'today', label: 'Today' },
-  { value: '7d', label: '7 days' },
-  { value: '30d', label: '30 days' },
-  { value: 'all', label: 'All time' },
-];
-
-const TAB_TRIGGER_CLASS = "text-[10px] font-mono uppercase tracking-wider px-2.5 py-1 rounded-full data-[state=active]:bg-primary/10 data-[state=active]:text-primary";
 
 export default function Admin() {
   const { isAdmin, loading: adminLoading } = useIsAdmin();
@@ -402,7 +350,7 @@ export default function Admin() {
               title="Cost"
               value={`$${periodStats.cost.toFixed(3)}`}
               subtitle={periodLabel}
-              alert={periodStats.cost > (period === 'today' ? 8 : period === '7d' ? 50 : period === '30d' ? 200 : false)}
+              alert={periodStats.cost > costWarn}
               trend={costTrend}
             />
             <StatCard
