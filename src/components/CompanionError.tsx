@@ -1,4 +1,4 @@
-import { RefreshCw, BookOpenText, Anchor, Clock, Mountain, Feather } from 'lucide-react';
+import { RefreshCw, BookOpenText, Anchor, Clock, Mountain, Feather, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const COMPANION_EMPTY_STATES: Record<string, { icon: React.ElementType; message: string; hint: string }> = {
@@ -7,7 +7,7 @@ const COMPANION_EMPTY_STATES: Record<string, { icon: React.ElementType; message:
     message: 'No philosophical insight available right now.',
     hint: 'Timeless Bitcoin thinking from the best minds — coming shortly.',
   },
-  learning: {
+  grounding: {
     icon: Anchor,
     message: 'Grounding research is taking a moment.',
     hint: 'Behavioral science to anchor your thinking — try again in a few seconds.',
@@ -27,6 +27,11 @@ const COMPANION_EMPTY_STATES: Record<string, { icon: React.ElementType; message:
     message: 'Haiku couldn\'t be composed.',
     hint: 'A poetic mirror for this moment — try refreshing.',
   },
+  intervention: {
+    icon: Sparkles,
+    message: 'Couldn\'t load this perspective.',
+    hint: 'The companion service may be unavailable or missing server configuration (e.g. API keys). Try again in a moment.',
+  },
 };
 
 interface Props {
@@ -35,9 +40,16 @@ interface Props {
   onRetry?: () => void;
 }
 
+/** Legacy library `source_type`; same empty state as Ground companion. */
+function normalizeCompanionType(type: string | undefined): string | undefined {
+  if (!type) return undefined;
+  return type === 'learning' ? 'grounding' : type;
+}
+
 export function CompanionError({ message, companionType, onRetry }: Props) {
   const { t } = useTranslation();
-  const empty = companionType ? COMPANION_EMPTY_STATES[companionType] : null;
+  const key = normalizeCompanionType(companionType);
+  const empty = key ? COMPANION_EMPTY_STATES[key] : null;
   const Icon = empty?.icon;
 
   return (

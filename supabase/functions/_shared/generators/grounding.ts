@@ -12,7 +12,10 @@ import { qualityGate, containsSlop, isUrlReachable, contentFingerprint } from ".
 import { GROUNDING_FALLBACKS, pickRandom } from "../fallbacks.ts";
 import { parseMarketDirection, serveFromCache } from "../cache.ts";
 import { createAttemptLogger } from "../observe.ts";
-import { searchLibrary, paperToGrounding } from "../content-library.ts";
+import { searchLibrary, paperToGrounding, recordLibraryServe } from "../content-library.ts";
+
+/** Bump when the search query, structuring prompt, or quality rules change. */
+export const PROMPT_VERSION = "v3";
 
 // ── Public types ──
 
@@ -27,12 +30,36 @@ export interface GenerateGroundingParams {
   context?: string;
   language?: string;
   recentTopics?: string[];
+  /** User's grounding catalog + custom URLs (parity with `generateSignal` `sources`). */
+  sources?: Array<{ name: string; type: string; url?: string }>;
+  /** Hostnames or publisher labels to avoid repeating (parity with `recentSignalSources`). */
+  recentGroundingSources?: string[];
+  /** Past nudge titles to avoid duplicating angles (typically `recentNudgeTopics` from orchestrator). */
+  recentGroundingTitles?: string[];
   userId?: string;
   preferredBias?: string;
   log: (msg: string, extra?: Record<string, unknown>) => void;
 }
 
 // ── Internals ──
+
+function buildSourceHints(sources?: Array<{ name: string; type: string; url?: string }>) {
+  const sourceNames: string[] = [];
+  const sourceUrls: string[] = [];
+  if (sources && Array.isArray(sources)) {
+    for (const s of sources) {
+      if (s.name) sourceNames.push(s.name);
+      if (s.url && typeof s.url === "string") {
+        try {
+          const hostname = new URL(s.url.startsWith("http") ? s.url : `https://${s.url}`)
+            .hostname.replace(/^www\./, "");
+          if (hostname && !sourceUrls.includes(hostname)) sourceUrls.push(hostname);
+        } catch { /* skip malformed URLs */ }
+      }
+    }
+  }
+  return { sourceNames, sourceUrls };
+}
 
 const BIAS_TOPICS: { topic: string; direction: "down" | "up" | "both" }[] = [
   { topic: "loss aversion and panic selling during market drops", direction: "down" },
@@ -46,18 +73,6 @@ const BIAS_TOPICS: { topic: string; direction: "down" | "up" | "both" }[] = [
   { topic: "regret aversion and its effect on long-term investment holding", direction: "both" },
   { topic: "social proof and information cascading in Bitcoin markets", direction: "down" },
 ];
-
-function groundingPreferTags(preferredBias: string | undefined, biasTopic: string): string[] {
-  const words = new Set<string>();
-  for (const text of [preferredBias, biasTopic]) {
-    if (!text) continue;
-    for (const w of text.split(/\s+/)) {
-      const t = w.replace(/[^a-zA-Z]/g, "");
-      if (t.length > 4) words.add(t.toLowerCase());
-    }
-  }
-  return [...words];
-}
 
 function findMatchingBiasTopic(preferredBias: string | undefined): (typeof BIAS_TOPICS)[number] | null {
   const pref = preferredBias?.trim().toLowerCase();
@@ -77,6 +92,18 @@ async function serveFallback(
   marketDirection?: "up" | "down" | "neutral",
   excludeIds?: string[],
 ): Promise<GroundingResult> {
+  const libraryRows = await searchLibrary(svcClient, {
+    type: "paper",
+    companionType: "ground_nudge",
+    userId,
+    includeStale: false,
+  });
+  if (libraryRows.length > 0) {
+    const pick = libraryRows[Math.floor(Math.random() * Math.min(libraryRows.length, 3))];
+    const result = paperToGrounding(pick);
+    recordLibraryServe(svcClient, userId, pick.id, "ground_nudge");
+    return { data: result, source: "cache", cacheId: null };
+  }
   const cached = await serveFromCache(svcClient, "ground_nudge", "en", { userId, marketDirection, excludeIds });
   if (cached) return { data: cached.data, source: "cache", cacheId: cached.cacheId };
   return { data: pickRandom(GROUNDING_FALLBACKS), source: "curated", cacheId: null };
@@ -118,7 +145,17 @@ async function callPerplexity(
 // ── Public entry point ──
 
 export async function generateGrounding(params: GenerateGroundingParams): Promise<GroundingResult> {
-  const { svcClient, context, recentTopics, userId, preferredBias, log } = params;
+  const {
+    svcClient,
+    context,
+    recentTopics,
+    sources,
+    recentGroundingSources,
+    recentGroundingTitles,
+    userId,
+    preferredBias,
+    log,
+  } = params;
   const marketDirectionForCache = parseMarketDirection(context);
 
   const logAttempt = createAttemptLogger(svcClient, { userId });
@@ -153,104 +190,60 @@ export async function generateGrounding(params: GenerateGroundingParams): Promis
 
   const marketContext = context || "Bitcoin market volatility";
 
-  // ── Try local content library first ──
-  const libraryResults = await searchLibrary(svcClient, {
-    type: "paper",
-    companionType: "ground_nudge",
-    preferTags: groundingPreferTags(preferredBias, randomBias),
-    excludeTitles: recentTopics,
-    limit: 3,
-  });
+  const { sourceNames, sourceUrls } = buildSourceHints(sources);
+  const recentSourceExcl = (recentGroundingSources && recentGroundingSources.length > 0)
+    ? ` Do NOT center the answer on these journals/sites (already surfaced recently): ${recentGroundingSources.slice(0, 5).join(", ")}. Prefer a different venue or research line.`
+    : "";
+  const topicExcl = (recentGroundingTitles && recentGroundingTitles.length > 0)
+    ? `\nDo NOT repeat these recent nudge titles or angles (find a fresh framing): ${recentGroundingTitles.slice(0, 5).join("; ")}.`
+    : "";
+  const sourceHint = sourceNames.length > 0
+    ? ` When possible, surface research that could plausibly appear in or relate to: ${sourceNames.sort(() => Math.random() - 0.5).slice(0, 5).join(", ")}. Still require real peer-reviewed or working-paper quality.`
+    : "";
 
-  if (libraryResults.length > 0) {
-    const pick = libraryResults[0];
-    const result = paperToGrounding(pick);
-    log(`served from content library: "${pick.title}"`);
-    const citations = pick.url ? [pick.url] : [];
-    let qualityScore = 1;
-    const cacheQg = qualityGate("ground_nudge", result);
-    if (result.title && result.body && result.citation && qualityScore > 0 && cacheQg.pass) {
-      try {
-        const { data: existing } = await svcClient.from("companion_cache").select("content").eq("companion_type", "ground_nudge").eq("language", "en").limit(30);
-        const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
-        const newNorm = norm(result.title);
-        const isDup = existing?.some((e: any) => {
-          const t = norm(e.content?.title || "");
-          return t === newNorm || t.includes(newNorm) || newNorm.includes(t);
-        });
-        if (!isDup) {
-          let sourceHost = "";
-          try { sourceHost = result.url ? new URL(result.url.startsWith("http") ? result.url : `https://${result.url}`).hostname.replace(/^www\./, "") : ""; } catch { /* ignore */ }
-          const fingerprint = await contentFingerprint(newNorm);
-          const { error: cacheErr } = await svcClient.from("companion_cache").insert({
-            companion_type: "ground_nudge",
-            language: "en",
-            content: result,
-            quality_score: qualityScore,
-            title: result.title,
-            title_norm: newNorm,
-            fingerprint,
-            source_kind: "academic_paper",
-            source_title: result.citation || null,
-            source_author: result.citation?.split("(")[0]?.trim() || null,
-            source_url: result.url || null,
-            source_host: sourceHost || null,
-            citations: citations.length > 0 ? JSON.stringify(citations) : null,
-            market_regime: parseMarketDirection(context),
-            expires_at: new Date(Date.now() + 14 * 86400000).toISOString(),
-            last_validated_at: qualityScore >= 2 ? new Date().toISOString() : null,
-            automated_score: qualityScore,
-          });
-          if (cacheErr) log(`cache insert error: ${cacheErr.message}`);
-        } else {
-          log("cache dedup: skipped duplicate title");
-        }
-      } catch (e) {
-        log(`cache write failed: ${e}`);
-      }
-    }
-    if (result.url && result.url.startsWith("http")) {
-      isUrlReachable(result.url).then(async (reachable) => {
-        if (reachable) {
-          try {
-            const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
-            await svcClient.from("companion_cache")
-              .update({ quality_score: 2, last_validated_at: new Date().toISOString() })
-              .eq("companion_type", "ground_nudge")
-              .eq("title_norm", norm(result.title));
-          } catch { /* non-critical */ }
-        } else {
-          log("background URL validation failed", { url: result.url });
-        }
-      }).catch(() => {});
-    }
-    return { data: result, source: "live", cacheId: null };
-  }
-
-  // ── No local match — fall through to Perplexity ──
-
-  const searchQuery = `Find a specific academic study or research paper about ${randomBias}. The research should be relevant to: ${marketContext}. Include the researcher names, university, year of publication, sample size or key methodology detail, and the main finding. Prefer peer-reviewed journals.`;
+  const searchQuery =
+    `Find a specific academic study or research paper about ${randomBias}. The research should be relevant to: ${marketContext}. Include the researcher names, university, year of publication, sample size or key methodology detail, and the main finding. Prefer peer-reviewed journals.${sourceHint}${recentSourceExcl}`;
 
   // ── Step 1: Perplexity academic search ──
   log("calling perplexity");
   let searchContent = "";
   let citations: string[] = [];
 
+  const perplexityBody: any = {
+    model: "sonar-pro",
+    messages: [
+      {
+        role: "system",
+        content:
+          `You are a behavioral finance research assistant. Search for real, specific academic research papers. Return ONE specific study with exact researcher names, publication year, journal name, and quantitative findings. Prefer lesser-known but fascinating studies over the most commonly cited ones.
+
+DIVERSITY: Use a different journal/venue angle when possible. Do not recycle the same famous paper every time.${topicExcl}`,
+      },
+      { role: "user", content: searchQuery },
+    ],
+    search_mode: "academic",
+    ...(sourceUrls.length > 0 ? { search_domain_filter: sourceUrls.slice(0, 5) } : {}),
+  };
+
   try {
-    const result = await callPerplexity({
-      model: "sonar-pro",
-      messages: [
-        {
-          role: "system",
-          content: "You are a behavioral finance research assistant. Search for real, specific academic research papers. Return ONE specific study with exact researcher names, publication year, journal name, and quantitative findings. Prefer lesser-known but fascinating studies over the most commonly cited ones.",
-        },
-        { role: "user", content: searchQuery },
-      ],
-      search_mode: "academic",
-    }, PERPLEXITY_API_KEY, log);
+    let result = await callPerplexity(perplexityBody, PERPLEXITY_API_KEY, log);
     searchContent = result.content;
     citations = result.citations;
     log(`content length: ${searchContent.length}, citations: ${citations.length}`);
+
+    if (citations.length === 0 && sourceUrls.length > 0 && searchContent.length > 0) {
+      log("0 citations with domain filter — retrying without filter");
+      const retryBody = { ...perplexityBody };
+      delete retryBody.search_domain_filter;
+      try {
+        const retry = await callPerplexity(retryBody, PERPLEXITY_API_KEY, log);
+        if (retry.citations.length > 0) {
+          searchContent = retry.content;
+          citations = retry.citations;
+          log(`retry got ${citations.length} citations`);
+        }
+      } catch { log("retry failed, using original content"); }
+    }
   } catch (e) {
     log(`perplexity failed: ${e}`);
     logAttempt({ companion_type: "ground_nudge", provider: "perplexity", model: "sonar-pro", status: String(e).includes("RATE_LIMITED") ? "rate_limited" : "error", latency_ms: 0, error_message: String(e) });

@@ -27,13 +27,15 @@ cd holzen
 npm install
 ```
 
-Copy environment variables and adjust for your Supabase project (or your team’s shared values):
+Environment variables (see [.env.example](.env.example)):
 
-```sh
-cp .env.example .env
-```
+- **Lovable Cloud only:** If you only edit and preview in [Lovable](https://lovable.dev), the platform **injects `VITE_SUPABASE_*` for you** — you do not maintain a `.env` file there. That does **not** apply to **`npm run dev` on your computer**; Vite reads files from disk locally (see below).
+- **Default (local machine):** `cp .env.example .env` then `npm run dev` — uses your `.env` values. If `VITE_SUPABASE_*` are missing, the **dev server only** can fall back to the bundled Holzen hosted keys (see `vite.config.ts`); **`npm run build` never does** — forks and CI must supply real `VITE_SUPABASE_*` for production bundles.
+- **Two files / two backends (optional on your machine):** Lovable Cloud does **not** read `.env.hosted`; that file is only for **`npm run dev:hosted`** when you want the app on your laptop to use **hosted** Supabase. If you **only** develop against **local Docker** Supabase, use **`.env.localstack`** / **`npm run dev:local`** and you can **ignore** `.env.hosted` entirely.
+  - **Hosted from local Vite:** copy [.env.hosted.example](.env.hosted.example) to **`.env.hosted.local`**, fill in URL + anon key, run **`npm run dev:hosted`**.
+  - **Local Docker only:** copy [.env.localstack.example](.env.localstack.example) to **`.env.localstack.local`**, set the anon key from `npm run supabase:status`, run **`npm run dev:local`** (no hosted URL/key fallback for that mode).
 
-See [.env.example](.env.example). The app reads **`VITE_SUPABASE_URL`** and **`VITE_SUPABASE_PUBLISHABLE_KEY`** (see `src/integrations/supabase/client.ts`). Optional **`VITE_ADMIN_USER_IDS`**: comma-separated Supabase user UUIDs that may access `/admin`. `VITE_SUPABASE_PROJECT_ID` in the example file is for your own reference when matching the dashboard project.
+The app reads **`VITE_SUPABASE_URL`** and **`VITE_SUPABASE_PUBLISHABLE_KEY`**. **`VITE_ADMIN_USER_IDS`** is optional (comma-separated auth user UUIDs); admin access may also be governed in the database (e.g. `is_admin` / `is_admin()`) depending on your setup.
 
 Start the dev server (Vite is configured for **port 8080**):
 
@@ -41,19 +43,25 @@ Start the dev server (Vite is configured for **port 8080**):
 npm run dev
 ```
 
-Open [http://localhost:8080](http://localhost:8080). You do **not** need a local database or Docker for everyday frontend work; the app talks to the hosted Supabase project.
+Open [http://localhost:8080](http://localhost:8080). For hosted Supabase you do **not** need Docker for everyday frontend work.
 
 ## npm scripts
 
 | Script | Purpose |
 |--------|---------|
-| `npm run dev` | Vite dev server with HMR |
+| `npm run dev` | Vite dev server with HMR (default mode) |
+| `npm run dev:hosted` | Dev server using `.env.hosted` / `.env.hosted.local` (optional: hit **cloud** Supabase from your PC; not used by Lovable) |
+| `npm run dev:local` | Dev server using `.env.localstack` / `.env.localstack.local` (local Supabase only; no hosted fallback) |
 | `npm run build` | Production build |
 | `npm run build:dev` | Build in development mode |
 | `npm run preview` | Serve the production build locally |
 | `npm run test` | Vitest (jsdom), single run |
 | `npm run test:watch` | Vitest in watch mode |
 | `npm run lint` | ESLint |
+| `npm run supabase:start` | Local Supabase stack (Docker); same as `npx supabase start` |
+| `npm run supabase:status` | Print local API URL and anon key |
+| `npm run supabase:stop` | Stop local stack |
+| `npm run supabase:reset` | Reapply `supabase/migrations/` on local DB |
 
 ## Repository layout
 
@@ -66,9 +74,43 @@ Open [http://localhost:8080](http://localhost:8080). You do **not** need a local
 
 ## Supabase & backend
 
-- **Schema changes**: apply migrations with your usual Supabase workflow (e.g. linked project + `supabase db push`, or dashboard SQL). Migrations in this repo are the source of truth for the database shape.
+- **Schema changes**: apply migrations with your usual Supabase workflow (e.g. linked project + `supabase db push`, or dashboard SQL). Migrations in this repo are the source of truth for the database shape. To **try migrations safely on your machine**, see [Local Supabase and migrations](#local-supabase-and-migrations) below.
 - **Edge functions**: each folder under `supabase/functions/<name>/` is a deployable function; shared code lives in `supabase/functions/_shared/`.
 - **Local frontend only**: the publishable Supabase key in `.env` is safe for the browser; never commit server keys or edge secrets to the repo.
+
+## Local Supabase and migrations
+
+For everyday UI work you can point `.env` at a **hosted** Supabase project only ([Getting started](#getting-started)). To **iterate on SQL** without touching production, use the [Supabase CLI](https://supabase.com/docs/guides/cli) with **Docker** (for example Docker Desktop on Windows).
+
+**Installing the CLI:** `npm install -g supabase` is **not supported**. After `npm install` in this repo, the CLI is available as a **dev dependency**—use `npx supabase …` or the `npm run supabase:*` scripts in the [npm scripts](#npm-scripts) table. On Windows you can also install via [Scoop](https://scoop.sh) ([Supabase docs](https://github.com/supabase/cli#install-the-cli)).
+
+1. From the repo root, start the local stack:
+
+   ```sh
+   npm run supabase:start
+   ```
+
+   (Equivalent: `npx supabase start`.)
+
+2. Read the **API URL** and **anon** key from that output, or run:
+
+   ```sh
+   npm run supabase:status
+   ```
+
+3. Copy [.env.localstack.example](.env.localstack.example) to **`.env.localstack.local`**, set **`VITE_SUPABASE_PUBLISHABLE_KEY`** from `npm run supabase:status`, and run **`npm run dev:local`** (or put the same values in `.env` and use `npm run dev` — but two-file workflow keeps hosted vs local separate).
+
+4. Rebuild the local database from `supabase/migrations/` whenever you need a clean apply:
+
+   ```sh
+   npm run supabase:reset
+   ```
+
+When migrations are ready, commit the SQL files under `supabase/migrations/` and apply them to your hosted project (e.g. [link the CLI](https://supabase.com/docs/guides/cli/local-development#link-your-project) to that project and `npx supabase db push`, or run the SQL via the dashboard), following your team’s process.
+
+**Edge functions:** You can run functions locally with `npx supabase functions serve`, but production behavior depends on **Supabase dashboard secrets** (Stripe, email, AI keys, etc.). Local testing may need those set for the CLI or a `.env` used by `supabase functions serve`—see [Supabase Functions local secrets](https://supabase.com/docs/guides/functions/secrets).
+
+**No Docker:** Use a separate hosted project (staging), put its URL and anon key in `.env`, and apply migrations there before production.
 
 ## PWA & offline
 
@@ -80,4 +122,6 @@ ESLint is enabled project-wide. The tree may report many existing issues; treat 
 
 ## Lovable
 
-The project was initially scaffolded with [Lovable](https://lovable.dev); you can keep using that workflow alongside local development. Publishing and custom domains are documented in [Lovable’s docs](https://docs.lovable.dev/features/custom-domain#custom-domain).
+The project was initially scaffolded with [Lovable](https://lovable.dev); you can keep using that workflow alongside local development. **Lovable Cloud** can generate and manage **`VITE_SUPABASE_*` for previews and deploys** so you do not hand-edit `.env` in that environment. **Locally**, Git + Vite still use `.env` / `.env.*.local` on your machine when you run `npm run dev` (or the `dev:hosted` / `dev:local` scripts above). Publishing and custom domains are documented in [Lovable’s docs](https://docs.lovable.dev/features/custom-domain#custom-domain).
+
+**When the repo syncs from GitHub into Lovable**, the linked Supabase project typically **applies new migrations and deploys edge function changes automatically** — that can affect **production** immediately, with no extra click. **Frontend** (this React app) still goes live for end users when you **publish** and confirm **Update** in Lovable’s publish flow. Merge backend changes with that split in mind; see [docs/navigating-the-codebase.md](docs/navigating-the-codebase.md) for `config.toml`, JWT defaults, and local vs hosted behavior.

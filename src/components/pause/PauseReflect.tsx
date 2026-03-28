@@ -18,11 +18,13 @@ interface Props {
   subscribed: boolean;
   onContinue: () => void;
   onBack?: () => void;
+  /** Current mood selected by the user in the Feel step */
+  mood?: string | null;
 }
 
 export function PauseReflect({
   companions, companionPrefs, severity, reflectionId, context, reflectionMessage,
-  isFavorite, onToggleFavorite, subscribed, onContinue, onBack,
+  isFavorite, onToggleFavorite, subscribed, onContinue, onBack, mood,
 }: Props) {
   const { t } = useTranslation();
 
@@ -57,7 +59,7 @@ export function PauseReflect({
         </motion.div>
       )}
 
-      {/* Companions */}
+      {/* Companions + featured intervention — data from useCompanionData inside CompanionSection */}
       <CompanionSection
         companions={companions}
         prefs={companionPrefs}
@@ -65,6 +67,7 @@ export function PauseReflect({
         reflectionId={reflectionId}
         context={context}
         reflectionMessage={reflectionMessage}
+        mood={mood}
       />
 
       {/* Continue */}

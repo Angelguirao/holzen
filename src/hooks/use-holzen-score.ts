@@ -13,7 +13,7 @@ interface Reflection {
   zoom_out_read?: boolean;
   history_read?: boolean;
   signal_read?: boolean;
-  learning_read?: boolean;
+  grounding_read?: boolean;
 }
 
 interface PracticeEntry {
@@ -161,7 +161,7 @@ export function useHolzenScore(
     // ─── 4. COGNITIVE REAPPRAISAL (15%) ───
     // Engaging with perspective-shifting tools. Weighted higher during volatility.
     const reappraisalTools = recent.map(r => {
-      const engaged = [r.zoom_out_read, r.history_read, r.signal_read, r.learning_read]
+      const engaged = [r.zoom_out_read, r.history_read, r.signal_read, r.grounding_read]
         .filter(Boolean).length; // 0-4
       const vol = parseVolatility(r.context);
       const volMultiplier = vol >= 3 ? 1.5 : 1; // bonus during volatile moments

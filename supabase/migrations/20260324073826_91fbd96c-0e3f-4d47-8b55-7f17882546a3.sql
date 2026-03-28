@@ -15,6 +15,10 @@ CREATE INDEX IF NOT EXISTS idx_user_companion_serves_cache
 
 ALTER TABLE user_companion_serves ENABLE ROW LEVEL SECURITY;
 
+-- Idempotent: table + policies may already exist (20260321000001_user_cache_tracking.sql).
+DROP POLICY IF EXISTS "Users can view own companion serve history" ON user_companion_serves;
+DROP POLICY IF EXISTS "Service role full access on user_companion_serves" ON user_companion_serves;
+
 CREATE POLICY "Users can view own companion serve history"
   ON user_companion_serves FOR SELECT
   USING (user_id = auth.uid());

@@ -56,8 +56,8 @@ interface Reflection {
   created_at: string;
   is_favorite: boolean;
   haiku: string | null;
-  learning_title: string | null;
-  learning_body: string | null;
+  grounding_title: string | null;
+  grounding_body: string | null;
   note: string | null;
   mood: string | null;
   mood_after: string | null;
@@ -65,7 +65,7 @@ interface Reflection {
   tags: string[];
   breathing_completed: boolean;
   haiku_read: boolean;
-  learning_read: boolean;
+  grounding_read: boolean;
   signal_read?: boolean;
   zoom_out_read?: boolean;
   history_read?: boolean;
@@ -152,7 +152,7 @@ const Profile = () => {
     const loadReflections = async () => {
       const { data } = await supabase
         .from('reflections')
-        .select('id, message, context, created_at, is_favorite, haiku, learning_title, learning_body, note, mood, mood_after, outcome, tags, breathing_completed, haiku_read, learning_read, signal_read, signal_source, zoom_out_read, history_read')
+        .select('id, message, context, created_at, is_favorite, haiku, grounding_title, grounding_body, note, mood, mood_after, outcome, tags, breathing_completed, haiku_read, grounding_read, signal_read, signal_source, zoom_out_read, history_read')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(1000);
@@ -206,14 +206,14 @@ const Profile = () => {
   }, [user]);
 
   const deleteLetter = useCallback(async (id: string) => {
-    try {
-      await supabase.from('future_letters').delete().eq('id', id);
-      setLetters((prev) => prev.filter((l) => l.id !== id));
-      toast('Letter deleted');
-    } catch {
-      toast('Failed to delete letter');
+    const { error } = await supabase.from('future_letters').delete().eq('id', id);
+    if (error) {
+      toast.error(t('letter.deleteDeliveredFailed'));
+      return;
     }
-  }, []);
+    setLetters((prev) => prev.filter((l) => l.id !== id));
+    toast(t('letter.deleted'));
+  }, [t]);
 
   const pendingLetters = useMemo(() => letters.filter((l) => !l.delivered), [letters]);
   const deliveredLetters = useMemo(() => letters.filter((l) => l.delivered), [letters]);
@@ -723,7 +723,7 @@ function LetterCard({ letter: l, onDelete, fmtPrice, type, onView }: {
       </div>
       {isDelivered ? (
         <>
-          <p className="text-sm leading-relaxed">{l.body}</p>
+          <p className="text-sm leading-relaxed break-words">{l.body}</p>
           <p className="text-[10px] font-mono text-muted-foreground/50">
             Written {format(new Date(l.written_at), 'MMM d, yyyy')} at {fmtPrice(l.btc_price_at_write)}
             {l.btc_price_at_delivery && ` · Delivered at ${fmtPrice(l.btc_price_at_delivery)}`}
@@ -734,7 +734,7 @@ function LetterCard({ letter: l, onDelete, fmtPrice, type, onView }: {
           <p className="text-xs text-muted-foreground/50">
             Delivers during next {l.deliver_during === 'surge' ? 'surge' : 'drop'}
           </p>
-          <p className="text-sm leading-relaxed blur-[8px] select-none pointer-events-none">
+          <p className="text-sm leading-relaxed blur-[8px] select-none pointer-events-none break-words">
             {l.body}
           </p>
         </>

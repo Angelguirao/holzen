@@ -38,7 +38,7 @@ export interface CollectionItem {
 
 export interface ReflectionReadFlags {
   haiku_read: boolean;
-  learning_read: boolean;
+  grounding_read: boolean;
   signal_read: boolean;
   zoom_out_read: boolean;
   history_read: boolean;
@@ -47,6 +47,9 @@ export interface ReflectionReadFlags {
 const CACHE_KEY_ITEMS = 'holzen_library_items';
 const CACHE_KEY_COLLECTIONS = 'holzen_library_collections';
 const CACHE_KEY_COL_ITEMS = 'holzen_library_col_items';
+
+/** Matches unique index idx_library_items_user_reflection_source (full index, not partial — PostgREST upsert). */
+const LIBRARY_ITEM_CONFLICT_COLUMNS = 'user_id,reflection_id,source_type';
 
 function readCache<T>(key: string): T | null {
   try {
@@ -106,11 +109,13 @@ export function useLibrary() {
 
     // Backfill: import reflections and their companions not yet in library (runs every load)
     const existingKeys = new Set(
-      libItems.filter((i) => i.reflection_id).map((i) => `${i.reflection_id}:${i.source_type}`)
+      libItems
+        .filter((i) => i.reflection_id && i.source_type)
+        .map((i) => `${i.reflection_id}:${i.source_type}`),
     );
     const { data: allReflections } = await supabase
       .from('reflections')
-      .select('id, message, context, created_at, outcome, haiku, learning_title, learning_body, learning_url, signal_title, signal_body, signal_source, signal_url, zoom_out_data, history_insight_data, haiku_read, learning_read, signal_read, zoom_out_read, history_read')
+      .select('id, message, context, created_at, outcome, haiku, grounding_title, grounding_body, grounding_url, signal_title, signal_body, signal_source, signal_url, zoom_out_data, history_insight_data, haiku_read, grounding_read, signal_read, zoom_out_read, history_read')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
     if (allReflections && allReflections.length > 0) {
@@ -121,7 +126,7 @@ export function useLibrary() {
       for (const r of allReflections as any[]) {
         flags[r.id] = {
           haiku_read: !!r.haiku_read,
-          learning_read: !!r.learning_read,
+          grounding_read: !!r.grounding_read,
           signal_read: !!r.signal_read,
           zoom_out_read: !!r.zoom_out_read,
           history_read: !!r.history_read,
@@ -144,8 +149,8 @@ export function useLibrary() {
         if (r.signal_source && !existingKeys.has(`${r.id}:signal`)) {
           inserts.push({ user_id: user.id, type: 'bookmark', title: r.signal_title, body: r.signal_body, source_type: 'signal', source_url: r.signal_url, reflection_id: r.id, tags: [], created_at: r.created_at, status: r.signal_read ? 'read' : 'unread' });
         }
-        if (r.learning_title && !existingKeys.has(`${r.id}:learning`)) {
-          inserts.push({ user_id: user.id, type: 'bookmark', title: r.learning_title, body: r.learning_body, source_type: 'learning', source_url: r.learning_url, reflection_id: r.id, tags: [], created_at: r.created_at, status: r.learning_read ? 'read' : 'unread' });
+        if (r.grounding_title && !existingKeys.has(`${r.id}:grounding`)) {
+          inserts.push({ user_id: user.id, type: 'bookmark', title: r.grounding_title, body: r.grounding_body, source_type: 'grounding', source_url: r.grounding_url, reflection_id: r.id, tags: [], created_at: r.created_at, status: r.grounding_read ? 'read' : 'unread' });
         }
         if (r.zoom_out_data && !existingKeys.has(`${r.id}:zoom_out`)) {
           const zd = r.zoom_out_data as any;
@@ -158,43 +163,33 @@ export function useLibrary() {
         }
       }
       if (inserts.length > 0) {
-        // Retry logic: attempt batch insert, on failure try individual inserts
-        const tryInsert = async (items: any[], retries = 2): Promise<void> => {
-          const { error: batchErr } = await supabase.from('library_items').insert(items);
-          if (!batchErr) return;
-          
-          console.warn(`[library backfill] batch insert failed (${items.length} items): ${batchErr.message}`);
-          
-          if (retries > 0) {
-            // Wait briefly then retry the whole batch
-            await new Promise((r) => setTimeout(r, 1000));
-            const { error: retryErr } = await supabase.from('library_items').insert(items);
-            if (!retryErr) return;
-            console.warn(`[library backfill] batch retry failed: ${retryErr.message}`);
-          }
+        const batchKeys = new Set<string>();
+        const deduped = inserts.filter((row) => {
+          const k = `${row.user_id}:${row.reflection_id}:${row.source_type}`;
+          if (batchKeys.has(k)) return false;
+          batchKeys.add(k);
+          return true;
+        });
 
-          // Fall back to individual inserts so partial failures don't lose everything
-          let failed = 0;
-          for (const item of items) {
-            const { error: singleErr } = await supabase.from('library_items').insert(item);
-            if (singleErr) {
-              // Skip duplicates silently (unique constraint), log others
-              if (!singleErr.message.includes('duplicate') && !singleErr.message.includes('unique')) {
-                failed++;
-                console.error(`[library backfill] single insert failed (${item.source_type}/${item.reflection_id}):`, singleErr.message);
-              }
+        const backfillUpsert = async (rows: any[]) => {
+          const { error: batchErr } = await supabase.from('library_items').upsert(rows, {
+            onConflict: LIBRARY_ITEM_CONFLICT_COLUMNS,
+            ignoreDuplicates: true,
+          });
+          if (!batchErr) return;
+          console.warn(`[library backfill] batch upsert failed (${rows.length} rows): ${batchErr.message}`);
+          for (const item of rows) {
+            const { error: oneErr } = await supabase.from('library_items').upsert(item, {
+              onConflict: LIBRARY_ITEM_CONFLICT_COLUMNS,
+              ignoreDuplicates: true,
+            });
+            if (oneErr && !oneErr.message.includes('duplicate') && !oneErr.message.includes('unique')) {
+              console.warn(`[library backfill] row upsert failed (${item.source_type}/${item.reflection_id}):`, oneErr.message);
             }
-          }
-          if (failed > 0) {
-            // Store failed count in localStorage so we can retry on next load
-            const retryKey = `holzen_backfill_retry_${user!.id}`;
-            const prev = parseInt(localStorage.getItem(retryKey) ?? '0', 10);
-            localStorage.setItem(retryKey, String(prev + failed));
-            console.warn(`[library backfill] ${failed} items failed, queued for next load`);
           }
         };
 
-        await tryInsert(inserts);
+        await backfillUpsert(deduped);
         const { data: refreshed } = await supabase
           .from('library_items')
           .select('*')
@@ -363,7 +358,7 @@ export function useLibrary() {
     if (!flags) return true; // no data, assume engaged
     const sourceToFlag: Record<string, keyof ReflectionReadFlags> = {
       haiku: 'haiku_read',
-      learning: 'learning_read',
+      grounding: 'grounding_read',
       signal: 'signal_read',
       zoom_out: 'zoom_out_read',
       history_insight: 'history_read',

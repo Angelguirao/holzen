@@ -7,6 +7,7 @@ import { SignalDisplay } from './SignalDisplay';
 import { ZoomOutDisplay } from './ZoomOutDisplay';
 import { HistoricalInsightDisplay } from './HistoricalInsightDisplay';
 import { CompanionFeedback } from './CompanionFeedback';
+import { InterventionSection } from './InterventionSection';
 import { Check, Heart, Lock, Feather, Anchor, BookOpenText, Mountain, Clock } from 'lucide-react';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
@@ -14,18 +15,21 @@ import { useCompanionData } from '@/hooks/use-companion-data';
 
 export interface CompanionData {
   haiku: string | null;
-  learningTitle: string | null;
-  learningBody: string | null;
+  groundingTitle: string | null;
+  groundingBody: string | null;
 }
 
 export interface CompanionPrefs {
   breathing: boolean;
   haiku: boolean;
-  learning: boolean;
+  /** Ground companion card; persisted as `profiles.companion_grounding`. */
+  grounding: boolean;
   signal: boolean;
   zoomOut: boolean;
   history: boolean;
 }
+
+const SEVERITY_NUMBER: Record<string, number> = { mild: 3, moderate: 6, high: 10 };
 
 interface Props {
   companions: CompanionData;
@@ -34,11 +38,13 @@ interface Props {
   reflectionId?: string | null;
   context?: string | null;
   reflectionMessage?: string | null;
+  /** Current user mood — drives intervention selection */
+  mood?: string | null;
 }
 
 const COMPANION_ICONS: Record<string, React.ElementType> = {
   haiku: Feather,
-  learning: Anchor,
+  grounding: Anchor,
   signal: BookOpenText,
   zoomOut: Mountain,
   history: Clock,
@@ -145,7 +151,7 @@ function CompanionCard({
   );
 }
 
-export const CompanionSection = forwardRef<HTMLDivElement, Props>(function CompanionSection({ companions, prefs, severity = 'mild', reflectionId, context, reflectionMessage }, ref) {
+export const CompanionSection = forwardRef<HTMLDivElement, Props>(function CompanionSection({ companions, prefs, severity = 'mild', reflectionId, context, reflectionMessage, mood }, ref) {
   const { isPro } = useProGate();
   const { t: i18nT } = useTranslation();
 
@@ -157,7 +163,9 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
     zoomOut, zoomOutLoading, zoomOutError, retryZoomOut,
     historyInsight, historyLoading, historyError, retryHistory,
     cacheIds,
-  } = useCompanionData({ companions, prefs, reflectionId, context, reflectionMessage });
+    intervention, interventionLoading, interventionError,
+    retryOrchestrate,
+  } = useCompanionData({ companions, prefs, reflectionId, context, reflectionMessage, mood, severityNumber: SEVERITY_NUMBER[severity] ?? 3 });
 
   const labels = {
     pause: i18nT('companions.pause'),
@@ -176,15 +184,34 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
   const [expandedHistory, setExpandedHistory] = useState(false);
 
   const hasHaiku = prefs.haiku && companions.haiku;
-  const hasLearning = prefs.learning;
+  const hasGrounding = prefs.grounding;
   const hasSignal = prefs.signal && !!reflectionId;
-  const hasZoomOut = prefs.zoomOut && !!reflectionId;
+  // Skip zoomOut companion card when intervention already shows it as secondary (avoid double-render)
+  const interventionHasZoomOut = intervention?.secondary?.type === 'zoom_out';
+  const hasZoomOut = prefs.zoomOut && !!reflectionId && !interventionHasZoomOut;
   const hasHistory = prefs.history && !!reflectionId;
 
-  if (!hasHaiku && !hasLearning && !hasSignal && !hasZoomOut && !hasHistory) return null;
+  if (!hasHaiku && !hasGrounding && !hasSignal && !hasZoomOut && !hasHistory) return null;
 
   return (
     <div ref={ref} className="space-y-2.5">
+      {/* Featured intervention — shown above companions when available */}
+      {(intervention || interventionLoading || interventionError) && (
+        <div className="mb-4">
+          <InterventionSection
+            mode={intervention?.mode ?? 'insight'}
+            primary={intervention?.primary ?? null}
+            secondary={intervention?.secondary ?? null}
+            question={intervention?.question ?? null}
+            loading={interventionLoading}
+            error={interventionError}
+            onRetry={retryOrchestrate}
+            reflectionId={reflectionId}
+          />
+          <div className="border-t border-border/10 mt-6" />
+        </div>
+      )}
+
       <p className="text-[10px] font-mono text-muted-foreground/40 uppercase tracking-[0.2em] text-center mb-1">
         {labels.pause}
       </p>
@@ -207,30 +234,30 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
         </CompanionCard>
       )}
 
-      {hasLearning && (
+      {hasGrounding && (
         <CompanionCard
-          id="learning"
+          id="grounding"
           label={labels.ground}
-          icon={COMPANION_ICONS.learning}
+          icon={COMPANION_ICONS.grounding}
           expanded={expandedLearning}
           onToggle={() => {
             setExpandedLearning((v) => !v);
-            if (!completion.learning) markCompleted('learning');
+            if (!completion.grounding) markCompleted('grounding');
           }}
-          completed={completion.learning}
+          completed={completion.grounding}
           loading={nudgeLoading}
-          isFavorite={isPro ? favorites['learning'] : undefined}
-          onToggleFavorite={isPro ? () => toggleCompanionFavorite('learning') : undefined}
+          isFavorite={isPro ? favorites['grounding'] : undefined}
+          onToggleFavorite={isPro ? () => toggleCompanionFavorite('grounding') : undefined}
         >
           <LearningInput
-            title={companions.learningTitle ?? ''}
-            body={companions.learningBody ?? ''}
+            title={companions.groundingTitle ?? ''}
+            body={companions.groundingBody ?? ''}
             nudge={nudge}
             nudgeLoading={nudgeLoading}
             nudgeError={nudgeError}
             onRetry={retryNudge}
           />
-          {nudge && !nudgeLoading && <CompanionFeedback reflectionId={reflectionId} companionType="learning" cacheId={cacheIds.nudge} />}
+          {nudge && !nudgeLoading && <CompanionFeedback reflectionId={reflectionId} companionType="grounding" cacheId={cacheIds.nudge} />}
         </CompanionCard>
       )}
 

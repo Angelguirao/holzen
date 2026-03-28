@@ -24,7 +24,7 @@ interface Reflection {
   zoom_out_read?: boolean;
   history_read?: boolean;
   signal_read?: boolean;
-  learning_read?: boolean;
+  grounding_read?: boolean;
   note?: string | null;
   tags?: string[] | null;
 }
@@ -103,7 +103,7 @@ function buildWeeklyData(reflections: Reflection[]): WeekBucket[] {
     }
 
     // Cognitive Reappraisal component
-    const toolsUsed = [r.zoom_out_read, r.history_read, r.signal_read, r.learning_read].filter(Boolean).length;
+    const toolsUsed = [r.zoom_out_read, r.history_read, r.signal_read, r.grounding_read].filter(Boolean).length;
     if (toolsUsed > 0) {
       const volMult = vol >= 3 ? 1.5 : 1;
       components.push(Math.min(100, (toolsUsed / 4) * 100 * volMult));

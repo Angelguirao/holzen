@@ -16,7 +16,6 @@ const SOURCE_TYPE_COLORS: Record<string, string> = {
 const CATEGORY_LABELS: Record<string, string> = {
   signal: 'Signal',
   grounding: 'Grounding',
-  learning: 'Learning',
 };
 
 export function SourceCatalogViewer({ sources, onRefresh, libraryEntries = [] }: {

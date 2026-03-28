@@ -35,6 +35,22 @@ export function LearningInput({ title, body, nudge, nudgeLoading = false, nudgeE
     );
   }
 
+  // Failed to load expanded grounding — show retry even when reflection has no featured title/body
+  // (SignalDisplay does this first; we used to `return null` here and hid CompanionError).
+  if (nudgeError && !nudge) {
+    return (
+      <div className="py-3 space-y-1.5">
+        {(displayTitle || displayBody) ? (
+          <>
+            <p className="text-xs font-mono font-medium text-foreground/80">{displayTitle}</p>
+            <p className="text-xs text-muted-foreground leading-relaxed">{displayBody}</p>
+          </>
+        ) : null}
+        <CompanionError companionType="grounding" onRetry={onRetry} />
+      </div>
+    );
+  }
+
   if (!displayTitle && !displayBody) return null;
 
   return (
@@ -58,9 +74,6 @@ export function LearningInput({ title, body, nudge, nudgeLoading = false, nudgeE
             </a>
           )}
         </div>
-      )}
-      {nudgeError && !nudge && (
-        <CompanionError companionType="learning" onRetry={onRetry} />
       )}
     </div>
   );

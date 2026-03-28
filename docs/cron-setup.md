@@ -109,6 +109,27 @@ SELECT cron.schedule(
 );
 ```
 
+## Follow-up Check (check-followups)
+
+Creates 24-48h follow-up entries for reflections where the user sold or bought. This feeds outcome data back into the Mirror intervention — without it, Mirror has no outcome history to surface.
+
+**Required for Mirror to work correctly.**
+
+```sql
+-- Run every 6 hours
+SELECT cron.schedule(
+  'check-followups',
+  '0 */6 * * *',
+  $$
+  SELECT net.http_post(
+    url := 'https://<YOUR_SUPABASE_PROJECT_ID>.supabase.co/functions/v1/check-followups',
+    headers := '{"Content-Type": "application/json", "Authorization": "Bearer YOUR_SERVICE_ROLE_KEY"}'::jsonb,
+    body := '{}'::jsonb
+  );
+  $$
+);
+```
+
 ## Night Reflection
 
 Sends personalized end-of-day reflections to users.

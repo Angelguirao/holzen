@@ -60,7 +60,7 @@ const Landing = () => {
   const COMPANIONS = [
     { icon: <Feather className="h-4 w-4" />, label: t('landing.companions.haiku'), desc: t('landing.companions.haikuDesc') },
     { icon: <Zap className="h-4 w-4" />, label: t('landing.companions.signal'), desc: t('landing.companions.signalDesc') },
-    { icon: <BookOpen className="h-4 w-4" />, label: t('landing.companions.learning'), desc: t('landing.companions.learningDesc') },
+    { icon: <BookOpen className="h-4 w-4" />, label: t('landing.companions.grounding'), desc: t('landing.companions.groundingDesc') },
     { icon: <Globe className="h-4 w-4" />, label: t('landing.companions.zoomOut'), desc: t('landing.companions.zoomOutDesc') },
     { icon: <Timer className="h-4 w-4" />, label: t('landing.companions.history'), desc: t('landing.companions.historyDesc') },
   ];

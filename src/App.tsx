@@ -25,6 +25,7 @@ import Blog from "./pages/Blog";
 import BlogPost from "./pages/BlogPost";
 import Roadmap from "./pages/Roadmap";
 import Breathe from "./pages/Breathe";
+import Ambient from "./pages/Ambient";
 import Reserve from "./pages/Reserve";
 import PracticeCheckIn from "./pages/PracticeCheckIn";
 import PracticeJournal from "./pages/PracticeJournal";
@@ -82,7 +83,7 @@ const App = () => (
                 <Route path="/breathe" element={<ProtectedRoute><Breathe /></ProtectedRoute>} />
                 <Route path="/ground" element={<ProtectedRoute><Ground /></ProtectedRoute>} />
                 <Route path="/ground/history" element={<ProtectedRoute><GroundHistory /></ProtectedRoute>} />
-                <Route path="/ambient" element={<ProtectedRoute><Breathe /></ProtectedRoute>} />
+                <Route path="/ambient" element={<ProtectedRoute><Ambient /></ProtectedRoute>} />
                 <Route path="/practice/checkin" element={<ProtectedRoute><PracticeCheckIn /></ProtectedRoute>} />
                 <Route path="/practice/journal" element={<ProtectedRoute><PracticeJournal /></ProtectedRoute>} />
                 <Route path="/practice/bodyscan" element={<ProtectedRoute><PracticeBodyScan /></ProtectedRoute>} />

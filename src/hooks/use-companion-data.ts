@@ -4,10 +4,29 @@ import { hapticFeedback } from '@/lib/haptics';
 import { useHolzen } from '@/hooks/use-holzen';
 import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
 
+// ── Intervention types (new pause flow) ──────────────────────────────────────
+
+export interface InterventionPrimary {
+  type: 'mirror' | 'pattern' | 'trap';
+  data: any;
+}
+
+export interface InterventionSecondary {
+  type: 'zoom_out';
+  data: any;
+}
+
+export interface InterventionState {
+  mode: 'insight' | 'question';
+  primary: InterventionPrimary | null;
+  secondary: InterventionSecondary | null;
+  question: string | null;
+}
+
 interface CompletionState {
   breathing: boolean;
   haiku: boolean;
-  learning: boolean;
+  grounding: boolean;
   signal: boolean;
   zoomOut: boolean;
   history: boolean;
@@ -48,6 +67,10 @@ interface UseCompanionDataParams {
   reflectionId?: string | null;
   context?: string | null;
   reflectionMessage?: string | null;
+  /** Current user mood — passed to intervention selector */
+  mood?: string | null;
+  /** Raw numeric BTC % change — passed to intervention selector for bucketing */
+  severityNumber?: number;
 }
 
 interface CompanionResult {
@@ -58,7 +81,16 @@ interface CompanionResult {
   error?: string;
 }
 
-export function useCompanionData({ companions, prefs, reflectionId, context, reflectionMessage }: UseCompanionDataParams) {
+function hostnameFromUrl(url: string | undefined): string {
+  if (!url) return '';
+  try {
+    return new URL(url.startsWith('http') ? url : `https://${url}`).hostname.replace(/^www\./, '');
+  } catch {
+    return '';
+  }
+}
+
+export function useCompanionData({ companions, prefs, reflectionId, context, reflectionMessage, mood, severityNumber }: UseCompanionDataParams) {
   const { language } = useHolzen();
 
   // ── Favorites ──
@@ -112,16 +144,19 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
         .eq('source_type', params.sourceType)
         .limit(1);
       if (existing && existing.length > 0) return;
-      await supabase.from('library_items').insert({
-        user_id: userId,
-        type: 'bookmark',
-        title: params.title,
-        body: params.body,
-        source_type: params.sourceType,
-        source_url: params.sourceUrl || null,
-        reflection_id: reflectionId,
-        tags: [],
-      });
+      await supabase.from('library_items').upsert(
+        {
+          user_id: userId,
+          type: 'bookmark',
+          title: params.title,
+          body: params.body,
+          source_type: params.sourceType,
+          source_url: params.sourceUrl || null,
+          reflection_id: reflectionId,
+          tags: [],
+        },
+        { onConflict: 'user_id,reflection_id,source_type', ignoreDuplicates: true },
+      );
     } finally {
       // Keep the key to prevent future attempts within same component lifecycle
     }
@@ -129,7 +164,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
 
   // ── Completion state ──
   const [completion, setCompletion] = useState<CompletionState>({
-    breathing: false, haiku: false, learning: false, signal: false, zoomOut: false, history: false,
+    breathing: false, haiku: false, grounding: false, signal: false, zoomOut: false, history: false,
   });
   const [cacheIds, setCacheIds] = useState<CacheIds>({ nudge: null, signal: null, zoomOut: null, history: null });
 
@@ -137,7 +172,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     if (!reflectionId) return;
     supabase
       .from('reflections')
-      .select('breathing_completed, haiku_read, learning_read, signal_read, zoom_out_read, history_read')
+      .select('breathing_completed, haiku_read, grounding_read, signal_read, zoom_out_read, history_read')
       .eq('id', reflectionId)
       .single()
       .then(({ data }) => {
@@ -145,7 +180,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
           setCompletion({
             breathing: (data as any).breathing_completed ?? false,
             haiku: (data as any).haiku_read ?? false,
-            learning: (data as any).learning_read ?? false,
+            grounding: (data as any).grounding_read ?? false,
             signal: (data as any).signal_read ?? false,
             zoomOut: (data as any).zoom_out_read ?? false,
             history: (data as any).history_read ?? false,
@@ -162,7 +197,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       const dbKeyMap: Record<string, string> = {
         breathing: 'breathing_completed',
         haiku: 'haiku_read',
-        learning: 'learning_read',
+        grounding: 'grounding_read',
         signal: 'signal_read',
         zoomOut: 'zoom_out_read',
         history: 'history_read',
@@ -197,6 +232,11 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
   const [retryCount, setRetryCount] = useState(0);
   const fetchedRef = useRef<string | null>(null);
 
+  // ── Intervention state (new pause flow) ──
+  const [intervention, setIntervention] = useState<InterventionState | null>(null);
+  const [interventionLoading, setInterventionLoading] = useState(false);
+  const [interventionError, setInterventionError] = useState(false);
+
   // ── Check for already-cached data on the reflection row ──
   const checkCachedReflection = useCallback(async (rid: string): Promise<{
     signal?: SignalData | null;
@@ -206,7 +246,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
   }> => {
     const { data: row } = await supabase
       .from('reflections')
-      .select('signal_title, signal_body, signal_source, signal_url, learning_title, learning_body, learning_citation, learning_url, zoom_out_data, history_insight_data')
+      .select('signal_title, signal_body, signal_source, signal_url, grounding_title, grounding_body, grounding_citation, grounding_url, zoom_out_data, history_insight_data')
       .eq('id', rid)
       .single();
     if (!row) return {};
@@ -215,8 +255,8 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     if ((row as any).signal_source) {
       result.signal = { title: (row as any).signal_title ?? '', body: (row as any).signal_body ?? '', source: (row as any).signal_source, url: (row as any).signal_url ?? '' };
     }
-    if ((row as any).learning_citation) {
-      result.grounding = { title: (row as any).learning_title ?? '', body: (row as any).learning_body ?? '', citation: (row as any).learning_citation, url: (row as any).learning_url ?? '' };
+    if ((row as any).grounding_citation) {
+      result.grounding = { title: (row as any).grounding_title ?? '', body: (row as any).grounding_body ?? '', citation: (row as any).grounding_citation, url: (row as any).grounding_url ?? '' };
     }
     if ((row as any).history_insight_data) {
       result.history = (row as any).history_insight_data;
@@ -236,6 +276,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       recentSignalSources: safeGet('holzen_recent_signal_sources'),
       recentSignalTitles: safeGet('holzen_recent_signal_titles'),
       recentNudgeTopics: safeGet('holzen_recent_nudge_topics'),
+      recentGroundingSources: safeGet('holzen_recent_grounding_sources'),
       recentHistoryTitles: safeGet('holzen_recent_history_titles'),
       recentZoomOutTitles: safeGet('holzen_recent_zoom_out_titles'),
     };
@@ -283,16 +324,39 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     } catch { return undefined; }
   }, []);
 
+  const getGroundingSources = useCallback(async () => {
+    try {
+      const { data: authData } = await supabase.auth.getUser();
+      const userId = authData?.user?.id;
+      if (!userId) return undefined;
+      const [{ data: catalog }, { data: userPrefs }] = await Promise.all([
+        supabase.from('signal_sources').select('id, name, type, url, category').eq('category', 'grounding'),
+        supabase.from('user_signal_preferences').select('source_id, custom_name, custom_url, custom_type, active, category').eq('user_id', userId).eq('category', 'grounding'),
+      ]);
+      const prefsMap = new Map((userPrefs ?? []).map((p: any) => [p.source_id, p]));
+      const catalogActive = (catalog ?? []).filter((s: any) => {
+        const pref = prefsMap.get(s.id);
+        return pref ? pref.active : true;
+      }).map((s: any) => ({ name: s.name, type: s.type, url: s.url }));
+      const customActive = (userPrefs ?? [])
+        .filter((p: any) => !p.source_id && p.custom_name && p.active)
+        .map((p: any) => ({ name: p.custom_name, type: p.custom_type || 'blog', url: p.custom_url }));
+      const sources = [...catalogActive, ...customActive];
+      return sources.length > 0 ? sources : undefined;
+    } catch { return undefined; }
+  }, []);
+
   // ── Main orchestrated fetch ──
   useEffect(() => {
     if (!reflectionId) return;
 
     const enableSignal = prefs.signal;
-    const enableGrounding = prefs.learning;
+    const enableGrounding = prefs.grounding;
     const enableHistory = prefs.history;
     const enableZoomOut = prefs.zoomOut;
 
-    if (!enableSignal && !enableGrounding && !enableHistory && !enableZoomOut) return;
+    // Always fire — intervention selection runs regardless of companion prefs.
+    // Individual prefs control which legacy companions are additionally generated.
 
     const key = `${reflectionId}:${retryCount}`;
     if (fetchedRef.current === key) return;
@@ -305,23 +369,31 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     if (enableGrounding) setNudgeLoading(true);
     if (enableHistory) setHistoryLoading(true);
     if (enableZoomOut) setZoomOutLoading(true);
+    setInterventionLoading(true);
 
     setSignalError(false);
     setNudgeError(false);
     setHistoryError(false);
     setZoomOutError(false);
+    setInterventionError(false);
 
     (async () => {
+      let needSignal = false;
+      let needGrounding = false;
+      let needHistory = false;
+      let needZoomOut = false;
+
+      try {
       // First check if reflection already has cached data
       const cached = await checkCachedReflection(reflectionId);
 
       if (cancelled) return;
 
       // Determine which companions still need fetching
-      const needSignal = enableSignal && !cached.signal;
-      const needGrounding = enableGrounding && !cached.grounding;
-      const needHistory = enableHistory && !cached.history;
-      const needZoomOut = enableZoomOut && !cached.zoomOut;
+      needSignal = enableSignal && !cached.signal;
+      needGrounding = enableGrounding && !cached.grounding;
+      needHistory = enableHistory && !cached.history;
+      needZoomOut = enableZoomOut && !cached.zoomOut;
 
       // Set already-cached companions immediately
       if (cached.signal && enableSignal) {
@@ -332,7 +404,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       if (cached.grounding && enableGrounding) {
         setNudge(cached.grounding);
         setNudgeLoading(false);
-        autoSaveToLibrary({ title: cached.grounding.title, body: cached.grounding.body, sourceType: 'learning', sourceUrl: cached.grounding.url });
+        autoSaveToLibrary({ title: cached.grounding.title, body: cached.grounding.body, sourceType: 'grounding', sourceUrl: cached.grounding.url });
       }
       if (cached.history && enableHistory) {
         setHistoryInsight(cached.history);
@@ -346,13 +418,31 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
         autoSaveToLibrary({ title: cached.zoomOut?.deepTime?.title || 'Zoom Out', body: zoomBody, sourceType: 'zoom_out' });
       }
 
-      // If nothing needs fetching, done
-      if (!needSignal && !needGrounding && !needHistory && !needZoomOut) return;
-
       // Build orchestrator payload
       const recency = getRecencyHints();
       const signalSources = needSignal ? await getSignalSources() : undefined;
-      const mood = (companions as any)?.mood || null;
+      const groundingSources = needGrounding ? await getGroundingSources() : undefined;
+
+      // Fetch recent mood history from DB for intervention selection
+      let moodHistory: Array<{ mood: string; outcome?: string | null }> = [];
+      try {
+        const { data: authData } = await supabase.auth.getUser();
+        const uid = authData?.user?.id;
+        if (uid) {
+          const { data: recentRows } = await supabase
+            .from('reflections')
+            .select('mood, outcome')
+            .eq('user_id', uid)
+            .not('mood', 'is', null)
+            .order('created_at', { ascending: false })
+            .limit(20);
+          if (recentRows) {
+            moodHistory = recentRows
+              .filter((r: any) => r.mood)
+              .map((r: any) => ({ mood: r.mood, outcome: r.outcome ?? null }));
+          }
+        }
+      } catch { /* non-fatal */ }
 
       const { data, error: fnError } = await supabase.functions.invoke('companion-orchestrate', {
         body: {
@@ -360,25 +450,43 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
           context: context ?? '',
           language,
           reflectionMessage: reflectionMessage ?? '',
-          mood,
+          mood: mood ?? null,
+          severity: severityNumber ?? 0,
+          moodHistory,
           signalSources,
+          groundingSources,
           ...recency,
           enableSignal: needSignal,
           enableGrounding: needGrounding,
           enableHistory: needHistory,
           enableZoomOut: needZoomOut,
+          // Always request intervention selection in the pause flow
+          useIntervention: true,
         },
       });
 
       if (cancelled) return;
 
-      if (fnError || !data) {
+      const body = data as Record<string, unknown> | null;
+      const payloadError = !!fnError || !body || Boolean(body.error);
+
+      if (payloadError) {
         if (needSignal) { setSignalError(true); setSignalLoading(false); }
         if (needGrounding) { setNudgeError(true); setNudgeLoading(false); }
         if (needHistory) { setHistoryError(true); setHistoryLoading(false); }
         if (needZoomOut) { setZoomOutError(true); setZoomOutLoading(false); }
+        setInterventionError(true);
+        setInterventionLoading(false);
         return;
       }
+
+      // Process intervention (new pause flow)
+      if (data.intervention) {
+        setIntervention(data.intervention as InterventionState);
+      } else {
+        setInterventionError(true);
+      }
+      setInterventionLoading(false);
 
       // Process signal
       if (needSignal) {
@@ -402,7 +510,9 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
           setNudge(r.data as NudgeData);
           if (r.cacheId) setCacheIds(prev => ({ ...prev, nudge: r.cacheId }));
           updateRecencyHints('grounding', r.data.title);
-          autoSaveToLibrary({ title: r.data.title, body: r.data.body, sourceType: 'learning', sourceUrl: r.data.url });
+          const gHost = hostnameFromUrl(r.data.url);
+          if (gHost) updateRecencyHints('grounding_source', gHost);
+          autoSaveToLibrary({ title: r.data.title, body: r.data.body, sourceType: 'grounding', sourceUrl: r.data.url });
         } else {
           setNudgeError(true);
         }
@@ -437,16 +547,34 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
         }
         setZoomOutLoading(false);
       }
+      } catch (e) {
+        console.error('[useCompanionData] orchestrate failed', e);
+        if (needSignal) setSignalError(true);
+        if (needGrounding) setNudgeError(true);
+        if (needHistory) setHistoryError(true);
+        if (needZoomOut) setZoomOutError(true);
+        setInterventionError(true);
+      } finally {
+        if (!cancelled) {
+          setSignalLoading(false);
+          setNudgeLoading(false);
+          setHistoryLoading(false);
+          setZoomOutLoading(false);
+          setInterventionLoading(false);
+        }
+      }
     })();
 
     return () => { cancelled = true; };
-  }, [reflectionId, retryCount, prefs.signal, prefs.learning, prefs.history, prefs.zoomOut, context, reflectionMessage]);
+  }, [reflectionId, retryCount, prefs.signal, prefs.grounding, prefs.history, prefs.zoomOut, context, reflectionMessage, mood, severityNumber, language]);
 
   // ── Retry helpers ──
   const retryNudge = useCallback(() => { setRetryCount(c => c + 1); }, []);
   const retrySignal = useCallback(() => { setRetryCount(c => c + 1); }, []);
   const retryZoomOut = useCallback(() => { setRetryCount(c => c + 1); }, []);
   const retryHistory = useCallback(() => { setRetryCount(c => c + 1); }, []);
+  /** Re-run companion-orchestrate (intervention + all companion slots). */
+  const retryOrchestrate = useCallback(() => { setRetryCount(c => c + 1); }, []);
 
   return {
     favorites,
@@ -458,5 +586,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     signal, signalLoading, signalError, retrySignal,
     zoomOut, zoomOutLoading, zoomOutError, retryZoomOut,
     historyInsight, historyLoading, historyError, retryHistory,
+    intervention, interventionLoading, interventionError,
+    retryOrchestrate,
   };
 }
