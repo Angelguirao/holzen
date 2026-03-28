@@ -196,7 +196,7 @@ serve(async (req) => {
       });
       log(`intervention selected: mode=${selection.mode} primary=${selection.primary ?? "none"}`);
       // Track which intervention type is being served — critical for outcome analysis
-      svcClient.from("analytics_events").insert({
+      void svcClient.from("analytics_events").insert({
         user_id: userId,
         event: "intervention_selected",
         metadata: {
@@ -205,7 +205,9 @@ serve(async (req) => {
           secondary: selection.secondary ?? null,
           reflection_id: reflectionId ?? null,
         },
-      }).catch(() => {});
+      }).then(({ error: insErr }: { error: { message: string } | null }) => {
+        if (insErr) log.error("analytics intervention_selected insert failed", { error: insErr.message });
+      });
     }
 
     // ── Build the intervention response ──
