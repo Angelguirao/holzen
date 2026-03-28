@@ -163,6 +163,8 @@ export async function markCompanionRead(
     [COMPANION_TYPES.GROUNDING]: "grounding_read",
     [COMPANION_TYPES.HISTORY]: "history_read",
     [COMPANION_TYPES.ZOOM_OUT]: "zoom_out_read",
+    /** Orchestrator uses `zoom_out_deep_time` in join table; same legacy read column as `zoom_out`. */
+    [COMPANION_TYPES.ZOOM_OUT_DEEP_TIME]: "zoom_out_read",
   };
   const col = readColumnMap[companionType];
   if (col) {
@@ -194,6 +196,7 @@ function buildLegacyUpdate(companionType: string, content: CompanionContent): Re
     case COMPANION_TYPES.HISTORY:
       return { history_insight_data: content };
     case COMPANION_TYPES.ZOOM_OUT:
+    case COMPANION_TYPES.ZOOM_OUT_DEEP_TIME:
       return { zoom_out_data: content };
     default:
       return {};

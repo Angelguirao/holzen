@@ -76,6 +76,7 @@ Reflection text and haiku land on the new row first; companion columns and inter
 | **Notifications** | In-app session | Push, optional email, `pause_notifications` row |
 | **Orchestrator auth** | User JWT via `supabase.functions.invoke` | **Service role** `Authorization` + **`userId` in JSON body** |
 | **Profile fields** | After **`holzen-reflect`** insert: **`last_message`**, **`last_context`** only (no **`last_trigger_at`**). **Silent mode** insert also sets **`last_trigger_at`**. | **`last_trigger_at`** updated with **optimistic cooldown claiming** before work; **`last_message`** / **`last_context`** updated when a reflection is created |
+| **Allowlisted `analytics_events` on reflection AI** | **`holzen-reflect`** inserts **`pause_ai_call`** before **`generateUnifiedReflection`** (counts toward per-user throttle when orchestrator runs). | **`check-volatility`** does **not** insert **`pause_ai_call`** for that step; **`companion-orchestrate`** still invokes **`checkRateLimit`**. See **§11.1**. |
 
 **Shared logic:** One implementation for adaptive context (mood history, severity bands, Fear & Greed guidance, banned phrases, haiku/message dedup when inputs provided), model fallback order, and the reflection quality gate. Bump **`REFLECTION_PROMPT_VERSION`** in `reflection-generate.ts` when you change that behavior.
 
@@ -136,7 +137,7 @@ Both paths share **`generateUnifiedReflection`** (via **`holzen-reflect`** vs in
 ## 5. `companion-orchestrate` (single entry point)
 
 - **File:** `supabase/functions/companion-orchestrate/index.ts`
-- **Role:** Auth → rate limit → daily budget → parse body → **`determineSessionIntent`** → **`selectIntervention`** → optional **`generateQuestion`** (question mode) → parallel **generator tasks** (gated by `enableSignal` / `enableGrounding` / `enableHistory` / `enableZoomOut`) → assemble **`intervention`** + legacy companion results → `companion_serves` inserts → **`writeCompanionData`** (dual-write to join table + denormalized columns on `reflections`).
+- **Role:** Auth → rate limit → daily budget → parse body → **`determineSessionIntent`** → **`selectIntervention`** → optional **`generateQuestion`** (question mode) → parallel **generator tasks** (gated by `enableSignal` / `enableGrounding` / `enableHistory` / `enableZoomOut`) → assemble **`intervention`** + legacy companion results → `companion_serves` inserts → **`writeCompanionData`** (dual-write to **`reflection_companions`** + denormalized columns on **`reflections`** where supported — all orchestrated types including **`zoom_out_deep_time` → `zoom_out_data`**).
 
 ### Diagram — inside `companion-orchestrate`
 
@@ -372,7 +373,7 @@ flowchart TB
 | **Orchestrator key** | **`zoomOut`** → **`zoom_out_deep_time`** in **`companion_serves` / `reflection_companions`** (`ORCHESTRATOR_KEY_MAP`). |
 | **Generator** | `_shared/generators/zoom-out.ts`; **`zoomOutAngle`** from session intent; depends on **`btc_price_cache`** (cron). |
 | **Profile pref** | **`companion_zoom_out`**. |
-| **Legacy columns** | **`buildLegacyUpdate`** only handles **`COMPANION_TYPES.ZOOM_OUT`** (`"zoom_out"`), **not** `zoom_out_deep_time`, so **denormalized `zoom_out_data` may stay empty** while the join row holds content. The client **hydrates from the orchestrator JSON** on first load; **`checkCachedReflection`** in `use-companion-data.ts` only reads **`zoom_out_data`** on the row — a known storage/client nuance if legacy update is not extended. |
+| **Legacy columns** | Orchestrator writes **`zoom_out_deep_time`** to **`reflection_companions`**; **`buildLegacyUpdate`** maps both **`zoom_out`** and **`zoom_out_deep_time`** to **`zoom_out_data`** on **`reflections`** so **`checkCachedReflection`** in `use-companion-data.ts` can reuse a row without refetching. |
 | **UI** | **`ZoomOutDisplay`**; feedback uses **`zoom_out`** → cache type **`zoom_out_deep_time`**. Card hidden when intervention already shows **`secondary.type === 'zoom_out'`** (§7.5). |
 
 ---
@@ -469,10 +470,10 @@ Exact SQL lives in **[cron-setup.md](./cron-setup.md)**. Typical schedules docum
 
 **Rate limits and budgets** do not line up 1:1 with that UX split:
 
-- **Sliding-window throttle** — `checkRateLimit` (`_shared/ratelimit.ts`) counts only **`analytics_events.event`** values on a **fixed allowlist** (e.g. **`pause_ai_call`**, **`signal_companion_ai_call`**, **`zoom_out_ai_call`**, **`historical_insight_ai_call`**, plus other named AI events — **read the file** for the current list). **`reflection_generated`** is **not** counted. **`holzen-reflect`** inserts **`pause_ai_call`** before generation, so reflection and orchestrator **share** that window. **`intervention_selected`** and other orchestrator-only events are **not** on the allowlist, so **companion fan-out does not multiply** that counter. **`companion-orchestrate`** does not insert **`pause_ai_call`** per companion.
-- **Daily cap** — **`checkDailyBudget`** sums **`generation_attempts.estimated_cost_usd`** for the **UTC day** (see §12 for numeric knobs).
+- **Sliding-window throttle (per user)** — `checkRateLimit` (`_shared/ratelimit.ts`) counts only **`analytics_events.event`** values on a **fixed allowlist** (e.g. **`pause_ai_call`**, **`signal_companion_ai_call`**, **`zoom_out_ai_call`**, **`historical_insight_ai_call`**, plus other named AI events — **read the file** for the current list). **`reflection_generated`** is **not** counted. **`intervention_selected`** is **not** on the allowlist, so companion fan-out does **not** add allowlisted rows. **`companion-orchestrate`** calls **`checkRateLimit`** on every invoke but **does not** insert **`pause_ai_call`** (or other allowlisted events) per companion. **Manual pause:** **`holzen-reflect`** inserts **`pause_ai_call`** before reflection AI, so that **one** row is visible to the orchestrator’s rate check on the same session. **Automatic pause:** **`check-volatility`** calls **`generateUnifiedReflection`** **without** inserting **`pause_ai_call`**, so the reflection step does **not** consume an allowlisted slot; the orchestrator’s check still runs against the user’s prior allowlisted events only.
+- **Daily cap (platform-wide)** — **`checkDailyBudget`** runs **only** at **`companion-orchestrate`** entry (not in **`holzen-reflect`**). It sums **all** **`generation_attempts.estimated_cost_usd`** from **UTC midnight** with **no `user_id` filter** — a shared pool for the whole project (see §12). Reflection AI can still run if the pool is exhausted, then orchestration may return **503**.
 
-**Practical levers:** Changing **UX** (what to show), **cost** (how many model calls), and **rate-limit wiring** (which events increment the allowlist) are **three separate decisions**. Hiding a companion in the UI does **not** reduce server work unless **`enable*`** flags or generator gating in `companion-orchestrate` change too. Orchestrator cost is bounded mainly by **daily budget** and **which generators run**, not by “one `pause_ai_call` per companion.”
+**Practical levers:** Changing **UX** (what to show), **cost** (how many model calls), **per-user throttle** (allowlist + who inserts which event), and **platform daily spend** are **different** concerns. Hiding a companion in the UI does **not** reduce server work unless **`enable*`** flags or generator gating in `companion-orchestrate` change too.
 
 ### 11.2 Resolved implementation issues (historical)
 
@@ -506,8 +507,10 @@ Intentional or deferred behavior — **not** parity bugs.
 
 ## 12. Cost and limits (orchestrator)
 
-- **Daily budget:** `checkDailyBudget(svcClient, 10.0)` — sums **`generation_attempts.estimated_cost_usd`** from **UTC midnight** (`_shared/ratelimit.ts`).
-- **Rate limit:** **`checkRateLimit(svcClient, userId, 60, 30)`** — at most **30** allowlisted **`analytics_events`** rows for that user in the last **60** minutes. The allowlist is **not** “all AI events”; copy the current array from **`ratelimit.ts`** when documenting integrations (full behavior: **§11.1**).
+Invoked at the start of **`companion-orchestrate`** only (before parsing the body’s **`enable*`** flags).
+
+- **Daily budget (platform-wide):** `checkDailyBudget(svcClient, 10.0)` — sums **`generation_attempts.estimated_cost_usd`** for **all users** from **UTC midnight** (`_shared/ratelimit.ts`). Not per-user; when exceeded, **every** orchestrator call fails with **503** until the next UTC day (unless the cap or query changes).
+- **Rate limit (per user):** **`checkRateLimit(svcClient, userId, 60, 30)`** — at most **30** allowlisted **`analytics_events`** rows for **that user** in the last **60** minutes. The allowlist is **not** “all AI events”; copy the current array from **`ratelimit.ts`** when documenting integrations (full behavior: **§11.1**).
 
 ---
 
