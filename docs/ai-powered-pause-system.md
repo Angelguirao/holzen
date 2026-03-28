@@ -12,14 +12,15 @@ This document describes **how Holzen turns Bitcoin volatility into a pause exper
 4. [Client flow after reflection (manual path)](#toc-client-flow)
 5. [`companion-orchestrate` (single entry point)](#toc-companion-orchestrate)
 6. [Generator family (orchestrated)](#toc-generator-family)
-7. [Data written by this system](#toc-data-written)
-8. [Frontend surfaces](#toc-frontend-surfaces)
-9. [Background jobs (pause-adjacent)](#toc-background-jobs)
-10. [Known inconsistencies, drift, and fixes](#toc-known-issues)
-11. [Cost and limits (orchestrator)](#toc-cost-limits)
-12. [Security notes](#toc-security)
-13. [File index (pause core)](#toc-file-index)
-14. [Related reading](#toc-related-reading)
+7. [Interventions and companions (reference)](#toc-interventions-reference)
+8. [Data written by this system](#toc-data-written)
+9. [Frontend surfaces](#toc-frontend-surfaces)
+10. [Background jobs (pause-adjacent)](#toc-background-jobs)
+11. [Known inconsistencies, drift, and fixes](#toc-known-issues)
+12. [Cost and limits (orchestrator)](#toc-cost-limits)
+13. [Security notes](#toc-security)
+14. [File index (pause core)](#toc-file-index)
+15. [Related reading](#toc-related-reading)
 
 Links use explicit HTML anchors before each numbered section so jumps behave consistently in GitHub, Cursor, and other Markdown previews (auto-generated heading slugs vary by tool).
 
@@ -32,7 +33,7 @@ Links use explicit HTML anchors before each numbered section so jumps behave con
 1. **Trigger** — User opens Pause (client) *or* the `check-volatility` cron decides a user crossed thresholds.
 2. **Reflection** — Short copy (+ optional haiku) anchored to market **context** (e.g. “BTC is down 5.2%…”).
 3. **Persist** — Insert a `reflections` row; update **`profiles.last_message`** / **`last_context`** (and **`last_trigger_at`** only on automatic triggers or manual **silent** mode — see §2).
-4. **Companions & intervention** — `companion-orchestrate` chooses an **intervention** (mirror / trap / pattern / question) and, according to **enable flags**, runs **Signal, Grounding, History, Zoom Out** generators in process, then writes structured data back to the reflection (and related tables).
+4. **Companions & intervention** — `companion-orchestrate` chooses an **intervention** (mirror / trap / pattern / question) and, according to **enable flags**, runs **Signal, Grounding, History, Zoom Out** generators in process, then writes structured data back to the reflection (and related tables). See **§7** for a per-type reference.
 5. **Surface** — Client shows `InterventionSection` plus optional companion cards from user preferences.
 
 ### Diagram — end-to-end pipeline
@@ -189,7 +190,7 @@ flowchart LR
   D --> E[Default pattern\nzoom_out if moderate]
 ```
 
-**Note:** Even when the headline is mirror / question / etc., enabled companion generators may still run in parallel (see §10 drift — *Intervention vs “run every enabled generator”*).
+**Note:** Even when the headline is mirror / question / etc., enabled companion generators may still run in parallel (see §11 drift — *Intervention vs “run every enabled generator”*).
 
 ### 5.3 Question mode
 
@@ -221,11 +222,196 @@ All are imported **directly** in `companion-orchestrate` (not HTTP to `signal-co
 
 **Library “freshness”:** Generators use `includeStale: true` in fallback paths; the 7-day freshness branch in `content-library.ts` is largely **unused** on the live-first path unless you add stricter reads.
 
+For a full breakdown of **which intervention** maps to **which generator output** and **which UI block** shows it, see **§7**.
+
+---
+
+<a id="toc-interventions-reference"></a>
+
+## 7. Interventions and companions (reference)
+
+The pause step combines two ideas that are easy to conflate:
+
+1. **Featured intervention** — One **cognitive headline** at the top (`InterventionSection`): mirror, trap, pattern, question mode, plus an optional **secondary** zoom-out block.
+2. **Companion cards** — Collapsible **slots** below the divider (`CompanionSection`): Haiku, Ground, Signal, Zoom Out, Look Back (history). Four of these are filled by the **same orchestrator run** that picks the intervention; **Haiku** comes from the reflection step instead.
+
+**Session intent** (§5.4) biases **all** orchestrated generators toward one emotional angle (Signal angle, Grounding bias, History mood, Zoom-out seed). Intervention **selection** (`intervention-selector.ts`) is separate: it only decides **what to feature** and **which generator outputs** are copied into the intervention payload.
+
+### Diagram — intervention vs companion cards
+
+```mermaid
+flowchart TB
+  subgraph INT [Featured intervention]
+    M[Mirror — DB only]
+    T[Trap — Grounding generator]
+    P[Pattern — History generator]
+    Q[Question — generateQuestion]
+    Z[Secondary Zoom Out — zoomOut task]
+  end
+  subgraph CARDS [Companion cards — prefs gated]
+    H[Haiku — reflection]
+    G[Ground — grounding task]
+    S[Signal — signal task]
+    ZC[Zoom Out card — zoomOut task]
+    HI[History — history task]
+  end
+  ORCH[companion-orchestrate]
+  ORCH --> INT
+  ORCH --> CARDS
+  REF[holzen-reflect / generateUnifiedReflection]
+  REF --> H
+```
+
+---
+
+### 7.1 Intervention: Mirror (`primary: mirror`)
+
+| Aspect | Detail |
+|--------|--------|
+| **When selected** | First match in `selectIntervention`: `buildMirror` returns non-null (`intervention-selector.ts`). |
+| **Data source** | Postgres RPC **`find_similar_reflection`** (`_min_age_days` default **30**). Picks another reflection by same user with **same direction** (context contains `is up` vs `is down`), **≥30 days older** than the current row, closest **matching % move**. |
+| **Extra gate (app)** | `mirror.ts` requires a **non-null `outcome`** on the matched row; otherwise mirror is **ineligible**. |
+| **AI** | **No** — template assembly from DB fields only. |
+| **Orchestrator** | Sets `intervention.primary = { type: "mirror", data: mirrorData }` immediately; **does not** use Signal/Ground/History/Zoom results to build mirror. |
+| **UI** | `InterventionSection` → `MirrorDisplay` (“You’ve been here before”, narrative + Then / Decision / When). |
+| **Companion overlap** | Enabled companions **still run** if flags allow (§11). Mirror does not consume a dedicated “mirror generator.” |
+
+---
+
+### 7.2 Intervention: Trap (`primary: trap`)
+
+| Aspect | Detail |
+|--------|--------|
+| **When selected** | **Fearful / anxious** mood + market **down**; **or** **FOMO / greedy / excited** + **up**; **or** **FOMO / greedy** + **down** (capitulation framing). |
+| **Primary body** | **`generateGrounding`** output. Orchestrator copies `tasks.grounding` result into `intervention.primary = { type: "trap", data }` when `selection.primary === "trap"` (`companion-orchestrate/index.ts`). |
+| **Framing** | `TrapFraming` uses **`primary.data.title`** as the bias label (“Your brain may be in a **…** trap”). |
+| **UI widget** | Same shape as the Ground card: **`LearningInput`** (title, body, citation-style nudge). |
+| **Secondary** | If **`severity === "high"`**, selection may add **`secondary: "zoom_out"`**; zoom payload comes from the **`zoomOut`** task when fulfilled. |
+| **AI** | **Yes** (Grounding generator — Perplexity + structure; see §6). |
+| **Product note** | If **Ground** companion pref is **on**, the user can see **the same grounding payload** both in the **trap** intervention and in the **Ground** card — same generator, two surfaces. |
+
+---
+
+### 7.3 Intervention: Pattern (`primary: pattern`)
+
+| Aspect | Detail |
+|--------|--------|
+| **When selected** | **`severity === "high"`** (after mirror/trap rules fail): always pattern with **`secondary: "zoom_out"`**. **Default branch** (new users, moderate/mild paths): also **`primary: pattern`**; **`secondary: "zoom_out"`** only when **`severity === "moderate"`**. |
+| **Primary body** | **`generateHistory`** output. Copied into `intervention.primary = { type: "pattern", data }` when `selection.primary === "pattern"`. |
+| **Framing** | `PatternFraming` + **`HistoricalInsightDisplay`**. |
+| **Secondary** | High-severity pattern **always** includes zoom-out secondary; moderate default includes zoom-out; mild default does **not**. |
+| **AI** | **Yes** (History generator; Zoom secondary uses Zoom Out generator when enabled). |
+
+---
+
+### 7.4 Intervention: Question mode (`mode: "question"`)
+
+| Aspect | Detail |
+|--------|--------|
+| **When selected** | **`severity === "mild"`** **and** total reflection count for user **≥ 20** (`countPastSessions`). |
+| **Payload** | No `primary` / `trap` / `pattern` / `mirror`. `intervention.mode === "question"` and **`intervention.question`** string from **`generateQuestion`** (`_shared/generators/question.ts`, Lovable/Gemini). |
+| **AI** | **Yes** — dedicated question path, parallel with companion tasks. |
+| **UI** | Centered question copy + “Sit with this before deciding.” **No** companion-shaped body for the headline. |
+| **Companion overlap** | Other generators still run per **`enable*`** flags (§11). |
+
+---
+
+### 7.5 Intervention secondary: Zoom out (`secondary: { type: "zoom_out", data }`)
+
+| Aspect | Detail |
+|--------|--------|
+| **When attached** | Selection sets `secondary: "zoom_out"` for **high trap**, **high pattern**, and **default pattern + moderate** (`intervention-selector.ts`). |
+| **Data** | Same **`generateZoomOut`** result as the **Zoom Out companion** task. Orchestrator assigns it when `key === "zoomOut" && selection.secondary === "zoom_out"`. |
+| **UI** | Collapsible **“Zoom out”** under the primary intervention (`InterventionSection`), **`ZoomOutDisplay`**. |
+| **Duplicate avoidance** | `CompanionSection` **hides the Zoom Out card** when `intervention?.secondary?.type === "zoom_out"` so the same payload is not shown twice. If zoom-out is **only** in the intervention secondary, the card is suppressed even when the pref is on. |
+
+---
+
+### 7.6 Companion card: Haiku
+
+| Aspect | Detail |
+|--------|--------|
+| **Source** | **`generateUnifiedReflection`** with **`includeLearning: false`** → `message` + **`haiku`** on the reflection row; **not** produced by `companion-orchestrate`. |
+| **Profile pref** | **`companion_haiku`** (UI: `prefs.haiku`). |
+| **Storage** | Reflection columns (haiku text + read flags as implemented). |
+| **UI** | `HaikuDisplay` in `CompanionSection`; card id **`haiku`**. |
+| **Feedback / cache** | Feedback key **`haiku`** maps to cache type **`haiku`** (`companion-types.ts`). |
+
+---
+
+### 7.7 Companion card: Ground (Grounding)
+
+| Aspect | Detail |
+|--------|--------|
+| **Orchestrator key** | **`grounding`** → DB type **`ground_nudge`** (`ORCHESTRATOR_KEY_MAP`). |
+| **Generator** | `_shared/generators/grounding.ts` (§6). Receives **`preferredBias`** from **session intent** (§5.4). |
+| **Profile pref** | **`companion_grounding`** (UI **`prefs.grounding`**; legacy **`learning`** in some maps only). |
+| **Denormalized columns** | **`grounding_*`** on **`reflections`** (`writeCompanionData` / `buildLegacyUpdate`). |
+| **UI** | **`LearningInput`** + optional **`CompanionFeedback`** with **`companionType="grounding"`**. |
+| **Library `source_type`** | Typically **`grounding`**. |
+
+---
+
+### 7.8 Companion card: Signal
+
+| Aspect | Detail |
+|--------|--------|
+| **Orchestrator key** | **`signal`** → **`signal`**. |
+| **Generator** | `_shared/generators/signal.ts`; **`searchAngle`** from session intent. |
+| **Profile pref** | **`companion_signal`**. |
+| **Denormalized columns** | **`signal_*`** on **`reflections`**. |
+| **UI** | **`SignalDisplay`** + feedback **`companionType="signal"`**. |
+| **Intervention** | Signal is **not** wired as a primary intervention type; it is always a **card** when enabled. |
+
+---
+
+### 7.9 Companion card: Zoom Out
+
+| Aspect | Detail |
+|--------|--------|
+| **Orchestrator key** | **`zoomOut`** → **`zoom_out_deep_time`** in **`companion_serves` / `reflection_companions`** (`ORCHESTRATOR_KEY_MAP`). |
+| **Generator** | `_shared/generators/zoom-out.ts`; **`zoomOutAngle`** from session intent; depends on **`btc_price_cache`** (cron). |
+| **Profile pref** | **`companion_zoom_out`**. |
+| **Legacy columns** | **`buildLegacyUpdate`** only handles **`COMPANION_TYPES.ZOOM_OUT`** (`"zoom_out"`), **not** `zoom_out_deep_time`, so **denormalized `zoom_out_data` may stay empty** while the join row holds content. The client **hydrates from the orchestrator JSON** on first load; **`checkCachedReflection`** in `use-companion-data.ts` only reads **`zoom_out_data`** on the row — a known storage/client nuance if legacy update is not extended. |
+| **UI** | **`ZoomOutDisplay`**; feedback uses **`zoom_out`** → cache type **`zoom_out_deep_time`**. Card hidden when intervention already shows **`secondary.type === 'zoom_out'`** (§7.5). |
+
+---
+
+### 7.10 Companion card: Look Back (History)
+
+| Aspect | Detail |
+|--------|--------|
+| **Orchestrator key** | **`history`** → **`historical_insight`**. |
+| **Generator** | `_shared/generators/history.ts`; **`preferredMood`** from session intent. |
+| **Profile pref** | **`companion_history`**. |
+| **Denormalized columns** | **`history_insight_data`** (+ read flag). |
+| **UI** | **`HistoricalInsightDisplay`**; Pro favorites key **`history_insight`**; feedback **`companionType="history_insight"`**. |
+
+---
+
+### 7.11 Rituals and prefs not covered above
+
+| Piece | Role |
+|-------|------|
+| **Breathing** | **`CompanionPrefs.breathing`** exists for pause prefs; the **breathing ritual** is **not** rendered inside `CompanionSection` companion cards — it is a **separate flow** in the pause UI. |
+| **Intervention loading** | `use-companion-data` sets **`useIntervention: true`** on every orchestrate call; **intervention selection runs even if all four companion slots are off** (see hook comment). |
+
+---
+
+### 7.12 Quick matrix (orchestrator internal key → storage → UI)
+
+| Internal key | `companion_type` (serves / join) | Typical denormalized `reflections` cols | Shown as |
+|--------------|----------------------------------|----------------------------------------|----------|
+| `signal` | `signal` | `signal_*` | Signal card |
+| `grounding` | `ground_nudge` | `grounding_*` | Ground card; **also** trap **primary** when trap |
+| `history` | `historical_insight` | `history_insight_data` | History card; **also** pattern **primary** when pattern |
+| `zoomOut` | `zoom_out_deep_time` | `zoom_out_data` (often via join only) | Zoom card **or** intervention **secondary** |
+
 ---
 
 <a id="toc-data-written"></a>
 
-## 7. Data written by this system
+## 8. Data written by this system
 
 - **`reflections`** — Core row: message, context, mood (manual), haiku, **`grounding_*`** (Ground companion denormalized fields), structured JSON columns for other companions (via `writeCompanionData` / migrations).
 - **`reflection_companions`** — Normalized companion payloads (dual-write).
@@ -240,21 +426,21 @@ All are imported **directly** in `companion-orchestrate` (not HTTP to `signal-co
 
 <a id="toc-frontend-surfaces"></a>
 
-## 8. Frontend surfaces
+## 9. Frontend surfaces
 
 | Piece | Role |
 |-------|------|
 | `use-holzen.ts` | BTC context, manual cooldown, `holzen-reflect`, reflection insert, initial companion state from reflection response |
 | `use-companion-data.ts` | Orchestrator invoke, intervention state, per-companion loading/errors, recency hints, library auto-save hooks |
 | `InterventionSection.tsx` | Renders mirror / trap / pattern / question + optional zoom-out secondary |
-| `CompanionSection.tsx` | Container for companion cards and prefs |
-| `src/lib/companion-types.ts` | Canonical type strings shared with tests |
+| `CompanionSection.tsx` | Container for companion cards and prefs; hides Zoom Out card when intervention already shows zoom-out secondary (§7.5) |
+| `src/lib/companion-types.ts` | Canonical type strings shared with tests; full intervention ↔ generator ↔ UI map in **§7** |
 
 ---
 
 <a id="toc-background-jobs"></a>
 
-## 9. Background jobs (pause-adjacent)
+## 10. Background jobs (pause-adjacent)
 
 Exact SQL lives in **[cron-setup.md](./cron-setup.md)**. Typical schedules documented there:
 
@@ -271,7 +457,7 @@ Exact SQL lives in **[cron-setup.md](./cron-setup.md)**. Typical schedules docum
 
 <a id="toc-known-issues"></a>
 
-## 10. Known inconsistencies, drift, and fixes
+## 11. Known inconsistencies, drift, and fixes
 
 ### UX vs server work vs rate limits
 
@@ -321,7 +507,7 @@ These are **not bugs** in the parity work; they describe how the system behaves 
 
 <a id="toc-cost-limits"></a>
 
-## 11. Cost and limits (orchestrator)
+## 12. Cost and limits (orchestrator)
 
 - **Daily budget:** `checkDailyBudget(svcClient, 10.0)` — sums **`generation_attempts.estimated_cost_usd`** from **UTC midnight** (`_shared/ratelimit.ts`).
 - **Rate limit:** **`checkRateLimit(svcClient, userId, 60, 30)`** — at most **30** allowlisted **`analytics_events`** rows for that user in the last **60** minutes. The allowlist is **not** “all AI events”; copy the current array from **`ratelimit.ts`** when documenting integrations (see §10).
@@ -330,7 +516,7 @@ These are **not bugs** in the parity work; they describe how the system behaves 
 
 <a id="toc-security"></a>
 
-## 12. Security notes
+## 13. Security notes
 
 - **User JWT** paths validate via `getUser()`.
 - **Service role** path is **only** as trustworthy as your cron secrets and network; `userId` in the body must **only** be accepted when the bearer is the service role key (implemented in orchestrator).
@@ -340,7 +526,7 @@ These are **not bugs** in the parity work; they describe how the system behaves 
 
 <a id="toc-file-index"></a>
 
-## 13. File index (pause core)
+## 14. File index (pause core)
 
 ```
 supabase/functions/
@@ -374,7 +560,7 @@ src/components/CompanionSection.tsx   # embeds InterventionSection + useCompanio
 
 <a id="toc-related-reading"></a>
 
-## 14. Related reading
+## 15. Related reading
 
 - [cron-setup.md](./cron-setup.md) — pg_cron + `net.http_post` snippets  
 - [navigating-the-codebase.md](./navigating-the-codebase.md) — repo tour and edge function invoke map  
