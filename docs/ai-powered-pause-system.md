@@ -33,10 +33,10 @@ This document describes **how Holzen turns Bitcoin volatility into a pause exper
 | **Entry** | User flow in app → `use-holzen.ts` | `supabase/functions/check-volatility/index.ts` (HTTP + service auth) |
 | **BTC data** | Client `fetchBtcData` (`src/lib/btc.ts`) for context string | CoinGecko `market_chart` 1d + 7d inside the function |
 | **Thresholds** | User-initiated (cooldown in hook: 15 min, or 5 s in dev mode) | Per-profile `threshold` / `threshold_down`, `cumulative_threshold`, `cooldown_hours`, quiet hours, `snoozed_until` |
-| **Reflection AI** | **`holzen-reflect`** → **`generateUnifiedReflection({ includeLearning: false })`** | **`check-volatility`** → **`generateUnifiedReflection({ includeLearning: true })`** — same module: `_shared/reflection-generate.ts` |
+| **Reflection AI** | **`holzen-reflect`** → **`generateUnifiedReflection({ includeLearning: false })`** | **`check-volatility`** → **same** (`includeLearning: false`) — `_shared/reflection-generate.ts` |
 | **Mood** | Collected in UI; stored on `reflections.mood` | Not set on the new row; **mood history for prompts** comes from the last 20 `reflections` with `mood` (server-side query) when available |
 | **Style / extras** | Full: `style`, `customPrompt`, `motivations`, `mantra`, `groundingActivities`, client-supplied `recentHaikus` / `recentMessages` | Default `style: standard`; no custom prompt/mantra/activities; no client dedup lists |
-| **Learning fields** | JSON path does not ask the model for learning block → **`learning_*` in response are null**; profile still controls what gets stored | Tool-call path returns **learning_title/body/citation/url** (URL validated); `companion_learning` / `companion_haiku` profile toggles still strip before insert |
+| **Reflection row `learning_*`** | **Null** at insert (JSON path); Ground content comes from **`companion-orchestrate`** | **Null** at insert; **`companion_haiku`** still toggles haiku; Ground / Signal / etc. come **only** from orchestrate |
 | **Severity sent to orchestrator** | `use-companion-data` passes numeric `severity` from client | **`userId`, `severity` (24h abs %), `reflectionMessage`** on orchestrate body |
 | **Notifications** | In-app session | Push, optional email, `pause_notifications` row |
 | **Orchestrator auth** | User JWT via `supabase.functions.invoke` | **Service role** `Authorization` + **`userId` in JSON body** |
@@ -48,15 +48,14 @@ This document describes **how Holzen turns Bitcoin volatility into a pause exper
 ## 4. Reflection generation (`_shared/reflection-generate.ts`)
 
 - **`generateUnifiedReflection(params)`** — Lovable gateway, primary `google/gemini-3-flash-preview` then `google/gemini-2.5-flash`.
-- **`includeLearning: false`** (manual / `holzen-reflect`): `response_format: json_object` with `message` + `haiku` only; quality gate; `generation_attempts` via `holzen-reflect`’s `logAttempt`.
-- **`includeLearning: true`** (cron): tool `generate_reflection` with learning fields; URL **HEAD** validation; same quality gate on message/haiku; learning columns attached after gate.
+- **`includeLearning: false`** (default for both **`holzen-reflect`** and **`check-volatility`**): `response_format: json_object` with `message` + `haiku` only; quality gate. **`includeLearning: true`** remains in the module for optional use (tool call + learning fields + URL check) but **cron no longer uses it** — companion columns are filled by **`companion-orchestrate`** only.
 - **Callers:** `holzen-reflect/index.ts` (auth, sanitization, analytics, curated fallback) and `check-volatility/index.ts` (eligibility, notifications, orchestrator dispatch).
 
 ---
 
 ## 5. Client flow after reflection (manual path)
 
-1. **`use-holzen.ts`** — Calls `holzen-reflect`, inserts `reflections`, updates profile, sets companion state from response (haiku; **`learning_*` usually null** on the JSON path unless you later enable learning for manual).
+1. **`use-holzen.ts`** — Calls `holzen-reflect`, inserts `reflections`, updates profile, sets companion state from response (haiku; **`learning_*` null** at insert — same as cron; orchestrate fills companion columns).
 2. **Pause UI** — Uses `use-companion-data.ts` with `reflectionId`, `context`, `reflectionMessage`, **`mood`**, **`severityNumber`**, language.
 3. **`use-companion-data`** — Loads partial companion data from the reflection row if already present; builds **`moodHistory`** from recent `reflections` (`mood`, `outcome`); invokes **`companion-orchestrate`** with `useIntervention: true` and per-preference **`needSignal` / `needGrounding` / `needHistory` / `needZoomOut`** (cached slots skipped).
 
@@ -155,13 +154,13 @@ Exact SQL lives in **[cron-setup.md](./cron-setup.md)**. Typical schedules docum
 1. **`questionPromise` undefined** — `companion-orchestrate` referenced `questionPromise` without defining it, which would **throw** when question mode was selected. **Fixed** by defining `questionPromise` from `generateQuestion` when `selection.mode === "question"`.
 2. **Cron → orchestrator auth** — Orchestrator required a **user** JWT; `check-volatility` sent **only** the service role key → **`getUser()` failed**, so companions never generated for automatic sessions. **Fixed** by accepting **service role + `userId` in body** and by **`check-volatility` sending `userId` and `severity`**.
 3. **Mirror intervention not returned** — `selectIntervention` could return `primary: "mirror"` with `mirrorData`, but the orchestrator never copied that into **`intervention.primary`**, so the UI could not show mirror. **Fixed** by assigning `interventionPayload.primary` when mirror is selected.
-4. **Unified reflection pipeline** — **`_shared/reflection-generate.ts`** (`generateUnifiedReflection`) is used by **`holzen-reflect`** and **`check-volatility`** so prompts, adaptive context, and quality gates stay aligned. Cron uses **`includeLearning: true`**; manual uses **`includeLearning: false`** (JSON-only message+haiku).
+4. **Unified reflection pipeline** — **`_shared/reflection-generate.ts`** (`generateUnifiedReflection`) is used by **`holzen-reflect`** and **`check-volatility`** with **`includeLearning: false`** (message + haiku only). **`learning_*`** on **`reflections`** are written by **`companion-orchestrate`**, not the reflection step.
 
 ### Remaining / product-level drift (monitor)
 
 | Topic | Detail |
 |-------|--------|
-| **Manual learning fields** | Manual path still uses JSON without learning; **`learning_*` response keys are null**. Cron path fills learning when the model returns it. To surface learning on manual, call `generateUnifiedReflection` with **`includeLearning: true`** from `holzen-reflect` (or merge a second step). |
+| **Optional tool+learning path** | `generateUnifiedReflection({ includeLearning: true })` still exists for experiments or one-off flows; neither production trigger uses it today. |
 | **Server path vs user prefs** | Cron dispatch uses **all** `enable*` flags `true`, independent of per-user companion toggles. The client respects prefs when **it** calls the orchestrator. |
 | **Intervention vs “run all generators”** | Orchestrator still runs **every** companion task whose `enable*` is true, even when intervention is mirror/question; the **UI** leads with intervention. Narrowing generation to “only what intervention needs” would save cost (future optimization). |
 | **Rate limit list** | `checkRateLimit` counts specific `analytics_events` event names. **`intervention_selected` is not in the list**; **`companion-orchestrate` does not log `pause_ai_call`**. Manual reflection remains the main throttle for “pause AI” spend per user. |
