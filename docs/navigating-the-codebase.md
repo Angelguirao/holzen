@@ -20,7 +20,7 @@ This guide walks a new contributor through the repository in roughly the order y
 | `public/` | Static assets (icons, manifest pieces, etc.). |
 | `supabase/migrations/` | Postgres schema and RLS — **source of truth** for the database. |
 | `supabase/functions/` | Deno edge functions (HTTP APIs, crons, webhooks). |
-| `supabase/config.toml` | Supabase project id and **explicit** per-function options (e.g. `verify_jwt`). Functions omitted here use **platform defaults** until you add an entry. |
+| `supabase/config.toml` | Supabase project id and **`[functions.<name>]`** per deployable folder — keep **one block per function** so local serve and hosted deploys match. |
 | `vite.config.ts` | Dev server (port 8080), `@` alias, PWA inject-manifest, **optional Supabase URL/key fallbacks** when not in `localstack` mode. |
 | `vitest.config.ts` | Tests: jsdom, `src/test/setup.ts`, same `@` alias as Vite. |
 
@@ -149,11 +149,13 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 
 **Cron / server / webhook style** (not an exhaustive list — see `cron-setup.md` and each `index.ts`): e.g. `check-volatility`, `refresh-btc-prices`, `fetch-source-feeds`, `weekly-digest`, `deliver-letters`, `auth-email-hook`, etc.
 
-**`supabase/config.toml`** — Only functions named under `[functions.<name>]` get the options you set (this repo sets `verify_jwt = false` for many **cron / webhook / internal** style handlers). **Any folder under `supabase/functions/` that has no block here** uses Supabase’s **default** for that environment (often **`verify_jwt = true`** for HTTP invokes). That matters when the client calls `supabase.functions.invoke`: if the gateway rejects the request before your code runs, you’ll see **401** with little detail in the function logs.
+**`supabase/config.toml`** — Each deployable function should have a **`[functions.<name>]`** block (same name as the folder under `supabase/functions/`, excluding `_shared`). This repo sets **`verify_jwt = false`** on those entries and relies on handlers to enforce auth where needed (e.g. `getUser()` with the `Authorization` header). **If you add a new function**, add its block in the **same change** so behavior is explicit.
 
-- **Debugging 401 on invoke:** confirm the **Authorization** header / session, **dashboard secrets** for that function, and whether **`[functions.<name>]`** exists and matches what you expect. Adding an explicit `[functions.my-function]` entry is how you pin behavior for deploys that read this file.
+- **Why list every function:** Supabase applies **platform defaults** for any function **not** named in `config.toml` (often **`verify_jwt = true`** at the gateway). An unlisted function can work in one environment and return **401** in another after deploy — or differ between **`npx supabase functions serve`** (reads this file) and older hosted config until redeployed.
 
-- **Local vs hosted:** `npx supabase functions serve` applies **`config.toml` from this repo** to your local stack. **Hosted Supabase** uses the config **deployed with the project** (e.g. via Lovable/GitHub sync or `supabase functions deploy`). Defaults can differ if a function is missing from `config.toml` in one place but not the other — when in doubt, add an explicit block for that function name.
+- **What you should do:** Keep **`config.toml` in sync with `supabase/functions/*`** (one block per function). After that, local serve and hosted deploys that ship this file should agree; if you still see **401** on `invoke`, check **session / `Authorization`**, **dashboard secrets**, and that the **deployed** revision actually includes your latest `config.toml`.
+
+- **Local vs hosted:** Both are driven by the **same committed `config.toml`** once deploys pick it up. **`npx supabase functions serve`** uses your working tree; **hosted** uses whatever was last deployed (Lovable sync, CI, or `supabase functions deploy`). Mismatch usually means **stale deploy** or a **function added without a new `config.toml` entry**.
 
 ---
 
