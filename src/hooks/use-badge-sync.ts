@@ -46,10 +46,11 @@ export function useBadgeSync(computedBadgeIds: string[], badgeMeta: Record<strin
       const fresh = computedBadgeIds.filter((id) => !existingIds.has(id));
 
       if (fresh.length > 0) {
-        // Insert new badges to DB
-        await supabase.from('user_badges' as any).insert(
-          fresh.map((badge_id) => ({ user_id: user.id, badge_id }))
-        );
+        const rows = fresh.map((badge_id) => ({ user_id: user.id, badge_id }));
+        await supabase.from('user_badges' as any).upsert(rows, {
+          onConflict: 'user_id,badge_id',
+          ignoreDuplicates: true,
+        });
 
         // Only show celebration for badges not yet shown this browser session
         const shownThisSession = getShownThisSession();
