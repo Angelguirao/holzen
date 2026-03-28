@@ -137,9 +137,9 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
       .select('version')
       .order('created_at', { ascending: false })
       .limit(1)
-      .single()
+      .maybeSingle()
       .then(({ data }) => {
-        if (data) {
+        if (data?.version) {
           const v = data.version;
           setLatestVersion(v);
           const lastSeen = localStorage.getItem(LAST_SEEN_VERSION_KEY);
