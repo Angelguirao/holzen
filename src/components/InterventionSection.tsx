@@ -188,6 +188,7 @@ export function InterventionSection({
                   nudge={primary.data}
                   nudgeLoading={false}
                   nudgeError={!primary.data}
+                  onRetry={onRetry}
                 />
               </>
             )}
