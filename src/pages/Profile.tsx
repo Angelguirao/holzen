@@ -56,8 +56,8 @@ interface Reflection {
   created_at: string;
   is_favorite: boolean;
   haiku: string | null;
-  learning_title: string | null;
-  learning_body: string | null;
+  grounding_title: string | null;
+  grounding_body: string | null;
   note: string | null;
   mood: string | null;
   mood_after: string | null;
@@ -65,7 +65,7 @@ interface Reflection {
   tags: string[];
   breathing_completed: boolean;
   haiku_read: boolean;
-  learning_read: boolean;
+  grounding_read: boolean;
   signal_read?: boolean;
   zoom_out_read?: boolean;
   history_read?: boolean;
@@ -152,7 +152,7 @@ const Profile = () => {
     const loadReflections = async () => {
       const { data } = await supabase
         .from('reflections')
-        .select('id, message, context, created_at, is_favorite, haiku, learning_title, learning_body, note, mood, mood_after, outcome, tags, breathing_completed, haiku_read, learning_read, signal_read, signal_source, zoom_out_read, history_read')
+        .select('id, message, context, created_at, is_favorite, haiku, grounding_title, grounding_body, note, mood, mood_after, outcome, tags, breathing_completed, haiku_read, grounding_read, signal_read, signal_source, zoom_out_read, history_read')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(1000);

@@ -38,7 +38,7 @@ export interface CollectionItem {
 
 export interface ReflectionReadFlags {
   haiku_read: boolean;
-  learning_read: boolean;
+  grounding_read: boolean;
   signal_read: boolean;
   zoom_out_read: boolean;
   history_read: boolean;
@@ -115,7 +115,7 @@ export function useLibrary() {
     );
     const { data: allReflections } = await supabase
       .from('reflections')
-      .select('id, message, context, created_at, outcome, haiku, learning_title, learning_body, learning_url, signal_title, signal_body, signal_source, signal_url, zoom_out_data, history_insight_data, haiku_read, learning_read, signal_read, zoom_out_read, history_read')
+      .select('id, message, context, created_at, outcome, haiku, grounding_title, grounding_body, grounding_url, signal_title, signal_body, signal_source, signal_url, zoom_out_data, history_insight_data, haiku_read, grounding_read, signal_read, zoom_out_read, history_read')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
     if (allReflections && allReflections.length > 0) {
@@ -126,7 +126,7 @@ export function useLibrary() {
       for (const r of allReflections as any[]) {
         flags[r.id] = {
           haiku_read: !!r.haiku_read,
-          learning_read: !!r.learning_read,
+          grounding_read: !!r.grounding_read,
           signal_read: !!r.signal_read,
           zoom_out_read: !!r.zoom_out_read,
           history_read: !!r.history_read,
@@ -149,8 +149,8 @@ export function useLibrary() {
         if (r.signal_source && !existingKeys.has(`${r.id}:signal`)) {
           inserts.push({ user_id: user.id, type: 'bookmark', title: r.signal_title, body: r.signal_body, source_type: 'signal', source_url: r.signal_url, reflection_id: r.id, tags: [], created_at: r.created_at, status: r.signal_read ? 'read' : 'unread' });
         }
-        if (r.learning_title && !existingKeys.has(`${r.id}:learning`)) {
-          inserts.push({ user_id: user.id, type: 'bookmark', title: r.learning_title, body: r.learning_body, source_type: 'learning', source_url: r.learning_url, reflection_id: r.id, tags: [], created_at: r.created_at, status: r.learning_read ? 'read' : 'unread' });
+        if (r.grounding_title && !existingKeys.has(`${r.id}:learning`)) {
+          inserts.push({ user_id: user.id, type: 'bookmark', title: r.grounding_title, body: r.grounding_body, source_type: 'learning', source_url: r.grounding_url, reflection_id: r.id, tags: [], created_at: r.created_at, status: r.grounding_read ? 'read' : 'unread' });
         }
         if (r.zoom_out_data && !existingKeys.has(`${r.id}:zoom_out`)) {
           const zd = r.zoom_out_data as any;
@@ -358,7 +358,7 @@ export function useLibrary() {
     if (!flags) return true; // no data, assume engaged
     const sourceToFlag: Record<string, keyof ReflectionReadFlags> = {
       haiku: 'haiku_read',
-      learning: 'learning_read',
+      learning: 'grounding_read',
       signal: 'signal_read',
       zoom_out: 'zoom_out_read',
       history_insight: 'history_read',

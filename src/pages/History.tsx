@@ -43,10 +43,10 @@ interface Reflection {
   created_at: string;
   is_favorite: boolean;
   haiku: string | null;
-  learning_title: string | null;
-  learning_body: string | null;
-  learning_citation: string | null;
-  learning_url: string | null;
+  grounding_title: string | null;
+  grounding_body: string | null;
+  grounding_citation: string | null;
+  grounding_url: string | null;
   signal_title: string | null;
   signal_body: string | null;
   signal_source: string | null;
@@ -62,11 +62,11 @@ interface Reflection {
   zoom_out_read?: boolean;
   history_read?: boolean;
   signal_read?: boolean;
-  learning_read?: boolean;
+  grounding_read?: boolean;
 }
 
 const PAGE_SIZE = 30;
-const FIELDS = 'id, message, context, created_at, is_favorite, haiku, learning_title, learning_body, learning_citation, learning_url, signal_title, signal_body, signal_source, signal_url, zoom_out_data, history_insight_data, note, mood, mood_after, outcome, tags, breathing_completed, zoom_out_read, history_read, signal_read, learning_read';
+const FIELDS = 'id, message, context, created_at, is_favorite, haiku, grounding_title, grounding_body, grounding_citation, grounding_url, signal_title, signal_body, signal_source, signal_url, zoom_out_data, history_insight_data, note, mood, mood_after, outcome, tags, breathing_completed, zoom_out_read, history_read, signal_read, grounding_read';
 
 function HistoryCompanions({ label, r }: { label: string; r: Reflection }) {
   const [open, setOpen] = useState(false);
@@ -86,15 +86,15 @@ function HistoryCompanions({ label, r }: { label: string; r: Reflection }) {
         <div className="space-y-3 pt-2.5">
           {r.haiku && <HaikuDisplay haiku={r.haiku} />}
 
-          {r.learning_title && r.learning_body && (
+          {r.grounding_title && r.grounding_body && (
             <LearningInput
-              title={r.learning_title}
-              body={r.learning_body}
-              nudge={r.learning_citation ? {
-                title: r.learning_title,
-                body: r.learning_body,
-                citation: r.learning_citation,
-                url: r.learning_url ?? '',
+              title={r.grounding_title}
+              body={r.grounding_body}
+              nudge={r.grounding_citation ? {
+                title: r.grounding_title,
+                body: r.grounding_body,
+                citation: r.grounding_citation,
+                url: r.grounding_url ?? '',
               } : undefined}
             />
           )}
@@ -827,7 +827,7 @@ const History = () => {
               {(() => {
                 const companionItems: string[] = [];
                 if (r.haiku) companionItems.push('Haiku');
-                if (r.learning_title) companionItems.push('Grounding');
+                if (r.grounding_title) companionItems.push('Grounding');
                 if (r.signal_source) companionItems.push('Signal');
                 if (r.zoom_out_data) companionItems.push('Zoom Out');
                 if (r.history_insight_data) companionItems.push('History');

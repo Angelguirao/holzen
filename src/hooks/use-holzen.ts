@@ -42,7 +42,7 @@ export function useHolzen() {
   const [btcData, setBtcData] = useState<BtcPriceData | null>(null);
   const [message, setMessage] = useState<string | null>(null);
   const [context, setContext] = useState<string | null>(null);
-  const [companions, setCompanions] = useState<CompanionData>({ haiku: null, learningTitle: null, learningBody: null });
+  const [companions, setCompanions] = useState<CompanionData>({ haiku: null, groundingTitle: null, groundingBody: null });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [newReflection, setNewReflection] = useState(false);
@@ -60,7 +60,7 @@ export function useHolzen() {
     if (lastMessage && user) {
       supabase
         .from('reflections')
-        .select('id, haiku, learning_title, learning_body')
+        .select('id, haiku, grounding_title, grounding_body')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(1)
@@ -70,8 +70,8 @@ export function useHolzen() {
             setLastReflectionId(latestReflection.id);
             setCompanions({
               haiku: latestReflection.haiku ?? null,
-              learningTitle: latestReflection.learning_title ?? null,
-              learningBody: latestReflection.learning_body ?? null,
+              groundingTitle: latestReflection.grounding_title ?? null,
+              groundingBody: latestReflection.grounding_body ?? null,
             });
           }
         });
@@ -107,7 +107,7 @@ export function useHolzen() {
       const silentMsg = 'BTC moved.';
       setMessage(silentMsg);
       setContext(ctx);
-      setCompanions({ haiku: null, learningTitle: null, learningBody: null });
+      setCompanions({ haiku: null, groundingTitle: null, groundingBody: null });
       setNewReflection(true);
 
       const { data: insertedReflection } = await supabase.from('reflections').insert({
@@ -220,8 +220,8 @@ export function useHolzen() {
 
         const companionData: CompanionData = {
           haiku: fnData?.haiku ?? null,
-          learningTitle: fnData?.learning_title ?? null,
-          learningBody: fnData?.learning_body ?? null,
+          groundingTitle: fnData?.grounding_title ?? null,
+          groundingBody: fnData?.grounding_body ?? null,
         };
         setCompanions(companionData);
 
@@ -230,10 +230,10 @@ export function useHolzen() {
           message: msg,
           context: ctx,
           haiku: companionData.haiku,
-          learning_title: companionData.learningTitle,
-          learning_body: companionData.learningBody,
-          learning_citation: fnData?.learning_citation ?? null,
-          learning_url: fnData?.learning_url ?? null,
+          grounding_title: companionData.groundingTitle,
+          grounding_body: companionData.groundingBody,
+          grounding_citation: fnData?.grounding_citation ?? null,
+          grounding_url: fnData?.grounding_url ?? null,
           ...(mood ? { mood } : {}),
         }).select('id').single();
 
@@ -358,7 +358,7 @@ export function useHolzen() {
   const dismissMessage = useCallback(async () => {
     setMessage(null);
     setContext(null);
-    setCompanions({ haiku: null, learningTitle: null, learningBody: null });
+    setCompanions({ haiku: null, groundingTitle: null, groundingBody: null });
     if (!user) return;
     await supabase
       .from('profiles')
@@ -384,7 +384,7 @@ export function useHolzen() {
       setNewReflection(true);
       const { data: latest } = await supabase
         .from('reflections')
-        .select('id, haiku, learning_title, learning_body')
+        .select('id, haiku, grounding_title, grounding_body')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(1)
@@ -393,8 +393,8 @@ export function useHolzen() {
         setLastReflectionId(latest.id);
         setCompanions({
           haiku: latest.haiku ?? null,
-          learningTitle: latest.learning_title ?? null,
-          learningBody: latest.learning_body ?? null,
+          groundingTitle: latest.grounding_title ?? null,
+          groundingBody: latest.grounding_body ?? null,
         });
       }
     }

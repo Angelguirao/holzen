@@ -15,7 +15,7 @@ interface Reflection {
   context?: string | null;
   breathing_completed: boolean;
   haiku_read: boolean;
-  learning_read: boolean;
+  grounding_read: boolean;
   signal_read?: boolean;
   zoom_out_read?: boolean;
   history_read?: boolean;

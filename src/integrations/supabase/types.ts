@@ -1137,11 +1137,11 @@ export type Database = {
           history_read: boolean
           id: string
           is_favorite: boolean
-          learning_body: string | null
-          learning_citation: string | null
-          learning_read: boolean
-          learning_title: string | null
-          learning_url: string | null
+          grounding_body: string | null
+          grounding_citation: string | null
+          grounding_read: boolean
+          grounding_title: string | null
+          grounding_url: string | null
           message: string
           mood: string | null
           mood_after: string | null
@@ -1167,11 +1167,11 @@ export type Database = {
           history_read?: boolean
           id?: string
           is_favorite?: boolean
-          learning_body?: string | null
-          learning_citation?: string | null
-          learning_read?: boolean
-          learning_title?: string | null
-          learning_url?: string | null
+          grounding_body?: string | null
+          grounding_citation?: string | null
+          grounding_read?: boolean
+          grounding_title?: string | null
+          grounding_url?: string | null
           message: string
           mood?: string | null
           mood_after?: string | null
@@ -1197,11 +1197,11 @@ export type Database = {
           history_read?: boolean
           id?: string
           is_favorite?: boolean
-          learning_body?: string | null
-          learning_citation?: string | null
-          learning_read?: boolean
-          learning_title?: string | null
-          learning_url?: string | null
+          grounding_body?: string | null
+          grounding_citation?: string | null
+          grounding_read?: boolean
+          grounding_title?: string | null
+          grounding_url?: string | null
           message?: string
           mood?: string | null
           mood_after?: string | null
@@ -1643,11 +1643,11 @@ export type Database = {
           history_read: boolean | null
           id: string | null
           is_favorite: boolean | null
-          learning_body: string | null
-          learning_citation: string | null
-          learning_read: boolean | null
-          learning_title: string | null
-          learning_url: string | null
+          grounding_body: string | null
+          grounding_citation: string | null
+          grounding_read: boolean | null
+          grounding_title: string | null
+          grounding_url: string | null
           message: string | null
           mood: string | null
           mood_after: string | null
