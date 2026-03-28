@@ -240,7 +240,7 @@
     "zenMode": "Zen modus",
     "zenModeDesc": "Reduceert het startscherm tot alleen de reflectie en ademhalingsoefening.",
     "enableZenMode": "Zen modus inschakelen",
-    "companionsDesc": "Optionele toevoegingen onder elke reflectie.",
+    "companionsDesc": "Kies welke begeleiderkaarten onder je reflectie verschijnen. Uitzetten verbergt alleen die kaart — de uitgelichte pauze boven kan nog steeds een vergelijkbaar inzicht tonen als het past.",
     "companionLabels": {
       "breathing": "Ademhalingsoefening",
       "haiku": "Haiku",
@@ -321,7 +321,7 @@
     "inhaleHoldExhale": "Inademen… vasthouden… uitademen…",
     "readAsHaiku": "Lees als haiku →",
     "learnFromHistory": "Leer van de geschiedenis →",
-    "toggleCompanions": "Schakel begeleiders in of uit in Instellingen.",
+    "toggleCompanions": "Toon of verberg begeleiderkaarten altijd in Instellingen.",
     "yourThreshold": "Je drempel",
     "thresholdQuestion": "Hoeveel moet Bitcoin bewegen (omhoog of omlaag) voordat je wilt pauzeren en reflecteren?",
     "changeThresholdLater": "Je kunt aparte drempels voor stijging & daling later instellen in Instellingen"
