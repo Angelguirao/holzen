@@ -16,7 +16,7 @@ This document describes **how Holzen turns Bitcoin volatility into a pause exper
 8. [Data written by this system](#toc-data-written)
 9. [Frontend surfaces](#toc-frontend-surfaces)
 10. [Background jobs (pause-adjacent)](#toc-background-jobs)
-11. [Known inconsistencies, drift, and fixes](#toc-known-issues)
+11. [Operating assumptions, drift, and history](#toc-known-issues)
 12. [Cost and limits (orchestrator)](#toc-cost-limits)
 13. [Security notes](#toc-security)
 14. [File index (pause core)](#toc-file-index)
@@ -190,7 +190,7 @@ flowchart LR
   D --> E[Default pattern\nzoom_out if moderate]
 ```
 
-**Note:** Even when the headline is mirror / question / etc., enabled companion generators may still run in parallel (see §11 drift — *Intervention vs “run every enabled generator”*).
+**Note:** Even when the headline is mirror / question / etc., enabled companion generators may still run in parallel (see **§11.3** — *Intervention vs “run every enabled generator”*).
 
 ### 5.3 Question mode
 
@@ -457,51 +457,48 @@ Exact SQL lives in **[cron-setup.md](./cron-setup.md)**. Typical schedules docum
 
 <a id="toc-known-issues"></a>
 
-## 11. Known inconsistencies, drift, and fixes
+## 11. Operating assumptions, drift, and history
 
-### UX vs server work vs rate limits
+**Purpose:** This section is for **people changing pause behavior** — where the **UI story** and **server phases** diverge, how **throttling** actually works, what was **fixed in past parity work** (short archaeology), and what is **intentional product drift** you may revisit later. It is not a bug list for triage.
+
+### 11.1 UX vs server phases vs rate limits (read this first)
 
 **What the user sees** is one pause surface: reflection copy, an intervention (mirror / trap / pattern / question / default), and optional companion cards driven by preferences.
 
 **What the server does** is split across phases: (1) **reflection** — `holzen-reflect` or `check-volatility` calling `generateUnifiedReflection` (message + haiku when `includeLearning: false`); (2) **orchestration** — `companion-orchestrate` may run **multiple** model-backed generators in parallel (Signal, Grounding, History, Zoom Out, and question mode when selected), then dual-write results to `reflections` / `reflection_companions` / analytics.
 
-**Rate limits and budgets** do not line up 1:1 with that UX split. Per-user **throttling** (`checkRateLimit` in `_shared/ratelimit.ts`) counts only **`analytics_events.event`** values in a **fixed allowlist** (e.g. **`pause_ai_call`**, **`signal_companion_ai_call`**, **`zoom_out_ai_call`**, **`historical_insight_ai_call`**, plus several other named AI events — see the file). **`reflection_generated`** is **not** in that list; **`holzen-reflect`** inserts **`pause_ai_call`** at the start of each invoke, so it shares the **same** sliding window the orchestrator checks. **Orchestrator-only** events such as **`intervention_selected`** are **not** in the allowlist, so companion fan-out does not increment that counter. **Daily cost** is capped separately via **`checkDailyBudget`** on summed **`generation_attempts.estimated_cost_usd`** (UTC day). When you change UX (what to show) or cost (how hard to hit the models), treat **reflection**, **orchestrator fan-out**, and **rate-limit event wiring** as three different levers — e.g. hiding a companion in the UI does not reduce server work unless **`enable*`** flags or generator gating in `companion-orchestrate` change too.
+**Rate limits and budgets** do not line up 1:1 with that UX split:
 
-### Resolved implementation issues (historical)
+- **Sliding-window throttle** — `checkRateLimit` (`_shared/ratelimit.ts`) counts only **`analytics_events.event`** values on a **fixed allowlist** (e.g. **`pause_ai_call`**, **`signal_companion_ai_call`**, **`zoom_out_ai_call`**, **`historical_insight_ai_call`**, plus other named AI events — **read the file** for the current list). **`reflection_generated`** is **not** counted. **`holzen-reflect`** inserts **`pause_ai_call`** before generation, so reflection and orchestrator **share** that window. **`intervention_selected`** and other orchestrator-only events are **not** on the allowlist, so **companion fan-out does not multiply** that counter. **`companion-orchestrate`** does not insert **`pause_ai_call`** per companion.
+- **Daily cap** — **`checkDailyBudget`** sums **`generation_attempts.estimated_cost_usd`** for the **UTC day** (see §12 for numeric knobs).
 
-These were bugs or gaps that **current `main` is expected to contain fixes for**; kept here so “why does the code look this way?” stays traceable.
+**Practical levers:** Changing **UX** (what to show), **cost** (how many model calls), and **rate-limit wiring** (which events increment the allowlist) are **three separate decisions**. Hiding a companion in the UI does **not** reduce server work unless **`enable*`** flags or generator gating in `companion-orchestrate` change too. Orchestrator cost is bounded mainly by **daily budget** and **which generators run**, not by “one `pause_ai_call` per companion.”
+
+### 11.2 Resolved implementation issues (historical)
+
+Brief archaeology — **current `main` is expected to include these fixes**; listed so “why does the code look this way?” stays traceable.
 
 1. **`questionPromise` undefined** — Question mode could throw until `questionPromise` was wired from **`generateQuestion`** when **`selection.mode === "question"`**.
-2. **Cron → orchestrator auth** — Orchestrator now accepts **service role + `userId` in body**; **`check-volatility`** sends **`userId`** and **`severity`** so automatic sessions get companions.
-3. **Mirror intervention not returned** — **`intervention.primary`** is populated when mirror is selected so the UI can render it.
-4. **Unified reflection pipeline** — Shared **`generateUnifiedReflection`** with **`includeLearning: false`**; **`grounding_*`** on **`reflections`** come from **`companion-orchestrate`**, not the reflection step.
-5. **Cron parity with manual pause** — **`check-volatility`** uses the same profile-backed reflection inputs (sanitized like **`holzen-reflect`**), recent haiku/message lists, **`companion-orchestrate`** **`enable*`** flags, and **mood / moodHistory** when available.
+2. **Cron → orchestrator auth** — Service role + **`userId` in body`**; **`check-volatility`** sends **`userId`** and **`severity`** for automatic sessions.
+3. **Mirror intervention not returned** — **`intervention.primary`** populated when mirror is selected.
+4. **Unified reflection pipeline** — **`generateUnifiedReflection`** with **`includeLearning: false`**; **`reflections.grounding_*`** filled by **`companion-orchestrate`**, not the reflection step.
+5. **Cron parity with manual pause** — Profile-backed reflection inputs (sanitized like **`holzen-reflect`**), recent haiku/message lists, orchestrator **`enable*`** flags, **mood / moodHistory** when available.
 
-### Remaining / product-level drift (monitor)
+### 11.3 Product-level drift (monitor)
 
-These are **not bugs** in the parity work; they describe how the system behaves today and what you might change later.
+Intentional or deferred behavior — **not** parity bugs.
 
-**Optional tool + learning fields on reflection**
+**Optional `includeLearning` on reflection**
 
-- **What:** `generateUnifiedReflection` can be called with **`includeLearning: true`** (tool call + `grounding_*` fields in the model response).
-- **Reality:** Production uses **`includeLearning: false`** for both manual pause and cron. Ground / Signal content is written by **`companion-orchestrate`**, not the reflection step.
-- **Why it’s listed:** The code path still exists if you experiment; it is easy to confuse with **`reflections.grounding_*`** columns (stored Ground companion payload). Prefer **`grounding`** in UI and i18n; **`learning`** remains a **legacy alias** in some maps (e.g. feedback → cache type, old library rows) and is not a Postgres column name for the Ground card.
+- **What:** `generateUnifiedReflection` can be called with **`includeLearning: true`** (tool call + `grounding_*` in the model response).
+- **Reality:** Production uses **`includeLearning: false`**. Ground / Signal content is written by **`companion-orchestrate`**.
+- **Why it’s listed:** The path still exists for experiments; easy to confuse with **`reflections.grounding_*`** (Ground companion denormalized fields). Prefer **`grounding`** in UI and i18n; **`learning`** is a **legacy alias** in some maps (feedback → cache, old library rows).
 
 **Intervention vs “run every enabled generator”**
 
-- **What:** `companion-orchestrate` picks a **primary intervention** (mirror, trap, pattern, question, etc.) for the top of the pause UI.
-- **Reality:** It **still runs** Signal, Grounding, History, and Zoom Out **in parallel** for every slot whose **`enable*`** flag is true (and not cached), even when the headline intervention is something like **mirror** or **question** that might not “need” all of them.
-- **Why it matters:** Extra model calls and cost. A future optimization could skip generators that the chosen intervention does not use (would need careful product rules).
-
-**Rate limit and analytics events**
-
-- **What:** `checkRateLimit` only counts **`analytics_events.event`** values listed in **`_shared/ratelimit.ts`**.
-- **Reality:** **`holzen-reflect`** inserts **`pause_ai_call`** (in the allowlist) before generation; **`reflection_generated`** is **not** in the allowlist. **`intervention_selected`** is **not** in the allowlist. **`companion-orchestrate`** does not insert **`pause_ai_call`** per companion.
-- **Why it matters:** One manual reflect consumes at least one allowlisted event before orchestration; orchestrator work is bounded mainly by **daily budget** and **generator** logic, not by multiplying the same sliding-window counter per companion.
-
-**Admin surface**
-
-- **What:** `Admin.tsx` exposes **seven** tabs: Monitor, Content, Sources, Tools, Library, Feed, Rejections. Ops / content tooling entry point.
+- **What:** Orchestrator picks a **primary intervention** for the top of the pause UI.
+- **Reality:** It still runs Signal, Grounding, History, and Zoom Out **in parallel** for every enabled slot (when not cached), even for headlines like **mirror** or **question** that might not “need” all of them.
+- **Why it matters:** Extra model calls and cost. A future optimization could skip generators the chosen intervention does not use (needs product rules).
 
 ---
 
@@ -510,7 +507,7 @@ These are **not bugs** in the parity work; they describe how the system behaves 
 ## 12. Cost and limits (orchestrator)
 
 - **Daily budget:** `checkDailyBudget(svcClient, 10.0)` — sums **`generation_attempts.estimated_cost_usd`** from **UTC midnight** (`_shared/ratelimit.ts`).
-- **Rate limit:** **`checkRateLimit(svcClient, userId, 60, 30)`** — at most **30** allowlisted **`analytics_events`** rows for that user in the last **60** minutes. The allowlist is **not** “all AI events”; copy the current array from **`ratelimit.ts`** when documenting integrations (see §10).
+- **Rate limit:** **`checkRateLimit(svcClient, userId, 60, 30)`** — at most **30** allowlisted **`analytics_events`** rows for that user in the last **60** minutes. The allowlist is **not** “all AI events”; copy the current array from **`ratelimit.ts`** when documenting integrations (full behavior: **§11.1**).
 
 ---
 
@@ -554,6 +551,7 @@ src/hooks/use-holzen.ts
 src/hooks/use-companion-data.ts
 src/components/InterventionSection.tsx
 src/components/CompanionSection.tsx   # embeds InterventionSection + useCompanionData
+src/pages/Admin.tsx                   # ops UI (Monitor, Content, Sources, …) — adjacent tooling, not pause pipeline
 ```
 
 ---
