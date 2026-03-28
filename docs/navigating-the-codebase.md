@@ -20,7 +20,7 @@ This guide walks a new contributor through the repository in roughly the order y
 | `public/` | Static assets (icons, manifest pieces, etc.). |
 | `supabase/migrations/` | Postgres schema and RLS — **source of truth** for the database. |
 | `supabase/functions/` | Deno edge functions (HTTP APIs, crons, webhooks). |
-| `supabase/config.toml` | Supabase project id and per-function options (e.g. `verify_jwt`). |
+| `supabase/config.toml` | Supabase project id and **explicit** per-function options (e.g. `verify_jwt`). Functions omitted here use **platform defaults** until you add an entry. |
 | `vite.config.ts` | Dev server (port 8080), `@` alias, PWA inject-manifest, **optional Supabase URL/key fallbacks** when not in `localstack` mode. |
 | `vitest.config.ts` | Tests: jsdom, `src/test/setup.ts`, same `@` alias as Vite. |
 
@@ -149,7 +149,11 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 
 **Cron / server / webhook style** (not an exhaustive list — see `cron-setup.md` and each `index.ts`): e.g. `check-volatility`, `refresh-btc-prices`, `fetch-source-feeds`, `weekly-digest`, `deliver-letters`, `auth-email-hook`, etc.
 
-**`supabase/config.toml`** sets `verify_jwt` per function for some entries. Functions **not** listed there use Supabase defaults for your CLI version — when adding or hardening functions, keep **config**, **deployment**, and **how the client passes the JWT** consistent. Several functions validate the user inside the handler (e.g. `send-feedback` uses `getUser()` with the incoming `Authorization` header).
+**`supabase/config.toml`** — Only functions named under `[functions.<name>]` get the options you set (this repo sets `verify_jwt = false` for many **cron / webhook / internal** style handlers). **Any folder under `supabase/functions/` that has no block here** uses Supabase’s **default** for that environment (often **`verify_jwt = true`** for HTTP invokes). That matters when the client calls `supabase.functions.invoke`: if the gateway rejects the request before your code runs, you’ll see **401** with little detail in the function logs.
+
+- **Debugging 401 on invoke:** confirm the **Authorization** header / session, **dashboard secrets** for that function, and whether **`[functions.<name>]`** exists and matches what you expect. Adding an explicit `[functions.my-function]` entry is how you pin behavior for deploys that read this file.
+
+- **Local vs hosted:** `npx supabase functions serve` applies **`config.toml` from this repo** to your local stack. **Hosted Supabase** uses the config **deployed with the project** (e.g. via Lovable/GitHub sync or `supabase functions deploy`). Defaults can differ if a function is missing from `config.toml` in one place but not the other — when in doubt, add an explicit block for that function name.
 
 ---
 
@@ -186,25 +190,35 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 
 ---
 
-## 17. Review notes: improvements and caveats
+## 17. Lovable Cloud: what deploys when
+
+If you use [Lovable](https://lovable.dev) with GitHub sync to a linked Supabase project (see [README.md](../README.md#Lovable)):
+
+| Change in repo | Typical effect on live users |
+|----------------|------------------------------|
+| New or updated SQL under **`supabase/migrations/`** | Migrations run against the **linked** database when the platform syncs — treat as **production** unless you use a dedicated staging project. |
+| Changes under **`supabase/functions/`** | Edge functions **redeploy** on sync — same immediacy as migrations. |
+| Changes under **`src/`**, `public/`, etc. | **Frontend** updates only after you **publish** and confirm **Update** in Lovable’s publish UI (not automatic the moment you push). |
+
+**Locally**, nothing in this table runs by itself: your machine uses **`.env` / `.env.*.local`** and **`npm run dev`** (or `dev:hosted` / `dev:local`). Use **local Supabase** (`npm run supabase:start`, `supabase:reset`) to test migrations safely; use **`npx supabase functions serve`** (and [function secrets](https://supabase.com/docs/guides/functions/secrets)) to approximate hosted function behavior.
+
+---
+
+## 18. Review notes: improvements and caveats
 
 These are observations from a structural pass — not a full security or QA audit.
 
 1. **`package.json` `name`** is still `vite_react_shadcn_ts`. Renaming to `holzen` (or similar) would match the product and published artifacts, if you care about npm metadata consistency.
 
-2. **`src/integrations/supabase/client.ts`** starts with a comment saying the file is auto-generated. In practice, teams often hand-edit or partially generate this wrapper; consider aligning the comment with reality so newcomers know whether to edit it.
-
-3. **`supabase/config.toml`** does not list every function under `supabase/functions/`. Unlisted functions use platform defaults (e.g. JWT verification). When debugging 401s on `invoke`, verify both **dashboard secrets** and **config.toml** for that function name.
-
-4. **Locales:** Translation files beyond English are present but not wired in `i18n.ts`. Re-enabling is a small, deliberate change (import + `resources`).
+2. **Locales:** Translation files beyond English are present but not wired in `i18n.ts`. Re-enabling is a small, deliberate change (import + `resources`).
 
 5. **Vite Supabase fallbacks** (`FALLBACK_SUPABASE_*` in `vite.config.ts`) let the app boot without a `.env`; for a **fork or production**, you should rely on explicit env vars so you are not tied to the template project URL/key.
 
-6. **ESLint debt:** Expect a large baseline of issues; scope cleanups to files you change unless you run a dedicated lint initiative.
+4. **ESLint debt:** Expect a large baseline of issues; scope cleanups to files you change unless you run a dedicated lint initiative.
 
 ---
 
-## 18. Suggested “first day” exercise
+## 19. Suggested “first day” exercise
 
 1. `cp .env.example .env`, fill Supabase URL + anon key, `npm install`, `npm run dev`, open `http://localhost:8080`.
 2. Trace **`/` → `Home` → `useHolzen` / `use-profile`** and one Supabase table read.
