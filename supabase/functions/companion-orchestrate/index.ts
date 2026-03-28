@@ -9,6 +9,7 @@ import { generateZoomOut, PROMPT_VERSION as ZOOM_OUT_VERSION } from "../_shared/
 import { generateQuestion } from "../_shared/generators/question.ts";
 import { determineSessionIntent } from "../_shared/session-intent.ts";
 import { selectIntervention, parseDirection, bucketSeverity, type InterventionSelection } from "../_shared/intervention-selector.ts";
+import { fetchGroundingSourcesForOrchestrate } from "../_shared/pause-cron-parity.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -19,7 +20,9 @@ const corsHeaders = {
 /**
  * Companion Orchestrator
  *
- * Single entry point that fires all enabled companion generators in parallel,
+ * Single entry point that fires companion generators in parallel — user **enable***
+ * flags **or** intervention requirements (trap → grounding, pattern → history,
+ * zoom_out secondary → zoom out) determine which tasks run.
  * writes results back to the reflections row, logs companion_serves and
  * generation_attempts, and returns a unified response.
  *
@@ -234,10 +237,34 @@ serve(async (req) => {
           })
         : Promise.resolve<string | null>(null);
 
-    // ── Fire only the selected companion(s) ──
+    const insightSelection = selection?.mode === "insight" ? selection : null;
+    const interventionNeedsGrounding = insightSelection?.primary === "trap";
+    const interventionNeedsHistory = insightSelection?.primary === "pattern";
+    const interventionNeedsZoomOut = insightSelection?.secondary === "zoom_out";
+
+    const shouldRunGrounding = Boolean(enableGrounding || interventionNeedsGrounding);
+    const shouldRunHistory = Boolean(enableHistory || interventionNeedsHistory);
+    const shouldRunZoomOut = Boolean(enableZoomOut || interventionNeedsZoomOut);
+
+    let effectiveGroundingSources = groundingSources as Array<{ name: string; type: string; url?: string }> | undefined;
+    if (shouldRunGrounding && (!effectiveGroundingSources || effectiveGroundingSources.length === 0)) {
+      effectiveGroundingSources = await fetchGroundingSourcesForOrchestrate(svcClient, userId) ?? undefined;
+    }
+
+    if (interventionNeedsGrounding && !enableGrounding) {
+      log("grounding task forced for trap intervention (companion pref off)");
+    }
+    if (interventionNeedsHistory && !enableHistory) {
+      log("history task forced for pattern intervention (companion pref off)");
+    }
+    if (interventionNeedsZoomOut && !enableZoomOut) {
+      log("zoomOut task forced for intervention secondary (companion pref off)");
+    }
+
+    // ── Fire companion generators (prefs and/or intervention headline requirements) ──
     const tasks: Record<string, Promise<CompanionResult>> = {};
 
-    if (enableGrounding) {
+    if (shouldRunGrounding) {
       tasks.grounding = (async (): Promise<CompanionResult> => {
         const t = Date.now();
         const result = await generateGrounding({
@@ -245,7 +272,7 @@ serve(async (req) => {
           context,
           language,
           recentTopics: recentNudgeTopics as string[] | undefined,
-          sources: groundingSources as Array<{ name: string; type: string; url?: string }> | undefined,
+          sources: effectiveGroundingSources,
           recentGroundingSources: recentGroundingSources as string[] | undefined,
           recentGroundingTitles: recentNudgeTopics as string[] | undefined,
           userId,
@@ -262,7 +289,7 @@ serve(async (req) => {
         return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t, promptVersion: HISTORY_VERSION };
       })();
     }
-    if (enableZoomOut) {
+    if (shouldRunZoomOut) {
       tasks.zoomOut = (async (): Promise<CompanionResult> => {
         const t = Date.now();
         const result = await generateZoomOut({ svcClient, context, language, reflectionMessage, mood, userId, recentTitles: recentZoomOutTitles, log, zoomOutAngle: intent.zoomOutAngle });

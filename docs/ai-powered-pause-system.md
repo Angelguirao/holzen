@@ -279,7 +279,7 @@ flowchart TD
 
 **Parallelism:** After selection, **`generateQuestion`** (if question mode) and **Signal / Grounding / History / Zoom out** run **concurrently** (`Promise.all` + `Promise.allSettled` on tasks). Generators are **in-process** imports. Each slot is omitted if its **`enable*`** flag is false or the client skipped it (e.g. already cached on the row).
 
-**Intervention vs generators:** **`intervention.primary`** for **trap** / **pattern** and **`intervention.secondary`** for **zoom_out** are filled **from the same task results** as the Ground / History / Zoom cards. If the user disables **`enableGrounding`** but **`selectIntervention`** returns **trap**, the trap headline may **lack** grounding data (task never ran). Same idea for **pattern** + **`enableHistory`**, and **zoom_out** secondary + **`enableZoomOut`**. See **§11.3** (*Intervention vs “run every enabled generator”*).
+**Intervention vs generators:** **`intervention.primary`** for **trap** / **pattern** and **`intervention.secondary`** for **zoom_out** are filled from the **same** generator runs as the cards. The orchestrator **forces** Grounding / History / Zoom Out when the selected intervention **requires** that output, even if the user turned the matching companion pref **off** (extra model cost vs empty headline). If **`groundingSources`** was omitted (pref off), the orchestrator loads the grounding catalog via **`fetchGroundingSourcesForOrchestrate`**. **Signal** is still prefs-only — not used as a headline type. See **§11.3** for broader cost notes.
 
 ### 5.1 Authentication (important)
 
@@ -410,7 +410,7 @@ flowchart TB
 | **Secondary** | If **`severity === "high"`**, selection may add **`secondary: "zoom_out"`**; zoom payload comes from the **`zoomOut`** task when fulfilled. |
 | **AI** | **Yes** (Grounding generator — Perplexity + structure; see §6). |
 | **Product note** | If **Ground** companion pref is **on**, the user can see **the same grounding payload** both in the **trap** intervention and in the **Ground** card — same generator, two surfaces. |
-| **Gating** | Trap **copy** in **`intervention.primary`** comes from the **grounding** task; **`enableGrounding`** must be **true** (and the task must succeed) or the trap headline can be empty. |
+| **Gating** | Trap **copy** comes from the **grounding** task. The orchestrator runs that task whenever **`primary === "trap"`**, even if **`enableGrounding`** is false; catalog URLs are loaded server-side if the client did not send **`groundingSources`**. |
 
 ---
 
@@ -423,7 +423,7 @@ flowchart TB
 | **Framing** | `PatternFraming` + **`HistoricalInsightDisplay`**. |
 | **Secondary** | High-severity pattern **always** includes zoom-out secondary; moderate default includes zoom-out; mild default does **not**. |
 | **AI** | **Yes** (History generator; Zoom secondary uses Zoom Out generator when enabled). |
-| **Gating** | Pattern **copy** needs the **history** task; **`enableHistory`** must be **true** for **`intervention.primary`**. Zoom **secondary** needs **`enableZoomOut`** (and a fulfilled **`zoomOut`** task). |
+| **Gating** | **Pattern** forces the **history** task; **zoom_out** secondary forces **zoomOut** — both run even when the matching **`enable*`** is false. Headline data still depends on the task succeeding (API errors, budget, etc.). |
 
 ---
 
@@ -447,7 +447,7 @@ flowchart TB
 | **Data** | Same **`generateZoomOut`** result as the **Zoom Out companion** task. Orchestrator assigns it when `key === "zoomOut" && selection.secondary === "zoom_out"`. |
 | **UI** | Collapsible **“Zoom out”** under the primary intervention (`InterventionSection`), **`ZoomOutDisplay`**. |
 | **Duplicate avoidance** | `CompanionSection` **hides the Zoom Out card** when `intervention?.secondary?.type === "zoom_out"` so the same payload is not shown twice. If zoom-out is **only** in the intervention secondary, the card is suppressed even when the pref is on. |
-| **Gating** | Secondary payload is only attached when **`enableZoomOut`** runs the **`zoomOut`** task successfully; selection may still **request** `secondary: "zoom_out"` from `intervention-selector.ts`. |
+| **Gating** | **`zoomOut`** runs when **`secondary === "zoom_out"`** is selected **or** **`enableZoomOut`** is true. The intervention secondary is filled from the task result when both selection and a successful run align. |
 
 ---
 
@@ -615,7 +615,7 @@ Intentional or deferred behavior — **not** parity bugs.
 **Intervention vs “run every enabled generator”**
 
 - **What:** Orchestrator picks a **primary intervention** for the top of the pause UI.
-- **Reality:** It still runs Signal, Grounding, History, and Zoom Out **in parallel** for every enabled slot (when not cached), even for headlines like **mirror** or **question** that might not “need” all of them.
+- **Reality:** It runs **Signal** only when **`enableSignal`**. **Grounding / History / Zoom out** run when the user enabled the card **or** the intervention **requires** that generator (trap / pattern / `zoom_out` secondary). **Mirror** and **question** headlines do not force extra companion generators beyond that rule. Cached slots may still be skipped by the client before invoke.
 - **Why it matters:** Extra model calls and cost. A future optimization could skip generators the chosen intervention does not use (needs product rules).
 
 ---
