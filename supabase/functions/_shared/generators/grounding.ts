@@ -92,14 +92,14 @@ async function serveFallback(
   marketDirection?: "up" | "down" | "neutral",
   excludeIds?: string[],
 ): Promise<GroundingResult> {
-  const staleLibrary = await searchLibrary(svcClient, {
+  const libraryRows = await searchLibrary(svcClient, {
     type: "paper",
     companionType: "ground_nudge",
     userId,
-    includeStale: true,
+    includeStale: false,
   });
-  if (staleLibrary.length > 0) {
-    const pick = staleLibrary[Math.floor(Math.random() * Math.min(staleLibrary.length, 3))];
+  if (libraryRows.length > 0) {
+    const pick = libraryRows[Math.floor(Math.random() * Math.min(libraryRows.length, 3))];
     const result = paperToGrounding(pick);
     recordLibraryServe(svcClient, userId, pick.id, "ground_nudge");
     return { data: result, source: "cache", cacheId: null };
