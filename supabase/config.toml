@@ -23,8 +23,6 @@ project_id = "edgbwdecaoottowliimu"
     verify_jwt = false
   [functions.deliver-letters]
     verify_jwt = false
-  [functions.ground-nudge]
-    verify_jwt = false
   [functions.personalized-nudge]
     verify_jwt = false
   [functions.monthly-report]
@@ -32,10 +30,6 @@ project_id = "edgbwdecaoottowliimu"
   [functions.record-referral]
     verify_jwt = false
   [functions.generate-wallpaper]
-    verify_jwt = false
-  [functions.zoom-out-companion]
-    verify_jwt = false
-  [functions.historical-insight]
     verify_jwt = false
   [functions.journal-prompt]
     verify_jwt = false
