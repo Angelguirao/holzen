@@ -210,13 +210,11 @@ If you use [Lovable](https://lovable.dev) with GitHub sync to a linked Supabase 
 
 These are observations from a structural pass — not a full security or QA audit.
 
-1. **`package.json` `name`** is still `vite_react_shadcn_ts`. Renaming to `holzen` (or similar) would match the product and published artifacts, if you care about npm metadata consistency.
+1. **Locales:** Translation files beyond English are present but not wired in `i18n.ts`. Re-enabling is a small, deliberate change (import + `resources`).
 
-2. **Locales:** Translation files beyond English are present but not wired in `i18n.ts`. Re-enabling is a small, deliberate change (import + `resources`).
+2. **Vite Supabase fallbacks** (`FALLBACK_SUPABASE_*` in `vite.config.ts`) let the app boot without a `.env`; for a **fork or production**, you should rely on explicit env vars so you are not tied to the template project URL/key.
 
-5. **Vite Supabase fallbacks** (`FALLBACK_SUPABASE_*` in `vite.config.ts`) let the app boot without a `.env`; for a **fork or production**, you should rely on explicit env vars so you are not tied to the template project URL/key.
-
-4. **ESLint debt:** Expect a large baseline of issues; scope cleanups to files you change unless you run a dedicated lint initiative.
+3. **ESLint debt:** Expect a large baseline of issues; scope cleanups to files you change unless you run a dedicated lint initiative.
 
 ---
 
