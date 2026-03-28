@@ -641,7 +641,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   {t('settings.companionsDesc')}
                 </p>
-                {(['breathing', 'haiku', 'learning', 'signal', 'zoomOut', 'history'] as const).map((comp) => (
+                {(['breathing', 'haiku', 'grounding', 'signal', 'zoomOut', 'history'] as const).map((comp) => (
                   <div key={comp} className="flex items-center justify-between">
                     <Label htmlFor={`comp-${comp}`} className="text-xs font-mono text-muted-foreground">
                       {t(`settings.companionLabels.${comp}`)}

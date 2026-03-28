@@ -60,7 +60,7 @@ export function LearningInput({ title, body, nudge, nudgeLoading = false, nudgeE
         </div>
       )}
       {nudgeError && !nudge && (
-        <CompanionError companionType="learning" onRetry={onRetry} />
+        <CompanionError companionType="grounding" onRetry={onRetry} />
       )}
     </div>
   );

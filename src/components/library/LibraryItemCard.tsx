@@ -16,6 +16,7 @@ interface Props {
 const SOURCE_EMOJIS: Record<string, string> = {
   reflection: '⏸',
   signal: '📡',
+  grounding: '🌿',
   learning: '🌿',
   haiku: '🍃',
   zoom_out: '🔭',
@@ -36,6 +37,7 @@ const TYPE_LABELS: Record<string, string> = {
 const SOURCE_COLORS: Record<string, string> = {
   reflection: 'border-l-primary/40',
   signal: 'border-l-[hsl(200,50%,50%)]/40',
+  grounding: 'border-l-[hsl(150,40%,45%)]/40',
   learning: 'border-l-[hsl(150,40%,45%)]/40',
   haiku: 'border-l-[hsl(280,40%,55%)]/40',
   zoom_out: 'border-l-[hsl(30,50%,50%)]/40',

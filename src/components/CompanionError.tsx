@@ -7,6 +7,11 @@ const COMPANION_EMPTY_STATES: Record<string, { icon: React.ElementType; message:
     message: 'No philosophical insight available right now.',
     hint: 'Timeless Bitcoin thinking from the best minds — coming shortly.',
   },
+  grounding: {
+    icon: Anchor,
+    message: 'Grounding research is taking a moment.',
+    hint: 'Behavioral science to anchor your thinking — try again in a few seconds.',
+  },
   learning: {
     icon: Anchor,
     message: 'Grounding research is taking a moment.',

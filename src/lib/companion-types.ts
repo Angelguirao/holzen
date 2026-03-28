@@ -20,11 +20,11 @@ export const COMPANION_TYPES = {
 
 /**
  * Map from frontend CompanionFeedback component keys to canonical cache types.
- * The feedback component passes companion_type as the UI key (e.g. "learning"),
- * but the cache uses the canonical type (e.g. "ground_nudge").
+ * Use "grounding" for the Ground card; "learning" is a legacy alias for old analytics rows.
  */
 export const FEEDBACK_TO_CACHE_TYPE: Record<string, string> = {
   signal: COMPANION_TYPES.SIGNAL,
+  grounding: COMPANION_TYPES.GROUNDING,
   learning: COMPANION_TYPES.GROUNDING,
   zoom_out: COMPANION_TYPES.ZOOM_OUT_DEEP_TIME,
   history_insight: COMPANION_TYPES.HISTORY,

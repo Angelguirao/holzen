@@ -252,7 +252,7 @@
     "companionLabels": {
       "breathing": "Breathing exercise",
       "haiku": "Haiku",
-      "learning": "Grounding nudge",
+      "grounding": "Grounding nudge",
       "signal": "Signal",
       "zoomOut": "Zoom out",
       "history": "Historical insight"
@@ -366,8 +366,8 @@
       "breathingDesc": "Guided breathwork to calm the impulse",
       "haiku": "Haiku",
       "haikuDesc": "Your reflection distilled into three lines",
-      "learning": "Grounding",
-      "learningDesc": "Behavioral finance research for today's move",
+      "grounding": "Grounding",
+      "groundingDesc": "Behavioral finance research for today's move",
       "signal": "Signal",
       "signalDesc": "Curated Bitcoin thinking on sovereignty, sound money, and time preference",
       "signalSampleSource": "Gigi · 21 Lessons",
@@ -482,8 +482,8 @@
       "haikuDesc": "5-7-5 stillness, unique each time",
       "signal": "Signal",
       "signalDesc": "Curated Bitcoin thinking on sovereignty, time preference, and sound money",
-      "learning": "Ground Yourself",
-      "learningDesc": "Behavioral finance research in context",
+      "grounding": "Ground Yourself",
+      "groundingDesc": "Behavioral finance research in context",
       "zoomOut": "Zoom Out",
       "zoomOutDesc": "BTC prices 1–5 years ago, your past reflections & deep-time perspective",
       "history": "Historical Echo",
@@ -1071,7 +1071,7 @@
     "companionLabels": {
       "breathing": "Breathing",
       "haiku": "Haiku",
-      "learning": "Grounding",
+      "grounding": "Grounding",
       "signal": "Signal",
       "zoomOut": "Zoom Out",
       "history": "History"
@@ -1134,8 +1134,8 @@
     "context": "BTC is down 7.2% in the last 24 hours. Market sentiment: Extreme Fear (18/100).",
     "message": "A sharp move invites reaction. This is a moment to observe the impulse before following it.",
     "haiku": "Numbers fall like rain\nThe urge to act rises fast\nBreathe before you move",
-    "learningTitle": "Panic Selling and Recovery",
-    "learningBody": "After Bitcoin's 30% drop in May 2021, it recovered within three months. Historically, sharp declines have often preceded periods of consolidation rather than further collapse."
+    "groundingTitle": "Panic Selling and Recovery",
+    "groundingBody": "After Bitcoin's 30% drop in May 2021, it recovered within three months. Historically, sharp declines have often preceded periods of consolidation rather than further collapse."
   },
   "periodComparison": {
     "title": "Period Comparison",
@@ -1413,6 +1413,7 @@
     "reflection": "Pause",
     "reflection_note": "Note",
     "signal": "Signal",
+    "grounding": "Grounding",
     "learning": "Grounding",
     "haiku": "Haiku",
     "zoom_out": "Zoom Out",
@@ -1457,7 +1458,7 @@
     "desc_signal": "Curated Bitcoin signals — sovereignty, sound money, and time preference from the deepest thinkers.",
     "desc_zoom_out": "See today's price through historical perspective and your own past reflections.",
     "desc_history": "Explore patterns across your full reflection history.",
-    "desc_learning": "Grounding research from behavioral finance — context when you need it most.",
+    "desc_ground_companion": "Grounding research from behavioral finance — context when you need it most.",
     "desc_ai_insights": "AI analyzes your reflections to reveal emotional patterns you might miss.",
     "desc_night_reflections": "Evening check-ins that help you process the day before sleep.",
     "desc_library": "Save and organize your favorite reflections, haikus, and insights.",

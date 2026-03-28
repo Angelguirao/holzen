@@ -34,7 +34,7 @@ export function useProfile() {
   const [groundingActivities, setGroundingActivitiesState] = useState<string[]>([]);
   const [currency, setCurrencyState] = useState<string>('USD');
   const [language, setLanguageState] = useState<string>('en');
-  const [companionPrefs, setCompanionPrefsState] = useState<CompanionPrefs>({ breathing: true, haiku: true, learning: true, signal: true, zoomOut: true, history: true });
+  const [companionPrefs, setCompanionPrefsState] = useState<CompanionPrefs>({ breathing: true, haiku: true, grounding: true, signal: true, zoomOut: true, history: true });
   const [profileLoaded, setProfileLoaded] = useState(false);
   const [hasOnboarded, setHasOnboarded] = useState(true);
 
@@ -76,7 +76,7 @@ export function useProfile() {
         setCompanionPrefsState({
           breathing: data.companion_breathing ?? true,
           haiku: data.companion_haiku ?? true,
-          learning: data.companion_grounding ?? true,
+          grounding: data.companion_grounding ?? true,
           signal: (data as any).companion_signal ?? true,
           zoomOut: (data as any).companion_zoom_out ?? true,
           history: (data as any).companion_history ?? true,
@@ -176,10 +176,7 @@ export function useProfile() {
   const setCompanionPref = useCallback(async (key: keyof CompanionPrefs, val: boolean) => {
     setCompanionPrefsState((prev) => ({ ...prev, [key]: val }));
     if (!user) return;
-    const snakeKey =
-      key === 'zoomOut' ? 'zoom_out' :
-      key === 'learning' ? 'grounding' :
-      key;
+    const snakeKey = key === 'zoomOut' ? 'zoom_out' : key;
     const dbKey = `companion_${snakeKey}` as string;
     await supabase
       .from('profiles')
