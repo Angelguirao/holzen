@@ -1,6 +1,10 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 import webpush from "npm:web-push@3.6.7";
+import {
+  generateUnifiedReflection,
+  type MoodHistoryEntry,
+} from "../_shared/reflection-generate.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -9,14 +13,6 @@ const corsHeaders = {
 };
 
 const DEFAULT_COOLDOWN_MS = 6 * 60 * 60 * 1000; // 6 hours fallback
-
-async function validateUrl(url: string, fallbackQuery: string): Promise<string> {
-  try {
-    const res = await fetch(url, { method: 'HEAD', redirect: 'follow' });
-    if (res.ok || res.status === 405 || res.status === 403) return url;
-  } catch { /* broken */ }
-  return `https://www.google.com/search?q=${encodeURIComponent(fallbackQuery)}`;
-}
 
 async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise<Response> {
   for (let i = 0; i < retries; i++) {
@@ -57,134 +53,6 @@ async function fetchBtcVolatility(): Promise<{ changePercent: number; direction:
     cumulativeChangePercent,
     cumulativeDirection: cumulativeChangePercent >= 0 ? "up" : "down",
   };
-}
-
-interface ReflectionResult {
-  message: string;
-  haiku: string | null;
-  learning_title: string | null;
-  learning_body: string | null;
-  learning_citation: string | null;
-  learning_url: string | null;
-}
-
-async function generateReflection(context: string, apiKey: string, tone = "stoic", language = "en"): Promise<ReflectionResult | null> {
-  const TONE_INSTRUCTIONS: Record<string, string> = {
-    stoic: "Write in a calm, stoic tone. Brief and grounded. Like Marcus Aurelius observing the market.",
-    zen: "Write in a gentle zen tone. Spacious, almost meditative. Use natural metaphors.",
-    poetic: "Write in a poetic, literary tone. Evocative and beautiful. Use imagery and rhythm.",
-    blunt: "Write in a direct, blunt tone. No fluff. Say it plainly in as few words as possible.",
-  };
-
-  const toneInstruction = TONE_INSTRUCTIONS[tone] || TONE_INSTRUCTIONS.stoic;
-
-  const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
-  const langName = LANG_NAMES[language] || "English";
-  const langInstruction = language !== "en" ? `CRITICAL LANGUAGE REQUIREMENT: You MUST write ALL output (reflection message, haiku, learning title, learning body) in ${langName}. Do not use English for any generated text.\n\n` : "";
-
-  const systemPrompt = `${langInstruction}You generate a short reflection for someone who just received a Bitcoin volatility alert. Your job is NOT to teach or inspire — it is to reduce urgency and validate what the user is feeling so they can pause before acting.
-
-You MUST respond by calling the "generate_reflection" function. Do not respond with plain text.
-
-Tone: ${toneInstruction}
-
-The context may include a Fear & Greed Index score (0-100). Use this to subtly adjust your reflection:
-- Extreme Fear (0-24): The crowd is panicking. Reflect on what happens when fear spreads.
-- Fear (25-44): Unease is building. A good moment to notice what's driving decisions.
-- Neutral (45-55): The market is quiet. Sometimes stillness is its own signal.
-- Greed (56-75): Optimism is growing. Worth noticing if excitement is clouding judgment.
-- Extreme Greed (76-100): Euphoria is everywhere. The hardest time to stay grounded.
-Do NOT name the index or its score directly. Weave the sentiment naturally into the reflection.
-
-Reflection rules:
-- 2-4 lines max. ${tone === 'blunt' ? '1 sentence preferred.' : ''}
-- Lead with emotional validation — acknowledge the feeling before anything else.
-- Reduce urgency. Slow down the impulse to act.
-- Preserve agency: never say "you should". Never prescribe action.
-- No education, philosophy, narrative, or historical reference.
-- No reassurance, excitement, trading advice, lists, or disclaimers.
-- No exclamation marks, emojis, motivational language, reward language.
-- Shorter is better.
-
-Haiku rules:
-- Exactly 3 lines separated by newlines.
-- Traditional 5-7-5 syllable structure.
-- Captures the emotional essence of the moment. Match the chosen tone.
-- No trading advice or price predictions.
-
-Learning input rules:
-- Title: a short, factual headline (5-10 words).
-- Body: 1-2 sentences about a historical Bitcoin event, market pattern, or behavioral finance insight relevant to the current context. Factual, educational, no advice.
-- Citation: formatted source reference (e.g. "CoinDesk, 2020" or "Kahneman & Tversky, 1979")
-- URL: a real, working URL to a reputable source documenting the event or research referenced.`;
-
-  const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      model: "google/gemini-3-flash-preview",
-      messages: [
-        { role: "system", content: systemPrompt },
-        { role: "user", content: context },
-      ],
-      tools: [
-        {
-          type: "function",
-          function: {
-            name: "generate_reflection",
-            description: "Generate a reflection message with optional haiku and learning companions.",
-            parameters: {
-              type: "object",
-              properties: {
-                message: { type: "string", description: "The core reflection message (1-3 sentences)." },
-                haiku: { type: "string", description: "A haiku (3 lines, 5-7-5 syllables). Lines separated by newlines." },
-                learning_title: { type: "string", description: "Short factual headline for a historical/educational insight." },
-                learning_body: { type: "string", description: "1-2 sentences of factual, educational context." },
-                learning_citation: { type: "string", description: "Formatted source reference (e.g. 'CoinDesk, 2020')." },
-                learning_url: { type: "string", description: "URL to a reputable source for the referenced event or research." },
-              },
-              required: ["message", "haiku", "learning_title", "learning_body", "learning_citation", "learning_url"],
-              additionalProperties: false,
-            },
-          },
-        },
-      ],
-      tool_choice: { type: "function", function: { name: "generate_reflection" } },
-    }),
-  });
-
-  if (!response.ok) {
-    const text = await response.text();
-    console.error("AI gateway error:", response.status, text);
-    return null;
-  }
-
-  const data = await response.json();
-
-  const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
-  if (toolCall?.function?.arguments) {
-    const args = JSON.parse(toolCall.function.arguments);
-    let learningUrl = args.learning_url || null;
-    if (learningUrl && args.learning_title) {
-      learningUrl = await validateUrl(learningUrl, `${args.learning_title} ${args.learning_citation || ''}`);
-    }
-    return {
-      message: args.message,
-      haiku: args.haiku || null,
-      learning_title: args.learning_title || null,
-      learning_body: args.learning_body || null,
-      learning_citation: args.learning_citation || null,
-      learning_url: learningUrl,
-    };
-  }
-
-  // Fallback to plain content
-  const message = data.choices?.[0]?.message?.content?.trim();
-  if (!message) return null;
-  return { message, haiku: null, learning_title: null, learning_body: null, learning_citation: null, learning_url: null };
 }
 
 async function sendNotificationEmail(
@@ -444,7 +312,36 @@ serve(async (req) => {
 
       const tone = (profile as any).reflection_tone || "stoic";
       const userLang = (profile as any).language || "en";
-      const result = await generateReflection(ctx, LOVABLE_API_KEY, tone, userLang);
+
+      let moodHistory: MoodHistoryEntry[] | undefined;
+      try {
+        const { data: recentRows } = await supabase
+          .from("reflections")
+          .select("mood, outcome, created_at")
+          .eq("user_id", profile.user_id)
+          .not("mood", "is", null)
+          .order("created_at", { ascending: false })
+          .limit(20);
+        if (recentRows?.length) {
+          moodHistory = recentRows
+            .filter((r: { mood?: string }) => r.mood)
+            .map((r: { mood: string; outcome?: string | null; created_at?: string }) => ({
+              mood: r.mood,
+              outcome: r.outcome ?? null,
+              created_at: r.created_at,
+            }));
+        }
+      } catch { /* non-fatal */ }
+
+      const { result } = await generateUnifiedReflection({
+        context: ctx,
+        apiKey: LOVABLE_API_KEY,
+        includeLearning: true,
+        tone,
+        language: userLang,
+        severity: absChange,
+        moodHistory,
+      });
       if (!result) {
         console.log(`[CHECK-VOLATILITY] Failed to generate reflection for ${profile.user_id}`);
         return false;

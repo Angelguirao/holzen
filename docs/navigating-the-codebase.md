@@ -200,7 +200,7 @@ These are observations from a structural pass — not a full security or QA audi
 
 5. **Vite Supabase fallbacks** (`FALLBACK_SUPABASE_*` in `vite.config.ts`) let the app boot without a `.env`; for a **fork or production**, you should rely on explicit env vars so you are not tied to the template project URL/key.
 
-6. **Dual reflection implementations (debt):** `check-volatility` and `holzen-reflect` duplicate reflection logic with **different** prompts and features, so automatic and manual pauses can diverge. **Prefer one flow** (e.g. shared `_shared` prompt + quality pipeline, or cron calling `holzen-reflect` with service auth + `userId` and a slim body) — see [ai-powered-pause-system.md](./ai-powered-pause-system.md) §3–4 and §11.
+6. **Reflection AI:** Both **`holzen-reflect`** and **`check-volatility`** call **`_shared/reflection-generate.ts`** (`generateUnifiedReflection`) — same core prompt and quality gate; cron adds learning via tool-call mode. See [ai-powered-pause-system.md](./ai-powered-pause-system.md) §3–4.
 
 7. **ESLint debt:** Expect a large baseline of issues; scope cleanups to files you change unless you run a dedicated lint initiative.
 
