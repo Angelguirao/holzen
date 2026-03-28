@@ -6,23 +6,11 @@ This document describes **how Holzen turns Bitcoin volatility into a pause exper
 
 ---
 
-## 1. Scope
-
-| In scope | Out of scope (see other docs / code) |
-|----------|--------------------------------------|
-| Manual pause vs `check-volatility` | Stripe, push subscription setup details |
-| Shared `_shared/reflection-generate.ts` (both triggers) | Every column in every migration |
-| `companion-orchestrate`, intervention selection, generators | Non-pause AI (`journal-prompt`, `suggest-grounding`, wallpapers, etc.) |
-| Frontend: `use-holzen`, `use-companion-data`, intervention UI | Full admin UI field lists |
-| Tables/views this flow touches | Generic Supabase tutorials |
-
----
-
-## 2. Conceptual model
+## 1. Conceptual model
 
 1. **Trigger** — User opens Pause (client) *or* the `check-volatility` cron decides a user crossed thresholds.
 2. **Reflection** — Short copy (+ optional haiku) anchored to market **context** (e.g. “BTC is down 5.2%…”).
-3. **Persist** — Insert a `reflections` row; update **`profiles.last_message`** / **`last_context`** (and **`last_trigger_at`** only on automatic triggers or manual **silent** mode — see §3).
+3. **Persist** — Insert a `reflections` row; update **`profiles.last_message`** / **`last_context`** (and **`last_trigger_at`** only on automatic triggers or manual **silent** mode — see §2).
 4. **Companions & intervention** — `companion-orchestrate` chooses an **intervention** (mirror / trap / pattern / question) and, according to **enable flags**, runs **Signal, Grounding, History, Zoom Out** generators in process, then writes structured data back to the reflection (and related tables).
 5. **Surface** — Client shows `InterventionSection` plus optional companion cards from user preferences.
 
@@ -49,7 +37,7 @@ Reflection text and haiku land on the new row first; companion columns and inter
 
 ---
 
-## 3. Two triggers: comparison
+## 2. Two triggers: comparison
 
 | Aspect | Manual pause (client) | Automatic (`check-volatility` cron) |
 |--------|------------------------|-------------------------------------|
@@ -98,7 +86,7 @@ Both paths share **`generateUnifiedReflection`** (via **`holzen-reflect`** vs in
 
 ---
 
-## 4. Reflection generation (`_shared/reflection-generate.ts`)
+## 3. Reflection generation (`_shared/reflection-generate.ts`)
 
 - **`generateUnifiedReflection(params)`** — Calls **`https://ai.gateway.lovable.dev/v1/chat/completions`** with **`LOVABLE_API_KEY`**, trying models in order: **`google/gemini-3-flash-preview`**, then **`google/gemini-2.5-flash`** (JSON path uses per-attempt timeouts **12s** then **8s**).
 - **`includeLearning`** — Parameter name is **legacy** (historical “learning” path); when **`true`**, uses a tool-call flow that can populate **`grounding_*`** fields on the result. Production callers use **`includeLearning: false`**: `response_format: json_object` with **`message`** + **`haiku`** only, plus the shared quality gate. The returned object type still includes **`grounding_*`** keys; they are **usually null** in this mode, and **`holzen-reflect`** echoes them in JSON for API stability.
@@ -115,7 +103,7 @@ Both paths share **`generateUnifiedReflection`** (via **`holzen-reflect`** vs in
 
 ---
 
-## 6. `companion-orchestrate` (single entry point)
+## 5. `companion-orchestrate` (single entry point)
 
 - **File:** `supabase/functions/companion-orchestrate/index.ts`
 - **Role:** Auth → rate limit → daily budget → parse body → **`determineSessionIntent`** → **`selectIntervention`** → optional **`generateQuestion`** (question mode) → parallel **generator tasks** (gated by `enableSignal` / `enableGrounding` / `enableHistory` / `enableZoomOut`) → assemble **`intervention`** + legacy companion results → `companion_serves` inserts → **`writeCompanionData`** (dual-write to join table + denormalized columns on `reflections`).
@@ -144,12 +132,12 @@ flowchart TD
 
 **Parallelism:** question (when selected) and the four companion generators run **alongside** each other after intervention selection; the diagram shows logical inputs to **assemble**, not strict sequencing. Generators run **in process** (not HTTP to standalone companion functions). Each slot is skipped if disabled by **`enable*`** flags or satisfied from cache.
 
-### 6.1 Authentication (important)
+### 5.1 Authentication (important)
 
 - **User calls:** `Authorization: Bearer <user JWT>` (Supabase anon client + JWT).
 - **Server calls (e.g. cron):** `Authorization: Bearer <service_role key>` and **JSON field `userId`** (the target `auth.users` id). Without `userId`, the function returns **400**.
 
-### 6.2 Intervention selection
+### 5.2 Intervention selection
 
 - **File:** `supabase/functions/_shared/intervention-selector.ts`
 - **Order (first match wins):**  
@@ -172,14 +160,14 @@ flowchart LR
   D --> E[Default pattern\nzoom_out if moderate]
 ```
 
-**Note:** Even when the headline is mirror / question / etc., enabled companion generators may still run in parallel (see §11 drift — *Intervention vs “run every enabled generator”*).
+**Note:** Even when the headline is mirror / question / etc., enabled companion generators may still run in parallel (see §10 drift — *Intervention vs “run every enabled generator”*).
 
 ### 6.3 Question mode
 
 - **File:** `supabase/functions/_shared/generators/question.ts`
 - **Invocation:** When `selection.mode === "question"`, orchestrator awaits **`generateQuestion`** in parallel with generator tasks (`questionPromise`).
 
-### 6.4 Session intent (theming)
+### 5.4 Session intent (theming)
 
 - **File:** `supabase/functions/_shared/session-intent.ts`
 - **Inputs:** `context` (parse “is up” / “is down”), `mood`, numeric `severity`, `moodHistory` (selling pattern).
@@ -187,7 +175,7 @@ flowchart LR
 
 ---
 
-## 7. Generator family (orchestrated)
+## 6. Generator family (orchestrated)
 
 All are imported **directly** in `companion-orchestrate` (not HTTP to `signal-companion`, `historical-insight`, etc. — those remain thin standalone endpoints if needed).
 
@@ -213,11 +201,11 @@ All are imported **directly** in `companion-orchestrate` (not HTTP to `signal-co
 - **`analytics_events`** — e.g. `pause_ai_call`, `intervention_selected`, `reflection_generated`.
 - **`companion_cache`**, **`user_companion_serves`**, **`content_library`** — Cache / dedup / fallback content.
 - **`pause_notifications`** — In-app bell for server-triggered sessions.
-- **`profiles`** — **`last_message`** / **`last_context`**: updated on **automatic** triggers when a reflection is created; **manual `holzen-reflect`** path updates these after insert (see §3). **`last_trigger_at`**: **automatic** triggers (optimistic cooldown claiming); **manual silent-mode** insert also sets it; **manual normal** AI path does **not** set it.
+- **`profiles`** — **`last_message`** / **`last_context`**: updated on **automatic** triggers when a reflection is created; **manual `holzen-reflect`** path updates these after insert (see §2). **`last_trigger_at`**: **automatic** triggers (optimistic cooldown claiming); **manual silent-mode** insert also sets it; **manual normal** AI path does **not** set it.
 
 ---
 
-## 9. Frontend surfaces
+## 8. Frontend surfaces
 
 | Piece | Role |
 |-------|------|
@@ -229,7 +217,7 @@ All are imported **directly** in `companion-orchestrate` (not HTTP to `signal-co
 
 ---
 
-## 10. Background jobs (pause-adjacent)
+## 9. Background jobs (pause-adjacent)
 
 Exact SQL lives in **[cron-setup.md](./cron-setup.md)**. Typical schedules documented there:
 
@@ -244,7 +232,7 @@ Exact SQL lives in **[cron-setup.md](./cron-setup.md)**. Typical schedules docum
 
 ---
 
-## 11. Known inconsistencies, drift, and fixes
+## 10. Known inconsistencies, drift, and fixes
 
 ### UX vs server work vs rate limits
 
@@ -292,14 +280,14 @@ These are **not bugs** in the parity work; they describe how the system behaves 
 
 ---
 
-## 12. Cost and limits (orchestrator)
+## 11. Cost and limits (orchestrator)
 
 - **Daily budget:** `checkDailyBudget(svcClient, 10.0)` — sums **`generation_attempts.estimated_cost_usd`** from **UTC midnight** (`_shared/ratelimit.ts`).
-- **Rate limit:** **`checkRateLimit(svcClient, userId, 60, 30)`** — at most **30** allowlisted **`analytics_events`** rows for that user in the last **60** minutes. The allowlist is **not** “all AI events”; copy the current array from **`ratelimit.ts`** when documenting integrations (see §11).
+- **Rate limit:** **`checkRateLimit(svcClient, userId, 60, 30)`** — at most **30** allowlisted **`analytics_events`** rows for that user in the last **60** minutes. The allowlist is **not** “all AI events”; copy the current array from **`ratelimit.ts`** when documenting integrations (see §10).
 
 ---
 
-## 13. Security notes
+## 12. Security notes
 
 - **User JWT** paths validate via `getUser()`.
 - **Service role** path is **only** as trustworthy as your cron secrets and network; `userId` in the body must **only** be accepted when the bearer is the service role key (implemented in orchestrator).
@@ -307,7 +295,7 @@ These are **not bugs** in the parity work; they describe how the system behaves 
 
 ---
 
-## 14. File index (pause core)
+## 13. File index (pause core)
 
 ```
 supabase/functions/
@@ -339,7 +327,7 @@ src/components/CompanionSection.tsx   # embeds InterventionSection + useCompanio
 
 ---
 
-## 15. Related reading
+## 14. Related reading
 
 - [cron-setup.md](./cron-setup.md) — pg_cron + `net.http_post` snippets  
 - [navigating-the-codebase.md](./navigating-the-codebase.md) — repo tour and edge function invoke map  
