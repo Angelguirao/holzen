@@ -47,7 +47,7 @@ Routes are declared in one file. Two patterns matter:
 
 **Main shell:** routes under `/`, `/library`, `/profile`, `/settings` use **`AppLayout`**: max-width column, header (“Holzen” + `NotificationBell`), `Outlet`, and **`BottomNav`**. `AppLayout` also wires `useHolzen`, `useLanguageSync`, and `useAutoTrigger` (pause-ready banner on non-home routes).
 
-**Full-screen / immersive routes** (no bottom nav): `/pause`, `/breathe`, `/ground`, `/ground/history`, `/ambient`, `/practice/*`, `/admin`.
+**Full-screen / immersive routes** (no bottom nav): `/pause`, `/breathe`, `/ground`, `/ground/history`, `/ambient`, `/practice/*`, `/admin`. (`/breathe` → `Breathe.tsx`; `/ambient` → `Ambient.tsx`.)
 
 **Redirects:** `/index` → `/`, `/history` → `/library`.
 
@@ -88,7 +88,7 @@ TanStack Query is available app-wide (`QueryClient` in `App.tsx`); individual ho
 - **Core app:** `Home`, `Library`, `Profile`, `Settings`.
 - **Auth / legal / marketing:** `Landing`, `Auth`, `ResetPassword`, `Terms`, `Privacy`, `About`, `Blog`, `BlogPost`, `Roadmap`, `Reserve`.
 - **Practices:** `PauseSession`, `Breathe`, `Ground`, `GroundHistory`, `PracticeCheckIn`, `PracticeJournal`, `PracticeBodyScan`, `PracticeReplay`, `Ambient`.
-- **Routing caveat:** `src/pages/Ambient.tsx` implements a dedicated “ambient mode” breathing screen (volatility-driven gradients), but **`App.tsx` maps `/ambient` to `<Breathe />`**, not `<Ambient />`. Unless something navigates to `Ambient` another way (it does not today), **`Ambient.tsx` is dead from the router’s perspective** — likely an oversight; fix by switching the route to `Ambient` or removing the unused page.
+- **`/ambient` vs `/breathe`:** `Ambient.tsx` is the full-screen volatility-gradient breathing screen; **`App.tsx` routes `/ambient` to `<Ambient />`**. `/breathe` uses `Breathe.tsx` (a different flow).
 - **Ops:** `Admin` (see below).
 - **Errors:** `NotFound`.
 
@@ -203,8 +203,6 @@ These are observations from a structural pass — not a full security or QA audi
 6. **Companion architecture nuance** (documented in more detail in `ai-companion-system.md`): automatic volatility flows and manual pause use **different** reflection generation paths; extending behavior in one path may not affect the other until you unify them.
 
 7. **ESLint debt:** Expect a large baseline of issues; scope cleanups to files you change unless you run a dedicated lint initiative.
-
-8. **`/ambient` vs `Ambient.tsx`:** See the pages list above — wire the route to the intended component or delete duplicate/unused code to avoid confusion.
 
 ---
 
