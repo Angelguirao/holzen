@@ -163,7 +163,8 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
     zoomOut, zoomOutLoading, zoomOutError, retryZoomOut,
     historyInsight, historyLoading, historyError, retryHistory,
     cacheIds,
-    intervention, interventionLoading,
+    intervention, interventionLoading, interventionError,
+    retryOrchestrate,
   } = useCompanionData({ companions, prefs, reflectionId, context, reflectionMessage, mood, severityNumber: SEVERITY_NUMBER[severity] ?? 3 });
 
   const labels = {
@@ -195,7 +196,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
   return (
     <div ref={ref} className="space-y-2.5">
       {/* Featured intervention — shown above companions when available */}
-      {(intervention || interventionLoading) && (
+      {(intervention || interventionLoading || interventionError) && (
         <div className="mb-4">
           <InterventionSection
             mode={intervention?.mode ?? 'insight'}
@@ -203,6 +204,8 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             secondary={intervention?.secondary ?? null}
             question={intervention?.question ?? null}
             loading={interventionLoading}
+            error={interventionError}
+            onRetry={retryOrchestrate}
             reflectionId={reflectionId}
           />
           <div className="border-t border-border/10 mt-6" />

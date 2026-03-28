@@ -17,6 +17,7 @@ import { HistoricalInsightDisplay } from './HistoricalInsightDisplay';
 import { LearningInput } from './LearningInput';
 import { ZoomOutDisplay } from './ZoomOutDisplay';
 import { Skeleton } from '@/components/ui/skeleton';
+import { CompanionError } from '@/components/CompanionError';
 
 // ── Mirror Display ────────────────────────────────────────────────────────────
 
@@ -100,11 +101,14 @@ interface Props {
   secondary?: SecondaryPayload | null;
   question?: string | null;
   loading: boolean;
+  /** Orchestrator / network failure — show retry instead of endless skeleton */
+  error?: boolean;
+  onRetry?: () => void;
   reflectionId?: string | null;
 }
 
 export function InterventionSection({
-  mode, primary, secondary, question, loading, reflectionId,
+  mode, primary, secondary, question, loading, error = false, onRetry, reflectionId,
 }: Props) {
   const [secondaryOpen, setSecondaryOpen] = useState(false);
 
@@ -117,7 +121,9 @@ export function InterventionSection({
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.7 }}
       >
-        {loading || !question ? (
+        {error && !loading ? (
+          <CompanionError companionType="intervention" onRetry={onRetry} />
+        ) : loading || !question ? (
           <div className="space-y-2 w-full max-w-xs">
             <Skeleton className="h-4 w-full" />
             <Skeleton className="h-4 w-4/5 mx-auto" />
@@ -150,7 +156,9 @@ export function InterventionSection({
           {label}
         </p>
 
-        {loading || !primary ? (
+        {error && !loading ? (
+          <CompanionError companionType="intervention" onRetry={onRetry} />
+        ) : loading || !primary ? (
           <div className="space-y-2">
             <Skeleton className="h-3 w-3/4" />
             <Skeleton className="h-3 w-full" />
