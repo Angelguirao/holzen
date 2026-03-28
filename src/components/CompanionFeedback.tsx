@@ -7,7 +7,7 @@ import { FEEDBACK_TO_CACHE_TYPE } from '@/lib/companion-types';
 interface Props {
   /** Reflection ID this companion belongs to */
   reflectionId?: string | null;
-  /** Companion type key (e.g. 'signal', 'learning', 'zoom_out', 'history_insight') */
+  /** Companion type key (e.g. 'signal', 'grounding', 'zoom_out', 'history_insight') */
   companionType: string;
   /** Cache entry ID for quality score correlation */
   cacheId?: string | null;

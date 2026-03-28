@@ -152,7 +152,7 @@ export function useHolzen() {
     let recentHaikus: string[] = [];
     let recentMessages: string[] = [];
     let recentSignalSources: string[] = [];
-    let learningSources: { name: string; url?: string }[] = [];
+    let groundingSources: { name: string; url?: string }[] = [];
     try {
       const [{ data: recentReflections }, { data: catalogSources }, { data: userPrefs }] = await Promise.all([
         supabase
@@ -161,8 +161,8 @@ export function useHolzen() {
           .eq('user_id', user.id)
           .order('created_at', { ascending: false })
           .limit(20),
-        supabase.from('signal_sources').select('id, name, url').eq('category', 'learning'),
-        supabase.from('user_signal_preferences').select('source_id, active, custom_name, custom_url, category').eq('user_id', user.id).eq('category', 'learning'),
+        supabase.from('signal_sources').select('id, name, url').eq('category', 'grounding'),
+        supabase.from('user_signal_preferences').select('source_id, active, custom_name, custom_url, category').eq('user_id', user.id).eq('category', 'grounding'),
       ]);
       moodHistory = (recentReflections ?? [])
         .filter((r: any) => r.mood)
@@ -187,7 +187,7 @@ export function useHolzen() {
       const customActive = (userPrefs ?? [])
         .filter((p: any) => !p.source_id && p.custom_name && p.active)
         .map((p: any) => ({ name: p.custom_name, url: p.custom_url }));
-      learningSources = [...catalogActive, ...customActive];
+      groundingSources = [...catalogActive, ...customActive];
     } catch { /* non-critical */ }
 
     try {
@@ -206,7 +206,7 @@ export function useHolzen() {
           language,
           recentHaikus,
           recentMessages,
-          learningSources: learningSources.length > 0 ? learningSources : undefined,
+          groundingSources: groundingSources.length > 0 ? groundingSources : undefined,
         },
       });
 

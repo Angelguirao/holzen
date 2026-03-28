@@ -169,7 +169,7 @@ serve(async (req) => {
 1. EMOTIONAL REGULATION — shifting from reactive to composed states (mood→mood_after improvement, breathing)
 2. DISTRESS TOLERANCE — holding steady during high volatility (≥3% change) without impulsive action
 3. DECISION ALIGNMENT — making choices consistent with their hold goals
-4. COGNITIVE REAPPRAISAL — engaging perspective-shifting tools (zoom out, history, signals, learning) especially during volatile moments
+4. COGNITIVE REAPPRAISAL — engaging perspective-shifting tools (zoom out, history, signals, grounding research) especially during volatile moments
 5. SELF-AWARENESS — depth of reflection through notes, tags, and pattern recognition
 
 Analyze the user's data through this skill lens. Generate 3-5 insights about their SKILL DEVELOPMENT — not mood patterns or generic advice.

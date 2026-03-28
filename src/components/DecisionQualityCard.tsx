@@ -66,7 +66,7 @@ export function DecisionQualityCard({ reflections }: Props) {
     const companions: CompanionStat[] = [
       { labelKey: 'decisionQuality.companionLabels.breathing', icon: Wind, used: withOutcome.filter((r) => r.breathing_completed).length, holdRate: holdRate(withOutcome.filter((r) => r.breathing_completed)) },
       { labelKey: 'decisionQuality.companionLabels.haiku', icon: Feather, used: withOutcome.filter((r) => r.haiku_read).length, holdRate: holdRate(withOutcome.filter((r) => r.haiku_read)) },
-      { labelKey: 'decisionQuality.companionLabels.learning', icon: BookOpen, used: withOutcome.filter((r) => r.grounding_read).length, holdRate: holdRate(withOutcome.filter((r) => r.grounding_read)) },
+      { labelKey: 'decisionQuality.companionLabels.grounding', icon: BookOpen, used: withOutcome.filter((r) => r.grounding_read).length, holdRate: holdRate(withOutcome.filter((r) => r.grounding_read)) },
       { labelKey: 'decisionQuality.companionLabels.signal', icon: Radio, used: withOutcome.filter((r) => r.signal_read).length, holdRate: holdRate(withOutcome.filter((r) => r.signal_read)) },
       { labelKey: 'decisionQuality.companionLabels.zoomOut', icon: Eye, used: withOutcome.filter((r) => r.zoom_out_read).length, holdRate: holdRate(withOutcome.filter((r) => r.zoom_out_read)) },
       { labelKey: 'decisionQuality.companionLabels.history', icon: History, used: withOutcome.filter((r) => r.history_read).length, holdRate: holdRate(withOutcome.filter((r) => r.history_read)) },

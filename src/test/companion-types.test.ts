@@ -30,6 +30,7 @@ describe('COMPANION_TYPES', () => {
 describe('FEEDBACK_TO_CACHE_TYPE', () => {
   it('maps all expected frontend keys', () => {
     expect(FEEDBACK_TO_CACHE_TYPE['signal']).toBe('signal');
+    expect(FEEDBACK_TO_CACHE_TYPE['grounding']).toBe('ground_nudge');
     expect(FEEDBACK_TO_CACHE_TYPE['learning']).toBe('ground_nudge');
     expect(FEEDBACK_TO_CACHE_TYPE['zoom_out']).toBe('zoom_out_deep_time');
     expect(FEEDBACK_TO_CACHE_TYPE['history_insight']).toBe('historical_insight');

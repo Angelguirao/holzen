@@ -26,7 +26,7 @@ export interface InterventionState {
 interface CompletionState {
   breathing: boolean;
   haiku: boolean;
-  learning: boolean;
+  grounding: boolean;
   signal: boolean;
   zoomOut: boolean;
   history: boolean;
@@ -155,7 +155,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
 
   // ── Completion state ──
   const [completion, setCompletion] = useState<CompletionState>({
-    breathing: false, haiku: false, learning: false, signal: false, zoomOut: false, history: false,
+    breathing: false, haiku: false, grounding: false, signal: false, zoomOut: false, history: false,
   });
   const [cacheIds, setCacheIds] = useState<CacheIds>({ nudge: null, signal: null, zoomOut: null, history: null });
 
@@ -171,7 +171,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
           setCompletion({
             breathing: (data as any).breathing_completed ?? false,
             haiku: (data as any).haiku_read ?? false,
-            learning: (data as any).grounding_read ?? false,
+            grounding: (data as any).grounding_read ?? false,
             signal: (data as any).signal_read ?? false,
             zoomOut: (data as any).zoom_out_read ?? false,
             history: (data as any).history_read ?? false,
@@ -188,7 +188,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       const dbKeyMap: Record<string, string> = {
         breathing: 'breathing_completed',
         haiku: 'haiku_read',
-        learning: 'grounding_read',
+        grounding: 'grounding_read',
         signal: 'signal_read',
         zoomOut: 'zoom_out_read',
         history: 'history_read',
@@ -319,7 +319,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     if (!reflectionId) return;
 
     const enableSignal = prefs.signal;
-    const enableGrounding = prefs.learning;
+    const enableGrounding = prefs.grounding;
     const enableHistory = prefs.history;
     const enableZoomOut = prefs.zoomOut;
 
@@ -366,7 +366,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       if (cached.grounding && enableGrounding) {
         setNudge(cached.grounding);
         setNudgeLoading(false);
-        autoSaveToLibrary({ title: cached.grounding.title, body: cached.grounding.body, sourceType: 'learning', sourceUrl: cached.grounding.url });
+        autoSaveToLibrary({ title: cached.grounding.title, body: cached.grounding.body, sourceType: 'grounding', sourceUrl: cached.grounding.url });
       }
       if (cached.history && enableHistory) {
         setHistoryInsight(cached.history);
@@ -467,7 +467,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
           setNudge(r.data as NudgeData);
           if (r.cacheId) setCacheIds(prev => ({ ...prev, nudge: r.cacheId }));
           updateRecencyHints('grounding', r.data.title);
-          autoSaveToLibrary({ title: r.data.title, body: r.data.body, sourceType: 'learning', sourceUrl: r.data.url });
+          autoSaveToLibrary({ title: r.data.title, body: r.data.body, sourceType: 'grounding', sourceUrl: r.data.url });
         } else {
           setNudgeError(true);
         }
@@ -505,7 +505,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     })();
 
     return () => { cancelled = true; };
-  }, [reflectionId, retryCount, prefs.signal, prefs.learning, prefs.history, prefs.zoomOut, context, reflectionMessage]);
+  }, [reflectionId, retryCount, prefs.signal, prefs.grounding, prefs.history, prefs.zoomOut, context, reflectionMessage]);
 
   // ── Retry helpers ──
   const retryNudge = useCallback(() => { setRetryCount(c => c + 1); }, []);

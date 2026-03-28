@@ -5,6 +5,7 @@ export const TYPE_LABELS: Record<string, string> = {
   zoom_out: 'Zoom Out',
   zoom_out_deep_time: 'Zoom Out',
   reflection: 'Reflection',
+  grounding: 'Grounding',
   learning: 'Grounding',
   history_insight: 'History',
   haiku: 'Haiku',

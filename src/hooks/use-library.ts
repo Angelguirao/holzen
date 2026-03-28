@@ -149,8 +149,8 @@ export function useLibrary() {
         if (r.signal_source && !existingKeys.has(`${r.id}:signal`)) {
           inserts.push({ user_id: user.id, type: 'bookmark', title: r.signal_title, body: r.signal_body, source_type: 'signal', source_url: r.signal_url, reflection_id: r.id, tags: [], created_at: r.created_at, status: r.signal_read ? 'read' : 'unread' });
         }
-        if (r.grounding_title && !existingKeys.has(`${r.id}:learning`)) {
-          inserts.push({ user_id: user.id, type: 'bookmark', title: r.grounding_title, body: r.grounding_body, source_type: 'learning', source_url: r.grounding_url, reflection_id: r.id, tags: [], created_at: r.created_at, status: r.grounding_read ? 'read' : 'unread' });
+        if (r.grounding_title && !existingKeys.has(`${r.id}:grounding`)) {
+          inserts.push({ user_id: user.id, type: 'bookmark', title: r.grounding_title, body: r.grounding_body, source_type: 'grounding', source_url: r.grounding_url, reflection_id: r.id, tags: [], created_at: r.created_at, status: r.grounding_read ? 'read' : 'unread' });
         }
         if (r.zoom_out_data && !existingKeys.has(`${r.id}:zoom_out`)) {
           const zd = r.zoom_out_data as any;
@@ -358,7 +358,7 @@ export function useLibrary() {
     if (!flags) return true; // no data, assume engaged
     const sourceToFlag: Record<string, keyof ReflectionReadFlags> = {
       haiku: 'haiku_read',
-      learning: 'grounding_read',
+      grounding: 'grounding_read',
       signal: 'signal_read',
       zoom_out: 'zoom_out_read',
       history_insight: 'history_read',

@@ -22,8 +22,8 @@ export interface CompanionData {
 export interface CompanionPrefs {
   breathing: boolean;
   haiku: boolean;
-  /** Grounding companion; persisted as `profiles.companion_grounding`. */
-  learning: boolean;
+  /** Ground companion card; persisted as `profiles.companion_grounding`. */
+  grounding: boolean;
   signal: boolean;
   zoomOut: boolean;
   history: boolean;
@@ -44,7 +44,7 @@ interface Props {
 
 const COMPANION_ICONS: Record<string, React.ElementType> = {
   haiku: Feather,
-  learning: Anchor,
+  grounding: Anchor,
   signal: BookOpenText,
   zoomOut: Mountain,
   history: Clock,
@@ -183,14 +183,14 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
   const [expandedHistory, setExpandedHistory] = useState(false);
 
   const hasHaiku = prefs.haiku && companions.haiku;
-  const hasLearning = prefs.learning;
+  const hasGrounding = prefs.grounding;
   const hasSignal = prefs.signal && !!reflectionId;
   // Skip zoomOut companion card when intervention already shows it as secondary (avoid double-render)
   const interventionHasZoomOut = intervention?.secondary?.type === 'zoom_out';
   const hasZoomOut = prefs.zoomOut && !!reflectionId && !interventionHasZoomOut;
   const hasHistory = prefs.history && !!reflectionId;
 
-  if (!hasHaiku && !hasLearning && !hasSignal && !hasZoomOut && !hasHistory) return null;
+  if (!hasHaiku && !hasGrounding && !hasSignal && !hasZoomOut && !hasHistory) return null;
 
   return (
     <div ref={ref} className="space-y-2.5">
@@ -231,20 +231,20 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
         </CompanionCard>
       )}
 
-      {hasLearning && (
+      {hasGrounding && (
         <CompanionCard
-          id="learning"
+          id="grounding"
           label={labels.ground}
-          icon={COMPANION_ICONS.learning}
+          icon={COMPANION_ICONS.grounding}
           expanded={expandedLearning}
           onToggle={() => {
             setExpandedLearning((v) => !v);
-            if (!completion.learning) markCompleted('learning');
+            if (!completion.grounding) markCompleted('grounding');
           }}
-          completed={completion.learning}
+          completed={completion.grounding}
           loading={nudgeLoading}
-          isFavorite={isPro ? favorites['learning'] : undefined}
-          onToggleFavorite={isPro ? () => toggleCompanionFavorite('learning') : undefined}
+          isFavorite={isPro ? favorites['grounding'] : undefined}
+          onToggleFavorite={isPro ? () => toggleCompanionFavorite('grounding') : undefined}
         >
           <LearningInput
             title={companions.groundingTitle ?? ''}
@@ -254,7 +254,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             nudgeError={nudgeError}
             onRetry={retryNudge}
           />
-          {nudge && !nudgeLoading && <CompanionFeedback reflectionId={reflectionId} companionType="learning" cacheId={cacheIds.nudge} />}
+          {nudge && !nudgeLoading && <CompanionFeedback reflectionId={reflectionId} companionType="grounding" cacheId={cacheIds.nudge} />}
         </CompanionCard>
       )}
 

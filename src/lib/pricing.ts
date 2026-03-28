@@ -17,7 +17,7 @@ export const PRO_FEATURES = [
   'signal',
   'zoom_out',
   'history',
-  'learning',
+  'ground_companion',
   'ai_insights',
   'night_reflections',
   

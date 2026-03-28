@@ -75,7 +75,7 @@ export default function PauseSession() {
   const context: string | null = navState.context ?? restored?.context ?? null;
   const reflectionId: string | null = navState.reflectionId ?? restored?.reflectionId ?? null;
   const companions: CompanionData = navState.companions ?? restored?.companions ?? { haiku: null, groundingTitle: null, groundingBody: null };
-  const companionPrefs: CompanionPrefs = navState.companionPrefs ?? restored?.companionPrefs ?? { breathing: true, haiku: true, learning: true, signal: true, zoomOut: true, history: true };
+  const companionPrefs: CompanionPrefs = navState.companionPrefs ?? restored?.companionPrefs ?? { breathing: true, haiku: true, grounding: true, signal: true, zoomOut: true, history: true };
   const severity: 'mild' | 'moderate' | 'high' = navState.severity ?? restored?.severity ?? 'mild';
 
   // Map old step names to new ones for session restoration
