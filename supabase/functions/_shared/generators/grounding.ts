@@ -15,7 +15,7 @@ import { createAttemptLogger } from "../observe.ts";
 import { searchLibrary, paperToGrounding, recordLibraryServe } from "../content-library.ts";
 
 /** Bump when the search query, structuring prompt, or quality rules change. */
-export const PROMPT_VERSION = "v2";
+export const PROMPT_VERSION = "v3";
 
 // ── Public types ──
 
@@ -30,12 +30,36 @@ export interface GenerateGroundingParams {
   context?: string;
   language?: string;
   recentTopics?: string[];
+  /** User's grounding catalog + custom URLs (parity with `generateSignal` `sources`). */
+  sources?: Array<{ name: string; type: string; url?: string }>;
+  /** Hostnames or publisher labels to avoid repeating (parity with `recentSignalSources`). */
+  recentGroundingSources?: string[];
+  /** Past nudge titles to avoid duplicating angles (typically `recentNudgeTopics` from orchestrator). */
+  recentGroundingTitles?: string[];
   userId?: string;
   preferredBias?: string;
   log: (msg: string, extra?: Record<string, unknown>) => void;
 }
 
 // ── Internals ──
+
+function buildSourceHints(sources?: Array<{ name: string; type: string; url?: string }>) {
+  const sourceNames: string[] = [];
+  const sourceUrls: string[] = [];
+  if (sources && Array.isArray(sources)) {
+    for (const s of sources) {
+      if (s.name) sourceNames.push(s.name);
+      if (s.url && typeof s.url === "string") {
+        try {
+          const hostname = new URL(s.url.startsWith("http") ? s.url : `https://${s.url}`)
+            .hostname.replace(/^www\./, "");
+          if (hostname && !sourceUrls.includes(hostname)) sourceUrls.push(hostname);
+        } catch { /* skip malformed URLs */ }
+      }
+    }
+  }
+  return { sourceNames, sourceUrls };
+}
 
 const BIAS_TOPICS: { topic: string; direction: "down" | "up" | "both" }[] = [
   { topic: "loss aversion and panic selling during market drops", direction: "down" },
@@ -121,7 +145,17 @@ async function callPerplexity(
 // ── Public entry point ──
 
 export async function generateGrounding(params: GenerateGroundingParams): Promise<GroundingResult> {
-  const { svcClient, context, recentTopics, userId, preferredBias, log } = params;
+  const {
+    svcClient,
+    context,
+    recentTopics,
+    sources,
+    recentGroundingSources,
+    recentGroundingTitles,
+    userId,
+    preferredBias,
+    log,
+  } = params;
   const marketDirectionForCache = parseMarketDirection(context);
 
   const logAttempt = createAttemptLogger(svcClient, { userId });
@@ -156,28 +190,60 @@ export async function generateGrounding(params: GenerateGroundingParams): Promis
 
   const marketContext = context || "Bitcoin market volatility";
 
-  const searchQuery = `Find a specific academic study or research paper about ${randomBias}. The research should be relevant to: ${marketContext}. Include the researcher names, university, year of publication, sample size or key methodology detail, and the main finding. Prefer peer-reviewed journals.`;
+  const { sourceNames, sourceUrls } = buildSourceHints(sources);
+  const recentSourceExcl = (recentGroundingSources && recentGroundingSources.length > 0)
+    ? ` Do NOT center the answer on these journals/sites (already surfaced recently): ${recentGroundingSources.slice(0, 5).join(", ")}. Prefer a different venue or research line.`
+    : "";
+  const topicExcl = (recentGroundingTitles && recentGroundingTitles.length > 0)
+    ? `\nDo NOT repeat these recent nudge titles or angles (find a fresh framing): ${recentGroundingTitles.slice(0, 5).join("; ")}.`
+    : "";
+  const sourceHint = sourceNames.length > 0
+    ? ` When possible, surface research that could plausibly appear in or relate to: ${sourceNames.sort(() => Math.random() - 0.5).slice(0, 5).join(", ")}. Still require real peer-reviewed or working-paper quality.`
+    : "";
+
+  const searchQuery =
+    `Find a specific academic study or research paper about ${randomBias}. The research should be relevant to: ${marketContext}. Include the researcher names, university, year of publication, sample size or key methodology detail, and the main finding. Prefer peer-reviewed journals.${sourceHint}${recentSourceExcl}`;
 
   // ── Step 1: Perplexity academic search ──
   log("calling perplexity");
   let searchContent = "";
   let citations: string[] = [];
 
+  const perplexityBody: any = {
+    model: "sonar-pro",
+    messages: [
+      {
+        role: "system",
+        content:
+          `You are a behavioral finance research assistant. Search for real, specific academic research papers. Return ONE specific study with exact researcher names, publication year, journal name, and quantitative findings. Prefer lesser-known but fascinating studies over the most commonly cited ones.
+
+DIVERSITY: Use a different journal/venue angle when possible. Do not recycle the same famous paper every time.${topicExcl}`,
+      },
+      { role: "user", content: searchQuery },
+    ],
+    search_mode: "academic",
+    ...(sourceUrls.length > 0 ? { search_domain_filter: sourceUrls.slice(0, 5) } : {}),
+  };
+
   try {
-    const result = await callPerplexity({
-      model: "sonar-pro",
-      messages: [
-        {
-          role: "system",
-          content: "You are a behavioral finance research assistant. Search for real, specific academic research papers. Return ONE specific study with exact researcher names, publication year, journal name, and quantitative findings. Prefer lesser-known but fascinating studies over the most commonly cited ones.",
-        },
-        { role: "user", content: searchQuery },
-      ],
-      search_mode: "academic",
-    }, PERPLEXITY_API_KEY, log);
+    let result = await callPerplexity(perplexityBody, PERPLEXITY_API_KEY, log);
     searchContent = result.content;
     citations = result.citations;
     log(`content length: ${searchContent.length}, citations: ${citations.length}`);
+
+    if (citations.length === 0 && sourceUrls.length > 0 && searchContent.length > 0) {
+      log("0 citations with domain filter — retrying without filter");
+      const retryBody = { ...perplexityBody };
+      delete retryBody.search_domain_filter;
+      try {
+        const retry = await callPerplexity(retryBody, PERPLEXITY_API_KEY, log);
+        if (retry.citations.length > 0) {
+          searchContent = retry.content;
+          citations = retry.citations;
+          log(`retry got ${citations.length} citations`);
+        }
+      } catch { log("retry failed, using original content"); }
+    }
   } catch (e) {
     log(`perplexity failed: ${e}`);
     logAttempt({ companion_type: "ground_nudge", provider: "perplexity", model: "sonar-pro", status: String(e).includes("RATE_LIMITED") ? "rate_limited" : "error", latency_ms: 0, error_message: String(e) });

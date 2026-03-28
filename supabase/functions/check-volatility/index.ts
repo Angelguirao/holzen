@@ -10,6 +10,7 @@ import {
   enrichAutomaticPauseContext,
   fetchFearGreedSnapshot,
   fetchOnChainSnapshot,
+  fetchGroundingSourcesForOrchestrate,
   fetchSignalSourcesForOrchestrate,
   recencyHintsFromReflectionRows,
 } from "../_shared/pause-cron-parity.ts";
@@ -402,7 +403,7 @@ serve(async (req) => {
         const { data: recentRows } = await supabase
           .from("reflections")
           .select(
-            "mood, outcome, created_at, message, haiku, signal_title, signal_source, grounding_title, zoom_out_data, history_insight_data",
+            "mood, outcome, created_at, message, haiku, signal_title, signal_source, grounding_title, grounding_url, zoom_out_data, history_insight_data",
           )
           .eq("user_id", profile.user_id)
           .order("created_at", { ascending: false })
@@ -516,6 +517,9 @@ serve(async (req) => {
         const signalSources = enableSignal
           ? await fetchSignalSourcesForOrchestrate(supabase, profile.user_id)
           : undefined;
+        const groundingSources = enableGrounding
+          ? await fetchGroundingSourcesForOrchestrate(supabase, profile.user_id)
+          : undefined;
 
         // Fire-and-forget orchestrator — same payload shape as manual pause (use-companion-data + holzen-reflect parity).
         fetch(`${supabaseUrl}/functions/v1/companion-orchestrate`, {
@@ -535,9 +539,11 @@ serve(async (req) => {
             mood: lastReportedMood ?? null,
             moodHistory: moodHistory ?? [],
             signalSources,
+            groundingSources,
             recentSignalSources: recency.recentSignalSources,
             recentSignalTitles: recency.recentSignalTitles,
             recentNudgeTopics: recency.recentNudgeTopics,
+            recentGroundingSources: recency.recentGroundingSources,
             recentHistoryTitles: recency.recentHistoryTitles,
             recentZoomOutTitles: recency.recentZoomOutTitles,
             enableSignal,

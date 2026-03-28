@@ -65,6 +65,8 @@ export interface OrchestratorRecencyHints {
   recentSignalSources: string[];
   recentSignalTitles: string[];
   recentNudgeTopics: string[];
+  /** Hostnames from past grounding URLs — same role as `recentSignalSources` for dedup. */
+  recentGroundingSources: string[];
   recentHistoryTitles: string[];
   recentZoomOutTitles: string[];
 }
@@ -73,9 +75,21 @@ type ReflectionRow = {
   signal_title?: string | null;
   signal_source?: string | null;
   grounding_title?: string | null;
+  grounding_url?: string | null;
   zoom_out_data?: unknown;
   history_insight_data?: unknown;
 };
+
+function hostnameFromReflectionUrl(url: string | null | undefined): string | null {
+  if (!url || typeof url !== "string") return null;
+  try {
+    const u = new URL(url.startsWith("http") ? url : `https://${url}`);
+    const h = u.hostname.replace(/^www\./, "");
+    return h || null;
+  } catch {
+    return null;
+  }
+}
 
 function pushUnique(cap: string[], v: string, max: number) {
   if (!v || cap.includes(v) || cap.length >= max) return;
@@ -87,6 +101,7 @@ export function recencyHintsFromReflectionRows(rows: ReflectionRow[]): Orchestra
   const recentSignalSources: string[] = [];
   const recentSignalTitles: string[] = [];
   const recentNudgeTopics: string[] = [];
+  const recentGroundingSources: string[] = [];
   const recentHistoryTitles: string[] = [];
   const recentZoomOutTitles: string[] = [];
 
@@ -94,6 +109,8 @@ export function recencyHintsFromReflectionRows(rows: ReflectionRow[]): Orchestra
     if (r.signal_source) pushUnique(recentSignalSources, r.signal_source, 5);
     if (r.signal_title) pushUnique(recentSignalTitles, r.signal_title, 5);
     if (r.grounding_title) pushUnique(recentNudgeTopics, r.grounding_title, 5);
+    const gh = hostnameFromReflectionUrl(r.grounding_url);
+    if (gh) pushUnique(recentGroundingSources, gh, 5);
 
     const hi = r.history_insight_data;
     if (hi && typeof hi === "object" && "title" in hi) {
@@ -112,6 +129,7 @@ export function recencyHintsFromReflectionRows(rows: ReflectionRow[]): Orchestra
     recentSignalSources,
     recentSignalTitles,
     recentNudgeTopics,
+    recentGroundingSources,
     recentHistoryTitles,
     recentZoomOutTitles,
   };
@@ -130,6 +148,37 @@ export async function fetchSignalSourcesForOrchestrate(
         .select("source_id, custom_name, custom_url, custom_type, active, category")
         .eq("user_id", userId)
         .eq("category", "signal"),
+    ]);
+    const prefsMap = new Map((userPrefs ?? []).map((p: any) => [p.source_id, p]));
+    const catalogActive = (catalog ?? [])
+      .filter((s: any) => {
+        const pref = prefsMap.get(s.id);
+        return pref ? pref.active : true;
+      })
+      .map((s: any) => ({ name: s.name, type: s.type, url: s.url }));
+    const customActive = (userPrefs ?? [])
+      .filter((p: any) => !p.source_id && p.custom_name && p.active)
+      .map((p: any) => ({ name: p.custom_name, type: p.custom_type || "blog", url: p.custom_url }));
+    const sources = [...catalogActive, ...customActive];
+    return sources.length > 0 ? sources : undefined;
+  } catch {
+    return undefined;
+  }
+}
+
+/** Active grounding catalog + custom URLs for Grounding companion (same merge rules as signal). */
+export async function fetchGroundingSourcesForOrchestrate(
+  svcClient: any,
+  userId: string,
+): Promise<Array<{ name: string; type: string; url: string }> | undefined> {
+  try {
+    const [{ data: catalog }, { data: userPrefs }] = await Promise.all([
+      svcClient.from("signal_sources").select("id, name, type, url, category").eq("category", "grounding"),
+      svcClient
+        .from("user_signal_preferences")
+        .select("source_id, custom_name, custom_url, custom_type, active, category")
+        .eq("user_id", userId)
+        .eq("category", "grounding"),
     ]);
     const prefsMap = new Map((userPrefs ?? []).map((p: any) => [p.source_id, p]));
     const catalogActive = (catalog ?? [])

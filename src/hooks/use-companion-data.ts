@@ -81,6 +81,15 @@ interface CompanionResult {
   error?: string;
 }
 
+function hostnameFromUrl(url: string | undefined): string {
+  if (!url) return '';
+  try {
+    return new URL(url.startsWith('http') ? url : `https://${url}`).hostname.replace(/^www\./, '');
+  } catch {
+    return '';
+  }
+}
+
 export function useCompanionData({ companions, prefs, reflectionId, context, reflectionMessage, mood, severityNumber }: UseCompanionDataParams) {
   const { language } = useHolzen();
 
@@ -267,6 +276,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       recentSignalSources: safeGet('holzen_recent_signal_sources'),
       recentSignalTitles: safeGet('holzen_recent_signal_titles'),
       recentNudgeTopics: safeGet('holzen_recent_nudge_topics'),
+      recentGroundingSources: safeGet('holzen_recent_grounding_sources'),
       recentHistoryTitles: safeGet('holzen_recent_history_titles'),
       recentZoomOutTitles: safeGet('holzen_recent_zoom_out_titles'),
     };
@@ -300,6 +310,28 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       const [{ data: catalog }, { data: userPrefs }] = await Promise.all([
         supabase.from('signal_sources').select('id, name, type, url, category').eq('category', 'signal'),
         supabase.from('user_signal_preferences').select('source_id, custom_name, custom_url, custom_type, active, category').eq('user_id', userId).eq('category', 'signal'),
+      ]);
+      const prefsMap = new Map((userPrefs ?? []).map((p: any) => [p.source_id, p]));
+      const catalogActive = (catalog ?? []).filter((s: any) => {
+        const pref = prefsMap.get(s.id);
+        return pref ? pref.active : true;
+      }).map((s: any) => ({ name: s.name, type: s.type, url: s.url }));
+      const customActive = (userPrefs ?? [])
+        .filter((p: any) => !p.source_id && p.custom_name && p.active)
+        .map((p: any) => ({ name: p.custom_name, type: p.custom_type || 'blog', url: p.custom_url }));
+      const sources = [...catalogActive, ...customActive];
+      return sources.length > 0 ? sources : undefined;
+    } catch { return undefined; }
+  }, []);
+
+  const getGroundingSources = useCallback(async () => {
+    try {
+      const { data: authData } = await supabase.auth.getUser();
+      const userId = authData?.user?.id;
+      if (!userId) return undefined;
+      const [{ data: catalog }, { data: userPrefs }] = await Promise.all([
+        supabase.from('signal_sources').select('id, name, type, url, category').eq('category', 'grounding'),
+        supabase.from('user_signal_preferences').select('source_id, custom_name, custom_url, custom_type, active, category').eq('user_id', userId).eq('category', 'grounding'),
       ]);
       const prefsMap = new Map((userPrefs ?? []).map((p: any) => [p.source_id, p]));
       const catalogActive = (catalog ?? []).filter((s: any) => {
@@ -415,6 +447,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
           severity: severityNumber ?? 0,
           moodHistory,
           signalSources,
+          groundingSources,
           ...recency,
           enableSignal: needSignal,
           enableGrounding: needGrounding,
@@ -467,6 +500,8 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
           setNudge(r.data as NudgeData);
           if (r.cacheId) setCacheIds(prev => ({ ...prev, nudge: r.cacheId }));
           updateRecencyHints('grounding', r.data.title);
+          const gHost = hostnameFromUrl(r.data.url);
+          if (gHost) updateRecencyHints('grounding_source', gHost);
           autoSaveToLibrary({ title: r.data.title, body: r.data.body, sourceType: 'grounding', sourceUrl: r.data.url });
         } else {
           setNudgeError(true);

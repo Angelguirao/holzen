@@ -145,9 +145,11 @@ serve(async (req) => {
       reflectionMessage,
       mood,
       signalSources,
+      groundingSources,
       recentSignalSources,
       recentSignalTitles,
       recentNudgeTopics,
+      recentGroundingSources,
       recentHistoryTitles,
       recentZoomOutTitles,
       enableSignal = false,
@@ -238,7 +240,18 @@ serve(async (req) => {
     if (enableGrounding) {
       tasks.grounding = (async (): Promise<CompanionResult> => {
         const t = Date.now();
-        const result = await generateGrounding({ svcClient, context, language, recentTopics: recentNudgeTopics, userId, log, preferredBias: intent.groundingBias });
+        const result = await generateGrounding({
+          svcClient,
+          context,
+          language,
+          recentTopics: recentNudgeTopics as string[] | undefined,
+          sources: groundingSources as Array<{ name: string; type: string; url?: string }> | undefined,
+          recentGroundingSources: recentGroundingSources as string[] | undefined,
+          recentGroundingTitles: recentNudgeTopics as string[] | undefined,
+          userId,
+          log,
+          preferredBias: intent.groundingBias,
+        });
         return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t, promptVersion: GROUNDING_VERSION };
       })();
     }
