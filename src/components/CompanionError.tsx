@@ -1,4 +1,4 @@
-import { RefreshCw, BookOpenText, Anchor, Clock, Mountain, Feather } from 'lucide-react';
+import { RefreshCw, BookOpenText, Anchor, Clock, Mountain, Feather, Sparkles } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 
 const COMPANION_EMPTY_STATES: Record<string, { icon: React.ElementType; message: string; hint: string }> = {
@@ -26,6 +26,11 @@ const COMPANION_EMPTY_STATES: Record<string, { icon: React.ElementType; message:
     icon: Feather,
     message: 'Haiku couldn\'t be composed.',
     hint: 'A poetic mirror for this moment — try refreshing.',
+  },
+  intervention: {
+    icon: Sparkles,
+    message: 'Couldn\'t load this perspective.',
+    hint: 'The companion service may be unavailable or missing server configuration (e.g. API keys). Try again in a moment.',
   },
 };
 

@@ -378,16 +378,22 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     setInterventionError(false);
 
     (async () => {
+      let needSignal = false;
+      let needGrounding = false;
+      let needHistory = false;
+      let needZoomOut = false;
+
+      try {
       // First check if reflection already has cached data
       const cached = await checkCachedReflection(reflectionId);
 
       if (cancelled) return;
 
       // Determine which companions still need fetching
-      const needSignal = enableSignal && !cached.signal;
-      const needGrounding = enableGrounding && !cached.grounding;
-      const needHistory = enableHistory && !cached.history;
-      const needZoomOut = enableZoomOut && !cached.zoomOut;
+      needSignal = enableSignal && !cached.signal;
+      needGrounding = enableGrounding && !cached.grounding;
+      needHistory = enableHistory && !cached.history;
+      needZoomOut = enableZoomOut && !cached.zoomOut;
 
       // Set already-cached companions immediately
       if (cached.signal && enableSignal) {
@@ -415,6 +421,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       // Build orchestrator payload
       const recency = getRecencyHints();
       const signalSources = needSignal ? await getSignalSources() : undefined;
+      const groundingSources = needGrounding ? await getGroundingSources() : undefined;
 
       // Fetch recent mood history from DB for intervention selection
       let moodHistory: Array<{ mood: string; outcome?: string | null }> = [];
@@ -460,7 +467,10 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
 
       if (cancelled) return;
 
-      if (fnError || !data) {
+      const body = data as Record<string, unknown> | null;
+      const payloadError = !!fnError || !body || Boolean(body.error);
+
+      if (payloadError) {
         if (needSignal) { setSignalError(true); setSignalLoading(false); }
         if (needGrounding) { setNudgeError(true); setNudgeLoading(false); }
         if (needHistory) { setHistoryError(true); setHistoryLoading(false); }
@@ -537,16 +547,34 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
         }
         setZoomOutLoading(false);
       }
+      } catch (e) {
+        console.error('[useCompanionData] orchestrate failed', e);
+        if (needSignal) setSignalError(true);
+        if (needGrounding) setNudgeError(true);
+        if (needHistory) setHistoryError(true);
+        if (needZoomOut) setZoomOutError(true);
+        setInterventionError(true);
+      } finally {
+        if (!cancelled) {
+          setSignalLoading(false);
+          setNudgeLoading(false);
+          setHistoryLoading(false);
+          setZoomOutLoading(false);
+          setInterventionLoading(false);
+        }
+      }
     })();
 
     return () => { cancelled = true; };
-  }, [reflectionId, retryCount, prefs.signal, prefs.grounding, prefs.history, prefs.zoomOut, context, reflectionMessage]);
+  }, [reflectionId, retryCount, prefs.signal, prefs.grounding, prefs.history, prefs.zoomOut, context, reflectionMessage, mood, severityNumber, language]);
 
   // ── Retry helpers ──
   const retryNudge = useCallback(() => { setRetryCount(c => c + 1); }, []);
   const retrySignal = useCallback(() => { setRetryCount(c => c + 1); }, []);
   const retryZoomOut = useCallback(() => { setRetryCount(c => c + 1); }, []);
   const retryHistory = useCallback(() => { setRetryCount(c => c + 1); }, []);
+  /** Re-run companion-orchestrate (intervention + all companion slots). */
+  const retryOrchestrate = useCallback(() => { setRetryCount(c => c + 1); }, []);
 
   return {
     favorites,
@@ -559,5 +587,6 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     zoomOut, zoomOutLoading, zoomOutError, retryZoomOut,
     historyInsight, historyLoading, historyError, retryHistory,
     intervention, interventionLoading, interventionError,
+    retryOrchestrate,
   };
 }
