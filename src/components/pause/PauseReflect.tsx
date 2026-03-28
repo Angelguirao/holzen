@@ -59,29 +59,16 @@ export function PauseReflect({
         </motion.div>
       )}
 
-      {/* Single adaptive intervention (new flow) */}
-      {(intervention || interventionLoading) && (
-        <InterventionSection
-          mode={intervention?.mode ?? 'insight'}
-          primary={intervention?.primary ?? null}
-          secondary={intervention?.secondary ?? null}
-          question={intervention?.question ?? null}
-          loading={interventionLoading}
-          reflectionId={reflectionId}
-        />
-      )}
-
-      {/* Legacy multi-companion display — shown only if intervention is unavailable */}
-      {!intervention && !interventionLoading && !interventionError && (
-        <CompanionSection
-          companions={companions}
-          prefs={companionPrefs}
-          severity={severity}
-          reflectionId={reflectionId}
-          context={context}
-          reflectionMessage={reflectionMessage}
-        />
-      )}
+      {/* Companions + featured intervention — data from useCompanionData inside CompanionSection */}
+      <CompanionSection
+        companions={companions}
+        prefs={companionPrefs}
+        severity={severity}
+        reflectionId={reflectionId}
+        context={context}
+        reflectionMessage={reflectionMessage}
+        mood={mood}
+      />
 
       {/* Continue */}
       <motion.div
