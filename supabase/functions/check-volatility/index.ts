@@ -3,8 +3,15 @@ import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 import webpush from "npm:web-push@3.6.7";
 import {
   generateUnifiedReflection,
+  REFLECTION_PROMPT_VERSION,
   type MoodHistoryEntry,
 } from "../_shared/reflection-generate.ts";
+import {
+  appendFearGreedToContext,
+  fetchFearGreedSnapshot,
+  fetchSignalSourcesForOrchestrate,
+  recencyHintsFromReflectionRows,
+} from "../_shared/pause-cron-parity.ts";
 import { sanitizePromptInput, sanitizePromptArray } from "../_shared/sanitize.ts";
 
 const corsHeaders = {
@@ -140,6 +147,9 @@ serve(async (req) => {
     const absChange = Math.abs(btc.changePercent);
     const absCumChange = Math.abs(btc.cumulativeChangePercent);
     console.log(`[CHECK-VOLATILITY] BTC 24h: ${btc.changePercent.toFixed(2)}%, 7d: ${btc.cumulativeChangePercent.toFixed(2)}%`);
+
+    // Fear & Greed once per run — same context line as manual pause (`use-holzen` / `fetchBtcData`).
+    const fearGreedSnapshot = await fetchFearGreedSnapshot();
 
     // 2. Get all profiles - we need to check both thresholds
     const { data: profiles, error: profilesError } = await supabase
@@ -312,6 +322,7 @@ serve(async (req) => {
         const cumDir = btc.cumulativeDirection === "down" ? "down" : "up";
         ctx += ` Over 7 days, it's ${cumDir} ${absCumChange.toFixed(1)}%.`;
       }
+      ctx = appendFearGreedToContext(ctx, fearGreedSnapshot);
 
       const p = profile as Record<string, unknown>;
       const tone = (p.reflection_tone as string) || "stoic";
@@ -332,14 +343,18 @@ serve(async (req) => {
       let moodHistory: MoodHistoryEntry[] | undefined;
       let recentMessages: string[] | undefined;
       let recentHaikus: string[] | undefined;
+      let rowsForRecency: Parameters<typeof recencyHintsFromReflectionRows>[0] = [];
       try {
         const { data: recentRows } = await supabase
           .from("reflections")
-          .select("mood, outcome, created_at, message, haiku")
+          .select(
+            "mood, outcome, created_at, message, haiku, signal_title, signal_source, grounding_title, zoom_out_data, history_insight_data",
+          )
           .eq("user_id", profile.user_id)
           .order("created_at", { ascending: false })
           .limit(20);
         if (recentRows?.length) {
+          rowsForRecency = recentRows as Parameters<typeof recencyHintsFromReflectionRows>[0];
           const rows = recentRows as Array<{
             mood?: string | null;
             outcome?: string | null;
@@ -361,6 +376,9 @@ serve(async (req) => {
           if (haikus.length > 0) recentHaikus = haikus.slice(0, 5);
         }
       } catch { /* non-fatal */ }
+
+      const recency = recencyHintsFromReflectionRows(rowsForRecency);
+      const lastReportedMood = moodHistory?.[0]?.mood;
 
       // Parity with holzen-reflect: same allowlisted event before reflection AI so per-user
       // throttle (companion-orchestrate checkRateLimit) sees a consistent signal for manual vs cron.
@@ -388,10 +406,23 @@ serve(async (req) => {
         mantra: mantra || undefined,
         groundingActivities: groundingActivities.length > 0 ? groundingActivities : undefined,
       });
-      if (!result) {
+      if (!result?.message) {
         console.log(`[CHECK-VOLATILITY] Failed to generate reflection for ${profile.user_id}`);
         return false;
       }
+
+      supabase.from("analytics_events").insert({
+        user_id: profile.user_id,
+        event: "reflection_generated",
+        metadata: {
+          tone,
+          style,
+          message_length: result.message.length,
+          has_haiku: !!result.haiku,
+          prompt_version: REFLECTION_PROMPT_VERSION,
+          source: "check-volatility",
+        },
+      }).then(() => {});
 
       const haiku = (profile as any).companion_haiku ? result.haiku : null;
       // grounding_* on the row are filled by companion-orchestrate (Grounding, etc.), not reflection AI
@@ -407,6 +438,7 @@ serve(async (req) => {
           grounding_body: null,
           grounding_citation: null,
           grounding_url: null,
+          ...(lastReportedMood ? { mood: lastReportedMood } : {}),
         })
         .select("id")
         .single();
@@ -423,9 +455,12 @@ serve(async (req) => {
         const enableGrounding = (p.companion_grounding as boolean | undefined) ?? true;
         const enableHistory = (p.companion_history as boolean | undefined) ?? true;
         const enableZoomOut = (p.companion_zoom_out as boolean | undefined) ?? true;
-        const lastReportedMood = moodHistory?.[0]?.mood;
 
-        // Fire-and-forget orchestrator (respects profile companion toggles; mood from latest past session)
+        const signalSources = enableSignal
+          ? await fetchSignalSourcesForOrchestrate(supabase, profile.user_id)
+          : undefined;
+
+        // Fire-and-forget orchestrator — same payload shape as manual pause (use-companion-data + holzen-reflect parity).
         fetch(`${supabaseUrl}/functions/v1/companion-orchestrate`, {
           method: "POST",
           headers: {
@@ -442,10 +477,17 @@ serve(async (req) => {
             severity: absChange,
             mood: lastReportedMood ?? null,
             moodHistory: moodHistory ?? [],
+            signalSources,
+            recentSignalSources: recency.recentSignalSources,
+            recentSignalTitles: recency.recentSignalTitles,
+            recentNudgeTopics: recency.recentNudgeTopics,
+            recentHistoryTitles: recency.recentHistoryTitles,
+            recentZoomOutTitles: recency.recentZoomOutTitles,
             enableSignal,
             enableGrounding,
             enableHistory,
             enableZoomOut,
+            useIntervention: true,
           }),
         }).then((res) => {
           if (!res.ok) res.text().then((t) => console.error(`[CHECK-VOLATILITY] Orchestrator failed (${res.status}): ${t}`));

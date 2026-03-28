@@ -66,17 +66,18 @@ Reflection text and haiku land on the new row first; companion columns and inter
 | Aspect | Manual pause (client) | Automatic (`check-volatility` cron) |
 |--------|------------------------|-------------------------------------|
 | **Entry** | User flow in app → `use-holzen.ts` | `supabase/functions/check-volatility/index.ts` (HTTP + service auth) |
-| **BTC data** | Client `fetchBtcData` (`src/lib/btc.ts`) for context string | CoinGecko `market_chart` 1d + 7d inside the function |
+| **BTC data** | Client `fetchBtcData` (`src/lib/btc.ts`) for context string (includes **Fear & Greed** from `api.alternative.me` when available; optional on-chain snippet from mempool.space). | CoinGecko `market_chart` 1d + 7d for price/cumulative string; **same Fear & Greed suffix** once per cron run via `_shared/pause-cron-parity.ts` (matches manual context line). On-chain extras are **not** appended on cron (lighter batch job). |
 | **Thresholds** | User-initiated (cooldown in hook: 15 min, or 5 s in dev mode) | Per-profile `threshold` / `threshold_down`, `cumulative_threshold`, `cooldown_hours`, quiet hours, `snoozed_until` |
 | **Reflection AI** | **`holzen-reflect`** → **`generateUnifiedReflection`** | **`check-volatility`** → **same** module (`_shared/reflection-generate.ts`) |
-| **Mood** | Collected in UI; stored on `reflections.mood` | Not set on the new row; **reflection prompts** use **mood history** from the last 20 `reflections` with `mood`. **Orchestrator** receives **`mood`** = most recent prior mood (if any) plus **`moodHistory`** for session intent (same idea as the client path). |
+| **Mood** | Collected in UI; stored on `reflections.mood` | **`reflections.mood`** set to **most recent prior mood** when history exists (same proxy as orchestrator). **Reflection prompts** use **mood history** from the last 20 `reflections` with `mood`. **Orchestrator** receives **`mood`** + **`moodHistory`** like the client path. |
 | **Style / extras** | Full: `style`, `customPrompt`, `motivations`, `mantra`, `groundingActivities`, client-supplied `recentHaikus` / `recentMessages` | Profile-backed: `reflection_style`, sanitized `custom_prompt`, `motivations`, `mantra`, `grounding_activities` (same **`sanitize.ts`** limits as **`holzen-reflect`**). **`recentMessages`** / **`recentHaikus`**: up to 5 each from the user’s last 20 reflection rows (dedup signal for the shared generator). |
 | **Reflection row `grounding_*`** | **Null** at insert (JSON path); Ground content comes from **`companion-orchestrate`** | **Null** at insert; **`companion_haiku`** still toggles haiku; Ground / Signal / etc. come **only** from orchestrate |
-| **Orchestrator body** | `use-companion-data`: prefs → **`needSignal` / `needGrounding` / `needHistory` / `needZoomOut`**, plus `mood`, `severity`, etc. | **`userId`, `severity` (24h abs %), `reflectionMessage`, `mood`, `moodHistory`**, and **`enableSignal` / `enableGrounding` / `enableHistory` / `enableZoomOut`** from profile columns **`companion_signal`**, **`companion_grounding`**, **`companion_history`**, **`companion_zoom_out`** (each defaults **true** if unset). Client pref key is **`grounding`** → **`companion_grounding`** (legacy **`learning`** may still appear in old analytics or library `source_type` until migrated). |
+| **Orchestrator body** | `use-companion-data`: prefs → **`enable*`** flags (via **`need*`** and cache), **`signalSources`**, localStorage **recency** hints, **`useIntervention: true`**. | Same **field names** as manual: profile **`companion_*`** → **`enable*`**, **`signalSources`** from DB (when Signal on), **recency** derived from last 20 reflection rows (`signal_*`, `grounding_title`, history/zoom JSON titles), **`useIntervention: true`**. Client pref key **`grounding`** maps to **`companion_grounding`**. |
 | **Notifications** | In-app session | Push, optional email, `pause_notifications` row |
 | **Orchestrator auth** | User JWT via `supabase.functions.invoke` | **Service role** `Authorization` + **`userId` in JSON body** |
 | **Profile fields** | After **`holzen-reflect`** insert: **`last_message`**, **`last_context`** only (no **`last_trigger_at`**). **Silent mode** insert also sets **`last_trigger_at`**. | **`last_trigger_at`** updated with **optimistic cooldown claiming** before work; **`last_message`** / **`last_context`** updated when a reflection is created |
 | **Allowlisted `analytics_events` on reflection AI** | **`holzen-reflect`** inserts **`pause_ai_call`** before **`generateUnifiedReflection`**. | **`check-volatility`** inserts the same **`pause_ai_call`** before **`generateUnifiedReflection`** (parity with manual). **`companion-orchestrate`** still invokes **`checkRateLimit`**. See **§11.1**. |
+| **`reflection_generated`** | **`holzen-reflect`** after a successful model response. | **`check-volatility`** after success too; metadata includes **`source: "check-volatility"`** for dashboards. |
 
 **Shared logic:** One implementation for adaptive context (mood history, severity bands, Fear & Greed guidance, banned phrases, haiku/message dedup when inputs provided), model fallback order, and the reflection quality gate. Bump **`REFLECTION_PROMPT_VERSION`** in `reflection-generate.ts` when you change that behavior.
 
@@ -537,6 +538,7 @@ supabase/functions/
 ├── ground-nudge/index.ts
 └── _shared/
     ├── reflection-generate.ts      # shared manual + cron reflection AI
+    ├── pause-cron-parity.ts        # Fear & Greed context + orchestrator hints for check-volatility
     ├── session-intent.ts
     ├── intervention-selector.ts
     ├── companion-data.ts
