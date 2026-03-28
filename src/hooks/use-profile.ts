@@ -42,12 +42,32 @@ export function useProfile() {
 
   useEffect(() => {
     if (!user) return;
+    const selectCols =
+      'threshold, threshold_down, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_grounding, companion_signal, companion_zoom_out, companion_history, reflection_tone, cooldown_hours, last_trigger_at, silent_mode, streak_freeze_dates, digest_frequency, custom_prompt, reflection_style, quiet_hours_start, quiet_hours_end, first_name, night_reflection_hour, ai_insights_enabled, ritual_template, notify_badges, motivations, mantra, hold_goal_currency, language, grounding_activities';
+
     const load = async () => {
-      const { data } = await supabase
+      let { data, error: selErr } = await supabase
         .from('profiles')
-        .select('threshold, threshold_down, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_grounding, companion_signal, companion_zoom_out, companion_history, reflection_tone, cooldown_hours, last_trigger_at, silent_mode, streak_freeze_dates, digest_frequency, custom_prompt, reflection_style, quiet_hours_start, quiet_hours_end, first_name, night_reflection_hour, ai_insights_enabled, ritual_template, notify_badges, motivations, mantra, hold_goal_currency, language, grounding_activities')
+        .select(selectCols)
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
+
+      if (selErr) {
+        console.error('[useProfile] profiles select failed:', selErr.message);
+        setProfileLoaded(true);
+        return;
+      }
+
+      // No row: local reset / missing trigger — create profile (RLS allows insert for own user_id)
+      if (!data) {
+        const { error: insErr } = await supabase.from('profiles').insert({ user_id: user.id });
+        if (insErr && !String(insErr.message).includes('duplicate') && insErr.code !== '23505') {
+          console.error('[useProfile] profiles insert failed:', insErr.message);
+        }
+        const again = await supabase.from('profiles').select(selectCols).eq('user_id', user.id).maybeSingle();
+        data = again.data;
+        if (again.error) console.error('[useProfile] profiles re-select failed:', again.error.message);
+      }
 
       if (data) {
         setThresholdState(data.threshold);
