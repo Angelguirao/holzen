@@ -168,26 +168,29 @@ function HistoryCompanions({ label, r }: { label: string; r: Reflection }) {
             );
           })()}
 
-          {r.history_insight_data && (
+          {(r.companion_history_data || r.history_insight_data) && (() => {
+            const hid = (r.companion_history_data ?? r.history_insight_data) as any;
+            return (
             <div className="space-y-2">
               <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Historical insight</p>
-              <p className="text-xs font-mono font-medium leading-relaxed">{r.history_insight_data.title}</p>
+              <p className="text-xs font-mono font-medium leading-relaxed">{hid.title}</p>
               <div className="space-y-1">
                 <div className="flex items-center gap-1.5">
                   <HistoryIcon className="h-3 w-3 text-muted-foreground/50 shrink-0" />
-                  <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Bitcoin · {r.history_insight_data.period}</p>
+                  <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Bitcoin · {hid.period}</p>
                 </div>
-                <p className="text-xs text-muted-foreground leading-relaxed">{r.history_insight_data.btcInsight}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">{hid.btcInsight}</p>
               </div>
               <div className="space-y-1 pl-3 border-l-2 border-border/40">
                 <div className="flex items-center gap-1.5">
                   <ArrowRight className="h-2.5 w-2.5 text-muted-foreground/40 shrink-0" />
-                  <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider">{r.history_insight_data.assetClass} parallel</p>
+                  <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider">{hid.assetClass} parallel</p>
                 </div>
-                <p className="text-xs text-muted-foreground/80 leading-relaxed italic">{r.history_insight_data.analogy}</p>
+                <p className="text-xs text-muted-foreground/80 leading-relaxed italic">{hid.analogy}</p>
               </div>
             </div>
-          )}
+            );
+          })()}
         </div>
       )}
     </div>
