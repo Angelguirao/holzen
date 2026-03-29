@@ -590,7 +590,12 @@
     "ground": "Conéctate contigo →",
     "signal": "Leer la señal →",
     "zoomOut": "Perspectiva amplia →",
-    "lookBack": "Mirar atrás →"
+    "lookBack": "Mirar atrás →",
+    "helpfulQuestion": "¿Útil?",
+    "regenerate": "Regenerar",
+    "regenerating": "Regenerando…",
+    "feedbackThanksUp": "¡Gracias!",
+    "feedbackThanksDown": "Anotado"
   },
   "reflectionNote": {
     "addNote": "Añadir nota",

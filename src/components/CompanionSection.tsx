@@ -165,6 +165,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
     cacheIds,
     intervention, interventionLoading, interventionError,
     retryOrchestrate,
+    regenerateCompanion,
   } = useCompanionData({ companions, prefs, reflectionId, context, reflectionMessage, mood, severityNumber: SEVERITY_NUMBER[severity] ?? 3 });
 
   const labels = {
@@ -257,7 +258,16 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             nudgeError={nudgeError}
             onRetry={retryNudge}
           />
-          {nudge && !nudgeLoading && <CompanionFeedback reflectionId={reflectionId} companionType="grounding" cacheId={cacheIds.nudge} />}
+          {nudge && (
+            <CompanionFeedback
+              reflectionId={reflectionId}
+              companionType="grounding"
+              cacheId={cacheIds.nudge}
+              regenerateSlot="grounding"
+              onRegenerate={() => regenerateCompanion('grounding')}
+              regenerating={nudgeLoading}
+            />
+          )}
         </CompanionCard>
       )}
 
@@ -282,7 +292,16 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             error={signalError}
             onRetry={retrySignal}
           />
-          {signal && !signalLoading && <CompanionFeedback reflectionId={reflectionId} companionType="signal" cacheId={cacheIds.signal} />}
+          {signal && (
+            <CompanionFeedback
+              reflectionId={reflectionId}
+              companionType="signal"
+              cacheId={cacheIds.signal}
+              regenerateSlot="signal"
+              onRegenerate={() => regenerateCompanion('signal')}
+              regenerating={signalLoading}
+            />
+          )}
         </CompanionCard>
       )}
 
@@ -307,7 +326,16 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             error={zoomOutError}
             onRetry={retryZoomOut}
           />
-          {zoomOut && !zoomOutLoading && <CompanionFeedback reflectionId={reflectionId} companionType="zoom_out" cacheId={cacheIds.zoomOut} />}
+          {zoomOut && (
+            <CompanionFeedback
+              reflectionId={reflectionId}
+              companionType="zoom_out"
+              cacheId={cacheIds.zoomOut}
+              regenerateSlot="zoomOut"
+              onRegenerate={() => regenerateCompanion('zoomOut')}
+              regenerating={zoomOutLoading}
+            />
+          )}
         </CompanionCard>
       )}
 
@@ -332,7 +360,16 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             error={historyError}
             onRetry={retryHistory}
           />
-          {historyInsight && !historyLoading && <CompanionFeedback reflectionId={reflectionId} companionType="history_insight" cacheId={cacheIds.history} />}
+          {historyInsight && (
+            <CompanionFeedback
+              reflectionId={reflectionId}
+              companionType="history_insight"
+              cacheId={cacheIds.history}
+              regenerateSlot="history"
+              onRegenerate={() => regenerateCompanion('history')}
+              regenerating={historyLoading}
+            />
+          )}
         </CompanionCard>
       )}
     </div>

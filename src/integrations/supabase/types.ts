@@ -214,6 +214,7 @@ export type Database = {
           topic_slug: string | null
           used_count: number
           user_score: number | null
+          source_untrusted: boolean
         }
         Insert: {
           automated_score?: number | null
@@ -243,6 +244,7 @@ export type Database = {
           topic_slug?: string | null
           used_count?: number
           user_score?: number | null
+          source_untrusted?: boolean
         }
         Update: {
           automated_score?: number | null
@@ -272,6 +274,7 @@ export type Database = {
           topic_slug?: string | null
           used_count?: number
           user_score?: number | null
+          source_untrusted?: boolean
         }
         Relationships: []
       }
@@ -1385,6 +1388,7 @@ export type Database = {
         Row: {
           category: string
           created_at: string
+          demoted_for_live: boolean
           description: string | null
           id: string
           name: string
@@ -1394,6 +1398,7 @@ export type Database = {
         Insert: {
           category?: string
           created_at?: string
+          demoted_for_live?: boolean
           description?: string | null
           id?: string
           name: string
@@ -1403,6 +1408,7 @@ export type Database = {
         Update: {
           category?: string
           created_at?: string
+          demoted_for_live?: boolean
           description?: string | null
           id?: string
           name?: string

@@ -73,6 +73,15 @@ export function CuratedContentManager({ entries, onRefresh }: { entries: CacheEn
     setActing(null);
   }, [onRefresh, toast]);
 
+  /** Keep row in pool but deprioritize for cache picks (attribution treated as untrusted server-side). */
+  const setSourceUntrusted = useCallback(async (id: string, untrusted: boolean) => {
+    setActing(id);
+    const { error } = await supabase.from('companion_cache').update({ source_untrusted: untrusted } as any).eq('id', id);
+    if (error) { toast({ title: 'Update failed', description: error.message, variant: 'destructive' }); setActing(null); return; }
+    await onRefresh();
+    setActing(null);
+  }, [onRefresh, toast]);
+
   const remove = useCallback(async (id: string) => {
     if (!window.confirm('Delete this cache entry? This cannot be undone.')) return;
     setActing(id);
@@ -148,6 +157,9 @@ export function CuratedContentManager({ entries, onRefresh }: { entries: CacheEn
         <p className="text-[9px] text-muted-foreground/50">
           Also: <span className="text-blue-600 dark:text-blue-400">good</span> = score 2, <span className="text-orange-600 dark:text-orange-400">low</span> = score 1.
         </p>
+        <p className="text-[9px] text-muted-foreground/55 leading-relaxed">
+          <span className="font-mono text-amber-600/90 dark:text-amber-400/90">Untrusted attribution</span> — keeps the cached body in the pool but makes the edge prefer other rows first when filling from cache (no delete).
+        </p>
       </div>
 
       <button onClick={() => setOpen(!open)} className="flex items-center gap-1.5 w-full text-left">
@@ -202,6 +214,11 @@ export function CuratedContentManager({ entries, onRefresh }: { entries: CacheEn
                         <p className="text-[10px] font-mono text-foreground/70 truncate">{entry.title || '(untitled)'}</p>
                         <div className="flex flex-wrap items-center gap-2 mt-0.5">
                           <QualityBadge score={entry.quality_score} />
+                          {entry.source_untrusted && (
+                            <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-700/90 dark:text-amber-400/90">
+                              untrusted attr.
+                            </span>
+                          )}
                           {isPermanent && <span className="text-[9px] font-mono text-muted-foreground/40">♾ permanent</span>}
                           {!isPermanent && entry.expires_at && (
                             <span className="text-[9px] font-mono text-muted-foreground/30">
@@ -234,6 +251,14 @@ export function CuratedContentManager({ entries, onRefresh }: { entries: CacheEn
                           <ArrowDown className="h-2.5 w-2.5" /> Demote
                         </button>
                       )}
+                      <button
+                        type="button"
+                        onClick={() => setSourceUntrusted(entry.id, !entry.source_untrusted)}
+                        disabled={isActing}
+                        className="flex items-center gap-0.5 text-[9px] font-mono text-amber-600/70 dark:text-amber-400/70 hover:text-amber-600 dark:hover:text-amber-400 disabled:opacity-30 transition-colors"
+                      >
+                        {entry.source_untrusted ? 'Trust attribution' : 'Untrusted attribution'}
+                      </button>
                       <button onClick={() => remove(entry.id)} disabled={isActing}
                         className="flex items-center gap-0.5 text-[9px] font-mono text-destructive/50 hover:text-destructive/80 disabled:opacity-30 transition-colors">
                         <Trash2 className="h-2.5 w-2.5" /> Delete
