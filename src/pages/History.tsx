@@ -844,10 +844,10 @@ const History = () => {
               {(() => {
                 const companionItems: string[] = [];
                 if (r.haiku) companionItems.push('Haiku');
-                if (r.grounding_title) companionItems.push('Grounding');
-                if (r.signal_source) companionItems.push('Signal');
-                if (r.zoom_out_data) companionItems.push('Zoom Out');
-                if (r.history_insight_data) companionItems.push('History');
+                if (r.grounding_title || r.companion_grounding_title) companionItems.push('Grounding');
+                if (r.companion_signal_source || r.signal_source) companionItems.push('Signal');
+                if (r.companion_zoom_out_data || r.zoom_out_data) companionItems.push('Zoom Out');
+                if (r.companion_history_data || r.history_insight_data) companionItems.push('History');
                 if (companionItems.length === 0) return null;
 
                 return (
