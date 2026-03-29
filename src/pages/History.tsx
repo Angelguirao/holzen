@@ -45,14 +45,6 @@ interface Reflection {
   haiku: string | null;
   grounding_title: string | null;
   grounding_body: string | null;
-  grounding_citation: string | null;
-  grounding_url: string | null;
-  signal_title: string | null;
-  signal_body: string | null;
-  signal_source: string | null;
-  signal_url: string | null;
-  zoom_out_data: any | null;
-  history_insight_data: any | null;
   note: string | null;
   mood: string | null;
   mood_after?: string | null;
@@ -63,7 +55,9 @@ interface Reflection {
   history_read?: boolean;
   signal_read?: boolean;
   grounding_read?: boolean;
-  // From view joins
+  // From view joins (now the only source for signal/zoom/history)
+  signal_title?: string | null;
+  signal_source?: string | null;
   companion_signal_title?: string | null;
   companion_signal_body?: string | null;
   companion_signal_source?: string | null;
@@ -74,10 +68,12 @@ interface Reflection {
   companion_grounding_url?: string | null;
   companion_history_data?: any | null;
   companion_zoom_out_data?: any | null;
+  zoom_out_data?: any | null;
+  history_insight_data?: any | null;
 }
 
 const PAGE_SIZE = 30;
-const FIELDS = 'id, message, context, created_at, is_favorite, haiku, grounding_title, grounding_body, signal_read, grounding_read, zoom_out_read, history_read, note, mood, mood_after, outcome, tags, breathing_completed, companion_signal_title, companion_signal_body, companion_signal_source, companion_signal_url, companion_grounding_title, companion_grounding_body, companion_grounding_citation, companion_grounding_url, companion_history_data, companion_zoom_out_data';
+const FIELDS = 'id, message, context, created_at, is_favorite, haiku, grounding_title, grounding_body, signal_title, signal_source, signal_read, grounding_read, zoom_out_read, history_read, zoom_out_data, history_insight_data, note, mood, mood_after, outcome, tags, breathing_completed, companion_signal_title, companion_signal_body, companion_signal_source, companion_signal_url, companion_grounding_title, companion_grounding_body, companion_grounding_citation, companion_grounding_url, companion_history_data, companion_zoom_out_data';
 
 function HistoryCompanions({ label, r }: { label: string; r: Reflection }) {
   const [open, setOpen] = useState(false);
@@ -114,10 +110,10 @@ function HistoryCompanions({ label, r }: { label: string; r: Reflection }) {
             <div className="space-y-1.5">
               <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Signal</p>
               {(r.companion_signal_title ?? r.signal_title) && <p className="text-xs font-medium leading-snug">{r.companion_signal_title ?? r.signal_title}</p>}
-              {(r.companion_signal_body ?? r.signal_body) && <p className="text-xs text-muted-foreground leading-relaxed">{r.companion_signal_body ?? r.signal_body}</p>}
-              {(r.companion_signal_url ?? r.signal_url) && (
+              {r.companion_signal_body && <p className="text-xs text-muted-foreground leading-relaxed">{r.companion_signal_body}</p>}
+              {r.companion_signal_url && (
                 <a
-                  href={(r.companion_signal_url ?? r.signal_url)!}
+                  href={r.companion_signal_url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 text-[10px] font-mono text-primary/70 hover:text-primary transition-colors"

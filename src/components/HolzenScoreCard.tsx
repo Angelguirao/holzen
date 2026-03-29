@@ -33,11 +33,11 @@ export function HolzenScoreCard() {
     if (!user) return;
     Promise.all([
       supabase
-        .from('reflections')
+        .from('v_reflection_with_companions')
         .select('created_at, mood, mood_after, outcome, context, breathing_completed, note, tags, is_favorite, zoom_out_read, history_read, signal_read, grounding_read')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
-        .limit(100),
+        .limit(100) as any,
       supabase
         .from('practice_entries')
         .select('created_at, type, mood')

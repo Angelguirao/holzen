@@ -75,7 +75,7 @@ type ReflectionRow = {
   signal_title?: string | null;
   signal_source?: string | null;
   grounding_title?: string | null;
-  grounding_url?: string | null;
+  companion_grounding_url?: string | null;
   zoom_out_data?: unknown;
   history_insight_data?: unknown;
 };
@@ -109,7 +109,7 @@ export function recencyHintsFromReflectionRows(rows: ReflectionRow[]): Orchestra
     if (r.signal_source) pushUnique(recentSignalSources, r.signal_source, 5);
     if (r.signal_title) pushUnique(recentSignalTitles, r.signal_title, 5);
     if (r.grounding_title) pushUnique(recentNudgeTopics, r.grounding_title, 5);
-    const gh = hostnameFromReflectionUrl(r.grounding_url);
+    const gh = hostnameFromReflectionUrl(r.companion_grounding_url);
     if (gh) pushUnique(recentGroundingSources, gh, 5);
 
     const hi = r.history_insight_data;

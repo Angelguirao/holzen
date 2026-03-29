@@ -226,13 +226,14 @@ export default function PauseSession() {
     }
     // Fetch final reflection state for score impact
     if (reflectionId) {
-      const { data: ref } = await supabase
-        .from('reflections')
+      const { data: ref } = await (supabase
+        .from('v_reflection_with_companions')
         .select('zoom_out_read, history_read, signal_read, grounding_read, note, tags')
         .eq('id', reflectionId)
-        .single();
+        .single() as any);
       if (ref) {
-        const tools = [ref.zoom_out_read, ref.history_read, ref.signal_read, ref.grounding_read].filter(Boolean).length;
+        const r = ref as { zoom_out_read?: boolean; history_read?: boolean; signal_read?: boolean; grounding_read?: boolean; note?: string | null; tags?: string[] | null };
+        const tools = [r.zoom_out_read, r.history_read, r.signal_read, r.grounding_read].filter(Boolean).length;
         setPauseImpactData({
           mood: selectedMood,
           moodAfter: selectedMoodAfter,
@@ -240,8 +241,8 @@ export default function PauseSession() {
           decision: d,
           context,
           engagedTools: tools,
-          wroteNote: !!(ref.note && ref.note.length > 10),
-          usedTags: !!(ref.tags && ref.tags.length > 0),
+          wroteNote: !!(r.note && r.note.length > 10),
+          usedTags: !!(r.tags && r.tags.length > 0),
         });
       }
     }
