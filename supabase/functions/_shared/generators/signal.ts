@@ -23,7 +23,7 @@ import { validateSource } from "../source-validation.ts";
 import { searchLibrary, essayToSignal, recordLibraryServe } from "../content-library.ts";
 
 /** Bump when the search query, structuring prompt, or quality rules change. */
-export const PROMPT_VERSION = "v2";
+export const PROMPT_VERSION = "v3";
 
 // ── Public types ──
 
@@ -137,7 +137,7 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
     ? `${trimmedSearchAngle}${sourceHint}${recentExclusion}`
     : context
     ? `Bitcoin philosophical perspective relevant when ${context}.${directionHint} Find a profound insight from a respected Bitcoin thinker or writer.${sourceHint}${recentExclusion}`
-    : `Find a profound, philosophical Bitcoin essay or insight about sovereignty, sound money, time preference, proof of work as philosophy, or the meaning of holding from a respected thinker.${sourceHint}${recentExclusion}`;
+    : `Find a profound Bitcoin essay or insight (sound money, proof-of-work, time preference, holding, or monetary ethics) from a respected thinker or publication — prioritize diversity of author and site.${sourceHint}${recentExclusion}`;
 
   const perplexityBody: any = {
     model: "sonar-pro",
@@ -146,13 +146,13 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
         role: "system",
         content: `You are searching for deep, philosophical Bitcoin writing — essays and ideas that make a holder feel grounded in WHY they hold.
 
-WHAT TO SEARCH FOR:
-- Deep ideas about what Bitcoin represents for human freedom, sovereignty, and self-custody
-- Philosophical perspectives on money, time preference, proof of work as a life principle
-- Long-form thinking from Bitcoin writers, philosophers, economists
-- Perspectives on sound money, Austrian economics, game theory, civilizational impact
+WHAT TO SEARCH FOR (rotate — do not fixate on one theme every answer):
+- Proof-of-work, settlement finality, time preference, sound money, holding through volatility
+- Ethics of saving, separation of money and state, Austrian or monetary history angles
+- Long-form pieces with a named author OR a reputable publication
 
 WHAT TO AVOID:
+- Returning the same blog or domain repeatedly across searches (e.g. over-using one small site)
 - Price predictions, chart analysis, trading setups
 - On-chain metrics, hash rate stats, exchange flows
 - Short-term market commentary or news
@@ -160,9 +160,9 @@ WHAT TO AVOID:
 - Altcoins, Ethereum, DeFi, NFTs, tokens, Web3 — NEVER mention these
 - "Crypto market" framing — always say "Bitcoin", never "crypto"
 
-IDEAL SOURCES: Bitcoin Magazine, Nakamoto Institute, Allen Farrington, Vijay Boyapati, Lyn Alden, Parker Lewis, Gigi, Robert Breedlove, Saifedean Ammous, Jeff Booth, Knut Svanholm
+GOOD SOURCES (examples — pick diverse domains): Bitcoin Magazine, Nakamoto Institute, Allen Farrington, Vijay Boyapati, Lyn Alden, Parker Lewis, Gigi, Saifedean Ammous, Jeff Booth, Knut Svanholm, Mises Institute
 
-DIVERSITY: Use a DIFFERENT thinker every time. Prefer timeless essays over recent posts.${recentExclusion}${topicExclusion}`,
+DIVERSITY: Prefer a DIFFERENT thinker and a DIFFERENT domain than obvious prior picks. Prefer timeless essays over thin SEO posts.${recentExclusion}${topicExclusion}`,
       },
       { role: "user", content: searchQuery },
     ],
@@ -248,6 +248,22 @@ DIVERSITY: Use a DIFFERENT thinker every time. Prefer timeless essays over recen
     api_requests: perplexityApiCalls,
   });
 
+  if (citations.length === 0) {
+    log("perplexity returned no citation URLs — skipping live structuring to avoid invented attributions");
+    logAttempt({
+      companion_type: "signal",
+      provider: "perplexity",
+      model: "sonar-pro",
+      status: "error",
+      latency_ms: Date.now() - perplexityT0,
+      error_message: "no_citations",
+      input_tokens: perplexityMerged?.prompt_tokens,
+      output_tokens: perplexityMerged?.completion_tokens,
+      api_requests: perplexityApiCalls,
+    });
+    return serveFallback(svcClient, userId, marketDirection);
+  }
+
   // ── Step 2: AI structuring ──
   const citationList = citations.length > 0
     ? citations.map((c: string, i: number) => `[${i + 1}] ${c}`).join("\n")
@@ -315,7 +331,7 @@ URL RULES (CRITICAL):
       },
     }],
     tool_choice: { type: "function" as const, function: { name: "return_signal" } },
-    temperature: 0.5,
+    temperature: 0.35,
   };
 
   const models = ["google/gemini-2.5-flash", "google/gemini-2.5-flash-lite"];
