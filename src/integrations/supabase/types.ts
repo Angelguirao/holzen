@@ -1669,6 +1669,10 @@ export type Database = {
           user_id: string | null
           zoom_out_data: Json | null
           zoom_out_read: boolean | null
+          serve_source_signal: string | null
+          serve_source_ground_nudge: string | null
+          serve_source_historical_insight: string | null
+          serve_source_zoom_out: string | null
         }
         Relationships: []
       }

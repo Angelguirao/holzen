@@ -5,7 +5,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { RefreshCw, Activity, Database, DollarSign, AlertTriangle, ThumbsUp, Clock, Loader2, ShieldX, ChevronDown, ChevronRight } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { useMemo, useState, useEffect } from 'react';
-import { label, shortModelName, PERIOD_OPTIONS, TAB_TRIGGER_CLASS, TYPE_COLORS } from '@/components/admin/admin-constants';
+import { label, shortModelName, serveSourceBadgeClass, PERIOD_OPTIONS, TAB_TRIGGER_CLASS, TYPE_COLORS } from '@/components/admin/admin-constants';
 import { StatCard, TrendInfo } from '@/components/admin/StatCard';
 import { FilterRow } from '@/components/admin/FilterRow';
 import { FeedCard } from '@/components/admin/FeedCard';
@@ -101,6 +101,16 @@ function zoomOutDeepTimeTitleFromData(data: unknown): string | null {
   if (typeof deepTime !== 'object' || deepTime === null || Array.isArray(deepTime)) return null;
   const t = (deepTime as Record<string, unknown>).title;
   return typeof t === 'string' ? t : null;
+}
+
+function ServeSourceTag({ source }: { source?: string | null }) {
+  const s = source ?? null;
+  const text = s ?? 'n/a';
+  return (
+    <span className={`text-[8px] font-mono px-1.5 py-0.5 rounded uppercase tracking-wide ${serveSourceBadgeClass(s)}`} title="From companion_serves at generation time">
+      {text}
+    </span>
+  );
 }
 
 export default function Admin() {
@@ -514,7 +524,7 @@ export default function Admin() {
           <div className="space-y-2">
             <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">Recent Sessions</p>
             <p className="text-[9px] font-mono text-muted-foreground/45 leading-relaxed">
-              Last reflections with companion titles filled in when available. Green chips mean that companion finished loading for that session (Signal is normal when the user has Signal enabled). Serve source (live vs cache) is not shown here.
+              Last reflections with companion titles when available. Green chips mean that companion row exists. Expand for <strong className="font-normal text-muted-foreground/55">live</strong> / <strong className="font-normal text-muted-foreground/55">cache</strong> / <strong className="font-normal text-muted-foreground/55">curated</strong> / <strong className="font-normal text-muted-foreground/55">empty</strong> from <code className="text-muted-foreground/55">companion_serves</code> (n/a = no log row, e.g. older sessions).
             </p>
             <div className="space-y-1.5">
               <FilterRow label="Mood" options={sessionMoodOptions} value={sessionMoodFilter} onChange={setSessionMoodFilter} />
@@ -592,26 +602,38 @@ export default function Admin() {
                         <p className="text-muted-foreground/50 uppercase tracking-wider">Companions</p>
                         {s.signal_title && (
                           <div className="space-y-0.5">
-                            <p className="text-muted-foreground/40">Signal</p>
+                            <p className="text-muted-foreground/40 flex items-center gap-2 flex-wrap">
+                              Signal
+                              <ServeSourceTag source={s.serve_source_signal} />
+                            </p>
                             <p className="text-foreground/70">{s.signal_title}</p>
                             {signalSource ? <p className="text-muted-foreground/60">source · {signalSource}</p> : null}
                           </div>
                         )}
                         {s.grounding_title && (
                           <div className="space-y-0.5">
-                            <p className="text-muted-foreground/40">Grounding</p>
+                            <p className="text-muted-foreground/40 flex items-center gap-2 flex-wrap">
+                              Grounding
+                              <ServeSourceTag source={s.serve_source_ground_nudge} />
+                            </p>
                             <p className="text-foreground/70">{s.grounding_title}</p>
                           </div>
                         )}
                         {s.history_insight_data && (
                           <div className="space-y-0.5">
-                            <p className="text-muted-foreground/40">History</p>
+                            <p className="text-muted-foreground/40 flex items-center gap-2 flex-wrap">
+                              History
+                              <ServeSourceTag source={s.serve_source_historical_insight} />
+                            </p>
                             <p className="text-foreground/70">{historyTitle ?? '—'}</p>
                           </div>
                         )}
                         {s.zoom_out_data && (
                           <div className="space-y-0.5">
-                            <p className="text-muted-foreground/40">Zoom Out</p>
+                            <p className="text-muted-foreground/40 flex items-center gap-2 flex-wrap">
+                              Zoom Out
+                              <ServeSourceTag source={s.serve_source_zoom_out} />
+                            </p>
                             <p className="text-foreground/70">{zoomTitle ?? '—'}</p>
                           </div>
                         )}
@@ -664,7 +686,7 @@ export default function Admin() {
             Latest cache writes <span className="text-muted-foreground/45">({recentContent.length})</span>
           </p>
           <p className="text-[9px] font-mono text-muted-foreground/50 leading-relaxed">
-            Newest rows in <code className="text-muted-foreground/60">companion_cache</code> (cron pregenerate + live generation). This is not the same as user sessions below — sessions show what each reflection received. Sessions do not show live vs cache vs curated here; that is tracked per serve in analytics.
+            Newest rows in <code className="text-muted-foreground/60">companion_cache</code> (cron pregenerate + live generation). Sessions below are per-reflection; expand a session to see each companion’s <strong className="font-normal text-muted-foreground/55">serve source</strong> (live / cache / curated / empty) from <code className="text-muted-foreground/55">companion_serves</code>.
           </p>
           <FilterRow label="Type" options={feedTypeOptions} value={feedTypeFilter} onChange={setFeedTypeFilter} />
           <p className="text-[9px] font-mono text-muted-foreground/50">

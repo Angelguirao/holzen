@@ -104,6 +104,11 @@ export interface SessionRow {
   history_insight_data: any;
   zoom_out_data: any;
   haiku: string | null;
+  /** From companion_serves (admin RLS); null for non-admins or pre-tracking rows */
+  serve_source_signal?: string | null;
+  serve_source_ground_nudge?: string | null;
+  serve_source_historical_insight?: string | null;
+  serve_source_zoom_out?: string | null;
 }
 
 export interface LibraryEntryRow {
@@ -339,7 +344,7 @@ export function useAdminStats(enabled = true): AdminStats {
     // Recent sessions (last 20 reflections)
     const { data: sessionData } = await (supabase
       .from('v_reflection_with_companions')
-      .select('id, created_at, message, context, mood, outcome, signal_title, signal_source, grounding_title, history_insight_data, zoom_out_data, haiku')
+      .select('id, created_at, message, context, mood, outcome, signal_title, signal_source, grounding_title, history_insight_data, zoom_out_data, haiku, serve_source_signal, serve_source_ground_nudge, serve_source_historical_insight, serve_source_zoom_out')
       .order('created_at', { ascending: false })
       .limit(20) as any);
     setSessions((sessionData ?? []) as SessionRow[]);
