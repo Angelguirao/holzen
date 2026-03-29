@@ -1,11 +1,15 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { Trash2, Loader2, Globe } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import type { LibraryEntryRow } from '@/hooks/use-admin-stats';
+import { Checkbox } from '@/components/ui/checkbox';
 import { label } from './admin-constants';
 import { FilterRow } from './FilterRow';
 import { QualityBadge } from './QualityBadge';
+import { AdminBulkBar } from './AdminBulkBar';
+
+const UPDATE_CHUNK = 40;
 
 const LIBRARY_TYPE_COLORS: Record<string, string> = {
   essay: '#8b5cf6',
@@ -21,6 +25,8 @@ export function ContentLibraryViewer({ entries, onRefresh }: { entries: LibraryE
   const [typeFilter, setTypeFilter] = useState('all');
   const [expandedId, setExpandedId] = useState<string | null>(null);
   const [deleting, setDeleting] = useState<string | null>(null);
+  const [bulkBusy, setBulkBusy] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
 
   const typeOptions = useMemo(() => {
     const types = Array.from(new Set(entries.map(e => e.type))).sort();
@@ -35,14 +41,57 @@ export function ContentLibraryViewer({ entries, onRefresh }: { entries: LibraryE
     return entries.filter(e => e.type === typeFilter);
   }, [entries, typeFilter]);
 
+  const idsShown = useMemo(() => filtered.map((e) => e.id), [filtered]);
+
+  useEffect(() => {
+    setSelectedIds((prev) => {
+      const allowed = new Set(idsShown);
+      let changed = false;
+      const next = new Set<string>();
+      for (const id of prev) {
+        if (allowed.has(id)) next.add(id);
+        else changed = true;
+      }
+      return changed ? next : prev;
+    });
+  }, [idsShown]);
+
   const deleteEntry = useCallback(async (id: string, title: string) => {
     if (!window.confirm(`Remove "${title}" from library?`)) return;
     setDeleting(id);
     const { error } = await supabase.from('content_library').update({ active: false } as any).eq('id', id);
     setDeleting(null);
     if (error) { toast({ title: 'Remove entry failed', description: error.message, variant: 'destructive' }); return; }
+    setSelectedIds((prev) => { const n = new Set(prev); n.delete(id); return n; });
     onRefresh();
   }, [onRefresh, toast]);
+
+  const bulkDeactivate = useCallback(async () => {
+    const ids = idsShown.filter((id) => selectedIds.has(id));
+    if (ids.length === 0) return;
+    if (!window.confirm(`Deactivate ${ids.length} library entr${ids.length === 1 ? 'y' : 'ies'}?`)) return;
+    setBulkBusy(true);
+    try {
+      for (let i = 0; i < ids.length; i += UPDATE_CHUNK) {
+        const slice = ids.slice(i, i + UPDATE_CHUNK);
+        const { error } = await supabase.from('content_library').update({ active: false } as any).in('id', slice);
+        if (error) {
+          toast({ title: 'Bulk deactivate failed', description: error.message, variant: 'destructive' });
+          setBulkBusy(false);
+          return;
+        }
+      }
+      setSelectedIds((prev) => {
+        const n = new Set(prev);
+        for (const id of ids) n.delete(id);
+        return n;
+      });
+      onRefresh();
+      toast({ title: 'Deactivated', description: `${ids.length} entr${ids.length === 1 ? 'y' : 'ies'} removed from the active library.` });
+    } finally {
+      setBulkBusy(false);
+    }
+  }, [idsShown, selectedIds, onRefresh, toast]);
 
   return (
     <div className="space-y-3">
@@ -65,6 +114,15 @@ export function ContentLibraryViewer({ entries, onRefresh }: { entries: LibraryE
         )}
       </p>
 
+      <AdminBulkBar
+        idsShown={idsShown}
+        selectedIds={selectedIds}
+        onSelectionChange={setSelectedIds}
+        onBulkDelete={bulkDeactivate}
+        busy={bulkBusy}
+        actionLabel="Deactivate selected"
+      />
+
       <div className="space-y-1.5">
         {filtered.map(entry => {
           const isExpanded = expandedId === entry.id;
@@ -72,6 +130,19 @@ export function ContentLibraryViewer({ entries, onRefresh }: { entries: LibraryE
           return (
             <div key={entry.id} className="rounded-lg border border-border/20 bg-card/10 px-3 py-2 space-y-1.5">
               <div className="flex items-center gap-2">
+                <Checkbox
+                  className="h-3.5 w-3.5 shrink-0"
+                  checked={selectedIds.has(entry.id)}
+                  onCheckedChange={(v) => {
+                    setSelectedIds((prev) => {
+                      const n = new Set(prev);
+                      if (v === true) n.add(entry.id);
+                      else n.delete(entry.id);
+                      return n;
+                    });
+                  }}
+                  disabled={bulkBusy}
+                />
                 <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full flex-shrink-0"
                   style={{
                     backgroundColor: `${LIBRARY_TYPE_COLORS[entry.type] ?? '#64748b'}20`,

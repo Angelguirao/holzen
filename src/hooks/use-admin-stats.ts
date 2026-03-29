@@ -159,6 +159,8 @@ export interface AdminStats {
   error: string | null;
   refresh: () => void;
   refreshCacheEntries: () => Promise<void>;
+  /** Refetch cache list + “New items” feed without full dashboard loading state */
+  refreshCompanionCacheUi: () => Promise<void>;
   lastUpdated: Date | null;
 }
 
@@ -209,6 +211,16 @@ export function useAdminStats(enabled = true): AdminStats {
       .limit(200);
     if (!err) setCacheEntries((data ?? []) as CacheEntryRow[]);
   }, []);
+
+  const refreshCompanionCacheUi = useCallback(async () => {
+    await fetchCacheEntries();
+    const { data: contentData } = await supabase
+      .from('companion_cache')
+      .select('id, companion_type, content, quality_score, title, created_at, used_count, source_author')
+      .order('created_at', { ascending: false })
+      .limit(20);
+    setRecentContent((contentData ?? []) as RecentContentRow[]);
+  }, [fetchCacheEntries]);
 
   // Store daily view data for period filtering
   const [servesPerDay, setServesPerDay] = useState<any[]>([]);
@@ -450,6 +462,7 @@ export function useAdminStats(enabled = true): AdminStats {
     cacheHits, costs, failures, feedback, cacheEntries, signalSources,
     period, setPeriod: handleSetPeriod, periodStats, prevPeriodStats,
     rejections, recentContent, sessions, libraryEntries,
-    loading, error, refresh: fetchAll, refreshCacheEntries: fetchCacheEntries, lastUpdated,
+    loading, error, refresh: fetchAll, refreshCacheEntries: fetchCacheEntries,
+    refreshCompanionCacheUi, lastUpdated,
   };
 }
