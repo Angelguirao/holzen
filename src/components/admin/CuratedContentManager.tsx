@@ -8,6 +8,7 @@ import { TYPE_COLORS, label } from './admin-constants';
 import { FilterRow } from './FilterRow';
 import { QualityBadge } from './QualityBadge';
 import { AdminBulkBar } from './AdminBulkBar';
+import { adminDeleteOneRow, adminDeleteRowsByIds } from '@/lib/admin-delete';
 
 const QUALITY_OPTIONS = [
   { value: 'all', label: 'All' },
@@ -75,8 +76,8 @@ export function CuratedContentManager({ entries, onRefresh }: { entries: CacheEn
   const remove = useCallback(async (id: string) => {
     if (!window.confirm('Delete this cache entry? This cannot be undone.')) return;
     setActing(id);
-    const { error } = await supabase.from('companion_cache').delete().eq('id', id);
-    if (error) { toast({ title: 'Delete failed', description: error.message, variant: 'destructive' }); setActing(null); return; }
+    const { ok, errorMessage } = await adminDeleteOneRow('companion_cache', id);
+    if (!ok) { toast({ title: 'Delete failed', description: errorMessage ?? 'Unknown error', variant: 'destructive' }); setActing(null); return; }
     setSelectedIds((prev) => { const n = new Set(prev); n.delete(id); return n; });
     await onRefresh();
     setActing(null);
@@ -103,14 +104,10 @@ export function CuratedContentManager({ entries, onRefresh }: { entries: CacheEn
     if (!window.confirm(`Delete ${ids.length} cache entr${ids.length === 1 ? 'y' : 'ies'}? This cannot be undone.`)) return;
     setBulkBusy(true);
     try {
-      for (let i = 0; i < ids.length; i += DELETE_CHUNK) {
-        const slice = ids.slice(i, i + DELETE_CHUNK);
-        const { error } = await supabase.from('companion_cache').delete().in('id', slice);
-        if (error) {
-          toast({ title: 'Bulk delete failed', description: error.message, variant: 'destructive' });
-          setBulkBusy(false);
-          return;
-        }
+      const { deleted, errorMessage } = await adminDeleteRowsByIds('companion_cache', ids, DELETE_CHUNK);
+      if (errorMessage) {
+        toast({ title: 'Bulk delete failed', description: errorMessage, variant: 'destructive' });
+        return;
       }
       setSelectedIds((prev) => {
         const n = new Set(prev);
@@ -118,7 +115,7 @@ export function CuratedContentManager({ entries, onRefresh }: { entries: CacheEn
         return n;
       });
       await onRefresh();
-      toast({ title: 'Deleted', description: `${ids.length} cache entr${ids.length === 1 ? 'y' : 'ies'} removed.` });
+      toast({ title: 'Deleted', description: `${deleted} cache entr${deleted === 1 ? 'y' : 'ies'} removed.` });
     } finally {
       setBulkBusy(false);
     }

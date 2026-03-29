@@ -5,6 +5,7 @@ import { useToast } from '@/hooks/use-toast';
 import type { SignalSourceRow, LibraryEntryRow } from '@/hooks/use-admin-stats';
 import { Checkbox } from '@/components/ui/checkbox';
 import { AdminBulkBar } from './AdminBulkBar';
+import { adminDeleteOneRow, adminDeleteRowsByIds } from '@/lib/admin-delete';
 
 const DELETE_CHUNK = 40;
 
@@ -85,8 +86,8 @@ export function SourceCatalogViewer({ sources, onRefresh, libraryEntries = [] }:
 
   const deleteSource = async (id: string, name: string) => {
     if (!window.confirm(`Remove "${name}" from sources?`)) return;
-    const { error } = await supabase.from('signal_sources').delete().eq('id', id);
-    if (error) { toast({ title: 'Delete source failed', description: error.message, variant: 'destructive' }); return; }
+    const { ok, errorMessage } = await adminDeleteOneRow('signal_sources', id);
+    if (!ok) { toast({ title: 'Delete source failed', description: errorMessage ?? 'Unknown error', variant: 'destructive' }); return; }
     setSelectedIds((prev) => { const n = new Set(prev); n.delete(id); return n; });
     onRefresh();
   };
@@ -97,14 +98,10 @@ export function SourceCatalogViewer({ sources, onRefresh, libraryEntries = [] }:
     if (!window.confirm(`Delete ${ids.length} source${ids.length === 1 ? '' : 's'}?`)) return;
     setBulkBusy(true);
     try {
-      for (let i = 0; i < ids.length; i += DELETE_CHUNK) {
-        const slice = ids.slice(i, i + DELETE_CHUNK);
-        const { error } = await supabase.from('signal_sources').delete().in('id', slice);
-        if (error) {
-          toast({ title: 'Bulk delete failed', description: error.message, variant: 'destructive' });
-          setBulkBusy(false);
-          return;
-        }
+      const { deleted, errorMessage } = await adminDeleteRowsByIds('signal_sources', ids, DELETE_CHUNK);
+      if (errorMessage) {
+        toast({ title: 'Bulk delete failed', description: errorMessage, variant: 'destructive' });
+        return;
       }
       setSelectedIds((prev) => {
         const n = new Set(prev);
@@ -112,7 +109,7 @@ export function SourceCatalogViewer({ sources, onRefresh, libraryEntries = [] }:
         return n;
       });
       onRefresh();
-      toast({ title: 'Deleted', description: `${ids.length} source${ids.length === 1 ? '' : 's'} removed.` });
+      toast({ title: 'Deleted', description: `${deleted} source${deleted === 1 ? '' : 's'} removed.` });
     } finally {
       setBulkBusy(false);
     }
