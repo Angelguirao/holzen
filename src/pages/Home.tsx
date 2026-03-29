@@ -926,19 +926,18 @@ function AutoCooldownIndicator({
     return () => clearInterval(interval);
   }, [cooldownRemaining, nextCronCheckIn]);
 
-  // Idle: live countdown to next ~quarter-hour scan + compact hours spacing (no long copy).
+  // No post-trigger cooldown active: only the server scan countdown (spacing is not “time left” until after a trigger).
   if (remaining <= 0) {
     return (
       <div
         className="flex items-center gap-3 py-2"
-        title={t('home.monitoringIdleTitle')}
+        title={t('home.nextScanIdleTitle')}
       >
         <Timer className="h-3.5 w-3.5 text-primary/60 shrink-0" />
         <p className="flex-1 min-w-0 text-[10px] font-mono text-primary/70 tabular-nums tracking-tight">
-          {t('home.monitoringIdle', {
+          {t('home.nextScanLine', {
             scan: formatMsAsMS(cronIn),
-            hours: cooldownHours,
-            defaultValue: '{{scan}} · {{hours}}h',
+            defaultValue: 'Next scan · {{scan}}',
           })}
         </p>
         <span className="h-1.5 w-1.5 rounded-full bg-primary/50 animate-pulse shrink-0" />
@@ -948,22 +947,26 @@ function AutoCooldownIndicator({
 
   const totalMs = cooldownHours * 60 * 60 * 1000;
   const progress = ((totalMs - remaining) / totalMs) * 100;
-  const hours = Math.floor(remaining / 3600000);
-  const minutes = Math.floor((remaining % 3600000) / 60000);
+  const remH = Math.floor(remaining / 3600000);
+  const remM = Math.floor((remaining % 3600000) / 60000);
 
-  const timeLabel = hours > 0
-    ? `${hours}h ${minutes}min`
-    : `${minutes}min`;
+  const timeLabel = remH > 0
+    ? `${remH}h ${remM}min`
+    : `${remM}min`;
 
   return (
-    <div className="flex items-center gap-3 py-2">
-      <Timer className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-      <div className="flex-1 space-y-1.5">
-        <div className="flex items-center justify-between">
-          <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">
-            {t('home.nextAutoCheck', { time: timeLabel })}
+    <div className="flex items-start gap-3 py-2">
+      <Timer className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-0.5" />
+      <div className="flex-1 min-w-0 space-y-1.5">
+        <div className="flex items-center justify-between gap-2">
+          <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider leading-snug">
+            {t('home.cooldownHeadline', {
+              hours: cooldownHours,
+              time: timeLabel,
+              defaultValue: '{{hours}}h cooldown · {{time}} left',
+            })}
           </p>
-          <p className="text-[10px] font-mono text-muted-foreground">
+          <p className="text-[10px] font-mono text-muted-foreground shrink-0">
             {Math.round(progress)}%
           </p>
         </div>
@@ -973,6 +976,12 @@ function AutoCooldownIndicator({
             style={{ width: `${progress}%` }}
           />
         </div>
+        <p className="text-[9px] font-mono text-muted-foreground/70 tabular-nums tracking-tight">
+          {t('home.nextScanLine', {
+            scan: formatMsAsMS(cronIn),
+            defaultValue: 'Next scan · {{scan}}',
+          })}
+        </p>
       </div>
     </div>
   );
