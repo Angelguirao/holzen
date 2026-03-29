@@ -204,8 +204,6 @@ export function useHolzen() {
           haiku: companionData.haiku,
           grounding_title: companionData.groundingTitle,
           grounding_body: companionData.groundingBody,
-          grounding_citation: fnData?.grounding_citation ?? null,
-          grounding_url: fnData?.grounding_url ?? null,
           ...(mood ? { mood } : {}),
         }).select('id').single();
 

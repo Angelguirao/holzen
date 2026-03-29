@@ -63,10 +63,21 @@ interface Reflection {
   history_read?: boolean;
   signal_read?: boolean;
   grounding_read?: boolean;
+  // From view joins
+  companion_signal_title?: string | null;
+  companion_signal_body?: string | null;
+  companion_signal_source?: string | null;
+  companion_signal_url?: string | null;
+  companion_grounding_title?: string | null;
+  companion_grounding_body?: string | null;
+  companion_grounding_citation?: string | null;
+  companion_grounding_url?: string | null;
+  companion_history_data?: any | null;
+  companion_zoom_out_data?: any | null;
 }
 
 const PAGE_SIZE = 30;
-const FIELDS = 'id, message, context, created_at, is_favorite, haiku, grounding_title, grounding_body, grounding_citation, grounding_url, signal_title, signal_body, signal_source, signal_url, zoom_out_data, history_insight_data, note, mood, mood_after, outcome, tags, breathing_completed, zoom_out_read, history_read, signal_read, grounding_read';
+const FIELDS = 'id, message, context, created_at, is_favorite, haiku, grounding_title, grounding_body, signal_read, grounding_read, zoom_out_read, history_read, note, mood, mood_after, outcome, tags, breathing_completed, companion_signal_title, companion_signal_body, companion_signal_source, companion_signal_url, companion_grounding_title, companion_grounding_body, companion_grounding_citation, companion_grounding_url, companion_history_data, companion_zoom_out_data';
 
 function HistoryCompanions({ label, r }: { label: string; r: Reflection }) {
   const [open, setOpen] = useState(false);
@@ -86,45 +97,47 @@ function HistoryCompanions({ label, r }: { label: string; r: Reflection }) {
         <div className="space-y-3 pt-2.5">
           {r.haiku && <HaikuDisplay haiku={r.haiku} />}
 
-          {r.grounding_title && r.grounding_body && (
+          {(r.grounding_title || r.companion_grounding_title) && (r.grounding_body || r.companion_grounding_body) && (
             <LearningInput
-              title={r.grounding_title}
-              body={r.grounding_body}
-              nudge={r.grounding_citation ? {
-                title: r.grounding_title,
-                body: r.grounding_body,
-                citation: r.grounding_citation,
-                url: r.grounding_url ?? '',
+              title={(r.companion_grounding_title ?? r.grounding_title)!}
+              body={(r.companion_grounding_body ?? r.grounding_body)!}
+              nudge={r.companion_grounding_citation ? {
+                title: (r.companion_grounding_title ?? r.grounding_title)!,
+                body: (r.companion_grounding_body ?? r.grounding_body)!,
+                citation: r.companion_grounding_citation,
+                url: r.companion_grounding_url ?? '',
               } : undefined}
             />
           )}
 
-          {r.signal_source && (
+          {(r.companion_signal_source || r.signal_source) && (
             <div className="space-y-1.5">
               <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Signal</p>
-              {r.signal_title && <p className="text-xs font-medium leading-snug">{r.signal_title}</p>}
-              {r.signal_body && <p className="text-xs text-muted-foreground leading-relaxed">{r.signal_body}</p>}
-              {r.signal_url && (
+              {(r.companion_signal_title ?? r.signal_title) && <p className="text-xs font-medium leading-snug">{r.companion_signal_title ?? r.signal_title}</p>}
+              {(r.companion_signal_body ?? r.signal_body) && <p className="text-xs text-muted-foreground leading-relaxed">{r.companion_signal_body ?? r.signal_body}</p>}
+              {(r.companion_signal_url ?? r.signal_url) && (
                 <a
-                  href={r.signal_url}
+                  href={(r.companion_signal_url ?? r.signal_url)!}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 text-[10px] font-mono text-primary/70 hover:text-primary transition-colors"
                 >
                   <ExternalLink className="h-2.5 w-2.5" />
-                  {r.signal_source}
+                  {r.companion_signal_source ?? r.signal_source}
                 </a>
               )}
             </div>
           )}
 
-          {r.zoom_out_data && (
+          {(r.companion_zoom_out_data || r.zoom_out_data) && (() => {
+            const zod = (r.companion_zoom_out_data ?? r.zoom_out_data) as any;
+            return (
             <div className="space-y-2">
               <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Zoom out</p>
-              {r.zoom_out_data.onThisDay?.length > 0 && r.zoom_out_data.currentPrice && (
+              {zod.onThisDay?.length > 0 && zod.currentPrice && (
                 <div className="space-y-1">
-                  {[...r.zoom_out_data.onThisDay].reverse().map((entry: any) => {
-                    const changePct = ((r.zoom_out_data.currentPrice - entry.price) / entry.price) * 100;
+                  {[...zod.onThisDay].reverse().map((entry: any) => {
+                    const changePct = ((zod.currentPrice - entry.price) / entry.price) * 100;
                     const isUp = changePct >= 0;
                     return (
                       <div key={entry.yearsAgo} className="flex items-center justify-between gap-2">
@@ -138,42 +151,46 @@ function HistoryCompanions({ label, r }: { label: string; r: Reflection }) {
                   })}
                 </div>
               )}
-              {r.zoom_out_data.echo && (
+              {zod.echo && (
                 <div className="space-y-1">
                   <div className="flex items-center gap-1.5">
                     <Clock className="h-3 w-3 text-muted-foreground/50" />
                     <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">
-                      Echo{r.zoom_out_data.echo.created_at ? ` · ${format(new Date(r.zoom_out_data.echo.created_at), 'MMM d, yyyy')}` : ''}
+                      Echo{zod.echo.created_at ? ` · ${format(new Date(zod.echo.created_at), 'MMM d, yyyy')}` : ''}
                     </p>
                   </div>
                   <p className="text-xs text-muted-foreground leading-relaxed italic line-clamp-2">
-                    "{r.zoom_out_data.echo.message}"
+                    "{zod.echo.message}"
                   </p>
                 </div>
               )}
             </div>
-          )}
+            );
+          })()}
 
-          {r.history_insight_data && (
+          {(r.companion_history_data || r.history_insight_data) && (() => {
+            const hid = (r.companion_history_data ?? r.history_insight_data) as any;
+            return (
             <div className="space-y-2">
               <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Historical insight</p>
-              <p className="text-xs font-mono font-medium leading-relaxed">{r.history_insight_data.title}</p>
+              <p className="text-xs font-mono font-medium leading-relaxed">{hid.title}</p>
               <div className="space-y-1">
                 <div className="flex items-center gap-1.5">
                   <HistoryIcon className="h-3 w-3 text-muted-foreground/50 shrink-0" />
-                  <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Bitcoin · {r.history_insight_data.period}</p>
+                  <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Bitcoin · {hid.period}</p>
                 </div>
-                <p className="text-xs text-muted-foreground leading-relaxed">{r.history_insight_data.btcInsight}</p>
+                <p className="text-xs text-muted-foreground leading-relaxed">{hid.btcInsight}</p>
               </div>
               <div className="space-y-1 pl-3 border-l-2 border-border/40">
                 <div className="flex items-center gap-1.5">
                   <ArrowRight className="h-2.5 w-2.5 text-muted-foreground/40 shrink-0" />
-                  <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider">{r.history_insight_data.assetClass} parallel</p>
+                  <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider">{hid.assetClass} parallel</p>
                 </div>
-                <p className="text-xs text-muted-foreground/80 leading-relaxed italic">{r.history_insight_data.analogy}</p>
+                <p className="text-xs text-muted-foreground/80 leading-relaxed italic">{hid.analogy}</p>
               </div>
             </div>
-          )}
+            );
+          })()}
         </div>
       )}
     </div>
@@ -212,7 +229,7 @@ const History = () => {
     if (!user) return;
     const loadReflections = async () => {
       const { data } = await supabase
-        .from('reflections')
+        .from('v_reflection_with_companions')
         .select(FIELDS)
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
@@ -267,7 +284,7 @@ const History = () => {
     const last = reflections[reflections.length - 1];
     if (!last) { setLoadingMore(false); return; }
     const { data } = await supabase
-      .from('reflections')
+      .from('v_reflection_with_companions')
       .select(FIELDS)
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
@@ -827,10 +844,10 @@ const History = () => {
               {(() => {
                 const companionItems: string[] = [];
                 if (r.haiku) companionItems.push('Haiku');
-                if (r.grounding_title) companionItems.push('Grounding');
-                if (r.signal_source) companionItems.push('Signal');
-                if (r.zoom_out_data) companionItems.push('Zoom Out');
-                if (r.history_insight_data) companionItems.push('History');
+                if (r.grounding_title || r.companion_grounding_title) companionItems.push('Grounding');
+                if (r.companion_signal_source || r.signal_source) companionItems.push('Signal');
+                if (r.companion_zoom_out_data || r.zoom_out_data) companionItems.push('Zoom Out');
+                if (r.companion_history_data || r.history_insight_data) companionItems.push('History');
                 if (companionItems.length === 0) return null;
 
                 return (
