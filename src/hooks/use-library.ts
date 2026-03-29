@@ -115,9 +115,27 @@ export function useLibrary() {
     );
     const { data: allReflections } = await supabase
       .from('reflections')
-      .select('id, message, context, created_at, outcome, haiku, grounding_title, grounding_body, grounding_url, signal_title, signal_body, signal_source, signal_url, zoom_out_data, history_insight_data, haiku_read, grounding_read, signal_read, zoom_out_read, history_read')
+      .select('id, message, context, created_at, outcome, haiku, haiku_read, grounding_read, signal_read, zoom_out_read, history_read')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
+
+    // Also fetch companion data from normalized table
+    const reflectionIds = (allReflections ?? []).map((r: any) => r.id);
+    const { data: allCompanions } = reflectionIds.length > 0
+      ? await supabase
+          .from('reflection_companions')
+          .select('reflection_id, companion_type, content, read')
+          .in('reflection_id', reflectionIds)
+      : { data: [] };
+
+    // Build companion lookup by reflection_id
+    const companionMap = new Map<string, any[]>();
+    for (const c of (allCompanions ?? [])) {
+      const arr = companionMap.get(c.reflection_id) ?? [];
+      arr.push(c);
+      companionMap.set(c.reflection_id, arr);
+    }
+
     if (allReflections && allReflections.length > 0) {
       // Build read flags map and incomplete set
       const flags: Record<string, ReflectionReadFlags> = {};
@@ -140,26 +158,34 @@ export function useLibrary() {
 
       const inserts: any[] = [];
       for (const r of allReflections as any[]) {
+        const companions = companionMap.get(r.id) ?? [];
+        const signalC = companions.find((c: any) => c.companion_type === 'signal');
+        const groundingC = companions.find((c: any) => c.companion_type === 'ground_nudge');
+        const zoomOutC = companions.find((c: any) => c.companion_type === 'zoom_out');
+        const historyC = companions.find((c: any) => c.companion_type === 'historical_insight');
+
         if (!existingKeys.has(`${r.id}:reflection`)) {
           inserts.push({ user_id: user.id, type: 'bookmark', title: 'Reflection', body: r.message, source_type: 'reflection', reflection_id: r.id, tags: ['reflection'], created_at: r.created_at, status: 'read' });
         }
         if (r.haiku && !existingKeys.has(`${r.id}:haiku`)) {
           inserts.push({ user_id: user.id, type: 'bookmark', title: 'Haiku', body: r.haiku, source_type: 'haiku', reflection_id: r.id, tags: [], created_at: r.created_at, status: r.haiku_read ? 'read' : 'unread' });
         }
-        if (r.signal_source && !existingKeys.has(`${r.id}:signal`)) {
-          inserts.push({ user_id: user.id, type: 'bookmark', title: r.signal_title, body: r.signal_body, source_type: 'signal', source_url: r.signal_url, reflection_id: r.id, tags: [], created_at: r.created_at, status: r.signal_read ? 'read' : 'unread' });
+        if (signalC && !existingKeys.has(`${r.id}:signal`)) {
+          const sd = signalC.content as any;
+          inserts.push({ user_id: user.id, type: 'bookmark', title: sd.title, body: sd.body, source_type: 'signal', source_url: sd.url, reflection_id: r.id, tags: [], created_at: r.created_at, status: signalC.read ? 'read' : 'unread' });
         }
-        if (r.grounding_title && !existingKeys.has(`${r.id}:grounding`)) {
-          inserts.push({ user_id: user.id, type: 'bookmark', title: r.grounding_title, body: r.grounding_body, source_type: 'grounding', source_url: r.grounding_url, reflection_id: r.id, tags: [], created_at: r.created_at, status: r.grounding_read ? 'read' : 'unread' });
+        if (groundingC && !existingKeys.has(`${r.id}:grounding`)) {
+          const gd = groundingC.content as any;
+          inserts.push({ user_id: user.id, type: 'bookmark', title: gd.title, body: gd.body, source_type: 'grounding', source_url: gd.url, reflection_id: r.id, tags: [], created_at: r.created_at, status: groundingC.read ? 'read' : 'unread' });
         }
-        if (r.zoom_out_data && !existingKeys.has(`${r.id}:zoom_out`)) {
-          const zd = r.zoom_out_data as any;
+        if (zoomOutC && !existingKeys.has(`${r.id}:zoom_out`)) {
+          const zd = zoomOutC.content as any;
           const zoomBody = zd?.deepTime?.body || zd?.echo?.message || zd?.deepTime?.title || (typeof zd === 'object' ? JSON.stringify(zd) : String(zd));
-          inserts.push({ user_id: user.id, type: 'bookmark', title: zd?.deepTime?.title || 'Zoom Out', body: zoomBody, source_type: 'zoom_out', reflection_id: r.id, tags: [], created_at: r.created_at, status: r.zoom_out_read ? 'read' : 'unread' });
+          inserts.push({ user_id: user.id, type: 'bookmark', title: zd?.deepTime?.title || 'Zoom Out', body: zoomBody, source_type: 'zoom_out', reflection_id: r.id, tags: [], created_at: r.created_at, status: zoomOutC.read ? 'read' : 'unread' });
         }
-        if (r.history_insight_data && !existingKeys.has(`${r.id}:history_insight`)) {
-          const hd = r.history_insight_data as any;
-          inserts.push({ user_id: user.id, type: 'bookmark', title: hd.title ?? 'History Insight', body: hd.btcInsight ?? '', source_type: 'history_insight', reflection_id: r.id, tags: [], created_at: r.created_at, status: r.history_read ? 'read' : 'unread' });
+        if (historyC && !existingKeys.has(`${r.id}:history_insight`)) {
+          const hd = historyC.content as any;
+          inserts.push({ user_id: user.id, type: 'bookmark', title: hd.title ?? 'History Insight', body: hd.btcInsight ?? '', source_type: 'history_insight', reflection_id: r.id, tags: [], created_at: r.created_at, status: historyC.read ? 'read' : 'unread' });
         }
       }
       if (inserts.length > 0) {
