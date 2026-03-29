@@ -337,11 +337,11 @@ export function useAdminStats(enabled = true): AdminStats {
     setRecentContent((contentData ?? []) as RecentContentRow[]);
 
     // Recent sessions (last 20 reflections)
-    const { data: sessionData } = await supabase
-      .from('v_reflection_with_companions' as any)
+    const { data: sessionData } = await (supabase
+      .from('v_reflection_with_companions')
       .select('id, created_at, message, context, mood, outcome, signal_title, signal_source, grounding_title, history_insight_data, zoom_out_data, haiku')
       .order('created_at', { ascending: false })
-      .limit(20);
+      .limit(20) as any);
     setSessions((sessionData ?? []) as SessionRow[]);
 
     // Content library entries (table may not exist before migration — fail gracefully)
