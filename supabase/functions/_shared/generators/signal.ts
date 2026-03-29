@@ -12,6 +12,7 @@ import { qualityGate, normalizeUrl, isUrlReachable, contentFingerprint } from ".
 import { loadFallbackPool, pickRandom } from "../fallbacks.ts";
 import { parseMarketDirection, serveFromCache } from "../cache.ts";
 import { createAttemptLogger } from "../observe.ts";
+import { enqueueCatalogSourceSuggestion } from "../source-suggestions.ts";
 import { callPerplexityChat, mergePerplexityUsage } from "../perplexity-client.ts";
 import { validateSource } from "../source-validation.ts";
 import { searchLibrary, essayToSignal, recordLibraryServe } from "../content-library.ts";
@@ -86,7 +87,7 @@ function buildSourceHints(sources?: Array<{ name: string; type: string; url?: st
 // ── Public entry point ──
 
 export async function generateSignal(params: GenerateSignalParams): Promise<SignalResult> {
-  const { svcClient, context, sources, recentSignalSources, recentSignalTitles, userId, searchAngle, log } = params;
+  const { svcClient, context, sources, recentSignalSources, recentSignalTitles, userId, reflectionId, searchAngle, log } = params;
   const marketDirection = parseMarketDirection(context);
 
   const logAttempt = createAttemptLogger(svcClient, { userId });
@@ -449,6 +450,13 @@ URL RULES (CRITICAL):
       log(`cache write failed: ${e}`);
     }
   }
+
+  void enqueueCatalogSourceSuggestion(svcClient, {
+    category: "signal",
+    name: signal.source,
+    url: signal.url,
+    reflectionId,
+  });
 
   // ── Step 6: Background URL validation (fire-and-forget) ──
   if (signal.url && signal.url.startsWith("http")) {

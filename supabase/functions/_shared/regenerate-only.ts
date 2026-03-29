@@ -115,6 +115,7 @@ export async function handleRegenerateOnly(params: {
         recentGroundingSources,
         recentGroundingTitles: recentNudgeTopics,
         userId,
+        reflectionId,
         log,
         preferredBias: intent.groundingBias,
       });
@@ -138,6 +139,7 @@ export async function handleRegenerateOnly(params: {
         recentSignalSources: body.recentSignalSources as string[] | undefined,
         recentSignalTitles: body.recentSignalTitles as string[] | undefined,
         userId,
+        reflectionId,
         log,
         searchAngle: intent.signalAngle,
       });
