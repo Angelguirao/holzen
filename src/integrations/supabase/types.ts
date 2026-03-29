@@ -278,6 +278,36 @@ export type Database = {
         }
         Relationships: []
       }
+      companion_fallbacks: {
+        Row: {
+          id: string
+          pool_type: string
+          sort_order: number
+          payload: Json
+          is_active: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          pool_type: string
+          sort_order?: number
+          payload: Json
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          pool_type?: string
+          sort_order?: number
+          payload?: Json
+          is_active?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       companion_serves: {
         Row: {
           cache_entry_id: string | null

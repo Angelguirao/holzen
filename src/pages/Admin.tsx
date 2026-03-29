@@ -13,6 +13,7 @@ import { FeedCard } from '@/components/admin/FeedCard';
 import { AdminBulkBar } from '@/components/admin/AdminBulkBar';
 import { RejectionEntry } from '@/components/admin/RejectionEntry';
 import { CuratedContentManager } from '@/components/admin/CuratedContentManager';
+import { HardcodedFallbacksManager } from '@/components/admin/HardcodedFallbacksManager';
 import { SourceCatalogViewer } from '@/components/admin/SourceCatalogViewer';
 import { ContentLibraryViewer } from '@/components/admin/ContentLibraryViewer';
 import { DevModeToggle } from '@/components/admin/DevModeToggle';
@@ -393,6 +394,7 @@ export default function Admin() {
           <TabsTrigger value="sources" className={TAB_TRIGGER_CLASS}>Sources</TabsTrigger>
           <TabsTrigger value="library" className={TAB_TRIGGER_CLASS}>Library{libraryEntries.length > 0 ? ` (${libraryEntries.length})` : ''}</TabsTrigger>
           <TabsTrigger value="content" className={TAB_TRIGGER_CLASS}>Cache</TabsTrigger>
+          <TabsTrigger value="fallbacks" className={TAB_TRIGGER_CLASS}>Fallbacks</TabsTrigger>
           <TabsTrigger value="tools" className={TAB_TRIGGER_CLASS}>Tools</TabsTrigger>
         </TabsList>
         <p className="text-[9px] font-mono text-muted-foreground/45 leading-relaxed max-w-3xl">
@@ -401,6 +403,7 @@ export default function Admin() {
           <span className="text-muted-foreground/55"> Sources</span> — URLs/names fed into live AI search (not the Library).
           <span className="text-muted-foreground/55"> Library</span> — curated essays/papers/events used when live generation falls back.
           <span className="text-muted-foreground/55"> Cache</span> — pregen pool in <code className="text-muted-foreground/50">companion_cache</code> (promote/demote/delete).
+          <span className="text-muted-foreground/55"> Fallbacks</span> — last-resort strings in <code className="text-muted-foreground/50">companion_fallbacks</code> (edit JSON, toggle active, reorder).
         </p>
 
         {/* Tab 1: Monitor */}
@@ -866,6 +869,10 @@ export default function Admin() {
             Companion cache — pregenerated and live-written pool rows. Quality score and used_count indicate how often entries are picked from the pool (after live tries and, for some companions, Library fallbacks — see copy inside the panel).
           </p>
           <CuratedContentManager entries={cacheEntries} onRefresh={refreshCacheEntries} />
+        </TabsContent>
+
+        <TabsContent value="fallbacks" className="mt-0">
+          <HardcodedFallbacksManager />
         </TabsContent>
 
         <TabsContent value="tools" className="mt-0">
