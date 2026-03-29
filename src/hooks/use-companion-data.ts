@@ -345,7 +345,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       const userId = authData?.user?.id;
       if (!userId) return undefined;
       const [{ data: catalog }, { data: userPrefs }] = await Promise.all([
-        supabase.from('signal_sources').select('id, name, type, url, category').eq('category', 'signal').eq('demoted_for_live', false),
+        supabase.from('signal_sources').select('id, name, type, url, category').eq('category', 'signal') as any,
         supabase.from('user_signal_preferences').select('source_id, custom_name, custom_url, custom_type, active, category').eq('user_id', userId).eq('category', 'signal'),
       ]);
       const prefsMap = new Map((userPrefs ?? []).map((p: any) => [p.source_id, p]));
@@ -367,7 +367,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       const userId = authData?.user?.id;
       if (!userId) return undefined;
       const [{ data: catalog }, { data: userPrefs }] = await Promise.all([
-        supabase.from('signal_sources').select('id, name, type, url, category').eq('category', 'grounding').eq('demoted_for_live', false),
+        supabase.from('signal_sources').select('id, name, type, url, category').eq('category', 'grounding') as any,
         supabase.from('user_signal_preferences').select('source_id, custom_name, custom_url, custom_type, active, category').eq('user_id', userId).eq('category', 'grounding'),
       ]);
       const prefsMap = new Map((userPrefs ?? []).map((p: any) => [p.source_id, p]));

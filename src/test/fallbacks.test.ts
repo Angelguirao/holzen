@@ -119,7 +119,7 @@ describe('HISTORY_FALLBACKS', () => {
 
   it('no entries contain slop in analogy', () => {
     for (const entry of HISTORY_FALLBACKS) {
-      expect(containsSlop(entry.analogy), `Analogy slop: "${entry.title}"`).toBe(false);
+      expect(containsSlop(entry.analogy as string), `Analogy slop: "${entry.title}"`).toBe(false);
     }
   });
 

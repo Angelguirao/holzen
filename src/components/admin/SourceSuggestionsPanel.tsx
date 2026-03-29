@@ -29,7 +29,7 @@ export function SourceSuggestionsPanel({ onCatalogChanged }: { onCatalogChanged?
 
   const fetchRows = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('signal_source_suggestions')
       .select('id, category, suggested_name, suggested_url, suggested_type, dedupe_key, status, metadata, created_at, reviewed_at')
       .eq('status', 'pending')
@@ -60,7 +60,7 @@ export function SourceSuggestionsPanel({ onCatalogChanged }: { onCatalogChanged?
       setActing(null);
       return;
     }
-    const { error: upErr } = await supabase
+    const { error: upErr } = await (supabase as any)
       .from('signal_source_suggestions')
       .update({ status: 'approved', reviewed_at: new Date().toISOString() })
       .eq('id', row.id);
@@ -76,7 +76,7 @@ export function SourceSuggestionsPanel({ onCatalogChanged }: { onCatalogChanged?
 
   const reject = async (row: SourceSuggestionRow) => {
     setActing(row.id);
-    const { error } = await supabase
+    const { error } = await (supabase as any)
       .from('signal_source_suggestions')
       .update({ status: 'rejected', reviewed_at: new Date().toISOString() })
       .eq('id', row.id);
