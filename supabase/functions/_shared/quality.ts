@@ -231,7 +231,8 @@ function checkSpecificity(companionType: string, content: any): { pass: boolean;
       }
       const body = (content.body || "").toLowerCase();
       const title = (content.title || "").toLowerCase();
-      if (body.includes("cryptosovereignty") || title.includes("cryptosovereignty")) {
+      const url = (content.url || "").toLowerCase();
+      if (body.includes("cryptosovereignty") || title.includes("cryptosovereignty") || url.includes("cryptosovereignty.org")) {
         return { pass: false, reason: "signal_overused_meme_domain" };
       }
       break;
