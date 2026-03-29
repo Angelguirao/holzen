@@ -780,7 +780,7 @@ export type Database = {
           companion_breathing: boolean
           companion_haiku: boolean
           companion_history: boolean
-          companion_grounding: boolean
+          companion_learning: boolean
           companion_signal: boolean
           companion_zoom_out: boolean
           cooldown_hours: number
@@ -832,7 +832,7 @@ export type Database = {
           companion_breathing?: boolean
           companion_haiku?: boolean
           companion_history?: boolean
-          companion_grounding?: boolean
+          companion_learning?: boolean
           companion_signal?: boolean
           companion_zoom_out?: boolean
           cooldown_hours?: number
@@ -884,7 +884,7 @@ export type Database = {
           companion_breathing?: boolean
           companion_haiku?: boolean
           companion_history?: boolean
-          companion_grounding?: boolean
+          companion_learning?: boolean
           companion_signal?: boolean
           companion_zoom_out?: boolean
           cooldown_hours?: number
@@ -1137,11 +1137,11 @@ export type Database = {
           history_read: boolean
           id: string
           is_favorite: boolean
-          grounding_body: string | null
-          grounding_citation: string | null
-          grounding_read: boolean
-          grounding_title: string | null
-          grounding_url: string | null
+          learning_body: string | null
+          learning_citation: string | null
+          learning_read: boolean
+          learning_title: string | null
+          learning_url: string | null
           message: string
           mood: string | null
           mood_after: string | null
@@ -1167,11 +1167,11 @@ export type Database = {
           history_read?: boolean
           id?: string
           is_favorite?: boolean
-          grounding_body?: string | null
-          grounding_citation?: string | null
-          grounding_read?: boolean
-          grounding_title?: string | null
-          grounding_url?: string | null
+          learning_body?: string | null
+          learning_citation?: string | null
+          learning_read?: boolean
+          learning_title?: string | null
+          learning_url?: string | null
           message: string
           mood?: string | null
           mood_after?: string | null
@@ -1197,11 +1197,11 @@ export type Database = {
           history_read?: boolean
           id?: string
           is_favorite?: boolean
-          grounding_body?: string | null
-          grounding_citation?: string | null
-          grounding_read?: boolean
-          grounding_title?: string | null
-          grounding_url?: string | null
+          learning_body?: string | null
+          learning_citation?: string | null
+          learning_read?: boolean
+          learning_title?: string | null
+          learning_url?: string | null
           message?: string
           mood?: string | null
           mood_after?: string | null
@@ -1643,11 +1643,11 @@ export type Database = {
           history_read: boolean | null
           id: string | null
           is_favorite: boolean | null
-          grounding_body: string | null
-          grounding_citation: string | null
-          grounding_read: boolean | null
-          grounding_title: string | null
-          grounding_url: string | null
+          learning_body: string | null
+          learning_citation: string | null
+          learning_read: boolean | null
+          learning_title: string | null
+          learning_url: string | null
           message: string | null
           mood: string | null
           mood_after: string | null
