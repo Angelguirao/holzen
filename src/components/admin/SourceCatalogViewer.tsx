@@ -119,14 +119,17 @@ export function SourceCatalogViewer({ sources, onRefresh, libraryEntries = [] }:
     <div className="space-y-3">
       <div className="rounded-xl border border-border/20 bg-card/10 px-4 py-3 space-y-2">
         <p className="text-[10px] font-mono text-foreground/70">
-          Sources the AI searches when generating Signal and Grounding companions.
+          Catalog for <strong className="font-normal text-muted-foreground/75">live</strong> generation: names/URLs the edge functions pass into web search (e.g. Perplexity) when building Signal and Grounding answers.
+        </p>
+        <p className="text-[9px] text-muted-foreground/55 leading-relaxed">
+          This is <strong className="font-normal text-muted-foreground/65">not</strong> the <strong className="font-normal text-muted-foreground/65">Library</strong> tab. Library rows are full essays/papers/events matched by author for <strong className="font-normal text-muted-foreground/65">fallback</strong> when live generation does not produce a body. Sources here shape what the model can cite while it is still “live.”
         </p>
         <div className="space-y-1">
           <p className="text-[9px] text-muted-foreground/60">
-            <span className="font-mono font-medium">signal</span> sources — Bitcoin thinkers, essayists, publications for philosophical insights
+            <span className="font-mono font-medium">signal</span> — thinkers, essayists, publications (philosophical angle)
           </p>
           <p className="text-[9px] text-muted-foreground/60">
-            <span className="font-mono font-medium">grounding</span> sources — Academic researchers, behavioral finance journals
+            <span className="font-mono font-medium">grounding</span> — research-oriented / behavioral finance style sources
           </p>
         </div>
       </div>

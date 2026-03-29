@@ -125,21 +125,28 @@ export function CuratedContentManager({ entries, onRefresh }: { entries: CacheEn
     <div className="space-y-3">
       <div className="rounded-xl border border-border/20 bg-card/10 px-4 py-3 space-y-2">
         <p className="text-[10px] font-mono text-foreground/70">
-          Content that AI generates gets cached here. You can manage its lifecycle:
+          Pregen pool (<code className="text-muted-foreground/60">companion_cache</code>). When live AI generation fails or skips, Signal / Grounding / History try the <strong className="font-normal text-muted-foreground/65">Library</strong> tab first, then this pool, then tiny hardcoded fallbacks (those show as “curated” in Monitor serve counts, not here).
         </p>
+        <p className="text-[9px] text-muted-foreground/55 leading-relaxed">
+          Order for those companions: <span className="text-muted-foreground/70">live</span> → <span className="text-muted-foreground/70">Library</span> → <span className="text-muted-foreground/70">this cache</span> → <span className="text-muted-foreground/70">hardcoded</span>. Manage long-form curated pieces under Library; manage pool rows here.
+        </p>
+        <p className="text-[10px] font-mono text-foreground/70">Lifecycle actions:</p>
         <div className="space-y-1">
           <p className="text-[9px] text-muted-foreground/60">
-            <span className="text-emerald-600 dark:text-emerald-400 font-mono">↑ Promote</span> — Makes content permanent (never expires). Best content gets served as fallback when AI is down.
+            <span className="text-emerald-600 dark:text-emerald-400 font-mono">↑ Promote</span> — quality 3, no expiry. Preferred within this pool.
           </p>
           <p className="text-[9px] text-muted-foreground/60">
-            <span className="text-orange-600 dark:text-orange-400 font-mono">↓ Demote</span> — Lowers quality score and sets 7-day expiry. For content that isn't good enough.
+            <span className="text-orange-600 dark:text-orange-400 font-mono">↓ Demote</span> — quality 1 and 7-day expiry.
           </p>
           <p className="text-[9px] text-muted-foreground/60">
-            <span className="text-destructive font-mono">🗑 Delete</span> — Permanently removes from cache.
+            <span className="text-destructive font-mono">🗑 Delete</span> — remove this pool row (does not delete reflections or Library entries).
           </p>
         </div>
         <p className="text-[9px] text-muted-foreground/50">
-          Quality badges: <span className="text-emerald-600 dark:text-emerald-400">curated</span> = permanent, <span className="text-blue-600 dark:text-blue-400">good</span> = verified URL, <span className="text-orange-600 dark:text-orange-400">low</span> = unverified
+          Badge <span className="text-emerald-600 dark:text-emerald-400">curated</span> here = score ≥3 in this table. That is unrelated to the Monitor “curated” serve counter (hardcoded fallbacks).
+        </p>
+        <p className="text-[9px] text-muted-foreground/50">
+          Also: <span className="text-blue-600 dark:text-blue-400">good</span> = score 2, <span className="text-orange-600 dark:text-orange-400">low</span> = score 1.
         </p>
       </div>
 
