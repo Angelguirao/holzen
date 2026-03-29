@@ -1,6 +1,11 @@
 /**
  * Shared Perplexity Chat Completions client (edge functions).
  * Returns API usage for cost attribution alongside content.
+ *
+ * Perplexity returns source URLs in multiple places:
+ * - `citations` (string[]) — often populated
+ * - `search_results[].url` — frequently populated when `citations` is empty (we merge both)
+ * - Inline `https://` links in the assistant message — last-resort fallback
  */
 
 export interface PerplexityUsage {
@@ -13,6 +18,55 @@ export interface PerplexityChatResult {
   content: string;
   citations: string[];
   usage?: PerplexityUsage;
+}
+
+/**
+ * Build a deduped URL list from a Perplexity JSON body.
+ * Exported for tests and any caller that parses raw responses.
+ */
+export function normalizePerplexityCitations(data: unknown, messageContent: string): string[] {
+  const d = data as Record<string, unknown> | null;
+  const out: string[] = [];
+  const push = (u: string) => {
+    const t = u.trim();
+    if (t.startsWith("http://") || t.startsWith("https://")) out.push(t);
+  };
+
+  if (d && Array.isArray(d.citations)) {
+    for (const c of d.citations) {
+      if (typeof c === "string") push(c);
+    }
+  }
+
+  if (d && Array.isArray(d.search_results)) {
+    for (const r of d.search_results) {
+      const u = (r as { url?: string })?.url;
+      if (typeof u === "string") push(u);
+    }
+  }
+
+  const seen = new Set<string>();
+  const deduped = out.filter((u) => {
+    if (seen.has(u)) return false;
+    seen.add(u);
+    return true;
+  });
+  if (deduped.length > 0) return deduped;
+
+  // Models often include markdown links or bare URLs in the message even when metadata arrays are empty
+  const fromText: string[] = [];
+  const seenText = new Set<string>();
+  const re = /https?:\/\/[^\s\])>"']+/g;
+  const matches = messageContent.match(re) ?? [];
+  for (let raw of matches) {
+    raw = raw.replace(/[.,;:)]+$/g, "");
+    if ((raw.startsWith("http://") || raw.startsWith("https://")) && !seenText.has(raw)) {
+      seenText.add(raw);
+      fromText.push(raw);
+    }
+    if (fromText.length >= 12) break;
+  }
+  return fromText;
 }
 
 /** Sum token usage across multiple Perplexity calls (e.g. primary + retry). */
@@ -48,9 +102,11 @@ export async function callPerplexityChat(
     }
     const data = await res.json();
     const u = data.usage;
+    const content = data.choices?.[0]?.message?.content || "";
+    const citations = normalizePerplexityCitations(data, content);
     return {
-      content: data.choices?.[0]?.message?.content || "",
-      citations: data.citations || [],
+      content,
+      citations,
       usage: u
         ? {
           prompt_tokens: typeof u.prompt_tokens === "number" ? u.prompt_tokens : undefined,

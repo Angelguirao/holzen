@@ -23,7 +23,7 @@ import { validateSource } from "../source-validation.ts";
 import { searchLibrary, essayToSignal, recordLibraryServe } from "../content-library.ts";
 
 /** Bump when the search query, structuring prompt, or quality rules change. */
-export const PROMPT_VERSION = "v3";
+export const PROMPT_VERSION = "v4";
 
 // ── Public types ──
 
@@ -183,7 +183,7 @@ DIVERSITY: Prefer a DIFFERENT thinker and a DIFFERENT domain than obvious prior 
     let apiCalls = 0;
     let mergedUsage = undefined as ReturnType<typeof mergePerplexityUsage>;
 
-    const result = await callPerplexityChat(perplexityBody, PERPLEXITY_API_KEY, (m) => log(m));
+    const result = await callPerplexityChat(perplexityBody, PERPLEXITY_API_KEY, (m) => log(m), 15_000);
     apiCalls++;
     mergedUsage = result.usage;
     searchContent = result.content;
@@ -191,11 +191,11 @@ DIVERSITY: Prefer a DIFFERENT thinker and a DIFFERENT domain than obvious prior 
     log(`perplexity content length: ${searchContent.length}, citations: ${citations.length}`);
 
     if (citations.length === 0 && sourceUrls.length > 0 && searchContent.length > 0) {
-      log("0 citations with domain filter — retrying without filter");
+      log("0 citations after merge — retrying without domain filter");
       const retryBody = { ...perplexityBody };
       delete retryBody.search_domain_filter;
       try {
-        const retry = await callPerplexityChat(retryBody, PERPLEXITY_API_KEY, (m) => log(m));
+        const retry = await callPerplexityChat(retryBody, PERPLEXITY_API_KEY, (m) => log(m), 15_000);
         apiCalls++;
         mergedUsage = mergePerplexityUsage(mergedUsage, retry.usage);
         if (retry.citations.length > 0) {
@@ -204,6 +204,10 @@ DIVERSITY: Prefer a DIFFERENT thinker and a DIFFERENT domain than obvious prior 
           log(`retry got ${citations.length} citations`);
         }
       } catch { log("retry failed, using original content"); }
+    }
+
+    if (citations.length === 0 && searchContent.length > 0) {
+      log("perplexity: still no citation URLs after merge + optional domain retry — literature exists; API metadata may be sparse");
     }
 
     perplexityApiCalls = apiCalls;
