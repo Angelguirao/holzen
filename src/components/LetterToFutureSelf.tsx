@@ -195,7 +195,7 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
     if (!currentPrice || !canWrite) return;
     const v = validateFutureLetterBody(body);
     if (!v.valid) {
-      const reason = v.reason;
+      const reason = (v as { valid: false; reason: string }).reason;
       if (reason === 'too_short') {
         toast.error(t('letter.validationTooShort', { min: FUTURE_LETTER_MIN_CHARS }));
       } else if (reason === 'too_long') {
