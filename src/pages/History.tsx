@@ -110,32 +110,34 @@ function HistoryCompanions({ label, r }: { label: string; r: Reflection }) {
             />
           )}
 
-          {r.signal_source && (
+          {(r.companion_signal_source || r.signal_source) && (
             <div className="space-y-1.5">
               <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Signal</p>
-              {r.signal_title && <p className="text-xs font-medium leading-snug">{r.signal_title}</p>}
-              {r.signal_body && <p className="text-xs text-muted-foreground leading-relaxed">{r.signal_body}</p>}
-              {r.signal_url && (
+              {(r.companion_signal_title ?? r.signal_title) && <p className="text-xs font-medium leading-snug">{r.companion_signal_title ?? r.signal_title}</p>}
+              {(r.companion_signal_body ?? r.signal_body) && <p className="text-xs text-muted-foreground leading-relaxed">{r.companion_signal_body ?? r.signal_body}</p>}
+              {(r.companion_signal_url ?? r.signal_url) && (
                 <a
-                  href={r.signal_url}
+                  href={(r.companion_signal_url ?? r.signal_url)!}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 text-[10px] font-mono text-primary/70 hover:text-primary transition-colors"
                 >
                   <ExternalLink className="h-2.5 w-2.5" />
-                  {r.signal_source}
+                  {r.companion_signal_source ?? r.signal_source}
                 </a>
               )}
             </div>
           )}
 
-          {r.zoom_out_data && (
+          {(r.companion_zoom_out_data || r.zoom_out_data) && (() => {
+            const zod = (r.companion_zoom_out_data ?? r.zoom_out_data) as any;
+            return (
             <div className="space-y-2">
               <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Zoom out</p>
-              {r.zoom_out_data.onThisDay?.length > 0 && r.zoom_out_data.currentPrice && (
+              {zod.onThisDay?.length > 0 && zod.currentPrice && (
                 <div className="space-y-1">
-                  {[...r.zoom_out_data.onThisDay].reverse().map((entry: any) => {
-                    const changePct = ((r.zoom_out_data.currentPrice - entry.price) / entry.price) * 100;
+                  {[...zod.onThisDay].reverse().map((entry: any) => {
+                    const changePct = ((zod.currentPrice - entry.price) / entry.price) * 100;
                     const isUp = changePct >= 0;
                     return (
                       <div key={entry.yearsAgo} className="flex items-center justify-between gap-2">
@@ -149,21 +151,22 @@ function HistoryCompanions({ label, r }: { label: string; r: Reflection }) {
                   })}
                 </div>
               )}
-              {r.zoom_out_data.echo && (
+              {zod.echo && (
                 <div className="space-y-1">
                   <div className="flex items-center gap-1.5">
                     <Clock className="h-3 w-3 text-muted-foreground/50" />
                     <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">
-                      Echo{r.zoom_out_data.echo.created_at ? ` · ${format(new Date(r.zoom_out_data.echo.created_at), 'MMM d, yyyy')}` : ''}
+                      Echo{zod.echo.created_at ? ` · ${format(new Date(zod.echo.created_at), 'MMM d, yyyy')}` : ''}
                     </p>
                   </div>
                   <p className="text-xs text-muted-foreground leading-relaxed italic line-clamp-2">
-                    "{r.zoom_out_data.echo.message}"
+                    "{zod.echo.message}"
                   </p>
                 </div>
               )}
             </div>
-          )}
+            );
+          })()}
 
           {r.history_insight_data && (
             <div className="space-y-2">
