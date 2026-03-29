@@ -27,7 +27,8 @@ export const FEEDBACK_TO_CACHE_TYPE: Record<string, string> = {
   signal: COMPANION_TYPES.SIGNAL,
   grounding: COMPANION_TYPES.GROUNDING,
   learning: COMPANION_TYPES.GROUNDING,
-  zoom_out: COMPANION_TYPES.ZOOM_OUT_DEEP_TIME,
+  /** Align with `generation_attempts` / `companion_serves` primary zoom type (was wrongly deep_time). */
+  zoom_out: COMPANION_TYPES.ZOOM_OUT,
   history_insight: COMPANION_TYPES.HISTORY,
   haiku: "haiku",
 };

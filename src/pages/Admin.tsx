@@ -5,7 +5,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { RefreshCw, Activity, Database, DollarSign, AlertTriangle, ThumbsUp, Clock, Loader2, ShieldX, ChevronDown, ChevronRight } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { useMemo, useState, useEffect } from 'react';
-import { label, PERIOD_OPTIONS, TAB_TRIGGER_CLASS, TYPE_COLORS } from '@/components/admin/admin-constants';
+import { label, shortModelName, PERIOD_OPTIONS, TAB_TRIGGER_CLASS, TYPE_COLORS } from '@/components/admin/admin-constants';
 import { StatCard, TrendInfo } from '@/components/admin/StatCard';
 import { FilterRow } from '@/components/admin/FilterRow';
 import { FeedCard } from '@/components/admin/FeedCard';
@@ -292,13 +292,19 @@ export default function Admin() {
       <Tabs defaultValue="monitor" className="space-y-4">
         <TabsList className="inline-flex h-auto items-center gap-1 rounded-lg bg-muted/30 p-1">
           <TabsTrigger value="monitor" className={TAB_TRIGGER_CLASS}>Monitor</TabsTrigger>
-          <TabsTrigger value="content" className={TAB_TRIGGER_CLASS}>Content</TabsTrigger>
+          <TabsTrigger value="content" className={TAB_TRIGGER_CLASS}>Cache</TabsTrigger>
           <TabsTrigger value="sources" className={TAB_TRIGGER_CLASS}>Sources</TabsTrigger>
           <TabsTrigger value="tools" className={TAB_TRIGGER_CLASS}>Tools</TabsTrigger>
           <TabsTrigger value="library" className={TAB_TRIGGER_CLASS}>Library{libraryEntries.length > 0 ? ` (${libraryEntries.length})` : ''}</TabsTrigger>
-          <TabsTrigger value="feed" className={TAB_TRIGGER_CLASS}>Feed{recentContent.length > 0 ? ` (${recentContent.length})` : ''}</TabsTrigger>
+          <TabsTrigger value="feed" className={TAB_TRIGGER_CLASS}>New items{recentContent.length > 0 ? ` (${recentContent.length})` : ''}</TabsTrigger>
           <TabsTrigger value="rejections" className={TAB_TRIGGER_CLASS}>Rejections{rejections.length > 0 ? ` (${rejections.length})` : ''}</TabsTrigger>
         </TabsList>
+        <p className="text-[9px] font-mono text-muted-foreground/45 leading-relaxed max-w-2xl">
+          <span className="text-muted-foreground/55">Monitor</span> aggregates serves, costs, and health.
+          <span className="text-muted-foreground/55"> Cache</span> is the companion pregen pool (what can be served to users).
+          <span className="text-muted-foreground/55"> Library</span> is curated long-form content (essays, papers, events).
+          <span className="text-muted-foreground/55"> New items</span> lists the latest rows written to that cache pool (not a full activity log).
+        </p>
 
         {/* Tab 1: Monitor */}
         <TabsContent value="monitor" className="space-y-6 mt-0">
@@ -397,6 +403,9 @@ export default function Admin() {
           {/* Cache Hit Rates */}
           <div className="space-y-2">
             <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">Cache Hit Rates <span className="text-muted-foreground/40 normal-case">(30 days)</span></p>
+            <p className="text-[9px] font-mono text-muted-foreground/45 leading-relaxed">
+              One row per <code className="text-muted-foreground/55">companion_type</code> in serves. Two “Zoom” rows mean timeline zoom vs deep-time zoom are stored as different types.
+            </p>
             <div className="space-y-1.5">
               {cacheHits.map((row, i) => {
                 const pct = row.cache_hit_pct ?? 0;
@@ -426,16 +435,23 @@ export default function Admin() {
           {/* Generation Health */}
           <div className="space-y-2">
             <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">Generation Health <span className="text-muted-foreground/40 normal-case">(30 days)</span></p>
+            <p className="text-[9px] font-mono text-muted-foreground/45 leading-relaxed">
+              Grouped by companion type <strong className="font-normal text-muted-foreground/55">and</strong> model. Multiple rows for the same label mean different Gemini models (e.g. flash vs flash-lite).
+            </p>
             <div className="space-y-1.5">
               {failures.map((row, i) => {
                 const failPct = row.failure_pct ?? 0;
                 const isAlert = failPct > 20;
                 return (
                   <div key={i} className={`rounded-lg border px-3 py-2 ${isAlert ? 'border-destructive/20 bg-destructive/5' : 'border-border/10 bg-card/5'}`}>
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <span className="text-[10px] font-mono text-foreground/80">{label(row.companion_type)}</span>
-                        <span className="text-[9px] text-muted-foreground/50 ml-2">{row.model}</span>
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="min-w-0">
+                        <span className="text-[10px] font-mono text-foreground/80">
+                          {label(row.companion_type)}
+                          {row.model ? (
+                            <span className="text-muted-foreground/50"> · {shortModelName(row.model)}</span>
+                          ) : null}
+                        </span>
                       </div>
                       <span className={`text-[10px] font-mono ${isAlert ? 'text-destructive/70' : 'text-muted-foreground/40'}`}>{failPct.toFixed(1)}% fail</span>
                     </div>
@@ -462,6 +478,9 @@ export default function Admin() {
           {/* User Feedback */}
           <div className="space-y-2">
             <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">User Feedback <span className="text-muted-foreground/40 normal-case">(all time)</span></p>
+            <p className="text-[9px] font-mono text-muted-foreground/45 leading-relaxed">
+              Thumbs from the app; timeline and deep-time zoom feedback are merged into one Zoom Out row.
+            </p>
             <div className="space-y-1.5">
               {feedback.map((row, i) => {
                 const pct = row.approval_pct ?? 0;
@@ -494,6 +513,9 @@ export default function Admin() {
           {/* Sessions Timeline */}
           <div className="space-y-2">
             <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">Recent Sessions</p>
+            <p className="text-[9px] font-mono text-muted-foreground/45 leading-relaxed">
+              Last reflections with companion titles filled in when available. Green chips mean that companion finished loading for that session (Signal is normal when the user has Signal enabled). Serve source (live vs cache) is not shown here.
+            </p>
             <div className="space-y-1.5">
               <FilterRow label="Mood" options={sessionMoodOptions} value={sessionMoodFilter} onChange={setSessionMoodFilter} />
               <FilterRow label="Outcome" options={sessionOutcomeOptions} value={sessionOutcomeFilter} onChange={setSessionOutcomeFilter} />
@@ -618,7 +640,10 @@ export default function Admin() {
           </div>
         </TabsContent>
 
-        <TabsContent value="content" className="mt-0">
+        <TabsContent value="content" className="mt-0 space-y-2">
+          <p className="text-[9px] font-mono text-muted-foreground/50">
+            Companion cache — pregenerated and live-written entries that power Signal, Grounding, History, Zoom, etc. Quality score and used_count indicate how often entries are served.
+          </p>
           <CuratedContentManager entries={cacheEntries} onRefresh={refreshCacheEntries} />
         </TabsContent>
 
@@ -636,7 +661,10 @@ export default function Admin() {
 
         <TabsContent value="feed" className="space-y-3 mt-0">
           <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">
-            Recent Content <span className="text-muted-foreground/45">({recentContent.length})</span>
+            Latest cache writes <span className="text-muted-foreground/45">({recentContent.length})</span>
+          </p>
+          <p className="text-[9px] font-mono text-muted-foreground/50 leading-relaxed">
+            Newest rows in <code className="text-muted-foreground/60">companion_cache</code> (cron pregenerate + live generation). This is not the same as user sessions below — sessions show what each reflection received. Sessions do not show live vs cache vs curated here; that is tracked per serve in analytics.
           </p>
           <FilterRow label="Type" options={feedTypeOptions} value={feedTypeFilter} onChange={setFeedTypeFilter} />
           <p className="text-[9px] font-mono text-muted-foreground/50">
