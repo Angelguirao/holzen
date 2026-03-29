@@ -133,7 +133,7 @@ async function tryServe(
   try {
     let query = svcClient
       .from("companion_cache")
-      .select("id, content, quality_score, used_count, market_regime")
+      .select("id, content, quality_score, used_count, market_regime, source_untrusted")
       .eq("companion_type", params.companionType)
       .eq("language", params.language)
       .gte("quality_score", params.minQuality)
@@ -158,8 +158,12 @@ async function tryServe(
 
     if (pool.length === 0) return null;
 
+    // Prefer rows not marked source_untrusted (admin can keep body but deprioritize attribution)
+    const trusted = pool.filter((d: any) => !d.source_untrusted);
+    const pickPool = trusted.length > 0 ? trusted : pool;
+
     // Random pick from top 3
-    const pick = pool[Math.floor(Math.random() * Math.min(pool.length, 3))];
+    const pick = pickPool[Math.floor(Math.random() * Math.min(pickPool.length, 3))];
     updateServeStats(svcClient, pick.id, pick.used_count, params.now);
     return { data: pick.content, cacheId: pick.id };
   } catch {

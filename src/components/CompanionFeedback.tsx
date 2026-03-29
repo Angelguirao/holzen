@@ -1,8 +1,10 @@
-import { ThumbsUp, ThumbsDown } from 'lucide-react';
+import { ThumbsUp, ThumbsDown, RefreshCw } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { hapticFeedback } from '@/lib/haptics';
 import { FEEDBACK_TO_CACHE_TYPE } from '@/lib/companion-types';
+import type { RegenerateCompanionSlot } from '@/hooks/use-companion-data';
 
 interface Props {
   /** Reflection ID this companion belongs to */
@@ -13,15 +15,31 @@ interface Props {
   cacheId?: string | null;
   /** Compact mode for inline use in library items */
   compact?: boolean;
+  /** AI slot for single-slot regenerate (orchestrate regenerateOnly) */
+  regenerateSlot?: RegenerateCompanionSlot;
+  onRegenerate?: () => void;
+  regenerating?: boolean;
 }
 
 /**
  * Thumbs up/down feedback for companion content.
  * Persists vote state so the user can't vote twice on the same reflection+companion.
  */
-export function CompanionFeedback({ reflectionId, companionType, cacheId, compact }: Props) {
+export function CompanionFeedback({
+  reflectionId,
+  companionType,
+  cacheId,
+  compact,
+  regenerateSlot,
+  onRegenerate,
+  regenerating,
+}: Props) {
+  const { t } = useTranslation();
   const [vote, setVote] = useState<'up' | 'down' | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const canRegenerate = Boolean(reflectionId && regenerateSlot && onRegenerate);
+  const regenBusy = Boolean(regenerating);
 
   // Load existing vote on mount (check if user already voted for this reflection+companion)
   useEffect(() => {
@@ -54,7 +72,7 @@ export function CompanionFeedback({ reflectionId, companionType, cacheId, compac
   }, [reflectionId, companionType]);
 
   const handleVote = async (type: 'up' | 'down') => {
-    if (vote || loading) return;
+    if (vote || loading || regenBusy) return;
     setLoading(true);
     setVote(type);
     hapticFeedback('light');
@@ -84,12 +102,18 @@ export function CompanionFeedback({ reflectionId, companionType, cacheId, compac
     }
   };
 
+  const handleRegenerate = () => {
+    if (!canRegenerate || regenBusy) return;
+    hapticFeedback('light');
+    onRegenerate?.();
+  };
+
   if (compact) {
     return (
       <span className="inline-flex items-center gap-1">
         <button
           onClick={() => handleVote('up')}
-          disabled={!!vote || loading}
+          disabled={!!vote || loading || regenBusy}
           className={`p-0.5 rounded transition-colors ${
             vote === 'up' ? 'text-primary/70' : vote ? 'text-muted-foreground/10' : 'text-muted-foreground/20 hover:text-primary/50'
           }`}
@@ -99,7 +123,7 @@ export function CompanionFeedback({ reflectionId, companionType, cacheId, compac
         </button>
         <button
           onClick={() => handleVote('down')}
-          disabled={!!vote || loading}
+          disabled={!!vote || loading || regenBusy}
           className={`p-0.5 rounded transition-colors ${
             vote === 'down' ? 'text-destructive/70' : vote ? 'text-muted-foreground/10' : 'text-muted-foreground/20 hover:text-destructive/50'
           }`}
@@ -107,16 +131,28 @@ export function CompanionFeedback({ reflectionId, companionType, cacheId, compac
         >
           <ThumbsDown className="h-2.5 w-2.5" />
         </button>
+        {canRegenerate && (
+          <button
+            type="button"
+            onClick={handleRegenerate}
+            disabled={regenBusy}
+            className="p-0.5 rounded transition-colors text-muted-foreground/25 hover:text-primary/50 disabled:opacity-30"
+            aria-label={t('companions.regenerate')}
+            title={t('companions.regenerate')}
+          >
+            <RefreshCw className={`h-2.5 w-2.5 ${regenBusy ? 'animate-spin' : ''}`} />
+          </button>
+        )}
       </span>
     );
   }
 
   return (
-    <div className="flex items-center gap-1.5 mt-2">
-      <span className="text-[9px] text-muted-foreground/30 font-mono">Helpful?</span>
+    <div className="flex flex-wrap items-center gap-x-2 gap-y-1 mt-2">
+      <span className="text-[9px] text-muted-foreground/30 font-mono">{t('companions.helpfulQuestion')}</span>
       <button
         onClick={() => handleVote('up')}
-        disabled={!!vote || loading}
+        disabled={!!vote || loading || regenBusy}
         className={`p-1 rounded transition-colors ${
           vote === 'up'
             ? 'text-primary/70'
@@ -130,7 +166,7 @@ export function CompanionFeedback({ reflectionId, companionType, cacheId, compac
       </button>
       <button
         onClick={() => handleVote('down')}
-        disabled={!!vote || loading}
+        disabled={!!vote || loading || regenBusy}
         className={`p-1 rounded transition-colors ${
           vote === 'down'
             ? 'text-destructive/70'
@@ -143,9 +179,23 @@ export function CompanionFeedback({ reflectionId, companionType, cacheId, compac
         <ThumbsDown className="h-3 w-3" />
       </button>
       {vote && (
-        <span className="text-[9px] text-muted-foreground/30 font-mono ml-1">
-          {vote === 'up' ? 'Thanks!' : 'Noted'}
+        <span className="text-[9px] text-muted-foreground/30 font-mono">
+          {vote === 'up' ? t('companions.feedbackThanksUp') : t('companions.feedbackThanksDown')}
         </span>
+      )}
+      {canRegenerate && (
+        <>
+          <span className="text-[9px] text-muted-foreground/20 font-mono hidden sm:inline">·</span>
+          <button
+            type="button"
+            onClick={handleRegenerate}
+            disabled={regenBusy}
+            className="inline-flex items-center gap-1 text-[9px] font-mono text-muted-foreground/40 hover:text-primary/60 disabled:opacity-40 transition-colors"
+          >
+            <RefreshCw className={`h-3 w-3 ${regenBusy ? 'animate-spin' : ''}`} />
+            {regenBusy ? t('companions.regenerating') : t('companions.regenerate')}
+          </button>
+        </>
       )}
     </div>
   );

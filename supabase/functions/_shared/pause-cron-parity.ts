@@ -142,7 +142,7 @@ export async function fetchSignalSourcesForOrchestrate(
 ): Promise<Array<{ name: string; type: string; url: string }> | undefined> {
   try {
     const [{ data: catalog }, { data: userPrefs }] = await Promise.all([
-      svcClient.from("signal_sources").select("id, name, type, url, category").eq("category", "signal"),
+      svcClient.from("signal_sources").select("id, name, type, url, category").eq("category", "signal").eq("demoted_for_live", false),
       svcClient
         .from("user_signal_preferences")
         .select("source_id, custom_name, custom_url, custom_type, active, category")
@@ -173,7 +173,7 @@ export async function fetchGroundingSourcesForOrchestrate(
 ): Promise<Array<{ name: string; type: string; url: string }> | undefined> {
   try {
     const [{ data: catalog }, { data: userPrefs }] = await Promise.all([
-      svcClient.from("signal_sources").select("id, name, type, url, category").eq("category", "grounding"),
+      svcClient.from("signal_sources").select("id, name, type, url, category").eq("category", "grounding").eq("demoted_for_live", false),
       svcClient
         .from("user_signal_preferences")
         .select("source_id, custom_name, custom_url, custom_type, active, category")
