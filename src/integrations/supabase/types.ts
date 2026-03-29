@@ -1174,8 +1174,10 @@ export type Database = {
           context: string | null
           created_at: string
           grounding_body: string | null
+          grounding_citation: string | null
           grounding_read: boolean
           grounding_title: string | null
+          grounding_url: string | null
           haiku: string | null
           haiku_read: boolean
           history_insight_data: Json | null
@@ -1202,8 +1204,10 @@ export type Database = {
           context?: string | null
           created_at?: string
           grounding_body?: string | null
+          grounding_citation?: string | null
           grounding_read?: boolean
           grounding_title?: string | null
+          grounding_url?: string | null
           haiku?: string | null
           haiku_read?: boolean
           history_insight_data?: Json | null
@@ -1230,8 +1234,10 @@ export type Database = {
           context?: string | null
           created_at?: string
           grounding_body?: string | null
+          grounding_citation?: string | null
           grounding_read?: boolean
           grounding_title?: string | null
+          grounding_url?: string | null
           haiku?: string | null
           haiku_read?: boolean
           history_insight_data?: Json | null
