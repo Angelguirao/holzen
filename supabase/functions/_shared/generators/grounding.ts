@@ -9,9 +9,10 @@
  */
 
 import { qualityGate, containsSlop, isUrlReachable, contentFingerprint } from "../quality.ts";
-import { GROUNDING_FALLBACKS, pickRandom } from "../fallbacks.ts";
+import { loadFallbackPool, pickRandom } from "../fallbacks.ts";
 import { parseMarketDirection, serveFromCache } from "../cache.ts";
 import { createAttemptLogger } from "../observe.ts";
+import { enqueueCatalogSourceSuggestion } from "../source-suggestions.ts";
 import { callPerplexityChat, mergePerplexityUsage } from "../perplexity-client.ts";
 import { searchLibrary, paperToGrounding, recordLibraryServe } from "../content-library.ts";
 
@@ -38,6 +39,7 @@ export interface GenerateGroundingParams {
   /** Past nudge titles to avoid duplicating angles (typically `recentNudgeTopics` from orchestrator). */
   recentGroundingTitles?: string[];
   userId?: string;
+  reflectionId?: string | null;
   preferredBias?: string;
   log: (msg: string, extra?: Record<string, unknown>) => void;
 }
@@ -107,7 +109,8 @@ async function serveFallback(
   }
   const cached = await serveFromCache(svcClient, "ground_nudge", "en", { userId, marketDirection, excludeIds });
   if (cached) return { data: cached.data, source: "cache", cacheId: cached.cacheId };
-  return { data: pickRandom(GROUNDING_FALLBACKS), source: "curated", cacheId: null };
+  const pool = await loadFallbackPool<{ title: string; body: string; citation: string; url: string }>(svcClient, "grounding");
+  return { data: pickRandom(pool), source: "curated", cacheId: null };
 }
 
 // ── Public entry point ──
@@ -121,6 +124,7 @@ export async function generateGrounding(params: GenerateGroundingParams): Promis
     recentGroundingSources,
     recentGroundingTitles,
     userId,
+    reflectionId,
     preferredBias,
     log,
   } = params;
@@ -433,6 +437,16 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
       log(`cache write failed: ${e}`);
     }
   }
+
+  const suggestName =
+    (nudge.citation && nudge.citation.split("(")[0]?.trim()) ||
+    nudge.title;
+  void enqueueCatalogSourceSuggestion(svcClient, {
+    category: "grounding",
+    name: suggestName,
+    url: nudge.url,
+    reflectionId,
+  });
 
   // ── Step 6: Background URL validation (fire-and-forget) ──
   if (nudge.url && nudge.url.startsWith("http")) {

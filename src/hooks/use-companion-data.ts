@@ -2,7 +2,10 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { hapticFeedback } from '@/lib/haptics';
 import { useHolzen } from '@/hooks/use-holzen';
+import { useToast } from '@/hooks/use-toast';
 import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
+
+export type RegenerateCompanionSlot = 'signal' | 'grounding' | 'history' | 'zoomOut';
 
 // ── Intervention types (new pause flow) ──────────────────────────────────────
 
@@ -92,6 +95,7 @@ function hostnameFromUrl(url: string | undefined): string {
 
 export function useCompanionData({ companions, prefs, reflectionId, context, reflectionMessage, mood, severityNumber }: UseCompanionDataParams) {
   const { language } = useHolzen();
+  const { toast } = useToast();
 
   // ── Favorites ──
   const [favorites, setFavorites] = useState<Record<string, boolean>>({});
@@ -341,7 +345,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       const userId = authData?.user?.id;
       if (!userId) return undefined;
       const [{ data: catalog }, { data: userPrefs }] = await Promise.all([
-        supabase.from('signal_sources').select('id, name, type, url, category').eq('category', 'signal'),
+        supabase.from('signal_sources').select('id, name, type, url, category').eq('category', 'signal').eq('demoted_for_live', false),
         supabase.from('user_signal_preferences').select('source_id, custom_name, custom_url, custom_type, active, category').eq('user_id', userId).eq('category', 'signal'),
       ]);
       const prefsMap = new Map((userPrefs ?? []).map((p: any) => [p.source_id, p]));
@@ -363,7 +367,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       const userId = authData?.user?.id;
       if (!userId) return undefined;
       const [{ data: catalog }, { data: userPrefs }] = await Promise.all([
-        supabase.from('signal_sources').select('id, name, type, url, category').eq('category', 'grounding'),
+        supabase.from('signal_sources').select('id, name, type, url, category').eq('category', 'grounding').eq('demoted_for_live', false),
         supabase.from('user_signal_preferences').select('source_id, custom_name, custom_url, custom_type, active, category').eq('user_id', userId).eq('category', 'grounding'),
       ]);
       const prefsMap = new Map((userPrefs ?? []).map((p: any) => [p.source_id, p]));
@@ -624,6 +628,120 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
   /** Re-run companion-orchestrate (intervention + all companion slots). */
   const retryOrchestrate = useCallback(() => { setRetryCount(c => c + 1); }, []);
 
+  const regenerateCompanion = useCallback(async (slot: RegenerateCompanionSlot) => {
+    if (!reflectionId) return;
+    const setLoading = (v: boolean) => {
+      if (slot === 'signal') setSignalLoading(v);
+      else if (slot === 'grounding') setNudgeLoading(v);
+      else if (slot === 'history') setHistoryLoading(v);
+      else setZoomOutLoading(v);
+    };
+    const setErr = (v: boolean) => {
+      if (slot === 'signal') setSignalError(v);
+      else if (slot === 'grounding') setNudgeError(v);
+      else if (slot === 'history') setHistoryError(v);
+      else setZoomOutError(v);
+    };
+    setLoading(true);
+    setErr(false);
+    try {
+      const recency = getRecencyHints();
+      const signalSources = slot === 'signal' ? await getSignalSources() : undefined;
+      const groundingSources = slot === 'grounding' ? await getGroundingSources() : undefined;
+      let moodHistory: Array<{ mood: string; outcome?: string | null }> = [];
+      try {
+        const { data: authData } = await supabase.auth.getUser();
+        const uid = authData?.user?.id;
+        if (uid) {
+          const { data: recentRows } = await supabase
+            .from('reflections')
+            .select('mood, outcome')
+            .eq('user_id', uid)
+            .not('mood', 'is', null)
+            .order('created_at', { ascending: false })
+            .limit(20);
+          if (recentRows) {
+            moodHistory = recentRows
+              .filter((r: any) => r.mood)
+              .map((r: any) => ({ mood: r.mood, outcome: r.outcome ?? null }));
+          }
+        }
+      } catch { /* non-fatal */ }
+
+      const { data, error: fnError } = await supabase.functions.invoke('companion-orchestrate', {
+        body: {
+          reflectionId,
+          regenerateOnly: slot,
+          context: context ?? '',
+          language,
+          reflectionMessage: reflectionMessage ?? '',
+          mood: mood ?? null,
+          severity: severityNumber ?? 0,
+          moodHistory,
+          signalSources,
+          groundingSources,
+          ...recency,
+        },
+      });
+
+      const body = data as Record<string, unknown> | null;
+      const payloadError = !!fnError || !body || Boolean(body.error);
+      if (payloadError) {
+        const msg = typeof body?.error === 'string' ? body.error : fnError?.message ?? 'Regenerate failed';
+        toast({ title: 'Regenerate failed', description: msg, variant: 'destructive' });
+        setErr(true);
+        return;
+      }
+
+      if (slot === 'signal') {
+        const r = body.signal as CompanionResult | null;
+        if (r?.data && r.source !== 'empty') {
+          setSignal(r.data as SignalData);
+          if (r.cacheId) setCacheIds(prev => ({ ...prev, signal: r.cacheId }));
+          updateRecencyHints('signal_title', r.data.title);
+          updateRecencyHints('signal_source', r.data.source);
+          autoSaveToLibrary({ title: r.data.title, body: r.data.body, sourceType: 'signal', sourceUrl: r.data.url });
+        } else setErr(true);
+      } else if (slot === 'grounding') {
+        const r = body.grounding as CompanionResult | null;
+        if (r?.data && r.source !== 'empty') {
+          setNudge(r.data as NudgeData);
+          if (r.cacheId) setCacheIds(prev => ({ ...prev, nudge: r.cacheId }));
+          updateRecencyHints('grounding', r.data.title);
+          const gHost = hostnameFromUrl(r.data.url);
+          if (gHost) updateRecencyHints('grounding_source', gHost);
+          autoSaveToLibrary({ title: r.data.title, body: r.data.body, sourceType: 'grounding', sourceUrl: r.data.url });
+        } else setErr(true);
+      } else if (slot === 'history') {
+        const r = body.history as CompanionResult | null;
+        if (r?.data && r.source !== 'empty') {
+          setHistoryInsight(r.data as HistoricalInsightData);
+          if (r.cacheId) setCacheIds(prev => ({ ...prev, history: r.cacheId }));
+          updateRecencyHints('history', r.data.title);
+          autoSaveToLibrary({ title: r.data.title, body: r.data.btcInsight, sourceType: 'history_insight' });
+        } else setErr(true);
+      } else {
+        const r = body.zoomOut as CompanionResult | null;
+        if (r?.data && r.source !== 'empty') {
+          setZoomOut(r.data);
+          if (r.cacheId) setCacheIds(prev => ({ ...prev, zoomOut: r.cacheId }));
+          updateRecencyHints('zoomOut', r.data?.deepTime?.title);
+          const zoomBody = r.data?.deepTime?.body || r.data?.echo?.message || 'Zoom Out perspective';
+          autoSaveToLibrary({ title: r.data?.deepTime?.title || 'Zoom Out', body: zoomBody, sourceType: 'zoom_out' });
+        } else setErr(true);
+      }
+    } catch (e) {
+      console.error('[useCompanionData] regenerateCompanion', e);
+      toast({ title: 'Regenerate failed', description: 'Network error', variant: 'destructive' });
+      setErr(true);
+    } finally {
+      setLoading(false);
+    }
+  }, [
+    reflectionId, context, reflectionMessage, mood, severityNumber, language,
+    getRecencyHints, getSignalSources, getGroundingSources, toast, autoSaveToLibrary, updateRecencyHints,
+  ]);
+
   return {
     favorites,
     toggleCompanionFavorite,
@@ -636,5 +754,6 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     historyInsight, historyLoading, historyError, retryHistory,
     intervention, interventionLoading, interventionError,
     retryOrchestrate,
+    regenerateCompanion,
   };
 }

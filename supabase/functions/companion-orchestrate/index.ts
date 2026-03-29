@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { checkRateLimit, checkDailyBudget } from "../_shared/ratelimit.ts";
+import { handleRegenerateOnly } from "../_shared/regenerate-only.ts";
 import { createLogger } from "../_shared/observe.ts";
 import { writeCompanionData } from "../_shared/companion-data.ts";
 import { generateSignal, PROMPT_VERSION as SIGNAL_VERSION } from "../_shared/generators/signal.ts";
@@ -120,6 +121,22 @@ serve(async (req) => {
     const svcClient = createClient(sbUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "", {
       auth: { persistSession: false },
     });
+
+    const regenerateOnly = body.regenerateOnly as string | undefined;
+    if (
+      regenerateOnly === "signal" ||
+      regenerateOnly === "grounding" ||
+      regenerateOnly === "history" ||
+      regenerateOnly === "zoomOut"
+    ) {
+      return await handleRegenerateOnly({
+        slot: regenerateOnly,
+        userId,
+        svcClient,
+        body,
+        log,
+      });
+    }
 
     // ── Per-user rate limit check ──
     const rateLimit = await checkRateLimit(svcClient, userId, 60, 30);
@@ -278,6 +295,7 @@ serve(async (req) => {
           recentGroundingSources: recentGroundingSources as string[] | undefined,
           recentGroundingTitles: recentNudgeTopics as string[] | undefined,
           userId,
+          reflectionId: typeof reflectionId === "string" ? reflectionId : null,
           log,
           preferredBias: intent.groundingBias,
         });
@@ -302,7 +320,18 @@ serve(async (req) => {
     if (enableSignal) {
       tasks.signal = (async (): Promise<CompanionResult> => {
         const t = Date.now();
-        const result = await generateSignal({ svcClient, context, language, sources: signalSources, recentSignalSources, recentSignalTitles, userId, log, searchAngle: intent.signalAngle });
+        const result = await generateSignal({
+          svcClient,
+          context,
+          language,
+          sources: signalSources,
+          recentSignalSources,
+          recentSignalTitles,
+          userId,
+          reflectionId: typeof reflectionId === "string" ? reflectionId : null,
+          log,
+          searchAngle: intent.signalAngle,
+        });
         return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t, promptVersion: SIGNAL_VERSION };
       })();
     }

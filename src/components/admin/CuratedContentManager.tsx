@@ -73,6 +73,15 @@ export function CuratedContentManager({ entries, onRefresh }: { entries: CacheEn
     setActing(null);
   }, [onRefresh, toast]);
 
+  /** Keep row in pool but deprioritize for cache picks (attribution treated as untrusted server-side). */
+  const setSourceUntrusted = useCallback(async (id: string, untrusted: boolean) => {
+    setActing(id);
+    const { error } = await supabase.from('companion_cache').update({ source_untrusted: untrusted } as any).eq('id', id);
+    if (error) { toast({ title: 'Update failed', description: error.message, variant: 'destructive' }); setActing(null); return; }
+    await onRefresh();
+    setActing(null);
+  }, [onRefresh, toast]);
+
   const remove = useCallback(async (id: string) => {
     if (!window.confirm('Delete this cache entry? This cannot be undone.')) return;
     setActing(id);
@@ -125,21 +134,31 @@ export function CuratedContentManager({ entries, onRefresh }: { entries: CacheEn
     <div className="space-y-3">
       <div className="rounded-xl border border-border/20 bg-card/10 px-4 py-3 space-y-2">
         <p className="text-[10px] font-mono text-foreground/70">
-          Content that AI generates gets cached here. You can manage its lifecycle:
+          Pregen pool (<code className="text-muted-foreground/60">companion_cache</code>). When live AI generation fails or skips, Signal / Grounding / History try the <strong className="font-normal text-muted-foreground/65">Library</strong> tab first, then this pool, then tiny hardcoded fallbacks (those show as “curated” in Monitor serve counts, not here).
         </p>
+        <p className="text-[9px] text-muted-foreground/55 leading-relaxed">
+          Order for those companions: <span className="text-muted-foreground/70">live</span> → <span className="text-muted-foreground/70">Library</span> → <span className="text-muted-foreground/70">this cache</span> → <span className="text-muted-foreground/70">hardcoded</span>. Manage long-form curated pieces under Library; manage pool rows here; edit last-resort strings under the <strong className="font-normal text-muted-foreground/65">Fallbacks</strong> tab.
+        </p>
+        <p className="text-[10px] font-mono text-foreground/70">Lifecycle actions:</p>
         <div className="space-y-1">
           <p className="text-[9px] text-muted-foreground/60">
-            <span className="text-emerald-600 dark:text-emerald-400 font-mono">↑ Promote</span> — Makes content permanent (never expires). Best content gets served as fallback when AI is down.
+            <span className="text-emerald-600 dark:text-emerald-400 font-mono">↑ Promote</span> — quality 3, no expiry. Preferred within this pool.
           </p>
           <p className="text-[9px] text-muted-foreground/60">
-            <span className="text-orange-600 dark:text-orange-400 font-mono">↓ Demote</span> — Lowers quality score and sets 7-day expiry. For content that isn't good enough.
+            <span className="text-orange-600 dark:text-orange-400 font-mono">↓ Demote</span> — quality 1 and 7-day expiry.
           </p>
           <p className="text-[9px] text-muted-foreground/60">
-            <span className="text-destructive font-mono">🗑 Delete</span> — Permanently removes from cache.
+            <span className="text-destructive font-mono">🗑 Delete</span> — remove this pool row (does not delete reflections or Library entries).
           </p>
         </div>
         <p className="text-[9px] text-muted-foreground/50">
-          Quality badges: <span className="text-emerald-600 dark:text-emerald-400">curated</span> = permanent, <span className="text-blue-600 dark:text-blue-400">good</span> = verified URL, <span className="text-orange-600 dark:text-orange-400">low</span> = unverified
+          Badge <span className="text-emerald-600 dark:text-emerald-400">curated</span> here = score ≥3 in this table. That is unrelated to the Monitor “curated” serve counter (hardcoded fallbacks).
+        </p>
+        <p className="text-[9px] text-muted-foreground/50">
+          Also: <span className="text-blue-600 dark:text-blue-400">good</span> = score 2, <span className="text-orange-600 dark:text-orange-400">low</span> = score 1.
+        </p>
+        <p className="text-[9px] text-muted-foreground/55 leading-relaxed">
+          <span className="font-mono text-amber-600/90 dark:text-amber-400/90">Untrusted attribution</span> — keeps the cached body in the pool but makes the edge prefer other rows first when filling from cache (no delete).
         </p>
       </div>
 
@@ -195,6 +214,11 @@ export function CuratedContentManager({ entries, onRefresh }: { entries: CacheEn
                         <p className="text-[10px] font-mono text-foreground/70 truncate">{entry.title || '(untitled)'}</p>
                         <div className="flex flex-wrap items-center gap-2 mt-0.5">
                           <QualityBadge score={entry.quality_score} />
+                          {entry.source_untrusted && (
+                            <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-700/90 dark:text-amber-400/90">
+                              untrusted attr.
+                            </span>
+                          )}
                           {isPermanent && <span className="text-[9px] font-mono text-muted-foreground/40">♾ permanent</span>}
                           {!isPermanent && entry.expires_at && (
                             <span className="text-[9px] font-mono text-muted-foreground/30">
@@ -227,6 +251,14 @@ export function CuratedContentManager({ entries, onRefresh }: { entries: CacheEn
                           <ArrowDown className="h-2.5 w-2.5" /> Demote
                         </button>
                       )}
+                      <button
+                        type="button"
+                        onClick={() => setSourceUntrusted(entry.id, !entry.source_untrusted)}
+                        disabled={isActing}
+                        className="flex items-center gap-0.5 text-[9px] font-mono text-amber-600/70 dark:text-amber-400/70 hover:text-amber-600 dark:hover:text-amber-400 disabled:opacity-30 transition-colors"
+                      >
+                        {entry.source_untrusted ? 'Trust attribution' : 'Untrusted attribution'}
+                      </button>
                       <button onClick={() => remove(entry.id)} disabled={isActing}
                         className="flex items-center gap-0.5 text-[9px] font-mono text-destructive/50 hover:text-destructive/80 disabled:opacity-30 transition-colors">
                         <Trash2 className="h-2.5 w-2.5" /> Delete

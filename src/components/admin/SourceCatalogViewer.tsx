@@ -92,6 +92,12 @@ export function SourceCatalogViewer({ sources, onRefresh, libraryEntries = [] }:
     onRefresh();
   };
 
+  const setDemotedForLive = async (id: string, demoted: boolean) => {
+    const { error } = await supabase.from('signal_sources').update({ demoted_for_live: demoted } as any).eq('id', id);
+    if (error) { toast({ title: 'Update failed', description: error.message, variant: 'destructive' }); return; }
+    onRefresh();
+  };
+
   const bulkDeleteSources = useCallback(async () => {
     const ids = idsShown.filter((id) => selectedIds.has(id));
     if (ids.length === 0) return;
@@ -119,14 +125,20 @@ export function SourceCatalogViewer({ sources, onRefresh, libraryEntries = [] }:
     <div className="space-y-3">
       <div className="rounded-xl border border-border/20 bg-card/10 px-4 py-3 space-y-2">
         <p className="text-[10px] font-mono text-foreground/70">
-          Sources the AI searches when generating Signal and Grounding companions.
+          Catalog for <strong className="font-normal text-muted-foreground/75">live</strong> generation: names/URLs the edge functions pass into web search (e.g. Perplexity) when building Signal and Grounding answers.
+        </p>
+        <p className="text-[9px] text-muted-foreground/55 leading-relaxed">
+          This is <strong className="font-normal text-muted-foreground/65">not</strong> the <strong className="font-normal text-muted-foreground/65">Library</strong> tab. Library rows are full essays/papers/events matched by author for <strong className="font-normal text-muted-foreground/65">fallback</strong> when live generation does not produce a body. Sources here shape what the model can cite while it is still “live.”
+        </p>
+        <p className="text-[9px] text-muted-foreground/55 leading-relaxed">
+          <span className="font-mono text-muted-foreground/70">Demoted from live</span> — row stays in the catalog but edge functions stop passing it into live web search until you restore it (no delete).
         </p>
         <div className="space-y-1">
           <p className="text-[9px] text-muted-foreground/60">
-            <span className="font-mono font-medium">signal</span> sources — Bitcoin thinkers, essayists, publications for philosophical insights
+            <span className="font-mono font-medium">signal</span> — thinkers, essayists, publications (philosophical angle)
           </p>
           <p className="text-[9px] text-muted-foreground/60">
-            <span className="font-mono font-medium">grounding</span> sources — Academic researchers, behavioral finance journals
+            <span className="font-mono font-medium">grounding</span> — research-oriented / behavioral finance style sources
           </p>
         </div>
       </div>
@@ -202,6 +214,7 @@ export function SourceCatalogViewer({ sources, onRefresh, libraryEntries = [] }:
                         });
                       }}
                       disabled={bulkBusy}
+                      onClick={(e) => e.stopPropagation()}
                     />
                     <div className="flex-1 min-w-0">
                       <p className="text-[10px] font-mono text-foreground/80 truncate">{src.name}</p>
@@ -218,6 +231,11 @@ export function SourceCatalogViewer({ sources, onRefresh, libraryEntries = [] }:
                             <BookOpen className="h-2.5 w-2.5 inline mr-0.5" />{libCount} in library
                           </span>
                         )}
+                        {src.demoted_for_live && (
+                          <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full bg-orange-500/15 text-orange-700/85 dark:text-orange-400/85">
+                            demoted from live
+                          </span>
+                        )}
                         {src.url && (
                           <a href={src.url} target="_blank" rel="noopener noreferrer"
                             className="text-[9px] text-primary/60 hover:text-primary flex items-center gap-0.5 truncate transition-colors">
@@ -227,10 +245,22 @@ export function SourceCatalogViewer({ sources, onRefresh, libraryEntries = [] }:
                         )}
                       </div>
                     </div>
-                    <button onClick={() => deleteSource(src.id, src.name)}
-                      className="text-destructive/40 hover:text-destructive transition-colors flex-shrink-0" title="Remove source">
-                      <Trash2 className="h-3 w-3" />
-                    </button>
+                    <div className="flex flex-col items-end gap-1 shrink-0">
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); setDemotedForLive(src.id, !src.demoted_for_live); }}
+                        className="text-[9px] font-mono text-orange-600/70 dark:text-orange-400/70 hover:text-orange-600 dark:hover:text-orange-400 transition-colors text-right"
+                      >
+                        {src.demoted_for_live ? 'Restore to live' : 'Demote from live'}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={(e) => { e.stopPropagation(); deleteSource(src.id, src.name); }}
+                        className="text-destructive/40 hover:text-destructive transition-colors" title="Remove source"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </button>
+                    </div>
                   </div>
                 );
               })}
