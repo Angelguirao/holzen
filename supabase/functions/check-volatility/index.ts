@@ -494,8 +494,6 @@ serve(async (req) => {
           haiku,
           grounding_title: null,
           grounding_body: null,
-          grounding_citation: null,
-          grounding_url: null,
           ...(lastReportedMood ? { mood: lastReportedMood } : {}),
         })
         .select("id")

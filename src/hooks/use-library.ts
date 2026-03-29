@@ -115,7 +115,7 @@ export function useLibrary() {
     );
     const { data: allReflections } = await supabase
       .from('reflections')
-      .select('id, message, context, created_at, outcome, haiku, haiku_read, grounding_read, signal_read, zoom_out_read, history_read')
+      .select('id, message, context, created_at, outcome, haiku, haiku_read, grounding_read')
       .eq('user_id', user.id)
       .order('created_at', { ascending: false });
 
@@ -142,12 +142,18 @@ export function useLibrary() {
       const incomplete = new Set<string>();
       const outcomes: Record<string, string> = {};
       for (const r of allReflections as any[]) {
+        // Get read flags from reflection_companions for this reflection
+        const companions = companionMap.get(r.id) ?? [];
+        const companionReadMap: Record<string, boolean> = {};
+        for (const c of companions) {
+          companionReadMap[c.companion_type] = c.read ?? false;
+        }
         flags[r.id] = {
           haiku_read: !!r.haiku_read,
           grounding_read: !!r.grounding_read,
-          signal_read: !!r.signal_read,
-          zoom_out_read: !!r.zoom_out_read,
-          history_read: !!r.history_read,
+          signal_read: companionReadMap['signal'] ?? false,
+          zoom_out_read: companionReadMap['zoom_out'] ?? companionReadMap['zoom_out_deep_time'] ?? false,
+          history_read: companionReadMap['historical_insight'] ?? false,
         };
         if (!r.outcome) incomplete.add(r.id);
         if (r.outcome) outcomes[r.id] = r.outcome;
