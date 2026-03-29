@@ -445,8 +445,8 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
                 {reason === 'too_repetitive' && t('letter.validationTooRepetitive')}
               </p>
             );
-          })()
-          )}
+          })()}
+
           <div className="flex items-center justify-between">
             <p className="text-[10px] text-muted-foreground/40">
               {body.length}/{FUTURE_LETTER_MAX_CHARS}
