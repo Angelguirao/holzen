@@ -235,40 +235,10 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
         </CompanionCard>
       )}
 
-      {hasGrounding && (
-        <CompanionCard
-          id="grounding"
-          label={labels.ground}
-          icon={COMPANION_ICONS.grounding}
-          expanded={expandedLearning}
-          onToggle={() => {
-            setExpandedLearning((v) => !v);
-            if (!completion.grounding) markCompleted('grounding');
-          }}
-          completed={completion.grounding}
-          loading={nudgeLoading}
-          isFavorite={isPro ? favorites['grounding'] : undefined}
-          onToggleFavorite={isPro ? () => toggleCompanionFavorite('grounding') : undefined}
-        >
-          <LearningInput
-            title={companions.groundingTitle ?? ''}
-            body={companions.groundingBody ?? ''}
-            nudge={nudge}
-            nudgeLoading={nudgeLoading}
-            nudgeError={nudgeError}
-            onRetry={retryNudge}
-          />
-          {nudge && (
-            <CompanionFeedback
-              reflectionId={reflectionId}
-              companionType="grounding"
-              cacheId={cacheIds.nudge}
-              regenerateSlot="grounding"
-              onRegenerate={() => regenerateCompanion('grounding')}
-              regenerating={nudgeLoading}
-            />
-          )}
-        </CompanionCard>
+      {hasHaiku && hasSignal && (
+        <p className="text-[10px] font-mono text-muted-foreground/40 text-center leading-relaxed px-1 -mt-1 mb-0.5">
+          {i18nT('companions.reflectOrderHint')}
+        </p>
       )}
 
       {hasSignal && (
@@ -300,6 +270,42 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
               regenerateSlot="signal"
               onRegenerate={() => regenerateCompanion('signal')}
               regenerating={signalLoading}
+            />
+          )}
+        </CompanionCard>
+      )}
+
+      {hasGrounding && (
+        <CompanionCard
+          id="grounding"
+          label={labels.ground}
+          icon={COMPANION_ICONS.grounding}
+          expanded={expandedLearning}
+          onToggle={() => {
+            setExpandedLearning((v) => !v);
+            if (!completion.grounding) markCompleted('grounding');
+          }}
+          completed={completion.grounding}
+          loading={nudgeLoading}
+          isFavorite={isPro ? favorites['grounding'] : undefined}
+          onToggleFavorite={isPro ? () => toggleCompanionFavorite('grounding') : undefined}
+        >
+          <LearningInput
+            title={companions.groundingTitle ?? ''}
+            body={companions.groundingBody ?? ''}
+            nudge={nudge}
+            nudgeLoading={nudgeLoading}
+            nudgeError={nudgeError}
+            onRetry={retryNudge}
+          />
+          {nudge && (
+            <CompanionFeedback
+              reflectionId={reflectionId}
+              companionType="grounding"
+              cacheId={cacheIds.nudge}
+              regenerateSlot="grounding"
+              onRegenerate={() => regenerateCompanion('grounding')}
+              regenerating={nudgeLoading}
             />
           )}
         </CompanionCard>
