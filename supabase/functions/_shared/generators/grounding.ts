@@ -12,6 +12,7 @@ import { qualityGate, containsSlop, isUrlReachable, contentFingerprint } from ".
 import { GROUNDING_FALLBACKS, pickRandom } from "../fallbacks.ts";
 import { parseMarketDirection, serveFromCache } from "../cache.ts";
 import { createAttemptLogger } from "../observe.ts";
+import { callPerplexityChat, mergePerplexityUsage } from "../perplexity-client.ts";
 import { searchLibrary, paperToGrounding, recordLibraryServe } from "../content-library.ts";
 
 /** Bump when the search query, structuring prompt, or quality rules change. */
@@ -109,39 +110,6 @@ async function serveFallback(
   return { data: pickRandom(GROUNDING_FALLBACKS), source: "curated", cacheId: null };
 }
 
-async function callPerplexity(
-  pBody: any,
-  apiKey: string,
-  log: GenerateGroundingParams["log"],
-): Promise<{ content: string; citations: string[] }> {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 10_000);
-  try {
-    const res = await fetch("https://api.perplexity.ai/chat/completions", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify(pBody),
-      signal: controller.signal,
-    });
-    clearTimeout(timeout);
-    log(`perplexity responded ${res.status}`);
-    if (!res.ok) {
-      const errText = await res.text();
-      console.error("Perplexity error:", res.status, errText);
-      if (res.status === 429) throw new Error("RATE_LIMITED");
-      throw new Error(`Perplexity ${res.status}`);
-    }
-    const data = await res.json();
-    return {
-      content: data.choices?.[0]?.message?.content || "",
-      citations: data.citations || [],
-    };
-  } catch (e) {
-    clearTimeout(timeout);
-    throw e;
-  }
-}
-
 // ── Public entry point ──
 
 export async function generateGrounding(params: GenerateGroundingParams): Promise<GroundingResult> {
@@ -225,8 +193,17 @@ DIVERSITY: Use a different journal/venue angle when possible. Do not recycle the
     ...(sourceUrls.length > 0 ? { search_domain_filter: sourceUrls.slice(0, 5) } : {}),
   };
 
+  let perplexityApiCalls = 0;
+  let perplexityMerged = undefined as ReturnType<typeof mergePerplexityUsage>;
+
+  const perplexityT0 = Date.now();
   try {
-    let result = await callPerplexity(perplexityBody, PERPLEXITY_API_KEY, log);
+    let apiCalls = 0;
+    let mergedUsage = undefined as ReturnType<typeof mergePerplexityUsage>;
+
+    let result = await callPerplexityChat(perplexityBody, PERPLEXITY_API_KEY, (m) => log(m));
+    apiCalls++;
+    mergedUsage = result.usage;
     searchContent = result.content;
     citations = result.citations;
     log(`content length: ${searchContent.length}, citations: ${citations.length}`);
@@ -236,7 +213,9 @@ DIVERSITY: Use a different journal/venue angle when possible. Do not recycle the
       const retryBody = { ...perplexityBody };
       delete retryBody.search_domain_filter;
       try {
-        const retry = await callPerplexity(retryBody, PERPLEXITY_API_KEY, log);
+        const retry = await callPerplexityChat(retryBody, PERPLEXITY_API_KEY, (m) => log(m));
+        apiCalls++;
+        mergedUsage = mergePerplexityUsage(mergedUsage, retry.usage);
         if (retry.citations.length > 0) {
           searchContent = retry.content;
           citations = retry.citations;
@@ -244,16 +223,48 @@ DIVERSITY: Use a different journal/venue angle when possible. Do not recycle the
         }
       } catch { log("retry failed, using original content"); }
     }
+
+    perplexityApiCalls = apiCalls;
+    perplexityMerged = mergedUsage;
   } catch (e) {
     log(`perplexity failed: ${e}`);
-    logAttempt({ companion_type: "ground_nudge", provider: "perplexity", model: "sonar-pro", status: String(e).includes("RATE_LIMITED") ? "rate_limited" : "error", latency_ms: 0, error_message: String(e) });
+    logAttempt({
+      companion_type: "ground_nudge",
+      provider: "perplexity",
+      model: "sonar-pro",
+      status: String(e).includes("RATE_LIMITED") ? "rate_limited" : "error",
+      latency_ms: Date.now() - perplexityT0,
+      error_message: String(e),
+      api_requests: 1,
+    });
     return serveFallback(svcClient, userId, marketDirectionForCache);
   }
 
   if (!searchContent) {
-    logAttempt({ companion_type: "ground_nudge", provider: "perplexity", model: "sonar-pro", status: "error", latency_ms: 0, error_message: "empty_search_content" });
+    logAttempt({
+      companion_type: "ground_nudge",
+      provider: "perplexity",
+      model: "sonar-pro",
+      status: "error",
+      latency_ms: Date.now() - perplexityT0,
+      error_message: "empty_search_content",
+      input_tokens: perplexityMerged?.prompt_tokens,
+      output_tokens: perplexityMerged?.completion_tokens,
+      api_requests: perplexityApiCalls || 1,
+    });
     return serveFallback(svcClient, userId, marketDirectionForCache);
   }
+
+  logAttempt({
+    companion_type: "ground_nudge",
+    provider: "perplexity",
+    model: "sonar-pro",
+    status: "success",
+    latency_ms: Date.now() - perplexityT0,
+    input_tokens: perplexityMerged?.prompt_tokens,
+    output_tokens: perplexityMerged?.completion_tokens,
+    api_requests: perplexityApiCalls,
+  });
 
   // ── Step 2: AI structuring ──
   log("calling AI structuring");

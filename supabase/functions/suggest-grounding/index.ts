@@ -1,5 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { sanitizePromptArray } from "../_shared/sanitize.ts";
+import { createAttemptLogger } from "../_shared/observe.ts";
+import { callPerplexityChat, type PerplexityUsage } from "../_shared/perplexity-client.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -7,40 +9,32 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-async function searchRecentArticle(activity: string, langCode: string): Promise<{ title: string; url: string; snippet: string } | null> {
+async function searchRecentArticle(
+  activity: string,
+  _langCode: string,
+): Promise<{ title: string; url: string; snippet: string; usage?: PerplexityUsage; searchMs: number } | null> {
   const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
   if (!PERPLEXITY_API_KEY) return null;
 
+  const t0 = Date.now();
   try {
     const query = `latest interesting discovery or technique about "${activity}" for wellbeing or mindfulness`;
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 10000);
-    const response = await fetch("https://api.perplexity.ai/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${PERPLEXITY_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+    const result = await callPerplexityChat(
+      {
         model: "sonar",
         messages: [
           { role: "system", content: "Return a single recent, interesting finding or article about the given activity. Be concise — 1-2 sentences max." },
           { role: "user", content: query },
         ],
         search_recency_filter: "month",
-      }),
-      signal: controller.signal,
-    });
-    clearTimeout(timeout);
-
-    if (!response.ok) {
-      console.error("Perplexity error:", response.status);
-      return null;
-    }
-
-    const data = await response.json();
-    const content = data.choices?.[0]?.message?.content || "";
-    const citations = data.citations || [];
+      },
+      PERPLEXITY_API_KEY,
+      () => {},
+      10_000,
+    );
+    const searchMs = Date.now() - t0;
+    const content = result.content;
+    const citations = result.citations || [];
     const firstCitation = citations[0] || null;
 
     if (content && firstCitation) {
@@ -48,9 +42,13 @@ async function searchRecentArticle(activity: string, langCode: string): Promise<
         title: activity,
         url: firstCitation,
         snippet: content.slice(0, 300),
+        usage: result.usage,
+        searchMs,
       };
     }
-    return content ? { title: activity, url: "", snippet: content.slice(0, 300) } : null;
+    return content
+      ? { title: activity, url: "", snippet: content.slice(0, 300), usage: result.usage, searchMs }
+      : null;
   } catch (e) {
     if (e instanceof DOMException && e.name === "AbortError") {
       console.warn("[suggest-grounding] Perplexity search timed out for:", activity);
@@ -81,8 +79,10 @@ serve(async (req) => {
     const sbAnon = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
     const sbUser = createClient(sbUrl, sbAnon, { global: { headers: { Authorization: authHeader } } });
     const { data: { user } } = await sbUser.auth.getUser();
+    let logAttempt: ReturnType<typeof createAttemptLogger> | null = null;
     if (user) {
       const svcClient = createClient(sbUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "", { auth: { persistSession: false } });
+      logAttempt = createAttemptLogger(svcClient, { userId: user.id });
       try { await svcClient.from("analytics_events").insert({ user_id: user.id, event: "suggest_grounding_ai_call" }); } catch (_) { /* non-fatal */ }
     }
 
@@ -130,6 +130,7 @@ Rules:
     const userPrompt = `${context ? `Market context: ${context}\n` : ""}${mood ? `Current mood: ${mood}\n` : ""}${severity ? `Severity: ${severity}\n` : ""}Suggest the best grounding activity for this moment, and share something interesting about it.`;
 
     // Run AI suggestion and Perplexity search in parallel (we'll search for all activities, then pick the right one after AI responds)
+    const aiWallClockT0 = Date.now();
     const aiController = new AbortController();
     const aiTimeout = setTimeout(() => aiController.abort(), 15000);
     const aiPromise = fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -227,6 +228,8 @@ Rules:
 
     const data = await response.json();
     const toolCall = data.choices?.[0]?.message?.tool_calls?.[0];
+    const geminiUsage = data.usage;
+    const geminiModel = "google/gemini-3-flash-preview";
 
     if (toolCall?.function?.arguments) {
       const args = JSON.parse(toolCall.function.arguments);
@@ -234,6 +237,30 @@ Rules:
 
       // Now search Perplexity for a recent article about the chosen activity
       const article = await searchRecentArticle(chosenActivity, langCode);
+
+      if (logAttempt) {
+        logAttempt({
+          companion_type: "suggest_grounding",
+          provider: "lovable",
+          model: geminiModel,
+          status: "success",
+          latency_ms: Date.now() - aiWallClockT0,
+          input_tokens: geminiUsage?.prompt_tokens,
+          output_tokens: geminiUsage?.completion_tokens,
+        });
+        if (article?.usage) {
+          logAttempt({
+            companion_type: "suggest_grounding",
+            provider: "perplexity",
+            model: "sonar",
+            status: "success",
+            latency_ms: article.searchMs,
+            input_tokens: article.usage.prompt_tokens,
+            output_tokens: article.usage.completion_tokens,
+            api_requests: 1,
+          });
+        }
+      }
 
       return new Response(JSON.stringify({
         activity: chosenActivity,

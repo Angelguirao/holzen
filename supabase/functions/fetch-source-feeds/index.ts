@@ -1,5 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { createAttemptLogger } from "../_shared/observe.ts";
+import { callPerplexityChat, type PerplexityUsage } from "../_shared/perplexity-client.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -73,42 +75,34 @@ async function searchWithPerplexity(
   category: string,
   apiKey: string,
   log: (msg: string) => void,
-): Promise<{ content: string; citations: string[] } | null> {
+): Promise<{ content: string; citations: string[]; usage?: PerplexityUsage; searchMs: number } | null> {
+  const t0 = Date.now();
   try {
     const searchPrompt = category === "signal"
       ? `Find the most profound or recent philosophical essay or insight from ${sourceName}. Look at ${sourceUrl}. Return ONE specific essay with its title, main argument in 2-3 sentences, and a memorable quote if available.`
       : `Find a specific research paper or finding from ${sourceName} about behavioral finance, investor psychology, or decision-making. Return ONE specific finding with the researcher name, year, and key result.`;
 
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 15000);
     let hostname = "";
     try { hostname = new URL(sourceUrl).hostname.replace(/^www\./, ""); } catch { /* ignore */ }
 
-    const res = await fetch("https://api.perplexity.ai/chat/completions", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
+    const result = await callPerplexityChat(
+      {
         model: "sonar",
         messages: [
           { role: "system", content: `You find specific content from ${sourceName}. Be precise — return the actual title, author, and key ideas.` },
           { role: "user", content: searchPrompt },
         ],
         ...(hostname ? { search_domain_filter: [hostname] } : {}),
-      }),
-      signal: controller.signal,
-    });
-    clearTimeout(timeout);
-
-    if (!res.ok) {
-      if (res.status === 429) { log(`Perplexity rate limited`); return null; }
-      log(`Perplexity error ${res.status}`);
-      return null;
-    }
-
-    const data = await res.json();
+      },
+      apiKey,
+      log,
+      15_000,
+    );
     return {
-      content: data.choices?.[0]?.message?.content || "",
-      citations: data.citations || [],
+      content: result.content,
+      citations: result.citations,
+      usage: result.usage,
+      searchMs: Date.now() - t0,
     };
   } catch (e) {
     log(`Perplexity error: ${e}`);
@@ -136,6 +130,7 @@ serve(async (req) => {
     }
 
     const supabase = createClient(Deno.env.get("SUPABASE_URL") ?? "", serviceRoleKey, { auth: { persistSession: false } });
+    const logAttempt = createAttemptLogger(supabase);
 
     const FIRECRAWL_API_KEY = Deno.env.get("FIRECRAWL_API_KEY");
     const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
@@ -191,6 +186,18 @@ serve(async (req) => {
           if (searchResult) {
             scrapedContent = searchResult.content;
             citations = searchResult.citations;
+            if (searchResult.usage) {
+              logAttempt({
+                companion_type: "source_feed",
+                provider: "perplexity",
+                model: "sonar",
+                status: "success",
+                latency_ms: searchResult.searchMs,
+                input_tokens: searchResult.usage.prompt_tokens,
+                output_tokens: searchResult.usage.completion_tokens,
+                api_requests: 1,
+              });
+            }
           }
         }
 
@@ -204,6 +211,7 @@ serve(async (req) => {
           ? `Extract the ONE most compelling essay or insight from this content by ${source.name}. Return JSON with: title, author (must be "${source.name}" or the specific writer found), summary (2-3 sentences distilling the core idea), key_quote (optional, a real quote from the text only — do NOT fabricate), url (use: ${citations[0] || source.url}).`
           : `Extract ONE specific research finding from this content. Return JSON with: title, author, summary (2-3 sentences), citation (Author (Year), Title format), finding (key result in plain language), url (use: ${citations[0] || source.url}).`;
 
+        const structureT0 = Date.now();
         const structureRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
           method: "POST",
           headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
@@ -224,6 +232,16 @@ serve(async (req) => {
         }
 
         const structureData = await structureRes.json();
+        const structUsage = structureData.usage;
+        logAttempt({
+          companion_type: "source_feed",
+          provider: "lovable",
+          model: "google/gemini-2.5-flash-lite",
+          status: "success",
+          latency_ms: Date.now() - structureT0,
+          input_tokens: structUsage?.prompt_tokens,
+          output_tokens: structUsage?.completion_tokens,
+        });
         const raw = structureData.choices?.[0]?.message?.content;
         if (!raw) { results.push(`${source.name}: empty structure`); continue; }
 
