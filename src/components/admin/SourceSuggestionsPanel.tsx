@@ -29,7 +29,7 @@ export function SourceSuggestionsPanel({ onCatalogChanged }: { onCatalogChanged?
 
   const fetchRows = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('signal_source_suggestions')
       .select('id, category, suggested_name, suggested_url, suggested_type, dedupe_key, status, metadata, created_at, reviewed_at')
       .eq('status', 'pending')

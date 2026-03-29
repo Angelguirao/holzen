@@ -210,7 +210,7 @@ export function useAdminStats(enabled = true): AdminStats {
   const fetchCacheEntries = useCallback(async () => {
     const { data, error: err } = await supabase
       .from('companion_cache')
-      .select('id, companion_type, title, quality_score, used_count, expires_at, thumbs_up, thumbs_down, created_at, content, source_untrusted')
+      .select('id, companion_type, title, quality_score, used_count, expires_at, thumbs_up, thumbs_down, created_at, content')
       .order('quality_score', { ascending: false })
       .order('used_count', { ascending: false })
       .limit(200);
@@ -445,7 +445,7 @@ export function useAdminStats(enabled = true): AdminStats {
 
       const sourcesRes = await supabase
         .from('signal_sources')
-        .select('id, name, type, url, category, demoted_for_live')
+        .select('id, name, type, url, category')
         .order('category', { ascending: true })
         .order('name', { ascending: true });
       if (!sourcesRes.error) setSignalSources((sourcesRes.data ?? []) as SignalSourceRow[]);
