@@ -183,7 +183,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
     try {
       const [{ data: profile }, { data: reflections }] = await Promise.all([
         supabase.from('profiles').select('*').eq('user_id', user.id).single(),
-        supabase.from('reflections').select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
+        supabase.from('v_reflection_with_companions' as any).select('*').eq('user_id', user.id).order('created_at', { ascending: false }),
       ]);
 
       const dateStr = new Date().toISOString().slice(0, 10);

@@ -227,7 +227,7 @@ export default function PauseSession() {
     // Fetch final reflection state for score impact
     if (reflectionId) {
       const { data: ref } = await supabase
-        .from('reflections')
+        .from('v_reflection_with_companions' as any)
         .select('zoom_out_read, history_read, signal_read, grounding_read, note, tags')
         .eq('id', reflectionId)
         .single();
