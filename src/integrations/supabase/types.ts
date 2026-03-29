@@ -1414,6 +1414,45 @@ export type Database = {
           },
         ]
       }
+      signal_source_suggestions: {
+        Row: {
+          id: string
+          category: string
+          suggested_name: string
+          suggested_url: string | null
+          suggested_type: string
+          dedupe_key: string
+          status: string
+          metadata: Json
+          created_at: string
+          reviewed_at: string | null
+        }
+        Insert: {
+          id?: string
+          category: string
+          suggested_name: string
+          suggested_url?: string | null
+          suggested_type?: string
+          dedupe_key: string
+          status?: string
+          metadata?: Json
+          created_at?: string
+          reviewed_at?: string | null
+        }
+        Update: {
+          id?: string
+          category?: string
+          suggested_name?: string
+          suggested_url?: string | null
+          suggested_type?: string
+          dedupe_key?: string
+          status?: string
+          metadata?: Json
+          created_at?: string
+          reviewed_at?: string | null
+        }
+        Relationships: []
+      }
       signal_sources: {
         Row: {
           category: string

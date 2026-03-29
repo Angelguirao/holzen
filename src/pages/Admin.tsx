@@ -15,6 +15,7 @@ import { RejectionEntry } from '@/components/admin/RejectionEntry';
 import { CuratedContentManager } from '@/components/admin/CuratedContentManager';
 import { HardcodedFallbacksManager } from '@/components/admin/HardcodedFallbacksManager';
 import { SourceCatalogViewer } from '@/components/admin/SourceCatalogViewer';
+import { SourceSuggestionsPanel } from '@/components/admin/SourceSuggestionsPanel';
 import { ContentLibraryViewer } from '@/components/admin/ContentLibraryViewer';
 import { DevModeToggle } from '@/components/admin/DevModeToggle';
 import { adminDeleteRowsByIds } from '@/lib/admin-delete';
@@ -400,7 +401,7 @@ export default function Admin() {
         <p className="text-[9px] font-mono text-muted-foreground/45 leading-relaxed max-w-3xl">
           Tab order matches the pipeline: <span className="text-muted-foreground/55">Monitor</span> (telemetry + generation failures).
           <span className="text-muted-foreground/55"> Activity</span> — user reflections and newest cache writes.
-          <span className="text-muted-foreground/55"> Sources</span> — URLs/names fed into live AI search (not the Library).
+          <span className="text-muted-foreground/55"> Sources</span> — live-search catalog + pending AI-suggested rows (approve/reject).
           <span className="text-muted-foreground/55"> Library</span> — curated essays/papers/events used when live generation falls back.
           <span className="text-muted-foreground/55"> Cache</span> — pregen pool in <code className="text-muted-foreground/50">companion_cache</code> (promote/demote/delete).
           <span className="text-muted-foreground/55"> Fallbacks</span> — last-resort strings in <code className="text-muted-foreground/50">companion_fallbacks</code> (edit JSON, toggle active, reorder).
@@ -856,7 +857,8 @@ export default function Admin() {
           </div>
         </TabsContent>
 
-        <TabsContent value="sources" className="mt-0">
+        <TabsContent value="sources" className="mt-0 space-y-4">
+          <SourceSuggestionsPanel onCatalogChanged={refresh} />
           <SourceCatalogViewer sources={signalSources} onRefresh={refresh} libraryEntries={libraryEntries} />
         </TabsContent>
 
