@@ -8,6 +8,7 @@ import { hapticFeedback } from '@/lib/haptics';
 import { toast } from 'sonner';
 import { Check, RefreshCw, Sparkles, Loader2 } from 'lucide-react';
 import { WritingField } from '@/components/WritingField';
+import { companionFallbacksDisabledClient } from '@/lib/companion-strict';
 
 const FALLBACK_PROMPTS = [
   'practice.prompt1',
@@ -32,6 +33,7 @@ export function GuidedJournal({ onComplete, textColor, ringColor }: Props) {
   const [promptIndex, setPromptIndex] = useState(0);
   const [isAI, setIsAI] = useState(false);
   const [loadingPrompts, setLoadingPrompts] = useState(true);
+  const [promptLoadFailed, setPromptLoadFailed] = useState(false);
   const [body, setBody] = useState('');
   const [saving, setSaving] = useState(false);
   const [done, setDone] = useState(false);
@@ -58,7 +60,15 @@ export function GuidedJournal({ onComplete, textColor, ringColor }: Props) {
         }
         throw new Error('Empty response');
       } catch {
-        // Fallback to static prompts
+        if (companionFallbacksDisabledClient()) {
+          setPromptLoadFailed(true);
+          setPrompts([]);
+          setIsAI(false);
+          setPromptIndex(0);
+          setLoadingPrompts(false);
+          toast.error(t('practice.journalPromptFailed'));
+          return;
+        }
         const fallback = FALLBACK_PROMPTS.map((k) => t(k));
         setPrompts(fallback);
         setIsAI(false);
@@ -124,6 +134,10 @@ export function GuidedJournal({ onComplete, textColor, ringColor }: Props) {
                   {t('practice.generatingPrompt')}
                 </p>
               </div>
+            ) : promptLoadFailed ? (
+              <p className="text-xs font-mono text-center leading-relaxed max-w-[260px]" style={{ color: textColor, opacity: 0.55 }}>
+                {t('practice.journalPromptFailed')}
+              </p>
             ) : (
               <div className="flex items-center gap-3">
                 <div className="flex flex-col items-center gap-1.5">

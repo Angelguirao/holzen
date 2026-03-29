@@ -11,6 +11,7 @@ import { playGroundingChime } from '@/lib/grounding-chime';
 import { type MoodValue } from '@/components/MoodCheck';
 import { MoodIcon } from '@/components/icons/MoodIcon';
 import { useProGate } from '@/hooks/use-pro-gate';
+import { companionFallbacksDisabledClient } from '@/lib/companion-strict';
 
 type Phase = 'idle' | 'suggestion' | 'timer' | 'checkin' | 'reflect' | 'done';
 
@@ -42,8 +43,10 @@ export default function Ground() {
   const [ready, setReady] = useState(false);
   const [selectedMood, setSelectedMood] = useState<MoodValue | null>(null);
   const [reflectionText, setReflectionText] = useState('');
+  const [suggestionError, setSuggestionError] = useState<string | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const fetchedRef = useRef(false);
+  const strictNoFallback = companionFallbacksDisabledClient();
 
   // Entrance delay
   useEffect(() => {
@@ -61,6 +64,7 @@ export default function Ground() {
 
     // Use pre-generated data from Home if available
     if (navState.preGenerated) {
+      setSuggestionError(null);
       const pg = navState.preGenerated;
       setActivity(pg.activity);
       setSuggestion(pg.suggestion);
@@ -74,6 +78,7 @@ export default function Ground() {
     }
 
     const fetchSuggestion = async () => {
+      setSuggestionError(null);
       try {
         const context = btcData
           ? `BTC is ${btcData.direction === 'down' ? 'down' : 'up'} ${Math.abs(btcData.changePercent).toFixed(1)}% in the last 24 hours.`
@@ -83,7 +88,24 @@ export default function Ground() {
           body: { groundingActivities, context, severity, language },
         });
 
-        if (error || !data) throw new Error('Failed to get suggestion');
+        const apiError =
+          data && typeof data === 'object' && 'error' in data && typeof (data as { error?: unknown }).error === 'string'
+            ? (data as { error: string }).error
+            : null;
+
+        if (strictNoFallback) {
+          if (error || !data || apiError) {
+            setSuggestionError(t('ground.suggestionFailed'));
+            setActivity('');
+            setSuggestion('');
+            setInsight(null);
+            setArticle(null);
+            setPhase('suggestion');
+            return;
+          }
+        } else {
+          if (error || !data) throw new Error('Failed to get suggestion');
+        }
 
         setActivity(data.activity);
         setSuggestion(data.suggestion);
@@ -107,17 +129,25 @@ export default function Ground() {
           }
         } catch { /* ignore */ }
       } catch {
-        const fallback = groundingActivities[Math.floor(Math.random() * groundingActivities.length)];
-        setActivity(fallback);
-        setSuggestion(t('ground.fallbackSuggestion', { activity: fallback }));
-        setSuggestedDuration(10);
-        setCustomDuration(10);
+        if (strictNoFallback) {
+          setSuggestionError(t('ground.suggestionFailed'));
+          setActivity('');
+          setSuggestion('');
+          setInsight(null);
+          setArticle(null);
+        } else {
+          const fallback = groundingActivities[Math.floor(Math.random() * groundingActivities.length)];
+          setActivity(fallback);
+          setSuggestion(t('ground.fallbackSuggestion', { activity: fallback }));
+          setSuggestedDuration(10);
+          setCustomDuration(10);
+        }
       }
       setPhase('suggestion');
     };
 
     fetchSuggestion();
-  }, [isPending, isPro, groundingActivities, btcData, severity, language, t, navState.preGenerated]);
+  }, [isPending, isPro, groundingActivities, btcData, severity, language, t, navState.preGenerated, strictNoFallback]);
 
   // Timer
   useEffect(() => {
@@ -288,6 +318,19 @@ export default function Ground() {
           {/* Suggestion */}
           {phase === 'suggestion' && (
             <motion.div key="suggestion" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.7, ease }} className="text-center space-y-7 w-full">
+              {suggestionError ? (
+                <div className="space-y-6 px-2">
+                  <p className="text-sm text-muted-foreground/70 leading-relaxed">{suggestionError}</p>
+                  <button
+                    type="button"
+                    onClick={handleReturn}
+                    className="px-6 py-2.5 rounded-lg border border-border/20 bg-muted/10 text-foreground/70 hover:bg-muted/20 transition-colors text-xs font-mono tracking-wider"
+                  >
+                    {t('ground.return', 'Return home')}
+                  </button>
+                </div>
+              ) : (
+                <>
               <motion.div className="space-y-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
                 <p className="text-[10px] font-mono tracking-[0.25em] uppercase text-muted-foreground/40">
                   {t('ground.title', 'Ground yourself')}
@@ -361,6 +404,8 @@ export default function Ground() {
                   {t('ground.skipTimer', 'Skip timer')}
                 </button>
               </motion.div>
+                </>
+              )}
             </motion.div>
           )}
 
