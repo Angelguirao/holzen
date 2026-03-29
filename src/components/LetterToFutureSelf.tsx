@@ -24,6 +24,7 @@ import {
   FUTURE_LETTER_MIN_CHARS,
   FUTURE_LETTER_MIN_WORDS,
   validateFutureLetterBody,
+  type FutureLetterInvalidReason,
 } from '@/lib/future-letter-validation';
 import { toast } from 'sonner';
 import { format } from 'date-fns';
