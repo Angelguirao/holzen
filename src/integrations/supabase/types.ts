@@ -823,7 +823,6 @@ export type Database = {
           companion_grounding: boolean
           companion_haiku: boolean
           companion_history: boolean
-          companion_learning: boolean
           companion_signal: boolean
           companion_zoom_out: boolean
           cooldown_hours: number
@@ -876,7 +875,6 @@ export type Database = {
           companion_grounding?: boolean
           companion_haiku?: boolean
           companion_history?: boolean
-          companion_learning?: boolean
           companion_signal?: boolean
           companion_zoom_out?: boolean
           cooldown_hours?: number
@@ -929,7 +927,6 @@ export type Database = {
           companion_grounding?: boolean
           companion_haiku?: boolean
           companion_history?: boolean
-          companion_learning?: boolean
           companion_signal?: boolean
           companion_zoom_out?: boolean
           cooldown_hours?: number
@@ -1185,11 +1182,6 @@ export type Database = {
           history_read: boolean
           id: string
           is_favorite: boolean
-          learning_body: string | null
-          learning_citation: string | null
-          learning_read: boolean
-          learning_title: string | null
-          learning_url: string | null
           message: string
           mood: string | null
           mood_after: string | null
@@ -1218,11 +1210,6 @@ export type Database = {
           history_read?: boolean
           id?: string
           is_favorite?: boolean
-          learning_body?: string | null
-          learning_citation?: string | null
-          learning_read?: boolean
-          learning_title?: string | null
-          learning_url?: string | null
           message: string
           mood?: string | null
           mood_after?: string | null
@@ -1251,11 +1238,6 @@ export type Database = {
           history_read?: boolean
           id?: string
           is_favorite?: boolean
-          learning_body?: string | null
-          learning_citation?: string | null
-          learning_read?: boolean
-          learning_title?: string | null
-          learning_url?: string | null
           message?: string
           mood?: string | null
           mood_after?: string | null
@@ -1691,17 +1673,15 @@ export type Database = {
           companion_zoom_out_read: boolean | null
           context: string | null
           created_at: string | null
+          grounding_body: string | null
+          grounding_read: boolean | null
+          grounding_title: string | null
           haiku: string | null
           haiku_read: boolean | null
           history_insight_data: Json | null
           history_read: boolean | null
           id: string | null
           is_favorite: boolean | null
-          learning_body: string | null
-          learning_citation: string | null
-          learning_read: boolean | null
-          learning_title: string | null
-          learning_url: string | null
           message: string | null
           mood: string | null
           mood_after: string | null
