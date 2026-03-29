@@ -195,7 +195,7 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
     if (!currentPrice || !canWrite) return;
     const v = validateFutureLetterBody(body);
     if (!v.valid) {
-      const reason = v.reason;
+      const reason = (v as { valid: false; reason: FutureLetterInvalidReason }).reason;
       if (reason === 'too_short') {
         toast.error(t('letter.validationTooShort', { min: FUTURE_LETTER_MIN_CHARS }));
       } else if (reason === 'too_long') {
@@ -433,7 +433,7 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
             })}
           </p>
           {body.trim().length > 0 && !letterValidation.valid && (() => {
-            const reason = letterValidation.reason;
+            const reason = (letterValidation as { valid: false; reason: FutureLetterInvalidReason }).reason;
             return (
               <p className="text-[10px] text-destructive/80 leading-relaxed">
                 {reason === 'too_short' &&
