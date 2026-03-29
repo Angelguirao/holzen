@@ -33,6 +33,23 @@ export function shortModelName(model: string | null | undefined): string {
   return m.length > 28 ? `${m.slice(0, 26)}…` : m;
 }
 
+/** Tailwind classes for companion_serves.serve_source badges */
+export function serveSourceBadgeClass(source: string | null | undefined): string {
+  if (!source) return 'bg-muted/25 text-muted-foreground/40';
+  switch (source) {
+    case 'live':
+      return 'bg-amber-500/12 text-amber-800/80 dark:text-amber-400/90';
+    case 'cache':
+      return 'bg-sky-500/12 text-sky-800/80 dark:text-sky-400/90';
+    case 'curated':
+      return 'bg-violet-500/12 text-violet-800/80 dark:text-violet-400/90';
+    case 'empty':
+      return 'bg-destructive/10 text-destructive/75';
+    default:
+      return 'bg-muted/30 text-muted-foreground/50';
+  }
+}
+
 export const PERIOD_OPTIONS = [
   { value: 'today' as const, label: 'Today' },
   { value: '7d' as const, label: '7 days' },
