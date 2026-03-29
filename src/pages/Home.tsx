@@ -32,6 +32,7 @@ import { SnoozeControl } from '@/components/SnoozeControl';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { playNotificationTone, prefetchNotificationTone } from '@/lib/notification-tone';
 import { isCumulativeMoveTriggered } from '@/lib/volatility-thresholds';
+import { companionFallbacksDisabledClient } from '@/lib/companion-strict';
 import {
   DndContext,
   closestCenter,
@@ -154,7 +155,9 @@ const Home = () => {
     try { return localStorage.getItem(groundDismissedKey) === 'true'; } catch { return false; }
   });
   const [groundDismissed, setGroundDismissed] = useState(() => groundDismissedRef.current());
+  const strictNoFallback = companionFallbacksDisabledClient();
   const [groundSuggestion, setGroundSuggestion] = useState<GroundingSuggestion | null>(() => {
+    if (companionFallbacksDisabledClient()) return null;
     try {
       const stored = localStorage.getItem(user ? `holzen_ground_suggestion_${user.id}` : 'holzen_ground_suggestion');
       return stored ? JSON.parse(stored) : null;
@@ -246,6 +249,16 @@ const Home = () => {
     localStorage.setItem(groundDismissedKey, 'true');
   }, [groundStorageKey, groundDismissedKey]);
 
+  // No cached grounding card when testing strict live paths — clear persisted suggestions
+  useEffect(() => {
+    if (!strictNoFallback) return;
+    setGroundSuggestion(null);
+    try {
+      if (user?.id) localStorage.removeItem(`holzen_ground_suggestion_${user.id}`);
+      localStorage.removeItem('holzen_ground_suggestion');
+    } catch { /* ignore */ }
+  }, [strictNoFallback, user?.id]);
+
   const handleStartGround = useCallback(() => {
     navigate('/ground', { state: { preGenerated: groundSuggestion } });
   }, [navigate, groundSuggestion]);
@@ -311,12 +324,14 @@ const Home = () => {
         article: data.article || null,
       };
       setGroundSuggestion(suggestion);
-      localStorage.setItem(groundStorageKey, JSON.stringify(suggestion));
+      if (!strictNoFallback) {
+        localStorage.setItem(groundStorageKey, JSON.stringify(suggestion));
+      }
     }).finally(() => {
       setGroundLoading(false);
       groundFetchingRef.current = false;
     });
-  }, [user, profileLoaded, subscribed, btcData, message, groundDismissed, groundSuggestion, groundingActivities, threshold, thresholdDown, cumulativeThreshold, severity, language, groundStorageKey]);
+  }, [user, profileLoaded, subscribed, btcData, message, groundDismissed, groundSuggestion, groundingActivities, threshold, thresholdDown, cumulativeThreshold, severity, language, groundStorageKey, strictNoFallback]);
 
   useEffect(() => {
     document.title = 'Holzen — Home';
