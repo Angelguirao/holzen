@@ -16,6 +16,7 @@ import { CuratedContentManager } from '@/components/admin/CuratedContentManager'
 import { SourceCatalogViewer } from '@/components/admin/SourceCatalogViewer';
 import { ContentLibraryViewer } from '@/components/admin/ContentLibraryViewer';
 import { DevModeToggle } from '@/components/admin/DevModeToggle';
+import { adminDeleteRowsByIds } from '@/lib/admin-delete';
 
 /**
  * Admin access control.
@@ -232,13 +233,10 @@ export default function Admin() {
     if (!window.confirm(`Delete ${ids.length} cache entr${ids.length === 1 ? 'y' : 'ies'}? This cannot be undone.`)) return;
     setFeedBulkBusy(true);
     try {
-      for (let i = 0; i < ids.length; i += FEED_DELETE_CHUNK) {
-        const slice = ids.slice(i, i + FEED_DELETE_CHUNK);
-        const { error: delErr } = await supabase.from('companion_cache').delete().in('id', slice);
-        if (delErr) {
-          toast({ title: 'Bulk delete failed', description: delErr.message, variant: 'destructive' });
-          return;
-        }
+      const { deleted, errorMessage } = await adminDeleteRowsByIds('companion_cache', ids, FEED_DELETE_CHUNK);
+      if (errorMessage) {
+        toast({ title: 'Bulk delete failed', description: errorMessage, variant: 'destructive' });
+        return;
       }
       setFeedSelectedIds((prev) => {
         const n = new Set(prev);
@@ -246,7 +244,7 @@ export default function Admin() {
         return n;
       });
       await refreshCompanionCacheUi();
-      toast({ title: 'Deleted', description: `${ids.length} entr${ids.length === 1 ? 'y' : 'ies'} removed.` });
+      toast({ title: 'Deleted', description: `${deleted} entr${deleted === 1 ? 'y' : 'ies'} removed.` });
     } finally {
       setFeedBulkBusy(false);
     }
@@ -292,13 +290,10 @@ export default function Admin() {
     if (!window.confirm(`Permanently delete ${ids.length} generation attempt record${ids.length === 1 ? '' : 's'}?`)) return;
     setRejectionBulkBusy(true);
     try {
-      for (let i = 0; i < ids.length; i += REJECTION_DELETE_CHUNK) {
-        const slice = ids.slice(i, i + REJECTION_DELETE_CHUNK);
-        const { error: delErr } = await supabase.from('generation_attempts').delete().in('id', slice);
-        if (delErr) {
-          toast({ title: 'Bulk delete failed', description: delErr.message, variant: 'destructive' });
-          return;
-        }
+      const { deleted, errorMessage } = await adminDeleteRowsByIds('generation_attempts', ids, REJECTION_DELETE_CHUNK);
+      if (errorMessage) {
+        toast({ title: 'Bulk delete failed', description: errorMessage, variant: 'destructive' });
+        return;
       }
       setRejectionSelectedIds((prev) => {
         const n = new Set(prev);
@@ -306,7 +301,7 @@ export default function Admin() {
         return n;
       });
       await refreshRejections();
-      toast({ title: 'Deleted', description: `${ids.length} record${ids.length === 1 ? '' : 's'} removed.` });
+      toast({ title: 'Deleted', description: `${deleted} record${deleted === 1 ? '' : 's'} removed.` });
     } finally {
       setRejectionBulkBusy(false);
     }
