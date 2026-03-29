@@ -397,7 +397,7 @@ export default function Admin() {
           <TabsTrigger value="rejections" className={TAB_TRIGGER_CLASS}>Rejections{rejections.length > 0 ? ` (${rejections.length})` : ''}</TabsTrigger>
         </TabsList>
         <p className="text-[9px] font-mono text-muted-foreground/45 leading-relaxed max-w-2xl">
-          <span className="text-muted-foreground/55">Monitor</span> aggregates serves, costs, and health.
+          <span className="text-muted-foreground/55">Monitor</span> aggregates serves, costs, and health from historical telemetry (<code className="text-muted-foreground/50">companion_serves</code>, <code className="text-muted-foreground/50">generation_attempts</code>, analytics). Clearing <span className="text-muted-foreground/55">Cache</span> or <span className="text-muted-foreground/55">Rejections</span> does not reset those charts.
           <span className="text-muted-foreground/55"> Cache</span> is the companion pregen pool (what can be served to users).
           <span className="text-muted-foreground/55"> Library</span> is curated long-form content (essays, papers, events).
           <span className="text-muted-foreground/55"> New items</span> lists the latest rows written to that cache pool (not a full activity log).
@@ -611,7 +611,7 @@ export default function Admin() {
           <div className="space-y-2">
             <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">Recent Sessions</p>
             <p className="text-[9px] font-mono text-muted-foreground/45 leading-relaxed">
-              Last reflections with companion titles when available. Green chips mean that companion row exists. Expand for <strong className="font-normal text-muted-foreground/55">live</strong> / <strong className="font-normal text-muted-foreground/55">cache</strong> / <strong className="font-normal text-muted-foreground/55">curated</strong> / <strong className="font-normal text-muted-foreground/55">empty</strong> from <code className="text-muted-foreground/55">companion_serves</code> (n/a = no log row, e.g. older sessions).
+              Rows come from the <code className="text-muted-foreground/55">reflections</code> table (real user sessions). Emptying the Cache tab does not delete them. Green chips mean that companion row exists. Expand for <strong className="font-normal text-muted-foreground/55">live</strong> / <strong className="font-normal text-muted-foreground/55">cache</strong> / <strong className="font-normal text-muted-foreground/55">curated</strong> / <strong className="font-normal text-muted-foreground/55">empty</strong> from <code className="text-muted-foreground/55">companion_serves</code> (n/a = no log row, e.g. older sessions).
             </p>
             <div className="space-y-1.5">
               <FilterRow label="Mood" options={sessionMoodOptions} value={sessionMoodFilter} onChange={setSessionMoodFilter} />
