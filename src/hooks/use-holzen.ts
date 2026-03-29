@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { fetchBtcData, type BtcPriceData } from '@/lib/btc';
+import { isCumulativeMoveTriggered } from '@/lib/volatility-thresholds';
 import { enrichPauseContextWithMarketData } from '@holzen-pause-context';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
@@ -89,9 +90,9 @@ export function useHolzen() {
     const dir = data.direction === 'down' ? 'down' : 'up';
     const pct = Math.abs(data.changePercent).toFixed(1);
     let ctx = `BTC is ${dir} ${pct}% in the last 24 hours.`;
-    if (data.cumulativeChangePercent !== undefined && Math.abs(data.cumulativeChangePercent) >= cumulativeThreshold) {
+    if (isCumulativeMoveTriggered(data.cumulativeChangePercent, cumulativeThreshold)) {
       const cumDir = data.cumulativeDirection === 'down' ? 'down' : 'up';
-      ctx += ` Over 7 days, it's ${cumDir} ${Math.abs(data.cumulativeChangePercent).toFixed(1)}%.`;
+      ctx += ` Over 7 days, it's ${cumDir} ${Math.abs(data.cumulativeChangePercent!).toFixed(1)}%.`;
     }
     ctx = enrichPauseContextWithMarketData(ctx, data.fearGreed, data.onChain);
 
