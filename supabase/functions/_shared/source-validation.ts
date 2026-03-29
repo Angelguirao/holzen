@@ -29,7 +29,6 @@ const KNOWN_AUTHORS: Record<string, string[]> = {
   "Nick Szabo": ["unenumerated.blogspot.com"],
   "Hal Finney": [],
   "Adam Back": ["blockstream.com"],
-  "Eric Cason": ["cryptosovereignty.org"],
   "Hugo Nguyen": ["hugonguyen.medium.com"],
   "Hasu": ["uncommoncore.co", "insights.deribit.com"],
   "Tuur Demeester": ["adamant.io"],

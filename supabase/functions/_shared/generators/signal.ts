@@ -23,7 +23,30 @@ import { validateSource } from "../source-validation.ts";
 import { searchLibrary, essayToSignal, recordLibraryServe } from "../content-library.ts";
 
 /** Bump when the search query, structuring prompt, or quality rules change. */
-export const PROMPT_VERSION = "v4";
+export const PROMPT_VERSION = "v5";
+
+/** Perplexity denylist (leading `-`). Cannot combine with allowlist in same request. */
+const SIGNAL_DOMAIN_DENYLIST = ["-cryptosovereignty.org"];
+
+/** Drop blocked domains from citation lists (defense in depth vs denylist misses). */
+function filterSignalCitations(urls: string[]): string[] {
+  const blocked = /cryptosovereignty\.org/i;
+  return urls.filter((u) => typeof u === "string" && u.length > 0 && !blocked.test(u));
+}
+
+function buildSignalPerplexitySystem(recentExclusion: string, topicExclusion: string): string {
+  return `You are helping with COGNITIVE REAPPRAISAL in a pause session: find substantive Bitcoin writing that helps someone reframe their reaction to price movement (fear, greed, or calm) — using real ideas from Bitcoin's literature, not trading hype or generic "crypto."
+
+WHAT TO FIND (vary the angle each search):
+- Essays and articles from established publishers and authors (e.g. Bitcoin Magazine, Nakamoto Institute, Mises Institute, Unchained, authors like Gigi, Ammous, Farrington, Boyapati, Parker Lewis, Lyn Alden — not exhaustive)
+- Themes: sound money, proof-of-work, time preference, settlement, holding, monetary history, ethics of saving, network security
+
+NEVER prioritize or cite:
+- cryptosovereignty.org (and similar single-site blogspam that crowded out quality results)
+- Price targets, TA, on-chain hype, altcoins, Ethereum, DeFi, NFTs, "crypto market" framing — BITCOIN ONLY
+
+Summarize faithfully and ground answers in real sources with retrievable URLs.${recentExclusion}${topicExclusion}`;
+}
 
 // ── Public types ──
 
@@ -136,38 +159,20 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
   const searchQuery = trimmedSearchAngle
     ? `${trimmedSearchAngle}${sourceHint}${recentExclusion}`
     : context
-    ? `Bitcoin philosophical perspective relevant when ${context}.${directionHint} Find a profound insight from a respected Bitcoin thinker or writer.${sourceHint}${recentExclusion}`
-    : `Find a profound Bitcoin essay or insight (sound money, proof-of-work, time preference, holding, or monetary ethics) from a respected thinker or publication — prioritize diversity of author and site.${sourceHint}${recentExclusion}`;
+    ? `Cognitive reappraisal for a Bitcoin holder when ${context}.${directionHint} Find one high-quality essay or article (sound money, PoW, time preference, holding, settlement, or monetary ethics) from a respected publication or author — not a personal blog.${sourceHint}${recentExclusion}`
+    : `Find one high-quality Bitcoin essay for cognitive reappraisal: sound money, proof-of-work, time preference, holding, or monetary ethics — from a reputable publication or writer; diversify author and domain.${sourceHint}${recentExclusion}`;
+
+  const perplexitySystem = buildSignalPerplexitySystem(recentExclusion, topicExclusion);
 
   const perplexityBody: any = {
     model: "sonar-pro",
     messages: [
-      {
-        role: "system",
-        content: `You are searching for deep, philosophical Bitcoin writing — essays and ideas that make a holder feel grounded in WHY they hold.
-
-WHAT TO SEARCH FOR (rotate — do not fixate on one theme every answer):
-- Proof-of-work, settlement finality, time preference, sound money, holding through volatility
-- Ethics of saving, separation of money and state, Austrian or monetary history angles
-- Long-form pieces with a named author OR a reputable publication
-
-WHAT TO AVOID:
-- Returning the same blog or domain repeatedly across searches (e.g. over-using one small site)
-- Price predictions, chart analysis, trading setups
-- On-chain metrics, hash rate stats, exchange flows
-- Short-term market commentary or news
-- Generic "crypto" or "blockchain" content — this is BITCOIN ONLY
-- Altcoins, Ethereum, DeFi, NFTs, tokens, Web3 — NEVER mention these
-- "Crypto market" framing — always say "Bitcoin", never "crypto"
-
-GOOD SOURCES (examples — pick diverse domains): Bitcoin Magazine, Nakamoto Institute, Allen Farrington, Vijay Boyapati, Lyn Alden, Parker Lewis, Gigi, Saifedean Ammous, Jeff Booth, Knut Svanholm, Mises Institute
-
-DIVERSITY: Prefer a DIFFERENT thinker and a DIFFERENT domain than obvious prior picks. Prefer timeless essays over thin SEO posts.${recentExclusion}${topicExclusion}`,
-      },
+      { role: "system", content: perplexitySystem },
       { role: "user", content: searchQuery },
     ],
-    // No recency filter — Bitcoin philosophy is timeless. Essays from 2018 are as valuable as 2025.
-    ...(sourceUrls.length > 0 ? { search_domain_filter: sourceUrls.slice(0, 5) } : {}),
+    ...(sourceUrls.length > 0
+      ? { search_domain_filter: sourceUrls.slice(0, 5) }
+      : { search_domain_filter: [...SIGNAL_DOMAIN_DENYLIST] }),
   };
 
   // ── Step 1: Perplexity search ──
@@ -183,12 +188,14 @@ DIVERSITY: Prefer a DIFFERENT thinker and a DIFFERENT domain than obvious prior 
     let apiCalls = 0;
     let mergedUsage = undefined as ReturnType<typeof mergePerplexityUsage>;
 
+    const usedDenylistOnly = sourceUrls.length === 0;
+
     const result = await callPerplexityChat(perplexityBody, PERPLEXITY_API_KEY, (m) => log(m), 15_000);
     apiCalls++;
     mergedUsage = result.usage;
     searchContent = result.content;
-    citations = result.citations;
-    log(`perplexity content length: ${searchContent.length}, citations: ${citations.length}`);
+    citations = filterSignalCitations(result.citations);
+    log(`perplexity content length: ${searchContent.length}, citations after filter: ${citations.length}`);
 
     if (citations.length === 0 && sourceUrls.length > 0 && searchContent.length > 0) {
       log("0 citations after merge — retrying without domain filter");
@@ -200,14 +207,28 @@ DIVERSITY: Prefer a DIFFERENT thinker and a DIFFERENT domain than obvious prior 
         mergedUsage = mergePerplexityUsage(mergedUsage, retry.usage);
         if (retry.citations.length > 0) {
           searchContent = retry.content;
-          citations = retry.citations;
-          log(`retry got ${citations.length} citations`);
+          citations = filterSignalCitations(retry.citations);
+          log(`retry got ${citations.length} citations after filter`);
         }
       } catch { log("retry failed, using original content"); }
     }
 
+    if (citations.length === 0 && usedDenylistOnly && searchContent.length > 0) {
+      log("0 usable citations after denylist filter — retrying Perplexity without search_domain_filter");
+      const retryWide = { ...perplexityBody };
+      delete retryWide.search_domain_filter;
+      try {
+        const wide = await callPerplexityChat(retryWide, PERPLEXITY_API_KEY, (m) => log(m), 15_000);
+        apiCalls++;
+        mergedUsage = mergePerplexityUsage(mergedUsage, wide.usage);
+        searchContent = wide.content;
+        citations = filterSignalCitations(wide.citations);
+        log(`wide retry: citations after filter: ${citations.length}`);
+      } catch { log("wide retry failed"); }
+    }
+
     if (citations.length === 0 && searchContent.length > 0) {
-      log("perplexity: still no citation URLs after merge + optional domain retry — literature exists; API metadata may be sparse");
+      log("perplexity: still no citation URLs after merge + retries — literature exists; API metadata may be sparse");
     }
 
     perplexityApiCalls = apiCalls;
@@ -279,14 +300,14 @@ DIVERSITY: Prefer a DIFFERENT thinker and a DIFFERENT domain than obvious prior 
     messages: [
       {
         role: "system",
-        content: `Extract ONE philosophical Bitcoin insight from the search results below.
+        content: `Extract ONE Bitcoin insight from the search results for COGNITIVE REAPPRAISAL: help the reader reframe fear, greed, or calm about price using ideas from the text — not trading advice.
 
 TONE: Profound, calm, grounding. Like a wise friend reminding you why you hold.
 TITLE: Evocative, poetic, 5-10 words. Should read like a book chapter title, not a headline.
 BODY: 2-3 sentences capturing the philosophical ESSENCE — not a summary. Distill the core idea.
 QUOTE (optional): If the search results contain a memorable direct quote from the thinker (1 sentence max), include it. Must be a REAL quote from the search results — do NOT fabricate. Leave empty if no direct quote is found.
 
-GOOD TITLES: "Proof of work is proof of sacrifice" / "Sound money teaches patience before wealth" / "Sovereignty begins with what you refuse to delegate"
+GOOD TITLES: "Proof of work is proof of sacrifice" / "Sound money teaches patience before wealth" / "Settlement is the antidote to narrative"
 BAD TITLES: "Bitcoin hash rate reaches new high" / "Analyst predicts BTC target" / anything with numbers or dates
 
 ACCURACY RULES (CRITICAL):

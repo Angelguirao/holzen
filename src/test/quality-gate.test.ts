@@ -163,6 +163,22 @@ describe('qualityGate - signal', () => {
     expect(result.reason).toBe('signal_generic_source');
   });
 
+  it('rejects cryptosovereignty in body, title, or url', () => {
+    const longBodyWithBanned = `${validSignal.body} This paragraph also references cryptosovereignty as a keyword we never want to promote in Signal cards.`;
+    expect(qualityGate('signal', {
+      ...validSignal,
+      body: longBodyWithBanned,
+    }).reason).toBe('signal_overused_meme_domain');
+    expect(qualityGate('signal', {
+      ...validSignal,
+      title: 'cryptosovereignty and you',
+    }).reason).toBe('signal_overused_meme_domain');
+    expect(qualityGate('signal', {
+      ...validSignal,
+      url: 'https://cryptosovereignty.org/some-post',
+    }).reason).toBe('signal_overused_meme_domain');
+  });
+
   it('rejects title with too many words', () => {
     const result = qualityGate('signal', {
       ...validSignal,
