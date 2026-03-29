@@ -4,7 +4,7 @@
  * Runtime prefers DB rows (admin-editable); falls back to file seed if empty/error.
  */
 
-import seed from "./fallback-seed.json";
+import seed from "./fallback-seed.json" with { type: "json" };
 
 export type FallbackPoolType =
   | "signal"

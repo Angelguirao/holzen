@@ -214,7 +214,6 @@ export type Database = {
           topic_slug: string | null
           used_count: number
           user_score: number | null
-          source_untrusted: boolean
         }
         Insert: {
           automated_score?: number | null
@@ -244,7 +243,6 @@ export type Database = {
           topic_slug?: string | null
           used_count?: number
           user_score?: number | null
-          source_untrusted?: boolean
         }
         Update: {
           automated_score?: number | null
@@ -274,37 +272,6 @@ export type Database = {
           topic_slug?: string | null
           used_count?: number
           user_score?: number | null
-          source_untrusted?: boolean
-        }
-        Relationships: []
-      }
-      companion_fallbacks: {
-        Row: {
-          id: string
-          pool_type: string
-          sort_order: number
-          payload: Json
-          is_active: boolean
-          created_at: string
-          updated_at: string
-        }
-        Insert: {
-          id?: string
-          pool_type: string
-          sort_order?: number
-          payload: Json
-          is_active?: boolean
-          created_at?: string
-          updated_at?: string
-        }
-        Update: {
-          id?: string
-          pool_type?: string
-          sort_order?: number
-          payload?: Json
-          is_active?: boolean
-          created_at?: string
-          updated_at?: string
         }
         Relationships: []
       }
@@ -1414,50 +1381,10 @@ export type Database = {
           },
         ]
       }
-      signal_source_suggestions: {
-        Row: {
-          id: string
-          category: string
-          suggested_name: string
-          suggested_url: string | null
-          suggested_type: string
-          dedupe_key: string
-          status: string
-          metadata: Json
-          created_at: string
-          reviewed_at: string | null
-        }
-        Insert: {
-          id?: string
-          category: string
-          suggested_name: string
-          suggested_url?: string | null
-          suggested_type?: string
-          dedupe_key: string
-          status?: string
-          metadata?: Json
-          created_at?: string
-          reviewed_at?: string | null
-        }
-        Update: {
-          id?: string
-          category?: string
-          suggested_name?: string
-          suggested_url?: string | null
-          suggested_type?: string
-          dedupe_key?: string
-          status?: string
-          metadata?: Json
-          created_at?: string
-          reviewed_at?: string | null
-        }
-        Relationships: []
-      }
       signal_sources: {
         Row: {
           category: string
           created_at: string
-          demoted_for_live: boolean
           description: string | null
           id: string
           name: string
@@ -1467,7 +1394,6 @@ export type Database = {
         Insert: {
           category?: string
           created_at?: string
-          demoted_for_live?: boolean
           description?: string | null
           id?: string
           name: string
@@ -1477,7 +1403,6 @@ export type Database = {
         Update: {
           category?: string
           created_at?: string
-          demoted_for_live?: boolean
           description?: string | null
           id?: string
           name?: string
