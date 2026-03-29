@@ -9,9 +9,10 @@
  */
 
 import { qualityGate, normalizeUrl, isUrlReachable, contentFingerprint } from "../quality.ts";
-import { SIGNAL_FALLBACKS, pickRandom } from "../fallbacks.ts";
+import { loadFallbackPool, pickRandom } from "../fallbacks.ts";
 import { parseMarketDirection, serveFromCache } from "../cache.ts";
 import { createAttemptLogger } from "../observe.ts";
+import { enqueueCatalogSourceSuggestion } from "../source-suggestions.ts";
 import { callPerplexityChat, mergePerplexityUsage } from "../perplexity-client.ts";
 import { validateSource } from "../source-validation.ts";
 import { searchLibrary, essayToSignal, recordLibraryServe } from "../content-library.ts";
@@ -61,7 +62,8 @@ async function serveFallback(
   }
   const cached = await serveFromCache(svcClient, "signal", "en", { userId, marketDirection, excludeIds });
   if (cached) return { data: cached.data, source: "cache", cacheId: cached.cacheId };
-  return { data: pickRandom(SIGNAL_FALLBACKS), source: "curated", cacheId: null };
+  const pool = await loadFallbackPool<{ title: string; body: string; source: string; url: string }>(svcClient, "signal");
+  return { data: pickRandom(pool), source: "curated", cacheId: null };
 }
 
 function buildSourceHints(sources?: Array<{ name: string; type: string; url?: string }>) {
@@ -85,7 +87,7 @@ function buildSourceHints(sources?: Array<{ name: string; type: string; url?: st
 // ── Public entry point ──
 
 export async function generateSignal(params: GenerateSignalParams): Promise<SignalResult> {
-  const { svcClient, context, sources, recentSignalSources, recentSignalTitles, userId, searchAngle, log } = params;
+  const { svcClient, context, sources, recentSignalSources, recentSignalTitles, userId, reflectionId, searchAngle, log } = params;
   const marketDirection = parseMarketDirection(context);
 
   const logAttempt = createAttemptLogger(svcClient, { userId });
@@ -448,6 +450,13 @@ URL RULES (CRITICAL):
       log(`cache write failed: ${e}`);
     }
   }
+
+  void enqueueCatalogSourceSuggestion(svcClient, {
+    category: "signal",
+    name: signal.source,
+    url: signal.url,
+    reflectionId,
+  });
 
   // ── Step 6: Background URL validation (fire-and-forget) ──
   if (signal.url && signal.url.startsWith("http")) {

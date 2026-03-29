@@ -13,7 +13,9 @@ import { FeedCard } from '@/components/admin/FeedCard';
 import { AdminBulkBar } from '@/components/admin/AdminBulkBar';
 import { RejectionEntry } from '@/components/admin/RejectionEntry';
 import { CuratedContentManager } from '@/components/admin/CuratedContentManager';
+import { HardcodedFallbacksManager } from '@/components/admin/HardcodedFallbacksManager';
 import { SourceCatalogViewer } from '@/components/admin/SourceCatalogViewer';
+import { SourceSuggestionsPanel } from '@/components/admin/SourceSuggestionsPanel';
 import { ContentLibraryViewer } from '@/components/admin/ContentLibraryViewer';
 import { DevModeToggle } from '@/components/admin/DevModeToggle';
 import { adminDeleteRowsByIds } from '@/lib/admin-delete';
@@ -361,7 +363,7 @@ export default function Admin() {
   const issues: string[] = [];
   const tips: string[] = [];
   if (failureRate > 20) issues.push('High failure rate — check if API keys (Perplexity/Lovable) are valid and not rate-limited');
-  else if (failureRate > 5) tips.push('Some generation failures — check Generation Health for details');
+  else if (failureRate > 5) tips.push('Some generation failures — see Recent generation failures under Monitor');
   if (periodStats.cost > costWarn) {
     issues.push(period === 'today'
       ? 'Approaching daily budget cap ($10) — generation will be blocked when exceeded'
@@ -387,20 +389,22 @@ export default function Admin() {
       </div>
 
       <Tabs defaultValue="monitor" className="space-y-4">
-        <TabsList className="inline-flex h-auto items-center gap-1 rounded-lg bg-muted/30 p-1">
+        <TabsList className="inline-flex h-auto flex-wrap items-center gap-1 rounded-lg bg-muted/30 p-1">
           <TabsTrigger value="monitor" className={TAB_TRIGGER_CLASS}>Monitor</TabsTrigger>
-          <TabsTrigger value="content" className={TAB_TRIGGER_CLASS}>Cache</TabsTrigger>
+          <TabsTrigger value="activity" className={TAB_TRIGGER_CLASS}>Activity</TabsTrigger>
           <TabsTrigger value="sources" className={TAB_TRIGGER_CLASS}>Sources</TabsTrigger>
-          <TabsTrigger value="tools" className={TAB_TRIGGER_CLASS}>Tools</TabsTrigger>
           <TabsTrigger value="library" className={TAB_TRIGGER_CLASS}>Library{libraryEntries.length > 0 ? ` (${libraryEntries.length})` : ''}</TabsTrigger>
-          <TabsTrigger value="feed" className={TAB_TRIGGER_CLASS}>New items{recentContent.length > 0 ? ` (${recentContent.length})` : ''}</TabsTrigger>
-          <TabsTrigger value="rejections" className={TAB_TRIGGER_CLASS}>Rejections{rejections.length > 0 ? ` (${rejections.length})` : ''}</TabsTrigger>
+          <TabsTrigger value="content" className={TAB_TRIGGER_CLASS}>Cache</TabsTrigger>
+          <TabsTrigger value="fallbacks" className={TAB_TRIGGER_CLASS}>Fallbacks</TabsTrigger>
+          <TabsTrigger value="tools" className={TAB_TRIGGER_CLASS}>Tools</TabsTrigger>
         </TabsList>
-        <p className="text-[9px] font-mono text-muted-foreground/45 leading-relaxed max-w-2xl">
-          <span className="text-muted-foreground/55">Monitor</span> aggregates serves, costs, and health from historical telemetry (<code className="text-muted-foreground/50">companion_serves</code>, <code className="text-muted-foreground/50">generation_attempts</code>, analytics). Clearing <span className="text-muted-foreground/55">Cache</span> or <span className="text-muted-foreground/55">Rejections</span> does not reset those charts.
-          <span className="text-muted-foreground/55"> Cache</span> is the companion pregen pool (what can be served to users).
-          <span className="text-muted-foreground/55"> Library</span> is curated long-form content (essays, papers, events).
-          <span className="text-muted-foreground/55"> New items</span> lists the latest rows written to that cache pool (not a full activity log).
+        <p className="text-[9px] font-mono text-muted-foreground/45 leading-relaxed max-w-3xl">
+          Tab order matches the pipeline: <span className="text-muted-foreground/55">Monitor</span> (telemetry + generation failures).
+          <span className="text-muted-foreground/55"> Activity</span> — user reflections and newest cache writes.
+          <span className="text-muted-foreground/55"> Sources</span> — live-search catalog + pending AI-suggested rows (approve/reject).
+          <span className="text-muted-foreground/55"> Library</span> — curated essays/papers/events used when live generation falls back.
+          <span className="text-muted-foreground/55"> Cache</span> — pregen pool in <code className="text-muted-foreground/50">companion_cache</code> (promote/demote/delete).
+          <span className="text-muted-foreground/55"> Fallbacks</span> — last-resort strings in <code className="text-muted-foreground/50">companion_fallbacks</code> (edit JSON, toggle active, reorder).
         </p>
 
         {/* Tab 1: Monitor */}
@@ -527,6 +531,9 @@ export default function Admin() {
               })}
               {cacheHits.length === 0 && <p className="text-[10px] text-muted-foreground/50 text-center py-3">No serve data yet</p>}
             </div>
+            <p className="text-[9px] font-mono text-muted-foreground/40 leading-relaxed">
+              <span className="text-muted-foreground/50">live</span> = generated on demand. <span className="text-muted-foreground/50">cache</span> = row from <code className="text-muted-foreground/45">companion_cache</code> or a Library pick (library serves are still labeled cache in telemetry). <span className="text-muted-foreground/50">curated</span> = hardcoded fallback strings when DB pool is empty — not editable here; use <span className="text-muted-foreground/55">Library</span> + <span className="text-muted-foreground/55">Cache</span> tabs to manage DB-backed fallbacks.
+            </p>
           </div>
 
           {/* Generation Health */}
@@ -572,6 +579,56 @@ export default function Admin() {
             </div>
           </div>
 
+          {/* Recent generation failures (was separate tab) */}
+          <div className="space-y-2">
+            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">
+              Recent generation failures <span className="text-muted-foreground/40 normal-case">({rejections.length} latest)</span>
+            </p>
+            <p className="text-[9px] font-mono text-muted-foreground/45 leading-relaxed">
+              Latest rows in <code className="text-muted-foreground/55">generation_attempts</code> with failed status. Deleting them only clears logs; it does not change Monitor aggregates until you refresh or the period rolls. Same list as before under the old Rejections tab.
+            </p>
+            <FilterRow label="Type" options={rejectionTypeOptions} value={rejectionTypeFilter} onChange={setRejectionTypeFilter} />
+            <FilterRow label="Status" options={rejectionStatusOptions} value={rejectionStatusFilter} onChange={setRejectionStatusFilter} />
+            <p className="text-[9px] font-mono text-muted-foreground/50">
+              {filteredRejections.length === rejections.length
+                ? `${rejections.length} row${rejections.length !== 1 ? 's' : ''}`
+                : `Showing ${filteredRejections.length} of ${rejections.length} — `}
+              {filteredRejections.length < rejections.length && (
+                <button type="button" onClick={() => { setRejectionTypeFilter('all'); setRejectionStatusFilter('all'); }} className="text-primary/70 hover:text-primary">clear filters</button>
+              )}
+            </p>
+            <AdminBulkBar
+              idsShown={rejectionIdsShown}
+              selectedIds={rejectionSelectedIds}
+              onSelectionChange={setRejectionSelectedIds}
+              onBulkDelete={bulkDeleteRejections}
+              busy={rejectionBulkBusy}
+            />
+            <div className="space-y-1.5 max-h-[min(420px,50vh)] overflow-y-auto pr-1">
+              {filteredRejections.map(r => (
+                <RejectionEntry
+                  key={r.id}
+                  row={r}
+                  selected={rejectionSelectedIds.has(r.id)}
+                  onToggleSelect={(id, checked) => {
+                    setRejectionSelectedIds((prev) => {
+                      const n = new Set(prev);
+                      if (checked) n.add(id);
+                      else n.delete(id);
+                      return n;
+                    });
+                  }}
+                  selectDisabled={rejectionBulkBusy}
+                />
+              ))}
+              {filteredRejections.length === 0 && (
+                <p className="text-[10px] text-muted-foreground/50 text-center py-3">
+                  {rejections.length === 0 ? 'No failures in the latest sample' : 'No rows match filters'}
+                </p>
+              )}
+            </div>
+          </div>
+
           {/* User Feedback */}
           <div className="space-y-2">
             <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">User Feedback <span className="text-muted-foreground/40 normal-case">(all time)</span></p>
@@ -606,12 +663,17 @@ export default function Admin() {
               {feedback.length === 0 && <p className="text-[10px] text-muted-foreground/50 text-center py-3">No feedback data yet</p>}
             </div>
           </div>
+        </TabsContent>
 
-          {/* Sessions Timeline */}
+        <TabsContent value="activity" className="space-y-8 mt-0">
+          <p className="text-[9px] font-mono text-muted-foreground/45 leading-relaxed max-w-3xl">
+            <span className="text-muted-foreground/55">Reflections</span> below are saved user sessions (<code className="text-muted-foreground/50">reflections</code>). <span className="text-muted-foreground/55">Latest cache writes</span> are new rows in <code className="text-muted-foreground/50">companion_cache</code> (cron + live writes) — same pool you manage under the Cache tab, shown here chronologically for a quick audit.
+          </p>
+
           <div className="space-y-2">
-            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">Recent Sessions</p>
+            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">Recent reflections</p>
             <p className="text-[9px] font-mono text-muted-foreground/45 leading-relaxed">
-              Rows come from the <code className="text-muted-foreground/55">reflections</code> table (real user sessions). Emptying the Cache tab does not delete them. Green chips mean that companion row exists. Expand for <strong className="font-normal text-muted-foreground/55">live</strong> / <strong className="font-normal text-muted-foreground/55">cache</strong> / <strong className="font-normal text-muted-foreground/55">curated</strong> / <strong className="font-normal text-muted-foreground/55">empty</strong> from <code className="text-muted-foreground/55">companion_serves</code> (n/a = no log row, e.g. older sessions).
+              Green chips mean that companion row exists on the reflection. Expand for <strong className="font-normal text-muted-foreground/55">live</strong> / <strong className="font-normal text-muted-foreground/55">cache</strong> / <strong className="font-normal text-muted-foreground/55">curated</strong> / <strong className="font-normal text-muted-foreground/55">empty</strong> from <code className="text-muted-foreground/55">companion_serves</code> (n/a = no log row, e.g. older sessions).
             </p>
             <div className="space-y-1.5">
               <FilterRow label="Mood" options={sessionMoodOptions} value={sessionMoodFilter} onChange={setSessionMoodFilter} />
@@ -747,117 +809,76 @@ export default function Admin() {
               )}
             </div>
           </div>
-        </TabsContent>
 
-        <TabsContent value="content" className="mt-0 space-y-2">
-          <p className="text-[9px] font-mono text-muted-foreground/50">
-            Companion cache — pregenerated and live-written entries that power Signal, Grounding, History, Zoom, etc. Quality score and used_count indicate how often entries are served.
-          </p>
-          <CuratedContentManager entries={cacheEntries} onRefresh={refreshCacheEntries} />
-        </TabsContent>
-
-        <TabsContent value="sources" className="mt-0">
-          <SourceCatalogViewer sources={signalSources} onRefresh={refresh} libraryEntries={libraryEntries} />
-        </TabsContent>
-
-        <TabsContent value="tools" className="mt-0">
-          <DevModeToggle />
-        </TabsContent>
-
-        <TabsContent value="library" className="mt-0">
-          <ContentLibraryViewer entries={libraryEntries} onRefresh={refresh} />
-        </TabsContent>
-
-        <TabsContent value="feed" className="space-y-3 mt-0">
-          <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">
-            Latest cache writes <span className="text-muted-foreground/45">({recentContent.length})</span>
-          </p>
-          <p className="text-[9px] font-mono text-muted-foreground/50 leading-relaxed">
-            Newest rows in <code className="text-muted-foreground/60">companion_cache</code> (cron pregenerate + live generation). Sessions below are per-reflection; expand a session to see each companion’s <strong className="font-normal text-muted-foreground/55">serve source</strong> (live / cache / curated / empty) from <code className="text-muted-foreground/55">companion_serves</code>.
-          </p>
-          <FilterRow label="Type" options={feedTypeOptions} value={feedTypeFilter} onChange={setFeedTypeFilter} />
-          <p className="text-[9px] font-mono text-muted-foreground/50">
-            {filteredFeed.length === recentContent.length
-              ? `${recentContent.length} item${recentContent.length !== 1 ? 's' : ''}`
-              : `Showing ${filteredFeed.length} of ${recentContent.length} — `}
-            {filteredFeed.length < recentContent.length && (
-              <button onClick={() => setFeedTypeFilter('all')} className="text-primary/70 hover:text-primary">clear filter</button>
-            )}
-          </p>
-          <AdminBulkBar
-            idsShown={feedIdsShown}
-            selectedIds={feedSelectedIds}
-            onSelectionChange={setFeedSelectedIds}
-            onBulkDelete={bulkDeleteFeedItems}
-            busy={feedBulkBusy}
-          />
-          {filteredFeed.map(item => (
-            <FeedCard
-              key={item.id}
-              item={item}
-              selected={feedSelectedIds.has(item.id)}
-              onToggleSelect={(id, checked) => {
-                setFeedSelectedIds((prev) => {
-                  const n = new Set(prev);
-                  if (checked) n.add(id);
-                  else n.delete(id);
-                  return n;
-                });
-              }}
-              selectDisabled={feedBulkBusy}
-            />
-          ))}
-          {filteredFeed.length === 0 && (
-            <p className="text-[10px] text-muted-foreground/50 text-center py-3">
-              {recentContent.length === 0 ? 'No content generated yet' : 'No content matches filter'}
+          <div className="space-y-3 border-t border-border/15 pt-6">
+            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">
+              Latest cache writes <span className="text-muted-foreground/45">({recentContent.length})</span>
             </p>
-          )}
-        </TabsContent>
-
-        <TabsContent value="rejections" className="space-y-3 mt-0">
-          <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/40">
-            Generation Failures <span className="text-muted-foreground/45">({rejections.length})</span>
-          </p>
-          <FilterRow label="Type" options={rejectionTypeOptions} value={rejectionTypeFilter} onChange={setRejectionTypeFilter} />
-          <FilterRow label="Status" options={rejectionStatusOptions} value={rejectionStatusFilter} onChange={setRejectionStatusFilter} />
-          <p className="text-[9px] font-mono text-muted-foreground/50">
-            {filteredRejections.length === rejections.length
-              ? `${rejections.length} rejection${rejections.length !== 1 ? 's' : ''}`
-              : `Showing ${filteredRejections.length} of ${rejections.length} — `}
-            {filteredRejections.length < rejections.length && (
-              <button onClick={() => { setRejectionTypeFilter('all'); setRejectionStatusFilter('all'); }} className="text-primary/70 hover:text-primary">clear filters</button>
-            )}
-          </p>
-          <AdminBulkBar
-            idsShown={rejectionIdsShown}
-            selectedIds={rejectionSelectedIds}
-            onSelectionChange={setRejectionSelectedIds}
-            onBulkDelete={bulkDeleteRejections}
-            busy={rejectionBulkBusy}
-          />
-          <div className="space-y-1.5">
-            {filteredRejections.map(r => (
-              <RejectionEntry
-                key={r.id}
-                row={r}
-                selected={rejectionSelectedIds.has(r.id)}
+            <p className="text-[9px] font-mono text-muted-foreground/50 leading-relaxed">
+              Newest rows in <code className="text-muted-foreground/60">companion_cache</code>. Bulk delete here removes pool entries (same as Cache tab).
+            </p>
+            <FilterRow label="Type" options={feedTypeOptions} value={feedTypeFilter} onChange={setFeedTypeFilter} />
+            <p className="text-[9px] font-mono text-muted-foreground/50">
+              {filteredFeed.length === recentContent.length
+                ? `${recentContent.length} item${recentContent.length !== 1 ? 's' : ''}`
+                : `Showing ${filteredFeed.length} of ${recentContent.length} — `}
+              {filteredFeed.length < recentContent.length && (
+                <button type="button" onClick={() => setFeedTypeFilter('all')} className="text-primary/70 hover:text-primary">clear filter</button>
+              )}
+            </p>
+            <AdminBulkBar
+              idsShown={feedIdsShown}
+              selectedIds={feedSelectedIds}
+              onSelectionChange={setFeedSelectedIds}
+              onBulkDelete={bulkDeleteFeedItems}
+              busy={feedBulkBusy}
+            />
+            {filteredFeed.map(item => (
+              <FeedCard
+                key={item.id}
+                item={item}
+                selected={feedSelectedIds.has(item.id)}
                 onToggleSelect={(id, checked) => {
-                  setRejectionSelectedIds((prev) => {
+                  setFeedSelectedIds((prev) => {
                     const n = new Set(prev);
                     if (checked) n.add(id);
                     else n.delete(id);
                     return n;
                   });
                 }}
-                selectDisabled={rejectionBulkBusy}
+                selectDisabled={feedBulkBusy}
               />
             ))}
-            {filteredRejections.length === 0 && (
+            {filteredFeed.length === 0 && (
               <p className="text-[10px] text-muted-foreground/50 text-center py-3">
-                {rejections.length === 0 ? 'No rejections' : 'No rejections match filters'}
+                {recentContent.length === 0 ? 'No cache rows in the latest sample' : 'No items match filter'}
               </p>
             )}
           </div>
+        </TabsContent>
+
+        <TabsContent value="sources" className="mt-0 space-y-4">
+          <SourceSuggestionsPanel onCatalogChanged={refresh} />
+          <SourceCatalogViewer sources={signalSources} onRefresh={refresh} libraryEntries={libraryEntries} />
+        </TabsContent>
+
+        <TabsContent value="library" className="mt-0">
+          <ContentLibraryViewer entries={libraryEntries} onRefresh={refresh} />
+        </TabsContent>
+
+        <TabsContent value="content" className="mt-0 space-y-2">
+          <p className="text-[9px] font-mono text-muted-foreground/50">
+            Companion cache — pregenerated and live-written pool rows. Quality score and used_count indicate how often entries are picked from the pool (after live tries and, for some companions, Library fallbacks — see copy inside the panel).
+          </p>
+          <CuratedContentManager entries={cacheEntries} onRefresh={refreshCacheEntries} />
+        </TabsContent>
+
+        <TabsContent value="fallbacks" className="mt-0">
+          <HardcodedFallbacksManager />
+        </TabsContent>
+
+        <TabsContent value="tools" className="mt-0">
+          <DevModeToggle />
         </TabsContent>
       </Tabs>
 

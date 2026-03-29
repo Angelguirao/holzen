@@ -150,7 +150,8 @@ serve(async (req) => {
     const { data: sources } = await supabase
       .from("signal_sources")
       .select("id, name, type, url, category")
-      .not("url", "is", null);
+      .not("url", "is", null)
+      .eq("demoted_for_live", false);
 
     if (!sources || sources.length === 0) {
       log("no sources with URLs");

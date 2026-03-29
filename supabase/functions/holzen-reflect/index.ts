@@ -2,7 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { handleCors, jsonResponse, errorResponse } from "../_shared/cors.ts";
 import { createAuthenticatedClient, createServiceClient } from "../_shared/auth.ts";
 import { createAttemptLogger, createObsTracker, createLogger } from "../_shared/observe.ts";
-import { REFLECTION_FALLBACKS, pickRandom } from "../_shared/fallbacks.ts";
+import { loadFallbackPool, pickRandom } from "../_shared/fallbacks.ts";
 import { sanitizePromptInput, sanitizePromptArray } from "../_shared/sanitize.ts";
 import {
   generateUnifiedReflection,
@@ -50,7 +50,8 @@ serve(async (req) => {
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
-      const fallback = pickRandom(REFLECTION_FALLBACKS);
+      const pool = await loadFallbackPool<{ message: string; haiku: string }>(svcClient, "reflection");
+      const fallback = pickRandom(pool);
       trackObs("companion_fallback_curated");
       return jsonResponse(fallback);
     }
@@ -111,8 +112,9 @@ serve(async (req) => {
   } catch (e) {
     console.error("holzen-reflect error:", e);
     try {
-      const fallback = pickRandom(REFLECTION_FALLBACKS);
-      return jsonResponse(fallback);
+      const svc = await createServiceClient();
+      const pool = await loadFallbackPool<{ message: string; haiku: string }>(svc, "reflection");
+      return jsonResponse(pickRandom(pool));
     } catch {
       return errorResponse(e instanceof Error ? e.message : "Unknown error", 500);
     }

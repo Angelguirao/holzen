@@ -119,3 +119,39 @@ export async function checkDailyBudget(
     return { allowed: true }; // Fail open
   }
 }
+
+/**
+ * Per-user limit for targeted companion regeneration (companion-orchestrate regenerateOnly).
+ * Counts analytics_events.companion_regenerate in the last windowHours.
+ */
+export async function checkCompanionRegenerateLimit(
+  svcClient: any,
+  userId: string,
+  windowHours = 24,
+  maxRegenerates = 12,
+): Promise<RateLimitResult> {
+  try {
+    const windowStart = new Date(Date.now() - windowHours * 60 * 60 * 1000).toISOString();
+    const { count, error } = await svcClient
+      .from("analytics_events")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .eq("event", "companion_regenerate")
+      .gte("created_at", windowStart);
+
+    if (error) {
+      console.warn("[ratelimit] regenerate limit check failed:", error.message);
+      return { allowed: true };
+    }
+    if ((count ?? 0) >= maxRegenerates) {
+      return {
+        allowed: false,
+        reason: `Regenerate limit: ${count} in the last ${windowHours}h (max ${maxRegenerates})`,
+      };
+    }
+    return { allowed: true };
+  } catch (e) {
+    console.warn("[ratelimit] regenerate limit error:", e);
+    return { allowed: true };
+  }
+}

@@ -439,7 +439,12 @@
     "ground": "Ground yourself →",
     "signal": "Read the signal →",
     "zoomOut": "Zoom out →",
-    "lookBack": "Look back →"
+    "lookBack": "Look back →",
+    "helpfulQuestion": "Helpful?",
+    "regenerate": "Regenerate",
+    "regenerating": "Regenerating…",
+    "feedbackThanksUp": "Thanks!",
+    "feedbackThanksDown": "Noted"
   },
   "landing": {
     "hero": "When Bitcoin moves, pause before you do.",
