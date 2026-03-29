@@ -68,8 +68,8 @@
     "ambientMode": "Ambient mode",
     "whenBtcMoves": "When Bitcoin moves, we'll help you pause before you act.",
     "nextAutoCheck": "Next auto-check · {{time}}",
-    "monitoringNextCheck": "Monitoring · next server check in ≈ {{minutes}} min",
-    "monitoringAutoPauseSpacing": "Auto-pause spacing: {{hours}}h after each trigger (your setting)",
+    "monitoringIdle": "{{scan}} · {{hours}}h",
+    "monitoringIdleTitle": "Time until next price check · hours between auto-pauses",
     "monitoringReady": "Monitoring · ready",
     "widget": {
       "market": "Market",

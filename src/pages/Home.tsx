@@ -897,6 +897,14 @@ function NeedAMomentButtonInner({ onTrigger, inCooldown, loading, minutes }: { o
   );
 }
 
+/** Format ms as m:ss for short countdowns (e.g. next cron tick). */
+function formatMsAsMS(ms: number): string {
+  const totalSec = Math.max(0, Math.floor(ms / 1000));
+  const m = Math.floor(totalSec / 60);
+  const s = totalSec % 60;
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
 function AutoCooldownIndicator({
   cooldownRemaining,
   cooldownHours,
@@ -918,30 +926,22 @@ function AutoCooldownIndicator({
     return () => clearInterval(interval);
   }, [cooldownRemaining, nextCronCheckIn]);
 
-  // When not in post-trigger cooldown: explain both server check cadence (~15m) and user's spacing setting (1h–24h).
+  // Idle: live countdown to next ~quarter-hour scan + compact hours spacing (no long copy).
   if (remaining <= 0) {
-    const cronMinutes = Math.max(1, Math.ceil(cronIn / 60000));
-
     return (
-      <div className="space-y-1 py-2">
-        <div className="flex items-center gap-3">
-          <Timer className="h-3.5 w-3.5 text-primary/60 shrink-0" />
-          <div className="flex-1 min-w-0">
-            <p className="text-[10px] font-mono text-primary/60 uppercase tracking-wider">
-              {t('home.monitoringNextCheck', {
-                minutes: cronMinutes,
-                defaultValue: 'Monitoring · next server check in ≈ {{minutes}} min',
-              })}
-            </p>
-          </div>
-          <span className="h-1.5 w-1.5 rounded-full bg-primary/50 animate-pulse shrink-0" />
-        </div>
-        <p className="text-[10px] font-mono text-muted-foreground/80 pl-[22px] leading-snug normal-case">
-          {t('home.monitoringAutoPauseSpacing', {
+      <div
+        className="flex items-center gap-3 py-2"
+        title={t('home.monitoringIdleTitle')}
+      >
+        <Timer className="h-3.5 w-3.5 text-primary/60 shrink-0" />
+        <p className="flex-1 min-w-0 text-[10px] font-mono text-primary/70 tabular-nums tracking-tight">
+          {t('home.monitoringIdle', {
+            scan: formatMsAsMS(cronIn),
             hours: cooldownHours,
-            defaultValue: 'Auto-pause spacing: {{hours}}h after each trigger (your setting)',
+            defaultValue: '{{scan}} · {{hours}}h',
           })}
         </p>
+        <span className="h-1.5 w-1.5 rounded-full bg-primary/50 animate-pulse shrink-0" />
       </div>
     );
   }
