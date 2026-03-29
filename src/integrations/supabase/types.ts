@@ -206,6 +206,7 @@ export type Database = {
           source_host: string | null
           source_kind: string | null
           source_title: string | null
+          source_untrusted: boolean
           source_url: string | null
           thumbs_down: number | null
           thumbs_up: number | null
@@ -235,6 +236,7 @@ export type Database = {
           source_host?: string | null
           source_kind?: string | null
           source_title?: string | null
+          source_untrusted?: boolean
           source_url?: string | null
           thumbs_down?: number | null
           thumbs_up?: number | null
@@ -264,6 +266,7 @@ export type Database = {
           source_host?: string | null
           source_kind?: string | null
           source_title?: string | null
+          source_untrusted?: boolean
           source_url?: string | null
           thumbs_down?: number | null
           thumbs_up?: number | null
@@ -272,6 +275,36 @@ export type Database = {
           topic_slug?: string | null
           used_count?: number
           user_score?: number | null
+        }
+        Relationships: []
+      }
+      companion_fallbacks: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean
+          payload: Json
+          pool_type: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          payload: Json
+          pool_type: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          payload?: Json
+          pool_type?: string
+          sort_order?: number
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1381,10 +1414,50 @@ export type Database = {
           },
         ]
       }
+      signal_source_suggestions: {
+        Row: {
+          category: string
+          created_at: string
+          dedupe_key: string
+          id: string
+          metadata: Json
+          reviewed_at: string | null
+          status: string
+          suggested_name: string
+          suggested_type: string
+          suggested_url: string | null
+        }
+        Insert: {
+          category: string
+          created_at?: string
+          dedupe_key: string
+          id?: string
+          metadata?: Json
+          reviewed_at?: string | null
+          status?: string
+          suggested_name: string
+          suggested_type?: string
+          suggested_url?: string | null
+        }
+        Update: {
+          category?: string
+          created_at?: string
+          dedupe_key?: string
+          id?: string
+          metadata?: Json
+          reviewed_at?: string | null
+          status?: string
+          suggested_name?: string
+          suggested_type?: string
+          suggested_url?: string | null
+        }
+        Relationships: []
+      }
       signal_sources: {
         Row: {
           category: string
           created_at: string
+          demoted_for_live: boolean
           description: string | null
           id: string
           name: string
@@ -1394,6 +1467,7 @@ export type Database = {
         Insert: {
           category?: string
           created_at?: string
+          demoted_for_live?: boolean
           description?: string | null
           id?: string
           name: string
@@ -1403,6 +1477,7 @@ export type Database = {
         Update: {
           category?: string
           created_at?: string
+          demoted_for_live?: boolean
           description?: string | null
           id?: string
           name?: string
@@ -1609,6 +1684,7 @@ export type Database = {
           p95_latency_ms: number | null
           provider: string | null
           quality_gate_failures: number | null
+          rate_limited: number | null
           successes: number | null
           timeouts: number | null
           total_attempts: number | null
