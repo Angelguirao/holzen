@@ -1,11 +1,13 @@
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { ChevronDown, ChevronRight, ArrowUp, ArrowDown, Trash2, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import type { CacheEntryRow } from '@/hooks/use-admin-stats';
+import { Checkbox } from '@/components/ui/checkbox';
 import { TYPE_COLORS, label } from './admin-constants';
 import { FilterRow } from './FilterRow';
 import { QualityBadge } from './QualityBadge';
+import { AdminBulkBar } from './AdminBulkBar';
 
 const QUALITY_OPTIONS = [
   { value: 'all', label: 'All' },
@@ -20,12 +22,20 @@ const STATUS_OPTIONS = [
   { value: 'expiring', label: 'Expiring' },
 ];
 
+const DELETE_CHUNK = 40;
+
 export function CuratedContentManager({ entries, onRefresh }: { entries: CacheEntryRow[]; onRefresh: () => Promise<void> }) {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [acting, setActing] = useState<string | null>(null);
+  const [bulkBusy, setBulkBusy] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
   const [qualityFilter, setQualityFilter] = useState('all');
   const [statusFilter, setStatusFilter] = useState('all');
+
+  useEffect(() => {
+    if (!open) setSelectedIds(new Set());
+  }, [open]);
 
   const filteredEntries = useMemo(() => entries.filter(e => {
     if (qualityFilter === 'curated' && e.quality_score < 3) return false;
@@ -67,9 +77,52 @@ export function CuratedContentManager({ entries, onRefresh }: { entries: CacheEn
     setActing(id);
     const { error } = await supabase.from('companion_cache').delete().eq('id', id);
     if (error) { toast({ title: 'Delete failed', description: error.message, variant: 'destructive' }); setActing(null); return; }
+    setSelectedIds((prev) => { const n = new Set(prev); n.delete(id); return n; });
     await onRefresh();
     setActing(null);
   }, [onRefresh, toast]);
+
+  const idsShown = useMemo(() => filteredEntries.map((e) => e.id), [filteredEntries]);
+
+  useEffect(() => {
+    setSelectedIds((prev) => {
+      const allowed = new Set(idsShown);
+      let changed = false;
+      const next = new Set<string>();
+      for (const id of prev) {
+        if (allowed.has(id)) next.add(id);
+        else changed = true;
+      }
+      return changed ? next : prev;
+    });
+  }, [idsShown]);
+
+  const bulkDelete = useCallback(async () => {
+    const ids = idsShown.filter((id) => selectedIds.has(id));
+    if (ids.length === 0) return;
+    if (!window.confirm(`Delete ${ids.length} cache entr${ids.length === 1 ? 'y' : 'ies'}? This cannot be undone.`)) return;
+    setBulkBusy(true);
+    try {
+      for (let i = 0; i < ids.length; i += DELETE_CHUNK) {
+        const slice = ids.slice(i, i + DELETE_CHUNK);
+        const { error } = await supabase.from('companion_cache').delete().in('id', slice);
+        if (error) {
+          toast({ title: 'Bulk delete failed', description: error.message, variant: 'destructive' });
+          setBulkBusy(false);
+          return;
+        }
+      }
+      setSelectedIds((prev) => {
+        const n = new Set(prev);
+        for (const id of ids) n.delete(id);
+        return n;
+      });
+      await onRefresh();
+      toast({ title: 'Deleted', description: `${ids.length} cache entr${ids.length === 1 ? 'y' : 'ies'} removed.` });
+    } finally {
+      setBulkBusy(false);
+    }
+  }, [idsShown, selectedIds, onRefresh, toast]);
 
   return (
     <div className="space-y-3">
@@ -107,6 +160,13 @@ export function CuratedContentManager({ entries, onRefresh }: { entries: CacheEn
           {(qualityFilter !== 'all' || statusFilter !== 'all') && (
             <p className="text-[9px] font-mono text-muted-foreground/40">Showing {filteredEntries.length} of {entries.length}</p>
           )}
+          <AdminBulkBar
+            idsShown={idsShown}
+            selectedIds={selectedIds}
+            onSelectionChange={setSelectedIds}
+            onBulkDelete={bulkDelete}
+            busy={bulkBusy}
+          />
           {grouped.map(([type, items]) => (
             <div key={type} className="space-y-1.5">
               <div className="flex items-center gap-2">
@@ -121,6 +181,19 @@ export function CuratedContentManager({ entries, onRefresh }: { entries: CacheEn
                 return (
                   <div key={entry.id} className="rounded-lg border border-border/20 bg-card/10 px-3 py-2 space-y-1.5">
                     <div className="flex items-start justify-between gap-2">
+                      <Checkbox
+                        className="mt-0.5 h-3.5 w-3.5 shrink-0"
+                        checked={selectedIds.has(entry.id)}
+                        onCheckedChange={(v) => {
+                          setSelectedIds((prev) => {
+                            const n = new Set(prev);
+                            if (v === true) n.add(entry.id);
+                            else n.delete(entry.id);
+                            return n;
+                          });
+                        }}
+                        disabled={bulkBusy}
+                      />
                       <div className="flex-1 min-w-0">
                         <p className="text-[10px] font-mono text-foreground/70 truncate">{entry.title || '(untitled)'}</p>
                         <div className="flex flex-wrap items-center gap-2 mt-0.5">

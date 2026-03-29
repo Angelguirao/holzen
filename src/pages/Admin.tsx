@@ -4,11 +4,13 @@ import { supabase } from '@/integrations/supabase/client';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { RefreshCw, Activity, Database, DollarSign, AlertTriangle, ThumbsUp, Clock, Loader2, ShieldX, ChevronDown, ChevronRight } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useCallback } from 'react';
+import { useToast } from '@/hooks/use-toast';
 import { label, shortModelName, serveSourceBadgeClass, PERIOD_OPTIONS, TAB_TRIGGER_CLASS, TYPE_COLORS } from '@/components/admin/admin-constants';
 import { StatCard, TrendInfo } from '@/components/admin/StatCard';
 import { FilterRow } from '@/components/admin/FilterRow';
 import { FeedCard } from '@/components/admin/FeedCard';
+import { AdminBulkBar } from '@/components/admin/AdminBulkBar';
 import { RejectionEntry } from '@/components/admin/RejectionEntry';
 import { CuratedContentManager } from '@/components/admin/CuratedContentManager';
 import { SourceCatalogViewer } from '@/components/admin/SourceCatalogViewer';
@@ -113,13 +115,16 @@ function ServeSourceTag({ source }: { source?: string | null }) {
   );
 }
 
+const FEED_DELETE_CHUNK = 40;
+
 export default function Admin() {
   const { isAdmin, loading: adminLoading } = useIsAdmin();
+  const { toast } = useToast();
   const {
     cacheHits, costs, failures, feedback, cacheEntries, signalSources,
     period, setPeriod, periodStats, prevPeriodStats,
     rejections, recentContent, sessions, libraryEntries,
-    loading, error, refresh, refreshCacheEntries, lastUpdated,
+    loading, error, refresh, refreshCacheEntries, refreshCompanionCacheUi, lastUpdated,
   } = useAdminStats(!adminLoading && isAdmin);
 
   // ── ALL HOOKS MUST BE ABOVE EARLY RETURNS ──
@@ -202,6 +207,49 @@ export default function Admin() {
     if (feedTypeFilter === 'all') return recentContent;
     return recentContent.filter(c => c.companion_type === feedTypeFilter);
   }, [recentContent, feedTypeFilter]);
+
+  const [feedSelectedIds, setFeedSelectedIds] = useState<Set<string>>(() => new Set());
+  const [feedBulkBusy, setFeedBulkBusy] = useState(false);
+  const feedIdsShown = useMemo(() => filteredFeed.map((c) => c.id), [filteredFeed]);
+
+  useEffect(() => {
+    setFeedSelectedIds((prev) => {
+      const allowed = new Set(feedIdsShown);
+      let changed = false;
+      const next = new Set<string>();
+      for (const id of prev) {
+        if (allowed.has(id)) next.add(id);
+        else changed = true;
+      }
+      return changed ? next : prev;
+    });
+  }, [feedIdsShown]);
+
+  const bulkDeleteFeedItems = useCallback(async () => {
+    const ids = feedIdsShown.filter((id) => feedSelectedIds.has(id));
+    if (ids.length === 0) return;
+    if (!window.confirm(`Delete ${ids.length} cache entr${ids.length === 1 ? 'y' : 'ies'}? This cannot be undone.`)) return;
+    setFeedBulkBusy(true);
+    try {
+      for (let i = 0; i < ids.length; i += FEED_DELETE_CHUNK) {
+        const slice = ids.slice(i, i + FEED_DELETE_CHUNK);
+        const { error: delErr } = await supabase.from('companion_cache').delete().in('id', slice);
+        if (delErr) {
+          toast({ title: 'Bulk delete failed', description: delErr.message, variant: 'destructive' });
+          return;
+        }
+      }
+      setFeedSelectedIds((prev) => {
+        const n = new Set(prev);
+        for (const id of ids) n.delete(id);
+        return n;
+      });
+      await refreshCompanionCacheUi();
+      toast({ title: 'Deleted', description: `${ids.length} entr${ids.length === 1 ? 'y' : 'ies'} removed.` });
+    } finally {
+      setFeedBulkBusy(false);
+    }
+  }, [feedIdsShown, feedSelectedIds, toast, refreshCompanionCacheUi]);
 
   // ── Rejection filters ──
   const [rejectionTypeFilter, setRejectionTypeFilter] = useState('all');
@@ -697,7 +745,29 @@ export default function Admin() {
               <button onClick={() => setFeedTypeFilter('all')} className="text-primary/70 hover:text-primary">clear filter</button>
             )}
           </p>
-          {filteredFeed.map(item => <FeedCard key={item.id} item={item} />)}
+          <AdminBulkBar
+            idsShown={feedIdsShown}
+            selectedIds={feedSelectedIds}
+            onSelectionChange={setFeedSelectedIds}
+            onBulkDelete={bulkDeleteFeedItems}
+            busy={feedBulkBusy}
+          />
+          {filteredFeed.map(item => (
+            <FeedCard
+              key={item.id}
+              item={item}
+              selected={feedSelectedIds.has(item.id)}
+              onToggleSelect={(id, checked) => {
+                setFeedSelectedIds((prev) => {
+                  const n = new Set(prev);
+                  if (checked) n.add(id);
+                  else n.delete(id);
+                  return n;
+                });
+              }}
+              selectDisabled={feedBulkBusy}
+            />
+          ))}
           {filteredFeed.length === 0 && (
             <p className="text-[10px] text-muted-foreground/50 text-center py-3">
               {recentContent.length === 0 ? 'No content generated yet' : 'No content matches filter'}
