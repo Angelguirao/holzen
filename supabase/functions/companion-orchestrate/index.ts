@@ -392,6 +392,13 @@ serve(async (req) => {
     // Attach the intervention payload if intervention selection was used
     if (selection) {
       response.intervention = interventionPayload;
+
+      // Persist intervention to reflection_companions so re-entry restores it
+      if (reflectionId) {
+        writePromises.push(
+          writeCompanionData(svcClient, reflectionId as string, "intervention", interventionPayload as any)
+        );
+      }
     }
 
     // Add serve log writes

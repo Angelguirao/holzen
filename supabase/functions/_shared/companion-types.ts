@@ -25,6 +25,8 @@ export const COMPANION_TYPES = {
   ZOOM_OUT_DEEP_TIME: "zoom_out_deep_time",
   /** Main reflection message + haiku */
   REFLECTION: "reflection",
+  /** Intervention selection result (persisted to avoid regeneration) */
+  INTERVENTION: "intervention",
 } as const;
 
 export type CompanionType = typeof COMPANION_TYPES[keyof typeof COMPANION_TYPES];

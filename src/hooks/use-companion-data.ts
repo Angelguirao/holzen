@@ -274,6 +274,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     grounding?: NudgeData | null;
     history?: HistoricalInsightData | null;
     zoomOut?: any;
+    intervention?: InterventionState | null;
   }> => {
     const { data: companions } = await supabase
       .from('reflection_companions')
@@ -291,8 +292,9 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       } else if (c.companion_type === 'historical_insight' && d) {
         result.history = d;
       } else if ((c.companion_type === 'zoom_out' || c.companion_type === 'zoom_out_deep_time') && d) {
-        // Prefer first match (both types represent zoom-out content)
         if (!result.zoomOut) result.zoomOut = d;
+      } else if (c.companion_type === 'intervention' && d) {
+        result.intervention = d as InterventionState;
       }
     }
     return result;
@@ -425,6 +427,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       needGrounding = enableGrounding && !cached.grounding;
       needHistory = enableHistory && !cached.history;
       needZoomOut = enableZoomOut && !cached.zoomOut;
+      const needIntervention = !cached.intervention;
 
       // Set already-cached companions immediately
       if (cached.signal && enableSignal) {
@@ -447,6 +450,20 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
         setZoomOutLoading(false);
         const zoomBody = cached.zoomOut?.deepTime?.body || cached.zoomOut?.echo?.message || 'Zoom Out perspective';
         autoSaveToLibrary({ title: cached.zoomOut?.deepTime?.title || 'Zoom Out', body: zoomBody, sourceType: 'zoom_out' });
+      }
+      if (cached.intervention) {
+        setIntervention(cached.intervention);
+        setInterventionLoading(false);
+      }
+
+      // If everything is already cached, skip the orchestrate call entirely
+      if (!needSignal && !needGrounding && !needHistory && !needZoomOut && !needIntervention) {
+        setSignalLoading(false);
+        setNudgeLoading(false);
+        setHistoryLoading(false);
+        setZoomOutLoading(false);
+        setInterventionLoading(false);
+        return;
       }
 
       // Build orchestrator payload
