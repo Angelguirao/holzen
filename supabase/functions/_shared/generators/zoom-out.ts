@@ -11,7 +11,12 @@
  */
 
 import { qualityGate, BANNED_PHRASES, containsSlop, contentFingerprint } from "../quality.ts";
-import { loadFallbackPool, pickRandom } from "../fallbacks.ts";
+import {
+  companionFallbacksDisabled,
+  COMPANION_FALLBACKS_DISABLED_MESSAGE,
+  loadFallbackPool,
+  pickRandom,
+} from "../fallbacks.ts";
 import { COMPANION_ZOOM_OUT_DEEP_TIME, parseMarketDirection, serveFromCache } from "../cache.ts";
 import { createAttemptLogger } from "../observe.ts";
 
@@ -22,8 +27,9 @@ export const PROMPT_VERSION = "v2";
 
 export interface ZoomOutResult {
   data: any | null;  // { onThisDay, currentPrice, echo, deepTime, partial }
-  source: "live" | "cache" | "curated";
+  source: "live" | "cache" | "curated" | "empty";
   cacheId: string | null;
+  error?: string;
 }
 
 export interface GenerateZoomOutParams {
@@ -130,7 +136,8 @@ async function fetchEchoReflection(
 
 interface DeepTimeResult {
   deepTime: { title: string; body: string } | null;
-  source: "live" | "cache" | "curated";
+  source: "live" | "cache" | "curated" | "empty";
+  error?: string;
 }
 
 async function generateDeepTime(
@@ -151,6 +158,9 @@ async function generateDeepTime(
 
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   if (!LOVABLE_API_KEY) {
+    if (companionFallbacksDisabled()) {
+      return { deepTime: null, source: "empty", error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
+    }
     const pool = await loadFallbackPool<{ title: string; body: string }>(svcClient, "zoom_out");
     return { deepTime: pickRandom(pool), source: "curated" };
   }
@@ -296,6 +306,9 @@ No trading advice, no price predictions, no exclamation marks.${mood ? `\n\nUSER
 
   // Fallback chain: cache (per-user + market-aware) → curated
   if (!deepTime) {
+    if (companionFallbacksDisabled()) {
+      return { deepTime: null, source: "empty", error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
+    }
     const marketDirection = parseMarketDirection(context);
     const cached = await serveFromCache(svcClient, COMPANION_ZOOM_OUT_DEEP_TIME, "en", { userId, marketDirection });
     if (cached) {
@@ -347,5 +360,10 @@ export async function generateZoomOut(params: GenerateZoomOutParams): Promise<Zo
     partial: prices.isPartial,
   };
 
-  return { data: result, source: deepTimeResult.source, cacheId: null };
+  return {
+    data: result,
+    source: deepTimeResult.source,
+    cacheId: null,
+    error: deepTimeResult.error,
+  };
 }

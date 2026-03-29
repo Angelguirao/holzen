@@ -9,7 +9,12 @@
  */
 
 import { qualityGate, normalizeUrl, isUrlReachable, contentFingerprint } from "../quality.ts";
-import { loadFallbackPool, pickRandom } from "../fallbacks.ts";
+import {
+  companionFallbacksDisabled,
+  COMPANION_FALLBACKS_DISABLED_MESSAGE,
+  loadFallbackPool,
+  pickRandom,
+} from "../fallbacks.ts";
 import { parseMarketDirection, serveFromCache } from "../cache.ts";
 import { createAttemptLogger } from "../observe.ts";
 import { enqueueCatalogSourceSuggestion } from "../source-suggestions.ts";
@@ -24,8 +29,10 @@ export const PROMPT_VERSION = "v2";
 
 export interface SignalResult {
   data: { title: string; body: string; source: string; url: string } | null;
-  source: "live" | "cache" | "curated";
+  source: "live" | "cache" | "curated" | "empty";
   cacheId: string | null;
+  /** Set when source is `empty` (e.g. DISABLE_COMPANION_FALLBACKS + live failure) */
+  error?: string;
 }
 
 export interface GenerateSignalParams {
@@ -48,6 +55,9 @@ async function serveFallback(
   marketDirection?: "up" | "down" | "neutral",
   excludeIds?: string[],
 ): Promise<SignalResult> {
+  if (companionFallbacksDisabled()) {
+    return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
+  }
   const libraryRows = await searchLibrary(svcClient, {
     type: "essay",
     companionType: "signal",

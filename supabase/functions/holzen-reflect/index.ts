@@ -2,7 +2,13 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { handleCors, jsonResponse, errorResponse } from "../_shared/cors.ts";
 import { createAuthenticatedClient, createServiceClient } from "../_shared/auth.ts";
 import { createAttemptLogger, createObsTracker, createLogger } from "../_shared/observe.ts";
-import { loadFallbackPool, pickRandom } from "../_shared/fallbacks.ts";
+import {
+  companionFallbacksDisabled,
+  COMPANION_FALLBACKS_DISABLED_MESSAGE,
+  loadFallbackPool,
+  pickRandom,
+  REFLECTION_FALLBACKS,
+} from "../_shared/fallbacks.ts";
 import { sanitizePromptInput, sanitizePromptArray } from "../_shared/sanitize.ts";
 import {
   generateUnifiedReflection,
@@ -50,6 +56,9 @@ serve(async (req) => {
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) {
+      if (companionFallbacksDisabled()) {
+        return errorResponse(COMPANION_FALLBACKS_DISABLED_MESSAGE, 503);
+      }
       const pool = await loadFallbackPool<{ message: string; haiku: string }>(svcClient, "reflection");
       const fallback = pickRandom(pool);
       trackObs("companion_fallback_curated");
@@ -81,6 +90,9 @@ serve(async (req) => {
       if (lastStatus === 402) {
         return errorResponse("AI usage limit reached.", 402);
       }
+      if (companionFallbacksDisabled()) {
+        return errorResponse(COMPANION_FALLBACKS_DISABLED_MESSAGE, 503);
+      }
       log("All AI models failed, serving curated fallback");
       const fallback = pickRandom(REFLECTION_FALLBACKS);
       trackObs("companion_fallback_curated");
@@ -111,6 +123,9 @@ serve(async (req) => {
     });
   } catch (e) {
     console.error("holzen-reflect error:", e);
+    if (companionFallbacksDisabled()) {
+      return errorResponse(e instanceof Error ? e.message : "Unknown error", 500);
+    }
     try {
       const svc = await createServiceClient();
       const pool = await loadFallbackPool<{ message: string; haiku: string }>(svc, "reflection");
