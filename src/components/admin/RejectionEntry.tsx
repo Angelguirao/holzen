@@ -1,5 +1,6 @@
 import { Clock } from 'lucide-react';
 import type { RejectionRow } from '@/hooks/use-admin-stats';
+import { Checkbox } from '@/components/ui/checkbox';
 import { TYPE_COLORS, label } from './admin-constants';
 
 const STATUS_COLOR: Record<string, string> = {
@@ -8,10 +9,26 @@ const STATUS_COLOR: Record<string, string> = {
   quality_gate_failed: 'bg-orange-500/15 text-orange-600 dark:text-orange-400',
 };
 
-export function RejectionEntry({ row }: { row: RejectionRow }) {
+type RejectionEntryProps = {
+  row: RejectionRow;
+  selected?: boolean;
+  onToggleSelect?: (id: string, checked: boolean) => void;
+  selectDisabled?: boolean;
+};
+
+export function RejectionEntry({ row, selected, onToggleSelect, selectDisabled }: RejectionEntryProps) {
+  const showSelect = Boolean(onToggleSelect);
   return (
     <div className="rounded-lg border border-border/20 bg-card/10 px-3 py-2">
       <div className="flex items-center gap-2">
+        {showSelect && (
+          <Checkbox
+            className="h-3.5 w-3.5 shrink-0"
+            checked={!!selected}
+            onCheckedChange={(v) => onToggleSelect?.(row.id, v === true)}
+            disabled={selectDisabled}
+          />
+        )}
         <span
           className="text-[9px] font-mono px-1.5 py-0.5 rounded-full flex-shrink-0"
           style={{

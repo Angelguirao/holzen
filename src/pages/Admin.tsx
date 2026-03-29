@@ -116,6 +116,7 @@ function ServeSourceTag({ source }: { source?: string | null }) {
 }
 
 const FEED_DELETE_CHUNK = 40;
+const REJECTION_DELETE_CHUNK = 40;
 
 export default function Admin() {
   const { isAdmin, loading: adminLoading } = useIsAdmin();
@@ -124,7 +125,7 @@ export default function Admin() {
     cacheHits, costs, failures, feedback, cacheEntries, signalSources,
     period, setPeriod, periodStats, prevPeriodStats,
     rejections, recentContent, sessions, libraryEntries,
-    loading, error, refresh, refreshCacheEntries, refreshCompanionCacheUi, lastUpdated,
+    loading, error, refresh, refreshCacheEntries, refreshCompanionCacheUi, refreshRejections, lastUpdated,
   } = useAdminStats(!adminLoading && isAdmin);
 
   // ── ALL HOOKS MUST BE ABOVE EARLY RETURNS ──
@@ -267,6 +268,49 @@ export default function Admin() {
     if (rejectionStatusFilter !== 'all' && r.status !== rejectionStatusFilter) return false;
     return true;
   }), [rejections, rejectionTypeFilter, rejectionStatusFilter]);
+
+  const [rejectionSelectedIds, setRejectionSelectedIds] = useState<Set<string>>(() => new Set());
+  const [rejectionBulkBusy, setRejectionBulkBusy] = useState(false);
+  const rejectionIdsShown = useMemo(() => filteredRejections.map((r) => r.id), [filteredRejections]);
+
+  useEffect(() => {
+    setRejectionSelectedIds((prev) => {
+      const allowed = new Set(rejectionIdsShown);
+      let changed = false;
+      const next = new Set<string>();
+      for (const id of prev) {
+        if (allowed.has(id)) next.add(id);
+        else changed = true;
+      }
+      return changed ? next : prev;
+    });
+  }, [rejectionIdsShown]);
+
+  const bulkDeleteRejections = useCallback(async () => {
+    const ids = rejectionIdsShown.filter((id) => rejectionSelectedIds.has(id));
+    if (ids.length === 0) return;
+    if (!window.confirm(`Permanently delete ${ids.length} generation attempt record${ids.length === 1 ? '' : 's'}?`)) return;
+    setRejectionBulkBusy(true);
+    try {
+      for (let i = 0; i < ids.length; i += REJECTION_DELETE_CHUNK) {
+        const slice = ids.slice(i, i + REJECTION_DELETE_CHUNK);
+        const { error: delErr } = await supabase.from('generation_attempts').delete().in('id', slice);
+        if (delErr) {
+          toast({ title: 'Bulk delete failed', description: delErr.message, variant: 'destructive' });
+          return;
+        }
+      }
+      setRejectionSelectedIds((prev) => {
+        const n = new Set(prev);
+        for (const id of ids) n.delete(id);
+        return n;
+      });
+      await refreshRejections();
+      toast({ title: 'Deleted', description: `${ids.length} record${ids.length === 1 ? '' : 's'} removed.` });
+    } finally {
+      setRejectionBulkBusy(false);
+    }
+  }, [rejectionIdsShown, rejectionSelectedIds, toast, refreshRejections]);
 
   // ── Early returns (after all hooks) ──
   if (adminLoading) {
@@ -789,8 +833,30 @@ export default function Admin() {
               <button onClick={() => { setRejectionTypeFilter('all'); setRejectionStatusFilter('all'); }} className="text-primary/70 hover:text-primary">clear filters</button>
             )}
           </p>
+          <AdminBulkBar
+            idsShown={rejectionIdsShown}
+            selectedIds={rejectionSelectedIds}
+            onSelectionChange={setRejectionSelectedIds}
+            onBulkDelete={bulkDeleteRejections}
+            busy={rejectionBulkBusy}
+          />
           <div className="space-y-1.5">
-            {filteredRejections.map(r => <RejectionEntry key={r.id} row={r} />)}
+            {filteredRejections.map(r => (
+              <RejectionEntry
+                key={r.id}
+                row={r}
+                selected={rejectionSelectedIds.has(r.id)}
+                onToggleSelect={(id, checked) => {
+                  setRejectionSelectedIds((prev) => {
+                    const n = new Set(prev);
+                    if (checked) n.add(id);
+                    else n.delete(id);
+                    return n;
+                  });
+                }}
+                selectDisabled={rejectionBulkBusy}
+              />
+            ))}
             {filteredRejections.length === 0 && (
               <p className="text-[10px] text-muted-foreground/50 text-center py-3">
                 {rejections.length === 0 ? 'No rejections' : 'No rejections match filters'}
