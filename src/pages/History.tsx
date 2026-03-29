@@ -97,15 +97,15 @@ function HistoryCompanions({ label, r }: { label: string; r: Reflection }) {
         <div className="space-y-3 pt-2.5">
           {r.haiku && <HaikuDisplay haiku={r.haiku} />}
 
-          {r.grounding_title && r.grounding_body && (
+          {(r.grounding_title || r.companion_grounding_title) && (r.grounding_body || r.companion_grounding_body) && (
             <LearningInput
-              title={r.grounding_title}
-              body={r.grounding_body}
-              nudge={r.grounding_citation ? {
-                title: r.grounding_title,
-                body: r.grounding_body,
-                citation: r.grounding_citation,
-                url: r.grounding_url ?? '',
+              title={(r.companion_grounding_title ?? r.grounding_title)!}
+              body={(r.companion_grounding_body ?? r.grounding_body)!}
+              nudge={r.companion_grounding_citation ? {
+                title: (r.companion_grounding_title ?? r.grounding_title)!,
+                body: (r.companion_grounding_body ?? r.grounding_body)!,
+                citation: r.companion_grounding_citation,
+                url: r.companion_grounding_url ?? '',
               } : undefined}
             />
           )}
@@ -223,7 +223,7 @@ const History = () => {
     if (!user) return;
     const loadReflections = async () => {
       const { data } = await supabase
-        .from('reflections')
+        .from('v_reflection_with_companions')
         .select(FIELDS)
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
@@ -278,7 +278,7 @@ const History = () => {
     const last = reflections[reflections.length - 1];
     if (!last) { setLoadingMore(false); return; }
     const { data } = await supabase
-      .from('reflections')
+      .from('v_reflection_with_companions')
       .select(FIELDS)
       .eq('user_id', user.id)
       .order('created_at', { ascending: false })
