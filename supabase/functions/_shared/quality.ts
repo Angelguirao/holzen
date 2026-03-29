@@ -229,6 +229,11 @@ function checkSpecificity(companionType: string, content: any): { pass: boolean;
       if (genericSources.some(g => source === g || source.startsWith(g + " "))) {
         return { pass: false, reason: "signal_generic_source" };
       }
+      const body = (content.body || "").toLowerCase();
+      const title = (content.title || "").toLowerCase();
+      if (body.includes("cryptosovereignty") || title.includes("cryptosovereignty")) {
+        return { pass: false, reason: "signal_overused_meme_domain" };
+      }
       break;
     }
     // zoom_out_deep_time — more lenient, philosophical content doesn't need specifics

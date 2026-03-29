@@ -1,14 +1,21 @@
 /**
  * Source attribution validation for signal companion content.
  *
- * Ensures the AI attributes insights to the correct author by:
- * 1. Cross-referencing against known sources from the signal_sources catalog
- * 2. Extracting author info from citation URLs
- * 3. Providing a correction when the AI's attribution doesn't match
+ * Priority: citation URL → publication or known author domain → AI string (only if consistent).
+ * Previously we trusted any "known author" substring in the AI output without checking the URL,
+ * which let the model invent attributions that passed validation.
  */
 
+// ── Publication homepages (prefer these over guessing a person from shared domains) ──
+const DOMAIN_PUBLICATION: Record<string, string> = {
+  "nakamotoinstitute.org": "Nakamoto Institute",
+  "bitcoinmagazine.com": "Bitcoin Magazine",
+  "mises.org": "Mises Institute",
+  "dergigi.com": "Gigi",
+  "21lessons.com": "Gigi",
+};
+
 // ── Well-known Bitcoin author → domain mapping ──
-// Used when the signal_sources table isn't available or for fast lookup
 const KNOWN_AUTHORS: Record<string, string[]> = {
   "Gigi": ["21lessons.com", "dergigi.com"],
   "Saifedean Ammous": ["saifedean.com"],
@@ -19,8 +26,8 @@ const KNOWN_AUTHORS: Record<string, string[]> = {
   "Jeff Booth": ["jeffbooth.ca"],
   "Lyn Alden": ["lynalden.com"],
   "Knut Svanholm": ["knutsvanholm.com"],
-  "Nick Szabo": ["nakamotoinstitute.org", "unenumerated.blogspot.com"],
-  "Hal Finney": ["nakamotoinstitute.org"],
+  "Nick Szabo": ["unenumerated.blogspot.com"],
+  "Hal Finney": [],
   "Adam Back": ["blockstream.com"],
   "Eric Cason": ["cryptosovereignty.org"],
   "Hugo Nguyen": ["hugonguyen.medium.com"],
@@ -28,14 +35,12 @@ const KNOWN_AUTHORS: Record<string, string[]> = {
   "Tuur Demeester": ["adamant.io"],
   "Michael Saylor": ["microstrategy.com", "saylor.org"],
   "Cypherpunk Manifesto": ["activism.net"],
-  "Murray Rothbard": ["mises.org"],
-  "Ludwig von Mises": ["mises.org"],
-  "Friedrich Hayek": ["mises.org"],
-  "Bitcoin Magazine": ["bitcoinmagazine.com"],
-  "Nakamoto Institute": ["nakamotoinstitute.org"],
+  "Murray Rothbard": [],
+  "Ludwig von Mises": [],
+  "Friedrich Hayek": [],
 };
 
-// Build a reverse lookup: domain → author
+// Build domain → person (publication entries override in resolveAttributionFromUrl)
 const DOMAIN_TO_AUTHOR = new Map<string, string>();
 for (const [author, domains] of Object.entries(KNOWN_AUTHORS)) {
   for (const domain of domains) {
@@ -43,33 +48,63 @@ for (const [author, domains] of Object.entries(KNOWN_AUTHORS)) {
   }
 }
 
-/**
- * Extract the likely author from a citation URL using known mappings.
- * Returns the author name if found, or null.
- */
-export function authorFromUrl(url: string): string | null {
-  if (!url) return null;
+function normalizeHost(url: string): string {
   try {
-    const hostname = new URL(url.startsWith("http") ? url : `https://${url}`).hostname.replace(/^www\./, "");
-    // Exact domain match
-    const exact = DOMAIN_TO_AUTHOR.get(hostname);
-    if (exact) return exact;
-    // Partial match (e.g., "blog.allenfarrington.com" contains "allenfarrington")
-    for (const [domain, author] of DOMAIN_TO_AUTHOR.entries()) {
-      if (hostname.includes(domain.split(".")[0])) return author;
+    return new URL(url.startsWith("http") ? url : `https://${url}`).hostname.replace(/^www\./, "");
+  } catch {
+    return "";
+  }
+}
+
+/** True if a and b refer to the same person/org (substring / token overlap). */
+function namesRoughlyMatch(a: string, b: string): boolean {
+  const x = a.trim().toLowerCase();
+  const y = b.trim().toLowerCase();
+  if (!x || !y) return false;
+  if (x === y) return true;
+  if (x.includes(y) || y.includes(x)) return true;
+  const ax = x.split(/\s+/).filter((w) => w.length > 2);
+  const by = y.split(/\s+/).filter((w) => w.length > 2);
+  if (ax.length === 0 || by.length === 0) return false;
+  return ax.some((w) => y.includes(w)) || by.some((w) => x.includes(w));
+}
+
+/**
+ * Best-effort attribution from URL: publication name, else mapped author, else null.
+ */
+export function resolveAttributionFromUrl(url: string): string | null {
+  if (!url) return null;
+  const hostname = normalizeHost(url);
+  if (!hostname) return null;
+
+  for (const [domain, pub] of Object.entries(DOMAIN_PUBLICATION)) {
+    if (hostname === domain || hostname.endsWith(`.${domain}`)) {
+      return pub;
     }
-  } catch { /* invalid URL */ }
+  }
+
+  const exact = DOMAIN_TO_AUTHOR.get(hostname);
+  if (exact) return exact;
+
+  // Subdomain match only for multi-part hosts (avoid matching "medium" globally)
+  for (const [domain, author] of DOMAIN_TO_AUTHOR.entries()) {
+    if (hostname === domain || hostname.endsWith(`.${domain}`)) {
+      return author;
+    }
+  }
+
   return null;
 }
 
 /**
- * Validate and potentially correct the source attribution.
- *
- * @param aiSource - The source name the AI generated
- * @param citationUrl - The URL the AI pinned to
- * @param citations - All available citation URLs
- * @param knownSources - Optional array from signal_sources table
- * @returns Corrected source name, or the original if no correction needed
+ * @deprecated Use resolveAttributionFromUrl — kept for tests and call sites
+ */
+export function authorFromUrl(url: string): string | null {
+  return resolveAttributionFromUrl(url);
+}
+
+/**
+ * Validate and correct the source attribution. Resolved URL (publication / known domain) wins over a mismatched AI label.
  */
 export function validateSource(
   aiSource: string,
@@ -77,42 +112,46 @@ export function validateSource(
   citations: string[],
   knownSources?: Array<{ name: string; url?: string | null }>,
 ): string {
-  if (!aiSource) return aiSource;
+  const trimmed = (aiSource || "").trim();
+  const seen = new Set<string>();
+  const orderedUrls = [citationUrl, ...citations].filter((u): u is string => {
+    if (!u || seen.has(u)) return false;
+    seen.add(u);
+    return true;
+  });
 
-  // 1. Check if AI source matches a known author exactly
-  const aiSourceLower = aiSource.toLowerCase();
-  for (const [author] of Object.entries(KNOWN_AUTHORS)) {
-    if (aiSourceLower.includes(author.toLowerCase())) return aiSource; // Looks correct
+  for (const url of orderedUrls) {
+    const fromUrl = resolveAttributionFromUrl(url);
+    if (!fromUrl) continue;
+    if (trimmed && namesRoughlyMatch(trimmed, fromUrl)) {
+      return trimmed;
+    }
+    return fromUrl;
   }
 
-  // 2. Check against the signal_sources catalog
+  // Catalog names (pause sources)
   if (knownSources) {
+    const low = trimmed.toLowerCase();
     for (const src of knownSources) {
-      if (aiSourceLower.includes(src.name.toLowerCase())) return aiSource; // Matches catalog
+      if (src.name && low.includes(src.name.toLowerCase())) return trimmed;
     }
   }
 
-  // 3. AI source doesn't match any known author — try to correct from URL
-  const urlAuthor = authorFromUrl(citationUrl);
-  if (urlAuthor) {
-    return urlAuthor; // Override with URL-based author
+  // Known author names in AI text (only when no URL mapped — weak)
+  const low = trimmed.toLowerCase();
+  for (const author of Object.keys(KNOWN_AUTHORS)) {
+    if (low.includes(author.toLowerCase())) return trimmed;
   }
 
-  // 4. Try each citation URL
-  for (const c of citations) {
-    const author = authorFromUrl(c);
-    if (author) return author;
-  }
-
-  // 5. Can't determine — keep the AI's source but append the domain for transparency
+  // Transparency: append hostname when we keep a free-form label
   if (citationUrl) {
     try {
-      const hostname = new URL(citationUrl.startsWith("http") ? citationUrl : `https://${citationUrl}`).hostname.replace(/^www\./, "");
-      if (hostname && !aiSourceLower.includes(hostname.split(".")[0])) {
-        return `${aiSource} (via ${hostname})`;
+      const hostname = normalizeHost(citationUrl);
+      if (hostname && !low.includes(hostname.split(".")[0])) {
+        return trimmed ? `${trimmed} (via ${hostname})` : hostname;
       }
     } catch { /* ignore */ }
   }
 
-  return aiSource;
+  return trimmed;
 }

@@ -46,7 +46,7 @@ const THEMES: Record<string, Omit<SessionIntent, "theme">> = {
     groundingBias: "loss aversion and panic selling during market drops",
     historyMood: "recovery",
     zoomOutAngle: "The patience of long timescales — things that took centuries to build",
-    signalAngle: "Bitcoin philosophy about patience, conviction during difficulty, and the cost of panic",
+    signalAngle: "A distinct Bitcoin thinker on patience and conviction during drawdowns — avoid repeating sovereignty clichés; prefer time preference, settlement, or sound money",
   },
   "steadiness-during-anxiety": {
     themeDescription: "The user is anxious but not panicking. Companions should gently acknowledge the discomfort and ground the user in their own track record.",
@@ -54,7 +54,7 @@ const THEMES: Record<string, Omit<SessionIntent, "theme">> = {
     groundingBias: "emotional regulation and prefrontal cortex function during financial stress",
     historyMood: "recovery",
     zoomOutAngle: "How slowly the biggest changes happen — glaciers, tectonic plates, monetary evolution",
-    signalAngle: "Bitcoin thinkers on the relationship between discomfort and growth, or sovereignty as a practice",
+    signalAngle: "Bitcoin writing on discomfort, growth, and holding through noise — pick a thinker not used in your last few pauses; vary the theme away from sovereignty",
   },
   "humility-during-euphoria": {
     themeDescription: "The market is up and the user may be feeling excited or greedy. Companions should gently invite caution without being a buzzkill.",
@@ -62,7 +62,7 @@ const THEMES: Record<string, Omit<SessionIntent, "theme">> = {
     groundingBias: "FOMO and herding behavior during market rallies",
     historyMood: "caution",
     zoomOutAngle: "How quickly empires and bubbles have risen and fallen throughout history",
-    signalAngle: "Bitcoin philosophy about humility, the danger of euphoria, and time preference over quick gains",
+    signalAngle: "Humility, euphoria, and time preference in Bitcoin writing — cite a specific essay; avoid generic crypto-sovereignty blog patterns",
   },
   "grounding-during-fomo": {
     themeDescription: "The user is experiencing FOMO. Companions should anchor them in rational thinking and their original reasons for holding.",
@@ -78,7 +78,7 @@ const THEMES: Record<string, Omit<SessionIntent, "theme">> = {
     groundingBias: "emotional regulation and prefrontal cortex function during financial stress",
     historyMood: "neutral",
     zoomOutAngle: "The deepest truths about persistence, compounding, and long-term thinking",
-    signalAngle: "The most profound Bitcoin essays about what it means to truly understand sound money",
+    signalAngle: "A profound piece on sound money, proof-of-work, or settlement assurances — rotate authors; do not default to sovereignty-only framing",
   },
   "reflection-on-selling": {
     themeDescription: "The user has a pattern of selling during volatility. Companions should gently explore this pattern without judgment.",
@@ -94,7 +94,7 @@ const THEMES: Record<string, Omit<SessionIntent, "theme">> = {
     groundingBias: "anchoring bias and mental accounting in investment decisions",
     historyMood: "neutral",
     zoomOutAngle: "A surprising deep-time perspective that reframes the ordinary",
-    signalAngle: "A timeless Bitcoin essay about sovereignty, sound money, or proof of work as philosophy",
+    signalAngle: "A timeless Bitcoin essay — rotate among themes: proof-of-work, time chains, separation of money and state, Austrian view of BTC, or ethics of holding (not the same theme every pause)",
   },
 };
 
