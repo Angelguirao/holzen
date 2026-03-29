@@ -717,6 +717,48 @@ export type Database = {
         }
         Relationships: []
       }
+      pause_notifications: {
+        Row: {
+          context: string | null
+          created_at: string
+          id: string
+          message: string
+          reflection_id: string | null
+          user_id: string
+        }
+        Insert: {
+          context?: string | null
+          created_at?: string
+          id?: string
+          message: string
+          reflection_id?: string | null
+          user_id: string
+        }
+        Update: {
+          context?: string | null
+          created_at?: string
+          id?: string
+          message?: string
+          reflection_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pause_notifications_reflection_id_fkey"
+            columns: ["reflection_id"]
+            isOneToOne: false
+            referencedRelation: "reflections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_notifications_reflection_id_fkey"
+            columns: ["reflection_id"]
+            isOneToOne: false
+            referencedRelation: "v_reflection_with_companions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       practice_entries: {
         Row: {
           body: string | null
@@ -778,6 +820,7 @@ export type Database = {
         Row: {
           ai_insights_enabled: boolean
           companion_breathing: boolean
+          companion_grounding: boolean
           companion_haiku: boolean
           companion_history: boolean
           companion_learning: boolean
@@ -830,6 +873,7 @@ export type Database = {
         Insert: {
           ai_insights_enabled?: boolean
           companion_breathing?: boolean
+          companion_grounding?: boolean
           companion_haiku?: boolean
           companion_history?: boolean
           companion_learning?: boolean
@@ -882,6 +926,7 @@ export type Database = {
         Update: {
           ai_insights_enabled?: boolean
           companion_breathing?: boolean
+          companion_grounding?: boolean
           companion_haiku?: boolean
           companion_history?: boolean
           companion_learning?: boolean
@@ -1131,6 +1176,9 @@ export type Database = {
           breathing_completed: boolean
           context: string | null
           created_at: string
+          grounding_body: string | null
+          grounding_read: boolean
+          grounding_title: string | null
           haiku: string | null
           haiku_read: boolean
           history_insight_data: Json | null
@@ -1161,6 +1209,9 @@ export type Database = {
           breathing_completed?: boolean
           context?: string | null
           created_at?: string
+          grounding_body?: string | null
+          grounding_read?: boolean
+          grounding_title?: string | null
           haiku?: string | null
           haiku_read?: boolean
           history_insight_data?: Json | null
@@ -1191,6 +1242,9 @@ export type Database = {
           breathing_completed?: boolean
           context?: string | null
           created_at?: string
+          grounding_body?: string | null
+          grounding_read?: boolean
+          grounding_title?: string | null
           haiku?: string | null
           haiku_read?: boolean
           history_insight_data?: Json | null
