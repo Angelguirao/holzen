@@ -170,23 +170,31 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
 
   useEffect(() => {
     if (!reflectionId) return;
-    supabase
-      .from('reflections')
-      .select('breathing_completed, haiku_read, grounding_read, signal_read, zoom_out_read, history_read')
-      .eq('id', reflectionId)
-      .single()
-      .then(({ data }) => {
-        if (data) {
-          setCompletion({
-            breathing: (data as any).breathing_completed ?? false,
-            haiku: (data as any).haiku_read ?? false,
-            grounding: (data as any).grounding_read ?? false,
-            signal: (data as any).signal_read ?? false,
-            zoomOut: (data as any).zoom_out_read ?? false,
-            history: (data as any).history_read ?? false,
-          });
-        }
+    // Read breathing/haiku/grounding from reflections, signal/zoomOut/history from reflection_companions
+    Promise.all([
+      supabase
+        .from('reflections')
+        .select('breathing_completed, haiku_read, grounding_read')
+        .eq('id', reflectionId)
+        .single(),
+      supabase
+        .from('reflection_companions')
+        .select('companion_type, read')
+        .eq('reflection_id', reflectionId),
+    ]).then(([{ data: refData }, { data: companions }]) => {
+      const companionReadMap: Record<string, boolean> = {};
+      for (const c of (companions ?? []) as any[]) {
+        companionReadMap[c.companion_type] = c.read ?? false;
+      }
+      setCompletion({
+        breathing: (refData as any)?.breathing_completed ?? false,
+        haiku: (refData as any)?.haiku_read ?? false,
+        grounding: (refData as any)?.grounding_read ?? false,
+        signal: companionReadMap['signal'] ?? false,
+        zoomOut: companionReadMap['zoom_out'] ?? companionReadMap['zoom_out_deep_time'] ?? false,
+        history: companionReadMap['historical_insight'] ?? false,
       });
+    });
   }, [reflectionId]);
 
   const markCompleted = useCallback(async (key: keyof CompletionState) => {
@@ -194,20 +202,34 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     setCompletion((prev) => ({ ...prev, [key]: true }));
     hapticFeedback('light');
     if (reflectionId) {
-      const dbKeyMap: Record<string, string> = {
+      // breathing, haiku, grounding read flags live on reflections
+      const reflectionKeyMap: Record<string, string> = {
         breathing: 'breathing_completed',
         haiku: 'haiku_read',
         grounding: 'grounding_read',
-        signal: 'signal_read',
-        zoomOut: 'zoom_out_read',
-        history: 'history_read',
       };
-      const dbKey = dbKeyMap[key];
-      if (dbKey) {
+      // signal, zoomOut, history read flags live on reflection_companions
+      const companionTypeMap: Record<string, string> = {
+        signal: 'signal',
+        zoomOut: 'zoom_out_deep_time',
+        history: 'historical_insight',
+      };
+
+      const reflectionKey = reflectionKeyMap[key];
+      if (reflectionKey) {
         await supabase
           .from('reflections')
-          .update({ [dbKey]: true } as any)
+          .update({ [reflectionKey]: true } as any)
           .eq('id', reflectionId);
+      }
+
+      const companionType = companionTypeMap[key];
+      if (companionType) {
+        await supabase
+          .from('reflection_companions')
+          .update({ read: true })
+          .eq('reflection_id', reflectionId)
+          .eq('companion_type', companionType);
       }
     }
   }, [reflectionId, completion]);

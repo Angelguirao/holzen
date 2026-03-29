@@ -358,7 +358,7 @@ serve(async (req) => {
           latency_ms: result.value.latencyMs,
         });
 
-        // Write companion data to both new join table and old denormalized columns
+        // Write companion data to reflection_companions (normalized)
         if (result.value.data && reflectionId) {
           const cType = companionTypeMap[key];
           if (cType) {
@@ -435,5 +435,4 @@ serve(async (req) => {
 import { ORCHESTRATOR_KEY_MAP } from "../_shared/companion-types.ts";
 const companionTypeMap = ORCHESTRATOR_KEY_MAP;
 
-// buildReflectionUpdate removed — replaced by writeCompanionData() from companion-data.ts
-// which dual-writes to both the new reflection_companions table and old denormalized columns.
+// All companion data is written to the normalized reflection_companions table via writeCompanionData().
