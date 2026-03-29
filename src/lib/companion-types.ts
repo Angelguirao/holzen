@@ -16,6 +16,7 @@ export const COMPANION_TYPES = {
   ZOOM_OUT: "zoom_out",
   ZOOM_OUT_DEEP_TIME: "zoom_out_deep_time",
   REFLECTION: "reflection",
+  INTERVENTION: "intervention",
 } as const;
 
 /**
