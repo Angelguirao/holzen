@@ -244,25 +244,24 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     history?: HistoricalInsightData | null;
     zoomOut?: any;
   }> => {
-    const { data: row } = await supabase
-      .from('reflections')
-      .select('signal_title, signal_body, signal_source, signal_url, grounding_title, grounding_body, grounding_citation, grounding_url, zoom_out_data, history_insight_data')
-      .eq('id', rid)
-      .single();
-    if (!row) return {};
+    const { data: companions } = await supabase
+      .from('reflection_companions')
+      .select('companion_type, content')
+      .eq('reflection_id', rid);
+    if (!companions || companions.length === 0) return {};
 
     const result: any = {};
-    if ((row as any).signal_source) {
-      result.signal = { title: (row as any).signal_title ?? '', body: (row as any).signal_body ?? '', source: (row as any).signal_source, url: (row as any).signal_url ?? '' };
-    }
-    if ((row as any).grounding_citation) {
-      result.grounding = { title: (row as any).grounding_title ?? '', body: (row as any).grounding_body ?? '', citation: (row as any).grounding_citation, url: (row as any).grounding_url ?? '' };
-    }
-    if ((row as any).history_insight_data) {
-      result.history = (row as any).history_insight_data;
-    }
-    if ((row as any).zoom_out_data) {
-      result.zoomOut = (row as any).zoom_out_data;
+    for (const c of companions) {
+      const d = c.content as any;
+      if (c.companion_type === 'signal' && d?.source) {
+        result.signal = { title: d.title ?? '', body: d.body ?? '', source: d.source, url: d.url ?? '' };
+      } else if (c.companion_type === 'ground_nudge' && d?.citation) {
+        result.grounding = { title: d.title ?? '', body: d.body ?? '', citation: d.citation, url: d.url ?? '' };
+      } else if (c.companion_type === 'historical_insight' && d) {
+        result.history = d;
+      } else if (c.companion_type === 'zoom_out' && d) {
+        result.zoomOut = d;
+      }
     }
     return result;
   }, []);
