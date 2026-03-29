@@ -12,6 +12,7 @@ import { qualityGate, BANNED_PHRASES, isUrlReachable, contentFingerprint } from 
 import { HISTORY_FALLBACKS, pickRandom } from "../fallbacks.ts";
 import { parseMarketDirection, serveFromCache } from "../cache.ts";
 import { createAttemptLogger } from "../observe.ts";
+import { callPerplexityChat, type PerplexityUsage } from "../perplexity-client.ts";
 import { searchLibrary, eventToHistory, recordLibraryServe } from "../content-library.ts";
 
 /** Bump when the search query, structuring prompt, or quality rules change. */
@@ -117,39 +118,6 @@ async function serveFallback(
   return { data: pickRandom(HISTORY_FALLBACKS), source: "curated", cacheId: null };
 }
 
-async function callPerplexity(
-  pBody: any,
-  apiKey: string,
-  log: GenerateHistoryParams["log"],
-): Promise<{ content: string; citations: string[] }> {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 10_000);
-  try {
-    const res = await fetch("https://api.perplexity.ai/chat/completions", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify(pBody),
-      signal: controller.signal,
-    });
-    clearTimeout(timeout);
-    log(`perplexity responded ${res.status}`);
-    if (!res.ok) {
-      const errText = await res.text();
-      console.error("Perplexity error:", res.status, errText);
-      if (res.status === 429) throw new Error("RATE_LIMITED");
-      throw new Error(`Perplexity ${res.status}`);
-    }
-    const data = await res.json();
-    return {
-      content: data.choices?.[0]?.message?.content || "",
-      citations: data.citations || [],
-    };
-  } catch (e) {
-    clearTimeout(timeout);
-    throw e;
-  }
-}
-
 // ── Public entry point ──
 
 export async function generateHistory(params: GenerateHistoryParams): Promise<HistoryResult> {
@@ -185,30 +153,65 @@ export async function generateHistory(params: GenerateHistoryParams): Promise<Hi
   let searchContent = "";
   let citations: string[] = [];
 
+  const perplexityBody = {
+    model: "sonar-pro",
+    messages: [
+      {
+        role: "system",
+        content: `You are a financial historian specializing in ${randomEra.era}. Search for ONE specific historical event with exact dates, prices, and percentage moves. Do NOT give a general overview — find a specific incident. Include what happened afterward (recovery timeline). Draw from: ${randomEra.examples}. Be precise with numbers.${titleExclusion}`,
+      },
+      { role: "user", content: `Find a specific historical financial event from ${randomEra.era} that parallels current Bitcoin conditions: ${marketContext}. ${moodContext} Include exact dates, prices, percentage moves, and what happened after.` },
+    ],
+  };
+
+  const perplexityT0 = Date.now();
+  let perplexityMerged: PerplexityUsage | undefined;
+
   try {
-    const result = await callPerplexity({
-      model: "sonar-pro",
-      messages: [
-        {
-          role: "system",
-          content: `You are a financial historian specializing in ${randomEra.era}. Search for ONE specific historical event with exact dates, prices, and percentage moves. Do NOT give a general overview — find a specific incident. Include what happened afterward (recovery timeline). Draw from: ${randomEra.examples}. Be precise with numbers.${titleExclusion}`,
-        },
-        { role: "user", content: `Find a specific historical financial event from ${randomEra.era} that parallels current Bitcoin conditions: ${marketContext}. ${moodContext} Include exact dates, prices, percentage moves, and what happened after.` },
-      ],
-    }, PERPLEXITY_API_KEY, log);
+    const result = await callPerplexityChat(perplexityBody, PERPLEXITY_API_KEY, (m) => log(m));
+    perplexityMerged = result.usage;
     searchContent = result.content;
     citations = result.citations;
     log(`content length: ${searchContent.length}, citations: ${citations.length}`);
   } catch (e) {
     log(`perplexity failed: ${e}`);
-    logAttempt({ companion_type: "historical_insight", provider: "perplexity", model: "sonar-pro", status: String(e).includes("RATE_LIMITED") ? "rate_limited" : "error", latency_ms: 0, error_message: String(e) });
+    logAttempt({
+      companion_type: "historical_insight",
+      provider: "perplexity",
+      model: "sonar-pro",
+      status: String(e).includes("RATE_LIMITED") ? "rate_limited" : "error",
+      latency_ms: Date.now() - perplexityT0,
+      error_message: String(e),
+      api_requests: 1,
+    });
     return serveFallback(svcClient, userId, marketDirection, undefined, historyMoodTag);
   }
 
   if (!searchContent) {
-    logAttempt({ companion_type: "historical_insight", provider: "perplexity", model: "sonar-pro", status: "error", latency_ms: 0, error_message: "empty_search_content" });
+    logAttempt({
+      companion_type: "historical_insight",
+      provider: "perplexity",
+      model: "sonar-pro",
+      status: "error",
+      latency_ms: Date.now() - perplexityT0,
+      error_message: "empty_search_content",
+      input_tokens: perplexityMerged?.prompt_tokens,
+      output_tokens: perplexityMerged?.completion_tokens,
+      api_requests: 1,
+    });
     return serveFallback(svcClient, userId, marketDirection, undefined, historyMoodTag);
   }
+
+  logAttempt({
+    companion_type: "historical_insight",
+    provider: "perplexity",
+    model: "sonar-pro",
+    status: "success",
+    latency_ms: Date.now() - perplexityT0,
+    input_tokens: perplexityMerged?.prompt_tokens,
+    output_tokens: perplexityMerged?.completion_tokens,
+    api_requests: 1,
+  });
 
   // ── Step 2: AI structuring ──
   log("calling AI structuring");

@@ -1,4 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createAttemptLogger } from "../_shared/observe.ts";
+import { callPerplexityChat } from "../_shared/perplexity-client.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -86,6 +88,7 @@ serve(async (req) => {
     const { createClient } = await import("npm:@supabase/supabase-js@2.57.2");
     const sbUrl = Deno.env.get("SUPABASE_URL") ?? "";
     const svcClient = createClient(sbUrl, serviceRoleKey, { auth: { persistSession: false } });
+    const logAttempt = createAttemptLogger(svcClient);
 
     const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
@@ -164,26 +167,31 @@ serve(async (req) => {
     for (let i = 0; i < 2; i++) {
       const topic = BIAS_TOPICS[Math.floor(Math.random() * BIAS_TOPICS.length)];
       try {
-        const searchRes = await fetch("https://api.perplexity.ai/chat/completions", {
-          method: "POST",
-          headers: { Authorization: `Bearer ${PERPLEXITY_API_KEY}`, "Content-Type": "application/json" },
-          body: JSON.stringify({
-            model: "sonar-pro",
-            messages: [
-              { role: "system", content: "Find a specific academic study about " + topic + ". Include researcher names, year, journal, and quantitative findings." },
-              { role: "user", content: `Find one specific behavioral finance research paper about ${topic} relevant to Bitcoin/crypto holders.` },
-            ],
-            search_mode: "academic",
-          }),
+        const pT0 = Date.now();
+        const searchPayload = await callPerplexityChat({
+          model: "sonar-pro",
+          messages: [
+            { role: "system", content: "Find a specific academic study about " + topic + ". Include researcher names, year, journal, and quantitative findings." },
+            { role: "user", content: `Find one specific behavioral finance research paper about ${topic} relevant to Bitcoin/crypto holders.` },
+          ],
+          search_mode: "academic",
+        }, PERPLEXITY_API_KEY, log, 45_000);
+        logAttempt({
+          companion_type: "pregenerate",
+          provider: "perplexity",
+          model: "sonar-pro",
+          status: "success",
+          latency_ms: Date.now() - pT0,
+          input_tokens: searchPayload.usage?.prompt_tokens,
+          output_tokens: searchPayload.usage?.completion_tokens,
+          api_requests: 1,
         });
+        const searchContent = searchPayload.content;
+        const citations: string[] = searchPayload.citations || [];
 
-        if (searchRes.ok) {
-          const searchData = await searchRes.json();
-          const searchContent = searchData.choices?.[0]?.message?.content || "";
-          const citations: string[] = searchData.citations || [];
-
-          if (searchContent) {
-            const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        if (searchContent) {
+          const aiT0 = Date.now();
+          const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
               method: "POST",
               headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
               body: JSON.stringify({
@@ -217,6 +225,16 @@ serve(async (req) => {
 
             if (aiRes.ok) {
               const aiData = await aiRes.json();
+              const gUsage = aiData.usage;
+              logAttempt({
+                companion_type: "pregenerate",
+                provider: "lovable",
+                model: "google/gemini-2.5-flash",
+                status: "success",
+                latency_ms: Date.now() - aiT0,
+                input_tokens: gUsage?.prompt_tokens,
+                output_tokens: gUsage?.completion_tokens,
+              });
               const toolCall = aiData.choices?.[0]?.message?.tool_calls?.[0];
               const content = toolCall?.function?.arguments || aiData.choices?.[0]?.message?.content;
               if (content) {
@@ -241,7 +259,6 @@ serve(async (req) => {
               }
             }
           }
-        }
       } catch (e) {
         results.push(`ground_nudge error: ${e}`);
       }
@@ -264,26 +281,31 @@ serve(async (req) => {
     const signalTopic = SIGNAL_TOPICS[Math.floor(Math.random() * SIGNAL_TOPICS.length)];
 
     try {
-      const signalSearchRes = await fetch("https://api.perplexity.ai/chat/completions", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${PERPLEXITY_API_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "sonar-pro",
-          messages: [
-            { role: "system", content: "Find a profound philosophical essay, talk, or piece of writing about Bitcoin. Focus on ideas, not market data. Look for thinkers like Allen Farrington, Vijay Boyapati, Parker Lewis, Gigi, Robert Breedlove, Saifedean Ammous, Jeff Booth, Lyn Alden, or similar." },
-            { role: "user", content: `Find a specific philosophical Bitcoin essay or insight about: ${signalTopic}. Include the author/thinker name and a link to the original piece.` },
-          ],
-          search_recency_filter: "year",
-        }),
+      const sigT0 = Date.now();
+      const signalPayload = await callPerplexityChat({
+        model: "sonar-pro",
+        messages: [
+          { role: "system", content: "Find a profound philosophical essay, talk, or piece of writing about Bitcoin. Focus on ideas, not market data. Look for thinkers like Allen Farrington, Vijay Boyapati, Parker Lewis, Gigi, Robert Breedlove, Saifedean Ammous, Jeff Booth, Lyn Alden, or similar." },
+          { role: "user", content: `Find a specific philosophical Bitcoin essay or insight about: ${signalTopic}. Include the author/thinker name and a link to the original piece.` },
+        ],
+        search_recency_filter: "year",
+      }, PERPLEXITY_API_KEY, log, 45_000);
+      logAttempt({
+        companion_type: "pregenerate",
+        provider: "perplexity",
+        model: "sonar-pro",
+        status: "success",
+        latency_ms: Date.now() - sigT0,
+        input_tokens: signalPayload.usage?.prompt_tokens,
+        output_tokens: signalPayload.usage?.completion_tokens,
+        api_requests: 1,
       });
+      const searchContent = signalPayload.content;
+      const citations: string[] = signalPayload.citations || [];
 
-      if (signalSearchRes.ok) {
-        const signalData = await signalSearchRes.json();
-        const searchContent = signalData.choices?.[0]?.message?.content || "";
-        const citations: string[] = signalData.citations || [];
-
-        if (searchContent) {
-          const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      if (searchContent) {
+        const sigAiT0 = Date.now();
+        const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
             method: "POST",
             headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -317,6 +339,16 @@ serve(async (req) => {
 
           if (aiRes.ok) {
             const aiData = await aiRes.json();
+            const sigUsage = aiData.usage;
+            logAttempt({
+              companion_type: "pregenerate",
+              provider: "lovable",
+              model: "google/gemini-2.5-flash",
+              status: "success",
+              latency_ms: Date.now() - sigAiT0,
+              input_tokens: sigUsage?.prompt_tokens,
+              output_tokens: sigUsage?.completion_tokens,
+            });
             const toolCall = aiData.choices?.[0]?.message?.tool_calls?.[0];
             const content = toolCall?.function?.arguments || aiData.choices?.[0]?.message?.content;
             if (content) {
@@ -338,7 +370,6 @@ serve(async (req) => {
             }
           }
         }
-      }
     } catch (e) {
       results.push(`signal error: ${e}`);
     }
@@ -363,25 +394,30 @@ serve(async (req) => {
     const historyEra = HISTORICAL_ERAS[Math.floor(Math.random() * HISTORICAL_ERAS.length)];
 
     try {
-      const histSearchRes = await fetch("https://api.perplexity.ai/chat/completions", {
-        method: "POST",
-        headers: { Authorization: `Bearer ${PERPLEXITY_API_KEY}`, "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "sonar-pro",
-          messages: [
-            { role: "system", content: "Find a detailed historical account of this financial event. Include specific dates, percentage changes, key figures involved, and the long-term outcome. Focus on the emotional experience of investors during the crisis." },
-            { role: "user", content: `Tell me about ${historyEra} — what happened, how investors felt, and what the outcome was years later.` },
-          ],
-        }),
+      const histT0 = Date.now();
+      const histPayload = await callPerplexityChat({
+        model: "sonar-pro",
+        messages: [
+          { role: "system", content: "Find a detailed historical account of this financial event. Include specific dates, percentage changes, key figures involved, and the long-term outcome. Focus on the emotional experience of investors during the crisis." },
+          { role: "user", content: `Tell me about ${historyEra} — what happened, how investors felt, and what the outcome was years later.` },
+        ],
+      }, PERPLEXITY_API_KEY, log, 45_000);
+      logAttempt({
+        companion_type: "pregenerate",
+        provider: "perplexity",
+        model: "sonar-pro",
+        status: "success",
+        latency_ms: Date.now() - histT0,
+        input_tokens: histPayload.usage?.prompt_tokens,
+        output_tokens: histPayload.usage?.completion_tokens,
+        api_requests: 1,
       });
+      const searchContent = histPayload.content;
+      const citations: string[] = histPayload.citations || [];
 
-      if (histSearchRes.ok) {
-        const histData = await histSearchRes.json();
-        const searchContent = histData.choices?.[0]?.message?.content || "";
-        const citations: string[] = histData.citations || [];
-
-        if (searchContent) {
-          const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+      if (searchContent) {
+        const histAiT0 = Date.now();
+        const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
             method: "POST",
             headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
             body: JSON.stringify({
@@ -397,6 +433,16 @@ serve(async (req) => {
 
           if (aiRes.ok) {
             const aiData = await aiRes.json();
+            const histUsage = aiData.usage;
+            logAttempt({
+              companion_type: "pregenerate",
+              provider: "lovable",
+              model: "google/gemini-2.5-flash",
+              status: "success",
+              latency_ms: Date.now() - histAiT0,
+              input_tokens: histUsage?.prompt_tokens,
+              output_tokens: histUsage?.completion_tokens,
+            });
             const raw = aiData.choices?.[0]?.message?.content;
             if (raw) {
               const insight = JSON.parse(raw);
@@ -421,7 +467,6 @@ serve(async (req) => {
             }
           }
         }
-      }
     } catch (e) {
       results.push(`history error: ${e}`);
     }
@@ -444,6 +489,7 @@ serve(async (req) => {
     const zoomTheme = ZOOM_OUT_THEMES[Math.floor(Math.random() * ZOOM_OUT_THEMES.length)];
 
     try {
+      const zoomT0 = Date.now();
       const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
         headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
@@ -460,6 +506,16 @@ serve(async (req) => {
 
       if (aiRes.ok) {
         const aiData = await aiRes.json();
+        const zoomUsage = aiData.usage;
+        logAttempt({
+          companion_type: "pregenerate",
+          provider: "lovable",
+          model: "google/gemini-2.5-flash",
+          status: "success",
+          latency_ms: Date.now() - zoomT0,
+          input_tokens: zoomUsage?.prompt_tokens,
+          output_tokens: zoomUsage?.completion_tokens,
+        });
         const raw = aiData.choices?.[0]?.message?.content;
         if (raw) {
           const parsed = JSON.parse(raw);

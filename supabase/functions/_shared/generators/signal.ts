@@ -12,6 +12,7 @@ import { qualityGate, normalizeUrl, isUrlReachable, contentFingerprint } from ".
 import { SIGNAL_FALLBACKS, pickRandom } from "../fallbacks.ts";
 import { parseMarketDirection, serveFromCache } from "../cache.ts";
 import { createAttemptLogger } from "../observe.ts";
+import { callPerplexityChat, mergePerplexityUsage } from "../perplexity-client.ts";
 import { validateSource } from "../source-validation.ts";
 import { searchLibrary, essayToSignal, recordLibraryServe } from "../content-library.ts";
 
@@ -79,39 +80,6 @@ function buildSourceHints(sources?: Array<{ name: string; type: string; url?: st
     }
   }
   return { sourceNames, sourceUrls };
-}
-
-async function callPerplexity(
-  pBody: any,
-  apiKey: string,
-  log: GenerateSignalParams["log"],
-): Promise<{ content: string; citations: string[] }> {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 10_000);
-  try {
-    const res = await fetch("https://api.perplexity.ai/chat/completions", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
-      body: JSON.stringify(pBody),
-      signal: controller.signal,
-    });
-    clearTimeout(timeout);
-    log(`perplexity responded ${res.status}`);
-    if (!res.ok) {
-      const errText = await res.text();
-      console.error("Perplexity error:", res.status, errText);
-      if (res.status === 429) throw new Error("RATE_LIMITED");
-      throw new Error("Perplexity search failed");
-    }
-    const data = await res.json();
-    return {
-      content: data.choices?.[0]?.message?.content || "",
-      citations: data.citations || [],
-    };
-  } catch (e) {
-    clearTimeout(timeout);
-    throw e;
-  }
 }
 
 // ── Public entry point ──
@@ -195,8 +163,17 @@ DIVERSITY: Use a DIFFERENT thinker every time. Prefer timeless essays over recen
   let searchContent = "";
   let citations: string[] = [];
 
+  let perplexityApiCalls = 0;
+  let perplexityMerged: ReturnType<typeof mergePerplexityUsage> = undefined;
+
+  const perplexityT0 = Date.now();
   try {
-    const result = await callPerplexity(perplexityBody, PERPLEXITY_API_KEY, log);
+    let apiCalls = 0;
+    let mergedUsage = undefined as ReturnType<typeof mergePerplexityUsage>;
+
+    const result = await callPerplexityChat(perplexityBody, PERPLEXITY_API_KEY, (m) => log(m));
+    apiCalls++;
+    mergedUsage = result.usage;
     searchContent = result.content;
     citations = result.citations;
     log(`perplexity content length: ${searchContent.length}, citations: ${citations.length}`);
@@ -206,7 +183,9 @@ DIVERSITY: Use a DIFFERENT thinker every time. Prefer timeless essays over recen
       const retryBody = { ...perplexityBody };
       delete retryBody.search_domain_filter;
       try {
-        const retry = await callPerplexity(retryBody, PERPLEXITY_API_KEY, log);
+        const retry = await callPerplexityChat(retryBody, PERPLEXITY_API_KEY, (m) => log(m));
+        apiCalls++;
+        mergedUsage = mergePerplexityUsage(mergedUsage, retry.usage);
         if (retry.citations.length > 0) {
           searchContent = retry.content;
           citations = retry.citations;
@@ -214,16 +193,48 @@ DIVERSITY: Use a DIFFERENT thinker every time. Prefer timeless essays over recen
         }
       } catch { log("retry failed, using original content"); }
     }
+
+    perplexityApiCalls = apiCalls;
+    perplexityMerged = mergedUsage;
   } catch (e) {
     log(`perplexity failed: ${e}`);
-    logAttempt({ companion_type: "signal", provider: "perplexity", model: "sonar-pro", status: String(e).includes("RATE_LIMITED") ? "rate_limited" : "error", latency_ms: Date.now() - Date.now(), error_message: String(e) });
+    logAttempt({
+      companion_type: "signal",
+      provider: "perplexity",
+      model: "sonar-pro",
+      status: String(e).includes("RATE_LIMITED") ? "rate_limited" : "error",
+      latency_ms: Date.now() - perplexityT0,
+      error_message: String(e),
+      api_requests: 1,
+    });
     return serveFallback(svcClient, userId, marketDirection);
   }
 
   if (!searchContent) {
-    logAttempt({ companion_type: "signal", provider: "perplexity", model: "sonar-pro", status: "error", latency_ms: 0, error_message: "empty_search_content" });
+    logAttempt({
+      companion_type: "signal",
+      provider: "perplexity",
+      model: "sonar-pro",
+      status: "error",
+      latency_ms: Date.now() - perplexityT0,
+      error_message: "empty_search_content",
+      input_tokens: perplexityMerged?.prompt_tokens,
+      output_tokens: perplexityMerged?.completion_tokens,
+      api_requests: perplexityApiCalls || 1,
+    });
     return serveFallback(svcClient, userId, marketDirection);
   }
+
+  logAttempt({
+    companion_type: "signal",
+    provider: "perplexity",
+    model: "sonar-pro",
+    status: "success",
+    latency_ms: Date.now() - perplexityT0,
+    input_tokens: perplexityMerged?.prompt_tokens,
+    output_tokens: perplexityMerged?.completion_tokens,
+    api_requests: perplexityApiCalls,
+  });
 
   // ── Step 2: AI structuring ──
   const citationList = citations.length > 0
