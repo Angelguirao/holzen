@@ -988,6 +988,7 @@
   "ground": {
     "title": "Ground yourself",
     "finding": "Finding what fits…",
+    "suggestionFailed": "Could not load a grounding suggestion right now.",
     "fallbackSuggestion": "Take a moment with {{activity}}. Sometimes the simplest thing is the most grounding.",
     "noActivities": "No grounding activities set up yet.",
     "noActivitiesHint": "Tell us what grounds you — running, music, cooking — so the AI can suggest what fits each moment.",
@@ -1616,6 +1617,7 @@
     "journalPlaceholder": "Write freely…",
     "journalSaved": "Journal entry saved",
     "generatingPrompt": "Crafting your prompt…",
+    "journalPromptFailed": "Could not load AI prompts. Try again later.",
     "aiGenerated": "AI generated",
     "prompt1": "What pattern am I noticing in my reactions lately?",
     "prompt2": "What would I tell a friend feeling this way about their portfolio?",
