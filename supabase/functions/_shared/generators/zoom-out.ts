@@ -11,7 +11,7 @@
  */
 
 import { qualityGate, BANNED_PHRASES, containsSlop, contentFingerprint } from "../quality.ts";
-import { ZOOM_OUT_FALLBACKS, pickRandom } from "../fallbacks.ts";
+import { loadFallbackPool, pickRandom } from "../fallbacks.ts";
 import { COMPANION_ZOOM_OUT_DEEP_TIME, parseMarketDirection, serveFromCache } from "../cache.ts";
 import { createAttemptLogger } from "../observe.ts";
 
@@ -151,7 +151,8 @@ async function generateDeepTime(
 
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
   if (!LOVABLE_API_KEY) {
-    return { deepTime: pickRandom(ZOOM_OUT_FALLBACKS), source: "curated" };
+    const pool = await loadFallbackPool<{ title: string; body: string }>(svcClient, "zoom_out");
+    return { deepTime: pickRandom(pool), source: "curated" };
   }
 
   const priceContext = currentPrice ? `Current BTC price: $${currentPrice.toLocaleString()}.` : "";
@@ -301,7 +302,8 @@ No trading advice, no price predictions, no exclamation marks.${mood ? `\n\nUSER
       return { deepTime: cached.data as { title: string; body: string }, source: "cache" };
     }
 
-    return { deepTime: pickRandom(ZOOM_OUT_FALLBACKS), source: "curated" };
+    const zpool = await loadFallbackPool<{ title: string; body: string }>(svcClient, "zoom_out");
+    return { deepTime: pickRandom(zpool), source: "curated" };
   }
 
   return { deepTime, source: "live" };

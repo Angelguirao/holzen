@@ -9,7 +9,7 @@
  */
 
 import { qualityGate, containsSlop, isUrlReachable, contentFingerprint } from "../quality.ts";
-import { GROUNDING_FALLBACKS, pickRandom } from "../fallbacks.ts";
+import { loadFallbackPool, pickRandom } from "../fallbacks.ts";
 import { parseMarketDirection, serveFromCache } from "../cache.ts";
 import { createAttemptLogger } from "../observe.ts";
 import { callPerplexityChat, mergePerplexityUsage } from "../perplexity-client.ts";
@@ -107,7 +107,8 @@ async function serveFallback(
   }
   const cached = await serveFromCache(svcClient, "ground_nudge", "en", { userId, marketDirection, excludeIds });
   if (cached) return { data: cached.data, source: "cache", cacheId: cached.cacheId };
-  return { data: pickRandom(GROUNDING_FALLBACKS), source: "curated", cacheId: null };
+  const pool = await loadFallbackPool<{ title: string; body: string; citation: string; url: string }>(svcClient, "grounding");
+  return { data: pickRandom(pool), source: "curated", cacheId: null };
 }
 
 // ── Public entry point ──

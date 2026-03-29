@@ -9,7 +9,7 @@
  */
 
 import { qualityGate, normalizeUrl, isUrlReachable, contentFingerprint } from "../quality.ts";
-import { SIGNAL_FALLBACKS, pickRandom } from "../fallbacks.ts";
+import { loadFallbackPool, pickRandom } from "../fallbacks.ts";
 import { parseMarketDirection, serveFromCache } from "../cache.ts";
 import { createAttemptLogger } from "../observe.ts";
 import { callPerplexityChat, mergePerplexityUsage } from "../perplexity-client.ts";
@@ -61,7 +61,8 @@ async function serveFallback(
   }
   const cached = await serveFromCache(svcClient, "signal", "en", { userId, marketDirection, excludeIds });
   if (cached) return { data: cached.data, source: "cache", cacheId: cached.cacheId };
-  return { data: pickRandom(SIGNAL_FALLBACKS), source: "curated", cacheId: null };
+  const pool = await loadFallbackPool<{ title: string; body: string; source: string; url: string }>(svcClient, "signal");
+  return { data: pickRandom(pool), source: "curated", cacheId: null };
 }
 
 function buildSourceHints(sources?: Array<{ name: string; type: string; url?: string }>) {
