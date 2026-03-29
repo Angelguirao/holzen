@@ -21,8 +21,18 @@ export function listenForSwUpdate() {
   navigator.serviceWorker
     .register('/sw.js', { scope: '/' })
     .then((registration) => {
+      const checkForUpdate = () => {
+        registration.update().catch(() => {});
+      };
+
       // Check for updates periodically (every 60s)
-      setInterval(() => registration.update(), 60 * 1000);
+      setInterval(checkForUpdate, 60 * 1000);
+
+      // When returning from background (common on mobile / PWA), fetch new sw.js sooner
+      document.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') checkForUpdate();
+      });
+      window.addEventListener('focus', checkForUpdate);
 
       const showUpdateToast = (waitingSW: ServiceWorker) => {
         toast('A new version is available', {
