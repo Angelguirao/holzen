@@ -167,7 +167,7 @@ export function useLibrary() {
         const companions = companionMap.get(r.id) ?? [];
         const signalC = companions.find((c: any) => c.companion_type === 'signal');
         const groundingC = companions.find((c: any) => c.companion_type === 'ground_nudge');
-        const zoomOutC = companions.find((c: any) => c.companion_type === 'zoom_out');
+        const zoomOutC = companions.find((c: any) => c.companion_type === 'zoom_out' || c.companion_type === 'zoom_out_deep_time');
         const historyC = companions.find((c: any) => c.companion_type === 'historical_insight');
 
         if (!existingKeys.has(`${r.id}:reflection`)) {

@@ -225,11 +225,20 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
 
       const companionType = companionTypeMap[key];
       if (companionType) {
-        await supabase
-          .from('reflection_companions')
-          .update({ read: true })
-          .eq('reflection_id', reflectionId)
-          .eq('companion_type', companionType);
+        // Update both zoom_out and zoom_out_deep_time for zoom, single type for others
+        if (key === 'zoomOut') {
+          await supabase
+            .from('reflection_companions')
+            .update({ read: true })
+            .eq('reflection_id', reflectionId)
+            .in('companion_type', ['zoom_out', 'zoom_out_deep_time']);
+        } else {
+          await supabase
+            .from('reflection_companions')
+            .update({ read: true })
+            .eq('reflection_id', reflectionId)
+            .eq('companion_type', companionType);
+        }
       }
     }
   }, [reflectionId, completion]);
@@ -277,12 +286,13 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       const d = c.content as any;
       if (c.companion_type === 'signal' && d?.source) {
         result.signal = { title: d.title ?? '', body: d.body ?? '', source: d.source, url: d.url ?? '' };
-      } else if (c.companion_type === 'ground_nudge' && d?.citation) {
-        result.grounding = { title: d.title ?? '', body: d.body ?? '', citation: d.citation, url: d.url ?? '' };
+      } else if (c.companion_type === 'ground_nudge' && d) {
+        result.grounding = { title: d.title ?? '', body: d.body ?? '', citation: d.citation ?? '', url: d.url ?? '' };
       } else if (c.companion_type === 'historical_insight' && d) {
         result.history = d;
-      } else if (c.companion_type === 'zoom_out' && d) {
-        result.zoomOut = d;
+      } else if ((c.companion_type === 'zoom_out' || c.companion_type === 'zoom_out_deep_time') && d) {
+        // Prefer first match (both types represent zoom-out content)
+        if (!result.zoomOut) result.zoomOut = d;
       }
     }
     return result;
