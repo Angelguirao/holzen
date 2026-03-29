@@ -717,6 +717,48 @@ export type Database = {
         }
         Relationships: []
       }
+      pause_notifications: {
+        Row: {
+          context: string | null
+          created_at: string
+          id: string
+          message: string
+          reflection_id: string | null
+          user_id: string
+        }
+        Insert: {
+          context?: string | null
+          created_at?: string
+          id?: string
+          message: string
+          reflection_id?: string | null
+          user_id: string
+        }
+        Update: {
+          context?: string | null
+          created_at?: string
+          id?: string
+          message?: string
+          reflection_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pause_notifications_reflection_id_fkey"
+            columns: ["reflection_id"]
+            isOneToOne: false
+            referencedRelation: "reflections"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_notifications_reflection_id_fkey"
+            columns: ["reflection_id"]
+            isOneToOne: false
+            referencedRelation: "v_reflection_with_companions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       practice_entries: {
         Row: {
           body: string | null
@@ -778,9 +820,10 @@ export type Database = {
         Row: {
           ai_insights_enabled: boolean
           companion_breathing: boolean
+          companion_grounding: boolean
           companion_haiku: boolean
           companion_history: boolean
-          companion_grounding: boolean
+          companion_learning: boolean
           companion_signal: boolean
           companion_zoom_out: boolean
           cooldown_hours: number
@@ -830,9 +873,10 @@ export type Database = {
         Insert: {
           ai_insights_enabled?: boolean
           companion_breathing?: boolean
+          companion_grounding?: boolean
           companion_haiku?: boolean
           companion_history?: boolean
-          companion_grounding?: boolean
+          companion_learning?: boolean
           companion_signal?: boolean
           companion_zoom_out?: boolean
           cooldown_hours?: number
@@ -882,9 +926,10 @@ export type Database = {
         Update: {
           ai_insights_enabled?: boolean
           companion_breathing?: boolean
+          companion_grounding?: boolean
           companion_haiku?: boolean
           companion_history?: boolean
-          companion_grounding?: boolean
+          companion_learning?: boolean
           companion_signal?: boolean
           companion_zoom_out?: boolean
           cooldown_hours?: number
@@ -1131,17 +1176,20 @@ export type Database = {
           breathing_completed: boolean
           context: string | null
           created_at: string
+          grounding_body: string | null
+          grounding_read: boolean
+          grounding_title: string | null
           haiku: string | null
           haiku_read: boolean
           history_insight_data: Json | null
           history_read: boolean
           id: string
           is_favorite: boolean
-          grounding_body: string | null
-          grounding_citation: string | null
-          grounding_read: boolean
-          grounding_title: string | null
-          grounding_url: string | null
+          learning_body: string | null
+          learning_citation: string | null
+          learning_read: boolean
+          learning_title: string | null
+          learning_url: string | null
           message: string
           mood: string | null
           mood_after: string | null
@@ -1161,17 +1209,20 @@ export type Database = {
           breathing_completed?: boolean
           context?: string | null
           created_at?: string
+          grounding_body?: string | null
+          grounding_read?: boolean
+          grounding_title?: string | null
           haiku?: string | null
           haiku_read?: boolean
           history_insight_data?: Json | null
           history_read?: boolean
           id?: string
           is_favorite?: boolean
-          grounding_body?: string | null
-          grounding_citation?: string | null
-          grounding_read?: boolean
-          grounding_title?: string | null
-          grounding_url?: string | null
+          learning_body?: string | null
+          learning_citation?: string | null
+          learning_read?: boolean
+          learning_title?: string | null
+          learning_url?: string | null
           message: string
           mood?: string | null
           mood_after?: string | null
@@ -1191,17 +1242,20 @@ export type Database = {
           breathing_completed?: boolean
           context?: string | null
           created_at?: string
+          grounding_body?: string | null
+          grounding_read?: boolean
+          grounding_title?: string | null
           haiku?: string | null
           haiku_read?: boolean
           history_insight_data?: Json | null
           history_read?: boolean
           id?: string
           is_favorite?: boolean
-          grounding_body?: string | null
-          grounding_citation?: string | null
-          grounding_read?: boolean
-          grounding_title?: string | null
-          grounding_url?: string | null
+          learning_body?: string | null
+          learning_citation?: string | null
+          learning_read?: boolean
+          learning_title?: string | null
+          learning_url?: string | null
           message?: string
           mood?: string | null
           mood_after?: string | null
@@ -1643,11 +1697,11 @@ export type Database = {
           history_read: boolean | null
           id: string | null
           is_favorite: boolean | null
-          grounding_body: string | null
-          grounding_citation: string | null
-          grounding_read: boolean | null
-          grounding_title: string | null
-          grounding_url: string | null
+          learning_body: string | null
+          learning_citation: string | null
+          learning_read: boolean | null
+          learning_title: string | null
+          learning_url: string | null
           message: string | null
           mood: string | null
           mood_after: string | null
