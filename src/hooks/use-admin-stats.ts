@@ -161,6 +161,8 @@ export interface AdminStats {
   refreshCacheEntries: () => Promise<void>;
   /** Refetch cache list + “New items” feed without full dashboard loading state */
   refreshCompanionCacheUi: () => Promise<void>;
+  /** Refetch Generation failures list (last 50) without full dashboard load */
+  refreshRejections: () => Promise<void>;
   lastUpdated: Date | null;
 }
 
@@ -335,8 +337,7 @@ export function useAdminStats(enabled = true): AdminStats {
     }
   }, []);
 
-  const fetchFeeds = useCallback(async () => {
-    // Quality gate rejections (last 50)
+  const refreshRejections = useCallback(async () => {
     const { data: rejectData } = await supabase
       .from('generation_attempts')
       .select('id, companion_type, model, quality_gate_reason, error_message, status, created_at, latency_ms')
@@ -344,6 +345,10 @@ export function useAdminStats(enabled = true): AdminStats {
       .order('created_at', { ascending: false })
       .limit(50);
     setRejections((rejectData ?? []) as RejectionRow[]);
+  }, []);
+
+  const fetchFeeds = useCallback(async () => {
+    await refreshRejections();
 
     // Recent generated content (last 20 cache entries by creation date)
     const { data: contentData } = await supabase
@@ -371,7 +376,7 @@ export function useAdminStats(enabled = true): AdminStats {
         .limit(100);
       if (!libErr) setLibraryEntries((libraryData ?? []) as LibraryEntryRow[]);
     } catch { /* table may not exist yet */ }
-  }, []);
+  }, [refreshRejections]);
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
@@ -463,6 +468,6 @@ export function useAdminStats(enabled = true): AdminStats {
     period, setPeriod: handleSetPeriod, periodStats, prevPeriodStats,
     rejections, recentContent, sessions, libraryEntries,
     loading, error, refresh: fetchAll, refreshCacheEntries: fetchCacheEntries,
-    refreshCompanionCacheUi, lastUpdated,
+    refreshCompanionCacheUi, refreshRejections, lastUpdated,
   };
 }
