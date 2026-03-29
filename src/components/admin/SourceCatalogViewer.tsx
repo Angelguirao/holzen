@@ -1,8 +1,12 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback, useEffect } from 'react';
 import { ChevronDown, ChevronRight, Trash2, Globe, BookOpen } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import type { SignalSourceRow, LibraryEntryRow } from '@/hooks/use-admin-stats';
+import { Checkbox } from '@/components/ui/checkbox';
+import { AdminBulkBar } from './AdminBulkBar';
+
+const DELETE_CHUNK = 40;
 
 const SOURCE_TYPE_COLORS: Record<string, string> = {
   blog: '#8b5cf6',
@@ -25,6 +29,8 @@ export function SourceCatalogViewer({ sources, onRefresh, libraryEntries = [] }:
 }) {
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
+  const [bulkBusy, setBulkBusy] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
   const [adding, setAdding] = useState(false);
   const [newName, setNewName] = useState('');
   const [newUrl, setNewUrl] = useState('');
@@ -40,6 +46,25 @@ export function SourceCatalogViewer({ sources, onRefresh, libraryEntries = [] }:
     }
     return Array.from(map.entries()).sort(([a], [b]) => a.localeCompare(b));
   }, [sources]);
+
+  const idsShown = useMemo(() => sources.map((s) => s.id), [sources]);
+
+  useEffect(() => {
+    if (!open) setSelectedIds(new Set());
+  }, [open]);
+
+  useEffect(() => {
+    setSelectedIds((prev) => {
+      const allowed = new Set(idsShown);
+      let changed = false;
+      const next = new Set<string>();
+      for (const id of prev) {
+        if (allowed.has(id)) next.add(id);
+        else changed = true;
+      }
+      return changed ? next : prev;
+    });
+  }, [idsShown]);
 
   const addSource = async () => {
     if (!newName.trim()) return;
@@ -62,8 +87,36 @@ export function SourceCatalogViewer({ sources, onRefresh, libraryEntries = [] }:
     if (!window.confirm(`Remove "${name}" from sources?`)) return;
     const { error } = await supabase.from('signal_sources').delete().eq('id', id);
     if (error) { toast({ title: 'Delete source failed', description: error.message, variant: 'destructive' }); return; }
+    setSelectedIds((prev) => { const n = new Set(prev); n.delete(id); return n; });
     onRefresh();
   };
+
+  const bulkDeleteSources = useCallback(async () => {
+    const ids = idsShown.filter((id) => selectedIds.has(id));
+    if (ids.length === 0) return;
+    if (!window.confirm(`Delete ${ids.length} source${ids.length === 1 ? '' : 's'}?`)) return;
+    setBulkBusy(true);
+    try {
+      for (let i = 0; i < ids.length; i += DELETE_CHUNK) {
+        const slice = ids.slice(i, i + DELETE_CHUNK);
+        const { error } = await supabase.from('signal_sources').delete().in('id', slice);
+        if (error) {
+          toast({ title: 'Bulk delete failed', description: error.message, variant: 'destructive' });
+          setBulkBusy(false);
+          return;
+        }
+      }
+      setSelectedIds((prev) => {
+        const n = new Set(prev);
+        for (const id of ids) n.delete(id);
+        return n;
+      });
+      onRefresh();
+      toast({ title: 'Deleted', description: `${ids.length} source${ids.length === 1 ? '' : 's'} removed.` });
+    } finally {
+      setBulkBusy(false);
+    }
+  }, [idsShown, selectedIds, onRefresh, toast]);
 
   return (
     <div className="space-y-3">
@@ -126,6 +179,13 @@ export function SourceCatalogViewer({ sources, onRefresh, libraryEntries = [] }:
 
       {open && (
         <div className="space-y-3">
+          <AdminBulkBar
+            idsShown={idsShown}
+            selectedIds={selectedIds}
+            onSelectionChange={setSelectedIds}
+            onBulkDelete={bulkDeleteSources}
+            busy={bulkBusy}
+          />
           {grouped.map(([category, items]) => (
             <div key={category} className="space-y-1.5">
               <span className="text-[10px] font-mono text-foreground/80">{CATEGORY_LABELS[category] ?? category}</span>
@@ -133,6 +193,19 @@ export function SourceCatalogViewer({ sources, onRefresh, libraryEntries = [] }:
                 const libCount = libraryEntries.filter(le => le.author?.toLowerCase() === src.name.toLowerCase()).length;
                 return (
                   <div key={src.id} className="rounded-lg border border-border/20 bg-card/10 px-3 py-2 flex items-center justify-between gap-2">
+                    <Checkbox
+                      className="h-3.5 w-3.5 shrink-0 self-start mt-0.5"
+                      checked={selectedIds.has(src.id)}
+                      onCheckedChange={(v) => {
+                        setSelectedIds((prev) => {
+                          const n = new Set(prev);
+                          if (v === true) n.add(src.id);
+                          else n.delete(src.id);
+                          return n;
+                        });
+                      }}
+                      disabled={bulkBusy}
+                    />
                     <div className="flex-1 min-w-0">
                       <p className="text-[10px] font-mono text-foreground/80 truncate">{src.name}</p>
                       <div className="flex items-center gap-2 mt-0.5">
