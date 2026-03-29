@@ -401,9 +401,9 @@ serve(async (req) => {
       let rowsForRecency: Parameters<typeof recencyHintsFromReflectionRows>[0] = [];
       try {
         const { data: recentRows } = await supabase
-          .from("reflections")
+          .from("v_reflection_with_companions")
           .select(
-            "mood, outcome, created_at, message, haiku, signal_title, signal_source, grounding_title, grounding_url, zoom_out_data, history_insight_data",
+            "mood, outcome, created_at, message, haiku, signal_title, signal_source, grounding_title, companion_grounding_url, zoom_out_data, history_insight_data",
           )
           .eq("user_id", profile.user_id)
           .order("created_at", { ascending: false })
