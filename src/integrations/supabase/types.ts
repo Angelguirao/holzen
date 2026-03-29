@@ -1660,6 +1660,10 @@ export type Database = {
           mood_after: string | null
           note: string | null
           outcome: string | null
+          serve_source_ground_nudge: string | null
+          serve_source_historical_insight: string | null
+          serve_source_signal: string | null
+          serve_source_zoom_out: string | null
           signal_body: string | null
           signal_read: boolean | null
           signal_source: string | null
@@ -1669,10 +1673,6 @@ export type Database = {
           user_id: string | null
           zoom_out_data: Json | null
           zoom_out_read: boolean | null
-          serve_source_signal: string | null
-          serve_source_ground_nudge: string | null
-          serve_source_historical_insight: string | null
-          serve_source_zoom_out: string | null
         }
         Relationships: []
       }
