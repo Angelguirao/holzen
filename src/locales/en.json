@@ -437,6 +437,7 @@
   },
   "companions": {
     "pause": "Pause with this",
+    "reflectOrderHint": "After the haiku, read the signal — one distilled idea from Bitcoin writing. Then ground or explore the rest.",
     "breathe": "Breathe with this →",
     "haiku": "Read as haiku →",
     "ground": "Ground yourself →",
