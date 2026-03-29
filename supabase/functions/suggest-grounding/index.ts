@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { companionFallbacksDisabled, COMPANION_FALLBACKS_DISABLED_MESSAGE } from "../_shared/fallbacks.ts";
 import { sanitizePromptArray } from "../_shared/sanitize.ts";
 import { createAttemptLogger } from "../_shared/observe.ts";
 import { callPerplexityChat, type PerplexityUsage } from "../_shared/perplexity-client.ts";
@@ -194,6 +195,12 @@ Rules:
     } catch (e) {
       clearTimeout(aiTimeout);
       if (e instanceof DOMException && e.name === "AbortError") {
+        if (companionFallbacksDisabled()) {
+          return new Response(JSON.stringify({ error: COMPANION_FALLBACKS_DISABLED_MESSAGE }), {
+            status: 503,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
         // Timeout — return fallback
         const fallbackActivity = groundingActivities[Math.floor(Math.random() * groundingActivities.length)];
         return new Response(JSON.stringify({
@@ -276,7 +283,13 @@ Rules:
       });
     }
 
-    // Fallback
+    if (companionFallbacksDisabled()) {
+      return new Response(JSON.stringify({ error: COMPANION_FALLBACKS_DISABLED_MESSAGE }), {
+        status: 503,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    // Fallback (no tool output from model)
     const fallbackActivity = groundingActivities[Math.floor(Math.random() * groundingActivities.length)];
     return new Response(JSON.stringify({
       activity: fallbackActivity,
