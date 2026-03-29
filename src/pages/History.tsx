@@ -110,10 +110,10 @@ function HistoryCompanions({ label, r }: { label: string; r: Reflection }) {
             <div className="space-y-1.5">
               <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Signal</p>
               {(r.companion_signal_title ?? r.signal_title) && <p className="text-xs font-medium leading-snug">{r.companion_signal_title ?? r.signal_title}</p>}
-              {(r.companion_signal_body ?? r.signal_body) && <p className="text-xs text-muted-foreground leading-relaxed">{r.companion_signal_body ?? r.signal_body}</p>}
-              {(r.companion_signal_url ?? r.signal_url) && (
+              {r.companion_signal_body && <p className="text-xs text-muted-foreground leading-relaxed">{r.companion_signal_body}</p>}
+              {r.companion_signal_url && (
                 <a
-                  href={(r.companion_signal_url ?? r.signal_url)!}
+                  href={r.companion_signal_url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center gap-1.5 text-[10px] font-mono text-primary/70 hover:text-primary transition-colors"
