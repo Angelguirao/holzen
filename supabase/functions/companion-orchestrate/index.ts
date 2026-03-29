@@ -37,6 +37,7 @@ interface CompanionResult {
   latencyMs: number;
   /** Prompt version from the generator — stored as content_fingerprint for regression tracking. */
   promptVersion?: string;
+  /** Present when source is `empty` (e.g. DISABLE_COMPANION_FALLBACKS). */
   error?: string;
 }
 
@@ -299,21 +300,42 @@ serve(async (req) => {
           log,
           preferredBias: intent.groundingBias,
         });
-        return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t, promptVersion: GROUNDING_VERSION };
+        return {
+          data: result.data,
+          source: result.source,
+          cacheId: result.cacheId,
+          latencyMs: Date.now() - t,
+          promptVersion: GROUNDING_VERSION,
+          error: result.error,
+        };
       })();
     }
     if (enableHistory) {
       tasks.history = (async (): Promise<CompanionResult> => {
         const t = Date.now();
         const result = await generateHistory({ svcClient, context, language, mood, recentTitles: recentHistoryTitles, userId, log, preferredMood: intent.historyMood });
-        return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t, promptVersion: HISTORY_VERSION };
+        return {
+          data: result.data,
+          source: result.source,
+          cacheId: result.cacheId,
+          latencyMs: Date.now() - t,
+          promptVersion: HISTORY_VERSION,
+          error: result.error,
+        };
       })();
     }
     if (shouldRunZoomOut) {
       tasks.zoomOut = (async (): Promise<CompanionResult> => {
         const t = Date.now();
         const result = await generateZoomOut({ svcClient, context, language, reflectionMessage, mood, userId, recentTitles: recentZoomOutTitles, log, zoomOutAngle: intent.zoomOutAngle });
-        return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t, promptVersion: ZOOM_OUT_VERSION };
+        return {
+          data: result.data,
+          source: result.source,
+          cacheId: result.cacheId,
+          latencyMs: Date.now() - t,
+          promptVersion: ZOOM_OUT_VERSION,
+          error: result.error,
+        };
       })();
     }
     // Signal — included in pause flow when enabled; provides market context for cognitive reappraisal
@@ -332,7 +354,14 @@ serve(async (req) => {
           log,
           searchAngle: intent.signalAngle,
         });
-        return { data: result.data, source: result.source, cacheId: result.cacheId, latencyMs: Date.now() - t, promptVersion: SIGNAL_VERSION };
+        return {
+          data: result.data,
+          source: result.source,
+          cacheId: result.cacheId,
+          latencyMs: Date.now() - t,
+          promptVersion: SIGNAL_VERSION,
+          error: result.error,
+        };
       })();
     }
 

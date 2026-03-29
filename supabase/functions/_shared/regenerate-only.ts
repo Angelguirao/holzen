@@ -125,6 +125,7 @@ export async function handleRegenerateOnly(params: {
         cacheId: g.cacheId,
         latencyMs: Date.now() - t0,
         promptVersion: GROUNDING_VERSION,
+        error: g.error,
       };
     } else if (slot === "signal") {
       let signalSources = body.signalSources as Array<{ name: string; type: string; url?: string }> | undefined;
@@ -149,6 +150,7 @@ export async function handleRegenerateOnly(params: {
         cacheId: s.cacheId,
         latencyMs: Date.now() - t0,
         promptVersion: SIGNAL_VERSION,
+        error: s.error,
       };
     } else if (slot === "history") {
       const h = await generateHistory({
@@ -167,6 +169,7 @@ export async function handleRegenerateOnly(params: {
         cacheId: h.cacheId,
         latencyMs: Date.now() - t0,
         promptVersion: HISTORY_VERSION,
+        error: h.error,
       };
     } else {
       const z = await generateZoomOut({
@@ -186,6 +189,7 @@ export async function handleRegenerateOnly(params: {
         cacheId: z.cacheId,
         latencyMs: Date.now() - t0,
         promptVersion: ZOOM_OUT_VERSION,
+        error: z.error,
       };
     }
   } catch (e) {

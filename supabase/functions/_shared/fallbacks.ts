@@ -66,3 +66,18 @@ export async function loadFallbackPool<T>(
 export function pickRandom<T>(pool: T[]): T {
   return pool[Math.floor(Math.random() * pool.length)];
 }
+
+/**
+ * Edge Function secret: when `1` / `true` / `yes`, generators skip library → cache → curated
+ * after live generation fails (and holzen-reflect returns errors instead of curated pools).
+ * Use to verify live paths without masking failures.
+ */
+export const ENV_DISABLE_COMPANION_FALLBACKS = "DISABLE_COMPANION_FALLBACKS";
+
+export function companionFallbacksDisabled(): boolean {
+  const v = Deno.env.get(ENV_DISABLE_COMPANION_FALLBACKS);
+  return v === "1" || v === "true" || v === "yes";
+}
+
+export const COMPANION_FALLBACKS_DISABLED_MESSAGE =
+  "Companion fallbacks disabled (DISABLE_COMPANION_FALLBACKS). Live generation failed or API keys missing.";

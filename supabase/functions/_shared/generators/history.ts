@@ -9,7 +9,12 @@
  */
 
 import { qualityGate, BANNED_PHRASES, isUrlReachable, contentFingerprint } from "../quality.ts";
-import { loadFallbackPool, pickRandom } from "../fallbacks.ts";
+import {
+  companionFallbacksDisabled,
+  COMPANION_FALLBACKS_DISABLED_MESSAGE,
+  loadFallbackPool,
+  pickRandom,
+} from "../fallbacks.ts";
 import { parseMarketDirection, serveFromCache } from "../cache.ts";
 import { createAttemptLogger } from "../observe.ts";
 import { callPerplexityChat, type PerplexityUsage } from "../perplexity-client.ts";
@@ -22,8 +27,9 @@ export const PROMPT_VERSION = "v2";
 
 export interface HistoryResult {
   data: { title: string; btcInsight: string; analogy: string; assetClass: string; period: string; source?: string; url?: string } | null;
-  source: "live" | "cache" | "curated";
+  source: "live" | "cache" | "curated" | "empty";
   cacheId: string | null;
+  error?: string;
 }
 
 export interface GenerateHistoryParams {
@@ -100,6 +106,9 @@ async function serveFallback(
   excludeIds?: string[],
   moodTag?: string,
 ): Promise<HistoryResult> {
+  if (companionFallbacksDisabled()) {
+    return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
+  }
   const libraryRows = await searchLibrary(svcClient, {
     type: "event",
     companionType: "historical_insight",

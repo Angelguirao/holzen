@@ -9,7 +9,12 @@
  */
 
 import { qualityGate, containsSlop, isUrlReachable, contentFingerprint } from "../quality.ts";
-import { loadFallbackPool, pickRandom } from "../fallbacks.ts";
+import {
+  companionFallbacksDisabled,
+  COMPANION_FALLBACKS_DISABLED_MESSAGE,
+  loadFallbackPool,
+  pickRandom,
+} from "../fallbacks.ts";
 import { parseMarketDirection, serveFromCache } from "../cache.ts";
 import { createAttemptLogger } from "../observe.ts";
 import { enqueueCatalogSourceSuggestion } from "../source-suggestions.ts";
@@ -23,8 +28,9 @@ export const PROMPT_VERSION = "v3";
 
 export interface GroundingResult {
   data: { title: string; body: string; citation: string; url: string } | null;
-  source: "live" | "cache" | "curated";
+  source: "live" | "cache" | "curated" | "empty";
   cacheId: string | null;
+  error?: string;
 }
 
 export interface GenerateGroundingParams {
@@ -95,6 +101,9 @@ async function serveFallback(
   marketDirection?: "up" | "down" | "neutral",
   excludeIds?: string[],
 ): Promise<GroundingResult> {
+  if (companionFallbacksDisabled()) {
+    return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
+  }
   const libraryRows = await searchLibrary(svcClient, {
     type: "paper",
     companionType: "ground_nudge",
