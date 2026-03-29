@@ -195,11 +195,12 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
     if (!currentPrice || !canWrite) return;
     const v = validateFutureLetterBody(body);
     if (!v.valid) {
-      if (v.reason === 'too_short') {
+      const reason = v.reason;
+      if (reason === 'too_short') {
         toast.error(t('letter.validationTooShort', { min: FUTURE_LETTER_MIN_CHARS }));
-      } else if (v.reason === 'too_long') {
+      } else if (reason === 'too_long') {
         toast.error(t('letter.validationTooLong', { max: FUTURE_LETTER_MAX_CHARS }));
-      } else if (v.reason === 'too_few_words') {
+      } else if (reason === 'too_few_words') {
         toast.error(t('letter.validationTooFewWords', { min: FUTURE_LETTER_MIN_WORDS }));
       } else {
         toast.error(t('letter.validationTooRepetitive'));
@@ -431,16 +432,20 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
               maxChars: FUTURE_LETTER_MAX_CHARS,
             })}
           </p>
-          {body.trim().length > 0 && !letterValidation.valid && (
-            <p className="text-[10px] text-destructive/80 leading-relaxed">
-              {letterValidation.reason === 'too_short' &&
-                t('letter.validationTooShort', { min: FUTURE_LETTER_MIN_CHARS })}
-              {letterValidation.reason === 'too_long' &&
-                t('letter.validationTooLong', { max: FUTURE_LETTER_MAX_CHARS })}
-              {letterValidation.reason === 'too_few_words' &&
-                t('letter.validationTooFewWords', { min: FUTURE_LETTER_MIN_WORDS })}
-              {letterValidation.reason === 'too_repetitive' && t('letter.validationTooRepetitive')}
-            </p>
+          {body.trim().length > 0 && !letterValidation.valid && (() => {
+            const reason = (letterValidation as { valid: false; reason: string }).reason;
+            return (
+              <p className="text-[10px] text-destructive/80 leading-relaxed">
+                {reason === 'too_short' &&
+                  t('letter.validationTooShort', { min: FUTURE_LETTER_MIN_CHARS })}
+                {reason === 'too_long' &&
+                  t('letter.validationTooLong', { max: FUTURE_LETTER_MAX_CHARS })}
+                {reason === 'too_few_words' &&
+                  t('letter.validationTooFewWords', { min: FUTURE_LETTER_MIN_WORDS })}
+                {reason === 'too_repetitive' && t('letter.validationTooRepetitive')}
+              </p>
+            );
+          })()
           )}
           <div className="flex items-center justify-between">
             <p className="text-[10px] text-muted-foreground/40">
