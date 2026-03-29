@@ -274,6 +274,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     grounding?: NudgeData | null;
     history?: HistoricalInsightData | null;
     zoomOut?: any;
+    intervention?: InterventionState | null;
   }> => {
     const { data: companions } = await supabase
       .from('reflection_companions')
@@ -291,8 +292,9 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       } else if (c.companion_type === 'historical_insight' && d) {
         result.history = d;
       } else if ((c.companion_type === 'zoom_out' || c.companion_type === 'zoom_out_deep_time') && d) {
-        // Prefer first match (both types represent zoom-out content)
         if (!result.zoomOut) result.zoomOut = d;
+      } else if (c.companion_type === 'intervention' && d) {
+        result.intervention = d as InterventionState;
       }
     }
     return result;
