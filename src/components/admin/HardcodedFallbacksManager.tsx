@@ -59,7 +59,7 @@ export function HardcodedFallbacksManager({ onRefresh }: { onRefresh?: () => voi
 
   const fetchRows = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await supabase
+    const { data, error } = await (supabase as any)
       .from('companion_fallbacks')
       .select('id, pool_type, sort_order, payload, is_active, created_at, updated_at')
       .order('pool_type', { ascending: true })
