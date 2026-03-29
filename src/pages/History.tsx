@@ -63,10 +63,21 @@ interface Reflection {
   history_read?: boolean;
   signal_read?: boolean;
   grounding_read?: boolean;
+  // From view joins
+  companion_signal_title?: string | null;
+  companion_signal_body?: string | null;
+  companion_signal_source?: string | null;
+  companion_signal_url?: string | null;
+  companion_grounding_title?: string | null;
+  companion_grounding_body?: string | null;
+  companion_grounding_citation?: string | null;
+  companion_grounding_url?: string | null;
+  companion_history_data?: any | null;
+  companion_zoom_out_data?: any | null;
 }
 
 const PAGE_SIZE = 30;
-const FIELDS = 'id, message, context, created_at, is_favorite, haiku, grounding_title, grounding_body, grounding_citation, grounding_url, signal_title, signal_body, signal_source, signal_url, zoom_out_data, history_insight_data, note, mood, mood_after, outcome, tags, breathing_completed, zoom_out_read, history_read, signal_read, grounding_read';
+const FIELDS = 'id, message, context, created_at, is_favorite, haiku, grounding_title, grounding_body, signal_read, grounding_read, zoom_out_read, history_read, note, mood, mood_after, outcome, tags, breathing_completed, companion_signal_title, companion_signal_body, companion_signal_source, companion_signal_url, companion_grounding_title, companion_grounding_body, companion_grounding_citation, companion_grounding_url, companion_history_data, companion_zoom_out_data';
 
 function HistoryCompanions({ label, r }: { label: string; r: Reflection }) {
   const [open, setOpen] = useState(false);
