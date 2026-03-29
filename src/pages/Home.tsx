@@ -31,6 +31,7 @@ import { BulkHoldCard } from '@/components/BulkHoldCard';
 import { SnoozeControl } from '@/components/SnoozeControl';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { playNotificationTone, prefetchNotificationTone } from '@/lib/notification-tone';
+import { isCumulativeMoveTriggered } from '@/lib/volatility-thresholds';
 import {
   DndContext,
   closestCenter,
@@ -289,9 +290,7 @@ const Home = () => {
 
     const effectiveThreshold = btcData.changePercent < 0 ? thresholdDown : threshold;
     const dailyTriggered = Math.abs(btcData.changePercent) >= effectiveThreshold;
-    const cumulativeTriggered = btcData.cumulativeChangePercent !== undefined
-      ? Math.abs(btcData.cumulativeChangePercent) >= cumulativeThreshold
-      : false;
+    const cumulativeTriggered = isCumulativeMoveTriggered(btcData.cumulativeChangePercent, cumulativeThreshold);
 
     if (!dailyTriggered && !cumulativeTriggered) return;
 
@@ -585,8 +584,8 @@ const Home = () => {
           ? (btcData.changePercent < 0 ? thresholdDown : threshold)
           : threshold;
         const dailyTriggered = btcData ? Math.abs(btcData.changePercent) >= effectiveThreshold : false;
-        const cumulativeTriggered = btcData?.cumulativeChangePercent !== undefined
-          ? Math.abs(btcData.cumulativeChangePercent) >= cumulativeThreshold
+        const cumulativeTriggered = btcData
+          ? isCumulativeMoveTriggered(btcData.cumulativeChangePercent, cumulativeThreshold)
           : false;
         const followsPauseThresholds = dailyTriggered || cumulativeTriggered;
 
@@ -919,19 +918,30 @@ function AutoCooldownIndicator({
     return () => clearInterval(interval);
   }, [cooldownRemaining, nextCronCheckIn]);
 
-  // When cooldown has expired, show next cron check countdown
+  // When not in post-trigger cooldown: explain both server check cadence (~15m) and user's spacing setting (1h–24h).
   if (remaining <= 0) {
     const cronMinutes = Math.max(1, Math.ceil(cronIn / 60000));
 
     return (
-      <div className="flex items-center gap-3 py-2">
-        <Timer className="h-3.5 w-3.5 text-primary/60 shrink-0" />
-        <div className="flex-1">
-          <p className="text-[10px] font-mono text-primary/60 uppercase tracking-wider">
-            {t('home.monitoringNextCheck', { minutes: cronMinutes, defaultValue: `Monitoring · next check ≈ {{minutes}}m` })}
-          </p>
+      <div className="space-y-1 py-2">
+        <div className="flex items-center gap-3">
+          <Timer className="h-3.5 w-3.5 text-primary/60 shrink-0" />
+          <div className="flex-1 min-w-0">
+            <p className="text-[10px] font-mono text-primary/60 uppercase tracking-wider">
+              {t('home.monitoringNextCheck', {
+                minutes: cronMinutes,
+                defaultValue: 'Monitoring · next server check in ≈ {{minutes}} min',
+              })}
+            </p>
+          </div>
+          <span className="h-1.5 w-1.5 rounded-full bg-primary/50 animate-pulse shrink-0" />
         </div>
-        <span className="h-1.5 w-1.5 rounded-full bg-primary/50 animate-pulse shrink-0" />
+        <p className="text-[10px] font-mono text-muted-foreground/80 pl-[22px] leading-snug normal-case">
+          {t('home.monitoringAutoPauseSpacing', {
+            hours: cooldownHours,
+            defaultValue: 'Auto-pause spacing: {{hours}}h after each trigger (your setting)',
+          })}
+        </p>
       </div>
     );
   }

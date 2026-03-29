@@ -15,6 +15,7 @@ import {
   recencyHintsFromReflectionRows,
 } from "../_shared/pause-cron-parity.ts";
 import { sanitizePromptInput, sanitizePromptArray } from "../_shared/sanitize.ts";
+import { isCumulativeMoveTriggered } from "../_shared/volatility-thresholds.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -286,12 +287,14 @@ serve(async (req) => {
     const eligible = profiles.filter((p) => {
       const b = metricsForProfile(p as { hold_goal_currency?: string | null });
       const absChange = Math.abs(b.changePercent);
-      const absCumChange = Math.abs(b.cumulativeChangePercent);
       const effectiveThreshold = b.direction === "down"
         ? ((p as any).threshold_down ?? p.threshold ?? 5)
         : (p.threshold ?? 5);
       const dailyTriggered = absChange >= effectiveThreshold;
-      const cumulativeTriggered = absCumChange >= ((p as any).cumulative_threshold ?? 15);
+      const cumulativeTriggered = isCumulativeMoveTriggered(
+        b.cumulativeChangePercent,
+        (p as any).cumulative_threshold,
+      );
       if (!dailyTriggered && !cumulativeTriggered) return false;
       if (isInQuietHours(p)) return false;
       if (isSnoozed(p)) return false;
@@ -369,13 +372,13 @@ serve(async (req) => {
 
       const userBtc = metricsForProfile(profile as { hold_goal_currency?: string | null });
       const absChange = Math.abs(userBtc.changePercent);
-      const absCumChange = Math.abs(userBtc.cumulativeChangePercent);
       const dir = userBtc.direction === "down" ? "down" : "up";
       const pct = absChange.toFixed(1);
       let ctx = `BTC is ${dir} ${pct}% in the last 24 hours.`;
-      if (absCumChange >= ((profile as any).cumulative_threshold ?? 15)) {
+      if (isCumulativeMoveTriggered(userBtc.cumulativeChangePercent, (profile as any).cumulative_threshold)) {
         const cumDir = userBtc.cumulativeDirection === "down" ? "down" : "up";
-        ctx += ` Over 7 days, it's ${cumDir} ${absCumChange.toFixed(1)}%.`;
+        const absCum = Math.abs(userBtc.cumulativeChangePercent);
+        ctx += ` Over 7 days, it's ${cumDir} ${absCum.toFixed(1)}%.`;
       }
       ctx = enrichAutomaticPauseContext(ctx, fearGreedSnapshot, onChainSnapshot);
 
