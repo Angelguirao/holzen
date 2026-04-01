@@ -112,7 +112,53 @@ Below are analyses teams commonly apply; they complement (not replace) human rev
 
 ---
 
-## 6. Related docs
+## 6. Industry metrics and how Holzen compares (caveats)
+
+There is **no single authoritative “average lines of code”** for web apps or startups: definitions differ (with/without tests, generated code, `node_modules`, UI kits), and **raw LOC correlates weakly with effort or risk** across languages and frameworks. Still, a few **published reference points** help situate this repo.
+
+### 6.1 Sonar “size” anchors (tooling, not biology)
+
+SonarSource publishes **performance targets** keyed to **representative project sizes** (first full analysis duration). The table is a **vendor scale for analysis time**, not a claim about “healthy” project size:
+
+| Anchor (LOC) | Sonar label (informal) |
+|--------------|-------------------------|
+| ≤ 1k | XS |
+| ~10k | S |
+| ~100k | M |
+| ~500k | L |
+| ~1M | XL |
+
+Source: [Sonar’s analysis performance targets](https://www.sonarsource.com/blog/sonars-analysis-performance-targets/) (June 2022).
+
+**Holzen (~57k code-ish LOC in §1)** sits **between the ~10k and ~100k anchors** on that ladder — i.e. **larger than a toy demo, smaller than a 100k-LOC monolith** Sonar uses as a “medium” performance scenario. Sonar’s own LOC definition (e.g. excluding comments/blanks per their docs) will not match §1’s raw line count exactly.
+
+### 6.2 “Same app” benchmark (RealWorld)
+
+The [RealWorld](https://github.com/gothinkster/realworld) spec (e.g. a Medium-like SPA + API) is often used to compare frameworks. Implementations are typically on the order of **~2k–4k LOC** for the **front end alone** in minimal expert solutions (exact numbers vary by implementation and counter). Holzen is **much larger** than that benchmark because it is a **full product** (many flows, admin, PWA, i18n, Stripe, rich Supabase surface), not a single reference CRUD app.
+
+### 6.3 Churn vs inventory (GitClear)
+
+[GitClear’s “Lines of Code Breakdown”](https://www.gitclear.com/lines_of_code_stats) analyzes **changed lines in commits** and argues that only a **small fraction** of diff volume is “purposeful” after filtering duplicates, formatting noise, and batch edits. That is a metric about **how misleading raw diff/LOC dashboards can be**, not a standard for **total repository size**. It supports the takeaway: **compare trends and risk hotspots**, not bragging rights on line count.
+
+### 6.4 Other metrics teams use instead of raw LOC
+
+| Metric family | What it measures | Typical use |
+|---------------|------------------|-------------|
+| **Cyclomatic / cognitive complexity** | Branching density per unit (function/module) | Find review/test hotspots; Sonar ESLint rules often encode this. |
+| **Test coverage** | % of lines/branches exercised by tests | Holzen’s suite is small vs app size (§5); coverage is meaningful **per critical path**, not as a single target for the whole UI kit. |
+| **Defect density** | Defects per KLOC (when tracked) | Historical software engineering literature; **controversial** for agile/TS codebases; still used in some regulated contexts. |
+| **DORA metrics** | Lead time, deploy frequency, change failure rate, MTTR | [DORA](https://dora.dev/) — **industry-standard outcome metrics**; they do **not** reduce to LOC. |
+| **Security / SAST findings** | Vuln classes, secret leaks, dependency CVEs | Comparable across repos when scoped (e.g. critical CVEs in shipped paths). |
+
+Wikipedia’s article on [source lines of code](https://en.wikipedia.org/wiki/Source_lines_of_code) summarizes long-standing **limitations of LOC** as a productivity or quality measure.
+
+### 6.5 Bottom line for Holzen
+
+On **Sonar-style anchors**, Holzen is **mid-range between 10k and 100k** raw inventory. On **product scope**, it is **far beyond** a RealWorld-sized reference app. On **what “industry” actually compares**, **outcomes (DORA), security posture, and critical-path correctness** matter more than a single LOC number.
+
+---
+
+## 7. Related docs
 
 - [navigating-the-codebase.md](./navigating-the-codebase.md) — how the app boots, routes, and data flow.
 - [AGENTS.md](../AGENTS.md) — commands, conventions, Supabase notes.
