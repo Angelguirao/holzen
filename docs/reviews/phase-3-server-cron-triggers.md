@@ -106,11 +106,13 @@ Use these as "prove-or-disprove" questions while reading the Phase 3 files.
 - **Fragility**: **time window** between notification and orchestrate completion; **duplicate orchestrate** risk when the user opens `/pause` immediately (aligns with `docs/backlog/orchestrate-client-cron.md`).
 - **Featured grounding**: cron may leave featured grounding null initially; expanded companions should still load when orchestration completes — UI must not assume parity with manual path for every field on first paint.
 
-Tradeoffs / alternatives:
+Tradeoffs / alternatives (tracked in backlog):
 
 - **Await orchestrate before `pause_notifications`**: fewer races, slower notifications, higher tail latency if orchestrate is slow.
 - **Enrich notification payload** with enough text to render without waiting for orchestrate: more duplication, faster first paint.
 - **Keep fire-and-forget**: current shape; rely on client cache, rate limits, and Phase 4+ worker docs for cost control.
+
+Backlog: `docs/backlog/automatic-pause-notification-timing.md` (ordering policy). Featured grounding / first paint parity for cron vs manual: `docs/backlog/cron-pause-featured-parity.md`.
 
 ## What to Review Next and Why
 

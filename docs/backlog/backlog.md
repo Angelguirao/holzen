@@ -18,6 +18,10 @@ Rule of thumb used here:
   - See: `orchestrate-client-cron.md`
 - `reflection-insert-partial-failure` — holzen-reflect succeeds but DB insert fails (manual path)
   - See: `reflection-insert-partial-failure.md`
+- `automatic-pause-notification-timing` — when to show "pause ready" vs wait for orchestrate (`pause_notifications` ordering)
+  - See: `automatic-pause-notification-timing.md`
+- `cron-pause-featured-parity` — featured fields / first paint parity for automatic vs manual pauses
+  - See: `cron-pause-featured-parity.md`
 
 ## Pending items (everything)
 
@@ -26,4 +30,6 @@ Rule of thumb used here:
 - 3. Reduce reliance on `location.state` for `/pause` restoration (`pause-session-hydration.md`)
 - 4. Client vs cron `companion-orchestrate` overlap — measure, then dedup / cache policy (`orchestrate-client-cron.md`)
 - 5. Partial failure: reflect OK, reflection insert fails — clearer error handling or server-side atomic path (`reflection-insert-partial-failure.md`)
+- 6. Automatic pause: notification timing vs orchestrate completion — policy (await, enrich payload, or keep async) (`automatic-pause-notification-timing.md`)
+- 7. Cron vs manual pause: featured field parity and loading affordances on first paint (`cron-pause-featured-parity.md`)
 
