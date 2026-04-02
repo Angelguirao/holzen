@@ -107,6 +107,9 @@ Tradeoffs / alternatives:
 
 - `docs/backlog/rate-limit-analytics-allowlist.md` — instrumentation parity with `checkRateLimit` allowlist.
 - `docs/backlog/cache-async-error-handling.md` — `.catch` on `cache.ts` fire-and-forget paths.
+- `docs/backlog/rate-budget-fail-open-observability.md` — metrics/alerts when rate or budget checks fail open.
+- `docs/backlog/quality-gates-false-positives.md` — tune regexes / localization; measure reject reasons.
+- `docs/backlog/cache-serve-relaxation-ux.md` — optional UX when `serveFromCache` relaxes to lower tier or repeats.
 
 ## What to Review Next and Why
 
