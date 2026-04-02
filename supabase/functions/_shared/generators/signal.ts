@@ -23,7 +23,7 @@ import { validateSource } from "../source-validation.ts";
 import { searchLibrary, essayToSignal, recordLibraryServe } from "../content-library.ts";
 
 /** Bump when the search query, structuring prompt, or quality rules change. */
-export const PROMPT_VERSION = "v5";
+export const PROMPT_VERSION = "v6";
 
 /** Perplexity denylist (leading `-`). Cannot combine with allowlist in same request. */
 const SIGNAL_DOMAIN_DENYLIST = ["-cryptosovereignty.org"];
@@ -32,6 +32,16 @@ const SIGNAL_DOMAIN_DENYLIST = ["-cryptosovereignty.org"];
 function filterSignalCitations(urls: string[]): string[] {
   const blocked = /cryptosovereignty\.org/i;
   return urls.filter((u) => typeof u === "string" && u.length > 0 && !blocked.test(u));
+}
+
+/** Shuffle for rotating catalog domains — avoids searching the same 5 hosts every pause. */
+function shuffle<T>(arr: T[]): T[] {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
 }
 
 function buildSignalPerplexitySystem(recentExclusion: string, topicExclusion: string): string {
@@ -65,7 +75,10 @@ export interface GenerateSignalParams {
   sources?: Array<{ name: string; type: string; url?: string }>;
   recentSignalSources?: string[];
   recentSignalTitles?: string[];
+  /** Citation URLs already shown recently — exclude from new search (Perplexity prompt). */
+  recentSignalUrls?: string[];
   userId?: string;
+  reflectionId?: string | null;
   searchAngle?: string;
   log: (msg: string, extra?: Record<string, unknown>) => void;
 }
@@ -120,7 +133,18 @@ function buildSourceHints(sources?: Array<{ name: string; type: string; url?: st
 // ── Public entry point ──
 
 export async function generateSignal(params: GenerateSignalParams): Promise<SignalResult> {
-  const { svcClient, context, sources, recentSignalSources, recentSignalTitles, userId, reflectionId, searchAngle, log } = params;
+  const {
+    svcClient,
+    context,
+    sources,
+    recentSignalSources,
+    recentSignalTitles,
+    recentSignalUrls,
+    userId,
+    reflectionId,
+    searchAngle,
+    log,
+  } = params;
   const marketDirection = parseMarketDirection(context);
 
   const logAttempt = createAttemptLogger(svcClient, { userId });
@@ -144,7 +168,11 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
     ? `\nDo NOT cover these topics (already shown): ${recentSignalTitles.slice(0, 5).join("; ")}. Find a COMPLETELY DIFFERENT angle.`
     : "";
   const sourceHint = sourceNames.length > 0
-    ? ` Look for insights from sources like: ${sourceNames.sort(() => Math.random() - 0.5).slice(0, 5).join(", ")}.`
+    ? ` Look for insights from sources like: ${shuffle(sourceNames).slice(0, 5).join(", ")}.`
+    : "";
+
+  const urlExclusion = (recentSignalUrls && recentSignalUrls.length > 0)
+    ? ` Do NOT cite or use these URLs (already shown in recent pauses): ${recentSignalUrls.slice(0, 8).join(" ")}. Find a different primary source.`
     : "";
 
   // Market direction awareness — different philosophical angles for up vs down
@@ -157,22 +185,30 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
     : "";
 
   const searchQuery = trimmedSearchAngle
-    ? `${trimmedSearchAngle}${sourceHint}${recentExclusion}`
+    ? `${trimmedSearchAngle}${sourceHint}${recentExclusion}${urlExclusion}`
     : context
-    ? `Cognitive reappraisal for a Bitcoin holder when ${context}.${directionHint} Find one high-quality essay or article (sound money, PoW, time preference, holding, settlement, or monetary ethics) from a respected publication or author — not a personal blog.${sourceHint}${recentExclusion}`
-    : `Find one high-quality Bitcoin essay for cognitive reappraisal: sound money, proof-of-work, time preference, holding, or monetary ethics — from a reputable publication or writer; diversify author and domain.${sourceHint}${recentExclusion}`;
+    ? `Cognitive reappraisal for a Bitcoin holder when ${context}.${directionHint} Find one high-quality essay or article (sound money, PoW, time preference, holding, settlement, or monetary ethics) from a respected publication or author — not a personal blog.${sourceHint}${recentExclusion}${urlExclusion}`
+    : `Find one high-quality Bitcoin essay for cognitive reappraisal: sound money, proof-of-work, time preference, holding, or monetary ethics — from a reputable publication or writer; diversify author and domain.${sourceHint}${recentExclusion}${urlExclusion}`;
 
   const perplexitySystem = buildSignalPerplexitySystem(recentExclusion, topicExclusion);
 
-  const perplexityBody: any = {
+  // Catalog allowlist: rotate which domains each request (fixed slice(0,5) repeated the same hits).
+  // Perplexity: temperature/top_p/web_search_context_size per API docs — reduces identical search results.
+  const domainFilterForSearch =
+    sourceUrls.length > 0
+      ? shuffle(sourceUrls).slice(0, Math.min(14, sourceUrls.length))
+      : [...SIGNAL_DOMAIN_DENYLIST];
+
+  const perplexityBody: Record<string, unknown> = {
     model: "sonar-pro",
+    temperature: 0.62,
+    top_p: 0.93,
+    web_search_options: { search_context_size: "high" },
     messages: [
       { role: "system", content: perplexitySystem },
       { role: "user", content: searchQuery },
     ],
-    ...(sourceUrls.length > 0
-      ? { search_domain_filter: sourceUrls.slice(0, 5) }
-      : { search_domain_filter: [...SIGNAL_DOMAIN_DENYLIST] }),
+    search_domain_filter: domainFilterForSearch,
   };
 
   // ── Step 1: Perplexity search ──

@@ -169,6 +169,7 @@ serve(async (req) => {
       groundingSources,
       recentSignalSources,
       recentSignalTitles,
+      recentSignalUrls,
       recentNudgeTopics,
       recentGroundingSources,
       recentHistoryTitles,
@@ -367,6 +368,9 @@ serve(async (req) => {
           sources: signalSources,
           recentSignalSources,
           recentSignalTitles,
+          recentSignalUrls: Array.isArray(recentSignalUrls)
+            ? (recentSignalUrls as string[]).filter((u) => typeof u === "string" && u.length > 0)
+            : undefined,
           userId,
           reflectionId: typeof reflectionId === "string" ? reflectionId : null,
           log,

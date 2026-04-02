@@ -312,6 +312,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     return {
       recentSignalSources: safeGet('holzen_recent_signal_sources'),
       recentSignalTitles: safeGet('holzen_recent_signal_titles'),
+      recentSignalUrls: safeGet('holzen_recent_signal_urls'),
       recentNudgeTopics: safeGet('holzen_recent_nudge_topics'),
       recentGroundingSources: safeGet('holzen_recent_grounding_sources'),
       recentHistoryTitles: safeGet('holzen_recent_history_titles'),
@@ -325,6 +326,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     const keyMap: Record<string, string> = {
       signal_title: 'holzen_recent_signal_titles',
       signal_source: 'holzen_recent_signal_sources',
+      signal_url: 'holzen_recent_signal_urls',
       grounding: 'holzen_recent_nudge_topics',
       history: 'holzen_recent_history_titles',
       zoomOut: 'holzen_recent_zoom_out_titles',
@@ -548,6 +550,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
           if (r.cacheId) setCacheIds(prev => ({ ...prev, signal: r.cacheId }));
           updateRecencyHints('signal_title', r.data.title);
           updateRecencyHints('signal_source', r.data.source);
+          if (r.data.url) updateRecencyHints('signal_url', r.data.url);
           autoSaveToLibrary({ title: r.data.title, body: r.data.body, sourceType: 'signal', sourceUrl: r.data.url });
         } else {
           setSignalError(true);
@@ -700,6 +703,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
           if (r.cacheId) setCacheIds(prev => ({ ...prev, signal: r.cacheId }));
           updateRecencyHints('signal_title', r.data.title);
           updateRecencyHints('signal_source', r.data.source);
+          if (r.data.url) updateRecencyHints('signal_url', r.data.url);
           autoSaveToLibrary({ title: r.data.title, body: r.data.body, sourceType: 'signal', sourceUrl: r.data.url });
         } else setErr(true);
       } else if (slot === 'grounding') {
