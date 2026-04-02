@@ -60,16 +60,19 @@ Exact strings change with **`PROMPT_VERSION`**; edit **`signal.ts`** rather than
 
 - **Catalog allowlist** — Domains are **shuffled** per request (not always the same first five hosts in fixed order).
 - **Perplexity** — **`temperature`**, **`top_p`**, **`search_context_size: high`** for broader retrieval (higher API cost than default).
-- **Dedup** — **`recentSignalUrls`** so the same citation URL is discouraged across sessions on the same device.
+- **Dedup (device)** — Client **`recentSignalUrls`** (`localStorage`) still feeds the orchestrator.
+- **Dedup (account)** — **`companion-orchestrate`** merges client URLs with recent **`reflections.signal_url`** rows for the same user (excluding the current reflection when known), deduped and capped, then passes the merged list into **`generateSignal`** so repeats are discouraged even across devices.
+- **Query diversification** — Each live run appends a **random exploration facet** (sub-theme) to the Perplexity user message so similar market context does not always yield the same search query.
+- **Citation ordering** — When Perplexity returns both YouTube and non-YouTube URLs, **non-YouTube links are ordered first** before structuring so the card prefers publisher pages when available.
 - **Domain policy** — **`SIGNAL_DOMAIN_DENYLIST`** is **empty by default**; optional `-domain` entries in code if you need a denylist later.
 
 **Still inherent (not “bugs” in Holzen alone):**
 
-- **Similar pause context** (e.g. “BTC down ~3%, extreme fear”) produces **similar search queries** → web ranking surfaces the **same canonical essays** and domains.
-- **Small catalog** or many URLs on the **same hostname** still concentrates results.
+- **Web ranking** can still favor the same canonical essays when context and retrieval overlap; facets and dedup **reduce** but do not eliminate that.
+- **Small catalog** or many URLs on the **same hostname** still concentrates results when the allowlist is narrow.
 - **Attribution** for generic hosts (e.g. YouTube) can vary run-to-run; **`validateSource`** is best-effort.
 
-Treating repetition as a **product** problem may mean stricter rules (e.g. prefer non-YouTube citations, server-side **URL** dedup from **`reflection_companions`** for the user), beyond prompt tweaks.
+Further tightening (e.g. hard block YouTube as primary citation, per-host caps in code) would be product policy beyond the current behavior.
 
 ---
 
@@ -78,6 +81,7 @@ Treating repetition as a **product** problem may mean stricter rules (e.g. prefe
 | Area | Path |
 |------|------|
 | Generator | `supabase/functions/_shared/generators/signal.ts` |
+| Recent URL merge (DB + client) | `supabase/functions/_shared/recent-signal-urls.ts` |
 | Perplexity client | `supabase/functions/_shared/perplexity-client.ts` |
 | Session angles | `supabase/functions/_shared/session-intent.ts` |
 | Orchestrator | `supabase/functions/companion-orchestrate/index.ts` |

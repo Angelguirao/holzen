@@ -21,9 +21,10 @@ import { enqueueCatalogSourceSuggestion } from "../source-suggestions.ts";
 import { callPerplexityChat, mergePerplexityUsage } from "../perplexity-client.ts";
 import { validateSource } from "../source-validation.ts";
 import { searchLibrary, essayToSignal, recordLibraryServe } from "../content-library.ts";
+import { preferNonYoutubeCitationsFirst } from "../recent-signal-urls.ts";
 
 /** Bump when the search query, structuring prompt, or quality rules change. */
-export const PROMPT_VERSION = "v7";
+export const PROMPT_VERSION = "v8";
 
 /**
  * Optional Perplexity denylist entries (leading `-`, e.g. `-example.com`).
@@ -44,6 +45,22 @@ function shuffle<T>(arr: T[]): T[] {
     [a[i], a[j]] = [a[j], a[i]];
   }
   return a;
+}
+
+/** Rotating sub-themes so similar market context does not always produce the same web query. */
+const SIGNAL_EXPLORATION_FACETS = [
+  "time preference and delayed gratification",
+  "sound money and monetary ethics",
+  "proof-of-work and energy framing",
+  "holding through volatility (psychology)",
+  "settlement vs. speculation",
+  "separation of money and state",
+  "network effects and monetary Schelling points",
+] as const;
+
+function pickExplorationFacet(): string {
+  const i = Math.floor(Math.random() * SIGNAL_EXPLORATION_FACETS.length);
+  return SIGNAL_EXPLORATION_FACETS[i] ?? SIGNAL_EXPLORATION_FACETS[0];
 }
 
 function buildSignalPerplexitySystem(recentExclusion: string, topicExclusion: string): string {
@@ -173,8 +190,12 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
     : "";
 
   const urlExclusion = (recentSignalUrls && recentSignalUrls.length > 0)
-    ? ` Do NOT cite or use these URLs (already shown in recent pauses): ${recentSignalUrls.slice(0, 8).join(" ")}. Find a different primary source.`
+    ? ` Do NOT cite or use these URLs (already shown in recent pauses): ${recentSignalUrls.slice(0, 16).join(" ")}. Find a different primary source.`
     : "";
+
+  const explorationFacet = pickExplorationFacet();
+  const facetSuffix =
+    ` Random exploration facet (vary retrieval, still Bitcoin-only): ${explorationFacet}.`;
 
   // Market direction awareness — different philosophical angles for up vs down
   const isDown = context?.toLowerCase().includes("is down");
@@ -186,10 +207,10 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
     : "";
 
   const searchQuery = trimmedSearchAngle
-    ? `${trimmedSearchAngle}${sourceHint}${recentExclusion}${urlExclusion}`
+    ? `${trimmedSearchAngle}${sourceHint}${recentExclusion}${urlExclusion}${facetSuffix}`
     : context
-    ? `Cognitive reappraisal for a Bitcoin holder when ${context}.${directionHint} Find one high-quality essay or article (sound money, PoW, time preference, holding, settlement, or monetary ethics) from a respected publication or author — not a personal blog.${sourceHint}${recentExclusion}${urlExclusion}`
-    : `Find one high-quality Bitcoin essay for cognitive reappraisal: sound money, proof-of-work, time preference, holding, or monetary ethics — from a reputable publication or writer; diversify author and domain.${sourceHint}${recentExclusion}${urlExclusion}`;
+    ? `Cognitive reappraisal for a Bitcoin holder when ${context}.${directionHint} Find one high-quality essay or article (sound money, PoW, time preference, holding, settlement, or monetary ethics) from a respected publication or author — not a personal blog.${sourceHint}${recentExclusion}${urlExclusion}${facetSuffix}`
+    : `Find one high-quality Bitcoin essay for cognitive reappraisal: sound money, proof-of-work, time preference, holding, or monetary ethics — from a reputable publication or writer; diversify author and domain.${sourceHint}${recentExclusion}${urlExclusion}${facetSuffix}`;
 
   const perplexitySystem = buildSignalPerplexitySystem(recentExclusion, topicExclusion);
 
@@ -285,6 +306,8 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
     });
     return serveFallback(svcClient, userId, marketDirection);
   }
+
+  citations = preferNonYoutubeCitationsFirst(citations);
 
   if (!searchContent) {
     logAttempt({
