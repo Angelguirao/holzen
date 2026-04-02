@@ -38,6 +38,8 @@ Rule of thumb used here:
   - See: `quality-gates-false-positives.md`
 - `cache-serve-relaxation-ux` — optional transparency when cache serve relaxes constraints
   - See: `cache-serve-relaxation-ux.md`
+- `writeCompanionData-grounding-consistency` — grounding dual-write: `reflection_companions` vs `reflections`
+  - See: `writeCompanionData-grounding-consistency.md`
 
 ## Pending items (everything)
 
@@ -56,4 +58,5 @@ Rule of thumb used here:
 - 13. Rate/daily budget fail-open: observability or policy (`rate-budget-fail-open-observability.md`)
 - 14. Quality gates: false positives and localization (`quality-gates-false-positives.md`)
 - 15. Cache serve relaxation: optional UX transparency (`cache-serve-relaxation-ux.md`)
+- 16. Grounding dual-write consistency — Home vs pause (`writeCompanionData-grounding-consistency.md`)
 
