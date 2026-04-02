@@ -64,4 +64,5 @@ Never commit `.env` or service role keys.
 ## Related docs
 
 - [README.md](README.md) — clone/setup, scripts, high-level layout.
+- [docs/architecture/c4-holzen.md](docs/architecture/c4-holzen.md) — C4 System Context + Container diagrams ([workspace.dsl](docs/architecture/workspace.dsl) for Structurizr).
 - [`.env.example`](.env.example) — template env vars.

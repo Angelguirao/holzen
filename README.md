@@ -70,7 +70,7 @@ Open [http://localhost:8080](http://localhost:8080). For hosted Supabase you do 
 - **`src/components/`** — Shared UI, including `components/ui` (shadcn-style primitives).
 - **`supabase/migrations/`** — SQL migrations for the hosted database.
 - **`supabase/functions/`** — Edge functions (Deno): checkout, subscriptions, notifications, AI companions, journaling helpers, and related HTTP APIs. They run on Supabase in production; **secrets** (Stripe, Resend, VAPID, etc.) are configured in the Supabase dashboard, not in the frontend `.env`.
-- **`docs/`** — Additional notes; the Signal companion pipeline is documented in [docs/systems/pause/companions/signal.md](docs/systems/pause/companions/signal.md) (linked from the [pause system](docs/systems/pause/ai-powered-pause-system.md) doc).
+- **`docs/`** — Additional notes; **[C4 architecture](docs/architecture/c4-holzen.md)** (context + container diagrams and optional Structurizr DSL); the Signal companion pipeline is in [docs/systems/pause/companions/signal.md](docs/systems/pause/companions/signal.md) (linked from the [pause system](docs/systems/pause/ai-powered-pause-system.md) doc).
 - **`public/`** — Static assets served as-is.
 
 ## Supabase & backend

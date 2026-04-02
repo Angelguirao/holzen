@@ -2,6 +2,12 @@
 
 This folder contains human-readable notes that complement the source code and in-repo reference docs.
 
+## Architecture (C4)
+
+- `architecture/README.md` — index for **C4** context + container views  
+- `architecture/c4-holzen.md` — Mermaid diagrams (System Context, Container)  
+- `architecture/workspace.dsl` — **Structurizr** workspace (same model; use Lite or CLI to render)
+
 ## Fundamentals
 
 - `fundamentals/navigating-the-codebase.md` - repo tour: boot flow, routing, auth, hooks, Supabase basics.
