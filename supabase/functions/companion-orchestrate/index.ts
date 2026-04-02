@@ -11,6 +11,7 @@ import { generateQuestion } from "../_shared/generators/question.ts";
 import { determineSessionIntent } from "../_shared/session-intent.ts";
 import { selectIntervention, parseDirection, bucketSeverity, type InterventionSelection } from "../_shared/intervention-selector.ts";
 import { fetchGroundingSourcesForOrchestrate } from "../_shared/pause-cron-parity.ts";
+import { fetchRecentSignalCitationUrls, mergeRecentSignalUrls } from "../_shared/recent-signal-urls.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -361,6 +362,27 @@ serve(async (req) => {
     if (enableSignal) {
       tasks.signal = (async (): Promise<CompanionResult> => {
         const t = Date.now();
+        const clientSignalUrls = Array.isArray(recentSignalUrls)
+          ? (recentSignalUrls as string[]).filter((u) => typeof u === "string" && u.length > 0)
+          : [];
+        let mergedRecentSignalUrls: string[] | undefined;
+        if (userId) {
+          try {
+            const fromDb = await fetchRecentSignalCitationUrls(svcClient, userId, {
+              excludeReflectionId: typeof reflectionId === "string" ? reflectionId : undefined,
+              limit: 24,
+            });
+            mergedRecentSignalUrls = mergeRecentSignalUrls(fromDb, clientSignalUrls, 24);
+            log(
+              `signal recent URLs: db=${fromDb.length} client=${clientSignalUrls.length} merged=${mergedRecentSignalUrls?.length ?? 0}`,
+            );
+          } catch (e) {
+            log(`fetchRecentSignalCitationUrls failed: ${e}`);
+            mergedRecentSignalUrls = clientSignalUrls.length > 0 ? clientSignalUrls.slice(0, 24) : undefined;
+          }
+        } else {
+          mergedRecentSignalUrls = clientSignalUrls.length > 0 ? clientSignalUrls.slice(0, 24) : undefined;
+        }
         const result = await generateSignal({
           svcClient,
           context,
@@ -368,9 +390,7 @@ serve(async (req) => {
           sources: signalSources,
           recentSignalSources,
           recentSignalTitles,
-          recentSignalUrls: Array.isArray(recentSignalUrls)
-            ? (recentSignalUrls as string[]).filter((u) => typeof u === "string" && u.length > 0)
-            : undefined,
+          recentSignalUrls: mergedRecentSignalUrls,
           userId,
           reflectionId: typeof reflectionId === "string" ? reflectionId : null,
           log,

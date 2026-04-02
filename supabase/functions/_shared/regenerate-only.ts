@@ -11,6 +11,7 @@ import { generateZoomOut } from "./generators/zoom-out.ts";
 import { determineSessionIntent } from "./session-intent.ts";
 import { bucketSeverity } from "./intervention-selector.ts";
 import { fetchGroundingSourcesForOrchestrate, fetchSignalSourcesForOrchestrate } from "./pause-cron-parity.ts";
+import { fetchRecentSignalCitationUrls, mergeRecentSignalUrls } from "./recent-signal-urls.ts";
 import { ORCHESTRATOR_KEY_MAP } from "./companion-types.ts";
 import { PROMPT_VERSION as SIGNAL_VERSION } from "./generators/signal.ts";
 import { PROMPT_VERSION as GROUNDING_VERSION } from "./generators/grounding.ts";
@@ -132,6 +133,20 @@ export async function handleRegenerateOnly(params: {
       if (!signalSources?.length) {
         signalSources = await fetchSignalSourcesForOrchestrate(svcClient, userId) ?? undefined;
       }
+      const clientSignalUrls = Array.isArray(body.recentSignalUrls)
+        ? (body.recentSignalUrls as string[]).filter((u) => typeof u === "string" && u.length > 0)
+        : [];
+      let mergedRecentSignalUrls: string[] | undefined;
+      try {
+        const fromDb = await fetchRecentSignalCitationUrls(svcClient, userId, {
+          excludeReflectionId: reflectionId,
+          limit: 24,
+        });
+        mergedRecentSignalUrls = mergeRecentSignalUrls(fromDb, clientSignalUrls, 24);
+      } catch (e) {
+        log(`fetchRecentSignalCitationUrls failed: ${e}`);
+        mergedRecentSignalUrls = clientSignalUrls.length > 0 ? clientSignalUrls.slice(0, 24) : undefined;
+      }
       const s = await generateSignal({
         svcClient,
         context,
@@ -139,6 +154,7 @@ export async function handleRegenerateOnly(params: {
         sources: signalSources,
         recentSignalSources: body.recentSignalSources as string[] | undefined,
         recentSignalTitles: body.recentSignalTitles as string[] | undefined,
+        recentSignalUrls: mergedRecentSignalUrls,
         userId,
         reflectionId,
         log,
