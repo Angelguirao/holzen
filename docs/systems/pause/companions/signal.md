@@ -61,7 +61,7 @@ Exact strings change with **`PROMPT_VERSION`**; edit **`signal.ts`** rather than
 - **Catalog allowlist** — Domains are **shuffled** per request (not always the same first five hosts in fixed order).
 - **Perplexity** — **`temperature`**, **`top_p`**, **`search_context_size: high`** for broader retrieval (higher API cost than default).
 - **Dedup (device)** — Client **`recentSignalUrls`** (`localStorage`) still feeds the orchestrator.
-- **Dedup (account)** — **`companion-orchestrate`** merges client URLs with recent **`reflections.signal_url`** rows for the same user (excluding the current reflection when known), deduped and capped, then passes the merged list into **`generateSignal`** so repeats are discouraged even across devices.
+- **Dedup (account)** — **`companion-orchestrate`** merges client URLs with recent Signal citation URLs from **`reflection_companions`** (same user, `companion_type = 'signal'`, `content.url`; excluding the current reflection when known), deduped and capped, then passes the merged list into **`generateSignal`** so repeats are discouraged even across devices.
 - **Query diversification** — Each live run appends a **random exploration facet** (sub-theme) to the Perplexity user message so similar market context does not always yield the same search query.
 - **Citation ordering** — When Perplexity returns both YouTube and non-YouTube URLs, **non-YouTube links are ordered first** before structuring so the card prefers publisher pages when available.
 - **Domain policy** — **`SIGNAL_DOMAIN_DENYLIST`** is **empty by default**; optional `-domain` entries in code if you need a denylist later.
