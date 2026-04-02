@@ -47,7 +47,7 @@ So complexity is not just “lines of React” — it is **frontend + Postgres/R
 | **UI breadth** | Medium–high | Many screens, admin tooling, reusable UI kit. |
 | **Client state** | Medium | TanStack Query, multiple domain hooks, offline/PWA touches. |
 | **Backend (Supabase)** | Medium–high | Many migrations and policies; edge functions orchestrate non-trivial flows. |
-| **Operational coupling** | Medium | Cron jobs, secrets, deploy ordering (see [cron-setup.md](./cron-setup.md)). |
+| **Operational coupling** | Medium | Cron jobs, secrets, deploy ordering (see [cron-setup.md](../ops/cron-setup.md)). |
 
 There is no single “god module” that defines the whole system, but **several large files** (large pages, hooks, and shared generators) reward **targeted** review and ownership boundaries rather than expecting one pass over every line.
 
@@ -162,7 +162,7 @@ On **Sonar-style anchors**, Holzen is **mid-range between 10k and 100k** raw inv
 
 - [navigating-the-codebase.md](./navigating-the-codebase.md) — how the app boots, routes, and data flow.
 - [AGENTS.md](../AGENTS.md) — commands, conventions, Supabase notes.
-- [cron-setup.md](./cron-setup.md) — scheduled jobs and operational context.
+- [cron-setup.md](../ops/cron-setup.md) — scheduled jobs and operational context.
 
 ---
 
