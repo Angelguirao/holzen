@@ -10,7 +10,7 @@ This page is the **companion-level** view. For **manual vs automatic pause**, **
 
 1. User completes reflection; **`use-companion-data`** invokes **`companion-orchestrate`** when the Signal slot is needed (not fully cached on the reflection row).
 2. **`companion-orchestrate`** runs **`generateSignal`** in `_shared/generators/signal.ts` when **`enableSignal`** is true, passing **context**, **session intent** (`searchAngle`), **signal source catalog** hints, and **recency dedup** fields from the client.
-3. **`generateSignal`** returns structured **`signal_*`** payload; the orchestrator **dual-writes** to **`reflections`** / **`reflection_companions`** and records **`companion_serves`** (including **`serve_source`**: live / cache / curated).
+3. **`generateSignal`** returns structured Signal payload; the orchestrator **writes** **`reflection_companions`** (canonical) and **`companion_serves`** — not duplicate Signal columns on **`reflections`** (those were removed; only **Grounding** still denormalizes to **`reflections.grounding_*`** for Home). The compatibility view **`v_reflection_with_companions`** can still expose `signal_url` as a computed alias for reads.
 
 Signal is **not** a primary **intervention** type (mirror / trap / pattern / question); it is always a **companion card** when the user enables it. See **§7.8** in the [system doc](../ai-powered-pause-system.md).
 

@@ -1,6 +1,7 @@
 /**
  * Recent Signal citation URLs for the same user — server-side dedup against
- * client-provided localStorage hints. Source: reflections.signal_url (denormalized).
+ * client-provided localStorage hints. Source: reflection_companions (companion_type signal) content.url.
+ * (Denormalized reflections.signal_url was removed; Signal lives only in the join table.)
  */
 
 export async function fetchRecentSignalCitationUrls(
@@ -9,25 +10,40 @@ export async function fetchRecentSignalCitationUrls(
   opts: { excludeReflectionId?: string | null; limit?: number },
 ): Promise<string[]> {
   const limit = Math.min(opts.limit ?? 20, 40);
-  let q = svcClient
+  // Two-step: reflections no longer has signal_url; companion rows live on reflection_companions.
+  let refQ = svcClient
     .from("reflections")
-    .select("signal_url")
+    .select("id")
     .eq("user_id", userId)
-    .not("signal_url", "is", null)
     .order("created_at", { ascending: false })
-    .limit(limit + 15);
+    .limit(80);
 
   if (opts.excludeReflectionId) {
-    q = q.neq("id", opts.excludeReflectionId);
+    refQ = refQ.neq("id", opts.excludeReflectionId);
   }
 
-  const { data, error } = await q;
+  const { data: refRows, error: refErr } = await refQ;
+  if (refErr || !refRows?.length) return [];
+
+  const ids = (refRows as { id: string }[]).map((r) => r.id);
+  const idOrder = new Map(ids.map((id, i) => [id, i]));
+
+  const { data, error } = await svcClient
+    .from("reflection_companions")
+    .select("content, reflection_id")
+    .eq("companion_type", "signal")
+    .in("reflection_id", ids);
+
   if (error || !data?.length) return [];
+
+  const rows = [...(data as { content?: { url?: string | null } | null; reflection_id: string }[])].sort(
+    (a, b) => (idOrder.get(a.reflection_id) ?? 999) - (idOrder.get(b.reflection_id) ?? 999),
+  );
 
   const seen = new Set<string>();
   const out: string[] = [];
-  for (const row of data as { signal_url: string | null }[]) {
-    const u = row.signal_url?.trim();
+  for (const row of rows) {
+    const u = typeof row.content?.url === "string" ? row.content.url.trim() : "";
     if (!u || !u.startsWith("http")) continue;
     if (seen.has(u)) continue;
     seen.add(u);
