@@ -1,87 +1,125 @@
-# Phase 4: Cron workers, caching, and content pipelines
+# Phase 4: Cron workers, caching, and content pipelines review
 
-## Scope
+This phase is the fourth "mental model pass": after Phase 3 (`check-volatility` and automatic pause), we review **other scheduled edge workers** that **warm caches** and **fill content libraries** so companion generation, Zoom Out, and Signal/Grounding have cheap inputs at user time. These workers are not the volatility trigger; they **feed** the pause ecosystem.
 
-- `supabase/functions/refresh-btc-prices/index.ts`
-- `supabase/functions/fetch-source-feeds/index.ts`
-- `supabase/functions/pregenerate-companions/index.ts`
+If these workers drift (stale prices, bad dedup, permissive auth), you get wrong Zoom Out numbers, bloated caches, or noisy duplicates — often **before** Phase 5 quality gates run.
 
-## What these workers guarantee
+## Table of Contents
 
-### 1. `refresh-btc-prices` (Zoom Out dependency)
+- [What to understand first (priority)](#what-to-understand-first-priority)
+- [Mental Models & Useful Concepts](#mental-models--useful-concepts)
+- [CS/SE Concepts to Know (for this phase)](#csse-concepts-to-know-for-this-phase)
+- [Reviewed starting points (file-by-file)](#reviewed-starting-points-file-by-file)
+- [Runtime touchpoints: endpoints, events, and side effects](#runtime-touchpoints-endpoints-events-and-side-effects)
+- [Data models affected](#data-models-affected)
+- [Systems that emerge from this review](#systems-that-emerge-from-this-review)
+- [Reviewer Questions Checklist](#reviewer-questions-checklist)
+- [Conclusions and Tradeoffs](#conclusions-and-tradeoffs)
+- [What to Review Next and Why](#what-to-review-next-and-why)
 
-Purpose (per code + `docs/ops/cron-setup.md`):
+## What to understand first (priority)
 
-- Runs on a schedule (cron every ~15 minutes).
-- Keeps `btc_price_cache` fresh so Zoom Out never has to call CoinGecko during user sessions.
+1. **Separation from Phase 3**: `refresh-btc-prices`, `fetch-source-feeds`, and `pregenerate-companions` run on their own schedules; they do not replace `check-volatility`.
+2. **Price cache for Zoom Out**: `btc_price_cache` is populated so user sessions avoid hitting CoinGecko for historical "on this day" paths.
+3. **Content library for Signal/Grounding**: `fetch-source-feeds` ingests from `signal_sources` into `content_library` for curated-style cards.
+4. **Companion cache warm pool**: `pregenerate-companions` maintains `companion_cache` quality tiers, pruning, and feedback-driven score adjustments.
 
-Key behaviors:
+## Mental Models & Useful Concepts
 
-- Auth gate:
-  - allows `Authorization: Bearer <service_role_key>` or `CRON_SECRET`, and also accepts `x-supabase-cron: true`.
-- Writes:
-  - upserts current BTC price daily key (`date`)
-  - upserts historical “on this day” prices (1-4 years ago) when missing or older than 24h
-- Uses a 2s delay between CoinGecko calls to reduce rate-limit pressure.
+- **Background producers**: workers run on cron/service role; **users** consume rows via edge functions and UI — eventual consistency between worker run and next user request.
+- **Cache vs source of truth**: `btc_price_cache` and `companion_cache` are **performance** layers; companion orchestration still may generate fresh content when cache misses.
+- **Dedup strategy shapes growth**: exact title dedup vs fuzzy title similarity — different false-negative rates for "near duplicate" content.
+- **Fail-open auth for cron**: secrets + `x-supabase-cron` headers must match how `docs/ops/cron-setup.md` invokes each function.
 
-### 2. `fetch-source-feeds` (active content library)
+## CS/SE Concepts to Know (for this phase)
 
-Purpose:
+- **TTL and freshness**: historical BTC rows refresh when missing or older than policy thresholds; correctness depends on cron cadence.
+- **Idempotency and dedup**: insert paths must tolerate retries without unbounded duplicate rows (title checks, similarity checks).
+- **Resource protection**: rate limits to external APIs (e.g. delays between CoinGecko calls).
+- **Garbage collection**: cache lifecycles (promote/prune/expire) — classic cache policy problem.
 
-- Fetches latest content from `signal_sources.url`.
-- Scrapes + cleans with Firecrawl if configured; otherwise falls back to Perplexity search.
-- Uses the Lovable AI gateway to structure content into entries for `content_library`.
+## Reviewed starting points (file-by-file)
 
-Key behaviors:
+### `supabase/functions/refresh-btc-prices/index.ts` — Zoom Out price dependency
 
-- Auth gate:
-  - allows service role key or `CRON_SECRET` (via `Authorization` or `x-supabase-cron` header).
-- Inserts into `content_library` with:
-  - `companion_types`: `signal` category maps to `signal`; others map to `ground_nudge`
-  - title/summary/citation/url + tags
-  - basic `quality_score: 2`
-- Dedup:
-  - checks existing `content_library` by exact `title` match before inserting.
+- Scheduled (cron ~15 minutes per `docs/ops/cron-setup.md`).
+- Keeps `btc_price_cache` fresh so Zoom Out does not call CoinGecko during user sessions.
+- **Auth**: `Authorization: Bearer <service_role>` or `CRON_SECRET`, and `x-supabase-cron: true` accepted.
+- **Writes**: upsert current daily key; upsert historical "on this day" prices (1-4 years ago) when missing or older than 24h.
+- **Rate pressure**: ~2s delay between CoinGecko calls.
 
-### 3. `pregenerate-companions` (companion_cache lifecycle + warm pool)
+### `supabase/functions/fetch-source-feeds/index.ts` — active content library
 
-Purpose:
+- Reads `signal_sources.url` (and related config); scrapes via Firecrawl when configured, else Perplexity fallback; structures entries via Lovable AI gateway into `content_library`.
+- **Auth**: service role or `CRON_SECRET` (including `x-supabase-cron`).
+- **Inserts**: `companion_types` mapping (`signal` vs `ground_nudge`), title/summary/citation/url/tags, `quality_score: 2`.
+- **Dedup**: exact `title` match against existing `content_library` before insert.
 
-- Runs periodically to keep `companion_cache` filled with high-quality cached companion payloads.
-- Also processes feedback (analytics_events where `event = companion_feedback`) to up/down-vote quality scores.
+### `supabase/functions/pregenerate-companions/index.ts` — companion_cache lifecycle
 
-Key behaviors:
+- Periodic fill of `companion_cache` with high-quality payloads; processes `companion_feedback` via `analytics_events`.
+- **Auth**: `SUPABASE_SERVICE_ROLE_KEY` or `CRON_SECRET`.
+- **Lifecycle**: promote high-quality entries to permanent (`expires_at = null`); prune low-quality after 3 days; expire medium tiers after 30 days.
+- **Generation loop**: small batch per type (grounding, signal, history, zoom-out deep time); dedup via title similarity vs existing cache rows.
+- **Feedback**: last 24h feedback events adjust `quality_score` within [0..3].
 
-- Auth gate:
-  - requires either `SUPABASE_SERVICE_ROLE_KEY` or `CRON_SECRET`.
-- Cache lifecycle:
-  - promotes high-quality (`quality_score >= 3` and/or `>=2` with `used_count >= 3`) to permanent entries (`expires_at = null`)
-  - prunes low-quality (`quality_score < 2` older than 3 days)
-  - expires medium entries (`quality_score 1-2` older than 30 days, not permanent)
-- Generation loop:
-  - generates a small number of grounding (2), signal (1), history (1), zoom-out deep-time (1)
-  - dedups using “title similarity” checks against existing `companion_cache` content for the companion type
-- Feedback processing:
-  - reads feedback events from the last 24 hours
-  - adjusts `quality_score` within bounds [0..3]
+### `docs/ops/cron-setup.md`
 
-## Risks / things to validate
+- Schedules and HTTP call patterns for these workers alongside `check-volatility`.
 
-1. **Dedup keys vs “meaningful duplicates”**
-   - `fetch-source-feeds` dedups only by exact `content_library.title`.
-   - `pregenerate-companions` uses a fuzzy-ish dedup on `companion_cache.content.title`.
-   - If your titles drift (or structure prompt changes), the caches could grow with near-duplicates.
+## Runtime touchpoints: endpoints, events, and side effects
 
-2. **Auth gating correctness across cron execution paths**
-   - `refresh-btc-prices` supports `x-supabase-cron: true` as a third signal; confirm other workers follow the same convention.
+- **Scheduled HTTP**: pg_cron (or equivalent) POSTs to each edge function URL with documented headers/secrets.
+- **External APIs**: CoinGecko (`refresh-btc-prices`); Firecrawl / Perplexity / Lovable gateway (`fetch-source-feeds`); AI generation inside `pregenerate-companions`.
+- **No direct user browser invoke** in normal flows — all three are worker-oriented.
 
-3. **Timing windows**
-   - `refresh-btc-prices` only refreshes historical snapshots when missing or older than 24h, so “on this day” accuracy depends on the cron cadence + date-key semantics.
+## Data models affected
 
-## Suggested next step
+- **`btc_price_cache`**: daily and historical "on this day" rows for Zoom Out.
+- **`content_library`**: ingested articles/snippets for Signal/Grounding-style consumption.
+- **`signal_sources`**: feed URLs and metadata (read by `fetch-source-feeds`).
+- **`companion_cache`**: pregenerated companion payloads, quality scores, expiry.
+- **`analytics_events`**: `companion_feedback` (or equivalent) for score adjustments in `pregenerate-companions`.
 
-Trace one “cache → UI” example end-to-end:
+## Systems that emerge from this review
 
-- Zoom Out card reads `btc_price_cache` produced by `refresh-btc-prices`
-- Signal/Grounding/History cards prefer `companion_cache` (and fall back to curated pools)
+1. **Pause system (architecture)**: `docs/systems/pause/ai-powered-pause-system.md`
+   - These workers are **inputs** to companion and Zoom Out behavior described there.
 
+2. **Ops / cron**: `docs/ops/cron-setup.md`
+   - Operational schedule and security for invoking workers.
+
+## Reviewer Questions Checklist
+
+1. Does each worker's auth gate match how cron actually calls it (headers, secrets, `x-supabase-cron`)?
+2. Are dedup keys stable if prompts or titles change slightly (exact title vs similarity)?
+3. Is `btc_price_cache` fresh enough for Zoom Out given the 24h historical refresh rule and cron cadence?
+4. Can `pregenerate-companions` prune or promote in a way that surprises users (empty cache, sudden drops)?
+5. **Cache → UI**: trace one path (Zoom Out reads `btc_price_cache`; companions prefer `companion_cache` then fall back) — does the UI handle empty cache gracefully?
+
+## Conclusions and Tradeoffs
+
+- **Coherent story**: three workers **warm** price data, **ingest** library content, and **maintain** a companion cache pool — each reduces latency or API load at user time.
+- **Risks** (folded from prior "risks / validate"):
+  - **Dedup vs near-duplicates**: exact title dedup in `fetch-source-feeds` and similarity dedup in `pregenerate-companions` can both miss "almost the same" rows if titles drift; caches can grow.
+  - **Auth consistency**: `refresh-btc-prices` accepts `x-supabase-cron: true` as a third signal — confirm other workers and ops docs agree so cron does not 401.
+  - **Timing windows**: historical BTC snapshots depend on cron cadence + "older than 24h" semantics; **on this day** accuracy is bounded by that policy.
+
+Tradeoffs / alternatives:
+
+- **Stricter dedup** (hash body, URL, normalized title) vs **fewer false merges** — more compute, less duplicate content.
+- **More frequent cron** vs **API rate limits** — higher cost, fresher data.
+- **Larger cache warm pool** vs **storage and generation cost** — product decision.
+
+## What to Review Next and Why
+
+**Phase 5** moves from **scheduled data producers** to **shared policy** inside edge functions: **rate limiting**, **daily budget**, **quality gates**, and **cache serve/write helpers** (`ratelimit.ts`, `quality.ts`, `cache.ts`, `companion-data.ts`). That is the natural next step because:
+
+1. Phase 4 showed **where** cached and library data **comes from**; Phase 5 shows **how** generation is **bounded and rejected** when quality or cost limits fail.
+2. Companion orchestration and manual/cron paths **reuse** these shared modules; Phase 5 connects worker output (Phase 4) to **runtime guardrails**.
+
+**Phase 5 scope (pointer):**
+
+- Shared `_shared` modules for rate limit, quality, cache, companion writes — see `docs/reviews/phase-5-quality-gates-rate-limit-cache.md`.
+
+Step-by-step review doc: `docs/reviews/phase-5-quality-gates-rate-limit-cache.md` (same section layout as Phases 1-4 once updated).

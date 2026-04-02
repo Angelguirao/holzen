@@ -129,4 +129,4 @@ Backlog: `docs/backlog/automatic-pause-notification-timing.md` (ordering policy)
 
 - `refresh-btc-prices`, `fetch-source-feeds`, `pregenerate-companions` per `docs/reviews/phase-4-cron-workers-caching.md`.
 
-Step-by-step review doc: `docs/reviews/phase-4-cron-workers-caching.md`.
+Step-by-step review doc: `docs/reviews/phase-4-cron-workers-caching.md` (same section layout as Phases 1-3).
