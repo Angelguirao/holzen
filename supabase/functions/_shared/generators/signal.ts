@@ -23,15 +23,17 @@ import { validateSource } from "../source-validation.ts";
 import { searchLibrary, essayToSignal, recordLibraryServe } from "../content-library.ts";
 
 /** Bump when the search query, structuring prompt, or quality rules change. */
-export const PROMPT_VERSION = "v6";
+export const PROMPT_VERSION = "v7";
 
-/** Perplexity denylist (leading `-`). Cannot combine with allowlist in same request. */
-const SIGNAL_DOMAIN_DENYLIST = ["-cryptosovereignty.org"];
+/**
+ * Optional Perplexity denylist entries (leading `-`, e.g. `-example.com`).
+ * Leave empty for unrestricted web search when no catalog allowlist is used.
+ */
+const SIGNAL_DOMAIN_DENYLIST: string[] = [];
 
-/** Drop blocked domains from citation lists (defense in depth vs denylist misses). */
+/** Normalize citation URLs from Perplexity (drop empties only). */
 function filterSignalCitations(urls: string[]): string[] {
-  const blocked = /cryptosovereignty\.org/i;
-  return urls.filter((u) => typeof u === "string" && u.length > 0 && !blocked.test(u));
+  return urls.filter((u) => typeof u === "string" && u.length > 0);
 }
 
 /** Shuffle for rotating catalog domains — avoids searching the same 5 hosts every pause. */
@@ -52,7 +54,6 @@ WHAT TO FIND (vary the angle each search):
 - Themes: sound money, proof-of-work, time preference, settlement, holding, monetary history, ethics of saving, network security
 
 NEVER prioritize or cite:
-- cryptosovereignty.org (and similar single-site blogspam that crowded out quality results)
 - Price targets, TA, on-chain hype, altcoins, Ethereum, DeFi, NFTs, "crypto market" framing — BITCOIN ONLY
 
 Summarize faithfully and ground answers in real sources with retrievable URLs.${recentExclusion}${topicExclusion}`;
@@ -199,6 +200,8 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
       ? shuffle(sourceUrls).slice(0, Math.min(14, sourceUrls.length))
       : [...SIGNAL_DOMAIN_DENYLIST];
 
+  const hadDomainFilter = domainFilterForSearch.length > 0;
+
   const perplexityBody: Record<string, unknown> = {
     model: "sonar-pro",
     temperature: 0.62,
@@ -208,8 +211,10 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
       { role: "system", content: perplexitySystem },
       { role: "user", content: searchQuery },
     ],
-    search_domain_filter: domainFilterForSearch,
   };
+  if (hadDomainFilter) {
+    perplexityBody.search_domain_filter = domainFilterForSearch;
+  }
 
   // ── Step 1: Perplexity search ──
   log("calling perplexity");
@@ -223,8 +228,6 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
   try {
     let apiCalls = 0;
     let mergedUsage = undefined as ReturnType<typeof mergePerplexityUsage>;
-
-    const usedDenylistOnly = sourceUrls.length === 0;
 
     const result = await callPerplexityChat(perplexityBody, PERPLEXITY_API_KEY, (m) => log(m), 15_000);
     apiCalls++;
@@ -249,8 +252,8 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
       } catch { log("retry failed, using original content"); }
     }
 
-    if (citations.length === 0 && usedDenylistOnly && searchContent.length > 0) {
-      log("0 usable citations after denylist filter — retrying Perplexity without search_domain_filter");
+    if (citations.length === 0 && hadDomainFilter && sourceUrls.length === 0 && searchContent.length > 0) {
+      log("0 usable citations — retrying Perplexity without search_domain_filter");
       const retryWide = { ...perplexityBody };
       delete retryWide.search_domain_filter;
       try {

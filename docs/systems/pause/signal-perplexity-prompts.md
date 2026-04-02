@@ -4,9 +4,9 @@ This doc summarizes what the **Signal** pipeline sends to **Perplexity (`sonar-p
 
 ## 1. Perplexity — system message (fixed)
 
-The system role frames **Signal** as **cognitive reappraisal** during a pause: find substantive Bitcoin writing that helps reframe emotional reactions to price moves. It lists themes (sound money, proof-of-work, time preference, etc.), **Bitcoin-only** constraints, and explicitly deprioritizes low-signal clusters (e.g. **cryptosovereignty.org**). Session-specific exclusions (`recentExclusion` / `topicExclusion`) apply when recent thinkers or titles are provided.
+The system role frames **Signal** as **cognitive reappraisal** during a pause: find substantive Bitcoin writing that helps reframe emotional reactions to price moves. It lists themes (sound money, proof-of-work, time preference, etc.) and **Bitcoin-only** constraints. Session-specific exclusions (`recentExclusion` / `topicExclusion` / recent citation URLs) apply when provided.
 
-When the user has not set pause **signal sources**, `search_domain_filter` uses a **denylist** (e.g. `-cryptosovereignty.org`) so Perplexity does not over-index one noisy domain. When the user **does** provide source URLs, up to five hosts are used as an **allowlist** instead (cannot combine with denylist in one request). Citation URLs are merged from multiple response fields in `perplexity-client.ts`, then **filtered** again server-side before structuring.
+When the user has not set pause **signal sources**, `search_domain_filter` is **omitted** (unrestricted web search). Optional denylist entries can be added in code via `SIGNAL_DOMAIN_DENYLIST` if needed. When the user **does** provide source URLs, a **shuffled** subset of catalog hosts is used as an **allowlist** (cannot combine allowlist and denylist in one request). Citation URLs are merged from multiple response fields in `perplexity-client.ts`, then deduped server-side before structuring.
 
 ## 2. Perplexity — user message (`searchQuery`) — varies each run
 
@@ -18,7 +18,7 @@ Built from:
 | **`context`** (e.g. “BTC is down 5%…”) | Adds market-aware phrasing and optional **direction hints** (patience on drops, humility on rallies). |
 | **Neither** | Default: broad request for a profound essay/insight with **diverse author and site**. |
 | **`sourceHint`** | If the user has pause **signal sources**, appends “Look for insights from sources like: …”. |
-| **`search_domain_filter`** | If pause sources have URLs: **allowlist** (up to 5 hosts). Otherwise: **denylist** (blocked hosts). |
+| **`search_domain_filter`** | If pause sources have URLs: **allowlist** (shuffled subset of catalog hosts). Otherwise: omitted unless `SIGNAL_DOMAIN_DENYLIST` is non-empty. |
 
 So the prompt is **not** “random Bitcoin trivia”; it is a **short search query** plus a **long system brief**. Richness depends on: Perplexity retrieval, whether domain filter is on, and whether citations are returned (we merge `citations`, `search_results[].url`, and inline URLs — see `perplexity-client.ts`).
 
