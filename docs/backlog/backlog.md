@@ -32,6 +32,12 @@ Rule of thumb used here:
   - See: `rate-limit-analytics-allowlist.md`
 - `cache-async-error-handling` — `.catch` on fire-and-forget cache helpers
   - See: `cache-async-error-handling.md`
+- `rate-budget-fail-open-observability` — alert/metric when rate or daily budget checks fail open
+  - See: `rate-budget-fail-open-observability.md`
+- `quality-gates-false-positives` — quality.ts rejects; i18n and regex tuning
+  - See: `quality-gates-false-positives.md`
+- `cache-serve-relaxation-ux` — optional transparency when cache serve relaxes constraints
+  - See: `cache-serve-relaxation-ux.md`
 
 ## Pending items (everything)
 
@@ -47,4 +53,7 @@ Rule of thumb used here:
 - 10. BTC `btc_price_cache` historical freshness vs cron (Zoom Out contract) (`btc-price-cache-freshness.md`)
 - 11. Rate limit: `analytics_events` allowlist parity with generators (`rate-limit-analytics-allowlist.md`)
 - 12. `cache.ts` fire-and-forget paths: `.catch` for logging (`cache-async-error-handling.md`)
+- 13. Rate/daily budget fail-open: observability or policy (`rate-budget-fail-open-observability.md`)
+- 14. Quality gates: false positives and localization (`quality-gates-false-positives.md`)
+- 15. Cache serve relaxation: optional UX transparency (`cache-serve-relaxation-ux.md`)
 
