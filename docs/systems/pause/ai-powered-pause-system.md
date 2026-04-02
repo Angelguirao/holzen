@@ -1,6 +1,6 @@
 # AI-powered pause system
 
-This document describes **how Holzen turns Bitcoin volatility into a pause experience**: server triggers, reflection text, the intervention layer, companion generation, storage, and the React hooks that tie it together. It is the **system-level** companion to [cron-setup.md](./cron-setup.md) (scheduling SQL) and [navigating-the-codebase.md](./navigating-the-codebase.md) (repo layout).
+This document describes **how Holzen turns Bitcoin volatility into a pause experience**: server triggers, reflection text, the intervention layer, companion generation, storage, and the React hooks that tie it together. It is the **system-level** companion to [cron-setup.md](../../ops/cron-setup.md) (scheduling SQL) and [navigating-the-codebase.md](../../fundamentals/navigating-the-codebase.md) (repo layout).
 
 **Diagrams** below use [Mermaid](https://mermaid.js.org/) (`flowchart`). They render on GitHub and in many Markdown previews (e.g. Cursor); use a Mermaid extension or [mermaid.live](https://mermaid.live) if your viewer does not draw them.
 
@@ -337,7 +337,7 @@ The pause UI and **`check-volatility`** only call **`companion-orchestrate`**, w
 | History | `_shared/generators/history.ts` | Perplexity + structure | library (events) → cache → curated |
 | Zoom out | `_shared/generators/zoom-out.ts` | `btc_price_cache` + echo + deep-time AI | cache → curated (**no** live CoinGecko in request path) |
 
-**Zoom out dependency:** Cron **`refresh-btc-prices`** must keep `btc_price_cache` fresh ([cron-setup.md](./cron-setup.md)).
+**Zoom out dependency:** Cron **`refresh-btc-prices`** must keep `btc_price_cache` fresh ([cron-setup.md](../../ops/cron-setup.md)).
 
 **Library “freshness”:** After live AI fails, **`searchLibrary`** runs with **`includeStale: false`**, so rows this user was served from **`content_library`** in the last **7 days** are skipped (`content-library.ts`). If nothing is left, the chain continues to **`companion_cache`** then static curated fallbacks.
 
@@ -566,7 +566,7 @@ flowchart TB
 
 ## 10. Background jobs (pause-adjacent)
 
-Exact SQL lives in **[cron-setup.md](./cron-setup.md)**. Typical schedules documented there:
+Exact SQL lives in **[cron-setup.md](../../ops/cron-setup.md)**. Typical schedules documented there:
 
 | Job | Role for pause system |
 |-----|------------------------|
@@ -589,7 +589,7 @@ Exact SQL lives in **[cron-setup.md](./cron-setup.md)**. Typical schedules docum
 
 **What the user sees** is one pause surface: reflection copy, an intervention (mirror / trap / pattern / question / default), and optional companion cards driven by preferences.
 
-**What the server does** is split across phases: (1) **reflection** — `holzen-reflect` or `check-volatility` calling `generateUnifiedReflection` (JSON message + haiku only); (2) **orchestration** — `companion-orchestrate` may run **multiple** model-backed generators in parallel (Signal, Grounding, History, Zoom Out, and question mode when selected), then dual-write results to `reflections` / `reflection_companions` / analytics.
+**What the server does** is split across phases: (1) **reflection** — `holzen-reflect` or `check-volatility` calling `generateUnifiedReflection` (the model output is **message + haiku**; **`holzen-reflect`** may echo **`grounding_*`** keys for API stability, but **`generateUnifiedReflection`** currently returns them as **null** — companions fill those columns later); (2) **orchestration** — `companion-orchestrate` may run **multiple** model-backed generators in parallel (Signal, Grounding, History, Zoom Out, and question mode when selected), then dual-write results to `reflections` / `reflection_companions` / analytics.
 
 **Rate limits and budgets** do not line up 1:1 with that UX split:
 
@@ -636,6 +636,7 @@ Invoked at the start of **`companion-orchestrate`** only (before parsing the bod
 ## 13. Security notes
 
 - **User JWT** paths validate via `getUser()`.
+- **`reflectionId` ownership:** When the client passes **`reflectionId`** to **`companion-orchestrate`**, the orchestrator verifies the row belongs to **`userId`** (returns **403** if not).
 - **Service role** path is **only** as trustworthy as your cron secrets and network; `userId` in the body must **only** be accepted when the bearer is the service role key (implemented in orchestrator).
 - Prompt hardening: `sanitize.ts`, quality gates, `containsCryptoLanguage`, etc., in shared modules.
 
@@ -678,8 +679,8 @@ src/pages/Admin.tsx                   # ops UI (Monitor, Content, Sources, …) 
 
 ## 15. Related reading
 
-- [cron-setup.md](./cron-setup.md) — pg_cron + `net.http_post` snippets  
-- [navigating-the-codebase.md](./navigating-the-codebase.md) — repo tour and edge function invoke map  
+- [cron-setup.md](../../ops/cron-setup.md) — pg_cron + `net.http_post` snippets  
+- [navigating-the-codebase.md](../../fundamentals/navigating-the-codebase.md) — repo tour and edge function invoke map  
 - [README.md](../README.md) — local dev, env modes  
 
 When you change **reflection** prompts or gates, bump **`REFLECTION_PROMPT_VERSION`** in `_shared/reflection-generate.ts` (and ensure `reflection_generated` analytics metadata stays in sync). Other companions keep their own **`PROMPT_VERSION`** in each generator file.
