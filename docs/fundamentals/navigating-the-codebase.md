@@ -1,6 +1,6 @@
 # Navigating the Holzen codebase
 
-This guide walks a new contributor through the repository in roughly the order you would discover it while running the app locally. It complements [README.md](../README.md) (setup and scripts) and [AGENTS.md](../AGENTS.md) (conventions for automation). Deep dives on the AI pause pipeline and cron jobs live in [ai-powered-pause-system.md](./ai-powered-pause-system.md) and [cron-setup.md](./cron-setup.md).
+This guide walks a new contributor through the repository in roughly the order you would discover it while running the app locally. It complements [README.md](../README.md) (setup and scripts) and [AGENTS.md](../AGENTS.md) (conventions for automation). Deep dives on the AI pause pipeline and cron jobs live in [ai-powered-pause-system.md](../systems/pause/ai-powered-pause-system.md) and [cron-setup.md](../ops/cron-setup.md).
 
 ---
 
@@ -188,8 +188,8 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 
 ## 16. Related documentation in `docs/`
 
-- **[ai-powered-pause-system.md](./ai-powered-pause-system.md)** — Manual vs automatic pause, shared reflection AI, `companion-orchestrate`, interventions, generators, drift and ops notes.
-- **[cron-setup.md](./cron-setup.md)** — Scheduling edge functions (BTC refresh, feeds, digests, etc.).
+- **[ai-powered-pause-system.md](../systems/pause/ai-powered-pause-system.md)** — Manual vs automatic pause, shared reflection AI, `companion-orchestrate`, interventions, generators, drift and ops notes.
+- **[cron-setup.md](../ops/cron-setup.md)** — Scheduling edge functions (BTC refresh, feeds, digests, etc.).
 
 ---
 
@@ -223,6 +223,6 @@ These are observations from a structural pass — not a full security or QA audi
 2. Trace **`/` → `Home` → `useHolzen` / `use-profile`** and one Supabase table read.
 3. Sign in, trigger **Pause** (`/pause`) and follow **`use-holzen`** → `holzen-reflect` then **`use-companion-data`** → `companion-orchestrate`.
 4. Skim **`supabase/migrations/`** for `profiles`, `reflections`, and RLS policy names you see in the app.
-5. Read **[ai-powered-pause-system.md](./ai-powered-pause-system.md)** if you touch pause, companions, or volatility.
+5. Read **[ai-powered-pause-system.md](../systems/pause/ai-powered-pause-system.md)** if you touch pause, companions, or volatility.
 
 Welcome aboard.

@@ -184,6 +184,24 @@ serve(async (req) => {
       | Array<{ mood: string; outcome?: string | null }>
       | undefined;
 
+    // ── Authorization: ensure reflection ownership ──
+    // This function uses the service-role key for writes (RLS bypass), so we must
+    // explicitly verify that any provided `reflectionId` belongs to `userId`.
+    if (typeof reflectionId === "string" && reflectionId.length > 0) {
+      const { data: reflection, error: refErr } = await svcClient
+        .from("reflections")
+        .select("user_id")
+        .eq("id", reflectionId)
+        .maybeSingle();
+
+      if (refErr || !reflection || reflection.user_id !== userId) {
+        return new Response(JSON.stringify({ error: "Reflection not found" }), {
+          status: 403,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
     // ── Determine session intent for coherent companion theming ──
     const intent = determineSessionIntent({
       context: (context as string | undefined) ?? undefined,
