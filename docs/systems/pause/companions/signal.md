@@ -54,25 +54,44 @@ Exact strings change with **`PROMPT_VERSION`**; edit **`signal.ts`** rather than
 
 ---
 
-## 5. Diversity and quality — what we improved vs what remains
+## 5. Diversity and quality
 
-**Implemented (recent iterations):**
+Signal’s quality problem splits into **(a)** “is this a good Bitcoin cognitive-reappraisal piece?” and **(b)** “does the user keep seeing the same article or domain?” Holzen addresses both through **layered controls** — prompts and retrieval knobs are not the whole story; **dedup**, **gates**, and **fallbacks** matter too.
 
-- **Catalog allowlist** — Domains are **shuffled** per request (not always the same first five hosts in fixed order).
-- **Perplexity** — **`temperature`**, **`top_p`**, **`search_context_size: high`** for broader retrieval (higher API cost than default).
-- **Dedup (device)** — Client **`recentSignalUrls`** (`localStorage`) still feeds the orchestrator.
-- **Dedup (account)** — **`companion-orchestrate`** merges client URLs with recent Signal citation URLs from **`reflection_companions`** (same user, `companion_type = 'signal'`, `content.url`; excluding the current reflection when known), deduped and capped, then passes the merged list into **`generateSignal`** so repeats are discouraged even across devices.
-- **Query diversification** — Each live run appends a **random exploration facet** (sub-theme) to the Perplexity user message so similar market context does not always yield the same search query.
-- **Citation ordering** — When Perplexity returns both YouTube and non-YouTube URLs, **non-YouTube links are ordered first** before structuring so the card prefers publisher pages when available.
-- **Domain policy** — **`SIGNAL_DOMAIN_DENYLIST`** is **empty by default**; optional `-domain` entries in code if you need a denylist later.
+### How we steer diversity and quality (overall)
 
-**Still inherent (not “bugs” in Holzen alone):**
+| Layer | Role |
+|--------|------|
+| **Session intent** | **`searchAngle`** ties Signal to the rest of the pause so the card is not a generic essay request every time. |
+| **Prompts** | System + user **`searchQuery`** encode Bitcoin-only framing, reappraisal intent, and (when present) exclusions for recent authors, topics, and URLs. **`PROMPT_VERSION`** in **`signal.ts`** marks material copy changes. |
+| **Retrieval settings** | Perplexity **`temperature`**, **`top_p`**, and **`web_search_options.search_context_size`** widen or sharpen web results relative to defaults (cost vs variety tradeoff). |
+| **Catalog / domains** | Optional user catalog → **shuffled** hostname allowlist for **`search_domain_filter`**; empty catalog → open web (unless **`SIGNAL_DOMAIN_DENYLIST`** is extended in code). Shuffling avoids always searching the same subset of hosts. |
+| **Query variation** | A rotating **exploration facet** (sub-theme) in the user message reduces identical queries when market **context** text is similar across sessions. |
+| **Recency dedup** | **Device:** client **`recentSignalUrls`** / titles / sources (`localStorage`). **Account:** orchestrator merges those hints with recent Signal **`content.url`** values from **`reflection_companions`** for the same user (excluding the current reflection when known), so “don’t repeat this URL” applies across browsers once data exists server-side. |
+| **Citation handling** | When both YouTube and non-YouTube URLs appear in Perplexity output, **non-YouTube URLs are ordered first** before structuring so the model tends to pick a publisher page when one exists. |
+| **Attribution** | **`validateSource`** reconciles stated source with URL hostname rules (best-effort; see limits below). |
+| **Structural quality** | **`qualityGate("signal", …)`** enforces length, banned terms, and Bitcoin-only constraints before the card is served live. |
+| **Fallbacks** | If live search/structure fails, **library essays → cache → curated pool** still ship *something* on-theme; those paths have their own diversity characteristics (e.g. smaller fixed sets). |
 
-- **Web ranking** can still favor the same canonical essays when context and retrieval overlap; facets and dedup **reduce** but do not eliminate that.
-- **Small catalog** or many URLs on the **same hostname** still concentrates results when the allowlist is narrow.
-- **Attribution** for generic hosts (e.g. YouTube) can vary run-to-run; **`validateSource`** is best-effort.
+Together, these layers aim for **credible citations**, **thematic fit**, and **less repetition** — not a single lever.
 
-Further tightening (e.g. hard block YouTube as primary citation, per-host caps in code) would be product policy beyond the current behavior.
+### Inherent limits (not specific to one Holzen release)
+
+- **Web search is not under our control** — Similar **context** strings still tend to produce similar ranked results; we can diversify *queries* and *exclusions*, not the entire index.
+- **Allowlists concentrate** — A small catalog or many URLs on one host still biases retrieval toward those domains.
+- **Third-party metadata** — Generic hosts (e.g. YouTube) make **attribution** noisy; **`validateSource`** cannot fully fix that.
+- **Repetition as a product question** — “Good enough” diversity may still require **stricter product rules** (e.g. block or deprioritize certain hosts, per-user URL budgets, stronger library-first policies) beyond tuning prompts.
+
+### What else could be done (examples)
+
+Engineering and product options to revisit when repetition or quality still feels wrong:
+
+- **Stricter URL policy** — Harder rules on YouTube or other hosts; per-host frequency caps in prompts or post-filtering.
+- **Library-first or hybrid** — Prefer **`content_library`** or cache for some sessions to guarantee curated variety.
+- **Analytics-driven tuning** — Use **`companion_serves`** / fingerprints to spot dominant domains or titles and feed that into exclusions or catalog suggestions.
+- **User-visible controls** — Narrower “only these sources” vs “surprise me” modes change the diversity–predictability tradeoff by design.
+
+Exact behavior in code changes with **`PROMPT_VERSION`** and the files in **§6**; treat this section as **design intent**, not a changelog.
 
 ---
 
