@@ -165,4 +165,4 @@ Phase 2 is **not** "the next arbitrary folder in the repo." It is the **first en
 
 - `/pause` -> `PauseSession` -> `use-holzen` -> reflection insert -> `use-companion-data` -> `companion-orchestrate`
 
-Step-by-step review doc: `docs/reviews/phase-2-manual-pause-pipeline.md`.
+Step-by-step review doc: `docs/reviews/phase-2-manual-pause-pipeline.md` (same section layout as this Phase 1 doc: TOC, mental models, touchpoints, checklist, conclusions, next phase).
