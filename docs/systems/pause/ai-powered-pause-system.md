@@ -260,7 +260,7 @@ flowchart TB
 ## 5. `companion-orchestrate` (single entry point)
 
 - **File:** `supabase/functions/companion-orchestrate/index.ts`
-- **Role:** Auth → rate limit → daily budget → parse body → **`determineSessionIntent`** → **`selectIntervention`** (when **`useIntervention`** is true **and** **`reflectionId`** is present) → **`Promise.all`** of **`generateQuestion`** (question mode only) **and** enabled generator tasks → assemble **`intervention`** + legacy companion results → `companion_serves` inserts → **`writeCompanionData`** (dual-write to **`reflection_companions`** + denormalized columns on **`reflections`** where supported — all orchestrated types including **`zoom_out_deep_time` → `zoom_out_data`**).
+- **Role:** Auth → rate limit → daily budget → parse body → **`determineSessionIntent`** → **`selectIntervention`** (when **`useIntervention`** is true **and** **`reflectionId`** is present) → **`Promise.all`** of **`generateQuestion`** (question mode only) **and** enabled generator tasks → assemble **`intervention`** + companion results → `companion_serves` inserts → **`writeCompanionData`** (upserts **`reflection_companions`**; **Grounding** also updates **`reflections.grounding_*`** for Home — Signal / History / Zoom / intervention payloads are **not** duplicated onto legacy `reflections` columns; they were removed in favor of the join table).
 - **Typical JSON body:** **`reflectionId`**, **`context`**, **`reflectionMessage`**, **`language`**, **`mood`**, numeric **`severity`** (absolute % move → **`bucketSeverity`** in `intervention-selector.ts`), **`moodHistory`**, **`signalSources`** / **`groundingSources`** (merged catalog URLs when Signal/Ground are on), recency arrays (**`recentNudgeTopics`**, **`recentGroundingSources`**, **`recentSignalSources`**, …), **`enableSignal` / `enableGrounding` / `enableHistory` / `enableZoomOut`**, **`useIntervention`** (default true). If **`reflectionId`** is missing or **`useIntervention: false`**, no intervention is selected (**`response.intervention`** omitted); generators still run per **`enable*`**.
 
 ### Diagram — inside `companion-orchestrate`
@@ -274,7 +274,7 @@ flowchart TD
   SEL --> PAR["Parallel: questionPromise\n+ enabled generator tasks"]
   PAR --> ASM[Map task results →\nintervention.primary/secondary\n+ legacy companion fields]
   ASM --> SRV[Insert companion_serves;\nqueue writeCompanionData]
-  SRV --> OUT[(reflections +\nreflection_companions)]
+  SRV --> OUT[(reflection_companions;\nreflections.grounding_* if Ground)]
 ```
 
 **Parallelism:** After selection, **`generateQuestion`** (if question mode) and **Signal / Grounding / History / Zoom out** run **concurrently** (`Promise.all` + `Promise.allSettled` on tasks). Generators are **in-process** imports. Each slot is omitted if its **`enable*`** flag is false or the client skipped it (e.g. already cached on the row).
@@ -526,12 +526,14 @@ flowchart TB
 
 ### 7.12 Quick matrix (orchestrator internal key → storage → UI)
 
-| Internal key | `companion_type` (serves / join) | Typical denormalized `reflections` cols | Shown as |
-|--------------|----------------------------------|----------------------------------------|----------|
-| `signal` | `signal` | `signal_*` | Signal card |
-| `grounding` | `ground_nudge` | `grounding_*` | Ground card; **also** trap **primary** when trap |
-| `history` | `historical_insight` | `history_insight_data` | History card; **also** pattern **primary** when pattern |
-| `zoomOut` | `zoom_out_deep_time` | `zoom_out_data` (often via join only) | Zoom card **or** intervention **secondary** |
+| Internal key | `companion_type` (serves / join) | `reflections` columns (base table) | Shown as |
+|--------------|----------------------------------|-------------------------------------|----------|
+| `signal` | `signal` | *(none — legacy `signal_*` dropped)* | Signal card |
+| `grounding` | `ground_nudge` | `grounding_*` (denormalized for Home) | Ground card; **also** trap **primary** when trap |
+| `history` | `historical_insight` | *(none — legacy column dropped)* | History card; **also** pattern **primary** when pattern |
+| `zoomOut` | `zoom_out_deep_time` | *(none — legacy column dropped)* | Zoom card **or** intervention **secondary** |
+
+Reads that need Signal/History/Zoom text use **`v_reflection_with_companions`** (or **`reflection_companions`**) — not bare `reflections` columns.
 
 ---
 
@@ -591,7 +593,7 @@ Exact SQL lives in **[cron-setup.md](../../ops/cron-setup.md)**. Typical schedul
 
 **What the user sees** is one pause surface: reflection copy, an intervention (mirror / trap / pattern / question / default), and optional companion cards driven by preferences.
 
-**What the server does** is split across phases: (1) **reflection** — `holzen-reflect` or `check-volatility` calling `generateUnifiedReflection` (the model output is **message + haiku**; **`holzen-reflect`** may echo **`grounding_*`** keys for API stability, but **`generateUnifiedReflection`** currently returns them as **null** — companions fill those columns later); (2) **orchestration** — `companion-orchestrate` may run **multiple** model-backed generators in parallel (Signal, Grounding, History, Zoom Out, and question mode when selected), then dual-write results to `reflections` / `reflection_companions` / analytics.
+**What the server does** is split across phases: (1) **reflection** — `holzen-reflect` or `check-volatility` calling `generateUnifiedReflection` (the model output is **message + haiku**; **`holzen-reflect`** may echo **`grounding_*`** keys for API stability, but **`generateUnifiedReflection`** currently returns them as **null** — companions fill those columns later); (2) **orchestration** — `companion-orchestrate` may run **multiple** model-backed generators in parallel (Signal, Grounding, History, Zoom Out, and question mode when selected), then write results to **`reflection_companions`** (and **`reflections.grounding_*`** when Grounding runs), **`companion_serves`**, and analytics.
 
 **Rate limits and budgets** do not line up 1:1 with that UX split:
 
