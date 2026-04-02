@@ -122,4 +122,4 @@ Tradeoffs / alternatives:
 
 - Shared `_shared` modules for rate limit, quality, cache, companion writes — see `docs/reviews/phase-5-quality-gates-rate-limit-cache.md`.
 
-Step-by-step review doc: `docs/reviews/phase-5-quality-gates-rate-limit-cache.md` (same section layout as Phases 1-4 once updated).
+Step-by-step review doc: `docs/reviews/phase-5-quality-gates-rate-limit-cache.md` (same section layout as Phases 1-4).
