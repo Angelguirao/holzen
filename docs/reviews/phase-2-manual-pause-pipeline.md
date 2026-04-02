@@ -121,7 +121,9 @@ Use these as "prove-or-disprove" questions while reading the Phase 2 files.
 
 - The manual pipeline is **coherent** when Home and `useHolzen` complete before navigation: reflection row, profile fields, and nav state align.
 - **Fragility** is at **entry boundaries**: any route to `/pause` that only passes `reflectionId` (or nothing) requires the same fallback rules as full state; `PauseSession` + `useHolzen` hydration address the worst "no reflection" dead-ends when `profileLoaded` and hook state catch up.
-- **Cost / duplication**: multiple clients (user session + cron) can invoke `companion-orchestrate`; caching and server logic limit waste but the tradeoff is worth monitoring (see Phase 3 cron review).
+- **Cost / duplication**: multiple clients (user session + cron) can invoke `companion-orchestrate`; caching and server logic limit waste but the tradeoff is worth monitoring (see Phase 3 cron review). Backlog: `docs/backlog/orchestrate-client-cron.md`.
+
+- **Partial failure on the manual path**: `holzen-reflect` can succeed while a later insert into `reflections` fails; backlog: `docs/backlog/reflection-insert-partial-failure.md`.
 
 Tradeoffs / alternatives (see also `docs/backlog/pause-session-hydration.md`):
 
