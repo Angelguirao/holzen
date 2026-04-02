@@ -29,3 +29,7 @@ Treat `location.state` as a hint, but reduce dependence on it by re-hydrating cr
 2. The “no reflection” UI appears only when there is genuinely no restorable reflection content (not just because nav payload was missing).
 3. Avoid mismatched states (e.g. `reflectionId` present but `reflectionMessage` empty) by enforcing a consistent restoration priority.
 
+## See also
+
+- `cron-pause-featured-parity.md` — automatic (cron) pauses may leave featured fields null until orchestration; first paint parity with manual pauses.
+
