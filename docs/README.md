@@ -32,7 +32,7 @@ This folder contains human-readable notes that complement the source code and in
 - `systems/routing/route-gating-system.md` - protected vs public-only vs ungated routes; `ProtectedRoute` / `PublicOnlyRoute` contracts
 - `systems/pause/ai-powered-pause-system.md` - end-to-end architecture of manual vs automatic pause and how companions/interventions are produced.
 - `systems/pause/pause-session-cost-estimates.md` - order-of-magnitude API spend estimates for a live pause session.
-- `systems/pause/signal-perplexity-prompts.md` - what the Signal pipeline sends to Perplexity + how it's structured by the secondary model.
+- `systems/pause/companions/` - deep dives per companion type (see [companions/signal.md](systems/pause/companions/signal.md) for Signal).
 
 ## Postmortems
 

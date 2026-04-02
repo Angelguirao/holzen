@@ -487,6 +487,8 @@ flowchart TB
 | **UI** | **`SignalDisplay`** + feedback **`companionType="signal"`**. |
 | **Intervention** | Signal is **not** wired as a primary intervention type; it is always a **card** when enabled. |
 
+**Deep dive (client → Perplexity → structuring → cache, catalog behavior, diversity notes):** [companions/signal.md](companions/signal.md).
+
 ---
 
 ### 7.9 Companion card: Zoom Out
@@ -682,5 +684,6 @@ src/pages/Admin.tsx                   # ops UI (Monitor, Content, Sources, …) 
 - [cron-setup.md](../../ops/cron-setup.md) — pg_cron + `net.http_post` snippets  
 - [navigating-the-codebase.md](../../fundamentals/navigating-the-codebase.md) — repo tour and edge function invoke map  
 - [README.md](../README.md) — local dev, env modes  
+- [companions/signal.md](companions/signal.md) — Signal companion end-to-end (search, prompts, sources, fallbacks)  
 
 When you change **reflection** prompts or gates, bump **`REFLECTION_PROMPT_VERSION`** in `_shared/reflection-generate.ts` (and ensure `reflection_generated` analytics metadata stays in sync). Other companions keep their own **`PROMPT_VERSION`** in each generator file.
