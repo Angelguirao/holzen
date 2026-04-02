@@ -101,14 +101,14 @@ If these workers drift (stale prices, bad dedup, permissive auth), you get wrong
 
 - **Coherent story**: three workers **warm** price data, **ingest** library content, and **maintain** a companion cache pool — each reduces latency or API load at user time.
 - **Risks** (folded from prior "risks / validate"):
-  - **Dedup vs near-duplicates**: exact title dedup in `fetch-source-feeds` and similarity dedup in `pregenerate-companions` can both miss "almost the same" rows if titles drift; caches can grow.
-  - **Auth consistency**: `refresh-btc-prices` accepts `x-supabase-cron: true` as a third signal — confirm other workers and ops docs agree so cron does not 401.
-  - **Timing windows**: historical BTC snapshots depend on cron cadence + "older than 24h" semantics; **on this day** accuracy is bounded by that policy.
+  - **Dedup vs near-duplicates**: exact title dedup in `fetch-source-feeds` and similarity dedup in `pregenerate-companions` can both miss "almost the same" rows if titles drift; caches can grow. Backlog: `docs/backlog/cache-dedup-near-duplicates.md`.
+  - **Auth consistency**: `refresh-btc-prices` accepts `x-supabase-cron: true` as a third signal — confirm other workers and ops docs agree so cron does not 401. Backlog: `docs/backlog/cron-worker-auth-consistency.md`.
+  - **Timing windows**: historical BTC snapshots depend on cron cadence + "older than 24h" semantics; **on this day** accuracy is bounded by that policy. Backlog: `docs/backlog/btc-price-cache-freshness.md`.
 
 Tradeoffs / alternatives:
 
-- **Stricter dedup** (hash body, URL, normalized title) vs **fewer false merges** — more compute, less duplicate content.
-- **More frequent cron** vs **API rate limits** — higher cost, fresher data.
+- **Stricter dedup** (hash body, URL, normalized title) vs **fewer false merges** — more compute, less duplicate content (see `cache-dedup-near-duplicates.md`).
+- **More frequent cron** vs **API rate limits** — higher cost, fresher data (see `btc-price-cache-freshness.md`).
 - **Larger cache warm pool** vs **storage and generation cost** — product decision.
 
 ## What to Review Next and Why

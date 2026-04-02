@@ -22,6 +22,12 @@ Rule of thumb used here:
   - See: `automatic-pause-notification-timing.md`
 - `cron-pause-featured-parity` — featured fields / first paint parity for automatic vs manual pauses
   - See: `cron-pause-featured-parity.md`
+- `cron-worker-auth-consistency` — align cron worker auth gates with `docs/ops/cron-setup.md`
+  - See: `cron-worker-auth-consistency.md`
+- `cache-dedup-near-duplicates` — stronger dedup for `content_library` and `companion_cache`
+  - See: `cache-dedup-near-duplicates.md`
+- `btc-price-cache-freshness` — historical BTC cache staleness vs cron cadence + Zoom Out expectations
+  - See: `btc-price-cache-freshness.md`
 
 ## Pending items (everything)
 
@@ -32,4 +38,7 @@ Rule of thumb used here:
 - 5. Partial failure: reflect OK, reflection insert fails — clearer error handling or server-side atomic path (`reflection-insert-partial-failure.md`)
 - 6. Automatic pause: notification timing vs orchestrate completion — policy (await, enrich payload, or keep async) (`automatic-pause-notification-timing.md`)
 - 7. Cron vs manual pause: featured field parity and loading affordances on first paint (`cron-pause-featured-parity.md`)
+- 8. Cron worker auth: headers/secrets aligned across workers and ops docs (`cron-worker-auth-consistency.md`)
+- 9. `content_library` / `companion_cache` dedup — reduce near-duplicates (`cache-dedup-near-duplicates.md`)
+- 10. BTC `btc_price_cache` historical freshness vs cron (Zoom Out contract) (`btc-price-cache-freshness.md`)
 
