@@ -56,7 +56,9 @@ Exact strings change with **`PROMPT_VERSION`**; edit **`signal.ts`** rather than
 
 ## 5. Diversity and quality
 
-Signal’s quality problem splits into **(a)** “is this a good Bitcoin cognitive-reappraisal piece?” and **(b)** “does the user keep seeing the same article or domain?” Holzen addresses both through **layered controls** — prompts and retrieval knobs are not the whole story; **dedup**, **gates**, and **fallbacks** matter too.
+**Pause quality is a primary product goal for Holzen** — the session should feel grounded, trustworthy, and emotionally proportionate. Signal is one companion card, but it sits next to **interventions**, **Grounding**, **History**, and **Zoom Out**; keeping Signal excellent (real citations, Bitcoin-appropriate framing, less repetition) supports the same standard as the rest of the pause flow.
+
+Signal’s design problem splits into **(a)** “is this a good Bitcoin cognitive-reappraisal piece?” and **(b)** “does the user keep seeing the same article or domain?” Both matter for perceived quality. Holzen uses **layered controls** — not a single knob: prompts and retrieval settings, **dedup**, **gates**, **attribution**, and **fallbacks** all contribute.
 
 ### How we steer diversity and quality (overall)
 
@@ -66,14 +68,15 @@ Signal’s quality problem splits into **(a)** “is this a good Bitcoin cogniti
 | **Prompts** | System + user **`searchQuery`** encode Bitcoin-only framing, reappraisal intent, and (when present) exclusions for recent authors, topics, and URLs. **`PROMPT_VERSION`** in **`signal.ts`** marks material copy changes. |
 | **Retrieval settings** | Perplexity **`temperature`**, **`top_p`**, and **`web_search_options.search_context_size`** widen or sharpen web results relative to defaults (cost vs variety tradeoff). |
 | **Catalog / domains** | Optional user catalog → **shuffled** hostname allowlist for **`search_domain_filter`**; empty catalog → open web (unless **`SIGNAL_DOMAIN_DENYLIST`** is extended in code). Shuffling avoids always searching the same subset of hosts. |
-| **Query variation** | A rotating **exploration facet** (sub-theme) in the user message reduces identical queries when market **context** text is similar across sessions. |
-| **Recency dedup** | **Device:** client **`recentSignalUrls`** / titles / sources (`localStorage`). **Account:** orchestrator merges those hints with recent Signal **`content.url`** values from **`reflection_companions`** for the same user (excluding the current reflection when known), so “don’t repeat this URL” applies across browsers once data exists server-side. |
+| **Query variation** | Each live run appends a **random exploration facet** (short sub-theme) to the user message so similar market **context** does not always yield the same search. Facets live in **`SIGNAL_EXPLORATION_FACETS`** in **`signal.ts`** — expand there (and bump **`PROMPT_VERSION`**) to cover more angles without bloating this doc. |
+| **Recency dedup** | **Device:** client **`recentSignalUrls`** / titles / sources (`localStorage`). **Account:** orchestrator merges those hints with recent Signal **`content.url`** values from **`reflection_companions`** for the same user (excluding the current reflection when known). **Implementation note:** today this uses two DB round trips and a capped reflection id list; a single RPC/join could reduce latency if needed. |
 | **Citation handling** | When both YouTube and non-YouTube URLs appear in Perplexity output, **non-YouTube URLs are ordered first** before structuring so the model tends to pick a publisher page when one exists. |
 | **Attribution** | **`validateSource`** reconciles stated source with URL hostname rules (best-effort; see limits below). |
 | **Structural quality** | **`qualityGate("signal", …)`** enforces length, banned terms, and Bitcoin-only constraints before the card is served live. |
 | **Fallbacks** | If live search/structure fails, **library essays → cache → curated pool** still ship *something* on-theme; those paths have their own diversity characteristics (e.g. smaller fixed sets). |
+| **Operations** | **`companion_serves`**, **`generation_attempts`**, and cache fingerprints support monitoring and later **analytics-driven** tuning (see below). |
 
-Together, these layers aim for **credible citations**, **thematic fit**, and **less repetition** — not a single lever.
+Together, these layers aim for **credible citations**, **thematic fit**, and **less repetition** — not a single lever. Improving “quality when pause” usually means moving **several** layers (and the other companion paths), not only adding facets — though a **richer facet list** is a cheap way to diversify retrieval.
 
 ### Inherent limits (not specific to one Holzen release)
 
@@ -87,11 +90,22 @@ Together, these layers aim for **credible citations**, **thematic fit**, and **l
 Engineering and product options to revisit when repetition or quality still feels wrong:
 
 - **Stricter URL policy** — Harder rules on YouTube or other hosts; per-host frequency caps in prompts or post-filtering.
-- **Library-first or hybrid** — Prefer **`content_library`** or cache for some sessions to guarantee curated variety.
+- **Library-first or hybrid** — Prefer **`content_library`** or cache for some sessions to guarantee curated variety and editorial tone.
 - **Analytics-driven tuning** — Use **`companion_serves`** / fingerprints to spot dominant domains or titles and feed that into exclusions or catalog suggestions.
 - **User-visible controls** — Narrower “only these sources” vs “surprise me” modes change the diversity–predictability tradeoff by design.
+- **Faster dedup path** — One Postgres RPC or a single query with a join (instead of two round trips) for recent Signal URLs; watch **`.in(reflection_id, …)`** size if the reflection window grows very large.
+- **Grounding / Home consistency** — Not Signal-specific, but it *is* pause-adjacent quality: dual-write drift between **`reflection_companions`** and **`reflections.grounding_*`** is tracked in the backlog (see **§7**).
 
 Exact behavior in code changes with **`PROMPT_VERSION`** and the files in **§6**; treat this section as **design intent**, not a changelog.
+
+### Related backlog (quality and pause)
+
+| Topic | Backlog / doc |
+|--------|----------------|
+| Grounding: Home vs pause data surfaces | [writeCompanionData-grounding-consistency.md](../../../backlog/writeCompanionData-grounding-consistency.md) |
+| Quality gate false positives / i18n | [quality-gates-false-positives.md](../../../backlog/quality-gates-false-positives.md) |
+| Cache / library near-duplicate dedup | [cache-dedup-near-duplicates.md](../../../backlog/cache-dedup-near-duplicates.md) |
+| Full backlog index | [backlog.md](../../../backlog/backlog.md) |
 
 ---
 
@@ -115,3 +129,4 @@ Exact behavior in code changes with **`PROMPT_VERSION`** and the files in **§6*
 - [AI-powered pause system](../ai-powered-pause-system.md) — full pause architecture  
 - [navigating-the-codebase.md](../../../fundamentals/navigating-the-codebase.md) — edge functions and hooks map  
 - [docs/README.md](../../README.md) — docs index  
+- [backlog.md](../../../backlog/backlog.md) — pending improvements; companion-quality items linked from **§5** (“Related backlog”)  
