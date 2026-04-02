@@ -92,5 +92,3 @@ Treating repetition as a **product** problem may mean stricter rules (e.g. prefe
 - [AI-powered pause system](../ai-powered-pause-system.md) — full pause architecture  
 - [navigating-the-codebase.md](../../../fundamentals/navigating-the-codebase.md) — edge functions and hooks map  
 - [docs/README.md](../../README.md) — docs index  
-
-The legacy filename **`signal-perplexity-prompts.md`** redirects here; use **this** file for Signal going forward.
