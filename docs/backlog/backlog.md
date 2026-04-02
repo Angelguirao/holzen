@@ -28,6 +28,10 @@ Rule of thumb used here:
   - See: `cache-dedup-near-duplicates.md`
 - `btc-price-cache-freshness` — historical BTC cache staleness vs cron cadence + Zoom Out expectations
   - See: `btc-price-cache-freshness.md`
+- `rate-limit-analytics-allowlist` — analytics events match `checkRateLimit` allowlist
+  - See: `rate-limit-analytics-allowlist.md`
+- `cache-async-error-handling` — `.catch` on fire-and-forget cache helpers
+  - See: `cache-async-error-handling.md`
 
 ## Pending items (everything)
 
@@ -41,4 +45,6 @@ Rule of thumb used here:
 - 8. Cron worker auth: headers/secrets aligned across workers and ops docs (`cron-worker-auth-consistency.md`)
 - 9. `content_library` / `companion_cache` dedup — reduce near-duplicates (`cache-dedup-near-duplicates.md`)
 - 10. BTC `btc_price_cache` historical freshness vs cron (Zoom Out contract) (`btc-price-cache-freshness.md`)
+- 11. Rate limit: `analytics_events` allowlist parity with generators (`rate-limit-analytics-allowlist.md`)
+- 12. `cache.ts` fire-and-forget paths: `.catch` for logging (`cache-async-error-handling.md`)
 
