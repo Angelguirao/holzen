@@ -24,7 +24,7 @@ import { searchLibrary, essayToSignal, recordLibraryServe } from "../content-lib
 import { preferNonYoutubeCitationsFirst } from "../recent-signal-urls.ts";
 
 /** Bump when the search query, structuring prompt, or quality rules change. */
-export const PROMPT_VERSION = "v8";
+export const PROMPT_VERSION = "v9";
 
 /**
  * Optional Perplexity denylist entries (leading `-`, e.g. `-example.com`).
@@ -47,15 +47,51 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-/** Rotating sub-themes so similar market context does not always produce the same web query. */
+/**
+ * Rotating sub-themes so similar market context does not always produce the same web query.
+ * Keep phrases short; expand here (and bump PROMPT_VERSION) rather than duplicating in docs.
+ */
 const SIGNAL_EXPLORATION_FACETS = [
+  // Time, patience, psychology
   "time preference and delayed gratification",
-  "sound money and monetary ethics",
-  "proof-of-work and energy framing",
-  "holding through volatility (psychology)",
-  "settlement vs. speculation",
-  "separation of money and state",
+  "low time preference as emotional skill during volatility",
+  "patience and long horizons vs. constant price checking",
+  "sitting with uncertainty without needing a trade",
+  "identity and self-worth separate from short-term P&L",
+  // Monetary theory & ethics
+  "sound money and salability across time",
+  "hard money vs. soft money (ethical framing, not trading)",
+  "monetary debasement and savings — conceptual, not political rant",
+  "Cantillon effects and who benefits from inflation (educational)",
+  "digital scarcity and predictable issuance (no price targets)",
+  // PoW, energy, settlement
+  "proof-of-work as unforgeable costliness and truth anchor",
+  "energy use as security budget, not apology tour",
+  "settlement finality vs. credit and IOUs",
+  "open ledger vs. trusted third parties",
+  // Sovereignty & agency
+  "self-custody as responsibility and agency",
+  "verification over trust; running the numbers mentally",
+  "neutral protocol vs. corporate or state money",
+  "censorship resistance and permissionless access",
+  // Network & coordination
   "network effects and monetary Schelling points",
+  "decentralization and resilience of the network",
+  "Bitcoin as savings technology, not a get-rich scheme",
+  // Volatility & reappraisal
+  "volatility as feature of free markets and price discovery",
+  "fear and greed as signals to pause, not to panic-trade",
+  "antifragility — stress that strengthens conviction in the protocol",
+  "grounding reactions in fundamentals vs. narrative of the week",
+  // History & comparison
+  "commodity money and gold — historical parallels without goldbug hype",
+  "predictable supply schedule and monetary credibility (not price prediction)",
+  "intergenerational thinking — money that outlives quarterly earnings",
+  // Protocol & society
+  "separation of money and state",
+  "open-source money vs. closed platforms",
+  "monetary ethics: thrift, saving, and intertemporal fairness",
+  "blockspace scarcity and honest fee markets (conceptual)",
 ] as const;
 
 function pickExplorationFacet(): string {

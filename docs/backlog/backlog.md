@@ -8,6 +8,7 @@ Rule of thumb used here:
 
 ## Categories
 
+- **Pause / companion quality (design levers, Signal diversity, future work)** — narrative and tables live in [systems/pause/companions/signal.md §5](../systems/pause/companions/signal.md); backlog files below cover *specific* pending fixes (grounding dual-write, quality gates, cache dedup, etc.).
 - `auth-referral` — pending auth + referral side-effect robustness items
   - See: `auth-referral.md`
 - `route-gating` — auth/routing UX vs correctness tradeoffs
