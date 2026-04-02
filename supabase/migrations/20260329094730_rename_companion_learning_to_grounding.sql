@@ -1,5 +1,6 @@
--- Repair: DB still has companion_learning (rename migration not applied yet, or drift).
--- App + types expect profiles.companion_grounding. Safe to run if column already renamed.
+-- Align column name with the Grounding companion (orchestrator enableGrounding).
+-- Runs before 20260329094842_view_v_reflection_with_companions.sql (that migration drops companion_learning).
+-- Idempotent: safe if column was already renamed.
 
 DO $$
 BEGIN
@@ -11,11 +12,6 @@ BEGIN
     WHERE table_schema = 'public' AND table_name = 'profiles' AND column_name = 'companion_grounding'
   ) THEN
     ALTER TABLE public.profiles RENAME COLUMN companion_learning TO companion_grounding;
-  ELSIF NOT EXISTS (
-    SELECT 1 FROM information_schema.columns
-    WHERE table_schema = 'public' AND table_name = 'profiles' AND column_name = 'companion_grounding'
-  ) THEN
-    ALTER TABLE public.profiles ADD COLUMN companion_grounding boolean NOT NULL DEFAULT true;
   END IF;
 END $$;
 
