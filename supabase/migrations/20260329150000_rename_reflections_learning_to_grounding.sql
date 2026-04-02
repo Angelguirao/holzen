@@ -1,7 +1,4 @@
--- Ground companion payload on reflections: align names with profiles.companion_grounding and orchestrator "grounding".
+-- Superseded by 20260329094700_rename_reflections_learning_to_grounding.sql (correct ordering for `supabase db reset`).
+-- Kept as a no-op so environments that already applied this migration filename remain valid.
 
-ALTER TABLE public.reflections RENAME COLUMN learning_title TO grounding_title;
-ALTER TABLE public.reflections RENAME COLUMN learning_body TO grounding_body;
-ALTER TABLE public.reflections RENAME COLUMN learning_citation TO grounding_citation;
-ALTER TABLE public.reflections RENAME COLUMN learning_url TO grounding_url;
-ALTER TABLE public.reflections RENAME COLUMN learning_read TO grounding_read;
+SELECT 1;
