@@ -102,3 +102,7 @@ High-level behavior:
   - decide whether retry is possible on failure.
 - Confirm that `record-referral` remains compatible with the body shape `{ referral_code }`.
 
+## See also
+
+- `docs/systems/routing/route-gating-system.md` - how `ProtectedRoute` / `PublicOnlyRoute` apply `user` + `loading` to the route table.
+
