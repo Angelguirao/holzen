@@ -110,6 +110,7 @@ Tradeoffs / alternatives:
 - `docs/backlog/rate-budget-fail-open-observability.md` — metrics/alerts when rate or budget checks fail open.
 - `docs/backlog/quality-gates-false-positives.md` — tune regexes / localization; measure reject reasons.
 - `docs/backlog/cache-serve-relaxation-ux.md` — optional UX when `serveFromCache` relaxes to lower tier or repeats.
+- `docs/backlog/writeCompanionData-grounding-consistency.md` — keep `reflection_companions` and `reflections.grounding_*` in sync for Home vs pause.
 
 ## What to Review Next and Why
 
