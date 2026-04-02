@@ -58,7 +58,18 @@ export default function PauseSession() {
   const navigate = useNavigate();
   const location = useLocation();
   const prefersReducedMotion = useReducedMotion();
-  const { mantra, dismissMessage, groundingActivities } = useHolzen();
+  const {
+    mantra,
+    dismissMessage,
+    groundingActivities,
+    message: holzenMessage,
+    context: holzenContext,
+    companions: holzenCompanions,
+    lastReflectionId: holzenLastReflectionId,
+    companionPrefs: holzenCompanionPrefs,
+    severity: holzenSeverity,
+    profileLoaded,
+  } = useHolzen();
   const { subscribed } = useSubscription();
 
   const navState = (location.state as any) ?? {};
@@ -66,17 +77,17 @@ export default function PauseSession() {
     const saved = loadSession();
     if (!saved) return null;
     // If navigating with fresh state for a DIFFERENT reflection, discard saved session
-    if (navState.reflectionMessage && navState.reflectionId && saved.reflectionId !== navState.reflectionId) return null;
+    if (navState.reflectionId && saved.reflectionId !== navState.reflectionId) return null;
     // Otherwise prefer the saved session (user is resuming)
     return saved;
   }, []);
 
-  const message: string = navState.reflectionMessage ?? restored?.message ?? '';
-  const context: string | null = navState.context ?? restored?.context ?? null;
-  const reflectionId: string | null = navState.reflectionId ?? restored?.reflectionId ?? null;
-  const companions: CompanionData = navState.companions ?? restored?.companions ?? { haiku: null, groundingTitle: null, groundingBody: null };
-  const companionPrefs: CompanionPrefs = navState.companionPrefs ?? restored?.companionPrefs ?? { breathing: true, haiku: true, grounding: true, signal: true, zoomOut: true, history: true };
-  const severity: 'mild' | 'moderate' | 'high' = navState.severity ?? restored?.severity ?? 'mild';
+  const message: string = navState.reflectionMessage ?? restored?.message ?? holzenMessage ?? '';
+  const context: string | null = navState.context ?? restored?.context ?? holzenContext ?? null;
+  const reflectionId: string | null = navState.reflectionId ?? restored?.reflectionId ?? holzenLastReflectionId ?? null;
+  const companions: CompanionData = navState.companions ?? restored?.companions ?? holzenCompanions ?? { haiku: null, groundingTitle: null, groundingBody: null };
+  const companionPrefs: CompanionPrefs = navState.companionPrefs ?? restored?.companionPrefs ?? holzenCompanionPrefs ?? { breathing: true, haiku: true, grounding: true, signal: true, zoomOut: true, history: true };
+  const severity: 'mild' | 'moderate' | 'high' = navState.severity ?? restored?.severity ?? holzenSeverity ?? 'mild';
 
   // Map old step names to new ones for session restoration
   const mapStep = (s: string): PauseStep => {
@@ -253,6 +264,18 @@ export default function PauseSession() {
 
   // No message fallback
   if (!message && phase !== 'done') {
+    // Avoid showing the "no reflection" dead-end while `useHolzen` is still hydrating
+    // pause data from profile load (e.g. when deep-linking into `/pause` from notifications).
+    if (!profileLoaded) {
+      return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
+          <div className="text-center space-y-4">
+            <p className="text-sm font-mono text-muted-foreground">{t('common.loading', 'Loading...')}</p>
+          </div>
+        </div>
+      );
+    }
+
     return (
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
         <div className="text-center space-y-4">

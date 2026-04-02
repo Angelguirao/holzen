@@ -27,10 +27,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (_event === 'SIGNED_IN' && session?.user) {
         const refCode = localStorage.getItem('holzen_ref');
         if (refCode) {
-          localStorage.removeItem('holzen_ref');
-          supabase.functions.invoke('record-referral', {
-            body: { referral_code: refCode },
-          });
+          // Fire-and-forget, but keep `holzen_ref` until the call succeeds.
+          void supabase.functions
+            .invoke('record-referral', { body: { referral_code: refCode } })
+            .then(() => localStorage.removeItem('holzen_ref'))
+            .catch((err) => {
+              console.error('[record-referral]', err);
+            });
         }
       }
     });

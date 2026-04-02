@@ -132,7 +132,7 @@ If **Signal** hits **3** Perplexity requests (retries) and **Grounding** hits **
 
 ### 6.1 What the product actually limits
 
-- **`check-volatility`** is often scheduled **every 15 minutes** (see [cron-setup.md](./cron-setup.md)), but that only **evaluates** users; it does **not** mean one new pause per user every 15 minutes.
+- **`check-volatility`** is often scheduled **every 15 minutes** (see [cron-setup.md](../../ops/cron-setup.md)), but that only **evaluates** users; it does **not** mean one new pause per user every 15 minutes.
 - **Automatic** pauses require thresholds **and** passing **`last_trigger_at` + `cooldown_hours`** (default **6 hours** in `check-volatility` when `last_trigger_at` is set). So in the worst **sustained** volatile market, expect on the order of **~4 automatic full generations per user per day**, not 96.
 - **Manual** pauses: each full flow does **reflection** (`pause_ai_call`) + **orchestrate**. `companion-orchestrate` uses `checkRateLimit` (**30** allowlisted AI events per **60** minutes per user). That caps **combined** frequency with other features that emit the same events (see `ratelimit.ts` allowlist).
 
