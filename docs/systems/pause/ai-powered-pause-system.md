@@ -589,7 +589,7 @@ Exact SQL lives in **[cron-setup.md](../../ops/cron-setup.md)**. Typical schedul
 
 **What the user sees** is one pause surface: reflection copy, an intervention (mirror / trap / pattern / question / default), and optional companion cards driven by preferences.
 
-**What the server does** is split across phases: (1) **reflection** — `holzen-reflect` or `check-volatility` calling `generateUnifiedReflection` (JSON message + haiku only); (2) **orchestration** — `companion-orchestrate` may run **multiple** model-backed generators in parallel (Signal, Grounding, History, Zoom Out, and question mode when selected), then dual-write results to `reflections` / `reflection_companions` / analytics.
+**What the server does** is split across phases: (1) **reflection** — `holzen-reflect` or `check-volatility` calling `generateUnifiedReflection` (the model output is **message + haiku**; **`holzen-reflect`** may echo **`grounding_*`** keys for API stability, but **`generateUnifiedReflection`** currently returns them as **null** — companions fill those columns later); (2) **orchestration** — `companion-orchestrate` may run **multiple** model-backed generators in parallel (Signal, Grounding, History, Zoom Out, and question mode when selected), then dual-write results to `reflections` / `reflection_companions` / analytics.
 
 **Rate limits and budgets** do not line up 1:1 with that UX split:
 
@@ -636,6 +636,7 @@ Invoked at the start of **`companion-orchestrate`** only (before parsing the bod
 ## 13. Security notes
 
 - **User JWT** paths validate via `getUser()`.
+- **`reflectionId` ownership:** When the client passes **`reflectionId`** to **`companion-orchestrate`**, the orchestrator verifies the row belongs to **`userId`** (returns **403** if not).
 - **Service role** path is **only** as trustworthy as your cron secrets and network; `userId` in the body must **only** be accepted when the bearer is the service role key (implemented in orchestrator).
 - Prompt hardening: `sanitize.ts`, quality gates, `containsCryptoLanguage`, etc., in shared modules.
 
