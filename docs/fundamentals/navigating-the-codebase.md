@@ -8,7 +8,8 @@ This guide walks a new contributor through the repository in roughly the order y
 
 1. **[README.md](../README.md)** — Node version, `npm install`, environment files (`.env`, `.env.hosted.local`, `.env.localstack.local`), and npm scripts (`dev` on port **8080**, Supabase CLI wrappers).
 2. **[AGENTS.md](../AGENTS.md)** — Where routes, pages, hooks, and Supabase artifacts live; import alias `@/` → `src/`; note on ESLint volume.
-3. **This doc** — How those pieces connect at runtime.
+3. **[architecture/c4-holzen.md](../architecture/c4-holzen.md)** — C4 **System Context** and **Container** diagrams (and [workspace.dsl](../architecture/workspace.dsl) for Structurizr).
+4. **This doc** — How those pieces connect at runtime.
 
 ---
 
