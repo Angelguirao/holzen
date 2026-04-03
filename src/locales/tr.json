@@ -59,6 +59,7 @@
     "generatingReflection": "Düşünce oluşturuluyor…",
     "needAMoment": "Bir ana ihtiyacım var",
     "manualReflectionIn": "Manuel düşünce {{minutes}} dk sonra",
+    "manualReflectionInSoon": "Sonraki duraklama {{time}} içinde",
     "cooldownMessage": "Bu zamanı nefes almak için kullanın. Bir sonraki düşünce ihtiyacınız olduğunda burada olacak.",
     "requestAnytime": "İstediğiniz zaman bir düşünce talep edin — eşik gerekmez.",
     "startRitualBeforeDeciding": "Karar vermeden önce ritüel başlat",

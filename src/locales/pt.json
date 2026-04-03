@@ -59,6 +59,7 @@
     "generatingReflection": "Gerando reflexão…",
     "needAMoment": "Preciso de um momento",
     "manualReflectionIn": "Reflexão manual em {{minutes}} min",
+    "manualReflectionInSoon": "Próxima pausa em {{time}}",
     "cooldownMessage": "Use este tempo para respirar. A próxima reflexão estará aqui quando precisar.",
     "requestAnytime": "Solicite uma reflexão a qualquer momento — sem limite necessário.",
     "startRitualBeforeDeciding": "Iniciar ritual antes de decidir",
