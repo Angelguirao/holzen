@@ -46,7 +46,7 @@ Optional: `take_snapshot` (a11y tree), `take_screenshot`, `evaluate_script` for 
 
 ## In-app console prefixes (source)
 
-The SPA emits **`[holzen:boot]`**, **`[holzen:auth]`**, **`[holzen:profile]`**, **`[holzen:router]`** from `src/lib/holzen-console.ts`, **`[holzen:manual]`** / **`[holzen:home]`** from the Holzen hook and Home page. Filter DevTools by **`holzen:`** to see boot → auth → profile → route → manual pause in order.
+The SPA emits **`[holzen:boot]`**, **`[holzen:auth]`**, **`[holzen:profile]`**, **`[holzen:router]`** from `src/lib/holzen-console.ts`, **`[holzen:manual]`** / **`[holzen:home]`** from the Holzen hook and Home page. **`[holzen:pause]`** logs a one-line mount summary on `/pause`; **`[holzen:subscription]`** logs entitlements when they change (and checkout / portal actions). **`[holzen:query]`** traces TanStack Query cache add/remove/state transitions in **dev** only, or in prod after `localStorage.setItem('holzen:debug','1')` and reload. Filter DevTools by **`holzen:`** to see boot → auth → profile → route → subscription → query (if verbose) → pause → manual.
 
 ## Related backlog
 

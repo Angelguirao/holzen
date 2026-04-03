@@ -19,6 +19,7 @@ import { PauseShift } from '@/components/pause/PauseShift';
 import { PauseDecide } from '@/components/pause/PauseDecide';
 import { PauseDone } from '@/components/pause/PauseDone';
 import { PauseScienceSheet } from '@/components/pause/PauseScienceSheet';
+import { holzenLog } from '@/lib/holzen-console';
 
 const SESSION_KEY = 'holzen_pause_session';
 
@@ -80,6 +81,17 @@ export default function PauseSession() {
     if (navState.reflectionId && saved.reflectionId !== navState.reflectionId) return null;
     // Otherwise prefer the saved session (user is resuming)
     return saved;
+  }, []);
+
+  useEffect(() => {
+    const rid = navState.reflectionId;
+    holzenLog.pause('mount', {
+      navStateKeys: Object.keys(navState),
+      reflectionIdPrefix: typeof rid === 'string' ? rid.slice(0, 8) : null,
+      hasReflectionMessage: typeof navState.reflectionMessage === 'string',
+      restoredFromStorage: restored !== null,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- log first paint of /pause only
   }, []);
 
   const message: string = navState.reflectionMessage ?? restored?.message ?? holzenMessage ?? '';

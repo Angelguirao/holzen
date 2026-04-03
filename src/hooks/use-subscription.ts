@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { PRICING } from '@/lib/pricing';
+import { holzenLog } from '@/lib/holzen-console';
 
 const FREE_MONTHLY_LIMIT = PRICING.freeReflectionsPerMonth;
 const CHECKOUT_RETURN_KEY = 'holzen_checkout_started_at';
@@ -35,6 +36,7 @@ export function useSubscription() {
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [monthlyUsed, setMonthlyUsed] = useState(cached?.monthlyUsed ?? 0);
   const [monthlyRemaining, setMonthlyRemaining] = useState<number | undefined>(cached?.monthlyRemaining);
+  const lastLoggedSubRef = useRef<{ subscribed: boolean; monthlyRemaining: number | undefined } | null>(null);
 
   const checkSubscription = useCallback(async (force = false) => {
     if (!user) {
@@ -102,7 +104,21 @@ export function useSubscription() {
     };
   }, [checkSubscription]);
 
+  useEffect(() => {
+    if (loading) return;
+    const next = { subscribed, monthlyRemaining };
+    const prev = lastLoggedSubRef.current;
+    if (prev && prev.subscribed === next.subscribed && prev.monthlyRemaining === next.monthlyRemaining) return;
+    lastLoggedSubRef.current = next;
+    holzenLog.subscription('state', {
+      subscribed,
+      monthlyRemaining,
+      monthlyUsed,
+    });
+  }, [loading, subscribed, monthlyRemaining, monthlyUsed]);
+
   const startCheckout = useCallback(async () => {
+    holzenLog.subscription('checkout', { action: 'start' });
     setCheckoutLoading(true);
     try {
       sessionStorage.setItem(CHECKOUT_RETURN_KEY, String(Date.now()));
@@ -134,6 +150,7 @@ export function useSubscription() {
   }, []);
 
   const openPortal = useCallback(async () => {
+    holzenLog.subscription('portal', { action: 'open' });
     try {
       const { data, error } = await supabase.functions.invoke('customer-portal');
       if (error) throw error;

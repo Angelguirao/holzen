@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-route
 import { useEffect } from "react";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import { holzenLog } from "@/lib/holzen-console";
+import { attachHolzenQueryLogging } from "@/lib/holzen-query-logging";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { OfflineBanner } from "./components/OfflineBanner";
 import { CookieConsent } from "./components/CookieConsent";
@@ -59,6 +60,12 @@ function ScrollToTop() {
   return null;
 }
 
+/** TanStack Query cache observer — only when dev or `holzen:debug=1` (see holzen-console). */
+function HolzenQueryLogging() {
+  useEffect(() => attachHolzenQueryLogging(queryClient), []);
+  return null;
+}
+
 /** Logs pathname + auth state when either changes (under `[holzen:router]`). */
 function RouterLocationLog() {
   const { pathname } = useLocation();
@@ -78,6 +85,7 @@ const App = () => (
   <ErrorBoundary>
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
       <QueryClientProvider client={queryClient}>
+        <HolzenQueryLogging />
         <TooltipProvider>
           <Sonner />
           <OfflineBanner />
