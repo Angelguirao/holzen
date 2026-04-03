@@ -36,10 +36,13 @@ Some functions validate the Bearer token in code even when `[functions.<name>]` 
 
 ### Getting an `access_token` for manual calls
 
-1. Run the app locally, sign in, open DevTools → **Application** → **Local Storage** (or **Session**) and find Supabase session JSON, **or** use the Supabase dashboard **Auth** tools if you use test users.
-2. Copy the **access_token** (short-lived). In Bruno, paste into `SUPABASE_ACCESS_TOKEN` in `local.bru` and re-run when it expires.
+**Option A — Bruno (recommended):** run **`auth/00-sign-in-password`** in the repo collection. It calls Supabase `POST /auth/v1/token?grant_type=password` with `AUTH_EMAIL` / `AUTH_PASSWORD` from `local.bru` and stores **`SUPABASE_ACCESS_TOKEN`** for the session (post-response script). Same contract as `signInWithPassword` in the app.
 
-Never commit tokens or service role keys.
+**Option B — Manual:** run the app locally, sign in, open DevTools → **Application** → **Local Storage** and copy **`access_token`** from the Supabase session JSON, then paste into `SUPABASE_ACCESS_TOKEN` in `local.bru`.
+
+Password auth does not cover magic link, OAuth, or MFA-only accounts—use Option B or a test user without those gates.
+
+Never commit tokens, passwords, or service role keys.
 
 ## Suggested “logging each step” workflow
 
@@ -59,7 +62,7 @@ Never commit tokens or service role keys.
 A starter collection lives at **`bruno/`** (see `bruno.json` and `pause-pipeline/*.bru`).
 
 1. **Open** the `bruno` folder in Bruno (not the repo root).
-2. Copy **`bruno/environments/local.bru.example`** → **`local.bru`**, fill `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` (same names as Vite — copy from `.env` / localstack), plus `SUPABASE_ACCESS_TOKEN` from the signed-in app.
+2. Copy **`bruno/environments/local.bru.example`** → **`local.bru`**, fill `VITE_SUPABASE_URL`, `VITE_SUPABASE_PUBLISHABLE_KEY`, and **`AUTH_EMAIL` / `AUTH_PASSWORD`** for a test user; run **`auth/00-sign-in-password`** to set `SUPABASE_ACCESS_TOKEN`, or paste a JWT manually.
 3. Run requests in order; pair with Edge Function logs.
 
 Details: [bruno/README.md](../../bruno/README.md).
