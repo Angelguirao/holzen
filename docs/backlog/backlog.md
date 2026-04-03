@@ -54,6 +54,7 @@ Use this when you are **choosing what to work on next**. Items are **not** stric
 | Priority hint | Ticket | Summary |
 |---------------|--------|---------|
 | Medium | [orchestrate-client-cron.md](orchestrate-client-cron.md) | Client vs cron `companion-orchestrate` overlap — measure, dedup, cache policy. |
+| Medium | [home-fetch-deduplication.md](home-fetch-deduplication.md) | After sign-in on **`/`**, dedupe repeated **`profiles`**, **`check-subscription`**, and **market** (CoinGecko / mempool / F&G) fetches. |
 | Lower | [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md) | Stronger dedup for `content_library` / `companion_cache`. |
 
 ### Product / UX (what the user sees or feels)
@@ -64,12 +65,16 @@ Use this when you are **choosing what to work on next**. Items are **not** stric
 | Medium | [cron-pause-featured-parity.md](cron-pause-featured-parity.md) | Automatic vs manual pause featured fields / first paint. |
 | Medium | [route-gating.md](route-gating.md) | Strict route gating UX vs correctness during auth loading. |
 | Lower | [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md) | Transparency when cache serve relaxes constraints. |
+| Lower | [form-field-name-id-a11y.md](form-field-name-id-a11y.md) | Form controls missing **`name`** / **`id`** / **`autocomplete`** — DevTools Issues. |
+| Lower | [pwa-mobile-web-app-meta.md](pwa-mobile-web-app-meta.md) | Add **`mobile-web-app-capable`** meta — Chrome deprecates **`apple-mobile-web-app-capable`**-only. |
+| Medium | [lighthouse-a11y-home.md](lighthouse-a11y-home.md) | Fix Lighthouse **axe** failures on **`/`** — buttons, contrast, **`main`**, notification name, touch target. |
 
 ### Ops & security (cron workers, secrets, docs alignment)
 
 | Priority hint | Ticket | Summary |
 |---------------|--------|---------|
 | Medium | [cron-worker-auth-consistency.md](cron-worker-auth-consistency.md) | Cron worker auth aligned with [cron-setup.md](../ops/cron-setup.md). |
+| Lower | [hosting-production-compression.md](hosting-production-compression.md) | Verify **gzip/Brotli** for **HTML** on production (dev fails by design). |
 
 ### Quality gates & content (reject noise, tune prompts)
 
@@ -88,8 +93,13 @@ Use this when you are **choosing what to work on next**. Items are **not** stric
 | Priority hint | Ticket | Summary |
 |---------------|--------|---------|
 | Medium | [typed-navigation-state.md](typed-navigation-state.md) | Type **`location.state`** instead of `as any` — aligns with pause navigation contracts. |
+| Medium | [route-level-code-splitting.md](route-level-code-splitting.md) | **`React.lazy`** + **`Suspense`** for route components — smaller first load than static imports in **`App.tsx`**. |
 | Lower | [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md) | Split oversized pages (`Home`, `PauseSession`); optionally narrow **`use-holzen`**; one slice per PR. |
+| Lower | [service-worker-registration-dev.md](service-worker-registration-dev.md) | Skip **`listenForSwUpdate`** in dev (or serve real **`sw.js`**) — removes MIME / **`SecurityError`** console noise. |
 | Lower | [data-fetching-conventions.md](data-fetching-conventions.md) | Document / align TanStack Query vs **`useEffect` + Supabase**; optional `QueryClient` defaults. |
+| Lower | [react-router-v7-future-flags.md](react-router-v7-future-flags.md) | Opt into **`v7_startTransition`** / **`v7_relativeSplatPath`** — clears Router upgrade warnings. |
+| Lower | [resource-hints-preconnect.md](resource-hints-preconnect.md) | **`preconnect`** for Supabase/fonts/market APIs — **after** [home-fetch-deduplication.md](home-fetch-deduplication.md). |
+| Lower | [home-recharts-layout-cost.md](home-recharts-layout-cost.md) | Reduce **Recharts** forced reflow / defer charts on Home. |
 
 ### Strategic (not a sprint task — revisit when product/hosting needs change)
 
@@ -115,16 +125,26 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | Observability | [cache-async-error-handling.md](cache-async-error-handling.md) | Fire-and-forget cache `.catch` |
 | Cost / efficiency | [orchestrate-client-cron.md](orchestrate-client-cron.md) | Client vs cron orchestrate overlap |
 | Cost / efficiency | [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md) | Near-duplicate cache entries |
+| Cost / efficiency | [home-fetch-deduplication.md](home-fetch-deduplication.md) | Redundant Home fetches after login |
 | Product / UX | [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md) | Notification vs orchestrate ordering |
 | Product / UX | [cron-pause-featured-parity.md](cron-pause-featured-parity.md) | Cron vs manual featured parity |
 | Product / UX | [route-gating.md](route-gating.md) | Auth loading + route gating UX |
 | Product / UX | [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md) | Cache relaxation transparency |
+| Product / UX | [form-field-name-id-a11y.md](form-field-name-id-a11y.md) | Form **`name`** / **`id`** / **`autocomplete`** for a11y |
+| Product / UX | [pwa-mobile-web-app-meta.md](pwa-mobile-web-app-meta.md) | **`mobile-web-app-capable`** meta (PWA deprecation warning) |
+| Product / UX | [lighthouse-a11y-home.md](lighthouse-a11y-home.md) | Lighthouse **axe** on Home — landmarks, buttons, contrast |
 | Ops / security | [cron-worker-auth-consistency.md](cron-worker-auth-consistency.md) | Worker auth vs docs |
+| Ops / security | [hosting-production-compression.md](hosting-production-compression.md) | Prod **HTML** **Content-Encoding** check |
 | Quality | [quality-gates-false-positives.md](quality-gates-false-positives.md) | Quality gate tuning |
 | Testing | [e2e-browser-automation.md](e2e-browser-automation.md) | UI journeys (E2E) vs Bruno API review |
 | Frontend | [typed-navigation-state.md](typed-navigation-state.md) | Typed `location.state` for router payloads |
+| Frontend | [route-level-code-splitting.md](route-level-code-splitting.md) | Lazy route chunks vs static imports in `App.tsx` |
 | Frontend | [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md) | Large pages + hook decomposition |
+| Frontend | [service-worker-registration-dev.md](service-worker-registration-dev.md) | SW registration guard in dev / console noise |
 | Frontend | [data-fetching-conventions.md](data-fetching-conventions.md) | Query vs Supabase+effect conventions |
+| Frontend | [react-router-v7-future-flags.md](react-router-v7-future-flags.md) | Router v7 future flags (console warnings) |
+| Frontend | [resource-hints-preconnect.md](resource-hints-preconnect.md) | **`preconnect`** hints (≤4 origins) |
+| Frontend | [home-recharts-layout-cost.md](home-recharts-layout-cost.md) | Recharts reflow / defer charts on Home |
 | Strategic | [spa-framework-evaluation.md](spa-framework-evaluation.md) | SPA vs framework evaluation |
 
 ---
@@ -133,10 +153,12 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 
 | Theme | Backlog files |
 |--------|----------------|
-| **Platform, architecture & tooling** | [e2e-browser-automation.md](e2e-browser-automation.md), [spa-framework-evaluation.md](spa-framework-evaluation.md) |
-| **Frontend structure & conventions** | [typed-navigation-state.md](typed-navigation-state.md), [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md), [data-fetching-conventions.md](data-fetching-conventions.md) |
+| **Platform, architecture & tooling** | [e2e-browser-automation.md](e2e-browser-automation.md), [spa-framework-evaluation.md](spa-framework-evaluation.md), [hosting-production-compression.md](hosting-production-compression.md) |
+| **Frontend structure & conventions** | [typed-navigation-state.md](typed-navigation-state.md), [route-level-code-splitting.md](route-level-code-splitting.md), [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md), [service-worker-registration-dev.md](service-worker-registration-dev.md), [data-fetching-conventions.md](data-fetching-conventions.md), [home-fetch-deduplication.md](home-fetch-deduplication.md), [react-router-v7-future-flags.md](react-router-v7-future-flags.md), [resource-hints-preconnect.md](resource-hints-preconnect.md), [home-recharts-layout-cost.md](home-recharts-layout-cost.md) |
 | **Auth & routing** | [auth-referral.md](auth-referral.md), [route-gating.md](route-gating.md) |
+| **Product / UX** | [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md), [cron-pause-featured-parity.md](cron-pause-featured-parity.md), [route-gating.md](route-gating.md), [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md), [form-field-name-id-a11y.md](form-field-name-id-a11y.md), [pwa-mobile-web-app-meta.md](pwa-mobile-web-app-meta.md), [lighthouse-a11y-home.md](lighthouse-a11y-home.md) |
 | **Pause pipeline & client–server boundaries** | [pause-session-hydration.md](pause-session-hydration.md), [orchestrate-client-cron.md](orchestrate-client-cron.md), [reflection-insert-partial-failure.md](reflection-insert-partial-failure.md), [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md), [cron-pause-featured-parity.md](cron-pause-featured-parity.md), [cron-worker-auth-consistency.md](cron-worker-auth-consistency.md) |
+| **Cost & duplicate work (client + server)** | [orchestrate-client-cron.md](orchestrate-client-cron.md), [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md), [home-fetch-deduplication.md](home-fetch-deduplication.md) |
 | **Cache, library & market data** | [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md), [btc-price-cache-freshness.md](btc-price-cache-freshness.md), [cache-async-error-handling.md](cache-async-error-handling.md), [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md) |
 | **Rate limits, quality & observability** | [rate-limit-analytics-allowlist.md](rate-limit-analytics-allowlist.md), [rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md), [quality-gates-false-positives.md](quality-gates-false-positives.md) |
 | **Data consistency** | [writeCompanionData-grounding-consistency.md](writeCompanionData-grounding-consistency.md) |
@@ -157,12 +179,22 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | [cron-worker-auth-consistency.md](cron-worker-auth-consistency.md) | Cron worker auth aligned with [cron-setup.md](../ops/cron-setup.md) |
 | [data-fetching-conventions.md](data-fetching-conventions.md) | TanStack Query vs `useEffect` + Supabase; optional QueryClient defaults |
 | [e2e-browser-automation.md](e2e-browser-automation.md) | Playwright/Cypress or Vitest+RTL; Bruno stays API-only |
+| [form-field-name-id-a11y.md](form-field-name-id-a11y.md) | Form **`name`** / **`id`** / **`autocomplete`** (DevTools Issues) |
+| [home-fetch-deduplication.md](home-fetch-deduplication.md) | Dedupe **`profiles`**, subscription, market fetches on signed-in **`/`** |
+| [home-recharts-layout-cost.md](home-recharts-layout-cost.md) | Recharts forced reflow / defer charts on Home |
+| [hosting-production-compression.md](hosting-production-compression.md) | Verify **gzip/Brotli** for HTML in production |
+| [lighthouse-a11y-home.md](lighthouse-a11y-home.md) | Lighthouse **axe** on **`/`** — buttons, contrast, landmark, targets |
 | [orchestrate-client-cron.md](orchestrate-client-cron.md) | Client vs cron `companion-orchestrate` overlap |
 | [pause-session-hydration.md](pause-session-hydration.md) | `/pause` when `location.state` is incomplete |
+| [pwa-mobile-web-app-meta.md](pwa-mobile-web-app-meta.md) | Add **`mobile-web-app-capable`** meta for PWA |
 | [quality-gates-false-positives.md](quality-gates-false-positives.md) | `quality.ts` rejects; i18n / regex tuning |
 | [rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md) | Alert/metric when rate or daily budget fails open |
 | [rate-limit-analytics-allowlist.md](rate-limit-analytics-allowlist.md) | `analytics_events` vs `checkRateLimit` allowlist |
 | [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md) | Split large pages (`Home`, `PauseSession`); optional `use-holzen` decomposition |
+| [react-router-v7-future-flags.md](react-router-v7-future-flags.md) | Opt into React Router v7 **`future`** flags |
+| [resource-hints-preconnect.md](resource-hints-preconnect.md) | **`preconnect`** for critical origins (after fetch dedup) |
+| [route-level-code-splitting.md](route-level-code-splitting.md) | Lazy routes + Suspense — avoid loading all pages on cold start |
+| [service-worker-registration-dev.md](service-worker-registration-dev.md) | Skip or fix SW registration when dev serves HTML for `sw.js` |
 | [reflection-insert-partial-failure.md](reflection-insert-partial-failure.md) | `holzen-reflect` OK, reflection insert fails |
 | [route-gating.md](route-gating.md) | Strict route gating UX vs correctness |
 | [spa-framework-evaluation.md](spa-framework-evaluation.md) | Vite SPA vs full-stack React framework (React docs tradeoffs; when to revisit) |
@@ -196,3 +228,13 @@ Legacy numeric IDs for chat / PR references; prefer **ticket file name** or [mas
 19. Typed React Router **`location.state`** — [typed-navigation-state.md](typed-navigation-state.md)
 20. Split large pages / heavy hooks — [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md)
 21. Data fetching conventions (Query vs Supabase + effects) — [data-fetching-conventions.md](data-fetching-conventions.md)
+22. Route-level code splitting (`React.lazy` / `Suspense`) — [route-level-code-splitting.md](route-level-code-splitting.md)
+23. Service worker registration in dev (console noise) — [service-worker-registration-dev.md](service-worker-registration-dev.md)
+24. Home fetch deduplication (signed-in **`/`**) — [home-fetch-deduplication.md](home-fetch-deduplication.md)
+25. Form field **`name`** / **`id`** / **`autocomplete`** (a11y) — [form-field-name-id-a11y.md](form-field-name-id-a11y.md)
+26. React Router v7 **future** flags — [react-router-v7-future-flags.md](react-router-v7-future-flags.md)
+27. PWA **`mobile-web-app-capable`** meta — [pwa-mobile-web-app-meta.md](pwa-mobile-web-app-meta.md)
+28. Lighthouse **a11y** on Home (`/` ) — [lighthouse-a11y-home.md](lighthouse-a11y-home.md)
+29. **`preconnect`** resource hints — [resource-hints-preconnect.md](resource-hints-preconnect.md)
+30. Home **Recharts** layout / defer — [home-recharts-layout-cost.md](home-recharts-layout-cost.md)
+31. Production **HTML** compression — [hosting-production-compression.md](hosting-production-compression.md)

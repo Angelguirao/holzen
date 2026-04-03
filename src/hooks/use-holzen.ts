@@ -10,6 +10,9 @@ import type { CompanionData } from '@/components/CompanionSection';
 const MANUAL_COOLDOWN_MS = 15 * 60 * 1000; // 15 minutes for on-demand
 const DEV_COOLDOWN_MS = 5 * 1000; // 5 seconds in dev mode
 
+/** Console prefix for manual "Need a moment" / on-demand reflection flow — filter DevTools by this string. */
+const LOG_MANUAL = '[holzen:manual]';
+
 /** Check if dev mode is active (localStorage synced from DB via Admin page) */
 function isDevMode(): boolean {
   try {
@@ -86,7 +89,16 @@ export function useHolzen() {
   // This eliminates the previous triple-invocation race condition.
 
   const generateMessage = useCallback(async (data: BtcPriceData, mood?: string) => {
-    if (!user) return;
+    if (!user) {
+      console.info(LOG_MANUAL, 'generateMessage: skipped (no user)');
+      return;
+    }
+    console.info(LOG_MANUAL, 'generateMessage: start', {
+      btcChangePct: data.changePercent,
+      cumulativePct: data.cumulativeChangePercent,
+      silentMode,
+      mood: mood ?? '(none)',
+    });
     const dir = data.direction === 'down' ? 'down' : 'up';
     const pct = Math.abs(data.changePercent).toFixed(1);
     let ctx = `BTC is ${dir} ${pct}% in the last 24 hours.`;
@@ -97,6 +109,7 @@ export function useHolzen() {
     ctx = enrichPauseContextWithMarketData(ctx, data.fearGreed, data.onChain);
 
     if (silentMode) {
+      console.info(LOG_MANUAL, 'generateMessage: silent mode — short reflection only (no AI)');
       const silentMsg = 'BTC moved.';
       setMessage(silentMsg);
       setContext(ctx);
@@ -135,6 +148,7 @@ export function useHolzen() {
       }
 
       setLastTriggerAt(new Date().toISOString());
+      console.info(LOG_MANUAL, 'generateMessage: silent mode done', { reflectionId: insertedReflection?.id });
       return;
     }
 
@@ -164,6 +178,11 @@ export function useHolzen() {
         .slice(0, 5);
     } catch { /* non-critical */ }
 
+    console.info(LOG_MANUAL, 'generateMessage: calling edge function holzen-reflect', {
+      contextPreview: ctx.slice(0, 120),
+      moodHistoryCount: moodHistory.length,
+    });
+
     try {
       const { data: fnData, error: fnError } = await supabase.functions.invoke('holzen-reflect', {
         body: {
@@ -186,6 +205,11 @@ export function useHolzen() {
       if (fnError) throw fnError;
 
       const msg = fnData?.message;
+      console.info(LOG_MANUAL, 'generateMessage: holzen-reflect returned', {
+        ok: !!msg,
+        messageLen: typeof msg === 'string' ? msg.length : 0,
+        hasHaiku: !!fnData?.haiku,
+      });
       if (msg) {
         setMessage(msg);
         setContext(ctx);
@@ -244,9 +268,11 @@ export function useHolzen() {
             }).eq('user_id', user.id),
           ]);
           if (libErr) console.error('[library] reflection+haiku insert failed:', libErr.message);
+          else console.info(LOG_MANUAL, 'generateMessage: DB insert + profile update ok', { reflectionId: insertedReflection.id });
         }
       }
     } catch (e: any) {
+      console.info(LOG_MANUAL, 'generateMessage: error', e?.message ?? e);
       const raw = e?.message || '';
       if (raw.includes('fetch') || raw.includes('network') || raw.includes('Failed to fetch')) {
         setError('Could not reach the reflection service. Check your connection.');
@@ -257,6 +283,7 @@ export function useHolzen() {
       }
     } finally {
       setLoading(false);
+      console.info(LOG_MANUAL, 'generateMessage: finished (loading cleared)');
     }
   }, [user, reflectionTone, reflectionStyle, silentMode, cumulativeThreshold, customPrompt]);
 
@@ -307,16 +334,30 @@ export function useHolzen() {
 
   const manualTrigger = useCallback(async (mood?: string) => {
     const remaining = manualCooldownRemaining();
-    if (remaining > 0) return;
+    if (remaining > 0) {
+      console.info(LOG_MANUAL, 'manualTrigger: blocked by cooldown', { remainingMs: remaining, devMode: isDevMode() });
+      return;
+    }
+
+    console.info(LOG_MANUAL, 'manualTrigger: start (Need a moment / Try again)', { mood: mood ?? '(none)', hasCachedBtc: !!btcData });
 
     try {
       const data = btcData || await fetchBtcData(currency);
-      if (!btcData) setBtcData(data);
+      if (!btcData) {
+        console.info(LOG_MANUAL, 'manualTrigger: fetched BTC for context', {
+          changePct: data.changePercent,
+        });
+        setBtcData(data);
+      } else {
+        console.info(LOG_MANUAL, 'manualTrigger: using cached btcData');
+      }
       await generateMessage(data, mood);
       const now = Date.now();
       setLastManualAt(now);
       localStorage.setItem(manualCooldownKey, String(now));
+      console.info(LOG_MANUAL, 'manualTrigger: complete — cooldown stored', { lastManualAt: now });
     } catch (e: any) {
+      console.info(LOG_MANUAL, 'manualTrigger: error', e?.message ?? e);
       const raw = e?.message || '';
       if (raw.includes('fetch') || raw.includes('Failed to fetch')) {
         setError('Could not connect. Check your internet and try again.');

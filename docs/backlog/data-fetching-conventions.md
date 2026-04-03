@@ -18,5 +18,6 @@ The root tree provides **`QueryClientProvider`** (`src/App.tsx`), but features d
 
 ## Related
 
+- [home-fetch-deduplication.md](home-fetch-deduplication.md) — concrete duplicate **`profiles`** / market fetches on Home after sign-in.
 - [mental-models-for-contributors.md](../fundamentals/mental-models-for-contributors.md) — TanStack Query section.
 - [navigating-the-codebase.md](../fundamentals/navigating-the-codebase.md) — feature hooks table.
