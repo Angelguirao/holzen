@@ -1,6 +1,7 @@
 // Global error handler — catches module-evaluation crashes that prevent React from mounting
 import { createRoot } from "react-dom/client";
 import "./index.css";
+import { holzenLog } from "./lib/holzen-console";
 
 function showCrashScreen(label: string, err: unknown) {
   console.error(`[${label}]`, err);
@@ -31,13 +32,18 @@ window.addEventListener('unhandledrejection', (e) => {
 
 async function boot() {
   try {
+    holzenLog.boot("start");
+    holzenLog.boot("dynamic import: App + sw-update");
     const [{ default: App }, { listenForSwUpdate }] = await Promise.all([
       import("./App.tsx"),
       import("./lib/sw-update"),
     ]);
+    holzenLog.boot("dynamic import: i18n");
     await import("./i18n");
+    holzenLog.boot("createRoot + render <App />");
     createRoot(document.getElementById("root")!).render(<App />);
     listenForSwUpdate();
+    holzenLog.boot("listenForSwUpdate registered");
   } catch (err) {
     showCrashScreen("Boot error — failed to load app", err);
   }

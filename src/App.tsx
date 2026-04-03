@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
+import { holzenLog } from "@/lib/holzen-console";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { OfflineBanner } from "./components/OfflineBanner";
 import { CookieConsent } from "./components/CookieConsent";
@@ -58,6 +59,21 @@ function ScrollToTop() {
   return null;
 }
 
+/** Logs pathname + auth state when either changes (under `[holzen:router]`). */
+function RouterLocationLog() {
+  const { pathname } = useLocation();
+  const { user, loading } = useAuth();
+  useEffect(() => {
+    holzenLog.router("location", {
+      pathname,
+      authLoading: loading,
+      signedIn: !!user,
+      userIdPrefix: user?.id?.slice(0, 8) ?? null,
+    });
+  }, [pathname, loading, user?.id]);
+  return null;
+}
+
 const App = () => (
   <ErrorBoundary>
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
@@ -69,6 +85,7 @@ const App = () => (
             <ScrollToTop />
             <CookieConsent />
             <AuthProvider>
+              <RouterLocationLog />
               <Routes>
                 <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
                   <Route path="/" element={<Home />} />

@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
+import { holzenLog } from '@/lib/holzen-console';
 import type { CompanionPrefs } from '@/components/CompanionSection';
 
 export interface ProfileLoadReflectionData {
@@ -41,11 +42,15 @@ export function useProfile() {
   const [_profileLoadReflectionData, setProfileLoadReflectionData] = useState<ProfileLoadReflectionData | null>(null);
 
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      holzenLog.profile('skip load (signed out)');
+      return;
+    }
     const selectCols =
       'threshold, threshold_down, cumulative_threshold, last_message, last_context, email_notifications, has_onboarded, companion_breathing, companion_haiku, companion_grounding, companion_signal, companion_zoom_out, companion_history, reflection_tone, cooldown_hours, last_trigger_at, silent_mode, streak_freeze_dates, digest_frequency, custom_prompt, reflection_style, quiet_hours_start, quiet_hours_end, first_name, night_reflection_hour, ai_insights_enabled, ritual_template, notify_badges, motivations, mantra, hold_goal_currency, language, grounding_activities';
 
     const load = async () => {
+      holzenLog.profile('fetch profiles', { userIdPrefix: user.id.slice(0, 8) });
       let { data, error: selErr } = await supabase
         .from('profiles')
         .select(selectCols)
@@ -54,12 +59,14 @@ export function useProfile() {
 
       if (selErr) {
         console.error('[useProfile] profiles select failed:', selErr.message);
+        holzenLog.profile('select failed', { message: selErr.message });
         setProfileLoaded(true);
         return;
       }
 
       // No row: local reset / missing trigger — create profile (RLS allows insert for own user_id)
       if (!data) {
+        holzenLog.profile('no row — inserting profiles');
         const { error: insErr } = await supabase.from('profiles').insert({ user_id: user.id });
         if (insErr && !String(insErr.message).includes('duplicate') && insErr.code !== '23505') {
           console.error('[useProfile] profiles insert failed:', insErr.message);
@@ -108,6 +115,12 @@ export function useProfile() {
           lastTriggerAt: (data as any).last_trigger_at ?? null,
         });
       }
+      holzenLog.profile('ready', {
+        hasRow: !!data,
+        hasOnboarded: data?.has_onboarded ?? null,
+        silentMode: data ? !!(data as { silent_mode?: boolean }).silent_mode : null,
+        hasLastMessage: !!(data?.last_message),
+      });
       setProfileLoaded(true);
     };
     load();
