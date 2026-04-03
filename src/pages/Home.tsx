@@ -884,6 +884,14 @@ const Home = () => {
   );
 };
 
+/** Format ms as m:ss for short countdowns (e.g. next cron tick, manual cooldown under one minute). */
+function formatMsAsMS(ms: number): string {
+  const totalSec = Math.max(0, Math.floor(ms / 1000));
+  const m = Math.floor(totalSec / 60);
+  const s = totalSec % 60;
+  return `${m}:${s.toString().padStart(2, '0')}`;
+}
+
 function NeedAMomentButton({
   onTrigger,
   cooldownRemaining,
@@ -903,17 +911,31 @@ function NeedAMomentButton({
   }, [cooldownRemaining]);
 
   const inCooldown = remaining > 0;
-  const minutes = Math.ceil(remaining / 60000);
 
   return (
     <div className="space-y-3">
-      <NeedAMomentButtonInner onTrigger={onTrigger} inCooldown={inCooldown} loading={loading} minutes={minutes} />
+      <NeedAMomentButtonInner onTrigger={onTrigger} inCooldown={inCooldown} loading={loading} remainingMs={remaining} />
     </div>
   );
 }
 
-function NeedAMomentButtonInner({ onTrigger, inCooldown, loading, minutes }: { onTrigger: () => void; inCooldown: boolean; loading: boolean; minutes: number }) {
+function NeedAMomentButtonInner({
+  onTrigger,
+  inCooldown,
+  loading,
+  remainingMs,
+}: {
+  onTrigger: () => void;
+  inCooldown: boolean;
+  loading: boolean;
+  remainingMs: number;
+}) {
   const { t } = useTranslation();
+  const cooldownLabel = !inCooldown
+    ? t('home.needAMoment')
+    : remainingMs >= 60_000
+      ? t('home.manualReflectionIn', { minutes: Math.ceil(remainingMs / 60_000) })
+      : t('home.manualReflectionInSoon', { time: formatMsAsMS(remainingMs) });
   return (
     <>
       <LoadingButton
@@ -925,9 +947,7 @@ function NeedAMomentButtonInner({ onTrigger, inCooldown, loading, minutes }: { o
         className="w-full font-mono text-xs gap-2"
       >
         <Pause className="h-3.5 w-3.5" />
-        {inCooldown
-          ? t('home.manualReflectionIn', { minutes })
-          : t('home.needAMoment')}
+        {cooldownLabel}
       </LoadingButton>
       <p className="text-[10px] text-muted-foreground text-center leading-relaxed">
         {inCooldown
@@ -936,14 +956,6 @@ function NeedAMomentButtonInner({ onTrigger, inCooldown, loading, minutes }: { o
       </p>
     </>
   );
-}
-
-/** Format ms as m:ss for short countdowns (e.g. next cron tick). */
-function formatMsAsMS(ms: number): string {
-  const totalSec = Math.max(0, Math.floor(ms / 1000));
-  const m = Math.floor(totalSec / 60);
-  const s = totalSec % 60;
-  return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
 function AutoCooldownIndicator({

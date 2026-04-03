@@ -312,6 +312,16 @@ export function useHolzen() {
     setLastManualAt(stored ? Number(stored) : null);
   }, [manualCooldownKey]);
 
+  // Other tabs update the same key — same-window updates use setState in manualTrigger.
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key !== manualCooldownKey || e.storageArea !== localStorage) return;
+      setLastManualAt(e.newValue ? Number(e.newValue) : null);
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, [manualCooldownKey]);
+
   const manualCooldownRemaining = useCallback(() => {
     if (!lastManualAt) return 0;
     const elapsed = Date.now() - lastManualAt;
@@ -359,7 +369,8 @@ export function useHolzen() {
       const now = Date.now();
       setLastManualAt(now);
       localStorage.setItem(manualCooldownKey, String(now));
-      holzenLog.manual( 'manualTrigger: complete — cooldown stored', { lastManualAt: now });
+      // Next allowed manual trigger: now + getEffectiveCooldownMs() (15 min prod; 5 s when holzen_dev_mode).
+      holzenLog.manual('manualTrigger: complete — cooldown stored', { lastManualAt: now });
     } catch (e: any) {
       holzenLog.manual('manualTrigger: error', { message: String(e?.message ?? e) });
       const raw = e?.message || '';

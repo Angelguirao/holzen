@@ -61,6 +61,7 @@
     "generatingReflection": "Preparing your pause…",
     "needAMoment": "I need a pause",
     "manualReflectionIn": "Next pause in {{minutes}} min",
+    "manualReflectionInSoon": "Next pause in {{time}}",
     "cooldownMessage": "Take this time to breathe. The next pause will be here when you need it.",
     "requestAnytime": "Request a pause anytime — no threshold required.",
     "startARitual": "Start a ritual",
