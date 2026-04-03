@@ -2,6 +2,8 @@
 
 This document describes **how Holzen turns Bitcoin volatility into a pause experience**: server triggers, reflection text, the intervention layer, companion generation, storage, and the React hooks that tie it together. It is the **system-level** companion to [cron-setup.md](../../ops/cron-setup.md) (scheduling SQL) and [navigating-the-codebase.md](../../fundamentals/navigating-the-codebase.md) (repo layout).
 
+**Readers newer to React SPAs or Supabase in the browser:** [mental-models-for-contributors.md](../../fundamentals/mental-models-for-contributors.md) (hooks, JWT, RLS, edge `invoke`). **Manual path contracts (producer / consumer):** [phase-2-manual-pause-pipeline.md](../../reviews/phase-2-manual-pause-pipeline.md).
+
 **Diagrams** below use [Mermaid](https://mermaid.js.org/) (`flowchart`). They render on GitHub and in many Markdown previews (e.g. Cursor); use a Mermaid extension or [mermaid.live](https://mermaid.live) if your viewer does not draw them.
 
 ## Table of contents
@@ -248,6 +250,8 @@ flowchart TB
 <a id="toc-client-flow"></a>
 
 ## 4. Client flow after reflection (manual path)
+
+This section is **client-centric**: **`use-holzen`** and **`use-companion-data`** run **in the browser** (React); **`holzen-reflect`** and **`companion-orchestrate`** are **HTTP edge functions**; **inserts/updates** to `reflections` / `profiles` / `library_items` use the **Supabase client** and are still enforced by **RLS** in Postgres. The step table in **§4.1** is the authoritative **request order** for debugging; the three bullets below summarize the same pipeline.
 
 1. **`use-holzen.ts`** — Calls `holzen-reflect`, inserts `reflections`, updates profile, sets companion state from response (haiku; **`grounding_*` null** at insert — same as cron; orchestrate fills companion columns).
 2. **Pause UI** — Uses `use-companion-data.ts` with `reflectionId`, `context`, `reflectionMessage`, **`mood`**, **`severityNumber`**, language.
