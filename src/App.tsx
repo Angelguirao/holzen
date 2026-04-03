@@ -60,7 +60,7 @@ function ScrollToTop() {
   return null;
 }
 
-/** TanStack Query cache observer — only when dev or `holzen:debug=1` (see holzen-console). */
+/** TanStack Query cache observer — same gate as all `holzenLog` output (see `isHolzenDebugEnabled`). */
 function HolzenQueryLogging() {
   useEffect(() => attachHolzenQueryLogging(queryClient), []);
   return null;
