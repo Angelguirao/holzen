@@ -16,7 +16,22 @@ Collection root for [Bruno](https://www.usebruno.com/) (`.bru` files). See **[SC
 | **`VITE_SUPABASE_PUBLISHABLE_KEY`** | Anon key (`npm run supabase:status` for local). |
 | **`AUTH_EMAIL`** / **`AUTH_PASSWORD`** | Test user for sign-up / sign-in. |
 | **`SUPABASE_SERVICE_ROLE_KEY`** | For **`service-cron/`** requests only — Dashboard → **Settings → API** (never commit). |
-| **`LOVABLE_API_KEY`** | Optional — for **`auth-hook/auth-email-hook-preview`** only. |
+| **`LOVABLE_API_KEY`** | Optional — for **`auth-hook/auth-email-hook-preview`** only (see below). |
+
+### LOVABLE_API_KEY — you won’t get it from this repo
+
+**Nobody can hand you the value here** — it is **your** project secret (provisioned by Lovable into Supabase, or set manually in the Supabase project).
+
+**Where it is used:** Edge functions read it as **`LOVABLE_API_KEY`** from the **Supabase Edge runtime** (Dashboard → **Project Settings → Edge Functions → Secrets**). Supabase generally **does not show** existing secret values again; you can **rotate / set** a new value if you have permission.
+
+**Do you need a “hosted” Bruno environment?** Bruno only sends HTTP. What matters is that **`VITE_SUPABASE_URL`** and keys match the stack you call:
+
+- **Most `.bru` requests** only need **anon + user JWT** (or service role for `service-cron/`). The Lovable key stays **on the server** — you do **not** put it in Bruno for `holzen-reflect`, `companion-orchestrate`, etc.
+- **Exception:** **`auth-hook/auth-email-hook-preview`** compares **`Authorization: Bearer …`** to **`LOVABLE_API_KEY`** inside the function. To run that request from Bruno you must put the **same** secret in **`local.bru`**. If you cannot obtain it, **skip that one request** — it does not block the rest of the collection.
+
+**Local `supabase functions serve`:** use a gitignored **`supabase/.env`** with `LOVABLE_API_KEY=...` (see [.env.example](../.env.example) and [Supabase function secrets](https://supabase.com/docs/guides/functions/secrets)). `supabase secrets list` on the linked project shows **names**, not values — you still need a one-time source for the string (dashboard rotate, team vault, or Lovable support if their provisioning never exposed it).
+
+**Optional:** add a second Bruno environment (e.g. **Hosted**) with your production `VITE_SUPABASE_URL` / anon key when you want to hit **deployed** functions without running Docker locally — still no magic way to “download” `LOVABLE_API_KEY` unless you set or retrieve it from your own systems.
 
 **After auth:** `auth/00` and `auth/01` set **`SUPABASE_ACCESS_TOKEN`** and **`AUTH_USER_ID`** when the Auth API returns a `user` object. If you paste a JWT manually, add **`AUTH_USER_ID`** in Bruno for **`user-jwt/reflection-insights`**.
 
