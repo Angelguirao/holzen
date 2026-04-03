@@ -10,6 +10,7 @@ Use a **step-by-step HTTP client** when you want to **review or debug multi-call
 
 ## When something else is better
 
+- **UI / full product journeys** (click-through pause, journal, settings): HTTP clients cannot drive the SPA. Use **Playwright**, **Cypress**, or **Vitest + React Testing Library** — tracked as [e2e-browser-automation.md](../backlog/e2e-browser-automation.md). Bruno stays for **API review** only; see [bruno/SCOPE.md](../../bruno/SCOPE.md).
 - **Automated regression:** prefer Vitest or integration tests against `functions serve`, not only manual clicks.
 - **RLS-heavy behavior:** the browser uses the user JWT; calling Postgres via REST still needs the same identity — document whether you’re testing as **the user** (JWT) or **service role** (dangerous; never commit).
 

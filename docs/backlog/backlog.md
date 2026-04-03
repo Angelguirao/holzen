@@ -81,7 +81,7 @@ Use this when you are **choosing what to work on next**. Items are **not** stric
 
 | Priority hint | Ticket | Summary |
 |---------------|--------|---------|
-| Enabler | [e2e-browser-automation.md](e2e-browser-automation.md) | Playwright/Cypress or Vitest+RTL for full flows; Bruno stays API-only. |
+| Enabler | [e2e-browser-automation.md](e2e-browser-automation.md) | **UI / journeys:** click-through pause, journal, etc. — Playwright/Cypress or Vitest+RTL; Bruno is **not** browser automation (API review only). |
 
 ### Strategic (not a sprint task — revisit when product/hosting needs change)
 
@@ -113,7 +113,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | Product / UX | [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md) | Cache relaxation transparency |
 | Ops / security | [cron-worker-auth-consistency.md](cron-worker-auth-consistency.md) | Worker auth vs docs |
 | Quality | [quality-gates-false-positives.md](quality-gates-false-positives.md) | Quality gate tuning |
-| Testing | [e2e-browser-automation.md](e2e-browser-automation.md) | Browser E2E vs Bruno |
+| Testing | [e2e-browser-automation.md](e2e-browser-automation.md) | UI journeys (E2E) vs Bruno API review |
 | Strategic | [spa-framework-evaluation.md](spa-framework-evaluation.md) | SPA vs framework evaluation |
 
 ---
