@@ -83,6 +83,14 @@ Use this when you are **choosing what to work on next**. Items are **not** stric
 |---------------|--------|---------|
 | Enabler | [e2e-browser-automation.md](e2e-browser-automation.md) | **UI / journeys:** click-through pause, journal, etc. — Playwright/Cypress or Vitest+RTL; Bruno is **not** browser automation (API review only). |
 
+### Frontend structure & conventions (React maintainability)
+
+| Priority hint | Ticket | Summary |
+|---------------|--------|---------|
+| Medium | [typed-navigation-state.md](typed-navigation-state.md) | Type **`location.state`** instead of `as any` — aligns with pause navigation contracts. |
+| Lower | [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md) | Split oversized pages (`Home`, `PauseSession`); optionally narrow **`use-holzen`**; one slice per PR. |
+| Lower | [data-fetching-conventions.md](data-fetching-conventions.md) | Document / align TanStack Query vs **`useEffect` + Supabase**; optional `QueryClient` defaults. |
+
 ### Strategic (not a sprint task — revisit when product/hosting needs change)
 
 | Priority hint | Ticket | Summary |
@@ -114,6 +122,9 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | Ops / security | [cron-worker-auth-consistency.md](cron-worker-auth-consistency.md) | Worker auth vs docs |
 | Quality | [quality-gates-false-positives.md](quality-gates-false-positives.md) | Quality gate tuning |
 | Testing | [e2e-browser-automation.md](e2e-browser-automation.md) | UI journeys (E2E) vs Bruno API review |
+| Frontend | [typed-navigation-state.md](typed-navigation-state.md) | Typed `location.state` for router payloads |
+| Frontend | [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md) | Large pages + hook decomposition |
+| Frontend | [data-fetching-conventions.md](data-fetching-conventions.md) | Query vs Supabase+effect conventions |
 | Strategic | [spa-framework-evaluation.md](spa-framework-evaluation.md) | SPA vs framework evaluation |
 
 ---
@@ -123,6 +134,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | Theme | Backlog files |
 |--------|----------------|
 | **Platform, architecture & tooling** | [e2e-browser-automation.md](e2e-browser-automation.md), [spa-framework-evaluation.md](spa-framework-evaluation.md) |
+| **Frontend structure & conventions** | [typed-navigation-state.md](typed-navigation-state.md), [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md), [data-fetching-conventions.md](data-fetching-conventions.md) |
 | **Auth & routing** | [auth-referral.md](auth-referral.md), [route-gating.md](route-gating.md) |
 | **Pause pipeline & client–server boundaries** | [pause-session-hydration.md](pause-session-hydration.md), [orchestrate-client-cron.md](orchestrate-client-cron.md), [reflection-insert-partial-failure.md](reflection-insert-partial-failure.md), [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md), [cron-pause-featured-parity.md](cron-pause-featured-parity.md), [cron-worker-auth-consistency.md](cron-worker-auth-consistency.md) |
 | **Cache, library & market data** | [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md), [btc-price-cache-freshness.md](btc-price-cache-freshness.md), [cache-async-error-handling.md](cache-async-error-handling.md), [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md) |
@@ -143,15 +155,18 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md) | Transparency when cache serve relaxes constraints |
 | [cron-pause-featured-parity.md](cron-pause-featured-parity.md) | Automatic vs manual pause featured fields / first paint |
 | [cron-worker-auth-consistency.md](cron-worker-auth-consistency.md) | Cron worker auth aligned with [cron-setup.md](../ops/cron-setup.md) |
+| [data-fetching-conventions.md](data-fetching-conventions.md) | TanStack Query vs `useEffect` + Supabase; optional QueryClient defaults |
 | [e2e-browser-automation.md](e2e-browser-automation.md) | Playwright/Cypress or Vitest+RTL; Bruno stays API-only |
 | [orchestrate-client-cron.md](orchestrate-client-cron.md) | Client vs cron `companion-orchestrate` overlap |
 | [pause-session-hydration.md](pause-session-hydration.md) | `/pause` when `location.state` is incomplete |
 | [quality-gates-false-positives.md](quality-gates-false-positives.md) | `quality.ts` rejects; i18n / regex tuning |
 | [rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md) | Alert/metric when rate or daily budget fails open |
 | [rate-limit-analytics-allowlist.md](rate-limit-analytics-allowlist.md) | `analytics_events` vs `checkRateLimit` allowlist |
+| [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md) | Split large pages (`Home`, `PauseSession`); optional `use-holzen` decomposition |
 | [reflection-insert-partial-failure.md](reflection-insert-partial-failure.md) | `holzen-reflect` OK, reflection insert fails |
 | [route-gating.md](route-gating.md) | Strict route gating UX vs correctness |
 | [spa-framework-evaluation.md](spa-framework-evaluation.md) | Vite SPA vs full-stack React framework (React docs tradeoffs; when to revisit) |
+| [typed-navigation-state.md](typed-navigation-state.md) | Typed `location.state` instead of `as any` for navigation payloads |
 | [writeCompanionData-grounding-consistency.md](writeCompanionData-grounding-consistency.md) | Grounding dual-write: `reflection_companions` vs `reflections` |
 
 ---
@@ -178,3 +193,6 @@ Legacy numeric IDs for chat / PR references; prefer **ticket file name** or [mas
 16. Grounding dual-write consistency — [writeCompanionData-grounding-consistency.md](writeCompanionData-grounding-consistency.md)
 17. E2E / browser automation — [e2e-browser-automation.md](e2e-browser-automation.md)
 18. SPA vs full-stack React framework — [spa-framework-evaluation.md](spa-framework-evaluation.md)
+19. Typed React Router **`location.state`** — [typed-navigation-state.md](typed-navigation-state.md)
+20. Split large pages / heavy hooks — [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md)
+21. Data fetching conventions (Query vs Supabase + effects) — [data-fetching-conventions.md](data-fetching-conventions.md)

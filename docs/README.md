@@ -52,7 +52,7 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 
 ## Backlog
 
-- `backlog/backlog.md` — pending improvements; **work queue (pick by goal)**, master table, quick finder by theme, alphabetical index. Individual tickets under `backlog/*.md`.
+- `backlog/backlog.md` — pending improvements; **work queue (pick by goal)**, master table, quick finder by theme, alphabetical index. Individual tickets under `backlog/*.md` (includes **frontend structure** items: typed navigation state, page/hook splits, data-fetching conventions).
 - `backlog/e2e-browser-automation.md` — **UI / journeys** (click-through pause, journal, settings): Playwright/Cypress or Vitest+RTL — not Bruno; see [bruno/SCOPE.md](../bruno/SCOPE.md) for HTTP vs full app.
 
 ## Reviews
