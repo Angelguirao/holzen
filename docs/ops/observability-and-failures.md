@@ -2,6 +2,8 @@
 
 This doc is an **index and checklist**: where to document logs, metrics, retries, and “what breaks if…” for each major pipeline. Prefer linking to **system docs** and **postmortems** instead of duplicating long narratives here.
 
+**Logging conventions** (edge vs browser vs DB): [logging-strategy.md](logging-strategy.md).
+
 ## Principles
 
 - **Idempotency:** Note whether workers or webhooks can safely retry the same payload (and where deduplication lives).
