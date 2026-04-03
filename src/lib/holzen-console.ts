@@ -2,9 +2,13 @@
  * Namespaced console helpers for local debugging. Filter DevTools by `[holzen:` or `holzen:boot`, etc.
  * Use for flow tracing; keep payloads small (id prefixes, lengths, flags) — no tokens or full PII.
  *
- * Verbose traces (TanStack Query cache): Dev build, or set `localStorage.setItem('holzen:debug','1')` and reload.
+ * **Production:** Nothing is printed unless the user opts in (`localStorage.setItem('holzen:debug','1')` + reload).
+ * That keeps session/entitlement hints out of typical user consoles (privacy) and avoids misleading support
+ * screenshots. **Cost:** no server or analytics usage — only `console.info` when enabled; bundle impact is negligible.
+ *
+ * **Dev:** All `[holzen:*]` lines are emitted so local debugging stays frictionless.
  */
-export function isHolzenVerbose(): boolean {
+export function isHolzenDebugEnabled(): boolean {
   if (import.meta.env.DEV) return true;
   try {
     return typeof localStorage !== 'undefined' && localStorage.getItem('holzen:debug') === '1';
@@ -13,6 +17,9 @@ export function isHolzenVerbose(): boolean {
   }
 }
 
+/** Alias for {@link isHolzenDebugEnabled} (query logging and older imports). */
+export const isHolzenVerbose = isHolzenDebugEnabled;
+
 type HolzenTag =
   | 'boot'
   | 'auth'
@@ -20,9 +27,12 @@ type HolzenTag =
   | 'router'
   | 'query'
   | 'pause'
-  | 'subscription';
+  | 'subscription'
+  | 'manual'
+  | 'home';
 
 function line(tag: HolzenTag, msg: string, data?: Record<string, unknown>) {
+  if (!isHolzenDebugEnabled()) return;
   const prefix = `[holzen:${tag}]`;
   if (data && Object.keys(data).length > 0) console.info(prefix, msg, data);
   else console.info(prefix, msg);
@@ -36,4 +46,6 @@ export const holzenLog = {
   query: (msg: string, data?: Record<string, unknown>) => line('query', msg, data),
   pause: (msg: string, data?: Record<string, unknown>) => line('pause', msg, data),
   subscription: (msg: string, data?: Record<string, unknown>) => line('subscription', msg, data),
+  manual: (msg: string, data?: Record<string, unknown>) => line('manual', msg, data),
+  home: (msg: string, data?: Record<string, unknown>) => line('home', msg, data),
 };

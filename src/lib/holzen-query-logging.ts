@@ -1,5 +1,5 @@
 import type { QueryClient } from '@tanstack/react-query';
-import { holzenLog, isHolzenVerbose } from '@/lib/holzen-console';
+import { holzenLog, isHolzenDebugEnabled } from '@/lib/holzen-console';
 
 function shortKey(key: unknown): string {
   try {
@@ -12,7 +12,7 @@ function shortKey(key: unknown): string {
 
 /** Subscribe to query cache updates; no-op unless {@link isHolzenVerbose} is true. */
 export function attachHolzenQueryLogging(client: QueryClient): () => void {
-  if (!isHolzenVerbose()) return () => {};
+  if (!isHolzenDebugEnabled()) return () => {};
 
   const cache = client.getQueryCache();
   const lastSnap = new Map<string, string>();

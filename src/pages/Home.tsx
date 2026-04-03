@@ -32,6 +32,7 @@ import { SnoozeControl } from '@/components/SnoozeControl';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { playNotificationTone, prefetchNotificationTone } from '@/lib/notification-tone';
 import { isCumulativeMoveTriggered } from '@/lib/volatility-thresholds';
+import { holzenLog } from '@/lib/holzen-console';
 import { companionFallbacksDisabledClient } from '@/lib/companion-strict';
 import {
   DndContext,
@@ -233,10 +234,10 @@ const Home = () => {
   const handleNeedAPause = () => {
     const remaining = manualCooldownRemaining();
     if (remaining > 0) {
-      console.info('[holzen:home]', 'Need a moment: ignored (cooldown)', { remainingMs: remaining });
+      holzenLog.home('Need a moment: ignored (cooldown)', { remainingMs: remaining });
       return;
     }
-    console.info('[holzen:home]', 'Need a moment: invoking manualTrigger');
+    holzenLog.home('Need a moment: invoking manualTrigger');
     manualTrigger();
   };
 
@@ -530,7 +531,7 @@ const Home = () => {
                             companionPrefs,
                             severity,
                           };
-                          console.info('[holzen:home]', 'Navigate to /pause (pause with this message)', {
+                          holzenLog.home('Navigate to /pause (pause with this message)', {
                             reflectionId: lastReflectionId,
                             severity,
                             messageLen: message?.length ?? 0,
@@ -584,7 +585,7 @@ const Home = () => {
                           </p>
                           <button
                             onClick={() => {
-                              console.info('[holzen:home]', 'Try again: manualTrigger');
+                              holzenLog.home('Try again: manualTrigger');
                               manualTrigger();
                             }}
                             className="text-xs font-mono text-primary underline"

@@ -46,7 +46,13 @@ Optional: `take_snapshot` (a11y tree), `take_screenshot`, `evaluate_script` for 
 
 ## In-app console prefixes (source)
 
-The SPA emits **`[holzen:boot]`**, **`[holzen:auth]`**, **`[holzen:profile]`**, **`[holzen:router]`** from `src/lib/holzen-console.ts`, **`[holzen:manual]`** / **`[holzen:home]`** from the Holzen hook and Home page. **`[holzen:pause]`** logs a one-line mount summary on `/pause`; **`[holzen:subscription]`** logs entitlements when they change (and checkout / portal actions). **`[holzen:query]`** traces TanStack Query cache add/remove/state transitions in **dev** only, or in prod after `localStorage.setItem('holzen:debug','1')` and reload. Filter DevTools by **`holzen:`** to see boot → auth → profile → route → subscription → query (if verbose) → pause → manual.
+The SPA can emit **`[holzen:boot]`**, **`[holzen:auth]`**, **`[holzen:profile]`**, **`[holzen:router]`**, **`[holzen:manual]`**, **`[holzen:home]`**, **`[holzen:pause]`**, **`[holzen:subscription]`**, **`[holzen:query]`** — all wired through `src/lib/holzen-console.ts` (except legacy `console.error` paths).
+
+**Production (privacy):** In a **production** build, **none** of these print unless the user (or support) opts in: `localStorage.setItem('holzen:debug','1')` then reload. That avoids leaking user id prefixes, routes, and entitlement hints into a typical end-user console. **Cost:** No extra hosting or analytics — only client-side `console.info` when enabled; code stays in the bundle but is a no-op for logging.
+
+**Local dev:** All prefixes are emitted so you can filter **`holzen:`** and see boot → auth → profile → route → subscription → query → pause → manual without toggles.
+
+**Query cache:** TanStack Query tracing uses the same gate (`holzen:debug` in prod; always on in dev).
 
 ## Related backlog
 
