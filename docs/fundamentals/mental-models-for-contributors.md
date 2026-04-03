@@ -132,7 +132,8 @@ Holzen can **install** as a PWA. A **service worker** (`vite-plugin-pwa`, `src/s
 
 ## When something still feels opaque
 
-- **Trace one button:** Pick a UI action in [navigating-the-codebase.md](navigating-the-codebase.md) “first day” exercise — follow imports from a page → hook → `supabase` or `invoke`. Names in code beat abstract definitions.
+- **Learning order:** [navigating-the-codebase.md](navigating-the-codebase.md) **§19 — Learning path: pause first, then whole app** — phased **docs → code → Network** steps.
+- **Trace one button:** Follow imports from a page → hook → `supabase` or `invoke`. Names in code beat abstract definitions.
 - **Bruno vs browser / UI journeys:** [http-review-playbooks.md](http-review-playbooks.md) exercises **HTTP** only. Full **click-through** flows (pause, journal, settings) need **Playwright / Cypress / Vitest+RTL** — see [e2e-browser-automation.md](../backlog/e2e-browser-automation.md). Bruno does **not** replace that.
 - **Phased reviews:** [phase-1-frontend-routing-auth.md](../reviews/phase-1-frontend-routing-auth.md) and [phase-2-manual-pause-pipeline.md](../reviews/phase-2-manual-pause-pipeline.md) spell out **contracts** between routes, hooks, and edge functions.
 

@@ -219,12 +219,45 @@ These are observations from a structural pass — not a full security or QA audi
 
 ---
 
-## 19. Suggested “first day” exercise
+## 19. Learning path: pause first, then whole app
 
-1. `cp .env.example .env`, fill Supabase URL + anon key, `npm install`, `npm run dev`, open `http://localhost:8080`.
-2. Trace **`/` → `Home` → `useHolzen` / `use-profile`** and one Supabase table read.
-3. Sign in, trigger **Pause** (`/pause`) and follow **`use-holzen`** → `holzen-reflect` then **`use-companion-data`** → `companion-orchestrate`.
-4. Skim **`supabase/migrations/`** for `profiles`, `reflections`, and RLS policy names you see in the app.
-5. Read **[ai-powered-pause-system.md](../systems/pause/ai-powered-pause-system.md)** if you touch pause, companions, or volatility.
+**Once — run the app:** `cp .env.example .env`, fill Supabase URL + anon key, `npm install`, `npm run dev` (or `dev:hosted` / `dev:local` per [README.md](../README.md)), open `http://localhost:8080`, **sign in**.
+
+If SPA/React vocabulary is still fuzzy, skim [mental-models-for-contributors.md](mental-models-for-contributors.md) first, then return here.
+
+---
+
+### Phase A — Pause (do this first)
+
+Goal: one **vertical slice** you can trace in **docs → code → Network tab** without knowing the whole repo.
+
+| Step | What to do |
+|------|------------|
+| 1. **Docs** | Read [ai-powered-pause-system.md](../systems/pause/ai-powered-pause-system.md) **§1–2** (skim), **§4–5** (focus). Optional: [phase-2-manual-pause-pipeline.md](../reviews/phase-2-manual-pause-pipeline.md) for producer/consumer contracts. |
+| 2. **Routes** | In `src/App.tsx`, find **`/pause`** → `PauseSession`. Note how **`Home`** also ties to pause (hooks, navigation). |
+| 3. **Hooks** | Read in order: `src/hooks/use-holzen.ts` (`manualTrigger` → `generateMessage`) → `src/hooks/use-companion-data.ts` (orchestrator invoke). Open `src/pages/PauseSession.tsx` to see how props connect. |
+| 4. **Edge** | In this doc **§12**, confirm **`holzen-reflect`** and **`companion-orchestrate`** invoke map. Optionally open `supabase/functions/holzen-reflect/index.ts` and `companion-orchestrate/index.ts` **headers only** (auth, entry). |
+| 5. **Click + Network** | With the app running, go to **`/pause`**, run a **non-silent** manual pause. In DevTools **Network**, filter for **`holzen-reflect`** and **`companion-orchestrate`** — order should match **§4.1** in the pause system doc. |
+| 6. **DB** | Skim **`supabase/migrations/`** for `profiles`, `reflections`, `reflection_companions` — name recognition only. |
+| 7. **HTTP-only** (optional) | [bruno/README.md](../../bruno/README.md) `pause-pipeline/`: same functions in isolation; **not** a full UI substitute. |
+
+Stop when you can explain **in one sentence** each: what **`use-holzen`** does vs what **`use-companion-data`** does, and **where** `holzen-reflect` vs `companion-orchestrate` run.
+
+---
+
+### Phase B — Whole app
+
+Goal: **map** the rest of the surface area without drowning in files. Use **§4** (routing) and **§6–7** (hooks + pages) in *this* doc as the index.
+
+| Step | What to do |
+|------|------------|
+| 1. **Route map** | Re-read **§4** above — list every **main** route (`/`, `/library`, `/profile`, `/settings`, `/pause`, practices, `/admin`, public routes). For each **bucket**, note the **page file** under `src/pages/`. |
+| 2. **Auth shell** | **§5** — `use-auth`, `ProtectedRoute` / `PublicOnlyRoute`. Trace **`/welcome`** vs **`/`** once in `App.tsx`. Optional: [route-gating-system.md](../systems/routing/route-gating-system.md). |
+| 3. **Feature hooks** | **§6** table — for each row you care about, open the hook and **one** page that uses it (`use-library` + `Library`, `use-subscription` + billing/settings, `use-push-notifications`, etc.). |
+| 4. **Components** | **§8** — skim `src/components/ui/` (primitives) vs feature folders (`pause/`, `practice/`, …). |
+| 5. **Edge functions** | **§12** — read the full table once; you do not need every `index.ts` until you touch a feature. [cron-setup.md](../ops/cron-setup.md) when you move to **server-triggered** pause and workers. |
+| 6. **Systems docs** | [docs/README.md](../README.md) — pick **auth**, **routing**, **pause** when you need depth; phased **reviews** in order if you care about security/pipeline history. |
+
+**Full-app click-through (optional):** same DevTools habit as Phase A — **Network** for `supabase.co` and `functions/v1` per screen; **React DevTools** if you want to see **which** component owns a route.
 
 Welcome aboard.
