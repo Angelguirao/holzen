@@ -2,6 +2,31 @@
 
 This note is for anyone who is strong on **servers, databases, and HTTP APIs** but less familiar with how a **browser-first** codebase like Holzen is structured. It does **not** replace hands-on reading of the repo — see [navigating-the-codebase.md](navigating-the-codebase.md) for the concrete tour and [architecture/c4-holzen.md](../architecture/c4-holzen.md) for containers.
 
+**How to use this page:** Skim [Start here — terms in plain language](#start-here--terms-in-plain-language) first if a word keeps tripping you up. Then read sections **1–6** in order (they build on each other). Sections **7–8** are optional extras (TanStack Query, PWA).
+
+---
+
+## Start here — terms in plain language
+
+| Term | Plain language |
+|------|----------------|
+| **SPA (single-page application)** | You load the app **once**; after that, “going to another page” is mostly **JavaScript swapping what you see**, not the server sending a brand-new HTML document for each URL. |
+| **Client / browser** | The user’s tab: where React runs and where the Supabase **anon** key and user **JWT** live (in memory / storage). |
+| **Bundle** | The compiled **`.js` / `.css`** files the browser downloads. Built by Vite when you run `npm run build`. Not a separate server process — just static files. |
+| **JSX** | Syntax that **looks like HTML inside TypeScript** but is really function calls that create a **description** of the UI. React turns that into real DOM updates. |
+| **Component** | A **function** (usually) that returns JSX. Like a template with logic: “given these inputs, this is what should appear.” |
+| **State** | Values the component **remembers** between renders (e.g. “loading”, “error message”). When state changes, React **re-runs** the component and updates the screen. |
+| **Props** | **Inputs** passed from a parent component into a child (read-only from the child’s point of view). Like function arguments. |
+| **Hook** | A function whose name starts with `use` that lets a component use **state**, **effects**, or **shared context**. Only call hooks at the **top level** of a component or custom hook — not inside `if` or loops (React rule). |
+| **Effect (`useEffect`)** | “After the browser has painted, **do this**” — fetch data, subscribe to something, etc. Dependencies list says **when** to re-run. |
+| **Context** | A way to pass data (e.g. current user) **down the tree** without threading props through every level. |
+| **JWT** | Signed token proving **who** the user is. The Supabase client attaches it to requests so **Postgres RLS** and **edge functions** can authorize. |
+| **Anon (publishable) key** | A **public** key shipped in the frontend bundle. It only lets you talk to Supabase **as** whoever is logged in; it does **not** bypass RLS. |
+| **RLS (Row Level Security)** | **Postgres policies** evaluated on the **server** for each row. Even if the client sends a malicious query, the database **enforces** what rows are visible or writable. |
+| **Edge function** | A **small HTTP service** (Deno) hosted next to your Supabase project. Invoked via `supabase.functions.invoke(...)` or cron/webhooks. Not the same as SQL stored procedures. |
+
+If you wonder **“why not Next.js / a full framework?”**, see [spa-framework-evaluation.md](../backlog/spa-framework-evaluation.md) (backlog — strategic note, not a decision).
+
 ---
 
 ## How this relates to other docs
@@ -17,39 +42,49 @@ This note is for anyone who is strong on **servers, databases, and HTTP APIs** b
 
 ## 1. Single-page application (SPA)
 
-After the first load, **navigation** (e.g. `/` → `/pause`) is usually handled **in JavaScript** by the client router. The server does not send a new HTML document for each “page”; it sends **one shell** (and JS/CSS assets), and React **replaces** what you see by rendering different **components** for each route.
+**Classic server-rendered site:** Each navigation often means **HTTP request → new HTML** from the server (or a full template render).
 
-**Mental model:** think “**one long-lived desktop app** that happens to run inside a tab,” not “each click is a new server round-trip for HTML.”
+**SPA:** The first load downloads **HTML shell + JS bundle**. The JS bootstraps React. After that, changing the path (e.g. `/` → `/pause`) is handled by **client-side routing**: React **unmounts** one screen and **mounts** another — **without** asking the server for a new HTML page each time.
 
-**In Holzen:** routes live in `src/App.tsx`; see [navigating-the-codebase.md](navigating-the-codebase.md) (section *Routing and layout*).
+**Mental model:** A **long-lived app in a tab**, not “every click equals one server HTML response.” (Data still loads over the network — Supabase, `fetch`, etc. — but the **document** is not replaced wholesale.)
+
+**Caveat:** Initial `index.html` is still a real file; SEO crawlers see that first unless you add prerendering or SSR (out of scope here; see backlog link above).
+
+**In Holzen:** Routes live in `src/App.tsx`; see [navigating-the-codebase.md](navigating-the-codebase.md) (section *Routing and layout*).
 
 ---
 
 ## 2. React (components, state, hooks)
 
-**Components** are functions (or classes) that **return UI** (JSX — HTML-like syntax in TypeScript). React **re-invokes** them when **state** or **props** change and **reconciles** the DOM.
+**What “React renders” means:** React calls your component functions and builds a **tree** of UI descriptions. It compares to the previous tree and **updates the real DOM** where things changed (“reconciliation”). You rarely touch the DOM by hand.
 
-**State** is “what should the UI show *right now*?” — local to a component unless lifted or shared via **context**.
+**Props vs state:** **Props** come from outside (“show this user’s name”). **State** is internal (“modal open or closed”). Either can change; when they do, React **re-runs** the affected components.
 
-**Hooks** (`useState`, `useEffect`, `useCallback`, …) are the **language feature** for wiring state and side effects into function components. A **custom hook** (e.g. `useHolzen`) is just a function whose name starts with `use` that **calls other hooks** and returns a small API — reusable logic for **one subtree** of the app, not a microservice.
+**Hooks:** Built-in hooks attach **state** (`useState`), **lifecycle side effects** (`useEffect`), **memoized callbacks** (`useCallback`), etc. A **custom hook** (e.g. `useHolzen`) bundles several hooks and returns an object of values and functions — **reusable logic** for any component that calls it.
 
-**Mental model:** hooks are **not** “background workers” or global singletons; they run **inside** the component tree that called them.
+**Important:** Hooks are **not** microservices or daemons. Each **call** is tied to **one place in the component tree**. Two different screens calling `useHolzen()` get **separate** state unless you lift state up or use global stores (this app mostly uses hooks + Supabase, not Redux).
 
-**In Holzen:** feature logic often lives in `src/hooks/`; pages compose hooks and pass data into `src/components/`. See [navigating-the-codebase.md](navigating-the-codebase.md) (section *Data and “feature” state*).
+**In Holzen:** Feature logic often lives in `src/hooks/`; pages compose hooks and pass data into `src/components/`. See [navigating-the-codebase.md](navigating-the-codebase.md) (section *Data and “feature” state*).
 
 ---
 
 ## 3. TypeScript
 
-TypeScript is **JavaScript with static types** at **compile time**. The browser still runs **JavaScript** after `vite build` strips types. Types help **refactors** and **API contracts** (`src/integrations/supabase/types.ts` vs the real schema).
+TypeScript adds **static types** while you edit and build. After `vite build`, types are **erased** — the browser runs ordinary JavaScript.
 
-**Mental model:** types are **documentation** and **checks** for developers; they are not a second runtime layer like the JVM.
+**Mental model:** Types are **checked documentation**. They catch many bugs before runtime but **do not** enforce security; RLS and edge auth still matter.
+
+**In Holzen:** `src/integrations/supabase/types.ts` mirrors the DB shape; drift between types and real migrations is a familiar maintenance task.
 
 ---
 
 ## 4. Vite
 
-The **dev server** serves modules fast and supports **hot reload** (edit a file, UI updates without full refresh). **Production** is a **static bundle** (JS/CSS) deployed to hosting (e.g. Lovable publish flow). Env vars are baked in at **build time** for the client (`VITE_*`); secrets that must stay server-side belong in **edge functions** or Supabase secrets, not in the SPA bundle.
+**Dev:** `npm run dev` starts a **dev server** (fast reload, often **HMR**: edit a file, see changes without losing all state).
+
+**Prod:** `npm run build` outputs **static files** (HTML, JS, CSS) you host on a CDN or static host. No Node server required for **serving** the SPA — though **APIs** are still Supabase in the cloud.
+
+**Env:** Anything prefixed `VITE_` is exposed to the **client bundle**. Never put **secrets** there; use Supabase **Edge Function secrets** or dashboard secrets for server-side keys.
 
 **In Holzen:** [README.md](../../README.md) scripts, env modes, and `vite.config.ts` (port 8080, `@/` alias, PWA).
 
@@ -57,15 +92,15 @@ The **dev server** serves modules fast and supports **hot reload** (edit a file,
 
 ## 5. Supabase in the browser
 
-Holzen uses the **Supabase JS client** for:
+Three different “doors” from the same JS client:
 
-- **Auth** — session in the browser; **JWT** is sent on requests the client makes.
-- **Postgres** — `supabase.from('…')` runs **queries** that are still subject to **Row Level Security (RLS)** on the server. The anon key is **not** a free pass; policies decide what rows you can read/write.
-- **Edge functions** — `supabase.functions.invoke('name', { body })` is **HTTP** from the client to Supabase’s gateway → your Deno function. Auth is **your** responsibility inside the function (e.g. validate JWT or service role + `userId`).
+1. **Auth** — Log in, get a **session** and **JWT**. Supabase client stores this and attaches it to later calls.
+2. **Postgres (`supabase.from('table')`)** — Still **HTTP** from the browser to Supabase’s API, which runs your query **with** the user’s JWT. **RLS** runs in Postgres — not in the user’s browser.
+3. **Edge functions (`supabase.functions.invoke`)** — **HTTP** to your function code. Your function must **validate** the JWT (or use service role for trusted server callers) and implement its own rules.
 
-**Mental model:** the SPA is a **thick client**. The database is **remote**; RLS is **server-side enforcement** of authorization, not “optional if the client behaves.” Edge functions are **small HTTP services** next to the DB, not “stored procedures.”
+**Mental model:** The SPA is a **thick client**: lots of logic in the browser, but **authoritative data rules** for Postgres are on the **server** (RLS). Edge functions are **tiny HTTP services**, not “just SQL.”
 
-**In Holzen:** client in `src/integrations/supabase/client.ts`; functions under `supabase/functions/`; [navigating-the-codebase.md](navigating-the-codebase.md) (section *Supabase: edge functions*) maps **which** function is called from where.
+**In Holzen:** Client in `src/integrations/supabase/client.ts`; functions under `supabase/functions/`; [navigating-the-codebase.md](navigating-the-codebase.md) (section *Supabase: edge functions*) maps **which** function is called from where.
 
 ---
 
@@ -83,13 +118,23 @@ A single **user flow** (e.g. manual pause) often touches **all three** in sequen
 
 ## 7. TanStack Query (React Query)
 
-The app wraps the tree in **QueryClientProvider** (`src/App.tsx`). TanStack Query is a **cache + sync** layer for **server state** (fetch, stale, refetch). Not every feature uses it; some hooks use **Supabase + `useEffect`** directly. When you see `useQuery` / `useMutation`, think **“cached HTTP/DB reads with lifecycle”** — not a replacement for RLS or edge auth.
+The app wraps the tree in **QueryClientProvider** (`src/App.tsx`). TanStack Query is a **cache and lifecycle** helper for **async data** (fetch, stale time, refetch on focus, etc.).
+
+Not every Holzen feature uses it; some code uses **Supabase inside `useEffect`** instead. If you see `useQuery` / `useMutation`, read it as: **“server data with caching rules.”** It does **not** replace RLS or edge auth.
 
 ---
 
 ## 8. PWA and service worker
 
-Holzen can **install** as a PWA and uses a **service worker** for caching and update prompts (`vite-plugin-pwa`, `src/sw.ts`). This adds **offline-ish** behavior and **cache** semantics; it does not change Supabase security rules.
+Holzen can **install** as a PWA. A **service worker** (`vite-plugin-pwa`, `src/sw.ts`) can cache assets and prompt for updates. That affects **offline-ish** behavior and **which JS/HTML** loads first; it does **not** change Postgres RLS.
+
+---
+
+## When something still feels opaque
+
+- **Trace one button:** Pick a UI action in [navigating-the-codebase.md](navigating-the-codebase.md) “first day” exercise — follow imports from a page → hook → `supabase` or `invoke`. Names in code beat abstract definitions.
+- **Bruno vs browser:** [http-review-playbooks.md](http-review-playbooks.md) exercises **HTTP** only. The SPA adds **routing, auth session, and client state** — same APIs, different shell.
+- **Phased reviews:** [phase-1-frontend-routing-auth.md](../reviews/phase-1-frontend-routing-auth.md) and [phase-2-manual-pause-pipeline.md](../reviews/phase-2-manual-pause-pipeline.md) spell out **contracts** between routes, hooks, and edge functions.
 
 ---
 
@@ -109,11 +154,11 @@ These are **general** primers; skim what you need, then return to the repo.
 | **Edge Functions** | [Edge Functions](https://supabase.com/docs/guides/functions) |
 | **TanStack Query** | [Overview](https://tanstack.com/query/latest/docs/framework/react/overview) |
 
-**Deeper React patterns (optional):** [Josh W. Comeau — React courses](https://www.joshwcomeau.com/) (paid, opinionated) or [Kent C. Dodds — Epic React](https://epicreact.dev/) (paid) — only if you want structured curriculum; the official React docs are enough for navigation-level reading.
+**Deeper React patterns (optional):** [Josh W. Comeau — React courses](https://www.joshwcomeau.com/) (paid) or [Kent C. Dodds — Epic React](https://epicreact.dev/) (paid) — only if you want structured curriculum; the official React docs are enough for navigation-level reading.
 
 ---
 
 ## Related in-repo reading
 
 - [codebase-size-and-review-practices.md](codebase-size-and-review-practices.md) — expectations for review depth across “frontend + Postgres + Deno.”
-- Phased reviews [phase-1-frontend-routing-auth.md](../reviews/phase-1-frontend-routing-auth.md) through [phase-2-manual-pause-pipeline.md](../reviews/phase-2-manual-pause-pipeline.md) — contracts that assume the vocabulary above.
+- [spa-framework-evaluation.md](../backlog/spa-framework-evaluation.md) — Vite SPA vs full-stack React frameworks (React team docs; when to reconsider).
