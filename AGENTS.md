@@ -64,7 +64,7 @@ Never commit `.env` or service role keys.
 ## Related docs
 
 - [docs/README.md](docs/README.md) — full docs index, **start-here** reading order, and **canonical sources** (what to edit when docs drift).
-- [docs/fundamentals/http-review-playbooks.md](docs/fundamentals/http-review-playbooks.md) — Postman/Bruno step-by-step API review; [bruno/](bruno/) for optional collections.
+- [docs/fundamentals/http-review-playbooks.md](docs/fundamentals/http-review-playbooks.md) — Postman/Bruno step-by-step API review; [bruno/](bruno/) collection, [bruno/SCOPE.md](bruno/SCOPE.md), [bruno/functions-catalog.md](bruno/functions-catalog.md).
 - [docs/ops/logging-strategy.md](docs/ops/logging-strategy.md) — edge vs browser logging, `observe.ts`, correlation IDs.
 - [README.md](README.md) — clone/setup, scripts, high-level layout.
 - [docs/architecture/c4-holzen.md](docs/architecture/c4-holzen.md) — C4 System Context + Container diagrams ([workspace.dsl](docs/architecture/workspace.dsl) for Structurizr).

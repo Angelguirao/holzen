@@ -1,6 +1,6 @@
 vars {
   VITE_SUPABASE_URL: http://127.0.0.1:54321
   VITE_SUPABASE_PUBLISHABLE_KEY: your-anon-key-from-npm-run-supabase-status
-  AUTH_EMAIL: test-user@example.com
+  AUTH_EMAIL: bruno-test@local.test
   AUTH_PASSWORD: your-test-user-password
 }

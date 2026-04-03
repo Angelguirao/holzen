@@ -34,7 +34,7 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 
 - `fundamentals/navigating-the-codebase.md` — repo tour: boot flow, routing, auth, hooks, Supabase basics.
 - `fundamentals/codebase-size-and-review-practices.md` — codebase size snapshot and review best-practices.
-- `fundamentals/http-review-playbooks.md` — step-by-step Postman/Bruno flows, Supabase `invoke` headers, pairing with Edge logs; optional [bruno/](../bruno/) collections.
+- `fundamentals/http-review-playbooks.md` — step-by-step Postman/Bruno flows, Supabase `invoke` headers, pairing with Edge logs; [bruno/](../bruno/) collection, [bruno/SCOPE.md](../bruno/SCOPE.md) (HTTP vs full app), [bruno/functions-catalog.md](../bruno/functions-catalog.md) (all Edge URLs).
 
 ## Decisions (light ADRs)
 
