@@ -25,11 +25,11 @@ Pick one tool and keep **one** canonical exported collection (or Bruno folder) i
 
 ## Supabase Edge Functions: URL and headers
 
-- **URL:** `{{SUPABASE_URL}}/functions/v1/<function-name>`  
-  Example: `https://<project-ref>.supabase.co/functions/v1/holzen-reflect`
+- **URL:** `{{VITE_SUPABASE_URL}}/functions/v1/<function-name>`  
+  Example: `http://127.0.0.1:54321/functions/v1/holzen-reflect` (local) or `https://<project-ref>.supabase.co/functions/v1/holzen-reflect` (hosted).
 - **Typical headers** (same as the JS client’s `invoke`):
-  - `Authorization: Bearer <access_token>` — user session JWT from sign-in (see below).
-  - `apikey: <SUPABASE_ANON_KEY>` — project anon key (public to the client; still treat repo copies carefully).
+  - `Authorization: Bearer <SUPABASE_ACCESS_TOKEN>` — user session JWT from sign-in (see below); not stored in `.env`.
+  - `apikey: <VITE_SUPABASE_PUBLISHABLE_KEY>` — same anon/publishable key as in `.env` / `.env.localstack.local` (public to the client; still treat repo copies carefully).
   - `Content-Type: application/json` for POST bodies.
 
 Some functions validate the Bearer token in code even when `[functions.<name>]` has `verify_jwt = false` in `config.toml` — the gateway may not enforce JWT, but the function still returns 401 without a valid user token.
@@ -37,7 +37,7 @@ Some functions validate the Bearer token in code even when `[functions.<name>]` 
 ### Getting an `access_token` for manual calls
 
 1. Run the app locally, sign in, open DevTools → **Application** → **Local Storage** (or **Session**) and find Supabase session JSON, **or** use the Supabase dashboard **Auth** tools if you use test users.
-2. Copy the **access_token** (short-lived). Paste into your environment as `ACCESS_TOKEN` and re-run when it expires.
+2. Copy the **access_token** (short-lived). In Bruno, paste into `SUPABASE_ACCESS_TOKEN` in `local.bru` and re-run when it expires.
 
 Never commit tokens or service role keys.
 
@@ -59,7 +59,7 @@ Never commit tokens or service role keys.
 A starter collection lives at **`bruno/`** (see `bruno.json` and `pause-pipeline/*.bru`).
 
 1. **Open** the `bruno` folder in Bruno (not the repo root).
-2. Copy **`bruno/environments/local.bru.example`** → **`local.bru`**, fill `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `ACCESS_TOKEN`.
+2. Copy **`bruno/environments/local.bru.example`** → **`local.bru`**, fill `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` (same names as Vite — copy from `.env` / localstack), plus `SUPABASE_ACCESS_TOKEN` from the signed-in app.
 3. Run requests in order; pair with Edge Function logs.
 
 Details: [bruno/README.md](../../bruno/README.md).

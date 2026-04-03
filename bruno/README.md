@@ -8,11 +8,11 @@ Collection root for [Bruno](https://www.usebruno.com/) (`.bru` files). Use it to
 2. **Open this folder as a collection:** File → Open Collection → choose folder `holzen/bruno` (the directory that contains `bruno.json`).
 3. **Create your local environment**
    - Copy `environments/local.bru.example` to **`environments/local.bru`** (same folder).
-   - Edit `local.bru` with real values:
-     - **`SUPABASE_URL`** — `https://<project-ref>.supabase.co` with **no trailing slash**.
-     - **`SUPABASE_ANON_KEY`** — project anon key (same role as `VITE_SUPABASE_PUBLISHABLE_KEY` in `.env`).
-     - **`ACCESS_TOKEN`** — short-lived **user** JWT after sign-in in the app (DevTools → Application → local storage Supabase session, or Auth → copy user session).
-4. In Bruno, select the **local** environment (top bar) so `{{SUPABASE_URL}}` etc. resolve.
+   - Edit `local.bru` using the **same names as Vite** so you can copy from your existing env files:
+     - **`VITE_SUPABASE_URL`** — from `.env`, `.env.localstack.local`, `.env.hosted.local`, etc. (e.g. `http://127.0.0.1:54321` for local Docker Supabase, or `https://<ref>.supabase.co` for hosted). **No trailing slash.**
+     - **`VITE_SUPABASE_PUBLISHABLE_KEY`** — same as in those files (anon / publishable key; for local stack use the anon key from `npm run supabase:status`).
+     - **`SUPABASE_ACCESS_TOKEN`** — **not** in `.env`: short-lived **user** JWT after sign-in (DevTools → Application → local storage Supabase session `access_token`, or your Auth flow). Refresh when you get 401.
+4. In Bruno, select the **local** environment (top bar) so `{{VITE_SUPABASE_URL}}` etc. resolve.
 
 `local.bru` is **gitignored**; never commit tokens.
 
@@ -27,7 +27,7 @@ Collection root for [Bruno](https://www.usebruno.com/) (`.bru` files). Use it to
 
 1. Send requests **in order** (01 → 02) the first time you smoke-test.
 2. In Supabase Dashboard → **Edge Functions** → logs, filter by time and look for **`cid`** in JSON log lines ([logging strategy](../docs/ops/logging-strategy.md)).
-3. If you get **401**, refresh `ACCESS_TOKEN` or confirm `apikey` + `Authorization` match the project.
+3. If you get **401**, refresh `SUPABASE_ACCESS_TOKEN` or confirm `apikey` + `Authorization` match the project.
 
 ## Adding requests
 
