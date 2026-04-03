@@ -6,7 +6,8 @@ This folder contains human-readable notes that complement the source code and in
 
 1. **[architecture/c4-holzen.md](architecture/c4-holzen.md)** — who the system talks to (System Context + Container). Optional: [workspace.dsl](architecture/workspace.dsl) in Structurizr.
 2. **[fundamentals/navigating-the-codebase.md](fundamentals/navigating-the-codebase.md)** — boot flow, routing, auth, hooks, and how Supabase pieces connect at runtime.
-3. **Your vertical slice** — pick one area below (e.g. [systems/routing/route-gating-system.md](systems/routing/route-gating-system.md) or [systems/pause/ai-powered-pause-system.md](systems/pause/ai-powered-pause-system.md)) and read the phased [reviews/](reviews/) docs in order when you need depth on security and pipelines.
+3. **Optional — [fundamentals/mental-models-for-contributors.md](fundamentals/mental-models-for-contributors.md)** — SPA, React, Supabase client model, and suggested external primers if you’re coming from a backend-heavy background.
+4. **Your vertical slice** — pick one area below (e.g. [systems/routing/route-gating-system.md](systems/routing/route-gating-system.md) or [systems/pause/ai-powered-pause-system.md](systems/pause/ai-powered-pause-system.md)) and read the phased [reviews/](reviews/) docs in order when you need depth on security and pipelines.
 
 [AGENTS.md](../AGENTS.md) at the repo root is the **quick reference** for commands and “where to change what” (optimized for automation and fast lookup). This index is the **full map**.
 
@@ -33,6 +34,7 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 ## Fundamentals
 
 - `fundamentals/navigating-the-codebase.md` — repo tour: boot flow, routing, auth, hooks, Supabase basics.
+- `fundamentals/mental-models-for-contributors.md` — vocabulary for SPAs, React, TypeScript, Vite, Supabase (RLS, edge functions); links to official docs and learning resources.
 - `fundamentals/codebase-size-and-review-practices.md` — codebase size snapshot and review best-practices.
 - `fundamentals/http-review-playbooks.md` — step-by-step Postman/Bruno flows, Supabase `invoke` headers, pairing with Edge logs; [bruno/](../bruno/) collection, [bruno/SCOPE.md](../bruno/SCOPE.md) (HTTP vs full app), [bruno/functions-catalog.md](../bruno/functions-catalog.md) (all Edge URLs).
 
