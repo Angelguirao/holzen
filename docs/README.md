@@ -50,7 +50,7 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 
 ## Backlog
 
-- `backlog/backlog.md` — pending improvements and fixes (category drill-down)
+- `backlog/backlog.md` — pending improvements; **quick finder by theme**, alphabetical index, flat numbered list. Individual tickets under `backlog/*.md`.
 
 ## Reviews
 
