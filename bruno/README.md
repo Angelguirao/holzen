@@ -8,15 +8,22 @@ Collection root for [Bruno](https://www.usebruno.com/) (`.bru` files). See **[SC
 
 1. **Install Bruno** (desktop app) from [usebruno.com](https://www.usebruno.com/).
 2. **Open this folder as a collection:** File → Open Collection → choose folder `holzen/bruno` (the directory that contains `bruno.json`).
-3. Copy **`environments/local.bru.example`** → **`environments/local.bru`** and fill:
+3. Create one or both **environments** (gitignored files — never commit):
+
+| File | Copy from | Use when |
+|------|-----------|----------|
+| **`environments/local.bru`** | [`local.bru.example`](environments/local.bru.example) | Docker Supabase (`http://127.0.0.1:54321`) — same as `npm run dev:local` / `.env.localstack.local`. |
+| **`environments/hosted.bru`** | [`hosted.bru.example`](environments/hosted.bru.example) | Hosted Supabase (`https://<ref>.supabase.co`) — same project as `npm run dev:hosted` / `.env.hosted.local`. |
+
+Shared variables (fill the one that matches the backend you selected):
 
 | Variable | Purpose |
 |----------|---------|
-| **`VITE_SUPABASE_URL`** | Same as Vite (e.g. `http://127.0.0.1:54321`). No trailing slash. |
-| **`VITE_SUPABASE_PUBLISHABLE_KEY`** | Anon key (`npm run supabase:status` for local). |
-| **`AUTH_EMAIL`** / **`AUTH_PASSWORD`** | Test user for sign-up / sign-in. |
-| **`SUPABASE_SERVICE_ROLE_KEY`** | For **`service-cron/`** requests only — Dashboard → **Settings → API** (never commit). |
-| **`LOVABLE_API_KEY`** | Optional — for **`auth-hook/auth-email-hook-preview`** only (see below). |
+| **`VITE_SUPABASE_URL`** | **Local:** `http://127.0.0.1:54321` (no trailing slash). **Hosted:** `https://<project-ref>.supabase.co`. |
+| **`VITE_SUPABASE_PUBLISHABLE_KEY`** | Anon key — local: `npm run supabase:status`; hosted: Supabase Dashboard → **Settings → API**. |
+| **`AUTH_EMAIL`** / **`AUTH_PASSWORD`** | User that exists on **that** project (create in Studio or sign-up). |
+| **`SUPABASE_SERVICE_ROLE_KEY`** | For **`service-cron/`** only — same project as `VITE_SUPABASE_URL` (Dashboard → **Settings → API** → service_role). |
+| **`LOVABLE_API_KEY`** | Optional — **`auth-hook/auth-email-hook-preview`** only (see below). |
 
 ### LOVABLE_API_KEY — you won’t get it from this repo
 
@@ -27,7 +34,7 @@ Collection root for [Bruno](https://www.usebruno.com/) (`.bru` files). See **[SC
 **Do you need a “hosted” Bruno environment?** Bruno only sends HTTP. What matters is that **`VITE_SUPABASE_URL`** and keys match the stack you call:
 
 - **Most `.bru` requests** only need **anon + user JWT** (or service role for `service-cron/`). The Lovable key stays **on the server** — you do **not** put it in Bruno for `holzen-reflect`, `companion-orchestrate`, etc.
-- **Exception:** **`auth-hook/auth-email-hook-preview`** compares **`Authorization: Bearer …`** to **`LOVABLE_API_KEY`** inside the function. To run that request from Bruno you must put the **same** secret in **`local.bru`**. If you cannot obtain it, **skip that one request** — it does not block the rest of the collection.
+- **Exception:** **`auth-hook/auth-email-hook-preview`** compares **`Authorization: Bearer …`** to **`LOVABLE_API_KEY`** inside the function. Put the same secret in **`local.bru`** or **`hosted.bru`** (whichever environment you selected). If you cannot obtain it, **skip that one request** — it does not block the rest of the collection.
 
 **Local `supabase functions serve`:** use a gitignored **`supabase/.env`** with `LOVABLE_API_KEY=...` (see [.env.example](../.env.example) and [Supabase function secrets](https://supabase.com/docs/guides/functions/secrets)). `supabase secrets list` on the linked project shows **names**, not values — you still need a one-time source for the string (dashboard rotate, team vault, or Lovable support if their provisioning never exposed it).
 
@@ -35,7 +42,7 @@ Collection root for [Bruno](https://www.usebruno.com/) (`.bru` files). See **[SC
 
 **After auth:** `auth/00` and `auth/01` set **`SUPABASE_ACCESS_TOKEN`** and **`AUTH_USER_ID`** when the Auth API returns a `user` object. If you paste a JWT manually, add **`AUTH_USER_ID`** in Bruno for **`user-jwt/reflection-insights`**.
 
-4. Select the **local** environment in Bruno’s toolbar.
+4. In Bruno’s environment dropdown, choose **local** or **hosted** so `{{VITE_SUPABASE_URL}}` resolves to the stack you intend to call.
 
 ## Folder layout (every Edge Function)
 

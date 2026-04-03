@@ -1,8 +1,0 @@
-vars {
-  VITE_SUPABASE_URL: http://127.0.0.1:54321
-  VITE_SUPABASE_PUBLISHABLE_KEY: your-anon-key-from-npm-run-supabase-status
-  AUTH_EMAIL: bruno-test@local.test
-  AUTH_PASSWORD: your-test-user-password
-  SUPABASE_SERVICE_ROLE_KEY: your-service-role-key-never-commit
-  LOVABLE_API_KEY: optional-for-auth-email-preview-only
-}
