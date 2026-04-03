@@ -36,4 +36,4 @@ Most handlers expect **POST** with **JSON**; all use **`Authorization: Bearer <u
 
 **Source of truth for names:** `supabase/config.toml` under `[functions.<name>]`.
 
-**Repo requests implemented today:** `pause-pipeline/` (holzen-reflect, companion-orchestrate) plus auth. Add more `.bru` files as you review each area.
+**Repo requests implemented today:** `auth/` (sign-up, sign-in), `pause-pipeline/` (holzen-reflect, companion-orchestrate), `billing/` (create-checkout, check-subscription, customer-portal). Add more `.bru` files as you review each area.
