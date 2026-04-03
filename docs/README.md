@@ -2,6 +2,28 @@
 
 This folder contains human-readable notes that complement the source code and in-repo reference docs.
 
+## Start here (new contributors)
+
+1. **[architecture/c4-holzen.md](architecture/c4-holzen.md)** — who the system talks to (System Context + Container). Optional: [workspace.dsl](architecture/workspace.dsl) in Structurizr.
+2. **[fundamentals/navigating-the-codebase.md](fundamentals/navigating-the-codebase.md)** — boot flow, routing, auth, hooks, and how Supabase pieces connect at runtime.
+3. **Your vertical slice** — pick one area below (e.g. [systems/routing/route-gating-system.md](systems/routing/route-gating-system.md) or [systems/pause/ai-powered-pause-system.md](systems/pause/ai-powered-pause-system.md)) and read the phased [reviews/](reviews/) docs in order when you need depth on security and pipelines.
+
+[AGENTS.md](../AGENTS.md) at the repo root is the **quick reference** for commands and “where to change what” (optimized for automation and fast lookup). This index is the **full map**.
+
+## Canonical sources (avoid drift)
+
+| Kind of information | Authoritative place | Notes |
+|---------------------|---------------------|--------|
+| Commands, env vars, “where to edit” table | [AGENTS.md](../AGENTS.md) | Keep tables here; link out for narratives. |
+| Boot sequence, repo tour, Lovable vs local | [fundamentals/navigating-the-codebase.md](fundamentals/navigating-the-codebase.md) | Do not duplicate long boot narratives in AGENTS. |
+| How a subsystem behaves (contracts, flows) | [systems/](systems/) | One primary doc per concern; cross-link related systems. |
+| Irreversible or costly-to-reverse choices | [decisions/](decisions/) | Short ADR-style notes; see [decisions/README.md](decisions/README.md). |
+| Incidents, invariants, “why we hardened X” | [postmortems/](postmortems/) | |
+| What to watch when things break (cron, retries, logs) | [ops/](ops/) | [ops/observability-and-failures.md](ops/observability-and-failures.md) is the checklist index. |
+| Step-by-step HTTP review (Postman / Bruno) | [fundamentals/http-review-playbooks.md](fundamentals/http-review-playbooks.md) | Optional [bruno/](../bruno/) folder for git-friendly collections. |
+
+When you change behavior, update the **one** doc that owns that slice (and ADRs only when the *decision* changes, not every refactor).
+
 ## Architecture (C4)
 
 - `architecture/README.md` — index for **C4** context + container views  
@@ -10,37 +32,42 @@ This folder contains human-readable notes that complement the source code and in
 
 ## Fundamentals
 
-- `fundamentals/navigating-the-codebase.md` - repo tour: boot flow, routing, auth, hooks, Supabase basics.
-- `fundamentals/codebase-size-and-review-practices.md` - codebase size snapshot and review best-practices.
+- `fundamentals/navigating-the-codebase.md` — repo tour: boot flow, routing, auth, hooks, Supabase basics.
+- `fundamentals/codebase-size-and-review-practices.md` — codebase size snapshot and review best-practices.
+- `fundamentals/http-review-playbooks.md` — step-by-step Postman/Bruno flows, Supabase `invoke` headers, pairing with Edge logs; optional [bruno/](../bruno/) collections.
+
+## Decisions (light ADRs)
+
+- `decisions/README.md` — when to add a decision record and a minimal template.
 
 ## Ops
 
-- `ops/cron-setup.md` - scheduled jobs: pg_cron + `net.http_post` callouts for pause-adjacent workers.
+- `ops/cron-setup.md` — scheduled jobs: pg_cron + `net.http_post` callouts for pause-adjacent workers.
+- `ops/observability-and-failures.md` — where to record logs, retries, and failure modes per pipeline (checklist; links into systems and postmortems).
 
 ## Backlog
 
-- `backlog/backlog.md` - pending improvements and fixes (category drill-down)
+- `backlog/backlog.md` — pending improvements and fixes (category drill-down)
 
 ## Reviews
 
-- `reviews/phase-1-frontend-routing-auth.md` - onboarding review for frontend auth + routing contracts
-- `reviews/phase-2-manual-pause-pipeline.md` - manual pause producer/client processing review
-- `reviews/phase-3-server-cron-triggers.md` - server cron trigger review (check-volatility)
-- `reviews/phase-4-cron-workers-caching.md` - cron workers + caching lifecycle review
-- `reviews/phase-5-quality-gates-rate-limit-cache.md` - quality gates, rate limiting, and cache logic review
-- `reviews/phase-6-rls-authz-security-model.md` - RLS/authz security model review
-- `reviews/phase-7-edge-function-auth-correctness.md` - edge function auth correctness review
-- `reviews/phase-8-rls-hardening-service-role-policies.md` - service-role hardening policies review
+- `reviews/phase-1-frontend-routing-auth.md` — onboarding review for frontend auth + routing contracts
+- `reviews/phase-2-manual-pause-pipeline.md` — manual pause producer/client processing review
+- `reviews/phase-3-server-cron-triggers.md` — server cron trigger review (check-volatility)
+- `reviews/phase-4-cron-workers-caching.md` — cron workers + caching lifecycle review
+- `reviews/phase-5-quality-gates-rate-limit-cache.md` — quality gates, rate limiting, and cache logic review
+- `reviews/phase-6-rls-authz-security-model.md` — RLS/authz security model review
+- `reviews/phase-7-edge-function-auth-correctness.md` — edge function auth correctness review
+- `reviews/phase-8-rls-hardening-service-role-policies.md` — service-role hardening policies review
 
 ## Systems
 
-- `systems/auth/auth-and-referral-system.md` - Auth system (Supabase) + optional referral side-effect
-- `systems/routing/route-gating-system.md` - protected vs public-only vs ungated routes; `ProtectedRoute` / `PublicOnlyRoute` contracts
-- `systems/pause/ai-powered-pause-system.md` - end-to-end architecture of manual vs automatic pause and how companions/interventions are produced.
-- `systems/pause/pause-session-cost-estimates.md` - order-of-magnitude API spend estimates for a live pause session.
-- `systems/pause/companions/` - deep dives per companion type (see [companions/signal.md](systems/pause/companions/signal.md) for Signal).
+- `systems/auth/auth-and-referral-system.md` — Auth system (Supabase) + optional referral side-effect
+- `systems/routing/route-gating-system.md` — protected vs public-only vs ungated routes; `ProtectedRoute` / `PublicOnlyRoute` contracts
+- `systems/pause/ai-powered-pause-system.md` — end-to-end architecture of manual vs automatic pause and how companions/interventions are produced.
+- `systems/pause/pause-session-cost-estimates.md` — order-of-magnitude API spend estimates for a live pause session.
+- `systems/pause/companions/` — deep dives per companion type (see [companions/signal.md](systems/pause/companions/signal.md) for Signal).
 
 ## Postmortems
 
-- `postmortems/holzen-postmortem-invariants.md` - core invariants and the "why" behind key codebase hardening
-
+- `postmortems/holzen-postmortem-invariants.md` — core invariants and the "why" behind key codebase hardening
