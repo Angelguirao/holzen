@@ -9,7 +9,7 @@ This document describes **how Holzen turns Bitcoin volatility into a pause exper
 1. [Conceptual model](#toc-conceptual-model)
 2. [Two triggers: comparison](#toc-two-triggers)
 3. [Reflection generation](#toc-reflection-generation)
-4. [Client flow after reflection (manual path)](#toc-client-flow)
+4. [Client flow after reflection (manual path)](#toc-client-flow) — [manual pause — request order (click path)](#toc-manual-pause-request-order)
 5. [`companion-orchestrate` (single entry point)](#toc-companion-orchestrate)
 6. [Generator family (orchestrated)](#toc-generator-family)
 7. [Interventions and companions (reference)](#toc-interventions-reference)
@@ -252,6 +252,28 @@ flowchart TB
 1. **`use-holzen.ts`** — Calls `holzen-reflect`, inserts `reflections`, updates profile, sets companion state from response (haiku; **`grounding_*` null** at insert — same as cron; orchestrate fills companion columns).
 2. **Pause UI** — Uses `use-companion-data.ts` with `reflectionId`, `context`, `reflectionMessage`, **`mood`**, **`severityNumber`**, language.
 3. **`use-companion-data`** — Loads partial companion data from the reflection row if already present; builds **`moodHistory`** from recent `reflections` (`mood`, `outcome`); invokes **`companion-orchestrate`** with `useIntervention: true` and per-preference **`needSignal` / `needGrounding` / `needHistory` / `needZoomOut`** (cached slots skipped).
+
+<a id="toc-manual-pause-request-order"></a>
+
+### 4.1 Manual pause — request order (click path)
+
+This is the **exact sequence** when a signed-in user runs a **normal** manual pause (not **silent mode**): `manualTrigger` → `generateMessage` in **`src/hooks/use-holzen.ts`**, then the Pause UI + **`src/hooks/use-companion-data.ts`**.
+
+| Step | Where | What happens |
+|------|--------|----------------|
+| 1 | Browser | **`fetchBtcData`** (or cached `btcData`) builds the **context** string (24h move, optional 7d cumulative, Fear & Greed / on-chain via **`enrichPauseContextWithMarketData`**). |
+| 2 | Browser | Client loads recent **`reflections`** rows to build **`moodHistory`**, **`recentHaikus`**, **`recentMessages`** (same query family as §2.3.E). |
+| 3 | Edge **`holzen-reflect`** | **`supabase.functions.invoke('holzen-reflect', { context, tone, style, … })`** → **`generateUnifiedReflection`** inside the function. Returns **`message`** (+ optional haiku / legacy grounding fields in the JSON). |
+| 4 | Browser + Postgres | Client **`insert`s `reflections`** with `message`, `context`, haiku/grounding from step 3; **`library_items`** upsert; **`profiles`** update **`last_message`**, **`last_context`** (normal manual does **not** set **`last_trigger_at`** — see §2.3.B). **`lastReflectionId`** is set in React state. |
+| 5 | Pause UI | **`PauseSession`** / **`useCompanionData`** receive **`reflectionId`**, **`context`**, **`reflectionMessage`**, mood, severity. |
+| 6 | Edge **`companion-orchestrate`** | When the reflection row has no usable cache for a needed slot, **`use-companion-data`** calls **`invoke('companion-orchestrate', { reflectionId, …, useIntervention: true, enable*… })`**. If everything needed is already cached on the row, the client **skips** the network call (see **`checkCachedReflection`** in `use-companion-data.ts`). |
+
+**Silent mode** (`profiles` / UI): **`holzen-reflect` is not called**. The client inserts a short fixed message (**`BTC moved.`**), sets **`last_trigger_at`**, and still gets a **`reflections`** row — step 6 can still run for companions when the Pause UI loads.
+
+**Matching this without the UI**
+
+- **Closest:** DevTools → **Network** → filter `holzen-reflect` and `companion-orchestrate`; replay **request order** and **bodies** (same JWT session).
+- **Bruno:** **`pause-pipeline/01-holzen-reflect`** and **`02-companion-orchestrate`** are **not** a single drop-in for steps 3–6: the app always **inserts `reflections` between** reflect and orchestrate, and orchestrate expects a real **`reflectionId`**. Use Bruno to test each function in isolation, or run **`02`** with a **`reflectionId`** copied from Table Editor after one real pause. See [bruno/README.md](../../../bruno/README.md) and [phase-2-manual-pause-pipeline.md](../../reviews/phase-2-manual-pause-pipeline.md).
 
 ---
 
