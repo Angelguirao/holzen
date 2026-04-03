@@ -1,0 +1,28 @@
+meta {
+  name: 02 companion-orchestrate
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{SUPABASE_URL}}/functions/v1/companion-orchestrate
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{ACCESS_TOKEN}}
+  apikey: {{SUPABASE_ANON_KEY}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "context": "Bruno smoke test — pause companion pipeline.",
+    "language": "en",
+    "enableSignal": true,
+    "enableGrounding": false,
+    "enableHistory": false,
+    "enableZoomOut": false
+  }
+}

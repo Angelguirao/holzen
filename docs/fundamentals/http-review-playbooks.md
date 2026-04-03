@@ -54,6 +54,12 @@ Never commit tokens or service role keys.
 - Cron / HTTP callouts: [ops/cron-setup.md](../ops/cron-setup.md).
 - Failure modes checklist: [ops/observability-and-failures.md](../ops/observability-and-failures.md).
 
-## Optional: collections in-repo
+## Repo collection (Bruno)
 
-If you add a **Bruno** collection under `bruno/`, use `bruno/environments/local.bru` for secrets (gitignored) and commit only `local.bru.example` with placeholders. See [bruno/README.md](../../bruno/README.md).
+A starter collection lives at **`bruno/`** (see `bruno.json` and `pause-pipeline/*.bru`).
+
+1. **Open** the `bruno` folder in Bruno (not the repo root).
+2. Copy **`bruno/environments/local.bru.example`** → **`local.bru`**, fill `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `ACCESS_TOKEN`.
+3. Run requests in order; pair with Edge Function logs.
+
+Details: [bruno/README.md](../../bruno/README.md).
