@@ -35,9 +35,19 @@ Run **`auth/01-sign-in-password`** when the token expires or you open a new Brun
 | `pause-pipeline/01-holzen-reflect` | POST reflection; minimal `context`. |
 | `pause-pipeline/02-companion-orchestrate` | Companion orchestrator; add `reflectionId` for full intervention checks. |
 
+## Billing / Stripe (after auth)
+
+| Request | Purpose |
+|---------|---------|
+| `billing/01-create-checkout` | Stripe Checkout session URL (`STRIPE_SECRET_KEY` on the project). |
+| `billing/02-check-subscription` | Cached subscription check; use `"force": true` in JSON to refresh from Stripe. |
+| `billing/03-customer-portal` | Billing Portal URL (needs existing Stripe customer). |
+
+Details: [billing/README.md](billing/README.md).
+
 ## Running a review
 
-1. **`auth/00`** (optional) → **`auth/01`** → **`pause-pipeline/01`** → **`02`**.
+1. **`auth/00`** (optional) → **`auth/01`** → **`pause-pipeline/01`** → **`02`**, and/or **`billing/01`** → **`02`** → **`03`**.
 2. **Edge logs:** Supabase Dashboard → Edge Functions → match timestamps / JSON **`cid`** ([logging strategy](../docs/ops/logging-strategy.md)).
 3. **401:** Re-run **`01`** or fix `VITE_*` / `AUTH_*`.
 

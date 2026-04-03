@@ -41,6 +41,8 @@ Rule of thumb used here:
   - See: `cache-serve-relaxation-ux.md`
 - `writeCompanionData-grounding-consistency` — grounding dual-write: `reflection_companions` vs `reflections`
   - See: `writeCompanionData-grounding-consistency.md`
+- `e2e-browser-automation` — Playwright/Cypress or Vitest+RTL for full product flows; Bruno is API-only
+  - See: `e2e-browser-automation.md`
 
 ## Pending items (everything)
 
@@ -60,4 +62,5 @@ Rule of thumb used here:
 - 14. Quality gates: false positives and localization (`quality-gates-false-positives.md`)
 - 15. Cache serve relaxation: optional UX transparency (`cache-serve-relaxation-ux.md`)
 - 16. Grounding dual-write consistency — Home vs pause (`writeCompanionData-grounding-consistency.md`)
+- 17. E2E / browser automation for full product flows — Playwright/Cypress or Vitest+RTL; Bruno stays API-only (`e2e-browser-automation.md`)
 
