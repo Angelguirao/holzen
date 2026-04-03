@@ -124,7 +124,8 @@ export function useProfile() {
       setProfileLoaded(true);
     };
     load();
-  }, [user]);
+    // Depend on stable id only — `user` object identity changes on TOKEN_REFRESHED etc., which would refetch unnecessarily.
+  }, [user?.id]);
 
   const setThreshold = useCallback(async (val: number) => {
     setThresholdState(val);
