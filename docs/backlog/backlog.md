@@ -54,7 +54,7 @@ Use this when you are **choosing what to work on next**. Items are **not** stric
 | Priority hint | Ticket | Summary |
 |---------------|--------|---------|
 | Medium | [orchestrate-client-cron.md](orchestrate-client-cron.md) | Client vs cron `companion-orchestrate` overlap — measure, dedup, cache policy. |
-| Medium | [home-fetch-deduplication.md](home-fetch-deduplication.md) | After sign-in on **`/`**, dedupe repeated **`profiles`**, **`check-subscription`**, and **market** (CoinGecko / mempool / F&G) fetches. |
+| Medium | [home-fetch-deduplication.md](home-fetch-deduplication.md) | After sign-in on **`/`**, dedupe repeated **`profiles`**, **`check-subscription`**, and **market** fetches. **Partial:** `useProfile` now keys on `user?.id` (fewer duplicate **`profiles`** reads on token refresh) — see ticket **Progress**. |
 | Lower | [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md) | Stronger dedup for `content_library` / `companion_cache`. |
 
 ### Product / UX (what the user sees or feels)
@@ -180,7 +180,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | [data-fetching-conventions.md](data-fetching-conventions.md) | TanStack Query vs `useEffect` + Supabase; optional QueryClient defaults |
 | [e2e-browser-automation.md](e2e-browser-automation.md) | Playwright/Cypress or Vitest+RTL; Bruno stays API-only |
 | [form-field-name-id-a11y.md](form-field-name-id-a11y.md) | Form **`name`** / **`id`** / **`autocomplete`** (DevTools Issues) |
-| [home-fetch-deduplication.md](home-fetch-deduplication.md) | Dedupe **`profiles`**, subscription, market fetches on signed-in **`/`** |
+| [home-fetch-deduplication.md](home-fetch-deduplication.md) | Dedupe **`profiles`**, subscription, market fetches on signed-in **`/`** (partial: **`profiles`** identity — see ticket) |
 | [home-recharts-layout-cost.md](home-recharts-layout-cost.md) | Recharts forced reflow / defer charts on Home |
 | [hosting-production-compression.md](hosting-production-compression.md) | Verify **gzip/Brotli** for HTML in production |
 | [lighthouse-a11y-home.md](lighthouse-a11y-home.md) | Lighthouse **axe** on **`/`** — buttons, contrast, landmark, targets |
@@ -230,7 +230,7 @@ Legacy numeric IDs for chat / PR references; prefer **ticket file name** or [mas
 21. Data fetching conventions (Query vs Supabase + effects) — [data-fetching-conventions.md](data-fetching-conventions.md)
 22. Route-level code splitting (`React.lazy` / `Suspense`) — [route-level-code-splitting.md](route-level-code-splitting.md)
 23. Service worker registration in dev (console noise) — [service-worker-registration-dev.md](service-worker-registration-dev.md)
-24. Home fetch deduplication (signed-in **`/`**) — [home-fetch-deduplication.md](home-fetch-deduplication.md)
+24. Home fetch deduplication (signed-in **`/`**) — [home-fetch-deduplication.md](home-fetch-deduplication.md) — *partial: `useProfile` `user?.id`*
 25. Form field **`name`** / **`id`** / **`autocomplete`** (a11y) — [form-field-name-id-a11y.md](form-field-name-id-a11y.md)
 26. React Router v7 **future** flags — [react-router-v7-future-flags.md](react-router-v7-future-flags.md)
 27. PWA **`mobile-web-app-capable`** meta — [pwa-mobile-web-app-meta.md](pwa-mobile-web-app-meta.md)
