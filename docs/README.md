@@ -22,6 +22,7 @@ This folder contains human-readable notes that complement the source code and in
 | Incidents, invariants, “why we hardened X” | [postmortems/](postmortems/) | |
 | What to watch when things break (cron, retries, logs) | [ops/](ops/) | [ops/observability-and-failures.md](ops/observability-and-failures.md) is the checklist index; [ops/logging-strategy.md](ops/logging-strategy.md) defines logging conventions. |
 | Step-by-step HTTP review (Postman / Bruno) | [fundamentals/http-review-playbooks.md](fundamentals/http-review-playbooks.md) | Optional [bruno/](../bruno/) folder for git-friendly collections. |
+| **UI / journeys** (click-through flows in the real app) | [backlog/e2e-browser-automation.md](backlog/e2e-browser-automation.md) | **Not** a substitute for HTTP review: use **Playwright**, **Cypress**, or **Vitest + React Testing Library** for full product flows; Bruno is for **API** review only. |
 
 When you change behavior, update the **one** doc that owns that slice (and ADRs only when the *decision* changes, not every refactor).
 
@@ -37,6 +38,7 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 - `fundamentals/mental-models-for-contributors.md` — glossary + vocabulary for SPAs, React, TypeScript, Vite, Supabase (RLS, edge functions); links to official docs and learning resources.
 - `fundamentals/codebase-size-and-review-practices.md` — codebase size snapshot and review best-practices.
 - `fundamentals/http-review-playbooks.md` — step-by-step Postman/Bruno flows, Supabase `invoke` headers, pairing with Edge logs; [bruno/](../bruno/) collection, [bruno/SCOPE.md](../bruno/SCOPE.md) (HTTP vs full app), [bruno/functions-catalog.md](../bruno/functions-catalog.md) (all Edge URLs).
+- **UI / journeys vs API review:** full app flows (pause, journal, settings) belong in browser automation — see [backlog/e2e-browser-automation.md](backlog/e2e-browser-automation.md). Bruno/Postman stay on the HTTP side; they do not replace E2E.
 
 ## Decisions (light ADRs)
 
@@ -51,6 +53,7 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 ## Backlog
 
 - `backlog/backlog.md` — pending improvements; **work queue (pick by goal)**, master table, quick finder by theme, alphabetical index. Individual tickets under `backlog/*.md`.
+- `backlog/e2e-browser-automation.md` — **UI / journeys** (click-through pause, journal, settings): Playwright/Cypress or Vitest+RTL — not Bruno; see [bruno/SCOPE.md](../bruno/SCOPE.md) for HTTP vs full app.
 
 ## Reviews
 
