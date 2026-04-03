@@ -231,7 +231,12 @@ const Home = () => {
   }, []);
 
   const handleNeedAPause = () => {
-    if (manualCooldownRemaining() > 0) return;
+    const remaining = manualCooldownRemaining();
+    if (remaining > 0) {
+      console.info('[holzen:home]', 'Need a moment: ignored (cooldown)', { remainingMs: remaining });
+      return;
+    }
+    console.info('[holzen:home]', 'Need a moment: invoking manualTrigger');
     manualTrigger();
   };
 
@@ -516,16 +521,28 @@ const Home = () => {
                         )}
                       </div>
                       <button
-                        onClick={() => navigate('/pause', {
-                          state: {
+                        onClick={() => {
+                          const navState = {
                             reflectionMessage: message,
                             context,
                             reflectionId: lastReflectionId,
                             companions,
                             companionPrefs,
                             severity,
-                          },
-                        })}
+                          };
+                          console.info('[holzen:home]', 'Navigate to /pause (pause with this message)', {
+                            reflectionId: lastReflectionId,
+                            severity,
+                            messageLen: message?.length ?? 0,
+                            hasContext: !!context,
+                            companionKeys: companions
+                              ? Object.entries(companions)
+                                  .filter(([, v]) => v != null)
+                                  .map(([k]) => k)
+                              : [],
+                          });
+                          navigate('/pause', { state: navState });
+                        }}
                         className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors"
                       >
                         <Sparkles className="h-3 w-3 text-primary/60" />
@@ -565,7 +582,15 @@ const Home = () => {
                               ? t('home.errors.aiTemporarilyUnavailable')
                               : t('home.errors.unexpectedError')}
                           </p>
-                          <button onClick={() => manualTrigger()} className="text-xs font-mono text-primary underline">{t('common.tryAgain')}</button>
+                          <button
+                            onClick={() => {
+                              console.info('[holzen:home]', 'Try again: manualTrigger');
+                              manualTrigger();
+                            }}
+                            className="text-xs font-mono text-primary underline"
+                          >
+                            {t('common.tryAgain')}
+                          </button>
                         </div>
                       ) : (
                         <div className="space-y-6">

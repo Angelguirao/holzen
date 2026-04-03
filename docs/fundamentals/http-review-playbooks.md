@@ -2,6 +2,8 @@
 
 Use a **step-by-step HTTP client** when you want to **review or debug multi-call flows** (auth → edge function → follow-up) with a clear trail: request order, headers, bodies, status codes, and rough timing. That complements **markdown review docs** (`docs/reviews/`) and **server-side logs** (Supabase Dashboard → Edge Functions → Logs).
 
+For **live SPA** inspection (network, console, Lighthouse, performance traces) via **Chrome DevTools MCP**, see **[browser-360-mcp-playbook.md](browser-360-mcp-playbook.md)** — it does **not** replace HTTP clients or E2E tests.
+
 ## When this helps
 
 - Tracing **401/403** on `invoke` (wrong `Authorization`, missing `apikey`, or function not listed in `supabase/config.toml` — see [AGENTS.md](../../AGENTS.md)).
