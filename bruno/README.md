@@ -34,6 +34,8 @@ Collection root for [Bruno](https://www.usebruno.com/) (`.bru` files). See **[SC
 | **`service-cron/`** | **Service role** (`SUPABASE_SERVICE_ROLE_KEY`) | Cron-style workers: `check-followups`, `check-volatility`, `weekly-digest`, `monthly-report`, `night-reflection`, `personalized-nudge`, `deliver-letters`, `pregenerate-companions`, `fetch-source-feeds`, `refresh-btc-prices` |
 | **`auth-hook/`** | **`LOVABLE_API_KEY`** | `auth-email-hook-preview` only (HTML preview). The real webhook is signed — not in Bruno. |
 
+**Why this layout:** Folders are grouped by **credentials and risk**, not only by product name. That makes it obvious which **`Authorization`** value each request needs (user JWT vs service role vs Lovable key) and keeps high-blast-radius calls (**`service-cron/`**, destructive user actions) from looking like normal client API calls. **`pause-pipeline/`** stays separate as the main manual review slice for pause + companions. A domain-only layout (e.g. all “journal” endpoints in one place) would read nicely but mixes auth modes — fine as a future refactor if you prefer that mental model.
+
 **`delete-account-DANGEROUS`** deletes the signed-in user — use a throwaway test account only.
 
 ## Typical flows
