@@ -1,6 +1,6 @@
 # Bruno — Holzen HTTP review
 
-Collection root for [Bruno](https://www.usebruno.com/) (`.bru` files). See **[SCOPE.md](SCOPE.md)** for what Bruno can and cannot cover (HTTP vs the whole React app), and **[functions-catalog.md](functions-catalog.md)** for every Edge Function URL.
+Collection root for [Bruno](https://www.usebruno.com/) (`.bru` files). See **[SCOPE.md](SCOPE.md)** for HTTP vs the React app, and **[functions-catalog.md](functions-catalog.md)** for every Edge Function URL.
 
 [docs/fundamentals/http-review-playbooks.md](../docs/fundamentals/http-review-playbooks.md) explains when to use Bruno vs tests vs the SPA.
 
@@ -8,54 +8,46 @@ Collection root for [Bruno](https://www.usebruno.com/) (`.bru` files). See **[SC
 
 1. **Install Bruno** (desktop app) from [usebruno.com](https://www.usebruno.com/).
 2. **Open this folder as a collection:** File → Open Collection → choose folder `holzen/bruno` (the directory that contains `bruno.json`).
-3. **Create your local environment**
-   - Copy `environments/local.bru.example` to **`environments/local.bru`** (same folder).
-   - Edit `local.bru`:
-     - **`VITE_SUPABASE_URL`** — from `.env` / `.env.localstack.local` / `.env.hosted.local` (e.g. `http://127.0.0.1:54321`). **No trailing slash.**
-     - **`VITE_SUPABASE_PUBLISHABLE_KEY`** — anon key (local: `npm run supabase:status`).
-     - **`AUTH_EMAIL`** / **`AUTH_PASSWORD`** — used by sign-up and sign-in (pick a **dedicated test** email; do not commit real passwords — `local.bru` is gitignored).
+3. Copy **`environments/local.bru.example`** → **`environments/local.bru`** and fill:
+
+| Variable | Purpose |
+|----------|---------|
+| **`VITE_SUPABASE_URL`** | Same as Vite (e.g. `http://127.0.0.1:54321`). No trailing slash. |
+| **`VITE_SUPABASE_PUBLISHABLE_KEY`** | Anon key (`npm run supabase:status` for local). |
+| **`AUTH_EMAIL`** / **`AUTH_PASSWORD`** | Test user for sign-up / sign-in. |
+| **`SUPABASE_SERVICE_ROLE_KEY`** | For **`service-cron/`** requests only — Dashboard → **Settings → API** (never commit). |
+| **`LOVABLE_API_KEY`** | Optional — for **`auth-hook/auth-email-hook-preview`** only. |
+
+**After auth:** `auth/00` and `auth/01` set **`SUPABASE_ACCESS_TOKEN`** and **`AUTH_USER_ID`** when the Auth API returns a `user` object. If you paste a JWT manually, add **`AUTH_USER_ID`** in Bruno for **`user-jwt/reflection-insights`**.
+
 4. Select the **local** environment in Bruno’s toolbar.
 
-## Greenfield: no users yet
+## Folder layout (every Edge Function)
 
-1. Run **`auth/00-sign-up-password`** once. If the project returns a session (typical for local with confirmation off), **`SUPABASE_ACCESS_TOKEN`** is set for this Bruno session.
-2. If sign-up returns **no session** (email confirmation), confirm the user in **Supabase Studio → Authentication** or adjust Auth settings for local dev, then run **`auth/01-sign-in-password`**.
-3. If the user **already exists**, sign-up may fail — run **`auth/01-sign-in-password`** only.
+| Folder | Auth | Contents |
+|--------|------|----------|
+| **`auth/`** | Sign-up / sign-in | `00-sign-up-password`, `01-sign-in-password` |
+| **`public/`** | Anon `apikey` only | `holzen-number` (RPC; no user JWT) |
+| **`pause-pipeline/`** | User JWT | `holzen-reflect`, `companion-orchestrate` |
+| **`billing/`** | User JWT | Stripe Checkout, subscription check, portal |
+| **`user-jwt/`** | User JWT | `badge-notify`, `suggest-grounding`, `suggest-ritual`, `journal-prompt`, `reflection-insights`, `register-push`, `send-feedback`, `generate-wallpaper`, `record-referral`, **`delete-account-DANGEROUS`** |
+| **`service-cron/`** | **Service role** (`SUPABASE_SERVICE_ROLE_KEY`) | Cron-style workers: `check-followups`, `check-volatility`, `weekly-digest`, `monthly-report`, `night-reflection`, `personalized-nudge`, `deliver-letters`, `pregenerate-companions`, `fetch-source-feeds`, `refresh-btc-prices` |
+| **`auth-hook/`** | **`LOVABLE_API_KEY`** | `auth-email-hook-preview` only (HTML preview). The real webhook is signed — not in Bruno. |
 
-## Returning users
+**`delete-account-DANGEROUS`** deletes the signed-in user — use a throwaway test account only.
 
-Run **`auth/01-sign-in-password`** when the token expires or you open a new Bruno session (or paste a JWT into the environment as **`SUPABASE_ACCESS_TOKEN`**).
+## Typical flows
 
-**Limits:** Email/password only. Magic link, OAuth, or MFA need a pasted token or a different flow. See [SCOPE.md](SCOPE.md).
-
-## Pause pipeline (after auth)
-
-| Request | Purpose |
-|---------|---------|
-| `pause-pipeline/01-holzen-reflect` | POST reflection; minimal `context`. |
-| `pause-pipeline/02-companion-orchestrate` | Companion orchestrator; add `reflectionId` for full intervention checks. |
-
-## Billing / Stripe (after auth)
-
-| Request | Purpose |
-|---------|---------|
-| `billing/01-create-checkout` | Stripe Checkout session URL (`STRIPE_SECRET_KEY` on the project). |
-| `billing/02-check-subscription` | Cached subscription check; use `"force": true` in JSON to refresh from Stripe. |
-| `billing/03-customer-portal` | Billing Portal URL (needs existing Stripe customer). |
-
-Details: [billing/README.md](billing/README.md).
+1. **User flows:** `auth/01` → any of `pause-pipeline/`, `billing/`, `user-jwt/` (skip `delete-account` unless intentional).
+2. **Cron / batch:** fill **`SUPABASE_SERVICE_ROLE_KEY`**, then run requests under **`service-cron/`** (can hit external APIs and send emails — use staging/local first).
+3. **Email template preview:** set **`LOVABLE_API_KEY`**, run **`auth-hook/auth-email-hook-preview`**.
 
 ## Running a review
 
-1. **`auth/00`** (optional) → **`auth/01`** → **`pause-pipeline/01`** → **`02`**, and/or **`billing/01`** → **`02`** → **`03`**.
-2. **Edge logs:** Supabase Dashboard → Edge Functions → match timestamps / JSON **`cid`** ([logging strategy](../docs/ops/logging-strategy.md)).
-3. **401:** Re-run **`01`** or fix `VITE_*` / `AUTH_*`.
+- **Edge logs:** Supabase Dashboard → Edge Functions → match timestamps / JSON **`cid`** ([logging strategy](../docs/ops/logging-strategy.md)).
+- **401 on user calls:** Re-run **`auth/01`** or fix `VITE_*` / `AUTH_*`.
+- **401 on service-cron:** Service role or `CRON_SECRET` must match what the function expects ([`verifyServiceAuth`](../supabase/functions/_shared/auth.ts)).
 
 ## “Full app” coverage
 
-Bruno cannot mirror **every screen** — only **HTTP APIs**. The catalog lists **all** Edge Function paths; add `.bru` files per feature as you need them (duplicate headers from `pause-pipeline/` and bodies from `supabase/functions/<name>/index.ts`).
-
-## Adding requests
-
-- One folder per theme (`billing/`, …).
-- Duplicate an existing `.bru`, set `url` and `body` from the function source.
+Bruno covers **all HTTP Edge Functions** in this repo with at least one `.bru` per function (except the signed webhook body for `auth-email-hook`). It does **not** cover React UI — see [docs/backlog/e2e-browser-automation.md](../docs/backlog/e2e-browser-automation.md).

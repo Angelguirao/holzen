@@ -1,0 +1,16 @@
+meta {
+  name: fetch-source-feeds
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{VITE_SUPABASE_URL}}/functions/v1/fetch-source-feeds
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{SUPABASE_SERVICE_ROLE_KEY}}
+  apikey: {{VITE_SUPABASE_PUBLISHABLE_KEY}}
+}
