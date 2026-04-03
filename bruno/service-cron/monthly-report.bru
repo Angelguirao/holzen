@@ -1,0 +1,16 @@
+meta {
+  name: monthly-report
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{VITE_SUPABASE_URL}}/functions/v1/monthly-report
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{SUPABASE_SERVICE_ROLE_KEY}}
+  apikey: {{VITE_SUPABASE_PUBLISHABLE_KEY}}
+}

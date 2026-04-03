@@ -1,0 +1,23 @@
+meta {
+  name: suggest-ritual
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{VITE_SUPABASE_URL}}/functions/v1/suggest-ritual
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{SUPABASE_ACCESS_TOKEN}}
+  apikey: {{VITE_SUPABASE_PUBLISHABLE_KEY}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "reflectionMessage": "Bruno smoke test — feeling steady."
+  }
+}

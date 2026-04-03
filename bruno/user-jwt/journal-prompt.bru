@@ -1,0 +1,23 @@
+meta {
+  name: journal-prompt
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{VITE_SUPABASE_URL}}/functions/v1/journal-prompt
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{SUPABASE_ACCESS_TOKEN}}
+  apikey: {{VITE_SUPABASE_PUBLISHABLE_KEY}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "language": "en"
+  }
+}

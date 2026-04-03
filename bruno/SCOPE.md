@@ -21,10 +21,9 @@ So **“whole app” in Bruno** means: **document and exercise every HTTP API yo
 3. If sign-up returns **no session** (e.g. confirmation required), confirm the user in **Supabase Studio → Authentication** or run **`auth/01-sign-in-password`** after the user exists.
 4. If the user **already exists**, sign-up may error — **skip to `01-sign-in-password`** only.
 
-### Growing the collection
+### Collection layout
 
-- Add folders by **feature** (`billing/`, `stripe/`, …) and duplicate the pause-pipeline pattern: `Authorization` + `apikey` + JSON body from `supabase/functions/<name>/index.ts`.
-- See **[functions-catalog.md](functions-catalog.md)** for every deployed function name and URL pattern. Bodies are **not** duplicated here — read each function’s `index.ts` (or add `.bru` stubs as you need them).
+The repo **`bruno/`** folder includes a **`.bru` request for every Edge Function** (see **[functions-catalog.md](functions-catalog.md)**): `auth/`, `public/`, `pause-pipeline/`, `billing/`, `user-jwt/`, `service-cron/`, `auth-hook/` (preview only). Adjust JSON bodies per `supabase/functions/<name>/index.ts` when you need stricter tests.
 
 ### When you need more than Bruno
 

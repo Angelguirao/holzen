@@ -1,0 +1,25 @@
+meta {
+  name: generate-wallpaper
+  type: http
+  seq: 8
+}
+
+post {
+  url: {{VITE_SUPABASE_URL}}/functions/v1/generate-wallpaper
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{SUPABASE_ACCESS_TOKEN}}
+  apikey: {{VITE_SUPABASE_PUBLISHABLE_KEY}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "message": "Staying calm and observing the market without reacting.",
+    "mood": "calm",
+    "context": "Bruno API review"
+  }
+}
