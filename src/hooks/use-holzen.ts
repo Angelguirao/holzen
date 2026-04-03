@@ -86,6 +86,11 @@ export function useHolzen() {
   // Server-side triggers (check-volatility) also pre-generate via the orchestrator.
   // This eliminates the previous triple-invocation race condition.
 
+  /**
+   * Generates a reflection and inserts a `reflections` row.
+   *
+   * **Optional `mood`:** If passed, stored on that row at insert time (e.g. silent mode or a future Home mood chip). Home’s “Need a moment” / “Try again” flows omit it: the user sets mood later on the **Feel** step in `/pause`, which updates the row — see `PauseSession.handleMoodSelect`. Automatic pauses set mood server-side (e.g. `check-volatility` + `lastReportedMood`).
+   */
   const generateMessage = useCallback(async (data: BtcPriceData, mood?: string) => {
     if (!user) {
       holzenLog.manual( 'generateMessage: skipped (no user)');
@@ -330,6 +335,7 @@ export function useHolzen() {
     return quarterMs - msIntoQuarter;
   }, []);
 
+  /** “Need a moment” / “Try again” (cooldown-gated). Optional `mood` → see `generateMessage`. */
   const manualTrigger = useCallback(async (mood?: string) => {
     const remaining = manualCooldownRemaining();
     if (remaining > 0) {
