@@ -1,6 +1,10 @@
 # Home (signed-in): dedupe redundant client fetches
 
-**Status:** backlog — measured from browser network panel after password sign-in.
+**Status:** backlog — measured from browser network panel after password sign-in. **Partial progress** on **`profiles`** (see below); **subscription** and **market** bundles still tracked here.
+
+## Progress
+
+- **`profiles` — duplicate loads from auth object identity (done):** `useProfile`’s load `useEffect` depended on `[user]`. Supabase `onAuthStateChange` passes a new `session.user` object on events such as **`TOKEN_REFRESHED`**, so React saw a new `user` reference and re-ran the effect → another full **`profiles`** `select` (and extra `[holzen:profile]` lines). **Change:** depend on **`[user?.id]`** only (`src/hooks/use-profile.ts`). Same user id → no refetch on token refresh. This does **not** complete the ticket: direction §1 (single source of truth / TanStack Query on Home) and any duplicate **`profiles`** traffic from **multiple mount trees** or **navigation** are still in scope.
 
 ## Goal
 
