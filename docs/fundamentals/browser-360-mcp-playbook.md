@@ -44,6 +44,10 @@ Optional: `take_snapshot` (a11y tree), `take_screenshot`, `evaluate_script` for 
 - **Third-party transfer totals** may aggregate many requests to the same host.
 - **Insight sets** expire when the MCP session drops; re-run a trace if `performance_analyze_insight` no longer finds `NAVIGATION_0`.
 
+## In-app console prefixes (source)
+
+The SPA emits **`[holzen:boot]`**, **`[holzen:auth]`**, **`[holzen:profile]`**, **`[holzen:router]`** from `src/lib/holzen-console.ts`, **`[holzen:manual]`** / **`[holzen:home]`** from the Holzen hook and Home page. Filter DevTools by **`holzen:`** to see boot → auth → profile → route → manual pause in order.
+
 ## Related backlog
 
 - [service-worker-registration-dev.md](../backlog/service-worker-registration-dev.md) — SW / MIME noise in dev.

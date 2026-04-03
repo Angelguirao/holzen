@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import type { User } from '@supabase/supabase-js';
+import { holzenLog } from '@/lib/holzen-console';
 
 interface AuthContextType {
   user: User | null;
@@ -20,6 +21,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+      holzenLog.auth('onAuthStateChange', {
+        event: _event,
+        hasSession: !!session,
+        userIdPrefix: session?.user?.id?.slice(0, 8) ?? null,
+      });
       setUser(session?.user ?? null);
       setLoading(false);
 
@@ -39,6 +45,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     supabase.auth.getSession().then(({ data: { session } }) => {
+      holzenLog.auth('getSession (initial)', {
+        hasSession: !!session,
+        userIdPrefix: session?.user?.id?.slice(0, 8) ?? null,
+      });
       setUser(session?.user ?? null);
       setLoading(false);
     });
