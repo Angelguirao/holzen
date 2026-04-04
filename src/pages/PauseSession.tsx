@@ -39,6 +39,20 @@ interface PersistedSession {
   step: PauseStep;
 }
 
+const DEFAULT_COMPANIONS: CompanionData = { haiku: null, groundingTitle: null, groundingBody: null };
+const DEFAULT_PREFS: CompanionPrefs = {
+  breathing: true, haiku: true, grounding: true, signal: true, zoomOut: true, history: true,
+};
+
+interface FetchedReflectionRow {
+  id: string;
+  message: string;
+  context: string | null;
+  haiku: string | null;
+  grounding_title: string | null;
+  grounding_body: string | null;
+}
+
 function saveSession(data: PersistedSession) {
   try { localStorage.setItem(SESSION_KEY, JSON.stringify(data)); } catch {}
 }
@@ -53,6 +67,30 @@ function loadSession(): PersistedSession | null {
 function clearSession() {
   try { localStorage.removeItem(SESSION_KEY); } catch {}
 }
+
+function viewRowToCompanionData(row: {
+  haiku?: string | null;
+  grounding_title?: string | null;
+  grounding_body?: string | null;
+}): CompanionData {
+  return {
+    haiku: row.haiku ?? null,
+    groundingTitle: row.grounding_title ?? null,
+    groundingBody: row.grounding_body ?? null,
+  };
+}
+
+type HydrationReady = {
+  status: 'ready';
+  message: string;
+  context: string | null;
+  reflectionId: string | null;
+  companions: CompanionData;
+  companionPrefs: CompanionPrefs;
+  severity: 'mild' | 'moderate' | 'high';
+};
+
+type HydrationState = HydrationReady | { status: 'fetch'; reflectionId: string } | { status: 'empty' };
 
 export default function PauseSession() {
   const { t } = useTranslation();
@@ -73,33 +111,163 @@ export default function PauseSession() {
   } = useHolzen();
   const { subscribed } = useSubscription();
 
-  const navState = (location.state as any) ?? {};
+  const nav = (location.state ?? {}) as Record<string, unknown>;
+  const navReflectionId = typeof nav.reflectionId === 'string' ? nav.reflectionId : null;
+  const navReflectionMessage =
+    typeof nav.reflectionMessage === 'string' ? nav.reflectionMessage.trim() : '';
+  const navContext = typeof nav.context === 'string' ? nav.context : null;
+  const navCompanions = nav.companions as CompanionData | undefined;
+  const navCompanionPrefs = nav.companionPrefs as CompanionPrefs | undefined;
+  const navSeverity = nav.severity as 'mild' | 'moderate' | 'high' | undefined;
+
   const restored = useMemo(() => {
     const saved = loadSession();
-    if (!saved) return null;
-    // If navigating with fresh state for a DIFFERENT reflection, discard saved session
-    if (navState.reflectionId && saved.reflectionId !== navState.reflectionId) return null;
-    // Otherwise prefer the saved session (user is resuming)
+    if (!saved?.message) return null;
+    if (navReflectionId && saved.reflectionId && saved.reflectionId !== navReflectionId) return null;
     return saved;
-  }, []);
+  }, [location.key, navReflectionId]);
+
+  const holzenAligned =
+    !navReflectionId || (holzenLastReflectionId != null && holzenLastReflectionId === navReflectionId);
+
+  const hydration = useMemo((): HydrationState => {
+    if (restored?.message) {
+      return {
+        status: 'ready',
+        message: restored.message,
+        context: restored.context ?? null,
+        reflectionId: restored.reflectionId ?? navReflectionId ?? holzenLastReflectionId,
+        companions: restored.companions ?? holzenCompanions ?? DEFAULT_COMPANIONS,
+        companionPrefs: restored.companionPrefs ?? holzenCompanionPrefs ?? DEFAULT_PREFS,
+        severity: restored.severity ?? holzenSeverity,
+      };
+    }
+
+    // Profile-backed hook: same reflection as router target (or no id in nav) — avoids stale nav text
+    if (holzenMessage && holzenAligned) {
+      return {
+        status: 'ready',
+        message: holzenMessage,
+        context: holzenContext,
+        reflectionId: holzenLastReflectionId,
+        companions: holzenCompanions ?? DEFAULT_COMPANIONS,
+        companionPrefs: holzenCompanionPrefs ?? DEFAULT_PREFS,
+        severity: holzenSeverity,
+      };
+    }
+
+    if (navReflectionMessage) {
+      return {
+        status: 'ready',
+        message: navReflectionMessage,
+        context: navContext ?? holzenContext,
+        reflectionId: navReflectionId ?? holzenLastReflectionId,
+        companions: navCompanions ?? holzenCompanions ?? DEFAULT_COMPANIONS,
+        companionPrefs: navCompanionPrefs ?? holzenCompanionPrefs ?? DEFAULT_PREFS,
+        severity: navSeverity ?? holzenSeverity,
+      };
+    }
+
+    if (navReflectionId) {
+      return { status: 'fetch', reflectionId: navReflectionId };
+    }
+
+    if (holzenMessage) {
+      return {
+        status: 'ready',
+        message: holzenMessage,
+        context: holzenContext,
+        reflectionId: holzenLastReflectionId,
+        companions: holzenCompanions ?? DEFAULT_COMPANIONS,
+        companionPrefs: holzenCompanionPrefs ?? DEFAULT_PREFS,
+        severity: holzenSeverity,
+      };
+    }
+
+    return { status: 'empty' };
+  }, [
+    restored,
+    holzenMessage,
+    holzenContext,
+    holzenLastReflectionId,
+    holzenCompanions,
+    holzenCompanionPrefs,
+    holzenSeverity,
+    holzenAligned,
+    navReflectionId,
+    navReflectionMessage,
+    navContext,
+    navCompanions,
+    navCompanionPrefs,
+    navSeverity,
+  ]);
+
+  const [fetchedRow, setFetchedRow] = useState<FetchedReflectionRow | null>(null);
+  const [fetchFailed, setFetchFailed] = useState(false);
+
+  const fetchReflectionId = hydration.status === 'fetch' ? hydration.reflectionId : null;
 
   useEffect(() => {
-    const rid = navState.reflectionId;
+    if (!fetchReflectionId) {
+      setFetchedRow(null);
+      setFetchFailed(false);
+      return;
+    }
+    let cancelled = false;
+    setFetchedRow(null);
+    setFetchFailed(false);
+    void (async () => {
+      const { data, error } = await supabase
+        .from('v_reflection_with_companions')
+        .select('id, message, context, haiku, grounding_title, grounding_body')
+        .eq('id', fetchReflectionId)
+        .maybeSingle();
+      if (cancelled) return;
+      if (error || !data?.message) {
+        setFetchFailed(true);
+        return;
+      }
+      setFetchedRow(data as FetchedReflectionRow);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [fetchReflectionId]);
+
+  const resolved: HydrationReady | null = useMemo(() => {
+    if (hydration.status === 'ready') return hydration;
+    if (hydration.status === 'fetch' && fetchedRow?.message) {
+      return {
+        status: 'ready',
+        message: fetchedRow.message,
+        context: fetchedRow.context ?? null,
+        reflectionId: fetchedRow.id,
+        companions: viewRowToCompanionData(fetchedRow),
+        companionPrefs: navCompanionPrefs ?? holzenCompanionPrefs ?? DEFAULT_PREFS,
+        severity: navSeverity ?? holzenSeverity,
+      };
+    }
+    return null;
+  }, [hydration, fetchedRow, navCompanionPrefs, holzenCompanionPrefs, navSeverity, holzenSeverity]);
+
+  useEffect(() => {
     holzenLog.pause('mount', {
-      navStateKeys: Object.keys(navState),
-      reflectionIdPrefix: typeof rid === 'string' ? rid.slice(0, 8) : null,
-      hasReflectionMessage: typeof navState.reflectionMessage === 'string',
+      reflectionIdPrefix: (fetchReflectionId ?? navReflectionId)?.slice(0, 8) ?? null,
+      hasNavMessage: navReflectionMessage.length > 0,
       restoredFromStorage: restored !== null,
+      hydrationStatus: hydration.status,
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- log first paint of /pause only
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- first paint of /pause only
   }, []);
 
-  const message: string = navState.reflectionMessage ?? restored?.message ?? holzenMessage ?? '';
-  const context: string | null = navState.context ?? restored?.context ?? holzenContext ?? null;
-  const reflectionId: string | null = navState.reflectionId ?? restored?.reflectionId ?? holzenLastReflectionId ?? null;
-  const companions: CompanionData = navState.companions ?? restored?.companions ?? holzenCompanions ?? { haiku: null, groundingTitle: null, groundingBody: null };
-  const companionPrefs: CompanionPrefs = navState.companionPrefs ?? restored?.companionPrefs ?? holzenCompanionPrefs ?? { breathing: true, haiku: true, grounding: true, signal: true, zoomOut: true, history: true };
-  const severity: 'mild' | 'moderate' | 'high' = navState.severity ?? restored?.severity ?? holzenSeverity ?? 'mild';
+  const message = resolved?.message ?? '';
+  const context = resolved?.context ?? null;
+  const reflectionId = resolved?.reflectionId ?? null;
+  const companions = resolved?.companions ?? DEFAULT_COMPANIONS;
+  const companionPrefs = resolved?.companionPrefs ?? DEFAULT_PREFS;
+  const severity = resolved?.severity ?? holzenSeverity;
+
+  const waitingForFetch = hydration.status === 'fetch' && !fetchFailed && !fetchedRow;
 
   // Map old step names to new ones for session restoration
   const mapStep = (s: string): PauseStep => {
@@ -128,7 +296,21 @@ export default function PauseSession() {
   useEffect(() => {
     if (!message) return;
     saveSession({ message, context, reflectionId, companions, companionPrefs, severity, moodDone, moodAfterDone, selectedMood, selectedMoodAfter, phase, decision, step });
-  }, [message, moodDone, moodAfterDone, selectedMood, selectedMoodAfter, phase, decision, step]);
+  }, [
+    message,
+    context,
+    reflectionId,
+    companions,
+    companionPrefs,
+    severity,
+    moodDone,
+    moodAfterDone,
+    selectedMood,
+    selectedMoodAfter,
+    phase,
+    decision,
+    step,
+  ]);
 
   // Cinematic entrance
   useEffect(() => {
@@ -276,9 +458,33 @@ export default function PauseSession() {
 
   // No message fallback
   if (!message && phase !== 'done') {
-    // Avoid showing the "no reflection" dead-end while `useHolzen` is still hydrating
-    // pause data from profile load (e.g. when deep-linking into `/pause` from notifications).
-    if (!profileLoaded) {
+    if (waitingForFetch) {
+      return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
+          <div className="text-center space-y-4">
+            <p className="text-sm font-mono text-muted-foreground">{t('common.loading', 'Loading...')}</p>
+          </div>
+        </div>
+      );
+    }
+
+    if (hydration.status === 'fetch' && fetchFailed) {
+      return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
+          <div className="text-center space-y-4 max-w-sm px-4">
+            <p className="text-sm font-mono text-muted-foreground">
+              {t('pause.couldNotLoadPause', 'We could not load this pause. It may have been removed or you may need to sign in again.')}
+            </p>
+            <button type="button" onClick={handleReturn} className="text-xs font-mono text-primary underline">
+              {t('pause.return')}
+            </button>
+          </div>
+        </div>
+      );
+    }
+
+    // Avoid "no reflection" while profile/hook may still supply the latest pause (direct /pause visit).
+    if (!profileLoaded && hydration.status === 'empty') {
       return (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
           <div className="text-center space-y-4">
@@ -292,7 +498,7 @@ export default function PauseSession() {
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
         <div className="text-center space-y-4">
           <p className="text-sm font-mono text-muted-foreground">{t('pause.noReflection')}</p>
-          <button onClick={handleReturn} className="text-xs font-mono text-primary underline">{t('pause.return')}</button>
+          <button type="button" onClick={handleReturn} className="text-xs font-mono text-primary underline">{t('pause.return')}</button>
         </div>
       </div>
     );
