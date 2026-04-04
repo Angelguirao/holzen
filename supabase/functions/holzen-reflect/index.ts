@@ -80,7 +80,7 @@ serve(async (req) => {
       mantra: mantra || undefined,
       groundingActivities: groundingActivities.length > 0 ? groundingActivities : undefined,
       log: (m) => log(m),
-      logAttempt: (e) => logAttempt(e as Parameters<typeof logAttempt>[0]),
+      logAttempt: (e) => logAttempt(e as unknown as Parameters<typeof logAttempt>[0]),
     });
 
     if (!result?.message) {
