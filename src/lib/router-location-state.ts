@@ -105,7 +105,7 @@ export function parseGroundLocationState(state: unknown): GroundLocationState {
   const p = pg as Record<string, unknown>;
   if (typeof p.activity !== 'string' || typeof p.suggestion !== 'string') return {};
   const duration = typeof p.duration === 'number' && Number.isFinite(p.duration) ? p.duration : 10;
-  const insight = p.insight === null || typeof p.insight === 'string' ? p.insight : null;
+  const insight: string | null = p.insight === null || typeof p.insight === 'string' ? p.insight : null;
   let article: GroundPreGenerated['article'] = null;
   if (p.article === null) article = null;
   else if (isGroundArticle(p.article)) article = p.article;
