@@ -312,8 +312,11 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
             <div className="space-y-1.5">
               <div className="flex items-center gap-2">
                 <Input
+                  id="hold-goal-target"
+                  name="hold-goal-target"
                   type={goalType === 'price' ? 'text' : 'number'}
                   inputMode={goalType === 'price' ? 'decimal' : 'numeric'}
+                  autoComplete="off"
                   value={inputValue}
                   onChange={(e) => handleInputChange(e.target.value)}
                   placeholder={

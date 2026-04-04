@@ -1,5 +1,6 @@
 import { useTranslation } from 'react-i18next';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { motion } from 'framer-motion';
 
 interface Props {
@@ -31,8 +32,13 @@ export function OnboardingWelcome({ firstName, onFirstNameChange, timezone, stag
 
       <motion.div className="space-y-4" {...stagger(0.3)}>
         <div className="space-y-2">
-          <p className="text-xs font-mono text-muted-foreground">{t('onboarding.whatToCallYou')}</p>
+          <Label htmlFor="onboarding-first-name" className="text-xs font-mono text-muted-foreground">
+            {t('onboarding.whatToCallYou')}
+          </Label>
           <Input
+            id="onboarding-first-name"
+            name="given-name"
+            autoComplete="given-name"
             value={firstName}
             onChange={(e) => onFirstNameChange(e.target.value)}
             placeholder={t('onboarding.firstNameOptional')}
