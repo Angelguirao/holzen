@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -124,14 +125,14 @@ Be observational, not prescriptive. No advice, no exclamation marks. Calm and gr
     });
 
     if (!response.ok) {
-      console.error(`[DIGEST] AI insight error: ${response.status}`);
+      holzenEdgeError("weekly-digest", `AI insight HTTP ${response.status}`);
       return null;
     }
 
     const data = await response.json();
     return data.choices?.[0]?.message?.content?.trim() || null;
   } catch (e) {
-    console.error("[DIGEST] AI insight failed:", e);
+    holzenEdgeError("weekly-digest", "AI insight failed", e);
     return null;
   }
 }
@@ -141,16 +142,17 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Auth: require service role key or cron secret
-  const { verifyServiceAuth } = await import("../_shared/auth.ts");
-  if (!verifyServiceAuth(req)) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), {
-      status: 401,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  }
-
   try {
+    holzenEdgeRun("weekly-digest", "request", { method: req.method });
+    const { verifyServiceAuth } = await import("../_shared/auth.ts");
+    if (!verifyServiceAuth(req)) {
+      holzenEdgeRun("weekly-digest", "auth rejected");
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    holzenEdgeRun("weekly-digest", "auth ok");
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
@@ -173,7 +175,7 @@ serve(async (req) => {
     const eligible = (profiles ?? []).filter(
       (p) => p.email_notifications && shouldSendDigest(p.digest_frequency ?? "weekly", now)
     );
-    console.log(`[DIGEST] ${eligible.length} users eligible`);
+    holzenEdgeLog("weekly-digest", "eligible users", { count: eligible.length });
 
     let sent = 0;
     const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
@@ -305,23 +307,23 @@ serve(async (req) => {
 
         if (!res.ok) {
           const errText = await res.text();
-          console.error(`[DIGEST] Resend error [${res.status}]: ${errText}`);
+          holzenEdgeError("weekly-digest", `Resend HTTP ${res.status}`, errText.slice(0, 200));
           continue;
         }
         await res.json();
         sent++;
       } catch (e) {
-        console.error(`[DIGEST] Send error for ${email}:`, e);
+        holzenEdgeError("weekly-digest", "send error", { emailDomain: email.includes("@") ? email.split("@")[1] : "?", err: e });
       }
     }
 
-    console.log(`[DIGEST] Sent ${sent} digest emails`);
+    holzenEdgeLog("weekly-digest", "run complete", { sent });
     return new Response(JSON.stringify({ sent }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    console.error("[DIGEST] Error:", msg);
+    holzenEdgeError("weekly-digest", "uncaught error", msg);
     return new Response(JSON.stringify({ error: msg }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

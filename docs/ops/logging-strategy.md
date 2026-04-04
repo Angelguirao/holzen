@@ -4,7 +4,7 @@ Holzen already uses **three complementary channels**. The strategy is to **keep 
 
 ## 1. Edge Functions (Deno) — **structured console + DB**
 
-**Implementation:** [`supabase/functions/_shared/observe.ts`](../../supabase/functions/_shared/observe.ts)
+**Implementation:** [`supabase/functions/_shared/observe.ts`](../../supabase/functions/_shared/observe.ts) for structured JSON + DB; **[`holzen-edge-log.ts`](../../supabase/functions/_shared/holzen-edge-log.ts)** for cron/worker lines grep-able as **`[holzen:<tag>]`** in Supabase Edge logs (`holzenEdgeRun` always; `holzenEdgeLog` / `Warn` gated by `HOLZEN_EDGE_LOG`; `holzenEdgeError` always).
 
 | Mechanism | Purpose | When to use |
 |-----------|---------|-------------|

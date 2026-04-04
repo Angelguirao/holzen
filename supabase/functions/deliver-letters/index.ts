@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 import webpush from "npm:web-push@3.6.7";
+import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -23,16 +24,17 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Auth: require service role key or cron secret
-  const { verifyServiceAuth } = await import("../_shared/auth.ts");
-  if (!verifyServiceAuth(req)) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), {
-      status: 401,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  }
-
   try {
+    holzenEdgeRun("deliver-letters", "request", { method: req.method });
+    const { verifyServiceAuth } = await import("../_shared/auth.ts");
+    if (!verifyServiceAuth(req)) {
+      holzenEdgeRun("deliver-letters", "auth rejected");
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    holzenEdgeRun("deliver-letters", "auth ok");
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
@@ -56,7 +58,7 @@ serve(async (req) => {
     const isSurge = changePercent > 0;
 
     if (changePercent === 0) {
-      console.log(`[DELIVER-LETTERS] Flat market, skipping`);
+      holzenEdgeLog("deliver-letters", "run complete", { delivered: 0, condition: "neutral" });
       return new Response(JSON.stringify({ delivered: 0, condition: "neutral" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -64,7 +66,7 @@ serve(async (req) => {
 
     const currentCondition = isCrash ? "crash" : "surge";
     const absChange = Math.abs(changePercent);
-    console.log(`[DELIVER-LETTERS] Market: ${currentCondition} ${absChange.toFixed(1)}%`);
+    holzenEdgeLog("deliver-letters", "market context", { condition: currentCondition, absChange: Number(absChange.toFixed(1)) });
 
     // 2. Find letters waiting for this condition
     const { data: letters, error: lettersError } = await supabase
@@ -75,7 +77,7 @@ serve(async (req) => {
 
     if (lettersError) throw lettersError;
     if (!letters || letters.length === 0) {
-      console.log("[DELIVER-LETTERS] No letters to deliver");
+      holzenEdgeLog("deliver-letters", "run complete", { delivered: 0, reason: "no_letters" });
       return new Response(JSON.stringify({ delivered: 0 }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -90,7 +92,7 @@ serve(async (req) => {
 
       // Only deliver if the current change magnitude meets the letter's threshold
       if (absChange < letterThreshold) {
-        console.log(`[DELIVER-LETTERS] Skipping letter ${letter.id}: needs ${letterThreshold}%, current ${absChange.toFixed(1)}%`);
+        holzenEdgeLog("deliver-letters", "skip letter — below threshold", { letterIdPrefix: String(letter.id).slice(0, 8), letterThreshold, currentAbs: Number(absChange.toFixed(1)) });
         continue;
       }
 
@@ -192,7 +194,7 @@ serve(async (req) => {
               }
             }
           } catch (vapidErr) {
-            console.error("[PUSH] VAPID setup error:", vapidErr);
+            holzenEdgeError("deliver-letters", "push VAPID setup error", vapidErr);
           }
         }
       }
@@ -200,13 +202,13 @@ serve(async (req) => {
       delivered++;
     }
 
-    console.log(`[DELIVER-LETTERS] Delivered ${delivered} letters`);
+    holzenEdgeLog("deliver-letters", "run complete", { delivered, condition: currentCondition });
     return new Response(JSON.stringify({ delivered, condition: currentCondition }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    console.error("[DELIVER-LETTERS] Error:", msg);
+    holzenEdgeError("deliver-letters", "uncaught error", msg);
     return new Response(JSON.stringify({ error: msg }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

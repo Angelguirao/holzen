@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createAttemptLogger } from "../_shared/observe.ts";
 import { callPerplexityChat } from "../_shared/perplexity-client.ts";
+import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -64,18 +65,19 @@ serve(async (req) => {
   }
 
   const t0 = Date.now();
-  const log = (msg: string) => console.log(`[pregenerate] ${msg} (+${Date.now() - t0}ms)`);
+  const hzLog = (msg: string) => holzenEdgeLog("pregenerate", msg, { ms: Date.now() - t0 });
 
   try {
+    holzenEdgeRun("pregenerate", "request", { method: req.method });
     const { verifyServiceAuth } = await import("../_shared/auth.ts");
     if (!verifyServiceAuth(req)) {
-      log("unauthorized: missing or invalid credentials");
+      holzenEdgeRun("pregenerate", "auth rejected");
       return new Response(JSON.stringify({ error: "Unauthorized. Requires service role or CRON_SECRET." }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    log("auth verified");
+    holzenEdgeRun("pregenerate", "auth ok");
 
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 
@@ -140,7 +142,7 @@ serve(async (req) => {
       .select("id");
     if (expired && expired.length > 0) results.push(`Expired ${expired.length} stale medium-quality entries`);
 
-    log(`Cache lifecycle done`);
+    hzLog("Cache lifecycle done");
 
     // ═══════════════════════════════════════════
     // STEP 2: Generate Grounding (2 entries)
@@ -573,12 +575,12 @@ serve(async (req) => {
       results.push(`Feedback processing error: ${e}`);
     }
 
-    log(`All done. Results: ${results.length} items`);
+    holzenEdgeLog("pregenerate", "run complete", { ms: Date.now() - t0, resultLines: results.length });
     return new Response(JSON.stringify({ success: true, results }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
-    console.error("pregenerate-companions error:", e);
+    holzenEdgeError("pregenerate", "uncaught error", e);
     return new Response(
       JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }

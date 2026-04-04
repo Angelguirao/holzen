@@ -54,7 +54,7 @@ The SPA can emit **`[holzen:boot]`**, **`[holzen:auth]`**, **`[holzen:profile]`*
 
 **Query cache:** TanStack Query tracing uses the same gate (`holzen:debug` in prod; always on in dev).
 
-**Edge (`check-volatility` and future crons):** Supabase logs use **`[holzen:volatility]`**, **`[holzen:volatility-email]`**, **`[holzen:volatility-push]`** via `supabase/functions/_shared/holzen-edge-log.ts`. Filter **`holzen:`** in Edge Function logs. **`holzenEdgeRun`** lines (request + auth) always print; other traces honor **`HOLZEN_EDGE_LOG=0`** to reduce noise. **Errors always log.**
+**Edge (cron / workers):** `supabase/functions/_shared/holzen-edge-log.ts` emits **`[holzen:<tag>]`** — e.g. **`volatility`**, **`volatility-email`**, **`volatility-push`**, **`refresh-btc`**, **`fetch-feeds`**, **`pregenerate`**, **`followups`**, **`night-reflection`**, **`weekly-digest`**, **`monthly-report`**, **`personalized-nudge`**, **`deliver-letters`**, **`reflection-insights`**. Filter **`holzen:`** in Edge Function logs. **`holzenEdgeRun`** (request + auth) always prints; **`holzenEdgeLog` / `holzenEdgeWarn`** honor **`HOLZEN_EDGE_LOG=0`**; **`holzenEdgeError`** always prints.
 
 ## Related backlog
 

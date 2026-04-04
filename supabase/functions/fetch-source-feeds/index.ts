@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "npm:@supabase/supabase-js@2.57.2";
 import { createAttemptLogger } from "../_shared/observe.ts";
 import { callPerplexityChat, type PerplexityUsage } from "../_shared/perplexity-client.ts";
+import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -118,13 +119,16 @@ serve(async (req) => {
   }
 
   const t0 = Date.now();
-  const log = (msg: string) => console.log(JSON.stringify({ ts: new Date().toISOString(), fn: "fetch-source-feeds", msg, elapsed_ms: Date.now() - t0 }));
+  const hzLog = (msg: string) => holzenEdgeLog("fetch-feeds", msg, { ms: Date.now() - t0 });
 
   try {
+    holzenEdgeRun("fetch-feeds", "request", { method: req.method });
     const { verifyServiceAuth } = await import("../_shared/auth.ts");
     if (!verifyServiceAuth(req)) {
+      holzenEdgeRun("fetch-feeds", "auth rejected");
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
+    holzenEdgeRun("fetch-feeds", "auth ok");
 
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
     const supabase = createClient(Deno.env.get("SUPABASE_URL") ?? "", serviceRoleKey, { auth: { persistSession: false } });
@@ -135,14 +139,16 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
     if (!LOVABLE_API_KEY) {
+      holzenEdgeError("fetch-feeds", "Missing LOVABLE_API_KEY");
       return new Response(JSON.stringify({ error: "Missing LOVABLE_API_KEY" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
     if (!FIRECRAWL_API_KEY && !PERPLEXITY_API_KEY) {
+      holzenEdgeError("fetch-feeds", "Need FIRECRAWL_API_KEY or PERPLEXITY_API_KEY");
       return new Response(JSON.stringify({ error: "Need either FIRECRAWL_API_KEY or PERPLEXITY_API_KEY" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
     const scrapeMode = FIRECRAWL_API_KEY ? "firecrawl" : "perplexity";
-    log(`scrape mode: ${scrapeMode}`);
+    hzLog(`scrape mode: ${scrapeMode}`);
 
     // Fetch all active sources with URLs
     const { data: sources } = await supabase
@@ -152,7 +158,7 @@ serve(async (req) => {
       .eq("demoted_for_live", false);
 
     if (!sources || sources.length === 0) {
-      log("no sources with URLs");
+      hzLog("no sources with URLs");
       return new Response(JSON.stringify({ fetched: 0, mode: scrapeMode }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
@@ -165,7 +171,7 @@ serve(async (req) => {
     for (const source of toProcess) {
       try {
         if (!source.url) continue;
-        log(`processing: ${source.name} (${source.url})`);
+        hzLog(`processing: ${source.name} (${source.url})`);
 
         const contentType = source.category === "signal" ? "essay" : "paper";
         let scrapedContent: string | null = null;
@@ -173,7 +179,7 @@ serve(async (req) => {
 
         // ── Step 1: Scrape content ──
         if (scrapeMode === "firecrawl") {
-          scrapedContent = await scrapeWithFirecrawl(source.url, FIRECRAWL_API_KEY!, log);
+          scrapedContent = await scrapeWithFirecrawl(source.url, FIRECRAWL_API_KEY!, hzLog);
           if (scrapedContent) {
             citations = [source.url]; // Firecrawl source is the URL itself
           }
@@ -181,7 +187,7 @@ serve(async (req) => {
 
         // Fallback to Perplexity if Firecrawl failed or not configured
         if (!scrapedContent && PERPLEXITY_API_KEY) {
-          const searchResult = await searchWithPerplexity(source.name, source.url, source.category, PERPLEXITY_API_KEY, log);
+          const searchResult = await searchWithPerplexity(source.name, source.url, source.category, PERPLEXITY_API_KEY, hzLog);
           if (searchResult) {
             scrapedContent = searchResult.content;
             citations = searchResult.citations;
@@ -291,12 +297,12 @@ serve(async (req) => {
       }
     }
 
-    log(`done: fetched ${fetched} from ${toProcess.length} sources via ${scrapeMode}`);
+    holzenEdgeLog("fetch-feeds", "run complete", { ms: Date.now() - t0, fetched, sourcesTried: toProcess.length, mode: scrapeMode });
     return new Response(JSON.stringify({ fetched, mode: scrapeMode, results }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
-    log(`error: ${e}`);
+    holzenEdgeError("fetch-feeds", "uncaught error", e);
     return new Response(JSON.stringify({ error: String(e) }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

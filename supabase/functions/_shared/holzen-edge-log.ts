@@ -6,7 +6,21 @@
  * - **Errors:** always emitted (so failures are never silent).
  */
 
-export type HolzenEdgeTag = "volatility" | "volatility-email" | "volatility-push";
+/** One tag per Edge surface — filter Supabase logs with `holzen:`. */
+export type HolzenEdgeTag =
+  | "volatility"
+  | "volatility-email"
+  | "volatility-push"
+  | "refresh-btc"
+  | "fetch-feeds"
+  | "pregenerate"
+  | "followups"
+  | "night-reflection"
+  | "weekly-digest"
+  | "monthly-report"
+  | "personalized-nudge"
+  | "deliver-letters"
+  | "reflection-insights";
 
 function tracesEnabled(): boolean {
   return Deno.env.get("HOLZEN_EDGE_LOG") !== "0";
