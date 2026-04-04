@@ -23,9 +23,9 @@ Do **not** use the **anon** / publishable key as `SERVICE_CRON_BEARER` — these
 
 Those workers used copy-pasted checks instead of **`verifyServiceAuth`**; they are aligned now.
 
-We **do not** accept **`x-supabase-cron: true`** without a valid Bearer on these functions. Edge URLs are public, so that header is **not** authentication — anyone could send it. Cron and Bruno should use **`Authorization: Bearer …`** with the service role JWT or **`CRON_SECRET`** ([`verifyServiceAuth`](../../supabase/functions/_shared/auth.ts)).
+We **do not** accept **`x-supabase-cron: true`** without a valid Bearer on worker endpoints. Edge URLs are public, so that header is **not** authentication. Cron and Bruno should use **`Authorization: Bearer …`** with the service role JWT or **`CRON_SECRET`** ([`verifyServiceAuth`](../../supabase/functions/_shared/auth.ts)).
 
-**(Exception elsewhere:** **`reflection-insights`** batch mode still documents its own cron paths in that function’s source — not the same as `service-cron/` smoke tests.)
+**`reflection-insights`** batch mode (no `user_id` in body) uses the same **`verifyServiceAuth`** — call it from cron/Bruno with **`SERVICE_CRON_BEARER`**, not `x-supabase-cron`.
 
 ## Files
 

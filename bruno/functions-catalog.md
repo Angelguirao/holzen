@@ -26,7 +26,7 @@ Base URL: **`{{VITE_SUPABASE_URL}}/functions/v1/<name>`**
 | personalized-nudge | `service-cron/` | `SERVICE_CRON_BEARER` |
 | pregenerate-companions | `service-cron/` | `SERVICE_CRON_BEARER` |
 | record-referral | `user-jwt/` | User JWT |
-| reflection-insights | `user-jwt/` | User JWT (+ `user_id` in body) or batch via service/cron in code |
+| reflection-insights | `user-jwt/` | User JWT + `user_id` in body, **or** batch (no `user_id`) with `SERVICE_CRON_BEARER` / `verifyServiceAuth` |
 | refresh-btc-prices | `service-cron/` | `SERVICE_CRON_BEARER` |
 | register-push | `user-jwt/` | User JWT |
 | send-feedback | `user-jwt/` | User JWT |
