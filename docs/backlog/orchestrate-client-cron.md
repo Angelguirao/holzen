@@ -4,30 +4,37 @@
 
 The manual pause path calls `companion-orchestrate` from the client (`use-companion-data`). **`check-volatility`** also POSTs the same function with service role + `userId` (fire-and-forget). Both can target the same `reflectionId` around the same time → possible duplicate work and races.
 
-## Shipped (2026-04) — measure
+## Shipped (2026-04) — measure + skip-if-served
+
+### Invoke logging
 
 **Structured invoke log** on every `companion-orchestrate` entry (full + regenerate paths):
 
 - Grep Edge logs for **`orchestrate_invoke`** or **`"holzen_event":"orchestrate_invoke"`**.
-- Fields: **`invoke_source`** (caller-supplied), **`auth_mode`** (`user_jwt` | `service_role`), **`reflection_prefix`** (first 8 chars of `reflectionId`), **`regenerate_only`** (slot or `null`).
+- Fields: **`invoke_source`** (caller-supplied **`holzenInvokeSource`**), **`auth_mode`**, **`reflection_prefix`**, **`regenerate_only`**.
 
-**Callers set** optional body field **`holzenInvokeSource`**:
-
-| Value | Set by |
-|--------|--------|
+| `holzenInvokeSource` | Set by |
+|----------------------|--------|
 | `browser_pause` | `use-companion-data` full orchestrate |
 | `browser_regenerate` | `use-companion-data` `regenerateCompanion` |
 | `cron_check_volatility` | `check-volatility` fetch body |
 
-Omit or unknown values log as **`invoke_source`:** **`unknown`**.
+### Skip cached (dedup)
 
-Use log drains to estimate **overlap** (same `reflection_prefix` + both `browser_*` and `cron_check_volatility` close in time).
+After **`selectIntervention`** and computing which generator slots would run, the orchestrator **loads `reflection_companions`** for the `reflectionId`. If **every** required slot already has valid content (same shape as the client’s `checkCachedReflection`), it returns **200** with JSON built from those rows, **`source: "cache"`**, and:
 
-## Still open
+- **Does not** run **`generateQuestion`** or companion generators.
+- **Does not** charge **rate limit** or **daily budget**.
+- **Does not** insert **`intervention_selected`** again.
 
-- **Dedup / skip-if-fresh** orchestration when cron already populated companions (see acceptance criteria in original ticket).
-- **Idempotency** tokens per reflection + slot (optional).
-- Ties to **`automatic-pause-notification-timing.md`** if “pause ready” UX changes.
+Grep: **`orchestrate_skip_cached`**.
+
+Typical win: cron finishes orchestration before the user opens `/pause` — the client’s invoke becomes a cheap DB read.
+
+## Optional follow-up
+
+- **Idempotency** tokens per reflection + slot.
+- **`automatic-pause-notification-timing.md`** if “pause ready” UX should wait on orchestration.
 
 ## Related code
 

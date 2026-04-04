@@ -59,6 +59,104 @@ interface OrchestrateResponse {
   intervention: InterventionPayload | null;
 }
 
+function contentSatisfiesCompanion(companionType: string, raw: unknown): boolean {
+  if (raw == null || typeof raw !== "object") return false;
+  const c = raw as Record<string, unknown>;
+  switch (companionType) {
+    case "signal":
+      return typeof c.source === "string" && c.source.length > 0;
+    case "ground_nudge":
+      return typeof c.title === "string" && c.title.length > 0 &&
+        typeof c.body === "string" && c.body.length > 0;
+    case "historical_insight":
+      return typeof c.btcInsight === "string" && c.btcInsight.length > 0;
+    case "zoom_out":
+    case "zoom_out_deep_time":
+      return Object.keys(c).length > 0;
+    case "intervention":
+      return typeof c.mode === "string" && c.mode.length > 0;
+    default:
+      return false;
+  }
+}
+
+/**
+ * If reflection_companions already has every slot this invoke would generate, return a
+ * response assembled from DB rows (source "cache") and skip AI, rate limit, and budget.
+ * Grep: orchestrate_skip_cached
+ */
+async function tryOrchestrateSkipFromReflectionCompanions(params: {
+  svcClient: any;
+  reflectionId: string;
+  useIntervention: boolean;
+  needSignal: boolean;
+  needGrounding: boolean;
+  needHistory: boolean;
+  needZoomOut: boolean;
+  log: ReturnType<typeof createLogger>;
+}): Promise<OrchestrateResponse | null> {
+  const { data: rows, error } = await params.svcClient
+    .from("reflection_companions")
+    .select("companion_type, content")
+    .eq("reflection_id", params.reflectionId);
+  if (error || !rows?.length) return null;
+
+  const byType = new Map<string, unknown>();
+  for (const r of rows) {
+    byType.set(r.companion_type as string, r.content);
+  }
+
+  const hasSignal = () => contentSatisfiesCompanion("signal", byType.get("signal"));
+  const hasGrounding = () => contentSatisfiesCompanion("ground_nudge", byType.get("ground_nudge"));
+  const hasHistory = () => contentSatisfiesCompanion("historical_insight", byType.get("historical_insight"));
+  const hasZoom = () =>
+    contentSatisfiesCompanion("zoom_out_deep_time", byType.get("zoom_out_deep_time")) ||
+    contentSatisfiesCompanion("zoom_out", byType.get("zoom_out"));
+  const hasIntervention = () => contentSatisfiesCompanion("intervention", byType.get("intervention"));
+
+  if (params.needSignal && !hasSignal()) return null;
+  if (params.needGrounding && !hasGrounding()) return null;
+  if (params.needHistory && !hasHistory()) return null;
+  if (params.needZoomOut && !hasZoom()) return null;
+  if (params.useIntervention && !hasIntervention()) return null;
+
+  const zoomRaw = byType.get("zoom_out_deep_time") ?? byType.get("zoom_out");
+
+  const response: OrchestrateResponse = {
+    signal: params.needSignal
+      ? { data: byType.get("signal"), source: "cache", cacheId: null, latencyMs: 0 }
+      : null,
+    grounding: params.needGrounding
+      ? { data: byType.get("ground_nudge"), source: "cache", cacheId: null, latencyMs: 0 }
+      : null,
+    history: params.needHistory
+      ? { data: byType.get("historical_insight"), source: "cache", cacheId: null, latencyMs: 0 }
+      : null,
+    zoomOut: params.needZoomOut
+      ? { data: zoomRaw, source: "cache", cacheId: null, latencyMs: 0 }
+      : null,
+    intervention: params.useIntervention
+      ? (byType.get("intervention") as InterventionPayload)
+      : null,
+  };
+
+  params.log("skip: all requested companion rows already on reflection_companions");
+  try {
+    console.log(JSON.stringify({
+      holzen_event: "orchestrate_skip_cached",
+      reflection_prefix: params.reflectionId.slice(0, 8),
+      need_signal: params.needSignal,
+      need_grounding: params.needGrounding,
+      need_history: params.needHistory,
+      need_zoom: params.needZoomOut,
+      need_intervention: params.useIntervention,
+      ts: new Date().toISOString(),
+    }));
+  } catch { /* ignore */ }
+
+  return response;
+}
+
 /** Client/cron overlap metrics — grep: orchestrate_invoke */
 function logOrchestrateInvoke(body: Record<string, unknown>, authMode: "service_role" | "user_jwt") {
   const raw = body.holzenInvokeSource;
@@ -168,26 +266,6 @@ serve(async (req) => {
       });
     }
 
-    // ── Per-user rate limit check ──
-    const rateLimit = await checkRateLimit(svcClient, userId, 60, 30);
-    if (!rateLimit.allowed) {
-      log(`rate limited: ${rateLimit.reason}`);
-      return new Response(JSON.stringify({ error: "Rate limited. Try again later." }), {
-        status: 429,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
-    // ── Daily budget check ──
-    const budget = await checkDailyBudget(svcClient, 10.0);
-    if (!budget.allowed) {
-      log(`budget exceeded: ${budget.reason}`);
-      return new Response(JSON.stringify({ error: "Generation budget exceeded for today." }), {
-        status: 503,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
-
     const {
       reflectionId,
       context,
@@ -261,19 +339,6 @@ serve(async (req) => {
         svcClient,
       });
       log(`intervention selected: mode=${selection.mode} primary=${selection.primary ?? "none"}`);
-      // Track which intervention type is being served — critical for outcome analysis
-      void svcClient.from("analytics_events").insert({
-        user_id: userId,
-        event: "intervention_selected",
-        metadata: {
-          mode: selection.mode,
-          primary: selection.primary ?? null,
-          secondary: selection.secondary ?? null,
-          reflection_id: reflectionId ?? null,
-        },
-      }).then(({ error: insErr }: { error: { message: string } | null }) => {
-        if (insErr) log.error("analytics intervention_selected insert failed", { error: insErr.message });
-      });
     }
 
     // ── Build the intervention response ──
@@ -288,10 +353,85 @@ serve(async (req) => {
       interventionPayload.primary = { type: "mirror", data: selection.mirrorData };
     }
 
+    const insightSelection = selection?.mode === "insight" ? selection : null;
+    const interventionNeedsGrounding = insightSelection?.primary === "trap";
+    const interventionNeedsHistory = insightSelection?.primary === "pattern";
+    const interventionNeedsZoomOut = insightSelection?.secondary === "zoom_out";
+
+    const shouldRunGrounding = Boolean(enableGrounding || interventionNeedsGrounding);
+    const shouldRunHistory = Boolean(enableHistory || interventionNeedsHistory);
+    const shouldRunZoomOut = Boolean(enableZoomOut || interventionNeedsZoomOut);
+
+    if (interventionNeedsGrounding && !enableGrounding) {
+      log("grounding task forced for trap intervention (companion pref off)");
+    }
+    if (interventionNeedsHistory && !enableHistory) {
+      log("history task forced for pattern intervention (companion pref off)");
+    }
+    if (interventionNeedsZoomOut && !enableZoomOut) {
+      log("zoomOut task forced for intervention secondary (companion pref off)");
+    }
+
+    const rid = typeof reflectionId === "string" ? reflectionId : "";
+    if (rid.length > 0) {
+      const skipped = await tryOrchestrateSkipFromReflectionCompanions({
+        svcClient,
+        reflectionId: rid,
+        useIntervention: Boolean(useIntervention),
+        needSignal: Boolean(enableSignal),
+        needGrounding: shouldRunGrounding,
+        needHistory: Boolean(enableHistory),
+        needZoomOut: shouldRunZoomOut,
+        log,
+      });
+      if (skipped) {
+        return new Response(JSON.stringify(skipped), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
+    // ── Per-user rate limit + daily budget (skipped when serving from reflection_companions) ──
+    const rateLimit = await checkRateLimit(svcClient, userId, 60, 30);
+    if (!rateLimit.allowed) {
+      log(`rate limited: ${rateLimit.reason}`);
+      return new Response(JSON.stringify({ error: "Rate limited. Try again later." }), {
+        status: 429,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const budget = await checkDailyBudget(svcClient, 10.0);
+    if (!budget.allowed) {
+      log(`budget exceeded: ${budget.reason}`);
+      return new Response(JSON.stringify({ error: "Generation budget exceeded for today." }), {
+        status: 503,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    if (selection && useIntervention && reflectionId) {
+      void svcClient.from("analytics_events").insert({
+        user_id: userId,
+        event: "intervention_selected",
+        metadata: {
+          mode: selection.mode,
+          primary: selection.primary ?? null,
+          secondary: selection.secondary ?? null,
+          reflection_id: reflectionId ?? null,
+        },
+      }).then(({ error: insErr }: { error: { message: string } | null }) => {
+        if (insErr) log.error("analytics intervention_selected insert failed", { error: insErr.message });
+      });
+    }
+
+    let effectiveGroundingSources = groundingSources as Array<{ name: string; type: string; url?: string }> | undefined;
+    if (shouldRunGrounding && (!effectiveGroundingSources || effectiveGroundingSources.length === 0)) {
+      effectiveGroundingSources = await fetchGroundingSourcesForOrchestrate(svcClient, userId) ?? undefined;
+    }
+
     const directionForQuestion = parseDirection(context as string | undefined);
     const rawSeverityForQuestion = typeof body.severity === "number" ? body.severity : 0;
     const severityBucketForQuestion = bucketSeverity(rawSeverityForQuestion);
-
     const questionPromise =
       selection?.mode === "question" && LOVABLE_API_KEY
         ? generateQuestion({
@@ -304,30 +444,6 @@ serve(async (req) => {
             language: (language as string) || "en",
           })
         : Promise.resolve<string | null>(null);
-
-    const insightSelection = selection?.mode === "insight" ? selection : null;
-    const interventionNeedsGrounding = insightSelection?.primary === "trap";
-    const interventionNeedsHistory = insightSelection?.primary === "pattern";
-    const interventionNeedsZoomOut = insightSelection?.secondary === "zoom_out";
-
-    const shouldRunGrounding = Boolean(enableGrounding || interventionNeedsGrounding);
-    const shouldRunHistory = Boolean(enableHistory || interventionNeedsHistory);
-    const shouldRunZoomOut = Boolean(enableZoomOut || interventionNeedsZoomOut);
-
-    let effectiveGroundingSources = groundingSources as Array<{ name: string; type: string; url?: string }> | undefined;
-    if (shouldRunGrounding && (!effectiveGroundingSources || effectiveGroundingSources.length === 0)) {
-      effectiveGroundingSources = await fetchGroundingSourcesForOrchestrate(svcClient, userId) ?? undefined;
-    }
-
-    if (interventionNeedsGrounding && !enableGrounding) {
-      log("grounding task forced for trap intervention (companion pref off)");
-    }
-    if (interventionNeedsHistory && !enableHistory) {
-      log("history task forced for pattern intervention (companion pref off)");
-    }
-    if (interventionNeedsZoomOut && !enableZoomOut) {
-      log("zoomOut task forced for intervention secondary (companion pref off)");
-    }
 
     // ── Fire companion generators (prefs and/or intervention headline requirements) ──
     const tasks: Record<string, Promise<CompanionResult>> = {};
