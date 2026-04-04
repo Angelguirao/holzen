@@ -42,6 +42,7 @@ Rule of thumb used here:
 | 2026-04 | [resource-hints-preconnect.md](resource-hints-preconnect.md) | **`vite.config`** **`transformIndexHtml`**: Supabase + Google Fonts + CoinGecko **`preconnect`**. |
 | 2026-04 | [home-recharts-layout-cost.md](home-recharts-layout-cost.md) | **`BtcChartLazyGate`**: viewport + **`React.lazy`**; chart **`ResponsiveContainer`** tweaks + no area animation. |
 | 2026-04 | [data-fetching-conventions.md](data-fetching-conventions.md) | **`navigating-the-codebase` §6.1** — Query vs **`useEffect` + Supabase**; defer global **`QueryClient` defaults**. |
+| 2026-04 | [hosting-production-compression.md](hosting-production-compression.md) | Verify **`Content-Encoding`** on prod HTML — **`curl`** / DevTools; sample **`gzip`** on Lovable chain. |
 
 ---
 
@@ -91,7 +92,7 @@ Use this when you are **choosing what to work on next**. Items are **not** stric
 
 | Priority hint | Ticket | Summary |
 |---------------|--------|---------|
-| Lower | [hosting-production-compression.md](hosting-production-compression.md) | Verify **gzip/Brotli** for **HTML** on production (dev fails by design). |
+| — | [hosting-production-compression.md](hosting-production-compression.md) | **Done (2026-04).** Verification steps + sample check — see ticket. |
 
 ### Quality gates & content (reject noise, tune prompts)
 
@@ -143,7 +144,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | Product / UX | [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md) | Cache relaxation transparency |
 | Product / UX | [form-field-name-id-a11y.md](form-field-name-id-a11y.md) | **Done (2026-04).** Form **`name`** / **`id`** / **`autocomplete`** — see ticket |
 | Product / UX | [lighthouse-a11y-home.md](lighthouse-a11y-home.md) | **Done (2026-04).** Home **`/`** axe fixes — see ticket |
-| Ops / security | [hosting-production-compression.md](hosting-production-compression.md) | Prod **HTML** **Content-Encoding** check |
+| Ops / security | [hosting-production-compression.md](hosting-production-compression.md) | **Done (2026-04).** Prod HTML compression verify — see ticket |
 | Quality | [quality-gates-false-positives.md](quality-gates-false-positives.md) | Quality gate tuning |
 | Testing | [e2e-browser-automation.md](e2e-browser-automation.md) | UI journeys (E2E) vs Bruno API review |
 | Frontend | [typed-navigation-state.md](typed-navigation-state.md) | **Done (2026-04).** Parsers in `router-location-state.ts` — see ticket |
@@ -160,7 +161,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 
 | Theme | Backlog files |
 |--------|----------------|
-| **Platform, architecture & tooling** | [e2e-browser-automation.md](e2e-browser-automation.md), [spa-framework-evaluation.md](spa-framework-evaluation.md), [hosting-production-compression.md](hosting-production-compression.md) |
+| **Platform, architecture & tooling** | [e2e-browser-automation.md](e2e-browser-automation.md), [spa-framework-evaluation.md](spa-framework-evaluation.md), ~~[hosting-production-compression.md](hosting-production-compression.md)~~ **done** |
 | **Frontend structure & conventions** | ~~[typed-navigation-state.md](typed-navigation-state.md)~~ **done**, ~~[route-level-code-splitting.md](route-level-code-splitting.md)~~ **done**, [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md), ~~[data-fetching-conventions.md](data-fetching-conventions.md)~~ **done**, [home-fetch-deduplication.md](home-fetch-deduplication.md), ~~[resource-hints-preconnect.md](resource-hints-preconnect.md)~~ **done**, ~~[home-recharts-layout-cost.md](home-recharts-layout-cost.md)~~ **done** |
 | **Auth & routing** | [auth-referral.md](auth-referral.md); ~~[route-gating.md](route-gating.md)~~ **done 2026-04** |
 | **Product / UX** | [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md), [cron-pause-featured-parity.md](cron-pause-featured-parity.md), ~~[route-gating.md](route-gating.md)~~ **done**, [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md), ~~[form-field-name-id-a11y.md](form-field-name-id-a11y.md)~~ **done**, ~~[lighthouse-a11y-home.md](lighthouse-a11y-home.md)~~ **done** |
@@ -189,7 +190,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | [form-field-name-id-a11y.md](form-field-name-id-a11y.md) | **Done (2026-04).** Form **`name`** / **`id`** / **`autocomplete`** — see ticket |
 | [home-fetch-deduplication.md](home-fetch-deduplication.md) | **Partial (2026-04).** Dedupe + **`navigating-the-codebase`** §6; optional **`profiles`** lift — see ticket |
 | [home-recharts-layout-cost.md](home-recharts-layout-cost.md) | **Done (2026-04).** Lazy viewport gate + chart container tweaks — see ticket |
-| [hosting-production-compression.md](hosting-production-compression.md) | Verify **gzip/Brotli** for HTML in production |
+| [hosting-production-compression.md](hosting-production-compression.md) | **Done (2026-04).** **`curl`** / DevTools procedure — see ticket |
 | [lighthouse-a11y-home.md](lighthouse-a11y-home.md) | **Done (2026-04).** **`main`**, contrast, notification label, touch targets — see ticket |
 | [orchestrate-client-cron.md](orchestrate-client-cron.md) | Client vs cron `companion-orchestrate` overlap |
 | [pause-session-hydration.md](pause-session-hydration.md) | **Done (2026-04).** `/pause` hydration — see ticket. |
@@ -244,4 +245,4 @@ Legacy numeric IDs for chat / PR references; prefer **ticket file name** or [mas
 28. ~~Lighthouse **a11y** on Home (`/` )~~ — **Shipped 2026-04** — [lighthouse-a11y-home.md](lighthouse-a11y-home.md)
 29. ~~**`preconnect`** resource hints~~ — **Shipped 2026-04** — [resource-hints-preconnect.md](resource-hints-preconnect.md)
 30. ~~Home **Recharts** layout / defer~~ — **Shipped 2026-04** — [home-recharts-layout-cost.md](home-recharts-layout-cost.md)
-31. Production **HTML** compression — [hosting-production-compression.md](hosting-production-compression.md)
+31. ~~Production **HTML** compression~~ — **Shipped 2026-04** — [hosting-production-compression.md](hosting-production-compression.md)
