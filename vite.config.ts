@@ -60,7 +60,7 @@ export default defineConfig(({ mode, command }) => {
     plugins: [
       {
         name: "holzen-inject-preconnect",
-        transformIndexHtml(html) {
+        transformIndexHtml(html: string) {
           if (!html.includes("</head>")) return html;
           return html.replace(
             "</head>",
