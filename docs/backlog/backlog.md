@@ -46,6 +46,8 @@ Rule of thumb used here:
 | 2026-04 | [rate-limit-analytics-allowlist.md](rate-limit-analytics-allowlist.md) | **`CHECK_RATE_LIMIT_ANALYTICS_EVENTS`** + generator / question-mode **`trackEvent`**; fixed missing **`signal`/`zoom`/`history`** inserts. |
 | 2026-04 | [rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md) | Structured **`limit_check_fail_open`** JSON logs (`scope` / `phase`) on rate, budget, regenerate fail-open. |
 | 2026-04 | [quality-gates-false-positives.md](quality-gates-false-positives.md) | **`quality_gate_reject`** logs + **`generation_attempts`** on post-AI gate fail; DOI / et al. / Unicode names; numeric dates for history. |
+| 2026-04 | [btc-price-cache-freshness.md](btc-price-cache-freshness.md) | **Doc:** Zoom Out **`btc_price_cache`** contract — 24h historical TTL, UTC, cron ~15m; `cron-setup` + `refresh-btc-prices` header. |
+| 2026-04 | [orchestrate-client-cron.md](orchestrate-client-cron.md) | **`orchestrate_invoke`** JSON log + **`holzenInvokeSource`** (`browser_*`, `cron_check_volatility`); dedup still open. |
 
 ---
 
@@ -57,7 +59,7 @@ Use this when you are **choosing what to work on next**. Items are **not** stric
 
 | Priority hint | Ticket | Summary |
 |---------------|--------|---------|
-| Medium | [btc-price-cache-freshness.md](btc-price-cache-freshness.md) | Historical BTC cache vs cron cadence + Zoom Out expectations. |
+| — | [btc-price-cache-freshness.md](btc-price-cache-freshness.md) | **Done (2026-04).** Freshness contract in **`cron-setup`** + **`refresh-btc-prices`** — see ticket. |
 
 ### Reliability & edge cases (fewer surprises under load or odd navigation)
 
@@ -76,7 +78,7 @@ Use this when you are **choosing what to work on next**. Items are **not** stric
 
 | Priority hint | Ticket | Summary |
 |---------------|--------|---------|
-| Medium | [orchestrate-client-cron.md](orchestrate-client-cron.md) | Client vs cron `companion-orchestrate` overlap — measure, dedup, cache policy. |
+| Lower | [orchestrate-client-cron.md](orchestrate-client-cron.md) | **Partial (2026-04).** **`orchestrate_invoke`** / **`holzenInvokeSource`** — dedup policy still open — see ticket. |
 | Lower | [home-fetch-deduplication.md](home-fetch-deduplication.md) | Optional: single **`profiles`** query at layout; doc pointer. **Shipped:** shared subscription query + BTC fetch coalescing — see ticket. |
 | Lower | [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md) | Stronger dedup for `content_library` / `companion_cache`. |
 
@@ -134,11 +136,11 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 
 | Work type | Ticket | One-line |
 |-----------|--------|----------|
-| Data / market | [btc-price-cache-freshness.md](btc-price-cache-freshness.md) | BTC cache freshness vs Zoom Out |
+| Data / market | [btc-price-cache-freshness.md](btc-price-cache-freshness.md) | **Done (2026-04).** Documented contract — see ticket |
 | Reliability | [auth-referral.md](auth-referral.md) | Referral delivery robustness |
 | Observability | [rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md) | **Done (2026-04).** Structured fail-open logs — see ticket |
 | Observability | [rate-limit-analytics-allowlist.md](rate-limit-analytics-allowlist.md) | **Done (2026-04).** Allowlist constant + generator inserts — see ticket |
-| Cost / efficiency | [orchestrate-client-cron.md](orchestrate-client-cron.md) | Client vs cron orchestrate overlap |
+| Cost / efficiency | [orchestrate-client-cron.md](orchestrate-client-cron.md) | **Partial (2026-04).** Invoke logging — dedup TBD — see ticket |
 | Cost / efficiency | [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md) | Near-duplicate cache entries |
 | Cost / efficiency | [home-fetch-deduplication.md](home-fetch-deduplication.md) | **Partial (2026-04).** + doc in **`navigating-the-codebase`** §6 — optional **`profiles`** Query — see ticket |
 | Product / UX | [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md) | Notification vs orchestrate ordering |
@@ -168,9 +170,9 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | **Frontend structure & conventions** | ~~[typed-navigation-state.md](typed-navigation-state.md)~~ **done**, ~~[route-level-code-splitting.md](route-level-code-splitting.md)~~ **done**, [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md), ~~[data-fetching-conventions.md](data-fetching-conventions.md)~~ **done**, [home-fetch-deduplication.md](home-fetch-deduplication.md), ~~[resource-hints-preconnect.md](resource-hints-preconnect.md)~~ **done**, ~~[home-recharts-layout-cost.md](home-recharts-layout-cost.md)~~ **done** |
 | **Auth & routing** | [auth-referral.md](auth-referral.md); ~~[route-gating.md](route-gating.md)~~ **done 2026-04** |
 | **Product / UX** | [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md), [cron-pause-featured-parity.md](cron-pause-featured-parity.md), ~~[route-gating.md](route-gating.md)~~ **done**, [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md), ~~[form-field-name-id-a11y.md](form-field-name-id-a11y.md)~~ **done**, ~~[lighthouse-a11y-home.md](lighthouse-a11y-home.md)~~ **done** |
-| **Pause pipeline & client–server boundaries** | [orchestrate-client-cron.md](orchestrate-client-cron.md), [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md), [cron-pause-featured-parity.md](cron-pause-featured-parity.md) |
-| **Cost & duplicate work (client + server)** | [orchestrate-client-cron.md](orchestrate-client-cron.md), [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md), [home-fetch-deduplication.md](home-fetch-deduplication.md) |
-| **Cache, library & market data** | [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md), [btc-price-cache-freshness.md](btc-price-cache-freshness.md), [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md) |
+| **Pause pipeline & client–server boundaries** | [orchestrate-client-cron.md](orchestrate-client-cron.md) **partial**, [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md), [cron-pause-featured-parity.md](cron-pause-featured-parity.md) |
+| **Cost & duplicate work (client + server)** | [orchestrate-client-cron.md](orchestrate-client-cron.md) **partial**, [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md), [home-fetch-deduplication.md](home-fetch-deduplication.md) |
+| **Cache, library & market data** | [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md), ~~[btc-price-cache-freshness.md](btc-price-cache-freshness.md)~~ **done**, [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md) |
 | **Rate limits, quality & observability** | ~~[rate-limit-analytics-allowlist.md](rate-limit-analytics-allowlist.md)~~ **done**, ~~[rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md)~~ **done**, [quality-gates-false-positives.md](quality-gates-false-positives.md) |
 | **Data consistency** | *(none pending — grounding dual-write shipped 2026-04)* |
 
@@ -182,7 +184,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 |------|---------|
 | [auth-referral.md](auth-referral.md) | Auth + referral side-effect robustness |
 | [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md) | “Pause ready” vs orchestrate completion (`pause_notifications`) |
-| [btc-price-cache-freshness.md](btc-price-cache-freshness.md) | Historical BTC cache vs cron + Zoom Out |
+| [btc-price-cache-freshness.md](btc-price-cache-freshness.md) | **Done (2026-04).** **`cron-setup`** + **`refresh-btc-prices`** contract — see ticket |
 | [cache-async-error-handling.md](cache-async-error-handling.md) | **Done (2026-04).** `.catch` on fire-and-forget cache helpers — see ticket. |
 | [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md) | Dedup for `content_library` / `companion_cache` |
 | [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md) | Transparency when cache serve relaxes constraints |
@@ -195,7 +197,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | [home-recharts-layout-cost.md](home-recharts-layout-cost.md) | **Done (2026-04).** Lazy viewport gate + chart container tweaks — see ticket |
 | [hosting-production-compression.md](hosting-production-compression.md) | **Done (2026-04).** **`curl`** / DevTools procedure — see ticket |
 | [lighthouse-a11y-home.md](lighthouse-a11y-home.md) | **Done (2026-04).** **`main`**, contrast, notification label, touch targets — see ticket |
-| [orchestrate-client-cron.md](orchestrate-client-cron.md) | Client vs cron `companion-orchestrate` overlap |
+| [orchestrate-client-cron.md](orchestrate-client-cron.md) | **Partial (2026-04).** **`orchestrate_invoke`** log + **`holzenInvokeSource`** — see ticket |
 | [pause-session-hydration.md](pause-session-hydration.md) | **Done (2026-04).** `/pause` hydration — see ticket. |
 | [pwa-mobile-web-app-meta.md](pwa-mobile-web-app-meta.md) | **Done (2026-04).** **`mobile-web-app-capable`** in `index.html` — see ticket. |
 | [quality-gates-false-positives.md](quality-gates-false-positives.md) | **Partial (2026-04).** Observability + specificity; locale-aware gates TBD — see ticket |
@@ -221,13 +223,13 @@ Legacy numeric IDs for chat / PR references; prefer **ticket file name** or [mas
 1. Guaranteed referral delivery — [auth-referral.md](auth-referral.md)
 2. ~~UX clarity for strict route gating during auth loading~~ — **Shipped 2026-04** — [route-gating.md](route-gating.md)
 3. ~~Reduce reliance on `location.state` for `/pause` restoration~~ — **Shipped 2026-04** — [pause-session-hydration.md](pause-session-hydration.md)
-4. Client vs cron `companion-orchestrate` overlap — [orchestrate-client-cron.md](orchestrate-client-cron.md)
+4. Client vs cron `companion-orchestrate` overlap — **Partial 2026-04** — [orchestrate-client-cron.md](orchestrate-client-cron.md) *(dedup / skip-if-fresh still open)*
 5. ~~Partial failure: reflect OK, reflection insert fails~~ — **Shipped 2026-04** — [reflection-insert-partial-failure.md](reflection-insert-partial-failure.md)
 6. Automatic pause: notification timing vs orchestrate completion — [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md)
 7. Cron vs manual pause: featured field parity — [cron-pause-featured-parity.md](cron-pause-featured-parity.md)
 8. ~~Cron worker auth~~ — **Shipped 2026-04** — [cron-worker-auth-consistency.md](cron-worker-auth-consistency.md)
 9. `content_library` / `companion_cache` dedup — [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md)
-10. BTC `btc_price_cache` historical freshness — [btc-price-cache-freshness.md](btc-price-cache-freshness.md)
+10. ~~BTC `btc_price_cache` historical freshness~~ — **Shipped 2026-04 (doc)** — [btc-price-cache-freshness.md](btc-price-cache-freshness.md)
 11. ~~Rate limit: `analytics_events` allowlist parity~~ — **Shipped 2026-04** — [rate-limit-analytics-allowlist.md](rate-limit-analytics-allowlist.md)
 12. ~~`cache.ts` fire-and-forget `.catch`~~ — **Shipped 2026-04** — [cache-async-error-handling.md](cache-async-error-handling.md)
 13. ~~Rate/daily budget fail-open observability~~ — **Shipped 2026-04** — [rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md)

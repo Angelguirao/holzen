@@ -498,6 +498,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
 
       const { data, error: fnError } = await supabase.functions.invoke('companion-orchestrate', {
         body: {
+          holzenInvokeSource: 'browser_pause',
           reflectionId,
           context: context ?? '',
           language,
@@ -671,6 +672,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
 
       const { data, error: fnError } = await supabase.functions.invoke('companion-orchestrate', {
         body: {
+          holzenInvokeSource: 'browser_regenerate',
           reflectionId,
           regenerateOnly: slot,
           context: context ?? '',

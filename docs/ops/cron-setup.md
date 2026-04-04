@@ -54,6 +54,14 @@ The SQL below uses **Vault** (`holzen_cron_service_role`) for the Bearer token s
 
 Keeps btc_price_cache fresh so the Zoom Out companion never needs to call CoinGecko during user sessions. Without this cron, Zoom Out won't have price data.
 
+### Freshness contract (Zoom Out / `btc_price_cache`)
+
+- **Current day** price: updated whenever this job runs successfully (~15 min when cron is healthy).
+- **“On this day” (1–4 years ago)** rows: refetched only when the row is **missing** or `fetched_at` is older than **24 hours** (see `refresh-btc-prices` — `recentThreshold`). Reduces CoinGecko calls; acceptable for **daily perspective copy**, not intraday precision.
+- **Calendar** alignment uses **UTC** date parts for “today” and anniversaries (same as the zoom-out generator).
+
+Tightening TTL or cron frequency trades **freshness vs CoinGecko rate limits** — see `docs/backlog/btc-price-cache-freshness.md`.
+
 ```sql
 -- Run every 15 minutes
 SELECT cron.schedule(

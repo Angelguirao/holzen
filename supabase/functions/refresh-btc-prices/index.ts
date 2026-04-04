@@ -10,14 +10,17 @@ const corsHeaders = {
 /**
  * Background BTC price refresh.
  *
- * Scheduled via cron every 15 minutes. Fetches:
+ * Scheduled via cron every ~15 minutes (see docs/ops/cron-setup.md). Fetches:
  * 1. Current BTC price (USD)
  * 2. Historical prices for "on this day" (1-4 years ago)
  *
- * Stores everything in btc_price_cache. The zoom-out companion
- * reads ONLY from this cache, never calling CoinGecko during sessions.
+ * Stores everything in btc_price_cache. The zoom-out companion reads ONLY from this
+ * cache during sessions (no CoinGecko at user time).
  *
- * This eliminates CoinGecko rate limit issues during user sessions.
+ * **Freshness contract (product):** Historical rows for the four anniversary dates are
+ * refetched when `fetched_at` is older than **24h** or missing. Dates are **UTC calendar**
+ * (year/month/day). This is accurate enough for **daily Zoom Out metaphor**, not intraday
+ * trading. After a missed cron, staleness is bounded by the next successful run + TTL.
  */
 
 serve(async (req) => {
