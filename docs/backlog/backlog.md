@@ -120,7 +120,7 @@ Use this when you are **choosing what to work on next**. Items are **not** stric
 |---------------|--------|---------|
 | — | [typed-navigation-state.md](typed-navigation-state.md) | **Done (2026-04).** `router-location-state` — see ticket. |
 | — | [route-level-code-splitting.md](route-level-code-splitting.md) | **Done (2026-04).** Lazy pages + **`Suspense`** — see ticket. |
-| Lower | [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md) | Split oversized pages (`Home`, `PauseSession`); optionally narrow **`use-holzen`**; one slice per PR. |
+| Lower | [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md) | **Partial (2026-04).** `Home` pause/cooldown/pro-lock → **`HomePauseChrome`** — see ticket; **`PauseSession`** / **`use-holzen`** still open. |
 | — | [data-fetching-conventions.md](data-fetching-conventions.md) | **Done (2026-04).** §6.1 in **`navigating-the-codebase`** — see ticket. |
 | — | [resource-hints-preconnect.md](resource-hints-preconnect.md) | **Done (2026-04).** Vite-injected **`preconnect`** — see ticket. |
 | — | [home-recharts-layout-cost.md](home-recharts-layout-cost.md) | **Done (2026-04).** Lazy + **`IntersectionObserver`** for Home BTC chart — see ticket. |
@@ -157,7 +157,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | Testing | [e2e-browser-automation.md](e2e-browser-automation.md) | UI journeys (E2E) vs Bruno API review |
 | Frontend | [typed-navigation-state.md](typed-navigation-state.md) | **Done (2026-04).** Parsers in `router-location-state.ts` — see ticket |
 | Frontend | [route-level-code-splitting.md](route-level-code-splitting.md) | **Done (2026-04).** **`React.lazy`** in `App.tsx` — see ticket |
-| Frontend | [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md) | Large pages + hook decomposition |
+| Frontend | [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md) | **Partial (2026-04).** `HomePauseChrome` slice — see ticket |
 | Frontend | [data-fetching-conventions.md](data-fetching-conventions.md) | **Done (2026-04).** Doc in **`navigating-the-codebase`** §6.1 — see ticket |
 | Frontend | [resource-hints-preconnect.md](resource-hints-preconnect.md) | **Done (2026-04).** Vite **`transformIndexHtml`** — see ticket |
 | Frontend | [home-recharts-layout-cost.md](home-recharts-layout-cost.md) | **Done (2026-04).** **`BtcChartLazyGate`** — see ticket |
@@ -206,7 +206,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | [quality-gates-false-positives.md](quality-gates-false-positives.md) | **Partial (2026-04).** Observability + specificity; locale-aware gates TBD — see ticket |
 | [rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md) | **Done (2026-04).** **`limit_check_fail_open`** JSON in **`ratelimit.ts`** — see ticket |
 | [rate-limit-analytics-allowlist.md](rate-limit-analytics-allowlist.md) | **Done (2026-04).** **`CHECK_RATE_LIMIT_ANALYTICS_EVENTS`** + **`trackEvent`** on live paths — see ticket |
-| [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md) | Split large pages (`Home`, `PauseSession`); optional `use-holzen` decomposition |
+| [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md) | **Partial (2026-04).** `Home` → **`components/home/HomePauseChrome`** — see ticket |
 | [react-router-v7-future-flags.md](react-router-v7-future-flags.md) | **Done (2026-04).** Router **`future`** flags — see ticket. |
 | [resource-hints-preconnect.md](resource-hints-preconnect.md) | **Done (2026-04).** Supabase + fonts + CoinGecko via **`vite.config`** — see ticket |
 | [route-level-code-splitting.md](route-level-code-splitting.md) | **Done (2026-04).** Lazy routes + Suspense in `App.tsx` — see ticket |
