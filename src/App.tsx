@@ -89,7 +89,12 @@ const App = () => (
         <TooltipProvider>
           <Sonner />
           <OfflineBanner />
-          <BrowserRouter>
+          <BrowserRouter
+            future={{
+              v7_startTransition: true,
+              v7_relativeSplatPath: true,
+            }}
+          >
             <ScrollToTop />
             <CookieConsent />
             <AuthProvider>

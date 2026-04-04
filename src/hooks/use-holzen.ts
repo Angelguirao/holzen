@@ -7,6 +7,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { useProfile } from '@/hooks/use-profile';
 import type { CompanionData } from '@/components/CompanionSection';
 import { holzenLog } from '@/lib/holzen-console';
+import { COMPANION_TYPES } from '@/lib/companion-types';
 
 const MANUAL_COOLDOWN_MS = 15 * 60 * 1000; // 15 minutes for on-demand
 const DEV_COOLDOWN_MS = 5 * 1000; // 5 seconds in dev mode
@@ -291,8 +292,27 @@ export function useHolzen() {
             tags: [],
           });
         }
-        // Run library bookmarks and profile update in parallel — neither depends on the other
-        const [{ error: libErr }] = await Promise.all([
+        // Keep reflection_companions.ground_nudge aligned with reflections.grounding_* (same as writeCompanionData).
+        const hasInitialGrounding = Boolean(companionData.groundingTitle || companionData.groundingBody);
+        const groundingRowPromise = hasInitialGrounding
+          ? supabase.from('reflection_companions').upsert(
+              {
+                reflection_id: insertedReflection.id,
+                companion_type: COMPANION_TYPES.GROUNDING,
+                content: {
+                  title: companionData.groundingTitle ?? '',
+                  body: companionData.groundingBody ?? '',
+                  citation: typeof fnData?.grounding_citation === 'string' ? fnData.grounding_citation : '',
+                  url: typeof fnData?.grounding_url === 'string' ? fnData.grounding_url : '',
+                },
+                read: false,
+              },
+              { onConflict: 'reflection_id,companion_type' },
+            )
+          : Promise.resolve({ error: null });
+
+        // Library + profile + optional ground_nudge row (same shape as writeCompanionData)
+        const [{ error: libErr }, , { error: groundNudgeErr }] = await Promise.all([
           supabase.from('library_items').upsert(libraryInserts, {
             onConflict: 'user_id,reflection_id,source_type',
             ignoreDuplicates: true,
@@ -301,9 +321,19 @@ export function useHolzen() {
             last_message: msg,
             last_context: ctx,
           }).eq('user_id', user.id),
+          groundingRowPromise,
         ]);
         if (libErr) console.error('[library] reflection+haiku insert failed:', libErr.message);
-        else holzenLog.manual( 'generateMessage: DB insert + profile update ok', { reflectionId: insertedReflection.id });
+        if (groundNudgeErr) {
+          console.error('[reflection_companions] ground_nudge upsert failed:', groundNudgeErr.message);
+          holzenLog.manual('generateMessage: ground_nudge sync failed', { message: groundNudgeErr.message });
+        }
+        if (!libErr) {
+          holzenLog.manual('generateMessage: DB insert + profile update ok', {
+            reflectionId: insertedReflection.id,
+            syncedGroundNudge: hasInitialGrounding && !groundNudgeErr,
+          });
+        }
       }
     } catch (e: any) {
       holzenLog.manual('generateMessage: error', { message: String(e?.message ?? e) });
