@@ -1,23 +1,19 @@
 # Data fetching: TanStack Query vs Supabase + useEffect
 
-**Status:** backlog — document first, then align gradually.
+**Status:** shipped (2026-04) for **documentation**; global **`QueryClient` defaults** remain **optional** / deferred.
 
-## Goal
+## What shipped
 
-Make **server state** handling **predictable** across features: when to use **TanStack Query** (`useQuery` / `useMutation`) vs **direct `supabase` calls inside `useEffect`**.
+- **Rules of thumb** and a summary table live in **[`docs/fundamentals/navigating-the-codebase.md`](../fundamentals/navigating-the-codebase.md) §6.1** — when to prefer **`useQuery` / `useMutation`**, when to keep **`useEffect` + Supabase**, and how **`fetchBtcData`** coalescing fits in.
+- Guidance to **avoid unscoped `defaultOptions`** on the root **`QueryClient`** until conventions are agreed; per-query options (as in **`use-subscription.ts`**) stay the pattern.
 
-## Rationale
+## Optional follow-ups
 
-The root tree provides **`QueryClientProvider`** (`src/App.tsx`), but features differ: some hooks use **React Query**, others use **Supabase client + `useEffect`**. Both are valid; inconsistency makes **caching, retries, and loading state** harder to reason about for new contributors.
-
-## Direction
-
-1. **Short doc** (this repo: `docs/fundamentals/` or a paragraph in [navigating-the-codebase.md](../fundamentals/navigating-the-codebase.md)): rules of thumb — e.g. Query for **shared/refetched** server data; effects for **one-shot** or **tightly coupled** side effects to a single screen.
-2. **Optional:** Set **`QueryClient` default options** (e.g. `staleTime`, `retry`) in `App.tsx` when conventions stabilize — avoid churn until then.
-3. **Migrate opportunistically** when touching a feature, not as a standalone rewrite.
+- Set shared **`QueryClient` defaults** (e.g. `staleTime`, `retry`) in **`App.tsx`** once several queries agree on behavior.
+- Lift **`profiles`** to a layout-level **`useQuery`** ([home-fetch-deduplication.md](home-fetch-deduplication.md)).
+- Migrate individual hooks when touching them — no big-bang rewrite.
 
 ## Related
 
-- [home-fetch-deduplication.md](home-fetch-deduplication.md) — concrete duplicate **`profiles`** / market fetches on Home after sign-in.
-- [mental-models-for-contributors.md](../fundamentals/mental-models-for-contributors.md) — TanStack Query section.
-- [navigating-the-codebase.md](../fundamentals/navigating-the-codebase.md) — feature hooks table.
+- [home-fetch-deduplication.md](home-fetch-deduplication.md)
+- [mental-models-for-contributors.md](../fundamentals/mental-models-for-contributors.md)
