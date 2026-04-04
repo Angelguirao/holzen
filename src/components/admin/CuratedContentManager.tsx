@@ -134,10 +134,10 @@ export function CuratedContentManager({ entries, onRefresh }: { entries: CacheEn
     <div className="space-y-3">
       <div className="rounded-xl border border-border/20 bg-card/10 px-4 py-3 space-y-2">
         <p className="text-[10px] font-mono text-foreground/70">
-          Pregen pool (<code className="text-muted-foreground/60">companion_cache</code>). When live AI generation fails or skips, Signal / Grounding / History try the <strong className="font-normal text-muted-foreground/65">Library</strong> tab first, then this pool, then tiny hardcoded fallbacks (those show as “curated” in Monitor serve counts, not here).
+          Pregen pool (<code className="text-muted-foreground/60">companion_cache</code>). Signal / Grounding / History try the <strong className="font-normal text-muted-foreground/65">Library</strong> tab first, then this pool, then live AI, then tiny hardcoded fallbacks (those show as “curated” in Monitor serve counts, not here).
         </p>
         <p className="text-[9px] text-muted-foreground/55 leading-relaxed">
-          Order for those companions: <span className="text-muted-foreground/70">live</span> → <span className="text-muted-foreground/70">Library</span> → <span className="text-muted-foreground/70">this cache</span> → <span className="text-muted-foreground/70">hardcoded</span>. Manage long-form curated pieces under Library; manage pool rows here; edit last-resort strings under the <strong className="font-normal text-muted-foreground/65">Fallbacks</strong> tab.
+          Order for those companions: <span className="text-muted-foreground/70">Library</span> → <span className="text-muted-foreground/70">this cache</span> → <span className="text-muted-foreground/70">live</span> → <span className="text-muted-foreground/70">hardcoded</span>. Manage long-form curated pieces under Library; manage pool rows here; edit last-resort strings under the <strong className="font-normal text-muted-foreground/65">Fallbacks</strong> tab.
         </p>
         <p className="text-[10px] font-mono text-foreground/70">Lifecycle actions:</p>
         <div className="space-y-1">

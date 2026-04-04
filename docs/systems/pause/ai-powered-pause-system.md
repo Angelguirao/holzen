@@ -35,8 +35,9 @@ Links use explicit HTML anchors before each numbered section so jumps behave con
 1. **Trigger** — User opens Pause (client) *or* the `check-volatility` cron decides a user crossed thresholds.
 2. **Reflection** — Short copy (+ optional haiku) anchored to market **context** (e.g. “BTC is down 5.2%…”).
 3. **Persist** — Insert a `reflections` row; update **`profiles.last_message`** / **`last_context`** (and **`last_trigger_at`** only on automatic triggers or manual **silent** mode — see §2).
-4. **Companions & intervention** — `companion-orchestrate` chooses an **intervention** (mirror / trap / pattern / question) and, according to **enable flags**, runs **Signal, Grounding, History, Zoom Out** generators in process, then writes structured data back to the reflection (and related tables). See **§7** for a per-type reference.
-5. **Surface** — Client shows `InterventionSection` plus optional companion cards from user preferences.
+4. **Intervention** — `companion-orchestrate` (intervention-only call, no companion slots) chooses an **intervention** (mirror / trap / pattern / question) and persists it. See **§7** for a per-type reference.
+5. **Companion cards (lazy)** — When the user **taps/expands** a companion card, a **single-slot** `companion-orchestrate` call generates that companion on demand. Each generator tries **library → cache → live → curated** (phase ordering controlled by `COMPANION_PHASE_*` env vars in `_shared/phase-config.ts`).
+6. **Surface** — Client shows `InterventionSection` plus optional companion cards from user preferences.
 
 ### Diagram — end-to-end pipeline
 
@@ -57,7 +58,7 @@ flowchart TB
   C -.->|optional| N[Push / email /\npause_notifications]
 ```
 
-Reflection text and haiku land on the new row first; companion columns and intervention payload are filled (or updated) when **`companion-orchestrate`** completes. **Who calls the orchestrator:** the **client** after insert (manual) vs **`check-volatility`** with service role + **`userId`** (automatic).
+Reflection text and haiku land on the new row first; the **intervention** is fetched eagerly; individual **companion slots** are generated lazily when the user taps a card (or hydrated from `reflection_companions` if already cached). **Who calls the orchestrator:** the **client** after insert (manual) vs **`check-volatility`** with service role + **`userId`** (automatic).
 
 ---
 
@@ -169,7 +170,7 @@ That is **separate** from `moodHistory`: it tags **this** row for storage, analy
 
 **G. Invoking `companion-orchestrate`**
 
-- **Manual:** **`use-companion-data`** sends **user JWT** + the usual body (enable flags, **`signalSources`**, recency hints, **`useIntervention: true`**).
+- **Manual:** **`use-companion-data`** sends **user JWT**. On mount it calls orchestrate with **`useIntervention: true`** and all `enable*` flags **false** (intervention-only). When the user taps a companion card, a second call with a single `enable*` flag fetches that slot (`holzenInvokeSource: 'browser_lazy_fetch'`). Regenerate uses **`regenerateOnly`** (`holzenInvokeSource: 'browser_regenerate'`).
 - **Automatic:** **`check-volatility`** uses **service role** **`Authorization`** and passes **`userId`** in the JSON body so the orchestrator acts **as that user** with the same field names.
 
 *Why:* the orchestrator is one implementation; the cron is not logged in as each user, so it uses **service role + explicit `userId`** instead of a browser session.
@@ -255,7 +256,8 @@ This section is **client-centric**: **`use-holzen`** and **`use-companion-data`*
 
 1. **`use-holzen.ts`** — Calls `holzen-reflect`, inserts `reflections`, updates profile, sets companion state from response (haiku; **`grounding_*` null** at insert — same as cron; orchestrate fills companion columns).
 2. **Pause UI** — Uses `use-companion-data.ts` with `reflectionId`, `context`, `reflectionMessage`, **`mood`**, **`severityNumber`**, language.
-3. **`use-companion-data`** — Loads partial companion data from the reflection row if already present; builds **`moodHistory`** from recent `reflections` (`mood`, `outcome`); invokes **`companion-orchestrate`** with `useIntervention: true` and per-preference **`needSignal` / `needGrounding` / `needHistory` / `needZoomOut`** (cached slots skipped).
+3. **`use-companion-data`** (mount) — Hydrates any already-persisted companion data from **`reflection_companions`**; builds **`moodHistory`** from recent `reflections`; invokes **`companion-orchestrate`** with **`useIntervention: true`** and all **`enable*` flags false** (intervention-only — no companion generation). Cached companions display immediately.
+4. **`use-companion-data`** (on tap) — When the user expands a companion card for the first time, **`fetchCompanion(slot)`** calls **`companion-orchestrate`** with a single **`enable*`** flag (`holzenInvokeSource: 'browser_lazy_fetch'`). The server-side generator tries **library → cache → live → curated** (phase ordering from `_shared/phase-config.ts`).
 
 <a id="toc-manual-pause-request-order"></a>
 
@@ -270,7 +272,8 @@ This is the **exact sequence** when a signed-in user runs a **normal** manual pa
 | 3 | Edge **`holzen-reflect`** | **`supabase.functions.invoke('holzen-reflect', { context, tone, style, … })`** → **`generateUnifiedReflection`** inside the function. Returns **`message`** (+ optional haiku / legacy grounding fields in the JSON). |
 | 4 | Browser + Postgres | Client **`insert`s `reflections`** with `message`, `context`, haiku/grounding from step 3; **`library_items`** upsert; **`profiles`** update **`last_message`**, **`last_context`** (normal manual does **not** set **`last_trigger_at`** — see §2.3.B). **`lastReflectionId`** is set in React state. |
 | 5 | Pause UI | **`PauseSession`** / **`useCompanionData`** receive **`reflectionId`**, **`context`**, **`reflectionMessage`**, mood, severity. |
-| 6 | Edge **`companion-orchestrate`** | When the reflection row has no usable cache for a needed slot, **`use-companion-data`** calls **`invoke('companion-orchestrate', { reflectionId, …, useIntervention: true, enable*… })`**. If everything needed is already cached on the row, the client **skips** the network call (see **`checkCachedReflection`** in `use-companion-data.ts`). |
+| 6a | Edge **`companion-orchestrate`** (intervention) | **`use-companion-data`** calls orchestrate with **`useIntervention: true`** and all **`enable*`** false. If the intervention is already cached in **`reflection_companions`**, the network call is skipped. |
+| 6b | Edge **`companion-orchestrate`** (per slot, lazy) | When the user **taps** a companion card, **`fetchCompanion(slot)`** calls orchestrate with a single **`enable*`** flag (`holzenInvokeSource: 'browser_lazy_fetch'`). Already-cached companions (from `reflection_companions`) are served from DB without network calls. |
 
 **Silent mode** (`profiles` / UI): **`holzen-reflect` is not called**. The client inserts a short fixed message (**`BTC moved.`**), sets **`last_trigger_at`**, and still gets a **`reflections`** row — step 6 can still run for companions when the Pause UI loads.
 
@@ -287,6 +290,7 @@ This is the **exact sequence** when a signed-in user runs a **normal** manual pa
 
 - **File:** `supabase/functions/companion-orchestrate/index.ts`
 - **Role:** Auth → rate limit → daily budget → parse body → **`determineSessionIntent`** → **`selectIntervention`** (when **`useIntervention`** is true **and** **`reflectionId`** is present) → **`Promise.all`** of **`generateQuestion`** (question mode only) **and** enabled generator tasks → assemble **`intervention`** + companion results → `companion_serves` inserts → **`writeCompanionData`** (upserts **`reflection_companions`**; **Grounding** also updates **`reflections.grounding_*`** for Home — Signal / History / Zoom / intervention payloads are **not** duplicated onto legacy `reflections` columns; they were removed in favor of the join table).
+- **Invocation modes (client):** The SPA usually sends **narrow** requests: (1) intervention-only (all `enable*` false, `holzenInvokeSource: 'browser_pause_intervention'`), (2) single-slot lazy fetch (`holzenInvokeSource: 'browser_lazy_fetch'`), (3) regenerate (`regenerateOnly`). Cron and pregenerate may enable multiple slots in one request.
 - **Typical JSON body:** **`reflectionId`**, **`context`**, **`reflectionMessage`**, **`language`**, **`mood`**, numeric **`severity`** (absolute % move → **`bucketSeverity`** in `intervention-selector.ts`), **`moodHistory`**, **`signalSources`** / **`groundingSources`** (merged catalog URLs when Signal/Ground are on), recency arrays (**`recentNudgeTopics`**, **`recentGroundingSources`**, **`recentSignalSources`**, …), **`enableSignal` / `enableGrounding` / `enableHistory` / `enableZoomOut`**, **`useIntervention`** (default true). If **`reflectionId`** is missing or **`useIntervention: false`**, no intervention is selected (**`response.intervention`** omitted); generators still run per **`enable*`**.
 
 ### Diagram — inside `companion-orchestrate`
@@ -303,7 +307,7 @@ flowchart TD
   SRV --> OUT[(reflection_companions;\nreflections.grounding_* if Ground)]
 ```
 
-**Parallelism:** After selection, **`generateQuestion`** (if question mode) and **Signal / Grounding / History / Zoom out** run **concurrently** (`Promise.all` + `Promise.allSettled` on tasks). Generators are **in-process** imports. Each slot is omitted if its **`enable*`** flag is false or the client skipped it (e.g. already cached on the row).
+**Parallelism:** Within a single invoke, **`generateQuestion`** (if question mode) and any enabled generator tasks run **concurrently** (`Promise.all` + `Promise.allSettled`). Generators are **in-process** imports. The **SPA** typically sends **one slot per request** (lazy loading on tap), so concurrency is most relevant for **cron** and **pregenerate** invocations that enable multiple slots.
 
 **Intervention vs generators:** **`intervention.primary`** for **trap** / **pattern** and **`intervention.secondary`** for **zoom_out** are filled from the **same** generator runs as the cards. The orchestrator **forces** Grounding / History / Zoom Out when the selected intervention **requires** that output, even if the user turned the matching companion pref **off** (extra model cost vs empty headline). If **`groundingSources`** was omitted (pref off), the orchestrator loads the grounding catalog via **`fetchGroundingSourcesForOrchestrate`**. **Signal** is still prefs-only — not used as a headline type. See **§11.3** for broader cost notes.
 
@@ -356,18 +360,18 @@ flowchart LR
 
 The pause UI and **`check-volatility`** only call **`companion-orchestrate`**, which imports **`_shared/generators/*`** in-process. There are no separate HTTP edge functions for individual companions—the generators are the implementation.
 
-| Generator | File | First hop | Fallback chain (simplified) |
-|-----------|------|-----------|------------------------------|
-| Signal | `_shared/generators/signal.ts` | Perplexity + structure via Lovable/Gemini | `content_library` (essays) → `serveFromCache` → curated |
-| Grounding | `_shared/generators/grounding.ts` | Perplexity academic + structure | library (papers) → cache → curated |
-| History | `_shared/generators/history.ts` | Perplexity + structure | library (events) → cache → curated |
-| Zoom out | `_shared/generators/zoom-out.ts` | `btc_price_cache` + echo + deep-time AI | cache → curated (**no** live CoinGecko in request path) |
+| Generator | File | Phase order | Last resort |
+|-----------|------|-------------|-------------|
+| Signal | `_shared/generators/signal.ts` | Library (essays) → Cache → Live (Perplexity + Gemini) | curated |
+| Grounding | `_shared/generators/grounding.ts` | Library (papers) → Cache → Live (Perplexity + Gemini) | curated |
+| History | `_shared/generators/history.ts` | Library (events) → Cache → Live (Perplexity + Gemini) | curated |
+| Zoom out | `_shared/generators/zoom-out.ts` | Cache → Live (`btc_price_cache` + echo + deep-time AI) | curated |
 
 **Zoom out dependency:** Cron **`refresh-btc-prices`** must keep `btc_price_cache` fresh ([cron-setup.md](../../ops/cron-setup.md)).
 
-**Library “freshness”:** After live AI fails, **`searchLibrary`** runs with **`includeStale: false`**, so rows this user was served from **`content_library`** in the last **7 days** are skipped (`content-library.ts`). If nothing is left, the chain continues to **`companion_cache`** then static curated fallbacks.
+**Phase ordering:** Generators try **library → cache → live → curated** (controlled by `_shared/phase-config.ts`). Each phase can be independently toggled via Supabase Edge Function secrets: **`COMPANION_PHASE_LIBRARY`**, **`COMPANION_PHASE_CACHE`**, **`COMPANION_PHASE_LIVE`** (all enabled by default; set to `0`/`false`/`no` to disable). When `DISABLE_COMPANION_FALLBACKS` is set, only live runs (existing behavior for testing).
 
-**Why live-first today:** Perplexity (etc.) gives topical, one-off material; the library is the **controlled** backup. **Library-first** would be reasonable if you invest in a large, high-quality catalog and want lower API cost/latency— that would mean calling **`searchLibrary`** *before* the live hop when fresh rows exist (not implemented today).
+**Library “freshness”:** **`searchLibrary`** runs with **`includeStale: false`**, so rows this user was served from **`content_library`** in the last **7 days** are skipped (`content-library.ts`). If nothing fresh is left, the chain continues to **`companion_cache`** then live AI, then static curated fallbacks.
 
 For a full breakdown of **which intervention** maps to **which generator output** and **which UI block** shows it, see **§7**.
 
@@ -380,7 +384,7 @@ For a full breakdown of **which intervention** maps to **which generator output*
 The pause step combines two ideas that are easy to conflate:
 
 1. **Featured intervention** — One **cognitive headline** at the top (`InterventionSection`): mirror, trap, pattern, question mode, plus an optional **secondary** zoom-out block.
-2. **Companion cards** — Collapsible **slots** below the divider (`CompanionSection`): Haiku, Ground, Signal, Zoom Out, Look Back (history). Four of these are filled by the **same orchestrator run** that picks the intervention; **Haiku** comes from the reflection step instead.
+2. **Companion cards** — Collapsible **slots** below the divider (`CompanionSection`): Haiku, Ground, Signal, Zoom Out, Look Back (history). Four of these are filled by **companion-orchestrate** (one slot per lazy-load call, or multiple slots via cron); the intervention is fetched in a **separate** initial orchestrate call; **Haiku** comes from the reflection step instead.
 
 **Session intent** (§5.4) biases **all** orchestrated generators toward one emotional angle (Signal angle, Grounding bias, History mood, Zoom-out seed). Intervention **selection** (`intervention-selector.ts`) is separate: it only decides **what to feature** and **which generator outputs** are copied into the intervention payload.
 
@@ -546,7 +550,7 @@ flowchart TB
 | Piece | Role |
 |-------|------|
 | **Breathing** | **`CompanionPrefs.breathing`** exists for pause prefs; the **breathing ritual** is **not** rendered inside `CompanionSection` companion cards — it is a **separate flow** in the pause UI. |
-| **Intervention loading** | `use-companion-data` sets **`useIntervention: true`** on every orchestrate call; **intervention selection runs even if all four companion slots are off** (see hook comment). |
+| **Intervention loading** | `use-companion-data` fetches the intervention eagerly on mount (`useIntervention: true`, all `enable*` false); companion slots are fetched lazily on card tap. |
 
 ---
 
@@ -585,7 +589,7 @@ Reads that need Signal/History/Zoom text use **`v_reflection_with_companions`** 
 | Piece | Role |
 |-------|------|
 | `use-holzen.ts` | BTC context, manual cooldown, `holzen-reflect`, reflection insert, initial companion state from reflection response |
-| `use-companion-data.ts` | Orchestrator invoke, intervention state, per-companion loading/errors, recency hints, library auto-save hooks |
+| `use-companion-data.ts` | Intervention-only orchestrate on mount, lazy per-slot `fetchCompanion` on card tap, per-companion loading/errors, recency hints, library auto-save hooks |
 | `InterventionSection.tsx` | Renders mirror / trap / pattern / question + optional zoom-out secondary |
 | `CompanionSection.tsx` | Container for companion cards and prefs; hides Zoom Out card when intervention already shows zoom-out secondary (§7.5) |
 | `src/lib/companion-types.ts` | Canonical type strings shared with tests; full intervention ↔ generator ↔ UI map in **§7** |
@@ -619,7 +623,7 @@ Exact SQL lives in **[cron-setup.md](../../ops/cron-setup.md)**. Typical schedul
 
 **What the user sees** is one pause surface: reflection copy, an intervention (mirror / trap / pattern / question / default), and optional companion cards driven by preferences.
 
-**What the server does** is split across phases: (1) **reflection** — `holzen-reflect` or `check-volatility` calling `generateUnifiedReflection` (the model output is **message + haiku**; **`holzen-reflect`** may echo **`grounding_*`** keys for API stability, but **`generateUnifiedReflection`** currently returns them as **null** — companions fill those columns later); (2) **orchestration** — `companion-orchestrate` may run **multiple** model-backed generators in parallel (Signal, Grounding, History, Zoom Out, and question mode when selected), then write results to **`reflection_companions`** (and **`reflections.grounding_*`** when Grounding runs), **`companion_serves`**, and analytics.
+**What the server does** is split across phases: (1) **reflection** — `holzen-reflect` or `check-volatility` calling `generateUnifiedReflection` (the model output is **message + haiku**; **`holzen-reflect`** may echo **`grounding_*`** keys for API stability, but **`generateUnifiedReflection`** currently returns them as **null** — companions fill those columns later); (2) **orchestration** — `companion-orchestrate` may run model-backed generators (one per lazy request, or multiple in cron/pregenerate) (Signal, Grounding, History, Zoom Out, and question mode when selected), then write results to **`reflection_companions`** (and **`reflections.grounding_*`** when Grounding runs), **`companion_serves`**, and analytics.
 
 **Rate limits and budgets** do not line up 1:1 with that UX split:
 
@@ -694,6 +698,7 @@ supabase/functions/
     ├── intervention-selector.ts
     ├── companion-data.ts
     ├── generators/{ signal, grounding, history, zoom-out, question, mirror }.ts
+    ├── phase-config.ts              # library → cache → live phase toggles (COMPANION_PHASE_*)
     ├── quality.ts, sanitize.ts, cache.ts, content-library.ts, observe.ts, ratelimit.ts, fallbacks.ts
 
 src/hooks/use-holzen.ts
