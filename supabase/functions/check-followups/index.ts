@@ -1,4 +1,5 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -11,16 +12,17 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Auth: require service role key or cron secret
-  const { verifyServiceAuth } = await import("../_shared/auth.ts");
-  if (!verifyServiceAuth(req)) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), {
-      status: 401,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  }
-
   try {
+    holzenEdgeRun("followups", "request", { method: req.method });
+    const { verifyServiceAuth } = await import("../_shared/auth.ts");
+    if (!verifyServiceAuth(req)) {
+      holzenEdgeRun("followups", "auth rejected");
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    holzenEdgeRun("followups", "auth ok");
     const { createClient } = await import("npm:@supabase/supabase-js@2.57.2");
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
@@ -43,6 +45,7 @@ serve(async (req) => {
 
     if (refError) throw refError;
     if (!reflections || reflections.length === 0) {
+      holzenEdgeLog("followups", "run complete", { created: 0 });
       return new Response(JSON.stringify({ created: 0 }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -67,6 +70,7 @@ serve(async (req) => {
       }));
 
     if (toInsert.length === 0) {
+      holzenEdgeLog("followups", "run complete", { created: 0 });
       return new Response(JSON.stringify({ created: 0 }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -78,13 +82,13 @@ serve(async (req) => {
 
     if (insertError) throw insertError;
 
-    console.log(`[check-followups] Created ${toInsert.length} follow-ups`);
+    holzenEdgeLog("followups", "run complete", { created: toInsert.length });
 
     return new Response(JSON.stringify({ created: toInsert.length }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
-    console.error("check-followups error:", e);
+    holzenEdgeError("followups", "uncaught error", e);
     return new Response(
       JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }),
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
