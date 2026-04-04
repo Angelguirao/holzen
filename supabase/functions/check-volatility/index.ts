@@ -552,6 +552,7 @@ serve(async (req) => {
             "apikey": anonKey,
           },
           body: JSON.stringify({
+            holzenInvokeSource: "cron_check_volatility",
             userId: profile.user_id,
             reflectionId,
             context: ctx,
