@@ -1,22 +1,19 @@
 # Home: Recharts layout / forced reflow cost
 
-**Status:** backlog — performance hygiene on **`/`**.
+**Status:** shipped (2026-04) for the **BTC 7-day** chart on Home; re-measure with Performance / Lighthouse after deploy.
 
-## Goal
+## What shipped
 
-Reduce **forced synchronous layout** and main-thread work attributed to **Recharts** on initial Home paint (`getStringSize2`, `updateBBox`, chart mount), observed in a **performance trace** (~**35 ms** reflow time cited; Recharts frames dominant).
+- **`BtcChartLazyGate`** (`src/components/BtcChartLazyGate.tsx`): **`React.lazy`** loads **`BtcChart`** (and the **Recharts** chunk) only after the chart slot is **near the viewport** (`IntersectionObserver`, **`rootMargin: 180px`**). Until then, the same **skeleton** pattern as **`BtcChart`** loading is shown. Stops observing after the first intersection.
+- **`BtcStatus`** renders **`BtcChartLazyGate`** instead of **`BtcChart`** directly (only consumer of **`BtcChart`**).
+- **`BtcChart`**: parent **`min-w-0`** for flex measure stability; **`ResponsiveContainer`** **`height={100}`** (fixed) + **`debounce={50}`** to batch resize; **`Area`** **`isAnimationActive={false}`** to skip mount animation work.
 
-## Rationale
+## Follow-ups (optional)
 
-LCP on the audited run was **text**, with **~99%** “render delay” — not slow TTFB. **Recharts** measuring label/box geometry contributes to **forced reflow** and competes with first paint. This overlaps **conceptually** with [home-fetch-deduplication.md](home-fetch-deduplication.md) (less duplicate work overall) and [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md) (smaller Home surface).
-
-## Direction
-
-- **Defer** charts below the fold: **`React.lazy`**, intersection observer, or “expand to load chart.”
-- Give chart containers **explicit width/height** where possible to reduce measure cycles.
-- Re-measure with **performance_start_trace** after changes.
+- Profile **`/`** again; if other Recharts surfaces dominate (e.g. Profile), apply the same pattern there.
+- [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md) — smaller Home surface overall.
 
 ## Related
 
-- [reports/2026-04-03-home-localhost-360-analysis.md](../reports/2026-04-03-home-localhost-360-analysis.md) — lab numbers.
-- [route-level-code-splitting.md](route-level-code-splitting.md) — route-level lazy loading.
+- [reports/2026-04-03-home-localhost-360-analysis.md](../reports/2026-04-03-home-localhost-360-analysis.md)
+- [route-level-code-splitting.md](route-level-code-splitting.md)

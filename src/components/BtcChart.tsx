@@ -87,8 +87,8 @@ export function BtcChart({ hidden = false, currency = 'USD' }: Props) {
           </span>
         </div>
       </div>
-      <div className="h-[100px] w-full">
-        <ResponsiveContainer width="100%" height="100%">
+      <div className="h-[100px] w-full min-w-0">
+        <ResponsiveContainer width="100%" height={100} debounce={50}>
           <AreaChart data={data} margin={{ top: 4, right: 0, left: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="btcGradient" x1="0" y1="0" x2="0" y2="1">
@@ -125,6 +125,7 @@ export function BtcChart({ hidden = false, currency = 'USD' }: Props) {
               strokeWidth={1.5}
               fill="url(#btcGradient)"
               dot={false}
+              isAnimationActive={false}
               activeDot={{ r: 2.5, fill: 'hsl(var(--foreground))' }}
             />
           </AreaChart>

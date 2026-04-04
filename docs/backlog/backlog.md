@@ -40,6 +40,7 @@ Rule of thumb used here:
 | 2026-04 | [route-level-code-splitting.md](route-level-code-splitting.md) | **`React.lazy`** for all **`src/pages`** routes; **`Suspense`** + **`RouteChunkFallback`** in **`App.tsx`**. |
 | 2026-04 | [lighthouse-a11y-home.md](lighthouse-a11y-home.md) | **`main`** landmark, header contrast, notification **`aria-label`**, **36px** touch targets on Home / **`BtcStatus`**. |
 | 2026-04 | [resource-hints-preconnect.md](resource-hints-preconnect.md) | **`vite.config`** **`transformIndexHtml`**: Supabase + Google Fonts + CoinGecko **`preconnect`**. |
+| 2026-04 | [home-recharts-layout-cost.md](home-recharts-layout-cost.md) | **`BtcChartLazyGate`**: viewport + **`React.lazy`**; chart **`ResponsiveContainer`** tweaks + no area animation. |
 
 ---
 
@@ -112,7 +113,7 @@ Use this when you are **choosing what to work on next**. Items are **not** stric
 | Lower | [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md) | Split oversized pages (`Home`, `PauseSession`); optionally narrow **`use-holzen`**; one slice per PR. |
 | Lower | [data-fetching-conventions.md](data-fetching-conventions.md) | Document / align TanStack Query vs **`useEffect` + Supabase**; optional `QueryClient` defaults. |
 | — | [resource-hints-preconnect.md](resource-hints-preconnect.md) | **Done (2026-04).** Vite-injected **`preconnect`** — see ticket. |
-| Lower | [home-recharts-layout-cost.md](home-recharts-layout-cost.md) | Reduce **Recharts** forced reflow / defer charts on Home. |
+| — | [home-recharts-layout-cost.md](home-recharts-layout-cost.md) | **Done (2026-04).** Lazy + **`IntersectionObserver`** for Home BTC chart — see ticket. |
 
 ### Strategic (not a sprint task — revisit when product/hosting needs change)
 
@@ -149,7 +150,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | Frontend | [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md) | Large pages + hook decomposition |
 | Frontend | [data-fetching-conventions.md](data-fetching-conventions.md) | Query vs Supabase+effect conventions |
 | Frontend | [resource-hints-preconnect.md](resource-hints-preconnect.md) | **Done (2026-04).** Vite **`transformIndexHtml`** — see ticket |
-| Frontend | [home-recharts-layout-cost.md](home-recharts-layout-cost.md) | Recharts reflow / defer charts on Home |
+| Frontend | [home-recharts-layout-cost.md](home-recharts-layout-cost.md) | **Done (2026-04).** **`BtcChartLazyGate`** — see ticket |
 | Strategic | [spa-framework-evaluation.md](spa-framework-evaluation.md) | SPA vs framework evaluation |
 
 ---
@@ -159,7 +160,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | Theme | Backlog files |
 |--------|----------------|
 | **Platform, architecture & tooling** | [e2e-browser-automation.md](e2e-browser-automation.md), [spa-framework-evaluation.md](spa-framework-evaluation.md), [hosting-production-compression.md](hosting-production-compression.md) |
-| **Frontend structure & conventions** | ~~[typed-navigation-state.md](typed-navigation-state.md)~~ **done**, ~~[route-level-code-splitting.md](route-level-code-splitting.md)~~ **done**, [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md), [data-fetching-conventions.md](data-fetching-conventions.md), [home-fetch-deduplication.md](home-fetch-deduplication.md), ~~[resource-hints-preconnect.md](resource-hints-preconnect.md)~~ **done**, [home-recharts-layout-cost.md](home-recharts-layout-cost.md) |
+| **Frontend structure & conventions** | ~~[typed-navigation-state.md](typed-navigation-state.md)~~ **done**, ~~[route-level-code-splitting.md](route-level-code-splitting.md)~~ **done**, [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md), [data-fetching-conventions.md](data-fetching-conventions.md), [home-fetch-deduplication.md](home-fetch-deduplication.md), ~~[resource-hints-preconnect.md](resource-hints-preconnect.md)~~ **done**, ~~[home-recharts-layout-cost.md](home-recharts-layout-cost.md)~~ **done** |
 | **Auth & routing** | [auth-referral.md](auth-referral.md); ~~[route-gating.md](route-gating.md)~~ **done 2026-04** |
 | **Product / UX** | [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md), [cron-pause-featured-parity.md](cron-pause-featured-parity.md), ~~[route-gating.md](route-gating.md)~~ **done**, [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md), ~~[form-field-name-id-a11y.md](form-field-name-id-a11y.md)~~ **done**, ~~[lighthouse-a11y-home.md](lighthouse-a11y-home.md)~~ **done** |
 | **Pause pipeline & client–server boundaries** | [orchestrate-client-cron.md](orchestrate-client-cron.md), [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md), [cron-pause-featured-parity.md](cron-pause-featured-parity.md) |
@@ -186,7 +187,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | [e2e-browser-automation.md](e2e-browser-automation.md) | Playwright/Cypress or Vitest+RTL; Bruno stays API-only |
 | [form-field-name-id-a11y.md](form-field-name-id-a11y.md) | **Done (2026-04).** Form **`name`** / **`id`** / **`autocomplete`** — see ticket |
 | [home-fetch-deduplication.md](home-fetch-deduplication.md) | **Partial (2026-04).** Dedupe + **`navigating-the-codebase`** §6; optional **`profiles`** lift — see ticket |
-| [home-recharts-layout-cost.md](home-recharts-layout-cost.md) | Recharts forced reflow / defer charts on Home |
+| [home-recharts-layout-cost.md](home-recharts-layout-cost.md) | **Done (2026-04).** Lazy viewport gate + chart container tweaks — see ticket |
 | [hosting-production-compression.md](hosting-production-compression.md) | Verify **gzip/Brotli** for HTML in production |
 | [lighthouse-a11y-home.md](lighthouse-a11y-home.md) | **Done (2026-04).** **`main`**, contrast, notification label, touch targets — see ticket |
 | [orchestrate-client-cron.md](orchestrate-client-cron.md) | Client vs cron `companion-orchestrate` overlap |
@@ -241,5 +242,5 @@ Legacy numeric IDs for chat / PR references; prefer **ticket file name** or [mas
 27. ~~PWA **`mobile-web-app-capable`** meta~~ — **Shipped 2026-04** — [pwa-mobile-web-app-meta.md](pwa-mobile-web-app-meta.md)
 28. ~~Lighthouse **a11y** on Home (`/` )~~ — **Shipped 2026-04** — [lighthouse-a11y-home.md](lighthouse-a11y-home.md)
 29. ~~**`preconnect`** resource hints~~ — **Shipped 2026-04** — [resource-hints-preconnect.md](resource-hints-preconnect.md)
-30. Home **Recharts** layout / defer — [home-recharts-layout-cost.md](home-recharts-layout-cost.md)
+30. ~~Home **Recharts** layout / defer~~ — **Shipped 2026-04** — [home-recharts-layout-cost.md](home-recharts-layout-cost.md)
 31. Production **HTML** compression — [hosting-production-compression.md](hosting-production-compression.md)
