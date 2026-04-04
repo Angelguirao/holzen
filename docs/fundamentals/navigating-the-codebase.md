@@ -23,7 +23,7 @@ This guide walks a new contributor through the repository in roughly the order y
 | `supabase/migrations/` | Postgres schema and RLS — **source of truth** for the database. |
 | `supabase/functions/` | Deno edge functions (HTTP APIs, crons, webhooks). |
 | `supabase/config.toml` | Supabase project id and **`[functions.<name>]`** per deployable folder — keep **one block per function** so local serve and hosted deploys match. |
-| `vite.config.ts` | Dev server (port 8080), `@` alias, PWA inject-manifest, **optional Supabase URL/key fallbacks** on dev serve and `vite build` when not in `localstack` mode. |
+| `vite.config.ts` | Dev server (port 8080), `@` alias, PWA inject-manifest, **optional Supabase URL/key fallbacks** on dev serve and `vite build` when not in `localstack` mode; **`transformIndexHtml`** injects **`preconnect`** for Supabase, Google Fonts, and CoinGecko ([resource-hints-preconnect.md](../backlog/resource-hints-preconnect.md)). |
 | `vitest.config.ts` | Tests: jsdom, `src/test/setup.ts`, same `@` alias as Vite. |
 
 ---
