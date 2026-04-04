@@ -64,7 +64,7 @@ async function sendRewardEmail(email: string, rewardType: string, referralCount:
       logStep('Reward email sent', { email, rewardType });
     }
   } catch (e) {
-    logStep('Email send exception', { error: e.message });
+    logStep('Email send exception', { error: e instanceof Error ? e.message : String(e) });
   }
 }
 
@@ -119,7 +119,7 @@ async function grantReward(
         }
       }
     } catch (e) {
-      logStep('Error cancelling subscription for lifetime', { error: e.message });
+      logStep('Error cancelling subscription for lifetime', { error: e instanceof Error ? e.message : String(e) });
     }
   } else {
     // Extend subscription by adding trial days (credit via Stripe customer balance)
@@ -138,7 +138,7 @@ async function grantReward(
         logStep('Applied balance credit', { creditCents, milestone: milestone.count });
       }
     } catch (e) {
-      logStep('Error applying credit', { error: e.message });
+      logStep('Error applying credit', { error: e instanceof Error ? e.message : String(e) });
     }
   }
 
@@ -266,8 +266,9 @@ serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (e) {
-    logStep('ERROR', { message: e.message });
-    return new Response(JSON.stringify({ error: e.message }), {
+    const errorMessage = e instanceof Error ? e.message : String(e);
+    logStep('ERROR', { message: errorMessage });
+    return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
