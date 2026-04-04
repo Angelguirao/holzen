@@ -20,6 +20,7 @@ import { PauseDecide } from '@/components/pause/PauseDecide';
 import { PauseDone } from '@/components/pause/PauseDone';
 import { PauseScienceSheet } from '@/components/pause/PauseScienceSheet';
 import { holzenLog } from '@/lib/holzen-console';
+import { parsePauseSessionLocationState } from '@/lib/router-location-state';
 
 const SESSION_KEY = 'holzen_pause_session';
 
@@ -111,14 +112,14 @@ export default function PauseSession() {
   } = useHolzen();
   const { subscribed } = useSubscription();
 
-  const nav = (location.state ?? {}) as Record<string, unknown>;
-  const navReflectionId = typeof nav.reflectionId === 'string' ? nav.reflectionId : null;
-  const navReflectionMessage =
-    typeof nav.reflectionMessage === 'string' ? nav.reflectionMessage.trim() : '';
-  const navContext = typeof nav.context === 'string' ? nav.context : null;
-  const navCompanions = nav.companions as CompanionData | undefined;
-  const navCompanionPrefs = nav.companionPrefs as CompanionPrefs | undefined;
-  const navSeverity = nav.severity as 'mild' | 'moderate' | 'high' | undefined;
+  const {
+    reflectionId: navReflectionId,
+    reflectionMessage: navReflectionMessage,
+    context: navContext,
+    companions: navCompanions,
+    companionPrefs: navCompanionPrefs,
+    severity: navSeverity,
+  } = parsePauseSessionLocationState(location.state);
 
   const restored = useMemo(() => {
     const saved = loadSession();

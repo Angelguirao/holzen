@@ -33,6 +33,8 @@ Rule of thumb used here:
 | 2026-04 | [pause-session-hydration.md](pause-session-hydration.md) | Coherent `/pause` hydration: storage → aligned hook → nav → fetch by id; loading/error UI. |
 | 2026-04 | [home-fetch-deduplication.md](home-fetch-deduplication.md) | `useQuery` for `check-subscription`; `fetchBtcData` per-currency in-flight coalescing. |
 | 2026-04 | [service-worker-registration-dev.md](service-worker-registration-dev.md) | Skip SW registration when `import.meta.env.DEV`. |
+| 2026-04 | [route-gating.md](route-gating.md) | `AuthLoading`: visible **`auth.restoringSession`** copy, **`role="status"`** / **`aria-live`**. |
+| 2026-04 | [typed-navigation-state.md](typed-navigation-state.md) | `src/lib/router-location-state.ts` parsers + types for **`/pause`**, **`/ground`**, **`/profile`**, notifications. |
 
 ---
 
@@ -73,7 +75,7 @@ Use this when you are **choosing what to work on next**. Items are **not** stric
 |---------------|--------|---------|
 | Medium | [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md) | “Pause ready” vs orchestrate completion (`pause_notifications`). |
 | Medium | [cron-pause-featured-parity.md](cron-pause-featured-parity.md) | Automatic vs manual pause featured fields / first paint. |
-| Medium | [route-gating.md](route-gating.md) | Strict route gating UX vs correctness during auth loading. |
+| — | [route-gating.md](route-gating.md) | **Done (2026-04).** Explicit session-restore copy on `AuthLoading` — see ticket. |
 | Lower | [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md) | Transparency when cache serve relaxes constraints. |
 | Lower | [form-field-name-id-a11y.md](form-field-name-id-a11y.md) | Form controls missing **`name`** / **`id`** / **`autocomplete`** — DevTools Issues. |
 | Medium | [lighthouse-a11y-home.md](lighthouse-a11y-home.md) | Fix Lighthouse **axe** failures on **`/`** — buttons, contrast, **`main`**, notification name, touch target. |
@@ -100,7 +102,7 @@ Use this when you are **choosing what to work on next**. Items are **not** stric
 
 | Priority hint | Ticket | Summary |
 |---------------|--------|---------|
-| Medium | [typed-navigation-state.md](typed-navigation-state.md) | Type **`location.state`** instead of `as any` — aligns with pause navigation contracts. |
+| — | [typed-navigation-state.md](typed-navigation-state.md) | **Done (2026-04).** `router-location-state` — see ticket. |
 | Medium | [route-level-code-splitting.md](route-level-code-splitting.md) | **`React.lazy`** + **`Suspense`** for route components — smaller first load than static imports in **`App.tsx`**. |
 | Lower | [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md) | Split oversized pages (`Home`, `PauseSession`); optionally narrow **`use-holzen`**; one slice per PR. |
 | Lower | [data-fetching-conventions.md](data-fetching-conventions.md) | Document / align TanStack Query vs **`useEffect` + Supabase**; optional `QueryClient` defaults. |
@@ -130,14 +132,14 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | Cost / efficiency | [home-fetch-deduplication.md](home-fetch-deduplication.md) | **Partial done (2026-04).** Subscription query + BTC coalesce — see ticket |
 | Product / UX | [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md) | Notification vs orchestrate ordering |
 | Product / UX | [cron-pause-featured-parity.md](cron-pause-featured-parity.md) | Cron vs manual featured parity |
-| Product / UX | [route-gating.md](route-gating.md) | Auth loading + route gating UX |
+| Product / UX | [route-gating.md](route-gating.md) | **Done (2026-04).** Auth loading copy + a11y on `AuthLoading` — see ticket |
 | Product / UX | [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md) | Cache relaxation transparency |
 | Product / UX | [form-field-name-id-a11y.md](form-field-name-id-a11y.md) | Form **`name`** / **`id`** / **`autocomplete`** for a11y |
 | Product / UX | [lighthouse-a11y-home.md](lighthouse-a11y-home.md) | Lighthouse **axe** on Home — landmarks, buttons, contrast |
 | Ops / security | [hosting-production-compression.md](hosting-production-compression.md) | Prod **HTML** **Content-Encoding** check |
 | Quality | [quality-gates-false-positives.md](quality-gates-false-positives.md) | Quality gate tuning |
 | Testing | [e2e-browser-automation.md](e2e-browser-automation.md) | UI journeys (E2E) vs Bruno API review |
-| Frontend | [typed-navigation-state.md](typed-navigation-state.md) | Typed `location.state` for router payloads |
+| Frontend | [typed-navigation-state.md](typed-navigation-state.md) | **Done (2026-04).** Parsers in `router-location-state.ts` — see ticket |
 | Frontend | [route-level-code-splitting.md](route-level-code-splitting.md) | Lazy route chunks vs static imports in `App.tsx` |
 | Frontend | [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md) | Large pages + hook decomposition |
 | Frontend | [data-fetching-conventions.md](data-fetching-conventions.md) | Query vs Supabase+effect conventions |
@@ -152,9 +154,9 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | Theme | Backlog files |
 |--------|----------------|
 | **Platform, architecture & tooling** | [e2e-browser-automation.md](e2e-browser-automation.md), [spa-framework-evaluation.md](spa-framework-evaluation.md), [hosting-production-compression.md](hosting-production-compression.md) |
-| **Frontend structure & conventions** | [typed-navigation-state.md](typed-navigation-state.md), [route-level-code-splitting.md](route-level-code-splitting.md), [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md), [data-fetching-conventions.md](data-fetching-conventions.md), [home-fetch-deduplication.md](home-fetch-deduplication.md), [resource-hints-preconnect.md](resource-hints-preconnect.md), [home-recharts-layout-cost.md](home-recharts-layout-cost.md) |
-| **Auth & routing** | [auth-referral.md](auth-referral.md), [route-gating.md](route-gating.md) |
-| **Product / UX** | [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md), [cron-pause-featured-parity.md](cron-pause-featured-parity.md), [route-gating.md](route-gating.md), [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md), [form-field-name-id-a11y.md](form-field-name-id-a11y.md), [lighthouse-a11y-home.md](lighthouse-a11y-home.md) |
+| **Frontend structure & conventions** | ~~[typed-navigation-state.md](typed-navigation-state.md)~~ **done**, [route-level-code-splitting.md](route-level-code-splitting.md), [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md), [data-fetching-conventions.md](data-fetching-conventions.md), [home-fetch-deduplication.md](home-fetch-deduplication.md), [resource-hints-preconnect.md](resource-hints-preconnect.md), [home-recharts-layout-cost.md](home-recharts-layout-cost.md) |
+| **Auth & routing** | [auth-referral.md](auth-referral.md); ~~[route-gating.md](route-gating.md)~~ **done 2026-04** |
+| **Product / UX** | [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md), [cron-pause-featured-parity.md](cron-pause-featured-parity.md), ~~[route-gating.md](route-gating.md)~~ **done**, [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md), [form-field-name-id-a11y.md](form-field-name-id-a11y.md), [lighthouse-a11y-home.md](lighthouse-a11y-home.md) |
 | **Pause pipeline & client–server boundaries** | [orchestrate-client-cron.md](orchestrate-client-cron.md), [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md), [cron-pause-featured-parity.md](cron-pause-featured-parity.md) |
 | **Cost & duplicate work (client + server)** | [orchestrate-client-cron.md](orchestrate-client-cron.md), [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md), [home-fetch-deduplication.md](home-fetch-deduplication.md) |
 | **Cache, library & market data** | [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md), [btc-price-cache-freshness.md](btc-price-cache-freshness.md), [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md) |
@@ -194,9 +196,9 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | [route-level-code-splitting.md](route-level-code-splitting.md) | Lazy routes + Suspense — avoid loading all pages on cold start |
 | [service-worker-registration-dev.md](service-worker-registration-dev.md) | **Done (2026-04).** DEV guard in `sw-update.ts` — see ticket. |
 | [reflection-insert-partial-failure.md](reflection-insert-partial-failure.md) | **Done (2026-04).** Insert failure after generate — see ticket. |
-| [route-gating.md](route-gating.md) | Strict route gating UX vs correctness |
+| [route-gating.md](route-gating.md) | **Done (2026-04).** Session-restore messaging on `AuthLoading` — see ticket |
 | [spa-framework-evaluation.md](spa-framework-evaluation.md) | Vite SPA vs full-stack React framework (React docs tradeoffs; when to revisit) |
-| [typed-navigation-state.md](typed-navigation-state.md) | Typed `location.state` instead of `as any` for navigation payloads |
+| [typed-navigation-state.md](typed-navigation-state.md) | **Done (2026-04).** `router-location-state.ts` — see ticket |
 | [writeCompanionData-grounding-consistency.md](writeCompanionData-grounding-consistency.md) | **Done (2026-04).** Grounding single source — see ticket. |
 
 ---
@@ -206,7 +208,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 Legacy numeric IDs for chat / PR references; prefer **ticket file name** or [master table](#master-table-all-items) for new work.
 
 1. Guaranteed referral delivery — [auth-referral.md](auth-referral.md)
-2. UX clarity for strict route gating during auth loading — [route-gating.md](route-gating.md)
+2. ~~UX clarity for strict route gating during auth loading~~ — **Shipped 2026-04** — [route-gating.md](route-gating.md)
 3. ~~Reduce reliance on `location.state` for `/pause` restoration~~ — **Shipped 2026-04** — [pause-session-hydration.md](pause-session-hydration.md)
 4. Client vs cron `companion-orchestrate` overlap — [orchestrate-client-cron.md](orchestrate-client-cron.md)
 5. ~~Partial failure: reflect OK, reflection insert fails~~ — **Shipped 2026-04** — [reflection-insert-partial-failure.md](reflection-insert-partial-failure.md)
@@ -223,7 +225,7 @@ Legacy numeric IDs for chat / PR references; prefer **ticket file name** or [mas
 16. ~~Grounding dual-write consistency~~ — **Shipped 2026-04** — [writeCompanionData-grounding-consistency.md](writeCompanionData-grounding-consistency.md)
 17. E2E / browser automation — [e2e-browser-automation.md](e2e-browser-automation.md)
 18. SPA vs full-stack React framework — [spa-framework-evaluation.md](spa-framework-evaluation.md)
-19. Typed React Router **`location.state`** — [typed-navigation-state.md](typed-navigation-state.md)
+19. ~~Typed React Router **`location.state`**~~ — **Shipped 2026-04** — [typed-navigation-state.md](typed-navigation-state.md)
 20. Split large pages / heavy hooks — [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md)
 21. Data fetching conventions (Query vs Supabase + effects) — [data-fetching-conventions.md](data-fetching-conventions.md)
 22. Route-level code splitting (`React.lazy` / `Suspense`) — [route-level-code-splitting.md](route-level-code-splitting.md)

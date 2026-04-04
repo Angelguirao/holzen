@@ -5,6 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useHolzen } from '@/hooks/use-holzen';
 import { useSubscription } from '@/hooks/use-subscription';
+import { parseProfileLocationState, PROFILE_TAB_IDS, type ProfileTab } from '@/lib/router-location-state';
 import { formatBtcPrice } from '@/lib/btc';
 import { format } from 'date-fns';
 import { Mail, Lock, Clock, Trash2, BarChart3, Sparkles, Award, CalendarDays, Info } from 'lucide-react';
@@ -98,8 +99,7 @@ const Profile = () => {
   const { t } = useTranslation();
   const { subscribed } = useSubscription();
   const location = useLocation();
-  const locationTab = (location.state as any)?.tab;
-  const locationLetterId = (location.state as any)?.letterId;
+  const { tab: locationTab, letterId: locationLetterId } = parseProfileLocationState(location.state);
   const [reflections, setReflections] = useState<Reflection[]>([]);
   const [letters, setLetters] = useState<Letter[]>([]);
   const [practiceEntries, setPracticeEntries] = useState<PracticeEntry[]>([]);
@@ -107,8 +107,8 @@ const Profile = () => {
   const [loading, setLoading] = useState(true);
   const [lettersLoading, setLettersLoading] = useState(true);
   const [viewingLetter, setViewingLetter] = useState<Letter | null>(null);
-  const [tab, setTab] = useState<'stats' | 'insights' | 'badges' | 'letters' | 'activity'>(
-    ['stats', 'insights', 'badges', 'letters', 'activity'].includes(locationTab) ? locationTab : 'stats'
+  const [tab, setTab] = useState<ProfileTab>(
+    locationTab && PROFILE_TAB_IDS.includes(locationTab) ? locationTab : 'stats'
   );
 
   // Track whether we're waiting to open a letter from a notification
@@ -116,8 +116,8 @@ const Profile = () => {
 
   // Keep tab in sync with navigation state (important when already on /profile)
   useEffect(() => {
-    if (locationTab && ['stats', 'insights', 'badges', 'letters', 'activity'].includes(locationTab)) {
-      setTab(locationTab as 'stats' | 'insights' | 'badges' | 'letters' | 'activity');
+    if (locationTab && PROFILE_TAB_IDS.includes(locationTab)) {
+      setTab(locationTab);
     }
   }, [locationTab]);
 
