@@ -1,5 +1,5 @@
 import { Eye, EyeOff, WifiOff, Bitcoin, Clock } from 'lucide-react';
-import { BtcChart } from '@/components/BtcChart';
+import { BtcChartLazyGate } from '@/components/BtcChartLazyGate';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatBtcPrice, type BtcPriceData } from '@/lib/btc';
 import { useTranslation } from 'react-i18next';
@@ -160,7 +160,7 @@ export function BtcStatus({ data, error, hidden, onToggleHidden, currency = 'USD
           </>
         )}
       </div>
-      <BtcChart hidden={hidden} currency={cur} />
+      <BtcChartLazyGate hidden={hidden} currency={cur} />
     </div>
   );
 }
