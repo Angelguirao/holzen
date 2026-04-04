@@ -58,7 +58,7 @@ If these workers drift (stale prices, bad dedup, permissive auth), you get wrong
 ### `supabase/functions/pregenerate-companions/index.ts` — companion_cache lifecycle
 
 - Periodic fill of `companion_cache` with high-quality payloads; processes `companion_feedback` via `analytics_events`.
-- **Auth**: `SUPABASE_SERVICE_ROLE_KEY` or `CRON_SECRET`.
+- **Auth**: Bruno **`SERVICE_CRON_BEARER`** (service_role JWT or `CRON_SECRET`); Edge: [`verifyServiceAuth`](../../supabase/functions/_shared/auth.ts).
 - **Lifecycle**: promote high-quality entries to permanent (`expires_at = null`); prune low-quality after 3 days; expire medium tiers after 30 days.
 - **Generation loop**: small batch per type (grounding, signal, history, zoom-out deep time); dedup via title similarity vs existing cache rows.
 - **Feedback**: last 24h feedback events adjust `quality_score` within [0..3].
