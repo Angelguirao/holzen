@@ -6,6 +6,15 @@ Holzen already uses **three complementary channels**. The strategy is to **keep 
 
 **Implementation:** [`supabase/functions/_shared/observe.ts`](../../supabase/functions/_shared/observe.ts) for structured JSON + DB; **[`holzen-edge-log.ts`](../../supabase/functions/_shared/holzen-edge-log.ts)** for cron/worker lines grep-able as **`[holzen:<tag>]`** in Supabase Edge logs (`holzenEdgeRun` always; `holzenEdgeLog` / `Warn` gated by `HOLZEN_EDGE_LOG`; `holzenEdgeError` always).
 
+**Prod vs “understand the flow” (same intent as [`holzen-console`](../../src/lib/holzen-console.ts)):**
+
+| Surface | Quiet default (prod) | Verbose flow tracing |
+|---------|----------------------|----------------------|
+| **Browser** | No `[holzen:*]` unless user sets `localStorage holzen:debug=1` | `import.meta.env.DEV` **or** `holzen:debug=1` |
+| **Edge cron / workers** | Set secret **`HOLZEN_EDGE_LOG=0`** (still get **`holzenEdgeRun`** + errors) | Leave secret **unset** or **`1`** on staging / while debugging |
+
+So: **production hosted** → `HOLZEN_EDGE_LOG=0` matches “no strategic spam in prod.” **Staging or local serve** → omit it to see **`holzenEdgeLog`** milestones (eligible counts, run complete, rate limits, etc.) the same way you rely on **`holzen:debug`** or dev mode in the app.
+
 | Mechanism | Purpose | When to use |
 |-----------|---------|-------------|
 | **`createLogger(prefix)`** | One JSON line per log (`fn`, `cid`, `elapsed_ms`, `level`, `msg`, optional `extra`) | Every new function: request lifecycle, branches, failures. Appears in **Supabase → Edge Functions → Logs**. |
@@ -19,6 +28,8 @@ Holzen already uses **three complementary channels**. The strategy is to **keep 
 - **Never log:** service role keys, full JWTs, raw Stripe payloads with secrets, or full user journal text in `extra`—use ids (`user_id`, `reflection_id`) and short hashes if needed.
 
 ## 2. Browser (React) — **prefixed console + user-visible errors**
+
+**Holzen flow tracing:** [`src/lib/holzen-console.ts`](../../src/lib/holzen-console.ts) — **`[holzen:boot]`**, **`holzen:profile`**, etc.; **on in dev**, **off in prod** unless `holzen:debug=1` (pairs with Edge **`HOLZEN_EDGE_LOG`** above).
 
 **Current pattern:** `console.error` / `console.warn` with a **stable prefix** (e.g. `[useCompanionData]`, `[boot-crash-promise]`), plus `ErrorBoundary` and `main.tsx` handlers for boot failures.
 
