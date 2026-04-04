@@ -78,8 +78,6 @@ serve(async (req) => {
     const authHeader = req.headers.get("Authorization");
     const sbUrl = Deno.env.get("SUPABASE_URL") ?? "";
     const sbAnon = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
-    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
-    const cronSecret = Deno.env.get("CRON_SECRET") ?? "";
 
     let userIds: string[] = [];
 
@@ -102,15 +100,11 @@ serve(async (req) => {
       }
       userIds = [singleUserId];
     } else {
-      const token = authHeader?.replace(/^Bearer\s+/i, "")?.trim() ?? "";
-      const okCron = cronSecret.length > 0 && token === cronSecret;
-      const okService = token.length > 0 && token === serviceRoleKey;
-      const okSupabaseCron = req.headers.get("x-supabase-cron") === "true";
-      if (!okCron && !okService && !okSupabaseCron) {
+      const { verifyServiceAuth } = await import("../_shared/auth.ts");
+      if (!verifyServiceAuth(req)) {
         return new Response(
           JSON.stringify({
-            error:
-              "Unauthorized. Batch mode requires service role, cron secret, or Supabase scheduled invoke.",
+            error: "Unauthorized. Batch mode requires Authorization: Bearer with service role or CRON_SECRET.",
           }),
           { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
         );
