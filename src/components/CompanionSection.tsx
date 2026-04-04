@@ -166,6 +166,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
     intervention, interventionLoading, interventionError,
     retryOrchestrate,
     regenerateCompanion,
+    fetchCompanion,
   } = useCompanionData({ companions, prefs, reflectionId, context, reflectionMessage, mood, severityNumber: SEVERITY_NUMBER[severity] ?? 3 });
 
   const labels = {
@@ -249,6 +250,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           expanded={expandedSignal}
           onToggle={() => {
             setExpandedSignal((v) => !v);
+            if (!signal && !signalLoading && !signalError) fetchCompanion('signal');
             if (!completion.signal) markCompleted('signal');
           }}
           completed={completion.signal}
@@ -283,6 +285,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           expanded={expandedLearning}
           onToggle={() => {
             setExpandedLearning((v) => !v);
+            if (!nudge && !nudgeLoading && !nudgeError) fetchCompanion('grounding');
             if (!completion.grounding) markCompleted('grounding');
           }}
           completed={completion.grounding}
@@ -319,6 +322,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           expanded={expandedZoomOut}
           onToggle={() => {
             setExpandedZoomOut((v) => !v);
+            if (!zoomOut && !zoomOutLoading && !zoomOutError) fetchCompanion('zoomOut');
             if (!completion.zoomOut) markCompleted('zoomOut');
           }}
           completed={completion.zoomOut}
@@ -353,6 +357,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           expanded={expandedHistory}
           onToggle={() => {
             setExpandedHistory((v) => !v);
+            if (!historyInsight && !historyLoading && !historyError) fetchCompanion('history');
             if (!completion.history) markCompleted('history');
           }}
           completed={completion.history}

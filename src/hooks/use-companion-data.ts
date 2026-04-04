@@ -270,24 +270,18 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
   const [interventionLoading, setInterventionLoading] = useState(false);
   const [interventionError, setInterventionError] = useState(false);
 
-  // Prime loaders before paint when switching reflections so cron/notification opens
-  // never flash an empty featured/intervention area (loaders start false in useState).
+  // Track which companion slots have already been fetched/requested for this reflection
+  const fetchedSlotsRef = useRef<Set<string>>(new Set());
+
+  // Prime only the intervention loader before paint when switching reflections.
+  // Companion slots are no longer eagerly loaded — they start idle until tapped.
   useLayoutEffect(() => {
     if (!reflectionId) {
-      setSignalLoading(false);
-      setNudgeLoading(false);
-      setHistoryLoading(false);
-      setZoomOutLoading(false);
       setInterventionLoading(false);
       return;
     }
     setInterventionLoading(true);
-    if (prefs.signal) setSignalLoading(true);
-    if (prefs.grounding) setNudgeLoading(true);
-    if (prefs.history) setHistoryLoading(true);
-    if (prefs.zoomOut) setZoomOutLoading(true);
-  // Only re-prime when the reflection changes; prefs toggles are handled by the orchestrate effect.
-  // eslint-disable-next-line react-hooks/exhaustive-deps -- prefs read intentionally; deps = reflectionId only
+    fetchedSlotsRef.current = new Set();
   }, [reflectionId]);
 
   // ── Check for already-cached data on the reflection row ──
@@ -403,99 +397,142 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     } catch { return undefined; }
   }, []);
 
-  // ── Main orchestrated fetch ──
+  // ── Intervention-only fetch + cached companion hydration ──
+  // Companions are NOT fetched here — only on user tap (see fetchCompanion below).
   useEffect(() => {
     if (!reflectionId) return;
-
-    const enableSignal = prefs.signal;
-    const enableGrounding = prefs.grounding;
-    const enableHistory = prefs.history;
-    const enableZoomOut = prefs.zoomOut;
-
-    // Always fire — intervention selection runs regardless of companion prefs.
-    // Individual prefs control which legacy companions are additionally generated.
 
     const key = `${reflectionId}:${retryCount}`;
     if (fetchedRef.current === key) return;
     fetchedRef.current = key;
 
     let cancelled = false;
-
-    // Set loading states
-    if (enableSignal) setSignalLoading(true);
-    if (enableGrounding) setNudgeLoading(true);
-    if (enableHistory) setHistoryLoading(true);
-    if (enableZoomOut) setZoomOutLoading(true);
     setInterventionLoading(true);
-
-    setSignalError(false);
-    setNudgeError(false);
-    setHistoryError(false);
-    setZoomOutError(false);
     setInterventionError(false);
 
     (async () => {
-      let needSignal = false;
-      let needGrounding = false;
-      let needHistory = false;
-      let needZoomOut = false;
-
       try {
-      // First check if reflection already has cached data
-      const cached = await checkCachedReflection(reflectionId);
+        // Hydrate any already-persisted companion data from reflection_companions
+        const cached = await checkCachedReflection(reflectionId);
+        if (cancelled) return;
 
-      if (cancelled) return;
+        if (cached.signal) {
+          setSignal(cached.signal);
+          fetchedSlotsRef.current.add('signal');
+          autoSaveToLibrary({ title: cached.signal.title, body: cached.signal.body, sourceType: 'signal', sourceUrl: cached.signal.url });
+        }
+        if (cached.grounding) {
+          setNudge(cached.grounding);
+          fetchedSlotsRef.current.add('grounding');
+          autoSaveToLibrary({ title: cached.grounding.title, body: cached.grounding.body, sourceType: 'grounding', sourceUrl: cached.grounding.url });
+        }
+        if (cached.history) {
+          setHistoryInsight(cached.history);
+          fetchedSlotsRef.current.add('history');
+          autoSaveToLibrary({ title: cached.history.title, body: cached.history.btcInsight, sourceType: 'history_insight' });
+        }
+        if (cached.zoomOut) {
+          setZoomOut(cached.zoomOut);
+          fetchedSlotsRef.current.add('zoomOut');
+          const zoomBody = cached.zoomOut?.deepTime?.body || cached.zoomOut?.echo?.message || 'Zoom Out perspective';
+          autoSaveToLibrary({ title: cached.zoomOut?.deepTime?.title || 'Zoom Out', body: zoomBody, sourceType: 'zoom_out' });
+        }
+        if (cached.intervention) {
+          setIntervention(cached.intervention);
+          setInterventionLoading(false);
+          return;
+        }
 
-      // Determine which companions still need fetching
-      needSignal = enableSignal && !cached.signal;
-      needGrounding = enableGrounding && !cached.grounding;
-      needHistory = enableHistory && !cached.history;
-      needZoomOut = enableZoomOut && !cached.zoomOut;
-      const needIntervention = !cached.intervention;
+        // Intervention not cached — fetch from orchestrate (intervention-only, no companion slots)
+        let moodHistory: Array<{ mood: string; outcome?: string | null }> = [];
+        try {
+          const { data: authData } = await supabase.auth.getUser();
+          const uid = authData?.user?.id;
+          if (uid) {
+            const { data: recentRows } = await supabase
+              .from('reflections')
+              .select('mood, outcome')
+              .eq('user_id', uid)
+              .not('mood', 'is', null)
+              .order('created_at', { ascending: false })
+              .limit(20);
+            if (recentRows) {
+              moodHistory = recentRows
+                .filter((r: any) => r.mood)
+                .map((r: any) => ({ mood: r.mood, outcome: r.outcome ?? null }));
+            }
+          }
+        } catch { /* non-fatal */ }
 
-      // Set already-cached companions immediately
-      if (cached.signal && enableSignal) {
-        setSignal(cached.signal);
-        setSignalLoading(false);
-        autoSaveToLibrary({ title: cached.signal.title, body: cached.signal.body, sourceType: 'signal', sourceUrl: cached.signal.url });
-      }
-      if (cached.grounding && enableGrounding) {
-        setNudge(cached.grounding);
-        setNudgeLoading(false);
-        autoSaveToLibrary({ title: cached.grounding.title, body: cached.grounding.body, sourceType: 'grounding', sourceUrl: cached.grounding.url });
-      }
-      if (cached.history && enableHistory) {
-        setHistoryInsight(cached.history);
-        setHistoryLoading(false);
-        autoSaveToLibrary({ title: cached.history.title, body: cached.history.btcInsight, sourceType: 'history_insight' });
-      }
-      if (cached.zoomOut && enableZoomOut) {
-        setZoomOut(cached.zoomOut);
-        setZoomOutLoading(false);
-        const zoomBody = cached.zoomOut?.deepTime?.body || cached.zoomOut?.echo?.message || 'Zoom Out perspective';
-        autoSaveToLibrary({ title: cached.zoomOut?.deepTime?.title || 'Zoom Out', body: zoomBody, sourceType: 'zoom_out' });
-      }
-      if (cached.intervention) {
-        setIntervention(cached.intervention);
+        const { data, error: fnError } = await supabase.functions.invoke('companion-orchestrate', {
+          body: {
+            holzenInvokeSource: 'browser_pause_intervention',
+            reflectionId,
+            context: context ?? '',
+            language,
+            reflectionMessage: reflectionMessage ?? '',
+            mood: mood ?? null,
+            severity: severityNumber ?? 0,
+            moodHistory,
+            enableSignal: false,
+            enableGrounding: false,
+            enableHistory: false,
+            enableZoomOut: false,
+            useIntervention: true,
+          },
+        });
+
+        if (cancelled) return;
+
+        const body = data as Record<string, unknown> | null;
+        if (!!fnError || !body || Boolean(body.error)) {
+          setInterventionError(true);
+          setInterventionLoading(false);
+          return;
+        }
+
+        if (data.intervention) {
+          setIntervention(data.intervention as InterventionState);
+        } else {
+          setInterventionError(true);
+        }
         setInterventionLoading(false);
+      } catch (e) {
+        console.error('[useCompanionData] intervention fetch failed', e);
+        setInterventionError(true);
+      } finally {
+        if (!cancelled) setInterventionLoading(false);
       }
+    })();
 
-      // If everything is already cached, skip the orchestrate call entirely
-      if (!needSignal && !needGrounding && !needHistory && !needZoomOut && !needIntervention) {
-        setSignalLoading(false);
-        setNudgeLoading(false);
-        setHistoryLoading(false);
-        setZoomOutLoading(false);
-        setInterventionLoading(false);
-        return;
-      }
+    return () => { cancelled = true; };
+  }, [reflectionId, retryCount, context, reflectionMessage, mood, severityNumber, language, checkCachedReflection, autoSaveToLibrary]);
 
-      // Build orchestrator payload
+  // ── On-demand companion slot fetch (triggered when user taps a card) ──
+  const fetchCompanion = useCallback(async (slot: RegenerateCompanionSlot) => {
+    if (!reflectionId) return;
+    if (fetchedSlotsRef.current.has(slot)) return;
+    fetchedSlotsRef.current.add(slot);
+
+    const setLoading = (v: boolean) => {
+      if (slot === 'signal') setSignalLoading(v);
+      else if (slot === 'grounding') setNudgeLoading(v);
+      else if (slot === 'history') setHistoryLoading(v);
+      else setZoomOutLoading(v);
+    };
+    const setErr = (v: boolean) => {
+      if (slot === 'signal') setSignalError(v);
+      else if (slot === 'grounding') setNudgeError(v);
+      else if (slot === 'history') setHistoryError(v);
+      else setZoomOutError(v);
+    };
+    setLoading(true);
+    setErr(false);
+
+    try {
       const recency = getRecencyHints();
-      const signalSources = needSignal ? await getSignalSources() : undefined;
-      const groundingSources = needGrounding ? await getGroundingSources() : undefined;
-
-      // Fetch recent mood history from DB for intervention selection
+      const signalSources = slot === 'signal' ? await getSignalSources() : undefined;
+      const groundingSources = slot === 'grounding' ? await getGroundingSources() : undefined;
       let moodHistory: Array<{ mood: string; outcome?: string | null }> = [];
       try {
         const { data: authData } = await supabase.auth.getUser();
@@ -518,7 +555,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
 
       const { data, error: fnError } = await supabase.functions.invoke('companion-orchestrate', {
         body: {
-          holzenInvokeSource: 'browser_pause',
+          holzenInvokeSource: 'browser_lazy_fetch',
           reflectionId,
           context: context ?? '',
           language,
@@ -529,41 +566,24 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
           signalSources,
           groundingSources,
           ...recency,
-          enableSignal: needSignal,
-          enableGrounding: needGrounding,
-          enableHistory: needHistory,
-          enableZoomOut: needZoomOut,
-          // Always request intervention selection in the pause flow
-          useIntervention: true,
+          enableSignal: slot === 'signal',
+          enableGrounding: slot === 'grounding',
+          enableHistory: slot === 'history',
+          enableZoomOut: slot === 'zoomOut',
+          useIntervention: false,
         },
       });
 
-      if (cancelled) return;
-
       const body = data as Record<string, unknown> | null;
       const payloadError = !!fnError || !body || Boolean(body.error);
-
       if (payloadError) {
-        if (needSignal) { setSignalError(true); setSignalLoading(false); }
-        if (needGrounding) { setNudgeError(true); setNudgeLoading(false); }
-        if (needHistory) { setHistoryError(true); setHistoryLoading(false); }
-        if (needZoomOut) { setZoomOutError(true); setZoomOutLoading(false); }
-        setInterventionError(true);
-        setInterventionLoading(false);
+        setErr(true);
+        setLoading(false);
         return;
       }
 
-      // Process intervention (new pause flow)
-      if (data.intervention) {
-        setIntervention(data.intervention as InterventionState);
-      } else {
-        setInterventionError(true);
-      }
-      setInterventionLoading(false);
-
-      // Process signal
-      if (needSignal) {
-        const r = data.signal as CompanionResult | null;
+      if (slot === 'signal') {
+        const r = body.signal as CompanionResult | null;
         if (r?.data && r.source !== 'empty') {
           setSignal(r.data as SignalData);
           if (r.cacheId) setCacheIds(prev => ({ ...prev, signal: r.cacheId }));
@@ -571,15 +591,9 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
           updateRecencyHints('signal_source', r.data.source);
           if (r.data.url) updateRecencyHints('signal_url', r.data.url);
           autoSaveToLibrary({ title: r.data.title, body: r.data.body, sourceType: 'signal', sourceUrl: r.data.url });
-        } else {
-          setSignalError(true);
-        }
-        setSignalLoading(false);
-      }
-
-      // Process grounding
-      if (needGrounding) {
-        const r = data.grounding as CompanionResult | null;
+        } else setErr(true);
+      } else if (slot === 'grounding') {
+        const r = body.grounding as CompanionResult | null;
         if (r?.data && r.source !== 'empty') {
           setNudge(r.data as NudgeData);
           if (r.cacheId) setCacheIds(prev => ({ ...prev, nudge: r.cacheId }));
@@ -587,68 +601,50 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
           const gHost = hostnameFromUrl(r.data.url);
           if (gHost) updateRecencyHints('grounding_source', gHost);
           autoSaveToLibrary({ title: r.data.title, body: r.data.body, sourceType: 'grounding', sourceUrl: r.data.url });
-        } else {
-          setNudgeError(true);
-        }
-        setNudgeLoading(false);
-      }
-
-      // Process history
-      if (needHistory) {
-        const r = data.history as CompanionResult | null;
+        } else setErr(true);
+      } else if (slot === 'history') {
+        const r = body.history as CompanionResult | null;
         if (r?.data && r.source !== 'empty') {
           setHistoryInsight(r.data as HistoricalInsightData);
           if (r.cacheId) setCacheIds(prev => ({ ...prev, history: r.cacheId }));
           updateRecencyHints('history', r.data.title);
           autoSaveToLibrary({ title: r.data.title, body: r.data.btcInsight, sourceType: 'history_insight' });
-        } else {
-          setHistoryError(true);
-        }
-        setHistoryLoading(false);
-      }
-
-      // Process zoomOut
-      if (needZoomOut) {
-        const r = data.zoomOut as CompanionResult | null;
+        } else setErr(true);
+      } else {
+        const r = body.zoomOut as CompanionResult | null;
         if (r?.data && r.source !== 'empty') {
           setZoomOut(r.data);
           if (r.cacheId) setCacheIds(prev => ({ ...prev, zoomOut: r.cacheId }));
           updateRecencyHints('zoomOut', r.data?.deepTime?.title);
           const zoomBody = r.data?.deepTime?.body || r.data?.echo?.message || 'Zoom Out perspective';
           autoSaveToLibrary({ title: r.data?.deepTime?.title || 'Zoom Out', body: zoomBody, sourceType: 'zoom_out' });
-        } else {
-          setZoomOutError(true);
-        }
-        setZoomOutLoading(false);
+        } else setErr(true);
       }
-      } catch (e) {
-        console.error('[useCompanionData] orchestrate failed', e);
-        if (needSignal) setSignalError(true);
-        if (needGrounding) setNudgeError(true);
-        if (needHistory) setHistoryError(true);
-        if (needZoomOut) setZoomOutError(true);
-        setInterventionError(true);
-      } finally {
-        if (!cancelled) {
-          setSignalLoading(false);
-          setNudgeLoading(false);
-          setHistoryLoading(false);
-          setZoomOutLoading(false);
-          setInterventionLoading(false);
-        }
-      }
-    })();
-
-    return () => { cancelled = true; };
-  }, [reflectionId, retryCount, prefs.signal, prefs.grounding, prefs.history, prefs.zoomOut, context, reflectionMessage, mood, severityNumber, language]);
+    } catch (e) {
+      console.error('[useCompanionData] fetchCompanion failed', slot, e);
+      setErr(true);
+    } finally {
+      setLoading(false);
+    }
+  }, [
+    reflectionId, context, reflectionMessage, mood, severityNumber, language,
+    getRecencyHints, getSignalSources, getGroundingSources, autoSaveToLibrary, updateRecencyHints,
+  ]);
 
   // ── Retry helpers ──
-  const retryNudge = useCallback(() => { setRetryCount(c => c + 1); }, []);
-  const retrySignal = useCallback(() => { setRetryCount(c => c + 1); }, []);
-  const retryZoomOut = useCallback(() => { setRetryCount(c => c + 1); }, []);
-  const retryHistory = useCallback(() => { setRetryCount(c => c + 1); }, []);
-  /** Re-run companion-orchestrate (intervention + all companion slots). */
-  const retryOrchestrate = useCallback(() => { setRetryCount(c => c + 1); }, []);
+  const retrySlot = useCallback((slot: RegenerateCompanionSlot) => {
+    fetchedSlotsRef.current.delete(slot);
+    fetchCompanion(slot);
+  }, [fetchCompanion]);
+  const retryNudge = useCallback(() => retrySlot('grounding'), [retrySlot]);
+  const retrySignal = useCallback(() => retrySlot('signal'), [retrySlot]);
+  const retryZoomOut = useCallback(() => retrySlot('zoomOut'), [retrySlot]);
+  const retryHistory = useCallback(() => retrySlot('history'), [retrySlot]);
+  /** Re-run companion-orchestrate (intervention + reset companion slots). */
+  const retryOrchestrate = useCallback(() => {
+    fetchedSlotsRef.current = new Set();
+    setRetryCount(c => c + 1);
+  }, []);
 
   const regenerateCompanion = useCallback(async (slot: RegenerateCompanionSlot) => {
     if (!reflectionId) return;
@@ -779,5 +775,6 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     intervention, interventionLoading, interventionError,
     retryOrchestrate,
     regenerateCompanion,
+    fetchCompanion,
   };
 }
