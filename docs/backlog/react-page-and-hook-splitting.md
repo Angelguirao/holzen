@@ -7,6 +7,7 @@
 | When | Slice |
 |------|--------|
 | 2026-04 | **`Home`:** `NeedAMomentButton`, `AutoCooldownIndicator`, and `ProLockedWidget` moved to **`src/components/home/HomePauseChrome.tsx`**. |
+| 2026-04 | **`PauseSession`:** localStorage + types → **`src/lib/pause-session-storage.ts`**; loading/error full-screen → **`PauseSessionGate`**; curtain / gradient / chrome → **`PauseSessionScaffold`**. |
 
 ## Goal
 
