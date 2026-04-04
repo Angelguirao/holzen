@@ -21,11 +21,11 @@ Do **not** use the **anon** / publishable key as `SERVICE_CRON_BEARER` — these
 
 ## Why auth looked “different” before
 
-All **`service-cron/`** workers now share the same **`verifyServiceAuth`** implementation for the **Bearer** path (service role JWT or `CRON_SECRET`).
+Those workers used copy-pasted checks instead of **`verifyServiceAuth`**; they are aligned now.
 
-**`refresh-btc-prices`**, **`fetch-source-feeds`**, and **`pregenerate-companions`** additionally pass **`allowSupabaseCronHeader: true`**, so they still accept **`x-supabase-cron: true`** without a Bearer token. That matches older pg_cron / host invoke patterns; it is **spoofable** on a public function URL, so prefer **`SERVICE_CRON_BEARER`** in Bruno and in Vault-backed cron SQL.
+We **do not** accept **`x-supabase-cron: true`** without a valid Bearer on these functions. Edge URLs are public, so that header is **not** authentication — anyone could send it. Cron and Bruno should use **`Authorization: Bearer …`** with the service role JWT or **`CRON_SECRET`** ([`verifyServiceAuth`](../../supabase/functions/_shared/auth.ts)).
 
-**`check-volatility`**, **`night-reflection`**, and the other `verifyServiceAuth` callers do **not** enable that header — only a valid Bearer (or a future deliberate change) unlocks them.
+**(Exception elsewhere:** **`reflection-insights`** batch mode still documents its own cron paths in that function’s source — not the same as `service-cron/` smoke tests.)
 
 ## Files
 

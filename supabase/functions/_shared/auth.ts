@@ -36,18 +36,11 @@ export async function verifyUserAuth(req: Request): Promise<{ user: any; authHea
   return { user, authHeader };
 }
 
-export type VerifyServiceAuthOptions = {
-  /** When true, accept `x-supabase-cron: true` without Bearer (legacy pg_cron / host invoke). Prefer Bearer when you can — this header is spoofable on public function URLs. */
-  allowSupabaseCronHeader?: boolean;
-};
-
 /**
  * Verify service role JWT or CRON_SECRET in `Authorization: Bearer …`.
- * Optionally allow `x-supabase-cron: true` for workers that historically supported it (see `allowSupabaseCronHeader`).
+ * Do not rely on `x-supabase-cron` here — Edge function URLs are public; that header is trivially spoofable.
  */
-export function verifyServiceAuth(req: Request, options?: VerifyServiceAuthOptions): boolean {
-  if (options?.allowSupabaseCronHeader && req.headers.get("x-supabase-cron") === "true") return true;
-
+export function verifyServiceAuth(req: Request): boolean {
   const authHeader = req.headers.get("Authorization");
   const token = authHeader?.replace("Bearer ", "") ?? "";
   const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";

@@ -68,9 +68,9 @@ serve(async (req) => {
 
   try {
     const { verifyServiceAuth } = await import("../_shared/auth.ts");
-    if (!verifyServiceAuth(req, { allowSupabaseCronHeader: true })) {
+    if (!verifyServiceAuth(req)) {
       log("unauthorized: missing or invalid credentials");
-      return new Response(JSON.stringify({ error: "Unauthorized. Requires service role, CRON_SECRET, or x-supabase-cron." }), {
+      return new Response(JSON.stringify({ error: "Unauthorized. Requires service role or CRON_SECRET." }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });

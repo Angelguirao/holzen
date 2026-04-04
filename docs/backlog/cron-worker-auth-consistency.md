@@ -2,11 +2,11 @@
 
 ## Summary
 
-Scheduled workers **`refresh-btc-prices`**, **`fetch-source-feeds`**, and **`pregenerate-companions`** use **`verifyServiceAuth(req, { allowSupabaseCronHeader: true })`** — same Bearer rules as everyone else (service role JWT or **`CRON_SECRET`**), plus optional **`x-supabase-cron: true`** for legacy cron invoke paths.
+Scheduled workers **`refresh-btc-prices`**, **`fetch-source-feeds`**, and **`pregenerate-companions`** use the same **`verifyServiceAuth(req)`** as other cron-style functions: **`Authorization: Bearer`** must match **`SUPABASE_SERVICE_ROLE_KEY`** or **`CRON_SECRET`** on the Edge runtime.
 
-Other cron-style functions use **`verifyServiceAuth(req)`** without the header flag so **`x-supabase-cron`** alone cannot unlock high-impact jobs (e.g. **`check-volatility`**).
+We intentionally **do not** treat **`x-supabase-cron: true`** as auth on these URLs — it is spoofable on public Edge endpoints. Use Vault + Bearer (see **`docs/ops/cron-setup.md`**) or Bruno **`SERVICE_CRON_BEARER`**.
 
 ## Related
 
-- `supabase/functions/_shared/auth.ts` — `VerifyServiceAuthOptions.allowSupabaseCronHeader`
+- `supabase/functions/_shared/auth.ts`
 - `docs/ops/cron-setup.md`, `bruno/service-cron/README.md`

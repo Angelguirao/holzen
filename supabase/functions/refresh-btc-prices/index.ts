@@ -29,7 +29,7 @@ serve(async (req) => {
 
   try {
     const { verifyServiceAuth } = await import("../_shared/auth.ts");
-    if (!verifyServiceAuth(req, { allowSupabaseCronHeader: true })) {
+    if (!verifyServiceAuth(req)) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
