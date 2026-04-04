@@ -48,11 +48,11 @@ Optional: `take_snapshot` (a11y tree), `take_screenshot`, `evaluate_script` for 
 
 The SPA can emit **`[holzen:boot]`**, **`[holzen:auth]`**, **`[holzen:profile]`**, **`[holzen:router]`**, **`[holzen:manual]`**, **`[holzen:home]`**, **`[holzen:pause]`**, **`[holzen:subscription]`**, **`[holzen:query]`** — all wired through `src/lib/holzen-console.ts` (except legacy `console.error` paths).
 
-**Production (privacy):** In a **production** build, **none** of these print unless the user (or support) opts in: `localStorage.setItem('holzen:debug','1')` then reload. That avoids leaking user id prefixes, routes, and entitlement hints into a typical end-user console. **Cost:** No extra hosting or analytics — only client-side `console.info` when enabled; code stays in the bundle but is a no-op for logging.
+**Production / hosted builds (privacy default):** **`[holzen:*]`** stays off unless you opt in: **`VITE_HOLZEN_DEBUG=1`** in env, **`?holzenDebug=1`** once (session, param stripped), or **`localStorage.setItem('holzen:debug','1')`** + reload.
 
-**Local dev:** All prefixes are emitted so you can filter **`holzen:`** and see boot → auth → profile → route → subscription → query → pause → manual without toggles.
+**Local dev:** All prefixes are emitted (`import.meta.env.DEV`) — filter **`holzen:`** for boot → auth → profile → route → subscription → query → pause → manual.
 
-**Query cache:** TanStack Query tracing uses the same gate (`holzen:debug` in prod; always on in dev).
+**Query cache:** Same gate as **`isHolzenDebugEnabled()`** (verbose builds + dev).
 
 **Edge (cron / workers):** `supabase/functions/_shared/holzen-edge-log.ts` emits **`[holzen:<tag>]`** — e.g. **`volatility`**, **`volatility-email`**, **`volatility-push`**, **`refresh-btc`**, **`fetch-feeds`**, **`pregenerate`**, **`followups`**, **`night-reflection`**, **`weekly-digest`**, **`monthly-report`**, **`personalized-nudge`**, **`deliver-letters`**, **`reflection-insights`**. Filter **`holzen:`** in Edge Function logs. **`holzenEdgeRun`** (request + auth) always prints; **`holzenEdgeLog` / `holzenEdgeWarn`** honor **`HOLZEN_EDGE_LOG=0`**; **`holzenEdgeError`** always prints.
 
