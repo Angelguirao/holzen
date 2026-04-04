@@ -273,15 +273,31 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
   // Track which companion slots have already been fetched/requested for this reflection
   const fetchedSlotsRef = useRef<Set<string>>(new Set());
 
-  // Prime only the intervention loader before paint when switching reflections.
-  // Companion slots are no longer eagerly loaded — they start idle until tapped.
+  // Reset all companion state when switching reflections so stale data from a
+  // previous reflection never leaks into the new one.
   useLayoutEffect(() => {
+    setSignal(null);
+    setSignalLoading(false);
+    setSignalError(false);
+    setNudge(null);
+    setNudgeLoading(false);
+    setNudgeError(false);
+    setZoomOut(null);
+    setZoomOutLoading(false);
+    setZoomOutError(false);
+    setHistoryInsight(null);
+    setHistoryLoading(false);
+    setHistoryError(false);
+    setIntervention(null);
+    setInterventionError(false);
+    setCacheIds({ nudge: null, signal: null, zoomOut: null, history: null });
+    fetchedSlotsRef.current = new Set();
+
     if (!reflectionId) {
       setInterventionLoading(false);
       return;
     }
     setInterventionLoading(true);
-    fetchedSlotsRef.current = new Set();
   }, [reflectionId]);
 
   // ── Check for already-cached data on the reflection row ──
@@ -497,6 +513,19 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
           setInterventionError(true);
         }
         setInterventionLoading(false);
+
+        // Hydrate any companion data the server returned alongside intervention
+        // (e.g. trap forces grounding, pattern forces history, secondary forces zoomOut)
+        const hydrateSlot = (key: string, result: CompanionResult | null | undefined, setter: (d: any) => void, slotName: string) => {
+          if (result?.data && result.source !== 'empty' && !fetchedSlotsRef.current.has(slotName)) {
+            setter(result.data);
+            fetchedSlotsRef.current.add(slotName);
+          }
+        };
+        hydrateSlot('grounding', data.grounding as CompanionResult | null, setNudge, 'grounding');
+        hydrateSlot('history', data.history as CompanionResult | null, setHistoryInsight, 'history');
+        hydrateSlot('zoomOut', data.zoomOut as CompanionResult | null, setZoomOut, 'zoomOut');
+        hydrateSlot('signal', data.signal as CompanionResult | null, setSignal, 'signal');
       } catch (e) {
         console.error('[useCompanionData] intervention fetch failed', e);
         setInterventionError(true);
@@ -643,6 +672,11 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
   /** Re-run companion-orchestrate (intervention + reset companion slots). */
   const retryOrchestrate = useCallback(() => {
     fetchedSlotsRef.current = new Set();
+    setSignal(null); setSignalError(false);
+    setNudge(null); setNudgeError(false);
+    setZoomOut(null); setZoomOutError(false);
+    setHistoryInsight(null); setHistoryError(false);
+    setIntervention(null); setInterventionError(false);
     setRetryCount(c => c + 1);
   }, []);
 
