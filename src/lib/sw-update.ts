@@ -7,6 +7,8 @@ import { toast } from "sonner";
  */
 export function listenForSwUpdate() {
   if (!('serviceWorker' in navigator)) return;
+  // Vite dev serves unknown paths as HTML — registering `/sw.js` throws MIME/SecurityError noise; prod build emits a real worker.
+  if (import.meta.env.DEV) return;
 
   let refreshing = false;
 

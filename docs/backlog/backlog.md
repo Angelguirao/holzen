@@ -32,6 +32,7 @@ Rule of thumb used here:
 | 2026-04 | [react-router-v7-future-flags.md](react-router-v7-future-flags.md) | `BrowserRouter` `future`: `v7_startTransition`, `v7_relativeSplatPath`. |
 | 2026-04 | [pause-session-hydration.md](pause-session-hydration.md) | Coherent `/pause` hydration: storage → aligned hook → nav → fetch by id; loading/error UI. |
 | 2026-04 | [home-fetch-deduplication.md](home-fetch-deduplication.md) | `useQuery` for `check-subscription`; `fetchBtcData` per-currency in-flight coalescing. |
+| 2026-04 | [service-worker-registration-dev.md](service-worker-registration-dev.md) | Skip SW registration when `import.meta.env.DEV`. |
 
 ---
 
@@ -102,7 +103,6 @@ Use this when you are **choosing what to work on next**. Items are **not** stric
 | Medium | [typed-navigation-state.md](typed-navigation-state.md) | Type **`location.state`** instead of `as any` — aligns with pause navigation contracts. |
 | Medium | [route-level-code-splitting.md](route-level-code-splitting.md) | **`React.lazy`** + **`Suspense`** for route components — smaller first load than static imports in **`App.tsx`**. |
 | Lower | [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md) | Split oversized pages (`Home`, `PauseSession`); optionally narrow **`use-holzen`**; one slice per PR. |
-| Lower | [service-worker-registration-dev.md](service-worker-registration-dev.md) | Skip **`listenForSwUpdate`** in dev (or serve real **`sw.js`**) — removes MIME / **`SecurityError`** console noise. |
 | Lower | [data-fetching-conventions.md](data-fetching-conventions.md) | Document / align TanStack Query vs **`useEffect` + Supabase**; optional `QueryClient` defaults. |
 | Lower | [resource-hints-preconnect.md](resource-hints-preconnect.md) | **`preconnect`** for Supabase/fonts/market APIs — **after** [home-fetch-deduplication.md](home-fetch-deduplication.md). |
 | Lower | [home-recharts-layout-cost.md](home-recharts-layout-cost.md) | Reduce **Recharts** forced reflow / defer charts on Home. |
@@ -140,7 +140,6 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | Frontend | [typed-navigation-state.md](typed-navigation-state.md) | Typed `location.state` for router payloads |
 | Frontend | [route-level-code-splitting.md](route-level-code-splitting.md) | Lazy route chunks vs static imports in `App.tsx` |
 | Frontend | [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md) | Large pages + hook decomposition |
-| Frontend | [service-worker-registration-dev.md](service-worker-registration-dev.md) | SW registration guard in dev / console noise |
 | Frontend | [data-fetching-conventions.md](data-fetching-conventions.md) | Query vs Supabase+effect conventions |
 | Frontend | [resource-hints-preconnect.md](resource-hints-preconnect.md) | **`preconnect`** hints (≤4 origins) |
 | Frontend | [home-recharts-layout-cost.md](home-recharts-layout-cost.md) | Recharts reflow / defer charts on Home |
@@ -153,7 +152,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | Theme | Backlog files |
 |--------|----------------|
 | **Platform, architecture & tooling** | [e2e-browser-automation.md](e2e-browser-automation.md), [spa-framework-evaluation.md](spa-framework-evaluation.md), [hosting-production-compression.md](hosting-production-compression.md) |
-| **Frontend structure & conventions** | [typed-navigation-state.md](typed-navigation-state.md), [route-level-code-splitting.md](route-level-code-splitting.md), [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md), [service-worker-registration-dev.md](service-worker-registration-dev.md), [data-fetching-conventions.md](data-fetching-conventions.md), [home-fetch-deduplication.md](home-fetch-deduplication.md), [resource-hints-preconnect.md](resource-hints-preconnect.md), [home-recharts-layout-cost.md](home-recharts-layout-cost.md) |
+| **Frontend structure & conventions** | [typed-navigation-state.md](typed-navigation-state.md), [route-level-code-splitting.md](route-level-code-splitting.md), [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md), [data-fetching-conventions.md](data-fetching-conventions.md), [home-fetch-deduplication.md](home-fetch-deduplication.md), [resource-hints-preconnect.md](resource-hints-preconnect.md), [home-recharts-layout-cost.md](home-recharts-layout-cost.md) |
 | **Auth & routing** | [auth-referral.md](auth-referral.md), [route-gating.md](route-gating.md) |
 | **Product / UX** | [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md), [cron-pause-featured-parity.md](cron-pause-featured-parity.md), [route-gating.md](route-gating.md), [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md), [form-field-name-id-a11y.md](form-field-name-id-a11y.md), [lighthouse-a11y-home.md](lighthouse-a11y-home.md) |
 | **Pause pipeline & client–server boundaries** | [orchestrate-client-cron.md](orchestrate-client-cron.md), [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md), [cron-pause-featured-parity.md](cron-pause-featured-parity.md) |
@@ -193,7 +192,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | [react-router-v7-future-flags.md](react-router-v7-future-flags.md) | **Done (2026-04).** Router **`future`** flags — see ticket. |
 | [resource-hints-preconnect.md](resource-hints-preconnect.md) | **`preconnect`** for critical origins (after fetch dedup) |
 | [route-level-code-splitting.md](route-level-code-splitting.md) | Lazy routes + Suspense — avoid loading all pages on cold start |
-| [service-worker-registration-dev.md](service-worker-registration-dev.md) | Skip or fix SW registration when dev serves HTML for `sw.js` |
+| [service-worker-registration-dev.md](service-worker-registration-dev.md) | **Done (2026-04).** DEV guard in `sw-update.ts` — see ticket. |
 | [reflection-insert-partial-failure.md](reflection-insert-partial-failure.md) | **Done (2026-04).** Insert failure after generate — see ticket. |
 | [route-gating.md](route-gating.md) | Strict route gating UX vs correctness |
 | [spa-framework-evaluation.md](spa-framework-evaluation.md) | Vite SPA vs full-stack React framework (React docs tradeoffs; when to revisit) |
@@ -228,7 +227,7 @@ Legacy numeric IDs for chat / PR references; prefer **ticket file name** or [mas
 20. Split large pages / heavy hooks — [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md)
 21. Data fetching conventions (Query vs Supabase + effects) — [data-fetching-conventions.md](data-fetching-conventions.md)
 22. Route-level code splitting (`React.lazy` / `Suspense`) — [route-level-code-splitting.md](route-level-code-splitting.md)
-23. Service worker registration in dev (console noise) — [service-worker-registration-dev.md](service-worker-registration-dev.md)
+23. ~~Service worker registration in dev (console noise)~~ — **Shipped 2026-04** — [service-worker-registration-dev.md](service-worker-registration-dev.md)
 24. Home fetch deduplication (signed-in **`/`**) — [home-fetch-deduplication.md](home-fetch-deduplication.md) — *partial: `useProfile` + subscription query + BTC coalesce (2026-04); optional `profiles` Query*
 25. Form field **`name`** / **`id`** / **`autocomplete`** (a11y) — [form-field-name-id-a11y.md](form-field-name-id-a11y.md)
 26. ~~React Router v7 **future** flags~~ — **Shipped 2026-04** — [react-router-v7-future-flags.md](react-router-v7-future-flags.md)
