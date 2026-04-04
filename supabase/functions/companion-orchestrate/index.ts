@@ -714,7 +714,7 @@ serve(async (req) => {
       // Persist intervention to reflection_companions so re-entry restores it
       if (typeof reflectionId === "string" && reflectionId.length > 0) {
         writePromises.push(
-          writeCompanionData(svcClient, reflectionId, "intervention", interventionPayload as Record<string, unknown>)
+          writeCompanionData(svcClient, reflectionId, "intervention", interventionPayload as unknown as Record<string, unknown>)
         );
       }
     }
