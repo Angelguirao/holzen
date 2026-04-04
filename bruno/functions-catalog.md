@@ -16,7 +16,7 @@ Base URL: **`{{VITE_SUPABASE_URL}}/functions/v1/<name>`**
 | customer-portal | `billing/` | User JWT |
 | delete-account | `user-jwt/` (DANGEROUS) | User JWT |
 | deliver-letters | `service-cron/` | `SERVICE_CRON_BEARER` |
-| fetch-source-feeds | `service-cron/` | `SERVICE_CRON_BEARER` (or `x-supabase-cron` from cron) |
+| fetch-source-feeds | `service-cron/` | `SERVICE_CRON_BEARER` |
 | generate-wallpaper | `user-jwt/` | User JWT |
 | holzen-number | `public/` | Anon `apikey` only |
 | holzen-reflect | `pause-pipeline/` | User JWT |
@@ -24,10 +24,10 @@ Base URL: **`{{VITE_SUPABASE_URL}}/functions/v1/<name>`**
 | monthly-report | `service-cron/` | `SERVICE_CRON_BEARER` |
 | night-reflection | `service-cron/` | `SERVICE_CRON_BEARER` |
 | personalized-nudge | `service-cron/` | `SERVICE_CRON_BEARER` |
-| pregenerate-companions | `service-cron/` | `SERVICE_CRON_BEARER` (or `x-supabase-cron` from cron) |
+| pregenerate-companions | `service-cron/` | `SERVICE_CRON_BEARER` |
 | record-referral | `user-jwt/` | User JWT |
 | reflection-insights | `user-jwt/` | User JWT (+ `user_id` in body) or batch via service/cron in code |
-| refresh-btc-prices | `service-cron/` | `SERVICE_CRON_BEARER` (or `x-supabase-cron` from cron) |
+| refresh-btc-prices | `service-cron/` | `SERVICE_CRON_BEARER` |
 | register-push | `user-jwt/` | User JWT |
 | send-feedback | `user-jwt/` | User JWT |
 | suggest-grounding | `user-jwt/` | User JWT |
