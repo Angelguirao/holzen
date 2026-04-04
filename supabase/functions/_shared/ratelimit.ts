@@ -42,6 +42,31 @@ export const CHECK_RATE_LIMIT_ANALYTICS_EVENTS = [
   "wallpaper_generation",
 ] as const;
 
+/**
+ * When a limit/budget DB check errors, we fail open (allow). Emit one JSON line so Edge log
+ * drains can grep/alert: `holzen_event":"limit_check_fail_open"` or substring `limit_check_fail_open`.
+ */
+function logLimitCheckFailOpen(
+  scope: "rate_limit" | "daily_budget" | "companion_regenerate",
+  phase: "supabase_error" | "thrown",
+  detail: string,
+): void {
+  const safe = (detail || "").slice(0, 500);
+  try {
+    console.warn(
+      JSON.stringify({
+        holzen_event: "limit_check_fail_open",
+        scope,
+        phase,
+        detail: safe,
+        ts: new Date().toISOString(),
+      }),
+    );
+  } catch {
+    console.warn(`[ratelimit] limit_check_fail_open scope=${scope} phase=${phase} ${safe}`);
+  }
+}
+
 interface RateLimitResult {
   allowed: boolean;
   retryAfterMs?: number;
@@ -74,8 +99,7 @@ export async function checkRateLimit(
       .gte("created_at", windowStart);
 
     if (error) {
-      // If we can't check, allow the request (fail open)
-      console.warn("[ratelimit] Failed to check rate limit:", error.message);
+      logLimitCheckFailOpen("rate_limit", "supabase_error", error.message ?? String(error));
       return { allowed: true };
     }
 
@@ -91,8 +115,11 @@ export async function checkRateLimit(
 
     return { allowed: true };
   } catch (e) {
-    // Fail open on errors
-    console.warn("[ratelimit] Rate limit check failed:", e);
+    logLimitCheckFailOpen(
+      "rate_limit",
+      "thrown",
+      e instanceof Error ? e.message : String(e),
+    );
     return { allowed: true };
   }
 }
@@ -120,8 +147,8 @@ export async function checkDailyBudget(
       .not("estimated_cost_usd", "is", null);
 
     if (error) {
-      console.warn("[budget] Failed to check daily budget:", error.message);
-      return { allowed: true }; // Fail open
+      logLimitCheckFailOpen("daily_budget", "supabase_error", error.message ?? String(error));
+      return { allowed: true };
     }
 
     const totalSpend = (data ?? []).reduce(
@@ -139,8 +166,12 @@ export async function checkDailyBudget(
 
     return { allowed: true, currentSpend: totalSpend };
   } catch (e) {
-    console.warn("[budget] Budget check failed:", e);
-    return { allowed: true }; // Fail open
+    logLimitCheckFailOpen(
+      "daily_budget",
+      "thrown",
+      e instanceof Error ? e.message : String(e),
+    );
+    return { allowed: true };
   }
 }
 
@@ -164,7 +195,7 @@ export async function checkCompanionRegenerateLimit(
       .gte("created_at", windowStart);
 
     if (error) {
-      console.warn("[ratelimit] regenerate limit check failed:", error.message);
+      logLimitCheckFailOpen("companion_regenerate", "supabase_error", error.message ?? String(error));
       return { allowed: true };
     }
     if ((count ?? 0) >= maxRegenerates) {
@@ -175,7 +206,11 @@ export async function checkCompanionRegenerateLimit(
     }
     return { allowed: true };
   } catch (e) {
-    console.warn("[ratelimit] regenerate limit error:", e);
+    logLimitCheckFailOpen(
+      "companion_regenerate",
+      "thrown",
+      e instanceof Error ? e.message : String(e),
+    );
     return { allowed: true };
   }
 }

@@ -44,6 +44,7 @@ Rule of thumb used here:
 | 2026-04 | [data-fetching-conventions.md](data-fetching-conventions.md) | **`navigating-the-codebase` §6.1** — Query vs **`useEffect` + Supabase**; defer global **`QueryClient` defaults**. |
 | 2026-04 | [hosting-production-compression.md](hosting-production-compression.md) | Verify **`Content-Encoding`** on prod HTML — **`curl`** / DevTools; sample **`gzip`** on Lovable chain. |
 | 2026-04 | [rate-limit-analytics-allowlist.md](rate-limit-analytics-allowlist.md) | **`CHECK_RATE_LIMIT_ANALYTICS_EVENTS`** + generator / question-mode **`trackEvent`**; fixed missing **`signal`/`zoom`/`history`** inserts. |
+| 2026-04 | [rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md) | Structured **`limit_check_fail_open`** JSON logs (`scope` / `phase`) on rate, budget, regenerate fail-open. |
 
 ---
 
@@ -67,7 +68,7 @@ Use this when you are **choosing what to work on next**. Items are **not** stric
 
 | Priority hint | Ticket | Summary |
 |---------------|--------|---------|
-| Medium | [rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md) | Alert/metric when rate or daily budget checks fail open. |
+| — | [rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md) | **Done (2026-04).** **`holzen_event`:** `limit_check_fail_open` in Edge logs — see ticket. |
 | — | [rate-limit-analytics-allowlist.md](rate-limit-analytics-allowlist.md) | **Done (2026-04).** **`CHECK_RATE_LIMIT_ANALYTICS_EVENTS`** + live-path **`trackEvent`** — see ticket. |
 
 ### Cost & duplicate work (same user/session doing redundant orchestration or cache churn)
@@ -134,7 +135,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 |-----------|--------|----------|
 | Data / market | [btc-price-cache-freshness.md](btc-price-cache-freshness.md) | BTC cache freshness vs Zoom Out |
 | Reliability | [auth-referral.md](auth-referral.md) | Referral delivery robustness |
-| Observability | [rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md) | Fail-open rate/budget visibility |
+| Observability | [rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md) | **Done (2026-04).** Structured fail-open logs — see ticket |
 | Observability | [rate-limit-analytics-allowlist.md](rate-limit-analytics-allowlist.md) | **Done (2026-04).** Allowlist constant + generator inserts — see ticket |
 | Cost / efficiency | [orchestrate-client-cron.md](orchestrate-client-cron.md) | Client vs cron orchestrate overlap |
 | Cost / efficiency | [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md) | Near-duplicate cache entries |
@@ -169,7 +170,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | **Pause pipeline & client–server boundaries** | [orchestrate-client-cron.md](orchestrate-client-cron.md), [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md), [cron-pause-featured-parity.md](cron-pause-featured-parity.md) |
 | **Cost & duplicate work (client + server)** | [orchestrate-client-cron.md](orchestrate-client-cron.md), [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md), [home-fetch-deduplication.md](home-fetch-deduplication.md) |
 | **Cache, library & market data** | [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md), [btc-price-cache-freshness.md](btc-price-cache-freshness.md), [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md) |
-| **Rate limits, quality & observability** | ~~[rate-limit-analytics-allowlist.md](rate-limit-analytics-allowlist.md)~~ **done**, [rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md), [quality-gates-false-positives.md](quality-gates-false-positives.md) |
+| **Rate limits, quality & observability** | ~~[rate-limit-analytics-allowlist.md](rate-limit-analytics-allowlist.md)~~ **done**, ~~[rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md)~~ **done**, [quality-gates-false-positives.md](quality-gates-false-positives.md) |
 | **Data consistency** | *(none pending — grounding dual-write shipped 2026-04)* |
 
 ---
@@ -197,7 +198,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | [pause-session-hydration.md](pause-session-hydration.md) | **Done (2026-04).** `/pause` hydration — see ticket. |
 | [pwa-mobile-web-app-meta.md](pwa-mobile-web-app-meta.md) | **Done (2026-04).** **`mobile-web-app-capable`** in `index.html` — see ticket. |
 | [quality-gates-false-positives.md](quality-gates-false-positives.md) | `quality.ts` rejects; i18n / regex tuning |
-| [rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md) | Alert/metric when rate or daily budget fails open |
+| [rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md) | **Done (2026-04).** **`limit_check_fail_open`** JSON in **`ratelimit.ts`** — see ticket |
 | [rate-limit-analytics-allowlist.md](rate-limit-analytics-allowlist.md) | **Done (2026-04).** **`CHECK_RATE_LIMIT_ANALYTICS_EVENTS`** + **`trackEvent`** on live paths — see ticket |
 | [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md) | Split large pages (`Home`, `PauseSession`); optional `use-holzen` decomposition |
 | [react-router-v7-future-flags.md](react-router-v7-future-flags.md) | **Done (2026-04).** Router **`future`** flags — see ticket. |
@@ -228,7 +229,7 @@ Legacy numeric IDs for chat / PR references; prefer **ticket file name** or [mas
 10. BTC `btc_price_cache` historical freshness — [btc-price-cache-freshness.md](btc-price-cache-freshness.md)
 11. ~~Rate limit: `analytics_events` allowlist parity~~ — **Shipped 2026-04** — [rate-limit-analytics-allowlist.md](rate-limit-analytics-allowlist.md)
 12. ~~`cache.ts` fire-and-forget `.catch`~~ — **Shipped 2026-04** — [cache-async-error-handling.md](cache-async-error-handling.md)
-13. Rate/daily budget fail-open observability — [rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md)
+13. ~~Rate/daily budget fail-open observability~~ — **Shipped 2026-04** — [rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md)
 14. Quality gates: false positives — [quality-gates-false-positives.md](quality-gates-false-positives.md)
 15. Cache serve relaxation UX — [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md)
 16. ~~Grounding dual-write consistency~~ — **Shipped 2026-04** — [writeCompanionData-grounding-consistency.md](writeCompanionData-grounding-consistency.md)
