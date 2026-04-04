@@ -42,7 +42,7 @@ This guide walks a new contributor through the repository in roughly the order y
 
 ## 4. Routing and layout (`src/App.tsx`)
 
-Routes are declared in one file. Two patterns matter:
+Routes are declared in one file. **Page components** under `src/pages/` are **`React.lazy`**-loaded; **`Suspense`** around **`Routes`** shows a small full-screen fallback while a chunk downloads. Two patterns matter:
 
 - **`ProtectedRoute`** — If auth is still loading, show `AuthLoading`. If no user, redirect to `/welcome`. Otherwise render children.
 - **`PublicOnlyRoute`** — Logged-in users are redirected to `/`.
