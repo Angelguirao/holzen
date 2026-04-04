@@ -98,7 +98,7 @@ serve(async (req) => {
         limit: 10,
       });
 
-      const eligibleSub = subscriptions.data.find((sub) => SUBSCRIBED_STATUSES.has(sub.status));
+      const eligibleSub = subscriptions.data.find((sub: any) => SUBSCRIBED_STATUSES.has(sub.status));
       hasActive = Boolean(eligibleSub);
 
       if (eligibleSub) {
