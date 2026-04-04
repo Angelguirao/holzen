@@ -22,6 +22,21 @@ function getEffectiveCooldownMs(): number {
   return isDevMode() ? DEV_COOLDOWN_MS : MANUAL_COOLDOWN_MS;
 }
 
+/** Fragment included in `error` when `reflections` insert fails after a successful generate — Home uses this to show the banner even when `btcData` exists. */
+export const REFLECTION_PERSIST_ERROR_MARKER = 'Could not save your reflection';
+
+export function isReflectionPersistError(error: string | null | undefined): boolean {
+  return Boolean(error?.includes(REFLECTION_PERSIST_ERROR_MARKER));
+}
+
+function reflectionPersistErrorMessage(insertErr: { message?: string } | null): string {
+  const raw = insertErr?.message ?? '';
+  const net = /network|fetch|Failed to fetch|timeout|ECONNRESET/i.test(raw);
+  return net
+    ? `${REFLECTION_PERSIST_ERROR_MARKER}. Check your connection and try again.`
+    : `${REFLECTION_PERSIST_ERROR_MARKER}. Try again in a moment or sign in again.`;
+}
+
 export function useHolzen() {
   const { user } = useAuth();
   const profile = useProfile();
@@ -119,36 +134,44 @@ export function useHolzen() {
       setCompanions({ haiku: null, groundingTitle: null, groundingBody: null });
       setNewReflection(true);
 
-      const { data: insertedReflection } = await supabase.from('reflections').insert({
+      const { data: insertedReflection, error: silentInsertErr } = await supabase.from('reflections').insert({
         user_id: user.id,
         message: silentMsg,
         context: ctx,
         ...(mood ? { mood } : {}),
       }).select('id').single();
 
-      if (insertedReflection) {
-        setLastReflectionId(insertedReflection.id);
-        // Run library bookmark and profile update in parallel — neither depends on the other
-        await Promise.all([
-          supabase.from('library_items').upsert(
-            {
-              user_id: user.id,
-              type: 'bookmark',
-              title: 'Reflection',
-              body: silentMsg,
-              source_type: 'reflection',
-              reflection_id: insertedReflection.id,
-              tags: ['reflection'],
-            },
-            { onConflict: 'user_id,reflection_id,source_type', ignoreDuplicates: true },
-          ),
-          supabase.from('profiles').update({
-            last_message: silentMsg,
-            last_context: ctx,
-            last_trigger_at: new Date().toISOString(),
-          }).eq('user_id', user.id),
-        ]);
+      if (silentInsertErr || !insertedReflection) {
+        holzenLog.manual('generateMessage: silent reflections insert failed', { message: silentInsertErr?.message ?? 'no row' });
+        setMessage(null);
+        setContext(null);
+        setCompanions({ haiku: null, groundingTitle: null, groundingBody: null });
+        setNewReflection(false);
+        setError(reflectionPersistErrorMessage(silentInsertErr));
+        return;
       }
+
+      setLastReflectionId(insertedReflection.id);
+      // Run library bookmark and profile update in parallel — neither depends on the other
+      await Promise.all([
+        supabase.from('library_items').upsert(
+          {
+            user_id: user.id,
+            type: 'bookmark',
+            title: 'Reflection',
+            body: silentMsg,
+            source_type: 'reflection',
+            reflection_id: insertedReflection.id,
+            tags: ['reflection'],
+          },
+          { onConflict: 'user_id,reflection_id,source_type', ignoreDuplicates: true },
+        ),
+        supabase.from('profiles').update({
+          last_message: silentMsg,
+          last_context: ctx,
+          last_trigger_at: new Date().toISOString(),
+        }).eq('user_id', user.id),
+      ]);
 
       setLastTriggerAt(new Date().toISOString());
       holzenLog.manual( 'generateMessage: silent mode done', { reflectionId: insertedReflection?.id });
@@ -225,7 +248,7 @@ export function useHolzen() {
         };
         setCompanions(companionData);
 
-        const { data: insertedReflection } = await supabase.from('reflections').insert({
+        const { data: insertedReflection, error: insertErr } = await supabase.from('reflections').insert({
           user_id: user.id,
           message: msg,
           context: ctx,
@@ -235,44 +258,52 @@ export function useHolzen() {
           ...(mood ? { mood } : {}),
         }).select('id').single();
 
-        if (insertedReflection) {
-          setLastReflectionId(insertedReflection.id);
-          const libraryInserts: any[] = [
-            {
-              user_id: user.id,
-              type: 'bookmark',
-              title: 'Reflection',
-              body: msg,
-              source_type: 'reflection',
-              reflection_id: insertedReflection.id,
-              tags: ['reflection'],
-            },
-          ];
-          if (companionData.haiku) {
-            libraryInserts.push({
-              user_id: user.id,
-              type: 'bookmark',
-              title: 'Haiku',
-              body: companionData.haiku,
-              source_type: 'haiku',
-              reflection_id: insertedReflection.id,
-              tags: [],
-            });
-          }
-          // Run library bookmarks and profile update in parallel — neither depends on the other
-          const [{ error: libErr }] = await Promise.all([
-            supabase.from('library_items').upsert(libraryInserts, {
-              onConflict: 'user_id,reflection_id,source_type',
-              ignoreDuplicates: true,
-            }),
-            supabase.from('profiles').update({
-              last_message: msg,
-              last_context: ctx,
-            }).eq('user_id', user.id),
-          ]);
-          if (libErr) console.error('[library] reflection+haiku insert failed:', libErr.message);
-          else holzenLog.manual( 'generateMessage: DB insert + profile update ok', { reflectionId: insertedReflection.id });
+        if (insertErr || !insertedReflection) {
+          holzenLog.manual('generateMessage: reflections insert failed', { message: insertErr?.message ?? 'no row' });
+          setMessage(null);
+          setContext(null);
+          setCompanions({ haiku: null, groundingTitle: null, groundingBody: null });
+          setNewReflection(false);
+          setError(reflectionPersistErrorMessage(insertErr));
+          return;
         }
+
+        setLastReflectionId(insertedReflection.id);
+        const libraryInserts: any[] = [
+          {
+            user_id: user.id,
+            type: 'bookmark',
+            title: 'Reflection',
+            body: msg,
+            source_type: 'reflection',
+            reflection_id: insertedReflection.id,
+            tags: ['reflection'],
+          },
+        ];
+        if (companionData.haiku) {
+          libraryInserts.push({
+            user_id: user.id,
+            type: 'bookmark',
+            title: 'Haiku',
+            body: companionData.haiku,
+            source_type: 'haiku',
+            reflection_id: insertedReflection.id,
+            tags: [],
+          });
+        }
+        // Run library bookmarks and profile update in parallel — neither depends on the other
+        const [{ error: libErr }] = await Promise.all([
+          supabase.from('library_items').upsert(libraryInserts, {
+            onConflict: 'user_id,reflection_id,source_type',
+            ignoreDuplicates: true,
+          }),
+          supabase.from('profiles').update({
+            last_message: msg,
+            last_context: ctx,
+          }).eq('user_id', user.id),
+        ]);
+        if (libErr) console.error('[library] reflection+haiku insert failed:', libErr.message);
+        else holzenLog.manual( 'generateMessage: DB insert + profile update ok', { reflectionId: insertedReflection.id });
       }
     } catch (e: any) {
       holzenLog.manual('generateMessage: error', { message: String(e?.message ?? e) });

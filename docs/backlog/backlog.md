@@ -27,6 +27,7 @@ Rule of thumb used here:
 | 2026-04 | [cron-worker-auth-consistency.md](cron-worker-auth-consistency.md) | `verifyServiceAuth` + Bruno `SERVICE_CRON_BEARER`; no `x-supabase-cron` bypass. |
 | 2026-04 | [pwa-mobile-web-app-meta.md](pwa-mobile-web-app-meta.md) | `mobile-web-app-capable` in `index.html`. |
 | 2026-04 | [cache-async-error-handling.md](cache-async-error-handling.md) | `.catch` + structured log on cache side-effect Supabase calls. |
+| 2026-04 | [reflection-insert-partial-failure.md](reflection-insert-partial-failure.md) | Revert optimistic UI + `isReflectionPersistError` on Home when `reflections` insert fails after generate. |
 
 ---
 
@@ -38,7 +39,6 @@ Use this when you are **choosing what to work on next**. Items are **not** stric
 
 | Priority hint | Ticket | Summary |
 |---------------|--------|---------|
-| High | [reflection-insert-partial-failure.md](reflection-insert-partial-failure.md) | `holzen-reflect` succeeds but `reflections` insert fails — UI/DB can disagree. |
 | High | [writeCompanionData-grounding-consistency.md](writeCompanionData-grounding-consistency.md) | Grounding dual-write: `reflection_companions` vs `reflections` / Home. |
 | Medium | [btc-price-cache-freshness.md](btc-price-cache-freshness.md) | Historical BTC cache vs cron cadence + Zoom Out expectations. |
 
@@ -120,7 +120,6 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 
 | Work type | Ticket | One-line |
 |-----------|--------|----------|
-| Correctness | [reflection-insert-partial-failure.md](reflection-insert-partial-failure.md) | Reflect OK, reflection insert fails |
 | Data integrity | [writeCompanionData-grounding-consistency.md](writeCompanionData-grounding-consistency.md) | Grounding dual-write Home vs pause |
 | Data / market | [btc-price-cache-freshness.md](btc-price-cache-freshness.md) | BTC cache freshness vs Zoom Out |
 | Reliability | [pause-session-hydration.md](pause-session-hydration.md) | `/pause` without full navigation state |
@@ -159,7 +158,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | **Frontend structure & conventions** | [typed-navigation-state.md](typed-navigation-state.md), [route-level-code-splitting.md](route-level-code-splitting.md), [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md), [service-worker-registration-dev.md](service-worker-registration-dev.md), [data-fetching-conventions.md](data-fetching-conventions.md), [home-fetch-deduplication.md](home-fetch-deduplication.md), [react-router-v7-future-flags.md](react-router-v7-future-flags.md), [resource-hints-preconnect.md](resource-hints-preconnect.md), [home-recharts-layout-cost.md](home-recharts-layout-cost.md) |
 | **Auth & routing** | [auth-referral.md](auth-referral.md), [route-gating.md](route-gating.md) |
 | **Product / UX** | [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md), [cron-pause-featured-parity.md](cron-pause-featured-parity.md), [route-gating.md](route-gating.md), [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md), [form-field-name-id-a11y.md](form-field-name-id-a11y.md), [lighthouse-a11y-home.md](lighthouse-a11y-home.md) |
-| **Pause pipeline & client–server boundaries** | [pause-session-hydration.md](pause-session-hydration.md), [orchestrate-client-cron.md](orchestrate-client-cron.md), [reflection-insert-partial-failure.md](reflection-insert-partial-failure.md), [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md), [cron-pause-featured-parity.md](cron-pause-featured-parity.md) |
+| **Pause pipeline & client–server boundaries** | [pause-session-hydration.md](pause-session-hydration.md), [orchestrate-client-cron.md](orchestrate-client-cron.md), [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md), [cron-pause-featured-parity.md](cron-pause-featured-parity.md) |
 | **Cost & duplicate work (client + server)** | [orchestrate-client-cron.md](orchestrate-client-cron.md), [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md), [home-fetch-deduplication.md](home-fetch-deduplication.md) |
 | **Cache, library & market data** | [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md), [btc-price-cache-freshness.md](btc-price-cache-freshness.md), [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md) |
 | **Rate limits, quality & observability** | [rate-limit-analytics-allowlist.md](rate-limit-analytics-allowlist.md), [rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md), [quality-gates-false-positives.md](quality-gates-false-positives.md) |
@@ -197,7 +196,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | [resource-hints-preconnect.md](resource-hints-preconnect.md) | **`preconnect`** for critical origins (after fetch dedup) |
 | [route-level-code-splitting.md](route-level-code-splitting.md) | Lazy routes + Suspense — avoid loading all pages on cold start |
 | [service-worker-registration-dev.md](service-worker-registration-dev.md) | Skip or fix SW registration when dev serves HTML for `sw.js` |
-| [reflection-insert-partial-failure.md](reflection-insert-partial-failure.md) | `holzen-reflect` OK, reflection insert fails |
+| [reflection-insert-partial-failure.md](reflection-insert-partial-failure.md) | **Done (2026-04).** Insert failure after generate — see ticket. |
 | [route-gating.md](route-gating.md) | Strict route gating UX vs correctness |
 | [spa-framework-evaluation.md](spa-framework-evaluation.md) | Vite SPA vs full-stack React framework (React docs tradeoffs; when to revisit) |
 | [typed-navigation-state.md](typed-navigation-state.md) | Typed `location.state` instead of `as any` for navigation payloads |
@@ -213,7 +212,7 @@ Legacy numeric IDs for chat / PR references; prefer **ticket file name** or [mas
 2. UX clarity for strict route gating during auth loading — [route-gating.md](route-gating.md)
 3. Reduce reliance on `location.state` for `/pause` restoration — [pause-session-hydration.md](pause-session-hydration.md)
 4. Client vs cron `companion-orchestrate` overlap — [orchestrate-client-cron.md](orchestrate-client-cron.md)
-5. Partial failure: reflect OK, reflection insert fails — [reflection-insert-partial-failure.md](reflection-insert-partial-failure.md)
+5. ~~Partial failure: reflect OK, reflection insert fails~~ — **Shipped 2026-04** — [reflection-insert-partial-failure.md](reflection-insert-partial-failure.md)
 6. Automatic pause: notification timing vs orchestrate completion — [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md)
 7. Cron vs manual pause: featured field parity — [cron-pause-featured-parity.md](cron-pause-featured-parity.md)
 8. ~~Cron worker auth~~ — **Shipped 2026-04** — [cron-worker-auth-consistency.md](cron-worker-auth-consistency.md)
