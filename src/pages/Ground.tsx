@@ -12,6 +12,7 @@ import { type MoodValue } from '@/components/MoodCheck';
 import { MoodIcon } from '@/components/icons/MoodIcon';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { companionFallbacksDisabledClient } from '@/lib/companion-strict';
+import { parseGroundLocationState } from '@/lib/router-location-state';
 
 type Phase = 'idle' | 'suggestion' | 'timer' | 'checkin' | 'reflect' | 'done';
 
@@ -23,7 +24,7 @@ export default function Ground() {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
-  const navState = (location.state as any) ?? {};
+  const navState = parseGroundLocationState(location.state);
   const prefersReducedMotion = useReducedMotion();
   const { groundingActivities, btcData, severity, language } = useHolzen();
   const { user } = useAuth();

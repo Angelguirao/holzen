@@ -1,20 +1,26 @@
 # Typed React Router navigation state
 
-**Status:** backlog — tighten types incrementally.
+**Status:** shipped (2026-04) for primary structured payloads; extend the same module for new routes as needed.
 
-## Goal
+## What shipped
 
-Replace loose casts (e.g. **`location.state as any`**) with **typed** `location.state` for routes that pass **structured** navigation payloads (notably **`/pause`** and deep links).
+**Module:** `src/lib/router-location-state.ts`
 
-## Rationale
+- **`PauseSessionLocationState`** + **`parsePauseSessionLocationState`** — used by **`PauseSession`** (`/pause`).
+- **`GroundPreGenerated`** / **`GroundLocationState`** + **`parseGroundLocationState`** — used by **`Ground`**; **`Home`** uses **`GroundPreGenerated`** for the grounding widget and `navigate('/ground', { state })`.
+- **`ProfileTab`**, **`PROFILE_TAB_IDS`**, **`ProfileLocationState`** + **`parseProfileLocationState`** — used by **`Profile`**.
+- **`NotificationNavigateState`** — union for notification deep links; **`NotificationBell`** action typing.
 
-Typed state catches **drift** between senders (`navigate(..., { state })`) and receivers (page hooks) at **compile time** and documents the **contract** for [pause-session-hydration.md](pause-session-hydration.md).
+Parsers narrow **`unknown`** / wire objects at runtime (companions, prefs, grounding payload) so consumers avoid **`as any`**.
 
-## Direction
+## Rationale (unchanged)
 
-- Define **small interfaces** per route or a **discriminated union** where multiple routes use `state`.
-- Use **`useLocation()`** with generics or a thin **typed wrapper** hook (e.g. `usePauseLocationState()`) where it pays off first.
-- Align with [phase-2-manual-pause-pipeline.md](../reviews/phase-2-manual-pause-pipeline.md) producer/consumer notes.
+Typed state catches drift between `navigate(..., { state })` senders and page receivers at compile time and documents the contract for [pause-session-hydration.md](pause-session-hydration.md).
+
+## Follow-ups (optional)
+
+- Add parsers for any new routes that pass structured **`location.state`**.
+- Consider a thin **`usePauseLocationState()`** hook if call sites multiply.
 
 ## Related
 

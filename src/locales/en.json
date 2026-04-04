@@ -32,6 +32,7 @@
     "until": "Until"
   },
   "auth": {
+    "restoringSession": "Restoring your session…",
     "signInToContinue": "Sign in to continue",
     "createAnAccount": "Create an account",
     "alreadyHaveAccount": "Already have an account",

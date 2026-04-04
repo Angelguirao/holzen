@@ -8,6 +8,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { formatDistanceToNow } from 'date-fns';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Skeleton } from '@/components/ui/skeleton';
+import type { NotificationNavigateState } from '@/lib/router-location-state';
 
 const SWIPE_THRESHOLD = 80;
 
@@ -15,7 +16,7 @@ const SwipeableNotification = forwardRef<HTMLDivElement, {
   n: NotificationItem;
   iconMap: Record<NotificationItem['type'], string>;
   onDismiss: (id: string) => void;
-  onAction: (path: string, state?: Record<string, any>) => void;
+  onAction: (path: string, state?: NotificationNavigateState) => void;
 }>(function SwipeableNotification({ n, iconMap, onDismiss, onAction }, _ref) {
   const startX = useRef(0);
   const currentX = useRef(0);
@@ -105,7 +106,7 @@ type NotificationItem = {
   title: string;
   subtitle: string;
   timestamp: string;
-  action?: { label: string; path: string; state?: Record<string, any> };
+  action?: { label: string; path: string; state?: NotificationNavigateState };
 };
 
 const LAST_READ_KEY = 'holzen_notifications_read_at';
@@ -267,7 +268,7 @@ export function NotificationBell() {
     }
   }
 
-  const handleAction = useCallback((path: string, state?: Record<string, any>) => {
+  const handleAction = useCallback((path: string, state?: NotificationNavigateState) => {
     setOpen(false);
     navigate(path, state ? { state } : undefined);
   }, [navigate]);

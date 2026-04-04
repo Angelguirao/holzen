@@ -34,6 +34,7 @@ import { playNotificationTone, prefetchNotificationTone } from '@/lib/notificati
 import { isCumulativeMoveTriggered } from '@/lib/volatility-thresholds';
 import { holzenLog } from '@/lib/holzen-console';
 import { companionFallbacksDisabledClient } from '@/lib/companion-strict';
+import { type GroundPreGenerated, type PauseSessionLocationState } from '@/lib/router-location-state';
 import {
   DndContext,
   closestCenter,
@@ -62,14 +63,6 @@ interface PinnedReflection {
   haiku: string | null;
   grounding_title: string | null;
   grounding_body: string | null;
-}
-
-interface GroundingSuggestion {
-  activity: string;
-  suggestion: string;
-  duration: number;
-  insight: string | null;
-  article: { snippet: string; url: string | null } | null;
 }
 
 const Home = () => {
@@ -157,7 +150,7 @@ const Home = () => {
   });
   const [groundDismissed, setGroundDismissed] = useState(() => groundDismissedRef.current());
   const strictNoFallback = companionFallbacksDisabledClient();
-  const [groundSuggestion, setGroundSuggestion] = useState<GroundingSuggestion | null>(() => {
+  const [groundSuggestion, setGroundSuggestion] = useState<GroundPreGenerated | null>(() => {
     if (companionFallbacksDisabledClient()) return null;
     try {
       const stored = localStorage.getItem(user ? `holzen_ground_suggestion_${user.id}` : 'holzen_ground_suggestion');
@@ -322,7 +315,7 @@ const Home = () => {
       body: { groundingActivities, context: ctx, severity, language },
     }).then(({ data, error }) => {
       if (error || !data || data.error) return;
-      const suggestion: GroundingSuggestion = {
+      const suggestion: GroundPreGenerated = {
         activity: data.activity,
         suggestion: data.suggestion,
         duration: data.duration || 10,
@@ -547,10 +540,10 @@ const Home = () => {
                       </div>
                       <button
                         onClick={() => {
-                          const navState = {
+                          const navState: PauseSessionLocationState = {
                             reflectionMessage: message,
                             context,
-                            reflectionId: lastReflectionId,
+                            reflectionId: lastReflectionId ?? undefined,
                             companions,
                             companionPrefs,
                             severity,

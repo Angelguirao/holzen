@@ -1,28 +1,26 @@
-# Route Gating (Pending Enhancements)
+# Route Gating (Shipped 2026-04)
 
-## Enhancement 2: UX clarity for strict gating vs perceived latency
+## What shipped
 
-### Current problem
-The correctness invariant is: do not render protected content until auth is resolved (`loading` is false and we know whether the user is authenticated).
+While `AuthProvider.loading` is true, **`ProtectedRoute`** / **`PublicOnlyRoute`** still render **`AuthLoading`** only (no protected content flash).
 
-When auth takes time (network, session restore), the app can feel "stuck" or "broken" if the UI does not explicitly explain that it is waiting for auth.
+**UX / a11y:** `src/components/AuthLoading.tsx` now shows translated copy **`auth.restoringSession`** (“Restoring your session…”) above the skeleton, with **`role="status"`**, **`aria-live="polite"`**, and **`aria-busy="true"`**, plus a screen-reader-only duplicate for clarity.
 
-### Implications if we leave it as-is
-- Users may interpret expected gating delays as failures.
-- Support/diagnostics get noisier because "blank screen" is ambiguous (loading vs bug vs logged-out redirect).
-- Even if correctness is preserved, perceived reliability can drop.
+**Diagnostics:** `RouterLocationLog` in `src/App.tsx` already logs **`authLoading`** with pathname changes under `[holzen:router]`.
 
-### Proposed improvement
-Keep the safety rule (never show protected content early), but make the UX explicit by:
-- ensuring protected routes show a consistent skeleton/loading/placeholder state while `AuthProvider.loading` is true
-- adding clear copy/logging for "waiting for session" vs "not authorized"
+## Original goals (reference)
+
+- Keep the safety rule: never show protected content until auth is resolved.
+- Avoid ambiguous blank screens during session restore.
 
 ### Related code pointers
+
 - Route guards: `src/App.tsx` (`ProtectedRoute` / `PublicOnlyRoute`)
 - Auth state source: `src/hooks/use-auth.tsx` (`loading` lifecycle)
+- Loading UI: `src/components/AuthLoading.tsx`
 
-### Acceptance criteria / how to verify
-1. There is no flash of protected content before auth settles (safety invariant remains).
-2. During `loading`, the UI consistently shows an explicit "auth is loading / session restoring" state (no ambiguous blank screens).
-3. Logged-out users are clearly routed away (or shown "not authorized") with no redirect loops.
+### Acceptance criteria (met)
 
+1. No flash of protected content before auth settles.
+2. During `loading`, the UI shows an explicit “restoring session” state (copy + skeleton + live region).
+3. Logged-out users redirect to `/welcome` (protected) or `/` (public-only) without loops.
