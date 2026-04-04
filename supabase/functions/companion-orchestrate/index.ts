@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { checkRateLimit, checkDailyBudget } from "../_shared/ratelimit.ts";
 import { handleRegenerateOnly } from "../_shared/regenerate-only.ts";
-import { createLogger } from "../_shared/observe.ts";
+import { createLogger, trackEvent } from "../_shared/observe.ts";
 import { writeCompanionData } from "../_shared/companion-data.ts";
 import { generateSignal, PROMPT_VERSION as SIGNAL_VERSION } from "../_shared/generators/signal.ts";
 import { generateGrounding, PROMPT_VERSION as GROUNDING_VERSION } from "../_shared/generators/grounding.ts";
@@ -416,6 +416,9 @@ serve(async (req) => {
 
     if (resolvedQuestion !== null) {
       interventionPayload.question = resolvedQuestion;
+      if (typeof resolvedQuestion === "string" && resolvedQuestion.length > 0) {
+        trackEvent(svcClient, userId, "intervention_question_ai_call");
+      }
     }
 
     const response: OrchestrateResponse = {

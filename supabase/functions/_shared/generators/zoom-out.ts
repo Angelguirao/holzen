@@ -18,7 +18,7 @@ import {
   pickRandom,
 } from "../fallbacks.ts";
 import { COMPANION_ZOOM_OUT_DEEP_TIME, parseMarketDirection, serveFromCache } from "../cache.ts";
-import { createAttemptLogger } from "../observe.ts";
+import { createAttemptLogger, trackEvent } from "../observe.ts";
 
 /** Bump when the deep-time prompt, seed pool, or quality rules change. */
 export const PROMPT_VERSION = "v2";
@@ -359,6 +359,10 @@ export async function generateZoomOut(params: GenerateZoomOutParams): Promise<Zo
     deepTime: deepTimeResult.deepTime,
     partial: prices.isPartial,
   };
+
+  if (userId && deepTimeResult.source === "live") {
+    trackEvent(svcClient, userId, "zoom_out_ai_call");
+  }
 
   return {
     data: result,

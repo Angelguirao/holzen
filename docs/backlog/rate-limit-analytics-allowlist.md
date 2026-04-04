@@ -1,30 +1,33 @@
-# Rate limit: analytics event allowlist parity (Pending)
+# Rate limit: analytics event allowlist parity
 
-## Context (from Phase 5)
+**Shipped (2026-04).** Sliding-window rate limiting now aligns with real companion AI work: generators and question mode emit allowlisted rows; the allowlist is a single exported constant with an inline inventory.
 
-`checkRateLimit` in `supabase/functions/_shared/ratelimit.ts` counts only **specific** `analytics_events.event` values. Paths that generate AI output but **do not** insert a matching event are **not** counted toward the sliding window.
+## What was wrong
 
-## Current problem
+`checkRateLimit` counted only specific `analytics_events.event` values, but **`signal_companion_ai_call`**, **`zoom_out_ai_call`**, and **`historical_insight_ai_call`** had **no insert paths** after the in-process generator refactor — companion orchestration could run many live generations without incrementing the sliding window.
 
-Allowlist drift: generator refactors can stop emitting an event, or emit a **renamed** event — effective rate limit becomes **looser** than intended without a code change to `ratelimit.ts`.
+Grounding (**`ground_nudge`**) live generations were also uncounted. Question-mode AI (**`generateQuestion`**) had no matching event.
 
-## Implications if we leave it as-is
+## What we did
 
-- Higher spend and abuse surface than product assumes from "30 per hour" style limits.
-- Hard to debug: limits look correct in code but telemetry is incomplete.
+1. **`CHECK_RATE_LIMIT_ANALYTICS_EVENTS`** in `supabase/functions/_shared/ratelimit.ts` — single source of truth; `checkRateLimit` uses `[...CHECK_RATE_LIMIT_ANALYTICS_EVENTS]`.
+2. **Table comment** in that file: each event → where it is inserted.
+3. **`trackEvent`** on the **live** path only (when `userId` is present):
+   - `generators/signal.ts` → `signal_companion_ai_call`
+   - `generators/history.ts` → `historical_insight_ai_call`
+   - `generators/grounding.ts` → `ground_nudge_ai_call` (**new** allowlist member)
+   - `generators/zoom-out.ts` → `zoom_out_ai_call` when deep-time source is `live`
+   - `companion-orchestrate` → `intervention_question_ai_call` (**new**) when `generateQuestion` returns a non-empty string
 
-## Proposed improvement
+Still **not** counted (by design): `intervention_selected`, `reflection_generated`, fallbacks, feedback, etc.
 
-1. **Inventory** every generator path that should participate in rate limiting and assert it emits the expected event (tests or checklist).
-2. **Document** the allowlist next to `checkRateLimit` or in Phase 5 review doc.
-3. Optional: **unit test** that `ratelimit` allowlist matches the set of events emitted by `companion-orchestrate` (or document exceptions).
+## Follow-up (optional)
 
-## Related code pointers
+- **Unit test** (Deno) that imports `CHECK_RATE_LIMIT_ANALYTICS_EVENTS` and fails if a generator references a string not in the list — not added yet (no Deno in CI path here).
+
+## Related code
 
 - `supabase/functions/_shared/ratelimit.ts`
-- Companion generators and `companion-orchestrate` (Phase 2-4 review context)
-
-## Acceptance criteria / how to verify
-
-1. For each allowlisted event, at least one code path exists that inserts it on the corresponding generation.
-2. Renaming or adding a generation path updates the allowlist or is explicitly excluded with rationale.
+- `supabase/functions/_shared/observe.ts` (`trackEvent`)
+- `supabase/functions/_shared/generators/{signal,history,grounding,zoom-out}.ts`
+- `supabase/functions/companion-orchestrate/index.ts`

@@ -16,7 +16,7 @@ import {
   pickRandom,
 } from "../fallbacks.ts";
 import { parseMarketDirection, serveFromCache } from "../cache.ts";
-import { createAttemptLogger } from "../observe.ts";
+import { createAttemptLogger, trackEvent } from "../observe.ts";
 import { callPerplexityChat, type PerplexityUsage } from "../perplexity-client.ts";
 import { searchLibrary, eventToHistory, recordLibraryServe } from "../content-library.ts";
 
@@ -382,5 +382,6 @@ BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? 
     }).catch(() => {});
   }
 
+  if (userId) trackEvent(svcClient, userId, "historical_insight_ai_call");
   return { data: insight, source: "live", cacheId: null };
 }
