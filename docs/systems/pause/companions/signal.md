@@ -8,7 +8,7 @@ This page is the **companion-level** view. For **manual vs automatic pause**, **
 
 ## 1. Where Signal sits in the pipeline
 
-1. User completes reflection; **`use-companion-data`** invokes **`companion-orchestrate`** when the Signal slot is needed (not fully cached on the reflection row).
+1. User completes reflection; when the user **taps the Signal card**, **`use-companion-data`** invokes **`companion-orchestrate`** with `enableSignal: true` (lazy loading). If Signal data is already cached in `reflection_companions`, it is hydrated from DB without a network call.
 2. **`companion-orchestrate`** runs **`generateSignal`** in `_shared/generators/signal.ts` when **`enableSignal`** is true, passing **context**, **session intent** (`searchAngle`), **signal source catalog** hints, and **recency dedup** fields from the client.
 3. **`generateSignal`** returns structured Signal payload; the orchestrator **writes** **`reflection_companions`** (canonical) and **`companion_serves`** — not duplicate Signal columns on **`reflections`** (those were removed; only **Grounding** still denormalizes to **`reflections.grounding_*`** for Home). The compatibility view **`v_reflection_with_companions`** can still expose `signal_url` as a computed alias for reads.
 
@@ -33,13 +33,22 @@ If the catalog is **empty**, Perplexity runs **without** a domain allowlist (unr
 
 High-level order (source of truth: **`supabase/functions/_shared/generators/signal.ts`**, **`PROMPT_VERSION`**):
 
+**Phase 1: Library** — `searchLibrary` checks `content_library` for fresh essays this user hasn't seen in 7 days. If found, returns immediately (`source: "cache"`).
+
+**Phase 2: Cache** — `serveFromCache` checks `companion_cache` with per-user dedup and market direction awareness. If found, returns (`source: "cache"`).
+
+**Phase 3: Live generation** (if phases 1–2 miss):
+
 1. **Perplexity (`sonar-pro`)** — Web-grounded search: system + user **`searchQuery`** (context, angle, exclusions, optional source hints). API options include **`temperature`**, **`top_p`**, and **`web_search_options.search_context_size`** to reduce identical results. **`search_domain_filter`** is set only when the catalog yields hostnames; otherwise omitted.
 2. **Citations** — Normalized from **`citations`**, **`search_results`**, and inline URLs (`perplexity-client.ts`); empty citation list can force fallback.
 3. **Structuring (Lovable AI gateway)** — Second model (e.g. Gemini) turns search text + citation list into **one card** (title, body, source, url, optional quote) via tool/function JSON.
 4. **`validateSource`** — Reconciles attribution with URL hostname rules (`source-validation.ts`).
 5. **`qualityGate("signal", …)`** — Length, banned terms, Bitcoin-only constraints (`quality.ts`).
 6. **On success (`source: "live"`)** — Inserts into **`companion_cache`** when not a duplicate title (pool for future fallback / other users).
-7. **Fallback chain** if live path fails — **Library** essays → **`serveFromCache`** → **curated** DB pool (`fallbacks.ts`).
+
+**Phase 4: Curated** — if all above fail, static fallback pool from `companion_fallbacks` DB / `fallback-seed.json`.
+
+Phase toggles: `COMPANION_PHASE_LIBRARY`, `COMPANION_PHASE_CACHE`, `COMPANION_PHASE_LIVE` (all enabled by default; see `_shared/phase-config.ts`).
 
 Admin **Monitor** shows **`live` vs `cache` vs `curated`** from **`companion_serves`**; a **live** run can still create a **cache** row for the pool — that is expected.
 
@@ -73,7 +82,7 @@ Signal’s design problem splits into **(a)** “is this a good Bitcoin cognitiv
 | **Citation handling** | When both YouTube and non-YouTube URLs appear in Perplexity output, **non-YouTube URLs are ordered first** before structuring so the model tends to pick a publisher page when one exists. |
 | **Attribution** | **`validateSource`** reconciles stated source with URL hostname rules (best-effort; see limits below). |
 | **Structural quality** | **`qualityGate("signal", …)`** enforces length, banned terms, and Bitcoin-only constraints before the card is served live. |
-| **Fallbacks** | If live search/structure fails, **library essays → cache → curated pool** still ship *something* on-theme; those paths have their own diversity characteristics (e.g. smaller fixed sets). |
+| **Fallbacks** | Generators try **library → cache → live → curated**. If live search/structure fails, the curated pool still ships *something* on-theme; those paths have their own diversity characteristics (e.g. smaller fixed sets). |
 | **Operations** | **`companion_serves`**, **`generation_attempts`**, and cache fingerprints support monitoring and later **analytics-driven** tuning (see below). |
 
 Together, these layers aim for **credible citations**, **thematic fit**, and **less repetition** — not a single lever. Improving “quality when pause” usually means moving **several** layers (and the other companion paths), not only adding facets — though a **richer facet list** is a cheap way to diversify retrieval.
@@ -90,7 +99,7 @@ Together, these layers aim for **credible citations**, **thematic fit**, and **l
 Engineering and product options to revisit when repetition or quality still feels wrong:
 
 - **Stricter URL policy** — Harder rules on YouTube or other hosts; per-host frequency caps in prompts or post-filtering.
-- **Library-first or hybrid** — Prefer **`content_library`** or cache for some sessions to guarantee curated variety and editorial tone.
+- **Phase tuning** — Adjust `COMPANION_PHASE_*` env vars to disable live generation for some deployments, or disable library/cache to force fresh AI content.
 - **Analytics-driven tuning** — Use **`companion_serves`** / fingerprints to spot dominant domains or titles and feed that into exclusions or catalog suggestions.
 - **User-visible controls** — Narrower “only these sources” vs “surprise me” modes change the diversity–predictability tradeoff by design.
 - **Faster dedup path** — One Postgres RPC or a single query with a join (instead of two round trips) for recent Signal URLs; watch **`.in(reflection_id, …)`** size if the reflection window grows very large.
