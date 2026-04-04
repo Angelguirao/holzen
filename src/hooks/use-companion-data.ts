@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { hapticFeedback } from '@/lib/haptics';
 import { useHolzen } from '@/hooks/use-holzen';
@@ -269,6 +269,26 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
   const [intervention, setIntervention] = useState<InterventionState | null>(null);
   const [interventionLoading, setInterventionLoading] = useState(false);
   const [interventionError, setInterventionError] = useState(false);
+
+  // Prime loaders before paint when switching reflections so cron/notification opens
+  // never flash an empty featured/intervention area (loaders start false in useState).
+  useLayoutEffect(() => {
+    if (!reflectionId) {
+      setSignalLoading(false);
+      setNudgeLoading(false);
+      setHistoryLoading(false);
+      setZoomOutLoading(false);
+      setInterventionLoading(false);
+      return;
+    }
+    setInterventionLoading(true);
+    if (prefs.signal) setSignalLoading(true);
+    if (prefs.grounding) setNudgeLoading(true);
+    if (prefs.history) setHistoryLoading(true);
+    if (prefs.zoomOut) setZoomOutLoading(true);
+  // Only re-prime when the reflection changes; prefs toggles are handled by the orchestrate effect.
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- prefs read intentionally; deps = reflectionId only
+  }, [reflectionId]);
 
   // ── Check for already-cached data on the reflection row ──
   const checkCachedReflection = useCallback(async (rid: string): Promise<{

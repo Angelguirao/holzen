@@ -104,15 +104,13 @@ Use these as "prove-or-disprove" questions while reading the Phase 3 files.
 
 - **Coherent story**: automatic pause is **one server-owned pipeline**: eligibility -> generate -> persist reflection + profile + notification -> **async** companion work. That matches "pause ready" in the bell before every companion slot is filled.
 - **Fragility**: **time window** between notification and orchestrate completion; **duplicate orchestrate** risk when the user opens `/pause` immediately (aligns with `docs/backlog/orchestrate-client-cron.md`).
-- **Featured grounding**: cron may leave featured grounding null initially; expanded companions should still load when orchestration completes — UI must not assume parity with manual path for every field on first paint.
+- **Featured grounding**: cron may leave featured grounding null initially; expanded companions should still load when orchestration completes — UI must not assume parity with manual path for every field on first paint. **2026-04:** `use-companion-data` primes loaders in `useLayoutEffect` on `reflectionId` so the first paint shows skeletons (see `docs/backlog/cron-pause-featured-parity.md`).
 
-Tradeoffs / alternatives (tracked in backlog):
+Tradeoffs / alternatives (documented in backlog; **policy chosen 2026-04** — fire-and-forget retained):
 
 - **Await orchestrate before `pause_notifications`**: fewer races, slower notifications, higher tail latency if orchestrate is slow.
 - **Enrich notification payload** with enough text to render without waiting for orchestrate: more duplication, faster first paint.
-- **Keep fire-and-forget**: current shape; rely on client cache, rate limits, and Phase 4+ worker docs for cost control.
-
-Backlog: `docs/backlog/automatic-pause-notification-timing.md` (ordering policy). Featured grounding / first paint parity for cron vs manual: `docs/backlog/cron-pause-featured-parity.md`.
+- **Keep fire-and-forget**: current shape; rely on client cache, rate limits, skip-if-served orchestrate, and loader UX on `/pause` (see `docs/backlog/automatic-pause-notification-timing.md`).
 
 ## What to Review Next and Why
 
