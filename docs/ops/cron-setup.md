@@ -40,7 +40,7 @@ jsonb_build_object(
 
 **Self-hosted / rare setups:** If `SELECT current_setting('supabase.service_role_key', true)` is non-null, you may use that instead of Vault; on hosted Supabase, expect **false** / NULL.
 
-**Bruno** (`bruno/service-cron/*.bru`): **`401`** on these calls usually means **`SUPABASE_SERVICE_ROLE_KEY`** in the active environment does **not** exactly match the project’s current service role (wrong project, typo, stale copy). Redeploying the function does not fix a bad client key.
+**Bruno** (`bruno/service-cron/*.bru`): **`401`** usually means **`SERVICE_CRON_BEARER`** is wrong — it must match the project’s **service_role** JWT or **`CRON_SECRET`** (see [`bruno/service-cron/README.md`](../../bruno/service-cron/README.md)). Redeploying the function does not fix a bad client secret.
 
 **Stale Edge deploy:** If keys are correct but behavior is wrong, redeploy the function and confirm **Edge Functions → Logs** show your expected `[holzen:volatility]` lines after [holzen-edge-log](../../supabase/functions/_shared/holzen-edge-log.ts) (see [browser-360-mcp-playbook.md](../fundamentals/browser-360-mcp-playbook.md)).
 

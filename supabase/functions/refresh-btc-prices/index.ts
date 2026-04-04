@@ -28,16 +28,12 @@ serve(async (req) => {
   const log = (msg: string) => console.log(JSON.stringify({ ts: new Date().toISOString(), fn: "refresh-btc-prices", msg, elapsed_ms: Date.now() - t0 }));
 
   try {
-    // Auth: service role or cron only
-    const authHeader = req.headers.get("Authorization");
-    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
-    const cronSecret = Deno.env.get("CRON_SECRET") ?? "";
-    const token = authHeader?.replace("Bearer ", "") ?? "";
-
-    if (token !== serviceRoleKey && token !== cronSecret && req.headers.get("x-supabase-cron") !== "true") {
+    const { verifyServiceAuth } = await import("../_shared/auth.ts");
+    if (!verifyServiceAuth(req, { allowSupabaseCronHeader: true })) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       serviceRoleKey,

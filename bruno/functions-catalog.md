@@ -8,30 +8,30 @@ Base URL: **`{{VITE_SUPABASE_URL}}/functions/v1/<name>`**
 |------|----------------|------------|
 | auth-email-hook | `auth-hook/` | Preview: `LOVABLE_API_KEY`. Main webhook: signed Lovable payload only. |
 | badge-notify | `user-jwt/` | User JWT |
-| check-followups | `service-cron/` | Service role / cron |
+| check-followups | `service-cron/` | `SERVICE_CRON_BEARER` |
 | check-subscription | `billing/` | User JWT |
-| check-volatility | `service-cron/` | Service role / cron |
+| check-volatility | `service-cron/` | `SERVICE_CRON_BEARER` |
 | companion-orchestrate | `pause-pipeline/` | User JWT |
 | create-checkout | `billing/` | User JWT |
 | customer-portal | `billing/` | User JWT |
 | delete-account | `user-jwt/` (DANGEROUS) | User JWT |
-| deliver-letters | `service-cron/` | Service role / cron |
-| fetch-source-feeds | `service-cron/` | Service role or `x-supabase-cron` |
+| deliver-letters | `service-cron/` | `SERVICE_CRON_BEARER` |
+| fetch-source-feeds | `service-cron/` | `SERVICE_CRON_BEARER` (or `x-supabase-cron` from cron) |
 | generate-wallpaper | `user-jwt/` | User JWT |
 | holzen-number | `public/` | Anon `apikey` only |
 | holzen-reflect | `pause-pipeline/` | User JWT |
 | journal-prompt | `user-jwt/` | User JWT |
-| monthly-report | `service-cron/` | Service role / cron |
-| night-reflection | `service-cron/` | Service role / cron |
-| personalized-nudge | `service-cron/` | Service role / cron |
-| pregenerate-companions | `service-cron/` | Service role / cron |
+| monthly-report | `service-cron/` | `SERVICE_CRON_BEARER` |
+| night-reflection | `service-cron/` | `SERVICE_CRON_BEARER` |
+| personalized-nudge | `service-cron/` | `SERVICE_CRON_BEARER` |
+| pregenerate-companions | `service-cron/` | `SERVICE_CRON_BEARER` (or `x-supabase-cron` from cron) |
 | record-referral | `user-jwt/` | User JWT |
 | reflection-insights | `user-jwt/` | User JWT (+ `user_id` in body) or batch via service/cron in code |
-| refresh-btc-prices | `service-cron/` | Service role / cron |
+| refresh-btc-prices | `service-cron/` | `SERVICE_CRON_BEARER` (or `x-supabase-cron` from cron) |
 | register-push | `user-jwt/` | User JWT |
 | send-feedback | `user-jwt/` | User JWT |
 | suggest-grounding | `user-jwt/` | User JWT |
 | suggest-ritual | `user-jwt/` | User JWT |
-| weekly-digest | `service-cron/` | Service role / cron |
+| weekly-digest | `service-cron/` | `SERVICE_CRON_BEARER` |
 
 **Source of truth for names:** `supabase/config.toml` under `[functions.<name>]`.

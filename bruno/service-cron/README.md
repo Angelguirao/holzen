@@ -1,25 +1,45 @@
 # Service / cron Edge Functions
 
-These requests send **`Authorization: Bearer <token>`**. The Edge runtime accepts the token if it equals **`SUPABASE_SERVICE_ROLE_KEY`** or **`CRON_SECRET`** (when that secret is set), except where noted below. The `.bru` files use **`{{SUPABASE_SERVICE_ROLE_KEY}}`** as the variable name — you may put the **service_role JWT** or the **`CRON_SECRET`** string there; both work for the same `Bearer` comparison on the server.
+## Bruno: `SERVICE_CRON_BEARER`
 
-- **With Supabase Dashboard access:** copy **service_role** from **Settings → API** into Bruno (never commit it).
-- **Hosted via Lovable Cloud (no dashboard):** use the **`CRON_SECRET`** value your platform exposes for cron; paste it into **`SUPABASE_SERVICE_ROLE_KEY`** in Bruno if that is the only slot, or add a **`CRON_SECRET`** env var and change the header to `Bearer {{CRON_SECRET}}` for clarity.
+Every request uses:
+
+```http
+Authorization: Bearer {{SERVICE_CRON_BEARER}}
+```
+
+Set **`SERVICE_CRON_BEARER`** in your Bruno environment (**`environments/hosted.bru`** or **`local.bru`**, gitignored) to **either**:
+
+| Where you get credentials | What to paste into `SERVICE_CRON_BEARER` |
+|---------------------------|------------------------------------------|
+| **Supabase Dashboard** → Settings → API | **`service_role`** JWT (full secret string) |
+| **Lovable Cloud** (no dashboard) | The **`CRON_SECRET`** value your platform uses for Edge secrets — it is compared to the same secret on the server |
+
+The Edge runtime compares the Bearer string to **`SUPABASE_SERVICE_ROLE_KEY`** and **`CRON_SECRET`** in the function environment ([`verifyServiceAuth`](../../supabase/functions/_shared/auth.ts)). The Bruno variable name is neutral because **both** server env vars are valid targets for the same header.
+
+Do **not** use the **anon** / publishable key as `SERVICE_CRON_BEARER` — these workers return **401**.
+
+## Why auth looked “different” before
+
+All **`service-cron/`** workers now share the same **`verifyServiceAuth`** implementation for the **Bearer** path (service role JWT or `CRON_SECRET`).
+
+**`refresh-btc-prices`**, **`fetch-source-feeds`**, and **`pregenerate-companions`** additionally pass **`allowSupabaseCronHeader: true`**, so they still accept **`x-supabase-cron: true`** without a Bearer token. That matches older pg_cron / host invoke patterns; it is **spoofable** on a public function URL, so prefer **`SERVICE_CRON_BEARER`** in Bruno and in Vault-backed cron SQL.
+
+**`check-volatility`**, **`night-reflection`**, and the other `verifyServiceAuth` callers do **not** enable that header — only a valid Bearer (or a future deliberate change) unlocks them.
+
+## Files
+
+| File | Function |
+|------|----------|
+| `check-followups.bru` | `check-followups` |
+| `check-volatility.bru` | `check-volatility` |
+| `weekly-digest.bru` | `weekly-digest` |
+| `monthly-report.bru` | `monthly-report` |
+| `night-reflection.bru` | `night-reflection` |
+| `personalized-nudge.bru` | `personalized-nudge` |
+| `deliver-letters.bru` | `deliver-letters` |
+| `pregenerate-companions.bru` | `pregenerate-companions` |
+| `fetch-source-feeds.bru` | `fetch-source-feeds` |
+| `refresh-btc-prices.bru` | `refresh-btc-prices` |
 
 Do **not** run destructive cron jobs against production without intent. Some functions call external APIs (CoinGecko, AI, email).
-
-## Auth implementation (code, not all `verifyServiceAuth`)
-
-| File | Function | How auth is checked |
-|------|----------|---------------------|
-| `check-followups.bru` | `check-followups` | `verifyServiceAuth` |
-| `check-volatility.bru` | `check-volatility` | `verifyServiceAuth` |
-| `weekly-digest.bru` | `weekly-digest` | `verifyServiceAuth` |
-| `monthly-report.bru` | `monthly-report` | `verifyServiceAuth` |
-| `night-reflection.bru` | `night-reflection` | `verifyServiceAuth` |
-| `personalized-nudge.bru` | `personalized-nudge` | `verifyServiceAuth` |
-| `deliver-letters.bru` | `deliver-letters` | `verifyServiceAuth` |
-| `pregenerate-companions.bru` | `pregenerate-companions` | service role or `CRON_SECRET` (inline) |
-| `fetch-source-feeds.bru` | `fetch-source-feeds` | service role, `CRON_SECRET`, or `x-supabase-cron: true` |
-| `refresh-btc-prices.bru` | `refresh-btc-prices` | service role, `CRON_SECRET`, or `x-supabase-cron: true` |
-
-Use the **anon** key as `Authorization` only for user-scoped flows — these workers will return **401**.
