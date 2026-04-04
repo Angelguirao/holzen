@@ -19,6 +19,7 @@ So: **production hosted** → `HOLZEN_EDGE_LOG=0` matches “no strategic spam i
 |-----------|---------|-------------|
 | **`createLogger(prefix)`** | One JSON line per log (`fn`, `cid`, `elapsed_ms`, `level`, `msg`, optional `extra`) | Every new function: request lifecycle, branches, failures. Appears in **Supabase → Edge Functions → Logs**. |
 | **`limit_check_fail_open`** ([`ratelimit.ts`](../../supabase/functions/_shared/ratelimit.ts)) | Rate / daily budget / regenerate check errored → request still **allowed** | Grep **`limit_check_fail_open`** or **`holzen_event":"limit_check_fail_open"`**; use **`scope`** (`rate_limit`, `daily_budget`, `companion_regenerate`) and **`phase`** (`supabase_error`, `thrown`) for dashboards/alerts. |
+| **`quality_gate_reject`** ([`quality.ts`](../../supabase/functions/_shared/quality.ts)) | Companion **live** output failed `qualityGate` → fallback path | Grep **`quality_gate_reject`**; fields **`companion_type`**, **`reason`** (stable code, no body text). Pair with **`generation_attempts.status`** = **`quality_gate_failed`** and **`quality_gate_reason`**. |
 | **`createAttemptLogger` → `generation_attempts`** | Model/API attempts, costs, quality gates | Companion and AI paths: success, error, timeout, `quality_gate_failed`. Enables **per-user / per-reflection** cost and debugging. |
 | **`createObsTracker` / `trackEvent` → `analytics_events`** | Product and pipeline events (counts, funnel steps) | User-scoped events (“pause_ai_call”, companion fallbacks, etc.); **not** a substitute for full request tracing. |
 

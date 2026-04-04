@@ -8,7 +8,13 @@
  * API keys are read from Deno.env directly (same as the original function).
  */
 
-import { qualityGate, BANNED_PHRASES, isUrlReachable, contentFingerprint } from "../quality.ts";
+import {
+  qualityGate,
+  BANNED_PHRASES,
+  isUrlReachable,
+  contentFingerprint,
+  logQualityGateStructuredReject,
+} from "../quality.ts";
 import {
   companionFallbacksDisabled,
   COMPANION_FALLBACKS_DISABLED_MESSAGE,
@@ -264,6 +270,7 @@ BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? 
 
   const models = ["google/gemini-2.5-flash", "google/gemini-2.5-flash-lite"];
   let insight: any = null;
+  let lastLovableModel: string | undefined;
 
   const AI_TIMEOUTS = [8000, 6000];
   for (let idx = 0; idx < models.length; idx++) {
@@ -301,6 +308,7 @@ BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? 
         }
       }
       logAttempt({ companion_type: "historical_insight", provider: "lovable", model, status: "success", latency_ms: Date.now() - attemptT0, input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
+      lastLovableModel = model;
       break;
     } catch (e) {
       clearTimeout(aiTimeout);
@@ -313,7 +321,19 @@ BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? 
   // ── Step 3: Quality gate ──
   const qg = qualityGate("historical_insight", insight);
   if (!insight || !qg.pass) {
-    log(`quality gate failed: ${!insight ? "no insight" : (qg.reason ?? "unknown")}`);
+    const reason = !insight ? "no_structured_output" : (qg.reason ?? "unknown");
+    log(`quality gate failed: ${reason}`);
+    logQualityGateStructuredReject("historical_insight", reason);
+    if (insight && lastLovableModel) {
+      logAttempt({
+        companion_type: "historical_insight",
+        provider: "lovable",
+        model: lastLovableModel,
+        status: "quality_gate_failed",
+        latency_ms: 0,
+        quality_gate_reason: qg.reason ?? "unknown",
+      });
+    }
     return serveFallback(svcClient, userId, marketDirection, undefined, historyMoodTag);
   }
 

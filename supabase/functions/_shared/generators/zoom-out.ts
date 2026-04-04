@@ -10,7 +10,13 @@
  * API keys are read from Deno.env directly (same as the original function).
  */
 
-import { qualityGate, BANNED_PHRASES, containsSlop, contentFingerprint } from "../quality.ts";
+import {
+  qualityGate,
+  BANNED_PHRASES,
+  containsSlop,
+  contentFingerprint,
+  logQualityGateStructuredReject,
+} from "../quality.ts";
 import {
   companionFallbacksDisabled,
   COMPANION_FALLBACKS_DISABLED_MESSAGE,
@@ -280,8 +286,19 @@ No trading advice, no price predictions, no exclamation marks.${mood ? `\n\nUSER
               } catch (e) { log(`cache write failed: ${e}`); }
               break;
             } else if (parsed.title && parsed.body) {
-              log(`deepTime quality gate failed: body=${(parsed.body || "").length}chars slop=${containsSlop(parsed.body || "")}`);
-              logAttempt({ companion_type: "zoom_out", provider: "lovable", model, status: "quality_gate_failed", latency_ms: Date.now() - attemptT0, quality_gate_reason: "deep_time_quality", input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
+              const qgReason = qg.reason ?? "deep_time_quality";
+              log(`deepTime quality gate failed: ${qgReason} body=${(parsed.body || "").length}chars`);
+              logQualityGateStructuredReject("zoom_out_deep_time", qgReason);
+              logAttempt({
+                companion_type: "zoom_out",
+                provider: "lovable",
+                model,
+                status: "quality_gate_failed",
+                latency_ms: Date.now() - attemptT0,
+                quality_gate_reason: qgReason,
+                input_tokens: usage?.prompt_tokens,
+                output_tokens: usage?.completion_tokens,
+              });
               if (model !== models[models.length - 1]) continue;
             }
           } catch {

@@ -8,7 +8,13 @@
  * API keys are read from Deno.env directly (same as the original function).
  */
 
-import { qualityGate, containsSlop, isUrlReachable, contentFingerprint } from "../quality.ts";
+import {
+  qualityGate,
+  containsSlop,
+  isUrlReachable,
+  contentFingerprint,
+  logQualityGateStructuredReject,
+} from "../quality.ts";
 import {
   companionFallbacksDisabled,
   COMPANION_FALLBACKS_DISABLED_MESSAGE,
@@ -339,6 +345,7 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
 
   const models = ["google/gemini-2.5-flash", "google/gemini-2.5-flash-lite"];
   let nudge: any = null;
+  let lastLovableModel: string | undefined;
 
   const AI_TIMEOUTS = [8000, 6000];
   for (let idx = 0; idx < models.length; idx++) {
@@ -382,6 +389,7 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
         }
       }
       logAttempt({ companion_type: "ground_nudge", provider: "lovable", model, status: "success", latency_ms: Date.now() - attemptT0, input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
+      lastLovableModel = model;
       break;
     } catch (e) {
       clearTimeout(aiTimeout);
@@ -394,7 +402,21 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
   // ── Step 3: Quality gate ──
   const qg = qualityGate("ground_nudge", nudge);
   if (!nudge || !qg.pass) {
-    log(`quality gate failed: ${!nudge ? "no nudge" : `body=${(nudge.body || "").length}chars, slop=${containsSlop(nudge?.body || "") || containsSlop(nudge?.title || "")}, reason=${qg.reason ?? "unknown"}`}`);
+    const reason = !nudge ? "no_structured_output" : (qg.reason ?? "unknown");
+    log(
+      `quality gate failed: ${!nudge ? "no nudge" : `body=${(nudge.body || "").length}chars, slop=${containsSlop(nudge?.body || "") || containsSlop(nudge?.title || "")}, reason=${reason}`}`,
+    );
+    logQualityGateStructuredReject("ground_nudge", reason);
+    if (nudge && lastLovableModel) {
+      logAttempt({
+        companion_type: "ground_nudge",
+        provider: "lovable",
+        model: lastLovableModel,
+        status: "quality_gate_failed",
+        latency_ms: 0,
+        quality_gate_reason: qg.reason ?? "unknown",
+      });
+    }
     return serveFallback(svcClient, userId, marketDirectionForCache);
   }
 

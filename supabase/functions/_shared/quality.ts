@@ -1,6 +1,10 @@
 /**
  * Shared quality gate logic for AI-generated companion content.
  * Centralises slop detection, schema validation, and length checks.
+ *
+ * **Generator behavior:** any `pass: false` from `qualityGate` is a **hard** reject for the
+ * live path — generators fall back to cache/curated. Use stable `reason` codes for SQL rollups
+ * on `generation_attempts.quality_gate_reason` and Edge logs (`quality_gate_reject`).
  */
 
 // ── Banned AI-slop phrases ──
@@ -30,6 +34,26 @@ const BANNED_CRYPTO_TERMS = [
   "defi", "nft", "nfts", "web3", "token", "tokens",
   "blockchain technology", "blockchain industry",
 ];
+
+/**
+ * Structured Edge log when a companion generator rejects live output after `qualityGate`.
+ * Grep: `quality_gate_reject` or `"holzen_event":"quality_gate_reject"`. No body/title text — only `reason`.
+ */
+export function logQualityGateStructuredReject(companionType: string, reason: string): void {
+  const r = (reason || "unknown").slice(0, 200);
+  try {
+    console.warn(
+      JSON.stringify({
+        holzen_event: "quality_gate_reject",
+        companion_type: companionType,
+        reason: r,
+        ts: new Date().toISOString(),
+      }),
+    );
+  } catch {
+    console.warn(`[quality] quality_gate_reject ${companionType} ${r}`);
+  }
+}
 
 /** Check if text uses generic crypto language instead of Bitcoin-specific language */
 export function containsCryptoLanguage(text: string): boolean {
@@ -201,21 +225,30 @@ function checkSpecificity(companionType: string, content: any): { pass: boolean;
     case "ground_nudge": {
       const body = content.body || "";
       const citation = content.citation || "";
-      // Grounding content should reference specific research
-      // Check body OR citation for a year
-      const hasYear = /\b(19|20)\d{2}\b/.test(body) || /\b(19|20)\d{2}\b/.test(citation);
-      // Check for academic-style names: "Firstname Lastname" (two adjacent capitalized words)
-      // or "Name's YYYY" or "Name and Name" or "Name (YYYY)"
-      const hasResearcherName = /[A-Z][a-z]{2,}\s+[A-Z][a-z]{2,}/.test(body);
-      if (!hasYear && !hasResearcherName) {
+      const combined = `${body}\n${citation}`;
+      const hasYear =
+        /\b(19|20)\d{2}\b/.test(body) ||
+        /\b(19|20)\d{2}\b/.test(citation);
+      // Two title-case words (Unicode letters) — less English-centric than ASCII-only `[A-Z][a-z]`
+      const hasResearcherName = /\p{Lu}\p{L}+\s+\p{Lu}\p{L}+/u.test(body);
+      const hasEtAl = /\bet\s+al\.?\b/i.test(combined);
+      const hasDoi = /\b10\.\d{4,}\/\S+/i.test(combined);
+      if (!hasYear && !hasResearcherName && !hasEtAl && !hasDoi) {
         return { pass: false, reason: "grounding_lacks_specificity: no researcher names or years" };
       }
       break;
     }
     case "historical_insight": {
       const insight = content.btcInsight || "";
-      // History should have specific dates or price points
-      const hasDate = /\b(19|20)\d{2}\b|\b(January|February|March|April|May|June|July|August|September|October|November|December)\b/i.test(insight);
+      const hasYearWord = /\b(19|20)\d{2}\b/.test(insight);
+      const hasMonthName =
+        /\b(January|February|March|April|May|June|July|August|September|October|November|December)\b/i.test(
+          insight,
+        );
+      const hasNumericDate =
+        /\b\d{1,2}[/.-]\d{1,2}[/.-](19|20)\d{2}\b/.test(insight) ||
+        /\b(19|20)\d{2}[/.-]\d{1,2}[/.-]\d{1,2}\b/.test(insight);
+      const hasDate = hasYearWord || hasMonthName || hasNumericDate;
       const hasNumber = /\$[\d,]+|\d+%/.test(insight);
       if (!hasDate && !hasNumber) {
         return { pass: false, reason: "history_lacks_specificity: no dates or numbers" };
