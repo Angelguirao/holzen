@@ -1,33 +1,27 @@
-# Cache and content dedup: near-duplicates (Pending)
+# Cache and content dedup: near-duplicates (Done — 2026-04)
 
-## Context (from Phase 4)
+## What shipped
 
-- **`fetch-source-feeds`** dedups `content_library` inserts by **exact `title` match**.
-- **`pregenerate-companions`** dedups against `companion_cache` using **title similarity** checks.
+### `content_library` (`fetch-source-feeds`)
 
-If prompts, models, or formatting change slightly, **near-duplicate** rows can accumulate (same URL, trivial title edits, whitespace).
+- Dedup checks **canonical URL variants** (`.in("url", …)` with raw + normalized host/path) and **`title_norm`** (trim + lowercase + collapsed whitespace), not only exact raw `title`.
+- New rows store **`url`** as **`canonicalContentUrl(...)`** when parsing succeeds, so future runs align with the URL index.
+- Migration **`20260403180000_content_library_title_norm_url_index.sql`**: generated **`title_norm`** column (matches JS `normalizeTitleKey`) + indexes on **`(type, title_norm)`** and **`url`**.
 
-## Current problem
+### `companion_cache` (`pregenerate-companions`)
 
-Dedup keys may be **too weak** for "meaningful duplicate" detection: caches grow, quality mix degrades, and users may see repetitive Signal/Grounding or companion cache entries.
+- Shared module **`supabase/functions/_shared/content-dedup.ts`**: `normalizeTitleKey`, `canonicalContentUrl`, `contentSnippetFingerprint`, `isCompanionCacheDuplicate`.
+- Inserts set **`title`**, **`title_norm`**, **`source_url`** (canonical), and **`fingerprint`** (SHA-256 prefix of normalized body snippet) so indexed columns are populated for new rows.
+- **`isCompanionCacheDuplicate`** uses **indexed** lookups first (`title_norm`, `source_url`, `fingerprint`), then a **fuzzy** pass on the last 120 rows (legacy rows without norms / near-similar titles).
 
-## Implications if we leave it as-is
+## Related code
 
-- Storage and query cost creep.
-- Harder to maintain quality tiers in `companion_cache` and `content_library`.
-
-## Proposed improvement
-
-- **Stronger keys**: normalize title (trim, lowercase, collapse whitespace), add **URL** or **content hash** where available before insert.
-- **Per-table policy**: `content_library` may favor URL+source; `companion_cache` may favor type + normalized title + hash of body snippet.
-- **Measure**: sample duplicate-ish rows in production (or staging) before changing logic.
-
-## Related code pointers
-
+- `supabase/functions/_shared/content-dedup.ts`
 - `supabase/functions/fetch-source-feeds/index.ts`
 - `supabase/functions/pregenerate-companions/index.ts`
+- `supabase/migrations/20260403180000_content_library_title_norm_url_index.sql`
 
-## Acceptance criteria / how to verify
+## How to verify
 
-1. Insert path rejects or updates existing rows when URL or normalized title matches, not only exact raw title.
-2. Duplicate rate drops in metrics or manual spot checks after deploy.
+1. Apply migration; run **`fetch-source-feeds`** twice on the same source — second run should skip with URL or normalized title message, not insert a second row.
+2. Run **`pregenerate-companions`** — logs may show **`SKIPPED duplicate`** when title, URL, or body fingerprint matches an indexed row.
