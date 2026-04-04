@@ -121,11 +121,12 @@ serve(async (req) => {
   const log = (msg: string) => console.log(JSON.stringify({ ts: new Date().toISOString(), fn: "fetch-source-feeds", msg, elapsed_ms: Date.now() - t0 }));
 
   try {
-    // Auth
+    // Auth: align with refresh-btc-prices / pregenerate — service role, CRON_SECRET, or Supabase cron header
     const authHeader = req.headers.get("Authorization");
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+    const cronSecret = Deno.env.get("CRON_SECRET") ?? "";
     const token = authHeader?.replace("Bearer ", "") ?? "";
-    if (token !== serviceRoleKey && req.headers.get("x-supabase-cron") !== "true") {
+    if (token !== serviceRoleKey && token !== cronSecret && req.headers.get("x-supabase-cron") !== "true") {
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
