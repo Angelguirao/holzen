@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { createAttemptLogger } from "../_shared/observe.ts";
+import { canonicalContentUrl, normalizeTitleKey, urlDedupCandidates } from "../_shared/content-dedup.ts";
 import { callPerplexityChat, type PerplexityUsage } from "../_shared/perplexity-client.ts";
 import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
 
@@ -254,17 +255,37 @@ serve(async (req) => {
         try { entry = JSON.parse(raw); } catch { results.push(`${source.name}: JSON parse error`); continue; }
         if (!entry.title || !entry.summary) { results.push(`${source.name}: invalid structure`); continue; }
 
-        // ── Step 3: Dedup check ──
-        const { data: existing } = await supabase
+        // ── Step 3: Dedup — canonical URL variants + indexed title_norm (not raw title only)
+        const resolvedUrl = String(entry.url || citations[0] || source.url || "");
+        const urlCandidates = urlDedupCandidates(resolvedUrl);
+        if (urlCandidates.length > 0) {
+          const { data: byUrl } = await supabase
+            .from("content_library")
+            .select("id")
+            .eq("type", contentType)
+            .eq("active", true)
+            .in("url", urlCandidates)
+            .limit(1);
+          if (byUrl && byUrl.length > 0) {
+            results.push(`${source.name}: URL already in content_library`);
+            continue;
+          }
+        }
+
+        const titleNorm = normalizeTitleKey(entry.title);
+        const { data: byNorm } = await supabase
           .from("content_library")
           .select("id")
-          .eq("title", entry.title)
+          .eq("type", contentType)
+          .eq("active", true)
+          .eq("title_norm", titleNorm)
           .limit(1);
-
-        if (existing && existing.length > 0) {
-          results.push(`${source.name}: "${entry.title}" already exists`);
+        if (byNorm && byNorm.length > 0) {
+          results.push(`${source.name}: same normalized title already in content_library`);
           continue;
         }
+
+        const storedUrl = canonicalContentUrl(resolvedUrl) ?? (resolvedUrl.trim() || null);
 
         // ── Step 4: Insert into content_library ──
         const insertData: any = {
@@ -272,7 +293,7 @@ serve(async (req) => {
           title: entry.title,
           author: entry.author || source.name,
           summary: entry.summary,
-          url: entry.url || citations[0] || source.url,
+          url: storedUrl,
           tags: [source.category, source.name.toLowerCase().replace(/\s+/g, '-')],
           companion_types: [source.category === "signal" ? "signal" : "ground_nudge"],
           language: "en",

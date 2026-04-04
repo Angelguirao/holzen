@@ -2,50 +2,18 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createAttemptLogger } from "../_shared/observe.ts";
 import { callPerplexityChat } from "../_shared/perplexity-client.ts";
 import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
+import {
+  canonicalContentUrl,
+  contentSnippetFingerprint,
+  isCompanionCacheDuplicate,
+  normalizeTitleKey,
+} from "../_shared/content-dedup.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers":
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
-
-// ── Title-based dedup helper ──
-// Returns true if a similar title already exists in cache for this companion type
-async function isDuplicate(svcClient: any, companionType: string, newTitle: string): Promise<boolean> {
-  if (!newTitle || newTitle.length < 5) return false;
-  const { data } = await svcClient
-    .from("companion_cache")
-    .select("content")
-    .eq("companion_type", companionType)
-    .eq("language", "en")
-    .limit(50);
-  if (!data || data.length === 0) return false;
-
-  const normalize = (s: string) => s.toLowerCase().replace(/[^a-z0-9 ]/g, "").trim();
-  const newNorm = normalize(newTitle);
-  const newWords = new Set(newNorm.split(/\s+/).filter(w => w.length > 3));
-
-  for (const entry of data) {
-    const existingTitle = (entry.content as any)?.title;
-    if (!existingTitle) continue;
-    const existNorm = normalize(existingTitle);
-
-    // Exact match
-    if (existNorm === newNorm) return true;
-
-    // Substring containment
-    if (existNorm.includes(newNorm) || newNorm.includes(existNorm)) return true;
-
-    // Word overlap: >60% of significant words match
-    const existWords = new Set(existNorm.split(/\s+/).filter((w: string) => w.length > 3));
-    if (newWords.size === 0 || existWords.size === 0) continue;
-    let overlap = 0;
-    for (const w of newWords) { if (existWords.has(w)) overlap++; }
-    const overlapRatio = overlap / Math.min(newWords.size, existWords.size);
-    if (overlapRatio > 0.6) return true;
-  }
-  return false;
-}
 
 // ── URL validation ──
 async function isUrlReachable(url: string): Promise<boolean> {
@@ -237,18 +205,26 @@ serve(async (req) => {
                 const nudge = typeof content === "string" ? JSON.parse(content) : content;
 
                 // Dedup check
-                if (await isDuplicate(svcClient, "ground_nudge", nudge.title)) {
+                if (await isCompanionCacheDuplicate(svcClient, "ground_nudge", nudge.title, {
+                  url: nudge.url,
+                  bodySnippet: nudge.body,
+                })) {
                   results.push(`ground_nudge: SKIPPED duplicate "${nudge.title}"`);
                 } else {
                   let qualityScore = 1;
                   if (nudge.url) {
                     if (await isUrlReachable(nudge.url)) qualityScore = 2;
                   }
+                  const nudgeFp = await contentSnippetFingerprint(nudge.body || "");
                   await svcClient.from("companion_cache").insert({
                     companion_type: "ground_nudge",
                     language: "en",
                     content: nudge,
                     quality_score: qualityScore,
+                    title: nudge.title,
+                    title_norm: normalizeTitleKey(nudge.title),
+                    source_url: nudge.url ? (canonicalContentUrl(nudge.url) ?? nudge.url) : null,
+                    fingerprint: nudgeFp,
                   });
                   results.push(`ground_nudge: ${nudge.title} (q=${qualityScore})`);
                 }
@@ -350,16 +326,24 @@ serve(async (req) => {
             if (content) {
               const signal = typeof content === "string" ? JSON.parse(content) : content;
 
-              if (await isDuplicate(svcClient, "signal", signal.title)) {
+              if (await isCompanionCacheDuplicate(svcClient, "signal", signal.title, {
+                url: signal.url,
+                bodySnippet: signal.body,
+              })) {
                 results.push(`signal: SKIPPED duplicate "${signal.title}"`);
               } else {
                 let qualityScore = 1;
                 if (signal.url && await isUrlReachable(signal.url)) qualityScore = 2;
+                const signalFp = await contentSnippetFingerprint(signal.body || "");
                 await svcClient.from("companion_cache").insert({
                   companion_type: "signal",
                   language: "en",
                   content: signal,
                   quality_score: qualityScore,
+                  title: signal.title,
+                  title_norm: normalizeTitleKey(signal.title),
+                  source_url: signal.url ? (canonicalContentUrl(signal.url) ?? signal.url) : null,
+                  fingerprint: signalFp,
                 });
                 results.push(`signal: ${signal.title} (q=${qualityScore})`);
               }
@@ -446,16 +430,24 @@ serve(async (req) => {
                 // Pin URL to first citation if available
                 if (!insight.url && citations.length > 0) insight.url = citations[0];
 
-                if (await isDuplicate(svcClient, "historical_insight", insight.title)) {
+                if (await isCompanionCacheDuplicate(svcClient, "historical_insight", insight.title, {
+                  url: insight.url,
+                  bodySnippet: insight.btcInsight,
+                })) {
                   results.push(`history: SKIPPED duplicate "${insight.title}"`);
                 } else {
                   let qualityScore = 1;
                   if (insight.url && await isUrlReachable(insight.url)) qualityScore = 2;
+                  const histFp = await contentSnippetFingerprint(insight.btcInsight || "");
                   await svcClient.from("companion_cache").insert({
                     companion_type: "historical_insight",
                     language: "en",
                     content: insight,
                     quality_score: qualityScore,
+                    title: insight.title,
+                    title_norm: normalizeTitleKey(insight.title),
+                    source_url: insight.url ? (canonicalContentUrl(insight.url) ?? insight.url) : null,
+                    fingerprint: histFp,
                   });
                   results.push(`history: ${insight.title} (q=${qualityScore})`);
                 }
@@ -516,14 +508,20 @@ serve(async (req) => {
         if (raw) {
           const parsed = JSON.parse(raw);
           if (parsed.title && parsed.body) {
-            if (await isDuplicate(svcClient, "zoom_out_deep_time", parsed.title)) {
+            if (await isCompanionCacheDuplicate(svcClient, "zoom_out_deep_time", parsed.title, {
+              bodySnippet: parsed.body,
+            })) {
               results.push(`zoom_out: SKIPPED duplicate "${parsed.title}"`);
             } else {
+              const zoomFp = await contentSnippetFingerprint(parsed.body || "");
               await svcClient.from("companion_cache").insert({
                 companion_type: "zoom_out_deep_time",
                 language: "en",
                 content: { title: parsed.title, body: parsed.body },
                 quality_score: 2,
+                title: parsed.title,
+                title_norm: normalizeTitleKey(parsed.title),
+                fingerprint: zoomFp,
               });
               results.push(`zoom_out: ${parsed.title}`);
             }
