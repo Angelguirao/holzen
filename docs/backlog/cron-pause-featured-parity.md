@@ -1,34 +1,25 @@
-# Cron pause: featured fields vs manual path on first paint (Pending)
+# Cron pause: featured fields vs manual path on first paint (Done — 2026-04)
 
-## Context (from Phase 3)
+## Context
 
-Automatic pauses created by `check-volatility` may insert `reflections` with **`grounding_title` / `grounding_body` null** initially; those columns are expected to be filled later by `companion-orchestrate`. Manual pauses from `use-holzen` + `holzen-reflect` may populate more featured fields in the same insert.
+Automatic pauses from `check-volatility` may insert `reflections` with **`grounding_title` / `grounding_body` null** initially; expanded content is filled by `companion-orchestrate` and `reflection_companions`. Manual pauses may arrive with more merged `location.state` from the browser.
 
-## Current problem
+## What we shipped
 
-**First paint** of `/pause` can **differ** between:
+**Client loader priming** in `use-companion-data`: a `useLayoutEffect` keyed on `reflectionId` sets `interventionLoading` and per-pref companion loaders (`signal`, `grounding` / nudge, `history`, `zoomOut`) to **true** before the browser paints when a reflection is active. That removes the first-frame gap where hooks initialized `loading` to `false`, so `InterventionSection` and `CompanionSection` did not render skeletons and grounding could look **silently empty** on notification opens.
 
-- **Manual path**: user often arrives from Home with full `location.state` + reflect output already merged into state.
-- **Cron / notification path**: user may open with only `reflectionId`; reflection row may still be **mid-orchestration** for featured snippets.
-
-## Implications if we leave it as-is
-
-- UI that assumes "featured grounding always exists" on `reflections` can look **empty or inconsistent** for cron-driven pauses until orchestration completes.
-- Users may perceive automatic pauses as "broken" compared to manual pauses if copy does not explain loading.
-
-## Proposed improvement
-
-- **Document** in UI components (`PauseReflect`, `CollapsibleReflectionHeader`, etc.) which fields are **best-effort on first paint** for automatic pauses.
-- **Optional**: after `reflectionId` is known, **fetch** the latest reflection row (or companion view) when featured fields are null and show skeletons until populated.
-- Overlaps with `pause-session-hydration.md` for navigation; this file focuses on **cron vs manual content parity**, not only `location.state`.
+Existing UI already had skeletons for intervention (`InterventionSection`) and grounding (`LearningInput` when `nudgeLoading`); this change ensures those paths are active on the first painted frame for cron-driven opens.
 
 ## Related code pointers
 
-- `supabase/functions/check-volatility/index.ts` — what is written to `reflections` before orchestrate
-- `src/pages/PauseSession.tsx` — merged view model
+- `src/hooks/use-companion-data.ts` — `useLayoutEffect` loader priming when `reflectionId` is set
+- `src/components/CompanionSection.tsx` — intervention + companion cards
+- `src/components/InterventionSection.tsx` — featured intervention skeletons
+- `src/components/LearningInput.tsx` — grounding skeleton while nudge loads
+- `supabase/functions/check-volatility/index.ts` — reflection write before orchestrate
 - `docs/reviews/phase-3-server-cron-triggers.md`
 
-## Acceptance criteria / how to verify
+## Acceptance (met)
 
-1. Opening `/pause` from a **notification** right after an automatic pause never shows a **silent** empty featured area without a loading or "still preparing" affordance.
-2. After orchestration completes, featured/expanded content **converges** with what manual pauses would show for equivalent settings.
+1. Opening `/pause` from a notification right after an automatic pause does not show a **silent** empty featured or grounding area without a loading affordance (skeletons / pulse on cards).
+2. After orchestration completes, content **converges** with the manual path for the same prefs (same orchestrate + `reflection_companions` sources).
