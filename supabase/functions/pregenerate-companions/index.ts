@@ -67,23 +67,17 @@ serve(async (req) => {
   const log = (msg: string) => console.log(`[pregenerate] ${msg} (+${Date.now() - t0}ms)`);
 
   try {
-    // ── Auth: require service role key or a valid cron secret ──
-    const authHeader = req.headers.get("Authorization");
-    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
-    const cronSecret = Deno.env.get("CRON_SECRET") ?? "";
-    const token = authHeader?.replace("Bearer ", "") ?? "";
-
-    const isServiceRole = token === serviceRoleKey;
-    const isCronSecret = cronSecret.length > 0 && token === cronSecret;
-
-    if (!isServiceRole && !isCronSecret) {
+    const { verifyServiceAuth } = await import("../_shared/auth.ts");
+    if (!verifyServiceAuth(req, { allowSupabaseCronHeader: true })) {
       log("unauthorized: missing or invalid credentials");
-      return new Response(JSON.stringify({ error: "Unauthorized. Requires service role key or cron secret." }), {
+      return new Response(JSON.stringify({ error: "Unauthorized. Requires service role, CRON_SECRET, or x-supabase-cron." }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
     log("auth verified");
+
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
 
     const { createClient } = await import("npm:@supabase/supabase-js@2.57.2");
     const sbUrl = Deno.env.get("SUPABASE_URL") ?? "";

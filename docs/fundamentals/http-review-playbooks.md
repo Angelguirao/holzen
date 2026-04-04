@@ -39,9 +39,9 @@ Some functions validate the Bearer token in code even when `[functions.<name>]` 
 
 ### Service role calls (`bruno/service-cron/*`)
 
-Cron-style Edge functions expect **`Authorization: Bearer {{SUPABASE_SERVICE_ROLE_KEY}}`** (see `bruno/service-cron/check-volatility.bru`) — the **service_role** JWT from **Supabase Dashboard → Project Settings → API**, not the anon/publishable key.
+Cron-style Edge functions expect **`Authorization: Bearer {{SERVICE_CRON_BEARER}}`** (see `bruno/service-cron/check-volatility.bru`). Set **`SERVICE_CRON_BEARER`** to the **service_role** JWT (**Dashboard → Project Settings → API**) or, on hosts without dashboard access, to the same **`CRON_SECRET`** string configured on Edge — not the anon/publishable key.
 
-If Bruno returns **`401 Unauthorized`**, the value in your environment almost always **does not match** the current project’s service role (wrong project, typo, stale env file). Fix the variable, then retry; redeploying the function does not correct a bad Bruno secret.
+If Bruno returns **`401 Unauthorized`**, the bearer value usually **does not match** the project’s **service_role** or **`CRON_SECRET`** (wrong project, typo, stale env). Fix **`SERVICE_CRON_BEARER`**, then retry; redeploying the function does not correct a bad client secret.
 
 For **pg_cron**, use **Vault** + `vault.decrypted_secrets` in the `Authorization` header (hosted Supabase does not set `current_setting('supabase.service_role_key')`) — see [Cron HTTP auth in cron-setup.md](../ops/cron-setup.md#cron-http-auth).
 

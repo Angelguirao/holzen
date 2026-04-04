@@ -22,7 +22,7 @@ Shared variables (fill the one that matches the backend you selected):
 | **`VITE_SUPABASE_URL`** | **Local:** `http://127.0.0.1:54321` (no trailing slash). **Hosted:** `https://<project-ref>.supabase.co`. |
 | **`VITE_SUPABASE_PUBLISHABLE_KEY`** | Anon key — local: `npm run supabase:status`; hosted: Supabase Dashboard → **Settings → API**. |
 | **`AUTH_EMAIL`** / **`AUTH_PASSWORD`** | User that exists on **that** project (create in Studio or sign-up). |
-| **`SUPABASE_SERVICE_ROLE_KEY`** | For **`service-cron/`** only — same project as `VITE_SUPABASE_URL` (Dashboard → **Settings → API** → service_role). |
+| **`SERVICE_CRON_BEARER`** | For **`service-cron/`** only — paste **service_role** JWT (Dashboard → API) **or** your hosted platform’s **`CRON_SECRET`** (e.g. Lovable); see [`service-cron/README.md`](service-cron/README.md). |
 | **`LOVABLE_API_KEY`** | Optional — **`auth-hook/auth-email-hook-preview`** only (see below). |
 
 ### LOVABLE_API_KEY — you won’t get it from this repo
@@ -53,7 +53,7 @@ Shared variables (fill the one that matches the backend you selected):
 | **`pause-pipeline/`** | User JWT | `holzen-reflect`, `companion-orchestrate` |
 | **`billing/`** | User JWT | Stripe Checkout, subscription check, portal |
 | **`user-jwt/`** | User JWT | `badge-notify`, `suggest-grounding`, `suggest-ritual`, `journal-prompt`, `reflection-insights`, `register-push`, `send-feedback`, `generate-wallpaper`, `record-referral`, **`delete-account-DANGEROUS`** |
-| **`service-cron/`** | **Service role** (`SUPABASE_SERVICE_ROLE_KEY`) | Cron-style workers: `check-followups`, `check-volatility`, `weekly-digest`, `monthly-report`, `night-reflection`, `personalized-nudge`, `deliver-letters`, `pregenerate-companions`, `fetch-source-feeds`, `refresh-btc-prices` |
+| **`service-cron/`** | **`SERVICE_CRON_BEARER`** (service_role or `CRON_SECRET`) | Cron-style workers: `check-followups`, `check-volatility`, `weekly-digest`, `monthly-report`, `night-reflection`, `personalized-nudge`, `deliver-letters`, `pregenerate-companions`, `fetch-source-feeds`, `refresh-btc-prices` |
 | **`auth-hook/`** | **`LOVABLE_API_KEY`** | `auth-email-hook-preview` only (HTML preview). The real webhook is signed — not in Bruno. |
 
 **Why this layout:** Folders are grouped by **credentials and risk**, not only by product name. That makes it obvious which **`Authorization`** value each request needs (user JWT vs service role vs Lovable key) and keeps high-blast-radius calls (**`service-cron/`**, destructive user actions) from looking like normal client API calls. **`pause-pipeline/`** stays separate as the main manual review slice for pause + companions. A domain-only layout (e.g. all “journal” endpoints in one place) would read nicely but mixes auth modes — fine as a future refactor if you prefer that mental model.
@@ -63,7 +63,7 @@ Shared variables (fill the one that matches the backend you selected):
 ## Typical flows
 
 1. **User flows:** `auth/01` → any of `pause-pipeline/`, `billing/`, `user-jwt/` (skip `delete-account` unless intentional).
-2. **Cron / batch:** fill **`SUPABASE_SERVICE_ROLE_KEY`**, then run requests under **`service-cron/`** (can hit external APIs and send emails — use staging/local first).
+2. **Cron / batch:** fill **`SERVICE_CRON_BEARER`** (see [`service-cron/README.md`](service-cron/README.md)), then run requests under **`service-cron/`** (can hit external APIs and send emails — use staging/local first).
 3. **Email template preview:** set **`LOVABLE_API_KEY`**, run **`auth-hook/auth-email-hook-preview`**.
 
 ## Running a review
