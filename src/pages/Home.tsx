@@ -197,7 +197,7 @@ const Home = () => {
     const pinnedId = localStorage.getItem('holzen_pinned_reflection');
     if (!pinnedId) return;
     supabase
-      .from('reflections')
+      .from('v_reflection_with_companions')
       .select('id, message, context, haiku, grounding_title, grounding_body')
       .eq('id', pinnedId)
       .eq('user_id', user.id)

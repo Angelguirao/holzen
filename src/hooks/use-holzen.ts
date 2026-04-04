@@ -78,7 +78,7 @@ export function useHolzen() {
 
     if (lastMessage && user) {
       supabase
-        .from('reflections')
+        .from('v_reflection_with_companions')
         .select('id, haiku, grounding_title, grounding_body')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
@@ -254,8 +254,6 @@ export function useHolzen() {
           message: msg,
           context: ctx,
           haiku: companionData.haiku,
-          grounding_title: companionData.groundingTitle,
-          grounding_body: companionData.groundingBody,
           ...(mood ? { mood } : {}),
         }).select('id').single();
 
@@ -471,7 +469,7 @@ export function useHolzen() {
       setContext(data.last_context);
       setNewReflection(true);
       const { data: latest } = await supabase
-        .from('reflections')
+        .from('v_reflection_with_companions')
         .select('id, haiku, grounding_title, grounding_body')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })

@@ -510,7 +510,6 @@ serve(async (req) => {
       }).then(() => {});
 
       const haiku = (profile as any).companion_haiku ? result.haiku : null;
-      // grounding_* on the row are filled by companion-orchestrate (Grounding, etc.), not reflection AI
 
       const { data: insertedReflection } = await supabase
         .from("reflections")
@@ -519,8 +518,6 @@ serve(async (req) => {
           message: result.message,
           context: ctx,
           haiku,
-          grounding_title: null,
-          grounding_body: null,
           ...(lastReportedMood ? { mood: lastReportedMood } : {}),
         })
         .select("id")
