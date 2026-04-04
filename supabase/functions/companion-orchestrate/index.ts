@@ -59,6 +59,46 @@ interface OrchestrateResponse {
   intervention: InterventionPayload | null;
 }
 
+type OrchestrateSourceInput = {
+  name: string;
+  type: string;
+  url?: string;
+};
+
+function asOptionalString(value: unknown): string | undefined {
+  return typeof value === "string" && value.length > 0 ? value : undefined;
+}
+
+function asStringArray(value: unknown): string[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+  const items = value.filter((item): item is string => typeof item === "string" && item.length > 0);
+  return items.length > 0 ? items : undefined;
+}
+
+function asSourceArray(value: unknown): OrchestrateSourceInput[] | undefined {
+  if (!Array.isArray(value)) return undefined;
+
+  const items = value.flatMap((item) => {
+    if (!item || typeof item !== "object") return [];
+
+    const entry = item as Record<string, unknown>;
+    if (typeof entry.name !== "string" || entry.name.length === 0) return [];
+    if (typeof entry.type !== "string" || entry.type.length === 0) return [];
+
+    const source: OrchestrateSourceInput = { name: entry.name, type: entry.type };
+    if (typeof entry.url === "string" && entry.url.length > 0) {
+      source.url = entry.url;
+    }
+    return [source];
+  });
+
+  return items.length > 0 ? items : undefined;
+}
+
+function isCompanionContent(value: unknown): value is Record<string, unknown> {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
 function contentSatisfiesCompanion(companionType: string, raw: unknown): boolean {
   if (raw == null || typeof raw !== "object") return false;
   const c = raw as Record<string, unknown>;
@@ -291,6 +331,18 @@ serve(async (req) => {
     const moodHistory = body.moodHistory as
       | Array<{ mood: string; outcome?: string | null }>
       | undefined;
+    const contextValue = asOptionalString(context);
+    const languageValue = asOptionalString(language) ?? "en";
+    const reflectionMessageValue = asOptionalString(reflectionMessage);
+    const moodValue = asOptionalString(mood);
+    const signalSourcesValue = asSourceArray(signalSources);
+    const groundingSourcesValue = asSourceArray(groundingSources);
+    const recentSignalSourcesValue = asStringArray(recentSignalSources);
+    const recentSignalTitlesValue = asStringArray(recentSignalTitles);
+    const recentNudgeTopicsValue = asStringArray(recentNudgeTopics);
+    const recentGroundingSourcesValue = asStringArray(recentGroundingSources);
+    const recentHistoryTitlesValue = asStringArray(recentHistoryTitles);
+    const recentZoomOutTitlesValue = asStringArray(recentZoomOutTitles);
 
     // ── Authorization: ensure reflection ownership ──
     // This function uses the service-role key for writes (RLS bypass), so we must
@@ -312,8 +364,8 @@ serve(async (req) => {
 
     // ── Determine session intent for coherent companion theming ──
     const intent = determineSessionIntent({
-      context: (context as string | undefined) ?? undefined,
-      mood: (mood as string | undefined) ?? undefined,
+      context: contextValue,
+      mood: moodValue,
       severity: typeof body.severity === "number" ? body.severity : undefined,
       moodHistory,
     });
@@ -325,14 +377,14 @@ serve(async (req) => {
     let selection: InterventionSelection | null = null;
     if (useIntervention && reflectionId) {
       const rawSeverity = typeof body.severity === "number" ? body.severity : 0;
-      const direction = parseDirection(context as string | undefined);
+      const direction = parseDirection(contextValue);
       const severity = bucketSeverity(rawSeverity);
-      log(`selecting intervention: mood=${mood} severity=${severity} direction=${direction}`);
+      log(`selecting intervention: mood=${moodValue} severity=${severity} direction=${direction}`);
 
       selection = await selectIntervention({
         userId,
         reflectionId: reflectionId as string,
-        mood: (mood as string | undefined) ?? undefined,
+        mood: moodValue,
         severity,
         direction,
         moodHistory,
@@ -424,24 +476,24 @@ serve(async (req) => {
       });
     }
 
-    let effectiveGroundingSources = groundingSources as Array<{ name: string; type: string; url?: string }> | undefined;
+    let effectiveGroundingSources = groundingSourcesValue;
     if (shouldRunGrounding && (!effectiveGroundingSources || effectiveGroundingSources.length === 0)) {
       effectiveGroundingSources = await fetchGroundingSourcesForOrchestrate(svcClient, userId) ?? undefined;
     }
 
-    const directionForQuestion = parseDirection(context as string | undefined);
+    const directionForQuestion = parseDirection(contextValue);
     const rawSeverityForQuestion = typeof body.severity === "number" ? body.severity : 0;
     const severityBucketForQuestion = bucketSeverity(rawSeverityForQuestion);
     const questionPromise =
       selection?.mode === "question" && LOVABLE_API_KEY
         ? generateQuestion({
-            context: (context as string) ?? "",
-            mood: (mood as string | undefined) ?? undefined,
+            context: contextValue ?? "",
+            mood: moodValue,
             direction: directionForQuestion,
             severity: severityBucketForQuestion,
             moodHistory,
             apiKey: LOVABLE_API_KEY,
-            language: (language as string) || "en",
+            language: languageValue,
           })
         : Promise.resolve<string | null>(null);
 
@@ -453,12 +505,12 @@ serve(async (req) => {
         const t = Date.now();
         const result = await generateGrounding({
           svcClient,
-          context,
-          language,
-          recentTopics: recentNudgeTopics as string[] | undefined,
+          context: contextValue,
+          language: languageValue,
+          recentTopics: recentNudgeTopicsValue,
           sources: effectiveGroundingSources,
-          recentGroundingSources: recentGroundingSources as string[] | undefined,
-          recentGroundingTitles: recentNudgeTopics as string[] | undefined,
+          recentGroundingSources: recentGroundingSourcesValue,
+          recentGroundingTitles: recentNudgeTopicsValue,
           userId,
           reflectionId: typeof reflectionId === "string" ? reflectionId : null,
           log,
@@ -474,10 +526,19 @@ serve(async (req) => {
         };
       })();
     }
-    if (enableHistory) {
+    if (shouldRunHistory) {
       tasks.history = (async (): Promise<CompanionResult> => {
         const t = Date.now();
-        const result = await generateHistory({ svcClient, context, language, mood, recentTitles: recentHistoryTitles, userId, log, preferredMood: intent.historyMood });
+        const result = await generateHistory({
+          svcClient,
+          context: contextValue,
+          language: languageValue,
+          mood: moodValue,
+          recentTitles: recentHistoryTitlesValue,
+          userId,
+          log,
+          preferredMood: intent.historyMood,
+        });
         return {
           data: result.data,
           source: result.source,
@@ -491,7 +552,17 @@ serve(async (req) => {
     if (shouldRunZoomOut) {
       tasks.zoomOut = (async (): Promise<CompanionResult> => {
         const t = Date.now();
-        const result = await generateZoomOut({ svcClient, context, language, reflectionMessage, mood, userId, recentTitles: recentZoomOutTitles, log, zoomOutAngle: intent.zoomOutAngle });
+        const result = await generateZoomOut({
+          svcClient,
+          context: contextValue,
+          language: languageValue,
+          reflectionMessage: reflectionMessageValue,
+          mood: moodValue,
+          userId,
+          recentTitles: recentZoomOutTitlesValue,
+          log,
+          zoomOutAngle: intent.zoomOutAngle,
+        });
         return {
           data: result.data,
           source: result.source,
@@ -529,11 +600,11 @@ serve(async (req) => {
         }
         const result = await generateSignal({
           svcClient,
-          context,
-          language,
-          sources: signalSources,
-          recentSignalSources,
-          recentSignalTitles,
+          context: contextValue,
+          language: languageValue,
+          sources: signalSourcesValue,
+          recentSignalSources: recentSignalSourcesValue,
+          recentSignalTitles: recentSignalTitlesValue,
           recentSignalUrls: mergedRecentSignalUrls,
           userId,
           reflectionId: typeof reflectionId === "string" ? reflectionId : null,
@@ -606,7 +677,7 @@ serve(async (req) => {
         });
 
         // Write companion data to reflection_companions (normalized)
-        if (result.value.data && reflectionId) {
+        if (isCompanionContent(result.value.data) && typeof reflectionId === "string" && reflectionId.length > 0) {
           const cType = companionTypeMap[key];
           if (cType) {
             writePromises.push(
@@ -641,9 +712,9 @@ serve(async (req) => {
       response.intervention = interventionPayload;
 
       // Persist intervention to reflection_companions so re-entry restores it
-      if (reflectionId) {
+      if (typeof reflectionId === "string" && reflectionId.length > 0) {
         writePromises.push(
-          writeCompanionData(svcClient, reflectionId as string, "intervention", interventionPayload as any)
+          writeCompanionData(svcClient, reflectionId, "intervention", interventionPayload as Record<string, unknown>)
         );
       }
     }
@@ -651,9 +722,10 @@ serve(async (req) => {
     // Add serve log writes
     if (serveInserts.length > 0) {
       writePromises.push(
-        svcClient.from("companion_serves").insert(serveInserts).then(({ error }: any) => {
+        (async () => {
+          const { error } = await svcClient.from("companion_serves").insert(serveInserts);
           if (error) log.error("serve insert error", { error: error.message });
-        })
+        })()
       );
     }
 

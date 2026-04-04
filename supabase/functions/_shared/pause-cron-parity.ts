@@ -71,6 +71,15 @@ export interface OrchestratorRecencyHints {
   recentZoomOutTitles: string[];
 }
 
+type UserSignalPreferenceRow = {
+  source_id: string | null;
+  custom_name: string | null;
+  custom_url: string | null;
+  custom_type: string | null;
+  active: boolean;
+  category: string;
+};
+
 type ReflectionRow = {
   signal_title?: string | null;
   signal_source?: string | null;
@@ -149,14 +158,19 @@ export async function fetchSignalSourcesForOrchestrate(
         .eq("user_id", userId)
         .eq("category", "signal"),
     ]);
-    const prefsMap = new Map((userPrefs ?? []).map((p: any) => [p.source_id, p]));
+    const typedUserPrefs = (userPrefs ?? []) as UserSignalPreferenceRow[];
+    const prefsMap = new Map<string, UserSignalPreferenceRow>(
+      typedUserPrefs
+        .filter((p) => typeof p.source_id === "string" && p.source_id.length > 0)
+        .map((p) => [p.source_id as string, p] as const),
+    );
     const catalogActive = (catalog ?? [])
       .filter((s: any) => {
         const pref = prefsMap.get(s.id);
-        return pref ? pref.active : true;
+        return pref?.active ?? true;
       })
       .map((s: any) => ({ name: s.name, type: s.type, url: s.url }));
-    const customActive = (userPrefs ?? [])
+    const customActive = typedUserPrefs
       .filter((p: any) => !p.source_id && p.custom_name && p.active)
       .map((p: any) => ({ name: p.custom_name, type: p.custom_type || "blog", url: p.custom_url }));
     const sources = [...catalogActive, ...customActive];
@@ -180,14 +194,19 @@ export async function fetchGroundingSourcesForOrchestrate(
         .eq("user_id", userId)
         .eq("category", "grounding"),
     ]);
-    const prefsMap = new Map((userPrefs ?? []).map((p: any) => [p.source_id, p]));
+    const typedUserPrefs = (userPrefs ?? []) as UserSignalPreferenceRow[];
+    const prefsMap = new Map<string, UserSignalPreferenceRow>(
+      typedUserPrefs
+        .filter((p) => typeof p.source_id === "string" && p.source_id.length > 0)
+        .map((p) => [p.source_id as string, p] as const),
+    );
     const catalogActive = (catalog ?? [])
       .filter((s: any) => {
         const pref = prefsMap.get(s.id);
-        return pref ? pref.active : true;
+        return pref?.active ?? true;
       })
       .map((s: any) => ({ name: s.name, type: s.type, url: s.url }));
-    const customActive = (userPrefs ?? [])
+    const customActive = typedUserPrefs
       .filter((p: any) => !p.source_id && p.custom_name && p.active)
       .map((p: any) => ({ name: p.custom_name, type: p.custom_type || "blog", url: p.custom_url }));
     const sources = [...catalogActive, ...customActive];

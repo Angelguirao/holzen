@@ -59,6 +59,11 @@ interface PriceFetchResult {
   isPartial: boolean;
 }
 
+interface PriceCacheRow {
+  date: string;
+  price: number;
+}
+
 /**
  * Read BTC prices from btc_price_cache ONLY.
  *
@@ -91,7 +96,8 @@ async function fetchHistoricalAndCurrentPrices(
     .select("date, price")
     .in("date", allDateKeys);
 
-  const priceMap = new Map((cached || []).map((r: any) => [r.date, r.price]));
+  const rows = (cached ?? []) as PriceCacheRow[];
+  const priceMap = new Map<string, number>(rows.map((r) => [r.date, r.price]));
 
   // Current price from today's cache entry
   const currentPrice = priceMap.get(todayKey) ?? null;
@@ -100,14 +106,16 @@ async function fetchHistoricalAndCurrentPrices(
   const onThisDay: { yearsAgo: number; price: number; date: string }[] = [];
   for (const target of yearTargets) {
     const price = priceMap.get(target.dateKey);
-    if (price) onThisDay.push({ yearsAgo: target.yearsAgo, date: target.dateKey, price: Math.round(price) });
+    if (typeof price === "number") {
+      onThisDay.push({ yearsAgo: target.yearsAgo, date: target.dateKey, price: Math.round(price) });
+    }
   }
 
   log(`prices from cache: current=${currentPrice ?? 'none'}, historical=${onThisDay.length}/4`);
 
   return {
     onThisDay,
-    currentPrice: currentPrice ? Math.round(currentPrice) : null,
+    currentPrice: typeof currentPrice === "number" ? Math.round(currentPrice) : null,
     rateLimited: false, // No API calls = no rate limits
     isPartial: onThisDay.length < yearTargets.length,
   };
