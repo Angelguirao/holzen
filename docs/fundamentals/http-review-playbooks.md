@@ -37,6 +37,14 @@ Pick one tool and keep **one** canonical exported collection (or Bruno folder) i
 
 Some functions validate the Bearer token in code even when `[functions.<name>]` has `verify_jwt = false` in `config.toml` — the gateway may not enforce JWT, but the function still returns 401 without a valid user token.
 
+### Service role calls (`bruno/service-cron/*`)
+
+Cron-style Edge functions expect **`Authorization: Bearer {{SUPABASE_SERVICE_ROLE_KEY}}`** (see `bruno/service-cron/check-volatility.bru`) — the **service_role** JWT from **Supabase Dashboard → Project Settings → API**, not the anon/publishable key.
+
+If Bruno returns **`401 Unauthorized`**, the value in your environment almost always **does not match** the current project’s service role (wrong project, typo, stale env file). Fix the variable, then retry; redeploying the function does not correct a bad Bruno secret.
+
+For **pg_cron**, prefer injecting the key at SQL runtime (e.g. `current_setting('supabase.service_role_key', true)`) instead of hardcoding it — see [Cron HTTP auth in cron-setup.md](../ops/cron-setup.md#cron-http-auth).
+
 ### Getting an `access_token` for manual calls
 
 **Option A — Bruno (recommended):** run **`auth/00-sign-up-password`** if you have no user yet, then **`auth/01-sign-in-password`** (or only **`01`** if the user already exists). Sign-up uses `POST /auth/v1/signup`; sign-in uses `POST /auth/v1/token?grant_type=password`. Both set **`SUPABASE_ACCESS_TOKEN`** when the response includes a session. See [bruno/SCOPE.md](../../bruno/SCOPE.md) for greenfield vs email confirmation.

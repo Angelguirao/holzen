@@ -1,5 +1,31 @@
 # Cron Job Setup
 
+## Cron HTTP auth
+
+Server-side functions that use `verifyServiceAuth` (e.g. `check-volatility`) accept:
+
+- **`Authorization: Bearer <service_role_jwt>`** — the **service_role** key from **Project Settings → API** (full JWT string, not the anon key), or  
+- **`Authorization: Bearer <CRON_SECRET>`** — if you set **`CRON_SECRET`** in Edge secrets and send the same value.
+
+**pg_cron / `pg_net`:** Prefer **not** hardcoding the service role inside `cron.schedule` (it appears in `cron.job` metadata and backups). Build the header at run time when Postgres exposes the project secret, for example:
+
+```sql
+jsonb_build_object(
+  'Content-Type', 'application/json',
+  'Authorization', 'Bearer ' || current_setting('supabase.service_role_key', true)
+)
+```
+
+Verify once in the **SQL Editor** (privileged session): `SELECT current_setting('supabase.service_role_key', true);` — if this is **NULL**, use [Vault](https://supabase.com/docs/guides/database/vault) or your host’s documented secret injection instead of embedding the key in SQL.
+
+**Bruno** (`bruno/service-cron/*.bru`): **`401`** on these calls usually means **`SUPABASE_SERVICE_ROLE_KEY`** in the active environment does **not** exactly match the project’s current service role (wrong project, typo, stale copy). Redeploying the function does not fix a bad client key.
+
+**Stale Edge deploy:** If keys are correct but behavior is wrong, redeploy the function and confirm **Edge Functions → Logs** show your expected `[holzen:volatility]` lines after [holzen-edge-log](../../supabase/functions/_shared/holzen-edge-log.ts) (see [browser-360-mcp-playbook.md](../fundamentals/browser-360-mcp-playbook.md)).
+
+The SQL below uses **`jsonb_build_object` + `current_setting('supabase.service_role_key', true)`** for every job so the key is not stored inside `cron.job` text. For a one-off test in SQL Editor you can temporarily substitute a literal `Bearer …` string instead.
+
+**Where jobs actually live:** This repo does **not** run `cron.schedule` in migrations. Schedules are created manually (SQL Editor or ops) on the Supabase project. To see what is installed: `SELECT jobid, jobname, schedule, command, active FROM cron.job;`.
+
 ## BTC Price Refresh (refresh-btc-prices) — MOST IMPORTANT
 
 Keeps btc_price_cache fresh so the Zoom Out companion never needs to call CoinGecko during user sessions. Without this cron, Zoom Out won't have price data.
@@ -12,7 +38,10 @@ SELECT cron.schedule(
   $$
   SELECT net.http_post(
     url := 'https://<YOUR_SUPABASE_PROJECT_ID>.supabase.co/functions/v1/refresh-btc-prices',
-    headers := '{"Content-Type": "application/json", "Authorization": "Bearer YOUR_SERVICE_ROLE_KEY"}'::jsonb,
+    headers := jsonb_build_object(
+      'Content-Type', 'application/json',
+      'Authorization', 'Bearer ' || current_setting('supabase.service_role_key', true)
+    ),
     body := '{}'::jsonb
   );
   $$
@@ -31,7 +60,10 @@ SELECT cron.schedule(
   $$
   SELECT net.http_post(
     url := 'https://<YOUR_SUPABASE_PROJECT_ID>.supabase.co/functions/v1/fetch-source-feeds',
-    headers := '{"Content-Type": "application/json", "Authorization": "Bearer YOUR_SERVICE_ROLE_KEY"}'::jsonb,
+    headers := jsonb_build_object(
+      'Content-Type', 'application/json',
+      'Authorization', 'Bearer ' || current_setting('supabase.service_role_key', true)
+    ),
     body := '{}'::jsonb
   );
   $$
@@ -58,14 +90,15 @@ SELECT cron.schedule(
   $$
   SELECT net.http_post(
     url := 'https://<YOUR_SUPABASE_PROJECT_ID>.supabase.co/functions/v1/pregenerate-companions',
-    headers := '{"Content-Type": "application/json", "Authorization": "Bearer YOUR_SERVICE_ROLE_KEY"}'::jsonb,
+    headers := jsonb_build_object(
+      'Content-Type', 'application/json',
+      'Authorization', 'Bearer ' || current_setting('supabase.service_role_key', true)
+    ),
     body := '{}'::jsonb
   );
   $$
 );
 ```
-
-Replace `YOUR_SERVICE_ROLE_KEY` with your Supabase service role key (found in Settings → API → service_role key).
 
 ### Verify it's running
 
@@ -95,14 +128,17 @@ SELECT cron.alter_job('pregenerate-companions', active := false);
 Checks BTC price and triggers pause sessions for eligible users.
 
 ```sql
--- Run every 15 minutes
+-- Run every 15 minutes (Authorization injected at runtime — see [Cron HTTP auth](#cron-http-auth))
 SELECT cron.schedule(
   'check-volatility',
   '*/15 * * * *',
   $$
   SELECT net.http_post(
     url := 'https://<YOUR_SUPABASE_PROJECT_ID>.supabase.co/functions/v1/check-volatility',
-    headers := '{"Content-Type": "application/json", "Authorization": "Bearer YOUR_SERVICE_ROLE_KEY"}'::jsonb,
+    headers := jsonb_build_object(
+      'Content-Type', 'application/json',
+      'Authorization', 'Bearer ' || current_setting('supabase.service_role_key', true)
+    ),
     body := '{}'::jsonb
   );
   $$
@@ -123,7 +159,10 @@ SELECT cron.schedule(
   $$
   SELECT net.http_post(
     url := 'https://<YOUR_SUPABASE_PROJECT_ID>.supabase.co/functions/v1/check-followups',
-    headers := '{"Content-Type": "application/json", "Authorization": "Bearer YOUR_SERVICE_ROLE_KEY"}'::jsonb,
+    headers := jsonb_build_object(
+      'Content-Type', 'application/json',
+      'Authorization', 'Bearer ' || current_setting('supabase.service_role_key', true)
+    ),
     body := '{}'::jsonb
   );
   $$
@@ -142,7 +181,10 @@ SELECT cron.schedule(
   $$
   SELECT net.http_post(
     url := 'https://<YOUR_SUPABASE_PROJECT_ID>.supabase.co/functions/v1/night-reflection',
-    headers := '{"Content-Type": "application/json", "Authorization": "Bearer YOUR_SERVICE_ROLE_KEY"}'::jsonb,
+    headers := jsonb_build_object(
+      'Content-Type', 'application/json',
+      'Authorization', 'Bearer ' || current_setting('supabase.service_role_key', true)
+    ),
     body := '{}'::jsonb
   );
   $$
