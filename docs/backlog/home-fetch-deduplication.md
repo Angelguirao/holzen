@@ -11,7 +11,10 @@
 ## Still optional (not required to close ticket)
 
 - Lift **`profiles`** into a single **`useQuery`** at layout level (or stricter stale policy) if DevTools still shows duplicate **`profiles`** rows from multiple trees.
-- Short note in **`docs/fundamentals/navigating-the-codebase.md`** pointing at **`useSubscription`** + **`fetchBtcData`** as canonical patterns (see [data-fetching-conventions.md](data-fetching-conventions.md)).
+
+## Doc pointer (done 2026-04)
+
+- **`docs/fundamentals/navigating-the-codebase.md`** §6 — **`useSubscription`**, **`fetchBtcData`**, and **`use-profile`** / optional layout query (links here and [data-fetching-conventions.md](data-fetching-conventions.md)).
 
 ## Related
 

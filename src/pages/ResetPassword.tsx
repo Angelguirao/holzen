@@ -62,12 +62,32 @@ const ResetPassword = () => {
         {ready && (
           <form onSubmit={handleReset} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-xs font-mono">{t('auth.newPassword')}</Label>
-              <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} className="font-mono text-sm" />
+              <Label htmlFor="reset-password-new" className="text-xs font-mono">{t('auth.newPassword')}</Label>
+              <Input
+                id="reset-password-new"
+                name="new-password"
+                type="password"
+                autoComplete="new-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+                minLength={6}
+                className="font-mono text-sm"
+              />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirm" className="text-xs font-mono">{t('auth.confirmPassword')}</Label>
-              <Input id="confirm" type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} required minLength={6} className="font-mono text-sm" />
+              <Label htmlFor="reset-password-confirm" className="text-xs font-mono">{t('auth.confirmPassword')}</Label>
+              <Input
+                id="reset-password-confirm"
+                name="new-password"
+                type="password"
+                autoComplete="new-password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                minLength={6}
+                className="font-mono text-sm"
+              />
             </div>
             {error && <p className="text-xs text-destructive font-mono">{error}</p>}
             <Button type="submit" className="w-full font-mono text-xs" disabled={loading}>{t('auth.updatePassword')}</Button>
