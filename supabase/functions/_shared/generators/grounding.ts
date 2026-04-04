@@ -16,7 +16,7 @@ import {
   pickRandom,
 } from "../fallbacks.ts";
 import { parseMarketDirection, serveFromCache } from "../cache.ts";
-import { createAttemptLogger } from "../observe.ts";
+import { createAttemptLogger, trackEvent } from "../observe.ts";
 import { enqueueCatalogSourceSuggestion } from "../source-suggestions.ts";
 import { callPerplexityChat, mergePerplexityUsage } from "../perplexity-client.ts";
 import { searchLibrary, paperToGrounding, recordLibraryServe } from "../content-library.ts";
@@ -474,5 +474,6 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
     }).catch(() => {});
   }
 
+  if (userId) trackEvent(svcClient, userId, "ground_nudge_ai_call");
   return { data: nudge, source: "live", cacheId: null };
 }

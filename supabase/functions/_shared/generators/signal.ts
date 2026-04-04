@@ -16,7 +16,7 @@ import {
   pickRandom,
 } from "../fallbacks.ts";
 import { parseMarketDirection, serveFromCache } from "../cache.ts";
-import { createAttemptLogger } from "../observe.ts";
+import { createAttemptLogger, trackEvent } from "../observe.ts";
 import { enqueueCatalogSourceSuggestion } from "../source-suggestions.ts";
 import { callPerplexityChat, mergePerplexityUsage } from "../perplexity-client.ts";
 import { validateSource } from "../source-validation.ts";
@@ -625,5 +625,6 @@ URL RULES (CRITICAL):
     }).catch(() => {});
   }
 
+  if (userId) trackEvent(svcClient, userId, "signal_companion_ai_call");
   return { data: signal, source: "live", cacheId: null };
 }
