@@ -1,29 +1,21 @@
 # Lighthouse: accessibility failures on Home (`/`)
 
-**Status:** backlog — addresses **axe** audits from Lighthouse (navigation, desktop) on **`http://localhost:8080/`**.
+**Status:** shipped (2026-04) — addresses the **2026-04-03** audit list in [report](../reports/2026-04-03-home-localhost-360-analysis.md). Re-run Lighthouse to confirm scores in your environment.
 
-## Goal
+## What shipped
 
-Raise **Accessibility** score by fixing audits that failed in the **2026-04-03** run (see [report](../reports/2026-04-03-home-localhost-360-analysis.md)).
-
-## Findings (from Lighthouse)
-
-| Audit | Issue |
+| Audit | Change |
 |--------|--------|
-| **`button-name`** | **Three** `<button>` elements lack an accessible name (icon-only / no `aria-label` / no visible text). |
-| **`color-contrast`** | Foreground/background ratio insufficient (e.g. **`h1.text-sm`** in header). |
-| **`label-content-name-mismatch`** | **Notification** control: `aria-label="Notifications"` but visible badge **“9”** not reflected in accessible name. |
-| **`landmark-one-main`** | Document lacks a **`<main>`** landmark (or `role="main"`). |
-| **`target-size`** | **“Collapse Market”** button **16×16px** — below **24×24px** minimum (spacing to neighbors also tight). |
+| **`landmark-one-main`** | **`AppLayout`:** primary column uses **`<header>`** + **`<main id="main-content">`** wrapping **`Outlet`**. |
+| **`color-contrast`** | App title **`h1`:** `text-muted-foreground` → **`text-foreground/80`** for stronger contrast on the shell background. |
+| **`label-content-name-mismatch`** | **`NotificationBell`:** **`aria-label`** includes unread count when the badge is visible (e.g. “Notifications, 3 unread”), with **`aria-hidden`** on the decorative bell icon and badge digit span. |
+| **`target-size`** | **Widget collapse** (**`HomeWidget`**): **36×36** hit target, **`aria-expanded`**, slightly larger chevron. **Dismiss / icon controls** on **Home** (reflection + ground preview), **`NightReflectionCard`**, and **`BtcStatus`** (BTC mode + price visibility): **36×36** **`inline-flex`** controls with **`aria-hidden`** on icons. Bell trigger uses **`min-h-9 min-w-9`**. |
 
-**Best practices** `errors-in-console` ( **`sw.js`** MIME) is tracked under [service-worker-registration-dev.md](service-worker-registration-dev.md), not this ticket.
+## **`button-name`**
 
-## Direction
-
-- Fix in **small PRs** (e.g. landmarks + one button cluster at a time).
-- Re-run Lighthouse in the same MCP setup to confirm.
-- Overlap with Chrome **Issues** (form `name`/`id`/`autocomplete`): [form-field-name-id-a11y.md](form-field-name-id-a11y.md).
+Icon-only controls above now pair **`aria-label`** with **`aria-hidden`** on glyphs where needed. If **axe** still flags a specific control after re-run, treat it as a follow-up (likely another subtree on **`/`**).
 
 ## Related
 
-- [browser-360-mcp-playbook.md](../fundamentals/browser-360-mcp-playbook.md) — how the run was produced.
+- [form-field-name-id-a11y.md](form-field-name-id-a11y.md) — form controls.
+- [browser-360-mcp-playbook.md](../fundamentals/browser-360-mcp-playbook.md) — how the original run was produced.

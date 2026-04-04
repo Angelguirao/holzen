@@ -1352,6 +1352,7 @@
   },
   "notifications": {
     "title": "Notifications",
+    "unread": "unread",
     "clearAll": "Clear all",
     "dismissAll": "Dismiss all",
     "allCaughtUp": "All caught up",

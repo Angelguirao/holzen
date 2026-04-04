@@ -299,16 +299,23 @@ export function NotificationBell() {
     pause: '⚡',
   };
 
+  const displayCount = unreadCount > 9 ? '9+' : unreadCount;
+  const bellAriaLabel =
+    unreadCount > 0
+      ? `${t('notifications.title')}, ${displayCount} ${t('notifications.unread', 'unread')}`
+      : t('notifications.title');
+
   return (
     <div ref={ref} className="relative">
       <button
+        type="button"
         onClick={handleOpen}
-        className="relative p-1.5 rounded-md hover:bg-accent transition-colors"
-        aria-label={t('notifications.title')}
+        className="relative inline-flex min-h-9 min-w-9 items-center justify-center rounded-md hover:bg-accent transition-colors"
+        aria-label={bellAriaLabel}
       >
-        <Bell className="h-4 w-4 text-muted-foreground" />
+        <Bell className="h-4 w-4 text-muted-foreground" aria-hidden />
         {unreadCount > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-primary text-primary-foreground text-[8px] font-mono flex items-center justify-center">
+          <span className="absolute -top-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-primary text-primary-foreground text-[8px] font-mono flex items-center justify-center" aria-hidden>
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
