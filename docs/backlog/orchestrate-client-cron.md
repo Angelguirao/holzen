@@ -15,7 +15,8 @@ The manual pause path calls `companion-orchestrate` from the client (`use-compan
 
 | `holzenInvokeSource` | Set by |
 |----------------------|--------|
-| `browser_pause` | `use-companion-data` full orchestrate |
+| `browser_pause_intervention` | `use-companion-data` intervention-only on mount |
+| `browser_lazy_fetch` | `use-companion-data` `fetchCompanion` (single slot on card tap) |
 | `browser_regenerate` | `use-companion-data` `regenerateCompanion` |
 | `cron_check_volatility` | `check-volatility` fetch body |
 
