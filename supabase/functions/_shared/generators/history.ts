@@ -47,6 +47,8 @@ export interface GenerateHistoryParams {
   recentTitles?: string[];
   userId?: string;
   preferredMood?: "recovery" | "caution" | "neutral";
+  /** Skip library/cache phases and go straight to live (used by regenerate). */
+  forceLive?: boolean;
   log: (msg: string, extra?: Record<string, unknown>) => void;
 }
 
@@ -172,7 +174,7 @@ async function serveFallback(
 // ── Public entry point ──
 
 export async function generateHistory(params: GenerateHistoryParams): Promise<HistoryResult> {
-  const { svcClient, context, mood, recentTitles, userId, preferredMood, log } = params;
+  const { svcClient, context, mood, recentTitles, userId, preferredMood, forceLive, log } = params;
   const marketDirection = parseMarketDirection(context);
   const phases = getPhaseConfig();
 
@@ -184,6 +186,7 @@ export async function generateHistory(params: GenerateHistoryParams): Promise<Hi
         ? "caution"
         : undefined);
 
+  if (!forceLive) {
   // ── Phase 1: Library ──
   if (phases.library) {
     const lib = await tryLibrary(svcClient, userId, historyMoodTag);
@@ -201,9 +204,10 @@ export async function generateHistory(params: GenerateHistoryParams): Promise<Hi
       return cached;
     }
   }
+  } // end !forceLive
 
   // ── Phase 3: Live generation ──
-  if (!phases.live) {
+  if (!phases.live && !forceLive) {
     log("live phase disabled, serving curated");
     if (companionFallbacksDisabled()) {
       return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
