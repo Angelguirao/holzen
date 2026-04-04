@@ -48,6 +48,8 @@ export interface GenerateZoomOutParams {
   userId?: string;
   recentTitles?: string[];
   zoomOutAngle?: string;
+  /** Skip cache phase and go straight to live (used by regenerate). */
+  forceLive?: boolean;
   log: (msg: string, extra?: Record<string, unknown>) => void;
 }
 
@@ -351,11 +353,11 @@ No trading advice, no price predictions, no exclamation marks.${mood ? `\n\nUSER
 // ── Public entry point ──
 
 export async function generateZoomOut(params: GenerateZoomOutParams): Promise<ZoomOutResult> {
-  const { svcClient, context, mood, recentTitles, userId, zoomOutAngle, log } = params;
+  const { svcClient, context, mood, recentTitles, userId, zoomOutAngle, forceLive, log } = params;
   const phases = getPhaseConfig();
 
   // ── Phase 2: Cache (no library type for zoom-out) ──
-  if (phases.cache) {
+  if (phases.cache && !forceLive) {
     const marketDirection = parseMarketDirection(context);
     const cached = await serveFromCache(svcClient, COMPANION_ZOOM_OUT_DEEP_TIME, "en", { userId, marketDirection });
     if (cached) {
@@ -378,7 +380,7 @@ export async function generateZoomOut(params: GenerateZoomOutParams): Promise<Zo
   }
 
   // ── Phase 3: Live generation ──
-  if (!phases.live) {
+  if (!phases.live && !forceLive) {
     log("live phase disabled, serving curated");
     if (companionFallbacksDisabled()) {
       return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
