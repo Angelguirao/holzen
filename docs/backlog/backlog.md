@@ -28,6 +28,8 @@ Rule of thumb used here:
 | 2026-04 | [pwa-mobile-web-app-meta.md](pwa-mobile-web-app-meta.md) | `mobile-web-app-capable` in `index.html`. |
 | 2026-04 | [cache-async-error-handling.md](cache-async-error-handling.md) | `.catch` + structured log on cache side-effect Supabase calls. |
 | 2026-04 | [reflection-insert-partial-failure.md](reflection-insert-partial-failure.md) | Revert optimistic UI + `isReflectionPersistError` on Home when `reflections` insert fails after generate. |
+| 2026-04 | [writeCompanionData-grounding-consistency.md](writeCompanionData-grounding-consistency.md) | Manual path upserts `ground_nudge` + RLS INSERT; doc rule in `companion-data.ts`. |
+| 2026-04 | [react-router-v7-future-flags.md](react-router-v7-future-flags.md) | `BrowserRouter` `future`: `v7_startTransition`, `v7_relativeSplatPath`. |
 
 ---
 
@@ -39,7 +41,6 @@ Use this when you are **choosing what to work on next**. Items are **not** stric
 
 | Priority hint | Ticket | Summary |
 |---------------|--------|---------|
-| High | [writeCompanionData-grounding-consistency.md](writeCompanionData-grounding-consistency.md) | Grounding dual-write: `reflection_companions` vs `reflections` / Home. |
 | Medium | [btc-price-cache-freshness.md](btc-price-cache-freshness.md) | Historical BTC cache vs cron cadence + Zoom Out expectations. |
 
 ### Reliability & edge cases (fewer surprises under load or odd navigation)
@@ -102,7 +103,6 @@ Use this when you are **choosing what to work on next**. Items are **not** stric
 | Lower | [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md) | Split oversized pages (`Home`, `PauseSession`); optionally narrow **`use-holzen`**; one slice per PR. |
 | Lower | [service-worker-registration-dev.md](service-worker-registration-dev.md) | Skip **`listenForSwUpdate`** in dev (or serve real **`sw.js`**) — removes MIME / **`SecurityError`** console noise. |
 | Lower | [data-fetching-conventions.md](data-fetching-conventions.md) | Document / align TanStack Query vs **`useEffect` + Supabase**; optional `QueryClient` defaults. |
-| Lower | [react-router-v7-future-flags.md](react-router-v7-future-flags.md) | Opt into **`v7_startTransition`** / **`v7_relativeSplatPath`** — clears Router upgrade warnings. |
 | Lower | [resource-hints-preconnect.md](resource-hints-preconnect.md) | **`preconnect`** for Supabase/fonts/market APIs — **after** [home-fetch-deduplication.md](home-fetch-deduplication.md). |
 | Lower | [home-recharts-layout-cost.md](home-recharts-layout-cost.md) | Reduce **Recharts** forced reflow / defer charts on Home. |
 
@@ -120,7 +120,6 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 
 | Work type | Ticket | One-line |
 |-----------|--------|----------|
-| Data integrity | [writeCompanionData-grounding-consistency.md](writeCompanionData-grounding-consistency.md) | Grounding dual-write Home vs pause |
 | Data / market | [btc-price-cache-freshness.md](btc-price-cache-freshness.md) | BTC cache freshness vs Zoom Out |
 | Reliability | [pause-session-hydration.md](pause-session-hydration.md) | `/pause` without full navigation state |
 | Reliability | [auth-referral.md](auth-referral.md) | Referral delivery robustness |
@@ -143,7 +142,6 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | Frontend | [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md) | Large pages + hook decomposition |
 | Frontend | [service-worker-registration-dev.md](service-worker-registration-dev.md) | SW registration guard in dev / console noise |
 | Frontend | [data-fetching-conventions.md](data-fetching-conventions.md) | Query vs Supabase+effect conventions |
-| Frontend | [react-router-v7-future-flags.md](react-router-v7-future-flags.md) | Router v7 future flags (console warnings) |
 | Frontend | [resource-hints-preconnect.md](resource-hints-preconnect.md) | **`preconnect`** hints (≤4 origins) |
 | Frontend | [home-recharts-layout-cost.md](home-recharts-layout-cost.md) | Recharts reflow / defer charts on Home |
 | Strategic | [spa-framework-evaluation.md](spa-framework-evaluation.md) | SPA vs framework evaluation |
@@ -155,14 +153,14 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | Theme | Backlog files |
 |--------|----------------|
 | **Platform, architecture & tooling** | [e2e-browser-automation.md](e2e-browser-automation.md), [spa-framework-evaluation.md](spa-framework-evaluation.md), [hosting-production-compression.md](hosting-production-compression.md) |
-| **Frontend structure & conventions** | [typed-navigation-state.md](typed-navigation-state.md), [route-level-code-splitting.md](route-level-code-splitting.md), [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md), [service-worker-registration-dev.md](service-worker-registration-dev.md), [data-fetching-conventions.md](data-fetching-conventions.md), [home-fetch-deduplication.md](home-fetch-deduplication.md), [react-router-v7-future-flags.md](react-router-v7-future-flags.md), [resource-hints-preconnect.md](resource-hints-preconnect.md), [home-recharts-layout-cost.md](home-recharts-layout-cost.md) |
+| **Frontend structure & conventions** | [typed-navigation-state.md](typed-navigation-state.md), [route-level-code-splitting.md](route-level-code-splitting.md), [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md), [service-worker-registration-dev.md](service-worker-registration-dev.md), [data-fetching-conventions.md](data-fetching-conventions.md), [home-fetch-deduplication.md](home-fetch-deduplication.md), [resource-hints-preconnect.md](resource-hints-preconnect.md), [home-recharts-layout-cost.md](home-recharts-layout-cost.md) |
 | **Auth & routing** | [auth-referral.md](auth-referral.md), [route-gating.md](route-gating.md) |
 | **Product / UX** | [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md), [cron-pause-featured-parity.md](cron-pause-featured-parity.md), [route-gating.md](route-gating.md), [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md), [form-field-name-id-a11y.md](form-field-name-id-a11y.md), [lighthouse-a11y-home.md](lighthouse-a11y-home.md) |
 | **Pause pipeline & client–server boundaries** | [pause-session-hydration.md](pause-session-hydration.md), [orchestrate-client-cron.md](orchestrate-client-cron.md), [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md), [cron-pause-featured-parity.md](cron-pause-featured-parity.md) |
 | **Cost & duplicate work (client + server)** | [orchestrate-client-cron.md](orchestrate-client-cron.md), [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md), [home-fetch-deduplication.md](home-fetch-deduplication.md) |
 | **Cache, library & market data** | [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md), [btc-price-cache-freshness.md](btc-price-cache-freshness.md), [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md) |
 | **Rate limits, quality & observability** | [rate-limit-analytics-allowlist.md](rate-limit-analytics-allowlist.md), [rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md), [quality-gates-false-positives.md](quality-gates-false-positives.md) |
-| **Data consistency** | [writeCompanionData-grounding-consistency.md](writeCompanionData-grounding-consistency.md) |
+| **Data consistency** | *(none pending — grounding dual-write shipped 2026-04)* |
 
 ---
 
@@ -192,7 +190,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | [rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md) | Alert/metric when rate or daily budget fails open |
 | [rate-limit-analytics-allowlist.md](rate-limit-analytics-allowlist.md) | `analytics_events` vs `checkRateLimit` allowlist |
 | [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md) | Split large pages (`Home`, `PauseSession`); optional `use-holzen` decomposition |
-| [react-router-v7-future-flags.md](react-router-v7-future-flags.md) | Opt into React Router v7 **`future`** flags |
+| [react-router-v7-future-flags.md](react-router-v7-future-flags.md) | **Done (2026-04).** Router **`future`** flags — see ticket. |
 | [resource-hints-preconnect.md](resource-hints-preconnect.md) | **`preconnect`** for critical origins (after fetch dedup) |
 | [route-level-code-splitting.md](route-level-code-splitting.md) | Lazy routes + Suspense — avoid loading all pages on cold start |
 | [service-worker-registration-dev.md](service-worker-registration-dev.md) | Skip or fix SW registration when dev serves HTML for `sw.js` |
@@ -200,7 +198,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | [route-gating.md](route-gating.md) | Strict route gating UX vs correctness |
 | [spa-framework-evaluation.md](spa-framework-evaluation.md) | Vite SPA vs full-stack React framework (React docs tradeoffs; when to revisit) |
 | [typed-navigation-state.md](typed-navigation-state.md) | Typed `location.state` instead of `as any` for navigation payloads |
-| [writeCompanionData-grounding-consistency.md](writeCompanionData-grounding-consistency.md) | Grounding dual-write: `reflection_companions` vs `reflections` |
+| [writeCompanionData-grounding-consistency.md](writeCompanionData-grounding-consistency.md) | **Done (2026-04).** Grounding dual-write — see ticket. |
 
 ---
 
@@ -223,7 +221,7 @@ Legacy numeric IDs for chat / PR references; prefer **ticket file name** or [mas
 13. Rate/daily budget fail-open observability — [rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md)
 14. Quality gates: false positives — [quality-gates-false-positives.md](quality-gates-false-positives.md)
 15. Cache serve relaxation UX — [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md)
-16. Grounding dual-write consistency — [writeCompanionData-grounding-consistency.md](writeCompanionData-grounding-consistency.md)
+16. ~~Grounding dual-write consistency~~ — **Shipped 2026-04** — [writeCompanionData-grounding-consistency.md](writeCompanionData-grounding-consistency.md)
 17. E2E / browser automation — [e2e-browser-automation.md](e2e-browser-automation.md)
 18. SPA vs full-stack React framework — [spa-framework-evaluation.md](spa-framework-evaluation.md)
 19. Typed React Router **`location.state`** — [typed-navigation-state.md](typed-navigation-state.md)
@@ -233,7 +231,7 @@ Legacy numeric IDs for chat / PR references; prefer **ticket file name** or [mas
 23. Service worker registration in dev (console noise) — [service-worker-registration-dev.md](service-worker-registration-dev.md)
 24. Home fetch deduplication (signed-in **`/`**) — [home-fetch-deduplication.md](home-fetch-deduplication.md) — *partial: `useProfile` `user?.id`*
 25. Form field **`name`** / **`id`** / **`autocomplete`** (a11y) — [form-field-name-id-a11y.md](form-field-name-id-a11y.md)
-26. React Router v7 **future** flags — [react-router-v7-future-flags.md](react-router-v7-future-flags.md)
+26. ~~React Router v7 **future** flags~~ — **Shipped 2026-04** — [react-router-v7-future-flags.md](react-router-v7-future-flags.md)
 27. ~~PWA **`mobile-web-app-capable`** meta~~ — **Shipped 2026-04** — [pwa-mobile-web-app-meta.md](pwa-mobile-web-app-meta.md)
 28. Lighthouse **a11y** on Home (`/` ) — [lighthouse-a11y-home.md](lighthouse-a11y-home.md)
 29. **`preconnect`** resource hints — [resource-hints-preconnect.md](resource-hints-preconnect.md)

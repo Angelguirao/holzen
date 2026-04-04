@@ -5,8 +5,12 @@
  * Legacy denormalized columns on reflections have been dropped
  * (signal_*, zoom_out_data/read, history_insight_data/read).
  *
- * Grounding still dual-writes grounding_title/body to reflections
- * for Home page pinned reflection display.
+ * Grounding invariant (keep Home + /pause aligned):
+ * - Canonical JSON lives in reflection_companions (`ground_nudge` / COMPANION_TYPES.GROUNDING).
+ * - reflections.grounding_title / grounding_body are denormalized for Home pinned text;
+ *   they must match the join row. Server paths use this module’s writeCompanionData;
+ *   the manual holzen-reflect client path upserts the same `ground_nudge` row after
+ *   inserting the reflections row (see use-holzen generateMessage).
  */
 
 import { COMPANION_TYPES } from "./companion-types.ts";
