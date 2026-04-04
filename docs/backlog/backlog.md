@@ -20,6 +20,14 @@ Rule of thumb used here:
 
 **Companion / Signal design** (narrative + tables, not a one-off ticket): [systems/pause/companions/signal.md §5](../systems/pause/companions/signal.md).
 
+### Recently shipped (detail still in ticket files)
+
+| When | Ticket | Notes |
+|------|--------|-------|
+| 2026-04 | [cron-worker-auth-consistency.md](cron-worker-auth-consistency.md) | `verifyServiceAuth` + Bruno `SERVICE_CRON_BEARER`; no `x-supabase-cron` bypass. |
+| 2026-04 | [pwa-mobile-web-app-meta.md](pwa-mobile-web-app-meta.md) | `mobile-web-app-capable` in `index.html`. |
+| 2026-04 | [cache-async-error-handling.md](cache-async-error-handling.md) | `.catch` + structured log on cache side-effect Supabase calls. |
+
 ---
 
 ## Work queue (pick by goal)
@@ -47,7 +55,6 @@ Use this when you are **choosing what to work on next**. Items are **not** stric
 |---------------|--------|---------|
 | Medium | [rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md) | Alert/metric when rate or daily budget checks fail open. |
 | Medium | [rate-limit-analytics-allowlist.md](rate-limit-analytics-allowlist.md) | `analytics_events` allowlist parity with `checkRateLimit` + generators. |
-| Medium | [cache-async-error-handling.md](cache-async-error-handling.md) | `.catch` on fire-and-forget cache helpers for logging. |
 
 ### Cost & duplicate work (same user/session doing redundant orchestration or cache churn)
 
@@ -66,14 +73,12 @@ Use this when you are **choosing what to work on next**. Items are **not** stric
 | Medium | [route-gating.md](route-gating.md) | Strict route gating UX vs correctness during auth loading. |
 | Lower | [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md) | Transparency when cache serve relaxes constraints. |
 | Lower | [form-field-name-id-a11y.md](form-field-name-id-a11y.md) | Form controls missing **`name`** / **`id`** / **`autocomplete`** — DevTools Issues. |
-| Lower | [pwa-mobile-web-app-meta.md](pwa-mobile-web-app-meta.md) | Add **`mobile-web-app-capable`** meta — Chrome deprecates **`apple-mobile-web-app-capable`**-only. |
 | Medium | [lighthouse-a11y-home.md](lighthouse-a11y-home.md) | Fix Lighthouse **axe** failures on **`/`** — buttons, contrast, **`main`**, notification name, touch target. |
 
 ### Ops & security (cron workers, secrets, docs alignment)
 
 | Priority hint | Ticket | Summary |
 |---------------|--------|---------|
-| Medium | [cron-worker-auth-consistency.md](cron-worker-auth-consistency.md) | Cron worker auth aligned with [cron-setup.md](../ops/cron-setup.md). |
 | Lower | [hosting-production-compression.md](hosting-production-compression.md) | Verify **gzip/Brotli** for **HTML** on production (dev fails by design). |
 
 ### Quality gates & content (reject noise, tune prompts)
@@ -122,7 +127,6 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | Reliability | [auth-referral.md](auth-referral.md) | Referral delivery robustness |
 | Observability | [rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md) | Fail-open rate/budget visibility |
 | Observability | [rate-limit-analytics-allowlist.md](rate-limit-analytics-allowlist.md) | Analytics vs allowlist parity |
-| Observability | [cache-async-error-handling.md](cache-async-error-handling.md) | Fire-and-forget cache `.catch` |
 | Cost / efficiency | [orchestrate-client-cron.md](orchestrate-client-cron.md) | Client vs cron orchestrate overlap |
 | Cost / efficiency | [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md) | Near-duplicate cache entries |
 | Cost / efficiency | [home-fetch-deduplication.md](home-fetch-deduplication.md) | Redundant Home fetches after login |
@@ -131,9 +135,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | Product / UX | [route-gating.md](route-gating.md) | Auth loading + route gating UX |
 | Product / UX | [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md) | Cache relaxation transparency |
 | Product / UX | [form-field-name-id-a11y.md](form-field-name-id-a11y.md) | Form **`name`** / **`id`** / **`autocomplete`** for a11y |
-| Product / UX | [pwa-mobile-web-app-meta.md](pwa-mobile-web-app-meta.md) | **`mobile-web-app-capable`** meta (PWA deprecation warning) |
 | Product / UX | [lighthouse-a11y-home.md](lighthouse-a11y-home.md) | Lighthouse **axe** on Home — landmarks, buttons, contrast |
-| Ops / security | [cron-worker-auth-consistency.md](cron-worker-auth-consistency.md) | Worker auth vs docs |
 | Ops / security | [hosting-production-compression.md](hosting-production-compression.md) | Prod **HTML** **Content-Encoding** check |
 | Quality | [quality-gates-false-positives.md](quality-gates-false-positives.md) | Quality gate tuning |
 | Testing | [e2e-browser-automation.md](e2e-browser-automation.md) | UI journeys (E2E) vs Bruno API review |
@@ -156,10 +158,10 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | **Platform, architecture & tooling** | [e2e-browser-automation.md](e2e-browser-automation.md), [spa-framework-evaluation.md](spa-framework-evaluation.md), [hosting-production-compression.md](hosting-production-compression.md) |
 | **Frontend structure & conventions** | [typed-navigation-state.md](typed-navigation-state.md), [route-level-code-splitting.md](route-level-code-splitting.md), [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md), [service-worker-registration-dev.md](service-worker-registration-dev.md), [data-fetching-conventions.md](data-fetching-conventions.md), [home-fetch-deduplication.md](home-fetch-deduplication.md), [react-router-v7-future-flags.md](react-router-v7-future-flags.md), [resource-hints-preconnect.md](resource-hints-preconnect.md), [home-recharts-layout-cost.md](home-recharts-layout-cost.md) |
 | **Auth & routing** | [auth-referral.md](auth-referral.md), [route-gating.md](route-gating.md) |
-| **Product / UX** | [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md), [cron-pause-featured-parity.md](cron-pause-featured-parity.md), [route-gating.md](route-gating.md), [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md), [form-field-name-id-a11y.md](form-field-name-id-a11y.md), [pwa-mobile-web-app-meta.md](pwa-mobile-web-app-meta.md), [lighthouse-a11y-home.md](lighthouse-a11y-home.md) |
-| **Pause pipeline & client–server boundaries** | [pause-session-hydration.md](pause-session-hydration.md), [orchestrate-client-cron.md](orchestrate-client-cron.md), [reflection-insert-partial-failure.md](reflection-insert-partial-failure.md), [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md), [cron-pause-featured-parity.md](cron-pause-featured-parity.md), [cron-worker-auth-consistency.md](cron-worker-auth-consistency.md) |
+| **Product / UX** | [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md), [cron-pause-featured-parity.md](cron-pause-featured-parity.md), [route-gating.md](route-gating.md), [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md), [form-field-name-id-a11y.md](form-field-name-id-a11y.md), [lighthouse-a11y-home.md](lighthouse-a11y-home.md) |
+| **Pause pipeline & client–server boundaries** | [pause-session-hydration.md](pause-session-hydration.md), [orchestrate-client-cron.md](orchestrate-client-cron.md), [reflection-insert-partial-failure.md](reflection-insert-partial-failure.md), [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md), [cron-pause-featured-parity.md](cron-pause-featured-parity.md) |
 | **Cost & duplicate work (client + server)** | [orchestrate-client-cron.md](orchestrate-client-cron.md), [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md), [home-fetch-deduplication.md](home-fetch-deduplication.md) |
-| **Cache, library & market data** | [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md), [btc-price-cache-freshness.md](btc-price-cache-freshness.md), [cache-async-error-handling.md](cache-async-error-handling.md), [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md) |
+| **Cache, library & market data** | [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md), [btc-price-cache-freshness.md](btc-price-cache-freshness.md), [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md) |
 | **Rate limits, quality & observability** | [rate-limit-analytics-allowlist.md](rate-limit-analytics-allowlist.md), [rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md), [quality-gates-false-positives.md](quality-gates-false-positives.md) |
 | **Data consistency** | [writeCompanionData-grounding-consistency.md](writeCompanionData-grounding-consistency.md) |
 
@@ -172,11 +174,11 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | [auth-referral.md](auth-referral.md) | Auth + referral side-effect robustness |
 | [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md) | “Pause ready” vs orchestrate completion (`pause_notifications`) |
 | [btc-price-cache-freshness.md](btc-price-cache-freshness.md) | Historical BTC cache vs cron + Zoom Out |
-| [cache-async-error-handling.md](cache-async-error-handling.md) | `.catch` on fire-and-forget cache helpers |
+| [cache-async-error-handling.md](cache-async-error-handling.md) | **Done (2026-04).** `.catch` on fire-and-forget cache helpers — see ticket. |
 | [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md) | Dedup for `content_library` / `companion_cache` |
 | [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md) | Transparency when cache serve relaxes constraints |
 | [cron-pause-featured-parity.md](cron-pause-featured-parity.md) | Automatic vs manual pause featured fields / first paint |
-| [cron-worker-auth-consistency.md](cron-worker-auth-consistency.md) | Cron worker auth aligned with [cron-setup.md](../ops/cron-setup.md) |
+| [cron-worker-auth-consistency.md](cron-worker-auth-consistency.md) | **Done (2026-04).** Cron worker auth — see ticket. |
 | [data-fetching-conventions.md](data-fetching-conventions.md) | TanStack Query vs `useEffect` + Supabase; optional QueryClient defaults |
 | [e2e-browser-automation.md](e2e-browser-automation.md) | Playwright/Cypress or Vitest+RTL; Bruno stays API-only |
 | [form-field-name-id-a11y.md](form-field-name-id-a11y.md) | Form **`name`** / **`id`** / **`autocomplete`** (DevTools Issues) |
@@ -186,7 +188,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | [lighthouse-a11y-home.md](lighthouse-a11y-home.md) | Lighthouse **axe** on **`/`** — buttons, contrast, landmark, targets |
 | [orchestrate-client-cron.md](orchestrate-client-cron.md) | Client vs cron `companion-orchestrate` overlap |
 | [pause-session-hydration.md](pause-session-hydration.md) | `/pause` when `location.state` is incomplete |
-| [pwa-mobile-web-app-meta.md](pwa-mobile-web-app-meta.md) | Add **`mobile-web-app-capable`** meta for PWA |
+| [pwa-mobile-web-app-meta.md](pwa-mobile-web-app-meta.md) | **Done (2026-04).** **`mobile-web-app-capable`** in `index.html` — see ticket. |
 | [quality-gates-false-positives.md](quality-gates-false-positives.md) | `quality.ts` rejects; i18n / regex tuning |
 | [rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md) | Alert/metric when rate or daily budget fails open |
 | [rate-limit-analytics-allowlist.md](rate-limit-analytics-allowlist.md) | `analytics_events` vs `checkRateLimit` allowlist |
@@ -214,11 +216,11 @@ Legacy numeric IDs for chat / PR references; prefer **ticket file name** or [mas
 5. Partial failure: reflect OK, reflection insert fails — [reflection-insert-partial-failure.md](reflection-insert-partial-failure.md)
 6. Automatic pause: notification timing vs orchestrate completion — [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md)
 7. Cron vs manual pause: featured field parity — [cron-pause-featured-parity.md](cron-pause-featured-parity.md)
-8. Cron worker auth — [cron-worker-auth-consistency.md](cron-worker-auth-consistency.md)
+8. ~~Cron worker auth~~ — **Shipped 2026-04** — [cron-worker-auth-consistency.md](cron-worker-auth-consistency.md)
 9. `content_library` / `companion_cache` dedup — [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md)
 10. BTC `btc_price_cache` historical freshness — [btc-price-cache-freshness.md](btc-price-cache-freshness.md)
 11. Rate limit: `analytics_events` allowlist parity — [rate-limit-analytics-allowlist.md](rate-limit-analytics-allowlist.md)
-12. `cache.ts` fire-and-forget `.catch` — [cache-async-error-handling.md](cache-async-error-handling.md)
+12. ~~`cache.ts` fire-and-forget `.catch`~~ — **Shipped 2026-04** — [cache-async-error-handling.md](cache-async-error-handling.md)
 13. Rate/daily budget fail-open observability — [rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md)
 14. Quality gates: false positives — [quality-gates-false-positives.md](quality-gates-false-positives.md)
 15. Cache serve relaxation UX — [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md)
@@ -233,7 +235,7 @@ Legacy numeric IDs for chat / PR references; prefer **ticket file name** or [mas
 24. Home fetch deduplication (signed-in **`/`**) — [home-fetch-deduplication.md](home-fetch-deduplication.md) — *partial: `useProfile` `user?.id`*
 25. Form field **`name`** / **`id`** / **`autocomplete`** (a11y) — [form-field-name-id-a11y.md](form-field-name-id-a11y.md)
 26. React Router v7 **future** flags — [react-router-v7-future-flags.md](react-router-v7-future-flags.md)
-27. PWA **`mobile-web-app-capable`** meta — [pwa-mobile-web-app-meta.md](pwa-mobile-web-app-meta.md)
+27. ~~PWA **`mobile-web-app-capable`** meta~~ — **Shipped 2026-04** — [pwa-mobile-web-app-meta.md](pwa-mobile-web-app-meta.md)
 28. Lighthouse **a11y** on Home (`/` ) — [lighthouse-a11y-home.md](lighthouse-a11y-home.md)
 29. **`preconnect`** resource hints — [resource-hints-preconnect.md](resource-hints-preconnect.md)
 30. Home **Recharts** layout / defer — [home-recharts-layout-cost.md](home-recharts-layout-cost.md)

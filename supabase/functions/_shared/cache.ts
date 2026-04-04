@@ -171,12 +171,22 @@ async function tryServe(
   }
 }
 
+function logCacheSideEffect(op: string, err: unknown): void {
+  console.error(JSON.stringify({
+    fn: "cache",
+    op,
+    level: "error",
+    msg: err instanceof Error ? err.message : String(err),
+  }));
+}
+
 function updateServeStats(svcClient: any, id: string, currentCount: number, now: string) {
   svcClient
     .from("companion_cache")
     .update({ used_count: (currentCount || 0) + 1, last_served_at: now })
     .eq("id", id)
-    .then(() => {});
+    .then(() => {})
+    .catch((e: unknown) => logCacheSideEffect("updateServeStats", e));
 }
 
 function recordUserServe(svcClient: any, userId: string | undefined, cacheId: string, companionType: string) {
@@ -188,7 +198,8 @@ function recordUserServe(svcClient: any, userId: string | undefined, cacheId: st
       { user_id: userId, cache_entry_id: cacheId, companion_type: companionType, served_at: new Date().toISOString() },
       { onConflict: "user_id,cache_entry_id" },
     )
-    .then(() => {});
+    .then(() => {})
+    .catch((e: unknown) => logCacheSideEffect("recordUserServe", e));
 }
 
 /**
