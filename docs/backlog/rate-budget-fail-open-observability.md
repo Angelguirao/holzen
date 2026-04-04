@@ -1,31 +1,30 @@
-# Rate and daily budget: fail-open observability (Pending)
+# Rate and daily budget: fail-open observability
 
-## Context (from Phase 5)
+**Shipped (2026-04).** Fail-open branches in `ratelimit.ts` now emit **structured JSON** so operators can find “limits not enforced because the check failed” without guessing from generic warnings.
 
-`checkRateLimit` and `checkDailyBudget` in `supabase/functions/_shared/ratelimit.ts` return **allow** when their underlying Supabase queries **fail** (fail-open). That favors **uptime** but can **silently weaken** cost controls during DB outages or transient errors.
+## Context
 
-## Current problem
+`checkRateLimit`, `checkDailyBudget`, and `checkCompanionRegenerateLimit` **allow** the request when their Supabase queries throw or return `error` (fail-open for uptime).
 
-There is no mandatory **signal** that "limits were not enforced because the check failed" — operators may not notice elevated spend until much later.
+## What we did
 
-## Implications if we leave it as-is
+**`logLimitCheckFailOpen`** in `supabase/functions/_shared/ratelimit.ts` writes one **`console.warn`** line per fail-open:
 
-- Budget and rate limits are **best-effort** under infrastructure stress exactly when you might want **stricter** caps.
-- Debugging "why did spend spike?" is harder without correlated logs/metrics.
+```json
+{
+  "holzen_event": "limit_check_fail_open",
+  "scope": "rate_limit" | "daily_budget" | "companion_regenerate",
+  "phase": "supabase_error" | "thrown",
+  "detail": "<message, max 500 chars>",
+  "ts": "<ISO8601>"
+}
+```
 
-## Proposed improvement
+**How to verify:** Supabase → Edge Functions → Logs — search **`limit_check_fail_open`** or **`"holzen_event":"limit_check_fail_open"`**. Optionally alert when count &gt; N / window in your log drain.
 
-Pick one or combine:
+**Policy:** Still **fail-open** for rate, budget, and regenerate checks (no behavior change to allow/deny). A future change could make budget **fail-closed** only — product/risk call; not implemented here.
 
-1. **Structured log + metric** when fail-open triggers (count by reason: rate check error vs budget query error).
-2. **Alerting threshold**: e.g. if fail-open count > N in 5 minutes, page or Slack.
-3. **Policy split** (larger change): keep fail-open for **rate limit** but **fail-closed** for **daily budget** only — product/risk tradeoff.
+## Related
 
-## Related code pointers
-
+- `docs/ops/logging-strategy.md` — Edge logging surfaces
 - `supabase/functions/_shared/ratelimit.ts`
-
-## Acceptance criteria / how to verify
-
-1. Fail-open paths are **visible** in dashboards or logs with enough context to correlate with spend.
-2. Team agrees whether fail-closed is ever desired for budget vs rate.
