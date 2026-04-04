@@ -141,6 +141,8 @@ export interface GenerateSignalParams {
   userId?: string;
   reflectionId?: string | null;
   searchAngle?: string;
+  /** Skip library/cache phases and go straight to live (used by regenerate). */
+  forceLive?: boolean;
   log: (msg: string, extra?: Record<string, unknown>) => void;
 }
 
@@ -237,11 +239,13 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
     userId,
     reflectionId,
     searchAngle,
+    forceLive,
     log,
   } = params;
   const marketDirection = parseMarketDirection(context);
   const phases = getPhaseConfig();
 
+  if (!forceLive) {
   // ── Phase 1: Library ──
   if (phases.library) {
     const lib = await tryLibrary(svcClient, userId);
@@ -259,9 +263,10 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
       return cached;
     }
   }
+  } // end !forceLive
 
   // ── Phase 3: Live generation ──
-  if (!phases.live) {
+  if (!phases.live && !forceLive) {
     log("live phase disabled, serving curated");
     if (companionFallbacksDisabled()) {
       return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
