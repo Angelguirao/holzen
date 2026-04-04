@@ -10,7 +10,7 @@ Holzen already uses **three complementary channels**. The strategy is to **keep 
 
 | Surface | Quiet default (prod) | Verbose flow tracing |
 |---------|----------------------|----------------------|
-| **Browser** | No `[holzen:*]` unless user sets `localStorage holzen:debug=1` | `import.meta.env.DEV` **or** `holzen:debug=1` |
+| **Browser** | Default prod build: no `[holzen:*]` | **`import.meta.env.DEV`**, **`VITE_HOLZEN_DEBUG=1`**, **`?holzenDebug=1`**, or **`localStorage holzen:debug=1`** |
 | **Edge cron / workers** | Set secret **`HOLZEN_EDGE_LOG=0`** (still get **`holzenEdgeRun`** + errors) | Leave secret **unset** or **`1`** on staging / while debugging |
 
 So: **production hosted** → `HOLZEN_EDGE_LOG=0` matches “no strategic spam in prod.” **Staging or local serve** → omit it to see **`holzenEdgeLog`** milestones (eligible counts, run complete, rate limits, etc.) the same way you rely on **`holzen:debug`** or dev mode in the app.
@@ -29,7 +29,13 @@ So: **production hosted** → `HOLZEN_EDGE_LOG=0` matches “no strategic spam i
 
 ## 2. Browser (React) — **prefixed console + user-visible errors**
 
-**Holzen flow tracing:** [`src/lib/holzen-console.ts`](../../src/lib/holzen-console.ts) — **`[holzen:boot]`**, **`holzen:profile`**, etc.; **on in dev**, **off in prod** unless `holzen:debug=1` (pairs with Edge **`HOLZEN_EDGE_LOG`** above).
+**Holzen flow tracing:** [`src/lib/holzen-console.ts`](../../src/lib/holzen-console.ts) — **`[holzen:boot]`**, **`holzen:profile`**, query cache, etc. **Turn everything on** (non-DEV builds too) using any of:
+
+1. **`VITE_HOLZEN_DEBUG=1`** in `.env.hosted.local` / `.env` (e.g. with **`npm run dev:hosted`**).
+2. Open the app with **`?holzenDebug=1`** once — enables **session** debug for that tab and removes the query param.
+3. **`localStorage.setItem('holzen:debug','1')`** + reload — persistent.
+
+**Dev server** (`import.meta.env.DEV`): always verbose. **Default prod build:** off unless one of the above (pairs with Edge: leave **`HOLZEN_EDGE_LOG`** unset for full **`holzenEdgeLog`** traces, or **`=0`** for quiet prod).
 
 **Current pattern:** `console.error` / `console.warn` with a **stable prefix** (e.g. `[useCompanionData]`, `[boot-crash-promise]`), plus `ErrorBoundary` and `main.tsx` handlers for boot failures.
 

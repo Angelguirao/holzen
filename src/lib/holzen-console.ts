@@ -2,16 +2,42 @@
  * Namespaced console helpers for local debugging. Filter DevTools by `[holzen:` or `holzen:boot`, etc.
  * Use for flow tracing; keep payloads small (id prefixes, lengths, flags) — no tokens or full PII.
  *
- * **Production:** Nothing is printed unless the user opts in (`localStorage.setItem('holzen:debug','1')` + reload).
- * That keeps session/entitlement hints out of typical user consoles (privacy) and avoids misleading support
- * screenshots. **Cost:** no server or analytics usage — only `console.info` when enabled; bundle impact is negligible.
+ * **When `[holzen:*]` is on (any of):**
+ * - **`import.meta.env.DEV`** — local Vite dev server.
+ * - **`VITE_HOLZEN_DEBUG=1`** — hosted/staging/prod build (e.g. `.env.hosted.local` for `npm run dev:hosted`).
+ * - **`?holzenDebug=1`** once in the URL — sets **session** `holzen:debug` and strips the param (this tab only).
+ * - **`localStorage.setItem('holzen:debug','1')`** + reload — persistent opt-in (support / power users).
  *
- * **Dev:** All `[holzen:*]` lines are emitted so local debugging stays frictionless.
+ * **Default production build** (none of the above): off — privacy and cleaner support screenshots.
  */
+function bootstrapHolzenDebugFromUrl(): void {
+  if (typeof window === "undefined") return;
+  try {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("holzenDebug") !== "1") return;
+    sessionStorage.setItem("holzen:debug", "1");
+    params.delete("holzenDebug");
+    const rest = params.toString();
+    const path = window.location.pathname + window.location.hash;
+    const next = rest ? `${path}?${rest}` : path;
+    window.history.replaceState({}, "", next);
+  } catch {
+    /* ignore */
+  }
+}
+
+bootstrapHolzenDebugFromUrl();
+
 export function isHolzenDebugEnabled(): boolean {
   if (import.meta.env.DEV) return true;
+  if (import.meta.env.VITE_HOLZEN_DEBUG === "1") return true;
   try {
-    return typeof localStorage !== 'undefined' && localStorage.getItem('holzen:debug') === '1';
+    if (typeof sessionStorage !== "undefined" && sessionStorage.getItem("holzen:debug") === "1") return true;
+  } catch {
+    /* ignore */
+  }
+  try {
+    return typeof localStorage !== "undefined" && localStorage.getItem("holzen:debug") === "1";
   } catch {
     return false;
   }
