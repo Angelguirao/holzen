@@ -18,6 +18,7 @@ const COMPANIONS = [
   { id: 'history', icon: History, labelKey: 'onboarding.companions.history', descKey: 'onboarding.companions.historyDesc' },
 ] as const;
 
+/** @deprecated Not used by the onboarding flow in `Onboarding.tsx`; retained for reference or future reuse. */
 export function OnboardingCompanions({ stagger }: Props) {
   const { t } = useTranslation();
   const prefersReduced = useReducedMotion();

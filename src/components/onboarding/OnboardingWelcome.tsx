@@ -9,6 +9,7 @@ interface Props {
   stagger: (delay: number) => object;
 }
 
+/** @deprecated Not used by the onboarding flow in `Onboarding.tsx`; retained for reference or future reuse. */
 export function OnboardingWelcome({ firstName, onFirstNameChange, timezone, stagger }: Props) {
   const { t } = useTranslation();
 
