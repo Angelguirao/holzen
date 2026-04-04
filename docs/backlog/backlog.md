@@ -41,6 +41,7 @@ Rule of thumb used here:
 | 2026-04 | [lighthouse-a11y-home.md](lighthouse-a11y-home.md) | **`main`** landmark, header contrast, notification **`aria-label`**, **36px** touch targets on Home / **`BtcStatus`**. |
 | 2026-04 | [resource-hints-preconnect.md](resource-hints-preconnect.md) | **`vite.config`** **`transformIndexHtml`**: Supabase + Google Fonts + CoinGecko **`preconnect`**. |
 | 2026-04 | [home-recharts-layout-cost.md](home-recharts-layout-cost.md) | **`BtcChartLazyGate`**: viewport + **`React.lazy`**; chart **`ResponsiveContainer`** tweaks + no area animation. |
+| 2026-04 | [data-fetching-conventions.md](data-fetching-conventions.md) | **`navigating-the-codebase` §6.1** — Query vs **`useEffect` + Supabase**; defer global **`QueryClient` defaults**. |
 
 ---
 
@@ -111,7 +112,7 @@ Use this when you are **choosing what to work on next**. Items are **not** stric
 | — | [typed-navigation-state.md](typed-navigation-state.md) | **Done (2026-04).** `router-location-state` — see ticket. |
 | — | [route-level-code-splitting.md](route-level-code-splitting.md) | **Done (2026-04).** Lazy pages + **`Suspense`** — see ticket. |
 | Lower | [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md) | Split oversized pages (`Home`, `PauseSession`); optionally narrow **`use-holzen`**; one slice per PR. |
-| Lower | [data-fetching-conventions.md](data-fetching-conventions.md) | Document / align TanStack Query vs **`useEffect` + Supabase**; optional `QueryClient` defaults. |
+| — | [data-fetching-conventions.md](data-fetching-conventions.md) | **Done (2026-04).** §6.1 in **`navigating-the-codebase`** — see ticket. |
 | — | [resource-hints-preconnect.md](resource-hints-preconnect.md) | **Done (2026-04).** Vite-injected **`preconnect`** — see ticket. |
 | — | [home-recharts-layout-cost.md](home-recharts-layout-cost.md) | **Done (2026-04).** Lazy + **`IntersectionObserver`** for Home BTC chart — see ticket. |
 
@@ -148,7 +149,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | Frontend | [typed-navigation-state.md](typed-navigation-state.md) | **Done (2026-04).** Parsers in `router-location-state.ts` — see ticket |
 | Frontend | [route-level-code-splitting.md](route-level-code-splitting.md) | **Done (2026-04).** **`React.lazy`** in `App.tsx` — see ticket |
 | Frontend | [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md) | Large pages + hook decomposition |
-| Frontend | [data-fetching-conventions.md](data-fetching-conventions.md) | Query vs Supabase+effect conventions |
+| Frontend | [data-fetching-conventions.md](data-fetching-conventions.md) | **Done (2026-04).** Doc in **`navigating-the-codebase`** §6.1 — see ticket |
 | Frontend | [resource-hints-preconnect.md](resource-hints-preconnect.md) | **Done (2026-04).** Vite **`transformIndexHtml`** — see ticket |
 | Frontend | [home-recharts-layout-cost.md](home-recharts-layout-cost.md) | **Done (2026-04).** **`BtcChartLazyGate`** — see ticket |
 | Strategic | [spa-framework-evaluation.md](spa-framework-evaluation.md) | SPA vs framework evaluation |
@@ -160,7 +161,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | Theme | Backlog files |
 |--------|----------------|
 | **Platform, architecture & tooling** | [e2e-browser-automation.md](e2e-browser-automation.md), [spa-framework-evaluation.md](spa-framework-evaluation.md), [hosting-production-compression.md](hosting-production-compression.md) |
-| **Frontend structure & conventions** | ~~[typed-navigation-state.md](typed-navigation-state.md)~~ **done**, ~~[route-level-code-splitting.md](route-level-code-splitting.md)~~ **done**, [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md), [data-fetching-conventions.md](data-fetching-conventions.md), [home-fetch-deduplication.md](home-fetch-deduplication.md), ~~[resource-hints-preconnect.md](resource-hints-preconnect.md)~~ **done**, ~~[home-recharts-layout-cost.md](home-recharts-layout-cost.md)~~ **done** |
+| **Frontend structure & conventions** | ~~[typed-navigation-state.md](typed-navigation-state.md)~~ **done**, ~~[route-level-code-splitting.md](route-level-code-splitting.md)~~ **done**, [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md), ~~[data-fetching-conventions.md](data-fetching-conventions.md)~~ **done**, [home-fetch-deduplication.md](home-fetch-deduplication.md), ~~[resource-hints-preconnect.md](resource-hints-preconnect.md)~~ **done**, ~~[home-recharts-layout-cost.md](home-recharts-layout-cost.md)~~ **done** |
 | **Auth & routing** | [auth-referral.md](auth-referral.md); ~~[route-gating.md](route-gating.md)~~ **done 2026-04** |
 | **Product / UX** | [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md), [cron-pause-featured-parity.md](cron-pause-featured-parity.md), ~~[route-gating.md](route-gating.md)~~ **done**, [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md), ~~[form-field-name-id-a11y.md](form-field-name-id-a11y.md)~~ **done**, ~~[lighthouse-a11y-home.md](lighthouse-a11y-home.md)~~ **done** |
 | **Pause pipeline & client–server boundaries** | [orchestrate-client-cron.md](orchestrate-client-cron.md), [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md), [cron-pause-featured-parity.md](cron-pause-featured-parity.md) |
@@ -183,7 +184,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md) | Transparency when cache serve relaxes constraints |
 | [cron-pause-featured-parity.md](cron-pause-featured-parity.md) | Automatic vs manual pause featured fields / first paint |
 | [cron-worker-auth-consistency.md](cron-worker-auth-consistency.md) | **Done (2026-04).** Cron worker auth — see ticket. |
-| [data-fetching-conventions.md](data-fetching-conventions.md) | TanStack Query vs `useEffect` + Supabase; optional QueryClient defaults |
+| [data-fetching-conventions.md](data-fetching-conventions.md) | **Done (2026-04).** **`navigating-the-codebase`** §6.1 — see ticket |
 | [e2e-browser-automation.md](e2e-browser-automation.md) | Playwright/Cypress or Vitest+RTL; Bruno stays API-only |
 | [form-field-name-id-a11y.md](form-field-name-id-a11y.md) | **Done (2026-04).** Form **`name`** / **`id`** / **`autocomplete`** — see ticket |
 | [home-fetch-deduplication.md](home-fetch-deduplication.md) | **Partial (2026-04).** Dedupe + **`navigating-the-codebase`** §6; optional **`profiles`** lift — see ticket |
@@ -233,7 +234,7 @@ Legacy numeric IDs for chat / PR references; prefer **ticket file name** or [mas
 18. SPA vs full-stack React framework — [spa-framework-evaluation.md](spa-framework-evaluation.md)
 19. ~~Typed React Router **`location.state`**~~ — **Shipped 2026-04** — [typed-navigation-state.md](typed-navigation-state.md)
 20. Split large pages / heavy hooks — [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md)
-21. Data fetching conventions (Query vs Supabase + effects) — [data-fetching-conventions.md](data-fetching-conventions.md)
+21. ~~Data fetching conventions (Query vs Supabase + effects)~~ — **Shipped 2026-04** — [data-fetching-conventions.md](data-fetching-conventions.md)
 22. ~~Route-level code splitting (`React.lazy` / `Suspense`)~~ — **Shipped 2026-04** — [route-level-code-splitting.md](route-level-code-splitting.md)
 23. ~~Service worker registration in dev (console noise)~~ — **Shipped 2026-04** — [service-worker-registration-dev.md](service-worker-registration-dev.md)
 24. Home fetch deduplication (signed-in **`/`**) — [home-fetch-deduplication.md](home-fetch-deduplication.md) — *partial: `useProfile` + subscription query + BTC coalesce (2026-04); optional `profiles` Query*

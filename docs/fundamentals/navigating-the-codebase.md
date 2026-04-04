@@ -85,6 +85,18 @@ TanStack Query is available app-wide (`QueryClient` in `App.tsx`); individual ho
 
 **Shared client fetch patterns (dedupe):** subscription status is centralized in **`use-subscription.ts`** (`useQuery` so all consumers share one `check-subscription` request/cache). BTC / market reads go through **`fetchBtcData`** in **`src/lib/btc.ts`**, which coalesces concurrent calls per currency. Profile row loading remains **`use-profile.ts`** (stable **`user?.id`** dependency); if DevTools still shows duplicate `profiles` requests, consider a single layout-level query (see [home-fetch-deduplication.md](../backlog/home-fetch-deduplication.md)).
 
+### 6.1 TanStack Query vs `useEffect` + Supabase
+
+Both are valid. Use this to choose and to match nearby code:
+
+| Prefer | When |
+|--------|------|
+| **`useQuery` / `useMutation`** | Data is **shared across routes or components**, benefits from a **stable cache key**, or needs **invalidation** after mutations (e.g. subscription status — **`use-subscription.ts`**; blog posts — **`Blog.tsx`**, **`BlogPost.tsx`**). |
+| **`useEffect` + `supabase` (or `fetch`)** | State is **owned by one hook/screen**, **many follow-up setters** run off one load (e.g. **`use-profile.ts`** seeding dozens of fields), or logic is **tightly coupled** to non-cache concerns (orchestration in **`use-holzen.ts`**, companion pipeline in **`use-companion-data.ts`**). |
+| **Module-level coalescing** | Heavy **third-party** reads where Query is not yet adopted — **`fetchBtcData`** dedupes in-flight requests per currency without a shared query cache. |
+
+Do **not** add global **`QueryClient` defaultOptions** lightly: they affect every future `useQuery`. Prefer explicit options on each query until team-wide defaults are agreed ([data-fetching-conventions.md](../backlog/data-fetching-conventions.md)). **Migrate opportunistically** when editing a feature, not in a standalone rewrite.
+
 ---
 
 ## 7. Pages (`src/pages/`) — grouped by domain
