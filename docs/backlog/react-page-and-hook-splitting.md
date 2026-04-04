@@ -2,6 +2,12 @@
 
 **Status:** backlog — incremental refactors (no big-bang).
 
+## Progress (slices shipped)
+
+| When | Slice |
+|------|--------|
+| 2026-04 | **`Home`:** `NeedAMomentButton`, `AutoCooldownIndicator`, and `ProLockedWidget` moved to **`src/components/home/HomePauseChrome.tsx`**. |
+
 ## Goal
 
 Improve **maintainability and testability** by breaking up **oversized page modules** and optionally **narrowing** very large custom hooks — without changing product behavior.
