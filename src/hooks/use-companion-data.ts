@@ -516,16 +516,31 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
 
         // Hydrate any companion data the server returned alongside intervention
         // (e.g. trap forces grounding, pattern forces history, secondary forces zoomOut)
-        const hydrateSlot = (key: string, result: CompanionResult | null | undefined, setter: (d: any) => void, slotName: string) => {
-          if (result?.data && result.source !== 'empty' && !fetchedSlotsRef.current.has(slotName)) {
-            setter(result.data);
-            fetchedSlotsRef.current.add(slotName);
-          }
-        };
-        hydrateSlot('grounding', data.grounding as CompanionResult | null, setNudge, 'grounding');
-        hydrateSlot('history', data.history as CompanionResult | null, setHistoryInsight, 'history');
-        hydrateSlot('zoomOut', data.zoomOut as CompanionResult | null, setZoomOut, 'zoomOut');
-        hydrateSlot('signal', data.signal as CompanionResult | null, setSignal, 'signal');
+        const gR = data.grounding as CompanionResult | null;
+        if (gR?.data && gR.source !== 'empty' && !fetchedSlotsRef.current.has('grounding')) {
+          setNudge(gR.data);
+          fetchedSlotsRef.current.add('grounding');
+          autoSaveToLibrary({ title: gR.data.title, body: gR.data.body, sourceType: 'grounding', sourceUrl: gR.data.url });
+        }
+        const hR = data.history as CompanionResult | null;
+        if (hR?.data && hR.source !== 'empty' && !fetchedSlotsRef.current.has('history')) {
+          setHistoryInsight(hR.data);
+          fetchedSlotsRef.current.add('history');
+          autoSaveToLibrary({ title: hR.data.title, body: hR.data.btcInsight, sourceType: 'history_insight' });
+        }
+        const zR = data.zoomOut as CompanionResult | null;
+        if (zR?.data && zR.source !== 'empty' && !fetchedSlotsRef.current.has('zoomOut')) {
+          setZoomOut(zR.data);
+          fetchedSlotsRef.current.add('zoomOut');
+          const zBody = zR.data?.deepTime?.body || zR.data?.echo?.message || 'Zoom Out perspective';
+          autoSaveToLibrary({ title: zR.data?.deepTime?.title || 'Zoom Out', body: zBody, sourceType: 'zoom_out' });
+        }
+        const sR = data.signal as CompanionResult | null;
+        if (sR?.data && sR.source !== 'empty' && !fetchedSlotsRef.current.has('signal')) {
+          setSignal(sR.data);
+          fetchedSlotsRef.current.add('signal');
+          autoSaveToLibrary({ title: sR.data.title, body: sR.data.body, sourceType: 'signal', sourceUrl: sR.data.url });
+        }
       } catch (e) {
         console.error('[useCompanionData] intervention fetch failed', e);
         setInterventionError(true);
