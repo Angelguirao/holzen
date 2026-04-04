@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next';
 import { usePullToRefresh } from '@/hooks/use-pull-to-refresh';
 import { useOutletContext } from 'react-router-dom';
-import { useHolzen } from '@/hooks/use-holzen';
+import { useHolzen, isReflectionPersistError } from '@/hooks/use-holzen';
 import { TestimonialRequest } from '@/components/TestimonialRequest';
 import { LetterToFutureSelf } from '@/components/LetterToFutureSelf';
 import AuthLoading from '@/components/AuthLoading';
@@ -399,6 +399,30 @@ const Home = () => {
               <Skeleton className="h-4 w-full" />
               <Skeleton className="h-4 w-3/4" />
             </motion.div>
+          ) : isReflectionPersistError(error) ? (
+            <motion.div
+              key="zen-reflection-save-error"
+              variants={zenVariants}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              className="rounded-md border border-destructive/20 bg-destructive/5 px-4 py-3 space-y-2 max-w-md mx-auto text-left"
+            >
+              <div className="flex items-center gap-2 text-destructive/80">
+                <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                <p className="text-xs font-mono">{error}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  holzenLog.home('Try again after reflection save error: manualTrigger');
+                  manualTrigger();
+                }}
+                className="text-xs font-mono text-primary underline"
+              >
+                {t('common.tryAgain')}
+              </button>
+            </motion.div>
           ) : !subscriptionReady ? (
             <motion.div key="zen-hydrating" variants={zenVariants} initial="hidden" animate="visible" exit="hidden">
               <SubscriptionSkeleton variant="centered" />
@@ -564,25 +588,29 @@ const Home = () => {
                           <Skeleton className="h-4 w-3/4" />
                           <Skeleton className="h-4 w-1/2" />
                         </div>
-                      ) : error && !btcData ? (
+                      ) : (error && !btcData) || isReflectionPersistError(error) ? (
                         <div className="rounded-md border border-destructive/20 bg-destructive/5 px-4 py-3 space-y-2">
                           <div className="flex items-center gap-2 text-destructive/80">
-                            <AlertCircle className="h-3.5 w-3.5" />
+                            <AlertCircle className="h-3.5 w-3.5 shrink-0" />
                             <p className="text-xs font-mono">
-                              {error.includes('fetch') || error.includes('network') || error.includes('Failed to fetch')
+                              {isReflectionPersistError(error)
+                                ? error
+                                : error.includes('fetch') || error.includes('network') || error.includes('Failed to fetch')
                                 ? t('home.errors.couldNotReachPrice')
                                 : error.includes('generate') || error.includes('reflect')
                                 ? t('home.errors.aiUnavailable')
                                 : t('home.errors.somethingWentWrong')}
                             </p>
                           </div>
-                          <p className="text-[10px] font-mono text-muted-foreground/60 leading-relaxed">
-                            {error.includes('fetch') || error.includes('network') || error.includes('Failed to fetch')
-                              ? t('home.errors.checkConnection')
-                              : error.includes('generate') || error.includes('reflect')
-                              ? t('home.errors.aiTemporarilyUnavailable')
-                              : t('home.errors.unexpectedError')}
-                          </p>
+                          {!isReflectionPersistError(error) && (
+                            <p className="text-[10px] font-mono text-muted-foreground/60 leading-relaxed">
+                              {error.includes('fetch') || error.includes('network') || error.includes('Failed to fetch')
+                                ? t('home.errors.checkConnection')
+                                : error.includes('generate') || error.includes('reflect')
+                                ? t('home.errors.aiTemporarilyUnavailable')
+                                : t('home.errors.unexpectedError')}
+                            </p>
+                          )}
                           <button
                             onClick={() => {
                               holzenLog.home('Try again: manualTrigger');
