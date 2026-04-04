@@ -174,7 +174,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
 
   useEffect(() => {
     if (!reflectionId) return;
-    // Read breathing/haiku/grounding from reflections, signal/zoomOut/history from reflection_companions
+    // Read breathing/haiku from reflections; grounding + others from reflection_companions (ground_nudge row is canonical)
     Promise.all([
       supabase
         .from('reflections')
@@ -193,7 +193,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       setCompletion({
         breathing: (refData as any)?.breathing_completed ?? false,
         haiku: (refData as any)?.haiku_read ?? false,
-        grounding: (refData as any)?.grounding_read ?? false,
+        grounding: companionReadMap['ground_nudge'] ?? (refData as any)?.grounding_read ?? false,
         signal: companionReadMap['signal'] ?? false,
         zoomOut: companionReadMap['zoom_out'] ?? companionReadMap['zoom_out_deep_time'] ?? false,
         history: companionReadMap['historical_insight'] ?? false,
@@ -206,15 +206,13 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     setCompletion((prev) => ({ ...prev, [key]: true }));
     hapticFeedback('light');
     if (reflectionId) {
-      // breathing, haiku, grounding read flags live on reflections
       const reflectionKeyMap: Record<string, string> = {
         breathing: 'breathing_completed',
         haiku: 'haiku_read',
-        grounding: 'grounding_read',
       };
-      // signal, zoomOut, history read flags live on reflection_companions
       const companionTypeMap: Record<string, string> = {
         signal: 'signal',
+        grounding: 'ground_nudge',
         zoomOut: 'zoom_out_deep_time',
         history: 'historical_insight',
       };

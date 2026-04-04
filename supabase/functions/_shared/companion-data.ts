@@ -1,28 +1,18 @@
 /**
  * Companion data abstraction layer.
  *
- * All companion data lives in the reflection_companions join table.
- * Legacy denormalized columns on reflections have been dropped
- * (signal_*, zoom_out_data/read, history_insight_data/read).
- *
- * Grounding invariant (keep Home + /pause aligned):
- * - Canonical JSON lives in reflection_companions (`ground_nudge` / COMPANION_TYPES.GROUNDING).
- * - reflections.grounding_title / grounding_body are denormalized for Home pinned text;
- *   they must match the join row. Server paths use this module’s writeCompanionData;
- *   the manual holzen-reflect client path upserts the same `ground_nudge` row after
- *   inserting the reflections row (see use-holzen generateMessage).
+ * All companion content lives in reflection_companions. Legacy denormalized columns on
+ * reflections were dropped for signal / zoom / history. Grounding text and read state are
+ * also stored only on the `ground_nudge` row; v_reflection_with_companions COALESCEs the
+ * join with legacy reflections.grounding_* for old rows. Do not write grounding_* on reflections.
  */
-
-import { COMPANION_TYPES } from "./companion-types.ts";
 
 interface CompanionContent {
   [key: string]: unknown;
 }
 
 /**
- * Write companion data for a reflection.
- * Writes to reflection_companions (primary).
- * For grounding, also writes title/body to reflections for Home display.
+ * Write companion data for a reflection (reflection_companions only).
  */
 export async function writeCompanionData(
   svcClient: any,
@@ -30,7 +20,6 @@ export async function writeCompanionData(
   companionType: string,
   content: CompanionContent,
 ): Promise<void> {
-  // Write to normalized table
   await svcClient.from("reflection_companions").upsert(
     {
       reflection_id: reflectionId,
@@ -39,17 +28,6 @@ export async function writeCompanionData(
     },
     { onConflict: "reflection_id,companion_type" },
   );
-
-  // Grounding: also write title/body to reflections for Home pinned display
-  if (companionType === COMPANION_TYPES.GROUNDING) {
-    await svcClient
-      .from("reflections")
-      .update({
-        grounding_title: content.title || null,
-        grounding_body: content.body || null,
-      })
-      .eq("id", reflectionId);
-  }
 }
 
 /**
@@ -81,8 +59,7 @@ export async function readCompanionData(
 }
 
 /**
- * Mark a companion as read for a reflection.
- * Updates reflection_companions. Also updates grounding_read on reflections.
+ * Mark a companion as read for a reflection (reflection_companions only).
  */
 export async function markCompanionRead(
   svcClient: any,
@@ -94,12 +71,4 @@ export async function markCompanionRead(
     .update({ read: true })
     .eq("reflection_id", reflectionId)
     .eq("companion_type", companionType);
-
-  // Grounding read flag still on reflections
-  if (companionType === COMPANION_TYPES.GROUNDING) {
-    await svcClient
-      .from("reflections")
-      .update({ grounding_read: true })
-      .eq("id", reflectionId);
-  }
 }

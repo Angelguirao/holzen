@@ -150,7 +150,7 @@ export function useLibrary() {
         }
         flags[r.id] = {
           haiku_read: !!r.haiku_read,
-          grounding_read: !!r.grounding_read,
+          grounding_read: companionReadMap['ground_nudge'] ?? !!r.grounding_read,
           signal_read: companionReadMap['signal'] ?? false,
           zoom_out_read: companionReadMap['zoom_out'] ?? companionReadMap['zoom_out_deep_time'] ?? false,
           history_read: companionReadMap['historical_insight'] ?? false,
