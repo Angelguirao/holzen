@@ -30,6 +30,7 @@ Rule of thumb used here:
 | 2026-04 | [reflection-insert-partial-failure.md](reflection-insert-partial-failure.md) | Revert optimistic UI + `isReflectionPersistError` on Home when `reflections` insert fails after generate. |
 | 2026-04 | [writeCompanionData-grounding-consistency.md](writeCompanionData-grounding-consistency.md) | Grounding only in `ground_nudge`; view COALESCE; no `reflections.grounding_*` writes. |
 | 2026-04 | [react-router-v7-future-flags.md](react-router-v7-future-flags.md) | `BrowserRouter` `future`: `v7_startTransition`, `v7_relativeSplatPath`. |
+| 2026-04 | [pause-session-hydration.md](pause-session-hydration.md) | Coherent `/pause` hydration: storage → aligned hook → nav → fetch by id; loading/error UI. |
 
 ---
 
@@ -47,7 +48,6 @@ Use this when you are **choosing what to work on next**. Items are **not** stric
 
 | Priority hint | Ticket | Summary |
 |---------------|--------|---------|
-| Medium | [pause-session-hydration.md](pause-session-hydration.md) | `/pause` when `location.state` is incomplete — align with profile/hooks. |
 | Medium | [auth-referral.md](auth-referral.md) | Referral side-effect delivery within retry policy. |
 
 ### Observability & limits (know when things fail open; align metrics with throttles)
@@ -121,7 +121,6 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | Work type | Ticket | One-line |
 |-----------|--------|----------|
 | Data / market | [btc-price-cache-freshness.md](btc-price-cache-freshness.md) | BTC cache freshness vs Zoom Out |
-| Reliability | [pause-session-hydration.md](pause-session-hydration.md) | `/pause` without full navigation state |
 | Reliability | [auth-referral.md](auth-referral.md) | Referral delivery robustness |
 | Observability | [rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md) | Fail-open rate/budget visibility |
 | Observability | [rate-limit-analytics-allowlist.md](rate-limit-analytics-allowlist.md) | Analytics vs allowlist parity |
@@ -156,7 +155,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | **Frontend structure & conventions** | [typed-navigation-state.md](typed-navigation-state.md), [route-level-code-splitting.md](route-level-code-splitting.md), [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md), [service-worker-registration-dev.md](service-worker-registration-dev.md), [data-fetching-conventions.md](data-fetching-conventions.md), [home-fetch-deduplication.md](home-fetch-deduplication.md), [resource-hints-preconnect.md](resource-hints-preconnect.md), [home-recharts-layout-cost.md](home-recharts-layout-cost.md) |
 | **Auth & routing** | [auth-referral.md](auth-referral.md), [route-gating.md](route-gating.md) |
 | **Product / UX** | [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md), [cron-pause-featured-parity.md](cron-pause-featured-parity.md), [route-gating.md](route-gating.md), [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md), [form-field-name-id-a11y.md](form-field-name-id-a11y.md), [lighthouse-a11y-home.md](lighthouse-a11y-home.md) |
-| **Pause pipeline & client–server boundaries** | [pause-session-hydration.md](pause-session-hydration.md), [orchestrate-client-cron.md](orchestrate-client-cron.md), [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md), [cron-pause-featured-parity.md](cron-pause-featured-parity.md) |
+| **Pause pipeline & client–server boundaries** | [orchestrate-client-cron.md](orchestrate-client-cron.md), [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md), [cron-pause-featured-parity.md](cron-pause-featured-parity.md) |
 | **Cost & duplicate work (client + server)** | [orchestrate-client-cron.md](orchestrate-client-cron.md), [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md), [home-fetch-deduplication.md](home-fetch-deduplication.md) |
 | **Cache, library & market data** | [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md), [btc-price-cache-freshness.md](btc-price-cache-freshness.md), [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md) |
 | **Rate limits, quality & observability** | [rate-limit-analytics-allowlist.md](rate-limit-analytics-allowlist.md), [rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md), [quality-gates-false-positives.md](quality-gates-false-positives.md) |
@@ -184,7 +183,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | [hosting-production-compression.md](hosting-production-compression.md) | Verify **gzip/Brotli** for HTML in production |
 | [lighthouse-a11y-home.md](lighthouse-a11y-home.md) | Lighthouse **axe** on **`/`** — buttons, contrast, landmark, targets |
 | [orchestrate-client-cron.md](orchestrate-client-cron.md) | Client vs cron `companion-orchestrate` overlap |
-| [pause-session-hydration.md](pause-session-hydration.md) | `/pause` when `location.state` is incomplete |
+| [pause-session-hydration.md](pause-session-hydration.md) | **Done (2026-04).** `/pause` hydration — see ticket. |
 | [pwa-mobile-web-app-meta.md](pwa-mobile-web-app-meta.md) | **Done (2026-04).** **`mobile-web-app-capable`** in `index.html` — see ticket. |
 | [quality-gates-false-positives.md](quality-gates-false-positives.md) | `quality.ts` rejects; i18n / regex tuning |
 | [rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md) | Alert/metric when rate or daily budget fails open |
@@ -208,7 +207,7 @@ Legacy numeric IDs for chat / PR references; prefer **ticket file name** or [mas
 
 1. Guaranteed referral delivery — [auth-referral.md](auth-referral.md)
 2. UX clarity for strict route gating during auth loading — [route-gating.md](route-gating.md)
-3. Reduce reliance on `location.state` for `/pause` restoration — [pause-session-hydration.md](pause-session-hydration.md)
+3. ~~Reduce reliance on `location.state` for `/pause` restoration~~ — **Shipped 2026-04** — [pause-session-hydration.md](pause-session-hydration.md)
 4. Client vs cron `companion-orchestrate` overlap — [orchestrate-client-cron.md](orchestrate-client-cron.md)
 5. ~~Partial failure: reflect OK, reflection insert fails~~ — **Shipped 2026-04** — [reflection-insert-partial-failure.md](reflection-insert-partial-failure.md)
 6. Automatic pause: notification timing vs orchestrate completion — [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md)
