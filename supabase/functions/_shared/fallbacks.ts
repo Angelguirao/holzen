@@ -75,7 +75,7 @@ export function pickRandom<T>(pool: T[]): T {
 export const ENV_DISABLE_COMPANION_FALLBACKS = "DISABLE_COMPANION_FALLBACKS";
 
 export function companionFallbacksDisabled(): boolean {
-  const v = Deno.env.get(ENV_DISABLE_COMPANION_FALLBACKS);
+  const v = (globalThis as any).Deno?.env?.get(ENV_DISABLE_COMPANION_FALLBACKS);
   return v === "1" || v === "true" || v === "yes";
 }
 
