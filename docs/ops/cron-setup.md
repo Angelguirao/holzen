@@ -7,22 +7,44 @@ Server-side functions that use `verifyServiceAuth` (e.g. `check-volatility`) acc
 - **`Authorization: Bearer <service_role_jwt>`** — the **service_role** key from **Project Settings → API** (full JWT string, not the anon key), or  
 - **`Authorization: Bearer <CRON_SECRET>`** — if you set **`CRON_SECRET`** in Edge secrets and send the same value.
 
-**pg_cron / `pg_net`:** Prefer **not** hardcoding the service role inside `cron.schedule` (it appears in `cron.job` metadata and backups). Build the header at run time when Postgres exposes the project secret, for example:
+**pg_cron / `pg_net`:** Do **not** paste the service role JWT into `cron.schedule` command text (it is visible in `cron.job` and backups). On **Supabase Cloud**, `current_setting('supabase.service_role_key', true)` is usually **NULL** — that GUC is not a supported way to inject the key. Use **[Vault](https://supabase.com/docs/guides/database/vault)** instead (same approach as [Schedule Edge Functions](https://supabase.com/docs/guides/functions/schedule-functions)).
+
+**One-time Vault setup** (SQL Editor, `postgres` role). Pick a stable secret name; this repo uses **`holzen_cron_service_role`** for the **raw** service_role JWT (no `Bearer ` prefix):
+
+```sql
+-- Paste the service_role value from Project Settings → API (never commit it to git).
+SELECT vault.create_secret('<YOUR_SERVICE_ROLE_JWT>', 'holzen_cron_service_role');
+```
+
+Verify (shows rows; values stay hidden in normal listings — use only inside trusted SQL):
+
+```sql
+SELECT name FROM vault.secrets WHERE name = 'holzen_cron_service_role';
+```
+
+**Authorization header** (use in every `net.http_post` below):
 
 ```sql
 jsonb_build_object(
   'Content-Type', 'application/json',
-  'Authorization', 'Bearer ' || current_setting('supabase.service_role_key', true)
+  'Authorization', 'Bearer ' || (
+    SELECT decrypted_secret
+    FROM vault.decrypted_secrets
+    WHERE name = 'holzen_cron_service_role'
+    LIMIT 1
+  )
 )
 ```
 
-Verify once in the **SQL Editor** (privileged session): `SELECT current_setting('supabase.service_role_key', true);` — if this is **NULL**, use [Vault](https://supabase.com/docs/guides/database/vault) or your host’s documented secret injection instead of embedding the key in SQL.
+**Optional:** If you also store the project URL as `holzen_project_url` (`https://<ref>.supabase.co`), you can build `url := (SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'holzen_project_url' LIMIT 1) || '/functions/v1/refresh-btc-prices'`.
+
+**Self-hosted / rare setups:** If `SELECT current_setting('supabase.service_role_key', true)` is non-null, you may use that instead of Vault; on hosted Supabase, expect **false** / NULL.
 
 **Bruno** (`bruno/service-cron/*.bru`): **`401`** on these calls usually means **`SUPABASE_SERVICE_ROLE_KEY`** in the active environment does **not** exactly match the project’s current service role (wrong project, typo, stale copy). Redeploying the function does not fix a bad client key.
 
 **Stale Edge deploy:** If keys are correct but behavior is wrong, redeploy the function and confirm **Edge Functions → Logs** show your expected `[holzen:volatility]` lines after [holzen-edge-log](../../supabase/functions/_shared/holzen-edge-log.ts) (see [browser-360-mcp-playbook.md](../fundamentals/browser-360-mcp-playbook.md)).
 
-The SQL below uses **`jsonb_build_object` + `current_setting('supabase.service_role_key', true)`** for every job so the key is not stored inside `cron.job` text. For a one-off test in SQL Editor you can temporarily substitute a literal `Bearer …` string instead.
+The SQL below uses **Vault** (`holzen_cron_service_role`) for the Bearer token so the JWT is not embedded in `cron.job`. For a disposable one-off test only, you may temporarily use a literal `'Bearer …'` header — do not schedule that.
 
 **Where jobs actually live:** This repo does **not** run `cron.schedule` in migrations. Schedules are created manually (SQL Editor or ops) on the Supabase project. To see what is installed: `SELECT jobid, jobname, schedule, command, active FROM cron.job;`.
 
@@ -40,7 +62,7 @@ SELECT cron.schedule(
     url := 'https://<YOUR_SUPABASE_PROJECT_ID>.supabase.co/functions/v1/refresh-btc-prices',
     headers := jsonb_build_object(
       'Content-Type', 'application/json',
-      'Authorization', 'Bearer ' || current_setting('supabase.service_role_key', true)
+      'Authorization', 'Bearer ' || (SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'holzen_cron_service_role' LIMIT 1)
     ),
     body := '{}'::jsonb
   );
@@ -62,7 +84,7 @@ SELECT cron.schedule(
     url := 'https://<YOUR_SUPABASE_PROJECT_ID>.supabase.co/functions/v1/fetch-source-feeds',
     headers := jsonb_build_object(
       'Content-Type', 'application/json',
-      'Authorization', 'Bearer ' || current_setting('supabase.service_role_key', true)
+      'Authorization', 'Bearer ' || (SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'holzen_cron_service_role' LIMIT 1)
     ),
     body := '{}'::jsonb
   );
@@ -92,7 +114,7 @@ SELECT cron.schedule(
     url := 'https://<YOUR_SUPABASE_PROJECT_ID>.supabase.co/functions/v1/pregenerate-companions',
     headers := jsonb_build_object(
       'Content-Type', 'application/json',
-      'Authorization', 'Bearer ' || current_setting('supabase.service_role_key', true)
+      'Authorization', 'Bearer ' || (SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'holzen_cron_service_role' LIMIT 1)
     ),
     body := '{}'::jsonb
   );
@@ -137,7 +159,7 @@ SELECT cron.schedule(
     url := 'https://<YOUR_SUPABASE_PROJECT_ID>.supabase.co/functions/v1/check-volatility',
     headers := jsonb_build_object(
       'Content-Type', 'application/json',
-      'Authorization', 'Bearer ' || current_setting('supabase.service_role_key', true)
+      'Authorization', 'Bearer ' || (SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'holzen_cron_service_role' LIMIT 1)
     ),
     body := '{}'::jsonb
   );
@@ -161,7 +183,7 @@ SELECT cron.schedule(
     url := 'https://<YOUR_SUPABASE_PROJECT_ID>.supabase.co/functions/v1/check-followups',
     headers := jsonb_build_object(
       'Content-Type', 'application/json',
-      'Authorization', 'Bearer ' || current_setting('supabase.service_role_key', true)
+      'Authorization', 'Bearer ' || (SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'holzen_cron_service_role' LIMIT 1)
     ),
     body := '{}'::jsonb
   );
@@ -183,7 +205,7 @@ SELECT cron.schedule(
     url := 'https://<YOUR_SUPABASE_PROJECT_ID>.supabase.co/functions/v1/night-reflection',
     headers := jsonb_build_object(
       'Content-Type', 'application/json',
-      'Authorization', 'Bearer ' || current_setting('supabase.service_role_key', true)
+      'Authorization', 'Bearer ' || (SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'holzen_cron_service_role' LIMIT 1)
     ),
     body := '{}'::jsonb
   );

@@ -43,7 +43,7 @@ Cron-style Edge functions expect **`Authorization: Bearer {{SUPABASE_SERVICE_ROL
 
 If Bruno returns **`401 Unauthorized`**, the value in your environment almost always **does not match** the current project’s service role (wrong project, typo, stale env file). Fix the variable, then retry; redeploying the function does not correct a bad Bruno secret.
 
-For **pg_cron**, prefer injecting the key at SQL runtime (e.g. `current_setting('supabase.service_role_key', true)`) instead of hardcoding it — see [Cron HTTP auth in cron-setup.md](../ops/cron-setup.md#cron-http-auth).
+For **pg_cron**, use **Vault** + `vault.decrypted_secrets` in the `Authorization` header (hosted Supabase does not set `current_setting('supabase.service_role_key')`) — see [Cron HTTP auth in cron-setup.md](../ops/cron-setup.md#cron-http-auth).
 
 ### Getting an `access_token` for manual calls
 
