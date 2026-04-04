@@ -38,6 +38,7 @@ Rule of thumb used here:
 | 2026-04 | [form-field-name-id-a11y.md](form-field-name-id-a11y.md) | Auth, reset password, settings, library search, hold goal, onboarding welcome: **`name`** / **`id`** / **`autoComplete`**. |
 | 2026-04 | *(home-fetch follow-up)* | **`navigating-the-codebase.md`** §6 documents subscription + BTC dedupe + profile note — [home-fetch-deduplication.md](home-fetch-deduplication.md). |
 | 2026-04 | [route-level-code-splitting.md](route-level-code-splitting.md) | **`React.lazy`** for all **`src/pages`** routes; **`Suspense`** + **`RouteChunkFallback`** in **`App.tsx`**. |
+| 2026-04 | [lighthouse-a11y-home.md](lighthouse-a11y-home.md) | **`main`** landmark, header contrast, notification **`aria-label`**, **36px** touch targets on Home / **`BtcStatus`**. |
 
 ---
 
@@ -81,7 +82,7 @@ Use this when you are **choosing what to work on next**. Items are **not** stric
 | — | [route-gating.md](route-gating.md) | **Done (2026-04).** Explicit session-restore copy on `AuthLoading` — see ticket. |
 | Lower | [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md) | Transparency when cache serve relaxes constraints. |
 | — | [form-field-name-id-a11y.md](form-field-name-id-a11y.md) | **Done (2026-04).** Auth, settings, library, hold goal, onboarding — see ticket. |
-| Medium | [lighthouse-a11y-home.md](lighthouse-a11y-home.md) | Fix Lighthouse **axe** failures on **`/`** — buttons, contrast, **`main`**, notification name, touch target. |
+| — | [lighthouse-a11y-home.md](lighthouse-a11y-home.md) | **Done (2026-04).** Landmark, contrast, bell label, targets — re-run Lighthouse to verify — see ticket. |
 
 ### Ops & security (cron workers, secrets, docs alignment)
 
@@ -138,7 +139,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | Product / UX | [route-gating.md](route-gating.md) | **Done (2026-04).** Auth loading copy + a11y on `AuthLoading` — see ticket |
 | Product / UX | [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md) | Cache relaxation transparency |
 | Product / UX | [form-field-name-id-a11y.md](form-field-name-id-a11y.md) | **Done (2026-04).** Form **`name`** / **`id`** / **`autocomplete`** — see ticket |
-| Product / UX | [lighthouse-a11y-home.md](lighthouse-a11y-home.md) | Lighthouse **axe** on Home — landmarks, buttons, contrast |
+| Product / UX | [lighthouse-a11y-home.md](lighthouse-a11y-home.md) | **Done (2026-04).** Home **`/`** axe fixes — see ticket |
 | Ops / security | [hosting-production-compression.md](hosting-production-compression.md) | Prod **HTML** **Content-Encoding** check |
 | Quality | [quality-gates-false-positives.md](quality-gates-false-positives.md) | Quality gate tuning |
 | Testing | [e2e-browser-automation.md](e2e-browser-automation.md) | UI journeys (E2E) vs Bruno API review |
@@ -159,7 +160,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | **Platform, architecture & tooling** | [e2e-browser-automation.md](e2e-browser-automation.md), [spa-framework-evaluation.md](spa-framework-evaluation.md), [hosting-production-compression.md](hosting-production-compression.md) |
 | **Frontend structure & conventions** | ~~[typed-navigation-state.md](typed-navigation-state.md)~~ **done**, ~~[route-level-code-splitting.md](route-level-code-splitting.md)~~ **done**, [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md), [data-fetching-conventions.md](data-fetching-conventions.md), [home-fetch-deduplication.md](home-fetch-deduplication.md), [resource-hints-preconnect.md](resource-hints-preconnect.md), [home-recharts-layout-cost.md](home-recharts-layout-cost.md) |
 | **Auth & routing** | [auth-referral.md](auth-referral.md); ~~[route-gating.md](route-gating.md)~~ **done 2026-04** |
-| **Product / UX** | [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md), [cron-pause-featured-parity.md](cron-pause-featured-parity.md), ~~[route-gating.md](route-gating.md)~~ **done**, [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md), ~~[form-field-name-id-a11y.md](form-field-name-id-a11y.md)~~ **done**, [lighthouse-a11y-home.md](lighthouse-a11y-home.md) |
+| **Product / UX** | [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md), [cron-pause-featured-parity.md](cron-pause-featured-parity.md), ~~[route-gating.md](route-gating.md)~~ **done**, [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md), ~~[form-field-name-id-a11y.md](form-field-name-id-a11y.md)~~ **done**, ~~[lighthouse-a11y-home.md](lighthouse-a11y-home.md)~~ **done** |
 | **Pause pipeline & client–server boundaries** | [orchestrate-client-cron.md](orchestrate-client-cron.md), [automatic-pause-notification-timing.md](automatic-pause-notification-timing.md), [cron-pause-featured-parity.md](cron-pause-featured-parity.md) |
 | **Cost & duplicate work (client + server)** | [orchestrate-client-cron.md](orchestrate-client-cron.md), [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md), [home-fetch-deduplication.md](home-fetch-deduplication.md) |
 | **Cache, library & market data** | [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md), [btc-price-cache-freshness.md](btc-price-cache-freshness.md), [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md) |
@@ -186,7 +187,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | [home-fetch-deduplication.md](home-fetch-deduplication.md) | **Partial (2026-04).** Dedupe + **`navigating-the-codebase`** §6; optional **`profiles`** lift — see ticket |
 | [home-recharts-layout-cost.md](home-recharts-layout-cost.md) | Recharts forced reflow / defer charts on Home |
 | [hosting-production-compression.md](hosting-production-compression.md) | Verify **gzip/Brotli** for HTML in production |
-| [lighthouse-a11y-home.md](lighthouse-a11y-home.md) | Lighthouse **axe** on **`/`** — buttons, contrast, landmark, targets |
+| [lighthouse-a11y-home.md](lighthouse-a11y-home.md) | **Done (2026-04).** **`main`**, contrast, notification label, touch targets — see ticket |
 | [orchestrate-client-cron.md](orchestrate-client-cron.md) | Client vs cron `companion-orchestrate` overlap |
 | [pause-session-hydration.md](pause-session-hydration.md) | **Done (2026-04).** `/pause` hydration — see ticket. |
 | [pwa-mobile-web-app-meta.md](pwa-mobile-web-app-meta.md) | **Done (2026-04).** **`mobile-web-app-capable`** in `index.html` — see ticket. |
@@ -237,7 +238,7 @@ Legacy numeric IDs for chat / PR references; prefer **ticket file name** or [mas
 25. ~~Form field **`name`** / **`id`** / **`autocomplete`** (a11y)~~ — **Shipped 2026-04** — [form-field-name-id-a11y.md](form-field-name-id-a11y.md)
 26. ~~React Router v7 **future** flags~~ — **Shipped 2026-04** — [react-router-v7-future-flags.md](react-router-v7-future-flags.md)
 27. ~~PWA **`mobile-web-app-capable`** meta~~ — **Shipped 2026-04** — [pwa-mobile-web-app-meta.md](pwa-mobile-web-app-meta.md)
-28. Lighthouse **a11y** on Home (`/` ) — [lighthouse-a11y-home.md](lighthouse-a11y-home.md)
+28. ~~Lighthouse **a11y** on Home (`/` )~~ — **Shipped 2026-04** — [lighthouse-a11y-home.md](lighthouse-a11y-home.md)
 29. **`preconnect`** resource hints — [resource-hints-preconnect.md](resource-hints-preconnect.md)
 30. Home **Recharts** layout / defer — [home-recharts-layout-cost.md](home-recharts-layout-cost.md)
 31. Production **HTML** compression — [hosting-production-compression.md](hosting-production-compression.md)

@@ -47,7 +47,7 @@ Routes are declared in one file. **Page components** under `src/pages/` are **`R
 - **`ProtectedRoute`** — If auth is still loading, show `AuthLoading`. If no user, redirect to `/welcome`. Otherwise render children.
 - **`PublicOnlyRoute`** — Logged-in users are redirected to `/`.
 
-**Main shell:** routes under `/`, `/library`, `/profile`, `/settings` use **`AppLayout`**: max-width column, header (“Holzen” + `NotificationBell`), `Outlet`, and **`BottomNav`**. `AppLayout` also wires `useHolzen`, `useLanguageSync`, and `useAutoTrigger` (pause-ready banner on non-home routes).
+**Main shell:** routes under `/`, `/library`, `/profile`, `/settings` use **`AppLayout`**: max-width column, **`<header>`** (“Holzen” + `NotificationBell`), **`<main id="main-content">`** around **`Outlet`**, and **`BottomNav`**. `AppLayout` also wires `useHolzen`, `useLanguageSync`, and `useAutoTrigger` (pause-ready banner on non-home routes).
 
 **Full-screen / immersive routes** (no bottom nav): `/pause`, `/breathe`, `/ground`, `/ground/history`, `/ambient`, `/practice/*`, `/admin`. (`/breathe` → `Breathe.tsx`; `/ambient` → `Ambient.tsx`.)
 

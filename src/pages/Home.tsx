@@ -523,11 +523,12 @@ const Home = () => {
                       {/* Reflection teaser with dismiss X */}
                       <div className="relative">
                         <button
+                          type="button"
                           onClick={handleDismiss}
-                          className="absolute -top-1 -right-1 p-1 rounded-full text-muted-foreground/30 hover:text-muted-foreground/60 hover:bg-muted/50 transition-colors"
+                          className="absolute -top-1 -right-1 inline-flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground/30 hover:text-muted-foreground/60 hover:bg-muted/50 transition-colors"
                           aria-label={t('common.dismiss', 'Dismiss')}
                         >
-                          <X className="h-3.5 w-3.5" />
+                          <X className="h-3.5 w-3.5" aria-hidden />
                         </button>
                         <p className="text-sm leading-relaxed text-foreground/80 pr-5">
                           {message.split(/[.!?]\s/)[0]}{message.split(/[.!?]\s/).length > 1 ? '…' : ''}
@@ -679,11 +680,12 @@ const Home = () => {
                 <>
                   <div className="relative">
                     <button
+                      type="button"
                       onClick={dismissGroundSuggestion}
-                      className="absolute -top-1 -right-1 p-1 rounded-full text-muted-foreground/30 hover:text-muted-foreground/60 hover:bg-muted/50 transition-colors"
+                      className="absolute -top-1 -right-1 inline-flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground/30 hover:text-muted-foreground/60 hover:bg-muted/50 transition-colors"
                       aria-label={t('common.dismiss', 'Dismiss')}
                     >
-                      <X className="h-3.5 w-3.5" />
+                      <X className="h-3.5 w-3.5" aria-hidden />
                     </button>
                     <p className="text-sm leading-relaxed text-foreground/80 pr-5">
                       {groundSuggestion.suggestion}
