@@ -1,23 +1,13 @@
-# Cron worker auth consistency (Pending)
+# Cron worker auth consistency (mostly done)
 
 ## Context (from Phase 4)
 
-Scheduled workers (`refresh-btc-prices`, `fetch-source-feeds`, `pregenerate-companions`) are invoked by pg_cron or similar with specific headers. `refresh-btc-prices` accepts `Authorization` (service role or `CRON_SECRET`), **`x-supabase-cron: true`**, and related patterns; other workers may not expose identical gates.
+Scheduled workers (`refresh-btc-prices`, `fetch-source-feeds`, `pregenerate-companions`) are invoked by pg_cron or similar with specific headers. As of the `fetch-source-feeds` alignment, all three accept **`Authorization`** with service role or **`CRON_SECRET`**, and the first two also accept **`x-supabase-cron: true`**.
 
-## Current problem
+## Remaining gaps
 
-If **ops** (`docs/ops/cron-setup.md`) and **code** disagree on which headers unlock a function, cron jobs can **401** or teams may rely on inconsistent secrets across workers.
-
-## Implications if we leave it as-is
-
-- Deploy or env changes break one worker but not others.
-- Harder onboarding: "which header does which function need?"
-
-## Proposed improvement
-
-1. **Audit** all three workers (and Phase 3 `check-volatility` if needed) for allowed auth paths.
-2. **Align** with a single convention documented in `docs/ops/cron-setup.md` (e.g. always send `Authorization: Bearer <CRON_SECRET>` or always service role + document `x-supabase-cron` where used).
-3. **Test** `functions serve` / deployed invoke with the same headers cron uses.
+- Documented cron SQL (`cron-setup.md`) should stay aligned with these auth paths after env changes.
+- Optional hardening: require `cronSecret.length > 0 && token === cronSecret` (as in `pregenerate-companions`) so an empty `CRON_SECRET` does not weaken checks when combined with empty `Authorization`.
 
 ## Related code pointers
 
