@@ -218,6 +218,38 @@ describe('qualityGate - ground_nudge', () => {
     expect(result.pass).toBe(false);
     expect(result.reason).toContain('grounding_lacks_specificity');
   });
+
+  it('allows grounding with et al. in citation when no year or Name Name in body', () => {
+    const body =
+      'Empirical work shows retail investors disproportionately sell winners and ride losers when volatility spikes. The effect persists across regimes and geographies in replicated studies.';
+    const result = qualityGate('ground_nudge', {
+      ...validNudge,
+      body,
+      citation: 'Smith et al., working paper, Department of Economics (forthcoming)',
+    });
+    expect(result.pass).toBe(true);
+  });
+
+  it('allows grounding with DOI in citation when body has no year', () => {
+    const body =
+      'Framing effects shift risk preferences when outcomes are presented as gains versus losses in laboratory and field settings; replication has tightened effect sizes.';
+    const result = qualityGate('ground_nudge', {
+      ...validNudge,
+      body,
+      citation: 'See 10.1038/s41562-019-0583-2',
+    });
+    expect(result.pass).toBe(true);
+  });
+
+  it('allows Unicode researcher names in body', () => {
+    const result = qualityGate('ground_nudge', {
+      ...validNudge,
+      title: 'Ángulos culturales del ahorro',
+      body: 'García López documentó en 2019 cómo el encuadre afecta la percepción del riesgo entre ahorradores.',
+      citation: 'García López (2019)',
+    });
+    expect(result.pass).toBe(true);
+  });
 });
 
 describe('qualityGate - historical_insight', () => {
@@ -246,6 +278,15 @@ describe('qualityGate - historical_insight', () => {
     });
     expect(result.pass).toBe(false);
     expect(result.reason).toContain('history_lacks_specificity');
+  });
+
+  it('passes history with numeric slash date (no English month name)', () => {
+    const result = qualityGate('historical_insight', {
+      ...validInsight,
+      btcInsight:
+        'On 15/03/2020 markets gapped down violently. Many portfolios saw double-digit paper losses in a single session. Recovery took months, not days.',
+    });
+    expect(result.pass).toBe(true);
   });
 });
 

@@ -45,6 +45,7 @@ Rule of thumb used here:
 | 2026-04 | [hosting-production-compression.md](hosting-production-compression.md) | Verify **`Content-Encoding`** on prod HTML — **`curl`** / DevTools; sample **`gzip`** on Lovable chain. |
 | 2026-04 | [rate-limit-analytics-allowlist.md](rate-limit-analytics-allowlist.md) | **`CHECK_RATE_LIMIT_ANALYTICS_EVENTS`** + generator / question-mode **`trackEvent`**; fixed missing **`signal`/`zoom`/`history`** inserts. |
 | 2026-04 | [rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md) | Structured **`limit_check_fail_open`** JSON logs (`scope` / `phase`) on rate, budget, regenerate fail-open. |
+| 2026-04 | [quality-gates-false-positives.md](quality-gates-false-positives.md) | **`quality_gate_reject`** logs + **`generation_attempts`** on post-AI gate fail; DOI / et al. / Unicode names; numeric dates for history. |
 
 ---
 
@@ -100,7 +101,7 @@ Use this when you are **choosing what to work on next**. Items are **not** stric
 
 | Priority hint | Ticket | Summary |
 |---------------|--------|---------|
-| Medium | [quality-gates-false-positives.md](quality-gates-false-positives.md) | `quality.ts` false positives; i18n / regex tuning. |
+| Lower | [quality-gates-false-positives.md](quality-gates-false-positives.md) | **Partial (2026-04).** Logs + specificity tune — **`language`**-aware gates still open — see ticket. |
 
 ### Testing & tooling (confidence before refactors)
 
@@ -147,7 +148,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | Product / UX | [form-field-name-id-a11y.md](form-field-name-id-a11y.md) | **Done (2026-04).** Form **`name`** / **`id`** / **`autocomplete`** — see ticket |
 | Product / UX | [lighthouse-a11y-home.md](lighthouse-a11y-home.md) | **Done (2026-04).** Home **`/`** axe fixes — see ticket |
 | Ops / security | [hosting-production-compression.md](hosting-production-compression.md) | **Done (2026-04).** Prod HTML compression verify — see ticket |
-| Quality | [quality-gates-false-positives.md](quality-gates-false-positives.md) | Quality gate tuning |
+| Quality | [quality-gates-false-positives.md](quality-gates-false-positives.md) | **Partial (2026-04).** `quality_gate_reject` + DB rows + regex tune — see ticket |
 | Testing | [e2e-browser-automation.md](e2e-browser-automation.md) | UI journeys (E2E) vs Bruno API review |
 | Frontend | [typed-navigation-state.md](typed-navigation-state.md) | **Done (2026-04).** Parsers in `router-location-state.ts` — see ticket |
 | Frontend | [route-level-code-splitting.md](route-level-code-splitting.md) | **Done (2026-04).** **`React.lazy`** in `App.tsx` — see ticket |
@@ -197,7 +198,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | [orchestrate-client-cron.md](orchestrate-client-cron.md) | Client vs cron `companion-orchestrate` overlap |
 | [pause-session-hydration.md](pause-session-hydration.md) | **Done (2026-04).** `/pause` hydration — see ticket. |
 | [pwa-mobile-web-app-meta.md](pwa-mobile-web-app-meta.md) | **Done (2026-04).** **`mobile-web-app-capable`** in `index.html` — see ticket. |
-| [quality-gates-false-positives.md](quality-gates-false-positives.md) | `quality.ts` rejects; i18n / regex tuning |
+| [quality-gates-false-positives.md](quality-gates-false-positives.md) | **Partial (2026-04).** Observability + specificity; locale-aware gates TBD — see ticket |
 | [rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md) | **Done (2026-04).** **`limit_check_fail_open`** JSON in **`ratelimit.ts`** — see ticket |
 | [rate-limit-analytics-allowlist.md](rate-limit-analytics-allowlist.md) | **Done (2026-04).** **`CHECK_RATE_LIMIT_ANALYTICS_EVENTS`** + **`trackEvent`** on live paths — see ticket |
 | [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md) | Split large pages (`Home`, `PauseSession`); optional `use-holzen` decomposition |
@@ -230,7 +231,7 @@ Legacy numeric IDs for chat / PR references; prefer **ticket file name** or [mas
 11. ~~Rate limit: `analytics_events` allowlist parity~~ — **Shipped 2026-04** — [rate-limit-analytics-allowlist.md](rate-limit-analytics-allowlist.md)
 12. ~~`cache.ts` fire-and-forget `.catch`~~ — **Shipped 2026-04** — [cache-async-error-handling.md](cache-async-error-handling.md)
 13. ~~Rate/daily budget fail-open observability~~ — **Shipped 2026-04** — [rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md)
-14. Quality gates: false positives — [quality-gates-false-positives.md](quality-gates-false-positives.md)
+14. Quality gates: false positives — **Partial 2026-04** — [quality-gates-false-positives.md](quality-gates-false-positives.md) *(locale-aware `language` in gate: still open)*
 15. Cache serve relaxation UX — [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md)
 16. ~~Grounding dual-write consistency~~ — **Shipped 2026-04** — [writeCompanionData-grounding-consistency.md](writeCompanionData-grounding-consistency.md)
 17. E2E / browser automation — [e2e-browser-automation.md](e2e-browser-automation.md)
