@@ -1,6 +1,5 @@
-import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { X } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
@@ -11,75 +10,26 @@ import { hapticFeedback } from '@/lib/haptics';
 import { type MoodValue } from '@/components/MoodCheck';
 import { type CompanionData, type CompanionPrefs } from '@/components/CompanionSection';
 
-import { PauseProgress, type PauseStep, STEPS } from '@/components/pause/PauseProgress';
+import { type PauseStep, STEPS } from '@/components/pause/PauseProgress';
+import { PauseSessionGate } from '@/components/pause/PauseSessionGate';
+import { PauseSessionScaffold } from '@/components/pause/PauseSessionScaffold';
 import { PauseFeel } from '@/components/pause/PauseFeel';
 import { PauseBreathing } from '@/components/pause/PauseBreathing';
 import { PauseReflect } from '@/components/pause/PauseReflect';
 import { PauseShift } from '@/components/pause/PauseShift';
 import { PauseDecide } from '@/components/pause/PauseDecide';
 import { PauseDone } from '@/components/pause/PauseDone';
-import { PauseScienceSheet } from '@/components/pause/PauseScienceSheet';
 import { holzenLog } from '@/lib/holzen-console';
 import { parsePauseSessionLocationState } from '@/lib/router-location-state';
-
-const SESSION_KEY = 'holzen_pause_session';
-
-interface PersistedSession {
-  message: string;
-  context: string | null;
-  reflectionId: string | null;
-  companions: CompanionData;
-  companionPrefs: CompanionPrefs;
-  severity: 'mild' | 'moderate' | 'high';
-  moodDone: boolean;
-  moodAfterDone: boolean;
-  selectedMood?: MoodValue | null;
-  selectedMoodAfter?: MoodValue | null;
-  phase: 'session' | 'done';
-  decision: string | null;
-  step: PauseStep;
-}
-
-const DEFAULT_COMPANIONS: CompanionData = { haiku: null, groundingTitle: null, groundingBody: null };
-const DEFAULT_PREFS: CompanionPrefs = {
-  breathing: true, haiku: true, grounding: true, signal: true, zoomOut: true, history: true,
-};
-
-interface FetchedReflectionRow {
-  id: string;
-  message: string;
-  context: string | null;
-  haiku: string | null;
-  grounding_title: string | null;
-  grounding_body: string | null;
-}
-
-function saveSession(data: PersistedSession) {
-  try { localStorage.setItem(SESSION_KEY, JSON.stringify(data)); } catch {}
-}
-
-function loadSession(): PersistedSession | null {
-  try {
-    const raw = localStorage.getItem(SESSION_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch { return null; }
-}
-
-function clearSession() {
-  try { localStorage.removeItem(SESSION_KEY); } catch {}
-}
-
-function viewRowToCompanionData(row: {
-  haiku?: string | null;
-  grounding_title?: string | null;
-  grounding_body?: string | null;
-}): CompanionData {
-  return {
-    haiku: row.haiku ?? null,
-    groundingTitle: row.grounding_title ?? null,
-    groundingBody: row.grounding_body ?? null,
-  };
-}
+import {
+  DEFAULT_COMPANIONS,
+  DEFAULT_PREFS,
+  type FetchedReflectionRow,
+  saveSession,
+  loadSession,
+  clearSession,
+  viewRowToCompanionData,
+} from '@/lib/pause-session-storage';
 
 type HydrationReady = {
   status: 'ready';
@@ -457,54 +407,6 @@ export default function PauseSession() {
     clearSession();
   }, [dismissMessage, reflectionId, selectedMood, selectedMoodAfter, context]);
 
-  // No message fallback
-  if (!message && phase !== 'done') {
-    if (waitingForFetch) {
-      return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
-          <div className="text-center space-y-4">
-            <p className="text-sm font-mono text-muted-foreground">{t('common.loading', 'Loading...')}</p>
-          </div>
-        </div>
-      );
-    }
-
-    if (hydration.status === 'fetch' && fetchFailed) {
-      return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
-          <div className="text-center space-y-4 max-w-sm px-4">
-            <p className="text-sm font-mono text-muted-foreground">
-              {t('pause.couldNotLoadPause', 'We could not load this pause. It may have been removed or you may need to sign in again.')}
-            </p>
-            <button type="button" onClick={handleReturn} className="text-xs font-mono text-primary underline">
-              {t('pause.return')}
-            </button>
-          </div>
-        </div>
-      );
-    }
-
-    // Avoid "no reflection" while profile/hook may still supply the latest pause (direct /pause visit).
-    if (!profileLoaded && hydration.status === 'empty') {
-      return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
-          <div className="text-center space-y-4">
-            <p className="text-sm font-mono text-muted-foreground">{t('common.loading', 'Loading...')}</p>
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
-        <div className="text-center space-y-4">
-          <p className="text-sm font-mono text-muted-foreground">{t('pause.noReflection')}</p>
-          <button type="button" onClick={handleReturn} className="text-xs font-mono text-primary underline">{t('pause.return')}</button>
-        </div>
-      </div>
-    );
-  }
-
   const slideX = prefersReducedMotion ? 0 : 80;
   const stepTransition = {
     initial: { opacity: 0, x: swipeDirection === 'forward' ? slideX : -slideX },
@@ -522,139 +424,91 @@ export default function PauseSession() {
   };
 
   return (
-    <>
-      {/* Dark curtain entrance */}
-      <AnimatePresence>
-        {!curtainLifted && (
-          <motion.div
-            className="fixed inset-0 z-[100] bg-background"
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1.8, ease: [0.22, 1, 0.36, 1] }}
-          />
-        )}
-      </AnimatePresence>
-
-      <motion.div
-        className="fixed inset-0 z-50 overflow-y-auto"
-        initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1.2, delay: 0.3 }}
-        style={{
-          background: 'linear-gradient(160deg, hsl(var(--background)) 0%, hsl(var(--muted)) 50%, hsl(var(--background)) 100%)',
-        }}
+    <PauseSessionGate
+      hasMessage={!!message}
+      phase={phase}
+      waitingForFetch={waitingForFetch}
+      fetchFailed={fetchFailed}
+      hydrationStatus={hydration.status}
+      profileLoaded={profileLoaded}
+      onReturn={handleReturn}
+    >
+      <PauseSessionScaffold
+        curtainLifted={curtainLifted}
+        prefersReducedMotion={!!prefersReducedMotion}
+        onClose={handleClose}
+        phase={phase}
+        step={step}
+        goToStep={goToStep}
       >
-        {/* Ambient orbs */}
-        <motion.div
-          className="fixed top-1/4 left-1/3 w-[300px] h-[300px] rounded-full pointer-events-none"
-          style={{
-            background: 'radial-gradient(circle, hsl(var(--primary) / 0.04) 0%, transparent 70%)',
-            filter: 'blur(80px)',
-          }}
-          animate={prefersReducedMotion ? {} : { x: [0, 30, -20, 0], y: [0, -20, 15, 0] }}
-          transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        <motion.div
-          className="fixed bottom-1/3 right-1/4 w-[250px] h-[250px] rounded-full pointer-events-none"
-          style={{
-            background: 'radial-gradient(circle, hsl(var(--accent) / 0.03) 0%, transparent 70%)',
-            filter: 'blur(60px)',
-          }}
-          animate={prefersReducedMotion ? {} : { x: [0, -25, 15, 0], y: [0, 20, -10, 0] }}
-          transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
-        />
-
-        {/* Close button */}
-        <button
-          onClick={handleClose}
-          className="fixed top-5 right-5 p-3 rounded-full bg-muted/40 backdrop-blur-sm text-muted-foreground/40 hover:text-foreground/60 hover:bg-muted/60 transition-all duration-300 z-[60]"
-          aria-label="Close"
-        >
-          <X className="h-4 w-4" />
-        </button>
-
-        {/* Progress indicator */}
         {phase === 'session' && (
-          <motion.div
-            className="fixed top-5 left-5 z-[55] flex flex-col items-start gap-2"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 2, duration: 1 }}
-          >
-            <PauseProgress currentStep={step} onStepClick={goToStep} />
-            <PauseScienceSheet />
-          </motion.div>
+          <AnimatePresence mode="wait" initial={false}>
+            {step === 'breathe' && (
+              <motion.div key="breathe" {...stepTransition} {...dragProps}>
+                <PauseBreathing mantra={mantra} onContinue={() => goToStep('feel')} />
+              </motion.div>
+            )}
+
+            {step === 'feel' && (
+              <motion.div key="feel" {...stepTransition} {...dragProps}>
+                <PauseFeel
+                  onMoodSelect={handleMoodSelect}
+                  onMoodSkip={handleMoodSkip}
+                  onMoodReset={handleMoodReset}
+                  moodDone={moodDone}
+                  selectedMood={selectedMood}
+                  onContinue={() => goToStep('reflect')}
+                  onBack={goBack}
+                />
+              </motion.div>
+            )}
+
+            {step === 'reflect' && (
+              <motion.div key="reflect" {...stepTransition} {...dragProps}>
+                <PauseReflect
+                  companions={companions}
+                  companionPrefs={companionPrefs}
+                  severity={severity}
+                  reflectionId={reflectionId}
+                  context={context}
+                  reflectionMessage={message}
+                  isFavorite={isFavorite}
+                  onToggleFavorite={toggleFavorite}
+                  subscribed={subscribed}
+                  onContinue={() => goToStep('shift')}
+                  onBack={goBack}
+                  mood={selectedMood}
+                />
+              </motion.div>
+            )}
+
+            {step === 'shift' && (
+              <motion.div key="shift" {...stepTransition} {...dragProps}>
+                <PauseShift
+                  onMoodAfterSelect={handleMoodAfterSelect}
+                  onMoodAfterSkip={handleMoodAfterSkip}
+                  onMoodAfterReset={handleMoodAfterReset}
+                  moodAfterDone={moodAfterDone}
+                  selectedMoodAfter={selectedMoodAfter}
+                  onContinue={() => goToStep('decide')}
+                  onBack={goBack}
+                  groundingActivities={groundingActivities}
+                />
+              </motion.div>
+            )}
+
+            {step === 'decide' && (
+              <motion.div key="decide" {...stepTransition} {...dragProps}>
+                <PauseDecide onDecide={handleDecide} onBack={goBack} />
+              </motion.div>
+            )}
+          </AnimatePresence>
         )}
 
-        <div className="relative z-10 max-w-md mx-auto px-6 py-20 overflow-hidden">
-          {phase === 'session' && (
-            <AnimatePresence mode="wait" initial={false}>
-              {step === 'breathe' && (
-                <motion.div key="breathe" {...stepTransition} {...dragProps}>
-                  <PauseBreathing mantra={mantra} onContinue={() => goToStep('feel')} />
-                </motion.div>
-              )}
-
-              {step === 'feel' && (
-                <motion.div key="feel" {...stepTransition} {...dragProps}>
-                  <PauseFeel
-                    onMoodSelect={handleMoodSelect}
-                    onMoodSkip={handleMoodSkip}
-                    onMoodReset={handleMoodReset}
-                    moodDone={moodDone}
-                    selectedMood={selectedMood}
-                    onContinue={() => goToStep('reflect')}
-                    onBack={goBack}
-                  />
-                </motion.div>
-              )}
-
-              {step === 'reflect' && (
-                <motion.div key="reflect" {...stepTransition} {...dragProps}>
-                  <PauseReflect
-                    companions={companions}
-                    companionPrefs={companionPrefs}
-                    severity={severity}
-                    reflectionId={reflectionId}
-                    context={context}
-                    reflectionMessage={message}
-                    isFavorite={isFavorite}
-                    onToggleFavorite={toggleFavorite}
-                    subscribed={subscribed}
-                    onContinue={() => goToStep('shift')}
-                    onBack={goBack}
-                    mood={selectedMood}
-                  />
-                </motion.div>
-              )}
-
-              {step === 'shift' && (
-                <motion.div key="shift" {...stepTransition} {...dragProps}>
-                  <PauseShift
-                    onMoodAfterSelect={handleMoodAfterSelect}
-                    onMoodAfterSkip={handleMoodAfterSkip}
-                    onMoodAfterReset={handleMoodAfterReset}
-                    moodAfterDone={moodAfterDone}
-                    selectedMoodAfter={selectedMoodAfter}
-                    onContinue={() => goToStep('decide')}
-                    onBack={goBack}
-                    groundingActivities={groundingActivities}
-                  />
-                </motion.div>
-              )}
-
-              {step === 'decide' && (
-                <motion.div key="decide" {...stepTransition} {...dragProps}>
-                  <PauseDecide onDecide={handleDecide} onBack={goBack} />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          )}
-
-          {phase === 'done' && (
-            <PauseDone decision={decision} onReturn={handleReturn} pauseData={pauseImpactData} />
-          )}
-        </div>
-      </motion.div>
-    </>
+        {phase === 'done' && (
+          <PauseDone decision={decision} onReturn={handleReturn} pauseData={pauseImpactData} />
+        )}
+      </PauseSessionScaffold>
+    </PauseSessionGate>
   );
 }
