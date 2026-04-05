@@ -22,6 +22,7 @@ import {
   COMPANION_STEP_TO_READ_TYPE,
 } from '@/lib/companion-completion-maps';
 import { hostnameFromUrl } from '@/lib/companion-url';
+import { saveCompanionLibraryBookmarkOnce } from '@/lib/companion-library-autosave';
 
 export type {
   RegenerateCompanionSlot,
@@ -107,43 +108,13 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
   }, [reflectionId, favorites]);
 
   // ── Auto-save to library ──
-  const savingRef = useRef<Set<string>>(new Set());
-
-  const autoSaveToLibrary = useCallback(async (params: { title: string; body: string; sourceType: string; sourceUrl?: string }) => {
-    if (!reflectionId) return;
-    const dedupKey = `${reflectionId}:${params.sourceType}`;
-    if (savingRef.current.has(dedupKey)) return;
-    savingRef.current.add(dedupKey);
-
-    try {
-      const { data: authData } = await supabase.auth.getUser();
-      const userId = authData?.user?.id;
-      if (!userId) return;
-      const { data: existing } = await supabase
-        .from('library_items')
-        .select('id')
-        .eq('user_id', userId)
-        .eq('reflection_id', reflectionId)
-        .eq('source_type', params.sourceType)
-        .limit(1);
-      if (existing && existing.length > 0) return;
-      await supabase.from('library_items').upsert(
-        {
-          user_id: userId,
-          type: 'bookmark',
-          title: params.title,
-          body: params.body,
-          source_type: params.sourceType,
-          source_url: params.sourceUrl || null,
-          reflection_id: reflectionId,
-          tags: [],
-        },
-        { onConflict: 'user_id,reflection_id,source_type', ignoreDuplicates: true },
-      );
-    } finally {
-      // Keep the key to prevent future attempts within same component lifecycle
-    }
-  }, [reflectionId]);
+  const libraryAutosaveDedupRef = useRef<Set<string>>(new Set());
+  const autoSaveToLibrary = useCallback(
+    async (params: { title: string; body: string; sourceType: string; sourceUrl?: string }) => {
+      await saveCompanionLibraryBookmarkOnce(reflectionId, params, libraryAutosaveDedupRef.current);
+    },
+    [reflectionId],
+  );
 
   // ── Completion state ──
   const [completion, setCompletion] = useState<CompletionState>({
