@@ -1,12 +1,18 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import type { User } from '@supabase/supabase-js';
+import type { PostgrestError, User } from '@supabase/supabase-js';
 import { holzenLog } from '@/lib/holzen-console';
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   signOut: () => Promise<void>;
+}
+
+interface UntypedInsertClient {
+  from: (table: string) => {
+    insert: (values: Record<string, unknown>) => Promise<{ error: PostgrestError | null }>;
+  };
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -35,10 +41,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const userId = session.user.id;
         if (refCode) {
           void (async () => {
-            const { error: qErr } = await supabase.from('referral_pending_jobs').insert({
+            const { error: qErr } = await (supabase as unknown as UntypedInsertClient)
+              .from('referral_pending_jobs')
+              .insert({
               referred_user_id: userId,
               referral_code: refCode,
-            });
+              });
             if (qErr && qErr.code !== '23505') {
               holzenLog.auth('referral_pending_jobs insert', { code: qErr.code, message: qErr.message });
             }
