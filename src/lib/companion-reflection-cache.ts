@@ -61,11 +61,11 @@ export function parseReflectionCompanionRows(rows: ReflectionCompanionRow[]): Pa
         url: (d.url as string) ?? '',
       };
     } else if (c.companion_type === 'historical_insight' && d) {
-      result.history = d as CachedHistoricalInsightShape;
+      result.history = d as unknown as CachedHistoricalInsightShape;
     } else if ((c.companion_type === 'zoom_out' || c.companion_type === 'zoom_out_deep_time') && d) {
       if (!result.zoomOut) result.zoomOut = d as CachedZoomOutShape;
     } else if (c.companion_type === 'intervention' && d) {
-      result.intervention = d as InterventionState;
+      result.intervention = d as unknown as InterventionState;
     }
   }
   return result;
