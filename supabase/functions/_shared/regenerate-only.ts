@@ -92,6 +92,7 @@ export async function handleRegenerateOnly(params: {
     data: any;
     source: "live" | "cache" | "curated" | "empty";
     cacheId: string | null;
+    cacheRelaxation?: string | null;
     latencyMs: number;
     promptVersion?: string;
     error?: string;
@@ -125,6 +126,7 @@ export async function handleRegenerateOnly(params: {
         data: g.data,
         source: g.source,
         cacheId: g.cacheId,
+        cacheRelaxation: g.cacheRelaxation ?? null,
         latencyMs: Date.now() - t0,
         promptVersion: GROUNDING_VERSION,
         error: g.error,
@@ -166,6 +168,7 @@ export async function handleRegenerateOnly(params: {
         data: s.data,
         source: s.source,
         cacheId: s.cacheId,
+        cacheRelaxation: s.cacheRelaxation ?? null,
         latencyMs: Date.now() - t0,
         promptVersion: SIGNAL_VERSION,
         error: s.error,
@@ -186,6 +189,7 @@ export async function handleRegenerateOnly(params: {
         data: h.data,
         source: h.source,
         cacheId: h.cacheId,
+        cacheRelaxation: h.cacheRelaxation ?? null,
         latencyMs: Date.now() - t0,
         promptVersion: HISTORY_VERSION,
         error: h.error,
@@ -207,6 +211,7 @@ export async function handleRegenerateOnly(params: {
         data: z.data,
         source: z.source,
         cacheId: z.cacheId,
+        cacheRelaxation: z.cacheRelaxation ?? null,
         latencyMs: Date.now() - t0,
         promptVersion: ZOOM_OUT_VERSION,
         error: z.error,
@@ -218,6 +223,7 @@ export async function handleRegenerateOnly(params: {
       data: null,
       source: "empty",
       cacheId: null,
+      cacheRelaxation: null,
       latencyMs: Date.now() - t0,
       error: e instanceof Error ? e.message : String(e),
     };
@@ -242,6 +248,7 @@ export async function handleRegenerateOnly(params: {
     companion_type: companionType,
     serve_source: result.source,
     cache_entry_id: result.cacheId || null,
+    cache_relaxation: result.cacheRelaxation ?? null,
     content_title: result.data?.title || result.data?.deepTime?.title || null,
     content_fingerprint: result.promptVersion ?? null,
     latency_ms: result.latencyMs,

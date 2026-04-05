@@ -21,7 +21,7 @@ import {
   loadFallbackPool,
   pickRandom,
 } from "../fallbacks.ts";
-import { parseMarketDirection, serveFromCache } from "../cache.ts";
+import { type CacheServeRelaxation, parseMarketDirection, serveFromCache } from "../cache.ts";
 import { createAttemptLogger, trackEvent } from "../observe.ts";
 import { enqueueCatalogSourceSuggestion } from "../source-suggestions.ts";
 import { callPerplexityChat, mergePerplexityUsage } from "../perplexity-client.ts";
@@ -125,6 +125,8 @@ export interface SignalResult {
   data: { title: string; body: string; source: string; url: string } | null;
   source: "live" | "cache" | "curated" | "empty";
   cacheId: string | null;
+  /** Set when `serveFromCache` served this row (not library / curated). */
+  cacheRelaxation?: CacheServeRelaxation;
   /** Set when source is `empty` (e.g. DISABLE_COMPANION_FALLBACKS + live failure) */
   error?: string;
 }
@@ -176,7 +178,14 @@ async function tryCache(
   excludeIds?: string[],
 ): Promise<SignalResult | null> {
   const cached = await serveFromCache(svcClient, "signal", "en", { userId, marketDirection, excludeIds });
-  if (cached) return { data: cached.data, source: "cache", cacheId: cached.cacheId };
+  if (cached) {
+    return {
+      data: cached.data,
+      source: "cache",
+      cacheId: cached.cacheId,
+      cacheRelaxation: cached.relaxation,
+    };
+  }
   return null;
 }
 

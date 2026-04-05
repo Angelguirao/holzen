@@ -14,6 +14,28 @@ export type CompanionSlotCacheIds = {
   history: string | null;
 };
 
+/** Shown in UI only for relaxed `serveFromCache` tiers. */
+export type CompanionSlotRelaxationUi = 'market' | 'repeat_or_lower_quality' | null;
+
+export type CompanionSlotRelaxations = {
+  nudge: CompanionSlotRelaxationUi;
+  signal: CompanionSlotRelaxationUi;
+  zoomOut: CompanionSlotRelaxationUi;
+  history: CompanionSlotRelaxationUi;
+};
+
+export const EMPTY_COMPANION_SLOT_RELAXATIONS: CompanionSlotRelaxations = {
+  nudge: null,
+  signal: null,
+  zoomOut: null,
+  history: null,
+};
+
+function toSlotRelaxationUi(v: string | null | undefined): CompanionSlotRelaxationUi {
+  if (v === 'market' || v === 'repeat_or_lower_quality') return v;
+  return null;
+}
+
 const SLOT_CACHE_KEY: Record<RegenerateCompanionSlot, keyof CompanionSlotCacheIds> = {
   signal: 'signal',
   grounding: 'nudge',
@@ -129,10 +151,15 @@ export function hydrateOrchestrateSlotIfNew(
   r: CompanionOrchestrateSlotResult | null | undefined,
   fetchedSlots: Set<string>,
   c: CompanionSlotCommitters,
+  setCacheRelaxations?: (fn: (prev: CompanionSlotRelaxations) => CompanionSlotRelaxations) => void,
 ): void {
   if (!isFilledOrchestrateSlot(r) || fetchedSlots.has(slot)) return;
   fetchedSlots.add(slot);
   commitOrchestrateSlotData(slot, r.data, c);
+  if (setCacheRelaxations) {
+    const field = SLOT_CACHE_KEY[slot];
+    setCacheRelaxations((prev) => ({ ...prev, [field]: toSlotRelaxationUi(r.cacheRelaxation) }));
+  }
 }
 
 /** After lazy fetch or regenerate — state, library, optional cache row id, recency. */
@@ -141,11 +168,16 @@ export function applyOrchestrateSlotLazyOrRegenerate(
   r: CompanionOrchestrateSlotResult & { data: NonNullable<CompanionOrchestrateSlotResult['data']> },
   setCacheIds: (fn: (prev: CompanionSlotCacheIds) => CompanionSlotCacheIds) => void,
   c: CompanionSlotCommitters,
+  setCacheRelaxations?: (fn: (prev: CompanionSlotRelaxations) => CompanionSlotRelaxations) => void,
 ): void {
   commitOrchestrateSlotData(slot, r.data, c);
   if (r.cacheId) {
     const field = SLOT_CACHE_KEY[slot];
     setCacheIds((prev) => ({ ...prev, [field]: r.cacheId }));
+  }
+  if (setCacheRelaxations) {
+    const field = SLOT_CACHE_KEY[slot];
+    setCacheRelaxations((prev) => ({ ...prev, [field]: toSlotRelaxationUi(r.cacheRelaxation) }));
   }
   pushRecencyForOrchestrateSlot(slot, r.data);
 }

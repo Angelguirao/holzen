@@ -1,276 +1,80 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import Stripe from "https://esm.sh/stripe@18.5.0";
+import {
+  applyReferralRecord,
+  markReferralJobCompleted,
+  markReferralJobFailedTerminal,
+} from "../_shared/referral-record-core.ts";
 
 const corsHeaders = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
-
-const MILESTONES = [
-  { count: 1, reward: '1_week_free', trialDays: 7 },
-  { count: 3, reward: '1_month_free', trialDays: 30 },
-  { count: 5, reward: 'lifetime', trialDays: 0 },
-];
-
-const REWARD_LABELS: Record<string, string> = {
-  '1_week_free': '1 week free',
-  '1_month_free': '1 month free',
-  'lifetime': 'lifetime access',
-};
-
-async function sendRewardEmail(email: string, rewardType: string, referralCount: number) {
-  const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-  if (!RESEND_API_KEY) {
-    logStep('RESEND_API_KEY not set, skipping reward email');
-    return;
-  }
-
-  const rewardLabel = REWARD_LABELS[rewardType] || rewardType;
-
-  try {
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${RESEND_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from: "Holzen <notify@holzen.app>",
-        to: [email],
-        subject: `Holzen — You earned ${rewardLabel}`,
-        html: `
-          <div style="font-family: monospace; max-width: 400px; margin: 0 auto; padding: 32px 16px;">
-            <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: #888;">Holzen</p>
-            <h2 style="font-size: 16px; margin: 24px 0 12px;">You've earned a reward</h2>
-            <p style="font-size: 14px; color: #444; line-height: 1.6;">
-              ${referralCount} ${referralCount === 1 ? 'person has' : 'people have'} joined Holzen through your referral link.
-            </p>
-            <p style="font-size: 14px; color: #444; line-height: 1.6;">
-              <strong>Your reward:</strong> ${rewardLabel}${rewardType === 'lifetime' ? ' — no more subscription needed.' : ' has been credited to your account.'}
-            </p>
-            <p style="font-size: 12px; color: #999; margin-top: 32px;">
-              Thank you for sharing a moment of pause.
-            </p>
-          </div>
-        `,
-      }),
-    });
-
-    if (!res.ok) {
-      const errText = await res.text();
-      logStep('Email send error', { status: res.status, error: errText });
-    } else {
-      logStep('Reward email sent', { email, rewardType });
-    }
-  } catch (e) {
-    logStep('Email send exception', { error: e instanceof Error ? e.message : String(e) });
-  }
-}
-
-const logStep = (step: string, details?: any) => {
-  const d = details ? ` - ${JSON.stringify(details)}` : '';
-  console.log(`[RECORD-REFERRAL] ${step}${d}`);
-};
-
-async function grantReward(
-  supabase: any,
-  stripe: any,
-  referrerId: string,
-  referrerEmail: string,
-  milestone: typeof MILESTONES[number],
-  referralCount: number
-) {
-  // Check if already granted
-  const { data: existing } = await supabase
-    .from('referral_rewards')
-    .select('id')
-    .eq('user_id', referrerId)
-    .eq('milestone', milestone.count)
-    .single();
-
-  if (existing) {
-    logStep('Reward already granted', { milestone: milestone.count });
-    return;
-  }
-
-  if (milestone.reward === 'lifetime') {
-    // Grant lifetime access — mark in profiles, cancel Stripe subscription
-    await supabase
-      .from('profiles')
-      .update({ lifetime_access: true })
-      .eq('user_id', referrerId);
-
-    // Try to cancel their Stripe subscription (they no longer need it)
-    try {
-      const customers = await stripe.customers.list({ email: referrerEmail, limit: 1 });
-      if (customers.data.length > 0) {
-        const subs = await stripe.subscriptions.list({
-          customer: customers.data[0].id,
-          status: 'active',
-          limit: 1,
-        });
-        if (subs.data.length > 0) {
-          await stripe.subscriptions.update(subs.data[0].id, {
-            cancel_at_period_end: true,
-            metadata: { cancelled_reason: 'lifetime_referral_reward' },
-          });
-          logStep('Subscription set to cancel at period end for lifetime reward');
-        }
-      }
-    } catch (e) {
-      logStep('Error cancelling subscription for lifetime', { error: e instanceof Error ? e.message : String(e) });
-    }
-  } else {
-    // Extend subscription by adding trial days (credit via Stripe customer balance)
-    try {
-      const customers = await stripe.customers.list({ email: referrerEmail, limit: 1 });
-      if (customers.data.length > 0) {
-        const customerId = customers.data[0].id;
-        // Credit the customer's balance (negative = credit in cents)
-        // $3/month ≈ $0.10/day, 7 days ≈ $0.70, 30 days ≈ $3.00
-        const creditCents = milestone.reward === '1_week_free' ? -70 : -300;
-        await stripe.customers.createBalanceTransaction(customerId, {
-          amount: creditCents,
-          currency: 'usd',
-          description: `Referral reward: ${milestone.reward} (${milestone.count} referrals)`,
-        });
-        logStep('Applied balance credit', { creditCents, milestone: milestone.count });
-      }
-    } catch (e) {
-      logStep('Error applying credit', { error: e instanceof Error ? e.message : String(e) });
-    }
-  }
-
-  // Record that this reward was granted
-  await supabase.from('referral_rewards').insert({
-    user_id: referrerId,
-    milestone: milestone.count,
-    reward_type: milestone.reward,
-  });
-
-  logStep('Reward granted', { milestone: milestone.count, reward: milestone.reward });
-
-  // Send email notification
-  await sendRewardEmail(referrerEmail, milestone.reward, referralCount);
-}
 
 serve(async (req) => {
-  if (req.method === 'OPTIONS') {
+  if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const authHeader = req.headers.get('Authorization');
+    const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
-      return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
-    // Get the user from the token
-    const anonClient = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY')!);
+    const anonClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!);
     const { data: { user }, error: userError } = await anonClient.auth.getUser(
-      authHeader.replace('Bearer ', '')
+      authHeader.replace("Bearer ", ""),
     );
 
     if (userError || !user) {
-      return new Response(JSON.stringify({ error: 'Invalid token' }), {
+      return new Response(JSON.stringify({ error: "Invalid token" }), {
         status: 401,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
     const { referral_code } = await req.json();
     if (!referral_code) {
-      return new Response(JSON.stringify({ error: 'No referral code' }), {
+      return new Response(JSON.stringify({ error: "No referral code" }), {
         status: 400,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // Find the referrer
-    const { data: referrer } = await supabase
-      .from('profiles')
-      .select('user_id')
-      .eq('referral_code', referral_code)
-      .single();
-
-    if (!referrer || referrer.user_id === user.id) {
-      return new Response(JSON.stringify({ ok: false, reason: 'Invalid referral' }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    // Check if already referred
-    const { data: existing } = await supabase
-      .from('referrals')
-      .select('id')
-      .eq('referred_user_id', user.id)
-      .single();
-
-    if (existing) {
-      return new Response(JSON.stringify({ ok: false, reason: 'Already referred' }), {
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
-    }
-
-    // Record the referral
-    await supabase.from('referrals').insert({
-      referrer_id: referrer.user_id,
-      referred_user_id: user.id,
+    const result = await applyReferralRecord(supabase, {
+      referredUserId: user.id,
+      referralCode: String(referral_code),
     });
 
-    // Update the referred user's profile
-    await supabase
-      .from('profiles')
-      .update({ referred_by: referral_code })
-      .eq('user_id', user.id);
-
-    logStep('Referral recorded, checking milestones');
-
-    // Count total referrals for the referrer
-    const { count: referralCount } = await supabase
-      .from('referrals')
-      .select('*', { count: 'exact', head: true })
-      .eq('referrer_id', referrer.user_id);
-
-    logStep('Referrer total referrals', { count: referralCount });
-
-    // Get referrer's email for Stripe operations
-    const { data: referrerAuth } = await supabase.auth.admin.getUserById(referrer.user_id);
-    const referrerEmail = referrerAuth?.user?.email;
-
-    if (referrerEmail && referralCount) {
-      const stripeKey = Deno.env.get('STRIPE_SECRET_KEY');
-      if (stripeKey) {
-        const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
-
-        // Check each milestone
-        for (const milestone of MILESTONES) {
-          if (referralCount >= milestone.count) {
-            await grantReward(supabase, stripe, referrer.user_id, referrerEmail, milestone, referralCount);
-          }
-        }
-      } else {
-        logStep('STRIPE_SECRET_KEY not set, skipping rewards');
-      }
+    if (result.ok) {
+      await markReferralJobCompleted(supabase, user.id);
+      return new Response(JSON.stringify({ ok: true }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
-    return new Response(JSON.stringify({ ok: true }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    if (!result.retryable) {
+      await markReferralJobFailedTerminal(supabase, user.id, result.reason);
+    }
+
+    return new Response(JSON.stringify({ ok: false, reason: result.reason }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
     const errorMessage = e instanceof Error ? e.message : String(e);
-    logStep('ERROR', { message: errorMessage });
+    console.log(`[RECORD-REFERRAL] ERROR - ${JSON.stringify({ message: errorMessage })}`);
     return new Response(JSON.stringify({ error: errorMessage }), {
       status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });

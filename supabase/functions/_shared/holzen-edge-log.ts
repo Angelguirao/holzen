@@ -27,7 +27,8 @@ export type HolzenEdgeTag =
   | "monthly-report"
   | "personalized-nudge"
   | "deliver-letters"
-  | "reflection-insights";
+  | "reflection-insights"
+  | "referral-pending";
 
 function tracesEnabled(): boolean {
   return Deno.env.get("HOLZEN_EDGE_LOG") !== "0";

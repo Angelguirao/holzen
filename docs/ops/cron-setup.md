@@ -201,6 +201,30 @@ SELECT cron.schedule(
 );
 ```
 
+## Referral pending queue (process-referral-pending)
+
+Processes rows in `referral_pending_jobs` when the client’s first `record-referral` invoke fails (network / transient errors). Uses `verifyServiceAuth` — same Bearer header as other service crons.
+
+**Schedule this after deploying the migration and function** (otherwise the table/RPC is missing).
+
+```sql
+-- Run every 5 minutes
+SELECT cron.schedule(
+  'process-referral-pending',
+  '*/5 * * * *',
+  $$
+  SELECT net.http_post(
+    url := 'https://<YOUR_SUPABASE_PROJECT_ID>.supabase.co/functions/v1/process-referral-pending',
+    headers := jsonb_build_object(
+      'Content-Type', 'application/json',
+      'Authorization', 'Bearer ' || (SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'holzen_cron_service_role' LIMIT 1)
+    ),
+    body := '{}'::jsonb
+  );
+  $$
+);
+```
+
 ## Night Reflection
 
 Sends personalized end-of-day reflections to users.

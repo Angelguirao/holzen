@@ -6,6 +6,24 @@
 /** `companion_cache.companion_type` for zoom-out deep-time entries */
 export const COMPANION_ZOOM_OUT_DEEP_TIME = "zoom_out_deep_time";
 
+/** Which `serveFromCache` pass produced the row (telemetry + optional UI transparency). */
+export type CacheServeRelaxation = "none" | "market" | "repeat_or_lower_quality";
+
+function logCacheServeTelemetry(companionType: string, relaxation: CacheServeRelaxation): void {
+  try {
+    console.log(
+      JSON.stringify({
+        holzen_event: "cache_serve",
+        companion_type: companionType,
+        cache_relaxation: relaxation,
+        ts: new Date().toISOString(),
+      }),
+    );
+  } catch {
+    /* ignore */
+  }
+}
+
 /** Options for context-aware and per-user cache serving */
 export interface ServeFromCacheOptions {
   /** User ID — if provided, excludes entries this user has already seen */
@@ -20,18 +38,18 @@ export interface ServeFromCacheOptions {
  * Serve from cache with quality-ranked selection, per-user dedup, and market context.
  *
  * Selection strategy:
- * 1. If userId provided: get list of cache entries this user has seen, exclude them
- * 2. If marketDirection provided: prefer entries matching that direction
- * 3. First pass: quality_score ≥ 2, unexpired, least recently served
- * 4. Second pass: any quality, unexpired (ignoring market direction)
- * 5. Returns null if all passes fail
+ * 1. Per-user seen rows excluded when userId is set (via `user_companion_serves`).
+ * 2. First pass: quality_score ≥ 2, optional market_regime filter → `relaxation: "none"`.
+ * 3. Second pass (only if marketDirection set): quality ≥ 2, any regime → `"market"`.
+ * 4. Third pass: any quality, seen rows allowed again → `"repeat_or_lower_quality"`.
+ * 5. Returns null if all passes fail.
  */
 export async function serveFromCache(
   svcClient: any,
   companionType: string,
   language = "en",
   excludeIdsOrOptions?: string[] | ServeFromCacheOptions,
-): Promise<{ data: any; cacheId: string } | null> {
+): Promise<{ data: any; cacheId: string; relaxation: CacheServeRelaxation } | null> {
   // Parse options (backward compatible with old string[] signature)
   let options: ServeFromCacheOptions;
   if (Array.isArray(excludeIdsOrOptions)) {
@@ -77,8 +95,9 @@ export async function serveFromCache(
     now,
   });
   if (picked) {
+    logCacheServeTelemetry(companionType, "none");
     recordUserServe(svcClient, userId, picked.cacheId, companionType);
-    return picked;
+    return { ...picked, relaxation: "none" };
   }
 
   // Step 3: Second pass — high quality, any direction (in case market filter was too restrictive)
@@ -92,8 +111,9 @@ export async function serveFromCache(
       now,
     });
     if (picked2) {
+      logCacheServeTelemetry(companionType, "market");
       recordUserServe(svcClient, userId, picked2.cacheId, companionType);
-      return picked2;
+      return { ...picked2, relaxation: "market" };
     }
   }
 
@@ -107,8 +127,9 @@ export async function serveFromCache(
     now,
   });
   if (picked3) {
+    logCacheServeTelemetry(companionType, "repeat_or_lower_quality");
     recordUserServe(svcClient, userId, picked3.cacheId, companionType);
-    return picked3;
+    return { ...picked3, relaxation: "repeat_or_lower_quality" };
   }
 
   return null;

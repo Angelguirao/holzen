@@ -21,11 +21,13 @@ import { loadActiveOrchestrateSources } from '@/lib/companion-orchestrate-source
 import { getRecencyHints } from '@/lib/companion-recency-hints';
 import {
   applyOrchestrateSlotLazyOrRegenerate,
+  EMPTY_COMPANION_SLOT_RELAXATIONS,
   hydrateOrchestrateSlotIfNew,
   isFilledOrchestrateSlot,
   readOrchestrateSlotBody,
   type CompanionSlotCacheIds,
   type CompanionSlotCommitters,
+  type CompanionSlotRelaxations,
 } from '@/lib/companion-orchestrate-slot-apply';
 import { saveCompanionLibraryBookmarkOnce } from '@/lib/companion-library-autosave';
 
@@ -91,6 +93,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     zoomOut: null,
     history: null,
   });
+  const [cacheRelaxations, setCacheRelaxations] = useState<CompanionSlotRelaxations>(EMPTY_COMPANION_SLOT_RELAXATIONS);
 
   useEffect(() => {
     if (!reflectionId) return;
@@ -152,6 +155,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     setIntervention(null);
     setInterventionError(false);
     setCacheIds({ nudge: null, signal: null, zoomOut: null, history: null });
+    setCacheRelaxations(EMPTY_COMPANION_SLOT_RELAXATIONS);
     fetchedSlotsRef.current = new Set();
 
     if (!reflectionId) {
@@ -259,24 +263,28 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
           readOrchestrateSlotBody(orchestrateBody, 'grounding'),
           fetchedSlotsRef.current,
           slotCommitters,
+          setCacheRelaxations,
         );
         hydrateOrchestrateSlotIfNew(
           'history',
           readOrchestrateSlotBody(orchestrateBody, 'history'),
           fetchedSlotsRef.current,
           slotCommitters,
+          setCacheRelaxations,
         );
         hydrateOrchestrateSlotIfNew(
           'zoomOut',
           readOrchestrateSlotBody(orchestrateBody, 'zoomOut'),
           fetchedSlotsRef.current,
           slotCommitters,
+          setCacheRelaxations,
         );
         hydrateOrchestrateSlotIfNew(
           'signal',
           readOrchestrateSlotBody(orchestrateBody, 'signal'),
           fetchedSlotsRef.current,
           slotCommitters,
+          setCacheRelaxations,
         );
       } catch (e) {
         console.error('[useCompanionData] intervention fetch failed', e);
@@ -354,7 +362,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       };
       const r = readOrchestrateSlotBody(body, slot);
       if (isFilledOrchestrateSlot(r)) {
-        applyOrchestrateSlotLazyOrRegenerate(slot, r, setCacheIds, slotCommitters);
+        applyOrchestrateSlotLazyOrRegenerate(slot, r, setCacheIds, slotCommitters, setCacheRelaxations);
       } else {
         setErr(true);
       }
@@ -383,6 +391,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     setZoomOut(null); setZoomOutError(false);
     setHistoryInsight(null); setHistoryError(false);
     setIntervention(null); setInterventionError(false);
+    setCacheRelaxations(EMPTY_COMPANION_SLOT_RELAXATIONS);
     setRetryCount(c => c + 1);
   }, []);
 
@@ -443,7 +452,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       };
       const r = readOrchestrateSlotBody(body, slot);
       if (isFilledOrchestrateSlot(r)) {
-        applyOrchestrateSlotLazyOrRegenerate(slot, r, setCacheIds, slotCommitters);
+        applyOrchestrateSlotLazyOrRegenerate(slot, r, setCacheIds, slotCommitters, setCacheRelaxations);
       } else {
         setErr(true);
       }
@@ -462,6 +471,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     completion,
     markCompleted,
     cacheIds,
+    cacheRelaxations,
     nudge, nudgeLoading, nudgeError, retryNudge,
     signal, signalLoading, signalError, retrySignal,
     zoomOut, zoomOutLoading, zoomOutError, retryZoomOut,

@@ -21,7 +21,7 @@ import {
   loadFallbackPool,
   pickRandom,
 } from "../fallbacks.ts";
-import { parseMarketDirection, serveFromCache } from "../cache.ts";
+import { type CacheServeRelaxation, parseMarketDirection, serveFromCache } from "../cache.ts";
 import { createAttemptLogger, trackEvent } from "../observe.ts";
 import { callPerplexityChat, type PerplexityUsage } from "../perplexity-client.ts";
 import { searchLibrary, eventToHistory, recordLibraryServe } from "../content-library.ts";
@@ -36,6 +36,8 @@ export interface HistoryResult {
   data: { title: string; btcInsight: string; analogy: string; assetClass: string; period: string; source?: string; url?: string } | null;
   source: "live" | "cache" | "curated" | "empty";
   cacheId: string | null;
+  /** Set when `serveFromCache` served this row (not library / curated). */
+  cacheRelaxation?: CacheServeRelaxation;
   error?: string;
 }
 
@@ -138,7 +140,14 @@ async function tryCache(
   excludeIds?: string[],
 ): Promise<HistoryResult | null> {
   const cached = await serveFromCache(svcClient, "historical_insight", "en", { userId, marketDirection, excludeIds });
-  if (cached) return { data: cached.data, source: "cache", cacheId: cached.cacheId };
+  if (cached) {
+    return {
+      data: cached.data,
+      source: "cache",
+      cacheId: cached.cacheId,
+      cacheRelaxation: cached.relaxation,
+    };
+  }
   return null;
 }
 

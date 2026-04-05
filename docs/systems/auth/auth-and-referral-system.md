@@ -25,9 +25,11 @@ flowchart TD
 
   P --> REF{`holzen_ref` exists?}
   REF -- no --> X[Done]
-  REF -- yes --> I[invoke edge function<br/>`record-referral`]
-  I -->|success| R[remove `holzen_ref` from localStorage]
-  I -->|failure| C[log error; keep `holzen_ref` for retry]
+  REF -- yes --> Q[insert `referral_pending_jobs`<br/>(durable queue)]
+  Q --> I[invoke `record-referral`]
+  I -->|ok true| R[remove `holzen_ref`]
+  I -->|invalid code| R2[remove `holzen_ref`]
+  I -->|invoke/network error| C[keep `holzen_ref`;<br/>cron runs `process-referral-pending`]
 ```
 
 ## Step-by-step runtime behavior
@@ -69,10 +71,11 @@ In `src/App.tsx`:
 
 1. User signs in via Supabase auth.
 2. `AuthProvider` receives the `SIGNED_IN` event.
-3. If `localStorage.getItem('holzen_ref')` is present, the app calls:
-   - `supabase.functions.invoke('record-referral', { body: { referral_code } })`
-4. After success, it removes `holzen_ref` from `localStorage`.
-5. If it fails, it logs the error and keeps `holzen_ref` for a later retry.
+3. If `localStorage.getItem('holzen_ref')` is present, the app:
+   - inserts a row into `referral_pending_jobs` (idempotent per user; duplicate insert is ignored),
+   - invokes `record-referral` with the code.
+4. It removes `holzen_ref` when the function returns `{ ok: true }` (including already-attributed users) or `{ ok: false, reason: 'Invalid referral' }`.
+5. On invoke/network failure it keeps `holzen_ref`; a scheduled **`process-referral-pending`** edge function claims queued rows and retries with backoff until success or permanent failure (see `docs/ops/cron-setup.md`).
 
 ## “Fire-and-forget” (what it means here)
 
@@ -85,14 +88,14 @@ In this codebase:
 
 ## Server-side handler (what the edge function does)
 
-Edge function: `supabase/functions/record-referral/index.ts`
+Edge function: `supabase/functions/record-referral/index.ts` (shared logic in `_shared/referral-record-core.ts`)
 
 High-level behavior:
 - validates the request token (`Authorization` header),
-- finds the referrer profile from `referral_code`,
-- records the referral row,
-- updates the referred user’s profile,
-- and then applies milestone rewards (Stripe + email) if configured.
+- runs idempotent attribution (referral row + `profiles.referred_by` + milestone rewards),
+- on success or permanent failure, updates the user’s `referral_pending_jobs` row when present.
+
+Worker: `supabase/functions/process-referral-pending/index.ts` — service-auth only; uses `claim_referral_pending_jobs()` to process the queue.
 
 ## Best practices / pitfalls to watch
 

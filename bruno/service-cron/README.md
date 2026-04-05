@@ -37,6 +37,7 @@ We **do not** accept **`x-supabase-cron: true`** without a valid Bearer on worke
 | `monthly-report.bru` | `monthly-report` |
 | `night-reflection.bru` | `night-reflection` |
 | `personalized-nudge.bru` | `personalized-nudge` |
+| `process-referral-pending.bru` | `process-referral-pending` |
 | `deliver-letters.bru` | `deliver-letters` |
 | `pregenerate-companions.bru` | `pregenerate-companions` |
 | `fetch-source-feeds.bru` | `fetch-source-feeds` |
