@@ -288,7 +288,7 @@ This is the **exact sequence** when a signed-in user runs a **normal** manual pa
 
 ## 5. `companion-orchestrate` (single entry point)
 
-- **Files:** `supabase/functions/companion-orchestrate/index.ts` (HTTP handler) and **`_shared/companion-orchestrate-*.ts`** (response types, body parsing, **`orchestrate_skip_cached`**, **`orchestrate_invoke`** logging).
+- **Files:** `supabase/functions/companion-orchestrate/index.ts` (HTTP handler) and **`_shared/companion-orchestrate-*.ts`** (types, body parsing, logging, skip-cache, **parallel generator tasks**, **settled-result fold + background writes**).
 - **Role:** Auth → rate limit → daily budget → parse body → **`determineSessionIntent`** → **`selectIntervention`** (when **`useIntervention`** is true **and** **`reflectionId`** is present) → **`Promise.all`** of **`generateQuestion`** (question mode only) **and** enabled generator tasks → assemble **`intervention`** + companion results → `companion_serves` inserts → **`writeCompanionData`** (upserts **`reflection_companions`**; **Grounding** also updates **`reflections.grounding_*`** for Home — Signal / History / Zoom / intervention payloads are **not** duplicated onto legacy `reflections` columns; they were removed in favor of the join table).
 - **Invocation modes (client):** The SPA usually sends **narrow** requests: (1) intervention-only (all `enable*` false, `holzenInvokeSource: 'browser_pause_intervention'`), (2) single-slot lazy fetch (`holzenInvokeSource: 'browser_lazy_fetch'`), (3) regenerate (`regenerateOnly`). Cron and pregenerate may enable multiple slots in one request.
 - **Typical JSON body:** **`reflectionId`**, **`context`**, **`reflectionMessage`**, **`language`**, **`mood`**, numeric **`severity`** (absolute % move → **`bucketSeverity`** in `intervention-selector.ts`), **`moodHistory`**, **`signalSources`** / **`groundingSources`** (merged catalog URLs when Signal/Ground are on), recency arrays (**`recentNudgeTopics`**, **`recentGroundingSources`**, **`recentSignalSources`**, …), **`enableSignal` / `enableGrounding` / `enableHistory` / `enableZoomOut`**, **`useIntervention`** (default true). If **`reflectionId`** is missing or **`useIntervention: false`**, no intervention is selected (**`response.intervention`** omitted); generators still run per **`enable*`**.
@@ -695,6 +695,8 @@ supabase/functions/
     ├── companion-orchestrate-parse.ts
     ├── companion-orchestrate-logging.ts
     ├── companion-orchestrate-skip-cached.ts
+    ├── companion-orchestrate-tasks.ts
+    ├── companion-orchestrate-assemble.ts
     ├── reflection-generate.ts      # shared manual + cron reflection AI
     ├── pause-context-suffix.ts     # single formatter: Fear & Greed + on-chain context suffix (client + cron)
     ├── pause-cron-parity.ts        # fetches + enrichAutomaticPauseContext + orchestrator hints for check-volatility
