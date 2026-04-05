@@ -311,7 +311,6 @@ export type Database = {
       companion_serves: {
         Row: {
           cache_entry_id: string | null
-          cache_relaxation: string | null
           companion_type: string
           content_fingerprint: string | null
           content_title: string | null
@@ -324,7 +323,6 @@ export type Database = {
         }
         Insert: {
           cache_entry_id?: string | null
-          cache_relaxation?: string | null
           companion_type: string
           content_fingerprint?: string | null
           content_title?: string | null
@@ -337,7 +335,6 @@ export type Database = {
         }
         Update: {
           cache_entry_id?: string | null
-          cache_relaxation?: string | null
           companion_type?: string
           content_fingerprint?: string | null
           content_title?: string | null
@@ -1071,45 +1068,6 @@ export type Database = {
         }
         Relationships: []
       }
-      referral_pending_jobs: {
-        Row: {
-          attempts: number
-          created_at: string
-          id: string
-          last_error: string | null
-          max_attempts: number
-          next_attempt_at: string | null
-          referral_code: string
-          referred_user_id: string
-          status: string
-          updated_at: string
-        }
-        Insert: {
-          attempts?: number
-          created_at?: string
-          id?: string
-          last_error?: string | null
-          max_attempts?: number
-          next_attempt_at?: string | null
-          referral_code: string
-          referred_user_id: string
-          status?: string
-          updated_at?: string
-        }
-        Update: {
-          attempts?: number
-          created_at?: string
-          id?: string
-          last_error?: string | null
-          max_attempts?: number
-          next_attempt_at?: string | null
-          referral_code?: string
-          referred_user_id?: string
-          status?: string
-          updated_at?: string
-        }
-        Relationships: []
-      }
       referral_rewards: {
         Row: {
           granted_at: string
@@ -1796,10 +1754,6 @@ export type Database = {
       }
     }
     Functions: {
-      claim_referral_pending_jobs: {
-        Args: { p_limit?: number }
-        Returns: Database["public"]["Tables"]["referral_pending_jobs"]["Row"][]
-      }
       claim_trigger_slot: {
         Args: { _cooldown_hours: number; _user_id: string }
         Returns: boolean
