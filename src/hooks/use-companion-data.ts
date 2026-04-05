@@ -4,27 +4,29 @@ import { hapticFeedback } from '@/lib/haptics';
 import { useHolzen } from '@/hooks/use-holzen';
 import { useToast } from '@/hooks/use-toast';
 import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
+import type {
+  CompanionOrchestrateSlotResult,
+  RegenerateCompanionSlot,
+  InterventionState,
+} from '@/lib/companion-orchestrate-types';
+import { parseReflectionCompanionRows } from '@/lib/companion-reflection-cache';
+import type {
+  CachedHistoricalInsightShape,
+  ReflectionCompanionRow,
+} from '@/lib/companion-reflection-cache';
+import { loadMoodHistoryForOrchestrate } from '@/lib/companion-mood-history';
+import {
+  COMPANION_STEP_TO_REFLECTION_COLUMN,
+  COMPANION_STEP_TO_READ_TYPE,
+} from '@/lib/companion-completion-maps';
+import { hostnameFromUrl } from '@/lib/companion-url';
 
-export type RegenerateCompanionSlot = 'signal' | 'grounding' | 'history' | 'zoomOut';
-
-// ── Intervention types (new pause flow) ──────────────────────────────────────
-
-export interface InterventionPrimary {
-  type: 'mirror' | 'pattern' | 'trap';
-  data: any;
-}
-
-export interface InterventionSecondary {
-  type: 'zoom_out';
-  data: any;
-}
-
-export interface InterventionState {
-  mode: 'insight' | 'question';
-  primary: InterventionPrimary | null;
-  secondary: InterventionSecondary | null;
-  question: string | null;
-}
+export type {
+  RegenerateCompanionSlot,
+  InterventionPrimary,
+  InterventionSecondary,
+  InterventionState,
+} from '@/lib/companion-orchestrate-types';
 
 interface CompletionState {
   breathing: boolean;
@@ -56,14 +58,6 @@ interface SignalData {
   url: string;
 }
 
-interface HistoricalInsightData {
-  title: string;
-  btcInsight: string;
-  analogy: string;
-  assetClass: string;
-  period: string;
-}
-
 interface UseCompanionDataParams {
   companions: CompanionData;
   prefs: CompanionPrefs;
@@ -74,23 +68,6 @@ interface UseCompanionDataParams {
   mood?: string | null;
   /** Raw numeric BTC % change — passed to intervention selector for bucketing */
   severityNumber?: number;
-}
-
-interface CompanionResult {
-  data: any | null;
-  source: 'live' | 'cache' | 'curated' | 'empty';
-  cacheId: string | null;
-  latencyMs: number;
-  error?: string;
-}
-
-function hostnameFromUrl(url: string | undefined): string {
-  if (!url) return '';
-  try {
-    return new URL(url.startsWith('http') ? url : `https://${url}`).hostname.replace(/^www\./, '');
-  } catch {
-    return '';
-  }
 }
 
 export function useCompanionData({ companions, prefs, reflectionId, context, reflectionMessage, mood, severityNumber }: UseCompanionDataParams) {
@@ -206,18 +183,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     setCompletion((prev) => ({ ...prev, [key]: true }));
     hapticFeedback('light');
     if (reflectionId) {
-      const reflectionKeyMap: Record<string, string> = {
-        breathing: 'breathing_completed',
-        haiku: 'haiku_read',
-      };
-      const companionTypeMap: Record<string, string> = {
-        signal: 'signal',
-        grounding: 'ground_nudge',
-        zoomOut: 'zoom_out_deep_time',
-        history: 'historical_insight',
-      };
-
-      const reflectionKey = reflectionKeyMap[key];
+      const reflectionKey = COMPANION_STEP_TO_REFLECTION_COLUMN[key];
       if (reflectionKey) {
         await supabase
           .from('reflections')
@@ -225,7 +191,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
           .eq('id', reflectionId);
       }
 
-      const companionType = companionTypeMap[key];
+      const companionType = COMPANION_STEP_TO_READ_TYPE[key];
       if (companionType) {
         // Update both zoom_out and zoom_out_deep_time for zoom, single type for others
         if (key === 'zoomOut') {
@@ -258,7 +224,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
   const [zoomOutLoading, setZoomOutLoading] = useState(false);
   const [zoomOutError, setZoomOutError] = useState(false);
 
-  const [historyInsight, setHistoryInsight] = useState<HistoricalInsightData | null>(null);
+  const [historyInsight, setHistoryInsight] = useState<CachedHistoricalInsightShape | null>(null);
   const [historyLoading, setHistoryLoading] = useState(false);
   const [historyError, setHistoryError] = useState(false);
 
@@ -301,35 +267,12 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
   }, [reflectionId]);
 
   // ── Check for already-cached data on the reflection row ──
-  const checkCachedReflection = useCallback(async (rid: string): Promise<{
-    signal?: SignalData | null;
-    grounding?: NudgeData | null;
-    history?: HistoricalInsightData | null;
-    zoomOut?: any;
-    intervention?: InterventionState | null;
-  }> => {
+  const checkCachedReflection = useCallback(async (rid: string) => {
     const { data: companions } = await supabase
       .from('reflection_companions')
       .select('companion_type, content')
       .eq('reflection_id', rid);
-    if (!companions || companions.length === 0) return {};
-
-    const result: any = {};
-    for (const c of companions) {
-      const d = c.content as any;
-      if (c.companion_type === 'signal' && d?.source) {
-        result.signal = { title: d.title ?? '', body: d.body ?? '', source: d.source, url: d.url ?? '' };
-      } else if (c.companion_type === 'ground_nudge' && d) {
-        result.grounding = { title: d.title ?? '', body: d.body ?? '', citation: d.citation ?? '', url: d.url ?? '' };
-      } else if (c.companion_type === 'historical_insight' && d) {
-        result.history = d;
-      } else if ((c.companion_type === 'zoom_out' || c.companion_type === 'zoom_out_deep_time') && d) {
-        if (!result.zoomOut) result.zoomOut = d;
-      } else if (c.companion_type === 'intervention' && d) {
-        result.intervention = d as InterventionState;
-      }
-    }
-    return result;
+    return parseReflectionCompanionRows((companions ?? []) as ReflectionCompanionRow[]);
   }, []);
 
   // ── Get localStorage dedup hints ──
@@ -460,25 +403,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
         }
 
         // Intervention not cached — fetch from orchestrate (intervention-only, no companion slots)
-        let moodHistory: Array<{ mood: string; outcome?: string | null }> = [];
-        try {
-          const { data: authData } = await supabase.auth.getUser();
-          const uid = authData?.user?.id;
-          if (uid) {
-            const { data: recentRows } = await supabase
-              .from('reflections')
-              .select('mood, outcome')
-              .eq('user_id', uid)
-              .not('mood', 'is', null)
-              .order('created_at', { ascending: false })
-              .limit(20);
-            if (recentRows) {
-              moodHistory = recentRows
-                .filter((r: any) => r.mood)
-                .map((r: any) => ({ mood: r.mood, outcome: r.outcome ?? null }));
-            }
-          }
-        } catch { /* non-fatal */ }
+        const moodHistory = await loadMoodHistoryForOrchestrate();
 
         const { data, error: fnError } = await supabase.functions.invoke('companion-orchestrate', {
           body: {
@@ -516,26 +441,26 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
 
         // Hydrate any companion data the server returned alongside intervention
         // (e.g. trap forces grounding, pattern forces history, secondary forces zoomOut)
-        const gR = data.grounding as CompanionResult | null;
+        const gR = data.grounding as CompanionOrchestrateSlotResult | null;
         if (gR?.data && gR.source !== 'empty' && !fetchedSlotsRef.current.has('grounding')) {
           setNudge(gR.data);
           fetchedSlotsRef.current.add('grounding');
           autoSaveToLibrary({ title: gR.data.title, body: gR.data.body, sourceType: 'grounding', sourceUrl: gR.data.url });
         }
-        const hR = data.history as CompanionResult | null;
+        const hR = data.history as CompanionOrchestrateSlotResult | null;
         if (hR?.data && hR.source !== 'empty' && !fetchedSlotsRef.current.has('history')) {
           setHistoryInsight(hR.data);
           fetchedSlotsRef.current.add('history');
           autoSaveToLibrary({ title: hR.data.title, body: hR.data.btcInsight, sourceType: 'history_insight' });
         }
-        const zR = data.zoomOut as CompanionResult | null;
+        const zR = data.zoomOut as CompanionOrchestrateSlotResult | null;
         if (zR?.data && zR.source !== 'empty' && !fetchedSlotsRef.current.has('zoomOut')) {
           setZoomOut(zR.data);
           fetchedSlotsRef.current.add('zoomOut');
           const zBody = zR.data?.deepTime?.body || zR.data?.echo?.message || 'Zoom Out perspective';
           autoSaveToLibrary({ title: zR.data?.deepTime?.title || 'Zoom Out', body: zBody, sourceType: 'zoom_out' });
         }
-        const sR = data.signal as CompanionResult | null;
+        const sR = data.signal as CompanionOrchestrateSlotResult | null;
         if (sR?.data && sR.source !== 'empty' && !fetchedSlotsRef.current.has('signal')) {
           setSignal(sR.data);
           fetchedSlotsRef.current.add('signal');
@@ -577,25 +502,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       const recency = getRecencyHints();
       const signalSources = slot === 'signal' ? await getSignalSources() : undefined;
       const groundingSources = slot === 'grounding' ? await getGroundingSources() : undefined;
-      let moodHistory: Array<{ mood: string; outcome?: string | null }> = [];
-      try {
-        const { data: authData } = await supabase.auth.getUser();
-        const uid = authData?.user?.id;
-        if (uid) {
-          const { data: recentRows } = await supabase
-            .from('reflections')
-            .select('mood, outcome')
-            .eq('user_id', uid)
-            .not('mood', 'is', null)
-            .order('created_at', { ascending: false })
-            .limit(20);
-          if (recentRows) {
-            moodHistory = recentRows
-              .filter((r: any) => r.mood)
-              .map((r: any) => ({ mood: r.mood, outcome: r.outcome ?? null }));
-          }
-        }
-      } catch { /* non-fatal */ }
+      const moodHistory = await loadMoodHistoryForOrchestrate();
 
       const { data, error: fnError } = await supabase.functions.invoke('companion-orchestrate', {
         body: {
@@ -627,7 +534,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       }
 
       if (slot === 'signal') {
-        const r = body.signal as CompanionResult | null;
+        const r = body.signal as CompanionOrchestrateSlotResult | null;
         if (r?.data && r.source !== 'empty') {
           setSignal(r.data as SignalData);
           if (r.cacheId) setCacheIds(prev => ({ ...prev, signal: r.cacheId }));
@@ -637,7 +544,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
           autoSaveToLibrary({ title: r.data.title, body: r.data.body, sourceType: 'signal', sourceUrl: r.data.url });
         } else setErr(true);
       } else if (slot === 'grounding') {
-        const r = body.grounding as CompanionResult | null;
+        const r = body.grounding as CompanionOrchestrateSlotResult | null;
         if (r?.data && r.source !== 'empty') {
           setNudge(r.data as NudgeData);
           if (r.cacheId) setCacheIds(prev => ({ ...prev, nudge: r.cacheId }));
@@ -647,15 +554,15 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
           autoSaveToLibrary({ title: r.data.title, body: r.data.body, sourceType: 'grounding', sourceUrl: r.data.url });
         } else setErr(true);
       } else if (slot === 'history') {
-        const r = body.history as CompanionResult | null;
+        const r = body.history as CompanionOrchestrateSlotResult | null;
         if (r?.data && r.source !== 'empty') {
-          setHistoryInsight(r.data as HistoricalInsightData);
+          setHistoryInsight(r.data as CachedHistoricalInsightShape);
           if (r.cacheId) setCacheIds(prev => ({ ...prev, history: r.cacheId }));
           updateRecencyHints('history', r.data.title);
           autoSaveToLibrary({ title: r.data.title, body: r.data.btcInsight, sourceType: 'history_insight' });
         } else setErr(true);
       } else {
-        const r = body.zoomOut as CompanionResult | null;
+        const r = body.zoomOut as CompanionOrchestrateSlotResult | null;
         if (r?.data && r.source !== 'empty') {
           setZoomOut(r.data);
           if (r.cacheId) setCacheIds(prev => ({ ...prev, zoomOut: r.cacheId }));
@@ -715,25 +622,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       const recency = getRecencyHints();
       const signalSources = slot === 'signal' ? await getSignalSources() : undefined;
       const groundingSources = slot === 'grounding' ? await getGroundingSources() : undefined;
-      let moodHistory: Array<{ mood: string; outcome?: string | null }> = [];
-      try {
-        const { data: authData } = await supabase.auth.getUser();
-        const uid = authData?.user?.id;
-        if (uid) {
-          const { data: recentRows } = await supabase
-            .from('reflections')
-            .select('mood, outcome')
-            .eq('user_id', uid)
-            .not('mood', 'is', null)
-            .order('created_at', { ascending: false })
-            .limit(20);
-          if (recentRows) {
-            moodHistory = recentRows
-              .filter((r: any) => r.mood)
-              .map((r: any) => ({ mood: r.mood, outcome: r.outcome ?? null }));
-          }
-        }
-      } catch { /* non-fatal */ }
+      const moodHistory = await loadMoodHistoryForOrchestrate();
 
       const { data, error: fnError } = await supabase.functions.invoke('companion-orchestrate', {
         body: {
@@ -762,7 +651,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       }
 
       if (slot === 'signal') {
-        const r = body.signal as CompanionResult | null;
+        const r = body.signal as CompanionOrchestrateSlotResult | null;
         if (r?.data && r.source !== 'empty') {
           setSignal(r.data as SignalData);
           if (r.cacheId) setCacheIds(prev => ({ ...prev, signal: r.cacheId }));
@@ -772,7 +661,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
           autoSaveToLibrary({ title: r.data.title, body: r.data.body, sourceType: 'signal', sourceUrl: r.data.url });
         } else setErr(true);
       } else if (slot === 'grounding') {
-        const r = body.grounding as CompanionResult | null;
+        const r = body.grounding as CompanionOrchestrateSlotResult | null;
         if (r?.data && r.source !== 'empty') {
           setNudge(r.data as NudgeData);
           if (r.cacheId) setCacheIds(prev => ({ ...prev, nudge: r.cacheId }));
@@ -782,15 +671,15 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
           autoSaveToLibrary({ title: r.data.title, body: r.data.body, sourceType: 'grounding', sourceUrl: r.data.url });
         } else setErr(true);
       } else if (slot === 'history') {
-        const r = body.history as CompanionResult | null;
+        const r = body.history as CompanionOrchestrateSlotResult | null;
         if (r?.data && r.source !== 'empty') {
-          setHistoryInsight(r.data as HistoricalInsightData);
+          setHistoryInsight(r.data as CachedHistoricalInsightShape);
           if (r.cacheId) setCacheIds(prev => ({ ...prev, history: r.cacheId }));
           updateRecencyHints('history', r.data.title);
           autoSaveToLibrary({ title: r.data.title, body: r.data.btcInsight, sourceType: 'history_insight' });
         } else setErr(true);
       } else {
-        const r = body.zoomOut as CompanionResult | null;
+        const r = body.zoomOut as CompanionOrchestrateSlotResult | null;
         if (r?.data && r.source !== 'empty') {
           setZoomOut(r.data);
           if (r.cacheId) setCacheIds(prev => ({ ...prev, zoomOut: r.cacheId }));
