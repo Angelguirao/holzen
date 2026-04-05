@@ -15,6 +15,7 @@ import type {
   ReflectionCompanionRow,
 } from '@/lib/companion-reflection-cache';
 import { loadMoodHistoryForOrchestrate } from '@/lib/companion-mood-history';
+import { loadActiveOrchestrateSources } from '@/lib/companion-orchestrate-sources';
 import {
   COMPANION_STEP_TO_REFLECTION_COLUMN,
   COMPANION_STEP_TO_READ_TYPE,
@@ -311,51 +312,6 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     } catch { /* ignore */ }
   }, []);
 
-  // ── Get active signal sources ──
-  const getSignalSources = useCallback(async () => {
-    try {
-      const { data: authData } = await supabase.auth.getUser();
-      const userId = authData?.user?.id;
-      if (!userId) return undefined;
-      const [{ data: catalog }, { data: userPrefs }] = await Promise.all([
-        supabase.from('signal_sources').select('id, name, type, url, category').eq('category', 'signal') as any,
-        supabase.from('user_signal_preferences').select('source_id, custom_name, custom_url, custom_type, active, category').eq('user_id', userId).eq('category', 'signal'),
-      ]);
-      const prefsMap = new Map((userPrefs ?? []).map((p: any) => [p.source_id, p]));
-      const catalogActive = (catalog ?? []).filter((s: any) => {
-        const pref = prefsMap.get(s.id);
-        return pref ? pref.active : true;
-      }).map((s: any) => ({ name: s.name, type: s.type, url: s.url }));
-      const customActive = (userPrefs ?? [])
-        .filter((p: any) => !p.source_id && p.custom_name && p.active)
-        .map((p: any) => ({ name: p.custom_name, type: p.custom_type || 'blog', url: p.custom_url }));
-      const sources = [...catalogActive, ...customActive];
-      return sources.length > 0 ? sources : undefined;
-    } catch { return undefined; }
-  }, []);
-
-  const getGroundingSources = useCallback(async () => {
-    try {
-      const { data: authData } = await supabase.auth.getUser();
-      const userId = authData?.user?.id;
-      if (!userId) return undefined;
-      const [{ data: catalog }, { data: userPrefs }] = await Promise.all([
-        supabase.from('signal_sources').select('id, name, type, url, category').eq('category', 'grounding') as any,
-        supabase.from('user_signal_preferences').select('source_id, custom_name, custom_url, custom_type, active, category').eq('user_id', userId).eq('category', 'grounding'),
-      ]);
-      const prefsMap = new Map((userPrefs ?? []).map((p: any) => [p.source_id, p]));
-      const catalogActive = (catalog ?? []).filter((s: any) => {
-        const pref = prefsMap.get(s.id);
-        return pref ? pref.active : true;
-      }).map((s: any) => ({ name: s.name, type: s.type, url: s.url }));
-      const customActive = (userPrefs ?? [])
-        .filter((p: any) => !p.source_id && p.custom_name && p.active)
-        .map((p: any) => ({ name: p.custom_name, type: p.custom_type || 'blog', url: p.custom_url }));
-      const sources = [...catalogActive, ...customActive];
-      return sources.length > 0 ? sources : undefined;
-    } catch { return undefined; }
-  }, []);
-
   // ── Intervention-only fetch + cached companion hydration ──
   // Companions are NOT fetched here — only on user tap (see fetchCompanion below).
   useEffect(() => {
@@ -500,8 +456,8 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
 
     try {
       const recency = getRecencyHints();
-      const signalSources = slot === 'signal' ? await getSignalSources() : undefined;
-      const groundingSources = slot === 'grounding' ? await getGroundingSources() : undefined;
+      const signalSources = slot === 'signal' ? await loadActiveOrchestrateSources('signal') : undefined;
+      const groundingSources = slot === 'grounding' ? await loadActiveOrchestrateSources('grounding') : undefined;
       const moodHistory = await loadMoodHistoryForOrchestrate();
 
       const { data, error: fnError } = await supabase.functions.invoke('companion-orchestrate', {
@@ -579,7 +535,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     }
   }, [
     reflectionId, context, reflectionMessage, mood, severityNumber, language,
-    getRecencyHints, getSignalSources, getGroundingSources, autoSaveToLibrary, updateRecencyHints,
+    getRecencyHints, autoSaveToLibrary, updateRecencyHints,
   ]);
 
   // ── Retry helpers ──
@@ -620,8 +576,8 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     setErr(false);
     try {
       const recency = getRecencyHints();
-      const signalSources = slot === 'signal' ? await getSignalSources() : undefined;
-      const groundingSources = slot === 'grounding' ? await getGroundingSources() : undefined;
+      const signalSources = slot === 'signal' ? await loadActiveOrchestrateSources('signal') : undefined;
+      const groundingSources = slot === 'grounding' ? await loadActiveOrchestrateSources('grounding') : undefined;
       const moodHistory = await loadMoodHistoryForOrchestrate();
 
       const { data, error: fnError } = await supabase.functions.invoke('companion-orchestrate', {
@@ -697,7 +653,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     }
   }, [
     reflectionId, context, reflectionMessage, mood, severityNumber, language,
-    getRecencyHints, getSignalSources, getGroundingSources, toast, autoSaveToLibrary, updateRecencyHints,
+    getRecencyHints, toast, autoSaveToLibrary, updateRecencyHints,
   ]);
 
   return {
