@@ -1,7 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { usePullToRefresh } from '@/hooks/use-pull-to-refresh';
 import { useOutletContext } from 'react-router-dom';
-import { useHolzen, isReflectionPersistError } from '@/hooks/use-holzen';
+import { useHolzen } from '@/hooks/use-holzen';
+import { isReflectionPersistError } from '@/lib/reflection-persist-error';
 import { TestimonialRequest } from '@/components/TestimonialRequest';
 import { LetterToFutureSelf } from '@/components/LetterToFutureSelf';
 import AuthLoading from '@/components/AuthLoading';

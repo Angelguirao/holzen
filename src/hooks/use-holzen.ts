@@ -1,42 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
 import { fetchBtcData, type BtcPriceData } from '@/lib/btc';
-import { isCumulativeMoveTriggered } from '@/lib/volatility-thresholds';
-import { enrichPauseContextWithMarketData } from '@holzen-pause-context';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useProfile } from '@/hooks/use-profile';
 import type { CompanionData } from '@/components/CompanionSection';
 import { holzenLog } from '@/lib/holzen-console';
 import { COMPANION_TYPES } from '@/lib/companion-types';
-
-const MANUAL_COOLDOWN_MS = 15 * 60 * 1000; // 15 minutes for on-demand
-const DEV_COOLDOWN_MS = 5 * 1000; // 5 seconds in dev mode
-
-/** Check if dev mode is active (localStorage synced from DB via Admin page) */
-function isDevMode(): boolean {
-  try {
-    return localStorage.getItem('holzen_dev_mode') === 'true';
-  } catch { return false; }
-}
-
-function getEffectiveCooldownMs(): number {
-  return isDevMode() ? DEV_COOLDOWN_MS : MANUAL_COOLDOWN_MS;
-}
-
-/** Fragment included in `error` when `reflections` insert fails after a successful generate — Home uses this to show the banner even when `btcData` exists. */
-export const REFLECTION_PERSIST_ERROR_MARKER = 'Could not save your reflection';
-
-export function isReflectionPersistError(error: string | null | undefined): boolean {
-  return Boolean(error?.includes(REFLECTION_PERSIST_ERROR_MARKER));
-}
-
-function reflectionPersistErrorMessage(insertErr: { message?: string } | null): string {
-  const raw = insertErr?.message ?? '';
-  const net = /network|fetch|Failed to fetch|timeout|ECONNRESET/i.test(raw);
-  return net
-    ? `${REFLECTION_PERSIST_ERROR_MARKER}. Check your connection and try again.`
-    : `${REFLECTION_PERSIST_ERROR_MARKER}. Try again in a moment or sign in again.`;
-}
+import { reflectionPersistErrorMessage } from '@/lib/reflection-persist-error';
+import { getManualReflectionCooldownMs, isHolzenDevMode } from '@/lib/holzen-manual-cooldown';
+import { buildPauseContextFromBtc } from '@/lib/pause-context-from-btc';
+import { severityFromBtcChangePercent } from '@/lib/btc-move-severity';
+import { millisecondsUntilNextQuarterHour } from '@/lib/next-cron-quarter';
 
 export function useHolzen() {
   const { user } = useAuth();
@@ -118,14 +92,7 @@ export function useHolzen() {
       silentMode,
       mood: mood ?? '(none)',
     });
-    const dir = data.direction === 'down' ? 'down' : 'up';
-    const pct = Math.abs(data.changePercent).toFixed(1);
-    let ctx = `BTC is ${dir} ${pct}% in the last 24 hours.`;
-    if (isCumulativeMoveTriggered(data.cumulativeChangePercent, cumulativeThreshold)) {
-      const cumDir = data.cumulativeDirection === 'down' ? 'down' : 'up';
-      ctx += ` Over 7 days, it's ${cumDir} ${Math.abs(data.cumulativeChangePercent!).toFixed(1)}%.`;
-    }
-    ctx = enrichPauseContextWithMarketData(ctx, data.fearGreed, data.onChain);
+    const ctx = buildPauseContextFromBtc(data, cumulativeThreshold);
 
     if (silentMode) {
       holzenLog.manual( 'generateMessage: silent mode — short reflection only (no AI)');
@@ -347,7 +314,19 @@ export function useHolzen() {
       setLoading(false);
       holzenLog.manual( 'generateMessage: finished (loading cleared)');
     }
-  }, [user, reflectionTone, reflectionStyle, silentMode, cumulativeThreshold, customPrompt]);
+  }, [
+    user,
+    reflectionTone,
+    reflectionStyle,
+    silentMode,
+    cumulativeThreshold,
+    customPrompt,
+    motivations,
+    mantra,
+    groundingActivities,
+    currency,
+    language,
+  ]);
 
   const fetchBtcDisplay = useCallback(async () => {
     try {
@@ -384,7 +363,7 @@ export function useHolzen() {
   const manualCooldownRemaining = useCallback(() => {
     if (!lastManualAt) return 0;
     const elapsed = Date.now() - lastManualAt;
-    return Math.max(0, getEffectiveCooldownMs() - elapsed);
+    return Math.max(0, getManualReflectionCooldownMs() - elapsed);
   }, [lastManualAt]);
 
   const autoCooldownRemaining = useCallback(() => {
@@ -394,21 +373,13 @@ export function useHolzen() {
     return Math.max(0, cooldownMs - elapsed);
   }, [lastTriggerAt, cooldownHours]);
 
-  /** Milliseconds until the next server cron quarter-hour (:00, :15, :30, :45) */
-  const nextCronCheckIn = useCallback(() => {
-    const now = new Date();
-    const mins = now.getMinutes();
-    const secs = now.getSeconds();
-    const msIntoQuarter = ((mins % 15) * 60 + secs) * 1000 + now.getMilliseconds();
-    const quarterMs = 15 * 60 * 1000;
-    return quarterMs - msIntoQuarter;
-  }, []);
+  const nextCronCheckIn = useCallback(() => millisecondsUntilNextQuarterHour(), []);
 
   /** “Need a moment” / “Try again” (cooldown-gated). Optional `mood` → see `generateMessage`. */
   const manualTrigger = useCallback(async (mood?: string) => {
     const remaining = manualCooldownRemaining();
     if (remaining > 0) {
-      holzenLog.manual( 'manualTrigger: blocked by cooldown', { remainingMs: remaining, devMode: isDevMode() });
+      holzenLog.manual( 'manualTrigger: blocked by cooldown', { remainingMs: remaining, devMode: isHolzenDevMode() });
       return;
     }
 
@@ -428,7 +399,7 @@ export function useHolzen() {
       const now = Date.now();
       setLastManualAt(now);
       localStorage.setItem(manualCooldownKey, String(now));
-      // Next allowed manual trigger: now + getEffectiveCooldownMs() (15 min prod; 5 s when holzen_dev_mode).
+      // Next allowed manual trigger: now + getManualReflectionCooldownMs() (15 min prod; 5 s when holzen_dev_mode).
       holzenLog.manual('manualTrigger: complete — cooldown stored', { lastManualAt: now });
     } catch (e: any) {
       holzenLog.manual('manualTrigger: error', { message: String(e?.message ?? e) });
@@ -486,11 +457,7 @@ export function useHolzen() {
     }
   }, [user, message]);
 
-  const severity: 'mild' | 'moderate' | 'high' = btcData
-    ? Math.abs(btcData.changePercent) >= 10 ? 'high'
-      : Math.abs(btcData.changePercent) >= 5 ? 'moderate'
-      : 'mild'
-    : 'mild';
+  const severity = severityFromBtcChangePercent(btcData?.changePercent);
 
   // Fetch BTC data on load and periodically (display only — no trigger logic)
   useEffect(() => {

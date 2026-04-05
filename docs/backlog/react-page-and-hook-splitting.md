@@ -8,6 +8,7 @@
 |------|--------|
 | 2026-04 | **`Home`:** `NeedAMomentButton`, `AutoCooldownIndicator`, and `ProLockedWidget` moved to **`src/components/home/HomePauseChrome.tsx`**. |
 | 2026-04 | **`PauseSession`:** localStorage + types → **`src/lib/pause-session-storage.ts`**; loading/error full-screen → **`PauseSessionGate`**; curtain / gradient / chrome → **`PauseSessionScaffold`**. |
+| 2026-04 | **`use-holzen`:** pure helpers → **`reflection-persist-error`**, **`holzen-manual-cooldown`**, **`pause-context-from-btc`**, **`btc-move-severity`**, **`next-cron-quarter`** (`src/lib/`). Hook still owns orchestration + state. |
 
 ## Goal
 
