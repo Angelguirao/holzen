@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { hapticFeedback } from '@/lib/haptics';
 import { useHolzen } from '@/hooks/use-holzen';
 import { useToast } from '@/hooks/use-toast';
+import { useCompanionLibraryFavorites } from '@/hooks/use-companion-library-favorites';
 import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
 import type { RegenerateCompanionSlot, InterventionState } from '@/lib/companion-orchestrate-types';
 import {
@@ -64,36 +65,7 @@ interface UseCompanionDataParams {
 export function useCompanionData({ companions, prefs, reflectionId, context, reflectionMessage, mood, severityNumber }: UseCompanionDataParams) {
   const { language } = useHolzen();
   const { toast } = useToast();
-
-  // ── Favorites ──
-  const [favorites, setFavorites] = useState<Record<string, boolean>>({});
-
-  useEffect(() => {
-    if (!reflectionId) return;
-    supabase
-      .from('library_items')
-      .select('source_type, is_favorite')
-      .eq('reflection_id', reflectionId)
-      .then(({ data }) => {
-        if (!data) return;
-        const favs: Record<string, boolean> = {};
-        data.forEach((row: any) => {
-          if (row.source_type) favs[row.source_type] = row.is_favorite ?? false;
-        });
-        setFavorites(favs);
-      });
-  }, [reflectionId]);
-
-  const toggleCompanionFavorite = useCallback(async (sourceType: string) => {
-    if (!reflectionId) return;
-    const newVal = !favorites[sourceType];
-    setFavorites((prev) => ({ ...prev, [sourceType]: newVal }));
-    await supabase
-      .from('library_items')
-      .update({ is_favorite: newVal })
-      .eq('reflection_id', reflectionId)
-      .eq('source_type', sourceType);
-  }, [reflectionId, favorites]);
+  const { favorites, toggleCompanionFavorite } = useCompanionLibraryFavorites(reflectionId);
 
   // ── Auto-save to library ──
   const libraryAutosaveDedupRef = useRef<Set<string>>(new Set());
