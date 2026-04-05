@@ -1,3 +1,4 @@
+import { supabase } from '@/integrations/supabase/client';
 import type { InterventionState } from '@/lib/companion-orchestrate-types';
 
 export type ReflectionCompanionRow = { companion_type: string; content: unknown };
@@ -68,4 +69,15 @@ export function parseReflectionCompanionRows(rows: ReflectionCompanionRow[]): Pa
     }
   }
   return result;
+}
+
+/** Load `reflection_companions` rows and parse into the hydration shape (client + edge parity). */
+export async function fetchParsedReflectionCompanionCache(
+  reflectionId: string,
+): Promise<ParsedReflectionCompanionCache> {
+  const { data: companions } = await supabase
+    .from('reflection_companions')
+    .select('companion_type, content')
+    .eq('reflection_id', reflectionId);
+  return parseReflectionCompanionRows((companions ?? []) as ReflectionCompanionRow[]);
 }

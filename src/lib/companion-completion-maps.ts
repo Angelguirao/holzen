@@ -6,7 +6,7 @@ export const COMPANION_STEP_TO_REFLECTION_COLUMN: Record<string, string> = {
 
 /**
  * `reflection_companions.companion_type` for marking read.
- * Zoom uses two DB types; see `markCompleted` in use-companion-data.
+ * Zoom uses two DB types; see `persistCompanionUiStepCompletion` in companion-completion-sync.
  */
 export const COMPANION_STEP_TO_READ_TYPE: Record<string, string> = {
   signal: 'signal',

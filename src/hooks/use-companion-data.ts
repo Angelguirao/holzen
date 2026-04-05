@@ -9,18 +9,19 @@ import type {
   RegenerateCompanionSlot,
   InterventionState,
 } from '@/lib/companion-orchestrate-types';
-import { parseReflectionCompanionRows } from '@/lib/companion-reflection-cache';
-import type {
-  CachedHistoricalInsightShape,
-  ReflectionCompanionRow,
+import {
+  fetchParsedReflectionCompanionCache,
 } from '@/lib/companion-reflection-cache';
+import type { CachedHistoricalInsightShape } from '@/lib/companion-reflection-cache';
+import type { CompanionUiCompletionStep } from '@/lib/companion-completion-sync';
+import {
+  loadCompanionUiCompletionState,
+  persistCompanionUiStepCompletion,
+  type CompanionUiCompletionState,
+} from '@/lib/companion-completion-sync';
 import { loadMoodHistoryForOrchestrate } from '@/lib/companion-mood-history';
 import { loadActiveOrchestrateSources } from '@/lib/companion-orchestrate-sources';
 import { getRecencyHints, updateRecencyHints } from '@/lib/companion-recency-hints';
-import {
-  COMPANION_STEP_TO_REFLECTION_COLUMN,
-  COMPANION_STEP_TO_READ_TYPE,
-} from '@/lib/companion-completion-maps';
 import { hostnameFromUrl } from '@/lib/companion-url';
 import { saveCompanionLibraryBookmarkOnce } from '@/lib/companion-library-autosave';
 
@@ -30,15 +31,6 @@ export type {
   InterventionSecondary,
   InterventionState,
 } from '@/lib/companion-orchestrate-types';
-
-interface CompletionState {
-  breathing: boolean;
-  haiku: boolean;
-  grounding: boolean;
-  signal: boolean;
-  zoomOut: boolean;
-  history: boolean;
-}
 
 interface CacheIds {
   nudge: string | null;
@@ -117,70 +109,27 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
   );
 
   // ── Completion state ──
-  const [completion, setCompletion] = useState<CompletionState>({
-    breathing: false, haiku: false, grounding: false, signal: false, zoomOut: false, history: false,
+  const [completion, setCompletion] = useState<CompanionUiCompletionState>({
+    breathing: false,
+    haiku: false,
+    grounding: false,
+    signal: false,
+    zoomOut: false,
+    history: false,
   });
   const [cacheIds, setCacheIds] = useState<CacheIds>({ nudge: null, signal: null, zoomOut: null, history: null });
 
   useEffect(() => {
     if (!reflectionId) return;
-    // Read breathing/haiku from reflections; grounding + others from reflection_companions (ground_nudge row is canonical)
-    Promise.all([
-      supabase
-        .from('reflections')
-        .select('breathing_completed, haiku_read, grounding_read')
-        .eq('id', reflectionId)
-        .single(),
-      supabase
-        .from('reflection_companions')
-        .select('companion_type, read')
-        .eq('reflection_id', reflectionId),
-    ]).then(([{ data: refData }, { data: companions }]) => {
-      const companionReadMap: Record<string, boolean> = {};
-      for (const c of (companions ?? []) as any[]) {
-        companionReadMap[c.companion_type] = c.read ?? false;
-      }
-      setCompletion({
-        breathing: (refData as any)?.breathing_completed ?? false,
-        haiku: (refData as any)?.haiku_read ?? false,
-        grounding: companionReadMap['ground_nudge'] ?? (refData as any)?.grounding_read ?? false,
-        signal: companionReadMap['signal'] ?? false,
-        zoomOut: companionReadMap['zoom_out'] ?? companionReadMap['zoom_out_deep_time'] ?? false,
-        history: companionReadMap['historical_insight'] ?? false,
-      });
-    });
+    loadCompanionUiCompletionState(reflectionId).then(setCompletion);
   }, [reflectionId]);
 
-  const markCompleted = useCallback(async (key: keyof CompletionState) => {
+  const markCompleted = useCallback(async (key: CompanionUiCompletionStep) => {
     if (completion[key]) return;
     setCompletion((prev) => ({ ...prev, [key]: true }));
     hapticFeedback('light');
     if (reflectionId) {
-      const reflectionKey = COMPANION_STEP_TO_REFLECTION_COLUMN[key];
-      if (reflectionKey) {
-        await supabase
-          .from('reflections')
-          .update({ [reflectionKey]: true } as any)
-          .eq('id', reflectionId);
-      }
-
-      const companionType = COMPANION_STEP_TO_READ_TYPE[key];
-      if (companionType) {
-        // Update both zoom_out and zoom_out_deep_time for zoom, single type for others
-        if (key === 'zoomOut') {
-          await supabase
-            .from('reflection_companions')
-            .update({ read: true })
-            .eq('reflection_id', reflectionId)
-            .in('companion_type', ['zoom_out', 'zoom_out_deep_time']);
-        } else {
-          await supabase
-            .from('reflection_companions')
-            .update({ read: true })
-            .eq('reflection_id', reflectionId)
-            .eq('companion_type', companionType);
-        }
-      }
+      await persistCompanionUiStepCompletion(reflectionId, key);
     }
   }, [reflectionId, completion]);
 
@@ -239,15 +188,6 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     setInterventionLoading(true);
   }, [reflectionId]);
 
-  // ── Check for already-cached data on the reflection row ──
-  const checkCachedReflection = useCallback(async (rid: string) => {
-    const { data: companions } = await supabase
-      .from('reflection_companions')
-      .select('companion_type, content')
-      .eq('reflection_id', rid);
-    return parseReflectionCompanionRows((companions ?? []) as ReflectionCompanionRow[]);
-  }, []);
-
   // ── Intervention-only fetch + cached companion hydration ──
   // Companions are NOT fetched here — only on user tap (see fetchCompanion below).
   useEffect(() => {
@@ -264,7 +204,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     (async () => {
       try {
         // Hydrate any already-persisted companion data from reflection_companions
-        const cached = await checkCachedReflection(reflectionId);
+        const cached = await fetchParsedReflectionCompanionCache(reflectionId);
         if (cancelled) return;
 
         if (cached.signal) {
@@ -367,7 +307,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     })();
 
     return () => { cancelled = true; };
-  }, [reflectionId, retryCount, context, reflectionMessage, mood, severityNumber, language, checkCachedReflection, autoSaveToLibrary]);
+  }, [reflectionId, retryCount, context, reflectionMessage, mood, severityNumber, language, autoSaveToLibrary]);
 
   // ── On-demand companion slot fetch (triggered when user taps a card) ──
   const fetchCompanion = useCallback(async (slot: RegenerateCompanionSlot) => {
