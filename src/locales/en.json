@@ -29,7 +29,9 @@
     "pinned": "Pinned",
     "unpin": "Unpin",
     "from": "From",
-    "until": "Until"
+    "until": "Until",
+    "offlineBanner": "You're offline",
+    "connectivityDegraded": "Can't reach Holzen right now — check your connection or try again shortly."
   },
   "auth": {
     "restoringSession": "Restoring your session…",
