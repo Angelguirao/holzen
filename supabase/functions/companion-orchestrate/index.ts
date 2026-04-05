@@ -12,6 +12,22 @@ import { determineSessionIntent } from "../_shared/session-intent.ts";
 import { selectIntervention, parseDirection, bucketSeverity, type InterventionSelection } from "../_shared/intervention-selector.ts";
 import { fetchGroundingSourcesForOrchestrate } from "../_shared/pause-cron-parity.ts";
 import { fetchRecentSignalCitationUrls, mergeRecentSignalUrls } from "../_shared/recent-signal-urls.ts";
+import { ORCHESTRATOR_KEY_MAP } from "../_shared/companion-types.ts";
+import type {
+  CompanionResult,
+  InterventionPayload,
+  OrchestrateResponse,
+} from "../_shared/companion-orchestrate-types.ts";
+import {
+  asOptionalString,
+  asSourceArray,
+  asStringArray,
+  isCompanionContent,
+} from "../_shared/companion-orchestrate-parse.ts";
+import { logOrchestrateInvoke } from "../_shared/companion-orchestrate-logging.ts";
+import { tryOrchestrateSkipFromReflectionCompanions } from "../_shared/companion-orchestrate-skip-cached.ts";
+
+const companionTypeMap = ORCHESTRATOR_KEY_MAP;
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -37,198 +53,6 @@ const corsHeaders = {
  *
  * Generators are invoked directly (in-process) instead of via HTTP.
  */
-
-interface CompanionResult {
-  data: any | null;
-  source: "live" | "cache" | "curated" | "empty";
-  cacheId: string | null;
-  latencyMs: number;
-  /** Prompt version from the generator — stored as content_fingerprint for regression tracking. */
-  promptVersion?: string;
-  /** Present when source is `empty` (e.g. DISABLE_COMPANION_FALLBACKS). */
-  error?: string;
-}
-
-interface InterventionPayload {
-  mode: "insight" | "question";
-  primary: { type: string; data: any } | null;
-  secondary: { type: string; data: any } | null;
-  question: string | null;
-}
-
-interface OrchestrateResponse {
-  // Legacy fields — kept for backward compat, null in the new intervention flow
-  signal: CompanionResult | null;
-  grounding: CompanionResult | null;
-  history: CompanionResult | null;
-  zoomOut: CompanionResult | null;
-  // New structured intervention response
-  intervention: InterventionPayload | null;
-}
-
-type OrchestrateSourceInput = {
-  name: string;
-  type: string;
-  url?: string;
-};
-
-function asOptionalString(value: unknown): string | undefined {
-  return typeof value === "string" && value.length > 0 ? value : undefined;
-}
-
-function asStringArray(value: unknown): string[] | undefined {
-  if (!Array.isArray(value)) return undefined;
-  const items = value.filter((item): item is string => typeof item === "string" && item.length > 0);
-  return items.length > 0 ? items : undefined;
-}
-
-function asSourceArray(value: unknown): OrchestrateSourceInput[] | undefined {
-  if (!Array.isArray(value)) return undefined;
-
-  const items = value.flatMap((item) => {
-    if (!item || typeof item !== "object") return [];
-
-    const entry = item as Record<string, unknown>;
-    if (typeof entry.name !== "string" || entry.name.length === 0) return [];
-    if (typeof entry.type !== "string" || entry.type.length === 0) return [];
-
-    const source: OrchestrateSourceInput = { name: entry.name, type: entry.type };
-    if (typeof entry.url === "string" && entry.url.length > 0) {
-      source.url = entry.url;
-    }
-    return [source];
-  });
-
-  return items.length > 0 ? items : undefined;
-}
-
-function isCompanionContent(value: unknown): value is Record<string, unknown> {
-  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
-}
-
-function contentSatisfiesCompanion(companionType: string, raw: unknown): boolean {
-  if (raw == null || typeof raw !== "object") return false;
-  const c = raw as Record<string, unknown>;
-  switch (companionType) {
-    case "signal":
-      return typeof c.source === "string" && c.source.length > 0;
-    case "ground_nudge":
-      return typeof c.title === "string" && c.title.length > 0 &&
-        typeof c.body === "string" && c.body.length > 0;
-    case "historical_insight":
-      return typeof c.btcInsight === "string" && c.btcInsight.length > 0;
-    case "zoom_out":
-    case "zoom_out_deep_time":
-      return Object.keys(c).length > 0;
-    case "intervention":
-      return typeof c.mode === "string" && c.mode.length > 0;
-    default:
-      return false;
-  }
-}
-
-/**
- * If reflection_companions already has every slot this invoke would generate, return a
- * response assembled from DB rows (source "cache") and skip AI, rate limit, and budget.
- * Grep: orchestrate_skip_cached
- */
-async function tryOrchestrateSkipFromReflectionCompanions(params: {
-  svcClient: any;
-  reflectionId: string;
-  useIntervention: boolean;
-  needSignal: boolean;
-  needGrounding: boolean;
-  needHistory: boolean;
-  needZoomOut: boolean;
-  log: ReturnType<typeof createLogger>;
-}): Promise<OrchestrateResponse | null> {
-  const { data: rows, error } = await params.svcClient
-    .from("reflection_companions")
-    .select("companion_type, content")
-    .eq("reflection_id", params.reflectionId);
-  if (error || !rows?.length) return null;
-
-  const byType = new Map<string, unknown>();
-  for (const r of rows) {
-    byType.set(r.companion_type as string, r.content);
-  }
-
-  const hasSignal = () => contentSatisfiesCompanion("signal", byType.get("signal"));
-  const hasGrounding = () => contentSatisfiesCompanion("ground_nudge", byType.get("ground_nudge"));
-  const hasHistory = () => contentSatisfiesCompanion("historical_insight", byType.get("historical_insight"));
-  const hasZoom = () =>
-    contentSatisfiesCompanion("zoom_out_deep_time", byType.get("zoom_out_deep_time")) ||
-    contentSatisfiesCompanion("zoom_out", byType.get("zoom_out"));
-  const hasIntervention = () => contentSatisfiesCompanion("intervention", byType.get("intervention"));
-
-  if (params.needSignal && !hasSignal()) return null;
-  if (params.needGrounding && !hasGrounding()) return null;
-  if (params.needHistory && !hasHistory()) return null;
-  if (params.needZoomOut && !hasZoom()) return null;
-  if (params.useIntervention && !hasIntervention()) return null;
-
-  const zoomRaw = byType.get("zoom_out_deep_time") ?? byType.get("zoom_out");
-
-  const response: OrchestrateResponse = {
-    signal: params.needSignal
-      ? { data: byType.get("signal"), source: "cache", cacheId: null, latencyMs: 0 }
-      : null,
-    grounding: params.needGrounding
-      ? { data: byType.get("ground_nudge"), source: "cache", cacheId: null, latencyMs: 0 }
-      : null,
-    history: params.needHistory
-      ? { data: byType.get("historical_insight"), source: "cache", cacheId: null, latencyMs: 0 }
-      : null,
-    zoomOut: params.needZoomOut
-      ? { data: zoomRaw, source: "cache", cacheId: null, latencyMs: 0 }
-      : null,
-    intervention: params.useIntervention
-      ? (byType.get("intervention") as InterventionPayload)
-      : null,
-  };
-
-  params.log("skip: all requested companion rows already on reflection_companions");
-  try {
-    console.log(JSON.stringify({
-      holzen_event: "orchestrate_skip_cached",
-      reflection_prefix: params.reflectionId.slice(0, 8),
-      need_signal: params.needSignal,
-      need_grounding: params.needGrounding,
-      need_history: params.needHistory,
-      need_zoom: params.needZoomOut,
-      need_intervention: params.useIntervention,
-      ts: new Date().toISOString(),
-    }));
-  } catch { /* ignore */ }
-
-  return response;
-}
-
-/** Client/cron overlap metrics — grep: orchestrate_invoke */
-function logOrchestrateInvoke(body: Record<string, unknown>, authMode: "service_role" | "user_jwt") {
-  const raw = body.holzenInvokeSource;
-  const invokeSource =
-    typeof raw === "string" && /^[a-z0-9_.:-]+$/i.test(raw) && raw.length <= 48
-      ? raw
-      : "unknown";
-  const rid = body.reflectionId;
-  const reflectionPrefix = typeof rid === "string" && rid.length >= 8 ? rid.slice(0, 8) : null;
-  const regen = body.regenerateOnly;
-  try {
-    console.log(
-      JSON.stringify({
-        holzen_event: "orchestrate_invoke",
-        invoke_source: invokeSource,
-        auth_mode: authMode,
-        reflection_prefix: reflectionPrefix,
-        regenerate_only: typeof regen === "string" ? regen : null,
-        ts: new Date().toISOString(),
-      }),
-    );
-  } catch {
-    /* non-fatal */
-  }
-}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -762,10 +586,3 @@ serve(async (req) => {
     );
   }
 });
-
-// ── Helpers ──
-
-import { ORCHESTRATOR_KEY_MAP } from "../_shared/companion-types.ts";
-const companionTypeMap = ORCHESTRATOR_KEY_MAP;
-
-// All companion data is written to the normalized reflection_companions table via writeCompanionData().
