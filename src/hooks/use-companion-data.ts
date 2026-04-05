@@ -4,11 +4,7 @@ import { hapticFeedback } from '@/lib/haptics';
 import { useHolzen } from '@/hooks/use-holzen';
 import { useToast } from '@/hooks/use-toast';
 import type { CompanionData, CompanionPrefs } from '@/components/CompanionSection';
-import type {
-  CompanionOrchestrateSlotResult,
-  RegenerateCompanionSlot,
-  InterventionState,
-} from '@/lib/companion-orchestrate-types';
+import type { RegenerateCompanionSlot, InterventionState } from '@/lib/companion-orchestrate-types';
 import {
   fetchParsedReflectionCompanionCache,
 } from '@/lib/companion-reflection-cache';
@@ -21,8 +17,15 @@ import {
 } from '@/lib/companion-completion-sync';
 import { loadMoodHistoryForOrchestrate } from '@/lib/companion-mood-history';
 import { loadActiveOrchestrateSources } from '@/lib/companion-orchestrate-sources';
-import { getRecencyHints, updateRecencyHints } from '@/lib/companion-recency-hints';
-import { hostnameFromUrl } from '@/lib/companion-url';
+import { getRecencyHints } from '@/lib/companion-recency-hints';
+import {
+  applyOrchestrateSlotLazyOrRegenerate,
+  hydrateOrchestrateSlotIfNew,
+  isFilledOrchestrateSlot,
+  readOrchestrateSlotBody,
+  type CompanionSlotCacheIds,
+  type CompanionSlotCommitters,
+} from '@/lib/companion-orchestrate-slot-apply';
 import { saveCompanionLibraryBookmarkOnce } from '@/lib/companion-library-autosave';
 
 export type {
@@ -31,13 +34,6 @@ export type {
   InterventionSecondary,
   InterventionState,
 } from '@/lib/companion-orchestrate-types';
-
-interface CacheIds {
-  nudge: string | null;
-  signal: string | null;
-  zoomOut: string | null;
-  history: string | null;
-}
 
 interface NudgeData {
   title: string;
@@ -117,7 +113,12 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     zoomOut: false,
     history: false,
   });
-  const [cacheIds, setCacheIds] = useState<CacheIds>({ nudge: null, signal: null, zoomOut: null, history: null });
+  const [cacheIds, setCacheIds] = useState<CompanionSlotCacheIds>({
+    nudge: null,
+    signal: null,
+    zoomOut: null,
+    history: null,
+  });
 
   useEffect(() => {
     if (!reflectionId) return;
@@ -273,31 +274,38 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
 
         // Hydrate any companion data the server returned alongside intervention
         // (e.g. trap forces grounding, pattern forces history, secondary forces zoomOut)
-        const gR = data.grounding as CompanionOrchestrateSlotResult | null;
-        if (gR?.data && gR.source !== 'empty' && !fetchedSlotsRef.current.has('grounding')) {
-          setNudge(gR.data);
-          fetchedSlotsRef.current.add('grounding');
-          autoSaveToLibrary({ title: gR.data.title, body: gR.data.body, sourceType: 'grounding', sourceUrl: gR.data.url });
-        }
-        const hR = data.history as CompanionOrchestrateSlotResult | null;
-        if (hR?.data && hR.source !== 'empty' && !fetchedSlotsRef.current.has('history')) {
-          setHistoryInsight(hR.data);
-          fetchedSlotsRef.current.add('history');
-          autoSaveToLibrary({ title: hR.data.title, body: hR.data.btcInsight, sourceType: 'history_insight' });
-        }
-        const zR = data.zoomOut as CompanionOrchestrateSlotResult | null;
-        if (zR?.data && zR.source !== 'empty' && !fetchedSlotsRef.current.has('zoomOut')) {
-          setZoomOut(zR.data);
-          fetchedSlotsRef.current.add('zoomOut');
-          const zBody = zR.data?.deepTime?.body || zR.data?.echo?.message || 'Zoom Out perspective';
-          autoSaveToLibrary({ title: zR.data?.deepTime?.title || 'Zoom Out', body: zBody, sourceType: 'zoom_out' });
-        }
-        const sR = data.signal as CompanionOrchestrateSlotResult | null;
-        if (sR?.data && sR.source !== 'empty' && !fetchedSlotsRef.current.has('signal')) {
-          setSignal(sR.data);
-          fetchedSlotsRef.current.add('signal');
-          autoSaveToLibrary({ title: sR.data.title, body: sR.data.body, sourceType: 'signal', sourceUrl: sR.data.url });
-        }
+        const orchestrateBody = (data ?? {}) as Record<string, unknown>;
+        const slotCommitters: CompanionSlotCommitters = {
+          setSignal,
+          setNudge,
+          setHistoryInsight,
+          setZoomOut,
+          autoSaveToLibrary,
+        };
+        hydrateOrchestrateSlotIfNew(
+          'grounding',
+          readOrchestrateSlotBody(orchestrateBody, 'grounding'),
+          fetchedSlotsRef.current,
+          slotCommitters,
+        );
+        hydrateOrchestrateSlotIfNew(
+          'history',
+          readOrchestrateSlotBody(orchestrateBody, 'history'),
+          fetchedSlotsRef.current,
+          slotCommitters,
+        );
+        hydrateOrchestrateSlotIfNew(
+          'zoomOut',
+          readOrchestrateSlotBody(orchestrateBody, 'zoomOut'),
+          fetchedSlotsRef.current,
+          slotCommitters,
+        );
+        hydrateOrchestrateSlotIfNew(
+          'signal',
+          readOrchestrateSlotBody(orchestrateBody, 'signal'),
+          fetchedSlotsRef.current,
+          slotCommitters,
+        );
       } catch (e) {
         console.error('[useCompanionData] intervention fetch failed', e);
         setInterventionError(true);
@@ -365,43 +373,18 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
         return;
       }
 
-      if (slot === 'signal') {
-        const r = body.signal as CompanionOrchestrateSlotResult | null;
-        if (r?.data && r.source !== 'empty') {
-          setSignal(r.data as SignalData);
-          if (r.cacheId) setCacheIds(prev => ({ ...prev, signal: r.cacheId }));
-          updateRecencyHints('signal_title', r.data.title);
-          updateRecencyHints('signal_source', r.data.source);
-          if (r.data.url) updateRecencyHints('signal_url', r.data.url);
-          autoSaveToLibrary({ title: r.data.title, body: r.data.body, sourceType: 'signal', sourceUrl: r.data.url });
-        } else setErr(true);
-      } else if (slot === 'grounding') {
-        const r = body.grounding as CompanionOrchestrateSlotResult | null;
-        if (r?.data && r.source !== 'empty') {
-          setNudge(r.data as NudgeData);
-          if (r.cacheId) setCacheIds(prev => ({ ...prev, nudge: r.cacheId }));
-          updateRecencyHints('grounding', r.data.title);
-          const gHost = hostnameFromUrl(r.data.url);
-          if (gHost) updateRecencyHints('grounding_source', gHost);
-          autoSaveToLibrary({ title: r.data.title, body: r.data.body, sourceType: 'grounding', sourceUrl: r.data.url });
-        } else setErr(true);
-      } else if (slot === 'history') {
-        const r = body.history as CompanionOrchestrateSlotResult | null;
-        if (r?.data && r.source !== 'empty') {
-          setHistoryInsight(r.data as CachedHistoricalInsightShape);
-          if (r.cacheId) setCacheIds(prev => ({ ...prev, history: r.cacheId }));
-          updateRecencyHints('history', r.data.title);
-          autoSaveToLibrary({ title: r.data.title, body: r.data.btcInsight, sourceType: 'history_insight' });
-        } else setErr(true);
+      const slotCommitters: CompanionSlotCommitters = {
+        setSignal,
+        setNudge,
+        setHistoryInsight,
+        setZoomOut,
+        autoSaveToLibrary,
+      };
+      const r = readOrchestrateSlotBody(body, slot);
+      if (isFilledOrchestrateSlot(r)) {
+        applyOrchestrateSlotLazyOrRegenerate(slot, r, setCacheIds, slotCommitters);
       } else {
-        const r = body.zoomOut as CompanionOrchestrateSlotResult | null;
-        if (r?.data && r.source !== 'empty') {
-          setZoomOut(r.data);
-          if (r.cacheId) setCacheIds(prev => ({ ...prev, zoomOut: r.cacheId }));
-          updateRecencyHints('zoomOut', r.data?.deepTime?.title);
-          const zoomBody = r.data?.deepTime?.body || r.data?.echo?.message || 'Zoom Out perspective';
-          autoSaveToLibrary({ title: r.data?.deepTime?.title || 'Zoom Out', body: zoomBody, sourceType: 'zoom_out' });
-        } else setErr(true);
+        setErr(true);
       }
     } catch (e) {
       console.error('[useCompanionData] fetchCompanion failed', slot, e);
@@ -479,43 +462,18 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
         return;
       }
 
-      if (slot === 'signal') {
-        const r = body.signal as CompanionOrchestrateSlotResult | null;
-        if (r?.data && r.source !== 'empty') {
-          setSignal(r.data as SignalData);
-          if (r.cacheId) setCacheIds(prev => ({ ...prev, signal: r.cacheId }));
-          updateRecencyHints('signal_title', r.data.title);
-          updateRecencyHints('signal_source', r.data.source);
-          if (r.data.url) updateRecencyHints('signal_url', r.data.url);
-          autoSaveToLibrary({ title: r.data.title, body: r.data.body, sourceType: 'signal', sourceUrl: r.data.url });
-        } else setErr(true);
-      } else if (slot === 'grounding') {
-        const r = body.grounding as CompanionOrchestrateSlotResult | null;
-        if (r?.data && r.source !== 'empty') {
-          setNudge(r.data as NudgeData);
-          if (r.cacheId) setCacheIds(prev => ({ ...prev, nudge: r.cacheId }));
-          updateRecencyHints('grounding', r.data.title);
-          const gHost = hostnameFromUrl(r.data.url);
-          if (gHost) updateRecencyHints('grounding_source', gHost);
-          autoSaveToLibrary({ title: r.data.title, body: r.data.body, sourceType: 'grounding', sourceUrl: r.data.url });
-        } else setErr(true);
-      } else if (slot === 'history') {
-        const r = body.history as CompanionOrchestrateSlotResult | null;
-        if (r?.data && r.source !== 'empty') {
-          setHistoryInsight(r.data as CachedHistoricalInsightShape);
-          if (r.cacheId) setCacheIds(prev => ({ ...prev, history: r.cacheId }));
-          updateRecencyHints('history', r.data.title);
-          autoSaveToLibrary({ title: r.data.title, body: r.data.btcInsight, sourceType: 'history_insight' });
-        } else setErr(true);
+      const slotCommitters: CompanionSlotCommitters = {
+        setSignal,
+        setNudge,
+        setHistoryInsight,
+        setZoomOut,
+        autoSaveToLibrary,
+      };
+      const r = readOrchestrateSlotBody(body, slot);
+      if (isFilledOrchestrateSlot(r)) {
+        applyOrchestrateSlotLazyOrRegenerate(slot, r, setCacheIds, slotCommitters);
       } else {
-        const r = body.zoomOut as CompanionOrchestrateSlotResult | null;
-        if (r?.data && r.source !== 'empty') {
-          setZoomOut(r.data);
-          if (r.cacheId) setCacheIds(prev => ({ ...prev, zoomOut: r.cacheId }));
-          updateRecencyHints('zoomOut', r.data?.deepTime?.title);
-          const zoomBody = r.data?.deepTime?.body || r.data?.echo?.message || 'Zoom Out perspective';
-          autoSaveToLibrary({ title: r.data?.deepTime?.title || 'Zoom Out', body: zoomBody, sourceType: 'zoom_out' });
-        } else setErr(true);
+        setErr(true);
       }
     } catch (e) {
       console.error('[useCompanionData] regenerateCompanion', e);
