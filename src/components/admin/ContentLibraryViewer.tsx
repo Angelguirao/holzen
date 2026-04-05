@@ -97,7 +97,7 @@ export function ContentLibraryViewer({ entries, onRefresh }: { entries: LibraryE
     <div className="space-y-3">
       <div className="rounded-xl border border-border/20 bg-card/10 px-4 py-3 space-y-2">
         <p className="text-[10px] font-mono text-foreground/70">
-          DB-backed curated library — essays, papers, events used when <strong className="font-normal text-muted-foreground/65">live</strong> generation falls back (before <code className="text-muted-foreground/55">companion_cache</code>, before hardcoded strings).
+          DB-backed curated library — essays, papers, events tried <strong className="font-normal text-muted-foreground/65">first</strong> by generators (before <code className="text-muted-foreground/55">companion_cache</code>, before live AI, before hardcoded strings).
         </p>
         <p className="text-[9px] text-muted-foreground/50 leading-relaxed">
           This is where you edit the long-form “curated” content users can receive. Monitor’s per-serve “curated” count is mostly hardcoded fallbacks when both Library and cache miss — not this list directly. Entries align with Sources by author name where applicable. Deactivate sets <span className="font-mono">active = false</span>.

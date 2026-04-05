@@ -25,6 +25,7 @@ import {
 } from "../fallbacks.ts";
 import { COMPANION_ZOOM_OUT_DEEP_TIME, parseMarketDirection, serveFromCache } from "../cache.ts";
 import { createAttemptLogger, trackEvent } from "../observe.ts";
+import { getPhaseConfig } from "../phase-config.ts";
 
 /** Bump when the deep-time prompt, seed pool, or quality rules change. */
 export const PROMPT_VERSION = "v2";
@@ -47,6 +48,8 @@ export interface GenerateZoomOutParams {
   userId?: string;
   recentTitles?: string[];
   zoomOutAngle?: string;
+  /** Skip cache phase and go straight to live (used by regenerate). */
+  forceLive?: boolean;
   log: (msg: string, extra?: Record<string, unknown>) => void;
 }
 
@@ -350,7 +353,52 @@ No trading advice, no price predictions, no exclamation marks.${mood ? `\n\nUSER
 // ── Public entry point ──
 
 export async function generateZoomOut(params: GenerateZoomOutParams): Promise<ZoomOutResult> {
-  const { svcClient, context, mood, recentTitles, userId, zoomOutAngle, log } = params;
+  const { svcClient, context, mood, recentTitles, userId, zoomOutAngle, forceLive, log } = params;
+  const phases = getPhaseConfig();
+
+  // ── Phase 2: Cache (no library type for zoom-out) ──
+  if (phases.cache && !forceLive) {
+    const marketDirection = parseMarketDirection(context);
+    const cached = await serveFromCache(svcClient, COMPANION_ZOOM_OUT_DEEP_TIME, "en", { userId, marketDirection });
+    if (cached) {
+      log("zoomOut resolved from cache (phase 2)");
+      const prices = await fetchHistoricalAndCurrentPrices(svcClient, context, log);
+      let echoReflection: any = null;
+      if (userId) echoReflection = await fetchEchoReflection(svcClient, userId, context, log);
+      return {
+        data: {
+          onThisDay: prices.onThisDay,
+          currentPrice: prices.currentPrice,
+          echo: echoReflection ? { message: echoReflection.message, created_at: echoReflection.created_at, mood: echoReflection.mood, outcome: echoReflection.outcome } : null,
+          deepTime: cached.data as { title: string; body: string },
+          partial: prices.isPartial,
+        },
+        source: "cache",
+        cacheId: cached.cacheId,
+      };
+    }
+  }
+
+  // ── Phase 3: Live generation ──
+  if (!phases.live && !forceLive) {
+    log("live phase disabled, serving curated");
+    if (companionFallbacksDisabled()) {
+      return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
+    }
+    const pool = await loadFallbackPool<{ title: string; body: string }>(svcClient, "zoom_out");
+    const prices = await fetchHistoricalAndCurrentPrices(svcClient, context, log);
+    return {
+      data: {
+        onThisDay: prices.onThisDay,
+        currentPrice: prices.currentPrice,
+        echo: null,
+        deepTime: pickRandom(pool),
+        partial: prices.isPartial,
+      },
+      source: "curated",
+      cacheId: null,
+    };
+  }
 
   // ── 1. Fetch historical BTC prices with DB caching ──
   const prices = await fetchHistoricalAndCurrentPrices(svcClient, context, log);

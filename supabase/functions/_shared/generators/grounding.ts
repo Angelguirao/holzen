@@ -26,6 +26,7 @@ import { createAttemptLogger, trackEvent } from "../observe.ts";
 import { enqueueCatalogSourceSuggestion } from "../source-suggestions.ts";
 import { callPerplexityChat, mergePerplexityUsage } from "../perplexity-client.ts";
 import { searchLibrary, paperToGrounding, recordLibraryServe } from "../content-library.ts";
+import { getPhaseConfig } from "../phase-config.ts";
 
 /** Bump when the search query, structuring prompt, or quality rules change. */
 export const PROMPT_VERSION = "v3";
@@ -53,6 +54,8 @@ export interface GenerateGroundingParams {
   userId?: string;
   reflectionId?: string | null;
   preferredBias?: string;
+  /** Skip library/cache phases and go straight to live (used by regenerate). */
+  forceLive?: boolean;
   log: (msg: string, extra?: Record<string, unknown>) => void;
 }
 
@@ -101,15 +104,11 @@ function findMatchingBiasTopic(preferredBias: string | undefined): (typeof BIAS_
   return null;
 }
 
-async function serveFallback(
+/** Try content_library (papers) for grounding. */
+async function tryLibrary(
   svcClient: any,
   userId?: string,
-  marketDirection?: "up" | "down" | "neutral",
-  excludeIds?: string[],
-): Promise<GroundingResult> {
-  if (companionFallbacksDisabled()) {
-    return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
-  }
+): Promise<GroundingResult | null> {
   const libraryRows = await searchLibrary(svcClient, {
     type: "paper",
     companionType: "ground_nudge",
@@ -122,10 +121,47 @@ async function serveFallback(
     recordLibraryServe(svcClient, userId, pick.id, "ground_nudge");
     return { data: result, source: "cache", cacheId: null };
   }
+  return null;
+}
+
+/** Try companion_cache for grounding. */
+async function tryCache(
+  svcClient: any,
+  userId?: string,
+  marketDirection?: "up" | "down" | "neutral",
+  excludeIds?: string[],
+): Promise<GroundingResult | null> {
   const cached = await serveFromCache(svcClient, "ground_nudge", "en", { userId, marketDirection, excludeIds });
   if (cached) return { data: cached.data, source: "cache", cacheId: cached.cacheId };
+  return null;
+}
+
+/** Last-resort curated fallback pool. */
+async function serveCurated(svcClient: any): Promise<GroundingResult> {
   const pool = await loadFallbackPool<{ title: string; body: string; citation: string; url: string }>(svcClient, "grounding");
   return { data: pickRandom(pool), source: "curated", cacheId: null };
+}
+
+/** Resolve from non-live phases in order (library → cache → curated). */
+async function serveFallback(
+  svcClient: any,
+  userId?: string,
+  marketDirection?: "up" | "down" | "neutral",
+  excludeIds?: string[],
+): Promise<GroundingResult> {
+  if (companionFallbacksDisabled()) {
+    return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
+  }
+  const phases = getPhaseConfig();
+  if (phases.library) {
+    const lib = await tryLibrary(svcClient, userId);
+    if (lib) return lib;
+  }
+  if (phases.cache) {
+    const cached = await tryCache(svcClient, userId, marketDirection, excludeIds);
+    if (cached) return cached;
+  }
+  return serveCurated(svcClient);
 }
 
 // ── Public entry point ──
@@ -141,9 +177,40 @@ export async function generateGrounding(params: GenerateGroundingParams): Promis
     userId,
     reflectionId,
     preferredBias,
+    forceLive,
     log,
   } = params;
   const marketDirectionForCache = parseMarketDirection(context);
+  const phases = getPhaseConfig();
+
+  if (!forceLive) {
+  // ── Phase 1: Library ──
+  if (phases.library) {
+    const lib = await tryLibrary(svcClient, userId);
+    if (lib) {
+      log("grounding resolved from library (phase 1)");
+      return lib;
+    }
+  }
+
+  // ── Phase 2: Cache ──
+  if (phases.cache) {
+    const cached = await tryCache(svcClient, userId, marketDirectionForCache);
+    if (cached) {
+      log("grounding resolved from cache (phase 2)");
+      return cached;
+    }
+  }
+  } // end !forceLive
+
+  // ── Phase 3: Live generation ──
+  if (!phases.live && !forceLive) {
+    log("live phase disabled, serving curated");
+    if (companionFallbacksDisabled()) {
+      return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
+    }
+    return serveCurated(svcClient);
+  }
 
   const logAttempt = createAttemptLogger(svcClient, { userId });
 

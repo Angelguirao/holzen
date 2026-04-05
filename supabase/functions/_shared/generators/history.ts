@@ -25,6 +25,7 @@ import { parseMarketDirection, serveFromCache } from "../cache.ts";
 import { createAttemptLogger, trackEvent } from "../observe.ts";
 import { callPerplexityChat, type PerplexityUsage } from "../perplexity-client.ts";
 import { searchLibrary, eventToHistory, recordLibraryServe } from "../content-library.ts";
+import { getPhaseConfig } from "../phase-config.ts";
 
 /** Bump when the search query, structuring prompt, or quality rules change. */
 export const PROMPT_VERSION = "v2";
@@ -46,6 +47,8 @@ export interface GenerateHistoryParams {
   recentTitles?: string[];
   userId?: string;
   preferredMood?: "recovery" | "caution" | "neutral";
+  /** Skip library/cache phases and go straight to live (used by regenerate). */
+  forceLive?: boolean;
   log: (msg: string, extra?: Record<string, unknown>) => void;
 }
 
@@ -105,16 +108,12 @@ function selectEra(
   return pool[Math.floor(Math.random() * pool.length)];
 }
 
-async function serveFallback(
+/** Try content_library (events) for history. */
+async function tryLibrary(
   svcClient: any,
   userId?: string,
-  marketDirection?: "up" | "down" | "neutral",
-  excludeIds?: string[],
   moodTag?: string,
-): Promise<HistoryResult> {
-  if (companionFallbacksDisabled()) {
-    return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
-  }
+): Promise<HistoryResult | null> {
   const libraryRows = await searchLibrary(svcClient, {
     type: "event",
     companionType: "historical_insight",
@@ -128,17 +127,93 @@ async function serveFallback(
     recordLibraryServe(svcClient, userId, pick.id, "historical_insight");
     return { data: result, source: "cache", cacheId: null };
   }
+  return null;
+}
+
+/** Try companion_cache for history. */
+async function tryCache(
+  svcClient: any,
+  userId?: string,
+  marketDirection?: "up" | "down" | "neutral",
+  excludeIds?: string[],
+): Promise<HistoryResult | null> {
   const cached = await serveFromCache(svcClient, "historical_insight", "en", { userId, marketDirection, excludeIds });
   if (cached) return { data: cached.data, source: "cache", cacheId: cached.cacheId };
+  return null;
+}
+
+/** Last-resort curated fallback pool. */
+async function serveCurated(svcClient: any): Promise<HistoryResult> {
   const pool = await loadFallbackPool<NonNullable<HistoryResult["data"]>>(svcClient, "history");
   return { data: pickRandom(pool), source: "curated", cacheId: null };
+}
+
+/** Resolve from non-live phases in order (library → cache → curated). */
+async function serveFallback(
+  svcClient: any,
+  userId?: string,
+  marketDirection?: "up" | "down" | "neutral",
+  excludeIds?: string[],
+  moodTag?: string,
+): Promise<HistoryResult> {
+  if (companionFallbacksDisabled()) {
+    return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
+  }
+  const phases = getPhaseConfig();
+  if (phases.library) {
+    const lib = await tryLibrary(svcClient, userId, moodTag);
+    if (lib) return lib;
+  }
+  if (phases.cache) {
+    const cached = await tryCache(svcClient, userId, marketDirection, excludeIds);
+    if (cached) return cached;
+  }
+  return serveCurated(svcClient);
 }
 
 // ── Public entry point ──
 
 export async function generateHistory(params: GenerateHistoryParams): Promise<HistoryResult> {
-  const { svcClient, context, mood, recentTitles, userId, preferredMood, log } = params;
+  const { svcClient, context, mood, recentTitles, userId, preferredMood, forceLive, log } = params;
   const marketDirection = parseMarketDirection(context);
+  const phases = getPhaseConfig();
+
+  const historyMoodTag: string | undefined =
+    preferredMood ??
+    (mood === "anxious" || mood === "fearful"
+      ? "recovery"
+      : mood === "excited" || mood === "fomo" || mood === "greedy"
+        ? "caution"
+        : undefined);
+
+  if (!forceLive) {
+  // ── Phase 1: Library ──
+  if (phases.library) {
+    const lib = await tryLibrary(svcClient, userId, historyMoodTag);
+    if (lib) {
+      log("history resolved from library (phase 1)");
+      return lib;
+    }
+  }
+
+  // ── Phase 2: Cache ──
+  if (phases.cache) {
+    const cached = await tryCache(svcClient, userId, marketDirection);
+    if (cached) {
+      log("history resolved from cache (phase 2)");
+      return cached;
+    }
+  }
+  } // end !forceLive
+
+  // ── Phase 3: Live generation ──
+  if (!phases.live && !forceLive) {
+    log("live phase disabled, serving curated");
+    if (companionFallbacksDisabled()) {
+      return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
+    }
+    return serveCurated(svcClient);
+  }
 
   const logAttempt = createAttemptLogger(svcClient, { userId });
 
@@ -155,14 +230,6 @@ export async function generateHistory(params: GenerateHistoryParams): Promise<Hi
     ? `\nDo NOT cover these topics (already shown recently): ${recentTitles.slice(0, 5).join("; ")}. Find a COMPLETELY DIFFERENT historical event.`
     : "";
   const randomEra = selectEra(mood, recentTitles, preferredMood);
-
-  const historyMoodTag: string | undefined =
-    preferredMood ??
-    (mood === "anxious" || mood === "fearful"
-      ? "recovery"
-      : mood === "excited" || mood === "fomo" || mood === "greedy"
-        ? "caution"
-        : undefined);
 
   // ── Step 1: Perplexity search ──
   log("calling perplexity");

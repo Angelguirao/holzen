@@ -1,13 +1,13 @@
 /**
  * Content Library — curated rows in `content_library` with per-user freshness.
  *
- * Companion generators (Signal, Grounding, History) are **live-first** (Perplexity, etc.),
- * then fall back to this library, then `companion_cache`, then static curated fallbacks.
+ * Companion generators (Signal, Grounding, History) try this library **first**,
+ * then `companion_cache`, then live AI (Perplexity, etc.), then static curated
+ * fallbacks. Phase ordering is controlled by `_shared/phase-config.ts`.
  *
- * When `includeStale` is false (fallback path), entries the user was served in the last
- * **7 days** are skipped so repeats are less likely. Use `includeStale: true` only if you
- * need any library row regardless of recency (e.g. a future library-before-live path that
- * still wants a guaranteed hit).
+ * When `includeStale` is false, entries the user was served in the last
+ * **7 days** are skipped so repeats are less likely. Use `includeStale: true`
+ * only if you need any library row regardless of recency.
  */
 
 const FRESHNESS_WINDOW_DAYS = 7;
