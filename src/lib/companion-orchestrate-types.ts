@@ -1,5 +1,8 @@
 export type RegenerateCompanionSlot = 'signal' | 'grounding' | 'history' | 'zoomOut';
 
+/** Mirrors Edge `CacheServeRelaxation` when surfaced to the client. */
+export type CompanionCacheRelaxation = 'none' | 'market' | 'repeat_or_lower_quality';
+
 export interface InterventionPrimary {
   type: 'mirror' | 'pattern' | 'trap';
   data: any;
@@ -22,6 +25,8 @@ export interface CompanionOrchestrateSlotResult {
   data: any | null;
   source: 'live' | 'cache' | 'curated' | 'empty';
   cacheId: string | null;
+  /** From `serveFromCache` — `none` is a strict companion_cache hit. */
+  cacheRelaxation?: CompanionCacheRelaxation | null;
   latencyMs: number;
   error?: string;
 }

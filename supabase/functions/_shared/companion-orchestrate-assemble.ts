@@ -63,6 +63,7 @@ export function foldOrchestrateSettledTasks(params: {
         companion_type: companionTypeMap[key],
         serve_source: result.value.source,
         cache_entry_id: result.value.cacheId || null,
+        cache_relaxation: result.value.cacheRelaxation ?? null,
         content_title: result.value.data?.title || result.value.data?.deepTime?.title || null,
         content_fingerprint: result.value.promptVersion ?? null,
         latency_ms: result.value.latencyMs,
@@ -85,6 +86,7 @@ export function foldOrchestrateSettledTasks(params: {
         data: null,
         source: "empty",
         cacheId: null,
+        cacheRelaxation: null,
         latencyMs: Date.now() - params.t0,
         error: result.reason?.message || "Unknown error",
       };
@@ -94,6 +96,7 @@ export function foldOrchestrateSettledTasks(params: {
         companion_type: companionTypeMap[key],
         serve_source: "empty",
         cache_entry_id: null,
+        cache_relaxation: null,
         content_title: null,
         content_fingerprint: null,
         latency_ms: Date.now() - params.t0,

@@ -450,7 +450,11 @@
     "regenerate": "Regenerate",
     "regenerating": "Regenerating…",
     "feedbackThanksUp": "Thanks!",
-    "feedbackThanksDown": "Noted"
+    "feedbackThanksDown": "Noted",
+    "cacheRelaxation": {
+      "market": "Pulled from cache with a broader market match than today’s move.",
+      "repeat_or_lower_quality": "From cache — may repeat an earlier card or use a lower-quality saved entry so this slot isn’t empty."
+    }
   },
   "landing": {
     "hero": "When Bitcoin moves, pause before you do.",

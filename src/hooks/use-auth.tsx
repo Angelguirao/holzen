@@ -29,17 +29,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setUser(session?.user ?? null);
       setLoading(false);
 
-      // Record referral on first sign-in
+      // Record referral on first sign-in: durable queue row + invoke (worker retries if invoke fails).
       if (_event === 'SIGNED_IN' && session?.user) {
         const refCode = localStorage.getItem('holzen_ref');
+        const userId = session.user.id;
         if (refCode) {
-          // Fire-and-forget, but keep `holzen_ref` until the call succeeds.
-          void supabase.functions
-            .invoke('record-referral', { body: { referral_code: refCode } })
-            .then(() => localStorage.removeItem('holzen_ref'))
-            .catch((err) => {
-              console.error('[record-referral]', err);
+          void (async () => {
+            const { error: qErr } = await supabase.from('referral_pending_jobs').insert({
+              referred_user_id: userId,
+              referral_code: refCode,
             });
+            if (qErr && qErr.code !== '23505') {
+              holzenLog.auth('referral_pending_jobs insert', { code: qErr.code, message: qErr.message });
+            }
+
+            const { data, error: fnErr } = await supabase.functions.invoke('record-referral', {
+              body: { referral_code: refCode },
+            });
+
+            if (fnErr) {
+              console.error('[record-referral]', fnErr);
+              return;
+            }
+
+            const payload = data as { ok?: boolean; reason?: string } | null;
+            if (payload?.ok === true) {
+              localStorage.removeItem('holzen_ref');
+              return;
+            }
+            if (payload?.ok === false && payload.reason === 'Invalid referral') {
+              localStorage.removeItem('holzen_ref');
+            }
+          })();
         }
       }
     });

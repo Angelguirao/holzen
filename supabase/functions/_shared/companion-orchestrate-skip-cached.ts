@@ -51,16 +51,16 @@ export async function tryOrchestrateSkipFromReflectionCompanions(params: {
 
   const response: OrchestrateResponse = {
     signal: params.needSignal
-      ? { data: byType.get("signal"), source: "cache", cacheId: null, latencyMs: 0 }
+      ? { data: byType.get("signal"), source: "cache", cacheId: null, cacheRelaxation: null, latencyMs: 0 }
       : null,
     grounding: params.needGrounding
-      ? { data: byType.get("ground_nudge"), source: "cache", cacheId: null, latencyMs: 0 }
+      ? { data: byType.get("ground_nudge"), source: "cache", cacheId: null, cacheRelaxation: null, latencyMs: 0 }
       : null,
     history: params.needHistory
-      ? { data: byType.get("historical_insight"), source: "cache", cacheId: null, latencyMs: 0 }
+      ? { data: byType.get("historical_insight"), source: "cache", cacheId: null, cacheRelaxation: null, latencyMs: 0 }
       : null,
     zoomOut: params.needZoomOut
-      ? { data: zoomRaw, source: "cache", cacheId: null, latencyMs: 0 }
+      ? { data: zoomRaw, source: "cache", cacheId: null, cacheRelaxation: null, latencyMs: 0 }
       : null,
     intervention: params.useIntervention
       ? (byType.get("intervention") as InterventionPayload)

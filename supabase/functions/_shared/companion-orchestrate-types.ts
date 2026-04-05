@@ -1,9 +1,13 @@
+import type { CacheServeRelaxation } from "./cache.ts";
+
 /** Response slot shape for companion-orchestrate JSON (mirrors client `CompanionOrchestrateSlotResult`). */
 export interface CompanionResult {
   data: any | null;
   source: "live" | "cache" | "curated" | "empty";
   cacheId: string | null;
   latencyMs: number;
+  /** When `serveFromCache` used a relaxed pass (`none` = strict companion_cache hit). */
+  cacheRelaxation?: CacheServeRelaxation | null;
   /** Prompt version from the generator — stored as content_fingerprint for regression tracking. */
   promptVersion?: string;
   /** Present when source is `empty` (e.g. DISABLE_COMPANION_FALLBACKS). */

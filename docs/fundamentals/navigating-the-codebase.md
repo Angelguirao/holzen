@@ -62,7 +62,7 @@ Routes are declared in one file. **Page components** under `src/pages/` are **`R
 ## 5. Authentication (`src/hooks/use-auth.tsx`)
 
 - **`AuthProvider`** subscribes to `supabase.auth.onAuthStateChange` and seeds state from `getSession()`.
-- On **`SIGNED_IN`**, if `localStorage` has `holzen_ref`, it is consumed and **`record-referral`** is invoked (fire-and-forget).
+- On **`SIGNED_IN`**, if `localStorage` has `holzen_ref`, the app inserts **`referral_pending_jobs`** then invokes **`record-referral`**; **`holzen_ref`** is cleared on success or invalid code (see **`docs/systems/auth/auth-and-referral-system.md`**).
 - **`useAuth()`** exposes `user`, `loading`, `signOut`.
 
 The Supabase browser client is **`src/integrations/supabase/client.ts`** (typed with **`src/integrations/supabase/types.ts`**).

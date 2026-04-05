@@ -163,6 +163,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
     zoomOut, zoomOutLoading, zoomOutError, retryZoomOut,
     historyInsight, historyLoading, historyError, retryHistory,
     cacheIds,
+    cacheRelaxations,
     intervention, interventionLoading, interventionError,
     retryOrchestrate,
     regenerateCompanion,
@@ -264,6 +265,11 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             error={signalError}
             onRetry={retrySignal}
           />
+          {signal && cacheRelaxations.signal && (
+            <p className="text-[10px] text-muted-foreground/55 font-mono mt-2 leading-snug px-0.5" role="status">
+              {i18nT(`companions.cacheRelaxation.${cacheRelaxations.signal}`)}
+            </p>
+          )}
           {signal && (
             <CompanionFeedback
               reflectionId={reflectionId}
@@ -301,6 +307,11 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             nudgeError={nudgeError}
             onRetry={retryNudge}
           />
+          {nudge && cacheRelaxations.nudge && (
+            <p className="text-[10px] text-muted-foreground/55 font-mono mt-2 leading-snug px-0.5" role="status">
+              {i18nT(`companions.cacheRelaxation.${cacheRelaxations.nudge}`)}
+            </p>
+          )}
           {nudge && (
             <CompanionFeedback
               reflectionId={reflectionId}
@@ -336,6 +347,11 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             error={zoomOutError}
             onRetry={retryZoomOut}
           />
+          {zoomOut && cacheRelaxations.zoomOut && (
+            <p className="text-[10px] text-muted-foreground/55 font-mono mt-2 leading-snug px-0.5" role="status">
+              {i18nT(`companions.cacheRelaxation.${cacheRelaxations.zoomOut}`)}
+            </p>
+          )}
           {zoomOut && (
             <CompanionFeedback
               reflectionId={reflectionId}
@@ -371,6 +387,11 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             error={historyError}
             onRetry={retryHistory}
           />
+          {historyInsight && cacheRelaxations.history && (
+            <p className="text-[10px] text-muted-foreground/55 font-mono mt-2 leading-snug px-0.5" role="status">
+              {i18nT(`companions.cacheRelaxation.${cacheRelaxations.history}`)}
+            </p>
+          )}
           {historyInsight && (
             <CompanionFeedback
               reflectionId={reflectionId}

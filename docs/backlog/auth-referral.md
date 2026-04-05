@@ -1,28 +1,25 @@
 # Auth + Referral (Pending Enhancements)
 
-## Enhancement 1: Guaranteed referral delivery (within retry policy)
+## Enhancement 1: Guaranteed referral delivery — **implemented**
 
-### Current problem
-The referral side-effect is initiated during `SIGNED_IN` as an async fire-and-forget invocation of the edge function `record-referral`.
+### What shipped (2026-04)
 
-That means if the invoke fails transiently (network/server edge outage, token/session mismatch, etc.), the referral might never be recorded.
+- **`referral_pending_jobs`** table: one row per referred user (`referred_user_id` unique), statuses `pending` → `processing` → `completed` / `failed`, with `attempts`, `next_attempt_at`, and `last_error`.
+- **Client** (`src/hooks/use-auth.tsx`): on `SIGNED_IN` with `holzen_ref`, inserts a queue row then invokes `record-referral`. Clears `holzen_ref` on `{ ok: true }` or invalid referral; keeps it on invoke/network failure so a repeat sign-in can retry the HTTP path.
+- **`record-referral`**: uses shared **`applyReferralRecord`** in `supabase/functions/_shared/referral-record-core.ts` (idempotent referrals + **`referral_rewards`** checks prevent double grants).
+- **`process-referral-pending`**: cron worker with **`verifyServiceAuth`**; **`claim_referral_pending_jobs`** (SKIP LOCKED); stale `processing` rows requeued after 15 minutes; transient failures use backoff until `max_attempts`.
+- **Ops**: schedule in **`docs/ops/cron-setup.md`**; Bruno **`bruno/service-cron/process-referral-pending.bru`**.
 
-### Implications if we leave it as-is
-- Referral attribution becomes non-deterministic (some sign-ups through a referral link won't be credited).
-- We lose observability: there is no durable "pending" state that tells us whether it succeeded vs failed.
-- It is harder to build safe retries later because there is no idempotent work item to retry.
+### How to verify
 
-### Proposed improvement
-Persist a durable "pending referral" work item (DB queue row or similar) and have a retry worker (edge/cron) process it with:
-- an idempotency key (so retries do not double-credit rewards)
-- explicit completion/failure status updates
+1. Queue a row, block or fail the first `record-referral` invoke — after cron runs, attribution appears in `referrals` and the job is `completed`.
+2. Re-running attribution does not duplicate **`referral_rewards`** rows for the same milestone.
+3. Inspect **`referral_pending_jobs`** for `pending` / `completed` / `failed` instead of relying only on client state.
 
 ### Related code pointers
-- Producer: `src/hooks/use-auth.tsx` (the `SIGNED_IN` handler invokes `record-referral`)
-- Consumer: `supabase/functions/record-referral/index.ts` (validates token, referral code, and grants rewards)
 
-### Acceptance criteria / how to verify
-1. If `record-referral` is temporarily failing during the initial sign-in, the referral still gets recorded later (within the retry policy).
-2. Retries do not produce duplicate reward grants (idempotency is enforced).
-3. The client no longer relies on ephemeral success; “work completed” is observable in the DB (pending item transitions to done).
-
+- Producer: `src/hooks/use-auth.tsx`
+- HTTP: `supabase/functions/record-referral/index.ts`
+- Core: `supabase/functions/_shared/referral-record-core.ts`
+- Worker: `supabase/functions/process-referral-pending/index.ts`
+- Migration: `supabase/migrations/20260403190000_referral_pending_jobs.sql`

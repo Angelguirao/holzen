@@ -23,7 +23,12 @@ import {
   loadFallbackPool,
   pickRandom,
 } from "../fallbacks.ts";
-import { COMPANION_ZOOM_OUT_DEEP_TIME, parseMarketDirection, serveFromCache } from "../cache.ts";
+import {
+  type CacheServeRelaxation,
+  COMPANION_ZOOM_OUT_DEEP_TIME,
+  parseMarketDirection,
+  serveFromCache,
+} from "../cache.ts";
 import { createAttemptLogger, trackEvent } from "../observe.ts";
 import { getPhaseConfig } from "../phase-config.ts";
 
@@ -36,6 +41,8 @@ export interface ZoomOutResult {
   data: any | null;  // { onThisDay, currentPrice, echo, deepTime, partial }
   source: "live" | "cache" | "curated" | "empty";
   cacheId: string | null;
+  /** Set when deep-time text came from `serveFromCache`. */
+  cacheRelaxation?: CacheServeRelaxation;
   error?: string;
 }
 
@@ -155,6 +162,8 @@ interface DeepTimeResult {
   deepTime: { title: string; body: string } | null;
   source: "live" | "cache" | "curated" | "empty";
   error?: string;
+  cacheId?: string | null;
+  cacheRelaxation?: CacheServeRelaxation;
 }
 
 async function generateDeepTime(
@@ -340,7 +349,12 @@ No trading advice, no price predictions, no exclamation marks.${mood ? `\n\nUSER
     const marketDirection = parseMarketDirection(context);
     const cached = await serveFromCache(svcClient, COMPANION_ZOOM_OUT_DEEP_TIME, "en", { userId, marketDirection });
     if (cached) {
-      return { deepTime: cached.data as { title: string; body: string }, source: "cache" };
+      return {
+        deepTime: cached.data as { title: string; body: string },
+        source: "cache",
+        cacheId: cached.cacheId,
+        cacheRelaxation: cached.relaxation,
+      };
     }
 
     const zpool = await loadFallbackPool<{ title: string; body: string }>(svcClient, "zoom_out");
@@ -375,6 +389,7 @@ export async function generateZoomOut(params: GenerateZoomOutParams): Promise<Zo
         },
         source: "cache",
         cacheId: cached.cacheId,
+        cacheRelaxation: cached.relaxation,
       };
     }
   }
@@ -440,7 +455,8 @@ export async function generateZoomOut(params: GenerateZoomOutParams): Promise<Zo
   return {
     data: result,
     source: deepTimeResult.source,
-    cacheId: null,
+    cacheId: deepTimeResult.cacheId ?? null,
+    cacheRelaxation: deepTimeResult.cacheRelaxation,
     error: deepTimeResult.error,
   };
 }
