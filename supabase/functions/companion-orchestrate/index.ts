@@ -22,11 +22,18 @@ const corsHeaders = {
 /**
  * Companion Orchestrator
  *
- * Single entry point that fires companion generators in parallel — user **enable***
- * flags **or** intervention requirements (trap → grounding, pattern → history,
- * zoom_out secondary → zoom out) determine which tasks run.
- * writes results back to the reflections row, logs companion_serves and
- * generation_attempts, and returns a unified response.
+ * Single entry point for intervention selection and companion generation.
+ *
+ * Client invocation modes:
+ * - Intervention-only: all enable* false, useIntervention true (mount)
+ * - Single-slot lazy: one enable* true (card tap, holzenInvokeSource: browser_lazy_fetch)
+ * - Regenerate: regenerateOnly param (explicit user action)
+ *
+ * Cron/pregenerate may enable multiple slots in one request; enabled tasks
+ * run in parallel via Promise.allSettled.
+ *
+ * Generator phase ordering (library → cache → live → curated) is controlled
+ * by COMPANION_PHASE_* env vars in _shared/phase-config.ts.
  *
  * Generators are invoked directly (in-process) instead of via HTTP.
  */

@@ -104,7 +104,7 @@ Use these as "prove-or-disprove" questions while reading the Phase 3 files.
 
 - **Coherent story**: automatic pause is **one server-owned pipeline**: eligibility -> generate -> persist reflection + profile + notification -> **async** companion work. That matches "pause ready" in the bell before every companion slot is filled.
 - **Fragility**: **time window** between notification and orchestrate completion; **duplicate orchestrate** risk when the user opens `/pause` immediately (aligns with `docs/backlog/orchestrate-client-cron.md`).
-- **Featured grounding**: cron may leave featured grounding null initially; expanded companions should still load when orchestration completes — UI must not assume parity with manual path for every field on first paint. **2026-04:** `use-companion-data` primes loaders in `useLayoutEffect` on `reflectionId` so the first paint shows skeletons (see `docs/backlog/cron-pause-featured-parity.md`).
+- **Featured grounding**: cron may leave featured grounding null initially; expanded companions should still load when orchestration completes — UI must not assume parity with manual path for every field on first paint. **2026-04:** `use-companion-data` resets all companion state in `useLayoutEffect` on `reflectionId` change; companion slots are loaded **lazily** on card tap (not on mount), so cron-filled `reflection_companions` rows are hydrated from DB and the user sees cached content instantly without a skeleton flash (see `docs/backlog/cron-pause-featured-parity.md`).
 
 Tradeoffs / alternatives (documented in backlog; **policy chosen 2026-04** — fire-and-forget retained):
 

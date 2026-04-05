@@ -28,6 +28,7 @@ import { callPerplexityChat, mergePerplexityUsage } from "../perplexity-client.t
 import { validateSource } from "../source-validation.ts";
 import { searchLibrary, essayToSignal, recordLibraryServe } from "../content-library.ts";
 import { preferNonYoutubeCitationsFirst } from "../recent-signal-urls.ts";
+import { getPhaseConfig } from "../phase-config.ts";
 
 /** Bump when the search query, structuring prompt, or quality rules change. */
 export const PROMPT_VERSION = "v9";
@@ -140,20 +141,18 @@ export interface GenerateSignalParams {
   userId?: string;
   reflectionId?: string | null;
   searchAngle?: string;
+  /** Skip library/cache phases and go straight to live (used by regenerate). */
+  forceLive?: boolean;
   log: (msg: string, extra?: Record<string, unknown>) => void;
 }
 
 // ── Internals ──
 
-async function serveFallback(
+/** Try content_library (essays) for signal. */
+async function tryLibrary(
   svcClient: any,
   userId?: string,
-  marketDirection?: "up" | "down" | "neutral",
-  excludeIds?: string[],
-): Promise<SignalResult> {
-  if (companionFallbacksDisabled()) {
-    return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
-  }
+): Promise<SignalResult | null> {
   const libraryRows = await searchLibrary(svcClient, {
     type: "essay",
     companionType: "signal",
@@ -166,10 +165,47 @@ async function serveFallback(
     recordLibraryServe(svcClient, userId, pick.id, "signal");
     return { data: result, source: "cache", cacheId: null };
   }
+  return null;
+}
+
+/** Try companion_cache for signal. */
+async function tryCache(
+  svcClient: any,
+  userId?: string,
+  marketDirection?: "up" | "down" | "neutral",
+  excludeIds?: string[],
+): Promise<SignalResult | null> {
   const cached = await serveFromCache(svcClient, "signal", "en", { userId, marketDirection, excludeIds });
   if (cached) return { data: cached.data, source: "cache", cacheId: cached.cacheId };
+  return null;
+}
+
+/** Last-resort curated fallback pool. */
+async function serveCurated(svcClient: any): Promise<SignalResult> {
   const pool = await loadFallbackPool<{ title: string; body: string; source: string; url: string }>(svcClient, "signal");
   return { data: pickRandom(pool), source: "curated", cacheId: null };
+}
+
+/** Resolve from non-live phases in order (library → cache → curated). */
+async function serveFallback(
+  svcClient: any,
+  userId?: string,
+  marketDirection?: "up" | "down" | "neutral",
+  excludeIds?: string[],
+): Promise<SignalResult> {
+  if (companionFallbacksDisabled()) {
+    return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
+  }
+  const phases = getPhaseConfig();
+  if (phases.library) {
+    const lib = await tryLibrary(svcClient, userId);
+    if (lib) return lib;
+  }
+  if (phases.cache) {
+    const cached = await tryCache(svcClient, userId, marketDirection, excludeIds);
+    if (cached) return cached;
+  }
+  return serveCurated(svcClient);
 }
 
 function buildSourceHints(sources?: Array<{ name: string; type: string; url?: string }>) {
@@ -203,9 +239,40 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
     userId,
     reflectionId,
     searchAngle,
+    forceLive,
     log,
   } = params;
   const marketDirection = parseMarketDirection(context);
+  const phases = getPhaseConfig();
+
+  if (!forceLive) {
+  // ── Phase 1: Library ──
+  if (phases.library) {
+    const lib = await tryLibrary(svcClient, userId);
+    if (lib) {
+      log("signal resolved from library (phase 1)");
+      return lib;
+    }
+  }
+
+  // ── Phase 2: Cache ──
+  if (phases.cache) {
+    const cached = await tryCache(svcClient, userId, marketDirection);
+    if (cached) {
+      log("signal resolved from cache (phase 2)");
+      return cached;
+    }
+  }
+  } // end !forceLive
+
+  // ── Phase 3: Live generation ──
+  if (!phases.live && !forceLive) {
+    log("live phase disabled, serving curated");
+    if (companionFallbacksDisabled()) {
+      return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
+    }
+    return serveCurated(svcClient);
+  }
 
   const logAttempt = createAttemptLogger(svcClient, { userId });
 

@@ -119,6 +119,7 @@ export async function handleRegenerateOnly(params: {
         reflectionId,
         log,
         preferredBias: intent.groundingBias,
+        forceLive: true,
       });
       result = {
         data: g.data,
@@ -159,6 +160,7 @@ export async function handleRegenerateOnly(params: {
         reflectionId,
         log,
         searchAngle: intent.signalAngle,
+        forceLive: true,
       });
       result = {
         data: s.data,
@@ -178,6 +180,7 @@ export async function handleRegenerateOnly(params: {
         userId,
         log,
         preferredMood: intent.historyMood as "recovery" | "caution" | "neutral",
+        forceLive: true,
       });
       result = {
         data: h.data,
@@ -198,6 +201,7 @@ export async function handleRegenerateOnly(params: {
         recentTitles: body.recentZoomOutTitles as string[] | undefined,
         log,
         zoomOutAngle: intent.zoomOutAngle,
+        forceLive: true,
       });
       result = {
         data: z.data,
