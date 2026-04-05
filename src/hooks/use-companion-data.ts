@@ -16,6 +16,7 @@ import type {
 } from '@/lib/companion-reflection-cache';
 import { loadMoodHistoryForOrchestrate } from '@/lib/companion-mood-history';
 import { loadActiveOrchestrateSources } from '@/lib/companion-orchestrate-sources';
+import { getRecencyHints, updateRecencyHints } from '@/lib/companion-recency-hints';
 import {
   COMPANION_STEP_TO_REFLECTION_COLUMN,
   COMPANION_STEP_TO_READ_TYPE,
@@ -276,42 +277,6 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     return parseReflectionCompanionRows((companions ?? []) as ReflectionCompanionRow[]);
   }, []);
 
-  // ── Get localStorage dedup hints ──
-  const getRecencyHints = useCallback(() => {
-    const safeGet = (key: string): string[] => {
-      try { return JSON.parse(localStorage.getItem(key) || '[]'); } catch { return []; }
-    };
-    return {
-      recentSignalSources: safeGet('holzen_recent_signal_sources'),
-      recentSignalTitles: safeGet('holzen_recent_signal_titles'),
-      recentSignalUrls: safeGet('holzen_recent_signal_urls'),
-      recentNudgeTopics: safeGet('holzen_recent_nudge_topics'),
-      recentGroundingSources: safeGet('holzen_recent_grounding_sources'),
-      recentHistoryTitles: safeGet('holzen_recent_history_titles'),
-      recentZoomOutTitles: safeGet('holzen_recent_zoom_out_titles'),
-    };
-  }, []);
-
-  // ── Update localStorage after receiving results ──
-  const updateRecencyHints = useCallback((type: string, title: string, source?: string) => {
-    if (!title) return;
-    const keyMap: Record<string, string> = {
-      signal_title: 'holzen_recent_signal_titles',
-      signal_source: 'holzen_recent_signal_sources',
-      signal_url: 'holzen_recent_signal_urls',
-      grounding: 'holzen_recent_nudge_topics',
-      history: 'holzen_recent_history_titles',
-      zoomOut: 'holzen_recent_zoom_out_titles',
-    };
-    const key = keyMap[type];
-    if (!key) return;
-    try {
-      const prev: string[] = JSON.parse(localStorage.getItem(key) || '[]');
-      const updated = [title, ...prev.filter(s => s !== title)].slice(0, 5);
-      localStorage.setItem(key, JSON.stringify(updated));
-    } catch { /* ignore */ }
-  }, []);
-
   // ── Intervention-only fetch + cached companion hydration ──
   // Companions are NOT fetched here — only on user tap (see fetchCompanion below).
   useEffect(() => {
@@ -533,10 +498,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     } finally {
       setLoading(false);
     }
-  }, [
-    reflectionId, context, reflectionMessage, mood, severityNumber, language,
-    getRecencyHints, autoSaveToLibrary, updateRecencyHints,
-  ]);
+  }, [reflectionId, context, reflectionMessage, mood, severityNumber, language, autoSaveToLibrary]);
 
   // ── Retry helpers ──
   const retrySlot = useCallback((slot: RegenerateCompanionSlot) => {
@@ -651,10 +613,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     } finally {
       setLoading(false);
     }
-  }, [
-    reflectionId, context, reflectionMessage, mood, severityNumber, language,
-    getRecencyHints, toast, autoSaveToLibrary, updateRecencyHints,
-  ]);
+  }, [reflectionId, context, reflectionMessage, mood, severityNumber, language, toast, autoSaveToLibrary]);
 
   return {
     favorites,

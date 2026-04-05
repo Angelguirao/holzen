@@ -20,8 +20,8 @@ Signal is **not** a primary **intervention** type (mirror / trap / pattern / que
 
 | Input | Source | Role |
 |--------|--------|------|
-| **`signalSources`** | `signal_sources` + `user_signal_preferences` (`getSignalSources()` in `use-companion-data.ts`) | Optional **catalog**: names + URLs → hostnames for Perplexity **allowlist** when URLs exist. |
-| **`recentSignalTitles` / `recentSignalSources` / `recentSignalUrls`** | `localStorage` keys `holzen_recent_signal_*` | Dedup: do not repeat same **titles**, **attribution strings**, or **citation URLs** across recent pauses on this browser. |
+| **`signalSources`** | `signal_sources` + `user_signal_preferences` (`loadActiveOrchestrateSources('signal')` in `companion-orchestrate-sources.ts`) | Optional **catalog**: names + URLs → hostnames for Perplexity **allowlist** when URLs exist. |
+| **`recentSignalTitles` / `recentSignalSources` / `recentSignalUrls`** | `localStorage` keys `holzen_recent_signal_*` (`getRecencyHints` in `companion-recency-hints.ts`) | Dedup: do not repeat same **titles**, **attribution strings**, or **citation URLs** across recent pauses on this browser. |
 | **`context`** | BTC + Fear & Greed + on-chain line (same suffix as reflection) | Grounds the **search query** in the current move. |
 | **`searchAngle`** | `determineSessionIntent()` → **`signalAngle`** (`session-intent.ts`) | Aligns Signal thematically with the rest of the pause session. |
 
