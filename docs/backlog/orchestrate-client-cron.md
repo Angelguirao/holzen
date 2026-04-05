@@ -22,7 +22,7 @@ The manual pause path calls `companion-orchestrate` from the client (`use-compan
 
 ### Skip cached (dedup)
 
-After **`selectIntervention`** and computing which generator slots would run, the orchestrator **loads `reflection_companions`** for the `reflectionId`. If **every** required slot already has valid content (same shape as the client’s `checkCachedReflection`), it returns **200** with JSON built from those rows, **`source: "cache"`**, and:
+After **`selectIntervention`** and computing which generator slots would run, the orchestrator **loads `reflection_companions`** for the `reflectionId`. If **every** required slot already has valid content (same shape as the client’s `fetchParsedReflectionCompanionCache`), it returns **200** with JSON built from those rows, **`source: "cache"`**, and:
 
 - **Does not** run **`generateQuestion`** or companion generators.
 - **Does not** charge **rate limit** or **daily budget**.

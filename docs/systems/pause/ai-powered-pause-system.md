@@ -528,7 +528,7 @@ flowchart TB
 | **Orchestrator key** | **`zoomOut`** → **`zoom_out_deep_time`** in **`companion_serves` / `reflection_companions`** (`ORCHESTRATOR_KEY_MAP`). |
 | **Generator** | `_shared/generators/zoom-out.ts`; **`zoomOutAngle`** from session intent; depends on **`btc_price_cache`** (cron). |
 | **Profile pref** | **`companion_zoom_out`**. |
-| **Legacy columns** | Orchestrator writes **`zoom_out_deep_time`** to **`reflection_companions`**; **`buildLegacyUpdate`** maps both **`zoom_out`** and **`zoom_out_deep_time`** to **`zoom_out_data`** on **`reflections`** so **`checkCachedReflection`** in `use-companion-data.ts` can reuse a row without refetching. |
+| **Legacy columns** | Orchestrator writes **`zoom_out_deep_time`** to **`reflection_companions`**; **`buildLegacyUpdate`** maps both **`zoom_out`** and **`zoom_out_deep_time`** to **`zoom_out_data`** on **`reflections`** so **`fetchParsedReflectionCompanionCache`** in `companion-reflection-cache.ts` (used by `use-companion-data`) can reuse a row without refetching. |
 | **UI** | **`ZoomOutDisplay`**; feedback uses **`zoom_out`** → cache type **`zoom_out_deep_time`**. Card hidden when intervention already shows **`secondary.type === 'zoom_out'`** (§7.5). |
 
 ---
