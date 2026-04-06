@@ -46,9 +46,6 @@ export function verifyServiceAuth(req: Request): boolean {
   const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
   const cronSecret = Deno.env.get("CRON_SECRET") ?? "";
 
-  // Temporary debug: log token/secret prefixes for mismatch diagnosis
-  console.log("[verifyServiceAuth] cronSecret_full:", cronSecret);
-
   if (token === serviceRoleKey) return true;
   if (cronSecret.length > 0 && token === cronSecret) return true;
 
