@@ -311,6 +311,7 @@ export type Database = {
       companion_serves: {
         Row: {
           cache_entry_id: string | null
+          cache_relaxation: string | null
           companion_type: string
           content_fingerprint: string | null
           content_title: string | null
@@ -323,6 +324,7 @@ export type Database = {
         }
         Insert: {
           cache_entry_id?: string | null
+          cache_relaxation?: string | null
           companion_type: string
           content_fingerprint?: string | null
           content_title?: string | null
@@ -335,6 +337,7 @@ export type Database = {
         }
         Update: {
           cache_entry_id?: string | null
+          cache_relaxation?: string | null
           companion_type?: string
           content_fingerprint?: string | null
           content_title?: string | null
