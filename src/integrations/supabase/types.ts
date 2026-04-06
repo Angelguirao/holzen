@@ -392,6 +392,7 @@ export type Database = {
           summary: string
           tags: string[] | null
           title: string
+          title_norm: string | null
           type: string
           updated_at: string | null
           url: string | null
@@ -415,6 +416,7 @@ export type Database = {
           summary: string
           tags?: string[] | null
           title: string
+          title_norm?: string | null
           type: string
           updated_at?: string | null
           url?: string | null
@@ -438,6 +440,7 @@ export type Database = {
           summary?: string
           tags?: string[] | null
           title?: string
+          title_norm?: string | null
           type?: string
           updated_at?: string | null
           url?: string | null
@@ -1068,6 +1071,45 @@ export type Database = {
           label?: string
           start_hour?: number
           user_id?: string
+        }
+        Relationships: []
+      }
+      referral_pending_jobs: {
+        Row: {
+          attempts: number
+          created_at: string
+          id: string
+          last_error: string | null
+          max_attempts: number
+          next_attempt_at: string | null
+          referral_code: string
+          referred_user_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          id?: string
+          last_error?: string | null
+          max_attempts?: number
+          next_attempt_at?: string | null
+          referral_code: string
+          referred_user_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          id?: string
+          last_error?: string | null
+          max_attempts?: number
+          next_attempt_at?: string | null
+          referral_code?: string
+          referred_user_id?: string
+          status?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -1757,6 +1799,27 @@ export type Database = {
       }
     }
     Functions: {
+      claim_referral_pending_jobs: {
+        Args: { p_limit?: number }
+        Returns: {
+          attempts: number
+          created_at: string
+          id: string
+          last_error: string | null
+          max_attempts: number
+          next_attempt_at: string | null
+          referral_code: string
+          referred_user_id: string
+          status: string
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "referral_pending_jobs"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       claim_trigger_slot: {
         Args: { _cooldown_hours: number; _user_id: string }
         Returns: boolean
