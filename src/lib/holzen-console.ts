@@ -53,6 +53,7 @@ type HolzenTag =
   | 'router'
   | 'query'
   | 'pause'
+  | 'companion'
   | 'subscription'
   | 'manual'
   | 'home';
@@ -71,6 +72,8 @@ export const holzenLog = {
   router: (msg: string, data?: Record<string, unknown>) => line('router', msg, data),
   query: (msg: string, data?: Record<string, unknown>) => line('query', msg, data),
   pause: (msg: string, data?: Record<string, unknown>) => line('pause', msg, data),
+  /** Lazy fetch / regenerate / intervention hydration for companion-orchestrate slots (pause session). */
+  companion: (msg: string, data?: Record<string, unknown>) => line('companion', msg, data),
   subscription: (msg: string, data?: Record<string, unknown>) => line('subscription', msg, data),
   manual: (msg: string, data?: Record<string, unknown>) => line('manual', msg, data),
   home: (msg: string, data?: Record<string, unknown>) => line('home', msg, data),

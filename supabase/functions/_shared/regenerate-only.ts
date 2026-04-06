@@ -13,6 +13,7 @@ import { bucketSeverity } from "./intervention-selector.ts";
 import { fetchGroundingSourcesForOrchestrate, fetchSignalSourcesForOrchestrate } from "./pause-cron-parity.ts";
 import { fetchRecentSignalCitationUrls, mergeRecentSignalUrls } from "./recent-signal-urls.ts";
 import { ORCHESTRATOR_KEY_MAP } from "./companion-types.ts";
+import { logCompanionSlotResolved } from "./companion-orchestrate-slot-telemetry.ts";
 import { PROMPT_VERSION as SIGNAL_VERSION } from "./generators/signal.ts";
 import { PROMPT_VERSION as GROUNDING_VERSION } from "./generators/grounding.ts";
 import { PROMPT_VERSION as HISTORY_VERSION } from "./generators/history.ts";
@@ -231,6 +232,17 @@ export async function handleRegenerateOnly(params: {
 
   const orchestratorKey = slot;
   const companionType = ORCHESTRATOR_KEY_MAP[orchestratorKey];
+
+  logCompanionSlotResolved({
+    companion_type: companionType,
+    orchestrator_slot: slot,
+    reflection_prefix: reflectionId.slice(0, 8),
+    source: result.source,
+    cache_relaxation: result.cacheRelaxation ?? null,
+    latency_ms: result.latencyMs,
+    filled: Boolean(result.data),
+    error: result.error ?? null,
+  });
 
   const response: Record<string, unknown> = {
     signal: null,

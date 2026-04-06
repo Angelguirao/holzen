@@ -3,8 +3,10 @@ import { generateGrounding, PROMPT_VERSION as GROUNDING_VERSION } from "./genera
 import { generateHistory, PROMPT_VERSION as HISTORY_VERSION } from "./generators/history.ts";
 import { generateZoomOut, PROMPT_VERSION as ZOOM_OUT_VERSION } from "./generators/zoom-out.ts";
 import { fetchRecentSignalCitationUrls, mergeRecentSignalUrls } from "./recent-signal-urls.ts";
+import { logCompanionSlotResolved } from "./companion-orchestrate-slot-telemetry.ts";
 import type { CompanionResult, OrchestrateSourceInput } from "./companion-orchestrate-types.ts";
 import type { SessionIntent } from "./session-intent.ts";
+import { ORCHESTRATOR_KEY_MAP } from "./companion-types.ts";
 
 export type OrchestrateTasksLog = {
   (msg: string, extra?: Record<string, unknown>): void;
@@ -59,12 +61,23 @@ export function buildOrchestrateCompanionTasks(
         log: p.log,
         preferredBias: p.intent.groundingBias,
       });
+      const latencyMs = Date.now() - t;
+      logCompanionSlotResolved({
+        companion_type: ORCHESTRATOR_KEY_MAP.grounding,
+        orchestrator_slot: "grounding",
+        reflection_prefix: rid ? rid.slice(0, 8) : null,
+        source: result.source,
+        cache_relaxation: result.cacheRelaxation ?? null,
+        latency_ms: latencyMs,
+        filled: Boolean(result.data),
+        error: result.error ?? null,
+      });
       return {
         data: result.data,
         source: result.source,
         cacheId: result.cacheId,
         cacheRelaxation: result.cacheRelaxation ?? null,
-        latencyMs: Date.now() - t,
+        latencyMs,
         promptVersion: GROUNDING_VERSION,
         error: result.error,
       };
@@ -84,12 +97,23 @@ export function buildOrchestrateCompanionTasks(
         log: p.log,
         preferredMood: p.intent.historyMood,
       });
+      const latencyMs = Date.now() - t;
+      logCompanionSlotResolved({
+        companion_type: ORCHESTRATOR_KEY_MAP.history,
+        orchestrator_slot: "history",
+        reflection_prefix: rid ? rid.slice(0, 8) : null,
+        source: result.source,
+        cache_relaxation: result.cacheRelaxation ?? null,
+        latency_ms: latencyMs,
+        filled: Boolean(result.data),
+        error: result.error ?? null,
+      });
       return {
         data: result.data,
         source: result.source,
         cacheId: result.cacheId,
         cacheRelaxation: result.cacheRelaxation ?? null,
-        latencyMs: Date.now() - t,
+        latencyMs,
         promptVersion: HISTORY_VERSION,
         error: result.error,
       };
@@ -110,12 +134,23 @@ export function buildOrchestrateCompanionTasks(
         log: p.log,
         zoomOutAngle: p.intent.zoomOutAngle,
       });
+      const latencyMs = Date.now() - t;
+      logCompanionSlotResolved({
+        companion_type: ORCHESTRATOR_KEY_MAP.zoomOut,
+        orchestrator_slot: "zoomOut",
+        reflection_prefix: rid ? rid.slice(0, 8) : null,
+        source: result.source,
+        cache_relaxation: result.cacheRelaxation ?? null,
+        latency_ms: latencyMs,
+        filled: Boolean(result.data),
+        error: result.error ?? null,
+      });
       return {
         data: result.data,
         source: result.source,
         cacheId: result.cacheId,
         cacheRelaxation: result.cacheRelaxation ?? null,
-        latencyMs: Date.now() - t,
+        latencyMs,
         promptVersion: ZOOM_OUT_VERSION,
         error: result.error,
       };
@@ -160,12 +195,23 @@ export function buildOrchestrateCompanionTasks(
         log: p.log,
         searchAngle: p.intent.signalAngle,
       });
+      const latencyMs = Date.now() - t;
+      logCompanionSlotResolved({
+        companion_type: ORCHESTRATOR_KEY_MAP.signal,
+        orchestrator_slot: "signal",
+        reflection_prefix: rid ? rid.slice(0, 8) : null,
+        source: result.source,
+        cache_relaxation: result.cacheRelaxation ?? null,
+        latency_ms: latencyMs,
+        filled: Boolean(result.data),
+        error: result.error ?? null,
+      });
       return {
         data: result.data,
         source: result.source,
         cacheId: result.cacheId,
         cacheRelaxation: result.cacheRelaxation ?? null,
-        latencyMs: Date.now() - t,
+        latencyMs,
         promptVersion: SIGNAL_VERSION,
         error: result.error,
       };
