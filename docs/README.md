@@ -36,6 +36,7 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 ## Fundamentals
 
 - `fundamentals/navigating-the-codebase.md` — repo tour: boot flow, routing, auth, hooks, Supabase basics.
+- `fundamentals/refactoring-strategy.md` — incremental split of large pages/hooks (`src/lib` vs components); pairs with [backlog/react-page-and-hook-splitting.md](backlog/react-page-and-hook-splitting.md).
 - `fundamentals/mental-models-for-contributors.md` — glossary + vocabulary for SPAs, React, TypeScript, Vite, Supabase (RLS, edge functions); links to official docs and learning resources.
 - `fundamentals/codebase-size-and-review-practices.md` — codebase size snapshot and review best-practices.
 - `fundamentals/http-review-playbooks.md` — step-by-step Postman/Bruno flows, Supabase `invoke` headers, pairing with Edge logs; [bruno/](../bruno/) collection, [bruno/SCOPE.md](../bruno/SCOPE.md) (HTTP vs full app), [bruno/functions-catalog.md](../bruno/functions-catalog.md) (all Edge URLs).
@@ -54,6 +55,7 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 
 - `ops/cron-setup.md` — scheduled jobs: pg_cron + `net.http_post` callouts for pause-adjacent workers.
 - `ops/logging-strategy.md` — edge vs browser vs DB logging; `observe.ts` patterns; correlation and PII.
+- `ops/pause-signal-companion-logging-e2e.md` — strategic goals + manual steps to trace pause → Signal (`holzen:companion` + `companion_slot_resolved`).
 - `ops/observability-and-failures.md` — where to record logs, retries, and failure modes per pipeline (checklist; links into systems and postmortems).
 
 ## Backlog
@@ -63,6 +65,7 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 
 ## Reviews
 
+- `reviews/full-app-review-backlog.md` — **inventory of all flows** with hour estimates and sequencing (beyond pause-first phases)
 - `reviews/phase-1-frontend-routing-auth.md` — onboarding review for frontend auth + routing contracts
 - `reviews/phase-2-manual-pause-pipeline.md` — manual pause producer/client processing review
 - `reviews/phase-3-server-cron-triggers.md` — server cron trigger review (check-volatility)

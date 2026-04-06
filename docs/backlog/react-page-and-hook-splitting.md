@@ -27,6 +27,7 @@ The app already follows sound patterns (function components, custom hooks, route
 
 ## Related
 
+- [**Refactoring strategy (canonical)**](../fundamentals/refactoring-strategy.md) — principles, boundaries (hook vs `src/lib`), anti-patterns, and how this backlog fits the architecture.
 - [route-level-code-splitting.md](route-level-code-splitting.md) — **when** route modules load (lazy vs eager); complements splitting **within** a page.
 - [pause-session-hydration.md](pause-session-hydration.md) — navigation state complexity overlaps Pause surface.
 - [AGENTS.md](../../AGENTS.md) — ESLint baseline; avoid widening debt in touched files.

@@ -22,6 +22,7 @@ So: **production hosted** → `HOLZEN_EDGE_LOG=0` matches “no strategic spam i
 | **`quality_gate_reject`** ([`quality.ts`](../../supabase/functions/_shared/quality.ts)) | Companion **live** output failed `qualityGate` → fallback path | Grep **`quality_gate_reject`**; fields **`companion_type`**, **`reason`** (stable code, no body text). Pair with **`generation_attempts.status`** = **`quality_gate_failed`** and **`quality_gate_reason`**. |
 | **`orchestrate_invoke`** ([`companion-orchestrate/index.ts`](../../supabase/functions/companion-orchestrate/index.ts)) | Every **`companion-orchestrate`** request after auth | Grep **`orchestrate_invoke`**; **`invoke_source`** from body **`holzenInvokeSource`** (`browser_pause_intervention`, `browser_lazy_fetch`, `browser_regenerate`, `cron_check_volatility`, …); **`auth_mode`**; **`reflection_prefix`** (8 chars). For client vs cron overlap metrics. |
 | **`orchestrate_skip_cached`** ([`companion-orchestrate/index.ts`](../../supabase/functions/companion-orchestrate/index.ts)) | All requested slots already on **`reflection_companions`** — no AI, no rate/budget charge | Grep **`orchestrate_skip_cached`**; **`need_*`** booleans show which slots were satisfied from cache. |
+| **`companion_slot_resolved`** ([`companion-orchestrate-slot-telemetry.ts`](../../supabase/functions/_shared/companion-orchestrate-slot-telemetry.ts)) | After each companion generator run inside **`companion-orchestrate`** (parallel tasks) or **`regenerate-only`** | Grep **`companion_slot_resolved`**; **`orchestrator_slot`** (`signal`, `grounding`, …), **`companion_type`** (canonical DB type), **`source`** (`live` / `cache` / `curated` / `empty`), **`cache_relaxation`**, **`filled`**, **`reflection_prefix`**. Pairs with client **`[holzen:companion]`** in **`use-companion-data`**. |
 | **`createAttemptLogger` → `generation_attempts`** | Model/API attempts, costs, quality gates | Companion and AI paths: success, error, timeout, `quality_gate_failed`. Enables **per-user / per-reflection** cost and debugging. |
 | **`createObsTracker` / `trackEvent` → `analytics_events`** | Product and pipeline events (counts, funnel steps) | User-scoped events (“pause_ai_call”, companion fallbacks, etc.); **not** a substitute for full request tracing. |
 
@@ -33,7 +34,7 @@ So: **production hosted** → `HOLZEN_EDGE_LOG=0` matches “no strategic spam i
 
 ## 2. Browser (React) — **prefixed console + user-visible errors**
 
-**Holzen flow tracing:** [`src/lib/holzen-console.ts`](../../src/lib/holzen-console.ts) — **`[holzen:boot]`**, **`holzen:profile`**, query cache, etc. **Turn everything on** (non-DEV builds too) using any of:
+**Holzen flow tracing:** [`src/lib/holzen-console.ts`](../../src/lib/holzen-console.ts) — **`[holzen:boot]`**, **`holzen:profile`**, **`[holzen:companion]`** (pause session lazy fetch / regenerate / intervention orchestrate), query cache, etc. **Turn everything on** (non-DEV builds too) using any of:
 
 1. **`VITE_HOLZEN_DEBUG=1`** in `.env.hosted.local` / `.env` (e.g. with **`npm run dev:hosted`**).
 2. Open the app with **`?holzenDebug=1`** once — enables **session** debug for that tab and removes the query param.
@@ -73,4 +74,5 @@ If a path does not yet attach `reflection_id` to attempts, improve that when you
 ## Related
 
 - [observability-and-failures.md](observability-and-failures.md) — per-pipeline checklist.
+- [pause-signal-companion-logging-e2e.md](pause-signal-companion-logging-e2e.md) — strategic checklist: pause → open Signal → grep client + Edge.
 - [http-review-playbooks.md](../fundamentals/http-review-playbooks.md) — pairing HTTP steps with Edge logs.

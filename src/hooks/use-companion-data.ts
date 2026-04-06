@@ -30,6 +30,7 @@ import {
   type CompanionSlotRelaxations,
 } from '@/lib/companion-orchestrate-slot-apply';
 import { saveCompanionLibraryBookmarkOnce } from '@/lib/companion-library-autosave';
+import { holzenLog } from '@/lib/holzen-console';
 
 export type {
   RegenerateCompanionSlot,
@@ -214,6 +215,11 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
         // Intervention not cached — fetch from orchestrate (intervention-only, no companion slots)
         const moodHistory = await loadMoodHistoryForOrchestrate();
 
+        holzenLog.companion('orchestrate invoke (intervention only)', {
+          holzenInvokeSource: 'browser_pause_intervention',
+          reflection_prefix: reflectionId.slice(0, 8),
+        });
+
         const { data, error: fnError } = await supabase.functions.invoke('companion-orchestrate', {
           body: {
             holzenInvokeSource: 'browser_pause_intervention',
@@ -236,6 +242,11 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
 
         const body = data as Record<string, unknown> | null;
         if (!!fnError || !body || Boolean(body.error)) {
+          holzenLog.companion('orchestrate intervention invoke failed', {
+            reflection_prefix: reflectionId.slice(0, 8),
+            fnError: fnError?.message ?? null,
+            bodyError: typeof body?.error === 'string' ? body.error : null,
+          });
           setInterventionError(true);
           setInterventionLoading(false);
           return;
@@ -247,6 +258,11 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
           setInterventionError(true);
         }
         setInterventionLoading(false);
+
+        holzenLog.companion('orchestrate intervention ok', {
+          reflection_prefix: reflectionId.slice(0, 8),
+          hasIntervention: Boolean(data.intervention),
+        });
 
         // Hydrate any companion data the server returned alongside intervention
         // (e.g. trap forces grounding, pattern forces history, secondary forces zoomOut)
@@ -286,6 +302,15 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
           slotCommitters,
           setCacheRelaxations,
         );
+
+        const sigSlot = readOrchestrateSlotBody(orchestrateBody, 'signal');
+        if (isFilledOrchestrateSlot(sigSlot)) {
+          holzenLog.companion('hydrated signal from intervention response', {
+            reflection_prefix: reflectionId.slice(0, 8),
+            source: sigSlot.source,
+            cacheRelaxation: sigSlot.cacheRelaxation ?? null,
+          });
+        }
       } catch (e) {
         console.error('[useCompanionData] intervention fetch failed', e);
         setInterventionError(true);
@@ -324,6 +349,12 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       const groundingSources = slot === 'grounding' ? await loadActiveOrchestrateSources('grounding') : undefined;
       const moodHistory = await loadMoodHistoryForOrchestrate();
 
+      holzenLog.companion('lazy fetch orchestrate invoke', {
+        slot,
+        holzenInvokeSource: 'browser_lazy_fetch',
+        reflection_prefix: reflectionId.slice(0, 8),
+      });
+
       const { data, error: fnError } = await supabase.functions.invoke('companion-orchestrate', {
         body: {
           holzenInvokeSource: 'browser_lazy_fetch',
@@ -348,6 +379,12 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       const body = data as Record<string, unknown> | null;
       const payloadError = !!fnError || !body || Boolean(body.error);
       if (payloadError) {
+        holzenLog.companion('lazy fetch orchestrate failed', {
+          slot,
+          reflection_prefix: reflectionId.slice(0, 8),
+          fnError: fnError?.message ?? null,
+          bodyError: typeof body?.error === 'string' ? body.error : null,
+        });
         setErr(true);
         setLoading(false);
         return;
@@ -363,7 +400,19 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       const r = readOrchestrateSlotBody(body, slot);
       if (isFilledOrchestrateSlot(r)) {
         applyOrchestrateSlotLazyOrRegenerate(slot, r, setCacheIds, slotCommitters, setCacheRelaxations);
+        holzenLog.companion('lazy fetch slot filled', {
+          slot,
+          reflection_prefix: reflectionId.slice(0, 8),
+          source: r.source,
+          latencyMs: r.latencyMs,
+          cacheRelaxation: r.cacheRelaxation ?? null,
+          hasCacheId: Boolean(r.cacheId),
+        });
       } else {
+        holzenLog.companion('lazy fetch empty or error slot', {
+          slot,
+          reflection_prefix: reflectionId.slice(0, 8),
+        });
         setErr(true);
       }
     } catch (e) {
@@ -417,6 +466,12 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       const groundingSources = slot === 'grounding' ? await loadActiveOrchestrateSources('grounding') : undefined;
       const moodHistory = await loadMoodHistoryForOrchestrate();
 
+      holzenLog.companion('regenerate orchestrate invoke', {
+        slot,
+        holzenInvokeSource: 'browser_regenerate',
+        reflection_prefix: reflectionId.slice(0, 8),
+      });
+
       const { data, error: fnError } = await supabase.functions.invoke('companion-orchestrate', {
         body: {
           holzenInvokeSource: 'browser_regenerate',
@@ -438,6 +493,12 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       const payloadError = !!fnError || !body || Boolean(body.error);
       if (payloadError) {
         const msg = typeof body?.error === 'string' ? body.error : fnError?.message ?? 'Regenerate failed';
+        holzenLog.companion('regenerate orchestrate failed', {
+          slot,
+          reflection_prefix: reflectionId.slice(0, 8),
+          fnError: fnError?.message ?? null,
+          bodyError: typeof body?.error === 'string' ? body.error : null,
+        });
         toast({ title: 'Regenerate failed', description: msg, variant: 'destructive' });
         setErr(true);
         return;
@@ -453,7 +514,15 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       const r = readOrchestrateSlotBody(body, slot);
       if (isFilledOrchestrateSlot(r)) {
         applyOrchestrateSlotLazyOrRegenerate(slot, r, setCacheIds, slotCommitters, setCacheRelaxations);
+        holzenLog.companion('regenerate slot filled', {
+          slot,
+          reflection_prefix: reflectionId.slice(0, 8),
+          source: r.source,
+          latencyMs: r.latencyMs,
+          cacheRelaxation: r.cacheRelaxation ?? null,
+        });
       } else {
+        holzenLog.companion('regenerate empty slot', { slot, reflection_prefix: reflectionId.slice(0, 8) });
         setErr(true);
       }
     } catch (e) {
