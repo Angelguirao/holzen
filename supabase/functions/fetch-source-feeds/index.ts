@@ -4,6 +4,13 @@ import { createAttemptLogger } from "../_shared/observe.ts";
 import { canonicalContentUrl, normalizeTitleKey, urlDedupCandidates } from "../_shared/content-dedup.ts";
 import { callPerplexityChat, type PerplexityUsage } from "../_shared/perplexity-client.ts";
 import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
+import {
+  fetchFeedXmlIfApplicable,
+  firecrawlMapArticleUrls,
+  isExplicitFeedSourceType,
+  isExplicitSiteMapSourceType,
+  parseArticleLinksFromFeedXml,
+} from "../_shared/feed-ingest.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -19,7 +26,16 @@ const corsHeaders = {
  * Falls back to Perplexity search if Firecrawl is not configured.
  *
  * Scheduled via cron (twice daily).
+ *
+ * Ingest modes (per `signal_sources.type` + URL):
+ * - Default / blog / etc.: scrape the single `url` (article or page).
+ * - `rss` or `feed`: treat `url` as RSS/Atom — extract item links, scrape up to N articles.
+ * - `site_map` or `site`: Firecrawl Map on `url`, then scrape up to N discovered article URLs.
+ * Auto-detect: if the URL returns RSS/Atom XML, it is parsed as a feed even when type is `blog`.
  */
+
+/** Max full article pipelines per source per run (keeps edge duration predictable). */
+const MAX_ARTICLES_PER_SOURCE = 2;
 
 // ── Firecrawl scraper ──
 
@@ -112,6 +128,8 @@ async function searchWithPerplexity(
   }
 }
 
+type SourceRow = { id: string; name: string; type: string; url: string; category: string };
+
 // ── Main handler ──
 
 serve(async (req) => {
@@ -166,153 +184,207 @@ serve(async (req) => {
     const results: string[] = [];
     let fetched = 0;
 
+    async function resolveArticleUrls(source: SourceRow): Promise<string[]> {
+      if (!source.url) return [];
+
+      if (isExplicitSiteMapSourceType(source.type)) {
+        if (!FIRECRAWL_API_KEY) {
+          hzLog(`${source.name}: site_map requires FIRECRAWL_API_KEY`);
+          return [source.url];
+        }
+        const mapped = await firecrawlMapArticleUrls(source.url, FIRECRAWL_API_KEY, hzLog);
+        if (mapped.length > 0) {
+          hzLog(`map: ${mapped.length} candidate URLs for ${source.name}`);
+          return mapped;
+        }
+        hzLog(`map: empty, falling back to single URL for ${source.name}`);
+        return [source.url];
+      }
+
+      const feedXml = await fetchFeedXmlIfApplicable(source.url, hzLog);
+      if (feedXml) {
+        const links = parseArticleLinksFromFeedXml(feedXml, source.url);
+        if (links.length > 0) {
+          hzLog(`rss/atom: ${links.length} item links for ${source.name}`);
+          return links;
+        }
+        if (isExplicitFeedSourceType(source.type)) {
+          hzLog(`${source.name}: explicit rss/feed type but no links parsed`);
+          return [];
+        }
+      } else if (isExplicitFeedSourceType(source.type)) {
+        hzLog(`${source.name}: url is not RSS/Atom XML`);
+        return [];
+      }
+
+      return [source.url];
+    }
+
+    async function ingestArticle(
+      source: SourceRow,
+      articleUrl: string,
+    ): Promise<"inserted" | "skipped" | "failed"> {
+      const contentType = source.category === "signal" ? "essay" : "paper";
+      let scrapedContent: string | null = null;
+      let citations: string[] = [];
+
+      if (scrapeMode === "firecrawl") {
+        scrapedContent = await scrapeWithFirecrawl(articleUrl, FIRECRAWL_API_KEY!, hzLog);
+        if (scrapedContent) citations = [articleUrl];
+      }
+
+      if (!scrapedContent && PERPLEXITY_API_KEY) {
+        const searchResult = await searchWithPerplexity(source.name, articleUrl, source.category, PERPLEXITY_API_KEY, hzLog);
+        if (searchResult) {
+          scrapedContent = searchResult.content;
+          citations = searchResult.citations;
+          if (searchResult.usage) {
+            logAttempt({
+              companion_type: "source_feed",
+              provider: "perplexity",
+              model: "sonar",
+              status: "success",
+              latency_ms: searchResult.searchMs,
+              input_tokens: searchResult.usage.prompt_tokens,
+              output_tokens: searchResult.usage.completion_tokens,
+              api_requests: 1,
+            });
+          }
+        }
+      }
+
+      if (!scrapedContent) {
+        results.push(`${source.name} (${articleUrl.slice(0, 48)}…): no content`);
+        return "failed";
+      }
+
+      const structurePrompt = contentType === "essay"
+        ? `Extract the ONE most compelling essay or insight from this content by ${source.name}. Return JSON with: title, author (must be "${source.name}" or the specific writer found), summary (2-3 sentences distilling the core idea), key_quote (optional, a real quote from the text only — do NOT fabricate), url (use: ${citations[0] || articleUrl}).`
+        : `Extract ONE specific research finding from this content. Return JSON with: title, author, summary (2-3 sentences), citation (Author (Year), Title format), finding (key result in plain language), url (use: ${citations[0] || articleUrl}).`;
+
+      const structureT0 = Date.now();
+      const structureRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "google/gemini-2.5-flash-lite",
+          messages: [
+            { role: "system", content: structurePrompt },
+            { role: "user", content: `Source: ${source.name}\nURL: ${articleUrl}\n\nContent:\n${scrapedContent.slice(0, 3000)}` },
+          ],
+          response_format: { type: "json_object" },
+          temperature: 0.3,
+        }),
+      });
+
+      if (!structureRes.ok) {
+        results.push(`${source.name}: structure error ${structureRes.status}`);
+        return "failed";
+      }
+
+      const structureData = await structureRes.json();
+      const structUsage = structureData.usage;
+      logAttempt({
+        companion_type: "source_feed",
+        provider: "lovable",
+        model: "google/gemini-2.5-flash-lite",
+        status: "success",
+        latency_ms: Date.now() - structureT0,
+        input_tokens: structUsage?.prompt_tokens,
+        output_tokens: structUsage?.completion_tokens,
+      });
+      const raw = structureData.choices?.[0]?.message?.content;
+      if (!raw) {
+        results.push(`${source.name}: empty structure`);
+        return "failed";
+      }
+
+      let entry: Record<string, unknown>;
+      try {
+        entry = JSON.parse(raw) as Record<string, unknown>;
+      } catch {
+        results.push(`${source.name}: JSON parse error`);
+        return "failed";
+      }
+      if (typeof entry.title !== "string" || typeof entry.summary !== "string") {
+        results.push(`${source.name}: invalid structure`);
+        return "failed";
+      }
+
+      const resolvedUrl = String(entry.url || citations[0] || articleUrl || "");
+      const urlCandidates = urlDedupCandidates(resolvedUrl);
+      if (urlCandidates.length > 0) {
+        const { data: byUrl } = await supabase
+          .from("content_library")
+          .select("id")
+          .eq("type", contentType)
+          .eq("active", true)
+          .in("url", urlCandidates)
+          .limit(1);
+        if (byUrl && byUrl.length > 0) {
+          results.push(`${source.name}: URL already in content_library`);
+          return "skipped";
+        }
+      }
+
+      const titleNorm = normalizeTitleKey(entry.title);
+      const { data: byNorm } = await supabase
+        .from("content_library")
+        .select("id")
+        .eq("type", contentType)
+        .eq("active", true)
+        .eq("title_norm", titleNorm)
+        .limit(1);
+      if (byNorm && byNorm.length > 0) {
+        results.push(`${source.name}: same normalized title already in content_library`);
+        return "skipped";
+      }
+
+      const storedUrl = canonicalContentUrl(resolvedUrl) ?? (resolvedUrl.trim() || null);
+
+      const insertData: Record<string, unknown> = {
+        type: contentType,
+        title: entry.title,
+        author: (typeof entry.author === "string" ? entry.author : null) || source.name,
+        summary: entry.summary,
+        url: storedUrl,
+        tags: [source.category, source.name.toLowerCase().replace(/\s+/g, "-")],
+        companion_types: [source.category === "signal" ? "signal" : "ground_nudge"],
+        language: "en",
+        quality_score: 2,
+      };
+
+      if (contentType === "essay") {
+        insertData.key_quote = typeof entry.key_quote === "string" ? entry.key_quote : null;
+      } else {
+        insertData.citation = typeof entry.citation === "string" ? entry.citation : null;
+        insertData.finding = typeof entry.finding === "string" ? entry.finding : null;
+      }
+
+      await supabase.from("content_library").insert(insertData);
+      results.push(`${source.name}: added "${entry.title}" (via ${scrapeMode})`);
+      fetched++;
+      return "inserted";
+    }
+
     // Process up to 5 sources per run
-    const toProcess = sources.slice(0, 5);
+    const toProcess = sources.slice(0, 5) as SourceRow[];
 
     for (const source of toProcess) {
       try {
         if (!source.url) continue;
         hzLog(`processing: ${source.name} (${source.url})`);
 
-        const contentType = source.category === "signal" ? "essay" : "paper";
-        let scrapedContent: string | null = null;
-        let citations: string[] = [];
+        const articlePool = await resolveArticleUrls(source);
+        const maxAttempts = Math.min(articlePool.length, 30);
+        let insertedForSource = 0;
 
-        // ── Step 1: Scrape content ──
-        if (scrapeMode === "firecrawl") {
-          scrapedContent = await scrapeWithFirecrawl(source.url, FIRECRAWL_API_KEY!, hzLog);
-          if (scrapedContent) {
-            citations = [source.url]; // Firecrawl source is the URL itself
-          }
+        for (let i = 0; i < maxAttempts && insertedForSource < MAX_ARTICLES_PER_SOURCE; i++) {
+          const articleUrl = articlePool[i]!;
+          const outcome = await ingestArticle(source, articleUrl);
+          if (outcome === "inserted") insertedForSource++;
+          await new Promise((r) => setTimeout(r, 2000));
         }
-
-        // Fallback to Perplexity if Firecrawl failed or not configured
-        if (!scrapedContent && PERPLEXITY_API_KEY) {
-          const searchResult = await searchWithPerplexity(source.name, source.url, source.category, PERPLEXITY_API_KEY, hzLog);
-          if (searchResult) {
-            scrapedContent = searchResult.content;
-            citations = searchResult.citations;
-            if (searchResult.usage) {
-              logAttempt({
-                companion_type: "source_feed",
-                provider: "perplexity",
-                model: "sonar",
-                status: "success",
-                latency_ms: searchResult.searchMs,
-                input_tokens: searchResult.usage.prompt_tokens,
-                output_tokens: searchResult.usage.completion_tokens,
-                api_requests: 1,
-              });
-            }
-          }
-        }
-
-        if (!scrapedContent) {
-          results.push(`${source.name}: no content found`);
-          continue;
-        }
-
-        // ── Step 2: Structure with Gemini ──
-        const structurePrompt = contentType === "essay"
-          ? `Extract the ONE most compelling essay or insight from this content by ${source.name}. Return JSON with: title, author (must be "${source.name}" or the specific writer found), summary (2-3 sentences distilling the core idea), key_quote (optional, a real quote from the text only — do NOT fabricate), url (use: ${citations[0] || source.url}).`
-          : `Extract ONE specific research finding from this content. Return JSON with: title, author, summary (2-3 sentences), citation (Author (Year), Title format), finding (key result in plain language), url (use: ${citations[0] || source.url}).`;
-
-        const structureT0 = Date.now();
-        const structureRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-          method: "POST",
-          headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
-          body: JSON.stringify({
-            model: "google/gemini-2.5-flash-lite",
-            messages: [
-              { role: "system", content: structurePrompt },
-              { role: "user", content: `Source: ${source.name}\nURL: ${source.url}\n\nContent:\n${scrapedContent.slice(0, 3000)}` },
-            ],
-            response_format: { type: "json_object" },
-            temperature: 0.3,
-          }),
-        });
-
-        if (!structureRes.ok) {
-          results.push(`${source.name}: structure error ${structureRes.status}`);
-          continue;
-        }
-
-        const structureData = await structureRes.json();
-        const structUsage = structureData.usage;
-        logAttempt({
-          companion_type: "source_feed",
-          provider: "lovable",
-          model: "google/gemini-2.5-flash-lite",
-          status: "success",
-          latency_ms: Date.now() - structureT0,
-          input_tokens: structUsage?.prompt_tokens,
-          output_tokens: structUsage?.completion_tokens,
-        });
-        const raw = structureData.choices?.[0]?.message?.content;
-        if (!raw) { results.push(`${source.name}: empty structure`); continue; }
-
-        let entry: any;
-        try { entry = JSON.parse(raw); } catch { results.push(`${source.name}: JSON parse error`); continue; }
-        if (!entry.title || !entry.summary) { results.push(`${source.name}: invalid structure`); continue; }
-
-        // ── Step 3: Dedup — canonical URL variants + indexed title_norm (not raw title only)
-        const resolvedUrl = String(entry.url || citations[0] || source.url || "");
-        const urlCandidates = urlDedupCandidates(resolvedUrl);
-        if (urlCandidates.length > 0) {
-          const { data: byUrl } = await supabase
-            .from("content_library")
-            .select("id")
-            .eq("type", contentType)
-            .eq("active", true)
-            .in("url", urlCandidates)
-            .limit(1);
-          if (byUrl && byUrl.length > 0) {
-            results.push(`${source.name}: URL already in content_library`);
-            continue;
-          }
-        }
-
-        const titleNorm = normalizeTitleKey(entry.title);
-        const { data: byNorm } = await supabase
-          .from("content_library")
-          .select("id")
-          .eq("type", contentType)
-          .eq("active", true)
-          .eq("title_norm", titleNorm)
-          .limit(1);
-        if (byNorm && byNorm.length > 0) {
-          results.push(`${source.name}: same normalized title already in content_library`);
-          continue;
-        }
-
-        const storedUrl = canonicalContentUrl(resolvedUrl) ?? (resolvedUrl.trim() || null);
-
-        // ── Step 4: Insert into content_library ──
-        const insertData: any = {
-          type: contentType,
-          title: entry.title,
-          author: entry.author || source.name,
-          summary: entry.summary,
-          url: storedUrl,
-          tags: [source.category, source.name.toLowerCase().replace(/\s+/g, '-')],
-          companion_types: [source.category === "signal" ? "signal" : "ground_nudge"],
-          language: "en",
-          quality_score: 2,
-        };
-
-        if (contentType === "essay") {
-          insertData.key_quote = entry.key_quote || null;
-        } else {
-          insertData.citation = entry.citation || null;
-          insertData.finding = entry.finding || null;
-        }
-
-        await supabase.from("content_library").insert(insertData);
-        results.push(`${source.name}: added "${entry.title}" (via ${scrapeMode})`);
-        fetched++;
-
-        // Rate limit respect
-        await new Promise(r => setTimeout(r, 2000));
       } catch (e) {
         results.push(`${source.name}: ${e}`);
       }
