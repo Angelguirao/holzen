@@ -186,11 +186,18 @@ serve(async (req) => {
     const results: string[] = [];
     let fetched = 0;
 
+    /** When the model omits original_url, grab obvious canonical links from markdown (not exhaustive). */
     function inferOriginalPublicationUrl(markdown: string): string | null {
-      const sub = markdown.match(/https:\/\/[a-z0-9-]+\.substack\.com\/[^\s\)\]\"<>]+/i);
-      if (sub?.[0]) return sub[0];
-      const med = markdown.match(/https:\/\/[a-z0-9-]+\.medium\.com\/[^\s\)\]\"<>]+/i);
-      return med?.[0] ?? null;
+      const patterns = [
+        /https:\/\/[a-z0-9-]+\.substack\.com\/[^\s\)\]\"<>]+/i,
+        /https:\/\/[a-z0-9-]+\.medium\.com\/[^\s\)\]\"<>]+/i,
+        /https:\/\/hackernoon\.com\/[^\s\)\]\"<>]+/i,
+      ];
+      for (const re of patterns) {
+        const m = markdown.match(re);
+        if (m?.[0]) return m[0];
+      }
+      return null;
     }
 
     async function resolveArticleRefs(source: SourceRow): Promise<FeedArticleRef[]> {
@@ -281,8 +288,8 @@ Return JSON with:
 - summary (2-3 sentences)
 - key_quote (optional string): a real quote from the text only — do NOT fabricate.
 - url (string): MUST be exactly this page URL: ${citations[0] || articleUrl}
-- original_url (optional string): if the article says it was "first published" elsewhere, or a prominent link points to the primary source (e.g. Substack, Medium), set that canonical URL. Otherwise omit.
-- original_publication (optional string): name of that outlet (e.g. "The Bitstein Brief") if known from the text; otherwise omit.`
+- original_url (optional string): if the article says it was "first published" elsewhere, or a link points to the primary source, set that full https URL (any domain — e.g. HackerNoon, Substack, Medium, a personal blog). Must differ from the page URL when this is a republish/syndication. Otherwise omit.
+- original_publication (optional string): human name of that outlet (e.g. "HackerNoon", "The Bitstein Brief") if clear from the text; otherwise omit.`
         : `Extract ONE specific research finding from this content. Return JSON with: title, author, summary (2-3 sentences), citation (Author (Year), Title format), finding (key result in plain language), url (use: ${citations[0] || articleUrl}).`;
 
       const structureT0 = Date.now();
