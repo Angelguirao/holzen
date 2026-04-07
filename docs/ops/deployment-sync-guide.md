@@ -84,7 +84,18 @@ Frontend is safe — it only goes live when you click **Publish → Update** in 
 □ New secrets documented / already added
 □ No destructive DB changes without code-first deploy
 □ Frontend doesn't reference columns/functions that don't exist yet
+□ **New DB columns used by Edge** — If a function `.order()` / `.update()` / `insert` references a column added in the same PR, confirm migrations apply **before** that function runs (see below).
 ```
+
+### Migrations that unlock Edge code (same push)
+
+Some Edge functions assume columns already exist — e.g. **`fetch-source-feeds`** orders and updates `signal_sources.last_fetch_feeds_at`, and may insert `content_library.original_url` / `original_publication`. If the deployed function runs **before** those migrations finish, PostgREST can return **400/500** (“column does not exist”) on the `signal_sources` select or update.
+
+**Mitigation:**
+
+1. **Normal GitHub → Lovable sync** usually applies migrations in timestamp order before traffic hits new code; if you see column errors right after sync, open **Database → Migrations** and confirm pending migrations are applied, then **re-invoke** the function or redeploy.
+2. **High-stakes prod:** Ship **migrations-only** first (or run the SQL from new migration files in the SQL editor), verify schema, then merge the function commit — matches the guide’s order-of-operations mindset.
+3. **Optional Edge secrets** (no deploy blocker if unset): `FETCH_FEEDS_MAX_SOURCES`, `FETCH_FEEDS_MAX_ARTICLES_PER_SOURCE`, `FETCH_FEEDS_ARTICLE_DELAY_MS` — defaults apply; add in **Cloud → Secrets** only for launch backfills.
 
 ## Troubleshooting
 
