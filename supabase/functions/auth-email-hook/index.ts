@@ -1,5 +1,5 @@
 import * as React from "https://esm.sh/react@18.3.1"
-import { renderAsync } from "https://esm.sh/@react-email/components@0.0.22"
+import { renderAsync } from "https://esm.sh/@react-email/components@0.0.22?deps=react@18.3.1,react-dom@18.3.1"
 import { sendLovableEmail, parseEmailWebhookPayload } from "https://esm.sh/@lovable.dev/email-js"
 import { WebhookError, verifyWebhookRequest } from "https://esm.sh/@lovable.dev/webhooks-js"
 import { SignupEmail } from '../_shared/email-templates/signup.tsx'
