@@ -452,7 +452,7 @@ export function useAdminStats(enabled = true): AdminStats {
         .select('id, name, type, url, category, last_fetch_feeds_at')
         .order('category', { ascending: true })
         .order('name', { ascending: true });
-      if (!sourcesRes.error) setSignalSources((sourcesRes.data ?? []) as SignalSourceRow[]);
+      if (!sourcesRes.error) setSignalSources((sourcesRes.data ?? []) as unknown as SignalSourceRow[]);
 
       setLastUpdated(new Date());
     } catch (e: any) {
