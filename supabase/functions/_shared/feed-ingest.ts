@@ -8,6 +8,27 @@
 
 const MAX_LINKS_FROM_FEED = 40;
 
+/**
+ * Trim whitespace and fix a common paste error: a trailing "." after a path that
+ * already ends in a feed-like extension (`.../atom.xml.` → `.../atom.xml`).
+ * Without this, the server 404s and we ingest the error page as an "essay".
+ */
+export function normalizeSourceUrl(raw: string): string {
+  const s = raw.trim();
+  if (!s) return s;
+  try {
+    const u = new URL(s);
+    const p = u.pathname;
+    if (/\.(atom|rss|xml|html|htm)\.$/i.test(p)) {
+      u.pathname = p.slice(0, -1);
+      return u.href;
+    }
+  } catch {
+    return s;
+  }
+  return s;
+}
+
 /** Types that mean "URL is an RSS/Atom feed" (explicit). */
 export function isExplicitFeedSourceType(type: string | null | undefined): boolean {
   return type === "rss" || type === "feed";
@@ -64,18 +85,43 @@ function resolveHref(raw: string, baseUrl: string): string | null {
   }
 }
 
+function stripCdataInner(s: string): string {
+  return s.replace(/<!\[CDATA\[([\s\S]*?)\]\]>/gi, "$1").trim();
+}
+
+/** Per-item metadata from RSS/Atom (best-effort). */
+export type FeedArticleRef = { url: string; feedAuthor: string | null };
+
+function extractFeedAuthorFromBlock(block: string): string | null {
+  const dc = block.match(/<dc:creator[^>]*>([\s\S]*?)<\/dc:creator>/i);
+  if (dc?.[1]) {
+    const t = stripCdataInner(dc[1]).replace(/<[^>]+>/g, "").trim();
+    if (t) return t;
+  }
+  const atomName = block.match(/<author[^>]*>[\s\S]*?<name[^>]*>([\s\S]*?)<\/name>/i);
+  if (atomName?.[1]) {
+    const t = stripCdataInner(atomName[1]).replace(/<[^>]+>/g, "").trim();
+    if (t) return t;
+  }
+  const authorTag = block.match(/<author[^>]*>([\s\S]*?)<\/author>/i);
+  if (authorTag?.[1] && !/<email/i.test(authorTag[1])) {
+    const t = stripCdataInner(authorTag[1]).replace(/<[^>]+>/g, "").trim();
+    if (t && t.length < 200) return t;
+  }
+  return null;
+}
+
 /**
- * Extract article URLs from RSS 2.0 or Atom XML (best-effort, no full XML parser).
+ * Extract article URLs + optional feed author from RSS 2.0 or Atom XML (best-effort).
  */
-export function parseArticleLinksFromFeedXml(xml: string, baseUrl: string): string[] {
-  const out: string[] = [];
+export function parseArticleRefsFromFeedXml(xml: string, baseUrl: string): FeedArticleRef[] {
+  const out: FeedArticleRef[] = [];
   const seen = new Set<string>();
 
-  const push = (u: string | null) => {
-    if (!u) return;
-    if (seen.has(u)) return;
+  const pushRef = (u: string | null, slice: string) => {
+    if (!u || seen.has(u)) return;
     seen.add(u);
-    out.push(u);
+    out.push({ url: u, feedAuthor: extractFeedAuthorFromBlock(slice) });
     if (out.length >= MAX_LINKS_FROM_FEED) return;
   };
 
@@ -87,7 +133,7 @@ export function parseArticleLinksFromFeedXml(xml: string, baseUrl: string): stri
     const slice = end >= 0 ? block.slice(0, end) : block;
     let href: string | null = null;
     const mLink = slice.match(/<link[^>]*>([\s\S]*?)<\/link>/i);
-    if (mLink?.[1]) href = resolveHref(mLink[1].replace(/<!\[CDATA\[([\s\S]*?)\]\]>/gi, "$1").trim(), baseUrl);
+    if (mLink?.[1]) href = resolveHref(stripCdataInner(mLink[1]), baseUrl);
     if (!href) {
       const mEmpty = slice.match(/<link[^>]+href\s*=\s*["']([^"']+)["']/i);
       if (mEmpty?.[1]) href = resolveHref(mEmpty[1], baseUrl);
@@ -95,11 +141,11 @@ export function parseArticleLinksFromFeedXml(xml: string, baseUrl: string): stri
     if (!href) {
       const mGuid = slice.match(/<guid[^>]*>([\s\S]*?)<\/guid>/i);
       if (mGuid?.[1]) {
-        const g = mGuid[1].replace(/<!\[CDATA\[([\s\S]*?)\]\]>/gi, "$1").trim();
+        const g = stripCdataInner(mGuid[1]);
         if (g.startsWith("http")) href = resolveHref(g, baseUrl);
       }
     }
-    push(href);
+    pushRef(href, slice);
     if (out.length >= MAX_LINKS_FROM_FEED) break;
   }
 
@@ -133,11 +179,15 @@ export function parseArticleLinksFromFeedXml(xml: string, baseUrl: string): stri
       if (!fallback && (rel === "" || rel === "alternate")) fallback = resolved;
     }
     href = bestAlt ?? fallback;
-    push(href);
+    pushRef(href, slice);
     if (out.length >= MAX_LINKS_FROM_FEED) break;
   }
 
   return out;
+}
+
+export function parseArticleLinksFromFeedXml(xml: string, baseUrl: string): string[] {
+  return parseArticleRefsFromFeedXml(xml, baseUrl).map((r) => r.url);
 }
 
 /** Heuristic: prefer article-like paths; drop tags, feeds, pagers. */

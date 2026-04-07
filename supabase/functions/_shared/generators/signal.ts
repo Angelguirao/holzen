@@ -122,7 +122,15 @@ Summarize faithfully and ground answers in real sources with retrievable URLs.${
 // ── Public types ──
 
 export interface SignalResult {
-  data: { title: string; body: string; source: string; url: string } | null;
+  data: {
+    title: string;
+    body: string;
+    source: string;
+    url: string;
+    quote?: string;
+    originalUrl?: string;
+    originalPublication?: string;
+  } | null;
   source: "live" | "cache" | "curated" | "empty";
   cacheId: string | null;
   /** Set when `serveFromCache` served this row (not library / curated). */

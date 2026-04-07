@@ -6,10 +6,12 @@ import { callPerplexityChat, type PerplexityUsage } from "../_shared/perplexity-
 import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
 import {
   fetchFeedXmlIfApplicable,
+  type FeedArticleRef,
   firecrawlMapArticleUrls,
   isExplicitFeedSourceType,
   isExplicitSiteMapSourceType,
-  parseArticleLinksFromFeedXml,
+  normalizeSourceUrl,
+  parseArticleRefsFromFeedXml,
 } from "../_shared/feed-ingest.ts";
 
 const corsHeaders = {
@@ -184,29 +186,36 @@ serve(async (req) => {
     const results: string[] = [];
     let fetched = 0;
 
-    async function resolveArticleUrls(source: SourceRow): Promise<string[]> {
+    function inferOriginalPublicationUrl(markdown: string): string | null {
+      const sub = markdown.match(/https:\/\/[a-z0-9-]+\.substack\.com\/[^\s\)\]\"<>]+/i);
+      if (sub?.[0]) return sub[0];
+      const med = markdown.match(/https:\/\/[a-z0-9-]+\.medium\.com\/[^\s\)\]\"<>]+/i);
+      return med?.[0] ?? null;
+    }
+
+    async function resolveArticleRefs(source: SourceRow): Promise<FeedArticleRef[]> {
       if (!source.url) return [];
 
       if (isExplicitSiteMapSourceType(source.type)) {
         if (!FIRECRAWL_API_KEY) {
           hzLog(`${source.name}: site_map requires FIRECRAWL_API_KEY`);
-          return [source.url];
+          return [{ url: source.url, feedAuthor: null }];
         }
         const mapped = await firecrawlMapArticleUrls(source.url, FIRECRAWL_API_KEY, hzLog);
         if (mapped.length > 0) {
           hzLog(`map: ${mapped.length} candidate URLs for ${source.name}`);
-          return mapped;
+          return mapped.map((url) => ({ url, feedAuthor: null }));
         }
         hzLog(`map: empty, falling back to single URL for ${source.name}`);
-        return [source.url];
+        return [{ url: source.url, feedAuthor: null }];
       }
 
       const feedXml = await fetchFeedXmlIfApplicable(source.url, hzLog);
       if (feedXml) {
-        const links = parseArticleLinksFromFeedXml(feedXml, source.url);
-        if (links.length > 0) {
-          hzLog(`rss/atom: ${links.length} item links for ${source.name}`);
-          return links;
+        const refs = parseArticleRefsFromFeedXml(feedXml, source.url);
+        if (refs.length > 0) {
+          hzLog(`rss/atom: ${refs.length} item links for ${source.name}`);
+          return refs;
         }
         if (isExplicitFeedSourceType(source.type)) {
           hzLog(`${source.name}: explicit rss/feed type but no links parsed`);
@@ -217,13 +226,14 @@ serve(async (req) => {
         return [];
       }
 
-      return [source.url];
+      return [{ url: source.url, feedAuthor: null }];
     }
 
     async function ingestArticle(
       source: SourceRow,
-      articleUrl: string,
+      articleRef: FeedArticleRef,
     ): Promise<"inserted" | "skipped" | "failed"> {
+      const articleUrl = articleRef.url;
       const contentType = source.category === "signal" ? "essay" : "paper";
       let scrapedContent: string | null = null;
       let citations: string[] = [];
@@ -258,8 +268,21 @@ serve(async (req) => {
         return "failed";
       }
 
+      const feedAuthor = articleRef.feedAuthor;
+      const authorHint = feedAuthor
+        ? `The syndicating feed lists the writer as "${feedAuthor}" — use that as "author" unless the page text clearly names someone else as the author.`
+        : "";
+
       const structurePrompt = contentType === "essay"
-        ? `Extract the ONE most compelling essay or insight from this content by ${source.name}. Return JSON with: title, author (must be "${source.name}" or the specific writer found), summary (2-3 sentences distilling the core idea), key_quote (optional, a real quote from the text only — do NOT fabricate), url (use: ${citations[0] || articleUrl}).`
+        ? `Extract the ONE most compelling essay or insight from this page (published on ${source.name}). ${authorHint}
+Return JSON with:
+- title (string)
+- author (string): the **human writer/byline**, not the website or institute name unless they are literally the author.
+- summary (2-3 sentences)
+- key_quote (optional string): a real quote from the text only — do NOT fabricate.
+- url (string): MUST be exactly this page URL: ${citations[0] || articleUrl}
+- original_url (optional string): if the article says it was "first published" elsewhere, or a prominent link points to the primary source (e.g. Substack, Medium), set that canonical URL. Otherwise omit.
+- original_publication (optional string): name of that outlet (e.g. "The Bitstein Brief") if known from the text; otherwise omit.`
         : `Extract ONE specific research finding from this content. Return JSON with: title, author, summary (2-3 sentences), citation (Author (Year), Title format), finding (key result in plain language), url (use: ${citations[0] || articleUrl}).`;
 
       const structureT0 = Date.now();
@@ -270,7 +293,7 @@ serve(async (req) => {
           model: "google/gemini-2.5-flash-lite",
           messages: [
             { role: "system", content: structurePrompt },
-            { role: "user", content: `Source: ${source.name}\nURL: ${articleUrl}\n\nContent:\n${scrapedContent.slice(0, 3000)}` },
+            { role: "user", content: `Source: ${source.name}\nURL: ${articleUrl}\n\nContent:\n${scrapedContent.slice(0, 6000)}` },
           ],
           response_format: { type: "json_object" },
           temperature: 0.3,
@@ -342,10 +365,23 @@ serve(async (req) => {
 
       const storedUrl = canonicalContentUrl(resolvedUrl) ?? (resolvedUrl.trim() || null);
 
+      let originalUrl: string | null = typeof entry.original_url === "string" ? entry.original_url.trim() : null;
+      let originalPublication: string | null =
+        typeof entry.original_publication === "string" ? entry.original_publication.trim() : null;
+      if (contentType === "essay") {
+        if (!originalUrl) {
+          const inferred = inferOriginalPublicationUrl(scrapedContent);
+          if (inferred) originalUrl = inferred;
+        }
+        if (originalUrl) {
+          originalUrl = canonicalContentUrl(originalUrl) ?? originalUrl;
+        }
+      }
+
       const insertData: Record<string, unknown> = {
         type: contentType,
         title: entry.title,
-        author: (typeof entry.author === "string" ? entry.author : null) || source.name,
+        author: (typeof entry.author === "string" ? entry.author : null) || feedAuthor || source.name,
         summary: entry.summary,
         url: storedUrl,
         tags: [source.category, source.name.toLowerCase().replace(/\s+/g, "-")],
@@ -356,6 +392,8 @@ serve(async (req) => {
 
       if (contentType === "essay") {
         insertData.key_quote = typeof entry.key_quote === "string" ? entry.key_quote : null;
+        if (originalUrl) insertData.original_url = originalUrl;
+        if (originalPublication) insertData.original_publication = originalPublication;
       } else {
         insertData.citation = typeof entry.citation === "string" ? entry.citation : null;
         insertData.finding = typeof entry.finding === "string" ? entry.finding : null;
@@ -373,15 +411,19 @@ serve(async (req) => {
     for (const source of toProcess) {
       try {
         if (!source.url) continue;
-        hzLog(`processing: ${source.name} (${source.url})`);
+        const sourceNorm: SourceRow = { ...source, url: normalizeSourceUrl(source.url) };
+        if (sourceNorm.url !== source.url) {
+          hzLog(`normalized URL (trim/trailing-dot fix): ${source.url} → ${sourceNorm.url}`);
+        }
+        hzLog(`processing: ${source.name} (${sourceNorm.url})`);
 
-        const articlePool = await resolveArticleUrls(source);
+        const articlePool = await resolveArticleRefs(sourceNorm);
         const maxAttempts = Math.min(articlePool.length, 30);
         let insertedForSource = 0;
 
         for (let i = 0; i < maxAttempts && insertedForSource < MAX_ARTICLES_PER_SOURCE; i++) {
-          const articleUrl = articlePool[i]!;
-          const outcome = await ingestArticle(source, articleUrl);
+          const articleRef = articlePool[i]!;
+          const outcome = await ingestArticle(sourceNorm, articleRef);
           if (outcome === "inserted") insertedForSource++;
           await new Promise((r) => setTimeout(r, 2000));
         }

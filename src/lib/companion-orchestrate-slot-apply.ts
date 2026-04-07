@@ -44,7 +44,14 @@ const SLOT_CACHE_KEY: Record<RegenerateCompanionSlot, keyof CompanionSlotCacheId
 };
 
 export type CompanionSlotCommitters = {
-  setSignal: (v: { title: string; body: string; source: string; url: string }) => void;
+  setSignal: (v: {
+    title: string;
+    body: string;
+    source: string;
+    url: string;
+    originalUrl?: string;
+    originalPublication?: string;
+  }) => void;
   setNudge: (v: { title: string; body: string; citation: string; url: string }) => void;
   setHistoryInsight: (v: CachedHistoricalInsightShape) => void;
   setZoomOut: (v: unknown) => void;

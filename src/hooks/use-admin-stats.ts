@@ -121,6 +121,8 @@ export interface LibraryEntryRow {
   author: string | null;
   summary: string;
   url: string | null;
+  original_url?: string | null;
+  original_publication?: string | null;
   tags: string[];
   companion_types: string[];
   quality_score: number;
@@ -373,7 +375,7 @@ export function useAdminStats(enabled = true): AdminStats {
     try {
       const { data: libraryData, error: libErr } = await supabase
         .from('content_library')
-        .select('id, type, title, author, summary, url, tags, companion_types, quality_score, active, created_at')
+        .select('id, type, title, author, summary, url, original_url, original_publication, tags, companion_types, quality_score, active, created_at')
         .eq('active', true)
         .order('created_at', { ascending: false })
         .limit(100);
