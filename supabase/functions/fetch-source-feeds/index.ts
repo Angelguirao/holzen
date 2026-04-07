@@ -221,15 +221,42 @@ serve(async (req) => {
       return lastIdx;
     }
 
+    /** Hosts that appear in legal/semantic boilerplate — never use as canonical original_url. */
+    const ORIGINAL_URL_SKIP_HOSTS = new Set([
+      "creativecommons.org",
+      "www.w3.org",
+      "validator.w3.org",
+    ]);
+
     /**
-     * Infer canonical `original_url` from syndication **attribution** lines only (narrow window).
+     * First external https URL in `window` (not the syndicated page host), or null.
+     */
+    function firstExternalCanonicalUrl(window: string, syndHost: string): string | null {
+      const urlRe = /https?:\/\/[^\s\)\]<>"]+/gi;
+      let m: RegExpExecArray | null;
+      while ((m = urlRe.exec(window)) !== null) {
+        const u = stripUrlTrailingJunk(m[0]);
+        try {
+          const h = new URL(u).hostname.replace(/^www\./, "").toLowerCase();
+          if (h === syndHost) continue;
+          if (ORIGINAL_URL_SKIP_HOSTS.has(h)) continue;
+          return u;
+        } catch {
+          continue;
+        }
+      }
+      return null;
+    }
+
+    /**
+     * Infer canonical `original_url` from syndication **attribution** lines only (never the full page).
      *
-     * We intentionally do **not** scan the full markdown for Substack/Medium/Hackernoon — a long page
-     * often embeds unrelated outbound links (related posts, footnotes); the first match would be wrong
-     * (e.g. a random Hackernoon URL in the body while the real "first published" link is elsewhere).
+     * SNI (Next.js) often puts "First published on …" in the **article header** with a Substack link;
+     * other sites put the same phrase at the **footer** (e.g. dergigi.com). We take the latest matching
+     * phrase in the scraped text, then prefer URLs **immediately** after that phrase (~500 chars) so
+     * we get the Substack/primary link before unrelated body links (e.g. mises.org in the first quote).
      *
-     * SNI-style pages put "First published on …" / "Originally published …" near the end; we take the
-     * latest matching phrase in the document and read https URLs only in the following ~2k chars.
+     * We intentionally do **not** scan the full markdown — unrelated outbound links dominate long pages.
      */
     function inferOriginalUrlFromAttributionFooter(markdown: string, syndicatedArticleUrl: string): string | null {
       let syndHost: string;
@@ -250,20 +277,11 @@ serve(async (req) => {
         if (idx > lastIdx) lastIdx = idx;
       }
       if (lastIdx === -1) return null;
-      const window = markdown.slice(lastIdx, lastIdx + 2000);
-      const urlRe = /https?:\/\/[^\s\)\]<>"]+/gi;
-      let m: RegExpExecArray | null;
-      while ((m = urlRe.exec(window)) !== null) {
-        const u = stripUrlTrailingJunk(m[0]);
-        try {
-          const h = new URL(u).hostname.replace(/^www\./, "").toLowerCase();
-          if (h === syndHost) continue;
-          return u;
-        } catch {
-          continue;
-        }
-      }
-      return null;
+      const narrow = markdown.slice(lastIdx, lastIdx + 520);
+      const fromNarrow = firstExternalCanonicalUrl(narrow, syndHost);
+      if (fromNarrow) return fromNarrow;
+      const wide = markdown.slice(lastIdx, lastIdx + 2000);
+      return firstExternalCanonicalUrl(wide, syndHost);
     }
 
     function safeUrlHost(u: string): string {
