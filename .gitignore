@@ -15,6 +15,9 @@ dist-ssr
 supabase/.temp/
 supabase/.branches/
 
+# Deno — `npm run check:edge` may write a lockfile at repo root
+/deno.lock
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

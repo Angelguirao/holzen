@@ -70,7 +70,7 @@ if (entrypoints.length === 0) {
 }
 
 console.log(`[check:edge] ${denoBin} — check (${entrypoints.length} functions)…`);
-const result = spawnSync(denoBin, ['check', ...entrypoints], {
+const result = spawnSync(denoBin, ['check', '--no-lock', ...entrypoints], {
   cwd: repoRoot,
   stdio: 'inherit',
 });
