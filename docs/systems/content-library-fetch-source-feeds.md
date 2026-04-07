@@ -47,7 +47,7 @@ Filter with **`[holzen:fetch-feeds]`**. Verbose lines (`holzenEdgeLog` / `holzen
 |--------|------|--------|
 | `fetch_feeds_batch` | After loading sources; `sourcesTotal`, `toProcess`, `maxArticlesPerSource`, `mode` | Yes |
 | `fetch_feeds_discover` | After resolving URLs for one source; `discovery`, `poolSize`, `feedAuthorsInPool` | If verbose |
-| `fetch_feeds_article` | Per article attempt: `outcome` (`inserted` / `skipped` / `failed`), `phase` / `reason`, `discovery`, `urlHost`, attribution flags | If verbose |
+| `fetch_feeds_article` | Per article attempt: `outcome`, `reason` (e.g. `dedup_url_pre_scrape`, `dedup_url`, `dedup_title_norm`), `phase` on failure, `discovery`, `urlHost` | If verbose |
 | `fetch_feeds_complete` | Run finished; `fetched`, `sourcesTried`, `mode` | Yes |
 | `fetch_feeds_source_error` | Uncaught error in one source loop | If verbose (warn) |
 
