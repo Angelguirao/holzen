@@ -208,30 +208,30 @@ serve(async (req) => {
       return u.replace(/[.,;:!?)>\]]+$/g, "");
     }
 
-    /**
-     * When the model omits original_url, grab obvious canonical links from markdown (not exhaustive).
-     * Covers Substack/Medium/Hackernoon in-body links.
-     */
-    function inferOriginalPublicationUrl(markdown: string): string | null {
-      const patterns = [
-        /https:\/\/[a-z0-9-]+\.substack\.com\/[^\s)\]"<>]+/i,
-        /https:\/\/[a-z0-9-]+\.medium\.com\/[^\s)\]"<>]+/i,
-        /https:\/\/hackernoon\.com\/[^\s)\]"<>]+/i,
-      ];
-      for (const re of patterns) {
-        const m = markdown.match(re);
-        if (m?.[0]) return stripUrlTrailingJunk(m[0]);
+    /** Last start index of `phrase` in `lower`, or -1. */
+    function lastIndexOfPhrase(lower: string, phrase: string): number {
+      let lastIdx = -1;
+      let searchFrom = 0;
+      while (true) {
+        const i = lower.indexOf(phrase, searchFrom);
+        if (i === -1) break;
+        lastIdx = i;
+        searchFrom = i + 1;
       }
-      return null;
+      return lastIdx;
     }
 
     /**
-     * Syndicated pages (e.g. Nakamoto Institute) often put "First published on …" at the **end** with a
-     * link to the canonical post (any domain). The structure model only sees a truncated excerpt, so we
-     * scan the **full** scraped markdown for the last "first published" phrase and take the first https URL
-     * whose host differs from the syndicated page (e.g. dergigi.com vs nakamotoinstitute.org).
+     * Infer canonical `original_url` from syndication **attribution** lines only (narrow window).
+     *
+     * We intentionally do **not** scan the full markdown for Substack/Medium/Hackernoon — a long page
+     * often embeds unrelated outbound links (related posts, footnotes); the first match would be wrong
+     * (e.g. a random Hackernoon URL in the body while the real "first published" link is elsewhere).
+     *
+     * SNI-style pages put "First published on …" / "Originally published …" near the end; we take the
+     * latest matching phrase in the document and read https URLs only in the following ~2k chars.
      */
-    function inferOriginalUrlFromFirstPublishedFooter(markdown: string, syndicatedArticleUrl: string): string | null {
+    function inferOriginalUrlFromAttributionFooter(markdown: string, syndicatedArticleUrl: string): string | null {
       let syndHost: string;
       try {
         syndHost = new URL(syndicatedArticleUrl).hostname.replace(/^www\./, "").toLowerCase();
@@ -239,13 +239,15 @@ serve(async (req) => {
         return null;
       }
       const lower = markdown.toLowerCase();
+      const attributionMarkers = [
+        "first published",
+        "originally published",
+        "reprinted from",
+      ];
       let lastIdx = -1;
-      let searchFrom = 0;
-      while (true) {
-        const i = lower.indexOf("first published", searchFrom);
-        if (i === -1) break;
-        lastIdx = i;
-        searchFrom = i + 1;
+      for (const phrase of attributionMarkers) {
+        const idx = lastIndexOfPhrase(lower, phrase);
+        if (idx > lastIdx) lastIdx = idx;
       }
       if (lastIdx === -1) return null;
       const window = markdown.slice(lastIdx, lastIdx + 2000);
@@ -546,11 +548,7 @@ Return JSON with:
         typeof entry.original_publication === "string" ? entry.original_publication.trim() : null;
       if (contentType === "essay") {
         if (!originalUrl) {
-          const inferred = inferOriginalPublicationUrl(scrapedContent);
-          if (inferred) originalUrl = inferred;
-        }
-        if (!originalUrl) {
-          const fromFooter = inferOriginalUrlFromFirstPublishedFooter(scrapedContent, articleUrl);
+          const fromFooter = inferOriginalUrlFromAttributionFooter(scrapedContent, articleUrl);
           if (fromFooter) originalUrl = fromFooter;
         }
         if (originalUrl) {
