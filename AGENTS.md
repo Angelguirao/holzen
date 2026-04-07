@@ -16,7 +16,7 @@ Instructions for AI assistants and automation working in this repository (e.g. C
 | `npm run test` | Vitest (jsdom), single run |
 | `npm run test:watch` | Vitest watch mode |
 | `npm run lint` | ESLint across the repo |
-| `npm run check:edge` | Optional: `deno check` on all `supabase/functions/*/index.ts`; **skips** if Deno not on PATH |
+| `npm run check:edge` | Optional: `deno check` on all `supabase/functions/*/index.ts`; **skips** if Deno is missing. Resolves `deno` from PATH, then `DENO_INSTALL/bin`, then `~/.deno/bin` (official installer default). |
 
 **Linting:** There are many **pre-existing** ESLint issues (~300). Do not treat cleaning the whole tree as part of a small task; avoid introducing *new* problems in files you touch.
 
