@@ -62,6 +62,12 @@ Never commit `.env` or service role keys.
 - **Commit as you go** when a logical chunk of work is done (e.g. one fix, one migration, one doc update)—do not leave the tree dirty at the end of a task unless the user asked for WIP only.
 - Use clear commit messages (what changed and why). Prefer `git` from the system install if it is not on `PATH` (e.g. `C:\Program Files\Git\bin\git.exe` on Windows).
 
+### Before every push to GitHub (Lovable sync)
+
+Pushing triggers **automatic** DB migrations and edge function deploys to the linked project; the **frontend** still needs a manual **Publish → Update** in Lovable.
+
+**Run the pre-push checklist** in [docs/ops/deployment-sync-guide.md](docs/ops/deployment-sync-guide.md) (tests, `npm run build`, lint on changed files, `npm run check:edge`, new `config.toml` entries, secrets, migration order, `as unknown as T` for new columns). Cursor loads the same expectations via `.cursor/rules/deployment-sync.mdc`.
+
 ## Related docs
 
 - [docs/README.md](docs/README.md) — full docs index, **start-here** reading order, and **canonical sources** (what to edit when docs drift).
