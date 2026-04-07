@@ -8,6 +8,8 @@ export interface CachedSignalShape {
   body: string;
   source: string;
   url: string;
+  originalUrl?: string;
+  originalPublication?: string;
 }
 
 export interface CachedGroundingShape {

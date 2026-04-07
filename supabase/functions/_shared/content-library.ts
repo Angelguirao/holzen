@@ -19,6 +19,9 @@ export interface LibraryEntry {
   author: string | null;
   summary: string;
   url: string | null;
+  /** First-publication URL when `url` is a mirror (e.g. Substack original). */
+  original_url: string | null;
+  original_publication: string | null;
   key_quote: string | null;
   citation: string | null;
   finding: string | null;
@@ -67,7 +70,9 @@ export async function searchLibrary(
   try {
     let query = svcClient
       .from("content_library")
-      .select("id, type, title, author, summary, url, key_quote, citation, finding, event_date, asset_class, analogy, recovery, mood_tag, tags, quality_score")
+      .select(
+        "id, type, title, author, summary, url, original_url, original_publication, key_quote, citation, finding, event_date, asset_class, analogy, recovery, mood_tag, tags, quality_score",
+      )
       .eq("type", options.type)
       .eq("active", true)
       .order("quality_score", { ascending: false })
@@ -181,13 +186,23 @@ async function getRecentlySeenLibraryIds(
 
 // ── Format converters ──
 
-export function essayToSignal(entry: LibraryEntry): { title: string; body: string; source: string; url: string; quote?: string } {
+export function essayToSignal(entry: LibraryEntry): {
+  title: string;
+  body: string;
+  source: string;
+  url: string;
+  quote?: string;
+  originalUrl?: string;
+  originalPublication?: string;
+} {
   return {
     title: entry.title,
     body: entry.summary,
     source: entry.author || "Unknown",
     url: entry.url || "",
     ...(entry.key_quote ? { quote: entry.key_quote } : {}),
+    ...(entry.original_url ? { originalUrl: entry.original_url } : {}),
+    ...(entry.original_publication ? { originalPublication: entry.original_publication } : {}),
   };
 }
 

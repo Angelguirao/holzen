@@ -51,6 +51,9 @@ interface SignalData {
   body: string;
   source: string;
   url: string;
+  /** Canonical first-publication link when the main `url` is a mirror */
+  originalUrl?: string;
+  originalPublication?: string;
 }
 
 interface UseCompanionDataParams {
