@@ -66,6 +66,8 @@ export interface SignalSourceRow {
   url: string | null;
   category: string;
   demoted_for_live?: boolean | null;
+  /** Set by fetch-source-feeds after each successful source pass */
+  last_fetch_feeds_at?: string | null;
 }
 
 // ── New types for dashboard improvements ──
@@ -121,6 +123,8 @@ export interface LibraryEntryRow {
   author: string | null;
   summary: string;
   url: string | null;
+  original_url?: string | null;
+  original_publication?: string | null;
   tags: string[];
   companion_types: string[];
   quality_score: number;
@@ -373,7 +377,7 @@ export function useAdminStats(enabled = true): AdminStats {
     try {
       const { data: libraryData, error: libErr } = await supabase
         .from('content_library')
-        .select('id, type, title, author, summary, url, tags, companion_types, quality_score, active, created_at')
+        .select('id, type, title, author, summary, url, original_url, original_publication, tags, companion_types, quality_score, active, created_at')
         .eq('active', true)
         .order('created_at', { ascending: false })
         .limit(100);
@@ -445,7 +449,7 @@ export function useAdminStats(enabled = true): AdminStats {
 
       const sourcesRes = await supabase
         .from('signal_sources')
-        .select('id, name, type, url, category')
+        .select('id, name, type, url, category, last_fetch_feeds_at')
         .order('category', { ascending: true })
         .order('name', { ascending: true });
       if (!sourcesRes.error) setSignalSources((sourcesRes.data ?? []) as SignalSourceRow[]);
