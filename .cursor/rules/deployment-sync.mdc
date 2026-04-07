@@ -1,0 +1,31 @@
+---
+description: Run the deployment pre-push checklist before GitHub push; Lovable sync behavior and migrations.
+alwaysApply: true
+---
+
+# Pre-push & Lovable / Supabase sync
+
+Before you **finish a task**, **suggest pushing**, or **confirm a branch is ready to merge**, treat [docs/ops/deployment-sync-guide.md](docs/ops/deployment-sync-guide.md) as the canonical checklist. Summarize or run the relevant steps; do not skip them for "small" changes if they touch migrations, edge functions, Supabase types, or production behavior.
+
+## Minimum commands (when code changed)
+
+Run and address failures before push:
+
+- `npm run test`
+- `npm run build`
+- `npm run lint` on touched files (whole-repo lint has known noise)
+- `npm run check:edge` when Deno is available (edge TS changes)
+
+## Always remember
+
+| What | Effect on sync |
+|------|----------------|
+| `supabase/migrations/` | Applied to **production DB** when GitHub syncs |
+| `supabase/functions/` + `config.toml` | Edge functions deploy to **production** |
+| `src/` frontend | **Not** live until **Publish → Update** in Lovable |
+
+- New `[functions.*]` block in `supabase/config.toml` for every new edge function (same PR).
+- New columns queried before `types.ts` regenerates: use `as unknown as YourRow[]` (see deployment guide).
+- Destructive migrations: order-of-operations per the guide (code ↔ schema).
+
+If the user asks only to "push" or "ship," still verify the checklist or state what was skipped and why.

@@ -2,6 +2,8 @@
 
 How Lovable Cloud auto-deploys when you push to GitHub, and how to avoid surprises.
 
+**Repo integration:** This checklist is referenced from [AGENTS.md](../../AGENTS.md) (humans + AI) and enforced for Cursor via [`.cursor/rules/deployment-sync.mdc`](../../.cursor/rules/deployment-sync.mdc) (`alwaysApply`). Run it before every push that touches app code, migrations, or edge functions.
+
 ## What happens on GitHub → Lovable sync
 
 | Artifact | Deployed automatically? | Goes live immediately? |
