@@ -77,8 +77,9 @@ Frontend is safe — it only goes live when you click **Publish → Update** in 
 
 ```
 □ Local tests pass                          npm run test
+□ Production build succeeds                 npm run build
 □ Lint is clean on changed files            npm run lint
-□ Edge functions type-check (if Deno)       npm run check:edge
+□ Edge functions type-check                 npm run check:edge
 □ New migrations tested locally             npm run supabase:reset
 □ New edge functions have config.toml entry
 □ New secrets documented / already added
@@ -120,6 +121,8 @@ Some Edge functions assume columns already exist — e.g. **`fetch-source-feeds`
 1. **Normal GitHub → Lovable sync** usually applies migrations in timestamp order before traffic hits new code; if you see column errors right after sync, open **Database → Migrations** and confirm pending migrations are applied, then **re-invoke** the function or redeploy.
 2. **High-stakes prod:** Ship **migrations-only** first (or run the SQL from new migration files in the SQL editor), verify schema, then merge the function commit — matches the guide's order-of-operations mindset.
 3. **Optional Edge secrets** (no deploy blocker if unset): `FETCH_FEEDS_MAX_SOURCES`, `FETCH_FEEDS_MAX_ARTICLES_PER_SOURCE`, `FETCH_FEEDS_ARTICLE_DELAY_MS` — defaults apply; add in **Cloud → Secrets** only for launch backfills.
+
+**`npm run check:edge`:** Runs `scripts/check-edge.mjs` (`deno check` on every `supabase/functions/*/index.ts` except `_shared`). It resolves the Deno binary from PATH, then `DENO_INSTALL/bin`, then `~/.deno/bin` (official installer default). Uses `--no-lock` so it does not write a root `deno.lock`. If Deno is missing entirely, the script exits 0 with a skip message.
 
 ## Troubleshooting
 
