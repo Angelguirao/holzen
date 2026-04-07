@@ -381,7 +381,7 @@ export function useAdminStats(enabled = true): AdminStats {
         .eq('active', true)
         .order('created_at', { ascending: false })
         .limit(100);
-      if (!libErr) setLibraryEntries((libraryData ?? []) as LibraryEntryRow[]);
+      if (!libErr) setLibraryEntries((libraryData ?? []) as unknown as LibraryEntryRow[]);
     } catch { /* table may not exist yet */ }
   }, [refreshRejections]);
 
