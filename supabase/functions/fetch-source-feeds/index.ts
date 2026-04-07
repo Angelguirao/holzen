@@ -206,9 +206,9 @@ serve(async (req) => {
     /** When the model omits original_url, grab obvious canonical links from markdown (not exhaustive). */
     function inferOriginalPublicationUrl(markdown: string): string | null {
       const patterns = [
-        /https:\/\/[a-z0-9-]+\.substack\.com\/[^\s\)\]\"<>]+/i,
-        /https:\/\/[a-z0-9-]+\.medium\.com\/[^\s\)\]\"<>]+/i,
-        /https:\/\/hackernoon\.com\/[^\s\)\]\"<>]+/i,
+        /https:\/\/[a-z0-9-]+\.substack\.com\/[^\s)\]"<>]+/i,
+        /https:\/\/[a-z0-9-]+\.medium\.com\/[^\s)\]"<>]+/i,
+        /https:\/\/hackernoon\.com\/[^\s)\]"<>]+/i,
       ];
       for (const re of patterns) {
         const m = markdown.match(re);
@@ -491,7 +491,7 @@ Return JSON with:
       const storedUrl = canonicalContentUrl(resolvedUrl) ?? (resolvedUrl.trim() || null);
 
       let originalUrl: string | null = typeof entry.original_url === "string" ? entry.original_url.trim() : null;
-      let originalPublication: string | null =
+      const originalPublication: string | null =
         typeof entry.original_publication === "string" ? entry.original_publication.trim() : null;
       if (contentType === "essay") {
         if (!originalUrl) {

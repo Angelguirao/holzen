@@ -653,7 +653,7 @@ URL RULES (CRITICAL):
   }
 
   // ── Step 5: Cache write ──
-  let qualityScore = 1;
+  const qualityScore = 1;
   if (signal.title && signal.body && signal.source && qualityScore > 0) {
     try {
       const { data: existing } = await svcClient
