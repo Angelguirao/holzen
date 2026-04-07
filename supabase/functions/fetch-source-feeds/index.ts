@@ -203,7 +203,15 @@ serve(async (req) => {
     const results: string[] = [];
     let fetched = 0;
 
-    /** When the model omits original_url, grab obvious canonical links from markdown (not exhaustive). */
+    /** Strip trailing punctuation often glued to URLs in markdown/HTML. */
+    function stripUrlTrailingJunk(u: string): string {
+      return u.replace(/[.,;:!?)>\]]+$/g, "");
+    }
+
+    /**
+     * When the model omits original_url, grab obvious canonical links from markdown (not exhaustive).
+     * Covers Substack/Medium/Hackernoon in-body links.
+     */
     function inferOriginalPublicationUrl(markdown: string): string | null {
       const patterns = [
         /https:\/\/[a-z0-9-]+\.substack\.com\/[^\s)\]"<>]+/i,
@@ -212,7 +220,46 @@ serve(async (req) => {
       ];
       for (const re of patterns) {
         const m = markdown.match(re);
-        if (m?.[0]) return m[0];
+        if (m?.[0]) return stripUrlTrailingJunk(m[0]);
+      }
+      return null;
+    }
+
+    /**
+     * Syndicated pages (e.g. Nakamoto Institute) often put "First published on …" at the **end** with a
+     * link to the canonical post (any domain). The structure model only sees a truncated excerpt, so we
+     * scan the **full** scraped markdown for the last "first published" phrase and take the first https URL
+     * whose host differs from the syndicated page (e.g. dergigi.com vs nakamotoinstitute.org).
+     */
+    function inferOriginalUrlFromFirstPublishedFooter(markdown: string, syndicatedArticleUrl: string): string | null {
+      let syndHost: string;
+      try {
+        syndHost = new URL(syndicatedArticleUrl).hostname.replace(/^www\./, "").toLowerCase();
+      } catch {
+        return null;
+      }
+      const lower = markdown.toLowerCase();
+      let lastIdx = -1;
+      let searchFrom = 0;
+      while (true) {
+        const i = lower.indexOf("first published", searchFrom);
+        if (i === -1) break;
+        lastIdx = i;
+        searchFrom = i + 1;
+      }
+      if (lastIdx === -1) return null;
+      const window = markdown.slice(lastIdx, lastIdx + 2000);
+      const urlRe = /https?:\/\/[^\s\)\]<>"]+/gi;
+      let m: RegExpExecArray | null;
+      while ((m = urlRe.exec(window)) !== null) {
+        const u = stripUrlTrailingJunk(m[0]);
+        try {
+          const h = new URL(u).hostname.replace(/^www\./, "").toLowerCase();
+          if (h === syndHost) continue;
+          return u;
+        } catch {
+          continue;
+        }
       }
       return null;
     }
@@ -355,11 +402,15 @@ Return JSON with:
 - summary (2-3 sentences)
 - key_quote (optional string): a real quote from the text only — do NOT fabricate.
 - url (string): MUST be exactly this page URL: ${citations[0] || articleUrl}
-- original_url (optional string): if the article says it was "first published" elsewhere, or a link points to the primary source, set that full https URL (any domain — e.g. HackerNoon, Substack, Medium, a personal blog). Must differ from the page URL when this is a republish/syndication. Otherwise omit.
-- original_publication (optional string): human name of that outlet (e.g. "HackerNoon", "The Bitstein Brief") if clear from the text; otherwise omit.`
+- original_url (optional string): if the article says it was "first published" elsewhere, or a link points to the primary source, set that full https URL (any domain — e.g. dergigi.com, HackerNoon, Substack, Medium). Must differ from the page URL when this is a republish/syndication. Check the **end** of the content for "First published on …" lines. Otherwise omit.
+- original_publication (optional string): human name of that outlet (e.g. "dergigi.com", "HackerNoon") if clear from the text; otherwise omit.`
         : `Extract ONE specific research finding from this content. Return JSON with: title, author, summary (2-3 sentences), citation (Author (Year), Title format), finding (key result in plain language), url (use: ${citations[0] || articleUrl}).`;
 
       const structureT0 = Date.now();
+      const structureExcerpt = contentType === "essay" && scrapedContent.length > 8000
+        ? `${scrapedContent.slice(0, 4500)}\n\n[...middle omitted...]\n\n${scrapedContent.slice(-4000)}`
+        : scrapedContent.slice(0, 6000);
+
       const structureRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
         method: "POST",
         headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
@@ -367,7 +418,7 @@ Return JSON with:
           model: "google/gemini-2.5-flash-lite",
           messages: [
             { role: "system", content: structurePrompt },
-            { role: "user", content: `Source: ${source.name}\nURL: ${articleUrl}\n\nContent:\n${scrapedContent.slice(0, 6000)}` },
+            { role: "user", content: `Source: ${source.name}\nURL: ${articleUrl}\n\nContent:\n${structureExcerpt}` },
           ],
           response_format: { type: "json_object" },
           temperature: 0.3,
@@ -491,15 +542,26 @@ Return JSON with:
       const storedUrl = canonicalContentUrl(resolvedUrl) ?? (resolvedUrl.trim() || null);
 
       let originalUrl: string | null = typeof entry.original_url === "string" ? entry.original_url.trim() : null;
-      const originalPublication: string | null =
+      let originalPublication: string | null =
         typeof entry.original_publication === "string" ? entry.original_publication.trim() : null;
       if (contentType === "essay") {
         if (!originalUrl) {
           const inferred = inferOriginalPublicationUrl(scrapedContent);
           if (inferred) originalUrl = inferred;
         }
+        if (!originalUrl) {
+          const fromFooter = inferOriginalUrlFromFirstPublishedFooter(scrapedContent, articleUrl);
+          if (fromFooter) originalUrl = fromFooter;
+        }
         if (originalUrl) {
           originalUrl = canonicalContentUrl(originalUrl) ?? originalUrl;
+        }
+        if (originalUrl && !originalPublication) {
+          try {
+            originalPublication = new URL(originalUrl).hostname.replace(/^www\./, "");
+          } catch {
+            /* keep null */
+          }
         }
       }
 
