@@ -10,6 +10,17 @@ This document describes the **Edge function** [`supabase/functions/fetch-source-
 | **`fetch-source-feeds`** | Cron- or invoke-driven worker: discovers article URLs, scrapes pages, structures JSON with Gemini, inserts rows into **`content_library`**. |
 | **Companion Signal** | Generators read `content_library` essays first (see [`signal.md`](pause/companions/signal.md), [`content-library.ts`](../../supabase/functions/_shared/content-library.ts)). |
 
+## When it runs
+
+- **Cron (typical)** — The repo documents a **pg_cron** job in [cron-setup.md](../ops/cron-setup.md): schedule **`0 6,18 * * *`** ( **06:00 and 18:00 UTC** daily, i.e. twice per day). Your **deployed** project may use a different expression or job name; confirm in the Supabase Dashboard (**Database → Cron Jobs**) or `SELECT * FROM cron.job`.
+- **Manual** — Invoke the function anytime: Dashboard (Edge Functions → `fetch-source-feeds`), [Bruno `fetch-source-feeds`](../../bruno/service-cron/fetch-source-feeds.bru), or `curl` with `Authorization: Bearer` (`SUPABASE_SERVICE_ROLE_KEY` or `CRON_SECRET`).
+
+## Concurrency (“how many processes?”)
+
+- **One HTTP request = one invocation** — Each trigger runs a **single** Edge Function instance for that request. There is **no** parallel `Promise.all` over sources or articles: the code uses **sequential** `for` loops (sources one by one; within each source, article URLs one by one with a **2s** pause between attempts — see `index.ts`).
+- **Per invocation limits** — At most **5** sources per run (`sources.slice(0, 5)`). Per source, up to **30** candidate URLs may be tried, but the run **stops after 2 new inserts** for that source (`MAX_ARTICLES_PER_SOURCE`), unless all candidates fail or are skipped (dedup).
+- **Overlapping runs** — If cron fires again while a long manual invoke is still running, you could have **two concurrent invocations** (two separate Edge isolates). They do not coordinate; both read `signal_sources` and write `content_library` with dedup protecting duplicate rows.
+
 ## End-to-end flow
 
 1. **Auth** — Service role or `CRON_SECRET` (same pattern as other cron workers; see [logging-strategy.md](../ops/logging-strategy.md)).
