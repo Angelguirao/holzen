@@ -445,7 +445,7 @@ export function useAdminStats(enabled = true): AdminStats {
 
       const sourcesRes = await supabase
         .from('signal_sources')
-        .select('id, name, type, url, category, last_fetch_feeds_at')
+        .select('id, name, type, url, category')
         .order('category', { ascending: true })
         .order('name', { ascending: true });
       if (!sourcesRes.error) setSignalSources((sourcesRes.data ?? []) as SignalSourceRow[]);
