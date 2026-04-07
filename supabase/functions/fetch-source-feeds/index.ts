@@ -232,10 +232,28 @@ serve(async (req) => {
     ]);
 
     /**
-     * First external https URL in `window` (not the syndicated page host), or null.
+     * Citations in body often link here; not a reliable “original publication” for syndicated mempool
+     * pieces (false positives like unrelated Ethereum articles).
      */
-    function firstExternalCanonicalUrl(window: string, syndHost: string): string | null {
+    const ORIGINAL_URL_DEPRIORITIZE_HOSTS = new Set(["hackernoon.com"]);
+
+    /** Prefer Substack/Medium/personal domains over generic tech blogs when multiple URLs appear. */
+    function scoreOriginalUrlHost(hostname: string): number {
+      const h = hostname.replace(/^www\./, "").toLowerCase();
+      if (ORIGINAL_URL_DEPRIORITIZE_HOSTS.has(h)) return 5;
+      if (h.endsWith("substack.com")) return 100;
+      if (h === "medium.com" || h.endsWith(".medium.com")) return 85;
+      if (h.endsWith("wordpress.com")) return 75;
+      return 40;
+    }
+
+    /**
+     * Best external https URL in `window` (not the syndicated page host), by score then document order.
+     */
+    function bestExternalCanonicalUrl(window: string, syndHost: string): string | null {
       const urlRe = /https?:\/\/[^\s\)\]<>"]+/gi;
+      type Cand = { url: string; score: number; pos: number };
+      const cands: Cand[] = [];
       let m: RegExpExecArray | null;
       while ((m = urlRe.exec(window)) !== null) {
         const u = stripUrlTrailingJunk(m[0]);
@@ -243,30 +261,42 @@ serve(async (req) => {
           const h = new URL(u).hostname.replace(/^www\./, "").toLowerCase();
           if (h === syndHost) continue;
           if (ORIGINAL_URL_SKIP_HOSTS.has(h)) continue;
-          return u;
+          if (ORIGINAL_URL_DEPRIORITIZE_HOSTS.has(h)) continue;
+          cands.push({ url: u, score: scoreOriginalUrlHost(h), pos: m.index });
         } catch {
           continue;
         }
       }
-      return null;
+      if (cands.length === 0) return null;
+      cands.sort((a, b) => (b.score - a.score) || (a.pos - b.pos));
+      return cands[0].url;
     }
 
-    const ATTRIBUTION_MARKERS = ["first published", "originally published", "reprinted from"] as const;
+    /** Match bylines like “First published on …” before loose “first published” in blockquotes. */
+    const ATTRIBUTION_MARKERS_SPECIFIC = [
+      "first published on",
+      "originally published on",
+      "originally published at",
+      "reprinted from",
+    ] as const;
 
-    /** Leftmost attribution phrase in `lower` (full string), or -1. */
-    function firstIndexOfAttributionPhrase(lower: string): number {
+    const ATTRIBUTION_MARKERS_GENERIC = ["first published", "originally published"] as const;
+
+    /** Leftmost of `markers` in lower[0..rangeEnd), or -1. */
+    function firstIndexOfAnyMarker(lower: string, markers: readonly string[], rangeEnd: number): number {
+      const slice = lower.slice(0, rangeEnd);
       let best = -1;
-      for (const phrase of ATTRIBUTION_MARKERS) {
-        const idx = lower.indexOf(phrase);
+      for (const phrase of markers) {
+        const idx = slice.indexOf(phrase);
         if (idx !== -1 && (best === -1 || idx < best)) best = idx;
       }
       return best;
     }
 
-    /** Rightmost occurrence among phrases (legacy footer-style). */
-    function lastIndexOfAnyAttributionPhrase(lower: string): number {
+    /** Rightmost occurrence among `markers` in full `lower`. */
+    function lastIndexOfAnyMarker(lower: string, markers: readonly string[]): number {
       let best = -1;
-      for (const phrase of ATTRIBUTION_MARKERS) {
+      for (const phrase of markers) {
         const idx = lastIndexOfPhrase(lower, phrase);
         if (idx > best) best = idx;
       }
@@ -274,11 +304,11 @@ serve(async (req) => {
     }
 
     function tryInferAtPhraseStart(markdown: string, syndHost: string, phraseStartIdx: number): string | null {
-      const narrow = markdown.slice(phraseStartIdx, phraseStartIdx + 520);
-      const fromNarrow = firstExternalCanonicalUrl(narrow, syndHost);
+      const narrow = markdown.slice(phraseStartIdx, phraseStartIdx + 1200);
+      const fromNarrow = bestExternalCanonicalUrl(narrow, syndHost);
       if (fromNarrow) return fromNarrow;
-      const wide = markdown.slice(phraseStartIdx, phraseStartIdx + 2000);
-      return firstExternalCanonicalUrl(wide, syndHost);
+      const wide = markdown.slice(phraseStartIdx, phraseStartIdx + 4500);
+      return bestExternalCanonicalUrl(wide, syndHost);
     }
 
     /**
@@ -299,16 +329,37 @@ serve(async (req) => {
         return null;
       }
       const lower = markdown.toLowerCase();
-      // Header / byline: first attribution phrase in ~first 12k chars (SNI byline block).
-      const headerCap = Math.min(lower.length, 12_000);
-      const headerIdx = firstIndexOfAttributionPhrase(lower.slice(0, headerCap));
+      const headerCap = Math.min(lower.length, 16_000);
+      // Prefer “first published on …” over bare “first published” (quotes can contain the latter first).
+      let headerIdx = firstIndexOfAnyMarker(lower, ATTRIBUTION_MARKERS_SPECIFIC, headerCap);
+      if (headerIdx === -1) {
+        headerIdx = firstIndexOfAnyMarker(lower, ATTRIBUTION_MARKERS_GENERIC, headerCap);
+      }
       if (headerIdx !== -1) {
         const fromHeader = tryInferAtPhraseStart(markdown, syndHost, headerIdx);
         if (fromHeader) return fromHeader;
       }
-      const lastIdx = lastIndexOfAnyAttributionPhrase(lower);
-      if (lastIdx === -1) return null;
-      return tryInferAtPhraseStart(markdown, syndHost, lastIdx);
+      let footerIdx = lastIndexOfAnyMarker(lower, ATTRIBUTION_MARKERS_SPECIFIC);
+      if (footerIdx === -1) footerIdx = lastIndexOfAnyMarker(lower, ATTRIBUTION_MARKERS_GENERIC);
+      if (footerIdx === -1) return null;
+      return tryInferAtPhraseStart(markdown, syndHost, footerIdx);
+    }
+
+    /** `original_url` must point off-site; same hostname as the syndicated page is never a valid “original.” */
+    function sanitizeCrossSiteOriginalUrl(candidate: string | null, syndicatedArticleUrl: string): string | null {
+      if (!candidate) return null;
+      try {
+        const ah = new URL(syndicatedArticleUrl).hostname.replace(/^www\./, "").toLowerCase();
+        const oh = new URL(candidate).hostname.replace(/^www\./, "").toLowerCase();
+        if (oh === ah) return null;
+      } catch {
+        return null;
+      }
+      return candidate;
+    }
+
+    function isDeprioritizedOriginalHost(hostname: string): boolean {
+      return ORIGINAL_URL_DEPRIORITIZE_HOSTS.has(hostname.replace(/^www\./, "").toLowerCase());
     }
 
     function safeUrlHost(u: string): string {
@@ -592,6 +643,17 @@ Return JSON with:
       let originalPublication: string | null =
         typeof entry.original_publication === "string" ? entry.original_publication.trim() : null;
       if (contentType === "essay") {
+        if (originalUrl) {
+          originalUrl = sanitizeCrossSiteOriginalUrl(originalUrl, articleUrl);
+        }
+        if (originalUrl) {
+          try {
+            if (isDeprioritizedOriginalHost(new URL(originalUrl).hostname)) originalUrl = null;
+          } catch {
+            originalUrl = null;
+          }
+        }
+        if (!originalUrl) originalPublication = null;
         if (!originalUrl) {
           const fromFooter = inferOriginalUrlFromAttributionFooter(scrapedContent, articleUrl);
           if (fromFooter) originalUrl = fromFooter;
