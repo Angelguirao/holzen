@@ -263,6 +263,30 @@ serve(async (req) => {
     ): Promise<"inserted" | "skipped" | "failed"> {
       const articleUrl = articleRef.url;
       const contentType = source.category === "signal" ? "essay" : "paper";
+
+      const preUrlCandidates = urlDedupCandidates(articleUrl);
+      if (preUrlCandidates.length > 0) {
+        const { data: existingPre } = await supabase
+          .from("content_library")
+          .select("id")
+          .eq("type", contentType)
+          .eq("active", true)
+          .in("url", preUrlCandidates)
+          .limit(1);
+        if (existingPre && existingPre.length > 0) {
+          results.push(`${source.name}: URL already in library (skipped before scrape)`);
+          holzenEdgeLog("fetch-feeds", "fetch_feeds_article", {
+            ms: Date.now() - t0,
+            outcome: "skipped",
+            reason: "dedup_url_pre_scrape",
+            source: source.name,
+            discovery,
+            urlHost: safeUrlHost(articleUrl),
+          });
+          return "skipped";
+        }
+      }
+
       let scrapedContent: string | null = null;
       let citations: string[] = [];
 

@@ -30,7 +30,7 @@ This document describes the **Edge function** [`supabase/functions/fetch-source-
 
 8. **Fallbacks** — If the model omits `original_url`, a small regex may infer a known pattern (Substack, Medium, HackerNoon) from markdown.
 
-9. **Dedup** — Skip insert if canonical URL or normalized title already exists in `content_library`.
+9. **Dedup** — Before scrape, **URL-only** check against `content_library` (same variants as [`urlDedupCandidates`](../../supabase/functions/_shared/content-dedup.ts)) so Firecrawl/Gemini are not called for known articles. After structure, **URL + `title_norm`** checks remain as a safety net (e.g. model returns a different normalized URL string).
 
 10. **Insert** — `content_library` row with tags derived from source category and name.
 
