@@ -86,9 +86,12 @@ async function scrapeWithFirecrawl(url: string, apiKey: string, log: (msg: strin
       return null;
     }
 
-    // Return markdown content, truncated to ~4000 chars for Gemini context
-    const markdown = data.data.markdown;
-    return markdown.slice(0, 4000);
+    // Full markdown for attribution parsing + structure excerpt (head/tail) below.
+    // Do **not** truncate here — a 4k cap dropped SNI's "First published on …" header on long pages
+    // and made `inferOriginalUrlFromAttributionFooter` miss Substack links while picking body URLs.
+    const markdown = String(data.data.markdown);
+    const maxChars = 200_000;
+    return markdown.length > maxChars ? markdown.slice(0, maxChars) : markdown;
   } catch (e) {
     if (e instanceof DOMException && e.name === "AbortError") {
       log(`Firecrawl timeout for ${url}`);
@@ -248,15 +251,45 @@ serve(async (req) => {
       return null;
     }
 
+    const ATTRIBUTION_MARKERS = ["first published", "originally published", "reprinted from"] as const;
+
+    /** Leftmost attribution phrase in `lower` (full string), or -1. */
+    function firstIndexOfAttributionPhrase(lower: string): number {
+      let best = -1;
+      for (const phrase of ATTRIBUTION_MARKERS) {
+        const idx = lower.indexOf(phrase);
+        if (idx !== -1 && (best === -1 || idx < best)) best = idx;
+      }
+      return best;
+    }
+
+    /** Rightmost occurrence among phrases (legacy footer-style). */
+    function lastIndexOfAnyAttributionPhrase(lower: string): number {
+      let best = -1;
+      for (const phrase of ATTRIBUTION_MARKERS) {
+        const idx = lastIndexOfPhrase(lower, phrase);
+        if (idx > best) best = idx;
+      }
+      return best;
+    }
+
+    function tryInferAtPhraseStart(markdown: string, syndHost: string, phraseStartIdx: number): string | null {
+      const narrow = markdown.slice(phraseStartIdx, phraseStartIdx + 520);
+      const fromNarrow = firstExternalCanonicalUrl(narrow, syndHost);
+      if (fromNarrow) return fromNarrow;
+      const wide = markdown.slice(phraseStartIdx, phraseStartIdx + 2000);
+      return firstExternalCanonicalUrl(wide, syndHost);
+    }
+
     /**
-     * Infer canonical `original_url` from syndication **attribution** lines only (never the full page).
+     * Infer canonical `original_url` from syndication **attribution** lines only (never arbitrary body links).
      *
-     * SNI (Next.js) often puts "First published on …" in the **article header** with a Substack link;
-     * other sites put the same phrase at the **footer** (e.g. dergigi.com). We take the latest matching
-     * phrase in the scraped text, then prefer URLs **immediately** after that phrase (~500 chars) so
-     * we get the Substack/primary link before unrelated body links (e.g. mises.org in the first quote).
+     * SNI (Next.js) puts "First published on …" in the **article header** (often a Substack URL). We
+     * **prefer the first** attribution phrase in the opening of the page so we do not pick a later
+     * phrase + wrong URL (e.g. an inline citation to hackernoon.com). If that fails, we fall back to
+     * the **last** phrase in the full text (footer-style originals).
      *
-     * We intentionally do **not** scan the full markdown — unrelated outbound links dominate long pages.
+     * Requires **untruncated** scrape text — truncating to a few KB previously dropped the header line.
      */
     function inferOriginalUrlFromAttributionFooter(markdown: string, syndicatedArticleUrl: string): string | null {
       let syndHost: string;
@@ -266,22 +299,16 @@ serve(async (req) => {
         return null;
       }
       const lower = markdown.toLowerCase();
-      const attributionMarkers = [
-        "first published",
-        "originally published",
-        "reprinted from",
-      ];
-      let lastIdx = -1;
-      for (const phrase of attributionMarkers) {
-        const idx = lastIndexOfPhrase(lower, phrase);
-        if (idx > lastIdx) lastIdx = idx;
+      // Header / byline: first attribution phrase in ~first 12k chars (SNI byline block).
+      const headerCap = Math.min(lower.length, 12_000);
+      const headerIdx = firstIndexOfAttributionPhrase(lower.slice(0, headerCap));
+      if (headerIdx !== -1) {
+        const fromHeader = tryInferAtPhraseStart(markdown, syndHost, headerIdx);
+        if (fromHeader) return fromHeader;
       }
+      const lastIdx = lastIndexOfAnyAttributionPhrase(lower);
       if (lastIdx === -1) return null;
-      const narrow = markdown.slice(lastIdx, lastIdx + 520);
-      const fromNarrow = firstExternalCanonicalUrl(narrow, syndHost);
-      if (fromNarrow) return fromNarrow;
-      const wide = markdown.slice(lastIdx, lastIdx + 2000);
-      return firstExternalCanonicalUrl(wide, syndHost);
+      return tryInferAtPhraseStart(markdown, syndHost, lastIdx);
     }
 
     function safeUrlHost(u: string): string {
@@ -422,7 +449,7 @@ Return JSON with:
 - summary (2-3 sentences)
 - key_quote (optional string): a real quote from the text only — do NOT fabricate.
 - url (string): MUST be exactly this page URL: ${citations[0] || articleUrl}
-- original_url (optional string): if the article says it was "first published" elsewhere, or a link points to the primary source, set that full https URL (any domain — e.g. dergigi.com, HackerNoon, Substack, Medium). Must differ from the page URL when this is a republish/syndication. Check the **end** of the content for "First published on …" lines. Otherwise omit.
+- original_url (optional string): if the article says it was "first published" elsewhere, or a link points to the primary source, set that full https URL (any domain — e.g. dergigi.com, HackerNoon, Substack, Medium). Must differ from the page URL when this is a republish/syndication. Check the **byline/header** and the **end** of the content for "First published on …" lines. Otherwise omit.
 - original_publication (optional string): human name of that outlet (e.g. "dergigi.com", "HackerNoon") if clear from the text; otherwise omit.`
         : `Extract ONE specific research finding from this content. Return JSON with: title, author, summary (2-3 sentences), citation (Author (Year), Title format), finding (key result in plain language), url (use: ${citations[0] || articleUrl}).`;
 
