@@ -1511,6 +1511,7 @@ export type Database = {
           demoted_for_live: boolean
           description: string | null
           id: string
+          last_fetch_feeds_at: string | null
           name: string
           type: string
           url: string | null
@@ -1521,8 +1522,9 @@ export type Database = {
           demoted_for_live?: boolean
           description?: string | null
           id?: string
+          last_fetch_feeds_at?: string | null
           name: string
-          type?: string
+          type: string
           url?: string | null
         }
         Update: {
@@ -1531,6 +1533,7 @@ export type Database = {
           demoted_for_live?: boolean
           description?: string | null
           id?: string
+          last_fetch_feeds_at?: string | null
           name?: string
           type?: string
           url?: string | null
