@@ -66,8 +66,6 @@ export interface SignalSourceRow {
   url: string | null;
   category: string;
   demoted_for_live?: boolean | null;
-  /** Set by fetch-source-feeds after each successful source pass */
-  last_fetch_feeds_at?: string | null;
 }
 
 // ── New types for dashboard improvements ──
