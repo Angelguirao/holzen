@@ -1,0 +1,65 @@
+# Content library ingestion — `fetch-source-feeds`
+
+This document describes the **Edge function** [`supabase/functions/fetch-source-feeds/index.ts`](../../supabase/functions/fetch-source-feeds/index.ts) and how it fills [`content_library`](../../supabase/migrations/20260321000003_content_library.sql) from admin-configured [`signal_sources`](../../src/components/admin/SourceCatalogViewer.tsx).
+
+## Role in the product
+
+| Piece | Purpose |
+|--------|---------|
+| **`signal_sources`** | Admin catalog: name, `type`, `url`, category. **One row per publisher/feed/site**, not per article. |
+| **`fetch-source-feeds`** | Cron- or invoke-driven worker: discovers article URLs, scrapes pages, structures JSON with Gemini, inserts rows into **`content_library`**. |
+| **Companion Signal** | Generators read `content_library` essays first (see [`signal.md`](pause/companions/signal.md), [`content-library.ts`](../../supabase/functions/_shared/content-library.ts)). |
+
+## End-to-end flow
+
+1. **Auth** — Service role or `CRON_SECRET` (same pattern as other cron workers; see [logging-strategy.md](../ops/logging-strategy.md)).
+2. **Load sources** — `signal_sources` where `url` is set and `demoted_for_live = false`.
+3. **Batch** — Up to **5** sources per run (`toProcess`); each source capped at **2** new inserts per run (`MAX_ARTICLES_PER_SOURCE`) to control Edge runtime and API cost.
+4. **URL normalization** — [`normalizeSourceUrl`](../../supabase/functions/_shared/feed-ingest.ts) fixes common paste errors (e.g. trailing `.` after `atom.xml`).
+5. **Discovery** (per source) — Depends on `signal_sources.type` and what the URL returns:
+
+   | Mode | Behavior |
+   |------|----------|
+   | **`rss` / `feed`** | Fetch XML; **parse item/entry links** + optional per-item author (`dc:creator`, Atom `<author>`). |
+   | **`site_map` / `site`** | Firecrawl **Map** on the URL; score/filter article-like paths. |
+   | **Default / `blog` / etc.** | If the URL returns RSS/Atom XML, treat as feed (**auto-detect**); else scrape **that single URL** as one article. |
+
+6. **Scrape** — For **each** discovered article URL: Firecrawl **scrape** → markdown (or Perplexity fallback if Firecrawl unavailable). The model does **not** ingest raw RSS `<content:encoded>` for structuring; it sees **the page** markdown (so “First published on …” lines and outbound links appear).
+
+7. **Structure** — Lovable gateway → **Gemini** (`google/gemini-2.5-flash-lite`) returns JSON: `title`, `author`, `summary`, `key_quote`, `url` (must match scraped page), optional `original_url` / `original_publication` for **any** domain when the page indicates a prior publication.
+
+8. **Fallbacks** — If the model omits `original_url`, a small regex may infer a known pattern (Substack, Medium, HackerNoon) from markdown.
+
+9. **Dedup** — Skip insert if canonical URL or normalized title already exists in `content_library`.
+
+10. **Insert** — `content_library` row with tags derived from source category and name.
+
+## Admin: what to add
+
+- **One feed URL** (e.g. `https://nakamotoinstitute.org/mempool/atom.xml`) with type **`rss`** — **not** individual article URLs unless you intentionally want a single-page ingest.
+- **Site discovery**: type **`site_map`** + site root URL (requires `FIRECRAWL_API_KEY`).
+
+## Logs (grep Supabase Edge logs)
+
+Filter with **`[holzen:fetch-feeds]`**. Verbose lines (`holzenEdgeLog` / `holzenEdgeWarn`) follow [logging-strategy.md](../ops/logging-strategy.md): **`HOLZEN_EDGE_LOG=0`** silences them in production; **`holzenEdgeRun`** always prints.
+
+| Message | When | Always |
+|--------|------|--------|
+| `fetch_feeds_batch` | After loading sources; `sourcesTotal`, `toProcess`, `maxArticlesPerSource`, `mode` | Yes |
+| `fetch_feeds_discover` | After resolving URLs for one source; `discovery`, `poolSize`, `feedAuthorsInPool` | If verbose |
+| `fetch_feeds_article` | Per article attempt: `outcome` (`inserted` / `skipped` / `failed`), `phase` / `reason`, `discovery`, `urlHost`, attribution flags | If verbose |
+| `fetch_feeds_complete` | Run finished; `fetched`, `sourcesTried`, `mode` | Yes |
+| `fetch_feeds_source_error` | Uncaught error in one source loop | If verbose (warn) |
+
+Stable grep tokens: **`fetch_feeds_batch`**, **`fetch_feeds_discover`**, **`fetch_feeds_article`**, **`fetch_feeds_complete`**.
+
+## Related code
+
+- **Shared helpers:** [`feed-ingest.ts`](../../supabase/functions/_shared/feed-ingest.ts) — RSS/Atom parsing, Map, URL normalization.
+- **Dedup:** [`content-dedup.ts`](../../supabase/functions/_shared/content-dedup.ts).
+- **Attribution in Signal UI:** [`essayToSignal`](../../supabase/functions/_shared/content-library.ts), [`SignalDisplay.tsx`](../../src/components/SignalDisplay.tsx).
+
+## Related docs
+
+- [logging-strategy.md](../ops/logging-strategy.md) — Edge vs browser logging; `HOLZEN_EDGE_LOG`.
+- [AGENTS.md](../../AGENTS.md) — `supabase/functions/` and migrations.

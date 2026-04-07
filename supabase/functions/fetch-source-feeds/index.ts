@@ -3,7 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { createAttemptLogger } from "../_shared/observe.ts";
 import { canonicalContentUrl, normalizeTitleKey, urlDedupCandidates } from "../_shared/content-dedup.ts";
 import { callPerplexityChat, type PerplexityUsage } from "../_shared/perplexity-client.ts";
-import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
+import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun, holzenEdgeWarn } from "../_shared/holzen-edge-log.ts";
 import {
   fetchFeedXmlIfApplicable,
   type FeedArticleRef,
@@ -34,6 +34,8 @@ const corsHeaders = {
  * - `rss` or `feed`: treat `url` as RSS/Atom — extract item links, scrape up to N articles.
  * - `site_map` or `site`: Firecrawl Map on `url`, then scrape up to N discovered article URLs.
  * Auto-detect: if the URL returns RSS/Atom XML, it is parsed as a feed even when type is `blog`.
+ *
+ * Human doc + log grep tokens: docs/systems/content-library-fetch-source-feeds.md
  */
 
 /** Max full article pipelines per source per run (keeps edge duration predictable). */
@@ -179,6 +181,7 @@ serve(async (req) => {
       .eq("demoted_for_live", false);
 
     if (!sources || sources.length === 0) {
+      holzenEdgeRun("fetch-feeds", "fetch_feeds_batch", { sourcesTotal: 0, toProcess: 0, mode: scrapeMode });
       hzLog("no sources with URLs");
       return new Response(JSON.stringify({ fetched: 0, mode: scrapeMode }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
@@ -200,21 +203,38 @@ serve(async (req) => {
       return null;
     }
 
-    async function resolveArticleRefs(source: SourceRow): Promise<FeedArticleRef[]> {
-      if (!source.url) return [];
+    function safeUrlHost(u: string): string {
+      try {
+        return new URL(u).hostname.replace(/^www\./, "");
+      } catch {
+        return "?";
+      }
+    }
+
+    type FeedDiscovery =
+      | "rss_feed"
+      | "rss_feed_empty"
+      | "site_map"
+      | "site_map_fallback_single"
+      | "single_page";
+
+    async function resolveArticleRefs(
+      source: SourceRow,
+    ): Promise<{ refs: FeedArticleRef[]; discovery: FeedDiscovery }> {
+      if (!source.url) return { refs: [], discovery: "single_page" };
 
       if (isExplicitSiteMapSourceType(source.type)) {
         if (!FIRECRAWL_API_KEY) {
           hzLog(`${source.name}: site_map requires FIRECRAWL_API_KEY`);
-          return [{ url: source.url, feedAuthor: null }];
+          return { refs: [{ url: source.url, feedAuthor: null }], discovery: "site_map_fallback_single" };
         }
         const mapped = await firecrawlMapArticleUrls(source.url, FIRECRAWL_API_KEY, hzLog);
         if (mapped.length > 0) {
           hzLog(`map: ${mapped.length} candidate URLs for ${source.name}`);
-          return mapped.map((url) => ({ url, feedAuthor: null }));
+          return { refs: mapped.map((url) => ({ url, feedAuthor: null })), discovery: "site_map" };
         }
         hzLog(`map: empty, falling back to single URL for ${source.name}`);
-        return [{ url: source.url, feedAuthor: null }];
+        return { refs: [{ url: source.url, feedAuthor: null }], discovery: "site_map_fallback_single" };
       }
 
       const feedXml = await fetchFeedXmlIfApplicable(source.url, hzLog);
@@ -222,23 +242,24 @@ serve(async (req) => {
         const refs = parseArticleRefsFromFeedXml(feedXml, source.url);
         if (refs.length > 0) {
           hzLog(`rss/atom: ${refs.length} item links for ${source.name}`);
-          return refs;
+          return { refs, discovery: "rss_feed" };
         }
         if (isExplicitFeedSourceType(source.type)) {
           hzLog(`${source.name}: explicit rss/feed type but no links parsed`);
-          return [];
+          return { refs: [], discovery: "rss_feed_empty" };
         }
       } else if (isExplicitFeedSourceType(source.type)) {
         hzLog(`${source.name}: url is not RSS/Atom XML`);
-        return [];
+        return { refs: [], discovery: "rss_feed_empty" };
       }
 
-      return [{ url: source.url, feedAuthor: null }];
+      return { refs: [{ url: source.url, feedAuthor: null }], discovery: "single_page" };
     }
 
     async function ingestArticle(
       source: SourceRow,
       articleRef: FeedArticleRef,
+      discovery: FeedDiscovery,
     ): Promise<"inserted" | "skipped" | "failed"> {
       const articleUrl = articleRef.url;
       const contentType = source.category === "signal" ? "essay" : "paper";
@@ -272,6 +293,14 @@ serve(async (req) => {
 
       if (!scrapedContent) {
         results.push(`${source.name} (${articleUrl.slice(0, 48)}…): no content`);
+        holzenEdgeLog("fetch-feeds", "fetch_feeds_article", {
+          ms: Date.now() - t0,
+          outcome: "failed",
+          phase: "scrape",
+          source: source.name,
+          discovery,
+          urlHost: safeUrlHost(articleUrl),
+        });
         return "failed";
       }
 
@@ -309,6 +338,15 @@ Return JSON with:
 
       if (!structureRes.ok) {
         results.push(`${source.name}: structure error ${structureRes.status}`);
+        holzenEdgeLog("fetch-feeds", "fetch_feeds_article", {
+          ms: Date.now() - t0,
+          outcome: "failed",
+          phase: "structure",
+          source: source.name,
+          discovery,
+          status: structureRes.status,
+          urlHost: safeUrlHost(articleUrl),
+        });
         return "failed";
       }
 
@@ -326,6 +364,14 @@ Return JSON with:
       const raw = structureData.choices?.[0]?.message?.content;
       if (!raw) {
         results.push(`${source.name}: empty structure`);
+        holzenEdgeLog("fetch-feeds", "fetch_feeds_article", {
+          ms: Date.now() - t0,
+          outcome: "failed",
+          phase: "structure_empty",
+          source: source.name,
+          discovery,
+          urlHost: safeUrlHost(articleUrl),
+        });
         return "failed";
       }
 
@@ -334,10 +380,26 @@ Return JSON with:
         entry = JSON.parse(raw) as Record<string, unknown>;
       } catch {
         results.push(`${source.name}: JSON parse error`);
+        holzenEdgeLog("fetch-feeds", "fetch_feeds_article", {
+          ms: Date.now() - t0,
+          outcome: "failed",
+          phase: "json_parse",
+          source: source.name,
+          discovery,
+          urlHost: safeUrlHost(articleUrl),
+        });
         return "failed";
       }
       if (typeof entry.title !== "string" || typeof entry.summary !== "string") {
         results.push(`${source.name}: invalid structure`);
+        holzenEdgeLog("fetch-feeds", "fetch_feeds_article", {
+          ms: Date.now() - t0,
+          outcome: "failed",
+          phase: "invalid_fields",
+          source: source.name,
+          discovery,
+          urlHost: safeUrlHost(articleUrl),
+        });
         return "failed";
       }
 
@@ -353,6 +415,15 @@ Return JSON with:
           .limit(1);
         if (byUrl && byUrl.length > 0) {
           results.push(`${source.name}: URL already in content_library`);
+          holzenEdgeLog("fetch-feeds", "fetch_feeds_article", {
+            ms: Date.now() - t0,
+            outcome: "skipped",
+            reason: "dedup_url",
+            source: source.name,
+            discovery,
+            title: String(entry.title).slice(0, 80),
+            urlHost: safeUrlHost(articleUrl),
+          });
           return "skipped";
         }
       }
@@ -367,6 +438,15 @@ Return JSON with:
         .limit(1);
       if (byNorm && byNorm.length > 0) {
         results.push(`${source.name}: same normalized title already in content_library`);
+        holzenEdgeLog("fetch-feeds", "fetch_feeds_article", {
+          ms: Date.now() - t0,
+          outcome: "skipped",
+          reason: "dedup_title_norm",
+          source: source.name,
+          discovery,
+          title: String(entry.title).slice(0, 80),
+          urlHost: safeUrlHost(articleUrl),
+        });
         return "skipped";
       }
 
@@ -409,11 +489,29 @@ Return JSON with:
       await supabase.from("content_library").insert(insertData);
       results.push(`${source.name}: added "${entry.title}" (via ${scrapeMode})`);
       fetched++;
+      holzenEdgeLog("fetch-feeds", "fetch_feeds_article", {
+        ms: Date.now() - t0,
+        outcome: "inserted",
+        source: source.name,
+        discovery,
+        title: String(entry.title).slice(0, 80),
+        urlHost: safeUrlHost(articleUrl),
+        feedAuthorHint: Boolean(feedAuthor),
+        originalUrlStored: Boolean(originalUrl),
+        originalPublicationStored: Boolean(originalPublication),
+        scrapeMode,
+      });
       return "inserted";
     }
 
     // Process up to 5 sources per run
     const toProcess = sources.slice(0, 5) as SourceRow[];
+    holzenEdgeRun("fetch-feeds", "fetch_feeds_batch", {
+      sourcesTotal: sources.length,
+      toProcess: toProcess.length,
+      maxArticlesPerSource: MAX_ARTICLES_PER_SOURCE,
+      mode: scrapeMode,
+    });
 
     for (const source of toProcess) {
       try {
@@ -424,22 +522,38 @@ Return JSON with:
         }
         hzLog(`processing: ${source.name} (${sourceNorm.url})`);
 
-        const articlePool = await resolveArticleRefs(sourceNorm);
+        const { refs: articlePool, discovery } = await resolveArticleRefs(sourceNorm);
+        holzenEdgeLog("fetch-feeds", "fetch_feeds_discover", {
+          ms: Date.now() - t0,
+          source: sourceNorm.name,
+          sourceType: sourceNorm.type,
+          discovery,
+          poolSize: articlePool.length,
+          feedAuthorsInPool: articlePool.filter((r) => r.feedAuthor).length,
+        });
+
         const maxAttempts = Math.min(articlePool.length, 30);
         let insertedForSource = 0;
 
         for (let i = 0; i < maxAttempts && insertedForSource < MAX_ARTICLES_PER_SOURCE; i++) {
           const articleRef = articlePool[i]!;
-          const outcome = await ingestArticle(sourceNorm, articleRef);
+          const outcome = await ingestArticle(sourceNorm, articleRef, discovery);
           if (outcome === "inserted") insertedForSource++;
           await new Promise((r) => setTimeout(r, 2000));
         }
       } catch (e) {
         results.push(`${source.name}: ${e}`);
+        holzenEdgeWarn("fetch-feeds", "fetch_feeds_source_error", { source: source.name, err: String(e) });
       }
     }
 
-    holzenEdgeLog("fetch-feeds", "run complete", { ms: Date.now() - t0, fetched, sourcesTried: toProcess.length, mode: scrapeMode });
+    holzenEdgeRun("fetch-feeds", "fetch_feeds_complete", {
+      ms: Date.now() - t0,
+      fetched,
+      sourcesTried: toProcess.length,
+      mode: scrapeMode,
+      resultsLines: results.length,
+    });
     return new Response(JSON.stringify({ fetched, mode: scrapeMode, results }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
