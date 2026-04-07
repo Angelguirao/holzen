@@ -36,10 +36,20 @@ const corsHeaders = {
  * Auto-detect: if the URL returns RSS/Atom XML, it is parsed as a feed even when type is `blog`.
  *
  * Human doc + log grep tokens: docs/systems/content-library-fetch-source-feeds.md
+ *
+ * Env (optional, for launch backfills — see docs):
+ * - FETCH_FEEDS_MAX_SOURCES (default 5, max 40)
+ * - FETCH_FEEDS_MAX_ARTICLES_PER_SOURCE (default 2, max 25)
+ * - FETCH_FEEDS_ARTICLE_DELAY_MS (default 2000, max 60000; 0 = no pause)
  */
 
-/** Max full article pipelines per source per run (keeps edge duration predictable). */
-const MAX_ARTICLES_PER_SOURCE = 2;
+function parseEnvInt(name: string, defaultVal: number, min: number, max: number): number {
+  const raw = Deno.env.get(name);
+  if (raw === undefined || raw === "") return defaultVal;
+  const n = parseInt(raw, 10);
+  if (Number.isNaN(n)) return defaultVal;
+  return Math.min(max, Math.max(min, n));
+}
 
 // ── Firecrawl scraper ──
 
@@ -171,14 +181,18 @@ serve(async (req) => {
     }
 
     const scrapeMode = FIRECRAWL_API_KEY ? "firecrawl" : "perplexity";
-    hzLog(`scrape mode: ${scrapeMode}`);
+    const maxSources = parseEnvInt("FETCH_FEEDS_MAX_SOURCES", 5, 1, 40);
+    const maxArticlesPerSource = parseEnvInt("FETCH_FEEDS_MAX_ARTICLES_PER_SOURCE", 2, 1, 25);
+    const articleDelayMs = parseEnvInt("FETCH_FEEDS_ARTICLE_DELAY_MS", 2000, 0, 60_000);
+    hzLog(`scrape mode: ${scrapeMode}; limits: sources=${maxSources} articles/source=${maxArticlesPerSource} delayMs=${articleDelayMs}`);
 
-    // Fetch all active sources with URLs
+    // Active sources: stalest first so all rows rotate across cron runs (requires last_fetch_feeds_at migration).
     const { data: sources } = await supabase
       .from("signal_sources")
       .select("id, name, type, url, category")
       .not("url", "is", null)
-      .eq("demoted_for_live", false);
+      .eq("demoted_for_live", false)
+      .order("last_fetch_feeds_at", { ascending: true, nullsFirst: true });
 
     if (!sources || sources.length === 0) {
       holzenEdgeRun("fetch-feeds", "fetch_feeds_batch", { sourcesTotal: 0, toProcess: 0, mode: scrapeMode });
@@ -528,12 +542,12 @@ Return JSON with:
       return "inserted";
     }
 
-    // Process up to 5 sources per run
-    const toProcess = sources.slice(0, 5) as SourceRow[];
+    const toProcess = sources.slice(0, maxSources) as SourceRow[];
     holzenEdgeRun("fetch-feeds", "fetch_feeds_batch", {
       sourcesTotal: sources.length,
       toProcess: toProcess.length,
-      maxArticlesPerSource: MAX_ARTICLES_PER_SOURCE,
+      maxArticlesPerSource,
+      articleDelayMs,
       mode: scrapeMode,
     });
 
@@ -559,12 +573,21 @@ Return JSON with:
         const maxAttempts = Math.min(articlePool.length, 30);
         let insertedForSource = 0;
 
-        for (let i = 0; i < maxAttempts && insertedForSource < MAX_ARTICLES_PER_SOURCE; i++) {
+        for (let i = 0; i < maxAttempts && insertedForSource < maxArticlesPerSource; i++) {
           const articleRef = articlePool[i]!;
           const outcome = await ingestArticle(sourceNorm, articleRef, discovery);
           if (outcome === "inserted") insertedForSource++;
-          await new Promise((r) => setTimeout(r, 2000));
+          if (
+            articleDelayMs > 0 && i + 1 < maxAttempts && insertedForSource < maxArticlesPerSource
+          ) {
+            await new Promise((r) => setTimeout(r, articleDelayMs));
+          }
         }
+
+        await supabase
+          .from("signal_sources")
+          .update({ last_fetch_feeds_at: new Date().toISOString() })
+          .eq("id", sourceNorm.id);
       } catch (e) {
         results.push(`${source.name}: ${e}`);
         holzenEdgeWarn("fetch-feeds", "fetch_feeds_source_error", { source: source.name, err: String(e) });

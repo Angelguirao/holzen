@@ -17,15 +17,30 @@ This document describes the **Edge function** [`supabase/functions/fetch-source-
 
 ## Concurrency (“how many processes?”)
 
-- **One HTTP request = one invocation** — Each trigger runs a **single** Edge Function instance for that request. There is **no** parallel `Promise.all` over sources or articles: the code uses **sequential** `for` loops (sources one by one; within each source, article URLs one by one with a **2s** pause between attempts — see `index.ts`).
-- **Per invocation limits** — At most **5** sources per run (`sources.slice(0, 5)`). Per source, up to **30** candidate URLs may be tried, but the run **stops after 2 new inserts** for that source (`MAX_ARTICLES_PER_SOURCE`), unless all candidates fail or are skipped (dedup).
+- **One HTTP request = one invocation** — Each trigger runs a **single** Edge Function instance for that request. There is **no** parallel `Promise.all` over sources or articles: the code uses **sequential** `for` loops (sources one by one; within each source, article URLs one by one with a configurable pause between attempts — see `index.ts`).
+- **Per invocation limits (defaults)** — Defaults: **5** sources, **2** inserts per source, **2000 ms** delay between article attempts. Override with Edge secrets (see below). Up to **30** URL attempts per source before giving up on that source’s quota.
+- **Fair rotation** — Sources are ordered by **`last_fetch_feeds_at` ascending, nulls first** (migration `signal_sources.last_fetch_feeds_at`). After each source finishes successfully, that timestamp is updated so the next run prefers **other** stale sources. **Apply the migration** before relying on rotation.
 - **Overlapping runs** — If cron fires again while a long manual invoke is still running, you could have **two concurrent invocations** (two separate Edge isolates). They do not coordinate; both read `signal_sources` and write `content_library` with dedup protecting duplicate rows.
+
+## Bigger library / launch backfill
+
+Steady-state cron is intentionally small (cost + Edge runtime). To **fill the library quickly** for launch:
+
+1. **Add many RSS feeds** (`signal_sources` rows) — one feed URL per publisher, not per article.
+2. **Raise Edge secrets temporarily** (then lower after backfill):
+   - `FETCH_FEEDS_MAX_SOURCES` — default `5`, max `40` (how many distinct sources per invocation).
+   - `FETCH_FEEDS_MAX_ARTICLES_PER_SOURCE` — default `2`, max `25` (new inserts per source per run).
+   - `FETCH_FEEDS_ARTICLE_DELAY_MS` — default `2000`; set `500` or `0` to speed up (be mindful of Firecrawl / Lovable rate limits).
+3. **Invoke repeatedly** — Manual runs (Dashboard / Bruno) plus `last_fetch_feeds_at` rotation so **all** sources get turns across runs.
+4. **Optional: seed SQL** — For a guaranteed baseline, insert curated rows directly into `content_library` via a migration or one-off SQL (bypasses API cost); keep quality_score + tags consistent with existing rows.
+
+See [`.env.example`](../../.env.example) for commented examples.
 
 ## End-to-end flow
 
 1. **Auth** — Service role or `CRON_SECRET` (same pattern as other cron workers; see [logging-strategy.md](../ops/logging-strategy.md)).
 2. **Load sources** — `signal_sources` where `url` is set and `demoted_for_live = false`.
-3. **Batch** — Up to **5** sources per run (`toProcess`); each source capped at **2** new inserts per run (`MAX_ARTICLES_PER_SOURCE`) to control Edge runtime and API cost.
+3. **Batch** — Up to **`FETCH_FEEDS_MAX_SOURCES`** (default **5**) sources per run; each source capped at **`FETCH_FEEDS_MAX_ARTICLES_PER_SOURCE`** (default **2**) new inserts; **`FETCH_FEEDS_ARTICLE_DELAY_MS`** between article attempts (default **2000**). Stalest sources first via **`last_fetch_feeds_at`**.
 4. **URL normalization** — [`normalizeSourceUrl`](../../supabase/functions/_shared/feed-ingest.ts) fixes common paste errors (e.g. trailing `.` after `atom.xml`).
 5. **Discovery** (per source) — Depends on `signal_sources.type` and what the URL returns:
 
