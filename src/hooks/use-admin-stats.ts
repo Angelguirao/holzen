@@ -121,8 +121,6 @@ export interface LibraryEntryRow {
   author: string | null;
   summary: string;
   url: string | null;
-  original_url?: string | null;
-  original_publication?: string | null;
   tags: string[];
   companion_types: string[];
   quality_score: number;
