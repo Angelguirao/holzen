@@ -604,6 +604,22 @@ serve(async (req) => {
           scrapedContent = fc.markdown;
           firecrawlMetadata = fc.metadata;
           citations = [articleUrl];
+          if (contentType === "essay") {
+            const mdLower = fc.markdown.toLowerCase();
+            holzenEdgeLog("fetch-feeds", "fetch_feeds_scrape_payload", {
+              ms: Date.now() - t0,
+              urlHost: safeUrlHost(articleUrl),
+              mdChars: fc.markdown.length,
+              mdHead: fc.markdown.slice(0, 800),
+              mdTail: fc.markdown.slice(-400),
+              metaKeys: fc.metadata ? Object.keys(fc.metadata) : null,
+              metaCanonical: fc.metadata?.canonicalUrl ?? fc.metadata?.canonical ?? null,
+              metaOgUrl: fc.metadata?.ogUrl ?? fc.metadata?.["og:url"] ?? null,
+              linksCount: fc.links.length,
+              hasBylineFirstPublished: mdLower.includes("first published"),
+              hasBylineOriginallyPublished: mdLower.includes("originally published"),
+            });
+          }
         }
       }
 
