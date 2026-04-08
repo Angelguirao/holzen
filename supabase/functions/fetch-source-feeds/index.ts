@@ -270,6 +270,8 @@ serve(async (req) => {
       candidatesPreview: string[];
       chosen: string | null;
       chosenDistanceAfterPhrase: number | null;
+      /** Set when path is no_marker — helps see if wording differed from our list */
+      noMarkerHint?: { hasPublished: boolean; hasFirst: boolean; headerScannedChars: number };
     };
 
     /**
@@ -336,12 +338,30 @@ serve(async (req) => {
       return { url: best.url, debug: emptyDebug(usedWide ? "after_phrase_wide" : "after_phrase_tight") };
     }
 
+    /**
+     * Normalize scraped text for phrase matching only. Replacements are 1:1 UTF-16 code units so indices
+     * stay aligned with `markdown` for slicing (smart quotes/dashes break naive `indexOf("first published on")`).
+     */
+    function normalizePhraseHaystack(s: string): string {
+      return s
+        .replace(/\u2019|\u2018/g, "'")
+        .replace(/\u201c|\u201d/g, '"')
+        .replace(/[\u2010-\u2015]/g, "-");
+    }
+
     /** Match bylines like “First published on …” before loose “first published” in blockquotes. */
     const ATTRIBUTION_MARKERS_SPECIFIC = [
       "first published on",
       "originally published on",
       "originally published at",
       "reprinted from",
+      "republished from",
+      "first posted on",
+      "originally posted on",
+      "first appeared on",
+      "originally appeared on",
+      "cross-posted from",
+      "cross posted from",
     ] as const;
 
     const ATTRIBUTION_MARKERS_GENERIC = ["first published", "originally published"] as const;
@@ -391,7 +411,7 @@ serve(async (req) => {
       } catch {
         return { url: null, debug: null };
       }
-      const lower = markdown.toLowerCase();
+      const lower = normalizePhraseHaystack(markdown.toLowerCase());
       const headerCap = Math.min(lower.length, 16_000);
 
       const headSpec = firstPhraseMatch(lower, ATTRIBUTION_MARKERS_SPECIFIC, headerCap);
@@ -424,6 +444,11 @@ serve(async (req) => {
             candidatesPreview: [],
             chosen: null,
             chosenDistanceAfterPhrase: null,
+            noMarkerHint: {
+              hasPublished: lower.includes("published"),
+              hasFirst: lower.includes("first "),
+              headerScannedChars: headerCap,
+            },
           },
         };
       }
