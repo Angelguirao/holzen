@@ -231,45 +231,82 @@ serve(async (req) => {
       "validator.w3.org",
     ]);
 
-    /**
-     * Citations in body often link here; not a reliable “original publication” for syndicated mempool
-     * pieces (false positives like unrelated Ethereum articles).
-     */
-    const ORIGINAL_URL_DEPRIORITIZE_HOSTS = new Set(["hackernoon.com"]);
-
-    /** Prefer Substack/Medium/personal domains over generic tech blogs when multiple URLs appear. */
-    function scoreOriginalUrlHost(hostname: string): number {
-      const h = hostname.replace(/^www\./, "").toLowerCase();
-      if (ORIGINAL_URL_DEPRIORITIZE_HOSTS.has(h)) return 5;
-      if (h.endsWith("substack.com")) return 100;
-      if (h === "medium.com" || h.endsWith(".medium.com")) return 85;
-      if (h.endsWith("wordpress.com")) return 75;
-      return 40;
-    }
+    type OriginalInferDebug = {
+      path: string;
+      phrase: string | null;
+      afterPhraseOffset: number | null;
+      tightChars: number;
+      wideChars: number;
+      usedWide: boolean;
+      candidateCount: number;
+      /** host@distanceAfterPhrase for up to 8 candidates, closest first */
+      candidatesPreview: string[];
+      chosen: string | null;
+      chosenDistanceAfterPhrase: number | null;
+    };
 
     /**
-     * Best external https URL in `window` (not the syndicated page host), by score then document order.
+     * External https URLs in `slice` with start offset relative to **after-phrase** origin (0 = first char after the attribution phrase).
      */
-    function bestExternalCanonicalUrl(window: string, syndHost: string): string | null {
+    function collectExternalUrlsAfterPhrase(slice: string, syndHost: string): { url: string; dist: number; host: string }[] {
       const urlRe = /https?:\/\/[^\s\)\]<>"]+/gi;
-      type Cand = { url: string; score: number; pos: number };
-      const cands: Cand[] = [];
+      const out: { url: string; dist: number; host: string }[] = [];
       let m: RegExpExecArray | null;
-      while ((m = urlRe.exec(window)) !== null) {
+      while ((m = urlRe.exec(slice)) !== null) {
         const u = stripUrlTrailingJunk(m[0]);
         try {
           const h = new URL(u).hostname.replace(/^www\./, "").toLowerCase();
           if (h === syndHost) continue;
           if (ORIGINAL_URL_SKIP_HOSTS.has(h)) continue;
-          if (ORIGINAL_URL_DEPRIORITIZE_HOSTS.has(h)) continue;
-          cands.push({ url: u, score: scoreOriginalUrlHost(h), pos: m.index });
+          out.push({ url: u, dist: m.index, host: h });
         } catch {
           continue;
         }
       }
-      if (cands.length === 0) return null;
-      cands.sort((a, b) => (b.score - a.score) || (a.pos - b.pos));
-      return cands[0].url;
+      return out;
+    }
+
+    /**
+     * Pick the external URL **closest to the end of the attribution phrase** (minimum character distance in
+     * the scraped text after the phrase). Syndication bylines put the canonical link first; unrelated citations
+     * in quotes appear later — no per-domain blocklist required.
+     */
+    function pickOriginalUrlAfterPhrase(
+      markdown: string,
+      syndHost: string,
+      phraseStartIdx: number,
+      matchedPhrase: string,
+      tightMax: number,
+      wideMax: number,
+    ): { url: string | null; debug: OriginalInferDebug } {
+      const afterPhrase = phraseStartIdx + matchedPhrase.length;
+      const tightSlice = markdown.slice(afterPhrase, afterPhrase + tightMax);
+      let cands = collectExternalUrlsAfterPhrase(tightSlice, syndHost);
+      let usedWide = false;
+      if (cands.length === 0) {
+        const wideSlice = markdown.slice(afterPhrase, afterPhrase + wideMax);
+        cands = collectExternalUrlsAfterPhrase(wideSlice, syndHost);
+        usedWide = true;
+      }
+      cands.sort((a, b) => a.dist - b.dist);
+      const best = cands[0];
+      const preview = cands.slice(0, 8).map((c) => `${c.host}@${c.dist}`);
+      const emptyDebug = (path: string): OriginalInferDebug => ({
+        path,
+        phrase: matchedPhrase,
+        afterPhraseOffset: afterPhrase,
+        tightChars: tightMax,
+        wideChars: wideMax,
+        usedWide,
+        candidateCount: cands.length,
+        candidatesPreview: preview,
+        chosen: best?.url ?? null,
+        chosenDistanceAfterPhrase: best?.dist ?? null,
+      });
+      if (!best) {
+        return { url: null, debug: emptyDebug("no_candidates") };
+      }
+      return { url: best.url, debug: emptyDebug(usedWide ? "after_phrase_wide" : "after_phrase_tight") };
     }
 
     /** Match bylines like “First published on …” before loose “first published” in blockquotes. */
@@ -282,67 +319,92 @@ serve(async (req) => {
 
     const ATTRIBUTION_MARKERS_GENERIC = ["first published", "originally published"] as const;
 
-    /** Leftmost of `markers` in lower[0..rangeEnd), or -1. */
-    function firstIndexOfAnyMarker(lower: string, markers: readonly string[], rangeEnd: number): number {
+    /** Earliest match among `markers` in lower[0..rangeEnd). */
+    function firstPhraseMatch(
+      lower: string,
+      markers: readonly string[],
+      rangeEnd: number,
+    ): { idx: number; phrase: string } | null {
       const slice = lower.slice(0, rangeEnd);
-      let best = -1;
+      let best: { idx: number; phrase: string } | null = null;
       for (const phrase of markers) {
         const idx = slice.indexOf(phrase);
-        if (idx !== -1 && (best === -1 || idx < best)) best = idx;
+        if (idx === -1) continue;
+        if (!best || idx < best.idx) best = { idx, phrase };
       }
       return best;
     }
 
-    /** Rightmost occurrence among `markers` in full `lower`. */
-    function lastIndexOfAnyMarker(lower: string, markers: readonly string[]): number {
-      let best = -1;
+    /** Latest (rightmost) match among `markers` in full `lower`. */
+    function lastPhraseMatch(lower: string, markers: readonly string[]): { idx: number; phrase: string } | null {
+      let best: { idx: number; phrase: string } | null = null;
       for (const phrase of markers) {
         const idx = lastIndexOfPhrase(lower, phrase);
-        if (idx > best) best = idx;
+        if (idx === -1) continue;
+        if (!best || idx > best.idx) best = { idx, phrase };
       }
       return best;
-    }
-
-    function tryInferAtPhraseStart(markdown: string, syndHost: string, phraseStartIdx: number): string | null {
-      const narrow = markdown.slice(phraseStartIdx, phraseStartIdx + 1200);
-      const fromNarrow = bestExternalCanonicalUrl(narrow, syndHost);
-      if (fromNarrow) return fromNarrow;
-      const wide = markdown.slice(phraseStartIdx, phraseStartIdx + 4500);
-      return bestExternalCanonicalUrl(wide, syndHost);
     }
 
     /**
-     * Infer canonical `original_url` from syndication **attribution** lines only (never arbitrary body links).
+     * Infer canonical `original_url` from text **after** syndication attribution phrases. Chooses the
+     * external URL with minimum distance from the end of the matched phrase (byline link first).
      *
-     * SNI (Next.js) puts "First published on …" in the **article header** (often a Substack URL). We
-     * **prefer the first** attribution phrase in the opening of the page so we do not pick a later
-     * phrase + wrong URL (e.g. an inline citation to hackernoon.com). If that fails, we fall back to
-     * the **last** phrase in the full text (footer-style originals).
-     *
-     * Requires **untruncated** scrape text — truncating to a few KB previously dropped the header line.
+     * Requires untruncated scrape text.
      */
-    function inferOriginalUrlFromAttributionFooter(markdown: string, syndicatedArticleUrl: string): string | null {
+    function inferOriginalUrlFromAttributionFooter(
+      markdown: string,
+      syndicatedArticleUrl: string,
+    ): { url: string | null; debug: OriginalInferDebug | null } {
+      const TIGHT = 450;
+      const WIDE = 5200;
       let syndHost: string;
       try {
         syndHost = new URL(syndicatedArticleUrl).hostname.replace(/^www\./, "").toLowerCase();
       } catch {
-        return null;
+        return { url: null, debug: null };
       }
       const lower = markdown.toLowerCase();
       const headerCap = Math.min(lower.length, 16_000);
-      // Prefer “first published on …” over bare “first published” (quotes can contain the latter first).
-      let headerIdx = firstIndexOfAnyMarker(lower, ATTRIBUTION_MARKERS_SPECIFIC, headerCap);
-      if (headerIdx === -1) {
-        headerIdx = firstIndexOfAnyMarker(lower, ATTRIBUTION_MARKERS_GENERIC, headerCap);
+
+      const headSpec = firstPhraseMatch(lower, ATTRIBUTION_MARKERS_SPECIFIC, headerCap);
+      const headGen = firstPhraseMatch(lower, ATTRIBUTION_MARKERS_GENERIC, headerCap);
+      const header = headSpec ?? headGen;
+
+      if (header) {
+        const r = pickOriginalUrlAfterPhrase(markdown, syndHost, header.idx, header.phrase, TIGHT, WIDE);
+        r.debug.path = `${headSpec ? "header_specific" : "header_generic"}_${r.debug.path}`;
+        if (r.url) return { url: r.url, debug: r.debug };
       }
-      if (headerIdx !== -1) {
-        const fromHeader = tryInferAtPhraseStart(markdown, syndHost, headerIdx);
-        if (fromHeader) return fromHeader;
+
+      const footSpec = lastPhraseMatch(lower, ATTRIBUTION_MARKERS_SPECIFIC);
+      const footGen = lastPhraseMatch(lower, ATTRIBUTION_MARKERS_GENERIC);
+      const footer = footSpec && footGen
+        ? (footSpec.idx >= footGen.idx ? footSpec : footGen)
+        : (footSpec ?? footGen);
+
+      if (!footer) {
+        return {
+          url: null,
+          debug: {
+            path: "no_marker",
+            phrase: null,
+            afterPhraseOffset: null,
+            tightChars: TIGHT,
+            wideChars: WIDE,
+            usedWide: false,
+            candidateCount: 0,
+            candidatesPreview: [],
+            chosen: null,
+            chosenDistanceAfterPhrase: null,
+          },
+        };
       }
-      let footerIdx = lastIndexOfAnyMarker(lower, ATTRIBUTION_MARKERS_SPECIFIC);
-      if (footerIdx === -1) footerIdx = lastIndexOfAnyMarker(lower, ATTRIBUTION_MARKERS_GENERIC);
-      if (footerIdx === -1) return null;
-      return tryInferAtPhraseStart(markdown, syndHost, footerIdx);
+
+      const r = pickOriginalUrlAfterPhrase(markdown, syndHost, footer.idx, footer.phrase, TIGHT, WIDE);
+      const useSpec = footSpec && footer.idx === footSpec.idx && footer.phrase === footSpec.phrase;
+      r.debug.path = `${useSpec ? "footer_specific" : "footer_generic"}_${r.debug.path}`;
+      return { url: r.url, debug: r.debug };
     }
 
     /** `original_url` must point off-site; same hostname as the syndicated page is never a valid “original.” */
@@ -356,10 +418,6 @@ serve(async (req) => {
         return null;
       }
       return candidate;
-    }
-
-    function isDeprioritizedOriginalHost(hostname: string): boolean {
-      return ORIGINAL_URL_DEPRIORITIZE_HOSTS.has(hostname.replace(/^www\./, "").toLowerCase());
     }
 
     function safeUrlHost(u: string): string {
@@ -643,20 +701,31 @@ Return JSON with:
       let originalPublication: string | null =
         typeof entry.original_publication === "string" ? entry.original_publication.trim() : null;
       if (contentType === "essay") {
+        const llmOriginalBeforeSanitize = originalUrl;
         if (originalUrl) {
           originalUrl = sanitizeCrossSiteOriginalUrl(originalUrl, articleUrl);
         }
-        if (originalUrl) {
-          try {
-            if (isDeprioritizedOriginalHost(new URL(originalUrl).hostname)) originalUrl = null;
-          } catch {
-            originalUrl = null;
-          }
+        if (llmOriginalBeforeSanitize && !originalUrl) {
+          holzenEdgeLog("fetch-feeds", "fetch_feeds_original_llm_rejected", {
+            ms: Date.now() - t0,
+            urlHost: safeUrlHost(articleUrl),
+            title: String(entry.title).slice(0, 80),
+            reason: "same_host_as_article",
+          });
         }
         if (!originalUrl) originalPublication = null;
         if (!originalUrl) {
-          const fromFooter = inferOriginalUrlFromAttributionFooter(scrapedContent, articleUrl);
-          if (fromFooter) originalUrl = fromFooter;
+          const inferred = inferOriginalUrlFromAttributionFooter(scrapedContent, articleUrl);
+          const logOriginalInfer = Deno.env.get("FETCH_FEEDS_LOG_ORIGINAL_INFER") !== "false";
+          if (logOriginalInfer && inferred.debug) {
+            holzenEdgeLog("fetch-feeds", "fetch_feeds_original_infer", {
+              ms: Date.now() - t0,
+              urlHost: safeUrlHost(articleUrl),
+              title: String(entry.title).slice(0, 80),
+              ...inferred.debug,
+            });
+          }
+          if (inferred.url) originalUrl = inferred.url;
         }
         if (originalUrl) {
           originalUrl = canonicalContentUrl(originalUrl) ?? originalUrl;

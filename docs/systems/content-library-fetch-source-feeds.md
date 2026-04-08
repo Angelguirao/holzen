@@ -54,7 +54,7 @@ See [`.env.example`](../../.env.example) for commented examples.
 
 7. **Structure** — Lovable gateway → **Gemini** (`google/gemini-2.5-flash-lite`) returns JSON: `title`, `author`, `summary`, `key_quote`, `url` (must match scraped page), optional `original_url` / `original_publication` for **any** domain when the page indicates a prior publication.
 
-8. **Fallbacks** — If the model omits `original_url`, a small regex may infer a known pattern (Substack, Medium, HackerNoon) from markdown.
+8. **Fallbacks** — If the model omits `original_url` (or it is rejected as same-host as the syndicated page), infer from markdown: find an attribution phrase (`first published on`, etc.), then take the **closest external https URL after that phrase** (minimum character distance). Optional Edge secret **`FETCH_FEEDS_LOG_ORIGINAL_INFER=false`** disables structured `fetch_feeds_original_infer` lines (default: log).
 
 9. **Dedup** — Before scrape, **URL-only** check against `content_library` (same variants as [`urlDedupCandidates`](../../supabase/functions/_shared/content-dedup.ts)) so Firecrawl/Gemini are not called for known articles. After structure, **URL + `title_norm`** checks remain as a safety net (e.g. model returns a different normalized URL string).
 
@@ -76,8 +76,10 @@ Filter with **`[holzen:fetch-feeds]`**. Verbose lines (`holzenEdgeLog` / `holzen
 | `fetch_feeds_article` | Per article attempt: `outcome`, `reason` (e.g. `dedup_url_pre_scrape`, `dedup_url`, `dedup_title_norm`), `phase` on failure, `discovery`, `urlHost` | If verbose |
 | `fetch_feeds_complete` | Run finished; `fetched`, `sourcesTried`, `mode` | Yes |
 | `fetch_feeds_source_error` | Uncaught error in one source loop | If verbose (warn) |
+| `fetch_feeds_original_infer` | Per essay when inferring `original_url`: `path`, `phrase`, `candidateCount`, `candidatesPreview` (`host@distance`), `chosen`, `chosenDistanceAfterPhrase` | If verbose (unless `FETCH_FEEDS_LOG_ORIGINAL_INFER=false`) |
+| `fetch_feeds_original_llm_rejected` | Model returned `original_url` on same host as article | If verbose |
 
-Stable grep tokens: **`fetch_feeds_batch`**, **`fetch_feeds_discover`**, **`fetch_feeds_article`**, **`fetch_feeds_complete`**.
+Stable grep tokens: **`fetch_feeds_batch`**, **`fetch_feeds_discover`**, **`fetch_feeds_article`**, **`fetch_feeds_complete`**, **`fetch_feeds_original_infer`**, **`fetch_feeds_original_llm_rejected`**.
 
 ## Related code
 
