@@ -612,9 +612,14 @@ serve(async (req) => {
           citations = [articleUrl];
           if (contentType === "essay") {
             const mdLower = fc.markdown.toLowerCase();
+            const articleHost = safeUrlHost(articleUrl);
+            const crossHostLinks = fc.links.filter((l) => {
+              try { return new URL(l).hostname.replace(/^www\./, "").toLowerCase() !== articleHost; }
+              catch { return false; }
+            });
             holzenEdgeLog("fetch-feeds", "fetch_feeds_scrape_payload", {
               ms: Date.now() - t0,
-              urlHost: safeUrlHost(articleUrl),
+              urlHost: articleHost,
               mdChars: fc.markdown.length,
               mdHead: fc.markdown.slice(0, 800),
               mdTail: fc.markdown.slice(-400),
@@ -622,6 +627,8 @@ serve(async (req) => {
               metaCanonical: fc.metadata?.canonicalUrl ?? fc.metadata?.canonical ?? null,
               metaOgUrl: fc.metadata?.ogUrl ?? fc.metadata?.["og:url"] ?? null,
               linksCount: fc.links.length,
+              crossHostLinksCount: crossHostLinks.length,
+              crossHostLinksPreview: crossHostLinks.slice(0, 15),
               hasBylineFirstPublished: mdLower.includes("first published"),
               hasBylineOriginallyPublished: mdLower.includes("originally published"),
             });
