@@ -506,46 +506,9 @@ serve(async (req) => {
       return { url: null, tried };
     }
 
-    /**
-     * Prefer Firecrawl `links` entries that also appear in markdown (skips nav-only URLs). Chooses the earliest
-     * occurrence in the markdown string.
-     */
-    function tryOriginalUrlFromFirecrawlLinks(
-      links: string[],
-      markdown: string,
-      syndicatedArticleUrl: string,
-    ): { url: string | null; crossHostCandidates: number } {
-      if (links.length === 0) return { url: null, crossHostCandidates: 0 };
-      let syndHost: string;
-      try {
-        syndHost = new URL(syndicatedArticleUrl).hostname.replace(/^www\./, "").toLowerCase();
-      } catch {
-        return { url: null, crossHostCandidates: 0 };
-      }
-      const lowerMd = markdown.toLowerCase();
-      let best: { url: string; idx: number } | null = null;
-      let crossHostCandidates = 0;
-      for (const raw of links) {
-        if (typeof raw !== "string" || !raw.startsWith("http")) continue;
-        const cleaned = stripUrlTrailingJunk(raw.trim());
-        let u: URL;
-        try {
-          u = new URL(cleaned);
-        } catch {
-          continue;
-        }
-        if (u.protocol !== "https:") continue;
-        const h = u.hostname.replace(/^www\./, "").toLowerCase();
-        if (h === syndHost) continue;
-        if (ORIGINAL_URL_SKIP_HOSTS.has(h)) continue;
-        crossHostCandidates++;
-        const norm = u.toString();
-        const idx = lowerMd.indexOf(cleaned.toLowerCase());
-        if (idx === -1) continue;
-        if (!best || idx < best.idx) best = { url: norm, idx };
-      }
-      return { url: best?.url ?? null, crossHostCandidates };
-    }
+    // Firecrawl `links` fallback removed: it picked the earliest external link in the body, which
+    // is almost always a citation/reference — not an original publication. Articles without an
+    // attribution byline or cross-site canonical are native content; original_url should stay null.
 
     function safeUrlHost(u: string): string {
       try {
@@ -634,14 +597,12 @@ serve(async (req) => {
       let scrapedContent: string | null = null;
       let citations: string[] = [];
       let firecrawlMetadata: Record<string, unknown> | null = null;
-      let firecrawlLinks: string[] = [];
 
       if (scrapeMode === "firecrawl") {
         const fc = await scrapeWithFirecrawl(articleUrl, FIRECRAWL_API_KEY!, hzLog);
         if (fc) {
           scrapedContent = fc.markdown;
           firecrawlMetadata = fc.metadata;
-          firecrawlLinks = fc.links;
           citations = [articleUrl];
         }
       }
@@ -885,24 +846,8 @@ Return JSON with:
             }
           }
         }
-        if (!originalUrl && firecrawlLinks.length > 0) {
-          const linkPick = tryOriginalUrlFromFirecrawlLinks(firecrawlLinks, scrapedContent, articleUrl);
-          const sanitized = linkPick.url ? sanitizeCrossSiteOriginalUrl(linkPick.url, articleUrl) : null;
-          if (sanitized) {
-            originalUrl = sanitized;
-            if (logOriginalResolution) {
-              holzenEdgeLog("fetch-feeds", "fetch_feeds_original_firecrawl", {
-                ms: Date.now() - t0,
-                urlHost: safeUrlHost(articleUrl),
-                title: String(entry.title).slice(0, 80),
-                source: "links",
-                chosen: sanitized,
-                linksArrayLen: firecrawlLinks.length,
-                crossHostLinkCandidates: linkPick.crossHostCandidates,
-              });
-            }
-          }
-        }
+        // Firecrawl `links` fallback removed — grabbing the first external body link was a
+        // false-positive machine for native articles with normal citations/references.
         if (originalUrl) {
           originalUrl = canonicalContentUrl(originalUrl) ?? originalUrl;
         }
