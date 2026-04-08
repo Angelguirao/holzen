@@ -73,7 +73,12 @@ function normalizeFirecrawlScrapeLinks(raw: unknown): string[] {
   return out;
 }
 
-async function scrapeWithFirecrawl(url: string, apiKey: string, log: (msg: string) => void): Promise<FirecrawlScrapeResult | null> {
+async function scrapeWithFirecrawl(
+  url: string,
+  apiKey: string,
+  log: (msg: string) => void,
+  opts?: { onlyMainContent?: boolean },
+): Promise<FirecrawlScrapeResult | null> {
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 20000);
@@ -86,9 +91,8 @@ async function scrapeWithFirecrawl(url: string, apiKey: string, log: (msg: strin
       },
       body: JSON.stringify({
         url,
-        // markdown: main text; links: all page links (combined with onlyMainContent in one request per Firecrawl scrape docs)
         formats: ["markdown", "links"],
-        onlyMainContent: true, // Skip navs, footers, sidebars for markdown (links may still include in-content hrefs)
+        onlyMainContent: opts?.onlyMainContent ?? true,
         timeout: 15000,
       }),
       signal: controller.signal,
@@ -599,7 +603,9 @@ serve(async (req) => {
       let firecrawlMetadata: Record<string, unknown> | null = null;
 
       if (scrapeMode === "firecrawl") {
-        const fc = await scrapeWithFirecrawl(articleUrl, FIRECRAWL_API_KEY!, hzLog);
+        const fc = await scrapeWithFirecrawl(articleUrl, FIRECRAWL_API_KEY!, hzLog, {
+          onlyMainContent: contentType !== "essay",
+        });
         if (fc) {
           scrapedContent = fc.markdown;
           firecrawlMetadata = fc.metadata;
