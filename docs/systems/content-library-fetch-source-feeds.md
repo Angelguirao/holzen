@@ -15,10 +15,10 @@ This document describes the **Edge function** [`supabase/functions/fetch-source-
 - **Cron (typical)** — The repo documents a **pg_cron** job in [cron-setup.md](../ops/cron-setup.md): schedule **`0 6,18 * * *`** ( **06:00 and 18:00 UTC** daily, i.e. twice per day). Your **deployed** project may use a different expression or job name; confirm in the Supabase Dashboard (**Database → Cron Jobs**) or `SELECT * FROM cron.job`.
 - **Manual** — Invoke the function anytime: Dashboard (Edge Functions → `fetch-source-feeds`), [Bruno `fetch-source-feeds`](../../bruno/service-cron/fetch-source-feeds.bru), or `curl` with `Authorization: Bearer` (`SUPABASE_SERVICE_ROLE_KEY` or `CRON_SECRET`).
 
-## Concurrency (“how many processes?”)
+## Concurrency ("how many processes?")
 
 - **One HTTP request = one invocation** — Each trigger runs a **single** Edge Function instance for that request. There is **no** parallel `Promise.all` over sources or articles: the code uses **sequential** `for` loops (sources one by one; within each source, article URLs one by one with a configurable pause between attempts — see `index.ts`).
-- **Per invocation limits (defaults)** — Defaults: **5** sources, **2** inserts per source, **2000 ms** delay between article attempts. Override with Edge secrets (see below). Up to **30** URL attempts per source before giving up on that source’s quota.
+- **Per invocation limits (defaults)** — Defaults: **5** sources, **2** inserts per source, **2000 ms** delay between article attempts. Override with Edge secrets (see below). Up to **30** URL attempts per source before giving up on that source's quota.
 - **Fair rotation** — Sources are ordered by **`last_fetch_feeds_at` ascending, nulls first** (migration `signal_sources.last_fetch_feeds_at`). After each source finishes successfully, that timestamp is updated so the next run prefers **other** stale sources. **Apply the migration** before relying on rotation.
 - **Overlapping runs** — If cron fires again while a long manual invoke is still running, you could have **two concurrent invocations** (two separate Edge isolates). They do not coordinate; both read `signal_sources` and write `content_library` with dedup protecting duplicate rows.
 
@@ -50,13 +50,13 @@ See [`.env.example`](../../.env.example) for commented examples.
    | **`site_map` / `site`** | Firecrawl **Map** on the URL; score/filter article-like paths. |
    | **Default / `blog` / etc.** | If the URL returns RSS/Atom XML, treat as feed (**auto-detect**); else scrape **that single URL** as one article. |
 
-6. **Scrape** — For **each** discovered article URL: Firecrawl **`/v2/scrape`** requests **`markdown`** and **`links`** in one call (`onlyMainContent: true`), and reads **`metadata`** from the response (canonical / Open Graph, etc. — see [Firecrawl scrape](https://docs.firecrawl.dev/features/scrape)). Perplexity fallback returns text only (no Firecrawl extras). The model does **not** ingest raw RSS `<content:encoded>` for structuring; it sees **the page** markdown (so “First published on …” lines and outbound links appear).
+6. **Scrape** — For **each** discovered article URL: Firecrawl **`/v2/scrape`** requests **`markdown`** and **`links`** in one call (`onlyMainContent: true`), and reads **`metadata`** from the response (canonical / Open Graph, etc. — see [Firecrawl scrape](https://docs.firecrawl.dev/features/scrape)). Perplexity fallback returns text only (no Firecrawl extras). The model does **not** ingest raw RSS `<content:encoded>` for structuring; it sees **the page** markdown (so "First published on …" lines and outbound links appear).
 
-7. **Structure** — Lovable gateway → **Gemini** (`google/gemini-2.5-flash-lite`) returns JSON: `title`, `author`, `summary`, `key_quote`, `url` (must match scraped page), optional `original_url` / `original_publication`. For essays, those fields are **inputs** to step 8; persistence order is **not** “model first” (see below).
+7. **Structure** — Lovable gateway → **Gemini** (`google/gemini-2.5-flash-lite`) returns JSON: `title`, `author`, `summary`, `key_quote`, `url` (must match scraped page), optional `original_url` / `original_publication`. For essays, those fields are **inputs** to step 8; persistence order is **not** "model first" (see below).
 
-8. **`original_url` resolution (essays)** — **Why this order:** phrase matching uses the **full** scrape (reliable for explicit bylines). Gemini only sees an **excerpt**, so it can confuse citations with syndication; Firecrawl **metadata** is cheap but often same-host canonical on republishers; **links** is broadest and can grab the first external link in the body, so it stays last.
+8. **`original_url` resolution (essays)** — **Why this order:** phrase matching uses the **full** scrape (reliable for explicit bylines). Gemini only sees an **excerpt**, so it can confuse body citations with syndication attribution. Firecrawl **metadata** is cheap but often same-host canonical on republishers. If none match, `original_url` stays **null** — the article is treated as native content (no false positives from body citation links).
 
-   **Precedence:** **(a)** Phrase inference on full markdown (Unicode normalization; **specific** syndication phrases beat generic for the footer match so a later generic “first published …” in the body does not override a **specific** “first published on …” byline); **closest** external `https` after the matched phrase. **(b)** If no URL from phrases, Gemini’s `original_url` (same-host rejected). **(c)** Firecrawl **metadata** (cross-site `canonical` / `ogUrl`). **(d)** Firecrawl **links** (cross-site `https` present in markdown, earliest position).
+   **Precedence:** **(a)** Phrase inference on full markdown (Unicode normalization; **specific** syndication phrases beat generic for the footer match); **closest** external `https` after the matched phrase. **(b)** If no URL from phrases, Gemini's `original_url` (same-host rejected). **(c)** Firecrawl **metadata** (cross-site `canonical` / `ogUrl`). **(no further fallback)** — Firecrawl `links` was removed because grabbing the first external body link produced false positives for native articles with normal citations.
 
    Logs with path **`no_marker`** include **`noMarkerHint`** when nothing matched. Optional **`FETCH_FEEDS_LOG_ORIGINAL_INFER=false`** disables `fetch_feeds_original_infer` / `fetch_feeds_original_firecrawl` lines (default: log).
 
@@ -81,7 +81,7 @@ Filter with **`[holzen:fetch-feeds]`**. Verbose lines (`holzenEdgeLog` / `holzen
 | `fetch_feeds_complete` | Run finished; `fetched`, `sourcesTried`, `mode` | Yes |
 | `fetch_feeds_source_error` | Uncaught error in one source loop | If verbose (warn) |
 | `fetch_feeds_original_infer` | Per essay when inferring `original_url`: `path`, `phrase`, `candidateCount`, `candidatesPreview` (`host@distance`), `chosen`, `chosenDistanceAfterPhrase`; if `path` is `no_marker`, `noMarkerHint` (`hasPublished`, `hasFirst`, `headerScannedChars`) | If verbose (unless `FETCH_FEEDS_LOG_ORIGINAL_INFER=false`) |
-| `fetch_feeds_original_firecrawl` | When `original_url` comes from Firecrawl **`metadata`** (`source`, `metadataKeysChecked`, `chosen`) or **`links`** (`linksArrayLen`, `crossHostLinkCandidates`, `chosen`) | If verbose (unless `FETCH_FEEDS_LOG_ORIGINAL_INFER=false`) |
+| `fetch_feeds_original_firecrawl` | When `original_url` comes from Firecrawl **`metadata`** (`source`, `metadataKeysChecked`, `chosen`) | If verbose (unless `FETCH_FEEDS_LOG_ORIGINAL_INFER=false`) |
 | `fetch_feeds_original_llm_rejected` | Model returned `original_url` on same host as article | If verbose |
 
 Stable grep tokens: **`fetch_feeds_batch`**, **`fetch_feeds_discover`**, **`fetch_feeds_article`**, **`fetch_feeds_complete`**, **`fetch_feeds_original_infer`**, **`fetch_feeds_original_firecrawl`**, **`fetch_feeds_original_llm_rejected`**.
