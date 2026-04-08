@@ -22,7 +22,7 @@ const corsHeaders = {
 /**
  * Active Source Feeds — fetches latest content from signal_sources URLs.
  *
- * Uses Firecrawl to scrape source URLs into clean text, then Gemini to
+ * Uses Firecrawl `/v2/scrape` (markdown + links + page metadata), then Gemini to
  * structure the content into content_library entries.
  *
  * Falls back to Perplexity search if Firecrawl is not configured.
@@ -53,7 +53,27 @@ function parseEnvInt(name: string, defaultVal: number, min: number, max: number)
 
 // ── Firecrawl scraper ──
 
-async function scrapeWithFirecrawl(url: string, apiKey: string, log: (msg: string) => void): Promise<string | null> {
+/** One v2/scrape response: markdown for Gemini + structured fields for original_url fallbacks. */
+type FirecrawlScrapeResult = {
+  markdown: string;
+  metadata: Record<string, unknown> | null;
+  /** Normalized https URLs from the `links` format (see Firecrawl docs). */
+  links: string[];
+};
+
+function normalizeFirecrawlScrapeLinks(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return [];
+  const out: string[] = [];
+  for (const item of raw) {
+    if (typeof item === "string") out.push(item);
+    else if (item && typeof item === "object" && "url" in item && typeof (item as { url: string }).url === "string") {
+      out.push((item as { url: string }).url);
+    }
+  }
+  return out;
+}
+
+async function scrapeWithFirecrawl(url: string, apiKey: string, log: (msg: string) => void): Promise<FirecrawlScrapeResult | null> {
   try {
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 20000);
@@ -66,8 +86,9 @@ async function scrapeWithFirecrawl(url: string, apiKey: string, log: (msg: strin
       },
       body: JSON.stringify({
         url,
-        formats: ["markdown"],
-        onlyMainContent: true, // Skip navs, footers, sidebars
+        // markdown: main text; links: all page links (combined with onlyMainContent in one request per Firecrawl scrape docs)
+        formats: ["markdown", "links"],
+        onlyMainContent: true, // Skip navs, footers, sidebars for markdown (links may still include in-content hrefs)
         timeout: 15000,
       }),
       signal: controller.signal,
@@ -80,7 +101,10 @@ async function scrapeWithFirecrawl(url: string, apiKey: string, log: (msg: strin
       return null;
     }
 
-    const data = await res.json();
+    const data = await res.json() as {
+      success?: boolean;
+      data?: { markdown?: string; links?: unknown; metadata?: Record<string, unknown> };
+    };
     if (!data.success || !data.data?.markdown) {
       log(`Firecrawl returned no content for ${url}`);
       return null;
@@ -91,7 +115,10 @@ async function scrapeWithFirecrawl(url: string, apiKey: string, log: (msg: strin
     // and made `inferOriginalUrlFromAttributionFooter` miss Substack links while picking body URLs.
     const markdown = String(data.data.markdown);
     const maxChars = 200_000;
-    return markdown.length > maxChars ? markdown.slice(0, maxChars) : markdown;
+    const md = markdown.length > maxChars ? markdown.slice(0, maxChars) : markdown;
+    const meta = data.data.metadata && typeof data.data.metadata === "object" ? data.data.metadata : null;
+    const links = normalizeFirecrawlScrapeLinks(data.data.links);
+    return { markdown: md, metadata: meta, links };
   } catch (e) {
     if (e instanceof DOMException && e.name === "AbortError") {
       log(`Firecrawl timeout for ${url}`);
@@ -420,6 +447,82 @@ serve(async (req) => {
       return candidate;
     }
 
+    /**
+     * Use Firecrawl `metadata` (canonical / Open Graph) when it points at another https host — common for
+     * republishers that set `rel=canonical` or `og:url` to the primary article.
+     */
+    function tryOriginalUrlFromFirecrawlMetadata(
+      metadata: Record<string, unknown> | null,
+      syndicatedArticleUrl: string,
+    ): { url: string | null; tried: string[] } {
+      if (!metadata) return { url: null, tried: [] };
+      let syndHost: string;
+      try {
+        syndHost = new URL(syndicatedArticleUrl).hostname.replace(/^www\./, "").toLowerCase();
+      } catch {
+        return { url: null, tried: [] };
+      }
+      const tried: string[] = [];
+      for (const key of ["canonicalUrl", "canonical", "ogUrl", "og:url"] as const) {
+        const v = metadata[key];
+        if (typeof v !== "string" || !v.startsWith("http")) continue;
+        const cleaned = stripUrlTrailingJunk(v.trim());
+        tried.push(`${key}`);
+        try {
+          const u = new URL(cleaned);
+          if (u.protocol !== "https:") continue;
+          const h = u.hostname.replace(/^www\./, "").toLowerCase();
+          if (h === syndHost) continue;
+          if (ORIGINAL_URL_SKIP_HOSTS.has(h)) continue;
+          return { url: u.toString(), tried };
+        } catch {
+          continue;
+        }
+      }
+      return { url: null, tried };
+    }
+
+    /**
+     * Prefer Firecrawl `links` entries that also appear in markdown (skips nav-only URLs). Chooses the earliest
+     * occurrence in the markdown string.
+     */
+    function tryOriginalUrlFromFirecrawlLinks(
+      links: string[],
+      markdown: string,
+      syndicatedArticleUrl: string,
+    ): { url: string | null; crossHostCandidates: number } {
+      if (links.length === 0) return { url: null, crossHostCandidates: 0 };
+      let syndHost: string;
+      try {
+        syndHost = new URL(syndicatedArticleUrl).hostname.replace(/^www\./, "").toLowerCase();
+      } catch {
+        return { url: null, crossHostCandidates: 0 };
+      }
+      const lowerMd = markdown.toLowerCase();
+      let best: { url: string; idx: number } | null = null;
+      let crossHostCandidates = 0;
+      for (const raw of links) {
+        if (typeof raw !== "string" || !raw.startsWith("http")) continue;
+        const cleaned = stripUrlTrailingJunk(raw.trim());
+        let u: URL;
+        try {
+          u = new URL(cleaned);
+        } catch {
+          continue;
+        }
+        if (u.protocol !== "https:") continue;
+        const h = u.hostname.replace(/^www\./, "").toLowerCase();
+        if (h === syndHost) continue;
+        if (ORIGINAL_URL_SKIP_HOSTS.has(h)) continue;
+        crossHostCandidates++;
+        const norm = u.toString();
+        const idx = lowerMd.indexOf(cleaned.toLowerCase());
+        if (idx === -1) continue;
+        if (!best || idx < best.idx) best = { url: norm, idx };
+      }
+      return { url: best?.url ?? null, crossHostCandidates };
+    }
+
     function safeUrlHost(u: string): string {
       try {
         return new URL(u).hostname.replace(/^www\./, "");
@@ -506,10 +609,17 @@ serve(async (req) => {
 
       let scrapedContent: string | null = null;
       let citations: string[] = [];
+      let firecrawlMetadata: Record<string, unknown> | null = null;
+      let firecrawlLinks: string[] = [];
 
       if (scrapeMode === "firecrawl") {
-        scrapedContent = await scrapeWithFirecrawl(articleUrl, FIRECRAWL_API_KEY!, hzLog);
-        if (scrapedContent) citations = [articleUrl];
+        const fc = await scrapeWithFirecrawl(articleUrl, FIRECRAWL_API_KEY!, hzLog);
+        if (fc) {
+          scrapedContent = fc.markdown;
+          firecrawlMetadata = fc.metadata;
+          firecrawlLinks = fc.links;
+          citations = [articleUrl];
+        }
       }
 
       if (!scrapedContent && PERPLEXITY_API_KEY) {
@@ -714,10 +824,10 @@ Return JSON with:
           });
         }
         if (!originalUrl) originalPublication = null;
+        const logOriginalResolution = Deno.env.get("FETCH_FEEDS_LOG_ORIGINAL_INFER") !== "false";
         if (!originalUrl) {
           const inferred = inferOriginalUrlFromAttributionFooter(scrapedContent, articleUrl);
-          const logOriginalInfer = Deno.env.get("FETCH_FEEDS_LOG_ORIGINAL_INFER") !== "false";
-          if (logOriginalInfer && inferred.debug) {
+          if (logOriginalResolution && inferred.debug) {
             holzenEdgeLog("fetch-feeds", "fetch_feeds_original_infer", {
               ms: Date.now() - t0,
               urlHost: safeUrlHost(articleUrl),
@@ -726,6 +836,41 @@ Return JSON with:
             });
           }
           if (inferred.url) originalUrl = inferred.url;
+        }
+        if (!originalUrl && firecrawlMetadata) {
+          const metaPick = tryOriginalUrlFromFirecrawlMetadata(firecrawlMetadata, articleUrl);
+          const sanitized = metaPick.url ? sanitizeCrossSiteOriginalUrl(metaPick.url, articleUrl) : null;
+          if (sanitized) {
+            originalUrl = sanitized;
+            if (logOriginalResolution) {
+              holzenEdgeLog("fetch-feeds", "fetch_feeds_original_firecrawl", {
+                ms: Date.now() - t0,
+                urlHost: safeUrlHost(articleUrl),
+                title: String(entry.title).slice(0, 80),
+                source: "metadata",
+                chosen: sanitized,
+                metadataKeysChecked: metaPick.tried,
+              });
+            }
+          }
+        }
+        if (!originalUrl && firecrawlLinks.length > 0) {
+          const linkPick = tryOriginalUrlFromFirecrawlLinks(firecrawlLinks, scrapedContent, articleUrl);
+          const sanitized = linkPick.url ? sanitizeCrossSiteOriginalUrl(linkPick.url, articleUrl) : null;
+          if (sanitized) {
+            originalUrl = sanitized;
+            if (logOriginalResolution) {
+              holzenEdgeLog("fetch-feeds", "fetch_feeds_original_firecrawl", {
+                ms: Date.now() - t0,
+                urlHost: safeUrlHost(articleUrl),
+                title: String(entry.title).slice(0, 80),
+                source: "links",
+                chosen: sanitized,
+                linksArrayLen: firecrawlLinks.length,
+                crossHostLinkCandidates: linkPick.crossHostCandidates,
+              });
+            }
+          }
         }
         if (originalUrl) {
           originalUrl = canonicalContentUrl(originalUrl) ?? originalUrl;

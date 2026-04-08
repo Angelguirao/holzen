@@ -50,11 +50,11 @@ See [`.env.example`](../../.env.example) for commented examples.
    | **`site_map` / `site`** | Firecrawl **Map** on the URL; score/filter article-like paths. |
    | **Default / `blog` / etc.** | If the URL returns RSS/Atom XML, treat as feed (**auto-detect**); else scrape **that single URL** as one article. |
 
-6. **Scrape** — For **each** discovered article URL: Firecrawl **scrape** → markdown (or Perplexity fallback if Firecrawl unavailable). The model does **not** ingest raw RSS `<content:encoded>` for structuring; it sees **the page** markdown (so “First published on …” lines and outbound links appear).
+6. **Scrape** — For **each** discovered article URL: Firecrawl **`/v2/scrape`** requests **`markdown`** and **`links`** in one call (`onlyMainContent: true`), and reads **`metadata`** from the response (canonical / Open Graph, etc. — see [Firecrawl scrape](https://docs.firecrawl.dev/features/scrape)). Perplexity fallback returns text only (no Firecrawl extras). The model does **not** ingest raw RSS `<content:encoded>` for structuring; it sees **the page** markdown (so “First published on …” lines and outbound links appear).
 
 7. **Structure** — Lovable gateway → **Gemini** (`google/gemini-2.5-flash-lite`) returns JSON: `title`, `author`, `summary`, `key_quote`, `url` (must match scraped page), optional `original_url` / `original_publication` for **any** domain when the page indicates a prior publication.
 
-8. **Fallbacks** — If the model omits `original_url` (or it is rejected as same-host as the syndicated page), infer from markdown: find an attribution phrase (`first published on`, etc.), then take the **closest external https URL after that phrase** (minimum character distance). Optional Edge secret **`FETCH_FEEDS_LOG_ORIGINAL_INFER=false`** disables structured `fetch_feeds_original_infer` lines (default: log).
+8. **Fallbacks** — If the model omits `original_url` (or it is rejected as same-host as the syndicated page): (a) infer from markdown — attribution phrase (`first published on`, etc.), then **closest** external `https` URL after that phrase; (b) else **Firecrawl `metadata`** — first cross-site `https` among `canonicalUrl` / `canonical` / `ogUrl`; (c) else **Firecrawl `links`** — cross-site `https` URLs that also appear in the markdown, earliest position wins (avoids nav-only links). Optional Edge secret **`FETCH_FEEDS_LOG_ORIGINAL_INFER=false`** disables structured `fetch_feeds_original_infer` / `fetch_feeds_original_firecrawl` lines (default: log).
 
 9. **Dedup** — Before scrape, **URL-only** check against `content_library` (same variants as [`urlDedupCandidates`](../../supabase/functions/_shared/content-dedup.ts)) so Firecrawl/Gemini are not called for known articles. After structure, **URL + `title_norm`** checks remain as a safety net (e.g. model returns a different normalized URL string).
 
@@ -77,9 +77,10 @@ Filter with **`[holzen:fetch-feeds]`**. Verbose lines (`holzenEdgeLog` / `holzen
 | `fetch_feeds_complete` | Run finished; `fetched`, `sourcesTried`, `mode` | Yes |
 | `fetch_feeds_source_error` | Uncaught error in one source loop | If verbose (warn) |
 | `fetch_feeds_original_infer` | Per essay when inferring `original_url`: `path`, `phrase`, `candidateCount`, `candidatesPreview` (`host@distance`), `chosen`, `chosenDistanceAfterPhrase` | If verbose (unless `FETCH_FEEDS_LOG_ORIGINAL_INFER=false`) |
+| `fetch_feeds_original_firecrawl` | When `original_url` comes from Firecrawl **`metadata`** (`source`, `metadataKeysChecked`, `chosen`) or **`links`** (`linksArrayLen`, `crossHostLinkCandidates`, `chosen`) | If verbose (unless `FETCH_FEEDS_LOG_ORIGINAL_INFER=false`) |
 | `fetch_feeds_original_llm_rejected` | Model returned `original_url` on same host as article | If verbose |
 
-Stable grep tokens: **`fetch_feeds_batch`**, **`fetch_feeds_discover`**, **`fetch_feeds_article`**, **`fetch_feeds_complete`**, **`fetch_feeds_original_infer`**, **`fetch_feeds_original_llm_rejected`**.
+Stable grep tokens: **`fetch_feeds_batch`**, **`fetch_feeds_discover`**, **`fetch_feeds_article`**, **`fetch_feeds_complete`**, **`fetch_feeds_original_infer`**, **`fetch_feeds_original_firecrawl`**, **`fetch_feeds_original_llm_rejected`**.
 
 ## Related code
 
