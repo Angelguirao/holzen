@@ -426,9 +426,8 @@ serve(async (req) => {
 
       const footSpec = lastPhraseMatch(lower, ATTRIBUTION_MARKERS_SPECIFIC);
       const footGen = lastPhraseMatch(lower, ATTRIBUTION_MARKERS_GENERIC);
-      const footer = footSpec && footGen
-        ? (footSpec.idx >= footGen.idx ? footSpec : footGen)
-        : (footSpec ?? footGen);
+      /** Prefer specific syndication phrases; never pick a later generic body hit over an earlier specific byline (rightmost-of-both was wrong). */
+      const footer = footSpec ?? footGen;
 
       if (!footer) {
         return {
@@ -836,32 +835,39 @@ Return JSON with:
       let originalPublication: string | null =
         typeof entry.original_publication === "string" ? entry.original_publication.trim() : null;
       if (contentType === "essay") {
-        const llmOriginalBeforeSanitize = originalUrl;
-        if (originalUrl) {
-          originalUrl = sanitizeCrossSiteOriginalUrl(originalUrl, articleUrl);
-        }
-        if (llmOriginalBeforeSanitize && !originalUrl) {
-          holzenEdgeLog("fetch-feeds", "fetch_feeds_original_llm_rejected", {
+        const logOriginalResolution = Deno.env.get("FETCH_FEEDS_LOG_ORIGINAL_INFER") !== "false";
+        const llmOriginalRaw = originalUrl;
+        const llmOriginalSanitized = originalUrl
+          ? sanitizeCrossSiteOriginalUrl(originalUrl, articleUrl)
+          : null;
+
+        /** Phrase-based URL from full markdown — deterministic for “First published on …” bylines; prefer over LLM (excerpt can confuse citations vs syndication). */
+        const inferred = inferOriginalUrlFromAttributionFooter(scrapedContent, articleUrl);
+        if (logOriginalResolution && inferred.debug) {
+          holzenEdgeLog("fetch-feeds", "fetch_feeds_original_infer", {
             ms: Date.now() - t0,
             urlHost: safeUrlHost(articleUrl),
             title: String(entry.title).slice(0, 80),
-            reason: "same_host_as_article",
+            ...inferred.debug,
           });
         }
-        if (!originalUrl) originalPublication = null;
-        const logOriginalResolution = Deno.env.get("FETCH_FEEDS_LOG_ORIGINAL_INFER") !== "false";
-        if (!originalUrl) {
-          const inferred = inferOriginalUrlFromAttributionFooter(scrapedContent, articleUrl);
-          if (logOriginalResolution && inferred.debug) {
-            holzenEdgeLog("fetch-feeds", "fetch_feeds_original_infer", {
+
+        if (inferred.url) {
+          originalUrl = inferred.url;
+          originalPublication = null;
+        } else {
+          originalUrl = llmOriginalSanitized;
+          if (llmOriginalRaw && !originalUrl) {
+            holzenEdgeLog("fetch-feeds", "fetch_feeds_original_llm_rejected", {
               ms: Date.now() - t0,
               urlHost: safeUrlHost(articleUrl),
               title: String(entry.title).slice(0, 80),
-              ...inferred.debug,
+              reason: "same_host_as_article",
             });
           }
-          if (inferred.url) originalUrl = inferred.url;
+          if (!originalUrl) originalPublication = null;
         }
+
         if (!originalUrl && firecrawlMetadata) {
           const metaPick = tryOriginalUrlFromFirecrawlMetadata(firecrawlMetadata, articleUrl);
           const sanitized = metaPick.url ? sanitizeCrossSiteOriginalUrl(metaPick.url, articleUrl) : null;
