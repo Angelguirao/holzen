@@ -53,8 +53,6 @@ project_id = "edgbwdecaoottowliimu"
     verify_jwt = false
   [functions.fetch-source-feeds]
     verify_jwt = false
-  [functions.admin-library-preview]
-    verify_jwt = true
   [functions.badge-notify]
     verify_jwt = false
   [functions.companion-orchestrate]
