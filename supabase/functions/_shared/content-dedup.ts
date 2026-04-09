@@ -3,6 +3,8 @@
  * Keep normalization aligned with DB generated columns where applicable.
  */
 
+import type { FeedArticleRef } from "./feed-ingest.ts";
+
 /** Trim, lowercase, collapse internal whitespace — matches content_library.title_norm in SQL. */
 export function normalizeTitleKey(s: string): string {
   return s.trim().toLowerCase().replace(/\s+/g, " ");
@@ -43,6 +45,80 @@ export function urlDedupCandidates(raw: string | null | undefined): string[] {
   return [...out];
 }
 
+/**
+ * Drop article refs whose URL (or a canonical variant) already exists in `content_library`.
+ * Use before ingest so each cron run does not walk the same known URLs from index 0 and burn
+ * attempt budget on `dedup_url_pre_scrape` skips.
+ */
+export function partitionArticleRefsByUrlInDb(
+  refs: FeedArticleRef[],
+  urlsPresentInDb: Set<string>,
+): { pending: FeedArticleRef[]; skippedKnown: number } {
+  const pending: FeedArticleRef[] = [];
+  let skippedKnown = 0;
+  for (const ref of refs) {
+    const cands = urlDedupCandidates(ref.url);
+    if (cands.length === 0) {
+      pending.push(ref);
+      continue;
+    }
+    if (cands.some((c) => urlsPresentInDb.has(c))) {
+      skippedKnown++;
+    } else {
+      pending.push(ref);
+    }
+  }
+  return { pending, skippedKnown };
+}
+
+const CONTENT_LIBRARY_URL_IN_CHUNK = 120;
+
+export async function filterArticleRefsNotInLibrary(
+  // Supabase client — use `any` so Deno/PostgREST builder chains type-check.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  svcClient: any,
+  contentType: "essay" | "paper",
+  refs: FeedArticleRef[],
+): Promise<{ pending: FeedArticleRef[]; skippedKnown: number; batchQueryOk: boolean }> {
+  if (refs.length === 0) return { pending: [], skippedKnown: 0, batchQueryOk: true };
+
+  const allCandidates = new Set<string>();
+  for (const ref of refs) {
+    for (const c of urlDedupCandidates(ref.url)) {
+      allCandidates.add(c);
+    }
+  }
+  const flat = [...allCandidates];
+  if (flat.length === 0) {
+    return { pending: refs, skippedKnown: 0, batchQueryOk: true };
+  }
+
+  const urlsPresentInDb = new Set<string>();
+  let batchQueryOk = true;
+  for (let i = 0; i < flat.length; i += CONTENT_LIBRARY_URL_IN_CHUNK) {
+    const chunk = flat.slice(i, i + CONTENT_LIBRARY_URL_IN_CHUNK);
+    const { data, error } = await svcClient
+      .from("content_library")
+      .select("url")
+      .eq("type", contentType)
+      .eq("active", true)
+      .in("url", chunk);
+    if (error) {
+      console.warn("[filterArticleRefsNotInLibrary] chunk query failed", error);
+      batchQueryOk = false;
+      continue;
+    }
+    if (data) {
+      for (const row of data) {
+        if (row.url) urlsPresentInDb.add(row.url);
+      }
+    }
+  }
+
+  const { pending, skippedKnown } = partitionArticleRefsByUrlInDb(refs, urlsPresentInDb);
+  return { pending, skippedKnown, batchQueryOk };
+}
+
 function normalizeSnippetForFingerprint(s: string): string {
   return s.trim().toLowerCase().replace(/\s+/g, " ").slice(0, 500);
 }
@@ -72,6 +148,8 @@ export interface CompanionCacheDedupOpts {
  * content fingerprint, or (legacy) fuzzy title similarity among recent entries.
  */
 export async function isCompanionCacheDuplicate(
+  // Supabase client — typed loosely to avoid coupling this helper to generated DB types.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- query builder chain
   svcClient: any,
   companionType: string,
   newTitle: string,
