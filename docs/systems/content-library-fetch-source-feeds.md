@@ -46,7 +46,7 @@ See [`.env.example`](../../.env.example) for commented examples.
 
    | Mode | Behavior |
    |------|----------|
-   | **`rss` / `feed`** | Fetch XML; **parse item/entry links** + optional per-item author (`dc:creator`, Atom `<author>`). |
+   | **`rss` / `feed`** | Fetch XML; **parse item/entry links** + optional per-item author (`dc:creator`, Atom `<author>`). Parses **RSS `<pubDate>`** and **Atom `<published>` / `<updated>`** into `publishedAt` (ISO). After batch URL dedup, pending refs are sorted **newest first** so small per-run insert limits favor fresh items. |
    | **`site_map` / `site`** | Firecrawl **Map** on the URL (up to **500** raw links per call); [`filterArticleLikeUrls`](../../supabase/functions/_shared/feed-ingest.ts) scores/filters paths and keeps up to **200** URLs for the pool (not “first rows on the HTML page” — order comes from Map/sitemap + score sort). Drops junk like `/tag/…`, boosts article-like segments. **Library sites:** paths ending in `copyright`, `table-of-contents`, or `toc` under `/library/…` are **excluded** (ancillary pages, not primary reading); `/library/<work-slug>/` is **boosted** so Map does not prefer TOC/copyright over the main work URL. |
    | **Default / `blog` / etc.** | If the URL returns RSS/Atom XML, treat as feed (**auto-detect**); else scrape **that single URL** as one article. |
 

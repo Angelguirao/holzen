@@ -106,7 +106,46 @@ function stripCdataInner(s: string): string {
 }
 
 /** Per-item metadata from RSS/Atom (best-effort). */
-export type FeedArticleRef = { url: string; feedAuthor: string | null };
+export type FeedArticleRef = {
+  url: string;
+  feedAuthor: string | null;
+  /** ISO 8601 from RSS `<pubDate>` or Atom `<published>` / `<updated>`; null for site_map / single-page. */
+  publishedAt: string | null;
+};
+
+/** Newest first; refs without a parseable date sort after dated refs (stable among nulls). */
+export function sortFeedArticleRefsByPublishedAtDesc(refs: FeedArticleRef[]): FeedArticleRef[] {
+  return [...refs].sort((a, b) => {
+    const ta = a.publishedAt ? Date.parse(a.publishedAt) : NaN;
+    const tb = b.publishedAt ? Date.parse(b.publishedAt) : NaN;
+    const aOk = !Number.isNaN(ta);
+    const bOk = !Number.isNaN(tb);
+    if (aOk && bOk) return tb - ta;
+    if (aOk && !bOk) return -1;
+    if (!aOk && bOk) return 1;
+    return 0;
+  });
+}
+
+function parseRssPubDateFromBlock(block: string): string | null {
+  const m = block.match(/<pubDate[^>]*>([\s\S]*?)<\/pubDate>/i);
+  if (!m?.[1]) return null;
+  const raw = stripCdataInner(m[1]).trim();
+  const d = Date.parse(raw);
+  if (Number.isNaN(d)) return null;
+  return new Date(d).toISOString();
+}
+
+function parseAtomPublishedFromBlock(block: string): string | null {
+  const pub = block.match(/<published[^>]*>([\s\S]*?)<\/published>/i);
+  const upd = block.match(/<updated[^>]*>([\s\S]*?)<\/updated>/i);
+  const raw = (pub?.[1] ?? upd?.[1])?.trim();
+  if (!raw) return null;
+  const inner = stripCdataInner(raw);
+  const d = Date.parse(inner);
+  if (Number.isNaN(d)) return null;
+  return new Date(d).toISOString();
+}
 
 function extractFeedAuthorFromBlock(block: string): string | null {
   const dc = block.match(/<dc:creator[^>]*>([\s\S]*?)<\/dc:creator>/i);
@@ -134,10 +173,10 @@ export function parseArticleRefsFromFeedXml(xml: string, baseUrl: string): FeedA
   const out: FeedArticleRef[] = [];
   const seen = new Set<string>();
 
-  const pushRef = (u: string | null, slice: string) => {
+  const pushRef = (u: string | null, slice: string, publishedAt: string | null) => {
     if (!u || seen.has(u)) return;
     seen.add(u);
-    out.push({ url: u, feedAuthor: extractFeedAuthorFromBlock(slice) });
+    out.push({ url: u, feedAuthor: extractFeedAuthorFromBlock(slice), publishedAt });
     if (out.length >= MAX_LINKS_FROM_FEED) return;
   };
 
@@ -161,7 +200,7 @@ export function parseArticleRefsFromFeedXml(xml: string, baseUrl: string): FeedA
         if (g.startsWith("http")) href = resolveHref(g, baseUrl);
       }
     }
-    pushRef(href, slice);
+    pushRef(href, slice, parseRssPubDateFromBlock(slice));
     if (out.length >= MAX_LINKS_FROM_FEED) break;
   }
 
@@ -195,7 +234,7 @@ export function parseArticleRefsFromFeedXml(xml: string, baseUrl: string): FeedA
       if (!fallback && (rel === "" || rel === "alternate")) fallback = resolved;
     }
     href = bestAlt ?? fallback;
-    pushRef(href, slice);
+    pushRef(href, slice, parseAtomPublishedFromBlock(slice));
     if (out.length >= MAX_LINKS_FROM_FEED) break;
   }
 

@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   filterArticleLikeUrls,
   normalizeSourceUrl,
+  parseArticleRefsFromFeedXml,
+  sortFeedArticleRefsByPublishedAtDesc,
 } from "../../supabase/functions/_shared/feed-ingest.ts";
 
 describe("normalizeSourceUrl", () => {
@@ -48,5 +50,30 @@ describe("filterArticleLikeUrls (site_map / Firecrawl Map)", () => {
       root,
     );
     expect(out[0]).toBe("https://nakamotoinstitute.org/library/the-ethics-of-money-production/");
+  });
+});
+
+describe("RSS/Atom publishedAt and sort (fetch-source-feeds)", () => {
+  const rssXml = `<?xml version="1.0"?>
+<rss version="2.0"><channel>
+  <item><link>https://example.com/old</link><pubDate>Mon, 01 Jan 2020 00:00:00 GMT</pubDate></item>
+  <item><link>https://example.com/new</link><pubDate>Wed, 01 Jan 2025 00:00:00 GMT</pubDate></item>
+  <item><link>https://example.com/mid</link><pubDate>Mon, 01 Jan 2022 00:00:00 GMT</pubDate></item>
+</channel></rss>`;
+
+  it("parses pubDate per item and sorts newest first", () => {
+    const refs = parseArticleRefsFromFeedXml(rssXml, "https://example.com/feed.xml");
+    expect(refs.map((r) => r.url)).toEqual([
+      "https://example.com/old",
+      "https://example.com/new",
+      "https://example.com/mid",
+    ]);
+    expect(refs[0]?.publishedAt).toBe("2020-01-01T00:00:00.000Z");
+    const sorted = sortFeedArticleRefsByPublishedAtDesc(refs);
+    expect(sorted.map((r) => r.url)).toEqual([
+      "https://example.com/new",
+      "https://example.com/mid",
+      "https://example.com/old",
+    ]);
   });
 });
