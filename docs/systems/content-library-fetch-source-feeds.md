@@ -41,7 +41,7 @@ See [`.env.example`](../../.env.example) for commented examples.
 1. **Auth** — Service role or `CRON_SECRET` (same pattern as other cron workers; see [logging-strategy.md](../ops/logging-strategy.md)).
 2. **Load sources** — `signal_sources` where `url` is set and `demoted_for_live = false`.
 3. **Batch** — Up to **`FETCH_FEEDS_MAX_SOURCES`** (default **5**) sources per run; each source capped at **`FETCH_FEEDS_MAX_ARTICLES_PER_SOURCE`** (default **2**) new inserts; **`FETCH_FEEDS_ARTICLE_DELAY_MS`** between article attempts (default **2000**). Stalest sources first via **`last_fetch_feeds_at`**.
-4. **URL normalization** — [`normalizeSourceUrl`](../../supabase/functions/_shared/feed-ingest.ts) fixes common paste errors (e.g. trailing `.` after `atom.xml`).
+4. **URL normalization** — [`normalizeSourceUrl`](../../supabase/functions/_shared/feed-ingest.ts) fixes common paste errors: trailing `.` after `atom.xml`, and **missing `https://`** (e.g. `nakamotoinstitute.org/mempool/atom.xml` → `https://…`) so `fetch` does not throw `Invalid URL`.
 5. **Discovery** (per source) — Depends on `signal_sources.type` and what the URL returns:
 
    | Mode | Behavior |
