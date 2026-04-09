@@ -190,6 +190,23 @@ export function parseArticleLinksFromFeedXml(xml: string, baseUrl: string): stri
   return parseArticleRefsFromFeedXml(xml, baseUrl).map((r) => r.url);
 }
 
+/** Last path segment: auxiliary pages under curated libraries (not primary reading HTML). */
+function isLibraryAuxiliarySubpage(pathname: string): boolean {
+  const p = pathname.toLowerCase().replace(/\/$/, "");
+  if (!p.includes("/library/")) return false;
+  const last = p.split("/").pop() ?? "";
+  return /^(copyright|table-of-contents|toc)$/i.test(last);
+}
+
+/** Prefer …/library/<work-slug>/ (and locale-prefixed …/library/<work-slug>/) over deeper child routes. */
+function libraryMainWorkScore(pathname: string): number {
+  const segs = pathname.split("/").filter(Boolean);
+  const i = segs.findIndex((s) => s.toLowerCase() === "library");
+  if (i < 0) return 0;
+  // Exactly one segment after `library` → main work root (e.g. /library/foo/ or /en/library/foo/).
+  return segs.length === i + 2 ? 5 : 0;
+}
+
 /** Heuristic: prefer article-like paths; drop tags, feeds, pagers. */
 export function filterArticleLikeUrls(candidateUrls: string[], siteRootUrl: string): string[] {
   let origin: string;
@@ -210,6 +227,7 @@ export function filterArticleLikeUrls(candidateUrls: string[], siteRootUrl: stri
         if (p.origin !== origin) return false;
         const path = p.pathname.toLowerCase();
         if (bad.test(path)) return false;
+        if (isLibraryAuxiliarySubpage(p.pathname)) return false;
         if (path.length < 3) return false;
         if (path.endsWith(".pdf")) return false;
         return true;
@@ -223,6 +241,7 @@ export function filterArticleLikeUrls(candidateUrls: string[], siteRootUrl: stri
         let score = 0;
         if (good.test(path)) score += 3;
         if (hasYear.test(path)) score += 2;
+        score += libraryMainWorkScore(path);
         if (path.split("/").filter(Boolean).length >= 3) score += 1;
         if (/^\/[^/]+\/?$/.test(path)) score -= 2;
         return { u, score };

@@ -47,10 +47,10 @@ See [`.env.example`](../../.env.example) for commented examples.
    | Mode | Behavior |
    |------|----------|
    | **`rss` / `feed`** | Fetch XML; **parse item/entry links** + optional per-item author (`dc:creator`, Atom `<author>`). |
-   | **`site_map` / `site`** | Firecrawl **Map** on the URL; score/filter article-like paths. |
+   | **`site_map` / `site`** | Firecrawl **Map** on the URL; [`filterArticleLikeUrls`](../../supabase/functions/_shared/feed-ingest.ts) scores/filters paths (drops junk like `/tag/…`, boosts article-like segments). **Library sites:** paths ending in `copyright`, `table-of-contents`, or `toc` under `/library/…` are **excluded** (ancillary pages, not primary reading); `/library/<work-slug>/` is **boosted** so Map does not prefer TOC/copyright over the main work URL. |
    | **Default / `blog` / etc.** | If the URL returns RSS/Atom XML, treat as feed (**auto-detect**); else scrape **that single URL** as one article. |
 
-6. **Scrape** — For **each** discovered article URL: Firecrawl **`/v2/scrape`** requests **`markdown`** and **`links`** in one call (`onlyMainContent: true`), and reads **`metadata`** from the response (canonical / Open Graph, etc. — see [Firecrawl scrape](https://docs.firecrawl.dev/features/scrape)). Perplexity fallback returns text only (no Firecrawl extras). The model does **not** ingest raw RSS `<content:encoded>` for structuring; it sees **the page** markdown (so "First published on …" lines and outbound links appear).
+6. **Scrape** — For **each** discovered article URL: Firecrawl **`/v2/scrape`** requests **`markdown`** and **`links`** in one call. **`onlyMainContent`:** `false` for **essays** (keeps article headers with "First published on …"); `true` for non-essay source types. Response **`metadata`** (canonical / Open Graph, etc. — see [Firecrawl scrape](https://docs.firecrawl.dev/features/scrape)). Perplexity fallback returns text only (no Firecrawl extras). The model does **not** ingest raw RSS `<content:encoded>` for structuring; it sees **the page** markdown.
 
 7. **Structure** — Lovable gateway → **Gemini** (`google/gemini-2.5-flash-lite`) returns JSON: `title`, `author`, `summary`, `key_quote`, `url` (must match scraped page), optional `original_url` / `original_publication`. For essays, those fields are **inputs** to step 8; persistence order is **not** "model first" (see below).
 
