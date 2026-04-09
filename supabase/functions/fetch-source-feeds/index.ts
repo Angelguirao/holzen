@@ -282,7 +282,7 @@ serve(async (req) => {
      * External https URLs in `slice` with start offset relative to **after-phrase** origin (0 = first char after the attribution phrase).
      */
     function collectExternalUrlsAfterPhrase(slice: string, syndHost: string): { url: string; dist: number; host: string }[] {
-      const urlRe = /https?:\/\/[^\s\)\]<>"]+/gi;
+      const urlRe = /https?:\/\/[^\s)\]<>"]+/gi;
       const out: { url: string; dist: number; host: string }[] = [];
       let m: RegExpExecArray | null;
       while ((m = urlRe.exec(slice)) !== null) {
@@ -956,7 +956,7 @@ Return JSON with:
           feedAuthorsInPool: articlePool.filter((r) => r.feedAuthor).length,
         });
 
-        const maxAttempts = Math.min(articlePool.length, 30);
+        const maxAttempts = Math.min(articlePool.length, 100);
         let insertedForSource = 0;
 
         for (let i = 0; i < maxAttempts && insertedForSource < maxArticlesPerSource; i++) {

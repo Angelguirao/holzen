@@ -8,6 +8,11 @@
 
 const MAX_LINKS_FROM_FEED = 40;
 
+/** Firecrawl Map `limit` — max raw URLs returned per request (see https://docs.firecrawl.dev/features/map). */
+const FIRECRAWL_MAP_LIMIT = 500;
+/** After scoring/filtering in `filterArticleLikeUrls`, keep this many URLs for the article pool (large indexes e.g. SNI Library). */
+const MAX_ARTICLE_URLS_AFTER_FILTER = 200;
+
 /**
  * Trim whitespace and fix a common paste error: a trailing "." after a path that
  * already ends in a feed-like extension (`.../atom.xml.` → `.../atom.xml`).
@@ -224,7 +229,7 @@ export function filterArticleLikeUrls(candidateUrls: string[], siteRootUrl: stri
   try {
     origin = new URL(siteRootUrl).origin;
   } catch {
-    return candidateUrls.slice(0, 20);
+    return candidateUrls.slice(0, MAX_ARTICLE_URLS_AFTER_FILTER);
   }
 
   const bad = /\/(tag|tags|category|author|page|feed|wp-json|search)(\/|$)/i;
@@ -286,7 +291,7 @@ export async function firecrawlMapArticleUrls(
       },
       body: JSON.stringify({
         url: siteUrl,
-        limit: 80,
+        limit: FIRECRAWL_MAP_LIMIT,
       }),
       signal: controller.signal,
     });
