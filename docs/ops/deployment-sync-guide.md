@@ -15,6 +15,17 @@ How Lovable Cloud auto-deploys when you push to GitHub, and how to avoid surpris
 
 **Key insight:** Backend changes (migrations + edge functions) hit production the moment GitHub syncs. Frontend changes are staged until you explicitly publish.
 
+## Hosted env files vs Cloud secrets
+
+| What | Where it runs | Where you set it (hosted) | When changes take effect |
+|------|---------------|---------------------------|---------------------------|
+| `VITE_*` | Browser (built SPA) | Lovable project env / build inputs; local `.env` for dev | New frontend build + **Publish → Update** |
+| Edge secrets (`FETCH_FEEDS_*`, `CRON_SECRET`, Stripe keys, …) | Supabase Edge (cloud) | **Lovable Cloud → Secrets** (injected into the Edge runtime) | Same as any secret change: available on the next function invocation |
+
+**Important:** Files like `.env.example`, `.env.hosted`, or `.env` in this repo **only affect the frontend build** when you run Vite locally (or when your CI loads them). They are **not** read by deployed Edge functions. For production Edge behavior, configure secrets in **Lovable Cloud → Secrets** (or Supabase Dashboard → Edge Function secrets for the linked project).
+
+**Local development only:** `supabase functions serve` can load `supabase/.env` (gitignored). That path does not apply to hosted runs.
+
 ## Safe workflow for outside-Lovable development
 
 ### 1. Migrations
@@ -58,14 +69,14 @@ verify_jwt = false
 - **"Function not found"** → the folder name doesn't match the config block name, or the function wasn't deployed (check Cloud → Edge Functions tab).
 - **Stale code** → Lovable may cache a previous deployment. Touch a file (add a comment) and push again, or redeploy from the Cloud UI.
 
-**Secrets:** Edge functions read secrets from the Supabase environment, not from `.env`. If you add a new secret dependency:
+**Secrets:** Edge functions read secrets from the Supabase environment, not from repo `.env` files. See [Hosted env files vs Cloud secrets](#hosted-env-files-vs-cloud-secrets). If you add a new secret dependency:
 1. Document it in your PR / commit message.
 2. Add the secret via Lovable Cloud → Secrets **before** the code that uses it goes live.
 3. If the secret is missing at runtime, the function will fail silently or throw — check Edge Function logs.
 
 ### 3. Frontend
 
-Frontend is safe — it only goes live when you click **Publish → Update** in Lovable. But:
+Frontend is safe — it only goes live when you click **Publish → Update** in Lovable. Changing `VITE_*` values requires a new build and publish; see [Hosted env files vs Cloud secrets](#hosted-env-files-vs-cloud-secrets). But:
 - If your frontend references a new DB column or edge function, make sure the backend side is already deployed before publishing.
 - If you remove a column the frontend still references, the published app will break until you publish the updated frontend too.
 
