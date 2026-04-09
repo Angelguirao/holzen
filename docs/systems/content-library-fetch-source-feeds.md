@@ -60,7 +60,7 @@ See [`.env.example`](../../.env.example) for commented examples.
 
    Logs with path **`no_marker`** include **`noMarkerHint`** when nothing matched. Optional **`FETCH_FEEDS_LOG_ORIGINAL_INFER=false`** disables `fetch_feeds_original_infer` / `fetch_feeds_original_firecrawl` lines (default: log).
 
-9. **Dedup** — Before scrape, **URL-only** check against `content_library` (same variants as [`urlDedupCandidates`](../../supabase/functions/_shared/content-dedup.ts)) so Firecrawl/Gemini are not called for known articles. After structure, **URL + `title_norm`** checks remain as a safety net (e.g. model returns a different normalized URL string).
+9. **Dedup** — Before scrape, **URL-only** check against `content_library` (same variants as [`urlDedupCandidates`](../../supabase/functions/_shared/content-dedup.ts)) so Firecrawl/Gemini are not called for known articles. The worker **batch-queries** all candidate URLs for the discovered pool first ([`filterArticleRefsNotInLibrary`](../../supabase/functions/_shared/content-dedup.ts)), drops refs that are already stored, then only walks the **pending** list — so skipped URLs do **not** consume the per-run attempt budget or repeat the same prefix on every cron. If batch queries fail, it falls back to per-URL pre-scrape checks. After structure, **URL + `title_norm`** checks remain as a safety net (e.g. model returns a different normalized URL string).
 
 10. **Insert** — `content_library` row with tags derived from source category and name.
 
@@ -76,7 +76,8 @@ Filter with **`[holzen:fetch-feeds]`**. Verbose lines (`holzenEdgeLog` / `holzen
 | Message | When | Always |
 |--------|------|--------|
 | `fetch_feeds_batch` | After loading sources; `sourcesTotal`, `toProcess`, `maxArticlesPerSource`, `mode` | Yes |
-| `fetch_feeds_discover` | After resolving URLs for one source; `discovery`, `poolSize`, `feedAuthorsInPool` | If verbose |
+| `fetch_feeds_discover` | After resolving URLs for one source; `discovery`, `poolSize`, **`poolPending`**, **`poolSkippedKnown`**, **`batchDedupOk`**, `feedAuthorsInPool` | If verbose |
+| `fetch_feeds_batch_dedup_failed` | Batch URL dedup query failed; falls back to per-URL pre-scrape checks | Warn |
 | `fetch_feeds_article` | Per article attempt: `outcome`, `reason` (e.g. `dedup_url_pre_scrape`, `dedup_url`, `dedup_title_norm`), `phase` on failure, `discovery`, `urlHost` | If verbose |
 | `fetch_feeds_complete` | Run finished; `fetched`, `sourcesTried`, `mode` | Yes |
 | `fetch_feeds_source_error` | Uncaught error in one source loop | If verbose (warn) |

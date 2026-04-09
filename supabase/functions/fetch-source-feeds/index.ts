@@ -1,7 +1,12 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { createAttemptLogger } from "../_shared/observe.ts";
-import { canonicalContentUrl, normalizeTitleKey, urlDedupCandidates } from "../_shared/content-dedup.ts";
+import {
+  canonicalContentUrl,
+  filterArticleRefsNotInLibrary,
+  normalizeTitleKey,
+  urlDedupCandidates,
+} from "../_shared/content-dedup.ts";
 import { callPerplexityChat, type PerplexityUsage } from "../_shared/perplexity-client.ts";
 import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun, holzenEdgeWarn } from "../_shared/holzen-edge-log.ts";
 import {
@@ -571,12 +576,13 @@ serve(async (req) => {
       source: SourceRow,
       articleRef: FeedArticleRef,
       discovery: FeedDiscovery,
+      opts?: { skipPreUrlDedup?: boolean },
     ): Promise<"inserted" | "skipped" | "failed"> {
       const articleUrl = articleRef.url;
       const contentType = source.category === "signal" ? "essay" : "paper";
 
       const preUrlCandidates = urlDedupCandidates(articleUrl);
-      if (preUrlCandidates.length > 0) {
+      if (!opts?.skipPreUrlDedup && preUrlCandidates.length > 0) {
         const { data: existingPre } = await supabase
           .from("content_library")
           .select("id")
@@ -947,21 +953,42 @@ Return JSON with:
         hzLog(`processing: ${source.name} (${sourceNorm.url})`);
 
         const { refs: articlePool, discovery } = await resolveArticleRefs(sourceNorm);
+        const contentType = sourceNorm.category === "signal" ? "essay" : "paper";
+        const batchDedup = await filterArticleRefsNotInLibrary(supabase, contentType, articlePool);
+        const poolToIngest = batchDedup.batchQueryOk ? batchDedup.pending : articlePool;
+        const skippedKnown = batchDedup.batchQueryOk ? batchDedup.skippedKnown : 0;
+        if (!batchDedup.batchQueryOk) {
+          holzenEdgeWarn("fetch-feeds", "fetch_feeds_batch_dedup_failed", {
+            source: sourceNorm.name,
+            hint: "falling back to per-URL pre-scrape dedup",
+          });
+        }
         holzenEdgeLog("fetch-feeds", "fetch_feeds_discover", {
           ms: Date.now() - t0,
           source: sourceNorm.name,
           sourceType: sourceNorm.type,
           discovery,
           poolSize: articlePool.length,
+          poolPending: poolToIngest.length,
+          poolSkippedKnown: skippedKnown,
+          batchDedupOk: batchDedup.batchQueryOk,
           feedAuthorsInPool: articlePool.filter((r) => r.feedAuthor).length,
         });
 
-        const maxAttempts = Math.min(articlePool.length, 100);
+        if (poolToIngest.length === 0) {
+          hzLog(
+            `${sourceNorm.name}: no new URLs to ingest (${skippedKnown} already in library, pool ${articlePool.length})`,
+          );
+        }
+
+        const maxAttempts = Math.min(poolToIngest.length, 100);
         let insertedForSource = 0;
 
         for (let i = 0; i < maxAttempts && insertedForSource < maxArticlesPerSource; i++) {
-          const articleRef = articlePool[i]!;
-          const outcome = await ingestArticle(sourceNorm, articleRef, discovery);
+          const articleRef = poolToIngest[i]!;
+          const outcome = await ingestArticle(sourceNorm, articleRef, discovery, {
+            skipPreUrlDedup: batchDedup.batchQueryOk,
+          });
           if (outcome === "inserted") insertedForSource++;
           if (
             articleDelayMs > 0 && i + 1 < maxAttempts && insertedForSource < maxArticlesPerSource
