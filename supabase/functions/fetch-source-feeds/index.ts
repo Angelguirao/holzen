@@ -17,6 +17,7 @@ import {
   isExplicitSiteMapSourceType,
   normalizeSourceUrl,
   parseArticleRefsFromFeedXml,
+  sortFeedArticleRefsByPublishedAtDesc,
 } from "../_shared/feed-ingest.ts";
 
 const corsHeaders = {
@@ -542,15 +543,18 @@ serve(async (req) => {
       if (isExplicitSiteMapSourceType(source.type)) {
         if (!FIRECRAWL_API_KEY) {
           hzLog(`${source.name}: site_map requires FIRECRAWL_API_KEY`);
-          return { refs: [{ url: source.url, feedAuthor: null }], discovery: "site_map_fallback_single" };
+          return { refs: [{ url: source.url, feedAuthor: null, publishedAt: null }], discovery: "site_map_fallback_single" };
         }
         const mapped = await firecrawlMapArticleUrls(source.url, FIRECRAWL_API_KEY, hzLog);
         if (mapped.length > 0) {
           hzLog(`map: ${mapped.length} candidate URLs for ${source.name}`);
-          return { refs: mapped.map((url) => ({ url, feedAuthor: null })), discovery: "site_map" };
+          return {
+            refs: mapped.map((url) => ({ url, feedAuthor: null, publishedAt: null })),
+            discovery: "site_map",
+          };
         }
         hzLog(`map: empty, falling back to single URL for ${source.name}`);
-        return { refs: [{ url: source.url, feedAuthor: null }], discovery: "site_map_fallback_single" };
+        return { refs: [{ url: source.url, feedAuthor: null, publishedAt: null }], discovery: "site_map_fallback_single" };
       }
 
       const feedXml = await fetchFeedXmlIfApplicable(source.url, hzLog);
@@ -569,7 +573,7 @@ serve(async (req) => {
         return { refs: [], discovery: "rss_feed_empty" };
       }
 
-      return { refs: [{ url: source.url, feedAuthor: null }], discovery: "single_page" };
+      return { refs: [{ url: source.url, feedAuthor: null, publishedAt: null }], discovery: "single_page" };
     }
 
     async function ingestArticle(
@@ -955,8 +959,11 @@ Return JSON with:
         const { refs: articlePool, discovery } = await resolveArticleRefs(sourceNorm);
         const contentType = sourceNorm.category === "signal" ? "essay" : "paper";
         const batchDedup = await filterArticleRefsNotInLibrary(supabase, contentType, articlePool);
-        const poolToIngest = batchDedup.batchQueryOk ? batchDedup.pending : articlePool;
+        let poolToIngest = batchDedup.batchQueryOk ? batchDedup.pending : articlePool;
         const skippedKnown = batchDedup.batchQueryOk ? batchDedup.skippedKnown : 0;
+        if (discovery === "rss_feed") {
+          poolToIngest = sortFeedArticleRefsByPublishedAtDesc(poolToIngest);
+        }
         if (!batchDedup.batchQueryOk) {
           holzenEdgeWarn("fetch-feeds", "fetch_feeds_batch_dedup_failed", {
             source: sourceNorm.name,
