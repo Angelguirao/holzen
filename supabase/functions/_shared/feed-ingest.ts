@@ -11,22 +11,33 @@ const MAX_LINKS_FROM_FEED = 40;
 /**
  * Trim whitespace and fix a common paste error: a trailing "." after a path that
  * already ends in a feed-like extension (`.../atom.xml.` → `.../atom.xml`).
- * Without this, the server 404s and we ingest the error page as an "essay".
+ * Also prepends `https://` when the value is missing a scheme (`example.com/feed.xml`),
+ * which would otherwise make `fetch()` throw `TypeError: Invalid URL`.
  */
 export function normalizeSourceUrl(raw: string): string {
   const s = raw.trim();
   if (!s) return s;
+
+  let u: URL;
   try {
-    const u = new URL(s);
-    const p = u.pathname;
-    if (/\.(atom|rss|xml|html|htm)\.$/i.test(p)) {
-      u.pathname = p.slice(0, -1);
-      return u.href;
-    }
+    u = new URL(s);
   } catch {
-    return s;
+    try {
+      if (s.startsWith("//")) {
+        u = new URL(`https:${s}`);
+      } else {
+        u = new URL(`https://${s.replace(/^\/+/, "")}`);
+      }
+    } catch {
+      return s;
+    }
   }
-  return s;
+
+  const p = u.pathname;
+  if (/\.(atom|rss|xml|html|htm)\.$/i.test(p)) {
+    u.pathname = p.slice(0, -1);
+  }
+  return u.href;
 }
 
 /** Types that mean "URL is an RSS/Atom feed" (explicit). */

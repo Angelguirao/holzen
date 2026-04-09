@@ -1,5 +1,22 @@
 import { describe, expect, it } from "vitest";
-import { filterArticleLikeUrls } from "../../supabase/functions/_shared/feed-ingest.ts";
+import {
+  filterArticleLikeUrls,
+  normalizeSourceUrl,
+} from "../../supabase/functions/_shared/feed-ingest.ts";
+
+describe("normalizeSourceUrl", () => {
+  it("prepends https when scheme is missing (admin paste)", () => {
+    expect(normalizeSourceUrl("nakamotoinstitute.org/mempool/atom.xml")).toBe(
+      "https://nakamotoinstitute.org/mempool/atom.xml",
+    );
+  });
+
+  it("leaves full URLs unchanged", () => {
+    expect(normalizeSourceUrl("https://nakamotoinstitute.org/mempool/atom.xml")).toBe(
+      "https://nakamotoinstitute.org/mempool/atom.xml",
+    );
+  });
+});
 
 describe("filterArticleLikeUrls (site_map / Firecrawl Map)", () => {
   const root = "https://nakamotoinstitute.org/library/";
