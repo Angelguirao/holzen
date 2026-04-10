@@ -5,6 +5,8 @@ import { PageMeta } from '@/components/PageMeta';
 import { PublicFooter } from '@/components/PublicFooter';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { NoxHeaderMain } from '@/components/ui/nox-header';
+import { StateCard } from '@/components/ui/state-card';
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 14 },
@@ -66,9 +68,8 @@ const Reserve = () => {
             <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center">
               <Bitcoin className="h-4 w-4 text-primary" />
             </div>
-            <h1 className="text-xl text-foreground leading-relaxed">{t('reserve.title')}</h1>
           </div>
-          <p className="text-sm text-muted-foreground leading-relaxed">{t('reserve.subtitle')}</p>
+          <NoxHeaderMain title={t('reserve.title')} subtitle={t('reserve.subtitle')} />
         </motion.div>
 
         <motion.div {...m(0.1)}>
@@ -98,7 +99,7 @@ const Reserve = () => {
         <motion.div {...m(0.1)}>
           <div className="space-y-4">
             <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">{t('reserve.treasury')}</p>
-            <div className="border border-border/60 rounded-lg p-5 space-y-4 bg-muted/10">
+            <StateCard title={t('reserve.treasury')} description={t('reserve.subtitle')} className="space-y-4">
               {TREASURY.hasStarted ? (
                 <>
                   <div className="flex items-baseline justify-between">
@@ -139,7 +140,7 @@ const Reserve = () => {
                   <p className="text-xs text-muted-foreground leading-relaxed">{t('reserve.reserveNotStarted')}</p>
                 </div>
               )}
-            </div>
+            </StateCard>
           </div>
         </motion.div>
 

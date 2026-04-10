@@ -9,15 +9,16 @@ import { Badge } from '@/components/ui/badge';
 import { PageMeta } from '@/components/PageMeta';
 import { PublicFooter } from '@/components/PublicFooter';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
+import { NoxHeaderMain } from '@/components/ui/nox-header';
 
 const PAGE_SIZE = 30;
 const CATEGORIES = ['all', 'self', 'together', 'intelligence', 'reach'] as const;
 
-const categoryColors: Record<string, string> = {
-  self: 'bg-amber-500/15 text-amber-400 border-amber-500/20',
-  together: 'bg-rose-500/15 text-rose-400 border-rose-500/20',
-  intelligence: 'bg-violet-500/15 text-violet-400 border-violet-500/20',
-  reach: 'bg-emerald-500/15 text-emerald-400 border-emerald-500/20',
+const categoryTone: Record<string, 'default' | 'secondary' | 'outline'> = {
+  self: 'default',
+  together: 'secondary',
+  intelligence: 'outline',
+  reach: 'secondary',
 };
 
 interface RoadmapItem {
@@ -109,12 +110,10 @@ const Roadmap = () => {
             <ArrowLeft className="h-3 w-3" />
             {t('common.back')}
           </Link>
-          <div className="space-y-1">
-            <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">{t('roadmap.title')}</h1>
-            <p className="text-xs text-muted-foreground">
-              {t('roadmap.voteOnNext')} {!user && t('roadmap.signInToVote')}
-            </p>
-          </div>
+          <NoxHeaderMain
+            title={t('roadmap.title')}
+            subtitle={`${t('roadmap.voteOnNext')} ${!user ? t('roadmap.signInToVote') : ''}`.trim()}
+          />
         </div>
 
         {/* Category filter chips */}
@@ -167,7 +166,7 @@ const Roadmap = () => {
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-medium leading-snug">{item.title}</p>
                       {item.category && (
-                        <Badge variant="outline" className={`text-[9px] font-mono uppercase px-1.5 py-0 h-4 ${categoryColors[item.category] ?? ''}`}>
+                        <Badge variant={categoryTone[item.category] ?? 'outline'} className="text-[9px] font-mono uppercase px-1.5 py-0 h-4">
                           {t(`roadmap.${item.category}`, item.category)}
                         </Badge>
                       )}

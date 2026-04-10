@@ -20,6 +20,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { SubscriptionSkeleton } from '@/components/SubscriptionSkeleton';
 import { Button } from '@/components/ui/button';
 import { LoadingButton } from '@/components/ui/loading-button';
+import { NoxHeaderMain } from '@/components/ui/nox-header';
 import { HomeWidget, useWidgetLayout } from '@/components/HomeWidget';
 import { useCallback, useEffect, useState, useMemo, useRef } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
@@ -847,6 +848,10 @@ const Home = () => {
 
   return (
     <div {...pullHandlers} className="space-y-4">
+      <NoxHeaderMain
+        title={t('home.title', 'Home')}
+        subtitle={t('home.whenBtcMoves')}
+      />
       {/* Pull-to-refresh indicator */}
       {(pullDistance > 0 || pullRefreshing) && (
         <div
