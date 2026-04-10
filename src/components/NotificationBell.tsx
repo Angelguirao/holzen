@@ -8,6 +8,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { formatDistanceToNow } from 'date-fns';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Skeleton } from '@/components/ui/skeleton';
+import type { NotificationNavigateState } from '@/lib/router-location-state';
 
 const SWIPE_THRESHOLD = 80;
 
@@ -15,7 +16,7 @@ const SwipeableNotification = forwardRef<HTMLDivElement, {
   n: NotificationItem;
   iconMap: Record<NotificationItem['type'], string>;
   onDismiss: (id: string) => void;
-  onAction: (path: string, state?: Record<string, any>) => void;
+  onAction: (path: string, state?: NotificationNavigateState) => void;
 }>(function SwipeableNotification({ n, iconMap, onDismiss, onAction }, _ref) {
   const startX = useRef(0);
   const currentX = useRef(0);
@@ -105,7 +106,7 @@ type NotificationItem = {
   title: string;
   subtitle: string;
   timestamp: string;
-  action?: { label: string; path: string; state?: Record<string, any> };
+  action?: { label: string; path: string; state?: NotificationNavigateState };
 };
 
 const LAST_READ_KEY = 'holzen_notifications_read_at';
@@ -267,7 +268,7 @@ export function NotificationBell() {
     }
   }
 
-  const handleAction = useCallback((path: string, state?: Record<string, any>) => {
+  const handleAction = useCallback((path: string, state?: NotificationNavigateState) => {
     setOpen(false);
     navigate(path, state ? { state } : undefined);
   }, [navigate]);
@@ -298,16 +299,23 @@ export function NotificationBell() {
     pause: '⚡',
   };
 
+  const displayCount = unreadCount > 9 ? '9+' : unreadCount;
+  const bellAriaLabel =
+    unreadCount > 0
+      ? `${t('notifications.title')}, ${displayCount} ${t('notifications.unread', 'unread')}`
+      : t('notifications.title');
+
   return (
     <div ref={ref} className="relative">
       <button
+        type="button"
         onClick={handleOpen}
-        className="relative p-1.5 rounded-md hover:bg-accent transition-colors"
-        aria-label={t('notifications.title')}
+        className="relative inline-flex min-h-9 min-w-9 items-center justify-center rounded-md hover:bg-accent transition-colors"
+        aria-label={bellAriaLabel}
       >
-        <Bell className="h-4 w-4 text-muted-foreground" />
+        <Bell className="h-4 w-4 text-muted-foreground" aria-hidden />
         {unreadCount > 0 && (
-          <span className="absolute -top-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-primary text-primary-foreground text-[8px] font-mono flex items-center justify-center">
+          <span className="absolute -top-0.5 -right-0.5 h-3.5 w-3.5 rounded-full bg-primary text-primary-foreground text-[8px] font-mono flex items-center justify-center" aria-hidden>
             {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}

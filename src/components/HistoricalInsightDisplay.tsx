@@ -1,17 +1,10 @@
 import { Skeleton } from '@/components/ui/skeleton';
 import { History, ArrowRight } from 'lucide-react';
+import type { CachedHistoricalInsightShape } from '@/lib/companion-reflection-cache';
 import { CompanionError } from './CompanionError';
 
-interface HistoricalInsightData {
-  title: string;
-  btcInsight: string;
-  analogy: string;
-  assetClass: string;
-  period: string;
-}
-
 interface Props {
-  data: HistoricalInsightData | null;
+  data: CachedHistoricalInsightShape | null;
   loading: boolean;
   error: boolean;
   onRetry?: () => void;

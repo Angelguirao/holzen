@@ -125,7 +125,10 @@ export function formatBtcPrice(price: number, currency: string): string {
   });
 }
 
-export async function fetchBtcData(currency: string = 'USD'): Promise<BtcPriceData> {
+/** Coalesce concurrent fetches for the same currency (e.g. interval + manual trigger on Home). */
+const btcFetchInflight = new Map<string, Promise<BtcPriceData>>();
+
+async function fetchBtcDataUncached(currency: string): Promise<BtcPriceData> {
   const cur = currency.toLowerCase();
 
   try {
@@ -182,4 +185,15 @@ export async function fetchBtcData(currency: string = 'USD'): Promise<BtcPriceDa
     }
     throw e;
   }
+}
+
+export async function fetchBtcData(currency: string = 'USD'): Promise<BtcPriceData> {
+  const key = currency.toUpperCase();
+  const existing = btcFetchInflight.get(key);
+  if (existing) return existing;
+  const p = fetchBtcDataUncached(currency).finally(() => {
+    btcFetchInflight.delete(key);
+  });
+  btcFetchInflight.set(key, p);
+  return p;
 }

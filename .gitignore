@@ -15,6 +15,9 @@ dist-ssr
 supabase/.temp/
 supabase/.branches/
 
+# Deno — `npm run check:edge` may write a lockfile at repo root
+/deno.lock
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -31,3 +34,7 @@ supabase/.branches/
 .env.*
 !.env.example
 !.env.*.example
+
+# Bruno — HTTP env files with secrets (copy from *.bru.example)
+bruno/environments/local.bru
+bruno/environments/hosted.bru

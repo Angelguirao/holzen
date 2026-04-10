@@ -1,0 +1,24 @@
+meta {
+  name: reflection-insights
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{VITE_SUPABASE_URL}}/functions/v1/reflection-insights
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{SUPABASE_ACCESS_TOKEN}}
+  apikey: {{VITE_SUPABASE_PUBLISHABLE_KEY}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "user_id": "{{AUTH_USER_ID}}",
+    "language": "en"
+  }
+}

@@ -313,6 +313,9 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                 {t('settings.firstNameDesc')}
               </p>
               <Input
+                id="settings-first-name"
+                name="given-name"
+                autoComplete="given-name"
                 value={firstName ?? ''}
                 onChange={(e) => setFirstName(e.target.value || null)}
                 placeholder={t('settings.firstNamePlaceholder')}
@@ -912,14 +915,20 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.passwordLabel')}</p>
               <Input
+                id="settings-new-password"
+                name="new-password"
                 type="password"
+                autoComplete="new-password"
                 placeholder={t('settings.newPasswordPlaceholder')}
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 className="text-xs font-mono"
               />
               <Input
+                id="settings-confirm-password"
+                name="new-password"
                 type="password"
+                autoComplete="new-password"
                 placeholder={t('settings.confirmPasswordPlaceholder')}
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
@@ -1091,7 +1100,10 @@ function ChangeEmailSection() {
     <div className="space-y-3">
       <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.emailLabel')}</p>
       <Input
+        id="settings-new-email"
+        name="email"
         type="email"
+        autoComplete="email"
         placeholder={t('settings.newEmailPlaceholder')}
         value={newEmail}
         onChange={(e) => setNewEmail(e.target.value)}

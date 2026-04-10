@@ -13,6 +13,7 @@ import { bucketSeverity } from "./intervention-selector.ts";
 import { fetchGroundingSourcesForOrchestrate, fetchSignalSourcesForOrchestrate } from "./pause-cron-parity.ts";
 import { fetchRecentSignalCitationUrls, mergeRecentSignalUrls } from "./recent-signal-urls.ts";
 import { ORCHESTRATOR_KEY_MAP } from "./companion-types.ts";
+import { logCompanionSlotResolved } from "./companion-orchestrate-slot-telemetry.ts";
 import { PROMPT_VERSION as SIGNAL_VERSION } from "./generators/signal.ts";
 import { PROMPT_VERSION as GROUNDING_VERSION } from "./generators/grounding.ts";
 import { PROMPT_VERSION as HISTORY_VERSION } from "./generators/history.ts";
@@ -92,6 +93,7 @@ export async function handleRegenerateOnly(params: {
     data: any;
     source: "live" | "cache" | "curated" | "empty";
     cacheId: string | null;
+    cacheRelaxation?: string | null;
     latencyMs: number;
     promptVersion?: string;
     error?: string;
@@ -119,11 +121,13 @@ export async function handleRegenerateOnly(params: {
         reflectionId,
         log,
         preferredBias: intent.groundingBias,
+        forceLive: true,
       });
       result = {
         data: g.data,
         source: g.source,
         cacheId: g.cacheId,
+        cacheRelaxation: g.cacheRelaxation ?? null,
         latencyMs: Date.now() - t0,
         promptVersion: GROUNDING_VERSION,
         error: g.error,
@@ -159,11 +163,13 @@ export async function handleRegenerateOnly(params: {
         reflectionId,
         log,
         searchAngle: intent.signalAngle,
+        forceLive: true,
       });
       result = {
         data: s.data,
         source: s.source,
         cacheId: s.cacheId,
+        cacheRelaxation: s.cacheRelaxation ?? null,
         latencyMs: Date.now() - t0,
         promptVersion: SIGNAL_VERSION,
         error: s.error,
@@ -178,11 +184,13 @@ export async function handleRegenerateOnly(params: {
         userId,
         log,
         preferredMood: intent.historyMood as "recovery" | "caution" | "neutral",
+        forceLive: true,
       });
       result = {
         data: h.data,
         source: h.source,
         cacheId: h.cacheId,
+        cacheRelaxation: h.cacheRelaxation ?? null,
         latencyMs: Date.now() - t0,
         promptVersion: HISTORY_VERSION,
         error: h.error,
@@ -198,11 +206,13 @@ export async function handleRegenerateOnly(params: {
         recentTitles: body.recentZoomOutTitles as string[] | undefined,
         log,
         zoomOutAngle: intent.zoomOutAngle,
+        forceLive: true,
       });
       result = {
         data: z.data,
         source: z.source,
         cacheId: z.cacheId,
+        cacheRelaxation: z.cacheRelaxation ?? null,
         latencyMs: Date.now() - t0,
         promptVersion: ZOOM_OUT_VERSION,
         error: z.error,
@@ -214,6 +224,7 @@ export async function handleRegenerateOnly(params: {
       data: null,
       source: "empty",
       cacheId: null,
+      cacheRelaxation: null,
       latencyMs: Date.now() - t0,
       error: e instanceof Error ? e.message : String(e),
     };
@@ -221,6 +232,17 @@ export async function handleRegenerateOnly(params: {
 
   const orchestratorKey = slot;
   const companionType = ORCHESTRATOR_KEY_MAP[orchestratorKey];
+
+  logCompanionSlotResolved({
+    companion_type: companionType,
+    orchestrator_slot: slot,
+    reflection_prefix: reflectionId.slice(0, 8),
+    source: result.source,
+    cache_relaxation: result.cacheRelaxation ?? null,
+    latency_ms: result.latencyMs,
+    filled: Boolean(result.data),
+    error: result.error ?? null,
+  });
 
   const response: Record<string, unknown> = {
     signal: null,
@@ -238,6 +260,7 @@ export async function handleRegenerateOnly(params: {
     companion_type: companionType,
     serve_source: result.source,
     cache_entry_id: result.cacheId || null,
+    cache_relaxation: result.cacheRelaxation ?? null,
     content_title: result.data?.title || result.data?.deepTime?.title || null,
     content_fingerprint: result.promptVersion ?? null,
     latency_ms: result.latencyMs,

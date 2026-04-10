@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "npm:@supabase/supabase-js@2.57.2";
-import webpush from "npm:web-push@3.6.7";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import webpush from "https://esm.sh/web-push@3.6.7";
 import {
   generateUnifiedReflection,
   REFLECTION_PROMPT_VERSION,
@@ -16,6 +16,12 @@ import {
 } from "../_shared/pause-cron-parity.ts";
 import { sanitizePromptInput, sanitizePromptArray } from "../_shared/sanitize.ts";
 import { isCumulativeMoveTriggered } from "../_shared/volatility-thresholds.ts";
+import {
+  holzenEdgeError,
+  holzenEdgeLog,
+  holzenEdgeRun,
+  holzenEdgeWarn,
+} from "../_shared/holzen-edge-log.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -29,7 +35,11 @@ async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise
   for (let i = 0; i < retries; i++) {
     const res = await fetch(url);
     if (res.ok) return res;
-    console.warn(`[CHECK-VOLATILITY] Fetch attempt ${i + 1} failed (${res.status}), ${i < retries - 1 ? "retrying..." : "giving up"}`);
+    holzenEdgeWarn("volatility", "CoinGecko HTTP retry", {
+      attempt: i + 1,
+      status: res.status,
+      willRetry: i < retries - 1,
+    });
     await res.text(); // consume body
     if (i < retries - 1) await new Promise((r) => setTimeout(r, delayMs * (i + 1)));
   }
@@ -87,7 +97,7 @@ async function sendNotificationEmail(
 ): Promise<boolean> {
   const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
   if (!RESEND_API_KEY) {
-    console.error("[EMAIL] RESEND_API_KEY not configured");
+    holzenEdgeError("volatility-email", "RESEND_API_KEY not configured");
     return false;
   }
 
@@ -122,15 +132,15 @@ async function sendNotificationEmail(
 
     if (!res.ok) {
       const errText = await res.text();
-      console.error(`[EMAIL] Resend error [${res.status}]: ${errText}`);
+      holzenEdgeError("volatility-email", `Resend HTTP ${res.status}`, errText.slice(0, 200));
       return false;
     }
 
     await res.json();
-    console.log(`[EMAIL] Sent to ${email}`);
+    holzenEdgeLog("volatility-email", "sent", { toDomain: email.includes("@") ? email.split("@")[1] : "?" });
     return true;
   } catch (e) {
-    console.error("[EMAIL] Send error:", e);
+    holzenEdgeError("volatility-email", "send error", e);
     return false;
   }
 }
@@ -140,14 +150,19 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
+  holzenEdgeRun("volatility", "request", { method: req.method });
+
   // Auth: require service role key or cron secret
   const { verifyServiceAuth } = await import("../_shared/auth.ts");
   if (!verifyServiceAuth(req)) {
+    holzenEdgeRun("volatility", "auth rejected — use Bearer service_role or CRON_SECRET");
     return new Response(JSON.stringify({ error: "Unauthorized" }), {
       status: 401,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
+
+  holzenEdgeRun("volatility", "auth ok");
 
   try {
     const supabase = createClient(
@@ -167,7 +182,7 @@ serve(async (req) => {
 
     if (profilesError) throw profilesError;
     if (!profiles || profiles.length === 0) {
-      console.log("[CHECK-VOLATILITY] No profiles");
+      holzenEdgeLog("volatility", "no profiles");
       return new Response(JSON.stringify({ triggered: 0 }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -186,7 +201,7 @@ serve(async (req) => {
             const m = await fetchBtcVolatilityForCurrency(c);
             return [c, m] as const;
           } catch (e) {
-            console.error(`[CHECK-VOLATILITY] CoinGecko failed for vs_currency=${c}`, e);
+            holzenEdgeError("volatility", `CoinGecko failed vs_currency=${c}`, e);
             return [c, null] as const;
           }
         }),
@@ -200,7 +215,7 @@ serve(async (req) => {
       if (m) btcByCur.set(c, m);
     }
     if (!btcByCur.has("usd")) {
-      console.error("[CHECK-VOLATILITY] Could not load USD BTC metrics");
+      holzenEdgeError("volatility", "could not load USD BTC metrics");
       return new Response(JSON.stringify({ error: "btc_fetch_failed" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -213,9 +228,11 @@ serve(async (req) => {
     }
 
     const usdPeek = btcByCur.get("usd")!;
-    console.log(
-      `[CHECK-VOLATILITY] BTC 24h (USD sample): ${usdPeek.changePercent.toFixed(2)}%, 7d: ${usdPeek.cumulativeChangePercent.toFixed(2)}% (${btcByCur.size} quote currency fetch(es)); F&G + on-chain cached for run`,
-    );
+    holzenEdgeLog("volatility", "BTC sample + market context loaded", {
+      change24hPct: Number(usdPeek.changePercent.toFixed(2)),
+      change7dPct: Number(usdPeek.cumulativeChangePercent.toFixed(2)),
+      quoteCurrencies: btcByCur.size,
+    });
 
     // Helper: get user's local hour
     function getUserLocalHour(timezone: string): number {
@@ -303,7 +320,10 @@ serve(async (req) => {
       return new Date(p.last_trigger_at).getTime() < Date.now() - cooldownMs;
     });
 
-    console.log(`[CHECK-VOLATILITY] ${eligible.length} users eligible (${profiles.length} total)`);
+    holzenEdgeLog("volatility", "eligible users", {
+      eligible: eligible.length,
+      totalProfiles: profiles.length,
+    });
 
     // Parse and configure VAPID once — all users share the same keys
     const vapidPublicKey = Deno.env.get("VAPID_PUBLIC_KEY");
@@ -329,14 +349,14 @@ serve(async (req) => {
               const jwk = await crypto.subtle.exportKey("jwk", cryptoKey);
               if (jwk.d) privateKey = jwk.d;
             } catch (decodeErr) {
-              console.error("[PUSH] Failed to extract key from PKCS8:", decodeErr);
+              holzenEdgeError("volatility-push", "VAPID PKCS8 decode failed", decodeErr);
             }
           }
         }
         webpush.setVapidDetails("mailto:noreply@holzen.app", vapidPublicKey, privateKey);
         vapidReady = true;
       } catch (vapidErr) {
-        console.error("[PUSH] VAPID setup error:", vapidErr);
+        holzenEdgeError("volatility-push", "VAPID setup error", vapidErr);
       }
     }
 
@@ -365,7 +385,9 @@ serve(async (req) => {
           .select("user_id")
           .single();
         if (!nullClaim) {
-          console.log(`[CHECK-VOLATILITY] Skipping ${profile.user_id} — cooldown claimed by another trigger`);
+          holzenEdgeLog("volatility", "skip — cooldown slot claimed elsewhere", {
+            userIdPrefix: String(profile.user_id).slice(0, 8),
+          });
           return false;
         }
       }
@@ -468,7 +490,9 @@ serve(async (req) => {
         groundingActivities: groundingActivities.length > 0 ? groundingActivities : undefined,
       });
       if (!result?.message) {
-        console.log(`[CHECK-VOLATILITY] Failed to generate reflection for ${profile.user_id}`);
+        holzenEdgeLog("volatility", "reflection generation returned empty", {
+          userIdPrefix: String(profile.user_id).slice(0, 8),
+        });
         return false;
       }
 
@@ -486,7 +510,6 @@ serve(async (req) => {
       }).then(() => {});
 
       const haiku = (profile as any).companion_haiku ? result.haiku : null;
-      // grounding_* on the row are filled by companion-orchestrate (Grounding, etc.), not reflection AI
 
       const { data: insertedReflection } = await supabase
         .from("reflections")
@@ -495,8 +518,6 @@ serve(async (req) => {
           message: result.message,
           context: ctx,
           haiku,
-          grounding_title: null,
-          grounding_body: null,
           ...(lastReportedMood ? { mood: lastReportedMood } : {}),
         })
         .select("id")
@@ -531,6 +552,7 @@ serve(async (req) => {
             "apikey": anonKey,
           },
           body: JSON.stringify({
+            holzenInvokeSource: "cron_check_volatility",
             userId: profile.user_id,
             reflectionId,
             context: ctx,
@@ -554,9 +576,14 @@ serve(async (req) => {
             useIntervention: true,
           }),
         }).then((res) => {
-          if (!res.ok) res.text().then((t) => console.error(`[CHECK-VOLATILITY] Orchestrator failed (${res.status}): ${t}`));
-          else console.log(`[CHECK-VOLATILITY] Orchestrator dispatched for reflection ${reflectionId}`);
-        }).catch((e) => console.error(`[CHECK-VOLATILITY] Orchestrator dispatch error:`, e));
+          if (!res.ok) {
+            res.text().then((t) =>
+              holzenEdgeError("volatility", `orchestrator HTTP ${res.status}`, t.slice(0, 300))
+            );
+          } else {
+            holzenEdgeLog("volatility", "orchestrator dispatched", { reflectionIdPrefix: reflectionId.slice(0, 8) });
+          }
+        }).catch((e) => holzenEdgeError("volatility", "orchestrator fetch error", e));
       }
 
       await profileUpdate;
@@ -592,7 +619,10 @@ serve(async (req) => {
                 payload
               );
             } catch (pushErr: any) {
-              console.error(`[PUSH] Failed for ${sub.endpoint}:`, pushErr.message, "statusCode:", pushErr.statusCode);
+              holzenEdgeError("volatility-push", "send failed", {
+                message: pushErr?.message,
+                statusCode: pushErr?.statusCode,
+              });
               if (pushErr.statusCode === 410 || pushErr.statusCode === 404) {
                 await supabase.from("push_subscriptions").delete().eq("endpoint", sub.endpoint);
               }
@@ -613,7 +643,7 @@ serve(async (req) => {
     }));
 
     const triggered = results.filter(Boolean).length;
-    console.log(`[CHECK-VOLATILITY] Triggered ${triggered} notifications`);
+    holzenEdgeLog("volatility", "run complete", { triggered });
 
     return new Response(
       JSON.stringify({ triggered, btcChangeUsd: usdPeek.changePercent, quoteCurrenciesLoaded: btcByCur.size }),
@@ -623,7 +653,7 @@ serve(async (req) => {
     );
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    console.error("[CHECK-VOLATILITY] Error:", msg);
+    holzenEdgeError("volatility", "uncaught error", msg);
     return new Response(JSON.stringify({ error: msg }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

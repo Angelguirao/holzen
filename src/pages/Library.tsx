@@ -240,6 +240,11 @@ export default function Library() {
             <div className="relative -mx-1 px-1">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/40" />
               <Input
+                id="library-search"
+                name="q"
+                type="search"
+                autoComplete="off"
+                aria-label={t('library.searchPlaceholder')}
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={t('library.searchPlaceholder')}

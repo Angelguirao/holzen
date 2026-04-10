@@ -5,7 +5,7 @@
 
 /** Create a Supabase client with the user's auth header */
 export async function createAuthenticatedClient(authHeader: string) {
-  const { createClient } = await import("npm:@supabase/supabase-js@2.57.2");
+  const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2.57.2");
   const sbUrl = Deno.env.get("SUPABASE_URL") ?? "";
   const sbAnon = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
   return createClient(sbUrl, sbAnon, {
@@ -15,7 +15,7 @@ export async function createAuthenticatedClient(authHeader: string) {
 
 /** Create a Supabase service role client (for server-side operations) */
 export async function createServiceClient() {
-  const { createClient } = await import("npm:@supabase/supabase-js@2.57.2");
+  const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2.57.2");
   const sbUrl = Deno.env.get("SUPABASE_URL") ?? "";
   const svcKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
   return createClient(sbUrl, svcKey, { auth: { persistSession: false } });
@@ -37,8 +37,8 @@ export async function verifyUserAuth(req: Request): Promise<{ user: any; authHea
 }
 
 /**
- * Verify service role key or cron secret.
- * Used for server-to-server and cron-triggered functions.
+ * Verify service role JWT or CRON_SECRET in `Authorization: Bearer …`.
+ * Do not rely on `x-supabase-cron` here — Edge function URLs are public; that header is trivially spoofable.
  */
 export function verifyServiceAuth(req: Request): boolean {
   const authHeader = req.headers.get("Authorization");

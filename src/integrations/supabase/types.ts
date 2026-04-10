@@ -311,6 +311,7 @@ export type Database = {
       companion_serves: {
         Row: {
           cache_entry_id: string | null
+          cache_relaxation: string | null
           companion_type: string
           content_fingerprint: string | null
           content_title: string | null
@@ -323,6 +324,7 @@ export type Database = {
         }
         Insert: {
           cache_entry_id?: string | null
+          cache_relaxation?: string | null
           companion_type: string
           content_fingerprint?: string | null
           content_title?: string | null
@@ -335,6 +337,7 @@ export type Database = {
         }
         Update: {
           cache_entry_id?: string | null
+          cache_relaxation?: string | null
           companion_type?: string
           content_fingerprint?: string | null
           content_title?: string | null
@@ -384,11 +387,14 @@ export type Database = {
           key_quote: string | null
           language: string | null
           mood_tag: string | null
+          original_publication: string | null
+          original_url: string | null
           quality_score: number | null
           recovery: string | null
           summary: string
           tags: string[] | null
           title: string
+          title_norm: string | null
           type: string
           updated_at: string | null
           url: string | null
@@ -407,11 +413,14 @@ export type Database = {
           key_quote?: string | null
           language?: string | null
           mood_tag?: string | null
+          original_publication?: string | null
+          original_url?: string | null
           quality_score?: number | null
           recovery?: string | null
           summary: string
           tags?: string[] | null
           title: string
+          title_norm?: string | null
           type: string
           updated_at?: string | null
           url?: string | null
@@ -430,11 +439,14 @@ export type Database = {
           key_quote?: string | null
           language?: string | null
           mood_tag?: string | null
+          original_publication?: string | null
+          original_url?: string | null
           quality_score?: number | null
           recovery?: string | null
           summary?: string
           tags?: string[] | null
           title?: string
+          title_norm?: string | null
           type?: string
           updated_at?: string | null
           url?: string | null
@@ -1068,6 +1080,45 @@ export type Database = {
         }
         Relationships: []
       }
+      referral_pending_jobs: {
+        Row: {
+          attempts: number
+          created_at: string
+          id: string
+          last_error: string | null
+          max_attempts: number
+          next_attempt_at: string | null
+          referral_code: string
+          referred_user_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          attempts?: number
+          created_at?: string
+          id?: string
+          last_error?: string | null
+          max_attempts?: number
+          next_attempt_at?: string | null
+          referral_code: string
+          referred_user_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          attempts?: number
+          created_at?: string
+          id?: string
+          last_error?: string | null
+          max_attempts?: number
+          next_attempt_at?: string | null
+          referral_code?: string
+          referred_user_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       referral_rewards: {
         Row: {
           granted_at: string
@@ -1460,6 +1511,7 @@ export type Database = {
           demoted_for_live: boolean
           description: string | null
           id: string
+          last_fetch_feeds_at: string | null
           name: string
           type: string
           url: string | null
@@ -1470,6 +1522,7 @@ export type Database = {
           demoted_for_live?: boolean
           description?: string | null
           id?: string
+          last_fetch_feeds_at?: string | null
           name: string
           type?: string
           url?: string | null
@@ -1480,6 +1533,7 @@ export type Database = {
           demoted_for_live?: boolean
           description?: string | null
           id?: string
+          last_fetch_feeds_at?: string | null
           name?: string
           type?: string
           url?: string | null
@@ -1754,6 +1808,27 @@ export type Database = {
       }
     }
     Functions: {
+      claim_referral_pending_jobs: {
+        Args: { p_limit?: number }
+        Returns: {
+          attempts: number
+          created_at: string
+          id: string
+          last_error: string | null
+          max_attempts: number
+          next_attempt_at: string | null
+          referral_code: string
+          referred_user_id: string
+          status: string
+          updated_at: string
+        }[]
+        SetofOptions: {
+          from: "*"
+          to: "referral_pending_jobs"
+          isOneToOne: false
+          isSetofReturn: true
+        }
+      }
       claim_trigger_slot: {
         Args: { _cooldown_hours: number; _user_id: string }
         Returns: boolean

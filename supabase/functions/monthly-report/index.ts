@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -68,16 +69,17 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Auth: require service role key or cron secret
-  const { verifyServiceAuth } = await import("../_shared/auth.ts");
-  if (!verifyServiceAuth(req)) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), {
-      status: 401,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  }
-
   try {
+    holzenEdgeRun("monthly-report", "request", { method: req.method });
+    const { verifyServiceAuth } = await import("../_shared/auth.ts");
+    if (!verifyServiceAuth(req)) {
+      holzenEdgeRun("monthly-report", "auth rejected");
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    holzenEdgeRun("monthly-report", "auth ok");
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
@@ -92,6 +94,7 @@ serve(async (req) => {
     // Only run on the 1st of the month
     const now = new Date();
     if (now.getUTCDate() !== 1) {
+      holzenEdgeLog("monthly-report", "run complete", { skipped: true, reason: "not_first_of_month" });
       return new Response(JSON.stringify({ skipped: true, reason: "not_first_of_month" }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -109,7 +112,7 @@ serve(async (req) => {
     if (profilesError) throw profilesError;
 
     const eligible = (profiles ?? []).filter((p) => p.email_notifications);
-    console.log(`[MONTHLY] ${eligible.length} users eligible`);
+    holzenEdgeLog("monthly-report", "eligible users", { count: eligible.length });
 
     let sent = 0;
     const monthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
@@ -188,7 +191,7 @@ Be observational, calm. No advice, no exclamation marks.${langInstruction}`;
             }
           }
         } catch (e) {
-          console.error("[MONTHLY] AI insight failed:", e);
+          holzenEdgeError("monthly-report", "AI insight failed", e);
         }
       }
 
@@ -277,23 +280,23 @@ Be observational, calm. No advice, no exclamation marks.${langInstruction}`;
 
         if (!res.ok) {
           const errText = await res.text();
-          console.error(`[MONTHLY] Resend error [${res.status}]: ${errText}`);
+          holzenEdgeError("monthly-report", `Resend HTTP ${res.status}`, errText.slice(0, 200));
           continue;
         }
         await res.json();
         sent++;
       } catch (e) {
-        console.error(`[MONTHLY] Send error for ${email}:`, e);
+        holzenEdgeError("monthly-report", "send error", { emailDomain: email.includes("@") ? email.split("@")[1] : "?", err: e });
       }
     }
 
-    console.log(`[MONTHLY] Sent ${sent} monthly reports`);
+    holzenEdgeLog("monthly-report", "run complete", { sent });
     return new Response(JSON.stringify({ sent }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    console.error("[MONTHLY] Error:", msg);
+    holzenEdgeError("monthly-report", "uncaught error", msg);
     return new Response(JSON.stringify({ error: msg }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

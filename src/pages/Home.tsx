@@ -2,6 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { usePullToRefresh } from '@/hooks/use-pull-to-refresh';
 import { useOutletContext } from 'react-router-dom';
 import { useHolzen } from '@/hooks/use-holzen';
+import { isReflectionPersistError } from '@/lib/reflection-persist-error';
 import { TestimonialRequest } from '@/components/TestimonialRequest';
 import { LetterToFutureSelf } from '@/components/LetterToFutureSelf';
 import AuthLoading from '@/components/AuthLoading';
@@ -25,14 +26,17 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { toast } from 'sonner';
-import { AlertCircle, Loader2, Pause, Pin, Timer, Sparkles, Waves, RotateCcw, RefreshCw, Lock, X, Anchor } from 'lucide-react';
+import { AlertCircle, Loader2, Pin, Sparkles, Waves, RotateCcw, RefreshCw, X, Anchor } from 'lucide-react';
+import { AutoCooldownIndicator, NeedAMomentButton, ProLockedWidget } from '@/components/home/HomePauseChrome';
 import { PracticeWidget } from '@/components/PracticeWidget';
 import { BulkHoldCard } from '@/components/BulkHoldCard';
 import { SnoozeControl } from '@/components/SnoozeControl';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { playNotificationTone, prefetchNotificationTone } from '@/lib/notification-tone';
 import { isCumulativeMoveTriggered } from '@/lib/volatility-thresholds';
+import { holzenLog } from '@/lib/holzen-console';
 import { companionFallbacksDisabledClient } from '@/lib/companion-strict';
+import { type GroundPreGenerated, type PauseSessionLocationState } from '@/lib/router-location-state';
 import {
   DndContext,
   closestCenter,
@@ -61,14 +65,6 @@ interface PinnedReflection {
   haiku: string | null;
   grounding_title: string | null;
   grounding_body: string | null;
-}
-
-interface GroundingSuggestion {
-  activity: string;
-  suggestion: string;
-  duration: number;
-  insight: string | null;
-  article: { snippet: string; url: string | null } | null;
 }
 
 const Home = () => {
@@ -156,7 +152,7 @@ const Home = () => {
   });
   const [groundDismissed, setGroundDismissed] = useState(() => groundDismissedRef.current());
   const strictNoFallback = companionFallbacksDisabledClient();
-  const [groundSuggestion, setGroundSuggestion] = useState<GroundingSuggestion | null>(() => {
+  const [groundSuggestion, setGroundSuggestion] = useState<GroundPreGenerated | null>(() => {
     if (companionFallbacksDisabledClient()) return null;
     try {
       const stored = localStorage.getItem(user ? `holzen_ground_suggestion_${user.id}` : 'holzen_ground_suggestion');
@@ -196,7 +192,7 @@ const Home = () => {
     const pinnedId = localStorage.getItem('holzen_pinned_reflection');
     if (!pinnedId) return;
     supabase
-      .from('reflections')
+      .from('v_reflection_with_companions')
       .select('id, message, context, haiku, grounding_title, grounding_body')
       .eq('id', pinnedId)
       .eq('user_id', user.id)
@@ -231,7 +227,12 @@ const Home = () => {
   }, []);
 
   const handleNeedAPause = () => {
-    if (manualCooldownRemaining() > 0) return;
+    const remaining = manualCooldownRemaining();
+    if (remaining > 0) {
+      holzenLog.home('Need a moment: ignored (cooldown)', { remainingMs: remaining });
+      return;
+    }
+    holzenLog.home('Need a moment: invoking manualTrigger');
     manualTrigger();
   };
 
@@ -316,7 +317,7 @@ const Home = () => {
       body: { groundingActivities, context: ctx, severity, language },
     }).then(({ data, error }) => {
       if (error || !data || data.error) return;
-      const suggestion: GroundingSuggestion = {
+      const suggestion: GroundPreGenerated = {
         activity: data.activity,
         suggestion: data.suggestion,
         duration: data.duration || 10,
@@ -392,6 +393,30 @@ const Home = () => {
               </div>
               <Skeleton className="h-4 w-full" />
               <Skeleton className="h-4 w-3/4" />
+            </motion.div>
+          ) : isReflectionPersistError(error) ? (
+            <motion.div
+              key="zen-reflection-save-error"
+              variants={zenVariants}
+              initial="hidden"
+              animate="visible"
+              exit="hidden"
+              className="rounded-md border border-destructive/20 bg-destructive/5 px-4 py-3 space-y-2 max-w-md mx-auto text-left"
+            >
+              <div className="flex items-center gap-2 text-destructive/80">
+                <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+                <p className="text-xs font-mono">{error}</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  holzenLog.home('Try again after reflection save error: manualTrigger');
+                  manualTrigger();
+                }}
+                className="text-xs font-mono text-primary underline"
+              >
+                {t('common.tryAgain')}
+              </button>
             </motion.div>
           ) : !subscriptionReady ? (
             <motion.div key="zen-hydrating" variants={zenVariants} initial="hidden" animate="visible" exit="hidden">
@@ -500,11 +525,12 @@ const Home = () => {
                       {/* Reflection teaser with dismiss X */}
                       <div className="relative">
                         <button
+                          type="button"
                           onClick={handleDismiss}
-                          className="absolute -top-1 -right-1 p-1 rounded-full text-muted-foreground/30 hover:text-muted-foreground/60 hover:bg-muted/50 transition-colors"
+                          className="absolute -top-1 -right-1 inline-flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground/30 hover:text-muted-foreground/60 hover:bg-muted/50 transition-colors"
                           aria-label={t('common.dismiss', 'Dismiss')}
                         >
-                          <X className="h-3.5 w-3.5" />
+                          <X className="h-3.5 w-3.5" aria-hidden />
                         </button>
                         <p className="text-sm leading-relaxed text-foreground/80 pr-5">
                           {message.split(/[.!?]\s/)[0]}{message.split(/[.!?]\s/).length > 1 ? '…' : ''}
@@ -516,16 +542,28 @@ const Home = () => {
                         )}
                       </div>
                       <button
-                        onClick={() => navigate('/pause', {
-                          state: {
+                        onClick={() => {
+                          const navState: PauseSessionLocationState = {
                             reflectionMessage: message,
                             context,
-                            reflectionId: lastReflectionId,
+                            reflectionId: lastReflectionId ?? undefined,
                             companions,
                             companionPrefs,
                             severity,
-                          },
-                        })}
+                          };
+                          holzenLog.home('Navigate to /pause (pause with this message)', {
+                            reflectionId: lastReflectionId,
+                            severity,
+                            messageLen: message?.length ?? 0,
+                            hasContext: !!context,
+                            companionKeys: companions
+                              ? Object.entries(companions)
+                                  .filter(([, v]) => v != null)
+                                  .map(([k]) => k)
+                              : [],
+                          });
+                          navigate('/pause', { state: navState });
+                        }}
                         className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors"
                       >
                         <Sparkles className="h-3 w-3 text-primary/60" />
@@ -546,26 +584,38 @@ const Home = () => {
                           <Skeleton className="h-4 w-3/4" />
                           <Skeleton className="h-4 w-1/2" />
                         </div>
-                      ) : error && !btcData ? (
+                      ) : (error && !btcData) || isReflectionPersistError(error) ? (
                         <div className="rounded-md border border-destructive/20 bg-destructive/5 px-4 py-3 space-y-2">
                           <div className="flex items-center gap-2 text-destructive/80">
-                            <AlertCircle className="h-3.5 w-3.5" />
+                            <AlertCircle className="h-3.5 w-3.5 shrink-0" />
                             <p className="text-xs font-mono">
-                              {error.includes('fetch') || error.includes('network') || error.includes('Failed to fetch')
+                              {isReflectionPersistError(error)
+                                ? error
+                                : error.includes('fetch') || error.includes('network') || error.includes('Failed to fetch')
                                 ? t('home.errors.couldNotReachPrice')
                                 : error.includes('generate') || error.includes('reflect')
                                 ? t('home.errors.aiUnavailable')
                                 : t('home.errors.somethingWentWrong')}
                             </p>
                           </div>
-                          <p className="text-[10px] font-mono text-muted-foreground/60 leading-relaxed">
-                            {error.includes('fetch') || error.includes('network') || error.includes('Failed to fetch')
-                              ? t('home.errors.checkConnection')
-                              : error.includes('generate') || error.includes('reflect')
-                              ? t('home.errors.aiTemporarilyUnavailable')
-                              : t('home.errors.unexpectedError')}
-                          </p>
-                          <button onClick={() => manualTrigger()} className="text-xs font-mono text-primary underline">{t('common.tryAgain')}</button>
+                          {!isReflectionPersistError(error) && (
+                            <p className="text-[10px] font-mono text-muted-foreground/60 leading-relaxed">
+                              {error.includes('fetch') || error.includes('network') || error.includes('Failed to fetch')
+                                ? t('home.errors.checkConnection')
+                                : error.includes('generate') || error.includes('reflect')
+                                ? t('home.errors.aiTemporarilyUnavailable')
+                                : t('home.errors.unexpectedError')}
+                            </p>
+                          )}
+                          <button
+                            onClick={() => {
+                              holzenLog.home('Try again: manualTrigger');
+                              manualTrigger();
+                            }}
+                            className="text-xs font-mono text-primary underline"
+                          >
+                            {t('common.tryAgain')}
+                          </button>
                         </div>
                       ) : (
                         <div className="space-y-6">
@@ -632,11 +682,12 @@ const Home = () => {
                 <>
                   <div className="relative">
                     <button
+                      type="button"
                       onClick={dismissGroundSuggestion}
-                      className="absolute -top-1 -right-1 p-1 rounded-full text-muted-foreground/30 hover:text-muted-foreground/60 hover:bg-muted/50 transition-colors"
+                      className="absolute -top-1 -right-1 inline-flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground/30 hover:text-muted-foreground/60 hover:bg-muted/50 transition-colors"
                       aria-label={t('common.dismiss', 'Dismiss')}
                     >
-                      <X className="h-3.5 w-3.5" />
+                      <X className="h-3.5 w-3.5" aria-hidden />
                     </button>
                     <p className="text-sm leading-relaxed text-foreground/80 pr-5">
                       {groundSuggestion.suggestion}
@@ -857,168 +908,5 @@ const Home = () => {
     </div>
   );
 };
-
-function NeedAMomentButton({
-  onTrigger,
-  cooldownRemaining,
-  loading,
-}: {
-  onTrigger: () => void;
-  cooldownRemaining: () => number;
-  loading: boolean;
-}) {
-  const [remaining, setRemaining] = useState(cooldownRemaining());
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setRemaining(cooldownRemaining());
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [cooldownRemaining]);
-
-  const inCooldown = remaining > 0;
-  const minutes = Math.ceil(remaining / 60000);
-
-  return (
-    <div className="space-y-3">
-      <NeedAMomentButtonInner onTrigger={onTrigger} inCooldown={inCooldown} loading={loading} minutes={minutes} />
-    </div>
-  );
-}
-
-function NeedAMomentButtonInner({ onTrigger, inCooldown, loading, minutes }: { onTrigger: () => void; inCooldown: boolean; loading: boolean; minutes: number }) {
-  const { t } = useTranslation();
-  return (
-    <>
-      <LoadingButton
-        onClick={onTrigger}
-        loading={loading}
-        loadingText={t('home.generatingReflection')}
-        disabled={inCooldown}
-        variant="outline"
-        className="w-full font-mono text-xs gap-2"
-      >
-        <Pause className="h-3.5 w-3.5" />
-        {inCooldown
-          ? t('home.manualReflectionIn', { minutes })
-          : t('home.needAMoment')}
-      </LoadingButton>
-      <p className="text-[10px] text-muted-foreground text-center leading-relaxed">
-        {inCooldown
-          ? t('home.cooldownMessage')
-          : t('home.requestAnytime')}
-      </p>
-    </>
-  );
-}
-
-/** Format ms as m:ss for short countdowns (e.g. next cron tick). */
-function formatMsAsMS(ms: number): string {
-  const totalSec = Math.max(0, Math.floor(ms / 1000));
-  const m = Math.floor(totalSec / 60);
-  const s = totalSec % 60;
-  return `${m}:${s.toString().padStart(2, '0')}`;
-}
-
-function AutoCooldownIndicator({
-  cooldownRemaining,
-  cooldownHours,
-  nextCronCheckIn,
-}: {
-  cooldownRemaining: () => number;
-  cooldownHours: number;
-  nextCronCheckIn: () => number;
-}) {
-  const { t } = useTranslation();
-  const [remaining, setRemaining] = useState(cooldownRemaining());
-  const [cronIn, setCronIn] = useState(nextCronCheckIn());
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setRemaining(cooldownRemaining());
-      setCronIn(nextCronCheckIn());
-    }, 1000);
-    return () => clearInterval(interval);
-  }, [cooldownRemaining, nextCronCheckIn]);
-
-  // No post-trigger cooldown active: only the server scan countdown (spacing is not “time left” until after a trigger).
-  if (remaining <= 0) {
-    return (
-      <div
-        className="flex items-center gap-3 py-2"
-        title={t('home.nextScanIdleTitle')}
-      >
-        <Timer className="h-3.5 w-3.5 text-primary/60 shrink-0" />
-        <p className="flex-1 min-w-0 text-[10px] font-mono text-primary/70 tabular-nums tracking-tight">
-          {t('home.nextScanLine', {
-            scan: formatMsAsMS(cronIn),
-            defaultValue: 'Next scan · {{scan}}',
-          })}
-        </p>
-        <span className="h-1.5 w-1.5 rounded-full bg-primary/50 animate-pulse shrink-0" />
-      </div>
-    );
-  }
-
-  const totalMs = cooldownHours * 60 * 60 * 1000;
-  const progress = ((totalMs - remaining) / totalMs) * 100;
-  const remH = Math.floor(remaining / 3600000);
-  const remM = Math.floor((remaining % 3600000) / 60000);
-
-  const timeLabel = remH > 0
-    ? `${remH}h ${remM}min`
-    : `${remM}min`;
-
-  return (
-    <div className="flex items-start gap-3 py-2">
-      <Timer className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-0.5" />
-      <div className="flex-1 min-w-0 space-y-1.5">
-        <div className="flex items-center justify-between gap-2">
-          <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider leading-snug">
-            {t('home.cooldownHeadline', {
-              hours: cooldownHours,
-              time: timeLabel,
-              defaultValue: '{{hours}}h cooldown · {{time}} left',
-            })}
-          </p>
-          <p className="text-[10px] font-mono text-muted-foreground shrink-0">
-            {Math.round(progress)}%
-          </p>
-        </div>
-        <div className="h-0.5 w-full bg-muted rounded-full overflow-hidden">
-          <div
-            className="h-full bg-muted-foreground/40 rounded-full transition-all duration-1000"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-        <p className="text-[9px] font-mono text-muted-foreground/70 tabular-nums tracking-tight">
-          {t('home.nextScanLine', {
-            scan: formatMsAsMS(cronIn),
-            defaultValue: 'Next scan · {{scan}}',
-          })}
-        </p>
-      </div>
-    </div>
-  );
-}
-
-function ProLockedWidget({ onUpgrade, checkoutLoading, feature }: { onUpgrade: () => void; checkoutLoading: boolean; feature?: string }) {
-  const { t } = useTranslation();
-  const descKey = feature ? `pro.desc_${feature}` : '';
-  const description = feature && t(descKey) !== descKey ? t(descKey) : t('pro.upgradeDesc');
-  return (
-    <div className="flex flex-col items-center gap-2 py-4">
-      <Lock className="h-4 w-4 text-muted-foreground/30" />
-      <p className="text-[10px] font-mono text-muted-foreground/50 text-center max-w-[200px]">{description}</p>
-      <button
-        onClick={onUpgrade}
-        disabled={checkoutLoading}
-        className="text-[10px] font-mono text-primary/60 hover:text-primary transition-colors underline"
-      >
-        {t('pro.upgradeCta')}
-      </button>
-    </div>
-  );
-}
 
 export default Home;

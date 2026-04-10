@@ -8,18 +8,25 @@
  * API keys are read from Deno.env directly (same as the original function).
  */
 
-import { qualityGate, containsSlop, isUrlReachable, contentFingerprint } from "../quality.ts";
+import {
+  qualityGate,
+  containsSlop,
+  isUrlReachable,
+  contentFingerprint,
+  logQualityGateStructuredReject,
+} from "../quality.ts";
 import {
   companionFallbacksDisabled,
   COMPANION_FALLBACKS_DISABLED_MESSAGE,
   loadFallbackPool,
   pickRandom,
 } from "../fallbacks.ts";
-import { parseMarketDirection, serveFromCache } from "../cache.ts";
-import { createAttemptLogger } from "../observe.ts";
+import { type CacheServeRelaxation, parseMarketDirection, serveFromCache } from "../cache.ts";
+import { createAttemptLogger, trackEvent } from "../observe.ts";
 import { enqueueCatalogSourceSuggestion } from "../source-suggestions.ts";
 import { callPerplexityChat, mergePerplexityUsage } from "../perplexity-client.ts";
 import { searchLibrary, paperToGrounding, recordLibraryServe } from "../content-library.ts";
+import { getPhaseConfig } from "../phase-config.ts";
 
 /** Bump when the search query, structuring prompt, or quality rules change. */
 export const PROMPT_VERSION = "v3";
@@ -30,6 +37,8 @@ export interface GroundingResult {
   data: { title: string; body: string; citation: string; url: string } | null;
   source: "live" | "cache" | "curated" | "empty";
   cacheId: string | null;
+  /** Set when `serveFromCache` served this row (not library / curated). */
+  cacheRelaxation?: CacheServeRelaxation;
   error?: string;
 }
 
@@ -47,6 +56,8 @@ export interface GenerateGroundingParams {
   userId?: string;
   reflectionId?: string | null;
   preferredBias?: string;
+  /** Skip library/cache phases and go straight to live (used by regenerate). */
+  forceLive?: boolean;
   log: (msg: string, extra?: Record<string, unknown>) => void;
 }
 
@@ -95,15 +106,11 @@ function findMatchingBiasTopic(preferredBias: string | undefined): (typeof BIAS_
   return null;
 }
 
-async function serveFallback(
+/** Try content_library (papers) for grounding. */
+async function tryLibrary(
   svcClient: any,
   userId?: string,
-  marketDirection?: "up" | "down" | "neutral",
-  excludeIds?: string[],
-): Promise<GroundingResult> {
-  if (companionFallbacksDisabled()) {
-    return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
-  }
+): Promise<GroundingResult | null> {
   const libraryRows = await searchLibrary(svcClient, {
     type: "paper",
     companionType: "ground_nudge",
@@ -116,10 +123,54 @@ async function serveFallback(
     recordLibraryServe(svcClient, userId, pick.id, "ground_nudge");
     return { data: result, source: "cache", cacheId: null };
   }
+  return null;
+}
+
+/** Try companion_cache for grounding. */
+async function tryCache(
+  svcClient: any,
+  userId?: string,
+  marketDirection?: "up" | "down" | "neutral",
+  excludeIds?: string[],
+): Promise<GroundingResult | null> {
   const cached = await serveFromCache(svcClient, "ground_nudge", "en", { userId, marketDirection, excludeIds });
-  if (cached) return { data: cached.data, source: "cache", cacheId: cached.cacheId };
+  if (cached) {
+    return {
+      data: cached.data,
+      source: "cache",
+      cacheId: cached.cacheId,
+      cacheRelaxation: cached.relaxation,
+    };
+  }
+  return null;
+}
+
+/** Last-resort curated fallback pool. */
+async function serveCurated(svcClient: any): Promise<GroundingResult> {
   const pool = await loadFallbackPool<{ title: string; body: string; citation: string; url: string }>(svcClient, "grounding");
   return { data: pickRandom(pool), source: "curated", cacheId: null };
+}
+
+/** Resolve from non-live phases in order (library → cache → curated). */
+async function serveFallback(
+  svcClient: any,
+  userId?: string,
+  marketDirection?: "up" | "down" | "neutral",
+  excludeIds?: string[],
+): Promise<GroundingResult> {
+  if (companionFallbacksDisabled()) {
+    return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
+  }
+  const phases = getPhaseConfig();
+  if (phases.library) {
+    const lib = await tryLibrary(svcClient, userId);
+    if (lib) return lib;
+  }
+  if (phases.cache) {
+    const cached = await tryCache(svcClient, userId, marketDirection, excludeIds);
+    if (cached) return cached;
+  }
+  return serveCurated(svcClient);
 }
 
 // ── Public entry point ──
@@ -135,9 +186,40 @@ export async function generateGrounding(params: GenerateGroundingParams): Promis
     userId,
     reflectionId,
     preferredBias,
+    forceLive,
     log,
   } = params;
   const marketDirectionForCache = parseMarketDirection(context);
+  const phases = getPhaseConfig();
+
+  if (!forceLive) {
+  // ── Phase 1: Library ──
+  if (phases.library) {
+    const lib = await tryLibrary(svcClient, userId);
+    if (lib) {
+      log("grounding resolved from library (phase 1)");
+      return lib;
+    }
+  }
+
+  // ── Phase 2: Cache ──
+  if (phases.cache) {
+    const cached = await tryCache(svcClient, userId, marketDirectionForCache);
+    if (cached) {
+      log("grounding resolved from cache (phase 2)");
+      return cached;
+    }
+  }
+  } // end !forceLive
+
+  // ── Phase 3: Live generation ──
+  if (!phases.live && !forceLive) {
+    log("live phase disabled, serving curated");
+    if (companionFallbacksDisabled()) {
+      return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
+    }
+    return serveCurated(svcClient);
+  }
 
   const logAttempt = createAttemptLogger(svcClient, { userId });
 
@@ -339,6 +421,7 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
 
   const models = ["google/gemini-2.5-flash", "google/gemini-2.5-flash-lite"];
   let nudge: any = null;
+  let lastLovableModel: string | undefined;
 
   const AI_TIMEOUTS = [8000, 6000];
   for (let idx = 0; idx < models.length; idx++) {
@@ -382,6 +465,7 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
         }
       }
       logAttempt({ companion_type: "ground_nudge", provider: "lovable", model, status: "success", latency_ms: Date.now() - attemptT0, input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
+      lastLovableModel = model;
       break;
     } catch (e) {
       clearTimeout(aiTimeout);
@@ -394,7 +478,21 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
   // ── Step 3: Quality gate ──
   const qg = qualityGate("ground_nudge", nudge);
   if (!nudge || !qg.pass) {
-    log(`quality gate failed: ${!nudge ? "no nudge" : `body=${(nudge.body || "").length}chars, slop=${containsSlop(nudge?.body || "") || containsSlop(nudge?.title || "")}, reason=${qg.reason ?? "unknown"}`}`);
+    const reason = !nudge ? "no_structured_output" : (qg.reason ?? "unknown");
+    log(
+      `quality gate failed: ${!nudge ? "no nudge" : `body=${(nudge.body || "").length}chars, slop=${containsSlop(nudge?.body || "") || containsSlop(nudge?.title || "")}, reason=${reason}`}`,
+    );
+    logQualityGateStructuredReject("ground_nudge", reason);
+    if (nudge && lastLovableModel) {
+      logAttempt({
+        companion_type: "ground_nudge",
+        provider: "lovable",
+        model: lastLovableModel,
+        status: "quality_gate_failed",
+        latency_ms: 0,
+        quality_gate_reason: qg.reason ?? "unknown",
+      });
+    }
     return serveFallback(svcClient, userId, marketDirectionForCache);
   }
 
@@ -474,5 +572,6 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
     }).catch(() => {});
   }
 
+  if (userId) trackEvent(svcClient, userId, "ground_nudge_ai_call");
   return { data: nudge, source: "live", cacheId: null };
 }

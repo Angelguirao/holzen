@@ -80,15 +80,17 @@ export function HomeWidget({
         {/* Collapse toggle */}
         {!alwaysOpen && (
           <button
+            type="button"
             onClick={onToggleCollapse}
-            className="p-0.5 text-muted-foreground/30 hover:text-muted-foreground/60 transition-colors"
+            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-muted-foreground/30 hover:text-muted-foreground/60 hover:bg-muted/40 transition-colors"
+            aria-expanded={!collapsed}
             aria-label={collapsed ? `Expand ${title}` : `Collapse ${title}`}
           >
             <motion.div
               animate={{ rotate: collapsed ? -90 : 0 }}
               transition={{ duration: 0.2 }}
             >
-              <ChevronDown className="h-3 w-3" />
+              <ChevronDown className="h-4 w-4" aria-hidden />
             </motion.div>
           </button>
         )}

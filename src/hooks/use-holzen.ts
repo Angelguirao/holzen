@@ -1,25 +1,16 @@
 import { useState, useEffect, useCallback } from 'react';
 import { fetchBtcData, type BtcPriceData } from '@/lib/btc';
-import { isCumulativeMoveTriggered } from '@/lib/volatility-thresholds';
-import { enrichPauseContextWithMarketData } from '@holzen-pause-context';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useProfile } from '@/hooks/use-profile';
 import type { CompanionData } from '@/components/CompanionSection';
-
-const MANUAL_COOLDOWN_MS = 15 * 60 * 1000; // 15 minutes for on-demand
-const DEV_COOLDOWN_MS = 5 * 1000; // 5 seconds in dev mode
-
-/** Check if dev mode is active (localStorage synced from DB via Admin page) */
-function isDevMode(): boolean {
-  try {
-    return localStorage.getItem('holzen_dev_mode') === 'true';
-  } catch { return false; }
-}
-
-function getEffectiveCooldownMs(): number {
-  return isDevMode() ? DEV_COOLDOWN_MS : MANUAL_COOLDOWN_MS;
-}
+import { holzenLog } from '@/lib/holzen-console';
+import { COMPANION_TYPES } from '@/lib/companion-types';
+import { reflectionPersistErrorMessage } from '@/lib/reflection-persist-error';
+import { getManualReflectionCooldownMs, isHolzenDevMode } from '@/lib/holzen-manual-cooldown';
+import { buildPauseContextFromBtc } from '@/lib/pause-context-from-btc';
+import { severityFromBtcChangePercent } from '@/lib/btc-move-severity';
+import { millisecondsUntilNextQuarterHour } from '@/lib/next-cron-quarter';
 
 export function useHolzen() {
   const { user } = useAuth();
@@ -61,7 +52,7 @@ export function useHolzen() {
 
     if (lastMessage && user) {
       supabase
-        .from('reflections')
+        .from('v_reflection_with_companions')
         .select('id, haiku, grounding_title, grounding_body')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
@@ -85,56 +76,73 @@ export function useHolzen() {
   // Server-side triggers (check-volatility) also pre-generate via the orchestrator.
   // This eliminates the previous triple-invocation race condition.
 
+  /**
+   * Generates a reflection and inserts a `reflections` row.
+   *
+   * **Optional `mood`:** If passed, stored on that row at insert time (e.g. silent mode or a future Home mood chip). Home’s “Need a moment” / “Try again” flows omit it: the user sets mood later on the **Feel** step in `/pause`, which updates the row — see `PauseSession.handleMoodSelect`. Automatic pauses set mood server-side (e.g. `check-volatility` + `lastReportedMood`).
+   */
   const generateMessage = useCallback(async (data: BtcPriceData, mood?: string) => {
-    if (!user) return;
-    const dir = data.direction === 'down' ? 'down' : 'up';
-    const pct = Math.abs(data.changePercent).toFixed(1);
-    let ctx = `BTC is ${dir} ${pct}% in the last 24 hours.`;
-    if (isCumulativeMoveTriggered(data.cumulativeChangePercent, cumulativeThreshold)) {
-      const cumDir = data.cumulativeDirection === 'down' ? 'down' : 'up';
-      ctx += ` Over 7 days, it's ${cumDir} ${Math.abs(data.cumulativeChangePercent!).toFixed(1)}%.`;
+    if (!user) {
+      holzenLog.manual( 'generateMessage: skipped (no user)');
+      return;
     }
-    ctx = enrichPauseContextWithMarketData(ctx, data.fearGreed, data.onChain);
+    holzenLog.manual( 'generateMessage: start', {
+      btcChangePct: data.changePercent,
+      cumulativePct: data.cumulativeChangePercent,
+      silentMode,
+      mood: mood ?? '(none)',
+    });
+    const ctx = buildPauseContextFromBtc(data, cumulativeThreshold);
 
     if (silentMode) {
+      holzenLog.manual( 'generateMessage: silent mode — short reflection only (no AI)');
       const silentMsg = 'BTC moved.';
       setMessage(silentMsg);
       setContext(ctx);
       setCompanions({ haiku: null, groundingTitle: null, groundingBody: null });
       setNewReflection(true);
 
-      const { data: insertedReflection } = await supabase.from('reflections').insert({
+      const { data: insertedReflection, error: silentInsertErr } = await supabase.from('reflections').insert({
         user_id: user.id,
         message: silentMsg,
         context: ctx,
         ...(mood ? { mood } : {}),
       }).select('id').single();
 
-      if (insertedReflection) {
-        setLastReflectionId(insertedReflection.id);
-        // Run library bookmark and profile update in parallel — neither depends on the other
-        await Promise.all([
-          supabase.from('library_items').upsert(
-            {
-              user_id: user.id,
-              type: 'bookmark',
-              title: 'Reflection',
-              body: silentMsg,
-              source_type: 'reflection',
-              reflection_id: insertedReflection.id,
-              tags: ['reflection'],
-            },
-            { onConflict: 'user_id,reflection_id,source_type', ignoreDuplicates: true },
-          ),
-          supabase.from('profiles').update({
-            last_message: silentMsg,
-            last_context: ctx,
-            last_trigger_at: new Date().toISOString(),
-          }).eq('user_id', user.id),
-        ]);
+      if (silentInsertErr || !insertedReflection) {
+        holzenLog.manual('generateMessage: silent reflections insert failed', { message: silentInsertErr?.message ?? 'no row' });
+        setMessage(null);
+        setContext(null);
+        setCompanions({ haiku: null, groundingTitle: null, groundingBody: null });
+        setNewReflection(false);
+        setError(reflectionPersistErrorMessage(silentInsertErr));
+        return;
       }
 
+      setLastReflectionId(insertedReflection.id);
+      // Run library bookmark and profile update in parallel — neither depends on the other
+      await Promise.all([
+        supabase.from('library_items').upsert(
+          {
+            user_id: user.id,
+            type: 'bookmark',
+            title: 'Reflection',
+            body: silentMsg,
+            source_type: 'reflection',
+            reflection_id: insertedReflection.id,
+            tags: ['reflection'],
+          },
+          { onConflict: 'user_id,reflection_id,source_type', ignoreDuplicates: true },
+        ),
+        supabase.from('profiles').update({
+          last_message: silentMsg,
+          last_context: ctx,
+          last_trigger_at: new Date().toISOString(),
+        }).eq('user_id', user.id),
+      ]);
+
       setLastTriggerAt(new Date().toISOString());
+      holzenLog.manual( 'generateMessage: silent mode done', { reflectionId: insertedReflection?.id });
       return;
     }
 
@@ -164,6 +172,11 @@ export function useHolzen() {
         .slice(0, 5);
     } catch { /* non-critical */ }
 
+    holzenLog.manual( 'generateMessage: calling edge function holzen-reflect', {
+      contextPreview: ctx.slice(0, 120),
+      moodHistoryCount: moodHistory.length,
+    });
+
     try {
       const { data: fnData, error: fnError } = await supabase.functions.invoke('holzen-reflect', {
         body: {
@@ -186,6 +199,11 @@ export function useHolzen() {
       if (fnError) throw fnError;
 
       const msg = fnData?.message;
+      holzenLog.manual( 'generateMessage: holzen-reflect returned', {
+        ok: !!msg,
+        messageLen: typeof msg === 'string' ? msg.length : 0,
+        hasHaiku: !!fnData?.haiku,
+      });
       if (msg) {
         setMessage(msg);
         setContext(ctx);
@@ -198,55 +216,92 @@ export function useHolzen() {
         };
         setCompanions(companionData);
 
-        const { data: insertedReflection } = await supabase.from('reflections').insert({
+        const { data: insertedReflection, error: insertErr } = await supabase.from('reflections').insert({
           user_id: user.id,
           message: msg,
           context: ctx,
           haiku: companionData.haiku,
-          grounding_title: companionData.groundingTitle,
-          grounding_body: companionData.groundingBody,
           ...(mood ? { mood } : {}),
         }).select('id').single();
 
-        if (insertedReflection) {
-          setLastReflectionId(insertedReflection.id);
-          const libraryInserts: any[] = [
-            {
-              user_id: user.id,
-              type: 'bookmark',
-              title: 'Reflection',
-              body: msg,
-              source_type: 'reflection',
-              reflection_id: insertedReflection.id,
-              tags: ['reflection'],
-            },
-          ];
-          if (companionData.haiku) {
-            libraryInserts.push({
-              user_id: user.id,
-              type: 'bookmark',
-              title: 'Haiku',
-              body: companionData.haiku,
-              source_type: 'haiku',
-              reflection_id: insertedReflection.id,
-              tags: [],
-            });
-          }
-          // Run library bookmarks and profile update in parallel — neither depends on the other
-          const [{ error: libErr }] = await Promise.all([
-            supabase.from('library_items').upsert(libraryInserts, {
-              onConflict: 'user_id,reflection_id,source_type',
-              ignoreDuplicates: true,
-            }),
-            supabase.from('profiles').update({
-              last_message: msg,
-              last_context: ctx,
-            }).eq('user_id', user.id),
-          ]);
-          if (libErr) console.error('[library] reflection+haiku insert failed:', libErr.message);
+        if (insertErr || !insertedReflection) {
+          holzenLog.manual('generateMessage: reflections insert failed', { message: insertErr?.message ?? 'no row' });
+          setMessage(null);
+          setContext(null);
+          setCompanions({ haiku: null, groundingTitle: null, groundingBody: null });
+          setNewReflection(false);
+          setError(reflectionPersistErrorMessage(insertErr));
+          return;
+        }
+
+        setLastReflectionId(insertedReflection.id);
+        const libraryInserts: any[] = [
+          {
+            user_id: user.id,
+            type: 'bookmark',
+            title: 'Reflection',
+            body: msg,
+            source_type: 'reflection',
+            reflection_id: insertedReflection.id,
+            tags: ['reflection'],
+          },
+        ];
+        if (companionData.haiku) {
+          libraryInserts.push({
+            user_id: user.id,
+            type: 'bookmark',
+            title: 'Haiku',
+            body: companionData.haiku,
+            source_type: 'haiku',
+            reflection_id: insertedReflection.id,
+            tags: [],
+          });
+        }
+        // Keep reflection_companions.ground_nudge aligned with reflections.grounding_* (same as writeCompanionData).
+        const hasInitialGrounding = Boolean(companionData.groundingTitle || companionData.groundingBody);
+        const groundingRowPromise = hasInitialGrounding
+          ? supabase.from('reflection_companions').upsert(
+              {
+                reflection_id: insertedReflection.id,
+                companion_type: COMPANION_TYPES.GROUNDING,
+                content: {
+                  title: companionData.groundingTitle ?? '',
+                  body: companionData.groundingBody ?? '',
+                  citation: typeof fnData?.grounding_citation === 'string' ? fnData.grounding_citation : '',
+                  url: typeof fnData?.grounding_url === 'string' ? fnData.grounding_url : '',
+                },
+                read: false,
+              },
+              { onConflict: 'reflection_id,companion_type' },
+            )
+          : Promise.resolve({ error: null });
+
+        // Library + profile + optional ground_nudge row (same shape as writeCompanionData)
+        const [{ error: libErr }, , { error: groundNudgeErr }] = await Promise.all([
+          supabase.from('library_items').upsert(libraryInserts, {
+            onConflict: 'user_id,reflection_id,source_type',
+            ignoreDuplicates: true,
+          }),
+          supabase.from('profiles').update({
+            last_message: msg,
+            last_context: ctx,
+          }).eq('user_id', user.id),
+          groundingRowPromise,
+        ]);
+        if (libErr) console.error('[library] reflection+haiku insert failed:', libErr.message);
+        if (groundNudgeErr) {
+          console.error('[reflection_companions] ground_nudge upsert failed:', groundNudgeErr.message);
+          holzenLog.manual('generateMessage: ground_nudge sync failed', { message: groundNudgeErr.message });
+        }
+        if (!libErr) {
+          holzenLog.manual('generateMessage: DB insert + profile update ok', {
+            reflectionId: insertedReflection.id,
+            syncedGroundNudge: hasInitialGrounding && !groundNudgeErr,
+          });
         }
       }
     } catch (e: any) {
+      holzenLog.manual('generateMessage: error', { message: String(e?.message ?? e) });
       const raw = e?.message || '';
       if (raw.includes('fetch') || raw.includes('network') || raw.includes('Failed to fetch')) {
         setError('Could not reach the reflection service. Check your connection.');
@@ -257,8 +312,21 @@ export function useHolzen() {
       }
     } finally {
       setLoading(false);
+      holzenLog.manual( 'generateMessage: finished (loading cleared)');
     }
-  }, [user, reflectionTone, reflectionStyle, silentMode, cumulativeThreshold, customPrompt]);
+  }, [
+    user,
+    reflectionTone,
+    reflectionStyle,
+    silentMode,
+    cumulativeThreshold,
+    customPrompt,
+    motivations,
+    mantra,
+    groundingActivities,
+    currency,
+    language,
+  ]);
 
   const fetchBtcDisplay = useCallback(async () => {
     try {
@@ -282,10 +350,20 @@ export function useHolzen() {
     setLastManualAt(stored ? Number(stored) : null);
   }, [manualCooldownKey]);
 
+  // Other tabs update the same key — same-window updates use setState in manualTrigger.
+  useEffect(() => {
+    const onStorage = (e: StorageEvent) => {
+      if (e.key !== manualCooldownKey || e.storageArea !== localStorage) return;
+      setLastManualAt(e.newValue ? Number(e.newValue) : null);
+    };
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
+  }, [manualCooldownKey]);
+
   const manualCooldownRemaining = useCallback(() => {
     if (!lastManualAt) return 0;
     const elapsed = Date.now() - lastManualAt;
-    return Math.max(0, getEffectiveCooldownMs() - elapsed);
+    return Math.max(0, getManualReflectionCooldownMs() - elapsed);
   }, [lastManualAt]);
 
   const autoCooldownRemaining = useCallback(() => {
@@ -295,28 +373,36 @@ export function useHolzen() {
     return Math.max(0, cooldownMs - elapsed);
   }, [lastTriggerAt, cooldownHours]);
 
-  /** Milliseconds until the next server cron quarter-hour (:00, :15, :30, :45) */
-  const nextCronCheckIn = useCallback(() => {
-    const now = new Date();
-    const mins = now.getMinutes();
-    const secs = now.getSeconds();
-    const msIntoQuarter = ((mins % 15) * 60 + secs) * 1000 + now.getMilliseconds();
-    const quarterMs = 15 * 60 * 1000;
-    return quarterMs - msIntoQuarter;
-  }, []);
+  const nextCronCheckIn = useCallback(() => millisecondsUntilNextQuarterHour(), []);
 
+  /** “Need a moment” / “Try again” (cooldown-gated). Optional `mood` → see `generateMessage`. */
   const manualTrigger = useCallback(async (mood?: string) => {
     const remaining = manualCooldownRemaining();
-    if (remaining > 0) return;
+    if (remaining > 0) {
+      holzenLog.manual( 'manualTrigger: blocked by cooldown', { remainingMs: remaining, devMode: isHolzenDevMode() });
+      return;
+    }
+
+    holzenLog.manual( 'manualTrigger: start (Need a moment / Try again)', { mood: mood ?? '(none)', hasCachedBtc: !!btcData });
 
     try {
       const data = btcData || await fetchBtcData(currency);
-      if (!btcData) setBtcData(data);
+      if (!btcData) {
+        holzenLog.manual( 'manualTrigger: fetched BTC for context', {
+          changePct: data.changePercent,
+        });
+        setBtcData(data);
+      } else {
+        holzenLog.manual( 'manualTrigger: using cached btcData');
+      }
       await generateMessage(data, mood);
       const now = Date.now();
       setLastManualAt(now);
       localStorage.setItem(manualCooldownKey, String(now));
+      // Next allowed manual trigger: now + getManualReflectionCooldownMs() (15 min prod; 5 s when holzen_dev_mode).
+      holzenLog.manual('manualTrigger: complete — cooldown stored', { lastManualAt: now });
     } catch (e: any) {
+      holzenLog.manual('manualTrigger: error', { message: String(e?.message ?? e) });
       const raw = e?.message || '';
       if (raw.includes('fetch') || raw.includes('Failed to fetch')) {
         setError('Could not connect. Check your internet and try again.');
@@ -354,7 +440,7 @@ export function useHolzen() {
       setContext(data.last_context);
       setNewReflection(true);
       const { data: latest } = await supabase
-        .from('reflections')
+        .from('v_reflection_with_companions')
         .select('id, haiku, grounding_title, grounding_body')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
@@ -371,11 +457,7 @@ export function useHolzen() {
     }
   }, [user, message]);
 
-  const severity: 'mild' | 'moderate' | 'high' = btcData
-    ? Math.abs(btcData.changePercent) >= 10 ? 'high'
-      : Math.abs(btcData.changePercent) >= 5 ? 'moderate'
-      : 'mild'
-    : 'mild';
+  const severity = severityFromBtcChangePercent(btcData?.changePercent);
 
   // Fetch BTC data on load and periodically (display only — no trigger logic)
   useEffect(() => {

@@ -1,38 +1,45 @@
-# Companion orchestration: client vs cron (Pending)
+# Companion orchestration: client vs cron
 
-## Context (from Phase 2 and Phase 3)
+## Context
 
-The manual pause path calls `companion-orchestrate` from the client (`use-companion-data`). Server-side jobs — **`check-volatility`** automatic pause (Phase 3) and related workers — also invoke orchestration for the same `reflectionId` around similar time.
+The manual pause path calls `companion-orchestrate` from the client (`use-companion-data`). **`check-volatility`** also POSTs the same function with service role + `userId` (fire-and-forget). Both can target the same `reflectionId` around the same time → possible duplicate work and races.
 
-Phase 3 review **confirms** the race: `pause_notifications` can exist and the user can open `/pause` while cron’s fire-and-forget orchestrate is still in flight, so the client may issue a **second** `companion-orchestrate` for overlapping work.
+## Shipped (2026-04) — measure + skip-if-served
 
-## Current problem
+### Invoke logging
 
-Two independent drivers can invoke `companion-orchestrate` around similar timing:
+**Structured invoke log** on every `companion-orchestrate` entry (full + regenerate paths):
 
-- **User opens `/pause`** -> client orchestration for reflection `R`.
-- **Cron / edge worker** may already be writing companion rows or invoking orchestration for `R`.
+- Grep Edge logs for **`orchestrate_invoke`** or **`"holzen_event":"orchestrate_invoke"`**.
+- Fields: **`invoke_source`** (caller-supplied **`holzenInvokeSource`**), **`auth_mode`**, **`reflection_prefix`**, **`regenerate_only`**.
 
-## Implications if we leave it as-is
+| `holzenInvokeSource` | Set by |
+|----------------------|--------|
+| `browser_pause_intervention` | `use-companion-data` intervention-only on mount |
+| `browser_lazy_fetch` | `use-companion-data` `fetchCompanion` (single slot on card tap) |
+| `browser_regenerate` | `use-companion-data` `regenerateCompanion` |
+| `cron_check_volatility` | `check-volatility` fetch body |
 
-- **Cost**: duplicate AI work if both paths run when one cached result would suffice.
-- **Races**: last writer wins on companion rows; usually OK if idempotent, but worth validating.
-- **Observability**: hard to tell "who paid for this generation" without logs/metrics.
+### Skip cached (dedup)
 
-## Proposed improvement
+After **`selectIntervention`** and computing which generator slots would run, the orchestrator **loads `reflection_companions`** for the `reflectionId`. If **every** required slot already has valid content (same shape as the client’s `fetchParsedReflectionCompanionCache`), it returns **200** with JSON built from those rows, **`source: "cache"`**, and:
 
-1. **Measure**: overlap frequency and extra cost (logs/metrics: client vs worker-driven orchestrate for the same `reflectionId`).
-2. **Then** consider: stronger cache keys, "skip orchestrate if companion row fresh", or explicit idempotency tokens per reflection + slot.
-3. Document the **intended** single owner when both could run (e.g. cron pre-warms, client only fills gaps).
-4. **Related**: notification timing vs orchestrate completion — `automatic-pause-notification-timing.md` if we change when "pause ready" appears.
+- **Does not** run **`generateQuestion`** or companion generators.
+- **Does not** charge **rate limit** or **daily budget**.
+- **Does not** insert **`intervention_selected`** again.
 
-## Related code pointers
+Grep: **`orchestrate_skip_cached`**.
 
-- `src/hooks/use-companion-data.ts` - `companion-orchestrate` invoke
-- `supabase/functions/companion-orchestrate/index.ts` - server behavior + cache
-- Phase 3 review: `docs/reviews/phase-3-server-cron-triggers.md`
+Typical win: cron finishes orchestration before the user opens `/pause` — the client’s invoke becomes a cheap DB read.
 
-## Acceptance criteria / how to verify
+## Optional follow-up
 
-1. For a reflection created by automatic trigger, opening `/pause` does not always trigger a full duplicate generation (or duplicate is detected and skipped cheaply).
-2. Metrics or logs distinguish client-driven vs worker-driven orchestrate calls (optional but useful).
+- **Idempotency** tokens per reflection + slot.
+- **`automatic-pause-notification-timing.md`** if “pause ready” UX should wait on orchestration.
+
+## Related code
+
+- `supabase/functions/companion-orchestrate/index.ts`
+- `src/hooks/use-companion-data.ts`
+- `supabase/functions/check-volatility/index.ts`
+- `docs/reviews/phase-3-server-cron-triggers.md`

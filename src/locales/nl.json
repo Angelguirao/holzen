@@ -59,6 +59,7 @@
     "generatingReflection": "Reflectie wordt gegenereerd…",
     "needAMoment": "Ik heb even nodig",
     "manualReflectionIn": "Handmatige reflectie over {{minutes}} min",
+    "manualReflectionInSoon": "Volgende pauze over {{time}}",
     "cooldownMessage": "Neem deze tijd om te ademen. De volgende reflectie is er wanneer je het nodig hebt.",
     "requestAnytime": "Vraag een reflectie aan wanneer je wilt — geen drempel vereist.",
     "startRitualBeforeDeciding": "Start ritueel voordat je beslist",

@@ -1,34 +1,31 @@
-# Quality gates: false rejects and localization (Pending)
+# Quality gates: false rejects and localization
 
-## Context (from Phase 5)
+**Shipped (partial, 2026-04).** Observability + specificity tuning; locale-aware prompts remain a separate follow-up.
 
-`supabase/functions/_shared/quality.ts` applies **centralized** checks: banned phrases, crypto wording, per-companion word ranges, **specificity regexes** (e.g. grounding expects patterns like year + researcher), sentence diversity.
+## What we did
 
-## Current problem
+### 1. Measure / visibility
 
-Strict **English-centric** or **format-specific** patterns can **reject valid** output when:
+- **`logQualityGateStructuredReject(companionType, reason)`** in `supabase/functions/_shared/quality.ts` — JSON line with **`holzen_event`:** **`quality_gate_reject`**, **`companion_type`**, **`reason`** (no PII / no body).
+- **Signal, history, grounding:** after a successful Lovable structuring call, if **`qualityGate`** fails, append **`generation_attempts`** row with **`status`** **`quality_gate_failed`** and **`quality_gate_reason`** (plus structured Edge log).
+- **Zoom-out deep-time:** same structured log; **`logAttempt`** already existed — now uses real **`qg.reason`** instead of a fixed **`deep_time_quality`** string when available.
 
-- content is **non-English** or mixed-language,
-- users or models produce **short** or **unusual** but acceptable phrasing,
-- prompts change and outputs no longer match legacy regex expectations.
+### 2. Tune (fewer false rejects)
 
-## Implications if we leave it as-is
+- **`ground_nudge` specificity:** accept **Unicode** “Two-Word Name” via `\p{Lu}\p{L}+` / **`u`** flag; also **“et al.”** and **DOI** (`10.xxxx/...`) in body+citation as anchors.
+- **`historical_insight` specificity:** accept **numeric dates** `DD/MM/YYYY`, `MM-DD-YYYY`, and **`YYYY-MM-DD`** style in addition to English month names and bare years.
 
-- Higher **regeneration** loops and cost.
-- Poor experience for locales or writing styles that rarely match the patterns.
+### 3. Hard vs soft
 
-## Proposed improvement
+- Documented in **`quality.ts`**: any **`pass: false`** is a **hard** reject on the live path (generators fall back to cache/curated). Reasons are stable codes for SQL rollups.
 
-1. **Measure**: log or sample **reject reasons** from quality gate (without PII) to see top false-positive buckets.
-2. **Tune**: relax or locale-gate specific regexes; consider `language` from profile in orchestration.
-3. **Document** which gates are **hard** vs **soft** (retry vs permanent reject).
+## Follow-up
 
-## Related code pointers
+- Pass **`language`** from orchestration into **`qualityGate`** for stricter/looser rules per locale (not done).
+- Optional Vitest for **`logQualityGateStructuredReject`** (console spy) — low value.
+
+## Related
 
 - `supabase/functions/_shared/quality.ts`
-- Companion generators that call `checkQuality` / equivalent
-
-## Acceptance criteria / how to verify
-
-1. False-reject rate drops for supported locales or content types after tuning (A/B or before/after sample).
-2. Product agrees on minimum bar for "specificity" vs inclusivity.
+- `supabase/functions/_shared/generators/{signal,history,grounding,zoom-out}.ts`
+- `docs/ops/logging-strategy.md`

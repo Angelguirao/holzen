@@ -163,9 +163,11 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
     zoomOut, zoomOutLoading, zoomOutError, retryZoomOut,
     historyInsight, historyLoading, historyError, retryHistory,
     cacheIds,
+    cacheRelaxations,
     intervention, interventionLoading, interventionError,
     retryOrchestrate,
     regenerateCompanion,
+    fetchCompanion,
   } = useCompanionData({ companions, prefs, reflectionId, context, reflectionMessage, mood, severityNumber: SEVERITY_NUMBER[severity] ?? 3 });
 
   const labels = {
@@ -249,6 +251,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           expanded={expandedSignal}
           onToggle={() => {
             setExpandedSignal((v) => !v);
+            if (!signal && !signalLoading && !signalError) fetchCompanion('signal');
             if (!completion.signal) markCompleted('signal');
           }}
           completed={completion.signal}
@@ -262,6 +265,11 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             error={signalError}
             onRetry={retrySignal}
           />
+          {signal && cacheRelaxations.signal && (
+            <p className="text-[10px] text-muted-foreground/55 font-mono mt-2 leading-snug px-0.5" role="status">
+              {i18nT(`companions.cacheRelaxation.${cacheRelaxations.signal}`)}
+            </p>
+          )}
           {signal && (
             <CompanionFeedback
               reflectionId={reflectionId}
@@ -283,6 +291,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           expanded={expandedLearning}
           onToggle={() => {
             setExpandedLearning((v) => !v);
+            if (!nudge && !nudgeLoading && !nudgeError) fetchCompanion('grounding');
             if (!completion.grounding) markCompleted('grounding');
           }}
           completed={completion.grounding}
@@ -298,6 +307,11 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             nudgeError={nudgeError}
             onRetry={retryNudge}
           />
+          {nudge && cacheRelaxations.nudge && (
+            <p className="text-[10px] text-muted-foreground/55 font-mono mt-2 leading-snug px-0.5" role="status">
+              {i18nT(`companions.cacheRelaxation.${cacheRelaxations.nudge}`)}
+            </p>
+          )}
           {nudge && (
             <CompanionFeedback
               reflectionId={reflectionId}
@@ -319,6 +333,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           expanded={expandedZoomOut}
           onToggle={() => {
             setExpandedZoomOut((v) => !v);
+            if (!zoomOut && !zoomOutLoading && !zoomOutError) fetchCompanion('zoomOut');
             if (!completion.zoomOut) markCompleted('zoomOut');
           }}
           completed={completion.zoomOut}
@@ -332,6 +347,11 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             error={zoomOutError}
             onRetry={retryZoomOut}
           />
+          {zoomOut && cacheRelaxations.zoomOut && (
+            <p className="text-[10px] text-muted-foreground/55 font-mono mt-2 leading-snug px-0.5" role="status">
+              {i18nT(`companions.cacheRelaxation.${cacheRelaxations.zoomOut}`)}
+            </p>
+          )}
           {zoomOut && (
             <CompanionFeedback
               reflectionId={reflectionId}
@@ -353,6 +373,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           expanded={expandedHistory}
           onToggle={() => {
             setExpandedHistory((v) => !v);
+            if (!historyInsight && !historyLoading && !historyError) fetchCompanion('history');
             if (!completion.history) markCompleted('history');
           }}
           completed={completion.history}
@@ -366,6 +387,11 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
             error={historyError}
             onRetry={retryHistory}
           />
+          {historyInsight && cacheRelaxations.history && (
+            <p className="text-[10px] text-muted-foreground/55 font-mono mt-2 leading-snug px-0.5" role="status">
+              {i18nT(`companions.cacheRelaxation.${cacheRelaxations.history}`)}
+            </p>
+          )}
           {historyInsight && (
             <CompanionFeedback
               reflectionId={reflectionId}

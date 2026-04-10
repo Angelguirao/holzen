@@ -62,6 +62,7 @@ Open [http://localhost:8080](http://localhost:8080). For hosted Supabase you do 
 | `npm run supabase:status` | Print local API URL and anon key |
 | `npm run supabase:stop` | Stop local stack |
 | `npm run supabase:reset` | Reapply `supabase/migrations/` on local DB |
+| `npm run check:edge` | Optional **Deno** typecheck of every `supabase/functions/*/index.ts`; **no-op** if `deno` is not installed |
 
 ## Repository layout
 
@@ -70,7 +71,7 @@ Open [http://localhost:8080](http://localhost:8080). For hosted Supabase you do 
 - **`src/components/`** — Shared UI, including `components/ui` (shadcn-style primitives).
 - **`supabase/migrations/`** — SQL migrations for the hosted database.
 - **`supabase/functions/`** — Edge functions (Deno): checkout, subscriptions, notifications, AI companions, journaling helpers, and related HTTP APIs. They run on Supabase in production; **secrets** (Stripe, Resend, VAPID, etc.) are configured in the Supabase dashboard, not in the frontend `.env`.
-- **`docs/`** — Additional notes; **[C4 architecture](docs/architecture/c4-holzen.md)** (context + container diagrams and optional Structurizr DSL); the Signal companion pipeline is in [docs/systems/pause/companions/signal.md](docs/systems/pause/companions/signal.md) (linked from the [pause system](docs/systems/pause/ai-powered-pause-system.md) doc).
+- **`docs/`** — **[Docs index and onboarding path](docs/README.md)** (C4, fundamentals, systems, reviews); **[C4 architecture](docs/architecture/c4-holzen.md)** (context + container diagrams and optional Structurizr DSL); the Signal companion pipeline is in [docs/systems/pause/companions/signal.md](docs/systems/pause/companions/signal.md) (linked from the [pause system](docs/systems/pause/ai-powered-pause-system.md) doc).
 - **`public/`** — Static assets served as-is.
 
 ## Supabase & backend
@@ -120,6 +121,8 @@ The app registers a custom service worker from `src/sw.ts` for installability an
 ## Linting & tests
 
 ESLint is enabled project-wide. The tree may report many existing issues; treat new changes as the bar for cleanliness. Tests use Vitest with Testing Library where present.
+
+**Edge functions:** After changing `supabase/functions/**/*.ts`, run **`npm run check:edge`** if you have [Deno](https://deno.land/) on your `PATH` — it runs `deno check` on each function’s `index.ts`. If Deno is missing, the script exits successfully and prints a skip message (so CI can call it without installing Deno unless you want stricter checks).
 
 ## Lovable
 

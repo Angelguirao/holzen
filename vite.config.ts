@@ -10,6 +10,29 @@ import { VitePWA } from "vite-plugin-pwa";
 const FALLBACK_SUPABASE_URL = "https://edgbwdecaoottowliimu.supabase.co";
 const FALLBACK_SUPABASE_PUBLISHABLE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVkZ2J3ZGVjYW9vdHRvd2xpaW11Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI3MzgyMzcsImV4cCI6MjA4ODMxNDIzN30.ZNh2feSmMhdZmEk6omdd8q5HDjBHytz-gzktI0txwM8";
 
+/** ≤4 origins: Supabase (effective project URL) + fonts + CoinGecko (see docs/backlog/resource-hints-preconnect.md). */
+function preconnectHeadSnippet(supabaseUrl: string): string {
+  const lines = [
+    "    <!-- Preconnects (vite): docs/backlog/resource-hints-preconnect.md -->",
+  ];
+  try {
+    if (supabaseUrl) {
+      const origin = new URL(supabaseUrl).origin;
+      if (origin.startsWith("http://") || origin.startsWith("https://")) {
+        lines.push(`    <link rel="preconnect" href="${origin}" />`);
+      }
+    }
+  } catch {
+    /* ignore invalid URL */
+  }
+  lines.push(
+    '    <link rel="preconnect" href="https://fonts.googleapis.com" />',
+    '    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />',
+    '    <link rel="preconnect" href="https://api.coingecko.com" />',
+  );
+  return lines.join("\n");
+}
+
 // https://vitejs.dev/config/
 export default defineConfig(({ mode, command }) => {
   const env = loadEnv(mode, process.cwd(), "");
@@ -35,6 +58,16 @@ export default defineConfig(({ mode, command }) => {
       "import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY": JSON.stringify(supabaseKey),
     },
     plugins: [
+      {
+        name: "holzen-inject-preconnect",
+        transformIndexHtml(html: string) {
+          if (!html.includes("</head>")) return html;
+          return html.replace(
+            "</head>",
+            `${preconnectHeadSnippet(supabaseUrl)}\n  </head>`,
+          );
+        },
+      },
       react(),
       (mode === "development" || mode === "hosted" || mode === "localstack") &&
         componentTagger(),
@@ -48,6 +81,7 @@ export default defineConfig(({ mode, command }) => {
         manifest: false,
         injectManifest: {
           globPatterns: ["**/*.{js,css,html,ico,png,svg,woff2}"],
+          maximumFileSizeToCacheInBytes: 3 * 1024 * 1024, // 3 MiB
         },
       }),
     ].filter(Boolean),

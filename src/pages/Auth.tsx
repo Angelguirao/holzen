@@ -108,8 +108,17 @@ const Auth = () => {
           </div>
           <form onSubmit={handleForgotPassword} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-xs font-mono">{t('auth.email')}</Label>
-              <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="font-mono text-sm" />
+              <Label htmlFor="auth-forgot-email" className="text-xs font-mono">{t('auth.email')}</Label>
+              <Input
+                id="auth-forgot-email"
+                name="email"
+                type="email"
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="font-mono text-sm"
+              />
             </div>
             {error && <p className="text-xs text-destructive font-mono">{error}</p>}
             <LoadingButton type="submit" className="w-full font-mono text-xs" loading={loading}>{t('auth.sendResetLink')}</LoadingButton>
@@ -142,19 +151,38 @@ const Auth = () => {
 
         <form onSubmit={handleEmailAuth} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-xs font-mono">{t('auth.email')}</Label>
-            <Input id="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} required className="font-mono text-sm" />
+            <Label htmlFor="auth-email" className="text-xs font-mono">{t('auth.email')}</Label>
+            <Input
+              id="auth-email"
+              name="email"
+              type="email"
+              autoComplete={view === 'sign-up' ? 'email' : 'username'}
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="font-mono text-sm"
+            />
           </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="password" className="text-xs font-mono">{t('auth.password')}</Label>
+              <Label htmlFor="auth-password" className="text-xs font-mono">{t('auth.password')}</Label>
               {view === 'sign-in' && (
                 <button type="button" onClick={() => { setView('forgot-password'); setError(null); }} className="text-xs font-mono text-muted-foreground underline">
                   {t('auth.forgotPassword')}
                 </button>
               )}
             </div>
-            <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} required minLength={6} className="font-mono text-sm" />
+            <Input
+              id="auth-password"
+              name="password"
+              type="password"
+              autoComplete={view === 'sign-up' ? 'new-password' : 'current-password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              minLength={6}
+              className="font-mono text-sm"
+            />
           </div>
           {error && <p className="text-xs text-destructive font-mono">{error}</p>}
           <LoadingButton type="submit" className="w-full font-mono text-xs" loading={loading}>
