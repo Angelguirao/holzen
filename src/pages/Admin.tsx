@@ -41,8 +41,9 @@ function useIsAdmin(): { isAdmin: boolean; loading: boolean } {
       .eq('user_id', user.id)
       .single()
       .then(({ data, error }) => {
-        if (!error && data && typeof (data as any).is_admin === 'boolean') {
-          setIsAdmin((data as any).is_admin);
+        const profile = data as { is_admin?: boolean } | null;
+        if (!error && typeof profile?.is_admin === 'boolean') {
+          setIsAdmin(profile.is_admin);
         } else {
           const adminIds = import.meta.env.VITE_ADMIN_USER_IDS;
           if (!adminIds) {
@@ -412,10 +413,10 @@ export default function Admin() {
           {/* Health Summary */}
           {issues.length > 0 || tips.length > 0 ? (
             <div className={`rounded-xl border px-4 py-2.5 space-y-1 ${
-              issues.length > 0 ? 'border-amber-500/20 bg-amber-500/5 dark:bg-amber-500/10' : 'border-border/20 bg-card/10'
+              issues.length > 0 ? 'border-destructive/20 bg-destructive/5' : 'border-border/20 bg-card/10'
             }`}>
               {[...issues.map(msg => ({ msg, level: 'issue' as const })), ...tips.map(msg => ({ msg, level: 'tip' as const }))].map(({ msg, level }, i) => (
-                <p key={i} className={`text-[10px] font-mono ${level === 'issue' ? 'text-amber-700/70 dark:text-amber-400/70' : 'text-muted-foreground/50'}`}>
+                <p key={i} className={`text-[10px] font-mono ${level === 'issue' ? 'text-destructive/70' : 'text-muted-foreground/50'}`}>
                   {level === 'issue' ? '⚠' : '💡'} {msg}
                 </p>
               ))}
@@ -546,6 +547,7 @@ export default function Admin() {
               {failures.map((row, i) => {
                 const failPct = row.failure_pct ?? 0;
                 const isAlert = failPct > 20;
+                const rateLimited = Number((row as { rate_limited?: number }).rate_limited ?? 0);
                 return (
                   <div key={i} className={`rounded-lg border px-3 py-2 ${isAlert ? 'border-destructive/20 bg-destructive/5' : 'border-border/10 bg-card/5'}`}>
                     <div className="flex items-center justify-between gap-2">
@@ -564,7 +566,7 @@ export default function Admin() {
                       <span className="text-[9px] text-muted-foreground/50">✗ {row.errors ?? 0} err</span>
                       <span className="text-[9px] text-muted-foreground/50">⏱ {row.timeouts ?? 0} timeout</span>
                       <span className="text-[9px] text-muted-foreground/50">⚠ {row.quality_gate_failures ?? 0} quality</span>
-                      {(row as any).rate_limited > 0 && <span className="text-[9px] text-amber-600 dark:text-amber-400">🚫 {(row as any).rate_limited} rate limit</span>}
+                      {rateLimited > 0 && <span className="text-[9px] text-destructive/70">🚫 {rateLimited} rate limit</span>}
                     </div>
                     <div className="flex gap-3 mt-0.5">
                       <span className="text-[9px] text-muted-foreground/50 flex items-center gap-0.5">
@@ -646,15 +648,19 @@ export default function Admin() {
                       <div className="flex items-center gap-2">
                         <span className="text-[9px] text-muted-foreground/50"><ThumbsUp className="h-2.5 w-2.5 inline mr-0.5" />{row.total_thumbs_up ?? 0}</span>
                         <span className="text-[9px] text-muted-foreground/50">👎 {row.total_thumbs_down ?? 0}</span>
-                        <span className={`text-[10px] font-mono ${pct >= 70 ? 'text-emerald-600 dark:text-emerald-400' : pct >= 40 ? 'text-amber-600 dark:text-amber-400' : 'text-red-600 dark:text-red-400'}`}>
+                        <span className={`text-[10px] font-mono ${pct >= 70 ? 'text-primary/70' : pct >= 40 ? 'text-muted-foreground/70' : 'text-destructive/70'}`}>
                           {pct.toFixed(0)}%
                         </span>
                       </div>
                     </div>
                     {total > 0 && (
                       <div className="h-1.5 bg-muted/40 rounded-full overflow-hidden">
-                        <div className="h-full rounded-full transition-all duration-500"
-                          style={{ width: `${pct}%`, backgroundColor: pct >= 70 ? '#10b981' : pct >= 40 ? '#f59e0b' : '#ef4444' }} />
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${
+                            pct >= 70 ? 'bg-primary/70' : pct >= 40 ? 'bg-muted-foreground/50' : 'bg-destructive/70'
+                          }`}
+                          style={{ width: `${pct}%` }}
+                        />
                       </div>
                     )}
                   </div>
@@ -714,9 +720,9 @@ export default function Admin() {
                       {theme && <span className="text-[8px] font-mono px-1.5 py-0.5 rounded-full bg-muted/30 text-muted-foreground/60">{theme}</span>}
                       {s.outcome && (
                         <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded-full flex-shrink-0 ${
-                          s.outcome === 'held' ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400'
-                          : s.outcome === 'sold' ? 'bg-red-500/15 text-red-600 dark:text-red-400'
-                          : 'bg-blue-500/15 text-blue-600 dark:text-blue-400'
+                          s.outcome === 'held' ? 'bg-primary/15 text-primary'
+                          : s.outcome === 'sold' ? 'bg-destructive/15 text-destructive'
+                          : 'bg-secondary text-secondary-foreground'
                         }`}>
                           {s.outcome}
                         </span>
@@ -734,7 +740,7 @@ export default function Admin() {
                         { loaded: !!s.haiku, name: 'Haiku' },
                       ].map(c => (
                         <span key={c.name} className={`text-[8px] font-mono px-1.5 py-0.5 rounded ${
-                          c.loaded ? 'bg-emerald-500/15 text-emerald-600 dark:text-emerald-400' : 'bg-muted/30 text-muted-foreground/40'
+                          c.loaded ? 'bg-primary/15 text-primary' : 'bg-muted/30 text-muted-foreground/40'
                         }`}>
                           {c.name}
                         </span>

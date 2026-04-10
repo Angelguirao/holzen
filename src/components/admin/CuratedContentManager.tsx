@@ -58,7 +58,7 @@ export function CuratedContentManager({ entries, onRefresh }: { entries: CacheEn
 
   const promote = useCallback(async (id: string) => {
     setActing(id);
-    const { error } = await supabase.from('companion_cache').update({ quality_score: 3, expires_at: null } as any).eq('id', id);
+    const { error } = await supabase.from('companion_cache').update({ quality_score: 3, expires_at: null }).eq('id', id);
     if (error) { toast({ title: 'Promote failed', description: error.message, variant: 'destructive' }); setActing(null); return; }
     await onRefresh();
     setActing(null);
@@ -67,7 +67,7 @@ export function CuratedContentManager({ entries, onRefresh }: { entries: CacheEn
   const demote = useCallback(async (id: string) => {
     setActing(id);
     const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
-    const { error } = await supabase.from('companion_cache').update({ quality_score: 1, expires_at: expires } as any).eq('id', id);
+    const { error } = await supabase.from('companion_cache').update({ quality_score: 1, expires_at: expires }).eq('id', id);
     if (error) { toast({ title: 'Demote failed', description: error.message, variant: 'destructive' }); setActing(null); return; }
     await onRefresh();
     setActing(null);
@@ -76,7 +76,7 @@ export function CuratedContentManager({ entries, onRefresh }: { entries: CacheEn
   /** Keep row in pool but deprioritize for cache picks (attribution treated as untrusted server-side). */
   const setSourceUntrusted = useCallback(async (id: string, untrusted: boolean) => {
     setActing(id);
-    const { error } = await supabase.from('companion_cache').update({ source_untrusted: untrusted } as any).eq('id', id);
+    const { error } = await supabase.from('companion_cache').update({ source_untrusted: untrusted }).eq('id', id);
     if (error) { toast({ title: 'Update failed', description: error.message, variant: 'destructive' }); setActing(null); return; }
     await onRefresh();
     setActing(null);
@@ -142,23 +142,23 @@ export function CuratedContentManager({ entries, onRefresh }: { entries: CacheEn
         <p className="text-[10px] font-mono text-foreground/70">Lifecycle actions:</p>
         <div className="space-y-1">
           <p className="text-[9px] text-muted-foreground/60">
-            <span className="text-emerald-600 dark:text-emerald-400 font-mono">↑ Promote</span> — quality 3, no expiry. Preferred within this pool.
+            <span className="text-primary font-mono">↑ Promote</span> — quality 3, no expiry. Preferred within this pool.
           </p>
           <p className="text-[9px] text-muted-foreground/60">
-            <span className="text-orange-600 dark:text-orange-400 font-mono">↓ Demote</span> — quality 1 and 7-day expiry.
+            <span className="text-destructive font-mono">↓ Demote</span> — quality 1 and 7-day expiry.
           </p>
           <p className="text-[9px] text-muted-foreground/60">
             <span className="text-destructive font-mono">🗑 Delete</span> — remove this pool row (does not delete reflections or Library entries).
           </p>
         </div>
         <p className="text-[9px] text-muted-foreground/50">
-          Badge <span className="text-emerald-600 dark:text-emerald-400">curated</span> here = score ≥3 in this table. That is unrelated to the Monitor “curated” serve counter (hardcoded fallbacks).
+          Badge <span className="text-primary">curated</span> here = score ≥3 in this table. That is unrelated to the Monitor “curated” serve counter (hardcoded fallbacks).
         </p>
         <p className="text-[9px] text-muted-foreground/50">
-          Also: <span className="text-blue-600 dark:text-blue-400">good</span> = score 2, <span className="text-orange-600 dark:text-orange-400">low</span> = score 1.
+          Also: <span className="text-secondary-foreground">good</span> = score 2, <span className="text-destructive">low</span> = score 1.
         </p>
         <p className="text-[9px] text-muted-foreground/55 leading-relaxed">
-          <span className="font-mono text-amber-600/90 dark:text-amber-400/90">Untrusted attribution</span> — keeps the cached body in the pool but makes the edge prefer other rows first when filling from cache (no delete).
+          <span className="font-mono text-secondary-foreground/90">Untrusted attribution</span> — keeps the cached body in the pool but makes the edge prefer other rows first when filling from cache (no delete).
         </p>
       </div>
 
@@ -215,7 +215,7 @@ export function CuratedContentManager({ entries, onRefresh }: { entries: CacheEn
                         <div className="flex flex-wrap items-center gap-2 mt-0.5">
                           <QualityBadge score={entry.quality_score} />
                           {entry.source_untrusted && (
-                            <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-amber-500/15 text-amber-700/90 dark:text-amber-400/90">
+                            <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-secondary text-secondary-foreground/90">
                               untrusted attr.
                             </span>
                           )}
@@ -241,13 +241,13 @@ export function CuratedContentManager({ entries, onRefresh }: { entries: CacheEn
                     <div className="flex items-center gap-1.5 pt-0.5">
                       {!isCurated && (
                         <button onClick={() => promote(entry.id)} disabled={isActing}
-                          className="flex items-center gap-0.5 text-[9px] font-mono text-emerald-600/70 dark:text-emerald-400/70 hover:text-emerald-600 dark:hover:text-emerald-400 disabled:opacity-30 transition-colors">
+                          className="flex items-center gap-0.5 text-[9px] font-mono text-primary/70 hover:text-primary disabled:opacity-30 transition-colors">
                           <ArrowUp className="h-2.5 w-2.5" /> Promote
                         </button>
                       )}
                       {(isCurated || entry.quality_score >= 2) && (
                         <button onClick={() => demote(entry.id)} disabled={isActing}
-                          className="flex items-center gap-0.5 text-[9px] font-mono text-orange-600/70 dark:text-orange-400/70 hover:text-orange-600 dark:hover:text-orange-400 disabled:opacity-30 transition-colors">
+                          className="flex items-center gap-0.5 text-[9px] font-mono text-destructive/70 hover:text-destructive disabled:opacity-30 transition-colors">
                           <ArrowDown className="h-2.5 w-2.5" /> Demote
                         </button>
                       )}
@@ -255,7 +255,7 @@ export function CuratedContentManager({ entries, onRefresh }: { entries: CacheEn
                         type="button"
                         onClick={() => setSourceUntrusted(entry.id, !entry.source_untrusted)}
                         disabled={isActing}
-                        className="flex items-center gap-0.5 text-[9px] font-mono text-amber-600/70 dark:text-amber-400/70 hover:text-amber-600 dark:hover:text-amber-400 disabled:opacity-30 transition-colors"
+                        className="flex items-center gap-0.5 text-[9px] font-mono text-secondary-foreground/70 hover:text-secondary-foreground disabled:opacity-30 transition-colors"
                       >
                         {entry.source_untrusted ? 'Trust attribution' : 'Untrusted attribution'}
                       </button>

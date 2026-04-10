@@ -14,12 +14,12 @@ export const TYPE_LABELS: Record<string, string> = {
 };
 
 export const TYPE_COLORS: Record<string, string> = {
-  signal: '#8b5cf6',
-  ground_nudge: '#06b6d4',
-  historical_insight: '#f59e0b',
-  zoom_out: '#10b981',
-  zoom_out_deep_time: '#059669',
-  reflection: '#6366f1',
+  signal: 'hsl(var(--primary) / 0.8)',
+  ground_nudge: 'hsl(var(--secondary-foreground) / 0.8)',
+  historical_insight: 'hsl(var(--muted-foreground) / 0.8)',
+  zoom_out: 'hsl(var(--accent-foreground) / 0.7)',
+  zoom_out_deep_time: 'hsl(var(--foreground) / 0.75)',
+  reflection: 'hsl(var(--ring) / 0.8)',
 };
 
 export function label(type: string | null): string {
@@ -38,11 +38,11 @@ export function serveSourceBadgeClass(source: string | null | undefined): string
   if (!source) return 'bg-muted/25 text-muted-foreground/40';
   switch (source) {
     case 'live':
-      return 'bg-amber-500/12 text-amber-800/80 dark:text-amber-400/90';
+      return 'bg-primary/10 text-primary/80';
     case 'cache':
-      return 'bg-sky-500/12 text-sky-800/80 dark:text-sky-400/90';
+      return 'bg-secondary text-secondary-foreground/80';
     case 'curated':
-      return 'bg-violet-500/12 text-violet-800/80 dark:text-violet-400/90';
+      return 'bg-accent text-accent-foreground/80';
     case 'empty':
       return 'bg-destructive/10 text-destructive/75';
     default:

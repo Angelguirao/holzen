@@ -5,8 +5,8 @@ type StatusTone = "default" | "success" | "warning" | "error";
 
 const toneClasses: Record<StatusTone, string> = {
   default: "border-border bg-card text-card-foreground",
-  success: "border-green-500/30 bg-green-500/10 text-foreground",
-  warning: "border-yellow-500/30 bg-yellow-500/10 text-foreground",
+  success: "border-primary/30 bg-primary/10 text-foreground",
+  warning: "border-secondary bg-secondary/40 text-foreground",
   error: "border-destructive/40 bg-destructive/10 text-foreground",
 };
 

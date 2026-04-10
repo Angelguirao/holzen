@@ -23,7 +23,8 @@ export function DevModeToggle() {
           .order('created_at', { ascending: false })
           .limit(1);
         if (data && data.length > 0) {
-          const dbValue = (data[0].metadata as any)?.enabled === true;
+          const metadata = data[0].metadata as { enabled?: boolean } | null;
+          const dbValue = metadata?.enabled === true;
           setDevMode(dbValue);
           try {
             if (dbValue) localStorage.setItem('holzen_dev_mode', 'true');
@@ -62,25 +63,25 @@ export function DevModeToggle() {
         onClick={toggle}
         className={`w-full rounded-xl border px-4 py-3 flex items-center gap-3 transition-all ${
           devMode
-            ? 'border-amber-500/30 bg-amber-500/5 dark:bg-amber-500/10'
+            ? 'border-secondary/60 bg-secondary/30'
             : 'border-border/15 bg-card/10 hover:bg-card/20'
         }`}
       >
-        <Zap className={`h-3.5 w-3.5 ${devMode ? 'text-amber-500 dark:text-amber-400' : 'text-muted-foreground/30'}`} />
+        <Zap className={`h-3.5 w-3.5 ${devMode ? 'text-secondary-foreground' : 'text-muted-foreground/30'}`} />
         <div className="flex-1 text-left">
-          <p className={`text-[10px] font-mono ${devMode ? 'text-amber-700 dark:text-amber-300' : 'text-foreground/60'}`}>
+          <p className={`text-[10px] font-mono ${devMode ? 'text-secondary-foreground' : 'text-foreground/60'}`}>
             Rapid Testing Mode {syncing && '…'}
           </p>
           <p className="text-[9px] text-muted-foreground/40">
             {devMode ? '5s cooldown between pauses (active)' : '15min cooldown between pauses (normal)'}
           </p>
         </div>
-        <span className={`text-[9px] font-mono ${devMode ? 'text-amber-600 dark:text-amber-400' : 'text-muted-foreground/30'}`}>
+        <span className={`text-[9px] font-mono ${devMode ? 'text-secondary-foreground/80' : 'text-muted-foreground/30'}`}>
           {devMode ? 'ON' : 'OFF'}
         </span>
       </button>
       {devMode && (
-        <p className="text-[9px] text-amber-700/50 dark:text-amber-400/50 px-1">
+        <p className="text-[9px] text-secondary-foreground/60 px-1">
           ⚡ Generate pause sessions rapidly to gather data. Each session costs ~$0.01-0.05 in API calls. Disable when done testing.
         </p>
       )}
