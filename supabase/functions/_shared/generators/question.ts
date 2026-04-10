@@ -6,6 +6,8 @@
  * external information or teach. No static pool; fully context-aware.
  */
 
+import { createAttemptLogger } from "../observe.ts";
+
 /** Bump when the system prompt or style rules change. */
 export const PROMPT_VERSION = "v1";
 
@@ -17,6 +19,9 @@ export interface GenerateQuestionParams {
   moodHistory?: Array<{ mood: string; outcome?: string | null }>;
   apiKey: string;
   language?: string;
+  svcClient?: any;
+  userId?: string;
+  log?: (msg: string, extra?: Record<string, unknown>) => void;
 }
 
 const LANG_NAMES: Record<string, string> = {
@@ -25,7 +30,8 @@ const LANG_NAMES: Record<string, string> = {
 };
 
 export async function generateQuestion(params: GenerateQuestionParams): Promise<string | null> {
-  const { context, mood, direction, severity, moodHistory, apiKey, language = "en" } = params;
+  const { context, mood, direction, severity, moodHistory, apiKey, language = "en", svcClient, userId, log } = params;
+  const logAttempt = svcClient ? createAttemptLogger(svcClient, { userId: userId ?? undefined }) : null;
 
   const langName = LANG_NAMES[language] || "English";
   const langInstruction = language !== "en"
@@ -69,6 +75,7 @@ Return JSON: { "question": "..." }`;
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 10_000);
+  const t0 = Date.now();
 
   try {
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
@@ -91,7 +98,15 @@ Return JSON: { "question": "..." }`;
     clearTimeout(timeout);
 
     if (!response.ok) {
-      console.error("[QUESTION] AI error:", response.status);
+      log?.(`AI error: HTTP ${response.status}`);
+      logAttempt?.({
+        companion_type: "question",
+        provider: "lovable",
+        model: "google/gemini-3-flash-preview",
+        status: "error",
+        latency_ms: Date.now() - t0,
+        error_message: `HTTP ${response.status}`,
+      });
       return null;
     }
 
@@ -100,28 +115,61 @@ Return JSON: { "question": "..." }`;
     const parsed = typeof raw === "string" ? JSON.parse(raw) : raw;
     const question = typeof parsed?.question === "string" ? parsed.question.trim() : null;
 
-    if (!question || question.length < 10 || question.length > 200) return null;
+    if (!question || question.length < 10 || question.length > 200) {
+      log?.("question rejected: length out of range or empty");
+      logAttempt?.({
+        companion_type: "question",
+        provider: "lovable",
+        model: "google/gemini-3-flash-preview",
+        status: "error",
+        latency_ms: Date.now() - t0,
+        error_message: "invalid_length",
+        input_tokens: data.usage?.prompt_tokens,
+        output_tokens: data.usage?.completion_tokens,
+      });
+      return null;
+    }
 
     // ── Soft quality checks — log violations but don't discard ──
     const forbiddenOpeners = ["are you", "do you", "have you", "did you"];
     const lc = question.toLowerCase();
     if (forbiddenOpeners.some((o) => lc.startsWith(o))) {
-      console.warn(`[QUESTION] quality: starts with forbidden opener — "${question.slice(0, 40)}"`);
+      log?.(`quality: starts with forbidden opener — "${question.slice(0, 40)}"`);
     }
     // A question should end with "?" (not a statement slipping through)
     if (!question.trim().endsWith("?")) {
-      console.warn(`[QUESTION] quality: does not end with "?" — "${question.slice(0, 60)}"`);
+      log?.(`quality: does not end with "?" — "${question.slice(0, 60)}"`);
     }
     // Single sentence check — more than one "?" means multiple questions
     const questionMarks = (question.match(/\?/g) || []).length;
     if (questionMarks > 1) {
-      console.warn(`[QUESTION] quality: contains ${questionMarks} question marks (expected 1)`);
+      log?.(`quality: contains ${questionMarks} question marks (expected 1)`);
     }
+
+    logAttempt?.({
+      companion_type: "question",
+      provider: "lovable",
+      model: "google/gemini-3-flash-preview",
+      status: "success",
+      latency_ms: Date.now() - t0,
+      input_tokens: data.usage?.prompt_tokens,
+      output_tokens: data.usage?.completion_tokens,
+    });
 
     return question;
   } catch (e) {
     clearTimeout(timeout);
-    console.error("[QUESTION] error:", e instanceof Error ? e.message : String(e));
+    const errMsg = e instanceof Error ? e.message : String(e);
+    const status = e instanceof DOMException && e.name === "AbortError" ? "timeout" : "error";
+    log?.(`${status}: ${errMsg}`);
+    logAttempt?.({
+      companion_type: "question",
+      provider: "lovable",
+      model: "google/gemini-3-flash-preview",
+      status,
+      latency_ms: Date.now() - t0,
+      error_message: errMsg,
+    });
     return null;
   }
 }

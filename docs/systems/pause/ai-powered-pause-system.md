@@ -439,7 +439,7 @@ flowchart TB
 | **UI widget** | Same shape as the Ground card: **`LearningInput`** (title, body, citation-style nudge). |
 | **Secondary** | If **`severity === "high"`**, selection may add **`secondary: "zoom_out"`**; zoom payload comes from the **`zoomOut`** task when fulfilled. |
 | **AI** | **Yes** (Grounding generator — Perplexity + structure; see §6). |
-| **Product note** | If **Ground** companion pref is **on**, the user can see **the same grounding payload** both in the **trap** intervention and in the **Ground** card — same generator, two surfaces. |
+| **Duplicate avoidance** | `CompanionSection` **hides the Ground card** when `intervention.primary.type === "trap"` so the same grounding payload is not shown twice (same pattern as Zoom Out secondary dedup — see §7.5). |
 | **Gating** | Trap **copy** comes from the **grounding** task. The orchestrator runs that task whenever **`primary === "trap"`**, even if **`enableGrounding`** is false; catalog URLs are loaded server-side if the client did not send **`groundingSources`**. |
 
 ---
@@ -453,6 +453,7 @@ flowchart TB
 | **Framing** | `PatternFraming` + **`HistoricalInsightDisplay`**. |
 | **Secondary** | High-severity pattern **always** includes zoom-out secondary; moderate default includes zoom-out; mild default does **not**. |
 | **AI** | **Yes** (History generator; Zoom secondary uses Zoom Out generator when enabled). |
+| **Duplicate avoidance** | `CompanionSection` **hides the History (Look Back) card** when `intervention.primary.type === "pattern"` so the same history payload is not shown twice (same pattern as Zoom Out secondary dedup — see §7.5, and trap/grounding dedup — see §7.2). |
 | **Gating** | **Pattern** forces the **history** task; **zoom_out** secondary forces **zoomOut** — both run even when the matching **`enable*`** is false. Headline data still depends on the task succeeding (API errors, budget, etc.). |
 
 ---
@@ -513,7 +514,7 @@ flowchart TB
 | **Orchestrator key** | **`signal`** → **`signal`**. |
 | **Generator** | `_shared/generators/signal.ts`; **`searchAngle`** from session intent. |
 | **Profile pref** | **`companion_signal`**. |
-| **Denormalized columns** | **`signal_*`** on **`reflections`**. |
+| **Denormalized columns** | *(deprecated — orchestrator writes `reflection_companions` only; legacy `signal_*` columns exist on `reflections` but are no longer populated)* |
 | **UI** | **`SignalDisplay`** + feedback **`companionType="signal"`**. |
 | **Intervention** | Signal is **not** wired as a primary intervention type; it is always a **card** when enabled. |
 
@@ -540,7 +541,7 @@ flowchart TB
 | **Orchestrator key** | **`history`** → **`historical_insight`**. |
 | **Generator** | `_shared/generators/history.ts`; **`preferredMood`** from session intent. |
 | **Profile pref** | **`companion_history`**. |
-| **Denormalized columns** | **`history_insight_data`** (+ read flag). |
+| **Denormalized columns** | *(deprecated — orchestrator writes `reflection_companions` only; legacy `history_insight_data` column exists on `reflections` but is no longer populated by the orchestrator; `pause-cron-parity.ts` still reads it for recency hints)* |
 | **UI** | **`HistoricalInsightDisplay`**; Pro favorites key **`history_insight`**; feedback **`companionType="history_insight"`**. |
 
 ---
@@ -558,10 +559,10 @@ flowchart TB
 
 | Internal key | `companion_type` (serves / join) | `reflections` columns (base table) | Shown as |
 |--------------|----------------------------------|-------------------------------------|----------|
-| `signal` | `signal` | *(none — legacy `signal_*` dropped)* | Signal card |
+| `signal` | `signal` | *(deprecated — legacy `signal_*` exist but not populated)* | Signal card |
 | `grounding` | `ground_nudge` | `grounding_*` (denormalized for Home) | Ground card; **also** trap **primary** when trap |
-| `history` | `historical_insight` | *(none — legacy column dropped)* | History card; **also** pattern **primary** when pattern |
-| `zoomOut` | `zoom_out_deep_time` | *(none — legacy column dropped)* | Zoom card **or** intervention **secondary** |
+| `history` | `historical_insight` | *(deprecated — legacy `history_insight_data` exists but not populated by orchestrator)* | History card; **also** pattern **primary** when pattern |
+| `zoomOut` | `zoom_out_deep_time` | *(deprecated — legacy `zoom_out_data` exists but not populated by orchestrator)* | Zoom card **or** intervention **secondary** |
 
 Reads that need Signal/History/Zoom text use **`v_reflection_with_companions`** (or **`reflection_companions`**) — not bare `reflections` columns.
 
@@ -723,6 +724,12 @@ src/pages/Admin.tsx                   # ops UI (Monitor, Content, Sources, …) 
 - [cron-setup.md](../../ops/cron-setup.md) — pg_cron + `net.http_post` snippets  
 - [navigating-the-codebase.md](../../fundamentals/navigating-the-codebase.md) — repo tour and edge function invoke map  
 - [README.md](../README.md) — local dev, env modes  
+- [companions/README.md](companions/README.md) — Companion and intervention deep-dive index  
+- [companions/intervention.md](companions/intervention.md) — Intervention types end-to-end (mirror, trap, pattern, question)  
 - [companions/signal.md](companions/signal.md) — Signal companion end-to-end (search, prompts, sources, fallbacks)  
+- [companions/grounding.md](companions/grounding.md) — Grounding companion end-to-end (bias topics, academic search, trap data source)  
+- [companions/history.md](companions/history.md) — History companion end-to-end (historical eras, cross-asset analogies, pattern data source)  
+- [companions/zoom-out.md](companions/zoom-out.md) — Zoom Out companion end-to-end (prices, echo, deep-time seeds)  
+- [companions/haiku.md](companions/haiku.md) — Haiku companion (reflection-generated, not orchestrated)  
 
 When you change **reflection** prompts or gates, bump **`REFLECTION_PROMPT_VERSION`** in `_shared/reflection-generate.ts` (and ensure `reflection_generated` analytics metadata stays in sync). Other companions keep their own **`PROMPT_VERSION`** in each generator file.

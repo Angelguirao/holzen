@@ -211,6 +211,7 @@ serve(async (req) => {
         direction,
         moodHistory,
         svcClient,
+        log: (msg, extra) => log(`[intervention] ${msg}`, extra),
       });
       log(`intervention selected: mode=${selection.mode} primary=${selection.primary ?? "none"}`);
     }
@@ -316,6 +317,9 @@ serve(async (req) => {
             moodHistory,
             apiKey: LOVABLE_API_KEY,
             language: languageValue,
+            svcClient,
+            userId,
+            log: (msg, extra) => log(`[question] ${msg}`, extra),
           })
         : Promise.resolve<string | null>(null);
 

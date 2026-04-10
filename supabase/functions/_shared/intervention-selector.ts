@@ -37,6 +37,7 @@ export interface SelectInterventionParams {
   direction: "up" | "down" | "neutral";
   moodHistory?: Array<{ mood: string; outcome?: string | null }>;
   svcClient: any;
+  log?: (msg: string, extra?: Record<string, unknown>) => void;
 }
 
 /**
@@ -81,13 +82,13 @@ async function countPastSessions(svcClient: any, userId: string): Promise<number
 export async function selectIntervention(
   params: SelectInterventionParams,
 ): Promise<InterventionSelection> {
-  const { userId, reflectionId, mood, severity, direction, moodHistory, svcClient } = params;
+  const { userId, reflectionId, mood, severity, direction, moodHistory, svcClient, log } = params;
 
   // ── 1. Mirror check (highest priority) ──
   // We fetch Mirror data here so the orchestrator can return it without a second DB call.
-  const mirrorData = await buildMirror(svcClient, userId, reflectionId);
+  const mirrorData = await buildMirror(svcClient, userId, reflectionId, log);
   if (mirrorData) {
-    console.log(`[INTERVENTION] mirror: eligible — past session found`);
+    log?.("mirror: eligible — past session found");
     return {
       mode: "insight",
       primary: "mirror",
@@ -98,9 +99,9 @@ export async function selectIntervention(
   // Mirror not eligible — log which case so we can track eligibility rate
   const sessionCount = await countPastSessions(svcClient, userId);
   if (sessionCount <= 1) {
-    console.log(`[INTERVENTION] mirror: ineligible — new user (${sessionCount} sessions)`);
+    log?.(`mirror: ineligible — new user (${sessionCount} sessions)`);
   } else {
-    console.log(`[INTERVENTION] mirror: ineligible — ${sessionCount} sessions but no qualifying match (need same direction + recorded outcome ≥30 days ago)`);
+    log?.(`mirror: ineligible — ${sessionCount} sessions but no qualifying match (need same direction + recorded outcome ≥30 days ago)`);
   }
 
   // ── 2. Trap — emotionally activated states ──
