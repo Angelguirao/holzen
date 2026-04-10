@@ -85,7 +85,7 @@ When `selectIntervention` picks **trap** as the primary intervention:
 3. The grounding result is copied into `intervention.primary = { type: "trap", data }`.
 4. `TrapFraming` in the UI uses `primary.data.title` as the bias label.
 
-If the user **also** has the Ground companion card enabled, they may see the **same payload** in both the trap headline and the Ground card — same generator, two surfaces.
+**Duplicate avoidance:** `CompanionSection` **hides** the Ground card when `intervention.primary.type === "trap"` so the same grounding content is not shown twice (same pattern as Zoom Out secondary dedup).
 
 ---
 

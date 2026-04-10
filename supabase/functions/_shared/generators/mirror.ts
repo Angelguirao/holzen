@@ -73,6 +73,7 @@ export async function buildMirror(
   svcClient: any,
   userId: string,
   reflectionId: string,
+  log?: (msg: string, extra?: Record<string, unknown>) => void,
 ): Promise<MirrorResult | null> {
   try {
     const { data, error } = await svcClient.rpc("find_similar_reflection", {
@@ -82,7 +83,7 @@ export async function buildMirror(
     });
 
     if (error) {
-      console.error("[MIRROR] find_similar_reflection error:", error.message);
+      log?.("find_similar_reflection error", { error: error.message });
       return null;
     }
 
@@ -99,7 +100,7 @@ export async function buildMirror(
 
     return { timeAgo, pastMood, pastContext, pastOutcome, message };
   } catch (e) {
-    console.error("[MIRROR] unexpected error:", e instanceof Error ? e.message : String(e));
+    log?.("unexpected error", { error: e instanceof Error ? e.message : String(e) });
     return null;
   }
 }
