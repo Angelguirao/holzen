@@ -22,6 +22,7 @@ This folder contains human-readable notes that complement the source code and in
 | Incidents, invariants, “why we hardened X” | [postmortems/](postmortems/) | |
 | What to watch when things break (cron, retries, logs) | [ops/](ops/) | [ops/observability-and-failures.md](ops/observability-and-failures.md) is the checklist index; [ops/logging-strategy.md](ops/logging-strategy.md) defines logging conventions. |
 | Step-by-step HTTP review (Postman / Bruno) | [fundamentals/http-review-playbooks.md](fundamentals/http-review-playbooks.md) | Optional [bruno/](../bruno/) folder for git-friendly collections. |
+| Design system migration (Nox) | [design/nox/](design/nox/) | Figma is canonical for visual values; markdown owns migration rules, mapping, and extension policy. |
 | **Live browser 360°** (MCP: network, console, Lighthouse, performance) | [fundamentals/browser-360-mcp-playbook.md](fundamentals/browser-360-mcp-playbook.md) | Pairs with source reading; optional snapshot reports under [reports/](reports/). |
 | **UI / journeys** (click-through flows in the real app) | [backlog/e2e-browser-automation.md](backlog/e2e-browser-automation.md) | **Not** a substitute for HTTP review: use **Playwright**, **Cypress**, or **Vitest + React Testing Library** for full product flows; Bruno is for **API** review only. |
 
