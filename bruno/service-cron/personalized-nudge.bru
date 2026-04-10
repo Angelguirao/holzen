@@ -1,0 +1,16 @@
+meta {
+  name: personalized-nudge
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{VITE_SUPABASE_URL}}/functions/v1/personalized-nudge
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{SERVICE_CRON_BEARER}}
+  apikey: {{VITE_SUPABASE_PUBLISHABLE_KEY}}
+}

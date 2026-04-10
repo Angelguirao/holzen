@@ -1,12 +1,17 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { PRICING } from '@/lib/pricing';
+import { holzenLog } from '@/lib/holzen-console';
 
 const FREE_MONTHLY_LIMIT = PRICING.freeReflectionsPerMonth;
 const CHECKOUT_RETURN_KEY = 'holzen_checkout_started_at';
 const CHECKOUT_RETURN_WINDOW_MS = 30 * 60 * 1000;
 const SUB_CACHE_KEY = 'holzen_sub_cache';
+
+/** Next fetch uses `{ force: true }` on check-subscription (window focus, refresh(), etc.). */
+let subscriptionForceNext = false;
 
 interface SubCache {
   subscribed: boolean;
@@ -20,89 +25,149 @@ function readSubCache(): SubCache | null {
     const raw = localStorage.getItem(SUB_CACHE_KEY);
     if (!raw) return null;
     return JSON.parse(raw) as SubCache;
-  } catch { return null; }
+  } catch {
+    return null;
+  }
 }
 
 function writeSubCache(c: SubCache) {
-  try { localStorage.setItem(SUB_CACHE_KEY, JSON.stringify(c)); } catch {}
+  try {
+    localStorage.setItem(SUB_CACHE_KEY, JSON.stringify(c));
+  } catch {
+    /* ignore */
+  }
+}
+
+function checkoutReturnWantsForce(): boolean {
+  const params = new URLSearchParams(window.location.search);
+  const hasCheckoutQuery = params.get('subscribed') === 'true';
+  const checkoutStartedAt = Number(sessionStorage.getItem(CHECKOUT_RETURN_KEY) ?? 0);
+  const returnedFromRecentCheckout =
+    checkoutStartedAt > 0 && Date.now() - checkoutStartedAt < CHECKOUT_RETURN_WINDOW_MS;
+  if (hasCheckoutQuery || returnedFromRecentCheckout) {
+    sessionStorage.removeItem(CHECKOUT_RETURN_KEY);
+    return true;
+  }
+  return false;
+}
+
+/** One checkout/return sweep per signed-in user id (matches previous mount-once behavior). */
+const checkoutSweepDoneForUser = new Set<string>();
+
+function consumeInitialCheckoutForce(userId: string): boolean {
+  if (checkoutSweepDoneForUser.has(userId)) return false;
+  checkoutSweepDoneForUser.add(userId);
+  return checkoutReturnWantsForce();
+}
+
+type SubscriptionSnapshot = {
+  subscribed: boolean;
+  monthlyUsed: number;
+  monthlyRemaining: number | undefined;
+};
+
+async function fetchSubscriptionSnapshot(userId: string, force: boolean): Promise<SubscriptionSnapshot> {
+  const { data, error } = await supabase.functions.invoke('check-subscription', {
+    body: force ? { force: true } : undefined,
+  });
+  if (error) throw error;
+
+  if (data?.subscribed) {
+    writeSubCache({
+      subscribed: true,
+      monthlyUsed: 0,
+      monthlyRemaining: undefined,
+      ts: Date.now(),
+    });
+    return { subscribed: true, monthlyUsed: 0, monthlyRemaining: undefined };
+  }
+
+  const now = new Date();
+  const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
+  const { count } = await supabase
+    .from('reflections')
+    .select('*', { count: 'exact', head: true })
+    .eq('user_id', userId)
+    .gte('created_at', monthStart);
+
+  const used = count ?? 0;
+  const remaining = Math.max(0, FREE_MONTHLY_LIMIT - used);
+  writeSubCache({
+    subscribed: false,
+    monthlyUsed: used,
+    monthlyRemaining: remaining,
+    ts: Date.now(),
+  });
+  return { subscribed: false, monthlyUsed: used, monthlyRemaining: remaining };
 }
 
 export function useSubscription() {
   const { user } = useAuth();
-  const cached = readSubCache();
-  const [subscribed, setSubscribed] = useState(cached?.subscribed ?? false);
-  const [loading, setLoading] = useState(true);
+  const queryClient = useQueryClient();
+  const userId = user?.id ?? null;
   const [checkoutLoading, setCheckoutLoading] = useState(false);
-  const [monthlyUsed, setMonthlyUsed] = useState(cached?.monthlyUsed ?? 0);
-  const [monthlyRemaining, setMonthlyRemaining] = useState<number | undefined>(cached?.monthlyRemaining);
+  const lastLoggedSubRef = useRef<{ subscribed: boolean; monthlyRemaining: number | undefined } | null>(null);
 
-  const checkSubscription = useCallback(async (force = false) => {
-    if (!user) {
-      setSubscribed(false);
-      setLoading(false);
-      return;
-    }
-
-    try {
-      const { data, error } = await supabase.functions.invoke('check-subscription', {
-        body: force ? { force: true } : undefined,
-      });
-      if (error) throw error;
-
-      if (data?.subscribed) {
-        setSubscribed(true);
-        setMonthlyRemaining(undefined);
-        writeSubCache({ subscribed: true, monthlyUsed: 0, monthlyRemaining: undefined, ts: Date.now() });
-      } else {
-        setSubscribed(false);
-        // Count reflections this month
-        const now = new Date();
-        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-        const { count } = await supabase
-          .from('reflections')
-          .select('*', { count: 'exact', head: true })
-          .eq('user_id', user.id)
-          .gte('created_at', monthStart);
-
-        const used = count ?? 0;
-        setMonthlyUsed(used);
-        const remaining = Math.max(0, FREE_MONTHLY_LIMIT - used);
-        setMonthlyRemaining(remaining);
-        writeSubCache({ subscribed: false, monthlyUsed: used, monthlyRemaining: remaining, ts: Date.now() });
+  const query = useQuery({
+    queryKey: ['subscription', userId],
+    enabled: !!userId,
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+    refetchInterval: userId ? 5 * 60 * 1000 : false,
+    refetchOnWindowFocus: false,
+    refetchOnReconnect: true,
+    retry: 1,
+    queryFn: async () => {
+      let force = subscriptionForceNext;
+      subscriptionForceNext = false;
+      if (!force) {
+        force = consumeInitialCheckoutForce(userId!);
       }
-    } catch {
-      // Offline or network error — keep current state (initialized from cache)
-    } finally {
-      setLoading(false);
-    }
-  }, [user]);
+      return fetchSubscriptionSnapshot(userId!, force);
+    },
+  });
+
+  const cacheFallback = readSubCache();
+  const effectiveSnapshot =
+    query.data ??
+    (cacheFallback
+      ? {
+          subscribed: cacheFallback.subscribed,
+          monthlyUsed: cacheFallback.monthlyUsed,
+          monthlyRemaining: cacheFallback.monthlyRemaining,
+        }
+      : undefined);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const hasCheckoutQuery = params.get('subscribed') === 'true';
-    const checkoutStartedAt = Number(sessionStorage.getItem(CHECKOUT_RETURN_KEY) ?? 0);
-    const returnedFromRecentCheckout = checkoutStartedAt > 0 && (Date.now() - checkoutStartedAt) < CHECKOUT_RETURN_WINDOW_MS;
-    const shouldForce = hasCheckoutQuery || returnedFromRecentCheckout;
-
-    if (shouldForce) {
-      sessionStorage.removeItem(CHECKOUT_RETURN_KEY);
-    }
-
-    checkSubscription(shouldForce);
-
-    // Poll every 5 minutes — cache handles freshness
-    const interval = setInterval(() => checkSubscription(), 5 * 60 * 1000);
-    // Force-refresh when tab regains focus (e.g. returning from checkout)
-    const onFocus = () => checkSubscription(true);
-    window.addEventListener('focus', onFocus);
-
-    return () => {
-      clearInterval(interval);
-      window.removeEventListener('focus', onFocus);
+    if (!userId) return;
+    const onFocus = () => {
+      subscriptionForceNext = true;
+      void queryClient.invalidateQueries({ queryKey: ['subscription', userId] });
     };
-  }, [checkSubscription]);
+    window.addEventListener('focus', onFocus);
+    return () => window.removeEventListener('focus', onFocus);
+  }, [userId, queryClient]);
+
+  const subscribed = effectiveSnapshot?.subscribed ?? false;
+  const monthlyUsed = effectiveSnapshot?.monthlyUsed ?? 0;
+  const monthlyRemaining = effectiveSnapshot?.monthlyRemaining;
+  const loading = !!userId && query.isLoading && !query.data;
+
+  useEffect(() => {
+    if (loading) return;
+    const next = { subscribed, monthlyRemaining };
+    const prev = lastLoggedSubRef.current;
+    if (prev && prev.subscribed === next.subscribed && prev.monthlyRemaining === next.monthlyRemaining) return;
+    lastLoggedSubRef.current = next;
+    holzenLog.subscription('state', {
+      subscribed,
+      monthlyRemaining,
+      monthlyUsed,
+    });
+  }, [loading, subscribed, monthlyRemaining, monthlyUsed]);
 
   const startCheckout = useCallback(async () => {
+    holzenLog.subscription('checkout', { action: 'start' });
     setCheckoutLoading(true);
     try {
       sessionStorage.setItem(CHECKOUT_RETURN_KEY, String(Date.now()));
@@ -112,8 +177,6 @@ export function useSubscription() {
       if (data?.url) {
         const checkoutUrl = data.url as string;
 
-        // In embedded previews, Stripe cannot render in-frame.
-        // Try top-level navigation first, then fall back to same-frame.
         try {
           if (window.self !== window.top && window.top) {
             window.top.location.href = checkoutUrl;
@@ -134,6 +197,7 @@ export function useSubscription() {
   }, []);
 
   const openPortal = useCallback(async () => {
+    holzenLog.subscription('portal', { action: 'open' });
     try {
       const { data, error } = await supabase.functions.invoke('customer-portal');
       if (error) throw error;
@@ -145,8 +209,28 @@ export function useSubscription() {
     }
   }, []);
 
-  /** Whether the user can create a new reflection (subscribed OR has free reflections left) */
-  const canReflect = subscribed || (monthlyRemaining !== undefined && monthlyRemaining > 0);
+  const refresh = useCallback(() => {
+    if (!userId) return Promise.resolve();
+    subscriptionForceNext = true;
+    return queryClient.invalidateQueries({ queryKey: ['subscription', userId] });
+  }, [userId, queryClient]);
+
+  const canReflect =
+    !userId ? false : subscribed || (monthlyRemaining !== undefined && monthlyRemaining > 0);
+
+  if (!userId) {
+    return {
+      subscribed: false,
+      loading: false,
+      checkoutLoading,
+      startCheckout,
+      openPortal,
+      refresh,
+      monthlyRemaining: undefined,
+      monthlyUsed: 0,
+      canReflect: false,
+    };
+  }
 
   return {
     subscribed,
@@ -154,7 +238,7 @@ export function useSubscription() {
     checkoutLoading,
     startCheckout,
     openPortal,
-    refresh: () => checkSubscription(true),
+    refresh,
     monthlyRemaining,
     monthlyUsed,
     canReflect,

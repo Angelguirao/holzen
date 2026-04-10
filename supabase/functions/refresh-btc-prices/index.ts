@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun, holzenEdgeWarn } from "../_shared/holzen-edge-log.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -9,14 +10,17 @@ const corsHeaders = {
 /**
  * Background BTC price refresh.
  *
- * Scheduled via cron every 15 minutes. Fetches:
+ * Scheduled via cron every ~15 minutes (see docs/ops/cron-setup.md). Fetches:
  * 1. Current BTC price (USD)
  * 2. Historical prices for "on this day" (1-4 years ago)
  *
- * Stores everything in btc_price_cache. The zoom-out companion
- * reads ONLY from this cache, never calling CoinGecko during sessions.
+ * Stores everything in btc_price_cache. The zoom-out companion reads ONLY from this
+ * cache during sessions (no CoinGecko at user time).
  *
- * This eliminates CoinGecko rate limit issues during user sessions.
+ * **Freshness contract (product):** Historical rows for the four anniversary dates are
+ * refetched when `fetched_at` is older than **24h** or missing. Dates are **UTC calendar**
+ * (year/month/day). This is accurate enough for **daily Zoom Out metaphor**, not intraday
+ * trading. After a missed cron, staleness is bounded by the next successful run + TTL.
  */
 
 serve(async (req) => {
@@ -25,19 +29,17 @@ serve(async (req) => {
   }
 
   const t0 = Date.now();
-  const log = (msg: string) => console.log(JSON.stringify({ ts: new Date().toISOString(), fn: "refresh-btc-prices", msg, elapsed_ms: Date.now() - t0 }));
 
   try {
-    // Auth: service role or cron only
-    const authHeader = req.headers.get("Authorization");
-    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
-    const cronSecret = Deno.env.get("CRON_SECRET") ?? "";
-    const token = authHeader?.replace("Bearer ", "") ?? "";
-
-    if (token !== serviceRoleKey && token !== cronSecret && req.headers.get("x-supabase-cron") !== "true") {
+    holzenEdgeRun("refresh-btc", "request", { method: req.method });
+    const { verifyServiceAuth } = await import("../_shared/auth.ts");
+    if (!verifyServiceAuth(req)) {
+      holzenEdgeRun("refresh-btc", "auth rejected");
       return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
+    holzenEdgeRun("refresh-btc", "auth ok");
 
+    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       serviceRoleKey,
@@ -62,7 +64,7 @@ serve(async (req) => {
           results.push(`current: $${Math.round(price)}`);
         }
       } else if (res.status === 429) {
-        log("CoinGecko rate limited for current price");
+        holzenEdgeWarn("refresh-btc", "CoinGecko rate limited for current price");
         // Try backup: Blockchain.info
         try {
           const backupRes = await fetch("https://blockchain.info/ticker");
@@ -82,7 +84,7 @@ serve(async (req) => {
         } catch { /* backup also failed */ }
       }
     } catch (e) {
-      log(`current price fetch error: ${e}`);
+      holzenEdgeError("refresh-btc", "current price fetch error", e);
     }
 
     // Wait 2s between CoinGecko calls to avoid rate limits
@@ -139,22 +141,22 @@ serve(async (req) => {
             results.push(`historical: ${inserts.length} prices cached`);
           }
         } else if (res.status === 429) {
-          log("CoinGecko rate limited for historical prices");
+          holzenEdgeWarn("refresh-btc", "CoinGecko rate limited for historical prices");
           results.push("historical: rate limited");
         }
       } catch (e) {
-        log(`historical price fetch error: ${e}`);
+        holzenEdgeError("refresh-btc", "historical price fetch error", e);
       }
     } else {
       results.push("historical: all cached within 24h");
     }
 
-    log(`done: ${results.join(", ")}`);
+    holzenEdgeLog("refresh-btc", "run complete", { ms: Date.now() - t0, summary: results.join("; ").slice(0, 500) });
     return new Response(JSON.stringify({ success: true, results }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
-    log(`error: ${e}`);
+    holzenEdgeError("refresh-btc", "uncaught error", e);
     return new Response(JSON.stringify({ error: String(e) }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

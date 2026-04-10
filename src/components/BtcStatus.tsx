@@ -1,5 +1,5 @@
 import { Eye, EyeOff, WifiOff, Bitcoin, Clock } from 'lucide-react';
-import { BtcChart } from '@/components/BtcChart';
+import { BtcChartLazyGate } from '@/components/BtcChartLazyGate';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatBtcPrice, type BtcPriceData } from '@/lib/btc';
 import { useTranslation } from 'react-i18next';
@@ -51,23 +51,25 @@ export function BtcStatus({ data, error, hidden, onToggleHidden, currency = 'USD
         <div className="space-y-1">
           <div className="flex items-center justify-between">
             <p className="text-xs font-mono text-muted-foreground/50">BTC / BTC</p>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
               {onToggleBtcMode && (
                 <button
+                  type="button"
                   onClick={onToggleBtcMode}
-                  className="text-primary/60 hover:text-primary transition-colors"
+                  className="inline-flex h-9 w-9 items-center justify-center rounded-md text-primary/60 hover:text-primary hover:bg-muted/40 transition-colors"
                   aria-label={t('btcStatus.exitBtcMode')}
                   title={t('btcStatus.exitBtcMode')}
                 >
-                  <Bitcoin className="h-3.5 w-3.5" />
+                  <Bitcoin className="h-3.5 w-3.5" aria-hidden />
                 </button>
               )}
               <button
+                type="button"
                 onClick={toggle}
-                className="text-muted-foreground hover:text-foreground transition-colors"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
                 aria-label={hidden ? t('btcStatus.show') : t('btcStatus.hide')}
               >
-                {hidden ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+                {hidden ? <EyeOff className="h-3.5 w-3.5" aria-hidden /> : <Eye className="h-3.5 w-3.5" aria-hidden />}
               </button>
             </div>
           </div>
@@ -115,23 +117,25 @@ export function BtcStatus({ data, error, hidden, onToggleHidden, currency = 'USD
               </span>
             )}
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
             {onToggleBtcMode && (
               <button
+                type="button"
                 onClick={onToggleBtcMode}
-                className="text-muted-foreground/40 hover:text-primary transition-colors"
+                className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground/40 hover:text-primary hover:bg-muted/40 transition-colors"
                 aria-label={t('btcStatus.enterBtcMode')}
                 title="1 BTC = 1 BTC"
               >
-                <Bitcoin className="h-3.5 w-3.5" />
+                <Bitcoin className="h-3.5 w-3.5" aria-hidden />
               </button>
             )}
             <button
+              type="button"
               onClick={toggle}
-              className="text-muted-foreground hover:text-foreground transition-colors"
+              className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
               aria-label={hidden ? t('btcStatus.showPrice') : t('btcStatus.hidePrice')}
             >
-              {hidden ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
+              {hidden ? <EyeOff className="h-3.5 w-3.5" aria-hidden /> : <Eye className="h-3.5 w-3.5" aria-hidden />}
             </button>
           </div>
         </div>
@@ -156,7 +160,7 @@ export function BtcStatus({ data, error, hidden, onToggleHidden, currency = 'USD
           </>
         )}
       </div>
-      <BtcChart hidden={hidden} currency={cur} />
+      <BtcChartLazyGate hidden={hidden} currency={cur} />
     </div>
   );
 }

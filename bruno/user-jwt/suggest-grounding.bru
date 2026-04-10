@@ -1,0 +1,27 @@
+meta {
+  name: suggest-grounding
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{VITE_SUPABASE_URL}}/functions/v1/suggest-grounding
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{SUPABASE_ACCESS_TOKEN}}
+  apikey: {{VITE_SUPABASE_PUBLISHABLE_KEY}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "context": "Bruno API review",
+    "groundingActivities": ["walk", "breathing", "stretch"],
+    "language": "en",
+    "mood": "calm",
+    "severity": 1
+  }
+}

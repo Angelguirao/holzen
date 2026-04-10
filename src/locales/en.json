@@ -29,9 +29,12 @@
     "pinned": "Pinned",
     "unpin": "Unpin",
     "from": "From",
-    "until": "Until"
+    "until": "Until",
+    "offlineBanner": "You're offline",
+    "connectivityDegraded": "Can't reach Holzen right now — check your connection or try again shortly."
   },
   "auth": {
+    "restoringSession": "Restoring your session…",
     "signInToContinue": "Sign in to continue",
     "createAnAccount": "Create an account",
     "alreadyHaveAccount": "Already have an account",
@@ -61,6 +64,7 @@
     "generatingReflection": "Preparing your pause…",
     "needAMoment": "I need a pause",
     "manualReflectionIn": "Next pause in {{minutes}} min",
+    "manualReflectionInSoon": "Next pause in {{time}}",
     "cooldownMessage": "Take this time to breathe. The next pause will be here when you need it.",
     "requestAnytime": "Request a pause anytime — no threshold required.",
     "startARitual": "Start a ritual",
@@ -448,7 +452,11 @@
     "regenerate": "Regenerate",
     "regenerating": "Regenerating…",
     "feedbackThanksUp": "Thanks!",
-    "feedbackThanksDown": "Noted"
+    "feedbackThanksDown": "Noted",
+    "cacheRelaxation": {
+      "market": "Pulled from cache with a broader market match than today’s move.",
+      "repeat_or_lower_quality": "From cache — may repeat an earlier card or use a lower-quality saved entry so this slot isn’t empty."
+    }
   },
   "landing": {
     "hero": "When Bitcoin moves, pause before you do.",
@@ -1350,6 +1358,7 @@
   },
   "notifications": {
     "title": "Notifications",
+    "unread": "unread",
     "clearAll": "Clear all",
     "dismissAll": "Dismiss all",
     "allCaughtUp": "All caught up",

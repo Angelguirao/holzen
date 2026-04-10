@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
-import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -98,7 +98,7 @@ serve(async (req) => {
         limit: 10,
       });
 
-      const eligibleSub = subscriptions.data.find((sub) => SUBSCRIBED_STATUSES.has(sub.status));
+      const eligibleSub = subscriptions.data.find((sub: any) => SUBSCRIBED_STATUSES.has(sub.status));
       hasActive = Boolean(eligibleSub);
 
       if (eligibleSub) {

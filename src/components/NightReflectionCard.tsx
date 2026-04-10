@@ -63,11 +63,12 @@ export function NightReflectionCard({ reflection, onDismiss }: Props) {
           <p className="text-[10px] font-mono uppercase tracking-wider">{t('nightReflection.title')}</p>
         </div>
         <button
+          type="button"
           onClick={onDismiss}
-          className="shrink-0 text-muted-foreground/40 hover:text-foreground transition-colors p-0.5"
+          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-muted-foreground/40 hover:text-foreground hover:bg-muted/40 transition-colors"
           aria-label={t('common.done')}
         >
-          <X className="h-3 w-3" />
+          <X className="h-3.5 w-3.5" aria-hidden />
         </button>
       </div>
       <p className="text-sm leading-relaxed">{reflection.message}</p>

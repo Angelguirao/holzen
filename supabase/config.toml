@@ -33,6 +33,8 @@ project_id = "edgbwdecaoottowliimu"
     verify_jwt = false
   [functions.record-referral]
     verify_jwt = false
+  [functions.process-referral-pending]
+    verify_jwt = false
   [functions.send-feedback]
     verify_jwt = false
   [functions.generate-wallpaper]
@@ -51,6 +53,8 @@ project_id = "edgbwdecaoottowliimu"
     verify_jwt = false
   [functions.fetch-source-feeds]
     verify_jwt = false
+  [functions.admin-library-preview]
+    verify_jwt = true
   [functions.badge-notify]
     verify_jwt = false
   [functions.companion-orchestrate]

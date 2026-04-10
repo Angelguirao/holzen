@@ -1,29 +1,19 @@
-# Cache serve: relaxation transparency (Pending)
+# Cache serve: relaxation transparency — **shipped (2026-04)**
 
-## Context (from Phase 5)
+## What shipped
 
-`serveFromCache` in `supabase/functions/_shared/cache.ts` **progressively relaxes** constraints when no unseen high-quality entry exists: it may serve **lower quality**, **already-seen**, or **any** cache rows to avoid **empty** companion slots.
+- **`serveFromCache`** (`supabase/functions/_shared/cache.ts`) returns `relaxation`: `none` | `market` | `repeat_or_lower_quality`, and emits structured Edge logs `holzen_event: "cache_serve"` with `cache_relaxation`.
+- Generators and **`CompanionResult`** propagate **`cacheRelaxation`**; **`companion_serves.cache_relaxation`** stores it (migration **`20260404120000_companion_serves_cache_relaxation.sql`**).
+- **Client**: `companion-orchestrate` slot payloads include `cacheRelaxation`; **`useCompanionData`** / **`CompanionSection`** show subtle copy when the tier is `market` or `repeat_or_lower_quality` (not for strict `none`).
+- i18n: **`companions.cacheRelaxation.*`** in **`src/locales/en.json`**.
 
-## Current problem
-
-Users may not **know** they are seeing a **fallback** (repeat, lower quality) versus a **fresh** high-quality cache hit — indistinguishable in UI if not surfaced.
-
-## Implications if we leave it as-is
-
-- Acceptable for many products; some users may perceive "repetitive" or "off" content without explanation.
-
-## Proposed improvement (optional product)
-
-- **Telemetry-only**: log relaxation tier for analytics (no UI change).
-- **Light UI**: subtle copy or badge when serving from relaxed tier (if product wants transparency).
-- **Stricter mode**: user setting "fewer repeats, allow empty" — major behavior change; validate demand first.
-
-## Related code pointers
+## Related code
 
 - `supabase/functions/_shared/cache.ts` — `serveFromCache`
-- Client companion cards — whether they can show a hint
+- `src/lib/companion-orchestrate-slot-apply.ts` — slot state + `EMPTY_COMPANION_SLOT_RELAXATIONS`
+- `src/hooks/use-companion-data.ts` — wires hydration + lazy fetch + regenerate
 
-## Acceptance criteria / how to verify
+## Optional follow-ups
 
-1. Product decision: **silent** vs **visible** fallback vs **stricter** cache-only mode.
-2. If visible, copy and accessibility reviewed.
+- Stricter user setting (“fewer repeats, allow empty”) — product validation first.
+- Localize **`cacheRelaxation`** strings beyond English.

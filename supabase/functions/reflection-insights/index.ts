@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "npm:@supabase/supabase-js@2.57.2";
+import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -75,16 +76,20 @@ serve(async (req) => {
     const singleUserId = body.user_id as string | undefined;
     const bodyLanguage = body.language as string | undefined;
 
+    holzenEdgeRun("reflection-insights", "request", {
+      method: req.method,
+      mode: singleUserId ? "user" : "batch",
+    });
+
     const authHeader = req.headers.get("Authorization");
     const sbUrl = Deno.env.get("SUPABASE_URL") ?? "";
     const sbAnon = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
-    const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
-    const cronSecret = Deno.env.get("CRON_SECRET") ?? "";
 
     let userIds: string[] = [];
 
     if (singleUserId) {
       if (!authHeader?.startsWith("Bearer ")) {
+        holzenEdgeRun("reflection-insights", "user auth rejected", { reason: "no_bearer" });
         return new Response(JSON.stringify({ error: "Unauthorized" }), {
           status: 401,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -95,6 +100,7 @@ serve(async (req) => {
       });
       const { data: { user }, error: userErr } = await anonClient.auth.getUser();
       if (userErr || !user || user.id !== singleUserId) {
+        holzenEdgeRun("reflection-insights", "user auth rejected", { reason: "jwt_mismatch" });
         return new Response(JSON.stringify({ error: "Unauthorized" }), {
           status: 401,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -102,19 +108,17 @@ serve(async (req) => {
       }
       userIds = [singleUserId];
     } else {
-      const token = authHeader?.replace(/^Bearer\s+/i, "")?.trim() ?? "";
-      const okCron = cronSecret.length > 0 && token === cronSecret;
-      const okService = token.length > 0 && token === serviceRoleKey;
-      const okSupabaseCron = req.headers.get("x-supabase-cron") === "true";
-      if (!okCron && !okService && !okSupabaseCron) {
+      const { verifyServiceAuth } = await import("../_shared/auth.ts");
+      if (!verifyServiceAuth(req)) {
+        holzenEdgeRun("reflection-insights", "auth rejected");
         return new Response(
           JSON.stringify({
-            error:
-              "Unauthorized. Batch mode requires service role, cron secret, or Supabase scheduled invoke.",
+            error: "Unauthorized. Batch mode requires Authorization: Bearer with service role or CRON_SECRET.",
           }),
           { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } },
         );
       }
+      holzenEdgeRun("reflection-insights", "auth ok");
 
       const { data: profiles } = await supabase
         .from("profiles")
@@ -278,13 +282,13 @@ Generate 3-5 skill development insights based on real patterns in this data. Ret
       generated++;
     }
 
-    console.log(`[INSIGHTS] Generated insights for ${generated} users`);
+    holzenEdgeLog("reflection-insights", "run complete", { generated, mode: singleUserId ? "user" : "batch" });
     return new Response(JSON.stringify({ generated }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    console.error("[INSIGHTS] Error:", msg);
+    holzenEdgeError("reflection-insights", "uncaught error", msg);
     return new Response(JSON.stringify({ error: msg }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

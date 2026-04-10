@@ -1,35 +1,27 @@
-# Automatic pause: notification vs orchestrate ordering (Pending)
+# Automatic pause: notification vs orchestrate ordering (Done — 2026-04)
 
-## Context (from Phase 3)
+## Chosen policy
 
-`check-volatility` persists the reflection, inserts `pause_notifications`, then dispatches `companion-orchestrate` with **fire-and-forget** (`fetch` without awaiting). Users can see "pause ready" and open `/pause` before every companion slot is written.
+**Keep fire-and-forget** (`check-volatility` persists the reflection + `pause_notifications`, then dispatches `companion-orchestrate` without awaiting). Rationale:
 
-## Current problem
+- Faster “pause ready” in the bell; users are not blocked on orchestrate tail latency or overload.
+- **Duplicate / overlapping orchestrate** when the client opens `/pause` immediately is acceptable when mitigated by cache + skip-if-served (`orchestrate_skip_cached` — see `orchestrate-client-cron.md`).
+- Alternatives (await orchestrate before notify, or duplicate copy into the notification payload) remain documented below if product priorities change.
 
-There is a **design choice**, not a single bug: when should the product tell the user the pause is "ready" relative to companion orchestration finishing?
+## Implications (accepted)
 
-- **Today**: notification appears after reflection + notification rows exist; orchestrate runs asynchronously.
-- **Alternative A**: delay notification until orchestrate completes (or fails).
-- **Alternative B**: keep current timing but **enrich** the notification (or client payload) so the first screen is usable without waiting for companion rows.
+- Featured fields on `reflections` and companion rows may still be filling when the user lands on `/pause`; the client must show **loading** for intervention and companion cards until data exists (see `cron-pause-featured-parity.md`).
 
-## Implications if we leave it as-is (fire-and-forget)
+## Historical options (not selected)
 
-- **Time window**: featured fields on `reflections` (e.g. grounding) may still be null when the user lands on `/pause` from a notification.
-- **Duplicate orchestrate**: client may invoke orchestrate while cron is still running — see `orchestrate-client-cron.md`.
-- **Faster** user feedback at the cost of **eventual consistency** for full companion data.
-
-## Proposed options (pick based on product priority)
-
-1. **Keep fire-and-forget** (current): rely on client loading states, cache, rate limits; measure cost via `orchestrate-client-cron.md` follow-up.
-2. **Await orchestrate before `pause_notifications`**: fewer races and less duplicate client work; **slower** notifications and higher tail latency if orchestrate is slow or overloaded.
-3. **Enrich `pause_notifications` (or reflection row) before notify**: duplicate some copy into the notification payload so the bell or first paint has enough text without waiting for all companion tables; **more** fields to keep consistent.
+1. **Await orchestrate before `pause_notifications`**: fewer races; slower notifications and higher tail latency.
+2. **Enrich `pause_notifications` (or reflection row) before notify**: faster first paint without DB reads; more fields to keep consistent.
 
 ## Related code pointers
 
 - `supabase/functions/check-volatility/index.ts` — order of inserts and orchestrate dispatch
-- `docs/reviews/phase-3-server-cron-triggers.md` — conclusions and tradeoffs
+- `docs/reviews/phase-3-server-cron-triggers.md` — mental model and tradeoffs
 
-## Acceptance criteria / how to verify
+## How to verify
 
-1. The team documents the **chosen** policy (speed vs consistency vs payload duplication).
-2. If policy changes, notification timing and user-visible loading states are tested for "open immediately after notification" flows.
+1. After a volatility trigger, open the pause notification **immediately**: reflection and ritual should load; featured/companion areas show skeletons or content, not a silent empty state (`use-companion-data` loader priming + existing `InterventionSection` / `LearningInput` skeletons).

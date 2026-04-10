@@ -1,6 +1,5 @@
-import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
+import { useState, useCallback, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
-import { X } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
@@ -11,47 +10,38 @@ import { hapticFeedback } from '@/lib/haptics';
 import { type MoodValue } from '@/components/MoodCheck';
 import { type CompanionData, type CompanionPrefs } from '@/components/CompanionSection';
 
-import { PauseProgress, type PauseStep, STEPS } from '@/components/pause/PauseProgress';
+import { type PauseStep, STEPS } from '@/components/pause/PauseProgress';
+import { PauseSessionGate } from '@/components/pause/PauseSessionGate';
+import { PauseSessionScaffold } from '@/components/pause/PauseSessionScaffold';
 import { PauseFeel } from '@/components/pause/PauseFeel';
 import { PauseBreathing } from '@/components/pause/PauseBreathing';
 import { PauseReflect } from '@/components/pause/PauseReflect';
 import { PauseShift } from '@/components/pause/PauseShift';
 import { PauseDecide } from '@/components/pause/PauseDecide';
 import { PauseDone } from '@/components/pause/PauseDone';
-import { PauseScienceSheet } from '@/components/pause/PauseScienceSheet';
+import { holzenLog } from '@/lib/holzen-console';
+import { parsePauseSessionLocationState } from '@/lib/router-location-state';
+import {
+  DEFAULT_COMPANIONS,
+  DEFAULT_PREFS,
+  type FetchedReflectionRow,
+  saveSession,
+  loadSession,
+  clearSession,
+  viewRowToCompanionData,
+} from '@/lib/pause-session-storage';
 
-const SESSION_KEY = 'holzen_pause_session';
-
-interface PersistedSession {
+type HydrationReady = {
+  status: 'ready';
   message: string;
   context: string | null;
   reflectionId: string | null;
   companions: CompanionData;
   companionPrefs: CompanionPrefs;
   severity: 'mild' | 'moderate' | 'high';
-  moodDone: boolean;
-  moodAfterDone: boolean;
-  selectedMood?: MoodValue | null;
-  selectedMoodAfter?: MoodValue | null;
-  phase: 'session' | 'done';
-  decision: string | null;
-  step: PauseStep;
-}
+};
 
-function saveSession(data: PersistedSession) {
-  try { localStorage.setItem(SESSION_KEY, JSON.stringify(data)); } catch {}
-}
-
-function loadSession(): PersistedSession | null {
-  try {
-    const raw = localStorage.getItem(SESSION_KEY);
-    return raw ? JSON.parse(raw) : null;
-  } catch { return null; }
-}
-
-function clearSession() {
-  try { localStorage.removeItem(SESSION_KEY); } catch {}
-}
+type HydrationState = HydrationReady | { status: 'fetch'; reflectionId: string } | { status: 'empty' };
 
 export default function PauseSession() {
   const { t } = useTranslation();
@@ -72,22 +62,163 @@ export default function PauseSession() {
   } = useHolzen();
   const { subscribed } = useSubscription();
 
-  const navState = (location.state as any) ?? {};
+  const {
+    reflectionId: navReflectionId,
+    reflectionMessage: navReflectionMessage,
+    context: navContext,
+    companions: navCompanions,
+    companionPrefs: navCompanionPrefs,
+    severity: navSeverity,
+  } = parsePauseSessionLocationState(location.state);
+
   const restored = useMemo(() => {
     const saved = loadSession();
-    if (!saved) return null;
-    // If navigating with fresh state for a DIFFERENT reflection, discard saved session
-    if (navState.reflectionId && saved.reflectionId !== navState.reflectionId) return null;
-    // Otherwise prefer the saved session (user is resuming)
+    if (!saved?.message) return null;
+    if (navReflectionId && saved.reflectionId && saved.reflectionId !== navReflectionId) return null;
     return saved;
+  }, [location.key, navReflectionId]);
+
+  const holzenAligned =
+    !navReflectionId || (holzenLastReflectionId != null && holzenLastReflectionId === navReflectionId);
+
+  const hydration = useMemo((): HydrationState => {
+    if (restored?.message) {
+      return {
+        status: 'ready',
+        message: restored.message,
+        context: restored.context ?? null,
+        reflectionId: restored.reflectionId ?? navReflectionId ?? holzenLastReflectionId,
+        companions: restored.companions ?? holzenCompanions ?? DEFAULT_COMPANIONS,
+        companionPrefs: restored.companionPrefs ?? holzenCompanionPrefs ?? DEFAULT_PREFS,
+        severity: restored.severity ?? holzenSeverity,
+      };
+    }
+
+    // Profile-backed hook: same reflection as router target (or no id in nav) — avoids stale nav text
+    if (holzenMessage && holzenAligned) {
+      return {
+        status: 'ready',
+        message: holzenMessage,
+        context: holzenContext,
+        reflectionId: holzenLastReflectionId,
+        companions: holzenCompanions ?? DEFAULT_COMPANIONS,
+        companionPrefs: holzenCompanionPrefs ?? DEFAULT_PREFS,
+        severity: holzenSeverity,
+      };
+    }
+
+    if (navReflectionMessage) {
+      return {
+        status: 'ready',
+        message: navReflectionMessage,
+        context: navContext ?? holzenContext,
+        reflectionId: navReflectionId ?? holzenLastReflectionId,
+        companions: navCompanions ?? holzenCompanions ?? DEFAULT_COMPANIONS,
+        companionPrefs: navCompanionPrefs ?? holzenCompanionPrefs ?? DEFAULT_PREFS,
+        severity: navSeverity ?? holzenSeverity,
+      };
+    }
+
+    if (navReflectionId) {
+      return { status: 'fetch', reflectionId: navReflectionId };
+    }
+
+    if (holzenMessage) {
+      return {
+        status: 'ready',
+        message: holzenMessage,
+        context: holzenContext,
+        reflectionId: holzenLastReflectionId,
+        companions: holzenCompanions ?? DEFAULT_COMPANIONS,
+        companionPrefs: holzenCompanionPrefs ?? DEFAULT_PREFS,
+        severity: holzenSeverity,
+      };
+    }
+
+    return { status: 'empty' };
+  }, [
+    restored,
+    holzenMessage,
+    holzenContext,
+    holzenLastReflectionId,
+    holzenCompanions,
+    holzenCompanionPrefs,
+    holzenSeverity,
+    holzenAligned,
+    navReflectionId,
+    navReflectionMessage,
+    navContext,
+    navCompanions,
+    navCompanionPrefs,
+    navSeverity,
+  ]);
+
+  const [fetchedRow, setFetchedRow] = useState<FetchedReflectionRow | null>(null);
+  const [fetchFailed, setFetchFailed] = useState(false);
+
+  const fetchReflectionId = hydration.status === 'fetch' ? hydration.reflectionId : null;
+
+  useEffect(() => {
+    if (!fetchReflectionId) {
+      setFetchedRow(null);
+      setFetchFailed(false);
+      return;
+    }
+    let cancelled = false;
+    setFetchedRow(null);
+    setFetchFailed(false);
+    void (async () => {
+      const { data, error } = await supabase
+        .from('v_reflection_with_companions')
+        .select('id, message, context, haiku, grounding_title, grounding_body')
+        .eq('id', fetchReflectionId)
+        .maybeSingle();
+      if (cancelled) return;
+      if (error || !data?.message) {
+        setFetchFailed(true);
+        return;
+      }
+      setFetchedRow(data as FetchedReflectionRow);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [fetchReflectionId]);
+
+  const resolved: HydrationReady | null = useMemo(() => {
+    if (hydration.status === 'ready') return hydration;
+    if (hydration.status === 'fetch' && fetchedRow?.message) {
+      return {
+        status: 'ready',
+        message: fetchedRow.message,
+        context: fetchedRow.context ?? null,
+        reflectionId: fetchedRow.id,
+        companions: viewRowToCompanionData(fetchedRow),
+        companionPrefs: navCompanionPrefs ?? holzenCompanionPrefs ?? DEFAULT_PREFS,
+        severity: navSeverity ?? holzenSeverity,
+      };
+    }
+    return null;
+  }, [hydration, fetchedRow, navCompanionPrefs, holzenCompanionPrefs, navSeverity, holzenSeverity]);
+
+  useEffect(() => {
+    holzenLog.pause('mount', {
+      reflectionIdPrefix: (fetchReflectionId ?? navReflectionId)?.slice(0, 8) ?? null,
+      hasNavMessage: navReflectionMessage.length > 0,
+      restoredFromStorage: restored !== null,
+      hydrationStatus: hydration.status,
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- first paint of /pause only
   }, []);
 
-  const message: string = navState.reflectionMessage ?? restored?.message ?? holzenMessage ?? '';
-  const context: string | null = navState.context ?? restored?.context ?? holzenContext ?? null;
-  const reflectionId: string | null = navState.reflectionId ?? restored?.reflectionId ?? holzenLastReflectionId ?? null;
-  const companions: CompanionData = navState.companions ?? restored?.companions ?? holzenCompanions ?? { haiku: null, groundingTitle: null, groundingBody: null };
-  const companionPrefs: CompanionPrefs = navState.companionPrefs ?? restored?.companionPrefs ?? holzenCompanionPrefs ?? { breathing: true, haiku: true, grounding: true, signal: true, zoomOut: true, history: true };
-  const severity: 'mild' | 'moderate' | 'high' = navState.severity ?? restored?.severity ?? holzenSeverity ?? 'mild';
+  const message = resolved?.message ?? '';
+  const context = resolved?.context ?? null;
+  const reflectionId = resolved?.reflectionId ?? null;
+  const companions = resolved?.companions ?? DEFAULT_COMPANIONS;
+  const companionPrefs = resolved?.companionPrefs ?? DEFAULT_PREFS;
+  const severity = resolved?.severity ?? holzenSeverity;
+
+  const waitingForFetch = hydration.status === 'fetch' && !fetchFailed && !fetchedRow;
 
   // Map old step names to new ones for session restoration
   const mapStep = (s: string): PauseStep => {
@@ -116,7 +247,21 @@ export default function PauseSession() {
   useEffect(() => {
     if (!message) return;
     saveSession({ message, context, reflectionId, companions, companionPrefs, severity, moodDone, moodAfterDone, selectedMood, selectedMoodAfter, phase, decision, step });
-  }, [message, moodDone, moodAfterDone, selectedMood, selectedMoodAfter, phase, decision, step]);
+  }, [
+    message,
+    context,
+    reflectionId,
+    companions,
+    companionPrefs,
+    severity,
+    moodDone,
+    moodAfterDone,
+    selectedMood,
+    selectedMoodAfter,
+    phase,
+    decision,
+    step,
+  ]);
 
   // Cinematic entrance
   useEffect(() => {
@@ -262,30 +407,6 @@ export default function PauseSession() {
     clearSession();
   }, [dismissMessage, reflectionId, selectedMood, selectedMoodAfter, context]);
 
-  // No message fallback
-  if (!message && phase !== 'done') {
-    // Avoid showing the "no reflection" dead-end while `useHolzen` is still hydrating
-    // pause data from profile load (e.g. when deep-linking into `/pause` from notifications).
-    if (!profileLoaded) {
-      return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
-          <div className="text-center space-y-4">
-            <p className="text-sm font-mono text-muted-foreground">{t('common.loading', 'Loading...')}</p>
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-background">
-        <div className="text-center space-y-4">
-          <p className="text-sm font-mono text-muted-foreground">{t('pause.noReflection')}</p>
-          <button onClick={handleReturn} className="text-xs font-mono text-primary underline">{t('pause.return')}</button>
-        </div>
-      </div>
-    );
-  }
-
   const slideX = prefersReducedMotion ? 0 : 80;
   const stepTransition = {
     initial: { opacity: 0, x: swipeDirection === 'forward' ? slideX : -slideX },
@@ -303,139 +424,91 @@ export default function PauseSession() {
   };
 
   return (
-    <>
-      {/* Dark curtain entrance */}
-      <AnimatePresence>
-        {!curtainLifted && (
-          <motion.div
-            className="fixed inset-0 z-[100] bg-background"
-            exit={{ opacity: 0 }}
-            transition={{ duration: 1.8, ease: [0.22, 1, 0.36, 1] }}
-          />
-        )}
-      </AnimatePresence>
-
-      <motion.div
-        className="fixed inset-0 z-50 overflow-y-auto"
-        initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 1.2, delay: 0.3 }}
-        style={{
-          background: 'linear-gradient(160deg, hsl(var(--background)) 0%, hsl(var(--muted)) 50%, hsl(var(--background)) 100%)',
-        }}
+    <PauseSessionGate
+      hasMessage={!!message}
+      phase={phase}
+      waitingForFetch={waitingForFetch}
+      fetchFailed={fetchFailed}
+      hydrationStatus={hydration.status}
+      profileLoaded={profileLoaded}
+      onReturn={handleReturn}
+    >
+      <PauseSessionScaffold
+        curtainLifted={curtainLifted}
+        prefersReducedMotion={!!prefersReducedMotion}
+        onClose={handleClose}
+        phase={phase}
+        step={step}
+        goToStep={goToStep}
       >
-        {/* Ambient orbs */}
-        <motion.div
-          className="fixed top-1/4 left-1/3 w-[300px] h-[300px] rounded-full pointer-events-none"
-          style={{
-            background: 'radial-gradient(circle, hsl(var(--primary) / 0.04) 0%, transparent 70%)',
-            filter: 'blur(80px)',
-          }}
-          animate={prefersReducedMotion ? {} : { x: [0, 30, -20, 0], y: [0, -20, 15, 0] }}
-          transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
-        />
-        <motion.div
-          className="fixed bottom-1/3 right-1/4 w-[250px] h-[250px] rounded-full pointer-events-none"
-          style={{
-            background: 'radial-gradient(circle, hsl(var(--accent) / 0.03) 0%, transparent 70%)',
-            filter: 'blur(60px)',
-          }}
-          animate={prefersReducedMotion ? {} : { x: [0, -25, 15, 0], y: [0, 20, -10, 0] }}
-          transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
-        />
-
-        {/* Close button */}
-        <button
-          onClick={handleClose}
-          className="fixed top-5 right-5 p-3 rounded-full bg-muted/40 backdrop-blur-sm text-muted-foreground/40 hover:text-foreground/60 hover:bg-muted/60 transition-all duration-300 z-[60]"
-          aria-label="Close"
-        >
-          <X className="h-4 w-4" />
-        </button>
-
-        {/* Progress indicator */}
         {phase === 'session' && (
-          <motion.div
-            className="fixed top-5 left-5 z-[55] flex flex-col items-start gap-2"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 2, duration: 1 }}
-          >
-            <PauseProgress currentStep={step} onStepClick={goToStep} />
-            <PauseScienceSheet />
-          </motion.div>
+          <AnimatePresence mode="wait" initial={false}>
+            {step === 'breathe' && (
+              <motion.div key="breathe" {...stepTransition} {...dragProps}>
+                <PauseBreathing mantra={mantra} onContinue={() => goToStep('feel')} />
+              </motion.div>
+            )}
+
+            {step === 'feel' && (
+              <motion.div key="feel" {...stepTransition} {...dragProps}>
+                <PauseFeel
+                  onMoodSelect={handleMoodSelect}
+                  onMoodSkip={handleMoodSkip}
+                  onMoodReset={handleMoodReset}
+                  moodDone={moodDone}
+                  selectedMood={selectedMood}
+                  onContinue={() => goToStep('reflect')}
+                  onBack={goBack}
+                />
+              </motion.div>
+            )}
+
+            {step === 'reflect' && (
+              <motion.div key="reflect" {...stepTransition} {...dragProps}>
+                <PauseReflect
+                  companions={companions}
+                  companionPrefs={companionPrefs}
+                  severity={severity}
+                  reflectionId={reflectionId}
+                  context={context}
+                  reflectionMessage={message}
+                  isFavorite={isFavorite}
+                  onToggleFavorite={toggleFavorite}
+                  subscribed={subscribed}
+                  onContinue={() => goToStep('shift')}
+                  onBack={goBack}
+                  mood={selectedMood}
+                />
+              </motion.div>
+            )}
+
+            {step === 'shift' && (
+              <motion.div key="shift" {...stepTransition} {...dragProps}>
+                <PauseShift
+                  onMoodAfterSelect={handleMoodAfterSelect}
+                  onMoodAfterSkip={handleMoodAfterSkip}
+                  onMoodAfterReset={handleMoodAfterReset}
+                  moodAfterDone={moodAfterDone}
+                  selectedMoodAfter={selectedMoodAfter}
+                  onContinue={() => goToStep('decide')}
+                  onBack={goBack}
+                  groundingActivities={groundingActivities}
+                />
+              </motion.div>
+            )}
+
+            {step === 'decide' && (
+              <motion.div key="decide" {...stepTransition} {...dragProps}>
+                <PauseDecide onDecide={handleDecide} onBack={goBack} />
+              </motion.div>
+            )}
+          </AnimatePresence>
         )}
 
-        <div className="relative z-10 max-w-md mx-auto px-6 py-20 overflow-hidden">
-          {phase === 'session' && (
-            <AnimatePresence mode="wait" initial={false}>
-              {step === 'breathe' && (
-                <motion.div key="breathe" {...stepTransition} {...dragProps}>
-                  <PauseBreathing mantra={mantra} onContinue={() => goToStep('feel')} />
-                </motion.div>
-              )}
-
-              {step === 'feel' && (
-                <motion.div key="feel" {...stepTransition} {...dragProps}>
-                  <PauseFeel
-                    onMoodSelect={handleMoodSelect}
-                    onMoodSkip={handleMoodSkip}
-                    onMoodReset={handleMoodReset}
-                    moodDone={moodDone}
-                    selectedMood={selectedMood}
-                    onContinue={() => goToStep('reflect')}
-                    onBack={goBack}
-                  />
-                </motion.div>
-              )}
-
-              {step === 'reflect' && (
-                <motion.div key="reflect" {...stepTransition} {...dragProps}>
-                  <PauseReflect
-                    companions={companions}
-                    companionPrefs={companionPrefs}
-                    severity={severity}
-                    reflectionId={reflectionId}
-                    context={context}
-                    reflectionMessage={message}
-                    isFavorite={isFavorite}
-                    onToggleFavorite={toggleFavorite}
-                    subscribed={subscribed}
-                    onContinue={() => goToStep('shift')}
-                    onBack={goBack}
-                    mood={selectedMood}
-                  />
-                </motion.div>
-              )}
-
-              {step === 'shift' && (
-                <motion.div key="shift" {...stepTransition} {...dragProps}>
-                  <PauseShift
-                    onMoodAfterSelect={handleMoodAfterSelect}
-                    onMoodAfterSkip={handleMoodAfterSkip}
-                    onMoodAfterReset={handleMoodAfterReset}
-                    moodAfterDone={moodAfterDone}
-                    selectedMoodAfter={selectedMoodAfter}
-                    onContinue={() => goToStep('decide')}
-                    onBack={goBack}
-                    groundingActivities={groundingActivities}
-                  />
-                </motion.div>
-              )}
-
-              {step === 'decide' && (
-                <motion.div key="decide" {...stepTransition} {...dragProps}>
-                  <PauseDecide onDecide={handleDecide} onBack={goBack} />
-                </motion.div>
-              )}
-            </AnimatePresence>
-          )}
-
-          {phase === 'done' && (
-            <PauseDone decision={decision} onReturn={handleReturn} pauseData={pauseImpactData} />
-          )}
-        </div>
-      </motion.div>
-    </>
+        {phase === 'done' && (
+          <PauseDone decision={decision} onReturn={handleReturn} pauseData={pauseImpactData} />
+        )}
+      </PauseSessionScaffold>
+    </PauseSessionGate>
   );
 }

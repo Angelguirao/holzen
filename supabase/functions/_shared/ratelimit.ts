@@ -1,12 +1,71 @@
 /**
  * Per-user rate limiting for companion generation endpoints.
- * 
+ *
  * Checks the analytics_events table for recent generation calls from a user.
  * Returns whether the user is rate-limited and when they can retry.
- * 
+ *
  * Uses a simple sliding window approach: count events in the last N minutes.
  * This adds ~50ms of latency per check (single indexed query).
+ *
+ * **Sliding-window allowlist** — every value here must have at least one insert path
+ * (generators, orchestrator, or standalone edge function), or limits drift loose/tight.
+ *
+ * | `event` | Inserted from |
+ * |---------|----------------|
+ * | `signal_companion_ai_call` | `generators/signal.ts` (source `live`) |
+ * | `zoom_out_ai_call` | `generators/zoom-out.ts` (deep-time `live`) |
+ * | `historical_insight_ai_call` | `generators/history.ts` (source `live`) |
+ * | `ground_nudge_ai_call` | `generators/grounding.ts` (source `live`) |
+ * | `intervention_question_ai_call` | `companion-orchestrate` after successful `generateQuestion` |
+ * | `pause_ai_call` | `holzen-reflect`, `check-volatility` |
+ * | `journal_prompt_ai_call` | `journal-prompt` |
+ * | `suggest_grounding_ai_call` | `suggest-grounding` |
+ * | `night_reflection_ai_call` | `night-reflection` |
+ * | `reflection_insights_ai_call` | `reflection-insights` |
+ * | `wallpaper_generation` | `generate-wallpaper` |
+ *
+ * Not counted: `intervention_selected`, `reflection_generated`, `companion_fallback_*`, `companion_feedback`, etc.
  */
+
+/** Event names included in `checkRateLimit` sliding-window count (keep in sync with inserts). */
+export const CHECK_RATE_LIMIT_ANALYTICS_EVENTS = [
+  "signal_companion_ai_call",
+  "zoom_out_ai_call",
+  "historical_insight_ai_call",
+  "ground_nudge_ai_call",
+  "intervention_question_ai_call",
+  "pause_ai_call",
+  "journal_prompt_ai_call",
+  "suggest_grounding_ai_call",
+  "night_reflection_ai_call",
+  "reflection_insights_ai_call",
+  "wallpaper_generation",
+] as const;
+
+/**
+ * When a limit/budget DB check errors, we fail open (allow). Emit one JSON line so Edge log
+ * drains can grep/alert: `holzen_event":"limit_check_fail_open"` or substring `limit_check_fail_open`.
+ */
+function logLimitCheckFailOpen(
+  scope: "rate_limit" | "daily_budget" | "companion_regenerate",
+  phase: "supabase_error" | "thrown",
+  detail: string,
+): void {
+  const safe = (detail || "").slice(0, 500);
+  try {
+    console.warn(
+      JSON.stringify({
+        holzen_event: "limit_check_fail_open",
+        scope,
+        phase,
+        detail: safe,
+        ts: new Date().toISOString(),
+      }),
+    );
+  } catch {
+    console.warn(`[ratelimit] limit_check_fail_open scope=${scope} phase=${phase} ${safe}`);
+  }
+}
 
 interface RateLimitResult {
   allowed: boolean;
@@ -36,22 +95,11 @@ export async function checkRateLimit(
       .from("analytics_events")
       .select("id", { count: "exact", head: true })
       .eq("user_id", userId)
-      .in("event", [
-        "signal_companion_ai_call",
-        "zoom_out_ai_call",
-        "historical_insight_ai_call",
-        "pause_ai_call",
-        "journal_prompt_ai_call",
-        "suggest_grounding_ai_call",
-        "night_reflection_ai_call",
-        "reflection_insights_ai_call",
-        "wallpaper_generation",
-      ])
+      .in("event", [...CHECK_RATE_LIMIT_ANALYTICS_EVENTS])
       .gte("created_at", windowStart);
 
     if (error) {
-      // If we can't check, allow the request (fail open)
-      console.warn("[ratelimit] Failed to check rate limit:", error.message);
+      logLimitCheckFailOpen("rate_limit", "supabase_error", error.message ?? String(error));
       return { allowed: true };
     }
 
@@ -67,8 +115,11 @@ export async function checkRateLimit(
 
     return { allowed: true };
   } catch (e) {
-    // Fail open on errors
-    console.warn("[ratelimit] Rate limit check failed:", e);
+    logLimitCheckFailOpen(
+      "rate_limit",
+      "thrown",
+      e instanceof Error ? e.message : String(e),
+    );
     return { allowed: true };
   }
 }
@@ -96,8 +147,8 @@ export async function checkDailyBudget(
       .not("estimated_cost_usd", "is", null);
 
     if (error) {
-      console.warn("[budget] Failed to check daily budget:", error.message);
-      return { allowed: true }; // Fail open
+      logLimitCheckFailOpen("daily_budget", "supabase_error", error.message ?? String(error));
+      return { allowed: true };
     }
 
     const totalSpend = (data ?? []).reduce(
@@ -115,8 +166,12 @@ export async function checkDailyBudget(
 
     return { allowed: true, currentSpend: totalSpend };
   } catch (e) {
-    console.warn("[budget] Budget check failed:", e);
-    return { allowed: true }; // Fail open
+    logLimitCheckFailOpen(
+      "daily_budget",
+      "thrown",
+      e instanceof Error ? e.message : String(e),
+    );
+    return { allowed: true };
   }
 }
 
@@ -140,7 +195,7 @@ export async function checkCompanionRegenerateLimit(
       .gte("created_at", windowStart);
 
     if (error) {
-      console.warn("[ratelimit] regenerate limit check failed:", error.message);
+      logLimitCheckFailOpen("companion_regenerate", "supabase_error", error.message ?? String(error));
       return { allowed: true };
     }
     if ((count ?? 0) >= maxRegenerates) {
@@ -151,7 +206,11 @@ export async function checkCompanionRegenerateLimit(
     }
     return { allowed: true };
   } catch (e) {
-    console.warn("[ratelimit] regenerate limit error:", e);
+    logLimitCheckFailOpen(
+      "companion_regenerate",
+      "thrown",
+      e instanceof Error ? e.message : String(e),
+    );
     return { allowed: true };
   }
 }

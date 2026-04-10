@@ -15,6 +15,7 @@ const DECISIONS = [
 
 type Phase = 'breathing' | 'reflection' | 'haiku' | 'decide' | 'done';
 
+/** @deprecated Not used by the onboarding flow in `Onboarding.tsx`; retained for reference or future reuse. */
 export function OnboardingDemo({ stagger }: Props) {
   const { t } = useTranslation();
   const prefersReduced = useReducedMotion();

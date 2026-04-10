@@ -10,15 +10,27 @@
  * API keys are read from Deno.env directly (same as the original function).
  */
 
-import { qualityGate, BANNED_PHRASES, containsSlop, contentFingerprint } from "../quality.ts";
+import {
+  qualityGate,
+  BANNED_PHRASES,
+  containsSlop,
+  contentFingerprint,
+  logQualityGateStructuredReject,
+} from "../quality.ts";
 import {
   companionFallbacksDisabled,
   COMPANION_FALLBACKS_DISABLED_MESSAGE,
   loadFallbackPool,
   pickRandom,
 } from "../fallbacks.ts";
-import { COMPANION_ZOOM_OUT_DEEP_TIME, parseMarketDirection, serveFromCache } from "../cache.ts";
-import { createAttemptLogger } from "../observe.ts";
+import {
+  type CacheServeRelaxation,
+  COMPANION_ZOOM_OUT_DEEP_TIME,
+  parseMarketDirection,
+  serveFromCache,
+} from "../cache.ts";
+import { createAttemptLogger, trackEvent } from "../observe.ts";
+import { getPhaseConfig } from "../phase-config.ts";
 
 /** Bump when the deep-time prompt, seed pool, or quality rules change. */
 export const PROMPT_VERSION = "v2";
@@ -29,6 +41,8 @@ export interface ZoomOutResult {
   data: any | null;  // { onThisDay, currentPrice, echo, deepTime, partial }
   source: "live" | "cache" | "curated" | "empty";
   cacheId: string | null;
+  /** Set when deep-time text came from `serveFromCache`. */
+  cacheRelaxation?: CacheServeRelaxation;
   error?: string;
 }
 
@@ -41,6 +55,8 @@ export interface GenerateZoomOutParams {
   userId?: string;
   recentTitles?: string[];
   zoomOutAngle?: string;
+  /** Skip cache phase and go straight to live (used by regenerate). */
+  forceLive?: boolean;
   log: (msg: string, extra?: Record<string, unknown>) => void;
 }
 
@@ -51,6 +67,11 @@ interface PriceFetchResult {
   currentPrice: number | null;
   rateLimited: boolean;
   isPartial: boolean;
+}
+
+interface PriceCacheRow {
+  date: string;
+  price: number;
 }
 
 /**
@@ -85,7 +106,8 @@ async function fetchHistoricalAndCurrentPrices(
     .select("date, price")
     .in("date", allDateKeys);
 
-  const priceMap = new Map((cached || []).map((r: any) => [r.date, r.price]));
+  const rows = (cached ?? []) as PriceCacheRow[];
+  const priceMap = new Map<string, number>(rows.map((r) => [r.date, r.price]));
 
   // Current price from today's cache entry
   const currentPrice = priceMap.get(todayKey) ?? null;
@@ -94,14 +116,16 @@ async function fetchHistoricalAndCurrentPrices(
   const onThisDay: { yearsAgo: number; price: number; date: string }[] = [];
   for (const target of yearTargets) {
     const price = priceMap.get(target.dateKey);
-    if (price) onThisDay.push({ yearsAgo: target.yearsAgo, date: target.dateKey, price: Math.round(price) });
+    if (typeof price === "number") {
+      onThisDay.push({ yearsAgo: target.yearsAgo, date: target.dateKey, price: Math.round(price) });
+    }
   }
 
   log(`prices from cache: current=${currentPrice ?? 'none'}, historical=${onThisDay.length}/4`);
 
   return {
     onThisDay,
-    currentPrice: currentPrice ? Math.round(currentPrice) : null,
+    currentPrice: typeof currentPrice === "number" ? Math.round(currentPrice) : null,
     rateLimited: false, // No API calls = no rate limits
     isPartial: onThisDay.length < yearTargets.length,
   };
@@ -138,6 +162,8 @@ interface DeepTimeResult {
   deepTime: { title: string; body: string } | null;
   source: "live" | "cache" | "curated" | "empty";
   error?: string;
+  cacheId?: string | null;
+  cacheRelaxation?: CacheServeRelaxation;
 }
 
 async function generateDeepTime(
@@ -280,8 +306,19 @@ No trading advice, no price predictions, no exclamation marks.${mood ? `\n\nUSER
               } catch (e) { log(`cache write failed: ${e}`); }
               break;
             } else if (parsed.title && parsed.body) {
-              log(`deepTime quality gate failed: body=${(parsed.body || "").length}chars slop=${containsSlop(parsed.body || "")}`);
-              logAttempt({ companion_type: "zoom_out", provider: "lovable", model, status: "quality_gate_failed", latency_ms: Date.now() - attemptT0, quality_gate_reason: "deep_time_quality", input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
+              const qgReason = qg.reason ?? "deep_time_quality";
+              log(`deepTime quality gate failed: ${qgReason} body=${(parsed.body || "").length}chars`);
+              logQualityGateStructuredReject("zoom_out_deep_time", qgReason);
+              logAttempt({
+                companion_type: "zoom_out",
+                provider: "lovable",
+                model,
+                status: "quality_gate_failed",
+                latency_ms: Date.now() - attemptT0,
+                quality_gate_reason: qgReason,
+                input_tokens: usage?.prompt_tokens,
+                output_tokens: usage?.completion_tokens,
+              });
               if (model !== models[models.length - 1]) continue;
             }
           } catch {
@@ -312,7 +349,12 @@ No trading advice, no price predictions, no exclamation marks.${mood ? `\n\nUSER
     const marketDirection = parseMarketDirection(context);
     const cached = await serveFromCache(svcClient, COMPANION_ZOOM_OUT_DEEP_TIME, "en", { userId, marketDirection });
     if (cached) {
-      return { deepTime: cached.data as { title: string; body: string }, source: "cache" };
+      return {
+        deepTime: cached.data as { title: string; body: string },
+        source: "cache",
+        cacheId: cached.cacheId,
+        cacheRelaxation: cached.relaxation,
+      };
     }
 
     const zpool = await loadFallbackPool<{ title: string; body: string }>(svcClient, "zoom_out");
@@ -325,7 +367,53 @@ No trading advice, no price predictions, no exclamation marks.${mood ? `\n\nUSER
 // ── Public entry point ──
 
 export async function generateZoomOut(params: GenerateZoomOutParams): Promise<ZoomOutResult> {
-  const { svcClient, context, mood, recentTitles, userId, zoomOutAngle, log } = params;
+  const { svcClient, context, mood, recentTitles, userId, zoomOutAngle, forceLive, log } = params;
+  const phases = getPhaseConfig();
+
+  // ── Phase 2: Cache (no library type for zoom-out) ──
+  if (phases.cache && !forceLive) {
+    const marketDirection = parseMarketDirection(context);
+    const cached = await serveFromCache(svcClient, COMPANION_ZOOM_OUT_DEEP_TIME, "en", { userId, marketDirection });
+    if (cached) {
+      log("zoomOut resolved from cache (phase 2)");
+      const prices = await fetchHistoricalAndCurrentPrices(svcClient, context, log);
+      let echoReflection: any = null;
+      if (userId) echoReflection = await fetchEchoReflection(svcClient, userId, context, log);
+      return {
+        data: {
+          onThisDay: prices.onThisDay,
+          currentPrice: prices.currentPrice,
+          echo: echoReflection ? { message: echoReflection.message, created_at: echoReflection.created_at, mood: echoReflection.mood, outcome: echoReflection.outcome } : null,
+          deepTime: cached.data as { title: string; body: string },
+          partial: prices.isPartial,
+        },
+        source: "cache",
+        cacheId: cached.cacheId,
+        cacheRelaxation: cached.relaxation,
+      };
+    }
+  }
+
+  // ── Phase 3: Live generation ──
+  if (!phases.live && !forceLive) {
+    log("live phase disabled, serving curated");
+    if (companionFallbacksDisabled()) {
+      return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
+    }
+    const pool = await loadFallbackPool<{ title: string; body: string }>(svcClient, "zoom_out");
+    const prices = await fetchHistoricalAndCurrentPrices(svcClient, context, log);
+    return {
+      data: {
+        onThisDay: prices.onThisDay,
+        currentPrice: prices.currentPrice,
+        echo: null,
+        deepTime: pickRandom(pool),
+        partial: prices.isPartial,
+      },
+      source: "curated",
+      cacheId: null,
+    };
+  }
 
   // ── 1. Fetch historical BTC prices with DB caching ──
   const prices = await fetchHistoricalAndCurrentPrices(svcClient, context, log);
@@ -360,10 +448,15 @@ export async function generateZoomOut(params: GenerateZoomOutParams): Promise<Zo
     partial: prices.isPartial,
   };
 
+  if (userId && deepTimeResult.source === "live") {
+    trackEvent(svcClient, userId, "zoom_out_ai_call");
+  }
+
   return {
     data: result,
     source: deepTimeResult.source,
-    cacheId: null,
+    cacheId: deepTimeResult.cacheId ?? null,
+    cacheRelaxation: deepTimeResult.cacheRelaxation,
     error: deepTimeResult.error,
   };
 }

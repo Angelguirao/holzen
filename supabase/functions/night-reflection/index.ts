@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "npm:@supabase/supabase-js@2.57.2";
-import webpush from "npm:web-push@3.6.7";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import webpush from "https://esm.sh/web-push@3.6.7";
+import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -161,7 +162,7 @@ Write one personalized night reflection message.`;
       clearTimeout(timeout);
 
       if (!response.ok) {
-        console.error(`[NIGHT-REFLECTION] AI ${model} error: ${response.status}`);
+        holzenEdgeError("night-reflection", `AI ${model} HTTP ${response.status}`);
         if (model !== models[models.length - 1]) continue;
         return null;
       }
@@ -176,7 +177,7 @@ Write one personalized night reflection message.`;
       // Strip any surrounding quotes the model might add
       return content.replace(/^["']|["']$/g, "").trim();
     } catch (e) {
-      console.error(`[NIGHT-REFLECTION] AI ${model} error:`, e);
+      holzenEdgeError("night-reflection", `AI ${model} error`, e);
       if (model !== models[models.length - 1]) continue;
       return null;
     }
@@ -189,16 +190,17 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  // Auth: require service role key or cron secret
-  const { verifyServiceAuth } = await import("../_shared/auth.ts");
-  if (!verifyServiceAuth(req)) {
-    return new Response(JSON.stringify({ error: "Unauthorized" }), {
-      status: 401,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  }
-
   try {
+    holzenEdgeRun("night-reflection", "request", { method: req.method });
+    const { verifyServiceAuth } = await import("../_shared/auth.ts");
+    if (!verifyServiceAuth(req)) {
+      holzenEdgeRun("night-reflection", "auth rejected");
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    holzenEdgeRun("night-reflection", "auth ok");
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
@@ -208,7 +210,7 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
     const usdData = await fetchBtc1dData("USD");
-    console.log(`[NIGHT-REFLECTION] BTC 24h: ${usdData.changePercent.toFixed(2)}%`);
+    holzenEdgeLog("night-reflection", "BTC 24h context", { changePct: Number(usdData.changePercent.toFixed(2)) });
 
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
@@ -216,6 +218,7 @@ serve(async (req) => {
 
     if (profilesError) throw profilesError;
     if (!profiles || profiles.length === 0) {
+      holzenEdgeLog("night-reflection", "run complete", { sent: 0, reason: "no_profiles" });
       return new Response(JSON.stringify({ sent: 0 }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -354,7 +357,7 @@ serve(async (req) => {
                   const jwk = await crypto.subtle.exportKey("jwk", cryptoKey);
                   if (jwk.d) privateKey = jwk.d;
                 } catch (e) {
-                  console.error("[PUSH] Failed to extract key:", e);
+                  holzenEdgeError("night-reflection", "push: extract subscription key failed", e);
                 }
               }
             }
@@ -373,14 +376,14 @@ serve(async (req) => {
                   payload
                 );
               } catch (pushErr: any) {
-                console.error(`[PUSH] Failed:`, pushErr.message);
+                holzenEdgeError("night-reflection", "push send failed", pushErr.message);
                 if (pushErr.statusCode === 410 || pushErr.statusCode === 404) {
                   await supabase.from("push_subscriptions").delete().eq("endpoint", sub.endpoint);
                 }
               }
             }
           } catch (vapidErr) {
-            console.error("[PUSH] VAPID setup error:", vapidErr);
+            holzenEdgeError("night-reflection", "push VAPID setup error", vapidErr);
           }
         }
       }
@@ -388,13 +391,13 @@ serve(async (req) => {
       sent++;
     }
 
-    console.log(`[NIGHT-REFLECTION] Sent ${sent} night reflections`);
+    holzenEdgeLog("night-reflection", "run complete", { sent });
     return new Response(JSON.stringify({ sent }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
-    console.error("[NIGHT-REFLECTION] Error:", msg);
+    holzenEdgeError("night-reflection", "uncaught error", msg);
     return new Response(JSON.stringify({ error: msg }), {
       status: 500,
       headers: { ...corsHeaders, "Content-Type": "application/json" },

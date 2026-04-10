@@ -29,7 +29,7 @@ If these workers drift (stale prices, bad dedup, permissive auth), you get wrong
 - **Background producers**: workers run on cron/service role; **users** consume rows via edge functions and UI — eventual consistency between worker run and next user request.
 - **Cache vs source of truth**: `btc_price_cache` and `companion_cache` are **performance** layers; companion orchestration still may generate fresh content when cache misses.
 - **Dedup strategy shapes growth**: exact title dedup vs fuzzy title similarity — different false-negative rates for "near duplicate" content.
-- **Fail-open auth for cron**: secrets + `x-supabase-cron` headers must match how `docs/ops/cron-setup.md` invokes each function.
+- **Cron auth**: `docs/ops/cron-setup.md` and Vault-backed `net.http_post` should send **`Authorization: Bearer …`** (service role or `CRON_SECRET`); do not rely on `x-supabase-cron` as auth on public Edge URLs.
 
 ## CS/SE Concepts to Know (for this phase)
 
@@ -44,21 +44,24 @@ If these workers drift (stale prices, bad dedup, permissive auth), you get wrong
 
 - Scheduled (cron ~15 minutes per `docs/ops/cron-setup.md`).
 - Keeps `btc_price_cache` fresh so Zoom Out does not call CoinGecko during user sessions.
-- **Auth**: `Authorization: Bearer <service_role>` or `CRON_SECRET`, and `x-supabase-cron: true` accepted.
+- **Auth**: `Authorization: Bearer <service_role>` or `CRON_SECRET` ([`verifyServiceAuth`](../../supabase/functions/_shared/auth.ts)).
+- **Logs**: [`holzen-edge-log`](../../supabase/functions/_shared/holzen-edge-log.ts) tag **`refresh-btc`** — filter **`holzen:refresh-btc`** in Edge logs; set **`HOLZEN_EDGE_LOG=0`** to quiet non-error traces.
 - **Writes**: upsert current daily key; upsert historical "on this day" prices (1-4 years ago) when missing or older than 24h.
 - **Rate pressure**: ~2s delay between CoinGecko calls.
 
 ### `supabase/functions/fetch-source-feeds/index.ts` — active content library
 
 - Reads `signal_sources.url` (and related config); scrapes via Firecrawl when configured, else Perplexity fallback; structures entries via Lovable AI gateway into `content_library`.
-- **Auth**: service role or `CRON_SECRET` (including `x-supabase-cron`).
+- **Auth**: `SERVICE_CRON_BEARER` / `verifyServiceAuth` (service role or `CRON_SECRET`).
+- **Logs**: **`holzen:fetch-feeds`** ([`holzen-edge-log`](../../supabase/functions/_shared/holzen-edge-log.ts)).
 - **Inserts**: `companion_types` mapping (`signal` vs `ground_nudge`), title/summary/citation/url/tags, `quality_score: 2`.
 - **Dedup**: exact `title` match against existing `content_library` before insert.
 
 ### `supabase/functions/pregenerate-companions/index.ts` — companion_cache lifecycle
 
 - Periodic fill of `companion_cache` with high-quality payloads; processes `companion_feedback` via `analytics_events`.
-- **Auth**: `SUPABASE_SERVICE_ROLE_KEY` or `CRON_SECRET`.
+- **Auth**: Bruno **`SERVICE_CRON_BEARER`** (service_role JWT or `CRON_SECRET`); Edge: [`verifyServiceAuth`](../../supabase/functions/_shared/auth.ts).
+- **Logs**: **`holzen:pregenerate`** ([`holzen-edge-log`](../../supabase/functions/_shared/holzen-edge-log.ts)).
 - **Lifecycle**: promote high-quality entries to permanent (`expires_at = null`); prune low-quality after 3 days; expire medium tiers after 30 days.
 - **Generation loop**: small batch per type (grounding, signal, history, zoom-out deep time); dedup via title similarity vs existing cache rows.
 - **Feedback**: last 24h feedback events adjust `quality_score` within [0..3].
@@ -91,7 +94,7 @@ If these workers drift (stale prices, bad dedup, permissive auth), you get wrong
 
 ## Reviewer Questions Checklist
 
-1. Does each worker's auth gate match how cron actually calls it (headers, secrets, `x-supabase-cron`)?
+1. Does each worker's auth gate match how cron actually calls it (Bearer + Vault / secrets)?
 2. Are dedup keys stable if prompts or titles change slightly (exact title vs similarity)?
 3. Is `btc_price_cache` fresh enough for Zoom Out given the 24h historical refresh rule and cron cadence?
 4. Can `pregenerate-companions` prune or promote in a way that surprises users (empty cache, sudden drops)?
@@ -102,7 +105,7 @@ If these workers drift (stale prices, bad dedup, permissive auth), you get wrong
 - **Coherent story**: three workers **warm** price data, **ingest** library content, and **maintain** a companion cache pool — each reduces latency or API load at user time.
 - **Risks** (folded from prior "risks / validate"):
   - **Dedup vs near-duplicates**: exact title dedup in `fetch-source-feeds` and similarity dedup in `pregenerate-companions` can both miss "almost the same" rows if titles drift; caches can grow. Backlog: `docs/backlog/cache-dedup-near-duplicates.md`.
-  - **Auth consistency**: `refresh-btc-prices` accepts `x-supabase-cron: true` as a third signal — confirm other workers and ops docs agree so cron does not 401. Backlog: `docs/backlog/cron-worker-auth-consistency.md`.
+  - **Auth consistency**: workers use **`verifyServiceAuth`** + Bearer only; cron SQL must send a real secret (see `docs/backlog/cron-worker-auth-consistency.md`).
   - **Timing windows**: historical BTC snapshots depend on cron cadence + "older than 24h" semantics; **on this day** accuracy is bounded by that policy. Backlog: `docs/backlog/btc-price-cache-freshness.md`.
 
 Tradeoffs / alternatives:

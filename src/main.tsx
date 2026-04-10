@@ -1,6 +1,7 @@
 // Global error handler — catches module-evaluation crashes that prevent React from mounting
 import { createRoot } from "react-dom/client";
 import "./index.css";
+import { holzenLog } from "./lib/holzen-console";
 
 function showCrashScreen(label: string, err: unknown) {
   console.error(`[${label}]`, err);
@@ -29,18 +30,18 @@ window.addEventListener('unhandledrejection', (e) => {
   console.error('[boot-crash-promise]', e.reason);
 });
 
-async function boot() {
-  try {
-    const [{ default: App }, { listenForSwUpdate }] = await Promise.all([
-      import("./App.tsx"),
-      import("./lib/sw-update"),
-    ]);
-    await import("./i18n");
-    createRoot(document.getElementById("root")!).render(<App />);
-    listenForSwUpdate();
-  } catch (err) {
-    showCrashScreen("Boot error — failed to load app", err);
-  }
-}
+// Static imports: Lovable preview (and some hosts) resolve `import("./App.tsx")` to a raw
+// `/src/App.tsx` URL that is not served as JS — boot fails with "Failed to fetch dynamically imported module".
+import "./i18n";
+import App from "./App.tsx";
+import { listenForSwUpdate } from "./lib/sw-update";
 
-boot();
+try {
+  holzenLog.boot("start");
+  holzenLog.boot("createRoot + render <App />");
+  createRoot(document.getElementById("root")!).render(<App />);
+  listenForSwUpdate();
+  holzenLog.boot("listenForSwUpdate registered");
+} catch (err) {
+  showCrashScreen("Boot error — failed to load app", err);
+}

@@ -1,0 +1,16 @@
+meta {
+  name: deliver-letters
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{VITE_SUPABASE_URL}}/functions/v1/deliver-letters
+  body: none
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{SERVICE_CRON_BEARER}}
+  apikey: {{VITE_SUPABASE_PUBLISHABLE_KEY}}
+}

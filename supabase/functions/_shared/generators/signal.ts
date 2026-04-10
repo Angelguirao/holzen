@@ -8,20 +8,27 @@
  * API keys are read from Deno.env directly (same as the original function).
  */
 
-import { qualityGate, normalizeUrl, isUrlReachable, contentFingerprint } from "../quality.ts";
+import {
+  qualityGate,
+  normalizeUrl,
+  isUrlReachable,
+  contentFingerprint,
+  logQualityGateStructuredReject,
+} from "../quality.ts";
 import {
   companionFallbacksDisabled,
   COMPANION_FALLBACKS_DISABLED_MESSAGE,
   loadFallbackPool,
   pickRandom,
 } from "../fallbacks.ts";
-import { parseMarketDirection, serveFromCache } from "../cache.ts";
-import { createAttemptLogger } from "../observe.ts";
+import { type CacheServeRelaxation, parseMarketDirection, serveFromCache } from "../cache.ts";
+import { createAttemptLogger, trackEvent } from "../observe.ts";
 import { enqueueCatalogSourceSuggestion } from "../source-suggestions.ts";
 import { callPerplexityChat, mergePerplexityUsage } from "../perplexity-client.ts";
 import { validateSource } from "../source-validation.ts";
 import { searchLibrary, essayToSignal, recordLibraryServe } from "../content-library.ts";
 import { preferNonYoutubeCitationsFirst } from "../recent-signal-urls.ts";
+import { getPhaseConfig } from "../phase-config.ts";
 
 /** Bump when the search query, structuring prompt, or quality rules change. */
 export const PROMPT_VERSION = "v9";
@@ -115,9 +122,19 @@ Summarize faithfully and ground answers in real sources with retrievable URLs.${
 // ── Public types ──
 
 export interface SignalResult {
-  data: { title: string; body: string; source: string; url: string } | null;
+  data: {
+    title: string;
+    body: string;
+    source: string;
+    url: string;
+    quote?: string;
+    originalUrl?: string;
+    originalPublication?: string;
+  } | null;
   source: "live" | "cache" | "curated" | "empty";
   cacheId: string | null;
+  /** Set when `serveFromCache` served this row (not library / curated). */
+  cacheRelaxation?: CacheServeRelaxation;
   /** Set when source is `empty` (e.g. DISABLE_COMPANION_FALLBACKS + live failure) */
   error?: string;
 }
@@ -134,20 +151,18 @@ export interface GenerateSignalParams {
   userId?: string;
   reflectionId?: string | null;
   searchAngle?: string;
+  /** Skip library/cache phases and go straight to live (used by regenerate). */
+  forceLive?: boolean;
   log: (msg: string, extra?: Record<string, unknown>) => void;
 }
 
 // ── Internals ──
 
-async function serveFallback(
+/** Try content_library (essays) for signal. */
+async function tryLibrary(
   svcClient: any,
   userId?: string,
-  marketDirection?: "up" | "down" | "neutral",
-  excludeIds?: string[],
-): Promise<SignalResult> {
-  if (companionFallbacksDisabled()) {
-    return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
-  }
+): Promise<SignalResult | null> {
   const libraryRows = await searchLibrary(svcClient, {
     type: "essay",
     companionType: "signal",
@@ -160,10 +175,54 @@ async function serveFallback(
     recordLibraryServe(svcClient, userId, pick.id, "signal");
     return { data: result, source: "cache", cacheId: null };
   }
+  return null;
+}
+
+/** Try companion_cache for signal. */
+async function tryCache(
+  svcClient: any,
+  userId?: string,
+  marketDirection?: "up" | "down" | "neutral",
+  excludeIds?: string[],
+): Promise<SignalResult | null> {
   const cached = await serveFromCache(svcClient, "signal", "en", { userId, marketDirection, excludeIds });
-  if (cached) return { data: cached.data, source: "cache", cacheId: cached.cacheId };
+  if (cached) {
+    return {
+      data: cached.data,
+      source: "cache",
+      cacheId: cached.cacheId,
+      cacheRelaxation: cached.relaxation,
+    };
+  }
+  return null;
+}
+
+/** Last-resort curated fallback pool. */
+async function serveCurated(svcClient: any): Promise<SignalResult> {
   const pool = await loadFallbackPool<{ title: string; body: string; source: string; url: string }>(svcClient, "signal");
   return { data: pickRandom(pool), source: "curated", cacheId: null };
+}
+
+/** Resolve from non-live phases in order (library → cache → curated). */
+async function serveFallback(
+  svcClient: any,
+  userId?: string,
+  marketDirection?: "up" | "down" | "neutral",
+  excludeIds?: string[],
+): Promise<SignalResult> {
+  if (companionFallbacksDisabled()) {
+    return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
+  }
+  const phases = getPhaseConfig();
+  if (phases.library) {
+    const lib = await tryLibrary(svcClient, userId);
+    if (lib) return lib;
+  }
+  if (phases.cache) {
+    const cached = await tryCache(svcClient, userId, marketDirection, excludeIds);
+    if (cached) return cached;
+  }
+  return serveCurated(svcClient);
 }
 
 function buildSourceHints(sources?: Array<{ name: string; type: string; url?: string }>) {
@@ -197,9 +256,40 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
     userId,
     reflectionId,
     searchAngle,
+    forceLive,
     log,
   } = params;
   const marketDirection = parseMarketDirection(context);
+  const phases = getPhaseConfig();
+
+  if (!forceLive) {
+  // ── Phase 1: Library ──
+  if (phases.library) {
+    const lib = await tryLibrary(svcClient, userId);
+    if (lib) {
+      log("signal resolved from library (phase 1)");
+      return lib;
+    }
+  }
+
+  // ── Phase 2: Cache ──
+  if (phases.cache) {
+    const cached = await tryCache(svcClient, userId, marketDirection);
+    if (cached) {
+      log("signal resolved from cache (phase 2)");
+      return cached;
+    }
+  }
+  } // end !forceLive
+
+  // ── Phase 3: Live generation ──
+  if (!phases.live && !forceLive) {
+    log("live phase disabled, serving curated");
+    if (companionFallbacksDisabled()) {
+      return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
+    }
+    return serveCurated(svcClient);
+  }
 
   const logAttempt = createAttemptLogger(svcClient, { userId });
 
@@ -459,6 +549,7 @@ URL RULES (CRITICAL):
 
   const models = ["google/gemini-2.5-flash", "google/gemini-2.5-flash-lite"];
   let signal: any = null;
+  let lastLovableModel: string | undefined;
 
   const AI_TIMEOUTS = [8000, 6000];
   for (let idx = 0; idx < models.length; idx++) {
@@ -504,6 +595,7 @@ URL RULES (CRITICAL):
         }
       }
       logAttempt({ companion_type: "signal", provider: "lovable", model, status: "success", latency_ms: Date.now() - attemptT0, input_tokens: usage?.prompt_tokens, output_tokens: usage?.completion_tokens });
+      lastLovableModel = model;
       break;
     } catch (e) {
       clearTimeout(aiTimeout);
@@ -516,7 +608,19 @@ URL RULES (CRITICAL):
   // ── Step 3: Quality gate ──
   const qg = qualityGate("signal", signal);
   if (!signal || !qg.pass) {
-    log(`quality gate failed: ${!signal ? "no signal" : (qg.reason ?? "unknown")}`);
+    const reason = !signal ? "no_structured_output" : (qg.reason ?? "unknown");
+    log(`quality gate failed: ${reason}`);
+    logQualityGateStructuredReject("signal", reason);
+    if (signal && lastLovableModel) {
+      logAttempt({
+        companion_type: "signal",
+        provider: "lovable",
+        model: lastLovableModel,
+        status: "quality_gate_failed",
+        latency_ms: 0,
+        quality_gate_reason: qg.reason ?? "unknown",
+      });
+    }
     return serveFallback(svcClient, userId, marketDirection);
   }
 
@@ -549,7 +653,7 @@ URL RULES (CRITICAL):
   }
 
   // ── Step 5: Cache write ──
-  let qualityScore = 1;
+  const qualityScore = 1;
   if (signal.title && signal.body && signal.source && qualityScore > 0) {
     try {
       const { data: existing } = await svcClient
@@ -625,5 +729,6 @@ URL RULES (CRITICAL):
     }).catch(() => {});
   }
 
+  if (userId) trackEvent(svcClient, userId, "signal_companion_ai_call");
   return { data: signal, source: "live", cacheId: null };
 }

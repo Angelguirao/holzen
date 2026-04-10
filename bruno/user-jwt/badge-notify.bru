@@ -1,0 +1,23 @@
+meta {
+  name: badge-notify
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{VITE_SUPABASE_URL}}/functions/v1/badge-notify
+  body: json
+  auth: none
+}
+
+headers {
+  Authorization: Bearer {{SUPABASE_ACCESS_TOKEN}}
+  apikey: {{VITE_SUPABASE_PUBLISHABLE_KEY}}
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "badges": []
+  }
+}

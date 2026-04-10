@@ -16,6 +16,12 @@ const SOURCE_TYPE_COLORS: Record<string, string> = {
   newsletter: '#10b981',
   twitter: '#6366f1',
   video: '#ec4899',
+  /** RSS/Atom feed URL — fetch-source-feeds expands items → articles */
+  rss: '#22c55e',
+  feed: '#22c55e',
+  /** Site root — Firecrawl Map discovers article URLs */
+  site_map: '#f97316',
+  site: '#f97316',
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -131,6 +137,10 @@ export function SourceCatalogViewer({ sources, onRefresh, libraryEntries = [] }:
           This is <strong className="font-normal text-muted-foreground/65">not</strong> the <strong className="font-normal text-muted-foreground/65">Library</strong> tab. Library rows are full essays/papers/events matched by author for <strong className="font-normal text-muted-foreground/65">fallback</strong> when live generation does not produce a body. Sources here shape what the model can cite while it is still “live.”
         </p>
         <p className="text-[9px] text-muted-foreground/55 leading-relaxed">
+          <span className="font-mono text-muted-foreground/70">rss</span> / <span className="font-mono text-muted-foreground/70">feed</span> — URL is an RSS or Atom feed; the source-feeds job pulls recent item links and ingests articles.{' '}
+          <span className="font-mono text-muted-foreground/70">site_map</span> / <span className="font-mono text-muted-foreground/70">site</span> — URL is a site or section root; Firecrawl Map discovers pages, then we scrape article URLs. Otherwise one URL = one scrape (e.g. a single article).
+        </p>
+        <p className="text-[9px] text-muted-foreground/55 leading-relaxed">
           <span className="font-mono text-muted-foreground/70">Demoted from live</span> — row stays in the catalog but edge functions stop passing it into live web search until you restore it (no delete).
         </p>
         <div className="space-y-1">
@@ -158,6 +168,8 @@ export function SourceCatalogViewer({ sources, onRefresh, libraryEntries = [] }:
           <div className="flex gap-2">
             <select value={newType} onChange={e => setNewType(e.target.value)} className="text-[10px] font-mono bg-transparent border border-border/30 rounded px-1.5 py-0.5">
               <option value="blog">blog</option>
+              <option value="rss">rss (feed URL)</option>
+              <option value="site_map">site_map (discover URLs)</option>
               <option value="book">book</option>
               <option value="podcast">podcast</option>
               <option value="essay">essay</option>
