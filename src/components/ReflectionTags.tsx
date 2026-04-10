@@ -1,8 +1,10 @@
 import { useState, useCallback, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
-import { Tag, X } from 'lucide-react';
+import { Tag as TagIcon, X } from 'lucide-react';
 import { useAuth } from '@/hooks/use-auth';
+import { Tag } from '@/components/ui/tag';
+import { Input } from '@/components/ui/input';
 
 interface Props {
   reflectionId: string;
@@ -99,30 +101,30 @@ export function ReflectionTags({ reflectionId, initialTags }: Props) {
           <button
             key={tag}
             onClick={() => removeTag(tag)}
-            className="inline-flex items-center gap-0.5 text-[10px] font-mono px-1.5 py-0.5 rounded bg-primary/10 text-primary hover:bg-primary/20 transition-colors"
+            className="inline-flex items-center gap-1 rounded-full border border-input bg-background px-2 py-0.5 text-[10px] font-mono text-foreground transition-colors hover:bg-accent"
           >
-            {tag}
-            <X className="h-2.5 w-2.5 text-primary/50 ml-0.5" />
+            <Tag state="selected" className="px-1.5 py-0 text-[10px] font-mono">{tag}</Tag>
+            <X className="h-2.5 w-2.5 text-muted-foreground" />
           </button>
         ))}
         <button
           onClick={() => setOpen(!open)}
           className="inline-flex items-center gap-0.5 text-[10px] font-mono text-muted-foreground/50 hover:text-muted-foreground transition-colors"
         >
-          <Tag className="h-2.5 w-2.5" />
+          <TagIcon className="h-2.5 w-2.5" />
           {tags.length === 0 ? t('reflectionTags.addTags') : '+'}
         </button>
       </div>
 
       {open && (
         <div className="space-y-1.5">
-          <input
+          <Input
             ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={t('reflectionTags.typeTag')}
-            className="w-full text-[11px] font-mono px-2 py-1.5 rounded border border-border/60 bg-background text-foreground placeholder:text-muted-foreground/40 focus:outline-none focus:border-primary/40 transition-colors"
+            className="h-8 text-[11px] font-mono placeholder:text-muted-foreground/40"
           />
           {suggestions.length > 0 && (
             <div className="flex flex-wrap gap-1">
