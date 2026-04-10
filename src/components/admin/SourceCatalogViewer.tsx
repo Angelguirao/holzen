@@ -10,18 +10,18 @@ import { adminDeleteOneRow, adminDeleteRowsByIds } from '@/lib/admin-delete';
 const DELETE_CHUNK = 40;
 
 const SOURCE_TYPE_COLORS: Record<string, string> = {
-  blog: '#8b5cf6',
-  podcast: '#06b6d4',
-  book: '#f59e0b',
-  newsletter: '#10b981',
-  twitter: '#6366f1',
-  video: '#ec4899',
+  blog: 'hsl(var(--primary) / 0.8)',
+  podcast: 'hsl(var(--secondary-foreground) / 0.8)',
+  book: 'hsl(var(--muted-foreground) / 0.8)',
+  newsletter: 'hsl(var(--accent-foreground) / 0.75)',
+  twitter: 'hsl(var(--ring) / 0.8)',
+  video: 'hsl(var(--destructive) / 0.8)',
   /** RSS/Atom feed URL — fetch-source-feeds expands items → articles */
-  rss: '#22c55e',
-  feed: '#22c55e',
+  rss: 'hsl(var(--primary) / 0.7)',
+  feed: 'hsl(var(--primary) / 0.7)',
   /** Site root — Firecrawl Map discovers article URLs */
-  site_map: '#f97316',
-  site: '#f97316',
+  site_map: 'hsl(var(--secondary-foreground) / 0.7)',
+  site: 'hsl(var(--secondary-foreground) / 0.7)',
 };
 
 const CATEGORY_LABELS: Record<string, string> = {
@@ -81,7 +81,7 @@ export function SourceCatalogViewer({ sources, onRefresh, libraryEntries = [] }:
       url: newUrl.trim() || null,
       type: newType,
       category: newCategory,
-    } as any);
+    });
     setSaving(false);
     if (error) { toast({ title: 'Add source failed', description: error.message, variant: 'destructive' }); return; }
     setNewName('');
@@ -99,7 +99,7 @@ export function SourceCatalogViewer({ sources, onRefresh, libraryEntries = [] }:
   };
 
   const setDemotedForLive = async (id: string, demoted: boolean) => {
-    const { error } = await supabase.from('signal_sources').update({ demoted_for_live: demoted } as any).eq('id', id);
+    const { error } = await supabase.from('signal_sources').update({ demoted_for_live: demoted }).eq('id', id);
     if (error) { toast({ title: 'Update failed', description: error.message, variant: 'destructive' }); return; }
     onRefresh();
   };
@@ -233,8 +233,8 @@ export function SourceCatalogViewer({ sources, onRefresh, libraryEntries = [] }:
                       <div className="flex items-center gap-2 mt-0.5">
                         <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full"
                           style={{
-                            backgroundColor: `${SOURCE_TYPE_COLORS[src.type] ?? '#64748b'}20`,
-                            color: SOURCE_TYPE_COLORS[src.type] ?? '#64748b',
+                            backgroundColor: SOURCE_TYPE_COLORS[src.type] ?? 'hsl(var(--muted-foreground) / 0.2)',
+                            color: SOURCE_TYPE_COLORS[src.type] ?? 'hsl(var(--muted-foreground) / 0.8)',
                           }}>
                           {src.type}
                         </span>
@@ -244,7 +244,7 @@ export function SourceCatalogViewer({ sources, onRefresh, libraryEntries = [] }:
                           </span>
                         )}
                         {src.demoted_for_live && (
-                          <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full bg-orange-500/15 text-orange-700/85 dark:text-orange-400/85">
+                          <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full bg-secondary text-secondary-foreground/85">
                             demoted from live
                           </span>
                         )}
@@ -261,7 +261,7 @@ export function SourceCatalogViewer({ sources, onRefresh, libraryEntries = [] }:
                       <button
                         type="button"
                         onClick={(e) => { e.stopPropagation(); setDemotedForLive(src.id, !src.demoted_for_live); }}
-                        className="text-[9px] font-mono text-orange-600/70 dark:text-orange-400/70 hover:text-orange-600 dark:hover:text-orange-400 transition-colors text-right"
+                        className="text-[9px] font-mono text-secondary-foreground/70 hover:text-secondary-foreground transition-colors text-right"
                       >
                         {src.demoted_for_live ? 'Restore to live' : 'Demote from live'}
                       </button>

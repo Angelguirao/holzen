@@ -100,30 +100,30 @@ function generateShareImage(
     const ctx = canvas.getContext('2d')!;
     ctx.scale(scale, scale);
 
-    ctx.fillStyle = '#f5f2ec';
+    ctx.fillStyle = 'rgb(245 242 236)';
     ctx.fillRect(0, 0, width, height);
 
-    ctx.fillStyle = '#2a2a2a';
+    ctx.fillStyle = 'rgb(42 42 42)';
     ctx.fillRect(0, 0, width, 3);
 
     let y = pad + 16;
 
     if (context) {
       ctx.font = '11px "IBM Plex Mono", monospace';
-      ctx.fillStyle = '#9a9488';
+      ctx.fillStyle = 'rgb(154 148 136)';
       ctx.fillText(context.toUpperCase(), pad, y);
       y += 28;
     }
 
     ctx.font = '20px "Inter", system-ui, sans-serif';
-    ctx.fillStyle = '#2a2a2a';
+    ctx.fillStyle = 'rgb(42 42 42)';
     y = wrapText(ctx, message, pad, y, contentWidth, 30);
     y += 32;
 
     if (haiku) {
       const haikuLines = haiku.split(/\\n|\n/).map((l: string) => l.trim()).filter(Boolean);
 
-      ctx.strokeStyle = '#d8d4cc';
+      ctx.strokeStyle = 'rgb(216 212 204)';
       ctx.lineWidth = 0.5;
       ctx.beginPath();
       ctx.moveTo(pad, y);
@@ -132,7 +132,7 @@ function generateShareImage(
       y += 20;
 
       ctx.font = 'italic 14px "IBM Plex Mono", monospace';
-      ctx.fillStyle = '#6b6560';
+      ctx.fillStyle = 'rgb(107 101 96)';
       for (const line of haikuLines) {
         ctx.fillText(line, pad, y);
         y += 22;
@@ -142,7 +142,7 @@ function generateShareImage(
 
     const footerY = height - pad + 4;
 
-    ctx.strokeStyle = '#d8d4cc';
+    ctx.strokeStyle = 'rgb(216 212 204)';
     ctx.lineWidth = 0.5;
     ctx.beginPath();
     ctx.moveTo(pad, footerY - 20);
@@ -150,11 +150,11 @@ function generateShareImage(
     ctx.stroke();
 
     ctx.font = '9px "IBM Plex Mono", monospace';
-    ctx.fillStyle = '#9a9488';
+    ctx.fillStyle = 'rgb(154 148 136)';
     ctx.fillText('HOLZEN', pad, footerY);
 
     ctx.font = '9px "IBM Plex Mono", monospace';
-    ctx.fillStyle = '#b8b4ac';
+    ctx.fillStyle = 'rgb(184 180 172)';
     const tagline = 'PAUSE BEFORE YOU ACT';
     const tagWidth = ctx.measureText(tagline).width;
     ctx.fillText(tagline, width - pad - tagWidth, footerY);
@@ -192,8 +192,8 @@ export const ShareReflection = forwardRef<HTMLButtonElement, Props>(
           URL.revokeObjectURL(url);
           toast(t('share.imageDownloaded'));
         }
-      } catch (e: any) {
-        if (e.name !== 'AbortError') {
+      } catch (e: unknown) {
+        if (!(e instanceof DOMException && e.name === 'AbortError')) {
           toast.error(t('share.couldNotShareImage'));
         }
       }

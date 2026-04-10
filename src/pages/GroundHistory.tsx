@@ -6,6 +6,8 @@ import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { MoodIcon } from '@/components/icons/MoodIcon';
+import { NoxHeaderMain } from '@/components/ui/nox-header';
+import { Button } from '@/components/ui/button';
 
 interface GroundingEntry {
   id: string;
@@ -116,11 +118,8 @@ export default function GroundHistory() {
           >
             <ArrowLeft className="h-4 w-4" />
           </button>
-          <div className="flex items-center gap-2">
-            <Anchor className="h-3.5 w-3.5 text-muted-foreground/30" />
-            <h1 className="text-xs font-mono tracking-[0.2em] uppercase text-foreground/60">
-              {t('ground.historyTitle', 'Grounding Journal')}
-            </h1>
+          <div className="flex-1">
+            <NoxHeaderMain title={t('ground.historyTitle', 'Grounding Journal')} />
           </div>
         </div>
       </div>
@@ -162,12 +161,14 @@ export default function GroundHistory() {
             <p className="text-sm text-muted-foreground/40 font-mono">
               {t('ground.noHistory', 'No grounding sessions yet')}
             </p>
-            <button
+            <Button
+              variant="tertiary"
+              size="sm"
               onClick={() => navigate('/ground', { replace: true })}
-              className="text-xs font-mono text-primary/50 hover:text-primary transition-colors underline underline-offset-4"
+              className="mx-auto font-mono"
             >
               {t('ground.startFirst', 'Start your first session')}
-            </button>
+            </Button>
           </motion.div>
         )}
 

@@ -74,7 +74,7 @@ export function TheVoid({ open, onClose }: TheVoidProps) {
         >
           <button
             onClick={handleClose}
-            className="absolute top-6 right-6 p-2 text-amber-200/20 hover:text-amber-200/50 transition-colors duration-500"
+            className="absolute top-6 right-6 p-2 text-foreground/20 hover:text-foreground/50 transition-colors duration-500"
           >
             <X className="h-5 w-5" />
           </button>
@@ -105,7 +105,7 @@ export function TheVoid({ open, onClose }: TheVoidProps) {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5, duration: 1 }}
-                className="relative z-10 text-amber-200/40 hover:text-amber-200/60 transition-colors duration-700 font-mono text-xs tracking-[0.3em] uppercase"
+                className="relative z-10 text-foreground/40 hover:text-foreground/60 transition-colors duration-700 font-mono text-xs tracking-[0.3em] uppercase"
               >
                 {t('void.begin')}
               </motion.button>
@@ -116,7 +116,7 @@ export function TheVoid({ open, onClose }: TheVoidProps) {
                 transition={{ duration: 1.5 }}
                 className="relative z-10 flex flex-col items-center gap-8"
               >
-                <p className="text-amber-200/30 font-mono text-xs tracking-[0.3em] uppercase">
+                <p className="text-foreground/30 font-mono text-xs tracking-[0.3em] uppercase">
                   {t('void.youStayed')}
                 </p>
                 <motion.button
@@ -124,7 +124,7 @@ export function TheVoid({ open, onClose }: TheVoidProps) {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 2, duration: 1 }}
-                  className="text-amber-200/20 hover:text-amber-200/40 transition-colors duration-700 font-mono text-[10px] tracking-[0.2em] uppercase"
+                  className="text-foreground/20 hover:text-foreground/40 transition-colors duration-700 font-mono text-[10px] tracking-[0.2em] uppercase"
                 >
                   {t('void.return')}
                 </motion.button>

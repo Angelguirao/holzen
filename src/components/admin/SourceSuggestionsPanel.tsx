@@ -29,7 +29,7 @@ export function SourceSuggestionsPanel({ onCatalogChanged }: { onCatalogChanged?
 
   const fetchRows = useCallback(async () => {
     setLoading(true);
-    const { data, error } = await (supabase as any)
+    const { data, error } = await supabase
       .from('signal_source_suggestions')
       .select('id, category, suggested_name, suggested_url, suggested_type, dedupe_key, status, metadata, created_at, reviewed_at')
       .eq('status', 'pending')
@@ -54,13 +54,13 @@ export function SourceSuggestionsPanel({ onCatalogChanged }: { onCatalogChanged?
       type: row.suggested_type || 'blog',
       category: row.category,
       demoted_for_live: false,
-    } as any);
+    });
     if (insErr) {
       toast({ title: 'Add to catalog failed', description: insErr.message, variant: 'destructive' });
       setActing(null);
       return;
     }
-    const { error: upErr } = await (supabase as any)
+    const { error: upErr } = await supabase
       .from('signal_source_suggestions')
       .update({ status: 'approved', reviewed_at: new Date().toISOString() })
       .eq('id', row.id);
@@ -76,7 +76,7 @@ export function SourceSuggestionsPanel({ onCatalogChanged }: { onCatalogChanged?
 
   const reject = async (row: SourceSuggestionRow) => {
     setActing(row.id);
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from('signal_source_suggestions')
       .update({ status: 'rejected', reviewed_at: new Date().toISOString() })
       .eq('id', row.id);
@@ -145,7 +145,7 @@ export function SourceSuggestionsPanel({ onCatalogChanged }: { onCatalogChanged?
                     type="button"
                     onClick={() => approve(row)}
                     disabled={busy}
-                    className="inline-flex items-center gap-0.5 text-[9px] font-mono text-emerald-600/80 dark:text-emerald-400/80 hover:text-emerald-600 disabled:opacity-30"
+                    className="inline-flex items-center gap-0.5 text-[9px] font-mono text-primary/80 hover:text-primary disabled:opacity-30"
                   >
                     {busy ? <Loader2 className="h-3 w-3 animate-spin" /> : <Check className="h-3 w-3" />}
                     Approve

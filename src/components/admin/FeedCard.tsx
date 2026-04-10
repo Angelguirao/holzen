@@ -44,8 +44,8 @@ export function FeedCard({ item, selected, onToggleSelect, selectDisabled }: Fee
             <span
               className="text-[9px] font-mono px-1.5 py-0.5 rounded-full flex-shrink-0"
               style={{
-                backgroundColor: `${TYPE_COLORS[item.companion_type] ?? '#64748b'}20`,
-                color: TYPE_COLORS[item.companion_type] ?? '#64748b',
+                backgroundColor: TYPE_COLORS[item.companion_type] ?? 'hsl(var(--muted-foreground) / 0.2)',
+                color: TYPE_COLORS[item.companion_type] ?? 'hsl(var(--muted-foreground) / 0.8)',
               }}
             >
               {label(item.companion_type)}
