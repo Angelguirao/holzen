@@ -439,7 +439,7 @@ flowchart TB
 | **UI widget** | Same shape as the Ground card: **`LearningInput`** (title, body, citation-style nudge). |
 | **Secondary** | If **`severity === "high"`**, selection may add **`secondary: "zoom_out"`**; zoom payload comes from the **`zoomOut`** task when fulfilled. |
 | **AI** | **Yes** (Grounding generator — Perplexity + structure; see §6). |
-| **Product note** | If **Ground** companion pref is **on**, the user can see **the same grounding payload** both in the **trap** intervention and in the **Ground** card — same generator, two surfaces. |
+| **Duplicate avoidance** | `CompanionSection` **hides the Ground card** when `intervention.primary.type === "trap"` so the same grounding payload is not shown twice (same pattern as Zoom Out secondary dedup — see §7.5). |
 | **Gating** | Trap **copy** comes from the **grounding** task. The orchestrator runs that task whenever **`primary === "trap"`**, even if **`enableGrounding`** is false; catalog URLs are loaded server-side if the client did not send **`groundingSources`**. |
 
 ---
@@ -453,6 +453,7 @@ flowchart TB
 | **Framing** | `PatternFraming` + **`HistoricalInsightDisplay`**. |
 | **Secondary** | High-severity pattern **always** includes zoom-out secondary; moderate default includes zoom-out; mild default does **not**. |
 | **AI** | **Yes** (History generator; Zoom secondary uses Zoom Out generator when enabled). |
+| **Duplicate avoidance** | `CompanionSection` **hides the History (Look Back) card** when `intervention.primary.type === "pattern"` so the same history payload is not shown twice (same pattern as Zoom Out secondary dedup — see §7.5, and trap/grounding dedup — see §7.2). |
 | **Gating** | **Pattern** forces the **history** task; **zoom_out** secondary forces **zoomOut** — both run even when the matching **`enable*`** is false. Headline data still depends on the task succeeding (API errors, budget, etc.). |
 
 ---

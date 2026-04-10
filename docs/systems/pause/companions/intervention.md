@@ -66,6 +66,7 @@ flowchart LR
 | **UI** | Same shape as Ground card: `LearningInput` (title, body, citation-style nudge). |
 | **Secondary** | When `severity === "high"`, adds `secondary: "zoom_out"`. |
 | **Forced generator** | Orchestrator runs the grounding task even if `enableGrounding` is false; loads catalog server-side if client omitted `groundingSources`. |
+| **Duplicate avoidance** | `CompanionSection` hides the Ground card when trap is selected so the same content is not shown twice. |
 
 ### 3.3 Pattern (`primary: "pattern"`)
 
@@ -77,6 +78,7 @@ flowchart LR
 | **Framing** | `PatternFraming` + `HistoricalInsightDisplay`. |
 | **Secondary** | High severity → always `zoom_out`; moderate default → `zoom_out`; mild default → no secondary. |
 | **Forced generator** | Orchestrator runs the history task even if `enableHistory` is false; runs zoomOut when secondary is `zoom_out`. |
+| **Duplicate avoidance** | `CompanionSection` hides the History (Look Back) card when pattern is selected so the same content is not shown twice. |
 
 ### 3.4 Question mode (`mode: "question"`)
 

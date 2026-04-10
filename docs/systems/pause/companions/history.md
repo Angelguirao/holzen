@@ -79,7 +79,7 @@ When `selectIntervention` picks **pattern** as the primary intervention:
 2. The history result is copied into `intervention.primary = { type: "pattern", data }`.
 3. `PatternFraming` + `HistoricalInsightDisplay` render the result in the intervention section.
 
-If the user **also** has the Look Back companion card enabled, they may see the **same payload** in both the pattern headline and the History card — same generator, two surfaces.
+**Duplicate avoidance:** `CompanionSection` **hides** the Look Back card when `intervention.primary.type === "pattern"` so the same history content is not shown twice (same pattern as Zoom Out secondary dedup and trap/grounding dedup).
 
 ---
 
