@@ -8,6 +8,8 @@ import { label } from './admin-constants';
 import { FilterRow } from './FilterRow';
 import { QualityBadge } from './QualityBadge';
 import { AdminBulkBar } from './AdminBulkBar';
+import { normalizeLibraryItemUrl } from '@/lib/library-item-url';
+import { normalizeTitleKey, urlDedupCandidates } from '../../../supabase/functions/_shared/content-dedup.ts';
 
 const UPDATE_CHUNK = 40;
 
@@ -27,6 +29,25 @@ export function ContentLibraryViewer({ entries, onRefresh }: { entries: LibraryE
   const [deleting, setDeleting] = useState<string | null>(null);
   const [bulkBusy, setBulkBusy] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(() => new Set());
+  const [adding, setAdding] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [newType, setNewType] = useState<'essay' | 'paper' | 'event'>('essay');
+  const [newTitle, setNewTitle] = useState('');
+  const [newAuthor, setNewAuthor] = useState('');
+  const [newSummary, setNewSummary] = useState('');
+  const [newUrl, setNewUrl] = useState('');
+  const [newTags, setNewTags] = useState('');
+  const [newCompanionTypes, setNewCompanionTypes] = useState('signal');
+  const [newQuality, setNewQuality] = useState('2');
+  const [newKeyQuote, setNewKeyQuote] = useState('');
+  const [newCitation, setNewCitation] = useState('');
+  const [newFinding, setNewFinding] = useState('');
+  const [newEventDate, setNewEventDate] = useState('');
+  const [newAssetClass, setNewAssetClass] = useState('');
+  const [newAnalogy, setNewAnalogy] = useState('');
+  const [newRecovery, setNewRecovery] = useState('');
+  const [newMoodTag, setNewMoodTag] = useState('');
+  const [previewBusy, setPreviewBusy] = useState(false);
 
   const typeOptions = useMemo(() => {
     const types = Array.from(new Set(entries.map(e => e.type))).sort();
@@ -59,6 +80,7 @@ export function ContentLibraryViewer({ entries, onRefresh }: { entries: LibraryE
   const deleteEntry = useCallback(async (id: string, title: string) => {
     if (!window.confirm(`Remove "${title}" from library?`)) return;
     setDeleting(id);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Supabase typed update payload
     const { error } = await supabase.from('content_library').update({ active: false } as any).eq('id', id);
     setDeleting(null);
     if (error) { toast({ title: 'Remove entry failed', description: error.message, variant: 'destructive' }); return; }
@@ -74,6 +96,7 @@ export function ContentLibraryViewer({ entries, onRefresh }: { entries: LibraryE
     try {
       for (let i = 0; i < ids.length; i += UPDATE_CHUNK) {
         const slice = ids.slice(i, i + UPDATE_CHUNK);
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Supabase typed update payload
         const { error } = await supabase.from('content_library').update({ active: false } as any).in('id', slice);
         if (error) {
           toast({ title: 'Bulk deactivate failed', description: error.message, variant: 'destructive' });
@@ -93,6 +116,160 @@ export function ContentLibraryViewer({ entries, onRefresh }: { entries: LibraryE
     }
   }, [idsShown, selectedIds, onRefresh, toast]);
 
+  const resetAddForm = useCallback(() => {
+    setNewType('essay');
+    setNewTitle('');
+    setNewAuthor('');
+    setNewSummary('');
+    setNewUrl('');
+    setNewTags('');
+    setNewCompanionTypes('signal');
+    setNewQuality('2');
+    setNewKeyQuote('');
+    setNewCitation('');
+    setNewFinding('');
+    setNewEventDate('');
+    setNewAssetClass('');
+    setNewAnalogy('');
+    setNewRecovery('');
+    setNewMoodTag('');
+    setPreviewBusy(false);
+  }, []);
+
+  const previewFromUrl = useCallback(async () => {
+    const raw = newUrl.trim();
+    if (!raw) {
+      toast({ title: 'Enter a URL first', variant: 'destructive' });
+      return;
+    }
+    const normalized = normalizeLibraryItemUrl(raw);
+    setNewUrl(normalized);
+    setPreviewBusy(true);
+    const { data, error } = await supabase.functions.invoke('admin-library-preview', {
+      body: { url: normalized },
+    });
+    setPreviewBusy(false);
+    if (error) {
+      toast({ title: 'Preview failed', description: error.message, variant: 'destructive' });
+      return;
+    }
+    const payload = data as {
+      error?: string;
+      title?: string;
+      author?: string | null;
+      summary?: string;
+      key_quote?: string | null;
+      hint?: string;
+    };
+    if (payload?.error) {
+      toast({ title: 'Preview failed', description: payload.error, variant: 'destructive' });
+      return;
+    }
+    if (payload.title) setNewTitle(payload.title);
+    if (payload.author !== undefined) setNewAuthor(payload.author ?? '');
+    if (payload.summary) setNewSummary(payload.summary);
+    if (payload.key_quote && newType === 'essay') setNewKeyQuote(payload.key_quote);
+    if (payload.hint) {
+      toast({ title: 'Preview (partial)', description: payload.hint });
+    } else {
+      toast({ title: 'Filled from URL', description: 'Review title, author, and summary before saving.' });
+    }
+  }, [newUrl, newType, toast]);
+
+  const addEntry = useCallback(async () => {
+    if (!newTitle.trim() || !newSummary.trim()) return;
+
+    const urlForRow = newUrl.trim() ? normalizeLibraryItemUrl(newUrl) : '';
+    const titleNorm = normalizeTitleKey(newTitle);
+    const urlCandidates = urlForRow ? urlDedupCandidates(urlForRow) : [];
+
+    const { data: dupTitleRows } = await supabase
+      .from('content_library')
+      .select('id,title')
+      .eq('title_norm', titleNorm)
+      .eq('active', true)
+      .limit(1);
+    const dupTitle = dupTitleRows?.[0];
+
+    let dupUrl: { id: string; title: string } | null = null;
+    if (urlCandidates.length > 0) {
+      const { data: dupUrlRows } = await supabase
+        .from('content_library')
+        .select('id,title')
+        .eq('active', true)
+        .in('url', urlCandidates)
+        .limit(1);
+      dupUrl = dupUrlRows?.[0] ?? null;
+    }
+
+    if (dupTitle || dupUrl) {
+      const parts: string[] = [];
+      if (dupTitle) parts.push(`same title as “${dupTitle.title}”`);
+      if (dupUrl) parts.push(`same URL as “${dupUrl.title}”`);
+      const ok = window.confirm(`Possible duplicate (${parts.join('; ')}). Add anyway?`);
+      if (!ok) return;
+    }
+
+    const qualityParsed = parseInt(newQuality, 10);
+    const qualityScore = Number.isNaN(qualityParsed) ? 2 : Math.max(1, Math.min(5, qualityParsed));
+    const tags = newTags.split(',').map((s) => s.trim()).filter(Boolean);
+    const companionTypes = newCompanionTypes.split(',').map((s) => s.trim()).filter(Boolean);
+
+    const payload: Record<string, unknown> = {
+      type: newType,
+      title: newTitle.trim(),
+      author: newAuthor.trim() || null,
+      summary: newSummary.trim(),
+      url: urlForRow || null,
+      tags,
+      companion_types: companionTypes,
+      quality_score: qualityScore,
+      language: 'en',
+      active: true,
+      key_quote: newType === 'essay' ? (newKeyQuote.trim() || null) : null,
+      citation: newType === 'paper' ? (newCitation.trim() || null) : null,
+      finding: newType === 'paper' ? (newFinding.trim() || null) : null,
+      event_date: newType === 'event' ? (newEventDate.trim() || null) : null,
+      asset_class: newType === 'event' ? (newAssetClass.trim() || null) : null,
+      analogy: newType === 'event' ? (newAnalogy.trim() || null) : null,
+      recovery: newType === 'event' ? (newRecovery.trim() || null) : null,
+      mood_tag: newType === 'event' ? (newMoodTag.trim() || null) : null,
+    };
+
+    setSaving(true);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Supabase typed insert payload
+    const { error } = await supabase.from('content_library').insert(payload as any);
+    setSaving(false);
+    if (error) {
+      toast({ title: 'Add library item failed', description: error.message, variant: 'destructive' });
+      return;
+    }
+    resetAddForm();
+    setAdding(false);
+    onRefresh();
+    toast({ title: 'Library item added' });
+  }, [
+    newTitle,
+    newSummary,
+    newQuality,
+    newTags,
+    newCompanionTypes,
+    newType,
+    newAuthor,
+    newUrl,
+    newKeyQuote,
+    newCitation,
+    newFinding,
+    newEventDate,
+    newAssetClass,
+    newAnalogy,
+    newRecovery,
+    newMoodTag,
+    onRefresh,
+    resetAddForm,
+    toast,
+  ]);
+
   return (
     <div className="space-y-3">
       <div className="rounded-xl border border-border/20 bg-card/10 px-4 py-3 space-y-2">
@@ -103,6 +280,92 @@ export function ContentLibraryViewer({ entries, onRefresh }: { entries: LibraryE
           This is where you edit the long-form “curated” content users can receive. Monitor’s per-serve “curated” count is mostly hardcoded fallbacks when both Library and cache miss — not this list directly. Entries align with Sources by author name where applicable. Deactivate sets <span className="font-mono">active = false</span>.
         </p>
       </div>
+
+      {!adding ? (
+        <button onClick={() => setAdding(true)} className="text-[10px] font-mono text-primary/70 hover:text-primary transition-colors">
+          + Add library item
+        </button>
+      ) : (
+        <div className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 space-y-2">
+          <div className="flex gap-2">
+            <select value={newType} onChange={(e) => setNewType(e.target.value as 'essay' | 'paper' | 'event')} className="text-[10px] font-mono bg-transparent border border-border/30 rounded px-1.5 py-0.5">
+              <option value="essay">essay</option>
+              <option value="paper">paper</option>
+              <option value="event">event</option>
+            </select>
+            <input
+              value={newQuality}
+              onChange={(e) => setNewQuality(e.target.value)}
+              placeholder="quality 1-5"
+              className="w-24 text-[10px] font-mono bg-transparent border-b border-border/30 pb-1 outline-none placeholder:text-muted-foreground/40"
+            />
+          </div>
+          <input value={newTitle} onChange={e => setNewTitle(e.target.value)} placeholder="Title *" className="w-full text-[10px] font-mono bg-transparent border-b border-border/30 pb-1 outline-none placeholder:text-muted-foreground/40" />
+          <input value={newAuthor} onChange={e => setNewAuthor(e.target.value)} placeholder="Author (optional)" className="w-full text-[10px] font-mono bg-transparent border-b border-border/30 pb-1 outline-none placeholder:text-muted-foreground/40" />
+          <div className="flex flex-wrap items-end gap-2">
+            <input
+              value={newUrl}
+              onChange={(e) => setNewUrl(e.target.value)}
+              placeholder="URL (optional)"
+              className="min-w-[12rem] flex-1 text-[10px] font-mono bg-transparent border-b border-border/30 pb-1 outline-none placeholder:text-muted-foreground/40"
+            />
+            <button
+              type="button"
+              onClick={() => void previewFromUrl()}
+              disabled={previewBusy || !newUrl.trim()}
+              className="text-[10px] font-mono text-primary/80 hover:text-primary disabled:opacity-30 shrink-0"
+            >
+              {previewBusy ? 'Fetching…' : 'Fill from URL'}
+            </button>
+          </div>
+          <p className="text-[8px] text-muted-foreground/45 leading-relaxed">
+            Fill from URL calls the <span className="font-mono">admin-library-preview</span> edge function (Firecrawl + optional Gemini via Lovable). You must be an admin; secrets match fetch-source-feeds.
+          </p>
+          <textarea value={newSummary} onChange={e => setNewSummary(e.target.value)} placeholder="Summary * (2-5 sentences)" rows={3} className="w-full text-[10px] font-mono bg-transparent border border-border/30 rounded px-2 py-1.5 outline-none placeholder:text-muted-foreground/40" />
+          <input value={newTags} onChange={e => setNewTags(e.target.value)} placeholder="tags (comma-separated, optional)" className="w-full text-[10px] font-mono bg-transparent border-b border-border/30 pb-1 outline-none placeholder:text-muted-foreground/40" />
+          <input value={newCompanionTypes} onChange={e => setNewCompanionTypes(e.target.value)} placeholder="companion_types (comma-separated, e.g. signal)" className="w-full text-[10px] font-mono bg-transparent border-b border-border/30 pb-1 outline-none placeholder:text-muted-foreground/40" />
+
+          {newType === 'essay' && (
+            <input value={newKeyQuote} onChange={e => setNewKeyQuote(e.target.value)} placeholder="Key quote (optional)" className="w-full text-[10px] font-mono bg-transparent border-b border-border/30 pb-1 outline-none placeholder:text-muted-foreground/40" />
+          )}
+          {newType === 'paper' && (
+            <>
+              <input value={newCitation} onChange={e => setNewCitation(e.target.value)} placeholder="Citation (optional)" className="w-full text-[10px] font-mono bg-transparent border-b border-border/30 pb-1 outline-none placeholder:text-muted-foreground/40" />
+              <input value={newFinding} onChange={e => setNewFinding(e.target.value)} placeholder="Finding (optional)" className="w-full text-[10px] font-mono bg-transparent border-b border-border/30 pb-1 outline-none placeholder:text-muted-foreground/40" />
+            </>
+          )}
+          {newType === 'event' && (
+            <>
+              <input value={newEventDate} onChange={e => setNewEventDate(e.target.value)} placeholder="Event date (optional)" className="w-full text-[10px] font-mono bg-transparent border-b border-border/30 pb-1 outline-none placeholder:text-muted-foreground/40" />
+              <input value={newAssetClass} onChange={e => setNewAssetClass(e.target.value)} placeholder="Asset class (optional)" className="w-full text-[10px] font-mono bg-transparent border-b border-border/30 pb-1 outline-none placeholder:text-muted-foreground/40" />
+              <input value={newAnalogy} onChange={e => setNewAnalogy(e.target.value)} placeholder="Analogy (optional)" className="w-full text-[10px] font-mono bg-transparent border-b border-border/30 pb-1 outline-none placeholder:text-muted-foreground/40" />
+              <input value={newRecovery} onChange={e => setNewRecovery(e.target.value)} placeholder="Recovery (optional)" className="w-full text-[10px] font-mono bg-transparent border-b border-border/30 pb-1 outline-none placeholder:text-muted-foreground/40" />
+              <select value={newMoodTag} onChange={(e) => setNewMoodTag(e.target.value)} className="text-[10px] font-mono bg-transparent border border-border/30 rounded px-1.5 py-0.5 w-full">
+                <option value="">mood_tag (optional)</option>
+                <option value="recovery">recovery</option>
+                <option value="caution">caution</option>
+                <option value="neutral">neutral</option>
+              </select>
+            </>
+          )}
+
+          <div className="flex gap-2">
+            <button onClick={addEntry} disabled={saving || !newTitle.trim() || !newSummary.trim()} className="text-[10px] font-mono text-primary hover:text-primary/80 disabled:opacity-30">
+              {saving ? 'Saving...' : 'Save'}
+            </button>
+            <button
+              onClick={() => {
+                setPreviewBusy(false);
+                setAdding(false);
+                resetAddForm();
+              }}
+              className="text-[10px] font-mono text-muted-foreground/60 hover:text-muted-foreground"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
 
       <FilterRow label="Type" options={typeOptions} value={typeFilter} onChange={setTypeFilter} />
       <p className="text-[9px] font-mono text-muted-foreground/50">
