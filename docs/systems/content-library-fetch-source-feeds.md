@@ -68,7 +68,8 @@ See [`.env.example`](../../.env.example) for commented examples.
 
 - **One feed URL** (e.g. `https://nakamotoinstitute.org/mempool/atom.xml`) with type **`rss`** — **not** individual article URLs unless you intentionally want a single-page ingest.
 - **Site discovery**: type **`site_map`** + site root URL (requires `FIRECRAWL_API_KEY`).
-
+- **Manual `content_library` rows** — `/admin` → Library: **Add library item** inserts via the browser (RLS: admin). Paste URLs are normalized like feeds (`https://` default, etc.). Before insert, the UI checks **active** duplicates (`title_norm` or URL variants per [`urlDedupCandidates`](../../supabase/functions/_shared/content-dedup.ts)) and asks for confirmation if something matches.
+- **Fill from URL** — same form: **`admin-library-preview`** edge function (JWT + `profiles.is_admin`): Firecrawl markdown scrape, then optional Gemini JSON fields via **`LOVABLE_API_KEY`** (same as fetch-source-feeds). Without Lovable key, the UI still gets a short markdown excerpt. Listed in [`supabase/config.toml`](../../supabase/config.toml) as `[functions.admin-library-preview]` with **`verify_jwt = true`**.
 ## Logs (grep Supabase Edge logs)
 
 Filter with **`[holzen:fetch-feeds]`**. Verbose lines (`holzenEdgeLog` / `holzenEdgeWarn`) follow [logging-strategy.md](../ops/logging-strategy.md): **`HOLZEN_EDGE_LOG=0`** silences them in production; **`holzenEdgeRun`** always prints.
