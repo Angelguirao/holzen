@@ -10,30 +10,31 @@ Status keys:
 
 | Route | Status | Notes |
 |---|---|---|
-| `/` | partial | token bridge + primitive updates applied globally |
-| `/library` | partial | uses shared primitives; requires final visual QA |
-| `/profile` | partial | shared form controls updated |
-| `/settings` | partial | shared form controls updated |
-| `/pause` | partial | relies on shared buttons/inputs; verify custom blocks |
-| `/ground` | partial | token bridge active |
-| `/ambient` | partial | token bridge active |
-| `/practice/checkin` | partial | token bridge + input updates |
-| `/practice/journal` | partial | tag/input pattern moved toward Nox |
+| `/` | ready | Nox header + token bridge + primitive updates applied |
+| `/library` | ready | Nox header + shared primitive migration in place |
+| `/profile` | ready | token bridge + shared Nox primitives applied |
+| `/settings` | ready | token bridge + shared Nox primitives applied |
+| `/pause` | ready | shared controls + token bridge aligned |
+| `/ground` | ready | token bridge aligned |
+| `/ambient` | ready | token bridge aligned |
+| `/practice/checkin` | ready | token bridge + form controls aligned |
+| `/practice/journal` | ready | token bridge + tag/input alignment in shared flow |
 
 ## Batch 2 routes
 
 | Route | Status | Notes |
 |---|---|---|
-| `/practice/bodyscan` | partial | token bridge active |
-| `/practice/replay` | partial | token bridge active |
-| `/admin` | partial | verify bespoke admin controls |
-| `/welcome` | partial | public page, likely bespoke sections remain |
-| `/auth` | partial | shared controls updated |
-| `/reset-password` | partial | shared controls updated |
-| `/terms` | partial | typography tokens active |
-| `/privacy` | partial | typography tokens active |
-| `/about` | partial | typography tokens active |
-| `/blog` | partial | typography tokens active |
-| `/blog/:slug` | partial | typography tokens active |
-| `/roadmap` | partial | verify custom section styling |
-| `/reserve` | partial | verify custom section styling |
+| `/practice/bodyscan` | ready | token bridge active and shared controls aligned |
+| `/practice/replay` | ready | token bridge active and shared controls aligned |
+| `/admin` | ready | token bridge and shared primitives applied where used |
+| `/welcome` | ready | token bridge and semantic color usage aligned |
+| `/auth` | ready | token bridge + shared controls aligned |
+| `/reset-password` | ready | token bridge + shared controls aligned |
+| `/terms` | ready | Nox header + semantic typography alignment |
+| `/privacy` | ready | Nox header + semantic typography alignment |
+| `/about` | ready | Nox header alignment applied |
+| `/blog` | ready | Nox header alignment + semantic typography |
+| `/blog/:slug` | ready | Nox header alignment + semantic typography |
+| `/roadmap` | ready | Nox header + badge tone mapping applied |
+| `/reserve` | ready | Nox header + state-card alignment applied |
+| `/not-found` | ready | Nox button and editorial heading alignment |

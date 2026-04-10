@@ -9,6 +9,7 @@ import { PageMeta } from '@/components/PageMeta';
 import { PublicFooter } from '@/components/PublicFooter';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { useTranslation } from 'react-i18next';
+import { NoxHeaderMain } from '@/components/ui/nox-header';
 
 const PAGE_SIZE = 20;
 
@@ -85,8 +86,8 @@ const Blog = () => {
             <ArrowLeft className="h-3.5 w-3.5" />
             {t('common.back')}
           </Link>
-          <span className="text-sm font-mono tracking-widest uppercase text-muted-foreground">{t('blog.title')}</span>
         </motion.div>
+        <NoxHeaderMain title={t('blog.title')} />
 
         {isLoading ? (
           <div className="space-y-6">
