@@ -187,12 +187,16 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
   const [expandedHistory, setExpandedHistory] = useState(false);
 
   const hasHaiku = prefs.haiku && companions.haiku;
-  const hasGrounding = prefs.grounding;
+  // Skip grounding companion card when intervention already shows it as trap primary (same data source)
+  const interventionHasTrap = intervention?.primary?.type === 'trap';
+  const hasGrounding = prefs.grounding && !interventionHasTrap;
   const hasSignal = prefs.signal && !!reflectionId;
   // Skip zoomOut companion card when intervention already shows it as secondary (avoid double-render)
   const interventionHasZoomOut = intervention?.secondary?.type === 'zoom_out';
   const hasZoomOut = prefs.zoomOut && !!reflectionId && !interventionHasZoomOut;
-  const hasHistory = prefs.history && !!reflectionId;
+  // Skip history companion card when intervention already shows it as pattern primary (same data source)
+  const interventionHasPattern = intervention?.primary?.type === 'pattern';
+  const hasHistory = prefs.history && !!reflectionId && !interventionHasPattern;
 
   if (!hasHaiku && !hasGrounding && !hasSignal && !hasZoomOut && !hasHistory) return null;
 

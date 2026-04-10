@@ -530,7 +530,7 @@ async function generateWithJson(opts: {
       }
       if (!response.ok) {
         const text = await response.text();
-        console.error(`[reflection] AI ${model} error:`, response.status, text);
+        log?.(`AI ${model} error: HTTP ${response.status} ${text.slice(0, 200)}`);
         lastStatus = response.status;
         logAttempt?.({
           companion_type: "reflection",

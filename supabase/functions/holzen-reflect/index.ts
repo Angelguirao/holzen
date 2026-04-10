@@ -122,7 +122,7 @@ serve(async (req) => {
       grounding_url: result.grounding_url,
     });
   } catch (e) {
-    console.error("holzen-reflect error:", e);
+    log.error("unhandled error", { error: e instanceof Error ? e.message : String(e) });
     if (companionFallbacksDisabled()) {
       return errorResponse(e instanceof Error ? e.message : "Unknown error", 500);
     }
