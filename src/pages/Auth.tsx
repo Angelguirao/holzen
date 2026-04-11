@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { useTranslation } from 'react-i18next';
 import { SIGNUPS_ENABLED } from '@/lib/signup-gate';
+import { NoxHeaderMain } from '@/components/ui/nox-header';
 
 type AuthView = 'sign-in' | 'sign-up' | 'forgot-password';
 
@@ -27,6 +28,7 @@ const Auth = () => {
   const [loading, setLoading] = useState(false);
   const [confirmSent, setConfirmSent] = useState(false);
   const [resetSent, setResetSent] = useState(false);
+  const getErrorMessage = (error: unknown) => error instanceof Error ? error.message : t('common.unexpectedError', 'Something went wrong');
 
   const handleEmailAuth = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -46,8 +48,8 @@ const Auth = () => {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
       }
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      setError(getErrorMessage(e));
     } finally {
       setLoading(false);
     }
@@ -61,8 +63,8 @@ const Auth = () => {
       const { error } = await supabase.auth.resetPasswordForEmail(email, { redirectTo: `${window.location.origin}/reset-password` });
       if (error) throw error;
       setResetSent(true);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      setError(getErrorMessage(e));
     } finally {
       setLoading(false);
     }
@@ -78,7 +80,7 @@ const Auth = () => {
     return (
       <div className="min-h-screen flex items-center justify-center p-6">
         <div className="w-full max-w-sm space-y-6">
-          <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">{t('common.holzen')}</h1>
+          <NoxHeaderMain title={t('common.holzen')} />
           <p className="text-sm">{t('auth.checkEmailConfirm')}</p>
           <button onClick={() => setConfirmSent(false)} className="text-xs font-mono text-muted-foreground underline">{t('common.back')}</button>
         </div>
@@ -90,7 +92,7 @@ const Auth = () => {
     return (
       <div className="min-h-screen flex items-center justify-center p-6">
         <div className="w-full max-w-sm space-y-6">
-          <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">{t('common.holzen')}</h1>
+          <NoxHeaderMain title={t('common.holzen')} />
           <p className="text-sm">{t('auth.checkEmailReset')}</p>
           <button onClick={() => { setResetSent(false); setView('sign-in'); }} className="text-xs font-mono text-muted-foreground underline">{t('auth.backToSignIn')}</button>
         </div>
@@ -102,10 +104,7 @@ const Auth = () => {
     return (
       <div className="min-h-screen flex items-center justify-center p-6">
         <div className="w-full max-w-sm space-y-8">
-          <div className="space-y-2">
-            <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">{t('common.holzen')}</h1>
-            <p className="text-sm text-muted-foreground">{t('auth.resetYourPassword')}</p>
-          </div>
+          <NoxHeaderMain title={t('common.holzen')} subtitle={t('auth.resetYourPassword')} />
           <form onSubmit={handleForgotPassword} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="auth-forgot-email" className="text-xs font-mono">{t('auth.email')}</Label>
@@ -132,12 +131,10 @@ const Auth = () => {
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
       <div className="w-full max-w-sm space-y-8">
-        <div className="space-y-2">
-          <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">{t('common.holzen')}</h1>
-          <p className="text-sm text-muted-foreground">
-            {view === 'sign-up' ? t('auth.createAnAccount') : t('auth.signInToContinue')}
-          </p>
-        </div>
+        <NoxHeaderMain
+          title={t('common.holzen')}
+          subtitle={view === 'sign-up' ? t('auth.createAnAccount') : t('auth.signInToContinue')}
+        />
 
         <Button variant="outline" className="w-full font-mono text-xs" onClick={handleGoogle}>
           {t('auth.continueWithGoogle')}

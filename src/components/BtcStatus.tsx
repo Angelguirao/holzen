@@ -98,7 +98,7 @@ export function BtcStatus({ data, error, hidden, onToggleHidden, currency = 'USD
 
   const fearGreedColor = data.fearGreed
     ? data.fearGreed.value <= 25 ? 'text-destructive'
-      : data.fearGreed.value <= 45 ? 'text-orange-500'
+      : data.fearGreed.value <= 45 ? 'text-secondary-foreground'
       : data.fearGreed.value <= 55 ? 'text-muted-foreground'
       : data.fearGreed.value <= 75 ? 'text-chart-2'
       : 'text-primary'

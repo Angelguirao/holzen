@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Separator } from '@/components/ui/separator';
 import { PageMeta } from '@/components/PageMeta';
 import { PublicFooter } from '@/components/PublicFooter';
+import { NoxHeaderMain } from '@/components/ui/nox-header';
 
 const Terms = () => {
   const navigate = useNavigate();
@@ -17,8 +18,10 @@ const Terms = () => {
           >
             ← Back
           </button>
-          <h1 className="text-xl font-medium text-foreground">Terms of Service</h1>
-          <p className="text-xs text-muted-foreground">Last updated: March 6, 2026</p>
+          <NoxHeaderMain
+            title="Terms of Service"
+            subtitle="Last updated: March 6, 2026"
+          />
         </div>
 
         <Separator />

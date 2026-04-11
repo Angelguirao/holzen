@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import tailwindcssAnimate from "tailwindcss-animate";
 
 export default {
   darkMode: ["class"],
@@ -15,6 +16,7 @@ export default {
     extend: {
       fontFamily: {
         body: ['var(--font-body)'],
+        editorial: ['var(--font-editorial)'],
         mono: ['var(--font-mono)'],
       },
       colors: {
@@ -61,6 +63,23 @@ export default {
           border: "hsl(var(--sidebar-border))",
           ring: "hsl(var(--sidebar-ring))",
         },
+        nox: {
+          background: {
+            primary: "hsl(var(--nox-color-background-primary))",
+            secondary: "hsl(var(--nox-color-background-secondary))",
+            accent: "hsl(var(--nox-color-background-accent))",
+          },
+          text: {
+            primary: "hsl(var(--nox-color-text-primary))",
+            secondary: "hsl(var(--nox-color-text-secondary))",
+            muted: "hsl(var(--nox-color-text-muted))",
+            contrast: "hsl(var(--nox-color-text-contrast))",
+          },
+          border: {
+            default: "hsl(var(--nox-color-border-default))",
+            focus: "hsl(var(--nox-color-border-focus))",
+          },
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -88,5 +107,5 @@ export default {
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [tailwindcssAnimate],
 } satisfies Config;

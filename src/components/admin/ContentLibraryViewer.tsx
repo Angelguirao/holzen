@@ -14,12 +14,12 @@ import { normalizeTitleKey, urlDedupCandidates } from '../../../supabase/functio
 const UPDATE_CHUNK = 40;
 
 const LIBRARY_TYPE_COLORS: Record<string, string> = {
-  essay: '#8b5cf6',
-  paper: '#06b6d4',
-  event: '#f59e0b',
-  article: '#10b981',
-  book: '#6366f1',
-  podcast: '#ec4899',
+  essay: 'hsl(var(--primary) / 0.8)',
+  paper: 'hsl(var(--secondary-foreground) / 0.8)',
+  event: 'hsl(var(--muted-foreground) / 0.8)',
+  article: 'hsl(var(--accent-foreground) / 0.75)',
+  book: 'hsl(var(--ring) / 0.8)',
+  podcast: 'hsl(var(--destructive) / 0.7)',
 };
 
 export function ContentLibraryViewer({ entries, onRefresh }: { entries: LibraryEntryRow[]; onRefresh: () => void }) {
@@ -408,8 +408,8 @@ export function ContentLibraryViewer({ entries, onRefresh }: { entries: LibraryE
                 />
                 <span className="text-[9px] font-mono px-1.5 py-0.5 rounded-full flex-shrink-0"
                   style={{
-                    backgroundColor: `${LIBRARY_TYPE_COLORS[entry.type] ?? '#64748b'}20`,
-                    color: LIBRARY_TYPE_COLORS[entry.type] ?? '#64748b',
+                    backgroundColor: LIBRARY_TYPE_COLORS[entry.type] ?? 'hsl(var(--muted-foreground) / 0.2)',
+                    color: LIBRARY_TYPE_COLORS[entry.type] ?? 'hsl(var(--muted-foreground) / 0.8)',
                   }}>
                   {entry.type}
                 </span>

@@ -125,7 +125,7 @@ export function StreakTimeline({ reflections, practiceEntries = [], streakFreeze
                     : status === 'practice'
                       ? 'bg-accent-foreground/20'
                       : status === 'freeze'
-                        ? 'bg-blue-400/40'
+                        ? 'bg-secondary/60'
                         : status === 'pre'
                           ? 'bg-transparent border border-border/20'
                           : 'bg-muted/50'
@@ -146,7 +146,7 @@ export function StreakTimeline({ reflections, practiceEntries = [], streakFreeze
           <span className="h-2 w-2 rounded-sm bg-accent-foreground/20" /> {t('streakTimeline.legend.practiceOnly', 'Practice only')}
         </span>
         <span className="flex items-center gap-1">
-          <span className="h-2 w-2 rounded-sm bg-blue-400/40" /> {t('streakTimeline.legend.streakFreeze')}
+          <span className="h-2 w-2 rounded-sm bg-secondary/60" /> {t('streakTimeline.legend.streakFreeze')}
         </span>
         <span className="flex items-center gap-1">
           <span className="h-2 w-2 rounded-sm bg-muted/50" /> {t('streakTimeline.legend.noActivity')}

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500&family=Newsreader:ital,wght@0,300;0,400;1,300;1,400&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,77 +6,116 @@
 
 @layer base {
   :root {
-    --background: 40 20% 97%;
-    --foreground: 220 8% 15%;
+    /* Nox v1.0.0 extracted tokens (dark mode only in Foundations) */
+    --nox-color-background-primary: 222 47% 11%;
+    --nox-color-background-secondary: 218 32% 15%;
+    --nox-color-background-accent: 216 33% 25%;
+    --nox-color-background-inverse: 214 30% 95%;
+    --nox-color-background-overlay: 222 47% 11% / 0.9;
+    --nox-color-text-primary: 214 30% 95%;
+    --nox-color-text-secondary: 213 22% 80%;
+    --nox-color-text-muted: 214 15% 55%;
+    --nox-color-text-contrast: 0 0% 100%;
+    --nox-color-text-link: 188 86% 53%;
+    --nox-color-text-inverse-contrast: 221 44% 7%;
+    --nox-color-state-success: 155 39% 64%;
+    --nox-color-state-error: 0 72% 51%;
+    --nox-color-state-warning: 32 95% 44%;
+    --nox-color-border-default: 216 33% 25%;
+    --nox-color-border-focus: 214 15% 55%;
+    --nox-radius-m: 0.75rem;
 
-    --card: 40 15% 95%;
-    --card-foreground: 220 8% 15%;
+    /* Legacy semantic vars mapped to Nox aliases */
+    --background: var(--nox-color-background-primary);
+    --foreground: var(--nox-color-text-primary);
 
-    --popover: 40 20% 97%;
-    --popover-foreground: 220 8% 15%;
+    --card: var(--nox-color-background-secondary);
+    --card-foreground: var(--nox-color-text-primary);
 
-    --primary: 220 8% 15%;
-    --primary-foreground: 40 20% 97%;
+    --popover: var(--nox-color-background-primary);
+    --popover-foreground: var(--nox-color-text-primary);
 
-    --secondary: 40 10% 92%;
-    --secondary-foreground: 220 8% 25%;
+    --primary: var(--nox-color-background-inverse);
+    --primary-foreground: var(--nox-color-text-inverse-contrast);
 
-    --muted: 40 8% 90%;
-    --muted-foreground: 220 5% 46%;
+    --secondary: var(--nox-color-background-secondary);
+    --secondary-foreground: var(--nox-color-text-primary);
 
-    --accent: 40 10% 88%;
-    --accent-foreground: 220 8% 15%;
+    --muted: var(--nox-color-background-accent);
+    --muted-foreground: var(--nox-color-text-muted);
 
-    --destructive: 0 50% 45%;
-    --destructive-foreground: 40 20% 97%;
+    --accent: var(--nox-color-background-accent);
+    --accent-foreground: var(--nox-color-text-primary);
 
-    --border: 40 8% 85%;
-    --input: 40 8% 85%;
-    --ring: 220 8% 15%;
+    --destructive: var(--nox-color-state-error);
+    --destructive-foreground: var(--nox-color-text-contrast);
 
-    --radius: 0.25rem;
+    --border: var(--nox-color-border-default);
+    --input: var(--nox-color-border-default);
+    --ring: var(--nox-color-border-focus);
+
+    --radius: var(--nox-radius-m);
 
     --font-body: 'Inter', system-ui, sans-serif;
+    --font-editorial: 'Newsreader', Georgia, serif;
     --font-mono: 'IBM Plex Mono', monospace;
 
-    --sidebar-background: 40 15% 95%;
-    --sidebar-foreground: 220 8% 15%;
-    --sidebar-primary: 220 8% 15%;
-    --sidebar-primary-foreground: 40 20% 97%;
-    --sidebar-accent: 40 10% 88%;
-    --sidebar-accent-foreground: 220 8% 15%;
-    --sidebar-border: 40 8% 85%;
-    --sidebar-ring: 220 8% 15%;
+    --sidebar-background: var(--nox-color-background-secondary);
+    --sidebar-foreground: var(--nox-color-text-primary);
+    --sidebar-primary: var(--nox-color-text-primary);
+    --sidebar-primary-foreground: var(--nox-color-text-contrast);
+    --sidebar-accent: var(--nox-color-background-accent);
+    --sidebar-accent-foreground: var(--nox-color-text-primary);
+    --sidebar-border: var(--nox-color-border-default);
+    --sidebar-ring: var(--nox-color-border-focus);
   }
 
   .dark {
-    --background: 220 10% 8%;
-    --foreground: 40 10% 88%;
-    --card: 220 10% 11%;
-    --card-foreground: 40 10% 88%;
-    --popover: 220 10% 8%;
-    --popover-foreground: 40 10% 88%;
-    --primary: 40 10% 88%;
-    --primary-foreground: 220 10% 8%;
-    --secondary: 220 8% 16%;
-    --secondary-foreground: 40 10% 88%;
-    --muted: 220 8% 18%;
-    --muted-foreground: 40 5% 55%;
-    --accent: 220 8% 16%;
-    --accent-foreground: 40 10% 88%;
-    --destructive: 0 50% 40%;
-    --destructive-foreground: 40 10% 88%;
-    --border: 220 8% 20%;
-    --input: 220 8% 20%;
-    --ring: 40 10% 88%;
-    --sidebar-background: 220 10% 8%;
-    --sidebar-foreground: 40 10% 88%;
-    --sidebar-primary: 40 10% 88%;
-    --sidebar-primary-foreground: 220 10% 8%;
-    --sidebar-accent: 220 8% 16%;
-    --sidebar-accent-foreground: 40 10% 88%;
-    --sidebar-border: 220 8% 20%;
-    --sidebar-ring: 40 10% 88%;
+    /* Same values as :root until Nox publishes light mode tokens */
+    --nox-color-background-primary: 222 47% 11%;
+    --nox-color-background-secondary: 218 32% 15%;
+    --nox-color-background-accent: 216 33% 25%;
+    --nox-color-background-inverse: 214 30% 95%;
+    --nox-color-background-overlay: 222 47% 11% / 0.9;
+    --nox-color-text-primary: 214 30% 95%;
+    --nox-color-text-secondary: 213 22% 80%;
+    --nox-color-text-muted: 214 15% 55%;
+    --nox-color-text-contrast: 0 0% 100%;
+    --nox-color-text-link: 188 86% 53%;
+    --nox-color-text-inverse-contrast: 221 44% 7%;
+    --nox-color-state-success: 155 39% 64%;
+    --nox-color-state-error: 0 72% 51%;
+    --nox-color-state-warning: 32 95% 44%;
+    --nox-color-border-default: 216 33% 25%;
+    --nox-color-border-focus: 214 15% 55%;
+
+    --background: var(--nox-color-background-primary);
+    --foreground: var(--nox-color-text-primary);
+    --card: var(--nox-color-background-secondary);
+    --card-foreground: var(--nox-color-text-primary);
+    --popover: var(--nox-color-background-primary);
+    --popover-foreground: var(--nox-color-text-primary);
+    --primary: var(--nox-color-background-inverse);
+    --primary-foreground: var(--nox-color-text-inverse-contrast);
+    --secondary: var(--nox-color-background-secondary);
+    --secondary-foreground: var(--nox-color-text-primary);
+    --muted: var(--nox-color-background-accent);
+    --muted-foreground: var(--nox-color-text-muted);
+    --accent: var(--nox-color-background-accent);
+    --accent-foreground: var(--nox-color-text-primary);
+    --destructive: var(--nox-color-state-error);
+    --destructive-foreground: var(--nox-color-text-contrast);
+    --border: var(--nox-color-border-default);
+    --input: var(--nox-color-border-default);
+    --ring: var(--nox-color-border-focus);
+    --sidebar-background: var(--nox-color-background-primary);
+    --sidebar-foreground: var(--nox-color-text-primary);
+    --sidebar-primary: var(--nox-color-text-primary);
+    --sidebar-primary-foreground: var(--nox-color-text-contrast);
+    --sidebar-accent: var(--nox-color-background-accent);
+    --sidebar-accent-foreground: var(--nox-color-text-primary);
+    --sidebar-border: var(--nox-color-border-default);
+    --sidebar-ring: var(--nox-color-border-focus);
   }
 }
 

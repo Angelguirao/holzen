@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { Separator } from '@/components/ui/separator';
 import { PageMeta } from '@/components/PageMeta';
 import { PublicFooter } from '@/components/PublicFooter';
+import { NoxHeaderMain } from '@/components/ui/nox-header';
 
 const Privacy = () => {
   const navigate = useNavigate();
@@ -17,8 +18,10 @@ const Privacy = () => {
           >
             ← Back
           </button>
-          <h1 className="text-xl font-medium text-foreground">Privacy Policy</h1>
-          <p className="text-xs text-muted-foreground">Last updated: March 6, 2026</p>
+          <NoxHeaderMain
+            title="Privacy Policy"
+            subtitle="Last updated: March 6, 2026"
+          />
         </div>
 
         <Separator />
