@@ -7,9 +7,8 @@ export interface CachedSignalShape {
   title: string;
   body: string;
   source: string;
+  /** Canonical first-publication URL — prioritized over any mirror upstream. */
   url: string;
-  originalUrl?: string;
-  originalPublication?: string;
 }
 
 export interface CachedGroundingShape {

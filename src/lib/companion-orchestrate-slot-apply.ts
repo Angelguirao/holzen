@@ -49,8 +49,6 @@ export type CompanionSlotCommitters = {
     body: string;
     source: string;
     url: string;
-    originalUrl?: string;
-    originalPublication?: string;
   }) => void;
   setNudge: (v: { title: string; body: string; citation: string; url: string }) => void;
   setHistoryInsight: (v: CachedHistoricalInsightShape) => void;
