@@ -13,6 +13,15 @@ status: draft
 - `radius-m`
 - `radius-full`
 
+## Extracted primitive values
+
+| Token | Value |
+|---|---|
+| `radius/none` | `0` |
+| `radius/s` | `4` |
+| `radius/m` | `12` |
+| `radius/full` | `999` |
+
 ## Usage rules
 
 - Controls default to `radius-m` unless design specifies otherwise.

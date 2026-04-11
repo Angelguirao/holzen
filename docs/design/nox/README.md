@@ -17,6 +17,7 @@ This folder is the implementation contract for migrating Holzen to Nox.
 - Read `components/` to align UI primitives and states.
 - Read `patterns/` for Holzen-specific compositions that are Nox-styled extensions.
 - Track route rollout in `parity-board.md`.
+- Read `extraction/` for raw ingestion snapshots from Figma MCP runs.
 
 ## Migration policy
 
