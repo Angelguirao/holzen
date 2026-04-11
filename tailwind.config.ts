@@ -74,6 +74,14 @@ export default {
             secondary: "hsl(var(--nox-color-text-secondary))",
             muted: "hsl(var(--nox-color-text-muted))",
             contrast: "hsl(var(--nox-color-text-contrast))",
+            highlight: "hsl(var(--nox-color-text-highlight))",
+          },
+          accent: {
+            cyan: "hsl(var(--nox-color-accent-cyan))",
+            green: "hsl(var(--nox-color-accent-green))",
+            violet: "hsl(var(--nox-color-accent-violet))",
+            magenta: "hsl(var(--nox-color-accent-magenta))",
+            mustard: "hsl(var(--nox-color-accent-mustard))",
           },
           border: {
             default: "hsl(var(--nox-color-border-default))",

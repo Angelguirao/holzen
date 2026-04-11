@@ -17,10 +17,16 @@
     --nox-color-text-muted: 214 15% 55%;
     --nox-color-text-contrast: 0 0% 100%;
     --nox-color-text-link: 188 86% 53%;
+    --nox-color-text-highlight: 36 58% 63%;
     --nox-color-text-inverse-contrast: 221 44% 7%;
     --nox-color-state-success: 155 39% 64%;
     --nox-color-state-error: 0 72% 51%;
     --nox-color-state-warning: 32 95% 44%;
+    --nox-color-accent-cyan: 188 86% 53%;
+    --nox-color-accent-green: 156 72% 67%;
+    --nox-color-accent-violet: 255 92% 76%;
+    --nox-color-accent-magenta: 291 85% 61%;
+    --nox-color-accent-mustard: 43 96% 56%;
     --nox-color-border-default: 216 33% 25%;
     --nox-color-border-focus: 214 15% 55%;
     --nox-radius-m: 0.75rem;
@@ -82,10 +88,16 @@
     --nox-color-text-muted: 214 15% 55%;
     --nox-color-text-contrast: 0 0% 100%;
     --nox-color-text-link: 188 86% 53%;
+    --nox-color-text-highlight: 36 58% 63%;
     --nox-color-text-inverse-contrast: 221 44% 7%;
     --nox-color-state-success: 155 39% 64%;
     --nox-color-state-error: 0 72% 51%;
     --nox-color-state-warning: 32 95% 44%;
+    --nox-color-accent-cyan: 188 86% 53%;
+    --nox-color-accent-green: 156 72% 67%;
+    --nox-color-accent-violet: 255 92% 76%;
+    --nox-color-accent-magenta: 291 85% 61%;
+    --nox-color-accent-mustard: 43 96% 56%;
     --nox-color-border-default: 216 33% 25%;
     --nox-color-border-focus: 214 15% 55%;
 
