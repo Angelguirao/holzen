@@ -192,17 +192,16 @@ export function essayToSignal(entry: LibraryEntry): {
   source: string;
   url: string;
   quote?: string;
-  originalUrl?: string;
-  originalPublication?: string;
 } {
+  // Prefer the canonical first-publication URL (author's own venue) over a
+  // syndicated mirror when both exist — the mirror is fine for ingestion but
+  // attribution during a pause should point at the original author.
   return {
     title: entry.title,
     body: entry.summary,
     source: entry.author || "Unknown",
-    url: entry.url || "",
+    url: entry.original_url || entry.url || "",
     ...(entry.key_quote ? { quote: entry.key_quote } : {}),
-    ...(entry.original_url ? { originalUrl: entry.original_url } : {}),
-    ...(entry.original_publication ? { originalPublication: entry.original_publication } : {}),
   };
 }
 

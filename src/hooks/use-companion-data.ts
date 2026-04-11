@@ -50,10 +50,8 @@ interface SignalData {
   title: string;
   body: string;
   source: string;
+  /** Canonical first-publication URL — prioritized over any mirror upstream. */
   url: string;
-  /** Canonical first-publication link when the main `url` is a mirror */
-  originalUrl?: string;
-  originalPublication?: string;
 }
 
 interface UseCompanionDataParams {
