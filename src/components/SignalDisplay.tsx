@@ -6,10 +6,8 @@ interface Props {
   title: string;
   body: string;
   source: string;
+  /** Canonical first-publication URL — prioritized over any mirror upstream. */
   url: string;
-  /** First-publication URL when `url` is a syndicated mirror */
-  originalUrl?: string;
-  originalPublication?: string;
 }
 
 interface SignalDisplayProps {
@@ -47,19 +45,6 @@ export function SignalDisplay({ signal, loading, error, onRetry }: SignalDisplay
         <ExternalLink className="h-2.5 w-2.5" />
         {signal.source}
       </a>
-      {signal.originalUrl && (
-        <a
-          href={signal.originalUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="block text-[10px] text-muted-foreground/90 hover:text-muted-foreground leading-snug"
-        >
-          {signal.originalPublication
-            ? `Originally published — ${signal.originalPublication}`
-            : 'Originally published'}
-          <span className="font-mono text-primary/60 ml-1 break-all">{signal.originalUrl}</span>
-        </a>
-      )}
     </div>
   );
 }

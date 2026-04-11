@@ -128,8 +128,6 @@ export interface SignalResult {
     source: string;
     url: string;
     quote?: string;
-    originalUrl?: string;
-    originalPublication?: string;
   } | null;
   source: "live" | "cache" | "curated" | "empty";
   cacheId: string | null;
