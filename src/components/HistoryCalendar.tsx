@@ -5,25 +5,25 @@ import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 
 const MOOD_COLORS: Record<string, string> = {
-  fomo: 'bg-amber-400',
-  excited: 'bg-yellow-400',
-  greedy: 'bg-orange-400',
-  anxious: 'bg-red-400',
-  calm: 'bg-emerald-400',
-  detached: 'bg-slate-400',
-  uncertain: 'bg-purple-400',
-  fearful: 'bg-rose-400',
+  fomo: 'bg-primary/70',
+  excited: 'bg-primary',
+  greedy: 'bg-secondary-foreground/80',
+  anxious: 'bg-destructive/80',
+  calm: 'bg-accent-foreground/70',
+  detached: 'bg-muted-foreground/70',
+  uncertain: 'bg-secondary-foreground/60',
+  fearful: 'bg-destructive',
 };
 
 const DAY_TINT: Record<string, string> = {
-  calm: 'bg-emerald-500/8',
-  detached: 'bg-slate-500/8',
-  excited: 'bg-yellow-500/8',
-  fomo: 'bg-amber-500/10',
-  greedy: 'bg-orange-500/10',
-  anxious: 'bg-red-500/10',
-  fearful: 'bg-rose-500/10',
-  uncertain: 'bg-purple-500/8',
+  calm: 'bg-accent/40',
+  detached: 'bg-muted/60',
+  excited: 'bg-primary/10',
+  fomo: 'bg-primary/15',
+  greedy: 'bg-secondary/70',
+  anxious: 'bg-destructive/10',
+  fearful: 'bg-destructive/15',
+  uncertain: 'bg-secondary/40',
 };
 
 export type ActivityType = 'reflection' | 'letter' | 'badge' | 'practice';
@@ -193,19 +193,19 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate }: Prop
               )}
               {lettersList.length > 0 && (
                 <span className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
-                  <Scroll className="h-2.5 w-2.5 text-amber-500/60" />
+                  <Scroll className="h-2.5 w-2.5 text-primary/70" />
                   {t('calendar.letterCount', { count: lettersList.length })}
                 </span>
               )}
               {badgesList.length > 0 && (
                 <span className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
-                  <Award className="h-2.5 w-2.5 text-yellow-500/60" />
+                  <Award className="h-2.5 w-2.5 text-secondary-foreground/70" />
                   {t('calendar.badgeCount', { count: badgesList.length })}
                 </span>
               )}
               {practiceList.length > 0 && (
                 <span className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
-                  <Heart className="h-2.5 w-2.5 text-pink-500/60" />
+                  <Heart className="h-2.5 w-2.5 text-accent-foreground/70" />
                   {t('calendar.practiceCount', { count: practiceList.length })}
                 </span>
               )}
@@ -237,7 +237,7 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate }: Prop
               <div className="space-y-1">
                 {badgesList.map((b) => (
                   <div key={b.id} className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <Award className="h-2.5 w-2.5 text-yellow-500/60 shrink-0" />
+                    <Award className="h-2.5 w-2.5 text-secondary-foreground/70 shrink-0" />
                     <span className="capitalize">{b.label?.replace(/-/g, ' ') || t('calendar.badge')}</span>
                   </div>
                 ))}
@@ -245,7 +245,7 @@ export function HistoryCalendar({ activities, selectedDate, onSelectDate }: Prop
                   const PIcon = p.practiceType === 'journal' ? PenLine : p.practiceType === 'bodyscan' ? Scan : p.practiceType === 'replay' ? RotateCcw : Heart;
                   return (
                     <div key={p.id} className="flex items-center gap-2 text-xs text-muted-foreground">
-                      <PIcon className="h-2.5 w-2.5 text-pink-500/60 shrink-0" />
+                      <PIcon className="h-2.5 w-2.5 text-accent-foreground/70 shrink-0" />
                       <span>{p.label || t('calendar.practice')}</span>
                     </div>
                   );

@@ -31,15 +31,15 @@ interface Props {
 const STREAK_MILESTONES = [3, 7, 14, 30, 60, 100];
 
 const MOOD_COLORS: Record<string, string> = {
-  fomo: 'bg-amber-400', excited: 'bg-yellow-400', greedy: 'bg-orange-400',
-  anxious: 'bg-red-400', calm: 'bg-emerald-400', detached: 'bg-slate-400',
-  uncertain: 'bg-purple-400', fearful: 'bg-rose-400',
+  fomo: 'bg-primary/70', excited: 'bg-primary', greedy: 'bg-secondary-foreground/80',
+  anxious: 'bg-destructive/80', calm: 'bg-accent-foreground/70', detached: 'bg-muted-foreground/70',
+  uncertain: 'bg-secondary-foreground/60', fearful: 'bg-destructive',
 };
 
 const DAY_TINT: Record<string, string> = {
-  calm: 'bg-emerald-500/8', detached: 'bg-slate-500/8', excited: 'bg-yellow-500/8',
-  fomo: 'bg-amber-500/10', greedy: 'bg-orange-500/10', anxious: 'bg-red-500/10',
-  fearful: 'bg-rose-500/10', uncertain: 'bg-purple-500/8',
+  calm: 'bg-accent/40', detached: 'bg-muted/60', excited: 'bg-primary/10',
+  fomo: 'bg-primary/15', greedy: 'bg-secondary/70', anxious: 'bg-destructive/10',
+  fearful: 'bg-destructive/15', uncertain: 'bg-secondary/40',
 };
 
 type ActivityType = 'reflection' | 'letter' | 'badge' | 'practice';
@@ -52,6 +52,11 @@ interface CalendarActivity {
   label?: string;
   practiceType?: string;
 }
+
+type ReflectionActivityRow = { id: string; created_at: string; mood: string | null };
+type LetterActivityRow = { id: string; written_at: string; deliver_during: string | null };
+type BadgeActivityRow = { id: string; earned_at: string; badge_id: string | null };
+type PracticeActivityRow = { id: string; created_at: string; type: string; mood: string | null };
 
 export function JourneyWidget({ reflections, practiceEntries = [], streakFreezeDates = [], memberSince }: Props) {
   const { t } = useTranslation();
@@ -163,10 +168,10 @@ export function JourneyWidget({ reflections, practiceEntries = [], streakFreezeD
       };
 
       const items: CalendarActivity[] = [];
-      (refs ?? []).forEach((r: any) => items.push({ date: r.created_at, type: 'reflection', mood: r.mood, id: r.id }));
-      (lets ?? []).forEach((l: any) => items.push({ date: l.written_at, type: 'letter', id: l.id, label: `Letter → ${l.deliver_during}` }));
-      (bads ?? []).forEach((b: any) => items.push({ date: b.earned_at, type: 'badge', id: b.id, label: b.badge_id }));
-      (pracs ?? []).forEach((p: any) => items.push({
+      (refs as ReflectionActivityRow[] | null ?? []).forEach((r) => items.push({ date: r.created_at, type: 'reflection', mood: r.mood, id: r.id }));
+      (lets as LetterActivityRow[] | null ?? []).forEach((l) => items.push({ date: l.written_at, type: 'letter', id: l.id, label: `Letter → ${l.deliver_during}` }));
+      (bads as BadgeActivityRow[] | null ?? []).forEach((b) => items.push({ date: b.earned_at, type: 'badge', id: b.id, label: b.badge_id ?? '' }));
+      (pracs as PracticeActivityRow[] | null ?? []).forEach((p) => items.push({
         date: p.created_at,
         type: 'practice',
         id: p.id,
@@ -219,7 +224,7 @@ export function JourneyWidget({ reflections, practiceEntries = [], streakFreezeD
                 status === 'outcome' ? 'bg-primary'
                 : status === 'reflection' ? 'bg-primary/30'
                 : status === 'practice' ? 'bg-accent-foreground/20'
-                : status === 'freeze' ? 'bg-blue-400/40'
+                : status === 'freeze' ? 'bg-secondary/60'
                 : status === 'pre' ? 'bg-transparent border border-border/20'
                 : 'bg-muted/50'
               } ${isTodayDate ? 'ring-1 ring-foreground/20' : ''}`}
@@ -240,7 +245,7 @@ export function JourneyWidget({ reflections, practiceEntries = [], streakFreezeD
           <span className="h-2 w-2 rounded-sm bg-accent-foreground/20" /> {t('streakTimeline.legend.practiceOnly', 'Practice only')}
         </span>
         <span className="flex items-center gap-1">
-          <span className="h-2 w-2 rounded-sm bg-blue-400/40" /> {t('streakTimeline.legend.streakFreeze')}
+          <span className="h-2 w-2 rounded-sm bg-secondary/60" /> {t('streakTimeline.legend.streakFreeze')}
         </span>
       </div>
 
@@ -467,19 +472,19 @@ function DayDetail({ date, activities }: { date: Date; activities: CalendarActiv
         )}
         {lettersList.length > 0 && (
           <span className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
-            <Scroll className="h-2.5 w-2.5 text-amber-500/60" />
+            <Scroll className="h-2.5 w-2.5 text-primary/70" />
             {t('calendar.letterCount', { count: lettersList.length })}
           </span>
         )}
         {badgesList.length > 0 && (
           <span className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
-            <Award className="h-2.5 w-2.5 text-yellow-500/60" />
+            <Award className="h-2.5 w-2.5 text-secondary-foreground/70" />
             {t('calendar.badgeCount', { count: badgesList.length })}
           </span>
         )}
         {practiceList.length > 0 && (
           <span className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground">
-            <Heart className="h-2.5 w-2.5 text-pink-500/60" />
+            <Heart className="h-2.5 w-2.5 text-accent-foreground/70" />
             {t('calendar.practiceCount', { count: practiceList.length })}
           </span>
         )}
@@ -511,7 +516,7 @@ function DayDetail({ date, activities }: { date: Date; activities: CalendarActiv
         <div className="space-y-1">
           {badgesList.map((b) => (
             <div key={b.id} className="flex items-center gap-2 text-xs text-muted-foreground">
-              <Award className="h-2.5 w-2.5 text-yellow-500/60 shrink-0" />
+              <Award className="h-2.5 w-2.5 text-secondary-foreground/70 shrink-0" />
               <span className="capitalize">{b.label?.replace(/-/g, ' ') || t('calendar.badge')}</span>
             </div>
           ))}
@@ -519,7 +524,7 @@ function DayDetail({ date, activities }: { date: Date; activities: CalendarActiv
             const PIcon = p.practiceType === 'journal' ? PenLine : p.practiceType === 'bodyscan' ? Scan : p.practiceType === 'replay' ? RotateCcw : Heart;
             return (
               <div key={p.id} className="flex items-center gap-2 text-xs text-muted-foreground">
-                <PIcon className="h-2.5 w-2.5 text-pink-500/60 shrink-0" />
+                <PIcon className="h-2.5 w-2.5 text-accent-foreground/70 shrink-0" />
                 <span>{p.label || t('calendar.practice')}</span>
               </div>
             );

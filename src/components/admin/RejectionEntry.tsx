@@ -4,9 +4,9 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { TYPE_COLORS, label } from './admin-constants';
 
 const STATUS_COLOR: Record<string, string> = {
-  error: 'bg-red-500/15 text-red-600 dark:text-red-400',
-  timeout: 'bg-amber-500/15 text-amber-600 dark:text-amber-400',
-  quality_gate_failed: 'bg-orange-500/15 text-orange-600 dark:text-orange-400',
+  error: 'bg-destructive/15 text-destructive',
+  timeout: 'bg-secondary text-secondary-foreground',
+  quality_gate_failed: 'bg-primary/15 text-primary',
 };
 
 type RejectionEntryProps = {
@@ -32,8 +32,8 @@ export function RejectionEntry({ row, selected, onToggleSelect, selectDisabled }
         <span
           className="text-[9px] font-mono px-1.5 py-0.5 rounded-full flex-shrink-0"
           style={{
-            backgroundColor: `${TYPE_COLORS[row.companion_type] ?? '#64748b'}20`,
-            color: TYPE_COLORS[row.companion_type] ?? '#64748b',
+            backgroundColor: TYPE_COLORS[row.companion_type] ?? 'hsl(var(--muted-foreground) / 0.2)',
+            color: TYPE_COLORS[row.companion_type] ?? 'hsl(var(--muted-foreground) / 0.8)',
           }}
         >
           {label(row.companion_type)}

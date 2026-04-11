@@ -4,6 +4,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowLeft } from 'lucide-react';
 import { PageMeta } from '@/components/PageMeta';
 import { PublicFooter } from '@/components/PublicFooter';
+import { NoxHeaderMain } from '@/components/ui/nox-header';
 
 const fade = (delay = 0) => ({
   initial: { opacity: 0, y: 14 },
@@ -38,9 +39,7 @@ const About = () => {
 
         {/* Title */}
         <motion.div {...m(0.05)}>
-          <h1 className="text-xl text-foreground leading-relaxed">
-            {t('about.whyHolzenExists')}
-          </h1>
+          <NoxHeaderMain title={t('about.whyHolzenExists')} />
         </motion.div>
 
         {/* Section: The opportunity */}

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useTranslation } from 'react-i18next';
+import { NoxHeaderMain } from '@/components/ui/nox-header';
 
 const ResetPassword = () => {
   const { t } = useTranslation();
@@ -15,6 +16,7 @@ const ResetPassword = () => {
   const [success, setSuccess] = useState(false);
   const [ready, setReady] = useState(false);
   const navigate = useNavigate();
+  const getErrorMessage = (error: unknown) => error instanceof Error ? error.message : t('common.unexpectedError', 'Something went wrong');
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
@@ -34,8 +36,8 @@ const ResetPassword = () => {
       if (error) throw error;
       setSuccess(true);
       setTimeout(() => navigate('/', { replace: true }), 2000);
-    } catch (e: any) {
-      setError(e.message);
+    } catch (e: unknown) {
+      setError(getErrorMessage(e));
     } finally {
       setLoading(false);
     }
@@ -45,7 +47,7 @@ const ResetPassword = () => {
     return (
       <div className="min-h-screen flex items-center justify-center p-6">
         <div className="w-full max-w-sm space-y-6">
-          <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">{t('common.holzen')}</h1>
+          <NoxHeaderMain title={t('common.holzen')} />
           <p className="text-sm">{t('auth.passwordUpdated')}</p>
         </div>
       </div>
@@ -55,10 +57,10 @@ const ResetPassword = () => {
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
       <div className="w-full max-w-sm space-y-8">
-        <div className="space-y-2">
-          <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">{t('common.holzen')}</h1>
-          <p className="text-sm text-muted-foreground">{ready ? t('auth.setNewPassword') : t('auth.verifyingResetLink')}</p>
-        </div>
+        <NoxHeaderMain
+          title={t('common.holzen')}
+          subtitle={ready ? t('auth.setNewPassword') : t('auth.verifyingResetLink')}
+        />
         {ready && (
           <form onSubmit={handleReset} className="space-y-4">
             <div className="space-y-2">
