@@ -11,6 +11,13 @@ status: draft
 - `stroke-width-1`
 - `stroke-width-2`
 
+## Extracted primitive values
+
+| Token | Value |
+|---|---|
+| `stroke/width-1` | `1` |
+| `stroke/width-2` | `2` |
+
 ## Usage rules
 
 - Use `stroke-width-1` for most borders and separators.

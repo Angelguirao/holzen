@@ -6,18 +6,24 @@
 
 @layer base {
   :root {
-    /* Nox aliases (light mode) */
-    --nox-color-background-primary: 40 20% 97%;
-    --nox-color-background-secondary: 40 15% 95%;
-    --nox-color-background-accent: 40 10% 88%;
-    --nox-color-text-primary: 220 8% 15%;
-    --nox-color-text-secondary: 220 8% 25%;
-    --nox-color-text-muted: 220 5% 46%;
-    --nox-color-text-contrast: 40 20% 97%;
-    --nox-color-state-error: 0 50% 45%;
-    --nox-color-border-default: 40 8% 85%;
-    --nox-color-border-focus: 220 8% 15%;
-    --nox-radius-m: 0.25rem;
+    /* Nox v1.0.0 extracted tokens (dark mode only in Foundations) */
+    --nox-color-background-primary: 222 47% 11%;
+    --nox-color-background-secondary: 218 32% 15%;
+    --nox-color-background-accent: 216 33% 25%;
+    --nox-color-background-inverse: 214 30% 95%;
+    --nox-color-background-overlay: 222 47% 11% / 0.9;
+    --nox-color-text-primary: 214 30% 95%;
+    --nox-color-text-secondary: 213 22% 80%;
+    --nox-color-text-muted: 214 15% 55%;
+    --nox-color-text-contrast: 0 0% 100%;
+    --nox-color-text-link: 188 86% 53%;
+    --nox-color-text-inverse-contrast: 221 44% 7%;
+    --nox-color-state-success: 155 39% 64%;
+    --nox-color-state-error: 0 72% 51%;
+    --nox-color-state-warning: 32 95% 44%;
+    --nox-color-border-default: 216 33% 25%;
+    --nox-color-border-focus: 214 15% 55%;
+    --nox-radius-m: 0.75rem;
 
     /* Legacy semantic vars mapped to Nox aliases */
     --background: var(--nox-color-background-primary);
@@ -29,13 +35,13 @@
     --popover: var(--nox-color-background-primary);
     --popover-foreground: var(--nox-color-text-primary);
 
-    --primary: var(--nox-color-text-primary);
-    --primary-foreground: var(--nox-color-text-contrast);
+    --primary: var(--nox-color-background-inverse);
+    --primary-foreground: var(--nox-color-text-inverse-contrast);
 
-    --secondary: 40 10% 92%;
-    --secondary-foreground: var(--nox-color-text-secondary);
+    --secondary: var(--nox-color-background-secondary);
+    --secondary-foreground: var(--nox-color-text-primary);
 
-    --muted: 40 8% 90%;
+    --muted: var(--nox-color-background-accent);
     --muted-foreground: var(--nox-color-text-muted);
 
     --accent: var(--nox-color-background-accent);
@@ -65,17 +71,23 @@
   }
 
   .dark {
-    /* Nox aliases (dark mode) */
-    --nox-color-background-primary: 220 10% 8%;
-    --nox-color-background-secondary: 220 10% 11%;
-    --nox-color-background-accent: 220 8% 16%;
-    --nox-color-text-primary: 40 10% 88%;
-    --nox-color-text-secondary: 40 10% 88%;
-    --nox-color-text-muted: 40 5% 55%;
-    --nox-color-text-contrast: 220 10% 8%;
-    --nox-color-state-error: 0 50% 40%;
-    --nox-color-border-default: 220 8% 20%;
-    --nox-color-border-focus: 40 10% 88%;
+    /* Same values as :root until Nox publishes light mode tokens */
+    --nox-color-background-primary: 222 47% 11%;
+    --nox-color-background-secondary: 218 32% 15%;
+    --nox-color-background-accent: 216 33% 25%;
+    --nox-color-background-inverse: 214 30% 95%;
+    --nox-color-background-overlay: 222 47% 11% / 0.9;
+    --nox-color-text-primary: 214 30% 95%;
+    --nox-color-text-secondary: 213 22% 80%;
+    --nox-color-text-muted: 214 15% 55%;
+    --nox-color-text-contrast: 0 0% 100%;
+    --nox-color-text-link: 188 86% 53%;
+    --nox-color-text-inverse-contrast: 221 44% 7%;
+    --nox-color-state-success: 155 39% 64%;
+    --nox-color-state-error: 0 72% 51%;
+    --nox-color-state-warning: 32 95% 44%;
+    --nox-color-border-default: 216 33% 25%;
+    --nox-color-border-focus: 214 15% 55%;
 
     --background: var(--nox-color-background-primary);
     --foreground: var(--nox-color-text-primary);
@@ -83,16 +95,16 @@
     --card-foreground: var(--nox-color-text-primary);
     --popover: var(--nox-color-background-primary);
     --popover-foreground: var(--nox-color-text-primary);
-    --primary: var(--nox-color-text-primary);
-    --primary-foreground: var(--nox-color-text-contrast);
-    --secondary: var(--nox-color-background-accent);
+    --primary: var(--nox-color-background-inverse);
+    --primary-foreground: var(--nox-color-text-inverse-contrast);
+    --secondary: var(--nox-color-background-secondary);
     --secondary-foreground: var(--nox-color-text-primary);
-    --muted: 220 8% 18%;
+    --muted: var(--nox-color-background-accent);
     --muted-foreground: var(--nox-color-text-muted);
     --accent: var(--nox-color-background-accent);
     --accent-foreground: var(--nox-color-text-primary);
     --destructive: var(--nox-color-state-error);
-    --destructive-foreground: var(--nox-color-text-primary);
+    --destructive-foreground: var(--nox-color-text-contrast);
     --border: var(--nox-color-border-default);
     --input: var(--nox-color-border-default);
     --ring: var(--nox-color-border-focus);

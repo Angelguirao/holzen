@@ -20,9 +20,26 @@ status: draft
 
 ## Size and rhythm
 
-- sizes: `font/size/{S,M,L,XL}`
+- sizes: `font/size/{3XL,2XL,XL,L,M,S,XS,2XS,3XS}`
 - line height: `line/height/{18,20,24,26,28,30,34,38,42,74}`
 - letter spacing: `font/spacing/{tight,normal,loose}`
+
+## Extracted primitive values
+
+| Token | Value |
+|---|---|
+| `font/size/3XL` | `64` |
+| `font/size/2XL` | `32` |
+| `font/size/XL` | `28` |
+| `font/size/L` | `24` |
+| `font/size/M` | `20` |
+| `font/size/S` | `16` |
+| `font/size/XS` | `14` |
+| `font/size/2XS` | `12` |
+| `font/size/3XS` | `10` |
+| `font/spacing/tight` | `-0.8` |
+| `font/spacing/normal` | `-0.4` |
+| `font/spacing/loose` | `-0.2` |
 
 ## Usage rules
 
