@@ -20,9 +20,11 @@ interface Props {
   onComplete: () => void;
   textColor: string;
   ringColor: string;
+  /** When set (e.g. from Zoom Out Echo), load this reflection instead of a random one. */
+  initialReflectionId?: string | null;
 }
 
-export function ReflectionReplay({ onComplete, textColor, ringColor }: Props) {
+export function ReflectionReplay({ onComplete, textColor, ringColor, initialReflectionId }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const [reflection, setReflection] = useState<PastReflection | null>(null);
@@ -35,6 +37,7 @@ export function ReflectionReplay({ onComplete, textColor, ringColor }: Props) {
   const loadRandom = useCallback(async () => {
     if (!user) return;
     setLoading(true);
+    setNoData(false);
     try {
       // Get a random reflection older than 7 days
       const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
@@ -62,13 +65,46 @@ export function ReflectionReplay({ onComplete, textColor, ringColor }: Props) {
     }
   }, [user]);
 
-  useEffect(() => { loadRandom(); }, [loadRandom]);
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+
+    const run = async () => {
+      setLoading(true);
+      setNoData(false);
+      if (initialReflectionId) {
+        try {
+          const { data, error } = await supabase
+            .from('reflections')
+            .select('id, message, mood, context, created_at')
+            .eq('user_id', user.id)
+            .eq('id', initialReflectionId)
+            .maybeSingle();
+          if (cancelled) return;
+          if (!error && data) {
+            setReflection(data);
+            setLoading(false);
+            return;
+          }
+        } catch {
+          /* fall through to random */
+        }
+      }
+      if (cancelled) return;
+      await loadRandom();
+    };
+
+    void run();
+    return () => {
+      cancelled = true;
+    };
+  }, [user, initialReflectionId, loadRandom]);
 
   const save = useCallback(async () => {
     if (!user || !reflection || !body.trim()) return;
     setSaving(true);
     try {
-      await supabase.from('practice_entries' as any).insert({
+      await supabase.from('practice_entries').insert({
         user_id: user.id,
         type: 'replay',
         body: body.trim(),
@@ -134,6 +170,12 @@ export function ReflectionReplay({ onComplete, textColor, ringColor }: Props) {
                   {reflection.message}
                 </p>
               </div>
+            )}
+
+            {initialReflectionId && reflection?.id === initialReflectionId && (
+              <p className="text-[10px] font-mono text-center max-w-[280px] leading-relaxed" style={{ color: textColor, opacity: 0.45 }}>
+                {t('practice.replayFromEchoHint')}
+              </p>
             )}
 
             <p className="text-[10px] font-mono tracking-[0.2em] uppercase" style={{ color: textColor, opacity: 0.5 }}>

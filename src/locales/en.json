@@ -456,7 +456,14 @@
     "cacheRelaxation": {
       "market": "Pulled from cache with a broader market match than today’s move.",
       "repeat_or_lower_quality": "From cache — may repeat an earlier card or use a lower-quality saved entry so this slot isn’t empty."
-    }
+    },
+    "echoFraming": "This is your own words from another day — not a new AI take. Use it to notice what changed in you or the market.",
+    "echoPromptIntro": "You might ask:",
+    "echoPrompt1": "What feels different now than when I wrote this?",
+    "echoPrompt2": "Would past-me be surprised or reassured by how I’m showing up today?",
+    "echoPrompt3": "What one line do I want to remember next time it feels like this?",
+    "echoRespondCta": "Write your take",
+    "echoExpandQuote": "Show full pause text"
   },
   "landing": {
     "hero": "When Bitcoin moves, pause before you do.",
@@ -1646,7 +1653,8 @@
     "needMoreReflections": "You need at least a week of pauses before replaying. Keep going.",
     "replayPrompt": "How has your perspective changed?",
     "replayPlaceholder": "Looking back now, I notice…",
-    "replaySaved": "Replay saved"
+    "replaySaved": "Replay saved",
+    "replayFromEchoHint": "You opened this from Echo — anchor what’s different now compared to that pause."
   },
   "mirror": {
     "title": "Decision Mirror",

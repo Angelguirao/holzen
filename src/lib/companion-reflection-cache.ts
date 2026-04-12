@@ -30,7 +30,7 @@ export interface CachedHistoricalInsightShape {
 /** Cached zoom-out payload (structure varies by row type; callers use optional branches). */
 export interface CachedZoomOutShape {
   deepTime?: { title?: string; body?: string };
-  echo?: { message?: string };
+  echo?: { id?: string; message?: string; created_at?: string; mood?: string | null; outcome?: string | null };
 }
 
 /** Parsed `reflection_companions` rows for orchestration skip / hydration. */
