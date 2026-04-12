@@ -40,6 +40,8 @@ interface Props {
   reflectionMessage?: string | null;
   /** Current user mood — drives intervention selection */
   mood?: string | null;
+  /** Overrides the small section label above companion cards (e.g. pause reflect step). */
+  sectionLead?: string | null;
 }
 
 const COMPANION_ICONS: Record<string, React.ElementType> = {
@@ -151,7 +153,10 @@ function CompanionCard({
   );
 }
 
-export const CompanionSection = forwardRef<HTMLDivElement, Props>(function CompanionSection({ companions, prefs, severity = 'mild', reflectionId, context, reflectionMessage, mood }, ref) {
+export const CompanionSection = forwardRef<HTMLDivElement, Props>(function CompanionSection(
+  { companions, prefs, severity = 'mild', reflectionId, context, reflectionMessage, mood, sectionLead },
+  ref,
+) {
   const { isPro } = useProGate();
   const { t: i18nT } = useTranslation();
 
@@ -219,8 +224,8 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
         </div>
       )}
 
-      <p className="text-[10px] font-mono text-muted-foreground/40 uppercase tracking-[0.2em] text-center mb-1">
-        {labels.pause}
+      <p className="mb-2 px-1 text-center text-xs font-medium leading-snug text-muted-foreground">
+        {sectionLead ?? labels.pause}
       </p>
 
       {hasHaiku && (

@@ -5,6 +5,7 @@ import { CompanionSection, type CompanionData, type CompanionPrefs } from '@/com
 import { CollapsibleReflectionHeader } from '@/components/pause/CollapsibleReflectionHeader';
 import { ReflectionNote } from '@/components/ReflectionNote';
 import { ReflectionTags } from '@/components/ReflectionTags';
+import { Button } from '@/components/ui/button';
 
 interface Props {
   companions: CompanionData;
@@ -30,36 +31,60 @@ export function PauseReflect({
 
   return (
     <motion.div
-      className="space-y-8"
+      className="space-y-8 pb-4"
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.6 }}
     >
-      {/* Collapsible header with reflection message */}
-      <CollapsibleReflectionHeader
-        message={reflectionMessage}
-        context={context}
-        haiku={companions?.haiku ?? null}
-        isFavorite={isFavorite}
-        onToggleFavorite={onToggleFavorite}
-        subscribed={subscribed}
-      />
+      <div className="space-y-2 text-center">
+        <p className="font-editorial text-xl leading-snug text-foreground sm:text-2xl">
+          {t('pause.reflect.heading', 'Sit with this reflection')}
+        </p>
+        <p className="mx-auto max-w-sm text-sm leading-relaxed text-muted-foreground">
+          {t(
+            'pause.reflect.subcopy',
+            'Read the message in full. Add a note or tags if you use Pro — then open the cards below only when you want more perspective.',
+          )}
+        </p>
+      </div>
 
-      {/* Note & tags — cognitive reappraisal tools (Pro only) */}
-      {reflectionId && subscribed && (
-        <motion.div
-          className="space-y-4"
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3, duration: 0.6 }}
-        >
-          <ReflectionNote reflectionId={reflectionId} initialNote={null} />
-          <ReflectionTags reflectionId={reflectionId} initialTags={[]} />
-        </motion.div>
-      )}
+      <div className="rounded-xl border border-border/50 bg-card/30 px-4 py-5 shadow-sm sm:px-5">
+        <CollapsibleReflectionHeader
+          message={reflectionMessage}
+          context={context}
+          haiku={companions?.haiku ?? null}
+          isFavorite={isFavorite}
+          onToggleFavorite={onToggleFavorite}
+          subscribed={subscribed}
+          defaultExpanded
+        />
 
-      {/* Companions + featured intervention — data from useCompanionData inside CompanionSection */}
+        {reflectionId && subscribed && (
+          <motion.div
+            className="mt-6 space-y-4 border-t border-border/30 pt-5"
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15, duration: 0.5 }}
+          >
+            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              {t('pause.reflect.proTools', 'Your note & tags')}
+            </p>
+            <ReflectionNote reflectionId={reflectionId} initialNote={null} />
+            <ReflectionTags reflectionId={reflectionId} initialTags={[]} />
+          </motion.div>
+        )}
+
+        {reflectionId && !subscribed && (
+          <p className="mt-5 border-t border-border/30 pt-4 text-center text-xs leading-relaxed text-muted-foreground">
+            {t(
+              'pause.reflect.freeHint',
+              'Holzen Pro adds an optional private note and tags on each pause — useful when you look back in your Library.',
+            )}
+          </p>
+        )}
+      </div>
+
       <CompanionSection
         companions={companions}
         prefs={companionPrefs}
@@ -68,31 +93,32 @@ export function PauseReflect({
         context={context}
         reflectionMessage={reflectionMessage}
         mood={mood}
+        sectionLead={t(
+          'pause.reflect.companionsLead',
+          'When you are ready, open a card — one at a time is enough.',
+        )}
       />
 
-      {/* Continue */}
       <motion.div
-        className="flex justify-center pt-4"
+        className="flex flex-col items-center gap-3 pt-2"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.3, duration: 0.6 }}
+        transition={{ delay: 0.2, duration: 0.5 }}
       >
-        <button
-          type="button"
-          onClick={onContinue}
-          className="text-sm font-medium text-primary underline-offset-4 hover:underline"
-        >
+        <Button type="button" variant="outline" size="sm" className="min-w-[9rem] font-medium" onClick={onContinue}>
           {t('pause.steps.continue', 'Continue')}
-        </button>
+        </Button>
+        <p className="max-w-xs text-center text-xs text-muted-foreground">
+          {t('pause.reflect.continueHint', 'There is no “right” amount of time — continue when you feel done.')}
+        </p>
       </motion.div>
 
-      {/* Back link */}
       {onBack && (
         <motion.div
-          className="flex justify-center pt-2"
+          className="flex justify-center pt-1"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1, duration: 0.8 }}
+          transition={{ delay: 0.5, duration: 0.6 }}
         >
           <button
             type="button"

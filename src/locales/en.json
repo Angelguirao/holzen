@@ -798,7 +798,24 @@
     "youChose": "You chose deliberately.",
     "return": "Return",
     "noReflection": "No active pause. Go back to trigger one.",
-    "favoriteProHint": "Your favorites will be waiting in your Library with Pro ✨"
+    "favoriteProHint": "Your favorites will be waiting in your Library with Pro ✨",
+    "steps": {
+      "breathe": "Breathe",
+      "feel": "Feel",
+      "reflect": "Reflect",
+      "shift": "Shift",
+      "decide": "Decide",
+      "continue": "Continue",
+      "back": "Back"
+    },
+    "reflect": {
+      "heading": "Sit with this reflection",
+      "subcopy": "Read the message in full. Add a note or tags if you use Pro — then open the cards below only when you want more perspective.",
+      "proTools": "Your note & tags",
+      "freeHint": "Holzen Pro adds an optional private note and tags on each pause — useful when you look back in your Library.",
+      "companionsLead": "When you are ready, open a card — one at a time is enough.",
+      "continueHint": "There is no \"right\" amount of time — continue when you feel done."
+    }
   },
   "reflectionNote": {
     "addNote": "Add a note",
