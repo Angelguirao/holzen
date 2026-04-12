@@ -12,10 +12,20 @@ interface Props {
   isFavorite: boolean;
   onToggleFavorite: () => void;
   subscribed: boolean;
+  /** When true, the full reflection and actions show on first paint (pause ritual reflect step). */
+  defaultExpanded?: boolean;
 }
 
-export function CollapsibleReflectionHeader({ message, context, haiku, isFavorite, onToggleFavorite, subscribed }: Props) {
-  const [expanded, setExpanded] = useState(false);
+export function CollapsibleReflectionHeader({
+  message,
+  context,
+  haiku,
+  isFavorite,
+  onToggleFavorite,
+  subscribed,
+  defaultExpanded = false,
+}: Props) {
+  const [expanded, setExpanded] = useState(defaultExpanded);
 
   return (
     <div
@@ -32,7 +42,7 @@ export function CollapsibleReflectionHeader({ message, context, haiku, isFavorit
               {context}
             </p>
           )}
-          <p className={`font-editorial text-base leading-relaxed text-foreground sm:text-lg ${expanded ? '' : 'line-clamp-3'}`}>
+          <p className={`font-editorial text-base leading-relaxed text-foreground sm:text-lg ${expanded ? '' : 'line-clamp-4'}`}>
             {message}
           </p>
         </div>
