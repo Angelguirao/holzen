@@ -115,7 +115,7 @@ export function PracticeWidget() {
     <div className="space-y-3">
       {/* Weekly progress */}
       <div className="flex items-center justify-between">
-        <p className="text-[11px] text-muted-foreground/60 leading-relaxed">
+        <p className="text-sm leading-relaxed text-muted-foreground">
           {t('practice.intro')}
         </p>
       </div>
@@ -139,11 +139,11 @@ export function PracticeWidget() {
           className="w-full flex items-center gap-3 px-3 py-3 rounded-lg border border-primary/15 bg-primary/[0.03] hover:bg-primary/[0.06] transition-colors"
         >
           <Sparkles className="h-3.5 w-3.5 text-primary/40 shrink-0" />
-          <div className="flex-1 text-left">
-            <span className="text-[10px] font-mono text-primary/50 uppercase tracking-wider">
+          <div className="min-w-0 flex-1 text-left">
+            <span className="text-xs font-semibold uppercase tracking-wide text-primary">
               {t('practice.suggested', 'Suggested')}
             </span>
-            <span className="block text-[11px] text-muted-foreground/60 mt-0.5">
+            <span className="mt-1 block text-sm leading-snug text-muted-foreground">
               {suggestion.reason}
             </span>
           </div>
@@ -163,11 +163,11 @@ export function PracticeWidget() {
               className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md transition-colors hover:bg-muted/30 group"
             >
               <Icon className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />
-              <div className="flex-1 text-left">
-                <span className="text-xs font-mono text-foreground/70 group-hover:text-foreground transition-colors">
+              <div className="min-w-0 flex-1 text-left">
+                <span className="text-sm font-medium text-foreground transition-colors group-hover:text-foreground">
                   {t(p.labelKey)}
                 </span>
-                <span className="block text-[10px] text-muted-foreground/40 mt-0.5">
+                <span className="mt-0.5 block text-xs leading-snug text-muted-foreground">
                   {t(p.descKey)}
                 </span>
               </div>

@@ -72,8 +72,8 @@ export function HomeWidget({
           <GripVertical className="h-4 w-4" />
         </button>
 
-        {/* Title */}
-        <span className="flex-1 text-[10px] font-mono tracking-[0.15em] uppercase text-muted-foreground/50">
+        {/* Section title — matches Nox-style module labels (sans, not body mono) */}
+        <span className="flex-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           {title}
         </span>
 
@@ -131,7 +131,9 @@ export function useWidgetLayout(defaultOrder: string[]) {
         const missing = defaultOrder.filter((id) => !merged.includes(id));
         return [...merged, ...missing];
       }
-    } catch { }
+    } catch {
+      void 0;
+    }
     return defaultOrder;
   });
 
@@ -139,7 +141,9 @@ export function useWidgetLayout(defaultOrder: string[]) {
     try {
       const stored = localStorage.getItem(COLLAPSED_KEY);
       if (stored) return JSON.parse(stored);
-    } catch { }
+    } catch {
+      void 0;
+    }
     return {};
   });
 

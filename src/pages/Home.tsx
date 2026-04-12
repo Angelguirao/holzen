@@ -501,13 +501,18 @@ const Home = () => {
 
               {!subLoading && !hasAccess ? (
                 <div className="space-y-3">
-                  <p className="text-sm text-muted-foreground">
+                  <p className="text-sm leading-relaxed text-muted-foreground">
                     {t('home.subscription.monthlyLimitReached')}
                   </p>
-                  <p className="text-xs font-mono text-muted-foreground">
+                  <p className="text-xs leading-relaxed text-muted-foreground">
                     {t('home.subscription.upgradeToPro')}
                   </p>
-                  <LoadingButton onClick={startCheckout} loading={checkoutLoading} loadingText={t('home.subscription.openingCheckout')} className="w-full font-mono text-xs">
+                  <LoadingButton
+                    onClick={startCheckout}
+                    loading={checkoutLoading}
+                    loadingText={t('home.subscription.openingCheckout')}
+                    className="w-full text-sm font-medium"
+                  >
                     {t('pro.upgradeCta')}
                   </LoadingButton>
                 </div>
@@ -516,7 +521,7 @@ const Home = () => {
               ) : (
                 <>
                   {!subscribed && monthlyRemaining !== undefined && monthlyRemaining > 0 && (
-                    <p className="text-xs font-mono text-muted-foreground">
+                    <p className="text-xs text-muted-foreground">
                       {t('home.subscription.freeRemaining', { count: monthlyRemaining })}
                     </p>
                   )}
@@ -533,12 +538,12 @@ const Home = () => {
                         >
                           <X className="h-3.5 w-3.5" aria-hidden />
                         </button>
-                        <p className="text-sm leading-relaxed text-foreground/80 pr-5">
+                        <p className="pr-5 font-editorial text-base leading-relaxed text-foreground sm:text-lg">
                           {message.split(/[.!?]\s/)[0]}{message.split(/[.!?]\s/).length > 1 ? '…' : ''}
                         </p>
                         {context && (
-                          <p className="text-[10px] font-mono text-muted-foreground/40 uppercase tracking-wider mt-2">
-                            {context.slice(0, 60)}{context.length > 60 ? '…' : ''}
+                          <p className="mt-2 text-xs leading-snug text-muted-foreground">
+                            {context.slice(0, 72)}{context.length > 72 ? '…' : ''}
                           </p>
                         )}
                       </div>
@@ -565,12 +570,10 @@ const Home = () => {
                           });
                           navigate('/pause', { state: navState });
                         }}
-                        className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors"
+                        className="flex w-full items-center justify-center gap-2 rounded-lg border border-primary/25 bg-primary/10 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-primary/15"
                       >
-                        <Sparkles className="h-3 w-3 text-primary/60" />
-                        <span className="text-[10px] font-mono text-primary/60 tracking-[0.15em] uppercase">
-                          {t('onboarding.pauseWithThis')}
-                        </span>
+                        <Sparkles className="h-4 w-4 shrink-0 text-primary" />
+                        {t('onboarding.pauseWithThis')}
                       </button>
                     </div>
                   ) : (
@@ -578,8 +581,8 @@ const Home = () => {
                       {loading ? (
                         <div className="space-y-4">
                           <div className="flex items-center gap-2 text-muted-foreground">
-                            <Loader2 className="h-3 w-3 animate-spin" />
-                            <p className="text-xs font-mono">{t('home.generatingReflection')}</p>
+                            <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
+                            <p className="text-sm">{t('home.generatingReflection')}</p>
                           </div>
                           <Skeleton className="h-4 w-full" />
                           <Skeleton className="h-4 w-3/4" />
@@ -587,9 +590,9 @@ const Home = () => {
                         </div>
                       ) : (error && !btcData) || isReflectionPersistError(error) ? (
                         <div className="rounded-md border border-destructive/20 bg-destructive/5 px-4 py-3 space-y-2">
-                          <div className="flex items-center gap-2 text-destructive/80">
-                            <AlertCircle className="h-3.5 w-3.5 shrink-0" />
-                            <p className="text-xs font-mono">
+                          <div className="flex items-center gap-2 text-destructive">
+                            <AlertCircle className="h-4 w-4 shrink-0" />
+                            <p className="text-sm font-medium leading-snug">
                               {isReflectionPersistError(error)
                                 ? error
                                 : error.includes('fetch') || error.includes('network') || error.includes('Failed to fetch')
@@ -600,7 +603,7 @@ const Home = () => {
                             </p>
                           </div>
                           {!isReflectionPersistError(error) && (
-                            <p className="text-[10px] font-mono text-muted-foreground/60 leading-relaxed">
+                            <p className="text-xs leading-relaxed text-muted-foreground">
                               {error.includes('fetch') || error.includes('network') || error.includes('Failed to fetch')
                                 ? t('home.errors.checkConnection')
                                 : error.includes('generate') || error.includes('reflect')
@@ -609,11 +612,12 @@ const Home = () => {
                             </p>
                           )}
                           <button
+                            type="button"
                             onClick={() => {
                               holzenLog.home('Try again: manualTrigger');
                               manualTrigger();
                             }}
-                            className="text-xs font-mono text-primary underline"
+                            className="text-sm font-medium text-primary underline-offset-4 hover:underline"
                           >
                             {t('common.tryAgain')}
                           </button>
@@ -621,15 +625,21 @@ const Home = () => {
                       ) : (
                         <div className="space-y-6">
                           {pinnedReflection && (
-                            <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2">
-                              <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-1.5 text-muted-foreground">
-                                  <Pin className="h-2.5 w-2.5" />
-                                 <span className="text-[10px] font-mono uppercase tracking-wider">{t('common.pinned')}</span>
+                            <div className="space-y-3 rounded-lg border border-border/60 bg-muted/30 px-4 py-3">
+                              <div className="flex items-center justify-between gap-2">
+                                <div className="flex items-center gap-2 text-muted-foreground">
+                                  <Pin className="h-3.5 w-3.5 shrink-0" />
+                                  <span className="text-xs font-semibold uppercase tracking-wide">{t('common.pinned')}</span>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={unpinReflection}
+                                  className="text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+                                >
+                                  {t('common.unpin')}
+                                </button>
                               </div>
-                              <button onClick={unpinReflection} className="text-[10px] font-mono text-muted-foreground/50 hover:text-foreground transition-colors">{t('common.unpin')}</button>
-                              </div>
-                              <p className="text-sm leading-relaxed">{pinnedReflection.message}</p>
+                              <p className="font-editorial text-sm leading-relaxed text-foreground">{pinnedReflection.message}</p>
                             </div>
                           )}
                           <NeedAMomentButton onTrigger={handleNeedAPause} cooldownRemaining={manualCooldownRemaining} loading={loading} />
@@ -690,28 +700,27 @@ const Home = () => {
                     >
                       <X className="h-3.5 w-3.5" aria-hidden />
                     </button>
-                    <p className="text-sm leading-relaxed text-foreground/80 pr-5">
+                    <p className="pr-5 text-sm leading-relaxed text-foreground">
                       {groundSuggestion.suggestion}
                     </p>
-                    <p className="text-[10px] font-mono text-muted-foreground/40 uppercase tracking-wider mt-2">
+                    <p className="mt-2 text-xs text-muted-foreground">
                       {groundSuggestion.duration} min · {groundSuggestion.activity}
                     </p>
                   </div>
                   <button
+                    type="button"
                     onClick={handleStartGround}
-                    className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-border/40 bg-muted/30 hover:bg-muted/50 transition-colors duration-500"
+                    className="flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-muted/40 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted/55"
                   >
-                    <Anchor className="h-3 w-3 text-muted-foreground/60" />
-                    <span className="text-[10px] font-mono tracking-[0.15em] uppercase text-muted-foreground/60">
-                      {t('home.groundYourself', 'Ground yourself')}
-                    </span>
+                    <Anchor className="h-4 w-4 shrink-0 text-muted-foreground" />
+                    {t('home.groundYourself', 'Ground yourself')}
                   </button>
                 </>
               ) : groundLoading ? (
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 text-muted-foreground">
-                    <Loader2 className="h-3 w-3 animate-spin" />
-                    <p className="text-xs font-mono">{t('home.groundFinding', 'Finding what fits…')}</p>
+                    <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
+                    <p className="text-sm">{t('home.groundFinding', 'Finding what fits…')}</p>
                   </div>
                   <Skeleton className="h-4 w-full" />
                   <Skeleton className="h-4 w-3/4" />
@@ -719,14 +728,17 @@ const Home = () => {
               ) : (
                 <>
                   {shouldNudgeGround && (
-                    <p className="text-[10px] font-mono text-primary/40 tracking-wider">
+                    <p className="text-sm font-medium text-primary">
                       {t('home.groundVolatileHint', 'The market is moving. A good moment to ground.')}
                     </p>
                   )}
 
-                  <div className="flex flex-wrap gap-1.5">
+                  <div className="flex flex-wrap gap-2">
                     {groundingActivities.slice(0, 4).map((activity) => (
-                      <span key={activity} className="text-[10px] font-mono px-2.5 py-1 rounded-full border border-border/20 bg-muted/10 text-muted-foreground/40">
+                      <span
+                        key={activity}
+                        className="rounded-full border border-border/50 bg-muted/20 px-3 py-1 text-xs text-muted-foreground"
+                      >
                         {activity}
                       </span>
                     ))}
@@ -734,17 +746,16 @@ const Home = () => {
 
                   {subscribed ? (
                     <button
+                      type="button"
                       onClick={() => navigate('/ground')}
-                      className={`w-full flex items-center justify-center gap-2 py-3 rounded-md border transition-colors duration-500 ${
+                      className={`flex w-full items-center justify-center gap-2 rounded-lg border py-3 text-sm font-semibold transition-colors ${
                         shouldNudgeGround
-                          ? 'border-primary/30 bg-primary/10 hover:bg-primary/15'
-                          : 'border-primary/20 bg-primary/5 hover:bg-primary/10'
+                          ? 'border-primary/35 bg-primary/12 text-foreground hover:bg-primary/18'
+                          : 'border-primary/25 bg-primary/10 text-foreground hover:bg-primary/15'
                       }`}
                     >
-                      <Anchor className={`h-3 w-3 ${shouldNudgeGround ? 'text-primary/70' : 'text-primary/50'}`} />
-                      <span className={`text-[10px] font-mono tracking-[0.15em] uppercase ${shouldNudgeGround ? 'text-primary/70' : 'text-primary/50'}`}>
-                        {t('home.groundYourself', 'Ground yourself')}
-                      </span>
+                      <Anchor className="h-4 w-4 shrink-0 text-primary" />
+                      {t('home.groundYourself', 'Ground yourself')}
                     </button>
                   ) : (
                     <ProLockedWidget onUpgrade={startCheckout} checkoutLoading={checkoutLoading} feature="grounding" />
@@ -754,8 +765,9 @@ const Home = () => {
 
               {subscribed && (
                 <button
+                  type="button"
                   onClick={() => navigate('/ground/history')}
-                  className="w-full text-center text-[9px] font-mono tracking-[0.15em] uppercase text-muted-foreground/25 hover:text-muted-foreground/50 transition-colors pt-1"
+                  className="w-full pt-1 text-center text-xs font-medium text-primary underline-offset-4 transition-colors hover:underline"
                 >
                   {t('home.groundJournal', 'View journal')}
                 </button>
@@ -821,18 +833,17 @@ const Home = () => {
             collapsed={collapsed['breathe']}
             onToggleCollapse={() => toggleCollapsed('breathe')}
           >
-            <div className="space-y-2">
-              <p className="text-[11px] text-muted-foreground/50 leading-relaxed">
+            <div className="space-y-3">
+              <p className="text-sm leading-relaxed text-muted-foreground">
                 {t('home.breatheDesc', 'A quiet space to find stillness. No goals, no tracking.')}
               </p>
               <button
+                type="button"
                 onClick={() => navigate('/breathe')}
-                className="w-full flex items-center justify-center gap-2 py-3 rounded-md border border-border/30 bg-muted/10 hover:bg-muted/20 transition-colors duration-500"
+                className="flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-muted/30 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted/45"
               >
-                <Waves className="h-3 w-3 text-muted-foreground/40" />
-                <span className="text-[10px] font-mono text-muted-foreground/40 tracking-[0.2em] uppercase">
-                  {t('home.enterStillness', 'Enter stillness')}
-                </span>
+                <Waves className="h-4 w-4 shrink-0 text-muted-foreground" />
+                {t('home.enterStillness', 'Enter stillness')}
               </button>
             </div>
           </HomeWidget>
@@ -867,17 +878,20 @@ const Home = () => {
         </div>
       )}
       {/* Greeting + reset */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between gap-3">
         {firstName ? (
-          <p className="text-sm font-mono text-muted-foreground/60">{firstName}.</p>
-        ) : <div />}
+          <p className="font-editorial text-lg text-foreground">{firstName}.</p>
+        ) : (
+          <div />
+        )}
         {(!isDefaultOrder || hasCollapsed) && (
           <button
+            type="button"
             onClick={resetLayout}
-            className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground/40 hover:text-muted-foreground transition-colors"
+            className="flex shrink-0 items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
             aria-label="Reset widget layout"
           >
-            <RotateCcw className="h-2.5 w-2.5" />
+            <RotateCcw className="h-3 w-3" />
             {t('common.reset')}
           </button>
         )}
@@ -906,10 +920,6 @@ const Home = () => {
 
       {/* Testimonial request */}
       <TestimonialRequest reflectionCount={reflectionCount} />
-
-      <p className="text-xs text-muted-foreground leading-relaxed">
-        {t('home.whenBtcMoves')}
-      </p>
     </div>
   );
 };
