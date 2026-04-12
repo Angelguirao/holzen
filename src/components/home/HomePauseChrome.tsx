@@ -92,8 +92,11 @@ export function AutoCooldownIndicator({
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setRemaining(cooldownRemaining());
-      setCronIn(nextCronCheckIn());
+      const rem = cooldownRemaining();
+      setRemaining(rem);
+      if (rem <= 0) {
+        setCronIn(nextCronCheckIn());
+      }
     }, 1000);
     return () => clearInterval(interval);
   }, [cooldownRemaining, nextCronCheckIn]);
@@ -147,12 +150,6 @@ export function AutoCooldownIndicator({
             style={{ width: `${progress}%` }}
           />
         </div>
-        <p className="text-xs tabular-nums text-muted-foreground">
-          {t('home.nextScanLine', {
-            scan: formatMsAsMS(cronIn),
-            defaultValue: 'Next scan · {{scan}}',
-          })}
-        </p>
       </div>
     </div>
   );
