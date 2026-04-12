@@ -54,7 +54,7 @@
     "passwordTooShort": "Le mot de passe doit contenir au moins 6 caractères"
   },
   "home": {
-    "greeting": "{{name}}.",
+    "greeting": "Bon retour, {{name}}",
     "noActiveReflection": "Aucune réflexion active.",
     "generatingReflection": "Génération de la réflexion…",
     "needAMoment": "J'ai besoin d'un moment",

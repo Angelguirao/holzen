@@ -54,7 +54,7 @@
     "passwordTooShort": "Passwort muss mindestens 6 Zeichen haben"
   },
   "home": {
-    "greeting": "{{name}}.",
+    "greeting": "Willkommen zurück, {{name}}",
     "noActiveReflection": "Keine aktive Reflexion.",
     "generatingReflection": "Reflexion wird erstellt…",
     "needAMoment": "Ich brauche einen Moment",

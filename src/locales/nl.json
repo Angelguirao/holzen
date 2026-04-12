@@ -54,7 +54,7 @@
     "passwordTooShort": "Wachtwoord moet minimaal 6 tekens bevatten"
   },
   "home": {
-    "greeting": "{{name}}.",
+    "greeting": "Welkom terug, {{name}}",
     "noActiveReflection": "Geen actieve reflectie.",
     "generatingReflection": "Reflectie wordt gegenereerd…",
     "needAMoment": "Ik heb even nodig",
