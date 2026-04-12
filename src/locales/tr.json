@@ -54,7 +54,7 @@
     "passwordTooShort": "Şifre en az 6 karakter olmalıdır"
   },
   "home": {
-    "greeting": "{{name}}.",
+    "greeting": "Tekrar hoş geldin, {{name}}",
     "noActiveReflection": "Aktif düşünce yok.",
     "generatingReflection": "Düşünce oluşturuluyor…",
     "needAMoment": "Bir ana ihtiyacım var",

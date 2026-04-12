@@ -62,7 +62,7 @@ export function HomeWidget({
       className={`rounded-xl border border-border/40 bg-card/40 transition-shadow ${isDragging ? 'shadow-lg' : ''} ${className}`}
     >
       {/* Header */}
-      <div className="flex items-center gap-2 px-3 py-2.5">
+      <div className="flex items-center gap-2 px-4 py-3">
         {/* Drag handle — large touch target */}
         <button
           {...listeners}
@@ -106,7 +106,7 @@ export function HomeWidget({
             transition={{ duration: 0.25, ease: 'easeInOut' }}
             className="overflow-hidden"
           >
-            <div className="px-3 pb-3">
+            <div className="px-4 pb-4">
               {children}
             </div>
           </motion.div>

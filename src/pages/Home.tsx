@@ -538,7 +538,7 @@ const Home = () => {
                         >
                           <X className="h-3.5 w-3.5" aria-hidden />
                         </button>
-                        <p className="pr-5 font-editorial text-base leading-relaxed text-foreground sm:text-lg">
+                        <p className="pr-5 text-sm font-medium leading-relaxed text-foreground">
                           {message.split(/[.!?]\s/)[0]}{message.split(/[.!?]\s/).length > 1 ? '…' : ''}
                         </p>
                         {context && (
@@ -570,7 +570,7 @@ const Home = () => {
                           });
                           navigate('/pause', { state: navState });
                         }}
-                        className="flex w-full items-center justify-center gap-2 rounded-lg border border-primary/25 bg-primary/10 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-primary/15"
+                        className="flex w-full items-center justify-center gap-2 rounded-xl border border-primary/25 bg-primary/10 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-primary/15"
                       >
                         <Sparkles className="h-4 w-4 shrink-0 text-primary" />
                         {t('onboarding.pauseWithThis')}
@@ -625,7 +625,7 @@ const Home = () => {
                       ) : (
                         <div className="space-y-6">
                           {pinnedReflection && (
-                            <div className="space-y-3 rounded-lg border border-border/60 bg-muted/30 px-4 py-3">
+                            <div className="space-y-3 rounded-xl border border-border/40 bg-card/30 px-4 py-3">
                               <div className="flex items-center justify-between gap-2">
                                 <div className="flex items-center gap-2 text-muted-foreground">
                                   <Pin className="h-3.5 w-3.5 shrink-0" />
@@ -639,7 +639,7 @@ const Home = () => {
                                   {t('common.unpin')}
                                 </button>
                               </div>
-                              <p className="font-editorial text-sm leading-relaxed text-foreground">{pinnedReflection.message}</p>
+                              <p className="text-sm leading-relaxed text-foreground">{pinnedReflection.message}</p>
                             </div>
                           )}
                           <NeedAMomentButton onTrigger={handleNeedAPause} cooldownRemaining={manualCooldownRemaining} loading={loading} />
@@ -710,7 +710,7 @@ const Home = () => {
                   <button
                     type="button"
                     onClick={handleStartGround}
-                    className="flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-muted/40 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted/55"
+                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-border/50 bg-muted/30 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted/45"
                   >
                     <Anchor className="h-4 w-4 shrink-0 text-muted-foreground" />
                     {t('home.groundYourself', 'Ground yourself')}
@@ -748,7 +748,7 @@ const Home = () => {
                     <button
                       type="button"
                       onClick={() => navigate('/ground')}
-                      className={`flex w-full items-center justify-center gap-2 rounded-lg border py-3 text-sm font-semibold transition-colors ${
+                      className={`flex w-full items-center justify-center gap-2 rounded-xl border py-3 text-sm font-semibold transition-colors ${
                         shouldNudgeGround
                           ? 'border-primary/35 bg-primary/12 text-foreground hover:bg-primary/18'
                           : 'border-primary/25 bg-primary/10 text-foreground hover:bg-primary/15'
@@ -840,7 +840,7 @@ const Home = () => {
               <button
                 type="button"
                 onClick={() => navigate('/breathe')}
-                className="flex w-full items-center justify-center gap-2 rounded-lg border border-border bg-muted/30 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted/45"
+                className="flex w-full items-center justify-center gap-2 rounded-xl border border-border/50 bg-muted/30 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted/45"
               >
                 <Waves className="h-4 w-4 shrink-0 text-muted-foreground" />
                 {t('home.enterStillness', 'Enter stillness')}
@@ -858,28 +858,26 @@ const Home = () => {
   const hasCollapsed = Object.values(collapsed).some(Boolean);
 
   const headerRightSlot =
-    firstName || !isDefaultOrder || hasCollapsed ? (
-      <div className="flex flex-col items-end gap-2 text-right">
-        {firstName ? (
-          <p className="text-sm font-medium text-foreground">{t('home.greeting', { name: firstName })}</p>
-        ) : null}
-        {!isDefaultOrder || hasCollapsed ? (
-          <button
-            type="button"
-            onClick={resetLayout}
-            className="flex shrink-0 items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
-            aria-label="Reset widget layout"
-          >
-            <RotateCcw className="h-3 w-3" />
-            {t('common.reset')}
-          </button>
-        ) : null}
-      </div>
+    !isDefaultOrder || hasCollapsed ? (
+      <button
+        type="button"
+        onClick={resetLayout}
+        className="flex shrink-0 items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+        aria-label="Reset widget layout"
+      >
+        <RotateCcw className="h-3 w-3" />
+        {t('common.reset')}
+      </button>
     ) : undefined;
 
   return (
     <div {...pullHandlers} className="space-y-6">
-      <NoxHeaderMain title={t('home.title', 'Home')} subtitle={t('home.whenBtcMoves')} rightSlot={headerRightSlot} />
+      <div className="space-y-2">
+        <NoxHeaderMain title={t('home.title', 'Home')} subtitle={t('home.whenBtcMoves')} rightSlot={headerRightSlot} />
+        {firstName ? (
+          <p className="text-sm leading-snug text-muted-foreground">{t('home.greeting', { name: firstName })}</p>
+        ) : null}
+      </div>
       {/* Pull-to-refresh indicator */}
       {(pullDistance > 0 || pullRefreshing) && (
         <div
@@ -902,7 +900,7 @@ const Home = () => {
         modifiers={[restrictToVerticalAxis]}
       >
         <SortableContext items={order} strategy={verticalListSortingStrategy}>
-          <div className="space-y-3">
+          <div className="space-y-4">
             {order.map((widgetId) => {
               const content = renderWidget(widgetId);
               // Don't render null widgets (e.g. letter when no access)
