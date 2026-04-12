@@ -12,6 +12,7 @@ import { Mail, Lock, Clock, Trash2, BarChart3, Sparkles, Award, CalendarDays, In
 import HistoryContent from '@/components/library/HistoryContent';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { NoxHeaderMain } from '@/components/ui/nox-header';
 
 
 import { DecisionQualityCard } from '@/components/DecisionQualityCard';
@@ -231,8 +232,9 @@ const Profile = () => {
 
   return (
     <div className="space-y-6">
+      <NoxHeaderMain title={t('nav.profile')} subtitle={t('profile.pageSubtitle')} />
       {/* Tab header */}
-      <div className="flex gap-1.5 overflow-x-auto pb-0.5 -mx-1 px-1">
+      <div className="-mx-1 flex gap-1 overflow-x-auto px-1 pb-0.5">
         {tabs.map((tabItem) => {
           const Icon = tabItem.icon;
           const isActive = tab === tabItem.id;
@@ -240,10 +242,10 @@ const Profile = () => {
             <button
               key={tabItem.id}
               onClick={() => setTab(tabItem.id)}
-              className={`relative flex items-center gap-1.5 px-3 py-2 rounded-lg text-[11px] font-mono tracking-wider uppercase transition-all whitespace-nowrap ${
+              className={`relative flex items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${
                 isActive
                   ? 'bg-primary/10 text-primary shadow-sm'
-                  : 'text-muted-foreground/50 hover:text-muted-foreground hover:bg-muted/50'
+                  : 'text-muted-foreground/60 hover:bg-muted/50 hover:text-muted-foreground'
               }`}
             >
               <Icon className={`h-3.5 w-3.5 ${isActive ? 'text-primary' : 'text-muted-foreground/40'}`} />

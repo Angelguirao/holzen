@@ -135,6 +135,7 @@
     "reflectionPinned": "Pause pinned to Home"
   },
   "profile": {
+    "pageSubtitle": "Your streak, charts, letters, and journey — in one place.",
     "stats": "Stats",
     "insights": "Insights",
     "badges": "Badges",
@@ -171,6 +172,7 @@
     }
   },
   "settings": {
+    "pageSubtitle": "Thresholds, companions, notifications, and your account.",
     "title": "Settings",
     "you": "You",
     "reflection": "Pause",

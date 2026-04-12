@@ -857,12 +857,29 @@ const Home = () => {
   const isDefaultOrder = order.every((id, i) => id === defaultOrder[i]);
   const hasCollapsed = Object.values(collapsed).some(Boolean);
 
+  const headerRightSlot =
+    firstName || !isDefaultOrder || hasCollapsed ? (
+      <div className="flex flex-col items-end gap-2 text-right">
+        {firstName ? (
+          <p className="text-sm font-medium text-foreground">{t('home.greeting', { name: firstName })}</p>
+        ) : null}
+        {!isDefaultOrder || hasCollapsed ? (
+          <button
+            type="button"
+            onClick={resetLayout}
+            className="flex shrink-0 items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+            aria-label="Reset widget layout"
+          >
+            <RotateCcw className="h-3 w-3" />
+            {t('common.reset')}
+          </button>
+        ) : null}
+      </div>
+    ) : undefined;
+
   return (
-    <div {...pullHandlers} className="space-y-4">
-      <NoxHeaderMain
-        title={t('home.title', 'Home')}
-        subtitle={t('home.whenBtcMoves')}
-      />
+    <div {...pullHandlers} className="space-y-6">
+      <NoxHeaderMain title={t('home.title', 'Home')} subtitle={t('home.whenBtcMoves')} rightSlot={headerRightSlot} />
       {/* Pull-to-refresh indicator */}
       {(pullDistance > 0 || pullRefreshing) && (
         <div
@@ -877,26 +894,6 @@ const Home = () => {
           />
         </div>
       )}
-      {/* Greeting + reset */}
-      <div className="flex items-center justify-between gap-3">
-        {firstName ? (
-          <p className="font-editorial text-lg text-foreground">{firstName}.</p>
-        ) : (
-          <div />
-        )}
-        {(!isDefaultOrder || hasCollapsed) && (
-          <button
-            type="button"
-            onClick={resetLayout}
-            className="flex shrink-0 items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
-            aria-label="Reset widget layout"
-          >
-            <RotateCcw className="h-3 w-3" />
-            {t('common.reset')}
-          </button>
-        )}
-      </div>
-
       {/* Draggable widgets */}
       <DndContext
         sensors={sensors}
