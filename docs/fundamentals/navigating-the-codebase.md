@@ -31,11 +31,11 @@ This guide walks a new contributor through the repository in roughly the order y
 
 ## 3. Boot sequence: from `index.html` to first paint
 
-1. **`index.html`** loads the Vite entry script (default Vite layout).
+1. **`index.html`** loads the Vite entry script and sets **`class="dark"`** on `<html>` so Tailwind’s `dark:` variant matches the single Nox appearance.
 2. **`src/main.tsx`** is the real entry:
    - Registers global `error` / `unhandledrejection` handlers and a **crash screen** if the app fails before React mounts (clears storage + reload button).
    - Dynamically imports `App.tsx`, `lib/sw-update.ts`, and `i18n.ts`, then renders `<App />` into `#root`.
-3. **`src/App.tsx`** wraps the tree in `ErrorBoundary`, `ThemeProvider` (next-themes), `QueryClientProvider`, `TooltipProvider`, toasts, offline banner, `BrowserRouter`, and **`AuthProvider`**.
+3. **`src/App.tsx`** wraps the tree in `ErrorBoundary`, `QueryClientProvider`, `TooltipProvider`, toasts, offline banner, `BrowserRouter`, and **`AuthProvider`**.
 
 **Why it matters:** anything that throws during static import of `App` or `i18n` is caught by `main.tsx`; errors inside React use `ErrorBoundary`.
 

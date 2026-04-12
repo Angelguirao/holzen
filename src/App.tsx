@@ -1,5 +1,4 @@
 import { lazy, Suspense, useEffect } from "react";
-import { ThemeProvider } from "next-themes";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -103,61 +102,59 @@ function RouterLocationLog() {
 
 const App = () => (
   <ErrorBoundary>
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-      <QueryClientProvider client={queryClient}>
-        <HolzenQueryLogging />
-        <TooltipProvider>
-          <Sonner />
-          <OfflineBanner />
-          <BrowserRouter
-            future={{
-              v7_startTransition: true,
-              v7_relativeSplatPath: true,
-            }}
-          >
-            <ScrollToTop />
-            <CookieConsent />
-            <AuthProvider>
-              <RouterLocationLog />
-              <Suspense fallback={<RouteChunkFallback />}>
-                <Routes>
-                  <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
-                    <Route path="/" element={<Home />} />
-                    <Route path="/index" element={<Navigate to="/" replace />} />
-                    <Route path="/library" element={<Library />} />
-                    <Route path="/history" element={<Navigate to="/library" replace />} />
-                    <Route path="/profile" element={<Profile />} />
-                    <Route path="/settings" element={<Settings />} />
-                  </Route>
-                  {/* Immersive full-screen experiences — no nav bar */}
-                  <Route path="/pause" element={<ProtectedRoute><PauseSession /></ProtectedRoute>} />
-                  <Route path="/breathe" element={<ProtectedRoute><Breathe /></ProtectedRoute>} />
-                  <Route path="/ground" element={<ProtectedRoute><Ground /></ProtectedRoute>} />
-                  <Route path="/ground/history" element={<ProtectedRoute><GroundHistory /></ProtectedRoute>} />
-                  <Route path="/ambient" element={<ProtectedRoute><Ambient /></ProtectedRoute>} />
-                  <Route path="/practice/checkin" element={<ProtectedRoute><PracticeCheckIn /></ProtectedRoute>} />
-                  <Route path="/practice/journal" element={<ProtectedRoute><PracticeJournal /></ProtectedRoute>} />
-                  <Route path="/practice/bodyscan" element={<ProtectedRoute><PracticeBodyScan /></ProtectedRoute>} />
-                  <Route path="/practice/replay" element={<ProtectedRoute><PracticeReplay /></ProtectedRoute>} />
-                  <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
-                  <Route path="/welcome" element={<PublicOnlyRoute><Landing /></PublicOnlyRoute>} />
-                  <Route path="/auth" element={<PublicOnlyRoute><Auth /></PublicOnlyRoute>} />
-                  <Route path="/reset-password" element={<ResetPassword />} />
-                  <Route path="/terms" element={<Terms />} />
-                  <Route path="/privacy" element={<Privacy />} />
-                  <Route path="/about" element={<About />} />
-                  <Route path="/blog" element={<Blog />} />
-                  <Route path="/blog/:slug" element={<BlogPost />} />
-                  <Route path="/roadmap" element={<Roadmap />} />
-                  <Route path="/reserve" element={<Reserve />} />
-                  <Route path="*" element={<NotFound />} />
-                </Routes>
-              </Suspense>
-            </AuthProvider>
-          </BrowserRouter>
-        </TooltipProvider>
-      </QueryClientProvider>
-    </ThemeProvider>
+    <QueryClientProvider client={queryClient}>
+      <HolzenQueryLogging />
+      <TooltipProvider>
+        <Sonner />
+        <OfflineBanner />
+        <BrowserRouter
+          future={{
+            v7_startTransition: true,
+            v7_relativeSplatPath: true,
+          }}
+        >
+          <ScrollToTop />
+          <CookieConsent />
+          <AuthProvider>
+            <RouterLocationLog />
+            <Suspense fallback={<RouteChunkFallback />}>
+              <Routes>
+                <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/index" element={<Navigate to="/" replace />} />
+                  <Route path="/library" element={<Library />} />
+                  <Route path="/history" element={<Navigate to="/library" replace />} />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/settings" element={<Settings />} />
+                </Route>
+                {/* Immersive full-screen experiences — no nav bar */}
+                <Route path="/pause" element={<ProtectedRoute><PauseSession /></ProtectedRoute>} />
+                <Route path="/breathe" element={<ProtectedRoute><Breathe /></ProtectedRoute>} />
+                <Route path="/ground" element={<ProtectedRoute><Ground /></ProtectedRoute>} />
+                <Route path="/ground/history" element={<ProtectedRoute><GroundHistory /></ProtectedRoute>} />
+                <Route path="/ambient" element={<ProtectedRoute><Ambient /></ProtectedRoute>} />
+                <Route path="/practice/checkin" element={<ProtectedRoute><PracticeCheckIn /></ProtectedRoute>} />
+                <Route path="/practice/journal" element={<ProtectedRoute><PracticeJournal /></ProtectedRoute>} />
+                <Route path="/practice/bodyscan" element={<ProtectedRoute><PracticeBodyScan /></ProtectedRoute>} />
+                <Route path="/practice/replay" element={<ProtectedRoute><PracticeReplay /></ProtectedRoute>} />
+                <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+                <Route path="/welcome" element={<PublicOnlyRoute><Landing /></PublicOnlyRoute>} />
+                <Route path="/auth" element={<PublicOnlyRoute><Auth /></PublicOnlyRoute>} />
+                <Route path="/reset-password" element={<ResetPassword />} />
+                <Route path="/terms" element={<Terms />} />
+                <Route path="/privacy" element={<Privacy />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/blog" element={<Blog />} />
+                <Route path="/blog/:slug" element={<BlogPost />} />
+                <Route path="/roadmap" element={<Roadmap />} />
+                <Route path="/reserve" element={<Reserve />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
+          </AuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
   </ErrorBoundary>
 );
 
