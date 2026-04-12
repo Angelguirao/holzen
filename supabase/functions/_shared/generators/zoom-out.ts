@@ -133,6 +133,17 @@ async function fetchHistoricalAndCurrentPrices(
 
 // ── Internals: Echo reflection fetch ──
 
+function echoPayloadFromRow(row: any | null): Record<string, unknown> | null {
+  if (!row) return null;
+  return {
+    id: row.id,
+    message: row.message,
+    created_at: row.created_at,
+    mood: row.mood,
+    outcome: row.outcome,
+  };
+}
+
 async function fetchEchoReflection(
   svcClient: any,
   userId: string,
@@ -142,14 +153,14 @@ async function fetchEchoReflection(
   try {
     const direction = context?.toLowerCase().includes("is down") ? "down" : context?.toLowerCase().includes("is up") ? "up" : null;
     if (direction) {
-      const { data } = await svcClient.from("reflections").select("message, created_at, mood, outcome, context").eq("user_id", userId).not("outcome", "is", null).lt("created_at", new Date(Date.now() - 3 * 86400000).toISOString()).order("created_at", { ascending: false }).limit(50);
+      const { data } = await svcClient.from("reflections").select("id, message, created_at, mood, outcome, context").eq("user_id", userId).not("outcome", "is", null).lt("created_at", new Date(Date.now() - 3 * 86400000).toISOString()).order("created_at", { ascending: false }).limit(50);
       if (data && data.length > 0) {
         const matching = data.filter((r: any) => direction === "down" ? r.context?.toLowerCase().includes("is down") : r.context?.toLowerCase().includes("is up"));
         const pool = matching.length > 0 ? matching : data;
         return pool[Math.floor(Math.random() * Math.min(pool.length, 10))];
       }
     } else {
-      const { data } = await svcClient.from("reflections").select("message, created_at, mood, outcome").eq("user_id", userId).not("outcome", "is", null).lt("created_at", new Date(Date.now() - 3 * 86400000).toISOString()).order("created_at", { ascending: false }).limit(10);
+      const { data } = await svcClient.from("reflections").select("id, message, created_at, mood, outcome").eq("user_id", userId).not("outcome", "is", null).lt("created_at", new Date(Date.now() - 3 * 86400000).toISOString()).order("created_at", { ascending: false }).limit(10);
       if (data && data.length > 0) return data[0];
     }
   } catch (e) { log(`echo fetch failed: ${e}`); }
@@ -383,7 +394,7 @@ export async function generateZoomOut(params: GenerateZoomOutParams): Promise<Zo
         data: {
           onThisDay: prices.onThisDay,
           currentPrice: prices.currentPrice,
-          echo: echoReflection ? { message: echoReflection.message, created_at: echoReflection.created_at, mood: echoReflection.mood, outcome: echoReflection.outcome } : null,
+          echo: echoPayloadFromRow(echoReflection) as any,
           deepTime: cached.data as { title: string; body: string },
           partial: prices.isPartial,
         },
@@ -443,7 +454,7 @@ export async function generateZoomOut(params: GenerateZoomOutParams): Promise<Zo
   const result = {
     onThisDay: prices.onThisDay,
     currentPrice: prices.currentPrice,
-    echo: echoReflection ? { message: echoReflection.message, created_at: echoReflection.created_at, mood: echoReflection.mood, outcome: echoReflection.outcome } : null,
+    echo: echoPayloadFromRow(echoReflection) as any,
     deepTime: deepTimeResult.deepTime,
     partial: prices.isPartial,
   };

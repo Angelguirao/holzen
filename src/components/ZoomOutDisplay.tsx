@@ -1,9 +1,14 @@
+import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
-import { TrendingUp, TrendingDown, Clock, Globe, CloudOff } from 'lucide-react';
+import { TrendingUp, TrendingDown, Clock, Globe, CloudOff, PenLine, ChevronDown, ChevronUp } from 'lucide-react';
 import { CompanionError } from './CompanionError';
 import { format } from 'date-fns';
 import { useHolzen } from '@/hooks/use-holzen';
 import { formatBtcPrice } from '@/lib/btc';
+import { useSubscription } from '@/hooks/use-subscription';
+import { toast } from 'sonner';
 
 interface OnThisDayEntry {
   yearsAgo: number;
@@ -15,6 +20,7 @@ export interface ZoomOutData {
   onThisDay: OnThisDayEntry[];
   currentPrice: number | null;
   echo: {
+    id?: string;
     message: string;
     created_at: string;
     mood: string | null;
@@ -39,8 +45,13 @@ const outcomeLabels: Record<string, string> = {
 };
 
 export function ZoomOutDisplay({ data, loading, error, onRetry }: Props) {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
+  const { subscribed, startCheckout } = useSubscription();
   const { currency } = useHolzen();
+  const [quoteExpanded, setQuoteExpanded] = useState(false);
   const fmtPrice = (n: number) => formatBtcPrice(n, currency);
+
   if (loading) {
     return (
       <div className="space-y-3">
@@ -61,6 +72,21 @@ export function ZoomOutDisplay({ data, loading, error, onRetry }: Props) {
   const hasPrices = currentPrice && onThisDay.length > 0;
   const hasContent = !!deepTime || !!echo;
   const isEmpty = !hasPrices && !hasContent;
+
+  const goToReplay = () => {
+    if (!echo?.id) return;
+    if (!subscribed) {
+      const descKey = 'pro.desc_replay';
+      const description = t(descKey) !== descKey ? t(descKey) : t('pro.upgradeDesc');
+      toast(t('pro.featureLocked'), {
+        description,
+        action: { label: t('pro.upgradeCta'), onClick: () => startCheckout() },
+        duration: 6000,
+      });
+      return;
+    }
+    navigate('/practice/replay', { state: { reflectionId: echo.id } });
+  };
 
   return (
     <div className="space-y-4">
@@ -140,28 +166,71 @@ export function ZoomOutDisplay({ data, loading, error, onRetry }: Props) {
 
       {/* Echo - real past reflection */}
       {echo ? (
-        <div className="space-y-1.5">
-          <div className="flex items-center gap-1.5">
-            <Clock className="h-3 w-3 text-muted-foreground/50" />
-            <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">
-              Echo · {format(new Date(echo.created_at), 'MMM d, yyyy')}
+        <div className="rounded-lg border border-border/40 bg-muted/[0.08] px-3.5 py-3 space-y-3">
+          <div className="space-y-1.5">
+            <div className="flex items-center gap-1.5">
+              <Clock className="h-3 w-3 text-muted-foreground/50" />
+              <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">
+                Echo · {format(new Date(echo.created_at), 'MMM d, yyyy')}
+              </p>
+            </div>
+            <p
+              className={`text-xs text-muted-foreground leading-relaxed italic ${
+                quoteExpanded ? '' : 'line-clamp-4'
+              }`}
+            >
+              &ldquo;{echo.message}&rdquo;
             </p>
+            {echo.message.length > 220 && (
+              <button
+                type="button"
+                onClick={() => setQuoteExpanded((v) => !v)}
+                className="text-[9px] font-mono text-muted-foreground/50 hover:text-muted-foreground/70 flex items-center gap-1"
+              >
+                {quoteExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                {quoteExpanded ? t('common.showLess', 'Show less') : t('companions.echoExpandQuote')}
+              </button>
+            )}
+            <div className="flex gap-1.5 flex-wrap">
+              {echo.mood && (
+                <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground">
+                  {echo.mood}
+                </span>
+              )}
+              {echo.outcome && (
+                <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground">
+                  {outcomeLabels[echo.outcome] || echo.outcome}
+                </span>
+              )}
+            </div>
           </div>
-          <p className="text-xs text-muted-foreground leading-relaxed italic line-clamp-3">
-            "{echo.message}"
+
+          <p className="text-[10px] text-muted-foreground/70 leading-relaxed">
+            {t('companions.echoFraming')}
           </p>
-          <div className="flex gap-1.5">
-            {echo.mood && (
-              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground">
-                {echo.mood}
-              </span>
-            )}
-            {echo.outcome && (
-              <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground">
-                {outcomeLabels[echo.outcome] || echo.outcome}
-              </span>
-            )}
+          <div className="space-y-1">
+            <p className="text-[9px] font-mono text-muted-foreground/45 uppercase tracking-wider">
+              {t('companions.echoPromptIntro')}
+            </p>
+            <ul className="text-[10px] text-muted-foreground/65 leading-relaxed list-disc pl-4 space-y-0.5">
+              <li>{t('companions.echoPrompt1')}</li>
+              <li>{t('companions.echoPrompt2')}</li>
+              <li>{t('companions.echoPrompt3')}</li>
+            </ul>
           </div>
+
+          {echo.id ? (
+            <button
+              type="button"
+              onClick={goToReplay}
+              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-md border border-primary/25 bg-primary/[0.06] hover:bg-primary/[0.1] transition-colors"
+            >
+              <PenLine className="h-3 w-3 text-primary/60 shrink-0" />
+              <span className="text-[10px] font-mono text-primary/70 tracking-[0.12em] uppercase">
+                {t('companions.echoRespondCta')}
+              </span>
+            </button>
+          ) : null}
         </div>
       ) : (
         <div className="space-y-1.5">
