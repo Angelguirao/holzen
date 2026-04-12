@@ -75,8 +75,8 @@ interface Props {
 }
 
 /**
- * Wax seal. Uses `nox.accent.mustard` + `nox.text.highlight` so the metaphor
- * lands as warm wax rather than as a white primary glow.
+ * Wax seal. Large sizes (ceremony) use Nox mustard + highlight for a warm wax read.
+ * Small sizes (under 48px) use primary/muted so the home widget matches Practice/Ground chrome.
  */
 function WaxSeal({
   size = 48,
@@ -87,14 +87,22 @@ function WaxSeal({
   breaking?: boolean;
   className?: string;
 }) {
+  const subtle = size < 48;
+
+  const ringBorder = subtle ? 'border-primary/25' : 'border-nox-text-highlight/50';
+  const outerBg = subtle
+    ? 'radial-gradient(circle at 35% 35%, hsl(var(--primary) / 0.14), hsl(var(--muted) / 0.45))'
+    : 'radial-gradient(circle at 35% 35%, hsl(var(--nox-color-accent-mustard) / 0.35), hsl(var(--nox-color-text-highlight) / 0.2))';
+  const innerBg = subtle
+    ? 'radial-gradient(circle at 40% 40%, hsl(var(--primary) / 0.22), hsl(var(--muted) / 0.35))'
+    : 'radial-gradient(circle at 40% 40%, hsl(var(--nox-color-accent-mustard) / 0.55), hsl(var(--nox-color-text-highlight) / 0.3))';
+  const hubBg = subtle ? 'bg-primary/30' : 'bg-nox-text-highlight/40';
+
   return (
     <div className={`relative ${className}`} style={{ width: size, height: size }}>
       <motion.div
-        className="absolute inset-0 rounded-full border border-nox-text-highlight/50"
-        style={{
-          background:
-            'radial-gradient(circle at 35% 35%, hsl(var(--nox-color-accent-mustard) / 0.35), hsl(var(--nox-color-text-highlight) / 0.2))',
-        }}
+        className={`absolute inset-0 rounded-full border ${ringBorder}`}
+        style={{ background: outerBg }}
         animate={breaking ? { scale: [1, 1.15, 0.95, 1.05], opacity: [1, 0.8, 1, 0.6] } : {}}
         transition={{ duration: 1.2, ease: 'easeOut' }}
       />
@@ -105,14 +113,13 @@ function WaxSeal({
           left: '22%',
           right: '22%',
           bottom: '22%',
-          background:
-            'radial-gradient(circle at 40% 40%, hsl(var(--nox-color-accent-mustard) / 0.55), hsl(var(--nox-color-text-highlight) / 0.3))',
+          background: innerBg,
         }}
         animate={breaking ? { rotate: [0, 15, -10, 5], scale: [1, 0.9, 1.1, 1] } : {}}
         transition={{ duration: 1, ease: 'easeOut', delay: 0.2 }}
       />
       <div
-        className="absolute rounded-full bg-nox-text-highlight/40"
+        className={`absolute rounded-full ${hubBg}`}
         style={{ top: '40%', left: '40%', right: '40%', bottom: '40%' }}
       />
     </div>
