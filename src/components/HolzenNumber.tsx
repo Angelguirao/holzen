@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
+import { homeInWidget } from '@/components/home/home-widget-styles';
 
 interface HolzenNumberData {
   total: number;
@@ -54,9 +55,10 @@ export function HolzenNumber({ variant = 'default' }: { variant?: 'default' | 'c
         {...motionProps}
       >
         <span className="inline-block h-1.5 w-1.5 rounded-full bg-primary/40 animate-pulse" />
-        <p className="text-[10px] font-mono tracking-wide">
-          <span className="text-foreground tabular-nums">{data.percent}%</span>
-          {' '}held steady today
+        <p className={homeInWidget.meta}>
+          <span className="font-semibold tabular-nums text-foreground">{data.percent}%</span>
+          {' '}
+          held steady today
         </p>
       </motion.div>
     );
@@ -64,19 +66,15 @@ export function HolzenNumber({ variant = 'default' }: { variant?: 'default' | 'c
 
   return (
     <motion.div
-      className="rounded-md border border-border/60 bg-muted/20 px-4 py-3 space-y-1.5"
+      className={`${homeInWidget.inset} space-y-1.5`}
       {...motionProps}
     >
       <div className="flex items-center gap-2">
         <span className="inline-block h-1.5 w-1.5 rounded-full bg-primary/50 animate-pulse" />
-        <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-foreground">
-          The Holzen Number
-        </p>
+        <p className={homeInWidget.kicker}>The Holzen Number</p>
       </div>
-      <p className="text-lg font-mono tabular-nums text-foreground">
-        {data.percent}%
-      </p>
-      <p className="text-[10px] text-muted-foreground leading-relaxed">
+      <p className="text-lg font-semibold tabular-nums tracking-tight text-foreground">{data.percent}%</p>
+      <p className={homeInWidget.meta}>
         of users held steady today · {data.total} pause{data.total !== 1 ? 's' : ''} recorded
       </p>
     </motion.div>

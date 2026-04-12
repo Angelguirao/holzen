@@ -11,6 +11,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/components/ui/popover';
+import { homeInWidget } from '@/components/home/home-widget-styles';
 
 const SNOOZE_OPTIONS = [
   { hours: 2, labelKey: 'snooze.2h' },
@@ -94,12 +95,13 @@ export function SnoozeControl() {
         className="flex items-center gap-2 py-1.5"
       >
         <Moon className="h-3 w-3 text-muted-foreground/50" />
-        <p className="text-[10px] font-mono text-muted-foreground/50 flex-1">
+        <p className={`${homeInWidget.meta} flex-1 text-muted-foreground/80`}>
           {t('snooze.activeLabel', { time: timeLabel, defaultValue: `Snoozed · {{time}} left` })}
         </p>
         <button
           onClick={handleCancel}
-          className="text-[10px] font-mono text-primary/50 hover:text-primary transition-colors"
+          type="button"
+          className="text-xs font-medium text-primary/70 transition-colors hover:text-primary"
         >
           {t('snooze.wake', 'Wake')}
         </button>
@@ -111,24 +113,22 @@ export function SnoozeControl() {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button
-          className="flex items-center gap-1.5 text-[10px] font-mono text-muted-foreground/40 hover:text-muted-foreground/60 transition-colors py-1"
+          className={`flex items-center gap-1.5 py-1 ${homeInWidget.metaFaint} hover:text-muted-foreground`}
         >
           <Moon className="h-3 w-3" />
           {t('snooze.pausePauses', 'Snooze pauses')}
         </button>
       </PopoverTrigger>
       <PopoverContent align="start" className="w-48 p-2 space-y-1">
-        <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider px-2 pb-1">
-          {t('snooze.snoozeFor', 'Snooze for')}
-        </p>
+        <p className={`px-2 pb-1 ${homeInWidget.kicker}`}>{t('snooze.snoozeFor', 'Snooze for')}</p>
         {SNOOZE_OPTIONS.map(({ hours, labelKey }) => (
           <button
             key={hours}
             onClick={() => handleSnooze(hours)}
-            className="w-full flex items-center gap-2 px-3 py-2 rounded-md hover:bg-muted/50 transition-colors text-left"
+            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left transition-colors hover:bg-muted/50"
           >
             <Clock className="h-3 w-3 text-muted-foreground/40" />
-            <span className="text-xs font-mono text-foreground/70">
+            <span className="text-sm font-medium text-foreground/80">
               {t(labelKey, `${hours} hours`)}
             </span>
           </button>

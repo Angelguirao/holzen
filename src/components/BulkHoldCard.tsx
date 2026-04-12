@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Inbox } from 'lucide-react';
 import { hapticFeedback } from '@/lib/haptics';
 import { Button } from '@/components/ui/button';
+import { homeInWidget } from '@/components/home/home-widget-styles';
 
 interface PendingReflection {
   id: string;
@@ -71,12 +72,12 @@ export function BulkHoldCard() {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           exit={{ opacity: 0, y: -8 }}
-          className="rounded-lg border border-primary/20 bg-primary/5 px-4 py-3 flex items-center gap-3"
+          className={`${homeInWidget.stripPrimary} flex items-center gap-3`}
         >
           <div className="h-6 w-6 rounded-full bg-primary/10 flex items-center justify-center shrink-0">
             <Check className="h-3.5 w-3.5 text-primary" />
           </div>
-          <p className="text-xs font-mono text-primary/70">
+          <p className="text-sm font-medium leading-snug text-primary/80">
             {t('bulkHold.allMarkedHold', { count: pending.length, defaultValue: '{{count}} pauses marked as Hold' })}
           </p>
         </motion.div>
@@ -86,17 +87,15 @@ export function BulkHoldCard() {
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
-          className="rounded-lg border border-border/60 bg-muted/30 px-4 py-4 space-y-3"
+          className={`${homeInWidget.strip} space-y-3 py-4`}
         >
           <div className="flex items-start gap-3">
             <Inbox className="h-4 w-4 text-muted-foreground/60 mt-0.5 shrink-0" />
             <div className="flex-1 space-y-1">
-              <p className="text-xs font-mono text-foreground/80">
+              <p className="text-sm font-medium leading-snug text-foreground">
                 {t('bulkHold.title', { count: pending.length, defaultValue: '{{count}} pauses while you were away' })}
               </p>
-              <p className="text-[10px] font-mono text-muted-foreground/50 leading-relaxed">
-                {t('bulkHold.subtitle', 'Mark all as Hold with one tap, or review them individually in the Library.')}
-              </p>
+              <p className={homeInWidget.meta}>{t('bulkHold.subtitle', 'Mark all as Hold with one tap, or review them individually in the Library.')}</p>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -104,13 +103,14 @@ export function BulkHoldCard() {
               onClick={handleHoldAll}
               disabled={loading}
               size="sm"
-              className="flex-1 font-mono text-xs"
+              className="h-9 flex-1 rounded-xl text-sm font-semibold"
             >
               {loading ? t('common.loading') : t('bulkHold.holdAll', 'Hold all')}
             </Button>
             <button
+              type="button"
               onClick={handleDismiss}
-              className="text-[10px] font-mono text-muted-foreground/50 hover:text-muted-foreground transition-colors px-2"
+              className={`px-2 ${homeInWidget.meta} hover:text-foreground`}
             >
               {t('common.dismiss', 'Dismiss')}
             </button>
