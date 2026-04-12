@@ -1,6 +1,6 @@
 /**
- * Shared typography + surfaces for content **inside** {@link HomeWidget}.
- * Keeps Market / Goal / Pause / etc. visually aligned with Library & Profile (sans body scale, one kicker style).
+ * Shared typography + surfaces for content **inside** {@link HomeWidget} and related Home chrome.
+ * Keeps Market / Goal / Pause / etc. visually aligned: one body scale, one kicker, shared CTAs / dismiss / errors.
  */
 export const homeInWidget = {
   body: 'text-sm leading-relaxed text-foreground',
@@ -30,4 +30,25 @@ export const homeInWidget = {
   rowButtonGhost: 'flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-muted/30',
   /** Motivation / tag chips (My Why, etc.) */
   chipTone: 'rounded-full border border-primary/15 bg-primary/5 px-2.5 py-0.5 text-xs font-medium text-primary/80',
+  /** Top-right dismiss on reflection / grounding previews */
+  dismissAbs:
+    'absolute -top-1 -right-1 inline-flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground/30 transition-colors hover:bg-muted/50 hover:text-muted-foreground/60',
+  /** Primary full-width action (Pause with this, Ground when subscribed) */
+  ctaPrimary:
+    'flex w-full items-center justify-center gap-2 rounded-xl border border-primary/25 bg-primary/10 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-primary/15',
+  /** Stronger primary tint when the moment calls for it (e.g. volatile nudge) */
+  ctaPrimaryEmphasis: 'border-primary/35 bg-primary/12 hover:bg-primary/18',
+  /** Muted full-width action (ground preview, stillness entry) */
+  ctaSecondary:
+    'flex w-full items-center justify-center gap-2 rounded-xl border border-border/50 bg-muted/30 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted/45',
+  /** Inline error / retry blocks inside widgets */
+  errorPanel: 'space-y-2 rounded-xl border border-destructive/20 bg-destructive/5 px-4 py-3',
+  /** Short reflection teaser line */
+  bodyLead: 'text-sm font-medium leading-relaxed text-foreground',
+  /** Spinner + label row inside widgets */
+  loadingRow: 'flex items-center gap-2 text-muted-foreground',
+  /** Compact activity tags (Ground widget) */
+  pillMuted: 'rounded-full border border-border/50 bg-muted/20 px-3 py-1 text-xs text-muted-foreground',
+  /** Next price-check countdown when auto cooldown is idle */
+  nextScanCountdown: 'min-w-0 flex-1 text-xs font-medium tabular-nums text-primary',
 } as const;

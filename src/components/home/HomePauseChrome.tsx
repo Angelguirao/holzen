@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pause, Timer, Lock } from 'lucide-react';
 import { LoadingButton } from '@/components/ui/loading-button';
+import { homeInWidget } from '@/components/home/home-widget-styles';
+import { cn } from '@/lib/utils';
 
 /** Format ms as m:ss for short countdowns (e.g. next cron tick, manual cooldown under one minute). */
 function formatMsAsMS(ms: number): string {
@@ -108,7 +110,7 @@ export function AutoCooldownIndicator({
         title={t('home.nextScanIdleTitle')}
       >
         <Timer className="h-3.5 w-3.5 text-primary/60 shrink-0" />
-        <p className="min-w-0 flex-1 text-xs font-medium tabular-nums text-primary">
+        <p className={homeInWidget.nextScanCountdown}>
           {t('home.nextScanLine', {
             scan: formatMsAsMS(cronIn),
             defaultValue: 'Next scan · {{scan}}',
@@ -133,14 +135,14 @@ export function AutoCooldownIndicator({
       <Timer className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-0.5" />
       <div className="flex-1 min-w-0 space-y-1.5">
         <div className="flex items-center justify-between gap-2">
-          <p className="text-xs font-medium uppercase tracking-wide leading-snug text-muted-foreground">
+          <p className={cn(homeInWidget.kicker, 'leading-snug')}>
             {t('home.cooldownHeadline', {
               hours: cooldownHours,
               time: timeLabel,
               defaultValue: '{{hours}}h cooldown · {{time}} left',
             })}
           </p>
-          <p className="shrink-0 text-xs font-medium tabular-nums text-muted-foreground">
+          <p className={cn(homeInWidget.meta, 'shrink-0 font-medium tabular-nums')}>
             {Math.round(progress)}%
           </p>
         </div>

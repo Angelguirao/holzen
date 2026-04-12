@@ -29,6 +29,8 @@ import { useAuth } from '@/hooks/use-auth';
 import { toast } from 'sonner';
 import { AlertCircle, Loader2, Pin, Sparkles, Waves, RotateCcw, RefreshCw, X, Anchor } from 'lucide-react';
 import { AutoCooldownIndicator, NeedAMomentButton, ProLockedWidget } from '@/components/home/HomePauseChrome';
+import { homeInWidget } from '@/components/home/home-widget-styles';
+import { cn } from '@/lib/utils';
 import { PracticeWidget } from '@/components/PracticeWidget';
 import { BulkHoldCard } from '@/components/BulkHoldCard';
 import { SnoozeControl } from '@/components/SnoozeControl';
@@ -501,10 +503,10 @@ const Home = () => {
 
               {!subLoading && !hasAccess ? (
                 <div className="space-y-3">
-                  <p className="text-sm leading-relaxed text-muted-foreground">
+                  <p className={homeInWidget.bodyMuted}>
                     {t('home.subscription.monthlyLimitReached')}
                   </p>
-                  <p className="text-xs leading-relaxed text-muted-foreground">
+                  <p className={homeInWidget.meta}>
                     {t('home.subscription.upgradeToPro')}
                   </p>
                   <LoadingButton
@@ -521,7 +523,7 @@ const Home = () => {
               ) : (
                 <>
                   {!subscribed && monthlyRemaining !== undefined && monthlyRemaining > 0 && (
-                    <p className="text-xs text-muted-foreground">
+                    <p className={homeInWidget.meta}>
                       {t('home.subscription.freeRemaining', { count: monthlyRemaining })}
                     </p>
                   )}
@@ -533,16 +535,16 @@ const Home = () => {
                         <button
                           type="button"
                           onClick={handleDismiss}
-                          className="absolute -top-1 -right-1 inline-flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground/30 hover:text-muted-foreground/60 hover:bg-muted/50 transition-colors"
+                          className={homeInWidget.dismissAbs}
                           aria-label={t('common.dismiss', 'Dismiss')}
                         >
                           <X className="h-3.5 w-3.5" aria-hidden />
                         </button>
-                        <p className="pr-5 text-sm font-medium leading-relaxed text-foreground">
+                        <p className={cn(homeInWidget.bodyLead, 'pr-5')}>
                           {message.split(/[.!?]\s/)[0]}{message.split(/[.!?]\s/).length > 1 ? '…' : ''}
                         </p>
                         {context && (
-                          <p className="mt-2 text-xs leading-snug text-muted-foreground">
+                          <p className={cn(homeInWidget.meta, 'mt-2')}>
                             {context.slice(0, 72)}{context.length > 72 ? '…' : ''}
                           </p>
                         )}
@@ -570,7 +572,7 @@ const Home = () => {
                           });
                           navigate('/pause', { state: navState });
                         }}
-                        className="flex w-full items-center justify-center gap-2 rounded-xl border border-primary/25 bg-primary/10 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-primary/15"
+                        className={homeInWidget.ctaPrimary}
                       >
                         <Sparkles className="h-4 w-4 shrink-0 text-primary" />
                         {t('onboarding.pauseWithThis')}
@@ -580,16 +582,16 @@ const Home = () => {
                     <>
                       {loading ? (
                         <div className="space-y-4">
-                          <div className="flex items-center gap-2 text-muted-foreground">
+                          <div className={homeInWidget.loadingRow}>
                             <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
-                            <p className="text-sm">{t('home.generatingReflection')}</p>
+                            <p className={homeInWidget.bodyMuted}>{t('home.generatingReflection')}</p>
                           </div>
                           <Skeleton className="h-4 w-full" />
                           <Skeleton className="h-4 w-3/4" />
                           <Skeleton className="h-4 w-1/2" />
                         </div>
                       ) : (error && !btcData) || isReflectionPersistError(error) ? (
-                        <div className="rounded-md border border-destructive/20 bg-destructive/5 px-4 py-3 space-y-2">
+                        <div className={homeInWidget.errorPanel}>
                           <div className="flex items-center gap-2 text-destructive">
                             <AlertCircle className="h-4 w-4 shrink-0" />
                             <p className="text-sm font-medium leading-snug">
@@ -603,7 +605,7 @@ const Home = () => {
                             </p>
                           </div>
                           {!isReflectionPersistError(error) && (
-                            <p className="text-xs leading-relaxed text-muted-foreground">
+                            <p className={homeInWidget.meta}>
                               {error.includes('fetch') || error.includes('network') || error.includes('Failed to fetch')
                                 ? t('home.errors.checkConnection')
                                 : error.includes('generate') || error.includes('reflect')
@@ -625,11 +627,11 @@ const Home = () => {
                       ) : (
                         <div className="space-y-6">
                           {pinnedReflection && (
-                            <div className="space-y-3 rounded-xl border border-border/40 bg-card/30 px-4 py-3">
+                            <div className={cn(homeInWidget.inset, 'space-y-3')}>
                               <div className="flex items-center justify-between gap-2">
                                 <div className="flex items-center gap-2 text-muted-foreground">
                                   <Pin className="h-3.5 w-3.5 shrink-0" />
-                                  <span className="text-xs font-semibold uppercase tracking-wide">{t('common.pinned')}</span>
+                                  <span className={homeInWidget.kicker}>{t('common.pinned')}</span>
                                 </div>
                                 <button
                                   type="button"
@@ -639,7 +641,7 @@ const Home = () => {
                                   {t('common.unpin')}
                                 </button>
                               </div>
-                              <p className="text-sm leading-relaxed text-foreground">{pinnedReflection.message}</p>
+                              <p className={homeInWidget.body}>{pinnedReflection.message}</p>
                             </div>
                           )}
                           <NeedAMomentButton onTrigger={handleNeedAPause} cooldownRemaining={manualCooldownRemaining} loading={loading} />
@@ -695,22 +697,22 @@ const Home = () => {
                     <button
                       type="button"
                       onClick={dismissGroundSuggestion}
-                      className="absolute -top-1 -right-1 inline-flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground/30 hover:text-muted-foreground/60 hover:bg-muted/50 transition-colors"
+                      className={homeInWidget.dismissAbs}
                       aria-label={t('common.dismiss', 'Dismiss')}
                     >
                       <X className="h-3.5 w-3.5" aria-hidden />
                     </button>
-                    <p className="pr-5 text-sm leading-relaxed text-foreground">
+                    <p className={cn(homeInWidget.body, 'pr-5')}>
                       {groundSuggestion.suggestion}
                     </p>
-                    <p className="mt-2 text-xs text-muted-foreground">
+                    <p className={cn(homeInWidget.meta, 'mt-2')}>
                       {groundSuggestion.duration} min · {groundSuggestion.activity}
                     </p>
                   </div>
                   <button
                     type="button"
                     onClick={handleStartGround}
-                    className="flex w-full items-center justify-center gap-2 rounded-xl border border-border/50 bg-muted/30 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted/45"
+                    className={homeInWidget.ctaSecondary}
                   >
                     <Anchor className="h-4 w-4 shrink-0 text-muted-foreground" />
                     {t('home.groundYourself', 'Ground yourself')}
@@ -718,9 +720,9 @@ const Home = () => {
                 </>
               ) : groundLoading ? (
                 <div className="space-y-3">
-                  <div className="flex items-center gap-2 text-muted-foreground">
+                  <div className={homeInWidget.loadingRow}>
                     <Loader2 className="h-4 w-4 shrink-0 animate-spin" />
-                    <p className="text-sm">{t('home.groundFinding', 'Finding what fits…')}</p>
+                    <p className={homeInWidget.bodyMuted}>{t('home.groundFinding', 'Finding what fits…')}</p>
                   </div>
                   <Skeleton className="h-4 w-full" />
                   <Skeleton className="h-4 w-3/4" />
@@ -728,7 +730,7 @@ const Home = () => {
               ) : (
                 <>
                   {shouldNudgeGround && (
-                    <p className="text-sm font-medium text-primary">
+                    <p className={cn(homeInWidget.body, 'font-medium text-primary')}>
                       {t('home.groundVolatileHint', 'The market is moving. A good moment to ground.')}
                     </p>
                   )}
@@ -737,7 +739,7 @@ const Home = () => {
                     {groundingActivities.slice(0, 4).map((activity) => (
                       <span
                         key={activity}
-                        className="rounded-full border border-border/50 bg-muted/20 px-3 py-1 text-xs text-muted-foreground"
+                        className={homeInWidget.pillMuted}
                       >
                         {activity}
                       </span>
@@ -748,11 +750,7 @@ const Home = () => {
                     <button
                       type="button"
                       onClick={() => navigate('/ground')}
-                      className={`flex w-full items-center justify-center gap-2 rounded-xl border py-3 text-sm font-semibold transition-colors ${
-                        shouldNudgeGround
-                          ? 'border-primary/35 bg-primary/12 text-foreground hover:bg-primary/18'
-                          : 'border-primary/25 bg-primary/10 text-foreground hover:bg-primary/15'
-                      }`}
+                      className={cn(homeInWidget.ctaPrimary, shouldNudgeGround && homeInWidget.ctaPrimaryEmphasis)}
                     >
                       <Anchor className="h-4 w-4 shrink-0 text-primary" />
                       {t('home.groundYourself', 'Ground yourself')}
@@ -834,13 +832,13 @@ const Home = () => {
             onToggleCollapse={() => toggleCollapsed('breathe')}
           >
             <div className="space-y-3">
-              <p className="text-sm leading-relaxed text-muted-foreground">
+              <p className={homeInWidget.bodyMuted}>
                 {t('home.breatheDesc', 'A quiet space to find stillness. No goals, no tracking.')}
               </p>
               <button
                 type="button"
                 onClick={() => navigate('/breathe')}
-                className="flex w-full items-center justify-center gap-2 rounded-xl border border-border/50 bg-muted/30 py-3 text-sm font-semibold text-foreground transition-colors hover:bg-muted/45"
+                className={homeInWidget.ctaSecondary}
               >
                 <Waves className="h-4 w-4 shrink-0 text-muted-foreground" />
                 {t('home.enterStillness', 'Enter stillness')}
@@ -875,7 +873,7 @@ const Home = () => {
       <div className="space-y-2">
         <NoxHeaderMain title={t('home.title', 'Home')} subtitle={t('home.whenBtcMoves')} rightSlot={headerRightSlot} />
         {firstName ? (
-          <p className="text-sm leading-snug text-muted-foreground">{t('home.greeting', { name: firstName })}</p>
+          <p className={cn(homeInWidget.bodyMuted, 'leading-snug')}>{t('home.greeting', { name: firstName })}</p>
         ) : null}
       </div>
       {/* Pull-to-refresh indicator */}
