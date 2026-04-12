@@ -68,7 +68,7 @@ export function PauseSessionScaffold({
 
         <button
           onClick={onClose}
-          className="fixed top-5 right-5 p-3 rounded-full bg-muted/40 backdrop-blur-sm text-muted-foreground/40 hover:text-foreground/60 hover:bg-muted/60 transition-all duration-300 z-[60]"
+          className="fixed top-5 right-5 p-3 rounded-full bg-muted/50 backdrop-blur-sm text-muted-foreground hover:text-foreground hover:bg-muted/70 transition-all duration-300 z-[60] border border-border/20"
           aria-label="Close"
         >
           <X className="h-4 w-4" />
@@ -76,17 +76,19 @@ export function PauseSessionScaffold({
 
         {phase === 'session' && (
           <motion.div
-            className="fixed top-5 left-5 z-[55] flex flex-col items-start gap-2"
+            className="fixed top-5 left-5 z-[55] flex max-w-[min(calc(100vw-5.5rem),20rem)] flex-col items-start gap-2"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 2, duration: 1 }}
+            transition={{ delay: 0.45, duration: 0.6 }}
           >
-            <PauseProgress currentStep={step} onStepClick={goToStep} />
+            <div className="w-full overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+              <PauseProgress currentStep={step} onStepClick={goToStep} />
+            </div>
             <PauseScienceSheet />
           </motion.div>
         )}
 
-        <div className="relative z-10 max-w-md mx-auto px-6 py-20 overflow-hidden">{children}</div>
+        <div className="relative z-10 mx-auto max-w-lg overflow-hidden px-5 py-16 sm:px-8 sm:py-20">{children}</div>
       </motion.div>
     </>
   );

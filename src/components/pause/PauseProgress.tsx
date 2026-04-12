@@ -21,7 +21,7 @@ export function PauseProgress({ currentStep, onStepClick }: Props) {
   const currentIndex = STEPS.indexOf(currentStep);
 
   return (
-    <div className="flex items-center justify-center gap-1.5">
+    <div className="flex w-max min-w-full items-center justify-start gap-1 sm:gap-1.5">
       {STEPS.map((step, i) => {
         const isActive = i === currentIndex;
         const isPast = i < currentIndex;
@@ -31,16 +31,21 @@ export function PauseProgress({ currentStep, onStepClick }: Props) {
             key={step}
             onClick={() => canClick && onStepClick(step)}
             disabled={!canClick}
-            className={`flex flex-col items-center gap-1 px-0.5 ${canClick ? 'cursor-pointer' : 'cursor-default'}`}
+            type="button"
+            className={`flex min-w-[2.75rem] flex-col items-center gap-1.5 px-0.5 sm:min-w-0 ${canClick ? 'cursor-pointer' : 'cursor-default'}`}
           >
             <div
               className={`h-1 rounded-full transition-all duration-500 ${
-                isActive ? 'w-5 bg-primary/60' : isPast ? 'w-3 bg-primary/25' : 'w-3 bg-border/30'
+                isActive ? 'w-6 bg-primary' : isPast ? 'w-4 bg-primary/40' : 'w-3 bg-border'
               }`}
             />
             <span
-              className={`text-[7px] font-mono uppercase tracking-[0.12em] transition-colors duration-500 ${
-                isActive ? 'text-primary/60' : isPast ? 'text-muted-foreground/30 hover:text-muted-foreground/50' : 'text-muted-foreground/15'
+              className={`max-w-[4.25rem] text-center text-[10px] font-medium uppercase leading-tight tracking-wide transition-colors duration-500 sm:max-w-none sm:text-xs ${
+                isActive
+                  ? 'text-foreground'
+                  : isPast
+                    ? `text-muted-foreground ${canClick ? 'hover:text-foreground' : ''}`
+                    : 'text-muted-foreground/70'
               }`}
             >
               {stepLabels[step]}

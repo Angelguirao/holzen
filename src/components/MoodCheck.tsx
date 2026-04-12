@@ -52,7 +52,7 @@ export function MoodCheck({ onSelect, onSkip, variant = 'before', hideHeading = 
         <div className="space-y-1">
           <p className="text-sm font-mono text-muted-foreground">{heading}</p>
           {variant === 'after' && (
-            <p className="text-[10px] text-muted-foreground/40 font-mono">
+            <p className="text-xs leading-relaxed text-muted-foreground">
               {t('moodCheck.afterDesc', 'After reflecting and grounding, check in again.')}
             </p>
           )}
@@ -60,7 +60,7 @@ export function MoodCheck({ onSelect, onSkip, variant = 'before', hideHeading = 
       )}
       {moodGroups.map((group) => (
         <div key={group.key} className="space-y-1.5">
-          <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground/50">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
             {t(`moodCheck.${group.key}`)}
           </p>
           <div className="grid grid-cols-4 gap-1.5">
@@ -70,9 +70,9 @@ export function MoodCheck({ onSelect, onSkip, variant = 'before', hideHeading = 
                 variant="outline"
                 size="sm"
                 onClick={() => onSelect(value)}
-                className="flex flex-col items-center gap-0.5 h-auto py-2.5 text-[10px] font-mono border-border/50 hover:border-primary/30 hover:bg-primary/5 transition-colors"
+                className="flex h-auto flex-col items-center gap-1 border-border/60 py-2.5 text-[11px] font-medium leading-tight text-foreground transition-colors hover:border-primary/40 hover:bg-primary/5"
               >
-                <MoodIcon mood={value} size={18} className="text-muted-foreground" />
+                <MoodIcon mood={value} size={20} className="text-muted-foreground" />
                 {t(`moodCheck.moods.${key}`)}
               </Button>
             ))}
@@ -80,8 +80,9 @@ export function MoodCheck({ onSelect, onSkip, variant = 'before', hideHeading = 
         </div>
       ))}
       <button
+        type="button"
         onClick={onSkip}
-        className="text-[10px] font-mono text-muted-foreground/60 underline w-full text-center"
+        className="w-full text-center text-xs text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
       >
         {t('common.skip')}
       </button>

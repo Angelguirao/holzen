@@ -98,22 +98,22 @@ export function ScoreImpact({ data }: { data: PauseData }) {
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.8, duration: 0.6 }}
-      className="w-full max-w-[280px] space-y-2"
+      className="w-full max-w-sm space-y-3"
     >
-      <p className="text-[9px] font-mono tracking-[0.15em] uppercase text-muted-foreground/30 text-center">
+      <p className="text-center text-xs font-medium uppercase tracking-wide text-muted-foreground">
         {t('scoreImpact.title', 'Score impact')}
       </p>
-      <div className="space-y-1.5">
+      <div className="space-y-2.5">
         {impacts.map((imp) => (
-          <div key={imp.key} className="flex items-center gap-2">
+          <div key={imp.key} className="flex items-start gap-2.5">
             {imp.direction === 'up' ? (
-              <TrendingUp className="h-3 w-3 text-primary/50 shrink-0" />
+              <TrendingUp className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
             ) : (
-              <Minus className="h-3 w-3 text-muted-foreground/30 shrink-0" />
+              <Minus className="mt-0.5 h-4 w-4 shrink-0 text-muted-foreground" />
             )}
-            <div className="flex-1 min-w-0">
-              <span className="text-[10px] font-mono text-foreground/50">{imp.label}</span>
-              <span className="text-[10px] font-mono text-muted-foreground/30 ml-1.5">{imp.reason}</span>
+            <div className="min-w-0 flex-1 text-left text-sm leading-snug">
+              <span className="font-medium text-foreground">{imp.label}</span>
+              <span className="text-muted-foreground"> — {imp.reason}</span>
             </div>
           </div>
         ))}

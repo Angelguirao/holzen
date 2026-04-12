@@ -59,7 +59,7 @@ export function PauseDecide({ onDecide, onBack }: Props) {
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.3 }}
           >
-            <p className="text-[10px] font-mono text-muted-foreground/30 uppercase tracking-[0.15em] text-center">
+            <p className="max-w-xs text-center font-editorial text-xl leading-snug text-foreground sm:text-2xl">
               {t('pause.whatWillYouDo')}
             </p>
 
@@ -72,7 +72,7 @@ export function PauseDecide({ onDecide, onBack }: Props) {
               <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/15 flex items-center justify-center">
                 <OutcomeIcon outcome="held" size={18} className="text-primary/60" />
               </div>
-              <span className="text-xs font-mono text-foreground/70 tracking-[0.12em] uppercase">
+              <span className="text-sm font-semibold tracking-wide text-foreground">
                 {t('ritual.decide.hold', 'I\'m holding')}
               </span>
             </motion.button>
@@ -80,18 +80,22 @@ export function PauseDecide({ onDecide, onBack }: Props) {
             {/* Secondary: Sell / Buy */}
             <div className="flex items-center gap-6">
               <button
+                type="button"
                 onClick={() => handleAction('sold')}
-                className="flex items-center gap-1.5 text-[9px] font-mono text-muted-foreground/30 hover:text-muted-foreground/50 transition-colors duration-500 tracking-[0.12em] uppercase"
+                className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
               >
-                <OutcomeIcon outcome="sold" size={14} className="opacity-50" />
+                <OutcomeIcon outcome="sold" size={14} className="text-muted-foreground" />
                 {t('ritual.decide.sell', 'I sold')}
               </button>
-              <span className="text-muted-foreground/10">·</span>
+              <span className="text-muted-foreground/40" aria-hidden>
+                ·
+              </span>
               <button
+                type="button"
                 onClick={() => handleAction('bought')}
-                className="flex items-center gap-1.5 text-[9px] font-mono text-muted-foreground/30 hover:text-muted-foreground/50 transition-colors duration-500 tracking-[0.12em] uppercase"
+                className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
               >
-                <OutcomeIcon outcome="bought" size={14} className="opacity-50" />
+                <OutcomeIcon outcome="bought" size={14} className="text-muted-foreground" />
                 {t('ritual.decide.buy', 'I bought')}
               </button>
             </div>
@@ -105,18 +109,18 @@ export function PauseDecide({ onDecide, onBack }: Props) {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <p className="text-[10px] font-mono text-muted-foreground/30 uppercase tracking-[0.15em]">
+            <p className="font-editorial text-lg text-foreground">
               {t('mirror.title', 'Decision Mirror')}
             </p>
 
-            <div className="space-y-4 w-full">
+            <div className="w-full space-y-4">
               {[1, 2, 3].map((i) => (
                 <motion.p
                   key={i}
                   initial={{ opacity: 0, y: 6 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: i * 0.6, duration: 0.8 }}
-                  className="text-[11px] font-mono text-muted-foreground/40 leading-relaxed italic"
+                  className="text-center text-sm italic leading-relaxed text-muted-foreground"
                 >
                   {t(`mirror.${mirrorKey}.q${i}`)}
                 </motion.p>
@@ -130,14 +134,16 @@ export function PauseDecide({ onDecide, onBack }: Props) {
               transition={{ delay: 2.4, duration: 0.8 }}
             >
               <button
+                type="button"
                 onClick={confirmMirror}
-                className="text-[10px] font-mono text-primary/50 hover:text-primary/70 transition-colors duration-500 tracking-[0.15em] uppercase"
+                className="text-sm font-medium text-primary underline-offset-4 hover:underline"
               >
                 {t(`mirror.confirm.${mirrorKey}`, mirrorKey === 'sell' ? 'I still want to sell' : 'I still want to buy')}
               </button>
               <button
+                type="button"
                 onClick={cancelMirror}
-                className="text-[9px] font-mono text-muted-foreground/20 hover:text-muted-foreground/40 transition-colors duration-500 tracking-[0.12em] uppercase"
+                className="text-xs text-muted-foreground transition-colors hover:text-foreground"
               >
                 {t('mirror.reconsider', 'Let me reconsider')}
               </button>
@@ -154,8 +160,9 @@ export function PauseDecide({ onDecide, onBack }: Props) {
           transition={{ delay: 0.5, duration: 0.8 }}
         >
           <button
+            type="button"
             onClick={onBack}
-            className="flex items-center gap-1 text-[9px] font-mono text-muted-foreground/20 hover:text-muted-foreground/40 transition-colors duration-500 tracking-[0.12em] uppercase"
+            className="flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
           >
             <ChevronLeft className="h-3 w-3" />
             {t('pause.steps.back', 'Back')}

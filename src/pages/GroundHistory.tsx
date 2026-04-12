@@ -110,21 +110,26 @@ export default function GroundHistory() {
       style={{ background: 'linear-gradient(160deg, hsl(var(--background)) 0%, hsl(var(--muted)) 50%, hsl(var(--background)) 100%)' }}
     >
       {/* Header */}
-      <div className="sticky top-0 z-20 backdrop-blur-md bg-background/70 border-b border-border/10">
-        <div className="max-w-md mx-auto px-6 py-4 flex items-center gap-3">
+      <div className="sticky top-0 z-20 border-b border-border/30 bg-background/85 backdrop-blur-md">
+        <div className="mx-auto flex max-w-md items-center gap-3 px-5 py-4 sm:px-8">
           <button
+            type="button"
             onClick={() => navigate(-1)}
-            className="p-2 -ml-2 rounded-full hover:bg-muted/40 text-muted-foreground/50 hover:text-foreground/70 transition-colors"
+            className="-ml-2 rounded-full p-2 text-muted-foreground transition-colors hover:bg-muted/50 hover:text-foreground"
           >
-            <ArrowLeft className="h-4 w-4" />
+            <ArrowLeft className="h-5 w-5" />
           </button>
-          <div className="flex-1">
-            <NoxHeaderMain title={t('ground.historyTitle', 'Grounding Journal')} />
+          <div className="min-w-0 flex-1">
+            <NoxHeaderMain
+              className="border-0 pb-0"
+              title={t('ground.historyTitle', 'Grounding Journal')}
+              subtitle={t('ground.historySubtitle', 'Your grounding sessions and notes')}
+            />
           </div>
         </div>
       </div>
 
-      <div className="max-w-md mx-auto px-6 py-6 space-y-8">
+      <div className="mx-auto max-w-md space-y-8 px-5 py-8 sm:px-8">
         {/* Stats summary */}
         {!loading && totalSessions > 0 && (
           <motion.div
@@ -133,16 +138,16 @@ export default function GroundHistory() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.2, duration: 0.5 }}
           >
-            <div className="text-center space-y-1">
-              <p className="text-2xl font-mono text-foreground/70">{totalSessions}</p>
-              <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-foreground/40">
+            <div className="space-y-1 text-center">
+              <p className="font-editorial text-3xl text-foreground">{totalSessions}</p>
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                 {t('ground.sessions', 'Sessions')}
               </p>
             </div>
-            <div className="w-px bg-border/10" />
-            <div className="text-center space-y-1">
-              <p className="text-2xl font-mono text-foreground/70">{totalMinutes}</p>
-              <p className="text-[9px] font-mono tracking-[0.2em] uppercase text-muted-foreground/40">
+            <div className="w-px bg-border/40" />
+            <div className="space-y-1 text-center">
+              <p className="font-editorial text-3xl text-foreground">{totalMinutes}</p>
+              <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                 {t('ground.minutesGrounded', 'Minutes')}
               </p>
             </div>
@@ -157,8 +162,8 @@ export default function GroundHistory() {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
           >
-            <Anchor className="h-5 w-5 text-muted-foreground/20 mx-auto" />
-            <p className="text-sm text-muted-foreground/40 font-mono">
+            <Anchor className="mx-auto h-6 w-6 text-muted-foreground" />
+            <p className="text-center text-base text-muted-foreground">
               {t('ground.noHistory', 'No grounding sessions yet')}
             </p>
             <Button
@@ -186,43 +191,45 @@ export default function GroundHistory() {
                     transition={{ delay: Math.min(i * 0.04, 0.4), duration: 0.4, ease }}
                     className="group relative"
                   >
-                    <div className="bg-muted/20 backdrop-blur-sm border border-border/10 rounded-xl px-5 py-4 space-y-3 hover:border-border/20 transition-colors duration-300">
+                    <div className="space-y-3 rounded-xl border border-border/40 bg-card/40 px-5 py-4 shadow-sm backdrop-blur-sm transition-colors duration-300 hover:border-border">
                       {/* Top row: date + duration */}
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-2">
-                          <Calendar className="h-3 w-3 text-muted-foreground/25" />
-                          <span className="text-[10px] font-mono text-muted-foreground/40">
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
+                          <Calendar className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+                          <span className="text-xs font-medium text-foreground">
                             {date.relative}
                           </span>
-                          <span className="text-[9px] text-muted-foreground/20">·</span>
-                          <span className="text-[10px] font-mono text-muted-foreground/30">
+                          <span className="text-muted-foreground/60" aria-hidden>
+                            ·
+                          </span>
+                          <span className="text-xs text-muted-foreground">
                             {date.time}
                           </span>
                         </div>
-                        {entry.duration_seconds && (
-                          <div className="flex items-center gap-1">
-                            <Clock className="h-3 w-3 text-muted-foreground/25" />
-                            <span className="text-[10px] font-mono text-muted-foreground/40">
+                        {entry.duration_seconds ? (
+                          <div className="flex shrink-0 items-center gap-1">
+                            <Clock className="h-3.5 w-3.5 text-muted-foreground" />
+                            <span className="text-xs font-medium tabular-nums text-muted-foreground">
                               {formatDuration(entry.duration_seconds)}
                             </span>
                           </div>
-                        )}
+                        ) : null}
                       </div>
 
                       {/* Activity + mood */}
-                      <div className="flex items-center gap-3">
+                      <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1">
                         {entry.mood && (
-                          <div className="flex items-center gap-1.5 shrink-0">
-                            <MoodIcon mood={entry.mood} size={16} className="text-muted-foreground/50" />
-                            <span className="text-[9px] font-mono tracking-wider uppercase text-muted-foreground/35">
+                          <div className="flex shrink-0 items-center gap-2">
+                            <MoodIcon mood={entry.mood} size={18} className="text-muted-foreground" />
+                            <span className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                               {t(`moodCheck.moods.${entry.mood}`, entry.mood)}
                             </span>
                           </div>
                         )}
                         {entry.trigger_text && (
                           <>
-                            {entry.mood && <span className="text-muted-foreground/15">·</span>}
-                            <span className="text-[10px] font-mono text-muted-foreground/50 truncate">
+                            {entry.mood ? <span className="text-muted-foreground/50" aria-hidden>·</span> : null}
+                            <span className="min-w-0 truncate text-sm font-medium text-foreground">
                               {entry.trigger_text}
                             </span>
                           </>
@@ -231,7 +238,7 @@ export default function GroundHistory() {
 
                       {/* Reflection note */}
                       {entry.body && (
-                        <p className="text-xs text-foreground/50 leading-relaxed font-mono border-l-2 border-border/15 pl-3">
+                        <p className="border-l-2 border-primary/30 pl-3 font-editorial text-sm leading-relaxed text-foreground/95">
                           {entry.body}
                         </p>
                       )}
@@ -245,8 +252,9 @@ export default function GroundHistory() {
             {hasMore && (
               <motion.div className="text-center pt-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                 <button
+                  type="button"
                   onClick={loadMore}
-                  className="text-[10px] font-mono text-muted-foreground/30 hover:text-muted-foreground/50 transition-colors tracking-[0.2em] uppercase"
+                  className="text-sm font-medium text-primary underline-offset-4 hover:underline"
                 >
                   {t('common.loadMore', 'Load more')}
                 </button>

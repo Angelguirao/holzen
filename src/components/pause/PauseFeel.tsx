@@ -28,7 +28,7 @@ export function PauseFeel({ onMoodSelect, onMoodSkip, onMoodReset, moodDone, sel
       {!moodDone ? (
         <>
           <motion.p
-            className="text-[11px] font-mono text-muted-foreground/40 uppercase tracking-[0.15em] text-center"
+            className="max-w-sm text-center font-editorial text-xl leading-snug text-foreground sm:text-2xl"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.6 }}
@@ -57,11 +57,11 @@ export function PauseFeel({ onMoodSelect, onMoodSkip, onMoodReset, moodDone, sel
               onClick={onMoodReset}
               className="flex flex-col items-center gap-2 group"
             >
-              <MoodIcon mood={selectedMood} size={28} className="text-muted-foreground/60 group-hover:text-muted-foreground transition-colors" />
-              <p className="text-xs font-mono text-muted-foreground/50 tracking-wide group-hover:text-muted-foreground transition-colors">
+              <MoodIcon mood={selectedMood} size={28} className="text-muted-foreground transition-colors group-hover:text-foreground" />
+              <p className="text-sm font-medium text-foreground transition-colors group-hover:text-foreground">
                 {t(`moodCheck.moods.${selectedMood}`)}
               </p>
-              <p className="text-[9px] font-mono text-muted-foreground/25 group-hover:text-muted-foreground/50 transition-colors">
+              <p className="text-xs text-muted-foreground transition-colors group-hover:text-foreground/80">
                 {t('pause.tapToChange', 'tap to change')}
               </p>
             </button>
@@ -70,17 +70,18 @@ export function PauseFeel({ onMoodSelect, onMoodSkip, onMoodReset, moodDone, sel
               onClick={onMoodReset}
               className="group flex flex-col items-center gap-1"
             >
-              <p className="text-[11px] font-mono text-muted-foreground/30 tracking-[0.15em] uppercase group-hover:text-muted-foreground/50 transition-colors">
+              <p className="text-sm font-medium text-muted-foreground transition-colors group-hover:text-foreground">
                 {t('common.skipped', 'Skipped')}
               </p>
-              <p className="text-[9px] font-mono text-muted-foreground/25 group-hover:text-muted-foreground/50 transition-colors">
+              <p className="text-xs text-muted-foreground transition-colors group-hover:text-foreground/80">
                 {t('pause.tapToChange', 'tap to change')}
               </p>
             </button>
           )}
           <button
+            type="button"
             onClick={onContinue}
-            className="text-[10px] font-mono text-primary/50 hover:text-primary/70 transition-colors duration-500 tracking-[0.15em] uppercase"
+            className="text-sm font-medium text-primary underline-offset-4 hover:underline"
           >
             {t('pause.steps.continue', 'Continue')}
           </button>
@@ -95,8 +96,9 @@ export function PauseFeel({ onMoodSelect, onMoodSkip, onMoodReset, moodDone, sel
           transition={{ delay: 1, duration: 0.8 }}
         >
           <button
+            type="button"
             onClick={onBack}
-            className="flex items-center gap-1 text-[9px] font-mono text-muted-foreground/20 hover:text-muted-foreground/40 transition-colors duration-500 tracking-[0.12em] uppercase"
+            className="flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
           >
             <ChevronLeft className="h-3 w-3" />
             {t('pause.steps.back', 'Back')}
