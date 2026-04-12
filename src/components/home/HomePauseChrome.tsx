@@ -63,12 +63,12 @@ function NeedAMomentButtonInner({
         loadingText={t('home.generatingReflection')}
         disabled={inCooldown}
         variant="outline"
-        className="w-full font-mono text-xs gap-2"
+        className="w-full gap-2 text-sm font-medium"
       >
-        <Pause className="h-3.5 w-3.5" />
+        <Pause className="h-4 w-4 shrink-0" />
         {cooldownLabel}
       </LoadingButton>
-      <p className="text-[10px] text-muted-foreground text-center leading-relaxed">
+      <p className="text-center text-xs leading-relaxed text-muted-foreground">
         {inCooldown
           ? t('home.cooldownMessage')
           : t('home.requestAnytime')}
@@ -105,7 +105,7 @@ export function AutoCooldownIndicator({
         title={t('home.nextScanIdleTitle')}
       >
         <Timer className="h-3.5 w-3.5 text-primary/60 shrink-0" />
-        <p className="flex-1 min-w-0 text-[10px] font-mono text-primary/70 tabular-nums tracking-tight">
+        <p className="min-w-0 flex-1 text-xs font-medium tabular-nums text-primary">
           {t('home.nextScanLine', {
             scan: formatMsAsMS(cronIn),
             defaultValue: 'Next scan · {{scan}}',
@@ -130,14 +130,14 @@ export function AutoCooldownIndicator({
       <Timer className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-0.5" />
       <div className="flex-1 min-w-0 space-y-1.5">
         <div className="flex items-center justify-between gap-2">
-          <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider leading-snug">
+          <p className="text-xs font-medium uppercase tracking-wide leading-snug text-muted-foreground">
             {t('home.cooldownHeadline', {
               hours: cooldownHours,
               time: timeLabel,
               defaultValue: '{{hours}}h cooldown · {{time}} left',
             })}
           </p>
-          <p className="text-[10px] font-mono text-muted-foreground shrink-0">
+          <p className="shrink-0 text-xs font-medium tabular-nums text-muted-foreground">
             {Math.round(progress)}%
           </p>
         </div>
@@ -147,7 +147,7 @@ export function AutoCooldownIndicator({
             style={{ width: `${progress}%` }}
           />
         </div>
-        <p className="text-[9px] font-mono text-muted-foreground/70 tabular-nums tracking-tight">
+        <p className="text-xs tabular-nums text-muted-foreground">
           {t('home.nextScanLine', {
             scan: formatMsAsMS(cronIn),
             defaultValue: 'Next scan · {{scan}}',
@@ -163,13 +163,14 @@ export function ProLockedWidget({ onUpgrade, checkoutLoading, feature }: { onUpg
   const descKey = feature ? `pro.desc_${feature}` : '';
   const description = feature && t(descKey) !== descKey ? t(descKey) : t('pro.upgradeDesc');
   return (
-    <div className="flex flex-col items-center gap-2 py-4">
-      <Lock className="h-4 w-4 text-muted-foreground/30" />
-      <p className="text-[10px] font-mono text-muted-foreground/50 text-center max-w-[200px]">{description}</p>
+    <div className="flex flex-col items-center gap-3 py-4">
+      <Lock className="h-5 w-5 text-muted-foreground" />
+      <p className="max-w-[220px] text-center text-sm leading-relaxed text-muted-foreground">{description}</p>
       <button
+        type="button"
         onClick={onUpgrade}
         disabled={checkoutLoading}
-        className="text-[10px] font-mono text-primary/60 hover:text-primary transition-colors underline"
+        className="text-sm font-medium text-primary underline-offset-4 transition-colors hover:underline disabled:opacity-50"
       >
         {t('pro.upgradeCta')}
       </button>

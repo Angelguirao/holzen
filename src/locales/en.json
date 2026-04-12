@@ -59,6 +59,7 @@
     "agreeToTerms": "By signing up, you agree to our <terms>Terms</terms> and <privacy>Privacy Policy</privacy>."
   },
   "home": {
+    "title": "Home",
     "greeting": "{{name}}.",
     "noActiveReflection": "No active pause.",
     "generatingReflection": "Preparing your pause…",
