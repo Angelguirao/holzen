@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { ChevronLeft } from 'lucide-react';
 import { OutcomeIcon } from '@/components/icons/OutcomeIcon';
 import { hapticFeedback } from '@/lib/haptics';
+import { pauseStepLayout } from '@/components/pause/pause-step-layout';
 
 /** Decisions that trigger the mirror */
 const MIRROR_DECISIONS = ['sold', 'bought'];
@@ -43,7 +44,7 @@ export function PauseDecide({ onDecide, onBack }: Props) {
 
   return (
     <motion.div
-      className="flex flex-col items-center justify-center min-h-[50vh] gap-8"
+      className={pauseStepLayout.columnCenter}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
@@ -59,7 +60,7 @@ export function PauseDecide({ onDecide, onBack }: Props) {
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.3 }}
           >
-            <p className="max-w-xs text-center font-editorial text-xl leading-snug text-foreground sm:text-2xl">
+            <p className={pauseStepLayout.screenTitle}>
               {t('pause.whatWillYouDo')}
             </p>
 
@@ -67,7 +68,7 @@ export function PauseDecide({ onDecide, onBack }: Props) {
             <motion.button
               onClick={handleHold}
               whileTap={{ scale: 0.97 }}
-              className="w-full flex items-center justify-center gap-3 py-5 rounded-xl border border-primary/20 bg-primary/5 hover:bg-primary/10 hover:border-primary/30 transition-all duration-300"
+              className="flex w-full items-center justify-center gap-3 rounded-2xl border border-primary/20 bg-primary/5 py-5 transition-all duration-300 hover:border-primary/30 hover:bg-primary/10"
             >
               <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/15 flex items-center justify-center">
                 <OutcomeIcon outcome="held" size={18} className="text-primary/60" />
@@ -109,7 +110,7 @@ export function PauseDecide({ onDecide, onBack }: Props) {
             exit={{ opacity: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <p className="font-editorial text-lg text-foreground">
+            <p className="text-center font-editorial text-xl text-foreground sm:text-2xl">
               {t('mirror.title', 'Decision Mirror')}
             </p>
 
@@ -136,7 +137,7 @@ export function PauseDecide({ onDecide, onBack }: Props) {
               <button
                 type="button"
                 onClick={confirmMirror}
-                className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+                className={pauseStepLayout.textContinue}
               >
                 {t(`mirror.confirm.${mirrorKey}`, mirrorKey === 'sell' ? 'I still want to sell' : 'I still want to buy')}
               </button>
@@ -155,6 +156,7 @@ export function PauseDecide({ onDecide, onBack }: Props) {
       {/* Back link */}
       {onBack && !mirrorDecision && (
         <motion.div
+          className={pauseStepLayout.backRow}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5, duration: 0.8 }}
@@ -162,7 +164,7 @@ export function PauseDecide({ onDecide, onBack }: Props) {
           <button
             type="button"
             onClick={onBack}
-            className="flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
+            className={pauseStepLayout.backButton}
           >
             <ChevronLeft className="h-3 w-3" />
             {t('pause.steps.back', 'Back')}

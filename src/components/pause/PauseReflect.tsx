@@ -6,6 +6,7 @@ import { CollapsibleReflectionHeader } from '@/components/pause/CollapsibleRefle
 import { ReflectionNote } from '@/components/ReflectionNote';
 import { ReflectionTags } from '@/components/ReflectionTags';
 import { Button } from '@/components/ui/button';
+import { pauseStepLayout } from '@/components/pause/pause-step-layout';
 
 interface Props {
   companions: CompanionData;
@@ -31,25 +32,25 @@ export function PauseReflect({
 
   return (
     <motion.div
-      className="space-y-8 pb-4"
+      className={pauseStepLayout.columnFlow}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
       transition={{ duration: 0.6 }}
     >
       <div className="space-y-2 text-center">
-        <p className="font-editorial text-xl leading-snug text-foreground sm:text-2xl">
+        <p className={pauseStepLayout.screenTitle}>
           {t('pause.reflect.heading', 'Sit with this reflection')}
         </p>
-        <p className="mx-auto max-w-sm text-sm leading-relaxed text-muted-foreground">
+        <p className={pauseStepLayout.screenSubtitle}>
           {t(
             'pause.reflect.subcopy',
-            'Read the message in full. Add a note or tags if you use Pro — then open the cards below only when you want more perspective.',
+            'Read at your own pace. Notes and tags are optional; open a companion card only when you want another angle.',
           )}
         </p>
       </div>
 
-      <div className="rounded-xl border border-border/50 bg-card/30 px-4 py-5 shadow-sm sm:px-5">
+      <div className="rounded-2xl border border-border/40 bg-card/40 px-4 py-5 shadow-sm backdrop-blur-sm sm:px-5">
         <CollapsibleReflectionHeader
           message={reflectionMessage}
           context={context}
@@ -115,7 +116,7 @@ export function PauseReflect({
 
       {onBack && (
         <motion.div
-          className="flex justify-center pt-1"
+          className={pauseStepLayout.backRow}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5, duration: 0.6 }}
@@ -123,7 +124,7 @@ export function PauseReflect({
           <button
             type="button"
             onClick={onBack}
-            className="flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
+            className={pauseStepLayout.backButton}
           >
             <ChevronLeft className="h-3 w-3" />
             {t('pause.steps.back', 'Back')}

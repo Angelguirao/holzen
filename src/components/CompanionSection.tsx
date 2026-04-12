@@ -7,7 +7,6 @@ import { SignalDisplay } from './SignalDisplay';
 import { ZoomOutDisplay } from './ZoomOutDisplay';
 import { HistoricalInsightDisplay } from './HistoricalInsightDisplay';
 import { CompanionFeedback } from './CompanionFeedback';
-import { InterventionSection } from './InterventionSection';
 import { Check, Heart, Lock, Feather, Anchor, BookOpenText, Mountain, Clock } from 'lucide-react';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
@@ -91,8 +90,8 @@ function CompanionCard({
         <div className="w-8 h-8 rounded-lg bg-muted/20 flex items-center justify-center shrink-0">
           <Lock className="h-3.5 w-3.5" />
         </div>
-        <span className="text-xs font-mono tracking-wide flex-1">{label}</span>
-        <span className="text-[9px] uppercase tracking-wider text-primary/40 font-mono">{t('pro.badge')}</span>
+        <span className="flex-1 text-sm font-medium text-muted-foreground">{label}</span>
+        <span className="text-[10px] font-semibold uppercase tracking-wide text-primary/50">{t('pro.badge')}</span>
       </button>
     );
   }
@@ -121,7 +120,7 @@ function CompanionCard({
             <Icon className={`h-3.5 w-3.5 ${loading ? 'text-muted-foreground/30' : expanded ? 'text-primary/70' : 'text-muted-foreground/50'}`} />
           )}
         </div>
-        <span className={`text-xs font-mono tracking-wide flex-1 ${completed ? 'text-muted-foreground/40' : 'text-foreground/70'}`}>
+        <span className={`flex-1 text-sm font-medium ${completed ? 'text-muted-foreground/50' : 'text-foreground/80'}`}>
           {label}
         </span>
         {onToggleFavorite && (
@@ -169,8 +168,6 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
     historyInsight, historyLoading, historyError, retryHistory,
     cacheIds,
     cacheRelaxations,
-    intervention, interventionLoading, interventionError,
-    retryOrchestrate,
     regenerateCompanion,
     fetchCompanion,
   } = useCompanionData({ companions, prefs, reflectionId, context, reflectionMessage, mood, severityNumber: SEVERITY_NUMBER[severity] ?? 3 });
@@ -192,38 +189,16 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
   const [expandedHistory, setExpandedHistory] = useState(false);
 
   const hasHaiku = prefs.haiku && companions.haiku;
-  // Skip grounding companion card when intervention already shows it as trap primary (same data source)
-  const interventionHasTrap = intervention?.primary?.type === 'trap';
-  const hasGrounding = prefs.grounding && !interventionHasTrap;
+  /** Intervention still runs in `useCompanionData` for hydration/cache — not shown as its own block (less visual noise). */
+  const hasGrounding = prefs.grounding;
   const hasSignal = prefs.signal && !!reflectionId;
-  // Skip zoomOut companion card when intervention already shows it as secondary (avoid double-render)
-  const interventionHasZoomOut = intervention?.secondary?.type === 'zoom_out';
-  const hasZoomOut = prefs.zoomOut && !!reflectionId && !interventionHasZoomOut;
-  // Skip history companion card when intervention already shows it as pattern primary (same data source)
-  const interventionHasPattern = intervention?.primary?.type === 'pattern';
-  const hasHistory = prefs.history && !!reflectionId && !interventionHasPattern;
+  const hasZoomOut = prefs.zoomOut && !!reflectionId;
+  const hasHistory = prefs.history && !!reflectionId;
 
   if (!hasHaiku && !hasGrounding && !hasSignal && !hasZoomOut && !hasHistory) return null;
 
   return (
     <div ref={ref} className="space-y-2.5">
-      {/* Featured intervention — shown above companions when available */}
-      {(intervention || interventionLoading || interventionError) && (
-        <div className="mb-4">
-          <InterventionSection
-            mode={intervention?.mode ?? 'insight'}
-            primary={intervention?.primary ?? null}
-            secondary={intervention?.secondary ?? null}
-            question={intervention?.question ?? null}
-            loading={interventionLoading}
-            error={interventionError}
-            onRetry={retryOrchestrate}
-            reflectionId={reflectionId}
-          />
-          <div className="border-t border-border/10 mt-6" />
-        </div>
-      )}
-
       <p className="mb-2 px-1 text-center text-xs font-medium leading-snug text-muted-foreground">
         {sectionLead ?? labels.pause}
       </p>
@@ -244,12 +219,6 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
         >
           <HaikuDisplay haiku={companions.haiku!} />
         </CompanionCard>
-      )}
-
-      {hasHaiku && hasSignal && (
-        <p className="text-[10px] font-mono text-muted-foreground/40 text-center leading-relaxed px-1 -mt-1 mb-0.5">
-          {i18nT('companions.reflectOrderHint')}
-        </p>
       )}
 
       {hasSignal && (

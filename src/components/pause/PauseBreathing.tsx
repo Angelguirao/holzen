@@ -3,6 +3,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { useTranslation } from 'react-i18next';
 import { hapticFeedback } from '@/lib/haptics';
 import { getSessionQuote } from '@/lib/wisdom-quotes';
+import { pauseStepLayout } from '@/components/pause/pause-step-layout';
 
 type Phase = { labelKey: string; duration: number };
 
@@ -98,7 +99,7 @@ export function PauseBreathing({ mantra, severity = 'mild', onContinue }: Props)
 
   return (
     <motion.div
-      className="flex flex-col items-center justify-center min-h-[60vh] gap-8"
+      className={pauseStepLayout.columnCenter}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -117,7 +118,7 @@ export function PauseBreathing({ mantra, severity = 'mild', onContinue }: Props)
           />
 
           <div className="flex max-w-md flex-col items-center gap-4 text-center">
-            <p className="font-editorial text-xl leading-snug text-foreground sm:text-2xl">
+            <p className={pauseStepLayout.screenTitle}>
               {t('pause.youPaused')}
             </p>
             {mantra && (
@@ -151,7 +152,7 @@ export function PauseBreathing({ mantra, severity = 'mild', onContinue }: Props)
             animate={{ opacity: 1 }}
             transition={{ delay: 1.5, duration: 1 }}
             onClick={() => { hapticFeedback('light'); setStarted(true); }}
-            className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+            className={pauseStepLayout.textContinue}
           >
             {t('breathing.begin', 'Begin breathing')}
           </motion.button>
@@ -198,7 +199,7 @@ export function PauseBreathing({ mantra, severity = 'mild', onContinue }: Props)
           className="flex flex-col items-center gap-6 text-center"
         >
           <div className="w-20 h-20 rounded-full border border-primary/15 bg-primary/5" />
-          <p className="font-editorial text-xl text-foreground">
+          <p className="text-center font-editorial text-2xl text-foreground sm:text-3xl">
             {t('breathing.settled', 'Settled')}
           </p>
           <motion.button
@@ -206,7 +207,7 @@ export function PauseBreathing({ mantra, severity = 'mild', onContinue }: Props)
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5, duration: 0.8 }}
             onClick={() => { hapticFeedback('light'); onContinue(); }}
-            className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+            className={pauseStepLayout.textContinue}
           >
             {t('pause.steps.continue', 'Continue')}
           </motion.button>

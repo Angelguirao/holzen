@@ -442,7 +442,6 @@
   },
   "companions": {
     "pause": "Pause with this",
-    "reflectOrderHint": "After the haiku, read the signal — one distilled idea from Bitcoin writing. Then ground or explore the rest.",
     "breathe": "Breathe with this →",
     "haiku": "Read as haiku →",
     "ground": "Ground yourself →",
@@ -811,7 +810,7 @@
     },
     "reflect": {
       "heading": "Sit with this reflection",
-      "subcopy": "Read the message in full. Add a note or tags if you use Pro — then open the cards below only when you want more perspective.",
+      "subcopy": "Read at your own pace. Notes and tags are optional; open a companion card only when you want another angle.",
       "proTools": "Your note & tags",
       "freeHint": "Holzen Pro adds an optional private note and tags on each pause — useful when you look back in your Library.",
       "companionsLead": "When you are ready, open a card — one at a time is enough.",
