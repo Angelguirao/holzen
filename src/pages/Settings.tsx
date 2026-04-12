@@ -15,8 +15,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { LoadingButton } from '@/components/ui/loading-button';
-import { useTheme } from 'next-themes';
-import { Moon, Sun, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useState, useEffect, useCallback, forwardRef, useRef } from 'react';
@@ -99,7 +98,6 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
   const { user, signOut } = useAuth();
   const { threshold, setThreshold, thresholdDown, setThresholdDown, cumulativeThreshold, setCumulativeThreshold, emailNotifications, setEmailNotifications, companionPrefs, setCompanionPref, reflectionTone, setReflectionTone, reflectionStyle, setReflectionStyle, silentMode, setSilentMode, cooldownHours, setCooldownHours, digestFrequency, setDigestFrequency, customPrompt, setCustomPrompt, quietHoursStart, quietHoursEnd, setQuietHours, streakFreezeDates, useStreakFreeze, firstName, setFirstName, nightReflectionHour, setNightReflectionHour, aiInsightsEnabled, setAiInsightsEnabled, notifyBadges, setNotifyBadges, motivations, setMotivations, mantra, setMantra, currency, setCurrency, language, setLanguage, groundingActivities, setGroundingActivities, profileLoaded } = useHolzen();
   const { subscribed, loading: subLoading, checkoutLoading, startCheckout, openPortal, monthlyRemaining } = useSubscription();
-  const { theme, setTheme } = useTheme();
   const { canInstall, install } = useInstallPrompt();
   const { isSupported: pushSupported, isSubscribed: pushSubscribed, loading: pushLoading, subscribe: pushSubscribe, unsubscribe: pushUnsubscribe } = usePushNotifications();
   const [deleting, setDeleting] = useState(false);
@@ -261,13 +259,6 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
           <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">
             {t('settings.title')}
           </h1>
-          <button
-            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-            className="text-muted-foreground hover:text-foreground transition-colors"
-            aria-label="Toggle dark mode"
-          >
-            {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-          </button>
         </div>
         <div className="space-y-3 animate-pulse">
           {[1, 2, 3].map((i) => (
@@ -285,18 +276,9 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
   return (
     <div ref={ref} className="space-y-4">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">
-            {t('settings.title')}
-          </h1>
-        </div>
-        <button
-          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-          className="text-muted-foreground hover:text-foreground transition-colors"
-          aria-label="Toggle dark mode"
-        >
-          {theme === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-        </button>
+        <h1 className="text-sm font-mono tracking-widest uppercase text-muted-foreground">
+          {t('settings.title')}
+        </h1>
       </div>
 
       <Accordion type="multiple" defaultValue={['you', 'reflection']} className="space-y-1">
