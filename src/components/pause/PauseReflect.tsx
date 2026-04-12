@@ -78,8 +78,9 @@ export function PauseReflect({
         transition={{ delay: 0.3, duration: 0.6 }}
       >
         <button
+          type="button"
           onClick={onContinue}
-          className="text-[10px] font-mono text-primary/50 hover:text-primary/70 transition-colors duration-500 tracking-[0.15em] uppercase"
+          className="text-sm font-medium text-primary underline-offset-4 hover:underline"
         >
           {t('pause.steps.continue', 'Continue')}
         </button>
@@ -94,8 +95,9 @@ export function PauseReflect({
           transition={{ delay: 1, duration: 0.8 }}
         >
           <button
+            type="button"
             onClick={onBack}
-            className="flex items-center gap-1 text-[9px] font-mono text-muted-foreground/20 hover:text-muted-foreground/40 transition-colors duration-500 tracking-[0.12em] uppercase"
+            className="flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
           >
             <ChevronLeft className="h-3 w-3" />
             {t('pause.steps.back', 'Back')}

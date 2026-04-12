@@ -28,11 +28,11 @@ export function CollapsibleReflectionHeader({ message, context, haiku, isFavorit
       <div className="flex items-start gap-2">
         <div className="flex-1 min-w-0">
           {context && (
-            <p className="text-[9px] font-mono text-muted-foreground/25 uppercase tracking-[0.12em] mb-1">
+            <p className="mb-1.5 text-xs font-mono uppercase tracking-wide text-muted-foreground">
               {context}
             </p>
           )}
-          <p className={`text-[13px] leading-[1.6] text-foreground/60 font-light ${expanded ? '' : 'line-clamp-2'}`}>
+          <p className={`font-editorial text-base leading-relaxed text-foreground sm:text-lg ${expanded ? '' : 'line-clamp-3'}`}>
             {message}
           </p>
         </div>
@@ -41,7 +41,7 @@ export function CollapsibleReflectionHeader({ message, context, haiku, isFavorit
           transition={{ duration: 0.2 }}
           className="shrink-0 mt-1"
         >
-          <ChevronDown className="h-3.5 w-3.5 text-muted-foreground/25" />
+          <ChevronDown className="h-4 w-4 text-muted-foreground" />
         </motion.div>
       </div>
 
@@ -58,7 +58,7 @@ export function CollapsibleReflectionHeader({ message, context, haiku, isFavorit
               {subscribed && (
                 <button
                   onClick={() => { hapticFeedback('light'); onToggleFavorite(); }}
-                  className={`p-1.5 rounded-full transition-all duration-300 ${isFavorite ? 'text-destructive bg-destructive/5' : 'text-muted-foreground/25 hover:text-destructive/60'}`}
+                  className={`p-1.5 rounded-full transition-all duration-300 ${isFavorite ? 'text-destructive bg-destructive/5' : 'text-muted-foreground hover:text-destructive'}`}
                   aria-label="Favorite"
                 >
                   <Heart className={`h-3 w-3 ${isFavorite ? 'fill-current' : ''}`} />

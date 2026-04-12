@@ -301,17 +301,17 @@ export default function Ground() {
       />
 
       {/* Close */}
-      <button onClick={handleReturn} className="fixed top-5 right-5 p-3 rounded-full bg-muted/40 backdrop-blur-sm text-muted-foreground/40 hover:text-foreground/60 hover:bg-muted/60 transition-all duration-300 z-[60]" aria-label="Close">
+      <button onClick={handleReturn} className="fixed top-5 right-5 z-[60] rounded-full border border-border/20 bg-muted/50 p-3 text-muted-foreground backdrop-blur-sm transition-all duration-300 hover:bg-muted/70 hover:text-foreground" aria-label="Close">
         <X className="h-4 w-4" />
       </button>
 
-      <div className="relative z-10 max-w-sm mx-auto px-6 flex flex-col items-center justify-center min-h-screen py-12">
+      <div className="relative z-10 mx-auto flex min-h-screen max-w-md flex-col items-center justify-center px-5 py-12 sm:px-8">
         <AnimatePresence mode="wait">
           {/* Loading */}
           {phase === 'idle' && (
             <motion.div key="idle" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="text-center space-y-4">
               <Loader2 className="h-4 w-4 text-muted-foreground/30 mx-auto animate-spin" />
-              <p className="text-[10px] font-mono text-muted-foreground/30 tracking-[0.2em] uppercase">
+              <p className="text-sm text-muted-foreground">
                 {t('ground.finding', 'Finding what fits...')}
               </p>
             </motion.div>
@@ -322,46 +322,46 @@ export default function Ground() {
             <motion.div key="suggestion" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }} transition={{ duration: 0.7, ease }} className="text-center space-y-7 w-full">
               {suggestionError ? (
                 <div className="space-y-6 px-2">
-                  <p className="text-sm text-muted-foreground/70 leading-relaxed">{suggestionError}</p>
+                  <p className="text-sm leading-relaxed text-muted-foreground">{suggestionError}</p>
                   <button
                     type="button"
                     onClick={handleReturn}
-                    className="px-6 py-2.5 rounded-lg border border-border/20 bg-muted/10 text-foreground/70 hover:bg-muted/20 transition-colors text-xs font-mono tracking-wider"
+                    className="rounded-lg border border-border bg-muted/30 px-6 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-muted/50"
                   >
                     {t('ground.return', 'Return home')}
                   </button>
                 </div>
               ) : (
                 <>
-              <motion.div className="space-y-2" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
-                <p className="text-[10px] font-mono tracking-[0.25em] uppercase text-muted-foreground/40">
+              <motion.div className="space-y-3" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
+                <p className="text-center text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   {t('ground.title', 'Ground yourself')}
                 </p>
-                <div className="h-px w-8 bg-foreground/10 mx-auto" />
+                <div className="mx-auto h-px w-10 bg-border" />
               </motion.div>
 
-              <motion.p className="text-xl font-mono text-foreground/80" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
+              <motion.p className="mx-auto max-w-sm text-center font-editorial text-2xl leading-snug text-foreground sm:text-3xl" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.5 }}>
                 {activity}
               </motion.p>
 
-              <motion.p className="text-sm text-muted-foreground/60 leading-relaxed max-w-[280px] mx-auto" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}>
+              <motion.p className="mx-auto max-w-sm text-center text-base leading-relaxed text-muted-foreground" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }}>
                 {suggestion}
               </motion.p>
 
               {/* Knowledge card */}
               {(insight || article) && (
-                <motion.div className="mx-auto max-w-[280px] rounded-lg border border-border/20 bg-muted/15 px-4 py-3.5 space-y-2.5 text-left" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.0, duration: 0.5 }}>
+                <motion.div className="mx-auto max-w-sm space-y-3 rounded-xl border border-border/40 bg-card/50 px-4 py-4 text-left shadow-sm backdrop-blur-sm" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.0, duration: 0.5 }}>
                   {insight && (
                     <>
-                      <p className="text-[9px] font-mono text-muted-foreground/30 tracking-[0.2em] uppercase">{t('ground.didYouKnow', 'Did you know?')}</p>
-                      <p className="text-xs text-muted-foreground/50 leading-relaxed">{insight}</p>
+                      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{t('ground.didYouKnow', 'Did you know?')}</p>
+                      <p className="text-sm leading-relaxed text-foreground/90">{insight}</p>
                     </>
                   )}
                   {article && (
-                    <div className={insight ? 'pt-2 border-t border-border/10' : ''}>
-                      <p className="text-xs text-muted-foreground/40 leading-relaxed">{article.snippet}</p>
+                    <div className={insight ? 'space-y-2 border-t border-border/30 pt-3' : ''}>
+                      <p className="text-sm leading-relaxed text-muted-foreground">{article.snippet}</p>
                       {article.url && (
-                        <a href={article.url} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 mt-2 text-[10px] font-mono text-primary/40 hover:text-primary/70 transition-colors">
+                        <a href={article.url} target="_blank" rel="noopener noreferrer" className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-primary underline-offset-2 hover:underline">
                           <ExternalLink className="h-2.5 w-2.5" />
                           {t('ground.readMore', 'Read more')}
                         </a>
@@ -372,14 +372,15 @@ export default function Ground() {
               )}
 
               {/* Duration slider */}
-              <motion.div className="space-y-4" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}>
-                <p className="text-[9px] font-mono text-muted-foreground/30 tracking-[0.2em] uppercase">
+              <motion.div className="space-y-5" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1.2 }}>
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   {t('ground.setTimer', 'Set a timer')}
                 </p>
 
-                <div className="space-y-3 max-w-[260px] mx-auto">
-                  <p className="text-2xl font-mono text-foreground/70 tabular-nums">
-                    {customDuration} <span className="text-sm text-muted-foreground/30">min</span>
+                <div className="mx-auto max-w-xs space-y-3">
+                  <p className="font-mono text-3xl tabular-nums text-foreground">
+                    {customDuration}{' '}
+                    <span className="text-base font-sans font-normal text-muted-foreground">min</span>
                   </p>
                   <input
                     type="range"
@@ -387,22 +388,23 @@ export default function Ground() {
                     max={MAX_DURATION}
                     value={customDuration}
                     onChange={(e) => setCustomDuration(parseInt(e.target.value))}
-                    className="w-full accent-primary/40 h-1 bg-border/20 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-primary/50 [&::-webkit-slider-thumb]:border-0 [&::-webkit-slider-thumb]:shadow-none"
+                    className="h-2 w-full cursor-pointer appearance-none rounded-full bg-border accent-primary [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-0 [&::-webkit-slider-thumb]:bg-primary [&::-webkit-slider-thumb]:shadow-none"
                   />
-                  <div className="flex justify-between text-[9px] font-mono text-muted-foreground/20">
+                  <div className="flex justify-between text-xs text-muted-foreground">
                     <span>{MIN_DURATION} min</span>
                     <span>{MAX_DURATION} min</span>
                   </div>
                 </div>
 
                 <button
+                  type="button"
                   onClick={() => startTimer(customDuration)}
-                  className="px-8 py-2.5 rounded-lg border border-primary/20 bg-primary/5 text-foreground/70 hover:bg-primary/10 transition-colors text-xs font-mono tracking-wider"
+                  className="rounded-lg border border-primary/30 bg-primary/10 px-8 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-primary/15"
                 >
                   {t('ground.begin', 'Begin')}
                 </button>
 
-                <button onClick={skipTimer} className="block mx-auto text-[10px] font-mono text-muted-foreground/20 hover:text-muted-foreground/50 transition-colors">
+                <button type="button" onClick={skipTimer} className="mx-auto block text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline">
                   {t('ground.skipTimer', 'Skip timer')}
                 </button>
               </motion.div>
@@ -416,7 +418,7 @@ export default function Ground() {
             <motion.div key="timer" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.96 }} transition={{ duration: 0.5, ease }} className="text-center space-y-10 w-full">
               {/* Activity label */}
               {!ambientMode && (
-                <motion.p className="text-xs font-mono text-muted-foreground/40" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <motion.p className="text-center text-sm font-medium text-muted-foreground" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
                   {activity}
                 </motion.p>
               )}
@@ -476,7 +478,7 @@ export default function Ground() {
                 {/* Time display — hidden in ambient mode */}
                 {!ambientMode && (
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <p className="text-3xl font-mono text-foreground/60 tabular-nums">{formatTime(timeLeft)}</p>
+                    <p className="font-mono text-4xl tabular-nums text-foreground">{formatTime(timeLeft)}</p>
                   </div>
                 )}
               </div>
@@ -485,20 +487,20 @@ export default function Ground() {
               <div className="flex items-center justify-center gap-5">
                 <button
                   onClick={() => setAmbientMode(!ambientMode)}
-                  className="p-3 rounded-full border border-border/15 bg-transparent text-muted-foreground/30 hover:text-muted-foreground/60 transition-colors"
+                  className="rounded-full border border-border bg-muted/20 p-3 text-muted-foreground transition-colors hover:bg-muted/40 hover:text-foreground"
                   aria-label={ambientMode ? 'Show time' : 'Hide time'}
                 >
                   {ambientMode ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
                 </button>
 
-                <button onClick={togglePause} className="p-4 rounded-full border border-border/20 bg-muted/10 hover:bg-muted/30 transition-colors">
-                  {isRunning ? <Pause className="h-4 w-4 text-foreground/50" /> : <Play className="h-4 w-4 text-foreground/50" />}
+                <button type="button" onClick={togglePause} className="rounded-full border border-border bg-muted/30 p-4 transition-colors hover:bg-muted/50">
+                  {isRunning ? <Pause className="h-5 w-5 text-foreground" /> : <Play className="h-5 w-5 text-foreground" />}
                 </button>
 
                 <div className="w-[42px]" /> {/* Spacer for centering */}
               </div>
 
-              <button onClick={skipTimer} className="text-[10px] font-mono text-muted-foreground/20 hover:text-muted-foreground/50 transition-colors">
+              <button type="button" onClick={skipTimer} className="text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline">
                 {t('ground.imDone', 'I\'m done')}
               </button>
             </motion.div>
@@ -508,14 +510,14 @@ export default function Ground() {
           {phase === 'checkin' && (
             <motion.div key="checkin" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.8, ease }} className="text-center space-y-10 w-full">
               <div className="space-y-3">
-                <p className="text-[10px] font-mono tracking-[0.25em] uppercase text-muted-foreground/40">{t('ground.checkIn', 'Check in')}</p>
-                <div className="h-px w-8 bg-foreground/10 mx-auto" />
-                <p className="text-sm text-muted-foreground/50 leading-relaxed">
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">{t('ground.checkIn', 'Check in')}</p>
+                <div className="mx-auto h-px w-10 bg-border" />
+                <p className="mx-auto max-w-xs text-center font-editorial text-xl leading-snug text-foreground">
                   {t('moodCheck.howAreYouFeelingNow', 'How are you feeling now?')}
                 </p>
               </div>
 
-              <div className="grid grid-cols-4 gap-x-4 gap-y-6 max-w-[280px] mx-auto">
+              <div className="mx-auto grid max-w-sm grid-cols-4 gap-x-3 gap-y-5 sm:gap-x-4 sm:gap-y-6">
                 {(['fomo', 'excited', 'greedy', 'anxious', 'calm', 'detached', 'uncertain', 'fearful'] as const).map((mood, i) => (
                   <motion.button
                     key={mood}
@@ -523,15 +525,15 @@ export default function Ground() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.15 + i * 0.06, ease }}
                     onClick={() => handleMoodSelect(mood)}
-                    className="flex flex-col items-center gap-2 group"
+                    className="group flex flex-col items-center gap-2"
                   >
                     <motion.div
-                      className="w-12 h-12 rounded-full flex items-center justify-center border border-border/30 bg-muted/30 backdrop-blur-sm transition-all duration-300 group-hover:border-primary/30 group-hover:bg-primary/5 group-hover:scale-110"
+                      className="flex h-12 w-12 items-center justify-center rounded-full border border-border/60 bg-muted/40 backdrop-blur-sm transition-all duration-300 group-hover:scale-110 group-hover:border-primary/40 group-hover:bg-primary/10"
                       whileTap={{ scale: 0.92 }}
                     >
-                      <MoodIcon mood={mood} size={22} className="text-muted-foreground/60 transition-colors duration-300 group-hover:text-foreground/70" />
+                      <MoodIcon mood={mood} size={22} className="text-muted-foreground transition-colors duration-300 group-hover:text-foreground" />
                     </motion.div>
-                    <span className="text-[8px] font-mono tracking-wider uppercase text-muted-foreground/40 transition-colors duration-300 group-hover:text-muted-foreground/70">
+                    <span className="max-w-[4.5rem] text-center text-[10px] font-medium leading-tight text-muted-foreground transition-colors duration-300 group-hover:text-foreground sm:max-w-none sm:text-xs">
                       {t(`moodCheck.moods.${mood}`)}
                     </span>
                   </motion.button>
@@ -542,8 +544,9 @@ export default function Ground() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.8 }}
+                type="button"
                 onClick={handleMoodSkip}
-                className="text-[10px] font-mono text-muted-foreground/30 hover:text-muted-foreground/50 transition-colors duration-300"
+                className="text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
               >
                 {t('common.skip')}
               </motion.button>
@@ -553,14 +556,14 @@ export default function Ground() {
           {/* Post-session reflection */}
           {phase === 'reflect' && (
             <motion.div key="reflect" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.6, ease }} className="text-center space-y-6 w-full">
-              <div className="space-y-2">
-                <p className="text-[10px] font-mono tracking-[0.25em] uppercase text-muted-foreground/40">
+              <div className="space-y-3">
+                <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                   {t('ground.reflectTitle', 'A brief note')}
                 </p>
-                <div className="h-px w-8 bg-foreground/10 mx-auto" />
+                <div className="mx-auto h-px w-10 bg-border" />
               </div>
 
-              <p className="text-sm text-muted-foreground/50 leading-relaxed max-w-[260px] mx-auto">
+              <p className="mx-auto max-w-sm text-center text-base leading-relaxed text-muted-foreground">
                 {t('ground.reflectPrompt', 'Anything you noticed during this moment? This is just for you.')}
               </p>
 
@@ -568,20 +571,22 @@ export default function Ground() {
                 value={reflectionText}
                 onChange={(e) => setReflectionText(e.target.value)}
                 placeholder={t('ground.reflectPlaceholder', 'Optional...')}
-                rows={3}
-                className="w-full max-w-[280px] mx-auto block bg-transparent border border-border/20 rounded-lg px-4 py-3 text-sm font-mono text-foreground/70 placeholder:text-muted-foreground/20 focus:border-border/40 outline-none resize-none transition-colors"
+                rows={4}
+                className="mx-auto block w-full max-w-sm rounded-xl border border-border bg-background/80 px-4 py-3 text-base leading-relaxed text-foreground placeholder:text-muted-foreground/60 focus:border-primary/40 focus:outline-none focus:ring-1 focus:ring-primary/20"
               />
 
               <div className="flex flex-col items-center gap-3">
                 <button
+                  type="button"
                   onClick={handleComplete}
-                  className="px-8 py-2.5 rounded-lg border border-primary/20 bg-primary/5 text-foreground/70 hover:bg-primary/10 transition-colors text-xs font-mono tracking-wider"
+                  className="rounded-lg border border-primary/30 bg-primary/10 px-8 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-primary/15"
                 >
                   {t('common.done', 'Done')}
                 </button>
                 <button
+                  type="button"
                   onClick={handleComplete}
-                  className="text-[10px] font-mono text-muted-foreground/20 hover:text-muted-foreground/50 transition-colors"
+                  className="text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
                 >
                   {t('common.skip', 'Skip')}
                 </button>
@@ -596,15 +601,15 @@ export default function Ground() {
                 <Anchor className="h-5 w-5 text-primary/30 mx-auto" />
               </motion.div>
 
-              <motion.p className="text-sm text-foreground/60 leading-relaxed max-w-[260px] mx-auto" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>
+              <motion.p className="mx-auto max-w-sm text-center font-editorial text-xl leading-relaxed text-foreground" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}>
                 {t('ground.doneMessage', 'You took a moment. That matters.')}
               </motion.p>
 
               <motion.div className="flex flex-col items-center gap-3" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }}>
-                <button onClick={handleReturn} className="text-xs font-mono text-muted-foreground/30 hover:text-foreground/60 transition-colors underline underline-offset-4">
+                <button type="button" onClick={handleReturn} className="text-sm font-medium text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline">
                   {t('ground.return', 'Return')}
                 </button>
-                <button onClick={() => navigate('/ground/history', { replace: true })} className="text-[10px] font-mono text-muted-foreground/20 hover:text-muted-foreground/50 transition-colors tracking-[0.15em] uppercase">
+                <button type="button" onClick={() => navigate('/ground/history', { replace: true })} className="text-xs font-medium uppercase tracking-wide text-primary underline-offset-4 hover:underline">
                   {t('ground.viewHistory', 'View journal')}
                 </button>
               </motion.div>

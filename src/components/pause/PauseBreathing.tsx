@@ -116,8 +116,8 @@ export function PauseBreathing({ mantra, severity = 'mild', onContinue }: Props)
             transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
           />
 
-          <div className="flex flex-col items-center gap-3 text-center">
-            <p className="text-[11px] font-mono text-muted-foreground/30 tracking-[0.2em] uppercase">
+          <div className="flex max-w-md flex-col items-center gap-4 text-center">
+            <p className="font-editorial text-xl leading-snug text-foreground sm:text-2xl">
               {t('pause.youPaused')}
             </p>
             {mantra && (
@@ -125,7 +125,7 @@ export function PauseBreathing({ mantra, severity = 'mild', onContinue }: Props)
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 1.2, duration: 1.5 }}
-                className="text-[11px] font-mono text-muted-foreground/25 italic max-w-xs leading-relaxed"
+                className="max-w-sm text-sm italic leading-relaxed text-muted-foreground"
               >
                 "{mantra}"
               </motion.p>
@@ -135,12 +135,12 @@ export function PauseBreathing({ mantra, severity = 'mild', onContinue }: Props)
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: mantra ? 2.5 : 1.2, duration: 2 }}
-              className="flex flex-col items-center gap-1.5 max-w-[280px]"
+              className="flex max-w-md flex-col items-center gap-2"
             >
-              <p className="text-[11px] font-mono text-muted-foreground/20 italic leading-relaxed text-center">
+              <p className="text-center text-sm italic leading-relaxed text-muted-foreground">
                 "{quote.text}"
               </p>
-              <p className="text-[9px] font-mono text-muted-foreground/15 tracking-[0.1em]">
+              <p className="text-xs text-muted-foreground/80">
                 — {quote.author}
               </p>
             </motion.div>
@@ -151,7 +151,7 @@ export function PauseBreathing({ mantra, severity = 'mild', onContinue }: Props)
             animate={{ opacity: 1 }}
             transition={{ delay: 1.5, duration: 1 }}
             onClick={() => { hapticFeedback('light'); setStarted(true); }}
-            className="text-[10px] font-mono text-primary/50 hover:text-primary/70 transition-colors duration-500 tracking-[0.15em] uppercase"
+            className="text-sm font-medium text-primary underline-offset-4 hover:underline"
           >
             {t('breathing.begin', 'Begin breathing')}
           </motion.button>
@@ -178,14 +178,14 @@ export function PauseBreathing({ mantra, severity = 'mild', onContinue }: Props)
             key={`${phaseIndex}-${cycle}`}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-sm font-mono text-muted-foreground/60 capitalize"
+            className="font-editorial text-2xl capitalize text-foreground sm:text-3xl"
           >
             {t(currentPhase.labelKey)}
           </motion.p>
-          <p className="text-[10px] font-mono text-muted-foreground/30">
+          <p className="font-mono text-3xl tabular-nums text-muted-foreground">
             {currentPhase.duration - elapsed}
           </p>
-          <p className="text-[10px] font-mono text-muted-foreground/20">
+          <p className="text-xs font-medium text-muted-foreground">
             {cycle + 1} / {TOTAL_CYCLES}
           </p>
         </motion.div>
@@ -198,7 +198,7 @@ export function PauseBreathing({ mantra, severity = 'mild', onContinue }: Props)
           className="flex flex-col items-center gap-6 text-center"
         >
           <div className="w-20 h-20 rounded-full border border-primary/15 bg-primary/5" />
-          <p className="text-[11px] font-mono text-muted-foreground/40 tracking-[0.15em] uppercase">
+          <p className="font-editorial text-xl text-foreground">
             {t('breathing.settled', 'Settled')}
           </p>
           <motion.button
@@ -206,7 +206,7 @@ export function PauseBreathing({ mantra, severity = 'mild', onContinue }: Props)
             animate={{ opacity: 1 }}
             transition={{ delay: 0.5, duration: 0.8 }}
             onClick={() => { hapticFeedback('light'); onContinue(); }}
-            className="text-[10px] font-mono text-primary/50 hover:text-primary/70 transition-colors duration-500 tracking-[0.15em] uppercase"
+            className="text-sm font-medium text-primary underline-offset-4 hover:underline"
           >
             {t('pause.steps.continue', 'Continue')}
           </motion.button>
@@ -220,7 +220,7 @@ export function PauseBreathing({ mantra, severity = 'mild', onContinue }: Props)
           animate={{ opacity: 1 }}
           transition={{ delay: started ? 3 : 4, duration: 1 }}
           onClick={() => { hapticFeedback('light'); onContinue(); }}
-          className="text-[9px] font-mono text-muted-foreground/15 hover:text-muted-foreground/30 transition-colors duration-500 tracking-[0.12em] uppercase"
+          className="text-xs text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
         >
           {t('common.skip')}
         </motion.button>

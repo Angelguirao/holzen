@@ -80,13 +80,16 @@ export function PauseScienceSheet() {
   return (
     <Drawer open={open} onOpenChange={setOpen}>
       <DrawerTrigger asChild>
-        <button className="text-[8px] font-mono text-muted-foreground/25 hover:text-muted-foreground/50 transition-colors duration-500 tracking-[0.12em] uppercase">
+        <button
+          type="button"
+          className="text-left text-xs text-muted-foreground underline-offset-2 transition-colors hover:text-foreground hover:underline"
+        >
           {t('pauseScience.whyThisOrder')}
         </button>
       </DrawerTrigger>
       <DrawerContent className="max-h-[85vh]">
         <div className="px-6 pt-4 pb-8 space-y-6 overflow-y-auto">
-          <p className="text-xs font-mono tracking-[0.15em] uppercase text-muted-foreground/60">
+          <p className="text-sm font-medium text-muted-foreground">
             {t('pauseScience.title')}
           </p>
           <div className="space-y-5">
@@ -99,7 +102,7 @@ export function PauseScienceSheet() {
                   <p className="text-xs font-medium text-foreground">
                     {t(`pauseScience.${key}`)}
                   </p>
-                  <p className="text-[11px] text-muted-foreground leading-relaxed">
+                  <p className="text-sm leading-relaxed text-muted-foreground">
                     {t(`pauseScience.${key}Desc`)}
                   </p>
                   <div className="flex flex-wrap gap-x-3 gap-y-1">
@@ -109,7 +112,7 @@ export function PauseScienceSheet() {
                         href={source.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-[9px] font-mono text-primary/60 hover:text-primary transition-colors"
+                        className="inline-flex max-w-full items-center gap-1 break-words text-xs text-primary underline-offset-2 hover:underline"
                       >
                         <ExternalLink className="h-2.5 w-2.5 shrink-0" />
                         {source.label}

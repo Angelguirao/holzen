@@ -67,15 +67,15 @@ export function PauseDone({ decision, onReturn, pauseData }: Props) {
         transition={{ delay: 0.4, duration: 0.6 }}
         className="flex items-center gap-2"
       >
-        <Flame className="h-3 w-3 text-primary/40" />
-        <p className="text-[10px] font-mono text-muted-foreground/40 tracking-[0.15em] uppercase">
+        <Flame className="h-4 w-4 text-primary" />
+        <p className="text-sm font-medium text-muted-foreground">
           {t('outcome.streakUpdated')}
         </p>
       </motion.div>
 
-      <div className="space-y-3">
-        <p className="text-sm font-mono text-foreground/50">{t('pause.youChose')}</p>
-        <p className="text-xs font-mono text-muted-foreground/30 capitalize">{decision}</p>
+      <div className="space-y-2">
+        <p className="text-sm text-muted-foreground">{t('pause.youChose')}</p>
+        <p className="font-editorial text-2xl capitalize text-foreground">{decision}</p>
       </div>
 
       {/* Score impact summary */}
@@ -95,13 +95,14 @@ export function PauseDone({ decision, onReturn, pauseData }: Props) {
               {t('pause.upsellTitle', 'You\'ve used all {{count}} free pauses this month', { count: PRICING.freeReflectionsPerMonth })}
             </p>
           </div>
-          <p className="text-[11px] font-mono text-muted-foreground/50 text-center leading-relaxed">
+          <p className="text-center text-sm leading-relaxed text-muted-foreground">
             {t('pause.upsellBody', 'Unlock unlimited pauses, AI companions, and your full reflection library.')}
           </p>
           <button
+            type="button"
             onClick={() => startCheckout()}
             disabled={checkoutLoading}
-            className="text-[11px] font-mono text-primary hover:text-primary/80 transition-colors tracking-wider uppercase"
+            className="text-sm font-medium text-primary underline-offset-4 hover:underline disabled:opacity-50"
           >
             {t('pause.upsellCta', 'Start {{days}}-day free trial', { days: PRICING.trialDays })}
           </button>
@@ -113,7 +114,7 @@ export function PauseDone({ decision, onReturn, pauseData }: Props) {
         animate={{ opacity: 1 }}
         transition={{ delay: justHitLimit ? 2.5 : 1.5, duration: 1 }}
         onClick={onReturn}
-        className="text-[10px] font-mono text-muted-foreground/20 hover:text-muted-foreground/40 transition-colors duration-500 tracking-[0.15em] uppercase mt-4"
+        className="mt-4 text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
       >
         {t('pause.return')}
       </motion.button>
