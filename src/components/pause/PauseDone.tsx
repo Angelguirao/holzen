@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useSubscription } from '@/hooks/use-subscription';
 import { PRICING } from '@/lib/pricing';
 import { ScoreImpact } from './ScoreImpact';
+import { pauseStepLayout } from '@/components/pause/pause-step-layout';
 
 interface PauseData {
   mood: string | null;
@@ -33,7 +34,7 @@ export function PauseDone({ decision, onReturn, pauseData }: Props) {
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 0.8 }}
-      className="flex flex-col items-center gap-10 justify-center min-h-[70vh] text-center"
+      className={pauseStepLayout.columnDone}
     >
       {/* Streak flame celebration */}
       <div className="relative">
@@ -87,11 +88,11 @@ export function PauseDone({ decision, onReturn, pauseData }: Props) {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 2, duration: 0.8 }}
-          className="flex flex-col items-center gap-3 px-6 py-5 rounded-xl bg-muted/30 border border-border/30 max-w-[300px]"
+          className="flex max-w-[300px] flex-col items-center gap-3 rounded-2xl border border-border/30 bg-card/30 px-6 py-5 backdrop-blur-sm"
         >
           <div className="flex items-center gap-2">
             <Sparkles className="h-3.5 w-3.5 text-primary/60" />
-            <p className="text-xs font-mono text-foreground/60">
+            <p className="text-xs font-medium text-foreground/80">
               {t('pause.upsellTitle', 'You\'ve used all {{count}} free pauses this month', { count: PRICING.freeReflectionsPerMonth })}
             </p>
           </div>

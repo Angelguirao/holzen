@@ -4,6 +4,7 @@ import { ChevronLeft, Anchor } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { MoodCheck, type MoodValue } from '@/components/MoodCheck';
 import { MoodIcon } from '@/components/icons/MoodIcon';
+import { pauseStepLayout } from '@/components/pause/pause-step-layout';
 
 interface Props {
   onMoodAfterSelect: (mood: MoodValue) => void;
@@ -31,7 +32,7 @@ export function PauseShift({ onMoodAfterSelect, onMoodAfterSkip, onMoodAfterRese
 
   return (
     <motion.div
-      className="flex flex-col items-center justify-center min-h-[50vh] gap-8"
+      className={pauseStepLayout.columnCenter}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
@@ -39,14 +40,19 @@ export function PauseShift({ onMoodAfterSelect, onMoodAfterSkip, onMoodAfterRese
     >
       {!moodAfterDone ? (
         <>
-          <motion.p
-            className="max-w-sm text-center font-editorial text-xl leading-snug text-foreground sm:text-2xl"
+          <motion.div
+            className="space-y-2 text-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 0.2, duration: 0.6 }}
           >
-            {t('pause.didAnythingShift', 'Did anything shift?')}
-          </motion.p>
+            <p className={pauseStepLayout.screenTitle}>
+              {t('pause.didAnythingShift', 'Did anything shift?')}
+            </p>
+            <p className={`${pauseStepLayout.screenSubtitle} max-w-xs`}>
+              {t('moodCheck.afterDesc', 'After reflecting and grounding, check in again.')}
+            </p>
+          </motion.div>
 
           <motion.div
             initial={{ opacity: 0 }}
@@ -54,7 +60,7 @@ export function PauseShift({ onMoodAfterSelect, onMoodAfterSkip, onMoodAfterRese
             transition={{ delay: 0.4, duration: 0.6 }}
             className="w-full"
           >
-            <MoodCheck onSelect={onMoodAfterSelect} onSkip={onMoodAfterSkip} variant="after" />
+            <MoodCheck onSelect={onMoodAfterSelect} onSkip={onMoodAfterSkip} variant="after" hideHeading />
           </motion.div>
         </>
       ) : (
@@ -94,7 +100,7 @@ export function PauseShift({ onMoodAfterSelect, onMoodAfterSkip, onMoodAfterRese
           {/* Grounding nudge — shown when still feeling negative */}
           {showGroundingNudge && (
             <motion.div
-              className="mt-2 rounded-lg border border-border/20 bg-muted/15 px-4 py-3 max-w-[260px] text-center space-y-2"
+              className="mt-2 max-w-[280px] space-y-2 rounded-2xl border border-border/30 bg-card/30 px-4 py-3 text-center backdrop-blur-sm"
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.5 }}
@@ -116,7 +122,7 @@ export function PauseShift({ onMoodAfterSelect, onMoodAfterSkip, onMoodAfterRese
           <button
             type="button"
             onClick={onContinue}
-            className="text-sm font-medium text-primary underline-offset-4 hover:underline"
+            className={pauseStepLayout.textContinue}
           >
             {t('pause.steps.continue', 'Continue')}
           </button>
@@ -126,6 +132,7 @@ export function PauseShift({ onMoodAfterSelect, onMoodAfterSkip, onMoodAfterRese
       {/* Back link */}
       {onBack && (
         <motion.div
+          className={pauseStepLayout.backRow}
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1, duration: 0.8 }}
@@ -133,7 +140,7 @@ export function PauseShift({ onMoodAfterSelect, onMoodAfterSkip, onMoodAfterRese
           <button
             type="button"
             onClick={onBack}
-            className="flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
+            className={pauseStepLayout.backButton}
           >
             <ChevronLeft className="h-3 w-3" />
             {t('pause.steps.back', 'Back')}
