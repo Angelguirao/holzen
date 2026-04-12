@@ -6,6 +6,7 @@ import { useAuth } from '@/hooks/use-auth';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import { homeInWidget } from '@/components/home/home-widget-styles';
 
 type PracticeId = 'checkin' | 'journal' | 'bodyscan' | 'replay';
 
@@ -115,9 +116,7 @@ export function PracticeWidget() {
     <div className="space-y-3">
       {/* Weekly progress */}
       <div className="flex items-center justify-between">
-        <p className="text-sm leading-relaxed text-muted-foreground">
-          {t('practice.intro')}
-        </p>
+        <p className={homeInWidget.bodyMuted}>{t('practice.intro')}</p>
       </div>
 
       {/* Progress dots */}
@@ -136,14 +135,12 @@ export function PracticeWidget() {
       {suggestion && (
         <button
           onClick={() => handleSelect(suggestion.id)}
-          className="w-full flex items-center gap-3 px-3 py-3 rounded-lg border border-primary/15 bg-primary/[0.03] hover:bg-primary/[0.06] transition-colors"
+          className="flex w-full items-center gap-3 rounded-xl border border-primary/15 bg-primary/[0.04] px-3 py-3 transition-colors hover:bg-primary/[0.07]"
         >
           <Sparkles className="h-3.5 w-3.5 text-primary/40 shrink-0" />
           <div className="min-w-0 flex-1 text-left">
-            <span className="text-xs font-semibold uppercase tracking-wide text-primary">
-              {t('practice.suggested', 'Suggested')}
-            </span>
-            <span className="mt-1 block text-sm leading-snug text-muted-foreground">
+            <span className={`${homeInWidget.kicker} text-primary`}>{t('practice.suggested', 'Suggested')}</span>
+            <span className={`mt-1 block ${homeInWidget.bodyMuted} leading-snug`}>
               {suggestion.reason}
             </span>
           </div>
@@ -160,7 +157,7 @@ export function PracticeWidget() {
             <button
               key={p.id}
               onClick={() => handleSelect(p.id)}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-md transition-colors hover:bg-muted/30 group"
+              className={`${homeInWidget.rowButtonGhost} group py-2.5`}
             >
               <Icon className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />
               <div className="min-w-0 flex-1 text-left">

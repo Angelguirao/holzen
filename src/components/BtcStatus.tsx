@@ -3,6 +3,7 @@ import { BtcChartLazyGate } from '@/components/BtcChartLazyGate';
 import { Skeleton } from '@/components/ui/skeleton';
 import { formatBtcPrice, type BtcPriceData } from '@/lib/btc';
 import { useTranslation } from 'react-i18next';
+import { homeInWidget } from '@/components/home/home-widget-styles';
 
 interface Props {
   data: BtcPriceData | null;
@@ -22,12 +23,10 @@ export function BtcStatus({ data, error, hidden, onToggleHidden, currency = 'USD
     return (
       <div className="space-y-2">
         <div className="flex items-center gap-2 text-muted-foreground">
-          <WifiOff className="h-3.5 w-3.5" />
-          <p className="text-xs font-mono">{t('btcStatus.unableToFetch')}</p>
+          <WifiOff className="h-3.5 w-3.5 shrink-0" />
+          <p className={homeInWidget.meta}>{t('btcStatus.unableToFetch')}</p>
         </div>
-        <p className="text-[10px] font-mono text-muted-foreground/60">
-          {t('btcStatus.checkConnection')}
-        </p>
+        <p className={homeInWidget.metaFaint}>{t('btcStatus.checkConnection')}</p>
       </div>
     );
   }
@@ -50,13 +49,13 @@ export function BtcStatus({ data, error, hidden, onToggleHidden, currency = 'USD
       <div className="space-y-3">
         <div className="space-y-1">
           <div className="flex items-center justify-between">
-            <p className="text-xs font-mono text-muted-foreground/50">BTC / BTC</p>
+            <p className={homeInWidget.kicker}>BTC / BTC</p>
             <div className="flex items-center gap-1">
               {onToggleBtcMode && (
                 <button
                   type="button"
                   onClick={onToggleBtcMode}
-                  className="inline-flex h-9 w-9 items-center justify-center rounded-md text-primary/60 hover:text-primary hover:bg-muted/40 transition-colors"
+                  className={`${homeInWidget.iconBtn} text-primary/60 hover:text-primary`}
                   aria-label={t('btcStatus.exitBtcMode')}
                   title={t('btcStatus.exitBtcMode')}
                 >
@@ -66,7 +65,7 @@ export function BtcStatus({ data, error, hidden, onToggleHidden, currency = 'USD
               <button
                 type="button"
                 onClick={toggle}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
+                className={homeInWidget.iconBtn}
                 aria-label={hidden ? t('btcStatus.show') : t('btcStatus.hide')}
               >
                 {hidden ? <EyeOff className="h-3.5 w-3.5" aria-hidden /> : <Eye className="h-3.5 w-3.5" aria-hidden />}
@@ -75,15 +74,13 @@ export function BtcStatus({ data, error, hidden, onToggleHidden, currency = 'USD
           </div>
           {hidden ? (
             <>
-              <p className="text-2xl font-mono tracking-tight text-muted-foreground/30">••••••</p>
-              <p className="text-sm font-mono text-muted-foreground/30">••••</p>
+              <p className={homeInWidget.priceHidden}>••••••</p>
+              <p className={homeInWidget.subPriceHidden}>••••</p>
             </>
           ) : (
             <>
-              <p className="text-2xl font-mono tracking-tight text-foreground/80">1 BTC = 1 BTC</p>
-              <p className="text-[10px] font-mono text-muted-foreground/40 leading-relaxed">
-                {t('btcStatus.priceIsNoise')}
-              </p>
+              <p className={`${homeInWidget.price} text-foreground/90`}>1 BTC = 1 BTC</p>
+              <p className={`${homeInWidget.meta} text-muted-foreground/60`}>{t('btcStatus.priceIsNoise')}</p>
             </>
           )}
         </div>
@@ -109,9 +106,9 @@ export function BtcStatus({ data, error, hidden, onToggleHidden, currency = 'USD
       <div className="space-y-1">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <p className="text-xs font-mono text-muted-foreground">BTC / {cur}</p>
+            <p className={homeInWidget.kicker}>BTC / {cur}</p>
             {data._stale && (
-              <span className="flex items-center gap-1 text-[8px] font-mono text-muted-foreground/40" title="Using cached data — live APIs unavailable">
+              <span className={`flex items-center gap-1 ${homeInWidget.metaFaint}`} title="Using cached data — live APIs unavailable">
                 <Clock className="h-2.5 w-2.5" />
                 cached
               </span>
@@ -122,7 +119,7 @@ export function BtcStatus({ data, error, hidden, onToggleHidden, currency = 'USD
               <button
                 type="button"
                 onClick={onToggleBtcMode}
-                className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground/40 hover:text-primary hover:bg-muted/40 transition-colors"
+                className={`${homeInWidget.iconBtn} text-muted-foreground/40 hover:text-primary`}
                 aria-label={t('btcStatus.enterBtcMode')}
                 title="1 BTC = 1 BTC"
               >
@@ -132,7 +129,7 @@ export function BtcStatus({ data, error, hidden, onToggleHidden, currency = 'USD
             <button
               type="button"
               onClick={toggle}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-md text-muted-foreground hover:text-foreground hover:bg-muted/40 transition-colors"
+              className={homeInWidget.iconBtn}
               aria-label={hidden ? t('btcStatus.showPrice') : t('btcStatus.hidePrice')}
             >
               {hidden ? <EyeOff className="h-3.5 w-3.5" aria-hidden /> : <Eye className="h-3.5 w-3.5" aria-hidden />}
@@ -141,18 +138,18 @@ export function BtcStatus({ data, error, hidden, onToggleHidden, currency = 'USD
         </div>
         {hidden ? (
           <>
-            <p className="text-2xl font-mono tracking-tight text-muted-foreground/30">••••••</p>
-            <p className="text-sm font-mono text-muted-foreground/30">••••</p>
+            <p className={homeInWidget.priceHidden}>••••••</p>
+            <p className={homeInWidget.subPriceHidden}>••••</p>
           </>
         ) : (
           <>
-            <p className="text-2xl font-mono tracking-tight">{price}</p>
-            <div className="flex items-center gap-3">
-              <p className="text-sm font-mono text-muted-foreground">
+            <p className={homeInWidget.price}>{price}</p>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+              <p className={homeInWidget.subPrice}>
                 {dir}{pct}% {t('btcStatus.in24h')}
               </p>
               {data.fearGreed && (
-                <p className={`text-[10px] font-mono ${fearGreedColor}`}>
+                <p className={`text-xs font-medium tabular-nums ${fearGreedColor}`}>
                   {data.fearGreed.value} · {data.fearGreed.label}
                 </p>
               )}

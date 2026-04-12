@@ -3,6 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { Moon, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { homeInWidget } from '@/components/home/home-widget-styles';
 
 interface NightReflection {
   id: string;
@@ -56,22 +57,22 @@ export function NightReflectionCard({ reflection, onDismiss }: Props) {
   const { t } = useTranslation();
 
   return (
-    <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-2">
+    <div className={`${homeInWidget.insetMuted} space-y-2`}>
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-center gap-2 text-muted-foreground">
-          <Moon className="h-3 w-3" />
-          <p className="text-[10px] font-mono uppercase tracking-wider">{t('nightReflection.title')}</p>
+          <Moon className="h-3 w-3 shrink-0" />
+          <p className={homeInWidget.kicker}>{t('nightReflection.title')}</p>
         </div>
         <button
           type="button"
           onClick={onDismiss}
-          className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-muted-foreground/40 hover:text-foreground hover:bg-muted/40 transition-colors"
+          className={homeInWidget.iconBtn}
           aria-label={t('common.done')}
         >
           <X className="h-3.5 w-3.5" aria-hidden />
         </button>
       </div>
-      <p className="text-sm leading-relaxed">{reflection.message}</p>
+      <p className={homeInWidget.body}>{reflection.message}</p>
     </div>
   );
 }
