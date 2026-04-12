@@ -375,7 +375,7 @@ const Landing = () => {
                   <AccordionTrigger className="text-sm text-foreground hover:no-underline py-4 text-left">
                     {item.q}
                   </AccordionTrigger>
-                  <AccordionContent className="text-xs text-muted-foreground leading-relaxed pb-4">
+                  <AccordionContent className="whitespace-pre-line text-xs text-muted-foreground leading-relaxed pb-4">
                     {item.a}
                     {item.key === 'data' && (
                       <>
