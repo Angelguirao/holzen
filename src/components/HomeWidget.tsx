@@ -59,7 +59,7 @@ export function HomeWidget({
       ref={setNodeRef}
       style={style}
       {...attributes}
-      className={`rounded-lg border border-border/50 bg-card/50 transition-shadow ${isDragging ? 'shadow-lg' : ''} ${className}`}
+      className={`rounded-xl border border-border/40 bg-card/40 transition-shadow ${isDragging ? 'shadow-lg' : ''} ${className}`}
     >
       {/* Header */}
       <div className="flex items-center gap-2 px-3 py-2.5">

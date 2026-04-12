@@ -111,7 +111,7 @@ export default function Library() {
     return (
       <div className="space-y-6 pb-24">
         <PageMeta title={t('library.pageTitle')} description={t('library.pageDescription')} />
-        <NoxHeaderMain title={t('library.pageTitle')} subtitle={t('library.pageDescription')} />
+        <NoxHeaderMain title={t('library.title')} subtitle={t('library.pageDescription')} />
         <SubscriptionSkeleton variant="inline" />
       </div>
     );
@@ -121,15 +121,15 @@ export default function Library() {
     return (
       <div className="space-y-6 pb-24">
         <PageMeta title={t('library.pageTitle')} description={t('library.pageDescription')} />
-        <NoxHeaderMain title={t('library.pageTitle')} subtitle={t('library.pageDescription')} />
+        <NoxHeaderMain title={t('library.title')} subtitle={t('library.pageDescription')} />
         <div className="flex flex-col items-center justify-center min-h-[40vh] gap-4 text-center px-6">
           <Lock className="h-6 w-6 text-muted-foreground/30" />
-          <h2 className="text-sm font-mono text-foreground">{t('pro.featureLocked')}</h2>
-          <p className="text-xs text-muted-foreground max-w-xs">{t('pro.desc_library')}</p>
+          <h2 className="text-sm font-semibold text-foreground">{t('pro.featureLocked')}</h2>
+          <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">{t('pro.desc_library')}</p>
           <button
             onClick={startCheckout}
             disabled={checkoutLoading}
-            className="text-xs font-mono text-primary hover:text-primary/80 underline transition-colors"
+            className="text-sm font-medium text-primary underline-offset-4 transition-colors hover:underline disabled:opacity-50"
           >
             {t('pro.upgradeCta')}
           </button>
@@ -153,9 +153,9 @@ export default function Library() {
   const sortLabel = sortMode === 'newest' ? t('library.sortNewest', { defaultValue: 'Newest' }) : sortMode === 'oldest' ? t('library.sortOldest', { defaultValue: 'Oldest' }) : t('library.sortAlpha', { defaultValue: 'A–Z' });
 
   return (
-    <div className="space-y-4 pb-24" {...handlers}>
+    <div className="space-y-6 pb-24" {...handlers}>
       <PageMeta title={t('library.pageTitle')} description={t('library.pageDescription')} />
-      <NoxHeaderMain title={t('library.pageTitle')} subtitle={t('library.pageDescription')} />
+      <NoxHeaderMain title={t('library.title')} subtitle={t('library.pageDescription')} />
 
       {/* Pull-to-refresh indicator */}
       <AnimatePresence>
@@ -184,7 +184,7 @@ export default function Library() {
         <button
           onClick={() => setTab('all')}
           className={cn(
-            'text-xs font-mono tracking-wide px-3 py-2 transition-colors whitespace-nowrap border-b-2',
+            'border-b-2 px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-colors whitespace-nowrap',
             tab === 'all'
               ? 'border-foreground text-foreground'
               : 'border-transparent text-muted-foreground/50 hover:text-muted-foreground'
@@ -195,7 +195,7 @@ export default function Library() {
         <button
           onClick={() => setTab('favorites')}
           className={cn(
-            'text-xs font-mono tracking-wide px-3 py-2 transition-colors whitespace-nowrap border-b-2 flex items-center gap-1.5',
+            'flex items-center gap-1.5 border-b-2 px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-colors whitespace-nowrap',
             tab === 'favorites'
               ? 'border-foreground text-foreground'
               : 'border-transparent text-muted-foreground/50 hover:text-muted-foreground'
@@ -207,7 +207,7 @@ export default function Library() {
         <button
           onClick={() => setTab('collections')}
           className={cn(
-            'text-xs font-mono tracking-wide px-3 py-2 transition-colors whitespace-nowrap border-b-2',
+            'border-b-2 px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-colors whitespace-nowrap',
             tab === 'collections'
               ? 'border-foreground text-foreground'
               : 'border-transparent text-muted-foreground/50 hover:text-muted-foreground'
@@ -252,7 +252,7 @@ export default function Library() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={t('library.searchPlaceholder')}
-                className="pl-8 h-8 text-xs font-mono border-border/30"
+                className="h-8 border-border/30 pl-8 text-xs"
               />
               {search && (
                 <button

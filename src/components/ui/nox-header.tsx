@@ -9,12 +9,12 @@ export interface NoxHeaderMainProps extends React.HTMLAttributes<HTMLElement> {
 
 export function NoxHeaderMain({ title, subtitle, rightSlot, className, ...props }: NoxHeaderMainProps) {
   return (
-    <header className={cn("flex items-start justify-between border-b border-border pb-4", className)} {...props}>
-      <div>
-        <h1 className="font-editorial text-2xl tracking-tight">{title}</h1>
-        {subtitle ? <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p> : null}
+    <header className={cn("flex items-start justify-between gap-4 border-b border-border pb-4", className)} {...props}>
+      <div className="min-w-0 flex-1">
+        <h1 className="font-editorial text-2xl tracking-tight text-foreground">{title}</h1>
+        {subtitle ? <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{subtitle}</p> : null}
       </div>
-      {rightSlot}
+      {rightSlot ? <div className="shrink-0 pt-0.5">{rightSlot}</div> : null}
     </header>
   );
 }
