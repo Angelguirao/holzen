@@ -6,10 +6,10 @@ import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { motion, useReducedMotion, useInView } from 'framer-motion';
 import {
-  ArrowRight, Twitter, Wind, Feather, BookOpen, TrendingDown, Brain, Tag,
-  BarChart3, MessageCircle, Target, Heart, Mail, Globe, Shield, Award,
+  ArrowRight, Twitter, Wind, Feather, BookOpen, TrendingDown, Brain,
+  BarChart3, Target, Heart, Mail, Globe, Shield, Award,
   Zap, Moon, ChevronDown, Timer, Eye, Sparkles, RefreshCw,
-  Smartphone, Users, MapPin, Compass, Quote, Anchor, Footprints, ExternalLink,
+  Smartphone, Anchor, ExternalLink, UserCircle,
 } from 'lucide-react';
 import { PageMeta } from '@/components/PageMeta';
 import { LandingTestimonials } from '@/components/LandingTestimonials';
@@ -63,37 +63,23 @@ const Landing = () => {
     { icon: <Timer className="h-4 w-4" />, label: t('landing.companions.history'), desc: t('landing.companions.historyDesc') },
   ];
 
+  /** What's included on the landing page — trimmed for clarity; product still includes more (see app). */
   const FEATURES = [
-    // Core experience
     { icon: <Wind />, label: t('landing.features.pause'), desc: t('landing.features.pauseDesc') },
     { icon: <Sparkles />, label: t('landing.features.companions'), desc: t('landing.features.companionsDesc') },
     { icon: <TrendingDown />, label: t('landing.features.detection'), desc: t('landing.features.detectionDesc') },
     { icon: <Brain />, label: t('landing.features.mood'), desc: t('landing.features.moodDesc') },
-    { icon: <Compass />, label: t('landing.features.decisionMirror'), desc: t('landing.features.decisionMirrorDesc') },
     { icon: <Anchor />, label: t('landing.features.grounding'), desc: t('landing.features.groundingDesc') },
-    // Intelligence & tracking
     { icon: <BarChart3 />, label: t('landing.features.insights'), desc: t('landing.features.insightsDesc') },
-    { icon: <Moon />, label: t('landing.features.nightReflections'), desc: t('landing.features.nightReflectionsDesc') },
     { icon: <Eye />, label: t('landing.features.holdGoals'), desc: t('landing.features.holdGoalsDesc') },
-    { icon: <BarChart3 />, label: t('landing.features.profileStats'), desc: t('landing.features.profileStatsDesc') },
+    { icon: <UserCircle />, label: t('landing.features.profileStats'), desc: t('landing.features.profileStatsDesc') },
     { icon: <Award />, label: t('landing.features.badges'), desc: t('landing.features.badgesDesc') },
-    // Content & reflection
     { icon: <Heart />, label: t('landing.features.library'), desc: t('landing.features.libraryDesc') },
     { icon: <Mail />, label: t('landing.features.letters'), desc: t('landing.features.lettersDesc') },
-    { icon: <Quote />, label: t('landing.features.wisdomQuotes'), desc: t('landing.features.wisdomQuotesDesc') },
     { icon: <Target />, label: t('landing.features.practice'), desc: t('landing.features.practiceDesc') },
-    { icon: <Wind />, label: t('landing.features.breatheGround'), desc: t('landing.features.breatheGroundDesc') },
-    // Personalization & platform
-    { icon: <Sparkles />, label: t('landing.features.personalization'), desc: t('landing.features.personalizationDesc') },
     { icon: <Feather />, label: t('landing.features.mantra'), desc: t('landing.features.mantraDesc') },
     { icon: <Moon />, label: t('landing.features.mindfulSpaces'), desc: t('landing.features.mindfulSpacesDesc') },
-    { icon: <Globe />, label: t('landing.features.globalDefault'), desc: t('landing.features.globalDefaultDesc') },
     { icon: <Smartphone />, label: t('landing.features.pwa'), desc: t('landing.features.pwaDesc') },
-    // Social & data
-    { icon: <MessageCircle />, label: t('landing.features.shareTrack'), desc: t('landing.features.shareTrackDesc') },
-    { icon: <Users />, label: t('landing.features.referral'), desc: t('landing.features.referralDesc') },
-    { icon: <MapPin />, label: t('landing.features.roadmap'), desc: t('landing.features.roadmapDesc') },
-    { icon: <BarChart3 />, label: t('landing.features.activityLog'), desc: t('landing.features.activityLogDesc') },
     { icon: <Shield />, label: t('landing.features.privacy'), desc: t('landing.features.privacyDesc') },
   ];
 
