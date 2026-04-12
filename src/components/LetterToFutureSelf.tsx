@@ -15,7 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog';
-import { Mail, Send, Info, Trash2 } from 'lucide-react';
+import { Mail, Send, Info, Trash2, ChevronRight } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -419,7 +419,7 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.8 }}
-                    className="text-sm text-nox-text-highlight"
+                    className="text-sm font-medium text-primary"
                   >
                     {t('letter.sealing')}
                   </motion.p>
@@ -485,17 +485,22 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
         </div>
 
         {canWrite && (
-          <Button onClick={() => setComposerOpen(true)} className="w-full gap-2">
-            <Mail className="h-4 w-4" />
-            {t('letter.writeCta', 'Write a letter')}
-          </Button>
+          <button
+            type="button"
+            onClick={() => setComposerOpen(true)}
+            className="flex w-full items-center gap-3 rounded-lg border border-primary/15 bg-primary/[0.03] px-3 py-3 text-left transition-colors hover:bg-primary/[0.06]"
+          >
+            <Mail className="h-3.5 w-3.5 shrink-0 text-primary/50" />
+            <span className="flex-1 text-sm font-medium text-foreground">{t('letter.writeCta', 'Write a letter')}</span>
+            <ChevronRight className="h-3 w-3 shrink-0 text-primary/30" />
+          </button>
         )}
       </div>
 
       {/* --- Pending letters (flat list, no inner card) --- */}
       {pendingLetters.length > 0 && (
         <div className="space-y-2">
-          <p className="text-xs uppercase tracking-wider text-muted-foreground">
+          <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
             {t('letter.sealedLetters')}
           </p>
           <ul className="space-y-1.5">
@@ -534,16 +539,16 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
                 initial={{ opacity: 0, y: 6 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="rounded-lg border border-nox-text-highlight/30 bg-nox-accent-mustard/5 px-4 py-4 space-y-4"
+                className="space-y-4 rounded-xl border border-border/40 bg-card/40 px-4 py-4 shadow-sm backdrop-blur-sm"
               >
                 <header className="flex items-start justify-between gap-3">
-                  <div className="flex items-center gap-3 min-w-0">
+                  <div className="flex min-w-0 items-center gap-3">
                     <div className="relative shrink-0">
                       <WaxSeal size={28} breaking />
                       <SealCracks />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-xs uppercase tracking-wider text-nox-text-highlight">
+                      <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
                         {t('letter.opened')}
                       </p>
                       {l.delivered_at && (
@@ -587,7 +592,7 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
                   {l.body}
                 </p>
 
-                <footer className="grid grid-cols-2 gap-3 border-t border-nox-text-highlight/20 pt-3 text-xs text-muted-foreground">
+                <footer className="grid grid-cols-2 gap-3 border-t border-border/30 pt-3 text-xs text-muted-foreground">
                   <div className="space-y-0.5">
                     <p className="uppercase tracking-wider text-muted-foreground/80">
                       {t('letter.written')}
@@ -610,7 +615,7 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
                             <span
                               className={
                                 priceDelta.startsWith('+')
-                                  ? 'text-nox-accent-green'
+                                  ? 'text-emerald-600 dark:text-emerald-400'
                                   : 'text-destructive'
                               }
                             >
@@ -664,7 +669,7 @@ export function LetterToFutureSelf({ currentPrice, changePercent }: Props) {
                       onClick={() => setCalmTarget(opt.key)}
                       className={`flex-1 rounded-sm px-3 py-1.5 text-xs transition-colors ${
                         selected
-                          ? 'bg-nox-accent-mustard/20 text-nox-text-highlight'
+                          ? 'bg-primary/10 font-medium text-foreground'
                           : 'text-muted-foreground hover:text-foreground'
                       }`}
                     >
