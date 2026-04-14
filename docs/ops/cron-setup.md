@@ -84,14 +84,15 @@ SELECT cron.schedule(
 
 **Not scheduled.** Service-auth POST to **`/functions/v1/backfill-btc-prices`** with JSON body:
 
-- **`from`**, **`to`**: inclusive UTC calendar dates `YYYY-MM-DD` (same `date` keys as `btc_price_cache`).
+- **`from`**, **`to`**: inclusive UTC calendar dates `YYYY-MM-DD` (same `date` keys as `btc_price_cache`). Span may be up to **4500** days (~12.3 years) per request.
 - **`onlyMissing`** (optional, default `true`): only insert dates that are not already in the table (idempotent replays).
 - **`dryRun`** (optional, default `false`): resolve prices from CoinGecko but **do not** write rows.
 - **`chunkDays`** (optional, default `45`): window size per `market_chart/range` call.
-
-**Limit:** at most **120** days per invocation (edge timeout + rate limits). For a multi-year gap, run several calls (e.g. `2024-01-01`–`2024-04-30`, then `2024-05-01`–…).
+- **`maxChunks`** (optional, default `10`, max `25`): CoinGecko HTTP calls **per invocation** (edge wall-clock). If more work remains, the JSON response sets **`completed: false`** and **`resumeFrom`** (`YYYY-MM-DD`). Call again with **`from: resumeFrom`** and the **same** **`to`** until **`completed: true`** (e.g. a **10-year** daily gap needs many invocations or a small loop script—watch **429**; paid CoinGecko helps).
 
 Bruno: `bruno/service-cron/backfill-btc-prices.bru`. Logs: filter **`holzen:backfill-btc`**.
+
+**Local chaining (e.g. ~10 years):** `node scripts/backfill-btc-chain.mjs 2016-04-14 2026-04-14` with the same env vars as Bruno (stops on **429** / `abortReason`; rerun after a pause or upgrade CoinGecko).
 
 ## Source Feed Fetcher (fetch-source-feeds)
 

@@ -7,9 +7,12 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-/** Max calendar days per invocation (edge timeout + CoinGecko limits). Run again with the next window. */
-const MAX_DAYS_PER_RUN = 120;
+/** Reject absurd typos (allows ~10y+ backfills in one logical range). */
+const MAX_SPAN_DAYS = 4500;
 const DEFAULT_CHUNK_DAYS = 45;
+/** CoinGecko calls per HTTP invocation (edge wall-clock); continue with `resumeFrom` until `completed`. */
+const DEFAULT_MAX_CHUNKS = 10;
+const ABSOLUTE_MAX_CHUNKS = 25;
 const COINGECKO_GAP_MS = 3000;
 const MATCH_WINDOW_MS = 48 * 3600 * 1000;
 
@@ -67,8 +70,11 @@ function closestPriceForTarget(
  * - `onlyMissing` (optional, default `true`): skip dates that already exist in the table.
  * - `dryRun` (optional, default `false`): compute rows but do not upsert.
  * - `chunkDays` (optional, default 45): CoinGecko window size per HTTP call.
+ * - `maxChunks` (optional, default 10, max 25): CoinGecko **calls** per invocation; if more
+ *   days remain, response includes **`resumeFrom`** — POST again with **`from: resumeFrom`**
+ *   and the **same** **`to`** until **`completed: true`** (multi-year / ~10y backfills).
  *
- * At most **120** days per call; run multiple invocations for longer spans.
+ * **`from`/`to` span:** up to **4500** UTC calendar days (~12.3 years) per request body.
  */
 
 serve(async (req) => {
@@ -132,11 +138,11 @@ serve(async (req) => {
     }
 
     const dayCount = Math.floor((toMs - fromMs) / 86400000) + 1;
-    if (dayCount > MAX_DAYS_PER_RUN) {
+    if (dayCount > MAX_SPAN_DAYS) {
       return new Response(
         JSON.stringify({
-          error: `Range too large (${dayCount} days). Max ${MAX_DAYS_PER_RUN} days per call; split the range.`,
-          maxDaysPerRun: MAX_DAYS_PER_RUN,
+          error: `Range too large (${dayCount} days). Max span is ${MAX_SPAN_DAYS} days; split into multiple ranges.`,
+          maxSpanDays: MAX_SPAN_DAYS,
         }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
@@ -147,6 +153,10 @@ serve(async (req) => {
     const chunkDays = typeof body.chunkDays === "number" && body.chunkDays > 0 && body.chunkDays <= 90
       ? Math.floor(body.chunkDays)
       : DEFAULT_CHUNK_DAYS;
+    let maxChunks = DEFAULT_MAX_CHUNKS;
+    if (typeof body.maxChunks === "number" && Number.isFinite(body.maxChunks)) {
+      maxChunks = Math.min(ABSOLUTE_MAX_CHUNKS, Math.max(1, Math.floor(body.maxChunks)));
+    }
 
     const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
     const supabase = createClient(
@@ -182,14 +192,17 @@ serve(async (req) => {
       return new Response(
         JSON.stringify({
           success: true,
+          completed: true,
+          resumeFrom: null,
+          abortReason: null,
           from: fromRaw,
           to: toRaw,
           onlyMissing,
           dryRun,
+          maxChunks,
           daysTargeted: 0,
           daysUpserted: 0,
           chunks: 0,
-          rateLimited: false,
         }),
         { headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
@@ -198,8 +211,14 @@ serve(async (req) => {
     let daysUpserted = 0;
     let chunks = 0;
     let abortReason: string | null = null;
+    let resumeFrom: string | null = null;
 
     for (let i = 0; i < allKeys.length; i += chunkDays) {
+      if (chunks >= maxChunks) {
+        resumeFrom = allKeys[i] ?? null;
+        break;
+      }
+
       const slice = allKeys.slice(i, i + chunkDays);
       const chunkStartMs = parseDateKey(slice[0]!)!;
       const chunkEndMs = parseDateKey(slice[slice.length - 1]!)!;
@@ -255,22 +274,28 @@ serve(async (req) => {
       daysUpserted += inserts.length;
     }
 
+    const completed = abortReason === null && resumeFrom === null;
     const summary = abortReason
       ? `partial: ${daysUpserted} rows, ${chunks} chunks, stopped=${abortReason}`
+      : resumeFrom
+      ? `partial: ${daysUpserted} rows, ${chunks} chunks, resumeFrom=${resumeFrom}`
       : `upserted ${daysUpserted} rows, ${chunks} chunks${dryRun ? " (dryRun)" : ""}`;
     holzenEdgeRun("backfill-btc", "run complete", { ms: Date.now() - t0, summary });
 
     return new Response(
       JSON.stringify({
         success: abortReason === null,
+        completed,
+        resumeFrom,
+        abortReason,
         from: fromRaw,
         to: toRaw,
         onlyMissing,
         dryRun,
+        maxChunks,
         daysTargeted: allKeys.length,
         daysUpserted,
         chunks,
-        abortReason,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
