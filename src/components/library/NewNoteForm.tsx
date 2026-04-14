@@ -68,6 +68,7 @@ export function NewNoteForm({ onSave }: Props) {
         onChange={setBody}
         placeholder={t('library.noteBodyPlaceholder')}
         minRows={3}
+        disableFocusMode
       />
       <div className="flex items-center gap-1 flex-wrap">
         {tags.map((tag) => (

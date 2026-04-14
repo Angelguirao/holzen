@@ -76,7 +76,7 @@ export function PauseSessionScaffold({
 
         {phase === 'session' && (
           <motion.div
-            className="fixed top-5 left-5 z-[55] flex max-w-[min(calc(100vw-5.5rem),20rem)] flex-col items-start gap-2"
+            className="fixed top-5 left-5 z-[55] flex max-w-[min(calc(100vw-5.5rem),20rem)] flex-col items-start gap-3"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.45, duration: 0.6 }}

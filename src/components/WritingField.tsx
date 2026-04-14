@@ -2,6 +2,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { writingTextareaClassName } from '@/lib/writing-surface';
 
 interface WritingFieldProps {
   value: string;
@@ -67,7 +68,7 @@ export function WritingField({
     }
   }, [focused]);
 
-  // Inline textarea (clickable to open focus mode)
+  // Inline textarea (clickable to open focus mode when focus mode is enabled)
   const inlineTextarea = (
     <div ref={inlineRef} className={cn('relative group', className)}>
       <textarea
@@ -81,23 +82,12 @@ export function WritingField({
         rows={minRows}
         readOnly={!disableFocusMode}
         className={cn(
-          'w-full rounded-lg border border-border/50 bg-muted/20 px-4 py-3',
-          'text-sm leading-[1.8] text-foreground/90 placeholder:text-muted-foreground/30',
-          'resize-none transition-all duration-300',
-          'focus:outline-none focus:border-primary/20 focus:bg-muted/30',
-          'font-[system-ui,_-apple-system,_sans-serif]',
-          !disableFocusMode && 'cursor-pointer',
+          writingTextareaClassName,
+          !disableFocusMode && 'cursor-pointer focus:ring-0 focus-visible:ring-0',
           textareaClassName,
         )}
         style={textareaStyle}
       />
-      {!disableFocusMode && !hasContent && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <span className="text-[9px] font-mono text-muted-foreground/30 tracking-[0.2em] uppercase">
-            Tap to write
-          </span>
-        </div>
-      )}
       {maxLength && (
         <p className={cn(
           'text-[10px] font-mono text-muted-foreground/30 text-right mt-1 transition-opacity',

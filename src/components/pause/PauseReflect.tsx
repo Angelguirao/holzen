@@ -5,7 +5,6 @@ import { CompanionSection, type CompanionData, type CompanionPrefs } from '@/com
 import { CollapsibleReflectionHeader } from '@/components/pause/CollapsibleReflectionHeader';
 import { ReflectionNote } from '@/components/ReflectionNote';
 import { ReflectionTags } from '@/components/ReflectionTags';
-import { Button } from '@/components/ui/button';
 import { pauseStepLayout } from '@/components/pause/pause-step-layout';
 
 interface Props {
@@ -32,7 +31,7 @@ export function PauseReflect({
 
   return (
     <motion.div
-      className={pauseStepLayout.columnFlow}
+      className={`${pauseStepLayout.columnFlow} scroll-mt-28 pt-6 sm:scroll-mt-32 sm:pt-10`}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -20 }}
@@ -68,7 +67,7 @@ export function PauseReflect({
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.15, duration: 0.5 }}
           >
-            <p className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+            <p className="text-sm font-medium text-muted-foreground">
               {t('pause.reflect.proTools', 'Your note & tags')}
             </p>
             <ReflectionNote reflectionId={reflectionId} initialNote={null} />
@@ -106,9 +105,9 @@ export function PauseReflect({
         animate={{ opacity: 1 }}
         transition={{ delay: 0.2, duration: 0.5 }}
       >
-        <Button type="button" variant="outline" size="sm" className="min-w-[9rem] font-medium" onClick={onContinue}>
+        <button type="button" onClick={onContinue} className={pauseStepLayout.textContinue}>
           {t('pause.steps.continue', 'Continue')}
-        </Button>
+        </button>
         <p className="max-w-xs text-center text-xs text-muted-foreground">
           {t('pause.reflect.continueHint', 'There is no “right” amount of time — continue when you feel done.')}
         </p>

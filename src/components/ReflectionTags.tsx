@@ -95,44 +95,47 @@ export function ReflectionTags({ reflectionId, initialTags }: Props) {
   }, [open]);
 
   return (
-    <div className="space-y-1.5">
-      <div className="flex items-center gap-1.5 flex-wrap">
+    <div className="space-y-2">
+      <div className="flex flex-wrap items-center gap-2">
         {tags.map((tag) => (
           <button
             key={tag}
+            type="button"
             onClick={() => removeTag(tag)}
-            className="inline-flex items-center gap-1 rounded-full border border-input bg-background px-2 py-0.5 text-[10px] font-mono text-foreground transition-colors hover:bg-accent"
+            className="inline-flex items-center gap-1 rounded-full border border-input bg-background px-2.5 py-1 text-xs font-mono text-foreground transition-colors hover:bg-accent"
           >
-            <Tag state="selected" className="px-1.5 py-0 text-[10px] font-mono">{tag}</Tag>
-            <X className="h-2.5 w-2.5 text-muted-foreground" />
+            <Tag state="selected" className="px-1.5 py-0 text-xs font-mono">{tag}</Tag>
+            <X className="h-3 w-3 text-muted-foreground" />
           </button>
         ))}
         <button
+          type="button"
           onClick={() => setOpen(!open)}
-          className="inline-flex items-center gap-0.5 text-[10px] font-mono text-muted-foreground/50 hover:text-muted-foreground transition-colors"
+          className="inline-flex min-h-[2.25rem] items-center gap-1.5 rounded-lg border border-dashed border-input/80 bg-muted/15 px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:border-input hover:bg-muted/25 hover:text-foreground"
         >
-          <TagIcon className="h-2.5 w-2.5" />
+          <TagIcon className="h-4 w-4 shrink-0 opacity-70" />
           {tags.length === 0 ? t('reflectionTags.addTags') : '+'}
         </button>
       </div>
 
       {open && (
-        <div className="space-y-1.5">
+        <div className="space-y-2">
           <Input
             ref={inputRef}
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={t('reflectionTags.typeTag')}
-            className="h-8 text-[11px] font-mono placeholder:text-muted-foreground/40"
+            className="h-10 text-sm font-mono placeholder:text-muted-foreground/50"
           />
           {suggestions.length > 0 && (
             <div className="flex flex-wrap gap-1">
               {suggestions.map((tag, idx) => (
                 <button
+                  type="button"
                   key={tag}
                   onClick={() => addTag(tag)}
-                  className={`text-[10px] font-mono px-1.5 py-0.5 rounded border transition-colors ${
+                  className={`rounded-md border px-2 py-1 text-xs font-mono transition-colors ${
                     idx === highlightIdx
                       ? 'border-primary/40 bg-primary/10 text-foreground'
                       : 'border-border/60 text-muted-foreground hover:text-foreground hover:border-foreground/30'
@@ -144,7 +147,7 @@ export function ReflectionTags({ reflectionId, initialTags }: Props) {
             </div>
           )}
           {input.trim() && !allUserTags.includes(input.trim().toLowerCase()) && (
-            <p className="text-[10px] font-mono text-muted-foreground/50">
+            <p className="text-xs font-mono text-muted-foreground/70">
               {t('reflectionTags.pressEnterToCreate', { tag: input.trim() })}
             </p>
           )}
