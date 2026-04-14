@@ -28,6 +28,7 @@ Base URL: **`{{VITE_SUPABASE_URL}}/functions/v1/<name>`**
 | record-referral | `user-jwt/` | User JWT |
 | reflection-insights | `user-jwt/` | User JWT + `user_id` in body, **or** batch (no `user_id`) with `SERVICE_CRON_BEARER` / `verifyServiceAuth` |
 | refresh-btc-prices | `service-cron/` | `SERVICE_CRON_BEARER` |
+| backfill-btc-prices | `service-cron/` | `SERVICE_CRON_BEARER` — manual POST JSON `from`/`to` (`YYYY-MM-DD`), optional `onlyMissing`, `dryRun`, `chunkDays` |
 | register-push | `user-jwt/` | User JWT |
 | send-feedback | `user-jwt/` | User JWT |
 | suggest-grounding | `user-jwt/` | User JWT |
