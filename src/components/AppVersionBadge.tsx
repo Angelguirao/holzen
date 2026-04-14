@@ -1,14 +1,16 @@
-import { useState, useEffect } from 'react';
-import { RefreshCw } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { RefreshCw, CheckCircle2 } from 'lucide-react';
 
 declare const __BUILD_TIME__: string;
 
 /**
- * Shows the app build timestamp and whether a service-worker update is waiting.
+ * Shows the app build timestamp, SW update status, and a manual check-for-updates button.
  * Placed in Settings → About.
  */
 export function AppVersionBadge({ changelogVersion }: { changelogVersion?: string | null }) {
   const [updateWaiting, setUpdateWaiting] = useState(false);
+  const [checking, setChecking] = useState(false);
+  const [lastChecked, setLastChecked] = useState<string | null>(null);
 
   useEffect(() => {
     if (!('serviceWorker' in navigator) || import.meta.env.DEV) return;
@@ -29,6 +31,27 @@ export function AppVersionBadge({ changelogVersion }: { changelogVersion?: strin
     reg?.waiting?.postMessage({ type: 'SKIP_WAITING' });
   };
 
+  const checkForUpdates = useCallback(async () => {
+    if (!('serviceWorker' in navigator)) return;
+    setChecking(true);
+    try {
+      const reg = await navigator.serviceWorker.getRegistration();
+      if (reg) {
+        await reg.update();
+        // Give the browser a moment to detect the new worker
+        await new Promise((r) => setTimeout(r, 1500));
+        if (reg.waiting) {
+          setUpdateWaiting(true);
+        }
+      }
+    } catch {
+      // update() can fail if offline or CORS issues
+    } finally {
+      setChecking(false);
+      setLastChecked(new Date().toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }));
+    }
+  }, []);
+
   const buildDate = (() => {
     try {
       const d = new Date(__BUILD_TIME__);
@@ -39,9 +62,11 @@ export function AppVersionBadge({ changelogVersion }: { changelogVersion?: strin
     }
   })();
 
+  const isDev = import.meta.env.DEV;
+
   return (
-    <div className="space-y-1.5">
-      <div className="flex items-center gap-2">
+    <div className="space-y-2">
+      <div className="flex items-center gap-2 flex-wrap">
         {changelogVersion && (
           <span className="text-[10px] font-mono text-muted-foreground/60">
             Holzen v{changelogVersion}
@@ -52,7 +77,7 @@ export function AppVersionBadge({ changelogVersion }: { changelogVersion?: strin
         </span>
       </div>
 
-      {updateWaiting && (
+      {updateWaiting ? (
         <button
           type="button"
           onClick={applyUpdate}
@@ -61,6 +86,27 @@ export function AppVersionBadge({ changelogVersion }: { changelogVersion?: strin
           <RefreshCw className="h-3 w-3" />
           Update available — tap to reload
         </button>
+      ) : (
+        <div className="flex items-center gap-2 flex-wrap">
+          <button
+            type="button"
+            onClick={checkForUpdates}
+            disabled={checking || isDev}
+            className="inline-flex items-center gap-1 text-[10px] font-mono text-muted-foreground/50 hover:text-foreground disabled:opacity-30 transition-colors"
+          >
+            <RefreshCw className={`h-3 w-3 ${checking ? 'animate-spin' : ''}`} />
+            {checking ? 'Checking…' : 'Check for updates'}
+          </button>
+          {lastChecked && !checking && (
+            <span className="inline-flex items-center gap-0.5 text-[9px] font-mono text-muted-foreground/35">
+              <CheckCircle2 className="h-2.5 w-2.5" />
+              up to date · {lastChecked}
+            </span>
+          )}
+          {isDev && (
+            <span className="text-[9px] font-mono text-muted-foreground/30">(dev mode — SW disabled)</span>
+          )}
+        </div>
       )}
     </div>
   );
