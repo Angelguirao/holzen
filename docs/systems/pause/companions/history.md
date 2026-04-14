@@ -120,6 +120,7 @@ When `selectIntervention` picks **pattern** as the primary intervention:
 | Phase config | `supabase/functions/_shared/phase-config.ts` |
 | Content library | `supabase/functions/_shared/content-library.ts` |
 | Client invoke | `src/hooks/use-companion-data.ts` |
+| Full-screen view | `src/pages/CompanionHistoryPage.tsx` — route `/companion/history/:reflectionId` |
 | UI | `src/components/CompanionSection.tsx` (Look Back card via `HistoricalInsightDisplay`) |
 
 ---
