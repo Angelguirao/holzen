@@ -42,6 +42,6 @@ We **do not** accept **`x-supabase-cron: true`** without a valid Bearer on worke
 | `pregenerate-companions.bru` | `pregenerate-companions` |
 | `fetch-source-feeds.bru` | `fetch-source-feeds` |
 | `refresh-btc-prices.bru` | `refresh-btc-prices` |
-| `backfill-btc-prices.bru` | `backfill-btc-prices` — optional ops backfill for `btc_price_cache` (CoinGecko); max **120** days per call |
+| `backfill-btc-prices.bru` | `backfill-btc-prices` — optional ops backfill for `btc_price_cache` (CoinGecko); chain on **`resumeFrom`** until **`completed`** (see `cron-setup.md`) |
 
 Do **not** run destructive cron jobs against production without intent. Some functions call external APIs (CoinGecko, AI, email).

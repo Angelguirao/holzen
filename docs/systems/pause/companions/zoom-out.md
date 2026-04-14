@@ -132,7 +132,7 @@ The `partial` flag allows the card to render with whatever data succeeded (e.g.,
 | Quality gate | `supabase/functions/_shared/quality.ts` |
 | Phase config | `supabase/functions/_shared/phase-config.ts` |
 | BTC price cron | `supabase/functions/refresh-btc-prices/index.ts` |
-| BTC cache backfill (ops) | `supabase/functions/backfill-btc-prices/index.ts` — manual date-range fill for missed rows |
+| BTC cache backfill (ops) | `supabase/functions/backfill-btc-prices/index.ts` — manual range fill; chain **`resumeFrom`** or `scripts/backfill-btc-chain.mjs` for multi-year gaps |
 | Client invoke | `src/hooks/use-companion-data.ts` |
 | UI | `src/components/CompanionSection.tsx` (`ZoomOutDisplay`) |
 
