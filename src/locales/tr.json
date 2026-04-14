@@ -261,6 +261,9 @@
     },
     "emailNotifications": "E-posta bildirimleri",
     "pushNotifications": "Push bildirimleri",
+    "pushFinishBannerTitle": "Ayarlar’da push bildirimini tamamlayın",
+    "pushFinishBannerBody": "Tarayıcınız bu site için bildirimlere zaten izin veriyor, ancak bu cihaz henüz Holzen push için kayıtlı değil. Kurulumu tamamlamak için aşağıdaki düğmeyi kullanın (push’u açmakla aynı).",
+    "pushFinishBannerAction": "Bu cihazda push’u etkinleştir",
     "digestFrequency": "Özet sıklığı",
     "digestDesc": "Düşünce özetinizi ne sıklıkla e-posta ile alırsınız.",
     "digestOptions": {

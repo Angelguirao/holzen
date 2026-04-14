@@ -270,6 +270,9 @@
     "ritualDescUpdated": "Pause sessions are guided sequences that slow you down before a financial decision.",
     "emailNotifications": "Email notifications",
     "pushNotifications": "Push notifications",
+    "pushFinishBannerTitle": "Finish enabling push in Settings",
+    "pushFinishBannerBody": "Your browser already allows notifications for this site, but this device is not registered for Holzen push yet. Use the button below to complete setup (same as turning push on).",
+    "pushFinishBannerAction": "Enable push on this device",
     "digestFrequency": "Digest frequency",
     "digestDesc": "How often you receive your reflection digest email.",
     "digestOptions": {

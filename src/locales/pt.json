@@ -261,6 +261,9 @@
     },
     "emailNotifications": "Notificações por email",
     "pushNotifications": "Notificações push",
+    "pushFinishBannerTitle": "Conclua a ativação das notificações push em Definições",
+    "pushFinishBannerBody": "O seu navegador já permite notificações para este site, mas este dispositivo ainda não está registado para push da Holzen. Use o botão abaixo para concluir (o mesmo que ativar push).",
+    "pushFinishBannerAction": "Ativar push neste dispositivo",
     "digestFrequency": "Frequência do resumo",
     "digestDesc": "Com que frequência você recebe seu resumo de reflexões por email.",
     "digestOptions": {

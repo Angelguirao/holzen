@@ -261,6 +261,9 @@
     },
     "emailNotifications": "E-mailmeldingen",
     "pushNotifications": "Pushmeldingen",
+    "pushFinishBannerTitle": "Push inschakelen afronden in Instellingen",
+    "pushFinishBannerBody": "Je browser staat meldingen voor deze site al toe, maar dit apparaat is nog niet geregistreerd voor Holzen-push. Gebruik de knop hieronder om in te stellen (zelfde als push aanzetten).",
+    "pushFinishBannerAction": "Push op dit apparaat inschakelen",
     "digestFrequency": "Samenvattingsfrequentie",
     "digestDesc": "Hoe vaak je je reflectiesamenvatting per e-mail ontvangt.",
     "digestOptions": {

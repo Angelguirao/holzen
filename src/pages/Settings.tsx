@@ -15,7 +15,7 @@ import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { LoadingButton } from '@/components/ui/loading-button';
-import { Loader2 } from 'lucide-react';
+import { Info, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { useState, useEffect, useCallback, forwardRef, useRef } from 'react';
@@ -39,6 +39,7 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { NoxHeaderMain } from '@/components/ui/nox-header';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 
 const LAST_SEEN_VERSION_KEY = 'holzen_last_seen_version';
 
@@ -100,7 +101,14 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
   const { threshold, setThreshold, thresholdDown, setThresholdDown, cumulativeThreshold, setCumulativeThreshold, emailNotifications, setEmailNotifications, companionPrefs, setCompanionPref, reflectionTone, setReflectionTone, reflectionStyle, setReflectionStyle, silentMode, setSilentMode, cooldownHours, setCooldownHours, digestFrequency, setDigestFrequency, customPrompt, setCustomPrompt, quietHoursStart, quietHoursEnd, setQuietHours, streakFreezeDates, useStreakFreeze, firstName, setFirstName, nightReflectionHour, setNightReflectionHour, aiInsightsEnabled, setAiInsightsEnabled, notifyBadges, setNotifyBadges, motivations, setMotivations, mantra, setMantra, currency, setCurrency, language, setLanguage, groundingActivities, setGroundingActivities, profileLoaded } = useHolzen();
   const { subscribed, loading: subLoading, checkoutLoading, startCheckout, openPortal, monthlyRemaining } = useSubscription();
   const { canInstall, install } = useInstallPrompt();
-  const { isSupported: pushSupported, isSubscribed: pushSubscribed, loading: pushLoading, subscribe: pushSubscribe, unsubscribe: pushUnsubscribe } = usePushNotifications();
+  const {
+    isSupported: pushSupported,
+    isSubscribed: pushSubscribed,
+    loading: pushLoading,
+    subscribe: pushSubscribe,
+    unsubscribe: pushUnsubscribe,
+    permissionGrantedNotSubscribed: pushPermissionGrantedIncomplete,
+  } = usePushNotifications();
   const [deleting, setDeleting] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [newPassword, setNewPassword] = useState('');
@@ -667,6 +675,32 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                 </Label>
                 <Switch id="email-notif" checked={emailNotifications} onCheckedChange={setEmailNotifications} />
               </div>
+              {pushSupported && pushPermissionGrantedIncomplete && (
+                <Alert className="border-primary/30 bg-primary/5">
+                  <Info className="h-4 w-4 text-primary" />
+                  <AlertTitle className="text-sm">
+                    {t('settings.pushFinishBannerTitle', 'Finish enabling push in Settings')}
+                  </AlertTitle>
+                  <AlertDescription className="mt-2 space-y-3 text-xs leading-relaxed text-muted-foreground">
+                    <p>
+                      {t(
+                        'settings.pushFinishBannerBody',
+                        'Your browser already allows notifications for this site, but this device is not registered for Holzen push yet. Use the button below to complete setup (same as turning push on).',
+                      )}
+                    </p>
+                    <LoadingButton
+                      type="button"
+                      size="sm"
+                      variant="secondary"
+                      className="font-medium"
+                      loading={pushLoading}
+                      onClick={() => void pushSubscribe()}
+                    >
+                      {t('settings.pushFinishBannerAction', 'Enable push on this device')}
+                    </LoadingButton>
+                  </AlertDescription>
+                </Alert>
+              )}
               {pushSupported && (
                 <div className="flex items-center justify-between">
                   <Label htmlFor="push-notif" className="text-xs font-mono text-muted-foreground">
