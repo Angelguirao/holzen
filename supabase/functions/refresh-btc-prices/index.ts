@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun, holzenEdgeWarn } from "../_shared/holzen-edge-log.ts";
+import { holzenEdgeError, holzenEdgeRun, holzenEdgeWarn } from "../_shared/holzen-edge-log.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -56,12 +56,20 @@ serve(async (req) => {
         const price = data?.bitcoin?.usd;
         if (price) {
           const today = new Date().toISOString().slice(0, 10);
-          await supabase.from("btc_price_cache").upsert({
+          const { error: upErr } = await supabase.from("btc_price_cache").upsert({
             date: today,
             price: Math.round(price),
             fetched_at: new Date().toISOString(),
           });
-          results.push(`current: $${Math.round(price)}`);
+          if (upErr) {
+            holzenEdgeError("refresh-btc", "current price upsert failed", upErr);
+            results.push("current: upsert failed");
+          } else {
+            results.push(`current: $${Math.round(price)}`);
+          }
+        } else {
+          holzenEdgeWarn("refresh-btc", "current price: OK response but missing bitcoin.usd");
+          results.push("current: no price in JSON");
         }
       } else if (res.status === 429) {
         holzenEdgeWarn("refresh-btc", "CoinGecko rate limited for current price");
@@ -73,15 +81,25 @@ serve(async (req) => {
             const price = data?.USD?.last;
             if (price) {
               const today = new Date().toISOString().slice(0, 10);
-              await supabase.from("btc_price_cache").upsert({
+              const { error: upErr } = await supabase.from("btc_price_cache").upsert({
                 date: today,
                 price: Math.round(price),
                 fetched_at: new Date().toISOString(),
               });
-              results.push(`current (backup): $${Math.round(price)}`);
+              if (upErr) {
+                holzenEdgeError("refresh-btc", "current price (backup) upsert failed", upErr);
+                results.push("current (backup): upsert failed");
+              } else {
+                results.push(`current (backup): $${Math.round(price)}`);
+              }
+            } else {
+              results.push("current (backup): no USD last");
             }
           }
         } catch { /* backup also failed */ }
+      } else {
+        holzenEdgeWarn("refresh-btc", "current price: CoinGecko non-OK", { status: res.status });
+        results.push(`current: HTTP ${res.status}`);
       }
     } catch (e) {
       holzenEdgeError("refresh-btc", "current price fetch error", e);
@@ -137,12 +155,26 @@ serve(async (req) => {
           }
 
           if (inserts.length > 0) {
-            await supabase.from("btc_price_cache").upsert(inserts);
-            results.push(`historical: ${inserts.length} prices cached`);
+            const { error: upErr } = await supabase.from("btc_price_cache").upsert(inserts);
+            if (upErr) {
+              holzenEdgeError("refresh-btc", "historical upsert failed", upErr);
+              results.push("historical: upsert failed");
+            } else {
+              results.push(`historical: ${inserts.length}/${missingTargets.length} prices cached`);
+            }
+          } else {
+            holzenEdgeWarn("refresh-btc", "historical: no rows matched range", {
+              missing: missingTargets.length,
+              coingecko_points: prices.length,
+            });
+            results.push(`historical: 0 matched (${missingTargets.length} needed, ${prices.length} points)`);
           }
         } else if (res.status === 429) {
           holzenEdgeWarn("refresh-btc", "CoinGecko rate limited for historical prices");
           results.push("historical: rate limited");
+        } else {
+          holzenEdgeWarn("refresh-btc", "historical: CoinGecko non-OK", { status: res.status });
+          results.push(`historical: HTTP ${res.status}`);
         }
       } catch (e) {
         holzenEdgeError("refresh-btc", "historical price fetch error", e);
@@ -151,7 +183,9 @@ serve(async (req) => {
       results.push("historical: all cached within 24h");
     }
 
-    holzenEdgeLog("refresh-btc", "run complete", { ms: Date.now() - t0, summary: results.join("; ").slice(0, 500) });
+    const summary = results.length > 0 ? results.join("; ").slice(0, 500) : "no steps recorded";
+    // Always emit completion so operators see current vs historical outcome when HOLZEN_EDGE_LOG=0.
+    holzenEdgeRun("refresh-btc", "run complete", { ms: Date.now() - t0, summary });
     return new Response(JSON.stringify({ success: true, results }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
