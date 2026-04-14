@@ -66,11 +66,24 @@ export function useBadgeSync(computedBadgeIds: string[], badgeMeta: Record<strin
           }));
           setNewBadges(newBadgeData);
 
-          // Send push notification (fire and forget)
+          // Send push notification (fire and forget). Use a freshly read/refreshed
+          // session so the edge function does not see an expired JWT (common cause
+          // of [BADGE-NOTIFY] Unauthorized while useAuth still has user).
           if (notifyEnabled) {
-            supabase.functions.invoke('badge-notify', {
-              body: { badges: newBadgeData },
-            }).catch(() => {});
+            void (async () => {
+              let { data: { session } } = await supabase.auth.getSession();
+              if (!session?.access_token) return;
+              const expiresAtMs = (session.expires_at ?? 0) * 1000;
+              if (expiresAtMs < Date.now() + 30_000) {
+                const { data: refreshed } = await supabase.auth.refreshSession();
+                session = refreshed.session ?? session;
+              }
+              if (!session?.access_token) return;
+              await supabase.functions.invoke('badge-notify', {
+                body: { badges: newBadgeData },
+                headers: { Authorization: `Bearer ${session.access_token}` },
+              }).catch(() => {});
+            })();
           }
         }
       }
