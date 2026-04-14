@@ -98,8 +98,9 @@ export async function serveFromCache(
     minQuality: 2,
     marketDirection,
     excludeIds: allExcludeIds,
-    limit: 15,
+    limit: 24,
     now,
+    randomPickCap: 12,
   });
   if (picked) {
     logCacheServeTelemetry(companionType, "none");
@@ -114,8 +115,9 @@ export async function serveFromCache(
       language,
       minQuality: 2,
       excludeIds: allExcludeIds,
-      limit: 10,
+      limit: 24,
       now,
+      randomPickCap: 12,
     });
     if (picked2) {
       logCacheServeTelemetry(companionType, "market");
