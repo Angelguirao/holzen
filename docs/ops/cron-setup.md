@@ -80,6 +80,19 @@ SELECT cron.schedule(
 );
 ```
 
+### Manual backfill (`backfill-btc-prices`)
+
+**Not scheduled.** Service-auth POST to **`/functions/v1/backfill-btc-prices`** with JSON body:
+
+- **`from`**, **`to`**: inclusive UTC calendar dates `YYYY-MM-DD` (same `date` keys as `btc_price_cache`).
+- **`onlyMissing`** (optional, default `true`): only insert dates that are not already in the table (idempotent replays).
+- **`dryRun`** (optional, default `false`): resolve prices from CoinGecko but **do not** write rows.
+- **`chunkDays`** (optional, default `45`): window size per `market_chart/range` call.
+
+**Limit:** at most **120** days per invocation (edge timeout + rate limits). For a multi-year gap, run several calls (e.g. `2024-01-01`–`2024-04-30`, then `2024-05-01`–…).
+
+Bruno: `bruno/service-cron/backfill-btc-prices.bru`. Logs: filter **`holzen:backfill-btc`**.
+
 ## Source Feed Fetcher (fetch-source-feeds)
 
 Fetches latest content from signal_sources URLs, structures it, and stores in content_library. This is what makes sources actively feed the system.

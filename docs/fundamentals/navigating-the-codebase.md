@@ -164,7 +164,7 @@ Each folder under **`supabase/functions/<name>/`** is a deployable function. Sha
 | `badge-notify` | `use-badge-sync.ts` |
 | `record-referral` | `use-auth.tsx` |
 
-**Cron / server / webhook style** (not an exhaustive list — see `cron-setup.md` and each `index.ts`): e.g. `check-volatility`, `refresh-btc-prices`, `fetch-source-feeds`, `weekly-digest`, `deliver-letters`, `auth-email-hook`, etc.
+**Cron / server / webhook style** (not an exhaustive list — see `cron-setup.md` and each `index.ts`): e.g. `check-volatility`, `refresh-btc-prices`, `backfill-btc-prices` (manual `btc_price_cache` gap fill), `fetch-source-feeds`, `weekly-digest`, `deliver-letters`, `auth-email-hook`, etc.
 
 **`supabase/config.toml`** — Each deployable function should have a **`[functions.<name>]`** block (same name as the folder under `supabase/functions/`, excluding `_shared`). This repo sets **`verify_jwt = false`** on those entries and relies on handlers to enforce auth where needed (e.g. `getUser()` with the `Authorization` header). **If you add a new function**, add its block in the **same change** so behavior is explicit.
 

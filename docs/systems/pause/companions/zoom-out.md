@@ -132,6 +132,7 @@ The `partial` flag allows the card to render with whatever data succeeded (e.g.,
 | Quality gate | `supabase/functions/_shared/quality.ts` |
 | Phase config | `supabase/functions/_shared/phase-config.ts` |
 | BTC price cron | `supabase/functions/refresh-btc-prices/index.ts` |
+| BTC cache backfill (ops) | `supabase/functions/backfill-btc-prices/index.ts` — manual date-range fill for missed rows |
 | Client invoke | `src/hooks/use-companion-data.ts` |
 | UI | `src/components/CompanionSection.tsx` (`ZoomOutDisplay`) |
 
@@ -141,5 +142,5 @@ The `partial` flag allows the card to render with whatever data succeeded (e.g.,
 
 - [AI-powered pause system](../ai-powered-pause-system.md) — full pause architecture (§7.9 Zoom Out reference, §7.5 secondary zoom-out)
 - [intervention.md](intervention.md) — Intervention types (zoom-out as secondary)
-- [cron-setup.md](../../../ops/cron-setup.md) — `refresh-btc-prices` schedule
+- [cron-setup.md](../../../ops/cron-setup.md) — `refresh-btc-prices` schedule; manual **`backfill-btc-prices`** for gaps
 - [navigating-the-codebase.md](../../../fundamentals/navigating-the-codebase.md) — edge functions and hooks map

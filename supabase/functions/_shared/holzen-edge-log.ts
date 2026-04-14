@@ -19,6 +19,7 @@ export type HolzenEdgeTag =
   | "volatility-email"
   | "volatility-push"
   | "refresh-btc"
+  | "backfill-btc"
   | "fetch-feeds"
   | "pregenerate"
   | "followups"
