@@ -468,7 +468,11 @@
     "echoPrompt2": "Would past-me be surprised or reassured by how I’m showing up today?",
     "echoPrompt3": "What one line do I want to remember next time it feels like this?",
     "echoRespondCta": "Write your take",
-    "echoExpandQuote": "Show full pause text"
+    "echoExpandQuote": "Show full pause text",
+    "openFullView": "Open full view",
+    "focusZoomOutMeta": "Zoom Out — Holzen",
+    "focusHistoryMeta": "Look back — Holzen",
+    "focusLoadError": "We could not load this pause. It may have been removed or you may need to sign in again."
   },
   "landing": {
     "hero": "When Bitcoin moves, pause before you do.",

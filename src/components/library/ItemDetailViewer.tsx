@@ -1,7 +1,8 @@
 import { useMemo, useState, useRef, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { Heart, ExternalLink, Tag, Link2, Clock, Pin, PinOff, Trash2, Archive, X, FolderPlus, Check } from 'lucide-react';
+import { Heart, ExternalLink, Tag, Link2, Clock, Pin, PinOff, Trash2, Archive, X, FolderPlus, Check, Maximize2 } from 'lucide-react';
 import { format } from 'date-fns';
 import type { LibraryItem, Collection } from '@/hooks/use-library';
 import { supabase } from '@/integrations/supabase/client';
@@ -90,6 +91,7 @@ export function ItemDetailViewer({
   isIncomplete, onOutcomeRecorded, currentOutcome,
 }: Props) {
   const { t } = useTranslation();
+  const navigate = useNavigate();
   const [editingTags, setEditingTags] = useState(false);
   const [tagInput, setTagInput] = useState('');
   const [showCollections, setShowCollections] = useState(false);
@@ -257,6 +259,25 @@ export function ItemDetailViewer({
             }
             return null;
           })()}
+
+          {item.reflection_id &&
+            (item.source_type === 'zoom_out' || item.source_type === 'history_insight') && (
+              <button
+                type="button"
+                onClick={() => {
+                  const path =
+                    item.source_type === 'zoom_out'
+                      ? `/companion/zoom-out/${item.reflection_id}`
+                      : `/companion/history/${item.reflection_id}`;
+                  navigate(path, { state: { from: 'library' } });
+                  onClose();
+                }}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-border/40 bg-muted/20 py-2.5 text-xs font-medium text-foreground/80 transition-colors hover:bg-muted/35"
+              >
+                <Maximize2 className="h-3.5 w-3.5 text-muted-foreground/60" aria-hidden />
+                {t('companions.openFullView')}
+              </button>
+            )}
 
           {/* Companion feedback — for companion-type library items */}
           {item.source_type && ['signal', 'grounding', 'learning', 'zoom_out', 'history_insight', 'haiku'].includes(item.source_type) && item.reflection_id && (

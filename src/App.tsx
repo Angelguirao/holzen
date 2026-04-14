@@ -35,6 +35,8 @@ const PracticeJournal = lazy(() => import("./pages/PracticeJournal"));
 const PracticeBodyScan = lazy(() => import("./pages/PracticeBodyScan"));
 const PracticeReplay = lazy(() => import("./pages/PracticeReplay"));
 const PauseSession = lazy(() => import("./pages/PauseSession"));
+const CompanionZoomOutPage = lazy(() => import("./pages/CompanionZoomOutPage"));
+const CompanionHistoryPage = lazy(() => import("./pages/CompanionHistoryPage"));
 const Ground = lazy(() => import("./pages/Ground"));
 const GroundHistory = lazy(() => import("./pages/GroundHistory"));
 const Admin = lazy(() => import("./pages/Admin"));
@@ -129,6 +131,14 @@ const App = () => (
                 </Route>
                 {/* Immersive full-screen experiences — no nav bar */}
                 <Route path="/pause" element={<ProtectedRoute><PauseSession /></ProtectedRoute>} />
+                <Route
+                  path="/companion/zoom-out/:reflectionId"
+                  element={<ProtectedRoute><CompanionZoomOutPage /></ProtectedRoute>}
+                />
+                <Route
+                  path="/companion/history/:reflectionId"
+                  element={<ProtectedRoute><CompanionHistoryPage /></ProtectedRoute>}
+                />
                 <Route path="/breathe" element={<ProtectedRoute><Breathe /></ProtectedRoute>} />
                 <Route path="/ground" element={<ProtectedRoute><Ground /></ProtectedRoute>} />
                 <Route path="/ground/history" element={<ProtectedRoute><GroundHistory /></ProtectedRoute>} />
