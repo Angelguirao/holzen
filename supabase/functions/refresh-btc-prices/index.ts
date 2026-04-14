@@ -21,6 +21,10 @@ const corsHeaders = {
  * refetched when `fetched_at` is older than **24h** or missing. Dates are **UTC calendar**
  * (year/month/day). This is accurate enough for **daily Zoom Out metaphor**, not intraday
  * trading. After a missed cron, staleness is bounded by the next successful run + TTL.
+ *
+ * **CoinGecko:** two calls per run when historical work is needed (simple price, then
+ * `market_chart/range`). Default **2s** gap between them; if the first returns **429**,
+ * the gap widens to **12s** before the second call to reduce back-to-back rate limits.
  */
 
 serve(async (req) => {
@@ -47,6 +51,8 @@ serve(async (req) => {
     );
 
     const results: string[] = [];
+    /** Longer pause before second CoinGecko call if the first was rate-limited. */
+    let coingeckoInterCallMs = 2000;
 
     // ── 1. Fetch current price ──
     try {
@@ -73,6 +79,7 @@ serve(async (req) => {
         }
       } else if (res.status === 429) {
         holzenEdgeWarn("refresh-btc", "CoinGecko rate limited for current price");
+        coingeckoInterCallMs = 12000; // reduce immediate second 429 on market_chart/range
         // Try backup: Blockchain.info
         try {
           const backupRes = await fetch("https://blockchain.info/ticker");
@@ -105,8 +112,7 @@ serve(async (req) => {
       holzenEdgeError("refresh-btc", "current price fetch error", e);
     }
 
-    // Wait 2s between CoinGecko calls to avoid rate limits
-    await new Promise(r => setTimeout(r, 2000));
+    await new Promise((r) => setTimeout(r, coingeckoInterCallMs));
 
     // ── 2. Fetch historical "on this day" prices (1-4 years ago) ──
     const today = new Date();
