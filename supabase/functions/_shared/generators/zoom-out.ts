@@ -31,9 +31,10 @@ import {
 } from "../cache.ts";
 import { createAttemptLogger, trackEvent } from "../observe.ts";
 import { getPhaseConfig } from "../phase-config.ts";
+import { BTC_ON_THIS_DAY_YEARS_BACK, btcOnThisDayYearOffsets } from "../btc-on-this-day-config.ts";
 
 /** Bump when the deep-time prompt, seed pool, or quality rules change. */
-export const PROMPT_VERSION = "v2";
+export const PROMPT_VERSION = "v3";
 
 // ── Public types ──
 
@@ -92,8 +93,8 @@ async function fetchHistoricalAndCurrentPrices(
   const day = today.getUTCDate();
   const todayKey = today.toISOString().slice(0, 10);
 
-  // Build date keys for today + 1-4 years ago
-  const yearTargets = [1, 2, 3, 4].map(y => {
+  // Build date keys for today + 1..N calendar years ago (see btc-on-this-day-config)
+  const yearTargets = btcOnThisDayYearOffsets().map((y) => {
     const d = new Date(Date.UTC(currentYear - y, month, day));
     return { yearsAgo: y, dateKey: d.toISOString().slice(0, 10) };
   });
@@ -121,7 +122,7 @@ async function fetchHistoricalAndCurrentPrices(
     }
   }
 
-  log(`prices from cache: current=${currentPrice ?? 'none'}, historical=${onThisDay.length}/4`);
+  log(`prices from cache: current=${currentPrice ?? 'none'}, historical=${onThisDay.length}/${BTC_ON_THIS_DAY_YEARS_BACK}`);
 
   return {
     onThisDay,

@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { holzenEdgeError, holzenEdgeRun, holzenEdgeWarn } from "../_shared/holzen-edge-log.ts";
+import { btcOnThisDayYearOffsets } from "../_shared/btc-on-this-day-config.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -12,12 +13,12 @@ const corsHeaders = {
  *
  * Scheduled via cron every ~15 minutes (see docs/ops/cron-setup.md). Fetches:
  * 1. Current BTC price (USD)
- * 2. Historical prices for "on this day" (1-4 years ago)
+ * 2. Historical prices for "on this day" (1–N calendar years ago; see btc-on-this-day-config)
  *
  * Stores everything in btc_price_cache. The zoom-out companion reads ONLY from this
  * cache during sessions (no CoinGecko at user time).
  *
- * **Freshness contract (product):** Historical rows for the four anniversary dates are
+ * **Freshness contract (product):** Historical rows for each anniversary date (1y..Ny ago) are
  * refetched when `fetched_at` is older than **24h** or missing. Dates are **UTC calendar**
  * (year/month/day). This is accurate enough for **daily Zoom Out metaphor**, not intraday
  * trading. After a missed cron, staleness is bounded by the next successful run + TTL.
@@ -114,13 +115,13 @@ serve(async (req) => {
 
     await new Promise((r) => setTimeout(r, coingeckoInterCallMs));
 
-    // ── 2. Fetch historical "on this day" prices (1-4 years ago) ──
+    // ── 2. Fetch historical "on this day" prices (1..N years ago, UTC) ──
     const today = new Date();
     const currentYear = today.getUTCFullYear();
     const month = today.getUTCMonth();
     const day = today.getUTCDate();
 
-    const yearTargets = [1, 2, 3, 4].map(y => {
+    const yearTargets = btcOnThisDayYearOffsets().map((y) => {
       const d = new Date(Date.UTC(currentYear - y, month, day));
       return { yearsAgo: y, dateKey: d.toISOString().slice(0, 10), ts: Math.floor(d.getTime() / 1000) };
     });
