@@ -3,6 +3,8 @@
  * Centralises the cache fallback chain logic used by all companion functions.
  */
 
+import { COMPANION_SERVE_FRESHNESS_DAYS } from "./companion-serve-freshness.ts";
+
 /** `companion_cache.companion_type` for zoom-out deep-time entries */
 export const COMPANION_ZOOM_OUT_DEEP_TIME = "zoom_out_deep_time";
 
@@ -38,7 +40,8 @@ export interface ServeFromCacheOptions {
  * Serve from cache with quality-ranked selection, per-user dedup, and market context.
  *
  * Selection strategy:
- * 1. Per-user seen rows excluded when userId is set (via `user_companion_serves`).
+ * 1. Per-user seen rows excluded when userId is set (via `user_companion_serves`,
+ *    only serves within COMPANION_SERVE_FRESHNESS_DAYS — aligns with content_library).
  * 2. First pass: quality_score ≥ 2, optional market_regime filter → `relaxation: "none"`.
  * 3. Second pass (only if marketDirection set): quality ≥ 2, any regime → `"market"`.
  * 4. Third pass: any quality, seen rows allowed again → `"repeat_or_lower_quality"`.
@@ -65,11 +68,15 @@ export async function serveFromCache(
   let userSeenIds: Set<string> = new Set();
   if (userId) {
     try {
+      const windowStart = new Date(
+        Date.now() - COMPANION_SERVE_FRESHNESS_DAYS * 24 * 60 * 60 * 1000,
+      ).toISOString();
       const { data: seen } = await svcClient
         .from("user_companion_serves")
         .select("cache_entry_id")
         .eq("user_id", userId)
-        .eq("companion_type", companionType);
+        .eq("companion_type", companionType)
+        .gte("served_at", windowStart);
       if (seen) {
         userSeenIds = new Set(seen.map((r: any) => r.cache_entry_id));
       }
@@ -123,8 +130,9 @@ export async function serveFromCache(
     language,
     minQuality: 0,
     excludeIds: new Set(excludeIds ?? []), // Only exclude explicit IDs, not user-seen
-    limit: 5,
+    limit: 40,
     now,
+    randomPickCap: 15,
   });
   if (picked3) {
     logCacheServeTelemetry(companionType, "repeat_or_lower_quality");
@@ -145,6 +153,8 @@ interface TryServeParams {
   excludeIds: Set<string>;
   limit: number;
   now: string;
+  /** Random pick among the first N rows of the filtered pool (default 3). */
+  randomPickCap?: number;
 }
 
 async function tryServe(
@@ -183,8 +193,8 @@ async function tryServe(
     const trusted = pool.filter((d: any) => !d.source_untrusted);
     const pickPool = trusted.length > 0 ? trusted : pool;
 
-    // Random pick from top 3
-    const pick = pickPool[Math.floor(Math.random() * Math.min(pickPool.length, 3))];
+    const cap = params.randomPickCap ?? 3;
+    const pick = pickPool[Math.floor(Math.random() * Math.min(pickPool.length, cap))];
     updateServeStats(svcClient, pick.id, pick.used_count, params.now);
     return { data: pick.content, cacheId: pick.id };
   } catch {
