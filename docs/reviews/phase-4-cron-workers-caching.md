@@ -46,7 +46,7 @@ If these workers drift (stale prices, bad dedup, permissive auth), you get wrong
 - Keeps `btc_price_cache` fresh so Zoom Out does not call CoinGecko during user sessions.
 - **Auth**: `Authorization: Bearer <service_role>` or `CRON_SECRET` ([`verifyServiceAuth`](../../supabase/functions/_shared/auth.ts)).
 - **Logs**: [`holzen-edge-log`](../../supabase/functions/_shared/holzen-edge-log.ts) tag **`refresh-btc`** — filter **`holzen:refresh-btc`** in Edge logs; set **`HOLZEN_EDGE_LOG=0`** to quiet non-error traces.
-- **Writes**: upsert current daily key; upsert historical "on this day" prices (1-4 years ago) when missing or older than 24h.
+- **Writes**: upsert current daily key; upsert historical "on this day" prices (1–10 years ago; `btc-on-this-day-config.ts`) when missing or older than 24h.
 - **Rate pressure**: ~2s delay between CoinGecko calls.
 
 ### `supabase/functions/fetch-source-feeds/index.ts` — active content library

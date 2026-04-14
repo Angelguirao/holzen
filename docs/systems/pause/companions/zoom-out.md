@@ -45,7 +45,7 @@ High-level order (source of truth: **`supabase/functions/_shared/generators/zoom
 
 **Note:** Zoom Out does **not** have a library phase — there is no `content_library` type for deep-time content. The phase order is **cache → live → curated** (not the library → cache → live → curated pattern used by Signal, Grounding, and History).
 
-**Step 1: Price data** — Fetches BTC prices from **`btc_price_cache`** table (kept fresh by the `refresh-btc-prices` cron every ~15 minutes). Builds "on this day" comparisons for 1–4 years ago. No CoinGecko API calls at generation time.
+**Step 1: Price data** — Fetches BTC prices from **`btc_price_cache`** table (kept fresh by the `refresh-btc-prices` cron every ~15 minutes). Builds "on this day" comparisons for **1–10 calendar years** ago (UTC; see `_shared/btc-on-this-day-config.ts`). No CoinGecko API calls at generation time.
 
 **Step 2: Echo reflection** — Fetches a past reflection from the same user (≥3 days old, with `outcome` set, optionally filtered by market direction). Provides "you reflected on this before" context.
 
@@ -89,7 +89,7 @@ Unlike other generators that return a single card, Zoom Out assembles a **compos
 
 ```
 {
-  onThisDay: [{ year, price, change }],  // 1-4 years of "on this day" prices
+  onThisDay: [{ year, price, change }],  // 1–10 years of "on this day" prices (see btc-on-this-day-config)
   currentPrice: number,                   // today's BTC price from cache
   echo: { message, mood, outcome, ... }, // past reflection (optional)
   deepTime: { title, body },             // AI-generated deep-time narrative
@@ -131,6 +131,7 @@ The `partial` flag allows the card to render with whatever data succeeded (e.g.,
 | Session intent | `supabase/functions/_shared/session-intent.ts` |
 | Quality gate | `supabase/functions/_shared/quality.ts` |
 | Phase config | `supabase/functions/_shared/phase-config.ts` |
+| “On this day” depth | `supabase/functions/_shared/btc-on-this-day-config.ts` — years back (default **10**) |
 | BTC price cron | `supabase/functions/refresh-btc-prices/index.ts` |
 | BTC cache backfill (ops) | `supabase/functions/backfill-btc-prices/index.ts` — manual range fill; chain **`resumeFrom`** or `scripts/backfill-btc-chain.mjs` for multi-year gaps |
 | Client invoke | `src/hooks/use-companion-data.ts` |
