@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
@@ -18,6 +18,44 @@ export function ReflectionNote({ reflectionId, initialNote }: Props) {
   const [editing, setEditing] = useState(false);
   const [saved, setSaved] = useState(false);
   const savedToLibraryRef = useRef(!!initialNote);
+
+  // Reload from DB when remounting (e.g. pause step away → back); props often pass initialNote=null.
+  useEffect(() => {
+    let cancelled = false;
+
+    if (initialNote != null && initialNote !== '') {
+      setNote(initialNote);
+      savedToLibraryRef.current = true;
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    void (async () => {
+      const { data, error } = await supabase
+        .from('reflections')
+        .select('note')
+        .eq('id', reflectionId)
+        .maybeSingle();
+      if (cancelled || error || !data) return;
+      const loaded = typeof data.note === 'string' ? data.note : '';
+      setNote(loaded);
+      if (loaded.trim()) {
+        const { count } = await supabase
+          .from('library_items')
+          .select('id', { count: 'exact', head: true })
+          .eq('reflection_id', reflectionId)
+          .eq('source_type', 'reflection_note');
+        if (!cancelled) savedToLibraryRef.current = (count ?? 0) > 0;
+      } else if (!cancelled) {
+        savedToLibraryRef.current = false;
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [reflectionId, initialNote]);
 
   const save = useCallback(async () => {
     setEditing(false);

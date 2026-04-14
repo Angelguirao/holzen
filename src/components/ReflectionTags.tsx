@@ -23,6 +23,22 @@ export function ReflectionTags({ reflectionId, initialTags }: Props) {
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const { data, error } = await supabase
+        .from('reflections')
+        .select('tags')
+        .eq('id', reflectionId)
+        .maybeSingle();
+      if (cancelled || error || !data?.tags || !Array.isArray(data.tags)) return;
+      setTags(data.tags as string[]);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [reflectionId]);
+
+  useEffect(() => {
     if (!open || !user) return;
     const fetchTags = async () => {
       const { data } = await supabase
