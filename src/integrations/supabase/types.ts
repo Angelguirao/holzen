@@ -1613,15 +1613,7 @@ export type Database = {
           served_at?: string | null
           user_id?: string
         }
-        Relationships: [
-          {
-            foreignKeyName: "user_companion_serves_cache_entry_id_fkey"
-            columns: ["cache_entry_id"]
-            isOneToOne: false
-            referencedRelation: "companion_cache"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       user_signal_preferences: {
         Row: {

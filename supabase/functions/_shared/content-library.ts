@@ -10,7 +10,7 @@
  * only if you need any library row regardless of recency.
  */
 
-const FRESHNESS_WINDOW_DAYS = 7;
+import { COMPANION_SERVE_FRESHNESS_DAYS } from "./companion-serve-freshness.ts";
 
 export interface LibraryEntry {
   id: string;
@@ -150,7 +150,20 @@ export function recordLibraryServe(
       },
       { onConflict: "user_id,cache_entry_id" },
     )
-    .then(() => {});
+    .then(() => {})
+    .catch((err: unknown) => {
+      try {
+        console.warn(
+          JSON.stringify({
+            fn: "recordLibraryServe",
+            level: "warn",
+            msg: err instanceof Error ? err.message : String(err),
+          }),
+        );
+      } catch {
+        /* ignore */
+      }
+    });
 }
 
 // ── Internal helpers ──
@@ -164,7 +177,7 @@ async function getRecentlySeenLibraryIds(
   companionType?: string,
 ): Promise<Set<string>> {
   try {
-    const windowStart = new Date(Date.now() - FRESHNESS_WINDOW_DAYS * 24 * 60 * 60 * 1000).toISOString();
+    const windowStart = new Date(Date.now() - COMPANION_SERVE_FRESHNESS_DAYS * 24 * 60 * 60 * 1000).toISOString();
 
     let query = svcClient
       .from("user_companion_serves")
