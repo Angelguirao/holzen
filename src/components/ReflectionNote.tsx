@@ -4,6 +4,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { Pencil, Check } from 'lucide-react';
 import { WritingField } from '@/components/WritingField';
+import { Button } from '@/components/ui/button';
 
 interface Props {
   reflectionId: string;
@@ -54,10 +55,11 @@ export function ReflectionNote({ reflectionId, initialNote }: Props) {
   if (!editing && !note.trim()) {
     return (
       <button
+        type="button"
         onClick={() => setEditing(true)}
-        className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground/50 hover:text-muted-foreground transition-colors"
+        className="flex w-full max-w-full items-center justify-center gap-2 rounded-lg border border-dashed border-input/80 bg-muted/15 px-3 py-3 text-left text-sm font-medium text-muted-foreground transition-colors hover:border-input hover:bg-muted/25 hover:text-foreground sm:justify-start"
       >
-        <Pencil className="h-2.5 w-2.5" />
+        <Pencil className="h-4 w-4 shrink-0 opacity-70" />
         {t('reflectionNote.addNote')}
       </button>
     );
@@ -65,38 +67,37 @@ export function ReflectionNote({ reflectionId, initialNote }: Props) {
 
   if (!editing) {
     return (
-      <div className="group relative">
-        <p className="text-xs text-muted-foreground/70 italic leading-relaxed pr-6">
+      <div className="group relative rounded-lg border border-border/50 bg-background/60 px-3 py-2.5 pr-10">
+        <p className="text-sm leading-relaxed text-muted-foreground">
           {note}
         </p>
         <button
+          type="button"
           onClick={() => setEditing(true)}
-          className="absolute top-0 right-0 opacity-0 group-hover:opacity-100 text-muted-foreground/40 hover:text-foreground transition-all p-0.5"
+          className="absolute top-2 right-2 rounded-md p-1.5 text-muted-foreground opacity-70 transition-all hover:bg-muted/50 hover:text-foreground group-hover:opacity-100"
           aria-label={t('reflectionNote.editNote')}
         >
-          <Pencil className="h-2.5 w-2.5" />
+          <Pencil className="h-4 w-4" />
         </button>
       </div>
     );
   }
 
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-3">
       <WritingField
         value={note}
         onChange={setNote}
         placeholder={t('reflectionNote.placeholder')}
-        minRows={2}
+        minRows={4}
         autoFocus
+        disableFocusMode
       />
       <div className="flex justify-end">
-        <button
-          onClick={save}
-          className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <Check className="h-2.5 w-2.5" />
+        <Button type="button" variant="secondary" size="sm" className="gap-1.5" onClick={save}>
+          <Check className="h-3.5 w-3.5" />
           {saved ? t('reflectionNote.saved') : t('reflectionNote.save')}
-        </button>
+        </Button>
       </div>
     </div>
   );

@@ -13,6 +13,7 @@ import { MoodIcon } from '@/components/icons/MoodIcon';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { companionFallbacksDisabledClient } from '@/lib/companion-strict';
 import { parseGroundLocationState } from '@/lib/router-location-state';
+import { Textarea } from '@/components/ui/textarea';
 
 type Phase = 'idle' | 'suggestion' | 'timer' | 'checkin' | 'reflect' | 'done';
 
@@ -567,12 +568,12 @@ export default function Ground() {
                 {t('ground.reflectPrompt', 'Anything you noticed during this moment? This is just for you.')}
               </p>
 
-              <textarea
+              <Textarea
                 value={reflectionText}
                 onChange={(e) => setReflectionText(e.target.value)}
                 placeholder={t('ground.reflectPlaceholder', 'Optional...')}
                 rows={4}
-                className="mx-auto block w-full max-w-sm rounded-xl border border-border bg-background/80 px-4 py-3 text-base leading-relaxed text-foreground placeholder:text-muted-foreground/60 focus:border-primary/40 focus:outline-none focus:ring-1 focus:ring-primary/20"
+                className="mx-auto block max-w-sm min-h-[7.5rem] text-base leading-relaxed"
               />
 
               <div className="flex flex-col items-center gap-3">
