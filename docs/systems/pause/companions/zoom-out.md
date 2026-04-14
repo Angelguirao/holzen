@@ -135,6 +135,7 @@ The `partial` flag allows the card to render with whatever data succeeded (e.g.,
 | BTC price cron | `supabase/functions/refresh-btc-prices/index.ts` |
 | BTC cache backfill (ops) | `supabase/functions/backfill-btc-prices/index.ts` — manual range fill; chain **`resumeFrom`** or `scripts/backfill-btc-chain.mjs` for multi-year gaps |
 | Client invoke | `src/hooks/use-companion-data.ts` |
+| Full-screen view | `src/pages/CompanionZoomOutPage.tsx` — route `/companion/zoom-out/:reflectionId` |
 | UI | `src/components/CompanionSection.tsx` (`ZoomOutDisplay`) |
 
 ---
