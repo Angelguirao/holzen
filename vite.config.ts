@@ -56,6 +56,7 @@ export default defineConfig(({ mode, command }) => {
     define: {
       "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(supabaseUrl),
       "import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY": JSON.stringify(supabaseKey),
+      "__BUILD_TIME__": JSON.stringify(new Date().toISOString()),
     },
     plugins: [
       {
