@@ -4,7 +4,7 @@
  *
  * **Parity with browser (`src/lib/holzen-console.ts`):**
  * - **Production:** set Edge secret **`HOLZEN_EDGE_LOG=0`** → verbose traces off (like prod without `holzen:debug`).
- *   You still get **`holzenEdgeRun`** (request + auth) and **`holzenEdgeError`** so cron health and failures are visible.
+ *   You still get **`holzenEdgeRun`** (request + auth, and **always-on** one-line summaries where a worker emits them, e.g. `refresh-btc` **run complete**) and **`holzenEdgeError`** so cron health and failures are visible.
  * - **Staging / investigation:** leave **`HOLZEN_EDGE_LOG` unset** or set **`1`** → full **`holzenEdgeLog` / `holzenEdgeWarn`** flow
  *   (like **`import.meta.env.DEV`** or `localStorage holzen:debug=1` on the client).
  * - **Local `supabase functions serve`:** usually unset → flow logs on by default.
@@ -67,7 +67,7 @@ export function holzenEdgeError(tag: HolzenEdgeTag, msg: string, err?: unknown):
 }
 
 /**
- * Always logged (ignores `HOLZEN_EDGE_LOG=0`) — request line + auth outcome so invocations are visible in Supabase.
+ * Always logged (ignores `HOLZEN_EDGE_LOG=0`) — request line + auth outcome so invocations are visible in Supabase. Some workers add a final line with a short **summary** payload (counts / HTTP / leg names).
  */
 export function holzenEdgeRun(tag: HolzenEdgeTag, msg: string, data?: Record<string, unknown>): void {
   const prefix = p(tag);
