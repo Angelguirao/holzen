@@ -1,4 +1,5 @@
 import { useAuth } from '@/hooks/use-auth';
+import { AppVersionBadge } from '@/components/AppVersionBadge';
 import { QuietWindowsManager } from '@/components/QuietWindowsManager';
 import { SourceManagement } from '@/components/SourceManagement';
 import { ProLock } from '@/components/ProLock';
@@ -1068,11 +1069,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                 </button>
                 <a href="/roadmap" target="_blank" rel="noopener noreferrer" className="text-xs font-mono text-muted-foreground underline">{t('settings.roadmap')}</a>
               </div>
-              {latestVersion && (
-                <p className="text-[10px] font-mono text-muted-foreground/50">
-                  Holzen v{latestVersion}
-                </p>
-              )}
+              <AppVersionBadge changelogVersion={latestVersion} />
             </div>
           </AccordionContent>
         </AccordionItem>
