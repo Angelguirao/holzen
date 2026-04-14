@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
 
@@ -7,19 +7,45 @@ export function usePushNotifications() {
   const [isSubscribed, setIsSubscribed] = useState(false);
   const [isSupported, setIsSupported] = useState(false);
   const [loading, setLoading] = useState(false);
+  /** False until first `getSubscription` completes for the signed-in user (avoids banner flash). */
+  const [pushRegistrationChecked, setPushRegistrationChecked] = useState(false);
 
   useEffect(() => {
     setIsSupported("serviceWorker" in navigator && "PushManager" in window);
   }, []);
 
-  // Check existing subscription on mount
+  // Check existing subscription on mount / user change
+  useEffect(() => {
+    if (!isSupported || !user) {
+      setIsSubscribed(false);
+      setPushRegistrationChecked(false);
+      return;
+    }
+    let cancelled = false;
+    setPushRegistrationChecked(false);
+    void navigator.serviceWorker.ready.then((reg) =>
+      reg.pushManager.getSubscription().then((sub) => {
+        if (!cancelled) {
+          setIsSubscribed(!!sub);
+          setPushRegistrationChecked(true);
+        }
+      }),
+    );
+    return () => {
+      cancelled = true;
+    };
+  }, [isSupported, user]);
+
+  // Re-check when returning to the tab (e.g. user cleared site data elsewhere)
   useEffect(() => {
     if (!isSupported || !user) return;
-    navigator.serviceWorker.ready.then((reg) => {
-      reg.pushManager.getSubscription().then((sub) => {
-        setIsSubscribed(!!sub);
-      });
-    });
+    const recheck = () => {
+      void navigator.serviceWorker.ready.then((reg) =>
+        reg.pushManager.getSubscription().then((sub) => setIsSubscribed(!!sub)),
+      );
+    };
+    window.addEventListener("focus", recheck);
+    return () => window.removeEventListener("focus", recheck);
   }, [isSupported, user]);
 
   const subscribe = useCallback(async () => {
@@ -90,7 +116,25 @@ export function usePushNotifications() {
     }
   }, [user, isSupported]);
 
-  return { isSupported, isSubscribed, loading, subscribe, unsubscribe };
+  const permissionGrantedNotSubscribed = useMemo(() => {
+    if (typeof window === "undefined" || typeof Notification === "undefined") return false;
+    return (
+      pushRegistrationChecked &&
+      isSupported &&
+      Notification.permission === "granted" &&
+      !isSubscribed
+    );
+  }, [pushRegistrationChecked, isSupported, isSubscribed]);
+
+  return {
+    isSupported,
+    isSubscribed,
+    loading,
+    subscribe,
+    unsubscribe,
+    /** Browser already allows notifications, but this device has no push subscription in-app yet. */
+    permissionGrantedNotSubscribed,
+  };
 }
 
 function urlBase64ToUint8Array(base64String: string): Uint8Array {

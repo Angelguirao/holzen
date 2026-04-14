@@ -260,6 +260,9 @@
     },
     "emailNotifications": "E-Mail-Benachrichtigungen",
     "pushNotifications": "Push-Benachrichtigungen",
+    "pushFinishBannerTitle": "Push-Benachrichtigung in den Einstellungen abschließen",
+    "pushFinishBannerBody": "Dein Browser erlaubt Benachrichtigungen für diese Seite, aber dieses Gerät ist noch nicht für Holzen-Push registriert. Tippe unten, um die Einrichtung abzuschließen (wie beim Aktivieren von Push).",
+    "pushFinishBannerAction": "Push auf diesem Gerät aktivieren",
     "digestFrequency": "Zusammenfassungshäufigkeit",
     "digestDesc": "Wie oft du deine Reflexionszusammenfassung per E-Mail erhältst.",
     "digestOptions": {
