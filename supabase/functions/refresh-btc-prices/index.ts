@@ -28,6 +28,12 @@ const corsHeaders = {
  * the gap widens to **12s** before the second call to reduce back-to-back rate limits.
  */
 
+/** Optional CoinGecko Demo API key — when present, send via `x-cg-demo-api-key` for a dedicated rate-limit pool. */
+function coingeckoHeaders(): HeadersInit {
+  const key = Deno.env.get("COINGECKO_API_KEY");
+  return key ? { "x-cg-demo-api-key": key } : {};
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -57,7 +63,7 @@ serve(async (req) => {
 
     // ── 1. Fetch current price ──
     try {
-      const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd");
+      const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd", { headers: coingeckoHeaders() });
       if (res.ok) {
         const data = await res.json();
         const price = data?.bitcoin?.usd;
@@ -142,7 +148,7 @@ serve(async (req) => {
       const to = Math.max(...timestamps) + 86400;
 
       try {
-        const res = await fetch(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=usd&from=${from}&to=${to}`);
+        const res = await fetch(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=usd&from=${from}&to=${to}`, { headers: coingeckoHeaders() });
         if (res.ok) {
           const data = await res.json();
           const prices: [number, number][] = data?.prices || [];
