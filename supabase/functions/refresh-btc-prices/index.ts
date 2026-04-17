@@ -148,7 +148,7 @@ serve(async (req) => {
       const to = Math.max(...timestamps) + 86400;
 
       try {
-        const res = await fetch(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=usd&from=${from}&to=${to}`);
+        const res = await fetch(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=usd&from=${from}&to=${to}`, { headers: coingeckoHeaders() });
         if (res.ok) {
           const data = await res.json();
           const prices: [number, number][] = data?.prices || [];
