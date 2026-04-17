@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import webpush from "https://esm.sh/web-push@3.6.7";
 import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
+import { coingeckoHeaders } from "../_shared/coingecko.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -25,7 +26,7 @@ function getUserLocalHour(timezone: string): number {
 
 async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise<Response> {
   for (let i = 0; i < retries; i++) {
-    const res = await fetch(url);
+    const res = await fetch(url, { headers: coingeckoHeaders() });
     if (res.ok) return res;
     await res.text();
     if (i < retries - 1) await new Promise((r) => setTimeout(r, delayMs * (i + 1)));

@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { holzenEdgeError, holzenEdgeRun, holzenEdgeWarn } from "../_shared/holzen-edge-log.ts";
 import { btcOnThisDayYearOffsets } from "../_shared/btc-on-this-day-config.ts";
+import { coingeckoHeaders } from "../_shared/coingecko.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -27,12 +28,6 @@ const corsHeaders = {
  * `market_chart/range`). Default **2s** gap between them; if the first returns **429**,
  * the gap widens to **12s** before the second call to reduce back-to-back rate limits.
  */
-
-/** Optional CoinGecko Demo API key — when present, send via `x-cg-demo-api-key` for a dedicated rate-limit pool. */
-function coingeckoHeaders(): HeadersInit {
-  const key = Deno.env.get("COINGECKO_API_KEY");
-  return key ? { "x-cg-demo-api-key": key } : {};
-}
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
