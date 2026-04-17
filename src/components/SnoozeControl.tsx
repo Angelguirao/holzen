@@ -76,6 +76,18 @@ export function SnoozeControl() {
     toast(t('snooze.activated', { hours, defaultValue: `Pauses snoozed for ${hours}h` }), { duration: 3000 });
   };
 
+  const handleSnoozeUntilTomorrow = async () => {
+    hapticFeedback('light');
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(8, 0, 0, 0);
+    const hours = (tomorrow.getTime() - now.getTime()) / (60 * 60 * 1000);
+    await snooze(hours);
+    setOpen(false);
+    toast(t('snooze.untilTomorrowActivated', 'Snoozed until tomorrow 8am'), { duration: 3000 });
+  };
+
   const handleCancel = async () => {
     hapticFeedback('light');
     await cancelSnooze();
