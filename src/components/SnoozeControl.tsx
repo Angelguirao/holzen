@@ -76,6 +76,18 @@ export function SnoozeControl() {
     toast(t('snooze.activated', { hours, defaultValue: `Pauses snoozed for ${hours}h` }), { duration: 3000 });
   };
 
+  const handleSnoozeUntilTomorrow = async () => {
+    hapticFeedback('light');
+    const now = new Date();
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    tomorrow.setHours(8, 0, 0, 0);
+    const hours = (tomorrow.getTime() - now.getTime()) / (60 * 60 * 1000);
+    await snooze(hours);
+    setOpen(false);
+    toast(t('snooze.untilTomorrowActivated', 'Snoozed until tomorrow 8am'), { duration: 3000 });
+  };
+
   const handleCancel = async () => {
     hapticFeedback('light');
     await cancelSnooze();
@@ -133,6 +145,15 @@ export function SnoozeControl() {
             </span>
           </button>
         ))}
+        <button
+          onClick={handleSnoozeUntilTomorrow}
+          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left transition-colors hover:bg-muted/50"
+        >
+          <Clock className="h-3 w-3 text-muted-foreground/40" />
+          <span className="text-sm font-medium text-foreground/80">
+            {t('snooze.untilTomorrow', 'Until tomorrow (8am)')}
+          </span>
+        </button>
       </PopoverContent>
     </Popover>
   );
