@@ -63,7 +63,7 @@ serve(async (req) => {
 
     // ── 1. Fetch current price ──
     try {
-      const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd");
+      const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd", { headers: coingeckoHeaders() });
       if (res.ok) {
         const data = await res.json();
         const price = data?.bitcoin?.usd;
