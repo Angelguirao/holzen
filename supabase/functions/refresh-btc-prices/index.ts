@@ -28,6 +28,12 @@ const corsHeaders = {
  * the gap widens to **12s** before the second call to reduce back-to-back rate limits.
  */
 
+/** Optional CoinGecko Demo API key — when present, send via `x-cg-demo-api-key` for a dedicated rate-limit pool. */
+function coingeckoHeaders(): HeadersInit {
+  const key = Deno.env.get("COINGECKO_API_KEY");
+  return key ? { "x-cg-demo-api-key": key } : {};
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
