@@ -22,6 +22,7 @@ import {
   holzenEdgeRun,
   holzenEdgeWarn,
 } from "../_shared/holzen-edge-log.ts";
+import { coingeckoHeaders } from "../_shared/coingecko.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -30,12 +31,6 @@ const corsHeaders = {
 };
 
 const DEFAULT_COOLDOWN_MS = 6 * 60 * 60 * 1000; // 6 hours fallback
-
-/** Optional CoinGecko Demo API key — when present, send via `x-cg-demo-api-key` for a dedicated rate-limit pool. */
-function coingeckoHeaders(): HeadersInit {
-  const key = Deno.env.get("COINGECKO_API_KEY");
-  return key ? { "x-cg-demo-api-key": key } : {};
-}
 
 async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise<Response> {
   for (let i = 0; i < retries; i++) {
