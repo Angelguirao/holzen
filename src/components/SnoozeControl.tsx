@@ -145,6 +145,15 @@ export function SnoozeControl() {
             </span>
           </button>
         ))}
+        <button
+          onClick={handleSnoozeUntilTomorrow}
+          className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left transition-colors hover:bg-muted/50"
+        >
+          <Clock className="h-3 w-3 text-muted-foreground/40" />
+          <span className="text-sm font-medium text-foreground/80">
+            {t('snooze.untilTomorrow', 'Until tomorrow (8am)')}
+          </span>
+        </button>
       </PopoverContent>
     </Popover>
   );
