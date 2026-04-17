@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { holzenEdgeError, holzenEdgeRun, holzenEdgeWarn } from "../_shared/holzen-edge-log.ts";
+import { coingeckoHeaders } from "../_shared/coingecko.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -230,7 +231,7 @@ serve(async (req) => {
 
       const url =
         `https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=usd&from=${fromSec}&to=${toSec}`;
-      const res = await fetch(url);
+      const res = await fetch(url, { headers: coingeckoHeaders() });
 
       if (res.status === 429) {
         holzenEdgeWarn("backfill-btc", "CoinGecko rate limited", { chunk: chunks });
