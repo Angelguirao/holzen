@@ -71,6 +71,17 @@ export interface ServeFromCacheOptions {
    * cached row is still better than an empty slot once live has already been tried.
    */
   strict?: boolean;
+  /**
+   * Filter cache rows to a specific generator `PROMPT_VERSION` (e.g. `"v4"`). Rows with
+   * a different or `NULL` `prompt_version` are excluded.
+   *
+   * Opt-in per generator: callers that don't pass this keep the pre-`prompt_version`
+   * behaviour (no filter). Use when bumping a generator's PROMPT_VERSION so stale rows
+   * written under an older prompt stop being served.
+   *
+   * See migration `20260418180000_companion_cache_prompt_version.sql`.
+   */
+  promptVersion?: string;
 }
 
 /**
@@ -99,7 +110,7 @@ export async function serveFromCache(
     options = excludeIdsOrOptions ?? {};
   }
 
-  const { userId, marketDirection, excludeIds, strict } = options;
+  const { userId, marketDirection, excludeIds, strict, promptVersion } = options;
   const now = new Date().toISOString();
 
   // Step 1: Get per-user seen entries (if userId provided)
@@ -139,6 +150,7 @@ export async function serveFromCache(
     limit: 24,
     now,
     randomPickCap: 12,
+    promptVersion,
   });
   if (picked) {
     logCacheServeTelemetry(companionType, "none");
@@ -156,6 +168,7 @@ export async function serveFromCache(
       limit: 24,
       now,
       randomPickCap: 12,
+      promptVersion,
     });
     if (picked2) {
       logCacheServeTelemetry(companionType, "market");
@@ -179,6 +192,7 @@ export async function serveFromCache(
     limit: 40,
     now,
     randomPickCap: 15,
+    promptVersion,
   });
   if (picked3) {
     logCacheServeTelemetry(companionType, "repeat_or_lower_quality");
@@ -201,6 +215,8 @@ interface TryServeParams {
   now: string;
   /** Random pick among the first N rows of the filtered pool (default 3). */
   randomPickCap?: number;
+  /** Restrict to rows matching this generator PROMPT_VERSION, if set. */
+  promptVersion?: string;
 }
 
 async function tryServe(
@@ -219,6 +235,13 @@ async function tryServe(
       .order("last_served_at", { ascending: true, nullsFirst: true })
       .order("used_count", { ascending: true })
       .limit(params.limit);
+
+    // Prompt-version filter (opt-in): generators bump their PROMPT_VERSION when
+    // the prompt/seed/quality rules materially change, and pass it here so rows
+    // written under older prompts stop being served.
+    if (params.promptVersion) {
+      query = query.eq("prompt_version", params.promptVersion);
+    }
 
     // Market direction filter
     if (params.marketDirection) {
