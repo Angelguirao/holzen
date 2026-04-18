@@ -245,7 +245,7 @@ export function ThresholdFrequencyEstimator({
       <div className="flex items-start gap-2 rounded-md border border-border/40 bg-muted/30 px-3 py-2.5">
         <Activity className="h-3 w-3 text-primary/50 mt-0.5 shrink-0" />
         <div className="space-y-0.5">
-          <p className="text-xs font-mono text-foreground/70 leading-snug pb-4">
+          <p className="text-xs font-mono text-foreground/70 leading-snug pb-2">
             {t('threshold.estimator.result', 'You\'d have paused ~{{count}} times last month', {
               count: stats.crossings30d,
             })}
