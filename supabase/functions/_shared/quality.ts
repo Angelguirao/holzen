@@ -86,7 +86,13 @@ const QUALITY_CONFIGS: Record<string, QualityConfig> = {
   },
   ground_nudge: {
     minBodyLength: 80,
-    maxBodyLength: 400,
+    // Grounding bodies have to fit a bias explanation + researcher/year citation
+    // + a "connection to the moment" closing sentence. 400 was too tight (Gemini
+    // consistently produced ~450-500 chars for 3 sentences) and caused
+    // `body_too_long` rejects on otherwise healthy live generations. 500 aligns
+    // with zoom-out and still keeps the UI card compact. The structuring prompt
+    // in grounding.ts references this cap explicitly — keep them in sync.
+    maxBodyLength: 500,
     minTitleWords: 1,
     maxTitleWords: 15,
     bodyField: "body",

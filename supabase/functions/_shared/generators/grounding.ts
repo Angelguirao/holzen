@@ -29,7 +29,7 @@ import { searchLibrary, paperToGrounding, recordLibraryServe } from "../content-
 import { getPhaseConfig } from "../phase-config.ts";
 
 /** Bump when the search query, structuring prompt, or quality rules change. */
-export const PROMPT_VERSION = "v3";
+export const PROMPT_VERSION = "v4";
 
 /**
  * Temporarily disable the Phase-1 library lookup for grounding.
@@ -394,7 +394,7 @@ DIVERSITY: Use a different journal/venue angle when possible. Do not recycle the
 
 TONE: Calm, grounding, educational. Like a professor gently explaining why your brain is lying to you right now.
 TITLE: Name the bias or finding clearly (5-15 words). Should feel like a section heading in a textbook.
-BODY: 2-3 sentences that explain the research finding and why it matters right now. Reference the researchers by name and year.
+BODY: 2-3 sentences (≤480 characters total, hard ceiling 500) that explain the research finding and why it matters right now. Reference the researchers by name and year. Keep each sentence tight — trim filler before adding a third sentence.
 CITATION: Formatted as "Author(s) (Year), Paper Title" — exactly as it appears in the search results.
 
 ACCURACY RULES (CRITICAL):
@@ -429,7 +429,7 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
           type: "object",
           properties: {
             title: { type: "string", description: "Short bias/finding summary (5-15 words)" },
-            body: { type: "string", description: "2-3 sentences referencing researchers and years" },
+            body: { type: "string", description: "2-3 sentences referencing researchers and years; ≤480 characters total (hard ceiling 500)" },
             citation: { type: "string", description: "Formatted: Author(s) (Year), Paper Title" },
             url: { type: "string", description: "Citation URL copied character-for-character" },
           },

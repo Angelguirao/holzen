@@ -110,7 +110,7 @@ When `selectIntervention` picks **trap** as the primary intervention:
 | **Academic mode** | Perplexity `search_mode: "academic"` for research-quality results. |
 | **Specificity gate** | Requires researcher names, years, "et al.", or DOI. |
 | **Citation format** | Required: "Author(s) (Year), Paper Title" — validated during structuring. |
-| **Quality gate** | Length (80–400 chars body), banned terms, Bitcoin-only, sentence diversity. |
+| **Quality gate** | Length (80–500 chars body; structuring prompt targets ≤480 to leave headroom), banned terms, Bitcoin-only, sentence diversity. |
 | **Fallbacks** | Library → cache → live → curated ensures something always ships. |
 
 ---
