@@ -50,25 +50,13 @@ echo "Repo: $ROOT"
 # ---- 1. View safety lint -----------------------------------------------------
 step "1/5  View safety lint (CREATE OR REPLACE VIEW)"
 
-# Find migrations that use CREATE OR REPLACE VIEW. We can't statically know if
-# the column list changed in an unsafe way, but we can flag any migration that
-# uses the pattern WITHOUT a matching DROP VIEW IF EXISTS for the same view.
-unsafe=0
-while IFS= read -r f; do
-  # views that get CREATE OR REPLACE'd in this file
-  while IFS= read -r view; do
-    if ! grep -qiE "DROP VIEW IF EXISTS\s+(public\.)?${view}\b" "$f"; then
-      warn_check "$(basename "$f"): CREATE OR REPLACE VIEW ${view} without prior DROP VIEW IF EXISTS"
-      warn      "  → safe ONLY if the change is append-only (new columns at the END)."
-      warn      "  → see docs/ops/migration-view-safety.md"
-      unsafe=$((unsafe+1))
-    fi
-  done < <(grep -iE "CREATE OR REPLACE VIEW\s+(public\.)?[a-zA-Z_]+" "$f" \
-            | sed -E 's/.*CREATE OR REPLACE VIEW[[:space:]]+(public\.)?([a-zA-Z_]+).*/\2/I')
-done < <(grep -rliE "CREATE OR REPLACE VIEW" supabase/migrations 2>/dev/null || true)
-
-if [ "$unsafe" -eq 0 ]; then
-  ok "no risky CREATE OR REPLACE VIEW patterns"
+# Delegate to the dedicated Node linter. It parses each migration's column list
+# and only fails when a CREATE OR REPLACE VIEW would actually break Postgres
+# (non-append-only change without a prior DROP VIEW). Exit code 1 = fail CI.
+if node scripts/lint-view-migrations.mjs; then
+  ok "all CREATE OR REPLACE VIEW migrations are safe"
+else
+  fail_check "unsafe view migration(s) detected — fix before pushing (see output above)"
 fi
 
 # ---- 2. config.toml coverage -------------------------------------------------
