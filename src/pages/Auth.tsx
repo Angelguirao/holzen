@@ -139,10 +139,12 @@ const Auth = () => {
         <X className="h-5 w-5" />
       </Link>
       <div className="w-full max-w-sm space-y-8">
-        <NoxHeaderMain
-          title={t('common.holzen')}
-          subtitle={view === 'sign-up' ? t('auth.createAnAccount') : t('auth.signInToContinue')}
-        />
+        <header className="space-y-3">
+          <h1 className="text-xs font-mono tracking-[0.25em] uppercase text-foreground/80">Holzen</h1>
+          <p className="text-sm leading-relaxed text-muted-foreground">
+            {view === 'sign-up' ? t('auth.createAnAccount') : t('auth.signInToContinue')}
+          </p>
+        </header>
 
         <Button variant="outline" className="w-full font-mono text-xs" onClick={handleGoogle}>
           {t('auth.continueWithGoogle')}
