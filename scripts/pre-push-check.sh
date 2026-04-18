@@ -1,0 +1,167 @@
+#!/usr/bin/env bash
+# scripts/pre-push-check.sh
+#
+# Pre-push checklist for Holzen.
+#
+# Run this BEFORE `git push` to catch the things Lovable's GitHub sync
+# can't catch for you:
+#   1. Migrations that fail on a fresh `supabase db reset`
+#      (the silent-failure mode that desyncs repo from live DB).
+#   2. View migrations using the unsafe `CREATE OR REPLACE VIEW`
+#      column-rename pattern.
+#   3. Edge functions registered in supabase/config.toml.
+#   4. Edge function Deno typecheck.
+#   5. Frontend build + tests.
+#
+# Usage:
+#   npm run check:prepush
+#
+# Requirements (skipped gracefully if absent):
+#   - supabase CLI                (for db reset)
+#   - docker / supabase start     (for local stack)
+#   - deno                        (for check:edge)
+#
+# Exit codes:
+#   0  all checks passed (or skipped because optional tooling missing)
+#   1  at least one REQUIRED check failed
+set -uo pipefail
+
+# ---- pretty output -----------------------------------------------------------
+RED=$'\033[31m'; GREEN=$'\033[32m'; YELLOW=$'\033[33m'; BLUE=$'\033[34m'; BOLD=$'\033[1m'; RESET=$'\033[0m'
+
+step()  { printf "\n${BOLD}${BLUE}▶ %s${RESET}\n" "$*"; }
+ok()    { printf "  ${GREEN}✓${RESET} %s\n" "$*"; }
+warn()  { printf "  ${YELLOW}⚠${RESET} %s\n" "$*"; }
+fail()  { printf "  ${RED}✗${RESET} %s\n" "$*"; }
+skip()  { printf "  ${YELLOW}↷ skipped:${RESET} %s\n" "$*"; }
+
+FAILED=0
+WARNED=0
+fail_check() { FAILED=$((FAILED+1)); fail "$*"; }
+warn_check() { WARNED=$((WARNED+1)); warn "$*"; }
+
+# ---- repo root ---------------------------------------------------------------
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$ROOT"
+
+echo "${BOLD}Holzen pre-push checklist${RESET}"
+echo "Repo: $ROOT"
+
+# ---- 1. View safety lint -----------------------------------------------------
+step "1/5  View safety lint (CREATE OR REPLACE VIEW)"
+
+# Find migrations that use CREATE OR REPLACE VIEW. We can't statically know if
+# the column list changed in an unsafe way, but we can flag any migration that
+# uses the pattern WITHOUT a matching DROP VIEW IF EXISTS for the same view.
+unsafe=0
+while IFS= read -r f; do
+  # views that get CREATE OR REPLACE'd in this file
+  while IFS= read -r view; do
+    if ! grep -qiE "DROP VIEW IF EXISTS\s+(public\.)?${view}\b" "$f"; then
+      warn_check "$(basename "$f"): CREATE OR REPLACE VIEW ${view} without prior DROP VIEW IF EXISTS"
+      warn      "  → safe ONLY if the change is append-only (new columns at the END)."
+      warn      "  → see docs/ops/migration-view-safety.md"
+      unsafe=$((unsafe+1))
+    fi
+  done < <(grep -iE "CREATE OR REPLACE VIEW\s+(public\.)?[a-zA-Z_]+" "$f" \
+            | sed -E 's/.*CREATE OR REPLACE VIEW[[:space:]]+(public\.)?([a-zA-Z_]+).*/\2/I')
+done < <(grep -rliE "CREATE OR REPLACE VIEW" supabase/migrations 2>/dev/null || true)
+
+if [ "$unsafe" -eq 0 ]; then
+  ok "no risky CREATE OR REPLACE VIEW patterns"
+fi
+
+# ---- 2. config.toml coverage -------------------------------------------------
+step "2/5  Edge functions registered in supabase/config.toml"
+
+if [ ! -f supabase/config.toml ]; then
+  warn_check "supabase/config.toml not found"
+else
+  missing=0
+  while IFS= read -r dir; do
+    name="$(basename "$dir")"
+    [ "$name" = "_shared" ] && continue
+    [ -f "$dir/index.ts" ] || continue
+    if ! grep -qE "^\[functions\.${name}\]" supabase/config.toml; then
+      fail_check "function '${name}' has no [functions.${name}] block in supabase/config.toml"
+      missing=$((missing+1))
+    fi
+  done < <(find supabase/functions -mindepth 1 -maxdepth 1 -type d 2>/dev/null)
+  if [ "$missing" -eq 0 ]; then ok "all functions registered"; fi
+fi
+
+# ---- 3. Edge function typecheck ---------------------------------------------
+step "3/5  Edge function typecheck (npm run check:edge)"
+
+if npm run | grep -qE "^\s+check:edge"; then
+  if npm run check:edge --silent 2>&1 | tee /tmp/.check-edge.log | tail -20; then
+    ok "deno check passed (or skipped because Deno missing)"
+  else
+    fail_check "npm run check:edge failed (see /tmp/.check-edge.log)"
+  fi
+else
+  skip "npm run check:edge is not defined"
+fi
+
+# ---- 4. Frontend build + tests ----------------------------------------------
+step "4/5  Frontend tests + build"
+
+if npm run test --silent -- --run 2>&1 | tail -30; then
+  ok "vitest passed"
+else
+  fail_check "npm run test failed"
+fi
+
+if npm run build --silent 2>&1 | tail -20; then
+  ok "vite build passed"
+else
+  fail_check "npm run build failed"
+fi
+
+# ---- 5. Local supabase db reset ---------------------------------------------
+step "5/5  supabase db reset (local stack)"
+
+if ! command -v supabase >/dev/null 2>&1; then
+  skip "supabase CLI not installed — install from https://supabase.com/docs/guides/local-development"
+elif ! command -v docker >/dev/null 2>&1; then
+  skip "docker not installed — required for local supabase stack"
+else
+  # Make sure we're operating on the LOCAL stack, never linked.
+  status_out="$(supabase status 2>&1 || true)"
+  if echo "$status_out" | grep -qiE "not running|no.*containers"; then
+    warn "local supabase stack is down — starting it (this may take a minute)…"
+    if ! supabase start >/tmp/.supabase-start.log 2>&1; then
+      fail_check "supabase start failed (see /tmp/.supabase-start.log)"
+      supabase=down
+    fi
+  fi
+
+  if [ "${supabase:-}" != "down" ]; then
+    echo "  Running: supabase db reset --local"
+    if supabase db reset --local 2>&1 | tail -30; then
+      ok "all migrations replayed cleanly on a fresh local DB"
+    else
+      fail_check "supabase db reset --local failed — a migration would break a fresh deploy"
+      fail      "  → fix the failing migration BEFORE pushing."
+    fi
+  fi
+fi
+
+# ---- summary ----------------------------------------------------------------
+printf "\n${BOLD}── Summary ──${RESET}\n"
+printf "  failures: %s\n" "$FAILED"
+printf "  warnings: %s\n" "$WARNED"
+
+if [ "$FAILED" -gt 0 ]; then
+  printf "\n${RED}${BOLD}✗ Pre-push checks FAILED. Do not push.${RESET}\n"
+  exit 1
+fi
+
+if [ "$WARNED" -gt 0 ]; then
+  printf "\n${YELLOW}${BOLD}⚠ Pre-push checks passed with warnings.${RESET}\n"
+  printf "  Review the warnings above before pushing.\n"
+  exit 0
+fi
+
+printf "\n${GREEN}${BOLD}✓ Pre-push checks all clear. Safe to push.${RESET}\n"
+exit 0
