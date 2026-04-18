@@ -13,7 +13,9 @@ import {
 import { CompanionFeedback } from '@/components/CompanionFeedback';
 import { CompanionFocusLayout } from '@/components/companion/CompanionFocusLayout';
 import { GroundingFullView } from '@/components/companion/GroundingFullView';
+import { GroundingEnrichment } from '@/components/companion/GroundingEnrichment';
 import { HistoryThread } from '@/components/companion/HistoryThread';
+import { useGroundingEnrichment } from '@/hooks/use-grounding-enrichment';
 import { InterventionCrossRefBadge } from '@/components/companion/InterventionCrossRefBadge';
 import { SaveThisMomentButton } from '@/components/companion/SaveThisMomentButton';
 import { useStaggeredReveal } from '@/components/companion/use-staggered-reveal';
@@ -108,6 +110,11 @@ export default function CompanionGroundingPage() {
 
   const revealed = useStaggeredReveal(BREATHING_ROOM_MS);
 
+  const enrichmentQuery = useGroundingEnrichment({
+    citation: nudge?.citation ?? null,
+    url: nudge?.url ?? null,
+  });
+
   const handleBack = useCallback(() => {
     const st = location.state as { from?: string } | undefined;
     if (st?.from === 'library') navigate('/library');
@@ -153,6 +160,15 @@ export default function CompanionGroundingPage() {
           error={nudgeError}
           onRetry={retryNudge}
           mood={mood}
+          enrichmentSlot={
+            nudge?.citation ? (
+              <GroundingEnrichment
+                data={enrichmentQuery.data ?? null}
+                loading={enrichmentQuery.isLoading}
+                error={enrichmentQuery.isError}
+              />
+            ) : undefined
+          }
         />
 
         {nudge && cacheRelaxations.nudge && (
