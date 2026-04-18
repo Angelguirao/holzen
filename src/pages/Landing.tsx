@@ -342,8 +342,8 @@ const Landing = () => {
             <SectionLabel>{t('landing.questions')}</SectionLabel>
             <Accordion type="single" collapsible className="w-full">
               {FAQ.map((item) => (
-                <AccordionItem key={item.key} value={item.key} className="border-border/40">
-                  <AccordionTrigger className="text-sm text-foreground hover:no-underline py-4 text-left [[data-state]:first-child_&]:pt-0">
+                <AccordionItem key={item.key} value={item.key} className="border-border/40 [&:first-child_button]:pt-0">
+                  <AccordionTrigger className="text-sm text-foreground hover:no-underline py-4 text-left">
                     {item.q}
                   </AccordionTrigger>
                   <AccordionContent className="whitespace-pre-line text-xs text-muted-foreground leading-relaxed pb-4">
