@@ -102,7 +102,7 @@ const QUALITY_CONFIGS: Record<string, QualityConfig> = {
   historical_insight: {
     minBodyLength: 80,
     maxBodyLength: 800,
-    minTitleWords: 1,
+    minTitleWords: 3,
     maxTitleWords: 15,
     bodyField: "btcInsight",
     requiredFields: ["title", "btcInsight"],
