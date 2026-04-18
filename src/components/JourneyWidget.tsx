@@ -234,7 +234,7 @@ export function JourneyWidget({ reflections, practiceEntries = [], streakFreezeD
       </div>
 
       {/* Legend */}
-      <div className="flex items-center flex-wrap gap-x-3 gap-y-1 text-[9px] font-mono text-muted-foreground/50">
+      <div className="flex items-center flex-wrap gap-x-3 gap-y-1 text-[9px] font-mono" style={{ color: '#C1CBD7' }}>
         <span className="flex items-center gap-1 text-xs">
           <span className="h-2 w-2 rounded-sm bg-primary" /> {t('streakTimeline.legend.outcomeLogged')}
         </span>
@@ -245,7 +245,7 @@ export function JourneyWidget({ reflections, practiceEntries = [], streakFreezeD
           <span className="h-2 w-2 rounded-sm bg-accent-foreground/20" /> {t('streakTimeline.legend.practiceOnly', 'Practice only')}
         </span>
         <span className="flex items-center gap-1 text-xs">
-          <span className="h-2 w-2 rounded-sm bg-secondary/60 border border-border/30" /> {t('streakTimeline.legend.streakFreeze')}
+          <span className="h-2 w-2 rounded-sm bg-secondary/60 border" style={{ borderColor: '#C1CBD7' }} /> {t('streakTimeline.legend.streakFreeze')}
         </span>
       </div>
 
