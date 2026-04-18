@@ -1126,7 +1126,7 @@ function ChangeEmailSection() {
         onClick={changeEmail}
         disabled={changing || !newEmail}
         size="sm"
-        className="w-full font-mono text-xs"
+        className="w-full font-mono text-xs mt-4"
       >
         {changing ? t('settings.sendingConfirmation') : t('settings.changeEmail')}
       </Button>
