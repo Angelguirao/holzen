@@ -382,10 +382,10 @@ export async function generateZoomOut(params: GenerateZoomOutParams): Promise<Zo
   const { svcClient, context, mood, recentTitles, userId, zoomOutAngle, forceLive, log } = params;
   const phases = getPhaseConfig();
 
-  // ── Phase 2: Cache (no library type for zoom-out) ──
+  // ── Phase 2: Cache (no library type for zoom-out; strict — fall through to live if no fresh row) ──
   if (phases.cache && !forceLive) {
     const marketDirection = parseMarketDirection(context);
-    const cached = await serveFromCache(svcClient, COMPANION_ZOOM_OUT_DEEP_TIME, "en", { userId, marketDirection });
+    const cached = await serveFromCache(svcClient, COMPANION_ZOOM_OUT_DEEP_TIME, "en", { userId, marketDirection, strict: true });
     if (cached) {
       log("zoomOut resolved from cache (phase 2)");
       const prices = await fetchHistoricalAndCurrentPrices(svcClient, context, log);

@@ -31,6 +31,21 @@ import { getPhaseConfig } from "../phase-config.ts";
 /** Bump when the search query, structuring prompt, or quality rules change. */
 export const PROMPT_VERSION = "v3";
 
+/**
+ * Temporarily disable the Phase-1 library lookup for grounding.
+ *
+ * As of 2026-04-18 `content_library` has no rows of `type: "paper"` and the
+ * ingestion pipeline for papers is parked. Every library call would only emit
+ * `library_search_rejected reason:"empty"` and add an unnecessary DB round-trip
+ * per grounding request. Skipping the phase entirely is faster and keeps the
+ * edge logs quieter.
+ *
+ * Flip this back to `true` when we resume ingesting papers into
+ * `content_library` (or replace with a `COMPANION_PHASE_LIBRARY_GROUNDING`
+ * env-var toggle if we need runtime control).
+ */
+const GROUNDING_LIBRARY_ENABLED = false;
+
 // ── Public types ──
 
 export interface GroundingResult {
@@ -127,14 +142,21 @@ async function tryLibrary(
   return null;
 }
 
-/** Try companion_cache for grounding. */
+/**
+ * Try companion_cache for grounding.
+ *
+ * `strict: true` (used by Phase-2 main flow) skips the pass-3 `repeat_or_lower_quality`
+ * relaxation so an empty strict pool falls through to Phase-3 live. `strict: false`
+ * (used by `serveFallback` after live failure) keeps pass-3 as a last-resort serve.
+ */
 async function tryCache(
   svcClient: any,
   userId?: string,
   marketDirection?: "up" | "down" | "neutral",
   excludeIds?: string[],
+  strict = false,
 ): Promise<GroundingResult | null> {
-  const cached = await serveFromCache(svcClient, "ground_nudge", "en", { userId, marketDirection, excludeIds });
+  const cached = await serveFromCache(svcClient, "ground_nudge", "en", { userId, marketDirection, excludeIds, strict });
   if (cached) {
     return {
       data: cached.data,
@@ -163,7 +185,7 @@ async function serveFallback(
     return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
   }
   const phases = getPhaseConfig();
-  if (phases.library) {
+  if (phases.library && GROUNDING_LIBRARY_ENABLED) {
     const lib = await tryLibrary(svcClient, userId);
     if (lib) return lib;
   }
@@ -194,8 +216,8 @@ export async function generateGrounding(params: GenerateGroundingParams): Promis
   const phases = getPhaseConfig();
 
   if (!forceLive) {
-  // ── Phase 1: Library ──
-  if (phases.library) {
+  // ── Phase 1: Library (disabled for grounding — see GROUNDING_LIBRARY_ENABLED) ──
+  if (phases.library && GROUNDING_LIBRARY_ENABLED) {
     const lib = await tryLibrary(svcClient, userId);
     if (lib) {
       log("grounding resolved from library (phase 1)");
@@ -203,9 +225,9 @@ export async function generateGrounding(params: GenerateGroundingParams): Promis
     }
   }
 
-  // ── Phase 2: Cache ──
+  // ── Phase 2: Cache (strict — no pass-3 repeats; fall through to live if strict pool empty) ──
   if (phases.cache) {
-    const cached = await tryCache(svcClient, userId, marketDirectionForCache);
+    const cached = await tryCache(svcClient, userId, marketDirectionForCache, undefined, true);
     if (cached) {
       log("grounding resolved from cache (phase 2)");
       return cached;

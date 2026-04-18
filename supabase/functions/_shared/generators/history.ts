@@ -133,14 +133,21 @@ async function tryLibrary(
   return null;
 }
 
-/** Try companion_cache for history. */
+/**
+ * Try companion_cache for history.
+ *
+ * `strict: true` (used by Phase-2 main flow) skips the pass-3 `repeat_or_lower_quality`
+ * relaxation so an empty strict pool falls through to Phase-3 live. `strict: false`
+ * (used by `serveFallback` after live failure) keeps pass-3 as a last-resort serve.
+ */
 async function tryCache(
   svcClient: any,
   userId?: string,
   marketDirection?: "up" | "down" | "neutral",
   excludeIds?: string[],
+  strict = false,
 ): Promise<HistoryResult | null> {
-  const cached = await serveFromCache(svcClient, "historical_insight", "en", { userId, marketDirection, excludeIds });
+  const cached = await serveFromCache(svcClient, "historical_insight", "en", { userId, marketDirection, excludeIds, strict });
   if (cached) {
     return {
       data: cached.data,
@@ -206,9 +213,9 @@ export async function generateHistory(params: GenerateHistoryParams): Promise<Hi
     }
   }
 
-  // ── Phase 2: Cache ──
+  // ── Phase 2: Cache (strict — no pass-3 repeats; fall through to live if strict pool empty) ──
   if (phases.cache) {
-    const cached = await tryCache(svcClient, userId, marketDirection);
+    const cached = await tryCache(svcClient, userId, marketDirection, undefined, true);
     if (cached) {
       log("history resolved from cache (phase 2)");
       return cached;

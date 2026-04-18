@@ -26,6 +26,29 @@ function logCacheServeTelemetry(companionType: string, relaxation: CacheServeRel
   }
 }
 
+/**
+ * Emitted when the Phase-2 main-flow cache call (strict) finds no fresh+quality row and
+ * yields to live generation. Grep: `cache_strict_miss` or `"holzen_event":"cache_strict_miss"`.
+ *
+ * Diagnostic only — expected when the user has seen the current cache pool within the
+ * freshness window. A burst of these means "live is getting its shot" and is healthy; a
+ * total absence of them combined with many `cache_serve relaxation:"repeat_or_lower_quality"`
+ * events means the strict-mode plumbing is not being exercised.
+ */
+function logCacheStrictMiss(companionType: string): void {
+  try {
+    console.log(
+      JSON.stringify({
+        holzen_event: "cache_strict_miss",
+        companion_type: companionType,
+        ts: new Date().toISOString(),
+      }),
+    );
+  } catch {
+    /* ignore */
+  }
+}
+
 /** Options for context-aware and per-user cache serving */
 export interface ServeFromCacheOptions {
   /** User ID — if provided, excludes entries this user has already seen */
@@ -34,6 +57,20 @@ export interface ServeFromCacheOptions {
   marketDirection?: "up" | "down" | "neutral";
   /** Specific cache entry IDs to exclude */
   excludeIds?: string[];
+  /**
+   * When true, skip the pass-3 `repeat_or_lower_quality` relaxation and return `null`
+   * instead of a stale/seen row.
+   *
+   * Intended for the Phase-2 **main flow** in each generator, so that an empty strict
+   * pool falls through to Phase-3 live generation instead of being pre-empted by a
+   * previously-seen cache row (the original bug that made live almost never run when
+   * the per-user freshness window, `COMPANION_SERVE_FRESHNESS_DAYS`, covered the
+   * whole cache).
+   *
+   * The `serveFallback` path (post-live failure) should leave this `false` — a degraded
+   * cached row is still better than an empty slot once live has already been tried.
+   */
+  strict?: boolean;
 }
 
 /**
@@ -45,7 +82,8 @@ export interface ServeFromCacheOptions {
  * 2. First pass: quality_score ≥ 2, optional market_regime filter → `relaxation: "none"`.
  * 3. Second pass (only if marketDirection set): quality ≥ 2, any regime → `"market"`.
  * 4. Third pass: any quality, seen rows allowed again → `"repeat_or_lower_quality"`.
- * 5. Returns null if all passes fail.
+ *    Skipped entirely when `options.strict` is true — see option docs.
+ * 5. Returns null if all (enabled) passes fail.
  */
 export async function serveFromCache(
   svcClient: any,
@@ -61,7 +99,7 @@ export async function serveFromCache(
     options = excludeIdsOrOptions ?? {};
   }
 
-  const { userId, marketDirection, excludeIds } = options;
+  const { userId, marketDirection, excludeIds, strict } = options;
   const now = new Date().toISOString();
 
   // Step 1: Get per-user seen entries (if userId provided)
@@ -126,7 +164,13 @@ export async function serveFromCache(
     }
   }
 
-  // Step 4: Third pass — any quality, ignore user seen (better to repeat than show nothing)
+  // Step 4: Third pass — any quality, ignore user seen (better to repeat than show nothing).
+  // Skipped in strict mode so the caller (Phase-2 main flow) can fall through to live
+  // instead of being pre-empted by a seen/low-quality row.
+  if (strict) {
+    logCacheStrictMiss(companionType);
+    return null;
+  }
   const picked3 = await tryServe(svcClient, {
     companionType,
     language,
