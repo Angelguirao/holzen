@@ -145,13 +145,6 @@ const Landing = () => {
             transition={{ duration: 0.8, delay: 0.2 }}
             className="space-y-6"
           >
-            {/* Breathing dot */}
-            <motion.div
-              className="mx-auto w-3 h-3 rounded-full bg-primary/20"
-              animate={prefersReduced ? {} : { scale: [1, 1.8, 1], opacity: [0.3, 0.6, 0.3] }}
-              transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-            />
-
             <h2 className="text-2xl sm:text-3xl leading-tight tracking-tight text-foreground">
               {t('landing.hero')}
             </h2>
