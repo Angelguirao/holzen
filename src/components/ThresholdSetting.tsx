@@ -35,7 +35,7 @@ export const ThresholdSetting = forwardRef<HTMLDivElement, Props>(function Thres
       <div className="space-y-4">
         <div className="space-y-2">
           <div className="flex items-center gap-2">
-            <ArrowUp className="h-3.5 w-3.5 text-primary" />
+            <ArrowUp className="h-3.5 w-3.5" style={{ color: '#22c55e' }} />
             <p className="text-sm text-muted-foreground font-mono">{t('threshold.priceRises')}</p>
           </div>
           <p className="text-3xl font-mono tracking-tight">{upVal.toFixed(1)}%</p>
