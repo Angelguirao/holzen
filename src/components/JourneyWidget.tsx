@@ -235,16 +235,16 @@ export function JourneyWidget({ reflections, practiceEntries = [], streakFreezeD
 
       {/* Legend */}
       <div className="flex items-center flex-wrap gap-x-3 gap-y-1 text-[9px] font-mono text-muted-foreground/50">
-        <span className="flex items-center gap-1">
+        <span className="flex items-center gap-1 text-xs">
           <span className="h-2 w-2 rounded-sm bg-primary" /> {t('streakTimeline.legend.outcomeLogged')}
         </span>
-        <span className="flex items-center gap-1">
+        <span className="flex items-center gap-1 text-xs">
           <span className="h-2 w-2 rounded-sm bg-primary/30" /> {t('streakTimeline.legend.pausedNoOutcome', 'Paused (no outcome)')}
         </span>
-        <span className="flex items-center gap-1">
+        <span className="flex items-center gap-1 text-xs">
           <span className="h-2 w-2 rounded-sm bg-accent-foreground/20" /> {t('streakTimeline.legend.practiceOnly', 'Practice only')}
         </span>
-        <span className="flex items-center gap-1">
+        <span className="flex items-center gap-1 text-xs">
           <span className="h-2 w-2 rounded-sm bg-secondary/60" /> {t('streakTimeline.legend.streakFreeze')}
         </span>
       </div>
