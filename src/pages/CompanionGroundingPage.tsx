@@ -155,9 +155,9 @@ export default function CompanionGroundingPage() {
           mood={mood}
         />
 
-        {nudge && cacheRelaxations.grounding && (
+        {nudge && cacheRelaxations.nudge && (
           <p className="text-[10px] text-muted-foreground/55 font-mono leading-snug" role="status">
-            {t(`companions.cacheRelaxation.${cacheRelaxations.grounding}`)}
+            {t(`companions.cacheRelaxation.${cacheRelaxations.nudge}`)}
           </p>
         )}
 
