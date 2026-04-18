@@ -19,6 +19,7 @@ import { HistoryThread } from '@/components/companion/HistoryThread';
 import { InterventionCrossRefBadge } from '@/components/companion/InterventionCrossRefBadge';
 import { SaveThisMomentButton } from '@/components/companion/SaveThisMomentButton';
 import { useStaggeredReveal } from '@/components/companion/use-staggered-reveal';
+import { useFullviewTelemetry } from '@/hooks/use-fullview-telemetry';
 import { PageMeta } from '@/components/PageMeta';
 
 const SEVERITY_NUMBER: Record<string, number> = { mild: 3, moderate: 6, high: 10 };
@@ -104,6 +105,7 @@ export default function CompanionHistoryPage() {
   ]);
 
   const revealed = useStaggeredReveal(BREATHING_ROOM_MS);
+  useFullviewTelemetry('history', reflectionId);
 
   const handleBack = useCallback(() => {
     const st = location.state as { from?: string } | undefined;

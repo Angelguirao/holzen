@@ -523,6 +523,10 @@
           "researchersHeading": "Researchers",
           "citationCount_one": "Cited by {{count}} paper",
           "citationCount_other": "Cited by {{count}} papers"
+        },
+        "relatedBiases": {
+          "label": "Biases surfaced this month",
+          "heading": "Other biases this month"
         }
       },
       "saveMoment": {

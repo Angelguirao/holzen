@@ -15,7 +15,9 @@ import { CompanionFocusLayout } from '@/components/companion/CompanionFocusLayou
 import { GroundingFullView } from '@/components/companion/GroundingFullView';
 import { GroundingEnrichment } from '@/components/companion/GroundingEnrichment';
 import { HistoryThread } from '@/components/companion/HistoryThread';
+import { RelatedBiasesThisMonth } from '@/components/companion/RelatedBiasesThisMonth';
 import { useGroundingEnrichment } from '@/hooks/use-grounding-enrichment';
+import { useFullviewTelemetry } from '@/hooks/use-fullview-telemetry';
 import { InterventionCrossRefBadge } from '@/components/companion/InterventionCrossRefBadge';
 import { SaveThisMomentButton } from '@/components/companion/SaveThisMomentButton';
 import { useStaggeredReveal } from '@/components/companion/use-staggered-reveal';
@@ -109,6 +111,7 @@ export default function CompanionGroundingPage() {
   ]);
 
   const revealed = useStaggeredReveal(BREATHING_ROOM_MS);
+  useFullviewTelemetry('grounding', reflectionId);
 
   const enrichmentQuery = useGroundingEnrichment({
     citation: nudge?.citation ?? null,
@@ -195,6 +198,11 @@ export default function CompanionGroundingPage() {
             />
           </div>
         )}
+
+        <RelatedBiasesThisMonth
+          currentReflectionId={reflectionId}
+          currentTitle={nudge?.title ?? null}
+        />
 
         <HistoryThread companion="grounding" currentReflectionId={reflectionId} />
       </div>
