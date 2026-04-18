@@ -500,7 +500,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
           <AccordionContent className="space-y-6 pb-4">
             {/* 1 BTC = 1 BTC mode */}
             <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.btcMode')}</p>
+              <p className="text-xs font-mono text-white uppercase tracking-wider">{t('settings.btcMode')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
                 {t('settings.btcModeDesc')}
               </p>
