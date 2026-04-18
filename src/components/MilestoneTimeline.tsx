@@ -184,12 +184,12 @@ export function MilestoneTimeline({ reflections, practiceEntries = [], letters =
         return (
           <div key={`${milestone.label}-${milestone.date}`} className="flex items-stretch gap-3">
             {/* Timeline line + dot */}
-            <div className="flex flex-col items-center w-6 shrink-0">
-              {!isFirst && <div className="w-px flex-1 bg-border/40" />}
-              <div className="rounded-full p-1.5 bg-muted border border-border/60">
+            <div className="relative flex flex-col items-center w-6 shrink-0">
+              {!isFirst && <div className="absolute top-0 bottom-1/2 w-px bg-border/40" />}
+              {!isLast && <div className="absolute top-1/2 bottom-0 w-px bg-border/40" />}
+              <div className="my-auto rounded-full p-1.5 bg-muted border border-border/60 z-10">
                 <Icon className="h-3 w-3 text-primary/70" />
               </div>
-              {!isLast && <div className="w-px flex-1 bg-border/40" />}
             </div>
 
             {/* Content */}
