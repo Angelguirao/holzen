@@ -129,7 +129,10 @@ export interface SignalResult {
     url: string;
     quote?: string;
   } | null;
-  source: "live" | "cache" | "curated" | "empty";
+  /** `library` = served from `content_library`; `cache` = served from runtime `companion_cache`. Keep
+   *  them distinct — they're populated and invalidated separately, and monitoring treats them as
+   *  different phases. */
+  source: "live" | "library" | "cache" | "curated" | "empty";
   cacheId: string | null;
   /** Set when `serveFromCache` served this row (not library / curated). */
   cacheRelaxation?: CacheServeRelaxation;
@@ -171,7 +174,7 @@ async function tryLibrary(
     const pick = libraryRows[Math.floor(Math.random() * Math.min(libraryRows.length, 3))];
     const result = essayToSignal(pick);
     recordLibraryServe(svcClient, userId, pick.id, "signal");
-    return { data: result, source: "cache", cacheId: null };
+    return { data: result, source: "library", cacheId: null };
   }
   return null;
 }

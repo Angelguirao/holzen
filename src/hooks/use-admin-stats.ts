@@ -7,6 +7,9 @@ interface CacheHitRow {
   companion_type: string | null;
   total_serves: number | null;
   cache_hits: number | null;
+  /** Added in migration `20260418120000_companion_serves_allow_library_source`; may be undefined
+   *  until Supabase regenerates types.ts. */
+  library_hits: number | null;
   live_generated: number | null;
   curated_fallbacks: number | null;
   cache_hit_pct: number | null;

@@ -33,12 +33,16 @@ export function shortModelName(model: string | null | undefined): string {
   return m.length > 28 ? `${m.slice(0, 26)}…` : m;
 }
 
-/** Tailwind classes for companion_serves.serve_source badges */
+/** Tailwind classes for companion_serves.serve_source badges.
+ *  `library` = content_library (curated catalog); `cache` = runtime companion_cache.
+ *  They're visually distinct so admins can tell which pool served a row. */
 export function serveSourceBadgeClass(source: string | null | undefined): string {
   if (!source) return 'bg-muted/25 text-muted-foreground/40';
   switch (source) {
     case 'live':
       return 'bg-primary/10 text-primary/80';
+    case 'library':
+      return 'bg-primary/5 text-primary/65 ring-1 ring-primary/20';
     case 'cache':
       return 'bg-secondary text-secondary-foreground/80';
     case 'curated':
