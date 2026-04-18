@@ -1,7 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { holzenEdgeError, holzenEdgeRun, holzenEdgeWarn } from "../_shared/holzen-edge-log.ts";
-import { coingeckoHeaders } from "../_shared/coingecko.ts";
+import { coingeckoHeaders, fetchCoinGeckoHistoryPrice } from "../_shared/coingecko.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -15,7 +15,14 @@ const DEFAULT_CHUNK_DAYS = 45;
 const DEFAULT_MAX_CHUNKS = 10;
 const ABSOLUTE_MAX_CHUNKS = 25;
 const COINGECKO_GAP_MS = 3000;
+const PER_DATE_GAP_MS = 1000;
 const MATCH_WINDOW_MS = 48 * 3600 * 1000;
+
+/**
+ * Hard cap per invocation when `mode: "per_date"` is in effect. 60 calls at
+ * 1s spacing ≈ 60s wall-clock, comfortably under the edge-function timeout.
+ */
+const PER_DATE_MAX_CALLS = 60;
 
 function parseDateKey(s: string): number | null {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) return null;
@@ -70,10 +77,19 @@ function closestPriceForTarget(
  * - `from` / `to`: `YYYY-MM-DD`, inclusive, UTC calendar dates.
  * - `onlyMissing` (optional, default `true`): skip dates that already exist in the table.
  * - `dryRun` (optional, default `false`): compute rows but do not upsert.
- * - `chunkDays` (optional, default 45): CoinGecko window size per HTTP call.
+ * - `mode` (optional, default `"range"`): `"range"` uses `/market_chart/range` (bulk,
+ *   efficient for contiguous spans but capped at ~365 days back on the demo
+ *   tier); `"per_date"` calls `/coins/bitcoin/history?date=…` once per date
+ *   (works for any historical year, paced `PER_DATE_GAP_MS` apart, capped at
+ *   `PER_DATE_MAX_CALLS` per invocation). Use **`per_date`** when `onlyMissing`
+ *   + a wide range leaves only a few gap dates (e.g. the 10 zoom-out anniversary
+ *   dates spanning a decade) — the endpoint swap avoids the demo-tier empty-
+ *   array problem that made `refresh-btc-prices` fail silently.
+ * - `chunkDays` (optional, default 45): CoinGecko window size per HTTP call. Ignored in `per_date` mode.
  * - `maxChunks` (optional, default 10, max 25): CoinGecko **calls** per invocation; if more
  *   days remain, response includes **`resumeFrom`** — POST again with **`from: resumeFrom`**
- *   and the **same** **`to`** until **`completed: true`** (multi-year / ~10y backfills).
+ *   and the **same** **`to`** until **`completed: true`** (multi-year / ~10y backfills). In
+ *   `per_date` mode this is replaced by `PER_DATE_MAX_CALLS`.
  *
  * **`from`/`to` span:** up to **4500** UTC calendar days (~12.3 years) per request body.
  */
@@ -151,6 +167,7 @@ serve(async (req) => {
 
     const onlyMissing = body.onlyMissing !== false;
     const dryRun = body.dryRun === true;
+    const mode: "range" | "per_date" = body.mode === "per_date" ? "per_date" : "range";
     const chunkDays = typeof body.chunkDays === "number" && body.chunkDays > 0 && body.chunkDays <= 90
       ? Math.floor(body.chunkDays)
       : DEFAULT_CHUNK_DAYS;
@@ -213,6 +230,72 @@ serve(async (req) => {
     let chunks = 0;
     let abortReason: string | null = null;
     let resumeFrom: string | null = null;
+
+    if (mode === "per_date") {
+      const fetchedAt = new Date().toISOString();
+      const limit = Math.min(allKeys.length, PER_DATE_MAX_CALLS);
+      const inserts: { date: string; price: number; fetched_at: string }[] = [];
+      let rateLimited = 0;
+      let other = 0;
+      let i = 0;
+      for (; i < limit; i++) {
+        const dateKey = allKeys[i];
+        if (i > 0) await new Promise((r) => setTimeout(r, PER_DATE_GAP_MS));
+        const hit = await fetchCoinGeckoHistoryPrice(dateKey);
+        chunks++;
+        if (!hit) { other++; continue; }
+        if ("rateLimited" in hit) {
+          rateLimited++;
+          abortReason = "rate_limited";
+          break;
+        }
+        inserts.push({ date: dateKey, price: hit.price, fetched_at: fetchedAt });
+      }
+
+      if (!dryRun && inserts.length > 0) {
+        const { error: upErr } = await supabase.from("btc_price_cache").upsert(inserts);
+        if (upErr) {
+          holzenEdgeError("backfill-btc", "upsert failed (per_date)", upErr);
+          return new Response(JSON.stringify({ error: "Upsert failed", detail: String(upErr) }), {
+            status: 500,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          });
+        }
+      }
+      daysUpserted += inserts.length;
+
+      // If we hit the call cap or aborted mid-run, the next unattempted key becomes resumeFrom.
+      if (i < allKeys.length) resumeFrom = allKeys[i] ?? null;
+
+      const completed = abortReason === null && resumeFrom === null;
+      const summary = abortReason
+        ? `per_date partial: ${daysUpserted} rows, ${chunks} calls, stopped=${abortReason}`
+        : resumeFrom
+        ? `per_date partial: ${daysUpserted} rows, ${chunks} calls, resumeFrom=${resumeFrom}`
+        : `per_date: upserted ${daysUpserted} rows, ${chunks} calls${dryRun ? " (dryRun)" : ""}`;
+      holzenEdgeRun("backfill-btc", "run complete", { ms: Date.now() - t0, summary });
+
+      return new Response(
+        JSON.stringify({
+          success: abortReason === null,
+          completed,
+          resumeFrom,
+          abortReason,
+          from: fromRaw,
+          to: toRaw,
+          onlyMissing,
+          dryRun,
+          mode,
+          maxChunks: PER_DATE_MAX_CALLS,
+          daysTargeted: allKeys.length,
+          daysUpserted,
+          chunks,
+          rateLimited,
+          otherFailures: other,
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
 
     for (let i = 0; i < allKeys.length; i += chunkDays) {
       if (chunks >= maxChunks) {
@@ -293,6 +376,7 @@ serve(async (req) => {
         to: toRaw,
         onlyMissing,
         dryRun,
+        mode,
         maxChunks,
         daysTargeted: allKeys.length,
         daysUpserted,

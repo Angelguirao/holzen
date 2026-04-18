@@ -56,8 +56,9 @@ Keeps btc_price_cache fresh so the Zoom Out companion never needs to call CoinGe
 
 ### Freshness contract (Zoom Out / `btc_price_cache`)
 
-- **Current day** price: updated whenever this job runs successfully (~15 min when cron is healthy).
+- **Current day** price: updated whenever this job runs successfully (~15 min when cron is healthy) via `/simple/price`.
 - **“On this day” (1–10 calendar years ago)** rows: refetched only when the row is **missing** or `fetched_at` is older than **24 hours** (see `refresh-btc-prices` — `recentThreshold`; count in `_shared/btc-on-this-day-config.ts`). Reduces CoinGecko calls; acceptable for **daily perspective copy**, not intraday precision.
+- **Endpoint (historical):** one call per missing anniversary date via `/coins/bitcoin/history?date=DD-MM-YYYY`, paced 1s apart. This endpoint works on the **free / demo** tier for any historical year; the older `/market_chart/range` approach silently capped at ~365 days back on free tier and left far-past rows empty (zoom-out logs reading `historical=0/10`).
 - **Calendar** alignment uses **UTC** date parts for “today” and anniversaries (same as the zoom-out generator).
 
 Tightening TTL or cron frequency trades **freshness vs CoinGecko rate limits** — see `docs/backlog/btc-price-cache-freshness.md`.
@@ -87,12 +88,15 @@ SELECT cron.schedule(
 - **`from`**, **`to`**: inclusive UTC calendar dates `YYYY-MM-DD` (same `date` keys as `btc_price_cache`). Span may be up to **4500** days (~12.3 years) per request.
 - **`onlyMissing`** (optional, default `true`): only insert dates that are not already in the table (idempotent replays).
 - **`dryRun`** (optional, default `false`): resolve prices from CoinGecko but **do not** write rows.
-- **`chunkDays`** (optional, default `45`): window size per `market_chart/range` call.
-- **`maxChunks`** (optional, default `10`, max `25`): CoinGecko HTTP calls **per invocation** (edge wall-clock). If more work remains, the JSON response sets **`completed: false`** and **`resumeFrom`** (`YYYY-MM-DD`). Call again with **`from: resumeFrom`** and the **same** **`to`** until **`completed: true`** (e.g. a **10-year** daily gap needs many invocations or a small loop script—watch **429**; paid CoinGecko helps).
+- **`mode`** (optional, default `"range"`): `"range"` uses `/market_chart/range` (bulk-efficient for contiguous spans but demo-tier caps at ~365 days back, returning empty arrays for older dates); `"per_date"` calls `/coins/bitcoin/history?date=…` once per date (works for any historical year, paced 1s apart, capped at **60** calls per invocation). Use `per_date` to fill sparse gaps like zoom-out's 10 anniversary dates across a decade — this is the same endpoint `refresh-btc-prices` now uses.
+- **`chunkDays`** (optional, default `45`): window size per `market_chart/range` call. Ignored in `per_date` mode.
+- **`maxChunks`** (optional, default `10`, max `25`): CoinGecko HTTP calls **per invocation** (edge wall-clock) in `range` mode. If more work remains, the JSON response sets **`completed: false`** and **`resumeFrom`** (`YYYY-MM-DD`). Call again with **`from: resumeFrom`** and the **same** **`to`** until **`completed: true`** (e.g. a **10-year** daily gap needs many invocations or a small loop script—watch **429**; paid CoinGecko helps). In `per_date` mode the cap is fixed at 60 calls and `resumeFrom` works the same way.
 
 Bruno: `bruno/service-cron/backfill-btc-prices.bru`. Logs: filter **`holzen:backfill-btc`**.
 
 **Local chaining (e.g. ~10 years):** `node scripts/backfill-btc-chain.mjs 2016-04-14 2026-04-14` with the same env vars as Bruno (stops on **429** / `abortReason`; rerun after a pause or upgrade CoinGecko).
+
+**Seeding the 10 zoom-out anniversaries today (recommended one-off):** POST with `{"from": "2016-04-18", "to": "2026-04-18", "mode": "per_date", "onlyMissing": true}`. Only the ~10 missing anniversary dates are touched (`onlyMissing` filters everything else); uses the `/history` endpoint that works on free tier.
 
 ## Source Feed Fetcher (fetch-source-feeds)
 

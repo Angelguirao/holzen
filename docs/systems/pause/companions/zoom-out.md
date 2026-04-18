@@ -47,6 +47,8 @@ High-level order (source of truth: **`supabase/functions/_shared/generators/zoom
 
 **Step 1: Price data** — Fetches BTC prices from **`btc_price_cache`** table (kept fresh by the `refresh-btc-prices` cron every ~15 minutes). Builds "on this day" comparisons for **1–10 calendar years** ago (UTC; see `_shared/btc-on-this-day-config.ts`). No CoinGecko API calls at generation time.
 
+**Gotcha (fixed 2026-04-18):** `refresh-btc-prices` previously fetched all 10 anniversary dates in a single `/market_chart/range` request. On CoinGecko's demo / free tier that endpoint silently returns an empty `prices[]` for anything older than ~365 days, so the cron logged `historical: 0 matched` and left `btc_price_cache` with only the current-day row — zoom-out logs showed `historical=0/10`. The fix is to use `/coins/bitcoin/history?date=DD-MM-YYYY` (one call per missing anniversary, paced 1s apart) which works on free tier for any year. `backfill-btc-prices` gained a `"mode": "per_date"` branch using the same endpoint for sparse gap-filling.
+
 **Step 2: Echo reflection** — Fetches a past reflection from the same user (≥3 days old, with `outcome` set, optionally filtered by market direction). Provides "you reflected on this before" context.
 
 **Phase 2: Cache (strict)** — `serveFromCache` with `strict: true` checks `companion_cache` for fresh, quality-≥-2 rows with per-user dedup and market direction awareness. If found, returns composite (cached deep-time + fresh prices + echo). If the strict pool is empty it returns `null` and emits `cache_strict_miss` (Edge log) so the flow falls through to Phase 3 instead of recycling seen rows.
