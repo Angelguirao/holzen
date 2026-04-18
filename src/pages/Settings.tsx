@@ -501,11 +501,11 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             {/* 1 BTC = 1 BTC mode */}
             <div className="space-y-3">
               <p className="text-xs font-mono text-white uppercase tracking-wider">{t('settings.btcMode')}</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
+              <p className="text-xs leading-relaxed text-primary">
                 {t('settings.btcModeDesc')}
               </p>
               <div className="flex items-center justify-between">
-                <Label htmlFor="btc-mode" className="text-xs text-muted-foreground cursor-pointer">
+                <Label htmlFor="btc-mode" className="text-xs cursor-pointer text-primary">
                   {t('settings.enableConvictionMode')}
                 </Label>
                 <Switch
@@ -522,7 +522,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             {/* Currency */}
             <div className={`space-y-3 transition-opacity ${btcMode ? 'opacity-30 pointer-events-none' : ''}`}>
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.displayCurrency')}</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
+              <p className="text-xs leading-relaxed text-primary">
                 {t('settings.displayCurrencyDesc')}
               </p>
               <div className="grid grid-cols-2 gap-2">
@@ -555,7 +555,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             {/* Zen Mode */}
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.zenMode')}</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
+              <p className="text-xs leading-relaxed text-primary">
                 {t('settings.zenModeDesc')}
               </p>
               <div className="flex items-center justify-between">
@@ -576,7 +576,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             {/* Silent Mode */}
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.silentMode')}</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
+              <p className="text-xs leading-relaxed text-primary">
                 {t('settings.silentModeDesc')}
               </p>
               <div className="flex items-center justify-between">
@@ -590,7 +590,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             {/* Notification Sound */}
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.notificationSound', 'Notification sound')}</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
+              <p className="text-xs leading-relaxed text-primary">
                 {t('settings.notificationSoundDesc', 'Play a singing-bowl chime when a new reflection arrives.')}
               </p>
               <div className="flex items-center justify-between">
@@ -604,7 +604,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             {/* Haptic Feedback */}
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.hapticFeedback')}</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
+              <p className="text-xs leading-relaxed text-primary">
                 {t('settings.hapticDesc')}
               </p>
               <div className="flex items-center justify-between">
