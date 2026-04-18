@@ -335,13 +335,6 @@ const Landing = () => {
         </Section>
       </div>
 
-      {/* ─── TESTIMONIALS ─── */}
-      <div className="max-w-lg mx-auto px-6 pb-16">
-        <Section>
-          <LandingTestimonials />
-        </Section>
-      </div>
-
       {/* ─── FAQ ─── */}
       <div className="bg-muted/30">
         <div className="max-w-lg mx-auto px-6 py-16">
