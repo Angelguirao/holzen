@@ -24,9 +24,10 @@ export function BottomNav() {
             className={({ isActive }) =>
               cn(
                 'flex flex-col items-center gap-0.5 px-4 py-1.5 text-[10px] font-mono transition-colors',
-                isActive ? 'text-foreground' : 'text-muted-foreground'
+                isActive ? '' : 'text-muted-foreground'
               )
             }
+            style={({ isActive }) => (isActive ? { color: '#DBB366' } : undefined)}
           >
             <Icon className="h-4 w-4" />
             <span>{t(`nav.${key}`)}</span>
