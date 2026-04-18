@@ -516,7 +516,14 @@
       },
       "grounding": {
         "meta": "Ground — Holzen",
-        "readPaper": "Read the paper"
+        "readPaper": "Read the paper",
+        "enrichment": {
+          "sectionLabel": "About this paper",
+          "abstractHeading": "Abstract",
+          "researchersHeading": "Researchers",
+          "citationCount_one": "Cited by {{count}} paper",
+          "citationCount_other": "Cited by {{count}} papers"
+        }
       },
       "saveMoment": {
         "trigger": "Save this moment",
