@@ -49,16 +49,17 @@ High-level order (source of truth: **`supabase/functions/_shared/generators/zoom
 
 **Gotcha (fixed 2026-04-18):** `refresh-btc-prices` previously fetched all 10 anniversary dates in a single `/market_chart/range` request. On CoinGecko's demo / free tier that endpoint silently returns an empty `prices[]` for anything older than ~365 days, so the cron logged `historical: 0 matched` and left `btc_price_cache` with only the current-day row — zoom-out logs showed `historical=0/10`. The fix is to use `/coins/bitcoin/history?date=DD-MM-YYYY` (one call per missing anniversary, paced 1s apart) which works on free tier for any year. `backfill-btc-prices` gained a `"mode": "per_date"` branch using the same endpoint for sparse gap-filling.
 
-**Step 2: Echo reflection** — Fetches a past reflection from the same user (≥3 days old, with `outcome` set, optionally filtered by market direction). Provides "you reflected on this before" context.
+**Step 2: Echo reflection** — Fetches a past reflection from the same user ≥3 days old, optionally filtered by market direction. **Prefers** `outcome`-tagged rows but **falls back to any reflection** when the user hasn't closed the loop on past pauses — the old strict-outcome filter left the "you reflected on this before" rail permanently empty for new users. Provides "you reflected on this before" context.
 
 **Phase 2: Cache (strict + prompt-version-pinned)** — `serveFromCache` with `strict: true` **and** `promptVersion: "v4"` checks `companion_cache` for fresh, quality-≥-2 rows that were **also written under the current prompt**, with per-user dedup and market direction awareness. If found, returns composite (cached deep-time + fresh prices + echo). If the strict pool is empty it returns `null` and emits `cache_strict_miss` (Edge log) so the flow falls through to Phase 3 instead of recycling seen or pre-v4 rows. Rows inserted before the `prompt_version` column existed have `NULL` and are ignored (effectively a hard invalidation every time `PROMPT_VERSION` bumps).
 
 **Phase 3: Live generation** (if cache misses):
 
-1. **Seed selection** — Selects from 18 predefined deep-time perspectives (see §5). Optional `zoomOutAngle` override from session intent.
-2. **AI generation (Lovable AI gateway)** — Gemini model (`gemini-2.5-flash`, 8s timeout; fallback to lite variant, 6s timeout) generates a short deep-time narrative grounded in the seed.
-3. **`qualityGate("zoom_out_deep_time", …)`** — Length (80–500 chars), no market data in body, no slop, no generic crypto language (`quality.ts`).
-4. **On success (`source: "live"`)** — Inserts deep-time text into `companion_cache`; assembles composite result with prices + echo.
+1. **Seed selection** — Selects from 33 predefined deep-time perspectives (see §5), grouped by category (money, geology, biology, tech adoption, civilizational, long-horizon, cosmic, Bitcoin-as-protocol). Optional `zoomOutAngle` override from session intent.
+2. **AI generation (Lovable AI gateway)** — Gemini model (`gemini-2.5-flash`, **10s** timeout; fallback to lite variant, **8s** timeout) generates a short deep-time narrative grounded in the seed.
+3. **Prompt constraints** — Explicit "anchor in a span ≥100 years, ideally 1,000+", "never mention BTC prices / dollar amounts / percentages", and **"body ≤480 characters (hard ceiling 500)"**. The user message no longer carries price context — injecting `$`-amounts was causing `body_contains_market_data` rejects when Gemini echoed them back (the `zoom_out_deep_time` quality gate has `noMarketData: true`). Deep-time should be orthogonal to today's price anyway.
+4. **`qualityGate("zoom_out_deep_time", …)`** — Length (80–500 chars), no market data in body, no slop, no generic crypto language (`quality.ts`).
+5. **On success (`source: "live"`)** — Inserts deep-time text into `companion_cache` with `prompt_version: "v4"`; assembles composite result with prices + echo.
 
 **Phase 4: Curated** — if all above fail, static fallback pool from `companion_fallbacks`.
 
@@ -66,22 +67,22 @@ High-level order (source of truth: **`supabase/functions/_shared/generators/zoom
 
 ## 5. Deep-time seeds
 
-The generator maintains 18 predefined perspectives that provide civilizational or natural timescale context:
+The generator maintains **33** predefined perspectives (expanded 2026-04-18 from 18) that provide civilizational or natural timescale context:
 
 | Category | Examples |
 |----------|----------|
-| **Geological** | Continental drift, ice ages, deep earth timescales |
-| **Technological** | Tech adoption curves, internet growth parallels |
-| **Civilizational** | Cathedral builders (multi-generational projects), Long Now Foundation |
-| **Biological** | DNA as proof-of-work, evolutionary patience |
-| **Astronomical** | Distant starlight, cosmic timescales |
-| **Monetary** | History of money, gold's 5,000-year timeline |
-| **Protocol** | Bitcoin as protocol (TCP/IP analogy, Lindy effect) |
-| **Human** | Generational wealth, compounding patience |
+| **Money & ledgers** | Shells/salt/gold history, Sumerian clay tablets, Rai stones, medieval tally sticks |
+| **Geological / planetary** | Continental drift, Antarctic ice cores, Pacific widening |
+| **Biological** | DNA as proof-of-work, Pando aspen grove, bristlecone pines, coral reefs, sequoias |
+| **Technology adoption** | Printing press → internet → Bitcoin, telegraph, TCP/IP longevity |
+| **Civilizational / monumental** | Cathedral builders, Stonehenge, Great Wall, Pyramids, Library of Alexandria |
+| **Long-horizon thinking** | Long Now clock, Svalbard seed vault, cosmic calendar |
+| **Cosmic** | Distant starlight, Voyager 1, sun's remaining fuel, Andromeda collision, Proxima Centauri |
+| **Bitcoin as protocol** | TCP/IP analogy, Lindy effect, halvings as generations |
 
-Each seed includes a key and a short prompt fragment. Selection considers: (a) `zoomOutAngle` from session intent (if provided, overrides random), (b) recency dedup (skip recently shown seeds), (c) random selection from remaining pool.
+Each seed is a short prompt fragment. Selection considers: (a) `zoomOutAngle` from session intent (if provided, overrides random), (b) recency dedup via `recentTitles` (skip recently shown titles), (c) random selection from remaining pool.
 
-Temperature is **0.7** (higher than other generators) for more creative variation.
+Temperature is **0.7** (higher than other generators) for more creative variation. The system prompt pins a **timescale ≥ 100 years** constraint ("name the span explicitly, e.g. 5,000 years / 3.5 billion years / since the 12th century") so outputs reliably feel "deep time" rather than drifting into decade-scale tech commentary.
 
 ---
 
