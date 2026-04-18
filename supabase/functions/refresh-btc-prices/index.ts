@@ -2,7 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { holzenEdgeError, holzenEdgeRun, holzenEdgeWarn } from "../_shared/holzen-edge-log.ts";
 import { btcOnThisDayYearOffsets } from "../_shared/btc-on-this-day-config.ts";
-import { coingeckoHeaders } from "../_shared/coingecko.ts";
+import { coingeckoHeaders, fetchCoinGeckoHistoryPrice } from "../_shared/coingecko.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -24,9 +24,13 @@ const corsHeaders = {
  * (year/month/day). This is accurate enough for **daily Zoom Out metaphor**, not intraday
  * trading. After a missed cron, staleness is bounded by the next successful run + TTL.
  *
- * **CoinGecko:** two calls per run when historical work is needed (simple price, then
- * `market_chart/range`). Default **2s** gap between them; if the first returns **429**,
- * the gap widens to **12s** before the second call to reduce back-to-back rate limits.
+ * **CoinGecko:** uses `/simple/price` for the current day and `/coins/bitcoin/history`
+ * once per missing anniversary date for history. The per-date `/history` endpoint
+ * works on the **free / demo** tier for any historical date; the previous
+ * `/market_chart/range` approach silently capped at ~365 days back on free tier
+ * and left anniversary rows 2+ years old empty ("historical=0/10" in zoom-out
+ * logs). Per-date calls are paced **1s apart** to stay under the 30 req/min
+ * demo quota (max 10 anniversary dates per run → ~10s total).
  */
 
 serve(async (req) => {
@@ -138,54 +142,46 @@ serve(async (req) => {
     const missingTargets = yearTargets.filter(t => !recentlyFetched.has(t.dateKey));
 
     if (missingTargets.length > 0) {
-      const timestamps = missingTargets.map(t => t.ts);
-      const from = Math.min(...timestamps) - 86400;
-      const to = Math.max(...timestamps) + 86400;
+      const fetchedAt = new Date().toISOString();
+      const inserts: { date: string; price: number; fetched_at: string }[] = [];
+      let rateLimited = 0;
+      let other = 0;
 
-      try {
-        const res = await fetch(`https://api.coingecko.com/api/v3/coins/bitcoin/market_chart/range?vs_currency=usd&from=${from}&to=${to}`, { headers: coingeckoHeaders() });
-        if (res.ok) {
-          const data = await res.json();
-          const prices: [number, number][] = data?.prices || [];
+      // One call per missing anniversary date via `/coins/bitcoin/history`
+      // (works on demo tier for any year, unlike `/market_chart/range`).
+      // 1s spacing keeps us well under the 30 req/min demo quota.
+      for (let i = 0; i < missingTargets.length; i++) {
+        const target = missingTargets[i];
+        if (i > 0) await new Promise((r) => setTimeout(r, 1000));
 
-          const inserts: { date: string; price: number; fetched_at: string }[] = [];
-          for (const target of missingTargets) {
-            const targetMs = target.ts * 1000;
-            let closest: [number, number] | null = null;
-            let closestDist = Infinity;
-            for (const [ts, price] of prices) {
-              const dist = Math.abs(ts - targetMs);
-              if (dist < closestDist) { closestDist = dist; closest = [ts, price]; }
-            }
-            if (closest && closestDist < 48 * 3600 * 1000) {
-              inserts.push({ date: target.dateKey, price: Math.round(closest[1]), fetched_at: new Date().toISOString() });
-            }
-          }
+        const hit = await fetchCoinGeckoHistoryPrice(target.dateKey);
+        if (!hit) { other++; continue; }
+        if ("rateLimited" in hit) { rateLimited++; continue; }
+        inserts.push({ date: target.dateKey, price: hit.price, fetched_at: fetchedAt });
+      }
 
-          if (inserts.length > 0) {
-            const { error: upErr } = await supabase.from("btc_price_cache").upsert(inserts);
-            if (upErr) {
-              holzenEdgeError("refresh-btc", "historical upsert failed", upErr);
-              results.push("historical: upsert failed");
-            } else {
-              results.push(`historical: ${inserts.length}/${missingTargets.length} prices cached`);
-            }
-          } else {
-            holzenEdgeWarn("refresh-btc", "historical: no rows matched range", {
-              missing: missingTargets.length,
-              coingecko_points: prices.length,
-            });
-            results.push(`historical: 0 matched (${missingTargets.length} needed, ${prices.length} points)`);
-          }
-        } else if (res.status === 429) {
-          holzenEdgeWarn("refresh-btc", "CoinGecko rate limited for historical prices");
-          results.push("historical: rate limited");
+      if (inserts.length > 0) {
+        const { error: upErr } = await supabase.from("btc_price_cache").upsert(inserts);
+        if (upErr) {
+          holzenEdgeError("refresh-btc", "historical upsert failed", upErr);
+          results.push("historical: upsert failed");
         } else {
-          holzenEdgeWarn("refresh-btc", "historical: CoinGecko non-OK", { status: res.status });
-          results.push(`historical: HTTP ${res.status}`);
+          results.push(
+            `historical: ${inserts.length}/${missingTargets.length} prices cached` +
+              (rateLimited > 0 ? `, ${rateLimited} rate-limited` : "") +
+              (other > 0 ? `, ${other} other failures` : ""),
+          );
         }
-      } catch (e) {
-        holzenEdgeError("refresh-btc", "historical price fetch error", e);
+      } else {
+        holzenEdgeWarn("refresh-btc", "historical: no dates resolved via /history", {
+          missing: missingTargets.length,
+          rate_limited: rateLimited,
+          other_failures: other,
+        });
+        results.push(
+          `historical: 0/${missingTargets.length} matched` +
+            (rateLimited > 0 ? ` (${rateLimited} rate-limited)` : ""),
+        );
       }
     } else {
       results.push("historical: all cached within 24h");
