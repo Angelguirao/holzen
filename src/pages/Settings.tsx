@@ -283,7 +283,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
     <div ref={ref} className="space-y-6">
       <NoxHeaderMain title={t('settings.title')} subtitle={t('settings.pageSubtitle')} />
 
-      <Accordion type="multiple" defaultValue={['you', 'reflection']} className="space-y-1">
+      <Accordion type="multiple" className="space-y-1">
 
         {/* 1. You */}
         <AccordionItem value="you" className="border border-border/40 rounded-md px-4">
