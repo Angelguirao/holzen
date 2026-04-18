@@ -151,21 +151,55 @@ async function fetchEchoReflection(
   context: string | undefined,
   log: GenerateZoomOutParams["log"],
 ): Promise<any | null> {
-  try {
-    const direction = context?.toLowerCase().includes("is down") ? "down" : context?.toLowerCase().includes("is up") ? "up" : null;
-    if (direction) {
-      const { data } = await svcClient.from("reflections").select("id, message, created_at, mood, outcome, context").eq("user_id", userId).not("outcome", "is", null).lt("created_at", new Date(Date.now() - 3 * 86400000).toISOString()).order("created_at", { ascending: false }).limit(50);
-      if (data && data.length > 0) {
-        const matching = data.filter((r: any) => direction === "down" ? r.context?.toLowerCase().includes("is down") : r.context?.toLowerCase().includes("is up"));
-        const pool = matching.length > 0 ? matching : data;
-        return pool[Math.floor(Math.random() * Math.min(pool.length, 10))];
-      }
-    } else {
-      const { data } = await svcClient.from("reflections").select("id, message, created_at, mood, outcome").eq("user_id", userId).not("outcome", "is", null).lt("created_at", new Date(Date.now() - 3 * 86400000).toISOString()).order("created_at", { ascending: false }).limit(10);
-      if (data && data.length > 0) return data[0];
+  // Users who haven't tagged `outcome` on their past reflections (new users, or
+  // users who pause/reflect but don't close the loop) were getting no echo at
+  // all — Zoom Out's "you reflected on this before" rail stayed empty forever.
+  // Prefer outcome-tagged rows when present, but fall back to any reflection
+  // ≥3 days old so the rail has something to show.
+  const cutoff = new Date(Date.now() - 3 * 86400000).toISOString();
+  const direction = context?.toLowerCase().includes("is down")
+    ? "down"
+    : context?.toLowerCase().includes("is up")
+    ? "up"
+    : null;
+
+  async function queryPool(onlyOutcomeTagged: boolean): Promise<any[] | null> {
+    try {
+      let q = svcClient
+        .from("reflections")
+        .select("id, message, created_at, mood, outcome, context")
+        .eq("user_id", userId)
+        .lt("created_at", cutoff)
+        .order("created_at", { ascending: false })
+        .limit(direction ? 50 : 10);
+      if (onlyOutcomeTagged) q = q.not("outcome", "is", null);
+      const { data } = await q;
+      return data ?? null;
+    } catch (e) {
+      log(`echo fetch failed: ${e}`, { onlyOutcomeTagged });
+      return null;
     }
-  } catch (e) { log(`echo fetch failed: ${e}`); }
-  return null;
+  }
+
+  let pool = (await queryPool(true)) ?? [];
+  if (pool.length === 0) {
+    pool = (await queryPool(false)) ?? [];
+    if (pool.length > 0) {
+      log("echo: no outcome-tagged rows, falling back to any reflection ≥3d");
+    }
+  }
+  if (pool.length === 0) return null;
+
+  if (direction) {
+    const matching = pool.filter((r: any) =>
+      direction === "down"
+        ? r.context?.toLowerCase().includes("is down")
+        : r.context?.toLowerCase().includes("is up")
+    );
+    const selected = matching.length > 0 ? matching : pool;
+    return selected[Math.floor(Math.random() * Math.min(selected.length, 10))];
+  }
+  return pool[0];
 }
 
 // ── Internals: AI deep-time generation ──
@@ -203,35 +237,69 @@ async function generateDeepTime(
     return { deepTime: pickRandom(pool), source: "curated" };
   }
 
-  const priceContext = currentPrice ? `Current BTC price: $${currentPrice.toLocaleString()}.` : "";
-  const historyContext = onThisDay.length > 0
-    ? `BTC prices on this day: ${onThisDay.map(e => `${e.yearsAgo}y ago: $${e.price.toLocaleString()}`).join(", ")}.`
-    : "";
+  // Previously we passed `Current BTC price` and "on this day" dollar amounts
+  // into the user message. The `zoom_out_deep_time` quality gate has
+  // `noMarketData: true` which rejects any body containing `$<digit>` or
+  // `<digits>%` — and Gemini reliably echoed those numbers back, causing
+  // `body_contains_market_data` rejects. Dropping the price scaffold entirely
+  // is the right fix: deep-time narration should be ORTHOGONAL to price (that's
+  // the whole point of zooming out) — the prices are already shown by the
+  // "On this day" panel in the UI composite. Keep `context` for mood framing
+  // but let the prompt handle the "don't mention prices" rule.
+  // Unused for now; kept here so git blame shows the removed injection path.
+  void currentPrice;
+  void onThisDay;
 
   const titleExclusion = (recentTitles && Array.isArray(recentTitles) && recentTitles.length > 0)
     ? `\nDo NOT reuse these titles or topics (already shown): ${recentTitles.slice(0, 5).join("; ")}. Find a COMPLETELY DIFFERENT perspective.`
     : "";
 
-  // Pick a random thematic seed to force diversity in generated content
+  // Pick a random thematic seed to force diversity in generated content.
+  // Grouped loosely by category; expanded 2026-04-18 from 18 -> 33 to reduce
+  // "same card over and over" after the cache-version invalidation bump.
   const DEEP_TIME_SEEDS = [
+    // Money & ledgers
     "Compare Bitcoin's age to the history of money (shells, salt, gold, paper, digital)",
-    "Frame today's volatility against geological timescales (Grand Canyon, tectonic plates, ice ages)",
-    "Technology adoption speed: printing press (50y), electricity (40y), internet (30y), Bitcoin (15y)",
-    "The patience of cathedral builders — Notre-Dame took 182 years, Sagrada Familia still ongoing",
-    "Light from distant stars: what we see in the sky happened thousands of years ago",
-    "The Long Now Foundation's 10,000-year clock and what it means to think in deep time",
-    "DNA has stored information for 3.5 billion years — the original proof of work",
-    "Human memory vs geological memory: we remember decades, rocks remember eons",
-    "The oldest living organism (Pando aspen grove, ~80,000 years) and what persistence means",
-    "Voyager 1 has traveled for 47 years and is barely outside our solar system",
-    "The Svalbard seed vault: humanity's 1,000-year bet on the future",
-    "Stonehenge was built over 1,500 years — longer than the entire history of banking",
-    "The cosmic calendar: if the universe's age is one year, humans appear at 11:59 PM on Dec 31",
     "Ancient Sumerian clay tablets recorded debts 5,000 years ago — the first ledgers",
-    "The sun has enough fuel for another 5 billion years — perspective on 'long-term'",
+    "The Rai stones of Yap: immutable public ledger, no movement required, 1,500+ years old",
+    "Gold has served as money for ~5,000 years — fiat currencies average 27 years before collapse",
+    "Medieval tally sticks: England's government money for 700 years, burned in 1834",
+    // Geological / planetary
+    "Frame today's volatility against geological timescales (Grand Canyon, tectonic plates, ice ages)",
     "Continental drift moves plates 2.5cm/year — in Bitcoin's lifetime, they've moved ~40cm",
-    "The Library of Alexandria held all human knowledge; Bitcoin holds all human trust",
+    "The Pacific Ocean is widening by ~7cm/year; the Atlantic by ~2.5cm — planetary patience",
+    "Antarctic ice cores hold an 800,000-year climate record, one year per centimeter",
+    // Biological
+    "DNA has stored information for 3.5 billion years — the original proof of work",
+    "The oldest living organism (Pando aspen grove, ~80,000 years) and what persistence means",
     "Bristlecone pines in California are 5,000 years old — they were saplings when money was invented",
+    "Coral reefs grow 1–3cm per year; the Great Barrier Reef has been building for 500,000 years",
+    "Sequoias live 3,000+ years by growing slowly and surviving fire — the case for patience",
+    // Technology adoption
+    "Technology adoption speed: printing press (50y), electricity (40y), internet (30y), Bitcoin (15y)",
+    "The telegraph compressed news from weeks to minutes — networks don't unwind once woven",
+    "The internet's TCP/IP protocol is 50 years old and still runs on the same core rules",
+    // Civilizational / monumental
+    "The patience of cathedral builders — Notre-Dame took 182 years, Sagrada Familia still ongoing",
+    "Stonehenge was built over 1,500 years — longer than the entire history of banking",
+    "The Library of Alexandria held all human knowledge; Bitcoin holds all human trust",
+    "The Great Wall of China was built across seven dynasties spanning 2,000 years",
+    "The Pyramids of Giza have stood for ~4,500 years — longer than most civilizations exist",
+    // Long-horizon thinking
+    "The Long Now Foundation's 10,000-year clock and what it means to think in deep time",
+    "The Svalbard seed vault: humanity's 1,000-year bet on the future",
+    "The cosmic calendar: if the universe's age is one year, humans appear at 11:59 PM on Dec 31",
+    "Human memory vs geological memory: we remember decades, rocks remember eons",
+    // Cosmic
+    "Light from distant stars: what we see in the sky happened thousands of years ago",
+    "Voyager 1 has traveled for 47 years and is barely outside our solar system",
+    "The sun has enough fuel for another 5 billion years — perspective on 'long-term'",
+    "The Andromeda galaxy is approaching ours at 110km/s — collision in 4.5 billion years",
+    "Proxima Centauri, our nearest star, is 4.2 light-years away — 40 trillion km",
+    // Bitcoin as protocol
+    "Bitcoin as TCP/IP — a protocol that survives by being boring, not by being fast",
+    "The Lindy effect: the longer something persists, the longer it's expected to persist",
+    "Every halving cycle is roughly one human generation apart, not one trading year",
   ];
   const trimmedAngle = zoomOutAngle?.trim();
   const seed = trimmedAngle
@@ -245,27 +313,47 @@ Think like the Long Now Foundation. Think in centuries and millennia.
 THEMATIC SEED FOR THIS SESSION (use this as your starting point, but make it your own):
 ${seed}
 
+TIMESCALE REQUIREMENT (CRITICAL):
+- Anchor the narrative in a concrete span of at least 100 years, ideally 1,000+
+- Name the specific timescale explicitly (e.g. "5,000 years", "3.5 billion years", "since the 12th century")
+- If the seed suggests multiple scales, pick the longest one that still feels human
+
 ACCURACY RULES (CRITICAL):
 - Every number must be verifiable and widely accepted
 - Prefer well-known facts over obscure claims
 - Use approximate numbers when unsure ("roughly 300,000 years")
 
+NEVER MENTION:
+- BTC prices, dollar amounts, percentages, market moves
+- Price predictions or trading advice
+- Exclamation marks
+
 BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}
 
-FORMAT: JSON with "title" (3-8 word evocative phrase) and "body" (1-2 poetic but factual sentences).
-No trading advice, no price predictions, no exclamation marks.${mood ? `\n\nUSER MOOD: The user is feeling "${mood}". Let this subtly inform which deep-time perspective you choose.` : ""}${titleExclusion}`;
+LENGTH: body MUST be ≤480 characters total (hard ceiling 500). Prefer 2 tight poetic sentences over a long one.
+
+FORMAT: JSON with "title" (3-8 word evocative phrase) and "body" (1-2 poetic but factual sentences, ≤480 chars).${mood ? `\n\nUSER MOOD: The user is feeling "${mood}". Let this subtly inform which deep-time perspective you choose.` : ""}${titleExclusion}`;
 
   const aiBody = {
     messages: [
       { role: "system", content: systemPrompt },
-      { role: "user", content: `${context || "BTC is moving today."} ${priceContext} ${historyContext}` },
+      // Context is intentionally minimal — no price scaffolding. The "zoom out"
+      // from today's move comes from the seed and the timescale requirement,
+      // not from echoing a dollar figure (which the quality gate rejects).
+      { role: "user", content: context?.trim() ? context.trim() : "Generate one deep-time perspective." },
     ],
     response_format: { type: "json_object" },
     temperature: 0.7,
   };
 
   const models = ["google/gemini-2.5-flash", "google/gemini-2.5-flash-lite"];
-  const AI_TIMEOUTS = [8000, 6000];
+  // Bumped 2026-04-18 from [8000, 6000]. Gemini Flash structuring occasionally
+  // overran the old budgets for zoom-out (which has a denser system prompt and
+  // temperature 0.7); timeouts caused us to fall through to the lite model or
+  // curated fallback unnecessarily. 10s/8s keeps the user-perceived latency
+  // well under the reflect-step patience budget while giving the model enough
+  // headroom to finish.
+  const AI_TIMEOUTS = [10000, 8000];
   let deepTime: { title: string; body: string } | null = null;
 
   for (let idx = 0; idx < models.length; idx++) {
