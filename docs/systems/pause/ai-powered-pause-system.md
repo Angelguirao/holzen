@@ -363,15 +363,15 @@ The pause UI and **`check-volatility`** only call **`companion-orchestrate`**, w
 | Generator | File | Phase order | Last resort |
 |-----------|------|-------------|-------------|
 | Signal | `_shared/generators/signal.ts` | Library (essays) → Cache → Live (Perplexity + Gemini) | curated |
-| Grounding | `_shared/generators/grounding.ts` | Library (papers) → Cache → Live (Perplexity + Gemini) | curated |
+| Grounding | `_shared/generators/grounding.ts` | Library (papers, **disabled**) → Cache → Live (Perplexity + Gemini) | curated |
 | History | `_shared/generators/history.ts` | Library (events) → Cache → Live (Perplexity + Gemini) | curated |
 | Zoom out | `_shared/generators/zoom-out.ts` | Cache → Live (`btc_price_cache` + echo + deep-time AI) | curated |
 
 **Zoom out dependency:** Cron **`refresh-btc-prices`** must keep `btc_price_cache` fresh ([cron-setup.md](../../ops/cron-setup.md)).
 
-**Phase ordering:** Generators try **library → cache → live → curated** (controlled by `_shared/phase-config.ts`). Each phase can be independently toggled via Supabase Edge Function secrets: **`COMPANION_PHASE_LIBRARY`**, **`COMPANION_PHASE_CACHE`**, **`COMPANION_PHASE_LIVE`** (all enabled by default; set to `0`/`false`/`no` to disable). When `DISABLE_COMPANION_FALLBACKS` is set, only live runs (existing behavior for testing).
+**Phase ordering:** Generators try **library → cache → live → curated** (controlled by `_shared/phase-config.ts`). Each phase can be independently toggled via Supabase Edge Function secrets: **`COMPANION_PHASE_LIBRARY`**, **`COMPANION_PHASE_CACHE`**, **`COMPANION_PHASE_LIVE`** (all enabled by default; set to `0`/`false`/`no` to disable). When `DISABLE_COMPANION_FALLBACKS` is set, only live runs (existing behavior for testing). **Grounding exception:** Phase 1 (Library) is force-disabled via the module-local constant `GROUNDING_LIBRARY_ENABLED = false` in `grounding.ts` while `content_library` has no ingested papers — the global `COMPANION_PHASE_LIBRARY` toggle is ignored for grounding until that flag is flipped back on.
 
-**Library “freshness”:** **`searchLibrary`** runs with **`includeStale: false`**, so rows this user was served from **`content_library`** in the last **7 days** are skipped (`content-library.ts`). If nothing fresh is left, the chain continues to **`companion_cache`** then live AI, then static curated fallbacks.
+**Library "freshness" & cache strictness:** **`searchLibrary`** runs with **`includeStale: false`**, so rows this user was served from **`content_library`** within the last **`COMPANION_SERVE_FRESHNESS_DAYS`** (currently **30 days**; `_shared/companion-serve-freshness.ts`) are skipped. The same window excludes seen rows from **`companion_cache`**. Phase-2 `serveFromCache` calls in the main flow run in **strict mode** — they skip the pass-3 `repeat_or_lower_quality` relaxation and return `null` (logging `cache_strict_miss`) instead of recycling seen rows, so live AI actually runs when the fresh pool empties. The relaxed pass-3 still fires inside `serveFallback` **after** live fails, preserving the "never leave the slot empty" guarantee.
 
 For a full breakdown of **which intervention** maps to **which generator output** and **which UI block** shows it, see **§7**.
 

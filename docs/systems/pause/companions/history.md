@@ -31,9 +31,9 @@ History also serves as the **data source for pattern interventions**: when `sele
 
 High-level order (source of truth: **`supabase/functions/_shared/generators/history.ts`**, **`PROMPT_VERSION`** v2):
 
-**Phase 1: Library** — `searchLibrary` checks `content_library` (type `event`) for fresh historical events this user hasn't seen in 7 days. Converts via `eventToHistory` with mood tag awareness. If found, returns immediately (`source: "cache"`).
+**Phase 1: Library** — `searchLibrary` checks `content_library` (type `event`) for fresh historical events this user hasn't seen within `COMPANION_SERVE_FRESHNESS_DAYS` (30 days). Converts via `eventToHistory` with mood tag awareness. If found, returns immediately (`source: "library"`).
 
-**Phase 2: Cache** — `serveFromCache` checks `companion_cache` with per-user dedup and market direction awareness. If found, returns (`source: "cache"`).
+**Phase 2: Cache (strict)** — `serveFromCache` with `strict: true` checks `companion_cache` for fresh, quality-≥-2 rows with per-user dedup and market direction awareness. If found, returns (`source: "cache"`). If the strict pool is empty it returns `null` and emits `cache_strict_miss` (Edge log) so the flow falls through to Phase 3 instead of recycling seen rows.
 
 **Phase 3: Live generation** (if phases 1–2 miss):
 

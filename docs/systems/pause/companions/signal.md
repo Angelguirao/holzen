@@ -33,9 +33,9 @@ If the catalog is **empty**, Perplexity runs **without** a domain allowlist (unr
 
 High-level order (source of truth: **`supabase/functions/_shared/generators/signal.ts`**, **`PROMPT_VERSION`**):
 
-**Phase 1: Library** — `searchLibrary` checks `content_library` for fresh essays this user hasn't seen in 7 days. If found, returns immediately (`source: "cache"`).
+**Phase 1: Library** — `searchLibrary` checks `content_library` for fresh essays this user hasn't seen within `COMPANION_SERVE_FRESHNESS_DAYS` (30 days). If found, returns immediately (`source: "library"`).
 
-**Phase 2: Cache** — `serveFromCache` checks `companion_cache` with per-user dedup and market direction awareness. If found, returns (`source: "cache"`).
+**Phase 2: Cache (strict)** — `serveFromCache` with `strict: true` checks `companion_cache` for fresh, quality-≥-2 rows with per-user dedup and market direction awareness. If found, returns (`source: "cache"`). If the strict pool is empty it returns `null` and emits `cache_strict_miss` (Edge log) so the flow falls through to Phase 3 instead of recycling seen rows.
 
 **Phase 3: Live generation** (if phases 1–2 miss):
 

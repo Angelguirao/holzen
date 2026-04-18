@@ -5,9 +5,10 @@
  * then `companion_cache`, then live AI (Perplexity, etc.), then static curated
  * fallbacks. Phase ordering is controlled by `_shared/phase-config.ts`.
  *
- * When `includeStale` is false, entries the user was served in the last
- * **7 days** are skipped so repeats are less likely. Use `includeStale: true`
- * only if you need any library row regardless of recency.
+ * When `includeStale` is false, entries the user was served within the
+ * `COMPANION_SERVE_FRESHNESS_DAYS` rolling window are skipped so repeats are
+ * less likely. Use `includeStale: true` only if you need any library row
+ * regardless of recency.
  */
 
 import { COMPANION_SERVE_FRESHNESS_DAYS } from "./companion-serve-freshness.ts";
@@ -124,8 +125,8 @@ function logLibraryRecentServesError(
  *
  * Returns entries sorted by quality and relevance, or empty array if:
  * - No matching entries exist
- * - All matching entries were seen by this user in the last 7 days
- *   (unless includeStale=true)
+ * - All matching entries were seen by this user within the last
+ *   `COMPANION_SERVE_FRESHNESS_DAYS` (unless includeStale=true)
  *
  * When the library phase rejects (returns []), emits a structured `library_search_rejected`
  * Edge log with a stable `reason` so the library → cache fallback becomes diagnosable.
@@ -197,7 +198,7 @@ export async function searchLibrary(
       entries = entries.filter(e => !excludeSet.has(e.title.toLowerCase()));
     }
 
-    // ── Per-user freshness: exclude entries seen in the last 7 days ──
+    // ── Per-user freshness: exclude entries seen within COMPANION_SERVE_FRESHNESS_DAYS ──
     if (options.userId && !options.includeStale) {
       const recentlySeen = await getRecentlySeenLibraryIds(
         svcClient,
