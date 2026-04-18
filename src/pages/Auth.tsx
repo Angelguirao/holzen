@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Trans } from 'react-i18next';
 import { Link } from 'react-router-dom';
-import { X } from 'lucide-react';
+import { X, Info } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable/index';
 import { Button } from '@/components/ui/button';
@@ -192,8 +192,9 @@ const Auth = () => {
               className="font-mono text-sm"
             />
             {view === 'sign-up' && (
-              <p className="text-[11px] leading-relaxed text-muted-foreground">
-                Must be at least 8 characters and include a letter and a number.
+              <p className="flex items-start gap-1.5 text-[11px] leading-relaxed text-muted-foreground">
+                <Info className="h-3 w-3 mt-0.5 shrink-0" aria-hidden="true" />
+                <span>Must be at least 8 characters and include a letter and a number.</span>
               </p>
             )}
           </div>
