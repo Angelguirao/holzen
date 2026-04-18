@@ -41,7 +41,7 @@ Zoom Out appears in **two places** depending on intervention selection:
 
 ## 4. Server pipeline (`zoom-out.ts`)
 
-High-level order (source of truth: **`supabase/functions/_shared/generators/zoom-out.ts`**, **`PROMPT_VERSION`** v2):
+High-level order (source of truth: **`supabase/functions/_shared/generators/zoom-out.ts`**, **`PROMPT_VERSION`** **v4** — bumped 2026-04-18 from v3, wired into `companion_cache.prompt_version` so pre-v4 rows are no longer served):
 
 **Note:** Zoom Out does **not** have a library phase — there is no `content_library` type for deep-time content. The phase order is **cache → live → curated** (not the library → cache → live → curated pattern used by Signal, Grounding, and History).
 
@@ -51,7 +51,7 @@ High-level order (source of truth: **`supabase/functions/_shared/generators/zoom
 
 **Step 2: Echo reflection** — Fetches a past reflection from the same user (≥3 days old, with `outcome` set, optionally filtered by market direction). Provides "you reflected on this before" context.
 
-**Phase 2: Cache (strict)** — `serveFromCache` with `strict: true` checks `companion_cache` for fresh, quality-≥-2 rows with per-user dedup and market direction awareness. If found, returns composite (cached deep-time + fresh prices + echo). If the strict pool is empty it returns `null` and emits `cache_strict_miss` (Edge log) so the flow falls through to Phase 3 instead of recycling seen rows.
+**Phase 2: Cache (strict + prompt-version-pinned)** — `serveFromCache` with `strict: true` **and** `promptVersion: "v4"` checks `companion_cache` for fresh, quality-≥-2 rows that were **also written under the current prompt**, with per-user dedup and market direction awareness. If found, returns composite (cached deep-time + fresh prices + echo). If the strict pool is empty it returns `null` and emits `cache_strict_miss` (Edge log) so the flow falls through to Phase 3 instead of recycling seen or pre-v4 rows. Rows inserted before the `prompt_version` column existed have `NULL` and are ignored (effectively a hard invalidation every time `PROMPT_VERSION` bumps).
 
 **Phase 3: Live generation** (if cache misses):
 

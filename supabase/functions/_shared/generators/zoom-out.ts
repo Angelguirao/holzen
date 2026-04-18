@@ -34,7 +34,7 @@ import { getPhaseConfig } from "../phase-config.ts";
 import { BTC_ON_THIS_DAY_YEARS_BACK, btcOnThisDayYearOffsets } from "../btc-on-this-day-config.ts";
 
 /** Bump when the deep-time prompt, seed pool, or quality rules change. */
-export const PROMPT_VERSION = "v3";
+export const PROMPT_VERSION = "v4";
 
 // ── Public types ──
 
@@ -312,6 +312,7 @@ No trading advice, no price predictions, no exclamation marks.${mood ? `\n\nUSER
                     market_regime: parseMarketDirection(context),
                     expires_at: new Date(Date.now() + 14 * 86400000).toISOString(),
                     automated_score: 2,
+                    prompt_version: PROMPT_VERSION,
                   });
                   if (cacheErr) log(`cache insert error: ${cacheErr.message}`);
                 }
@@ -359,7 +360,7 @@ No trading advice, no price predictions, no exclamation marks.${mood ? `\n\nUSER
       return { deepTime: null, source: "empty", error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
     }
     const marketDirection = parseMarketDirection(context);
-    const cached = await serveFromCache(svcClient, COMPANION_ZOOM_OUT_DEEP_TIME, "en", { userId, marketDirection });
+    const cached = await serveFromCache(svcClient, COMPANION_ZOOM_OUT_DEEP_TIME, "en", { userId, marketDirection, promptVersion: PROMPT_VERSION });
     if (cached) {
       return {
         deepTime: cached.data as { title: string; body: string },
@@ -385,7 +386,7 @@ export async function generateZoomOut(params: GenerateZoomOutParams): Promise<Zo
   // ── Phase 2: Cache (no library type for zoom-out; strict — fall through to live if no fresh row) ──
   if (phases.cache && !forceLive) {
     const marketDirection = parseMarketDirection(context);
-    const cached = await serveFromCache(svcClient, COMPANION_ZOOM_OUT_DEEP_TIME, "en", { userId, marketDirection, strict: true });
+    const cached = await serveFromCache(svcClient, COMPANION_ZOOM_OUT_DEEP_TIME, "en", { userId, marketDirection, strict: true, promptVersion: PROMPT_VERSION });
     if (cached) {
       log("zoomOut resolved from cache (phase 2)");
       const prices = await fetchHistoricalAndCurrentPrices(svcClient, context, log);
