@@ -91,7 +91,7 @@ export async function handleRegenerateOnly(params: {
   const t0 = Date.now();
   type CompanionResult = {
     data: any;
-    source: "live" | "cache" | "curated" | "empty";
+    source: "live" | "library" | "cache" | "curated" | "empty";
     cacheId: string | null;
     cacheRelaxation?: string | null;
     latencyMs: number;

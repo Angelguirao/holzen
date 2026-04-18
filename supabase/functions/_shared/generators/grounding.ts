@@ -35,7 +35,8 @@ export const PROMPT_VERSION = "v3";
 
 export interface GroundingResult {
   data: { title: string; body: string; citation: string; url: string } | null;
-  source: "live" | "cache" | "curated" | "empty";
+  /** `library` = served from `content_library`; `cache` = served from runtime `companion_cache`. */
+  source: "live" | "library" | "cache" | "curated" | "empty";
   cacheId: string | null;
   /** Set when `serveFromCache` served this row (not library / curated). */
   cacheRelaxation?: CacheServeRelaxation;
@@ -121,7 +122,7 @@ async function tryLibrary(
     const pick = libraryRows[Math.floor(Math.random() * Math.min(libraryRows.length, 3))];
     const result = paperToGrounding(pick);
     recordLibraryServe(svcClient, userId, pick.id, "ground_nudge");
-    return { data: result, source: "cache", cacheId: null };
+    return { data: result, source: "library", cacheId: null };
   }
   return null;
 }

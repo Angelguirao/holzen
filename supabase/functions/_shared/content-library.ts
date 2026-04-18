@@ -53,6 +53,72 @@ export interface LibrarySearchOptions {
   includeStale?: boolean;
 }
 
+/** Stable reasons the library phase returned [] and the generator fell through.
+ *  Matches `logQualityGateStructuredReject` shape: `holzen_event` + `reason` stable code. */
+type LibrarySearchRejectReason = "db_error" | "empty" | "all_seen" | "threw";
+
+/**
+ * Structured Edge log when the content_library phase returns nothing and the generator
+ * falls through to `companion_cache` / curated.
+ *
+ * Grep: `library_search_rejected` or `"holzen_event":"library_search_rejected"`.
+ * Pair with `companion_slot_resolved` (same reflection) to see which slot fell through.
+ * Aggregate by `reason` to spot RLS regressions (`db_error`), empty pools (`empty`),
+ * freshness exhaustion (`all_seen`), or unexpected throws (`threw`).
+ */
+function logLibrarySearchRejected(
+  reason: LibrarySearchRejectReason,
+  fields: {
+    type: string;
+    companion_type: string | null;
+    mood_tag: string | null;
+    candidate_pool_size?: number;
+    recently_seen_size?: number;
+    detail?: string;
+  },
+): void {
+  try {
+    console.warn(JSON.stringify({
+      holzen_event: "library_search_rejected",
+      reason,
+      type: fields.type,
+      companion_type: fields.companion_type,
+      mood_tag: fields.mood_tag,
+      candidate_pool_size: fields.candidate_pool_size ?? null,
+      recently_seen_size: fields.recently_seen_size ?? null,
+      detail: fields.detail ? fields.detail.slice(0, 200) : null,
+      ts: new Date().toISOString(),
+    }));
+  } catch {
+    console.warn(`[library] library_search_rejected reason=${reason} type=${fields.type}`);
+  }
+}
+
+/**
+ * Structured Edge log when the per-user freshness lookup (`user_companion_serves`) errors.
+ *
+ * Grep: `library_recent_serves_error` or `"holzen_event":"library_recent_serves_error"`.
+ * When this fires, `searchLibrary` falls open (treats user as if no recent serves) rather
+ * than rejecting library — so we see rejected=none but library serves ignore freshness
+ * until this clears.
+ */
+function logLibraryRecentServesError(
+  phase: "db_error" | "threw",
+  fields: { companion_type: string | null; detail?: string },
+): void {
+  try {
+    console.warn(JSON.stringify({
+      holzen_event: "library_recent_serves_error",
+      phase,
+      companion_type: fields.companion_type,
+      detail: fields.detail ? fields.detail.slice(0, 200) : null,
+      ts: new Date().toISOString(),
+    }));
+  } catch {
+    console.warn(`[library] library_recent_serves_error phase=${phase}`);
+  }
+}
+
 /**
  * Search the local content library for FRESH entries this user hasn't seen recently.
  *
@@ -61,12 +127,29 @@ export interface LibrarySearchOptions {
  * - All matching entries were seen by this user in the last 7 days
  *   (unless includeStale=true)
  *
+ * When the library phase rejects (returns []), emits a structured `library_search_rejected`
+ * Edge log with a stable `reason` so the library → cache fallback becomes diagnosable.
+ *
  * The library table may not exist yet (before migration) — returns empty gracefully.
+ *
+ * Candidate-pool sizing: we pull a wider window than the caller's `limit` before applying
+ * the per-user freshness filter so that, when the top rows are all recently seen, lower-
+ * ranked fresh rows still get a chance instead of being starved by `.limit()` + quality
+ * sort. `limit` still bounds the *returned* slice.
  */
+const LIBRARY_FRESHNESS_OVERSAMPLE = 5;
+const LIBRARY_MIN_CANDIDATE_POOL = 100;
+
 export async function searchLibrary(
   svcClient: any,
   options: LibrarySearchOptions,
 ): Promise<LibraryEntry[]> {
+  const returnLimit = options.limit ?? 20;
+  // When a userId is set we need to oversample so freshness exclusions don't starve fresh rows.
+  const candidateLimit = options.userId && !options.includeStale
+    ? Math.max(returnLimit * LIBRARY_FRESHNESS_OVERSAMPLE, LIBRARY_MIN_CANDIDATE_POOL)
+    : returnLimit;
+
   try {
     let query = svcClient
       .from("content_library")
@@ -76,7 +159,7 @@ export async function searchLibrary(
       .eq("type", options.type)
       .eq("active", true)
       .order("quality_score", { ascending: false })
-      .limit(options.limit ?? 20);
+      .limit(candidateLimit);
 
     if (options.companionType) {
       query = query.contains("companion_types", [options.companionType]);
@@ -87,9 +170,26 @@ export async function searchLibrary(
     }
 
     const { data, error } = await query;
-    if (error || !data || data.length === 0) return [];
+    if (error) {
+      logLibrarySearchRejected("db_error", {
+        type: options.type,
+        companion_type: options.companionType ?? null,
+        mood_tag: options.moodTag ?? null,
+        detail: error.message,
+      });
+      return [];
+    }
+    if (!data || data.length === 0) {
+      logLibrarySearchRejected("empty", {
+        type: options.type,
+        companion_type: options.companionType ?? null,
+        mood_tag: options.moodTag ?? null,
+      });
+      return [];
+    }
 
     let entries = data as LibraryEntry[];
+    const totalCandidates = entries.length;
 
     // Exclude by title (from localStorage dedup hints)
     if (options.excludeTitles?.length) {
@@ -99,15 +199,24 @@ export async function searchLibrary(
 
     // ── Per-user freshness: exclude entries seen in the last 7 days ──
     if (options.userId && !options.includeStale) {
-      const recentlySeen = await getRecentlySeenLibraryIds(svcClient, options.userId, options.companionType);
+      const recentlySeen = await getRecentlySeenLibraryIds(
+        svcClient,
+        options.userId,
+        options.companionType,
+      );
       if (recentlySeen.size > 0) {
         const freshEntries = entries.filter(e => !recentlySeen.has(e.id));
-        if (freshEntries.length > 0) {
-          entries = freshEntries;
-        } else {
-          // All entries seen recently — return empty to force Perplexity
+        if (freshEntries.length === 0) {
+          logLibrarySearchRejected("all_seen", {
+            type: options.type,
+            companion_type: options.companionType ?? null,
+            mood_tag: options.moodTag ?? null,
+            candidate_pool_size: totalCandidates,
+            recently_seen_size: recentlySeen.size,
+          });
           return [];
         }
+        entries = freshEntries;
       }
     }
 
@@ -121,8 +230,14 @@ export async function searchLibrary(
       });
     }
 
-    return entries;
-  } catch {
+    return entries.slice(0, returnLimit);
+  } catch (e) {
+    logLibrarySearchRejected("threw", {
+      type: options.type,
+      companion_type: options.companionType ?? null,
+      mood_tag: options.moodTag ?? null,
+      detail: e instanceof Error ? e.message : String(e),
+    });
     return [];
   }
 }
@@ -170,6 +285,15 @@ export function recordLibraryServe(
 
 /**
  * Get IDs of library/cache entries this user has seen in the freshness window.
+ *
+ * Note: `user_companion_serves.cache_entry_id` holds both `companion_cache.id` and
+ * `content_library.id` values (see migration `20260414180000_user_companion_serves_dual_entry_ids`),
+ * but the two UUID spaces don't collide so it's safe to intersect against library IDs.
+ *
+ * On DB error or throw, emits `library_recent_serves_error` (stable grep target) and returns an
+ * empty set — i.e. fails open: the caller will treat the user as if they have no recent serves
+ * rather than force a reject. The tradeoff is intentional; we'd rather risk a repeat than
+ * starve library entirely on a transient failure.
  */
 async function getRecentlySeenLibraryIds(
   svcClient: any,
@@ -189,11 +313,22 @@ async function getRecentlySeenLibraryIds(
       query = query.eq("companion_type", companionType);
     }
 
-    const { data } = await query;
+    const { data, error } = await query;
+    if (error) {
+      logLibraryRecentServesError("db_error", {
+        companion_type: companionType ?? null,
+        detail: error.message,
+      });
+      return new Set();
+    }
     if (!data) return new Set();
     return new Set(data.map((r: any) => r.cache_entry_id));
-  } catch {
-    return new Set(); // Table may not exist yet
+  } catch (e) {
+    logLibraryRecentServesError("threw", {
+      companion_type: companionType ?? null,
+      detail: e instanceof Error ? e.message : String(e),
+    });
+    return new Set();
   }
 }
 

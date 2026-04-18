@@ -50,7 +50,7 @@ High-level order (source of truth: **`supabase/functions/_shared/generators/sign
 
 Phase toggles: `COMPANION_PHASE_LIBRARY`, `COMPANION_PHASE_CACHE`, `COMPANION_PHASE_LIVE` (all enabled by default; see `_shared/phase-config.ts`).
 
-Admin **Monitor** shows **`live` vs `cache` vs `curated`** from **`companion_serves`**; a **live** run can still create a **cache** row for the pool — that is expected.
+Admin **Monitor** shows **`live` / `library` / `cache` / `curated`** from **`companion_serves`**. `library` = a hit in the curated **`content_library`** table (Phase 1); `cache` = a hit in the runtime **`companion_cache`** pool (Phase 2). A **live** run can still create a **cache** row for the pool — that is expected.
 
 ---
 

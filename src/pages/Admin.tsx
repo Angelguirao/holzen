@@ -679,7 +679,7 @@ export default function Admin() {
           <div className="space-y-2">
             <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">Recent reflections</p>
             <p className="text-[9px] font-mono text-muted-foreground/45 leading-relaxed">
-              Green chips mean that companion row exists on the reflection. Expand for <strong className="font-normal text-muted-foreground/55">live</strong> / <strong className="font-normal text-muted-foreground/55">cache</strong> / <strong className="font-normal text-muted-foreground/55">curated</strong> / <strong className="font-normal text-muted-foreground/55">empty</strong> from <code className="text-muted-foreground/55">companion_serves</code> (n/a = no log row, e.g. older sessions).
+              Green chips mean that companion row exists on the reflection. Expand for <strong className="font-normal text-muted-foreground/55">live</strong> / <strong className="font-normal text-muted-foreground/55">library</strong> / <strong className="font-normal text-muted-foreground/55">cache</strong> / <strong className="font-normal text-muted-foreground/55">curated</strong> / <strong className="font-normal text-muted-foreground/55">empty</strong> from <code className="text-muted-foreground/55">companion_serves</code> (library = curated <code className="text-muted-foreground/55">content_library</code> hit; cache = runtime <code className="text-muted-foreground/55">companion_cache</code>; n/a = no log row, e.g. older sessions).
             </p>
             <div className="space-y-1.5">
               <FilterRow label="Mood" options={sessionMoodOptions} value={sessionMoodFilter} onChange={setSessionMoodFilter} />
