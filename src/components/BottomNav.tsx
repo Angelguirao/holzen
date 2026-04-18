@@ -27,6 +27,7 @@ export function BottomNav() {
                 isActive ? '' : 'text-muted-foreground'
               )
             }
+            style={({ isActive }) => (isActive ? { color: '#DBB366' } : undefined)}
           >
             <Icon className="h-4 w-4" />
             <span>{t(`nav.${key}`)}</span>
