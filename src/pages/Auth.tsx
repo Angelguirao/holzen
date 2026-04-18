@@ -187,9 +187,15 @@ const Auth = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
-              minLength={6}
+              minLength={view === 'sign-up' ? 8 : 6}
+              {...(view === 'sign-up' && { pattern: '(?=.*[A-Za-z])(?=.*\\d).{8,}' })}
               className="font-mono text-sm"
             />
+            {view === 'sign-up' && (
+              <p className="text-[11px] leading-relaxed text-muted-foreground">
+                Must be at least 8 characters and include a letter and a number.
+              </p>
+            )}
           </div>
           {error && <p className="text-xs text-destructive font-mono">{error}</p>}
           <LoadingButton type="submit" className="w-full font-mono text-xs" loading={loading}>
