@@ -953,7 +953,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                 onClick={changePassword}
                 disabled={changingPassword || !newPassword}
                 size="sm"
-                className="w-full font-mono text-xs"
+                className="w-full font-mono text-xs mt-4"
               >
                 {changingPassword ? t('settings.updatingPassword') : t('settings.updatePassword')}
               </Button>
@@ -1126,7 +1126,7 @@ function ChangeEmailSection() {
         onClick={changeEmail}
         disabled={changing || !newEmail}
         size="sm"
-        className="w-full font-mono text-xs"
+        className="w-full font-mono text-xs mt-4"
       >
         {changing ? t('settings.sendingConfirmation') : t('settings.changeEmail')}
       </Button>
