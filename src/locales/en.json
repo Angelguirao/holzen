@@ -826,15 +826,6 @@
       "continueHint": "There is no \"right\" amount of time — continue when you feel done."
     }
   },
-  "reflectionNote": {
-    "addNote": "Add a note",
-    "placeholder": "Write a note…",
-    "saved": "Saved"
-  },
-  "reflectionTags": {
-    "addTags": "Add tags",
-    "typeTag": "Type a tag…"
-  },
   "letter": {
     "calmTitle": "Calm letter",
     "stormTitle": "Storm letter",
@@ -1273,7 +1264,8 @@
     "editNote": "Edit note",
     "placeholder": "How did this make you feel?",
     "save": "Save",
-    "saved": "Saved"
+    "saved": "Saved",
+    "autosaveHint": "Your note also saves automatically a moment after you stop typing."
   },
   "reflectionTags": {
     "addTags": "Add tags",

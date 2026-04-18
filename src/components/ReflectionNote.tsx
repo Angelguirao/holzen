@@ -11,60 +11,20 @@ interface Props {
   initialNote: string | null;
 }
 
+const DEBOUNCE_MS = 1000;
+
 export function ReflectionNote({ reflectionId, initialNote }: Props) {
   const { user } = useAuth();
   const { t } = useTranslation();
   const [note, setNote] = useState(initialNote ?? '');
   const [editing, setEditing] = useState(false);
   const [saved, setSaved] = useState(false);
+  /** After first load for this reflectionId; avoids autosave overwriting DB before hydrate. */
+  const [hydrated, setHydrated] = useState(false);
   const savedToLibraryRef = useRef(!!initialNote);
 
-  // Reload from DB when remounting (e.g. pause step away → back); props often pass initialNote=null.
-  useEffect(() => {
-    let cancelled = false;
-
-    if (initialNote != null && initialNote !== '') {
-      setNote(initialNote);
-      savedToLibraryRef.current = true;
-      return () => {
-        cancelled = true;
-      };
-    }
-
-    void (async () => {
-      const { data, error } = await supabase
-        .from('reflections')
-        .select('note')
-        .eq('id', reflectionId)
-        .maybeSingle();
-      if (cancelled || error || !data) return;
-      const loaded = typeof data.note === 'string' ? data.note : '';
-      setNote(loaded);
-      if (loaded.trim()) {
-        const { count } = await supabase
-          .from('library_items')
-          .select('id', { count: 'exact', head: true })
-          .eq('reflection_id', reflectionId)
-          .eq('source_type', 'reflection_note');
-        if (!cancelled) savedToLibraryRef.current = (count ?? 0) > 0;
-      } else if (!cancelled) {
-        savedToLibraryRef.current = false;
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [reflectionId, initialNote]);
-
-  const save = useCallback(async () => {
-    setEditing(false);
-    setSaved(true);
-    const trimmed = note.trim() || null;
-    await supabase
-      .from('reflections')
-      .update({ note: trimmed })
-      .eq('id', reflectionId);
+  const syncNoteToBackend = useCallback(async (trimmed: string | null) => {
+    await supabase.from('reflections').update({ note: trimmed }).eq('id', reflectionId);
 
     if (trimmed && user && !savedToLibraryRef.current) {
       savedToLibraryRef.current = true;
@@ -86,9 +46,68 @@ export function ReflectionNote({ reflectionId, initialNote }: Props) {
         .eq('reflection_id', reflectionId)
         .eq('source_type', 'reflection_note');
     }
+  }, [reflectionId, user]);
 
+  // Reload from DB when remounting (e.g. pause step away → back); props often pass initialNote=null.
+  useEffect(() => {
+    let cancelled = false;
+    setHydrated(false);
+
+    if (initialNote != null && initialNote !== '') {
+      setNote(initialNote);
+      savedToLibraryRef.current = true;
+      setHydrated(true);
+      return () => {
+        cancelled = true;
+      };
+    }
+
+    void (async () => {
+      const { data, error } = await supabase
+        .from('reflections')
+        .select('note')
+        .eq('id', reflectionId)
+        .maybeSingle();
+      if (cancelled || error || !data) {
+        if (!cancelled) setHydrated(true);
+        return;
+      }
+      const loaded = typeof data.note === 'string' ? data.note : '';
+      setNote(loaded);
+      if (loaded.trim()) {
+        const { count } = await supabase
+          .from('library_items')
+          .select('id', { count: 'exact', head: true })
+          .eq('reflection_id', reflectionId)
+          .eq('source_type', 'reflection_note');
+        if (!cancelled) savedToLibraryRef.current = (count ?? 0) > 0;
+      } else if (!cancelled) {
+        savedToLibraryRef.current = false;
+      }
+      if (!cancelled) setHydrated(true);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [reflectionId, initialNote]);
+
+  // Debounced autosave while typing (same persistence as Save, without closing the editor).
+  useEffect(() => {
+    if (!hydrated || !editing) return;
+    const trimmed = note.trim() || null;
+    const t = setTimeout(() => {
+      void syncNoteToBackend(trimmed);
+    }, DEBOUNCE_MS);
+    return () => clearTimeout(t);
+  }, [note, hydrated, editing, syncNoteToBackend]);
+
+  const save = useCallback(async () => {
+    setEditing(false);
+    setSaved(true);
+    await syncNoteToBackend(note.trim() || null);
     setTimeout(() => setSaved(false), 1500);
-  }, [reflectionId, note, user]);
+  }, [note, syncNoteToBackend]);
 
   if (!editing && !note.trim()) {
     return (
@@ -131,11 +150,17 @@ export function ReflectionNote({ reflectionId, initialNote }: Props) {
         autoFocus
         disableFocusMode
       />
-      <div className="flex justify-end">
+      <div className="flex flex-col items-end gap-2">
         <Button type="button" variant="secondary" size="sm" className="gap-1.5" onClick={save}>
           <Check className="h-3.5 w-3.5" />
           {saved ? t('reflectionNote.saved') : t('reflectionNote.save')}
         </Button>
+        <p className="max-w-md text-right text-xs leading-relaxed text-muted-foreground">
+          {t(
+            'reflectionNote.autosaveHint',
+            'Your note also saves automatically a moment after you stop typing.',
+          )}
+        </p>
       </div>
     </div>
   );
