@@ -753,6 +753,48 @@ export type Database = {
         }
         Relationships: []
       }
+      grounding_enrichment_cache: {
+        Row: {
+          abstract: string | null
+          citation_count: number | null
+          citation_hash: string
+          created_at: string
+          doi: string | null
+          expires_at: string
+          id: string
+          last_validated_at: string | null
+          researchers: Json
+          source_provenance: Json
+          url: string | null
+        }
+        Insert: {
+          abstract?: string | null
+          citation_count?: number | null
+          citation_hash: string
+          created_at?: string
+          doi?: string | null
+          expires_at?: string
+          id?: string
+          last_validated_at?: string | null
+          researchers?: Json
+          source_provenance?: Json
+          url?: string | null
+        }
+        Update: {
+          abstract?: string | null
+          citation_count?: number | null
+          citation_hash?: string
+          created_at?: string
+          doi?: string | null
+          expires_at?: string
+          id?: string
+          last_validated_at?: string | null
+          researchers?: Json
+          source_provenance?: Json
+          url?: string | null
+        }
+        Relationships: []
+      }
       library_items: {
         Row: {
           body: string | null
