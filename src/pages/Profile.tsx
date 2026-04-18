@@ -448,7 +448,7 @@ function StatsContent({ reflections, practiceEntries = [], letters = [], memberS
   return (
     <div className="space-y-6">
       {/* Hero score + merged summary */}
-      <div className="space-y-4">
+      <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-5 space-y-4">
         <div className="flex items-center gap-5">
           {/* Score ring — hero size */}
           <div className="relative shrink-0 cursor-pointer" onClick={() => scoreData && setShowScoreInfo(true)}>
