@@ -953,7 +953,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                 onClick={changePassword}
                 disabled={changingPassword || !newPassword}
                 size="sm"
-                className="w-full font-mono text-xs mt-4"
+                className="w-full font-mono text-xs !mt-4"
               >
                 {changingPassword ? t('settings.updatingPassword') : t('settings.updatePassword')}
               </Button>
