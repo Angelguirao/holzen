@@ -245,7 +245,7 @@ export function JourneyWidget({ reflections, practiceEntries = [], streakFreezeD
           <span className="h-2 w-2 rounded-sm bg-accent-foreground/20" /> {t('streakTimeline.legend.practiceOnly', 'Practice only')}
         </span>
         <span className="flex items-center gap-1 text-xs">
-          <span className="h-2 w-2 rounded-sm bg-secondary/60 border" style={{ borderColor: '#C1CBD7' }} /> {t('streakTimeline.legend.streakFreeze')}
+          <span className="h-2 w-2 rounded-sm bg-secondary/60 border" style={{ borderColor: '#7B8A9E' }} /> {t('streakTimeline.legend.streakFreeze')}
         </span>
       </div>
 
