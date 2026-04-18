@@ -448,7 +448,17 @@ function StatsContent({ reflections, practiceEntries = [], letters = [], memberS
   return (
     <div className="space-y-6">
       {/* Hero score + merged summary */}
-      <div className="rounded-md border border-border/60 bg-muted/30 px-2 py-5 space-y-4">
+      <div className="relative rounded-md border border-border/60 bg-muted/30 px-2 py-5 space-y-4">
+        {scoreData && (
+          <button
+            type="button"
+            aria-label="Score info"
+            onClick={() => setShowScoreInfo(true)}
+            className="absolute top-2 left-2 rounded-full p-1 text-muted-foreground/50 hover:text-muted-foreground transition-colors"
+          >
+            <Info className="h-3.5 w-3.5" />
+          </button>
+        )}
         <div className="flex items-center gap-5">
           {/* Score ring — hero size */}
           <div className="relative shrink-0 cursor-pointer" onClick={() => scoreData && setShowScoreInfo(true)}>
@@ -468,11 +478,6 @@ function StatsContent({ reflections, practiceEntries = [], letters = [], memberS
                 <span className={`text-[9px] font-mono mt-0.5 ${scoreColor}`}>{scoreGrade}</span>
               )}
             </div>
-            {scoreData && (
-              <div className="absolute -top-1 -right-1 rounded-full bg-foreground p-1">
-                <Info className="h-4 w-4 text-background" />
-              </div>
-            )}
           </div>
 
           {/* Summary metrics with micro-context */}
