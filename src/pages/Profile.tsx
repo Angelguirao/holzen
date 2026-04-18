@@ -510,7 +510,7 @@ function StatsContent({ reflections, practiceEntries = [], letters = [], memberS
 
         {/* Score component bars */}
         {scoreData && (
-          <div className="space-y-1.5 pt-2 px-4 border-t border-border/30">
+          <div className="space-y-4 pt-2 px-4 border-t border-border/30">
             <ScoreBarInline label={t('holzenScore.emotionalRegulation', 'Regulation')} value={scoreData.emotionalRegulation} hint={t('scoreHint.regulation', 'Mood improvement during pauses + breathing completion')} />
             <ScoreBarInline label={t('holzenScore.distressTolerance', 'Tolerance')} value={scoreData.distressTolerance} hint={t('scoreHint.tolerance', 'Holding steady during high volatility')} />
             {hasHoldGoal && <ScoreBarInline label={t('holzenScore.decisionAlignment', 'Alignment')} value={scoreData.decisionAlignment} hint={t('scoreHint.alignment', 'Actions aligned with your hold goal')} />}
