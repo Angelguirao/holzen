@@ -39,6 +39,37 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (_event === 'SIGNED_IN' && session?.user) {
         const refCode = localStorage.getItem('holzen_ref');
         const userId = session.user.id;
+
+        // Send welcome email once per user (idempotency key on the function side
+        // also guards against duplicates if localStorage is cleared).
+        void (async () => {
+          const sentKey = `holzen_welcome_sent_${userId}`;
+          if (localStorage.getItem(sentKey)) return;
+          // Only send if the account was created in the last ~10 minutes
+          // (avoids welcoming long-time users on every login).
+          const createdAt = session.user.created_at ? new Date(session.user.created_at).getTime() : 0;
+          if (!createdAt || Date.now() - createdAt > 10 * 60 * 1000) {
+            localStorage.setItem(sentKey, '1');
+            return;
+          }
+          const email = session.user.email;
+          if (!email) return;
+          const firstName =
+            (session.user.user_metadata?.first_name as string | undefined) ??
+            (session.user.user_metadata?.full_name as string | undefined)?.split(' ')[0] ??
+            null;
+          const { error: weErr } = await supabase.functions.invoke('send-transactional-email', {
+            body: {
+              templateName: 'welcome',
+              recipientEmail: email,
+              idempotencyKey: `welcome-${userId}`,
+              templateData: firstName ? { firstName } : {},
+            },
+          });
+          if (!weErr) localStorage.setItem(sentKey, '1');
+          else holzenLog.auth('welcome email invoke failed', { message: weErr.message });
+        })();
+
         if (refCode) {
           void (async () => {
             const { error: qErr } = await (supabase as unknown as UntypedInsertClient)

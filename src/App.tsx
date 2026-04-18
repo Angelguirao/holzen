@@ -40,6 +40,7 @@ const CompanionHistoryPage = lazy(() => import("./pages/CompanionHistoryPage"));
 const Ground = lazy(() => import("./pages/Ground"));
 const GroundHistory = lazy(() => import("./pages/GroundHistory"));
 const Admin = lazy(() => import("./pages/Admin"));
+const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
 
 const queryClient = createHolzenQueryClient();
 
@@ -158,6 +159,7 @@ const App = () => (
                 <Route path="/blog/:slug" element={<BlogPost />} />
                 <Route path="/roadmap" element={<Roadmap />} />
                 <Route path="/reserve" element={<Reserve />} />
+                <Route path="/unsubscribe" element={<Unsubscribe />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </Suspense>
