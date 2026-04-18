@@ -14,6 +14,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "check:edge": "node scripts/check-edge.mjs",
+    "check:prepush": "bash scripts/pre-push-check.sh",
     "supabase:start": "supabase start",
     "supabase:stop": "supabase stop",
     "supabase:status": "supabase status",
