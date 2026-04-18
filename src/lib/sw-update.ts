@@ -37,20 +37,26 @@ export function listenForSwUpdate() {
       window.addEventListener('focus', checkForUpdate);
 
       const showUpdateToast = (waitingSW: ServiceWorker) => {
+        let applied = false;
+        const apply = () => {
+          if (applied) return;
+          applied = true;
+          waitingSW.postMessage({ type: 'SKIP_WAITING' });
+        };
+
         toast('A new version is available', {
-          duration: Infinity,
+          duration: 10000,
           id: 'sw-update',
           action: {
-            label: 'Refresh',
-            onClick: () => {
-              waitingSW.postMessage({ type: 'SKIP_WAITING' });
-            },
+            label: 'Refresh now',
+            onClick: apply,
           },
-          cancel: {
-            label: 'Later',
-            onClick: () => {},
-          },
+          description: 'Auto-updating in 10s…',
         });
+
+        // Auto-apply after 10s if the user doesn't interact — prevents PWA users
+        // from getting stuck on stale builds (common on iOS / installed PWAs).
+        window.setTimeout(apply, 10_000);
       };
 
       // If a new SW is already waiting, prompt user
