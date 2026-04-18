@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { motion, useReducedMotion, useInView } from 'framer-motion';
 import {
-  ArrowRight, Twitter, Wind, Feather, BookOpen, TrendingDown, Brain,
+  ArrowRight, Twitter, Instagram, Wind, Feather, BookOpen, TrendingDown, Brain,
   BarChart3, Target, Heart, Mail, Globe, Shield, Award,
   Zap, Moon, ChevronDown, Timer, Eye, Sparkles, RefreshCw,
   Smartphone, Anchor, ExternalLink, UserCircle,
@@ -375,10 +375,8 @@ const Landing = () => {
             <a href="https://x.com/holzenapp" target="_blank" rel="noopener noreferrer" className="text-muted-foreground/60 hover:text-foreground transition-colors" aria-label="Follow on X">
               <Twitter className="h-4 w-4" />
             </a>
-            <a href="https://njump.me/holzen" target="_blank" rel="noopener noreferrer" className="text-muted-foreground/60 hover:text-foreground transition-colors" aria-label="Follow on Nostr">
-              <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 15.5v-3.07c-1.42-.17-2.7-.8-3.64-1.74l1.42-1.42A4.47 4.47 0 0012 12.5c1.38 0 2.63-.56 3.54-1.46l1.42 1.42A6.47 6.47 0 0113 14.43V17.5h-2z" />
-              </svg>
+            <a href="https://instagram.com/holzenapp" target="_blank" rel="noopener noreferrer" className="text-muted-foreground/60 hover:text-foreground transition-colors" aria-label="Follow on Instagram">
+              <Instagram className="h-4 w-4" />
             </a>
           </div>
 
