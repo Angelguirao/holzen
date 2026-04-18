@@ -633,7 +633,7 @@ function MicroStat({ value, suffix, label, context, isText }: {
           <span className="text-[9px] font-mono text-muted-foreground/40">{context}</span>
         )}
       </div>
-      <p className="text-[9px] font-mono tracking-widest uppercase text-muted-foreground/50">{label}</p>
+      <p className="text-[9px] font-mono tracking-widest uppercase text-white">{label}</p>
     </div>
   );
 }
