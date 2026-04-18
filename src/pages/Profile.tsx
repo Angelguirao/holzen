@@ -234,7 +234,7 @@ const Profile = () => {
     <div className="space-y-6">
       <NoxHeaderMain title={t('nav.profile')} subtitle={t('profile.pageSubtitle')} />
       {/* Tab header */}
-      <div className="-mx-1 flex gap-1 overflow-x-auto px-1 pb-4">
+      <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-4">
         {tabs.map((tabItem) => {
           const Icon = tabItem.icon;
           const isActive = tab === tabItem.id;
