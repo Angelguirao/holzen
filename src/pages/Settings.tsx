@@ -65,7 +65,7 @@ function GroundingTagInput({ activities, onChange }: { activities: string[]; onC
   return (
     <div className="space-y-3">
       <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.groundingTitle')}</p>
-      <p className="text-xs text-muted-foreground leading-relaxed">
+      <p className="text-xs leading-relaxed text-primary">
         {t('settings.groundingDesc')}
       </p>
       <div className="flex flex-wrap gap-1.5 min-h-[2rem]">
@@ -293,7 +293,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
           <AccordionContent className="space-y-5 pb-4">
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.firstName')}</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
+              <p className="text-xs leading-relaxed text-primary">
                 {t('settings.firstNameDesc')}
               </p>
               <Input
@@ -311,7 +311,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             {/* My Why — Motivations */}
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.myWhy')}</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
+              <p className="text-xs leading-relaxed text-primary">
                 {t('settings.myWhyDesc')}
               </p>
               <div className="grid grid-cols-2 gap-2">
@@ -343,7 +343,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             {/* Mantra */}
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.personalMantra')}</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
+              <p className="text-xs leading-relaxed text-primary">
                 {t('settings.mantraDesc')}
               </p>
               <textarea
