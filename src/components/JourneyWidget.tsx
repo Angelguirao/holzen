@@ -268,7 +268,8 @@ export function JourneyWidget({ reflections, practiceEntries = [], streakFreezeD
       {/* Expand to calendar */}
       <button
         onClick={() => setExpanded((p) => !p)}
-        className="w-full flex items-center justify-center gap-1.5 pt-1 text-[9px] font-mono text-muted-foreground/40 hover:text-muted-foreground/70 transition-colors"
+        className="w-full flex items-center justify-center gap-1.5 pt-1 text-[9px] font-mono transition-colors"
+        style={{ color: '#C1CBD7' }}
       >
         <motion.div
           animate={{ rotate: expanded ? 180 : 0 }}
