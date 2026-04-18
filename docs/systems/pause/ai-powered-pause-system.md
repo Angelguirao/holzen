@@ -602,7 +602,7 @@ All four companion cards have a dedicated Full View route that mounts the same p
 | Companion | Route | Page | Presentation |
 |----------|-------|------|--------------|
 | Signal | `/companion/signal/:reflectionId` | `src/pages/CompanionSignalPage.tsx` | `SignalFullView` (favicon + trusted-source badge) |
-| Grounding | `/companion/grounding/:reflectionId` | `src/pages/CompanionGroundingPage.tsx` | `GroundingFullView` (promoted citation CTA; PR 2 adds abstract + bios) |
+| Grounding | `/companion/grounding/:reflectionId` | `src/pages/CompanionGroundingPage.tsx` | `GroundingFullView` (promoted citation CTA + enrichment block: abstract preview, researcher bios, citation count — via `grounding-enrich` edge function; see [grounding.md §10](companions/grounding.md)). Also: `RelatedBiasesThisMonth` chip rail dedup-by-title from the last 30 days. |
 | History | `/companion/history/:reflectionId` | `src/pages/CompanionHistoryPage.tsx` | `HistoricalInsightDisplay` |
 | Zoom Out | `/companion/zoom-out/:reflectionId` | `src/pages/CompanionZoomOutPage.tsx` | `ZoomOutDisplay` |
 
@@ -616,6 +616,8 @@ Shared primitives reused across all four pages (in `src/components/companion/`):
 - **`SaveThisMomentButton`** — **Pro-gated** note capture that writes a `library_items` row of `type: note`, `source_type: companion_moment`. Distinct from the existing auto-bookmark of the card itself. Free users see a locked state with an upgrade toast.
 
 The "Open full view" navigation is always free. The only Full View action behind Pro today is **Save this moment**; the autosave of the card's content itself continues to work for free users (`companion-library-autosave.ts`).
+
+Page mounts fire a single `companion_fullview_opened` analytics event (user, reflection, companion) via `useFullviewTelemetry`, so Full View adoption can be tracked independently of inline card impressions.
 
 ---
 
