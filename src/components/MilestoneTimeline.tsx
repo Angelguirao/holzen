@@ -175,7 +175,7 @@ export function MilestoneTimeline({ reflections, practiceEntries = [], letters =
   }
 
   return (
-    <div className="space-y-1">
+    <div className="space-y-0">
       {milestones.map((milestone, i) => {
         const Icon = milestone.icon;
         const isFirst = i === 0;
