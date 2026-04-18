@@ -627,10 +627,10 @@ function MicroStat({ value, suffix, label, context, isText }: {
     <div className="space-y-0.5">
       <div className="flex items-baseline gap-1">
         <span className={`font-mono font-medium leading-none ${isText ? 'text-base' : 'text-lg'}`}>
-          {value}{suffix && <span className="text-[10px] text-muted-foreground/50 ml-0.5">{suffix}</span>}
+          {value}{suffix && <span className="text-[10px] ml-0.5" style={{ color: '#F0F3F7' }}>{suffix}</span>}
         </span>
         {context && (
-          <span className="text-[9px] font-mono text-muted-foreground/40">{context}</span>
+          <span className="text-[9px] font-mono" style={{ color: '#F0F3F7' }}>{context}</span>
         )}
       </div>
       <p className="text-[9px] font-mono tracking-widest uppercase text-white">{label}</p>
