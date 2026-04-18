@@ -469,8 +469,8 @@ function StatsContent({ reflections, practiceEntries = [], letters = [], memberS
               )}
             </div>
             {scoreData && (
-              <div className="absolute -top-1 -right-1 rounded-full bg-muted p-0.5">
-                <Info className="h-3 w-3 text-muted-foreground/50" />
+              <div className="absolute -top-1 -right-1 rounded-full bg-foreground p-1">
+                <Info className="h-4 w-4 text-background" />
               </div>
             )}
           </div>
