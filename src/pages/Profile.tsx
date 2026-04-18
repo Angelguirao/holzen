@@ -641,7 +641,7 @@ function MicroStat({ value, suffix, label, context, isText }: {
 function ScoreBarInline({ label, value, hint }: { label: string; value: number; hint?: string }) {
   const [open, setOpen] = useState(false);
   return (
-    <div className="space-y-0.5 cursor-pointer" onClick={() => hint && setOpen(!open)}>
+    <div className="space-y-2 cursor-pointer" onClick={() => hint && setOpen(!open)}>
       <div className="flex justify-between text-[10px] font-mono text-muted-foreground">
         <span>{label}</span>
         <span>{value}</span>
