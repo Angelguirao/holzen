@@ -245,7 +245,7 @@ const Profile = () => {
               className={`relative flex items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${
                 isActive
                   ? 'bg-primary/10 text-primary shadow-sm'
-                  : 'text-muted-foreground/60 hover:bg-muted/50 hover:text-muted-foreground'
+                  : 'border border-border/30 text-muted-foreground/60 hover:bg-muted/50 hover:text-muted-foreground'
               }`}
             >
               <Icon className={`h-3.5 w-3.5 ${isActive ? 'text-primary' : 'text-muted-foreground/40'}`} />
