@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { Trans } from 'react-i18next';
 import { Link } from 'react-router-dom';
+import { X } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { lovable } from '@/integrations/lovable/index';
 import { Button } from '@/components/ui/button';
@@ -129,7 +130,14 @@ const Auth = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-6">
+    <div className="min-h-screen flex items-center justify-center p-6 relative">
+      <Link
+        to="/welcome"
+        aria-label="Close"
+        className="absolute top-4 right-4 p-2 text-muted-foreground hover:text-foreground transition-colors"
+      >
+        <X className="h-5 w-5" />
+      </Link>
       <div className="w-full max-w-sm space-y-8">
         <NoxHeaderMain
           title={t('common.holzen')}
