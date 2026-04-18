@@ -448,7 +448,7 @@ function StatsContent({ reflections, practiceEntries = [], letters = [], memberS
   return (
     <div className="space-y-6">
       {/* Hero score + merged summary */}
-      <div className="relative rounded-md border border-border/60 bg-muted/30 px-2 py-5 space-y-4">
+      <div className="relative rounded-md border border-border/60 bg-muted/30 px-0 py-5 space-y-4">
         {scoreData && (
           <button
             type="button"
