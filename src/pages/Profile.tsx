@@ -459,7 +459,7 @@ function StatsContent({ reflections, practiceEntries = [], letters = [], memberS
             <Info className="h-3.5 w-3.5" />
           </button>
         )}
-        <div className="flex items-center gap-5">
+        <div className="flex items-center gap-5 px-2">
           {/* Score ring — hero size */}
           <div className="relative shrink-0 cursor-pointer" onClick={() => scoreData && setShowScoreInfo(true)}>
             <svg width="108" height="108" viewBox="0 0 108 108">
