@@ -77,7 +77,8 @@ function GroundingTagInput({ activities, onChange }: { activities: string[]; onC
             {tag}
             <button
               onClick={() => onChange(activities.filter((a) => a !== tag))}
-              className="text-muted-foreground/40 hover:text-foreground transition-colors"
+              className="hover:text-foreground transition-colors"
+              style={{ color: '#7B8A9E' }}
             >
               ×
             </button>
