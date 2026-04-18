@@ -1045,12 +1045,14 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
         {/* 8. About */}
         <AccordionItem value="about" className="border border-border/40 rounded-md px-4">
           <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
-            {t('settings.about')}
-            {hasNewVersion && (
-              <span className="ml-2 text-[10px] font-mono bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">
-                {t('common.new')}
-              </span>
-            )}
+            <span className="flex items-center gap-4 flex-1">
+              {t('settings.about')}
+              {hasNewVersion && (
+                <span className="text-[10px] font-mono bg-primary/10 text-primary px-1.5 py-0.5 rounded-full">
+                  {t('common.new')}
+                </span>
+              )}
+            </span>
           </AccordionTrigger>
           <AccordionContent className="space-y-5 pb-4">
             <FeedbackForm />
