@@ -1787,6 +1787,7 @@ export type Database = {
           cache_hits: number | null
           companion_type: string | null
           curated_fallbacks: number | null
+          library_hits: number | null
           live_generated: number | null
           total_serves: number | null
         }
