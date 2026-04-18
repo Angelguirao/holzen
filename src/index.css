@@ -103,3 +103,27 @@ body.ambient-active header {
     display: flex;
   }
 }
+
+/* Custom thin scrollbar for horizontal tab strips (e.g. Profile chips).
+   - No card background: blends with page
+   - Track: subtle muted line (matches progress-bar background)
+   - Thumb: same tint as the active chip background (primary/10) */
+.tabs-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--primary) / 0.25) hsl(var(--muted) / 0.4);
+}
+.tabs-scroll::-webkit-scrollbar {
+  height: 4px;
+  background: transparent;
+}
+.tabs-scroll::-webkit-scrollbar-track {
+  background: hsl(var(--muted) / 0.4);
+  border-radius: 9999px;
+}
+.tabs-scroll::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary) / 0.25);
+  border-radius: 9999px;
+}
+.tabs-scroll::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary) / 0.4);
+}
