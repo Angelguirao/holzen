@@ -37,6 +37,8 @@ const PracticeReplay = lazy(() => import("./pages/PracticeReplay"));
 const PauseSession = lazy(() => import("./pages/PauseSession"));
 const CompanionZoomOutPage = lazy(() => import("./pages/CompanionZoomOutPage"));
 const CompanionHistoryPage = lazy(() => import("./pages/CompanionHistoryPage"));
+const CompanionSignalPage = lazy(() => import("./pages/CompanionSignalPage"));
+const CompanionGroundingPage = lazy(() => import("./pages/CompanionGroundingPage"));
 const Ground = lazy(() => import("./pages/Ground"));
 const GroundHistory = lazy(() => import("./pages/GroundHistory"));
 const Admin = lazy(() => import("./pages/Admin"));
@@ -139,6 +141,14 @@ const App = () => (
                 <Route
                   path="/companion/history/:reflectionId"
                   element={<ProtectedRoute><CompanionHistoryPage /></ProtectedRoute>}
+                />
+                <Route
+                  path="/companion/signal/:reflectionId"
+                  element={<ProtectedRoute><CompanionSignalPage /></ProtectedRoute>}
+                />
+                <Route
+                  path="/companion/grounding/:reflectionId"
+                  element={<ProtectedRoute><CompanionGroundingPage /></ProtectedRoute>}
                 />
                 <Route path="/breathe" element={<ProtectedRoute><Breathe /></ProtectedRoute>} />
                 <Route path="/ground" element={<ProtectedRoute><Ground /></ProtectedRoute>} />

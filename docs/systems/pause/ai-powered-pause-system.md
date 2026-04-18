@@ -592,8 +592,30 @@ Reads that need Signal/History/Zoom text use **`v_reflection_with_companions`** 
 | `use-holzen.ts` | BTC context, manual cooldown, `holzen-reflect`, reflection insert, initial companion state from reflection response |
 | `use-companion-data.ts` | Intervention-only orchestrate on mount, lazy per-slot `fetchCompanion` on card tap, per-companion loading/errors, recency hints, library auto-save hooks |
 | `InterventionSection.tsx` | Renders mirror / trap / pattern / question + optional zoom-out secondary |
-| `CompanionSection.tsx` | Container for companion cards and prefs; hides Zoom Out card when intervention already shows zoom-out secondary (§7.5) |
+| `CompanionSection.tsx` | Container for companion cards and prefs; hides Zoom Out card when intervention already shows zoom-out secondary (§7.5). Each companion card has an **"Open full view"** button wired to the routes below. |
 | `src/lib/companion-types.ts` | Canonical type strings shared with tests; full intervention ↔ generator ↔ UI map in **§7** |
+
+### 9.1 Companion Full View pages
+
+All four companion cards have a dedicated Full View route that mounts the same payload with extra reading affordances. The inline card remains the primary interaction surface; the Full View is a voluntary "deep read" for users who want more context — never mandatory.
+
+| Companion | Route | Page | Presentation |
+|----------|-------|------|--------------|
+| Signal | `/companion/signal/:reflectionId` | `src/pages/CompanionSignalPage.tsx` | `SignalFullView` (favicon + trusted-source badge) |
+| Grounding | `/companion/grounding/:reflectionId` | `src/pages/CompanionGroundingPage.tsx` | `GroundingFullView` (promoted citation CTA; PR 2 adds abstract + bios) |
+| History | `/companion/history/:reflectionId` | `src/pages/CompanionHistoryPage.tsx` | `HistoricalInsightDisplay` |
+| Zoom Out | `/companion/zoom-out/:reflectionId` | `src/pages/CompanionZoomOutPage.tsx` | `ZoomOutDisplay` |
+
+Shared primitives reused across all four pages (in `src/components/companion/`):
+
+- **`ReadTime`** — chars/WPM-bucketed read-time indicator.
+- **`WhyThisCard`** — collapsible disclosure that explains the orchestrator's pick in terms of mood + market direction + session `preferredBias`. Renders nothing if none of the three are known.
+- **`HistoryThread`** — the last 5 cards of the same companion type for this user, deep-linking to their own Full Views.
+- **`InterventionCrossRefBadge`** — small "This was also today's headline" tag for `grounding`/`history`/`zoomOut` when their payload was also the featured intervention (see §7.2 / §7.3 / §7.5).
+- **`useStaggeredReveal`** — 8 s breathing-room delay before feedback + save CTAs appear. Honors `prefers-reduced-motion` (skips the delay for accessibility).
+- **`SaveThisMomentButton`** — **Pro-gated** note capture that writes a `library_items` row of `type: note`, `source_type: companion_moment`. Distinct from the existing auto-bookmark of the card itself. Free users see a locked state with an upgrade toast.
+
+The "Open full view" navigation is always free. The only Full View action behind Pro today is **Save this moment**; the autosave of the card's content itself continues to work for free users (`companion-library-autosave.ts`).
 
 ---
 

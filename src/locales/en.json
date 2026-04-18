@@ -472,7 +472,61 @@
     "openFullView": "Open full view",
     "focusZoomOutMeta": "Zoom Out — Holzen",
     "focusHistoryMeta": "Look back — Holzen",
-    "focusLoadError": "We could not load this pause. It may have been removed or you may need to sign in again."
+    "focusLoadError": "We could not load this pause. It may have been removed or you may need to sign in again.",
+    "fullview": {
+      "readTime": {
+        "glance": "a glance",
+        "thirty": "~30 s read",
+        "ninety": "~90 s read",
+        "minutes": "~{{n}} min read"
+      },
+      "whyThis": {
+        "trigger": "Why this card now?",
+        "unknownMood": "how you said you felt",
+        "unknownDirection": "today's market",
+        "unknownBias": "this pause's theme",
+        "direction": {
+          "up": "the market is up",
+          "down": "the market is down"
+        },
+        "body": {
+          "signal": "Chosen because you feel {{mood}}, {{direction}}, and this pause's theme is {{bias}}.",
+          "grounding": "Chosen because you feel {{mood}}, {{direction}}, and this pause's theme is {{bias}}. Grounding cards surface the bias most likely to trip you today.",
+          "history": "Chosen because you feel {{mood}}, {{direction}}, and this pause's theme is {{bias}}. History cards look for a comparable Bitcoin moment from your past.",
+          "zoomOut": "Chosen because you feel {{mood}}, {{direction}}, and this pause's theme is {{bias}}. Zoom Out pulls in deep-time perspective to balance short-term noise.",
+          "fallback": "Chosen based on how you said you felt and this pause's theme."
+        }
+      },
+      "thread": {
+        "heading": {
+          "signal": "Your recent Signal cards",
+          "grounding": "Your recent Ground cards",
+          "history": "Your recent Look-back cards",
+          "zoomOut": "Your recent Zoom-Out cards"
+        },
+        "untitled": "(untitled)"
+      },
+      "crossRef": {
+        "headline": "This was also today's headline"
+      },
+      "signal": {
+        "meta": "Signal — Holzen",
+        "trusted": "trusted source",
+        "readSource": "Read the source"
+      },
+      "grounding": {
+        "meta": "Ground — Holzen",
+        "readPaper": "Read the paper"
+      },
+      "saveMoment": {
+        "trigger": "Save this moment",
+        "saved": "Saved to your library",
+        "saveCta": "Save",
+        "titlePrefix": "Note on: {{title}}",
+        "placeholder": "What is this card surfacing for you right now?",
+        "contextHint": "Writing alongside: {{title}}"
+      }
+    }
   },
   "landing": {
     "hero": "When Bitcoin moves, pause before you do.",
@@ -1525,7 +1579,8 @@
     "desc_advanced_stats": "Deep analysis: mood shifts, scatter plots, and statistical trends.",
     "desc_badges_pro": "Unlock exclusive Pro badges and track deeper milestones.",
     "desc_grounding": "Choose personal grounding activities and get AI-powered suggestions tailored to the market moment.",
-    "desc_notifications": "Smart digests, night reflections, and quiet hours to control when and how Holzen reaches you."
+    "desc_notifications": "Smart digests, night reflections, and quiet hours to control when and how Holzen reaches you.",
+    "desc_save_moment": "Capture what a companion card surfaces for you as a journal note saved to your library."
   },
   "triggerOverlay": {
     "readyToPause": "You paused. That's the hardest part.",

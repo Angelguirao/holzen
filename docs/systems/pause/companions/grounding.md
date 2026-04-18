@@ -127,10 +127,28 @@ When `selectIntervention` picks **trap** as the primary intervention:
 | Content library | `supabase/functions/_shared/content-library.ts` |
 | Client invoke | `src/hooks/use-companion-data.ts` |
 | UI | `src/components/CompanionSection.tsx` (Ground card via `LearningInput`) |
+| Full View page | `src/pages/CompanionGroundingPage.tsx` (route `/companion/grounding/:reflectionId`) |
+| Full View presentation | `src/components/companion/GroundingFullView.tsx` |
 
 ---
 
-## 9. Related reading
+## 9. Full View (reflect-step deep read)
+
+The inline Ground card in `CompanionSection` has an **"Open full view"** button that routes to **`/companion/grounding/:reflectionId`** (lazy-loaded in `src/App.tsx`). The Full View keeps the generated body verbatim and surrounds it with affordances that don't fit in the inline card:
+
+- **Promoted citation CTA** — the tiny `ExternalLink` footnote in `LearningInput` becomes a proper **"Read the paper →"** link sitting directly under the citation text.
+- **Enrichment slot** (placeholder in PR 1, wired in PR 2) — the `GroundingFullView` accepts an `enrichmentSlot` ReactNode where `CompanionGroundingPage` renders abstract preview + researcher bios + citation count from the `grounding-enrich` edge function.
+- **Read-time indicator** + **"Why this card now?"** disclosure with mood / market direction / session-intent transparency (explains why *this* bias was picked today).
+- **Cross-reference badge** — when the session's primary intervention was a `trap` that used this same Ground payload, a subtle **"This was also today's headline"** badge sits above the card so the repetition is acknowledged rather than confusing.
+- **Breathing-room pacing** (8 s) before feedback + save CTAs fade in.
+- **Per-user history thread** — the last 5 Ground cards for this user from `reflection_companions`, deep-linked to their own Full Views so the Full View doubles as a small personal archive of biases surfaced.
+- **Pro-gated "Save this moment"** — captures the user's own reflection triggered by the card as a `library_items` note (`source_type: companion_moment`). Free users get a locked state with an upgrade toast.
+
+The "Open full view" navigation is free; only the **Save this moment** action is gated.
+
+---
+
+## 10. Related reading
 
 - [AI-powered pause system](../ai-powered-pause-system.md) — full pause architecture (§7.7 Grounding reference)
 - [intervention.md](intervention.md) — Intervention types (trap uses Grounding)

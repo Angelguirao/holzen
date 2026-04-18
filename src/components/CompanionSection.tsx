@@ -260,6 +260,20 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
               regenerating={signalLoading}
             />
           )}
+          {reflectionId && (signal || signalLoading) && (
+            <div className="pt-2" onClick={(e) => e.stopPropagation()}>
+              <button
+                type="button"
+                onClick={() =>
+                  navigate(`/companion/signal/${reflectionId}`, { state: { from: 'pause' } })
+                }
+                className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-border/40 bg-muted/20 py-2.5 text-xs font-medium text-foreground/80 transition-colors hover:bg-muted/35"
+              >
+                <Maximize2 className="h-3.5 w-3.5 text-muted-foreground/60" aria-hidden />
+                {i18nT('companions.openFullView')}
+              </button>
+            </div>
+          )}
         </CompanionCard>
       )}
 
@@ -301,6 +315,20 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
               onRegenerate={() => regenerateCompanion('grounding')}
               regenerating={nudgeLoading}
             />
+          )}
+          {reflectionId && (nudge || nudgeLoading) && (
+            <div className="pt-2" onClick={(e) => e.stopPropagation()}>
+              <button
+                type="button"
+                onClick={() =>
+                  navigate(`/companion/grounding/${reflectionId}`, { state: { from: 'pause' } })
+                }
+                className="inline-flex w-full items-center justify-center gap-2 rounded-lg border border-border/40 bg-muted/20 py-2.5 text-xs font-medium text-foreground/80 transition-colors hover:bg-muted/35"
+              >
+                <Maximize2 className="h-3.5 w-3.5 text-muted-foreground/60" aria-hidden />
+                {i18nT('companions.openFullView')}
+              </button>
+            </div>
           )}
         </CompanionCard>
       )}
