@@ -26,9 +26,10 @@ import { createAttemptLogger, trackEvent } from "../observe.ts";
 import { callPerplexityChat, type PerplexityUsage } from "../perplexity-client.ts";
 import { searchLibrary, eventToHistory, recordLibraryServe } from "../content-library.ts";
 import { getPhaseConfig } from "../phase-config.ts";
+import { type HistoricalEra, pickEra } from "../history-util.ts";
 
 /** Bump when the search query, structuring prompt, or quality rules change. */
-export const PROMPT_VERSION = "v2";
+export const PROMPT_VERSION = "v3";
 
 // ── Public types ──
 
@@ -57,59 +58,8 @@ export interface GenerateHistoryParams {
 
 // ── Internals ──
 
-// Eras tagged by emotional resonance for mood-aware selection
-interface HistoricalEra {
-  era: string;
-  examples: string;
-  mood: "recovery" | "caution" | "neutral"; // recovery=good for anxious, caution=good for excited
-}
-
-const HISTORICAL_ERAS: HistoricalEra[] = [
-  // Recovery stories — best for anxious/fearful users (show that crashes end)
-  { era: "COVID and institutional era (2020-2021)", examples: "March 2020 crash recovered in 40 days, MicroStrategy buys, El Salvador adoption, $69k peak", mood: "recovery" },
-  { era: "tech stock parallels", examples: "Amazon's 95% crash then becoming a trillion-dollar company, Apple near-bankruptcy then iPhone revolution", mood: "recovery" },
-  { era: "early Bitcoin (2011-2013)", examples: "Bitcoin's crash from $32 to $2 then recovery to $1,000+, the 2013 China ban crash and recovery", mood: "recovery" },
-
-  // Cautionary tales — best for excited/greedy users (show that euphoria precedes crashes)
-  { era: "2017 mania and aftermath (2017-2018)", examples: "Bitcoin's rise to $20k driven by hype, the painful 2018 bear market, speculative excess", mood: "caution" },
-  { era: "traditional finance bubbles", examples: "1987 Black Monday, dot-com bubble 2000, 2008 financial crisis, gold's 1980 peak and 20-year decline", mood: "caution" },
-
-  // Neutral — good for calm users or when mood is unknown
-  { era: "Mt. Gox era (2014-2015)", examples: "Mt. Gox collapse, the long Bitcoin bear market of 2014-2015, survival of the protocol", mood: "neutral" },
-  { era: "Bitcoin bear market (2022-2023)", examples: "Industry contagion from Luna/Terra and FTX failures, Bitcoin's resilience and recovery", mood: "neutral" },
-  { era: "commodity and forex history", examples: "oil price shocks, Swiss franc unpegging 2015, Asian financial crisis 1997", mood: "neutral" },
-];
-
-/** Select a historical era that matches the user's emotional state */
-function selectEra(
-  mood: string | undefined,
-  recentTitles: string[] | undefined,
-  preferredMood?: "recovery" | "caution" | "neutral",
-): HistoricalEra {
-  const recentSet = new Set((recentTitles || []).map(t => t.toLowerCase()));
-
-  // Mood-aware filtering
-  let preferred: HistoricalEra[];
-  if (preferredMood) {
-    preferred = HISTORICAL_ERAS.filter(e => e.mood === preferredMood);
-    if (preferred.length === 0) preferred = HISTORICAL_ERAS;
-  } else if (mood === "anxious" || mood === "fearful") {
-    preferred = HISTORICAL_ERAS.filter(e => e.mood === "recovery");
-  } else if (mood === "excited" || mood === "fomo" || mood === "greedy") {
-    preferred = HISTORICAL_ERAS.filter(e => e.mood === "caution");
-  } else {
-    preferred = HISTORICAL_ERAS; // Any era for calm/neutral
-  }
-
-  // Filter out recently shown eras
-  const available = preferred.filter(e =>
-    !recentSet.has(e.era.toLowerCase()) &&
-    !Array.from(recentSet).some(t => e.era.toLowerCase().includes(t) || t.includes(e.era.toLowerCase()))
-  );
-
-  const pool = available.length > 0 ? available : preferred.length > 0 ? preferred : HISTORICAL_ERAS;
-  return pool[Math.floor(Math.random() * pool.length)];
-}
+// `HistoricalEra`, `HISTORICAL_ERAS`, and `pickEra` live in `../history-util.ts`
+// (pure, unit-tested). See that file for the keyword-anchored dedup rationale.
 
 /** Try content_library (events) for history. */
 async function tryLibrary(
@@ -147,7 +97,7 @@ async function tryCache(
   excludeIds?: string[],
   strict = false,
 ): Promise<HistoryResult | null> {
-  const cached = await serveFromCache(svcClient, "historical_insight", "en", { userId, marketDirection, excludeIds, strict });
+  const cached = await serveFromCache(svcClient, "historical_insight", "en", { userId, marketDirection, excludeIds, strict, promptVersion: PROMPT_VERSION });
   if (cached) {
     return {
       data: cached.data,
@@ -246,7 +196,7 @@ export async function generateHistory(params: GenerateHistoryParams): Promise<Hi
   const titleExclusion = (recentTitles && Array.isArray(recentTitles) && recentTitles.length > 0)
     ? `\nDo NOT cover these topics (already shown recently): ${recentTitles.slice(0, 5).join("; ")}. Find a COMPLETELY DIFFERENT historical event.`
     : "";
-  const randomEra = selectEra(mood, recentTitles, preferredMood);
+  const randomEra: HistoricalEra = pickEra(mood, recentTitles, preferredMood);
 
   // ── Step 1: Perplexity search ──
   log("calling perplexity");
@@ -356,7 +306,7 @@ BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? 
   let insight: any = null;
   let lastLovableModel: string | undefined;
 
-  const AI_TIMEOUTS = [8000, 6000];
+  const AI_TIMEOUTS = [10000, 8000];
   for (let idx = 0; idx < models.length; idx++) {
     const model = models[idx];
     const aiController = new AbortController();
@@ -459,6 +409,7 @@ BANNED PHRASES — NEVER use any of these: ${BANNED_PHRASES.join(", ")}${mood ? 
           expires_at: new Date(Date.now() + 14 * 86400000).toISOString(),
           last_validated_at: qualityScore >= 2 ? new Date().toISOString() : null,
           automated_score: qualityScore,
+          prompt_version: PROMPT_VERSION,
         });
         if (cacheErr) log(`cache insert error: ${cacheErr.message}`);
       } else {

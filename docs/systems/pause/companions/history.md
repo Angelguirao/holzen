@@ -29,21 +29,21 @@ History also serves as the **data source for pattern interventions**: when `sele
 
 ## 3. Server pipeline (`history.ts`)
 
-High-level order (source of truth: **`supabase/functions/_shared/generators/history.ts`**, **`PROMPT_VERSION`** v2):
+High-level order (source of truth: **`supabase/functions/_shared/generators/history.ts`**, **`PROMPT_VERSION`** v3):
 
 **Phase 1: Library** — `searchLibrary` checks `content_library` (type `event`) for fresh historical events this user hasn't seen within `COMPANION_SERVE_FRESHNESS_DAYS` (30 days). Converts via `eventToHistory` with mood tag awareness. If found, returns immediately (`source: "library"`).
 
-**Phase 2: Cache (strict)** — `serveFromCache` with `strict: true` checks `companion_cache` for fresh, quality-≥-2 rows with per-user dedup and market direction awareness. If found, returns (`source: "cache"`). If the strict pool is empty it returns `null` and emits `cache_strict_miss` (Edge log) so the flow falls through to Phase 3 instead of recycling seen rows.
+**Phase 2: Cache (strict + prompt-version pinned)** — `serveFromCache` with `strict: true` AND `promptVersion: "v3"` checks `companion_cache` for fresh, quality-≥-2 rows with per-user dedup, market direction awareness, and a `prompt_version = "v3"` filter (added migration `20260418180000_companion_cache_prompt_version.sql`). Pre-v3 rows written by earlier prompt revisions are invisible to reads, so they won't be served even after cache eviction of newer rows. If found, returns (`source: "cache"`). If the strict pool is empty it returns `null` and emits `cache_strict_miss` (Edge log) so the flow falls through to Phase 3 instead of recycling seen rows.
 
 **Phase 3: Live generation** (if phases 1–2 miss):
 
 1. **Mood mapping** — `anxious`/`fearful` → `recovery` tag; `excited`/`fomo`/`greedy` → `caution` tag; else `undefined`.
-2. **Era selection** — Selects from 9 predefined historical eras, each tagged with mood (`recovery`, `caution`, `neutral`). Filters by mood tag and avoids recently shown eras (substring match on recent titles).
+2. **Era selection** — `pickEra` in `_shared/history-util.ts` selects from **22 predefined historical eras**, each tagged with a mood (`recovery`, `caution`, `neutral`) and a list of distinctive `keywords`. Three-step fallback: (1) mood-matched AND not recently seen by keyword, (2) **any** era not recently seen (preference → fallback, not a hard filter), (3) full pool at random. Dedup is **keyword-anchored**: an era is "recently seen" only if one of its short keyword anchors (`"march 2020"`, `"ftx"`, `"mt. gox"`, etc.) appears as a substring of a recent card title. This replaces the earlier descriptor-text substring check which almost never fired.
 3. **Perplexity (`sonar-pro`)** — Web search for specific historical events with dates, prices, and percentage moves. Prompt requires cross-asset analogies (gold, tech stocks, forex, etc.) and "what happened afterward" recovery context.
-4. **Structuring (Lovable AI gateway)** — Turns search text + citations into one card: title, `btcInsight` (main body), analogy, assetClass, period, optional source and url.
+4. **Structuring (Lovable AI gateway)** — Turns search text + citations into one card: title, `btcInsight` (main body), analogy, assetClass, period, optional source and url. AI timeouts are **10 s** for `gemini-2.5-flash` then **8 s** for `gemini-2.5-flash-lite` (previously 8 s / 6 s).
 5. **Specificity gate** — Quality gate requires dates (year/month/numeric) OR numbers ($/%).
-6. **`qualityGate("historical_insight", …)`** — Length (80–800 chars), banned terms, sentence diversity (`quality.ts`).
-7. **On success (`source: "live"`)** — Inserts into `companion_cache`; background URL validation.
+6. **`qualityGate("historical_insight", …)`** — Length (80–800 chars), title word count **3–15**, banned terms, sentence diversity (`quality.ts`).
+7. **On success (`source: "live"`)** — Inserts into `companion_cache` with `prompt_version: "v3"`; background URL validation.
 
 **Phase 4: Curated** — if all above fail, static fallback pool from `companion_fallbacks` DB / `fallback-seed.json`.
 
@@ -53,21 +53,40 @@ Phase toggles: `COMPANION_PHASE_LIBRARY`, `COMPANION_PHASE_CACHE`, `COMPANION_PH
 
 ## 4. Historical eras
 
-The generator maintains 9 predefined eras. Each has a key, label, example events, and a mood tag:
+The generator maintains **22 predefined eras** in `_shared/history-util.ts` (`HISTORICAL_ERAS`). Each carries a `mood` tag, an `examples` descriptor passed to Perplexity, and a `keywords` array used for dedup against recent card titles.
 
-| Era | Mood tag | Focus |
-|-----|----------|-------|
-| COVID recovery (2020) | `recovery` | V-shaped recovery after March crash |
-| Tech parallels | `caution` | Dot-com bubble lessons |
-| Early Bitcoin | `neutral` | Pre-2013 price discovery |
-| 2017 mania | `caution` | Bull run + crash cycle |
-| TradFi bubbles | `caution` | Historical financial manias |
-| Mt. Gox era | `recovery` | Exchange failure + recovery |
-| Bear market | `recovery` | Extended downturns + eventual recovery |
-| Commodity history | `neutral` | Gold, oil, long-term cycles |
-| Bitcoin halving cycles | `neutral` | Supply schedule + price patterns |
+**Recovery (10)** — crashes that ended; best for anxious / fearful users:
 
-Era selection considers: (a) mood tag filter, (b) recency dedup (skip recently shown eras by substring match on titles), (c) `preferredMood` from session intent.
+- COVID crash and recovery (March 2020)
+- 2018-2019 bear market bottom
+- Mt. Gox collapse and aftermath (2014-2015)
+- FTX collapse and 2023 recovery
+- Early Bitcoin volatility (2011-2013)
+- May 2021 China mining ban
+- Nasdaq dot-com recovery (2002-2007)
+- S&P 500 post-2008 recovery
+- Amazon's 95% crash and trillion-dollar rise
+- Apple's 1997 near-bankruptcy and iPhone era
+
+**Caution (7)** — euphoria before pain; best for excited / fomo / greedy users:
+
+- 2017 Bitcoin mania and 2018 bear
+- 2021 top and 2022 bear market
+- Dot-com bubble (1999-2000)
+- Black Monday (October 19, 1987)
+- Japan asset price bubble (1989)
+- Gold's 1980 peak and 20-year decline
+- US housing bubble (2006-2008)
+
+**Neutral (5)** — long-cycle context for calm / unknown mood:
+
+- Bitcoin halving cycles
+- 1970s oil price shocks
+- Swiss franc unpegging (January 15, 2015)
+- Asian financial crisis (1997)
+- Emerging market FX crises
+
+Era selection considers: (a) mood tag preference, (b) **keyword-anchored** recency dedup against recent card titles, (c) `preferredMood` from session intent. When the preferred pool is fully "seen by keyword", selection softens to **any** fresh era before ever forcing a repeat.
 
 ---
 
@@ -99,8 +118,8 @@ When `selectIntervention` picks **pattern** as the primary intervention:
 | Layer | Role |
 |--------|------|
 | **Session intent** | `historyMood` (recovery/caution) aligns History with the session theme. |
-| **Era pool** | 9 predefined eras with mood tags; random selection within filtered pool. |
-| **Recency dedup** | Recent titles excluded from era selection by substring match. |
+| **Era pool** | 22 predefined eras with mood tags in `_shared/history-util.ts`; three-step preference-with-fallback selection. |
+| **Recency dedup** | Keyword-anchored: each era declares distinctive substrings (`"covid"`, `"ftx"`, `"mt. gox"`, `"black monday"`, …) and is skipped if any recent card title contains one. |
 | **Specificity gate** | Requires dates (year, month name, numeric date) OR dollar/percentage amounts. |
 | **Cross-asset requirement** | Must draw analogy from another asset class (gold, tech stocks, etc.). |
 | **Recovery context** | Prompt asks "what happened afterward" for grounding in outcomes. |
@@ -114,6 +133,7 @@ When `selectIntervention` picks **pattern** as the primary intervention:
 | Area | Path |
 |------|------|
 | Generator | `supabase/functions/_shared/generators/history.ts` |
+| Era pool + `pickEra` helper | `supabase/functions/_shared/history-util.ts` (pure, unit-tested in `src/test/history-util.test.ts`) |
 | Orchestrator | `supabase/functions/companion-orchestrate/index.ts` |
 | Session intent | `supabase/functions/_shared/session-intent.ts` |
 | Quality gate | `supabase/functions/_shared/quality.ts` |
