@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { RefreshCw, CheckCircle2 } from 'lucide-react';
+import { RefreshCw, CheckCircle2, Zap } from 'lucide-react';
 
 declare const __BUILD_TIME__: string;
 
@@ -49,6 +49,27 @@ export function AppVersionBadge({ changelogVersion }: { changelogVersion?: strin
     } finally {
       setChecking(false);
       setLastChecked(new Date().toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }));
+    }
+  }, []);
+
+  const forceFullRefresh = useCallback(async () => {
+    if (!confirm('This will clear the app cache and reload. Continue?')) return;
+    try {
+      if ('serviceWorker' in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map((r) => r.unregister()));
+      }
+      if ('caches' in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map((k) => caches.delete(k)));
+      }
+    } catch {
+      /* ignore */
+    } finally {
+      // Cache-bust query param so the HTML itself isn't served from cache
+      const url = new URL(window.location.href);
+      url.searchParams.set('cache-bust', String(Date.now()));
+      window.location.replace(url.toString());
     }
   }, []);
 
@@ -107,6 +128,17 @@ export function AppVersionBadge({ changelogVersion }: { changelogVersion?: strin
             <span className="text-[9px] font-mono text-muted-foreground/30">(dev mode — SW disabled)</span>
           )}
         </div>
+      )}
+
+      {!isDev && (
+        <button
+          type="button"
+          onClick={forceFullRefresh}
+          className="inline-flex items-center gap-1 text-[10px] font-mono text-muted-foreground/50 hover:text-destructive transition-colors"
+        >
+          <Zap className="h-3 w-3" />
+          Force refresh (clear cache)
+        </button>
       )}
     </div>
   );
