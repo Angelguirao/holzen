@@ -94,7 +94,7 @@ const Landing = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-background text-foreground">
+    <div className="min-h-screen bg-[#0F172A] text-foreground">
       <PageMeta
         title="Holzen — When Bitcoin moves, pause before you do"
         description="Holzen watches Bitcoin volatility and sends AI-generated reflections to help you pause before acting on impulse. Mood tracking, journaling, and behavioral insights."
@@ -103,21 +103,6 @@ const Landing = () => {
 
       {/* ─── HERO ─── */}
       <div className="relative min-h-[92vh] flex flex-col items-center justify-center px-6 overflow-hidden">
-        {/* Ambient background */}
-        <div className="absolute inset-0 pointer-events-none">
-          <motion.div
-            className="absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full"
-            style={{ background: 'radial-gradient(circle, hsl(var(--primary) / 0.04) 0%, transparent 70%)', filter: 'blur(100px)' }}
-            animate={prefersReduced ? {} : { x: [0, 40, -20, 0], y: [0, -30, 20, 0] }}
-            transition={{ duration: 20, repeat: Infinity, ease: 'easeInOut' }}
-          />
-          <motion.div
-            className="absolute bottom-1/4 right-1/4 w-[350px] h-[350px] rounded-full"
-            style={{ background: 'radial-gradient(circle, hsl(var(--accent) / 0.03) 0%, transparent 70%)', filter: 'blur(80px)' }}
-            animate={prefersReduced ? {} : { x: [0, -30, 20, 0], y: [0, 25, -15, 0] }}
-            transition={{ duration: 25, repeat: Infinity, ease: 'easeInOut' }}
-          />
-        </div>
 
         {/* Nav */}
         <motion.nav
