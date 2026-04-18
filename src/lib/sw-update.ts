@@ -21,11 +21,24 @@ export function listenForSwUpdate() {
 
   // Register the service worker
   navigator.serviceWorker
-    .register('/sw.js', { scope: '/' })
+    .register('/sw.js', { scope: '/', updateViaCache: 'none' })
     .then((registration) => {
       const checkForUpdate = () => {
         registration.update().catch(() => {});
       };
+
+      // Aggressive boot-time check: bypass HTTP cache so a stale `sw.js`
+      // (cached by the browser or CDN) cannot hide a newer deploy.
+      // This is what unsticks PWAs that "never see" updates.
+      const forceFreshSwCheck = async () => {
+        try {
+          await fetch('/sw.js', { cache: 'no-store' });
+          await registration.update();
+        } catch {
+          /* offline or fetch blocked — ignore */
+        }
+      };
+      forceFreshSwCheck();
 
       // Check for updates periodically (every 60s)
       setInterval(checkForUpdate, 60 * 1000);
