@@ -11,7 +11,7 @@ export function NoxHeaderMain({ title, subtitle, rightSlot, className, ...props 
   return (
     <header className={cn("flex items-start justify-between gap-4 border-b border-border pb-4", className)} {...props}>
       <div className="min-w-0 flex-1">
-        <h1 className="font-editorial text-2xl tracking-tight text-foreground">{title}</h1>
+        <h1 className="font-editorial text-2xl tracking-tight" style={{ color: '#DBB366' }}>{title}</h1>
         {subtitle ? <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{subtitle}</p> : null}
       </div>
       {rightSlot ? <div className="shrink-0 pt-0.5">{rightSlot}</div> : null}
