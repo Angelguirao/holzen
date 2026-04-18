@@ -200,6 +200,7 @@ export type Database = {
           last_served_at: string | null
           last_validated_at: string | null
           market_regime: string | null
+          prompt_version: string | null
           quality_flags: Json | null
           quality_score: number
           source_author: string | null
@@ -230,6 +231,7 @@ export type Database = {
           last_served_at?: string | null
           last_validated_at?: string | null
           market_regime?: string | null
+          prompt_version?: string | null
           quality_flags?: Json | null
           quality_score?: number
           source_author?: string | null
@@ -260,6 +262,7 @@ export type Database = {
           last_served_at?: string | null
           last_validated_at?: string | null
           market_regime?: string | null
+          prompt_version?: string | null
           quality_flags?: Json | null
           quality_score?: number
           source_author?: string | null
