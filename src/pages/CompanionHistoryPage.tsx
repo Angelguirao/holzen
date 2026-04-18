@@ -13,9 +13,16 @@ import {
 import { HistoricalInsightDisplay } from '@/components/HistoricalInsightDisplay';
 import { CompanionFeedback } from '@/components/CompanionFeedback';
 import { CompanionFocusLayout } from '@/components/companion/CompanionFocusLayout';
+import { ReadTime } from '@/components/companion/ReadTime';
+import { WhyThisCard } from '@/components/companion/WhyThisCard';
+import { HistoryThread } from '@/components/companion/HistoryThread';
+import { InterventionCrossRefBadge } from '@/components/companion/InterventionCrossRefBadge';
+import { SaveThisMomentButton } from '@/components/companion/SaveThisMomentButton';
+import { useStaggeredReveal } from '@/components/companion/use-staggered-reveal';
 import { PageMeta } from '@/components/PageMeta';
 
 const SEVERITY_NUMBER: Record<string, number> = { mild: 3, moderate: 6, high: 10 };
+const BREATHING_ROOM_MS = 8000;
 
 type Row = FetchedReflectionRow & { mood?: string | null };
 
@@ -70,6 +77,7 @@ export default function CompanionHistoryPage() {
     cacheRelaxations,
     regenerateCompanion,
     interventionLoading,
+    intervention,
   } = useCompanionData({
     companions,
     prefs: { ...prefs, history: true },
@@ -94,6 +102,8 @@ export default function CompanionHistoryPage() {
     historyError,
     fetchCompanion,
   ]);
+
+  const revealed = useStaggeredReveal(BREATHING_ROOM_MS);
 
   const handleBack = useCallback(() => {
     const st = location.state as { from?: string } | undefined;
@@ -132,6 +142,21 @@ export default function CompanionHistoryPage() {
         noindex
       />
       <div className="space-y-6">
+        <InterventionCrossRefBadge companion="history" intervention={intervention} />
+
+        {historyInsight && (
+          <div className="flex items-center gap-2 flex-wrap">
+            <ReadTime
+              chars={
+                (historyInsight.title?.length ?? 0) +
+                (historyInsight.btcInsight?.length ?? 0) +
+                (historyInsight.analogy?.length ?? 0)
+              }
+            />
+            <WhyThisCard companion="history" mood={mood} className="ml-auto" />
+          </div>
+        )}
+
         <HistoricalInsightDisplay
           data={historyInsight}
           loading={historyLoading}
@@ -143,16 +168,26 @@ export default function CompanionHistoryPage() {
             {t(`companions.cacheRelaxation.${cacheRelaxations.history}`)}
           </p>
         )}
-        {historyInsight && (
-          <CompanionFeedback
-            reflectionId={reflectionId}
-            companionType="history_insight"
-            cacheId={cacheIds.history}
-            regenerateSlot="history"
-            onRegenerate={() => regenerateCompanion('history')}
-            regenerating={historyLoading}
-          />
+        {historyInsight && revealed && (
+          <div className="space-y-4 border-t border-border/20 pt-5 animate-in fade-in duration-500">
+            <SaveThisMomentButton
+              seedTitle={historyInsight.title ?? ''}
+              seedContext={historyInsight.btcInsight ?? ''}
+              companion="history"
+              reflectionId={reflectionId}
+            />
+            <CompanionFeedback
+              reflectionId={reflectionId}
+              companionType="history_insight"
+              cacheId={cacheIds.history}
+              regenerateSlot="history"
+              onRegenerate={() => regenerateCompanion('history')}
+              regenerating={historyLoading}
+            />
+          </div>
         )}
+
+        <HistoryThread companion="history" currentReflectionId={reflectionId} />
       </div>
     </CompanionFocusLayout>
   );

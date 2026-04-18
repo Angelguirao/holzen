@@ -130,10 +130,27 @@ Exact behavior in code changes with **`PROMPT_VERSION`** and the files in **§6*
 | Client invoke + recency | `src/hooks/use-companion-data.ts` |
 | Attribution | `supabase/functions/_shared/source-validation.ts` |
 | Quality gate | `supabase/functions/_shared/quality.ts` |
+| Full View page | `src/pages/CompanionSignalPage.tsx` (route `/companion/signal/:reflectionId`) |
+| Full View presentation | `src/components/companion/SignalFullView.tsx` |
 
 ---
 
-## 7. Related reading
+## 7. Full View (reflect-step deep read)
+
+The inline card in `CompanionSection` has an **"Open full view"** button that routes to **`/companion/signal/:reflectionId`** (lazy-loaded in `src/App.tsx`). The Full View renders the same Signal payload with extra reading affordances that don't fit in the inline card:
+
+- **Favicon + publisher host** above the source link — the source reads as credibility, not as a footnote.
+- **Trusted-source badge** — only shown when the signal URL's host matches a row in `signal_sources`. Falls back silently when there is no match (no negative "untrusted" state).
+- **Read-time indicator** + **"Why this card now?"** collapsible disclosure (mood / market direction / session bias transparency).
+- **Breathing-room pacing** (8 s) before feedback and save CTAs fade in, so the screen doesn't demand input before the user has read.
+- **Per-user history thread** — the last 5 Signal cards for this user from `reflection_companions`, deep-linked to their own Full Views.
+- **Pro-gated "Save this moment"** — writes a `library_items` row of `type: note`, `source_type: companion_moment`, capturing the user's own thinking about the card (not the card itself, which is already autosaved as a bookmark).
+
+The free "Open full view" button is visible to all users; gating only applies to the **Save this moment** action.
+
+---
+
+## 8. Related reading
 
 - [AI-powered pause system](../ai-powered-pause-system.md) — full pause architecture  
 - [navigating-the-codebase.md](../../../fundamentals/navigating-the-codebase.md) — edge functions and hooks map  

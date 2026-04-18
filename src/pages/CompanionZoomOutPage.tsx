@@ -13,9 +13,16 @@ import {
 import { ZoomOutDisplay } from '@/components/ZoomOutDisplay';
 import { CompanionFeedback } from '@/components/CompanionFeedback';
 import { CompanionFocusLayout } from '@/components/companion/CompanionFocusLayout';
+import { ReadTime } from '@/components/companion/ReadTime';
+import { WhyThisCard } from '@/components/companion/WhyThisCard';
+import { HistoryThread } from '@/components/companion/HistoryThread';
+import { InterventionCrossRefBadge } from '@/components/companion/InterventionCrossRefBadge';
+import { SaveThisMomentButton } from '@/components/companion/SaveThisMomentButton';
+import { useStaggeredReveal } from '@/components/companion/use-staggered-reveal';
 import { PageMeta } from '@/components/PageMeta';
 
 const SEVERITY_NUMBER: Record<string, number> = { mild: 3, moderate: 6, high: 10 };
+const BREATHING_ROOM_MS = 8000;
 
 type Row = FetchedReflectionRow & { mood?: string | null };
 
@@ -70,6 +77,7 @@ export default function CompanionZoomOutPage() {
     cacheRelaxations,
     regenerateCompanion,
     interventionLoading,
+    intervention,
   } = useCompanionData({
     companions,
     prefs: { ...prefs, zoomOut: true },
@@ -94,6 +102,8 @@ export default function CompanionZoomOutPage() {
     zoomOutError,
     fetchCompanion,
   ]);
+
+  const revealed = useStaggeredReveal(BREATHING_ROOM_MS);
 
   const handleBack = useCallback(() => {
     const st = location.state as { from?: string } | undefined;
@@ -132,6 +142,21 @@ export default function CompanionZoomOutPage() {
         noindex
       />
       <div className="space-y-6">
+        <InterventionCrossRefBadge companion="zoomOut" intervention={intervention} />
+
+        {zoomOut && (
+          <div className="flex items-center gap-2 flex-wrap">
+            <ReadTime
+              chars={
+                (zoomOut?.deepTime?.title?.length ?? 0) +
+                (zoomOut?.deepTime?.body?.length ?? 0) +
+                (zoomOut?.echo?.message?.length ?? 0)
+              }
+            />
+            <WhyThisCard companion="zoomOut" mood={mood} className="ml-auto" />
+          </div>
+        )}
+
         <ZoomOutDisplay
           data={zoomOut}
           loading={zoomOutLoading}
@@ -143,16 +168,26 @@ export default function CompanionZoomOutPage() {
             {t(`companions.cacheRelaxation.${cacheRelaxations.zoomOut}`)}
           </p>
         )}
-        {zoomOut && (
-          <CompanionFeedback
-            reflectionId={reflectionId}
-            companionType="zoom_out"
-            cacheId={cacheIds.zoomOut}
-            regenerateSlot="zoomOut"
-            onRegenerate={() => regenerateCompanion('zoomOut')}
-            regenerating={zoomOutLoading}
-          />
+        {zoomOut && revealed && (
+          <div className="space-y-4 border-t border-border/20 pt-5 animate-in fade-in duration-500">
+            <SaveThisMomentButton
+              seedTitle={zoomOut?.deepTime?.title ?? t('companions.zoomOut')}
+              seedContext={zoomOut?.deepTime?.body ?? zoomOut?.echo?.message ?? ''}
+              companion="zoomOut"
+              reflectionId={reflectionId}
+            />
+            <CompanionFeedback
+              reflectionId={reflectionId}
+              companionType="zoom_out"
+              cacheId={cacheIds.zoomOut}
+              regenerateSlot="zoomOut"
+              onRegenerate={() => regenerateCompanion('zoomOut')}
+              regenerating={zoomOutLoading}
+            />
+          </div>
         )}
+
+        <HistoryThread companion="zoomOut" currentReflectionId={reflectionId} />
       </div>
     </CompanionFocusLayout>
   );
