@@ -916,9 +916,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             {t('settings.account')}
           </AccordionTrigger>
           <AccordionContent className="space-y-6 pb-4">
-            {user && (
-              <p className="text-xs font-mono text-muted-foreground truncate">{user.email}</p>
-            )}
+              <p className="text-xs truncate font-sans text-primary">{user.email}</p>
 
             <ChangeEmailSection />
 
@@ -1126,7 +1124,7 @@ function ChangeEmailSection() {
       >
         {changing ? t('settings.sendingConfirmation') : t('settings.changeEmail')}
       </Button>
-      <p className="text-[10px] text-muted-foreground/50 leading-relaxed">
+      <p className="text-[10px] leading-relaxed text-[#7b8a9d]">
         {t('settings.emailConfirmNote')}
       </p>
     </div>
