@@ -19,7 +19,7 @@ export function AppLayout() {
       {!isHome && <PauseReadyBanner visible={pauseReady} onDismiss={dismiss} />}
       <div className="w-full max-w-sm pt-4">
         <header className="mb-10 flex items-center justify-between">
-          <h1 className="text-xs font-mono tracking-[0.25em] uppercase text-foreground/80">
+          <h1 className="text-xs font-mono tracking-[0.25em] uppercase" style={{ color: '#DBB366' }}>
             Holzen
           </h1>
           <NotificationBell />
