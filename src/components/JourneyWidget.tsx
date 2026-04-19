@@ -199,10 +199,10 @@ export function JourneyWidget({ reflections, practiceEntries = [], streakFreezeD
   if (reflections.length === 0 && practiceEntries.length === 0) return null;
 
   return (
-    <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3">
+    <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3 mb-0">
       {/* Streak header */}
       <div className="flex items-center justify-between">
-        <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
+        <p className="tracking-widest uppercase text-muted-foreground text-sm font-sans mb-[8px] font-medium">
           {t('streakTimeline.title')}
         </p>
         {nextMilestone && currentStreak > 0 && (
@@ -235,16 +235,16 @@ export function JourneyWidget({ reflections, practiceEntries = [], streakFreezeD
 
       {/* Legend */}
       <div className="flex items-center flex-wrap gap-x-3 gap-y-1 text-[9px] font-mono" style={{ color: '#C1CBD7' }}>
-        <span className="flex items-center gap-1 text-xs">
+        <span className="flex items-center gap-1 font-sans text-sm my-[16px] mb-0">
           <span className="h-2 w-2 rounded-sm bg-primary" /> {t('streakTimeline.legend.outcomeLogged')}
         </span>
-        <span className="flex items-center gap-1 text-xs">
+        <span className="flex items-center gap-1 font-sans text-sm mt-[16px]">
           <span className="h-2 w-2 rounded-sm bg-primary/30" /> {t('streakTimeline.legend.pausedNoOutcome', 'Paused (no outcome)')}
         </span>
-        <span className="flex items-center gap-1 text-xs">
+        <span className="flex items-center gap-1 text-sm font-sans mb-[16px]">
           <span className="h-2 w-2 rounded-sm bg-accent-foreground/20" /> {t('streakTimeline.legend.practiceOnly', 'Practice only')}
         </span>
-        <span className="flex items-center gap-1 text-xs">
+        <span className="flex items-center gap-1 text-sm font-sans mb-[16px]">
           <span className="h-2 w-2 rounded-sm bg-secondary/60 border" style={{ borderColor: '#7B8A9E' }} /> {t('streakTimeline.legend.streakFreeze')}
         </span>
       </div>
@@ -268,7 +268,7 @@ export function JourneyWidget({ reflections, practiceEntries = [], streakFreezeD
       {/* Expand to calendar */}
       <button
         onClick={() => setExpanded((p) => !p)}
-        className="w-full flex items-center justify-center gap-1.5 pt-1 text-[9px] font-mono transition-colors"
+        className="w-full flex items-center justify-center gap-1.5 pt-1 transition-colors text-base font-sans font-medium"
         style={{ color: '#C1CBD7' }}
       >
         <motion.div

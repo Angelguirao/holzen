@@ -194,8 +194,8 @@ export function MilestoneTimeline({ reflections, practiceEntries = [], letters =
 
             {/* Content */}
             <div className="py-2.5 min-w-0">
-              <p className="text-xs font-mono text-foreground/80 leading-tight">{milestone.label}</p>
-              <p className="text-[9px] font-mono text-muted-foreground/40 mt-0.5">{milestone.detail}</p>
+              <p className="text-foreground/80 leading-tight font-sans font-medium text-base">{milestone.label}</p>
+              <p className="mt-0.5 text-sm font-sans text-muted-foreground">{milestone.detail}</p>
             </div>
           </div>
         );
