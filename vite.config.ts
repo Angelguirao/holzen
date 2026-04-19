@@ -3,6 +3,7 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { VitePWA } from "vite-plugin-pwa";
+import { sentryVitePlugin } from "@sentry/vite-plugin";
 
 // Defaults when `VITE_SUPABASE_*` are unset: local `npm run dev`, and `vite build` without env
 // (e.g. Lovable preview). Override with `.env` / CI / Lovable Cloud vars for another project.
@@ -45,6 +46,17 @@ export default defineConfig(({ mode, command }) => {
     ? env.VITE_SUPABASE_PUBLISHABLE_KEY || FALLBACK_SUPABASE_PUBLISHABLE_KEY
     : env.VITE_SUPABASE_PUBLISHABLE_KEY || "";
 
+  // Release identifier shared with Sentry (frontend + edges) and PostHog (`$app_version`).
+  // CI should set VITE_APP_VERSION = Git SHA; local builds fall back to "dev".
+  const appVersion = env.VITE_APP_VERSION || process.env.VITE_APP_VERSION || "dev";
+
+  // Source-map upload gated on CI-only secrets; plugin is a no-op without them.
+  const sentryAuthToken = process.env.SENTRY_AUTH_TOKEN;
+  const sentryOrg = process.env.SENTRY_ORG;
+  const sentryProject = process.env.SENTRY_PROJECT;
+  const sentryPluginEnabled =
+    command === "build" && !!sentryAuthToken && !!sentryOrg && !!sentryProject;
+
   return {
     server: {
       host: "::",
@@ -57,6 +69,11 @@ export default defineConfig(({ mode, command }) => {
       "import.meta.env.VITE_SUPABASE_URL": JSON.stringify(supabaseUrl),
       "import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY": JSON.stringify(supabaseKey),
       "__BUILD_TIME__": JSON.stringify(new Date().toISOString()),
+      "__APP_VERSION__": JSON.stringify(appVersion),
+    },
+    // Sentry needs hidden source maps so stack traces resolve without shipping maps to users.
+    build: {
+      sourcemap: sentryPluginEnabled ? "hidden" : false,
     },
     plugins: [
       {
@@ -85,6 +102,16 @@ export default defineConfig(({ mode, command }) => {
           maximumFileSizeToCacheInBytes: 3 * 1024 * 1024, // 3 MiB
         },
       }),
+      // Must be last — uploads source maps after the build finishes.
+      sentryPluginEnabled &&
+        sentryVitePlugin({
+          authToken: sentryAuthToken,
+          org: sentryOrg,
+          project: sentryProject,
+          release: { name: appVersion },
+          sourcemaps: { filesToDeleteAfterUpload: ["dist/**/*.map"] },
+          telemetry: false,
+        }),
     ].filter(Boolean),
     resolve: {
       alias: {
