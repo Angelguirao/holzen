@@ -25,6 +25,7 @@ This folder contains human-readable notes that complement the source code and in
 | Design system migration (Nox) | [design/nox/](design/nox/) | Figma is canonical for visual values; markdown owns migration rules, mapping, and extension policy. |
 | **Live browser 360°** (MCP: network, console, Lighthouse, performance) | [fundamentals/browser-360-mcp-playbook.md](fundamentals/browser-360-mcp-playbook.md) | Pairs with source reading; optional snapshot reports under [reports/](reports/). |
 | **UI / journeys** (click-through flows in the real app) | [backlog/e2e-browser-automation.md](backlog/e2e-browser-automation.md) | **Not** a substitute for HTTP review: use **Playwright**, **Cypress**, or **Vitest + React Testing Library** for full product flows; Bruno is for **API** review only. |
+| **Testing strategy** (test pyramid, what we do / don't test) | [fundamentals/testing-strategy.md](fundamentals/testing-strategy.md) | Canonical map of layers (unit / contract / integration / E2E) and where tests live. |
 
 When you change behavior, update the **one** doc that owns that slice (and ADRs only when the *decision* changes, not every refactor).
 
