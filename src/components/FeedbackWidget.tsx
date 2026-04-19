@@ -142,6 +142,7 @@ export function FeedbackWidget() {
       >
         <MessageSquareText className="h-4 w-4" />
       </button>
+      )}
 
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent side="right" className="w-full sm:max-w-md flex flex-col gap-4">
