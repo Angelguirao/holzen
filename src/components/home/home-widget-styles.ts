@@ -48,7 +48,7 @@ export const homeInWidget = {
   /** Spinner + label row inside widgets */
   loadingRow: 'flex items-center gap-2 text-muted-foreground',
   /** Compact activity tags (Ground widget) */
-  pillMuted: 'rounded-full border border-border/50 bg-muted/20 px-3 py-1 text-xs text-muted-foreground',
+  pillMuted: 'rounded-full border border-border/50 bg-muted/20 px-3 py-1 text-muted-foreground text-xs',
   /** Next price-check countdown when auto cooldown is idle */
   nextScanCountdown: 'min-w-0 flex-1 font-medium tabular-nums text-primary text-sm',
 } as const;
