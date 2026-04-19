@@ -57,12 +57,21 @@ function getPostHogSessionId(): string | undefined {
  *   - `sentry_event_id`, `error_stack` — only when arriving from the error boundary
  *   - `posthog_session_id` — UX replay anchor (session replay itself stays disabled)
  */
+const DISMISSED_KEY = 'holzen:feedback-widget-dismissed';
+
 export function FeedbackWidget() {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [category, setCategory] = useState<Category>('question');
   const [message, setMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [dismissed, setDismissed] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem(DISMISSED_KEY) === '1';
+    } catch {
+      return false;
+    }
+  });
   const [errorContext, setErrorContext] = useState<{
     sentryEventId?: string;
     errorStack?: string;
