@@ -29,7 +29,7 @@ export function BottomNav() {
             }
           >
             <Icon className="h-4 w-4" />
-            <span>{t(`nav.${key}`)}</span>
+            <span className="text-sm font-sans">{t(`nav.${key}`)}</span>
           </NavLink>
         ))}
       </div>
