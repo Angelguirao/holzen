@@ -21,17 +21,19 @@ negotiated rate differs.
 
 ### 1.1 Perplexity — [pricing docs](https://docs.perplexity.ai/docs/getting-started/pricing)
 
-| Model        | Input $/1M | Output $/1M | Per-request fee (low context) |
-|--------------|-----------:|------------:|------------------------------:|
-| `sonar-pro`  |         $3 |         $15 |                        $0.006 |
-| `sonar`      |         $1 |          $1 |                        $0.005 |
+
+| Model       | Input $/1M | Output $/1M | Per-request fee (low context) |
+| ----------- | ---------- | ----------- | ----------------------------- |
+| `sonar-pro` | $3         | $15         | $0.006                        |
+| `sonar`     | $1         | $1          | $0.005                        |
+
 
 > **Watch:** the per-request fee is tiered by `search_context_size`.
 >
 > - Sonar Pro fast search: **low $0.006 / medium $0.010 / high $0.014** per request.
 > - Sonar fast search: **low $0.005 / … / high $0.012** per request.
 > - Sonar Pro with the **Pro Search auto-classifier** enabled: **$0.014–$0.022** per
->   request on top of the same $3/$15 token rates.
+> request on top of the same $3/$15 token rates.
 >
 > We currently bill as low-context in `DEFAULT_PERPLEXITY_REQUEST_FEE_USD`.
 > If the generators ever pass `search_context_size: "medium" | "high"`, override
@@ -44,20 +46,22 @@ list price: *"The cost of using Lovable AI is exactly the same as going
 directly to the LLM provider. There are no hidden fees."* Numbers below are
 Google Gemini API list rates ([source](https://ai.google.dev/gemini-api/docs/pricing)).
 
-| Model                             | Input $/1M | Output $/1M | Notes |
-|-----------------------------------|-----------:|------------:|-------|
-| `google/gemini-2.5-flash`         |      $0.30 |       $2.50 | GA pricing since Aug 2025 (was $0.15 / $0.60 under preview tiered pricing). |
-| `google/gemini-3-flash-preview`   |      $0.50 |       $3.00 | Released Dec 17, 2025. Batch/flex tier is half. |
-| `google/gemini-2.5-flash-lite`    |      $0.10 |       $0.40 | Current GA rate. |
-| `google/gemini-2.5-flash-image`   |      $0.30 |      $30.00 | ~1,290 output tokens/image → ~$0.039 per 1024×1024 image. Batch mode ≈ $0.0195/image. |
+
+| Model                           | Input $/1M | Output $/1M | Notes                                                                                 |
+| ------------------------------- | ---------- | ----------- | ------------------------------------------------------------------------------------- |
+| `google/gemini-2.5-flash`       | $0.30      | $2.50       | GA pricing since Aug 2025 (was $0.15 / $0.60 under preview tiered pricing).           |
+| `google/gemini-3-flash-preview` | $0.50      | $3.00       | Released Dec 17, 2025. Batch/flex tier is half.                                       |
+| `google/gemini-2.5-flash-lite`  | $0.10      | $0.40       | Current GA rate.                                                                      |
+| `google/gemini-2.5-flash-image` | $0.30      | $30.00      | ~1,290 output tokens/image → ~$0.039 per 1024×1024 image. Batch mode ≈ $0.0195/image. |
+
 
 ### 1.3 Pricing drift policy
 
 - Re-verify **quarterly** and whenever a provider posts a changelog entry.
 - `DEFAULT_COST_MAP` in `supabase/functions/_shared/observe.ts` carries a
-  `last verified` comment next to the map — bump the date when you update.
+`last verified` comment next to the map — bump the date when you update.
 - Treat all numbers in §3–§4 as **order-of-magnitude**; reconcile with the
-  provider dashboards per §8 before making capacity decisions.
+provider dashboards per §8 before making capacity decisions.
 
 ---
 
@@ -68,30 +72,32 @@ cost ceilings). Rows with "✓" for logging appear in the admin Cost tab's
 per-feature breakdown. Logging is how per-user daily caps know anything was
 spent — a row without logging still runs but cannot be capped per-user.
 
-| Function | Trigger | Provider / model(s) | Logs `generation_attempts` | Fallback on block |
-|---|---|---|---|---|
-| `holzen-reflect` | user / cron (`check-volatility`) | Lovable `gemini-3-flash-preview` → `gemini-2.5-flash` | ✓ | Curated fallback pool |
-| `companion-orchestrate` → signal | user / cron | Perplexity `sonar-pro` + Lovable `gemini-2.5-flash(-lite)` | ✓ | Library → cache → curated |
-| `companion-orchestrate` → grounding | user / cron | Perplexity `sonar-pro` + Lovable `gemini-2.5-flash(-lite)` | ✓ | Library → cache → curated |
-| `companion-orchestrate` → history | user / cron | Perplexity `sonar-pro` + Lovable `gemini-2.5-flash(-lite)` | ✓ | Cache → curated |
-| `companion-orchestrate` → zoom-out | user / cron | Lovable `gemini-2.5-flash(-lite)` (BTC prices from cache) | ✓ | Cache → curated |
-| `companion-orchestrate` → intervention (question) | user / cron | Lovable `gemini-3-flash-preview` | ✓ (conditional) | Skip question |
-| `regenerate-only` | user (targeted refresh) | One of the above generators | ✓ | 503 with reason |
-| `journal-prompt` | user | Lovable `gemini-2.5-flash` | ✓ | 503 |
-| `suggest-grounding` | user | Perplexity `sonar` + Lovable | ✓ | 503 |
-| `suggest-ritual` | user | Lovable `gemini-3-flash-preview` | ✓ | Canned ritual template |
-| `generate-wallpaper` | user (Pro) | Lovable `gemini-2.5-flash-image` | ✓ | 503 |
-| `night-reflection` | cron | Lovable `gemini-2.5-flash` → `gemini-2.5-flash-lite` | ✓ | Static localized fallback |
-| `reflection-insights` | cron / user | Lovable Gemini | ✓ | Skip run / 503 |
-| `weekly-digest` | cron | Lovable `gemini-2.5-flash-lite` | ✓ | Digest email sent **without** AI insight |
-| `monthly-report` | cron | Lovable `gemini-2.5-flash-lite` | ✓ | Report email sent **without** AI paragraph |
-| `grounding-enrich` | user | Lovable `gemini-2.5-flash` (cache hits skip) | (via `createLogger`) | 503 |
-| `admin-library-preview` | admin | Lovable `gemini-2.5-flash-lite` | ✓ | 503 |
-| `pregenerate-companions` | cron | Perplexity + Lovable (same as orchestrate) | ✓ | Skip run |
-| `fetch-source-feeds` | cron | Lovable + optional Perplexity | ✓ | Skip run |
-| `personalized-nudge` | cron | **none** — CoinGecko + Resend only | N/A | N/A |
-| `deliver-letters` | cron | **none** — stored letters + push | N/A | N/A |
-| `holzen-number` | user | **none** | N/A | N/A |
+
+| Function                                          | Trigger                          | Provider / model(s)                                        | Logs `generation_attempts` | Fallback on block                          |
+| ------------------------------------------------- | -------------------------------- | ---------------------------------------------------------- | -------------------------- | ------------------------------------------ |
+| `holzen-reflect`                                  | user / cron (`check-volatility`) | Lovable `gemini-3-flash-preview` → `gemini-2.5-flash`      | ✓                          | Curated fallback pool                      |
+| `companion-orchestrate` → signal                  | user / cron                      | Perplexity `sonar-pro` + Lovable `gemini-2.5-flash(-lite)` | ✓                          | Library → cache → curated                  |
+| `companion-orchestrate` → grounding               | user / cron                      | Perplexity `sonar-pro` + Lovable `gemini-2.5-flash(-lite)` | ✓                          | Library → cache → curated                  |
+| `companion-orchestrate` → history                 | user / cron                      | Perplexity `sonar-pro` + Lovable `gemini-2.5-flash(-lite)` | ✓                          | Cache → curated                            |
+| `companion-orchestrate` → zoom-out                | user / cron                      | Lovable `gemini-2.5-flash(-lite)` (BTC prices from cache)  | ✓                          | Cache → curated                            |
+| `companion-orchestrate` → intervention (question) | user / cron                      | Lovable `gemini-3-flash-preview`                           | ✓ (conditional)            | Skip question                              |
+| `regenerate-only`                                 | user (targeted refresh)          | One of the above generators                                | ✓                          | 503 with reason                            |
+| `journal-prompt`                                  | user                             | Lovable `gemini-2.5-flash`                                 | ✓                          | 503                                        |
+| `suggest-grounding`                               | user                             | Perplexity `sonar` + Lovable                               | ✓                          | 503                                        |
+| `suggest-ritual`                                  | user                             | Lovable `gemini-3-flash-preview`                           | ✓                          | Canned ritual template                     |
+| `generate-wallpaper`                              | user (Pro)                       | Lovable `gemini-2.5-flash-image`                           | ✓                          | 503                                        |
+| `night-reflection`                                | cron                             | Lovable `gemini-2.5-flash` → `gemini-2.5-flash-lite`       | ✓                          | Static localized fallback                  |
+| `reflection-insights`                             | cron / user                      | Lovable Gemini                                             | ✓                          | Skip run / 503                             |
+| `weekly-digest`                                   | cron                             | Lovable `gemini-2.5-flash-lite`                            | ✓                          | Digest email sent **without** AI insight   |
+| `monthly-report`                                  | cron                             | Lovable `gemini-2.5-flash-lite`                            | ✓                          | Report email sent **without** AI paragraph |
+| `grounding-enrich`                                | user                             | Lovable `gemini-2.5-flash` (cache hits skip)               | (via `createLogger`)       | 503                                        |
+| `admin-library-preview`                           | admin                            | Lovable `gemini-2.5-flash-lite`                            | ✓                          | 503                                        |
+| `pregenerate-companions`                          | cron                             | Perplexity + Lovable (same as orchestrate)                 | ✓                          | Skip run                                   |
+| `fetch-source-feeds`                              | cron                             | Lovable + optional Perplexity                              | ✓                          | Skip run                                   |
+| `personalized-nudge`                              | cron                             | **none** — CoinGecko + Resend only                         | N/A                        | N/A                                        |
+| `deliver-letters`                                 | cron                             | **none** — stored letters + push                           | N/A                        | N/A                                        |
+| `holzen-number`                                   | user                             | **none**                                                   | N/A                        | N/A                                        |
+
 
 ---
 
@@ -109,8 +115,8 @@ GA rates:
 USD ≈ (5000 × 0.30 + 500 × 2.50) / 1e6 ≈ $0.00275
 ```
 
-`gemini-2.5-flash-lite` is roughly a third of that (~$0.00070).
-`gemini-3-flash-preview` is roughly double (~$0.00400).
+`gemini-2.5-flash-lite` is roughly a third of that (~~$0.00070).
+`gemini-3-flash-preview` is roughly double (~~$0.00400).
 
 > Note: these numbers are ~2× what this doc showed before 2026-04-19.
 > Google re-priced 2.5 Flash and launched 3 Flash Preview between versions.
@@ -129,8 +135,8 @@ This is the dominant per-call cost in a pause session and the number the
 
 ### 3.3 Wallpaper (Gemini image)
 
-Flat ~$0.039 per image at current `COST_MAP` rate. Output tokens
-(~1,290/image) multiply at the $30/1M output rate.
+Flat ~~$0.039 per image at current `COST_MAP` rate. Output tokens
+(~~1,290/image) multiply at the $30/1M output rate.
 
 ### 3.4 Reflection
 
@@ -163,18 +169,18 @@ admin preview) — those are roughly **2× more expensive per call** now.
 
 - **Pauses.** 100 × 2 full pauses/day × ~$0.21 (all-live happy path) ≈ $42/day.
 - **Auxiliary AI** (journal prompts, night reflections, wallpapers at 20%
-  weekly adoption, digests, reports): ~$6–10/day (up from ~$3–5 pre-drift).
-- **Total.** ~$48–52/day ≈ **~$1,500/month** AI spend. Well above the default
-  $300/month cap → you either raise the cap or let panic mode + feature flags
-  degrade non-essential features.
+weekly adoption, digests, reports): ~$6–10/day (up from ~$3–5 pre-drift).
+- **Total.** ~~$48–52/day ≈ **~~$1,500/month** AI spend. Well above the default
+$300/month cap → you either raise the cap or let panic mode + feature flags
+degrade non-essential features.
 
 ### 4.2 1,000 Pro DAU
 
 - **Pauses.** 1000 × 2 × ~$0.21 ≈ $420/day.
 - **Auxiliary.** ~$60–100/day (up from ~$30–50 pre-drift).
-- **Total.** ~$480–520/day ≈ **~$15,000/month**. At this scale the pause
-  path is still the binding constraint; prioritize caching
-  (`pregenerate-companions` hit rate) and Perplexity rate negotiation.
+- **Total.** ~~$480–520/day ≈ **~~$15,000/month**. At this scale the pause
+path is still the binding constraint; prioritize caching
+(`pregenerate-companions` hit rate) and Perplexity rate negotiation.
 
 ### 4.3 10,000 Pro DAU
 
@@ -198,40 +204,42 @@ admin Tools tab when you see the daily spend bar sustain >60% for a week.
 The defense-in-depth layers, outermost first:
 
 1. **Provider-side caps** — Perplexity auto-reload ceiling and Lovable
-   workspace monthly cap. See §8 for recommended numbers.
+  workspace monthly cap. See §8 for recommended numbers.
 2. **Engineering global caps** — `app_config.budget_daily_usd_global`,
-   `budget_monthly_usd_global`. Block requests when exceeded.
+  `budget_monthly_usd_global`. Block requests when exceeded.
 3. **Engineering per-user caps** — `app_config.budget_daily_usd_per_user`.
-   Catches a single runaway account without punishing everyone.
+  Catches a single runaway account without punishing everyone.
 4. **Feature flags** — `app_config.feature_flags`. Turn off wallpaper,
-   letters, nudges, digest, reports, etc. independently of cost state.
+  letters, nudges, digest, reports, etc. independently of cost state.
 5. **Panic mode** — `app_config.panic_mode`. Bypasses the 5 companion
-   generators + `pregenerate`. Reflection still runs.
+  generators + `pregenerate`. Reflection still runs.
 6. **Per-user rate limit** — `checkRateLimit`, 30 AI events/60 min. Applies
-   to the orchestrator and its event allowlist only; see
+  to the orchestrator and its event allowlist only; see
    `supabase/functions/_shared/ratelimit.ts`.
 7. **Provider 402 / 429** — last-resort failure handling returns the feature's
-   natural fallback (curated pool, canned template, silent no-op).
+  natural fallback (curated pool, canned template, silent no-op).
 
 ### 5.1 Where each cap is enforced today
 
-| Path | Global daily | Per-user daily | Monthly | Panic mode | Feature flag |
-|---|:-:|:-:|:-:|:-:|:-:|
-| `companion-orchestrate` | ✓ | ✓ | ✓ | ✓ | (per generator) |
-| `regenerate-only` | ✓ | ✓ | ✓ | ✓ | — |
-| `holzen-reflect` | ✓ | ✓ | ✓ | **✗ (by design)** | — |
-| `journal-prompt` | ✓ | ✓ | ✓ | — | `journal_prompt` |
-| `suggest-grounding` | ✓ | ✓ | ✓ | — | `suggest_grounding` |
-| `suggest-ritual` | ✓ | ✓ | ✓ | — | `suggest_ritual` |
-| `generate-wallpaper` | ✓ | ✓ | ✓ | — | `wallpaper` |
-| `grounding-enrich` | ✓ | ✓ | ✓ | — | `grounding_enrich` |
-| `admin-library-preview` | ✓ | ✓ | ✓ | — | `admin_library_preview` |
-| `night-reflection` | ✓ | — | ✓ | — | `night_reflection` |
-| `weekly-digest` | ✓ | — | ✓ | — | `digest` |
-| `monthly-report` | ✓ | — | ✓ | — | `reports` |
-| `reflection-insights` | ✓ | — | ✓ | — | `reflection_insights` |
-| `pregenerate-companions` | ✓ | — | ✓ | ✓ | `pregenerate` |
-| `fetch-source-feeds` | ✓ | — | ✓ | — | `fetch_source_feeds` |
+
+| Path                     | Global daily | Per-user daily | Monthly | Panic mode        | Feature flag            |
+| ------------------------ | ------------ | -------------- | ------- | ----------------- | ----------------------- |
+| `companion-orchestrate`  | ✓            | ✓              | ✓       | ✓                 | (per generator)         |
+| `regenerate-only`        | ✓            | ✓              | ✓       | ✓                 | —                       |
+| `holzen-reflect`         | ✓            | ✓              | ✓       | **✗ (by design)** | —                       |
+| `journal-prompt`         | ✓            | ✓              | ✓       | —                 | `journal_prompt`        |
+| `suggest-grounding`      | ✓            | ✓              | ✓       | —                 | `suggest_grounding`     |
+| `suggest-ritual`         | ✓            | ✓              | ✓       | —                 | `suggest_ritual`        |
+| `generate-wallpaper`     | ✓            | ✓              | ✓       | —                 | `wallpaper`             |
+| `grounding-enrich`       | ✓            | ✓              | ✓       | —                 | `grounding_enrich`      |
+| `admin-library-preview`  | ✓            | ✓              | ✓       | —                 | `admin_library_preview` |
+| `night-reflection`       | ✓            | —              | ✓       | —                 | `night_reflection`      |
+| `weekly-digest`          | ✓            | —              | ✓       | —                 | `digest`                |
+| `monthly-report`         | ✓            | —              | ✓       | —                 | `reports`               |
+| `reflection-insights`    | ✓            | —              | ✓       | —                 | `reflection_insights`   |
+| `pregenerate-companions` | ✓            | —              | ✓       | ✓                 | `pregenerate`           |
+| `fetch-source-feeds`     | ✓            | —              | ✓       | —                 | `fetch_source_feeds`    |
+
 
 Per-user caps only apply when a specific `userId` is available (user-facing
 endpoints); cron paths that loop over many users can't meaningfully cap
@@ -244,13 +252,13 @@ endpoints); cron paths that loop over many users can't meaningfully cap
 The `/admin` UI exposes three surfaces relevant to cost:
 
 - **Monitor tab** — daily cost chart, cache hit rates, failure rates. Same
-  data as before; scales with `generation_attempts` logging.
+data as before; scales with `generation_attempts` logging.
 - **Cost tab (new)** — per-feature breakdown, projected monthly at 7-day
-  burn, top users by cost (7d), and **attempt-logging coverage**. If a
-  feature is missing from the coverage grid, its spend isn't visible and
-  per-user caps don't enforce on it.
+burn, top users by cost (7d), and **attempt-logging coverage**. If a
+feature is missing from the coverage grid, its spend isn't visible and
+per-user caps don't enforce on it.
 - **Tools tab** — edit signup gate, cost ceilings, panic mode, feature
-  flags at runtime. DB-backed; ~30 s propagation.
+flags at runtime. DB-backed; ~30 s propagation.
 
 The numbers in the Cost tab come from `generation_attempts.estimated_cost_usd`
 (same source the Monitor tab uses) and should match within noise.
@@ -262,39 +270,77 @@ The numbers in the Cost tab come from `generation_attempts.estimated_cost_usd`
 ### 7.1 Daily spend alert fires / ceiling hit
 
 1. Open **Admin → Cost**. Who are the top 3 users over the last 24 h? Any
-   single user >50% of the per-user cap is your first suspect.
+  single user >50% of the per-user cap is your first suspect.
 2. Check **Admin → Cost → logging coverage**. A feature suddenly listed in
-   the breakdown that wasn't there yesterday is worth investigating.
+  the breakdown that wasn't there yesterday is worth investigating.
 3. If a cron loop is suspect, **flip the relevant feature flag off** in
-   Admin → Tools. Cron runs will skip it until you flip it back.
+  Admin → Tools. Cron runs will skip it until you flip it back.
 4. If unclear what's spending, **enable panic mode** in Admin → Tools. That
-   buys you 15–30 min of near-zero AI spend to investigate while users still
+  buys you 15–30 min of near-zero AI spend to investigate while users still
    get reflections.
 5. Once the source is clear, raise the cap (Admin → Tools) or leave panic
-   mode on and deploy a fix.
+  mode on and deploy a fix.
 
 ### 7.2 Perplexity returns 402 (credit exhausted)
 
 - Edge functions already degrade to cache/library/fallback on 402.
 - Open Perplexity dashboard, verify auto-reload fired (§8). If reload is off
-  or the monthly cap was hit, top up manually.
+or the monthly cap was hit, top up manually.
 - Check Admin → Cost for unexpected spend in the last 24 h.
 
 ### 7.3 Lovable AI 402
 
 - Same pattern: functions degrade on 402.
 - Open Lovable **Workspace Settings → Cloud & AI balance**. Apply auto
-  top-up settings per §8 if not already in place.
+top-up settings per §8 if not already in place.
 - Worth checking all feature flags in Admin → Tools — the `wallpaper` flag
-  gets the most out-sized individual call cost (image model).
+gets the most out-sized individual call cost (image model).
 
 ### 7.4 Panic mode on — when to turn it off
 
 Panic mode is designed to be safe to leave on for hours. Turn off when:
+
 - Cause is identified and fixed.
 - Daily spend bar in Admin → Tools has recovered below 50% of cap.
 - Pregenerate crons are unpaused and cache warm enough that the next wave
-  of live generation won't immediately re-trigger the cap.
+of live generation won't immediately re-trigger the cap.
+
+### 7.5 Daily cost alert email
+
+`supabase/functions/ai-cost-alert` fires a single email when one or more of:
+
+| Trigger | Default threshold | Setting in `app_config` |
+|---|---|---|
+| Yesterday's global spend ≥ *X*% of `budget_daily_usd_global` | 80% | `ai_cost_alert_daily_threshold_pct` |
+| Yesterday's spend ≥ *N*× the 7-day average | 2.0× | `ai_cost_alert_wow_multiplier` |
+| Month-to-date projection > `budget_monthly_usd_global` | — | (always on) |
+
+**Setup:**
+
+1. Open `/admin → Tools → Daily cost alert email`.
+2. Enable the master switch.
+3. Add recipient addresses (comma-separated). Empty list = no email sent.
+4. Leave thresholds at defaults unless you know your burn pattern.
+5. Schedule the cron: point Supabase scheduled functions (or pg_cron) at
+   `POST /functions/v1/ai-cost-alert` with the service-role key or
+   `CRON_SECRET` in `Authorization`. Daily at **08:00 UTC** is the intended
+   cadence; the function always looks at *yesterday UTC* so the dispatch
+   time within the day doesn't matter.
+6. Verify by running the function once manually; it logs either
+   `ai-cost-alert: no triggers` or `ai-cost-alert: alert sent` with the
+   numbers.
+
+**When an alert fires:**
+
+1. Open the email — it lists which triggers fired, yesterday's spend,
+   7-day average, month-to-date, projected monthly, and top-3 users +
+   features.
+2. Follow §7.1 runbook from there.
+
+**When an alert doesn't fire but you think it should:** check the scheduled
+function actually ran (Supabase logs filter `holzen:ai-cost-alert`). A
+`skipped: disabled` or `skipped: no_recipients` line means the Tools tab
+config needs attention.
 
 ---
 
@@ -306,11 +352,13 @@ engineering cap first, not the provider cap.
 
 ### 8.1 Perplexity (Billing → Auto Reload)
 
-| Setting | Value |
-|---|---|
-| Reload when balance below | **$20** |
-| Reload amount | **$50** |
-| Monthly spend cap | **$300** |
+
+| Setting                   | Value    |
+| ------------------------- | -------- |
+| Reload when balance below | **$20**  |
+| Reload amount             | **$50**  |
+| Monthly spend cap         | **$300** |
+
 
 Each $50 top-up buys ~250 Sonar Pro calls at the current midpoint. The $300
 cap is ~2× current 100 Pro DAU forecast (§4.1) so it provides cushion for
@@ -318,11 +366,13 @@ moderate growth without going wild during an incident.
 
 ### 8.2 Lovable AI (Workspace → Cloud & AI balance → Auto top-up)
 
-| Setting | Value |
-|---|---|
-| Reload when balance below | **$15** |
-| Reload amount | **$40** |
-| Monthly spend cap | **$150** |
+
+| Setting                   | Value    |
+| ------------------------- | -------- |
+| Reload when balance below | **$15**  |
+| Reload amount             | **$40**  |
+| Monthly spend cap         | **$150** |
+
 
 Lovable spend is dominated by cheap Gemini flash tokens; wallpaper images
 are the outlier. $150/month covers ~3,800 wallpapers + all other Gemini
@@ -341,32 +391,36 @@ Provider top-up is a secondary net.
 
 ## 9. Related docs
 
-- [`docs/systems/pause/pause-session-cost-estimates.md`](../pause/pause-session-cost-estimates.md)
-  — pause-only case study. Still valid for that narrow scope; this doc is
-  the superset.
-- [`docs/ops/deployment-sync-guide.md`](../../ops/deployment-sync-guide.md)
-  — pre-push checklist. Add a note to re-run the cost estimates whenever
-  `DEFAULT_COST_MAP` or new edge functions land.
+- `[docs/systems/pause/pause-session-cost-estimates.md](../pause/pause-session-cost-estimates.md)`
+— pause-only case study. Still valid for that narrow scope; this doc is
+the superset.
+- `[docs/ops/deployment-sync-guide.md](../../ops/deployment-sync-guide.md)`
+— pre-push checklist. Add a note to re-run the cost estimates whenever
+`DEFAULT_COST_MAP` or new edge functions land.
 - `supabase/migrations/20260419120000_app_config.sql` — schema for caps + flags.
 - `supabase/functions/_shared/app-config.ts` — loader with TTL cache.
 - `supabase/functions/_shared/ratelimit.ts` — `checkCostCeilings` + `guardAiFeature`.
 - `src/components/admin/AppConfigTools.tsx` — Admin Tools UI.
 - `src/components/admin/CostAnalytics.tsx` — Admin Cost tab.
+- `supabase/functions/ai-cost-alert/index.ts` — daily alert email (§7.5).
+- `supabase/migrations/20260419150000_ai_cost_alert_config.sql` — alert config seed.
 
 ---
 
 ## 10. Changelog
 
+- **2026-04-19 (end of day):** Added `ai-cost-alert` daily email function + admin
+  config (recipients, threshold %, WoW multiplier) + runbook §7.5.
 - **2026-04-19 (later that day):** Pricing verification pass against Perplexity
-  and Google docs (via Context7). Updated `DEFAULT_COST_MAP` to current GA
-  rates:
-  - `gemini-2.5-flash`: `[0.15, 0.60]` → **`[0.30, 2.50]`** (GA, Aug 2025).
-  - `gemini-3-flash-preview`: `[0.15, 0.60]` → **`[0.50, 3.00]`** (released Dec 2025).
-  - `gemini-2.5-flash-lite`: `[0.075, 0.30]` → **`[0.10, 0.40]`**.
+and Google docs (via Context7). Updated `DEFAULT_COST_MAP` to current GA
+rates:
+  - `gemini-2.5-flash`: `[0.15, 0.60]` → `**[0.30, 2.50]`** (GA, Aug 2025).
+  - `gemini-3-flash-preview`: `[0.15, 0.60]` → `**[0.50, 3.00]**` (released Dec 2025).
+  - `gemini-2.5-flash-lite`: `[0.075, 0.30]` → `**[0.10, 0.40]**`.
   - Perplexity, `gemini-2.5-flash-image`: unchanged.
-
   Pre-drift doc had underestimated Lovable-side spend by ~2×. Scenario totals,
   per-pause arithmetic, and ceiling-math updated to match.
 - **2026-04-19:** Initial version. Supersedes pause-only estimates doc as
-  canonical. Covers all 17 AI-touching edge functions. Adds guardrail map,
-  scenario bounds, runbooks, auto top-up recommendations.
+canonical. Covers all 17 AI-touching edge functions. Adds guardrail map,
+scenario bounds, runbooks, auto top-up recommendations.
+

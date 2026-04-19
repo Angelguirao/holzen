@@ -61,6 +61,8 @@ project_id = "edgbwdecaoottowliimu"
     verify_jwt = true
   [functions.badge-notify]
     verify_jwt = false
+  [functions.ai-cost-alert]
+    verify_jwt = false
   [functions.companion-orchestrate]
     verify_jwt = false
   [functions.grounding-enrich]
