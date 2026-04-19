@@ -164,7 +164,7 @@ export function ProLockedWidget({ onUpgrade, checkoutLoading, feature }: { onUpg
   return (
     <div className="flex flex-col items-center gap-3 py-4">
       <Lock className="h-5 w-5 text-muted-foreground" />
-      <p className="max-w-[220px] text-center text-sm leading-relaxed text-muted-foreground">{description}</p>
+      <p className="w-full text-center text-sm leading-relaxed text-muted-foreground">{description}</p>
       <button
         type="button"
         onClick={onUpgrade}
