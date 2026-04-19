@@ -546,8 +546,8 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                         : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
                     }`}
                   >
-                    <p className="text-xs font-mono font-medium">{c.label}</p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">{c.desc}</p>
+                    <p className="font-medium text-base font-sans text-secondary-foreground">{c.label}</p>
+                    <p className="mt-0.5 text-sm font-sans text-muted-foreground">{c.desc}</p>
                   </button>
                 ))}
               </div>
