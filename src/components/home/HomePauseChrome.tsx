@@ -170,7 +170,7 @@ export function ProLockedWidget({ onUpgrade, checkoutLoading, feature }: { onUpg
         onClick={onUpgrade}
         disabled={checkoutLoading}
         className="text-sm font-medium underline-offset-4 transition-colors hover:underline disabled:opacity-50"
-        style={{ color: '#22D3EE' }}
+        style={{ color: '#0284C7' }}
       >
         {t('pro.upgradeCta')}
       </button>
