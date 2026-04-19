@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import webpush from "https://esm.sh/web-push@3.6.7";
 import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
+import { createAttemptLogger } from "../_shared/observe.ts";
 import { coingeckoHeaders } from "../_shared/coingecko.ts";
 
 const corsHeaders = {
@@ -106,6 +107,7 @@ async function generateAIMessage(
   recentMoods: string[],
   streakDays: number,
   tone: string,
+  logAttempt: (p: Parameters<ReturnType<typeof createAttemptLogger>>[0]) => void,
 ): Promise<string | null> {
   const moodSummary = recentMoods.length > 0
     ? `Recent moods (last 7 days): ${recentMoods.join(", ")}`
@@ -139,8 +141,9 @@ ${reflectionSummary}
 Write one personalized night reflection message.`;
 
   const models = ["google/gemini-2.5-flash", "google/gemini-2.5-flash-lite"];
-  
+
   for (const model of models) {
+    const t0 = Date.now();
     try {
       const controller = new AbortController();
       const timeout = setTimeout(() => controller.abort(), 15000);
@@ -164,6 +167,14 @@ Write one personalized night reflection message.`;
 
       if (!response.ok) {
         holzenEdgeError("night-reflection", `AI ${model} HTTP ${response.status}`);
+        logAttempt({
+          companion_type: "night_reflection",
+          provider: "lovable",
+          model,
+          status: "error",
+          latency_ms: Date.now() - t0,
+          error_message: `HTTP ${response.status}`,
+        });
         if (model !== models[models.length - 1]) continue;
         return null;
       }
@@ -171,14 +182,42 @@ Write one personalized night reflection message.`;
       const data = await response.json();
       const content = data.choices?.[0]?.message?.content?.trim();
       if (!content || content.length < 10) {
+        logAttempt({
+          companion_type: "night_reflection",
+          provider: "lovable",
+          model,
+          status: "quality_gate_failed",
+          latency_ms: Date.now() - t0,
+          input_tokens: data?.usage?.prompt_tokens,
+          output_tokens: data?.usage?.completion_tokens,
+          quality_gate_reason: "empty_or_too_short",
+        });
         if (model !== models[models.length - 1]) continue;
         return null;
       }
 
+      logAttempt({
+        companion_type: "night_reflection",
+        provider: "lovable",
+        model,
+        status: "success",
+        latency_ms: Date.now() - t0,
+        input_tokens: data?.usage?.prompt_tokens,
+        output_tokens: data?.usage?.completion_tokens,
+      });
       // Strip any surrounding quotes the model might add
       return content.replace(/^["']|["']$/g, "").trim();
     } catch (e) {
       holzenEdgeError("night-reflection", `AI ${model} error`, e);
+      const isAbort = e instanceof DOMException && e.name === "AbortError";
+      logAttempt({
+        companion_type: "night_reflection",
+        provider: "lovable",
+        model,
+        status: isAbort ? "timeout" : "error",
+        latency_ms: Date.now() - t0,
+        error_message: e instanceof Error ? e.message : String(e),
+      });
       if (model !== models[models.length - 1]) continue;
       return null;
     }
@@ -304,6 +343,7 @@ serve(async (req) => {
       if (LOVABLE_API_KEY) {
         // Track AI usage
         try { await supabase.from("analytics_events").insert({ user_id: profile.user_id, event: "night_reflection_ai_call" }); } catch (_) { /* non-fatal */ }
+        const logAttempt = createAttemptLogger(supabase, { userId: profile.user_id });
         const aiMessage = await generateAIMessage(
           LOVABLE_API_KEY,
           userLang,
@@ -314,6 +354,7 @@ serve(async (req) => {
           recentMoods,
           streakDays,
           tone,
+          logAttempt,
         );
         if (aiMessage) {
           message = aiMessage;

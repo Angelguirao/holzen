@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { createAttemptLogger } from "../_shared/observe.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -48,6 +49,8 @@ serve(async (req) => {
         blocked: guard.reason,
       }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
+    const logAttempt = createAttemptLogger(svcClient, { userId: user.id });
+    const RITUAL_MODEL = "google/gemini-3-flash-preview";
 
     const prompt = `You are a wellness ritual designer for Bitcoin holders. Based on the user's current emotional state, suggest a ritual sequence.
 
@@ -69,6 +72,7 @@ ${reflectionMessage ? `The user's current reflection: "${reflectionMessage}"` : 
 
 Respond ONLY with valid JSON.`;
 
+    const t0 = Date.now();
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -76,12 +80,20 @@ Respond ONLY with valid JSON.`;
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: RITUAL_MODEL,
         messages: [{ role: "user", content: prompt }],
       }),
     });
 
     if (!response.ok) {
+      logAttempt({
+        companion_type: "suggest_ritual",
+        provider: "lovable",
+        model: RITUAL_MODEL,
+        status: "error",
+        latency_ms: Date.now() - t0,
+        error_message: `HTTP ${response.status}`,
+      });
       if (response.status === 429) {
         return new Response(JSON.stringify({ error: "Rate limited" }), { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } });
       }
@@ -92,6 +104,15 @@ Respond ONLY with valid JSON.`;
     }
 
     const data = await response.json();
+    logAttempt({
+      companion_type: "suggest_ritual",
+      provider: "lovable",
+      model: RITUAL_MODEL,
+      status: "success",
+      latency_ms: Date.now() - t0,
+      input_tokens: data?.usage?.prompt_tokens,
+      output_tokens: data?.usage?.completion_tokens,
+    });
     const content = data.choices?.[0]?.message?.content || "";
     
     // Parse JSON from response

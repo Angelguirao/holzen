@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { createAttemptLogger } from "../_shared/observe.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -31,6 +32,8 @@ serve(async (req) => {
     // Track AI usage
     const svcClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false } });
     try { await svcClient.from("analytics_events").insert({ user_id: user.id, event: "journal_prompt_ai_call" }); } catch (_) { /* non-fatal */ }
+    const logAttempt = createAttemptLogger(svcClient, { userId: user.id });
+    const JOURNAL_MODEL = "google/gemini-2.5-flash";
 
     // Cost / feature guard. Degrades gracefully: on block, return a 503 with reason;
     // the client already handles errors with a retry-later toast.
@@ -92,26 +95,50 @@ ${contextBlock}${recentPromptsBlock}`;
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000);
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-2.5-flash",
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: "Generate 3 journal prompts for me." },
-        ],
-        response_format: { type: "json_object" },
-        temperature: 0.9,
-      }),
-      signal: controller.signal,
-    });
+    const t0 = Date.now();
+    let response: Response;
+    try {
+      response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          model: JOURNAL_MODEL,
+          messages: [
+            { role: "system", content: systemPrompt },
+            { role: "user", content: "Generate 3 journal prompts for me." },
+          ],
+          response_format: { type: "json_object" },
+          temperature: 0.9,
+        }),
+        signal: controller.signal,
+      });
+    } catch (e) {
+      clearTimeout(timeout);
+      const isAbort = e instanceof DOMException && e.name === "AbortError";
+      logAttempt({
+        companion_type: "journal_prompt",
+        provider: "lovable",
+        model: JOURNAL_MODEL,
+        status: isAbort ? "timeout" : "error",
+        latency_ms: Date.now() - t0,
+        error_message: e instanceof Error ? e.message : String(e),
+      });
+      throw e;
+    }
     clearTimeout(timeout);
 
     if (!response.ok) {
+      logAttempt({
+        companion_type: "journal_prompt",
+        provider: "lovable",
+        model: JOURNAL_MODEL,
+        status: "error",
+        latency_ms: Date.now() - t0,
+        error_message: `HTTP ${response.status}`,
+      });
       if (response.status === 429) {
         return new Response(JSON.stringify({ error: "Rate limited, please try again later." }), {
           status: 429,
@@ -130,6 +157,15 @@ ${contextBlock}${recentPromptsBlock}`;
     }
 
     const result = await response.json();
+    logAttempt({
+      companion_type: "journal_prompt",
+      provider: "lovable",
+      model: JOURNAL_MODEL,
+      status: "success",
+      latency_ms: Date.now() - t0,
+      input_tokens: result?.usage?.prompt_tokens,
+      output_tokens: result?.usage?.completion_tokens,
+    });
     const raw = result.choices?.[0]?.message?.content ?? "{}";
 
     let prompts: string[];
