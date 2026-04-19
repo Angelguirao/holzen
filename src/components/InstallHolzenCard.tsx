@@ -105,7 +105,7 @@ export function InstallHolzenCard({ alwaysShow = false, compact = false, classNa
             </p>
             <p className="leading-relaxed text-primary mt-1.5 text-sm">
               Install Holzen to receive pauses when Bitcoin moves.
-              <span className="block leading-relaxed text-[#7b8a9d] mt-1 text-sm">
+              <span className="block leading-relaxed text-[#7b8a9d] mt-1 text-xs">
                 Required on iPhone for notifications. Tap Share, then Add to Home Screen.
               </span>
             </p>
