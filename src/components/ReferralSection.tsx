@@ -79,7 +79,8 @@ export function ReferralSection({ defaultExpanded = false }: { defaultExpanded?:
     <div className="space-y-3">
       <button
         onClick={() => setExpanded(!expanded)}
-        className="text-xs font-mono text-muted-foreground underline"
+        className="text-xs font-mono underline"
+        style={{ color: '#24B2C8' }}
       >
         {expanded ? t('referral.hideLink') : t('referral.inviteFriends')}
       </button>
