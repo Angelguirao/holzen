@@ -82,7 +82,7 @@ export const Changelog = forwardRef<HTMLDivElement, ChangelogProps>(function Cha
           onWhatsNewOpen?.();
           setOpen(true);
         }}
-        className="text-xs font-mono text-muted-foreground underline"
+        className="text-muted-foreground underline text-sm font-sans"
       >
         {t('changelog.whatsNew')}
       </button>
