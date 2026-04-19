@@ -284,7 +284,7 @@ export function LibraryItems({ library, filtered }: Props) {
             filtered.length > 0 && (
               <button
                 onClick={enterSelectMode}
-                className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground/40 hover:text-muted-foreground transition-colors ml-auto"
+                className="flex items-center gap-1 transition-colors ml-auto text-sm font-sans text-secondary-foreground"
               >
                 <CheckSquare className="h-3 w-3" />
                 {t('library.select', { defaultValue: 'Select' })}
