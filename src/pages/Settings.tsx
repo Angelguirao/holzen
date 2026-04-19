@@ -1067,17 +1067,14 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             <FeedbackForm />
             <div className="border-t border-border/30 pt-4 space-y-3">
               <div className="flex items-center gap-3">
-                <button
-                  onClick={() => {
+                <Changelog
+                  onWhatsNewOpen={() => {
                     if (latestVersion) {
                       localStorage.setItem(LAST_SEEN_VERSION_KEY, latestVersion);
                       setHasNewVersion(false);
                     }
                   }}
-                  className="contents"
-                >
-                  <Changelog />
-                </button>
+                />
               </div>
               <AppVersionBadge changelogVersion={latestVersion} />
             </div>
