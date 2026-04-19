@@ -38,6 +38,69 @@ export type Database = {
         }
         Relationships: []
       }
+      app_config: {
+        Row: {
+          description: string | null
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          description?: string | null
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value: Json
+        }
+        Update: {
+          description?: string | null
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
+      audit_log: {
+        Row: {
+          action: string
+          actor_id: string | null
+          after: Json | null
+          before: Json | null
+          cid: string | null
+          created_at: string
+          id: number
+          metadata: Json | null
+          target_id: string | null
+          target_type: string | null
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          after?: Json | null
+          before?: Json | null
+          cid?: string | null
+          created_at?: string
+          id?: number
+          metadata?: Json | null
+          target_id?: string | null
+          target_type?: string | null
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          after?: Json | null
+          before?: Json | null
+          cid?: string | null
+          created_at?: string
+          id?: number
+          metadata?: Json | null
+          target_id?: string | null
+          target_type?: string | null
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           body: string
@@ -545,24 +608,45 @@ export type Database = {
       }
       feedback: {
         Row: {
+          app_version: string | null
           category: string
+          cid: string | null
           created_at: string
+          error_stack: string | null
           id: string
           message: string
+          page: string | null
+          posthog_session_id: string | null
+          sentry_event_id: string | null
+          user_agent: string | null
           user_id: string
         }
         Insert: {
+          app_version?: string | null
           category?: string
+          cid?: string | null
           created_at?: string
+          error_stack?: string | null
           id?: string
           message: string
+          page?: string | null
+          posthog_session_id?: string | null
+          sentry_event_id?: string | null
+          user_agent?: string | null
           user_id: string
         }
         Update: {
+          app_version?: string | null
           category?: string
+          cid?: string | null
           created_at?: string
+          error_stack?: string | null
           id?: string
           message?: string
+          page?: string | null
+          posthog_session_id?: string | null
+          sentry_event_id?: string | null
+          user_agent?: string | null
           user_id?: string
         }
         Relationships: []
@@ -1817,6 +1901,25 @@ export type Database = {
       }
     }
     Views: {
+      v_ai_spend_month_global: {
+        Row: {
+          total_usd: number | null
+        }
+        Relationships: []
+      }
+      v_ai_spend_today_global: {
+        Row: {
+          total_usd: number | null
+        }
+        Relationships: []
+      }
+      v_ai_spend_today_per_user: {
+        Row: {
+          total_usd: number | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
       v_companion_avg_latency: {
         Row: {
           avg_latency_ms: number | null
@@ -1986,6 +2089,7 @@ export type Database = {
         Args: { message_id: number; queue_name: string }
         Returns: boolean
       }
+      emit_heartbeat: { Args: { hb_id: string }; Returns: undefined }
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
         Returns: number
@@ -2009,6 +2113,7 @@ export type Database = {
       }
       get_admin_stats: { Args: never; Returns: Json }
       get_holzen_number: { Args: never; Returns: Json }
+      get_signup_gate: { Args: never; Returns: Json }
       is_admin: { Args: never; Returns: boolean }
       move_to_dlq: {
         Args: {
