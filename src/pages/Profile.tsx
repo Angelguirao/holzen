@@ -475,7 +475,7 @@ function StatsContent({ reflections, practiceEntries = [], letters = [], memberS
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <span className="text-2xl font-mono font-semibold leading-none">{scoreData?.score ?? '—'}</span>
               {scoreGrade && (
-                <span className={`mt-0.5 text-sm font-sans text-secondary-foreground font-normal ${scoreColor}`}>{scoreGrade}</span>
+                <span className={`mt-0.5 text-sm font-sans font-normal ${scoreColor}`}>{scoreGrade}</span>
               )}
             </div>
           </div>
@@ -625,7 +625,7 @@ function MicroStat({ value, suffix, label, context, isText }: {
 }) {
   return (
     <div className="flex items-baseline gap-1 flex-wrap">
-      <span className={`font-mono font-medium leading-none ${isText ? 'text-base' : 'text-lg'}`}>
+      <span className={`font-sans font-medium leading-none text-primary ${isText ? 'text-base' : 'text-lg'}`}>
         {value}{suffix && <span className="ml-0.5 text-sm" style={{ color: '#C1CBD7' }}>{suffix}</span>}
       </span>
       {context && (
