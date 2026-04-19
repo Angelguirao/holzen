@@ -137,7 +137,7 @@ export function PracticeWidget() {
           onClick={() => handleSelect(suggestion.id)}
           className="flex w-full items-start gap-3 rounded-xl border border-primary/15 bg-primary/[0.04] px-3 py-3 transition-colors hover:bg-primary/[0.07]"
         >
-          <Sparkles className="h-3.5 w-3.5 text-primary/40 shrink-0 mt-[3px]" />
+          <Sparkles className="h-3.5 w-3.5 text-primary/40 shrink-0 mt-[6px]" />
           <div className="min-w-0 flex-1 text-left">
             <span className={`${homeInWidget.kicker} text-primary`}>{t('practice.suggested', 'Suggested')}</span>
             <span className={`mt-1 block ${homeInWidget.bodyMuted} leading-snug`}>
