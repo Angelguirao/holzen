@@ -144,7 +144,7 @@ export function PracticeWidget() {
               {suggestion.reason}
             </span>
           </div>
-          <ChevronRight className="h-3 w-3 text-primary/30 shrink-0" />
+          <ChevronRight className="h-3 w-3 text-primary/30 shrink-0 mt-[5px]" />
         </button>
       )}
 
@@ -169,9 +169,9 @@ export function PracticeWidget() {
                 </span>
               </div>
               {locked ? (
-                <Lock className="h-3 w-3 text-muted-foreground/30 shrink-0" />
+                <Lock className="h-3 w-3 text-muted-foreground/30 shrink-0 mt-[6px]" />
               ) : (
-                <ChevronRight className="h-3 w-3 text-muted-foreground/30 shrink-0" />
+                <ChevronRight className="h-3 w-3 text-muted-foreground/30 shrink-0 mt-[6px]" />
               )}
             </button>
           );
