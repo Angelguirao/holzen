@@ -370,11 +370,11 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
   const goalActions = (
     <div className="flex items-center gap-2">
       <button type="button" onClick={editGoal} className={`${homeInWidget.iconBtn} text-muted-foreground/50`} aria-label="Edit goal">
-        <Pencil className="h-3.5 w-3.5" />
+        <Pencil className="h-3.5 w-3.5 text-secondary-foreground" />
       </button>
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <button type="button" className="text-xs font-medium text-muted-foreground/60 transition-colors hover:text-foreground">
+          <button type="button" className="font-medium transition-colors text-sm text-secondary-foreground">
             {t('holdGoal.clear')}
           </button>
         </AlertDialogTrigger>
