@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 
@@ -48,8 +48,6 @@ const CACHE_KEY_ITEMS = 'holzen_library_items';
 const CACHE_KEY_COLLECTIONS = 'holzen_library_collections';
 const CACHE_KEY_COL_ITEMS = 'holzen_library_col_items';
 
-/** Matches unique index idx_library_items_user_reflection_source (full index, not partial — PostgREST upsert). */
-const LIBRARY_ITEM_CONFLICT_COLUMNS = 'user_id,reflection_id,source_type';
 
 function readCache<T>(key: string): T | null {
   try {
@@ -107,134 +105,56 @@ export function useLibrary() {
     writeCache(CACHE_KEY_COLLECTIONS, cols);
     writeCache(CACHE_KEY_COL_ITEMS, colItems);
 
-    // Backfill: import reflections and their companions not yet in library (runs every load)
-    const existingKeys = new Set(
-      libItems
-        .filter((i) => i.reflection_id && i.source_type)
-        .map((i) => `${i.reflection_id}:${i.source_type}`),
+    // Targeted hydrate: only pull reflection fields we actually render in the UI,
+    // scoped to the reflection_ids referenced by the loaded library items.
+    // (Replaces the previous "fetch all reflections + all companions + backfill" loop
+    //  which was the dominant source of Library load latency.)
+    const reflectionIds = Array.from(
+      new Set(libItems.map((i) => i.reflection_id).filter((x): x is string => !!x)),
     );
-    const { data: allReflections } = await supabase
-      .from('reflections')
-      .select('id, message, context, created_at, outcome, haiku, haiku_read, grounding_read')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false });
-
-    // Also fetch companion data from normalized table
-    const reflectionIds = (allReflections ?? []).map((r: any) => r.id);
-    const { data: allCompanions } = reflectionIds.length > 0
-      ? await supabase
-          .from('reflection_companions')
-          .select('reflection_id, companion_type, content, read')
-          .in('reflection_id', reflectionIds)
-      : { data: [] };
-
-    // Build companion lookup by reflection_id
-    const companionMap = new Map<string, any[]>();
-    for (const c of (allCompanions ?? [])) {
-      const arr = companionMap.get(c.reflection_id) ?? [];
-      arr.push(c);
-      companionMap.set(c.reflection_id, arr);
+    if (reflectionIds.length === 0) {
+      setReadFlagsMap({});
+      setIncompleteReflections(new Set());
+      setReflectionOutcomes({});
+      return;
     }
 
-    if (allReflections && allReflections.length > 0) {
-      // Build read flags map and incomplete set
-      const flags: Record<string, ReflectionReadFlags> = {};
-      const incomplete = new Set<string>();
-      const outcomes: Record<string, string> = {};
-      for (const r of allReflections as any[]) {
-        // Get read flags from reflection_companions for this reflection
-        const companions = companionMap.get(r.id) ?? [];
-        const companionReadMap: Record<string, boolean> = {};
-        for (const c of companions) {
-          companionReadMap[c.companion_type] = c.read ?? false;
-        }
-        flags[r.id] = {
-          haiku_read: !!r.haiku_read,
-          grounding_read: companionReadMap['ground_nudge'] ?? !!r.grounding_read,
-          signal_read: companionReadMap['signal'] ?? false,
-          zoom_out_read: companionReadMap['zoom_out'] ?? companionReadMap['zoom_out_deep_time'] ?? false,
-          history_read: companionReadMap['historical_insight'] ?? false,
-        };
-        if (!r.outcome) incomplete.add(r.id);
-        if (r.outcome) outcomes[r.id] = r.outcome;
-      }
-      setReadFlagsMap(flags);
-      setIncompleteReflections(incomplete);
-      setReflectionOutcomes(outcomes);
+    const [{ data: reflRows }, { data: companionRows }] = await Promise.all([
+      supabase
+        .from('reflections')
+        .select('id, outcome, haiku_read, grounding_read')
+        .in('id', reflectionIds),
+      supabase
+        .from('reflection_companions')
+        .select('reflection_id, companion_type, read')
+        .in('reflection_id', reflectionIds),
+    ]);
 
-      const inserts: any[] = [];
-      for (const r of allReflections as any[]) {
-        const companions = companionMap.get(r.id) ?? [];
-        const signalC = companions.find((c: any) => c.companion_type === 'signal');
-        const groundingC = companions.find((c: any) => c.companion_type === 'ground_nudge');
-        const zoomOutC = companions.find((c: any) => c.companion_type === 'zoom_out' || c.companion_type === 'zoom_out_deep_time');
-        const historyC = companions.find((c: any) => c.companion_type === 'historical_insight');
-
-        if (!existingKeys.has(`${r.id}:reflection`)) {
-          inserts.push({ user_id: user.id, type: 'bookmark', title: 'Reflection', body: r.message, source_type: 'reflection', reflection_id: r.id, tags: ['reflection'], created_at: r.created_at, status: 'read' });
-        }
-        if (r.haiku && !existingKeys.has(`${r.id}:haiku`)) {
-          inserts.push({ user_id: user.id, type: 'bookmark', title: 'Haiku', body: r.haiku, source_type: 'haiku', reflection_id: r.id, tags: [], created_at: r.created_at, status: r.haiku_read ? 'read' : 'unread' });
-        }
-        if (signalC && !existingKeys.has(`${r.id}:signal`)) {
-          const sd = signalC.content as any;
-          inserts.push({ user_id: user.id, type: 'bookmark', title: sd.title, body: sd.body, source_type: 'signal', source_url: sd.url, reflection_id: r.id, tags: [], created_at: r.created_at, status: signalC.read ? 'read' : 'unread' });
-        }
-        if (groundingC && !existingKeys.has(`${r.id}:grounding`)) {
-          const gd = groundingC.content as any;
-          inserts.push({ user_id: user.id, type: 'bookmark', title: gd.title, body: gd.body, source_type: 'grounding', source_url: gd.url, reflection_id: r.id, tags: [], created_at: r.created_at, status: groundingC.read ? 'read' : 'unread' });
-        }
-        if (zoomOutC && !existingKeys.has(`${r.id}:zoom_out`)) {
-          const zd = zoomOutC.content as any;
-          const zoomBody = zd?.deepTime?.body || zd?.echo?.message || zd?.deepTime?.title || (typeof zd === 'object' ? JSON.stringify(zd) : String(zd));
-          inserts.push({ user_id: user.id, type: 'bookmark', title: zd?.deepTime?.title || 'Zoom Out', body: zoomBody, source_type: 'zoom_out', reflection_id: r.id, tags: [], created_at: r.created_at, status: zoomOutC.read ? 'read' : 'unread' });
-        }
-        if (historyC && !existingKeys.has(`${r.id}:history_insight`)) {
-          const hd = historyC.content as any;
-          inserts.push({ user_id: user.id, type: 'bookmark', title: hd.title ?? 'History Insight', body: hd.btcInsight ?? '', source_type: 'history_insight', reflection_id: r.id, tags: [], created_at: r.created_at, status: historyC.read ? 'read' : 'unread' });
-        }
-      }
-      if (inserts.length > 0) {
-        const batchKeys = new Set<string>();
-        const deduped = inserts.filter((row) => {
-          const k = `${row.user_id}:${row.reflection_id}:${row.source_type}`;
-          if (batchKeys.has(k)) return false;
-          batchKeys.add(k);
-          return true;
-        });
-
-        const backfillUpsert = async (rows: any[]) => {
-          const { error: batchErr } = await supabase.from('library_items').upsert(rows, {
-            onConflict: LIBRARY_ITEM_CONFLICT_COLUMNS,
-            ignoreDuplicates: true,
-          });
-          if (!batchErr) return;
-          console.warn(`[library backfill] batch upsert failed (${rows.length} rows): ${batchErr.message}`);
-          for (const item of rows) {
-            const { error: oneErr } = await supabase.from('library_items').upsert(item, {
-              onConflict: LIBRARY_ITEM_CONFLICT_COLUMNS,
-              ignoreDuplicates: true,
-            });
-            if (oneErr && !oneErr.message.includes('duplicate') && !oneErr.message.includes('unique')) {
-              console.warn(`[library backfill] row upsert failed (${item.source_type}/${item.reflection_id}):`, oneErr.message);
-            }
-          }
-        };
-
-        await backfillUpsert(deduped);
-        const { data: refreshed } = await supabase
-          .from('library_items')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('pinned', { ascending: false })
-          .order('created_at', { ascending: false });
-        if (refreshed) {
-          const updated = refreshed as unknown as LibraryItem[];
-          setItems(updated);
-          writeCache(CACHE_KEY_ITEMS, updated);
-        }
-      }
+    const companionReadByReflection = new Map<string, Record<string, boolean>>();
+    for (const c of (companionRows ?? []) as any[]) {
+      const map = companionReadByReflection.get(c.reflection_id) ?? {};
+      map[c.companion_type] = c.read ?? false;
+      companionReadByReflection.set(c.reflection_id, map);
     }
+
+    const flags: Record<string, ReflectionReadFlags> = {};
+    const incomplete = new Set<string>();
+    const outcomes: Record<string, string> = {};
+    for (const r of (reflRows ?? []) as any[]) {
+      const cMap = companionReadByReflection.get(r.id) ?? {};
+      flags[r.id] = {
+        haiku_read: !!r.haiku_read,
+        grounding_read: cMap['ground_nudge'] ?? !!r.grounding_read,
+        signal_read: cMap['signal'] ?? false,
+        zoom_out_read: cMap['zoom_out'] ?? cMap['zoom_out_deep_time'] ?? false,
+        history_read: cMap['historical_insight'] ?? false,
+      };
+      if (!r.outcome) incomplete.add(r.id);
+      if (r.outcome) outcomes[r.id] = r.outcome;
+    }
+    setReadFlagsMap(flags);
+    setIncompleteReflections(incomplete);
+    setReflectionOutcomes(outcomes);
   }, [user]);
 
   useEffect(() => { fetchAll(); }, [fetchAll]);
