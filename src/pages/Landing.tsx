@@ -36,7 +36,7 @@ function Section({ children, className = '', delay = 0 }: { children: React.Reac
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-muted-foreground/60 mb-6">
+    <p className="tracking-[0.2em] uppercase text-muted-foreground/60 mb-6 text-sm font-sans">
       {children}
     </p>
   );
