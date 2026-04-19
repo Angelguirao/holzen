@@ -304,7 +304,7 @@ const Landing = () => {
                   viewport={{ once: true }}
                   transition={{ duration: 0.35, delay: i * 0.04 }}
                 >
-                  <div className="text-muted-foreground/60 [&>svg]:h-3.5 [&>svg]:w-3.5">{f.icon}</div>
+                  <div className="[&>svg]:h-3.5 [&>svg]:w-3.5" style={{ color: '#C1CBD7' }}>{f.icon}</div>
                   <p className="font-medium text-foreground text-base font-sans">{f.label}</p>
                   <p className="text-muted-foreground leading-relaxed text-sm font-sans">{f.desc}</p>
                 </motion.div>
