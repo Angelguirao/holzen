@@ -106,10 +106,9 @@ export function AutoCooldownIndicator({
   if (remaining <= 0) {
     return (
       <div
-        className="flex items-center gap-3 py-2"
-        title={t('home.nextScanIdleTitle')}
+        className="flex items-center gap-2 py-1"
+        title={t('nextScanIdleTitle', { defaultValue: 'Next automatic scan' })}
       >
-        <Timer className="h-3.5 w-3.5 text-primary/60 shrink-0" />
         <p className={homeInWidget.nextScanCountdown}>
           {t('home.nextScanLine', {
             scan: formatMsAsMS(cronIn),
