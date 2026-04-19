@@ -164,7 +164,7 @@ export function PracticeWidget() {
                 <span className="text-sm font-medium text-foreground transition-colors group-hover:text-foreground">
                   {t(p.labelKey)}
                 </span>
-                <span className="mt-0.5 block text-xs leading-snug text-muted-foreground">
+                <span className="mt-0.5 block leading-snug text-muted-foreground text-sm">
                   {t(p.descKey)}
                 </span>
               </div>
