@@ -59,7 +59,7 @@ export function FeedbackForm() {
             <button
               key={c.value}
               onClick={() => setCategory(c.value)}
-              className={`rounded-md border px-3 py-2.5 text-left transition-colors flex flex-col ${
+              className={`rounded-md border px-3 py-2.5 text-left transition-colors ${
                 selected
                   ? 'border-primary bg-primary/5 text-foreground'
                   : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
