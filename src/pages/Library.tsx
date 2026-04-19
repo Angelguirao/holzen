@@ -360,6 +360,15 @@ export default function Library() {
 
           {/* Item list - natural page scroll */}
           <LibraryItems library={library} filtered={filtered} />
+
+          {/* Infinite scroll sentinel — only when no client-side filters reduce results */}
+          {library.hasMore && (
+            <div ref={loadMoreRef} className="flex items-center justify-center py-6">
+              {library.loadingMore && (
+                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground/40" />
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>
