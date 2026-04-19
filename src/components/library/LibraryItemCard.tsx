@@ -127,7 +127,7 @@ export function LibraryItemCard({ item, onToggleFavorite, onClick, engaged = tru
 
       <button
         onClick={() => onToggleFavorite(item.id)}
-        className={`p-1 mt-0.5 shrink-0 transition-colors ${item.is_favorite ? 'text-destructive' : 'text-muted-foreground/40'}`}
+        className={`p-1 mt-0.5 shrink-0 transition-colors ${item.is_favorite ? 'text-primary' : 'text-muted-foreground/40'}`}
         aria-label={item.is_favorite ? t('libraryCard.removeFavorite') : t('libraryCard.addFavorite')}
       >
         <Heart className={`h-3.5 w-3.5 ${item.is_favorite ? 'fill-current' : ''}`} />
