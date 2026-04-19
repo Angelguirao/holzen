@@ -459,7 +459,7 @@ function StatsContent({ reflections, practiceEntries = [], letters = [], memberS
             <Info className="h-3.5 w-3.5" />
           </button>
         )}
-        <div className="flex items-center gap-5 px-2">
+        <div className="flex items-center gap-5 px-[8px]">
           {/* Score ring — hero size */}
           <div className="relative shrink-0 cursor-pointer" onClick={() => scoreData && setShowScoreInfo(true)}>
             <svg width="108" height="108" viewBox="0 0 108 108">
@@ -630,10 +630,10 @@ function MicroStat({ value, suffix, label, context, isText }: {
           {value}{suffix && <span className="ml-0.5 text-sm" style={{ color: '#C1CBD7' }}>{suffix}</span>}
         </span>
         {context && (
-          <span className="font-sans text-sm" style={{ color: '#C1CBD7' }}>{context}</span>
+          <span className="font-sans text-xs" style={{ color: '#C1CBD7' }}>{context}</span>
         )}
       </div>
-      <p className="lowercase text-sm font-sans" style={{ color: '#C1CBD7' }}>{label}</p>
+      <p className="lowercase font-sans text-xs font-medium" style={{ color: '#C1CBD7' }}>{label}</p>
     </div>
   );
 }
