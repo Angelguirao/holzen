@@ -254,7 +254,7 @@ export function BadgesPanel({ reflections, subscribed, notifyBadges = true }: Ba
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2 min-w-0">
+                    <div className="gap-2 min-w-0 flex items-start justify-start mt-0 pt-0">
                       <badge.icon
                         className="h-3.5 w-3.5 shrink-0"
                         style={{ color: badge.earned && !isLocked ? badge.color : undefined }}
