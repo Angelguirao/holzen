@@ -2,6 +2,8 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import { supabase } from '@/integrations/supabase/client';
 import type { PostgrestError, User } from '@supabase/supabase-js';
 import { holzenLog } from '@/lib/holzen-console';
+import { setSentryUser } from '@/lib/sentry';
+import { identifyPostHog, resetPostHog, trackEvent } from '@/lib/posthog';
 
 interface AuthContextType {
   user: User | null;
@@ -34,6 +36,42 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
       setUser(session?.user ?? null);
       setLoading(false);
+
+      // Observability identification — id only, no email/name. See docs/ops/pii-masking-review.md.
+      if (session?.user) {
+        setSentryUser(session.user.id);
+        identifyPostHog(session.user.id);
+      } else if (_event === 'SIGNED_OUT') {
+        setSentryUser(null);
+        resetPostHog();
+      }
+
+      // Auth funnel events (see docs/ops/event-taxonomy.md § auth).
+      if (_event === 'SIGNED_IN' && session?.user) {
+        const provider = (session.user.app_metadata?.provider as string | undefined) ?? 'email';
+        const createdAt = session.user.created_at
+          ? new Date(session.user.created_at).getTime()
+          : 0;
+        // `signed_up` fires once, on the *first* sign-in within 10 min of account creation.
+        // A localStorage flag guards against re-emission on token refresh.
+        const signedUpKey = `holzen_signed_up_fired_${session.user.id}`;
+        if (
+          createdAt &&
+          Date.now() - createdAt < 10 * 60 * 1000 &&
+          !localStorage.getItem(signedUpKey)
+        ) {
+          trackEvent('auth.signed_up', { provider });
+          try {
+            localStorage.setItem(signedUpKey, '1');
+          } catch {
+            /* quota exceeded — next session will just re-skip by createdAt */
+          }
+        }
+        trackEvent('auth.signed_in', { provider });
+      }
+      if (_event === 'SIGNED_OUT') {
+        trackEvent('auth.signed_out');
+      }
 
       // Record referral on first sign-in: durable queue row + invoke (worker retries if invoke fails).
       if (_event === 'SIGNED_IN' && session?.user) {
@@ -111,6 +149,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
       setUser(session?.user ?? null);
       setLoading(false);
+      if (session?.user) {
+        setSentryUser(session.user.id);
+        identifyPostHog(session.user.id);
+      }
     });
 
     return () => subscription.unsubscribe();
