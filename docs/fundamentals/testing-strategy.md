@@ -15,7 +15,9 @@ We follow a **classic test pyramid**, weighted toward the base:
 
 ```
               ┌──────────────┐
-              │    E2E (0)   │   ← deferred (backlog/e2e-browser-automation.md)
+              │   E2E (1)    │   ← Playwright landing-page smoke; pause /
+              │              │     journal / auth flows deferred (backlog/
+              │              │     e2e-browser-automation.md)
               └──────────────┘
            ┌────────────────────┐
            │ Integration (~few) │   ← React hook + component tests where
@@ -93,7 +95,16 @@ We write integration tests for React code **only** when the behavior is not redu
 
 ### Top: end-to-end
 
-**None today.** Tracked in [`backlog/e2e-browser-automation.md`](../backlog/e2e-browser-automation.md). When it lands, start with one smoke path (auth shell → `/pause`) before asserting full pause copy.
+**One smoke test today.** `e2e/landing.smoke.spec.ts` loads `/` against a `vite preview` server and asserts that the SPA shell boots without page errors. It's the first step on the path in [`backlog/e2e-browser-automation.md`](../backlog/e2e-browser-automation.md) — deliberately shallow so it needs **no backend, no auth, no Supabase**. Broader flows (pause → companions, journal, auth shell → `/pause`) still wait on the backend-for-tests strategy.
+
+Run locally with:
+
+```
+npm run test:e2e:install   # one-time: download Chromium
+npm run test:e2e
+```
+
+CI runs the smoke test in a dedicated job (`.github/workflows/ci.yml`, `e2e-smoke`) that is **non-blocking** (`continue-on-error: true`) until flake is understood. Flip to required once pause / journal E2E is proven stable.
 
 ---
 

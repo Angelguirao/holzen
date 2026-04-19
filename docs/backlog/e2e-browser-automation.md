@@ -1,6 +1,6 @@
 # E2E / browser automation for full product flows
 
-**Status:** backlog — not started.
+**Status:** in progress — **scaffolding + one landing-page smoke test** landed (Playwright + `e2e/landing.smoke.spec.ts` + CI job). Pause / journal / auth flows still deferred until the backend-for-tests strategy below is in place.
 
 ---
 

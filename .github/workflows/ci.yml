@@ -1,0 +1,91 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Cancel in-progress runs for the same branch when a new push arrives.
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-test-build:
+    name: lint + test + build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Lint does not fail the build: the repo has ~300 pre-existing issues
+      # (see AGENTS.md). We surface warnings in the job log without gating
+      # merges. Real-bug rules that we don't want to regress can be flipped
+      # to errors in eslint.config.js when ready.
+      - name: Lint (informational)
+        run: npm run lint
+        continue-on-error: true
+
+      - name: Unit + contract tests
+        run: npm run test
+
+      - name: Production build
+        run: npm run build
+        env:
+          # Build reads VITE_SUPABASE_* via loadEnv; vite.config.ts falls back
+          # to hosted project values when env is missing and mode is not
+          # localstack. CI just needs the build to compile.
+          NODE_ENV: production
+
+  e2e-smoke:
+    name: e2e smoke (landing page)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    # Don't gate merges on E2E yet — it's the first step on the backlog path
+    # (see docs/backlog/e2e-browser-automation.md). Flip to required once the
+    # backend-for-tests strategy is in place and flake is understood.
+    continue-on-error: true
+    needs: lint-test-build
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run Playwright smoke tests
+        run: npm run test:e2e
+        env:
+          CI: "true"
+
+      - name: Upload Playwright report on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 7
