@@ -29,7 +29,7 @@ export const homeInWidget = {
   /** List row with no default border (Practice list) */
   rowButtonGhost: 'flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-muted/30',
   /** Motivation / tag chips (My Why, etc.) */
-  chipTone: 'rounded-full border border-primary/15 bg-primary/5 px-2.5 text-xs font-medium text-primary/80 py-[4px]',
+  chipTone: 'rounded-full border border-primary/15 bg-primary/5 px-2.5 font-medium text-primary/80 py-[4px] text-xs',
   /** Top-right dismiss on reflection / grounding previews */
   dismissAbs:
     'absolute -top-1 -right-1 inline-flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground/30 transition-colors hover:bg-muted/50 hover:text-muted-foreground/60',
