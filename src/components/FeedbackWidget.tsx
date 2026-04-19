@@ -92,11 +92,27 @@ export function FeedbackWidget() {
           })}`
         : '';
       setMessage(prefix);
+      // Errors from the boundary always force the widget to surface, even if dismissed.
+      setDismissed(false);
+      try { localStorage.removeItem(DISMISSED_KEY); } catch { /* no-op */ }
       setOpen(true);
     };
+    const restoreHandler = () => {
+      try { localStorage.removeItem(DISMISSED_KEY); } catch { /* no-op */ }
+      setDismissed(false);
+    };
     window.addEventListener('holzen:open-feedback', handler);
-    return () => window.removeEventListener('holzen:open-feedback', handler);
+    window.addEventListener('holzen:restore-feedback-widget', restoreHandler);
+    return () => {
+      window.removeEventListener('holzen:open-feedback', handler);
+      window.removeEventListener('holzen:restore-feedback-widget', restoreHandler);
+    };
   }, [t]);
+
+  const dismissWidget = () => {
+    try { localStorage.setItem(DISMISSED_KEY, '1'); } catch { /* no-op */ }
+    setDismissed(true);
+  };
 
   const reset = () => {
     setMessage('');
