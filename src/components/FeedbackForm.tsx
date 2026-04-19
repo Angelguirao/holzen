@@ -59,13 +59,13 @@ export function FeedbackForm() {
             <button
               key={c.value}
               onClick={() => setCategory(c.value)}
-              className={`rounded-md border px-3 py-2.5 text-left transition-colors ${
+              className={`rounded-md border px-3 py-2.5 text-left transition-colors flex flex-col ${
                 selected
                   ? 'border-primary bg-primary/5 text-foreground'
                   : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
               }`}
             >
-              <Icon className="h-3.5 w-3.5 mb-1 border-secondary-foreground bg-secondary-foreground" />
+              <Icon className="h-3.5 w-3.5 mb-1 text-secondary" />
               <p className="font-normal text-base font-sans text-secondary-foreground">{t(c.labelKey)}</p>
               <p className="text-muted-foreground mt-0.5 text-sm">{t(c.descKey)}</p>
             </button>
