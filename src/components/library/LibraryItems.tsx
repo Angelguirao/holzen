@@ -230,7 +230,7 @@ export function LibraryItems({ library, filtered }: Props) {
 
   return (
     <>
-      <div className="flex h-full min-h-0 flex-col">
+      <div className="flex flex-col">
         {/* Select mode toggle + bulk action bar */}
         <div className="flex items-center justify-between px-1 min-h-[28px] shrink-0">
           {selectMode ? (
@@ -293,7 +293,7 @@ export function LibraryItems({ library, filtered }: Props) {
           )}
         </div>
 
-        <div className="flex-1 min-h-0">
+        <div>
           {filtered.length === 0 ? (
             <div className="text-center py-12 space-y-3">
               <p className="text-2xl">📚</p>
@@ -304,23 +304,8 @@ export function LibraryItems({ library, filtered }: Props) {
                 {t('library.emptyStateHint', { defaultValue: 'Swipe cards left to delete, right to favorite' })}
               </p>
             </div>
-          ) : useVirtual ? (
-            <GroupedVirtuoso
-              style={{ height: '100%' }}
-              className="tabs-scroll-y"
-              groupCounts={groupCounts}
-              groupContent={(index) => (
-                <div className="bg-background/95 backdrop-blur-sm pt-2 pb-1 px-3">
-                  <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider">
-                    {groupLabels[index]}
-                  </p>
-                </div>
-              )}
-              itemContent={(index) => renderCard(index, flatItems[index])}
-              overscan={200}
-            />
           ) : (
-            <div className="h-full overflow-y-auto space-y-4 pr-1 tabs-scroll-y">
+            <div className="space-y-4">
               {pinnedItems.length > 0 && (
                 <div className="space-y-0.5">
                   <p className="uppercase tracking-wider px-3 pb-1 text-sm font-sans font-normal text-[#dbb266]">
