@@ -322,7 +322,7 @@ export function LibraryItems({ library, filtered }: Props) {
             <div className="h-full overflow-y-auto space-y-4 pr-1">
               {pinnedItems.length > 0 && (
                 <div className="space-y-0.5">
-                  <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider px-3 pb-1">
+                  <p className="uppercase tracking-wider px-3 pb-1 text-sm font-sans font-normal text-[#dbb266]">
                     📌 {t('common.pinned')}
                   </p>
                   <div className="divide-y divide-border/20">
@@ -342,7 +342,7 @@ export function LibraryItems({ library, filtered }: Props) {
 
               {unpinnedGroups.map((group) => (
                 <div key={group.key} className="space-y-0.5">
-                  <p className="text-[9px] font-mono text-muted-foreground/40 uppercase tracking-wider px-3 pb-1">
+                  <p className="uppercase tracking-wider px-3 pb-1 text-sm font-sans font-normal text-[#dbb266] mt-0 pt-[16px]">
                     {group.label}
                   </p>
                   <div className="divide-y divide-border/20">

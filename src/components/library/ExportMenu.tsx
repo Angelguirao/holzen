@@ -31,7 +31,7 @@ export function ExportMenu({ items, label }: Props) {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <button className="flex items-center gap-1 text-[9px] font-mono text-muted-foreground/40 hover:text-muted-foreground transition-colors">
+        <button className="flex items-center gap-1 transition-colors ml-auto text-sm font-sans text-primary">
           <Download className="h-2.5 w-2.5" />
           {t('library.export', { defaultValue: 'Export' })}
         </button>
