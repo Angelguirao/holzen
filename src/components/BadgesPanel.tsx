@@ -11,6 +11,7 @@ interface Reflection {
   id: string;
   created_at: string;
   mood: string | null;
+  mood_after?: string | null;
   outcome: string | null;
   is_favorite: boolean;
   note: string | null;
