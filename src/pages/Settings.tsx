@@ -12,6 +12,7 @@ import { ThresholdSetting } from '@/components/ThresholdSetting';
 import { ReferralSection } from '@/components/ReferralSection';
 import { Changelog } from '@/components/Changelog';
 import { FeedbackForm } from '@/components/FeedbackForm';
+import { InstallHolzenCard } from '@/components/InstallHolzenCard';
 import { Switch } from '@/components/ui/switch';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
