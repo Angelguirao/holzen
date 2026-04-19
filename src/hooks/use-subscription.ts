@@ -84,13 +84,17 @@ async function fetchSubscriptionSnapshot(userId: string, force: boolean): Promis
 
   const now = new Date();
   const monthStart = new Date(now.getFullYear(), now.getMonth(), 1).toISOString();
-  const { count } = await supabase
+  // Only "engaged" pauses count toward the free-tier monthly quota:
+  // breathing completed AND mood/mood_after/outcome set. Ignored notifications
+  // (rows that were merely generated) don't burn quota.
+  const { data: rows } = await supabase
     .from('reflections')
-    .select('*', { count: 'exact', head: true })
+    .select('breathing_completed, mood, mood_after, outcome')
     .eq('user_id', userId)
     .gte('created_at', monthStart);
 
-  const used = count ?? 0;
+  const { isEngagedPause } = await import('@/lib/engaged-pause');
+  const used = (rows ?? []).filter(isEngagedPause).length;
   const remaining = Math.max(0, FREE_MONTHLY_LIMIT - used);
   writeSubCache({
     subscribed: false,
