@@ -242,7 +242,7 @@ const Profile = () => {
             <button
               key={tabItem.id}
               onClick={() => setTab(tabItem.id)}
-              className={`relative flex items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-2 text-xs font-semibold uppercase tracking-wide transition-all ${
+              className={`relative flex items-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-2 font-medium text-xs uppercase tracking-wide transition-all ${
                 isActive
                   ? 'bg-primary/10 text-primary shadow-sm'
                   : 'border border-border/30 text-muted-foreground/60 hover:bg-muted/50 hover:text-muted-foreground'
@@ -648,7 +648,7 @@ function ScoreBarInline({ label, value, hint }: { label: string; value: number; 
         <div className="h-full rounded-full bg-primary/60 transition-all duration-700 ease-out" style={{ width: `${value}%` }} />
       </div>
       {open && hint && (
-        <p className="leading-relaxed pt-0.5 animate-in fade-in duration-200 text-xs text-muted-foreground">
+        <p className="leading-relaxed pt-0.5 animate-in fade-in duration-200 text-sm text-muted-foreground">
           {hint}
         </p>
       )}
@@ -659,7 +659,7 @@ function ScoreBarInline({ label, value, hint }: { label: string; value: number; 
 function StatsSection({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-4">
-      <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground border-b border-border/40 pb-1.5">
+      <p className="tracking-widest uppercase text-muted-foreground border-b border-border/40 pb-1.5 text-sm font-medium font-sans">
         {label}
       </p>
       {children}

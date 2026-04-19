@@ -58,14 +58,14 @@ export function ProLock({ children, inline, feature, hideContent }: Props) {
       {/* Upgrade CTA overlay */}
       <div className={`${hideContent ? 'py-8' : 'absolute inset-0'} flex flex-col items-center justify-center gap-3`}>
         <Lock className="h-6 w-6 text-muted-foreground/30" />
-        <h2 className="text-sm font-semibold text-foreground">{t('pro.featureLocked')}</h2>
-        <p className="max-w-xs text-sm leading-relaxed text-muted-foreground text-center">
+        <h2 className="font-semibold text-foreground text-base">{t('pro.featureLocked')}</h2>
+        <p className="max-w-xs leading-relaxed text-muted-foreground text-center text-base">
           {contextualDesc || fallbackDesc}
         </p>
         <button
           onClick={() => startCheckout()}
           disabled={checkoutLoading}
-          className="group inline-flex items-center gap-1.5 text-sm font-medium underline-offset-4 transition-colors hover:underline disabled:opacity-50"
+          className="group inline-flex items-center gap-1.5 font-medium underline-offset-4 transition-colors hover:underline disabled:opacity-50 text-base font-sans"
           style={{ color: '#24B2C8' }}
         >
           {t('pro.upgradeCta')}

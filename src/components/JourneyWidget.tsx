@@ -202,7 +202,7 @@ export function JourneyWidget({ reflections, practiceEntries = [], streakFreezeD
     <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3 mb-0">
       {/* Streak header */}
       <div className="flex items-center justify-between">
-        <p className="tracking-widest uppercase text-muted-foreground text-sm font-sans mb-[8px] font-medium">
+        <p className="tracking-widest uppercase text-sm font-sans mb-[8px] font-medium text-secondary-foreground">
           {t('streakTimeline.title')}
         </p>
         {nextMilestone && currentStreak > 0 && (
@@ -235,10 +235,10 @@ export function JourneyWidget({ reflections, practiceEntries = [], streakFreezeD
 
       {/* Legend */}
       <div className="flex items-center flex-wrap gap-x-3 gap-y-1 text-[9px] font-mono" style={{ color: '#C1CBD7' }}>
-        <span className="flex items-center gap-1 font-sans text-sm my-[16px] mb-0">
+        <span className="flex items-center gap-1 font-sans text-sm my-[16px] mb-[8px]">
           <span className="h-2 w-2 rounded-sm bg-primary" /> {t('streakTimeline.legend.outcomeLogged')}
         </span>
-        <span className="flex items-center gap-1 font-sans text-sm mt-[16px]">
+        <span className="flex items-center gap-1 font-sans text-sm mt-[16px] mb-[8px]">
           <span className="h-2 w-2 rounded-sm bg-primary/30" /> {t('streakTimeline.legend.pausedNoOutcome', 'Paused (no outcome)')}
         </span>
         <span className="flex items-center gap-1 text-sm font-sans mb-[16px]">
