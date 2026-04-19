@@ -439,6 +439,12 @@ function StatsContent({ reflections, practiceEntries = [], letters = [], memberS
     ? `${Math.ceil(daysSinceFirst / 7)}w`
     : `${Math.ceil(daysSinceFirst / 30)}mo`;
 
+  // Engaged pauses = breathing + mood + mood_after + outcome (the user actually paused).
+  const engagedCount = reflections.filter(
+    (r) => r.breathing_completed && r.mood && r.mood_after && r.outcome
+  ).length;
+  const generatedCount = reflections.length;
+
   const circumference = 2 * Math.PI * 44;
   const scoreOffset = scoreData ? circumference - (scoreData.score / 100) * circumference : circumference;
 
