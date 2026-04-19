@@ -253,25 +253,25 @@ export function BadgesPanel({ reflections, subscribed, notifyBadges = true }: Ba
                       : 'border-border/40 bg-muted/20 opacity-50'
                   }`}
                 >
-                  {/* Pro badge indicator */}
-                  {badge.proOnly && (
-                    <div className="absolute top-2 right-2 flex items-center gap-0.5">
-                      {isLocked ? (
-                        <Lock className="h-2.5 w-2.5 text-muted-foreground/40" />
-                      ) : (
-                        <Sparkles className="h-2.5 w-2.5 text-primary/50" />
-                      )}
+                  <div className="flex items-center justify-between gap-2">
+                    <div className="flex items-center gap-2 min-w-0">
+                      <badge.icon
+                        className="h-3.5 w-3.5 shrink-0"
+                        style={{ color: badge.earned && !isLocked ? badge.color : undefined }}
+                      />
+                      <p className={`text-xs font-mono leading-tight ${badge.earned && !isLocked ? 'text-foreground' : 'text-muted-foreground'}`}>
+                        {t(badge.labelKey)}
+                      </p>
                     </div>
-                  )}
-
-                  <div className="flex items-center gap-2">
-                    <badge.icon
-                      className="h-3.5 w-3.5 shrink-0"
-                      style={{ color: badge.earned && !isLocked ? badge.color : undefined }}
-                    />
-                    <p className={`text-xs font-mono leading-tight ${badge.earned && !isLocked ? 'text-foreground' : 'text-muted-foreground'}`}>
-                      {t(badge.labelKey)}
-                    </p>
+                    {badge.proOnly && (
+                      <div className="flex items-center shrink-0">
+                        {isLocked ? (
+                          <Lock className="h-2.5 w-2.5 text-muted-foreground/40" />
+                        ) : (
+                          <Sparkles className="h-2.5 w-2.5 text-primary/50" />
+                        )}
+                      </div>
+                    )}
                   </div>
                   <p className="text-[10px] text-muted-foreground leading-snug">
                     {isLocked ? t('badges.proExclusive', 'Unlock with Pro') : t(badge.descKey)}
