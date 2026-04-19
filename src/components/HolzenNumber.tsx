@@ -54,7 +54,7 @@ export function HolzenNumber({ variant = 'default' }: { variant?: 'default' | 'c
         className="flex items-center gap-2 text-muted-foreground"
         {...motionProps}
       >
-        <span className="inline-block h-1.5 w-1.5 rounded-full bg-primary/40 animate-pulse" />
+        <span className="inline-block h-1.5 w-1.5 rounded-full bg-primary/40 animate-pulse px-0 mx-[4px]" />
         <p className={homeInWidget.meta}>
           <span className="font-semibold tabular-nums text-foreground">{data.percent}%</span>
           {' '}
