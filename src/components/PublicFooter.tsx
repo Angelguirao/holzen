@@ -35,8 +35,6 @@ export function PublicFooter() {
           <span className="text-muted-foreground/20">·</span>
           <Link to="/blog" className="hover:text-foreground transition-colors">{t('landing.blog')}</Link>
           <span className="text-muted-foreground/20">·</span>
-          <Link to="/roadmap" className="hover:text-foreground transition-colors">{t('landing.roadmap')}</Link>
-          <span className="text-muted-foreground/20">·</span>
           <Link to="/terms" className="hover:text-foreground transition-colors">{t('landing.terms')}</Link>
           <span className="text-muted-foreground/20">·</span>
           <Link to="/privacy" className="hover:text-foreground transition-colors">{t('landing.privacy')}</Link>

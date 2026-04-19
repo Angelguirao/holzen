@@ -1078,7 +1078,6 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                 >
                   <Changelog />
                 </button>
-                <a href="/roadmap" target="_blank" rel="noopener noreferrer" className="text-xs font-mono text-muted-foreground underline">{t('settings.roadmap')}</a>
               </div>
               <AppVersionBadge changelogVersion={latestVersion} />
             </div>
