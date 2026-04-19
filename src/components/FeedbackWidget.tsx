@@ -133,6 +133,7 @@ export function FeedbackWidget() {
 
   return (
     <>
+      {!open && (
       <button
         type="button"
         aria-label={t('feedback.openButton', { defaultValue: 'Send feedback' })}
