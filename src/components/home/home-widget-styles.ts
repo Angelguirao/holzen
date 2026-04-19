@@ -5,13 +5,13 @@
 export const homeInWidget = {
   body: 'text-sm leading-relaxed text-foreground',
   bodyMuted: 'text-sm leading-relaxed text-primary',
-  meta: 'text-xs leading-snug text-muted-foreground',
+  meta: 'leading-snug text-muted-foreground text-sm',
   metaFaint: 'text-xs leading-snug text-muted-foreground/70',
   /** Row label — matches HomeWidget chrome (uppercase module tone) */
   kicker: 'text-xs font-semibold uppercase tracking-wide text-muted-foreground',
   kickerAccent: 'text-xs font-semibold uppercase tracking-wide text-primary/80',
   /** Large price / masked price line */
-  price: 'text-2xl font-semibold tabular-nums tracking-tight text-foreground',
+  price: 'text-2xl font-semibold tabular-nums tracking-tight text-[#dbb266]',
   priceHidden: 'text-2xl font-semibold tabular-nums tracking-tight text-muted-foreground/30',
   /** Secondary number under price */
   subPrice: 'text-sm font-medium tabular-nums text-muted-foreground',
@@ -50,5 +50,5 @@ export const homeInWidget = {
   /** Compact activity tags (Ground widget) */
   pillMuted: 'rounded-full border border-border/50 bg-muted/20 px-3 py-1 text-xs text-muted-foreground',
   /** Next price-check countdown when auto cooldown is idle */
-  nextScanCountdown: 'min-w-0 flex-1 text-xs font-medium tabular-nums text-primary',
+  nextScanCountdown: 'min-w-0 flex-1 font-medium tabular-nums text-primary text-sm',
 } as const;

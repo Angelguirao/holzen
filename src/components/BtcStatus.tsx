@@ -59,7 +59,7 @@ export function BtcStatus({ data, error, hidden, onToggleHidden, currency = 'USD
                   aria-label={t('btcStatus.exitBtcMode')}
                   title={t('btcStatus.exitBtcMode')}
                 >
-                  <Bitcoin className="h-3.5 w-3.5" aria-hidden />
+                  <Bitcoin className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
                 </button>
               )}
               <button
@@ -68,7 +68,7 @@ export function BtcStatus({ data, error, hidden, onToggleHidden, currency = 'USD
                 className={homeInWidget.iconBtn}
                 aria-label={hidden ? t('btcStatus.show') : t('btcStatus.hide')}
               >
-                {hidden ? <EyeOff className="h-3.5 w-3.5" aria-hidden /> : <Eye className="h-3.5 w-3.5" aria-hidden />}
+                {hidden ? <EyeOff className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden /> : <Eye className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />}
               </button>
             </div>
           </div>
@@ -123,7 +123,7 @@ export function BtcStatus({ data, error, hidden, onToggleHidden, currency = 'USD
                 aria-label={t('btcStatus.enterBtcMode')}
                 title="1 BTC = 1 BTC"
               >
-                <Bitcoin className="h-3.5 w-3.5" aria-hidden />
+                <Bitcoin className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />
               </button>
             )}
             <button
@@ -132,7 +132,7 @@ export function BtcStatus({ data, error, hidden, onToggleHidden, currency = 'USD
               className={homeInWidget.iconBtn}
               aria-label={hidden ? t('btcStatus.showPrice') : t('btcStatus.hidePrice')}
             >
-              {hidden ? <EyeOff className="h-3.5 w-3.5" aria-hidden /> : <Eye className="h-3.5 w-3.5" aria-hidden />}
+              {hidden ? <EyeOff className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden /> : <Eye className="h-3.5 w-3.5 text-secondary-foreground" aria-hidden />}
             </button>
           </div>
         </div>

@@ -73,7 +73,7 @@ export function HomeWidget({
         </button>
 
         {/* Section title — matches Nox-style module labels (sans, not body mono) */}
-        <span className="flex-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+        <span className="flex-1 text-xs uppercase tracking-wide text-secondary-foreground font-normal">
           {title}
         </span>
 
