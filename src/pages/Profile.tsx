@@ -650,7 +650,7 @@ function ScoreBarInline({ label, value, hint }: { label: string; value: number; 
         <div className="h-full rounded-full bg-primary/60 transition-all duration-700 ease-out" style={{ width: `${value}%` }} />
       </div>
       {open && hint && (
-        <p className="text-[10px] text-muted-foreground/50 leading-relaxed pt-0.5 animate-in fade-in duration-200">
+        <p className="leading-relaxed pt-0.5 animate-in fade-in duration-200 text-xs text-muted-foreground">
           {hint}
         </p>
       )}
