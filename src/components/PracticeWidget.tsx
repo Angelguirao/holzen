@@ -159,7 +159,7 @@ export function PracticeWidget() {
               onClick={() => handleSelect(p.id)}
               className={`${homeInWidget.rowButtonGhost} group py-2.5 items-start`}
             >
-              <Icon className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0 mt-[5px]" />
+              <Icon className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0 mt-[6px]" />
               <div className="min-w-0 flex-1 text-left">
                 <span className="text-sm font-medium text-foreground transition-colors group-hover:text-foreground">
                   {t(p.labelKey)}
