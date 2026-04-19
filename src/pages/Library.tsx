@@ -274,7 +274,7 @@ export default function Library() {
                     key={key}
                     onClick={() => setSourceFilter(sourceFilter === key ? null : key)}
                     className={cn(
-                      'text-[10px] font-mono px-2 py-1 rounded-full border transition-colors whitespace-nowrap flex items-center gap-1 mb-[16px]',
+                      'px-2 py-1 rounded-full border transition-colors whitespace-nowrap flex items-center gap-1 mb-[16px] text-sm font-sans',
                       sourceFilter === key
                         ? 'border-foreground/20 bg-foreground/5 text-foreground'
                         : 'border-border/30 text-muted-foreground/50 hover:text-muted-foreground/70'
