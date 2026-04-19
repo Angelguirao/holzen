@@ -109,8 +109,8 @@ export function DecisionAccuracyCard() {
               </div>
               <div className="h-1 rounded-full bg-muted/50 overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-primary/60 transition-all duration-700 ease-out"
-                  style={{ width: `${rate}%` }}
+                  className="h-full rounded-full transition-all duration-700 ease-out"
+                  style={{ width: `${rate}%`, backgroundColor: '#C1CBD7' }}
                 />
               </div>
             </div>

@@ -22,8 +22,8 @@ export const ChartEmptyState = forwardRef<HTMLDivElement, Props>(function ChartE
         <div className="pt-1 space-y-1">
           <div className="h-1 w-24 mx-auto rounded-full bg-muted/50 overflow-hidden">
             <div
-              className="h-full rounded-full bg-primary/30 transition-all"
-              style={{ width: `${Math.min((current / needed) * 100, 100)}%` }}
+              className="h-full rounded-full transition-all"
+              style={{ width: `${Math.min((current / needed) * 100, 100)}%`, backgroundColor: '#C1CBD7' }}
             />
           </div>
           <p className="text-[9px] font-mono text-muted-foreground/40">
