@@ -36,13 +36,57 @@ export function AppVersionBadge({ changelogVersion }: { changelogVersion?: strin
     setChecking(true);
     try {
       const reg = await navigator.serviceWorker.getRegistration();
-      if (reg) {
-        await reg.update();
-        // Give the browser a moment to detect the new worker
-        await new Promise((r) => setTimeout(r, 1500));
-        if (reg.waiting) {
-          setUpdateWaiting(true);
-        }
+      if (!reg) return;
+
+      // Already waiting — surface immediately, no network round-trip needed.
+      if (reg.waiting) {
+        setUpdateWaiting(true);
+        return;
+      }
+
+      // Bypass the HTTP cache before asking the SW registration to re-check.
+      // Browsers (and any CDN in front of the origin) can serve a stale `sw.js`
+      // to `registration.update()`, which then concludes "no change" and leaves
+      // `reg.waiting` null even when a newer build is deployed. Forcing a
+      // `no-store` fetch primes the cache with the current bytes so the
+      // subsequent `update()` compares against the real deploy. Same trick used
+      // by the boot-time auto-checker in `src/lib/sw-update.ts` — without this
+      // step the button silently no-ops for PWA users on stale caches.
+      try {
+        await fetch('/sw.js', { cache: 'no-store' });
+      } catch {
+        // Offline or fetch blocked — let update() try anyway; it'll fail cleanly.
+      }
+
+      // Register listeners *before* calling update() so we don't miss a
+      // synchronous `updatefound`. Race the install lifecycle against a
+      // generous timeout so slow networks don't produce a false negative.
+      const foundInstalled = new Promise<boolean>((resolve) => {
+        const timer = window.setTimeout(() => resolve(false), 8000);
+        const onUpdateFound = () => {
+          const sw = reg.installing;
+          if (!sw) return;
+          const onStateChange = () => {
+            if (sw.state === 'installed') {
+              sw.removeEventListener('statechange', onStateChange);
+              window.clearTimeout(timer);
+              resolve(true);
+            } else if (sw.state === 'redundant') {
+              sw.removeEventListener('statechange', onStateChange);
+              window.clearTimeout(timer);
+              resolve(false);
+            }
+          };
+          sw.addEventListener('statechange', onStateChange);
+        };
+        reg.addEventListener('updatefound', onUpdateFound, { once: true });
+      });
+
+      await reg.update();
+      const didFindUpdate = await foundInstalled;
+      // After `installed` + an existing controller, the new SW is in `waiting`.
+      if (didFindUpdate && reg.waiting) {
+        setUpdateWaiting(true);
       }
     } catch {
       // update() can fail if offline or CORS issues
