@@ -243,16 +243,23 @@ const History = () => {
       if (!user) return;
       const loadActivities = async () => {
         const [{ data: allReflections }, { data: letters }, { data: badges }] = await Promise.all([
-          supabase.from('reflections').select('id, created_at, mood').eq('user_id', user.id).order('created_at', { ascending: false }),
+          supabase
+            .from('reflections')
+            .select('id, created_at, mood, mood_after, outcome, breathing_completed')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false }),
           supabase.from('future_letters').select('id, written_at, deliver_during').eq('user_id', user.id).order('written_at', { ascending: false }),
           supabase.from('user_badges').select('id, earned_at, badge_id').eq('user_id', user.id).order('earned_at', { ascending: false }),
         ]);
 
         const activities: CalendarActivity[] = [];
 
-        (allReflections ?? []).forEach((r: any) => {
-          activities.push({ date: r.created_at, type: 'reflection', mood: r.mood, id: r.id });
-        });
+        // Activity calendar shows engaged pauses only.
+        (allReflections ?? [])
+          .filter((r: any) => r.breathing_completed && r.mood && r.mood_after && r.outcome)
+          .forEach((r: any) => {
+            activities.push({ date: r.created_at, type: 'reflection', mood: r.mood, id: r.id });
+          });
       (letters ?? []).forEach((l: any) => {
         activities.push({ date: l.written_at, type: 'letter', id: l.id, label: `Letter → ${l.deliver_during}` });
       });
