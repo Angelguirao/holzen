@@ -187,7 +187,7 @@ const Landing = () => {
             <p className="text-sm text-muted-foreground leading-relaxed mb-8">
               {t('landing.companionsDesc')}
             </p>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="flex flex-col gap-3">
               {COMPANIONS.map((c, i) => (
                 <motion.div
                   key={c.label}
