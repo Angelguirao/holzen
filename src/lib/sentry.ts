@@ -7,12 +7,14 @@
 //     is fine; lower cost/quota risk early.
 //   - `beforeSend` scrubs known PII fields (emails, reflection/journal content, free-text bodies)
 //     and drops expected/benign errors so Sentry quota is spent on real regressions.
-//   - No init when `VITE_SENTRY_DSN` is missing — zero side effects in local/dev unless you opt in.
+//   - No init when `SENTRY_DSN` is empty — zero side effects in local/dev unless you opt in.
 //
 // This module must stay small: it is imported synchronously at the top of `main.tsx` before
 // React renders, so any failure here can brick the app. Guard everything behind try/catch.
 
 import * as Sentry from "@sentry/react";
+
+import { SENTRY_DSN } from "@/config/public-env";
 
 /** Keys whose values are free-text user content we must never send to Sentry. */
 const PII_VALUE_KEYS = new Set<string>([
@@ -86,12 +88,11 @@ let initialized = false;
 
 export function initSentry(): void {
   if (initialized) return;
-  const dsn = import.meta.env.VITE_SENTRY_DSN;
-  if (!dsn) return;
+  if (!SENTRY_DSN) return;
 
   try {
     Sentry.init({
-      dsn,
+      dsn: SENTRY_DSN,
       release: __APP_VERSION__,
       environment: import.meta.env.MODE,
       // Browser tracing + on-error Replay. Replay is `errorSampleRate: 1.0` so every *captured*

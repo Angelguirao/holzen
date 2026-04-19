@@ -11,6 +11,8 @@
 //     `useTrackPageview` later) so we can include our own properties (surface, flag, cid).
 
 import posthog, { type PostHog, type Properties } from "posthog-js";
+
+import { POSTHOG_HOST, POSTHOG_KEY } from "@/config/public-env";
 import { getCid } from "./cid";
 
 const PII_VALUE_KEYS = new Set<string>([
@@ -59,16 +61,15 @@ function sanitizeProperties(properties: Properties): Properties {
 }
 
 let initialized = false;
-let posthogInstance: any = null;
+let posthogInstance: PostHog | null = null;
 
 export function initPostHog(): void {
   if (initialized) return;
-  const key = import.meta.env.VITE_POSTHOG_KEY;
-  if (!key) return;
+  if (!POSTHOG_KEY) return;
 
   try {
-    posthog.init(key, {
-      api_host: import.meta.env.VITE_POSTHOG_HOST || "https://us.i.posthog.com",
+    posthog.init(POSTHOG_KEY, {
+      api_host: POSTHOG_HOST,
       autocapture: false,
       capture_pageview: false,
       capture_pageleave: false,
