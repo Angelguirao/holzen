@@ -489,9 +489,13 @@ function StatsContent({ reflections, practiceEntries = [], letters = [], memberS
           {/* Summary metrics with micro-context */}
           <div className="flex-1 min-w-0 flex flex-col gap-2">
             <MicroStat
-              value={reflections.length}
+              value={engagedCount}
               label={t('profile.pauses', 'Pauses')}
-              context={reflectionContext ? `in ${reflectionContext}` : undefined}
+              context={
+                generatedCount > engagedCount
+                  ? `${generatedCount} generated`
+                  : reflectionContext ? `in ${reflectionContext}` : undefined
+              }
             />
             <MicroStat
               value={activeDaysLast30}
