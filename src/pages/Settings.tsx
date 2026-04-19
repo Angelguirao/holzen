@@ -288,7 +288,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
       <Accordion type="multiple" className="space-y-1">
 
         {/* 1. You */}
-        <AccordionItem value="you" className="border border-border/40 rounded-md px-4">
+        <AccordionItem value="you" className="border border-border/40 rounded-md px-4 mb-[16px]">
           <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
             {t('settings.you')}
           </AccordionTrigger>
@@ -373,7 +373,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
         </AccordionItem>
 
         {/* 2. Reflection */}
-        <AccordionItem value="reflection" className="border border-border/40 rounded-md px-4">
+        <AccordionItem value="reflection" className="border border-border/40 rounded-md px-4 mb-[16px]">
           <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
             {t('settings.reflection')}
           </AccordionTrigger>
@@ -494,7 +494,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
         </AccordionItem>
 
         {/* 3. Experience */}
-        <AccordionItem value="experience" className="border border-border/40 rounded-md px-4">
+        <AccordionItem value="experience" className="border border-border/40 rounded-md px-4 mb-[16px]">
           <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
             {t('settings.experience', 'Experience')}
           </AccordionTrigger>
@@ -619,7 +619,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
         </AccordionItem>
 
         {/* 4. Companions & AI */}
-        <AccordionItem value="companions" className="border border-border/40 rounded-md px-4">
+        <AccordionItem value="companions" className="border border-border/40 rounded-md px-4 mb-[16px]">
           <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
             {t('settings.companionsAi', 'Companions & AI')}
           </AccordionTrigger>
@@ -666,7 +666,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
   
 
         {/* 5. Notifications & Schedule */}
-        <AccordionItem value="notifications" className="border border-border/40 rounded-md px-4">
+        <AccordionItem value="notifications" className="border border-border/40 rounded-md px-4 mb-[16px]">
           <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
             {t('settings.notificationsSchedule')}
           </AccordionTrigger>
@@ -866,7 +866,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
         </AccordionItem>
 
         {/* 6. Subscription & Referrals */}
-        <AccordionItem value="subscription" className="border border-border/40 rounded-md px-4">
+        <AccordionItem value="subscription" className="border border-border/40 rounded-md px-4 mb-[16px]">
           <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
             {t('settings.subscriptionReferrals')}
           </AccordionTrigger>
@@ -915,7 +915,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
         </AccordionItem>
 
         {/* 7. Account */}
-        <AccordionItem value="account" className="border border-border/40 rounded-md px-4">
+        <AccordionItem value="account" className="border border-border/40 rounded-md px-4 mb-[16px]">
           <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
             {t('settings.account')}
           </AccordionTrigger>
@@ -1052,7 +1052,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
         </AccordionItem>
 
         {/* 8. About */}
-        <AccordionItem value="about" className="border border-border/40 rounded-md px-4">
+        <AccordionItem value="about" className="border border-border/40 rounded-md px-4 mb-[16px]">
           <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
             <span className="flex items-center gap-4 flex-1">
               {t('settings.about')}
