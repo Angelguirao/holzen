@@ -258,8 +258,8 @@ export function JourneyWidget({ reflections, practiceEntries = [], streakFreezeD
           </div>
           <div className="h-1.5 rounded-full bg-muted/50 overflow-hidden">
             <div
-              className="h-full rounded-full bg-primary/60 transition-all duration-700 ease-out"
-              style={{ width: `${Math.min((currentStreak / nextMilestone) * 100, 100)}%` }}
+              className="h-full rounded-full transition-all duration-700 ease-out"
+              style={{ width: `${Math.min((currentStreak / nextMilestone) * 100, 100)}%`, backgroundColor: '#C1CBD7' }}
             />
           </div>
         </div>
