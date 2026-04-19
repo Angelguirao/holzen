@@ -19,7 +19,7 @@ interface Props {
 
 function trackEvent(userId: string | undefined, event: string, metadata?: Record<string, unknown>) {
   if (!userId) return;
-  void supabase.from('analytics_events').insert({ user_id: userId, event, metadata: metadata ?? {} });
+  void supabase.from('analytics_events').insert([{ user_id: userId, event, metadata: (metadata ?? {}) as never }]);
 }
 
 export function InstallHolzenCard({ alwaysShow = false, compact = false, className }: Props) {
@@ -129,7 +129,7 @@ export function InstallHolzenCard({ alwaysShow = false, compact = false, classNa
           icon="/icon-512.png"
           name="Holzen"
           description="Pause before you act. Bitcoin volatility reflections."
-          manual-chrome
+          manual-chrome="true"
         />
       )}
     </>
