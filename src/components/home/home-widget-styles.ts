@@ -4,7 +4,7 @@
  */
 export const homeInWidget = {
   body: 'text-sm leading-relaxed text-foreground',
-  bodyMuted: 'text-sm leading-relaxed text-muted-foreground',
+  bodyMuted: 'text-sm leading-relaxed text-primary',
   meta: 'text-xs leading-snug text-muted-foreground',
   metaFaint: 'text-xs leading-snug text-muted-foreground/70',
   /** Row label — matches HomeWidget chrome (uppercase module tone) */
