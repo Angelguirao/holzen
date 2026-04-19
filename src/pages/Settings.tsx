@@ -389,9 +389,9 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             )}
 
             {/* Cooldown */}
-            <div className="space-y-3">
+            <div className="space-y-3 text-sm font-sans">
               <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.cooldown')}</p>
-              <p className="text-xs text-muted-foreground leading-relaxed">
+              <p className="leading-relaxed text-sm text-secondary-foreground">
                 {t('settings.cooldownDesc')}
               </p>
               <div className="grid grid-cols-4 gap-2">
@@ -405,7 +405,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                         : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
                     }`}
                   >
-                    <p className="text-xs font-mono">{h}h</p>
+                    <p className="text-base font-sans">{h}h</p>
                   </button>
                 ))}
               </div>
