@@ -11,7 +11,7 @@ export const homeInWidget = {
   kicker: 'uppercase tracking-wide font-normal text-muted-foreground text-xs',
   kickerAccent: 'text-xs font-semibold uppercase tracking-wide text-primary/80',
   /** Large price / masked price line */
-  price: 'text-2xl font-semibold tabular-nums tracking-tight text-[#dbb266]',
+  price: 'font-semibold tabular-nums tracking-tight text-[#dbb266] text-xl',
   priceHidden: 'text-2xl font-semibold tabular-nums tracking-tight text-muted-foreground/30',
   /** Secondary number under price */
   subPrice: 'text-sm font-medium tabular-nums text-muted-foreground',
