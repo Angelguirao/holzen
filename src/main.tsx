@@ -2,6 +2,18 @@
 import { createRoot } from "react-dom/client";
 import "./index.css";
 import { holzenLog } from "./lib/holzen-console";
+import { initSentry, captureException } from "./lib/sentry";
+import { initWebVitals } from "./lib/web-vitals";
+import { initCid } from "./lib/cid";
+import { initPostHog } from "./lib/posthog";
+
+// Sentry must init before any other code can throw. It no-ops when VITE_SENTRY_DSN is absent.
+initSentry();
+// cid is generated on first access, but call initCid() eagerly so the Sentry tag is set
+// before any capture happens during early render.
+initCid();
+// PostHog init — no-op when VITE_POSTHOG_KEY is absent. Autocapture/pageview/replay all off.
+initPostHog();
 
 function showCrashScreen(label: string, err: unknown) {
   console.error(`[${label}]`, err);
@@ -20,6 +32,7 @@ function showCrashScreen(label: string, err: unknown) {
 }
 
 window.addEventListener('error', (e) => {
+  captureException(e.error ?? e.message, { source: "window.error" });
   const root = document.getElementById("root");
   if (root && root.children.length === 0) {
     showCrashScreen("Boot error", e.error || e.message);
@@ -27,7 +40,10 @@ window.addEventListener('error', (e) => {
 });
 
 window.addEventListener('unhandledrejection', (e) => {
+  // Previous version only logged — we now forward to Sentry so promise chain regressions
+  // (e.g. stale Supabase queries, PWA update races) surface in the same workflow as sync errors.
   console.error('[boot-crash-promise]', e.reason);
+  captureException(e.reason, { source: "unhandledrejection" });
 });
 
 // Static imports: Lovable preview (and some hosts) resolve `import("./App.tsx")` to a raw
@@ -42,6 +58,8 @@ try {
   createRoot(document.getElementById("root")!).render(<App />);
   listenForSwUpdate();
   holzenLog.boot("listenForSwUpdate registered");
+  // Fire after first paint so the import doesn't delay render. Errors are swallowed inside.
+  void initWebVitals();
 } catch (err) {
   showCrashScreen("Boot error — failed to load app", err);
 }
