@@ -7,7 +7,7 @@
  * in `supabase/functions/_shared/app-config.ts`).
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { AlertTriangle, Check, DollarSign, Loader2, Power, RefreshCw, Save, Users, Zap } from 'lucide-react';
+import { AlertTriangle, Check, DollarSign, Loader2, Mail, Power, RefreshCw, Save, Users, Zap } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { DevModeToggle } from '@/components/admin/DevModeToggle';
@@ -39,6 +39,10 @@ type ConfigState = {
   budget_monthly_usd_global: number;
   panic_mode: boolean;
   feature_flags: Record<string, boolean>;
+  ai_cost_alert_enabled: boolean;
+  ai_cost_alert_recipients: string[];
+  ai_cost_alert_daily_threshold_pct: number;
+  ai_cost_alert_wow_multiplier: number;
 };
 
 const DEFAULTS: ConfigState = {
@@ -49,6 +53,10 @@ const DEFAULTS: ConfigState = {
   budget_monthly_usd_global: 300,
   panic_mode: false,
   feature_flags: Object.fromEntries(FEATURE_KEYS.map((k) => [k, true])),
+  ai_cost_alert_enabled: true,
+  ai_cost_alert_recipients: [],
+  ai_cost_alert_daily_threshold_pct: 80,
+  ai_cost_alert_wow_multiplier: 2,
 };
 
 type SpendSnapshot = {
@@ -93,6 +101,24 @@ async function loadConfig(): Promise<ConfigState> {
         if (row.value && typeof row.value === 'object' && !Array.isArray(row.value)) {
           next.feature_flags = { ...next.feature_flags, ...(row.value as Record<string, boolean>) };
         }
+        break;
+      case 'ai_cost_alert_enabled':
+        next.ai_cost_alert_enabled = row.value !== false && row.value !== 'false';
+        break;
+      case 'ai_cost_alert_recipients':
+        if (Array.isArray(row.value)) {
+          next.ai_cost_alert_recipients = (row.value as unknown[])
+            .map((v) => (typeof v === 'string' ? v.trim() : ''))
+            .filter((s) => s.length > 0);
+        }
+        break;
+      case 'ai_cost_alert_daily_threshold_pct':
+        next.ai_cost_alert_daily_threshold_pct =
+          Number(row.value) || DEFAULTS.ai_cost_alert_daily_threshold_pct;
+        break;
+      case 'ai_cost_alert_wow_multiplier':
+        next.ai_cost_alert_wow_multiplier =
+          Number(row.value) || DEFAULTS.ai_cost_alert_wow_multiplier;
         break;
     }
   }
@@ -173,6 +199,11 @@ export function AppConfigTools() {
     state.budget_daily_usd_global !== initial.budget_daily_usd_global
     || state.budget_daily_usd_per_user !== initial.budget_daily_usd_per_user
     || state.budget_monthly_usd_global !== initial.budget_monthly_usd_global;
+  const alertsDirty =
+    state.ai_cost_alert_enabled !== initial.ai_cost_alert_enabled
+    || state.ai_cost_alert_recipients.join(',') !== initial.ai_cost_alert_recipients.join(',')
+    || state.ai_cost_alert_daily_threshold_pct !== initial.ai_cost_alert_daily_threshold_pct
+    || state.ai_cost_alert_wow_multiplier !== initial.ai_cost_alert_wow_multiplier;
 
   const dailyPct = useMemo(() => {
     if (spend.dailyGlobal === null) return null;
@@ -352,6 +383,98 @@ export function AppConfigTools() {
                 persist('budget_daily_usd_global', state.budget_daily_usd_global, snapshot),
                 persist('budget_daily_usd_per_user', state.budget_daily_usd_per_user, snapshot),
                 persist('budget_monthly_usd_global', state.budget_monthly_usd_global, snapshot),
+              ]);
+            }}
+          />
+        </div>
+      </section>
+
+      {/* ── Cost alert email ── */}
+      <section className="space-y-2">
+        <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">
+          Daily cost alert email
+        </p>
+        <p className="text-[9px] font-mono text-muted-foreground/45 leading-relaxed">
+          <code className="text-muted-foreground/55">ai-cost-alert</code> runs daily (cron scheduled
+          separately — see deployment notes). Emails recipients when yesterday&apos;s spend crosses
+          the threshold, anomalies vs 7-day average, or month-to-date projection exceeds the
+          monthly cap. Empty recipient list = no email sent.
+        </p>
+        <div className="rounded-xl border border-border/20 bg-card/10 p-4 space-y-3">
+          <ToggleRow
+            icon={Mail}
+            label="Alert email enabled"
+            description="Master switch. When off, the cron runs but sends nothing."
+            checked={state.ai_cost_alert_enabled}
+            onChange={(v) => setState((s) => ({ ...s, ai_cost_alert_enabled: v }))}
+          />
+          <div className="flex items-start gap-3">
+            <span className="h-3.5 w-3.5 mt-0.5 flex-shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="text-[10px] font-mono text-foreground/80">Recipient emails</p>
+              <p className="text-[9px] text-muted-foreground/40 leading-relaxed">
+                Comma-separated. Only these addresses receive alerts.
+              </p>
+              <input
+                type="text"
+                value={state.ai_cost_alert_recipients.join(', ')}
+                placeholder="ops@example.com, ceo@example.com"
+                onChange={(e) => {
+                  const list = e.target.value
+                    .split(',')
+                    .map((s) => s.trim())
+                    .filter((s) => s.length > 0);
+                  setState((s) => ({ ...s, ai_cost_alert_recipients: list }));
+                }}
+                className="w-full mt-1.5 text-[10px] font-mono bg-muted/30 border border-border/20 rounded px-2 py-1.5 focus:outline-none focus:border-primary/40"
+              />
+            </div>
+          </div>
+          <NumberRow
+            label="Daily threshold (% of daily cap)"
+            description="Alert when yesterday's spend exceeds this % of the daily global cap."
+            value={state.ai_cost_alert_daily_threshold_pct}
+            onChange={(v) =>
+              setState((s) => ({
+                ...s,
+                ai_cost_alert_daily_threshold_pct: v ?? DEFAULTS.ai_cost_alert_daily_threshold_pct,
+              }))
+            }
+            min={0}
+            step={5}
+          />
+          <NumberRow
+            label="WoW anomaly multiplier"
+            description="Alert when yesterday ≥ this × the 7-day average. 2.0 = doubled overnight."
+            value={state.ai_cost_alert_wow_multiplier}
+            onChange={(v) =>
+              setState((s) => ({
+                ...s,
+                ai_cost_alert_wow_multiplier: v ?? DEFAULTS.ai_cost_alert_wow_multiplier,
+              }))
+            }
+            min={1}
+            step={0.1}
+          />
+          <SaveRow
+            dirty={alertsDirty}
+            busy={
+              saving.has('ai_cost_alert_enabled')
+              || saving.has('ai_cost_alert_recipients')
+              || saving.has('ai_cost_alert_daily_threshold_pct')
+              || saving.has('ai_cost_alert_wow_multiplier')
+            }
+            onSave={async () => {
+              const snapshot = { ...state };
+              await Promise.all([
+                persist('ai_cost_alert_enabled', state.ai_cost_alert_enabled, snapshot),
+                persist('ai_cost_alert_recipients', state.ai_cost_alert_recipients, snapshot),
+                persist(
+                  'ai_cost_alert_daily_threshold_pct',
+                  state.ai_cost_alert_daily_threshold_pct,
+                  snapshot,
+                ),
+                persist('ai_cost_alert_wow_multiplier', state.ai_cost_alert_wow_multiplier, snapshot),
               ]);
             }}
           />

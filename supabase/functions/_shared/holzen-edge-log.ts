@@ -30,7 +30,8 @@ export type HolzenEdgeTag =
   | "personalized-nudge"
   | "deliver-letters"
   | "reflection-insights"
-  | "referral-pending";
+  | "referral-pending"
+  | "ai-cost-alert";
 
 function tracesEnabled(): boolean {
   return Deno.env.get("HOLZEN_EDGE_LOG") !== "0";
