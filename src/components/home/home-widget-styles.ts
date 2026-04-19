@@ -8,7 +8,7 @@ export const homeInWidget = {
   meta: 'leading-snug text-muted-foreground text-sm',
   metaFaint: 'text-xs leading-snug text-muted-foreground/70',
   /** Row label — matches HomeWidget chrome (uppercase module tone) */
-  kicker: 'uppercase tracking-wide text-sm font-normal text-muted-foreground',
+  kicker: 'uppercase tracking-wide font-normal text-muted-foreground text-xs',
   kickerAccent: 'text-xs font-semibold uppercase tracking-wide text-primary/80',
   /** Large price / masked price line */
   price: 'text-2xl font-semibold tabular-nums tracking-tight text-[#dbb266]',
