@@ -307,6 +307,7 @@ export function LibraryItems({ library, filtered }: Props) {
           ) : useVirtual ? (
             <GroupedVirtuoso
               style={{ height: '100%' }}
+              className="tabs-scroll-y"
               groupCounts={groupCounts}
               groupContent={(index) => (
                 <div className="bg-background/95 backdrop-blur-sm pt-2 pb-1 px-3">
@@ -319,7 +320,7 @@ export function LibraryItems({ library, filtered }: Props) {
               overscan={200}
             />
           ) : (
-            <div className="h-full overflow-y-auto space-y-4 pr-1">
+            <div className="h-full overflow-y-auto space-y-4 pr-1 tabs-scroll-y">
               {pinnedItems.length > 0 && (
                 <div className="space-y-0.5">
                   <p className="uppercase tracking-wider px-3 pb-1 text-sm font-sans font-normal text-[#dbb266]">
