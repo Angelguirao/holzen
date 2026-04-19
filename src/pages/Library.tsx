@@ -17,15 +17,15 @@ import { cn } from '@/lib/utils';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { NoxHeaderMain } from '@/components/ui/nox-header';
 
-const SOURCE_CHIPS: { key: string; emoji: string; label: string }[] = [
-  { key: 'reflection', emoji: '⏸', label: 'Pause' },
-  { key: 'signal', emoji: '📡', label: 'Signal' },
-  { key: 'grounding', emoji: '🌿', label: 'Grounding' },
-  { key: 'haiku', emoji: '🍃', label: 'Haiku' },
-  { key: 'zoom_out', emoji: '🔭', label: 'Zoom Out' },
-  { key: 'history_insight', emoji: '📜', label: 'History' },
-  { key: 'reflection_note', emoji: '✏️', label: 'Note' },
-  { key: 'external', emoji: '🔗', label: 'External' },
+const SOURCE_CHIPS: { key: string; icon: LucideIcon; label: string }[] = [
+  { key: 'reflection', icon: Pause, label: 'Pause' },
+  { key: 'signal', icon: Radio, label: 'Signal' },
+  { key: 'grounding', icon: Leaf, label: 'Grounding' },
+  { key: 'haiku', icon: Feather, label: 'Haiku' },
+  { key: 'zoom_out', icon: Telescope, label: 'Zoom Out' },
+  { key: 'history_insight', icon: ScrollText, label: 'History' },
+  { key: 'reflection_note', icon: Pencil, label: 'Note' },
+  { key: 'external', icon: LinkIcon, label: 'External' },
 ];
 
 
