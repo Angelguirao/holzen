@@ -196,10 +196,10 @@ export function BadgesPanel({ reflections, subscribed, notifyBadges = true }: Ba
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Award className="h-4 w-4 text-primary" />
-            <p className="text-xs font-mono text-muted-foreground">
+            <p className="text-muted-foreground font-sans text-sm">
               <span className="text-foreground font-medium">{earnedCount}</span> / {badges.length} {t('badges.earned')}
               {proLockedCount > 0 && (
-                <span className="text-muted-foreground/40 ml-1">
+                <span className="ml-1 text-muted-foreground">
                   · {proLockedCount} <Lock className="inline h-2.5 w-2.5 -mt-0.5" />
                 </span>
               )}
@@ -215,7 +215,7 @@ export function BadgesPanel({ reflections, subscribed, notifyBadges = true }: Ba
         {nextBadge && (
           <div className="flex items-center gap-2 text-[10px] font-mono text-muted-foreground/60">
             <nextBadge.icon className="h-3 w-3" style={{ color: nextBadge.color }} />
-            <span>
+            <span className="text-sm font-sans">
               {t('badges.next')}: <span className="text-foreground/70">{t(nextBadge.labelKey)}</span> — {nextBadge.current}/{nextBadge.requirement} {t(nextBadge.unitKey)}
             </span>
           </div>
@@ -229,10 +229,10 @@ export function BadgesPanel({ reflections, subscribed, notifyBadges = true }: Ba
         return (
           <div key={cat} className="space-y-2.5">
             <div className="flex items-center justify-between">
-              <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground/60">
+              <p className="tracking-widest uppercase text-muted-foreground/60 text-sm font-sans">
                 {t(`badges.categories.${cat}`)}
               </p>
-              <p className="text-[9px] font-mono text-muted-foreground/40">
+              <p className="text-base font-sans text-muted-foreground">
                 {catEarned}/{catBadges.length}
               </p>
             </div>
