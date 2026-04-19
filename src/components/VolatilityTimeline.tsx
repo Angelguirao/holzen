@@ -193,7 +193,7 @@ export function VolatilityTimeline() {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
+        <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
           {t('volatilityTimeline.title')}
         </p>
         <div className="flex gap-1">
@@ -283,7 +283,7 @@ export function VolatilityTimeline() {
 
       {reflectionPoints.length > 0 && (
         <div className="space-y-2">
-          <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
+          <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
             {t('volatilityTimeline.reflections', { count: reflectionPoints.length })}
           </p>
           <div className="space-y-1.5 max-h-[300px] overflow-y-auto">

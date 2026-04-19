@@ -167,7 +167,7 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
+        <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
           {t('aiInsights.title')}
         </p>
         <LoadingButton

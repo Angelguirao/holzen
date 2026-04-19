@@ -213,7 +213,7 @@ export function StatsTrends({ reflections }: Props) {
       {/* Holzen Score over time */}
       <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3">
         <div className="flex items-center justify-between">
-          <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
+          <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
             {t('statsTrends.scoreOverTime')}
           </p>
           <span className={`text-[10px] font-mono px-2 py-0.5 rounded bg-muted/50 ${
@@ -258,7 +258,7 @@ export function StatsTrends({ reflections }: Props) {
       {/* Regulation Opportunity */}
       <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3">
         <div className="flex items-center justify-between">
-          <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
+          <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
             {t('statsTrends.regulationOpportunity', 'Regulation Opportunity')}
           </p>
           {avgNavRate !== null && (
@@ -309,7 +309,7 @@ export function StatsTrends({ reflections }: Props) {
       {/* Hold rate over time */}
       <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3">
         <div className="flex items-center justify-between">
-          <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
+          <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
             {t('statsTrends.holdRate')}
           </p>
           <span className={`text-[10px] font-mono px-2 py-0.5 rounded bg-muted/50 ${
