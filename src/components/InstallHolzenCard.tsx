@@ -95,7 +95,7 @@ export function InstallHolzenCard({ alwaysShow = false, compact = false, classNa
         <div className="flex items-start gap-3">
           <Smartphone className="h-4 w-4 shrink-0 mt-0.5" style={{ color: '#DBB366' }} />
           <div className="flex-1 min-w-0 pr-4">
-            <p className="tracking-wider font-sans text-sm text-[#dbb266] font-medium">
+            <p className="tracking-wider font-sans text-[#dbb266] font-medium text-base">
               Install Holzen
             </p>
             <p className="leading-relaxed text-primary mt-1.5 text-sm">
