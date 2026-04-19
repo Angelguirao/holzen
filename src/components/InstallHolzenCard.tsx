@@ -94,13 +94,13 @@ export function InstallHolzenCard({ alwaysShow = false, compact = false, classNa
 
         <div className="flex items-start gap-3">
           <div
-            className="shrink-0 mt-0.5 rounded-md p-2"
+            className="shrink-0 rounded-md p-2"
             style={{ backgroundColor: 'rgba(219, 179, 102, 0.1)' }}
           >
             <Smartphone className="h-4 w-4" style={{ color: '#DBB366' }} />
           </div>
           <div className="flex-1 min-w-0 pr-4">
-            <p className="text-xs font-mono uppercase tracking-wider mt-2" style={{ color: '#DBB366' }}>
+            <p className="text-xs font-mono uppercase tracking-wider" style={{ color: '#DBB366' }}>
               Install Holzen
             </p>
             <p className="leading-relaxed text-primary mt-1.5 text-sm">
