@@ -75,7 +75,9 @@ serve(async (req) => {
     // Feature flag + global budget guard. On block, return a 503 (cron retries
     // tomorrow; user-triggered calls show a retry-later toast).
     const { guardAiFeature } = await import("../_shared/ratelimit.ts");
-    const riGuard = await guardAiFeature(supabase, "reflection_insights");
+    const riGuard = await guardAiFeature(supabase, "reflection_insights", {
+      providers: ["lovable"],
+    });
     if (!riGuard.allowed) {
       return new Response(
         JSON.stringify({ error: riGuard.reason ?? "Temporarily unavailable", processed: 0 }),

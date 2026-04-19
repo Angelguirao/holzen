@@ -64,7 +64,9 @@ serve(async (req) => {
     // biggest blast-radius cron if a bug loops, so this check is especially
     // important. Also respects panic_mode (which includes `pregenerate`).
     const { guardAiFeature } = await import("../_shared/ratelimit.ts");
-    const pregenGuard = await guardAiFeature(svcClient, "pregenerate");
+    const pregenGuard = await guardAiFeature(svcClient, "pregenerate", {
+      providers: ["perplexity", "lovable"],
+    });
     if (!pregenGuard.allowed) {
       hzLog(`pregenerate skipped: ${pregenGuard.reason}`);
       return new Response(

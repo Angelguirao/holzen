@@ -85,7 +85,10 @@ serve(async (req) => {
       auth: { persistSession: false },
     });
     const { guardAiFeature } = await import("../_shared/ratelimit.ts");
-    const enrichGuard = await guardAiFeature(svcGuard, "grounding_enrich", { userId: user.id });
+    const enrichGuard = await guardAiFeature(svcGuard, "grounding_enrich", {
+      userId: user.id,
+      providers: ["lovable"],
+    });
     if (!enrichGuard.allowed) {
       return new Response(
         JSON.stringify({ error: enrichGuard.reason ?? "Enrichment paused" }),

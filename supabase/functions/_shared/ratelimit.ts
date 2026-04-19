@@ -346,6 +346,9 @@ export async function checkCostCeilings(
  *   1. Feature flag check (`feature_flags[feature]` from app_config).
  *   2. Panic-mode short-circuit for companion features.
  *   3. Cost ceilings (global daily, per-user daily, global monthly).
+ *   4. Circuit-breaker check for the feature's upstream provider(s) —
+ *      when the error rate for a provider is elevated, skip live generation
+ *      for features that depend on it. See `_shared/circuit-breaker.ts`.
  *
  * Returns `{ allowed: false, reason, status }` on first failure. Callers
  * should branch to their natural fallback (cache/library/template/no-op)
@@ -356,12 +359,28 @@ export async function checkCostCeilings(
 export async function guardAiFeature(
   svcClient: any,
   feature: string,
-  options?: { userId?: string; skipCostCheck?: boolean },
+  options?: {
+    userId?: string;
+    skipCostCheck?: boolean;
+    /**
+     * Upstream providers this feature depends on. When **any** listed provider
+     * is currently degraded, the guard blocks with `tripped: 'breaker_<p>'`
+     * and the caller should fall through to its non-AI path (canned template,
+     * skip AI in email, cached-only, etc.). Companion-orchestrate does its
+     * own per-provider skip since it runs multiple generators in parallel.
+     */
+    providers?: Array<"perplexity" | "lovable">;
+  },
 ): Promise<{
   allowed: boolean;
   reason?: string;
   status?: number;
-  tripped?: CostCeilingsResult["tripped"] | "feature_flag" | "panic_mode";
+  tripped?:
+    | CostCeilingsResult["tripped"]
+    | "feature_flag"
+    | "panic_mode"
+    | "breaker_perplexity"
+    | "breaker_lovable";
 }> {
   try {
     const { loadAppConfig, isFeatureEnabled, PANIC_MODE_FEATURES } = await import(
@@ -379,6 +398,20 @@ export async function guardAiFeature(
         status: 503,
         tripped: panicHit ? "panic_mode" : "feature_flag",
       };
+    }
+
+    if (options?.providers && options.providers.length > 0) {
+      const { degradedProviders } = await import("./circuit-breaker.ts");
+      const degraded = await degradedProviders(svcClient, options.providers);
+      if (degraded.length > 0) {
+        const p = degraded[0];
+        return {
+          allowed: false,
+          reason: `Provider '${p}' degraded — skipping live AI for '${feature}'`,
+          status: 503,
+          tripped: p === "perplexity" ? "breaker_perplexity" : "breaker_lovable",
+        };
+      }
     }
 
     if (options?.skipCostCheck) return { allowed: true };

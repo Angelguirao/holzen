@@ -53,6 +53,8 @@ export interface GenerateHistoryParams {
   preferredMood?: "recovery" | "caution" | "neutral";
   /** Skip library/cache phases and go straight to live (used by regenerate). */
   forceLive?: boolean;
+  /** Skip the live phase only — library/cache still serve. Used by circuit breaker. */
+  skipLive?: boolean;
   log: (msg: string, extra?: Record<string, unknown>) => void;
 }
 
@@ -141,9 +143,10 @@ async function serveFallback(
 // ── Public entry point ──
 
 export async function generateHistory(params: GenerateHistoryParams): Promise<HistoryResult> {
-  const { svcClient, context, mood, recentTitles, userId, preferredMood, forceLive, log } = params;
+  const { svcClient, context, mood, recentTitles, userId, preferredMood, forceLive, skipLive, log } = params;
   const marketDirection = parseMarketDirection(context);
   const phases = getPhaseConfig();
+  const liveEnabled = phases.live && !skipLive;
 
   const historyMoodTag: string | undefined =
     preferredMood ??
@@ -174,12 +177,16 @@ export async function generateHistory(params: GenerateHistoryParams): Promise<Hi
   } // end !forceLive
 
   // ── Phase 3: Live generation ──
-  if (!phases.live && !forceLive) {
-    log("live phase disabled, serving curated");
+  if (!liveEnabled && !forceLive) {
+    log(skipLive ? "history: live phase skipped (breaker), serving curated" : "live phase disabled, serving curated");
     if (companionFallbacksDisabled()) {
       return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
     }
     return serveCurated(svcClient);
+  }
+  if (skipLive && forceLive) {
+    log("history: breaker tripped and forceLive requested — returning blocked");
+    return { data: null, source: "empty", cacheId: null, error: "circuit_breaker" };
   }
 
   const logAttempt = createAttemptLogger(svcClient, { userId });

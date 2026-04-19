@@ -154,6 +154,13 @@ export interface GenerateSignalParams {
   searchAngle?: string;
   /** Skip library/cache phases and go straight to live (used by regenerate). */
   forceLive?: boolean;
+  /**
+   * Skip the **live** phase only — library and cache still serve. Used by the
+   * circuit breaker in companion-orchestrate when the upstream provider is
+   * degraded. Ignored when `forceLive` is also true (regenerate still surfaces
+   * a breaker-blocked error to the user so the UI can show a retry-later message).
+   */
+  skipLive?: boolean;
   log: (msg: string, extra?: Record<string, unknown>) => void;
 }
 
@@ -265,10 +272,12 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
     reflectionId,
     searchAngle,
     forceLive,
+    skipLive,
     log,
   } = params;
   const marketDirection = parseMarketDirection(context);
   const phases = getPhaseConfig();
+  const liveEnabled = phases.live && !skipLive;
 
   if (!forceLive) {
   // ── Phase 1: Library ──
@@ -291,12 +300,18 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
   } // end !forceLive
 
   // ── Phase 3: Live generation ──
-  if (!phases.live && !forceLive) {
-    log("live phase disabled, serving curated");
+  if (!liveEnabled && !forceLive) {
+    log(skipLive ? "signal: live phase skipped (breaker), serving curated" : "live phase disabled, serving curated");
     if (companionFallbacksDisabled()) {
       return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
     }
     return serveCurated(svcClient);
+  }
+  if (skipLive && forceLive) {
+    // Regenerate + breaker trip: surface a clear block so the UI can show a
+    // retry-later message instead of silently serving curated.
+    log("signal: breaker tripped and forceLive requested — returning blocked");
+    return { data: null, source: "empty", cacheId: null, error: "circuit_breaker" };
   }
 
   const logAttempt = createAttemptLogger(svcClient, { userId });

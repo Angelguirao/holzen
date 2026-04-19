@@ -41,7 +41,10 @@ serve(async (req) => {
       auth: { persistSession: false },
     });
     const { guardAiFeature } = await import("../_shared/ratelimit.ts");
-    const guard = await guardAiFeature(svcClient, "suggest_ritual", { userId: user.id });
+    const guard = await guardAiFeature(svcClient, "suggest_ritual", {
+      userId: user.id,
+      providers: ["lovable"],
+    });
     if (!guard.allowed) {
       return new Response(JSON.stringify({
         steps: [{ type: "breathe" }, { type: "reflect" }, { type: "journal" }, { type: "decide" }],

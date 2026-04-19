@@ -36,6 +36,14 @@ export interface BuildOrchestrateCompanionTasksParams {
   recentGroundingSourcesValue: string[] | undefined;
   recentHistoryTitlesValue: string[] | undefined;
   recentZoomOutTitlesValue: string[] | undefined;
+  /**
+   * Circuit-breaker hints from companion-orchestrate. When true, the matching
+   * tasks skip their live phase only — library/cache still serve. Perplexity-
+   * degraded affects signal/grounding/history (Sonar Pro search). Lovable-
+   * degraded affects all four (structuring + deep-time).
+   */
+  skipLivePerplexity?: boolean;
+  skipLiveLovable?: boolean;
 }
 
 /** Build parallel generator promises (grounding / history / zoomOut / signal) from orchestrate inputs. */
@@ -44,6 +52,15 @@ export function buildOrchestrateCompanionTasks(
 ): Record<string, Promise<CompanionResult>> {
   const tasks: Record<string, Promise<CompanionResult>> = {};
   const rid = typeof p.reflectionId === "string" ? p.reflectionId : null;
+
+  // Perplexity-backed generators: signal, grounding, history. Lovable-backed:
+  // all four (structuring step on signal/grounding/history + zoom-out deep-time).
+  // If either breaker trips, skip the live phase for affected tasks; cache +
+  // library + curated fallback still run.
+  const skipLiveSignal = Boolean(p.skipLivePerplexity || p.skipLiveLovable);
+  const skipLiveGrounding = Boolean(p.skipLivePerplexity || p.skipLiveLovable);
+  const skipLiveHistory = Boolean(p.skipLivePerplexity || p.skipLiveLovable);
+  const skipLiveZoomOut = Boolean(p.skipLiveLovable);
 
   if (p.shouldRunGrounding) {
     tasks.grounding = (async (): Promise<CompanionResult> => {
@@ -60,6 +77,7 @@ export function buildOrchestrateCompanionTasks(
         reflectionId: rid,
         log: p.log,
         preferredBias: p.intent.groundingBias,
+        skipLive: skipLiveGrounding,
       });
       const latencyMs = Date.now() - t;
       logCompanionSlotResolved({
@@ -96,6 +114,7 @@ export function buildOrchestrateCompanionTasks(
         userId: p.userId,
         log: p.log,
         preferredMood: p.intent.historyMood,
+        skipLive: skipLiveHistory,
       });
       const latencyMs = Date.now() - t;
       logCompanionSlotResolved({
@@ -133,6 +152,7 @@ export function buildOrchestrateCompanionTasks(
         recentTitles: p.recentZoomOutTitlesValue,
         log: p.log,
         zoomOutAngle: p.intent.zoomOutAngle,
+        skipLive: skipLiveZoomOut,
       });
       const latencyMs = Date.now() - t;
       logCompanionSlotResolved({
@@ -194,6 +214,7 @@ export function buildOrchestrateCompanionTasks(
         reflectionId: rid,
         log: p.log,
         searchAngle: p.intent.signalAngle,
+        skipLive: skipLiveSignal,
       });
       const latencyMs = Date.now() - t;
       logCompanionSlotResolved({

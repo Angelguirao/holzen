@@ -37,7 +37,10 @@ serve(async (req) => {
     try { await svcClient.from("analytics_events").insert({ user_id: user.id, event: "wallpaper_generation" }); } catch (_) { /* non-fatal */ }
 
     const { guardAiFeature } = await import("../_shared/ratelimit.ts");
-    const guard = await guardAiFeature(svcClient, "wallpaper", { userId: user.id });
+    const guard = await guardAiFeature(svcClient, "wallpaper", {
+      userId: user.id,
+      providers: ["lovable"],
+    });
     if (!guard.allowed) {
       return new Response(JSON.stringify({ error: guard.reason ?? "Wallpaper generation paused" }), {
         status: guard.status ?? 503,

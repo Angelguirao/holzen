@@ -21,10 +21,13 @@ import {
   RefreshCw,
   TrendingUp,
   Users,
+  Wallet,
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { PERIOD_OPTIONS, TAB_TRIGGER_CLASS, label } from '@/components/admin/admin-constants';
 import type { TimePeriod } from '@/hooks/use-admin-stats';
+import { PRICING } from '@/lib/pricing';
+import { ProviderHealthCard } from '@/components/admin/ProviderHealthCard';
 
 /** All AI features we expect to see logging in `generation_attempts`. */
 const EXPECTED_FEATURES = [
@@ -149,21 +152,54 @@ function loggedFeatures(rows: AttemptRow[]): Set<string> {
   return s;
 }
 
+interface MrrSnapshot {
+  activeSubscribers: number;
+  mrrUsd: number;
+  mtdCostUsd: number;
+  ratio: number | null;
+}
+
+async function fetchMrrSnapshot(): Promise<MrrSnapshot> {
+  // Count active/trialing subscribers. Lifetime-access users are not counted
+  // toward MRR (they've already paid one-off), but they still consume AI —
+  // the ratio reflects real unit economics rather than an idealized number.
+  const { count: activeCount } = await supabase
+    .from('profiles')
+    .select('*', { count: 'exact', head: true })
+    .in('subscription_status', ['active', 'trialing']);
+
+  const active = activeCount ?? 0;
+  const mrrUsd = active * PRICING.monthlyPrice;
+
+  const { data: mtdRow } = await supabase
+    .from('v_ai_spend_month_global' as never)
+    .select('total_usd')
+    .maybeSingle();
+  const mtdCostUsd =
+    mtdRow == null ? 0 : Number((mtdRow as { total_usd: number }).total_usd) || 0;
+
+  const ratio = mrrUsd > 0 ? mtdCostUsd / mrrUsd : null;
+  return { activeSubscribers: active, mrrUsd, mtdCostUsd, ratio };
+}
+
 export function CostAnalytics() {
   const [period, setPeriod] = useState<TimePeriod>('7d');
   const [rows7d, setRows7d] = useState<AttemptRow[]>([]);
   const [rowsPeriod, setRowsPeriod] = useState<AttemptRow[]>([]);
+  const [mrr, setMrr] = useState<MrrSnapshot | null>(null);
   const [loading, setLoading] = useState(true);
 
   const refresh = useCallback(async () => {
     setLoading(true);
     try {
-      const [periodData, sevenDayData] = await Promise.all([
+      const [periodData, sevenDayData, mrrSnap] = await Promise.all([
         fetchAttempts(period),
         period === '7d' ? Promise.resolve<AttemptRow[] | null>(null) : fetchAttempts('7d'),
+        fetchMrrSnapshot(),
       ]);
       setRowsPeriod(periodData);
       setRows7d(sevenDayData ?? periodData);
+      setMrr(mrrSnap);
     } finally {
       setLoading(false);
     }
@@ -238,6 +274,22 @@ export function CostAnalytics() {
           />
         </div>
       </div>
+
+      {/* Unit economics */}
+      <section className="space-y-2">
+        <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">
+          Unit economics <span className="text-muted-foreground/40 normal-case">(this month)</span>
+        </p>
+        <p className="text-[9px] font-mono text-muted-foreground/45 leading-relaxed">
+          Active MRR (active + trialing × ${PRICING.monthlyPrice}/mo) vs. month-to-date AI spend.
+          Ratio &gt; 25% means AI cost is eating a large slice of revenue — worth rethinking
+          defaults before the hard cap fires.
+        </p>
+        <MrrCard snapshot={mrr} loading={loading} />
+      </section>
+
+      {/* Provider health (circuit breakers) */}
+      <ProviderHealthCard />
 
       {/* Per-feature breakdown */}
       <section className="space-y-2">
@@ -360,6 +412,73 @@ export function CostAnalytics() {
           </div>
         )}
       </section>
+    </div>
+  );
+}
+
+function MrrCard({ snapshot, loading }: { snapshot: MrrSnapshot | null; loading: boolean }) {
+  if (loading && !snapshot) {
+    return (
+      <div className="flex items-center gap-2 py-3">
+        <Loader2 className="h-3 w-3 animate-spin text-muted-foreground/40" />
+      </div>
+    );
+  }
+  if (!snapshot) return null;
+
+  const ratioPct = snapshot.ratio === null ? null : Math.round(snapshot.ratio * 100);
+  const alert = ratioPct !== null && ratioPct >= 25;
+
+  return (
+    <div className="grid grid-cols-3 gap-3">
+      <div className="rounded-lg border border-border/20 bg-card/10 px-3 py-2.5">
+        <div className="flex items-center gap-2 mb-1">
+          <Wallet className="h-3 w-3 text-muted-foreground/40" />
+          <span className="text-[9px] font-mono uppercase tracking-wider text-muted-foreground/60">
+            MRR
+          </span>
+        </div>
+        <p className="text-[12px] font-mono text-foreground/80">${snapshot.mrrUsd.toFixed(0)}</p>
+        <p className="text-[9px] font-mono text-muted-foreground/50">
+          {snapshot.activeSubscribers} active
+        </p>
+      </div>
+      <div className="rounded-lg border border-border/20 bg-card/10 px-3 py-2.5">
+        <div className="flex items-center gap-2 mb-1">
+          <DollarSign className="h-3 w-3 text-muted-foreground/40" />
+          <span className="text-[9px] font-mono uppercase tracking-wider text-muted-foreground/60">
+            MTD AI cost
+          </span>
+        </div>
+        <p className="text-[12px] font-mono text-foreground/80">
+          ${snapshot.mtdCostUsd.toFixed(2)}
+        </p>
+        <p className="text-[9px] font-mono text-muted-foreground/50">from generation_attempts</p>
+      </div>
+      <div
+        className={`rounded-lg border px-3 py-2.5 ${
+          alert ? 'border-destructive/30 bg-destructive/10' : 'border-border/20 bg-card/10'
+        }`}
+      >
+        <div className="flex items-center gap-2 mb-1">
+          {alert ? (
+            <AlertCircle className="h-3 w-3 text-destructive" />
+          ) : (
+            <TrendingUp className="h-3 w-3 text-muted-foreground/40" />
+          )}
+          <span className="text-[9px] font-mono uppercase tracking-wider text-muted-foreground/60">
+            Cost / MRR
+          </span>
+        </div>
+        <p
+          className={`text-[12px] font-mono ${alert ? 'text-destructive' : 'text-foreground/80'}`}
+        >
+          {ratioPct === null ? 'n/a' : `${ratioPct}%`}
+        </p>
+        <p className="text-[9px] font-mono text-muted-foreground/50">
+          {ratioPct === null ? 'no MRR yet' : alert ? 'investigate' : 'healthy'}
+        </p>
+      </div>
     </div>
   );
 }

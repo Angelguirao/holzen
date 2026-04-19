@@ -38,7 +38,10 @@ serve(async (req) => {
     // Cost / feature guard. Degrades gracefully: on block, return a 503 with reason;
     // the client already handles errors with a retry-later toast.
     const { guardAiFeature } = await import("../_shared/ratelimit.ts");
-    const guard = await guardAiFeature(svcClient, "journal_prompt", { userId: user.id });
+    const guard = await guardAiFeature(svcClient, "journal_prompt", {
+      userId: user.id,
+      providers: ["lovable"],
+    });
     if (!guard.allowed) {
       return new Response(JSON.stringify({ error: guard.reason ?? "Temporarily unavailable" }), {
         status: guard.status ?? 503,

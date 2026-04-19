@@ -204,20 +204,71 @@ admin Tools tab when you see the daily spend bar sustain >60% for a week.
 The defense-in-depth layers, outermost first:
 
 1. **Provider-side caps** — Perplexity auto-reload ceiling and Lovable
-  workspace monthly cap. See §8 for recommended numbers.
+   workspace monthly cap. See §8 for recommended numbers.
 2. **Engineering global caps** — `app_config.budget_daily_usd_global`,
-  `budget_monthly_usd_global`. Block requests when exceeded.
+   `budget_monthly_usd_global`. Block requests when exceeded.
 3. **Engineering per-user caps** — `app_config.budget_daily_usd_per_user`.
-  Catches a single runaway account without punishing everyone.
+   Catches a single runaway account without punishing everyone.
 4. **Feature flags** — `app_config.feature_flags`. Turn off wallpaper,
-  letters, nudges, digest, reports, etc. independently of cost state.
+   letters, nudges, digest, reports, etc. independently of cost state.
 5. **Panic mode** — `app_config.panic_mode`. Bypasses the 5 companion
-  generators + `pregenerate`. Reflection still runs.
-6. **Per-user rate limit** — `checkRateLimit`, 30 AI events/60 min. Applies
-  to the orchestrator and its event allowlist only; see
+   generators + `pregenerate`. Reflection still runs.
+6. **Circuit breakers** — per-provider auto-trip when error rate is elevated.
+   See §5.2 below.
+7. **Per-user rate limit** — `checkRateLimit`, 30 AI events/60 min. Applies
+   to the orchestrator and its event allowlist only; see
    `supabase/functions/_shared/ratelimit.ts`.
-7. **Provider 402 / 429** — last-resort failure handling returns the feature's
-  natural fallback (curated pool, canned template, silent no-op).
+8. **Provider 402 / 429** — last-resort failure handling returns the feature's
+   natural fallback (curated pool, canned template, silent no-op).
+
+### 5.2 Circuit breakers
+
+Implemented in `supabase/functions/_shared/circuit-breaker.ts`. Two
+independent breakers (`perplexity`, `lovable`) computed on the fly from
+`generation_attempts` with a 30-second per-Edge-instance cache.
+
+**Trip rule:** a provider is marked `degraded` when, in the last 10 minutes,
+its error rate is ≥ 30% **and** it has ≥ 10 completed calls. The sample-size
+gate is important — we never trip on "3 of 3 failed" because that isn't
+statistically meaningful and a retry probably works.
+
+**What "error" means here:** `status IN ('error', 'timeout', 'rate_limited')`.
+**Not counted:** `quality_gate_failed` (that's a content issue, not a provider
+health issue — a prompt regression shouldn't trip the breaker).
+
+**Scope when tripped:**
+
+| Breaker tripped | Affected generators | Behavior |
+|---|---|---|
+| `perplexity` | Signal, Grounding, History | Skip the live Perplexity + Lovable structuring step. Library + cache + curated fallback still serve. |
+| `lovable` | Signal, Grounding, History, Zoom-Out, Intervention, Reflection, + all non-companion AI features | Same: skip live phase; cache/library/fallback still serve. Reflection falls back to the curated pool. |
+
+**Cached serves are completely unaffected.** Rows already written to
+`reflection_companions`, `companion_cache` hits, and `content_library` hits
+all keep serving. Only *new* live generation is skipped for the duration
+of the trip.
+
+**Regeneration (user-initiated):** when a user explicitly taps "regenerate"
+and the relevant breaker is tripped, `regenerate-only` returns a 503 with
+`tripped: 'breaker_<provider>'` instead of silently serving cache. The
+client UI can show a "provider having issues, try again in a few minutes"
+message.
+
+**Recovery:** automatic. The breaker recomputes on every call (after the
+30 s instance-cache TTL expires). When new successes push the rolling 10-min
+error rate below 30%, the provider state flips back to `ok` and live
+generation resumes.
+
+**Admin visibility:** `/admin → Cost` shows a live "Provider health" card
+with the state, error rate, and sample count per provider. Auto-refreshes
+every 30 s.
+
+**Tuning:** if the defaults are too aggressive (false trips during normal
+small-sample windows) or too loose (didn't trip during a real incident),
+change the constants in `circuit-breaker.ts`. Not yet exposed as
+`app_config` — provider-health tuning should be a deliberate code change
+so we don't accidentally trip during an incident because someone edited
+a threshold.
 
 ### 5.1 Where each cap is enforced today
 
@@ -404,11 +455,17 @@ the superset.
 - `src/components/admin/CostAnalytics.tsx` — Admin Cost tab.
 - `supabase/functions/ai-cost-alert/index.ts` — daily alert email (§7.5).
 - `supabase/migrations/20260419150000_ai_cost_alert_config.sql` — alert config seed.
+- `supabase/functions/_shared/circuit-breaker.ts` — per-provider breakers (§5.2).
+- `src/components/admin/ProviderHealthCard.tsx` — live breaker state in Admin Cost tab.
 
 ---
 
 ## 10. Changelog
 
+- **2026-04-19 (evening):** Added per-provider circuit breakers (§5.2) +
+  MRR / AI-cost ratio card on the Cost tab. Breakers skip **live** generation
+  only; cache + library + curated fallback still serve. Regenerate surfaces
+  a clear 503 when tripped. Added unit tests for the breaker math.
 - **2026-04-19 (end of day):** Added `ai-cost-alert` daily email function + admin
   config (recipients, threshold %, WoW multiplier) + runbook §7.5.
 - **2026-04-19 (later that day):** Pricing verification pass against Perplexity

@@ -99,6 +99,7 @@ Frontend is safe — it only goes live when you click **Publish → Update** in 
 □ No destructive DB changes without code-first deploy
 □ Frontend doesn't reference columns/functions that don't exist yet
 □ **New DB columns used by code** — use `as unknown as T` pattern (see below)
+□ **AI provider pricing** — if the last entry in `docs/systems/costs/ai-cost-model.md` §10 is **> 90 days old**, re-verify Perplexity + Google Gemini list prices via Context7, update `DEFAULT_COST_MAP` in `supabase/functions/_shared/observe.ts`, and add a changelog entry. See §1.3 of the cost doc for the drift policy.
 ```
 
 ### TypeScript types lag behind migrations (build-breaking chicken-and-egg)

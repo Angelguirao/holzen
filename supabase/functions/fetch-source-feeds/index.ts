@@ -210,7 +210,9 @@ serve(async (req) => {
     // Feature flag + global budget guard. On block, return a no-op so the
     // cron keeps advancing through its schedule without error.
     const { guardAiFeature } = await import("../_shared/ratelimit.ts");
-    const feedsGuard = await guardAiFeature(supabase, "fetch_source_feeds");
+    const feedsGuard = await guardAiFeature(supabase, "fetch_source_feeds", {
+      providers: ["lovable"],
+    });
     if (!feedsGuard.allowed) {
       hzLog(`fetch-feeds skipped: ${feedsGuard.reason}`);
       return new Response(

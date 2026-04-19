@@ -60,6 +60,8 @@ export interface GenerateZoomOutParams {
   zoomOutAngle?: string;
   /** Skip cache phase and go straight to live (used by regenerate). */
   forceLive?: boolean;
+  /** Skip the live phase only — cache still serves. Used by circuit breaker. */
+  skipLive?: boolean;
   log: (msg: string, extra?: Record<string, unknown>) => void;
 }
 
@@ -475,8 +477,9 @@ FORMAT: JSON with "title" (3-8 word evocative phrase) and "body" (1-2 poetic but
 // ── Public entry point ──
 
 export async function generateZoomOut(params: GenerateZoomOutParams): Promise<ZoomOutResult> {
-  const { svcClient, context, mood, recentTitles, userId, zoomOutAngle, forceLive, log } = params;
+  const { svcClient, context, mood, recentTitles, userId, zoomOutAngle, forceLive, skipLive, log } = params;
   const phases = getPhaseConfig();
+  const liveEnabled = phases.live && !skipLive;
 
   // ── Phase 2: Cache (no library type for zoom-out; strict — fall through to live if no fresh row) ──
   if (phases.cache && !forceLive) {
@@ -503,8 +506,8 @@ export async function generateZoomOut(params: GenerateZoomOutParams): Promise<Zo
   }
 
   // ── Phase 3: Live generation ──
-  if (!phases.live && !forceLive) {
-    log("live phase disabled, serving curated");
+  if (!liveEnabled && !forceLive) {
+    log(skipLive ? "zoomOut: live phase skipped (breaker), serving curated" : "live phase disabled, serving curated");
     if (companionFallbacksDisabled()) {
       return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
     }
@@ -521,6 +524,10 @@ export async function generateZoomOut(params: GenerateZoomOutParams): Promise<Zo
       source: "curated",
       cacheId: null,
     };
+  }
+  if (skipLive && forceLive) {
+    log("zoomOut: breaker tripped and forceLive requested — returning blocked");
+    return { data: null, source: "empty", cacheId: null, error: "circuit_breaker" };
   }
 
   // ── 1. Fetch historical BTC prices with DB caching ──
