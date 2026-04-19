@@ -169,8 +169,7 @@ export function ProLockedWidget({ onUpgrade, checkoutLoading, feature }: { onUpg
         type="button"
         onClick={onUpgrade}
         disabled={checkoutLoading}
-        className="group inline-flex items-center gap-1.5 text-sm font-medium underline-offset-4 transition-colors hover:underline disabled:opacity-50"
-        style={{ color: '#24B2C8' }}
+        className="group inline-flex items-center gap-1.5 font-medium underline-offset-4 transition-colors hover:underline disabled:opacity-50 text-base text-[#24b1c6]"
       >
         {t('pro.upgradeCta')}
         <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
