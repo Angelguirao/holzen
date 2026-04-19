@@ -254,7 +254,7 @@ export default function Library() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={t('library.searchPlaceholder')}
-                className="h-8 border-border/30 pl-8 text-xs py-[16px]"
+                className="h-8 border-border/30 pl-8 text-xs py-[16px] mb-0"
               />
               {search && (
                 <button
