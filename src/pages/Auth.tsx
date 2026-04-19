@@ -116,7 +116,7 @@ const Auth = () => {
           <NoxHeaderMain title={t('common.holzen')} subtitle={t('auth.resetYourPassword')} />
           <form onSubmit={handleForgotPassword} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="auth-forgot-email" className="text-xs font-mono">{t('auth.email')}</Label>
+              <Label htmlFor="auth-forgot-email" className="text-base font-sans">{t('auth.email')}</Label>
               <Input
                 id="auth-forgot-email"
                 name="email"
@@ -180,7 +180,7 @@ const Auth = () => {
           </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="auth-password" className="text-xs font-mono">{t('auth.password')}</Label>
+              <Label htmlFor="auth-password" className="text-base font-sans">{t('auth.password')}</Label>
               {view === 'sign-in' && (
                 <button type="button" onClick={() => { setView('forgot-password'); setError(null); }} className="text-muted-foreground underline text-sm font-sans">
                   {t('auth.forgotPassword')}
