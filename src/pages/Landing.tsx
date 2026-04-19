@@ -147,7 +147,7 @@ const Landing = () => {
             <Button
               onClick={() => navigate('/auth?view=sign-up')}
               size="lg"
-              className="font-sans text-base tracking-wider group px-8 font-normal"
+              className="font-sans text-base tracking-wider group px-8 font-medium"
             >
               {t('landing.getStartedForFree')}
             </Button>
