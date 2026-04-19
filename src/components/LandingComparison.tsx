@@ -54,7 +54,7 @@ function SideBySide({ reaction, reflection, prefersReduced, t }: VariantProps) {
         viewport={{ once: true }}
         transition={{ duration: 0.5 }}
       >
-        <p className="text-[10px] font-mono tracking-[0.15em] uppercase text-destructive/60 mb-4">
+        <p className="tracking-[0.15em] uppercase text-destructive/60 mb-4 text-sm font-sans">
           {t('landing.reaction.label')}
         </p>
         {reaction.map((step, i) => (
@@ -65,7 +65,7 @@ function SideBySide({ reaction, reflection, prefersReduced, t }: VariantProps) {
             <div className="relative z-10 flex-shrink-0 w-6 h-6 rounded-full border border-destructive/20 bg-destructive/5 flex items-center justify-center text-destructive/40">
               {step.icon}
             </div>
-            <p className="text-xs text-muted-foreground/70 pt-1 leading-snug">{step.title}</p>
+            <p className="text-muted-foreground/70 pt-1 leading-snug text-sm">{step.title}</p>
           </div>
         ))}
       </motion.div>
@@ -77,7 +77,7 @@ function SideBySide({ reaction, reflection, prefersReduced, t }: VariantProps) {
         viewport={{ once: true }}
         transition={{ duration: 0.5, delay: 0.15 }}
       >
-        <p className="text-[10px] font-mono tracking-[0.15em] uppercase text-primary/60 mb-4">
+        <p className="tracking-[0.15em] uppercase text-primary/60 mb-4 text-sm font-sans">
           {t('landing.reflection.label')}
         </p>
         {reflection.map((step, i) => (
@@ -88,7 +88,7 @@ function SideBySide({ reaction, reflection, prefersReduced, t }: VariantProps) {
             <div className="relative z-10 flex-shrink-0 w-6 h-6 rounded-full border border-primary/30 bg-primary/5 flex items-center justify-center text-primary/50">
               {step.icon}
             </div>
-            <p className="text-xs text-foreground pt-1 leading-snug">{step.title}</p>
+            <p className="text-foreground pt-1 leading-snug text-base">{step.title}</p>
           </div>
         ))}
       </motion.div>
