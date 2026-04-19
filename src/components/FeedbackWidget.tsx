@@ -146,13 +146,21 @@ export function FeedbackWidget() {
 
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent side="right" className="w-full sm:max-w-md flex flex-col gap-4">
-          <SheetHeader>
+          <SheetHeader className="relative pr-8">
             <SheetTitle className="font-semibold tracking-wider uppercase text-base font-sans text-[#dbb266]">
               {t('feedback.getInTouch')}
             </SheetTitle>
             <SheetDescription className="text-base font-sans text-secondary-foreground">
               {t('feedback.description')}
             </SheetDescription>
+            <button
+              type="button"
+              onClick={() => setOpen(false)}
+              aria-label={t('feedback.close', { defaultValue: 'Close' })}
+              className="absolute right-0 top-0 h-7 w-7 rounded-md flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
           </SheetHeader>
 
           <div className="grid grid-cols-3 gap-2">
