@@ -475,7 +475,7 @@ function StatsContent({ reflections, practiceEntries = [], letters = [], memberS
             <div className="absolute inset-0 flex flex-col items-center justify-center">
               <span className="text-2xl font-mono font-semibold leading-none">{scoreData?.score ?? '—'}</span>
               {scoreGrade && (
-                <span className={`text-[9px] font-mono mt-0.5 ${scoreColor}`}>{scoreGrade}</span>
+                <span className={`mt-0.5 text-sm font-sans text-secondary-foreground font-normal ${scoreColor}`}>{scoreGrade}</span>
               )}
             </div>
           </div>
@@ -627,13 +627,13 @@ function MicroStat({ value, suffix, label, context, isText }: {
     <div className="space-y-0.5">
       <div className="flex items-baseline gap-1">
         <span className={`font-mono font-medium leading-none ${isText ? 'text-base' : 'text-lg'}`}>
-          {value}{suffix && <span className="text-[10px] ml-0.5" style={{ color: '#C1CBD7' }}>{suffix}</span>}
+          {value}{suffix && <span className="ml-0.5 text-sm" style={{ color: '#C1CBD7' }}>{suffix}</span>}
         </span>
         {context && (
-          <span className="text-[9px] font-mono" style={{ color: '#C1CBD7' }}>{context}</span>
+          <span className="font-sans text-sm" style={{ color: '#C1CBD7' }}>{context}</span>
         )}
       </div>
-      <p className="text-[9px] font-mono tracking-widest lowercase" style={{ color: '#C1CBD7' }}>{label}</p>
+      <p className="tracking-widest lowercase text-sm font-sans" style={{ color: '#C1CBD7' }}>{label}</p>
     </div>
   );
 }
@@ -643,7 +643,7 @@ function ScoreBarInline({ label, value, hint }: { label: string; value: number; 
   return (
     <div className="space-y-2 cursor-pointer" onClick={() => hint && setOpen(!open)}>
       <div className="flex justify-between text-[10px] font-mono text-muted-foreground">
-        <span>{label}</span>
+        <span className="text-sm font-sans font-medium">{label}</span>
         <span>{value}</span>
       </div>
       <div className="h-1 rounded-full bg-muted/50 overflow-hidden">
