@@ -152,7 +152,7 @@ const Landing = () => {
               {t('landing.getStartedForFree')}
               <ArrowRight className="h-3.5 w-3.5 ml-2 transition-transform group-hover:translate-x-0.5" />
             </Button>
-            <p className="text-[11px] text-muted-foreground/50 mt-3 font-mono">
+            <p className="mt-3 text-base font-sans text-muted-foreground">
               {t('landing.noCreditCard')}
             </p>
           </motion.div>
