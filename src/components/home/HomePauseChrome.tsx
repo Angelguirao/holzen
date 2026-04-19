@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pause, Timer, Lock } from 'lucide-react';
+import { Pause, Timer, Lock, ArrowRight } from 'lucide-react';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { homeInWidget } from '@/components/home/home-widget-styles';
 import { cn } from '@/lib/utils';
