@@ -12,6 +12,7 @@ import { OfflineBanner } from "./components/OfflineBanner";
 import { CookieConsent } from "./components/CookieConsent";
 import AuthLoading from "./components/AuthLoading";
 import { AppLayout } from "./components/AppLayout";
+import { FeedbackWidget } from "./components/FeedbackWidget";
 
 const Home = lazy(() => import("./pages/Home"));
 const Library = lazy(() => import("./pages/Library"));
@@ -90,6 +91,17 @@ function HolzenQueryLogging() {
   return null;
 }
 
+/**
+ * Floating feedback button — only shown for authenticated users.
+ * `send-feedback` requires an auth'd session, and the ErrorBoundary listener on the widget
+ * also needs the auth context in case the user wants to reach support from the error screen.
+ */
+function FeedbackWidgetGate() {
+  const { user } = useAuth();
+  if (!user) return null;
+  return <FeedbackWidget />;
+}
+
 /** Logs pathname + auth state when either changes (under `[holzen:router]`). */
 function RouterLocationLog() {
   const { pathname } = useLocation();
@@ -122,6 +134,7 @@ const App = () => (
           <CookieConsent />
           <AuthProvider>
             <RouterLocationLog />
+            <FeedbackWidgetGate />
             <Suspense fallback={<RouteChunkFallback />}>
               <Routes>
                 <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
