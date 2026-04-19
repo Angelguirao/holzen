@@ -498,15 +498,15 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
           <AccordionTrigger className="text-xs font-mono uppercase tracking-wider text-muted-foreground hover:text-foreground py-3 hover:no-underline">
             {t('settings.experience', 'Experience')}
           </AccordionTrigger>
-          <AccordionContent className="space-y-6 pb-4">
+          <AccordionContent className="space-y-6 pb-4 text-muted-foreground">
             {/* 1 BTC = 1 BTC mode */}
             <div className="space-y-3">
-              <p className="text-xs font-mono text-white uppercase tracking-wider">{t('settings.btcMode')}</p>
+              <p className="uppercase tracking-wider text-base font-sans font-semibold text-[#dbb266]">{t('settings.btcMode')}</p>
               <p className="leading-relaxed text-primary text-sm">
                 {t('settings.btcModeDesc')}
               </p>
               <div className="flex items-center justify-between">
-                <Label htmlFor="btc-mode" className="text-xs cursor-pointer text-primary">
+                <Label htmlFor="btc-mode" className="cursor-pointer text-base font-sans text-secondary-foreground">
                   {t('settings.enableConvictionMode')}
                 </Label>
                 <Switch
