@@ -509,7 +509,7 @@ const Home = () => {
                   <p className={homeInWidget.bodyMuted}>
                     {t('home.subscription.monthlyLimitReached')}
                   </p>
-                  <p className={`${homeInWidget.meta} mb-4`}>
+                  <p className={`${homeInWidget.meta} mb-[16px]`}>
                     {t('home.subscription.upgradeToPro')}
                   </p>
                   <LoadingButton
