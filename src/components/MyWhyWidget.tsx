@@ -11,7 +11,7 @@ export function MyWhyWidget() {
 
   return (
     <div className={`${homeInWidget.inset} space-y-2`}>
-      <div className="flex items-center gap-1.5">
+      <div className="flex items-center gap-1.5 mb-4">
         <Heart className="h-3 w-3 shrink-0 text-primary/50" />
         <p className={homeInWidget.kicker}>{t('myWhy.title')}</p>
       </div>
