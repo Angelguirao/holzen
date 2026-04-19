@@ -103,16 +103,16 @@ export function InstallHolzenCard({ alwaysShow = false, compact = false, classNa
             <p className="text-xs font-mono uppercase tracking-wider mt-2" style={{ color: '#DBB366' }}>
               Install Holzen
             </p>
-            <p className="text-xs leading-relaxed text-primary mt-1.5">
+            <p className="leading-relaxed text-primary mt-1.5 text-sm">
               Install Holzen to receive pauses when Bitcoin moves.
-              <span className="block leading-relaxed text-[#7b8a9d] mt-1 text-xs">
+              <span className="block leading-relaxed text-[#7b8a9d] mt-1 text-sm">
                 Required on iPhone for notifications. Tap Share, then Add to Home Screen.
               </span>
             </p>
             <Button
               onClick={handleInstall}
               size="sm"
-              className="w-full font-mono text-xs mt-3"
+              className="w-full font-sans text-base mt-3"
             >
               <Download className="h-3 w-3 mr-1.5" />
               Install Holzen
