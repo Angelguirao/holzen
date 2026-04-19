@@ -254,7 +254,7 @@ export default function Library() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={t('library.searchPlaceholder')}
-                className="h-8 border-border/30 pl-8 text-xs py-[16px]"
+                className="h-8 border-border/30 pl-8 text-xs py-[16px] mb-[24px]"
               />
               {search && (
                 <button
@@ -274,7 +274,7 @@ export default function Library() {
                     key={key}
                     onClick={() => setSourceFilter(sourceFilter === key ? null : key)}
                     className={cn(
-                      'px-2 py-1 rounded-full border transition-colors whitespace-nowrap flex items-center gap-1 text-sm font-sans',
+                      'px-2 py-1 rounded-full border transition-colors whitespace-nowrap flex items-center gap-1 text-sm font-sans mb-[16px]',
                       sourceFilter === key
                         ? 'border-foreground/20 bg-foreground/5 text-foreground'
                         : 'border-border/30 text-muted-foreground'
