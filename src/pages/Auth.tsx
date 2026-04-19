@@ -11,7 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { useTranslation } from 'react-i18next';
-import { SIGNUPS_ENABLED } from '@/lib/signup-gate';
+import { checkSignupGate } from '@/lib/signup-gate';
 import { NoxHeaderMain } from '@/components/ui/nox-header';
 
 type AuthView = 'sign-in' | 'sign-up' | 'forgot-password';
@@ -37,8 +37,16 @@ const Auth = () => {
     setLoading(true);
     try {
       if (view === 'sign-up') {
-        if (!SIGNUPS_ENABLED) {
-          setError(t('auth.signupsPaused', 'Signups are temporarily paused. Please try again later.'));
+        const gate = await checkSignupGate(supabase);
+        if (!gate.allow) {
+          if (gate.reason === 'daily_cap') {
+            setError(t(
+              'auth.signupsDailyCap',
+              "Today's signup limit has been reached. Please try again tomorrow.",
+            ));
+          } else {
+            setError(t('auth.signupsPaused', 'Signups are temporarily paused. Please try again later.'));
+          }
           setLoading(false);
           return;
         }

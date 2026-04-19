@@ -88,6 +88,7 @@ const Landing = () => {
     { key: 'breathe', q: t('landing.faq.breatheQuestion'), a: t('landing.faq.breatheAnswer') },
     { key: 'meditation', q: t('landing.faq.meditationQuestion'), a: t('landing.faq.meditationAnswer') },
     { key: 'value', q: t('landing.faq.valueQuestion'), a: t('landing.faq.valueAnswer', { freeReflectionsPerMonth: PRICING.freeReflectionsPerMonth }) },
+    { key: 'fairUse', q: t('landing.faq.fairUseQuestion'), a: t('landing.faq.fairUseAnswer') },
     { key: 'works', q: t('landing.faq.worksQuestion'), a: t('landing.faq.worksAnswer') },
     { key: 'rational', q: t('landing.faq.rationalQuestion'), a: t('landing.faq.rationalAnswer') },
     { key: 'data', q: t('landing.faq.dataQuestion'), a: t('landing.faq.dataAnswer') },

@@ -34,6 +34,21 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
+    // Feature flag + budget guard. On block, fall through to the canned template
+    // already returned in the catch branch below.
+    const svcClient = createClient(sbUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "", {
+      auth: { persistSession: false },
+    });
+    const { guardAiFeature } = await import("../_shared/ratelimit.ts");
+    const guard = await guardAiFeature(svcClient, "suggest_ritual", { userId: user.id });
+    if (!guard.allowed) {
+      return new Response(JSON.stringify({
+        steps: [{ type: "breathe" }, { type: "reflect" }, { type: "journal" }, { type: "decide" }],
+        reasoning: "Fallback to standard ritual",
+        blocked: guard.reason,
+      }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
     const prompt = `You are a wellness ritual designer for Bitcoin holders. Based on the user's current emotional state, suggest a ritual sequence.
 
 Available step types:

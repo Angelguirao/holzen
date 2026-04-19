@@ -90,7 +90,16 @@ serve(async (req) => {
     const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
     if (!RESEND_API_KEY) throw new Error("RESEND_API_KEY not configured");
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    let LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+
+    // Feature flag + global budget guard. On block, we still send the email
+    // summary but drop the AI paragraph.
+    const { guardAiFeature } = await import("../_shared/ratelimit.ts");
+    const reportsAiGuard = await guardAiFeature(supabase, "reports");
+    if (!reportsAiGuard.allowed) {
+      holzenEdgeLog("monthly-report", "ai summary skipped", { reason: reportsAiGuard.reason });
+      LOVABLE_API_KEY = undefined;
+    }
 
     // Only run on the 1st of the month
     const now = new Date();

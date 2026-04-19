@@ -2,6 +2,8 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { handleCors, jsonResponse, errorResponse } from "../_shared/cors.ts";
 import { createAuthenticatedClient, createServiceClient } from "../_shared/auth.ts";
 import { createAttemptLogger, createObsTracker, createLogger } from "../_shared/observe.ts";
+import { checkCostCeilings } from "../_shared/ratelimit.ts";
+import { loadAppConfig } from "../_shared/app-config.ts";
 import {
   companionFallbacksDisabled,
   COMPANION_FALLBACKS_DISABLED_MESSAGE,
@@ -40,6 +42,25 @@ serve(async (req) => {
     try {
       await svcClient.from("analytics_events").insert({ user_id: userId, event: "pause_ai_call" });
     } catch (_) { /* tracking failure is non-fatal */ }
+
+    // Reflection is NOT subject to panic_mode (we want users to see a reflection
+    // even when companions are bypassed — it's ~$0.001 per call). It IS subject
+    // to the cost ceilings so a runaway loop still gets stopped.
+    const appConfig = await loadAppConfig(svcClient);
+    const budget = await checkCostCeilings(svcClient, {
+      dailyGlobalUsd: appConfig.budget_daily_usd_global,
+      dailyPerUserUsd: appConfig.budget_daily_usd_per_user,
+      monthlyGlobalUsd: appConfig.budget_monthly_usd_global,
+      userId,
+    });
+    if (!budget.allowed) {
+      log(`reflection budget tripped (${budget.tripped}): ${budget.reason}`);
+      if (companionFallbacksDisabled()) {
+        return errorResponse(budget.reason ?? "Budget exceeded", 503);
+      }
+      const pool = await loadFallbackPool<{ message: string; haiku: string }>(svcClient, "reflection");
+      return jsonResponse(pickRandom(pool));
+    }
 
     const trackObs = createObsTracker(svcClient, userId, "reflection", t0);
     const logAttempt = createAttemptLogger(svcClient, { userId });

@@ -2,7 +2,8 @@
  * Targeted single-companion regeneration for companion-orchestrate.
  */
 
-import { checkDailyBudget, checkCompanionRegenerateLimit } from "./ratelimit.ts";
+import { checkCostCeilings, checkCompanionRegenerateLimit } from "./ratelimit.ts";
+import { loadAppConfig, PANIC_MODE_FEATURES } from "./app-config.ts";
 import { writeCompanionData } from "./companion-data.ts";
 import { generateSignal } from "./generators/signal.ts";
 import { generateGrounding } from "./generators/grounding.ts";
@@ -44,12 +45,26 @@ export async function handleRegenerateOnly(params: {
     });
   }
 
-  const budget = await checkDailyBudget(svcClient, 10.0);
+  const appConfig = await loadAppConfig(svcClient);
+
+  if (appConfig.panic_mode && PANIC_MODE_FEATURES.has("companion_signal")) {
+    return new Response(
+      JSON.stringify({ error: "Companion generation is temporarily paused.", panic_mode: true }),
+      { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
+  }
+
+  const budget = await checkCostCeilings(svcClient, {
+    dailyGlobalUsd: appConfig.budget_daily_usd_global,
+    dailyPerUserUsd: appConfig.budget_daily_usd_per_user,
+    monthlyGlobalUsd: appConfig.budget_monthly_usd_global,
+    userId,
+  });
   if (!budget.allowed) {
-    return new Response(JSON.stringify({ error: budget.reason ?? "Budget exceeded" }), {
-      status: 503,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({ error: budget.reason ?? "Budget exceeded", tripped: budget.tripped }),
+      { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
   }
 
   const regenLimit = await checkCompanionRegenerateLimit(svcClient, userId, 24, 12);

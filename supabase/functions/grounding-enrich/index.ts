@@ -79,6 +79,20 @@ serve(async (req) => {
       });
     }
 
+    // Feature flag + budget guard. Cache hits below bypass this; only the
+    // upstream-fanout path (Gemini bio generation) pays the AI cost.
+    const svcGuard = createClient(supabaseUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, {
+      auth: { persistSession: false },
+    });
+    const { guardAiFeature } = await import("../_shared/ratelimit.ts");
+    const enrichGuard = await guardAiFeature(svcGuard, "grounding_enrich", { userId: user.id });
+    if (!enrichGuard.allowed) {
+      return new Response(
+        JSON.stringify({ error: enrichGuard.reason ?? "Enrichment paused" }),
+        { status: enrichGuard.status ?? 503, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
     const body = (await req.json().catch(() => null)) as EnrichmentRequest | null;
     if (!body?.citation || typeof body.citation !== "string") {
       return new Response(JSON.stringify({ error: "Missing citation" }), {

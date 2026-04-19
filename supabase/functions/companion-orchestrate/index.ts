@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { checkRateLimit, checkDailyBudget } from "../_shared/ratelimit.ts";
+import { checkRateLimit, checkCostCeilings } from "../_shared/ratelimit.ts";
+import { loadAppConfig, PANIC_MODE_FEATURES } from "../_shared/app-config.ts";
 import { handleRegenerateOnly } from "../_shared/regenerate-only.ts";
 import { createLogger, trackEvent } from "../_shared/observe.ts";
 import { generateQuestion } from "../_shared/generators/question.ts";
@@ -266,7 +267,8 @@ serve(async (req) => {
       }
     }
 
-    // ── Per-user rate limit + daily budget (skipped when serving from reflection_companions) ──
+    // ── Per-user rate limit + cost ceilings + panic mode ──
+    // (all skipped when we successfully served from reflection_companions above).
     const rateLimit = await checkRateLimit(svcClient, userId, 60, 30);
     if (!rateLimit.allowed) {
       log(`rate limited: ${rateLimit.reason}`);
@@ -275,13 +277,42 @@ serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    const budget = await checkDailyBudget(svcClient, 10.0);
+
+    const appConfig = await loadAppConfig(svcClient);
+
+    // Panic mode: companion features are off. Return empty companions and let
+    // the client fall back to its local cache / reflection_companions path.
+    // Reflection is not affected (see PANIC_MODE_FEATURES in _shared/app-config.ts).
+    if (appConfig.panic_mode && PANIC_MODE_FEATURES.has("companion_signal")) {
+      log("panic mode active — bypassing companion generation");
+      return new Response(
+        JSON.stringify({
+          signal: null,
+          grounding: null,
+          history: null,
+          zoomOut: null,
+          intervention: null,
+          panic_mode: true,
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
+    const budget = await checkCostCeilings(svcClient, {
+      dailyGlobalUsd: appConfig.budget_daily_usd_global,
+      dailyPerUserUsd: appConfig.budget_daily_usd_per_user,
+      monthlyGlobalUsd: appConfig.budget_monthly_usd_global,
+      userId,
+    });
     if (!budget.allowed) {
-      log(`budget exceeded: ${budget.reason}`);
-      return new Response(JSON.stringify({ error: "Generation budget exceeded for today." }), {
-        status: 503,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      log(`budget exceeded (${budget.tripped}): ${budget.reason}`);
+      return new Response(
+        JSON.stringify({
+          error: "Generation budget exceeded.",
+          tripped: budget.tripped,
+        }),
+        { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
     }
 
     if (selection && useIntervention && reflectionId) {

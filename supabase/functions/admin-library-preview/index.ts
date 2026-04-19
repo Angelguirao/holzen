@@ -90,6 +90,20 @@ serve(async (req) => {
       });
     }
 
+    // Feature flag + global budget guard. Admin feature but still worth a
+    // cap so a dashboard left open doesn't silently burn credits.
+    const svcClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "", {
+      auth: { persistSession: false },
+    });
+    const { guardAiFeature } = await import("../_shared/ratelimit.ts");
+    const libGuard = await guardAiFeature(svcClient, "admin_library_preview", { userId: userData.user.id });
+    if (!libGuard.allowed) {
+      return new Response(JSON.stringify({ error: libGuard.reason ?? "Paused" }), {
+        status: libGuard.status ?? 503,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const body = (await req.json()) as PreviewBody;
     const raw = typeof body.url === "string" ? body.url : "";
     const url = normalizeSourceUrl(raw);
