@@ -2,7 +2,8 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { holzenEdgeError, holzenEdgeRun, holzenEdgeWarn } from "../_shared/holzen-edge-log.ts";
 import { btcOnThisDayYearOffsets } from "../_shared/btc-on-this-day-config.ts";
-import { coingeckoHeaders, fetchCoinGeckoHistoryPrice } from "../_shared/coingecko.ts";
+import { coingeckoHeaders } from "../_shared/coingecko.ts";
+import { warmMissingBtcPrices } from "../_shared/btc-price-warm.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -29,8 +30,12 @@ const corsHeaders = {
  * works on the **free / demo** tier for any historical date; the previous
  * `/market_chart/range` approach silently capped at ~365 days back on free tier
  * and left anniversary rows 2+ years old empty ("historical=0/10" in zoom-out
- * logs). Per-date calls are paced **1s apart** to stay under the 30 req/min
- * demo quota (max 10 anniversary dates per run → ~10s total).
+ * logs). Historical fills now run through the shared `warmMissingBtcPrices`
+ * helper with bounded parallelism (default concurrency 5 with 1.2s between
+ * batches), so 10 anniversary dates finish in ~2-3s instead of the previous
+ * ~10s sequential loop, while still staying well under the ~30 req/min demo
+ * quota. The same helper powers the session-side warm-on-read path in
+ * `zoom-out.ts` so both paths share dedupe + concurrency semantics.
  */
 
 serve(async (req) => {
@@ -142,46 +147,35 @@ serve(async (req) => {
     const missingTargets = yearTargets.filter(t => !recentlyFetched.has(t.dateKey));
 
     if (missingTargets.length > 0) {
-      const fetchedAt = new Date().toISOString();
-      const inserts: { date: string; price: number; fetched_at: string }[] = [];
-      let rateLimited = 0;
-      let other = 0;
-
-      // One call per missing anniversary date via `/coins/bitcoin/history`
-      // (works on demo tier for any year, unlike `/market_chart/range`).
-      // 1s spacing keeps us well under the 30 req/min demo quota.
-      for (let i = 0; i < missingTargets.length; i++) {
-        const target = missingTargets[i];
-        if (i > 0) await new Promise((r) => setTimeout(r, 1000));
-
-        const hit = await fetchCoinGeckoHistoryPrice(target.dateKey);
-        if (!hit) { other++; continue; }
-        if ("rateLimited" in hit) { rateLimited++; continue; }
-        inserts.push({ date: target.dateKey, price: hit.price, fetched_at: fetchedAt });
-      }
-
-      if (inserts.length > 0) {
-        const { error: upErr } = await supabase.from("btc_price_cache").upsert(inserts);
-        if (upErr) {
-          holzenEdgeError("refresh-btc", "historical upsert failed", upErr);
-          results.push("historical: upsert failed");
-        } else {
+      try {
+        const warm = await warmMissingBtcPrices(
+          supabase,
+          missingTargets.map((t) => t.dateKey),
+        );
+        if (warm.upserted > 0) {
           results.push(
-            `historical: ${inserts.length}/${missingTargets.length} prices cached` +
-              (rateLimited > 0 ? `, ${rateLimited} rate-limited` : "") +
-              (other > 0 ? `, ${other} other failures` : ""),
+            `historical: ${warm.upserted}/${missingTargets.length} prices cached` +
+              (warm.rateLimited > 0 ? `, ${warm.rateLimited} rate-limited` : "") +
+              (warm.other > 0 ? `, ${warm.other} other failures` : "") +
+              (warm.skippedRecent > 0 ? `, ${warm.skippedRecent} skipped (recent)` : ""),
+          );
+        } else if (warm.skippedRecent === missingTargets.length) {
+          results.push(`historical: all ${missingTargets.length} fetched <15min ago (skipped)`);
+        } else {
+          holzenEdgeWarn("refresh-btc", "historical: no dates resolved via /history", {
+            missing: missingTargets.length,
+            rate_limited: warm.rateLimited,
+            other_failures: warm.other,
+            skipped_recent: warm.skippedRecent,
+          });
+          results.push(
+            `historical: 0/${missingTargets.length} matched` +
+              (warm.rateLimited > 0 ? ` (${warm.rateLimited} rate-limited)` : ""),
           );
         }
-      } else {
-        holzenEdgeWarn("refresh-btc", "historical: no dates resolved via /history", {
-          missing: missingTargets.length,
-          rate_limited: rateLimited,
-          other_failures: other,
-        });
-        results.push(
-          `historical: 0/${missingTargets.length} matched` +
-            (rateLimited > 0 ? ` (${rateLimited} rate-limited)` : ""),
-        );
+      } catch (e) {
+        holzenEdgeError("refresh-btc", "historical warm failed", e);
+        results.push("historical: warm helper failed");
       }
     } else {
       results.push("historical: all cached within 24h");
