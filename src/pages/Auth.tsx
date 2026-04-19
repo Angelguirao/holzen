@@ -160,7 +160,7 @@ const Auth = () => {
 
         <div className="flex items-center gap-3">
           <Separator className="flex-1" />
-          <span className="text-xs text-muted-foreground font-mono">{t('auth.or')}</span>
+          <span className="text-muted-foreground text-base font-sans">{t('auth.or')}</span>
           <Separator className="flex-1" />
         </div>
 
