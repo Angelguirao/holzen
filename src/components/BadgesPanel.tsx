@@ -11,6 +11,7 @@ interface Reflection {
   id: string;
   created_at: string;
   mood: string | null;
+  mood_after?: string | null;
   outcome: string | null;
   is_favorite: boolean;
   note: string | null;
@@ -81,7 +82,12 @@ export function BadgesPanel({ reflections, subscribed, notifyBadges = true }: Ba
   const { t } = useTranslation();
 
   const badges = useMemo(() => {
-    const total = reflections.length;
+    // Volume = engaged pauses only (breathing + mood + mood_after + outcome).
+    // Generated-but-ignored reflections don't count toward badges.
+    const engaged = reflections.filter(
+      (r) => r.breathing_completed && r.mood && r.mood_after && r.outcome
+    );
+    const total = engaged.length;
     const calmCount = reflections.filter((r) => r.mood === 'calm').length;
     const heldCount = reflections.filter((r) => r.outcome === 'held' || r.outcome === 'nothing').length;
     const favCount = reflections.filter((r) => r.is_favorite).length;
