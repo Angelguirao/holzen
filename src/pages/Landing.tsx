@@ -112,7 +112,7 @@ const Landing = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className="text-xs font-mono tracking-[0.25em] uppercase text-foreground/80">Holzen</h1>
+          <h1 className="text-base font-mono tracking-[0.25em] uppercase" style={{ color: '#DBB366' }}>Holzen</h1>
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate('/auth')}
