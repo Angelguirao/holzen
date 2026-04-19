@@ -214,7 +214,7 @@ export function BadgesPanel({ reflections, subscribed, notifyBadges = true }: Ba
         </div>
         {nextBadge && (
           <div className="flex items-center gap-2 text-[10px] font-mono text-muted-foreground/60">
-            <nextBadge.icon className="h-3 w-3" style={{ color: nextBadge.color }} />
+            <nextBadge.icon className="h-3 w-3 text-secondary-foreground" style={{ color: nextBadge.color }} />
             <span className="text-sm font-sans">
               {t('badges.next')}: <span className="text-foreground/70">{t(nextBadge.labelKey)}</span> — {nextBadge.current}/{nextBadge.requirement} {t(nextBadge.unitKey)}
             </span>
