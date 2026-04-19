@@ -262,10 +262,10 @@ const Landing = () => {
                     </div>
                     <div className="flex items-baseline gap-2">
                       <span className="text-[10px] font-mono text-muted-foreground/40">{step}</span>
-                      <p className="text-xs font-medium text-foreground">{key}</p>
+                      <p className="font-medium text-foreground text-base font-sans">{key}</p>
                     </div>
                   </div>
-                  <p className="text-[11px] text-muted-foreground leading-relaxed pl-[38px]">
+                  <p className="leading-relaxed pl-[38px] text-sm font-sans text-secondary-foreground">
                     {t(`landing.scienceStep${key}`)}
                   </p>
                   <div className="flex flex-wrap gap-x-3 gap-y-1 pl-[38px]">
@@ -275,7 +275,7 @@ const Landing = () => {
                         href={s.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 text-[9px] font-mono text-primary/60 hover:text-primary transition-colors"
+                        className="inline-flex items-center gap-1 text-primary/60 hover:text-primary transition-colors text-sm font-sans"
                       >
                         <ExternalLink className="h-2.5 w-2.5 shrink-0" />
                         {s.label}
@@ -305,8 +305,8 @@ const Landing = () => {
                   transition={{ duration: 0.35, delay: i * 0.04 }}
                 >
                   <div className="text-muted-foreground/60 [&>svg]:h-3.5 [&>svg]:w-3.5">{f.icon}</div>
-                  <p className="text-xs font-medium text-foreground">{f.label}</p>
-                  <p className="text-[10px] text-muted-foreground leading-relaxed">{f.desc}</p>
+                  <p className="font-medium text-foreground text-base font-sans">{f.label}</p>
+                  <p className="text-muted-foreground leading-relaxed text-sm font-sans">{f.desc}</p>
                 </motion.div>
               ))}
             </div>
@@ -319,8 +319,8 @@ const Landing = () => {
         <Section>
           <div className="rounded-xl border border-border bg-card p-6 sm:p-8 space-y-6 text-center">
             <div className="space-y-2">
-              <p className="text-xl font-mono text-foreground">{t('landing.freeToStart')}</p>
-              <p className="text-xs text-muted-foreground leading-relaxed max-w-sm mx-auto">
+              <p className="text-xl font-sans text-[#dbb266]">{t('landing.freeToStart')}</p>
+              <p className="leading-relaxed max-w-sm mx-auto text-sm font-sans text-secondary-foreground">
                 {t('landing.pricingDesc')}
               </p>
             </div>
