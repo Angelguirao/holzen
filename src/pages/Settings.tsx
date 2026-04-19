@@ -721,6 +721,9 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
               )}
             </div>
 
+            {/* Install Holzen — persistent re-entry point */}
+            <InstallHolzenCard alwaysShow compact />
+
             {/* Badge notifications — free */}
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.badgeNotifications')}</p>
