@@ -57,9 +57,19 @@ Holzen’s `observe.ts` uses the same order of magnitude: `sonar-pro` → `[3, 1
 
 ### 2.2 Lovable AI (Gemini via gateway)
 
-[Lovable AI — Usage and pricing](https://docs.lovable.dev/integrations/ai) states usage-based AI is billed like the **underlying provider**; [Cloud & AI balance](https://docs.lovable.dev/integrations/cloud#usage-based-cloud-and-ai-pricing) is where workspace AI spend accrues.
+[Lovable AI — Usage and pricing](https://docs.lovable.dev/integrations/ai) confirms gateway billing is parity with the underlying provider ("exactly the same as going directly to the LLM provider"). [Cloud & AI balance](https://docs.lovable.dev/integrations/cloud#usage-based-cloud-and-ai-pricing) is where workspace AI spend accrues.
 
-Holzen maps Gemini-style models in `observe.ts`, e.g. `google/gemini-2.5-flash` → **$0.15 / 1M input**, **$0.60 / 1M output** (defaults; override with `COST_MAP_OVERRIDE` if your contract differs).
+Holzen maps Gemini-style models in `observe.ts` at **current GA rates** (re-verified 2026-04-19):
+
+| Model | Input $/1M | Output $/1M |
+|---|---:|---:|
+| `google/gemini-2.5-flash` | $0.30 | $2.50 |
+| `google/gemini-3-flash-preview` | $0.50 | $3.00 |
+| `google/gemini-2.5-flash-lite` | $0.10 | $0.40 |
+
+Override with `COST_MAP_OVERRIDE` env var if your negotiated rate differs.
+For the image model and fuller scenario analysis across all AI-powered
+features, see [`docs/systems/costs/ai-cost-model.md`](../costs/ai-cost-model.md).
 
 ---
 
@@ -71,13 +81,13 @@ Holzen maps Gemini-style models in `observe.ts`, e.g. `google/gemini-2.5-flash` 
 \text{USD} \approx \frac{\text{prompt\_tokens}}{10^6}\times 3 + \frac{\text{completion\_tokens}}{10^6}\times 15 + 0.006
 \]
 
-**Gemini via Lovable (one successful completion, using observe defaults for 2.5 Flash):**
+**Gemini via Lovable (one successful completion, using observe defaults for 2.5 Flash at current GA rates):**
 
 \[
-\text{USD} \approx \frac{\text{prompt\_tokens}}{10^6}\times 0.15 + \frac{\text{completion\_tokens}}{10^6}\times 0.60
+\text{USD} \approx \frac{\text{prompt\_tokens}}{10^6}\times 0.30 + \frac{\text{completion\_tokens}}{10^6}\times 2.50
 \]
 
-Use **$0.15 / $0.60** for `google/gemini-3-flash-preview` in code defaults as well; provider list pricing may drift—treat as **approximate**.
+For `google/gemini-3-flash-preview` use **$0.50 / $3.00** per 1M tokens; for `google/gemini-2.5-flash-lite` use **$0.10 / $0.40**. Provider list pricing may drift—treat as **approximate** and reconcile with the provider dashboards.
 
 ---
 
@@ -98,22 +108,22 @@ Exact tokens vary with language, context length, and search results. Round numbe
 
 ### 5.1 Reflection only (user or cron generates message/haiku)
 
-Using **Gemini 3 Flash preview** defaults (~3k in, 500 out):
+Using **Gemini 3 Flash preview** defaults (~3k in, 500 out) at current GA rates:
 
-- Token part: \(3000\times 0.15 + 500\times 0.60\) / 1e6 ≈ **$0.00075** (plus a second attempt if the first fails).
+- Token part: \(3000\times 0.50 + 500\times 3.00\) / 1e6 ≈ **$0.0030** (plus a second attempt if the first fails).
 
-**Order of magnitude: well under one cent** per successful reflection, unless prompts grow much larger or models change.
+**Order of magnitude: still a fraction of a cent** per successful reflection, unless prompts grow much larger or models change.
 
-### 5.2 Per companion (each live path, “happy path” 1× Perplexity + 1× Gemini success)
+### 5.2 Per companion (each live path, "happy path" 1× Perplexity + 1× Gemini success)
 
 Example midpoint: **1,200** in / **3,000** out on Sonar Pro, **8,000** in / **600** out on Gemini 2.5 Flash:
 
 - **Perplexity:** \(1200\times 3 + 3000\times 15\) / 1e6 + 0.006 ≈ **$0.0546**
-- **Gemini structuring:** \(8000\times 0.15 + 600\times 0.60\) / 1e6 ≈ **$0.00156**
+- **Gemini structuring (2.5 Flash GA):** \(8000\times 0.30 + 600\times 2.50\) / 1e6 ≈ **$0.0039**
 
-So **~$0.055–0.06 API** per companion that uses Perplexity + structuring, **before** retries.
+So **~$0.057–0.060 API** per companion that uses Perplexity + structuring, **before** retries.
 
-**Zoom Out (live):** only the Gemini deep-time call → typically **$0.001–0.004** with the assumptions above.
+**Zoom Out (live):** only the Gemini deep-time call → typically **$0.002–0.006** at current GA rates.
 
 ### 5.3 Full pause: reflection + all four companions enabled (all live)
 
@@ -121,16 +131,16 @@ Rough **sum** (happy path, 1 Perplexity call each for Signal, Grounding, History
 
 | Piece | Approx. API USD |
 |-------|-----------------|
-| Reflection | ~0.001 |
-| Signal | ~0.056 |
-| Grounding | ~0.056 |
-| History | ~0.056 |
-| Zoom Out | ~0.003 |
-| **Total** | **~$0.17–0.22** |
+| Reflection | ~0.003 |
+| Signal | ~0.058 |
+| Grounding | ~0.058 |
+| History | ~0.058 |
+| Zoom Out | ~0.004 |
+| **Total** | **~$0.18–0.24** |
 
-If **Signal** hits **3** Perplexity requests (retries) and **Grounding** hits **2**, add roughly **2× ~$0.055** extra → total moves toward **~$0.28–0.38**. If search context is **medium/high**, add **$0.004–0.008** per extra Perplexity request vs low.
+If **Signal** hits **3** Perplexity requests (retries) and **Grounding** hits **2**, add roughly **2× ~$0.055** extra → total moves toward **~$0.29–0.39**. If search context is **medium/high**, add **$0.004–0.008** per extra Perplexity request vs low.
 
-**Question mode** adds roughly **$0.0005–0.002** per session (still small vs Sonar Pro).
+**Question mode** adds roughly **$0.001–0.004** per session (still small vs Sonar Pro).
 
 ---
 
@@ -150,11 +160,11 @@ With **1%** daily and **3%** cumulative, users enter the eligible pool **often**
 
 **Worst-case automatic (illustrative):**
 
-- 4 full sessions/day × **~$0.20** API ≈ **~$0.80/day** ≈ **~$24/month** API per user **if** every automatic run is all-live and all companions stay on.
+- 4 full sessions/day × **~$0.21** API ≈ **~$0.85/day** ≈ **~$25/month** API per user **if** every automatic run is all-live and all companions stay on.
 
 **Worst-case manual (illustrative, rate-limit bound):**
 
-- **30** sessions/hour × 16 waking hours is not realistic; if you assume **30** full live sessions in a rolling hour (the orchestrator limit), API cost ≈ 30 × **$0.20** ≈ **$6/hour** for that hour—again **before** cache, fallbacks, or user actually hitting the limit every hour.
+- **30** sessions/hour × 16 waking hours is not realistic; if you assume **30** full live sessions in a rolling hour (the orchestrator limit), API cost ≈ 30 × **~$0.21** ≈ **~$6.30/hour** for that hour—again **before** cache, fallbacks, or user actually hitting the limit every hour.
 
 Use these as **stress bounds**, not typical behavior.
 
@@ -174,6 +184,13 @@ The **15-minute** cadence in ops docs is the **volatility cron** schedule and al
 
 ## 8. Changelog
 
+- **2026-04-19 (later that day):** Gemini pricing drift correction.
+  `gemini-2.5-flash` GA pricing is now **$0.30 / $2.50** per 1M (was
+  $0.15 / $0.60), `gemini-3-flash-preview` is **$0.50 / $3.00**, and
+  `gemini-2.5-flash-lite` is **$0.10 / $0.40**. Scenario totals updated:
+  full-live pause now ~$0.18–0.24 (was ~$0.17–0.22); worst-case automatic
+  per-user ~$25/month (was ~$24); orchestrator rate-limit burst cost
+  ~$6.30/hour (was ~$6). Perplexity and the image model unchanged.
 - **2026-04-19:** Demoted to pause-specific case study. Runtime guardrails
   (DB-backed ceilings, panic mode, feature flags, signup gate) and the
   cross-feature cost picture now live in
