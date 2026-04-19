@@ -66,8 +66,8 @@ export function FeedbackForm() {
               }`}
             >
               <Icon className="h-3.5 w-3.5 mb-1" />
-              <p className="font-normal text-base font-sans text-secondary-foreground">{t(c.labelKey)}</p>
-              <p className="text-muted-foreground mt-0.5 text-sm">{t(c.descKey)}</p>
+              <p className="font-medium text-base font-sans text-secondary-foreground">{t(c.labelKey)}</p>
+              <p className="mt-0.5 text-sm font-sans text-muted-foreground">{t(c.descKey)}</p>
             </button>
           );
         })}
