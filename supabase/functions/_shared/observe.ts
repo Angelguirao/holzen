@@ -13,6 +13,9 @@ const DEFAULT_COST_MAP: Record<string, [number, number]> = {
   "google/gemini-2.5-flash": [0.15, 0.6],
   "google/gemini-3-flash-preview": [0.15, 0.6],
   "google/gemini-2.5-flash-lite": [0.075, 0.3],
+  // Gemini image model bills output tokens at a premium (~1290 output tokens
+  // per image → ~$0.039 / image). Input stays at text-prompt rates.
+  "google/gemini-2.5-flash-image": [0.3, 30],
 };
 
 /** USD per Chat Completions API request (Perplexity bills separately from tokens). */

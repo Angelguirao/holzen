@@ -1,0 +1,390 @@
+/**
+ * Admin Cost tab.
+ *
+ * Surfaces that aren't in the Monitor tab:
+ *   - Per-feature spend breakdown (not just by companion_type) over a time window.
+ *   - Top-N users by cost in the last 7 days (abuse surface).
+ *   - 7-day projected monthly spend extrapolated from the current burn rate.
+ *   - Attempt-logging coverage: which AI features have landed rows in the last
+ *     7 days. Missing features flag that something shipped without logging —
+ *     means the budget-ceiling check below reads as "always safe" for that
+ *     path even when it isn't.
+ *
+ * All queries hit `generation_attempts` directly (admin RLS allows SELECT).
+ * Cached per mount; refresh button re-runs.
+ */
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  AlertCircle,
+  DollarSign,
+  Loader2,
+  RefreshCw,
+  TrendingUp,
+  Users,
+} from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { PERIOD_OPTIONS, TAB_TRIGGER_CLASS, label } from '@/components/admin/admin-constants';
+import type { TimePeriod } from '@/hooks/use-admin-stats';
+
+/** All AI features we expect to see logging in `generation_attempts`. */
+const EXPECTED_FEATURES = [
+  'reflection',
+  'signal',
+  'grounding',
+  'history',
+  'zoom_out',
+  'intervention',
+  'journal_prompt',
+  'suggest_grounding',
+  'suggest_ritual',
+  'wallpaper',
+  'night_reflection',
+  'reflection_insights',
+  'digest',
+  'reports',
+  'admin_library_preview',
+  'pregenerate',
+  'fetch_source_feeds',
+] as const;
+
+interface AttemptRow {
+  companion_type: string | null;
+  user_id: string | null;
+  estimated_cost_usd: number | null;
+  created_at: string;
+}
+
+interface FeatureStat {
+  feature: string;
+  attempts: number;
+  costUsd: number;
+  avgCostUsd: number;
+}
+
+interface UserStat {
+  userId: string;
+  costUsd: number;
+  attempts: number;
+  topFeature: string;
+}
+
+function periodStart(period: TimePeriod): Date {
+  const now = new Date();
+  switch (period) {
+    case 'today': {
+      const d = new Date(now);
+      d.setUTCHours(0, 0, 0, 0);
+      return d;
+    }
+    case '7d':
+      return new Date(now.getTime() - 7 * 86_400_000);
+    case '30d':
+      return new Date(now.getTime() - 30 * 86_400_000);
+    case 'all':
+    default:
+      return new Date(0);
+  }
+}
+
+async function fetchAttempts(period: TimePeriod): Promise<AttemptRow[]> {
+  const sinceIso = periodStart(period).toISOString();
+  // Defensive upper bound — if something has blown up and written hundreds of
+  // thousands of rows, we'd rather show a slice than hang the tab.
+  const { data, error } = await supabase
+    .from('generation_attempts')
+    .select('companion_type, user_id, estimated_cost_usd, created_at')
+    .gte('created_at', sinceIso)
+    .not('estimated_cost_usd', 'is', null)
+    .limit(50_000);
+  if (error || !data) return [];
+  return data as AttemptRow[];
+}
+
+function summarizeByFeature(rows: AttemptRow[]): FeatureStat[] {
+  const acc = new Map<string, { attempts: number; cost: number }>();
+  for (const r of rows) {
+    const key = r.companion_type ?? 'unknown';
+    const prev = acc.get(key) ?? { attempts: 0, cost: 0 };
+    prev.attempts += 1;
+    prev.cost += Number(r.estimated_cost_usd ?? 0);
+    acc.set(key, prev);
+  }
+  return Array.from(acc.entries())
+    .map(([feature, v]) => ({
+      feature,
+      attempts: v.attempts,
+      costUsd: v.cost,
+      avgCostUsd: v.attempts > 0 ? v.cost / v.attempts : 0,
+    }))
+    .sort((a, b) => b.costUsd - a.costUsd);
+}
+
+function summarizeByUser(rows: AttemptRow[], topN = 20): UserStat[] {
+  const acc = new Map<string, { cost: number; attempts: number; features: Map<string, number> }>();
+  for (const r of rows) {
+    if (!r.user_id) continue;
+    const prev = acc.get(r.user_id) ?? { cost: 0, attempts: 0, features: new Map<string, number>() };
+    prev.cost += Number(r.estimated_cost_usd ?? 0);
+    prev.attempts += 1;
+    const f = r.companion_type ?? 'unknown';
+    prev.features.set(f, (prev.features.get(f) ?? 0) + 1);
+    acc.set(r.user_id, prev);
+  }
+  return Array.from(acc.entries())
+    .map(([userId, v]) => {
+      let top = 'unknown';
+      let topCount = 0;
+      for (const [feat, count] of v.features.entries()) {
+        if (count > topCount) { top = feat; topCount = count; }
+      }
+      return { userId, costUsd: v.cost, attempts: v.attempts, topFeature: top };
+    })
+    .sort((a, b) => b.costUsd - a.costUsd)
+    .slice(0, topN);
+}
+
+function loggedFeatures(rows: AttemptRow[]): Set<string> {
+  const s = new Set<string>();
+  for (const r of rows) if (r.companion_type) s.add(r.companion_type);
+  return s;
+}
+
+export function CostAnalytics() {
+  const [period, setPeriod] = useState<TimePeriod>('7d');
+  const [rows7d, setRows7d] = useState<AttemptRow[]>([]);
+  const [rowsPeriod, setRowsPeriod] = useState<AttemptRow[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const refresh = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [periodData, sevenDayData] = await Promise.all([
+        fetchAttempts(period),
+        period === '7d' ? Promise.resolve<AttemptRow[] | null>(null) : fetchAttempts('7d'),
+      ]);
+      setRowsPeriod(periodData);
+      setRows7d(sevenDayData ?? periodData);
+    } finally {
+      setLoading(false);
+    }
+  }, [period]);
+
+  useEffect(() => { void refresh(); }, [refresh]);
+
+  const features = useMemo(() => summarizeByFeature(rowsPeriod), [rowsPeriod]);
+  const topUsers = useMemo(() => summarizeByUser(rows7d), [rows7d]);
+  const totalCost = useMemo(
+    () => features.reduce((s, f) => s + f.costUsd, 0),
+    [features],
+  );
+
+  const totalCost7d = useMemo(
+    () => rows7d.reduce((s, r) => s + Number(r.estimated_cost_usd ?? 0), 0),
+    [rows7d],
+  );
+  const projectedMonthly = useMemo(() => (totalCost7d / 7) * 30, [totalCost7d]);
+
+  const logged = useMemo(() => loggedFeatures(rows7d), [rows7d]);
+  const missingCoverage = useMemo(
+    () => EXPECTED_FEATURES.filter((f) => !logged.has(f)),
+    [logged],
+  );
+
+  return (
+    <div className="space-y-6 animate-in fade-in">
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <h3 className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/70">
+          Cost analytics
+        </h3>
+        <button
+          onClick={() => void refresh()}
+          className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground/50 hover:text-primary"
+        >
+          <RefreshCw className="h-3 w-3" />
+          Refresh
+        </button>
+      </div>
+
+      {/* Period + projected monthly */}
+      <div className="space-y-2">
+        <div className="flex items-center gap-1.5">
+          {PERIOD_OPTIONS.map((opt) => (
+            <button
+              key={opt.value}
+              onClick={() => setPeriod(opt.value)}
+              className={`text-[9px] font-mono px-2 py-0.5 rounded-full transition-colors ${
+                period === opt.value
+                  ? 'bg-primary/15 text-primary'
+                  : 'text-muted-foreground/50 hover:text-muted-foreground/80 hover:bg-muted/20'
+              } ${TAB_TRIGGER_CLASS.includes('ring') ? '' : ''}`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <StatCard
+            icon={DollarSign}
+            title="Period cost"
+            value={`$${totalCost.toFixed(3)}`}
+            sub={loading ? '…' : `${features.reduce((s, f) => s + f.attempts, 0)} logged attempts`}
+          />
+          <StatCard
+            icon={TrendingUp}
+            title="Projected monthly"
+            value={`$${projectedMonthly.toFixed(2)}`}
+            sub={`at 7d burn of $${(totalCost7d / 7).toFixed(3)}/day`}
+          />
+        </div>
+      </div>
+
+      {/* Per-feature breakdown */}
+      <section className="space-y-2">
+        <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">
+          Spend by feature <span className="text-muted-foreground/40 normal-case">({period})</span>
+        </p>
+        {loading ? (
+          <div className="flex items-center gap-2 py-4">
+            <Loader2 className="h-3 w-3 animate-spin text-muted-foreground/40" />
+            <span className="text-[10px] font-mono text-muted-foreground/50">loading…</span>
+          </div>
+        ) : features.length === 0 ? (
+          <p className="text-[10px] font-mono text-muted-foreground/50 py-3 text-center">
+            No cost data in this window.
+          </p>
+        ) : (
+          <div className="space-y-1.5">
+            {features.map((f) => {
+              const pct = totalCost > 0 ? (f.costUsd / totalCost) * 100 : 0;
+              return (
+                <div key={f.feature} className="rounded-lg border border-border/20 bg-card/10 px-3 py-2">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[10px] font-mono text-foreground/80">{label(f.feature)}</span>
+                    <span className="text-[10px] font-mono text-muted-foreground/60">
+                      ${f.costUsd.toFixed(4)} · {pct.toFixed(0)}%
+                    </span>
+                  </div>
+                  <div className="h-1 bg-muted/40 rounded-full overflow-hidden">
+                    <div
+                      className="h-full rounded-full bg-primary/50"
+                      style={{ width: `${Math.min(pct, 100)}%` }}
+                    />
+                  </div>
+                  <div className="flex gap-3 mt-1">
+                    <span className="text-[9px] text-muted-foreground/50">{f.attempts} calls</span>
+                    <span className="text-[9px] text-muted-foreground/50">
+                      avg ${f.avgCostUsd.toFixed(5)}
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </section>
+
+      {/* Top users */}
+      <section className="space-y-2">
+        <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">
+          Top users by cost <span className="text-muted-foreground/40 normal-case">(7d)</span>
+        </p>
+        <p className="text-[9px] font-mono text-muted-foreground/45 leading-relaxed">
+          Abuse surface. Normal Pro users should sit well under the per-user daily cap. A single
+          row near or past the cap is the usual early signal that a bot, script, or shared account
+          is burning credits.
+        </p>
+        {loading ? (
+          <Loader2 className="h-3 w-3 animate-spin text-muted-foreground/40" />
+        ) : topUsers.length === 0 ? (
+          <p className="text-[10px] font-mono text-muted-foreground/50 py-3 text-center">
+            No user-attributed cost in last 7 days.
+          </p>
+        ) : (
+          <div className="space-y-1">
+            {topUsers.map((u) => (
+              <div
+                key={u.userId}
+                className="flex items-center gap-3 rounded-lg border border-border/15 bg-card/5 px-3 py-1.5"
+              >
+                <Users className="h-3 w-3 text-muted-foreground/40 flex-shrink-0" />
+                <code className="text-[9px] font-mono text-muted-foreground/70 flex-shrink-0">
+                  {u.userId.slice(0, 8)}…
+                </code>
+                <span className="flex-1 text-[9px] font-mono text-muted-foreground/50">
+                  {u.attempts} calls · top: {u.topFeature}
+                </span>
+                <span className="text-[10px] font-mono text-foreground/70 flex-shrink-0">
+                  ${u.costUsd.toFixed(4)}
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </section>
+
+      {/* Logging coverage */}
+      <section className="space-y-2">
+        <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">
+          Attempt-logging coverage <span className="text-muted-foreground/40 normal-case">(7d)</span>
+        </p>
+        <p className="text-[9px] font-mono text-muted-foreground/45 leading-relaxed">
+          Features expected to write to <code className="text-muted-foreground/55">generation_attempts</code>.
+          A missing row below means either the feature hasn&apos;t been used in 7 days, or it ships
+          without logging (per-user daily caps can&apos;t enforce on untracked spend — investigate).
+        </p>
+        <div className="flex flex-wrap gap-1.5">
+          {EXPECTED_FEATURES.map((f) => {
+            const ok = logged.has(f);
+            return (
+              <span
+                key={f}
+                className={`text-[9px] font-mono px-1.5 py-0.5 rounded ${
+                  ok ? 'bg-primary/15 text-primary' : 'bg-muted/30 text-muted-foreground/50'
+                }`}
+              >
+                {ok ? '✓' : '·'} {f}
+              </span>
+            );
+          })}
+        </div>
+        {missingCoverage.length > 0 && (
+          <div className="flex items-start gap-2 rounded-lg border border-muted/30 bg-muted/10 px-3 py-2">
+            <AlertCircle className="h-3 w-3 text-muted-foreground/50 flex-shrink-0 mt-0.5" />
+            <p className="text-[9px] font-mono text-muted-foreground/60 leading-relaxed">
+              No rows in 7d for: <span className="text-foreground/70">{missingCoverage.join(', ')}</span>.
+              If you expect these to have run, double-check the corresponding edge function is
+              calling <code className="text-muted-foreground/70">createAttemptLogger</code> around
+              its AI fetch.
+            </p>
+          </div>
+        )}
+      </section>
+    </div>
+  );
+}
+
+function StatCard({
+  icon: Icon,
+  title,
+  value,
+  sub,
+}: {
+  icon: typeof DollarSign;
+  title: string;
+  value: string;
+  sub: string;
+}) {
+  return (
+    <div className="rounded-lg border border-border/20 bg-card/10 px-3 py-2.5">
+      <div className="flex items-center gap-2 mb-1">
+        <Icon className="h-3 w-3 text-muted-foreground/40" />
+        <span className="text-[9px] font-mono uppercase tracking-wider text-muted-foreground/60">
+          {title}
+        </span>
+      </div>
+      <p className="text-[12px] font-mono text-foreground/80">{value}</p>
+      <p className="text-[9px] font-mono text-muted-foreground/50">{sub}</p>
+    </div>
+  );
+}

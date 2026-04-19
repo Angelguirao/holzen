@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { createAttemptLogger } from "../_shared/observe.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -43,6 +44,8 @@ serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+    const logAttempt = createAttemptLogger(svcClient, { userId: user.id });
+    const WALLPAPER_MODEL = "google/gemini-2.5-flash-image";
 
     const { message, mood, context } = await req.json();
     if (!message) throw new Error("Missing reflection message");
@@ -70,6 +73,7 @@ serve(async (req) => {
 
     const prompt = `Create a beautiful, artistic phone wallpaper (portrait orientation) inspired by this personal reflection about financial composure: "${message.substring(0, 200)}". ${contextHint}Visual style: ${moodStyle}. The image should be abstract and atmospheric — no text, no words, no letters, no numbers. Think fine art photography or abstract painting. Moody, cinematic lighting. Suitable as a phone lock screen wallpaper. High quality, visually striking.`;
 
+    const t0 = Date.now();
     const response = await fetch(
       "https://ai.gateway.lovable.dev/v1/chat/completions",
       {
@@ -79,7 +83,7 @@ serve(async (req) => {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-2.5-flash-image",
+          model: WALLPAPER_MODEL,
           messages: [{ role: "user", content: prompt }],
           modalities: ["image", "text"],
         }),
@@ -87,6 +91,14 @@ serve(async (req) => {
     );
 
     if (!response.ok) {
+      logAttempt({
+        companion_type: "wallpaper",
+        provider: "lovable",
+        model: WALLPAPER_MODEL,
+        status: "error",
+        latency_ms: Date.now() - t0,
+        error_message: `HTTP ${response.status}`,
+      });
       if (response.status === 429) {
         return new Response(
           JSON.stringify({ error: "Rate limited. Please try again in a moment." }),
@@ -105,6 +117,19 @@ serve(async (req) => {
     }
 
     const data = await response.json();
+    // Wallpaper image models don't report standard prompt/completion tokens;
+    // we log a fixed notional cost via input_tokens=1 so the row at least
+    // lands in the per-feature totals. Calibrate with COST_MAP_OVERRIDE if
+    // provider moves to a flat per-image rate you want tracked precisely.
+    logAttempt({
+      companion_type: "wallpaper",
+      provider: "lovable",
+      model: WALLPAPER_MODEL,
+      status: "success",
+      latency_ms: Date.now() - t0,
+      input_tokens: data?.usage?.prompt_tokens,
+      output_tokens: data?.usage?.completion_tokens,
+    });
     const imageUrl = data.choices?.[0]?.message?.images?.[0]?.image_url?.url;
 
     if (!imageUrl) {

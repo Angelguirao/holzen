@@ -1,7 +1,10 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
+import { createAttemptLogger } from "../_shared/observe.ts";
 import { coingeckoHeaders } from "../_shared/coingecko.ts";
+
+const REPORT_MODEL = "google/gemini-2.5-flash-lite";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -167,6 +170,8 @@ serve(async (req) => {
       // AI monthly insight
       let aiInsight = "";
       if (LOVABLE_API_KEY && reflectionCount > 0) {
+        const logAttempt = createAttemptLogger(supabase, { userId: profile.user_id });
+        const t0 = Date.now();
         try {
           const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
           const langCode = (profile as any).language || "en";
@@ -188,20 +193,46 @@ Be observational, calm. No advice, no exclamation marks.${langInstruction}`;
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              model: "google/gemini-2.5-flash-lite",
+              model: REPORT_MODEL,
               messages: [{ role: "user", content: prompt }],
             }),
           });
 
           if (aiRes.ok) {
             const aiData = await aiRes.json();
+            logAttempt({
+              companion_type: "reports",
+              provider: "lovable",
+              model: REPORT_MODEL,
+              status: "success",
+              latency_ms: Date.now() - t0,
+              input_tokens: aiData?.usage?.prompt_tokens,
+              output_tokens: aiData?.usage?.completion_tokens,
+            });
             const content = aiData.choices?.[0]?.message?.content?.trim();
             if (content) {
               aiInsight = `<p style="font-size: 13px; color: #2a2a2a; line-height: 1.6; font-style: italic; border-left: 2px solid #d4d0c8; padding-left: 12px; margin: 16px 0;">${content}</p>`;
             }
+          } else {
+            logAttempt({
+              companion_type: "reports",
+              provider: "lovable",
+              model: REPORT_MODEL,
+              status: "error",
+              latency_ms: Date.now() - t0,
+              error_message: `HTTP ${aiRes.status}`,
+            });
           }
         } catch (e) {
           holzenEdgeError("monthly-report", "AI insight failed", e);
+          logAttempt({
+            companion_type: "reports",
+            provider: "lovable",
+            model: REPORT_MODEL,
+            status: "error",
+            latency_ms: Date.now() - t0,
+            error_message: e instanceof Error ? e.message : String(e),
+          });
         }
       }
 

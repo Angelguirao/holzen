@@ -1,7 +1,10 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
+import { createAttemptLogger } from "../_shared/observe.ts";
 import { coingeckoHeaders } from "../_shared/coingecko.ts";
+
+const DIGEST_MODEL = "google/gemini-2.5-flash-lite";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -92,10 +95,12 @@ async function generateAIInsight(
   weekDir: string,
   absWeekChange: string,
   LOVABLE_API_KEY: string,
-  language?: string
+  language: string | undefined,
+  logAttempt: (params: Parameters<ReturnType<typeof createAttemptLogger>>[0]) => void
 ): Promise<string | null> {
   if (reflectionCount === 0) return null;
 
+  const t0 = Date.now();
   try {
     const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
     const langCode = language || "en";
@@ -120,20 +125,45 @@ Be observational, not prescriptive. No advice, no exclamation marks. Calm and gr
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
+        model: DIGEST_MODEL,
         messages: [{ role: "user", content: prompt }],
       }),
     });
 
     if (!response.ok) {
       holzenEdgeError("weekly-digest", `AI insight HTTP ${response.status}`);
+      logAttempt({
+        companion_type: "digest",
+        provider: "lovable",
+        model: DIGEST_MODEL,
+        status: "error",
+        latency_ms: Date.now() - t0,
+        error_message: `HTTP ${response.status}`,
+      });
       return null;
     }
 
     const data = await response.json();
+    logAttempt({
+      companion_type: "digest",
+      provider: "lovable",
+      model: DIGEST_MODEL,
+      status: "success",
+      latency_ms: Date.now() - t0,
+      input_tokens: data?.usage?.prompt_tokens,
+      output_tokens: data?.usage?.completion_tokens,
+    });
     return data.choices?.[0]?.message?.content?.trim() || null;
   } catch (e) {
     holzenEdgeError("weekly-digest", "AI insight failed", e);
+    logAttempt({
+      companion_type: "digest",
+      provider: "lovable",
+      model: DIGEST_MODEL,
+      status: "error",
+      latency_ms: Date.now() - t0,
+      error_message: e instanceof Error ? e.message : String(e),
+    });
     return null;
   }
 }
@@ -228,8 +258,10 @@ serve(async (req) => {
       // Generate AI insight
       let aiInsight: string | null = null;
       if (LOVABLE_API_KEY && reflectionCount > 0) {
+        const logAttempt = createAttemptLogger(supabase, { userId: profile.user_id });
         aiInsight = await generateAIInsight(
-          reflectionCount, topMood, steadyCount, weekDir, absWeekChange, LOVABLE_API_KEY, (profile as any).language
+          reflectionCount, topMood, steadyCount, weekDir, absWeekChange, LOVABLE_API_KEY, (profile as any).language,
+          logAttempt,
         );
       }
 

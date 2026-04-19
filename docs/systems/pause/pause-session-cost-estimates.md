@@ -1,5 +1,11 @@
 # Pause session API cost estimates
 
+> **Canonical source:** [`docs/systems/costs/ai-cost-model.md`](../costs/ai-cost-model.md).
+> That doc covers **all** AI-powered features + the guardrail architecture
+> + runbooks + auto top-up recommendations. This file is now a narrow
+> **case study** for the pause flow specifically; use it for pause-path
+> deep-dives but defer to the cost-model doc for anything cross-cutting.
+
 This document estimates **third-party API spend** for a Holzen pause session when content is **live-generated** (no companion cache hits, no curated fallbacks). It ties numbers to [Perplexity Sonar API pricing](https://docs.perplexity.ai/docs/getting-started/pricing) and [Lovable AI / Cloud usage billing](https://docs.lovable.dev/integrations/ai), and to how the repo actually calls those services.
 
 **Not included here:** Lovable **workspace subscription**, **Cloud hosting** (database compute, egress, instance size), **Supabase** plan fees, **Stripe**, email (Resend), push (VAPID), or CoinGecko usage inside `check-volatility`. Those are real costs but are billed on different dashboards. Lovable documents Cloud vs AI balance separately in [Usage-based Cloud and AI pricing](https://docs.lovable.dev/integrations/cloud#usage-based-cloud-and-ai-pricing).
@@ -168,4 +174,8 @@ The **15-minute** cadence in ops docs is the **volatility cron** schedule and al
 
 ## 8. Changelog
 
+- **2026-04-19:** Demoted to pause-specific case study. Runtime guardrails
+  (DB-backed ceilings, panic mode, feature flags, signup gate) and the
+  cross-feature cost picture now live in
+  [`docs/systems/costs/ai-cost-model.md`](../costs/ai-cost-model.md).
 - **2026-04-01:** Initial version (estimates + code pointers; pricing cites Perplexity + Lovable docs as of that date).

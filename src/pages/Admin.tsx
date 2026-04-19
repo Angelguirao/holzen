@@ -18,6 +18,7 @@ import { SourceCatalogViewer } from '@/components/admin/SourceCatalogViewer';
 import { SourceSuggestionsPanel } from '@/components/admin/SourceSuggestionsPanel';
 import { ContentLibraryViewer } from '@/components/admin/ContentLibraryViewer';
 import { AppConfigTools } from '@/components/admin/AppConfigTools';
+import { CostAnalytics } from '@/components/admin/CostAnalytics';
 import { adminDeleteRowsByIds } from '@/lib/admin-delete';
 
 /**
@@ -392,6 +393,7 @@ export default function Admin() {
       <Tabs defaultValue="monitor" className="space-y-4">
         <TabsList className="inline-flex h-auto flex-wrap items-center gap-1 rounded-lg bg-muted/30 p-1">
           <TabsTrigger value="monitor" className={TAB_TRIGGER_CLASS}>Monitor</TabsTrigger>
+          <TabsTrigger value="cost" className={TAB_TRIGGER_CLASS}>Cost</TabsTrigger>
           <TabsTrigger value="activity" className={TAB_TRIGGER_CLASS}>Activity</TabsTrigger>
           <TabsTrigger value="sources" className={TAB_TRIGGER_CLASS}>Sources</TabsTrigger>
           <TabsTrigger value="library" className={TAB_TRIGGER_CLASS}>Library{libraryEntries.length > 0 ? ` (${libraryEntries.length})` : ''}</TabsTrigger>
@@ -881,6 +883,10 @@ export default function Admin() {
 
         <TabsContent value="fallbacks" className="mt-0">
           <HardcodedFallbacksManager />
+        </TabsContent>
+
+        <TabsContent value="cost" className="mt-0">
+          <CostAnalytics />
         </TabsContent>
 
         <TabsContent value="tools" className="mt-0">

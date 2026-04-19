@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { normalizeSourceUrl } from "../_shared/feed-ingest.ts";
+import { createAttemptLogger } from "../_shared/observe.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -103,6 +104,8 @@ serve(async (req) => {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+    const logAttempt = createAttemptLogger(svcClient, { userId: userData.user.id });
+    const LIB_MODEL = "google/gemini-2.5-flash-lite";
 
     const body = (await req.json()) as PreviewBody;
     const raw = typeof body.url === "string" ? body.url : "";
@@ -149,11 +152,12 @@ serve(async (req) => {
 
     const excerpt = markdown.length > 14_000 ? `${markdown.slice(0, 10_000)}\n\n[...]\n\n${markdown.slice(-4000)}` : markdown;
 
+    const t0 = Date.now();
     const llmRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: { Authorization: `Bearer ${LOVABLE_API_KEY}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
+        model: LIB_MODEL,
         messages: [
           {
             role: "system",
@@ -168,6 +172,14 @@ serve(async (req) => {
     });
 
     if (!llmRes.ok) {
+      logAttempt({
+        companion_type: "admin_library_preview",
+        provider: "lovable",
+        model: LIB_MODEL,
+        status: "error",
+        latency_ms: Date.now() - t0,
+        error_message: `HTTP ${llmRes.status}`,
+      });
       const errText = await llmRes.text().catch(() => "");
       return new Response(
         JSON.stringify({
@@ -180,7 +192,17 @@ serve(async (req) => {
 
     const llmJson = await llmRes.json() as {
       choices?: Array<{ message?: { content?: string } }>;
+      usage?: { prompt_tokens?: number; completion_tokens?: number };
     };
+    logAttempt({
+      companion_type: "admin_library_preview",
+      provider: "lovable",
+      model: LIB_MODEL,
+      status: "success",
+      latency_ms: Date.now() - t0,
+      input_tokens: llmJson.usage?.prompt_tokens,
+      output_tokens: llmJson.usage?.completion_tokens,
+    });
     let rawJson = llmJson.choices?.[0]?.message?.content ?? "{}";
     rawJson = rawJson.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/i, "").trim();
     let title = "";
