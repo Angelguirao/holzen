@@ -59,7 +59,7 @@ function sanitizeProperties(properties: Properties): Properties {
 }
 
 let initialized = false;
-let posthogInstance: PostHog | null = null;
+let posthogInstance: any = null;
 
 export function initPostHog(): void {
   if (initialized) return;
