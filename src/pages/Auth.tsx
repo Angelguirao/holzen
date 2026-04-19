@@ -213,7 +213,7 @@ const Auth = () => {
         </form>
 
         {view === 'sign-up' && (
-          <p className="text-[10px] font-mono text-muted-foreground/60 text-center leading-relaxed">
+          <p className="text-center leading-relaxed text-sm font-sans text-muted-foreground">
             <Trans
               i18nKey="auth.agreeToTerms"
               components={{
@@ -224,7 +224,7 @@ const Auth = () => {
           </p>
         )}
 
-        <button onClick={() => { setView(view === 'sign-up' ? 'sign-in' : 'sign-up'); setError(null); }} className="text-xs font-mono text-muted-foreground underline w-full text-center">
+        <button onClick={() => { setView(view === 'sign-up' ? 'sign-in' : 'sign-up'); setError(null); }} className="text-muted-foreground underline w-full text-center text-base font-sans">
           {view === 'sign-up' ? t('auth.alreadyHaveAccount') : t('auth.createAnAccount')}
         </button>
       </div>
