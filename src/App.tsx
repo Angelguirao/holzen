@@ -26,7 +26,7 @@ const NotFound = lazy(() => import("./pages/NotFound"));
 const About = lazy(() => import("./pages/About"));
 const Blog = lazy(() => import("./pages/Blog"));
 const BlogPost = lazy(() => import("./pages/BlogPost"));
-const Roadmap = lazy(() => import("./pages/Roadmap"));
+// Roadmap page kept in repo; re-add lazy + route element when making it public again.
 const Breathe = lazy(() => import("./pages/Breathe"));
 const Ambient = lazy(() => import("./pages/Ambient"));
 const Reserve = lazy(() => import("./pages/Reserve"));
@@ -167,7 +167,7 @@ const App = () => (
                 <Route path="/about" element={<About />} />
                 <Route path="/blog" element={<Blog />} />
                 <Route path="/blog/:slug" element={<BlogPost />} />
-                <Route path="/roadmap" element={<Roadmap />} />
+                <Route path="/roadmap" element={<Navigate to="/welcome" replace />} />
                 <Route path="/reserve" element={<Reserve />} />
                 <Route path="/unsubscribe" element={<Unsubscribe />} />
                 <Route path="*" element={<NotFound />} />
