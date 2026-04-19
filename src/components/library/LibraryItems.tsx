@@ -326,7 +326,7 @@ export function LibraryItems({ library, filtered }: Props) {
                   <p className="uppercase tracking-wider px-3 pb-1 text-sm font-sans font-normal text-[#dbb266]">
                     📌 {t('common.pinned')}
                   </p>
-                  <div className="divide-y divide-border/20">
+                  <div className="space-y-4">
                     {pinnedItems.map((item, i) => (
                       <motion.div
                         key={item.id}
@@ -346,7 +346,7 @@ export function LibraryItems({ library, filtered }: Props) {
                   <p className="uppercase tracking-wider px-3 pb-1 text-sm font-sans font-normal text-[#dbb266] mt-0 pt-[16px]">
                     {group.label}
                   </p>
-                  <div className="divide-y divide-border/20">
+                  <div className="space-y-4">
                     {group.items.map((item, i) => (
                       <motion.div
                         key={item.id}
