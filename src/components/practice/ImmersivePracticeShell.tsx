@@ -6,13 +6,14 @@ import { useNavigate } from 'react-router-dom';
 interface Props {
   children: React.ReactNode;
   title?: string;
+  onClose?: () => void;
 }
 
 /**
  * Shared immersive full-screen shell for practice pages.
  * Provides dark-curtain entrance, ambient orbs, and close button — matching /pause and /breathe.
  */
-export function ImmersivePracticeShell({ children, title }: Props) {
+export function ImmersivePracticeShell({ children, title, onClose }: Props) {
   const navigate = useNavigate();
   const prefersReducedMotion = useReducedMotion();
   const [curtainLifted, setCurtainLifted] = useState(false);
@@ -22,7 +23,7 @@ export function ImmersivePracticeShell({ children, title }: Props) {
     return () => clearTimeout(timer);
   }, []);
 
-  const handleReturn = () => navigate('/', { replace: true });
+  const handleReturn = onClose ?? (() => navigate('/', { replace: true }));
 
   return (
     <>

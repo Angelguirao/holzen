@@ -135,7 +135,7 @@ export function ReflectionReplay({ onComplete, textColor, ringColor, initialRefl
         {!done ? (
           <motion.div key="replay" className="flex flex-col items-center gap-6 w-full" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
             {past && (
-              <div className="w-full rounded-md p-4 space-y-3" style={{ border: `1px solid ${ringColor}`, background: 'rgba(255,255,255,0.02)' }}>
+              <div className="w-full min-w-0 rounded-md p-4 space-y-3 overflow-hidden" style={{ border: `1px solid ${ringColor}`, background: 'rgba(255,255,255,0.02)' }}>
                 <div className="flex items-center justify-between">
                   <p className="text-[9px] font-mono uppercase tracking-wider" style={{ color: textColor, opacity: 0.4 }}>
                     {format(new Date(past.created_at), 'MMM d, yyyy')}
@@ -156,7 +156,7 @@ export function ReflectionReplay({ onComplete, textColor, ringColor, initialRefl
                   )}
                 </div>
                 {past.context && (
-                  <p className="text-[10px] font-mono" style={{ color: textColor, opacity: 0.35 }}>
+                  <p className="text-[10px] font-mono break-words [overflow-wrap:anywhere]" style={{ color: textColor, opacity: 0.35 }}>
                     {past.context}
                   </p>
                 )}
@@ -167,7 +167,7 @@ export function ReflectionReplay({ onComplete, textColor, ringColor, initialRefl
                     <p className="text-[9px] font-mono uppercase tracking-wider" style={{ color: textColor, opacity: 0.4 }}>
                       {t('practice.replayHolzenAsked')}
                     </p>
-                    <p className="text-sm leading-relaxed" style={{ color: textColor, opacity: 0.65 }}>
+                    <p className="text-sm leading-relaxed break-words [overflow-wrap:anywhere]" style={{ color: textColor, opacity: 0.65 }}>
                       {past.aiPrompt}
                     </p>
                   </div>
@@ -185,7 +185,7 @@ export function ReflectionReplay({ onComplete, textColor, ringColor, initialRefl
                         <p className="text-[9px] font-mono uppercase tracking-wider" style={{ color: textColor, opacity: 0.4 }}>
                           {kindLabel(w.kind)} · {format(new Date(w.created_at), 'MMM d, yyyy')}
                         </p>
-                        <p className="text-sm leading-relaxed" style={{ color: textColor, opacity: 0.75 }}>
+                        <p className="text-sm leading-relaxed break-words [overflow-wrap:anywhere]" style={{ color: textColor, opacity: 0.75 }}>
                           {w.body}
                         </p>
                       </div>
