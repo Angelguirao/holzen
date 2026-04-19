@@ -32,6 +32,7 @@ import {
 import { createAttemptLogger, trackEvent } from "../observe.ts";
 import { getPhaseConfig } from "../phase-config.ts";
 import { BTC_ON_THIS_DAY_YEARS_BACK, btcOnThisDayYearOffsets } from "../btc-on-this-day-config.ts";
+import { warmMissingBtcPrices } from "../btc-price-warm.ts";
 
 /** Bump when the deep-time prompt, seed pool, or quality rules change. */
 export const PROMPT_VERSION = "v4";
@@ -124,10 +125,39 @@ async function fetchHistoricalAndCurrentPrices(
 
   log(`prices from cache: current=${currentPrice ?? 'none'}, historical=${onThisDay.length}/${BTC_ON_THIS_DAY_YEARS_BACK}`);
 
+  // Background warm-on-read: if any anniversary dates were missing from the
+  // cache, kick off a non-blocking fill via `EdgeRuntime.waitUntil` so the next
+  // session has a full timeline. Current session still returns with whatever it
+  // has now — this costs the user nothing. The helper dedupes via a 15-min
+  // freshness check, so concurrent sessions with the same gap won't hammer
+  // CoinGecko. Only runs when the Supabase edge runtime exposes `waitUntil`.
+  const missingDateKeys = yearTargets
+    .filter((t) => !priceMap.has(t.dateKey))
+    .map((t) => t.dateKey);
+  const rt = (globalThis as any).EdgeRuntime;
+  if (missingDateKeys.length > 0 && rt && typeof rt.waitUntil === "function") {
+    try {
+      rt.waitUntil(
+        warmMissingBtcPrices(svcClient, missingDateKeys)
+          .then((warm) => {
+            log(
+              `btc warm-on-read: attempted=${warm.attempted} upserted=${warm.upserted} ` +
+                `rate_limited=${warm.rateLimited} other=${warm.other} skipped_recent=${warm.skippedRecent}`,
+            );
+          })
+          .catch((e) => {
+            log(`btc warm-on-read failed: ${e?.message ?? String(e)}`);
+          }),
+      );
+    } catch (e) {
+      log(`btc warm-on-read scheduling failed: ${(e as any)?.message ?? String(e)}`);
+    }
+  }
+
   return {
     onThisDay,
     currentPrice: typeof currentPrice === "number" ? Math.round(currentPrice) : null,
-    rateLimited: false, // No API calls = no rate limits
+    rateLimited: false, // No API calls on the blocking path = no rate limits
     isPartial: onThisDay.length < yearTargets.length,
   };
 }
