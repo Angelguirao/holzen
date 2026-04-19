@@ -65,7 +65,7 @@ export function FeedbackForm() {
                   : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
               }`}
             >
-              <Icon className="h-3.5 w-3.5 mb-1 text-secondary" />
+              <Icon className="h-3.5 w-3.5 mb-1 text-secondary-foreground" />
               <p className="font-normal text-base font-sans text-secondary-foreground">{t(c.labelKey)}</p>
               <p className="text-muted-foreground mt-0.5 text-sm">{t(c.descKey)}</p>
             </button>
