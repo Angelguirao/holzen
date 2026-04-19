@@ -200,7 +200,7 @@ export function BadgesPanel({ reflections, subscribed, notifyBadges = true }: Ba
               <span className="text-foreground font-medium">{earnedCount}</span> / {badges.length} {t('badges.earned')}
               {proLockedCount > 0 && (
                 <span className="ml-1 text-muted-foreground">
-                  · {proLockedCount} <Lock className="inline h-2.5 w-2.5 -mt-0.5" />
+                  · {proLockedCount} <Lock className="inline h-2.5 w-2.5 -mt-0.5 text-[#dbb266]" />
                 </span>
               )}
             </p>
