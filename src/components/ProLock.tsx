@@ -65,10 +65,11 @@ export function ProLock({ children, inline, feature, hideContent }: Props) {
         <button
           onClick={() => startCheckout()}
           disabled={checkoutLoading}
-          className="flex items-center gap-1.5 mt-1 text-xs font-mono text-primary hover:text-primary/80 transition-all group"
+          className="group inline-flex items-center gap-1.5 text-sm font-medium underline-offset-4 transition-colors hover:underline disabled:opacity-50"
+          style={{ color: '#24B2C8' }}
         >
-          <span>{t('pro.upgradeCta')}</span>
-          <ArrowRight className="h-3 w-3 transition-transform group-hover:translate-x-0.5" />
+          {t('pro.upgradeCta')}
+          <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
         </button>
       </div>
     </div>
