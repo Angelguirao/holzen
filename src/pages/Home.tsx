@@ -378,7 +378,7 @@ const Home = () => {
         };
 
     return (
-      <div className="min-h-[60vh] flex flex-col justify-center">
+      <div className="min-h-[60vh] flex flex-col justify-center text-sm font-sans">
         <AnimatePresence mode="wait">
           {message ? (
             <motion.div key="zen-reflection" variants={zenVariants} initial="hidden" animate="visible" exit="hidden">
