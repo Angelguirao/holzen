@@ -77,7 +77,7 @@ export function BtcChart({ hidden = false, currency = 'USD' }: Props) {
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between text-sm font-sans text-secondary-foreground">
-        <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">
+        <p className="uppercase tracking-wider text-sm font-sans text-secondary-foreground">
           7-day
         </p>
         <div className="flex items-center gap-1 text-muted-foreground">
