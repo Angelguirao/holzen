@@ -100,7 +100,7 @@ export function StreakTimeline({ reflections, practiceEntries = [], streakFreeze
   return (
     <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3">
       <div className="flex items-center justify-between">
-        <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
+        <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
           {t('streakTimeline.title')}
         </p>
         {nextMilestone && currentStreak > 0 && (
