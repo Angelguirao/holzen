@@ -633,7 +633,7 @@ function MicroStat({ value, suffix, label, context, isText }: {
           <span className="font-sans text-sm" style={{ color: '#C1CBD7' }}>{context}</span>
         )}
       </div>
-      <p className="tracking-widest lowercase text-sm font-sans" style={{ color: '#C1CBD7' }}>{label}</p>
+      <p className="lowercase text-sm font-sans" style={{ color: '#C1CBD7' }}>{label}</p>
     </div>
   );
 }
