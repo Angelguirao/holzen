@@ -66,7 +66,7 @@ function GroundingTagInput({ activities, onChange }: { activities: string[]; onC
   return (
     <div className="space-y-3">
       <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.groundingTitle')}</p>
-      <p className="text-xs leading-relaxed text-primary">
+      <p className="leading-relaxed text-primary text-sm">
         {t('settings.groundingDesc')}
       </p>
       <div className="flex flex-wrap gap-1.5 min-h-[2rem]">
@@ -295,7 +295,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
           <AccordionContent className="space-y-5 pb-4">
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.firstName')}</p>
-              <p className="text-xs leading-relaxed text-primary">
+              <p className="leading-relaxed text-primary text-sm">
                 {t('settings.firstNameDesc')}
               </p>
               <Input
@@ -313,7 +313,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             {/* My Why — Motivations */}
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.myWhy')}</p>
-              <p className="text-xs leading-relaxed text-primary">
+              <p className="leading-relaxed text-primary text-sm">
                 {t('settings.myWhyDesc')}
               </p>
               <div className="grid grid-cols-2 gap-2">
@@ -345,7 +345,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             {/* Mantra */}
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.personalMantra')}</p>
-              <p className="text-xs leading-relaxed text-primary">
+              <p className="leading-relaxed text-primary text-sm">
                 {t('settings.mantraDesc')}
               </p>
               <textarea
@@ -502,7 +502,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             {/* 1 BTC = 1 BTC mode */}
             <div className="space-y-3">
               <p className="text-xs font-mono text-white uppercase tracking-wider">{t('settings.btcMode')}</p>
-              <p className="text-xs leading-relaxed text-primary">
+              <p className="leading-relaxed text-primary text-sm">
                 {t('settings.btcModeDesc')}
               </p>
               <div className="flex items-center justify-between">
@@ -523,7 +523,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             {/* Currency */}
             <div className={`space-y-3 transition-opacity ${btcMode ? 'opacity-30 pointer-events-none' : ''}`}>
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.displayCurrency')}</p>
-              <p className="text-xs leading-relaxed text-primary">
+              <p className="leading-relaxed text-primary text-sm">
                 {t('settings.displayCurrencyDesc')}
               </p>
               <div className="grid grid-cols-2 gap-2">
@@ -556,7 +556,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             {/* Zen Mode */}
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.zenMode')}</p>
-              <p className="text-xs leading-relaxed text-primary">
+              <p className="leading-relaxed text-primary text-sm">
                 {t('settings.zenModeDesc')}
               </p>
               <div className="flex items-center justify-between">
@@ -577,7 +577,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             {/* Silent Mode */}
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.silentMode')}</p>
-              <p className="text-xs leading-relaxed text-primary">
+              <p className="leading-relaxed text-primary text-sm">
                 {t('settings.silentModeDesc')}
               </p>
               <div className="flex items-center justify-between">
@@ -591,7 +591,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             {/* Notification Sound */}
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.notificationSound', 'Notification sound')}</p>
-              <p className="text-xs leading-relaxed text-primary">
+              <p className="leading-relaxed text-primary text-sm">
                 {t('settings.notificationSoundDesc', 'Play a singing-bowl chime when a new reflection arrives.')}
               </p>
               <div className="flex items-center justify-between">
@@ -605,7 +605,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             {/* Haptic Feedback */}
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.hapticFeedback')}</p>
-              <p className="text-xs leading-relaxed text-primary">
+              <p className="leading-relaxed text-primary text-sm">
                 {t('settings.hapticDesc')}
               </p>
               <div className="flex items-center justify-between">
@@ -728,7 +728,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             {/* Badge notifications — free */}
             <div className="space-y-3">
               <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.badgeNotifications')}</p>
-              <p className="text-xs leading-relaxed text-primary">
+              <p className="leading-relaxed text-primary text-sm">
                 {t('settings.badgeNotifDesc')}
               </p>
               <div className="flex items-center justify-between">
@@ -885,16 +885,16 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
               ) : (
                 <div className="space-y-2">
                   {monthlyRemaining !== undefined && monthlyRemaining > 0 && (
-                    <p className="text-xs font-mono text-muted-foreground">
+                    <p className="text-sm font-sans text-primary">
                       {t('home.subscription.freeRemaining', { count: monthlyRemaining })}
                     </p>
                   )}
                   {monthlyRemaining !== undefined && monthlyRemaining <= 0 && (
-                    <p className="text-xs font-mono text-muted-foreground">
+                    <p className="text-sm font-sans text-primary">
                       {t('home.subscription.monthlyLimitReached')}
                     </p>
                   )}
-                  <p className="text-xs font-mono text-muted-foreground">
+                  <p className="text-sm font-sans text-primary">
                     {t('settings.pricePerMonth')}
                   </p>
                   <LoadingButton
@@ -920,7 +920,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             {t('settings.account')}
           </AccordionTrigger>
           <AccordionContent className="space-y-6 pb-4">
-              <p className="text-xs truncate font-sans text-primary">{user.email}</p>
+              <p className="truncate font-sans text-primary text-sm">{user.email}</p>
 
             <ChangeEmailSection />
 
@@ -1134,7 +1134,7 @@ function ChangeEmailSection() {
       >
         {changing ? t('settings.sendingConfirmation') : t('settings.changeEmail')}
       </Button>
-      <p className="text-[10px] leading-relaxed text-[#7b8a9d]">
+      <p className="leading-relaxed text-[#7b8a9d] text-sm">
         {t('settings.emailConfirmNote')}
       </p>
     </div>
