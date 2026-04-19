@@ -21,9 +21,11 @@ const corsHeaders = {
  * cache during sessions (no CoinGecko at user time).
  *
  * **Freshness contract (product):** Historical rows for each anniversary date (1y..Ny ago) are
- * refetched when `fetched_at` is older than **24h** or missing. Dates are **UTC calendar**
- * (year/month/day). This is accurate enough for **daily Zoom Out metaphor**, not intraday
- * trading. After a missed cron, staleness is bounded by the next successful run + TTL.
+ * fetched **once and never refreshed** — a closing price for a past UTC date is immutable, so
+ * re-fetching it is a pure cost with no product benefit. Today's row refreshes every run via
+ * `/simple/price`. Dates are **UTC calendar** (year/month/day). This is accurate enough for
+ * **daily Zoom Out metaphor**, not intraday trading. After a missed cron, today's row is stale
+ * until the next successful run; historical rows are unaffected.
  *
  * **CoinGecko:** uses `/simple/price` for the current day and `/coins/bitcoin/history`
  * once per missing anniversary date for history. The per-date `/history` endpoint
@@ -136,15 +138,23 @@ serve(async (req) => {
       return { yearsAgo: y, dateKey: d.toISOString().slice(0, 10), ts: Math.floor(d.getTime() / 1000) };
     });
 
-    // Check which dates we already have cached (skip if recently fetched)
-    const dateKeys = yearTargets.map(t => t.dateKey);
-    const { data: cached } = await supabase.from("btc_price_cache").select("date, fetched_at").in("date", dateKeys);
-    const recentThreshold = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString(); // 24h
-    const recentlyFetched = new Set(
-      (cached ?? []).filter((r: any) => r.fetched_at > recentThreshold).map((r: any) => r.date),
-    );
-
-    const missingTargets = yearTargets.filter(t => !recentlyFetched.has(t.dateKey));
+    // Skip anniversary dates that already have a row in the cache. Historical
+    // BTC prices for past UTC calendar dates are **immutable** — once we've
+    // successfully cached the closing price for 2018-04-19, that value never
+    // changes, so there's no reason to re-fetch it. The old 24h-TTL behaviour
+    // burned CoinGecko quota on every 15-min run trying to refresh rows that
+    // wouldn't change, and since mid-2024 demo tier returns 401 for
+    // /coins/bitcoin/history on dates >365d back (see
+    // docs/ops/cron-setup.md) the refetches were guaranteed to fail anyway.
+    // Today's row refreshes via the /simple/price call above, which is the
+    // right place for intraday updates — this list only covers 1y..Ny ago.
+    const dateKeys = yearTargets.map((t) => t.dateKey);
+    const { data: cached } = await supabase
+      .from("btc_price_cache")
+      .select("date")
+      .in("date", dateKeys);
+    const alreadyCached = new Set((cached ?? []).map((r: any) => r.date));
+    const missingTargets = yearTargets.filter((t) => !alreadyCached.has(t.dateKey));
 
     if (missingTargets.length > 0) {
       try {

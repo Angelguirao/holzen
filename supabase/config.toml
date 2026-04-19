@@ -49,6 +49,8 @@ project_id = "edgbwdecaoottowliimu"
     verify_jwt = false
   [functions.backfill-btc-prices]
     verify_jwt = false
+  [functions.seed-btc-history]
+    verify_jwt = false
   [functions.suggest-grounding]
     verify_jwt = false
   [functions.suggest-ritual]
