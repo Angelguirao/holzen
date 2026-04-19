@@ -514,7 +514,7 @@ const Home = () => {
                     onClick={startCheckout}
                     loading={checkoutLoading}
                     loadingText={t('home.subscription.openingCheckout')}
-                    className="w-full text-sm font-medium"
+                    className="w-full text-sm font-medium mt-4"
                   >
                     {t('pro.upgradeCta')}
                   </LoadingButton>
