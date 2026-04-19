@@ -268,7 +268,7 @@ export default function Library() {
 
             {/* Source type chips */}
             {availableSources.length > 1 && (
-              <div className="tabs-scroll flex items-center gap-1.5 overflow-x-auto pb-0.5 -mx-1 px-1">
+              <div className="tabs-scroll gap-1.5 overflow-x-auto pb-0.5 -mx-1 px-1 flex items-center justify-start mt-[24px]">
                 {availableSources.map(({ key, icon: Icon, label }) => (
                   <button
                     key={key}
