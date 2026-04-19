@@ -98,7 +98,9 @@ serve(async (req) => {
     // Feature flag + global budget guard. On block, we still send the email
     // summary but drop the AI paragraph.
     const { guardAiFeature } = await import("../_shared/ratelimit.ts");
-    const reportsAiGuard = await guardAiFeature(supabase, "reports");
+    const reportsAiGuard = await guardAiFeature(supabase, "reports", {
+      providers: ["lovable"],
+    });
     if (!reportsAiGuard.allowed) {
       holzenEdgeLog("monthly-report", "ai summary skipped", { reason: reportsAiGuard.reason });
       LOVABLE_API_KEY = undefined;

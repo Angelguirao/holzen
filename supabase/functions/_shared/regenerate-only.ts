@@ -4,6 +4,7 @@
 
 import { checkCostCeilings, checkCompanionRegenerateLimit } from "./ratelimit.ts";
 import { loadAppConfig, PANIC_MODE_FEATURES } from "./app-config.ts";
+import { getProviderHealth } from "./circuit-breaker.ts";
 import { writeCompanionData } from "./companion-data.ts";
 import { generateSignal } from "./generators/signal.ts";
 import { generateGrounding } from "./generators/grounding.ts";
@@ -73,6 +74,25 @@ export async function handleRegenerateOnly(params: {
       status: 429,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
+  }
+
+  // Circuit breaker: regenerate is an explicit user action, so we surface a
+  // clear 503 rather than silently serving cache. The UI can show a
+  // "provider having issues, try again shortly" message.
+  const providerHealth = await getProviderHealth(svcClient);
+  const slotNeedsPerplexity = slot === "signal" || slot === "grounding" || slot === "history";
+  const breakerBlocked =
+    (slotNeedsPerplexity && providerHealth.perplexity.state === "degraded") ||
+    providerHealth.lovable.state === "degraded";
+  if (breakerBlocked) {
+    const tripped = providerHealth.lovable.state === "degraded" ? "lovable" : "perplexity";
+    return new Response(
+      JSON.stringify({
+        error: `Provider '${tripped}' is temporarily degraded. Please try again in a few minutes.`,
+        tripped: `breaker_${tripped}`,
+      }),
+      { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
   }
 
   const { data: reflection, error: refErr } = await svcClient

@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { checkRateLimit, checkCostCeilings } from "../_shared/ratelimit.ts";
 import { loadAppConfig, PANIC_MODE_FEATURES } from "../_shared/app-config.ts";
+import { getProviderHealth } from "../_shared/circuit-breaker.ts";
 import { handleRegenerateOnly } from "../_shared/regenerate-only.ts";
 import { createLogger, trackEvent } from "../_shared/observe.ts";
 import { generateQuestion } from "../_shared/generators/question.ts";
@@ -354,6 +355,24 @@ serve(async (req) => {
           })
         : Promise.resolve<string | null>(null);
 
+    // Circuit breakers: if either provider's recent error rate is elevated,
+    // signal/grounding/history skip the Perplexity-dependent live phase;
+    // Lovable degraded affects all four (structuring + zoom-out).
+    // Cache + library + curated fallback still serve in both cases.
+    const providerHealth = await getProviderHealth(svcClient);
+    const skipLivePerplexity = providerHealth.perplexity.state === "degraded";
+    const skipLiveLovable = providerHealth.lovable.state === "degraded";
+    if (skipLivePerplexity || skipLiveLovable) {
+      log(
+        `circuit breaker: perplexity=${providerHealth.perplexity.state} ` +
+          `(${(providerHealth.perplexity.errorRate * 100).toFixed(0)}% err over ` +
+          `${providerHealth.perplexity.sample} calls), ` +
+          `lovable=${providerHealth.lovable.state} ` +
+          `(${(providerHealth.lovable.errorRate * 100).toFixed(0)}% err over ` +
+          `${providerHealth.lovable.sample} calls)`,
+      );
+    }
+
     const tasks = buildOrchestrateCompanionTasks({
       svcClient,
       log,
@@ -377,6 +396,8 @@ serve(async (req) => {
       recentGroundingSourcesValue,
       recentHistoryTitlesValue,
       recentZoomOutTitlesValue,
+      skipLivePerplexity,
+      skipLiveLovable,
     });
 
     const keys = Object.keys(tasks);

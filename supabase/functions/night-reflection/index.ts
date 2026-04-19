@@ -252,7 +252,9 @@ serve(async (req) => {
     // Feature flag + global budget guard. If disabled / over budget, we still
     // deliver a fallback message (FALLBACKS above) without the AI call.
     const { guardAiFeature } = await import("../_shared/ratelimit.ts");
-    const nightGuard = await guardAiFeature(supabase, "night_reflection");
+    const nightGuard = await guardAiFeature(supabase, "night_reflection", {
+      providers: ["lovable"],
+    });
     if (!nightGuard.allowed) {
       holzenEdgeLog("night-reflection", "ai skipped", { reason: nightGuard.reason });
       LOVABLE_API_KEY = undefined;

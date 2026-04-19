@@ -4,6 +4,7 @@ import { createAuthenticatedClient, createServiceClient } from "../_shared/auth.
 import { createAttemptLogger, createObsTracker, createLogger } from "../_shared/observe.ts";
 import { checkCostCeilings } from "../_shared/ratelimit.ts";
 import { loadAppConfig } from "../_shared/app-config.ts";
+import { degradedProviders } from "../_shared/circuit-breaker.ts";
 import {
   companionFallbacksDisabled,
   COMPANION_FALLBACKS_DISABLED_MESSAGE,
@@ -57,6 +58,19 @@ serve(async (req) => {
       log(`reflection budget tripped (${budget.tripped}): ${budget.reason}`);
       if (companionFallbacksDisabled()) {
         return errorResponse(budget.reason ?? "Budget exceeded", 503);
+      }
+      const pool = await loadFallbackPool<{ message: string; haiku: string }>(svcClient, "reflection");
+      return jsonResponse(pickRandom(pool));
+    }
+
+    // Circuit breaker: if Lovable is degraded, skip the live call and serve the
+    // curated pool. Reflection only uses Lovable, so this is a simple one-gate
+    // check. Saves the API call that would probably fail anyway.
+    const degraded = await degradedProviders(svcClient, ["lovable"]);
+    if (degraded.length > 0) {
+      log("reflection: lovable degraded, serving curated pool");
+      if (companionFallbacksDisabled()) {
+        return errorResponse("Provider degraded", 503);
       }
       const pool = await loadFallbackPool<{ message: string; haiku: string }>(svcClient, "reflection");
       return jsonResponse(pickRandom(pool));

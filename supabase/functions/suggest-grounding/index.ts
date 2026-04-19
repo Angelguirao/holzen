@@ -87,7 +87,10 @@ serve(async (req) => {
       try { await svcClient.from("analytics_events").insert({ user_id: user.id, event: "suggest_grounding_ai_call" }); } catch (_) { /* non-fatal */ }
 
       const { guardAiFeature } = await import("../_shared/ratelimit.ts");
-      const guard = await guardAiFeature(svcClient, "suggest_grounding", { userId: user.id });
+      const guard = await guardAiFeature(svcClient, "suggest_grounding", {
+        userId: user.id,
+        providers: ["perplexity", "lovable"],
+      });
       if (!guard.allowed) {
         return new Response(JSON.stringify({ error: guard.reason ?? "Temporarily unavailable" }), {
           status: guard.status ?? 503,

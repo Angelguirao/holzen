@@ -97,7 +97,10 @@ serve(async (req) => {
       auth: { persistSession: false },
     });
     const { guardAiFeature } = await import("../_shared/ratelimit.ts");
-    const libGuard = await guardAiFeature(svcClient, "admin_library_preview", { userId: userData.user.id });
+    const libGuard = await guardAiFeature(svcClient, "admin_library_preview", {
+      userId: userData.user.id,
+      providers: ["lovable"],
+    });
     if (!libGuard.allowed) {
       return new Response(JSON.stringify({ error: libGuard.reason ?? "Paused" }), {
         status: libGuard.status ?? 503,

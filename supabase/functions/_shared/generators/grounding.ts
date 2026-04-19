@@ -74,6 +74,8 @@ export interface GenerateGroundingParams {
   preferredBias?: string;
   /** Skip library/cache phases and go straight to live (used by regenerate). */
   forceLive?: boolean;
+  /** Skip the live phase only — library/cache still serve. Used by circuit breaker. */
+  skipLive?: boolean;
   log: (msg: string, extra?: Record<string, unknown>) => void;
 }
 
@@ -210,10 +212,12 @@ export async function generateGrounding(params: GenerateGroundingParams): Promis
     reflectionId,
     preferredBias,
     forceLive,
+    skipLive,
     log,
   } = params;
   const marketDirectionForCache = parseMarketDirection(context);
   const phases = getPhaseConfig();
+  const liveEnabled = phases.live && !skipLive;
 
   if (!forceLive) {
   // ── Phase 1: Library (disabled for grounding — see GROUNDING_LIBRARY_ENABLED) ──
@@ -236,12 +240,16 @@ export async function generateGrounding(params: GenerateGroundingParams): Promis
   } // end !forceLive
 
   // ── Phase 3: Live generation ──
-  if (!phases.live && !forceLive) {
-    log("live phase disabled, serving curated");
+  if (!liveEnabled && !forceLive) {
+    log(skipLive ? "grounding: live phase skipped (breaker), serving curated" : "live phase disabled, serving curated");
     if (companionFallbacksDisabled()) {
       return { data: null, source: "empty", cacheId: null, error: COMPANION_FALLBACKS_DISABLED_MESSAGE };
     }
     return serveCurated(svcClient);
+  }
+  if (skipLive && forceLive) {
+    log("grounding: breaker tripped and forceLive requested — returning blocked");
+    return { data: null, source: "empty", cacheId: null, error: "circuit_breaker" };
   }
 
   const logAttempt = createAttemptLogger(svcClient, { userId });

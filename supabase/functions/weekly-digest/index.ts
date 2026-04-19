@@ -198,7 +198,9 @@ serve(async (req) => {
     // Feature flag + global budget guard. If the `digest` feature is off or
     // budget is exhausted, we still send the email but skip the AI insight.
     const { guardAiFeature } = await import("../_shared/ratelimit.ts");
-    const digestAiGuard = await guardAiFeature(supabase, "digest");
+    const digestAiGuard = await guardAiFeature(supabase, "digest", {
+      providers: ["lovable"],
+    });
     if (!digestAiGuard.allowed) {
       holzenEdgeLog("weekly-digest", "ai insight skipped", { reason: digestAiGuard.reason });
       LOVABLE_API_KEY = undefined;
