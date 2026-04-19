@@ -12,13 +12,19 @@ export default function PracticeReplay() {
   const navigate = useNavigate();
   const location = useLocation();
   const { t } = useTranslation();
-  const reflectionId = (location.state as { reflectionId?: string } | undefined)?.reflectionId;
+  const state = location.state as { reflectionId?: string; returnTo?: string } | undefined;
+  const reflectionId = state?.reflectionId;
+  const returnTo = state?.returnTo;
+
+  const handleClose = returnTo
+    ? () => navigate(returnTo, { replace: true })
+    : undefined;
 
   return (
-    <ImmersivePracticeShell title={t('practice.replayLabel')}>
+    <ImmersivePracticeShell title={t('practice.replayLabel')} onClose={handleClose}>
       <ReflectionReplay
         initialReflectionId={reflectionId}
-        onComplete={() => navigate('/', { replace: true })}
+        onComplete={() => navigate(returnTo ?? '/', { replace: true })}
         {...COLORS}
       />
     </ImmersivePracticeShell>
