@@ -65,7 +65,7 @@ function GroundingTagInput({ activities, onChange }: { activities: string[]; onC
 
   return (
     <div className="space-y-3">
-      <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.groundingTitle')}</p>
+      <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.groundingTitle')}</p>
       <p className="leading-relaxed text-primary text-sm">
         {t('settings.groundingDesc')}
       </p>
@@ -294,7 +294,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
           </AccordionTrigger>
           <AccordionContent className="space-y-5 pb-4">
             <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.firstName')}</p>
+              <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.firstName')}</p>
               <p className="leading-relaxed text-primary text-sm">
                 {t('settings.firstNameDesc')}
               </p>
@@ -312,7 +312,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
 
             {/* My Why — Motivations */}
             <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.myWhy')}</p>
+              <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.myWhy')}</p>
               <p className="leading-relaxed text-primary text-sm">
                 {t('settings.myWhyDesc')}
               </p>
@@ -334,8 +334,8 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                           : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
                       }`}
                     >
-                      <p className="text-xs font-mono font-medium">{t(`settings.motivations.${value}`)}</p>
-                      <p className="text-[10px] text-muted-foreground mt-0.5">{t(`settings.motivations.${value}Desc`)}</p>
+                      <p className="font-medium text-sm font-sans text-secondary-foreground">{t(`settings.motivations.${value}`)}</p>
+                      <p className="text-muted-foreground mt-0.5 text-sm font-sans font-normal">{t(`settings.motivations.${value}Desc`)}</p>
                     </button>
                   );
                 })}
@@ -344,7 +344,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
 
             {/* Mantra */}
             <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.personalMantra')}</p>
+              <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.personalMantra')}</p>
               <p className="leading-relaxed text-primary text-sm">
                 {t('settings.mantraDesc')}
               </p>
@@ -390,7 +390,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
 
             {/* Cooldown */}
             <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.cooldown')}</p>
+              <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.cooldown')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
                 {t('settings.cooldownDesc')}
               </p>
@@ -414,7 +414,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             {/* Tone — Pro */}
             <ProLock feature="tone">
             <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.tone')}</p>
+              <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.tone')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
                 {t('settings.toneDesc')}
               </p>
@@ -440,7 +440,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             {/* Style — Pro */}
             <ProLock feature="style">
             <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.style')}</p>
+              <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.style')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
                 {t('settings.styleDesc')}
               </p>
@@ -472,7 +472,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             {/* Custom Prompt — Pro */}
             <ProLock feature="custom_prompt">
             <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.customPrompt')}</p>
+              <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.customPrompt')}</p>
               <p className="text-xs text-muted-foreground leading-relaxed">
                 {t('settings.customPromptDesc')}
               </p>
@@ -522,7 +522,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
 
             {/* Currency */}
             <div className={`space-y-3 transition-opacity ${btcMode ? 'opacity-30 pointer-events-none' : ''}`}>
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.displayCurrency')}</p>
+              <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.displayCurrency')}</p>
               <p className="leading-relaxed text-primary text-sm">
                 {t('settings.displayCurrencyDesc')}
               </p>
@@ -555,7 +555,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
 
             {/* Zen Mode */}
             <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.zenMode')}</p>
+              <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.zenMode')}</p>
               <p className="leading-relaxed text-primary text-sm">
                 {t('settings.zenModeDesc')}
               </p>
@@ -576,7 +576,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
 
             {/* Silent Mode */}
             <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.silentMode')}</p>
+              <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.silentMode')}</p>
               <p className="leading-relaxed text-primary text-sm">
                 {t('settings.silentModeDesc')}
               </p>
@@ -590,7 +590,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
 
             {/* Notification Sound */}
             <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.notificationSound', 'Notification sound')}</p>
+              <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.notificationSound', 'Notification sound')}</p>
               <p className="leading-relaxed text-primary text-sm">
                 {t('settings.notificationSoundDesc', 'Play a singing-bowl chime when a new reflection arrives.')}
               </p>
@@ -604,7 +604,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
 
             {/* Haptic Feedback */}
             <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.hapticFeedback')}</p>
+              <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.hapticFeedback')}</p>
               <p className="leading-relaxed text-primary text-sm">
                 {t('settings.hapticDesc')}
               </p>
@@ -648,7 +648,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
               <SourceManagement />
 
               <div className="space-y-3">
-                <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.aiInsights')}</p>
+                <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.aiInsights')}</p>
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   {t('settings.aiInsightsDesc')}
                 </p>
@@ -727,7 +727,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
 
             {/* Badge notifications — free */}
             <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.badgeNotifications')}</p>
+              <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.badgeNotifications')}</p>
               <p className="leading-relaxed text-primary text-sm">
                 {t('settings.badgeNotifDesc')}
               </p>
@@ -744,7 +744,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
             <div className="space-y-6">
               {/* Digest */}
               <div className="space-y-3">
-                <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.digestFrequency')}</p>
+                <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.digestFrequency')}</p>
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   {t('settings.digestDesc')}
                 </p>
@@ -782,7 +782,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
 
               {/* Night Reflection */}
               <div className="space-y-3">
-                <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.nightReflection')}</p>
+                <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.nightReflection')}</p>
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   {t('settings.nightReflectionDesc')}
                 </p>
@@ -798,7 +798,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                 </div>
                 {nightReflectionHour !== null && (
                   <div className="space-y-1.5">
-                    <p className="text-[10px] font-mono text-muted-foreground/60">{t('settings.deliveryTime')}</p>
+                    <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.deliveryTime')}</p>
                     <select
                       value={nightReflectionHour}
                       onChange={(e) => setNightReflectionHour(Number(e.target.value))}
@@ -814,7 +814,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
 
               {/* Quiet Hours */}
               <div className="space-y-3">
-                <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.quietHours')}</p>
+                <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.quietHours')}</p>
                 <p className="text-xs text-muted-foreground leading-relaxed">
                   {t('settings.quietHoursDesc')}
                 </p>
@@ -831,7 +831,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                 {quietHoursStart !== null && quietHoursEnd !== null && (
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-1.5">
-                      <p className="text-[10px] font-mono text-muted-foreground/60">{t('common.from')}</p>
+                      <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('common.from')}</p>
                       <select
                         value={quietHoursStart}
                         onChange={(e) => setQuietHours(Number(e.target.value), quietHoursEnd)}
@@ -843,7 +843,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                       </select>
                     </div>
                     <div className="space-y-1.5">
-                      <p className="text-[10px] font-mono text-muted-foreground/60">{t('common.until')}</p>
+                      <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('common.until')}</p>
                       <select
                         value={quietHoursEnd}
                         onChange={(e) => setQuietHours(quietHoursStart, Number(e.target.value))}
@@ -872,7 +872,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
           </AccordionTrigger>
           <AccordionContent className="space-y-6 pb-4">
             <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.plan')}</p>
+              <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.plan')}</p>
               {subLoading ? (
                 <p className="text-xs font-mono text-muted-foreground">{t('common.loading')}</p>
               ) : subscribed ? (
@@ -926,7 +926,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
 
             {/* Password */}
             <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.passwordLabel')}</p>
+              <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.passwordLabel')}</p>
               <Input
                 id="settings-new-password"
                 name="new-password"
@@ -965,7 +965,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
 
             {/* Data export */}
             <div className="space-y-3">
-              <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.data')}</p>
+              <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.data')}</p>
               <div className="flex gap-4">
                 <LoadingButton
                   variant="link"
@@ -1111,7 +1111,7 @@ function ChangeEmailSection() {
 
   return (
     <div className="space-y-3">
-      <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">{t('settings.emailLabel')}</p>
+      <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">{t('settings.emailLabel')}</p>
       <Input
         id="settings-new-email"
         name="email"
