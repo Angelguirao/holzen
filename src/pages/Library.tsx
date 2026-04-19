@@ -53,6 +53,12 @@ export default function Library() {
     threshold: 70,
   });
 
+  const loadMoreRef = useInfiniteScroll({
+    hasMore: library.hasMore,
+    loading: library.loadingMore,
+    onLoadMore: library.loadMore,
+  });
+
   const { items, collections } = library;
 
   // Available source types from actual data
