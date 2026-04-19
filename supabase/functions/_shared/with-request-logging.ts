@@ -1,0 +1,119 @@
+// Shared request wrapper for edge functions.
+//
+// Cross-cutting concerns this owns (so individual functions don't reinvent them):
+//   - CORS preflight
+//   - Correlation id (reads `x-cid` header; generates one if missing)
+//   - Structured request/response logs via `createLogger` (→ stdout + BetterStack)
+//   - EdgeError → JSON response with the standardized envelope
+//   - Sentry capture for unexpected errors (skips `EdgeError.isExpected` codes)
+//   - One-time Sentry init per cold start
+//
+// Usage (see docs/ops/edge-logging-conventions.md):
+//
+//   import { withRequestLogging } from "../_shared/with-request-logging.ts";
+//
+//   Deno.serve(withRequestLogging("my-function", async ({ req, log, cid }) => {
+//     log("handled", { path: new URL(req.url).pathname });
+//     return jsonResponse({ ok: true });
+//   }));
+//
+// Handlers receive `{ req, log, cid }` and return a `Response`. Throwing `EdgeError` produces
+// a structured client response; any other throw becomes a 500 + Sentry capture.
+
+import { corsHeaders, handleCors } from "./cors.ts";
+import { createLogger } from "./observe.ts";
+import { edgeErrorToJson, EdgeError, isEdgeError } from "./edge-error.ts";
+import { captureEdgeError, initSentryEdges } from "./sentry.ts";
+
+export interface RequestLoggingContext {
+  req: Request;
+  /** Structured logger bound to this request (already carries cid + fn + release). */
+  log: ReturnType<typeof createLogger>;
+  /** Correlation id — same value as the `x-cid` request header (or a freshly generated UUID). */
+  cid: string;
+}
+
+export type EdgeHandler = (ctx: RequestLoggingContext) => Promise<Response> | Response;
+
+function readCid(req: Request): string {
+  const fromHeader = req.headers.get("x-cid") || req.headers.get("X-Cid");
+  if (fromHeader && fromHeader.length > 0 && fromHeader.length < 128) return fromHeader;
+  return crypto.randomUUID();
+}
+
+function decorateResponse(res: Response, cid: string): Response {
+  // Attach cid + ensure CORS headers are present on every response so handlers can return
+  // bare `new Response(...)` without repeating CORS plumbing.
+  const headers = new Headers(res.headers);
+  headers.set("x-cid", cid);
+  for (const [k, v] of Object.entries(corsHeaders)) {
+    if (!headers.has(k)) headers.set(k, v);
+  }
+  return new Response(res.body, { status: res.status, headers });
+}
+
+/**
+ * Wrap an edge handler with CORS, logging, Sentry, and EdgeError handling.
+ *
+ * @param fnName Function name — used as log prefix, Sentry tag, and BetterStack `service`.
+ * @param handler Business logic. Throw `EdgeError` for user-visible failures; throw anything
+ *                else and it becomes a 500 + Sentry capture.
+ */
+export function withRequestLogging(fnName: string, handler: EdgeHandler) {
+  // Init Sentry once per cold start — no-op when SENTRY_DSN_EDGES is unset.
+  initSentryEdges();
+
+  return async (req: Request): Promise<Response> => {
+    const cors = handleCors(req);
+    if (cors) return cors;
+
+    const cid = readCid(req);
+    const log = createLogger(fnName, cid);
+    const url = new URL(req.url);
+
+    log("request", {
+      method: req.method,
+      path: url.pathname,
+      // Query string is safe to log in principle, but some functions accept `?q=` free text.
+      // Keep it off by default — functions that need it can log inside the handler.
+    });
+
+    try {
+      const response = await handler({ req, log, cid });
+      log("response", { status: response.status });
+      return decorateResponse(response, cid);
+    } catch (err) {
+      if (isEdgeError(err)) {
+        const ee = err as EdgeError;
+        log.warn("edge_error", { code: ee.code, status: ee.status, message: ee.message });
+        // `captureEdgeError` already short-circuits on `isExpected`.
+        captureEdgeError(err, { fn: fnName, cid });
+        return decorateResponse(
+          new Response(JSON.stringify(edgeErrorToJson(ee, cid)), {
+            status: ee.status,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }),
+          cid
+        );
+      }
+
+      // Unexpected throw — capture to Sentry, log structurally, return 500.
+      const message = err instanceof Error ? err.message : String(err);
+      const stack = err instanceof Error ? err.stack : undefined;
+      log.error("unhandled_exception", { message, stack });
+      captureEdgeError(err, { fn: fnName, cid, forceSend: true });
+      return decorateResponse(
+        new Response(
+          JSON.stringify({
+            error: { code: "internal", message: "Internal error", cid },
+          }),
+          {
+            status: 500,
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+          }
+        ),
+        cid
+      );
+    }
+  };
+}
