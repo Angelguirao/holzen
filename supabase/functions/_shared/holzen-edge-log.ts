@@ -20,6 +20,7 @@ export type HolzenEdgeTag =
   | "volatility-push"
   | "refresh-btc"
   | "backfill-btc"
+  | "seed-btc-history"
   | "fetch-feeds"
   | "pregenerate"
   | "followups"

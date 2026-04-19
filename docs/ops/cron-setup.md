@@ -57,8 +57,8 @@ Keeps btc_price_cache fresh so the Zoom Out companion never needs to call CoinGe
 ### Freshness contract (Zoom Out / `btc_price_cache`)
 
 - **Current day** price: updated whenever this job runs successfully (~15 min when cron is healthy) via `/simple/price`.
-- **“On this day” (1–10 calendar years ago)** rows: refetched only when the row is **missing** or `fetched_at` is older than **24 hours** (see `refresh-btc-prices` — `recentThreshold`; count in `_shared/btc-on-this-day-config.ts`). Reduces CoinGecko calls; acceptable for **daily perspective copy**, not intraday precision.
-- **Endpoint (historical):** one call per missing anniversary date via `/coins/bitcoin/history?date=DD-MM-YYYY`. Calls run through the shared `_shared/btc-price-warm.ts` helper with **bounded parallelism (5 concurrent, 1.2s between batches)**, so 10 missing anniversaries finish in ~2-3s instead of the old ~10s sequential loop while staying well under the demo tier's ~30 req/min quota. The helper dedupes via a 15-min freshness check so the cron and the session-side warm-on-read don't double-fetch. This endpoint works on the **free / demo** tier for any historical year; the older `/market_chart/range` approach silently capped at ~365 days back on free tier and left far-past rows empty (zoom-out logs reading `historical=0/10`).
+- **“On this day” (1–10 calendar years ago)** rows: fetched **once and never refreshed** — a closing price for a past UTC date is immutable, so once the row lands in `btc_price_cache` the cron skips it on every subsequent run (count in `_shared/btc-on-this-day-config.ts`). Prior iterations used a 24h TTL and re-fetched rows that were guaranteed not to have changed, which burned CoinGecko quota and produced noisy `historical: 0/9 matched` logs on the demo tier (see next bullet).
+- **Endpoint (historical):** one call per missing anniversary date via `/coins/bitcoin/history?date=DD-MM-YYYY`. Calls run through the shared `_shared/btc-price-warm.ts` helper with **bounded parallelism (5 concurrent, 1.2s between batches)**, so 10 missing anniversaries finish in ~2-3s instead of the old ~10s sequential loop while staying well under the demo tier's ~30 req/min quota. The helper dedupes via a 15-min freshness check so the cron and the session-side warm-on-read don't double-fetch. **CoinGecko demo-tier limitation (observed mid-2026):** both `/market_chart/range` and `/coins/bitcoin/history` return 401 or non-OK for dates older than ~365 days, so the 2y–10y anniversary dates **cannot be resolved via this endpoint on the free plan**. Populate them once via **`seed-btc-history`** (see below); after that the cron only needs to fill the 1y anniversary as it rolls forward each day.
 - **Session-side self-healing (warm-on-read):** `zoom-out.ts` reads `btc_price_cache` on every invocation. If fewer than 10/10 historical rows are present, it fires a non-blocking `EdgeRuntime.waitUntil(warmMissingBtcPrices(…))` for the missing dates. The current session still returns whatever it has (no added latency for the user); the next session sees a full timeline. Observable via the `btc warm-on-read: attempted=… upserted=…` orchestrate log line. Same helper, same dedupe — safe to run alongside the cron.
 - **Calendar** alignment uses **UTC** date parts for “today” and anniversaries (same as the zoom-out generator).
 
@@ -98,6 +98,28 @@ Bruno: `bruno/service-cron/backfill-btc-prices.bru`. Logs: filter **`holzen:back
 **Local chaining (e.g. ~10 years):** `node scripts/backfill-btc-chain.mjs 2016-04-14 2026-04-14` with the same env vars as Bruno (stops on **429** / `abortReason`; rerun after a pause or upgrade CoinGecko).
 
 **Seeding the 10 zoom-out anniversaries today (recommended one-off):** POST with `{"from": "2016-04-18", "to": "2026-04-18", "mode": "per_date", "onlyMissing": true}`. Only the ~10 missing anniversary dates are touched (`onlyMissing` filters everything else); uses the `/history` endpoint that works on free tier.
+
+### Bulk historical seed (`seed-btc-history`)
+
+**When `backfill-btc-prices` can't reach the years you need (CoinGecko demo tier returns 401 for dates >365d back), use this instead.** It pulls daily BTC-USD closing prices from **CryptoCompare**'s free `histoday` endpoint (no API key required, serves data back to 2010) and bulk-upserts into `btc_price_cache`. Same idempotent shape as `backfill-btc-prices`.
+
+**Not scheduled.** Run **once** after deployment (or after a DB restore) to populate the 2y–10y anniversary rows that CoinGecko can't give us. After that, the `refresh-btc-prices` cron only needs to fill the 1y anniversary as it rolls forward each day.
+
+Body (all optional):
+
+- **`from`** (default `"2014-09-17"`): earliest UTC calendar date to fill. BTC daily data exists earlier but has no liquid USD spot reference before mid-2014.
+- **`to`** (default today UTC).
+- **`onlyMissing`** (default `true`): skip dates already in `btc_price_cache`.
+- **`dryRun`** (default `false`): fetch + parse but don't upsert.
+- **`batchLimit`** (default `2000`, max `2000`): rows per CryptoCompare call; ~12 years fit in 3 pages.
+
+Recommended one-off from Bruno (`bruno/service-cron/seed-btc-history.bru`):
+
+1. POST with `{"from": "2014-09-17", "onlyMissing": true, "dryRun": true}` — confirm the row count looks right (~4000+ rows on a fresh install).
+2. POST again with `"dryRun": false` — takes ~3–5s, uses 3 pages.
+3. Verify: `select count(*), min(date), max(date) from btc_price_cache;`.
+
+Logs: filter **`holzen:seed-btc-history`**.
 
 ## Source Feed Fetcher (fetch-source-feeds)
 
