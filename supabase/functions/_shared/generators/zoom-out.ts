@@ -33,6 +33,7 @@ import { createAttemptLogger, trackEvent } from "../observe.ts";
 import { getPhaseConfig } from "../phase-config.ts";
 import { BTC_ON_THIS_DAY_YEARS_BACK, btcOnThisDayYearOffsets } from "../btc-on-this-day-config.ts";
 import { warmMissingBtcPrices } from "../btc-price-warm.ts";
+import { fetchPastReflectionWithWords, type PastReflectionWithWords } from "../past-reflections.ts";
 
 /** Bump when the deep-time prompt, seed pool, or quality rules change. */
 export const PROMPT_VERSION = "v4";
@@ -162,16 +163,35 @@ async function fetchHistoricalAndCurrentPrices(
   };
 }
 
-// ── Internals: Echo reflection fetch ──
+// ── Internals: Echo reflection fetch (strict user-words-only) ──
 
-function echoPayloadFromRow(row: any | null): Record<string, unknown> | null {
-  if (!row) return null;
+/**
+ * Build the `echo` slot for the zoom-out composite payload.
+ *
+ * Strict policy (2026-04-18): Echo surfaces ONLY user-authored text —
+ * `reflections.note` and `practice_entries.body` (replays). It NEVER surfaces
+ * `reflections.message` (the AI-generated reflect-step prompt), which was the
+ * previous behaviour behind the misleading "your own words from another day"
+ * UI label. If the user has never left a note or replay on a past pause,
+ * `echo` is `null` and the card renders a truthful empty state.
+ *
+ * Includes a legacy `message` field (= the first user-words entry, or empty
+ * string) so older downstream readers that grab `echo.message` directly
+ * (`History.tsx`, `CompanionZoomOutPage`'s ReadTime / seed fallback) continue
+ * to show user text rather than nothing.
+ */
+function echoPayloadFromPast(p: PastReflectionWithWords | null): Record<string, unknown> | null {
+  if (!p) return null;
+  const firstBody = p.userWords[0]?.body ?? "";
   return {
-    id: row.id,
-    message: row.message,
-    created_at: row.created_at,
-    mood: row.mood,
-    outcome: row.outcome,
+    id: p.id,
+    created_at: p.created_at,
+    mood: p.mood,
+    outcome: p.outcome,
+    context: p.context,
+    aiPrompt: p.aiPrompt,
+    userWords: p.userWords,
+    message: firstBody,
   };
 }
 
@@ -180,56 +200,13 @@ async function fetchEchoReflection(
   userId: string,
   context: string | undefined,
   log: GenerateZoomOutParams["log"],
-): Promise<any | null> {
-  // Users who haven't tagged `outcome` on their past reflections (new users, or
-  // users who pause/reflect but don't close the loop) were getting no echo at
-  // all — Zoom Out's "you reflected on this before" rail stayed empty forever.
-  // Prefer outcome-tagged rows when present, but fall back to any reflection
-  // ≥3 days old so the rail has something to show.
-  const cutoff = new Date(Date.now() - 3 * 86400000).toISOString();
-  const direction = context?.toLowerCase().includes("is down")
-    ? "down"
-    : context?.toLowerCase().includes("is up")
-    ? "up"
-    : null;
-
-  async function queryPool(onlyOutcomeTagged: boolean): Promise<any[] | null> {
-    try {
-      let q = svcClient
-        .from("reflections")
-        .select("id, message, created_at, mood, outcome, context")
-        .eq("user_id", userId)
-        .lt("created_at", cutoff)
-        .order("created_at", { ascending: false })
-        .limit(direction ? 50 : 10);
-      if (onlyOutcomeTagged) q = q.not("outcome", "is", null);
-      const { data } = await q;
-      return data ?? null;
-    } catch (e) {
-      log(`echo fetch failed: ${e}`, { onlyOutcomeTagged });
-      return null;
-    }
-  }
-
-  let pool = (await queryPool(true)) ?? [];
-  if (pool.length === 0) {
-    pool = (await queryPool(false)) ?? [];
-    if (pool.length > 0) {
-      log("echo: no outcome-tagged rows, falling back to any reflection ≥3d");
-    }
-  }
-  if (pool.length === 0) return null;
-
-  if (direction) {
-    const matching = pool.filter((r: any) =>
-      direction === "down"
-        ? r.context?.toLowerCase().includes("is down")
-        : r.context?.toLowerCase().includes("is up")
-    );
-    const selected = matching.length > 0 ? matching : pool;
-    return selected[Math.floor(Math.random() * Math.min(selected.length, 10))];
-  }
-  return pool[0];
+): Promise<PastReflectionWithWords | null> {
+  return fetchPastReflectionWithWords(
+    svcClient,
+    userId,
+    { sessionContext: context },
+    (msg, extra) => log(msg, extra),
+  );
 }
 
 // ── Internals: AI deep-time generation ──
@@ -508,13 +485,13 @@ export async function generateZoomOut(params: GenerateZoomOutParams): Promise<Zo
     if (cached) {
       log("zoomOut resolved from cache (phase 2)");
       const prices = await fetchHistoricalAndCurrentPrices(svcClient, context, log);
-      let echoReflection: any = null;
-      if (userId) echoReflection = await fetchEchoReflection(svcClient, userId, context, log);
+      let echoPast: PastReflectionWithWords | null = null;
+      if (userId) echoPast = await fetchEchoReflection(svcClient, userId, context, log);
       return {
         data: {
           onThisDay: prices.onThisDay,
           currentPrice: prices.currentPrice,
-          echo: echoPayloadFromRow(echoReflection) as any,
+          echo: echoPayloadFromPast(echoPast) as any,
           deepTime: cached.data as { title: string; body: string },
           partial: prices.isPartial,
         },
@@ -552,10 +529,10 @@ export async function generateZoomOut(params: GenerateZoomOutParams): Promise<Zo
   // CoinGecko is no longer called during sessions — prices come from
   // the refresh-btc-prices cron job via btc_price_cache.
 
-  // ── 2. Fetch past echo reflection ──
-  let echoReflection: any = null;
+  // ── 2. Fetch past echo reflection (strict user-words-only — never AI text) ──
+  let echoPast: PastReflectionWithWords | null = null;
   if (userId) {
-    echoReflection = await fetchEchoReflection(svcClient, userId, context, log);
+    echoPast = await fetchEchoReflection(svcClient, userId, context, log);
   }
 
   // ── 3. Generate deep-time perspective via AI ──
@@ -574,7 +551,7 @@ export async function generateZoomOut(params: GenerateZoomOutParams): Promise<Zo
   const result = {
     onThisDay: prices.onThisDay,
     currentPrice: prices.currentPrice,
-    echo: echoPayloadFromRow(echoReflection) as any,
+    echo: echoPayloadFromPast(echoPast) as any,
     deepTime: deepTimeResult.deepTime,
     partial: prices.isPartial,
   };

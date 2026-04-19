@@ -51,7 +51,7 @@ High-level order (source of truth: **`supabase/functions/_shared/generators/zoom
 
 **Gotcha (fixed 2026-04-18):** `refresh-btc-prices` previously fetched all 10 anniversary dates in a single `/market_chart/range` request. On CoinGecko's demo / free tier that endpoint silently returns an empty `prices[]` for anything older than ~365 days, so the cron logged `historical: 0 matched` and left `btc_price_cache` with only the current-day row — zoom-out logs showed `historical=0/10`. The fix is to use `/coins/bitcoin/history?date=DD-MM-YYYY` (one call per missing anniversary) which works on free tier for any year. The shared `warmMissingBtcPrices` helper now parallelises these with bounded concurrency (**5 concurrent**, **1.2s between batches**) — 10 anniversaries finish in ~2-3s instead of the previous ~10s sequential loop, while staying well under the demo tier's ~30 req/min quota. `backfill-btc-prices` still has a `"mode": "per_date"` branch using the same endpoint for sparse gap-filling (ops-triggered, not self-healing).
 
-**Step 2: Echo reflection** — Fetches a past reflection from the same user ≥3 days old, optionally filtered by market direction. **Prefers** `outcome`-tagged rows but **falls back to any reflection** when the user hasn't closed the loop on past pauses — the old strict-outcome filter left the "you reflected on this before" rail permanently empty for new users. Provides "you reflected on this before" context.
+**Step 2: Echo reflection (strict user-words-only — 2026-04-18)** — Fetches a past reflection from the same user ≥3 days old **that has at least one user-authored entry** (`reflections.note` OR a `practice_entries.body` row with `type="replay"` pointing at it). Never surfaces `reflections.message` (the AI-generated reflect-step prompt) — the old implementation did, which made the "your own words from another day" UI copy factually wrong for any user who hadn't also typed a note. Selection is biased by current market direction (`is up` / `is down` in `context`) with full-pool fallback when no direction-matching row exists. Shared read model with Daily Practice Replay — see [past-reflections.md](../past-reflections.md). When the user has zero past pauses with words yet, `echo` is `null` and `ZoomOutDisplay` renders a truthful empty state ("You haven't left notes on past pauses yet…"). The AI prompt that started the echoed pause is still available to the UI as `echo.aiPrompt` — shown as context ("Holzen asked…") in Replay's thread view, never as the main quote.
 
 **Phase 2: Cache (strict + prompt-version-pinned)** — `serveFromCache` with `strict: true` **and** `promptVersion: "v4"` checks `companion_cache` for fresh, quality-≥-2 rows that were **also written under the current prompt**, with per-user dedup and market direction awareness. If found, returns composite (cached deep-time + fresh prices + echo). If the strict pool is empty it returns `null` and emits `cache_strict_miss` (Edge log) so the flow falls through to Phase 3 instead of recycling seen or pre-v4 rows. Rows inserted before the `prompt_version` column existed have `NULL` and are ignored (effectively a hard invalidation every time `PROMPT_VERSION` bumps).
 
@@ -96,7 +96,12 @@ Unlike other generators that return a single card, Zoom Out assembles a **compos
 {
   onThisDay: [{ year, price, change }],  // 1–10 years of "on this day" prices (see btc-on-this-day-config)
   currentPrice: number,                   // today's BTC price from cache
-  echo: { message, mood, outcome, ... }, // past reflection (optional)
+  echo: {                                // past reflection with user words (null if none)
+    id, created_at, mood, outcome, context,
+    aiPrompt,                             // reflections.message (AI-generated; shown as context only)
+    userWords: [{ kind: "note"|"replay", body, created_at }],
+    message                               // legacy mirror = userWords[0].body (back-compat)
+  } | null,
   deepTime: { title, body },             // AI-generated deep-time narrative
   partial: boolean                       // true if some sub-components failed
 }
@@ -132,6 +137,8 @@ The `partial` flag allows the card to render with whatever data succeeded (e.g.,
 | Area | Path |
 |------|------|
 | Generator | `supabase/functions/_shared/generators/zoom-out.ts` |
+| Echo read model (edge) | `supabase/functions/_shared/past-reflections.ts` + pure helpers in `_shared/past-reflection-util.ts` |
+| Echo read model (client, shared with Replay) | `src/hooks/use-past-reflection.ts` |
 | Orchestrator | `supabase/functions/companion-orchestrate/index.ts` |
 | Session intent | `supabase/functions/_shared/session-intent.ts` |
 | Quality gate | `supabase/functions/_shared/quality.ts` |
@@ -149,6 +156,7 @@ The `partial` flag allows the card to render with whatever data succeeded (e.g.,
 ## 10. Related reading
 
 - [AI-powered pause system](../ai-powered-pause-system.md) — full pause architecture (§7.9 Zoom Out reference, §7.5 secondary zoom-out)
+- [past-reflections.md](../past-reflections.md) — shared "user words" read model behind Zoom Out's Echo and Daily Practice Replay
 - [intervention.md](intervention.md) — Intervention types (zoom-out as secondary)
 - [cron-setup.md](../../../ops/cron-setup.md) — `refresh-btc-prices` schedule; manual **`backfill-btc-prices`** for gaps
 - [navigating-the-codebase.md](../../../fundamentals/navigating-the-codebase.md) — edge functions and hooks map

@@ -84,6 +84,7 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 - `systems/pause/ai-powered-pause-system.md` — end-to-end architecture of manual vs automatic pause and how companions/interventions are produced.
 - `systems/pause/pause-session-cost-estimates.md` — order-of-magnitude API spend estimates for a live pause session.
 - `systems/pause/companions/` — deep dives per companion type (see [companions/signal.md](systems/pause/companions/signal.md) for Signal).
+- `systems/pause/past-reflections.md` — shared "user words" read model behind Zoom Out's Echo and Daily Practice Replay (notes + replay entries, never AI text).
 - `systems/content-library-fetch-source-feeds.md` — **`fetch-source-feeds`** pipeline: RSS/Map discovery → scrape → Gemini → `content_library`; admin setup and **`[holzen:fetch-feeds]`** log grep tokens.
 
 ## Postmortems
