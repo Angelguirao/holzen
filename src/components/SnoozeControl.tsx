@@ -125,7 +125,7 @@ export function SnoozeControl() {
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button
-          className="flex items-center gap-1.5 py-1 leading-snug font-sans font-medium text-sm text-[#24b1c6]"
+          className="flex items-center gap-1.5 py-1 leading-snug font-sans font-medium text-[#24b1c6] text-base"
         >
           <Moon className="h-3.5 w-3.5" />
           {t('snooze.pausePauses', 'Snooze pauses')}
