@@ -7,12 +7,13 @@ import { initWebVitals } from "./lib/web-vitals";
 import { initCid } from "./lib/cid";
 import { initPostHog } from "./lib/posthog";
 
-// Sentry must init before any other code can throw. It no-ops when VITE_SENTRY_DSN is absent.
+// Sentry must init before any other code can throw. It no-ops when SENTRY_DSN is empty
+// (see src/config/public-env.ts).
 initSentry();
 // cid is generated on first access, but call initCid() eagerly so the Sentry tag is set
 // before any capture happens during early render.
 initCid();
-// PostHog init — no-op when VITE_POSTHOG_KEY is absent. Autocapture/pageview/replay all off.
+// PostHog init — no-op when POSTHOG_KEY is empty. Autocapture/pageview/replay all off.
 initPostHog();
 
 function showCrashScreen(label: string, err: unknown) {
