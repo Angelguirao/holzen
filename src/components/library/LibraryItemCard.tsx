@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { Heart } from 'lucide-react';
+import { Heart, Pause, Radio, Leaf, Feather, Telescope, ScrollText, Pencil, Link as LinkIcon, FileText, type LucideIcon } from 'lucide-react';
 import type { LibraryItem } from '@/hooks/use-library';
 import { useTranslation } from 'react-i18next';
 import { formatDistanceToNow, differenceInHours } from 'date-fns';
@@ -79,7 +79,8 @@ export function LibraryItemCard({ item, onToggleFavorite, onClick, engaged = tru
     }
   }, [item.created_at, item.status]);
 
-  const emoji = SOURCE_EMOJIS[item.source_type ?? ''] ?? TYPE_LABELS[item.type] ?? '📄';
+  const meta = SOURCE_META[item.source_type ?? ''] ?? { icon: FileText, label: item.type ?? 'Item' };
+  const CategoryIcon = meta.icon;
   const isCompanion = item.source_type && !['reflection', 'reflection_note', 'ground', 'practice', 'external'].includes(item.source_type);
   // Only show as skipped if the pause is complete (has outcome) and user didn't engage
   const dimmed = isCompanion && !engaged && !incomplete;
