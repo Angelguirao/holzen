@@ -254,7 +254,7 @@ export default function Library() {
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 placeholder={t('library.searchPlaceholder')}
-                className="h-8 border-border/30 pl-8 text-xs py-[16px] mb-0"
+                className="h-8 border-border/30 pl-8 text-xs py-[16px] mb-[24px]"
               />
               {search && (
                 <button
@@ -277,7 +277,7 @@ export default function Library() {
                       'px-2 py-1 rounded-full border transition-colors whitespace-nowrap flex items-center gap-1 mb-[16px] text-sm font-sans',
                       sourceFilter === key
                         ? 'border-foreground/20 bg-foreground/5 text-foreground'
-                        : 'border-border/30 text-muted-foreground/50 hover:text-muted-foreground/70'
+                        : 'border-border/30 text-muted-foreground'
                     )}
                   >
                     <Icon className="h-3 w-3" />
@@ -295,7 +295,7 @@ export default function Library() {
                     key={tag}
                     onClick={() => setTagFilter(tagFilter === tag ? null : tag)}
                     className={cn(
-                      'text-[10px] font-mono px-2 py-1 rounded-full border transition-colors whitespace-nowrap',
+                      'px-2 py-1 rounded-full border transition-colors whitespace-nowrap text-sm font-sans',
                       tagFilter === tag
                         ? 'border-primary/30 bg-primary/10 text-primary'
                         : 'border-border/30 text-muted-foreground/50 hover:text-muted-foreground/70'
@@ -326,7 +326,7 @@ export default function Library() {
             {hasActiveFilters && !smartFilter && (
               <button
                 onClick={clearAllFilters}
-                className="flex items-center gap-1 text-[9px] font-mono text-muted-foreground/50 hover:text-muted-foreground transition-colors"
+                className="flex items-center gap-1 transition-colors text-cyan-600 text-sm font-sans"
               >
                 <X className="h-2.5 w-2.5" /> {t('library.clearAll')}
               </button>
@@ -334,14 +334,14 @@ export default function Library() {
 
             {/* Count + Sort */}
             <div className="flex items-center justify-between px-1">
-              <span className="text-[9px] font-mono text-muted-foreground/30">
+              <span className="text-sm font-sans text-muted-foreground">
                 {filtered.length} {filtered.length === 1 ? 'item' : 'items'}
               </span>
               <div className="flex items-center gap-3">
                 <ExportMenu items={filtered} />
                 <button
                   onClick={cycleSortMode}
-                  className="flex items-center gap-1 text-[9px] font-mono text-muted-foreground/40 hover:text-muted-foreground transition-colors"
+                  className="flex items-center gap-1 transition-colors text-cyan-700 text-sm font-sans"
                 >
                   <ArrowUpDown className="h-2.5 w-2.5" />
                   {sortLabel}
