@@ -481,7 +481,7 @@ function StatsContent({ reflections, practiceEntries = [], letters = [], memberS
           </div>
 
           {/* Summary metrics with micro-context */}
-          <div className="flex-1 min-w-0 grid grid-cols-2 gap-x-4 gap-y-3">
+          <div className="flex-1 min-w-0 flex flex-col gap-2">
             <MicroStat
               value={reflections.length}
               label={t('profile.pauses', 'Pauses')}
