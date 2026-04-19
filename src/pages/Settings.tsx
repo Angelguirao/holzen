@@ -706,7 +706,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
               )}
               {pushSupported && (
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="push-notif" className="text-xs font-mono text-muted-foreground">
+                  <Label htmlFor="push-notif" className="font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-muted-foreground text-base font-sans">
                     {t('settings.pushNotifications')}
                   </Label>
                   <div className="flex items-center gap-2">
