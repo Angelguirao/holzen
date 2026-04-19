@@ -129,10 +129,11 @@ export default function Library() {
           <button
             onClick={startCheckout}
             disabled={checkoutLoading}
-            className="text-sm font-medium underline-offset-4 transition-colors hover:underline disabled:opacity-50"
+            className="group inline-flex items-center gap-1.5 text-sm font-medium underline-offset-4 transition-colors hover:underline disabled:opacity-50"
             style={{ color: '#24B2C8' }}
           >
             {t('pro.upgradeCta')}
+            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
           </button>
         </div>
       </div>
