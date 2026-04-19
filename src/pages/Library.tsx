@@ -129,7 +129,8 @@ export default function Library() {
           <button
             onClick={startCheckout}
             disabled={checkoutLoading}
-            className="text-sm font-medium text-primary underline-offset-4 transition-colors hover:underline disabled:opacity-50"
+            className="text-sm font-medium underline-offset-4 transition-colors hover:underline disabled:opacity-50"
+            style={{ color: '#24B2C8' }}
           >
             {t('pro.upgradeCta')}
           </button>
