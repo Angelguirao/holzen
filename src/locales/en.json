@@ -1282,10 +1282,10 @@
       "empty": "no activity"
     },
     "legend": {
-      "outcomeLogged": "outcome logged",
-      "reflectedNoOutcome": "reflected (no outcome)",
-      "streakFreeze": "streak freeze",
-      "noActivity": "no activity"
+      "outcomeLogged": "Outcome logged",
+      "reflectedNoOutcome": "Reflected (no outcome)",
+      "streakFreeze": "Streak freeze",
+      "noActivity": "No activity"
     }
   },
   "statsTrends": {
