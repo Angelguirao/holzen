@@ -629,9 +629,9 @@ function MicroStat({ value, suffix, label, context, isText }: {
         {value}{suffix && <span className="ml-0.5 text-sm" style={{ color: '#C1CBD7' }}>{suffix}</span>}
       </span>
       {context && (
-        <span className="font-sans text-xs" style={{ color: '#C1CBD7' }}>{context}</span>
+        <span className="font-sans text-sm font-normal" style={{ color: '#C1CBD7' }}>{context}</span>
       )}
-      <span className="lowercase font-sans text-xs font-medium" style={{ color: '#C1CBD7' }}>{label}</span>
+      <span className="lowercase font-sans font-medium text-sm" style={{ color: '#C1CBD7' }}>{label}</span>
     </div>
   );
 }
