@@ -624,16 +624,14 @@ function MicroStat({ value, suffix, label, context, isText }: {
   isText?: boolean;
 }) {
   return (
-    <div className="space-y-0.5">
-      <div className="flex items-baseline gap-1">
-        <span className={`font-mono font-medium leading-none ${isText ? 'text-base' : 'text-lg'}`}>
-          {value}{suffix && <span className="ml-0.5 text-sm" style={{ color: '#C1CBD7' }}>{suffix}</span>}
-        </span>
-        {context && (
-          <span className="font-sans text-xs" style={{ color: '#C1CBD7' }}>{context}</span>
-        )}
-      </div>
-      <p className="lowercase font-sans text-xs font-medium" style={{ color: '#C1CBD7' }}>{label}</p>
+    <div className="flex items-baseline gap-1 flex-wrap">
+      <span className={`font-mono font-medium leading-none ${isText ? 'text-base' : 'text-lg'}`}>
+        {value}{suffix && <span className="ml-0.5 text-sm" style={{ color: '#C1CBD7' }}>{suffix}</span>}
+      </span>
+      {context && (
+        <span className="font-sans text-xs" style={{ color: '#C1CBD7' }}>{context}</span>
+      )}
+      <span className="lowercase font-sans text-xs font-medium" style={{ color: '#C1CBD7' }}>{label}</span>
     </div>
   );
 }
