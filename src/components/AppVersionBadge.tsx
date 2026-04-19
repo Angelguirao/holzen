@@ -15,15 +15,47 @@ export function AppVersionBadge({ changelogVersion }: { changelogVersion?: strin
   useEffect(() => {
     if (!('serviceWorker' in navigator) || import.meta.env.DEV) return;
 
-    const check = async () => {
-      const reg = await navigator.serviceWorker.getRegistration();
-      if (reg?.waiting) setUpdateWaiting(true);
-    };
-    check();
+    let disposed = false;
+    let registration: ServiceWorkerRegistration | undefined;
 
-    const onControllerChange = () => setUpdateWaiting(false);
-    navigator.serviceWorker.addEventListener('controllerchange', onControllerChange);
-    return () => navigator.serviceWorker.removeEventListener('controllerchange', onControllerChange);
+    const syncWaiting = () => {
+      if (disposed) return;
+      setUpdateWaiting(Boolean(registration?.waiting));
+    };
+
+    const onUpdateFound = () => {
+      const installing = registration?.installing;
+      if (!installing) {
+        syncWaiting();
+        return;
+      }
+      installing.addEventListener(
+        'statechange',
+        () => {
+          if (installing.state === 'installed') syncWaiting();
+        },
+        { once: true },
+      );
+    };
+
+    (async () => {
+      try {
+        registration = await navigator.serviceWorker.ready;
+      } catch {
+        registration = (await navigator.serviceWorker.getRegistration()) ?? undefined;
+      }
+      if (disposed || !registration) return;
+
+      syncWaiting();
+      registration.addEventListener('updatefound', onUpdateFound);
+      navigator.serviceWorker.addEventListener('controllerchange', syncWaiting);
+    })();
+
+    return () => {
+      disposed = true;
+      registration?.removeEventListener('updatefound', onUpdateFound);
+      navigator.serviceWorker.removeEventListener('controllerchange', syncWaiting);
+    };
   }, []);
 
   const applyUpdate = async () => {
@@ -98,6 +130,7 @@ export function AppVersionBadge({ changelogVersion }: { changelogVersion?: strin
 
   const forceFullRefresh = useCallback(async () => {
     if (!confirm('This will clear the app cache and reload. Continue?')) return;
+    setUpdateWaiting(false);
     try {
       if ('serviceWorker' in navigator) {
         const regs = await navigator.serviceWorker.getRegistrations();
@@ -146,7 +179,7 @@ export function AppVersionBadge({ changelogVersion }: { changelogVersion?: strin
         <button
           type="button"
           onClick={applyUpdate}
-          className="inline-flex items-center gap-1 text-[10px] font-mono text-primary/80 hover:text-primary transition-colors"
+          className="inline-flex min-h-9 min-w-[11rem] items-center justify-center gap-1 rounded-sm px-2 py-2 text-left text-[10px] font-mono text-primary/80 hover:bg-primary/5 hover:text-primary active:bg-primary/10 transition-colors"
         >
           <RefreshCw className="h-3 w-3" />
           Update available — tap to reload

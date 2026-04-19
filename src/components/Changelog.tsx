@@ -23,7 +23,15 @@ interface ChangelogEntry {
   created_at: string;
 }
 
-export const Changelog = forwardRef<HTMLDivElement, object>(function Changelog(_props, ref) {
+export type ChangelogProps = {
+  /** Fires when the user opens “What’s new” (before the dialog opens). */
+  onWhatsNewOpen?: () => void;
+};
+
+export const Changelog = forwardRef<HTMLDivElement, ChangelogProps>(function Changelog(
+  { onWhatsNewOpen },
+  ref,
+) {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [entries, setEntries] = useState<ChangelogEntry[]>([]);
@@ -69,7 +77,11 @@ export const Changelog = forwardRef<HTMLDivElement, object>(function Changelog(_
   return (
     <div ref={ref}>
       <button
-        onClick={() => setOpen(true)}
+        type="button"
+        onClick={() => {
+          onWhatsNewOpen?.();
+          setOpen(true);
+        }}
         className="text-xs font-mono text-muted-foreground underline"
       >
         {t('changelog.whatsNew')}
