@@ -158,15 +158,25 @@ export function FeedbackWidget() {
 
   return (
     <>
-      {!open && (
-      <button
-        type="button"
-        aria-label={t('feedback.openButton', { defaultValue: 'Send feedback' })}
-        onClick={() => setOpen(true)}
-        className="fixed bottom-32 right-4 z-[60] h-10 w-10 rounded-full bg-primary text-primary-foreground shadow-lg shadow-black/10 hover:opacity-90 flex items-center justify-center"
-      >
-        <MessageSquareText className="h-4 w-4" />
-      </button>
+      {!open && !dismissed && (
+      <div className="fixed bottom-32 right-4 z-[60] group">
+        <button
+          type="button"
+          aria-label={t('feedback.openButton', { defaultValue: 'Send feedback' })}
+          onClick={() => setOpen(true)}
+          className="h-10 w-10 rounded-full bg-primary text-primary-foreground shadow-lg shadow-black/10 hover:opacity-90 flex items-center justify-center"
+        >
+          <MessageSquareText className="h-4 w-4" />
+        </button>
+        <button
+          type="button"
+          aria-label={t('feedback.dismissWidget', { defaultValue: 'Hide feedback button' })}
+          onClick={dismissWidget}
+          className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-background border border-border text-muted-foreground hover:text-foreground hover:bg-muted flex items-center justify-center opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
+        >
+          <X className="h-3 w-3" />
+        </button>
+      </div>
       )}
 
       <Sheet open={open} onOpenChange={setOpen}>
