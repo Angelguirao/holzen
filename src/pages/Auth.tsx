@@ -103,7 +103,7 @@ const Auth = () => {
         <div className="w-full max-w-sm space-y-6">
           <NoxHeaderMain title={t('common.holzen')} />
           <p className="text-sm">{t('auth.checkEmailReset')}</p>
-          <button onClick={() => { setResetSent(false); setView('sign-in'); }} className="text-xs font-mono text-muted-foreground underline">{t('auth.backToSignIn')}</button>
+          <button onClick={() => { setResetSent(false); setView('sign-in'); }} className="text-muted-foreground underline text-sm font-sans">{t('auth.backToSignIn')}</button>
         </div>
       </div>
     );
@@ -131,7 +131,7 @@ const Auth = () => {
             {error && <p className="text-xs text-destructive font-mono">{error}</p>}
             <LoadingButton type="submit" className="w-full text-base font-sans font-normal" loading={loading}>{t('auth.sendResetLink')}</LoadingButton>
           </form>
-          <button onClick={() => { setView('sign-in'); setError(null); }} className="text-xs font-mono text-muted-foreground underline w-full text-center">{t('auth.backToSignIn')}</button>
+          <button onClick={() => { setView('sign-in'); setError(null); }} className="text-muted-foreground underline text-sm font-sans w-full text-center">{t('auth.backToSignIn')}</button>
         </div>
       </div>
     );
