@@ -370,6 +370,7 @@ export function useLibrary() {
 
   return {
     items, collections, collectionItems, loading,
+    loadingMore, hasMore, loadMore,
     addItem, updateItem, deleteItem, togglePin, toggleFavorite,
     addCollection, updateCollection, deleteCollection,
     addToCollection, removeFromCollection,
