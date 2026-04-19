@@ -148,7 +148,7 @@ const Auth = () => {
       </Link>
       <div className="w-full max-w-sm space-y-8">
         <header className="space-y-3">
-          <h1 className="text-xs font-mono tracking-[0.25em] uppercase text-foreground/80">Holzen</h1>
+          <h1 className="text-sm font-mono tracking-[0.25em] uppercase" style={{ color: '#DBB366' }}>Holzen</h1>
           <p className="text-sm leading-relaxed text-muted-foreground">
             {view === 'sign-up' ? t('auth.createAnAccount') : t('auth.signInToContinue')}
           </p>
