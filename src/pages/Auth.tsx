@@ -129,7 +129,7 @@ const Auth = () => {
               />
             </div>
             {error && <p className="text-xs text-destructive font-mono">{error}</p>}
-            <LoadingButton type="submit" className="w-full font-mono text-xs" loading={loading}>{t('auth.sendResetLink')}</LoadingButton>
+            <LoadingButton type="submit" className="w-full text-base font-sans font-normal" loading={loading}>{t('auth.sendResetLink')}</LoadingButton>
           </form>
           <button onClick={() => { setView('sign-in'); setError(null); }} className="text-xs font-mono text-muted-foreground underline w-full text-center">{t('auth.backToSignIn')}</button>
         </div>
@@ -207,7 +207,7 @@ const Auth = () => {
             )}
           </div>
           {error && <p className="text-xs text-destructive font-mono">{error}</p>}
-          <LoadingButton type="submit" className="w-full font-mono text-xs" loading={loading}>
+          <LoadingButton type="submit" className="w-full text-base font-sans font-normal" loading={loading}>
             {view === 'sign-up' ? t('common.signUp') : t('common.signIn')}
           </LoadingButton>
         </form>
