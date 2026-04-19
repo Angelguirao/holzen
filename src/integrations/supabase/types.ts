@@ -38,6 +38,30 @@ export type Database = {
         }
         Relationships: []
       }
+      app_config: {
+        Row: {
+          description: string | null
+          key: string
+          updated_at: string
+          updated_by: string | null
+          value: Json
+        }
+        Insert: {
+          description?: string | null
+          key: string
+          updated_at?: string
+          updated_by?: string | null
+          value: Json
+        }
+        Update: {
+          description?: string | null
+          key?: string
+          updated_at?: string
+          updated_by?: string | null
+          value?: Json
+        }
+        Relationships: []
+      }
       blog_posts: {
         Row: {
           body: string
@@ -1817,6 +1841,25 @@ export type Database = {
       }
     }
     Views: {
+      v_ai_spend_month_global: {
+        Row: {
+          total_usd: number | null
+        }
+        Relationships: []
+      }
+      v_ai_spend_today_global: {
+        Row: {
+          total_usd: number | null
+        }
+        Relationships: []
+      }
+      v_ai_spend_today_per_user: {
+        Row: {
+          total_usd: number | null
+          user_id: string | null
+        }
+        Relationships: []
+      }
       v_companion_avg_latency: {
         Row: {
           avg_latency_ms: number | null
@@ -2009,6 +2052,7 @@ export type Database = {
       }
       get_admin_stats: { Args: never; Returns: Json }
       get_holzen_number: { Args: never; Returns: Json }
+      get_signup_gate: { Args: never; Returns: Json }
       is_admin: { Args: never; Returns: boolean }
       move_to_dlq: {
         Args: {
