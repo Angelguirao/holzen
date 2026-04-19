@@ -100,16 +100,14 @@ async function loadConfig(): Promise<ConfigState> {
 }
 
 async function loadSpendSnapshot(): Promise<SpendSnapshot> {
-  const [dailyRes, monthlyRes] = await Promise.all([
+  const [dailyRes, monthlyRes] = (await Promise.all([
     supabase.from('v_ai_spend_today_global' as never).select('total_usd').maybeSingle(),
     supabase.from('v_ai_spend_month_global' as never).select('total_usd').maybeSingle(),
-  ]);
+  ])) as unknown as Array<{ data: { total_usd: number } | null; error: unknown }>;
   const dailyGlobal =
-    dailyRes.error || !dailyRes.data ? null : Number((dailyRes.data as { total_usd: number }).total_usd);
+    dailyRes.error || !dailyRes.data ? null : Number(dailyRes.data.total_usd);
   const monthlyGlobal =
-    monthlyRes.error || !monthlyRes.data
-      ? null
-      : Number((monthlyRes.data as { total_usd: number }).total_usd);
+    monthlyRes.error || !monthlyRes.data ? null : Number(monthlyRes.data.total_usd);
   return {
     dailyGlobal: Number.isFinite(dailyGlobal) ? dailyGlobal : null,
     monthlyGlobal: Number.isFinite(monthlyGlobal) ? monthlyGlobal : null,
