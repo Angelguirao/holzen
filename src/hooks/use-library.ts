@@ -69,56 +69,17 @@ export function useLibrary() {
   const [collections, setCollections] = useState<Collection[]>(() => readCache<Collection[]>(CACHE_KEY_COLLECTIONS) ?? []);
   const [collectionItems, setCollectionItems] = useState<CollectionItem[]>(() => readCache<CollectionItem[]>(CACHE_KEY_COL_ITEMS) ?? []);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
   const [readFlagsMap, setReadFlagsMap] = useState<Record<string, ReflectionReadFlags>>({});
   const [incompleteReflections, setIncompleteReflections] = useState<Set<string>>(new Set());
   const [reflectionOutcomes, setReflectionOutcomes] = useState<Record<string, string>>({});
 
-  const fetchAll = useCallback(async () => {
-    if (!user) return;
-    setLoading(true);
-    const [{ data: itemsData }, { data: collectionsData }, { data: colItemsData }] = await Promise.all([
-      supabase
-        .from('library_items')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('pinned', { ascending: false })
-        .order('created_at', { ascending: false }),
-      supabase
-        .from('collections')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false }),
-      supabase
-        .from('collection_items')
-        .select('*')
-        .order('position', { ascending: true }),
-    ]);
-    const libItems = (itemsData as unknown as LibraryItem[]) ?? [];
-    const cols = (collectionsData as unknown as Collection[]) ?? [];
-    const colItems = (colItemsData as unknown as CollectionItem[]) ?? [];
-    setItems(libItems);
-    setCollections(cols);
-    setCollectionItems(colItems);
-    setLoading(false);
-
-    // Persist to cache for offline-first reads
-    writeCache(CACHE_KEY_ITEMS, libItems);
-    writeCache(CACHE_KEY_COLLECTIONS, cols);
-    writeCache(CACHE_KEY_COL_ITEMS, colItems);
-
-    // Targeted hydrate: only pull reflection fields we actually render in the UI,
-    // scoped to the reflection_ids referenced by the loaded library items.
-    // (Replaces the previous "fetch all reflections + all companions + backfill" loop
-    //  which was the dominant source of Library load latency.)
+  const hydrateReflectionMeta = useCallback(async (libItems: LibraryItem[]) => {
     const reflectionIds = Array.from(
       new Set(libItems.map((i) => i.reflection_id).filter((x): x is string => !!x)),
     );
-    if (reflectionIds.length === 0) {
-      setReadFlagsMap({});
-      setIncompleteReflections(new Set());
-      setReflectionOutcomes({});
-      return;
-    }
+    if (reflectionIds.length === 0) return;
 
     const [{ data: reflRows }, { data: companionRows }] = await Promise.all([
       supabase
@@ -138,25 +99,102 @@ export function useLibrary() {
       companionReadByReflection.set(c.reflection_id, map);
     }
 
-    const flags: Record<string, ReflectionReadFlags> = {};
-    const incomplete = new Set<string>();
-    const outcomes: Record<string, string> = {};
-    for (const r of (reflRows ?? []) as any[]) {
-      const cMap = companionReadByReflection.get(r.id) ?? {};
-      flags[r.id] = {
-        haiku_read: !!r.haiku_read,
-        grounding_read: cMap['ground_nudge'] ?? !!r.grounding_read,
-        signal_read: cMap['signal'] ?? false,
-        zoom_out_read: cMap['zoom_out'] ?? cMap['zoom_out_deep_time'] ?? false,
-        history_read: cMap['historical_insight'] ?? false,
-      };
-      if (!r.outcome) incomplete.add(r.id);
-      if (r.outcome) outcomes[r.id] = r.outcome;
+    setReadFlagsMap((prev) => {
+      const next = { ...prev };
+      for (const r of (reflRows ?? []) as any[]) {
+        const cMap = companionReadByReflection.get(r.id) ?? {};
+        next[r.id] = {
+          haiku_read: !!r.haiku_read,
+          grounding_read: cMap['ground_nudge'] ?? !!r.grounding_read,
+          signal_read: cMap['signal'] ?? false,
+          zoom_out_read: cMap['zoom_out'] ?? cMap['zoom_out_deep_time'] ?? false,
+          history_read: cMap['historical_insight'] ?? false,
+        };
+      }
+      return next;
+    });
+    setIncompleteReflections((prev) => {
+      const next = new Set(prev);
+      for (const r of (reflRows ?? []) as any[]) {
+        if (!r.outcome) next.add(r.id); else next.delete(r.id);
+      }
+      return next;
+    });
+    setReflectionOutcomes((prev) => {
+      const next = { ...prev };
+      for (const r of (reflRows ?? []) as any[]) {
+        if (r.outcome) next[r.id] = r.outcome;
+      }
+      return next;
+    });
+  }, []);
+
+  const fetchAll = useCallback(async () => {
+    if (!user) return;
+    setLoading(true);
+    const [{ data: itemsData }, { data: collectionsData }, { data: colItemsData }] = await Promise.all([
+      supabase
+        .from('library_items')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('pinned', { ascending: false })
+        .order('created_at', { ascending: false })
+        .range(0, PAGE_SIZE - 1),
+      supabase
+        .from('collections')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false }),
+      supabase
+        .from('collection_items')
+        .select('*')
+        .order('position', { ascending: true }),
+    ]);
+    const libItems = (itemsData as unknown as LibraryItem[]) ?? [];
+    const cols = (collectionsData as unknown as Collection[]) ?? [];
+    const colItems = (colItemsData as unknown as CollectionItem[]) ?? [];
+    setItems(libItems);
+    setCollections(cols);
+    setCollectionItems(colItems);
+    setHasMore(libItems.length === PAGE_SIZE);
+    setLoading(false);
+
+    writeCache(CACHE_KEY_ITEMS, libItems);
+    writeCache(CACHE_KEY_COLLECTIONS, cols);
+    writeCache(CACHE_KEY_COL_ITEMS, colItems);
+
+    // Reset reflection-derived state, then hydrate for the loaded page.
+    setReadFlagsMap({});
+    setIncompleteReflections(new Set());
+    setReflectionOutcomes({});
+    await hydrateReflectionMeta(libItems);
+  }, [user, hydrateReflectionMeta]);
+
+  const loadMore = useCallback(async () => {
+    if (!user || loadingMore || !hasMore) return;
+    setLoadingMore(true);
+    const offset = items.length;
+    const { data } = await supabase
+      .from('library_items')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('pinned', { ascending: false })
+      .order('created_at', { ascending: false })
+      .range(offset, offset + PAGE_SIZE - 1);
+    const newItems = (data as unknown as LibraryItem[]) ?? [];
+    if (newItems.length > 0) {
+      setItems((prev) => {
+        const seen = new Set(prev.map((i) => i.id));
+        const merged = [...prev, ...newItems.filter((i) => !seen.has(i.id))];
+        writeCache(CACHE_KEY_ITEMS, merged);
+        return merged;
+      });
+      await hydrateReflectionMeta(newItems);
     }
-    setReadFlagsMap(flags);
-    setIncompleteReflections(incomplete);
-    setReflectionOutcomes(outcomes);
-  }, [user]);
+    setHasMore(newItems.length === PAGE_SIZE);
+    setLoadingMore(false);
+  }, [user, loadingMore, hasMore, items.length, hydrateReflectionMeta]);
+
 
   useEffect(() => { fetchAll(); }, [fetchAll]);
 
