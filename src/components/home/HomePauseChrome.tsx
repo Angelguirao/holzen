@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Pause, Timer, Lock } from 'lucide-react';
+import { Pause, Timer, Lock, ArrowRight } from 'lucide-react';
 import { LoadingButton } from '@/components/ui/loading-button';
 import { homeInWidget } from '@/components/home/home-widget-styles';
 import { cn } from '@/lib/utils';
@@ -170,10 +170,11 @@ export function ProLockedWidget({ onUpgrade, checkoutLoading, feature }: { onUpg
         type="button"
         onClick={onUpgrade}
         disabled={checkoutLoading}
-        className="text-sm font-medium underline-offset-4 transition-colors hover:underline disabled:opacity-50"
+        className="group inline-flex items-center gap-1.5 text-sm font-medium underline-offset-4 transition-colors hover:underline disabled:opacity-50"
         style={{ color: '#24B2C8' }}
       >
         {t('pro.upgradeCta')}
+        <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
       </button>
     </div>
   );
