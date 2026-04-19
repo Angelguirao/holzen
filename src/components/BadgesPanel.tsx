@@ -254,14 +254,12 @@ export function BadgesPanel({ reflections, subscribed, notifyBadges = true }: Ba
                   }`}
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2 min-w-0">
-                      {cat !== 'volume' && (
-                        <badge.icon
-                          className="h-3.5 w-3.5 shrink-0"
-                          style={{ color: badge.earned && !isLocked ? badge.color : undefined }}
-                        />
-                      )}
-                      <p className={`leading-tight font-sans text-sm ${badge.earned && !isLocked ? 'text-foreground' : 'text-secondary-foreground'}`}>
+                    <div className="gap-2 min-w-0 flex items-start justify-start mt-0 pt-0">
+                      <badge.icon
+                        className="h-3.5 w-3.5 shrink-0"
+                        style={{ color: badge.earned && !isLocked ? badge.color : undefined }}
+                      />
+                      <p className={`text-xs font-mono leading-tight ${badge.earned && !isLocked ? 'text-foreground' : 'text-muted-foreground'}`}>
                         {t(badge.labelKey)}
                       </p>
                     </div>
@@ -275,7 +273,7 @@ export function BadgesPanel({ reflections, subscribed, notifyBadges = true }: Ba
                       </div>
                     )}
                   </div>
-                  <p className="text-muted-foreground leading-snug text-sm">
+                  <p className="text-[10px] text-muted-foreground leading-snug">
                     {isLocked ? t('badges.proExclusive', 'Unlock with Pro') : t(badge.descKey)}
                   </p>
 
@@ -290,7 +288,7 @@ export function BadgesPanel({ reflections, subscribed, notifyBadges = true }: Ba
                           transition={{ delay: 0.3, duration: 0.5 }}
                         />
                       </div>
-                      <p className="text-sm font-sans text-muted-foreground">
+                      <p className="text-[9px] font-mono text-muted-foreground/50">
                         {badge.current} / {badge.requirement} {t(badge.unitKey)}
                       </p>
                     </div>
