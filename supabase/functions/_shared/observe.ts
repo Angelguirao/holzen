@@ -180,17 +180,54 @@ export function trackEvent(svcClient: any, userId: string, event: string) {
  * - level: "info" | "warn" | "error"
  * - extra: optional additional data
  *
- * Falls back to simple console.log format for readability in dev.
+ * Every entry is written to stdout (picked up by the Supabase log stream) AND,
+ * when `LOG_DRAIN_URL` + `LOG_DRAIN_TOKEN` are configured, fire-and-forget
+ * POSTed to BetterStack for structured querying + alerting. The drain POST
+ * never throws and never blocks the response — failures are swallowed.
+ *
+ * `release`, `environment`, and `service` are attached so logs from multiple
+ * deployed functions can be filtered / grouped in BetterStack.
  */
 export function createLogger(prefix: string, correlationId?: string) {
   const t0 = Date.now();
   const cid = correlationId || crypto.randomUUID().slice(0, 8);
 
+  // Resolve drain settings lazily — edge functions share this module, so doing it once
+  // per logger is fine and lets us pick up runtime env changes in long-lived invocations.
+  const drainUrl = typeof Deno !== "undefined" ? Deno.env.get("LOG_DRAIN_URL") ?? "" : "";
+  const drainToken = typeof Deno !== "undefined" ? Deno.env.get("LOG_DRAIN_TOKEN") ?? "" : "";
+  const release = typeof Deno !== "undefined"
+    ? Deno.env.get("SENTRY_RELEASE") ?? Deno.env.get("APP_VERSION") ?? "unknown"
+    : "unknown";
+  const environment = typeof Deno !== "undefined"
+    ? Deno.env.get("SENTRY_ENVIRONMENT") ?? "production"
+    : "production";
+
+  const forwardToDrain = (entry: Record<string, unknown>) => {
+    if (!drainUrl) return;
+    try {
+      // Fire-and-forget. `.catch` prevents an unhandled-rejection warning in the edge runtime.
+      fetch(drainUrl, {
+        method: "POST",
+        headers: {
+          "content-type": "application/json",
+          ...(drainToken ? { authorization: `Bearer ${drainToken}` } : {}),
+        },
+        body: JSON.stringify(entry),
+      }).catch(() => { /* drain failure must never break the request */ });
+    } catch {
+      /* synchronous fetch() throws only on malformed URL — don't crash */
+    }
+  };
+
   const log = (msg: string, level: "info" | "warn" | "error" = "info", extra?: Record<string, unknown>) => {
     const entry = {
       ts: new Date().toISOString(),
       fn: prefix,
+      service: prefix,
       cid,
+      release,
+      environment,
       elapsed_ms: Date.now() - t0,
       level,
       msg,
@@ -204,6 +241,8 @@ export function createLogger(prefix: string, correlationId?: string) {
     } else {
       console.log(JSON.stringify(entry));
     }
+
+    forwardToDrain(entry);
   };
 
   // Return a callable that defaults to info level, with .warn and .error methods
