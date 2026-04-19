@@ -901,7 +901,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                     onClick={startCheckout}
                     loading={checkoutLoading}
                     loadingText={t('settings.openingCheckout')}
-                    className="w-full font-mono text-xs"
+                    className="w-full text-base font-sans"
                     size="sm"
                   >
                     {t('pro.upgradeCta')}
