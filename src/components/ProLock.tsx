@@ -59,7 +59,7 @@ export function ProLock({ children, inline, feature, hideContent }: Props) {
       <div className={`${hideContent ? 'py-8' : 'absolute inset-0'} flex flex-col items-center justify-center gap-3`}>
         <Lock className="h-6 w-6 text-muted-foreground/30" />
         <h2 className="text-sm font-semibold text-foreground">{t('pro.featureLocked')}</h2>
-        <p className="text-xs font-mono text-foreground/60 text-center max-w-[280px] leading-relaxed">
+        <p className="max-w-xs text-sm leading-relaxed text-muted-foreground text-center">
           {contextualDesc || fallbackDesc}
         </p>
         <button
