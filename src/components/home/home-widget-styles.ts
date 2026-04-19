@@ -5,7 +5,7 @@
 export const homeInWidget = {
   body: 'text-sm leading-relaxed text-foreground',
   bodyMuted: 'text-sm leading-relaxed text-primary',
-  meta: 'leading-snug text-muted-foreground text-sm',
+  meta: 'leading-snug text-muted-foreground text-base',
   metaFaint: 'text-xs leading-snug text-muted-foreground/70',
   /** Row label — matches HomeWidget chrome (uppercase module tone) */
   kicker: 'uppercase tracking-wide font-normal text-muted-foreground text-xs',
@@ -50,5 +50,5 @@ export const homeInWidget = {
   /** Compact activity tags (Ground widget) */
   pillMuted: 'rounded-full border border-border/50 bg-muted/20 px-3 py-1 text-muted-foreground text-xs',
   /** Next price-check countdown when auto cooldown is idle */
-  nextScanCountdown: 'min-w-0 flex-1 font-medium tabular-nums text-primary text-sm',
+  nextScanCountdown: 'min-w-0 flex-1 font-medium tabular-nums text-primary text-base',
 } as const;
