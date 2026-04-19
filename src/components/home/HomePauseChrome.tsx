@@ -162,8 +162,8 @@ export function ProLockedWidget({ onUpgrade, checkoutLoading, feature }: { onUpg
   const description = feature && t(descKey) !== descKey ? t(descKey) : t('pro.upgradeDesc');
   return (
     <div className="flex flex-col items-center gap-3 py-4">
-      <Lock className="h-5 w-5 text-muted-foreground" />
-      <h2 className="text-sm font-semibold text-foreground">{t('pro.featureLocked')}</h2>
+      <Lock className="h-5 w-5 text-[#dbb266]" />
+      <h2 className="text-sm font-semibold text-secondary-foreground">{t('pro.featureLocked')}</h2>
       <p className="w-full text-center text-sm leading-relaxed text-muted-foreground">{description}</p>
       <button
         type="button"
