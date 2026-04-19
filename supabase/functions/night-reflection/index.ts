@@ -208,7 +208,16 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    let LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+
+    // Feature flag + global budget guard. If disabled / over budget, we still
+    // deliver a fallback message (FALLBACKS above) without the AI call.
+    const { guardAiFeature } = await import("../_shared/ratelimit.ts");
+    const nightGuard = await guardAiFeature(supabase, "night_reflection");
+    if (!nightGuard.allowed) {
+      holzenEdgeLog("night-reflection", "ai skipped", { reason: nightGuard.reason });
+      LOVABLE_API_KEY = undefined;
+    }
 
     const usdData = await fetchBtc1dData("USD");
     holzenEdgeLog("night-reflection", "BTC 24h context", { changePct: Number(usdData.changePercent.toFixed(2)) });

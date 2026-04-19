@@ -85,6 +85,15 @@ serve(async (req) => {
       const svcClient = createClient(sbUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "", { auth: { persistSession: false } });
       logAttempt = createAttemptLogger(svcClient, { userId: user.id });
       try { await svcClient.from("analytics_events").insert({ user_id: user.id, event: "suggest_grounding_ai_call" }); } catch (_) { /* non-fatal */ }
+
+      const { guardAiFeature } = await import("../_shared/ratelimit.ts");
+      const guard = await guardAiFeature(svcClient, "suggest_grounding", { userId: user.id });
+      if (!guard.allowed) {
+        return new Response(JSON.stringify({ error: guard.reason ?? "Temporarily unavailable" }), {
+          status: guard.status ?? 503,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
     }
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");

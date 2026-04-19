@@ -72,6 +72,17 @@ serve(async (req) => {
       { auth: { persistSession: false } }
     );
 
+    // Feature flag + global budget guard. On block, return a 503 (cron retries
+    // tomorrow; user-triggered calls show a retry-later toast).
+    const { guardAiFeature } = await import("../_shared/ratelimit.ts");
+    const riGuard = await guardAiFeature(supabase, "reflection_insights");
+    if (!riGuard.allowed) {
+      return new Response(
+        JSON.stringify({ error: riGuard.reason ?? "Temporarily unavailable", processed: 0 }),
+        { status: riGuard.status ?? 503, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
     const body = await req.json().catch(() => ({}));
     const singleUserId = body.user_id as string | undefined;
     const bodyLanguage = body.language as string | undefined;

@@ -60,6 +60,19 @@ serve(async (req) => {
       return new Response(JSON.stringify({ error: "Missing API keys" }), { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 
+    // Feature flag + panic mode guard. The cache-warmer is the single
+    // biggest blast-radius cron if a bug loops, so this check is especially
+    // important. Also respects panic_mode (which includes `pregenerate`).
+    const { guardAiFeature } = await import("../_shared/ratelimit.ts");
+    const pregenGuard = await guardAiFeature(svcClient, "pregenerate");
+    if (!pregenGuard.allowed) {
+      hzLog(`pregenerate skipped: ${pregenGuard.reason}`);
+      return new Response(
+        JSON.stringify({ skipped: true, reason: pregenGuard.reason }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
     const results: string[] = [];
 
     // ═══════════════════════════════════════════

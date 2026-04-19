@@ -32,6 +32,17 @@ serve(async (req) => {
     const svcClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false } });
     try { await svcClient.from("analytics_events").insert({ user_id: user.id, event: "journal_prompt_ai_call" }); } catch (_) { /* non-fatal */ }
 
+    // Cost / feature guard. Degrades gracefully: on block, return a 503 with reason;
+    // the client already handles errors with a retry-later toast.
+    const { guardAiFeature } = await import("../_shared/ratelimit.ts");
+    const guard = await guardAiFeature(svcClient, "journal_prompt", { userId: user.id });
+    if (!guard.allowed) {
+      return new Response(JSON.stringify({ error: guard.reason ?? "Temporarily unavailable" }), {
+        status: guard.status ?? 503,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const { language: rawLang } = await req.json().catch(() => ({ language: "en" }));
     const langCode = rawLang || "en";
     const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };

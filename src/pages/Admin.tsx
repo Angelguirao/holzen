@@ -17,7 +17,7 @@ import { HardcodedFallbacksManager } from '@/components/admin/HardcodedFallbacks
 import { SourceCatalogViewer } from '@/components/admin/SourceCatalogViewer';
 import { SourceSuggestionsPanel } from '@/components/admin/SourceSuggestionsPanel';
 import { ContentLibraryViewer } from '@/components/admin/ContentLibraryViewer';
-import { DevModeToggle } from '@/components/admin/DevModeToggle';
+import { AppConfigTools } from '@/components/admin/AppConfigTools';
 import { adminDeleteRowsByIds } from '@/lib/admin-delete';
 
 /**
@@ -884,7 +884,7 @@ export default function Admin() {
         </TabsContent>
 
         <TabsContent value="tools" className="mt-0">
-          <DevModeToggle />
+          <AppConfigTools />
         </TabsContent>
       </Tabs>
 

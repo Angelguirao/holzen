@@ -163,7 +163,16 @@ serve(async (req) => {
     const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
     if (!RESEND_API_KEY) throw new Error("RESEND_API_KEY not configured");
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    let LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+
+    // Feature flag + global budget guard. If the `digest` feature is off or
+    // budget is exhausted, we still send the email but skip the AI insight.
+    const { guardAiFeature } = await import("../_shared/ratelimit.ts");
+    const digestAiGuard = await guardAiFeature(supabase, "digest");
+    if (!digestAiGuard.allowed) {
+      holzenEdgeLog("weekly-digest", "ai insight skipped", { reason: digestAiGuard.reason });
+      LOVABLE_API_KEY = undefined;
+    }
 
     // Get all users with email notifications enabled
     const { data: profiles, error: profilesError } = await supabase

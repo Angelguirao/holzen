@@ -47,7 +47,12 @@ export const CHECK_RATE_LIMIT_ANALYTICS_EVENTS = [
  * drains can grep/alert: `holzen_event":"limit_check_fail_open"` or substring `limit_check_fail_open`.
  */
 function logLimitCheckFailOpen(
-  scope: "rate_limit" | "daily_budget" | "companion_regenerate",
+  scope:
+    | "rate_limit"
+    | "daily_budget"
+    | "companion_regenerate"
+    | "cost_ceilings"
+    | "feature_flag",
   phase: "supabase_error" | "thrown",
   detail: string,
 ): void {
@@ -168,6 +173,234 @@ export async function checkDailyBudget(
   } catch (e) {
     logLimitCheckFailOpen(
       "daily_budget",
+      "thrown",
+      e instanceof Error ? e.message : String(e),
+    );
+    return { allowed: true };
+  }
+}
+
+/**
+ * Multi-ceiling cost check: global daily, per-user daily, global monthly.
+ *
+ * Any ceiling that is `undefined` is skipped. Fails open on DB errors (logged).
+ * The heavy-hitters (`companion-orchestrate`, `regenerate-only`) should prefer
+ * this over the legacy single-cap `checkDailyBudget`. Every other AI function
+ * should wrap its entry with `guardAiFeature` (see below), which calls this
+ * internally with values from `app_config`.
+ */
+export interface CostCeilingsResult {
+  allowed: boolean;
+  reason?: string;
+  /** Which ceiling tripped first (for structured logging). */
+  tripped?: "daily_global" | "daily_user" | "monthly_global";
+  currentGlobalDailyUsd?: number;
+  currentUserDailyUsd?: number;
+  currentGlobalMonthlyUsd?: number;
+}
+
+export async function checkCostCeilings(
+  svcClient: any,
+  opts: {
+    /** Global cap per UTC day. Skipped if undefined. */
+    dailyGlobalUsd?: number;
+    /** Per-user cap per UTC day. Requires userId. Skipped if undefined/no userId. */
+    dailyPerUserUsd?: number;
+    /** Global cap per UTC month. Skipped if undefined. */
+    monthlyGlobalUsd?: number;
+    userId?: string;
+  },
+): Promise<CostCeilingsResult> {
+  try {
+    const startOfDayUtc = new Date();
+    startOfDayUtc.setUTCHours(0, 0, 0, 0);
+    const startOfMonthUtc = new Date(
+      Date.UTC(startOfDayUtc.getUTCFullYear(), startOfDayUtc.getUTCMonth(), 1, 0, 0, 0, 0),
+    );
+
+    // Run the three queries in parallel — worst case ~1 round trip each at the edge.
+    const queries: Array<Promise<{ scope: string; total: number } | null>> = [];
+
+    if (typeof opts.dailyGlobalUsd === "number") {
+      queries.push(
+        svcClient
+          .from("generation_attempts")
+          .select("estimated_cost_usd")
+          .gte("created_at", startOfDayUtc.toISOString())
+          .not("estimated_cost_usd", "is", null)
+          .then(({ data, error }: { data: unknown; error: unknown }) => {
+            if (error) return null;
+            const total = ((data as Array<{ estimated_cost_usd: number | null }>) ?? []).reduce(
+              (s, r) => s + (Number(r.estimated_cost_usd) || 0),
+              0,
+            );
+            return { scope: "daily_global", total };
+          }),
+      );
+    }
+
+    if (typeof opts.dailyPerUserUsd === "number" && opts.userId) {
+      queries.push(
+        svcClient
+          .from("generation_attempts")
+          .select("estimated_cost_usd")
+          .eq("user_id", opts.userId)
+          .gte("created_at", startOfDayUtc.toISOString())
+          .not("estimated_cost_usd", "is", null)
+          .then(({ data, error }: { data: unknown; error: unknown }) => {
+            if (error) return null;
+            const total = ((data as Array<{ estimated_cost_usd: number | null }>) ?? []).reduce(
+              (s, r) => s + (Number(r.estimated_cost_usd) || 0),
+              0,
+            );
+            return { scope: "daily_user", total };
+          }),
+      );
+    }
+
+    if (typeof opts.monthlyGlobalUsd === "number") {
+      queries.push(
+        svcClient
+          .from("generation_attempts")
+          .select("estimated_cost_usd")
+          .gte("created_at", startOfMonthUtc.toISOString())
+          .not("estimated_cost_usd", "is", null)
+          .then(({ data, error }: { data: unknown; error: unknown }) => {
+            if (error) return null;
+            const total = ((data as Array<{ estimated_cost_usd: number | null }>) ?? []).reduce(
+              (s, r) => s + (Number(r.estimated_cost_usd) || 0),
+              0,
+            );
+            return { scope: "monthly_global", total };
+          }),
+      );
+    }
+
+    if (queries.length === 0) return { allowed: true };
+
+    const results = await Promise.all(queries);
+    const byScope: Record<string, number> = {};
+    for (const r of results) {
+      if (r) byScope[r.scope] = r.total;
+    }
+
+    const out: CostCeilingsResult = {
+      allowed: true,
+      currentGlobalDailyUsd: byScope.daily_global,
+      currentUserDailyUsd: byScope.daily_user,
+      currentGlobalMonthlyUsd: byScope.monthly_global,
+    };
+
+    if (
+      typeof opts.dailyGlobalUsd === "number" &&
+      byScope.daily_global !== undefined &&
+      byScope.daily_global >= opts.dailyGlobalUsd
+    ) {
+      return {
+        ...out,
+        allowed: false,
+        tripped: "daily_global",
+        reason: `Daily budget exceeded: $${byScope.daily_global.toFixed(4)} / $${opts.dailyGlobalUsd.toFixed(2)}`,
+      };
+    }
+    if (
+      typeof opts.dailyPerUserUsd === "number" &&
+      opts.userId &&
+      byScope.daily_user !== undefined &&
+      byScope.daily_user >= opts.dailyPerUserUsd
+    ) {
+      return {
+        ...out,
+        allowed: false,
+        tripped: "daily_user",
+        reason: `Per-user daily cap exceeded: $${byScope.daily_user.toFixed(4)} / $${opts.dailyPerUserUsd.toFixed(2)}`,
+      };
+    }
+    if (
+      typeof opts.monthlyGlobalUsd === "number" &&
+      byScope.monthly_global !== undefined &&
+      byScope.monthly_global >= opts.monthlyGlobalUsd
+    ) {
+      return {
+        ...out,
+        allowed: false,
+        tripped: "monthly_global",
+        reason: `Monthly budget exceeded: $${byScope.monthly_global.toFixed(2)} / $${opts.monthlyGlobalUsd.toFixed(2)}`,
+      };
+    }
+
+    return out;
+  } catch (e) {
+    logLimitCheckFailOpen(
+      "cost_ceilings",
+      "thrown",
+      e instanceof Error ? e.message : String(e),
+    );
+    return { allowed: true };
+  }
+}
+
+/**
+ * Single entry point for every AI-powered edge function. Combines:
+ *
+ *   1. Feature flag check (`feature_flags[feature]` from app_config).
+ *   2. Panic-mode short-circuit for companion features.
+ *   3. Cost ceilings (global daily, per-user daily, global monthly).
+ *
+ * Returns `{ allowed: false, reason, status }` on first failure. Callers
+ * should branch to their natural fallback (cache/library/template/no-op)
+ * rather than surfacing a hard error when possible.
+ *
+ * Import is lazy to keep callers from paying the cost when they don't use it.
+ */
+export async function guardAiFeature(
+  svcClient: any,
+  feature: string,
+  options?: { userId?: string; skipCostCheck?: boolean },
+): Promise<{
+  allowed: boolean;
+  reason?: string;
+  status?: number;
+  tripped?: CostCeilingsResult["tripped"] | "feature_flag" | "panic_mode";
+}> {
+  try {
+    const { loadAppConfig, isFeatureEnabled, PANIC_MODE_FEATURES } = await import(
+      "./app-config.ts"
+    );
+    const config = await loadAppConfig(svcClient);
+
+    if (!isFeatureEnabled(config, feature)) {
+      const panicHit = config.panic_mode && PANIC_MODE_FEATURES.has(feature);
+      return {
+        allowed: false,
+        reason: panicHit
+          ? `Panic mode: '${feature}' bypassed`
+          : `Feature '${feature}' disabled`,
+        status: 503,
+        tripped: panicHit ? "panic_mode" : "feature_flag",
+      };
+    }
+
+    if (options?.skipCostCheck) return { allowed: true };
+
+    const budget = await checkCostCeilings(svcClient, {
+      dailyGlobalUsd: config.budget_daily_usd_global,
+      dailyPerUserUsd: options?.userId ? config.budget_daily_usd_per_user : undefined,
+      monthlyGlobalUsd: config.budget_monthly_usd_global,
+      userId: options?.userId,
+    });
+    if (!budget.allowed) {
+      return {
+        allowed: false,
+        reason: budget.reason,
+        status: 503,
+        tripped: budget.tripped,
+      };
+    }
+    return { allowed: true };
+  } catch (e) {
+    logLimitCheckFailOpen(
+      "feature_flag",
       "thrown",
       e instanceof Error ? e.message : String(e),
     );

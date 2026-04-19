@@ -25,13 +25,24 @@ serve(async (req) => {
     } = await supabase.auth.getUser();
     if (!user) throw new Error("Not authenticated");
 
-    // Track AI usage (no enforcement yet — monitoring only)
+    // Track AI usage + enforce feature flag / cost ceilings.
+    // Wallpaper is the most expensive per-invocation AI unit in the app (image
+    // generation); keep the per-user daily cap honest here.
     const svcClient = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
       { auth: { persistSession: false } }
     );
     try { await svcClient.from("analytics_events").insert({ user_id: user.id, event: "wallpaper_generation" }); } catch (_) { /* non-fatal */ }
+
+    const { guardAiFeature } = await import("../_shared/ratelimit.ts");
+    const guard = await guardAiFeature(svcClient, "wallpaper", { userId: user.id });
+    if (!guard.allowed) {
+      return new Response(JSON.stringify({ error: guard.reason ?? "Wallpaper generation paused" }), {
+        status: guard.status ?? 503,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
     const { message, mood, context } = await req.json();
     if (!message) throw new Error("Missing reflection message");

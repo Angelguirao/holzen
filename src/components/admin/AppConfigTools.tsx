@@ -1,0 +1,582 @@
+/**
+ * Admin panel: runtime guardrails for AI spend, feature flags, signup gate.
+ *
+ * Source of truth is the `app_config` table (see
+ * `supabase/migrations/20260419120000_app_config.sql`). All changes are
+ * picked up by edge functions within ~30 seconds (per-instance TTL cache
+ * in `supabase/functions/_shared/app-config.ts`).
+ */
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { AlertTriangle, Check, DollarSign, Loader2, Power, RefreshCw, Save, Users, Zap } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import { DevModeToggle } from '@/components/admin/DevModeToggle';
+
+const FEATURE_KEYS = [
+  'wallpaper',
+  'letters',
+  'nudges',
+  'digest',
+  'reports',
+  'night_reflection',
+  'reflection_insights',
+  'suggest_ritual',
+  'suggest_grounding',
+  'journal_prompt',
+  'pregenerate',
+  'fetch_source_feeds',
+  'grounding_enrich',
+  'admin_library_preview',
+] as const;
+
+type FeatureKey = typeof FEATURE_KEYS[number];
+
+type ConfigState = {
+  signups_enabled: boolean;
+  signups_max_per_day: number | null;
+  budget_daily_usd_global: number;
+  budget_daily_usd_per_user: number;
+  budget_monthly_usd_global: number;
+  panic_mode: boolean;
+  feature_flags: Record<string, boolean>;
+};
+
+const DEFAULTS: ConfigState = {
+  signups_enabled: true,
+  signups_max_per_day: null,
+  budget_daily_usd_global: 10,
+  budget_daily_usd_per_user: 1,
+  budget_monthly_usd_global: 300,
+  panic_mode: false,
+  feature_flags: Object.fromEntries(FEATURE_KEYS.map((k) => [k, true])),
+};
+
+type SpendSnapshot = {
+  dailyGlobal: number | null;
+  monthlyGlobal: number | null;
+};
+
+async function loadConfig(): Promise<ConfigState> {
+  const { data, error } = await supabase
+    .from('app_config' as never)
+    .select('key, value');
+
+  if (error || !data) return { ...DEFAULTS };
+
+  const next: ConfigState = {
+    ...DEFAULTS,
+    feature_flags: { ...DEFAULTS.feature_flags },
+  };
+
+  for (const row of data as Array<{ key: string; value: unknown }>) {
+    switch (row.key) {
+      case 'signups_enabled':
+        next.signups_enabled = row.value !== false && row.value !== 'false';
+        break;
+      case 'signups_max_per_day':
+        next.signups_max_per_day =
+          row.value === null || row.value === undefined ? null : Number(row.value) || null;
+        break;
+      case 'budget_daily_usd_global':
+        next.budget_daily_usd_global = Number(row.value) || DEFAULTS.budget_daily_usd_global;
+        break;
+      case 'budget_daily_usd_per_user':
+        next.budget_daily_usd_per_user = Number(row.value) || DEFAULTS.budget_daily_usd_per_user;
+        break;
+      case 'budget_monthly_usd_global':
+        next.budget_monthly_usd_global = Number(row.value) || DEFAULTS.budget_monthly_usd_global;
+        break;
+      case 'panic_mode':
+        next.panic_mode = row.value === true || row.value === 'true';
+        break;
+      case 'feature_flags':
+        if (row.value && typeof row.value === 'object' && !Array.isArray(row.value)) {
+          next.feature_flags = { ...next.feature_flags, ...(row.value as Record<string, boolean>) };
+        }
+        break;
+    }
+  }
+  return next;
+}
+
+async function loadSpendSnapshot(): Promise<SpendSnapshot> {
+  const [dailyRes, monthlyRes] = await Promise.all([
+    supabase.from('v_ai_spend_today_global' as never).select('total_usd').maybeSingle(),
+    supabase.from('v_ai_spend_month_global' as never).select('total_usd').maybeSingle(),
+  ]);
+  const dailyGlobal =
+    dailyRes.error || !dailyRes.data ? null : Number((dailyRes.data as { total_usd: number }).total_usd);
+  const monthlyGlobal =
+    monthlyRes.error || !monthlyRes.data
+      ? null
+      : Number((monthlyRes.data as { total_usd: number }).total_usd);
+  return {
+    dailyGlobal: Number.isFinite(dailyGlobal) ? dailyGlobal : null,
+    monthlyGlobal: Number.isFinite(monthlyGlobal) ? monthlyGlobal : null,
+  };
+}
+
+async function saveRow(key: string, value: unknown): Promise<void> {
+  const { error } = await supabase
+    .from('app_config' as never)
+    .upsert({ key, value } as never, { onConflict: 'key' } as never);
+  if (error) throw error;
+}
+
+export function AppConfigTools() {
+  const { toast } = useToast();
+  const [state, setState] = useState<ConfigState>(DEFAULTS);
+  const [initial, setInitial] = useState<ConfigState>(DEFAULTS);
+  const [spend, setSpend] = useState<SpendSnapshot>({ dailyGlobal: null, monthlyGlobal: null });
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState<Set<string>>(() => new Set());
+
+  const refresh = useCallback(async () => {
+    setLoading(true);
+    try {
+      const [cfg, sp] = await Promise.all([loadConfig(), loadSpendSnapshot()]);
+      setState(cfg);
+      setInitial(cfg);
+      setSpend(sp);
+    } catch (_e) {
+      toast({ title: 'Failed to load config', variant: 'destructive' });
+    } finally {
+      setLoading(false);
+    }
+  }, [toast]);
+
+  useEffect(() => { void refresh(); }, [refresh]);
+
+  const mark = (k: string, busy: boolean) =>
+    setSaving((prev) => {
+      const next = new Set(prev);
+      if (busy) next.add(k); else next.delete(k);
+      return next;
+    });
+
+  const persist = useCallback(async (key: string, value: unknown, optimistic: ConfigState) => {
+    mark(key, true);
+    try {
+      await saveRow(key, value);
+      setInitial(optimistic);
+      toast({ title: 'Saved', description: key });
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'save failed';
+      toast({ title: 'Save failed', description: msg, variant: 'destructive' });
+      setState(initial);
+    } finally {
+      mark(key, false);
+    }
+  }, [initial, toast]);
+
+  const signupsDirty = state.signups_enabled !== initial.signups_enabled
+    || state.signups_max_per_day !== initial.signups_max_per_day;
+  const budgetDirty =
+    state.budget_daily_usd_global !== initial.budget_daily_usd_global
+    || state.budget_daily_usd_per_user !== initial.budget_daily_usd_per_user
+    || state.budget_monthly_usd_global !== initial.budget_monthly_usd_global;
+
+  const dailyPct = useMemo(() => {
+    if (spend.dailyGlobal === null) return null;
+    return Math.min(100, Math.round((spend.dailyGlobal / state.budget_daily_usd_global) * 100));
+  }, [spend.dailyGlobal, state.budget_daily_usd_global]);
+  const monthlyPct = useMemo(() => {
+    if (spend.monthlyGlobal === null) return null;
+    return Math.min(100, Math.round((spend.monthlyGlobal / state.budget_monthly_usd_global) * 100));
+  }, [spend.monthlyGlobal, state.budget_monthly_usd_global]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-10">
+        <Loader2 className="h-4 w-4 animate-spin text-muted-foreground/30" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-8">
+      {/* ── Spend snapshot ── */}
+      <section className="space-y-2">
+        <div className="flex items-center justify-between">
+          <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">
+            Spend today
+          </p>
+          <button
+            onClick={() => void refresh()}
+            className="flex items-center gap-1 text-[10px] font-mono text-muted-foreground/50 hover:text-primary"
+          >
+            <RefreshCw className="h-3 w-3" />
+            Refresh
+          </button>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          <BudgetStat
+            label="Daily global"
+            spend={spend.dailyGlobal}
+            cap={state.budget_daily_usd_global}
+            pct={dailyPct}
+          />
+          <BudgetStat
+            label="Monthly global"
+            spend={spend.monthlyGlobal}
+            cap={state.budget_monthly_usd_global}
+            pct={monthlyPct}
+          />
+        </div>
+        <p className="text-[9px] font-mono text-muted-foreground/40 leading-relaxed">
+          Totals from <code className="text-muted-foreground/55">generation_attempts.estimated_cost_usd</code>.
+          Excludes AI functions that don&apos;t yet log attempts (wallpaper, journal-prompt, suggest-ritual,
+          weekly-digest, monthly-report, admin-library-preview) — guards still fire but the totals here
+          under-report until logging is backfilled in the follow-up PR.
+        </p>
+      </section>
+
+      {/* ── Panic mode ── */}
+      <section className="space-y-2">
+        <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">
+          Panic mode
+        </p>
+        <button
+          onClick={() => {
+            const next = !state.panic_mode;
+            const optimistic = { ...state, panic_mode: next };
+            if (next && !window.confirm('Enable panic mode? All companion AI will be bypassed until you turn this off. Reflection and all non-companion features continue to run.')) return;
+            setState(optimistic);
+            void persist('panic_mode', next, optimistic);
+          }}
+          disabled={saving.has('panic_mode')}
+          className={`w-full rounded-xl border px-4 py-3 flex items-center gap-3 transition-all ${
+            state.panic_mode
+              ? 'border-destructive/60 bg-destructive/15'
+              : 'border-border/20 bg-card/10 hover:bg-card/20'
+          }`}
+        >
+          <Power
+            className={`h-3.5 w-3.5 ${state.panic_mode ? 'text-destructive' : 'text-muted-foreground/30'}`}
+          />
+          <div className="flex-1 text-left">
+            <p
+              className={`text-[10px] font-mono ${state.panic_mode ? 'text-destructive' : 'text-foreground/60'}`}
+            >
+              {state.panic_mode ? 'PANIC MODE ACTIVE' : 'Panic mode'}
+            </p>
+            <p className="text-[9px] text-muted-foreground/40">
+              Bypasses all companion AI. Reflection still runs (~$0.001/call). Use when unit economics
+              go sideways or a provider is misbehaving.
+            </p>
+          </div>
+          {saving.has('panic_mode') ? (
+            <Loader2 className="h-3 w-3 animate-spin text-muted-foreground/40" />
+          ) : (
+            <span
+              className={`text-[9px] font-mono ${state.panic_mode ? 'text-destructive' : 'text-muted-foreground/30'}`}
+            >
+              {state.panic_mode ? 'ON' : 'OFF'}
+            </span>
+          )}
+        </button>
+      </section>
+
+      {/* ── Signup gate ── */}
+      <section className="space-y-2">
+        <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">
+          Signup gate
+        </p>
+        <div className="rounded-xl border border-border/20 bg-card/10 p-4 space-y-3">
+          <ToggleRow
+            icon={Users}
+            label="Accept new signups"
+            description="Master on/off. When off, signup form shows a pause message."
+            checked={state.signups_enabled}
+            onChange={(v) => setState((s) => ({ ...s, signups_enabled: v }))}
+          />
+          <NumberRow
+            label="Max signups per UTC day"
+            description="Blank = unlimited. Useful during viral spikes."
+            value={state.signups_max_per_day}
+            onChange={(v) => setState((s) => ({ ...s, signups_max_per_day: v }))}
+          />
+          <SaveRow
+            dirty={signupsDirty}
+            busy={saving.has('signups_enabled') || saving.has('signups_max_per_day')}
+            onSave={async () => {
+              const snapshot = { ...state };
+              await Promise.all([
+                persist('signups_enabled', state.signups_enabled, snapshot),
+                persist(
+                  'signups_max_per_day',
+                  state.signups_max_per_day === null ? null : state.signups_max_per_day,
+                  snapshot,
+                ),
+              ]);
+            }}
+          />
+        </div>
+      </section>
+
+      {/* ── Cost ceilings ── */}
+      <section className="space-y-2">
+        <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">
+          Cost ceilings
+        </p>
+        <div className="rounded-xl border border-border/20 bg-card/10 p-4 space-y-3">
+          <NumberRow
+            label="Daily global cap (USD)"
+            icon={DollarSign}
+            description="Sum of estimated_cost_usd per UTC day. Edge functions return 503 when exceeded."
+            value={state.budget_daily_usd_global}
+            onChange={(v) => setState((s) => ({ ...s, budget_daily_usd_global: v ?? DEFAULTS.budget_daily_usd_global }))}
+            min={0}
+            step={0.5}
+          />
+          <NumberRow
+            label="Daily per-user cap (USD)"
+            description="Abuse backstop. Typical users never approach this."
+            value={state.budget_daily_usd_per_user}
+            onChange={(v) => setState((s) => ({ ...s, budget_daily_usd_per_user: v ?? DEFAULTS.budget_daily_usd_per_user }))}
+            min={0}
+            step={0.1}
+          />
+          <NumberRow
+            label="Monthly global cap (USD)"
+            description="Long horizon guardrail. Raise before you hit it, not after."
+            value={state.budget_monthly_usd_global}
+            onChange={(v) => setState((s) => ({ ...s, budget_monthly_usd_global: v ?? DEFAULTS.budget_monthly_usd_global }))}
+            min={0}
+            step={10}
+          />
+          <SaveRow
+            dirty={budgetDirty}
+            busy={saving.has('budget_daily_usd_global') || saving.has('budget_daily_usd_per_user') || saving.has('budget_monthly_usd_global')}
+            onSave={async () => {
+              const snapshot = { ...state };
+              await Promise.all([
+                persist('budget_daily_usd_global', state.budget_daily_usd_global, snapshot),
+                persist('budget_daily_usd_per_user', state.budget_daily_usd_per_user, snapshot),
+                persist('budget_monthly_usd_global', state.budget_monthly_usd_global, snapshot),
+              ]);
+            }}
+          />
+        </div>
+      </section>
+
+      {/* ── Feature flags ── */}
+      <section className="space-y-2">
+        <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">
+          Feature flags
+        </p>
+        <p className="text-[9px] font-mono text-muted-foreground/45 leading-relaxed">
+          Per-feature AI on/off. Panic mode overrides the companion-related flags regardless.
+          Disabling a feature returns the feature&apos;s natural fallback (canned template, cached
+          text, silent no-op for cron emails) — not a user-visible error.
+        </p>
+        <div className="rounded-xl border border-border/20 bg-card/10 p-4 space-y-2">
+          {FEATURE_KEYS.map((k) => (
+            <FeatureFlagRow
+              key={k}
+              featureKey={k}
+              checked={state.feature_flags[k] !== false}
+              busy={saving.has(`feature:${k}`)}
+              onChange={async (v) => {
+                const nextFlags = { ...state.feature_flags, [k]: v };
+                const optimistic = { ...state, feature_flags: nextFlags };
+                setState(optimistic);
+                mark(`feature:${k}`, true);
+                try {
+                  await saveRow('feature_flags', nextFlags);
+                  setInitial(optimistic);
+                  toast({ title: 'Saved', description: `feature:${k}` });
+                } catch (e) {
+                  const msg = e instanceof Error ? e.message : 'save failed';
+                  toast({ title: 'Save failed', description: msg, variant: 'destructive' });
+                  setState(initial);
+                } finally {
+                  mark(`feature:${k}`, false);
+                }
+              }}
+            />
+          ))}
+        </div>
+      </section>
+
+      {/* ── Dev tools (existing) ── */}
+      <section>
+        <DevModeToggle />
+      </section>
+    </div>
+  );
+}
+
+// ─── Sub-components ───────────────────────────────────────────────────
+
+function BudgetStat({
+  label,
+  spend,
+  cap,
+  pct,
+}: {
+  label: string;
+  spend: number | null;
+  cap: number;
+  pct: number | null;
+}) {
+  const alert = pct !== null && pct >= 80;
+  return (
+    <div className={`rounded-lg border px-3 py-2.5 ${alert ? 'border-destructive/30 bg-destructive/5' : 'border-border/20 bg-card/10'}`}>
+      <div className="flex items-center justify-between mb-1.5">
+        <span className="text-[9px] font-mono uppercase tracking-wider text-muted-foreground/60">{label}</span>
+        {alert && <AlertTriangle className="h-3 w-3 text-destructive" />}
+      </div>
+      <p className="text-[11px] font-mono text-foreground/80">
+        ${spend === null ? '—' : spend.toFixed(2)} <span className="text-muted-foreground/40">/ ${cap.toFixed(2)}</span>
+      </p>
+      {pct !== null && (
+        <div className="h-1 bg-muted/40 rounded-full overflow-hidden mt-1.5">
+          <div
+            className={`h-full rounded-full ${alert ? 'bg-destructive/70' : 'bg-primary/50'}`}
+            style={{ width: `${pct}%` }}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+function ToggleRow({
+  icon: Icon,
+  label,
+  description,
+  checked,
+  onChange,
+}: {
+  icon: typeof Users;
+  label: string;
+  description: string;
+  checked: boolean;
+  onChange: (v: boolean) => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={() => onChange(!checked)}
+      className="w-full flex items-start gap-3 text-left"
+    >
+      <Icon className="h-3.5 w-3.5 mt-0.5 text-muted-foreground/40 flex-shrink-0" />
+      <div className="flex-1 min-w-0">
+        <p className="text-[10px] font-mono text-foreground/80">{label}</p>
+        <p className="text-[9px] text-muted-foreground/40 leading-relaxed">{description}</p>
+      </div>
+      <span
+        className={`text-[9px] font-mono flex-shrink-0 ${
+          checked ? 'text-primary' : 'text-muted-foreground/40'
+        }`}
+      >
+        {checked ? 'ON' : 'OFF'}
+      </span>
+    </button>
+  );
+}
+
+function NumberRow({
+  label,
+  description,
+  value,
+  onChange,
+  icon: Icon,
+  min,
+  step,
+}: {
+  label: string;
+  description: string;
+  value: number | null;
+  onChange: (v: number | null) => void;
+  icon?: typeof DollarSign;
+  min?: number;
+  step?: number;
+}) {
+  const [raw, setRaw] = useState<string>(value === null ? '' : String(value));
+  useEffect(() => { setRaw(value === null ? '' : String(value)); }, [value]);
+  return (
+    <div className="flex items-start gap-3">
+      {Icon ? (
+        <Icon className="h-3.5 w-3.5 mt-0.5 text-muted-foreground/40 flex-shrink-0" />
+      ) : (
+        <span className="h-3.5 w-3.5 mt-0.5 flex-shrink-0" />
+      )}
+      <div className="flex-1 min-w-0">
+        <p className="text-[10px] font-mono text-foreground/80">{label}</p>
+        <p className="text-[9px] text-muted-foreground/40 leading-relaxed">{description}</p>
+      </div>
+      <input
+        type="number"
+        inputMode="decimal"
+        value={raw}
+        min={min}
+        step={step}
+        placeholder="—"
+        onChange={(e) => {
+          const v = e.target.value;
+          setRaw(v);
+          if (v === '') onChange(null);
+          else {
+            const n = Number(v);
+            if (Number.isFinite(n)) onChange(n);
+          }
+        }}
+        className="w-20 text-[10px] font-mono text-right bg-muted/30 border border-border/20 rounded px-2 py-1 focus:outline-none focus:border-primary/40"
+      />
+    </div>
+  );
+}
+
+function SaveRow({ dirty, busy, onSave }: { dirty: boolean; busy: boolean; onSave: () => Promise<void> }) {
+  if (!dirty) return null;
+  return (
+    <div className="flex justify-end pt-2 border-t border-border/10">
+      <button
+        type="button"
+        disabled={busy}
+        onClick={() => void onSave()}
+        className="flex items-center gap-1.5 text-[10px] font-mono text-primary hover:text-primary/80 disabled:opacity-50"
+      >
+        {busy ? <Loader2 className="h-3 w-3 animate-spin" /> : <Save className="h-3 w-3" />}
+        Save changes
+      </button>
+    </div>
+  );
+}
+
+function FeatureFlagRow({
+  featureKey,
+  checked,
+  busy,
+  onChange,
+}: {
+  featureKey: FeatureKey;
+  checked: boolean;
+  busy: boolean;
+  onChange: (v: boolean) => void;
+}) {
+  return (
+    <button
+      type="button"
+      disabled={busy}
+      onClick={() => onChange(!checked)}
+      className="w-full flex items-center gap-3 text-left disabled:opacity-50"
+    >
+      <Zap
+        className={`h-3 w-3 flex-shrink-0 ${checked ? 'text-primary/50' : 'text-muted-foreground/30'}`}
+      />
+      <span className="flex-1 text-[10px] font-mono text-foreground/70 truncate">{featureKey}</span>
+      {busy ? (
+        <Loader2 className="h-3 w-3 animate-spin text-muted-foreground/40" />
+      ) : checked ? (
+        <span className="flex items-center gap-1 text-[9px] font-mono text-primary">
+          <Check className="h-2.5 w-2.5" /> ON
+        </span>
+      ) : (
+        <span className="text-[9px] font-mono text-muted-foreground/40">OFF</span>
+      )}
+    </button>
+  );
+}

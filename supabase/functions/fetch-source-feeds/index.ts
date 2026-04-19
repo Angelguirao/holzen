@@ -207,6 +207,18 @@ serve(async (req) => {
     const supabase = createClient(Deno.env.get("SUPABASE_URL") ?? "", serviceRoleKey, { auth: { persistSession: false } });
     const logAttempt = createAttemptLogger(supabase);
 
+    // Feature flag + global budget guard. On block, return a no-op so the
+    // cron keeps advancing through its schedule without error.
+    const { guardAiFeature } = await import("../_shared/ratelimit.ts");
+    const feedsGuard = await guardAiFeature(supabase, "fetch_source_feeds");
+    if (!feedsGuard.allowed) {
+      hzLog(`fetch-feeds skipped: ${feedsGuard.reason}`);
+      return new Response(
+        JSON.stringify({ skipped: true, reason: feedsGuard.reason }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
     const FIRECRAWL_API_KEY = Deno.env.get("FIRECRAWL_API_KEY");
     const PERPLEXITY_API_KEY = Deno.env.get("PERPLEXITY_API_KEY");
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
