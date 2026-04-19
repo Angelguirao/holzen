@@ -147,10 +147,10 @@ export function FeedbackWidget() {
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent side="right" className="w-full sm:max-w-md flex flex-col gap-4">
           <SheetHeader>
-            <SheetTitle className="font-mono text-sm tracking-wider uppercase text-muted-foreground">
+            <SheetTitle className="font-semibold tracking-wider uppercase text-base font-sans text-[#dbb266]">
               {t('feedback.getInTouch')}
             </SheetTitle>
-            <SheetDescription className="text-xs">
+            <SheetDescription className="text-base font-sans text-secondary-foreground">
               {t('feedback.description')}
             </SheetDescription>
           </SheetHeader>
@@ -170,8 +170,8 @@ export function FeedbackWidget() {
                   }`}
                 >
                   <Icon className="h-3.5 w-3.5 mb-1" />
-                  <p className="text-xs font-mono font-medium">{t(c.labelKey)}</p>
-                  <p className="text-[10px] text-muted-foreground mt-0.5">{t(c.descKey)}</p>
+                  <p className="font-medium text-base font-sans text-secondary-foreground">{t(c.labelKey)}</p>
+                  <p className="mt-0.5 text-sm font-sans text-muted-foreground">{t(c.descKey)}</p>
                 </button>
               );
             })}
