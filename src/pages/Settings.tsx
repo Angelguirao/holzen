@@ -894,7 +894,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                       {t('home.subscription.monthlyLimitReached')}
                     </p>
                   )}
-                  <p className="text-sm font-sans text-primary">
+                  <p className="text-sm font-sans text-muted-foreground">
                     {t('settings.pricePerMonth')}
                   </p>
                   <LoadingButton
