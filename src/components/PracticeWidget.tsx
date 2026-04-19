@@ -135,9 +135,9 @@ export function PracticeWidget() {
       {suggestion && (
         <button
           onClick={() => handleSelect(suggestion.id)}
-          className="flex w-full items-center gap-3 rounded-xl border border-primary/15 bg-primary/[0.04] px-3 py-3 transition-colors hover:bg-primary/[0.07]"
+          className="flex w-full items-start gap-3 rounded-xl border border-primary/15 bg-primary/[0.04] px-3 py-3 transition-colors hover:bg-primary/[0.07]"
         >
-          <Sparkles className="h-3.5 w-3.5 text-primary/40 shrink-0" />
+          <Sparkles className="h-3.5 w-3.5 text-primary/40 shrink-0 mt-[3px]" />
           <div className="min-w-0 flex-1 text-left">
             <span className={`${homeInWidget.kicker} text-primary`}>{t('practice.suggested', 'Suggested')}</span>
             <span className={`mt-1 block ${homeInWidget.bodyMuted} leading-snug`}>
@@ -157,9 +157,9 @@ export function PracticeWidget() {
             <button
               key={p.id}
               onClick={() => handleSelect(p.id)}
-              className={`${homeInWidget.rowButtonGhost} group py-2.5`}
+              className={`${homeInWidget.rowButtonGhost} group py-2.5 items-start`}
             >
-              <Icon className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0" />
+              <Icon className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0 mt-[5px]" />
               <div className="min-w-0 flex-1 text-left">
                 <span className="text-sm font-medium text-foreground transition-colors group-hover:text-foreground">
                   {t(p.labelKey)}
