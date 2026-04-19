@@ -166,7 +166,7 @@ const Auth = () => {
 
         <form onSubmit={handleEmailAuth} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="auth-email" className="text-xs font-mono">{t('auth.email')}</Label>
+            <Label htmlFor="auth-email" className="text-base font-sans">{t('auth.email')}</Label>
             <Input
               id="auth-email"
               name="email"
@@ -182,7 +182,7 @@ const Auth = () => {
             <div className="flex items-center justify-between">
               <Label htmlFor="auth-password" className="text-xs font-mono">{t('auth.password')}</Label>
               {view === 'sign-in' && (
-                <button type="button" onClick={() => { setView('forgot-password'); setError(null); }} className="text-xs font-mono text-muted-foreground underline">
+                <button type="button" onClick={() => { setView('forgot-password'); setError(null); }} className="text-muted-foreground underline text-sm font-sans">
                   {t('auth.forgotPassword')}
                 </button>
               )}
