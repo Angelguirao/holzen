@@ -127,3 +127,22 @@ body.ambient-active header {
 .tabs-scroll::-webkit-scrollbar-thumb:hover {
   background: hsl(var(--primary) / 0.4);
 }
+.tabs-scroll-y {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--primary) / 0.25) hsl(var(--muted) / 0.4);
+}
+.tabs-scroll-y::-webkit-scrollbar {
+  width: 4px;
+  background: transparent;
+}
+.tabs-scroll-y::-webkit-scrollbar-track {
+  background: hsl(var(--muted) / 0.4);
+  border-radius: 9999px;
+}
+.tabs-scroll-y::-webkit-scrollbar-thumb {
+  background: hsl(var(--primary) / 0.25);
+  border-radius: 9999px;
+}
+.tabs-scroll-y::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--primary) / 0.4);
+}
