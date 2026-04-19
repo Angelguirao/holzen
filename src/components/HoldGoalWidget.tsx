@@ -400,7 +400,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
     const days = elapsed % 365;
 
     return (
-      <div className={`${homeInWidget.insetMuted} space-y-2.5`}>
+      <div className={`${homeInWidget.insetMuted} space-y-2.5 pb-0`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Infinity className="h-3 w-3 text-primary/60" />
