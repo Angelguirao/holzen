@@ -1,0 +1,206 @@
+# Observability Setup Bible
+
+Click-paths and config for the Holzen observability stack. This is the setup source of truth; companion runbooks cover day-to-day operation.
+
+- Incident flow: [incident-response.md](incident-response.md)
+- PII review checklist: [pii-masking-review.md](pii-masking-review.md)
+- Backup/restore drill: [backup-restore-drill.md](backup-restore-drill.md)
+- Event taxonomy (PostHog): [event-taxonomy.md](event-taxonomy.md)
+- Feature flags: [feature-flags.md](feature-flags.md)
+- Edge logging conventions: [edge-logging-conventions.md](edge-logging-conventions.md)
+- Broader logging strategy: [logging-strategy.md](logging-strategy.md)
+
+## Stack at a glance
+
+| Vendor | Use | Data |
+|---|---|---|
+| **Sentry** | Error tracking (frontend **and** edges), on-error Session Replay, release health, Web Vitals | Grouped errors with stack traces, tagged by `cid`, `release`, `source` |
+| **PostHog** | Product analytics, funnels, retention, feature flags | Deliberate events only; autocapture and session recording disabled |
+| **BetterStack (Logtail)** | Edge log aggregation, search, alerting | All structured JSON from `observe.ts` + cron heartbeats |
+| **UptimeRobot** | Uptime monitoring | Frontend root URL + `/functions/v1/health` |
+| **Slack** (`#holzen-alerts`) | Unified alert inbox | All vendor alerts + feedback forwarder summaries |
+| **Backup email** (`alerts@...`) | Vendors without Slack integration | Anthropic budget, Supabase/Lovable limits |
+
+**Division of labor**: Sentry owns error workflow (group, resolve, regress). BetterStack owns log search, rate-based alerting, heartbeats. PostHog owns product signals. Postgres owns audit/compliance.
+
+## Inputs needed (gather before execution)
+
+Set via Lovable secrets UI unless noted otherwise. Nothing in this list goes into the repo except through `.env.example` (frontend) or documented placeholders.
+
+### Frontend (Lovable Cloud env for the Vite build)
+
+| Variable | Value | Where obtained |
+|---|---|---|
+| `VITE_SENTRY_DSN` | Sentry DSN for frontend project | Sentry → Settings → Projects → [project] → Client Keys (DSN) |
+| `VITE_POSTHOG_KEY` | PostHog project API key | PostHog → Project Settings → Project API Key |
+| `VITE_POSTHOG_HOST` | `https://us.i.posthog.com` (default) or EU equivalent | PostHog region setting |
+| `VITE_APP_VERSION` | Git SHA of the deploy, 7-char prefix OK | Auto-injected via Vite `define` if `process.env.VITE_APP_VERSION` is set by the CI build, otherwise `dev` |
+| `SENTRY_AUTH_TOKEN` | Build-time only, for `@sentry/vite-plugin` source-map upload | Sentry → Settings → Account → API → Auth Tokens (scope: `project:releases`) |
+| `SENTRY_ORG`, `SENTRY_PROJECT` | Build-time only | Sentry org + project slugs |
+
+### Edge functions (Lovable secrets UI)
+
+| Variable | Value |
+|---|---|
+| `SENTRY_DSN_EDGES` | Sentry DSN for edges. Recommended: same project as frontend (unified quota + release health). Alternative: separate project if you anticipate muting edge noise during incidents. Tag segmentation via `source:edge` vs `source:frontend` handles the same-project case. |
+| `SENTRY_RELEASE` | Git SHA of the deploy (same value as `VITE_APP_VERSION`). Enables cross-surface release correlation. |
+| `SENTRY_ENVIRONMENT` | `production` or `preview` |
+| `LOG_DRAIN_URL` | BetterStack log ingest endpoint (`https://in.logs.betterstack.com`) |
+| `LOG_DRAIN_TOKEN` | BetterStack source token (not the API token) |
+| `SLACK_WEBHOOK_URL` | Slack Incoming Webhook URL for `#holzen-alerts` |
+| `RESEND_API_KEY` | Already present; required for transactional emails |
+
+If any edge secret is absent, the corresponding forwarder silently no-ops. Never hard-fails user flows.
+
+## 1. Slack channel + webhook
+
+1. Slack → Create channel `#holzen-alerts`. Private is fine; add whoever needs the pages.
+2. [api.slack.com/apps](https://api.slack.com/apps) → **Create New App → From scratch** → name `Holzen Alerts`.
+3. Enable **Incoming Webhooks** → **Add New Webhook to Workspace** → pick `#holzen-alerts`.
+4. Copy the webhook URL (`https://hooks.slack.com/services/...`). Store as `SLACK_WEBHOOK_URL` in Lovable secrets.
+5. Optional `alerts@<yourdomain>` for vendors without Slack integration (Anthropic budget emails, Lovable limit warnings).
+
+Test once from any shell with network access:
+
+```bash
+curl -X POST -H 'Content-Type: application/json' \
+  -d '{"text":"holzen-alerts smoke ping"}' "$SLACK_WEBHOOK_URL"
+```
+
+## 2. Sentry
+
+### 2.1 Project
+
+1. [sentry.io](https://sentry.io) → Create project → platform **Browser JavaScript / React**. Name: `holzen`.
+2. Copy the DSN. Store as `VITE_SENTRY_DSN` (frontend env) and — unless you want a dedicated edge project — also as `SENTRY_DSN_EDGES` (Lovable secret).
+3. Settings → Projects → `holzen` → **Security & Privacy** → enable **Scrub IP addresses** and **Data scrubbing**. Defaults handle PAN/SSN-like patterns; our `beforeSend` on both surfaces adds Holzen-specific keys (`prompt|reflection|content|message|body|input`).
+4. Settings → Projects → `holzen` → **Release Health** → enable.
+
+### 2.2 Source maps (build-time)
+
+1. Settings → Account → API → **Auth Tokens** → Create with scope `project:releases`. Store as `SENTRY_AUTH_TOKEN` in the CI build env (not Lovable runtime).
+2. Vite build uploads source maps automatically when `SENTRY_AUTH_TOKEN` + `SENTRY_ORG` + `SENTRY_PROJECT` are present (see `vite.config.ts`). Missing token = plugin is a no-op.
+
+### 2.3 Slack integration
+
+1. Sentry → Settings → Integrations → **Slack** → Authorize workspace.
+2. Map project `holzen` → `#holzen-alerts`.
+
+### 2.4 Alert rules (Sentry Alerts UI)
+
+Create each as an **Issue Alert** (not Metric Alert) unless noted:
+
+| Name | When | Filter | Action |
+|---|---|---|---|
+| First-seen (any source) | A new issue is created | `environment: production` | Slack `#holzen-alerts` |
+| First-seen edge (paging) | A new issue is created | `environment: production` AND `source: edge` | Slack + `@here` (edges usually block core flows) |
+| Regression | An issue changes state from resolved to unresolved | `environment: production` | Slack |
+| Issue volume (warning) | Number of events in an issue > 10 in 1 hour | — | Slack |
+| Issue volume edge (paging) | Number of events in an issue > 50 in 1 hour | `source: edge` | Slack |
+| Release deployed | A release is created (info-level) | — | Slack |
+| Error rate frontend (metric alert) | `event.type:error AND source:frontend` > 2% over 15 min | — | Slack + email |
+
+Ensure **weekly summary** is on (Settings → Account → Notifications → Weekly Reports) → backup email.
+
+**Quota hygiene note**: `beforeSend` in `supabase/functions/_shared/sentry.ts` drops expected `EdgeError` codes (`auth_required`, `rate_limited`, `bad_input`, `not_found`) so user-input errors never create issues. BetterStack still receives them for search.
+
+## 3. PostHog
+
+### 3.1 Project
+
+1. [posthog.com](https://posthog.com) → Create project → platform **React**. Region: US or EU (match compliance needs; stored in `VITE_POSTHOG_HOST`).
+2. Copy the project API key → `VITE_POSTHOG_KEY`.
+3. Project Settings → **Autocapture** → **Disabled**. Confirm; our `src/lib/posthog.ts` also sets `autocapture: false` but UI-level disable is belt-and-braces.
+4. Project Settings → **Session Recording** → **Disabled**. Our init explicitly disables too; this closes any "enable globally" button.
+5. Project Settings → **Data Management** → **Anonymize IPs** → enable.
+
+### 3.2 Events and properties
+
+Do **not** create events in the PostHog UI. Events are emitted from the app per [event-taxonomy.md](event-taxonomy.md). PostHog discovers them on first write. If an event shows up that isn't in the taxonomy, it's a bug — delete and add to taxonomy first.
+
+### 3.3 First insights (optional; nice-to-have)
+
+- Funnel: `auth.signed_up` → `reflection.completed` → `paywall.subscribed`
+- Trend: `reflection.completed` count by day, breakdown by `had_bitcoin_context`
+- Retention: `auth.signed_in` cohort weekly
+
+## 4. BetterStack (Logtail)
+
+### 4.1 Source
+
+1. [betterstack.com/logs](https://betterstack.com/logs) → **Sources** → **Add source** → platform **HTTP** (or "Custom").
+2. Name: `holzen-edges`. Copy the **HTTP endpoint URL** (`https://in.logs.betterstack.com`) → `LOG_DRAIN_URL`, and the **source token** → `LOG_DRAIN_TOKEN`. Store both in Lovable secrets.
+
+### 4.2 Slack integration
+
+1. Integrations → **Slack** → authorize → pick `#holzen-alerts`.
+
+### 4.3 Alert rules (BetterStack → Alerts)
+
+Each targets source `holzen-edges`:
+
+| Name | Query | Severity |
+|---|---|---|
+| Edge error | `level = "error"` | Slack, paging |
+| fail-open rate-limit | `msg contains "limit_check_fail_open"` | Slack, warning |
+| Orchestrate invoke error | `msg contains "orchestrate_invoke_error"` | Slack, warning |
+| Error spike | `level = "error"` count > 10 per 5 min | Slack, paging |
+| Heartbeat miss: refresh-btc-prices | See §6 below | Slack, paging |
+| Heartbeat miss: pregenerate-companions | See §6 | Slack, paging |
+| Heartbeat miss: check-volatility | See §6 | Slack, paging |
+| Heartbeat miss: check-followups | See §6 | Slack, paging |
+| Heartbeat miss: night-reflection | See §6 | Slack, paging |
+| Heartbeat miss: fetch-source-feeds | See §6 | Slack, paging |
+| Heartbeat miss: process-referral-pending | See §6 | Slack, warning |
+
+## 5. UptimeRobot
+
+1. [uptimerobot.com](https://uptimerobot.com) → Add monitor.
+2. Monitor 1: **HTTPS GET** `https://holzen.app/` (or your production frontend URL). 5-min interval. Keyword match: `<html`.
+3. Monitor 2: **HTTPS GET** `https://<ref>.supabase.co/functions/v1/health`. 5-min interval. Keyword match: `"status":"ok"`.
+4. Integrations → **Slack** → native integration → pick `#holzen-alerts`. Enable Down + Up notifications.
+
+## 6. Cron heartbeats (BetterStack Heartbeats)
+
+1. BetterStack → **Heartbeats** → Create heartbeat for each scheduled cron job. Recommended grace period: **2 × schedule interval** (e.g. 15-min cron → 30-min grace).
+2. Copy each heartbeat URL (form: `https://uptime.betterstack.com/api/v1/heartbeat/<uuid>`).
+3. Store the map below in this doc (update as jobs change). The `cron-deadman` migration extends each `SELECT net.http_post(...)` block to also `SELECT net.http_get('<heartbeat url>')` on success.
+
+| Cron job | Schedule | Heartbeat UUID | Grace |
+|---|---|---|---|
+| `refresh-btc-prices` | `*/15 * * * *` | `<fill on setup>` | 30 min |
+| `pregenerate-companions` | `0 */6 * * *` | `<fill on setup>` | 12 hr |
+| `check-volatility` | `*/15 * * * *` | `<fill on setup>` | 30 min |
+| `check-followups` | `0 */6 * * *` | `<fill on setup>` | 12 hr |
+| `night-reflection` | `0 * * * *` | `<fill on setup>` | 2 hr |
+| `fetch-source-feeds` | `0 6,18 * * *` | `<fill on setup>` | 24 hr |
+| `process-referral-pending` | `*/5 * * * *` | `<fill on setup>` | 15 min |
+
+The cron migration that adds the `net.http_get` calls is committed as part of this plan; fill the UUIDs in the migration template once generated.
+
+## 7. Anthropic + Lovable limit alerts
+
+- Anthropic Console → Billing → **Budget alerts** at 50 / 80 / 100% → email to `alerts@<yourdomain>`.
+- Lovable dashboard → Billing / Limits → whatever hard caps Lovable exposes → email to `alerts@<yourdomain>`.
+
+Neither vendor offers native Slack integration for billing. Route email → `alerts@...` → forward to Slack via your email client's rule or a Slack email address (`#holzen-alerts` → More → Open channel details → **Integrations → Send emails to this channel**).
+
+## 8. Release tagging
+
+`VITE_APP_VERSION` (frontend) and `SENTRY_RELEASE` (edges) must match for cross-surface correlation. A CI step sets both from the same Git SHA.
+
+- Frontend build: Vite `define` injects `__APP_VERSION__`; `src/lib/sentry.ts` uses it as the Sentry `release`; PostHog registers it as super-property `$app_version`.
+- Edge functions: `observe.ts` includes `release` in every forwarded log line; `supabase/functions/_shared/sentry.ts` uses `SENTRY_RELEASE` as Sentry `release`.
+
+Release health UI (Sentry) shows the % of sessions free of crashes, grouped by release.
+
+## 9. Verifying end-to-end correlation
+
+After setup, a single test flow must hit every surface. See smoke test in [incident-response.md](incident-response.md) §Verify.
+
+## 10. When to promote / reconsider
+
+- **Dashboard access to Supabase** (claim via Lovable) → promote to **native log drain**; retire the in-function HTTP forwarder. `observability-setup.md` stays; BetterStack alert rules stay.
+- **Edge log volume > 5M lines / month** → add batching in `observe.ts` forwarder (§backlog item in the plan).
+- **Error volume > 5k / month (Sentry free tier)** → choose: upgrade Sentry plan, tighten `beforeSend` skip-list, or use Sentry sampling (`Sentry.init({ sampleRate: 0.5 })`).
+- **EU users become primary cohort** → switch PostHog region to EU and revisit consent (see [pii-masking-review.md](pii-masking-review.md)).
