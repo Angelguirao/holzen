@@ -47,6 +47,7 @@ export interface ReflectionReadFlags {
 const CACHE_KEY_ITEMS = 'holzen_library_items';
 const CACHE_KEY_COLLECTIONS = 'holzen_library_collections';
 const CACHE_KEY_COL_ITEMS = 'holzen_library_col_items';
+const PAGE_SIZE = 50;
 
 
 function readCache<T>(key: string): T | null {
