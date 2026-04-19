@@ -26,29 +26,38 @@ negotiated rate differs.
 | `sonar-pro`  |         $3 |         $15 |                        $0.006 |
 | `sonar`      |         $1 |          $1 |                        $0.005 |
 
-> **Watch:** request fee jumps to $0.010 / $0.014 per request at medium/high
-> search context. We currently bill as low; tune `PERPLEXITY_REQUEST_FEE_USD_JSON`
-> if that changes.
+> **Watch:** the per-request fee is tiered by `search_context_size`.
+>
+> - Sonar Pro fast search: **low $0.006 / medium $0.010 / high $0.014** per request.
+> - Sonar fast search: **low $0.005 / … / high $0.012** per request.
+> - Sonar Pro with the **Pro Search auto-classifier** enabled: **$0.014–$0.022** per
+>   request on top of the same $3/$15 token rates.
+>
+> We currently bill as low-context in `DEFAULT_PERPLEXITY_REQUEST_FEE_USD`.
+> If the generators ever pass `search_context_size: "medium" | "high"`, override
+> via `PERPLEXITY_REQUEST_FEE_USD_JSON`.
 
 ### 1.2 Lovable AI Gateway — [pricing docs](https://docs.lovable.dev/integrations/ai)
 
-| Model                             | Input $/1M | Output $/1M |
-|-----------------------------------|-----------:|------------:|
-| `google/gemini-2.5-flash`         |      $0.15 |       $0.60 |
-| `google/gemini-3-flash-preview`   |      $0.15 |       $0.60 |
-| `google/gemini-2.5-flash-lite`    |     $0.075 |       $0.30 |
-| `google/gemini-2.5-flash-image`   |      $0.30 |      $30.00 |
+Lovable states explicitly that gateway pricing equals the underlying provider
+list price: *"The cost of using Lovable AI is exactly the same as going
+directly to the LLM provider. There are no hidden fees."* Numbers below are
+Google Gemini API list rates ([source](https://ai.google.dev/gemini-api/docs/pricing)).
 
-The image model bills output tokens at a premium (~1,290 output tokens per
-image → ~$0.039 per generated image). A Lovable usage-based surcharge may
-apply on top of Google list pricing — verify in
-**Workspace Settings → Cloud & AI balance**.
+| Model                             | Input $/1M | Output $/1M | Notes |
+|-----------------------------------|-----------:|------------:|-------|
+| `google/gemini-2.5-flash`         |      $0.30 |       $2.50 | GA pricing since Aug 2025 (was $0.15 / $0.60 under preview tiered pricing). |
+| `google/gemini-3-flash-preview`   |      $0.50 |       $3.00 | Released Dec 17, 2025. Batch/flex tier is half. |
+| `google/gemini-2.5-flash-lite`    |      $0.10 |       $0.40 | Current GA rate. |
+| `google/gemini-2.5-flash-image`   |      $0.30 |      $30.00 | ~1,290 output tokens/image → ~$0.039 per 1024×1024 image. Batch mode ≈ $0.0195/image. |
 
 ### 1.3 Pricing drift policy
 
-- Re-verify quarterly or when a provider publishes changes.
-- Treat all numbers in §5 / §6 as **order-of-magnitude** until reconciled with
-  the provider dashboards per §8.
+- Re-verify **quarterly** and whenever a provider posts a changelog entry.
+- `DEFAULT_COST_MAP` in `supabase/functions/_shared/observe.ts` carries a
+  `last verified` comment next to the map — bump the date when you update.
+- Treat all numbers in §3–§4 as **order-of-magnitude**; reconcile with the
+  provider dashboards per §8 before making capacity decisions.
 
 ---
 
@@ -93,15 +102,19 @@ context length, and search depth. Use as order of magnitude only.
 
 ### 3.1 Lovable Gemini (text models)
 
-Assume 5,000 input tokens / 500 output tokens on `gemini-2.5-flash`:
+Assume 5,000 input tokens / 500 output tokens on `gemini-2.5-flash` at current
+GA rates:
 
 ```
-USD ≈ (5000 × 0.15 + 500 × 0.60) / 1e6 ≈ $0.00105
+USD ≈ (5000 × 0.30 + 500 × 2.50) / 1e6 ≈ $0.00275
 ```
 
-`gemini-2.5-flash-lite` is ~half that. `gemini-3-flash-preview` uses the
-same default rate as `2.5-flash` in our `COST_MAP` until provider pricing
-diverges.
+`gemini-2.5-flash-lite` is roughly a third of that (~$0.00070).
+`gemini-3-flash-preview` is roughly double (~$0.00400).
+
+> Note: these numbers are ~2× what this doc showed before 2026-04-19.
+> Google re-priced 2.5 Flash and launched 3 Flash Preview between versions.
+> See §10 changelog.
 
 ### 3.2 Perplexity Sonar Pro
 
@@ -134,32 +147,46 @@ past their 3-pause/month cap. These are stress figures; the cache warmer, the
 reflection_companions skip-cache path, and user behavior all cut real numbers
 below them.
 
+Per-pause AI cost at the **current** Gemini GA pricing (Apr 2026):
+
+- 1× Perplexity Sonar Pro call (signal/grounding/history): ~$0.055
+- 1× Gemini 2.5 Flash structuring call on top: ~$0.0040 (was ~$0.0016)
+- Reflection (Gemini 3 Flash Preview): ~$0.004 (was ~$0.001)
+
+So the **"full pause" happy path** now totals ~$0.19–0.24 (vs. ~$0.17–0.22
+in earlier estimates). The Perplexity component still dominates, so the
+headline ceiling math in §4.4 is unchanged. What **does** change meaningfully
+is auxiliary AI spend (journal prompts, digests, reports, night reflections,
+admin preview) — those are roughly **2× more expensive per call** now.
+
 ### 4.1 100 Pro DAU
 
-- **Pauses.** 100 × 2 full pauses/day × $0.20 (all-live happy path) ≈ $40/day.
+- **Pauses.** 100 × 2 full pauses/day × ~$0.21 (all-live happy path) ≈ $42/day.
 - **Auxiliary AI** (journal prompts, night reflections, wallpapers at 20%
-  weekly adoption, digests, reports): ~$3–5/day.
-- **Total.** ~$45/day ≈ **~$1,350/month** AI spend. Well above the default
+  weekly adoption, digests, reports): ~$6–10/day (up from ~$3–5 pre-drift).
+- **Total.** ~$48–52/day ≈ **~$1,500/month** AI spend. Well above the default
   $300/month cap → you either raise the cap or let panic mode + feature flags
   degrade non-essential features.
 
 ### 4.2 1,000 Pro DAU
 
-- **Pauses.** 1000 × 2 × $0.20 ≈ $400/day.
-- **Auxiliary.** ~$30–50/day.
-- **Total.** ~$430–450/day ≈ **~$13,000/month**. At this scale the pause
-  path is the binding constraint; prioritize caching (`pregenerate-companions`
-  hit rate) and Perplexity rate negotiation.
+- **Pauses.** 1000 × 2 × ~$0.21 ≈ $420/day.
+- **Auxiliary.** ~$60–100/day (up from ~$30–50 pre-drift).
+- **Total.** ~$480–520/day ≈ **~$15,000/month**. At this scale the pause
+  path is still the binding constraint; prioritize caching
+  (`pregenerate-companions` hit rate) and Perplexity rate negotiation.
 
 ### 4.3 10,000 Pro DAU
 
-Infeasible without substantially higher cache hit rates (>70%) and tighter
-per-user ceilings. The doc exists so nobody can say we didn't see it coming.
+Infeasible without substantially higher cache hit rates (>70%), tighter
+per-user ceilings, and a provider contract. The doc exists so nobody can
+say we didn't see it coming.
 
 ### 4.4 What caps actually stop
 
 The defaults in `app_config` (`$10` daily global / `$1` daily per-user /
-`$300` monthly global) map to roughly **50 all-live pauses globally per day**.
+`$300` monthly global) map to roughly **45 all-live pauses globally per day**
+(down from ~50 pre-drift since each pause now costs a bit more).
 That's the ceiling, not the expected usage. The ceiling is intentionally
 aggressive so you raise it on purpose, not by accident. Raise the cap in the
 admin Tools tab when you see the daily spend bar sustain >60% for a week.
@@ -330,6 +357,16 @@ Provider top-up is a secondary net.
 
 ## 10. Changelog
 
+- **2026-04-19 (later that day):** Pricing verification pass against Perplexity
+  and Google docs (via Context7). Updated `DEFAULT_COST_MAP` to current GA
+  rates:
+  - `gemini-2.5-flash`: `[0.15, 0.60]` → **`[0.30, 2.50]`** (GA, Aug 2025).
+  - `gemini-3-flash-preview`: `[0.15, 0.60]` → **`[0.50, 3.00]`** (released Dec 2025).
+  - `gemini-2.5-flash-lite`: `[0.075, 0.30]` → **`[0.10, 0.40]`**.
+  - Perplexity, `gemini-2.5-flash-image`: unchanged.
+
+  Pre-drift doc had underestimated Lovable-side spend by ~2×. Scenario totals,
+  per-pause arithmetic, and ceiling-math updated to match.
 - **2026-04-19:** Initial version. Supersedes pause-only estimates doc as
   canonical. Covers all 17 AI-touching edge functions. Adds guardrail map,
   scenario bounds, runbooks, auto top-up recommendations.

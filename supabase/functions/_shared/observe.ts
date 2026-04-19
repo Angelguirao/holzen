@@ -6,13 +6,22 @@
 // ── Cost estimation per 1M tokens [input, output] in USD ──
 // Default costs; can be overridden via COST_MAP_OVERRIDE env var
 // (JSON string, e.g. '{"google/gemini-2.5-flash":[0.15,0.6]}')
+// NOTE: prices last verified 2026-04-19 against Perplexity + Google (via
+// Lovable docs, which explicitly state parity with provider list pricing).
+// See docs/systems/costs/ai-cost-model.md §1 for sources. Re-verify quarterly.
 const DEFAULT_COST_MAP: Record<string, [number, number]> = {
+  // Perplexity — token rates unchanged, request fee handled separately below.
   "sonar-pro": [3, 15],
   // Perplexity sonar: $1/M in and out (see dashboard / docs; not $5/M output)
   "sonar": [1, 1],
-  "google/gemini-2.5-flash": [0.15, 0.6],
-  "google/gemini-3-flash-preview": [0.15, 0.6],
-  "google/gemini-2.5-flash-lite": [0.075, 0.3],
+  // Google Gemini 2.5 Flash — GA pricing (Aug 2025). Previously we used the
+  // preview tiered rate [0.15, 0.60]; actual is [0.30, 2.50] post-GA.
+  "google/gemini-2.5-flash": [0.3, 2.5],
+  // Google Gemini 3 Flash Preview — released Dec 2025. Batch/flex tier is
+  // half, but most of our traffic is real-time so we use list.
+  "google/gemini-3-flash-preview": [0.5, 3.0],
+  // Google Gemini 2.5 Flash Lite — current GA rate.
+  "google/gemini-2.5-flash-lite": [0.1, 0.4],
   // Gemini image model bills output tokens at a premium (~1290 output tokens
   // per image → ~$0.039 / image). Input stays at text-prompt rates.
   "google/gemini-2.5-flash-image": [0.3, 30],
