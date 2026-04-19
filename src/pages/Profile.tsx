@@ -456,7 +456,7 @@ function StatsContent({ reflections, practiceEntries = [], letters = [], memberS
             onClick={() => setShowScoreInfo(true)}
             className="absolute top-2 right-2 rounded-full p-1.5 text-muted-foreground/50 hover:text-muted-foreground transition-colors"
           >
-            <Info className="h-5 w-5" />
+            <Info className="h-5 w-5 text-secondary-foreground" />
           </button>
         )}
         <div className="flex items-center gap-5 px-[8px]">
@@ -641,7 +641,7 @@ function ScoreBarInline({ label, value, hint }: { label: string; value: number; 
   return (
     <div className="space-y-2 cursor-pointer" onClick={() => hint && setOpen(!open)}>
       <div className="flex justify-between text-[10px] font-mono text-muted-foreground">
-        <span className="font-sans font-medium text-base text-secondary-foreground">{label}</span>
+        <span className="font-sans text-base text-secondary-foreground font-normal">{label}</span>
         <span className="text-sm font-sans text-secondary-foreground">{value}</span>
       </div>
       <div className="h-1 rounded-full bg-muted/50 overflow-hidden">
@@ -659,7 +659,7 @@ function ScoreBarInline({ label, value, hint }: { label: string; value: number; 
 function StatsSection({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-4">
-      <p className="tracking-widest uppercase text-muted-foreground border-b border-border/40 pb-1.5 text-sm font-medium font-sans">
+      <p className="tracking-widest uppercase border-b border-border/40 pb-1.5 text-sm font-sans font-normal text-[#dbb266]">
         {label}
       </p>
       {children}
