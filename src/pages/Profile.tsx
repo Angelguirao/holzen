@@ -312,7 +312,7 @@ const Profile = () => {
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Lock className="h-3 w-3" />
-                    <p className="text-[10px] font-mono tracking-widest uppercase">
+                    <p className="text-xs font-mono tracking-widest uppercase">
                       {t('profile.sealed')} ({pendingLetters.length})
                     </p>
                   </div>
@@ -325,7 +325,7 @@ const Profile = () => {
                 <div className="space-y-3">
                   <div className="flex items-center gap-2 text-muted-foreground">
                     <Mail className="h-3 w-3" />
-                    <p className="text-[10px] font-mono tracking-widest uppercase">
+                    <p className="text-xs font-mono tracking-widest uppercase">
                       {t('profile.delivered')} ({deliveredLetters.length})
                     </p>
                   </div>
@@ -553,7 +553,7 @@ function StatsContent({ reflections, practiceEntries = [], letters = [], memberS
             const maxW = Math.max(...practiceStats.weeks, 1);
             return (
               <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-3 space-y-3">
-                <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
+                <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
                   {t('profile.practiceActivity')}
                 </p>
                 <div className="flex items-baseline gap-4">
@@ -661,7 +661,7 @@ function ScoreBarInline({ label, value, hint }: { label: string; value: number; 
 function StatsSection({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-4">
-      <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground border-b border-border/40 pb-1.5">
+      <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground border-b border-border/40 pb-1.5">
         {label}
       </p>
       {children}

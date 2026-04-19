@@ -78,7 +78,7 @@ export function SkillBalanceCard({ reflections }: Props) {
     <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-4">
       <div className="flex items-center gap-2">
         <Radar className="h-3.5 w-3.5 text-primary" />
-        <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
+        <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
           {t('skillBalance.title', 'Skill Balance')}
         </p>
       </div>

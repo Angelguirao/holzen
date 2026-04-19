@@ -139,7 +139,7 @@ export function VolatilityToleranceCard({ reflections }: Props) {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Activity className="h-3.5 w-3.5 text-primary" />
-          <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
+          <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
             {t('volatility.title')}
           </p>
         </div>

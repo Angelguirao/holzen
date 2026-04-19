@@ -12,7 +12,7 @@ export const ChartEmptyState = forwardRef<HTMLDivElement, Props>(function ChartE
   return (
     <div ref={ref} className="rounded-md border border-border/60 bg-muted/30 px-4 py-6 space-y-2 text-center">
       <BarChart3 className="h-4 w-4 mx-auto text-muted-foreground/30" />
-      <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground/50">
+      <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground/50">
         {title}
       </p>
       <p className="text-xs text-muted-foreground/60 leading-relaxed max-w-[220px] mx-auto">
