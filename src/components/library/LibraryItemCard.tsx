@@ -89,7 +89,7 @@ export function LibraryItemCard({ item, onToggleFavorite, onClick, engaged = tru
   return (
     <div
       className={cn(
-        'group flex items-start gap-2.5 rounded-lg border-l-2 px-3 py-2.5 transition-colors hover:bg-card/80 cursor-pointer',
+        'group flex items-start gap-2.5 rounded-lg border-l-2 px-3 py-2.5 transition-colors hover:bg-card/80 cursor-pointer mb-0 pb-[16px] pt-[16px]',
         sourceColor,
         dimmed && 'opacity-40'
       )}
@@ -116,13 +116,13 @@ export function LibraryItemCard({ item, onToggleFavorite, onClick, engaged = tru
           )}
         </div>
         {preview && (
-          <p className="text-[11px] text-muted-foreground/70 leading-relaxed line-clamp-2">
+          <p className="text-muted-foreground/70 leading-relaxed line-clamp-2 font-sans text-sm">
             {item.source_type === 'haiku' ? (
               <span className="italic">{preview}</span>
             ) : preview}
           </p>
         )}
-        <p className="text-[9px] font-mono text-muted-foreground/35 pt-0.5">{timeAgo}</p>
+        <p className="text-muted-foreground/35 pt-0.5 text-sm font-sans">{timeAgo}</p>
       </div>
 
       <button
