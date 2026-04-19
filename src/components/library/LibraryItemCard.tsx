@@ -116,7 +116,7 @@ export function LibraryItemCard({ item, onToggleFavorite, onClick, engaged = tru
           )}
         </div>
         {preview && (
-          <p className="text-muted-foreground/70 leading-relaxed line-clamp-2 font-sans text-sm">
+          <p className="leading-relaxed line-clamp-2 font-sans text-sm text-secondary-foreground">
             {item.source_type === 'haiku' ? (
               <span className="italic">{preview}</span>
             ) : preview}
