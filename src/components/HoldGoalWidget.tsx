@@ -412,7 +412,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
           <span className="text-sm font-semibold tabular-nums text-foreground/90">
             {years > 0 ? `${years}y ${days}d` : `${elapsed} day${elapsed !== 1 ? 's' : ''}`} {t('holdGoal.andCounting')}
           </span>
-          <p className={homeInWidget.metaFaint}>
+          <p className={`${homeInWidget.metaFaint} mb-[16px]`}>
             {t('holdGoal.since', { date: format(start, 'MMM d, yyyy') })}{elapsed > 0 ? ` · ${t('holdGoal.daysHeld', { count: elapsed })}` : ''} · {t('holdGoal.noEndDate')}
           </p>
         </div>
