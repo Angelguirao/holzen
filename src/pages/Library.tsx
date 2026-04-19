@@ -269,7 +269,7 @@ export default function Library() {
             {/* Source type chips */}
             {availableSources.length > 1 && (
               <div className="tabs-scroll flex items-center gap-1.5 overflow-x-auto pb-0.5 -mx-1 px-1">
-                {availableSources.map(({ key, emoji, label }) => (
+                {availableSources.map(({ key, icon: Icon, label }) => (
                   <button
                     key={key}
                     onClick={() => setSourceFilter(sourceFilter === key ? null : key)}
@@ -280,7 +280,7 @@ export default function Library() {
                         : 'border-border/30 text-muted-foreground/50 hover:text-muted-foreground/70'
                     )}
                   >
-                    <span>{emoji}</span>
+                    <Icon className="h-3 w-3" />
                     {label}
                   </button>
                 ))}
