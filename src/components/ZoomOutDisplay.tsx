@@ -16,16 +16,38 @@ interface OnThisDayEntry {
   date: string;
 }
 
+export interface EchoUserWord {
+  kind: 'note' | 'replay';
+  body: string;
+  created_at: string;
+}
+
+/**
+ * Strict Echo payload (2026-04-18): surfaces ONLY user-authored text
+ * (`reflections.note` + replay `practice_entries.body`). The AI-generated
+ * reflect-step prompt is available via `aiPrompt` but is never rendered as the
+ * main quote. Legacy `message` is kept for back-compat with older readers
+ * (History timeline, full-view ReadTime) and equals the first userWords body
+ * when present. See `supabase/functions/_shared/past-reflection-util.ts`.
+ */
+export interface ZoomOutEchoData {
+  id?: string;
+  /** Legacy mirror of `userWords[0].body` — kept for older consumers. */
+  message?: string;
+  created_at: string;
+  mood: string | null;
+  outcome: string | null;
+  context?: string | null;
+  /** Original AI-generated reflect-step prompt that started this pause. */
+  aiPrompt?: string | null;
+  /** Chronological (oldest first). Populated on modern payloads. */
+  userWords?: EchoUserWord[];
+}
+
 export interface ZoomOutData {
   onThisDay: OnThisDayEntry[];
   currentPrice: number | null;
-  echo: {
-    id?: string;
-    message: string;
-    created_at: string;
-    mood: string | null;
-    outcome: string | null;
-  } | null;
+  echo: ZoomOutEchoData | null;
   deepTime: {
     title: string;
     body: string;
@@ -68,9 +90,12 @@ export function ZoomOutDisplay({ data, loading, error, onRetry }: Props) {
 
   const { onThisDay, currentPrice, echo, deepTime } = data;
 
-  // Show deep time or echo even without price data — the companion is still valuable
+  // Show deep time or echo even without price data — the companion is still valuable.
+  // `hasEcho` is strict about user-authored words: legacy payloads with only
+  // `message` (the AI prompt) don't count, matching the strict Echo policy below.
   const hasPrices = currentPrice && onThisDay.length > 0;
-  const hasContent = !!deepTime || !!echo;
+  const hasEcho = !!echo && (echo.userWords?.length ?? 0) > 0;
+  const hasContent = !!deepTime || hasEcho;
   const isEmpty = !hasPrices && !hasContent;
 
   const goToReplay = () => {
@@ -164,85 +189,110 @@ export function ZoomOutDisplay({ data, loading, error, onRetry }: Props) {
         </div>
       )}
 
-      {/* Echo - real past reflection */}
-      {echo ? (
-        <div className="rounded-lg border border-border/40 bg-muted/[0.08] px-3.5 py-3 space-y-3">
-          <div className="space-y-1.5">
-            <div className="flex items-center gap-1.5">
-              <Clock className="h-3 w-3 text-muted-foreground/50" />
-              <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">
-                Echo · {format(new Date(echo.created_at), 'MMM d, yyyy')}
+      {/* Echo - user-authored past words only (note + replay). Never AI text. */}
+      {(() => {
+        const userWords = echo?.userWords ?? [];
+        const primary = userWords[0];
+        const extraCount = Math.max(0, userWords.length - 1);
+        if (!echo || !primary) {
+          // Strict empty state: no user notes/replays exist for recent pauses.
+          return (
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-1.5">
+                <Clock className="h-3 w-3 text-muted-foreground/50" />
+                <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">
+                  {t('companions.echoEmptyTitle')}
+                </p>
+              </div>
+              <p className="text-xs text-muted-foreground/60 leading-relaxed">
+                {t('companions.echoEmptyBody')}
               </p>
             </div>
-            <p
-              className={`text-xs text-muted-foreground leading-relaxed italic ${
-                quoteExpanded ? '' : 'line-clamp-4'
-              }`}
-            >
-              &ldquo;{echo.message}&rdquo;
-            </p>
-            {echo.message.length > 220 && (
-              <button
-                type="button"
-                onClick={() => setQuoteExpanded((v) => !v)}
-                className="text-[9px] font-mono text-muted-foreground/50 hover:text-muted-foreground/70 flex items-center gap-1"
+          );
+        }
+        const quoteLong = primary.body.length > 220;
+        return (
+          <div className="rounded-lg border border-border/40 bg-muted/[0.08] px-3.5 py-3 space-y-3">
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-1.5">
+                <Clock className="h-3 w-3 text-muted-foreground/50" />
+                <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">
+                  {t('companions.echoHeader', {
+                    date: format(new Date(primary.created_at), 'MMM d, yyyy'),
+                    kind:
+                      primary.kind === 'replay'
+                        ? t('companions.echoKindReplay')
+                        : t('companions.echoKindNote'),
+                  })}
+                </p>
+              </div>
+              <p
+                className={`text-xs text-muted-foreground leading-relaxed italic ${
+                  quoteExpanded ? '' : 'line-clamp-4'
+                }`}
               >
-                {quoteExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-                {quoteExpanded ? t('common.showLess', 'Show less') : t('companions.echoExpandQuote')}
-              </button>
-            )}
-            <div className="flex gap-1.5 flex-wrap">
-              {echo.mood && (
-                <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground">
-                  {echo.mood}
-                </span>
+                &ldquo;{primary.body}&rdquo;
+              </p>
+              {quoteLong && (
+                <button
+                  type="button"
+                  onClick={() => setQuoteExpanded((v) => !v)}
+                  className="text-[9px] font-mono text-muted-foreground/50 hover:text-muted-foreground/70 flex items-center gap-1"
+                >
+                  {quoteExpanded ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
+                  {quoteExpanded ? t('common.showLess', 'Show less') : t('companions.echoExpandQuote')}
+                </button>
               )}
-              {echo.outcome && (
-                <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground">
-                  {outcomeLabels[echo.outcome] || echo.outcome}
-                </span>
+              <div className="flex gap-1.5 flex-wrap">
+                {echo.mood && (
+                  <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground">
+                    {echo.mood}
+                  </span>
+                )}
+                {echo.outcome && (
+                  <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-muted/50 text-muted-foreground">
+                    {outcomeLabels[echo.outcome] || echo.outcome}
+                  </span>
+                )}
+              </div>
+              {extraCount > 0 && (
+                <p className="text-[10px] font-mono text-muted-foreground/55">
+                  {t('companions.echoMoreEntries', { count: extraCount })}
+                </p>
               )}
             </div>
-          </div>
 
-          <p className="text-[10px] text-muted-foreground/70 leading-relaxed">
-            {t('companions.echoFraming')}
-          </p>
-          <div className="space-y-1">
-            <p className="text-[9px] font-mono text-muted-foreground/45 uppercase tracking-wider">
-              {t('companions.echoPromptIntro')}
+            <p className="text-[10px] text-muted-foreground/70 leading-relaxed">
+              {t('companions.echoFraming')}
             </p>
-            <ul className="text-[10px] text-muted-foreground/65 leading-relaxed list-disc pl-4 space-y-0.5">
-              <li>{t('companions.echoPrompt1')}</li>
-              <li>{t('companions.echoPrompt2')}</li>
-              <li>{t('companions.echoPrompt3')}</li>
-            </ul>
-          </div>
+            <div className="space-y-1">
+              <p className="text-[9px] font-mono text-muted-foreground/45 uppercase tracking-wider">
+                {t('companions.echoPromptIntro')}
+              </p>
+              <ul className="text-[10px] text-muted-foreground/65 leading-relaxed list-disc pl-4 space-y-0.5">
+                <li>{t('companions.echoPrompt1')}</li>
+                <li>{t('companions.echoPrompt2')}</li>
+                <li>{t('companions.echoPrompt3')}</li>
+              </ul>
+            </div>
 
-          {echo.id ? (
-            <button
-              type="button"
-              onClick={goToReplay}
-              className="w-full flex items-center justify-center gap-2 py-2.5 rounded-md border border-primary/25 bg-primary/[0.06] hover:bg-primary/[0.1] transition-colors"
-            >
-              <PenLine className="h-3 w-3 text-primary/60 shrink-0" />
-              <span className="text-[10px] font-mono text-primary/70 tracking-[0.12em] uppercase">
-                {t('companions.echoRespondCta')}
-              </span>
-            </button>
-          ) : null}
-        </div>
-      ) : (
-        <div className="space-y-1.5">
-          <div className="flex items-center gap-1.5">
-            <Clock className="h-3 w-3 text-muted-foreground/50" />
-            <p className="text-[9px] font-mono text-muted-foreground/50 uppercase tracking-wider">Echo</p>
+            {echo.id ? (
+              <button
+                type="button"
+                onClick={goToReplay}
+                className="w-full flex items-center justify-center gap-2 py-2.5 rounded-md border border-primary/25 bg-primary/[0.06] hover:bg-primary/[0.1] transition-colors"
+              >
+                <PenLine className="h-3 w-3 text-primary/60 shrink-0" />
+                <span className="text-[10px] font-mono text-primary/70 tracking-[0.12em] uppercase">
+                  {extraCount > 0
+                    ? t('companions.echoContinueThreadCta')
+                    : t('companions.echoRespondCta')}
+                </span>
+              </button>
+            ) : null}
           </div>
-          <p className="text-xs text-muted-foreground/50 leading-relaxed italic">
-            No past reflection to echo yet. Keep reflecting — your future self will thank you.
-          </p>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 }
