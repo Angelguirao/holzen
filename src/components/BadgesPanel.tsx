@@ -256,7 +256,7 @@ export function BadgesPanel({ reflections, subscribed, notifyBadges = true }: Ba
                   <div className="flex items-center justify-between gap-2">
                     <div className="gap-2 min-w-0 flex items-start justify-start mt-0 pt-0">
                       <badge.icon
-                        className="h-3.5 w-3.5 shrink-0"
+                        className="h-3.5 w-3.5 shrink-0 mt-0.5"
                         style={{ color: badge.earned && !isLocked ? badge.color : undefined }}
                       />
                       <p className={`leading-tight text-sm font-sans font-medium ${badge.earned && !isLocked ? 'text-secondary-foreground' : 'text-secondary-foreground/70'}`}>
