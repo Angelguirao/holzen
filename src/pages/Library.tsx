@@ -334,34 +334,31 @@ export default function Library() {
           )}
 
           {/* Count + Sort */}
-            <div className="flex items-center justify-between px-1">
-              <span className="text-sm font-sans text-muted-foreground">
-                {filtered.length} {filtered.length === 1 ? 'item' : 'items'}
-              </span>
-              <div className="flex items-center gap-3">
-                <ExportMenu items={filtered} />
-                <button
-                  onClick={cycleSortMode}
-                  className="flex items-center gap-1 transition-colors text-cyan-700 text-sm font-sans"
-                >
-                  <ArrowUpDown className="h-2.5 w-2.5" />
-                  {sortLabel}
-                </button>
-              </div>
+          <div className="flex items-center justify-between px-1">
+            <span className="text-sm font-sans text-muted-foreground">
+              {filtered.length} {filtered.length === 1 ? 'item' : 'items'}
+            </span>
+            <div className="flex items-center gap-3">
+              <ExportMenu items={filtered} />
+              <button
+                onClick={cycleSortMode}
+                className="flex items-center gap-1 transition-colors text-cyan-700 text-sm font-sans"
+              >
+                <ArrowUpDown className="h-2.5 w-2.5" />
+                {sortLabel}
+              </button>
             </div>
-
-            {/* Duplicate detection banner */}
-            <DuplicateBanner
-              items={items}
-              onDeleteItem={library.deleteItem}
-              onSelectItem={() => {}}
-            />
           </div>
 
-          {/* Scrollable item list */}
-          <div className="flex-1 min-h-0">
-            <LibraryItems library={library} filtered={filtered} />
-          </div>
+          {/* Duplicate detection banner */}
+          <DuplicateBanner
+            items={items}
+            onDeleteItem={library.deleteItem}
+            onSelectItem={() => {}}
+          />
+
+          {/* Item list - natural page scroll */}
+          <LibraryItems library={library} filtered={filtered} />
         </div>
       )}
     </div>
