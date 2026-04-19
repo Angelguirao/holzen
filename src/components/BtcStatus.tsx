@@ -80,7 +80,7 @@ export function BtcStatus({ data, error, hidden, onToggleHidden, currency = 'USD
           ) : (
             <>
               <p className={`${homeInWidget.price} text-foreground/90`}>1 BTC = 1 BTC</p>
-              <p className="leading-snug text-sm text-secondary-foreground">{t('btcStatus.priceIsNoise')}</p>
+              <p className="leading-snug text-sm text-[#dbb266]">{t('btcStatus.priceIsNoise')}</p>
             </>
           )}
         </div>
