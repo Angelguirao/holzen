@@ -76,20 +76,20 @@ export function BtcChart({ hidden = false, currency = 'USD' }: Props) {
 
   return (
     <div className="space-y-2">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between text-sm font-sans text-secondary-foreground">
         <p className="text-[10px] font-mono text-muted-foreground uppercase tracking-wider">
           7-day
         </p>
         <div className="flex items-center gap-1 text-muted-foreground">
-          {isUp ? <TrendingUp className="h-3 w-3" /> : <TrendingDown className="h-3 w-3" />}
-          <span className="text-[10px] font-mono">
+          {isUp ? <TrendingUp className="h-3 w-3 text-secondary-foreground" /> : <TrendingDown className="h-3 w-3 text-secondary-foreground" />}
+          <span className="text-sm font-sans text-secondary-foreground">
             {isUp ? '+' : '−'}{Math.abs(change7d).toFixed(1)}%
           </span>
         </div>
       </div>
       <div className="h-[100px] w-full min-w-0">
         <ResponsiveContainer width="100%" height={100} debounce={50}>
-          <AreaChart data={data} margin={{ top: 4, right: 0, left: 0, bottom: 0 }}>
+          <AreaChart data={data} margin={{ top: 4, right: 0, left: 0, bottom: 0 }} className="font-sans">
             <defs>
               <linearGradient id="btcGradient" x1="0" y1="0" x2="0" y2="1">
                 <stop offset="0%" stopColor="hsl(var(--foreground))" stopOpacity={0.12} />
