@@ -197,9 +197,6 @@ const Landing = () => {
                   viewport={{ once: true }}
                   transition={{ duration: 0.4, delay: i * 0.06 }}
                 >
-                  <div className="w-8 h-8 rounded-full bg-muted/60 flex items-center justify-center text-muted-foreground/70">
-                    {c.icon}
-                  </div>
                   <p className="text-xs font-medium text-foreground">{c.label}</p>
                   <p className="text-[10px] text-muted-foreground leading-relaxed">{c.desc}</p>
                 </motion.div>
