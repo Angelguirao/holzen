@@ -44,10 +44,10 @@ export function FeedbackForm() {
 
   return (
     <div className="space-y-3">
-      <p className="text-[10px] font-mono text-muted-foreground/60 uppercase tracking-wider">
+      <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">
         {t('feedback.getInTouch')}
       </p>
-      <p className="text-xs text-muted-foreground leading-relaxed">
+      <p className="text-muted-foreground leading-relaxed text-sm font-sans">
         {t('feedback.description')}
       </p>
 
@@ -65,9 +65,9 @@ export function FeedbackForm() {
                   : 'border-border/60 bg-muted/30 text-muted-foreground hover:text-foreground'
               }`}
             >
-              <Icon className="h-3.5 w-3.5 mb-1" />
-              <p className="text-xs font-mono font-medium">{t(c.labelKey)}</p>
-              <p className="text-[10px] text-muted-foreground mt-0.5">{t(c.descKey)}</p>
+              <Icon className="h-3.5 w-3.5 mb-1 border-secondary-foreground bg-secondary-foreground" />
+              <p className="font-normal text-base font-sans text-secondary-foreground">{t(c.labelKey)}</p>
+              <p className="text-muted-foreground mt-0.5 text-sm">{t(c.descKey)}</p>
             </button>
           );
         })}
