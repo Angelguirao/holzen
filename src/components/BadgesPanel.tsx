@@ -229,7 +229,7 @@ export function BadgesPanel({ reflections, subscribed, notifyBadges = true }: Ba
         return (
           <div key={cat} className="space-y-2.5">
             <div className="flex items-center justify-between">
-              <p className="tracking-widest uppercase text-muted-foreground/60 text-sm font-sans">
+              <p className="tracking-widest uppercase text-sm font-sans text-[#dbb266]">
                 {t(`badges.categories.${cat}`)}
               </p>
               <p className="text-base font-sans text-muted-foreground">
