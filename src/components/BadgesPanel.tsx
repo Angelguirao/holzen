@@ -207,8 +207,8 @@ export function BadgesPanel({ reflections, subscribed, notifyBadges = true }: Ba
           </div>
           <div className="h-1.5 flex-1 max-w-[120px] ml-4 rounded-full bg-muted/50 overflow-hidden">
             <div
-              className="h-full rounded-full bg-primary/60 transition-all duration-700 ease-out"
-              style={{ width: `${(earnedCount / badges.length) * 100}%` }}
+              className="h-full rounded-full transition-all duration-700 ease-out"
+              style={{ width: `${(earnedCount / badges.length) * 100}%`, backgroundColor: '#C1CBD7' }}
             />
           </div>
         </div>
@@ -282,7 +282,7 @@ export function BadgesPanel({ reflections, subscribed, notifyBadges = true }: Ba
                       <div className="h-1 w-full rounded-full bg-border/40 overflow-hidden">
                         <motion.div
                           className="h-full rounded-full"
-                          style={{ backgroundColor: badge.color }}
+                          style={{ backgroundColor: '#C1CBD7' }}
                           initial={{ width: 0 }}
                           animate={{ width: `${badge.progress * 100}%` }}
                           transition={{ delay: 0.3, duration: 0.5 }}

@@ -96,8 +96,8 @@ export function SkillBalanceCard({ reflections }: Props) {
             </div>
             <div className="h-1.5 rounded-full bg-muted/50 overflow-hidden">
               <div
-                className={`h-full rounded-full transition-all ${BAR_COLORS[skill]}`}
-                style={{ width: `${(pct / maxPct) * 100}%` }}
+                className="h-full rounded-full transition-all"
+                style={{ width: `${(pct / maxPct) * 100}%`, backgroundColor: '#C1CBD7' }}
               />
             </div>
           </div>
