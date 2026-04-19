@@ -116,6 +116,15 @@ Exact behavior in code changes with **`PROMPT_VERSION`** and the files in **§6*
 | Cache / library near-duplicate dedup | [cache-dedup-near-duplicates.md](../../../backlog/cache-dedup-near-duplicates.md) |
 | Full backlog index | [backlog.md](../../../backlog/backlog.md) |
 
+### Companion reading & sharing (backlog)
+
+| Topic | Ticket |
+|--------|--------|
+| Text-to-speech (Pro): `SpeechSynthesis` → ElevenLabs if insufficient | [companion-tts-pro.md](../../../backlog/companion-tts-pro.md) |
+| Share as image (Pro): `html-to-image` + design pass | [companion-share-as-image-pro.md](../../../backlog/companion-share-as-image-pro.md) |
+| High-contrast reading mode (theme token swap) | [companion-high-contrast-reading-mode.md](../../../backlog/companion-high-contrast-reading-mode.md) |
+| Print-friendly CSS | [companion-print-friendly-css.md](../../../backlog/companion-print-friendly-css.md) |
+
 ---
 
 ## 6. Key files

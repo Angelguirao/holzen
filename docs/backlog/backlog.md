@@ -95,6 +95,10 @@ Use this when you are **choosing what to work on next**. Items are **not** stric
 | — | [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md) | **Done (2026-04).** Telemetry + UI hint + **`companion_serves.cache_relaxation`** — see ticket. |
 | — | [form-field-name-id-a11y.md](form-field-name-id-a11y.md) | **Done (2026-04).** Auth, settings, library, hold goal, onboarding — see ticket. |
 | — | [lighthouse-a11y-home.md](lighthouse-a11y-home.md) | **Done (2026-04).** Landmark, contrast, bell label, targets — re-run Lighthouse to verify — see ticket. |
+| Lower | [companion-tts-pro.md](companion-tts-pro.md) | **Companions:** Pro **TTS** — start with **`SpeechSynthesis`**; **ElevenLabs** if quality insufficient — see ticket. |
+| Lower | [companion-share-as-image-pro.md](companion-share-as-image-pro.md) | **Companions:** Pro **share as image** — **`html-to-image`** client-side; design pass — see ticket. |
+| Lower | [companion-high-contrast-reading-mode.md](companion-high-contrast-reading-mode.md) | **Companions:** **High-contrast reading** — theme token swap for Full View / cards — see ticket. |
+| Lower | [companion-print-friendly-css.md](companion-print-friendly-css.md) | **Companions:** **`@media print`** for reading surfaces — see ticket. |
 
 ### Ops & security (cron workers, secrets, docs alignment)
 
@@ -152,6 +156,10 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | Product / UX | [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md) | **Done (2026-04).** Logs + pause UI copy — see ticket |
 | Product / UX | [form-field-name-id-a11y.md](form-field-name-id-a11y.md) | **Done (2026-04).** Form **`name`** / **`id`** / **`autocomplete`** — see ticket |
 | Product / UX | [lighthouse-a11y-home.md](lighthouse-a11y-home.md) | **Done (2026-04).** Home **`/`** axe fixes — see ticket |
+| Product / UX | [companion-tts-pro.md](companion-tts-pro.md) | **Companions:** Pro TTS (`SpeechSynthesis` → ElevenLabs if needed) |
+| Product / UX | [companion-share-as-image-pro.md](companion-share-as-image-pro.md) | **Companions:** Pro share-as-image (`html-to-image` + design) |
+| Product / UX | [companion-high-contrast-reading-mode.md](companion-high-contrast-reading-mode.md) | **Companions:** High-contrast reading (theme tokens) |
+| Product / UX | [companion-print-friendly-css.md](companion-print-friendly-css.md) | **Companions:** Print-friendly CSS |
 | Ops / security | [hosting-production-compression.md](hosting-production-compression.md) | **Done (2026-04).** Prod HTML compression verify — see ticket |
 | Quality | [quality-gates-false-positives.md](quality-gates-false-positives.md) | **Partial (2026-04).** `quality_gate_reject` + DB rows + regex tune — see ticket |
 | Testing | [e2e-browser-automation.md](e2e-browser-automation.md) | UI journeys (E2E) vs Bruno API review |
@@ -173,6 +181,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | **Frontend structure & conventions** | ~~[typed-navigation-state.md](typed-navigation-state.md)~~ **done**, ~~[route-level-code-splitting.md](route-level-code-splitting.md)~~ **done**, [react-page-and-hook-splitting.md](react-page-and-hook-splitting.md), ~~[data-fetching-conventions.md](data-fetching-conventions.md)~~ **done**, [home-fetch-deduplication.md](home-fetch-deduplication.md), ~~[resource-hints-preconnect.md](resource-hints-preconnect.md)~~ **done**, ~~[home-recharts-layout-cost.md](home-recharts-layout-cost.md)~~ **done** |
 | **Auth & routing** | ~~[auth-referral.md](auth-referral.md)~~ **done 2026-04**; ~~[route-gating.md](route-gating.md)~~ **done 2026-04** |
 | **Product / UX** | ~~[automatic-pause-notification-timing.md](automatic-pause-notification-timing.md)~~ **done**, ~~[cron-pause-featured-parity.md](cron-pause-featured-parity.md)~~ **done**, ~~[route-gating.md](route-gating.md)~~ **done**, ~~[cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md)~~ **done 2026-04**, ~~[form-field-name-id-a11y.md](form-field-name-id-a11y.md)~~ **done**, ~~[lighthouse-a11y-home.md](lighthouse-a11y-home.md)~~ **done** |
+| **Companions (reading / sharing)** | [companion-tts-pro.md](companion-tts-pro.md), [companion-share-as-image-pro.md](companion-share-as-image-pro.md), [companion-high-contrast-reading-mode.md](companion-high-contrast-reading-mode.md), [companion-print-friendly-css.md](companion-print-friendly-css.md) |
 | **Pause pipeline & client–server boundaries** | ~~[orchestrate-client-cron.md](orchestrate-client-cron.md)~~ **done**, ~~[automatic-pause-notification-timing.md](automatic-pause-notification-timing.md)~~ **done**, ~~[cron-pause-featured-parity.md](cron-pause-featured-parity.md)~~ **done** |
 | **Cost & duplicate work (client + server)** | ~~[orchestrate-client-cron.md](orchestrate-client-cron.md)~~ **done**, ~~[cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md)~~ **done**, [home-fetch-deduplication.md](home-fetch-deduplication.md) |
 | **Cache, library & market data** | ~~[cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md)~~ **done**, ~~[btc-price-cache-freshness.md](btc-price-cache-freshness.md)~~ **done**, ~~[cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md)~~ **done 2026-04** |
@@ -191,6 +200,10 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | [cache-async-error-handling.md](cache-async-error-handling.md) | **Done (2026-04).** `.catch` on fire-and-forget cache helpers — see ticket. |
 | [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md) | **Done (2026-04).** **`fetch-source-feeds`** + **`pregenerate-companions`** — see ticket |
 | [cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md) | **Done (2026-04).** `holzen_event: cache_serve` + UI + DB column — see ticket |
+| [companion-high-contrast-reading-mode.md](companion-high-contrast-reading-mode.md) | **Companions:** high-contrast reading — theme token swap — see ticket |
+| [companion-print-friendly-css.md](companion-print-friendly-css.md) | **Companions:** `@media print` for reading surfaces — see ticket |
+| [companion-share-as-image-pro.md](companion-share-as-image-pro.md) | **Companions:** Pro share-as-image — `html-to-image` + design pass — see ticket |
+| [companion-tts-pro.md](companion-tts-pro.md) | **Companions:** Pro TTS — `SpeechSynthesis` first; ElevenLabs if needed — see ticket |
 | [cron-pause-featured-parity.md](cron-pause-featured-parity.md) | **Done (2026-04).** **`useLayoutEffect`** loader priming — see ticket |
 | [cron-worker-auth-consistency.md](cron-worker-auth-consistency.md) | **Done (2026-04).** Cron worker auth — see ticket. |
 | [data-fetching-conventions.md](data-fetching-conventions.md) | **Done (2026-04).** **`navigating-the-codebase`** §6.1 — see ticket |
@@ -254,3 +267,7 @@ Legacy numeric IDs for chat / PR references; prefer **ticket file name** or [mas
 29. ~~**`preconnect`** resource hints~~ — **Shipped 2026-04** — [resource-hints-preconnect.md](resource-hints-preconnect.md)
 30. ~~Home **Recharts** layout / defer~~ — **Shipped 2026-04** — [home-recharts-layout-cost.md](home-recharts-layout-cost.md)
 31. ~~Production **HTML** compression~~ — **Shipped 2026-04** — [hosting-production-compression.md](hosting-production-compression.md)
+32. Companion **text-to-speech** (Pro) — [companion-tts-pro.md](companion-tts-pro.md)
+33. Companion **share as image** (Pro) — [companion-share-as-image-pro.md](companion-share-as-image-pro.md)
+34. Companion **high-contrast reading** mode — [companion-high-contrast-reading-mode.md](companion-high-contrast-reading-mode.md)
+35. Companion **print-friendly CSS** — [companion-print-friendly-css.md](companion-print-friendly-css.md)
