@@ -560,7 +560,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                 {t('settings.zenModeDesc')}
               </p>
               <div className="flex items-center justify-between">
-                <Label htmlFor="zen-mode" className="text-xs font-mono text-muted-foreground">
+                <Label htmlFor="zen-mode" className="text-muted-foreground text-base font-sans">
                   {t('settings.enableZenMode')}
                 </Label>
                 <Switch
