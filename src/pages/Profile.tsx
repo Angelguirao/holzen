@@ -454,9 +454,9 @@ function StatsContent({ reflections, practiceEntries = [], letters = [], memberS
             type="button"
             aria-label="Score info"
             onClick={() => setShowScoreInfo(true)}
-            className="absolute top-2 left-2 rounded-full p-1 text-muted-foreground/50 hover:text-muted-foreground transition-colors"
+            className="absolute top-2 right-2 rounded-full p-1.5 text-muted-foreground/50 hover:text-muted-foreground transition-colors"
           >
-            <Info className="h-3.5 w-3.5" />
+            <Info className="h-5 w-5" />
           </button>
         )}
         <div className="flex items-center gap-5 px-[8px]">
