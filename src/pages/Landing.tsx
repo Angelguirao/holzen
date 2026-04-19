@@ -272,9 +272,9 @@ const Landing = () => {
                         href={s.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 transition-colors text-sm font-sans text-muted-foreground"
+                        className="inline-flex items-start gap-1 transition-colors text-sm font-sans text-muted-foreground"
                       >
-                        <ExternalLink className="h-2.5 w-2.5 shrink-0" />
+                        <ExternalLink className="h-2.5 w-2.5 shrink-0 mt-[0.4em]" />
                         {s.label}
                       </a>
                     ))}
