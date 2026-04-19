@@ -116,7 +116,7 @@ const Landing = () => {
           <div className="flex items-center gap-4">
             <button
               onClick={() => navigate('/auth')}
-              className="text-xs font-mono text-muted-foreground hover:text-foreground transition-colors"
+              className="text-muted-foreground hover:text-foreground transition-colors font-sans text-base"
             >
               {t('common.signIn')}
             </button>
