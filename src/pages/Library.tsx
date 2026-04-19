@@ -241,7 +241,7 @@ export default function Library() {
       {tab !== 'collections' && (
         <div className="space-y-3 !mt-4">
           {/* Sticky controls: tabs are above; here we stick search + source chips */}
-          <div className="sticky top-[36px] z-20 -mx-1 px-1 pt-0 pb-2 space-y-3 bg-background/95 backdrop-blur-sm">
+          <div className="sticky top-[36px] z-20 -mx-1 px-1 pt-4 pb-2 space-y-3 bg-background/95 backdrop-blur-sm">
             {/* Search */}
             <div className="relative">
               <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 h-3.5 w-3.5 text-muted-foreground/40" />
