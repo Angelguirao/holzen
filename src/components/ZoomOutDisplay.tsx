@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { Skeleton } from '@/components/ui/skeleton';
 import { TrendingUp, TrendingDown, Clock, Globe, CloudOff, PenLine, ChevronDown, ChevronUp } from 'lucide-react';
 import { CompanionError } from './CompanionError';
@@ -69,6 +69,7 @@ const outcomeLabels: Record<string, string> = {
 export function ZoomOutDisplay({ data, loading, error, onRetry }: Props) {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const { subscribed, startCheckout } = useSubscription();
   const { currency } = useHolzen();
   const [quoteExpanded, setQuoteExpanded] = useState(false);
@@ -110,7 +111,9 @@ export function ZoomOutDisplay({ data, loading, error, onRetry }: Props) {
       });
       return;
     }
-    navigate('/practice/replay', { state: { reflectionId: echo.id } });
+    navigate('/practice/replay', {
+      state: { reflectionId: echo.id, returnTo: location.pathname + location.search },
+    });
   };
 
   return (
