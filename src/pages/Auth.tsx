@@ -154,7 +154,7 @@ const Auth = () => {
           </p>
         </header>
 
-        <Button variant="outline" className="w-full font-mono text-xs" onClick={handleGoogle}>
+        <Button variant="outline" className="w-full text-base font-sans font-normal" onClick={handleGoogle}>
           {t('auth.continueWithGoogle')}
         </Button>
 
