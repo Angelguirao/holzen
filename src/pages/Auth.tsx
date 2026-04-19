@@ -103,7 +103,7 @@ const Auth = () => {
         <div className="w-full max-w-sm space-y-6">
           <NoxHeaderMain title={t('common.holzen')} />
           <p className="text-sm">{t('auth.checkEmailReset')}</p>
-          <button onClick={() => { setResetSent(false); setView('sign-in'); }} className="text-xs font-mono text-muted-foreground underline">{t('auth.backToSignIn')}</button>
+          <button onClick={() => { setResetSent(false); setView('sign-in'); }} className="text-muted-foreground underline text-sm font-sans">{t('auth.backToSignIn')}</button>
         </div>
       </div>
     );
@@ -116,7 +116,7 @@ const Auth = () => {
           <NoxHeaderMain title={t('common.holzen')} subtitle={t('auth.resetYourPassword')} />
           <form onSubmit={handleForgotPassword} className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="auth-forgot-email" className="text-xs font-mono">{t('auth.email')}</Label>
+              <Label htmlFor="auth-forgot-email" className="text-base font-sans">{t('auth.email')}</Label>
               <Input
                 id="auth-forgot-email"
                 name="email"
@@ -131,7 +131,7 @@ const Auth = () => {
             {error && <p className="text-xs text-destructive font-mono">{error}</p>}
             <LoadingButton type="submit" className="w-full text-base font-sans font-normal" loading={loading}>{t('auth.sendResetLink')}</LoadingButton>
           </form>
-          <button onClick={() => { setView('sign-in'); setError(null); }} className="text-xs font-mono text-muted-foreground underline w-full text-center">{t('auth.backToSignIn')}</button>
+          <button onClick={() => { setView('sign-in'); setError(null); }} className="text-muted-foreground underline text-sm font-sans w-full text-center">{t('auth.backToSignIn')}</button>
         </div>
       </div>
     );
@@ -166,7 +166,7 @@ const Auth = () => {
 
         <form onSubmit={handleEmailAuth} className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="auth-email" className="text-xs font-mono">{t('auth.email')}</Label>
+            <Label htmlFor="auth-email" className="text-base font-sans">{t('auth.email')}</Label>
             <Input
               id="auth-email"
               name="email"
@@ -180,9 +180,9 @@ const Auth = () => {
           </div>
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <Label htmlFor="auth-password" className="text-xs font-mono">{t('auth.password')}</Label>
+              <Label htmlFor="auth-password" className="text-base font-sans">{t('auth.password')}</Label>
               {view === 'sign-in' && (
-                <button type="button" onClick={() => { setView('forgot-password'); setError(null); }} className="text-xs font-mono text-muted-foreground underline">
+                <button type="button" onClick={() => { setView('forgot-password'); setError(null); }} className="text-muted-foreground underline text-sm font-sans">
                   {t('auth.forgotPassword')}
                 </button>
               )}
