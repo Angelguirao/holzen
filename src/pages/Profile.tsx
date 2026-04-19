@@ -644,7 +644,7 @@ function ScoreBarInline({ label, value, hint }: { label: string; value: number; 
     <div className="space-y-2 cursor-pointer" onClick={() => hint && setOpen(!open)}>
       <div className="flex justify-between text-[10px] font-mono text-muted-foreground">
         <span className="font-sans font-medium text-base text-secondary-foreground">{label}</span>
-        <span className="text-sm font-sans">{value}</span>
+        <span className="text-sm font-sans text-secondary-foreground">{value}</span>
       </div>
       <div className="h-1 rounded-full bg-muted/50 overflow-hidden">
         <div className="h-full rounded-full bg-primary/60 transition-all duration-700 ease-out" style={{ width: `${value}%` }} />
