@@ -1,16 +1,17 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { createAttemptLogger } from "../_shared/observe.ts";
+import { withRequestLogging } from "../_shared/with-request-logging.ts";
+import { EdgeError } from "../_shared/edge-error.ts";
+import { logDependencyCall } from "../_shared/deps.ts";
 
-const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
-};
+// Reference migration: this function is one of the three wrapped for the observability
+// rollout (see docs/ops/edge-logging-conventions.md § Migration plan). `withRequestLogging`
+// handles CORS, correlation id, structured request/response logs, Sentry capture, and the
+// standardized EdgeError → JSON response envelope. Business logic stays focused on AI orchestration.
 
-serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
-
-  try {
+serve(
+  withRequestLogging("journal-prompt", async ({ req, log, cid }) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
@@ -22,39 +23,45 @@ serve(async (req) => {
     });
 
     const { data: { user } } = await sb.auth.getUser();
-    if (!user) {
-      return new Response(JSON.stringify({ error: "Unauthorized" }), {
-        status: 401,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
-    }
+    if (!user) throw new EdgeError("auth_required", "Sign in to request journal prompts.");
 
-    // Track AI usage
-    const svcClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!, { auth: { persistSession: false } });
-    try { await svcClient.from("analytics_events").insert({ user_id: user.id, event: "journal_prompt_ai_call" }); } catch (_) { /* non-fatal */ }
+    const svcClient = createClient(
+      supabaseUrl,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+      { auth: { persistSession: false } }
+    );
+    try {
+      await svcClient
+        .from("analytics_events")
+        .insert({ user_id: user.id, event: "journal_prompt_ai_call" });
+    } catch (_) {
+      /* non-fatal */
+    }
     const logAttempt = createAttemptLogger(svcClient, { userId: user.id });
     const JOURNAL_MODEL = "google/gemini-2.5-flash";
 
-    // Cost / feature guard. Degrades gracefully: on block, return a 503 with reason;
-    // the client already handles errors with a retry-later toast.
     const { guardAiFeature } = await import("../_shared/ratelimit.ts");
     const guard = await guardAiFeature(svcClient, "journal_prompt", {
       userId: user.id,
       providers: ["lovable"],
     });
     if (!guard.allowed) {
-      return new Response(JSON.stringify({ error: guard.reason ?? "Temporarily unavailable" }), {
-        status: guard.status ?? 503,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-      });
+      // Feature/rate guard failures are expected — they carry budget/fairness semantics
+      // and should not page to Sentry. `dependency_unavailable` maps that to a 503.
+      throw new EdgeError(
+        "dependency_unavailable",
+        guard.reason ?? "Temporarily unavailable",
+        guard.status ?? 503
+      );
     }
 
-    const { language: rawLang } = await req.json().catch(() => ({ language: "en" }));
+    const { language: rawLang } = await req
+      .json()
+      .catch(() => ({ language: "en" }));
     const langCode = rawLang || "en";
     const LANG_NAMES: Record<string, string> = { en: "English", es: "Spanish", pt: "Portuguese", de: "German", nl: "Dutch", fr: "French", tr: "Turkish" };
     const langName = LANG_NAMES[langCode] || "English";
 
-    // Fetch recent reflections for context
     const { data: reflections } = await sb
       .from("reflections")
       .select("message, context, mood, outcome, created_at")
@@ -62,7 +69,6 @@ serve(async (req) => {
       .order("created_at", { ascending: false })
       .limit(5);
 
-    // Fetch recent journal entries to avoid repetition
     const { data: recentJournals } = await sb
       .from("practice_entries")
       .select("prompt, body")
@@ -79,7 +85,10 @@ serve(async (req) => {
       ? `\n\nRecent journal prompts (DO NOT repeat these):\n${recentJournals.map((j: any) => `- ${j.prompt}`).join("\n")}`
       : "";
 
-    const langInstruction = langCode !== "en" ? `CRITICAL LANGUAGE REQUIREMENT: You MUST write ALL prompts in ${langName}. Do NOT use English.\n\n` : "";
+    const langInstruction =
+      langCode !== "en"
+        ? `CRITICAL LANGUAGE REQUIREMENT: You MUST write ALL prompts in ${langName}. Do NOT use English.\n\n`
+        : "";
 
     const systemPrompt = `${langInstruction}You are a reflective journaling guide for Bitcoin holders who use a mindfulness app called Holzen. Your job is to generate 3 unique, thought-provoking journal prompts that help the user explore their emotional relationship with their investment decisions.
 
@@ -101,23 +110,29 @@ ${contextBlock}${recentPromptsBlock}`;
     const t0 = Date.now();
     let response: Response;
     try {
-      response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: JOURNAL_MODEL,
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: "Generate 3 journal prompts for me." },
-          ],
-          response_format: { type: "json_object" },
-          temperature: 0.9,
-        }),
-        signal: controller.signal,
-      });
+      response = await logDependencyCall(
+        log,
+        "lovable-ai-gateway",
+        () =>
+          fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${LOVABLE_API_KEY}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              model: JOURNAL_MODEL,
+              messages: [
+                { role: "system", content: systemPrompt },
+                { role: "user", content: "Generate 3 journal prompts for me." },
+              ],
+              response_format: { type: "json_object" },
+              temperature: 0.9,
+            }),
+            signal: controller.signal,
+          }),
+        { operation: "chat.completions" }
+      );
     } catch (e) {
       clearTimeout(timeout);
       const isAbort = e instanceof DOMException && e.name === "AbortError";
@@ -143,19 +158,17 @@ ${contextBlock}${recentPromptsBlock}`;
         error_message: `HTTP ${response.status}`,
       });
       if (response.status === 429) {
-        return new Response(JSON.stringify({ error: "Rate limited, please try again later." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+        throw new EdgeError("rate_limited", "Rate limited, please try again later.");
       }
       if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "Payment required." }), {
-          status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
+        throw new EdgeError(
+          "dependency_unavailable",
+          "Payment required at upstream AI provider.",
+          402
+        );
       }
       const errText = await response.text();
-      console.error("AI gateway error:", response.status, errText);
+      log.error("ai_gateway_http_error", { status: response.status, body: errText.slice(0, 500) });
       throw new Error("AI gateway error");
     }
 
@@ -184,14 +197,9 @@ ${contextBlock}${recentPromptsBlock}`;
       prompts = jsonMatch ? JSON.parse(jsonMatch[0]) : [];
     }
 
+    log("prompts_generated", { count: prompts.length, cid });
     return new Response(JSON.stringify({ prompts }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json" },
     });
-  } catch (e) {
-    console.error("journal-prompt error:", e);
-    return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-    });
-  }
-});
+  })
+);
