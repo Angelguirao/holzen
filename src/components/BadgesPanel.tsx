@@ -266,7 +266,7 @@ export function BadgesPanel({ reflections, subscribed, notifyBadges = true }: Ba
                     {badge.proOnly && (
                       <div className="flex items-center shrink-0">
                         {isLocked ? (
-                          <Lock className="h-2.5 w-2.5 text-muted-foreground/40" />
+                          <Lock className="h-2.5 w-2.5 text-[#dbb266]" />
                         ) : (
                           <Sparkles className="h-2.5 w-2.5 text-primary/50" />
                         )}
