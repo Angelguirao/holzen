@@ -25,18 +25,21 @@ Click-paths and config for the Holzen observability stack. This is the setup sou
 
 ## Inputs needed (gather before execution)
 
-Set via Lovable secrets UI unless noted otherwise. Nothing in this list goes into the repo except through `.env.example` (frontend) or documented placeholders.
+**Where each value lives is not interchangeable.** `VITE_*` variables are inlined into the browser bundle at build time by Vite — they are public by definition. Lovable's Secrets vault rightly refuses them (storing them there would be a category error: a "secret" that Vite would immediately publish to every user). Edge-function secrets are the opposite: they stay server-side and must never appear in the bundle.
 
-### Frontend (Lovable Cloud env for the Vite build)
+### Frontend (committed to `vite.config.ts` as hardcoded fallbacks — values are public)
 
-| Variable | Value | Where obtained |
-|---|---|---|
-| `VITE_SENTRY_DSN` | Sentry DSN for frontend project | Sentry → Settings → Projects → [project] → Client Keys (DSN) |
-| `VITE_POSTHOG_KEY` | PostHog project API key | PostHog → Project Settings → Project API Key |
-| `VITE_POSTHOG_HOST` | `https://us.i.posthog.com` (default) or EU equivalent | PostHog region setting |
-| `VITE_APP_VERSION` | Git SHA of the deploy, 7-char prefix OK | Auto-injected via Vite `define` if `process.env.VITE_APP_VERSION` is set by the CI build, otherwise `dev` |
-| `SENTRY_AUTH_TOKEN` | Build-time only, for `@sentry/vite-plugin` source-map upload | Sentry → Settings → Account → API → Auth Tokens (scope: `project:releases`) |
-| `SENTRY_ORG`, `SENTRY_PROJECT` | Build-time only | Sentry org + project slugs |
+| Variable | Value | Where obtained | Where set |
+|---|---|---|---|
+| `VITE_SENTRY_DSN` | Sentry DSN for frontend project — safe to commit; Sentry enforces allowed origins on the project side | Sentry → Settings → Projects → [project] → Client Keys (DSN) | `vite.config.ts` → `FALLBACK_SENTRY_DSN` |
+| `VITE_POSTHOG_KEY` | PostHog project API key — safe to commit; write-scoped, domain-throttled | PostHog → Project Settings → Project API Key | `vite.config.ts` → `FALLBACK_POSTHOG_KEY` |
+| `VITE_POSTHOG_HOST` | `https://us.i.posthog.com` (default) or EU equivalent | PostHog region setting | `vite.config.ts` → `FALLBACK_POSTHOG_HOST` |
+| `VITE_APP_VERSION` | Git SHA (7-char). Auto-`dev` when unset | Build env (CI) | `process.env.VITE_APP_VERSION` at build time; falls back to `dev` |
+| `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` | Build-time only, for `@sentry/vite-plugin` source-map upload | Sentry → Settings → Account → API → Auth Tokens (scope: `project:releases`) | CI build env or local-only; never committed |
+
+**Why not Lovable Secrets for `VITE_*`?** They're inlined into the JS bundle. Lovable's UI blocks `VITE_*` secret names with the message *"VITE_ prefixed variables are build-time browser values and should be defined in .env files, not in secrets."* Because `.env` / `.env.*` are gitignored in this repo, the codebase convention is **hardcoded fallbacks in `vite.config.ts`** (same mechanism used for `VITE_SUPABASE_URL` / `VITE_SUPABASE_PUBLISHABLE_KEY`). To enable observability in the hosted build, edit `FALLBACK_SENTRY_DSN` / `FALLBACK_POSTHOG_KEY` in `vite.config.ts` and push.
+
+**Defense in depth (required):** Set allowed origins on the Sentry project and on the PostHog project so the embedded keys can only be used from your own domains. This is standard practice — vendors expect public-in-bundle keys and provide origin-restriction as the security layer.
 
 ### Edge functions (Lovable secrets UI)
 
@@ -72,9 +75,10 @@ curl -X POST -H 'Content-Type: application/json' \
 ### 2.1 Project
 
 1. [sentry.io](https://sentry.io) → Create project → platform **Browser JavaScript / React**. Name: `holzen`.
-2. Copy the DSN. Store as `VITE_SENTRY_DSN` (frontend env) and — unless you want a dedicated edge project — also as `SENTRY_DSN_EDGES` (Lovable secret).
+2. Copy the DSN. Paste as `FALLBACK_SENTRY_DSN` in `vite.config.ts` (frontend, committed) and — unless you want a dedicated edge project — also store as `SENTRY_DSN_EDGES` in the Lovable secrets UI (edges, server-side).
 3. Settings → Projects → `holzen` → **Security & Privacy** → enable **Scrub IP addresses** and **Data scrubbing**. Defaults handle PAN/SSN-like patterns; our `beforeSend` on both surfaces adds Holzen-specific keys (`prompt|reflection|content|message|body|input`).
-4. Settings → Projects → `holzen` → **Release Health** → enable.
+4. Settings → Projects → `holzen` → **Security & Privacy** → **Allowed Domains** → add your production + preview domains. The DSN is committed to the repo, so origin-restriction on the Sentry side is the security layer that prevents third parties from spamming your quota.
+5. Settings → Projects → `holzen` → **Release Health** → enable.
 
 ### 2.2 Source maps (build-time)
 
@@ -108,11 +112,12 @@ Ensure **weekly summary** is on (Settings → Account → Notifications → Week
 
 ### 3.1 Project
 
-1. [posthog.com](https://posthog.com) → Create project → platform **React**. Region: US or EU (match compliance needs; stored in `VITE_POSTHOG_HOST`).
-2. Copy the project API key → `VITE_POSTHOG_KEY`.
+1. [posthog.com](https://posthog.com) → Create project → platform **React**. Region: US or EU (match compliance needs; the region URL goes into `FALLBACK_POSTHOG_HOST` in `vite.config.ts`).
+2. Copy the project API key → paste as `FALLBACK_POSTHOG_KEY` in `vite.config.ts` (committed; public by design — write-scoped and domain-throttled).
 3. Project Settings → **Autocapture** → **Disabled**. Confirm; our `src/lib/posthog.ts` also sets `autocapture: false` but UI-level disable is belt-and-braces.
 4. Project Settings → **Session Recording** → **Disabled**. Our init explicitly disables too; this closes any "enable globally" button.
 5. Project Settings → **Data Management** → **Anonymize IPs** → enable.
+6. Project Settings → **Authorized domains / URLs** → add your production + preview domains. Mirrors the Sentry allowed-domains step — since the key is in the bundle, origin-restriction on the PostHog side is the security layer.
 
 ### 3.2 Events and properties
 
