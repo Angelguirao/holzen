@@ -673,7 +673,7 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
           <AccordionContent className="space-y-6 pb-4">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <Label htmlFor="email-notif" className="text-primary font-sans text-sm font-normal">
+                <Label htmlFor="email-notif" className="font-sans text-base font-medium text-primary">
                   {t('settings.emailNotifications')}
                 </Label>
                 <Switch id="email-notif" checked={emailNotifications} onCheckedChange={setEmailNotifications} />
