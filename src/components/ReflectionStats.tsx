@@ -7,7 +7,7 @@ import { toast } from 'sonner';
 import { formatDistanceToNow } from 'date-fns';
 
 interface Props {
-  reflections: { created_at: string; outcome: string | null }[];
+  reflections: { created_at: string; outcome: string | null; breathing_completed?: boolean | null; mood?: string | null; mood_after?: string | null }[];
   streakFreezeDates?: string[];
   onUseFreeze?: () => Promise<void>;
 }
