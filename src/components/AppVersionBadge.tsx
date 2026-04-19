@@ -166,11 +166,11 @@ export function AppVersionBadge({ changelogVersion }: { changelogVersion?: strin
     <div className="space-y-2">
       <div className="flex items-center gap-2 flex-wrap">
         {changelogVersion && (
-          <span className="text-[10px] font-mono text-muted-foreground/60">
+          <span className="text-muted-foreground/60 text-sm font-sans">
             Holzen v{changelogVersion}
           </span>
         )}
-        <span className="text-[9px] font-mono text-muted-foreground/40">
+        <span className="text-muted-foreground/40 text-sm font-sans">
           build {buildDate}
         </span>
       </div>
@@ -190,7 +190,7 @@ export function AppVersionBadge({ changelogVersion }: { changelogVersion?: strin
             type="button"
             onClick={checkForUpdates}
             disabled={checking || isDev}
-            className="inline-flex items-center gap-1 text-[10px] font-mono text-muted-foreground/50 hover:text-foreground disabled:opacity-30 transition-colors"
+            className="inline-flex items-center gap-1 disabled:opacity-30 transition-colors text-sm font-sans text-cyan-700"
           >
             <RefreshCw className={`h-3 w-3 ${checking ? 'animate-spin' : ''}`} />
             {checking ? 'Checking…' : 'Check for updates'}
@@ -202,7 +202,7 @@ export function AppVersionBadge({ changelogVersion }: { changelogVersion?: strin
             </span>
           )}
           {isDev && (
-            <span className="text-[9px] font-mono text-muted-foreground/30">(dev mode — SW disabled)</span>
+            <span className="text-muted-foreground/30 text-sm font-sans">(dev mode — SW disabled)</span>
           )}
         </div>
       )}
