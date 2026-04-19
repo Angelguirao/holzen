@@ -108,9 +108,9 @@ export const ThresholdSetting = forwardRef<HTMLDivElement, Props>(function Thres
       {/* Cumulative threshold */}
       <div className="space-y-4">
         <div className="space-y-2">
-          <p className="text-sm text-muted-foreground font-mono">{t('threshold.cumulative')}</p>
+          <p className="text-muted-foreground text-base font-sans">{t('threshold.cumulative')}</p>
           <p className="text-3xl font-mono tracking-tight">{cumVal.toFixed(1)}%</p>
-          <p className="text-sm text-muted-foreground">{t('threshold.rolling7day')}</p>
+          <p className="text-base font-sans text-muted-foreground">{t('threshold.rolling7day')}</p>
         </div>
 
         <Slider
