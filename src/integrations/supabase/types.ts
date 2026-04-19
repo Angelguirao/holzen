@@ -569,24 +569,45 @@ export type Database = {
       }
       feedback: {
         Row: {
+          app_version: string | null
           category: string
+          cid: string | null
           created_at: string
+          error_stack: string | null
           id: string
           message: string
+          page: string | null
+          posthog_session_id: string | null
+          sentry_event_id: string | null
+          user_agent: string | null
           user_id: string
         }
         Insert: {
+          app_version?: string | null
           category?: string
+          cid?: string | null
           created_at?: string
+          error_stack?: string | null
           id?: string
           message: string
+          page?: string | null
+          posthog_session_id?: string | null
+          sentry_event_id?: string | null
+          user_agent?: string | null
           user_id: string
         }
         Update: {
+          app_version?: string | null
           category?: string
+          cid?: string | null
           created_at?: string
+          error_stack?: string | null
           id?: string
           message?: string
+          page?: string | null
+          posthog_session_id?: string | null
+          sentry_event_id?: string | null
+          user_agent?: string | null
           user_id?: string
         }
         Relationships: []
