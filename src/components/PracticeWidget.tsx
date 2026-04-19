@@ -157,7 +157,7 @@ export function PracticeWidget() {
             <button
               key={p.id}
               onClick={() => handleSelect(p.id)}
-              className={`${homeInWidget.rowButtonGhost} group py-2.5 items-start`}
+              className="w-full gap-3 rounded-xl px-3 py-2.5 text-left transition-colors hover:bg-muted/30 group py-2.5 flex items-start justify-start"
             >
               <Icon className="h-3.5 w-3.5 text-muted-foreground/50 shrink-0 mt-[6px]" />
               <div className="min-w-0 flex-1 text-left">
