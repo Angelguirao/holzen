@@ -90,7 +90,7 @@ export function HomeWidget({
               animate={{ rotate: collapsed ? -90 : 0 }}
               transition={{ duration: 0.2 }}
             >
-              <ChevronDown className="h-4 w-4" aria-hidden />
+              <ChevronDown className="h-4 w-4 text-secondary-foreground" aria-hidden />
             </motion.div>
           </button>
         )}
