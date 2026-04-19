@@ -123,7 +123,7 @@ export default function Library() {
         <PageMeta title={t('library.pageTitle')} description={t('library.pageDescription')} />
         <NoxHeaderMain title={t('library.title')} subtitle={t('library.pageDescription')} />
         <div className="flex flex-col items-center justify-center min-h-[40vh] gap-4 text-center px-6">
-          <Lock className="h-6 w-6 text-muted-foreground/30" />
+          <Lock className="h-6 w-6 text-[#dbb266]" />
           <h2 className="text-sm font-semibold text-foreground">{t('pro.featureLocked')}</h2>
           <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">{t('pro.desc_library')}</p>
           <button
