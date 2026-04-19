@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { LoadingButton } from '@/components/ui/loading-button';
-import { Sparkles, Wind, Brain, Infinity, Anchor, Lightbulb, BookOpen, Moon, Image, Mail } from 'lucide-react';
+import { Sparkles, Wind, Brain, Infinity as InfinityIcon, Anchor, Lightbulb, BookOpen, Moon, Image, Mail } from 'lucide-react';
 import { PRICING } from '@/lib/pricing';
 
 interface Props {
@@ -88,7 +88,7 @@ export function OnboardingReady({
             {t('onboarding.ready.proPlan', 'Pro')}
           </p>
           {[
-            { icon: Infinity, text: t('onboarding.ready.proUnlimited', 'Unlimited pauses') },
+            { icon: InfinityIcon, text: t('onboarding.ready.proUnlimited', 'Unlimited pauses') },
             { icon: Anchor, text: t('onboarding.ready.proGrounding', 'AI-guided grounding & stillness') },
             { icon: Lightbulb, text: t('onboarding.ready.proInsights', 'AI pattern insights across pauses') },
             { icon: Moon, text: t('onboarding.ready.proNight', 'Evening reflection prompts') },

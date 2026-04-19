@@ -138,7 +138,10 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
       toast(t('settings.saved', 'Saved'), { duration: 1200, id: 'auto-save' });
     }, 400);
     return () => clearTimeout(saveTimeoutRef.current);
-  }, [threshold, thresholdDown, cumulativeThreshold, emailNotifications, reflectionTone, reflectionStyle, silentMode, cooldownHours, digestFrequency, customPrompt, quietHoursStart, quietHoursEnd, firstName, nightReflectionHour, aiInsightsEnabled, notifyBadges, mantra, currency, language, groundingActivities, companionPrefs]);
+    // `t` is intentionally omitted: its identity can change on i18n re-init and would fire a
+    // spurious "Saved" toast with no user input.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profileLoaded, threshold, thresholdDown, cumulativeThreshold, emailNotifications, reflectionTone, reflectionStyle, silentMode, cooldownHours, digestFrequency, customPrompt, quietHoursStart, quietHoursEnd, firstName, nightReflectionHour, aiInsightsEnabled, notifyBadges, mantra, currency, language, groundingActivities, companionPrefs]);
 
 
   useEffect(() => {

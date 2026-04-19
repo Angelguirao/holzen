@@ -5,7 +5,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useHolzen } from '@/hooks/use-holzen';
 import { formatBtcPrice, SUPPORTED_CURRENCIES } from '@/lib/btc';
-import { Target, Calendar, Coins, Infinity, X, Check, Pencil } from 'lucide-react';
+import { Target, Calendar, Coins, Infinity as InfinityIcon, X, Check, Pencil } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { differenceInDays, format } from 'date-fns';
@@ -226,7 +226,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
                   : 'text-muted-foreground/50 hover:text-muted-foreground'
               }`}
             >
-              {tp === 'time' ? <Calendar className="h-2.5 w-2.5" /> : tp === 'price' ? <Coins className="h-2.5 w-2.5" /> : <Infinity className="h-2.5 w-2.5" />}
+              {tp === 'time' ? <Calendar className="h-2.5 w-2.5" /> : tp === 'price' ? <Coins className="h-2.5 w-2.5" /> : <InfinityIcon className="h-2.5 w-2.5" />}
               {tp === 'time' ? t('holdGoal.time') : tp === 'price' ? t('holdGoal.price') : t('holdGoal.forever')}
             </button>
           ))}
@@ -283,7 +283,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
                 : t('holdGoal.counterStartsFrom', { date: format(startDate, 'MMM d, yyyy') })}
             </p>
             <Button size="sm" onClick={saveGoal} className="h-9 w-full rounded-xl text-sm font-semibold">
-              <Infinity className="h-3 w-3 mr-1.5" />
+              <InfinityIcon className="h-3 w-3 mr-1.5" />
               {t('holdGoal.commitForever')}
             </Button>
           </div>
@@ -403,7 +403,7 @@ export function HoldGoalWidget({ currentPrice }: { currentPrice?: number }) {
       <div className={`${homeInWidget.insetMuted} mb-0 pb-[16px]`}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Infinity className="h-3 w-3 text-primary/60" />
+            <InfinityIcon className="h-3 w-3 text-primary/60" />
             <p className={homeInWidget.kicker}>{t('holdGoal.holdForever')}</p>
           </div>
           {goalActions}

@@ -21,7 +21,6 @@ function extractArray(constName) {
   const m = txt.match(re);
   if (!m) throw new Error(`Could not extract ${constName}`);
   const code = m[1];
-  // eslint-disable-next-line no-new-func
   const arr = new Function(`"use strict"; return (${code});`)();
   return arr;
 }

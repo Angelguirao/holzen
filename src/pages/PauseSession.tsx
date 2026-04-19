@@ -76,6 +76,9 @@ export default function PauseSession() {
     if (!saved?.message) return null;
     if (navReflectionId && saved.reflectionId && saved.reflectionId !== navReflectionId) return null;
     return saved;
+    // `location.key` is intentional: we want a fresh `loadSession()` read on every navigation,
+    // even when `navReflectionId` is unchanged (e.g. same-route re-entry).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.key, navReflectionId]);
 
   const holzenAligned =

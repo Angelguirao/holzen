@@ -204,6 +204,9 @@ const Profile = () => {
     loadLetters();
     loadPractice();
     loadProfile();
+    // `locationLetterId` is only read once during the initial fetch; subsequent changes are handled
+    // by the dedicated effect below that watches `[locationLetterId, letters, lettersLoading]`.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
 
   const deleteLetter = useCallback(async (id: string) => {

@@ -71,7 +71,9 @@ async function fetchBlockData(): Promise<BlockData | null> {
       if (Array.isArray(blocks) && blocks.length > 0) {
         lastBlockTime = blocks[0].timestamp;
       }
-    } catch {}
+    } catch {
+      // mempool.space recent-blocks is a nice-to-have; leave lastBlockTime undefined on error.
+    }
 
     const h = typeof height === 'number' ? height : parseInt(height);
     const epochProgress = (h % 2016) / 2016;

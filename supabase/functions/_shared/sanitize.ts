@@ -12,7 +12,9 @@
 
 /** Strip control characters and zero-width chars */
 function stripControl(s: string): string {
-  // Remove ASCII control chars except newline/tab, and zero-width chars
+  // Remove ASCII control chars except newline/tab, and zero-width chars.
+  // The control-character range is the whole point of this regex; silence the rule.
+  // eslint-disable-next-line no-control-regex
   return s.replace(/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F\u200B-\u200F\uFEFF]/g, "");
 }
 

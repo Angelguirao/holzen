@@ -128,6 +128,8 @@ export function LetterViewer({ letter, onClose }: Props) {
       localStorage.setItem(seenKey, JSON.stringify([...seen, letter.id]));
     }, 2200);
     return () => { clearTimeout(t1); clearTimeout(t2); };
+    // Re-run only when the letter identity changes; other fields don't need to restart the ceremony.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [letter?.id, prefersReducedMotion]);
 
   const getWrittenDuringLabel = (during: string) => {

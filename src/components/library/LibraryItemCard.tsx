@@ -58,7 +58,9 @@ export function LibraryItemCard({ item, onToggleFavorite, onClick, engaged = tru
       try {
         const parsed = JSON.parse(text);
         text = parsed?.deepTime?.body || parsed?.echo?.message || parsed?.deepTime?.title || 'Zoom Out';
-      } catch {}
+      } catch {
+        // body is not JSON; fall back to the raw string we already have.
+      }
     }
     return text.length > 120 ? text.slice(0, 120) + '…' : text;
   }, [item.body, item.source_type]);

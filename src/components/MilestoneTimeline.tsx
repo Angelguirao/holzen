@@ -161,7 +161,7 @@ export function MilestoneTimeline({ reflections, practiceEntries = [], letters =
     items.sort((a, b) => b.date.localeCompare(a.date));
 
     return items;
-  }, [reflections, practiceEntries, t]);
+  }, [reflections, practiceEntries, letters, t]);
 
   if (milestones.length === 0) {
     return (

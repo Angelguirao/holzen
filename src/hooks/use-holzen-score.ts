@@ -221,5 +221,5 @@ export function useHolzenScore(
       selfAwareness: Math.round(awarenessScore),
       trend,
     };
-  }, [reflections, _freezeDates, practiceEntries, holdGoal]);
+  }, [reflections, holdGoal]);
 }

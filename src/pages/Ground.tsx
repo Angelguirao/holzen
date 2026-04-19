@@ -150,7 +150,7 @@ export default function Ground() {
     };
 
     fetchSuggestion();
-  }, [isPending, isPro, groundingActivities, btcData, severity, language, t, navState.preGenerated, strictNoFallback]);
+  }, [isPending, isPro, groundingActivities, btcData, severity, language, t, navState.preGenerated, strictNoFallback, user?.id]);
 
   // Timer
   useEffect(() => {

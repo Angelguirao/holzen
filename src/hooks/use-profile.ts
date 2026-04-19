@@ -51,11 +51,13 @@ export function useProfile() {
 
     const load = async () => {
       holzenLog.profile('fetch profiles', { userIdPrefix: user.id.slice(0, 8) });
-      let { data, error: selErr } = await supabase
+      const firstSelect = await supabase
         .from('profiles')
         .select(selectCols)
         .eq('user_id', user.id)
         .maybeSingle();
+      let data = firstSelect.data;
+      const selErr = firstSelect.error;
 
       if (selErr) {
         console.error('[useProfile] profiles select failed:', selErr.message);
@@ -125,6 +127,7 @@ export function useProfile() {
     };
     load();
     // Depend on stable id only — `user` object identity changes on TOKEN_REFRESHED etc., which would refetch unnecessarily.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id]);
 
   const setThreshold = useCallback(async (val: number) => {

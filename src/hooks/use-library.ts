@@ -59,7 +59,9 @@ function readCache<T>(key: string): T | null {
 }
 
 function writeCache<T>(key: string, data: T) {
-  try { localStorage.setItem(key, JSON.stringify(data)); } catch {}
+  try { localStorage.setItem(key, JSON.stringify(data)); } catch {
+    // localStorage can throw on quota / privacy-mode; cache miss is acceptable.
+  }
 }
 
 export function useLibrary() {

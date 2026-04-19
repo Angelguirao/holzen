@@ -327,7 +327,7 @@ DIVERSITY: Use a different journal/venue angle when possible. Do not recycle the
     let apiCalls = 0;
     let mergedUsage = undefined as ReturnType<typeof mergePerplexityUsage>;
 
-    let result = await callPerplexityChat(perplexityBody, PERPLEXITY_API_KEY, (m) => log(m));
+    const result = await callPerplexityChat(perplexityBody, PERPLEXITY_API_KEY, (m) => log(m));
     apiCalls++;
     mergedUsage = result.usage;
     searchContent = result.content;
@@ -533,7 +533,7 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
   }
 
   // ── Step 5: Cache write ──
-  let qualityScore = 1;
+  const qualityScore = 1;
   const cacheQg = qualityGate("ground_nudge", nudge);
   if (nudge.title && nudge.body && nudge.citation && qualityScore > 0 && cacheQg.pass) {
     try {

@@ -125,6 +125,9 @@ export function BreathingExercise({ severity = 'mild', onComplete, onClose, auto
       });
     }, 1000);
     return () => clearInterval(timer);
+    // Intentionally omit `onComplete`: including it would restart the breathing timer
+    // every time the parent re-renders with a fresh callback identity.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [active, completed, phaseIndex, cycle, currentPhase.duration, pattern.phases.length]);
 
   const progress = currentPhase.duration > 0 ? elapsed / currentPhase.duration : 0;

@@ -101,6 +101,8 @@ function RouterLocationLog() {
       signedIn: !!user,
       userIdPrefix: user?.id?.slice(0, 8) ?? null,
     });
+    // Depend on stable `user?.id` only; `user` identity flips on token refresh and would cause redundant logs.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pathname, loading, user?.id]);
   return null;
 }

@@ -92,7 +92,7 @@ export function useBadgeSync(computedBadgeIds: string[], badgeMeta: Record<strin
     };
 
     sync();
-  }, [user, computedBadgeIds, badgeMeta, synced]);
+  }, [user, computedBadgeIds, badgeMeta, synced, notifyEnabled]);
 
   const dismissCelebration = useCallback(() => {
     setNewBadges([]);
