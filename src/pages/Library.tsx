@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLibrary } from '@/hooks/use-library';
 import { PageMeta } from '@/components/PageMeta';
-import { Heart, Search, X, Lock, ArrowUpDown, RefreshCw } from 'lucide-react';
+import { Heart, Search, X, Lock, ArrowUpDown, RefreshCw, ArrowRight } from 'lucide-react';
 import { ExportMenu } from '@/components/library/ExportMenu';
 import { SubscriptionSkeleton } from '@/components/SubscriptionSkeleton';
 import { LibraryItems } from '@/components/library/LibraryItems';
@@ -129,10 +129,11 @@ export default function Library() {
           <button
             onClick={startCheckout}
             disabled={checkoutLoading}
-            className="text-sm font-medium underline-offset-4 transition-colors hover:underline disabled:opacity-50"
+            className="group inline-flex items-center gap-1.5 text-sm font-medium underline-offset-4 transition-colors hover:underline disabled:opacity-50"
             style={{ color: '#24B2C8' }}
           >
             {t('pro.upgradeCta')}
+            <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
           </button>
         </div>
       </div>
