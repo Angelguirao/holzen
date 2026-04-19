@@ -259,7 +259,7 @@ export function BadgesPanel({ reflections, subscribed, notifyBadges = true }: Ba
                         className="h-3.5 w-3.5 shrink-0"
                         style={{ color: badge.earned && !isLocked ? badge.color : undefined }}
                       />
-                      <p className={`text-xs font-mono leading-tight ${badge.earned && !isLocked ? 'text-foreground' : 'text-muted-foreground'}`}>
+                      <p className={`leading-tight font-sans text-sm ${badge.earned && !isLocked ? 'text-foreground' : 'text-secondary-foreground'}`}>
                         {t(badge.labelKey)}
                       </p>
                     </div>
@@ -273,7 +273,7 @@ export function BadgesPanel({ reflections, subscribed, notifyBadges = true }: Ba
                       </div>
                     )}
                   </div>
-                  <p className="text-[10px] text-muted-foreground leading-snug">
+                  <p className="text-muted-foreground leading-snug text-sm">
                     {isLocked ? t('badges.proExclusive', 'Unlock with Pro') : t(badge.descKey)}
                   </p>
 
@@ -288,7 +288,7 @@ export function BadgesPanel({ reflections, subscribed, notifyBadges = true }: Ba
                           transition={{ delay: 0.3, duration: 0.5 }}
                         />
                       </div>
-                      <p className="text-[9px] font-mono text-muted-foreground/50">
+                      <p className="text-sm font-sans text-muted-foreground">
                         {badge.current} / {badge.requirement} {t(badge.unitKey)}
                       </p>
                     </div>
