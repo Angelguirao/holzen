@@ -31,6 +31,16 @@ Instructions for AI assistants and automation working in this repository (e.g. C
 | Supabase browser client | `src/integrations/supabase/client.ts` |
 | i18n | `src/i18n/`; `useTranslation()` where strings are already externalized |
 | PWA / service worker | `src/sw.ts`; registered via `vite-plugin-pwa` in `vite.config.ts` |
+| Frontend error reporting | `src/lib/sentry.ts` (init + `beforeSend` scrubber); `src/components/ErrorBoundary.tsx` (React boundary); `src/main.tsx` (boot + unhandledrejection) |
+| Frontend analytics + flags | `src/lib/posthog.ts` (privacy-first init); `src/hooks/use-feature-flag.ts`; events listed in [docs/ops/event-taxonomy.md](docs/ops/event-taxonomy.md); flags in [docs/ops/feature-flags.md](docs/ops/feature-flags.md) |
+| Cross-surface correlation | `src/lib/cid.ts` → per-tab `cid`, attached as `x-cid` header via `invokeEdge` wrapper; set as Sentry tag + PostHog super-property |
+| Web Vitals | `src/lib/web-vitals.ts` forwards CLS/INP/LCP/FCP/TTFB to Sentry + PostHog |
+| Edge request logging | `supabase/functions/_shared/with-request-logging.ts` wraps new functions; `_shared/deps.ts` for external call logging; `_shared/edge-error.ts` for standardized errors |
+| Edge log drain (BetterStack) | `supabase/functions/_shared/observe.ts` — `createLogger` POSTs each JSON line to `LOG_DRAIN_URL`; configure via Lovable secrets |
+| Edge error reporting | `supabase/functions/_shared/sentry.ts` — `initSentryEdges` + `captureEdgeError`; wired from `withRequestLogging` catch + `observe.ts` `.error` path; no per-function init needed |
+| Audit log | `supabase/functions/_shared/audit.ts` + `audit_log` table — security-sensitive ops (account deletion, admin overrides, subscription state changes) |
+| Feedback widget | `src/components/FeedbackWidget.tsx` (floating button + sheet); `supabase/functions/send-feedback/index.ts` posts PII-safe summary to `SLACK_WEBHOOK_URL` |
+| Health check | `supabase/functions/health/index.ts` (`verify_jwt = false`) for UptimeRobot |
 
 **Imports:** Use the `@/` alias for `src/` (configured in `vite.config.ts` and `vitest.config.ts`).
 
@@ -67,6 +77,25 @@ Never commit `.env` or service role keys.
 Pushing triggers **automatic** DB migrations and edge function deploys to the linked project; the **frontend** still needs a manual **Publish → Update** in Lovable.
 
 **Run the pre-push checklist** in [docs/ops/deployment-sync-guide.md](docs/ops/deployment-sync-guide.md) (tests, `npm run build`, lint on changed files, `npm run check:edge`, new `config.toml` entries, secrets, migration order, `as unknown as T` for new columns). Cursor loads the same expectations via `.cursor/rules/deployment-sync.mdc`.
+
+## Observability
+
+- **Frontend errors → Sentry** with on-error Session Replay (fully masked: `maskAllText`, `blockAllMedia`, `maskAllInputs`). Tracing sample rate 0.1. No global Replay.
+- **Edge errors → Sentry** via `supabase/functions/_shared/sentry.ts` (shared helper, no per-function init). Captured from `withRequestLogging` catch and `observe.ts` `.error` path. `tracesSampleRate: 0`, no Replay. `beforeSend` skips expected `EdgeError` codes (`auth_required`, `rate_limited`, `bad_input`, `not_found`) to protect quota.
+- **Structured edge logs → BetterStack** via `observe.ts` in-function HTTP forwarder (Lovable-managed Supabase has no dashboard log drain).
+- **Product analytics + feature flags → PostHog** with `autocapture: false`, `session_recording.disabled: true`, `person_profiles: 'identified_only'`, `sanitize_properties`.
+- **Alerts → Slack (`#holzen-alerts`)** from Sentry + BetterStack + UptimeRobot + the feedback forwarder.
+- **Cron heartbeats → BetterStack Heartbeats** via `net.http_get` inside each `pg_cron` schedule.
+- **Correlation ID (`cid`)**: per-tab UUID generated in `src/lib/cid.ts`, sent as `x-cid` header on every `supabase.functions.invoke()`; pivoted in Sentry (tag), PostHog (super-property), BetterStack (field), Postgres (`audit_log.cid`).
+- **Release tagging**: `VITE_APP_VERSION` (frontend) and `SENTRY_RELEASE` (edges) must match — both Git SHA.
+- **Runbooks**:
+  - [docs/ops/observability-setup.md](docs/ops/observability-setup.md) — the setup bible (DSNs, webhooks, alert rules, heartbeats).
+  - [docs/ops/incident-response.md](docs/ops/incident-response.md) — Slack-first triage flow.
+  - [docs/ops/pii-masking-review.md](docs/ops/pii-masking-review.md) — PR checklist for Sentry + PostHog + edge logs + Slack.
+  - [docs/ops/event-taxonomy.md](docs/ops/event-taxonomy.md) — PostHog events + properties.
+  - [docs/ops/feature-flags.md](docs/ops/feature-flags.md) — active flags + sunset triggers.
+  - [docs/ops/edge-logging-conventions.md](docs/ops/edge-logging-conventions.md) — `withRequestLogging`, `logDependencyCall`, `EdgeError`, `logAudit`.
+  - [docs/ops/backup-restore-drill.md](docs/ops/backup-restore-drill.md) — quarterly restore drill.
 
 ## Related docs
 

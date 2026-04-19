@@ -28,4 +28,20 @@ Run and address failures before push:
 - New columns queried before `types.ts` regenerates: use `as unknown as YourRow[]` (see deployment guide).
 - Destructive migrations: order-of-operations per the guide (code ↔ schema).
 
+## Observability secrets (Lovable)
+
+Before every push that touches frontend observability or edge logging/Sentry wiring, verify in Lovable secrets:
+
+- Frontend build env (Lovable Cloud): `VITE_SENTRY_DSN`, `VITE_POSTHOG_KEY`, `VITE_POSTHOG_HOST`, `VITE_APP_VERSION` (= Git SHA).
+- Edge secrets: `SENTRY_DSN_EDGES`, `SENTRY_RELEASE` (= same Git SHA), `SENTRY_ENVIRONMENT`, `LOG_DRAIN_URL`, `LOG_DRAIN_TOKEN`, `SLACK_WEBHOOK_URL`.
+- CI build (source-map upload): `SENTRY_AUTH_TOKEN`, `SENTRY_ORG`, `SENTRY_PROJECT` (optional — plugin no-ops without them).
+
+Additional reminders:
+
+- PostHog events added/renamed → also update [docs/ops/event-taxonomy.md](../../docs/ops/event-taxonomy.md) in the same PR.
+- Feature flags added → also update [docs/ops/feature-flags.md](../../docs/ops/feature-flags.md) with owner, default, sunset trigger.
+- `x-cid` propagation should remain intact — use the `invokeEdge` wrapper (or pass `withCidHeaders()`) on new edge call sites.
+- New edge functions automatically inherit Sentry error capture via `withRequestLogging` + `_shared/observe.ts`; no per-function Sentry init required.
+- New cron jobs need a corresponding BetterStack heartbeat UUID and an entry in [docs/ops/observability-setup.md](../../docs/ops/observability-setup.md) §6.
+
 If the user asks only to "push" or "ship," still verify the checklist or state what was skipped and why.
