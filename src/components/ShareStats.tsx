@@ -63,7 +63,7 @@ export function ShareStats(props: Props) {
   return (
     <button
       onClick={handleShare}
-      className="flex items-center gap-1.5 text-[10px] font-mono tracking-widest uppercase text-muted-foreground/60 hover:text-foreground transition-colors px-2 py-1 rounded bg-muted/40 hover:bg-muted/60"
+      className="flex items-center gap-1.5 text-xs font-mono tracking-widest uppercase text-muted-foreground/60 hover:text-foreground transition-colors px-2 py-1 rounded bg-muted/40 hover:bg-muted/60"
       aria-label={t('share.share')}
     >
       {copied ? <Check className="h-3 w-3" /> : <Share2 className="h-3 w-3" />}

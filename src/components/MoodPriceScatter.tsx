@@ -91,7 +91,7 @@ export const MoodPriceScatter = forwardRef<HTMLDivElement, Props>(function MoodP
 
   return (
     <div ref={ref} className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3">
-      <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
+      <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
         {t('moodCharts.moodPriceScatter')}
       </p>
 

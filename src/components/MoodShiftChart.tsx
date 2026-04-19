@@ -91,7 +91,7 @@ export function MoodShiftChart({ reflections }: Props) {
   return (
     <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-3">
       <div className="flex items-center justify-between">
-        <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">
+        <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">
           {t('statsTrends.regulationEffect', 'Regulation Effect')}
         </p>
         <span className={`text-[10px] font-mono px-2 py-0.5 rounded bg-muted/50 ${

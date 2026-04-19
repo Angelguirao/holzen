@@ -84,7 +84,7 @@ export function InsightsPanel({ reflections }: Props) {
 
   return (
     <div className="rounded-md border border-border/60 bg-muted/30 px-4 py-4 space-y-5">
-      <p className="text-[10px] font-mono tracking-widest uppercase text-muted-foreground">{t('insightsPanel.title')}</p>
+      <p className="text-xs font-mono tracking-widest uppercase text-muted-foreground">{t('insightsPanel.title')}</p>
 
       {totalMoods > 0 && (
         <div className="space-y-2">
