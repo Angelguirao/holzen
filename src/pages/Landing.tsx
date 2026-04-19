@@ -151,7 +151,7 @@ const Landing = () => {
             >
               {t('landing.getStartedForFree')}
             </Button>
-            <p className="mt-3 text-base font-sans text-muted-foreground">
+            <p className="mt-3 font-sans text-muted-foreground text-sm">
               {t('landing.noCreditCard')}
             </p>
           </motion.div>
