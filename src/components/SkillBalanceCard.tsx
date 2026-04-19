@@ -87,10 +87,10 @@ export function SkillBalanceCard({ reflections }: Props) {
         {data.map(({ skill, count, pct }) => (
           <div key={skill} className="space-y-1">
             <div className="flex items-center justify-between">
-              <span className="text-[10px] font-mono text-muted-foreground">
+              <span className="text-xs font-mono text-muted-foreground">
                 {t(SKILL_LABELS[skill])}
               </span>
-              <span className="text-[10px] font-mono text-muted-foreground/50 tabular-nums">
+              <span className="text-xs font-mono text-muted-foreground/50 tabular-nums">
                 {pct}% ({count})
               </span>
             </div>
