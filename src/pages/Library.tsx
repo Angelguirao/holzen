@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLibrary } from '@/hooks/use-library';
 import { PageMeta } from '@/components/PageMeta';
-import { Heart, Search, X, Lock, ArrowUpDown, RefreshCw, ArrowRight } from 'lucide-react';
+import { Heart, Search, X, Lock, ArrowUpDown, RefreshCw, ArrowRight, Pause, Radio, Leaf, Feather, Telescope, ScrollText, Pencil, Link as LinkIcon, type LucideIcon } from 'lucide-react';
 import { ExportMenu } from '@/components/library/ExportMenu';
 import { SubscriptionSkeleton } from '@/components/SubscriptionSkeleton';
 import { LibraryItems } from '@/components/library/LibraryItems';
@@ -17,15 +17,15 @@ import { cn } from '@/lib/utils';
 import { useProGate } from '@/hooks/use-pro-gate';
 import { NoxHeaderMain } from '@/components/ui/nox-header';
 
-const SOURCE_CHIPS: { key: string; emoji: string; label: string }[] = [
-  { key: 'reflection', emoji: '⏸', label: 'Pause' },
-  { key: 'signal', emoji: '📡', label: 'Signal' },
-  { key: 'grounding', emoji: '🌿', label: 'Grounding' },
-  { key: 'haiku', emoji: '🍃', label: 'Haiku' },
-  { key: 'zoom_out', emoji: '🔭', label: 'Zoom Out' },
-  { key: 'history_insight', emoji: '📜', label: 'History' },
-  { key: 'reflection_note', emoji: '✏️', label: 'Note' },
-  { key: 'external', emoji: '🔗', label: 'External' },
+const SOURCE_CHIPS: { key: string; icon: LucideIcon; label: string }[] = [
+  { key: 'reflection', icon: Pause, label: 'Pause' },
+  { key: 'signal', icon: Radio, label: 'Signal' },
+  { key: 'grounding', icon: Leaf, label: 'Grounding' },
+  { key: 'haiku', icon: Feather, label: 'Haiku' },
+  { key: 'zoom_out', icon: Telescope, label: 'Zoom Out' },
+  { key: 'history_insight', icon: ScrollText, label: 'History' },
+  { key: 'reflection_note', icon: Pencil, label: 'Note' },
+  { key: 'external', icon: LinkIcon, label: 'External' },
 ];
 
 
@@ -269,7 +269,7 @@ export default function Library() {
             {/* Source type chips */}
             {availableSources.length > 1 && (
               <div className="tabs-scroll flex items-center gap-1.5 overflow-x-auto pb-0.5 -mx-1 px-1">
-                {availableSources.map(({ key, emoji, label }) => (
+                {availableSources.map(({ key, icon: Icon, label }) => (
                   <button
                     key={key}
                     onClick={() => setSourceFilter(sourceFilter === key ? null : key)}
@@ -280,7 +280,7 @@ export default function Library() {
                         : 'border-border/30 text-muted-foreground/50 hover:text-muted-foreground/70'
                     )}
                   >
-                    <span>{emoji}</span>
+                    <Icon className="h-3 w-3" />
                     {label}
                   </button>
                 ))}
