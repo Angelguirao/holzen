@@ -57,12 +57,21 @@ function getPostHogSessionId(): string | undefined {
  *   - `sentry_event_id`, `error_stack` — only when arriving from the error boundary
  *   - `posthog_session_id` — UX replay anchor (session replay itself stays disabled)
  */
+const DISMISSED_KEY = 'holzen:feedback-widget-dismissed';
+
 export function FeedbackWidget() {
   const { t } = useTranslation();
   const [open, setOpen] = useState(false);
   const [category, setCategory] = useState<Category>('question');
   const [message, setMessage] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [dismissed, setDismissed] = useState<boolean>(() => {
+    try {
+      return localStorage.getItem(DISMISSED_KEY) === '1';
+    } catch {
+      return false;
+    }
+  });
   const [errorContext, setErrorContext] = useState<{
     sentryEventId?: string;
     errorStack?: string;
@@ -83,11 +92,27 @@ export function FeedbackWidget() {
           })}`
         : '';
       setMessage(prefix);
+      // Errors from the boundary always force the widget to surface, even if dismissed.
+      setDismissed(false);
+      try { localStorage.removeItem(DISMISSED_KEY); } catch { /* no-op */ }
       setOpen(true);
     };
+    const restoreHandler = () => {
+      try { localStorage.removeItem(DISMISSED_KEY); } catch { /* no-op */ }
+      setDismissed(false);
+    };
     window.addEventListener('holzen:open-feedback', handler);
-    return () => window.removeEventListener('holzen:open-feedback', handler);
+    window.addEventListener('holzen:restore-feedback-widget', restoreHandler);
+    return () => {
+      window.removeEventListener('holzen:open-feedback', handler);
+      window.removeEventListener('holzen:restore-feedback-widget', restoreHandler);
+    };
   }, [t]);
+
+  const dismissWidget = () => {
+    try { localStorage.setItem(DISMISSED_KEY, '1'); } catch { /* no-op */ }
+    setDismissed(true);
+  };
 
   const reset = () => {
     setMessage('');
@@ -133,15 +158,25 @@ export function FeedbackWidget() {
 
   return (
     <>
-      {!open && (
-      <button
-        type="button"
-        aria-label={t('feedback.openButton', { defaultValue: 'Send feedback' })}
-        onClick={() => setOpen(true)}
-        className="fixed bottom-32 right-4 z-[60] h-10 w-10 rounded-full bg-primary text-primary-foreground shadow-lg shadow-black/10 hover:opacity-90 flex items-center justify-center"
-      >
-        <MessageSquareText className="h-4 w-4" />
-      </button>
+      {!open && !dismissed && (
+      <div className="fixed bottom-32 right-4 z-[60] group">
+        <button
+          type="button"
+          aria-label={t('feedback.openButton', { defaultValue: 'Send feedback' })}
+          onClick={() => setOpen(true)}
+          className="h-10 w-10 rounded-full bg-primary text-primary-foreground shadow-lg shadow-black/10 hover:opacity-90 flex items-center justify-center"
+        >
+          <MessageSquareText className="h-4 w-4" />
+        </button>
+        <button
+          type="button"
+          aria-label={t('feedback.dismissWidget', { defaultValue: 'Hide feedback button' })}
+          onClick={dismissWidget}
+          className="absolute -top-1.5 -right-1.5 h-5 w-5 rounded-full bg-background border border-border text-muted-foreground hover:text-foreground hover:bg-muted flex items-center justify-center opacity-0 group-hover:opacity-100 focus:opacity-100 transition-opacity"
+        >
+          <X className="h-3 w-3" />
+        </button>
+      </div>
       )}
 
       <Sheet open={open} onOpenChange={setOpen}>
