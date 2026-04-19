@@ -2,8 +2,9 @@ import { useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useLibrary } from '@/hooks/use-library';
+import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { PageMeta } from '@/components/PageMeta';
-import { Heart, Search, X, Lock, ArrowUpDown, RefreshCw, ArrowRight, Pause, Radio, Leaf, Feather, Telescope, ScrollText, Pencil, Link as LinkIcon, type LucideIcon } from 'lucide-react';
+import { Heart, Search, X, Lock, ArrowUpDown, RefreshCw, ArrowRight, Pause, Radio, Leaf, Feather, Telescope, ScrollText, Pencil, Link as LinkIcon, Loader2, type LucideIcon } from 'lucide-react';
 import { ExportMenu } from '@/components/library/ExportMenu';
 import { SubscriptionSkeleton } from '@/components/SubscriptionSkeleton';
 import { LibraryItems } from '@/components/library/LibraryItems';
@@ -50,6 +51,12 @@ export default function Library() {
   const { pullDistance, refreshing, handlers } = usePullToRefresh({
     onRefresh: handleRefresh,
     threshold: 70,
+  });
+
+  const loadMoreRef = useInfiniteScroll({
+    hasMore: library.hasMore,
+    loading: library.loadingMore,
+    onLoadMore: library.loadMore,
   });
 
   const { items, collections } = library;
@@ -359,6 +366,15 @@ export default function Library() {
 
           {/* Item list - natural page scroll */}
           <LibraryItems library={library} filtered={filtered} />
+
+          {/* Infinite scroll sentinel — only when no client-side filters reduce results */}
+          {library.hasMore && (
+            <div ref={loadMoreRef} className="flex items-center justify-center py-6">
+              {library.loadingMore && (
+                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground/40" />
+              )}
+            </div>
+          )}
         </div>
       )}
     </div>
