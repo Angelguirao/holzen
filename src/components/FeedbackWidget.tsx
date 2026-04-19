@@ -138,7 +138,7 @@ export function FeedbackWidget() {
         type="button"
         aria-label={t('feedback.openButton', { defaultValue: 'Send feedback' })}
         onClick={() => setOpen(true)}
-        className="fixed bottom-24 right-4 z-[60] h-10 w-10 rounded-full bg-primary text-primary-foreground shadow-lg shadow-black/10 hover:opacity-90 flex items-center justify-center"
+        className="fixed bottom-32 right-4 z-[60] h-10 w-10 rounded-full bg-primary text-primary-foreground shadow-lg shadow-black/10 hover:opacity-90 flex items-center justify-center"
       >
         <MessageSquareText className="h-4 w-4" />
       </button>
