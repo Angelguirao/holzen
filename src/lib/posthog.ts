@@ -76,7 +76,7 @@ export function initPostHog(): void {
       disable_session_recording: true,
       person_profiles: "identified_only",
       loaded: (ph) => {
-        posthogInstance = ph as unknown as PostHogInterface;
+        posthogInstance = ph as unknown as PostHog;
         // Register super-properties attached to every event.
         try {
           ph.register({
