@@ -337,14 +337,18 @@ export function LibraryItems({ library, filtered }: Props) {
                   </p>
                   <div className="space-y-4">
                     {group.items.map((item, i) => (
-                      <motion.div
-                        key={item.id}
-                        initial={{ opacity: 0, y: 6 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.2, delay: Math.min(i * 0.03, 0.3) }}
-                      >
-                        {renderCard(i, item)}
-                      </motion.div>
+                      i < 10 ? (
+                        <motion.div
+                          key={item.id}
+                          initial={{ opacity: 0, y: 6 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ duration: 0.2, delay: Math.min(i * 0.03, 0.3) }}
+                        >
+                          {renderCard(i, item)}
+                        </motion.div>
+                      ) : (
+                        <div key={item.id}>{renderCard(i, item)}</div>
+                      )
                     ))}
                   </div>
                 </div>
