@@ -92,7 +92,7 @@ const ResetPassword = () => {
               />
             </div>
             {error && <p className="text-xs text-destructive font-mono">{error}</p>}
-            <Button type="submit" className="w-full font-mono text-xs" disabled={loading}>{t('auth.updatePassword')}</Button>
+            <Button type="submit" className="w-full text-base font-sans font-normal" disabled={loading}>{t('auth.updatePassword')}</Button>
           </form>
         )}
       </div>
