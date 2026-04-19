@@ -13,24 +13,18 @@ interface Props {
   incomplete?: boolean;
 }
 
-const SOURCE_EMOJIS: Record<string, string> = {
-  reflection: '⏸',
-  signal: '📡',
-  grounding: '🌿',
-  learning: '🌿',
-  haiku: '🍃',
-  zoom_out: '🔭',
-  history_insight: '📜',
-  reflection_note: '✏️',
-  external: '🔗',
-  ground: '🌿',
-  practice: '🧘',
-};
-
-const TYPE_LABELS: Record<string, string> = {
-  bookmark: '🔖',
-  note: '📝',
-  clipping: '✂️',
+const SOURCE_META: Record<string, { icon: LucideIcon; label: string }> = {
+  reflection: { icon: Pause, label: 'Pause' },
+  signal: { icon: Radio, label: 'Signal' },
+  grounding: { icon: Leaf, label: 'Grounding' },
+  learning: { icon: Leaf, label: 'Grounding' },
+  ground: { icon: Leaf, label: 'Grounding' },
+  haiku: { icon: Feather, label: 'Haiku' },
+  zoom_out: { icon: Telescope, label: 'Zoom Out' },
+  history_insight: { icon: ScrollText, label: 'History' },
+  reflection_note: { icon: Pencil, label: 'Note' },
+  external: { icon: LinkIcon, label: 'External' },
+  practice: { icon: Pencil, label: 'Practice' },
 };
 
 // HSL-based color accents per source type (uses design system hues)
@@ -99,9 +93,11 @@ export function LibraryItemCard({ item, onToggleFavorite, onClick, engaged = tru
         onClick?.();
       }}
     >
-      <span className="text-sm mt-0.5 shrink-0">{emoji}</span>
-
-      <div className="flex-1 min-w-0 space-y-0.5">
+      <div className="flex-1 min-w-0 space-y-1">
+        <span className="inline-flex items-center gap-1 px-2 py-1 rounded-full border border-foreground/20 bg-foreground/5 text-foreground text-xs font-sans whitespace-nowrap">
+          <CategoryIcon className="h-3 w-3" />
+          {meta.label}
+        </span>
         <div className="flex items-center gap-1.5">
           {item.title && item.title !== 'Reflection' && (
             <p className="text-xs font-medium text-foreground leading-snug truncate">{item.title}</p>
