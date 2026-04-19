@@ -181,8 +181,8 @@ export default function Library() {
         )}
       </AnimatePresence>
 
-      {/* Tab bar */}
-      <div className="flex items-center gap-1 border-b border-border/30 overflow-x-auto">
+      {/* Tab bar - sticky */}
+      <div className="sticky top-0 z-30 bg-background/95 backdrop-blur-sm flex items-center gap-1 border-b border-border/30 overflow-x-auto">
         <button
           onClick={() => setTab('all')}
           className={cn(
