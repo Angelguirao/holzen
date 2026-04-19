@@ -326,7 +326,6 @@ const Landing = () => {
               className="font-sans text-base tracking-wider group px-10"
             >
               {t('landing.getStartedForFree')}
-              <ArrowRight className="h-3.5 w-3.5 ml-2 transition-transform group-hover:translate-x-0.5" />
             </Button>
           </div>
         </Section>
