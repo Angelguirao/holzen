@@ -67,6 +67,8 @@ project_id = "edgbwdecaoottowliimu"
     verify_jwt = false
   [functions.grounding-enrich]
     verify_jwt = false
+  [functions.health]
+    verify_jwt = false
 
   [functions.process-email-queue]
     verify_jwt = true
