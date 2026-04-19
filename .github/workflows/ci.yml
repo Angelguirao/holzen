@@ -6,6 +6,13 @@ on:
   pull_request:
     branches: [main]
 
+# Least privilege: this workflow only reads the repo and runs tests. It does
+# not comment on PRs, push commits, or publish packages, so no elevated
+# permissions are needed. Using `pull_request` (not `pull_request_target`)
+# also means fork PRs run without access to secrets.
+permissions:
+  contents: read
+
 # Cancel in-progress runs for the same branch when a new push arrives.
 concurrency:
   group: ci-${{ github.workflow }}-${{ github.ref }}
