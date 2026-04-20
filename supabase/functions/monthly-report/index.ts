@@ -3,6 +3,11 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
 import { createAttemptLogger } from "../_shared/observe.ts";
 import { coingeckoHeaders } from "../_shared/coingecko.ts";
+import {
+  holzenResendLogger,
+  sendResendBatch,
+  type ResendEmail,
+} from "../_shared/resend.ts";
 
 const REPORT_MODEL = "google/gemini-2.5-flash-lite";
 
@@ -129,7 +134,9 @@ serve(async (req) => {
     const eligible = (profiles ?? []).filter((p) => p.email_notifications);
     holzenEdgeLog("monthly-report", "eligible users", { count: eligible.length });
 
-    let sent = 0;
+    // Collect all rendered emails and ship them in one batched Resend call at
+    // the end (one HTTP round trip per 100 recipients, with retry/backoff).
+    const queued: ResendEmail[] = [];
     const monthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
     for (const profile of eligible) {
@@ -306,37 +313,39 @@ Be observational, calm. No advice, no exclamation marks.${langInstruction}`;
 </body>
 </html>`;
 
-      try {
-        const res = await fetch("https://api.resend.com/emails", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${RESEND_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            from: "Holzen <notify@holzen.app>",
-            to: [email],
-            subject: `Holzen — ${lastMonth} Report: BTC ${monthDir} ${absMonthChange}%`,
-            html,
-          }),
-        });
-
-        if (!res.ok) {
-          const errText = await res.text();
-          holzenEdgeError("monthly-report", `Resend HTTP ${res.status}`, errText.slice(0, 200));
-          continue;
-        }
-        await res.json();
-        sent++;
-      } catch (e) {
-        holzenEdgeError("monthly-report", "send error", { emailDomain: email.includes("@") ? email.split("@")[1] : "?", err: e });
-      }
+      queued.push({
+        from: "Holzen <notify@holzen.app>",
+        to: [email],
+        subject: `Holzen — ${lastMonth} Report: BTC ${monthDir} ${absMonthChange}%`,
+        html,
+      });
     }
 
-    holzenEdgeLog("monthly-report", "run complete", { sent });
-    return new Response(JSON.stringify({ sent }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    // Monthly idempotency — this cron only runs on the 1st (guarded above),
+    // but if Supabase retries the invocation within 24h, the same key blocks
+    // duplicates at Resend's side.
+    const idempotencyMonth = now.toISOString().slice(0, 7);
+    const batch = await sendResendBatch(queued, {
+      apiKey: RESEND_API_KEY,
+      source: "monthly-report",
+      idempotencyKey: `monthly-report:${idempotencyMonth}`,
+      logger: holzenResendLogger(
+        (m, d) => holzenEdgeLog("monthly-report", m, d),
+        (m, err) => holzenEdgeError("monthly-report", m, err),
+      ),
     });
+
+    holzenEdgeLog("monthly-report", "run complete", {
+      sent: batch.sent,
+      failed: batch.failed,
+      chunks: batch.chunks,
+      eligible: eligible.length,
+      queued: queued.length,
+    });
+    return new Response(
+      JSON.stringify({ sent: batch.sent, failed: batch.failed, chunks: batch.chunks }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     holzenEdgeError("monthly-report", "uncaught error", msg);

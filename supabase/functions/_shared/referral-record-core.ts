@@ -3,6 +3,7 @@
  * Idempotent: duplicate referrals / rewards are safe.
  */
 import Stripe from "https://esm.sh/stripe@18.5.0";
+import { sendResendEmail } from "./resend.ts";
 
 const MILESTONES = [
   { count: 1, reward: "1_week_free", trialDays: 7 },
@@ -21,55 +22,60 @@ const logStep = (step: string, details?: unknown) => {
   console.log(`[RECORD-REFERRAL] ${step}${d}`);
 };
 
-async function sendRewardEmail(email: string, rewardType: string, referralCount: number) {
-  const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-  if (!RESEND_API_KEY) {
+async function sendRewardEmail(
+  email: string,
+  rewardType: string,
+  referralCount: number,
+  referrerId: string,
+) {
+  if (!Deno.env.get("RESEND_API_KEY")) {
     logStep("RESEND_API_KEY not set, skipping reward email");
     return;
   }
 
   const rewardLabel = REWARD_LABELS[rewardType] || rewardType;
-
-  try {
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${RESEND_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from: "Holzen <notify@holzen.app>",
-        to: [email],
-        subject: `Holzen — You earned ${rewardLabel}`,
-        html: `
-          <div style="font-family: monospace; max-width: 400px; margin: 0 auto; padding: 32px 16px;">
-            <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: #888;">Holzen</p>
-            <h2 style="font-size: 16px; margin: 24px 0 12px;">You've earned a reward</h2>
-            <p style="font-size: 14px; color: #444; line-height: 1.6;">
-              ${referralCount} ${referralCount === 1 ? "person has" : "people have"} joined Holzen through your referral link.
-            </p>
-            <p style="font-size: 14px; color: #444; line-height: 1.6;">
-              <strong>Your reward:</strong> ${rewardLabel}${
+  const html = `
+    <div style="font-family: monospace; max-width: 400px; margin: 0 auto; padding: 32px 16px;">
+      <p style="font-size: 11px; text-transform: uppercase; letter-spacing: 2px; color: #888;">Holzen</p>
+      <h2 style="font-size: 16px; margin: 24px 0 12px;">You've earned a reward</h2>
+      <p style="font-size: 14px; color: #444; line-height: 1.6;">
+        ${referralCount} ${referralCount === 1 ? "person has" : "people have"} joined Holzen through your referral link.
+      </p>
+      <p style="font-size: 14px; color: #444; line-height: 1.6;">
+        <strong>Your reward:</strong> ${rewardLabel}${
           rewardType === "lifetime" ? " — no more subscription needed." : " has been credited to your account."
         }
-            </p>
-            <p style="font-size: 12px; color: #999; margin-top: 32px;">
-              Thank you for sharing a moment of pause.
-            </p>
-          </div>
-        `,
-      }),
-    });
+      </p>
+      <p style="font-size: 12px; color: #999; margin-top: 32px;">
+        Thank you for sharing a moment of pause.
+      </p>
+    </div>
+  `;
 
-    if (!res.ok) {
-      const errText = await res.text();
-      logStep("Email send error", { status: res.status, error: errText });
-    } else {
-      logStep("Reward email sent", { email, rewardType });
-    }
-  } catch (e) {
-    logStep("Email send exception", { error: e instanceof Error ? e.message : String(e) });
+  // Each (referrer, reward milestone) is unique — even if the referral job
+  // retries (webhook replay, cron), the same idempotency key means Resend
+  // only delivers this reward email once per 24h window.
+  const result = await sendResendEmail(
+    {
+      from: "Holzen <notify@holzen.app>",
+      to: [email],
+      subject: `Holzen — You earned ${rewardLabel}`,
+      html,
+    },
+    {
+      source: "referral-reward",
+      idempotencyKey: `referral-reward:${referrerId}:${rewardType}`,
+      logger: {
+        log: (m, d) => logStep(m, d),
+        error: (m, d) => logStep(m, d),
+      },
+    },
+  );
+
+  if (result.ok) {
+    logStep("Reward email sent", { email, rewardType, attempts: result.attempts });
   }
+  // Failures are already logged by sendResendEmail via the logger above.
 }
 
 async function grantReward(
@@ -145,7 +151,7 @@ async function grantReward(
 
   logStep("Reward granted", { milestone: milestone.count, reward: milestone.reward });
 
-  await sendRewardEmail(referrerEmail, milestone.reward, referralCount);
+  await sendRewardEmail(referrerEmail, milestone.reward, referralCount, referrerId);
 }
 
 async function grantMilestonesForReferrer(

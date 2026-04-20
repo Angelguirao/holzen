@@ -2,6 +2,11 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
 import { coingeckoHeaders } from "../_shared/coingecko.ts";
+import {
+  holzenResendLogger,
+  sendResendBatch,
+  type ResendEmail,
+} from "../_shared/resend.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -78,7 +83,12 @@ serve(async (req) => {
 
     const eligible = (profiles ?? []).filter((p) => p.email_notifications && !isInQuietHours(p));
     const cutoff = new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString();
-    let nudged = 0;
+    // BTC direction is a global property of this cron run (not per-user) — we
+    // compute it once so it can also feed the idempotency key below.
+    const runDirection = (data?.bitcoin?.usd_24h_change ?? 0) >= 0 ? "up" : "down";
+    // Each user gets bespoke localized copy; we accumulate rendered payloads
+    // and ship them in one batched Resend call at the end.
+    const queued: ResendEmail[] = [];
 
     for (const profile of eligible) {
       // Check if user has reflected in the last 48 hours
@@ -97,7 +107,7 @@ serve(async (req) => {
       const email = userData?.user?.email;
       if (!email) continue;
 
-      const direction = (data?.bitcoin?.usd_24h_change ?? 0) >= 0 ? "up" : "down";
+      const direction = runDirection;
       const pct = change24h.toFixed(1);
       const userLang = (profile as any).language || "en";
 
@@ -179,37 +189,39 @@ serve(async (req) => {
 </body>
 </html>`;
 
-      try {
-        const sendRes = await fetch("https://api.resend.com/emails", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${RESEND_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            from: "Holzen <notify@holzen.app>",
-            to: [email],
-            subject: copy.subject(direction, pct),
-            html,
-          }),
-        });
-
-        if (!sendRes.ok) {
-          const errText = await sendRes.text();
-          holzenEdgeError("personalized-nudge", `Resend HTTP ${sendRes.status}`, errText.slice(0, 200));
-          continue;
-        }
-        await sendRes.json();
-        nudged++;
-      } catch (e) {
-        holzenEdgeError("personalized-nudge", "send error", { emailDomain: email.includes("@") ? email.split("@")[1] : "?", err: e });
-      }
+      queued.push({
+        from: "Holzen <notify@holzen.app>",
+        to: [email],
+        subject: copy.subject(direction, pct),
+        html,
+      });
     }
 
-    holzenEdgeLog("personalized-nudge", "run complete", { nudged, change24h: Number(change24h.toFixed(1)) });
-    return new Response(JSON.stringify({ nudged }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    // Idempotency key per day+direction — if Supabase retries the cron within
+    // 24h, Resend dedupes the batch and users never get duplicate nudges.
+    const dateKey = new Date().toISOString().slice(0, 10);
+    const batch = await sendResendBatch(queued, {
+      apiKey: RESEND_API_KEY,
+      source: "personalized-nudge",
+      idempotencyKey: `personalized-nudge:${dateKey}:${runDirection}`,
+      logger: holzenResendLogger(
+        (m, d) => holzenEdgeLog("personalized-nudge", m, d),
+        (m, err) => holzenEdgeError("personalized-nudge", m, err),
+      ),
     });
+
+    holzenEdgeLog("personalized-nudge", "run complete", {
+      nudged: batch.sent,
+      failed: batch.failed,
+      chunks: batch.chunks,
+      eligible: eligible.length,
+      queued: queued.length,
+      change24h: Number(change24h.toFixed(1)),
+    });
+    return new Response(
+      JSON.stringify({ nudged: batch.sent, failed: batch.failed }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     holzenEdgeError("personalized-nudge", "uncaught error", msg);
