@@ -43,9 +43,11 @@ interface Props {
   mantra: string | null;
   severity?: 'mild' | 'moderate' | 'high';
   onContinue: () => void;
+  completed?: boolean;
+  onComplete?: () => void;
 }
 
-export function PauseBreathing({ mantra, severity = 'mild', onContinue }: Props) {
+export function PauseBreathing({ mantra, severity = 'mild', onContinue, completed: completedProp, onComplete }: Props) {
   const { t } = useTranslation();
   const prefersReduced = useReducedMotion();
   const quote = useMemo(() => getSessionQuote(), []);
@@ -53,12 +55,13 @@ export function PauseBreathing({ mantra, severity = 'mild', onContinue }: Props)
   const patternIndex = severity === 'high' ? 1 : 0;
   const pattern = PATTERNS[patternIndex];
 
-  const [started, setStarted] = useState(false);
+  const [started, setStarted] = useState(!!completedProp);
   const [phaseIndex, setPhaseIndex] = useState(0);
   const [elapsed, setElapsed] = useState(0);
   const [cycle, setCycle] = useState(0);
-  const [completed, setCompleted] = useState(false);
+  const [completedLocal, setCompletedLocal] = useState(!!completedProp);
 
+  const completed = completedProp ?? completedLocal;
   const currentPhase = pattern.phases[phaseIndex];
 
   // Timer
@@ -72,7 +75,8 @@ export function PauseBreathing({ mantra, severity = 'mild', onContinue }: Props)
           if (nextPhase >= pattern.phases.length) {
             const nextCycle = cycle + 1;
             if (nextCycle >= TOTAL_CYCLES) {
-              setCompleted(true);
+              setCompletedLocal(true);
+              onComplete?.();
               hapticFeedback('success');
               return 0;
             }
@@ -87,7 +91,7 @@ export function PauseBreathing({ mantra, severity = 'mild', onContinue }: Props)
       });
     }, 1000);
     return () => clearInterval(timer);
-  }, [started, completed, phaseIndex, cycle, currentPhase.duration, pattern.phases.length]);
+  }, [started, completed, phaseIndex, cycle, currentPhase.duration, pattern.phases.length, onComplete]);
 
   const progress = currentPhase.duration > 0 ? elapsed / currentPhase.duration : 0;
   const isExpand = EXPAND_KEYS.includes(currentPhase.labelKey);

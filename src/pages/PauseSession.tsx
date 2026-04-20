@@ -236,6 +236,7 @@ export default function PauseSession() {
   const [moodAfterDone, setMoodAfterDone] = useState(restored?.moodAfterDone ?? false);
   const [selectedMood, setSelectedMood] = useState<MoodValue | null>(restored?.selectedMood ?? null);
   const [selectedMoodAfter, setSelectedMoodAfter] = useState<MoodValue | null>(restored?.selectedMoodAfter ?? null);
+  const [breathingCompleted, setBreathingCompleted] = useState<boolean>(restored?.breathingCompleted ?? false);
   const [curtainLifted, setCurtainLifted] = useState(false);
   const [pauseImpactData, setPauseImpactData] = useState<{
     mood: string | null; moodAfter: string | null; breathingCompleted: boolean;
@@ -246,7 +247,7 @@ export default function PauseSession() {
   // Persist session
   useEffect(() => {
     if (!message) return;
-    saveSession({ message, context, reflectionId, companions, companionPrefs, severity, moodDone, moodAfterDone, selectedMood, selectedMoodAfter, phase, decision, step });
+    saveSession({ message, context, reflectionId, companions, companionPrefs, severity, moodDone, moodAfterDone, selectedMood, selectedMoodAfter, phase, decision, step, breathingCompleted });
   }, [
     message,
     context,
@@ -261,6 +262,7 @@ export default function PauseSession() {
     phase,
     decision,
     step,
+    breathingCompleted,
   ]);
 
   // Cinematic entrance
@@ -393,7 +395,7 @@ export default function PauseSession() {
         setPauseImpactData({
           mood: selectedMood,
           moodAfter: selectedMoodAfter,
-          breathingCompleted: true, // they went through breathing step
+          breathingCompleted,
           decision: d,
           context,
           engagedTools: tools,
@@ -405,7 +407,7 @@ export default function PauseSession() {
     hapticFeedback('success');
     setPhase('done');
     clearSession();
-  }, [dismissMessage, reflectionId, selectedMood, selectedMoodAfter, context]);
+  }, [dismissMessage, reflectionId, selectedMood, selectedMoodAfter, context, breathingCompleted]);
 
   const slideX = prefersReducedMotion ? 0 : 80;
   const stepTransition = {
@@ -445,7 +447,13 @@ export default function PauseSession() {
           <AnimatePresence mode="wait" initial={false}>
             {step === 'breathe' && (
               <motion.div key="breathe" {...stepTransition} {...dragProps}>
-                <PauseBreathing mantra={mantra} onContinue={() => goToStep('feel')} />
+                <PauseBreathing
+                  mantra={mantra}
+                  severity={severity}
+                  completed={breathingCompleted}
+                  onComplete={() => setBreathingCompleted(true)}
+                  onContinue={() => goToStep('feel')}
+                />
               </motion.div>
             )}
 
