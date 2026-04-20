@@ -18,6 +18,7 @@ export interface PersistedSession {
   phase: 'session' | 'done';
   decision: string | null;
   step: PauseStep;
+  breathingCompleted?: boolean;
 }
 
 export const DEFAULT_COMPANIONS: CompanionData = { haiku: null, groundingTitle: null, groundingBody: null };
