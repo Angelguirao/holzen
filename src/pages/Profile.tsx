@@ -638,10 +638,10 @@ function MicroStat({ value, suffix, label, context, isText }: {
       <span className={`font-sans font-medium leading-none text-primary ${isText ? 'text-base' : 'text-lg'}`}>
         {value}{suffix && <span className="ml-0.5 text-sm" style={{ color: '#C1CBD7' }}>{suffix}</span>}
       </span>
+      <span className="lowercase font-sans font-medium text-sm" style={{ color: '#C1CBD7' }}>{label}</span>
       {context && (
         <span className="font-sans text-sm font-normal" style={{ color: '#C1CBD7' }}>{context}</span>
       )}
-      <span className="lowercase font-sans font-medium text-sm" style={{ color: '#C1CBD7' }}>{label}</span>
     </div>
   );
 }
