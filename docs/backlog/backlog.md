@@ -76,6 +76,10 @@ Use this when you are **choosing what to work on next**. Items are **not** stric
 |---------------|--------|---------|
 | — | [rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md) | **Done (2026-04).** **`holzen_event`:** `limit_check_fail_open` in Edge logs — see ticket. |
 | — | [rate-limit-analytics-allowlist.md](rate-limit-analytics-allowlist.md) | **Done (2026-04).** **`CHECK_RATE_LIMIT_ANALYTICS_EVENTS`** + live-path **`trackEvent`** — see ticket. |
+| Medium | [pg-cron-heartbeat-wiring.md](pg-cron-heartbeat-wiring.md) | **Open.** Create 8 BetterStack heartbeats, populate `app_config.heartbeat.*` UUIDs, append `emit_job_heartbeat(...)` to each cron body. Code-side ready; manual wiring pending. |
+| Medium | [edge-functions-request-logging-migration.md](edge-functions-request-logging-migration.md) | **Open.** Migrate remaining ~35 edge functions to `withRequestLogging` so every invocation gets structured logs + Sentry capture + unified error envelope. |
+| Medium | [posthog-ui-privacy-hardening.md](posthog-ui-privacy-hardening.md) | **Open.** UI-level defense-in-depth: disable autocapture / session recording / heatmaps, enable anonymize IPs, set Authorized URLs. |
+| Medium | [sentry-allowed-domains.md](sentry-allowed-domains.md) | **Open.** Restrict the public frontend DSN to `holzen.lovable.app`, `holzen.app`, `*.lovable.app`. |
 
 ### Cost & duplicate work (same user/session doing redundant orchestration or cache churn)
 
@@ -147,6 +151,10 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | Reliability | [auth-referral.md](auth-referral.md) | **Done (2026-04).** Durable queue + worker — see ticket |
 | Observability | [rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md) | **Done (2026-04).** Structured fail-open logs — see ticket |
 | Observability | [rate-limit-analytics-allowlist.md](rate-limit-analytics-allowlist.md) | **Done (2026-04).** Allowlist constant + generator inserts — see ticket |
+| Observability | [pg-cron-heartbeat-wiring.md](pg-cron-heartbeat-wiring.md) | **Open.** BetterStack heartbeats + `app_config` UUIDs + cron body wiring |
+| Observability | [edge-functions-request-logging-migration.md](edge-functions-request-logging-migration.md) | **Open.** Migrate ~35 remaining edge functions to `withRequestLogging` |
+| Ops / security | [posthog-ui-privacy-hardening.md](posthog-ui-privacy-hardening.md) | **Open.** UI toggles + Authorized URLs — defense-in-depth for code-side privacy flags |
+| Ops / security | [sentry-allowed-domains.md](sentry-allowed-domains.md) | **Open.** Restrict public DSN to Holzen origins |
 | Cost / efficiency | [orchestrate-client-cron.md](orchestrate-client-cron.md) | **Done (2026-04).** **`orchestrate_skip_cached`** + invoke logging — see ticket |
 | Cost / efficiency | [cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md) | **Done (2026-04).** Indexed dedup keys — see ticket |
 | Cost / efficiency | [home-fetch-deduplication.md](home-fetch-deduplication.md) | **Partial (2026-04).** + doc in **`navigating-the-codebase`** §6 — optional **`profiles`** Query — see ticket |
@@ -185,7 +193,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | **Pause pipeline & client–server boundaries** | ~~[orchestrate-client-cron.md](orchestrate-client-cron.md)~~ **done**, ~~[automatic-pause-notification-timing.md](automatic-pause-notification-timing.md)~~ **done**, ~~[cron-pause-featured-parity.md](cron-pause-featured-parity.md)~~ **done** |
 | **Cost & duplicate work (client + server)** | ~~[orchestrate-client-cron.md](orchestrate-client-cron.md)~~ **done**, ~~[cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md)~~ **done**, [home-fetch-deduplication.md](home-fetch-deduplication.md) |
 | **Cache, library & market data** | ~~[cache-dedup-near-duplicates.md](cache-dedup-near-duplicates.md)~~ **done**, ~~[btc-price-cache-freshness.md](btc-price-cache-freshness.md)~~ **done**, ~~[cache-serve-relaxation-ux.md](cache-serve-relaxation-ux.md)~~ **done 2026-04** |
-| **Rate limits, quality & observability** | ~~[rate-limit-analytics-allowlist.md](rate-limit-analytics-allowlist.md)~~ **done**, ~~[rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md)~~ **done**, [quality-gates-false-positives.md](quality-gates-false-positives.md) |
+| **Rate limits, quality & observability** | ~~[rate-limit-analytics-allowlist.md](rate-limit-analytics-allowlist.md)~~ **done**, ~~[rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md)~~ **done**, [quality-gates-false-positives.md](quality-gates-false-positives.md), [pg-cron-heartbeat-wiring.md](pg-cron-heartbeat-wiring.md), [edge-functions-request-logging-migration.md](edge-functions-request-logging-migration.md), [posthog-ui-privacy-hardening.md](posthog-ui-privacy-hardening.md), [sentry-allowed-domains.md](sentry-allowed-domains.md) |
 | **Data consistency** | *(none pending — grounding dual-write shipped 2026-04)* |
 
 ---
@@ -208,6 +216,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | [cron-worker-auth-consistency.md](cron-worker-auth-consistency.md) | **Done (2026-04).** Cron worker auth — see ticket. |
 | [data-fetching-conventions.md](data-fetching-conventions.md) | **Done (2026-04).** **`navigating-the-codebase`** §6.1 — see ticket |
 | [e2e-browser-automation.md](e2e-browser-automation.md) | Playwright/Cypress or Vitest+RTL; Bruno stays API-only |
+| [edge-functions-request-logging-migration.md](edge-functions-request-logging-migration.md) | **Open.** Migrate ~35 remaining edge functions to `withRequestLogging` |
 | [form-field-name-id-a11y.md](form-field-name-id-a11y.md) | **Done (2026-04).** Form **`name`** / **`id`** / **`autocomplete`** — see ticket |
 | [home-fetch-deduplication.md](home-fetch-deduplication.md) | **Partial (2026-04).** Dedupe + **`navigating-the-codebase`** §6; optional **`profiles`** lift — see ticket |
 | [home-recharts-layout-cost.md](home-recharts-layout-cost.md) | **Done (2026-04).** Lazy viewport gate + chart container tweaks — see ticket |
@@ -215,6 +224,8 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | [lighthouse-a11y-home.md](lighthouse-a11y-home.md) | **Done (2026-04).** **`main`**, contrast, notification label, touch targets — see ticket |
 | [orchestrate-client-cron.md](orchestrate-client-cron.md) | **Done (2026-04).** Skip-if-served + **`orchestrate_invoke`** — see ticket |
 | [pause-session-hydration.md](pause-session-hydration.md) | **Done (2026-04).** `/pause` hydration — see ticket. |
+| [pg-cron-heartbeat-wiring.md](pg-cron-heartbeat-wiring.md) | **Open.** BetterStack heartbeats + `app_config` UUIDs + cron body wiring |
+| [posthog-ui-privacy-hardening.md](posthog-ui-privacy-hardening.md) | **Open.** PostHog project-level privacy toggles + Authorized URLs |
 | [pwa-mobile-web-app-meta.md](pwa-mobile-web-app-meta.md) | **Done (2026-04).** **`mobile-web-app-capable`** in `index.html` — see ticket. |
 | [quality-gates-false-positives.md](quality-gates-false-positives.md) | **Partial (2026-04).** Observability + specificity; locale-aware gates TBD — see ticket |
 | [rate-budget-fail-open-observability.md](rate-budget-fail-open-observability.md) | **Done (2026-04).** **`limit_check_fail_open`** JSON in **`ratelimit.ts`** — see ticket |
@@ -226,6 +237,7 @@ Sortable mentally by **Work type** column; links go to the full ticket.
 | [service-worker-registration-dev.md](service-worker-registration-dev.md) | **Done (2026-04).** DEV guard in `sw-update.ts` — see ticket. |
 | [reflection-insert-partial-failure.md](reflection-insert-partial-failure.md) | **Done (2026-04).** Insert failure after generate — see ticket. |
 | [route-gating.md](route-gating.md) | **Done (2026-04).** Session-restore messaging on `AuthLoading` — see ticket |
+| [sentry-allowed-domains.md](sentry-allowed-domains.md) | **Open.** Restrict public DSN to Holzen origins |
 | [spa-framework-evaluation.md](spa-framework-evaluation.md) | Vite SPA vs full-stack React framework (React docs tradeoffs; when to revisit) |
 | [typed-navigation-state.md](typed-navigation-state.md) | **Done (2026-04).** `router-location-state.ts` — see ticket |
 | [writeCompanionData-grounding-consistency.md](writeCompanionData-grounding-consistency.md) | **Done (2026-04).** Grounding single source — see ticket. |
@@ -271,3 +283,7 @@ Legacy numeric IDs for chat / PR references; prefer **ticket file name** or [mas
 33. Companion **share as image** (Pro) — [companion-share-as-image-pro.md](companion-share-as-image-pro.md)
 34. Companion **high-contrast reading** mode — [companion-high-contrast-reading-mode.md](companion-high-contrast-reading-mode.md)
 35. Companion **print-friendly CSS** — [companion-print-friendly-css.md](companion-print-friendly-css.md)
+36. **pg_cron heartbeat wiring** — [pg-cron-heartbeat-wiring.md](pg-cron-heartbeat-wiring.md) *(code shipped 2026-04 as `emit_job_heartbeat`; BetterStack UUIDs + per-job `app_config` rows + cron body `PERFORM` calls pending)*
+37. **Edge functions → `withRequestLogging` migration** — [edge-functions-request-logging-migration.md](edge-functions-request-logging-migration.md) *(4/39 wrapped; ~35 remaining)*
+38. **PostHog UI-level privacy hardening** — [posthog-ui-privacy-hardening.md](posthog-ui-privacy-hardening.md) *(code-side already locked down; UI toggles + Authorized URLs remaining)*
+39. **Sentry Allowed Domains** — [sentry-allowed-domains.md](sentry-allowed-domains.md) *(1-minute UI change; scopes public DSN to Holzen origins)*
