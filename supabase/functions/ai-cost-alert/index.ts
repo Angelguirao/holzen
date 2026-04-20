@@ -29,6 +29,11 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
+import {
+  holzenResendLogger,
+  sendResendBatch,
+  type ResendEmail,
+} from "../_shared/resend.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -298,38 +303,24 @@ async function sendAlert(
   html: string,
   subject: string,
   resendKey: string,
+  idempotencyKey: string,
 ): Promise<{ sent: number; errors: number }> {
-  let sent = 0;
-  let errors = 0;
-  for (const to of recipients) {
-    try {
-      const res = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${resendKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          from: "Holzen <notify@holzen.app>",
-          to: [to],
-          subject,
-          html,
-        }),
-      });
-      if (!res.ok) {
-        const errText = await res.text().catch(() => "");
-        holzenEdgeError("ai-cost-alert", `Resend HTTP ${res.status}`, errText.slice(0, 200));
-        errors += 1;
-        continue;
-      }
-      await res.json().catch(() => null);
-      sent += 1;
-    } catch (e) {
-      holzenEdgeError("ai-cost-alert", "send error", { err: e });
-      errors += 1;
-    }
-  }
-  return { sent, errors };
+  const emails: ResendEmail[] = recipients.map((to) => ({
+    from: "Holzen <notify@holzen.app>",
+    to: [to],
+    subject,
+    html,
+  }));
+  const batch = await sendResendBatch(emails, {
+    apiKey: resendKey,
+    source: "ai-cost-alert",
+    idempotencyKey,
+    logger: holzenResendLogger(
+      (m, d) => holzenEdgeLog("ai-cost-alert", m, d),
+      (m, err) => holzenEdgeError("ai-cost-alert", m, err),
+    ),
+  });
+  return { sent: batch.sent, errors: batch.failed };
 }
 
 serve(async (req) => {
@@ -399,7 +390,17 @@ serve(async (req) => {
 
     const subject = `Holzen AI cost alert — ${triggers.map((t) => t.kind).join(", ")}`;
     const html = renderHtml(snap, cfg, triggers);
-    const { sent, errors } = await sendAlert(cfg.recipients, html, subject, RESEND_API_KEY);
+    // One idempotency key per (day, trigger-set). If the cron retries within
+    // 24h with the same triggers, Resend dedupes the batch.
+    const dateKey = new Date().toISOString().slice(0, 10);
+    const triggerKinds = triggers.map((t) => t.kind).sort().join("-");
+    const { sent, errors } = await sendAlert(
+      cfg.recipients,
+      html,
+      subject,
+      RESEND_API_KEY,
+      `ai-cost-alert:${dateKey}:${triggerKinds}`,
+    );
 
     holzenEdgeLog("ai-cost-alert", "alert sent", {
       triggers: triggers.map((t) => t.kind),

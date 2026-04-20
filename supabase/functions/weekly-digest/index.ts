@@ -3,6 +3,11 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
 import { createAttemptLogger } from "../_shared/observe.ts";
 import { coingeckoHeaders } from "../_shared/coingecko.ts";
+import {
+  holzenResendLogger,
+  sendResendBatch,
+  type ResendEmail,
+} from "../_shared/resend.ts";
 
 const DIGEST_MODEL = "google/gemini-2.5-flash-lite";
 
@@ -219,7 +224,11 @@ serve(async (req) => {
     );
     holzenEdgeLog("weekly-digest", "eligible users", { count: eligible.length });
 
-    let sent = 0;
+    // We collect all rendered emails and send them in a single batch request
+    // at the end (≤100 per chunk). That's one Resend round trip instead of N
+    // — faster, less rate-limit pressure, and the helper retries the batch on
+    // 429/5xx.
+    const queued: ResendEmail[] = [];
     const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
     for (const profile of eligible) {
@@ -334,37 +343,37 @@ serve(async (req) => {
 </body>
 </html>`;
 
-      try {
-        const res = await fetch("https://api.resend.com/emails", {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${RESEND_API_KEY}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            from: "Holzen <notify@holzen.app>",
-            to: [email],
-            subject: `Holzen — BTC ${weekDir} ${absWeekChange}% this week`,
-            html,
-          }),
-        });
-
-        if (!res.ok) {
-          const errText = await res.text();
-          holzenEdgeError("weekly-digest", `Resend HTTP ${res.status}`, errText.slice(0, 200));
-          continue;
-        }
-        await res.json();
-        sent++;
-      } catch (e) {
-        holzenEdgeError("weekly-digest", "send error", { emailDomain: email.includes("@") ? email.split("@")[1] : "?", err: e });
-      }
+      queued.push({
+        from: "Holzen <notify@holzen.app>",
+        to: [email],
+        subject: `Holzen — BTC ${weekDir} ${absWeekChange}% this week`,
+        html,
+      });
     }
 
-    holzenEdgeLog("weekly-digest", "run complete", { sent });
-    return new Response(JSON.stringify({ sent }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    // Idempotency key per day → cron re-runs within 24h don't double-send.
+    const idempotencyDate = now.toISOString().slice(0, 10);
+    const batch = await sendResendBatch(queued, {
+      apiKey: RESEND_API_KEY,
+      source: "weekly-digest",
+      idempotencyKey: `weekly-digest:${idempotencyDate}`,
+      logger: holzenResendLogger(
+        (m, d) => holzenEdgeLog("weekly-digest", m, d),
+        (m, err) => holzenEdgeError("weekly-digest", m, err),
+      ),
     });
+
+    holzenEdgeLog("weekly-digest", "run complete", {
+      sent: batch.sent,
+      failed: batch.failed,
+      chunks: batch.chunks,
+      eligible: eligible.length,
+      queued: queued.length,
+    });
+    return new Response(
+      JSON.stringify({ sent: batch.sent, failed: batch.failed, chunks: batch.chunks }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     holzenEdgeError("weekly-digest", "uncaught error", msg);

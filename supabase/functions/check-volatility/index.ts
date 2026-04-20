@@ -23,6 +23,7 @@ import {
   holzenEdgeWarn,
 } from "../_shared/holzen-edge-log.ts";
 import { coingeckoHeaders } from "../_shared/coingecko.ts";
+import { holzenResendLogger, sendResendEmail } from "../_shared/resend.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -94,10 +95,10 @@ async function fetchBtcVolatilityForCurrency(vsCurrency: string): Promise<BtcVol
 async function sendNotificationEmail(
   email: string,
   reflection: string,
-  context: string
+  context: string,
+  reflectionId: string | null,
 ): Promise<boolean> {
-  const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-  if (!RESEND_API_KEY) {
+  if (!Deno.env.get("RESEND_API_KEY")) {
     holzenEdgeError("volatility-email", "RESEND_API_KEY not configured");
     return false;
   }
@@ -116,34 +117,34 @@ async function sendNotificationEmail(
     </html>
   `;
 
-  try {
-    const res = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${RESEND_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from: "Holzen <notify@holzen.app>",
-        to: [email],
-        subject: "Holzen — A moment to pause",
-        html,
-      }),
+  // Each reflection has a unique UUID — perfect idempotency key. A retry of
+  // the same volatility cron (or a double-fire from pg_cron) never produces
+  // a duplicate email within Resend's 24h dedupe window.
+  const result = await sendResendEmail(
+    {
+      from: "Holzen <notify@holzen.app>",
+      to: [email],
+      subject: "Holzen — A moment to pause",
+      html,
+    },
+    {
+      source: "volatility-email",
+      idempotencyKey: reflectionId ? `volatility:${reflectionId}` : undefined,
+      logger: holzenResendLogger(
+        (m, d) => holzenEdgeLog("volatility-email", m, d),
+        (m, err) => holzenEdgeError("volatility-email", m, err),
+      ),
+    },
+  );
+
+  if (result.ok) {
+    holzenEdgeLog("volatility-email", "sent", {
+      toDomain: email.includes("@") ? email.split("@")[1] : "?",
+      attempts: result.attempts,
     });
-
-    if (!res.ok) {
-      const errText = await res.text();
-      holzenEdgeError("volatility-email", `Resend HTTP ${res.status}`, errText.slice(0, 200));
-      return false;
-    }
-
-    await res.json();
-    holzenEdgeLog("volatility-email", "sent", { toDomain: email.includes("@") ? email.split("@")[1] : "?" });
     return true;
-  } catch (e) {
-    holzenEdgeError("volatility-email", "send error", e);
-    return false;
   }
+  return false;
 }
 
 serve(async (req) => {
@@ -596,7 +597,14 @@ serve(async (req) => {
           if (!profile.email_notifications) return;
           const { data: userData } = await supabase.auth.admin.getUserById(profile.user_id);
           const email = userData?.user?.email;
-          if (email) await sendNotificationEmail(email, result.message, ctx);
+          if (email) {
+            await sendNotificationEmail(
+              email,
+              result.message,
+              ctx,
+              insertedReflection?.id ?? null,
+            );
+          }
         })(),
         // Push
         (async () => {

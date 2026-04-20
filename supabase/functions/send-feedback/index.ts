@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import { EdgeError } from "../_shared/edge-error.ts";
 import { logDependencyCall } from "../_shared/deps.ts";
+import { sendResendEmail } from "../_shared/resend.ts";
 
 const escapeHtml = (str: string) =>
   str
@@ -109,8 +110,7 @@ serve(
       ).catch(() => { /* swallowed — already logged by logDependencyCall */ });
     }
 
-    const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-    if (RESEND_API_KEY) {
+    if (Deno.env.get("RESEND_API_KEY")) {
       const html = `
         <div style="font-family: monospace; max-width: 600px; margin: 0 auto;">
           <h2 style="font-size: 14px; color: #666;">New Feedback</h2>
@@ -128,25 +128,22 @@ serve(
         </div>
       `;
 
-      void logDependencyCall(
-        log,
-        "resend",
-        () =>
-          fetch("https://api.resend.com/emails", {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${RESEND_API_KEY}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              from: "Holzen Feedback <notify@notify.holzen.app>",
-              to: ["hello@holzen.app"],
-              subject: `${CATEGORY_EMOJI[category] || ""} [${category.toUpperCase()}] New feedback from ${escapeHtml(user.email || "")}`,
-              html,
-            }),
-          }),
-        { operation: "emails.send" }
-      ).catch(() => { /* swallowed */ });
+      // Fire-and-forget: the Resend helper retries on 429/5xx internally and
+      // uses `cid` as an idempotency key so any duplicate POST from the
+      // browser is de-duped by Resend inside the 24h window.
+      void sendResendEmail(
+        {
+          from: "Holzen Feedback <notify@notify.holzen.app>",
+          to: ["hello@holzen.app"],
+          subject: `${CATEGORY_EMOJI[category] || ""} [${category.toUpperCase()}] New feedback from ${escapeHtml(user.email || "")}`,
+          html,
+        },
+        {
+          source: "send-feedback",
+          idempotencyKey: `send-feedback:${cid}`,
+          logger: { log: (m, d) => log(m, d), error: (m, d) => log.error(m, d) },
+        },
+      ).catch(() => { /* already logged by sendResendEmail */ });
     }
 
     return new Response(JSON.stringify({ success: true }), {
