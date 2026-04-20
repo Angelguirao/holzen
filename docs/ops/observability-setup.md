@@ -167,21 +167,38 @@ Each targets source `holzen-edges`:
 
 ## 6. Cron heartbeats (BetterStack Heartbeats)
 
-1. BetterStack → **Heartbeats** → Create heartbeat for each scheduled cron job. Recommended grace period: **2 × schedule interval** (e.g. 15-min cron → 30-min grace).
-2. Copy each heartbeat URL (form: `https://uptime.betterstack.com/api/v1/heartbeat/<uuid>`).
-3. Store the map below in this doc (update as jobs change). The `cron-deadman` migration extends each `SELECT net.http_post(...)` block to also `SELECT net.http_get('<heartbeat url>')` on success.
+**Storage model.** Heartbeat UUIDs live in the existing `public.app_config` table (keys of the form `heartbeat.<job_name>`), seeded with empty strings by migration [`20260420190000_cron_heartbeats_app_config.sql`](../../supabase/migrations/20260420190000_cron_heartbeats_app_config.sql). The `ALTER DATABASE postgres SET app.heartbeat_*` pattern from the earlier migration requires superuser privileges that Lovable-managed Supabase does not expose — `app_config` is the workaround.
 
-| Cron job | Schedule | Heartbeat UUID | Grace |
+The helper `public.emit_job_heartbeat('<job_name>')` looks up the UUID and no-ops if it's still empty, so the migration can ship before UUIDs exist.
+
+**Operational rollout (create heartbeats, populate UUIDs, wire cron jobs, attach Slack) is tracked as a single backlog ticket:** [pg-cron-heartbeat-wiring.md](../backlog/pg-cron-heartbeat-wiring.md).
+
+Short version:
+
+1. BetterStack → **Heartbeats** → create one per job (grace ≈ 2× schedule interval).
+2. In Supabase SQL editor:
+   ```sql
+   UPDATE public.app_config
+      SET value = to_jsonb('<uuid-from-betterstack>'::text)
+    WHERE key  = 'heartbeat.refresh_btc_prices';
+   ```
+3. In each cron schedule body, after the real work:
+   ```sql
+   PERFORM public.emit_job_heartbeat('refresh_btc_prices');
+   ```
+
+| Cron job | Schedule | `app_config` key | Grace |
 |---|---|---|---|
-| `refresh-btc-prices` | `*/15 * * * *` | `<fill on setup>` | 30 min |
-| `pregenerate-companions` | `0 */6 * * *` | `<fill on setup>` | 12 hr |
-| `check-volatility` | `*/15 * * * *` | `<fill on setup>` | 30 min |
-| `check-followups` | `0 */6 * * *` | `<fill on setup>` | 12 hr |
-| `night-reflection` | `0 * * * *` | `<fill on setup>` | 2 hr |
-| `fetch-source-feeds` | `0 6,18 * * *` | `<fill on setup>` | 24 hr |
-| `process-referral-pending` | `*/5 * * * *` | `<fill on setup>` | 15 min |
+| `refresh-btc-prices` | `*/15 * * * *` | `heartbeat.refresh_btc_prices` | 30 min |
+| `pregenerate-companions` | `0 */6 * * *` | `heartbeat.pregenerate_companions` | 12 hr |
+| `check-volatility` | `*/15 * * * *` | `heartbeat.check_volatility` | 30 min |
+| `check-followups` | `0 */6 * * *` | `heartbeat.check_followups` | 12 hr |
+| `night-reflection` | `0 * * * *` | `heartbeat.night_reflection` | 2 hr |
+| `fetch-source-feeds` | `0 6,18 * * *` | `heartbeat.fetch_source_feeds` | 24 hr |
+| `process-referral-pending` | `*/5 * * * *` | `heartbeat.process_referral_pending` | 15 min |
+| `process-email-queue` | `*/1 * * * *` | `heartbeat.process_email_queue` | 5 min |
 
-The cron migration that adds the `net.http_get` calls is committed as part of this plan; fill the UUIDs in the migration template once generated.
+Override the base URL (e.g. to a non-BetterStack provider) via `heartbeat._base_url` in `app_config`.
 
 ## 7. Anthropic + Lovable limit alerts
 
