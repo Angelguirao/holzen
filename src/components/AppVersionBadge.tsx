@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { RefreshCw, CheckCircle2, Zap } from 'lucide-react';
+import { toast } from 'sonner';
 
 declare const __BUILD_TIME__: string;
+declare const __APP_VERSION__: string;
 
 /**
  * Shows the app build timestamp, SW update status, and a manual check-for-updates button.
@@ -64,15 +66,28 @@ export function AppVersionBadge({ changelogVersion }: { changelogVersion?: strin
   };
 
   const checkForUpdates = useCallback(async () => {
-    if (!('serviceWorker' in navigator)) return;
+    if (!('serviceWorker' in navigator)) {
+      toast.error('Your browser does not support service workers.');
+      return;
+    }
     setChecking(true);
+
+    // Explicit user feedback matters here: without a toast, a successful "no update"
+    // check is indistinguishable from a dead button. Previously we only updated a
+    // 9 px / 35 %-opacity label that was effectively invisible on mobile, which is
+    // why the button "looked broken" even when it worked. Every exit path below
+    // must either show `updateWaiting` UI or emit a toast.
     try {
       const reg = await navigator.serviceWorker.getRegistration();
-      if (!reg) return;
+      if (!reg) {
+        toast.error('Service worker not registered yet — try again in a moment.');
+        return;
+      }
 
       // Already waiting — surface immediately, no network round-trip needed.
       if (reg.waiting) {
         setUpdateWaiting(true);
+        toast.success('Update ready — tap "Update available" to reload.');
         return;
       }
 
@@ -84,8 +99,10 @@ export function AppVersionBadge({ changelogVersion }: { changelogVersion?: strin
       // subsequent `update()` compares against the real deploy. Same trick used
       // by the boot-time auto-checker in `src/lib/sw-update.ts` — without this
       // step the button silently no-ops for PWA users on stale caches.
+      // Extra `?t=…` cache-bust defends against intermediaries that ignore
+      // `Cache-Control: no-store` on the request (some mobile carriers do this).
       try {
-        await fetch('/sw.js', { cache: 'no-store' });
+        await fetch(`/sw.js?t=${Date.now()}`, { cache: 'no-store' });
       } catch {
         // Offline or fetch blocked — let update() try anyway; it'll fail cleanly.
       }
@@ -119,9 +136,13 @@ export function AppVersionBadge({ changelogVersion }: { changelogVersion?: strin
       // After `installed` + an existing controller, the new SW is in `waiting`.
       if (didFindUpdate && reg.waiting) {
         setUpdateWaiting(true);
+        toast.success('Update found — tap "Update available" to reload.');
+      } else {
+        toast.success("You're on the latest version.");
       }
     } catch {
       // update() can fail if offline or CORS issues
+      toast.error("Couldn't reach the server — check your connection and try again.");
     } finally {
       setChecking(false);
       setLastChecked(new Date().toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' }));
@@ -160,6 +181,9 @@ export function AppVersionBadge({ changelogVersion }: { changelogVersion?: strin
     }
   })();
 
+  // `dev` in local, short Git SHA or `<pkg>-b<stamp>` in prod — see `resolveAppVersion` in vite.config.ts.
+  const releaseTag = typeof __APP_VERSION__ === 'string' ? __APP_VERSION__ : 'unknown';
+
   const isDev = import.meta.env.DEV;
 
   return (
@@ -173,6 +197,14 @@ export function AppVersionBadge({ changelogVersion }: { changelogVersion?: strin
         <span className="text-muted-foreground/40 text-sm font-sans">
           build {buildDate}
         </span>
+        {releaseTag && releaseTag !== 'dev' && (
+          <span
+            className="text-muted-foreground/40 text-[10px] font-mono select-all"
+            title="Release identifier — quote this when reporting a bug"
+          >
+            {releaseTag}
+          </span>
+        )}
       </div>
 
       {updateWaiting ? (
@@ -190,19 +222,25 @@ export function AppVersionBadge({ changelogVersion }: { changelogVersion?: strin
             type="button"
             onClick={checkForUpdates}
             disabled={checking || isDev}
-            className="inline-flex items-center gap-1 disabled:opacity-30 transition-colors text-sm font-sans text-cyan-700"
+            className="inline-flex items-center gap-1 disabled:opacity-40 transition-colors text-sm font-sans text-cyan-700"
+            aria-label={isDev ? 'Update checks disabled in dev mode' : 'Check for updates'}
           >
             <RefreshCw className={`h-3 w-3 ${checking ? 'animate-spin' : ''}`} />
             {checking ? 'Checking…' : 'Check for updates'}
           </button>
-          {lastChecked && !checking && (
-            <span className="inline-flex items-center gap-0.5 text-[9px] font-mono text-muted-foreground/35">
-              <CheckCircle2 className="h-2.5 w-2.5" />
+          {lastChecked && !checking && !isDev && (
+            <span
+              className="inline-flex items-center gap-1 text-xs font-sans text-muted-foreground/70"
+              aria-live="polite"
+            >
+              <CheckCircle2 className="h-3 w-3" />
               up to date · {lastChecked}
             </span>
           )}
           {isDev && (
-            <span className="text-muted-foreground/30 text-sm font-sans">(dev mode — SW disabled)</span>
+            <span className="text-muted-foreground/50 text-xs font-sans">
+              (dev mode — SW disabled)
+            </span>
           )}
         </div>
       )}

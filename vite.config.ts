@@ -1,6 +1,8 @@
 import { defineConfig, loadEnv } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import path from "path";
+import { execSync } from "node:child_process";
+import { readFileSync } from "node:fs";
 import { componentTagger } from "lovable-tagger";
 import { VitePWA } from "vite-plugin-pwa";
 import { sentryVitePlugin } from "@sentry/vite-plugin";
@@ -39,6 +41,50 @@ function preconnectHeadSnippet(supabaseUrl: string): string {
   return lines.join("\n");
 }
 
+/**
+ * Resolve the release string injected as `__APP_VERSION__` (Sentry release + PostHog `$app_version`).
+ * See `define` block in `defineConfig` below for how this flows into the bundle.
+ */
+function resolveAppVersion({
+  explicit,
+  isBuild,
+}: {
+  explicit?: string;
+  isBuild: boolean;
+}): string {
+  if (explicit && explicit.trim()) return explicit.trim();
+
+  // Dev server / tests: a stable placeholder is fine — no release health at stake.
+  if (!isBuild) return "dev";
+
+  // Prefer Git SHA — Lovable builds from the repo so this just works, and a SHA is the most
+  // useful identifier for bisecting a crash back to a commit.
+  try {
+    const sha = execSync("git rev-parse --short=12 HEAD", {
+      stdio: ["ignore", "pipe", "ignore"],
+      encoding: "utf8",
+      timeout: 2000,
+    }).trim();
+    if (sha) return sha;
+  } catch {
+    /* git unavailable (stripped workspace, non-git build worker) — fall through */
+  }
+
+  // Last resort: package.json version + base36 timestamp. Guarantees two deploys never collide,
+  // even if somehow the worker has no git binary. Format: `0.0.0-b3m7wfq2` → sortable by deploy.
+  let pkgVersion = "0.0.0";
+  try {
+    const pkg = JSON.parse(readFileSync(path.resolve(__dirname, "package.json"), "utf8")) as {
+      version?: string;
+    };
+    if (pkg.version) pkgVersion = pkg.version;
+  } catch {
+    /* keep default */
+  }
+  const stamp = Date.now().toString(36);
+  return `${pkgVersion}-b${stamp}`;
+}
+
 // https://vitejs.dev/config/
 export default defineConfig(({ mode, command }) => {
   const env = loadEnv(mode, process.cwd(), "");
@@ -52,8 +98,18 @@ export default defineConfig(({ mode, command }) => {
     : env.VITE_SUPABASE_PUBLISHABLE_KEY || "";
 
   // Release identifier shared with Sentry (frontend + edges) and PostHog (`$app_version`).
-  // CI should set VITE_APP_VERSION = Git SHA; local builds fall back to "dev".
-  const appVersion = env.VITE_APP_VERSION || process.env.VITE_APP_VERSION || "dev";
+  // Resolution order so Lovable/local/CI all get a unique, useful release string without
+  // requiring anyone to remember to set VITE_APP_VERSION:
+  //   1. Explicit `VITE_APP_VERSION` (env/CI/Lovable override — always wins).
+  //   2. Short Git SHA via `git rev-parse` (works on Lovable + any git-based build worker).
+  //   3. `package.json#version` + build-time epoch slug, so two deploys without git still differ.
+  // Falls back to `"dev"` only for non-build commands (dev server / tests) where a real release
+  // makes no sense. Sentry release-health breaks the moment two deploys share a release ID, so
+  // guaranteeing uniqueness per build is the whole point of this ladder.
+  const appVersion = resolveAppVersion({
+    explicit: env.VITE_APP_VERSION || process.env.VITE_APP_VERSION,
+    isBuild: command === "build",
+  });
 
   // Source-map upload gated on CI-only secrets; plugin is a no-op without them.
   const sentryAuthToken = process.env.SENTRY_AUTH_TOKEN;
