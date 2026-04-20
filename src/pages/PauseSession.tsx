@@ -60,7 +60,7 @@ export default function PauseSession() {
     severity: holzenSeverity,
     profileLoaded,
   } = useHolzen();
-  const { subscribed } = useSubscription();
+  const { subscribed, refresh: refreshSubscription } = useSubscription();
 
   const {
     reflectionId: navReflectionId,
@@ -381,6 +381,11 @@ export default function PauseSession() {
     dismissMessage();
     if (reflectionId) {
       await supabase.from('reflections').update({ outcome: d }).eq('id', reflectionId);
+      // Outcome just flipped this row to an "engaged pause" — force a quota refetch so
+      // PauseDone sees the up-to-date monthlyUsed and can render the `justHitLimit` upsell
+      // for the pause that just crossed the free-tier threshold (instead of waiting for
+      // the 5-min staleTime or window focus).
+      void refreshSubscription();
     }
     // Fetch final reflection state for score impact
     if (reflectionId) {
@@ -407,7 +412,7 @@ export default function PauseSession() {
     hapticFeedback('success');
     setPhase('done');
     clearSession();
-  }, [dismissMessage, reflectionId, selectedMood, selectedMoodAfter, context, breathingCompleted]);
+  }, [dismissMessage, reflectionId, selectedMood, selectedMoodAfter, context, breathingCompleted, refreshSubscription]);
 
   const slideX = prefersReducedMotion ? 0 : 80;
   const stepTransition = {
