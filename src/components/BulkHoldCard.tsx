@@ -44,10 +44,11 @@ export function BulkHoldCard() {
     hapticFeedback('medium');
 
     const ids = pending.map((r) => r.id);
-    // Batch update all pending reflections to 'hold'
+    // Use 'held' (not 'hold') to match the value written by OutcomePrompt
+    // and consumed by DecisionQualityCard, StatsTrends, use-holzen-score, etc.
     const { error } = await supabase
       .from('reflections')
-      .update({ outcome: 'hold' })
+      .update({ outcome: 'held' })
       .in('id', ids);
 
     if (!error) {
