@@ -5,6 +5,7 @@ import { Flame, MessageSquare, Shield, Eye, Heart, Award, Target, Wind, BookOpen
 import { motion } from 'framer-motion';
 import { BadgeCelebration } from './BadgeCelebration';
 import { useBadgeSync } from '@/hooks/use-badge-sync';
+import { filterFullRitual } from '@/lib/engaged-pause';
 
 
 interface Reflection {
@@ -83,10 +84,10 @@ export function BadgesPanel({ reflections, subscribed, notifyBadges = true }: Ba
 
   const badges = useMemo(() => {
     // Volume = engaged pauses only (breathing + mood + mood_after + outcome).
-    // Generated-but-ignored reflections don't count toward badges.
-    const engaged = reflections.filter(
-      (r) => r.breathing_completed && r.mood && r.mood_after && r.outcome
-    );
+    // Badges are an effort/commitment gate: only count rows where the user
+    // completed the full ritual (breathing + mood + mood_after + outcome).
+    // Generated-but-ignored and partial pauses don't count.
+    const engaged = filterFullRitual(reflections);
     const total = engaged.length;
     const calmCount = reflections.filter((r) => r.mood === 'calm').length;
     const heldCount = reflections.filter((r) => r.outcome === 'held' || r.outcome === 'nothing').length;

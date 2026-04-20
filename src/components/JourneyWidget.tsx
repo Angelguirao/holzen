@@ -7,10 +7,12 @@ import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { useEffect } from 'react';
+import { filterCompleted, pauseTimestamp } from '@/lib/engaged-pause';
 
 // ─── Types ───
 interface Reflection {
   created_at: string;
+  engaged_at?: string | null;
   outcome: string | null;
   mood?: string | null;
 }
@@ -53,7 +55,7 @@ interface CalendarActivity {
   practiceType?: string;
 }
 
-type ReflectionActivityRow = { id: string; created_at: string; mood: string | null };
+type ReflectionActivityRow = { id: string; created_at: string; engaged_at: string | null; outcome: string | null; mood: string | null };
 type LetterActivityRow = { id: string; written_at: string; deliver_during: string | null };
 type BadgeActivityRow = { id: string; earned_at: string; badge_id: string | null };
 type PracticeActivityRow = { id: string; created_at: string; type: string; mood: string | null };
@@ -69,7 +71,7 @@ export function JourneyWidget({ reflections, practiceEntries = [], streakFreezeD
     const today = new Date();
     const dayCount = 28;
     const memberStart = memberSince ? new Date(memberSince).toISOString().slice(0, 10) : null;
-    const dayMap = new Map<string, 'outcome' | 'reflection' | 'practice' | 'freeze' | 'empty' | 'pre'>();
+    const dayMap = new Map<string, 'outcome' | 'practice' | 'freeze' | 'empty' | 'pre'>();
 
     for (let i = 0; i < dayCount; i++) {
       const d = subDays(today, i).toISOString().slice(0, 10);
@@ -85,21 +87,25 @@ export function JourneyWidget({ reflections, practiceEntries = [], streakFreezeD
       if (dayMap.has(d) && dayMap.get(d) === 'empty') dayMap.set(d, 'practice');
     }
 
-    for (const r of reflections) {
-      const d = new Date(r.created_at).toISOString().slice(0, 10);
+    // Only count reflections the user actually completed. Ignored notifications
+    // (rows that were generated but never engaged with) used to light up the
+    // grid as a gray "Paused (no outcome)" cell, which misrepresented activity.
+    // Also key by engaged_at (via pauseTimestamp) so a cron row the user
+    // acted on the next day lands in the correct day bucket.
+    const completedReflections = filterCompleted(reflections);
+    for (const r of completedReflections) {
+      const d = pauseTimestamp(r).toISOString().slice(0, 10);
       if (dayMap.has(d)) {
         const current = dayMap.get(d);
         if (current === 'empty' || current === 'practice') {
-          dayMap.set(d, r.outcome ? 'outcome' : 'reflection');
-        } else if (current === 'reflection' && r.outcome) {
           dayMap.set(d, 'outcome');
         }
       }
     }
 
     const allDays = new Set<string>();
-    for (const r of reflections) {
-      if (r.outcome) allDays.add(new Date(r.created_at).toISOString().slice(0, 10));
+    for (const r of completedReflections) {
+      allDays.add(pauseTimestamp(r).toISOString().slice(0, 10));
     }
     for (const p of practiceEntries) {
       allDays.add(new Date(p.created_at).toISOString().slice(0, 10));
@@ -154,7 +160,7 @@ export function JourneyWidget({ reflections, practiceEntries = [], streakFreezeD
 
     const load = async () => {
       const [{ data: refs }, { data: lets }, { data: bads }, { data: pracs }] = await Promise.all([
-        supabase.from('reflections').select('id, created_at, mood').eq('user_id', user.id),
+        supabase.from('reflections').select('id, created_at, engaged_at, outcome, mood').eq('user_id', user.id),
         supabase.from('future_letters').select('id, written_at, deliver_during').eq('user_id', user.id),
         supabase.from('user_badges').select('id, earned_at, badge_id').eq('user_id', user.id),
         supabase.from('practice_entries').select('id, created_at, type, mood, prompt').eq('user_id', user.id),
@@ -168,7 +174,19 @@ export function JourneyWidget({ reflections, practiceEntries = [], streakFreezeD
       };
 
       const items: CalendarActivity[] = [];
-      (refs as ReflectionActivityRow[] | null ?? []).forEach((r) => items.push({ date: r.created_at, type: 'reflection', mood: r.mood, id: r.id }));
+      // Calendar activity should only reflect pauses the user actually
+      // completed. Ignored-notification rows still carry a pre-filled mood
+      // from the cron worker (see src/lib/engaged-pause.ts docstring), so
+      // without filterCompleted + pauseTimestamp the calendar would dot days
+      // the user never engaged on AND poison the dominant-mood tint.
+      filterCompleted((refs as ReflectionActivityRow[] | null) ?? []).forEach((r) =>
+        items.push({
+          date: pauseTimestamp(r).toISOString(),
+          type: 'reflection',
+          mood: r.mood,
+          id: r.id,
+        }),
+      );
       (lets as LetterActivityRow[] | null ?? []).forEach((l) => items.push({ date: l.written_at, type: 'letter', id: l.id, label: `Letter → ${l.deliver_during}` }));
       (bads as BadgeActivityRow[] | null ?? []).forEach((b) => items.push({ date: b.earned_at, type: 'badge', id: b.id, label: b.badge_id ?? '' }));
       (pracs as PracticeActivityRow[] | null ?? []).forEach((p) => items.push({
@@ -222,7 +240,6 @@ export function JourneyWidget({ reflections, practiceEntries = [], streakFreezeD
               title={`${format(new Date(date), 'MMM d')} — ${status === 'pre' ? t('streakTimeline.beforeSignup') : t(`streakTimeline.status.${status}`)}`}
               className={`aspect-square rounded-sm transition-colors ${
                 status === 'outcome' ? 'bg-primary'
-                : status === 'reflection' ? 'bg-primary/30'
                 : status === 'practice' ? 'bg-accent-foreground/20'
                 : status === 'freeze' ? 'bg-secondary/60'
                 : status === 'pre' ? 'bg-transparent border border-border/20'
@@ -237,9 +254,6 @@ export function JourneyWidget({ reflections, practiceEntries = [], streakFreezeD
       <div className="flex items-center flex-wrap gap-x-3 gap-y-1 text-[9px] font-mono" style={{ color: '#C1CBD7' }}>
         <span className="flex items-center gap-1 font-sans text-sm my-[16px] mb-[8px]">
           <span className="h-2 w-2 rounded-sm bg-primary" /> {t('streakTimeline.legend.outcomeLogged')}
-        </span>
-        <span className="flex items-center gap-1 font-sans text-sm mt-[16px] mb-[8px]">
-          <span className="h-2 w-2 rounded-sm bg-primary/30" /> {t('streakTimeline.legend.pausedNoOutcome', 'Paused (no outcome)')}
         </span>
         <span className="flex items-center gap-1 text-sm font-sans mb-[16px]">
           <span className="h-2 w-2 rounded-sm bg-accent-foreground/20" /> {t('streakTimeline.legend.practiceOnly', 'Practice only')}

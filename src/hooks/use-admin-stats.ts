@@ -146,6 +146,24 @@ export interface PeriodStats {
   feedbackDown: number;
 }
 
+/**
+ * Notification response-rate summary for the currently selected admin period.
+ * Sourced from v_notification_response_rate (see migration
+ * 20260420220000_reflection_source_and_engagement_views.sql). Engagement
+ * definitions match src/lib/engaged-pause.ts — ignored notifications are an
+ * explicit counter here, never silently folded into behavioural scores.
+ */
+export interface NotificationResponseStats {
+  notifications: number;
+  completed: number;
+  engaged: number;
+  ignored: number;
+  /** 0–100, integer. null when no notifications were sent. */
+  pctCompleted: number | null;
+  pctEngaged: number | null;
+  pctIgnored: number | null;
+}
+
 export interface AdminStats {
   // View-based data (all-time aggregates)
   cacheHits: CacheHitRow[];
@@ -159,6 +177,8 @@ export interface AdminStats {
   setPeriod: (p: TimePeriod) => void;
   periodStats: PeriodStats;
   prevPeriodStats: PeriodStats | null; // for trend comparison
+  /** Notification response rate over the selected period. */
+  notificationStats: NotificationResponseStats;
   // New feeds
   rejections: RejectionRow[];
   recentContent: RecentContentRow[];
@@ -210,6 +230,12 @@ export function useAdminStats(enabled = true): AdminStats {
   const [period, setPeriod] = useState<TimePeriod>('7d');
   const [periodStats, setPeriodStats] = useState<PeriodStats>({ serves: 0, cacheHits: 0, cacheHitRate: 0, cost: 0, failures: 0, totalAttempts: 0, feedbackUp: 0, feedbackDown: 0 });
   const [prevPeriodStats, setPrevPeriodStats] = useState<PeriodStats | null>(null);
+  // Daily rows from v_notification_response_rate — filtered client-side by period.
+  const [notificationPerDay, setNotificationPerDay] = useState<any[]>([]);
+  const [notificationStats, setNotificationStats] = useState<NotificationResponseStats>({
+    notifications: 0, completed: 0, engaged: 0, ignored: 0,
+    pctCompleted: null, pctEngaged: null, pctIgnored: null,
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
@@ -254,6 +280,7 @@ export function useAdminStats(enabled = true): AdminStats {
     dailyServes: any[],
     dailyFailures: any[],
     dailyFeedback: any[],
+    dailyNotifications: any[],
   ) => {
     const start = periodStart(p);
     const startDate = start?.slice(0, 10);
@@ -312,6 +339,26 @@ export function useAdminStats(enabled = true): AdminStats {
     }
 
     setPeriodStats({ serves: totalServes, cacheHits: totalCacheHits, cacheHitRate, cost: totalCost, failures: totalFails, totalAttempts, feedbackUp: fbUp, feedbackDown: fbDown });
+
+    // ── Notification response rate (from v_notification_response_rate daily rows) ──
+    // Empty array = view not available yet or zero notifications — render as zeros.
+    const notifRows = dailyNotifications;
+    const notifFiltered = startDate
+      ? notifRows.filter((r: any) => r.day && r.day >= startDate)
+      : notifRows;
+    const notifs = notifFiltered.reduce((s: number, r: any) => s + (r.notifications ?? 0), 0);
+    const notifCompleted = notifFiltered.reduce((s: number, r: any) => s + (r.completed ?? 0), 0);
+    const notifEngaged = notifFiltered.reduce((s: number, r: any) => s + (r.engaged ?? 0), 0);
+    const notifIgnored = notifFiltered.reduce((s: number, r: any) => s + (r.ignored ?? 0), 0);
+    setNotificationStats({
+      notifications: notifs,
+      completed: notifCompleted,
+      engaged: notifEngaged,
+      ignored: notifIgnored,
+      pctCompleted: notifs > 0 ? Math.round((notifCompleted / notifs) * 100) : null,
+      pctEngaged: notifs > 0 ? Math.round((notifEngaged / notifs) * 100) : null,
+      pctIgnored: notifs > 0 ? Math.round((notifIgnored / notifs) * 100) : null,
+    });
 
     // ── Previous period for trend comparison ──
     const ms = periodToMs(p);
@@ -419,19 +466,22 @@ export function useAdminStats(enabled = true): AdminStats {
       setFeedback(feedData);
 
       // Fetch daily breakdown views (may return empty if migration hasn't run)
-      const [servesRes, failDayRes, fbDayRes] = await Promise.all([
+      const [servesRes, failDayRes, fbDayRes, notifRes] = await Promise.all([
         supabase.from('v_companion_serves_per_day' as any).select('*').limit(500),
         supabase.from('v_generation_failures_per_day' as any).select('*').limit(500),
         supabase.from('v_companion_feedback_per_day' as any).select('*').limit(500),
+        supabase.from('v_notification_response_rate' as any).select('*').limit(500),
       ]);
 
       const dailyServes = servesRes.error ? [] : (servesRes.data ?? []);
       const dailyFailures = failDayRes.error ? [] : (failDayRes.data ?? []);
       const dailyFeedback = fbDayRes.error ? [] : (fbDayRes.data ?? []);
+      const dailyNotifications = notifRes.error ? [] : (notifRes.data ?? []);
 
       setServesPerDay(dailyServes);
       setFailuresPerDay(dailyFailures);
       setFeedbackPerDay(dailyFeedback);
+      setNotificationPerDay(dailyNotifications);
 
       // Compute period stats from view data
       computePeriodStats(
@@ -443,6 +493,7 @@ export function useAdminStats(enabled = true): AdminStats {
         dailyServes,
         dailyFailures,
         dailyFeedback,
+        dailyNotifications,
       );
 
       await Promise.all([
@@ -470,12 +521,12 @@ export function useAdminStats(enabled = true): AdminStats {
   // Recompute period stats when period changes (no network call needed — uses cached view data)
   const handleSetPeriod = useCallback((p: TimePeriod) => {
     setPeriod(p);
-    computePeriodStats(p, costs, cacheHits, failures, feedback, servesPerDay, failuresPerDay, feedbackPerDay);
-  }, [computePeriodStats, costs, cacheHits, failures, feedback, servesPerDay, failuresPerDay, feedbackPerDay]);
+    computePeriodStats(p, costs, cacheHits, failures, feedback, servesPerDay, failuresPerDay, feedbackPerDay, notificationPerDay);
+  }, [computePeriodStats, costs, cacheHits, failures, feedback, servesPerDay, failuresPerDay, feedbackPerDay, notificationPerDay]);
 
   return {
     cacheHits, costs, failures, feedback, cacheEntries, signalSources,
-    period, setPeriod: handleSetPeriod, periodStats, prevPeriodStats,
+    period, setPeriod: handleSetPeriod, periodStats, prevPeriodStats, notificationStats,
     rejections, recentContent, sessions, libraryEntries,
     loading, error, refresh: fetchAll, refreshCacheEntries: fetchCacheEntries,
     refreshCompanionCacheUi, refreshRejections, lastUpdated,

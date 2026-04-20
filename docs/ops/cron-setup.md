@@ -287,3 +287,72 @@ SELECT cron.schedule(
   $$
 );
 ```
+
+## Purge Orphan Notification Reflections
+
+Every cron-generated reflection that a user never engaged with (no outcome, no
+`mood_after`, no `breathing_completed`) is an **ignored notification**. These
+rows are already excluded from every metric via `src/lib/engaged-pause.ts`
+(`isCompletedPause` / `isFullRitualPause`) and the server-side `v_reflections_*`
+views — but they still accumulate in `public.reflections`.
+
+This cron deletes them after a TTL to keep the table lean. Because
+`pause_notifications.reflection_id` is `ON DELETE SET NULL`, the bell history
+stays intact; only the dangling reflection row is removed. The purge function
+lives in migration `20260420220000_reflection_source_and_engagement_views.sql`.
+
+**Before scheduling:** confirm `v_notification_response_rate` (Admin → Monitor
+→ Notification Response) looks reasonable — that view counts these rows, so a
+too-short TTL shrinks its window.
+
+Predicate (enforced inside the function):
+
+```sql
+source IS NOT NULL
+AND source <> 'manual'
+AND outcome IS NULL
+AND mood_after IS NULL
+AND (breathing_completed IS NULL OR breathing_completed = false)
+AND created_at < now() - make_interval(days => <cutoff_days>)
+```
+
+### Schedule (daily at 03:15 UTC, 30-day TTL)
+
+```sql
+SELECT cron.schedule(
+  'purge-orphan-notification-reflections',
+  '15 3 * * *',
+  $$
+  SELECT public.purge_orphan_notification_reflections(30);
+  $$
+);
+```
+
+### Dry-run / one-off
+
+```sql
+-- How many rows would be purged at the current TTL (read-only probe).
+SELECT count(*) AS candidates
+FROM public.reflections
+WHERE source IS NOT NULL
+  AND source <> 'manual'
+  AND outcome IS NULL
+  AND mood_after IS NULL
+  AND (breathing_completed IS NULL OR breathing_completed = false)
+  AND created_at < now() - interval '30 days';
+
+-- Run once manually (returns the actual deleted count).
+SELECT public.purge_orphan_notification_reflections(30);
+```
+
+### Tuning the TTL
+
+- **Shorter TTL** (7–14 days): leaner table, but the admin Notification
+  Response card only sees the last N days of history.
+- **Longer TTL** (60–90 days): more historical context for pipeline analysis at
+  the cost of extra rows that the `idx_reflections_orphan_notifications`
+  partial index already keeps cheap to scan.
+
+Adjust with `cron.alter_job('purge-orphan-notification-reflections', schedule :=
+'…')` and pass a different `cutoff_days` arg by updating the command body
+(`SELECT public.purge_orphan_notification_reflections(<N>);`).
