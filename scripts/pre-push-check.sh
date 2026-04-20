@@ -47,6 +47,22 @@ cd "$ROOT"
 echo "${BOLD}Holzen pre-push checklist${RESET}"
 echo "Repo: $ROOT"
 
+# ---- 0. Edge release stamp ---------------------------------------------------
+# Refresh `supabase/functions/_shared/release.ts` so edge-deployed Sentry events
+# (and BetterStack log lines) report a real Git SHA instead of "unknown". The
+# script is idempotent: no write, no warning if the stamp is already current.
+step "0/5  Edge release stamp"
+
+if node scripts/stamp-edge-release.mjs; then
+  if ! git diff --quiet -- supabase/functions/_shared/release.ts 2>/dev/null; then
+    warn_check "release.ts was regenerated — run: git add supabase/functions/_shared/release.ts && git commit --amend --no-edit"
+  else
+    ok "edge release stamp up to date"
+  fi
+else
+  warn_check "stamp-edge-release.mjs failed — edges may report 'unknown' release"
+fi
+
 # ---- 1. View safety lint -----------------------------------------------------
 step "1/5  View safety lint (CREATE OR REPLACE VIEW)"
 

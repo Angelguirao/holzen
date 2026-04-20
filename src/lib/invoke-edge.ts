@@ -13,6 +13,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { getCid } from "./cid";
 import { Sentry } from "./sentry";
 
+declare const __APP_VERSION__: string;
+
 export interface InvokeEdgeOptions<B = unknown> {
   /** JSON body. */
   body?: B;
@@ -36,8 +38,13 @@ export async function invokeEdge<T = unknown, B = unknown>(
   options: InvokeEdgeOptions<B> = {}
 ): Promise<InvokeEdgeResult<T>> {
   const cid = getCid();
+  // `x-app-version` lets edge Sentry + BetterStack tag every event with the
+  // exact frontend build that issued the request — decisive when debugging
+  // "this edge errored, was the user on a stale PWA cache?" questions.
+  // Matches Sentry `release` on the frontend (`__APP_VERSION__` from Vite).
   const headers: Record<string, string> = {
     "x-cid": cid,
+    "x-app-version": typeof __APP_VERSION__ === "string" ? __APP_VERSION__ : "dev",
     ...options.headers,
   };
 

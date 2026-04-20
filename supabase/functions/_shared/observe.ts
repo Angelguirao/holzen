@@ -3,6 +3,8 @@
  * Centralises cost tracking, attempt logging, and analytics events.
  */
 
+import { EDGE_RELEASE } from "./release.ts";
+
 // ── Cost estimation per 1M tokens [input, output] in USD ──
 // Default costs; can be overridden via COST_MAP_OVERRIDE env var
 // (JSON string, e.g. '{"google/gemini-2.5-flash":[0.15,0.6]}')
@@ -188,17 +190,36 @@ export function trackEvent(svcClient: any, userId: string, event: string) {
  * `release`, `environment`, and `service` are attached so logs from multiple
  * deployed functions can be filtered / grouped in BetterStack.
  */
-export function createLogger(prefix: string, correlationId?: string) {
+export interface CreateLoggerOptions {
+  /**
+   * Frontend release (`x-app-version` header) for this request. Included on
+   * every log entry as `frontend_release` so BetterStack queries can filter
+   * edge logs by which frontend build triggered them — parallel to the
+   * `frontend_release` Sentry tag set by `captureEdgeError`.
+   */
+  frontendRelease?: string;
+}
+
+export function createLogger(
+  prefix: string,
+  correlationId?: string,
+  options?: CreateLoggerOptions,
+) {
   const t0 = Date.now();
   const cid = correlationId || crypto.randomUUID().slice(0, 8);
+  const frontendRelease = options?.frontendRelease;
 
   // Resolve drain settings lazily — edge functions share this module, so doing it once
   // per logger is fine and lets us pick up runtime env changes in long-lived invocations.
   const drainUrl = typeof Deno !== "undefined" ? Deno.env.get("LOG_DRAIN_URL") ?? "" : "";
   const drainToken = typeof Deno !== "undefined" ? Deno.env.get("LOG_DRAIN_TOKEN") ?? "" : "";
+  // Release resolution matches `_shared/sentry.ts`: env overrides first, then the
+  // committed `EDGE_RELEASE` stamp. Having the same field value across Sentry +
+  // BetterStack log lines is what lets us pivot from a log to its Sentry event by
+  // `release` when debugging a specific deploy.
   const release = typeof Deno !== "undefined"
-    ? Deno.env.get("SENTRY_RELEASE") ?? Deno.env.get("APP_VERSION") ?? "unknown"
-    : "unknown";
+    ? Deno.env.get("SENTRY_RELEASE") ?? Deno.env.get("APP_VERSION") ?? EDGE_RELEASE ?? "unknown"
+    : EDGE_RELEASE ?? "unknown";
   const environment = typeof Deno !== "undefined"
     ? Deno.env.get("SENTRY_ENVIRONMENT") ?? "production"
     : "production";
@@ -227,6 +248,7 @@ export function createLogger(prefix: string, correlationId?: string) {
       service: prefix,
       cid,
       release,
+      ...(frontendRelease ? { frontend_release: frontendRelease } : {}),
       environment,
       elapsed_ms: Date.now() - t0,
       level,
