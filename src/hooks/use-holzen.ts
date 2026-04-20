@@ -106,6 +106,7 @@ export function useHolzen() {
         user_id: user.id,
         message: silentMsg,
         context: ctx,
+        source: 'manual',
         ...(mood ? { mood } : {}),
       }).select('id').single();
 
@@ -221,6 +222,7 @@ export function useHolzen() {
           message: msg,
           context: ctx,
           haiku: companionData.haiku,
+          source: 'manual',
           ...(mood ? { mood } : {}),
         }).select('id').single();
 

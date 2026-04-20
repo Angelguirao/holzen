@@ -2,7 +2,7 @@ import { useAdminStats } from '@/hooks/use-admin-stats';
 import { useAuth } from '@/hooks/use-auth';
 import { supabase } from '@/integrations/supabase/client';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
-import { RefreshCw, Activity, Database, DollarSign, AlertTriangle, ThumbsUp, Clock, Loader2, ShieldX, ChevronDown, ChevronRight } from 'lucide-react';
+import { RefreshCw, Activity, Database, DollarSign, AlertTriangle, ThumbsUp, Clock, Loader2, ShieldX, ChevronDown, ChevronRight, Bell } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { useMemo, useState, useEffect, useCallback } from 'react';
 import { useToast } from '@/hooks/use-toast';
@@ -128,7 +128,7 @@ export default function Admin() {
   const { toast } = useToast();
   const {
     cacheHits, costs, failures, feedback, cacheEntries, signalSources,
-    period, setPeriod, periodStats, prevPeriodStats,
+    period, setPeriod, periodStats, prevPeriodStats, notificationStats,
     rejections, recentContent, sessions, libraryEntries,
     loading, error, refresh, refreshCacheEntries, refreshCompanionCacheUi, refreshRejections, lastUpdated,
   } = useAdminStats(!adminLoading && isAdmin);
@@ -503,6 +503,48 @@ export default function Admin() {
               </div>
             </div>
           )}
+
+          {/* Notification Response Rate — explicitly separated from behavioural scores.
+              Counts what the pause notification pipeline actually produced: how many
+              push/email/bell notifications we dispatched, and how many users acted on
+              them (completed a decision / fully engaged with the pause). Rows that
+              remain "ignored" never count toward Holzen Score, skill balance, badges
+              or quota — they're just the denominator here. Source:
+              v_notification_response_rate. */}
+          <div className="space-y-2">
+            <p className="text-[10px] font-mono uppercase tracking-wider text-muted-foreground/60">
+              Notification Response <span className="text-muted-foreground/40 normal-case">({periodLabel})</span>
+            </p>
+            <p className="text-[9px] font-mono text-muted-foreground/45 leading-relaxed">
+              Pipeline output, not user behaviour. <span className="text-muted-foreground/55">ignored</span> rows never touch Holzen Score / skill balance / badges — they're tracked here so we can see pipeline effectiveness independently of engagement quality.
+            </p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <StatCard
+                icon={Bell}
+                title="Sent"
+                value={notificationStats.notifications.toLocaleString()}
+                subtitle={periodLabel}
+              />
+              <StatCard
+                icon={Activity}
+                title="Completed"
+                value={notificationStats.pctCompleted === null ? '—' : `${notificationStats.pctCompleted}%`}
+                subtitle={`${notificationStats.completed} decisions recorded`}
+              />
+              <StatCard
+                icon={ThumbsUp}
+                title="Engaged"
+                value={notificationStats.pctEngaged === null ? '—' : `${notificationStats.pctEngaged}%`}
+                subtitle={`${notificationStats.engaged} full flow`}
+              />
+              <StatCard
+                icon={ShieldX}
+                title="Ignored"
+                value={notificationStats.pctIgnored === null ? '—' : `${notificationStats.pctIgnored}%`}
+                subtitle={`${notificationStats.ignored} no interaction`}
+              />
+            </div>
+          </div>
 
           {/* Cache Hit Rates */}
           <div className="space-y-2">

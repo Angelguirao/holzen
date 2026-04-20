@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Radar } from 'lucide-react';
 import { ChartEmptyState } from './ChartEmptyState';
 import { detectSkills, SKILL_LABELS, type SkillType } from '@/lib/skill-detection';
+import { filterCompleted, isCompletedPause } from '@/lib/engaged-pause';
 
 interface Reflection {
   mood?: string | null;
@@ -37,8 +38,7 @@ export function SkillBalanceCard({ reflections }: Props) {
   const { t } = useTranslation();
 
   const data = useMemo(() => {
-    // Only count completed pauses (with outcome)
-    const completed = reflections.filter(r => r.outcome != null && r.outcome !== '');
+    const completed = filterCompleted(reflections);
     if (completed.length < 3) return null;
 
     const counts: Record<SkillType, number> = {
@@ -59,7 +59,7 @@ export function SkillBalanceCard({ reflections }: Props) {
   }, [reflections]);
 
   if (!data) {
-    const completedCount = reflections.filter(r => r.outcome != null && r.outcome !== '').length;
+    const completedCount = reflections.filter(isCompletedPause).length;
     return (
       <ChartEmptyState
         title={t('skillBalance.title', 'Skill Balance')}

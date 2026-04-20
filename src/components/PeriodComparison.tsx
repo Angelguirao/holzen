@@ -4,11 +4,13 @@ import { ArrowUpRight, ArrowDownRight, Minus, CalendarDays } from 'lucide-react'
 import { ChartEmptyState } from './ChartEmptyState';
 import {
   startOfWeek, endOfWeek, subWeeks, startOfMonth, endOfMonth, subMonths,
-  parseISO, isWithinInterval, format,
+  isWithinInterval, format,
 } from 'date-fns';
+import { filterCompleted, pauseTimestamp } from '@/lib/engaged-pause';
 
 interface Reflection {
   created_at: string;
+  engaged_at?: string | null;
   mood: string | null;
   mood_after?: string | null;
   outcome: string | null;
@@ -45,8 +47,9 @@ interface PeriodStats {
 const CALM_MOODS = ['calm', 'detached'];
 
 function computeStats(refs: Reflection[]): PeriodStats {
-  // Only count completed pauses (with outcome)
-  const completed = refs.filter((r) => r.outcome != null && r.outcome !== '');
+  // Denominator = pauses where a decision was recorded. Ignored notifications
+  // (no outcome) are excluded so they can't pull hold-rate / calm-exit rate down.
+  const completed = filterCompleted(refs);
   if (completed.length === 0) return { count: 0, holdRate: null, calmExitRate: null };
 
   const held = completed.filter((r) => r.outcome === 'held' || r.outcome === 'nothing');
@@ -87,13 +90,14 @@ export function PeriodComparison({ reflections, holdGoal }: Props) {
       previousLabel = format(subMonths(now, 1), 'MMMM');
     }
 
+    // Bucket by engaged_at (fallback created_at) so delayed engagements from
+    // notification pushes land in the right week/month. See
+    // src/lib/engaged-pause.ts#pauseTimestamp.
     const currentRefs = reflections.filter((r) => {
-      const d = parseISO(r.created_at);
-      return isWithinInterval(d, { start: currentStart, end: currentEnd });
+      return isWithinInterval(pauseTimestamp(r), { start: currentStart, end: currentEnd });
     });
     const prevRefs = reflections.filter((r) => {
-      const d = parseISO(r.created_at);
-      return isWithinInterval(d, { start: prevStart, end: prevEnd });
+      return isWithinInterval(pauseTimestamp(r), { start: prevStart, end: prevEnd });
     });
 
     return { currentRefs, prevRefs, currentLabel, previousLabel };

@@ -520,6 +520,10 @@ serve(async (req) => {
           message: result.message,
           context: ctx,
           haiku,
+          // Tag provenance so admin analytics can distinguish cron-generated
+          // rows and the purge job can safely sweep ignored-notification
+          // orphans (see 20260420220000 migration + docs/ops/cron-setup.md).
+          source: "cron_volatility",
           ...(lastReportedMood ? { mood: lastReportedMood } : {}),
         })
         .select("id")

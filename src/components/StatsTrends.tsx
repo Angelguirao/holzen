@@ -12,10 +12,12 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import { startOfWeek, parseISO, format } from 'date-fns';
+import { startOfWeek, format } from 'date-fns';
+import { filterCompleted, pauseTimestamp } from '@/lib/engaged-pause';
 
 interface Reflection {
   created_at: string;
+  engaged_at?: string | null;
   mood: string | null;
   mood_after?: string | null;
   outcome: string | null;
@@ -58,8 +60,9 @@ interface WeekBucket {
 }
 
 function buildWeeklyData(reflections: Reflection[]): WeekBucket[] {
-  // Only process completed pauses (with outcome)
-  const completed = reflections.filter(r => r.outcome != null && r.outcome !== '');
+  // Ignored-notification rows (no outcome) are excluded so they never
+  // drag down weekly trends.
+  const completed = filterCompleted(reflections);
   const buckets = new Map<string, {
     scores: number[];
     held: number; totalOutcomes: number;
@@ -68,7 +71,10 @@ function buildWeeklyData(reflections: Reflection[]): WeekBucket[] {
   }>();
 
   for (const r of completed) {
-    const date = parseISO(r.created_at);
+    // Bucket by engaged_at (when the user actually acted), not created_at
+    // (which is the notification insertion time for cron rows). See
+    // src/lib/engaged-pause.ts#pauseTimestamp.
+    const date = pauseTimestamp(r);
     const key = startOfWeek(date, { weekStartsOn: 1 }).toISOString().slice(0, 10);
     const entry = buckets.get(key) || {
       scores: [],

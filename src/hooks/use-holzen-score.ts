@@ -1,4 +1,5 @@
 import { useMemo } from 'react';
+import { filterCompleted } from '@/lib/engaged-pause';
 
 interface Reflection {
   created_at: string;
@@ -71,8 +72,9 @@ export function useHolzenScore(
   holdGoal?: HoldGoal | null,
 ): HolzenScoreData | null {
   return useMemo(() => {
-    // Only count completed pauses (those with a decision/outcome)
-    const completed = reflections.filter(r => r.outcome != null && r.outcome !== '');
+    // Only count completed pauses (those with a recorded decision).
+    // Ignored-notification rows have no outcome and are excluded by construction.
+    const completed = filterCompleted(reflections);
     if (completed.length < 1) return null;
 
     const recent = completed.slice(0, 30);
