@@ -16,6 +16,8 @@
     "check:edge": "node scripts/check-edge.mjs",
     "check:view-migrations": "node scripts/lint-view-migrations.mjs",
     "check:prepush": "bash scripts/pre-push-check.sh",
+    "stamp:release": "node scripts/stamp-edge-release.mjs",
+    "check:release-stamp": "node scripts/stamp-edge-release.mjs --check",
     "supabase:start": "supabase start",
     "supabase:stop": "supabase stop",
     "supabase:status": "supabase status",

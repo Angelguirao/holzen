@@ -27,10 +27,16 @@ import { captureEdgeError, initSentryEdges } from "./sentry.ts";
 
 export interface RequestLoggingContext {
   req: Request;
-  /** Structured logger bound to this request (already carries cid + fn + release). */
+  /** Structured logger bound to this request (already carries cid + fn + release + frontend_release). */
   log: ReturnType<typeof createLogger>;
   /** Correlation id — same value as the `x-cid` request header (or a freshly generated UUID). */
   cid: string;
+  /**
+   * Frontend release (`x-app-version` header) of the caller, or `undefined` if the caller is
+   * an internal invocation (cron, another edge fn) that doesn't carry the header. Handlers
+   * generally don't need this — Sentry + the logger already include it automatically.
+   */
+  frontendRelease?: string;
 }
 
 export type EdgeHandler = (ctx: RequestLoggingContext) => Promise<Response> | Response;
@@ -39,6 +45,18 @@ function readCid(req: Request): string {
   const fromHeader = req.headers.get("x-cid") || req.headers.get("X-Cid");
   if (fromHeader && fromHeader.length > 0 && fromHeader.length < 128) return fromHeader;
   return crypto.randomUUID();
+}
+
+function readFrontendRelease(req: Request): string | undefined {
+  const raw = req.headers.get("x-app-version") || req.headers.get("X-App-Version");
+  if (!raw) return undefined;
+  // Keep it short + ascii-safe — `release` strings are a Git SHA (12 hex) or
+  // `<semver>-b<stamp>`. Anything wildly longer is suspect (header injection, bug);
+  // clamp rather than propagate. Drop it entirely if it looks like garbage.
+  const trimmed = raw.trim();
+  if (trimmed.length === 0 || trimmed.length > 64) return undefined;
+  if (!/^[A-Za-z0-9._-]+$/.test(trimmed)) return undefined;
+  return trimmed;
 }
 
 function decorateResponse(res: Response, cid: string): Response {
@@ -68,7 +86,8 @@ export function withRequestLogging(fnName: string, handler: EdgeHandler) {
     if (cors) return cors;
 
     const cid = readCid(req);
-    const log = createLogger(fnName, cid);
+    const frontendRelease = readFrontendRelease(req);
+    const log = createLogger(fnName, cid, { frontendRelease });
     const url = new URL(req.url);
 
     log("request", {
@@ -79,7 +98,7 @@ export function withRequestLogging(fnName: string, handler: EdgeHandler) {
     });
 
     try {
-      const response = await handler({ req, log, cid });
+      const response = await handler({ req, log, cid, frontendRelease });
       log("response", { status: response.status });
       return decorateResponse(response, cid);
     } catch (err) {
@@ -87,7 +106,7 @@ export function withRequestLogging(fnName: string, handler: EdgeHandler) {
         const ee = err as EdgeError;
         log.warn("edge_error", { code: ee.code, status: ee.status, message: ee.message });
         // `captureEdgeError` already short-circuits on `isExpected`.
-        captureEdgeError(err, { fn: fnName, cid });
+        captureEdgeError(err, { fn: fnName, cid, frontendRelease });
         return decorateResponse(
           new Response(JSON.stringify(edgeErrorToJson(ee, cid)), {
             status: ee.status,
@@ -101,7 +120,7 @@ export function withRequestLogging(fnName: string, handler: EdgeHandler) {
       const message = err instanceof Error ? err.message : String(err);
       const stack = err instanceof Error ? err.stack : undefined;
       log.error("unhandled_exception", { message, stack });
-      captureEdgeError(err, { fn: fnName, cid, forceSend: true });
+      captureEdgeError(err, { fn: fnName, cid, frontendRelease, forceSend: true });
       return decorateResponse(
         new Response(
           JSON.stringify({

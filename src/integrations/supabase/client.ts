@@ -4,6 +4,8 @@ import { createClient } from '@supabase/supabase-js';
 import type { Database } from './types';
 import { getCid } from '@/lib/cid';
 
+declare const __APP_VERSION__: string;
+
 const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
 const SUPABASE_PUBLISHABLE_KEY = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
@@ -40,6 +42,16 @@ supabase.functions.invoke = ((functionName: string, options?: Parameters<InvokeF
       headers["x-cid"] = getCid();
     } catch {
       /* getCid is defensive — this is belt-and-suspenders */
+    }
+  }
+  // Frontend release, mirrored on every edge call so Sentry edge events can tag
+  // `frontend_release` regardless of whether the caller used `invokeEdge()` or
+  // `supabase.functions.invoke()` directly. Caller-supplied header still wins.
+  if (!headers["x-app-version"] && !headers["X-App-Version"]) {
+    try {
+      headers["x-app-version"] = typeof __APP_VERSION__ === "string" ? __APP_VERSION__ : "dev";
+    } catch {
+      /* define-guarded — shouldn't throw, but stay defensive */
     }
   }
   return originalInvoke(functionName, { ...options, headers });

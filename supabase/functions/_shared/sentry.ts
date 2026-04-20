@@ -14,6 +14,7 @@
 
 import * as Sentry from "https://esm.sh/@sentry/deno@8.47.0";
 import { isEdgeError, type EdgeError } from "./edge-error.ts";
+import { EDGE_RELEASE } from "./release.ts";
 
 /** Keys whose values are user-authored free-text content — never forward to Sentry. */
 const PII_VALUE_KEYS = new Set<string>([
@@ -81,7 +82,17 @@ export function initSentryEdges(): void {
   try {
     Sentry.init({
       dsn,
-      release: Deno.env.get("SENTRY_RELEASE") ?? Deno.env.get("APP_VERSION") ?? "unknown",
+      // Resolution order mirrors the frontend (`resolveAppVersion` in vite.config.ts):
+      //   1. `SENTRY_RELEASE` secret — lets ops override per-environment without a redeploy.
+      //   2. `APP_VERSION` secret — legacy alias kept for backwards compat.
+      //   3. `EDGE_RELEASE` constant — stamped at pre-push by `scripts/stamp-edge-release.mjs`
+      //      and committed, so every `supabase functions deploy` ships a real Git SHA.
+      //   4. `"unknown"` only if the stamp somehow got lost — should never happen.
+      release:
+        Deno.env.get("SENTRY_RELEASE") ??
+        Deno.env.get("APP_VERSION") ??
+        EDGE_RELEASE ??
+        "unknown",
       environment: Deno.env.get("SENTRY_ENVIRONMENT") ?? "production",
       tracesSampleRate: 0,
       // Don't sample frequent noise. Upstream rate limiting / invocation quotas are the real
@@ -133,6 +144,12 @@ export interface EdgeErrorContext {
   userId?: string;
   /** Any extra structured fields. Values are scrubbed before send. */
   extra?: Record<string, unknown>;
+  /**
+   * Frontend release (`x-app-version` header) at the time of the erroring request.
+   * Indexed as the `frontend_release` tag so Sentry filters can answer "this edge
+   * error — which frontend build was the user on?" without joining across projects.
+   */
+  frontendRelease?: string;
   /** Expected-error override (normally resolved from EdgeError.isExpected). */
   forceSend?: boolean;
 }
@@ -154,6 +171,7 @@ export function captureEdgeError(err: unknown, ctx: EdgeErrorContext): string {
       if (ctx.cid) scope.setTag("cid", ctx.cid);
       if (ctx.userId) scope.setUser({ id: ctx.userId });
       if (ctx.extra) scope.setContext("extra", scrubPiiEdge(ctx.extra));
+      if (ctx.frontendRelease) scope.setTag("frontend_release", ctx.frontendRelease);
       if (isEdgeError(err)) {
         scope.setTag("error.code", (err as EdgeError).code);
         scope.setFingerprint([ctx.fn, (err as EdgeError).code]);
