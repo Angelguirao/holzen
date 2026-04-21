@@ -63,7 +63,9 @@ export function useAutoTrigger() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [user]);
+    // Depend only on user.id — the `user` object reference can change on token
+    // refresh / re-emission and would otherwise tear down + resubscribe the channel.
+  }, [user?.id]);
 
   const dismiss = useCallback(() => setPauseReady(false), []);
 
