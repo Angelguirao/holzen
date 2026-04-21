@@ -33,30 +33,37 @@ Resolution order for `__APP_VERSION__`:
 
 - Purpose: npm package metadata.
 - In this repo (`"private": true`), this is not the production release source.
-- Current default `0.0.0` is acceptable in decoupled mode.
+- It is still used as a consistency anchor for release hygiene.
 
 ## Current Policy
 
 - Build identity: Git SHA (`__APP_VERSION__`) for diagnostics and correlation.
 - Changelog version: product-facing semver in `changelog_entries.version`.
-- `package.json` version: optional/cosmetic unless we adopt npm-style release workflows.
+- `package.json` version: synced to the latest changelog version (guarded at prebuild).
 
-## Optional Strict Sync Mode
+## Enforced Sync Guard
 
-If we later want strict alignment, we can require:
+This repo now enforces:
 
-- `package.json#version` == latest `changelog_entries.version`
+- `package.json#version` must equal the latest `changelog_entries.version`
 
-This is not currently enforced because changelog entries are DB-managed and can be updated independently of build-time filesystem state.
+Implementation:
+
+- Script: `scripts/check-version-sync.mjs`
+- npm command: `npm run check:version-sync`
+- `prebuild` hook runs the check automatically before `npm run build`
+
+The guard queries Supabase (`changelog_entries` ordered by `created_at DESC LIMIT 1`) using `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` (with project fallbacks).
 
 ## Release Checklist (Versioning)
 
 Before publishing a new release:
 
 1. Add/update changelog entry with the intended human version.
-2. Ensure build uses a unique `__APP_VERSION__` (prefer Git SHA).
-3. Ensure `SENTRY_RELEASE` (edges) matches frontend release identifier policy.
-4. Verify Settings -> About shows:
+2. Update `package.json#version` to the same value.
+3. Ensure build uses a unique `__APP_VERSION__` (prefer Git SHA).
+4. Ensure `SENTRY_RELEASE` (edges) matches frontend release identifier policy.
+5. Verify Settings -> About shows:
    - `Changelog v<semantic version>`
    - build timestamp
    - release ID (SHA or fallback)
