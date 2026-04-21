@@ -57,6 +57,7 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 - `ops/deployment-sync-guide.md` — **GitHub ↔ Lovable sync**: what auto-deploys, safe workflow, pre-push checklist, and troubleshooting (401s, migration failures, stale deploys, CRON_SECRET mismatches).
 - `ops/cron-setup.md` — scheduled jobs: pg_cron + `net.http_post` callouts for pause-adjacent workers.
 - `ops/logging-strategy.md` — edge vs browser vs DB logging; `observe.ts` patterns; correlation and PII.
+- `ops/versioning.md` — canonical version policy: changelog version vs build/release ID vs `package.json` metadata.
 - `ops/pause-signal-companion-logging-e2e.md` — strategic goals + manual steps to trace pause → Signal (`holzen:companion` + `companion_slot_resolved`).
 - `ops/observability-and-failures.md` — where to record logs, retries, and failure modes per pipeline (checklist; links into systems and postmortems).
 

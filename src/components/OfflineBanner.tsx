@@ -9,7 +9,7 @@ import { toast } from 'sonner';
 async function handleQueuedAction(action: { type: string; payload: Record<string, unknown> }): Promise<boolean> {
   if (action.type === 'feedback') {
     const { error } = await supabase.functions.invoke('send-feedback', {
-      body: { category: action.payload.category, message: action.payload.message },
+      body: action.payload,
     });
     return !error;
   }
