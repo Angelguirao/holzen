@@ -1,6 +1,7 @@
 import * as React from 'npm:react@18.3.1'
 import { renderAsync } from 'npm:@react-email/components@0.0.22'
 import { TEMPLATES } from '../_shared/transactional-email-templates/registry.ts'
+import { withRequestLogging } from "../_shared/with-request-logging.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -10,11 +11,7 @@ const corsHeaders = {
 // Renders all registered templates with their previewData.
 // Gated by LOVABLE_API_KEY — only the Go API calls this.
 
-Deno.serve(async (req) => {
-  if (req.method === 'OPTIONS') {
-    return new Response(null, { headers: corsHeaders })
-  }
-
+Deno.serve(withRequestLogging("preview-transactional-email", async ({ req }) => {
   const apiKey = Deno.env.get('LOVABLE_API_KEY')
   if (!apiKey) {
     return new Response(
@@ -97,4 +94,4 @@ Deno.serve(async (req) => {
     status: 200,
     headers: { ...corsHeaders, 'Content-Type': 'application/json' },
   })
-})
+}))

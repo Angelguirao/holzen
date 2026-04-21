@@ -3,6 +3,7 @@ import { companionFallbacksDisabled, COMPANION_FALLBACKS_DISABLED_MESSAGE } from
 import { sanitizePromptArray } from "../_shared/sanitize.ts";
 import { createAttemptLogger } from "../_shared/observe.ts";
 import { callPerplexityChat, type PerplexityUsage } from "../_shared/perplexity-client.ts";
+import { withRequestLogging } from "../_shared/with-request-logging.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -60,11 +61,8 @@ async function searchRecentArticle(
   }
 }
 
-serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
-
+serve(
+  withRequestLogging("suggest-grounding", async ({ req }) => {
   try {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader?.startsWith("Bearer ")) {
@@ -319,4 +317,5 @@ Rules:
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
-});
+  })
+);

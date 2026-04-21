@@ -1,8 +1,8 @@
 // deno-lint-ignore-file no-explicit-any
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
-import { createLogger } from "../_shared/observe.ts";
 import { extractDoi, normalizeCitation } from "../_shared/grounding-enrichment-util.ts";
+import { withRequestLogging } from "../_shared/with-request-logging.ts";
 
 /**
  * `grounding-enrich` — read-optimized enrichment for Grounding Full View.
@@ -58,11 +58,8 @@ interface EnrichmentResponse {
   cached: boolean;
 }
 
-serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
-
-  const log = createLogger("grounding-enrich");
-
+serve(
+  withRequestLogging("grounding-enrich", async ({ req, log }) => {
   try {
     const authHeader = req.headers.get("Authorization");
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
@@ -236,7 +233,8 @@ serve(async (req) => {
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   }
-});
+  })
+);
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 

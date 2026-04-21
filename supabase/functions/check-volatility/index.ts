@@ -22,6 +22,7 @@ import {
   holzenEdgeRun,
   holzenEdgeWarn,
 } from "../_shared/holzen-edge-log.ts";
+import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import { coingeckoHeaders } from "../_shared/coingecko.ts";
 import { holzenResendLogger, sendResendEmail } from "../_shared/resend.ts";
 
@@ -147,11 +148,8 @@ async function sendNotificationEmail(
   return false;
 }
 
-serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
-
+serve(
+  withRequestLogging("check-volatility", async ({ req }) => {
   holzenEdgeRun("volatility", "request", { method: req.method });
 
   // Auth: require service role key or cron secret
@@ -672,4 +670,5 @@ serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
-});
+  })
+);

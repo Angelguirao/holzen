@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
 import { coingeckoHeaders } from "../_shared/coingecko.ts";
+import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import {
   holzenResendLogger,
   sendResendBatch,
@@ -14,11 +15,8 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
-
+serve(
+  withRequestLogging("personalized-nudge", async ({ req }) => {
   try {
     holzenEdgeRun("personalized-nudge", "request", { method: req.method });
     const { verifyServiceAuth } = await import("../_shared/auth.ts");
@@ -230,4 +228,5 @@ serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
-});
+  })
+);

@@ -1,7 +1,8 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { handleCors, jsonResponse, errorResponse } from "../_shared/cors.ts";
+import { jsonResponse, errorResponse } from "../_shared/cors.ts";
 import { createAuthenticatedClient, createServiceClient } from "../_shared/auth.ts";
-import { createAttemptLogger, createObsTracker, createLogger } from "../_shared/observe.ts";
+import { createAttemptLogger, createObsTracker } from "../_shared/observe.ts";
+import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import { checkCostCeilings } from "../_shared/ratelimit.ts";
 import { loadAppConfig } from "../_shared/app-config.ts";
 import { degradedProviders } from "../_shared/circuit-breaker.ts";
@@ -19,12 +20,9 @@ import {
   type MoodHistoryEntry,
 } from "../_shared/reflection-generate.ts";
 
-serve(async (req) => {
-  const corsRes = handleCors(req);
-  if (corsRes) return corsRes;
-
+serve(
+  withRequestLogging("holzen-reflect", async ({ req, log }) => {
   const t0 = Date.now();
-  const log = createLogger("holzen-reflect");
 
   try {
     const authHeader = req.headers.get("Authorization");
@@ -169,4 +167,5 @@ serve(async (req) => {
       return errorResponse(e instanceof Error ? e.message : "Unknown error", 500);
     }
   }
-});
+  })
+);
