@@ -436,6 +436,20 @@ export type Database = {
             referencedRelation: "v_reflection_with_companions"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "companion_serves_reflection_id_fkey"
+            columns: ["reflection_id"]
+            isOneToOne: false
+            referencedRelation: "v_reflections_completed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "companion_serves_reflection_id_fkey"
+            columns: ["reflection_id"]
+            isOneToOne: false
+            referencedRelation: "v_reflections_engaged"
+            referencedColumns: ["id"]
+          },
         ]
       }
       content_library: {
@@ -694,6 +708,20 @@ export type Database = {
             referencedRelation: "v_reflection_with_companions"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "follow_ups_reflection_id_fkey"
+            columns: ["reflection_id"]
+            isOneToOne: true
+            referencedRelation: "v_reflections_completed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "follow_ups_reflection_id_fkey"
+            columns: ["reflection_id"]
+            isOneToOne: true
+            referencedRelation: "v_reflections_engaged"
+            referencedColumns: ["id"]
+          },
         ]
       }
       future_letters: {
@@ -803,6 +831,20 @@ export type Database = {
             columns: ["reflection_id"]
             isOneToOne: false
             referencedRelation: "v_reflection_with_companions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "generation_attempts_reflection_id_fkey"
+            columns: ["reflection_id"]
+            isOneToOne: false
+            referencedRelation: "v_reflections_completed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "generation_attempts_reflection_id_fkey"
+            columns: ["reflection_id"]
+            isOneToOne: false
+            referencedRelation: "v_reflections_engaged"
             referencedColumns: ["id"]
           },
         ]
@@ -943,6 +985,20 @@ export type Database = {
             referencedRelation: "v_reflection_with_companions"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "library_items_reflection_id_fkey"
+            columns: ["reflection_id"]
+            isOneToOne: false
+            referencedRelation: "v_reflections_completed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "library_items_reflection_id_fkey"
+            columns: ["reflection_id"]
+            isOneToOne: false
+            referencedRelation: "v_reflections_engaged"
+            referencedColumns: ["id"]
+          },
         ]
       }
       night_reflections: {
@@ -1018,6 +1074,20 @@ export type Database = {
             referencedRelation: "v_reflection_with_companions"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "pause_notifications_reflection_id_fkey"
+            columns: ["reflection_id"]
+            isOneToOne: false
+            referencedRelation: "v_reflections_completed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pause_notifications_reflection_id_fkey"
+            columns: ["reflection_id"]
+            isOneToOne: false
+            referencedRelation: "v_reflections_engaged"
+            referencedColumns: ["id"]
+          },
         ]
       }
       practice_entries: {
@@ -1073,6 +1143,20 @@ export type Database = {
             columns: ["source_reflection_id"]
             isOneToOne: false
             referencedRelation: "v_reflection_with_companions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "practice_entries_source_reflection_id_fkey"
+            columns: ["source_reflection_id"]
+            isOneToOne: false
+            referencedRelation: "v_reflections_completed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "practice_entries_source_reflection_id_fkey"
+            columns: ["source_reflection_id"]
+            isOneToOne: false
+            referencedRelation: "v_reflections_engaged"
             referencedColumns: ["id"]
           },
         ]
@@ -1430,6 +1514,20 @@ export type Database = {
             referencedRelation: "v_reflection_with_companions"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "reflection_companions_reflection_id_fkey"
+            columns: ["reflection_id"]
+            isOneToOne: false
+            referencedRelation: "v_reflections_completed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reflection_companions_reflection_id_fkey"
+            columns: ["reflection_id"]
+            isOneToOne: false
+            referencedRelation: "v_reflections_engaged"
+            referencedColumns: ["id"]
+          },
         ]
       }
       reflection_insights: {
@@ -1473,6 +1571,7 @@ export type Database = {
           breathing_completed: boolean
           context: string | null
           created_at: string
+          engaged_at: string | null
           grounding_body: string | null
           grounding_read: boolean
           grounding_title: string | null
@@ -1485,6 +1584,7 @@ export type Database = {
           mood_after: string | null
           note: string | null
           outcome: string | null
+          source: string | null
           tags: string[] | null
           user_id: string
         }
@@ -1492,6 +1592,7 @@ export type Database = {
           breathing_completed?: boolean
           context?: string | null
           created_at?: string
+          engaged_at?: string | null
           grounding_body?: string | null
           grounding_read?: boolean
           grounding_title?: string | null
@@ -1504,6 +1605,7 @@ export type Database = {
           mood_after?: string | null
           note?: string | null
           outcome?: string | null
+          source?: string | null
           tags?: string[] | null
           user_id: string
         }
@@ -1511,6 +1613,7 @@ export type Database = {
           breathing_completed?: boolean
           context?: string | null
           created_at?: string
+          engaged_at?: string | null
           grounding_body?: string | null
           grounding_read?: boolean
           grounding_title?: string | null
@@ -1523,6 +1626,7 @@ export type Database = {
           mood_after?: string | null
           note?: string | null
           outcome?: string | null
+          source?: string | null
           tags?: string[] | null
           user_id?: string
         }
@@ -1585,6 +1689,20 @@ export type Database = {
             columns: ["reflection_id"]
             isOneToOne: false
             referencedRelation: "v_reflection_with_companions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ritual_completions_reflection_id_fkey"
+            columns: ["reflection_id"]
+            isOneToOne: false
+            referencedRelation: "v_reflections_completed"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ritual_completions_reflection_id_fkey"
+            columns: ["reflection_id"]
+            isOneToOne: false
+            referencedRelation: "v_reflections_engaged"
             referencedColumns: ["id"]
           },
         ]
@@ -2009,6 +2127,18 @@ export type Database = {
         }
         Relationships: []
       }
+      v_notification_response_rate: {
+        Row: {
+          completed: number | null
+          day: string | null
+          engaged: number | null
+          ignored: number | null
+          notifications: number | null
+          pct_completed: number | null
+          pct_engaged: number | null
+        }
+        Relationships: []
+      }
       v_reflection_with_companions: {
         Row: {
           breathing_completed: boolean | null
@@ -2028,6 +2158,7 @@ export type Database = {
           companion_zoom_out_read: boolean | null
           context: string | null
           created_at: string | null
+          engaged_at: string | null
           grounding_body: string | null
           grounding_read: boolean | null
           grounding_title: string | null
@@ -2055,6 +2186,138 @@ export type Database = {
           user_id: string | null
           zoom_out_data: Json | null
           zoom_out_read: boolean | null
+        }
+        Relationships: []
+      }
+      v_reflections_completed: {
+        Row: {
+          breathing_completed: boolean | null
+          context: string | null
+          created_at: string | null
+          engaged_at: string | null
+          grounding_body: string | null
+          grounding_read: boolean | null
+          grounding_title: string | null
+          haiku: string | null
+          haiku_read: boolean | null
+          id: string | null
+          is_favorite: boolean | null
+          message: string | null
+          mood: string | null
+          mood_after: string | null
+          note: string | null
+          outcome: string | null
+          source: string | null
+          tags: string[] | null
+          user_id: string | null
+        }
+        Insert: {
+          breathing_completed?: boolean | null
+          context?: string | null
+          created_at?: string | null
+          engaged_at?: string | null
+          grounding_body?: string | null
+          grounding_read?: boolean | null
+          grounding_title?: string | null
+          haiku?: string | null
+          haiku_read?: boolean | null
+          id?: string | null
+          is_favorite?: boolean | null
+          message?: string | null
+          mood?: string | null
+          mood_after?: string | null
+          note?: string | null
+          outcome?: string | null
+          source?: string | null
+          tags?: string[] | null
+          user_id?: string | null
+        }
+        Update: {
+          breathing_completed?: boolean | null
+          context?: string | null
+          created_at?: string | null
+          engaged_at?: string | null
+          grounding_body?: string | null
+          grounding_read?: boolean | null
+          grounding_title?: string | null
+          haiku?: string | null
+          haiku_read?: boolean | null
+          id?: string | null
+          is_favorite?: boolean | null
+          message?: string | null
+          mood?: string | null
+          mood_after?: string | null
+          note?: string | null
+          outcome?: string | null
+          source?: string | null
+          tags?: string[] | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      v_reflections_engaged: {
+        Row: {
+          breathing_completed: boolean | null
+          context: string | null
+          created_at: string | null
+          engaged_at: string | null
+          grounding_body: string | null
+          grounding_read: boolean | null
+          grounding_title: string | null
+          haiku: string | null
+          haiku_read: boolean | null
+          id: string | null
+          is_favorite: boolean | null
+          message: string | null
+          mood: string | null
+          mood_after: string | null
+          note: string | null
+          outcome: string | null
+          source: string | null
+          tags: string[] | null
+          user_id: string | null
+        }
+        Insert: {
+          breathing_completed?: boolean | null
+          context?: string | null
+          created_at?: string | null
+          engaged_at?: string | null
+          grounding_body?: string | null
+          grounding_read?: boolean | null
+          grounding_title?: string | null
+          haiku?: string | null
+          haiku_read?: boolean | null
+          id?: string | null
+          is_favorite?: boolean | null
+          message?: string | null
+          mood?: string | null
+          mood_after?: string | null
+          note?: string | null
+          outcome?: string | null
+          source?: string | null
+          tags?: string[] | null
+          user_id?: string | null
+        }
+        Update: {
+          breathing_completed?: boolean | null
+          context?: string | null
+          created_at?: string | null
+          engaged_at?: string | null
+          grounding_body?: string | null
+          grounding_read?: boolean | null
+          grounding_title?: string | null
+          haiku?: string | null
+          haiku_read?: boolean | null
+          id?: string | null
+          is_favorite?: boolean | null
+          message?: string | null
+          mood?: string | null
+          mood_after?: string | null
+          note?: string | null
+          outcome?: string | null
+          source?: string | null
+          tags?: string[] | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -2090,6 +2353,7 @@ export type Database = {
         Returns: boolean
       }
       emit_heartbeat: { Args: { hb_id: string }; Returns: undefined }
+      emit_job_heartbeat: { Args: { job_name: string }; Returns: undefined }
       enqueue_email: {
         Args: { payload: Json; queue_name: string }
         Returns: number
@@ -2127,6 +2391,10 @@ export type Database = {
       owns_collection: {
         Args: { _collection_id: string; _user_id: string }
         Returns: boolean
+      }
+      purge_orphan_notification_reflections: {
+        Args: { cutoff_days?: number }
+        Returns: number
       }
       read_email_batch: {
         Args: { batch_size: number; queue_name: string; vt: number }
