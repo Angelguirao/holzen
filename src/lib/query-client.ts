@@ -46,6 +46,10 @@ export function createHolzenQueryClient(): QueryClient {
       queries: {
         networkMode: 'online',
         retry: queryRetry,
+        // Default true caused widgets to refetch on every micro focus change
+        // (devtools click, iframe blur, etc.) producing a visible "blink".
+        // Opt back in per-query where freshness on focus actually matters.
+        refetchOnWindowFocus: false,
       },
       mutations: {
         networkMode: 'online',
