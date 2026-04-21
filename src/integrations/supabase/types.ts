@@ -1473,7 +1473,6 @@ export type Database = {
           breathing_completed: boolean
           context: string | null
           created_at: string
-          engaged_at: string | null
           grounding_body: string | null
           grounding_read: boolean
           grounding_title: string | null
@@ -1486,7 +1485,6 @@ export type Database = {
           mood_after: string | null
           note: string | null
           outcome: string | null
-          source: string | null
           tags: string[] | null
           user_id: string
         }
@@ -1494,7 +1492,6 @@ export type Database = {
           breathing_completed?: boolean
           context?: string | null
           created_at?: string
-          engaged_at?: string | null
           grounding_body?: string | null
           grounding_read?: boolean
           grounding_title?: string | null
@@ -1507,7 +1504,6 @@ export type Database = {
           mood_after?: string | null
           note?: string | null
           outcome?: string | null
-          source?: string | null
           tags?: string[] | null
           user_id: string
         }
@@ -1515,7 +1511,6 @@ export type Database = {
           breathing_completed?: boolean
           context?: string | null
           created_at?: string
-          engaged_at?: string | null
           grounding_body?: string | null
           grounding_read?: boolean
           grounding_title?: string | null
@@ -1528,7 +1523,6 @@ export type Database = {
           mood_after?: string | null
           note?: string | null
           outcome?: string | null
-          source?: string | null
           tags?: string[] | null
           user_id?: string
         }
@@ -2034,7 +2028,6 @@ export type Database = {
           companion_zoom_out_read: boolean | null
           context: string | null
           created_at: string | null
-          engaged_at: string | null
           grounding_body: string | null
           grounding_read: boolean | null
           grounding_title: string | null
