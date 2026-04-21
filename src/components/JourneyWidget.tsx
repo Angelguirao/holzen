@@ -179,7 +179,7 @@ export function JourneyWidget({ reflections, practiceEntries = [], streakFreezeD
       // from the cron worker (see src/lib/engaged-pause.ts docstring), so
       // without filterCompleted + pauseTimestamp the calendar would dot days
       // the user never engaged on AND poison the dominant-mood tint.
-      filterCompleted((refs as ReflectionActivityRow[] | null) ?? []).forEach((r) =>
+      filterCompleted((refs as unknown as ReflectionActivityRow[] | null) ?? []).forEach((r) =>
         items.push({
           date: pauseTimestamp(r).toISOString(),
           type: 'reflection',
