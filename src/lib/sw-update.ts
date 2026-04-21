@@ -47,7 +47,6 @@ export function listenForSwUpdate() {
       document.addEventListener('visibilitychange', () => {
         if (document.visibilityState === 'visible') checkForUpdate();
       });
-      window.addEventListener('focus', checkForUpdate);
 
       const showUpdateToast = (waitingSW: ServiceWorker) => {
         let applied = false;
@@ -58,18 +57,14 @@ export function listenForSwUpdate() {
         };
 
         toast('A new version is available', {
-          duration: 10000,
+          duration: Infinity,
           id: 'sw-update',
           action: {
             label: 'Refresh now',
             onClick: apply,
           },
-          description: 'Auto-updating in 10s…',
+          description: 'Tap refresh when you are ready.',
         });
-
-        // Auto-apply after 10s if the user doesn't interact — prevents PWA users
-        // from getting stuck on stale builds (common on iOS / installed PWAs).
-        window.setTimeout(apply, 10_000);
       };
 
       // If a new SW is already waiting, prompt user
