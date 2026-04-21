@@ -1,12 +1,13 @@
 {
   "name": "holzen",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "dev:hosted": "vite --mode hosted",
     "dev:local": "vite --mode localstack",
+    "prebuild": "npm run check:version-sync",
     "build": "vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
@@ -14,6 +15,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "check:edge": "node scripts/check-edge.mjs",
+    "check:version-sync": "node scripts/check-version-sync.mjs",
     "check:view-migrations": "node scripts/lint-view-migrations.mjs",
     "check:prepush": "bash scripts/pre-push-check.sh",
     "stamp:release": "node scripts/stamp-edge-release.mjs",
