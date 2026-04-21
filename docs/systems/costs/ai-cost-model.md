@@ -106,43 +106,33 @@ spent — a row without logging still runs but cannot be capped per-user.
 Engineering estimates using midpoint token counts. Actuals vary with locale,
 context length, and search depth. Use as order of magnitude only.
 
-### 3.1 Lovable Gemini (text models)
+### 3.1 Per-call assumptions and arithmetic
 
-Assume 5,000 input tokens / 500 output tokens on `gemini-2.5-flash` at current
-GA rates:
+| Call type | Assumed token profile | Formula | Estimated USD / call |
+| --- | --- | --- | --- |
+| Perplexity Sonar Pro (low context) | 1,200 in / 3,000 out | `(1200×3 + 3000×15)/1e6 + 0.006` | `~$0.0546` |
+| Gemini 2.5 Flash structuring | 8,000 in / 600 out | `(8000×0.30 + 600×2.50)/1e6` | `~$0.0039` |
+| Reflection (Gemini 3 Flash Preview) | 3,000 in / 500 out | `(3000×0.50 + 500×3.00)/1e6` | `~$0.0030` |
+| Zoom-out deep-time (Gemini 2.5 Flash) | 10,000 in / 400 out | `(10000×0.30 + 400×2.50)/1e6` | `~$0.0040` |
+| Wallpaper (Gemini image) | ~1,290 output tokens / image | `1290×30/1e6` (output-dominated) | `~$0.039` |
 
-```
-USD ≈ (5000 × 0.30 + 500 × 2.50) / 1e6 ≈ $0.00275
-```
+Perplexity remains the dominant per-call cost in pause generation, so the
+`$10/day` global cap is mainly sizing against Sonar Pro volume.
 
-`gemini-2.5-flash-lite` is roughly a third of that (~~$0.00070).
-`gemini-3-flash-preview` is roughly double (~~$0.00400).
+### 3.2 Full pause build-up (all-live, all companions on)
 
-> Note: these numbers are ~2× what this doc showed before 2026-04-19.
-> Google re-priced 2.5 Flash and launched 3 Flash Preview between versions.
-> See §10 changelog.
+| Piece | Formula | Estimated USD |
+| --- | --- | --- |
+| 3x companion search+structure (signal, grounding, history) | `3 × (0.0546 + 0.0039)` | `~$0.1755` |
+| Zoom-out | `1 × 0.0040` | `~$0.0040` |
+| Reflection | `1 × 0.0030` | `~$0.0030` |
+| **Total all-live baseline** |  | **`~$0.1825` (round to `~$0.18`)** |
 
-### 3.2 Perplexity Sonar Pro
+For capacity planning, this doc uses `~$0.21` as a realistic average when some
+sessions incur retries, larger contexts, or heavier prompt payloads.
 
-Assume 1,200 input tokens / 3,000 output tokens, low context:
-
-```
-USD ≈ (1200 × 3 + 3000 × 15) / 1e6 + 0.006 ≈ $0.0546
-```
-
-This is the dominant per-call cost in a pause session and the number the
-`$10/day` global cap is really sizing against.
-
-### 3.3 Wallpaper (Gemini image)
-
-Flat ~~$0.039 per image at current `COST_MAP` rate. Output tokens
-(~~1,290/image) multiply at the $30/1M output rate.
-
-### 3.4 Reflection
-
-Under one cent per successful reflection. Intentionally cheap — that's why
-reflection is **exempt** from panic mode: you want a user to see a reflection
-message even when the expensive companions are bypassed.
+> Note: these Lovable-side numbers are ~2x higher than older internal
+> estimates from before the 2026-04-19 pricing refresh. See §10 changelog.
 
 ---
 
@@ -153,34 +143,35 @@ past their 3-pause/month cap. These are stress figures; the cache warmer, the
 reflection_companions skip-cache path, and user behavior all cut real numbers
 below them.
 
-Per-pause AI cost at the **current** Gemini GA pricing (Apr 2026):
+### 4.0 Shared assumptions
 
-- 1× Perplexity Sonar Pro call (signal/grounding/history): ~$0.055
-- 1× Gemini 2.5 Flash structuring call on top: ~$0.0040 (was ~$0.0016)
-- Reflection (Gemini 3 Flash Preview): ~$0.004 (was ~$0.001)
+- Scenario baseline uses **2 full pauses / user / day**.
+- Full-pause **all-live baseline** from §3.2 is `~$0.18`.
+- Planning average is `~$0.21` (same flow + retry/context overhead).
+- Stress upper bound for heavy retry/context windows is `~$0.24`.
 
-So the **"full pause" happy path** now totals ~$0.19–0.24 (vs. ~$0.17–0.22
-in earlier estimates). The Perplexity component still dominates, so the
-headline ceiling math in §4.4 is unchanged. What **does** change meaningfully
-is auxiliary AI spend (journal prompts, digests, reports, night reflections,
-admin preview) — those are roughly **2× more expensive per call** now.
+| Per-pause assumption | Cost |
+| --- | --- |
+| All-live baseline (direct arithmetic) | `~$0.18` |
+| Planning average (used for cap sizing) | `~$0.21` |
+| Stress upper bound | `~$0.24` |
 
 ### 4.1 100 Pro DAU
 
-- **Pauses.** 100 × 2 full pauses/day × ~$0.21 (all-live happy path) ≈ $42/day.
-- **Auxiliary AI** (journal prompts, night reflections, wallpapers at 20%
-weekly adoption, digests, reports): ~$6–10/day (up from ~$3–5 pre-drift).
-- **Total.** ~~$48–52/day ≈ **~~$1,500/month** AI spend. Well above the default
-$300/month cap → you either raise the cap or let panic mode + feature flags
-degrade non-essential features.
+- **Pauses.** `100 × 2 × $0.21 ≈ $42/day` (planning average).
+- **Auxiliary AI (current observed usage envelope).** `~$2–3/day`.
+- **Total (planning).** `~$44–45/day` or `~$1,320–$1,380/month`.
+- **Stress note.** If auxiliary usage ramps materially (for example, heavier
+  wallpaper or digest/report uptake), `~$48–52/day` remains a reasonable
+  stress envelope.
 
 ### 4.2 1,000 Pro DAU
 
-- **Pauses.** 1000 × 2 × ~$0.21 ≈ $420/day.
-- **Auxiliary.** ~$60–100/day (up from ~$30–50 pre-drift).
-- **Total.** ~~$480–520/day ≈ **~~$15,000/month**. At this scale the pause
-path is still the binding constraint; prioritize caching
-(`pregenerate-companions` hit rate) and Perplexity rate negotiation.
+- **Pauses.** `1000 × 2 × $0.21 ≈ $420/day`.
+- **Auxiliary (scaled planning envelope).** `~$20–30/day`.
+- **Total (planning).** `~$440–450/day` or `~$13,200–$13,500/month`.
+- **Stress note.** `~$480–520/day` is still plausible under high auxiliary
+  uptake or poor cache hit rates.
 
 ### 4.3 10,000 Pro DAU
 
@@ -462,6 +453,10 @@ the superset.
 
 ## 10. Changelog
 
+- **2026-04-21:** Corrected scenario-model arithmetic language and added
+  explicit per-call/per-pause tables in §3–§4. Reflection midpoint corrected
+  to `~$0.003` (from `~$0.004`), and scenario totals now separate planning
+  baseline (`~$0.21/pause`) from stress envelope.
 - **2026-04-19 (evening):** Added per-provider circuit breakers (§5.2) +
   MRR / AI-cost ratio card on the Cost tab. Breakers skip **live** generation
   only; cache + library + curated fallback still serve. Regenerate surfaces
