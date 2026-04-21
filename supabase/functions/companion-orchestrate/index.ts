@@ -3,7 +3,8 @@ import { checkRateLimit, checkCostCeilings } from "../_shared/ratelimit.ts";
 import { loadAppConfig, PANIC_MODE_FEATURES } from "../_shared/app-config.ts";
 import { getProviderHealth } from "../_shared/circuit-breaker.ts";
 import { handleRegenerateOnly } from "../_shared/regenerate-only.ts";
-import { createLogger, trackEvent } from "../_shared/observe.ts";
+import { trackEvent } from "../_shared/observe.ts";
+import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import { generateQuestion } from "../_shared/generators/question.ts";
 import { determineSessionIntent } from "../_shared/session-intent.ts";
 import { selectIntervention, parseDirection, bucketSeverity, type InterventionSelection } from "../_shared/intervention-selector.ts";
@@ -47,13 +48,9 @@ const corsHeaders = {
  * Generators are invoked directly (in-process) instead of via HTTP.
  */
 
-serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
-
+serve(
+  withRequestLogging("companion-orchestrate", async ({ req, log }) => {
   const t0 = Date.now();
-  const log = createLogger("orchestrate");
 
   try {
     const authHeader = req.headers.get("Authorization");
@@ -447,4 +444,5 @@ serve(async (req) => {
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   }
-});
+  })
+);

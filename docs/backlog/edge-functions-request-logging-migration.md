@@ -1,6 +1,6 @@
 # Migrate remaining edge functions to `withRequestLogging`
 
-**Status:** Open. 4 of 39 functions wrapped; ≈ 35 remaining.
+**Status:** Completed (2026-04). 39 of 39 functions wrapped.
 
 ## Why
 
@@ -21,8 +21,43 @@ Wrapped:
 - `supabase/functions/send-feedback/index.ts`
 - `supabase/functions/health/index.ts`
 - `supabase/functions/delete-account/index.ts`
+- `supabase/functions/companion-orchestrate/index.ts`
+- `supabase/functions/refresh-btc-prices/index.ts`
+- `supabase/functions/fetch-source-feeds/index.ts`
+- `supabase/functions/pregenerate-companions/index.ts`
+- `supabase/functions/check-volatility/index.ts`
+- `supabase/functions/check-followups/index.ts`
+- `supabase/functions/night-reflection/index.ts`
+- `supabase/functions/process-referral-pending/index.ts`
+- `supabase/functions/suggest-ritual/index.ts`
+- `supabase/functions/suggest-grounding/index.ts`
+- `supabase/functions/reflection-insights/index.ts`
+- `supabase/functions/weekly-digest/index.ts`
+- `supabase/functions/monthly-report/index.ts`
+- `supabase/functions/holzen-reflect/index.ts`
+- `supabase/functions/personalized-nudge/index.ts`
+- `supabase/functions/grounding-enrich/index.ts`
+- `supabase/functions/generate-wallpaper/index.ts`
+- `supabase/functions/ai-cost-alert/index.ts`
+- `supabase/functions/admin-library-preview/index.ts`
+- `supabase/functions/seed-btc-history/index.ts`
+- `supabase/functions/backfill-btc-prices/index.ts`
+- `supabase/functions/process-email-queue/index.ts`
+- `supabase/functions/check-subscription/index.ts`
+- `supabase/functions/register-push/index.ts`
+- `supabase/functions/record-referral/index.ts`
+- `supabase/functions/holzen-number/index.ts`
+- `supabase/functions/badge-notify/index.ts`
+- `supabase/functions/create-checkout/index.ts`
+- `supabase/functions/customer-portal/index.ts`
+- `supabase/functions/deliver-letters/index.ts`
+- `supabase/functions/preview-transactional-email/index.ts`
+- `supabase/functions/send-transactional-email/index.ts`
+- `supabase/functions/auth-email-hook/index.ts`
+- `supabase/functions/handle-email-unsubscribe/index.ts`
+- `supabase/functions/handle-email-suppression/index.ts`
 
-Unwrapped: the remaining ~35 functions under `supabase/functions/`, including every companion-facing and cron-driven entry point.
+Unwrapped: none.
 
 List is deliberately open-ended here rather than enumerated — run `ls supabase/functions | rg -v ^_` to generate the current set at migration time; the count will change as new functions land.
 

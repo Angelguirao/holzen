@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
+import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import {
   applyReferralRecord,
   referralBackoffMsAfterAttempt,
@@ -13,11 +14,8 @@ const corsHeaders = {
 
 const STALE_PROCESSING_MS = 15 * 60 * 1000;
 
-serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
-
+serve(
+  withRequestLogging("process-referral-pending", async ({ req }) => {
   try {
     holzenEdgeRun("referral-pending", "request", { method: req.method });
     const { verifyServiceAuth } = await import("../_shared/auth.ts");
@@ -146,4 +144,5 @@ serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
-});
+  })
+);

@@ -3,6 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
 import { createAttemptLogger } from "../_shared/observe.ts";
 import { coingeckoHeaders } from "../_shared/coingecko.ts";
+import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import {
   holzenResendLogger,
   sendResendBatch,
@@ -73,11 +74,8 @@ async function fetchBtcMonthData(currency: string): Promise<BtcMonthData> {
   return result;
 }
 
-serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
-
+serve(
+  withRequestLogging("monthly-report", async ({ req }) => {
   try {
     holzenEdgeRun("monthly-report", "request", { method: req.method });
     const { verifyServiceAuth } = await import("../_shared/auth.ts");
@@ -354,4 +352,5 @@ Be observational, calm. No advice, no exclamation marks.${langInstruction}`;
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
-});
+  })
+);

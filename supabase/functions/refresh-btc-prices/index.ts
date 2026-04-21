@@ -4,6 +4,7 @@ import { holzenEdgeError, holzenEdgeRun, holzenEdgeWarn } from "../_shared/holze
 import { btcOnThisDayYearOffsets } from "../_shared/btc-on-this-day-config.ts";
 import { coingeckoHeaders } from "../_shared/coingecko.ts";
 import { warmMissingBtcPrices } from "../_shared/btc-price-warm.ts";
+import { withRequestLogging } from "../_shared/with-request-logging.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -40,11 +41,8 @@ const corsHeaders = {
  * `zoom-out.ts` so both paths share dedupe + concurrency semantics.
  */
 
-serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
-
+serve(
+  withRequestLogging("refresh-btc-prices", async ({ req }) => {
   const t0 = Date.now();
 
   try {
@@ -204,4 +202,5 @@ serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
-});
+  })
+);

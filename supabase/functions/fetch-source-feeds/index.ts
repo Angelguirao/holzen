@@ -9,6 +9,7 @@ import {
 } from "../_shared/content-dedup.ts";
 import { callPerplexityChat, type PerplexityUsage } from "../_shared/perplexity-client.ts";
 import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun, holzenEdgeWarn } from "../_shared/holzen-edge-log.ts";
+import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import {
   fetchFeedXmlIfApplicable,
   type FeedArticleRef,
@@ -186,11 +187,8 @@ type SourceRow = { id: string; name: string; type: string; url: string; category
 
 // ── Main handler ──
 
-serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
-
+serve(
+  withRequestLogging("fetch-source-feeds", async ({ req }) => {
   const t0 = Date.now();
   const hzLog = (msg: string) => holzenEdgeLog("fetch-feeds", msg, { ms: Date.now() - t0 });
 
@@ -1045,4 +1043,5 @@ Return JSON with:
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
-});
+  })
+);

@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createAttemptLogger } from "../_shared/observe.ts";
 import { callPerplexityChat } from "../_shared/perplexity-client.ts";
 import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
+import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import {
   canonicalContentUrl,
   contentSnippetFingerprint,
@@ -27,11 +28,8 @@ async function isUrlReachable(url: string): Promise<boolean> {
   } catch { return false; }
 }
 
-serve(async (req) => {
-  if (req.method === "OPTIONS") {
-    return new Response(null, { headers: corsHeaders });
-  }
-
+serve(
+  withRequestLogging("pregenerate-companions", async ({ req }) => {
   const t0 = Date.now();
   const hzLog = (msg: string) => holzenEdgeLog("pregenerate", msg, { ms: Date.now() - t0 });
 
@@ -599,4 +597,5 @@ serve(async (req) => {
       { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   }
-});
+  })
+);
