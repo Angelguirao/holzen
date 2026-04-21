@@ -89,6 +89,15 @@ features, see [`docs/systems/costs/ai-cost-model.md`](../costs/ai-cost-model.md)
 
 For `google/gemini-3-flash-preview` use **$0.50 / $3.00** per 1M tokens; for `google/gemini-2.5-flash-lite` use **$0.10 / $0.40**. Provider list pricing may drift—treat as **approximate** and reconcile with the provider dashboards.
 
+### 3.1 Quick per-call table (same assumptions as cost-model doc)
+
+| Call type | Assumed token profile | Formula | Estimated USD / call |
+| --- | --- | --- | --- |
+| Perplexity Sonar Pro (low context) | 1,200 in / 3,000 out | `(1200×3 + 3000×15)/1e6 + 0.006` | `~$0.0546` |
+| Gemini 2.5 Flash structuring | 8,000 in / 600 out | `(8000×0.30 + 600×2.50)/1e6` | `~$0.0039` |
+| Reflection (Gemini 3 Flash Preview) | 3,000 in / 500 out | `(3000×0.50 + 500×3.00)/1e6` | `~$0.0030` |
+| Zoom-out deep-time (Gemini 2.5 Flash) | 10,000 in / 400 out | `(10000×0.30 + 400×2.50)/1e6` | `~$0.0040` |
+
 ---
 
 ## 4. Representative token assumptions (live generation)
