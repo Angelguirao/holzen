@@ -6,6 +6,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { enqueueAction } from '@/lib/offline-queue';
 import { useTranslation } from 'react-i18next';
+import { getCid } from '@/lib/cid';
+
+declare const __APP_VERSION__: string;
 
 const CATEGORIES = [
   { value: 'bug', labelKey: 'feedback.bug', icon: Bug, descKey: 'feedback.bugDesc' },
@@ -22,8 +25,17 @@ export function FeedbackForm() {
   const submit = async () => {
     if (!message.trim()) return;
 
+    const payload = {
+      category,
+      message: message.trim(),
+      page: `${window.location.pathname}${window.location.search}`,
+      user_agent: navigator.userAgent,
+      cid: getCid(),
+      app_version: __APP_VERSION__,
+    };
+
     if (!navigator.onLine) {
-      enqueueAction('feedback', { category, message: message.trim() });
+      enqueueAction('feedback', payload);
       toast(t('feedback.savedOffline'), { description: t('feedback.savedOfflineDesc') });
       setMessage('');
       return;
@@ -31,7 +43,7 @@ export function FeedbackForm() {
 
     setSubmitting(true);
     const { error } = await supabase.functions.invoke('send-feedback', {
-      body: { category, message: message.trim() },
+      body: payload,
     });
     setSubmitting(false);
     if (error) {

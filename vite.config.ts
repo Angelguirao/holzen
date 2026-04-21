@@ -71,18 +71,19 @@ function resolveAppVersion({
   }
 
   // Last resort: package.json version + base36 timestamp. Guarantees two deploys never collide,
-  // even if somehow the worker has no git binary. Format: `0.0.0-b3m7wfq2` → sortable by deploy.
-  let pkgVersion = "0.0.0";
+  // even if somehow the worker has no git binary. Format: `1.2.3-b3m7wfq2` / `build-b3m7wfq2`.
+  // We intentionally avoid surfacing `0.0.0-*` in production UI because it reads like a broken build.
+  let pkgVersion: string | null = null;
   try {
     const pkg = JSON.parse(readFileSync(path.resolve(__dirname, "package.json"), "utf8")) as {
       version?: string;
     };
-    if (pkg.version) pkgVersion = pkg.version;
+    if (pkg.version && pkg.version !== "0.0.0") pkgVersion = pkg.version;
   } catch {
     /* keep default */
   }
   const stamp = Date.now().toString(36);
-  return `${pkgVersion}-b${stamp}`;
+  return `${pkgVersion ?? "build"}-b${stamp}`;
 }
 
 // https://vitejs.dev/config/
