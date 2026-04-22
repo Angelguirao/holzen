@@ -79,6 +79,8 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
   const { language } = useHolzen();
   const { toast } = useToast();
   const { favorites, toggleCompanionFavorite } = useCompanionLibraryFavorites(reflectionId);
+  const { isPro, requirePro, startCheckout } = useProGate();
+  const { companionRemaining, flexCreditsBalance, applyOptimisticDecrement, refresh: refreshSubscription } = useSubscription();
 
   // ── Auto-save to library ──
   const libraryAutosaveDedupRef = useRef<Set<string>>(new Set());
