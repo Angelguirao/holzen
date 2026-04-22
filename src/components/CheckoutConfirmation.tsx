@@ -786,7 +786,7 @@ export function CheckoutConfirmation() {
 
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) handleClose(); }}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent ref={dialogContentRef} className="sm:max-w-md">
         <DialogHeader>
           {/*
             Quiet state: no celebratory badge / coloured halo. A single neutral
