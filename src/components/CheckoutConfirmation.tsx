@@ -686,7 +686,13 @@ export function CheckoutConfirmation() {
     // and we'll re-run on the next render once `sub` resolves.
     if (mode === 'subscription' && (sub.loading || !sub.subscriptionStatus)) return;
 
-    notifySentRef.current = mode;
+    // Mark the in-flight intent so concurrent renders / StrictMode double-
+    // invokes don't fire twice. We track the snapshot we set so the cleanup
+    // below can roll it back **only if it still owns the marker** — a later
+    // resolved request must not clobber a fresh attempt.
+    const claimedMode = mode;
+    notifySentRef.current = claimedMode;
+    let cancelled = false;
     setNotifyStatus(null);
 
     const payload =
@@ -720,6 +726,7 @@ export function CheckoutConfirmation() {
     void supabase.functions
       .invoke('notify-checkout-confirmation', { body: payload })
       .then(({ data, error }) => {
+        if (cancelled) return;
         if (error) {
           console.warn('[checkout-confirmation] notify failed', error);
           setNotifyStatus({
@@ -736,6 +743,7 @@ export function CheckoutConfirmation() {
         setNotifyStatus({ emailed, pushed, skipped, failed: false, errorMessage: null });
       })
       .catch((e) => {
+        if (cancelled) return;
         console.warn('[checkout-confirmation] notify failed', e);
         setNotifyStatus({
           emailed: false,
@@ -744,6 +752,20 @@ export function CheckoutConfirmation() {
           errorMessage: e instanceof Error ? e.message : String(e),
         });
       });
+
+    // Cleanup: if the effect tears down (unmount, dependency change, or
+    // StrictMode dev double-invoke) before the request resolves, drop the
+    // idempotency marker so a future remount can issue the intervention
+    // again. We only clear the marker if it still points at *our* claim —
+    // a successful resolve happens **after** the await returns, so by the
+    // time we'd care to clear, the request is either done (then we keep
+    // the marker) or genuinely cancelled (then we release it).
+    return () => {
+      cancelled = true;
+      if (notifySentRef.current === claimedMode) {
+        notifySentRef.current = null;
+      }
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, sub.loading, sub.subscriptionStatus, sub.tier, currentBalance, creditsAdded, projectedBalance]);
 
