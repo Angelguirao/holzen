@@ -4,6 +4,7 @@ import { Sparkles, Download, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { parseEdgeFunctionError, toUserFacingAiErrorMessage } from '@/lib/edge-function-error';
+import { useSubscription } from '@/hooks/use-subscription';
 import {
   Dialog,
   DialogContent,
@@ -113,11 +114,14 @@ export function ReflectionWallpaper({ message, mood, context, haiku, variant = '
   const [generating, setGenerating] = useState(false);
   const [compositeUrl, setCompositeUrl] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
+  const { applyOptimisticDecrement, refresh: refreshSubscription } = useSubscription();
 
   const generate = useCallback(async () => {
     setGenerating(true);
     setOpen(true);
     setCompositeUrl(null);
+    // Reflect the wallpaper spend instantly; refresh below reconciles.
+    applyOptimisticDecrement('wallpaper');
     try {
       const { data, error } = await supabase.functions.invoke('generate-wallpaper', {
         body: { message, mood, context },
@@ -136,8 +140,9 @@ export function ReflectionWallpaper({ message, mood, context, haiku, variant = '
       setOpen(false);
     } finally {
       setGenerating(false);
+      void refreshSubscription();
     }
-  }, [message, mood, context, haiku, t]);
+  }, [message, mood, context, haiku, t, applyOptimisticDecrement, refreshSubscription]);
 
   const download = useCallback(() => {
     if (!compositeUrl) return;

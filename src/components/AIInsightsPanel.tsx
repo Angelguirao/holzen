@@ -64,7 +64,7 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { language } = useHolzen();
-  const { subscribed, loading: subLoading } = useSubscription();
+  const { subscribed, loading: subLoading, applyOptimisticDecrement, refresh: refreshSubscription } = useSubscription();
   const [allData, setAllData] = useState<InsightsRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
@@ -113,6 +113,7 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
   const generateInsights = useCallback(async () => {
     if (!user) return;
     setGenerating(true);
+    applyOptimisticDecrement('insight');
     try {
       const { error } = await supabase.functions.invoke('reflection-insights', {
         body: { user_id: user.id, language },
@@ -129,8 +130,9 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
       toast(message);
     } finally {
       setGenerating(false);
+      void refreshSubscription();
     }
-  }, [user, language, loadInsights, t]);
+  }, [user, language, loadInsights, t, applyOptimisticDecrement, refreshSubscription]);
 
   if (subLoading) {
     return <SubscriptionSkeleton variant="inline" />;
