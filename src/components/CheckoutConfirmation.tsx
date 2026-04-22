@@ -762,13 +762,18 @@ export function CheckoutConfirmation() {
   const handleRetryGrant = async () => {
     if (retrying) return;
     setRetrying(true);
+    // Toast semantics for this dialog (kept consistent across all paths):
+    //   • toast.message → acknowledged outcomes (success, no-op, suppressed
+    //                     duplicate). Neutral, no colour, no icon.
+    //   • toast.error   → real, surfaceable failures only — i.e. the network
+    //                     / server call itself rejected. User-facing
+    //                     "nothing to do" responses are NOT errors.
     try {
       const { data, error } = await supabase.functions.invoke('retry-flex-credit');
       if (error) throw error;
       const applied = Number(data?.applied) || 0;
       const scanned = Number(data?.scanned) || 0;
       if (applied > 0) {
-        // Quiet state: no success-coloured toast. Neutral acknowledgement only.
         toast.message(`Credits reconciled from ${applied} session${applied === 1 ? '' : 's'}.`);
       } else if (scanned > 0) {
         toast.message('No missing credits. Balance already up to date.');
@@ -777,8 +782,11 @@ export function CheckoutConfirmation() {
       }
       await sub.refresh();
     } catch (e) {
-      const msg = e instanceof Error ? e.message : 'Retry failed';
-      toast.error(`Retry failed: ${msg}`);
+      // Real failure: the edge function or transport rejected. Use the
+      // destructive-styled toast so the user can distinguish this from the
+      // neutral acknowledgements above.
+      const msg = e instanceof Error ? e.message : 'Unknown error';
+      toast.error('Could not reconcile credits', { description: msg });
     } finally {
       setRetrying(false);
     }
