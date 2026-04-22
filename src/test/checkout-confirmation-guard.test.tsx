@@ -251,4 +251,63 @@ describe('CheckoutConfirmation 30-minute guard', () => {
       { replace: true },
     );
   });
+
+  describe('malformed / missing guard fallback', () => {
+    /**
+     * The persistent guard lives in `localStorage` and is therefore at the
+     * mercy of anything that can corrupt that store: a partial write from a
+     * crashed tab, a manual edit in DevTools, a quota-exceeded truncation,
+     * an extension that stomps on the key, a schema migration that hasn't
+     * run yet, etc. In every one of those cases the safe behaviour is to
+     * **treat the guard as absent** — i.e. open the celebratory dialog and
+     * sync the subscription — rather than silently swallowing the legitimate
+     * checkout return. These tests pin that contract down so a future
+     * "defensive" refactor can't accidentally suppress the dialog when the
+     * stored payload is unreadable.
+     */
+
+    const cases: Array<{ name: string; raw: string }> = [
+      { name: 'invalid JSON (truncated object)', raw: '{"mode":"subscription","ts":' },
+      { name: 'completely garbage string', raw: 'not-json-at-all' },
+      { name: 'JSON null', raw: 'null' },
+      { name: 'JSON of wrong shape (missing ts)', raw: '{"mode":"subscription"}' },
+      { name: 'JSON with non-numeric ts', raw: '{"mode":"subscription","ts":"yesterday"}' },
+      { name: 'empty string', raw: '' },
+    ];
+
+    for (const { name, raw } of cases) {
+      it(`opens the dialog and triggers sync when guard is ${name}`, () => {
+        // Seed the corrupt payload directly — bypassing JSON.stringify so
+        // we can control the exact bytes the component will read.
+        window.localStorage.setItem(CHECKOUT_CONFIRMED_KEY, raw);
+
+        renderAt('/?subscribed=true');
+
+        // Dialog opens — fallback to "fresh confirmation" path.
+        expect(screen.getByRole('dialog')).toBeInTheDocument();
+        // Subscription sync fires exactly once on first arrival.
+        expect(refreshMock).toHaveBeenCalledTimes(1);
+        // Corrupt entry is replaced with a well-formed guard so subsequent
+        // mounts within the window behave correctly.
+        const stored = JSON.parse(
+          window.localStorage.getItem(CHECKOUT_CONFIRMED_KEY) || 'null',
+        );
+        expect(stored).toMatchObject({ mode: 'subscription' });
+        expect(typeof stored.ts).toBe('number');
+        expect(Date.now() - stored.ts).toBeLessThan(5_000);
+      });
+    }
+
+    it('opens the dialog when the guard key is entirely missing', () => {
+      // Sanity check — the absence of the key should behave identically
+      // to corruption. localStorage is already cleared in `beforeEach`,
+      // so we just assert directly.
+      expect(window.localStorage.getItem(CHECKOUT_CONFIRMED_KEY)).toBeNull();
+
+      renderAt('/?subscribed=true');
+
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(refreshMock).toHaveBeenCalledTimes(1);
+    });
+  });
 });
