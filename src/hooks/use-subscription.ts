@@ -201,6 +201,10 @@ async function fetchSubscriptionSnapshot(userId: string, force: boolean): Promis
     insightsUsed: 0,
     insightsRemaining: 0,
     flexCreditsBalance: apiFlexCreditsBalance,
+    subscriptionStatus: null,
+    subscriptionEnd: null,
+    trialStart: null,
+    trialEnd: null,
   };
 }
 
