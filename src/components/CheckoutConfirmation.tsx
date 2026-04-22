@@ -383,59 +383,29 @@ export function CheckoutConfirmation() {
   };
 
   /**
-   * Auto-refetch the subscription snapshot whenever the dialog (or the page
-   * hosting it) becomes visible again. Runs:
-   *  - once when the dialog first opens (mount),
-   *  - on every `visibilitychange` to `visible` (tab return, OS unlock),
-   *  - on every `focus` (alt-tab back into the window).
+   * Refetch policy.
    *
-   * Throttled to one refetch per 4s to avoid hammering the edge function on
-   * rapid focus/blur cycles (e.g. clicking outside a Stripe sub-window). We
-   * also skip refetches once `balanceReflectsPurchase` is true — there's
-   * nothing left to confirm and the sticky display values would absorb any
-   * incoming snapshot anyway.
+   * We deliberately do **not** auto-refetch on `visibilitychange` or `focus`
+   * here. Those events fire indistinguishably for genuine user attention
+   * (the user came back to the tab) and for incidental browser activity:
    *
-   * Errors are swallowed: this is best-effort polling. The explicit "Try
-   * again" button + 45s timeout banner remain the primary recovery path for
-   * users who notice something's wrong.
+   *  - `navigate({ replace: true })` after stripping the checkout query
+   *    params can briefly cycle focus.
+   *  - Browser back/forward navigation that lands on this page fires
+   *    `focus` even though the user did not ask to refresh anything.
+   *  - Other tabs / OS-level focus juggling can fire spurious events.
+   *
+   * Treating any of those as a refresh trigger results in unintended edge
+   * function calls and (worse) silent state churn that can flicker the
+   * displayed numbers. The numbers we already show are authoritative
+   * (sourced from Stripe checkout metadata via `list-checkout-events`), so
+   * the explicit "Try again" / "Retry credit grant" buttons remain the
+   * **only** intentional re-fetch surface for users.
+   *
+   * The single mount-time `sub.refresh()` triggered above (line ~174, when
+   * a *fresh* checkout return is detected and the `alreadyConfirmed` guard
+   * lets it through) covers the just-returned-from-Stripe happy path.
    */
-  useEffect(() => {
-    if (!mode || mode === 'subscription') return;
-    if (balanceReflectsPurchase) return;
-
-    let lastRefreshAt = 0;
-    let cancelled = false;
-
-    const maybeRefresh = (reason: 'mount' | 'visibility' | 'focus') => {
-      const now = Date.now();
-      if (now - lastRefreshAt < 4_000) return;
-      lastRefreshAt = now;
-      void sub.refresh().catch(() => {
-        // Silent — the lifecycle / retry path owns surfaced errors.
-        if (cancelled) return;
-      });
-      void reason; // kept for future telemetry
-    };
-
-    // Initial fetch on dialog open.
-    maybeRefresh('mount');
-
-    const onVisibility = () => {
-      if (document.visibilityState === 'visible') maybeRefresh('visibility');
-    };
-    const onFocus = () => maybeRefresh('focus');
-
-    document.addEventListener('visibilitychange', onVisibility);
-    window.addEventListener('focus', onFocus);
-    return () => {
-      cancelled = true;
-      document.removeEventListener('visibilitychange', onVisibility);
-      window.removeEventListener('focus', onFocus);
-    };
-    // `sub.refresh` is a stable useCallback; depending on it directly would
-    // cause re-subscriptions on unrelated subscription state changes.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [mode, balanceReflectsPurchase]);
 
   // Fire-and-forget the optional email + push confirmation. Honors
   // `profiles.email_notifications` server-side, so users who turned that off
