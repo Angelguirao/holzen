@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Check, Sparkles, Coins, CalendarClock, TrendingUp, RefreshCw, Settings as SettingsIcon, AlertTriangle } from 'lucide-react';
+import { CalendarClock, RefreshCw, Settings as SettingsIcon, AlertTriangle, Receipt, FileCheck } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
