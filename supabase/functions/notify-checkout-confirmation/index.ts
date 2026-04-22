@@ -1,0 +1,215 @@
+// Sends an optional one-screen checkout-confirmation summary via email and/or
+// web push. Gated by `profiles.email_notifications` (per the user's preference
+// to reuse this single flag for both channels). Idempotent: dedup key is
+// `confirm:<userId>:<mode>:<bucket>` where bucket is the calendar minute, so a
+// double-trigger from React StrictMode / refresh within the same minute will
+// still result in exactly one email and one push payload per device.
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import webpush from "https://esm.sh/web-push@3.6.7";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+};
+
+type Mode = "subscription" | "flex_pack_s" | "flex_pack_m";
+
+interface Body {
+  mode: Mode;
+  tierLabel?: string;
+  isTrialing?: boolean;
+  trialStart?: string | null;
+  firstChargeAt?: string | null;
+  monthlyPrice?: string;
+  companionUnlocks?: number;
+  wallpapers?: number;
+  flexCreditsBalance?: number;
+  packLabel?: string;
+  previousBalance?: number;
+  creditsAdded?: number;
+  newBalance?: number;
+}
+
+const log = (step: string, data?: unknown) =>
+  console.log(`[NOTIFY-CHECKOUT-CONFIRMATION] ${step}`, data ? JSON.stringify(data) : "");
+
+async function resolveVapidPrivateKey(raw: string): Promise<string> {
+  try {
+    const parsed = JSON.parse(raw);
+    if (parsed?.d) return parsed.d;
+  } catch { /* not JSON */ }
+  if (raw.length <= 44) return raw;
+  try {
+    const stdBase64 = raw.replace(/-/g, "+").replace(/_/g, "/").padEnd(
+      raw.length + (4 - (raw.length % 4)) % 4,
+      "=",
+    );
+    const binaryStr = atob(stdBase64);
+    const pkcs8Bytes = new Uint8Array(binaryStr.length);
+    for (let i = 0; i < binaryStr.length; i++) pkcs8Bytes[i] = binaryStr.charCodeAt(i);
+    const cryptoKey = await crypto.subtle.importKey(
+      "pkcs8",
+      pkcs8Bytes.buffer,
+      { name: "ECDSA", namedCurve: "P-256" },
+      true,
+      ["sign"],
+    );
+    const jwk = await crypto.subtle.exportKey("jwk", cryptoKey);
+    if (jwk.d) return jwk.d as string;
+  } catch (e) {
+    console.error("[NOTIFY-CHECKOUT-CONFIRMATION] vapid parse failed:", e);
+  }
+  return raw;
+}
+
+serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  try {
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) {
+      return new Response(JSON.stringify({ error: "Missing auth" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { auth: { persistSession: false } },
+    );
+
+    const token = authHeader.replace("Bearer ", "");
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    if (authError || !user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const body = (await req.json().catch(() => null)) as Body | null;
+    if (!body || (body.mode !== "subscription" && body.mode !== "flex_pack_s" && body.mode !== "flex_pack_m")) {
+      return new Response(JSON.stringify({ error: "Invalid body" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("email_notifications, first_name")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    const notificationsOn = profile?.email_notifications !== false;
+    if (!notificationsOn) {
+      log("opted_out", { userId: user.id });
+      return new Response(JSON.stringify({ skipped: "opted_out", emailed: false, pushed: 0 }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const minuteBucket = Math.floor(Date.now() / 60_000);
+    const idempotencyKey = `confirm:${user.id}:${body.mode}:${minuteBucket}`;
+
+    // ---------- Email ----------
+    let emailed = false;
+    let emailError: string | null = null;
+    if (user.email) {
+      try {
+        const { error } = await supabase.functions.invoke("send-transactional-email", {
+          body: {
+            templateName: "checkout-confirmation",
+            recipientEmail: user.email,
+            idempotencyKey,
+            templateData: { ...body },
+          },
+          headers: { Authorization: authHeader },
+        });
+        if (error) {
+          emailError = error.message ?? String(error);
+          log("email_invoke_error", { emailError });
+        } else {
+          emailed = true;
+        }
+      } catch (e) {
+        emailError = e instanceof Error ? e.message : String(e);
+        log("email_throw", { emailError });
+      }
+    }
+
+    // ---------- Push ----------
+    let pushed = 0;
+    let pushError: string | null = null;
+    const vapidPublic = Deno.env.get("VAPID_PUBLIC_KEY");
+    const vapidPrivateRaw = Deno.env.get("VAPID_PRIVATE_KEY");
+
+    if (vapidPublic && vapidPrivateRaw) {
+      const { data: pushSubs } = await supabase
+        .from("push_subscriptions")
+        .select("endpoint, p256dh, auth")
+        .eq("user_id", user.id);
+
+      if (pushSubs && pushSubs.length > 0) {
+        const privateKey = await resolveVapidPrivateKey(vapidPrivateRaw);
+        webpush.setVapidDetails("mailto:noreply@holzen.app", vapidPublic, privateKey);
+
+        const isSub = body.mode === "subscription";
+        const title = isSub
+          ? `Welcome to Holzen ${body.tierLabel ?? "Pro"}`
+          : "Holzen credits added";
+        const pushBody = isSub
+          ? body.isTrialing && body.firstChargeAt
+            ? `Trial active — first charge ${body.firstChargeAt}.`
+            : body.firstChargeAt
+            ? `Subscription active — next charge ${body.firstChargeAt}.`
+            : "Your subscription is active."
+          : typeof body.creditsAdded === "number" && typeof body.newBalance === "number"
+          ? `+${body.creditsAdded} credits • new balance ${body.newBalance}`
+          : "Your Flex credits are ready to spend.";
+
+        const payload = JSON.stringify({
+          title,
+          body: pushBody,
+          url: "/settings",
+          tag: idempotencyKey,
+        });
+
+        for (const sub of pushSubs) {
+          try {
+            await webpush.sendNotification(
+              { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
+              payload,
+            );
+            pushed++;
+          } catch (pushErr: any) {
+            if (pushErr?.statusCode === 410 || pushErr?.statusCode === 404) {
+              await supabase.from("push_subscriptions").delete().eq("endpoint", sub.endpoint);
+            } else {
+              pushError = pushErr?.message ?? String(pushErr);
+              log("push_send_error", { endpoint: sub.endpoint.slice(0, 40), pushError });
+            }
+          }
+        }
+      }
+    } else {
+      pushError = "no_vapid";
+    }
+
+    return new Response(
+      JSON.stringify({ emailed, pushed, emailError, pushError, idempotencyKey }),
+      { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+    );
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error("[NOTIFY-CHECKOUT-CONFIRMATION] fatal", msg);
+    return new Response(JSON.stringify({ error: msg }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+});

@@ -89,6 +89,10 @@ export function CheckoutConfirmation() {
   // Snapshot the credit balance at the moment the dialog opens so we can show
   // "+N credits" once the refreshed balance comes in.
   const baselineBalanceRef = useRef<number | null>(null);
+  // Guards against React StrictMode double-invoke + accidental re-fires while
+  // the dialog is still open. The server itself is idempotent per minute, but
+  // there's no reason to issue multiple round-trips from the client.
+  const notifySentRef = useRef<Mode | null>(null);
 
   useEffect(() => {
     const detected = detectMode(location.search);
@@ -185,6 +189,56 @@ export function CheckoutConfirmation() {
   const subscriptionSyncing = awaitingStripe;
 
   const handleClose = () => setMode(null);
+
+  // Fire-and-forget the optional email + push confirmation. Honors
+  // `profiles.email_notifications` server-side, so users who turned that off
+  // get neither channel without any extra UI here.
+  useEffect(() => {
+    if (!mode) return;
+    if (notifySentRef.current === mode) return;
+    // For subscriptions we wait until Stripe has populated tier/dates so the
+    // email matches what the dialog shows. Subscription-syncing returns early
+    // and we'll re-run on the next render once `sub` resolves.
+    if (mode === 'subscription' && (sub.loading || !sub.subscriptionStatus)) return;
+
+    notifySentRef.current = mode;
+
+    const payload =
+      mode === 'subscription'
+        ? {
+            mode,
+            tierLabel,
+            isTrialing,
+            trialStart: trialStart ? dateFmt.format(trialStart) : null,
+            firstChargeAt: firstChargeAt ? dateFmt.format(firstChargeAt) : null,
+            monthlyPrice:
+              sub.tier === 'pro_plus'
+                ? `$${PRICING.proPlusMonthlyPrice.toFixed(2)}`
+                : `$${PRICING.monthlyPrice.toFixed(2)}`,
+            companionUnlocks:
+              sub.tier === 'pro_plus'
+                ? PRICING.proPlusCompanionUnlocks
+                : PRICING.proCompanionUnlocks,
+            wallpapers:
+              sub.tier === 'pro_plus' ? PRICING.proPlusWallpapers : PRICING.proWallpapers,
+            flexCreditsBalance: currentBalance,
+          }
+        : {
+            mode,
+            packLabel: mode === 'flex_pack_m' ? 'Flex Pack M' : 'Flex Pack S',
+            previousBalance: baseline,
+            creditsAdded,
+            newBalance: projectedBalance,
+          };
+
+    void supabase.functions
+      .invoke('notify-checkout-confirmation', { body: payload })
+      .catch((e) => {
+        // Best-effort — never block the dialog or toast on failure.
+        console.warn('[checkout-confirmation] notify failed', e);
+      });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, sub.loading, sub.subscriptionStatus, sub.tier, currentBalance, creditsAdded, projectedBalance]);
 
   const handleManageSubscription = () => {
     setMode(null);
