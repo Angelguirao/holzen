@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Check, Sparkles, Coins, CalendarClock, TrendingUp, RefreshCw, Settings as SettingsIcon } from 'lucide-react';
+import { Check, Sparkles, Coins, CalendarClock, TrendingUp, RefreshCw, Settings as SettingsIcon, AlertTriangle } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -117,6 +117,17 @@ export function CheckoutConfirmation() {
   // true we trust `currentBalance` even before the local subscription snapshot
   // catches up via its own polling.
   const [grantApplied, setGrantApplied] = useState(false);
+  // Refresh lifecycle for the wallet balance after a flex-pack purchase:
+  //  - 'idle'    : not waiting (subscription mode, or grant already applied)
+  //  - 'updating': polling/awaiting wallet refresh
+  //  - 'timeout' : wallet didn't reflect the purchase within the budget
+  //  - 'error'   : explicit refresh failure surfaced by `sub.refresh()`
+  // The numbers shown remain authoritative (Stripe metadata) — this state only
+  // drives the inline status messaging + retry affordance.
+  const [refreshState, setRefreshState] = useState<'idle' | 'updating' | 'timeout' | 'error'>('idle');
+  const [refreshError, setRefreshError] = useState<string | null>(null);
+  const refreshTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const refreshAttemptRef = useRef(0);
 
   useEffect(() => {
     const detected = detectMode(location.search);
@@ -278,7 +289,75 @@ export function CheckoutConfirmation() {
     mode !== null && mode !== 'subscription' && !balanceReflectsPurchase;
   const subscriptionSyncing = awaitingStripe;
 
-  const handleClose = () => setMode(null);
+  const handleClose = () => {
+    if (refreshTimeoutRef.current) {
+      clearTimeout(refreshTimeoutRef.current);
+      refreshTimeoutRef.current = null;
+    }
+    setMode(null);
+    setRefreshState('idle');
+    setRefreshError(null);
+    refreshAttemptRef.current = 0;
+  };
+
+  /**
+   * Drives the wallet-refresh lifecycle for flex-pack confirmations.
+   *
+   * Subscription confirmations rely on `useSubscription`'s own polling; this
+   * effect is a no-op for them. For credit packs we:
+   *  - mark the row as `updating` while we wait for `currentBalance` to catch
+   *    up (or for the server to report `grant_status: 'applied'`),
+   *  - flip to `timeout` after a generous budget so the user gets an explicit
+   *    "we tried, here's a retry" affordance instead of a forever-spinner,
+   *  - flip to `idle` the instant the wallet reflects the purchase.
+   *
+   * The timeout budget intentionally exceeds the `list-checkout-events`
+   * back-off window (~30s) so we don't surface a scary state during the
+   * normal happy-path lag between checkout return and webhook commit.
+   */
+  useEffect(() => {
+    if (!mode || mode === 'subscription') return;
+    if (refreshTimeoutRef.current) {
+      clearTimeout(refreshTimeoutRef.current);
+      refreshTimeoutRef.current = null;
+    }
+    if (balanceReflectsPurchase) {
+      setRefreshState('idle');
+      return;
+    }
+    // Don't downgrade an existing 'error' just because we're still waiting.
+    setRefreshState((prev) => (prev === 'error' ? prev : 'updating'));
+    refreshTimeoutRef.current = setTimeout(() => {
+      setRefreshState((prev) => (prev === 'idle' ? prev : 'timeout'));
+    }, 45_000);
+    return () => {
+      if (refreshTimeoutRef.current) {
+        clearTimeout(refreshTimeoutRef.current);
+        refreshTimeoutRef.current = null;
+      }
+    };
+  }, [mode, balanceReflectsPurchase]);
+
+  /**
+   * User-facing retry: re-invokes the subscription snapshot and surfaces an
+   * explicit error state if the underlying TanStack query throws (network
+   * down, edge function 5xx, etc.). Keeps `creditsAdded` / `projectedBalance`
+   * intact — they're authoritative regardless of refresh outcome.
+   */
+  const handleRetryRefresh = async () => {
+    refreshAttemptRef.current += 1;
+    setRefreshState('updating');
+    setRefreshError(null);
+    try {
+      await sub.refresh();
+      // The lifecycle effect above will flip back to 'idle' or re-arm the
+      // timeout depending on whether the new snapshot includes the credits.
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Unknown error';
+      setRefreshError(msg);
+      setRefreshState('error');
+    }
+  };
 
   // Fire-and-forget the optional email + push confirmation. Honors
   // `profiles.email_notifications` server-side, so users who turned that off
@@ -455,12 +534,28 @@ export function CheckoutConfirmation() {
                 label="New balance"
                 value={String(projectedBalance)}
                 pending={creditBalanceUpdating}
-                pendingHint="updating"
+                pendingHint={
+                  refreshState === 'updating'
+                    ? 'Updating balance…'
+                    : refreshState === 'timeout'
+                      ? 'Still syncing'
+                      : refreshState === 'error'
+                        ? 'Refresh failed'
+                        : 'updating'
+                }
                 highlight
               />
             </ul>
           )}
         </div>
+
+        {mode !== null && mode !== 'subscription' && refreshState !== 'idle' ? (
+          <RefreshStatusBanner
+            state={refreshState}
+            errorMessage={refreshError}
+            onRetry={handleRetryRefresh}
+          />
+        ) : null}
 
         <DialogFooter className="mt-2">
           {mode !== null && mode !== 'subscription' ? (
@@ -544,3 +639,90 @@ function SummaryRow({
 }
 
 export default CheckoutConfirmation;
+
+/**
+ * Inline status banner for the wallet-refresh lifecycle on flex-pack
+ * confirmations. Renders nothing for the `idle` state — the caller already
+ * gates on that, but we double-check defensively.
+ *
+ * Visual hierarchy is intentionally calm:
+ *  - `updating` → muted info row, no call to action
+ *  - `timeout`  → muted warning row + outlined "Try again" button
+ *  - `error`    → destructive-toned row + outlined "Try again" button
+ *
+ * The numbers shown above are authoritative either way, so this banner is
+ * about transparency, not blocking the user's understanding of the purchase.
+ */
+function RefreshStatusBanner({
+  state,
+  errorMessage,
+  onRetry,
+}: {
+  state: 'updating' | 'timeout' | 'error';
+  errorMessage: string | null;
+  onRetry: () => void;
+}) {
+  if (state === 'updating') {
+    return (
+      <div
+        className="mt-3 flex items-center gap-2 rounded-md border border-border bg-muted/20 px-3 py-2 text-xs text-muted-foreground"
+        role="status"
+        aria-live="polite"
+      >
+        <LoadingSpinner className="h-3 w-3 border-[1.5px]" />
+        <span>Updating balance…</span>
+      </div>
+    );
+  }
+  if (state === 'timeout') {
+    return (
+      <div
+        className="mt-3 flex flex-col gap-2 rounded-md border border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between"
+        role="status"
+        aria-live="polite"
+      >
+        <span className="flex items-center gap-2">
+          <AlertTriangle className="h-3.5 w-3.5 text-muted-foreground" aria-hidden />
+          Balance is still syncing. Your credits are safe.
+        </span>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={onRetry}
+          className="h-7 px-2 text-xs"
+        >
+          <RefreshCw className="mr-1.5 h-3 w-3" aria-hidden />
+          Try again
+        </Button>
+      </div>
+    );
+  }
+  // 'error'
+  return (
+    <div
+      className="mt-3 flex flex-col gap-2 rounded-md border border-destructive/40 bg-destructive/5 px-3 py-2 text-xs text-destructive sm:flex-row sm:items-center sm:justify-between"
+      role="alert"
+      aria-live="assertive"
+    >
+      <span className="flex items-center gap-2">
+        <AlertTriangle className="h-3.5 w-3.5" aria-hidden />
+        <span>
+          Could not refresh balance
+          {errorMessage ? <span className="ml-1 opacity-70">({errorMessage})</span> : null}
+          . Your credits are still safe.
+        </span>
+      </span>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={onRetry}
+        className="h-7 px-2 text-xs"
+      >
+        <RefreshCw className="mr-1.5 h-3 w-3" aria-hidden />
+        Try again
+      </Button>
+    </div>
+  );
+}
