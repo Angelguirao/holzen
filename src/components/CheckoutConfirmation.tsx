@@ -300,6 +300,7 @@ export function CheckoutConfirmation() {
         stickyCreditsAddedRef.current = persisted.stickyCreditsAdded;
         baselineBalanceRef.current = persisted.baseline ?? sub.flexCreditsBalance ?? 0;
         refreshAttemptRef.current = persisted.attempts;
+        setRefreshAttempt(persisted.attempts);
         setRefreshError(persisted.error);
         setRefreshState(persisted.state);
         setMode(detected);
