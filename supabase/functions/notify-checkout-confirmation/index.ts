@@ -128,7 +128,9 @@ serve(
             idempotencyKey,
             templateData: { ...body },
           },
-          headers: { Authorization: authHeader },
+          headers: {
+            Authorization: `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""}`,
+          },
         });
         if (error) {
           emailError = error.message ?? String(error);
