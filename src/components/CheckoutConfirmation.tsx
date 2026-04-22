@@ -639,3 +639,90 @@ function SummaryRow({
 }
 
 export default CheckoutConfirmation;
+
+/**
+ * Inline status banner for the wallet-refresh lifecycle on flex-pack
+ * confirmations. Renders nothing for the `idle` state — the caller already
+ * gates on that, but we double-check defensively.
+ *
+ * Visual hierarchy is intentionally calm:
+ *  - `updating` → muted info row, no call to action
+ *  - `timeout`  → muted warning row + outlined "Try again" button
+ *  - `error`    → destructive-toned row + outlined "Try again" button
+ *
+ * The numbers shown above are authoritative either way, so this banner is
+ * about transparency, not blocking the user's understanding of the purchase.
+ */
+function RefreshStatusBanner({
+  state,
+  errorMessage,
+  onRetry,
+}: {
+  state: 'updating' | 'timeout' | 'error';
+  errorMessage: string | null;
+  onRetry: () => void;
+}) {
+  if (state === 'updating') {
+    return (
+      <div
+        className="mt-3 flex items-center gap-2 rounded-md border border-border bg-muted/20 px-3 py-2 text-xs text-muted-foreground"
+        role="status"
+        aria-live="polite"
+      >
+        <LoadingSpinner className="h-3 w-3 border-[1.5px]" />
+        <span>Updating balance…</span>
+      </div>
+    );
+  }
+  if (state === 'timeout') {
+    return (
+      <div
+        className="mt-3 flex flex-col gap-2 rounded-md border border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between"
+        role="status"
+        aria-live="polite"
+      >
+        <span className="flex items-center gap-2">
+          <AlertTriangle className="h-3.5 w-3.5 text-amber-500" aria-hidden />
+          Balance is still syncing. Your credits are safe.
+        </span>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={onRetry}
+          className="h-7 px-2 text-xs"
+        >
+          <RefreshCw className="mr-1.5 h-3 w-3" aria-hidden />
+          Try again
+        </Button>
+      </div>
+    );
+  }
+  // 'error'
+  return (
+    <div
+      className="mt-3 flex flex-col gap-2 rounded-md border border-destructive/40 bg-destructive/5 px-3 py-2 text-xs text-destructive sm:flex-row sm:items-center sm:justify-between"
+      role="alert"
+      aria-live="assertive"
+    >
+      <span className="flex items-center gap-2">
+        <AlertTriangle className="h-3.5 w-3.5" aria-hidden />
+        <span>
+          Could not refresh balance
+          {errorMessage ? <span className="ml-1 opacity-70">({errorMessage})</span> : null}
+          . Your credits are still safe.
+        </span>
+      </span>
+      <Button
+        type="button"
+        variant="outline"
+        size="sm"
+        onClick={onRetry}
+        className="h-7 px-2 text-xs"
+      >
+        <RefreshCw className="mr-1.5 h-3 w-3" aria-hidden />
+        Try again
+      </Button>
+    </div>
+  );
+}
