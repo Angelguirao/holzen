@@ -154,6 +154,68 @@ describe('CheckoutConfirmation 30-minute guard', () => {
     expect(Date.now() - stored.ts).toBeLessThan(5_000);
   });
 
+  describe('30-minute boundary precision', () => {
+    const WINDOW_MS = 30 * 60 * 1000;
+
+    it('keeps the dialog suppressed when the guard is 1 second inside the window (1799s old)', () => {
+      // 1,799,000 ms ago — just *under* the 30-minute boundary. The guard
+      // must still be considered live: no dialog, no sub.refresh().
+      const justInside = Date.now() - (WINDOW_MS - 1_000);
+      localStorage.setItem(
+        CHECKOUT_CONFIRMED_KEY,
+        JSON.stringify({ mode: 'subscription', ts: justInside }),
+      );
+      sessionStorage.setItem(CHECKOUT_STARTED_KEY, String(justInside));
+
+      renderAt('/?subscribed=true');
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(refreshMock).not.toHaveBeenCalled();
+      // Original timestamp preserved — the window keeps counting from it.
+      const stored = JSON.parse(localStorage.getItem(CHECKOUT_CONFIRMED_KEY) || 'null');
+      expect(stored.ts).toBe(justInside);
+    });
+
+    it('re-opens the dialog when the guard is 1 second past the window (1801s old)', () => {
+      // 1,801,000 ms ago — just *over* the boundary. The guard must be
+      // treated as expired: dialog re-opens, sub.refresh() fires, and the
+      // stale timestamp is replaced with a fresh stamp.
+      const justOutside = Date.now() - (WINDOW_MS + 1_000);
+      localStorage.setItem(
+        CHECKOUT_CONFIRMED_KEY,
+        JSON.stringify({ mode: 'subscription', ts: justOutside }),
+      );
+
+      renderAt('/?subscribed=true');
+
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(refreshMock).toHaveBeenCalledTimes(1);
+      const stored = JSON.parse(localStorage.getItem(CHECKOUT_CONFIRMED_KEY) || 'null');
+      // Fresh stamp, not the stale one.
+      expect(stored.ts).not.toBe(justOutside);
+      expect(Date.now() - stored.ts).toBeLessThan(5_000);
+    });
+
+    it('treats a guard exactly at the boundary (ts === now - WINDOW_MS) as still live', () => {
+      // Exactly on the boundary. Implementation uses `now - ts > windowMs`
+      // (strict greater-than), so equality counts as inside the window.
+      // Locking this in prevents a future off-by-one regression that would
+      // re-open the dialog on the tick the window closes.
+      const onBoundary = Date.now() - WINDOW_MS;
+      localStorage.setItem(
+        CHECKOUT_CONFIRMED_KEY,
+        JSON.stringify({ mode: 'subscription', ts: onBoundary }),
+      );
+
+      renderAt('/?subscribed=true');
+
+      expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+      expect(refreshMock).not.toHaveBeenCalled();
+      const stored = JSON.parse(localStorage.getItem(CHECKOUT_CONFIRMED_KEY) || 'null');
+      expect(stored.ts).toBe(onBoundary);
+    });
+  });
+
   it('skips BOTH dialog and subscription sync when returning within the 30-minute window', () => {
     // Simulate a confirmation that happened 5 minutes ago — well within the
     // 30-minute guard window. The user navigates back to the confirmation
