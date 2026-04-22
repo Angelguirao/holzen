@@ -896,41 +896,37 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                       ? t('settings.planLifetime', 'Lifetime plan')
                       : t('settings.planPro', 'Pro plan')}
                   </p>
-                  <div className="space-y-2 text-xs font-mono text-muted-foreground">
-                    <p>
-                      {t('settings.allowanceCompanions', 'Companions & guidance')}: {companionUsed}/{companionLimit} ({companionRemaining} {t('settings.remainingLabel', 'left')})
-                    </p>
-                    <p>
-                      {t('settings.allowanceWallpapers', 'Wallpapers')}: {wallpaperUsed}/{wallpaperLimit} ({wallpaperRemaining} {t('settings.remainingLabel', 'left')})
-                    </p>
-                    <p>
-                      {t('settings.allowanceInsights', 'Insights')}: {insightsUsed}/{insightsLimit} ({insightsRemaining} {t('settings.remainingLabel', 'left')})
-                    </p>
-                    <p>
-                      {t('settings.flexCreditsBalance', 'Flex credits')}: {flexCreditsBalance}
-                    </p>
-                  </div>
                   {tier !== 'lifetime' && (
                     <div className="grid grid-cols-1 gap-2">
                       <LoadingButton
                         onClick={() => startCheckout('flex_pack_s')}
-                        loading={checkoutLoading}
+                        loading={checkoutLoading && checkoutLoadingTarget === 'flex_pack_s'}
+                        disabled={checkoutLoading && checkoutLoadingTarget !== 'flex_pack_s'}
                         loadingText={t('settings.openingCheckout')}
                         variant="outline"
                         className="w-full text-sm font-sans"
                         size="sm"
                       >
-                        {t('settings.flexPackSCta', { count: PRICING.flexPackSCredits, defaultValue: 'Buy Flex Pack S · {{count}} credits' })}
+                        {t('settings.flexPackSCta', {
+                          count: PRICING.flexPackSCredits,
+                          price: PRICING.flexPackSPrice.toFixed(2),
+                          defaultValue: 'Buy Flex Pack S · ${{price}} · {{count}} credits',
+                        })}
                       </LoadingButton>
                       <LoadingButton
                         onClick={() => startCheckout('flex_pack_m')}
-                        loading={checkoutLoading}
+                        loading={checkoutLoading && checkoutLoadingTarget === 'flex_pack_m'}
+                        disabled={checkoutLoading && checkoutLoadingTarget !== 'flex_pack_m'}
                         loadingText={t('settings.openingCheckout')}
                         variant="outline"
                         className="w-full text-sm font-sans"
                         size="sm"
                       >
-                        {t('settings.flexPackMCta', { count: PRICING.flexPackMCredits, defaultValue: 'Buy Flex Pack M · {{count}} credits' })}
+                        {t('settings.flexPackMCta', {
+                          count: PRICING.flexPackMCredits,
+                          price: PRICING.flexPackMPrice.toFixed(2),
+                          defaultValue: 'Buy Flex Pack M · ${{price}} · {{count}} credits',
+                        })}
                       </LoadingButton>
                     </div>
                   )}
