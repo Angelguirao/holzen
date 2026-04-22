@@ -19,6 +19,21 @@ import { toast } from 'sonner';
 type Mode = 'subscription' | 'flex_pack_s' | 'flex_pack_m' | null;
 
 /**
+ * Subset of the `list-checkout-events` row we care about. The full shape lives
+ * in `src/pages/BillingHistory.tsx`; we duplicate the slice here to avoid a
+ * cross-page import for a tiny structural type.
+ */
+type CheckoutEventLite = {
+  session_id: string;
+  created: number;
+  pack_type: string | null;
+  expected_credits: number;
+  payment_status: string;
+  grant_status: 'applied' | 'pending' | 'not_applicable';
+  granted_credits: number | null;
+};
+
+/**
  * Session-scoped guard so refreshing or hitting Back within the same checkout
  * redirect window doesn't re-open the confirmation dialog. Keyed by mode +
  * a short time bucket so a genuinely new checkout (different params arriving
@@ -93,6 +108,15 @@ export function CheckoutConfirmation() {
   // the dialog is still open. The server itself is idempotent per minute, but
   // there's no reason to issue multiple round-trips from the client.
   const notifySentRef = useRef<Mode | null>(null);
+  // Authoritative credit amount sourced from Stripe checkout metadata via
+  // `list-checkout-events`. Falls back to PRICING constants only when the
+  // lookup hasn't returned yet — this prevents drift if pack sizes change in
+  // Stripe but the bundled PRICING constants haven't been redeployed.
+  const [purchasedCredits, setPurchasedCredits] = useState<number | null>(null);
+  // Tracks whether the matched session has been credited server-side. When
+  // true we trust `currentBalance` even before the local subscription snapshot
+  // catches up via its own polling.
+  const [grantApplied, setGrantApplied] = useState(false);
 
   useEffect(() => {
     const detected = detectMode(location.search);
@@ -136,10 +160,66 @@ export function CheckoutConfirmation() {
 
   const open = mode !== null;
 
-  const expectedCredits = useMemo(() => {
+  // Fallback when the Stripe lookup hasn't completed yet. Always replaced by
+  // the metadata value once `list-checkout-events` returns.
+  const fallbackExpectedCredits = useMemo(() => {
     if (mode === 'flex_pack_m') return PRICING.flexPackMCredits;
     if (mode === 'flex_pack_s') return PRICING.flexPackSCredits;
     return 0;
+  }, [mode]);
+  const expectedCredits = purchasedCredits ?? fallbackExpectedCredits;
+
+  // Resolve the actual purchased credit amount from the most recent paid
+  // checkout session matching this mode. Polls briefly because the session
+  // may not yet be visible to Stripe's list API the instant we redirect back.
+  useEffect(() => {
+    if (!mode || mode === 'subscription') return;
+    let cancelled = false;
+    let attempt = 0;
+    const maxAttempts = 6; // ~ up to 30s with the backoff below
+
+    const tick = async () => {
+      attempt += 1;
+      try {
+        const { data, error } = await supabase.functions.invoke('list-checkout-events');
+        if (error) throw error;
+        const events = (data?.events ?? []) as CheckoutEventLite[];
+        // Most recent paid session for this pack type, by created desc.
+        const match = events
+          .filter(
+            (e) =>
+              e.pack_type === mode &&
+              e.payment_status === 'paid' &&
+              (e.expected_credits > 0 || (e.granted_credits ?? 0) > 0),
+          )
+          .sort((a, b) => b.created - a.created)[0];
+        if (match && !cancelled) {
+          // Prefer the actual granted amount once the webhook applied it
+          // (handles partial grants or future per-session pricing). Otherwise
+          // use the metadata-declared expected amount, which is what Stripe
+          // recorded at checkout time.
+          const authoritative =
+            match.grant_status === 'applied' && (match.granted_credits ?? 0) > 0
+              ? (match.granted_credits as number)
+              : match.expected_credits;
+          setPurchasedCredits(authoritative);
+          setGrantApplied(match.grant_status === 'applied');
+          if (match.grant_status === 'applied') return; // done
+        }
+      } catch {
+        // Best-effort; we'll fall back to PRICING constants until success.
+      }
+      if (cancelled) return;
+      if (attempt < maxAttempts) {
+        // Backoff: 1.5s, 3s, 5s, 8s, 12s, 18s
+        const delays = [1500, 3000, 5000, 8000, 12000, 18000];
+        setTimeout(tick, delays[Math.min(attempt - 1, delays.length - 1)]);
+      }
+    };
+    void tick();
+    return () => {
+      cancelled = true;
+    };
   }, [mode]);
 
   const tierLabel = useMemo(() => {
@@ -176,14 +256,24 @@ export function CheckoutConfirmation() {
   const baseline = baselineBalanceRef.current ?? 0;
   const currentBalance = sub.flexCreditsBalance ?? 0;
   const observedDelta = Math.max(0, currentBalance - baseline);
-  // Until the refreshed balance reflects the purchase, fall back to the
-  // expected credits for the chosen pack.
-  const balanceReflectsPurchase = observedDelta >= expectedCredits && expectedCredits > 0;
-  const creditsAdded = balanceReflectsPurchase ? observedDelta : expectedCredits;
-  const projectedBalance = balanceReflectsPurchase ? currentBalance : baseline + expectedCredits;
-  // True while we're still waiting for the refreshed wallet balance to reflect
-  // the purchase. Drives inline spinners on the affected rows so the user sees
-  // that the number they're looking at is provisional.
+  // The wallet has caught up if either (a) the local balance moved by at
+  // least the purchased amount, or (b) the server confirmed the grant via
+  // `list-checkout-events`. Either path lets us drop the "updating" spinner.
+  const balanceReflectsPurchase =
+    (expectedCredits > 0 && observedDelta >= expectedCredits) || grantApplied;
+  // Always show the actual purchased amount from Stripe metadata (or the
+  // applied grant amount once available). This stays accurate even when the
+  // local wallet snapshot lags behind the webhook.
+  const creditsAdded = expectedCredits;
+  // New balance = snapshot at dialog-open + authoritative purchased amount.
+  // We deliberately don't show `currentBalance` until it matches, so the
+  // "before / +added / after" arithmetic is always internally consistent.
+  const projectedBalance = balanceReflectsPurchase
+    ? Math.max(currentBalance, baseline + creditsAdded)
+    : baseline + creditsAdded;
+  // True while we're still waiting for the refreshed wallet balance to
+  // reflect the purchase. The number shown is already correct; the spinner
+  // just signals "we're confirming with the server".
   const creditBalanceUpdating =
     mode !== null && mode !== 'subscription' && !balanceReflectsPurchase;
   const subscriptionSyncing = awaitingStripe;
