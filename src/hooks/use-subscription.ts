@@ -284,6 +284,10 @@ export function useSubscription() {
   const insightsUsed = effectiveSnapshot?.insightsUsed ?? 0;
   const insightsRemaining = effectiveSnapshot?.insightsRemaining ?? 0;
   const flexCreditsBalance = effectiveSnapshot?.flexCreditsBalance ?? 0;
+  const subscriptionStatus = effectiveSnapshot?.subscriptionStatus ?? null;
+  const subscriptionEnd = effectiveSnapshot?.subscriptionEnd ?? null;
+  const trialStart = effectiveSnapshot?.trialStart ?? null;
+  const trialEnd = effectiveSnapshot?.trialEnd ?? null;
   const loading = !!userId && query.isLoading && !query.data;
 
   useEffect(() => {
@@ -383,6 +387,10 @@ export function useSubscription() {
       insightsRemaining: 0,
       flexCreditsBalance: 0,
       canReflect: false,
+      subscriptionStatus: null,
+      subscriptionEnd: null,
+      trialStart: null,
+      trialEnd: null,
     };
   }
 
@@ -407,5 +415,9 @@ export function useSubscription() {
     insightsRemaining,
     flexCreditsBalance,
     canReflect,
+    subscriptionStatus,
+    subscriptionEnd,
+    trialStart,
+    trialEnd,
   };
 }
