@@ -278,16 +278,31 @@ export function CheckoutConfirmation() {
   // `list-checkout-events`. Either path lets us drop the "updating" spinner.
   const balanceReflectsPurchase =
     (expectedCredits > 0 && observedDelta >= expectedCredits) || grantApplied;
-  // Always show the actual purchased amount from Stripe metadata (or the
-  // applied grant amount once available). This stays accurate even when the
-  // local wallet snapshot lags behind the webhook.
-  const creditsAdded = expectedCredits;
-  // New balance = snapshot at dialog-open + authoritative purchased amount.
-  // We deliberately don't show `currentBalance` until it matches, so the
-  // "before / +added / after" arithmetic is always internally consistent.
-  const projectedBalance = balanceReflectsPurchase
+  // Authoritative purchased amount from Stripe metadata (or the applied grant
+  // amount once available). We track this through a ref so re-fetches that
+  // arrive *before* `purchasedCredits` resolves can't transiently regress the
+  // shown value to the PRICING fallback.
+  if (expectedCredits > stickyCreditsAddedRef.current) {
+    stickyCreditsAddedRef.current = expectedCredits;
+  }
+  const creditsAdded = stickyCreditsAddedRef.current || expectedCredits;
+  // Computed new balance: snapshot at dialog-open + authoritative purchased
+  // amount, OR the live wallet once it matches/exceeds that figure.
+  const computedBalance = balanceReflectsPurchase
     ? Math.max(currentBalance, baseline + creditsAdded)
     : baseline + creditsAdded;
+  // Monotonic display value: never regresses below what we've already shown
+  // the user. Prevents flicker when a focus refetch returns an intermediate
+  // snapshot (e.g. webhook half-applied, or a stale cache hit racing with a
+  // fresh one). The number is still capped by reality once `currentBalance`
+  // overtakes it.
+  if (
+    stickyBalanceRef.current === null ||
+    computedBalance > stickyBalanceRef.current
+  ) {
+    stickyBalanceRef.current = computedBalance;
+  }
+  const projectedBalance = stickyBalanceRef.current ?? computedBalance;
   // True while we're still waiting for the refreshed wallet balance to
   // reflect the purchase. The number shown is already correct; the spinner
   // just signals "we're confirming with the server".
