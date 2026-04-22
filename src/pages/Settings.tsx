@@ -138,6 +138,25 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
   const [zenMode, setZenMode] = useState(() => localStorage.getItem('holzen_zen_mode') === 'true');
   const [hapticEnabled, setHapticEnabledState] = useState(isHapticEnabled);
   const [soundEnabled, setSoundEnabled] = useState(() => localStorage.getItem('holzen_sound_enabled') !== 'false');
+  const [checkoutWindowMinutes, setCheckoutWindowMinutesState] = useState<number>(() =>
+    getCheckoutSuppressionWindowMinutes(),
+  );
+  const [checkoutWindowDraft, setCheckoutWindowDraft] = useState<string>(() =>
+    String(getCheckoutSuppressionWindowMinutes()),
+  );
+  const commitCheckoutWindow = useCallback(
+    (raw: string) => {
+      const parsed = Number(raw);
+      if (!Number.isFinite(parsed)) {
+        setCheckoutWindowDraft(String(checkoutWindowMinutes));
+        return;
+      }
+      const stored = setCheckoutSuppressionWindowMinutes(parsed);
+      setCheckoutWindowMinutesState(stored);
+      setCheckoutWindowDraft(String(stored));
+    },
+    [checkoutWindowMinutes],
+  );
   const [btcMode, setBtcMode] = useState(() => localStorage.getItem('holzen_btc_mode') === 'true');
   const [latestVersion, setLatestVersion] = useState<string | null>(null);
   const [hasNewVersion, setHasNewVersion] = useState(false);
