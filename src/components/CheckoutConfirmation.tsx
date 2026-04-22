@@ -534,12 +534,28 @@ export function CheckoutConfirmation() {
                 label="New balance"
                 value={String(projectedBalance)}
                 pending={creditBalanceUpdating}
-                pendingHint="updating"
+                pendingHint={
+                  refreshState === 'updating'
+                    ? 'Updating balance…'
+                    : refreshState === 'timeout'
+                      ? 'Still syncing'
+                      : refreshState === 'error'
+                        ? 'Refresh failed'
+                        : 'updating'
+                }
                 highlight
               />
             </ul>
           )}
         </div>
+
+        {mode !== null && mode !== 'subscription' && refreshState !== 'idle' ? (
+          <RefreshStatusBanner
+            state={refreshState}
+            errorMessage={refreshError}
+            onRetry={handleRetryRefresh}
+          />
+        ) : null}
 
         <DialogFooter className="mt-2">
           {mode !== null && mode !== 'subscription' ? (
