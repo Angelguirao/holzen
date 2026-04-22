@@ -784,6 +784,65 @@ export function CheckoutConfirmation() {
     }
   };
 
+  // ── QUIET_STATE_CHECKLIST audit (DEV only) ────────────────────────────
+  // Re-scans the rendered dialog after every render and warns once per
+  // session for any rule violation. Compiled out of production by Vite via
+  // the `import.meta.env.DEV` guard (constant-folded → dead-code-eliminated).
+  useEffect(() => {
+    if (!import.meta.env.DEV) return;
+    if (!open) return;
+    const root = dialogContentRef.current;
+    if (!root) return;
+    // Defer one frame so Radix portal content is in the DOM.
+    const id = window.requestAnimationFrame(() => {
+      const text = (root.textContent ?? '').toLowerCase();
+      const violations: string[] = [];
+      // 1. Forbidden phrases.
+      for (const phrase of QUIET_STATE_CHECKLIST.forbiddenPhrases) {
+        if (text.includes(phrase)) {
+          violations.push(`praise/hype phrase: "${phrase}"`);
+        }
+      }
+      // 2. Forbidden celebratory icons (lucide renders the component name on
+      //    the SVG via `data-lucide` / `class*="lucide-<name>"`).
+      const svgs = root.querySelectorAll('svg');
+      svgs.forEach((svg) => {
+        const cls = svg.getAttribute('class') ?? '';
+        for (const name of QUIET_STATE_CHECKLIST.forbiddenIconNames) {
+          // lucide-react emits class names like "lucide-party-popper".
+          const kebab = name.replace(/([a-z0-9])([A-Z])/g, '$1-$2').toLowerCase();
+          if (cls.toLowerCase().includes(`lucide-${kebab}`)) {
+            violations.push(`celebratory icon: ${name}`);
+          }
+        }
+      });
+      // 3. No emojis anywhere in the rendered text.
+      if (QUIET_STATE_CHECKLIST.emojiPattern.test(root.textContent ?? '')) {
+        violations.push('emoji found in rendered text');
+      }
+      // 4. At least one clear-exit affordance must be reachable.
+      const buttonNames = Array.from(root.querySelectorAll('button')).map(
+        (b) => (b.textContent ?? '').trim(),
+      );
+      const hasExit = QUIET_STATE_CHECKLIST.requiredExits.some((label) =>
+        buttonNames.some((name) => name.toLowerCase().includes(label.toLowerCase())),
+      );
+      if (!hasExit) {
+        violations.push(
+          `no clear exit (expected one of: ${QUIET_STATE_CHECKLIST.requiredExits.join(', ')})`,
+        );
+      }
+      if (violations.length > 0) {
+        // eslint-disable-next-line no-console
+        console.warn(
+          '[CheckoutConfirmation] QUIET_STATE_CHECKLIST violations:\n  • ' +
+            violations.join('\n  • '),
+        );
+      }
+    });
+    return () => window.cancelAnimationFrame(id);
+  });
+
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) handleClose(); }}>
       <DialogContent ref={dialogContentRef} className="sm:max-w-md">
