@@ -39,6 +39,39 @@ const STORAGE_PREFIX = 'holzen.orchestrate.intervention.invoked:';
 
 const inFlight = new Map<string, Promise<unknown>>();
 
+// ── Metrics ──────────────────────────────────────────────────────────────────
+// We instrument the idempotency layer itself so every caller (current and
+// future) is observed without needing to remember to log at the call-site.
+//
+//  - `intervention_idempotency_skip` — caller asked, marker already set.
+//  - `intervention_idempotency_dedup` — concurrent caller joined the in-flight
+//    Promise (StrictMode double-invoke, fast remounts).
+//  - `intervention_first_call_latency` — wall-clock latency of the *first*
+//    real invocation per `reflectionId`, captured on success or failure.
+//
+// Events are forwarded to PostHog via `trackEvent` (no-op when PostHog is
+// disabled) and mirrored to the `[holzen:companion]` console channel so
+// they show up in dev / VITE_HOLZEN_DEBUG=1 builds.
+import { trackEvent } from '@/lib/posthog';
+import { holzenLog } from '@/lib/holzen-console';
+
+function emit(event: string, props: Record<string, unknown>): void {
+  try {
+    trackEvent(event, props);
+  } catch {
+    /* posthog itself swallows errors — this is belt-and-suspenders */
+  }
+  try {
+    holzenLog.companion(event, props);
+  } catch {
+    /* ignore */
+  }
+}
+
+function reflectionPrefix(id: string): string {
+  return id.slice(0, 8);
+}
+
 function storageKey(reflectionId: string): string {
   return `${STORAGE_PREFIX}${reflectionId}`;
 }
@@ -50,9 +83,22 @@ function storageKey(reflectionId: string): string {
  */
 export function hasInvokedIntervention(reflectionId: string): boolean {
   if (!reflectionId) return false;
-  if (inFlight.has(reflectionId)) return true;
+  if (inFlight.has(reflectionId)) {
+    emit('intervention_idempotency_skip', {
+      reflection_prefix: reflectionPrefix(reflectionId),
+      layer: 'in_flight',
+    });
+    return true;
+  }
   try {
-    return sessionStorage.getItem(storageKey(reflectionId)) === '1';
+    const hit = sessionStorage.getItem(storageKey(reflectionId)) === '1';
+    if (hit) {
+      emit('intervention_idempotency_skip', {
+        reflection_prefix: reflectionPrefix(reflectionId),
+        layer: 'session_storage',
+      });
+    }
+    return hit;
   } catch {
     return false;
   }
@@ -74,7 +120,17 @@ export async function runOnceIntervention<T>(
 ): Promise<T> {
   const key = reflectionId;
   const existing = inFlight.get(key) as Promise<T> | undefined;
-  if (existing) return existing;
+  if (existing) {
+    emit('intervention_idempotency_dedup', {
+      reflection_prefix: reflectionPrefix(key),
+    });
+    return existing;
+  }
+
+  const startedAt =
+    typeof performance !== 'undefined' && typeof performance.now === 'function'
+      ? performance.now()
+      : Date.now();
 
   const promise = (async () => {
     try {
@@ -84,6 +140,15 @@ export async function runOnceIntervention<T>(
       } catch {
         /* private mode / storage full — best-effort */
       }
+      emit('intervention_first_call_latency', {
+        reflection_prefix: reflectionPrefix(key),
+        latency_ms: Math.round(
+          (typeof performance !== 'undefined' && typeof performance.now === 'function'
+            ? performance.now()
+            : Date.now()) - startedAt,
+        ),
+        outcome: 'success',
+      });
       return result;
     } catch (err) {
       // Allow a manual retry to fire a fresh call; the in-memory entry is
@@ -93,6 +158,15 @@ export async function runOnceIntervention<T>(
       } catch {
         /* ignore */
       }
+      emit('intervention_first_call_latency', {
+        reflection_prefix: reflectionPrefix(key),
+        latency_ms: Math.round(
+          (typeof performance !== 'undefined' && typeof performance.now === 'function'
+            ? performance.now()
+            : Date.now()) - startedAt,
+        ),
+        outcome: 'error',
+      });
       throw err;
     } finally {
       inFlight.delete(key);
