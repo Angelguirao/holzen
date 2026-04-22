@@ -533,6 +533,63 @@ export type Database = {
         }
         Relationships: []
       }
+      credit_ledger: {
+        Row: {
+          created_at: string
+          delta_credits: number
+          feature: string | null
+          id: string
+          metadata: Json
+          reason: string
+          source: string
+          source_ref: string | null
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          delta_credits: number
+          feature?: string | null
+          id?: string
+          metadata?: Json
+          reason: string
+          source: string
+          source_ref?: string | null
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          delta_credits?: number
+          feature?: string | null
+          id?: string
+          metadata?: Json
+          reason?: string
+          source?: string
+          source_ref?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      credit_wallets: {
+        Row: {
+          balance_credits: number
+          created_at: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance_credits?: number
+          created_at?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance_credits?: number
+          created_at?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       email_send_log: {
         Row: {
           created_at: string
@@ -1001,6 +1058,36 @@ export type Database = {
           },
         ]
       }
+      monthly_feature_usage: {
+        Row: {
+          created_at: string
+          feature: string
+          id: string
+          month_start: string
+          updated_at: string
+          used: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          feature: string
+          id?: string
+          month_start: string
+          updated_at?: string
+          used?: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          feature?: string
+          id?: string
+          month_start?: string
+          updated_at?: string
+          used?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       night_reflections: {
         Row: {
           btc_change_percent: number
@@ -1030,6 +1117,51 @@ export type Database = {
           had_reflection?: boolean
           id?: string
           message?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          action_path: string | null
+          action_state: Json | null
+          created_at: string
+          dismissed_at: string | null
+          id: string
+          metadata: Json
+          read_at: string | null
+          source_id: string
+          source_table: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          action_path?: string | null
+          action_state?: Json | null
+          created_at?: string
+          dismissed_at?: string | null
+          id?: string
+          metadata?: Json
+          read_at?: string | null
+          source_id: string
+          source_table: string
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          action_path?: string | null
+          action_state?: Json | null
+          created_at?: string
+          dismissed_at?: string | null
+          id?: string
+          metadata?: Json
+          read_at?: string | null
+          source_id?: string
+          source_table?: string
+          type?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: []
@@ -1208,6 +1340,7 @@ export type Database = {
           subscription_checked_at: string | null
           subscription_end: string | null
           subscription_status: string
+          subscription_tier: string
           threshold: number
           threshold_down: number
           timezone: string | null
@@ -1260,6 +1393,7 @@ export type Database = {
           subscription_checked_at?: string | null
           subscription_end?: string | null
           subscription_status?: string
+          subscription_tier?: string
           threshold?: number
           threshold_down?: number
           timezone?: string | null
@@ -1312,6 +1446,7 @@ export type Database = {
           subscription_checked_at?: string | null
           subscription_end?: string | null
           subscription_status?: string
+          subscription_tier?: string
           threshold?: number
           threshold_down?: number
           timezone?: string | null
@@ -2323,6 +2458,18 @@ export type Database = {
       }
     }
     Functions: {
+      add_flex_credits: {
+        Args: {
+          p_credits: number
+          p_feature?: string
+          p_metadata?: Json
+          p_reason: string
+          p_source: string
+          p_source_ref?: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
       claim_referral_pending_jobs: {
         Args: { p_limit?: number }
         Returns: {
@@ -2347,6 +2494,29 @@ export type Database = {
       claim_trigger_slot: {
         Args: { _cooldown_hours: number; _user_id: string }
         Returns: boolean
+      }
+      consume_feature_allowance_or_credits: {
+        Args: {
+          p_amount?: number
+          p_credit_cost?: number
+          p_feature: string
+          p_limit: number
+          p_metadata?: Json
+          p_reason?: string
+          p_source?: string
+          p_source_ref?: string
+          p_user_id: string
+        }
+        Returns: Json
+      }
+      consume_monthly_feature_quota: {
+        Args: {
+          p_amount?: number
+          p_feature: string
+          p_limit: number
+          p_user_id: string
+        }
+        Returns: Json
       }
       delete_email: {
         Args: { message_id: number; queue_name: string }
@@ -2387,6 +2557,19 @@ export type Database = {
           source_queue: string
         }
         Returns: number
+      }
+      notifications_upsert: {
+        Args: {
+          p_action_path?: string
+          p_action_state?: Json
+          p_created_at?: string
+          p_metadata?: Json
+          p_source_id: string
+          p_source_table: string
+          p_type: string
+          p_user_id: string
+        }
+        Returns: undefined
       }
       owns_collection: {
         Args: { _collection_id: string; _user_id: string }
