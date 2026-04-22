@@ -4,10 +4,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/use-auth';
 import { PRICING } from '@/lib/pricing';
 import { holzenLog } from '@/lib/holzen-console';
+import { getCheckoutSuppressionWindowMs } from '@/lib/checkout-suppression-window';
 
 const FREE_MONTHLY_LIMIT = PRICING.freeReflectionsPerMonth;
 const CHECKOUT_RETURN_KEY = 'holzen_checkout_started_at';
-const CHECKOUT_RETURN_WINDOW_MS = 30 * 60 * 1000;
 const SUB_CACHE_KEY = 'holzen_sub_cache';
 
 /** Next fetch uses `{ force: true }` on check-subscription (window focus, refresh(), etc.). */
