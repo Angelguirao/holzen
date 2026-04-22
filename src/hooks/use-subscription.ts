@@ -221,9 +221,13 @@ export function useSubscription() {
   const query = useQuery({
     queryKey: ['subscription', userId],
     enabled: !!userId,
-    staleTime: 5 * 60 * 1000,
+    // Tightened from 5min → 30s so credit changes (regenerate, wallpaper,
+    // insights) reconcile within the same interaction window even if a
+    // call site forgets to invalidate. Optimistic decrement still gives
+    // an instant UI; this is the safety net.
+    staleTime: 30 * 1000,
     gcTime: 30 * 60 * 1000,
-    refetchInterval: userId ? 5 * 60 * 1000 : false,
+    refetchInterval: userId ? 60 * 1000 : false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: true,
     retry: 1,
@@ -368,6 +372,41 @@ export function useSubscription() {
     return queryClient.invalidateQueries({ queryKey: ['subscription', userId] });
   }, [userId, queryClient]);
 
+  /**
+   * Optimistically decrement a feature counter (and/or flex credits) in the
+   * cached subscription snapshot so the UI reflects the spend instantly.
+   * The next `refresh()` reconciles with the server. Safe to call before the
+   * action — if the action fails, just call `refresh()` to roll back.
+   */
+  const applyOptimisticDecrement = useCallback(
+    (feature: 'companion' | 'wallpaper' | 'insight', amount = 1) => {
+      if (!userId) return;
+      queryClient.setQueryData<SubscriptionSnapshot | undefined>(
+        ['subscription', userId],
+        (prev) => {
+          if (!prev) return prev;
+          const next = { ...prev };
+          // Pro/Pro+ users spend the monthly bucket first.
+          if (feature === 'companion' && next.companionRemaining > 0) {
+            next.companionRemaining = Math.max(0, next.companionRemaining - amount);
+            next.companionUsed = next.companionUsed + amount;
+          } else if (feature === 'wallpaper' && next.wallpaperRemaining > 0) {
+            next.wallpaperRemaining = Math.max(0, next.wallpaperRemaining - amount);
+            next.wallpaperUsed = next.wallpaperUsed + amount;
+          } else if (feature === 'insight' && next.insightsRemaining > 0) {
+            next.insightsRemaining = Math.max(0, next.insightsRemaining - amount);
+            next.insightsUsed = next.insightsUsed + amount;
+          } else {
+            // Bucket empty → spend a flex credit instead.
+            next.flexCreditsBalance = Math.max(0, next.flexCreditsBalance - amount);
+          }
+          return next;
+        },
+      );
+    },
+    [userId, queryClient],
+  );
+
   const canReflect =
     !userId ? false : subscribed || (monthlyRemaining !== undefined && monthlyRemaining > 0);
 
@@ -380,6 +419,7 @@ export function useSubscription() {
       startCheckout,
       openPortal,
       refresh,
+      applyOptimisticDecrement,
       monthlyRemaining: undefined,
       monthlyUsed: 0,
       tier: 'free',
@@ -409,6 +449,7 @@ export function useSubscription() {
     startCheckout,
     openPortal,
     refresh,
+    applyOptimisticDecrement,
     monthlyRemaining,
     monthlyUsed,
     tier,

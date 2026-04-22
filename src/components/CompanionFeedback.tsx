@@ -41,7 +41,7 @@ export function CompanionFeedback({
   const [vote, setVote] = useState<'up' | 'down' | null>(null);
   const [loading, setLoading] = useState(false);
   const { isPro, requirePro, startCheckout } = useProGate();
-  const { companionRemaining, flexCreditsBalance } = useSubscription();
+  const { companionRemaining, flexCreditsBalance, applyOptimisticDecrement, refresh: refreshSubscription } = useSubscription();
 
   const canRegenerate = Boolean(reflectionId && regenerateSlot && onRegenerate);
   const regenBusy = Boolean(regenerating);
@@ -126,7 +126,13 @@ export function CompanionFeedback({
       return;
     }
     hapticFeedback('light');
-    onRegenerate?.();
+    // Optimistically reflect the spend in the UI immediately; the next
+    // subscription refresh reconciles with the server. If the regenerate
+    // fails, the refresh below restores accurate counts.
+    applyOptimisticDecrement('companion');
+    Promise.resolve(onRegenerate?.()).finally(() => {
+      void refreshSubscription();
+    });
   };
 
   if (compact) {
