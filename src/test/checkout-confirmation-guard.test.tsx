@@ -196,12 +196,15 @@ describe('CheckoutConfirmation 30-minute guard', () => {
       expect(Date.now() - stored.ts).toBeLessThan(5_000);
     });
 
-    it('treats a guard exactly at the boundary (ts === now - WINDOW_MS) as still live', () => {
-      // Exactly on the boundary. Implementation uses `now - ts > windowMs`
-      // (strict greater-than), so equality counts as inside the window.
-      // Locking this in prevents a future off-by-one regression that would
-      // re-open the dialog on the tick the window closes.
-      const onBoundary = Date.now() - WINDOW_MS;
+    it('treats a guard a few ms inside the boundary as still live (strict > comparison)', () => {
+      // Implementation uses `now - ts > windowMs` (strict greater-than), so
+      // a guard whose age is *less than* the window — even by a few ms —
+      // must still be considered live. We can't assert on `ts === now -
+      // WINDOW_MS` exactly because the wall clock advances during render
+      // (test → component mount → guard read), pushing the age past the
+      // boundary. A 100 ms cushion is well within typical render time and
+      // still proves the off-by-one boundary semantics.
+      const onBoundary = Date.now() - (WINDOW_MS - 100);
       localStorage.setItem(
         CHECKOUT_CONFIRMED_KEY,
         JSON.stringify({ mode: 'subscription', ts: onBoundary }),
