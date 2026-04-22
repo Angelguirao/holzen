@@ -19,6 +19,60 @@ import { toast } from 'sonner';
 type Mode = 'subscription' | 'flex_pack_s' | 'flex_pack_m' | null;
 
 /**
+ * QUIET_STATE_CHECKLIST — internal pre-ship rules for this dialog.
+ *
+ * The checkout confirmation must read like a receipt, not a celebration.
+ * Each rule below is enforced at runtime by the dev-only audit effect at
+ * the bottom of `CheckoutConfirmation` (no-op in production builds).
+ *
+ * If you find yourself wanting to add a 🎉, a "Welcome", or a coloured
+ * "Success!" badge, stop and re-read this list — the answer is no.
+ */
+const QUIET_STATE_CHECKLIST = {
+  // 1. No praise / hype / "wellness influencer" language. Receipts don't
+  //    congratulate. Use factual, past-tense or neutral verbs.
+  forbiddenPhrases: [
+    'welcome',
+    'congrat', // congrats / congratulations
+    'awesome',
+    'great job',
+    'amazing',
+    'enjoy',
+    'thank you',
+    'thanks for',
+    'success!', // bare "success" is fine in technical strings, the bang isn't
+    "you're all set",
+    'get started',
+    "let's go",
+  ] as const,
+  // 2. No celebratory / decorative icons. The dialog uses neutral
+  //    receipt-style marks only (FileCheck, Receipt, AlertTriangle,
+  //    CalendarClock, Mail, BellRing, BellOff, RefreshCw, Settings,
+  //    LoadingSpinner). The names below would imply praise / motion.
+  forbiddenIconNames: [
+    'PartyPopper',
+    'Sparkles',
+    'Sparkle',
+    'Confetti',
+    'Trophy',
+    'Award',
+    'Medal',
+    'Star',
+    'Heart',
+    'ThumbsUp',
+    'Rocket',
+    'Crown',
+    'Gift',
+  ] as const,
+  // 3. No emojis. Anywhere. Receipts are text + monochrome glyphs only.
+  //    Detected via the Extended_Pictographic Unicode property.
+  emojiPattern: /\p{Extended_Pictographic}/u,
+  // 4. Clear exits required. The dialog must always render at least one
+  //    affordance whose accessible name dismisses or navigates away.
+  requiredExits: ['Close', 'Manage subscription'] as const,
+} as const;
+
+/**
  * Subset of the `list-checkout-events` row we care about. The full shape lives
  * in `src/pages/BillingHistory.tsx`; we duplicate the slice here to avoid a
  * cross-page import for a tiny structural type.
