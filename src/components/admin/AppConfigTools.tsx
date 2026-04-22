@@ -254,8 +254,8 @@ export function AppConfigTools() {
         </div>
         <p className="text-[9px] font-mono text-muted-foreground/40 leading-relaxed">
           Totals from <code className="text-muted-foreground/55">generation_attempts.estimated_cost_usd</code>.
-          Excludes AI functions that don&apos;t yet log attempts (wallpaper, journal-prompt, suggest-ritual,
-          weekly-digest, monthly-report, admin-library-preview) — guards still fire but the totals here
+          Excludes AI functions that don&apos;t yet log attempts (wallpaper, weekly-digest,
+          monthly-report, admin-library-preview) — guards still fire but the totals here
           under-report until logging is backfilled in the follow-up PR.
         </p>
       </section>

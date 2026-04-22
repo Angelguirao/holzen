@@ -8,6 +8,7 @@ import { useHolzen } from '@/hooks/use-holzen';
 import { useSubscription } from '@/hooks/use-subscription';
 import { useInstallPrompt } from '@/hooks/use-install-prompt';
 import { usePushNotifications } from '@/hooks/use-push-notifications';
+import { PRICING } from '@/lib/pricing';
 import { ThresholdSetting } from '@/components/ThresholdSetting';
 import { ReferralSection } from '@/components/ReferralSection';
 import { Changelog } from '@/components/Changelog';
@@ -102,7 +103,25 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
   const { t } = useTranslation();
   const { user, signOut } = useAuth();
   const { threshold, setThreshold, thresholdDown, setThresholdDown, cumulativeThreshold, setCumulativeThreshold, emailNotifications, setEmailNotifications, companionPrefs, setCompanionPref, reflectionTone, setReflectionTone, reflectionStyle, setReflectionStyle, silentMode, setSilentMode, cooldownHours, setCooldownHours, digestFrequency, setDigestFrequency, customPrompt, setCustomPrompt, quietHoursStart, quietHoursEnd, setQuietHours, streakFreezeDates, useStreakFreeze, firstName, setFirstName, nightReflectionHour, setNightReflectionHour, aiInsightsEnabled, setAiInsightsEnabled, notifyBadges, setNotifyBadges, motivations, setMotivations, mantra, setMantra, currency, setCurrency, language, setLanguage, groundingActivities, setGroundingActivities, profileLoaded } = useHolzen();
-  const { subscribed, loading: subLoading, checkoutLoading, startCheckout, openPortal, monthlyRemaining } = useSubscription();
+  const {
+    subscribed,
+    loading: subLoading,
+    checkoutLoading,
+    startCheckout,
+    openPortal,
+    monthlyRemaining,
+    tier,
+    companionLimit,
+    companionUsed,
+    companionRemaining,
+    wallpaperLimit,
+    wallpaperUsed,
+    wallpaperRemaining,
+    insightsLimit,
+    insightsUsed,
+    insightsRemaining,
+    flexCreditsBalance,
+  } = useSubscription();
   const { canInstall, install } = useInstallPrompt();
   const {
     isSupported: pushSupported,
@@ -876,12 +895,59 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
               {subLoading ? (
                 <p className="text-xs font-mono text-muted-foreground">{t('common.loading')}</p>
               ) : subscribed ? (
-                <button
-                  onClick={openPortal}
-                  className="text-xs font-mono text-muted-foreground underline"
-                >
-                  {t('settings.manageSubscription')}
-                </button>
+                <div className="space-y-3">
+                  <p className="text-sm font-sans text-primary">
+                    {tier === 'pro_plus'
+                      ? t('settings.planProPlus', 'Pro+ plan')
+                      : tier === 'lifetime'
+                      ? t('settings.planLifetime', 'Lifetime plan')
+                      : t('settings.planPro', 'Pro plan')}
+                  </p>
+                  <div className="space-y-2 text-xs font-mono text-muted-foreground">
+                    <p>
+                      {t('settings.allowanceCompanions', 'Companions & guidance')}: {companionUsed}/{companionLimit} ({companionRemaining} {t('settings.remainingLabel', 'left')})
+                    </p>
+                    <p>
+                      {t('settings.allowanceWallpapers', 'Wallpapers')}: {wallpaperUsed}/{wallpaperLimit} ({wallpaperRemaining} {t('settings.remainingLabel', 'left')})
+                    </p>
+                    <p>
+                      {t('settings.allowanceInsights', 'Insights')}: {insightsUsed}/{insightsLimit} ({insightsRemaining} {t('settings.remainingLabel', 'left')})
+                    </p>
+                    <p>
+                      {t('settings.flexCreditsBalance', 'Flex credits')}: {flexCreditsBalance}
+                    </p>
+                  </div>
+                  {tier !== 'lifetime' && (
+                    <div className="grid grid-cols-1 gap-2">
+                      <LoadingButton
+                        onClick={() => startCheckout('flex_pack_s')}
+                        loading={checkoutLoading}
+                        loadingText={t('settings.openingCheckout')}
+                        variant="outline"
+                        className="w-full text-sm font-sans"
+                        size="sm"
+                      >
+                        {t('settings.flexPackSCta', { count: PRICING.flexPackSCredits, defaultValue: 'Buy Flex Pack S · {{count}} credits' })}
+                      </LoadingButton>
+                      <LoadingButton
+                        onClick={() => startCheckout('flex_pack_m')}
+                        loading={checkoutLoading}
+                        loadingText={t('settings.openingCheckout')}
+                        variant="outline"
+                        className="w-full text-sm font-sans"
+                        size="sm"
+                      >
+                        {t('settings.flexPackMCta', { count: PRICING.flexPackMCredits, defaultValue: 'Buy Flex Pack M · {{count}} credits' })}
+                      </LoadingButton>
+                    </div>
+                  )}
+                  <button
+                    onClick={openPortal}
+                    className="text-xs font-mono text-muted-foreground underline"
+                  >
+                    {t('settings.manageSubscription')}
+                  </button>
+                </div>
               ) : (
                 <div className="space-y-2">
                   {monthlyRemaining !== undefined && monthlyRemaining > 0 && (
@@ -895,17 +961,29 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                     </p>
                   )}
                   <p className="text-sm font-sans text-muted-foreground">
-                    {t('settings.pricePerMonth')}
+                    {t('settings.choosePlan', 'Choose your plan')}
                   </p>
-                  <LoadingButton
-                    onClick={startCheckout}
-                    loading={checkoutLoading}
-                    loadingText={t('settings.openingCheckout')}
-                    className="w-full text-base font-sans"
-                    size="sm"
-                  >
-                    {t('pro.upgradeCta')}
-                  </LoadingButton>
+                  <div className="grid grid-cols-1 gap-2">
+                    <LoadingButton
+                      onClick={() => startCheckout('pro')}
+                      loading={checkoutLoading}
+                      loadingText={t('settings.openingCheckout')}
+                      className="w-full text-base font-sans"
+                      size="sm"
+                    >
+                      {t('settings.planProCta', 'Start Pro · $4.99/month')}
+                    </LoadingButton>
+                    <LoadingButton
+                      onClick={() => startCheckout('pro_plus')}
+                      loading={checkoutLoading}
+                      loadingText={t('settings.openingCheckout')}
+                      variant="outline"
+                      className="w-full text-base font-sans"
+                      size="sm"
+                    >
+                      {t('settings.planProPlusCta', 'Start Pro+ · $9.99/month')}
+                    </LoadingButton>
+                  </div>
                 </div>
               )}
             </div>

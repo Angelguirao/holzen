@@ -134,7 +134,7 @@ export default function Library() {
           <h2 className="text-sm font-semibold text-foreground">{t('pro.featureLocked')}</h2>
           <p className="max-w-xs text-sm leading-relaxed text-muted-foreground">{t('pro.desc_library')}</p>
           <button
-            onClick={startCheckout}
+            onClick={() => startCheckout('pro')}
             disabled={checkoutLoading}
             className="group inline-flex items-center gap-1.5 text-sm font-medium underline-offset-4 transition-colors hover:underline disabled:opacity-50"
             style={{ color: '#24B2C8' }}

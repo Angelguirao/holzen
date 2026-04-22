@@ -11,6 +11,8 @@ project_id = "edgbwdecaoottowliimu"
     verify_jwt = false
   [functions.customer-portal]
     verify_jwt = false
+  [functions.stripe-webhook]
+    verify_jwt = false
   [functions.holzen-number]
     verify_jwt = false
   [functions.holzen-reflect]

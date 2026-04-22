@@ -4,6 +4,11 @@ import { sanitizePromptArray } from "../_shared/sanitize.ts";
 import { createAttemptLogger } from "../_shared/observe.ts";
 import { callPerplexityChat, type PerplexityUsage } from "../_shared/perplexity-client.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
+import {
+  consumeAllowanceOrCredits,
+  resolveTierFromProfile,
+  tierLimits,
+} from "../_shared/subscription-entitlements.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -71,6 +76,8 @@ serve(
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
+    const body = await req.json().catch(() => ({} as Record<string, unknown>));
+    const consumeQuota = body.consumeQuota !== false;
 
     // Extract user for tracking
     const { createClient } = await import("https://esm.sh/@supabase/supabase-js@2.57.2");
@@ -95,12 +102,53 @@ serve(
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
+
+      if (consumeQuota) {
+        const { data: profile } = await svcClient
+          .from("profiles")
+          .select("lifetime_access, subscription_status, subscription_tier")
+          .eq("user_id", user.id)
+          .maybeSingle();
+        const tier = resolveTierFromProfile(profile);
+        if (tier === "free") {
+          return new Response(
+            JSON.stringify({
+              error: "AI grounding suggestions are available on paid plans.",
+              code: "ai_action_upgrade_required",
+            }),
+            { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          );
+        }
+        const limits = tierLimits(tier);
+        const quota = await consumeAllowanceOrCredits(svcClient, {
+          userId: user.id,
+          feature: "premium_companion",
+          limit: limits.premium_companion,
+          amount: 1,
+          reason: "companions_overage",
+          source: "suggest-grounding",
+        });
+        if (!quota.allowed) {
+          return new Response(
+            JSON.stringify({
+              error: "You've used this month's AI guidance allowance.",
+              code: "ai_action_quota_exceeded",
+              tier,
+              allowance_limit: quota.limit,
+              allowance_used: quota.used,
+              allowance_remaining: quota.remainingAllowance,
+              credits_balance: quota.creditsBalance,
+              credits_needed: Math.max(0, quota.creditCost - quota.creditsBalance),
+            }),
+            { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          );
+        }
+      }
     }
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const body = await req.json();
     const { context, mood, severity, language } = body;
     // Sanitize user-controlled grounding activities before embedding in prompt
     const groundingActivities = sanitizePromptArray(body.groundingActivities, 10, 100);

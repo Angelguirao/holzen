@@ -27,6 +27,7 @@ interface SubCache {
   insightsLimit: number;
   insightsUsed: number;
   insightsRemaining: number;
+  flexCreditsBalance: number;
   ts: number;
 }
 
@@ -84,6 +85,7 @@ type SubscriptionSnapshot = {
   insightsLimit: number;
   insightsUsed: number;
   insightsRemaining: number;
+  flexCreditsBalance: number;
 };
 
 async function fetchSubscriptionSnapshot(userId: string, force: boolean): Promise<SubscriptionSnapshot> {
@@ -91,6 +93,7 @@ async function fetchSubscriptionSnapshot(userId: string, force: boolean): Promis
     body: force ? { force: true } : undefined,
   });
   if (error) throw error;
+  const apiFlexCreditsBalance = Number(data?.flex_credits_balance) || 0;
 
   if (data?.subscribed) {
     const tier = (data.tier as SubscriptionSnapshot['tier']) || 'pro';
@@ -103,6 +106,7 @@ async function fetchSubscriptionSnapshot(userId: string, force: boolean): Promis
     const insightsLimit = Number(data.monthly_insights_limit) || 0;
     const insightsUsed = Number(data.monthly_insights_used) || 0;
     const insightsRemaining = Math.max(0, Number(data.monthly_insights_remaining) || 0);
+    const flexCreditsBalance = Number(data.flex_credits_balance) || 0;
     writeSubCache({
       subscribed: true,
       tier,
@@ -117,6 +121,7 @@ async function fetchSubscriptionSnapshot(userId: string, force: boolean): Promis
       insightsLimit,
       insightsUsed,
       insightsRemaining,
+      flexCreditsBalance,
       ts: Date.now(),
     });
     return {
@@ -133,6 +138,7 @@ async function fetchSubscriptionSnapshot(userId: string, force: boolean): Promis
       insightsLimit,
       insightsUsed,
       insightsRemaining,
+      flexCreditsBalance,
     };
   }
 
@@ -165,6 +171,7 @@ async function fetchSubscriptionSnapshot(userId: string, force: boolean): Promis
     insightsLimit: 0,
     insightsUsed: 0,
     insightsRemaining: 0,
+    flexCreditsBalance: apiFlexCreditsBalance,
     ts: Date.now(),
   });
   return {
@@ -181,6 +188,7 @@ async function fetchSubscriptionSnapshot(userId: string, force: boolean): Promis
     insightsLimit: 0,
     insightsUsed: 0,
     insightsRemaining: 0,
+    flexCreditsBalance: apiFlexCreditsBalance,
   };
 }
 
@@ -228,6 +236,7 @@ export function useSubscription() {
           insightsLimit: cacheFallback.insightsLimit,
           insightsUsed: cacheFallback.insightsUsed,
           insightsRemaining: cacheFallback.insightsRemaining,
+          flexCreditsBalance: cacheFallback.flexCreditsBalance,
         }
       : undefined);
 
@@ -254,6 +263,7 @@ export function useSubscription() {
   const insightsLimit = effectiveSnapshot?.insightsLimit ?? 0;
   const insightsUsed = effectiveSnapshot?.insightsUsed ?? 0;
   const insightsRemaining = effectiveSnapshot?.insightsRemaining ?? 0;
+  const flexCreditsBalance = effectiveSnapshot?.flexCreditsBalance ?? 0;
   const loading = !!userId && query.isLoading && !query.data;
 
   useEffect(() => {
@@ -270,16 +280,20 @@ export function useSubscription() {
       companionRemaining,
       wallpaperRemaining,
       insightsRemaining,
+      flexCreditsBalance,
     });
-  }, [loading, subscribed, tier, monthlyRemaining, monthlyUsed, companionRemaining, wallpaperRemaining, insightsRemaining]);
+  }, [loading, subscribed, tier, monthlyRemaining, monthlyUsed, companionRemaining, wallpaperRemaining, insightsRemaining, flexCreditsBalance]);
 
-  const startCheckout = useCallback(async (planTier: 'pro' | 'pro_plus' = 'pro') => {
-    holzenLog.subscription('checkout', { action: 'start', planTier });
+  const startCheckout = useCallback(async (target: 'pro' | 'pro_plus' | 'flex_pack_s' | 'flex_pack_m' = 'pro') => {
+    holzenLog.subscription('checkout', { action: 'start', target });
     setCheckoutLoading(true);
     try {
       sessionStorage.setItem(CHECKOUT_RETURN_KEY, String(Date.now()));
+      const isPack = target === 'flex_pack_s' || target === 'flex_pack_m';
       const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: { planTier },
+        body: isPack
+          ? { checkoutKind: target }
+          : { checkoutKind: 'subscription', planTier: target },
       });
       if (error) throw error;
 
@@ -347,6 +361,7 @@ export function useSubscription() {
       insightsLimit: 0,
       insightsUsed: 0,
       insightsRemaining: 0,
+      flexCreditsBalance: 0,
       canReflect: false,
     };
   }
@@ -370,6 +385,7 @@ export function useSubscription() {
     insightsLimit,
     insightsUsed,
     insightsRemaining,
+    flexCreditsBalance,
     canReflect,
   };
 }

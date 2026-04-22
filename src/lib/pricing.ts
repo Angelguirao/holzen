@@ -17,6 +17,9 @@ export const PRICING = {
   /** Included wallpaper generations per month */
   proWallpapers: 5,
   proPlusWallpapers: 15,
+  /** Flex credit packs */
+  flexPackSCredits: 30,
+  flexPackMCredits: 55,
 } as const;
 
 /** Features that require a Pro subscription */

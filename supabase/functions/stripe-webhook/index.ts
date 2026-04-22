@@ -1,0 +1,111 @@
+import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
+import Stripe from "https://esm.sh/stripe@18.5.0";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { withRequestLogging } from "../_shared/with-request-logging.ts";
+import {
+  FLEX_PACK_CREDITS,
+  grantFlexCredits,
+  type FlexPackType,
+} from "../_shared/subscription-entitlements.ts";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers":
+    "authorization, x-client-info, apikey, content-type, stripe-signature, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
+};
+
+function resolvePackCredits(pack: string | null | undefined): number {
+  if (!pack) return 0;
+  if (pack in FLEX_PACK_CREDITS) {
+    return FLEX_PACK_CREDITS[pack as FlexPackType];
+  }
+  return 0;
+}
+
+serve(
+  withRequestLogging("stripe-webhook", async ({ req, log }) => {
+    if (req.method === "OPTIONS") {
+      return new Response("ok", { headers: corsHeaders });
+    }
+    if (req.method !== "POST") {
+      return new Response("Method not allowed", { status: 405, headers: corsHeaders });
+    }
+
+    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
+    const webhookSecret = Deno.env.get("STRIPE_WEBHOOK_SECRET");
+    if (!stripeKey || !webhookSecret) {
+      return new Response(JSON.stringify({ error: "Stripe webhook secrets not configured" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const signature = req.headers.get("stripe-signature");
+    if (!signature) {
+      return new Response(JSON.stringify({ error: "Missing stripe-signature header" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const rawBody = await req.text();
+    const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
+
+    let event: Stripe.Event;
+    try {
+      event = await stripe.webhooks.constructEventAsync(rawBody, signature, webhookSecret);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      return new Response(JSON.stringify({ error: `Invalid signature: ${msg}` }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const svcClient = createClient(
+      Deno.env.get("SUPABASE_URL") ?? "",
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      { auth: { persistSession: false } },
+    );
+
+    if (event.type === "checkout.session.completed" || event.type === "checkout.session.async_payment_succeeded") {
+      const session = event.data.object as Stripe.Checkout.Session;
+      const kind = session.metadata?.checkout_kind ?? null;
+      const packType = session.metadata?.flex_pack_type ?? null;
+      const userId = session.metadata?.user_id ?? session.client_reference_id ?? null;
+
+      if (kind && kind !== "subscription" && packType && userId) {
+        const credits = resolvePackCredits(packType);
+        if (credits > 0) {
+          const grant = await grantFlexCredits(svcClient, {
+            userId,
+            credits,
+            reason: "flex_pack_purchase",
+            source: "stripe_checkout",
+            sourceRef: event.id,
+            metadata: {
+              checkout_session_id: session.id,
+              stripe_event_type: event.type,
+              pack_type: packType,
+            },
+          });
+
+          log("flex credits grant processed", {
+            event_id: event.id,
+            checkout_session_id: session.id,
+            user_id: userId,
+            pack_type: packType,
+            credits,
+            applied: grant.applied,
+            duplicate: grant.duplicate ?? false,
+            balance: grant.balance,
+          });
+        }
+      }
+    }
+
+    return new Response(JSON.stringify({ received: true, type: event.type }), {
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }),
+);

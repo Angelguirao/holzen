@@ -14,6 +14,7 @@ import { useProGate } from '@/hooks/use-pro-gate';
 import { companionFallbacksDisabledClient } from '@/lib/companion-strict';
 import { parseGroundLocationState } from '@/lib/router-location-state';
 import { Textarea } from '@/components/ui/textarea';
+import { parseEdgeFunctionError } from '@/lib/edge-function-error';
 
 type Phase = 'idle' | 'suggestion' | 'timer' | 'checkin' | 'reflect' | 'done';
 
@@ -87,13 +88,27 @@ export default function Ground() {
           : undefined;
 
         const { data, error } = await supabase.functions.invoke('suggest-grounding', {
-          body: { groundingActivities, context, severity, language },
+          body: { groundingActivities, context, severity, language, consumeQuota: true },
         });
 
         const apiError =
           data && typeof data === 'object' && 'error' in data && typeof (data as { error?: unknown }).error === 'string'
             ? (data as { error: string }).error
             : null;
+        const apiCode =
+          data && typeof data === 'object' && 'code' in data && typeof (data as { code?: unknown }).code === 'string'
+            ? (data as { code: string }).code
+            : null;
+
+        if (apiCode === 'ai_action_quota_exceeded' || apiCode === 'ai_action_upgrade_required') {
+          setSuggestionError(apiError ?? t('ground.suggestionFailed'));
+          setActivity('');
+          setSuggestion('');
+          setInsight(null);
+          setArticle(null);
+          setPhase('suggestion');
+          return;
+        }
 
         if (strictNoFallback) {
           if (error || !data || apiError) {
@@ -131,7 +146,17 @@ export default function Ground() {
             }
           } catch { /* ignore */ }
         }
-      } catch {
+      } catch (error) {
+        const parsed = await parseEdgeFunctionError(error);
+        if (parsed.code === 'ai_action_quota_exceeded' || parsed.code === 'ai_action_upgrade_required') {
+          setSuggestionError(parsed.message ?? t('ground.suggestionFailed'));
+          setActivity('');
+          setSuggestion('');
+          setInsight(null);
+          setArticle(null);
+          setPhase('suggestion');
+          return;
+        }
         if (strictNoFallback) {
           setSuggestionError(t('ground.suggestionFailed'));
           setActivity('');

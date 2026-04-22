@@ -6,7 +6,7 @@ import { handleRegenerateOnly } from "../_shared/regenerate-only.ts";
 import { trackEvent } from "../_shared/observe.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import {
-  consumeMonthlyFeatureQuota,
+  consumeAllowanceOrCredits,
   resolveTierFromProfile,
   tierLimits,
 } from "../_shared/subscription-entitlements.ts";
@@ -274,13 +274,14 @@ serve(
         );
       }
 
-      const quota = await consumeMonthlyFeatureQuota(
-        svcClient,
+      const quota = await consumeAllowanceOrCredits(svcClient, {
         userId,
-        "premium_companion",
-        tierQuotaLimits.premium_companion,
-        premiumCompanionUnits,
-      );
+        feature: "premium_companion",
+        limit: tierQuotaLimits.premium_companion,
+        amount: premiumCompanionUnits,
+        reason: "companions_overage",
+        source: "companion-orchestrate",
+      });
       if (!quota.allowed) {
         return new Response(
           JSON.stringify({
@@ -289,7 +290,12 @@ serve(
             tier,
             companion_limit: quota.limit,
             companion_used: quota.used,
-            companion_remaining: quota.remaining,
+            companion_remaining: quota.remainingAllowance,
+            credits_balance: quota.creditsBalance,
+            credits_needed: Math.max(
+              0,
+              (premiumCompanionUnits - quota.remainingAllowance) * quota.creditCost - quota.creditsBalance,
+            ),
           }),
           { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
         );
@@ -299,8 +305,10 @@ serve(
         tier,
         amount: premiumCompanionUnits,
         used: quota.used,
-        remaining: quota.remaining,
+        remaining: quota.remainingAllowance,
         limit: quota.limit,
+        credits_used: quota.creditsUsed,
+        credits_balance: quota.creditsBalance,
       });
     }
 

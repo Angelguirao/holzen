@@ -2,6 +2,11 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { createAttemptLogger } from "../_shared/observe.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
+import {
+  consumeAllowanceOrCredits,
+  resolveTierFromProfile,
+  tierLimits,
+} from "../_shared/subscription-entitlements.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -51,6 +56,45 @@ serve(
         reasoning: "Fallback to standard ritual",
         blocked: guard.reason,
       }), { headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+    const { data: profile } = await svcClient
+      .from("profiles")
+      .select("lifetime_access, subscription_status, subscription_tier")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    const tier = resolveTierFromProfile(profile);
+    if (tier === "free") {
+      return new Response(
+        JSON.stringify({
+          error: "AI ritual generation is available on paid plans.",
+          code: "ai_action_upgrade_required",
+        }),
+        { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+    const limits = tierLimits(tier);
+    const quota = await consumeAllowanceOrCredits(svcClient, {
+      userId: user.id,
+      feature: "premium_companion",
+      limit: limits.premium_companion,
+      amount: 1,
+      reason: "companions_overage",
+      source: "suggest-ritual",
+    });
+    if (!quota.allowed) {
+      return new Response(
+        JSON.stringify({
+          error: "You've used this month's AI guidance allowance.",
+          code: "ai_action_quota_exceeded",
+          tier,
+          allowance_limit: quota.limit,
+          allowance_used: quota.used,
+          allowance_remaining: quota.remainingAllowance,
+          credits_balance: quota.creditsBalance,
+          credits_needed: Math.max(0, quota.creditCost - quota.creditsBalance),
+        }),
+        { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
     }
     const logAttempt = createAttemptLogger(svcClient, { userId: user.id });
     const RITUAL_MODEL = "google/gemini-3-flash-preview";

@@ -4,6 +4,11 @@ import { createAttemptLogger } from "../_shared/observe.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import { EdgeError } from "../_shared/edge-error.ts";
 import { logDependencyCall } from "../_shared/deps.ts";
+import {
+  consumeAllowanceOrCredits,
+  resolveTierFromProfile,
+  tierLimits,
+} from "../_shared/subscription-entitlements.ts";
 
 // Reference migration: this function is one of the three wrapped for the observability
 // rollout (see docs/ops/edge-logging-conventions.md § Migration plan). `withRequestLogging`
@@ -52,6 +57,46 @@ serve(
         "dependency_unavailable",
         guard.reason ?? "Temporarily unavailable",
         guard.status ?? 503
+      );
+    }
+
+    const { data: profile } = await svcClient
+      .from("profiles")
+      .select("lifetime_access, subscription_status, subscription_tier")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    const tier = resolveTierFromProfile(profile);
+    if (tier === "free") {
+      throw new EdgeError(
+        "dependency_unavailable",
+        "AI journal prompts are available on paid plans.",
+        402,
+        { code: "ai_action_upgrade_required" },
+      );
+    }
+    const limits = tierLimits(tier);
+    const quota = await consumeAllowanceOrCredits(svcClient, {
+      userId: user.id,
+      feature: "premium_companion",
+      limit: limits.premium_companion,
+      amount: 1,
+      reason: "companions_overage",
+      source: "journal-prompt",
+    });
+    if (!quota.allowed) {
+      throw new EdgeError(
+        "dependency_unavailable",
+        "You've used this month's AI guidance allowance.",
+        402,
+        {
+          code: "ai_action_quota_exceeded",
+          tier,
+          allowance_limit: quota.limit,
+          allowance_used: quota.used,
+          allowance_remaining: quota.remainingAllowance,
+          credits_balance: quota.creditsBalance,
+          credits_needed: Math.max(0, quota.creditCost - quota.creditsBalance),
+        },
       );
     }
 
