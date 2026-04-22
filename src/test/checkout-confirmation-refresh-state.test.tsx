@@ -144,22 +144,45 @@ describe('CheckoutConfirmation refreshState lifecycle', () => {
     expect(subState.refresh).toHaveBeenCalledTimes(2);
   });
 
-  it('returns to "idle" (banner removed) once the wallet reflects the purchase', async () => {
-    // Pretend the wallet already reflects the smallest flex pack purchase, so
-    // `balanceReflectsPurchase` is true on first render → lifecycle stays idle.
-    subState.flexCreditsBalance = 9_999;
+  it('returns to "idle" (banner removed) once the server reports the grant as applied', async () => {
+    // Make `list-checkout-events` report the grant as applied immediately, so
+    // `balanceReflectsPurchase` is true on first render → lifecycle stays idle
+    // and the lifecycle banner is suppressed.
+    invokeMock.mockResolvedValue({
+      data: {
+        events: [
+          {
+            session_id: 'cs_test_idle',
+            created: Math.floor(Date.now() / 1000),
+            pack_type: 'flex_pack_s',
+            expected_credits: 30,
+            payment_status: 'paid',
+            grant_status: 'applied',
+            granted_credits: 30,
+          },
+        ],
+      },
+      error: null,
+    });
 
     renderAt('/settings?credits=true&pack=flex_pack_s');
 
-    // Dialog mounted but the lifecycle banner is suppressed (idle).
     expect(await screen.findByRole('dialog')).toBeInTheDocument();
-    expect(screen.queryByText(/Updating balance…/i)).not.toBeInTheDocument();
-    expect(
-      screen.queryByText(/Balance is still syncing\. Your credits are safe\./i),
-    ).not.toBeInTheDocument();
-    expect(screen.queryByText(/Could not refresh balance/i)).not.toBeInTheDocument();
 
-    // No persisted lifecycle row should linger when the state is idle.
+    // Wait for the events poll to resolve and flip `grantApplied` → idle.
+    await waitFor(() => {
+      // None of the lifecycle banner's signature affordances should render
+      // when the state is idle. These strings are unique to the banner
+      // (timeout / error branches) and to its retry button.
+      expect(
+        screen.queryByText(/Balance is still syncing\. Your credits are safe\./i),
+      ).not.toBeInTheDocument();
+      expect(screen.queryByText(/Could not refresh balance/i)).not.toBeInTheDocument();
+      expect(screen.queryByRole('button', { name: /Try again/i })).not.toBeInTheDocument();
+    });
+
+    // The lifecycle persistence effect short-circuits on idle, so no
+    // refresh-state row should be written for this confirmation.
     expect(localStorage.getItem('holzen_checkout_refresh_state')).toBeNull();
   });
 });
