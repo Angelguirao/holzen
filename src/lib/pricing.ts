@@ -20,6 +20,9 @@ export const PRICING = {
   /** Flex credit packs */
   flexPackSCredits: 30,
   flexPackMCredits: 55,
+  /** Flex pack prices in USD (one-time) */
+  flexPackSPrice: 2.99,
+  flexPackMPrice: 4.99,
 } as const;
 
 /** Features that require a Pro subscription */
