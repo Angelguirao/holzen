@@ -241,7 +241,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
           // affordance is the way forward. Tagged with a stable id so we don't
           // stack duplicates across StrictMode / fast remounts.
           interventionSkippedRef.current = true;
-          toast('Already loaded for this pause', {
+          sonnerToast('Already loaded for this pause', {
             id: `intervention-skip:${reflectionId}`,
             description: 'Tap "Try again" to fetch a fresh perspective.',
           });
