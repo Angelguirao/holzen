@@ -486,6 +486,11 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
   const retryHistory = useCallback(() => retrySlot('history'), [retrySlot]);
   /** Re-run companion-orchestrate (intervention + reset companion slots). */
   const retryOrchestrate = useCallback(() => {
+    // Clear the per-trigger idempotency guard so the next render can fire a
+    // fresh `companion-orchestrate` call. Without this the user-facing
+    // "Try again" affordance would silently skip due to the marker set on
+    // the previous (failed or stale) attempt.
+    if (reflectionId) resetInterventionIdempotency(reflectionId);
     fetchedSlotsRef.current = new Set();
     setSignal(null); setSignalError(false);
     setNudge(null); setNudgeError(false);
@@ -494,7 +499,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     setIntervention(null); setInterventionError(false);
     setCacheRelaxations(EMPTY_COMPANION_SLOT_RELAXATIONS);
     setRetryCount(c => c + 1);
-  }, []);
+  }, [reflectionId]);
 
   const regenerateCompanion = useCallback(async (slot: RegenerateCompanionSlot) => {
     if (!reflectionId) return;
