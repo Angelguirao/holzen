@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Check, Sparkles, Coins, CalendarClock, TrendingUp, RefreshCw } from 'lucide-react';
+import { Check, Sparkles, Coins, CalendarClock, TrendingUp, RefreshCw, Settings as SettingsIcon } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -186,6 +186,11 @@ export function CheckoutConfirmation() {
 
   const handleClose = () => setMode(null);
 
+  const handleManageSubscription = () => {
+    setMode(null);
+    navigate('/settings');
+  };
+
   /**
    * Manually replays the credit-grant for recent paid flex-pack sessions.
    *
@@ -327,6 +332,16 @@ export function CheckoutConfirmation() {
                 <RefreshCw className="mr-2 h-4 w-4" aria-hidden />
               )}
               Retry credit grant
+            </Button>
+          ) : null}
+          {mode === 'subscription' ? (
+            <Button
+              variant="outline"
+              onClick={handleManageSubscription}
+              className="w-full sm:w-auto"
+            >
+              <SettingsIcon className="mr-2 h-4 w-4" aria-hidden />
+              Manage subscription
             </Button>
           ) : null}
           <Button onClick={handleClose} className="w-full sm:w-auto">
