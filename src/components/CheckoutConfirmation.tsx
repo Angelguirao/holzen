@@ -469,11 +469,17 @@ export function CheckoutConfirmation() {
       refreshTimeoutRef.current = null;
     }
     setMode(null);
-    setRefreshState('idle');
-    setRefreshError(null);
-    refreshAttemptRef.current = 0;
-    stickyBalanceRef.current = null;
-    stickyCreditsAddedRef.current = 0;
+    // NOTE: We intentionally do **not** reset `refreshState`, `refreshError`,
+    // sticky display refs, or the persisted row here. If the user reopens
+    // the dialog within the same confirmation guard window (back-nav with
+    // checkout params, or the guard's re-open path above) we want the same
+    // banner — closing the dialog is not an acknowledgement that the wallet
+    // refresh succeeded. The lifecycle is cleared either when:
+    //   - the wallet catches up and the lifecycle effect flips to `idle`
+    //     (which clears the persisted row), or
+    //   - a fresh guard is written (new checkout), or
+    //   - the 30-min guard window elapses (the next `readConfirmedGuard`
+    //     call drops both the guard and the persisted lifecycle).
   };
 
   /**
