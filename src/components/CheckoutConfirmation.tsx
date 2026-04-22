@@ -160,10 +160,66 @@ export function CheckoutConfirmation() {
 
   const open = mode !== null;
 
-  const expectedCredits = useMemo(() => {
+  // Fallback when the Stripe lookup hasn't completed yet. Always replaced by
+  // the metadata value once `list-checkout-events` returns.
+  const fallbackExpectedCredits = useMemo(() => {
     if (mode === 'flex_pack_m') return PRICING.flexPackMCredits;
     if (mode === 'flex_pack_s') return PRICING.flexPackSCredits;
     return 0;
+  }, [mode]);
+  const expectedCredits = purchasedCredits ?? fallbackExpectedCredits;
+
+  // Resolve the actual purchased credit amount from the most recent paid
+  // checkout session matching this mode. Polls briefly because the session
+  // may not yet be visible to Stripe's list API the instant we redirect back.
+  useEffect(() => {
+    if (!mode || mode === 'subscription') return;
+    let cancelled = false;
+    let attempt = 0;
+    const maxAttempts = 6; // ~ up to 30s with the backoff below
+
+    const tick = async () => {
+      attempt += 1;
+      try {
+        const { data, error } = await supabase.functions.invoke('list-checkout-events');
+        if (error) throw error;
+        const events = (data?.events ?? []) as CheckoutEventLite[];
+        // Most recent paid session for this pack type, by created desc.
+        const match = events
+          .filter(
+            (e) =>
+              e.pack_type === mode &&
+              e.payment_status === 'paid' &&
+              (e.expected_credits > 0 || (e.granted_credits ?? 0) > 0),
+          )
+          .sort((a, b) => b.created - a.created)[0];
+        if (match && !cancelled) {
+          // Prefer the actual granted amount once the webhook applied it
+          // (handles partial grants or future per-session pricing). Otherwise
+          // use the metadata-declared expected amount, which is what Stripe
+          // recorded at checkout time.
+          const authoritative =
+            match.grant_status === 'applied' && (match.granted_credits ?? 0) > 0
+              ? (match.granted_credits as number)
+              : match.expected_credits;
+          setPurchasedCredits(authoritative);
+          setGrantApplied(match.grant_status === 'applied');
+          if (match.grant_status === 'applied') return; // done
+        }
+      } catch {
+        // Best-effort; we'll fall back to PRICING constants until success.
+      }
+      if (cancelled) return;
+      if (attempt < maxAttempts) {
+        // Backoff: 1.5s, 3s, 5s, 8s, 12s, 18s
+        const delays = [1500, 3000, 5000, 8000, 12000, 18000];
+        setTimeout(tick, delays[Math.min(attempt - 1, delays.length - 1)]);
+      }
+    };
+    void tick();
+    return () => {
+      cancelled = true;
+    };
   }, [mode]);
 
   const tierLabel = useMemo(() => {
