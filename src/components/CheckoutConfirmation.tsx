@@ -671,8 +671,7 @@ export function CheckoutConfirmation() {
             </Button>
           ) : null}
           <Button onClick={handleClose} className="w-full sm:w-auto">
-            <Check className="mr-2 h-4 w-4" aria-hidden />
-            Got it
+            Close
           </Button>
         </DialogFooter>
       </DialogContent>
