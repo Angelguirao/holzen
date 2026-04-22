@@ -835,6 +835,10 @@ export function CheckoutConfirmation() {
           />
         ) : null}
 
+        {mode !== null ? (
+          <NotifyDispatchStatus status={notifyStatus} />
+        ) : null}
+
         <DialogFooter className="mt-2">
           {mode !== null && mode !== 'subscription' ? (
             <Button
