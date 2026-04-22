@@ -13,6 +13,15 @@ const SUB_CACHE_KEY = 'holzen_sub_cache';
 /** Next fetch uses `{ force: true }` on check-subscription (window focus, refresh(), etc.). */
 let subscriptionForceNext = false;
 
+/**
+ * Trigger source for the next subscription fetch. Lets us prove in logs whether
+ * a `check-subscription` call came from the user's explicit Refresh button
+ * (`manual_retry`) vs. the initial mount, focus, or interval refetch — so we
+ * can verify back-navigation / param stripping never invokes `manual_retry`.
+ */
+type SubFetchSource = 'mount' | 'manual_retry' | 'focus' | 'interval' | 'invalidate';
+let subscriptionNextFetchSource: SubFetchSource | null = null;
+
 interface SubCache {
   subscribed: boolean;
   tier: 'free' | 'pro' | 'pro_plus' | 'lifetime';
@@ -234,9 +243,15 @@ export function useSubscription() {
     queryFn: async () => {
       let force = subscriptionForceNext;
       subscriptionForceNext = false;
+      // Initial mount = no explicit source set yet AND no cached query data.
+      const source: SubFetchSource =
+        subscriptionNextFetchSource ??
+        (queryClient.getQueryData(['subscription', userId]) ? 'interval' : 'mount');
+      subscriptionNextFetchSource = null;
       if (!force) {
         force = consumeInitialCheckoutForce(userId!);
       }
+      holzenLog.subscription('fetch', { source, force });
       return fetchSubscriptionSnapshot(userId!, force);
     },
   });
@@ -271,6 +286,7 @@ export function useSubscription() {
     if (!userId) return;
     const onFocus = () => {
       subscriptionForceNext = true;
+      subscriptionNextFetchSource = 'focus';
       void queryClient.invalidateQueries({ queryKey: ['subscription', userId] });
     };
     window.addEventListener('focus', onFocus);
@@ -366,9 +382,31 @@ export function useSubscription() {
     }
   }, []);
 
+  /**
+   * Programmatic invalidation used by code paths *other* than the user's
+   * explicit Refresh button (e.g. after a successful checkout, after spending
+   * a credit). Tagged `invalidate` in logs.
+   *
+   * **Do not** call this from focus, visibility, route, or URL-param handlers
+   * — those have their own dedicated source tags (or should not call at all).
+   */
   const refresh = useCallback(() => {
     if (!userId) return Promise.resolve();
     subscriptionForceNext = true;
+    subscriptionNextFetchSource = 'invalidate';
+    return queryClient.invalidateQueries({ queryKey: ['subscription', userId] });
+  }, [userId, queryClient]);
+
+  /**
+   * Dedicated path for the user-visible Retry / Refresh button in the
+   * Credits Dashboard. Tagged `manual_retry` in logs so we can grep and
+   * confirm back-navigation / param stripping never trips this code path.
+   */
+  const manualRetry = useCallback(() => {
+    if (!userId) return Promise.resolve();
+    subscriptionForceNext = true;
+    subscriptionNextFetchSource = 'manual_retry';
+    holzenLog.subscription('manual_retry', { trigger: 'user_click' });
     return queryClient.invalidateQueries({ queryKey: ['subscription', userId] });
   }, [userId, queryClient]);
 
@@ -419,6 +457,7 @@ export function useSubscription() {
       startCheckout,
       openPortal,
       refresh,
+      manualRetry,
       applyOptimisticDecrement,
       monthlyRemaining: undefined,
       monthlyUsed: 0,
@@ -449,6 +488,7 @@ export function useSubscription() {
     startCheckout,
     openPortal,
     refresh,
+    manualRetry,
     applyOptimisticDecrement,
     monthlyRemaining,
     monthlyUsed,
