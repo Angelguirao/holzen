@@ -860,13 +860,18 @@ export function CheckoutConfirmation() {
             mono mark, left-aligned with the title, communicates "this is a
             receipt" without praise or ambient motion.
           */}
-          <div className="mb-2 flex items-center gap-2 text-muted-foreground" aria-hidden>
+          {/*
+            Header mark intentionally lightweight: smaller glyph, lower-contrast
+            foreground, mono caption. Communicates "receipt" as state, not as
+            decoration — no badge, no fill, no colour halo.
+          */}
+          <div className="mb-2 flex items-center gap-1.5 text-muted-foreground/70" aria-hidden>
             {mode === 'subscription' ? (
-              <FileCheck className="h-4 w-4" />
+              <FileCheck className="h-3 w-3" strokeWidth={1.5} />
             ) : (
-              <Receipt className="h-4 w-4" />
+              <Receipt className="h-3 w-3" strokeWidth={1.5} />
             )}
-            <span className="text-xs uppercase tracking-wide">
+            <span className="text-[10px] font-mono uppercase tracking-wider">
               {mode === 'subscription' ? 'Subscription receipt' : 'Credits receipt'}
             </span>
           </div>
