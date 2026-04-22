@@ -48,15 +48,15 @@ type ConfigState = {
 const DEFAULTS: ConfigState = {
   signups_enabled: true,
   signups_max_per_day: null,
-  budget_daily_usd_global: 10,
-  budget_daily_usd_per_user: 1,
-  budget_monthly_usd_global: 300,
+  budget_daily_usd_global: 60,
+  budget_daily_usd_per_user: 2.5,
+  budget_monthly_usd_global: 1800,
   panic_mode: false,
   feature_flags: Object.fromEntries(FEATURE_KEYS.map((k) => [k, true])),
   ai_cost_alert_enabled: true,
   ai_cost_alert_recipients: [],
-  ai_cost_alert_daily_threshold_pct: 80,
-  ai_cost_alert_wow_multiplier: 2,
+  ai_cost_alert_daily_threshold_pct: 70,
+  ai_cost_alert_wow_multiplier: 1.8,
 };
 
 type SpendSnapshot = {
@@ -445,7 +445,7 @@ export function AppConfigTools() {
           />
           <NumberRow
             label="WoW anomaly multiplier"
-            description="Alert when yesterday ≥ this × the 7-day average. 2.0 = doubled overnight."
+            description="Alert when yesterday ≥ this × the 7-day average. 1.8 = material overnight jump."
             value={state.ai_cost_alert_wow_multiplier}
             onChange={(v) =>
               setState((s) => ({

@@ -7,9 +7,9 @@
  *
  * Triggers (any one fires → email sent):
  *   1. Yesterday's global spend >= `ai_cost_alert_daily_threshold_pct` of
- *      `budget_daily_usd_global`. Default threshold 80%.
+ *      `budget_daily_usd_global`. Default threshold 70%.
  *   2. Yesterday's spend >= `ai_cost_alert_wow_multiplier` × 7-day average
- *      (excluding yesterday). Default multiplier 2.0×.
+ *      (excluding yesterday). Default multiplier 1.8×.
  *   3. Month-to-date spend is projected to exceed
  *      `budget_monthly_usd_global` by end of month.
  *
@@ -20,7 +20,7 @@
  * Auth: service role or CRON_SECRET in `Authorization: Bearer …`, per the
  * shared `verifyServiceAuth` pattern.
  *
- * Email: direct Resend API (matches `personalized-nudge`, `weekly-digest`,
+ * Email: Lovable Email API (matches `personalized-nudge`, `weekly-digest`,
  * etc.); plain HTML, no template registry.
  *
  * Runbook: see `docs/systems/costs/ai-cost-model.md` §7.5.
@@ -31,10 +31,10 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import {
-  holzenResendLogger,
-  sendResendBatch,
-  type ResendEmail,
-} from "../_shared/resend.ts";
+  holzenLovableEmailLogger,
+  sendLovableEmailBatch,
+  type LovableEmail,
+} from "../_shared/lovable-email.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -56,10 +56,10 @@ async function loadAlertConfig(sb: any): Promise<AlertConfig> {
   const cfg: AlertConfig = {
     enabled: true,
     recipients: [],
-    dailyThresholdPct: 80,
-    wowMultiplier: 2,
-    dailyCapUsd: 10,
-    monthlyCapUsd: 300,
+    dailyThresholdPct: 70,
+    wowMultiplier: 1.8,
+    dailyCapUsd: 60,
+    monthlyCapUsd: 1800,
   };
   for (const row of (data ?? []) as Array<{ key: string; value: unknown }>) {
     switch (row.key) {
@@ -74,16 +74,16 @@ async function loadAlertConfig(sb: any): Promise<AlertConfig> {
         }
         break;
       case "ai_cost_alert_daily_threshold_pct":
-        cfg.dailyThresholdPct = Number(row.value) || 80;
+        cfg.dailyThresholdPct = Number(row.value) || 70;
         break;
       case "ai_cost_alert_wow_multiplier":
-        cfg.wowMultiplier = Number(row.value) || 2;
+        cfg.wowMultiplier = Number(row.value) || 1.8;
         break;
       case "budget_daily_usd_global":
-        cfg.dailyCapUsd = Number(row.value) || 10;
+        cfg.dailyCapUsd = Number(row.value) || 60;
         break;
       case "budget_monthly_usd_global":
-        cfg.monthlyCapUsd = Number(row.value) || 300;
+        cfg.monthlyCapUsd = Number(row.value) || 1800;
         break;
     }
   }
@@ -303,20 +303,20 @@ async function sendAlert(
   recipients: string[],
   html: string,
   subject: string,
-  resendKey: string,
+  lovableKey: string,
   idempotencyKey: string,
 ): Promise<{ sent: number; errors: number }> {
-  const emails: ResendEmail[] = recipients.map((to) => ({
+  const emails: LovableEmail[] = recipients.map((to) => ({
     from: "Holzen <notify@holzen.app>",
     to: [to],
     subject,
     html,
   }));
-  const batch = await sendResendBatch(emails, {
-    apiKey: resendKey,
+  const batch = await sendLovableEmailBatch(emails, {
+    apiKey: lovableKey,
     source: "ai-cost-alert",
     idempotencyKey,
-    logger: holzenResendLogger(
+    logger: holzenLovableEmailLogger(
       (m, d) => holzenEdgeLog("ai-cost-alert", m, d),
       (m, err) => holzenEdgeError("ai-cost-alert", m, err),
     ),
@@ -379,10 +379,10 @@ serve(
       );
     }
 
-    const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-    if (!RESEND_API_KEY) {
-      holzenEdgeError("ai-cost-alert", "RESEND_API_KEY missing");
-      return new Response(JSON.stringify({ error: "RESEND_API_KEY not configured" }), {
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) {
+      holzenEdgeError("ai-cost-alert", "LOVABLE_API_KEY missing");
+      return new Response(JSON.stringify({ error: "LOVABLE_API_KEY not configured" }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -391,14 +391,14 @@ serve(
     const subject = `Holzen AI cost alert — ${triggers.map((t) => t.kind).join(", ")}`;
     const html = renderHtml(snap, cfg, triggers);
     // One idempotency key per (day, trigger-set). If the cron retries within
-    // 24h with the same triggers, Resend dedupes the batch.
+    // 24h with the same triggers, Lovable dedupes each message.
     const dateKey = new Date().toISOString().slice(0, 10);
     const triggerKinds = triggers.map((t) => t.kind).sort().join("-");
     const { sent, errors } = await sendAlert(
       cfg.recipients,
       html,
       subject,
-      RESEND_API_KEY,
+      LOVABLE_API_KEY,
       `ai-cost-alert:${dateKey}:${triggerKinds}`,
     );
 

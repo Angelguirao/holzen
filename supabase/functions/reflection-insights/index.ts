@@ -7,6 +7,7 @@ import {
   resolveTierFromProfile,
   tierLimits,
 } from "../_shared/subscription-entitlements.ts";
+import { AI_TEMPORARILY_UNAVAILABLE_MESSAGE } from "../_shared/ai-user-messages.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -82,8 +83,12 @@ serve(
       providers: ["lovable"],
     });
     if (!riGuard.allowed) {
+      holzenEdgeLog("reflection-insights", "guard blocked", {
+        reason: riGuard.reason ?? "unknown",
+        tripped: riGuard.tripped ?? null,
+      });
       return new Response(
-        JSON.stringify({ error: riGuard.reason ?? "Temporarily unavailable", processed: 0 }),
+        JSON.stringify({ error: AI_TEMPORARILY_UNAVAILABLE_MESSAGE, processed: 0 }),
         { status: riGuard.status ?? 503, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }

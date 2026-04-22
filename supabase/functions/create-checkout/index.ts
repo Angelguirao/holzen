@@ -9,7 +9,6 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const DEFAULT_PRO_PRICE_ID = "price_1T9142I1yxxxpduPWh7kf9CI";
 const PLAN_TIERS = new Set(["pro", "pro_plus"]);
 const FLEX_PACK_TYPES = new Set<FlexPackType>(["flex_pack_s", "flex_pack_m"]);
 
@@ -54,12 +53,16 @@ serve(
       checkoutKind = "subscription";
     }
 
-    const priceIdPro = Deno.env.get("STRIPE_PRICE_ID_PRO") ?? DEFAULT_PRO_PRICE_ID;
+    const priceIdPro = Deno.env.get("STRIPE_PRICE_ID_PRO");
     const priceIdProPlus = Deno.env.get("STRIPE_PRICE_ID_PRO_PLUS");
     const priceIdPackS = Deno.env.get("STRIPE_PRICE_ID_FLEX_PACK_S");
     const priceIdPackM = Deno.env.get("STRIPE_PRICE_ID_FLEX_PACK_M");
+    if (checkoutKind === "subscription" && requestedTier === "pro_plus" && !priceIdProPlus) {
+      throw new Error("Missing STRIPE_PRICE_ID_PRO_PLUS for pro_plus checkout");
+    }
+
     const selectedPriceId = checkoutKind === "subscription"
-      ? (requestedTier === "pro_plus" && priceIdProPlus ? priceIdProPlus : priceIdPro)
+      ? (requestedTier === "pro_plus" ? priceIdProPlus : priceIdPro)
       : checkoutKind === "flex_pack_s"
         ? priceIdPackS
         : priceIdPackM;

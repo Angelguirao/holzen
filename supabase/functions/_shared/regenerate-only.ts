@@ -25,6 +25,7 @@ import { PROMPT_VERSION as SIGNAL_VERSION } from "./generators/signal.ts";
 import { PROMPT_VERSION as GROUNDING_VERSION } from "./generators/grounding.ts";
 import { PROMPT_VERSION as HISTORY_VERSION } from "./generators/history.ts";
 import { PROMPT_VERSION as ZOOM_OUT_VERSION } from "./generators/zoom-out.ts";
+import { AI_TEMPORARILY_UNAVAILABLE_MESSAGE } from "./ai-user-messages.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -61,8 +62,9 @@ export async function handleRegenerateOnly(params: {
   const limits = tierLimits(tier);
 
   if (appConfig.panic_mode && PANIC_MODE_FEATURES.has("companion_signal")) {
+    log("regenerate blocked by panic mode");
     return new Response(
-      JSON.stringify({ error: "Companion generation is temporarily paused.", panic_mode: true }),
+      JSON.stringify({ error: AI_TEMPORARILY_UNAVAILABLE_MESSAGE, panic_mode: true }),
       { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   }
@@ -114,8 +116,9 @@ export async function handleRegenerateOnly(params: {
     userId,
   });
   if (!budget.allowed) {
+    log(`regenerate blocked by cost ceiling: ${budget.reason ?? "unknown"}`);
     return new Response(
-      JSON.stringify({ error: budget.reason ?? "Budget exceeded", tripped: budget.tripped }),
+      JSON.stringify({ error: AI_TEMPORARILY_UNAVAILABLE_MESSAGE, tripped: budget.tripped }),
       { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   }
@@ -138,9 +141,10 @@ export async function handleRegenerateOnly(params: {
     providerHealth.lovable.state === "degraded";
   if (breakerBlocked) {
     const tripped = providerHealth.lovable.state === "degraded" ? "lovable" : "perplexity";
+    log(`regenerate blocked by breaker_${tripped}`);
     return new Response(
       JSON.stringify({
-        error: `Provider '${tripped}' is temporarily degraded. Please try again in a few minutes.`,
+        error: AI_TEMPORARILY_UNAVAILABLE_MESSAGE,
         tripped: `breaker_${tripped}`,
       }),
       { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } },

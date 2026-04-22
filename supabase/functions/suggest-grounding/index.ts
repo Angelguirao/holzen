@@ -4,6 +4,7 @@ import { sanitizePromptArray } from "../_shared/sanitize.ts";
 import { createAttemptLogger } from "../_shared/observe.ts";
 import { callPerplexityChat, type PerplexityUsage } from "../_shared/perplexity-client.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
+import { AI_TEMPORARILY_UNAVAILABLE_MESSAGE } from "../_shared/ai-user-messages.ts";
 import {
   consumeAllowanceOrCredits,
   resolveTierFromProfile,
@@ -97,7 +98,8 @@ serve(
         providers: ["perplexity", "lovable"],
       });
       if (!guard.allowed) {
-        return new Response(JSON.stringify({ error: guard.reason ?? "Temporarily unavailable" }), {
+        console.warn(`[suggest-grounding] guard blocked: ${guard.reason ?? "unknown"}`);
+        return new Response(JSON.stringify({ error: AI_TEMPORARILY_UNAVAILABLE_MESSAGE }), {
           status: guard.status ?? 503,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });

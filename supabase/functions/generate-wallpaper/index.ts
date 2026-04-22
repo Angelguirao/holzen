@@ -7,6 +7,7 @@ import {
   resolveTierFromProfile,
   tierLimits,
 } from "../_shared/subscription-entitlements.ts";
+import { AI_TEMPORARILY_UNAVAILABLE_MESSAGE } from "../_shared/ai-user-messages.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -86,7 +87,8 @@ serve(
       providers: ["lovable"],
     });
     if (!guard.allowed) {
-      return new Response(JSON.stringify({ error: guard.reason ?? "Wallpaper generation paused" }), {
+      console.warn(`[generate-wallpaper] guard blocked: ${guard.reason ?? "unknown"}`);
+      return new Response(JSON.stringify({ error: AI_TEMPORARILY_UNAVAILABLE_MESSAGE }), {
         status: guard.status ?? 503,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
