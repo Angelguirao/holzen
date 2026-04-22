@@ -618,6 +618,7 @@ export function CheckoutConfirmation() {
     if (mode === 'subscription' && (sub.loading || !sub.subscriptionStatus)) return;
 
     notifySentRef.current = mode;
+    setNotifyStatus(null);
 
     const payload =
       mode === 'subscription'
@@ -649,9 +650,30 @@ export function CheckoutConfirmation() {
 
     void supabase.functions
       .invoke('notify-checkout-confirmation', { body: payload })
+      .then(({ data, error }) => {
+        if (error) {
+          console.warn('[checkout-confirmation] notify failed', error);
+          setNotifyStatus({
+            emailed: false,
+            pushed: 0,
+            failed: true,
+            errorMessage: error.message ?? String(error),
+          });
+          return;
+        }
+        const emailed = Boolean((data as { emailed?: boolean } | null)?.emailed);
+        const pushed = Number((data as { pushed?: number } | null)?.pushed ?? 0);
+        const skipped = (data as { skipped?: string | null } | null)?.skipped ?? null;
+        setNotifyStatus({ emailed, pushed, skipped, failed: false, errorMessage: null });
+      })
       .catch((e) => {
-        // Best-effort — never block the dialog or toast on failure.
         console.warn('[checkout-confirmation] notify failed', e);
+        setNotifyStatus({
+          emailed: false,
+          pushed: 0,
+          failed: true,
+          errorMessage: e instanceof Error ? e.message : String(e),
+        });
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, sub.loading, sub.subscriptionStatus, sub.tier, currentBalance, creditsAdded, projectedBalance]);
