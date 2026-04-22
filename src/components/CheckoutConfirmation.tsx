@@ -101,6 +101,12 @@ export function CheckoutConfirmation() {
 
   const [mode, setMode] = useState<Mode>(null);
   const [retrying, setRetrying] = useState(false);
+  // Per-tab dedup so the suppression status line shows at most once per
+  // guard hit — repeated re-renders of the same suppressed URL don't pile up
+  // duplicate toasts. Cleared implicitly when the tab closes (sessionStorage
+  // semantics aren't needed here; a render-scoped ref suffices because the
+  // suppressing effect only fires once per `location.search` change).
+  const suppressionAnnouncedRef = useRef<string | null>(null);
   // Snapshot the credit balance at the moment the dialog opens so we can show
   // "+N credits" once the refreshed balance comes in.
   const baselineBalanceRef = useRef<number | null>(null);
@@ -156,6 +162,25 @@ export function CheckoutConfirmation() {
         { pathname: location.pathname, search: next ? `?${next}` : '', hash: location.hash },
         { replace: true },
       );
+      // Quiet, non-rewarding status line. The guard intentionally does *not*
+      // re-open the celebratory dialog (refresh / back-nav with stale params
+      // shouldn't re-trigger praise UI), but the user just performed an
+      // action that *looked* like it should have produced a confirmation.
+      // Surfacing a one-liner avoids the silent-failure feeling without
+      // veering into "Welcome back!" territory:
+      //   - neutral `toast.message` (no success colour, no icon)
+      //   - past-tense, descriptive copy ("already shown", not "great job")
+      //   - dedup keyed on the suppressed search string so back-and-forth
+      //     navigation doesn't stack toasts.
+      const dedupeKey = `${detected}:${location.search}`;
+      if (suppressionAnnouncedRef.current !== dedupeKey) {
+        suppressionAnnouncedRef.current = dedupeKey;
+        toast.message('Confirmation already shown for this checkout.', {
+          description: 'Open Settings to review your subscription or credits.',
+          duration: 4000,
+          id: `checkout-suppressed:${detected}`,
+        });
+      }
       return;
     }
     setMode(detected);
