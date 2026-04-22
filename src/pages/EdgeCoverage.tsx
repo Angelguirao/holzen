@@ -102,6 +102,36 @@ export default function EdgeCoverage() {
   const { isAdmin, loading } = useIsAdmin();
   const [q, setQ] = useState("");
   const [filter, setFilter] = useState<"all" | Severity>("all");
+  const [heartbeats, setHeartbeats] = useState<Record<string, string> | null>(null);
+
+  useEffect(() => {
+    if (!isAdmin) return;
+    let cancelled = false;
+    supabase
+      .from("app_config")
+      .select("key,value")
+      .like("key", "heartbeat.%")
+      .then(({ data, error }) => {
+        if (cancelled || error || !data) {
+          if (!cancelled) setHeartbeats({});
+          return;
+        }
+        const map: Record<string, string> = {};
+        for (const row of data as Array<{ key: string; value: unknown }>) {
+          const job = row.key.replace(/^heartbeat\./, "");
+          // value is jsonb — usually a JSON string holding the UUID.
+          const uuid = typeof row.value === "string" ? row.value : String(row.value ?? "");
+          if (job && uuid) map[job] = uuid;
+        }
+        setHeartbeats(map);
+      });
+    return () => { cancelled = true; };
+  }, [isAdmin]);
+
+  const heartbeatCount = useMemo(
+    () => (heartbeats ? Object.keys(heartbeats).length : 0),
+    [heartbeats],
+  );
 
   const rows = useMemo(() => {
     return COVERAGE.map((r) => ({ ...r, sev: severityOf(r) }))
