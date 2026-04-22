@@ -59,6 +59,64 @@ const CHECKOUT_CONFIRMED_KEY = 'holzen_checkout_confirmed';
 const CHECKOUT_STARTED_KEY = 'holzen_checkout_started_at'; // mirrors useSubscription
 const CHECKOUT_CONFIRMED_WINDOW_MS = 30 * 60 * 1000;
 
+/**
+ * Persisted wallet-refresh lifecycle for the *current* confirmation guard.
+ *
+ * Keyed implicitly by the active `holzen_checkout_confirmed` row (`mode + ts`)
+ * — when the guard rolls (new checkout, or 30-min window elapses) we discard
+ * any stale lifecycle so a fresh confirmation always starts from `idle`.
+ *
+ * We persist the user-visible banner state (`updating`/`timeout`/`error`) so
+ * a user who closes the dialog and re-triggers it within the same window
+ * (e.g. back-nav with the same checkout params, or the explicit re-open path
+ * below) sees the same status row instead of a misleading reset to "idle".
+ * Sticky display values are persisted alongside so the shown numbers also
+ * never regress across close/reopen.
+ */
+const CHECKOUT_REFRESH_STATE_KEY = 'holzen_checkout_refresh_state';
+
+type PersistedRefreshState = {
+  guardTs: number;
+  mode: Mode;
+  state: 'idle' | 'updating' | 'timeout' | 'error';
+  error: string | null;
+  attempts: number;
+  stickyBalance: number | null;
+  stickyCreditsAdded: number;
+  baseline: number | null;
+};
+
+function readPersistedRefreshState(
+  guard: { mode: Mode; ts: number } | null,
+): PersistedRefreshState | null {
+  if (!guard) return null;
+  try {
+    const raw = localStorage.getItem(CHECKOUT_REFRESH_STATE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as PersistedRefreshState;
+    // Only honour the persisted row if it belongs to the *current* guard.
+    if (parsed?.guardTs !== guard.ts || parsed?.mode !== guard.mode) {
+      localStorage.removeItem(CHECKOUT_REFRESH_STATE_KEY);
+      return null;
+    }
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function writePersistedRefreshState(next: PersistedRefreshState | null) {
+  try {
+    if (!next) {
+      localStorage.removeItem(CHECKOUT_REFRESH_STATE_KEY);
+      return;
+    }
+    localStorage.setItem(CHECKOUT_REFRESH_STATE_KEY, JSON.stringify(next));
+  } catch {
+    /* ignore */
+  }
+}
+
 function readConfirmedGuard(): { mode: Mode; ts: number } | null {
   try {
     const raw = localStorage.getItem(CHECKOUT_CONFIRMED_KEY);
@@ -173,6 +231,10 @@ export function CheckoutConfirmation() {
   // arriving from a focus-driven refetch a second later.
   const stickyBalanceRef = useRef<number | null>(null);
   const stickyCreditsAddedRef = useRef<number>(0);
+  // Tracks the persisted-guard timestamp the lifecycle state currently
+  // belongs to. Used both as the persistence key and as a hydration guard
+  // (so we don't repeatedly re-hydrate on every render).
+  const activeGuardTsRef = useRef<number | null>(null);
 
   useEffect(() => {
     const detected = detectMode(location.search);
@@ -184,6 +246,11 @@ export function CheckoutConfirmation() {
     const alreadyConfirmed = guard?.mode === detected;
     if (!alreadyConfirmed) {
       writeConfirmedGuard(detected);
+      // Fresh guard → discard any stale persisted lifecycle from an older
+      // confirmation. The fresh row will be written below as the dialog
+      // drives its lifecycle effect.
+      writePersistedRefreshState(null);
+      activeGuardTsRef.current = null;
     }
     if (alreadyConfirmed) {
       const params = new URLSearchParams(location.search);
@@ -201,6 +268,24 @@ export function CheckoutConfirmation() {
       // the persisted-outcome shortcut and burn an edge invocation per
       // refresh / back-nav.
       clearPendingForceRefreshSentinel();
+      // If the previous confirmation left the wallet refresh in a non-idle
+      // state (still updating, timed out, or errored), re-open the dialog
+      // so the user sees the same banner — the refresh outcome is the part
+      // of the confirmation they actually need to act on. Hydrate sticky
+      // numbers from the persisted row so the displayed balance / credits
+      // also don't regress.
+      const persisted = readPersistedRefreshState(guard);
+      if (persisted && persisted.state !== 'idle') {
+        activeGuardTsRef.current = guard.ts;
+        stickyBalanceRef.current = persisted.stickyBalance;
+        stickyCreditsAddedRef.current = persisted.stickyCreditsAdded;
+        baselineBalanceRef.current = persisted.baseline ?? sub.flexCreditsBalance ?? 0;
+        refreshAttemptRef.current = persisted.attempts;
+        setRefreshError(persisted.error);
+        setRefreshState(persisted.state);
+        setMode(detected);
+        return;
+      }
       // Quiet, non-rewarding status line. The guard intentionally does *not*
       // re-open the celebratory dialog (refresh / back-nav with stale params
       // shouldn't re-trigger praise UI), but the user just performed an
@@ -224,6 +309,10 @@ export function CheckoutConfirmation() {
     }
     setMode(detected);
     baselineBalanceRef.current = sub.flexCreditsBalance ?? 0;
+    // Anchor the active guard timestamp so subsequent persistence writes
+    // share the same row. `writeConfirmedGuard` above just wrote
+    // `Date.now()`, so re-read to capture the exact value.
+    activeGuardTsRef.current = readConfirmedGuard()?.ts ?? Date.now();
     // Strip checkout query params; keep path + hash.
     const params = new URLSearchParams(location.search);
     params.delete('subscribed');
@@ -380,11 +469,17 @@ export function CheckoutConfirmation() {
       refreshTimeoutRef.current = null;
     }
     setMode(null);
-    setRefreshState('idle');
-    setRefreshError(null);
-    refreshAttemptRef.current = 0;
-    stickyBalanceRef.current = null;
-    stickyCreditsAddedRef.current = 0;
+    // NOTE: We intentionally do **not** reset `refreshState`, `refreshError`,
+    // sticky display refs, or the persisted row here. If the user reopens
+    // the dialog within the same confirmation guard window (back-nav with
+    // checkout params, or the guard's re-open path above) we want the same
+    // banner — closing the dialog is not an acknowledgement that the wallet
+    // refresh succeeded. The lifecycle is cleared either when:
+    //   - the wallet catches up and the lifecycle effect flips to `idle`
+    //     (which clears the persisted row), or
+    //   - a fresh guard is written (new checkout), or
+    //   - the 30-min guard window elapses (the next `readConfirmedGuard`
+    //     call drops both the guard and the persisted lifecycle).
   };
 
   /**
@@ -410,6 +505,10 @@ export function CheckoutConfirmation() {
     }
     if (balanceReflectsPurchase) {
       setRefreshState('idle');
+      // Wallet caught up — drop the persisted lifecycle so a future
+      // re-arrival within the guard window stays quiet (suppressed toast
+      // path) instead of re-opening a stale "updating" banner.
+      writePersistedRefreshState(null);
       return;
     }
     // Don't downgrade an existing 'error' just because we're still waiting.
@@ -424,6 +523,31 @@ export function CheckoutConfirmation() {
       }
     };
   }, [mode, balanceReflectsPurchase]);
+
+  /**
+   * Persist the wallet-refresh lifecycle (state, error, sticky display
+   * values) so a close + re-open within the same confirmation window
+   * restores the same banner instead of resetting to `idle`. Keyed on the
+   * active guard timestamp so a fresh checkout always starts clean.
+   *
+   * Subscriptions don't drive this lifecycle, so we skip them.
+   */
+  useEffect(() => {
+    if (!mode || mode === 'subscription') return;
+    if (refreshState === 'idle') return; // cleared by the lifecycle effect above
+    const guardTs = activeGuardTsRef.current;
+    if (guardTs === null) return;
+    writePersistedRefreshState({
+      guardTs,
+      mode,
+      state: refreshState,
+      error: refreshError,
+      attempts: refreshAttemptRef.current,
+      stickyBalance: stickyBalanceRef.current,
+      stickyCreditsAdded: stickyCreditsAddedRef.current,
+      baseline: baselineBalanceRef.current,
+    });
+  }, [mode, refreshState, refreshError, projectedBalance, creditsAdded]);
 
   /**
    * User-facing retry: re-invokes the subscription snapshot and surfaces an
