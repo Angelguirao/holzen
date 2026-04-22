@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { CalendarClock, RefreshCw, Settings as SettingsIcon, AlertTriangle, Receipt, FileCheck } from 'lucide-react';
+import { CalendarClock, RefreshCw, Settings as SettingsIcon, AlertTriangle, Receipt, FileCheck, Mail, BellRing, BellOff } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -224,6 +224,17 @@ export function CheckoutConfirmation() {
   const [refreshState, setRefreshState] = useState<'idle' | 'updating' | 'timeout' | 'error'>('idle');
   const [refreshError, setRefreshError] = useState<string | null>(null);
   const refreshTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Notify-channel status for the *current* confirmation. Purely informational —
+  // the dialog never blocks on it. `null` = request still in flight (or not yet
+  // dispatched for a syncing subscription); otherwise the resolved per-channel
+  // outcome from `notify-checkout-confirmation`.
+  const [notifyStatus, setNotifyStatus] = useState<{
+    emailed: boolean;
+    pushed: number;
+    skipped?: string | null;
+    failed: boolean;
+    errorMessage?: string | null;
+  } | null>(null);
   const refreshAttemptRef = useRef(0);
   // Sticky display values. We only ever advance forward (never regress to a
   // smaller balance / "credits added" than what we previously showed) so the
