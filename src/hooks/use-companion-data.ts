@@ -231,6 +231,15 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
           holzenLog.companion('orchestrate intervention skipped (idempotency)', {
             reflection_prefix: reflectionId.slice(0, 8),
           });
+          // Surface a distinct, non-blocking message so the user understands
+          // why nothing is loading on this remount and knows the "Try again"
+          // affordance is the way forward. Tagged with a stable id so we don't
+          // stack duplicates across StrictMode / fast remounts.
+          interventionSkippedRef.current = true;
+          toast('Already loaded for this pause', {
+            id: `intervention-skip:${reflectionId}`,
+            description: 'Tap "Try again" to fetch a fresh perspective.',
+          });
           setInterventionLoading(false);
           return;
         }
