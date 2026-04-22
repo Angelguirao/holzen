@@ -128,6 +128,12 @@ export function CheckoutConfirmation() {
   const [refreshError, setRefreshError] = useState<string | null>(null);
   const refreshTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const refreshAttemptRef = useRef(0);
+  // Sticky display values. We only ever advance forward (never regress to a
+  // smaller balance / "credits added" than what we previously showed) so the
+  // dialog never flickers between an authoritative snapshot and a stale one
+  // arriving from a focus-driven refetch a second later.
+  const stickyBalanceRef = useRef<number | null>(null);
+  const stickyCreditsAddedRef = useRef<number>(0);
 
   useEffect(() => {
     const detected = detectMode(location.search);
