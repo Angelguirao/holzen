@@ -272,10 +272,18 @@ function readConfirmedGuard(): { mode: Mode; ts: number } | null {
 
 function writeConfirmedGuard(mode: Mode) {
   try {
+    const ts = Date.now();
     localStorage.setItem(
       CHECKOUT_CONFIRMED_KEY,
-      JSON.stringify({ mode, ts: Date.now() }),
+      JSON.stringify({ mode, ts }),
     );
+    // Notify sibling tabs so any of them currently rendering the
+    // celebratory dialog (or about to mount with the same checkout query
+    // params) can fold into the suppression path instead of double-firing
+    // `sub.refresh()` and stacking duplicate dialogs.
+    if (mode) {
+      broadcastCheckoutConfirmed({ mode, ts });
+    }
   } catch {
     /* ignore */
   }
