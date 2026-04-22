@@ -1,5 +1,8 @@
 import { useTranslation } from 'react-i18next';
 import { useSubscription } from '@/hooks/use-subscription';
+import { RefreshCw } from 'lucide-react';
+import { useState, useCallback } from 'react';
+import { LoadingButton } from '@/components/ui/loading-button';
 
 /**
  * Compact credits dashboard: shows current Flex credit balance, monthly allowance
@@ -25,7 +28,19 @@ export function CreditsDashboard() {
     insightsRemaining,
     monthlyUsed,
     monthlyRemaining,
+    refresh,
   } = useSubscription();
+
+  const [refreshing, setRefreshing] = useState(false);
+  const handleRefresh = useCallback(async () => {
+    if (refreshing) return;
+    setRefreshing(true);
+    try {
+      await refresh();
+    } finally {
+      setRefreshing(false);
+    }
+  }, [refresh, refreshing]);
 
   if (loading) {
     return (
@@ -83,9 +98,23 @@ export function CreditsDashboard() {
         <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">
           {t('settings.creditsDashboard', 'Credits dashboard')}
         </p>
-        <p className="text-xs font-mono text-muted-foreground">
-          {t('settings.flexBalanceShort', 'Balance')}: <span className="text-foreground">{flexCreditsBalance}</span>
-        </p>
+        <div className="flex items-center gap-2">
+          <p className="text-xs font-mono text-muted-foreground">
+            {t('settings.flexBalanceShort', 'Balance')}: <span className="text-foreground">{flexCreditsBalance}</span>
+          </p>
+          <LoadingButton
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={handleRefresh}
+            loading={refreshing}
+            aria-label={t('common.refresh', 'Refresh')}
+            title={t('common.refresh', 'Refresh')}
+            className="h-7 w-7 p-0 text-muted-foreground"
+          >
+            {!refreshing && <RefreshCw className="h-3.5 w-3.5" />}
+          </LoadingButton>
+        </div>
       </div>
 
       <div className="rounded-md border border-border/40 divide-y divide-border/40">
