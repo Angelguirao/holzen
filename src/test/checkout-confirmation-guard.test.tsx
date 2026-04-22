@@ -15,10 +15,12 @@ import { MemoryRouter } from 'react-router-dom';
  * (a fresh mount with the original `location.search`).
  */
 
-const refreshMock = vi.fn().mockResolvedValue(undefined);
-const navigateMock = vi.fn();
-const toastMessageMock = vi.fn();
-const invokeMock = vi.fn().mockResolvedValue({ data: { events: [] }, error: null });
+const { refreshMock, navigateMock, toastMessageMock, invokeMock } = vi.hoisted(() => ({
+  refreshMock: vi.fn().mockResolvedValue(undefined),
+  navigateMock: vi.fn(),
+  toastMessageMock: vi.fn(),
+  invokeMock: vi.fn().mockResolvedValue({ data: { events: [] }, error: null }),
+}));
 
 vi.mock('@/hooks/use-subscription', () => ({
   useSubscription: () => ({
