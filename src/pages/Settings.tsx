@@ -947,6 +947,14 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                   >
                     {t('settings.manageSubscription')}
                   </button>
+                  <div>
+                    <a
+                      href="/settings/billing-history"
+                      className="text-xs font-mono text-muted-foreground underline"
+                    >
+                      View checkout history
+                    </a>
+                  </div>
                 </div>
               ) : (
                 <div className="space-y-2">
