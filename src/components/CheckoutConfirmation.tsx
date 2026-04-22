@@ -231,6 +231,10 @@ export function CheckoutConfirmation() {
   // arriving from a focus-driven refetch a second later.
   const stickyBalanceRef = useRef<number | null>(null);
   const stickyCreditsAddedRef = useRef<number>(0);
+  // Tracks the persisted-guard timestamp the lifecycle state currently
+  // belongs to. Used both as the persistence key and as a hydration guard
+  // (so we don't repeatedly re-hydrate on every render).
+  const activeGuardTsRef = useRef<number | null>(null);
 
   useEffect(() => {
     const detected = detectMode(location.search);
