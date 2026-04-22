@@ -319,6 +319,8 @@ export function CheckoutConfirmation() {
     setRefreshState('idle');
     setRefreshError(null);
     refreshAttemptRef.current = 0;
+    stickyBalanceRef.current = null;
+    stickyCreditsAddedRef.current = 0;
   };
 
   /**
