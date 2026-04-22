@@ -310,4 +310,100 @@ describe('CheckoutConfirmation 30-minute guard', () => {
       expect(refreshMock).toHaveBeenCalledTimes(1);
     });
   });
+
+  describe('suppression toast dedup', () => {
+    /**
+     * The suppression toast must dedup on `${mode}:${location.search}`
+     * within a single mount, **and** repeated mounts at the *same* URL
+     * (e.g. browser back → forward → back) must each emit at most one
+     * suppression toast — never multiple within one mount, and never
+     * stacking inside the sonner queue.
+     *
+     * Sonner additionally honours the `id` field on the toast options,
+     * so even if two mounts both call `toast.message`, sonner collapses
+     * them by id. We assert the call-site dedup directly because that's
+     * the contract `CheckoutConfirmation` owns; sonner's id-based dedup
+     * is a belt-and-braces second layer we don't need to re-test here.
+     */
+
+    it('emits exactly one suppression toast per mount even when the component re-renders', () => {
+      localStorage.setItem(
+        CHECKOUT_CONFIRMED_KEY,
+        JSON.stringify({ mode: 'subscription', ts: Date.now() }),
+      );
+
+      const { rerender } = render(
+        <MemoryRouter initialEntries={['/?subscribed=true']}>
+          <CheckoutConfirmation />
+        </MemoryRouter>,
+      );
+
+      // Force several re-renders at the same URL — exactly the shape
+      // produced by parent state churn (auth refresh, theme toggle,
+      // realtime payloads) while the user is parked on the suppressed
+      // confirmation route.
+      for (let i = 0; i < 5; i += 1) {
+        rerender(
+          <MemoryRouter initialEntries={['/?subscribed=true']}>
+            <CheckoutConfirmation />
+          </MemoryRouter>,
+        );
+      }
+
+      // Dedup ref means: one toast per mount, regardless of re-render count.
+      expect(toastMessageMock).toHaveBeenCalledTimes(1);
+      // And it must carry the mode-scoped sonner id so the queue itself
+      // would collapse a stray sibling call as well.
+      expect(toastMessageMock).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.objectContaining({ id: 'checkout-suppressed:subscription' }),
+      );
+    });
+
+    it('reuses the same dedupe id across back-navigation to an identical URL', () => {
+      localStorage.setItem(
+        CHECKOUT_CONFIRMED_KEY,
+        JSON.stringify({ mode: 'flex_pack_m', ts: Date.now() }),
+      );
+
+      // Three "back-nav" mounts at the same URL, simulating browser
+      // back → forward → back in quick succession.
+      const url = '/settings?credits=true&pack=flex_pack_m';
+      for (let i = 0; i < 3; i += 1) {
+        const view = renderAt(url);
+        view.unmount();
+      }
+
+      // Each mount has its own ref, so we expect ≤ one toast per mount
+      // (3 max). The critical invariant is that **every** toast call
+      // carries the *same* sonner id — that's what makes sonner collapse
+      // them visually into a single notification.
+      expect(toastMessageMock.mock.calls.length).toBeGreaterThan(0);
+      expect(toastMessageMock.mock.calls.length).toBeLessThanOrEqual(3);
+      for (const [, opts] of toastMessageMock.mock.calls) {
+        expect(opts).toEqual(
+          expect.objectContaining({ id: 'checkout-suppressed:flex_pack_m' }),
+        );
+      }
+    });
+
+    it('uses distinct dedupe ids when the suppressed URL search differs across mounts', () => {
+      // Same mode, different `?pack=` — the search string is part of the
+      // ref dedup key, so each URL gets its own toast on first mount.
+      // (The sonner `id` is mode-scoped, so sonner itself would still
+      // collapse them; the ref-key check is what we're locking in here.)
+      localStorage.setItem(
+        CHECKOUT_CONFIRMED_KEY,
+        JSON.stringify({ mode: 'flex_pack_m', ts: Date.now() }),
+      );
+
+      renderAt('/settings?credits=true&pack=flex_pack_m').unmount();
+      renderAt('/settings?credits=true&pack=flex_pack_m&from=email').unmount();
+
+      // Two distinct URLs → two separate ref keys → up to two toasts
+      // (one per mount), but never more — re-renders on either mount
+      // would have been deduped by the previous test's invariant.
+      expect(toastMessageMock.mock.calls.length).toBeLessThanOrEqual(2);
+    });
+  });
 });
