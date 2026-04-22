@@ -88,3 +88,5 @@ project_id = "edgbwdecaoottowliimu"
     verify_jwt = false
   [functions.handle-email-suppression]
     verify_jwt = false
+  [functions.admin-check-stripe-prices]
+    verify_jwt = true
