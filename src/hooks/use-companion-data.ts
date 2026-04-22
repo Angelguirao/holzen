@@ -360,7 +360,24 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
   const fetchCompanion = useCallback(async (slot: RegenerateCompanionSlot) => {
     if (!reflectionId) return;
     if (fetchedSlotsRef.current.has(slot)) return;
+
+    // Mirror the regenerate paywall: free users get the standard upgrade
+    // toast; Pro users with neither bucket nor flex credits left get the
+    // limit-reached toast. Without this gate the very first card tap
+    // surfaced a generic "Companion unavailable" toast even though the
+    // edge function was returning a paywall code.
+    if (!isPro) {
+      requirePro('companions');
+      return;
+    }
+    if (isPaidLimitReached({ remaining: companionRemaining, flexCreditsBalance })) {
+      showLimitReachedToast({ feature: 'companion', startCheckout });
+      return;
+    }
+
     fetchedSlotsRef.current.add(slot);
+    // Reflect the spend instantly; refresh below reconciles with the server.
+    applyOptimisticDecrement('companion');
 
     const setLoading = (v: boolean) => {
       if (slot === 'signal') setSignalLoading(v);
