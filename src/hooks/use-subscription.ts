@@ -86,6 +86,10 @@ type SubscriptionSnapshot = {
   insightsUsed: number;
   insightsRemaining: number;
   flexCreditsBalance: number;
+  subscriptionStatus: string | null;
+  subscriptionEnd: string | null;
+  trialStart: string | null;
+  trialEnd: string | null;
 };
 
 async function fetchSubscriptionSnapshot(userId: string, force: boolean): Promise<SubscriptionSnapshot> {
@@ -107,6 +111,10 @@ async function fetchSubscriptionSnapshot(userId: string, force: boolean): Promis
     const insightsUsed = Number(data.monthly_insights_used) || 0;
     const insightsRemaining = Math.max(0, Number(data.monthly_insights_remaining) || 0);
     const flexCreditsBalance = Number(data.flex_credits_balance) || 0;
+    const subscriptionStatus = (data.subscription_status as string) ?? null;
+    const subscriptionEnd = (data.subscription_end as string) ?? null;
+    const trialStart = (data.trial_start as string) ?? null;
+    const trialEnd = (data.trial_end as string) ?? null;
     writeSubCache({
       subscribed: true,
       tier,
@@ -139,6 +147,10 @@ async function fetchSubscriptionSnapshot(userId: string, force: boolean): Promis
       insightsUsed,
       insightsRemaining,
       flexCreditsBalance,
+      subscriptionStatus,
+      subscriptionEnd,
+      trialStart,
+      trialEnd,
     };
   }
 
@@ -189,6 +201,10 @@ async function fetchSubscriptionSnapshot(userId: string, force: boolean): Promis
     insightsUsed: 0,
     insightsRemaining: 0,
     flexCreditsBalance: apiFlexCreditsBalance,
+    subscriptionStatus: null,
+    subscriptionEnd: null,
+    trialStart: null,
+    trialEnd: null,
   };
 }
 
@@ -237,6 +253,10 @@ export function useSubscription() {
           insightsUsed: cacheFallback.insightsUsed,
           insightsRemaining: cacheFallback.insightsRemaining,
           flexCreditsBalance: cacheFallback.flexCreditsBalance,
+          subscriptionStatus: null,
+          subscriptionEnd: null,
+          trialStart: null,
+          trialEnd: null,
         }
       : undefined);
 
@@ -264,6 +284,10 @@ export function useSubscription() {
   const insightsUsed = effectiveSnapshot?.insightsUsed ?? 0;
   const insightsRemaining = effectiveSnapshot?.insightsRemaining ?? 0;
   const flexCreditsBalance = effectiveSnapshot?.flexCreditsBalance ?? 0;
+  const subscriptionStatus = effectiveSnapshot?.subscriptionStatus ?? null;
+  const subscriptionEnd = effectiveSnapshot?.subscriptionEnd ?? null;
+  const trialStart = effectiveSnapshot?.trialStart ?? null;
+  const trialEnd = effectiveSnapshot?.trialEnd ?? null;
   const loading = !!userId && query.isLoading && !query.data;
 
   useEffect(() => {
@@ -363,6 +387,10 @@ export function useSubscription() {
       insightsRemaining: 0,
       flexCreditsBalance: 0,
       canReflect: false,
+      subscriptionStatus: null,
+      subscriptionEnd: null,
+      trialStart: null,
+      trialEnd: null,
     };
   }
 
@@ -387,5 +415,9 @@ export function useSubscription() {
     insightsRemaining,
     flexCreditsBalance,
     canReflect,
+    subscriptionStatus,
+    subscriptionEnd,
+    trialStart,
+    trialEnd,
   };
 }
