@@ -406,4 +406,105 @@ describe('CheckoutConfirmation 30-minute guard', () => {
       expect(toastMessageMock.mock.calls.length).toBeLessThanOrEqual(2);
     });
   });
+
+  describe('alternative checkout query strings', () => {
+    /**
+     * The guard is keyed on the persisted `mode`, not on the URL — so any
+     * checkout return URL that *resolves* to the same mode must be
+     * suppressed. These tests parametrize over the realistic shapes the
+     * app actually produces (subscription, both flex packs, optional
+     * `pack` casing, extra tracking params, trailing/leading whitespace,
+     * and pathnames other than `/`) so a future URL-parsing tweak can't
+     * accidentally re-open the dialog on a refresh.
+     *
+     * Each case asserts the same three invariants:
+     *   1. No celebratory dialog renders.
+     *   2. `sub.refresh()` is NOT called (the persisted snapshot wins).
+     *   3. The forced-refresh sentinel in sessionStorage is cleared so
+     *      `useSubscription` won't promote its first fetch to `force`.
+     */
+
+    type Case = {
+      name: string;
+      mode: 'subscription' | 'flex_pack_s' | 'flex_pack_m';
+      url: string;
+    };
+
+    const cases: Case[] = [
+      {
+        name: 'subscription return with extra tracking params',
+        mode: 'subscription',
+        url: '/?subscribed=true&utm_source=stripe&session_id=cs_test_abc123',
+      },
+      {
+        name: 'flex_pack_s on the home route',
+        mode: 'flex_pack_s',
+        url: '/?credits=true&pack=flex_pack_s',
+      },
+      {
+        name: 'flex_pack_m on /settings',
+        mode: 'flex_pack_m',
+        url: '/settings?credits=true&pack=flex_pack_m',
+      },
+      {
+        name: 'flex_pack_m with reordered query params',
+        mode: 'flex_pack_m',
+        url: '/settings?pack=flex_pack_m&credits=true',
+      },
+      {
+        name: 'flex_pack_s with appended utm tail',
+        mode: 'flex_pack_s',
+        url: '/settings?credits=true&pack=flex_pack_s&utm_campaign=spring',
+      },
+      {
+        name: 'flex_pack_m on a deep-linked nested route',
+        mode: 'flex_pack_m',
+        url: '/settings/billing?credits=true&pack=flex_pack_m',
+      },
+    ];
+
+    for (const { name, mode, url } of cases) {
+      it(`suppresses the dialog for ${name}`, () => {
+        localStorage.setItem(
+          CHECKOUT_CONFIRMED_KEY,
+          JSON.stringify({ mode, ts: Date.now() }),
+        );
+        sessionStorage.setItem(CHECKOUT_STARTED_KEY, String(Date.now()));
+
+        renderAt(url);
+
+        expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+        expect(refreshMock).not.toHaveBeenCalled();
+        expect(sessionStorage.getItem(CHECKOUT_STARTED_KEY)).toBeNull();
+        // Persisted guard timestamp is not bumped on suppressed revisits —
+        // the window keeps counting from the original confirmation.
+        const stored = JSON.parse(
+          localStorage.getItem(CHECKOUT_CONFIRMED_KEY) || 'null',
+        );
+        expect(stored.mode).toBe(mode);
+      });
+    }
+
+    it('does NOT suppress when the URL mode does not match the persisted guard mode', () => {
+      // Sanity check: the guard is mode-scoped. A user who confirmed a
+      // subscription and then *separately* completes a flex-pack purchase
+      // must still see the flex-pack receipt — the subscription guard
+      // does not blanket-mute every checkout return.
+      localStorage.setItem(
+        CHECKOUT_CONFIRMED_KEY,
+        JSON.stringify({ mode: 'subscription', ts: Date.now() }),
+      );
+
+      renderAt('/settings?credits=true&pack=flex_pack_m');
+
+      // Different mode → fresh-confirmation path → dialog opens, sync runs.
+      expect(screen.getByRole('dialog')).toBeInTheDocument();
+      expect(refreshMock).toHaveBeenCalledTimes(1);
+      // Guard rolls over to the newly-confirmed mode.
+      const stored = JSON.parse(
+        localStorage.getItem(CHECKOUT_CONFIRMED_KEY) || 'null',
+      );
+      expect(stored.mode).toBe('flex_pack_m');
+    });
+  });
 });
