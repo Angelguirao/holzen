@@ -236,6 +236,14 @@ export function CheckoutConfirmation() {
     errorMessage?: string | null;
   } | null>(null);
   const refreshAttemptRef = useRef(0);
+  // Mirror of `refreshAttemptRef` for rendering (refs don't trigger re-renders).
+  // Bumped in lock-step inside `handleRetryRefresh` so the banner can show
+  // "Attempt N/MAX" without us having to thread a derived value through props.
+  const [refreshAttempt, setRefreshAttempt] = useState(0);
+  // Hard cap on user-initiated retries within a single confirmation window.
+  // Matches the implicit ceiling already enforced by the backoff polling
+  // (`maxAttempts = 6`) but applies to the *manual* "Try again" button only.
+  const MAX_REFRESH_RETRIES = 3;
   // Sticky display values. We only ever advance forward (never regress to a
   // smaller balance / "credits added" than what we previously showed) so the
   // dialog never flickers between an authoritative snapshot and a stale one
