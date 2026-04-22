@@ -44,6 +44,7 @@ const Ground = lazy(() => import("./pages/Ground"));
 const GroundHistory = lazy(() => import("./pages/GroundHistory"));
 const Admin = lazy(() => import("./pages/Admin"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
+const BillingHistory = lazy(() => import("./pages/BillingHistory"));
 
 const queryClient = createHolzenQueryClient();
 
@@ -144,6 +145,7 @@ const App = () => (
                   <Route path="/history" element={<Navigate to="/library" replace />} />
                   <Route path="/profile" element={<Profile />} />
                   <Route path="/settings" element={<Settings />} />
+                  <Route path="/settings/billing-history" element={<BillingHistory />} />
                 </Route>
                 {/* Immersive full-screen experiences — no nav bar */}
                 <Route path="/pause" element={<ProtectedRoute><PauseSession /></ProtectedRoute>} />
