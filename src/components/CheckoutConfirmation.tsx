@@ -1074,7 +1074,7 @@ function RefreshStatusBanner({
       >
         <span className="flex items-center gap-2">
           <AlertTriangle className="h-3.5 w-3.5 text-muted-foreground" aria-hidden />
-          Balance is still syncing. Your credits are safe.
+          Balance not yet updated. Credits are recorded server-side.
           {attemptLabel ? (
             <span className="ml-1 opacity-70">(attempt {attemptLabel})</span>
           ) : null}
@@ -1103,9 +1103,9 @@ function RefreshStatusBanner({
       <span className="flex items-center gap-2">
         <AlertTriangle className="h-3.5 w-3.5" aria-hidden />
         <span>
-          Could not refresh balance
+          Balance refresh failed
           {errorMessage ? <span className="ml-1 opacity-70">({errorMessage})</span> : null}
-          . Your credits are still safe.
+          . Credits remain recorded server-side.
           {attemptLabel ? (
             <span className="ml-1 opacity-70">(attempt {attemptLabel})</span>
           ) : null}
