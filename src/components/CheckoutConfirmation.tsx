@@ -34,22 +34,39 @@ type CheckoutEventLite = {
 };
 
 /**
- * Session-scoped guard so refreshing or hitting Back within the same checkout
- * redirect window doesn't re-open the confirmation dialog. Keyed by mode +
- * a short time bucket so a genuinely new checkout (different params arriving
- * later) still triggers a fresh confirmation.
+ * Persistent guard for the most-recently-confirmed checkout outcome.
+ *
+ * We persist `{ mode, ts }` to **`localStorage`** (not `sessionStorage`) so a
+ * user who closes the tab and returns within `CHECKOUT_CONFIRMED_WINDOW_MS`
+ * — e.g. clicked the Stripe email receipt 10 minutes later, or just hit
+ * back-and-forward in a fresh tab — still gets a quiet confirmation
+ * suppression instead of a re-opened celebratory dialog *and* a redundant
+ * `sub.refresh()` round-trip.
+ *
+ * The window is intentionally bounded (30 min) so a genuinely new checkout
+ * later in the day still triggers a fresh confirmation.
+ *
+ * Suppression effects (both, when the guard hits):
+ *   1. Dialog is not re-opened — `setMode` is never called.
+ *   2. Underlying sync requests are skipped:
+ *        - the in-component `sub.refresh()` (line ~204) is bypassed,
+ *        - the `useSubscription` hook's initial checkout-return force flag
+ *          (`holzen_checkout_started_at`) is cleared so its first fetch
+ *          uses the cached snapshot instead of hitting `check-subscription`
+ *          with `{ force: true }`.
  */
 const CHECKOUT_CONFIRMED_KEY = 'holzen_checkout_confirmed';
+const CHECKOUT_STARTED_KEY = 'holzen_checkout_started_at'; // mirrors useSubscription
 const CHECKOUT_CONFIRMED_WINDOW_MS = 30 * 60 * 1000;
 
 function readConfirmedGuard(): { mode: Mode; ts: number } | null {
   try {
-    const raw = sessionStorage.getItem(CHECKOUT_CONFIRMED_KEY);
+    const raw = localStorage.getItem(CHECKOUT_CONFIRMED_KEY);
     if (!raw) return null;
     const parsed = JSON.parse(raw) as { mode: Mode; ts: number };
     if (!parsed || typeof parsed.ts !== 'number') return null;
     if (Date.now() - parsed.ts > CHECKOUT_CONFIRMED_WINDOW_MS) {
-      sessionStorage.removeItem(CHECKOUT_CONFIRMED_KEY);
+      localStorage.removeItem(CHECKOUT_CONFIRMED_KEY);
       return null;
     }
     return parsed;
@@ -60,10 +77,26 @@ function readConfirmedGuard(): { mode: Mode; ts: number } | null {
 
 function writeConfirmedGuard(mode: Mode) {
   try {
-    sessionStorage.setItem(
+    localStorage.setItem(
       CHECKOUT_CONFIRMED_KEY,
       JSON.stringify({ mode, ts: Date.now() }),
     );
+  } catch {
+    /* ignore */
+  }
+}
+
+/**
+ * When the guard suppresses a confirmation we also want to make sure the
+ * `useSubscription` hook does not still issue a `check-subscription` call
+ * with `{ force: true }` on its first fetch (its initial-checkout sweep
+ * looks at `sessionStorage[CHECKOUT_STARTED_KEY]`). Clearing it here keeps
+ * the suppressed return path fully sync-free — the cached snapshot from
+ * the original confirmation is authoritative.
+ */
+function clearPendingForceRefreshSentinel() {
+  try {
+    sessionStorage.removeItem(CHECKOUT_STARTED_KEY);
   } catch {
     /* ignore */
   }
