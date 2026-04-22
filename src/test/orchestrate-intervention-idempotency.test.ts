@@ -129,4 +129,42 @@ describe('orchestrate intervention idempotency', () => {
     expect(() => resetInterventionIdempotency('never-seen')).not.toThrow();
     expect(hasInvokedIntervention('')).toBe(false);
   });
+
+  it('emits idempotency + latency metrics', async () => {
+    const factory = vi.fn().mockResolvedValue({ ok: true });
+    await runOnceIntervention('r-1', factory);
+
+    // First call → exactly one latency event (success).
+    const latency = trackEvent.mock.calls.find(
+      ([name]) => name === 'intervention_first_call_latency',
+    );
+    expect(latency?.[1]).toMatchObject({ outcome: 'success' });
+    expect(typeof latency?.[1]?.latency_ms).toBe('number');
+
+    // Subsequent gate read → skip event (sessionStorage layer).
+    trackEvent.mockClear();
+    expect(hasInvokedIntervention('r-1')).toBe(true);
+    expect(trackEvent).toHaveBeenCalledWith(
+      'intervention_idempotency_skip',
+      expect.objectContaining({ layer: 'session_storage' }),
+    );
+  });
+
+  it('emits a dedup metric when a concurrent caller joins the in-flight Promise', async () => {
+    let resolveFactory: (v: { ok: boolean }) => void = () => {};
+    const factory = vi.fn(
+      () => new Promise<{ ok: boolean }>((r) => { resolveFactory = r; }),
+    );
+
+    const a = runOnceIntervention('r-2', factory);
+    const b = runOnceIntervention('r-2', factory);
+
+    expect(trackEvent).toHaveBeenCalledWith(
+      'intervention_idempotency_dedup',
+      expect.objectContaining({ reflection_prefix: 'r-2' }),
+    );
+
+    resolveFactory({ ok: true });
+    await Promise.all([a, b]);
+  });
 });
