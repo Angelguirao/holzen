@@ -29,7 +29,10 @@ describe('sweepStaleCheckoutGuards', () => {
       REFRESH_STATE_KEY,
       JSON.stringify({ guardTs: ts, mode: 'subscription', state: 'idle' }),
     );
-    sessionStorage.setItem(
+    // Idempotency row was promoted from sessionStorage → localStorage so a
+    // sibling tab opening the same checkout-success URL doesn't double-fire
+    // the mount-slot `sub.refresh()`. Cleanup must follow it.
+    localStorage.setItem(
       REFRESH_IDEMPOTENCY_KEY,
       JSON.stringify({ guardTs: ts, mode: 'subscription', fired: ['mount'] }),
     );
@@ -40,7 +43,7 @@ describe('sweepStaleCheckoutGuards', () => {
     expect(report.removed).toEqual([]);
     expect(localStorage.getItem(CONFIRMED_KEY)).not.toBeNull();
     expect(localStorage.getItem(REFRESH_STATE_KEY)).not.toBeNull();
-    expect(sessionStorage.getItem(REFRESH_IDEMPOTENCY_KEY)).not.toBeNull();
+    expect(localStorage.getItem(REFRESH_IDEMPOTENCY_KEY)).not.toBeNull();
     expect(sessionStorage.getItem(STARTED_KEY)).not.toBeNull();
   });
 
@@ -51,7 +54,7 @@ describe('sweepStaleCheckoutGuards', () => {
       REFRESH_STATE_KEY,
       JSON.stringify({ guardTs: expiredTs, mode: 'subscription', state: 'idle' }),
     );
-    sessionStorage.setItem(
+    localStorage.setItem(
       REFRESH_IDEMPOTENCY_KEY,
       JSON.stringify({ guardTs: expiredTs, mode: 'subscription', fired: ['mount'] }),
     );
@@ -61,7 +64,7 @@ describe('sweepStaleCheckoutGuards', () => {
 
     expect(localStorage.getItem(CONFIRMED_KEY)).toBeNull();
     expect(localStorage.getItem(REFRESH_STATE_KEY)).toBeNull();
-    expect(sessionStorage.getItem(REFRESH_IDEMPOTENCY_KEY)).toBeNull();
+    expect(localStorage.getItem(REFRESH_IDEMPOTENCY_KEY)).toBeNull();
     expect(sessionStorage.getItem(STARTED_KEY)).toBeNull();
     expect(report.removed).toContain(CONFIRMED_KEY);
     expect(report.removed).toContain(REFRESH_STATE_KEY);
@@ -75,7 +78,7 @@ describe('sweepStaleCheckoutGuards', () => {
       REFRESH_STATE_KEY,
       JSON.stringify({ guardTs: orphanTs, mode: 'subscription', state: 'idle' }),
     );
-    sessionStorage.setItem(
+    localStorage.setItem(
       REFRESH_IDEMPOTENCY_KEY,
       JSON.stringify({ guardTs: orphanTs, mode: 'subscription', fired: [] }),
     );
@@ -83,20 +86,20 @@ describe('sweepStaleCheckoutGuards', () => {
     sweepStaleCheckoutGuards();
 
     expect(localStorage.getItem(REFRESH_STATE_KEY)).toBeNull();
-    expect(sessionStorage.getItem(REFRESH_IDEMPOTENCY_KEY)).toBeNull();
+    expect(localStorage.getItem(REFRESH_IDEMPOTENCY_KEY)).toBeNull();
   });
 
   it('removes malformed JSON in any guard slot defensively', () => {
     localStorage.setItem(CONFIRMED_KEY, '{not json');
     localStorage.setItem(REFRESH_STATE_KEY, 'also bad');
-    sessionStorage.setItem(REFRESH_IDEMPOTENCY_KEY, 'nope');
+    localStorage.setItem(REFRESH_IDEMPOTENCY_KEY, 'nope');
     sessionStorage.setItem(STARTED_KEY, 'NaN-ish');
 
     sweepStaleCheckoutGuards();
 
     expect(localStorage.getItem(CONFIRMED_KEY)).toBeNull();
     expect(localStorage.getItem(REFRESH_STATE_KEY)).toBeNull();
-    expect(sessionStorage.getItem(REFRESH_IDEMPOTENCY_KEY)).toBeNull();
+    expect(localStorage.getItem(REFRESH_IDEMPOTENCY_KEY)).toBeNull();
     expect(sessionStorage.getItem(STARTED_KEY)).toBeNull();
   });
 
