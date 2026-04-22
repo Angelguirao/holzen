@@ -246,6 +246,11 @@ export function CheckoutConfirmation() {
     const alreadyConfirmed = guard?.mode === detected;
     if (!alreadyConfirmed) {
       writeConfirmedGuard(detected);
+      // Fresh guard → discard any stale persisted lifecycle from an older
+      // confirmation. The fresh row will be written below as the dialog
+      // drives its lifecycle effect.
+      writePersistedRefreshState(null);
+      activeGuardTsRef.current = null;
     }
     if (alreadyConfirmed) {
       const params = new URLSearchParams(location.search);
@@ -263,6 +268,24 @@ export function CheckoutConfirmation() {
       // the persisted-outcome shortcut and burn an edge invocation per
       // refresh / back-nav.
       clearPendingForceRefreshSentinel();
+      // If the previous confirmation left the wallet refresh in a non-idle
+      // state (still updating, timed out, or errored), re-open the dialog
+      // so the user sees the same banner — the refresh outcome is the part
+      // of the confirmation they actually need to act on. Hydrate sticky
+      // numbers from the persisted row so the displayed balance / credits
+      // also don't regress.
+      const persisted = readPersistedRefreshState(guard);
+      if (persisted && persisted.state !== 'idle') {
+        activeGuardTsRef.current = guard.ts;
+        stickyBalanceRef.current = persisted.stickyBalance;
+        stickyCreditsAddedRef.current = persisted.stickyCreditsAdded;
+        baselineBalanceRef.current = persisted.baseline ?? sub.flexCreditsBalance ?? 0;
+        refreshAttemptRef.current = persisted.attempts;
+        setRefreshError(persisted.error);
+        setRefreshState(persisted.state);
+        setMode(detected);
+        return;
+      }
       // Quiet, non-rewarding status line. The guard intentionally does *not*
       // re-open the celebratory dialog (refresh / back-nav with stale params
       // shouldn't re-trigger praise UI), but the user just performed an
@@ -286,6 +309,10 @@ export function CheckoutConfirmation() {
     }
     setMode(detected);
     baselineBalanceRef.current = sub.flexCreditsBalance ?? 0;
+    // Anchor the active guard timestamp so subsequent persistence writes
+    // share the same row. `writeConfirmedGuard` above just wrote
+    // `Date.now()`, so re-read to capture the exact value.
+    activeGuardTsRef.current = readConfirmedGuard()?.ts ?? Date.now();
     // Strip checkout query params; keep path + hash.
     const params = new URLSearchParams(location.search);
     params.delete('subscribed');
