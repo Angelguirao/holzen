@@ -320,7 +320,7 @@ export function CheckoutConfirmation() {
       if (suppressionAnnouncedRef.current !== dedupeKey) {
         suppressionAnnouncedRef.current = dedupeKey;
         toast.message('Confirmation already shown for this checkout.', {
-          description: 'Open Settings to review your subscription or credits.',
+          description: 'Review subscription and credits in Settings.',
           duration: 4000,
           id: `checkout-suppressed:${detected}`,
         });
@@ -712,11 +712,11 @@ export function CheckoutConfirmation() {
       const scanned = Number(data?.scanned) || 0;
       if (applied > 0) {
         // Quiet state: no success-coloured toast. Neutral acknowledgement only.
-        toast.message(`Credits restored from ${applied} session${applied === 1 ? '' : 's'}.`);
+        toast.message(`Credits reconciled from ${applied} session${applied === 1 ? '' : 's'}.`);
       } else if (scanned > 0) {
-        toast.message('No missing credits found. Your balance is already up to date.');
+        toast.message('No missing credits. Balance already up to date.');
       } else {
-        toast.message('No recent flex-pack sessions to recover.');
+        toast.message('No recent flex-pack sessions to reconcile.');
       }
       await sub.refresh();
     } catch (e) {
@@ -747,14 +747,14 @@ export function CheckoutConfirmation() {
             </span>
           </div>
           <DialogTitle className="text-left">
-            {mode === 'subscription' ? `Holzen ${tierLabel} active` : 'Credits added'}
+            {mode === 'subscription' ? `Holzen ${tierLabel} subscription` : 'Flex credits added'}
           </DialogTitle>
           <DialogDescription className="text-left">
             {mode === 'subscription'
               ? isTrialing
-                ? `Your ${PRICING.trialDays}-day trial has started. Manage or cancel anytime from Settings.`
-                : 'Your subscription is active. Manage or cancel anytime from Settings.'
-              : 'Your Flex credits are available below.'}
+                ? `${PRICING.trialDays}-day trial started. Manage or cancel anytime in Settings.`
+                : 'Subscription active. Manage or cancel anytime in Settings.'
+              : 'Updated balance and grant details below.'}
           </DialogDescription>
         </DialogHeader>
 
@@ -1074,7 +1074,7 @@ function RefreshStatusBanner({
       >
         <span className="flex items-center gap-2">
           <AlertTriangle className="h-3.5 w-3.5 text-muted-foreground" aria-hidden />
-          Balance is still syncing. Your credits are safe.
+          Balance not yet updated. Credits are recorded server-side.
           {attemptLabel ? (
             <span className="ml-1 opacity-70">(attempt {attemptLabel})</span>
           ) : null}
@@ -1103,9 +1103,9 @@ function RefreshStatusBanner({
       <span className="flex items-center gap-2">
         <AlertTriangle className="h-3.5 w-3.5" aria-hidden />
         <span>
-          Could not refresh balance
+          Balance refresh failed
           {errorMessage ? <span className="ml-1 opacity-70">({errorMessage})</span> : null}
-          . Your credits are still safe.
+          . Credits remain recorded server-side.
           {attemptLabel ? (
             <span className="ml-1 opacity-70">(attempt {attemptLabel})</span>
           ) : null}
