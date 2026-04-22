@@ -26,6 +26,13 @@ import { useState, useEffect, useCallback, forwardRef, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { useTranslation } from 'react-i18next';
 import {
+  getCheckoutSuppressionWindowMinutes,
+  setCheckoutSuppressionWindowMinutes,
+  CHECKOUT_SUPPRESSION_WINDOW_DEFAULT_MINUTES,
+  CHECKOUT_SUPPRESSION_WINDOW_MIN_MINUTES,
+  CHECKOUT_SUPPRESSION_WINDOW_MAX_MINUTES,
+} from '@/lib/checkout-suppression-window';
+import {
   Accordion,
   AccordionContent,
   AccordionItem,
@@ -131,6 +138,25 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
   const [zenMode, setZenMode] = useState(() => localStorage.getItem('holzen_zen_mode') === 'true');
   const [hapticEnabled, setHapticEnabledState] = useState(isHapticEnabled);
   const [soundEnabled, setSoundEnabled] = useState(() => localStorage.getItem('holzen_sound_enabled') !== 'false');
+  const [checkoutWindowMinutes, setCheckoutWindowMinutesState] = useState<number>(() =>
+    getCheckoutSuppressionWindowMinutes(),
+  );
+  const [checkoutWindowDraft, setCheckoutWindowDraft] = useState<string>(() =>
+    String(getCheckoutSuppressionWindowMinutes()),
+  );
+  const commitCheckoutWindow = useCallback(
+    (raw: string) => {
+      const parsed = Number(raw);
+      if (!Number.isFinite(parsed)) {
+        setCheckoutWindowDraft(String(checkoutWindowMinutes));
+        return;
+      }
+      const stored = setCheckoutSuppressionWindowMinutes(parsed);
+      setCheckoutWindowMinutesState(stored);
+      setCheckoutWindowDraft(String(stored));
+    },
+    [checkoutWindowMinutes],
+  );
   const [btcMode, setBtcMode] = useState(() => localStorage.getItem('holzen_btc_mode') === 'true');
   const [latestVersion, setLatestVersion] = useState<string | null>(null);
   const [hasNewVersion, setHasNewVersion] = useState(false);
@@ -583,6 +609,57 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                   }}
                 />
               </div>
+            </div>
+
+            {/* Checkout-confirmed suppression window */}
+            <div className="space-y-3">
+              <p className="text-muted-foreground/60 uppercase tracking-wider text-sm font-sans">
+                {t('settings.checkoutWindow', 'Checkout-confirmed window')}
+              </p>
+              <p className="leading-relaxed text-primary text-sm">
+                {t(
+                  'settings.checkoutWindowDesc',
+                  'After a successful purchase, the confirmation dialog and subscription re-sync are skipped if you return within this window. Default is {{default}} minutes.',
+                  { default: CHECKOUT_SUPPRESSION_WINDOW_DEFAULT_MINUTES },
+                )}
+              </p>
+              <div className="flex items-center justify-between gap-3">
+                <Label
+                  htmlFor="checkout-window-minutes"
+                  className="text-muted-foreground text-base font-sans"
+                >
+                  {t('settings.checkoutWindowLabel', 'Window (minutes)')}
+                </Label>
+                <Input
+                  id="checkout-window-minutes"
+                  type="number"
+                  inputMode="numeric"
+                  min={CHECKOUT_SUPPRESSION_WINDOW_MIN_MINUTES}
+                  max={CHECKOUT_SUPPRESSION_WINDOW_MAX_MINUTES}
+                  step={1}
+                  value={checkoutWindowDraft}
+                  onChange={(e) => setCheckoutWindowDraft(e.target.value)}
+                  onBlur={(e) => commitCheckoutWindow(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      commitCheckoutWindow((e.target as HTMLInputElement).value);
+                      (e.target as HTMLInputElement).blur();
+                    }
+                  }}
+                  className="w-24 text-right font-mono"
+                />
+              </div>
+              <p className="text-[11px] font-mono text-muted-foreground">
+                {t(
+                  'settings.checkoutWindowRange',
+                  'Allowed range: {{min}}–{{max}} minutes.',
+                  {
+                    min: CHECKOUT_SUPPRESSION_WINDOW_MIN_MINUTES,
+                    max: CHECKOUT_SUPPRESSION_WINDOW_MAX_MINUTES,
+                  },
+                )}
+              </p>
             </div>
 
             {/* Silent Mode */}
