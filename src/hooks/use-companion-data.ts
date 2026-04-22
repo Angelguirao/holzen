@@ -177,6 +177,10 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     setCacheIds({ nudge: null, signal: null, zoomOut: null, history: null });
     setCacheRelaxations(EMPTY_COMPANION_SLOT_RELAXATIONS);
     fetchedSlotsRef.current = new Set();
+    // New reflection → forget any stale skip / retry-confirm state from the
+    // previous one so we never confirm a retry against the wrong id.
+    interventionSkippedRef.current = false;
+    pendingRetryConfirmRef.current = null;
 
     if (!reflectionId) {
       setInterventionLoading(false);
@@ -184,6 +188,21 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     }
     setInterventionLoading(true);
   }, [reflectionId]);
+
+  // Watcher: when a deliberate retry that followed an idempotency skip lands
+  // a fresh `intervention` payload, confirm to the user that the retry went
+  // through. Single-fire per retry — `pendingRetryConfirmRef` is cleared
+  // immediately so re-renders don't re-toast.
+  useEffect(() => {
+    if (!intervention) return;
+    if (!pendingRetryConfirmRef.current) return;
+    if (pendingRetryConfirmRef.current !== reflectionId) return;
+    sonnerToast.success('New perspective loaded', {
+      id: `intervention-retry:${reflectionId}`,
+    });
+    pendingRetryConfirmRef.current = null;
+    interventionSkippedRef.current = false;
+  }, [intervention, reflectionId]);
 
   // ── Intervention-only fetch + cached companion hydration ──
   // Companions are NOT fetched here — only on user tap (see fetchCompanion below).
