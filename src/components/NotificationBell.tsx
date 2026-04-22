@@ -261,7 +261,7 @@ export function NotificationBell() {
     if (showLoading) setLoading(true);
 
     try {
-      const { data } = await supabase
+      const { data } = await (supabase as any)
         .from('notifications')
         .select('id, type, metadata, action_path, action_state, created_at, dismissed_at')
         .eq('user_id', user.id)
@@ -269,7 +269,7 @@ export function NotificationBell() {
         .order('created_at', { ascending: false })
         .limit(20);
 
-      const mapped = ((data ?? []) as NotificationRow[])
+      const mapped = ((data ?? []) as unknown as NotificationRow[])
         .map(mapRowToNotification)
         .filter((item): item is NotificationItem => item !== null);
       setAllNotifications(normalizeNotifications(mapped));
