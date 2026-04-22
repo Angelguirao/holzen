@@ -828,9 +828,14 @@ export function CheckoutConfirmation() {
       if (QUIET_STATE_CHECKLIST.emojiPattern.test(root.textContent ?? '')) {
         violations.push('emoji found in rendered text');
       }
-      // 4. At least one clear-exit affordance must be reachable.
-      const buttonNames = Array.from(root.querySelectorAll('button')).map(
-        (b) => (b.textContent ?? '').trim(),
+      // 4. At least one clear-exit affordance must be reachable, and the
+      //    "Close" button must be the primary action: rendered with the
+      //    default Button variant (no `variant="outline"`-style modifier
+      //    classes), focusable via keyboard, and carrying an accessible
+      //    name that explicitly says "Close".
+      const buttons = Array.from(root.querySelectorAll<HTMLButtonElement>('button'));
+      const buttonNames = buttons.map((b) =>
+        (b.getAttribute('aria-label') ?? b.textContent ?? '').trim(),
       );
       const hasExit = QUIET_STATE_CHECKLIST.requiredExits.some((label) =>
         buttonNames.some((name) => name.toLowerCase().includes(label.toLowerCase())),
@@ -839,6 +844,26 @@ export function CheckoutConfirmation() {
         violations.push(
           `no clear exit (expected one of: ${QUIET_STATE_CHECKLIST.requiredExits.join(', ')})`,
         );
+      }
+      const closeBtn = buttons.find((b) =>
+        ((b.getAttribute('aria-label') ?? b.textContent ?? '')
+          .toLowerCase()
+          .includes('close')),
+      );
+      if (!closeBtn) {
+        violations.push('Close button missing');
+      } else {
+        // Must be keyboard-reachable.
+        if (closeBtn.disabled || closeBtn.tabIndex < 0) {
+          violations.push('Close button is not keyboard-reachable');
+        }
+        // Must be the primary action — the shadcn Button "outline" /
+        // "ghost" / "secondary" variants all add a recognizable border or
+        // bg-transparent class. Primary uses `bg-primary`.
+        const cls = closeBtn.className;
+        if (!/bg-primary(?!-)/.test(cls)) {
+          violations.push('Close button is not the primary (default) variant');
+        }
       }
       if (violations.length > 0) {
         // eslint-disable-next-line no-console
@@ -1008,7 +1033,24 @@ export function CheckoutConfirmation() {
               Manage subscription
             </Button>
           ) : null}
-          <Button onClick={handleClose} className="w-full sm:w-auto">
+          {/*
+            Primary exit. Radix Dialog already traps focus, restores focus to
+            the trigger on close, and wires Escape → onOpenChange(false). This
+            button is the default (primary) variant so it's the visually and
+            tabbing-wise prominent action, autoFocused so screen-reader users
+            land on a clear exit immediately, and labeled "Close" with an
+            explicit aria-label that names the dialog being closed.
+          */}
+          <Button
+            onClick={handleClose}
+            autoFocus
+            aria-label={
+              mode === 'subscription'
+                ? 'Close subscription receipt'
+                : 'Close credits receipt'
+            }
+            className="w-full sm:w-auto"
+          >
             Close
           </Button>
         </DialogFooter>
