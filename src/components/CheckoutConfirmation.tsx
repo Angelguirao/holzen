@@ -320,7 +320,7 @@ export function CheckoutConfirmation() {
       if (suppressionAnnouncedRef.current !== dedupeKey) {
         suppressionAnnouncedRef.current = dedupeKey;
         toast.message('Confirmation already shown for this checkout.', {
-          description: 'Open Settings to review your subscription or credits.',
+          description: 'Review subscription and credits in Settings.',
           duration: 4000,
           id: `checkout-suppressed:${detected}`,
         });
@@ -712,11 +712,11 @@ export function CheckoutConfirmation() {
       const scanned = Number(data?.scanned) || 0;
       if (applied > 0) {
         // Quiet state: no success-coloured toast. Neutral acknowledgement only.
-        toast.message(`Credits restored from ${applied} session${applied === 1 ? '' : 's'}.`);
+        toast.message(`Credits reconciled from ${applied} session${applied === 1 ? '' : 's'}.`);
       } else if (scanned > 0) {
-        toast.message('No missing credits found. Your balance is already up to date.');
+        toast.message('No missing credits. Balance already up to date.');
       } else {
-        toast.message('No recent flex-pack sessions to recover.');
+        toast.message('No recent flex-pack sessions to reconcile.');
       }
       await sub.refresh();
     } catch (e) {
