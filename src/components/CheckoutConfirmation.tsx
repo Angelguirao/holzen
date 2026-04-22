@@ -15,7 +15,11 @@ import { useSubscription } from '@/hooks/use-subscription';
 import { PRICING } from '@/lib/pricing';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { getCheckoutSuppressionWindowMs } from '@/lib/checkout-suppression-window';
+import {
+  getCheckoutSuppressionWindowMs,
+  broadcastCheckoutConfirmed,
+  subscribeToCheckoutConfirmations,
+} from '@/lib/checkout-suppression-window';
 
 type Mode = 'subscription' | 'flex_pack_s' | 'flex_pack_m' | null;
 
