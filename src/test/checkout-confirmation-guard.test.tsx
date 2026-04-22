@@ -153,4 +153,37 @@ describe('CheckoutConfirmation 30-minute guard', () => {
     const stored = JSON.parse(localStorage.getItem(CHECKOUT_CONFIRMED_KEY) || 'null');
     expect(Date.now() - stored.ts).toBeLessThan(5_000);
   });
+
+  it('skips BOTH dialog and subscription sync when returning within the 30-minute window', () => {
+    // Simulate a confirmation that happened 5 minutes ago — well within the
+    // 30-minute guard window. The user navigates back to the confirmation
+    // route (e.g. via browser back, deep link, or shared URL) with the
+    // original ?subscribed=true params still present.
+    const fiveMinutesAgo = Date.now() - 5 * 60 * 1000;
+    localStorage.setItem(
+      CHECKOUT_CONFIRMED_KEY,
+      JSON.stringify({ mode: 'subscription', ts: fiveMinutesAgo }),
+    );
+    sessionStorage.setItem(CHECKOUT_STARTED_KEY, String(fiveMinutesAgo));
+
+    renderAt('/?subscribed=true');
+
+    // 1. Celebratory dialog must NOT re-open.
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
+    // 2. Subscription sync (`check-subscription` via sub.refresh) must be skipped.
+    expect(refreshMock).not.toHaveBeenCalled();
+    // 3. The forced-refresh sentinel is cleared so the next `useSubscription`
+    //    initial fetch will not be promoted to `{ force: true }` either.
+    expect(sessionStorage.getItem(CHECKOUT_STARTED_KEY)).toBeNull();
+    // 4. Persisted guard timestamp is preserved (not overwritten on revisit),
+    //    so the window keeps counting from the original confirmation.
+    const stored = JSON.parse(localStorage.getItem(CHECKOUT_CONFIRMED_KEY) || 'null');
+    expect(stored.ts).toBe(fiveMinutesAgo);
+    expect(stored.mode).toBe('subscription');
+    // 5. URL params stripped via replace nav (cosmetic only, no fetch).
+    expect(navigateMock).toHaveBeenCalledWith(
+      expect.objectContaining({ pathname: '/', search: '' }),
+      { replace: true },
+    );
+  });
 });
