@@ -37,6 +37,9 @@ import {
   resetInterventionIdempotency,
   runOnceIntervention,
 } from '@/lib/orchestrate-intervention-idempotency';
+import { useSubscription } from '@/hooks/use-subscription';
+import { useProGate } from '@/hooks/use-pro-gate';
+import { showLimitReachedToast, isPaidLimitReached } from '@/lib/limit-upsell';
 
 export type {
   RegenerateCompanionSlot,
