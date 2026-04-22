@@ -45,6 +45,7 @@ const GroundHistory = lazy(() => import("./pages/GroundHistory"));
 const Admin = lazy(() => import("./pages/Admin"));
 const SmokeTest = lazy(() => import("./pages/SmokeTest"));
 const SentryAlerts = lazy(() => import("./pages/SentryAlerts"));
+const EdgeCoverage = lazy(() => import("./pages/EdgeCoverage"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
 const BillingHistory = lazy(() => import("./pages/BillingHistory"));
 
@@ -178,6 +179,7 @@ const App = () => (
                 <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
                 <Route path="/admin/smoke-test" element={<ProtectedRoute><SmokeTest /></ProtectedRoute>} />
                 <Route path="/admin/sentry-alerts" element={<ProtectedRoute><SentryAlerts /></ProtectedRoute>} />
+                <Route path="/admin/edge-coverage" element={<ProtectedRoute><EdgeCoverage /></ProtectedRoute>} />
                 <Route path="/welcome" element={<PublicOnlyRoute><Landing /></PublicOnlyRoute>} />
                 <Route path="/auth" element={<PublicOnlyRoute><Auth /></PublicOnlyRoute>} />
                 <Route path="/reset-password" element={<ResetPassword />} />
