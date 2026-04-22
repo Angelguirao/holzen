@@ -12,6 +12,8 @@ import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { useSubscription } from '@/hooks/use-subscription';
 import { SubscriptionSkeleton } from '@/components/SubscriptionSkeleton';
 import { parseEdgeFunctionError, toUserFacingAiErrorMessage } from '@/lib/edge-function-error';
+import { useProGate } from '@/hooks/use-pro-gate';
+import { showLimitReachedToast, isPaidLimitReached } from '@/lib/limit-upsell';
 
 interface Insight {
   category: 'regulation' | 'tolerance' | 'alignment' | 'reappraisal' | 'awareness' | 'timing' | 'mood' | 'behavior' | 'engagement' | 'growth';
@@ -64,7 +66,16 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
   const { t } = useTranslation();
   const { user } = useAuth();
   const { language } = useHolzen();
-  const { subscribed, loading: subLoading, applyOptimisticDecrement, refresh: refreshSubscription } = useSubscription();
+  const {
+    subscribed,
+    loading: subLoading,
+    applyOptimisticDecrement,
+    refresh: refreshSubscription,
+    insightsRemaining,
+    flexCreditsBalance,
+    startCheckout,
+  } = useSubscription();
+  const { isPro, requirePro } = useProGate();
   const [allData, setAllData] = useState<InsightsRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [generating, setGenerating] = useState(false);
@@ -112,16 +123,44 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
 
   const generateInsights = useCallback(async () => {
     if (!user) return;
+    // Mirror the regenerate paywall: free users see the upgrade toast,
+    // Pro users with no insights bucket and no flex credits see the
+    // limit-reached toast — never the raw edge function error.
+    if (!isPro) {
+      requirePro('ai_insights');
+      return;
+    }
+    if (isPaidLimitReached({ remaining: insightsRemaining, flexCreditsBalance })) {
+      showLimitReachedToast({ feature: 'insight', startCheckout });
+      return;
+    }
     setGenerating(true);
     applyOptimisticDecrement('insight');
     try {
-      const { error } = await supabase.functions.invoke('reflection-insights', {
+      const { data, error } = await supabase.functions.invoke('reflection-insights', {
         body: { user_id: user.id, language },
       });
       if (error) {
         const parsed = await parseEdgeFunctionError(error);
+        if (parsed.code === 'companions_upgrade_required') {
+          requirePro('ai_insights');
+          return;
+        }
+        if (parsed.code === 'companions_quota_exceeded' || parsed.code === 'insights_quota_exceeded') {
+          showLimitReachedToast({ feature: 'insight', startCheckout });
+          return;
+        }
         const detail = toUserFacingAiErrorMessage(parsed, t('aiInsights.failedToGenerate'));
         throw new Error(detail);
+      }
+      const code = (data as { code?: string } | null)?.code;
+      if (code === 'companions_upgrade_required') {
+        requirePro('ai_insights');
+        return;
+      }
+      if (code === 'companions_quota_exceeded' || code === 'insights_quota_exceeded') {
+        showLimitReachedToast({ feature: 'insight', startCheckout });
+        return;
       }
       await loadInsights();
       toast(t('aiInsights.generated'));
@@ -132,7 +171,19 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
       setGenerating(false);
       void refreshSubscription();
     }
-  }, [user, language, loadInsights, t, applyOptimisticDecrement, refreshSubscription]);
+  }, [
+    user,
+    language,
+    loadInsights,
+    t,
+    applyOptimisticDecrement,
+    refreshSubscription,
+    isPro,
+    requirePro,
+    insightsRemaining,
+    flexCreditsBalance,
+    startCheckout,
+  ]);
 
   if (subLoading) {
     return <SubscriptionSkeleton variant="inline" />;
