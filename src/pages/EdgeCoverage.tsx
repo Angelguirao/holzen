@@ -207,6 +207,19 @@ export default function EdgeCoverage() {
             <span className="font-medium text-foreground"> EdgeError</span> +
             <span className="font-medium text-foreground"> createLogger</span> raise the bar from
             "error reaches Sentry" to "error has actionable context".
+            <span className="block mt-2">
+              <span className="font-medium text-foreground">Heartbeat</span> reads
+              {" "}<code>app_config.heartbeat.&lt;function&gt;</code> — when set, the matching
+              {" "}<code>pg_cron</code> job pings BetterStack via{" "}
+              <code>emit_job_heartbeat()</code>. Missing rows mean the function isn't
+              monitored for liveness (only for errors).
+              {heartbeats !== null && (
+                <span className="ml-1">
+                  Found <span className="font-medium text-foreground">{heartbeatCount}</span>
+                  {" "}configured heartbeat key{heartbeatCount === 1 ? "" : "s"}.
+                </span>
+              )}
+            </span>
           </CardDescription>
         </CardHeader>
       </Card>
@@ -246,11 +259,13 @@ export default function EdgeCoverage() {
                 <th className="text-left px-2 py-2">EdgeError</th>
                 <th className="text-left px-2 py-2">createLogger</th>
                 <th className="text-left px-2 py-2">logAudit</th>
+                <th className="text-left px-2 py-2">Heartbeat</th>
               </tr>
             </thead>
             <tbody>
               {rows.map((r) => {
                 const meta = sevMeta[r.sev];
+                const hbUuid = heartbeats?.[r.name];
                 return (
                   <tr key={r.name} className="border-t">
                     <td className="px-4 py-2 font-mono text-xs">
@@ -271,11 +286,26 @@ export default function EdgeCoverage() {
                     <td className="px-2 py-2 text-muted-foreground">{r.edgeError ? "✓" : "—"}</td>
                     <td className="px-2 py-2 text-muted-foreground">{r.logger ? "✓" : "—"}</td>
                     <td className="px-2 py-2 text-muted-foreground">{r.audit ? "✓" : "—"}</td>
+                    <td className="px-2 py-2">
+                      {heartbeats === null ? (
+                        <span className="text-muted-foreground text-xs">…</span>
+                      ) : hbUuid ? (
+                        <span
+                          className="inline-flex items-center gap-1 text-xs text-muted-foreground"
+                          title={`heartbeat.${r.name} = ${hbUuid}`}
+                        >
+                          <HeartPulse className="h-3.5 w-3.5 text-foreground" />
+                          <span className="font-mono">{hbUuid.slice(0, 8)}…</span>
+                        </span>
+                      ) : (
+                        <span className="text-muted-foreground">—</span>
+                      )}
+                    </td>
                   </tr>
                 );
               })}
               {rows.length === 0 && (
-                <tr><td colSpan={6} className="px-4 py-6 text-center text-muted-foreground">No functions match.</td></tr>
+                <tr><td colSpan={7} className="px-4 py-6 text-center text-muted-foreground">No functions match.</td></tr>
               )}
             </tbody>
           </table>
