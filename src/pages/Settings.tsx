@@ -997,6 +997,8 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
               )}
             </div>
 
+            <CreditsDashboard />
+
             <ReferralSection />
           </AccordionContent>
         </AccordionItem>
