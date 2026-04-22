@@ -447,11 +447,15 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
           bodyCode: code,
         });
         if (code === 'companions_quota_exceeded' || code === 'companions_upgrade_required') {
-          toast({
-            title: 'Companion unavailable',
-            description: msg ?? 'This companion is outside your current plan allowance.',
-            variant: 'destructive',
-          });
+          // Roll back the optimistic spend and route to the standard
+          // upsell so the very-first card tap that hits a paywall lands
+          // in the same place as regenerate.
+          fetchedSlotsRef.current.delete(slot);
+          if (code === 'companions_upgrade_required') {
+            requirePro('companions');
+          } else {
+            showLimitReachedToast({ feature: 'companion', startCheckout });
+          }
         } else {
           toast({
             title: 'Companion unavailable',
@@ -461,6 +465,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
         }
         setErr(true);
         setLoading(false);
+        void refreshSubscription();
         return;
       }
 
@@ -494,8 +499,25 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       setErr(true);
     } finally {
       setLoading(false);
+      void refreshSubscription();
     }
-  }, [reflectionId, context, reflectionMessage, mood, severityNumber, language, autoSaveToLibrary]);
+  }, [
+    reflectionId,
+    context,
+    reflectionMessage,
+    mood,
+    severityNumber,
+    language,
+    autoSaveToLibrary,
+    isPro,
+    requirePro,
+    startCheckout,
+    companionRemaining,
+    flexCreditsBalance,
+    applyOptimisticDecrement,
+    refreshSubscription,
+    toast,
+  ]);
 
   // ── Retry helpers ──
   const retrySlot = useCallback((slot: RegenerateCompanionSlot) => {
