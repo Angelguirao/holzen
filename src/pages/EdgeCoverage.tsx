@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { ShieldCheck, ShieldAlert, Search, FileWarning } from "lucide-react";
+import { ShieldCheck, ShieldAlert, Search, FileWarning, HeartPulse } from "lucide-react";
 
 // Static manifest of edge-function error-reporting coverage.
 // Generated from `supabase/functions/*/index.ts` source by scanning for:
