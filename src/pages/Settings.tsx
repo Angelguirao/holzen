@@ -26,6 +26,13 @@ import { useState, useEffect, useCallback, forwardRef, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { useTranslation } from 'react-i18next';
 import {
+  getCheckoutSuppressionWindowMinutes,
+  setCheckoutSuppressionWindowMinutes,
+  CHECKOUT_SUPPRESSION_WINDOW_DEFAULT_MINUTES,
+  CHECKOUT_SUPPRESSION_WINDOW_MIN_MINUTES,
+  CHECKOUT_SUPPRESSION_WINDOW_MAX_MINUTES,
+} from '@/lib/checkout-suppression-window';
+import {
   Accordion,
   AccordionContent,
   AccordionItem,
