@@ -38,6 +38,9 @@ import {
   resetInterventionIdempotency,
   runOnceIntervention,
 } from '@/lib/orchestrate-intervention-idempotency';
+import { useSubscription } from '@/hooks/use-subscription';
+import { useProGate } from '@/hooks/use-pro-gate';
+import { showLimitReachedToast, isPaidLimitReached } from '@/lib/limit-upsell';
 
 export type {
   RegenerateCompanionSlot,
@@ -77,6 +80,8 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
   const { language } = useHolzen();
   const { toast } = useToast();
   const { favorites, toggleCompanionFavorite } = useCompanionLibraryFavorites(reflectionId);
+  const { isPro, requirePro, startCheckout } = useProGate();
+  const { companionRemaining, flexCreditsBalance, applyOptimisticDecrement, refresh: refreshSubscription } = useSubscription();
 
   // ── Auto-save to library ──
   const libraryAutosaveDedupRef = useRef<Set<string>>(new Set());
@@ -395,7 +400,24 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
   const fetchCompanion = useCallback(async (slot: RegenerateCompanionSlot) => {
     if (!reflectionId) return;
     if (fetchedSlotsRef.current.has(slot)) return;
+
+    // Mirror the regenerate paywall: free users get the standard upgrade
+    // toast; Pro users with neither bucket nor flex credits left get the
+    // limit-reached toast. Without this gate the very first card tap
+    // surfaced a generic "Companion unavailable" toast even though the
+    // edge function was returning a paywall code.
+    if (!isPro) {
+      requirePro('companions');
+      return;
+    }
+    if (isPaidLimitReached({ remaining: companionRemaining, flexCreditsBalance })) {
+      showLimitReachedToast({ feature: 'companion', startCheckout });
+      return;
+    }
+
     fetchedSlotsRef.current.add(slot);
+    // Reflect the spend instantly; refresh below reconciles with the server.
+    applyOptimisticDecrement('companion');
 
     const setLoading = (v: boolean) => {
       if (slot === 'signal') setSignalLoading(v);
@@ -465,11 +487,15 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
           bodyCode: code,
         });
         if (code === 'companions_quota_exceeded' || code === 'companions_upgrade_required') {
-          toast({
-            title: 'Companion unavailable',
-            description: msg ?? 'This companion is outside your current plan allowance.',
-            variant: 'destructive',
-          });
+          // Roll back the optimistic spend and route to the standard
+          // upsell so the very-first card tap that hits a paywall lands
+          // in the same place as regenerate.
+          fetchedSlotsRef.current.delete(slot);
+          if (code === 'companions_upgrade_required') {
+            requirePro('companions');
+          } else {
+            showLimitReachedToast({ feature: 'companion', startCheckout });
+          }
         } else {
           toast({
             title: 'Companion unavailable',
@@ -479,6 +505,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
         }
         setErr(true);
         setLoading(false);
+        void refreshSubscription();
         return;
       }
 
@@ -512,8 +539,25 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       setErr(true);
     } finally {
       setLoading(false);
+      void refreshSubscription();
     }
-  }, [reflectionId, context, reflectionMessage, mood, severityNumber, language, autoSaveToLibrary]);
+  }, [
+    reflectionId,
+    context,
+    reflectionMessage,
+    mood,
+    severityNumber,
+    language,
+    autoSaveToLibrary,
+    isPro,
+    requirePro,
+    startCheckout,
+    companionRemaining,
+    flexCreditsBalance,
+    applyOptimisticDecrement,
+    refreshSubscription,
+    toast,
+  ]);
 
   // ── Retry helpers ──
   const retrySlot = useCallback((slot: RegenerateCompanionSlot) => {
