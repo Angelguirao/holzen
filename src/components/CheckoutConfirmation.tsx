@@ -505,6 +505,10 @@ export function CheckoutConfirmation() {
     }
     if (balanceReflectsPurchase) {
       setRefreshState('idle');
+      // Wallet caught up — drop the persisted lifecycle so a future
+      // re-arrival within the guard window stays quiet (suppressed toast
+      // path) instead of re-opening a stale "updating" banner.
+      writePersistedRefreshState(null);
       return;
     }
     // Don't downgrade an existing 'error' just because we're still waiting.
@@ -519,6 +523,31 @@ export function CheckoutConfirmation() {
       }
     };
   }, [mode, balanceReflectsPurchase]);
+
+  /**
+   * Persist the wallet-refresh lifecycle (state, error, sticky display
+   * values) so a close + re-open within the same confirmation window
+   * restores the same banner instead of resetting to `idle`. Keyed on the
+   * active guard timestamp so a fresh checkout always starts clean.
+   *
+   * Subscriptions don't drive this lifecycle, so we skip them.
+   */
+  useEffect(() => {
+    if (!mode || mode === 'subscription') return;
+    if (refreshState === 'idle') return; // cleared by the lifecycle effect above
+    const guardTs = activeGuardTsRef.current;
+    if (guardTs === null) return;
+    writePersistedRefreshState({
+      guardTs,
+      mode,
+      state: refreshState,
+      error: refreshError,
+      attempts: refreshAttemptRef.current,
+      stickyBalance: stickyBalanceRef.current,
+      stickyCreditsAdded: stickyCreditsAddedRef.current,
+      baseline: baselineBalanceRef.current,
+    });
+  }, [mode, refreshState, refreshError, projectedBalance, creditsAdded]);
 
   /**
    * User-facing retry: re-invokes the subscription snapshot and surfaces an
