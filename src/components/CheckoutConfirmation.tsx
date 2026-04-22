@@ -108,6 +108,15 @@ export function CheckoutConfirmation() {
   // the dialog is still open. The server itself is idempotent per minute, but
   // there's no reason to issue multiple round-trips from the client.
   const notifySentRef = useRef<Mode | null>(null);
+  // Authoritative credit amount sourced from Stripe checkout metadata via
+  // `list-checkout-events`. Falls back to PRICING constants only when the
+  // lookup hasn't returned yet — this prevents drift if pack sizes change in
+  // Stripe but the bundled PRICING constants haven't been redeployed.
+  const [purchasedCredits, setPurchasedCredits] = useState<number | null>(null);
+  // Tracks whether the matched session has been credited server-side. When
+  // true we trust `currentBalance` even before the local subscription snapshot
+  // catches up via its own polling.
+  const [grantApplied, setGrantApplied] = useState(false);
 
   useEffect(() => {
     const detected = detectMode(location.search);
