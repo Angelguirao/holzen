@@ -17,7 +17,7 @@ import { fetchRecentSignalCitationUrls, mergeRecentSignalUrls } from "./recent-s
 import { ORCHESTRATOR_KEY_MAP } from "./companion-types.ts";
 import { logCompanionSlotResolved } from "./companion-orchestrate-slot-telemetry.ts";
 import {
-  consumeMonthlyFeatureQuota,
+  consumeAllowanceOrCredits,
   resolveTierFromProfile,
   tierLimits,
 } from "./subscription-entitlements.ts";
@@ -80,13 +80,16 @@ export async function handleRegenerateOnly(params: {
         { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
-    const quota = await consumeMonthlyFeatureQuota(
-      svcClient,
+    const quota = await consumeAllowanceOrCredits(svcClient, {
       userId,
-      "premium_companion",
-      limits.premium_companion,
-      1,
-    );
+      feature: "premium_companion",
+      limit: limits.premium_companion,
+      amount: 1,
+      reason: "companions_overage",
+      source: "companion-regenerate",
+      sourceRef: reflectionId,
+      metadata: { slot },
+    });
     if (!quota.allowed) {
       return new Response(
         JSON.stringify({
@@ -95,7 +98,9 @@ export async function handleRegenerateOnly(params: {
           tier,
           companion_limit: quota.limit,
           companion_used: quota.used,
-          companion_remaining: quota.remaining,
+          companion_remaining: quota.remainingAllowance,
+          credits_balance: quota.creditsBalance,
+          credits_needed: Math.max(0, quota.creditCost - quota.creditsBalance),
         }),
         { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );

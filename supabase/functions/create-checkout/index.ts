@@ -2,6 +2,7 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
+import { FLEX_PACK_CREDITS, type FlexPackType } from "../_shared/subscription-entitlements.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -10,6 +11,7 @@ const corsHeaders = {
 
 const DEFAULT_PRO_PRICE_ID = "price_1T9142I1yxxxpduPWh7kf9CI";
 const PLAN_TIERS = new Set(["pro", "pro_plus"]);
+const FLEX_PACK_TYPES = new Set<FlexPackType>(["flex_pack_s", "flex_pack_m"]);
 
 serve(
   withRequestLogging("create-checkout", async ({ req }) => {
@@ -38,33 +40,71 @@ serve(
 
     const origin = req.headers.get("origin") || "http://localhost:3000";
     let requestedTier = "pro";
+    let checkoutKind: "subscription" | FlexPackType = "subscription";
     try {
       const body = await req.json();
       const rawTier = typeof body?.planTier === "string" ? body.planTier.trim().toLowerCase() : "pro";
       requestedTier = PLAN_TIERS.has(rawTier) ? rawTier : "pro";
+      const rawKind = typeof body?.checkoutKind === "string" ? body.checkoutKind.trim().toLowerCase() : "subscription";
+      if (FLEX_PACK_TYPES.has(rawKind as FlexPackType)) {
+        checkoutKind = rawKind as FlexPackType;
+      }
     } catch {
       requestedTier = "pro";
+      checkoutKind = "subscription";
     }
 
     const priceIdPro = Deno.env.get("STRIPE_PRICE_ID_PRO") ?? DEFAULT_PRO_PRICE_ID;
     const priceIdProPlus = Deno.env.get("STRIPE_PRICE_ID_PRO_PLUS");
-    const selectedPriceId =
-      requestedTier === "pro_plus" && priceIdProPlus ? priceIdProPlus : priceIdPro;
+    const priceIdPackS = Deno.env.get("STRIPE_PRICE_ID_FLEX_PACK_S");
+    const priceIdPackM = Deno.env.get("STRIPE_PRICE_ID_FLEX_PACK_M");
+    const selectedPriceId = checkoutKind === "subscription"
+      ? (requestedTier === "pro_plus" && priceIdProPlus ? priceIdProPlus : priceIdPro)
+      : checkoutKind === "flex_pack_s"
+        ? priceIdPackS
+        : priceIdPackM;
 
-    const session = await stripe.checkout.sessions.create({
-      customer: customerId,
-      customer_email: customerId ? undefined : user.email,
-      line_items: [{ price: selectedPriceId, quantity: 1 }],
-      mode: "subscription",
-      allow_promotion_codes: true,
-      success_url: `${origin}/?subscribed=true`,
-      cancel_url: `${origin}/`,
-      subscription_data: {
-        trial_period_days: 7,
-        description: "Holzen — Bitcoin self-awareness companion",
-        metadata: { plan_tier: requestedTier },
-      },
-    });
+    if (!selectedPriceId) {
+      throw new Error(`Missing Stripe price id for checkout kind '${checkoutKind}'`);
+    }
+
+    const session = checkoutKind === "subscription"
+      ? await stripe.checkout.sessions.create({
+          customer: customerId,
+          customer_email: customerId ? undefined : user.email,
+          line_items: [{ price: selectedPriceId, quantity: 1 }],
+          mode: "subscription",
+          allow_promotion_codes: true,
+          success_url: `${origin}/?subscribed=true`,
+          cancel_url: `${origin}/`,
+          client_reference_id: user.id,
+          metadata: {
+            user_id: user.id,
+            checkout_kind: "subscription",
+            plan_tier: requestedTier,
+          },
+          subscription_data: {
+            trial_period_days: 7,
+            description: "Holzen — Bitcoin self-awareness companion",
+            metadata: { plan_tier: requestedTier, user_id: user.id },
+          },
+        })
+      : await stripe.checkout.sessions.create({
+          customer: customerId,
+          customer_email: customerId ? undefined : user.email,
+          line_items: [{ price: selectedPriceId, quantity: 1 }],
+          mode: "payment",
+          allow_promotion_codes: true,
+          success_url: `${origin}/settings?credits=true`,
+          cancel_url: `${origin}/settings`,
+          client_reference_id: user.id,
+          metadata: {
+            user_id: user.id,
+            checkout_kind: checkoutKind,
+            flex_pack_type: checkoutKind,
+            flex_pack_credits: String(FLEX_PACK_CREDITS[checkoutKind]),
+          },
+        });
 
     return new Response(JSON.stringify({ url: session.url }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

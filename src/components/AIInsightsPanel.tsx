@@ -11,6 +11,7 @@ import { format } from 'date-fns';
 import { useInfiniteScroll } from '@/hooks/use-infinite-scroll';
 import { useSubscription } from '@/hooks/use-subscription';
 import { SubscriptionSkeleton } from '@/components/SubscriptionSkeleton';
+import { parseEdgeFunctionError } from '@/lib/edge-function-error';
 
 interface Insight {
   category: 'regulation' | 'tolerance' | 'alignment' | 'reappraisal' | 'awareness' | 'timing' | 'mood' | 'behavior' | 'engagement' | 'growth';
@@ -117,15 +118,8 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
         body: { user_id: user.id, language },
       });
       if (error) {
-        let detail = t('aiInsights.failedToGenerate');
-        try {
-          const payload = await (error as any)?.context?.json?.();
-          if (typeof payload?.error === 'string' && payload.error.length > 0) {
-            detail = payload.error;
-          }
-        } catch {
-          // Ignore parse issues; fallback to generic copy.
-        }
+        const parsed = await parseEdgeFunctionError(error);
+        const detail = parsed.message ?? t('aiInsights.failedToGenerate');
         throw new Error(detail);
       }
       await loadInsights();

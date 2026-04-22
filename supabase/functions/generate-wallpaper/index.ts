@@ -3,7 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { createAttemptLogger } from "../_shared/observe.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import {
-  consumeMonthlyFeatureQuota,
+  consumeAllowanceOrCredits,
   resolveTierFromProfile,
   tierLimits,
 } from "../_shared/subscription-entitlements.ts";
@@ -54,13 +54,14 @@ serve(
       );
     }
     const limits = tierLimits(tier);
-    const wallpaperQuota = await consumeMonthlyFeatureQuota(
-      svcClient,
-      user.id,
-      "wallpaper",
-      limits.wallpaper,
-      1,
-    );
+    const wallpaperQuota = await consumeAllowanceOrCredits(svcClient, {
+      userId: user.id,
+      feature: "wallpaper",
+      limit: limits.wallpaper,
+      amount: 1,
+      reason: "wallpaper_overage",
+      source: "generate-wallpaper",
+    });
     if (!wallpaperQuota.allowed) {
       return new Response(
         JSON.stringify({
@@ -69,7 +70,9 @@ serve(
           tier,
           wallpaper_limit: wallpaperQuota.limit,
           wallpaper_used: wallpaperQuota.used,
-          wallpaper_remaining: wallpaperQuota.remaining,
+          wallpaper_remaining: wallpaperQuota.remainingAllowance,
+          credits_balance: wallpaperQuota.creditsBalance,
+          credits_needed: Math.max(0, wallpaperQuota.creditCost - wallpaperQuota.creditsBalance),
         }),
         { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );

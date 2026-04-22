@@ -3,7 +3,7 @@ import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import {
-  consumeMonthlyFeatureQuota,
+  consumeAllowanceOrCredits,
   resolveTierFromProfile,
   tierLimits,
 } from "../_shared/subscription-entitlements.ts";
@@ -198,13 +198,14 @@ serve(
           );
         }
         const limits = tierLimits(tier);
-        const quota = await consumeMonthlyFeatureQuota(
-          supabase,
+        const quota = await consumeAllowanceOrCredits(supabase, {
           userId,
-          "reflection_insights",
-          limits.reflection_insights,
-          1,
-        );
+          feature: "reflection_insights",
+          limit: limits.reflection_insights,
+          amount: 1,
+          reason: "insights_overage",
+          source: "reflection-insights",
+        });
         if (!quota.allowed) {
           return new Response(
             JSON.stringify({
@@ -213,7 +214,9 @@ serve(
               tier,
               insights_limit: quota.limit,
               insights_used: quota.used,
-              insights_remaining: quota.remaining,
+              insights_remaining: quota.remainingAllowance,
+              credits_balance: quota.creditsBalance,
+              credits_needed: Math.max(0, quota.creditCost - quota.creditsBalance),
             }),
             { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
           );

@@ -318,7 +318,7 @@ const Home = () => {
     const ctx = `BTC is ${btcData.direction === 'down' ? 'down' : 'up'} ${Math.abs(btcData.changePercent).toFixed(1)}% in the last 24 hours.`;
 
     supabase.functions.invoke('suggest-grounding', {
-      body: { groundingActivities, context: ctx, severity, language },
+      body: { groundingActivities, context: ctx, severity, language, consumeQuota: false },
     }).then(({ data, error }) => {
       if (error || !data || data.error) return;
       const suggestion: GroundPreGenerated = {
@@ -441,7 +441,7 @@ const Home = () => {
                   <p className="text-xs text-muted-foreground/60 font-mono leading-relaxed max-w-[280px] mx-auto">
                     {t('home.subscription.upgradeToPro')}
                   </p>
-                  <LoadingButton onClick={startCheckout} loading={checkoutLoading} loadingText={t('home.subscription.openingCheckout')} size="sm" className="font-mono text-xs">
+                  <LoadingButton onClick={() => startCheckout('pro')} loading={checkoutLoading} loadingText={t('home.subscription.openingCheckout')} size="sm" className="font-mono text-xs">
                     {t('pro.upgradeCta')}
                   </LoadingButton>
                 </>
@@ -513,7 +513,7 @@ const Home = () => {
                     {t('home.subscription.upgradeToPro')}
                   </p>
                   <LoadingButton
-                    onClick={startCheckout}
+                    onClick={() => startCheckout('pro')}
                     loading={checkoutLoading}
                     loadingText={t('home.subscription.openingCheckout')}
                     className="w-full text-sm font-medium mt-4"

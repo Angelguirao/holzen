@@ -445,6 +445,8 @@ the superset.
 - `supabase/migrations/20260419120000_app_config.sql` — schema for caps + flags.
 - `supabase/functions/_shared/app-config.ts` — loader with TTL cache.
 - `supabase/functions/_shared/ratelimit.ts` — `checkCostCeilings` + `guardAiFeature`.
+- `supabase/functions/_shared/subscription-entitlements.ts` — package limits + flex credit helpers.
+- `supabase/functions/stripe-webhook/index.ts` — Stripe checkout pack grants to flex wallet.
 - `src/components/admin/AppConfigTools.tsx` — Admin Tools UI.
 - `src/components/admin/CostAnalytics.tsx` — Admin Cost tab.
 - `supabase/functions/ai-cost-alert/index.ts` — daily alert email (§7.5).

@@ -4,6 +4,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import {
   clampUsage,
+  getFlexCreditBalance,
   getMonthlyFeatureUsage,
   startOfUtcMonthDate,
   tierFromStripePriceId,
@@ -75,10 +76,11 @@ serve(
     if (profile?.lifetime_access) {
       const limits = tierLimits("lifetime");
       const monthStart = startOfUtcMonthDate();
-      const [companionsUsed, wallpapersUsed, insightsUsed] = await Promise.all([
+      const [companionsUsed, wallpapersUsed, insightsUsed, flexCreditsBalance] = await Promise.all([
         getMonthlyFeatureUsage(serviceClient, userId, "premium_companion", monthStart),
         getMonthlyFeatureUsage(serviceClient, userId, "wallpaper", monthStart),
         getMonthlyFeatureUsage(serviceClient, userId, "reflection_insights", monthStart),
+        getFlexCreditBalance(serviceClient, userId),
       ]);
       const companions = clampUsage(companionsUsed, limits.premium_companion);
       const wallpapers = clampUsage(wallpapersUsed, limits.wallpaper);
@@ -97,6 +99,7 @@ serve(
         monthly_insights_limit: limits.reflection_insights,
         monthly_insights_used: insights.used,
         monthly_insights_remaining: insights.remaining,
+        flex_credits_balance: flexCreditsBalance,
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -120,10 +123,11 @@ serve(
           : "free";
         const limits = tierLimits(tier);
         const monthStart = startOfUtcMonthDate();
-        const [companionsUsed, wallpapersUsed, insightsUsed] = await Promise.all([
+        const [companionsUsed, wallpapersUsed, insightsUsed, flexCreditsBalance] = await Promise.all([
           getMonthlyFeatureUsage(serviceClient, userId, "premium_companion", monthStart),
           getMonthlyFeatureUsage(serviceClient, userId, "wallpaper", monthStart),
           getMonthlyFeatureUsage(serviceClient, userId, "reflection_insights", monthStart),
+          getFlexCreditBalance(serviceClient, userId),
         ]);
         const companions = clampUsage(companionsUsed, limits.premium_companion);
         const wallpapers = clampUsage(wallpapersUsed, limits.wallpaper);
@@ -143,6 +147,7 @@ serve(
           monthly_insights_limit: limits.reflection_insights,
           monthly_insights_used: insights.used,
           monthly_insights_remaining: insights.remaining,
+          flex_credits_balance: flexCreditsBalance,
         }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
@@ -208,10 +213,11 @@ serve(
 
     const limits = tierLimits(subscriptionTier);
     const monthStart = startOfUtcMonthDate();
-    const [companionsUsed, wallpapersUsed, insightsUsed] = await Promise.all([
+    const [companionsUsed, wallpapersUsed, insightsUsed, flexCreditsBalance] = await Promise.all([
       getMonthlyFeatureUsage(serviceClient, userId, "premium_companion", monthStart),
       getMonthlyFeatureUsage(serviceClient, userId, "wallpaper", monthStart),
       getMonthlyFeatureUsage(serviceClient, userId, "reflection_insights", monthStart),
+      getFlexCreditBalance(serviceClient, userId),
     ]);
     const companions = clampUsage(companionsUsed, limits.premium_companion);
     const wallpapers = clampUsage(wallpapersUsed, limits.wallpaper);
@@ -233,6 +239,7 @@ serve(
       monthly_insights_limit: limits.reflection_insights,
       monthly_insights_used: insights.used,
       monthly_insights_remaining: insights.remaining,
+      flex_credits_balance: flexCreditsBalance,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

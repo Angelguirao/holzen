@@ -9,6 +9,7 @@ import { toast } from 'sonner';
 import { Check, RefreshCw, Sparkles, Loader2 } from 'lucide-react';
 import { WritingField } from '@/components/WritingField';
 import { companionFallbacksDisabledClient } from '@/lib/companion-strict';
+import { parseEdgeFunctionError } from '@/lib/edge-function-error';
 
 const FALLBACK_PROMPTS = [
   'practice.prompt1',
@@ -59,7 +60,11 @@ export function GuidedJournal({ onComplete, textColor, ringColor }: Props) {
           return;
         }
         throw new Error('Empty response');
-      } catch {
+      } catch (error) {
+        const parsed = await parseEdgeFunctionError(error);
+        if (parsed.code === 'ai_action_quota_exceeded' || parsed.code === 'ai_action_upgrade_required') {
+          toast(parsed.message ?? t('practice.journalPromptFailed'));
+        }
         if (companionFallbacksDisabledClient()) {
           setPromptLoadFailed(true);
           setPrompts([]);

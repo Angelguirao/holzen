@@ -50,7 +50,7 @@ const Terms = () => {
         <section className="space-y-3">
           <h2 className="text-sm font-medium text-foreground">4. Subscription & Payments</h2>
           <p className="text-xs text-muted-foreground leading-relaxed">
-            Holzen is offered as a paid subscription at $3/month. Payment is processed via Stripe. Your subscription renews automatically each billing cycle unless cancelled. You authorize recurring charges to your chosen payment method until you cancel.
+            Holzen is offered through paid subscription plans (currently Pro and Pro+). Plan pricing and included allowances are shown in-app at checkout and may be updated over time. Payment is processed via Stripe. Your subscription renews automatically each billing cycle unless cancelled. You authorize recurring charges to your chosen payment method until you cancel.
           </p>
         </section>
 

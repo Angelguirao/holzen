@@ -17,6 +17,19 @@ const DEFAULT_LIMITS: Record<SubscriptionTier, TierLimits> = {
 
 const ACTIVE_STATUSES = new Set(["active", "trialing"]);
 
+export const FEATURE_CREDIT_COST: Record<MeteredFeature, number> = {
+  premium_companion: 3,
+  wallpaper: 2,
+  reflection_insights: 1,
+};
+
+export const FLEX_PACK_CREDITS = {
+  flex_pack_s: 30,
+  flex_pack_m: 55,
+} as const;
+
+export type FlexPackType = keyof typeof FLEX_PACK_CREDITS;
+
 export function startOfUtcMonthDate(): string {
   const now = new Date();
   const y = now.getUTCFullYear();
@@ -113,4 +126,118 @@ export async function consumeMonthlyFeatureQuota(
   const remaining = Number(out.remaining) || 0;
   const limitOut = Number(out.limit) || safeLimit;
   return { allowed, used, remaining, limit: limitOut };
+}
+
+export async function getFlexCreditBalance(svcClient: any, userId: string): Promise<number> {
+  const { data, error } = await svcClient
+    .from("credit_wallets")
+    .select("balance_credits")
+    .eq("user_id", userId)
+    .maybeSingle();
+  if (error) return 0;
+  return Number(data?.balance_credits) || 0;
+}
+
+export async function consumeAllowanceOrCredits(
+  svcClient: any,
+  args: {
+    userId: string;
+    feature: MeteredFeature;
+    limit: number;
+    amount?: number;
+    reason?: string;
+    source?: string;
+    sourceRef?: string | null;
+    metadata?: Record<string, unknown>;
+  },
+): Promise<{
+  allowed: boolean;
+  feature: MeteredFeature;
+  limit: number;
+  used: number;
+  remainingAllowance: number;
+  requestedUnits: number;
+  creditCost: number;
+  creditsUsed: number;
+  creditsBalance: number;
+}> {
+  const safeLimit = Math.max(0, Math.floor(args.limit));
+  const safeAmount = Math.max(1, Math.floor(args.amount ?? 1));
+  const creditCost = FEATURE_CREDIT_COST[args.feature] ?? 1;
+
+  const { data, error } = await svcClient.rpc("consume_feature_allowance_or_credits", {
+    p_user_id: args.userId,
+    p_feature: args.feature,
+    p_limit: safeLimit,
+    p_amount: safeAmount,
+    p_credit_cost: creditCost,
+    p_reason: args.reason ?? "feature_overage",
+    p_source: args.source ?? "edge_function",
+    p_source_ref: args.sourceRef ?? null,
+    p_metadata: args.metadata ?? {},
+  });
+
+  if (error || !data) {
+    const used = await getMonthlyFeatureUsage(svcClient, args.userId, args.feature);
+    const clamped = clampUsage(used, safeLimit);
+    const creditsBalance = await getFlexCreditBalance(svcClient, args.userId);
+    return {
+      allowed: false,
+      feature: args.feature,
+      limit: safeLimit,
+      used: clamped.used,
+      remainingAllowance: clamped.remaining,
+      requestedUnits: safeAmount,
+      creditCost,
+      creditsUsed: 0,
+      creditsBalance,
+    };
+  }
+
+  const out = typeof data === "object" && data !== null ? (data as Record<string, unknown>) : {};
+  return {
+    allowed: out.allowed === true,
+    feature: args.feature,
+    limit: Number(out.limit) || safeLimit,
+    used: Number(out.used) || 0,
+    remainingAllowance: Number(out.remaining_allowance) || 0,
+    requestedUnits: Number(out.requested_units) || safeAmount,
+    creditCost: Number(out.credit_cost) || creditCost,
+    creditsUsed: Number(out.credits_used) || 0,
+    creditsBalance: Number(out.credits_balance) || 0,
+  };
+}
+
+export async function grantFlexCredits(
+  svcClient: any,
+  args: {
+    userId: string;
+    credits: number;
+    reason: string;
+    source: string;
+    sourceRef?: string | null;
+    feature?: string | null;
+    metadata?: Record<string, unknown>;
+  },
+): Promise<{ applied: boolean; balance: number; added: number; duplicate?: boolean }> {
+  const { data, error } = await svcClient.rpc("add_flex_credits", {
+    p_user_id: args.userId,
+    p_credits: Math.max(0, Math.floor(args.credits)),
+    p_reason: args.reason,
+    p_source: args.source,
+    p_source_ref: args.sourceRef ?? null,
+    p_feature: args.feature ?? null,
+    p_metadata: args.metadata ?? {},
+  });
+
+  if (error || !data) {
+    return { applied: false, balance: await getFlexCreditBalance(svcClient, args.userId), added: 0 };
+  }
+  const out = data as Record<string, unknown>;
+  return {
+    applied: out.applied === true,
+    balance: Number(out.balance) || 0,
+    added: Number(out.added) || 0,
+    duplicate: out.duplicate === true || undefined,
+  };
 }
