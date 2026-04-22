@@ -151,6 +151,12 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
   // confirmation toast once the deliberate retry actually issues a fresh call.
   const interventionSkippedRef = useRef<boolean>(false);
 
+  // When `retryOrchestrate` is triggered from a skipped state, we stash the
+  // `reflectionId` here so the watcher effect below can fire a confirmation
+  // toast as soon as fresh intervention data arrives. Cleared after firing
+  // (or on reflection switch) so we never confirm twice.
+  const pendingRetryConfirmRef = useRef<string | null>(null);
+
   // Reset all companion state when switching reflections so stale data from a
   // previous reflection never leaks into the new one.
   useLayoutEffect(() => {
