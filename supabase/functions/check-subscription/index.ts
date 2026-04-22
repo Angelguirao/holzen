@@ -198,6 +198,14 @@ serve(
         } catch (e) {
           console.log("Could not parse subscription end date:", raw, e);
         }
+        const ts = (eligibleSub as any).trial_start;
+        const te = (eligibleSub as any).trial_end;
+        try {
+          if (typeof ts === "number") trialStart = new Date(ts * 1000).toISOString();
+        } catch { /* ignore */ }
+        try {
+          if (typeof te === "number") trialEnd = new Date(te * 1000).toISOString();
+        } catch { /* ignore */ }
       }
     }
 
@@ -231,6 +239,9 @@ serve(
       subscription_end: subscriptionEnd,
       cached: false,
       stripe_price_id: activePriceId,
+      subscription_status: subscriptionStatus,
+      trial_start: trialStart,
+      trial_end: trialEnd,
       monthly_companion_limit: limits.premium_companion,
       monthly_companion_used: companions.used,
       monthly_companion_remaining: companions.remaining,
