@@ -16,6 +16,42 @@ import { PRICING } from '@/lib/pricing';
 
 type Mode = 'subscription' | 'flex_pack_s' | 'flex_pack_m' | null;
 
+/**
+ * Session-scoped guard so refreshing or hitting Back within the same checkout
+ * redirect window doesn't re-open the confirmation dialog. Keyed by mode +
+ * a short time bucket so a genuinely new checkout (different params arriving
+ * later) still triggers a fresh confirmation.
+ */
+const CHECKOUT_CONFIRMED_KEY = 'holzen_checkout_confirmed';
+const CHECKOUT_CONFIRMED_WINDOW_MS = 30 * 60 * 1000;
+
+function readConfirmedGuard(): { mode: Mode; ts: number } | null {
+  try {
+    const raw = sessionStorage.getItem(CHECKOUT_CONFIRMED_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as { mode: Mode; ts: number };
+    if (!parsed || typeof parsed.ts !== 'number') return null;
+    if (Date.now() - parsed.ts > CHECKOUT_CONFIRMED_WINDOW_MS) {
+      sessionStorage.removeItem(CHECKOUT_CONFIRMED_KEY);
+      return null;
+    }
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function writeConfirmedGuard(mode: Mode) {
+  try {
+    sessionStorage.setItem(
+      CHECKOUT_CONFIRMED_KEY,
+      JSON.stringify({ mode, ts: Date.now() }),
+    );
+  } catch {
+    /* ignore */
+  }
+}
+
 function detectMode(search: string): Mode {
   const params = new URLSearchParams(search);
   if (params.get('subscribed') === 'true') return 'subscription';
@@ -54,6 +90,26 @@ export function CheckoutConfirmation() {
   useEffect(() => {
     const detected = detectMode(location.search);
     if (!detected) return;
+    // If we already showed a confirmation for this mode within the window,
+    // strip params silently and bail — handles refresh + back-navigation
+    // arriving with the same checkout query string.
+    const guard = readConfirmedGuard();
+    const alreadyConfirmed = guard?.mode === detected;
+    if (!alreadyConfirmed) {
+      writeConfirmedGuard(detected);
+    }
+    if (alreadyConfirmed) {
+      const params = new URLSearchParams(location.search);
+      params.delete('subscribed');
+      params.delete('credits');
+      params.delete('pack');
+      const next = params.toString();
+      navigate(
+        { pathname: location.pathname, search: next ? `?${next}` : '', hash: location.hash },
+        { replace: true },
+      );
+      return;
+    }
     setMode(detected);
     baselineBalanceRef.current = sub.flexCreditsBalance ?? 0;
     // Strip checkout query params; keep path + hash.
