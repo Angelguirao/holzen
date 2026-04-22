@@ -54,12 +54,12 @@ const CheckoutConfirmationEmail = ({
   newBalance,
 }: CheckoutConfirmationProps) => {
   const isSub = mode === 'subscription'
-  const heading = isSub ? `Welcome to Holzen ${tierLabel}` : 'Credits added'
+  const heading = isSub ? `Holzen ${tierLabel} subscription` : 'Flex credits added'
   const intro = isSub
     ? isTrialing
-      ? 'Your trial has started. You can manage or cancel anytime from Settings.'
-      : 'Your subscription is active. You can manage or cancel anytime from Settings.'
-    : 'Thanks for the top-up. Your Flex credits are ready to spend.'
+      ? 'Trial started. Manage or cancel anytime in Settings.'
+      : 'Subscription active. Manage or cancel anytime in Settings.'
+    : 'Flex credits applied. Updated balance below.'
 
   return (
     <Html lang="en" dir="ltr">
@@ -148,8 +148,8 @@ export const template = {
   component: CheckoutConfirmationEmail,
   subject: (data: Record<string, any>) =>
     data?.mode === 'subscription'
-      ? `Welcome to Holzen ${data?.tierLabel ?? 'Pro'}`
-      : 'Your Holzen credits are ready',
+      ? `Holzen ${data?.tierLabel ?? 'Pro'} subscription confirmed`
+      : 'Holzen flex credits added',
   displayName: 'Checkout confirmation',
   previewData: {
     mode: 'subscription',
