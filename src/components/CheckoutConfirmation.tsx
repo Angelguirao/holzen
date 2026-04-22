@@ -117,6 +117,17 @@ export function CheckoutConfirmation() {
   // true we trust `currentBalance` even before the local subscription snapshot
   // catches up via its own polling.
   const [grantApplied, setGrantApplied] = useState(false);
+  // Refresh lifecycle for the wallet balance after a flex-pack purchase:
+  //  - 'idle'    : not waiting (subscription mode, or grant already applied)
+  //  - 'updating': polling/awaiting wallet refresh
+  //  - 'timeout' : wallet didn't reflect the purchase within the budget
+  //  - 'error'   : explicit refresh failure surfaced by `sub.refresh()`
+  // The numbers shown remain authoritative (Stripe metadata) — this state only
+  // drives the inline status messaging + retry affordance.
+  const [refreshState, setRefreshState] = useState<'idle' | 'updating' | 'timeout' | 'error'>('idle');
+  const [refreshError, setRefreshError] = useState<string | null>(null);
+  const refreshTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const refreshAttemptRef = useRef(0);
 
   useEffect(() => {
     const detected = detectMode(location.search);
