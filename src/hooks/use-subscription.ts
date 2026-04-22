@@ -221,9 +221,13 @@ export function useSubscription() {
   const query = useQuery({
     queryKey: ['subscription', userId],
     enabled: !!userId,
-    staleTime: 5 * 60 * 1000,
+    // Tightened from 5min → 30s so credit changes (regenerate, wallpaper,
+    // insights) reconcile within the same interaction window even if a
+    // call site forgets to invalidate. Optimistic decrement still gives
+    // an instant UI; this is the safety net.
+    staleTime: 30 * 1000,
     gcTime: 30 * 60 * 1000,
-    refetchInterval: userId ? 5 * 60 * 1000 : false,
+    refetchInterval: userId ? 60 * 1000 : false,
     refetchOnWindowFocus: false,
     refetchOnReconnect: true,
     retry: 1,
