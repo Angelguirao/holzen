@@ -114,6 +114,82 @@ const CHECKOUT_STARTED_KEY = 'holzen_checkout_started_at'; // mirrors useSubscri
 const CHECKOUT_CONFIRMED_WINDOW_MS = 30 * 60 * 1000;
 
 /**
+ * Per-checkout idempotency guard for `sub.refresh()` calls driven by this
+ * component.
+ *
+ * Two call sites refresh the subscription snapshot:
+ *   1. Mount-time refresh on a fresh checkout return (`sub.refresh()` near
+ *      the bottom of the detect-mode effect).
+ *   2. The user-clicked "Try again" / "Retry credit grant" button
+ *      (`handleRetryRefresh`).
+ *
+ * Without a guard the dialog can remount in the middle of an intentional
+ * retry flow (back-nav, focus jitter, React StrictMode double-invoke,
+ * persisted-state hydration) and re-issue `sub.refresh()` for the *same*
+ * logical action. That's wasted edge invocations and, worse, can race the
+ * lifecycle effect into a stale snapshot.
+ *
+ * Each call site is keyed by `{guardTs, mode, slot}`:
+ *   - `mount`     → fires at most once per confirmed checkout (same guardTs)
+ *   - `retry:N`   → fires at most once per click of "Try again" (attempt N)
+ *
+ * Module-level + persisted to `sessionStorage` so a remount within the same
+ * tab still hits the guard. Cleared whenever a fresh confirmation guard is
+ * written (new checkout) so a genuinely new purchase always gets fresh slots.
+ */
+const CHECKOUT_REFRESH_IDEMPOTENCY_KEY = 'holzen_checkout_refresh_idempotency';
+
+type RefreshIdempotencyRow = {
+  guardTs: number;
+  mode: Exclude<Mode, null>;
+  /** Which logical refresh this was: mount-time or a specific retry attempt. */
+  fired: string[];
+};
+
+function readRefreshIdempotency(): RefreshIdempotencyRow | null {
+  try {
+    const raw = sessionStorage.getItem(CHECKOUT_REFRESH_IDEMPOTENCY_KEY);
+    if (!raw) return null;
+    return JSON.parse(raw) as RefreshIdempotencyRow;
+  } catch {
+    return null;
+  }
+}
+
+function writeRefreshIdempotency(row: RefreshIdempotencyRow | null) {
+  try {
+    if (!row) {
+      sessionStorage.removeItem(CHECKOUT_REFRESH_IDEMPOTENCY_KEY);
+      return;
+    }
+    sessionStorage.setItem(CHECKOUT_REFRESH_IDEMPOTENCY_KEY, JSON.stringify(row));
+  } catch {
+    /* ignore */
+  }
+}
+
+/**
+ * Returns `true` if this `slot` for `(guardTs, mode)` has not yet been fired,
+ * and atomically marks it fired. Returns `false` if the slot is already used
+ * — caller MUST skip the `sub.refresh()` call in that case.
+ */
+function claimRefreshSlot(
+  guardTs: number,
+  mode: Exclude<Mode, null>,
+  slot: string,
+): boolean {
+  const existing = readRefreshIdempotency();
+  // Different guard (new checkout, or window rolled) → start fresh row.
+  if (!existing || existing.guardTs !== guardTs || existing.mode !== mode) {
+    writeRefreshIdempotency({ guardTs, mode, fired: [slot] });
+    return true;
+  }
+  if (existing.fired.includes(slot)) return false;
+  writeRefreshIdempotency({ ...existing, fired: [...existing.fired, slot] });
+  return true;
+}
+
+/**
  * Persisted wallet-refresh lifecycle for the *current* confirmation guard.
  *
  * Keyed implicitly by the active `holzen_checkout_confirmed` row (`mode + ts`)
@@ -326,6 +402,9 @@ export function CheckoutConfirmation() {
       // confirmation. The fresh row will be written below as the dialog
       // drives its lifecycle effect.
       writePersistedRefreshState(null);
+      // Fresh guard → also drop the per-checkout refresh idempotency row so
+      // mount-time + retry slots are available again for this new purchase.
+      writeRefreshIdempotency(null);
       activeGuardTsRef.current = null;
     }
     if (alreadyConfirmed) {
@@ -400,8 +479,15 @@ export function CheckoutConfirmation() {
       { pathname: location.pathname, search: next ? `?${next}` : '', hash: location.hash },
       { replace: true },
     );
-    // Trigger a refresh in case the focus listener didn't fire (e.g. same-tab redirect).
-    void sub.refresh();
+    // Trigger a refresh in case the focus listener didn't fire (e.g. same-tab
+    // redirect). Idempotency-guarded: if the dialog remounts within the same
+    // confirmation guard window (back-nav, persisted-state hydration, React
+    // StrictMode double-invoke) the second call is a no-op so we don't burn
+    // a redundant `check-subscription` round-trip per remount.
+    const guardTs = activeGuardTsRef.current;
+    if (guardTs !== null && claimRefreshSlot(guardTs, detected, 'mount')) {
+      void sub.refresh();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.search]);
 
@@ -635,8 +721,17 @@ export function CheckoutConfirmation() {
   const handleRetryRefresh = async () => {
     if (refreshAttemptRef.current >= MAX_REFRESH_RETRIES) return;
     if (refreshState === 'updating') return;
-    refreshAttemptRef.current += 1;
-    setRefreshAttempt(refreshAttemptRef.current);
+    const nextAttempt = refreshAttemptRef.current + 1;
+    const guardTs = activeGuardTsRef.current;
+    // Per-checkout idempotency: each user click owns a unique `retry:N` slot
+    // tied to the active confirmation guard. If the dialog remounts mid-retry
+    // (state hydration, transient unmount) the in-flight slot is already
+    // claimed and the duplicate call is suppressed.
+    if (mode && guardTs !== null && !claimRefreshSlot(guardTs, mode, `retry:${nextAttempt}`)) {
+      return;
+    }
+    refreshAttemptRef.current = nextAttempt;
+    setRefreshAttempt(nextAttempt);
     setRefreshState('updating');
     setRefreshError(null);
     try {
