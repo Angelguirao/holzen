@@ -175,7 +175,7 @@ The helper `public.emit_job_heartbeat('<job_name>')` looks up the UUID and no-op
 
 Short version:
 
-1. BetterStack → **Heartbeats** → create one per job (grace ≈ 2× schedule interval).
+1. BetterStack → **Heartbeats** → create one per job using the **Period** + **Grace** in the table below — these are the canonical values, do not eyeball them. Tuning rationale lives in the backlog ticket.
 2. In Supabase SQL editor:
    ```sql
    UPDATE public.app_config
@@ -187,16 +187,22 @@ Short version:
    PERFORM public.emit_job_heartbeat('refresh_btc_prices');
    ```
 
-| Cron job | Schedule | `app_config` key | Grace |
-|---|---|---|---|
-| `refresh-btc-prices` | `*/15 * * * *` | `heartbeat.refresh_btc_prices` | 30 min |
-| `pregenerate-companions` | `0 */6 * * *` | `heartbeat.pregenerate_companions` | 12 hr |
-| `check-volatility` | `*/15 * * * *` | `heartbeat.check_volatility` | 30 min |
-| `check-followups` | `0 */6 * * *` | `heartbeat.check_followups` | 12 hr |
-| `night-reflection` | `0 * * * *` | `heartbeat.night_reflection` | 2 hr |
-| `fetch-source-feeds` | `0 6,18 * * *` | `heartbeat.fetch_source_feeds` | 24 hr |
-| `process-referral-pending` | `*/5 * * * *` | `heartbeat.process_referral_pending` | 15 min |
-| `process-email-queue` | `*/1 * * * *` | `heartbeat.process_email_queue` | 5 min |
+#### Heartbeat windows (canonical)
+
+Mirror of the table in [pg-cron-heartbeat-wiring.md §Part A](../backlog/pg-cron-heartbeat-wiring.md#part-a--betterstack-heartbeats--8-min). If you change a value, change it in **both** places in the same PR — the backlog ticket owns the *why* (per-job rationale + tuning rule), this runbook is the *what* (the values to type into BetterStack).
+
+| Cron job | Schedule | Period | Grace | `app_config` key |
+|---|---|---|---|---|
+| `process-email-queue` | `*/1 * * * *` | 1 min | 5 min | `heartbeat.process_email_queue` |
+| `process-referral-pending` | `*/5 * * * *` | 5 min | 2 min | `heartbeat.process_referral_pending` |
+| `refresh-btc-prices` | `*/15 * * * *` | 15 min | 5 min | `heartbeat.refresh_btc_prices` |
+| `check-volatility` | `*/15 * * * *` | 15 min | 5 min | `heartbeat.check_volatility` |
+| `night-reflection` | `0 * * * *` | 1 hr | 10 min | `heartbeat.night_reflection` |
+| `pregenerate-companions` | `0 */6 * * *` | 6 hr | 30 min | `heartbeat.pregenerate_companions` |
+| `check-followups` | `0 */6 * * *` | 6 hr | 30 min | `heartbeat.check_followups` |
+| `fetch-source-feeds` | `0 6,18 * * *` | 12 hr | 30 min | `heartbeat.fetch_source_feeds` |
+
+**Tuning rule (one-liner):** sub-hourly → grace = period; hourly → grace = 10 min; multi-hour/daily → grace = 30 min absolute. Floor 2 min; never exceed 1× period for sub-hourly. Full rationale + per-job justification in the backlog ticket.
 
 Override the base URL (e.g. to a non-BetterStack provider) via `heartbeat._base_url` in `app_config`.
 
