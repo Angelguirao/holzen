@@ -24,6 +24,9 @@ interface SubCache {
   wallpaperLimit: number;
   wallpaperUsed: number;
   wallpaperRemaining: number;
+  insightsLimit: number;
+  insightsUsed: number;
+  insightsRemaining: number;
   ts: number;
 }
 
@@ -78,6 +81,9 @@ type SubscriptionSnapshot = {
   wallpaperLimit: number;
   wallpaperUsed: number;
   wallpaperRemaining: number;
+  insightsLimit: number;
+  insightsUsed: number;
+  insightsRemaining: number;
 };
 
 async function fetchSubscriptionSnapshot(userId: string, force: boolean): Promise<SubscriptionSnapshot> {
@@ -94,6 +100,9 @@ async function fetchSubscriptionSnapshot(userId: string, force: boolean): Promis
     const wallpaperLimit = Number(data.monthly_wallpaper_limit) || 0;
     const wallpaperUsed = Number(data.monthly_wallpaper_used) || 0;
     const wallpaperRemaining = Math.max(0, Number(data.monthly_wallpaper_remaining) || 0);
+    const insightsLimit = Number(data.monthly_insights_limit) || 0;
+    const insightsUsed = Number(data.monthly_insights_used) || 0;
+    const insightsRemaining = Math.max(0, Number(data.monthly_insights_remaining) || 0);
     writeSubCache({
       subscribed: true,
       tier,
@@ -105,6 +114,9 @@ async function fetchSubscriptionSnapshot(userId: string, force: boolean): Promis
       wallpaperLimit,
       wallpaperUsed,
       wallpaperRemaining,
+      insightsLimit,
+      insightsUsed,
+      insightsRemaining,
       ts: Date.now(),
     });
     return {
@@ -118,6 +130,9 @@ async function fetchSubscriptionSnapshot(userId: string, force: boolean): Promis
       wallpaperLimit,
       wallpaperUsed,
       wallpaperRemaining,
+      insightsLimit,
+      insightsUsed,
+      insightsRemaining,
     };
   }
 
@@ -147,6 +162,9 @@ async function fetchSubscriptionSnapshot(userId: string, force: boolean): Promis
     wallpaperLimit: 0,
     wallpaperUsed: 0,
     wallpaperRemaining: 0,
+    insightsLimit: 0,
+    insightsUsed: 0,
+    insightsRemaining: 0,
     ts: Date.now(),
   });
   return {
@@ -160,6 +178,9 @@ async function fetchSubscriptionSnapshot(userId: string, force: boolean): Promis
     wallpaperLimit: 0,
     wallpaperUsed: 0,
     wallpaperRemaining: 0,
+    insightsLimit: 0,
+    insightsUsed: 0,
+    insightsRemaining: 0,
   };
 }
 
@@ -204,6 +225,9 @@ export function useSubscription() {
           wallpaperLimit: cacheFallback.wallpaperLimit,
           wallpaperUsed: cacheFallback.wallpaperUsed,
           wallpaperRemaining: cacheFallback.wallpaperRemaining,
+          insightsLimit: cacheFallback.insightsLimit,
+          insightsUsed: cacheFallback.insightsUsed,
+          insightsRemaining: cacheFallback.insightsRemaining,
         }
       : undefined);
 
@@ -227,6 +251,9 @@ export function useSubscription() {
   const wallpaperLimit = effectiveSnapshot?.wallpaperLimit ?? 0;
   const wallpaperUsed = effectiveSnapshot?.wallpaperUsed ?? 0;
   const wallpaperRemaining = effectiveSnapshot?.wallpaperRemaining ?? 0;
+  const insightsLimit = effectiveSnapshot?.insightsLimit ?? 0;
+  const insightsUsed = effectiveSnapshot?.insightsUsed ?? 0;
+  const insightsRemaining = effectiveSnapshot?.insightsRemaining ?? 0;
   const loading = !!userId && query.isLoading && !query.data;
 
   useEffect(() => {
@@ -242,8 +269,9 @@ export function useSubscription() {
       monthlyUsed,
       companionRemaining,
       wallpaperRemaining,
+      insightsRemaining,
     });
-  }, [loading, subscribed, tier, monthlyRemaining, monthlyUsed, companionRemaining, wallpaperRemaining]);
+  }, [loading, subscribed, tier, monthlyRemaining, monthlyUsed, companionRemaining, wallpaperRemaining, insightsRemaining]);
 
   const startCheckout = useCallback(async (planTier: 'pro' | 'pro_plus' = 'pro') => {
     holzenLog.subscription('checkout', { action: 'start', planTier });
@@ -316,6 +344,9 @@ export function useSubscription() {
       wallpaperLimit: 0,
       wallpaperUsed: 0,
       wallpaperRemaining: 0,
+      insightsLimit: 0,
+      insightsUsed: 0,
+      insightsRemaining: 0,
       canReflect: false,
     };
   }
@@ -336,6 +367,9 @@ export function useSubscription() {
     wallpaperLimit,
     wallpaperUsed,
     wallpaperRemaining,
+    insightsLimit,
+    insightsUsed,
+    insightsRemaining,
     canReflect,
   };
 }

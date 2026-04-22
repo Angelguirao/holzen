@@ -2,6 +2,11 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
+import {
+  consumeMonthlyFeatureQuota,
+  resolveTierFromProfile,
+  tierLimits,
+} from "../_shared/subscription-entitlements.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -175,6 +180,45 @@ serve(
         .limit(200);
 
       if (refError || !reflections || reflections.length < 5) continue;
+
+      if (singleUserId) {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("lifetime_access, subscription_status, subscription_tier")
+          .eq("user_id", userId)
+          .maybeSingle();
+        const tier = resolveTierFromProfile(profile);
+        if (tier === "free") {
+          return new Response(
+            JSON.stringify({
+              error: "AI insights are available on paid plans.",
+              code: "insights_upgrade_required",
+            }),
+            { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          );
+        }
+        const limits = tierLimits(tier);
+        const quota = await consumeMonthlyFeatureQuota(
+          supabase,
+          userId,
+          "reflection_insights",
+          limits.reflection_insights,
+          1,
+        );
+        if (!quota.allowed) {
+          return new Response(
+            JSON.stringify({
+              error: "You've used this month's insights allowance.",
+              code: "insights_quota_exceeded",
+              tier,
+              insights_limit: quota.limit,
+              insights_used: quota.used,
+              insights_remaining: quota.remaining,
+            }),
+            { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+          );
+        }
+      }
 
       // Build skill-oriented summary
       const summary = reflections.map((r: any) => {
