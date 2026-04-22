@@ -1,4 +1,13 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
+
+// The idempotency module emits PostHog + holzen-console events. Mock both so
+// tests don't depend on analytics init and can assert on emitted metrics.
+const trackEvent = vi.fn();
+vi.mock('@/lib/posthog', () => ({ trackEvent: (...args: unknown[]) => trackEvent(...args) }));
+vi.mock('@/lib/holzen-console', () => ({
+  holzenLog: { companion: vi.fn() },
+}));
+
 import {
   hasInvokedIntervention,
   runOnceIntervention,
@@ -20,6 +29,7 @@ import {
 describe('orchestrate intervention idempotency', () => {
   beforeEach(() => {
     sessionStorage.clear();
+    trackEvent.mockClear();
     // Ensure the in-memory single-flight map starts empty between tests.
     resetInterventionIdempotency('r-1');
     resetInterventionIdempotency('r-2');
