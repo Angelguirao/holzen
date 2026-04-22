@@ -15,6 +15,7 @@ import { useSubscription } from '@/hooks/use-subscription';
 import { PRICING } from '@/lib/pricing';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
+import { getCheckoutSuppressionWindowMs } from '@/lib/checkout-suppression-window';
 
 type Mode = 'subscription' | 'flex_pack_s' | 'flex_pack_m' | null;
 
@@ -111,7 +112,6 @@ type CheckoutEventLite = {
  */
 const CHECKOUT_CONFIRMED_KEY = 'holzen_checkout_confirmed';
 const CHECKOUT_STARTED_KEY = 'holzen_checkout_started_at'; // mirrors useSubscription
-const CHECKOUT_CONFIRMED_WINDOW_MS = 30 * 60 * 1000;
 
 /**
  * Per-checkout idempotency guard for `sub.refresh()` calls driven by this
