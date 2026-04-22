@@ -10,6 +10,7 @@ import {
   resolveTierFromProfile,
   tierLimits,
 } from "../_shared/subscription-entitlements.ts";
+import { AI_TEMPORARILY_UNAVAILABLE_MESSAGE } from "../_shared/ai-user-messages.ts";
 import { generateQuestion } from "../_shared/generators/question.ts";
 import { determineSessionIntent } from "../_shared/session-intent.ts";
 import { selectIntervention, parseDirection, bucketSeverity, type InterventionSelection } from "../_shared/intervention-selector.ts";
@@ -372,7 +373,7 @@ serve(
       log(`budget exceeded (${budget.tripped}): ${budget.reason}`);
       return new Response(
         JSON.stringify({
-          error: "Generation budget exceeded.",
+          error: AI_TEMPORARILY_UNAVAILABLE_MESSAGE,
           tripped: budget.tripped,
         }),
         { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } },

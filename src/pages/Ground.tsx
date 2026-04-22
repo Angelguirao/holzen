@@ -14,7 +14,7 @@ import { useProGate } from '@/hooks/use-pro-gate';
 import { companionFallbacksDisabledClient } from '@/lib/companion-strict';
 import { parseGroundLocationState } from '@/lib/router-location-state';
 import { Textarea } from '@/components/ui/textarea';
-import { parseEdgeFunctionError } from '@/lib/edge-function-error';
+import { parseEdgeFunctionError, toUserFacingAiErrorMessage } from '@/lib/edge-function-error';
 
 type Phase = 'idle' | 'suggestion' | 'timer' | 'checkin' | 'reflect' | 'done';
 
@@ -148,8 +148,9 @@ export default function Ground() {
         }
       } catch (error) {
         const parsed = await parseEdgeFunctionError(error);
+        const message = toUserFacingAiErrorMessage(parsed, t('ground.suggestionFailed'));
         if (parsed.code === 'ai_action_quota_exceeded' || parsed.code === 'ai_action_upgrade_required') {
-          setSuggestionError(parsed.message ?? t('ground.suggestionFailed'));
+          setSuggestionError(message);
           setActivity('');
           setSuggestion('');
           setInsight(null);
@@ -158,7 +159,7 @@ export default function Ground() {
           return;
         }
         if (strictNoFallback) {
-          setSuggestionError(t('ground.suggestionFailed'));
+          setSuggestionError(message);
           setActivity('');
           setSuggestion('');
           setInsight(null);

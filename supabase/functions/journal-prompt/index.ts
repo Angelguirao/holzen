@@ -4,6 +4,7 @@ import { createAttemptLogger } from "../_shared/observe.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import { EdgeError } from "../_shared/edge-error.ts";
 import { logDependencyCall } from "../_shared/deps.ts";
+import { AI_TEMPORARILY_UNAVAILABLE_MESSAGE } from "../_shared/ai-user-messages.ts";
 import {
   consumeAllowanceOrCredits,
   resolveTierFromProfile,
@@ -51,11 +52,12 @@ serve(
       providers: ["lovable"],
     });
     if (!guard.allowed) {
+      log("guard blocked", { reason: guard.reason ?? "unknown", status: guard.status ?? 503 });
       // Feature/rate guard failures are expected — they carry budget/fairness semantics
       // and should not page to Sentry. `dependency_unavailable` maps that to a 503.
       throw new EdgeError(
         "dependency_unavailable",
-        guard.reason ?? "Temporarily unavailable",
+        AI_TEMPORARILY_UNAVAILABLE_MESSAGE,
         guard.status ?? 503
       );
     }

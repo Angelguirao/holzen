@@ -37,3 +37,45 @@ export async function parseEdgeFunctionError(error: unknown): Promise<ParsedEdge
   }
   return { message: null, code: null, details: null };
 }
+
+const ALLOWANCE_CODES = new Set([
+  "companions_quota_exceeded",
+  "companions_upgrade_required",
+  "ai_action_quota_exceeded",
+  "ai_action_upgrade_required",
+  "insights_quota_exceeded",
+  "insights_upgrade_required",
+  "wallpaper_quota_exceeded",
+  "wallpaper_upgrade_required",
+]);
+
+/**
+ * Convert edge function failures into user-facing copy:
+ * - keep allowance/upgrade messages specific,
+ * - collapse operational guardrails (budget/circuit breaker/rate-limits/provider errors)
+ *   into a single friendly retry-later message.
+ */
+export function toUserFacingAiErrorMessage(
+  parsed: ParsedEdgeFunctionError,
+  fallback: string,
+): string {
+  if (parsed.code && ALLOWANCE_CODES.has(parsed.code)) {
+    return parsed.message ?? fallback;
+  }
+
+  const lower = (parsed.message ?? "").toLowerCase();
+  if (
+    lower.includes("rate limited") ||
+    lower.includes("budget exceeded") ||
+    lower.includes("cap exceeded") ||
+    lower.includes("temporarily unavailable") ||
+    lower.includes("provider") ||
+    lower.includes("degraded") ||
+    lower.includes("feature") ||
+    lower.includes("panic mode")
+  ) {
+    return "This AI feature is temporarily unavailable. Please try again in a minute.";
+  }
+
+  return parsed.message ?? fallback;
+}

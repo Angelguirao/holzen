@@ -19,7 +19,7 @@ import {
 import { loadMoodHistoryForOrchestrate } from '@/lib/companion-mood-history';
 import { loadActiveOrchestrateSources } from '@/lib/companion-orchestrate-sources';
 import { getRecencyHints } from '@/lib/companion-recency-hints';
-import { parseEdgeFunctionError } from '@/lib/edge-function-error';
+import { parseEdgeFunctionError, toUserFacingAiErrorMessage } from '@/lib/edge-function-error';
 import {
   applyOrchestrateSlotLazyOrRegenerate,
   EMPTY_COMPANION_SLOT_RELAXATIONS,
@@ -381,9 +381,15 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       const body = data as Record<string, unknown> | null;
       const payloadError = !!fnError || !body || Boolean(body.error);
       if (payloadError) {
-        const parsedError = fnError ? await parseEdgeFunctionError(fnError) : { code: null, message: null };
+        const parsedError = fnError ? await parseEdgeFunctionError(fnError) : { code: null, message: null, details: null };
         const code = typeof body?.code === 'string' ? body.code : parsedError.code;
-        const msg = typeof body?.error === 'string' ? body.error : parsedError.message;
+        const msg = toUserFacingAiErrorMessage(
+          {
+            ...parsedError,
+            message: typeof body?.error === 'string' ? body.error : parsedError.message,
+          },
+          'This AI feature is temporarily unavailable. Please try again in a minute.',
+        );
         holzenLog.companion('lazy fetch orchestrate failed', {
           slot,
           reflection_prefix: reflectionId.slice(0, 8),
@@ -395,6 +401,12 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
           toast({
             title: 'Companion unavailable',
             description: msg ?? 'This companion is outside your current plan allowance.',
+            variant: 'destructive',
+          });
+        } else {
+          toast({
+            title: 'Companion unavailable',
+            description: msg,
             variant: 'destructive',
           });
         }
@@ -505,11 +517,18 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       const body = data as Record<string, unknown> | null;
       const payloadError = !!fnError || !body || Boolean(body.error);
       if (payloadError) {
-        const parsedError = fnError ? await parseEdgeFunctionError(fnError) : { code: null, message: null };
+        const parsedError = fnError ? await parseEdgeFunctionError(fnError) : { code: null, message: null, details: null };
         const code = typeof body?.code === 'string' ? body.code : parsedError.code;
-        const msg = typeof body?.error === 'string'
-          ? body.error
-          : parsedError.message ?? fnError?.message ?? 'Regenerate failed';
+        const msg = toUserFacingAiErrorMessage(
+          {
+            ...parsedError,
+            message:
+              typeof body?.error === 'string'
+                ? body.error
+                : parsedError.message ?? fnError?.message,
+          },
+          'This AI feature is temporarily unavailable. Please try again in a minute.',
+        );
         holzenLog.companion('regenerate orchestrate failed', {
           slot,
           reflection_prefix: reflectionId.slice(0, 8),

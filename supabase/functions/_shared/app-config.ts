@@ -55,9 +55,9 @@ export interface AppConfig {
 const DEFAULTS: AppConfig = {
   signups_enabled: true,
   signups_max_per_day: null,
-  budget_daily_usd_global: 10.0,
-  budget_daily_usd_per_user: 1.0,
-  budget_monthly_usd_global: 300.0,
+  budget_daily_usd_global: 60.0,
+  budget_daily_usd_per_user: 2.5,
+  budget_monthly_usd_global: 1800.0,
   panic_mode: false,
   feature_flags: {},
 };

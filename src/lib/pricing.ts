@@ -4,7 +4,7 @@
  */
 export const PRICING = {
   /** Monthly price in USD */
-  monthlyPrice: 5,
+  monthlyPrice: 4.99,
   /** Pro+ monthly price in USD */
   proPlusMonthlyPrice: 9.99,
   /** Number of free reflections per month */

@@ -18,7 +18,6 @@ const corsHeaders = {
 
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 const SUBSCRIBED_STATUSES = new Set(["active", "trialing"]);
-const DEFAULT_PRO_PRICE_ID = "price_1T9142I1yxxxpduPWh7kf9CI";
 
 serve(
   withRequestLogging("check-subscription", async ({ req }) => {
@@ -164,7 +163,7 @@ serve(
     let subscriptionTier: "free" | "pro" | "pro_plus" | "lifetime" = "free";
     let activePriceId: string | null = null;
 
-    const proPriceId = Deno.env.get("STRIPE_PRICE_ID_PRO") ?? DEFAULT_PRO_PRICE_ID;
+    const proPriceId = Deno.env.get("STRIPE_PRICE_ID_PRO") ?? null;
     const proPlusPriceId = Deno.env.get("STRIPE_PRICE_ID_PRO_PLUS") ?? null;
 
     if (customers.data.length > 0) {

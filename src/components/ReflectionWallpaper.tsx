@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 import { Sparkles, Download, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
-import { parseEdgeFunctionError } from '@/lib/edge-function-error';
+import { parseEdgeFunctionError, toUserFacingAiErrorMessage } from '@/lib/edge-function-error';
 import {
   Dialog,
   DialogContent,
@@ -125,7 +125,7 @@ export function ReflectionWallpaper({ message, mood, context, haiku, variant = '
 
       if (error) {
         const parsed = await parseEdgeFunctionError(error);
-        throw new Error(parsed.message || t('wallpaper.failedToGenerate'));
+        throw new Error(toUserFacingAiErrorMessage(parsed, t('wallpaper.failedToGenerate')));
       }
       if (data?.error) throw new Error(data.error);
 

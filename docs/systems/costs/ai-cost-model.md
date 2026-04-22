@@ -117,7 +117,7 @@ context length, and search depth. Use as order of magnitude only.
 | Wallpaper (Gemini image) | ~1,290 output tokens / image | `1290×30/1e6` (output-dominated) | `~$0.039` |
 
 Perplexity remains the dominant per-call cost in pause generation, so the
-`$10/day` global cap is mainly sizing against Sonar Pro volume.
+`$60/day` global cap is mainly sizing against Sonar Pro volume.
 
 ### 3.2 Full pause build-up (all-live, all companions on)
 
@@ -181,12 +181,15 @@ say we didn't see it coming.
 
 ### 4.4 What caps actually stop
 
-The defaults in `app_config` (`$10` daily global / `$1` daily per-user /
-`$300` monthly global) map to roughly **45 all-live pauses globally per day**
-(down from ~50 pre-drift since each pause now costs a bit more).
-That's the ceiling, not the expected usage. The ceiling is intentionally
-aggressive so you raise it on purpose, not by accident. Raise the cap in the
-admin Tools tab when you see the daily spend bar sustain >60% for a week.
+The current defaults in `app_config` (`$60` daily global / `$2.5` daily
+per-user / `$1,800` monthly global) map to roughly:
+
+- **~285 all-live pauses/day globally** (`$60 / ~$0.21`)
+- **~11 all-live pauses/day for a single user** (`$2.5 / ~$0.21`)
+
+This is a growth-ready operating envelope for the Flex-credit model, while
+still preserving hard backstops. Raise caps intentionally (not reactively)
+when spend bars stay elevated and conversion economics remain healthy.
 
 ---
 
@@ -353,8 +356,8 @@ of live generation won't immediately re-trigger the cap.
 
 | Trigger | Default threshold | Setting in `app_config` |
 |---|---|---|
-| Yesterday's global spend ≥ *X*% of `budget_daily_usd_global` | 80% | `ai_cost_alert_daily_threshold_pct` |
-| Yesterday's spend ≥ *N*× the 7-day average | 2.0× | `ai_cost_alert_wow_multiplier` |
+| Yesterday's global spend ≥ *X*% of `budget_daily_usd_global` | 70% | `ai_cost_alert_daily_threshold_pct` |
+| Yesterday's spend ≥ *N*× the 7-day average | 1.8× | `ai_cost_alert_wow_multiplier` |
 | Month-to-date projection > `budget_monthly_usd_global` | — | (always on) |
 
 **Setup:**
@@ -397,23 +400,23 @@ engineering cap first, not the provider cap.
 
 | Setting                   | Value    |
 | ------------------------- | -------- |
-| Reload when balance below | **$20**  |
-| Reload amount             | **$50**  |
-| Monthly spend cap         | **$300** |
+| Reload when balance below | **$50**  |
+| Reload amount             | **$150** |
+| Monthly spend cap         | **$1,200** |
 
 
-Each $50 top-up buys ~250 Sonar Pro calls at the current midpoint. The $300
-cap is ~2× current 100 Pro DAU forecast (§4.1) so it provides cushion for
-moderate growth without going wild during an incident.
+Each $150 top-up buys ~750 Sonar Pro calls at the current midpoint. The
+$1,200 cap keeps provider billing aligned with the new engineering monthly cap,
+while still limiting blast radius during abnormal traffic.
 
 ### 8.2 Lovable AI (Workspace → Cloud & AI balance → Auto top-up)
 
 
 | Setting                   | Value    |
 | ------------------------- | -------- |
-| Reload when balance below | **$15**  |
-| Reload amount             | **$40**  |
-| Monthly spend cap         | **$150** |
+| Reload when balance below | **$30**  |
+| Reload amount             | **$90**  |
+| Monthly spend cap         | **$600** |
 
 
 Lovable spend is dominated by cheap Gemini flash tokens; wallpaper images
