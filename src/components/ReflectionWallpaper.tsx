@@ -4,6 +4,7 @@ import { Sparkles, Download, Loader2 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { parseEdgeFunctionError, toUserFacingAiErrorMessage } from '@/lib/edge-function-error';
+import { useSubscription } from '@/hooks/use-subscription';
 import {
   Dialog,
   DialogContent,
