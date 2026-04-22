@@ -43,6 +43,7 @@ const CompanionGroundingPage = lazy(() => import("./pages/CompanionGroundingPage
 const Ground = lazy(() => import("./pages/Ground"));
 const GroundHistory = lazy(() => import("./pages/GroundHistory"));
 const Admin = lazy(() => import("./pages/Admin"));
+const SmokeTest = lazy(() => import("./pages/SmokeTest"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
 const BillingHistory = lazy(() => import("./pages/BillingHistory"));
 
@@ -174,6 +175,7 @@ const App = () => (
                 <Route path="/practice/bodyscan" element={<ProtectedRoute><PracticeBodyScan /></ProtectedRoute>} />
                 <Route path="/practice/replay" element={<ProtectedRoute><PracticeReplay /></ProtectedRoute>} />
                 <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
+                <Route path="/admin/smoke-test" element={<ProtectedRoute><SmokeTest /></ProtectedRoute>} />
                 <Route path="/welcome" element={<PublicOnlyRoute><Landing /></PublicOnlyRoute>} />
                 <Route path="/auth" element={<PublicOnlyRoute><Auth /></PublicOnlyRoute>} />
                 <Route path="/reset-password" element={<ResetPassword />} />
