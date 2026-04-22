@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { CalendarClock, RefreshCw, Settings as SettingsIcon, AlertTriangle, Receipt, FileCheck } from 'lucide-react';
+import { CalendarClock, RefreshCw, Settings as SettingsIcon, AlertTriangle, Receipt, FileCheck, Mail, BellRing, BellOff } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -224,6 +224,17 @@ export function CheckoutConfirmation() {
   const [refreshState, setRefreshState] = useState<'idle' | 'updating' | 'timeout' | 'error'>('idle');
   const [refreshError, setRefreshError] = useState<string | null>(null);
   const refreshTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  // Notify-channel status for the *current* confirmation. Purely informational —
+  // the dialog never blocks on it. `null` = request still in flight (or not yet
+  // dispatched for a syncing subscription); otherwise the resolved per-channel
+  // outcome from `notify-checkout-confirmation`.
+  const [notifyStatus, setNotifyStatus] = useState<{
+    emailed: boolean;
+    pushed: number;
+    skipped?: string | null;
+    failed: boolean;
+    errorMessage?: string | null;
+  } | null>(null);
   const refreshAttemptRef = useRef(0);
   // Sticky display values. We only ever advance forward (never regress to a
   // smaller balance / "credits added" than what we previously showed) so the
@@ -607,6 +618,7 @@ export function CheckoutConfirmation() {
     if (mode === 'subscription' && (sub.loading || !sub.subscriptionStatus)) return;
 
     notifySentRef.current = mode;
+    setNotifyStatus(null);
 
     const payload =
       mode === 'subscription'
@@ -638,9 +650,30 @@ export function CheckoutConfirmation() {
 
     void supabase.functions
       .invoke('notify-checkout-confirmation', { body: payload })
+      .then(({ data, error }) => {
+        if (error) {
+          console.warn('[checkout-confirmation] notify failed', error);
+          setNotifyStatus({
+            emailed: false,
+            pushed: 0,
+            failed: true,
+            errorMessage: error.message ?? String(error),
+          });
+          return;
+        }
+        const emailed = Boolean((data as { emailed?: boolean } | null)?.emailed);
+        const pushed = Number((data as { pushed?: number } | null)?.pushed ?? 0);
+        const skipped = (data as { skipped?: string | null } | null)?.skipped ?? null;
+        setNotifyStatus({ emailed, pushed, skipped, failed: false, errorMessage: null });
+      })
       .catch((e) => {
-        // Best-effort — never block the dialog or toast on failure.
         console.warn('[checkout-confirmation] notify failed', e);
+        setNotifyStatus({
+          emailed: false,
+          pushed: 0,
+          failed: true,
+          errorMessage: e instanceof Error ? e.message : String(e),
+        });
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, sub.loading, sub.subscriptionStatus, sub.tier, currentBalance, creditsAdded, projectedBalance]);
@@ -802,6 +835,10 @@ export function CheckoutConfirmation() {
           />
         ) : null}
 
+        {mode !== null ? (
+          <NotifyDispatchStatus status={notifyStatus} />
+        ) : null}
+
         <DialogFooter className="mt-2">
           {mode !== null && mode !== 'subscription' ? (
             <Button
@@ -883,6 +920,88 @@ function SummaryRow({
 }
 
 export default CheckoutConfirmation;
+
+/**
+ * Inline transparency row showing whether the optional email + web-push
+ * confirmation requests were successfully queued for this purchase.
+ *
+ * Intentionally calm: no celebratory icons, no retry affordance — the channel
+ * is best-effort and the dialog never blocks on it. Three states:
+ *  - `null`              → still dispatching (muted spinner row)
+ *  - server `skipped`    → user opted out of notifications (muted note)
+ *  - resolved            → per-channel summary (email + N device(s))
+ *  - `failed`            → muted warning row with the error message
+ */
+function NotifyDispatchStatus({
+  status,
+}: {
+  status: {
+    emailed: boolean;
+    pushed: number;
+    skipped?: string | null;
+    failed: boolean;
+    errorMessage?: string | null;
+  } | null;
+}) {
+  const baseClass =
+    'mt-3 flex items-center gap-2 rounded-md border border-border bg-muted/20 px-3 py-2 text-xs text-muted-foreground';
+
+  if (status === null) {
+    return (
+      <div className={baseClass} role="status" aria-live="polite">
+        <LoadingSpinner className="h-3 w-3 border-[1.5px]" />
+        <span>Queuing email and push confirmation…</span>
+      </div>
+    );
+  }
+
+  if (status.skipped === 'opted_out') {
+    return (
+      <div className={baseClass} role="status">
+        <BellOff className="h-3.5 w-3.5" aria-hidden />
+        <span>Notifications are off — no email or push sent.</span>
+      </div>
+    );
+  }
+
+  if (status.failed) {
+    return (
+      <div
+        className="mt-3 flex items-center gap-2 rounded-md border border-border bg-muted/30 px-3 py-2 text-xs text-muted-foreground"
+        role="status"
+      >
+        <AlertTriangle className="h-3.5 w-3.5" aria-hidden />
+        <span>
+          Could not queue email/push confirmation
+          {status.errorMessage ? (
+            <span className="ml-1 opacity-70">({status.errorMessage})</span>
+          ) : null}
+          .
+        </span>
+      </div>
+    );
+  }
+
+  const emailLabel = status.emailed ? 'Email queued' : 'Email skipped';
+  const pushLabel =
+    status.pushed > 0
+      ? `Push queued · ${status.pushed} device${status.pushed === 1 ? '' : 's'}`
+      : 'Push skipped';
+
+  return (
+    <div className={baseClass} role="status">
+      <span className="inline-flex items-center gap-1.5">
+        <Mail className="h-3.5 w-3.5" aria-hidden />
+        {emailLabel}
+      </span>
+      <span aria-hidden className="opacity-50">·</span>
+      <span className="inline-flex items-center gap-1.5">
+        <BellRing className="h-3.5 w-3.5" aria-hidden />
+        {pushLabel}
+      </span>
+    </div>
+  );
+}
 
 /**
  * Inline status banner for the wallet-refresh lifecycle on flex-pack
