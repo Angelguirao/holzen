@@ -162,17 +162,17 @@ serve(
 
         const isSub = body.mode === "subscription";
         const title = isSub
-          ? `Welcome to Holzen ${body.tierLabel ?? "Pro"}`
-          : "Holzen credits added";
+          ? `Holzen ${body.tierLabel ?? "Pro"} subscription confirmed`
+          : "Holzen flex credits added";
         const pushBody = isSub
           ? body.isTrialing && body.firstChargeAt
-            ? `Trial active — first charge ${body.firstChargeAt}.`
+            ? `Trial started — first charge ${body.firstChargeAt}.`
             : body.firstChargeAt
             ? `Subscription active — next charge ${body.firstChargeAt}.`
-            : "Your subscription is active."
+            : "Subscription active."
           : typeof body.creditsAdded === "number" && typeof body.newBalance === "number"
           ? `+${body.creditsAdded} credits • new balance ${body.newBalance}`
-          : "Your Flex credits are ready to spend.";
+          : "Flex credits added to your balance.";
 
         const payload = JSON.stringify({
           title,
