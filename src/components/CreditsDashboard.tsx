@@ -28,7 +28,7 @@ export function CreditsDashboard() {
     insightsRemaining,
     monthlyUsed,
     monthlyRemaining,
-    refresh,
+    manualRetry,
   } = useSubscription();
 
   const [refreshing, setRefreshing] = useState(false);
@@ -36,11 +36,11 @@ export function CreditsDashboard() {
     if (refreshing) return;
     setRefreshing(true);
     try {
-      await refresh();
+      await manualRetry();
     } finally {
       setRefreshing(false);
     }
-  }, [refresh, refreshing]);
+  }, [manualRetry, refreshing]);
 
   if (loading) {
     return (
