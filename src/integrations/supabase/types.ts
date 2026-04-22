@@ -1034,6 +1034,51 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          action_path: string | null
+          action_state: Json | null
+          created_at: string
+          dismissed_at: string | null
+          id: string
+          metadata: Json
+          read_at: string | null
+          source_id: string
+          source_table: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          action_path?: string | null
+          action_state?: Json | null
+          created_at?: string
+          dismissed_at?: string | null
+          id?: string
+          metadata?: Json
+          read_at?: string | null
+          source_id: string
+          source_table: string
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          action_path?: string | null
+          action_state?: Json | null
+          created_at?: string
+          dismissed_at?: string | null
+          id?: string
+          metadata?: Json
+          read_at?: string | null
+          source_id?: string
+          source_table?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       pause_notifications: {
         Row: {
           context: string | null
