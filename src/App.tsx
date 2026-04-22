@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-route
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import { holzenLog } from "@/lib/holzen-console";
 import { attachHolzenQueryLogging } from "@/lib/holzen-query-logging";
+import { scheduleCheckoutGuardCleanup } from "@/lib/checkout-suppression-window";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { OfflineBanner } from "./components/OfflineBanner";
 import { CookieConsent } from "./components/CookieConsent";
@@ -96,6 +97,15 @@ function HolzenQueryLogging() {
 }
 
 /**
+ * Periodically evict expired checkout-guard entries from local/session
+ * storage so they never grow unbounded across long-lived tabs.
+ */
+function CheckoutGuardCleanup() {
+  useEffect(() => scheduleCheckoutGuardCleanup(), []);
+  return null;
+}
+
+/**
  * Floating feedback button — only shown for authenticated users.
  * `send-feedback` requires an auth'd session, and the ErrorBoundary listener on the widget
  * also needs the auth context in case the user wants to reach support from the error screen.
@@ -125,6 +135,7 @@ const App = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
       <HolzenQueryLogging />
+      <CheckoutGuardCleanup />
       <TooltipProvider>
         <Sonner />
         <OfflineBanner />
