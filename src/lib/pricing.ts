@@ -5,10 +5,18 @@
 export const PRICING = {
   /** Monthly price in USD */
   monthlyPrice: 5,
+  /** Pro+ monthly price in USD */
+  proPlusMonthlyPrice: 9.99,
   /** Number of free reflections per month */
   freeReflectionsPerMonth: 3,
   /** Free trial duration in days */
   trialDays: 7,
+  /** Included premium companion unlocks per month */
+  proCompanionUnlocks: 12,
+  proPlusCompanionUnlocks: 30,
+  /** Included wallpaper generations per month */
+  proWallpapers: 5,
+  proPlusWallpapers: 15,
 } as const;
 
 /** Features that require a Pro subscription */

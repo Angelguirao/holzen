@@ -433,6 +433,9 @@ Provider top-up is a secondary net.
 
 ## 9. Related docs
 
+- `[docs/systems/costs/pricing-strategy.md](./pricing-strategy.md)` — final
+pricing/package strategy derived from this cost model (plan limits, add-ons,
+and sustainability thresholds).
 - `[docs/systems/pause/pause-session-cost-estimates.md](../pause/pause-session-cost-estimates.md)`
 — pause-only case study. Still valid for that narrow scope; this doc is
 the superset.

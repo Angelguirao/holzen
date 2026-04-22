@@ -2,6 +2,13 @@ import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
+import {
+  clampUsage,
+  getMonthlyFeatureUsage,
+  startOfUtcMonthDate,
+  tierFromStripePriceId,
+  tierLimits,
+} from "../_shared/subscription-entitlements.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -10,6 +17,7 @@ const corsHeaders = {
 
 const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 const SUBSCRIBED_STATUSES = new Set(["active", "trialing"]);
+const DEFAULT_PRO_PRICE_ID = "price_1T9142I1yxxxpduPWh7kf9CI";
 
 serve(
   withRequestLogging("check-subscription", async ({ req }) => {
@@ -57,16 +65,33 @@ serve(
     // Fetch cached subscription data from profiles
     const { data: profile } = await serviceClient
       .from("profiles")
-      .select("lifetime_access, subscription_status, subscription_end, subscription_checked_at")
+      .select(
+        "lifetime_access, subscription_status, subscription_tier, subscription_end, subscription_checked_at",
+      )
       .eq("user_id", userId)
       .single();
 
     // Lifetime access — always return immediately
     if (profile?.lifetime_access) {
+      const limits = tierLimits("lifetime");
+      const monthStart = startOfUtcMonthDate();
+      const [companionsUsed, wallpapersUsed] = await Promise.all([
+        getMonthlyFeatureUsage(serviceClient, userId, "premium_companion", monthStart),
+        getMonthlyFeatureUsage(serviceClient, userId, "wallpaper", monthStart),
+      ]);
+      const companions = clampUsage(companionsUsed, limits.premium_companion);
+      const wallpapers = clampUsage(wallpapersUsed, limits.wallpaper);
       return new Response(JSON.stringify({
         subscribed: true,
         lifetime: true,
+        tier: "lifetime",
         subscription_end: null,
+        monthly_companion_limit: limits.premium_companion,
+        monthly_companion_used: companions.used,
+        monthly_companion_remaining: companions.remaining,
+        monthly_wallpaper_limit: limits.wallpaper,
+        monthly_wallpaper_used: wallpapers.used,
+        monthly_wallpaper_remaining: wallpapers.remaining,
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -85,11 +110,29 @@ serve(
       if (now - checkedAt < CACHE_TTL_MS) {
         // Return cached result
         const cachedSubscribed = SUBSCRIBED_STATUSES.has(profile.subscription_status);
+        const tier = profile.subscription_status && SUBSCRIBED_STATUSES.has(profile.subscription_status)
+          ? (profile.subscription_tier === "pro_plus" ? "pro_plus" : "pro")
+          : "free";
+        const limits = tierLimits(tier);
+        const monthStart = startOfUtcMonthDate();
+        const [companionsUsed, wallpapersUsed] = await Promise.all([
+          getMonthlyFeatureUsage(serviceClient, userId, "premium_companion", monthStart),
+          getMonthlyFeatureUsage(serviceClient, userId, "wallpaper", monthStart),
+        ]);
+        const companions = clampUsage(companionsUsed, limits.premium_companion);
+        const wallpapers = clampUsage(wallpapersUsed, limits.wallpaper);
         return new Response(JSON.stringify({
           subscribed: cachedSubscribed,
           lifetime: false,
+          tier,
           subscription_end: profile.subscription_end,
           cached: true,
+          monthly_companion_limit: limits.premium_companion,
+          monthly_companion_used: companions.used,
+          monthly_companion_remaining: companions.remaining,
+          monthly_wallpaper_limit: limits.wallpaper,
+          monthly_wallpaper_used: wallpapers.used,
+          monthly_wallpaper_remaining: wallpapers.remaining,
         }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
@@ -103,6 +146,11 @@ serve(
     let hasActive = false;
     let subscriptionEnd: string | null = null;
     let subscriptionStatus = "free";
+    let subscriptionTier: "free" | "pro" | "pro_plus" | "lifetime" = "free";
+    let activePriceId: string | null = null;
+
+    const proPriceId = Deno.env.get("STRIPE_PRICE_ID_PRO") ?? DEFAULT_PRO_PRICE_ID;
+    const proPlusPriceId = Deno.env.get("STRIPE_PRICE_ID_PRO_PLUS") ?? null;
 
     if (customers.data.length > 0) {
       const subscriptions = await stripe.subscriptions.list({
@@ -116,6 +164,13 @@ serve(
 
       if (eligibleSub) {
         subscriptionStatus = eligibleSub.status;
+        activePriceId = eligibleSub.items?.data?.[0]?.price?.id ?? null;
+        subscriptionTier = tierFromStripePriceId({
+          hasActive: true,
+          priceId: activePriceId,
+          proPriceId,
+          proPlusPriceId,
+        });
         const itemEnd = eligibleSub.items?.data?.[0]?.current_period_end;
         const raw = itemEnd ?? (eligibleSub as any).current_period_end ?? eligibleSub.billing_cycle_anchor;
         try {
@@ -135,16 +190,34 @@ serve(
       .from("profiles")
       .update({
         subscription_status: subscriptionStatus,
+        subscription_tier: subscriptionTier,
         subscription_end: subscriptionEnd,
         subscription_checked_at: new Date().toISOString(),
       })
       .eq("user_id", userId);
 
+    const limits = tierLimits(subscriptionTier);
+    const monthStart = startOfUtcMonthDate();
+    const [companionsUsed, wallpapersUsed] = await Promise.all([
+      getMonthlyFeatureUsage(serviceClient, userId, "premium_companion", monthStart),
+      getMonthlyFeatureUsage(serviceClient, userId, "wallpaper", monthStart),
+    ]);
+    const companions = clampUsage(companionsUsed, limits.premium_companion);
+    const wallpapers = clampUsage(wallpapersUsed, limits.wallpaper);
+
     return new Response(JSON.stringify({
       subscribed: hasActive,
       lifetime: false,
+      tier: subscriptionTier,
       subscription_end: subscriptionEnd,
       cached: false,
+      stripe_price_id: activePriceId,
+      monthly_companion_limit: limits.premium_companion,
+      monthly_companion_used: companions.used,
+      monthly_companion_remaining: companions.remaining,
+      monthly_wallpaper_limit: limits.wallpaper,
+      monthly_wallpaper_used: wallpapers.used,
+      monthly_wallpaper_remaining: wallpapers.remaining,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });

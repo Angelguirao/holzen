@@ -8,7 +8,8 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
-const PRICE_ID = "price_1T9142I1yxxxpduPWh7kf9CI";
+const DEFAULT_PRO_PRICE_ID = "price_1T9142I1yxxxpduPWh7kf9CI";
+const PLAN_TIERS = new Set(["pro", "pro_plus"]);
 
 serve(
   withRequestLogging("create-checkout", async ({ req }) => {
@@ -36,11 +37,24 @@ serve(
     }
 
     const origin = req.headers.get("origin") || "http://localhost:3000";
+    let requestedTier = "pro";
+    try {
+      const body = await req.json();
+      const rawTier = typeof body?.planTier === "string" ? body.planTier.trim().toLowerCase() : "pro";
+      requestedTier = PLAN_TIERS.has(rawTier) ? rawTier : "pro";
+    } catch {
+      requestedTier = "pro";
+    }
+
+    const priceIdPro = Deno.env.get("STRIPE_PRICE_ID_PRO") ?? DEFAULT_PRO_PRICE_ID;
+    const priceIdProPlus = Deno.env.get("STRIPE_PRICE_ID_PRO_PLUS");
+    const selectedPriceId =
+      requestedTier === "pro_plus" && priceIdProPlus ? priceIdProPlus : priceIdPro;
 
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
-      line_items: [{ price: PRICE_ID, quantity: 1 }],
+      line_items: [{ price: selectedPriceId, quantity: 1 }],
       mode: "subscription",
       allow_promotion_codes: true,
       success_url: `${origin}/?subscribed=true`,
@@ -48,6 +62,7 @@ serve(
       subscription_data: {
         trial_period_days: 7,
         description: "Holzen — Bitcoin self-awareness companion",
+        metadata: { plan_tier: requestedTier },
       },
     });
 
