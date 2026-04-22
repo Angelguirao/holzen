@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-route
 import { AuthProvider, useAuth } from "@/hooks/use-auth";
 import { holzenLog } from "@/lib/holzen-console";
 import { attachHolzenQueryLogging } from "@/lib/holzen-query-logging";
+import { scheduleCheckoutGuardCleanup } from "@/lib/checkout-suppression-window";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { OfflineBanner } from "./components/OfflineBanner";
 import { CookieConsent } from "./components/CookieConsent";
@@ -92,6 +93,15 @@ function RouteChunkFallback() {
 /** TanStack Query cache observer — same gate as all `holzenLog` output (see `isHolzenDebugEnabled`). */
 function HolzenQueryLogging() {
   useEffect(() => attachHolzenQueryLogging(queryClient), []);
+  return null;
+}
+
+/**
+ * Periodically evict expired checkout-guard entries from local/session
+ * storage so they never grow unbounded across long-lived tabs.
+ */
+function CheckoutGuardCleanup() {
+  useEffect(() => scheduleCheckoutGuardCleanup(), []);
   return null;
 }
 
