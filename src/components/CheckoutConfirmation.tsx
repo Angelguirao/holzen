@@ -844,6 +844,8 @@ export function CheckoutConfirmation() {
             state={refreshState}
             errorMessage={refreshError}
             onRetry={handleRetryRefresh}
+            attempt={refreshAttempt}
+            maxAttempts={MAX_REFRESH_RETRIES}
           />
         ) : null}
 
