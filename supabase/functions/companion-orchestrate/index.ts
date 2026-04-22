@@ -5,6 +5,11 @@ import { getProviderHealth } from "../_shared/circuit-breaker.ts";
 import { handleRegenerateOnly } from "../_shared/regenerate-only.ts";
 import { trackEvent } from "../_shared/observe.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
+import {
+  consumeMonthlyFeatureQuota,
+  resolveTierFromProfile,
+  tierLimits,
+} from "../_shared/subscription-entitlements.ts";
 import { generateQuestion } from "../_shared/generators/question.ts";
 import { determineSessionIntent } from "../_shared/session-intent.ts";
 import { selectIntervention, parseDirection, bucketSeverity, type InterventionSelection } from "../_shared/intervention-selector.ts";
@@ -110,6 +115,14 @@ serve(
     });
 
     logOrchestrateInvoke(body, token === serviceKey ? "service_role" : "user_jwt");
+
+    const { data: profile } = await svcClient
+      .from("profiles")
+      .select("lifetime_access, subscription_status, subscription_tier")
+      .eq("user_id", userId)
+      .maybeSingle();
+    const tier = resolveTierFromProfile(profile);
+    const tierQuotaLimits = tierLimits(tier);
 
     const regenerateOnly = body.regenerateOnly as string | undefined;
     if (
@@ -235,6 +248,10 @@ serve(
     const shouldRunGrounding = Boolean(enableGrounding || interventionNeedsGrounding);
     const shouldRunHistory = Boolean(enableHistory || interventionNeedsHistory);
     const shouldRunZoomOut = Boolean(enableZoomOut || interventionNeedsZoomOut);
+    const premiumCompanionUnits =
+      Number(Boolean(enableSignal)) +
+      Number(shouldRunGrounding) +
+      Number(shouldRunHistory);
 
     if (interventionNeedsGrounding && !enableGrounding) {
       log("grounding task forced for trap intervention (companion pref off)");
@@ -244,6 +261,47 @@ serve(
     }
     if (interventionNeedsZoomOut && !enableZoomOut) {
       log("zoomOut task forced for intervention secondary (companion pref off)");
+    }
+
+    if (premiumCompanionUnits > 0) {
+      if (tier === "free") {
+        return new Response(
+          JSON.stringify({
+            error: "Premium companions require an active plan.",
+            code: "companions_upgrade_required",
+          }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+
+      const quota = await consumeMonthlyFeatureQuota(
+        svcClient,
+        userId,
+        "premium_companion",
+        tierQuotaLimits.premium_companion,
+        premiumCompanionUnits,
+      );
+      if (!quota.allowed) {
+        return new Response(
+          JSON.stringify({
+            error: "You've used this month's premium companion allowance.",
+            code: "companions_quota_exceeded",
+            tier,
+            companion_limit: quota.limit,
+            companion_used: quota.used,
+            companion_remaining: quota.remaining,
+          }),
+          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+        );
+      }
+
+      log("premium companion quota consumed", {
+        tier,
+        amount: premiumCompanionUnits,
+        used: quota.used,
+        remaining: quota.remaining,
+        limit: quota.limit,
+      });
     }
 
     const rid = typeof reflectionId === "string" ? reflectionId : "";

@@ -16,6 +16,11 @@ import { fetchGroundingSourcesForOrchestrate, fetchSignalSourcesForOrchestrate }
 import { fetchRecentSignalCitationUrls, mergeRecentSignalUrls } from "./recent-signal-urls.ts";
 import { ORCHESTRATOR_KEY_MAP } from "./companion-types.ts";
 import { logCompanionSlotResolved } from "./companion-orchestrate-slot-telemetry.ts";
+import {
+  consumeMonthlyFeatureQuota,
+  resolveTierFromProfile,
+  tierLimits,
+} from "./subscription-entitlements.ts";
 import { PROMPT_VERSION as SIGNAL_VERSION } from "./generators/signal.ts";
 import { PROMPT_VERSION as GROUNDING_VERSION } from "./generators/grounding.ts";
 import { PROMPT_VERSION as HISTORY_VERSION } from "./generators/history.ts";
@@ -47,12 +52,54 @@ export async function handleRegenerateOnly(params: {
   }
 
   const appConfig = await loadAppConfig(svcClient);
+  const { data: profile } = await svcClient
+    .from("profiles")
+    .select("lifetime_access, subscription_status, subscription_tier")
+    .eq("user_id", userId)
+    .maybeSingle();
+  const tier = resolveTierFromProfile(profile);
+  const limits = tierLimits(tier);
 
   if (appConfig.panic_mode && PANIC_MODE_FEATURES.has("companion_signal")) {
     return new Response(
       JSON.stringify({ error: "Companion generation is temporarily paused.", panic_mode: true }),
       { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
+  }
+
+  // Premium companion slots are metered by package allowance.
+  // ZoomOut remains outside the premium companion meter.
+  const consumesPremiumCompanion = slot === "signal" || slot === "grounding" || slot === "history";
+  if (consumesPremiumCompanion) {
+    if (tier === "free") {
+      return new Response(
+        JSON.stringify({
+          error: "Premium companions require an active plan.",
+          code: "companions_upgrade_required",
+        }),
+        { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+    const quota = await consumeMonthlyFeatureQuota(
+      svcClient,
+      userId,
+      "premium_companion",
+      limits.premium_companion,
+      1,
+    );
+    if (!quota.allowed) {
+      return new Response(
+        JSON.stringify({
+          error: "You've used this month's premium companion allowance.",
+          code: "companions_quota_exceeded",
+          tier,
+          companion_limit: quota.limit,
+          companion_used: quota.used,
+          companion_remaining: quota.remaining,
+        }),
+        { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
   }
 
   const budget = await checkCostCeilings(svcClient, {

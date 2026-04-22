@@ -380,12 +380,22 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
       const body = data as Record<string, unknown> | null;
       const payloadError = !!fnError || !body || Boolean(body.error);
       if (payloadError) {
+        const code = typeof body?.code === 'string' ? body.code : null;
+        const msg = typeof body?.error === 'string' ? body.error : null;
         holzenLog.companion('lazy fetch orchestrate failed', {
           slot,
           reflection_prefix: reflectionId.slice(0, 8),
           fnError: fnError?.message ?? null,
-          bodyError: typeof body?.error === 'string' ? body.error : null,
+          bodyError: msg,
+          bodyCode: code,
         });
+        if (code === 'companions_quota_exceeded' || code === 'companions_upgrade_required') {
+          toast({
+            title: 'Companion unavailable',
+            description: msg ?? 'This companion is outside your current plan allowance.',
+            variant: 'destructive',
+          });
+        }
         setErr(true);
         setLoading(false);
         return;

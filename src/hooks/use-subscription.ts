@@ -15,8 +15,15 @@ let subscriptionForceNext = false;
 
 interface SubCache {
   subscribed: boolean;
+  tier: 'free' | 'pro' | 'pro_plus' | 'lifetime';
   monthlyUsed: number;
   monthlyRemaining: number | undefined;
+  companionLimit: number;
+  companionUsed: number;
+  companionRemaining: number;
+  wallpaperLimit: number;
+  wallpaperUsed: number;
+  wallpaperRemaining: number;
   ts: number;
 }
 
@@ -62,8 +69,15 @@ function consumeInitialCheckoutForce(userId: string): boolean {
 
 type SubscriptionSnapshot = {
   subscribed: boolean;
+  tier: 'free' | 'pro' | 'pro_plus' | 'lifetime';
   monthlyUsed: number;
   monthlyRemaining: number | undefined;
+  companionLimit: number;
+  companionUsed: number;
+  companionRemaining: number;
+  wallpaperLimit: number;
+  wallpaperUsed: number;
+  wallpaperRemaining: number;
 };
 
 async function fetchSubscriptionSnapshot(userId: string, force: boolean): Promise<SubscriptionSnapshot> {
@@ -73,13 +87,38 @@ async function fetchSubscriptionSnapshot(userId: string, force: boolean): Promis
   if (error) throw error;
 
   if (data?.subscribed) {
+    const tier = (data.tier as SubscriptionSnapshot['tier']) || 'pro';
+    const companionLimit = Number(data.monthly_companion_limit) || 0;
+    const companionUsed = Number(data.monthly_companion_used) || 0;
+    const companionRemaining = Math.max(0, Number(data.monthly_companion_remaining) || 0);
+    const wallpaperLimit = Number(data.monthly_wallpaper_limit) || 0;
+    const wallpaperUsed = Number(data.monthly_wallpaper_used) || 0;
+    const wallpaperRemaining = Math.max(0, Number(data.monthly_wallpaper_remaining) || 0);
     writeSubCache({
       subscribed: true,
+      tier,
       monthlyUsed: 0,
       monthlyRemaining: undefined,
+      companionLimit,
+      companionUsed,
+      companionRemaining,
+      wallpaperLimit,
+      wallpaperUsed,
+      wallpaperRemaining,
       ts: Date.now(),
     });
-    return { subscribed: true, monthlyUsed: 0, monthlyRemaining: undefined };
+    return {
+      subscribed: true,
+      tier,
+      monthlyUsed: 0,
+      monthlyRemaining: undefined,
+      companionLimit,
+      companionUsed,
+      companionRemaining,
+      wallpaperLimit,
+      wallpaperUsed,
+      wallpaperRemaining,
+    };
   }
 
   const now = new Date();
@@ -99,11 +138,29 @@ async function fetchSubscriptionSnapshot(userId: string, force: boolean): Promis
   const remaining = Math.max(0, FREE_MONTHLY_LIMIT - used);
   writeSubCache({
     subscribed: false,
+    tier: 'free',
     monthlyUsed: used,
     monthlyRemaining: remaining,
+    companionLimit: 0,
+    companionUsed: 0,
+    companionRemaining: 0,
+    wallpaperLimit: 0,
+    wallpaperUsed: 0,
+    wallpaperRemaining: 0,
     ts: Date.now(),
   });
-  return { subscribed: false, monthlyUsed: used, monthlyRemaining: remaining };
+  return {
+    subscribed: false,
+    tier: 'free',
+    monthlyUsed: used,
+    monthlyRemaining: remaining,
+    companionLimit: 0,
+    companionUsed: 0,
+    companionRemaining: 0,
+    wallpaperLimit: 0,
+    wallpaperUsed: 0,
+    wallpaperRemaining: 0,
+  };
 }
 
 export function useSubscription() {
@@ -138,8 +195,15 @@ export function useSubscription() {
     (cacheFallback
       ? {
           subscribed: cacheFallback.subscribed,
+          tier: cacheFallback.tier,
           monthlyUsed: cacheFallback.monthlyUsed,
           monthlyRemaining: cacheFallback.monthlyRemaining,
+          companionLimit: cacheFallback.companionLimit,
+          companionUsed: cacheFallback.companionUsed,
+          companionRemaining: cacheFallback.companionRemaining,
+          wallpaperLimit: cacheFallback.wallpaperLimit,
+          wallpaperUsed: cacheFallback.wallpaperUsed,
+          wallpaperRemaining: cacheFallback.wallpaperRemaining,
         }
       : undefined);
 
@@ -154,8 +218,15 @@ export function useSubscription() {
   }, [userId, queryClient]);
 
   const subscribed = effectiveSnapshot?.subscribed ?? false;
+  const tier = effectiveSnapshot?.tier ?? 'free';
   const monthlyUsed = effectiveSnapshot?.monthlyUsed ?? 0;
   const monthlyRemaining = effectiveSnapshot?.monthlyRemaining;
+  const companionLimit = effectiveSnapshot?.companionLimit ?? 0;
+  const companionUsed = effectiveSnapshot?.companionUsed ?? 0;
+  const companionRemaining = effectiveSnapshot?.companionRemaining ?? 0;
+  const wallpaperLimit = effectiveSnapshot?.wallpaperLimit ?? 0;
+  const wallpaperUsed = effectiveSnapshot?.wallpaperUsed ?? 0;
+  const wallpaperRemaining = effectiveSnapshot?.wallpaperRemaining ?? 0;
   const loading = !!userId && query.isLoading && !query.data;
 
   useEffect(() => {
@@ -166,17 +237,22 @@ export function useSubscription() {
     lastLoggedSubRef.current = next;
     holzenLog.subscription('state', {
       subscribed,
+      tier,
       monthlyRemaining,
       monthlyUsed,
+      companionRemaining,
+      wallpaperRemaining,
     });
-  }, [loading, subscribed, monthlyRemaining, monthlyUsed]);
+  }, [loading, subscribed, tier, monthlyRemaining, monthlyUsed, companionRemaining, wallpaperRemaining]);
 
-  const startCheckout = useCallback(async () => {
-    holzenLog.subscription('checkout', { action: 'start' });
+  const startCheckout = useCallback(async (planTier: 'pro' | 'pro_plus' = 'pro') => {
+    holzenLog.subscription('checkout', { action: 'start', planTier });
     setCheckoutLoading(true);
     try {
       sessionStorage.setItem(CHECKOUT_RETURN_KEY, String(Date.now()));
-      const { data, error } = await supabase.functions.invoke('create-checkout');
+      const { data, error } = await supabase.functions.invoke('create-checkout', {
+        body: { planTier },
+      });
       if (error) throw error;
 
       if (data?.url) {
@@ -233,6 +309,13 @@ export function useSubscription() {
       refresh,
       monthlyRemaining: undefined,
       monthlyUsed: 0,
+      tier: 'free',
+      companionLimit: 0,
+      companionUsed: 0,
+      companionRemaining: 0,
+      wallpaperLimit: 0,
+      wallpaperUsed: 0,
+      wallpaperRemaining: 0,
       canReflect: false,
     };
   }
@@ -246,6 +329,13 @@ export function useSubscription() {
     refresh,
     monthlyRemaining,
     monthlyUsed,
+    tier,
+    companionLimit,
+    companionUsed,
+    companionRemaining,
+    wallpaperLimit,
+    wallpaperUsed,
+    wallpaperRemaining,
     canReflect,
   };
 }

@@ -2,6 +2,11 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { createAttemptLogger } from "../_shared/observe.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
+import {
+  consumeMonthlyFeatureQuota,
+  resolveTierFromProfile,
+  tierLimits,
+} from "../_shared/subscription-entitlements.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -33,6 +38,43 @@ serve(
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
       { auth: { persistSession: false } }
     );
+    const { data: profile } = await svcClient
+      .from("profiles")
+      .select("lifetime_access, subscription_status, subscription_tier")
+      .eq("user_id", user.id)
+      .maybeSingle();
+    const tier = resolveTierFromProfile(profile);
+    if (tier === "free") {
+      return new Response(
+        JSON.stringify({
+          error: "Wallpaper generation requires an active plan.",
+          code: "wallpaper_upgrade_required",
+        }),
+        { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+    const limits = tierLimits(tier);
+    const wallpaperQuota = await consumeMonthlyFeatureQuota(
+      svcClient,
+      user.id,
+      "wallpaper",
+      limits.wallpaper,
+      1,
+    );
+    if (!wallpaperQuota.allowed) {
+      return new Response(
+        JSON.stringify({
+          error: "You've used this month's wallpaper allowance.",
+          code: "wallpaper_quota_exceeded",
+          tier,
+          wallpaper_limit: wallpaperQuota.limit,
+          wallpaper_used: wallpaperQuota.used,
+          wallpaper_remaining: wallpaperQuota.remaining,
+        }),
+        { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
     try { await svcClient.from("analytics_events").insert({ user_id: user.id, event: "wallpaper_generation" }); } catch (_) { /* non-fatal */ }
 
     const { guardAiFeature } = await import("../_shared/ratelimit.ts");
