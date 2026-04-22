@@ -137,6 +137,7 @@ serve(
           tier,
           subscription_end: profile.subscription_end,
           cached: true,
+          subscription_status: profile.subscription_status,
           monthly_companion_limit: limits.premium_companion,
           monthly_companion_used: companions.used,
           monthly_companion_remaining: companions.remaining,
