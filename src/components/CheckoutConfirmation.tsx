@@ -576,7 +576,10 @@ export function CheckoutConfirmation() {
    * intact — they're authoritative regardless of refresh outcome.
    */
   const handleRetryRefresh = async () => {
+    if (refreshAttemptRef.current >= MAX_REFRESH_RETRIES) return;
+    if (refreshState === 'updating') return;
     refreshAttemptRef.current += 1;
+    setRefreshAttempt(refreshAttemptRef.current);
     setRefreshState('updating');
     setRefreshError(null);
     try {
