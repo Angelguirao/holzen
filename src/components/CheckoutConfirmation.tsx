@@ -402,6 +402,9 @@ export function CheckoutConfirmation() {
       // confirmation. The fresh row will be written below as the dialog
       // drives its lifecycle effect.
       writePersistedRefreshState(null);
+      // Fresh guard → also drop the per-checkout refresh idempotency row so
+      // mount-time + retry slots are available again for this new purchase.
+      writeRefreshIdempotency(null);
       activeGuardTsRef.current = null;
     }
     if (alreadyConfirmed) {
@@ -476,8 +479,15 @@ export function CheckoutConfirmation() {
       { pathname: location.pathname, search: next ? `?${next}` : '', hash: location.hash },
       { replace: true },
     );
-    // Trigger a refresh in case the focus listener didn't fire (e.g. same-tab redirect).
-    void sub.refresh();
+    // Trigger a refresh in case the focus listener didn't fire (e.g. same-tab
+    // redirect). Idempotency-guarded: if the dialog remounts within the same
+    // confirmation guard window (back-nav, persisted-state hydration, React
+    // StrictMode double-invoke) the second call is a no-op so we don't burn
+    // a redundant `check-subscription` round-trip per remount.
+    const guardTs = activeGuardTsRef.current;
+    if (guardTs !== null && claimRefreshSlot(guardTs, detected, 'mount')) {
+      void sub.refresh();
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.search]);
 
@@ -711,8 +721,17 @@ export function CheckoutConfirmation() {
   const handleRetryRefresh = async () => {
     if (refreshAttemptRef.current >= MAX_REFRESH_RETRIES) return;
     if (refreshState === 'updating') return;
-    refreshAttemptRef.current += 1;
-    setRefreshAttempt(refreshAttemptRef.current);
+    const nextAttempt = refreshAttemptRef.current + 1;
+    const guardTs = activeGuardTsRef.current;
+    // Per-checkout idempotency: each user click owns a unique `retry:N` slot
+    // tied to the active confirmation guard. If the dialog remounts mid-retry
+    // (state hydration, transient unmount) the in-flight slot is already
+    // claimed and the duplicate call is suppressed.
+    if (mode && guardTs !== null && !claimRefreshSlot(guardTs, mode, `retry:${nextAttempt}`)) {
+      return;
+    }
+    refreshAttemptRef.current = nextAttempt;
+    setRefreshAttempt(nextAttempt);
     setRefreshState('updating');
     setRefreshError(null);
     try {
