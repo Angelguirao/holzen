@@ -508,7 +508,8 @@ export function CheckoutConfirmation() {
       const applied = Number(data?.applied) || 0;
       const scanned = Number(data?.scanned) || 0;
       if (applied > 0) {
-        toast.success(`Credits restored from ${applied} session${applied === 1 ? '' : 's'}.`);
+        // Quiet state: no success-coloured toast. Neutral acknowledgement only.
+        toast.message(`Credits restored from ${applied} session${applied === 1 ? '' : 's'}.`);
       } else if (scanned > 0) {
         toast.message('No missing credits found. Your balance is already up to date.');
       } else {
@@ -527,21 +528,30 @@ export function CheckoutConfirmation() {
     <Dialog open={open} onOpenChange={(o) => { if (!o) handleClose(); }}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <div
-            className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10 text-primary"
-            aria-hidden
-          >
-            {mode === 'subscription' ? <Sparkles className="h-6 w-6" /> : <Coins className="h-6 w-6" />}
+          {/*
+            Quiet state: no celebratory badge / coloured halo. A single neutral
+            mono mark, left-aligned with the title, communicates "this is a
+            receipt" without praise or ambient motion.
+          */}
+          <div className="mb-2 flex items-center gap-2 text-muted-foreground" aria-hidden>
+            {mode === 'subscription' ? (
+              <FileCheck className="h-4 w-4" />
+            ) : (
+              <Receipt className="h-4 w-4" />
+            )}
+            <span className="text-xs uppercase tracking-wide">
+              {mode === 'subscription' ? 'Subscription receipt' : 'Credits receipt'}
+            </span>
           </div>
-          <DialogTitle className="text-center">
-            {mode === 'subscription' ? 'Welcome to Holzen ' + tierLabel : 'Credits added'}
+          <DialogTitle className="text-left">
+            {mode === 'subscription' ? `Holzen ${tierLabel} active` : 'Credits added'}
           </DialogTitle>
-          <DialogDescription className="text-center">
+          <DialogDescription className="text-left">
             {mode === 'subscription'
               ? isTrialing
-                ? `Your ${PRICING.trialDays}-day trial has started. You can manage or cancel anytime from Settings.`
-                : 'Your subscription is active. You can manage or cancel anytime from Settings.'
-              : 'Thanks for the top-up. Your Flex credits are ready to spend.'}
+                ? `Your ${PRICING.trialDays}-day trial has started. Manage or cancel anytime from Settings.`
+                : 'Your subscription is active. Manage or cancel anytime from Settings.'
+              : 'Your Flex credits are available below.'}
           </DialogDescription>
         </DialogHeader>
 
