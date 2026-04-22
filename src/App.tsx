@@ -44,6 +44,7 @@ const Ground = lazy(() => import("./pages/Ground"));
 const GroundHistory = lazy(() => import("./pages/GroundHistory"));
 const Admin = lazy(() => import("./pages/Admin"));
 const SmokeTest = lazy(() => import("./pages/SmokeTest"));
+const SentryAlerts = lazy(() => import("./pages/SentryAlerts"));
 const Unsubscribe = lazy(() => import("./pages/Unsubscribe"));
 const BillingHistory = lazy(() => import("./pages/BillingHistory"));
 
