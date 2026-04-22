@@ -11,6 +11,7 @@ import { AlertTriangle, Check, DollarSign, Loader2, Mail, Power, RefreshCw, Save
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { DevModeToggle } from '@/components/admin/DevModeToggle';
+import { StripePriceCheck } from '@/components/admin/StripePriceCheck';
 
 const FEATURE_KEYS = [
   'wallpaper',
@@ -523,6 +524,11 @@ export function AppConfigTools() {
       {/* ── Dev tools (existing) ── */}
       <section>
         <DevModeToggle />
+      </section>
+
+      {/* ── Stripe price ID validation ── */}
+      <section>
+        <StripePriceCheck />
       </section>
     </div>
   );
