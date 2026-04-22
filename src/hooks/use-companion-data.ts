@@ -506,6 +506,13 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     // "Try again" affordance would silently skip due to the marker set on
     // the previous (failed or stale) attempt.
     if (reflectionId) resetInterventionIdempotency(reflectionId);
+    // If the prior auto-fetch was short-circuited by idempotency, dismiss
+    // the "Already loaded" notice and arm the success-confirmation toast
+    // (fired below in the effect that watches `intervention`).
+    if (interventionSkippedRef.current && reflectionId) {
+      sonnerToast.dismiss(`intervention-skip:${reflectionId}`);
+      pendingRetryConfirmRef.current = reflectionId;
+    }
     fetchedSlotsRef.current = new Set();
     setSignal(null); setSignalError(false);
     setNudge(null); setNudgeError(false);
