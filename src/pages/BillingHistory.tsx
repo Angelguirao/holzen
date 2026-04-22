@@ -60,7 +60,7 @@ function GrantBadge({ event }: { event: CheckoutEvent }) {
   }
   if (event.grant_status === 'pending') {
     return (
-      <span className="inline-flex items-center gap-1 text-xs font-mono text-amber-500">
+      <span className="inline-flex items-center gap-1 text-xs font-mono text-muted-foreground">
         <Clock className="h-3 w-3" aria-hidden />
         Grant pending ({event.expected_credits} expected)
       </span>
