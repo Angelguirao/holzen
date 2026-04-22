@@ -44,8 +44,8 @@ Therefore the sustainable pattern is:
 | Plan | Price | Included |
 | --- | --- | --- |
 | Free | `$0` | `3` pauses/month, core ritual + reflection, no premium companions, no AI extras |
-| Pro | `$4.99/mo` | Unlimited pauses/reflections, `12` premium companion unlocks/month, `5` wallpapers/month, weekly digest + night reflection |
-| Pro+ | `$9.99/mo` | Unlimited pauses/reflections, `30` premium companion unlocks/month, `15` wallpapers/month, higher regeneration limits, richer report depth |
+| Pro | `$4.99/mo` | Unlimited pauses/reflections, `12` premium companion unlocks/month, `5` wallpapers/month, `4` on-demand insight generations/month, weekly digest + night reflection |
+| Pro+ | `$9.99/mo` | Unlimited pauses/reflections, `30` premium companion unlocks/month, `15` wallpapers/month, `12` on-demand insight generations/month, higher regeneration limits, richer report depth |
 
 Notes:
 
@@ -103,6 +103,7 @@ This is why v1 plan limits are intentionally conservative.
 - Metered: premium companion unlocks and wallpaper generation.
 - Included with sensible internal throttles: digest/night reflection, journal
   prompts, standard insights cadence.
+- Metered by package: user-triggered "Generate/Refresh insights" action.
 
 ### 5.3 Pro+
 

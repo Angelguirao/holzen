@@ -1,17 +1,18 @@
 export type SubscriptionTier = "free" | "pro" | "pro_plus" | "lifetime";
-export type MeteredFeature = "premium_companion" | "wallpaper";
+export type MeteredFeature = "premium_companion" | "wallpaper" | "reflection_insights";
 
 export interface TierLimits {
   premium_companion: number;
   wallpaper: number;
+  reflection_insights: number;
 }
 
 const DEFAULT_LIMITS: Record<SubscriptionTier, TierLimits> = {
-  free: { premium_companion: 0, wallpaper: 0 },
-  pro: { premium_companion: 12, wallpaper: 5 },
-  pro_plus: { premium_companion: 30, wallpaper: 15 },
+  free: { premium_companion: 0, wallpaper: 0, reflection_insights: 0 },
+  pro: { premium_companion: 12, wallpaper: 5, reflection_insights: 4 },
+  pro_plus: { premium_companion: 30, wallpaper: 15, reflection_insights: 12 },
   // Lifetime should not hit package limits in normal usage.
-  lifetime: { premium_companion: 999_999, wallpaper: 999_999 },
+  lifetime: { premium_companion: 999_999, wallpaper: 999_999, reflection_insights: 999_999 },
 };
 
 const ACTIVE_STATUSES = new Set(["active", "trialing"]);

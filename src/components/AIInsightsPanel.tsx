@@ -116,11 +116,23 @@ export function AIInsightsPanel({ reflectionCount }: Props) {
       const { error } = await supabase.functions.invoke('reflection-insights', {
         body: { user_id: user.id, language },
       });
-      if (error) throw error;
+      if (error) {
+        let detail = t('aiInsights.failedToGenerate');
+        try {
+          const payload = await (error as any)?.context?.json?.();
+          if (typeof payload?.error === 'string' && payload.error.length > 0) {
+            detail = payload.error;
+          }
+        } catch {
+          // Ignore parse issues; fallback to generic copy.
+        }
+        throw new Error(detail);
+      }
       await loadInsights();
       toast(t('aiInsights.generated'));
-    } catch {
-      toast(t('aiInsights.failedToGenerate'));
+    } catch (e) {
+      const message = e instanceof Error ? e.message : t('aiInsights.failedToGenerate');
+      toast(message);
     } finally {
       setGenerating(false);
     }

@@ -75,12 +75,14 @@ serve(
     if (profile?.lifetime_access) {
       const limits = tierLimits("lifetime");
       const monthStart = startOfUtcMonthDate();
-      const [companionsUsed, wallpapersUsed] = await Promise.all([
+      const [companionsUsed, wallpapersUsed, insightsUsed] = await Promise.all([
         getMonthlyFeatureUsage(serviceClient, userId, "premium_companion", monthStart),
         getMonthlyFeatureUsage(serviceClient, userId, "wallpaper", monthStart),
+        getMonthlyFeatureUsage(serviceClient, userId, "reflection_insights", monthStart),
       ]);
       const companions = clampUsage(companionsUsed, limits.premium_companion);
       const wallpapers = clampUsage(wallpapersUsed, limits.wallpaper);
+      const insights = clampUsage(insightsUsed, limits.reflection_insights);
       return new Response(JSON.stringify({
         subscribed: true,
         lifetime: true,
@@ -92,6 +94,9 @@ serve(
         monthly_wallpaper_limit: limits.wallpaper,
         monthly_wallpaper_used: wallpapers.used,
         monthly_wallpaper_remaining: wallpapers.remaining,
+        monthly_insights_limit: limits.reflection_insights,
+        monthly_insights_used: insights.used,
+        monthly_insights_remaining: insights.remaining,
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -115,12 +120,14 @@ serve(
           : "free";
         const limits = tierLimits(tier);
         const monthStart = startOfUtcMonthDate();
-        const [companionsUsed, wallpapersUsed] = await Promise.all([
+        const [companionsUsed, wallpapersUsed, insightsUsed] = await Promise.all([
           getMonthlyFeatureUsage(serviceClient, userId, "premium_companion", monthStart),
           getMonthlyFeatureUsage(serviceClient, userId, "wallpaper", monthStart),
+          getMonthlyFeatureUsage(serviceClient, userId, "reflection_insights", monthStart),
         ]);
         const companions = clampUsage(companionsUsed, limits.premium_companion);
         const wallpapers = clampUsage(wallpapersUsed, limits.wallpaper);
+        const insights = clampUsage(insightsUsed, limits.reflection_insights);
         return new Response(JSON.stringify({
           subscribed: cachedSubscribed,
           lifetime: false,
@@ -133,6 +140,9 @@ serve(
           monthly_wallpaper_limit: limits.wallpaper,
           monthly_wallpaper_used: wallpapers.used,
           monthly_wallpaper_remaining: wallpapers.remaining,
+          monthly_insights_limit: limits.reflection_insights,
+          monthly_insights_used: insights.used,
+          monthly_insights_remaining: insights.remaining,
         }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
@@ -198,12 +208,14 @@ serve(
 
     const limits = tierLimits(subscriptionTier);
     const monthStart = startOfUtcMonthDate();
-    const [companionsUsed, wallpapersUsed] = await Promise.all([
+    const [companionsUsed, wallpapersUsed, insightsUsed] = await Promise.all([
       getMonthlyFeatureUsage(serviceClient, userId, "premium_companion", monthStart),
       getMonthlyFeatureUsage(serviceClient, userId, "wallpaper", monthStart),
+      getMonthlyFeatureUsage(serviceClient, userId, "reflection_insights", monthStart),
     ]);
     const companions = clampUsage(companionsUsed, limits.premium_companion);
     const wallpapers = clampUsage(wallpapersUsed, limits.wallpaper);
+    const insights = clampUsage(insightsUsed, limits.reflection_insights);
 
     return new Response(JSON.stringify({
       subscribed: hasActive,
@@ -218,6 +230,9 @@ serve(
       monthly_wallpaper_limit: limits.wallpaper,
       monthly_wallpaper_used: wallpapers.used,
       monthly_wallpaper_remaining: wallpapers.remaining,
+      monthly_insights_limit: limits.reflection_insights,
+      monthly_insights_used: insights.used,
+      monthly_insights_remaining: insights.remaining,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
