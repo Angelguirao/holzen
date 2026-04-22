@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Check, Sparkles, Coins } from 'lucide-react';
+import { Check, Sparkles, Coins, CalendarClock, TrendingUp } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -49,12 +49,16 @@ export function CheckoutConfirmation() {
   // Snapshot the credit balance at the moment the dialog opens so we can show
   // "+N credits" once the refreshed balance comes in.
   const baselineBalanceRef = useRef<number | null>(null);
+  // Snapshot the moment the dialog opens — used as the trial start anchor so
+  // the displayed dates remain stable even if the snapshot refreshes mid-view.
+  const openedAtRef = useRef<Date | null>(null);
 
   useEffect(() => {
     const detected = detectMode(location.search);
     if (!detected) return;
     setMode(detected);
     baselineBalanceRef.current = sub.flexCreditsBalance ?? 0;
+    openedAtRef.current = new Date();
     // Strip checkout query params; keep path + hash.
     const params = new URLSearchParams(location.search);
     params.delete('subscribed');
@@ -85,6 +89,28 @@ export function CheckoutConfirmation() {
     return 'Pro';
   }, [sub.tier]);
 
+  const dateFmt = useMemo(
+    () => new Intl.DateTimeFormat(undefined, { month: 'short', day: 'numeric', year: 'numeric' }),
+    [],
+  );
+
+  const trialStart = openedAtRef.current;
+  const trialEnd = useMemo(() => {
+    if (!trialStart) return null;
+    const d = new Date(trialStart);
+    d.setDate(d.getDate() + PRICING.trialDays);
+    return d;
+  }, [trialStart]);
+
+  const baseline = baselineBalanceRef.current ?? 0;
+  const currentBalance = sub.flexCreditsBalance ?? 0;
+  const observedDelta = Math.max(0, currentBalance - baseline);
+  // Until the refreshed balance reflects the purchase, fall back to the
+  // expected credits for the chosen pack.
+  const balanceReflectsPurchase = observedDelta >= expectedCredits && expectedCredits > 0;
+  const creditsAdded = balanceReflectsPurchase ? observedDelta : expectedCredits;
+  const projectedBalance = balanceReflectsPurchase ? currentBalance : baseline + expectedCredits;
+
   const handleClose = () => setMode(null);
 
   return (
@@ -112,6 +138,24 @@ export function CheckoutConfirmation() {
             <ul className="space-y-2">
               <SummaryRow label="Plan" value={`Holzen ${tierLabel}`} />
               <SummaryRow
+                label="Trial started"
+                value={trialStart ? dateFmt.format(trialStart) : '—'}
+                icon={<CalendarClock className="h-3.5 w-3.5" aria-hidden />}
+              />
+              <SummaryRow
+                label="First charge on"
+                value={trialEnd ? dateFmt.format(trialEnd) : '—'}
+                highlight
+              />
+              <SummaryRow
+                label="Monthly price"
+                value={
+                  sub.tier === 'pro_plus'
+                    ? `$${PRICING.proPlusMonthlyPrice.toFixed(2)}`
+                    : `$${PRICING.monthlyPrice.toFixed(2)}`
+                }
+              />
+              <SummaryRow
                 label="Pause companions / month"
                 value={
                   sub.tier === 'pro_plus'
@@ -127,7 +171,7 @@ export function CheckoutConfirmation() {
                     : String(PRICING.proWallpapers)
                 }
               />
-              <SummaryRow label="Flex credits balance" value={String(sub.flexCreditsBalance ?? 0)} />
+              <SummaryRow label="Flex credits balance" value={String(currentBalance)} />
             </ul>
           ) : (
             <ul className="space-y-2">
@@ -135,10 +179,21 @@ export function CheckoutConfirmation() {
                 label="Pack"
                 value={mode === 'flex_pack_m' ? 'Flex Pack M' : 'Flex Pack S'}
               />
-              <SummaryRow label="Credits added" value={`+${expectedCredits}`} highlight />
+              <SummaryRow label="Previous balance" value={String(baseline)} />
+              <SummaryRow
+                label="Credits added"
+                value={`+${creditsAdded}`}
+                highlight
+                icon={<TrendingUp className="h-3.5 w-3.5" aria-hidden />}
+              />
               <SummaryRow
                 label="New balance"
-                value={sub.loading ? 'Updating…' : String(sub.flexCreditsBalance ?? 0)}
+                value={
+                  sub.loading && !balanceReflectsPurchase
+                    ? `${projectedBalance} (updating…)`
+                    : String(projectedBalance)
+                }
+                highlight
               />
             </ul>
           )}
@@ -159,14 +214,19 @@ function SummaryRow({
   label,
   value,
   highlight,
+  icon,
 }: {
   label: string;
   value: string;
   highlight?: boolean;
+  icon?: React.ReactNode;
 }) {
   return (
     <li className="flex items-center justify-between gap-3">
-      <span className="text-muted-foreground">{label}</span>
+      <span className="flex items-center gap-1.5 text-muted-foreground">
+        {icon}
+        {label}
+      </span>
       <span className={highlight ? 'font-semibold text-primary' : 'font-medium text-foreground'}>
         {value}
       </span>
