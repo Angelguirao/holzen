@@ -1008,7 +1008,24 @@ export function CheckoutConfirmation() {
               Manage subscription
             </Button>
           ) : null}
-          <Button onClick={handleClose} className="w-full sm:w-auto">
+          {/*
+            Primary exit. Radix Dialog already traps focus, restores focus to
+            the trigger on close, and wires Escape → onOpenChange(false). This
+            button is the default (primary) variant so it's the visually and
+            tabbing-wise prominent action, autoFocused so screen-reader users
+            land on a clear exit immediately, and labeled "Close" with an
+            explicit aria-label that names the dialog being closed.
+          */}
+          <Button
+            onClick={handleClose}
+            autoFocus
+            aria-label={
+              mode === 'subscription'
+                ? 'Close subscription receipt'
+                : 'Close credits receipt'
+            }
+            className="w-full sm:w-auto"
+          >
             Close
           </Button>
         </DialogFooter>
