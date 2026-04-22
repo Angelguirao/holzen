@@ -455,8 +455,8 @@ export function CheckoutConfirmation() {
       const dedupeKey = `${detected}:${location.search}`;
       if (suppressionAnnouncedRef.current !== dedupeKey) {
         suppressionAnnouncedRef.current = dedupeKey;
-        toast.message('Confirmation already shown for this checkout.', {
-          description: 'Review subscription and credits in Settings.',
+        toast.message('Checkout already confirmed — no new sync triggered.', {
+          description: 'Your previous confirmation is still on record. Subscription and credit data were not re-fetched.',
           duration: 4000,
           id: `checkout-suppressed:${detected}`,
         });
