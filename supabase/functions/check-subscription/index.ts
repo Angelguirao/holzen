@@ -162,6 +162,8 @@ serve(
     let subscriptionStatus = "free";
     let subscriptionTier: "free" | "pro" | "pro_plus" | "lifetime" = "free";
     let activePriceId: string | null = null;
+    let trialStart: string | null = null;
+    let trialEnd: string | null = null;
 
     const proPriceId = Deno.env.get("STRIPE_PRICE_ID_PRO") ?? null;
     const proPlusPriceId = Deno.env.get("STRIPE_PRICE_ID_PRO_PLUS") ?? null;
