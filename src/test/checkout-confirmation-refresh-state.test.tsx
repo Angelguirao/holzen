@@ -108,7 +108,7 @@ describe('CheckoutConfirmation refreshState lifecycle', () => {
     });
 
     expect(
-      await screen.findByText(/Balance is still syncing\. Your credits are safe\./i),
+      await screen.findByText(/Balance not yet updated\. Credits are recorded server-side\./i),
     ).toBeInTheDocument();
     // "Try again" affordance is now reachable.
     expect(screen.getByRole('button', { name: /Try again/i })).toBeEnabled();
@@ -138,7 +138,7 @@ describe('CheckoutConfirmation refreshState lifecycle', () => {
     await waitFor(() => {
       expect(screen.getByRole('alert')).toBeInTheDocument();
     });
-    expect(screen.getByText(/Could not refresh balance/i)).toBeInTheDocument();
+    expect(screen.getByText(/Balance refresh failed/i)).toBeInTheDocument();
     expect(screen.getByText(/network down/i)).toBeInTheDocument();
     // Mount-time call + the user retry.
     expect(subState.refresh).toHaveBeenCalledTimes(2);
@@ -175,9 +175,9 @@ describe('CheckoutConfirmation refreshState lifecycle', () => {
       // when the state is idle. These strings are unique to the banner
       // (timeout / error branches) and to its retry button.
       expect(
-        screen.queryByText(/Balance is still syncing\. Your credits are safe\./i),
+        screen.queryByText(/Balance not yet updated\. Credits are recorded server-side\./i),
       ).not.toBeInTheDocument();
-      expect(screen.queryByText(/Could not refresh balance/i)).not.toBeInTheDocument();
+      expect(screen.queryByText(/Balance refresh failed/i)).not.toBeInTheDocument();
       expect(screen.queryByRole('button', { name: /Try again/i })).not.toBeInTheDocument();
     });
 
