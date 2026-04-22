@@ -7,6 +7,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import webpush from "https://esm.sh/web-push@3.6.7";
+import { withRequestLogging } from "../_shared/with-request-logging.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -64,9 +65,8 @@ async function resolveVapidPrivateKey(raw: string): Promise<string> {
   return raw;
 }
 
-serve(async (req) => {
-  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
-
+serve(
+  withRequestLogging("notify-checkout-confirmation", async ({ req }) => {
   try {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
@@ -212,4 +212,5 @@ serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
-});
+  })
+);
