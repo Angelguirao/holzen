@@ -135,6 +135,7 @@ const App = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
       <HolzenQueryLogging />
+      <CheckoutGuardCleanup />
       <TooltipProvider>
         <Sonner />
         <OfflineBanner />
