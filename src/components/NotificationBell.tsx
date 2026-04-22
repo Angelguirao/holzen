@@ -14,10 +14,11 @@ const SWIPE_THRESHOLD = 80;
 
 const SwipeableNotification = forwardRef<HTMLDivElement, {
   n: NotificationItem;
+  isFresh: boolean;
   iconMap: Record<NotificationItem['type'], string>;
   onDismiss: (id: string) => void;
   onAction: (path: string, state?: NotificationNavigateState) => void;
-}>(function SwipeableNotification({ n, iconMap, onDismiss, onAction }, _ref) {
+}>(function SwipeableNotification({ n, isFresh, iconMap, onDismiss, onAction }, _ref) {
   const startX = useRef(0);
   const currentX = useRef(0);
   const swiping = useRef(false);
@@ -82,6 +83,12 @@ const SwipeableNotification = forwardRef<HTMLDivElement, {
               <p className="text-[9px] text-muted-foreground/60 font-mono">
                 {formatDistanceToNow(new Date(n.timestamp), { addSuffix: true })}
               </p>
+              {isFresh && (
+                <span
+                  className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse"
+                  aria-label="New notification"
+                />
+              )}
               {n.action && (
                 <button
                   onClick={() => onAction(n.action!.path, n.action!.state)}
@@ -109,6 +116,16 @@ type NotificationItem = {
   action?: { label: string; path: string; state?: NotificationNavigateState };
 };
 
+type NotificationRow = {
+  id: string;
+  type: NotificationItem['type'];
+  metadata: unknown;
+  action_path: string | null;
+  action_state: unknown;
+  created_at: string;
+  dismissed_at: string | null;
+};
+
 const LAST_READ_KEY = 'holzen_notifications_read_at';
 const DISMISSED_KEY = 'holzen_notifications_dismissed';
 
@@ -125,6 +142,18 @@ function saveDismissedIds(ids: Set<string>) {
   localStorage.setItem(DISMISSED_KEY, JSON.stringify([...ids]));
 }
 
+function asRecord(value: unknown): Record<string, unknown> {
+  return value && typeof value === 'object' ? (value as Record<string, unknown>) : {};
+}
+
+function getString(value: unknown): string | null {
+  return typeof value === 'string' ? value : null;
+}
+
+function getNumber(value: unknown): number | null {
+  return typeof value === 'number' ? value : null;
+}
+
 export function NotificationBell() {
   const { t } = useTranslation();
   const { user } = useAuth();
@@ -134,110 +163,197 @@ export function NotificationBell() {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [freshIds, setFreshIds] = useState<Set<string>>(new Set());
   const ref = useRef<HTMLDivElement>(null);
+  const previousIdsRef = useRef<Set<string>>(new Set());
+  const freshTimersRef = useRef<Map<string, number>>(new Map());
+  const fetchInFlightRef = useRef(false);
 
   const visibleNotifications = allNotifications.filter(n => !dismissed.has(n.id));
+  const normalizeNotifications = useCallback((items: NotificationItem[]) => {
+    return [...items]
+      .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+      .slice(0, 20);
+  }, []);
+
+  const mapRowToNotification = useCallback((row: NotificationRow): NotificationItem | null => {
+    if (!row?.id || !row?.type || !row?.created_at) return null;
+
+    const metadata = asRecord(row.metadata);
+    const actionPath = getString(row.action_path);
+    const actionStateRaw = asRecord(row.action_state);
+    const actionState = Object.keys(actionStateRaw).length > 0
+      ? (actionStateRaw as NotificationNavigateState)
+      : undefined;
+
+    let title = t('notifications.title');
+    let subtitle = '';
+    let actionLabel: string | null = null;
+
+    if (row.type === 'badge') {
+      title = t('notifications.badgeEarned');
+      const badgeId = getString(metadata.badge_id);
+      subtitle = badgeId ? badgeId.replace(/_/g, ' ') : t('notifications.badgeEarned');
+      actionLabel = t('notifications.viewBadges');
+    } else if (row.type === 'night_reflection') {
+      title = t('notifications.nightReflection');
+      const message = getString(metadata.message) ?? '';
+      subtitle = message.slice(0, 60) + (message.length > 60 ? '…' : '');
+    } else if (row.type === 'letter') {
+      title = t('notifications.letterDelivered');
+      subtitle = t('notifications.letterFromPast');
+      actionLabel = t('notifications.readLetter');
+    } else if (row.type === 'insight') {
+      title = t('notifications.aiInsightsReady');
+      const reflectionCount = getNumber(metadata.reflection_count) ?? 0;
+      subtitle = t('notifications.basedOnReflections', { count: reflectionCount });
+      actionLabel = t('notifications.viewInsights');
+    } else if (row.type === 'pause') {
+      title = t('notifications.pauseReady', 'Pause ready');
+      const message = getString(metadata.message) ?? '';
+      subtitle = message.slice(0, 80) + (message.length > 80 ? '…' : '');
+      actionLabel = t('notifications.openPause', 'Open pause');
+    } else {
+      return null;
+    }
+
+    if (!subtitle) subtitle = title;
+
+    return {
+      id: row.id,
+      type: row.type,
+      title,
+      subtitle,
+      timestamp: row.created_at,
+      action: actionPath && actionLabel
+        ? { label: actionLabel, path: actionPath, state: actionState }
+        : undefined,
+    };
+  }, [t]);
+
+  const upsertNotification = useCallback((next: NotificationItem) => {
+    setAllNotifications((prev) => {
+      const filtered = prev.filter((item) => item.id !== next.id);
+      return normalizeNotifications([next, ...filtered]);
+    });
+  }, [normalizeNotifications]);
+
+  const removeNotification = useCallback((id: string) => {
+    setAllNotifications((prev) => prev.filter((item) => item.id !== id));
+    setFreshIds((prev) => {
+      if (!prev.has(id)) return prev;
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+    const timer = freshTimersRef.current.get(id);
+    if (timer) {
+      window.clearTimeout(timer);
+      freshTimersRef.current.delete(id);
+    }
+  }, []);
+
+  const fetchNotifications = useCallback(async ({ showLoading = true }: { showLoading?: boolean } = {}) => {
+    if (!user) return;
+    if (fetchInFlightRef.current) return;
+    fetchInFlightRef.current = true;
+
+    if (showLoading) setLoading(true);
+
+    try {
+      const { data } = await supabase
+        .from('notifications')
+        .select('id, type, metadata, action_path, action_state, created_at, dismissed_at')
+        .eq('user_id', user.id)
+        .is('dismissed_at', null)
+        .order('created_at', { ascending: false })
+        .limit(20);
+
+      const mapped = ((data ?? []) as NotificationRow[])
+        .map(mapRowToNotification)
+        .filter((item): item is NotificationItem => item !== null);
+      setAllNotifications(normalizeNotifications(mapped));
+    } finally {
+      fetchInFlightRef.current = false;
+      setLoading(false);
+    }
+  }, [user, mapRowToNotification, normalizeNotifications]);
+
+  useEffect(() => {
+    if (!user) return;
+    fetchNotifications();
+  }, [user, fetchNotifications]);
+
+  useEffect(() => {
+    const previousIds = previousIdsRef.current;
+    const currentIds = new Set(allNotifications.map((n) => n.id));
+    const addedIds = allNotifications
+      .map((n) => n.id)
+      .filter((id) => !previousIds.has(id));
+
+    if (previousIds.size > 0 && addedIds.length > 0) {
+      setFreshIds((prev) => {
+        const next = new Set(prev);
+        for (const id of addedIds) next.add(id);
+        return next;
+      });
+
+      for (const id of addedIds) {
+        const existingTimer = freshTimersRef.current.get(id);
+        if (existingTimer) window.clearTimeout(existingTimer);
+        const timer = window.setTimeout(() => {
+          setFreshIds((prev) => {
+            const next = new Set(prev);
+            next.delete(id);
+            return next;
+          });
+          freshTimersRef.current.delete(id);
+        }, 5000);
+        freshTimersRef.current.set(id, timer);
+      }
+    }
+
+    previousIdsRef.current = currentIds;
+  }, [allNotifications]);
 
   useEffect(() => {
     if (!user) return;
 
-    async function fetchNotifications() {
-      setLoading(true);
-      const items: NotificationItem[] = [];
+    const channel = supabase
+      .channel(`notification-bell-${user.id}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'notifications',
+          filter: `user_id=eq.${user.id}`,
+        },
+        (payload) => {
+          if (payload.eventType === 'DELETE') {
+            const oldRow = (payload.old ?? {}) as Record<string, unknown>;
+            const id = getString(oldRow.id);
+            if (id) removeNotification(id);
+            return;
+          }
 
-      const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+          const row = (payload.new ?? {}) as NotificationRow;
+          if (row.dismissed_at) {
+            removeNotification(row.id);
+            return;
+          }
 
-      const [
-        { data: badges },
-        { data: nights },
-        { data: letters },
-        { data: insights },
-        { data: pauses },
-      ] = await Promise.all([
-        supabase.from('user_badges').select('id, badge_id, earned_at').eq('user_id', user!.id).order('earned_at', { ascending: false }).limit(10),
-        supabase.from('night_reflections').select('id, message, created_at').eq('user_id', user!.id).order('created_at', { ascending: false }).limit(5),
-        supabase.from('future_letters').select('id, delivered_at').eq('user_id', user!.id).eq('delivered', true).not('delivered_at', 'is', null).order('delivered_at', { ascending: false }).limit(5),
-        supabase.from('reflection_insights').select('id, generated_at, reflection_count').eq('user_id', user!.id).order('generated_at', { ascending: false }).limit(3),
-        supabase.from('pause_notifications').select('id, message, context, reflection_id, created_at').eq('user_id', user!.id).gte('created_at', sevenDaysAgo).order('created_at', { ascending: false }).limit(5),
-      ]);
+          const mapped = mapRowToNotification(row);
+          if (mapped) upsertNotification(mapped);
+          else fetchNotifications({ showLoading: false });
+        },
+      )
+      .subscribe();
 
-      if (badges) {
-        for (const b of badges) {
-          items.push({
-            id: `badge-${b.id}`,
-            type: 'badge',
-            title: t('notifications.badgeEarned'),
-            subtitle: b.badge_id.replace(/_/g, ' '),
-            timestamp: b.earned_at,
-            action: { label: t('notifications.viewBadges'), path: '/profile' },
-          });
-        }
-      }
-
-      if (nights) {
-        for (const n of nights) {
-          items.push({
-            id: `night-${n.id}`,
-            type: 'night_reflection',
-            title: t('notifications.nightReflection'),
-            subtitle: n.message.slice(0, 60) + (n.message.length > 60 ? '…' : ''),
-            timestamp: n.created_at,
-          });
-        }
-      }
-
-      if (letters) {
-        for (const l of letters) {
-          items.push({
-            id: `letter-${l.id}`,
-            type: 'letter',
-            title: t('notifications.letterDelivered'),
-            subtitle: t('notifications.letterFromPast'),
-            timestamp: l.delivered_at!,
-            action: { label: t('notifications.readLetter'), path: '/profile', state: { tab: 'letters', letterId: l.id } },
-          });
-        }
-      }
-
-
-
-
-
-      if (insights) {
-        for (const i of insights) {
-          items.push({
-            id: `insight-${i.id}`,
-            type: 'insight',
-            title: t('notifications.aiInsightsReady'),
-            subtitle: t('notifications.basedOnReflections', { count: i.reflection_count }),
-            timestamp: i.generated_at,
-            action: { label: t('notifications.viewInsights'), path: '/profile', state: { tab: 'insights' } },
-          });
-        }
-      }
-
-      if (pauses) {
-        for (const p of pauses) {
-          items.push({
-            id: `pause-${p.id}`,
-            type: 'pause',
-            title: t('notifications.pauseReady', 'Pause ready'),
-            subtitle: p.message.slice(0, 80) + (p.message.length > 80 ? '…' : ''),
-            timestamp: p.created_at,
-            action: p.reflection_id
-              ? { label: t('notifications.openPause', 'Open pause'), path: '/pause', state: { reflectionId: p.reflection_id } }
-              : undefined,
-          });
-        }
-      }
-
-      items.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
-      setAllNotifications(items.slice(0, 20));
-      setLoading(false);
-    }
-
-    fetchNotifications();
-  }, [user, t]);
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user, fetchNotifications, mapRowToNotification, removeNotification, upsertNotification]);
 
   useEffect(() => {
     const visible = allNotifications.filter(n => !dismissed.has(n.id));
@@ -259,6 +375,16 @@ export function NotificationBell() {
     if (open) document.addEventListener('mousedown', handleClick);
     return () => document.removeEventListener('mousedown', handleClick);
   }, [open]);
+
+  useEffect(() => {
+    const timers = freshTimersRef.current;
+    return () => {
+      for (const timer of timers.values()) {
+        window.clearTimeout(timer);
+      }
+      timers.clear();
+    };
+  }, []);
 
   function handleOpen() {
     setOpen(prev => !prev);
@@ -370,6 +496,7 @@ export function NotificationBell() {
                     <SwipeableNotification
                       key={n.id}
                       n={n}
+                      isFresh={freshIds.has(n.id)}
                       iconMap={iconMap}
                       onDismiss={dismissOne}
                       onAction={handleAction}
