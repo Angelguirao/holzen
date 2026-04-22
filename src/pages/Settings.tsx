@@ -113,7 +113,6 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
     openPortal,
     monthlyRemaining,
     tier,
-    flexCreditsBalance,
   } = useSubscription();
   const { canInstall, install } = useInstallPrompt();
   const {
