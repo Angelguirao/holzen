@@ -747,14 +747,14 @@ export function CheckoutConfirmation() {
             </span>
           </div>
           <DialogTitle className="text-left">
-            {mode === 'subscription' ? `Holzen ${tierLabel} active` : 'Credits added'}
+            {mode === 'subscription' ? `Holzen ${tierLabel} subscription` : 'Flex credits added'}
           </DialogTitle>
           <DialogDescription className="text-left">
             {mode === 'subscription'
               ? isTrialing
-                ? `Your ${PRICING.trialDays}-day trial has started. Manage or cancel anytime from Settings.`
-                : 'Your subscription is active. Manage or cancel anytime from Settings.'
-              : 'Your Flex credits are available below.'}
+                ? `${PRICING.trialDays}-day trial started. Manage or cancel anytime in Settings.`
+                : 'Subscription active. Manage or cancel anytime in Settings.'
+              : 'Updated balance and grant details below.'}
           </DialogDescription>
         </DialogHeader>
 
