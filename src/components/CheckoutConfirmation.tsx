@@ -59,6 +59,64 @@ const CHECKOUT_CONFIRMED_KEY = 'holzen_checkout_confirmed';
 const CHECKOUT_STARTED_KEY = 'holzen_checkout_started_at'; // mirrors useSubscription
 const CHECKOUT_CONFIRMED_WINDOW_MS = 30 * 60 * 1000;
 
+/**
+ * Persisted wallet-refresh lifecycle for the *current* confirmation guard.
+ *
+ * Keyed implicitly by the active `holzen_checkout_confirmed` row (`mode + ts`)
+ * — when the guard rolls (new checkout, or 30-min window elapses) we discard
+ * any stale lifecycle so a fresh confirmation always starts from `idle`.
+ *
+ * We persist the user-visible banner state (`updating`/`timeout`/`error`) so
+ * a user who closes the dialog and re-triggers it within the same window
+ * (e.g. back-nav with the same checkout params, or the explicit re-open path
+ * below) sees the same status row instead of a misleading reset to "idle".
+ * Sticky display values are persisted alongside so the shown numbers also
+ * never regress across close/reopen.
+ */
+const CHECKOUT_REFRESH_STATE_KEY = 'holzen_checkout_refresh_state';
+
+type PersistedRefreshState = {
+  guardTs: number;
+  mode: Mode;
+  state: 'idle' | 'updating' | 'timeout' | 'error';
+  error: string | null;
+  attempts: number;
+  stickyBalance: number | null;
+  stickyCreditsAdded: number;
+  baseline: number | null;
+};
+
+function readPersistedRefreshState(
+  guard: { mode: Mode; ts: number } | null,
+): PersistedRefreshState | null {
+  if (!guard) return null;
+  try {
+    const raw = localStorage.getItem(CHECKOUT_REFRESH_STATE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as PersistedRefreshState;
+    // Only honour the persisted row if it belongs to the *current* guard.
+    if (parsed?.guardTs !== guard.ts || parsed?.mode !== guard.mode) {
+      localStorage.removeItem(CHECKOUT_REFRESH_STATE_KEY);
+      return null;
+    }
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+function writePersistedRefreshState(next: PersistedRefreshState | null) {
+  try {
+    if (!next) {
+      localStorage.removeItem(CHECKOUT_REFRESH_STATE_KEY);
+      return;
+    }
+    localStorage.setItem(CHECKOUT_REFRESH_STATE_KEY, JSON.stringify(next));
+  } catch {
+    /* ignore */
+  }
+}
+
 function readConfirmedGuard(): { mode: Mode; ts: number } | null {
   try {
     const raw = localStorage.getItem(CHECKOUT_CONFIRMED_KEY);
