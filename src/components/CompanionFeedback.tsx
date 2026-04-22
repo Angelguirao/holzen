@@ -5,6 +5,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { hapticFeedback } from '@/lib/haptics';
 import { FEEDBACK_TO_CACHE_TYPE } from '@/lib/companion-types';
 import type { RegenerateCompanionSlot } from '@/hooks/use-companion-data';
+import { useSubscription } from '@/hooks/use-subscription';
+import { useProGate } from '@/hooks/use-pro-gate';
+import { showLimitReachedToast, isPaidLimitReached } from '@/lib/limit-upsell';
 
 interface Props {
   /** Reflection ID this companion belongs to */
@@ -37,9 +40,17 @@ export function CompanionFeedback({
   const { t } = useTranslation();
   const [vote, setVote] = useState<'up' | 'down' | null>(null);
   const [loading, setLoading] = useState(false);
+  const { isPro, requirePro, startCheckout } = useProGate();
+  const { companionRemaining, flexCreditsBalance } = useSubscription();
 
   const canRegenerate = Boolean(reflectionId && regenerateSlot && onRegenerate);
   const regenBusy = Boolean(regenerating);
+  // Pro users hit a true wall when both the monthly companion bucket AND
+  // their flex credits are empty — gate the button visually then.
+  const limitReached = isPro && isPaidLimitReached({
+    remaining: companionRemaining,
+    flexCreditsBalance,
+  });
 
   // Load existing vote on mount (check if user already voted for this reflection+companion)
   useEffect(() => {
@@ -104,6 +115,16 @@ export function CompanionFeedback({
 
   const handleRegenerate = () => {
     if (!canRegenerate || regenBusy) return;
+    // Non-Pro: route through the standard Pro upsell toast.
+    if (!isPro) {
+      requirePro('companions');
+      return;
+    }
+    // Pro but out of allowance + flex credits: standard limit-reached toast.
+    if (limitReached) {
+      showLimitReachedToast({ feature: 'regenerate', startCheckout });
+      return;
+    }
     hapticFeedback('light');
     onRegenerate?.();
   };
