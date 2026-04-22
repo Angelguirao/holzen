@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { Check, Sparkles, Coins, CalendarClock, TrendingUp } from 'lucide-react';
+import { Check, Sparkles, Coins, CalendarClock, TrendingUp, RefreshCw } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -13,6 +13,8 @@ import { Button } from '@/components/ui/button';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useSubscription } from '@/hooks/use-subscription';
 import { PRICING } from '@/lib/pricing';
+import { supabase } from '@/integrations/supabase/client';
+import { toast } from 'sonner';
 
 type Mode = 'subscription' | 'flex_pack_s' | 'flex_pack_m' | null;
 
@@ -83,6 +85,7 @@ export function CheckoutConfirmation() {
   const sub = useSubscription();
 
   const [mode, setMode] = useState<Mode>(null);
+  const [retrying, setRetrying] = useState(false);
   // Snapshot the credit balance at the moment the dialog opens so we can show
   // "+N credits" once the refreshed balance comes in.
   const baselineBalanceRef = useRef<number | null>(null);
@@ -183,6 +186,37 @@ export function CheckoutConfirmation() {
 
   const handleClose = () => setMode(null);
 
+  /**
+   * Manually replays the credit-grant for recent paid flex-pack sessions.
+   *
+   * Used when the Stripe webhook didn't credit the wallet (misconfig,
+   * transient 5xx). Server-side dedup via `(stripe_checkout, cs:<session_id>)`
+   * makes this idempotent — re-running after a successful webhook is a no-op.
+   */
+  const handleRetryGrant = async () => {
+    if (retrying) return;
+    setRetrying(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('retry-flex-credit');
+      if (error) throw error;
+      const applied = Number(data?.applied) || 0;
+      const scanned = Number(data?.scanned) || 0;
+      if (applied > 0) {
+        toast.success(`Credits restored from ${applied} session${applied === 1 ? '' : 's'}.`);
+      } else if (scanned > 0) {
+        toast.message('No missing credits found. Your balance is already up to date.');
+      } else {
+        toast.message('No recent flex-pack sessions to recover.');
+      }
+      await sub.refresh();
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Retry failed';
+      toast.error(`Retry failed: ${msg}`);
+    } finally {
+      setRetrying(false);
+    }
+  };
+
   return (
     <Dialog open={open} onOpenChange={(o) => { if (!o) handleClose(); }}>
       <DialogContent className="sm:max-w-md">
@@ -280,6 +314,21 @@ export function CheckoutConfirmation() {
         </div>
 
         <DialogFooter className="mt-2">
+          {mode !== null && mode !== 'subscription' ? (
+            <Button
+              variant="outline"
+              onClick={handleRetryGrant}
+              disabled={retrying}
+              className="w-full sm:w-auto"
+            >
+              {retrying ? (
+                <LoadingSpinner className="mr-2 h-4 w-4 border-[1.5px]" />
+              ) : (
+                <RefreshCw className="mr-2 h-4 w-4" aria-hidden />
+              )}
+              Retry credit grant
+            </Button>
+          ) : null}
           <Button onClick={handleClose} className="w-full sm:w-auto">
             <Check className="mr-2 h-4 w-4" aria-hidden />
             Got it
