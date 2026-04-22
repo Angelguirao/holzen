@@ -32,6 +32,11 @@ import {
 } from '@/lib/companion-orchestrate-slot-apply';
 import { saveCompanionLibraryBookmarkOnce } from '@/lib/companion-library-autosave';
 import { holzenLog } from '@/lib/holzen-console';
+import {
+  hasInvokedIntervention,
+  resetInterventionIdempotency,
+  runOnceIntervention,
+} from '@/lib/orchestrate-intervention-idempotency';
 
 export type {
   RegenerateCompanionSlot,
