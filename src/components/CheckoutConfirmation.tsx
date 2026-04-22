@@ -693,6 +693,7 @@ export function CheckoutConfirmation() {
     const claimedMode = mode;
     notifySentRef.current = claimedMode;
     let cancelled = false;
+    let settled = false;
     setNotifyStatus(null);
 
     const payload =
@@ -727,6 +728,7 @@ export function CheckoutConfirmation() {
       .invoke('notify-checkout-confirmation', { body: payload })
       .then(({ data, error }) => {
         if (cancelled) return;
+        settled = true;
         if (error) {
           console.warn('[checkout-confirmation] notify failed', error);
           setNotifyStatus({
@@ -744,6 +746,7 @@ export function CheckoutConfirmation() {
       })
       .catch((e) => {
         if (cancelled) return;
+        settled = true;
         console.warn('[checkout-confirmation] notify failed', e);
         setNotifyStatus({
           emailed: false,
@@ -762,7 +765,12 @@ export function CheckoutConfirmation() {
     // the marker) or genuinely cancelled (then we release it).
     return () => {
       cancelled = true;
-      if (notifySentRef.current === claimedMode) {
+      // Only release the marker if the request never resolved — a settled
+      // request (success or handled failure) keeps the marker so the effect
+      // doesn't refire when downstream deps (balance, tier) change. An
+      // in-flight request that's torn down (unmount, hot-reload, StrictMode
+      // double-invoke) frees the slot so a remount can issue it again.
+      if (!settled && notifySentRef.current === claimedMode) {
         notifySentRef.current = null;
       }
     };
