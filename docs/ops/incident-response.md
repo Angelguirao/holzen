@@ -36,7 +36,7 @@ Pre-PMF we're a team of one. "On-call" means: Slack unmuted during waking hours;
    - Edges: GitHub commit history; the last sync to Lovable is the latest deploy.
 6. **Form a hypothesis**. One of:
    - **Deploy regression** — revert via Lovable (frontend) or create a fix commit for edges.
-   - **Provider outage** — check Anthropic / Perplexity / Resend / Stripe status pages. See `dep.error` in BetterStack for the service name. Mitigate: flip an app-config flag if available (e.g. `guardAiFeature` → disable); communicate if user-facing.
+   - **Provider outage** — check Anthropic / Perplexity / Lovable / Stripe status pages. See `dep.error` in BetterStack for the service name. Mitigate: flip an app-config flag if available (e.g. `guardAiFeature` → disable); communicate if user-facing.
    - **DB issue** — RLS regression, unique-constraint violation, pg_cron silence. Query the DB directly; match `cid` against `analytics_events`, `generation_attempts`, `audit_log`.
    - **User-input class** — `auth_required`, `rate_limited`, `bad_input`, `not_found` should NOT create Sentry issues (skip-list in `scrubPiiEdge`). If they do, the skip-list regressed.
 7. **Mitigate**. Quickest reversible action first.

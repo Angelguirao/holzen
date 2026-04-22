@@ -70,7 +70,7 @@ If this path diverges from the manual path (Phase 2), users see inconsistent pau
 - **Scheduled HTTP**: cron invokes edge function URL for `check-volatility` (see `docs/ops/cron-setup.md` for headers/secrets).
 - **Edge function: `check-volatility`**: full automatic pause pipeline (BTC fetch, generate, DB writes, notify, dispatch orchestrate).
 - **Edge function: `companion-orchestrate`**: invoked from `check-volatility` with `Authorization: Bearer <service role>` and JSON body including `userId`, `reflectionId`, context, severity, mood history, feature flags.
-- **External APIs**: CoinGecko (BTC charts), Fear & Greed, on-chain snapshot helpers; optional email via Resend for notification copy.
+- **External APIs**: CoinGecko (BTC charts), Fear & Greed, on-chain snapshot helpers; optional email via Lovable Email for notification copy.
 - **Web Push**: may be used in `check-volatility` for push delivery (see function body for full flow).
 
 ## Data models affected

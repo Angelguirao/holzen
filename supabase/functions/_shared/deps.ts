@@ -1,7 +1,7 @@
 // External dependency (HTTP) call logging helper for edge functions.
 //
 // `logDependencyCall` wraps any `Promise` representing a call to an external service
-// (Anthropic, Perplexity, Stripe, Resend, CoinGecko, etc.) and produces a single structured
+// (Anthropic, Perplexity, Stripe, Lovable Email, CoinGecko, etc.) and produces a single structured
 // log entry with the dependency name, duration, and outcome. This gives us:
 //
 //   - A canonical timing / error log for every upstream call, without per-call ad hoc logs.

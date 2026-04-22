@@ -3,7 +3,7 @@
  * Idempotent: duplicate referrals / rewards are safe.
  */
 import Stripe from "https://esm.sh/stripe@18.5.0";
-import { sendResendEmail } from "./resend.ts";
+import { sendLovableEmailMessage } from "./lovable-email.ts";
 
 const MILESTONES = [
   { count: 1, reward: "1_week_free", trialDays: 7 },
@@ -28,8 +28,8 @@ async function sendRewardEmail(
   referralCount: number,
   referrerId: string,
 ) {
-  if (!Deno.env.get("RESEND_API_KEY")) {
-    logStep("RESEND_API_KEY not set, skipping reward email");
+  if (!Deno.env.get("LOVABLE_API_KEY")) {
+    logStep("LOVABLE_API_KEY not set, skipping reward email");
     return;
   }
 
@@ -53,9 +53,9 @@ async function sendRewardEmail(
   `;
 
   // Each (referrer, reward milestone) is unique — even if the referral job
-  // retries (webhook replay, cron), the same idempotency key means Resend
+  // retries (webhook replay, cron), the same idempotency key means Lovable
   // only delivers this reward email once per 24h window.
-  const result = await sendResendEmail(
+  const result = await sendLovableEmailMessage(
     {
       from: "Holzen <notify@holzen.app>",
       to: [email],
@@ -75,7 +75,7 @@ async function sendRewardEmail(
   if (result.ok) {
     logStep("Reward email sent", { email, rewardType, attempts: result.attempts });
   }
-  // Failures are already logged by sendResendEmail via the logger above.
+  // Failures are already logged by sendLovableEmailMessage via the logger above.
 }
 
 async function grantReward(

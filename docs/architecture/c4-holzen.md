@@ -23,7 +23,7 @@ System(holzen, "Holzen", "Bitcoin-aware mindfulness: SPA plus serverless APIs an
 System_Ext(supabase, "Supabase", "Postgres, Row Level Security, Auth, Edge Function runtime, storage.")
 System_Ext(stripe, "Stripe", "Checkout, subscriptions, customer portal; webhooks to Holzen.")
 System_Ext(ai, "AI & search providers", "Model APIs and web search used for companions (e.g. pause orchestration, Signal).")
-System_Ext(email, "Email provider", "Transactional email from edge functions (e.g. Resend).")
+System_Ext(email, "Email provider", "Transactional email from edge functions (Lovable Email API).")
 System_Ext(push, "Web push infrastructure", "VAPID and delivery for notifications.")
 
 Rel(user, holzen, "Uses", "HTTPS")

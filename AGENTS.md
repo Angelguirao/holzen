@@ -50,7 +50,7 @@ Instructions for AI assistants and automation working in this repository (e.g. C
 - **Edge functions:** `supabase/functions/<name>/index.ts` (Deno). Shared helpers: `supabase/functions/_shared/`. Larger handlers (e.g. **`companion-orchestrate`**) also use **`_shared/companion-orchestrate-*.ts`** (types, parse, logging, skip-cache, tasks, assemble). Add **`[functions.<name>]`** in **`supabase/config.toml`** for **every** new function (same PR). Unlisted names use **Supabase defaults** and can **401** on `invoke` or disagree with `functions serve` until you add the block and redeploy. **401** → session/`Authorization`, dashboard secrets, deployed `config.toml`. After editing edge TS, run **`npm run check:edge`** when Deno is installed.
 - **Lovable + GitHub sync:** migrations and edge functions often **deploy to the linked project immediately** on sync; the **React app** still needs a **publish / Update** in Lovable. See [docs/fundamentals/navigating-the-codebase.md](docs/fundamentals/navigating-the-codebase.md) §17.
 - **Runtime:** Functions run on Supabase in deployed environments. You typically **do not** start them locally during ordinary frontend work unless you are explicitly developing/testing a function.
-- **Secrets** (Stripe, Resend, VAPID, model keys, etc.) belong in the **Supabase dashboard** for edge functions — not in `VITE_*` or committed files.
+- **Secrets** (Stripe, Lovable email/AI keys, VAPID, model keys, etc.) belong in the **Supabase dashboard** for edge functions — not in `VITE_*` or committed files.
 
 ## Environment variables
 

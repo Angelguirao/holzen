@@ -6,7 +6,7 @@ pause-only estimates doc (which is now a focused case study — see link in §7)
 
 > **Scope.** Third-party AI API spend only: Perplexity (Sonar Pro, Sonar) and
 > Lovable AI Gateway (Google Gemini models). **Not** included: Lovable
-> workspace subscription, Cloud hosting, Supabase plan fees, Stripe, Resend,
+> workspace subscription, Cloud hosting, Supabase plan fees, Stripe, Lovable Email,
 > VAPID, CoinGecko usage. Those are real costs but bill on separate dashboards
 > and don't scale with AI usage.
 
@@ -94,7 +94,7 @@ spent — a row without logging still runs but cannot be capped per-user.
 | `admin-library-preview`                           | admin                            | Lovable `gemini-2.5-flash-lite`                            | ✓                          | 503                                        |
 | `pregenerate-companions`                          | cron                             | Perplexity + Lovable (same as orchestrate)                 | ✓                          | Skip run                                   |
 | `fetch-source-feeds`                              | cron                             | Lovable + optional Perplexity                              | ✓                          | Skip run                                   |
-| `personalized-nudge`                              | cron                             | **none** — CoinGecko + Resend only                         | N/A                        | N/A                                        |
+| `personalized-nudge`                              | cron                             | **none** — CoinGecko + Lovable Email only                  | N/A                        | N/A                                        |
 | `deliver-letters`                                 | cron                             | **none** — stored letters + push                           | N/A                        | N/A                                        |
 | `holzen-number`                                   | user                             | **none**                                                   | N/A                        | N/A                                        |
 

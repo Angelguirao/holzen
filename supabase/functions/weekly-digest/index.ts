@@ -5,10 +5,10 @@ import { createAttemptLogger } from "../_shared/observe.ts";
 import { coingeckoHeaders } from "../_shared/coingecko.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import {
-  holzenResendLogger,
-  sendResendBatch,
-  type ResendEmail,
-} from "../_shared/resend.ts";
+  holzenLovableEmailLogger,
+  sendLovableEmailBatch,
+  type LovableEmail,
+} from "../_shared/lovable-email.ts";
 
 const DIGEST_MODEL = "google/gemini-2.5-flash-lite";
 
@@ -193,8 +193,8 @@ serve(
       { auth: { persistSession: false } }
     );
 
-    const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-    if (!RESEND_API_KEY) throw new Error("RESEND_API_KEY not configured");
+    const LOVABLE_EMAIL_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_EMAIL_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
     let LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
@@ -223,10 +223,10 @@ serve(
     holzenEdgeLog("weekly-digest", "eligible users", { count: eligible.length });
 
     // We collect all rendered emails and send them in a single batch request
-    // at the end (≤100 per chunk). That's one Resend round trip instead of N
+    // at the end (≤100 per chunk). That's one Lovable Email round trip instead of N
     // — faster, less rate-limit pressure, and the helper retries the batch on
     // 429/5xx.
-    const queued: ResendEmail[] = [];
+    const queued: LovableEmail[] = [];
     const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
 
     for (const profile of eligible) {
@@ -351,11 +351,11 @@ serve(
 
     // Idempotency key per day → cron re-runs within 24h don't double-send.
     const idempotencyDate = now.toISOString().slice(0, 10);
-    const batch = await sendResendBatch(queued, {
-      apiKey: RESEND_API_KEY,
+    const batch = await sendLovableEmailBatch(queued, {
+      apiKey: LOVABLE_EMAIL_API_KEY,
       source: "weekly-digest",
       idempotencyKey: `weekly-digest:${idempotencyDate}`,
-      logger: holzenResendLogger(
+      logger: holzenLovableEmailLogger(
         (m, d) => holzenEdgeLog("weekly-digest", m, d),
         (m, err) => holzenEdgeError("weekly-digest", m, err),
       ),

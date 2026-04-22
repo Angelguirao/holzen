@@ -50,7 +50,7 @@ Lovable secrets are not exported automatically.
    - `SENTRY_DSN_EDGES`, `SENTRY_RELEASE`, `SENTRY_ENVIRONMENT`
    - `LOG_DRAIN_URL`, `LOG_DRAIN_TOKEN`
    - `SLACK_WEBHOOK_URL`
-   - `RESEND_API_KEY`
+   - `LOVABLE_API_KEY`
    - `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
    - `PERPLEXITY_API_KEY`, `LOVABLE_API_KEY` (or whichever model keys are in use)
    - `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY` (set automatically by platform)

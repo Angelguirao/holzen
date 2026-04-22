@@ -8,7 +8,7 @@
 
 This document estimates **third-party API spend** for a Holzen pause session when content is **live-generated** (no companion cache hits, no curated fallbacks). It ties numbers to [Perplexity Sonar API pricing](https://docs.perplexity.ai/docs/getting-started/pricing) and [Lovable AI / Cloud usage billing](https://docs.lovable.dev/integrations/ai), and to how the repo actually calls those services.
 
-**Not included here:** Lovable **workspace subscription**, **Cloud hosting** (database compute, egress, instance size), **Supabase** plan fees, **Stripe**, email (Resend), push (VAPID), or CoinGecko usage inside `check-volatility`. Those are real costs but are billed on different dashboards. Lovable documents Cloud vs AI balance separately in [Usage-based Cloud and AI pricing](https://docs.lovable.dev/integrations/cloud#usage-based-cloud-and-ai-pricing).
+**Not included here:** Lovable **workspace subscription**, **Cloud hosting** (database compute, egress, instance size), **Supabase** plan fees, **Stripe**, email (Lovable Email), push (VAPID), or CoinGecko usage inside `check-volatility`. Those are real costs but are billed on different dashboards. Lovable documents Cloud vs AI balance separately in [Usage-based Cloud and AI pricing](https://docs.lovable.dev/integrations/cloud#usage-based-cloud-and-ai-pricing).
 
 **Admin “Cost” card** in `/admin` sums `generation_attempts.estimated_cost_usd` (see `v_companion_cost_per_day`). That uses the same **token + Per-request fee** model as `supabase/functions/_shared/observe.ts`; it is an **estimate**, not an invoice. Question-mode generation (`generateQuestion`) does **not** currently log `generation_attempts`, so a small slice of Lovable usage can be missing from that dashboard.
 

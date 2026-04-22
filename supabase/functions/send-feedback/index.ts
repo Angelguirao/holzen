@@ -3,7 +3,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import { EdgeError } from "../_shared/edge-error.ts";
 import { logDependencyCall } from "../_shared/deps.ts";
-import { sendResendEmail } from "../_shared/resend.ts";
+import { sendLovableEmailMessage } from "../_shared/lovable-email.ts";
 
 const escapeHtml = (str: string) =>
   str
@@ -82,7 +82,7 @@ serve(
       has_error_stack: !!enrichment.error_stack,
     });
 
-    // Two fire-and-forget notifications: the ops Slack channel and the Resend email.
+    // Two fire-and-forget notifications: the ops Slack channel and the Lovable email.
     // Both are best-effort — we've already confirmed success to the client via the row insert.
 
     const slackWebhook = Deno.env.get("SLACK_WEBHOOK_URL");
@@ -110,7 +110,7 @@ serve(
       ).catch(() => { /* swallowed — already logged by logDependencyCall */ });
     }
 
-    if (Deno.env.get("RESEND_API_KEY")) {
+    if (Deno.env.get("LOVABLE_API_KEY")) {
       const html = `
         <div style="font-family: monospace; max-width: 600px; margin: 0 auto;">
           <h2 style="font-size: 14px; color: #666;">New Feedback</h2>
@@ -128,10 +128,10 @@ serve(
         </div>
       `;
 
-      // Fire-and-forget: the Resend helper retries on 429/5xx internally and
+      // Fire-and-forget: the Lovable helper retries on 429/5xx internally and
       // uses `cid` as an idempotency key so any duplicate POST from the
-      // browser is de-duped by Resend inside the 24h window.
-      void sendResendEmail(
+      // browser is de-duped by Lovable inside the 24h window.
+      void sendLovableEmailMessage(
         {
           from: "Holzen Feedback <notify@notify.holzen.app>",
           to: ["hello@holzen.app"],
@@ -143,7 +143,7 @@ serve(
           idempotencyKey: `send-feedback:${cid}`,
           logger: { log: (m, d) => log(m, d), error: (m, d) => log.error(m, d) },
         },
-      ).catch(() => { /* already logged by sendResendEmail */ });
+      ).catch(() => { /* already logged by sendLovableEmailMessage */ });
     }
 
     return new Response(JSON.stringify({ success: true }), {

@@ -5,10 +5,10 @@ import { createAttemptLogger } from "../_shared/observe.ts";
 import { coingeckoHeaders } from "../_shared/coingecko.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import {
-  holzenResendLogger,
-  sendResendBatch,
-  type ResendEmail,
-} from "../_shared/resend.ts";
+  holzenLovableEmailLogger,
+  sendLovableEmailBatch,
+  type LovableEmail,
+} from "../_shared/lovable-email.ts";
 
 const REPORT_MODEL = "google/gemini-2.5-flash-lite";
 
@@ -93,8 +93,8 @@ serve(
       { auth: { persistSession: false } }
     );
 
-    const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-    if (!RESEND_API_KEY) throw new Error("RESEND_API_KEY not configured");
+    const LOVABLE_EMAIL_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_EMAIL_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
     let LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
 
@@ -132,9 +132,9 @@ serve(
     const eligible = (profiles ?? []).filter((p) => p.email_notifications);
     holzenEdgeLog("monthly-report", "eligible users", { count: eligible.length });
 
-    // Collect all rendered emails and ship them in one batched Resend call at
+    // Collect all rendered emails and ship them in one batched Lovable Email call at
     // the end (one HTTP round trip per 100 recipients, with retry/backoff).
-    const queued: ResendEmail[] = [];
+    const queued: LovableEmail[] = [];
     const monthAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
     for (const profile of eligible) {
@@ -321,13 +321,13 @@ Be observational, calm. No advice, no exclamation marks.${langInstruction}`;
 
     // Monthly idempotency — this cron only runs on the 1st (guarded above),
     // but if Supabase retries the invocation within 24h, the same key blocks
-    // duplicates at Resend's side.
+    // duplicates in Lovable Email.
     const idempotencyMonth = now.toISOString().slice(0, 7);
-    const batch = await sendResendBatch(queued, {
-      apiKey: RESEND_API_KEY,
+    const batch = await sendLovableEmailBatch(queued, {
+      apiKey: LOVABLE_EMAIL_API_KEY,
       source: "monthly-report",
       idempotencyKey: `monthly-report:${idempotencyMonth}`,
-      logger: holzenResendLogger(
+      logger: holzenLovableEmailLogger(
         (m, d) => holzenEdgeLog("monthly-report", m, d),
         (m, err) => holzenEdgeError("monthly-report", m, err),
       ),
