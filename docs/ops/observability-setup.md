@@ -51,7 +51,7 @@ Click-paths and config for the Holzen observability stack. This is the setup sou
 | `LOG_DRAIN_URL` | BetterStack log ingest endpoint (`https://in.logs.betterstack.com`) |
 | `LOG_DRAIN_TOKEN` | BetterStack source token (not the API token) |
 | `SLACK_WEBHOOK_URL` | Slack Incoming Webhook URL for `#holzen-alerts` |
-| `RESEND_API_KEY` | Already present; required for transactional emails |
+| `LOVABLE_API_KEY` | Already present; required for Lovable Email + AI gateway calls |
 
 If any edge secret is absent, the corresponding forwarder silently no-ops. Never hard-fails user flows.
 

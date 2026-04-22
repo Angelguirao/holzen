@@ -4,10 +4,10 @@ import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen
 import { coingeckoHeaders } from "../_shared/coingecko.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import {
-  holzenResendLogger,
-  sendResendBatch,
-  type ResendEmail,
-} from "../_shared/resend.ts";
+  holzenLovableEmailLogger,
+  sendLovableEmailBatch,
+  type LovableEmail,
+} from "../_shared/lovable-email.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -34,8 +34,8 @@ serve(
       { auth: { persistSession: false } }
     );
 
-    const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-    if (!RESEND_API_KEY) throw new Error("RESEND_API_KEY not configured");
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
 
     // 1. Check current BTC volatility
     const res = await fetch(
@@ -85,8 +85,8 @@ serve(
     // compute it once so it can also feed the idempotency key below.
     const runDirection = (data?.bitcoin?.usd_24h_change ?? 0) >= 0 ? "up" : "down";
     // Each user gets bespoke localized copy; we accumulate rendered payloads
-    // and ship them in one batched Resend call at the end.
-    const queued: ResendEmail[] = [];
+    // and ship them in one batched Lovable Email call at the end.
+    const queued: LovableEmail[] = [];
 
     for (const profile of eligible) {
       // Check if user has reflected in the last 48 hours
@@ -196,13 +196,13 @@ serve(
     }
 
     // Idempotency key per day+direction — if Supabase retries the cron within
-    // 24h, Resend dedupes the batch and users never get duplicate nudges.
+    // 24h, Lovable dedupes messages and users never get duplicate nudges.
     const dateKey = new Date().toISOString().slice(0, 10);
-    const batch = await sendResendBatch(queued, {
-      apiKey: RESEND_API_KEY,
+    const batch = await sendLovableEmailBatch(queued, {
+      apiKey: LOVABLE_API_KEY,
       source: "personalized-nudge",
       idempotencyKey: `personalized-nudge:${dateKey}:${runDirection}`,
-      logger: holzenResendLogger(
+      logger: holzenLovableEmailLogger(
         (m, d) => holzenEdgeLog("personalized-nudge", m, d),
         (m, err) => holzenEdgeError("personalized-nudge", m, err),
       ),

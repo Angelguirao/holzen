@@ -24,7 +24,10 @@ import {
 } from "../_shared/holzen-edge-log.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
 import { coingeckoHeaders } from "../_shared/coingecko.ts";
-import { holzenResendLogger, sendResendEmail } from "../_shared/resend.ts";
+import {
+  holzenLovableEmailLogger,
+  sendLovableEmailMessage,
+} from "../_shared/lovable-email.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -99,8 +102,8 @@ async function sendNotificationEmail(
   context: string,
   reflectionId: string | null,
 ): Promise<boolean> {
-  if (!Deno.env.get("RESEND_API_KEY")) {
-    holzenEdgeError("volatility-email", "RESEND_API_KEY not configured");
+  if (!Deno.env.get("LOVABLE_API_KEY")) {
+    holzenEdgeError("volatility-email", "LOVABLE_API_KEY not configured");
     return false;
   }
 
@@ -120,8 +123,8 @@ async function sendNotificationEmail(
 
   // Each reflection has a unique UUID — perfect idempotency key. A retry of
   // the same volatility cron (or a double-fire from pg_cron) never produces
-  // a duplicate email within Resend's 24h dedupe window.
-  const result = await sendResendEmail(
+  // a duplicate email within Lovable Email's idempotency window.
+  const result = await sendLovableEmailMessage(
     {
       from: "Holzen <notify@holzen.app>",
       to: [email],
@@ -131,7 +134,7 @@ async function sendNotificationEmail(
     {
       source: "volatility-email",
       idempotencyKey: reflectionId ? `volatility:${reflectionId}` : undefined,
-      logger: holzenResendLogger(
+      logger: holzenLovableEmailLogger(
         (m, d) => holzenEdgeLog("volatility-email", m, d),
         (m, err) => holzenEdgeError("volatility-email", m, err),
       ),
