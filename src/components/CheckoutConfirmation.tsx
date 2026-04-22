@@ -1034,11 +1034,20 @@ function RefreshStatusBanner({
   state,
   errorMessage,
   onRetry,
+  attempt,
+  maxAttempts,
 }: {
   state: 'updating' | 'timeout' | 'error';
   errorMessage: string | null;
   onRetry: () => void;
+  attempt: number;
+  maxAttempts: number;
 }) {
+  const exhausted = attempt >= maxAttempts;
+  const updating = state === 'updating';
+  // Counter shown next to "Try again". Hidden until the user has actually
+  // retried at least once so the first attempt looks clean.
+  const attemptLabel = attempt > 0 ? `${attempt}/${maxAttempts}` : null;
   if (state === 'updating') {
     return (
       <div
@@ -1047,7 +1056,12 @@ function RefreshStatusBanner({
         aria-live="polite"
       >
         <LoadingSpinner className="h-3 w-3 border-[1.5px]" />
-        <span>Updating balance…</span>
+        <span>
+          Updating balance…
+          {attemptLabel ? (
+            <span className="ml-1 opacity-70">(attempt {attemptLabel})</span>
+          ) : null}
+        </span>
       </div>
     );
   }
@@ -1061,16 +1075,20 @@ function RefreshStatusBanner({
         <span className="flex items-center gap-2">
           <AlertTriangle className="h-3.5 w-3.5 text-muted-foreground" aria-hidden />
           Balance is still syncing. Your credits are safe.
+          {attemptLabel ? (
+            <span className="ml-1 opacity-70">(attempt {attemptLabel})</span>
+          ) : null}
         </span>
         <Button
           type="button"
           variant="outline"
           size="sm"
           onClick={onRetry}
+          disabled={updating || exhausted}
           className="h-7 px-2 text-xs"
         >
-          <RefreshCw className="mr-1.5 h-3 w-3" aria-hidden />
-          Try again
+          <RefreshCw className={`mr-1.5 h-3 w-3 ${updating ? 'animate-spin' : ''}`} aria-hidden />
+          {exhausted ? 'No retries left' : updating ? 'Retrying…' : 'Try again'}
         </Button>
       </div>
     );
@@ -1088,6 +1106,9 @@ function RefreshStatusBanner({
           Could not refresh balance
           {errorMessage ? <span className="ml-1 opacity-70">({errorMessage})</span> : null}
           . Your credits are still safe.
+          {attemptLabel ? (
+            <span className="ml-1 opacity-70">(attempt {attemptLabel})</span>
+          ) : null}
         </span>
       </span>
       <Button
@@ -1095,10 +1116,11 @@ function RefreshStatusBanner({
         variant="outline"
         size="sm"
         onClick={onRetry}
+        disabled={updating || exhausted}
         className="h-7 px-2 text-xs"
       >
-        <RefreshCw className="mr-1.5 h-3 w-3" aria-hidden />
-        Try again
+        <RefreshCw className={`mr-1.5 h-3 w-3 ${updating ? 'animate-spin' : ''}`} aria-hidden />
+        {exhausted ? 'No retries left' : updating ? 'Retrying…' : 'Try again'}
       </Button>
     </div>
   );
