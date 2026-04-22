@@ -682,7 +682,7 @@ function RefreshStatusBanner({
         aria-live="polite"
       >
         <span className="flex items-center gap-2">
-          <AlertTriangle className="h-3.5 w-3.5 text-amber-500" aria-hidden />
+          <AlertTriangle className="h-3.5 w-3.5 text-muted-foreground" aria-hidden />
           Balance is still syncing. Your credits are safe.
         </span>
         <Button
