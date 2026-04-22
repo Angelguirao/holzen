@@ -128,6 +128,12 @@ export function CheckoutConfirmation() {
   const [refreshError, setRefreshError] = useState<string | null>(null);
   const refreshTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const refreshAttemptRef = useRef(0);
+  // Sticky display values. We only ever advance forward (never regress to a
+  // smaller balance / "credits added" than what we previously showed) so the
+  // dialog never flickers between an authoritative snapshot and a stale one
+  // arriving from a focus-driven refetch a second later.
+  const stickyBalanceRef = useRef<number | null>(null);
+  const stickyCreditsAddedRef = useRef<number>(0);
 
   useEffect(() => {
     const detected = detectMode(location.search);
@@ -272,16 +278,31 @@ export function CheckoutConfirmation() {
   // `list-checkout-events`. Either path lets us drop the "updating" spinner.
   const balanceReflectsPurchase =
     (expectedCredits > 0 && observedDelta >= expectedCredits) || grantApplied;
-  // Always show the actual purchased amount from Stripe metadata (or the
-  // applied grant amount once available). This stays accurate even when the
-  // local wallet snapshot lags behind the webhook.
-  const creditsAdded = expectedCredits;
-  // New balance = snapshot at dialog-open + authoritative purchased amount.
-  // We deliberately don't show `currentBalance` until it matches, so the
-  // "before / +added / after" arithmetic is always internally consistent.
-  const projectedBalance = balanceReflectsPurchase
+  // Authoritative purchased amount from Stripe metadata (or the applied grant
+  // amount once available). We track this through a ref so re-fetches that
+  // arrive *before* `purchasedCredits` resolves can't transiently regress the
+  // shown value to the PRICING fallback.
+  if (expectedCredits > stickyCreditsAddedRef.current) {
+    stickyCreditsAddedRef.current = expectedCredits;
+  }
+  const creditsAdded = stickyCreditsAddedRef.current || expectedCredits;
+  // Computed new balance: snapshot at dialog-open + authoritative purchased
+  // amount, OR the live wallet once it matches/exceeds that figure.
+  const computedBalance = balanceReflectsPurchase
     ? Math.max(currentBalance, baseline + creditsAdded)
     : baseline + creditsAdded;
+  // Monotonic display value: never regresses below what we've already shown
+  // the user. Prevents flicker when a focus refetch returns an intermediate
+  // snapshot (e.g. webhook half-applied, or a stale cache hit racing with a
+  // fresh one). The number is still capped by reality once `currentBalance`
+  // overtakes it.
+  if (
+    stickyBalanceRef.current === null ||
+    computedBalance > stickyBalanceRef.current
+  ) {
+    stickyBalanceRef.current = computedBalance;
+  }
+  const projectedBalance = stickyBalanceRef.current ?? computedBalance;
   // True while we're still waiting for the refreshed wallet balance to
   // reflect the purchase. The number shown is already correct; the spinner
   // just signals "we're confirming with the server".
@@ -298,6 +319,8 @@ export function CheckoutConfirmation() {
     setRefreshState('idle');
     setRefreshError(null);
     refreshAttemptRef.current = 0;
+    stickyBalanceRef.current = null;
+    stickyCreditsAddedRef.current = 0;
   };
 
   /**
@@ -358,6 +381,61 @@ export function CheckoutConfirmation() {
       setRefreshState('error');
     }
   };
+
+  /**
+   * Auto-refetch the subscription snapshot whenever the dialog (or the page
+   * hosting it) becomes visible again. Runs:
+   *  - once when the dialog first opens (mount),
+   *  - on every `visibilitychange` to `visible` (tab return, OS unlock),
+   *  - on every `focus` (alt-tab back into the window).
+   *
+   * Throttled to one refetch per 4s to avoid hammering the edge function on
+   * rapid focus/blur cycles (e.g. clicking outside a Stripe sub-window). We
+   * also skip refetches once `balanceReflectsPurchase` is true — there's
+   * nothing left to confirm and the sticky display values would absorb any
+   * incoming snapshot anyway.
+   *
+   * Errors are swallowed: this is best-effort polling. The explicit "Try
+   * again" button + 45s timeout banner remain the primary recovery path for
+   * users who notice something's wrong.
+   */
+  useEffect(() => {
+    if (!mode || mode === 'subscription') return;
+    if (balanceReflectsPurchase) return;
+
+    let lastRefreshAt = 0;
+    let cancelled = false;
+
+    const maybeRefresh = (reason: 'mount' | 'visibility' | 'focus') => {
+      const now = Date.now();
+      if (now - lastRefreshAt < 4_000) return;
+      lastRefreshAt = now;
+      void sub.refresh().catch(() => {
+        // Silent — the lifecycle / retry path owns surfaced errors.
+        if (cancelled) return;
+      });
+      void reason; // kept for future telemetry
+    };
+
+    // Initial fetch on dialog open.
+    maybeRefresh('mount');
+
+    const onVisibility = () => {
+      if (document.visibilityState === 'visible') maybeRefresh('visibility');
+    };
+    const onFocus = () => maybeRefresh('focus');
+
+    document.addEventListener('visibilitychange', onVisibility);
+    window.addEventListener('focus', onFocus);
+    return () => {
+      cancelled = true;
+      document.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener('focus', onFocus);
+    };
+    // `sub.refresh` is a stable useCallback; depending on it directly would
+    // cause re-subscriptions on unrelated subscription state changes.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, balanceReflectsPurchase]);
 
   // Fire-and-forget the optional email + push confirmation. Honors
   // `profiles.email_notifications` server-side, so users who turned that off
