@@ -82,9 +82,13 @@ serve(
             credits,
             reason: "flex_pack_purchase",
             source: "stripe_checkout",
-            sourceRef: event.id,
+            // Use the checkout session id (not the webhook event id) as the
+            // dedupe ref so the manual `retry-flex-credit` recovery path
+            // collapses to the same ledger row and never double-credits.
+            sourceRef: `cs:${session.id}`,
             metadata: {
               checkout_session_id: session.id,
+              stripe_event_id: event.id,
               stripe_event_type: event.type,
               pack_type: packType,
             },
