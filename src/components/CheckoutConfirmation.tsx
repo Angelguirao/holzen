@@ -308,6 +308,9 @@ export function CheckoutConfirmation() {
   // belongs to. Used both as the persistence key and as a hydration guard
   // (so we don't repeatedly re-hydrate on every render).
   const activeGuardTsRef = useRef<number | null>(null);
+  // Dev-only: ref to the rendered dialog root, scanned by the
+  // QUIET_STATE_CHECKLIST audit effect below. Never read in production.
+  const dialogContentRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     const detected = detectMode(location.search);
