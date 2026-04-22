@@ -137,8 +137,11 @@ const CHECKOUT_STARTED_KEY = 'holzen_checkout_started_at'; // mirrors useSubscri
  *   - `mount`     → fires at most once per confirmed checkout (same guardTs)
  *   - `retry:N`   → fires at most once per click of "Try again" (attempt N)
  *
- * Module-level + persisted to `sessionStorage` so a remount within the same
- * tab still hits the guard. Cleared whenever a fresh confirmation guard is
+ * Module-level + persisted to `localStorage` so a remount within the same
+ * tab — *and* a concurrent mount in a sibling tab racing the same checkout
+ * return — both hit the guard. Without cross-tab visibility two tabs that
+ * open the success URL within the same few hundred ms would each fire a
+ * `mount`-slot refresh. Cleared whenever a fresh confirmation guard is
  * written (new checkout) so a genuinely new purchase always gets fresh slots.
  */
 const CHECKOUT_REFRESH_IDEMPOTENCY_KEY = 'holzen_checkout_refresh_idempotency';
@@ -152,7 +155,7 @@ type RefreshIdempotencyRow = {
 
 function readRefreshIdempotency(): RefreshIdempotencyRow | null {
   try {
-    const raw = sessionStorage.getItem(CHECKOUT_REFRESH_IDEMPOTENCY_KEY);
+    const raw = localStorage.getItem(CHECKOUT_REFRESH_IDEMPOTENCY_KEY);
     if (!raw) return null;
     return JSON.parse(raw) as RefreshIdempotencyRow;
   } catch {
@@ -163,10 +166,10 @@ function readRefreshIdempotency(): RefreshIdempotencyRow | null {
 function writeRefreshIdempotency(row: RefreshIdempotencyRow | null) {
   try {
     if (!row) {
-      sessionStorage.removeItem(CHECKOUT_REFRESH_IDEMPOTENCY_KEY);
+      localStorage.removeItem(CHECKOUT_REFRESH_IDEMPOTENCY_KEY);
       return;
     }
-    sessionStorage.setItem(CHECKOUT_REFRESH_IDEMPOTENCY_KEY, JSON.stringify(row));
+    localStorage.setItem(CHECKOUT_REFRESH_IDEMPOTENCY_KEY, JSON.stringify(row));
   } catch {
     /* ignore */
   }
