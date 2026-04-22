@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { LoadingButton } from '@/components/ui/loading-button';
-import { Sparkles, Wind, Brain, Infinity, Anchor, Lightbulb, BookOpen, Moon, Image, Mail } from 'lucide-react';
+import { Sparkles, Wind, Brain, Infinity, Anchor, Lightbulb, BookOpen, Moon, Image, Mail, MessageSquare } from 'lucide-react';
 import { PRICING } from '@/lib/pricing';
 
 interface Props {
@@ -94,7 +94,8 @@ export function OnboardingReady({
             { icon: Moon, text: t('onboarding.ready.proNight', 'Evening reflection prompts') },
             { icon: BookOpen, text: t('onboarding.ready.proLibrary', 'Personal library & collections') },
             { icon: Mail, text: t('onboarding.ready.proLetters', 'Letters to your future self') },
-            { icon: Image, text: t('onboarding.ready.proWallpapers', 'AI-generated wallpapers') },
+            { icon: MessageSquare, text: t('onboarding.ready.proCompanions', '{{count}} companion deep-dives / month', { count: PRICING.proCompanionUnlocks }) },
+            { icon: Image, text: t('onboarding.ready.proWallpapers', '{{count}} AI wallpapers / month', { count: PRICING.proWallpapers }) },
           ].map(({ icon: Icon, text }, i) => (
             <div key={i} className="flex items-center gap-2.5">
               <Icon className="h-3 w-3 text-foreground/50 shrink-0" />
@@ -115,12 +116,18 @@ export function OnboardingReady({
           <Sparkles className="h-3 w-3" />
           {t('onboarding.ready.startTrial', 'Start {{days}}-day free trial', { days: PRICING.trialDays })}
         </LoadingButton>
+        <p className="text-center text-[10px] font-mono text-muted-foreground/40 -mt-1">
+          {t('onboarding.ready.trialFinePrint', 'Then ${{price}}/mo · Cancel anytime', { price: PRICING.monthlyPrice })}
+        </p>
         <button
           onClick={onBeginFree}
           className="w-full text-center text-[10px] font-mono text-muted-foreground/40 hover:text-foreground transition-colors py-2"
         >
           {t('onboarding.ready.beginFree', 'Continue with free plan →')}
         </button>
+        <p className="text-center text-[10px] font-mono text-muted-foreground/30 leading-relaxed">
+          {t('onboarding.ready.proPlusHint', 'Power user? Pro+ available after signup.')}
+        </p>
       </motion.div>
     </div>
   );
