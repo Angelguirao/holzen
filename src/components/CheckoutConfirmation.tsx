@@ -253,7 +253,7 @@ function readConfirmedGuard(): { mode: Mode; ts: number } | null {
     if (!raw) return null;
     const parsed = JSON.parse(raw) as { mode: Mode; ts: number };
     if (!parsed || typeof parsed.ts !== 'number') return null;
-    if (Date.now() - parsed.ts > CHECKOUT_CONFIRMED_WINDOW_MS) {
+    if (Date.now() - parsed.ts > getCheckoutSuppressionWindowMs()) {
       localStorage.removeItem(CHECKOUT_CONFIRMED_KEY);
       return null;
     }
