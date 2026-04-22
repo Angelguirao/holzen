@@ -213,6 +213,9 @@ export function useSubscription() {
   const queryClient = useQueryClient();
   const userId = user?.id ?? null;
   const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [checkoutLoadingTarget, setCheckoutLoadingTarget] = useState<
+    'pro' | 'pro_plus' | 'flex_pack_s' | 'flex_pack_m' | null
+  >(null);
   const lastLoggedSubRef = useRef<{ subscribed: boolean; monthlyRemaining: number | undefined } | null>(null);
 
   const query = useQuery({
@@ -311,6 +314,7 @@ export function useSubscription() {
   const startCheckout = useCallback(async (target: 'pro' | 'pro_plus' | 'flex_pack_s' | 'flex_pack_m' = 'pro') => {
     holzenLog.subscription('checkout', { action: 'start', target });
     setCheckoutLoading(true);
+    setCheckoutLoadingTarget(target);
     try {
       sessionStorage.setItem(CHECKOUT_RETURN_KEY, String(Date.now()));
       const isPack = target === 'flex_pack_s' || target === 'flex_pack_m';
@@ -337,9 +341,11 @@ export function useSubscription() {
       }
 
       setCheckoutLoading(false);
+      setCheckoutLoadingTarget(null);
     } catch (e) {
       console.error('Checkout error:', e);
       setCheckoutLoading(false);
+      setCheckoutLoadingTarget(null);
     }
   }, []);
 
