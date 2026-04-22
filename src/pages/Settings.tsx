@@ -897,6 +897,21 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                   </p>
                   {tier !== 'lifetime' && (
                     <div className="grid grid-cols-1 gap-2">
+                      {tier === 'pro' && (
+                        <LoadingButton
+                          onClick={() => startCheckout('pro_plus')}
+                          loading={checkoutLoading && checkoutLoadingTarget === 'pro_plus'}
+                          disabled={checkoutLoading && checkoutLoadingTarget !== 'pro_plus'}
+                          loadingText={t('settings.openingCheckout')}
+                          className="w-full text-sm font-sans"
+                          size="sm"
+                        >
+                          {t('settings.upgradeToProPlusCta', {
+                            price: PRICING.proPlusMonthlyPrice.toFixed(2),
+                            defaultValue: 'Upgrade to Pro+ · ${{price}}/month',
+                          })}
+                        </LoadingButton>
+                      )}
                       <LoadingButton
                         onClick={() => startCheckout('flex_pack_s')}
                         loading={checkoutLoading && checkoutLoadingTarget === 'flex_pack_s'}
@@ -929,12 +944,14 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                       </LoadingButton>
                     </div>
                   )}
-                  <button
+                  <Button
                     onClick={openPortal}
-                    className="text-xs font-mono text-muted-foreground underline"
+                    variant="outline"
+                    size="sm"
+                    className="w-full text-sm font-sans"
                   >
                     {t('settings.manageSubscription')}
-                  </button>
+                  </Button>
                   <div>
                     <a
                       href="/settings/billing-history"

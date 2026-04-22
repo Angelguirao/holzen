@@ -5,6 +5,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import { parseEdgeFunctionError, toUserFacingAiErrorMessage } from '@/lib/edge-function-error';
 import { useSubscription } from '@/hooks/use-subscription';
+import { useProGate } from '@/hooks/use-pro-gate';
+import { showLimitReachedToast, isPaidLimitReached } from '@/lib/limit-upsell';
 import {
   Dialog,
   DialogContent,
@@ -114,9 +116,27 @@ export function ReflectionWallpaper({ message, mood, context, haiku, variant = '
   const [generating, setGenerating] = useState(false);
   const [compositeUrl, setCompositeUrl] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
-  const { applyOptimisticDecrement, refresh: refreshSubscription } = useSubscription();
+  const {
+    applyOptimisticDecrement,
+    refresh: refreshSubscription,
+    wallpaperRemaining,
+    flexCreditsBalance,
+    startCheckout,
+  } = useSubscription();
+  const { isPro, requirePro } = useProGate();
 
   const generate = useCallback(async () => {
+    // Mirror the regenerate paywall: free users see the upgrade toast,
+    // Pro users with no wallpaper bucket and no flex credits see the
+    // limit-reached toast — never the raw edge function error.
+    if (!isPro) {
+      requirePro('wallpapers');
+      return;
+    }
+    if (isPaidLimitReached({ remaining: wallpaperRemaining, flexCreditsBalance })) {
+      showLimitReachedToast({ feature: 'wallpaper', startCheckout });
+      return;
+    }
     setGenerating(true);
     setOpen(true);
     setCompositeUrl(null);
@@ -129,6 +149,16 @@ export function ReflectionWallpaper({ message, mood, context, haiku, variant = '
 
       if (error) {
         const parsed = await parseEdgeFunctionError(error);
+        if (parsed.code === 'companions_upgrade_required') {
+          requirePro('wallpapers');
+          setOpen(false);
+          return;
+        }
+        if (parsed.code === 'companions_quota_exceeded' || parsed.code === 'wallpapers_quota_exceeded') {
+          showLimitReachedToast({ feature: 'wallpaper', startCheckout });
+          setOpen(false);
+          return;
+        }
         throw new Error(toUserFacingAiErrorMessage(parsed, t('wallpaper.failedToGenerate')));
       }
       if (data?.error) throw new Error(data.error);
@@ -142,7 +172,20 @@ export function ReflectionWallpaper({ message, mood, context, haiku, variant = '
       setGenerating(false);
       void refreshSubscription();
     }
-  }, [message, mood, context, haiku, t, applyOptimisticDecrement, refreshSubscription]);
+  }, [
+    message,
+    mood,
+    context,
+    haiku,
+    t,
+    applyOptimisticDecrement,
+    refreshSubscription,
+    isPro,
+    requirePro,
+    wallpaperRemaining,
+    flexCreditsBalance,
+    startCheckout,
+  ]);
 
   const download = useCallback(() => {
     if (!compositeUrl) return;
