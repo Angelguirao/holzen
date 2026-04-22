@@ -146,6 +146,11 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
   // Track which companion slots have already been fetched/requested for this reflection
   const fetchedSlotsRef = useRef<Set<string>>(new Set());
 
+  // Tracks whether the most recent intervention auto-fetch was short-circuited
+  // by the per-tab idempotency guard. Used by `retryOrchestrate` to surface a
+  // confirmation toast once the deliberate retry actually issues a fresh call.
+  const interventionSkippedRef = useRef<boolean>(false);
+
   // Reset all companion state when switching reflections so stale data from a
   // previous reflection never leaks into the new one.
   useLayoutEffect(() => {
