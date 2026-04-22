@@ -286,3 +286,160 @@ export function scheduleCheckoutGuardCleanup(
     window.clearInterval(id);
   };
 }
+
+/**
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Cross-tab confirmation sync
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ * The persistent `holzen_checkout_confirmed` row already gives us cross-tab
+ * suppression "for free" whenever a sibling tab mounts *after* the first tab
+ * recorded its guard — every read of `readConfirmedGuard()` consults
+ * `localStorage` synchronously.
+ *
+ * What it does *not* cover:
+ *
+ *   1. **Concurrent arrival.** The user clicks a Stripe email receipt while
+ *      the success-redirect tab is also opening. Both mount in the same few
+ *      hundred ms with the checkout query string, both read no guard, and
+ *      both want to `setMode(...)` + `sub.refresh()`. We need a fast
+ *      cross-tab broadcast so the laggard collapses into the suppression
+ *      path before it issues the redundant edge call.
+ *
+ *   2. **Already-open siblings.** Tab A is still showing the celebratory
+ *      dialog from a confirmation 30s ago. Tab B opens a deep link with the
+ *      same checkout params. Tab B will silently suppress (good), but tab A
+ *      is still a stale celebratory surface that the user can't dismiss
+ *      from B. We dispatch a notification so tab A can fold into the same
+ *      quiet "already confirmed" state instead of two surfaces drifting.
+ *
+ * We use `BroadcastChannel` when available (all evergreen browsers since
+ * 2022) and fall back to a `storage`-event ping written to a dedicated key.
+ * The ping payload is intentionally small — `{ mode, ts, source }` — and is
+ * idempotent: subscribers re-read `readConfirmedGuard()` themselves, so a
+ * dropped or duplicate broadcast is non-fatal (the persistent guard is
+ * still authoritative).
+ */
+
+export type CheckoutConfirmedBroadcast = {
+  mode: string;
+  /** Guard timestamp (`localStorage[holzen_checkout_confirmed].ts`). */
+  ts: number;
+  /** Per-tab id of the broadcaster — listeners ignore their own broadcasts. */
+  source: string;
+};
+
+const BROADCAST_CHANNEL_NAME = 'holzen_checkout_guard';
+const BROADCAST_PING_STORAGE_KEY = 'holzen_checkout_guard_ping';
+
+/**
+ * Per-tab id used to filter out self-broadcasts. We need this because both
+ * `BroadcastChannel` (in some browsers, on the same realm) and the
+ * `storage`-event fallback (always, in same-tab cross-frame setups) can
+ * deliver our own messages back to us, which would cause the broadcasting
+ * tab to dedupe its own dialog into nothing.
+ */
+const TAB_ID =
+  typeof crypto !== 'undefined' && 'randomUUID' in crypto
+    ? crypto.randomUUID()
+    : `tab-${Math.random().toString(36).slice(2)}-${Date.now()}`;
+
+export function getCheckoutGuardTabId(): string {
+  return TAB_ID;
+}
+
+function getBroadcastChannel(): BroadcastChannel | null {
+  if (typeof window === 'undefined') return null;
+  if (typeof BroadcastChannel === 'undefined') return null;
+  try {
+    return new BroadcastChannel(BROADCAST_CHANNEL_NAME);
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Notify other tabs that a checkout confirmation was just recorded by this
+ * tab. Safe to call even when no listeners exist.
+ */
+export function broadcastCheckoutConfirmed(payload: Omit<CheckoutConfirmedBroadcast, 'source'>): void {
+  if (typeof window === 'undefined') return;
+  const message: CheckoutConfirmedBroadcast = { ...payload, source: TAB_ID };
+  const channel = getBroadcastChannel();
+  try {
+    if (channel) {
+      channel.postMessage(message);
+      // BroadcastChannel.close() is safe immediately after postMessage —
+      // delivery is queued before close resolves the underlying port.
+      channel.close();
+    }
+  } catch {
+    /* ignore */
+  }
+  // Always also write a storage ping. Two reasons:
+  //   1. Acts as a fallback for environments without BroadcastChannel
+  //      (older Safari, some embedded webviews, jsdom in tests).
+  //   2. Lets late-mounting tabs that subscribe *after* the post still pick
+  //      up the latest confirmation by reading the ping key on init.
+  try {
+    window.localStorage.setItem(BROADCAST_PING_STORAGE_KEY, JSON.stringify(message));
+  } catch {
+    /* ignore quota / privacy mode */
+  }
+}
+
+/**
+ * Subscribe to checkout-confirmation broadcasts from sibling tabs. The
+ * handler is **never** invoked for messages this tab itself broadcast.
+ * Returns a teardown function. No-op in non-browser envs.
+ */
+export function subscribeToCheckoutConfirmations(
+  handler: (payload: CheckoutConfirmedBroadcast) => void,
+): () => void {
+  if (typeof window === 'undefined') return () => {};
+
+  const safeHandle = (raw: unknown) => {
+    if (!raw || typeof raw !== 'object') return;
+    const msg = raw as Partial<CheckoutConfirmedBroadcast>;
+    if (typeof msg.mode !== 'string') return;
+    if (typeof msg.ts !== 'number') return;
+    if (typeof msg.source !== 'string') return;
+    if (msg.source === TAB_ID) return; // ignore self
+    handler(msg as CheckoutConfirmedBroadcast);
+  };
+
+  // 1. BroadcastChannel listener (evergreen browsers).
+  let channel: BroadcastChannel | null = null;
+  try {
+    if (typeof BroadcastChannel !== 'undefined') {
+      channel = new BroadcastChannel(BROADCAST_CHANNEL_NAME);
+      channel.onmessage = (ev) => safeHandle(ev.data);
+    }
+  } catch {
+    channel = null;
+  }
+
+  // 2. storage-event fallback (works cross-tab, never same-tab — exactly the
+  //    semantic we want).
+  const onStorage = (ev: StorageEvent) => {
+    if (ev.key !== BROADCAST_PING_STORAGE_KEY) return;
+    if (!ev.newValue) return;
+    try {
+      safeHandle(JSON.parse(ev.newValue));
+    } catch {
+      /* malformed payload — ignore */
+    }
+  };
+  window.addEventListener('storage', onStorage);
+
+  return () => {
+    window.removeEventListener('storage', onStorage);
+    if (channel) {
+      try {
+        channel.close();
+      } catch {
+        /* ignore */
+      }
+    }
+  };
+}
