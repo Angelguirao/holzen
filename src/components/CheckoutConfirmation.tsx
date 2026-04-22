@@ -19,6 +19,21 @@ import { toast } from 'sonner';
 type Mode = 'subscription' | 'flex_pack_s' | 'flex_pack_m' | null;
 
 /**
+ * Subset of the `list-checkout-events` row we care about. The full shape lives
+ * in `src/pages/BillingHistory.tsx`; we duplicate the slice here to avoid a
+ * cross-page import for a tiny structural type.
+ */
+type CheckoutEventLite = {
+  session_id: string;
+  created: number;
+  pack_type: string | null;
+  expected_credits: number;
+  payment_status: string;
+  grant_status: 'applied' | 'pending' | 'not_applicable';
+  granted_credits: number | null;
+};
+
+/**
  * Session-scoped guard so refreshing or hitting Back within the same checkout
  * redirect window doesn't re-open the confirmation dialog. Keyed by mode +
  * a short time bucket so a genuinely new checkout (different params arriving
