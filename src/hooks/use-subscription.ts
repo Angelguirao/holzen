@@ -63,7 +63,7 @@ function checkoutReturnWantsForce(): boolean {
   const hasCheckoutQuery = params.get('subscribed') === 'true';
   const checkoutStartedAt = Number(sessionStorage.getItem(CHECKOUT_RETURN_KEY) ?? 0);
   const returnedFromRecentCheckout =
-    checkoutStartedAt > 0 && Date.now() - checkoutStartedAt < CHECKOUT_RETURN_WINDOW_MS;
+    checkoutStartedAt > 0 && Date.now() - checkoutStartedAt < getCheckoutSuppressionWindowMs();
   if (hasCheckoutQuery || returnedFromRecentCheckout) {
     sessionStorage.removeItem(CHECKOUT_RETURN_KEY);
     return true;
