@@ -236,6 +236,14 @@ export function CheckoutConfirmation() {
     errorMessage?: string | null;
   } | null>(null);
   const refreshAttemptRef = useRef(0);
+  // Mirror of `refreshAttemptRef` for rendering (refs don't trigger re-renders).
+  // Bumped in lock-step inside `handleRetryRefresh` so the banner can show
+  // "Attempt N/MAX" without us having to thread a derived value through props.
+  const [refreshAttempt, setRefreshAttempt] = useState(0);
+  // Hard cap on user-initiated retries within a single confirmation window.
+  // Matches the implicit ceiling already enforced by the backoff polling
+  // (`maxAttempts = 6`) but applies to the *manual* "Try again" button only.
+  const MAX_REFRESH_RETRIES = 3;
   // Sticky display values. We only ever advance forward (never regress to a
   // smaller balance / "credits added" than what we previously showed) so the
   // dialog never flickers between an authoritative snapshot and a stale one
@@ -292,6 +300,7 @@ export function CheckoutConfirmation() {
         stickyCreditsAddedRef.current = persisted.stickyCreditsAdded;
         baselineBalanceRef.current = persisted.baseline ?? sub.flexCreditsBalance ?? 0;
         refreshAttemptRef.current = persisted.attempts;
+        setRefreshAttempt(persisted.attempts);
         setRefreshError(persisted.error);
         setRefreshState(persisted.state);
         setMode(detected);
@@ -567,7 +576,10 @@ export function CheckoutConfirmation() {
    * intact — they're authoritative regardless of refresh outcome.
    */
   const handleRetryRefresh = async () => {
+    if (refreshAttemptRef.current >= MAX_REFRESH_RETRIES) return;
+    if (refreshState === 'updating') return;
     refreshAttemptRef.current += 1;
+    setRefreshAttempt(refreshAttemptRef.current);
     setRefreshState('updating');
     setRefreshError(null);
     try {
@@ -832,6 +844,8 @@ export function CheckoutConfirmation() {
             state={refreshState}
             errorMessage={refreshError}
             onRetry={handleRetryRefresh}
+            attempt={refreshAttempt}
+            maxAttempts={MAX_REFRESH_RETRIES}
           />
         ) : null}
 
@@ -1020,11 +1034,20 @@ function RefreshStatusBanner({
   state,
   errorMessage,
   onRetry,
+  attempt,
+  maxAttempts,
 }: {
   state: 'updating' | 'timeout' | 'error';
   errorMessage: string | null;
   onRetry: () => void;
+  attempt: number;
+  maxAttempts: number;
 }) {
+  const exhausted = attempt >= maxAttempts;
+  const updating = state === 'updating';
+  // Counter shown next to "Try again". Hidden until the user has actually
+  // retried at least once so the first attempt looks clean.
+  const attemptLabel = attempt > 0 ? `${attempt}/${maxAttempts}` : null;
   if (state === 'updating') {
     return (
       <div
@@ -1033,7 +1056,12 @@ function RefreshStatusBanner({
         aria-live="polite"
       >
         <LoadingSpinner className="h-3 w-3 border-[1.5px]" />
-        <span>Updating balance…</span>
+        <span>
+          Updating balance…
+          {attemptLabel ? (
+            <span className="ml-1 opacity-70">(attempt {attemptLabel})</span>
+          ) : null}
+        </span>
       </div>
     );
   }
@@ -1047,16 +1075,20 @@ function RefreshStatusBanner({
         <span className="flex items-center gap-2">
           <AlertTriangle className="h-3.5 w-3.5 text-muted-foreground" aria-hidden />
           Balance is still syncing. Your credits are safe.
+          {attemptLabel ? (
+            <span className="ml-1 opacity-70">(attempt {attemptLabel})</span>
+          ) : null}
         </span>
         <Button
           type="button"
           variant="outline"
           size="sm"
           onClick={onRetry}
+          disabled={updating || exhausted}
           className="h-7 px-2 text-xs"
         >
-          <RefreshCw className="mr-1.5 h-3 w-3" aria-hidden />
-          Try again
+          <RefreshCw className={`mr-1.5 h-3 w-3 ${updating ? 'animate-spin' : ''}`} aria-hidden />
+          {exhausted ? 'No retries left' : updating ? 'Retrying…' : 'Try again'}
         </Button>
       </div>
     );
@@ -1074,6 +1106,9 @@ function RefreshStatusBanner({
           Could not refresh balance
           {errorMessage ? <span className="ml-1 opacity-70">({errorMessage})</span> : null}
           . Your credits are still safe.
+          {attemptLabel ? (
+            <span className="ml-1 opacity-70">(attempt {attemptLabel})</span>
+          ) : null}
         </span>
       </span>
       <Button
@@ -1081,10 +1116,11 @@ function RefreshStatusBanner({
         variant="outline"
         size="sm"
         onClick={onRetry}
+        disabled={updating || exhausted}
         className="h-7 px-2 text-xs"
       >
-        <RefreshCw className="mr-1.5 h-3 w-3" aria-hidden />
-        Try again
+        <RefreshCw className={`mr-1.5 h-3 w-3 ${updating ? 'animate-spin' : ''}`} aria-hidden />
+        {exhausted ? 'No retries left' : updating ? 'Retrying…' : 'Try again'}
       </Button>
     </div>
   );
