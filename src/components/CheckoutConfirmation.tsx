@@ -508,6 +508,69 @@ export function CheckoutConfirmation() {
 
   const open = mode !== null;
 
+  /**
+   * Cross-tab listener: when a sibling tab records a fresh checkout
+   * confirmation we want this tab to fold into the same suppressed,
+   * receipt-only state — without firing its own `sub.refresh()`.
+   *
+   * Two scenarios this covers:
+   *
+   *   1. **Sibling already shows the dialog.** This tab has the celebratory
+   *      dialog open from a confirmation a few seconds ago. The user opens
+   *      another tab (e.g. clicked the Stripe email receipt) and that tab
+   *      writes a fresh guard for the same `mode`. We close the local
+   *      dialog here so two tabs don't drift on stale celebratory UI.
+   *
+   *   2. **This tab arrives second on the same checkout.** The detect-mode
+   *      effect above already consults `localStorage` synchronously, so a
+   *      late-arriving tab usually sees the guard and goes straight to the
+   *      suppression path. The broadcast is the safety net for the small
+   *      window where two mounts race in the same few hundred ms before
+   *      either has written its guard.
+   */
+  useEffect(() => {
+    const unsubscribe = subscribeToCheckoutConfirmations(({ mode: incoming, ts }) => {
+      // Sibling tab reported a confirmation that's newer than what we have
+      // staged locally. The persistent guard is already written by the
+      // sibling, so any subsequent re-render in this tab will read it via
+      // `readConfirmedGuard()`. Two things to do *now*:
+      //
+      //   1. Close any locally-open dialog whose mode matches — we don't
+      //      want two tabs showing the same celebratory surface.
+      //   2. Pre-mark the mount slot as fired for this guard so a later
+      //      remount in this tab (URL strip, focus jitter) does not issue
+      //      a redundant `sub.refresh()` for a confirmation already
+      //      reconciled by the sibling.
+      if (mode && incoming === mode) {
+        // Suppress the dialog quietly. Mirrors the suppression toast path
+        // in the detect-mode effect so the user gets a single, neutral
+        // status line per logical confirmation regardless of which tab
+        // authored it.
+        const dedupeKey = `${incoming}:cross-tab:${ts}`;
+        if (suppressionAnnouncedRef.current !== dedupeKey) {
+          suppressionAnnouncedRef.current = dedupeKey;
+          toast.message('Checkout already confirmed in another tab.', {
+            description:
+              'Your previous confirmation is still on record. Subscription and credit data were not re-fetched here.',
+            duration: 4000,
+            id: `checkout-suppressed-cross-tab:${incoming}`,
+          });
+        }
+        setMode(null);
+      }
+      // Mark mount slot as claimed so the local detect-mode effect won't
+      // fire its own `sub.refresh()` on a subsequent param-stripping
+      // remount. Safe even if `mode` here is null — the slot is keyed on
+      // `(guardTs, mode, slot)` and any local mount must match `incoming`
+      // for the same checkout to be relevant.
+      const incomingMode = incoming as Exclude<Mode, null>;
+      if (incomingMode) {
+        claimRefreshSlot(ts, incomingMode, 'mount');
+      }
+    });
+    return unsubscribe;
+  }, [mode]);
+
   // Fallback when the Stripe lookup hasn't completed yet. Always replaced by
   // the metadata value once `list-checkout-events` returns.
   const fallbackExpectedCredits = useMemo(() => {
