@@ -256,14 +256,24 @@ export function CheckoutConfirmation() {
   const baseline = baselineBalanceRef.current ?? 0;
   const currentBalance = sub.flexCreditsBalance ?? 0;
   const observedDelta = Math.max(0, currentBalance - baseline);
-  // Until the refreshed balance reflects the purchase, fall back to the
-  // expected credits for the chosen pack.
-  const balanceReflectsPurchase = observedDelta >= expectedCredits && expectedCredits > 0;
-  const creditsAdded = balanceReflectsPurchase ? observedDelta : expectedCredits;
-  const projectedBalance = balanceReflectsPurchase ? currentBalance : baseline + expectedCredits;
-  // True while we're still waiting for the refreshed wallet balance to reflect
-  // the purchase. Drives inline spinners on the affected rows so the user sees
-  // that the number they're looking at is provisional.
+  // The wallet has caught up if either (a) the local balance moved by at
+  // least the purchased amount, or (b) the server confirmed the grant via
+  // `list-checkout-events`. Either path lets us drop the "updating" spinner.
+  const balanceReflectsPurchase =
+    (expectedCredits > 0 && observedDelta >= expectedCredits) || grantApplied;
+  // Always show the actual purchased amount from Stripe metadata (or the
+  // applied grant amount once available). This stays accurate even when the
+  // local wallet snapshot lags behind the webhook.
+  const creditsAdded = expectedCredits;
+  // New balance = snapshot at dialog-open + authoritative purchased amount.
+  // We deliberately don't show `currentBalance` until it matches, so the
+  // "before / +added / after" arithmetic is always internally consistent.
+  const projectedBalance = balanceReflectsPurchase
+    ? Math.max(currentBalance, baseline + creditsAdded)
+    : baseline + creditsAdded;
+  // True while we're still waiting for the refreshed wallet balance to
+  // reflect the purchase. The number shown is already correct; the spinner
+  // just signals "we're confirming with the server".
   const creditBalanceUpdating =
     mode !== null && mode !== 'subscription' && !balanceReflectsPurchase;
   const subscriptionSyncing = awaitingStripe;
