@@ -253,6 +253,10 @@ export function useSubscription() {
           insightsUsed: cacheFallback.insightsUsed,
           insightsRemaining: cacheFallback.insightsRemaining,
           flexCreditsBalance: cacheFallback.flexCreditsBalance,
+          subscriptionStatus: null,
+          subscriptionEnd: null,
+          trialStart: null,
+          trialEnd: null,
         }
       : undefined);
 
