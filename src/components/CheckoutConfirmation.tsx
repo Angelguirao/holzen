@@ -49,16 +49,12 @@ export function CheckoutConfirmation() {
   // Snapshot the credit balance at the moment the dialog opens so we can show
   // "+N credits" once the refreshed balance comes in.
   const baselineBalanceRef = useRef<number | null>(null);
-  // Snapshot the moment the dialog opens — used as the trial start anchor so
-  // the displayed dates remain stable even if the snapshot refreshes mid-view.
-  const openedAtRef = useRef<Date | null>(null);
 
   useEffect(() => {
     const detected = detectMode(location.search);
     if (!detected) return;
     setMode(detected);
     baselineBalanceRef.current = sub.flexCreditsBalance ?? 0;
-    openedAtRef.current = new Date();
     // Strip checkout query params; keep path + hash.
     const params = new URLSearchParams(location.search);
     params.delete('subscribed');
@@ -94,13 +90,24 @@ export function CheckoutConfirmation() {
     [],
   );
 
-  const trialStart = openedAtRef.current;
-  const trialEnd = useMemo(() => {
-    if (!trialStart) return null;
-    const d = new Date(trialStart);
-    d.setDate(d.getDate() + PRICING.trialDays);
-    return d;
-  }, [trialStart]);
+  // Trial / billing dates come straight from Stripe via check-subscription.
+  // `trial_start` / `trial_end` are only set when Stripe applied a trial;
+  // otherwise we fall back to the current period end as the first charge.
+  const trialStart = useMemo(
+    () => (sub.trialStart ? new Date(sub.trialStart) : null),
+    [sub.trialStart],
+  );
+  const trialEnd = useMemo(
+    () => (sub.trialEnd ? new Date(sub.trialEnd) : null),
+    [sub.trialEnd],
+  );
+  const periodEnd = useMemo(
+    () => (sub.subscriptionEnd ? new Date(sub.subscriptionEnd) : null),
+    [sub.subscriptionEnd],
+  );
+  const isTrialing = sub.subscriptionStatus === 'trialing' && !!trialEnd;
+  const firstChargeAt = isTrialing ? trialEnd : periodEnd;
+  const awaitingStripe = mode === 'subscription' && sub.loading && !sub.subscriptionStatus;
 
   const baseline = baselineBalanceRef.current ?? 0;
   const currentBalance = sub.flexCreditsBalance ?? 0;
@@ -128,7 +135,9 @@ export function CheckoutConfirmation() {
           </DialogTitle>
           <DialogDescription className="text-center">
             {mode === 'subscription'
-              ? `Your ${PRICING.trialDays}-day trial has started. You can manage or cancel anytime from Settings.`
+              ? isTrialing
+                ? `Your ${PRICING.trialDays}-day trial has started. You can manage or cancel anytime from Settings.`
+                : 'Your subscription is active. You can manage or cancel anytime from Settings.'
               : 'Thanks for the top-up. Your Flex credits are ready to spend.'}
           </DialogDescription>
         </DialogHeader>
@@ -137,15 +146,18 @@ export function CheckoutConfirmation() {
           {mode === 'subscription' ? (
             <ul className="space-y-2">
               <SummaryRow label="Plan" value={`Holzen ${tierLabel}`} />
+              {isTrialing ? (
+                <SummaryRow
+                  label="Trial started"
+                  value={trialStart ? dateFmt.format(trialStart) : awaitingStripe ? 'Syncing…' : '—'}
+                  icon={<CalendarClock className="h-3.5 w-3.5" aria-hidden />}
+                />
+              ) : null}
               <SummaryRow
-                label="Trial started"
-                value={trialStart ? dateFmt.format(trialStart) : '—'}
-                icon={<CalendarClock className="h-3.5 w-3.5" aria-hidden />}
-              />
-              <SummaryRow
-                label="First charge on"
-                value={trialEnd ? dateFmt.format(trialEnd) : '—'}
+                label={isTrialing ? 'First charge on' : 'Next charge on'}
+                value={firstChargeAt ? dateFmt.format(firstChargeAt) : awaitingStripe ? 'Syncing…' : '—'}
                 highlight
+                icon={!isTrialing ? <CalendarClock className="h-3.5 w-3.5" aria-hidden /> : undefined}
               />
               <SummaryRow
                 label="Monthly price"
