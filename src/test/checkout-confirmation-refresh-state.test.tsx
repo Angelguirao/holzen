@@ -85,8 +85,14 @@ describe('CheckoutConfirmation refreshState lifecycle', () => {
   it('enters "updating" state on first mount when the wallet has not caught up', async () => {
     renderAt('/settings?credits=true&pack=flex_pack_s');
 
-    // The dialog mounts, balance hasn't moved yet → "updating" banner shown.
-    expect(await screen.findByText(/Updating balance…/i)).toBeInTheDocument();
+    // The dialog opened.
+    expect(await screen.findByRole('dialog')).toBeInTheDocument();
+    // Two occurrences of "Updating balance…": one in the SummaryRow's
+    // pendingHint and one inside the lifecycle banner — confirms the
+    // `updating` branch is rendering, distinct from the bare hint.
+    await waitFor(() => {
+      expect(screen.getAllByText(/Updating balance…/i).length).toBeGreaterThanOrEqual(2);
+    });
     // Initial mount-time refresh fires once.
     expect(subState.refresh).toHaveBeenCalledTimes(1);
   });
@@ -94,7 +100,7 @@ describe('CheckoutConfirmation refreshState lifecycle', () => {
   it('flips to "timeout" after 45s without the wallet catching up', async () => {
     renderAt('/settings?credits=true&pack=flex_pack_s');
 
-    expect(await screen.findByText(/Updating balance…/i)).toBeInTheDocument();
+    await screen.findByRole('dialog');
 
     // Advance past the 45s budget — lifecycle effect should trip to 'timeout'.
     await act(async () => {
