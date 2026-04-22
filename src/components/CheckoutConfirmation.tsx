@@ -615,7 +615,6 @@ export function CheckoutConfirmation() {
                 label="Credits added"
                 value={`+${creditsAdded}`}
                 highlight
-                icon={<TrendingUp className="h-3.5 w-3.5" aria-hidden />}
                 pending={creditBalanceUpdating}
               />
               <SummaryRow
