@@ -289,7 +289,75 @@ export function CheckoutConfirmation() {
     mode !== null && mode !== 'subscription' && !balanceReflectsPurchase;
   const subscriptionSyncing = awaitingStripe;
 
-  const handleClose = () => setMode(null);
+  const handleClose = () => {
+    if (refreshTimeoutRef.current) {
+      clearTimeout(refreshTimeoutRef.current);
+      refreshTimeoutRef.current = null;
+    }
+    setMode(null);
+    setRefreshState('idle');
+    setRefreshError(null);
+    refreshAttemptRef.current = 0;
+  };
+
+  /**
+   * Drives the wallet-refresh lifecycle for flex-pack confirmations.
+   *
+   * Subscription confirmations rely on `useSubscription`'s own polling; this
+   * effect is a no-op for them. For credit packs we:
+   *  - mark the row as `updating` while we wait for `currentBalance` to catch
+   *    up (or for the server to report `grant_status: 'applied'`),
+   *  - flip to `timeout` after a generous budget so the user gets an explicit
+   *    "we tried, here's a retry" affordance instead of a forever-spinner,
+   *  - flip to `idle` the instant the wallet reflects the purchase.
+   *
+   * The timeout budget intentionally exceeds the `list-checkout-events`
+   * back-off window (~30s) so we don't surface a scary state during the
+   * normal happy-path lag between checkout return and webhook commit.
+   */
+  useEffect(() => {
+    if (!mode || mode === 'subscription') return;
+    if (refreshTimeoutRef.current) {
+      clearTimeout(refreshTimeoutRef.current);
+      refreshTimeoutRef.current = null;
+    }
+    if (balanceReflectsPurchase) {
+      setRefreshState('idle');
+      return;
+    }
+    // Don't downgrade an existing 'error' just because we're still waiting.
+    setRefreshState((prev) => (prev === 'error' ? prev : 'updating'));
+    refreshTimeoutRef.current = setTimeout(() => {
+      setRefreshState((prev) => (prev === 'idle' ? prev : 'timeout'));
+    }, 45_000);
+    return () => {
+      if (refreshTimeoutRef.current) {
+        clearTimeout(refreshTimeoutRef.current);
+        refreshTimeoutRef.current = null;
+      }
+    };
+  }, [mode, balanceReflectsPurchase]);
+
+  /**
+   * User-facing retry: re-invokes the subscription snapshot and surfaces an
+   * explicit error state if the underlying TanStack query throws (network
+   * down, edge function 5xx, etc.). Keeps `creditsAdded` / `projectedBalance`
+   * intact — they're authoritative regardless of refresh outcome.
+   */
+  const handleRetryRefresh = async () => {
+    refreshAttemptRef.current += 1;
+    setRefreshState('updating');
+    setRefreshError(null);
+    try {
+      await sub.refresh();
+      // The lifecycle effect above will flip back to 'idle' or re-arm the
+      // timeout depending on whether the new snapshot includes the credits.
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Unknown error';
+      setRefreshError(msg);
+      setRefreshState('error');
+    }
+  };
 
   // Fire-and-forget the optional email + push confirmation. Honors
   // `profiles.email_notifications` server-side, so users who turned that off
