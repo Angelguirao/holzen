@@ -32,6 +32,11 @@ import {
 } from '@/lib/companion-orchestrate-slot-apply';
 import { saveCompanionLibraryBookmarkOnce } from '@/lib/companion-library-autosave';
 import { holzenLog } from '@/lib/holzen-console';
+import {
+  hasInvokedIntervention,
+  resetInterventionIdempotency,
+  runOnceIntervention,
+} from '@/lib/orchestrate-intervention-idempotency';
 
 export type {
   RegenerateCompanionSlot,
@@ -214,6 +219,21 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
           return;
         }
 
+        // Per-trigger idempotency. If we've already issued the intervention
+        // call for this `reflectionId` in the current tab session — even if
+        // a remount happened before the server persisted the row that the
+        // cache lookup above reads — bail out and wait for the
+        // `reflection_companions` realtime subscription / next remount to
+        // hydrate. The `retryOrchestrate` path explicitly resets the marker
+        // so a deliberate retry still gets through.
+        if (hasInvokedIntervention(reflectionId)) {
+          holzenLog.companion('orchestrate intervention skipped (idempotency)', {
+            reflection_prefix: reflectionId.slice(0, 8),
+          });
+          setInterventionLoading(false);
+          return;
+        }
+
         // Intervention not cached — fetch from orchestrate (intervention-only, no companion slots)
         const moodHistory = await loadMoodHistoryForOrchestrate();
 
@@ -222,23 +242,30 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
           reflection_prefix: reflectionId.slice(0, 8),
         });
 
-        const { data, error: fnError } = await supabase.functions.invoke('companion-orchestrate', {
-          body: {
-            holzenInvokeSource: 'browser_pause_intervention',
-            reflectionId,
-            context: context ?? '',
-            language,
-            reflectionMessage: reflectionMessage ?? '',
-            mood: mood ?? null,
-            severity: severityNumber ?? 0,
-            moodHistory,
-            enableSignal: false,
-            enableGrounding: false,
-            enableHistory: false,
-            enableZoomOut: false,
-            useIntervention: true,
-          },
-        });
+        // Single-flight per `reflectionId`: concurrent renders share the
+        // same Promise, and on success a `sessionStorage` marker prevents
+        // future remounts in the same tab session from re-issuing the call.
+        const { data, error: fnError } = await runOnceIntervention(
+          reflectionId,
+          () =>
+            supabase.functions.invoke('companion-orchestrate', {
+              body: {
+                holzenInvokeSource: 'browser_pause_intervention',
+                reflectionId,
+                context: context ?? '',
+                language,
+                reflectionMessage: reflectionMessage ?? '',
+                mood: mood ?? null,
+                severity: severityNumber ?? 0,
+                moodHistory,
+                enableSignal: false,
+                enableGrounding: false,
+                enableHistory: false,
+                enableZoomOut: false,
+                useIntervention: true,
+              },
+            }),
+        );
 
         if (cancelled) return;
 
@@ -459,6 +486,11 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
   const retryHistory = useCallback(() => retrySlot('history'), [retrySlot]);
   /** Re-run companion-orchestrate (intervention + reset companion slots). */
   const retryOrchestrate = useCallback(() => {
+    // Clear the per-trigger idempotency guard so the next render can fire a
+    // fresh `companion-orchestrate` call. Without this the user-facing
+    // "Try again" affordance would silently skip due to the marker set on
+    // the previous (failed or stale) attempt.
+    if (reflectionId) resetInterventionIdempotency(reflectionId);
     fetchedSlotsRef.current = new Set();
     setSignal(null); setSignalError(false);
     setNudge(null); setNudgeError(false);
@@ -467,7 +499,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     setIntervention(null); setInterventionError(false);
     setCacheRelaxations(EMPTY_COMPANION_SLOT_RELAXATIONS);
     setRetryCount(c => c + 1);
-  }, []);
+  }, [reflectionId]);
 
   const regenerateCompanion = useCallback(async (slot: RegenerateCompanionSlot) => {
     if (!reflectionId) return;
