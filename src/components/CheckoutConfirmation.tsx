@@ -10,6 +10,7 @@ import {
   DialogFooter,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { useSubscription } from '@/hooks/use-subscription';
 import { PRICING } from '@/lib/pricing';
 
@@ -117,6 +118,12 @@ export function CheckoutConfirmation() {
   const balanceReflectsPurchase = observedDelta >= expectedCredits && expectedCredits > 0;
   const creditsAdded = balanceReflectsPurchase ? observedDelta : expectedCredits;
   const projectedBalance = balanceReflectsPurchase ? currentBalance : baseline + expectedCredits;
+  // True while we're still waiting for the refreshed wallet balance to reflect
+  // the purchase. Drives inline spinners on the affected rows so the user sees
+  // that the number they're looking at is provisional.
+  const creditBalanceUpdating =
+    mode !== null && mode !== 'subscription' && !balanceReflectsPurchase;
+  const subscriptionSyncing = awaitingStripe;
 
   const handleClose = () => setMode(null);
 
@@ -149,13 +156,15 @@ export function CheckoutConfirmation() {
               {isTrialing ? (
                 <SummaryRow
                   label="Trial started"
-                  value={trialStart ? dateFmt.format(trialStart) : awaitingStripe ? 'Syncing…' : '—'}
+                  value={trialStart ? dateFmt.format(trialStart) : subscriptionSyncing ? 'Syncing' : '—'}
+                  pending={!trialStart && subscriptionSyncing}
                   icon={<CalendarClock className="h-3.5 w-3.5" aria-hidden />}
                 />
               ) : null}
               <SummaryRow
                 label={isTrialing ? 'First charge on' : 'Next charge on'}
-                value={firstChargeAt ? dateFmt.format(firstChargeAt) : awaitingStripe ? 'Syncing…' : '—'}
+                value={firstChargeAt ? dateFmt.format(firstChargeAt) : subscriptionSyncing ? 'Syncing' : '—'}
+                pending={!firstChargeAt && subscriptionSyncing}
                 highlight
                 icon={!isTrialing ? <CalendarClock className="h-3.5 w-3.5" aria-hidden /> : undefined}
               />
@@ -183,7 +192,11 @@ export function CheckoutConfirmation() {
                     : String(PRICING.proWallpapers)
                 }
               />
-              <SummaryRow label="Flex credits balance" value={String(currentBalance)} />
+              <SummaryRow
+                label="Flex credits balance"
+                value={String(currentBalance)}
+                pending={subscriptionSyncing}
+              />
             </ul>
           ) : (
             <ul className="space-y-2">
@@ -197,14 +210,13 @@ export function CheckoutConfirmation() {
                 value={`+${creditsAdded}`}
                 highlight
                 icon={<TrendingUp className="h-3.5 w-3.5" aria-hidden />}
+                pending={creditBalanceUpdating}
               />
               <SummaryRow
                 label="New balance"
-                value={
-                  sub.loading && !balanceReflectsPurchase
-                    ? `${projectedBalance} (updating…)`
-                    : String(projectedBalance)
-                }
+                value={String(projectedBalance)}
+                pending={creditBalanceUpdating}
+                pendingHint="updating"
                 highlight
               />
             </ul>
@@ -227,11 +239,15 @@ function SummaryRow({
   value,
   highlight,
   icon,
+  pending,
+  pendingHint,
 }: {
   label: string;
   value: string;
   highlight?: boolean;
   icon?: React.ReactNode;
+  pending?: boolean;
+  pendingHint?: string;
 }) {
   return (
     <li className="flex items-center justify-between gap-3">
@@ -239,8 +255,25 @@ function SummaryRow({
         {icon}
         {label}
       </span>
-      <span className={highlight ? 'font-semibold text-primary' : 'font-medium text-foreground'}>
+      <span
+        className={
+          (highlight ? 'font-semibold text-primary' : 'font-medium text-foreground') +
+          ' inline-flex items-center gap-1.5'
+        }
+        aria-live={pending ? 'polite' : undefined}
+        aria-busy={pending || undefined}
+      >
         {value}
+        {pending ? (
+          <>
+            <LoadingSpinner className="h-3 w-3 border-[1.5px]" />
+            {pendingHint ? (
+              <span className="text-xs font-normal text-muted-foreground">
+                {pendingHint}
+              </span>
+            ) : null}
+          </>
+        ) : null}
       </span>
     </li>
   );
