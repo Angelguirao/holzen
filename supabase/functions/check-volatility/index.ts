@@ -527,6 +527,23 @@ serve(
         .select("id")
         .single();
 
+      // Keep Library parity with manual pauses: every generated reflection
+      // gets a `source_type='reflection'` bookmark row.
+      const libraryUpsert = insertedReflection?.id
+        ? supabase.from("library_items").upsert(
+            {
+              user_id: profile.user_id,
+              type: "bookmark",
+              title: "Reflection",
+              body: result.message,
+              source_type: "reflection",
+              reflection_id: insertedReflection.id,
+              tags: ["reflection"],
+            },
+            { onConflict: "user_id,reflection_id,source_type", ignoreDuplicates: true },
+          )
+        : Promise.resolve({ error: null });
+
       // Profile update and orchestrator dispatch can run in parallel
       const profileUpdate = supabase
         .from("profiles")
@@ -590,7 +607,17 @@ serve(
         }).catch((e) => holzenEdgeError("volatility", "orchestrator fetch error", e));
       }
 
-      await profileUpdate;
+      const [{ error: profileUpdateErr }, { error: libraryUpsertErr }] = await Promise.all([
+        profileUpdate,
+        libraryUpsert,
+      ]);
+      if (profileUpdateErr) {
+        holzenEdgeError("volatility", "profile update failed", profileUpdateErr.message);
+        return false;
+      }
+      if (libraryUpsertErr) {
+        holzenEdgeError("volatility", "library reflection upsert failed", libraryUpsertErr.message);
+      }
 
       // Email + push + in-app bell notification in parallel
       await Promise.all([
