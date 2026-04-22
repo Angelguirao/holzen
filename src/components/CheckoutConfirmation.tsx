@@ -195,6 +195,12 @@ export function CheckoutConfirmation() {
         { pathname: location.pathname, search: next ? `?${next}` : '', hash: location.hash },
         { replace: true },
       );
+      // Skip the underlying sync. The guard's whole point is "we already
+      // confirmed this checkout within the window" — re-running
+      // `sub.refresh()` (and the hook's force-refresh sentinel) would defeat
+      // the persisted-outcome shortcut and burn an edge invocation per
+      // refresh / back-nav.
+      clearPendingForceRefreshSentinel();
       // Quiet, non-rewarding status line. The guard intentionally does *not*
       // re-open the celebratory dialog (refresh / back-nav with stale params
       // shouldn't re-trigger praise UI), but the user just performed an
