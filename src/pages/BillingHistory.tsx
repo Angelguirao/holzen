@@ -49,6 +49,37 @@ function describeKind(event: CheckoutEvent): string {
   return 'Checkout';
 }
 
+/**
+ * Humanise Stripe's raw `payment_status` for display. Stripe returns
+ * `unpaid` on subscription sessions until the first invoice is paid (which
+ * is normal during trial / activation, not a "due amount"), and
+ * `no_payment_required` on $0 / 100%-coupon checkouts (e.g. lifetime).
+ * Map those to friendlier copy + tone so the page never reads as if the
+ * user owes money.
+ */
+function describePaymentStatus(event: CheckoutEvent): { label: string; tone: 'paid' | 'free' | 'pending' | 'failed' | 'neutral' } {
+  const raw = (event.payment_status || '').toLowerCase();
+  if (raw === 'paid') return { label: 'Paid', tone: 'paid' };
+  if (raw === 'no_payment_required') return { label: 'Free', tone: 'free' };
+  if (raw === 'unpaid') {
+    // Subscription sessions sit at `unpaid` until the first invoice settles.
+    if (event.kind === 'subscription') return { label: 'Activating', tone: 'pending' };
+    return { label: 'Pending', tone: 'pending' };
+  }
+  if (raw === 'pending' || raw === 'processing') return { label: 'Processing', tone: 'pending' };
+  if (raw === 'failed' || raw === 'canceled') return { label: raw === 'failed' ? 'Failed' : 'Cancelled', tone: 'failed' };
+  if (!raw || raw === 'unknown') return { label: 'Unknown', tone: 'neutral' };
+  return { label: raw, tone: 'neutral' };
+}
+
+const STATUS_TONE_CLASS: Record<'paid' | 'free' | 'pending' | 'failed' | 'neutral', string> = {
+  paid: 'text-primary',
+  free: 'text-primary',
+  pending: 'text-muted-foreground',
+  failed: 'text-destructive',
+  neutral: 'text-muted-foreground',
+};
+
 function GrantBadge({ event }: { event: CheckoutEvent }) {
   if (event.grant_status === 'applied') {
     return (
@@ -179,9 +210,14 @@ export default function BillingHistory() {
                   <p className="text-sm font-mono">
                     {formatCurrency(event.amount_total, event.currency)}
                   </p>
-                  <p className="text-xs font-mono text-muted-foreground">
-                    {event.payment_status}
-                  </p>
+                  {(() => {
+                    const status = describePaymentStatus(event);
+                    return (
+                      <p className={`text-xs font-mono ${STATUS_TONE_CLASS[status.tone]}`}>
+                        {status.label}
+                      </p>
+                    );
+                  })()}
                 </div>
               </div>
 
