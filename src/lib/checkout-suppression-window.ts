@@ -120,9 +120,20 @@ const REFRESH_STATE_KEY = 'holzen_checkout_refresh_state';
 const REFRESH_IDEMPOTENCY_KEY = 'holzen_checkout_refresh_idempotency';
 const STARTED_KEY = 'holzen_checkout_started_at';
 
-/** All known checkout-guard storage keys, exported for tests/debugging. */
-export const CHECKOUT_GUARD_LOCAL_KEYS = [CONFIRMED_KEY, REFRESH_STATE_KEY] as const;
-export const CHECKOUT_GUARD_SESSION_KEYS = [REFRESH_IDEMPOTENCY_KEY, STARTED_KEY] as const;
+/**
+ * All known checkout-guard storage keys, exported for tests/debugging.
+ *
+ * `holzen_checkout_refresh_idempotency` lives in **`localStorage`** so a
+ * second tab opening the same checkout-success URL doesn't fire its own
+ * `mount`-slot `sub.refresh()` for an already-claimed guard. Originally
+ * `sessionStorage` (per-tab) — the cross-tab guard work upgraded it.
+ */
+export const CHECKOUT_GUARD_LOCAL_KEYS = [
+  CONFIRMED_KEY,
+  REFRESH_STATE_KEY,
+  REFRESH_IDEMPOTENCY_KEY,
+] as const;
+export const CHECKOUT_GUARD_SESSION_KEYS = [STARTED_KEY] as const;
 
 function safeRemoveLocal(key: string) {
   try {
@@ -214,9 +225,9 @@ export function sweepStaleCheckoutGuards(): SweepReport {
     report.removed.push(REFRESH_STATE_KEY);
   }
 
-  // 3. Idempotency row (sessionStorage) — same pinning rule.
+  // 3. Idempotency row (localStorage — cross-tab) — same pinning rule.
   try {
-    const raw = window.sessionStorage.getItem(REFRESH_IDEMPOTENCY_KEY);
+    const raw = window.localStorage.getItem(REFRESH_IDEMPOTENCY_KEY);
     if (raw) {
       const parsed = JSON.parse(raw) as { guardTs?: unknown; mode?: unknown };
       const guardTs = typeof parsed?.guardTs === 'number' ? parsed.guardTs : NaN;
@@ -226,14 +237,14 @@ export function sweepStaleCheckoutGuards(): SweepReport {
         guardTs === liveGuard.ts &&
         parsed.mode === liveGuard.mode;
       if (!stillPinned) {
-        safeRemoveSession(REFRESH_IDEMPOTENCY_KEY);
+        safeRemoveLocal(REFRESH_IDEMPOTENCY_KEY);
         report.removed.push(REFRESH_IDEMPOTENCY_KEY);
       } else {
         report.kept.push(REFRESH_IDEMPOTENCY_KEY);
       }
     }
   } catch {
-    safeRemoveSession(REFRESH_IDEMPOTENCY_KEY);
+    safeRemoveLocal(REFRESH_IDEMPOTENCY_KEY);
     report.removed.push(REFRESH_IDEMPOTENCY_KEY);
   }
 
