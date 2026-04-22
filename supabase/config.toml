@@ -17,6 +17,8 @@ project_id = "edgbwdecaoottowliimu"
     verify_jwt = false
   [functions.list-checkout-events]
     verify_jwt = false
+  [functions.notify-checkout-confirmation]
+    verify_jwt = false
   [functions.holzen-number]
     verify_jwt = false
   [functions.holzen-reflect]
