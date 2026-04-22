@@ -11,6 +11,7 @@ import { usePushNotifications } from '@/hooks/use-push-notifications';
 import { PRICING } from '@/lib/pricing';
 import { ThresholdSetting } from '@/components/ThresholdSetting';
 import { ReferralSection } from '@/components/ReferralSection';
+import { CreditsDashboard } from '@/components/CreditsDashboard';
 import { Changelog } from '@/components/Changelog';
 import { FeedbackForm } from '@/components/FeedbackForm';
 import { InstallHolzenCard } from '@/components/InstallHolzenCard';
@@ -995,6 +996,8 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                 </div>
               )}
             </div>
+
+            <CreditsDashboard />
 
             <ReferralSection />
           </AccordionContent>
