@@ -150,7 +150,7 @@ describe('No refetch on back-navigation or param stripping', () => {
 
     // Persisted idempotency row reflects the claimed `mount` slot.
     const row = JSON.parse(
-      sessionStorage.getItem(CHECKOUT_REFRESH_IDEMPOTENCY_KEY) || 'null',
+      localStorage.getItem(CHECKOUT_REFRESH_IDEMPOTENCY_KEY) || 'null',
     );
     expect(row).toMatchObject({ mode: 'subscription', fired: ['mount'] });
   });
