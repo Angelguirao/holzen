@@ -67,7 +67,7 @@ async function resolveVapidPrivateKey(raw: string): Promise<string> {
 }
 
 serve(
-  withRequestLogging("notify-checkout-confirmation", async ({ req }) => {
+  withRequestLogging("notify-checkout-confirmation", async ({ req, log, cid }) => {
   try {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
