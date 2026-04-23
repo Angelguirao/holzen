@@ -105,10 +105,13 @@ describe('CheckoutConfirmation close + re-open within the same guard', () => {
     // Mount-time `sub.refresh()` fired exactly once.
     expect(subState.refresh).toHaveBeenCalledTimes(1);
 
-    // Capture the projected "+N credits" line so we can assert it doesn't
-    // regress on re-open. flex_pack_s = 30 credits via PRICING.
-    const creditsAddedFirst = screen.getByText(/\+30 credits/i);
-    expect(creditsAddedFirst).toBeInTheDocument();
+    // Capture the projected "+N" credits line so we can assert it doesn't
+    // regress on re-open. flex_pack_s = 30 credits via PRICING. The number
+    // and the "credits added" label live in sibling spans, so match the
+    // delta directly inside the SummaryRow that owns it.
+    const creditsRowFirst = screen.getByText(/credits added/i).closest('li');
+    expect(creditsRowFirst).not.toBeNull();
+    expect(creditsRowFirst!).toHaveTextContent('+30');
 
     // ── 2. User closes the dialog while still `updating`. ─────────────
     // The Radix DialogClose renders an "×" button with sr-only "Close".
@@ -142,7 +145,10 @@ describe('CheckoutConfirmation close + re-open within the same guard', () => {
     await waitFor(() => {
       expect(screen.getAllByText(/Updating balance…/i).length).toBeGreaterThanOrEqual(2);
     });
-    expect(screen.getByText(/\+30 credits/i)).toBeInTheDocument();
+    const creditsRowSecond = screen.getByText(/credits added/i).closest('li');
+    expect(creditsRowSecond).not.toBeNull();
+    // Sticky monotonic display value — must not regress to 0 / fallback.
+    expect(creditsRowSecond!).toHaveTextContent('+30');
     // No "Try again" button — that only renders in `timeout` / `error`.
     expect(screen.queryByRole('button', { name: /Try again/i })).not.toBeInTheDocument();
 
