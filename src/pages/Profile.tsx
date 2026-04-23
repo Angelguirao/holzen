@@ -25,6 +25,7 @@ import { ProLock } from '@/components/ProLock';
 import { LetterViewer } from '@/components/LetterViewer';
 
 import { BadgesPanel } from '@/components/BadgesPanel';
+import { BadgesPanelV2 } from '@/components/BadgesPanelV2';
 import { StatsContentV2 } from '@/components/stats/StatsContentV2';
 import { MoodPriceChart } from '@/components/MoodPriceChart';
 import { MoodTrendChart } from '@/components/MoodTrendChart';
@@ -316,6 +317,8 @@ const Profile = () => {
           <div className="space-y-3">
             <Skeleton className="h-40 w-full rounded-md" />
           </div>
+        ) : pauseV2Enabled ? (
+          <BadgesPanelV2 subscribed={subscribed} holdGoal={holdGoal} />
         ) : (
           <BadgesPanel reflections={reflections} subscribed={subscribed} />
         )

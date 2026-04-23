@@ -447,7 +447,40 @@ source for what each card should render.
 
 ## 10. Badges derivation
 
-_See [badges-system.md](badges-system.md); Phase H refresh will cross-reference back here._
+During cutover, Badges is either the legacy `BadgesPanel` (reads
+`reflections`) or the new `BadgesPanelV2` (reads `pause_instances` +
+events via `useBadges`). `Profile.tsx` picks between them at mount
+based on `pause_v2_enabled`.
+
+The V2 substrate implements the 4-family / 14-active model from
+[badges-system.md](badges-system.md):
+
+- `src/lib/badges/definitions.ts` — declarative list of every badge
+  organized by family (Foundation, Core skills, Mastery, Legacy) with
+  icon / color / Pro flag / requirement / unit.
+- `src/lib/badges/compute.ts` — pure `computeBadges()` producing a
+  `BadgeSnapshot[]` with earned/current/progress. Counts:
+  - Foundation: first-pause, first-week (3 distinct days in rolling
+    7-day window), first-ritual (first completed with counted companion).
+  - Core skills (5 ladders x 3 tiers): regulation (reactive -> composed
+    transitions), tolerance (holds under moderate+ severity), alignment
+    (hold-goal-aligned outcomes; zero when no hold goal configured),
+    reappraisal (counted companion events), awareness (depth signals).
+  - Mastery: iron-hands (>= 80% hold rate over >= 20 moderate+ pauses),
+    thirty-strong (30-day streak), full-ritual-100 (100 counted-
+    companion-completions).
+  - Legacy: btc-genesis (Jan 3), btc-pizza (May 22), btc-halving
+    (+-3 days of any halving).
+- `src/hooks/use-badges.ts` — memoized wrapper over `usePauseStatsData`
+  returning `snapshots`, `earnedIds`, and the i18n'd meta map that
+  `useBadgeSync` needs.
+- `src/components/BadgesPanelV2.tsx` — four-family layout with
+  ladder-collapsing: each Core skill renders only its next unearned
+  tier (plus an "earned strip" count). Pro gate limited to Mastery.
+
+Cutover deletes `user_badges` (Phase J) so earned timestamps regenerate
+from the new model. See
+[decisions/2026-04-23-four-family-badge-reorg.md](../decisions/2026-04-23-four-family-badge-reorg.md).
 
 ## 11. Observability
 
