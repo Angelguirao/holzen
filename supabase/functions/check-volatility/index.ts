@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import webpush from "https://esm.sh/web-push@3.6.7";
+import { createCidSupabaseClient, sendWebPushWithCid } from "../_shared/cid-clients.ts";
 import {
   generateUnifiedReflection,
   REFLECTION_PROMPT_VERSION,
@@ -152,7 +152,7 @@ async function sendNotificationEmail(
 }
 
 serve(
-  withRequestLogging("check-volatility", async ({ req }) => {
+  withRequestLogging("check-volatility", async ({ req, log, cid }) => {
   holzenEdgeRun("volatility", "request", { method: req.method });
 
   // Auth: require service role key or cron secret
@@ -168,9 +168,10 @@ serve(
   holzenEdgeRun("volatility", "auth ok");
 
   try {
-    const supabase = createClient(
+    const supabase = createCidSupabaseClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      cid,
       { auth: { persistSession: false } }
     );
 
@@ -655,14 +656,18 @@ serve(
           });
           await Promise.all(pushSubs.map(async (sub) => {
             try {
-              await webpush.sendNotification(
+              await sendWebPushWithCid(
+                log,
+                webpush,
                 { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
-                payload
+                payload,
+                { notificationTag: "volatility" }
               );
             } catch (pushErr: any) {
               holzenEdgeError("volatility-push", "send failed", {
                 message: pushErr?.message,
                 statusCode: pushErr?.statusCode,
+                cid,
               });
               if (pushErr.statusCode === 410 || pushErr.statusCode === 404) {
                 await supabase.from("push_subscriptions").delete().eq("endpoint", sub.endpoint);

@@ -5,9 +5,9 @@
 // double-trigger from React StrictMode / refresh within the same minute will
 // still result in exactly one email and one push payload per device.
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import webpush from "https://esm.sh/web-push@3.6.7";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
+import { createCidSupabaseClient, sendWebPushWithCid } from "../_shared/cid-clients.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -33,8 +33,9 @@ interface Body {
   newBalance?: number;
 }
 
-const log = (step: string, data?: unknown) =>
-  console.log(`[NOTIFY-CHECKOUT-CONFIRMATION] ${step}`, data ? JSON.stringify(data) : "");
+// Note: a wrapper-bound `log` (carrying cid + fn + release) is provided to
+// the handler. Do not redefine a local `console.log` shim here — that
+// strips the cid and breaks BetterStack's `cid` pivot.
 
 async function resolveVapidPrivateKey(raw: string): Promise<string> {
   try {
@@ -66,7 +67,7 @@ async function resolveVapidPrivateKey(raw: string): Promise<string> {
 }
 
 serve(
-  withRequestLogging("notify-checkout-confirmation", async ({ req }) => {
+  withRequestLogging("notify-checkout-confirmation", async ({ req, log, cid }) => {
   try {
     const authHeader = req.headers.get("Authorization");
     if (!authHeader) {
@@ -76,9 +77,10 @@ serve(
       });
     }
 
-    const supabase = createClient(
+    const supabase = createCidSupabaseClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      cid,
       { auth: { persistSession: false } },
     );
 
@@ -183,9 +185,12 @@ serve(
 
         for (const sub of pushSubs) {
           try {
-            await webpush.sendNotification(
+            await sendWebPushWithCid(
+              log,
+              webpush,
               { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
               payload,
+              { notificationTag: idempotencyKey },
             );
             pushed++;
           } catch (pushErr: any) {
@@ -193,7 +198,11 @@ serve(
               await supabase.from("push_subscriptions").delete().eq("endpoint", sub.endpoint);
             } else {
               pushError = pushErr?.message ?? String(pushErr);
-              log("push_send_error", { endpoint: sub.endpoint.slice(0, 40), pushError });
+              // The `dependency_call` log line from `sendWebPushWithCid` already
+              // captured the error with cid + endpoint host; here we only need
+              // the higher-level signal that the per-sub send was treated as
+              // a delivery failure (vs a stale-sub prune above).
+              log.warn("push_send_failed", { pushError });
             }
           }
         }

@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import webpush from "https://esm.sh/web-push@3.6.7";
+import { createCidSupabaseClient, sendWebPushWithCid } from "../_shared/cid-clients.ts";
 import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
 import { createAttemptLogger } from "../_shared/observe.ts";
 import { coingeckoHeaders } from "../_shared/coingecko.ts";
@@ -227,7 +227,7 @@ Write one personalized night reflection message.`;
 }
 
 serve(
-  withRequestLogging("night-reflection", async ({ req }) => {
+  withRequestLogging("night-reflection", async ({ req, log, cid }) => {
   try {
     holzenEdgeRun("night-reflection", "request", { method: req.method });
     const { verifyServiceAuth } = await import("../_shared/auth.ts");
@@ -239,9 +239,10 @@ serve(
       });
     }
     holzenEdgeRun("night-reflection", "auth ok");
-    const supabase = createClient(
+    const supabase = createCidSupabaseClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      cid,
       { auth: { persistSession: false } }
     );
 
@@ -422,12 +423,15 @@ serve(
 
             for (const sub of pushSubs) {
               try {
-                await webpush.sendNotification(
+                await sendWebPushWithCid(
+                  log,
+                  webpush,
                   { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
-                  payload
+                  payload,
+                  { notificationTag: "night_reflection" }
                 );
               } catch (pushErr: any) {
-                holzenEdgeError("night-reflection", "push send failed", pushErr.message);
+                holzenEdgeError("night-reflection", "push send failed", { message: pushErr?.message, cid });
                 if (pushErr.statusCode === 410 || pushErr.statusCode === 404) {
                   await supabase.from("push_subscriptions").delete().eq("endpoint", sub.endpoint);
                 }
