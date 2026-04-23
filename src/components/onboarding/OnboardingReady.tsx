@@ -156,7 +156,7 @@ export function OnboardingReady({
           className="w-full font-mono text-xs h-10 gap-2"
         >
           <Sparkles className="h-3 w-3" />
-          {t('onboarding.ready.startTrial', 'Start {{days}}-day free trial', { days: PRICING.trialDays })}
+          {t('onboarding.ready.startTrial', 'Start {{days}}-day free trial · then ${{price}}/mo', { days: PRICING.trialDays, price: PRICING.monthlyPrice })}
         </LoadingButton>
         <p className="text-center text-[10px] font-mono text-muted-foreground/40 -mt-1">
           {t('onboarding.ready.trialFinePrint', 'Then ${{price}}/mo · Cancel anytime', { price: PRICING.monthlyPrice })}
