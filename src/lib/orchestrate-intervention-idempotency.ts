@@ -175,7 +175,7 @@ export async function runOnceIntervention<T>(
   reflectionId: string,
   factory: () => Promise<T>,
 ): Promise<T> {
-  const key = reflectionId;
+  const key = normalizeReflectionId(reflectionId);
   const existing = inFlight.get(key) as Promise<T> | undefined;
   if (existing) {
     emit('intervention_idempotency_dedup', {
