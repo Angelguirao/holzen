@@ -1,5 +1,27 @@
 # Feature Flags
 
+Two flag surfaces live in this repo, split by who needs to agree on the
+value:
+
+1. **PostHog feature flags** (documented below) — client-side, per-user,
+   A/B-style gates for UI experiments.
+2. **`app_config.feature_flags` jsonb** — a shared on/off map evaluated
+   **identically** in browser + edge functions, used for cutovers and
+   global kill switches. Migrations can read it; edge functions read it
+   via `supabase/functions/_shared/app-config.ts`; the client reads it
+   via `src/lib/pause-v2-flag.ts` (add similar helpers per flag). The
+   value flips with a single SQL `UPDATE app_config SET value = …`.
+
+Only use `app_config.feature_flags` when the flag gates DB triggers
+and/or edge behavior *in addition to* UI — otherwise PostHog is the
+default.
+
+## Active `app_config.feature_flags` entries
+
+| Key | Default | Surface | Purpose | Sunset trigger |
+|---|---|---|---|---|
+| `pause_v2_enabled` | `false` | DB triggers + edge cron + client hooks + Stats V2 + Badges V2 | Pause V2 cutover. When true, new pauses land in `pause_instances` + events + artifacts, Stats + Badges read from the new tables, and the legacy `notifications_from_reflections` + `notifications_from_pause_notifications` triggers skip to avoid double-emit. | Remove at Phase L (≥ 14 days of green post-cutover), together with the legacy `reflections` table and the branches that read this key. |
+
 Feature flags run on **PostHog**. Evaluation is client-side only today; server-side evaluation is a backlog item.
 
 **Hard rules**

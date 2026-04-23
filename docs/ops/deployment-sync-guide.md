@@ -15,6 +15,33 @@ How Lovable Cloud auto-deploys when you push to GitHub, and how to avoid surpris
 
 **Key insight:** Backend changes (migrations + edge functions) hit production the moment GitHub syncs. Frontend changes are staged until you explicitly publish.
 
+### Pause V2 cutover (one-time, Phase J)
+
+The Pause V2 migration shipped all changes behind an `app_config` flag
+that defaults to `false`. Sync cost is zero until the flag flips. When
+you're ready to cut over (staging first; prod after 24h green):
+
+1. Push latest main (runs all pending migrations, including
+   `20260423204000_pause_v2_cutover_helpers.sql` which revokes direct
+   client INSERT on `reflections` and installs the two admin RPCs).
+2. **Publish → Update** the frontend so `StatsContentV2`,
+   `BadgesPanelV2`, and `CurrentPauseCard` are live.
+3. Flip the flag in the SQL editor:
+   ```sql
+   SELECT public.cutover_flip_pause_v2(true);
+   ```
+4. Reset the `user_badges` baseline (Phase H rewrites counters; this
+   discards the legacy `earned_at` timestamps):
+   ```sql
+   SELECT public.cutover_reset_user_badges_baseline();
+   ```
+5. Work through the full checklist in
+   [pause-v2-cutover-runbook.md](pause-v2-cutover-runbook.md).
+
+Rollback during the 7-day post-cutover window:
+`SELECT public.cutover_flip_pause_v2(false);` + Lovable republish.
+Post Phase L (legacy tables dropped) rollback requires a DB restore.
+
 ## Hosted env files vs Cloud secrets
 
 | What | Where it runs | Where you set it (hosted) | When changes take effect |
