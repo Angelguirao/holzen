@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 
 // The idempotency module emits PostHog + holzen-console events. Mock both so
 // tests don't depend on analytics init and can assert on emitted metrics.
