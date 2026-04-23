@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pause, Timer, Lock, ArrowRight } from 'lucide-react';
 import { LoadingButton } from '@/components/ui/loading-button';
@@ -156,8 +156,11 @@ export function AutoCooldownIndicator({
     return () => window.clearTimeout(id);
   }, [cooldownRemaining, nextCronCheckIn]);
 
-  const fmtClock = (ms: number) =>
-    new Date(ms).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+  // Build the formatter once per mount. Pinning the IANA timezone + 24h
+  // hour-cycle + locale here means the rendered "14:32" stays identical
+  // across UI-language switches and survives DST transitions cleanly
+  // (the same instant always maps to the same wall-clock string).
+  const fmtClock = useMemo(() => createStableClockFormatter(), []);
 
   if (snapshot.remaining <= 0) {
     return (
