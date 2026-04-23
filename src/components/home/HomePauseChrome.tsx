@@ -237,11 +237,43 @@ export function AutoCooldownIndicator({
     window.addEventListener('pageshow', onPageShow);
     window.addEventListener('focus', onPageShow);
 
+    // Cross-tab sync: when another tab writes a fresh snapshot, mirror it
+    // here so every open instance of Home shows the same static target.
+    // We trust the writer's clock — they computed `readyAt` / `nextScanAt`
+    // as absolute timestamps, so importing them verbatim is correct.
+    const onStorage = (event: StorageEvent) => {
+      if (event.key !== SNAPSHOT_STORAGE_KEY || !event.newValue) return;
+      try {
+        const parsed = JSON.parse(event.newValue) as Partial<CooldownSnapshot> | null;
+        if (
+          !parsed ||
+          typeof parsed.readyAt !== 'number' ||
+          typeof parsed.nextScanAt !== 'number' ||
+          typeof parsed.remaining !== 'number'
+        ) return;
+        const next: CooldownSnapshot = {
+          remaining: parsed.remaining,
+          readyAt: parsed.readyAt,
+          nextScanAt: parsed.nextScanAt,
+        };
+        snapshotRef.current = next;
+        setSnapshot(next);
+        // Reschedule the next natural resnapshot against the new target.
+        if (timeoutId !== undefined) window.clearTimeout(timeoutId);
+        const target = (next.remaining > 0 ? next.readyAt : next.nextScanAt) - Date.now();
+        if (target > 0) {
+          timeoutId = window.setTimeout(() => resnapshotAndSchedule(), target + DRIFT_TOLERANCE_MS);
+        }
+      } catch { void 0; }
+    };
+    window.addEventListener('storage', onStorage);
+
     return () => {
       if (timeoutId !== undefined) window.clearTimeout(timeoutId);
       document.removeEventListener('visibilitychange', onVisible);
       window.removeEventListener('pageshow', onPageShow);
       window.removeEventListener('focus', onPageShow);
+      window.removeEventListener('storage', onStorage);
     };
   }, [cooldownRemaining, nextCronCheckIn]);
 
