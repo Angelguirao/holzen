@@ -229,29 +229,48 @@ export function AutoCooldownIndicator({
   const fmtClock = useMemo(() => createStableClockFormatter(), []);
 
   if (snapshot.remaining <= 0) {
+    const nextScanClock = fmtClock(snapshot.nextScanAt);
+    const nextScanAria = t('home.nextScanAria', {
+      time: nextScanClock,
+      defaultValue: 'All quiet. The next automatic check is scheduled for {{time}}.',
+    });
     return (
       <div
         className="flex items-center gap-2 py-1 text-base font-sans"
         title={t('nextScanIdleTitle', { defaultValue: 'Next automatic scan' })}
+        role="status"
+        aria-live="polite"
+        aria-label={nextScanAria}
       >
-        <p className={cn(homeInWidget.nextScanCountdown, 'tabular-nums')}>
+        <p className={cn(homeInWidget.nextScanCountdown, 'tabular-nums')} aria-hidden="true">
           {t('home.nextScanAtClock', {
-            time: fmtClock(snapshot.nextScanAt),
+            time: nextScanClock,
             defaultValue: 'Next scan at {{time}}',
           })}
         </p>
-        <span className="h-1.5 w-1.5 rounded-full bg-primary/40 shrink-0" />
+        <span className="h-1.5 w-1.5 rounded-full bg-primary/40 shrink-0" aria-hidden="true" />
       </div>
     );
   }
 
+  const readyClock = fmtClock(snapshot.readyAt);
+  const cooldownAria = t('home.cooldownAria', {
+    hours: cooldownHours,
+    time: readyClock,
+    defaultValue: 'Resting between checks. The next reflection can arrive after {{time}} (a {{hours}}-hour cooldown is in place).',
+  });
   return (
-    <div className="flex items-center gap-2 py-1 text-base font-sans">
-      <Timer className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
-      <p className={cn(homeInWidget.nextScanCountdown, 'tabular-nums')}>
+    <div
+      className="flex items-center gap-2 py-1 text-base font-sans"
+      role="status"
+      aria-live="polite"
+      aria-label={cooldownAria}
+    >
+      <Timer className="h-3.5 w-3.5 text-muted-foreground shrink-0" aria-hidden="true" />
+      <p className={cn(homeInWidget.nextScanCountdown, 'tabular-nums')} aria-hidden="true">
         {t('home.cooldownReadyAt', {
           hours: cooldownHours,
-          time: fmtClock(snapshot.readyAt),
+          time: readyClock,
           defaultValue: '{{hours}}h cooldown · ready at {{time}}',
         })}
       </p>
