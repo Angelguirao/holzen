@@ -83,6 +83,24 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
   const { isPro, requirePro, startCheckout } = useProGate();
   const { companionRemaining, flexCreditsBalance, applyOptimisticDecrement, refresh: refreshSubscription } = useSubscription();
 
+  const canAccessCompanion = useCallback(() => {
+    if (!isPro) {
+      requirePro('companions');
+      return false;
+    }
+    if (isPaidLimitReached({ remaining: companionRemaining, flexCreditsBalance })) {
+      showLimitReachedToast({ feature: 'companion', startCheckout });
+      return false;
+    }
+    return true;
+  }, [
+    isPro,
+    requirePro,
+    companionRemaining,
+    flexCreditsBalance,
+    startCheckout,
+  ]);
+
   // ── Auto-save to library ──
   const libraryAutosaveDedupRef = useRef<Set<string>>(new Set());
   const autoSaveToLibrary = useCallback(
@@ -406,12 +424,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     // limit-reached toast. Without this gate the very first card tap
     // surfaced a generic "Companion unavailable" toast even though the
     // edge function was returning a paywall code.
-    if (!isPro) {
-      requirePro('companions');
-      return;
-    }
-    if (isPaidLimitReached({ remaining: companionRemaining, flexCreditsBalance })) {
-      showLimitReachedToast({ feature: 'companion', startCheckout });
+    if (!canAccessCompanion()) {
       return;
     }
 
@@ -549,11 +562,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     severityNumber,
     language,
     autoSaveToLibrary,
-    isPro,
-    requirePro,
-    startCheckout,
-    companionRemaining,
-    flexCreditsBalance,
+    canAccessCompanion,
     applyOptimisticDecrement,
     refreshSubscription,
     toast,
@@ -716,6 +725,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     intervention, interventionLoading, interventionError,
     retryOrchestrate,
     regenerateCompanion,
+    canAccessCompanion,
     fetchCompanion,
   };
 }
