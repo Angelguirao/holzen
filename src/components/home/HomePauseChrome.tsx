@@ -108,91 +108,61 @@ export function AutoCooldownIndicator({
   nextCronCheckIn: () => number;
 }) {
   const { t } = useTranslation();
-  const [remaining, setRemaining] = useState(cooldownRemaining());
-  const [cronIn, setCronIn] = useState(nextCronCheckIn());
-  // Tracks the largest cronIn we've seen since cooldown ended. When the cron
-  // actually ticks, `nextCronCheckIn()` resets upward — that's our signal the
-  // next scan has run and it's safe to show the "Next scan" line again.
-  const [lastCronIn, setLastCronIn] = useState<number | null>(null);
-  const [scanReady, setScanReady] = useState(cooldownRemaining() <= 0);
+  // Render absolute clock targets — "Ready at 14:32", "Next scan at 14:47" —
+  // instead of a live "X min left" countdown. The widget is then completely
+  // static: no per-minute re-render, no blink. We re-snapshot exactly once,
+  // when the displayed target moment passes.
+  const [snapshot, setSnapshot] = useState(() => {
+    const rem = cooldownRemaining();
+    const cron = nextCronCheckIn();
+    const now = Date.now();
+    return { remaining: rem, readyAt: now + rem, nextScanAt: now + cron };
+  });
 
   useEffect(() => {
-    // Single strategy for both states: re-render only when the displayed
-    // minute label could change. No per-second ticks, no progress animation —
-    // that's what was causing the visible "blink" on Home.
-    let timeoutId: number | undefined;
-    const scheduleNext = () => {
-      const rem = cooldownRemaining();
-      const cron = nextCronCheckIn();
-      setRemaining(rem);
-      setCronIn(cron);
-      if (rem > 0) {
-        // While cooling down, suppress the "Next scan" line. We'll re-enable
-        // it only after the next cron tick fires post-cooldown.
-        setScanReady(false);
-        setLastCronIn(null);
-      } else {
-        setLastCronIn((prev) => {
-          if (prev === null) {
-            // First tick after cooldown ended — remember current cron window
-            // and keep the line hidden until it resets upward.
-            return cron;
-          }
-          // cron resets to a larger value when the scheduled scan actually
-          // runs (e.g. jumps from ~30s back up to ~15min).
-          if (cron > prev + 30_000) setScanReady(true);
-          return cron;
-        });
-      }
-      // Pick whichever countdown is currently displayed; align to its next
-      // minute boundary so the label changes exactly once per minute.
-      const active = rem > 0 ? rem : cron;
-      const msUntilMinuteChange = active > 0 ? ((active - 1) % 60_000) + 1 : 30_000;
-      timeoutId = window.setTimeout(scheduleNext, Math.max(1_000, msUntilMinuteChange));
-    };
-    scheduleNext();
-    return () => { if (timeoutId !== undefined) window.clearTimeout(timeoutId); };
+    const rem = cooldownRemaining();
+    const cron = nextCronCheckIn();
+    const now = Date.now();
+    setSnapshot({ remaining: rem, readyAt: now + rem, nextScanAt: now + cron });
+    const target = rem > 0 ? rem : cron;
+    if (target <= 0) return;
+    const id = window.setTimeout(() => {
+      const r2 = cooldownRemaining();
+      const c2 = nextCronCheckIn();
+      const t2 = Date.now();
+      setSnapshot({ remaining: r2, readyAt: t2 + r2, nextScanAt: t2 + c2 });
+    }, target + 500);
+    return () => window.clearTimeout(id);
   }, [cooldownRemaining, nextCronCheckIn]);
 
-  if (remaining <= 0) {
-    // Cooldown just ended but next scan hasn't fired yet — render nothing so
-    // the widget collapses cleanly instead of jumping straight into "Next scan".
-    if (!scanReady) return null;
+  const fmtClock = (ms: number) =>
+    new Date(ms).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+
+  if (snapshot.remaining <= 0) {
     return (
       <div
         className="flex items-center gap-2 py-1 text-base font-sans"
         title={t('nextScanIdleTitle', { defaultValue: 'Next automatic scan' })}
       >
-        <p className={homeInWidget.nextScanCountdown}>
-          {t('home.nextScanLine', {
-            scan: formatMsAsMinutes(cronIn),
-            defaultValue: 'Next scan · {{scan}}',
+        <p className={cn(homeInWidget.nextScanCountdown, 'tabular-nums')}>
+          {t('home.nextScanAtClock', {
+            time: fmtClock(snapshot.nextScanAt),
+            defaultValue: 'Next scan at {{time}}',
           })}
         </p>
-        {/* Static dot — the previous animate-pulse caused a subtle continuous
-            "blink" against the muted background. */}
         <span className="h-1.5 w-1.5 rounded-full bg-primary/40 shrink-0" />
       </div>
     );
   }
 
-  const remH = Math.floor(remaining / 3600000);
-  const remM = Math.floor((remaining % 3600000) / 60000);
-
-  const timeLabel = remH > 0
-    ? `${remH}h ${remM}min`
-    : `${remM}min`;
-
-  // While in cooldown we ONLY show the cooldown line (no "Next scan", no
-  // progress bar) — keeps the widget visually static, one minute-level update.
   return (
     <div className="flex items-center gap-2 py-1 text-base font-sans">
       <Timer className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
       <p className={cn(homeInWidget.nextScanCountdown, 'tabular-nums')}>
-        {t('home.cooldownHeadline', {
+        {t('home.cooldownReadyAt', {
           hours: cooldownHours,
-          time: timeLabel,
-          defaultValue: '{{hours}}h cooldown · {{time}} left',
+          time: fmtClock(snapshot.readyAt),
+          defaultValue: '{{hours}}h cooldown · ready at {{time}}',
         })}
       </p>
     </div>
