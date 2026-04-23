@@ -603,6 +603,12 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
 
   const regenerateCompanion = useCallback(async (slot: RegenerateCompanionSlot) => {
     if (!reflectionId) return;
+    // Defensive gate: some callers already block before invoking this
+    // callback, but enforcing the check here guarantees we never issue a
+    // paid regenerate request when the user is out of allowance/credits.
+    if (!canAccessCompanion()) {
+      return;
+    }
     const setLoading = (v: boolean) => {
       if (slot === 'signal') setSignalLoading(v);
       else if (slot === 'grounding') setNudgeLoading(v);
@@ -709,7 +715,7 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     } finally {
       setLoading(false);
     }
-  }, [reflectionId, context, reflectionMessage, mood, severityNumber, language, toast, autoSaveToLibrary]);
+  }, [reflectionId, context, reflectionMessage, mood, severityNumber, language, toast, autoSaveToLibrary, canAccessCompanion]);
 
   return {
     favorites,
