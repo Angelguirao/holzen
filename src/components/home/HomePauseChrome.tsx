@@ -47,7 +47,7 @@ function createStableClockFormatter(): (ms: number) => string {
 
 type CooldownSnapshot = { remaining: number; readyAt: number; nextScanAt: number };
 
-export const SNAPSHOT_STORAGE_KEY = 'holzen_home_cooldown_snapshot_v1';
+const SNAPSHOT_STORAGE_KEY = 'holzen_home_cooldown_snapshot_v1';
 
 /**
  * Hydrate the snapshot from localStorage. Returns null when nothing valid is
@@ -55,7 +55,7 @@ export const SNAPSHOT_STORAGE_KEY = 'holzen_home_cooldown_snapshot_v1';
  * the storage layer throws (private mode, quota, etc.). The freshness check
  * keeps us from rendering a stale "Ready at 09:12" hours after the fact.
  */
-export function readPersistedSnapshot(): CooldownSnapshot | null {
+function readPersistedSnapshot(): CooldownSnapshot | null {
   try {
     const raw = localStorage.getItem(SNAPSHOT_STORAGE_KEY);
     if (!raw) return null;
@@ -88,7 +88,7 @@ const CRON_INTERVAL_MS = 15 * 60_000; // matches `millisecondsUntilNextQuarterHo
  * effectively no-ops for them — so the next *meaningful* scan is the first
  * quarter-hour boundary at or after cooldown ends.
  */
-export function computeNextScanAt(now: number, cooldownMsRemaining: number, msUntilNextCron: number): number {
+function computeNextScanAt(now: number, cooldownMsRemaining: number, msUntilNextCron: number): number {
   // While idle, the next cron tick is the next meaningful scan.
   if (cooldownMsRemaining <= 0) return now + msUntilNextCron;
   // While cooling down, anchor to the cron grid: round the cooldown-end
