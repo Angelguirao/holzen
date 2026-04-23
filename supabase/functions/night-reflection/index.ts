@@ -227,7 +227,7 @@ Write one personalized night reflection message.`;
 }
 
 serve(
-  withRequestLogging("night-reflection", async ({ req }) => {
+  withRequestLogging("night-reflection", async ({ req, log, cid }) => {
   try {
     holzenEdgeRun("night-reflection", "request", { method: req.method });
     const { verifyServiceAuth } = await import("../_shared/auth.ts");
