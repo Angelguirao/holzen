@@ -817,6 +817,76 @@ export function CheckoutConfirmation() {
   }, [mode, refreshState, refreshError, refreshAttempt, projectedBalance, creditsAdded]);
 
   /**
+   * Proactive cleanup of the persisted refresh lifecycle.
+   *
+   * Two paths converge here:
+   *
+   *   1. **Guard expiry timer.** `readConfirmedGuard()` already drops the
+   *      `holzen_checkout_confirmed` row lazily (next read after 30 min),
+   *      but the *refresh-state* row is keyed off the same `guardTs` and
+   *      would otherwise live in `localStorage` until the next confirmation
+   *      mounts and prunes it. Schedule a one-shot timer that fires the
+   *      moment the guard window elapses for the *currently active* guard
+   *      and wipes the persisted lifecycle proactively. This keeps storage
+   *      tidy and ensures other tabs / a fresh dialog mount can't pick up
+   *      a stale `updating` banner from a guard that's already past TTL.
+   *
+   *   2. **Unmount-after-timeout.** If the user closes the dialog while it's
+   *      sitting in a terminal `timeout` state and never retries, there's
+   *      no value in resurrecting the stale "Still syncing" banner on a
+   *      future re-open within the same guard — by definition we already
+   *      gave up. Drop the row on unmount in that case so the next mount
+   *      starts from `idle` (and the suppression-toast path takes over).
+   *
+   * Subscriptions don't drive this lifecycle, so the effect is a no-op for
+   * them.
+   */
+  useEffect(() => {
+    if (!mode || mode === 'subscription') return;
+    const guardTs = activeGuardTsRef.current;
+    if (guardTs === null) return;
+
+    let expiryTimer: ReturnType<typeof setTimeout> | null = null;
+    const windowMs = getCheckoutSuppressionWindowMs();
+    const remaining = guardTs + windowMs - Date.now();
+    if (remaining > 0) {
+      // Cap at ~24d to stay inside the 32-bit `setTimeout` ceiling. The
+      // suppression window today is 30min so this is purely defensive — if
+      // someone bumps it to days via `setCheckoutSuppressionWindowMinutes`
+      // we still won't wrap around to a near-zero delay.
+      const safeDelay = Math.min(remaining, 2_147_000_000);
+      expiryTimer = setTimeout(() => {
+        // Re-check: if the user kicked off a new checkout in the meantime,
+        // the active guard already moved on and a fresh row was written
+        // with a newer `guardTs` — leave that one alone.
+        if (activeGuardTsRef.current !== guardTs) return;
+        writePersistedRefreshState(null);
+        lastPersistedSigRef.current = null;
+      }, safeDelay);
+    } else {
+      // Already past the window on mount (back-nav into a stale URL).
+      writePersistedRefreshState(null);
+      lastPersistedSigRef.current = null;
+    }
+
+    return () => {
+      if (expiryTimer) clearTimeout(expiryTimer);
+      // Unmount-after-timeout: only clears when the lifecycle has settled
+      // into the terminal `timeout` state. We deliberately keep `error` and
+      // `updating` rows alive across unmount so a re-open within the guard
+      // window can resurface them — the user expects to be able to retry.
+      if (refreshState === 'timeout') {
+        writePersistedRefreshState(null);
+        lastPersistedSigRef.current = null;
+      }
+    };
+    // `refreshState` is intentionally in the deps so the cleanup branch
+    // observes the *current* lifecycle value at unmount time. `mode` flips
+    // when the dialog detects a new checkout — we want a fresh expiry timer
+    // bound to the new `guardTs` in that case.
+  }, [mode, refreshState]);
+
+  /**
    * User-facing retry: re-invokes the subscription snapshot and surfaces an
    * explicit error state if the underlying TanStack query throws (network
    * down, edge function 5xx, etc.). Keeps `creditsAdded` / `projectedBalance`
