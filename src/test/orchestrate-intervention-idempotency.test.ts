@@ -35,6 +35,38 @@ describe('orchestrate intervention idempotency', () => {
     resetInterventionIdempotency('r-2');
   });
 
+  it('resetInterventionIdempotency clears both in-memory + storage so a retry fires exactly one new call', async () => {
+    const factory = vi.fn().mockResolvedValue({ ok: true });
+
+    // First call seeds both the sessionStorage marker and the in-memory
+    // fallback Set (the implementation always writes to both for resilience).
+    await runOnceIntervention('r-1', factory);
+    expect(factory).toHaveBeenCalledTimes(1);
+    expect(hasInvokedIntervention('r-1')).toBe(true);
+    expect(sessionStorage.getItem('holzen.orchestrate.intervention.invoked:r-1')).toBe('1');
+
+    // Reset must clear BOTH layers — otherwise the gate in the call sites
+    // (`if (!hasInvokedIntervention) ...`) would still short-circuit and the
+    // user's retry tap would silently no-op.
+    resetInterventionIdempotency('r-1');
+    expect(hasInvokedIntervention('r-1')).toBe(false);
+    expect(sessionStorage.getItem('holzen.orchestrate.intervention.invoked:r-1')).toBeNull();
+
+    // Retry: exactly one *new* call (factory total = 2), and the marker is
+    // re-armed so further remounts don't double-fire again.
+    await runOnceIntervention('r-1', factory);
+    expect(factory).toHaveBeenCalledTimes(2);
+    expect(hasInvokedIntervention('r-1')).toBe(true);
+
+    for (let i = 0; i < 3; i++) {
+      if (!hasInvokedIntervention('r-1')) {
+        await runOnceIntervention('r-1', factory);
+      }
+    }
+    expect(factory).toHaveBeenCalledTimes(2);
+  });
+
+
   it('invokes the factory exactly once across simulated remounts', async () => {
     const factory = vi.fn().mockResolvedValue({ ok: true });
 
