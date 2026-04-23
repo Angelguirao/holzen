@@ -105,6 +105,145 @@ function pushUnique(cap: string[], v: string, max: number) {
   cap.push(v);
 }
 
+/**
+ * Pause V2: derive orchestrator recency hints from recent pause_ai_artifacts
+ * rows. Called from check-volatility after looking up the target user's
+ * artifacts. Equivalent information to the legacy reflection-based helper
+ * but tuned to the V2 schema shape.
+ */
+export async function recencyHintsFromPauseArtifacts(
+  svcClient: { from: (t: string) => any },
+  userId: string,
+): Promise<OrchestratorRecencyHints> {
+  const recentSignalSources: string[] = [];
+  const recentSignalTitles: string[] = [];
+  const recentNudgeTopics: string[] = [];
+  const recentGroundingSources: string[] = [];
+  const recentHistoryTitles: string[] = [];
+  const recentZoomOutTitles: string[] = [];
+
+  try {
+    const { data } = await svcClient
+      .from("pause_ai_artifacts")
+      .select("kind, content, created_at")
+      .eq("user_id", userId)
+      .in("kind", [
+        "signal",
+        "ground_nudge",
+        "historical_insight",
+        "zoom_out",
+        "zoom_out_deep_time",
+      ])
+      .order("created_at", { ascending: false })
+      .limit(60);
+
+    for (const row of (data ?? []) as Array<{ kind: string; content: Record<string, unknown> }>) {
+      const c = row.content ?? {};
+      if (row.kind === "signal") {
+        const src = typeof c.source === "string" ? c.source : null;
+        const title = typeof c.title === "string" ? c.title : null;
+        if (src) pushUnique(recentSignalSources, src, 5);
+        if (title) pushUnique(recentSignalTitles, title, 5);
+      } else if (row.kind === "ground_nudge") {
+        const title = typeof c.title === "string" ? c.title : null;
+        if (title) pushUnique(recentNudgeTopics, title, 5);
+        const url = typeof c.url === "string" ? c.url : null;
+        const h = hostnameFromReflectionUrl(url);
+        if (h) pushUnique(recentGroundingSources, h, 5);
+      } else if (row.kind === "historical_insight") {
+        const t = typeof c.title === "string" ? c.title : null;
+        if (t) pushUnique(recentHistoryTitles, t, 5);
+      } else if (row.kind === "zoom_out" || row.kind === "zoom_out_deep_time") {
+        const dt = (c as { deepTime?: { title?: string }; title?: string });
+        const title = dt.deepTime?.title ?? dt.title ?? null;
+        if (title) pushUnique(recentZoomOutTitles, title, 5);
+      }
+    }
+  } catch {
+    /* non-fatal */
+  }
+
+  return {
+    recentSignalSources,
+    recentSignalTitles,
+    recentNudgeTopics,
+    recentGroundingSources,
+    recentHistoryTitles,
+    recentZoomOutTitles,
+  };
+}
+
+/**
+ * Pause V2: derive recent mood history + reflection/haiku pools from the
+ * new tables. Replaces the legacy `v_reflection_with_companions` probe
+ * used by check-volatility.
+ */
+export async function pauseRecencyInputs(
+  svcClient: { from: (t: string) => any },
+  userId: string,
+): Promise<{
+  moodHistory: Array<{ mood: string; outcome: string | null; created_at: string | undefined }> | undefined;
+  recentMessages: string[] | undefined;
+  recentHaikus: string[] | undefined;
+}> {
+  let moodHistory: Array<{ mood: string; outcome: string | null; created_at: string | undefined }> | undefined;
+  let recentMessages: string[] | undefined;
+  let recentHaikus: string[] | undefined;
+
+  try {
+    // Mood history + outcomes join step events for the same instance.
+    const { data: rows } = await svcClient
+      .from("pause_step_events")
+      .select("pause_instance_id, step_type, payload, created_at")
+      .eq("user_id", userId)
+      .in("step_type", ["initial_emotion_logged", "outcome_logged"])
+      .order("created_at", { ascending: false })
+      .limit(60);
+
+    const byInstance = new Map<string, { mood?: string; outcome?: string; created_at?: string }>();
+    for (const r of (rows ?? []) as Array<{ pause_instance_id: string; step_type: string; payload: Record<string, unknown>; created_at: string }>) {
+      const e = byInstance.get(r.pause_instance_id) ?? {};
+      if (r.step_type === "initial_emotion_logged" && typeof r.payload?.mood === "string") {
+        e.mood = r.payload.mood as string;
+        e.created_at = r.created_at;
+      } else if (r.step_type === "outcome_logged" && typeof r.payload?.outcome === "string") {
+        e.outcome = r.payload.outcome as string;
+      }
+      byInstance.set(r.pause_instance_id, e);
+    }
+
+    const entries = Array.from(byInstance.values()).filter((e) => e.mood);
+    if (entries.length > 0) {
+      moodHistory = entries
+        .sort((a, b) => (b.created_at ?? "").localeCompare(a.created_at ?? ""))
+        .map((e) => ({ mood: e.mood!, outcome: e.outcome ?? null, created_at: e.created_at }));
+    }
+
+    const { data: artifacts } = await svcClient
+      .from("pause_ai_artifacts")
+      .select("kind, content, created_at")
+      .eq("user_id", userId)
+      .in("kind", ["reflection_text", "haiku"])
+      .order("created_at", { ascending: false })
+      .limit(20);
+    const msgs: string[] = [];
+    const haikus: string[] = [];
+    for (const a of (artifacts ?? []) as Array<{ kind: string; content: Record<string, unknown> }>) {
+      if (a.kind === "reflection_text" && typeof a.content?.message === "string") {
+        msgs.push(a.content.message as string);
+      } else if (a.kind === "haiku" && typeof a.content?.haiku === "string") {
+        haikus.push(a.content.haiku as string);
+      }
+    }
+    if (msgs.length > 0) recentMessages = msgs.slice(0, 5);
+    if (haikus.length > 0) recentHaikus = haikus.slice(0, 5);
+  } catch {
+    /* non-fatal */
+  }
+
+  return { moodHistory, recentMessages, recentHaikus };
+}
+
 /** Derive orchestrator recency hints from recent reflection rows (newest first). */
 export function recencyHintsFromReflectionRows(rows: ReflectionRow[]): OrchestratorRecencyHints {
   const recentSignalSources: string[] = [];

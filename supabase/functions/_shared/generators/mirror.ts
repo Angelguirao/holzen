@@ -1,8 +1,12 @@
 /**
  * Mirror intervention — surfaces a user's own past behavior in a similar market moment.
  *
- * Uses the existing `find_similar_reflection` DB function (no embeddings, no AI).
- * Returns null if the user has no qualifying past session.
+ * Pause V2 implementation: queries `v_pause_full` for past completed pauses
+ * that share direction (up/down) and are at least 30 days old. Uses the
+ * pause's initial_mood + outcome + context snapshot to build a short
+ * "X ago you were feeling Y when Z. You chose to A." narrative.
+ *
+ * Returns null if no qualifying past session exists.
  */
 
 export interface MirrorResult {
@@ -18,9 +22,6 @@ export interface MirrorResult {
   message: string;
 }
 
-/**
- * Compute a human-readable relative time string from a past ISO timestamp.
- */
 function timeAgoFrom(isoDate: string): string {
   const diffMs = Date.now() - new Date(isoDate).getTime();
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
@@ -38,63 +39,96 @@ function timeAgoFrom(isoDate: string): string {
   return `${years} year${years === 1 ? "" : "s"} ago`;
 }
 
-/**
- * Extract a short market description from the stored context string.
- * Input: "BTC is down 5.2% in the last 24 hours."
- * Output: "BTC was down 5.2%"
- */
 function extractContext(context: string | null): string {
   if (!context) return "a similar move";
-  // Normalize "BTC is" → "BTC was"
   const normalized = context.replace(/^BTC is/, "BTC was");
-  // Trim to just the first sentence / first clause
   const trimmed = normalized.split(/\.\s/)[0].replace(/\s+in the last.*/, "").trim();
   return trimmed || "a similar move";
 }
 
-/**
- * Humanize the outcome label for display.
- */
 function humanizeOutcome(outcome: string | null): string {
   switch (outcome) {
-    case "sold": return "sold";
-    case "bought": return "bought more";
+    case "sold":
+      return "sold";
+    case "bought":
+      return "bought more";
     case "held":
     case "nothing":
-    default: return "held";
+    default:
+      return "held";
   }
 }
 
-/**
- * Build a Mirror result from the user's past similar reflection.
- * Returns null if no qualifying past session exists.
- */
+function normalizeDirection(raw: unknown): "up" | "down" | "neutral" {
+  if (raw === "up" || raw === "down") return raw;
+  return "neutral";
+}
+
 export async function buildMirror(
   svcClient: any,
   userId: string,
-  reflectionId: string,
+  pauseInstanceId: string,
   log?: (msg: string, extra?: Record<string, unknown>) => void,
 ): Promise<MirrorResult | null> {
   try {
-    const { data, error } = await svcClient.rpc("find_similar_reflection", {
-      _user_id: userId,
-      _reflection_id: reflectionId,
-      _min_age_days: 30,
-    });
+    // 1. Read the current pause to get its direction.
+    const { data: current, error: curErr } = await svcClient
+      .from("pause_instances")
+      .select("context_snapshot, created_at")
+      .eq("id", pauseInstanceId)
+      .maybeSingle();
+    if (curErr || !current) return null;
+
+    const currentDir = normalizeDirection(
+      (current.context_snapshot as Record<string, unknown> | null)?.direction,
+    );
+    if (currentDir === "neutral") return null;
+
+    const cutoff = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+
+    // 2. Query v_pause_full for a past completed pause with matching direction.
+    //    We rely on the view's counted companion + mood + outcome columns.
+    const { data, error } = await svcClient
+      .from("v_pause_full")
+      .select(
+        "id, user_id, created_at, completed_at, context_snapshot, initial_mood, outcome, state",
+      )
+      .eq("user_id", userId)
+      .eq("state", "completed")
+      .not("outcome", "is", null)
+      .lt("completed_at", cutoff)
+      .order("completed_at", { ascending: false })
+      .limit(20);
 
     if (error) {
-      log?.("find_similar_reflection error", { error: error.message });
+      log?.("v_pause_full mirror query error", { error: error.message });
       return null;
     }
 
-    // RETURNS TABLE gives an array; take the first row
-    const row = Array.isArray(data) ? data[0] : data;
-    if (!row || !row.outcome) return null;
+    const rows = (data ?? []) as Array<{
+      id: string;
+      created_at: string;
+      completed_at: string | null;
+      context_snapshot: Record<string, unknown> | null;
+      initial_mood: string | null;
+      outcome: string | null;
+    }>;
 
-    const timeAgo = timeAgoFrom(row.created_at);
-    const pastMood = row.mood || "uncertain";
-    const pastContext = extractContext(row.context);
-    const pastOutcome = humanizeOutcome(row.outcome);
+    const match = rows.find((r) => {
+      const dir = normalizeDirection(r.context_snapshot?.direction);
+      return dir === currentDir;
+    });
+    if (!match) return null;
+
+    const whenIso = match.completed_at ?? match.created_at;
+    const timeAgo = timeAgoFrom(whenIso);
+    const pastMood = match.initial_mood || "uncertain";
+    const pastContextText =
+      typeof match.context_snapshot?.context_text === "string"
+        ? (match.context_snapshot.context_text as string)
+        : null;
+    const pastContext = extractContext(pastContextText);
+    const pastOutcome = humanizeOutcome(match.outcome);
 
     const message = `${timeAgo}, you were feeling ${pastMood} when ${pastContext}. You chose to ${pastOutcome}.`;
 

@@ -44,9 +44,9 @@ export async function handleRegenerateOnly(params: {
 }): Promise<Response> {
   const { slot, userId, svcClient, body, log } = params;
 
-  const reflectionId = body.reflectionId as string | undefined;
-  if (!reflectionId) {
-    return new Response(JSON.stringify({ error: "reflectionId required" }), {
+  const pauseInstanceId = body.pauseInstanceId as string | undefined;
+  if (!pauseInstanceId) {
+    return new Response(JSON.stringify({ error: "pauseInstanceId required" }), {
       status: 400,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
@@ -89,7 +89,7 @@ export async function handleRegenerateOnly(params: {
       amount: 1,
       reason: "companions_overage",
       source: "companion-regenerate",
-      sourceRef: reflectionId,
+      sourceRef: pauseInstanceId,
       metadata: { slot },
     });
     if (!quota.allowed) {
@@ -151,22 +151,42 @@ export async function handleRegenerateOnly(params: {
     );
   }
 
-  const { data: reflection, error: refErr } = await svcClient
-    .from("reflections")
-    .select("user_id, message, context, mood")
-    .eq("id", reflectionId)
+  // Ownership: verify the pause_instance belongs to the caller. We also
+  // pull the context snapshot + reflection_text artifact for AI inputs so
+  // the client doesn't need to resend them on regenerate.
+  const { data: instance, error: instErr } = await svcClient
+    .from("pause_instances")
+    .select("user_id, context_snapshot")
+    .eq("id", pauseInstanceId)
     .maybeSingle();
 
-  if (refErr || !reflection || reflection.user_id !== userId) {
-    return new Response(JSON.stringify({ error: "Reflection not found" }), {
+  if (instErr || !instance || instance.user_id !== userId) {
+    return new Response(JSON.stringify({ error: "Pause instance not found" }), {
       status: 403,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 
-  const context = (body.context as string | undefined) ?? (reflection.context as string) ?? "";
-  const reflectionMessage = (body.reflectionMessage as string | undefined) ?? (reflection.message as string) ?? "";
-  const mood = (body.mood as string | undefined) ?? (reflection.mood as string | undefined) ?? undefined;
+  const { data: refArtifact } = await svcClient
+    .from("pause_ai_artifacts")
+    .select("content")
+    .eq("pause_instance_id", pauseInstanceId)
+    .eq("kind", "reflection_text")
+    .maybeSingle();
+
+  const ctxSnapshot = (instance.context_snapshot ?? {}) as Record<string, unknown>;
+  const context =
+    (body.context as string | undefined) ??
+    (typeof ctxSnapshot.context_text === "string" ? (ctxSnapshot.context_text as string) : "");
+  const refArtContent = (refArtifact?.content ?? {}) as Record<string, unknown>;
+  const reflectionMessage =
+    (body.reflectionMessage as string | undefined) ??
+    (typeof refArtContent.message === "string" ? (refArtContent.message as string) : "");
+  const mood =
+    (body.mood as string | undefined) ??
+    (typeof ctxSnapshot.last_reported_mood === "string"
+      ? (ctxSnapshot.last_reported_mood as string)
+      : undefined);
   const language = (body.language as string) || "en";
   const moodHistory = body.moodHistory as Array<{ mood: string; outcome?: string | null }> | undefined;
   const rawSeverity = typeof body.severity === "number" ? body.severity : 0;
@@ -209,7 +229,7 @@ export async function handleRegenerateOnly(params: {
         recentGroundingSources,
         recentGroundingTitles: recentNudgeTopics,
         userId,
-        reflectionId,
+        pauseInstanceId,
         log,
         preferredBias: intent.groundingBias,
         forceLive: true,
@@ -234,7 +254,7 @@ export async function handleRegenerateOnly(params: {
       let mergedRecentSignalUrls: string[] | undefined;
       try {
         const fromDb = await fetchRecentSignalCitationUrls(svcClient, userId, {
-          excludeReflectionId: reflectionId,
+          excludeReflectionId: pauseInstanceId,
           limit: 24,
         });
         mergedRecentSignalUrls = mergeRecentSignalUrls(fromDb, clientSignalUrls, 24);
@@ -251,7 +271,7 @@ export async function handleRegenerateOnly(params: {
         recentSignalTitles: body.recentSignalTitles as string[] | undefined,
         recentSignalUrls: mergedRecentSignalUrls,
         userId,
-        reflectionId,
+        pauseInstanceId,
         log,
         searchAngle: intent.signalAngle,
         forceLive: true,
@@ -327,7 +347,7 @@ export async function handleRegenerateOnly(params: {
   logCompanionSlotResolved({
     companion_type: companionType,
     orchestrator_slot: slot,
-    reflection_prefix: reflectionId.slice(0, 8),
+    pause_prefix: pauseInstanceId.slice(0, 8),
     source: result.source,
     cache_relaxation: result.cacheRelaxation ?? null,
     latency_ms: result.latencyMs,
@@ -347,7 +367,7 @@ export async function handleRegenerateOnly(params: {
 
   const serveRow = {
     user_id: userId,
-    reflection_id: reflectionId,
+    pause_instance_id: pauseInstanceId,
     companion_type: companionType,
     serve_source: result.source,
     cache_entry_id: result.cacheId || null,
@@ -359,13 +379,13 @@ export async function handleRegenerateOnly(params: {
 
   try {
     if (result.data) {
-      await writeCompanionData(svcClient, reflectionId, companionType, result.data);
+      await writeCompanionData(svcClient, pauseInstanceId, userId, companionType, result.data);
     }
     await svcClient.from("companion_serves").insert(serveRow);
     await svcClient.from("analytics_events").insert({
       user_id: userId,
       event: "companion_regenerate",
-      metadata: { reflection_id: reflectionId, slot, source: result.source },
+      metadata: { pause_instance_id: pauseInstanceId, slot, source: result.source },
     });
   } catch (e) {
     log(`regenerate persist error: ${e instanceof Error ? e.message : String(e)}`);

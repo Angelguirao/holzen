@@ -1,44 +1,31 @@
 /**
  * Recent Signal citation URLs for the same user — server-side dedup against
- * client-provided localStorage hints. Source: reflection_companions (companion_type signal) content.url.
- * (Denormalized reflections.signal_url was removed; Signal lives only in the join table.)
+ * client-provided localStorage hints. Source: pause_ai_artifacts (kind='signal') content.url.
  */
 
 export async function fetchRecentSignalCitationUrls(
   svcClient: any,
   userId: string,
-  opts: { excludeReflectionId?: string | null; limit?: number },
+  opts: { excludePauseInstanceId?: string | null; limit?: number },
 ): Promise<string[]> {
   const limit = Math.min(opts.limit ?? 20, 40);
-  // Two-step: reflections no longer has signal_url; companion rows live on reflection_companions.
-  let refQ = svcClient
-    .from("reflections")
-    .select("id")
+
+  let q = svcClient
+    .from("pause_ai_artifacts")
+    .select("content, pause_instance_id, created_at")
     .eq("user_id", userId)
+    .eq("kind", "signal")
     .order("created_at", { ascending: false })
     .limit(80);
 
-  if (opts.excludeReflectionId) {
-    refQ = refQ.neq("id", opts.excludeReflectionId);
+  if (opts.excludePauseInstanceId) {
+    q = q.neq("pause_instance_id", opts.excludePauseInstanceId);
   }
 
-  const { data: refRows, error: refErr } = await refQ;
-  if (refErr || !refRows?.length) return [];
-
-  const ids = (refRows as { id: string }[]).map((r) => r.id);
-  const idOrder = new Map(ids.map((id, i) => [id, i]));
-
-  const { data, error } = await svcClient
-    .from("reflection_companions")
-    .select("content, reflection_id")
-    .eq("companion_type", "signal")
-    .in("reflection_id", ids);
-
+  const { data, error } = await q;
   if (error || !data?.length) return [];
 
-  const rows = [...(data as { content?: { url?: string | null } | null; reflection_id: string }[])].sort(
-    (a, b) => (idOrder.get(a.reflection_id) ?? 999) - (idOrder.get(b.reflection_id) ?? 999),
-  );
+  const rows = data as Array<{ content?: { url?: string | null } | null }>;
 
   const seen = new Set<string>();
   const out: string[] = [];
