@@ -13,18 +13,6 @@ function formatMsAsMS(ms: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
-/**
- * Format ms as a coarse "in Nm" / "<1m" label for the idle "Next scan" line.
- * Stable to the minute — lets us avoid second-level re-renders that caused a
- * subtle continuous flicker on Home.
- */
-function formatMsAsMinutes(ms: number): string {
-  const totalSec = Math.max(0, Math.floor(ms / 1000));
-  if (totalSec < 60) return '<1m';
-  const m = Math.ceil(totalSec / 60);
-  return `${m}m`;
-}
-
 export function NeedAMomentButton({
   onTrigger,
   cooldownRemaining,
