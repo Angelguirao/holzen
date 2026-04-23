@@ -1061,7 +1061,10 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                       className="w-full text-base font-sans"
                       size="sm"
                     >
-                      {t('settings.planProCta', 'Start Pro · $4.99/month')}
+                      {t('settings.planProCta', {
+                        price: PRICING.monthlyPrice.toFixed(2),
+                        defaultValue: 'Start Pro · ${{price}}/month',
+                      })}
                     </LoadingButton>
                     <LoadingButton
                       onClick={() => startCheckout('pro_plus')}
@@ -1071,7 +1074,10 @@ const Settings = forwardRef<HTMLDivElement>(function Settings(_props, ref) {
                       className="w-full text-base font-sans"
                       size="sm"
                     >
-                      {t('settings.planProPlusCta', 'Start Pro+ · $9.99/month')}
+                      {t('settings.planProPlusCta', {
+                        price: PRICING.proPlusMonthlyPrice.toFixed(2),
+                        defaultValue: 'Start Pro+ · ${{price}}/month',
+                      })}
                     </LoadingButton>
                   </div>
                 </div>
