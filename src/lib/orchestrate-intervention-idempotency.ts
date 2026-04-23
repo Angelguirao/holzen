@@ -95,43 +95,65 @@ function storageKey(reflectionId: string): string {
 }
 
 /**
+ * Canonical form of a `reflectionId` used for every map / storage / Set
+ * lookup in this module. Reflection IDs are UUIDs minted by Postgres and
+ * are already lowercase in the happy path, but they can reach the
+ * idempotency layer via:
+ *
+ *  - React Router `useParams()` (string from the URL — preserves whatever
+ *    case the link was generated with),
+ *  - hand-crafted deep links shared between users,
+ *  - copy-pasted IDs from the admin dashboard.
+ *
+ * Without normalization, `"ABC..."` and `"abc..."` would write to two
+ * separate sessionStorage slots and the duplicate-call guarantee would
+ * silently break across remounts that disagree on case. Trim guards
+ * against accidental whitespace from query-string parsing.
+ */
+function normalizeReflectionId(reflectionId: string): string {
+  return reflectionId.trim().toLowerCase();
+}
+
+/**
  * Returns true iff the intervention call has already been issued in this
  * tab session for the given reflection. Safe to call from SSR — degrades
  * to "not yet invoked" when `sessionStorage` is unavailable.
  */
 export function hasInvokedIntervention(reflectionId: string): boolean {
   if (!reflectionId) return false;
-  if (inFlight.has(reflectionId)) {
+  const id = normalizeReflectionId(reflectionId);
+  if (!id) return false;
+  if (inFlight.has(id)) {
     emit('intervention_idempotency_skip', {
-      reflection_prefix: reflectionPrefix(reflectionId),
+      reflection_prefix: reflectionPrefix(id),
       layer: 'in_flight',
     });
     return true;
   }
   try {
-    const hit = sessionStorage.getItem(storageKey(reflectionId)) === '1';
+    const hit = sessionStorage.getItem(storageKey(id)) === '1';
     if (hit) {
       emit('intervention_idempotency_skip', {
-        reflection_prefix: reflectionPrefix(reflectionId),
+        reflection_prefix: reflectionPrefix(id),
         layer: 'session_storage',
       });
       return true;
     }
   } catch (err) {
     emit('intervention_idempotency_storage_error', {
-      reflection_prefix: reflectionPrefix(reflectionId),
+      reflection_prefix: reflectionPrefix(id),
       op: 'getItem',
       error_name: (err as { name?: string } | null)?.name ?? 'unknown',
     });
     /* fall through to in-memory fallback */
   }
-  if (memoryMarkers.has(reflectionId)) {
+  if (memoryMarkers.has(id)) {
     emit('intervention_idempotency_skip', {
-      reflection_prefix: reflectionPrefix(reflectionId),
+      reflection_prefix: reflectionPrefix(id),
       layer: 'memory_fallback',
     });
     emit('intervention_idempotency_fallback_used', {
-      reflection_prefix: reflectionPrefix(reflectionId),
+      reflection_prefix: reflectionPrefix(id),
       phase: 'read',
     });
     return true;
@@ -153,7 +175,7 @@ export async function runOnceIntervention<T>(
   reflectionId: string,
   factory: () => Promise<T>,
 ): Promise<T> {
-  const key = reflectionId;
+  const key = normalizeReflectionId(reflectionId);
   const existing = inFlight.get(key) as Promise<T> | undefined;
   if (existing) {
     emit('intervention_idempotency_dedup', {
@@ -236,10 +258,12 @@ export async function runOnceIntervention<T>(
  */
 export function resetInterventionIdempotency(reflectionId: string): void {
   if (!reflectionId) return;
-  inFlight.delete(reflectionId);
-  memoryMarkers.delete(reflectionId);
+  const id = normalizeReflectionId(reflectionId);
+  if (!id) return;
+  inFlight.delete(id);
+  memoryMarkers.delete(id);
   try {
-    sessionStorage.removeItem(storageKey(reflectionId));
+    sessionStorage.removeItem(storageKey(id));
   } catch {
     /* ignore */
   }
@@ -274,14 +298,16 @@ export function getInterventionIdempotencyDecision(
   reflectionId: string,
 ): InterventionIdempotencyDecision {
   if (!reflectionId) return 'none';
-  if (inFlight.has(reflectionId)) return 'inFlight';
+  const id = normalizeReflectionId(reflectionId);
+  if (!id) return 'none';
+  if (inFlight.has(id)) return 'inFlight';
   try {
-    if (sessionStorage.getItem(storageKey(reflectionId)) === '1') {
+    if (sessionStorage.getItem(storageKey(id)) === '1') {
       return 'completedStorage';
     }
   } catch {
     /* fall through */
   }
-  if (memoryMarkers.has(reflectionId)) return 'completedFallback';
+  if (memoryMarkers.has(id)) return 'completedFallback';
   return 'none';
 }
