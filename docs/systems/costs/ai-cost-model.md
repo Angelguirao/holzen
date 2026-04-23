@@ -128,6 +128,10 @@ Perplexity remains the dominant per-call cost in pause generation, so the
 | Reflection | `1 × 0.0030` | `~$0.0030` |
 | **Total all-live baseline** |  | **`~$0.1825` (round to `~$0.18`)** |
 
+Packaging note: `zoom-out` is intentionally not metered separately in v1;
+see [pricing-strategy.md §3.1.1](./pricing-strategy.md#311-why-zoom-out-is-excluded-from-credit-metering-v1)
+for rationale and revisit criteria.
+
 For capacity planning, this doc uses `~$0.21` as a realistic average when some
 sessions incur retries, larger contexts, or heavier prompt payloads.
 

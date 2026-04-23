@@ -55,6 +55,25 @@ Notes:
   (`journal-prompt`, `suggest-grounding`, `suggest-ritual`).
 - `zoom-out` remains included and is not metered separately in v1.
 
+### 3.1.1 Why `zoom-out` is excluded from credit metering (v1)
+
+The exclusion is intentional, not a gap in implementation:
+
+- **Cost profile:** `zoom-out` is materially cheaper than premium companion paths
+  that rely on Perplexity (`signal`, `grounding`, `history`). Most of the
+  payload comes from cached BTC price history plus a lightweight deep-time
+  generation step.
+- **Product role:** `zoom-out` is part of the emotional-regulation layer
+  (perspective and de-escalation), including intervention secondary rendering.
+  We keep this path broadly available to avoid adding friction at the exact
+  moment users need grounding context.
+- **Metering intent:** companion/flex credits are focused on higher-variable-cost
+  actions. In v1, that means premium companion + guidance actions and other
+  explicitly metered features (`wallpaper`, on-demand insights), while
+  `zoom-out` remains included.
+- **Revisit trigger:** if real per-serve cost, traffic mix, or COGS pressure
+  changes materially, this can be revisited in a future packaging revision.
+
 ### 3.2 Add-on packs
 
 | Pack | Price | Included |
