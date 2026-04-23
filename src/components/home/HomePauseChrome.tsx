@@ -13,6 +13,39 @@ function formatMsAsMS(ms: number): string {
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
 
+/**
+ * Resolve the timezone we should pin clock formatting to. We prefer the IANA
+ * zone the browser resolves *now*, so a single Intl.DateTimeFormat instance
+ * always renders the same wall-clock string for a given instant — even across
+ * DST transitions (the zone, e.g. "Europe/Madrid", is stable; only the offset
+ * shifts, and DateTimeFormat handles that consistently).
+ */
+function resolveStableTimezone(): string {
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (tz) return tz;
+  } catch { void 0; }
+  return 'UTC';
+}
+
+/**
+ * Locale- and DST-stable HH:mm formatter. Uses 24-hour `hourCycle: 'h23'` and
+ * the `en-GB` locale so the displayed glyphs ("14:32") never shift when the
+ * user changes UI language; the IANA timezone is pinned per-mount so the
+ * displayed hour represents the *same instant* regardless of DST changes.
+ */
+function createStableClockFormatter(): (ms: number) => string {
+  const timeZone = resolveStableTimezone();
+  const fmt = new Intl.DateTimeFormat('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+    timeZone,
+  });
+  return (ms: number) => fmt.format(new Date(ms));
+}
+
+
 export function NeedAMomentButton({
   onTrigger,
   cooldownRemaining,
