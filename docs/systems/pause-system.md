@@ -244,7 +244,57 @@ _Documented in full alongside Phase D (client hook rewire)._
 
 ## 8. Companion counting rule
 
-_Documented in full alongside Phase B (RPC surface)._
+On `pause_companion_events(action='complete')`, the server decides whether
+the event advances the paired instance's completion gate. The rule is
+evaluated inside `pause_log_companion` (RPC) so clients cannot lie about
+whether something counted.
+
+`counts_for_pause = true` iff **all** of the following are true:
+
+1. `p_instance_id` is non-null.
+2. The instance's state is `active` or `engaged`.
+3. `now() < window_ends_at` (the window is still open).
+4. `companion_type ∈ template.allowed_companion_types`.
+5. No prior row exists for `(pause_instance_id, companion_type)` with
+   `action='complete'` and `counts_for_pause=true` (enforced by a partial
+   unique index as a second line of defence).
+
+Otherwise the row is still inserted — completions are never silently
+dropped — but `counts_for_pause = false` and `non_counting_reason` is one
+of:
+
+| Reason | When |
+|---|---|
+| `no_active_pause` | No instance, or instance was dismissed / completed / expired for a non-context reason. |
+| `context_lost` | Instance was expired because the market regime changed. |
+| `outside_window` | Instance is still live but `window_ends_at` has passed, or was expired by `window_elapsed`. |
+| `not_allowed_for_template` | Companion type isn't in `allowed_companion_types`. |
+| `already_counted` | Same companion type already counted for this instance. |
+
+`entry_point` is analytics metadata only: it tells us where the user was
+when they completed the companion (`pause_flow`, `library`, `bell`,
+`admin_preview`). It does **not** influence counting.
+
+### Client mirror
+
+The pure helper `shouldCountCompanion` in `src/lib/pause-state.ts`
+implements the same rule for optimistic UI. The DB stays authoritative;
+the helper just lets the Pause session show a "✓ counted" chip without a
+round-trip.
+
+### Write surface (Phase B RPCs)
+
+All four pause mutations flow through SECURITY DEFINER RPCs:
+
+| RPC | Callers | Purpose |
+|---|---|---|
+| `pause_create_or_reuse(template_slug, source, context_snapshot, context_rule_result, context_fingerprint)` | Edge (cron), client hook | Fingerprint-idempotent create. Returns `{ instance_id, created, reused_reason }`. |
+| `pause_log_step(instance_id, step_type, payload)` | Client (Pause flow) | Append a step event; returns the resulting state. |
+| `pause_log_companion(instance_id, companion_type, action, entry_point)` | Client (Pause flow + library) | Append a companion event; returns `{ counts_for_pause, non_counting_reason, resulting_state }`. |
+| `pause_dismiss_current()` | Client | Dismiss whichever open pause the caller has. No-op if none. |
+
+Direct table writes are rejected by RLS (only `service_role` has a write
+policy). This keeps the "single source of truth" invariant honest.
 
 ## 9. Stats derivation
 

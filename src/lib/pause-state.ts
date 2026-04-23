@@ -1,0 +1,268 @@
+/**
+ * Pause state machine — pure helpers.
+ *
+ * The canonical state engine lives in Postgres
+ * (`public.pause_evaluate_transitions`). This module mirrors the same rules
+ * in TypeScript so:
+ *
+ *   1. The Pause UI can render an optimistic state *before* the RPC round
+ *      trip resolves (e.g. disabling the shift step until breath+initial
+ *      mood events have been logged).
+ *   2. `src/lib/badges/compute.ts` and the Stats hooks can derive state
+ *      from fixture data without round-tripping to a database.
+ *   3. Unit tests pin the rules to a place humans can read (the SQL is
+ *      correct by construction but reads like SQL).
+ *
+ * The SQL remains authoritative. If these two implementations ever drift,
+ * the SQL wins and this file is wrong; fix this file to match.
+ *
+ * See: `supabase/migrations/20260423200730_pause_transition_engine.sql`,
+ *      `docs/systems/pause-system.md`.
+ */
+
+export type PauseState =
+  | 'active'
+  | 'engaged'
+  | 'completed'
+  | 'dismissed'
+  | 'expired';
+
+export type PauseExpiredReason =
+  | 'context_lost'
+  | 'window_elapsed'
+  | 'superseded'
+  | 'ineligible_user_state'
+  | 'system_cancelled';
+
+export type PauseStepType =
+  | 'breath_completed'
+  | 'initial_emotion_logged'
+  | 'reflection_step'
+  | 'shift_emotion_logged'
+  | 'outcome_logged'
+  | 'note_updated'
+  | 'tag_updated'
+  | 'favorite_toggled';
+
+export type PauseCompanionAction = 'open' | 'complete';
+
+export type PauseCompanionNonCountingReason =
+  | 'no_active_pause'
+  | 'outside_window'
+  | 'context_lost'
+  | 'not_allowed_for_template'
+  | 'already_counted';
+
+/** Shape of `pause_templates` rows used by the transition rules. */
+export interface PauseTemplateRow {
+  slug: string;
+  window_ms: number;
+  required_for_engaged: PauseStepType[];
+  required_for_completed: PauseStepType[];
+  allowed_companion_types: string[];
+  required_companion_count: number;
+}
+
+/** Minimum shape of `pause_instances` rows used here. */
+export interface PauseInstanceRow {
+  id: string;
+  user_id: string;
+  state: PauseState;
+  window_starts_at: string;
+  window_ends_at: string;
+  context_fingerprint: string;
+  created_at: string;
+  engaged_at: string | null;
+  completed_at: string | null;
+  terminal_at: string | null;
+  expired_reason: PauseExpiredReason | null;
+}
+
+/** Minimum shape of `pause_step_events` rows used here. */
+export interface PauseStepEventRow {
+  pause_instance_id: string;
+  step_type: PauseStepType;
+  created_at: string;
+  payload?: Record<string, unknown>;
+}
+
+/** Minimum shape of `pause_companion_events` rows used here. */
+export interface PauseCompanionEventRow {
+  pause_instance_id: string | null;
+  companion_type: string;
+  action: PauseCompanionAction;
+  counts_for_pause: boolean;
+  non_counting_reason: PauseCompanionNonCountingReason | null;
+  created_at: string;
+}
+
+/** Distinct step types present in an event list for a given instance. */
+export function collectStepTypes(
+  events: readonly PauseStepEventRow[],
+  instanceId: string,
+): Set<PauseStepType> {
+  const seen = new Set<PauseStepType>();
+  for (const e of events) {
+    if (e.pause_instance_id === instanceId) seen.add(e.step_type);
+  }
+  return seen;
+}
+
+/** Count of `complete` companion events for this instance where `counts_for_pause=true`. */
+export function countedCompanionCount(
+  events: readonly PauseCompanionEventRow[],
+  instanceId: string,
+): number {
+  const seen = new Set<string>();
+  for (const e of events) {
+    if (e.pause_instance_id !== instanceId) continue;
+    if (e.action !== 'complete') continue;
+    if (!e.counts_for_pause) continue;
+    seen.add(e.companion_type);
+  }
+  return seen.size;
+}
+
+function allIn<T>(required: readonly T[], present: Set<T>): boolean {
+  for (const r of required) if (!present.has(r)) return false;
+  return true;
+}
+
+/**
+ * Derive the state for a given instance by replaying its events against its
+ * template. Mirrors `pause_evaluate_transitions` in SQL.
+ *
+ * Rules (in order — first match wins):
+ *   1. Instance already terminal → return as-is.
+ *   2. Window elapsed (`now > window_ends_at`) → `expired` (reason
+ *      `window_elapsed`). We don't mutate here; the caller would act on the
+ *      returned state to show "expired" in the UI. The DB sweeper writes the
+ *      authoritative row later.
+ *   3. `required_for_completed` all present AND
+ *      `countedCompanionCount >= required_companion_count` → `completed`.
+ *   4. `required_for_engaged` all present → `engaged` (only from `active`).
+ *   5. Otherwise: unchanged.
+ */
+export function computePauseState(params: {
+  instance: PauseInstanceRow;
+  template: PauseTemplateRow;
+  stepEvents: readonly PauseStepEventRow[];
+  companionEvents: readonly PauseCompanionEventRow[];
+  now?: Date;
+}): PauseState {
+  const { instance, template, stepEvents, companionEvents } = params;
+  const now = params.now ?? new Date();
+
+  if (
+    instance.state === 'completed' ||
+    instance.state === 'dismissed' ||
+    instance.state === 'expired'
+  ) {
+    return instance.state;
+  }
+
+  if (new Date(instance.window_ends_at).getTime() <= now.getTime()) {
+    return 'expired';
+  }
+
+  const seenSteps = collectStepTypes(stepEvents, instance.id);
+  const counted = countedCompanionCount(companionEvents, instance.id);
+
+  const engagedOk = allIn(template.required_for_engaged, seenSteps);
+  const completedOk =
+    allIn(template.required_for_completed, seenSteps) &&
+    counted >= template.required_companion_count;
+
+  if (completedOk) return 'completed';
+  if (engagedOk && instance.state === 'active') return 'engaged';
+  return instance.state;
+}
+
+/**
+ * Decide whether a companion completion about to be logged should count.
+ * Mirrors the server-side decision in `pause_log_companion`. Returns either
+ *   { counts: true }
+ * or
+ *   { counts: false, reason: PauseCompanionNonCountingReason }.
+ *
+ * The DB version is still authoritative — this is for UI optimism.
+ */
+export function shouldCountCompanion(params: {
+  openInstance: PauseInstanceRow | null;
+  template: PauseTemplateRow | null;
+  companionEvents: readonly PauseCompanionEventRow[];
+  companionType: string;
+  now?: Date;
+}): { counts: true } | { counts: false; reason: PauseCompanionNonCountingReason } {
+  const { openInstance, template, companionEvents, companionType } = params;
+  const now = params.now ?? new Date();
+
+  if (!openInstance || openInstance.state === 'completed' ||
+      openInstance.state === 'dismissed') {
+    return { counts: false, reason: 'no_active_pause' };
+  }
+  if (openInstance.state === 'expired') {
+    return {
+      counts: false,
+      reason: openInstance.expired_reason === 'context_lost' ? 'context_lost' :
+              openInstance.expired_reason === 'window_elapsed' ? 'outside_window' :
+              'no_active_pause',
+    };
+  }
+  if (new Date(openInstance.window_ends_at).getTime() <= now.getTime()) {
+    return { counts: false, reason: 'outside_window' };
+  }
+  if (!template) {
+    // Defensive: without a template we can't evaluate; treat as no_active_pause.
+    return { counts: false, reason: 'no_active_pause' };
+  }
+  if (!template.allowed_companion_types.includes(companionType)) {
+    return { counts: false, reason: 'not_allowed_for_template' };
+  }
+  const already = companionEvents.some(
+    (e) =>
+      e.pause_instance_id === openInstance.id &&
+      e.action === 'complete' &&
+      e.counts_for_pause === true &&
+      e.companion_type === companionType,
+  );
+  if (already) return { counts: false, reason: 'already_counted' };
+
+  return { counts: true };
+}
+
+/**
+ * Cron-fire decision. Given the user's latest open pause (if any) + the new
+ * fingerprint, tell the caller whether to create, reject (matching
+ * fingerprint), or supersede (differing fingerprint). See
+ * `docs/systems/pause-system.md` §6 and `PLAN.md` §2.9.
+ *
+ * Does *not* mutate anything — callers invoke `pause_create_or_reuse` in the
+ * DB to do the actual work. This helper is useful for edge-function logs
+ * and tests so the branch logic has a TS home.
+ */
+export type CronFireDecision =
+  | { action: 'create' }
+  | { action: 'reject'; reason: 'fingerprint_match' | 'recent_dismissal' }
+  | { action: 'supersede'; oldInstanceId: string };
+
+export function decideCronFire(params: {
+  openInstance: PauseInstanceRow | null;
+  recentTerminalMatch: PauseInstanceRow | null;
+  newFingerprint: string;
+}): CronFireDecision {
+  const { openInstance, recentTerminalMatch, newFingerprint } = params;
+
+  if (openInstance) {
+    if (openInstance.context_fingerprint === newFingerprint) {
+      return { action: 'reject', reason: 'fingerprint_match' };
+    }
+    return { action: 'supersede', oldInstanceId: openInstance.id };
+  }
+
+  if (recentTerminalMatch && recentTerminalMatch.context_fingerprint === newFingerprint) {
+    return { action: 'reject', reason: 'recent_dismissal' };
+  }
+
+  return { action: 'create' };
+}
