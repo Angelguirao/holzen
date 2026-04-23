@@ -115,11 +115,19 @@ export function hasInvokedIntervention(reflectionId: string): boolean {
         reflection_prefix: reflectionPrefix(reflectionId),
         layer: 'session_storage',
       });
+      return true;
     }
-    return hit;
   } catch {
-    return false;
+    /* fall through to in-memory fallback */
   }
+  if (memoryMarkers.has(reflectionId)) {
+    emit('intervention_idempotency_skip', {
+      reflection_prefix: reflectionPrefix(reflectionId),
+      layer: 'memory_fallback',
+    });
+    return true;
+  }
+  return false;
 }
 
 /**
