@@ -112,33 +112,24 @@ export function AutoCooldownIndicator({
   const [cronIn, setCronIn] = useState(nextCronCheckIn());
 
   useEffect(() => {
-    // Active cooldown ticks each second so the progress bar stays smooth.
-    // Idle state only re-renders when the displayed minute changes, so the
-    // "Next scan" line is visually stable (no per-second flicker).
-    if (remaining > 0) {
-      const interval = setInterval(() => {
-        const rem = cooldownRemaining();
-        setRemaining(rem);
-        if (rem <= 0) setCronIn(nextCronCheckIn());
-      }, 1000);
-      return () => clearInterval(interval);
-    }
-    // Idle: align next tick to the next minute boundary of the cron countdown.
+    // Single strategy for both states: re-render only when the displayed
+    // minute label could change. No per-second ticks, no progress animation —
+    // that's what was causing the visible "blink" on Home.
     let timeoutId: number | undefined;
     const scheduleNext = () => {
       const rem = cooldownRemaining();
       const cron = nextCronCheckIn();
-      // Time until the displayed minute label changes (or 30s as a floor).
-      const msUntilMinuteChange = cron > 0 ? ((cron - 1) % 60_000) + 1 : 30_000;
-      timeoutId = window.setTimeout(() => {
-        setRemaining(rem);
-        setCronIn(cron);
-        scheduleNext();
-      }, Math.max(1_000, msUntilMinuteChange));
+      setRemaining(rem);
+      setCronIn(cron);
+      // Pick whichever countdown is currently displayed; align to its next
+      // minute boundary so the label changes exactly once per minute.
+      const active = rem > 0 ? rem : cron;
+      const msUntilMinuteChange = active > 0 ? ((active - 1) % 60_000) + 1 : 30_000;
+      timeoutId = window.setTimeout(scheduleNext, Math.max(1_000, msUntilMinuteChange));
     };
     scheduleNext();
     return () => { if (timeoutId !== undefined) window.clearTimeout(timeoutId); };
-  }, [cooldownRemaining, nextCronCheckIn, remaining]);
+  }, [cooldownRemaining, nextCronCheckIn]);
 
   if (remaining <= 0) {
     return (
@@ -159,8 +150,6 @@ export function AutoCooldownIndicator({
     );
   }
 
-  const totalMs = cooldownHours * 60 * 60 * 1000;
-  const progress = ((totalMs - remaining) / totalMs) * 100;
   const remH = Math.floor(remaining / 3600000);
   const remM = Math.floor((remaining % 3600000) / 60000);
 
@@ -168,29 +157,18 @@ export function AutoCooldownIndicator({
     ? `${remH}h ${remM}min`
     : `${remM}min`;
 
+  // While in cooldown we ONLY show the cooldown line (no "Next scan", no
+  // progress bar) — keeps the widget visually static, one minute-level update.
   return (
-    <div className="flex items-start gap-3 py-2">
-      <Timer className="h-3.5 w-3.5 text-muted-foreground shrink-0 mt-0.5" />
-      <div className="flex-1 min-w-0 space-y-1.5">
-        <div className="flex items-center justify-between gap-2">
-          <p className={cn(homeInWidget.kicker, 'leading-snug')}>
-            {t('home.cooldownHeadline', {
-              hours: cooldownHours,
-              time: timeLabel,
-              defaultValue: '{{hours}}h cooldown · {{time}} left',
-            })}
-          </p>
-          <p className={cn(homeInWidget.meta, 'shrink-0 font-medium tabular-nums')}>
-            {Math.round(progress)}%
-          </p>
-        </div>
-        <div className="h-0.5 w-full bg-muted rounded-full overflow-hidden">
-          <div
-            className="h-full bg-muted-foreground/40 rounded-full transition-all duration-1000"
-            style={{ width: `${progress}%` }}
-          />
-        </div>
-      </div>
+    <div className="flex items-center gap-2 py-1 text-base font-sans">
+      <Timer className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+      <p className={cn(homeInWidget.nextScanCountdown, 'tabular-nums')}>
+        {t('home.cooldownHeadline', {
+          hours: cooldownHours,
+          time: timeLabel,
+          defaultValue: '{{hours}}h cooldown · {{time}} left',
+        })}
+      </p>
     </div>
   );
 }
