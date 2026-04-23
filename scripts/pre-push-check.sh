@@ -107,6 +107,18 @@ else
   skip "npm run check:edge is not defined"
 fi
 
+# ---- 3b. Edge function logging guardrail ------------------------------------
+# Catches functions that boot Deno.serve / serve(...) without wrapping the
+# handler in withRequestLogging — those would silently disappear from
+# BetterStack and Sentry. Cheap regex check, runs in <100 ms.
+if npm run | grep -qE "^\s+check:edge-logging"; then
+  if npm run check:edge-logging --silent 2>&1 | tee /tmp/.check-edge-logging.log | tail -20; then
+    ok "edge-logging guardrail passed"
+  else
+    fail_check "npm run check:edge-logging failed (see /tmp/.check-edge-logging.log)"
+  fi
+fi
+
 # ---- 4. Frontend build + tests ----------------------------------------------
 step "4/5  Frontend tests + build"
 
