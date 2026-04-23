@@ -26,7 +26,8 @@ export type FeatureFlagKey =
   | "pregenerate"
   | "fetch_source_feeds"
   | "grounding_enrich"
-  | "admin_library_preview";
+  | "admin_library_preview"
+  | "pause_v2_enabled";
 
 /**
  * Companion generator feature keys that are short-circuited when `panic_mode` is on.

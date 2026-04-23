@@ -235,8 +235,44 @@ push in the evening" never sneaks through.
 
 ## 6. Cron-fire and manual-trigger decision rules
 
-_Documented in full alongside Phase C (edge rewire). Placeholder section so
-the doc's numbering is stable across phases._
+The cron-fire path is the single highest-risk surface: a bug here either
+floods the user with redundant pauses or silently buries a pause the user
+needed. The engine implements exactly this table.
+
+### Cron tick (`check-volatility`)
+
+Per eligible user, after the cron has decided the user deserves a pause
+(thresholds met, not in quiet hours, not snoozed, cooldown elapsed):
+
+1. Compute `new_fingerprint` = hash of the regime-relevant parts of the
+   current context snapshot. The hash function lives in
+   `supabase/functions/_shared/pause.ts#computeContextFingerprint` and
+   rounds 24h + cumulative change percents into stable buckets so
+   minute-to-minute fluctuations don't produce a new fingerprint.
+2. Find the user's open pause: the single row (if any) with
+   `state IN ('active','engaged')`.
+3. Branch:
+   - **No open pause + no matching-fingerprint terminal within
+     `window_ms`** -> create a fresh `active` instance.
+   - **Open pause, fingerprint matches** -> reject (no-op, no push). The
+     existing pause still covers this regime.
+   - **Open pause, fingerprint differs** -> expire the old (`context_lost`,
+     `superseded_by = <new>`), then create the new `active` instance. One
+     push for the new pause.
+   - **No open pause, but a dismissed/expired pause within `window_ms`
+     has the same fingerprint** -> reject. The user already walked away
+     from this context; don't pester.
+
+During Phase C, this logic runs **alongside** the legacy path, gated by
+the `pause_v2_enabled` feature flag in `app_config.feature_flags`:
+
+- Flag off -> only the legacy `reflections` row is created.
+- Flag on  -> both the legacy row and the new `pause_instances` +
+  `pause_ai_artifacts` + companion artifacts (from the orchestrator) are
+  written in parallel. Push payloads include `pauseInstanceId`.
+
+At Phase J the flag flips to true in prod; at Phase L the legacy write
+(and this flag) are removed.
 
 ## 7. Manual-trigger rules
 

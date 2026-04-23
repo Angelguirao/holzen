@@ -28,6 +28,12 @@ import {
   holzenLovableEmailLogger,
   sendLovableEmailMessage,
 } from "../_shared/lovable-email.ts";
+import {
+  bucketChangePercent,
+  computeContextFingerprint,
+  isPauseV2Enabled,
+  upsertPauseAiArtifact,
+} from "../_shared/pause.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -177,6 +183,12 @@ serve(
 
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not configured");
+
+    // Pause V2 flag: read once per cron run. When true, we additionally
+    // create pause_instances + pause_ai_artifacts rows alongside the legacy
+    // reflection row so the two surfaces stay in sync during cutover.
+    const pauseV2 = await isPauseV2Enabled(supabase).catch(() => false);
+    holzenEdgeLog("volatility", "pause_v2_enabled", { enabled: pauseV2 });
 
     const { data: profiles, error: profilesError } = await supabase
       .from("profiles")
@@ -528,6 +540,186 @@ serve(
         .select("id")
         .single();
 
+      // Pause V2 parallel write. When the flag is on, the cron-created pause
+      // has a first-class home in `pause_instances` + `pause_ai_artifacts`.
+      // The legacy reflections row above is still written so Phase D/E/F
+      // surfaces that haven't been cut over yet keep rendering. At Phase J
+      // (cutover) we drop the legacy write; at Phase L we delete the column.
+      let pauseInstanceId: string | null = null;
+      if (pauseV2) {
+        try {
+          const directionBucket = userBtc.direction === "down" ? "down" : "up";
+          const severityBand = absChange >= 10 ? "high" : absChange >= 5 ? "moderate" : "mild";
+          const fingerprint = await computeContextFingerprint({
+            templateSlug: "volatility_v1",
+            directionBucket,
+            severityBand,
+            dailyBucketPct: bucketChangePercent(userBtc.changePercent),
+            cumulativeBucketPct: bucketChangePercent(userBtc.cumulativeChangePercent),
+            fearGreedBand: fearGreedSnapshot?.classification ?? null,
+            onChainBand: onChainSnapshot?.regime ?? null,
+          });
+
+          // A service-role supabase.rpc on pause_create_or_reuse needs
+          // auth.uid() == target user. Our `supabase` is service_role only
+          // (no user JWT), so we call via the privileged INSERT path
+          // directly: mimic the RPC's idempotency rule here so we don't
+          // need to mint a user JWT per tick.
+          // Matching fingerprint with an open instance -> reuse.
+          // Differing -> expire old (context_lost) + create new.
+          // Recent terminal match within window -> skip.
+          const { data: openInst } = await supabase
+            .from("pause_instances")
+            .select("id, state, context_fingerprint")
+            .eq("user_id", profile.user_id)
+            .in("state", ["active", "engaged"])
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+
+          let shouldCreate = true;
+          let openInstanceId: string | null = null;
+          if (openInst) {
+            if (openInst.context_fingerprint === fingerprint) {
+              shouldCreate = false;
+              pauseInstanceId = openInst.id;
+              holzenEdgeLog("volatility", "pause_v2 reuse (fingerprint_match)", {
+                userIdPrefix: String(profile.user_id).slice(0, 8),
+                instanceIdPrefix: String(openInst.id).slice(0, 8),
+              });
+            } else {
+              openInstanceId = openInst.id;
+            }
+          } else {
+            // Check for a recent terminal with matching fingerprint (don't pester).
+            const { data: terminalMatch } = await supabase
+              .from("pause_instances")
+              .select("id, terminal_at")
+              .eq("user_id", profile.user_id)
+              .eq("context_fingerprint", fingerprint)
+              .in("state", ["dismissed", "expired"])
+              .order("terminal_at", { ascending: false })
+              .limit(1)
+              .maybeSingle();
+            if (terminalMatch?.terminal_at) {
+              const windowMs = 6 * 60 * 60 * 1000; // default volatility window
+              const elapsedMs = Date.now() - new Date(terminalMatch.terminal_at).getTime();
+              if (elapsedMs < windowMs) {
+                shouldCreate = false;
+                holzenEdgeLog("volatility", "pause_v2 reuse (recent_dismissal)", {
+                  userIdPrefix: String(profile.user_id).slice(0, 8),
+                });
+              }
+            }
+          }
+
+          if (shouldCreate) {
+            // Look up template id once per tick (tiny table).
+            const { data: tplRow } = await supabase
+              .from("pause_templates")
+              .select("id, window_ms")
+              .eq("slug", "volatility_v1")
+              .eq("active", true)
+              .maybeSingle();
+            if (tplRow) {
+              const now = new Date();
+              const windowMs = Number(tplRow.window_ms) || 6 * 60 * 60 * 1000;
+
+              if (openInstanceId) {
+                await supabase
+                  .from("pause_instances")
+                  .update({
+                    state: "expired",
+                    expired_reason: "context_lost",
+                    terminal_at: now.toISOString(),
+                  })
+                  .eq("id", openInstanceId);
+              }
+
+              const { data: createdInst, error: createErr } = await supabase
+                .from("pause_instances")
+                .insert({
+                  user_id: profile.user_id,
+                  template_id: tplRow.id,
+                  state: "active",
+                  source: "cron_volatility",
+                  context_snapshot: {
+                    change_24h_pct: userBtc.changePercent,
+                    change_7d_pct: userBtc.cumulativeChangePercent,
+                    direction: userBtc.direction,
+                    severity: severityBand,
+                    fear_greed: fearGreedSnapshot ?? null,
+                    on_chain: onChainSnapshot ?? null,
+                  },
+                  context_rule_result: {
+                    triggered: [
+                      Math.abs(userBtc.changePercent) >=
+                      ((p.threshold as number | null | undefined) ?? 5)
+                        ? "daily"
+                        : null,
+                      isCumulativeMoveTriggered(
+                        userBtc.cumulativeChangePercent,
+                        p.cumulative_threshold as number | null | undefined,
+                      )
+                        ? "cumulative"
+                        : null,
+                    ].filter(Boolean),
+                  },
+                  context_fingerprint: fingerprint,
+                  window_starts_at: now.toISOString(),
+                  window_ends_at: new Date(now.getTime() + windowMs).toISOString(),
+                  superseded_by: null,
+                })
+                .select("id")
+                .single();
+
+              if (!createErr && createdInst?.id) {
+                pauseInstanceId = createdInst.id;
+                if (openInstanceId) {
+                  await supabase
+                    .from("pause_instances")
+                    .update({ superseded_by: createdInst.id })
+                    .eq("id", openInstanceId);
+                }
+                // Write the reflection_text artifact + optional haiku artifact.
+                await upsertPauseAiArtifact(supabase, {
+                  instanceId: createdInst.id,
+                  userId: profile.user_id,
+                  kind: "reflection_text",
+                  content: { message: result.message, context: ctx },
+                  model: "lovable",
+                  promptVersion: REFLECTION_PROMPT_VERSION,
+                }).catch((e) =>
+                  holzenEdgeError("volatility", "pause_v2 reflection_text upsert failed", e),
+                );
+                if (haiku) {
+                  await upsertPauseAiArtifact(supabase, {
+                    instanceId: createdInst.id,
+                    userId: profile.user_id,
+                    kind: "haiku",
+                    content: { haiku },
+                    model: "lovable",
+                    promptVersion: REFLECTION_PROMPT_VERSION,
+                  }).catch((e) =>
+                    holzenEdgeError("volatility", "pause_v2 haiku upsert failed", e),
+                  );
+                }
+                holzenEdgeLog("volatility", "pause_v2 instance created", {
+                  userIdPrefix: String(profile.user_id).slice(0, 8),
+                  instanceIdPrefix: String(createdInst.id).slice(0, 8),
+                  supersededOld: !!openInstanceId,
+                });
+              } else if (createErr) {
+                holzenEdgeError("volatility", "pause_v2 instance insert failed", createErr);
+              }
+            }
+          }
+        } catch (v2err) {
+          // Never let pause V2 failure break the legacy path during cutover.
+          holzenEdgeError("volatility", "pause_v2 parallel write threw", v2err);
+        }
+      }
+
       // Keep Library parity with manual pauses: every generated reflection
       // gets a `source_type='reflection'` bookmark row.
       const libraryUpsert = insertedReflection?.id
@@ -577,6 +769,7 @@ serve(
             holzenInvokeSource: "cron_check_volatility",
             userId: profile.user_id,
             reflectionId,
+            pauseInstanceId,
             context: ctx,
             language: userLang,
             reflectionMessage: result.message,
@@ -649,6 +842,7 @@ serve(
             title: "Holzen",
             body: result.message.slice(0, 120),
             reflectionId: insertedReflection?.id ?? null,
+            pauseInstanceId: pauseInstanceId,
             action: "pause_ready",
           });
           await Promise.all(pushSubs.map(async (sub) => {

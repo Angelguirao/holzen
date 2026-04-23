@@ -24,6 +24,7 @@ export function foldOrchestrateSettledTasks(params: {
   interventionPayload: InterventionPayload;
   userId: string;
   reflectionId: unknown;
+  pauseInstanceId?: string | null;
   t0: number;
 }): {
   response: OrchestrateResponse;
@@ -77,7 +78,16 @@ export function foldOrchestrateSettledTasks(params: {
         const cType = companionTypeMap[key];
         if (cType) {
           companionWritePromises.push(
-            writeCompanionData(params.svcClient, params.reflectionId, cType, result.value.data),
+            writeCompanionData(
+              params.svcClient,
+              params.reflectionId,
+              cType,
+              result.value.data,
+              {
+                pauseInstanceId: params.pauseInstanceId ?? null,
+                userId: params.userId,
+              },
+            ),
           );
         }
       }
@@ -116,6 +126,8 @@ export function scheduleOrchestrateBackgroundWrites(params: {
   serveInserts: any[];
   companionWritePromises: Promise<void>[];
   reflectionId: unknown;
+  pauseInstanceId?: string | null;
+  userId?: string | null;
   log: OrchestrateAssembleLog;
 }): void {
   const writePromises = [...params.companionWritePromises];
@@ -129,6 +141,10 @@ export function scheduleOrchestrateBackgroundWrites(params: {
           params.reflectionId,
           "intervention",
           params.interventionPayload as unknown as Record<string, unknown>,
+          {
+            pauseInstanceId: params.pauseInstanceId ?? null,
+            userId: params.userId ?? null,
+          },
         ),
       );
     }

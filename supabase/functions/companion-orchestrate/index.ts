@@ -143,6 +143,7 @@ serve(
 
     const {
       reflectionId,
+      pauseInstanceId,
       context,
       language = "en",
       reflectionMessage,
@@ -477,6 +478,11 @@ serve(
       }
     }
 
+    const pauseInstanceIdValue =
+      typeof pauseInstanceId === "string" && pauseInstanceId.length > 0
+        ? pauseInstanceId
+        : null;
+
     const { response, serveInserts, companionWritePromises } = foldOrchestrateSettledTasks({
       svcClient,
       keys,
@@ -485,6 +491,7 @@ serve(
       interventionPayload,
       userId,
       reflectionId,
+      pauseInstanceId: pauseInstanceIdValue,
       t0,
     });
 
@@ -496,6 +503,8 @@ serve(
       serveInserts,
       companionWritePromises,
       reflectionId,
+      pauseInstanceId: pauseInstanceIdValue,
+      userId,
       log,
     });
 

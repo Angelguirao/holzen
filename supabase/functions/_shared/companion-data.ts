@@ -1,10 +1,15 @@
 /**
  * Companion data abstraction layer.
  *
- * All companion content lives in reflection_companions. Legacy denormalized columns on
- * reflections were dropped for signal / zoom / history. Grounding text and read state are
- * also stored only on the `ground_nudge` row; v_reflection_with_companions COALESCEs the
- * join with legacy reflections.grounding_* for old rows. Do not write grounding_* on reflections.
+ * Writes go to **two places in parallel** during the Pause V2 cutover:
+ *   1. `reflection_companions` (legacy) — still canonical while `pause_v2_enabled=false`.
+ *   2. `pause_ai_artifacts` (new) — the V2 home, written only when callers pass a
+ *      `pauseInstanceId` (the orchestrator does when the cron / hook fired with V2 on).
+ *
+ * At Phase J (cutover) we set `pause_v2_enabled=true` and keep both writes; at Phase L
+ * we drop the legacy write and delete `reflection_companions` altogether. Until then,
+ * the mirror is defensive: a failed V2 write must never block the legacy path, so we
+ * wrap it in a try/catch and log only (the orchestrator already logs dependency calls).
  */
 
 interface CompanionContent {
@@ -12,13 +17,17 @@ interface CompanionContent {
 }
 
 /**
- * Write companion data for a reflection (reflection_companions only).
+ * Write companion data for a reflection.
+ * - Always writes `reflection_companions` (legacy, still canonical during cutover).
+ * - Additionally writes `pause_ai_artifacts` when `pauseInstanceId` + `userId` are
+ *   provided. Passes silently if either is missing.
  */
 export async function writeCompanionData(
   svcClient: any,
   reflectionId: string,
   companionType: string,
   content: CompanionContent,
+  options?: { pauseInstanceId?: string | null; userId?: string | null },
 ): Promise<void> {
   await svcClient.from("reflection_companions").upsert(
     {
@@ -28,6 +37,28 @@ export async function writeCompanionData(
     },
     { onConflict: "reflection_id,companion_type" },
   );
+
+  const pauseInstanceId = options?.pauseInstanceId ?? null;
+  const userId = options?.userId ?? null;
+  if (pauseInstanceId && userId) {
+    try {
+      await svcClient.from("pause_ai_artifacts").upsert(
+        {
+          pause_instance_id: pauseInstanceId,
+          user_id: userId,
+          kind: companionType,
+          content,
+        },
+        { onConflict: "pause_instance_id,kind" },
+      );
+    } catch (e) {
+      // Never fail the legacy path on V2 mirror errors.
+      console.error("[pause_v2] pause_ai_artifacts mirror upsert failed", {
+        companionType,
+        error: e instanceof Error ? e.message : String(e),
+      });
+    }
+  }
 }
 
 /**
@@ -60,6 +91,10 @@ export async function readCompanionData(
 
 /**
  * Mark a companion as read for a reflection (reflection_companions only).
+ *
+ * The V2 equivalent is a `pause_companion_events` row with
+ * `action='complete'`, logged via the `pause_log_companion` RPC — that
+ * surface belongs to Phase E (pause-session UI).
  */
 export async function markCompanionRead(
   svcClient: any,
