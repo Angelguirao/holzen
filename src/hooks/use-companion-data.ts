@@ -284,15 +284,10 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
           holzenLog.companion('orchestrate intervention skipped (idempotency)', {
             reflection_prefix: reflectionId.slice(0, 8),
           });
-          // Surface a distinct, non-blocking message so the user understands
-          // why nothing is loading on this remount and knows the "Try again"
-          // affordance is the way forward. Tagged with a stable id so we don't
-          // stack duplicates across StrictMode / fast remounts.
+          // Passive remount/idempotency skips are expected (StrictMode, quick
+          // route bounces). Keep this path silent to avoid surfacing
+          // implementation details to users; manual retry remains available.
           interventionSkippedRef.current = true;
-          sonnerToast('Already loaded for this pause', {
-            id: `intervention-skip:${reflectionId}`,
-            description: 'Tap "Try again" to fetch a fresh perspective.',
-          });
           setInterventionLoading(false);
           return;
         }
@@ -584,11 +579,10 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     // "Try again" affordance would silently skip due to the marker set on
     // the previous (failed or stale) attempt.
     if (reflectionId) resetInterventionIdempotency(reflectionId);
-    // If the prior auto-fetch was short-circuited by idempotency, dismiss
-    // the "Already loaded" notice and arm the success-confirmation toast
-    // (fired below in the effect that watches `intervention`).
+    // If the prior auto-fetch was short-circuited by idempotency, arm the
+    // success-confirmation toast (fired below in the effect that watches
+    // `intervention`) once this deliberate retry lands.
     if (interventionSkippedRef.current && reflectionId) {
-      sonnerToast.dismiss(`intervention-skip:${reflectionId}`);
       pendingRetryConfirmRef.current = reflectionId;
     }
     fetchedSlotsRef.current = new Set();
