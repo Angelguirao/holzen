@@ -85,7 +85,7 @@ serve(
 
     // Pull all matching ledger rows in one query so we can show grant status
     // (applied vs duplicate-collapsed) per checkout session.
-    const sourceRefs = sessions.data.map((s) => `cs:${s.id}`);
+    const sourceRefs = sessions.data.map((s: Stripe.Checkout.Session) => `cs:${s.id}`);
     const { data: ledgerRows } = await svcClient
       .from("credit_ledger")
       .select("source_ref, delta_credits, reason, created_at, metadata")
@@ -112,7 +112,7 @@ serve(
       ledgerByRef.set(ref, list);
     }
 
-    const events = sessions.data.map((session) => {
+    const events = sessions.data.map((session: Stripe.Checkout.Session) => {
       const kind = session.metadata?.checkout_kind ?? null;
       const packType = session.metadata?.flex_pack_type ?? null;
       const expectedCredits =
