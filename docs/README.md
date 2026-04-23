@@ -60,6 +60,8 @@ When you change behavior, update the **one** doc that owns that slice (and ADRs 
 - `ops/versioning.md` — canonical version policy: changelog version vs build/release ID vs `package.json` metadata.
 - `ops/pause-signal-companion-logging-e2e.md` — strategic goals + manual steps to trace pause → Signal (`holzen:companion` + `companion_slot_resolved`).
 - `ops/observability-and-failures.md` — where to record logs, retries, and failure modes per pipeline (checklist; links into systems and postmortems).
+- `ops/migration-security-conventions.md` — required `SECURITY DEFINER` + `search_path` conventions for every function in `supabase/migrations/`.
+- `ops/migration-view-safety.md` — when `CREATE OR REPLACE VIEW` is unsafe; use `DROP VIEW IF EXISTS … CREATE VIEW …`.
 
 ## Backlog
 
