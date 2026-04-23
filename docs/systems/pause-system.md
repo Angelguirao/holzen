@@ -413,7 +413,37 @@ schema and the transition engine treats them transparently.
 
 ## 9. Stats derivation
 
-_See [stats-system.md](stats-system.md); Phase G refresh will cross-reference back here._
+During cutover, Stats is either the legacy `StatsContent` (reads
+`reflections`) or the new `StatsContentV2` (reads `v_pause_full` +
+event tables via `usePauseStatsData`). `Profile.tsx` picks between them
+at mount based on `pause_v2_enabled`.
+
+The V2 substrate:
+
+- `src/hooks/use-pause-stats-data.ts` — one loader returning
+  `{ rows, stepEvents, companionEvents }` with realtime kept intact.
+- `src/lib/stats/pause-score.ts` — `computePauseScore` mirrors the
+  legacy 5-skill formula but eats the V2 row shape. Decision Alignment
+  weight redistributes across the other four skills when no hold goal
+  is configured (identical to the legacy behaviour).
+- `src/lib/stats/confidence.ts` — shared `sampleConfidence` helper so
+  every card labels reliability consistently.
+- `src/components/stats/{SkillBar,TrendChip,ConfidenceChip}.tsx` —
+  primitives.
+- `src/components/stats/SkillOverviewCard.tsx` — replaces the legacy
+  `HolzenScoreCard` + `SkillBalanceCard` combo with a single skills-
+  first hero. When no hold goal is configured the Alignment row shows
+  a "Not configured" CTA rather than a synthetic bar, per the target
+  model in [stats-system.md](stats-system.md).
+- `src/components/stats/StatsContentV2.tsx` — implements the four-
+  section skills-first IA: Skill Overview -> Skill Deep Dives -> Journey
+  & Consistency -> Advanced (collapsed). Deep dives + Journey scaffolds
+  land today with placeholder copy; the cards that feed them migrate
+  in subsequent commits. Advanced is collapsed by default.
+
+See [stats-system.md](stats-system.md) for the target IA and per-card
+formulas; that doc's "Recommended target model" section is the canonical
+source for what each card should render.
 
 ## 10. Badges derivation
 

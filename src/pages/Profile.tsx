@@ -25,6 +25,7 @@ import { ProLock } from '@/components/ProLock';
 import { LetterViewer } from '@/components/LetterViewer';
 
 import { BadgesPanel } from '@/components/BadgesPanel';
+import { StatsContentV2 } from '@/components/stats/StatsContentV2';
 import { MoodPriceChart } from '@/components/MoodPriceChart';
 import { MoodTrendChart } from '@/components/MoodTrendChart';
 import { MoodPriceScatter } from '@/components/MoodPriceScatter';
@@ -108,6 +109,20 @@ const Profile = () => {
   const [practiceEntries, setPracticeEntries] = useState<PracticeEntry[]>([]);
   const [holdGoal, setHoldGoal] = useState<{ type: string | null; targetMonths: number | null; targetPrice: number | null; start: string | null } | null>(null);
   const [loading, setLoading] = useState(true);
+  // Pause V2: when on, Stats + Badges read from the new tables via
+  // StatsContentV2 / (Phase H) BadgesPanelV2 instead of `reflections`.
+  const [pauseV2Enabled, setPauseV2Enabled] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const { isPauseV2Enabled } = await import('@/lib/pause-v2-flag');
+      const v = await isPauseV2Enabled();
+      if (!cancelled) setPauseV2Enabled(v);
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
   const [lettersLoading, setLettersLoading] = useState(true);
   const [viewingLetter, setViewingLetter] = useState<Letter | null>(null);
   const [tab, setTab] = useState<ProfileTab>(
@@ -280,6 +295,8 @@ const Profile = () => {
             <Skeleton className="h-20 w-full rounded-md" />
             <Skeleton className="h-40 w-full rounded-md" />
           </div>
+        ) : pauseV2Enabled ? (
+          <StatsContentV2 holdGoal={holdGoal} />
         ) : (
           <StatsContent reflections={reflections} practiceEntries={practiceEntries} letters={letters} memberSince={user?.created_at} holdGoal={holdGoal} />
         )
