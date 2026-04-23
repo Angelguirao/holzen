@@ -1521,17 +1521,45 @@ function RefreshStatusBanner({
   if (state === 'updating') {
     return (
       <div
-        className="mt-3 flex items-center gap-2 rounded-md border border-border bg-muted/20 px-3 py-2 text-xs text-muted-foreground"
+        className="mt-3 flex flex-col gap-2 rounded-md border border-border bg-muted/20 px-3 py-2 text-xs text-muted-foreground sm:flex-row sm:items-center sm:justify-between"
         role="status"
         aria-live="polite"
+        aria-busy="true"
       >
-        <LoadingSpinner className="h-3 w-3 border-[1.5px]" />
-        <span>
-          Updating balance…
-          {attemptLabel ? (
-            <span className="ml-1 opacity-70">(attempt {attemptLabel})</span>
-          ) : null}
+        <span className="flex items-center gap-2">
+          <LoadingSpinner className="h-3 w-3 border-[1.5px]" />
+          <span>
+            Updating balance…
+            {attemptLabel ? (
+              <span className="ml-1 opacity-70">(attempt {attemptLabel})</span>
+            ) : null}
+          </span>
         </span>
+        {/*
+          Non-interactive disabled affordance while a refresh is in flight.
+          The persisted lifecycle row (`holzen_checkout_refresh_state`) is
+          actively being driven here, and `handleRetryRefresh` already short-
+          circuits when `refreshState === 'updating'` — but surfacing the
+          disabled button (instead of hiding it) communicates *why* clicking
+          isn't possible right now and prevents users from rage-clicking the
+          empty space where the retry will appear once we settle into
+          `timeout` / `error`. `aria-disabled` + `tabIndex={-1}` keep
+          assistive tech from offering it as an actionable target.
+        */}
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          disabled
+          aria-disabled="true"
+          tabIndex={-1}
+          className="h-7 px-2 text-xs"
+          // No `onClick` — the upstream guard already blocks duplicate
+          // retries, and a disabled button shouldn't fire one anyway.
+        >
+          <RefreshCw className="mr-1.5 h-3 w-3 animate-spin" aria-hidden />
+          Retrying…
+        </Button>
       </div>
     );
   }
