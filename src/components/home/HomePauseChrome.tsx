@@ -141,19 +141,39 @@ export function AutoCooldownIndicator({
   });
 
   useEffect(() => {
-    const rem = cooldownRemaining();
-    const cron = nextCronCheckIn();
-    const now = Date.now();
-    setSnapshot({ remaining: rem, readyAt: now + rem, nextScanAt: now + cron });
-    const target = rem > 0 ? rem : cron;
-    if (target <= 0) return;
-    const id = window.setTimeout(() => {
-      const r2 = cooldownRemaining();
-      const c2 = nextCronCheckIn();
-      const t2 = Date.now();
-      setSnapshot({ remaining: r2, readyAt: t2 + r2, nextScanAt: t2 + c2 });
-    }, target + 500);
-    return () => window.clearTimeout(id);
+    let timeoutId: number | undefined;
+
+    const resnapshotAndSchedule = () => {
+      if (timeoutId !== undefined) window.clearTimeout(timeoutId);
+      const rem = cooldownRemaining();
+      const cron = nextCronCheckIn();
+      const now = Date.now();
+      setSnapshot({ remaining: rem, readyAt: now + rem, nextScanAt: now + cron });
+      const target = rem > 0 ? rem : cron;
+      if (target <= 0) return;
+      timeoutId = window.setTimeout(resnapshotAndSchedule, target + 500);
+    };
+
+    resnapshotAndSchedule();
+
+    // When the app resumes from the background — tab refocus, OS sleep,
+    // mobile app foreground, bfcache restore — the cached `readyAt` /
+    // `nextScanAt` may now be in the past. Resnapshot immediately so the
+    // widget reflects the real current target instead of a stale one.
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') resnapshotAndSchedule();
+    };
+    const onPageShow = () => resnapshotAndSchedule();
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('pageshow', onPageShow);
+    window.addEventListener('focus', onPageShow);
+
+    return () => {
+      if (timeoutId !== undefined) window.clearTimeout(timeoutId);
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('pageshow', onPageShow);
+      window.removeEventListener('focus', onPageShow);
+    };
   }, [cooldownRemaining, nextCronCheckIn]);
 
   // Build the formatter once per mount. Pinning the IANA timezone + 24h
