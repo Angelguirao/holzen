@@ -45,6 +45,50 @@ function createStableClockFormatter(): (ms: number) => string {
   return (ms: number) => fmt.format(new Date(ms));
 }
 
+type CooldownSnapshot = { remaining: number; readyAt: number; nextScanAt: number };
+
+const SNAPSHOT_STORAGE_KEY = 'holzen_home_cooldown_snapshot_v1';
+
+/**
+ * Hydrate the snapshot from localStorage. Returns null when nothing valid is
+ * stored, when the persisted target moments are already in the past, or when
+ * the storage layer throws (private mode, quota, etc.). The freshness check
+ * keeps us from rendering a stale "Ready at 09:12" hours after the fact.
+ */
+function readPersistedSnapshot(): CooldownSnapshot | null {
+  try {
+    const raw = localStorage.getItem(SNAPSHOT_STORAGE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as Partial<CooldownSnapshot> | null;
+    if (!parsed || typeof parsed.readyAt !== 'number' || typeof parsed.nextScanAt !== 'number' || typeof parsed.remaining !== 'number') {
+      return null;
+    }
+    const now = Date.now();
+    // If both displayed moments are already in the past, the value is stale.
+    const activeTarget = parsed.remaining > 0 ? parsed.readyAt : parsed.nextScanAt;
+    if (activeTarget <= now) return null;
+    return { remaining: parsed.remaining, readyAt: parsed.readyAt, nextScanAt: parsed.nextScanAt };
+  } catch {
+    return null;
+  }
+}
+
+function writePersistedSnapshot(snap: CooldownSnapshot): void {
+  try {
+    localStorage.setItem(SNAPSHOT_STORAGE_KEY, JSON.stringify(snap));
+  } catch { void 0; }
+}
+
+function computeFreshSnapshot(
+  cooldownRemaining: () => number,
+  nextCronCheckIn: () => number,
+): CooldownSnapshot {
+  const rem = cooldownRemaining();
+  const cron = nextCronCheckIn();
+  const now = Date.now();
+  return { remaining: rem, readyAt: now + rem, nextScanAt: now + cron };
+}
+
 
 export function NeedAMomentButton({
   onTrigger,
