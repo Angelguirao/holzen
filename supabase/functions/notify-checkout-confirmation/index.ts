@@ -185,9 +185,12 @@ serve(
 
         for (const sub of pushSubs) {
           try {
-            await webpush.sendNotification(
+            await sendWebPushWithCid(
+              log,
+              webpush,
               { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
               payload,
+              { notificationTag: idempotencyKey },
             );
             pushed++;
           } catch (pushErr: any) {
@@ -195,7 +198,11 @@ serve(
               await supabase.from("push_subscriptions").delete().eq("endpoint", sub.endpoint);
             } else {
               pushError = pushErr?.message ?? String(pushErr);
-              log("push_send_error", { endpoint: sub.endpoint.slice(0, 40), pushError });
+              // The `dependency_call` log line from `sendWebPushWithCid` already
+              // captured the error with cid + endpoint host; here we only need
+              // the higher-level signal that the per-sub send was treated as
+              // a delivery failure (vs a stale-sub prune above).
+              log.warn("push_send_failed", { pushError });
             }
           }
         }
