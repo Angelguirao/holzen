@@ -152,7 +152,7 @@ async function sendNotificationEmail(
 }
 
 serve(
-  withRequestLogging("check-volatility", async ({ req }) => {
+  withRequestLogging("check-volatility", async ({ req, log, cid }) => {
   holzenEdgeRun("volatility", "request", { method: req.method });
 
   // Auth: require service role key or cron secret
