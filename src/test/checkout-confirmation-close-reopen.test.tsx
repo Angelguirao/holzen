@@ -109,7 +109,7 @@ describe('CheckoutConfirmation close + re-open within the same guard', () => {
     // regress on re-open. flex_pack_s = 30 credits via PRICING. The number
     // and the "credits added" label live in sibling spans, so match the
     // delta directly inside the SummaryRow that owns it.
-    const creditsRowFirst = screen.getByText(/credits added/i).closest('li');
+    const creditsRowFirst = screen.getAllByText(/credits added/i)[0].closest('li');
     expect(creditsRowFirst).not.toBeNull();
     expect(creditsRowFirst!).toHaveTextContent('+30');
 
@@ -145,7 +145,7 @@ describe('CheckoutConfirmation close + re-open within the same guard', () => {
     await waitFor(() => {
       expect(screen.getAllByText(/Updating balance…/i).length).toBeGreaterThanOrEqual(2);
     });
-    const creditsRowSecond = screen.getByText(/credits added/i).closest('li');
+    const creditsRowSecond = screen.getAllByText(/credits added/i)[0].closest('li');
     expect(creditsRowSecond).not.toBeNull();
     // Sticky monotonic display value — must not regress to 0 / fallback.
     expect(creditsRowSecond!).toHaveTextContent('+30');
