@@ -25,11 +25,18 @@ export function NeedAMomentButton({
   const [remaining, setRemaining] = useState(cooldownRemaining());
 
   useEffect(() => {
+    // Only tick while a cooldown is actually counting down. When idle
+    // (remaining === 0) we don't need to re-render every second — that
+    // wasted render contributed to the subtle "blink" on Home.
+    // We re-check once after the cooldown elapses so the button re-enables.
+    if (remaining <= 0) return;
     const interval = setInterval(() => {
-      setRemaining(cooldownRemaining());
+      const next = cooldownRemaining();
+      setRemaining(next);
+      if (next <= 0) clearInterval(interval);
     }, 1000);
     return () => clearInterval(interval);
-  }, [cooldownRemaining]);
+  }, [cooldownRemaining, remaining]);
 
   const inCooldown = remaining > 0;
 
@@ -93,15 +100,17 @@ export function AutoCooldownIndicator({
   const [cronIn, setCronIn] = useState(nextCronCheckIn());
 
   useEffect(() => {
+    // Idle state ("Next scan · m:ss") only needs minute-level granularity —
+    // ticking every second caused a perpetual subtle re-render flicker on Home.
+    // Active cooldown still ticks each second so the progress bar stays smooth.
+    const tickMs = remaining > 0 ? 1000 : 15_000;
     const interval = setInterval(() => {
       const rem = cooldownRemaining();
       setRemaining(rem);
-      if (rem <= 0) {
-        setCronIn(nextCronCheckIn());
-      }
-    }, 1000);
+      setCronIn(nextCronCheckIn());
+    }, tickMs);
     return () => clearInterval(interval);
-  }, [cooldownRemaining, nextCronCheckIn]);
+  }, [cooldownRemaining, nextCronCheckIn, remaining]);
 
   if (remaining <= 0) {
     return (
@@ -115,7 +124,9 @@ export function AutoCooldownIndicator({
             defaultValue: 'Next scan · {{scan}}',
           })}
         </p>
-        <span className="h-1.5 w-1.5 rounded-full bg-primary/50 animate-pulse shrink-0" />
+        {/* Static dot — the previous animate-pulse caused a subtle continuous
+            "blink" against the muted background. */}
+        <span className="h-1.5 w-1.5 rounded-full bg-primary/40 shrink-0" />
       </div>
     );
   }
