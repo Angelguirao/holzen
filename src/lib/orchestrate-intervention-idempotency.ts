@@ -222,3 +222,44 @@ export function resetInterventionIdempotency(reflectionId: string): void {
     /* ignore */
   }
 }
+
+/**
+ * Idempotency decision for a given `reflectionId`. UI layers (e.g. the
+ * retry affordance on the Pause screen) use this to render an accurate
+ * skip message instead of guessing from the boolean `hasInvokedIntervention`.
+ *
+ *  - `none`               — no marker found; a fresh call will fire.
+ *  - `inFlight`           — a call is currently in progress in this tab.
+ *  - `completedStorage`   — a prior call finished and the marker survives
+ *                           in `sessionStorage` (normal browser path).
+ *  - `completedFallback`  — a prior call finished and the marker only
+ *                           lives in the in-memory Set because
+ *                           `sessionStorage` is unavailable / threw
+ *                           (Safari ITP, private mode, quota exceeded).
+ */
+export type InterventionIdempotencyDecision =
+  | 'none'
+  | 'inFlight'
+  | 'completedStorage'
+  | 'completedFallback';
+
+/**
+ * Pure read — does not emit telemetry (callers may poll on every render).
+ * Mirrors the precedence used inside `hasInvokedIntervention`:
+ *   in-flight Map → sessionStorage → in-memory fallback Set.
+ */
+export function getInterventionIdempotencyDecision(
+  reflectionId: string,
+): InterventionIdempotencyDecision {
+  if (!reflectionId) return 'none';
+  if (inFlight.has(reflectionId)) return 'inFlight';
+  try {
+    if (sessionStorage.getItem(storageKey(reflectionId)) === '1') {
+      return 'completedStorage';
+    }
+  } catch {
+    /* fall through */
+  }
+  if (memoryMarkers.has(reflectionId)) return 'completedFallback';
+  return 'none';
+}
