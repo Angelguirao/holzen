@@ -110,6 +110,11 @@ export function AutoCooldownIndicator({
   const { t } = useTranslation();
   const [remaining, setRemaining] = useState(cooldownRemaining());
   const [cronIn, setCronIn] = useState(nextCronCheckIn());
+  // Tracks the largest cronIn we've seen since cooldown ended. When the cron
+  // actually ticks, `nextCronCheckIn()` resets upward — that's our signal the
+  // next scan has run and it's safe to show the "Next scan" line again.
+  const [lastCronIn, setLastCronIn] = useState<number | null>(null);
+  const [scanReady, setScanReady] = useState(cooldownRemaining() <= 0);
 
   useEffect(() => {
     // Single strategy for both states: re-render only when the displayed
@@ -121,6 +126,24 @@ export function AutoCooldownIndicator({
       const cron = nextCronCheckIn();
       setRemaining(rem);
       setCronIn(cron);
+      if (rem > 0) {
+        // While cooling down, suppress the "Next scan" line. We'll re-enable
+        // it only after the next cron tick fires post-cooldown.
+        setScanReady(false);
+        setLastCronIn(null);
+      } else {
+        setLastCronIn((prev) => {
+          if (prev === null) {
+            // First tick after cooldown ended — remember current cron window
+            // and keep the line hidden until it resets upward.
+            return cron;
+          }
+          // cron resets to a larger value when the scheduled scan actually
+          // runs (e.g. jumps from ~30s back up to ~15min).
+          if (cron > prev + 30_000) setScanReady(true);
+          return cron;
+        });
+      }
       // Pick whichever countdown is currently displayed; align to its next
       // minute boundary so the label changes exactly once per minute.
       const active = rem > 0 ? rem : cron;
@@ -132,6 +155,9 @@ export function AutoCooldownIndicator({
   }, [cooldownRemaining, nextCronCheckIn]);
 
   if (remaining <= 0) {
+    // Cooldown just ended but next scan hasn't fired yet — render nothing so
+    // the widget collapses cleanly instead of jumping straight into "Next scan".
+    if (!scanReady) return null;
     return (
       <div
         className="flex items-center gap-2 py-1 text-base font-sans"
