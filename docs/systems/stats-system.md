@@ -1,4 +1,15 @@
-# Stats System (Current App Order)
+# Stats System
+
+> **Status (post Pause V2 Phase G):** the "Recommended target model
+> (skills-first)" at the bottom of this doc is **shipped behind the
+> `pause_v2_enabled` flag**. See
+> [`docs/systems/pause-system.md`](pause-system.md) §9 for the data
+> flow and [`StatsContentV2`](../../src/components/stats/StatsContentV2.tsx)
+> for the live component. The "Current App Order" section below
+> documents the legacy layout that still renders when the flag is off;
+> Phase L deletes it.
+
+## Current App Order (legacy path, rendered while `pause_v2_enabled=false`)
 
 This document explains the metrics shown **today** in `Profile > Stats`, in the same order the UI renders them.
 

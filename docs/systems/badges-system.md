@@ -1,4 +1,16 @@
-# Badges System (Current App Order)
+# Badges System
+
+> **Status (post Pause V2 Phase H):** the "Recommended target model
+> (skills-aligned badges)" at the bottom of this doc is **shipped
+> behind the `pause_v2_enabled` flag** as the 4-family / 14-active
+> model. See
+> [`docs/systems/pause-system.md`](pause-system.md) §10,
+> [`BadgesPanelV2`](../../src/components/BadgesPanelV2.tsx), and
+> [`src/lib/badges/{definitions,compute}.ts`](../../src/lib/badges/).
+> The "Current App Order" section below documents the legacy panel
+> that still renders when the flag is off; Phase L deletes it.
+
+## Current App Order (legacy path, rendered while `pause_v2_enabled=false`)
 
 This document explains the badge system exactly as it works **today** in `Profile > Badges`, in the same order users see it.
 

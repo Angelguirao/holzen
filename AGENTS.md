@@ -26,6 +26,9 @@ Instructions for AI assistants and automation working in this repository (e.g. C
 |------|----------|
 | Routes | `src/App.tsx` — `ProtectedRoute` / `PublicOnlyRoute`, layout vs full-screen routes |
 | Page screens | `src/pages/` |
+| Pause lifecycle | `src/lib/pause-state.ts` (state machine helpers), `src/lib/pause-api.ts` (typed RPC wrappers), `src/lib/pause-quality.ts` (quality score). Canonical model: [docs/systems/pause-system.md](docs/systems/pause-system.md). Schema: `supabase/migrations/20260423200{700..760}_pause_*.sql`. RPCs: `supabase/migrations/20260423201000_pause_rpc_functions.sql`. |
+| Stats | `src/components/stats/` (V2, post-Phase G). Legacy `HolzenScoreCard` / `SkillBalanceCard` / `StatsTrends` / `ReflectionStats` live during cutover and get deleted at Phase L. Scoring: `src/lib/stats/pause-score.ts`. Confidence: `src/lib/stats/confidence.ts`. |
+| Badges | `src/components/BadgesPanelV2.tsx` (post-Phase H). Definitions: `src/lib/badges/definitions.ts`. Computation: `src/lib/badges/compute.ts` (pure). Sync / celebration: `src/hooks/use-badge-sync.ts`. |
 | Shared UI | `src/components/`; primitives in `src/components/ui/` (shadcn / Radix patterns) |
 | Auth state | `src/hooks/use-auth.tsx` + `AuthProvider` in `App.tsx` |
 | Supabase browser client | `src/integrations/supabase/client.ts` |

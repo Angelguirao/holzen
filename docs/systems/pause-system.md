@@ -484,22 +484,99 @@ from the new model. See
 
 ## 11. Observability
 
-_Documented in full alongside Phase C–D (edge + hook events emit PostHog /
-Sentry tags)._
+Three surfaces share one pivot: `pause_instance_id`.
+
+- **Sentry**: edge + hook error handlers attach `pause_instance_id` as
+  a tag. Filter by `tags.pause_instance_id:<uuid>` to see every error
+  tied to a specific pause, or group by the tag to spot instance-level
+  error clusters.
+- **BetterStack**: every edge log line around pause creation carries
+  `pause_instance_id` + `pause_v2` sub-tag (e.g. `pause_v2 instance
+  created`, `pause_v2 reuse (fingerprint_match)`). Filter on
+  `"pause_v2"` to scope to V2-specific events.
+- **PostHog**: product events fired from the client (manual path) and
+  edge (cron path). Event list:
+  - `pause_instance_created` — `{ pause_instance_id, template_slug,
+    source, severity }`.
+  - `pause_engaged` — `{ pause_instance_id, ms_since_created }`.
+  - `pause_completed` — `{ pause_instance_id, ms_since_created,
+    counted_companion_count }`.
+  - `pause_expired` — `{ pause_instance_id, reason }`.
+  - `pause_companion_counted` — `{ pause_instance_id, companion_type,
+    entry_point }`.
+  - `pause_companion_not_counted` — `{ companion_type, reason,
+    entry_point, pause_instance_id? }`.
+
+These are also listed in
+[docs/ops/event-taxonomy.md](../ops/event-taxonomy.md).
 
 ## 12. Adding a new pause type
 
 Two steps, in order:
 
-1. Insert a new row into `pause_templates` with its `slug`, `window_ms`,
-   engaged/completed gates, allowed companions, and required companion
-   count.
-2. Add a code path that creates instances via `pause_create_manual` (Phase B
-   RPC) or a service-role equivalent with the new `template_id`.
+1. **Insert a `pause_templates` row.** Pick a slug (`<surface>_v1`),
+   set `window_ms`, pick your `required_for_engaged` and
+   `required_for_completed` from the existing `pause_step_type` enum,
+   list allowed companion types, and set `required_companion_count`.
+2. **Add a creation path.** Either:
+   - (Client path) call `pause_create_or_reuse` from the new hook with
+     the new `template_slug`. Reuses the Phase B RPC and its
+     idempotency rules for free.
+   - (Edge / cron path) invoke `pause_create_or_reuse` from a
+     service-role client, or use the `pause.ts` helper directly.
 
-No schema changes are required unless you introduce a brand-new step type
-(add an `ALTER TYPE pause_step_type ADD VALUE …` migration) or companion
-type (open-ended text in `allowed_companion_types`, no migration needed).
+No schema changes unless you need:
+- a new step type: `ALTER TYPE public.pause_step_type ADD VALUE 'x';`
+  (safe; no rewrite needed).
+- a new companion type: nothing — `allowed_companion_types` is an
+  unconstrained `text[]`.
+
+Document the new type in this file (Section 4 walkthrough pattern) and
+add an entry to the event-taxonomy doc.
+
+## 13. Admin / runbook
+
+Common operations (service role, via SQL Editor):
+
+```sql
+-- How many open pauses per user? (Should always be 0 or 1.)
+SELECT user_id, count(*)
+  FROM public.pause_instances
+ WHERE state IN ('active','engaged')
+ GROUP BY 1
+ HAVING count(*) > 1;
+
+-- Force-expire a pause (system_cancelled).
+SELECT public.pause_expire('<uuid>', 'system_cancelled');
+
+-- Sweep stale windows manually (cron runs this every minute once
+-- wired; see docs/ops/cron-setup.md for the pg_cron installation).
+SELECT public.pause_sweep_window_elapsed();
+
+-- Per-day lifecycle aggregate for a user.
+SELECT * FROM public.v_pause_metrics_daily
+ WHERE user_id = '<uuid>'
+ ORDER BY day DESC
+ LIMIT 30;
+
+-- Flip the V2 feature flag (admin-only).
+SELECT public.cutover_flip_pause_v2(true);   -- enable
+SELECT public.cutover_flip_pause_v2(false);  -- rollback (within 7d window)
+
+-- Reset user_badges after flag flip.
+SELECT public.cutover_reset_user_badges_baseline();
+```
+
+Related runbooks:
+
+- [pause-v2-cutover-runbook.md](../ops/pause-v2-cutover-runbook.md) —
+  staging + production cutover steps.
+- [pause-v2-post-cutover-monitoring.md](../ops/pause-v2-post-cutover-monitoring.md)
+  — seven-day green-light checklist.
+- [pause-v2-phase-l-legacy-delete.sql](../ops/pause-v2-phase-l-legacy-delete.sql)
+  — the deletion script (do not auto-run).
+- [pause-v2-phase-l-code-cleanup.md](../ops/pause-v2-phase-l-code-cleanup.md)
+  — the paired code-side cleanup manifest.
 
 ## 13. Admin / runbook
 
