@@ -28,9 +28,10 @@ export function SignalDisplay({ signal, loading, error, onRetry }: SignalDisplay
     );
   }
 
-  if (error || !signal) {
+  if (error) {
     return <CompanionError companionType="signal" onRetry={onRetry} />;
   }
+  if (!signal) return null;
 
   return (
     <div className="space-y-2">

@@ -22,9 +22,10 @@ export function HistoricalInsightDisplay({ data, loading, error, onRetry }: Prop
     );
   }
 
-  if (error || !data) {
+  if (error) {
     return <CompanionError companionType="history" onRetry={onRetry} />;
   }
+  if (!data) return null;
 
   return (
     <div className="space-y-3">

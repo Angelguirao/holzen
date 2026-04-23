@@ -171,6 +171,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
     cacheIds,
     cacheRelaxations,
     regenerateCompanion,
+    canAccessCompanion,
     fetchCompanion,
   } = useCompanionData({ companions, prefs, reflectionId, context, reflectionMessage, mood, severityNumber: SEVERITY_NUMBER[severity] ?? 3 });
 
@@ -230,8 +231,14 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           icon={COMPANION_ICONS.signal}
           expanded={expandedSignal}
           onToggle={() => {
-            setExpandedSignal((v) => !v);
-            if (!signal && !signalLoading && !signalError) fetchCompanion('signal');
+            setExpandedSignal((v) => {
+              const next = !v;
+              if (next && !signal && !signalLoading && !signalError) {
+                if (!canAccessCompanion()) return v;
+                void fetchCompanion('signal');
+              }
+              return next;
+            });
             if (!completion.signal) markCompleted('signal');
           }}
           completed={completion.signal}
@@ -284,8 +291,14 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           icon={COMPANION_ICONS.grounding}
           expanded={expandedLearning}
           onToggle={() => {
-            setExpandedLearning((v) => !v);
-            if (!nudge && !nudgeLoading && !nudgeError) fetchCompanion('grounding');
+            setExpandedLearning((v) => {
+              const next = !v;
+              if (next && !nudge && !nudgeLoading && !nudgeError) {
+                if (!canAccessCompanion()) return v;
+                void fetchCompanion('grounding');
+              }
+              return next;
+            });
             if (!completion.grounding) markCompleted('grounding');
           }}
           completed={completion.grounding}
@@ -340,8 +353,14 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           icon={COMPANION_ICONS.zoomOut}
           expanded={expandedZoomOut}
           onToggle={() => {
-            setExpandedZoomOut((v) => !v);
-            if (!zoomOut && !zoomOutLoading && !zoomOutError) fetchCompanion('zoomOut');
+            setExpandedZoomOut((v) => {
+              const next = !v;
+              if (next && !zoomOut && !zoomOutLoading && !zoomOutError) {
+                if (!canAccessCompanion()) return v;
+                void fetchCompanion('zoomOut');
+              }
+              return next;
+            });
             if (!completion.zoomOut) markCompleted('zoomOut');
           }}
           completed={completion.zoomOut}
@@ -394,8 +413,14 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
           icon={COMPANION_ICONS.history}
           expanded={expandedHistory}
           onToggle={() => {
-            setExpandedHistory((v) => !v);
-            if (!historyInsight && !historyLoading && !historyError) fetchCompanion('history');
+            setExpandedHistory((v) => {
+              const next = !v;
+              if (next && !historyInsight && !historyLoading && !historyError) {
+                if (!canAccessCompanion()) return v;
+                void fetchCompanion('history');
+              }
+              return next;
+            });
             if (!completion.history) markCompleted('history');
           }}
           completed={completion.history}

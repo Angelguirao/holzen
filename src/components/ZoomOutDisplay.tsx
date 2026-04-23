@@ -85,9 +85,10 @@ export function ZoomOutDisplay({ data, loading, error, onRetry }: Props) {
     );
   }
 
-  if (error || !data) {
+  if (error) {
     return <CompanionError companionType="zoomOut" onRetry={onRetry} />;
   }
+  if (!data) return null;
 
   const { onThisDay, currentPrice, echo, deepTime } = data;
 
