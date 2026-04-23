@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pause, Timer, Lock, ArrowRight } from 'lucide-react';
 import { LoadingButton } from '@/components/ui/loading-button';
@@ -183,6 +183,10 @@ export function AutoCooldownIndicator({
   // happens when the first paint computes a slightly different target than
   // the one the user saw moments ago.
   const [snapshot, setSnapshot] = useState(() => readPersistedSnapshot() ?? computeFreshSnapshot(cooldownRemaining, nextCronCheckIn));
+  // Mirror the latest snapshot into a ref so the scheduling logic can read
+  // the current target without re-subscribing the effect on every commit.
+  const snapshotRef = useRef(snapshot);
+  snapshotRef.current = snapshot;
 
   useEffect(() => {
     let timeoutId: number | undefined;
