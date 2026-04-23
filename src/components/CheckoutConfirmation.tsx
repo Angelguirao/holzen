@@ -427,6 +427,9 @@ export function CheckoutConfirmation() {
       // confirmation. The fresh row will be written below as the dialog
       // drives its lifecycle effect.
       writePersistedRefreshState(null);
+      // Reset the throttle signature so the fresh lifecycle's first write
+      // isn't accidentally suppressed by a stale sig from the prior guard.
+      lastPersistedSigRef.current = null;
       // Fresh guard → also drop the per-checkout refresh idempotency row so
       // mount-time + retry slots are available again for this new purchase.
       writeRefreshIdempotency(null);
@@ -760,6 +763,7 @@ export function CheckoutConfirmation() {
       // re-arrival within the guard window stays quiet (suppressed toast
       // path) instead of re-opening a stale "updating" banner.
       writePersistedRefreshState(null);
+      lastPersistedSigRef.current = null;
       return;
     }
     // Don't downgrade an existing 'error' just because we're still waiting.
