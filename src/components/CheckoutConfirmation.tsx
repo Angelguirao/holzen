@@ -385,6 +385,16 @@ export function CheckoutConfirmation() {
   // Bumped in lock-step inside `handleRetryRefresh` so the banner can show
   // "Attempt N/MAX" without us having to thread a derived value through props.
   const [refreshAttempt, setRefreshAttempt] = useState(0);
+  // Signature of the last lifecycle row we wrote to localStorage. Used to
+  // throttle the persistence effect: the deps array also includes
+  // `projectedBalance` / `creditsAdded` (so the persisted snapshot stays in
+  // sync with whatever sticky values we'd restore on remount), but those
+  // numbers can wobble between identical Stripe / wallet snapshots without
+  // the user-visible lifecycle (state / error / attempts) actually moving.
+  // Re-serialising + writing on every such tick is wasted work and shows up
+  // as `storage` events to other tabs. We only flush when the lifecycle
+  // tuple itself changes — sticky/baseline numbers piggy-back on those flushes.
+  const lastPersistedSigRef = useRef<string | null>(null);
   // Hard cap on user-initiated retries within a single confirmation window.
   // Matches the implicit ceiling already enforced by the backoff polling
   // (`maxAttempts = 6`) but applies to the *manual* "Try again" button only.
@@ -417,6 +427,9 @@ export function CheckoutConfirmation() {
       // confirmation. The fresh row will be written below as the dialog
       // drives its lifecycle effect.
       writePersistedRefreshState(null);
+      // Reset the throttle signature so the fresh lifecycle's first write
+      // isn't accidentally suppressed by a stale sig from the prior guard.
+      lastPersistedSigRef.current = null;
       // Fresh guard → also drop the per-checkout refresh idempotency row so
       // mount-time + retry slots are available again for this new purchase.
       writeRefreshIdempotency(null);
@@ -750,6 +763,7 @@ export function CheckoutConfirmation() {
       // re-arrival within the guard window stays quiet (suppressed toast
       // path) instead of re-opening a stale "updating" banner.
       writePersistedRefreshState(null);
+      lastPersistedSigRef.current = null;
       return;
     }
     // Don't downgrade an existing 'error' just because we're still waiting.
@@ -778,6 +792,14 @@ export function CheckoutConfirmation() {
     if (refreshState === 'idle') return; // cleared by the lifecycle effect above
     const guardTs = activeGuardTsRef.current;
     if (guardTs === null) return;
+    // Throttle: only write when the lifecycle tuple
+    // (guard / mode / state / error / attempts) actually changes. Sticky
+    // balance / creditsAdded / baseline ride along on those flushes — they're
+    // monotonic refs that we'd only restore on remount, so a few seconds of
+    // staleness in localStorage between lifecycle transitions is harmless.
+    const sig = `${guardTs}|${mode}|${refreshState}|${refreshError ?? ''}|${refreshAttemptRef.current}`;
+    if (lastPersistedSigRef.current === sig) return;
+    lastPersistedSigRef.current = sig;
     writePersistedRefreshState({
       guardTs,
       mode,
@@ -788,7 +810,11 @@ export function CheckoutConfirmation() {
       stickyCreditsAdded: stickyCreditsAddedRef.current,
       baseline: baselineBalanceRef.current,
     });
-  }, [mode, refreshState, refreshError, projectedBalance, creditsAdded]);
+    // `refreshAttempt` is intentionally in the dep array (not just the ref):
+    // it's the state mirror of `refreshAttemptRef`, and we want a re-run the
+    // moment a retry bumps the counter so the new attempts value lands in
+    // localStorage on the same tick the banner re-renders.
+  }, [mode, refreshState, refreshError, refreshAttempt, projectedBalance, creditsAdded]);
 
   /**
    * User-facing retry: re-invokes the subscription snapshot and surfaces an
