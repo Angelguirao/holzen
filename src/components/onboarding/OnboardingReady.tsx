@@ -2,7 +2,7 @@ import { useTranslation } from 'react-i18next';
 import { motion } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { LoadingButton } from '@/components/ui/loading-button';
-import { Sparkles, Wind, Brain, Infinity, Anchor, Lightbulb, BookOpen, Moon, Image, Mail, MessageSquare } from 'lucide-react';
+import { Sparkles, Wind, Brain, Infinity, Anchor, Lightbulb, BookOpen, Moon, Image, Mail, MessageSquare, Zap, Coins } from 'lucide-react';
 import { PRICING } from '@/lib/pricing';
 
 interface Props {
@@ -85,7 +85,7 @@ export function OnboardingReady({
 
         <div className="space-y-2">
           <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-foreground/60">
-            {t('onboarding.ready.proPlan', 'Pro')}
+            {t('onboarding.ready.proPlan', 'Pro · ${{price}}/mo', { price: PRICING.monthlyPrice })}
           </p>
           {[
             { icon: Infinity, text: t('onboarding.ready.proUnlimited', 'Unlimited pauses') },
@@ -102,6 +102,48 @@ export function OnboardingReady({
               <span className="text-xs text-foreground/80 leading-snug">{text}</span>
             </div>
           ))}
+        </div>
+
+        {/* Pro+ — compact upsell line, not a separate CTA. Pro+ is reachable
+            from Settings post-signup; keeping it inline avoids decision
+            paralysis on the trial page while still surfacing the option for
+            power users. */}
+        <div className="space-y-2 pt-1">
+          <p className="text-[10px] font-mono tracking-[0.2em] uppercase text-foreground/60">
+            {t('onboarding.ready.proPlusPlan', 'Pro+ · ${{price}}/mo', { price: PRICING.proPlusMonthlyPrice })}
+          </p>
+          <div className="flex items-start gap-2.5">
+            <Zap className="h-3 w-3 text-foreground/50 shrink-0 mt-0.5" />
+            <span className="text-xs text-foreground/70 leading-snug">
+              {t(
+                'onboarding.ready.proPlusSummary',
+                'Everything in Pro, plus {{companions}} companion deep-dives & {{wallpapers}} AI wallpapers / month',
+                {
+                  companions: PRICING.proPlusCompanionUnlocks,
+                  wallpapers: PRICING.proPlusWallpapers,
+                },
+              )}
+            </span>
+          </div>
+        </div>
+
+        {/* Flex packs — one-line top-up footnote. Purchasing happens from
+            Settings; surfacing it here just sets the expectation that limits
+            are not hard caps. */}
+        <div className="flex items-start gap-2.5 pt-1">
+          <Coins className="h-3 w-3 text-muted-foreground/40 shrink-0 mt-0.5" />
+          <span className="text-[11px] text-muted-foreground/60 leading-snug">
+            {t(
+              'onboarding.ready.flexPacksHint',
+              'Top up anytime · Flex S: {{sCredits}} credits / ${{sPrice}} · Flex M: {{mCredits}} credits / ${{mPrice}}',
+              {
+                sCredits: PRICING.flexPackSCredits,
+                sPrice: PRICING.flexPackSPrice,
+                mCredits: PRICING.flexPackMCredits,
+                mPrice: PRICING.flexPackMPrice,
+              },
+            )}
+          </span>
         </div>
       </motion.div>
 
@@ -125,9 +167,6 @@ export function OnboardingReady({
         >
           {t('onboarding.ready.beginFree', 'Continue with free plan →')}
         </button>
-        <p className="text-center text-[10px] font-mono text-muted-foreground/30 leading-relaxed">
-          {t('onboarding.ready.proPlusHint', 'Power user? Pro+ available after signup.')}
-        </p>
       </motion.div>
     </div>
   );
