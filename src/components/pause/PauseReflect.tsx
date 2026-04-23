@@ -12,6 +12,8 @@ interface Props {
   companionPrefs: CompanionPrefs;
   severity: 'mild' | 'moderate' | 'high';
   reflectionId: string | null;
+  /** Pause V2 instance id (see docs/systems/pause-system.md). */
+  pauseInstanceId?: string | null;
   context: string | null;
   reflectionMessage: string;
   isFavorite: boolean;
@@ -24,7 +26,7 @@ interface Props {
 }
 
 export function PauseReflect({
-  companions, companionPrefs, severity, reflectionId, context, reflectionMessage,
+  companions, companionPrefs, severity, reflectionId, pauseInstanceId, context, reflectionMessage,
   isFavorite, onToggleFavorite, subscribed, onContinue, onBack, mood,
 }: Props) {
   const { t } = useTranslation();
@@ -90,6 +92,7 @@ export function PauseReflect({
         prefs={companionPrefs}
         severity={severity}
         reflectionId={reflectionId}
+        pauseInstanceId={pauseInstanceId ?? null}
         context={context}
         reflectionMessage={reflectionMessage}
         mood={mood}

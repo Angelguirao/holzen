@@ -21,6 +21,7 @@ import { PauseDecide } from '@/components/pause/PauseDecide';
 import { PauseDone } from '@/components/pause/PauseDone';
 import { holzenLog } from '@/lib/holzen-console';
 import { parsePauseSessionLocationState } from '@/lib/router-location-state';
+import { logPauseStepIfV2 } from '@/lib/pause-step-logger';
 import {
   DEFAULT_COMPANIONS,
   DEFAULT_PREFS,
@@ -56,6 +57,7 @@ export default function PauseSession() {
     context: holzenContext,
     companions: holzenCompanions,
     lastReflectionId: holzenLastReflectionId,
+    lastPauseInstanceId: holzenLastPauseInstanceId,
     companionPrefs: holzenCompanionPrefs,
     severity: holzenSeverity,
     profileLoaded,
@@ -217,6 +219,11 @@ export default function PauseSession() {
   const companions = resolved?.companions ?? DEFAULT_COMPANIONS;
   const companionPrefs = resolved?.companionPrefs ?? DEFAULT_PREFS;
   const severity = resolved?.severity ?? holzenSeverity;
+  // Phase E: when pause V2 is live, every handler also logs a step event
+  // against this pause_instance_id. Manual pauses populate it via
+  // useHolzen.lastPauseInstanceId; Phase F will wire the bell + library
+  // surfaces to pass it in via navigation state.
+  const pauseInstanceId = holzenLastPauseInstanceId ?? null;
 
   const waitingForFetch = hydration.status === 'fetch' && !fetchFailed && !fetchedRow;
 
@@ -318,7 +325,12 @@ export default function PauseSession() {
     if (reflectionId) {
       await supabase.from('reflections').update({ mood } as any).eq('id', reflectionId);
     }
-  }, [reflectionId]);
+    void logPauseStepIfV2({
+      pauseInstanceId,
+      stepType: 'initial_emotion_logged',
+      payload: { mood },
+    });
+  }, [reflectionId, pauseInstanceId]);
 
   const handleMoodSkip = useCallback(() => {
     setMoodDone(true);
@@ -336,7 +348,12 @@ export default function PauseSession() {
     if (reflectionId) {
       await supabase.from('reflections').update({ mood_after: mood } as any).eq('id', reflectionId);
     }
-  }, [reflectionId]);
+    void logPauseStepIfV2({
+      pauseInstanceId,
+      stepType: 'shift_emotion_logged',
+      payload: { mood },
+    });
+  }, [reflectionId, pauseInstanceId]);
 
   const handleMoodAfterSkip = useCallback(() => {
     setMoodAfterDone(true);
@@ -360,10 +377,15 @@ export default function PauseSession() {
       setIsFavorite(!newVal); // roll back optimistic update
       return;
     }
+    void logPauseStepIfV2({
+      pauseInstanceId,
+      stepType: 'favorite_toggled',
+      payload: { is_favorite: newVal },
+    });
     if (newVal && !subscribed) {
       toast(t('pause.favoriteProHint'), { duration: 4000 });
     }
-  }, [reflectionId, isFavorite, subscribed, t]);
+  }, [reflectionId, pauseInstanceId, isFavorite, subscribed, t]);
 
   const handleClose = useCallback(() => {
     // Preserve session so user can resume later
@@ -387,6 +409,11 @@ export default function PauseSession() {
       // the 5-min staleTime or window focus).
       void refreshSubscription();
     }
+    void logPauseStepIfV2({
+      pauseInstanceId,
+      stepType: 'outcome_logged',
+      payload: { outcome: d },
+    });
     // Fetch final reflection state for score impact
     if (reflectionId) {
       const { data: ref } = await (supabase
@@ -412,7 +439,7 @@ export default function PauseSession() {
     hapticFeedback('success');
     setPhase('done');
     clearSession();
-  }, [dismissMessage, reflectionId, selectedMood, selectedMoodAfter, context, breathingCompleted, refreshSubscription]);
+  }, [dismissMessage, reflectionId, pauseInstanceId, selectedMood, selectedMoodAfter, context, breathingCompleted, refreshSubscription]);
 
   const slideX = prefersReducedMotion ? 0 : 80;
   const stepTransition = {
@@ -456,7 +483,13 @@ export default function PauseSession() {
                   mantra={mantra}
                   severity={severity}
                   completed={breathingCompleted}
-                  onComplete={() => setBreathingCompleted(true)}
+                  onComplete={() => {
+                    setBreathingCompleted(true);
+                    void logPauseStepIfV2({
+                      pauseInstanceId,
+                      stepType: 'breath_completed',
+                    });
+                  }}
                   onContinue={() => goToStep('feel')}
                 />
               </motion.div>
@@ -483,6 +516,7 @@ export default function PauseSession() {
                   companionPrefs={companionPrefs}
                   severity={severity}
                   reflectionId={reflectionId}
+                  pauseInstanceId={pauseInstanceId}
                   context={context}
                   reflectionMessage={message}
                   isFavorite={isFavorite}

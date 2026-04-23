@@ -68,6 +68,13 @@ interface UseCompanionDataParams {
   companions: CompanionData;
   prefs: CompanionPrefs;
   reflectionId?: string | null;
+  /**
+   * Pause V2 instance id. When present, every "mark companion completed"
+   * call additionally logs a `pause_companion_events` row via the
+   * `pause_log_companion` RPC. Server decides `counts_for_pause`.
+   * Unused when the flag `pause_v2_enabled` is false.
+   */
+  pauseInstanceId?: string | null;
   context?: string | null;
   reflectionMessage?: string | null;
   /** Current user mood — passed to intervention selector */
@@ -76,7 +83,7 @@ interface UseCompanionDataParams {
   severityNumber?: number;
 }
 
-export function useCompanionData({ companions, prefs, reflectionId, context, reflectionMessage, mood, severityNumber }: UseCompanionDataParams) {
+export function useCompanionData({ companions, prefs, reflectionId, pauseInstanceId, context, reflectionMessage, mood, severityNumber }: UseCompanionDataParams) {
   const { language } = useHolzen();
   const { toast } = useToast();
   const { favorites, toggleCompanionFavorite } = useCompanionLibraryFavorites(reflectionId);
@@ -137,9 +144,12 @@ export function useCompanionData({ companions, prefs, reflectionId, context, ref
     setCompletion((prev) => ({ ...prev, [key]: true }));
     hapticFeedback('light');
     if (reflectionId) {
-      await persistCompanionUiStepCompletion(reflectionId, key);
+      await persistCompanionUiStepCompletion(reflectionId, key, {
+        pauseInstanceId: pauseInstanceId ?? null,
+        entryPoint: 'pause_flow',
+      });
     }
-  }, [reflectionId, completion]);
+  }, [reflectionId, pauseInstanceId, completion]);
 
   // ── Companion state ──
   const [nudge, setNudge] = useState<NudgeData | null>(null);

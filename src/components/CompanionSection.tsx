@@ -36,6 +36,12 @@ interface Props {
   prefs: CompanionPrefs;
   severity?: 'mild' | 'moderate' | 'high';
   reflectionId?: string | null;
+  /**
+   * Pause V2 instance id. Forwarded to `useCompanionData` so companion
+   * "mark read" also logs a `pause_companion_events` row. No-op when
+   * `pause_v2_enabled` is false or the instance id is null.
+   */
+  pauseInstanceId?: string | null;
   context?: string | null;
   reflectionMessage?: string | null;
   /** Current user mood — drives intervention selection */
@@ -154,7 +160,7 @@ function CompanionCard({
 }
 
 export const CompanionSection = forwardRef<HTMLDivElement, Props>(function CompanionSection(
-  { companions, prefs, severity = 'mild', reflectionId, context, reflectionMessage, mood, sectionLead },
+  { companions, prefs, severity = 'mild', reflectionId, pauseInstanceId, context, reflectionMessage, mood, sectionLead },
   ref,
 ) {
   const { isPro } = useProGate();
@@ -173,7 +179,7 @@ export const CompanionSection = forwardRef<HTMLDivElement, Props>(function Compa
     regenerateCompanion,
     canAccessCompanion,
     fetchCompanion,
-  } = useCompanionData({ companions, prefs, reflectionId, context, reflectionMessage, mood, severityNumber: SEVERITY_NUMBER[severity] ?? 3 });
+  } = useCompanionData({ companions, prefs, reflectionId, pauseInstanceId, context, reflectionMessage, mood, severityNumber: SEVERITY_NUMBER[severity] ?? 3 });
 
   const labels = {
     pause: i18nT('companions.pause'),

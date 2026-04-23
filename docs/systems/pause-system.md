@@ -367,6 +367,26 @@ All four pause mutations flow through SECURITY DEFINER RPCs:
 Direct table writes are rejected by RLS (only `service_role` has a write
 policy). This keeps the "single source of truth" invariant honest.
 
+### Step event map (Phase E wiring)
+
+The pause UI emits one event per user action. Each event lands in
+`pause_step_events`; the transition engine re-evaluates after each
+insert so state always reflects the append-only log.
+
+| UI action | step_type | payload |
+|---|---|---|
+| Breathing exercise finished (PauseBreathing.onComplete) | `breath_completed` | `{}` |
+| Initial mood chip tapped (PauseFeel) | `initial_emotion_logged` | `{ "mood": "calm" }` |
+| Shift mood chip tapped (PauseShift) | `shift_emotion_logged` | `{ "mood": "calm" }` |
+| Decide chip tapped (PauseDecide) | `outcome_logged` | `{ "outcome": "held" }` |
+| Favorite toggled (PauseReflect header) | `favorite_toggled` | `{ "is_favorite": true }` |
+| Companion card marked read (`useCompanionData.markCompleted`) | *(also writes `pause_companion_events` with `action='complete'`)* | — |
+
+Notes / tags will land in Phases G–H as they're refactored off the
+legacy `reflections` columns and onto the canonical event stream
+(`note_updated`, `tag_updated`). The enum values already exist in the
+schema and the transition engine treats them transparently.
+
 ## 9. Stats derivation
 
 _See [stats-system.md](stats-system.md); Phase G refresh will cross-reference back here._
