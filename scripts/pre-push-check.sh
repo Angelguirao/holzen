@@ -86,7 +86,7 @@ else
     name="$(basename "$dir")"
     [ "$name" = "_shared" ] && continue
     [ -f "$dir/index.ts" ] || continue
-    if ! grep -qE "^\[functions\.${name}\]" supabase/config.toml; then
+    if ! grep -qE "^[[:space:]]*\[functions\.${name}\]" supabase/config.toml; then
       fail_check "function '${name}' has no [functions.${name}] block in supabase/config.toml"
       missing=$((missing+1))
     fi
