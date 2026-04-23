@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pause, Timer, Lock, ArrowRight } from 'lucide-react';
 import { LoadingButton } from '@/components/ui/loading-button';
@@ -12,6 +12,39 @@ function formatMsAsMS(ms: number): string {
   const s = totalSec % 60;
   return `${m}:${s.toString().padStart(2, '0')}`;
 }
+
+/**
+ * Resolve the timezone we should pin clock formatting to. We prefer the IANA
+ * zone the browser resolves *now*, so a single Intl.DateTimeFormat instance
+ * always renders the same wall-clock string for a given instant — even across
+ * DST transitions (the zone, e.g. "Europe/Madrid", is stable; only the offset
+ * shifts, and DateTimeFormat handles that consistently).
+ */
+function resolveStableTimezone(): string {
+  try {
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+    if (tz) return tz;
+  } catch { void 0; }
+  return 'UTC';
+}
+
+/**
+ * Locale- and DST-stable HH:mm formatter. Uses 24-hour `hourCycle: 'h23'` and
+ * the `en-GB` locale so the displayed glyphs ("14:32") never shift when the
+ * user changes UI language; the IANA timezone is pinned per-mount so the
+ * displayed hour represents the *same instant* regardless of DST changes.
+ */
+function createStableClockFormatter(): (ms: number) => string {
+  const timeZone = resolveStableTimezone();
+  const fmt = new Intl.DateTimeFormat('en-GB', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hourCycle: 'h23',
+    timeZone,
+  });
+  return (ms: number) => fmt.format(new Date(ms));
+}
+
 
 export function NeedAMomentButton({
   onTrigger,
@@ -123,8 +156,11 @@ export function AutoCooldownIndicator({
     return () => window.clearTimeout(id);
   }, [cooldownRemaining, nextCronCheckIn]);
 
-  const fmtClock = (ms: number) =>
-    new Date(ms).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' });
+  // Build the formatter once per mount. Pinning the IANA timezone + 24h
+  // hour-cycle + locale here means the rendered "14:32" stays identical
+  // across UI-language switches and survives DST transitions cleanly
+  // (the same instant always maps to the same wall-clock string).
+  const fmtClock = useMemo(() => createStableClockFormatter(), []);
 
   if (snapshot.remaining <= 0) {
     return (
