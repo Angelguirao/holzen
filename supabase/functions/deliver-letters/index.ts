@@ -22,7 +22,7 @@ async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise
 }
 
 serve(
-  withRequestLogging("deliver-letters", async ({ req }) => {
+  withRequestLogging("deliver-letters", async ({ req, log, cid }) => {
   try {
     holzenEdgeRun("deliver-letters", "request", { method: req.method });
     const { verifyServiceAuth } = await import("../_shared/auth.ts");
