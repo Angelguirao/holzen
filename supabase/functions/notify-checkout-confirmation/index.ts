@@ -33,8 +33,9 @@ interface Body {
   newBalance?: number;
 }
 
-const log = (step: string, data?: unknown) =>
-  console.log(`[NOTIFY-CHECKOUT-CONFIRMATION] ${step}`, data ? JSON.stringify(data) : "");
+// Note: a wrapper-bound `log` (carrying cid + fn + release) is provided to
+// the handler. Do not redefine a local `console.log` shim here — that
+// strips the cid and breaks BetterStack's `cid` pivot.
 
 async function resolveVapidPrivateKey(raw: string): Promise<string> {
   try {
