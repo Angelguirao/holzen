@@ -175,7 +175,16 @@ export async function runOnceIntervention<T>(
       memoryMarkers.add(key);
       try {
         sessionStorage.setItem(storageKey(key), '1');
-      } catch {
+      } catch (err) {
+        emit('intervention_idempotency_storage_error', {
+          reflection_prefix: reflectionPrefix(key),
+          op: 'setItem',
+          error_name: (err as { name?: string } | null)?.name ?? 'unknown',
+        });
+        emit('intervention_idempotency_fallback_used', {
+          reflection_prefix: reflectionPrefix(key),
+          phase: 'write',
+        });
         /* private mode / storage full — best-effort */
       }
       emit('intervention_first_call_latency', {
@@ -194,8 +203,12 @@ export async function runOnceIntervention<T>(
       memoryMarkers.delete(key);
       try {
         sessionStorage.removeItem(storageKey(key));
-      } catch {
-        /* ignore */
+      } catch (err) {
+        emit('intervention_idempotency_storage_error', {
+          reflection_prefix: reflectionPrefix(key),
+          op: 'removeItem',
+          error_name: (err as { name?: string } | null)?.name ?? 'unknown',
+        });
       }
       emit('intervention_first_call_latency', {
         reflection_prefix: reflectionPrefix(key),
