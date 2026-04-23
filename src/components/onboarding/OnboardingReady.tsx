@@ -94,8 +94,8 @@ export function OnboardingReady({
             { icon: Moon, text: t('onboarding.ready.proNight', 'Evening reflection prompts') },
             { icon: BookOpen, text: t('onboarding.ready.proLibrary', 'Personal library & collections') },
             { icon: Mail, text: t('onboarding.ready.proLetters', 'Letters to your future self') },
-            { icon: MessageSquare, text: t('onboarding.ready.proCompanions', '{{count}} companion deep-dives / month', { count: PRICING.proCompanionUnlocks }) },
-            { icon: Image, text: t('onboarding.ready.proWallpapers', '{{count}} AI wallpapers / month', { count: PRICING.proWallpapers }) },
+            { icon: MessageSquare, text: t('onboarding.ready.proCompanions', '{{count}} companion deep-dives included / month', { count: PRICING.proCompanionUnlocks }) },
+            { icon: Image, text: t('onboarding.ready.proWallpapers', '{{count}} AI wallpapers included / month', { count: PRICING.proWallpapers }) },
           ].map(({ icon: Icon, text }, i) => (
             <div key={i} className="flex items-center gap-2.5">
               <Icon className="h-3 w-3 text-foreground/50 shrink-0" />
@@ -117,7 +117,7 @@ export function OnboardingReady({
             <span className="text-xs text-foreground/70 leading-snug">
               {t(
                 'onboarding.ready.proPlusSummary',
-                'Everything in Pro, plus {{companions}} companion deep-dives & {{wallpapers}} AI wallpapers / month',
+                'Everything in Pro, with {{companions}} companion deep-dives & {{wallpapers}} AI wallpapers included / month',
                 {
                   companions: PRICING.proPlusCompanionUnlocks,
                   wallpapers: PRICING.proPlusWallpapers,
