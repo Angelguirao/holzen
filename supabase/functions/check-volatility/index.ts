@@ -370,30 +370,27 @@ serve(
 
     // Process all eligible users in parallel
     const results = await Promise.all(eligible.map(async (profile) => {
-      // Optimistic lock: claim the cooldown slot BEFORE generating the reflection
-      const nowIso = new Date().toISOString();
-      const { data: claimResult } = await supabase
-        .from("profiles")
-        .update({ last_trigger_at: nowIso })
-        .eq("user_id", profile.user_id)
-        .lt("last_trigger_at", new Date(Date.now() - ((profile as any).cooldown_hours ?? 6) * 60 * 60 * 1000).toISOString())
-        .select("user_id")
-        .single();
-
-      if (!claimResult) {
-        const { data: nullClaim } = await supabase
-          .from("profiles")
-          .update({ last_trigger_at: nowIso })
-          .eq("user_id", profile.user_id)
-          .is("last_trigger_at", null)
-          .select("user_id")
-          .single();
-        if (!nullClaim) {
-          holzenEdgeLog("volatility", "skip — cooldown slot claimed elsewhere", {
-            userIdPrefix: String(profile.user_id).slice(0, 8),
-          });
-          return false;
-        }
+      // Server-side idempotency: a single atomic UPDATE acts as the per-user
+      // cooldown lock. `claim_trigger_slot` returns true only for the first
+      // cron tick whose write actually flips `last_trigger_at` for this user
+      // within the cooldown window — every concurrent or duplicated tick
+      // (pg_cron retry, manual invoke, overlapping schedule) is rejected
+      // before any LLM call is made.
+      const cooldownHours = (profile as any).cooldown_hours ?? 6;
+      const { data: claimed, error: claimError } = await supabase.rpc(
+        "claim_trigger_slot",
+        { _user_id: profile.user_id, _cooldown_hours: cooldownHours },
+      );
+      if (claimError) {
+        holzenEdgeError("volatility", "claim_trigger_slot failed", claimError);
+        return false;
+      }
+      if (claimed !== true) {
+        holzenEdgeLog("volatility", "skip — cooldown slot already claimed", {
+          userIdPrefix: String(profile.user_id).slice(0, 8),
+          cooldownHours,
+        });
+        return false;
       }
 
       const userBtc = metricsForProfile(profile as { hold_goal_currency?: string | null });
