@@ -1,6 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import webpush from "https://esm.sh/web-push@3.6.7";
+import { createCidSupabaseClient, sendWebPushWithCid } from "../_shared/cid-clients.ts";
 import { holzenEdgeError, holzenEdgeLog, holzenEdgeRun } from "../_shared/holzen-edge-log.ts";
 import { coingeckoHeaders } from "../_shared/coingecko.ts";
 import { withRequestLogging } from "../_shared/with-request-logging.ts";
@@ -22,7 +22,7 @@ async function fetchWithRetry(url: string, retries = 3, delayMs = 2000): Promise
 }
 
 serve(
-  withRequestLogging("deliver-letters", async ({ req }) => {
+  withRequestLogging("deliver-letters", async ({ req, log, cid }) => {
   try {
     holzenEdgeRun("deliver-letters", "request", { method: req.method });
     const { verifyServiceAuth } = await import("../_shared/auth.ts");
@@ -34,9 +34,10 @@ serve(
       });
     }
     holzenEdgeRun("deliver-letters", "auth ok");
-    const supabase = createClient(
+    const supabase = createCidSupabaseClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+      cid,
       { auth: { persistSession: false } }
     );
 
@@ -182,9 +183,12 @@ serve(
 
             for (const sub of pushSubs) {
               try {
-                await webpush.sendNotification(
+                await sendWebPushWithCid(
+                  log,
+                  webpush,
                   { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
-                  payload
+                  payload,
+                  { notificationTag: "letter" }
                 );
               } catch (pushErr: any) {
                 if (pushErr.statusCode === 410 || pushErr.statusCode === 404) {
