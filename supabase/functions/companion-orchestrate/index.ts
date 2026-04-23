@@ -22,7 +22,7 @@ import {
   asStringArray,
 } from "../_shared/companion-orchestrate-parse.ts";
 import { logOrchestrateInvoke } from "../_shared/companion-orchestrate-logging.ts";
-import { tryOrchestrateSkipFromReflectionCompanions } from "../_shared/companion-orchestrate-skip-cached.ts";
+import { tryOrchestrateSkipFromPauseArtifacts } from "../_shared/companion-orchestrate-skip-cached.ts";
 import { buildOrchestrateCompanionTasks } from "../_shared/companion-orchestrate-tasks.ts";
 import {
   foldOrchestrateSettledTasks,
@@ -142,7 +142,7 @@ serve(
     }
 
     const {
-      reflectionId,
+      pauseInstanceId,
       context,
       language = "en",
       reflectionMessage,
@@ -179,18 +179,17 @@ serve(
     const recentHistoryTitlesValue = asStringArray(recentHistoryTitles);
     const recentZoomOutTitlesValue = asStringArray(recentZoomOutTitles);
 
-    // ── Authorization: ensure reflection ownership ──
-    // This function uses the service-role key for writes (RLS bypass), so we must
-    // explicitly verify that any provided `reflectionId` belongs to `userId`.
-    if (typeof reflectionId === "string" && reflectionId.length > 0) {
-      const { data: reflection, error: refErr } = await svcClient
-        .from("reflections")
+    // ── Authorization: verify pause_instance ownership ──
+    // service_role writes; explicitly confirm the caller owns the instance.
+    if (typeof pauseInstanceId === "string" && pauseInstanceId.length > 0) {
+      const { data: instance, error: instErr } = await svcClient
+        .from("pause_instances")
         .select("user_id")
-        .eq("id", reflectionId)
+        .eq("id", pauseInstanceId)
         .maybeSingle();
 
-      if (refErr || !reflection || reflection.user_id !== userId) {
-        return new Response(JSON.stringify({ error: "Reflection not found" }), {
+      if (instErr || !instance || instance.user_id !== userId) {
+        return new Response(JSON.stringify({ error: "Pause instance not found" }), {
           status: 403,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
@@ -210,7 +209,7 @@ serve(
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY") ?? "";
 
     let selection: InterventionSelection | null = null;
-    if (useIntervention && reflectionId) {
+    if (useIntervention && pauseInstanceId) {
       const rawSeverity = typeof body.severity === "number" ? body.severity : 0;
       const direction = parseDirection(contextValue);
       const severity = bucketSeverity(rawSeverity);
@@ -218,7 +217,7 @@ serve(
 
       selection = await selectIntervention({
         userId,
-        reflectionId: reflectionId as string,
+        pauseInstanceId: pauseInstanceId as string,
         mood: moodValue,
         severity,
         direction,
@@ -313,11 +312,11 @@ serve(
       });
     }
 
-    const rid = typeof reflectionId === "string" ? reflectionId : "";
-    if (rid.length > 0) {
-      const skipped = await tryOrchestrateSkipFromReflectionCompanions({
+    const pid = typeof pauseInstanceId === "string" ? pauseInstanceId : "";
+    if (pid.length > 0) {
+      const skipped = await tryOrchestrateSkipFromPauseArtifacts({
         svcClient,
-        reflectionId: rid,
+        pauseInstanceId: pid,
         useIntervention: Boolean(useIntervention),
         needSignal: Boolean(enableSignal),
         needGrounding: shouldRunGrounding,
@@ -380,7 +379,7 @@ serve(
       );
     }
 
-    if (selection && useIntervention && reflectionId) {
+    if (selection && useIntervention && pauseInstanceId) {
       void svcClient.from("analytics_events").insert({
         user_id: userId,
         event: "intervention_selected",
@@ -388,7 +387,7 @@ serve(
           mode: selection.mode,
           primary: selection.primary ?? null,
           secondary: selection.secondary ?? null,
-          reflection_id: reflectionId ?? null,
+          pause_instance_id: pauseInstanceId ?? null,
         },
       }).then(({ error: insErr }: { error: { message: string } | null }) => {
         if (insErr) log.error("analytics intervention_selected insert failed", { error: insErr.message });
@@ -442,7 +441,7 @@ serve(
       log,
       userId,
       body,
-      reflectionId,
+      pauseInstanceId: typeof pauseInstanceId === "string" ? pauseInstanceId : null,
       contextValue,
       languageValue,
       reflectionMessageValue,
@@ -477,6 +476,11 @@ serve(
       }
     }
 
+    const pauseInstanceIdValue =
+      typeof pauseInstanceId === "string" && pauseInstanceId.length > 0
+        ? pauseInstanceId
+        : null;
+
     const { response, serveInserts, companionWritePromises } = foldOrchestrateSettledTasks({
       svcClient,
       keys,
@@ -484,7 +488,7 @@ serve(
       selection,
       interventionPayload,
       userId,
-      reflectionId,
+      pauseInstanceId: pauseInstanceIdValue,
       t0,
     });
 
@@ -495,7 +499,8 @@ serve(
       response,
       serveInserts,
       companionWritePromises,
-      reflectionId,
+      pauseInstanceId: pauseInstanceIdValue,
+      userId,
       log,
     });
 

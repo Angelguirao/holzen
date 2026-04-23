@@ -150,7 +150,7 @@ export interface GenerateSignalParams {
   /** Citation URLs already shown recently — exclude from new search (Perplexity prompt). */
   recentSignalUrls?: string[];
   userId?: string;
-  reflectionId?: string | null;
+  pauseInstanceId?: string | null;
   searchAngle?: string;
   /** Skip library/cache phases and go straight to live (used by regenerate). */
   forceLive?: boolean;
@@ -269,7 +269,7 @@ export async function generateSignal(params: GenerateSignalParams): Promise<Sign
     recentSignalTitles,
     recentSignalUrls,
     userId,
-    reflectionId,
+    pauseInstanceId,
     searchAngle,
     forceLive,
     skipLive,
@@ -731,7 +731,7 @@ URL RULES (CRITICAL):
     category: "signal",
     name: signal.source,
     url: signal.url,
-    reflectionId,
+    pauseInstanceId,
   });
 
   // ── Step 6: Background URL validation (fire-and-forget) ──

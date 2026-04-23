@@ -33,7 +33,7 @@ export async function enqueueCatalogSourceSuggestion(
     /** Display name (author or publication) */
     name: string;
     url: string;
-    reflectionId?: string | null;
+    pauseInstanceId?: string | null;
   },
 ): Promise<void> {
   const name = opts.name?.trim();
@@ -73,7 +73,7 @@ export async function enqueueCatalogSourceSuggestion(
       status: "pending",
       metadata: {
         origin: `live_${opts.category}`,
-        reflection_id: opts.reflectionId ?? null,
+        pause_instance_id: opts.pauseInstanceId ?? null,
       },
     });
   } catch (e) {

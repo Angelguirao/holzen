@@ -70,7 +70,7 @@ export interface GenerateGroundingParams {
   /** Past nudge titles to avoid duplicating angles (typically `recentNudgeTopics` from orchestrator). */
   recentGroundingTitles?: string[];
   userId?: string;
-  reflectionId?: string | null;
+  pauseInstanceId?: string | null;
   preferredBias?: string;
   /** Skip library/cache phases and go straight to live (used by regenerate). */
   forceLive?: boolean;
@@ -209,7 +209,7 @@ export async function generateGrounding(params: GenerateGroundingParams): Promis
     recentGroundingSources,
     recentGroundingTitles,
     userId,
-    reflectionId,
+    pauseInstanceId,
     preferredBias,
     forceLive,
     skipLive,
@@ -583,7 +583,7 @@ BANNED PHRASES — NEVER use any of these: dive into, game-changer, paradigm shi
     category: "grounding",
     name: suggestName,
     url: nudge.url,
-    reflectionId,
+    pauseInstanceId,
   });
 
   // ── Step 6: Background URL validation (fire-and-forget) ──

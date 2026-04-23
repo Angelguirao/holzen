@@ -8,13 +8,13 @@ export type OrchestrateSkipCacheLog = {
 };
 
 /**
- * If reflection_companions already has every slot this invoke would generate, return a
- * response assembled from DB rows (source "cache") and skip AI, rate limit, and budget.
- * Grep: orchestrate_skip_cached
+ * If pause_ai_artifacts already has every slot this invoke would generate, return a
+ * response assembled from the existing rows (source "cache") and skip AI, rate limit,
+ * and budget. Grep: orchestrate_skip_cached.
  */
-export async function tryOrchestrateSkipFromReflectionCompanions(params: {
+export async function tryOrchestrateSkipFromPauseArtifacts(params: {
   svcClient: any;
-  reflectionId: string;
+  pauseInstanceId: string;
   useIntervention: boolean;
   needSignal: boolean;
   needGrounding: boolean;
@@ -23,14 +23,14 @@ export async function tryOrchestrateSkipFromReflectionCompanions(params: {
   log: OrchestrateSkipCacheLog;
 }): Promise<OrchestrateResponse | null> {
   const { data: rows, error } = await params.svcClient
-    .from("reflection_companions")
-    .select("companion_type, content")
-    .eq("reflection_id", params.reflectionId);
+    .from("pause_ai_artifacts")
+    .select("kind, content")
+    .eq("pause_instance_id", params.pauseInstanceId);
   if (error || !rows?.length) return null;
 
   const byType = new Map<string, unknown>();
   for (const r of rows) {
-    byType.set(r.companion_type as string, r.content);
+    byType.set(r.kind as string, r.content);
   }
 
   const hasSignal = () => contentSatisfiesCompanion("signal", byType.get("signal"));
@@ -67,11 +67,11 @@ export async function tryOrchestrateSkipFromReflectionCompanions(params: {
       : null,
   };
 
-  params.log("skip: all requested companion rows already on reflection_companions");
+  params.log("skip: all requested companion rows already on pause_ai_artifacts");
   try {
     console.log(JSON.stringify({
       holzen_event: "orchestrate_skip_cached",
-      reflection_prefix: params.reflectionId.slice(0, 8),
+      pause_prefix: params.pauseInstanceId.slice(0, 8),
       need_signal: params.needSignal,
       need_grounding: params.needGrounding,
       need_history: params.needHistory,

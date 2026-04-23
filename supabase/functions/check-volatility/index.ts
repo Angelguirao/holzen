@@ -12,7 +12,8 @@ import {
   fetchOnChainSnapshot,
   fetchGroundingSourcesForOrchestrate,
   fetchSignalSourcesForOrchestrate,
-  recencyHintsFromReflectionRows,
+  pauseRecencyInputs,
+  recencyHintsFromPauseArtifacts,
 } from "../_shared/pause-cron-parity.ts";
 import { sanitizePromptInput, sanitizePromptArray } from "../_shared/sanitize.ts";
 import { isCumulativeMoveTriggered } from "../_shared/volatility-thresholds.ts";
@@ -28,6 +29,11 @@ import {
   holzenLovableEmailLogger,
   sendLovableEmailMessage,
 } from "../_shared/lovable-email.ts";
+import {
+  bucketChangePercent,
+  computeContextFingerprint,
+  upsertPauseAiArtifact,
+} from "../_shared/pause.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -100,7 +106,7 @@ async function sendNotificationEmail(
   email: string,
   reflection: string,
   context: string,
-  reflectionId: string | null,
+  pauseInstanceId: string | null,
 ): Promise<boolean> {
   if (!Deno.env.get("LOVABLE_API_KEY")) {
     holzenEdgeError("volatility-email", "LOVABLE_API_KEY not configured");
@@ -133,7 +139,7 @@ async function sendNotificationEmail(
     },
     {
       source: "volatility-email",
-      idempotencyKey: reflectionId ? `volatility:${reflectionId}` : undefined,
+      idempotencyKey: pauseInstanceId ? `volatility:${pauseInstanceId}` : undefined,
       logger: holzenLovableEmailLogger(
         (m, d) => holzenEdgeLog("volatility-email", m, d),
         (m, err) => holzenEdgeError("volatility-email", m, err),
@@ -421,45 +427,17 @@ serve(
         100,
       );
 
-      let moodHistory: MoodHistoryEntry[] | undefined;
-      let recentMessages: string[] | undefined;
-      let recentHaikus: string[] | undefined;
-      let rowsForRecency: Parameters<typeof recencyHintsFromReflectionRows>[0] = [];
-      try {
-        const { data: recentRows } = await supabase
-          .from("v_reflection_with_companions")
-          .select(
-            "mood, outcome, created_at, message, haiku, signal_title, signal_source, grounding_title, companion_grounding_url, zoom_out_data, history_insight_data",
-          )
-          .eq("user_id", profile.user_id)
-          .order("created_at", { ascending: false })
-          .limit(20);
-        if (recentRows?.length) {
-          rowsForRecency = recentRows as Parameters<typeof recencyHintsFromReflectionRows>[0];
-          const rows = recentRows as Array<{
-            mood?: string | null;
-            outcome?: string | null;
-            created_at?: string;
-            message?: string | null;
-            haiku?: string | null;
-          }>;
-          const withMood = rows.filter((r) => r.mood);
-          if (withMood.length > 0) {
-            moodHistory = withMood.map((r) => ({
-              mood: r.mood as string,
-              outcome: r.outcome ?? null,
-              created_at: r.created_at,
-            }));
-          }
-          const msgs = rows.filter((r) => r.message).map((r) => r.message as string);
-          if (msgs.length > 0) recentMessages = msgs.slice(0, 5);
-          const haikus = rows.filter((r) => r.haiku).map((r) => r.haiku as string);
-          if (haikus.length > 0) recentHaikus = haikus.slice(0, 5);
-        }
-      } catch { /* non-fatal */ }
-
-      const recency = recencyHintsFromReflectionRows(rowsForRecency);
+      // Pause V2: pull mood history + reflection/haiku pools from the
+      // new tables, and companion recency hints from pause_ai_artifacts.
+      const [{ moodHistory, recentMessages, recentHaikus }, recency] = await Promise.all([
+        pauseRecencyInputs(supabase, profile.user_id),
+        recencyHintsFromPauseArtifacts(supabase, profile.user_id),
+      ]);
       const lastReportedMood = moodHistory?.[0]?.mood;
+      // Keep MoodHistoryEntry shape for the AI call below.
+      const moodHistoryForAi: MoodHistoryEntry[] | undefined = moodHistory
+        ? moodHistory.map((m) => ({ mood: m.mood, outcome: m.outcome, created_at: m.created_at }))
+        : undefined;
 
       // Parity with holzen-reflect: same allowlisted event before reflection AI so per-user
       // throttle (companion-orchestrate checkRateLimit) sees a consistent signal for manual vs cron.
@@ -482,7 +460,7 @@ serve(
           ? p.hold_goal_currency.trim().toUpperCase()
           : "USD",
         severity: absChange,
-        moodHistory,
+        moodHistory: moodHistoryForAi,
         recentHaikus,
         recentMessages,
         customPrompt: customPrompt || undefined,
@@ -512,38 +490,125 @@ serve(
 
       const haiku = (profile as any).companion_haiku ? result.haiku : null;
 
-      const { data: insertedReflection } = await supabase
-        .from("reflections")
-        .insert({
-          user_id: profile.user_id,
-          message: result.message,
-          context: ctx,
-          haiku,
-          // Tag provenance so admin analytics can distinguish cron-generated
-          // rows and the purge job can safely sweep ignored-notification
-          // orphans (see 20260420220000 migration + docs/ops/cron-setup.md).
-          source: "cron_volatility",
-          ...(lastReportedMood ? { mood: lastReportedMood } : {}),
-        })
-        .select("id")
-        .single();
+      // Pause V2: create (or reuse) the pause instance via the
+      // service-role RPC, which serializes per-user with an advisory
+      // lock and implements the fingerprint idempotency rule
+      // (matching fingerprint -> reuse; differing -> expire old with
+      // context_lost + supersede; recent-dismissal match -> skip).
+      const directionBucket = userBtc.direction === "down" ? "down" : "up";
+      const severityBand = absChange >= 10 ? "high" : absChange >= 5 ? "moderate" : "mild";
+      const fingerprint = await computeContextFingerprint({
+        templateSlug: "volatility_v1",
+        directionBucket,
+        severityBand,
+        dailyBucketPct: bucketChangePercent(userBtc.changePercent),
+        cumulativeBucketPct: bucketChangePercent(userBtc.cumulativeChangePercent),
+        fearGreedBand: fearGreedSnapshot?.classification ?? null,
+        onChainBand: onChainSnapshot?.regime ?? null,
+      });
 
-      // Keep Library parity with manual pauses: every generated reflection
-      // gets a `source_type='reflection'` bookmark row.
-      const libraryUpsert = insertedReflection?.id
-        ? supabase.from("library_items").upsert(
-            {
-              user_id: profile.user_id,
-              type: "bookmark",
-              title: "Reflection",
-              body: result.message,
-              source_type: "reflection",
-              reflection_id: insertedReflection.id,
-              tags: ["reflection"],
-            },
-            { onConflict: "user_id,reflection_id,source_type", ignoreDuplicates: true },
-          )
-        : Promise.resolve({ error: null });
+      const { data: createRes, error: createErr } = await supabase.rpc(
+        "pause_create_or_reuse_as",
+        {
+          p_user_id: profile.user_id,
+          p_template_slug: "volatility_v1",
+          p_source: "cron_volatility",
+          p_context_snapshot: {
+            change_24h_pct: userBtc.changePercent,
+            change_7d_pct: userBtc.cumulativeChangePercent,
+            direction: userBtc.direction,
+            severity: severityBand,
+            context_text: ctx,
+            fear_greed: fearGreedSnapshot ?? null,
+            on_chain: onChainSnapshot ?? null,
+            last_reported_mood: lastReportedMood ?? null,
+          },
+          p_context_rule_result: {
+            triggered: [
+              Math.abs(userBtc.changePercent) >= ((p.threshold as number | null | undefined) ?? 5)
+                ? "daily"
+                : null,
+              isCumulativeMoveTriggered(
+                userBtc.cumulativeChangePercent,
+                p.cumulative_threshold as number | null | undefined,
+              )
+                ? "cumulative"
+                : null,
+            ].filter(Boolean),
+          },
+          p_context_fingerprint: fingerprint,
+        },
+      );
+      if (createErr) {
+        holzenEdgeError("volatility", "pause_create_or_reuse_as failed", createErr);
+        return false;
+      }
+
+      const pauseInstanceId: string | null = createRes?.instance_id ?? null;
+      const wasCreated: boolean = createRes?.created === true;
+      const reusedReason: string | null = createRes?.reused_reason ?? null;
+
+      if (!pauseInstanceId) {
+        // Recent-dismissal match: user already walked away from this
+        // context; don't re-push.
+        holzenEdgeLog("volatility", "skip — recent dismissal with same fingerprint", {
+          userIdPrefix: String(profile.user_id).slice(0, 8),
+          reusedReason,
+        });
+        return false;
+      }
+
+      if (!wasCreated) {
+        // Fingerprint match with an already-open pause: reuse, don't
+        // re-dispatch a push.
+        holzenEdgeLog("volatility", "skip — open pause already covers this context", {
+          userIdPrefix: String(profile.user_id).slice(0, 8),
+          instanceIdPrefix: String(pauseInstanceId).slice(0, 8),
+          reusedReason,
+        });
+        return false;
+      }
+
+      // Write the reflection_text + (optional) haiku artifacts now that
+      // the instance exists.
+      await upsertPauseAiArtifact(supabase, {
+        instanceId: pauseInstanceId,
+        userId: profile.user_id,
+        kind: "reflection_text",
+        content: { message: result.message, context: ctx },
+        model: "lovable",
+        promptVersion: REFLECTION_PROMPT_VERSION,
+      }).catch((e) =>
+        holzenEdgeError("volatility", "reflection_text upsert failed", e),
+      );
+      if (haiku) {
+        await upsertPauseAiArtifact(supabase, {
+          instanceId: pauseInstanceId,
+          userId: profile.user_id,
+          kind: "haiku",
+          content: { haiku },
+          model: "lovable",
+          promptVersion: REFLECTION_PROMPT_VERSION,
+        }).catch((e) =>
+          holzenEdgeError("volatility", "haiku upsert failed", e),
+        );
+      }
+
+      // Keep Library parity with manual pauses: every generated pause
+      // gets a `source_type='reflection'` bookmark row keyed on
+      // pause_instance_id (reflection_id doesn't exist anymore).
+      const libraryUpsert = supabase.from("library_items").upsert(
+        {
+          user_id: profile.user_id,
+          type: "bookmark",
+          title: "Reflection",
+          body: result.message,
+          source_type: "reflection",
+          pause_instance_id: pauseInstanceId,
+          tags: ["reflection"],
+        },
+        { onConflict: "user_id,pause_instance_id,source_type", ignoreDuplicates: true },
+      );
 
       // Profile update and orchestrator dispatch can run in parallel
       const profileUpdate = supabase
@@ -551,8 +616,7 @@ serve(
         .update({ last_message: result.message, last_context: ctx })
         .eq("user_id", profile.user_id);
 
-      if (insertedReflection?.id) {
-        const reflectionId = insertedReflection.id;
+      {
         const enableSignal = (p.companion_signal as boolean | undefined) ?? true;
         const enableGrounding = (p.companion_grounding as boolean | undefined) ?? true;
         const enableHistory = (p.companion_history as boolean | undefined) ?? true;
@@ -565,7 +629,7 @@ serve(
           ? await fetchGroundingSourcesForOrchestrate(supabase, profile.user_id)
           : undefined;
 
-        // Fire-and-forget orchestrator — same payload shape as manual pause (use-companion-data + holzen-reflect parity).
+        // Fire-and-forget orchestrator — same payload shape as manual pause.
         fetch(`${supabaseUrl}/functions/v1/companion-orchestrate`, {
           method: "POST",
           headers: {
@@ -576,13 +640,13 @@ serve(
           body: JSON.stringify({
             holzenInvokeSource: "cron_check_volatility",
             userId: profile.user_id,
-            reflectionId,
+            pauseInstanceId,
             context: ctx,
             language: userLang,
             reflectionMessage: result.message,
             severity: absChange,
             mood: lastReportedMood ?? null,
-            moodHistory: moodHistory ?? [],
+            moodHistory: moodHistoryForAi ?? [],
             signalSources,
             groundingSources,
             recentSignalSources: recency.recentSignalSources,
@@ -603,7 +667,9 @@ serve(
               holzenEdgeError("volatility", `orchestrator HTTP ${res.status}`, t.slice(0, 300))
             );
           } else {
-            holzenEdgeLog("volatility", "orchestrator dispatched", { reflectionIdPrefix: reflectionId.slice(0, 8) });
+            holzenEdgeLog("volatility", "orchestrator dispatched", {
+              pauseInstanceIdPrefix: pauseInstanceId.slice(0, 8),
+            });
           }
         }).catch((e) => holzenEdgeError("volatility", "orchestrator fetch error", e));
       }
@@ -620,7 +686,9 @@ serve(
         holzenEdgeError("volatility", "library reflection upsert failed", libraryUpsertErr.message);
       }
 
-      // Email + push + in-app bell notification in parallel
+      // Email + push. In-app bell is emitted by the
+      // notifications_from_pause_instances trigger when the instance was
+      // created above — no explicit insert needed here.
       await Promise.all([
         // Email
         (async () => {
@@ -632,7 +700,7 @@ serve(
               email,
               result.message,
               ctx,
-              insertedReflection?.id ?? null,
+              pauseInstanceId,
             );
           }
         })(),
@@ -648,7 +716,7 @@ serve(
           const payload = JSON.stringify({
             title: "Holzen",
             body: result.message.slice(0, 120),
-            reflectionId: insertedReflection?.id ?? null,
+            pauseInstanceId,
             action: "pause_ready",
           });
           await Promise.all(pushSubs.map(async (sub) => {
@@ -672,14 +740,6 @@ serve(
             }
           }));
         })(),
-        // In-app bell record
-        supabase.from("pause_notifications").insert({
-          user_id: profile.user_id,
-          reflection_id: insertedReflection?.id ?? null,
-          message: result.message,
-          context: ctx,
-          severity: absChange >= 10 ? "high" : absChange >= 5 ? "moderate" : "mild",
-        }),
       ]);
 
       return true;

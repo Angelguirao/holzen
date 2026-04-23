@@ -23,7 +23,7 @@ export function foldOrchestrateSettledTasks(params: {
   selection: InterventionSelection | null;
   interventionPayload: InterventionPayload;
   userId: string;
-  reflectionId: unknown;
+  pauseInstanceId: string | null;
   t0: number;
 }): {
   response: OrchestrateResponse;
@@ -59,7 +59,7 @@ export function foldOrchestrateSettledTasks(params: {
 
       serveInserts.push({
         user_id: params.userId,
-        reflection_id: (params.reflectionId as string) || null,
+        pause_instance_id: params.pauseInstanceId,
         companion_type: companionTypeMap[key],
         serve_source: result.value.source,
         cache_entry_id: result.value.cacheId || null,
@@ -71,13 +71,19 @@ export function foldOrchestrateSettledTasks(params: {
 
       if (
         isCompanionContent(result.value.data) &&
-        typeof params.reflectionId === "string" &&
-        params.reflectionId.length > 0
+        typeof params.pauseInstanceId === "string" &&
+        params.pauseInstanceId.length > 0
       ) {
         const cType = companionTypeMap[key];
         if (cType) {
           companionWritePromises.push(
-            writeCompanionData(params.svcClient, params.reflectionId, cType, result.value.data),
+            writeCompanionData(
+              params.svcClient,
+              params.pauseInstanceId,
+              params.userId,
+              cType,
+              result.value.data,
+            ),
           );
         }
       }
@@ -92,7 +98,7 @@ export function foldOrchestrateSettledTasks(params: {
       };
       serveInserts.push({
         user_id: params.userId,
-        reflection_id: (params.reflectionId as string) || null,
+        pause_instance_id: params.pauseInstanceId,
         companion_type: companionTypeMap[key],
         serve_source: "empty",
         cache_entry_id: null,
@@ -115,18 +121,20 @@ export function scheduleOrchestrateBackgroundWrites(params: {
   response: OrchestrateResponse;
   serveInserts: any[];
   companionWritePromises: Promise<void>[];
-  reflectionId: unknown;
+  pauseInstanceId: string | null;
+  userId: string;
   log: OrchestrateAssembleLog;
 }): void {
   const writePromises = [...params.companionWritePromises];
 
   if (params.selection) {
     params.response.intervention = params.interventionPayload;
-    if (typeof params.reflectionId === "string" && params.reflectionId.length > 0) {
+    if (typeof params.pauseInstanceId === "string" && params.pauseInstanceId.length > 0) {
       writePromises.push(
         writeCompanionData(
           params.svcClient,
-          params.reflectionId,
+          params.pauseInstanceId,
+          params.userId,
           "intervention",
           params.interventionPayload as unknown as Record<string, unknown>,
         ),

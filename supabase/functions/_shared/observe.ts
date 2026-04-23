@@ -98,8 +98,8 @@ interface AttemptParams {
 interface AttemptLoggerOptions {
   /** User ID to associate with all attempts (for cost attribution) */
   userId?: string;
-  /** Reflection ID to associate with all attempts (for session correlation) */
-  reflectionId?: string;
+  /** Pause instance ID to associate with all attempts (for session correlation) */
+  pauseInstanceId?: string;
 }
 
 /**
@@ -122,7 +122,7 @@ interface AttemptLoggerOptions {
 export function createAttemptLogger(svcClient: any, options?: AttemptLoggerOptions) {
   let attemptOrder = 0;
   const userId = options?.userId ?? null;
-  const reflectionId = options?.reflectionId ?? null;
+  const pauseInstanceId = options?.pauseInstanceId ?? null;
 
   return (params: AttemptParams) => {
     attemptOrder++;
@@ -140,7 +140,7 @@ export function createAttemptLogger(svcClient: any, options?: AttemptLoggerOptio
       attempt_order: attemptOrder,
       estimated_cost_usd: cost,
       ...(userId ? { user_id: userId } : {}),
-      ...(reflectionId ? { reflection_id: reflectionId } : {}),
+      ...(pauseInstanceId ? { pause_instance_id: pauseInstanceId } : {}),
     }).then(() => {});
   };
 }
