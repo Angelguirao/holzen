@@ -116,7 +116,10 @@ describe('CheckoutConfirmation close + re-open within the same guard', () => {
 
     // ── 2. User closes the dialog while still `updating`. ─────────────
     // The Radix DialogClose renders an "×" button with sr-only "Close".
-    const closeBtn = screen.getByRole('button', { name: /close/i });
+    // Multiple "Close" affordances exist (Radix × in the corner + the
+    // explicit footer button). Either path tears the dialog down via the
+    // same `setMode(null)` handler — pick the first one for stability.
+    const closeBtn = screen.getAllByRole('button', { name: /close/i })[0];
     await act(async () => {
       fireEvent.click(closeBtn);
     });
