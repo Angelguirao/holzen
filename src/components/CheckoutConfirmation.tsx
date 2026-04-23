@@ -788,6 +788,14 @@ export function CheckoutConfirmation() {
     if (refreshState === 'idle') return; // cleared by the lifecycle effect above
     const guardTs = activeGuardTsRef.current;
     if (guardTs === null) return;
+    // Throttle: only write when the lifecycle tuple
+    // (guard / mode / state / error / attempts) actually changes. Sticky
+    // balance / creditsAdded / baseline ride along on those flushes — they're
+    // monotonic refs that we'd only restore on remount, so a few seconds of
+    // staleness in localStorage between lifecycle transitions is harmless.
+    const sig = `${guardTs}|${mode}|${refreshState}|${refreshError ?? ''}|${refreshAttemptRef.current}`;
+    if (lastPersistedSigRef.current === sig) return;
+    lastPersistedSigRef.current = sig;
     writePersistedRefreshState({
       guardTs,
       mode,
@@ -798,7 +806,11 @@ export function CheckoutConfirmation() {
       stickyCreditsAdded: stickyCreditsAddedRef.current,
       baseline: baselineBalanceRef.current,
     });
-  }, [mode, refreshState, refreshError, projectedBalance, creditsAdded]);
+    // `refreshAttempt` is intentionally in the dep array (not just the ref):
+    // it's the state mirror of `refreshAttemptRef`, and we want a re-run the
+    // moment a retry bumps the counter so the new attempts value lands in
+    // localStorage on the same tick the banner re-renders.
+  }, [mode, refreshState, refreshError, refreshAttempt, projectedBalance, creditsAdded]);
 
   /**
    * User-facing retry: re-invokes the subscription snapshot and surfaces an
