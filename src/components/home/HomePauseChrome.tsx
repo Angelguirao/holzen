@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Pause, Timer, Lock, ArrowRight } from 'lucide-react';
 import { LoadingButton } from '@/components/ui/loading-button';
@@ -183,33 +183,56 @@ export function AutoCooldownIndicator({
   // happens when the first paint computes a slightly different target than
   // the one the user saw moments ago.
   const [snapshot, setSnapshot] = useState(() => readPersistedSnapshot() ?? computeFreshSnapshot(cooldownRemaining, nextCronCheckIn));
+  // Mirror the latest snapshot into a ref so the scheduling logic can read
+  // the current target without re-subscribing the effect on every commit.
+  const snapshotRef = useRef(snapshot);
+  snapshotRef.current = snapshot;
 
   useEffect(() => {
     let timeoutId: number | undefined;
+    // Single, shared drift tolerance. Wake-up handlers and the natural
+    // timeout both go through `resnapshotAndSchedule`; if it's invoked
+    // *before* the displayed target moment has actually arrived (within
+    // this tolerance), we skip the state update and just reschedule —
+    // so the row's text never updates twice in quick succession.
+    const DRIFT_TOLERANCE_MS = 750;
 
-    const resnapshotAndSchedule = () => {
+    const resnapshotAndSchedule = (opts?: { force?: boolean }) => {
       if (timeoutId !== undefined) window.clearTimeout(timeoutId);
       const rem = cooldownRemaining();
       const cron = nextCronCheckIn();
       const now = Date.now();
-      const next = { remaining: rem, readyAt: now + rem, nextScanAt: now + cron };
-      setSnapshot(next);
-      writePersistedSnapshot(next);
       const target = rem > 0 ? rem : cron;
+      // Only commit a new snapshot when (a) we were asked to force one
+      // (cold mount / bfcache restore where the prior values may be
+      // stale) or (b) the previously displayed target moment has truly
+      // elapsed. Otherwise just reschedule — no re-render, no flicker.
+      const previousTargetMs = snapshotRef.current
+        ? (snapshotRef.current.remaining > 0 ? snapshotRef.current.readyAt : snapshotRef.current.nextScanAt) - now
+        : Number.POSITIVE_INFINITY;
+      const shouldCommit = opts?.force === true || previousTargetMs <= DRIFT_TOLERANCE_MS;
+      if (shouldCommit) {
+        const next = { remaining: rem, readyAt: now + rem, nextScanAt: now + cron };
+        snapshotRef.current = next;
+        setSnapshot(next);
+        writePersistedSnapshot(next);
+      }
       if (target <= 0) return;
-      timeoutId = window.setTimeout(resnapshotAndSchedule, target + 500);
+      timeoutId = window.setTimeout(() => resnapshotAndSchedule(), target + DRIFT_TOLERANCE_MS);
     };
 
-    resnapshotAndSchedule();
+    // First run after mount: force a commit so the row reflects the
+    // freshest data from the source callbacks.
+    resnapshotAndSchedule({ force: true });
 
     // When the app resumes from the background — tab refocus, OS sleep,
     // mobile app foreground, bfcache restore — the cached `readyAt` /
     // `nextScanAt` may now be in the past. Resnapshot immediately so the
     // widget reflects the real current target instead of a stale one.
     const onVisible = () => {
-      if (document.visibilityState === 'visible') resnapshotAndSchedule();
+      if (document.visibilityState === 'visible') resnapshotAndSchedule({ force: true });
     };
-    const onPageShow = () => resnapshotAndSchedule();
+    const onPageShow = () => resnapshotAndSchedule({ force: true });
     document.addEventListener('visibilitychange', onVisible);
     window.addEventListener('pageshow', onPageShow);
     window.addEventListener('focus', onPageShow);
