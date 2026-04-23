@@ -183,9 +183,12 @@ serve(
 
             for (const sub of pushSubs) {
               try {
-                await webpush.sendNotification(
+                await sendWebPushWithCid(
+                  log,
+                  webpush,
                   { endpoint: sub.endpoint, keys: { p256dh: sub.p256dh, auth: sub.auth } },
-                  payload
+                  payload,
+                  { notificationTag: "letter" }
                 );
               } catch (pushErr: any) {
                 if (pushErr.statusCode === 410 || pushErr.statusCode === 404) {
