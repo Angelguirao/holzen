@@ -704,6 +704,35 @@ serve(
                     holzenEdgeError("volatility", "pause_v2 haiku upsert failed", e),
                   );
                 }
+                // Mirror the reflection bookmark into library_items with
+                // the pause_instance_id FK. Dual-keyed during cutover;
+                // Phase L drops reflection_id.
+                await supabase
+                  .from("library_items")
+                  .upsert(
+                    {
+                      user_id: profile.user_id,
+                      type: "bookmark",
+                      title: "Reflection",
+                      body: result.message,
+                      source_type: "reflection",
+                      pause_instance_id: createdInst.id,
+                      tags: ["reflection"],
+                    },
+                    {
+                      onConflict: "user_id,pause_instance_id,source_type",
+                      ignoreDuplicates: true,
+                    },
+                  )
+                  .then(({ error: libV2Err }) => {
+                    if (libV2Err) {
+                      holzenEdgeError(
+                        "volatility",
+                        "pause_v2 library mirror failed",
+                        libV2Err,
+                      );
+                    }
+                  });
                 holzenEdgeLog("volatility", "pause_v2 instance created", {
                   userIdPrefix: String(profile.user_id).slice(0, 8),
                   instanceIdPrefix: String(createdInst.id).slice(0, 8),

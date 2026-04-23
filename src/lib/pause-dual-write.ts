@@ -123,6 +123,31 @@ export async function runPauseV2DualWrite(
           message: artErr.message,
         });
       }
+
+      // Mirror the reflection bookmark into library_items with the new
+      // pause_instance_id FK. Legacy reflection_id is still written by
+      // the caller; Phase L drops it.
+      try {
+        await supabase.from('library_items').upsert(
+          {
+            user_id: input.userId,
+            type: 'bookmark',
+            title: 'Reflection',
+            body: input.reflectionMessage,
+            source_type: 'reflection',
+            pause_instance_id: res.instance_id,
+            tags: ['reflection'],
+          } as never,
+          {
+            onConflict: 'user_id,pause_instance_id,source_type',
+            ignoreDuplicates: true,
+          } as never,
+        );
+      } catch (libErr) {
+        holzenLog.manual('pause_v2 manual: library bookmark mirror failed', {
+          message: libErr instanceof Error ? libErr.message : String(libErr),
+        });
+      }
     } else {
       holzenLog.manual('pause_v2 manual: reused existing instance', {
         instanceIdPrefix: res.instance_id.slice(0, 8),

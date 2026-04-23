@@ -66,6 +66,7 @@ export default function PauseSession() {
 
   const {
     reflectionId: navReflectionId,
+    pauseInstanceId: navPauseInstanceId,
     reflectionMessage: navReflectionMessage,
     context: navContext,
     companions: navCompanions,
@@ -219,11 +220,11 @@ export default function PauseSession() {
   const companions = resolved?.companions ?? DEFAULT_COMPANIONS;
   const companionPrefs = resolved?.companionPrefs ?? DEFAULT_PREFS;
   const severity = resolved?.severity ?? holzenSeverity;
-  // Phase E: when pause V2 is live, every handler also logs a step event
-  // against this pause_instance_id. Manual pauses populate it via
-  // useHolzen.lastPauseInstanceId; Phase F will wire the bell + library
-  // surfaces to pass it in via navigation state.
-  const pauseInstanceId = holzenLastPauseInstanceId ?? null;
+  // Pause V2 instance id. Resolution order:
+  //   1. Navigation state (Bell + Library current-pause card, Phase F).
+  //   2. Hook-aligned last manual pause (Phase D).
+  // Handlers use this to log pause_step_events via the Phase B RPCs.
+  const pauseInstanceId = navPauseInstanceId ?? holzenLastPauseInstanceId ?? null;
 
   const waitingForFetch = hydration.status === 'fetch' && !fetchFailed && !fetchedRow;
 

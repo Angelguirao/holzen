@@ -367,6 +367,30 @@ All four pause mutations flow through SECURITY DEFINER RPCs:
 Direct table writes are rejected by RLS (only `service_role` has a write
 policy). This keeps the "single source of truth" invariant honest.
 
+### Bell + Library surfaces (Phase F)
+
+**Bell** (unified `notifications` feed):
+- The `notifications_from_pause_instances` trigger fans pause lifecycle
+  into the bell:
+  - INSERT with `state='active'` -> upsert a `pause` notification with
+    `action_path='/pause'`, `action_state={ pauseInstanceId }`.
+  - UPDATE from an open state to any terminal state -> stamp
+    `dismissed_at=now()` so the bell card disappears.
+- The two legacy triggers (`notifications_from_reflections` and
+  `notifications_from_pause_notifications`) check
+  `app_config.feature_flags.pause_v2_enabled` inline and **skip** when V2
+  is on — so cutover doesn't double-emit.
+
+**Library** (`src/pages/Library.tsx`):
+- `CurrentPauseCard` sits above the tab bar. Hidden entirely when the
+  flag is off or the user has no open pause.
+- Tapping it navigates to `/pause` with `{ pauseInstanceId }` in
+  navigation state. `PauseSession` prefers that over the
+  `useHolzen.lastPauseInstanceId` fallback.
+- The existing library list below renders completed / dismissed /
+  expired pauses via `library_items` as before; those rows now also
+  carry a `pause_instance_id` FK (set by the cutover dual-write).
+
 ### Step event map (Phase E wiring)
 
 The pause UI emits one event per user action. Each event lands in
