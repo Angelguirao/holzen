@@ -234,7 +234,7 @@ export function AutoCooldownIndicator({
         : Number.POSITIVE_INFINITY;
       const shouldCommit = opts?.force === true || previousTargetMs <= DRIFT_TOLERANCE_MS;
       if (shouldCommit) {
-        const next = { remaining: rem, readyAt: now + rem, nextScanAt: now + cron };
+        const next = { remaining: rem, readyAt: now + rem, nextScanAt: computeNextScanAt(now, rem, cron) };
         snapshotRef.current = next;
         setSnapshot(next);
         writePersistedSnapshot(next);
