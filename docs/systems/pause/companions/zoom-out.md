@@ -162,3 +162,4 @@ The `partial` flag allows the card to render with whatever data succeeded (e.g.,
 - [intervention.md](intervention.md) — Intervention types (zoom-out as secondary)
 - [cron-setup.md](../../../ops/cron-setup.md) — `refresh-btc-prices` schedule; manual **`backfill-btc-prices`** for gaps
 - [navigating-the-codebase.md](../../../fundamentals/navigating-the-codebase.md) — edge functions and hooks map
+- [pricing-strategy.md](../../costs/pricing-strategy.md#311-why-zoom-out-is-excluded-from-credit-metering-v1) — why `zoom-out` is intentionally not metered in v1
